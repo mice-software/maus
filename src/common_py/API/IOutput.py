@@ -29,11 +29,21 @@ class IOutput(IModule):#pylint: disable=R0921
         """Constructor"""
         super(IOutput, self).__init__()
 
-    def save(self, data):
+    def save_spill(self, data):
         """
-        Handles the saving of data
-        @param data the data object
+        Handles the saving of spill data
+        @param data the spill data object
         @return bool success/failure
         """
-        raise NotImplementedError('save function not implemented '\
+        raise NotImplementedError('save_spill function not implemented '\
                                   'in class %s' % self.__class__.__name__)
+
+    def save_job_header(self, data):
+        """
+        Handles the saving of job header data
+        @param data the job header data object
+        @return bool success/failure
+        """
+        raise NotImplementedError('save_job_header function not implemented '\
+                                  'in class %s' % self.__class__.__name__)
+

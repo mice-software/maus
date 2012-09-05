@@ -25,6 +25,9 @@
 #pragma link C++ class MAUS::ThreeVector+;
 #pragma link C++ class std::vector<int>;
 
+#pragma link C++ class MAUS::DateTime+;
+#pragma link C++ class MAUS::JobHeader+;
+#pragma link C++ class MAUS::JobFooter+;
 #pragma link C++ class MAUS::RunHeader+;
 #pragma link C++ class MAUS::RunFooter+;
 

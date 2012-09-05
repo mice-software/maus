@@ -30,27 +30,53 @@ class OutputBase(ModuleBase, IOutput):#pylint: disable=R0921
         """Constructor"""
         super(OutputBase, self).__init__()
         
-    def save(self, data):
+    def save_spill(self, data):
+        """
+        Handles the saving of data
+
+        This is part of the public interface and serves to wrap the
+        private _save_spill method with any abstracted behaviour
+
+        @param data the spill data object
+        @return bool success/failure
+        """
+        return self._save_spill(data)
+
+    def save_job_header(self, data):
         """
         Handles the saving of data
 
         This is part of the public interface and serves to wrap the
         private _save method with any abstracted behaviour
 
-        @param data the data object
+        @param data the job_header object
         @return bool success/failure
         """
-        return self._save(data)
+        return self._save_job_header(data)
 
-    def _save(self, data):
+    def _save_spill(self, data):
         """
         Handles the saving of data
 
         This is the private method which must be overridden in derived classes
         to provide the outputters saving behaviour.
         
-        @param data the data object
+        @param data the spill object
         @return bool success/failure
         """       
-        raise NotImplementedError('_save function not implemented '\
+        raise NotImplementedError('_save_spill function not implemented '\
                                   'in class %s' % self.__class__.__name__)
+
+    def _save_job_header(self, data):
+        """
+        Handles the saving of job header data
+
+        This is the private method which must be overridden in derived classes
+        to provide the outputters saving behaviour.
+        
+        @param data the job header object
+        @return bool success/failure
+        """       
+        raise NotImplementedError('_save_job_header function not implemented '\
+                                  'in class %s' % self.__class__.__name__)
+

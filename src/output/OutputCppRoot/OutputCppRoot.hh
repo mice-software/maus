@@ -20,11 +20,12 @@
 
 #include <string>
 
-// TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
-//                call death(); needs proper error handler calling
+#include "src/common_cpp/API/OutputBase.hh"
 
 class Data;
 class JsonCppConverter;
+class JobHeader;
+class JsonCppHeaderConverter;
 class orstream;
 
 namespace MAUS {
@@ -34,7 +35,7 @@ namespace MAUS {
  *  OutputCppRoot writes the data structure out as a ROOT tree
  */
 
-class OutputCppRoot {
+class OutputCppRoot : public OutputBase<std::string> {
  public:
   /** OutputCppRoot constructor - initialise to NULL
    */
@@ -45,30 +46,57 @@ class OutputCppRoot {
   ~OutputCppRoot() {death();}
 
   /** Initialise member data using datacards
+   *
    *  @param json_datacards Json document containing datacards. Only card used
    *         is root_output_file [string], the root file name
    *
-   *  @returns True on success, False on failure
+   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
+   *  base class method
    */
-  bool birth(std::string json_datacards);
-
-  /** Store a spill in the ROOT tree
-   *
-   *  @returns True on success, False on failure
-   */
-  bool save(std::string json_spill_document);
+  inline void birth(const std::string& json_datacards) {
+      ModuleBase::birth(json_datacards);
+  }
 
   /** Delete member data
    *
-   *  @returns True on success, False on failure
+   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
+   *  base class method
    */
-  bool death();
+  inline void death() {
+      ModuleBase::death();
+  }
 
  private:
+  void _birth(const std::string& json_datacards);
+
+  void _death();
+
+  /** Store a spill in the ROOT tree
+   *
+   * OutputBase provides public interface
+   *
+   *  @returns True on success, False on failure
+   */
+  bool _save_spill(std::string json_spill_document);
+
+  /** Store job header in the ROOT tree, overwriting current job header
+   *
+   * OutputBase provides public interface
+   *
+   *  @returns True on success, False on failure
+   */
+  bool _save_job_header(std::string json_header);
+
   orstream* _outfile;
-  Data* _data;
+  orstream* _outfile_2;
+
+  Data* _spill;
   JsonCppConverter* _jsonCppConverter;
-  std::string _classname;
+
+  JobHeader* _header;
+  JsonCppHeaderConverter* _jsonCppHeaderConverter;
+
+  std::string _fname;
 };
 }
 

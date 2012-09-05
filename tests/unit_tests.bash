@@ -24,8 +24,8 @@ fi
 # force nosetests here otherwise use easy_install default python - which is 
 # hard coded to whatever easy_install was set up with (not right if we move code)
 # Issue #819
-# --cover-html --cover-html-dir=${MAUS_ROOT_DIR}/doc/python_coverage --cover-inclusive
-python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests --with-coverage -v ${MAUS_ROOT_DIR}/build
+# --with-coverage --cover-html --cover-html-dir=${MAUS_ROOT_DIR}/doc/python_coverage --cover-inclusive
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
         echo Building lcov output

@@ -20,6 +20,8 @@ Go controls the running of MAUS dataflows.
 import os
 import json
 import sys
+import datetime
+import subprocess 
 
 import maus_cpp.globals
 
@@ -173,3 +175,37 @@ class Go: # pylint: disable=R0921, R0903
         possible_types_of_dataflow['multi_process_merge_output'] = \
             MergeOutputExecutor.get_dataflow_description() 
         return possible_types_of_dataflow
+
+    @staticmethod
+    def get_job_header(json_datacards):
+        """
+        Generate the JobHeader object and send it to the output stream
+        """
+        start_of_job = {"datetime":datetime.datetime.utcnow().isoformat(' ')}
+        bzr_dir = os.path.expandvars('$MAUS_ROOT_DIR/.bzr/branch/')
+        bzr_configuration = ''
+        try:
+            bzr_conf_file = open(os.path.join(bzr_dir, 'branch.conf'))
+            bzr_configuration = bzr_conf_file.read()
+        except OSError:
+            pass
+        bzr_revision = ''
+        try:
+            bzr_rev_file = open(os.path.join(bzr_dir, 'last-revision'))
+            bzr_revision = bzr_rev_file.read()
+        except OSError:
+            pass
+        proc = subprocess.Popen(['bzr', 'status'], stdout=subprocess.PIPE,
+                                                      stderr=subprocess.STDOUT)
+        proc.wait()
+        bzr_status = proc.stdout.read()
+        maus_version = json_datacards["maus_version"]
+        return {
+            "start_of_job":start_of_job,
+            "bzr_configuration":bzr_configuration,
+            "bzr_revision":bzr_revision,
+            "bzr_status":bzr_status,
+            "maus_version":maus_version,
+            "json_configuration":json_datacards
+        }
+

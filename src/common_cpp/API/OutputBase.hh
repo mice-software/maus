@@ -32,16 +32,16 @@
 
 namespace MAUS {
 
-  /*!
-   * \class OutputBase
-   *
-   * \brief Abstract base class for all outputters
-   *
-   * \author Alexander Richards, Imperial College London
-   * \date 06/06/2012
-   */
-  template <typename T>
-  class OutputBase : public virtual IOutput<T>, public ModuleBase {
+/*!
+ * \class OutputBase
+ *
+ * \brief Abstract base class for all outputters
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ */
+template <typename T>
+class OutputBase : public virtual IOutput<T>, public ModuleBase {
 
   public:
     /*!\brief Constructor
@@ -56,26 +56,43 @@ namespace MAUS {
     virtual ~OutputBase();
 
   public:
-    /*!\brief Save data
+    /*!\brief Save spill data
      *
      * Implementation of the interface. Wraps the _save function
      * providing additional control/checking.
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    bool save(T* t);
+    bool save_spill(T t);
 
-  private:
-    /*!\brief Save data
+    /*!\brief Save header data
      *
-     * Pure virtual private function to be implemented by the
-     * derived outputter author to correctly save the input data type.
+     * Implementation of the interface. Wraps the _save function
+     * providing additional control/checking.
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    virtual bool _save(T* t) = 0;
-  };
+    bool save_job_header(T t);
 
+  private:
+    /*!\brief Save spill data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived outputter author to correctly save the input spill data type.
+     * \param T* Pointer to the input data
+     * \return boolean save status
+     */
+    virtual bool _save_spill(T t) = 0;
+
+    /*!\brief Save job header data
+     *
+     * Pure virtual private function to be implemented by the
+     * derived outputter author to correctly save the input data type.
+     * \param T* Pointer to the input header data
+     * \return boolean save status
+     */
+    virtual bool _save_job_header(T t) = 0;
+};
 }// end of namespace
 
 #include "src/common_cpp/API/OutputBase-inl.hh"
