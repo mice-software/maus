@@ -85,30 +85,13 @@ PatternRecognition::~PatternRecognition() {
 };
 
 void PatternRecognition::process(SciFiEvent &evt) {
-
-  if ( debug > 0 ) {
-    std::cout << "\nBegining Pattern Recognition" << std::endl;
-    std::cout << "Number of spacepoints in spill: " << evt.spacepoints().size() << std::endl;
-  }
-
-  if ( static_cast<int>(evt.spacepoints().size()) > 0 ) {
-
-    // Split spacepoints up according to which tracker they occured in and set used flag to false
+  if ( evt.spacepoints().size() > 0 ) {
+    evt.set_spacepoints_used_flag(false);
     std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
-    for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {  // Loop over trackers
-      for ( unsigned int i = 0; i < evt.spacepoints().size(); ++i ) {  // Loop over spacepoints
-        evt.spacepoints()[i]->set_used(false);
-        if ( evt.spacepoints()[i]->get_tracker() == trker_no ) {
-          spnts_by_tracker[trker_no].push_back(evt.spacepoints()[i]);
-        }
-      } // ~Loop over spacepoints
-    } // ~Loop over trackers
+    spnts_by_tracker = sort_by_tracker(evt.spacepoints());
 
     // Loop over trackers
     for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
-      if ( debug > 0 )
-        std::cout << "Reconstructing for Tracker " << trker_no + 1 << std::endl;
-
       // Split spacepoints according to which station they occured in
       std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(_n_stations);
       sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
@@ -124,7 +107,6 @@ void PatternRecognition::process(SciFiEvent &evt) {
         for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
           strks[i].set_tracker(trker_no);
           evt.add_straightprtrack(strks[i]);
-          // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
           htrks[i].set_tracker(trker_no);
@@ -138,7 +120,6 @@ void PatternRecognition::process(SciFiEvent &evt) {
         for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
           strks[i].set_tracker(trker_no);
           evt.add_straightprtrack(strks[i]);
-          // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
           htrks[i].set_tracker(trker_no);
@@ -152,15 +133,12 @@ void PatternRecognition::process(SciFiEvent &evt) {
         for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
           strks[i].set_tracker(trker_no);
           evt.add_straightprtrack(strks[i]);
-          // evt.set_residuals(residuals);
         }
         for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
           htrks[i].set_tracker(trker_no);
           evt.add_helicalprtrack(htrks[i]);
         }
       }
-      if ( debug > 0 )
-        std::cout << "Finished Tracker " << trker_no + 1 << std::endl;
     }// ~Loop over trackers
     std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
     std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
@@ -1202,6 +1180,19 @@ void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*> &sp
     }
   }
 } // ~sort_by_station(...)
+
+std::vector< std::vector<SciFiSpacePoint*> > PatternRecognition::sort_by_tracker(
+                                                    const std::vector<SciFiSpacePoint*> &spnts) {
+  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_tracker(_n_trackers);
+  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
+    for ( unsigned int i = 0; i < spnts.size(); ++i ) {
+      if ( spnts[i]->get_tracker() == trker_no ) {
+        spnts_by_tracker[trker_no].push_back(spnts[i]);
+      }
+    }
+  }
+  return spnts_by_tracker;
+}
 
 int PatternRecognition::num_stations_with_unused_spnts(
     const std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station) {

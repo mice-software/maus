@@ -92,6 +92,12 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   }
 
   // ================= Reconstruction =========================
+
+  if ( !spill.GetReconEvents() ) {
+    ReconEventArray* revts = new ReconEventArray();
+    spill.SetReconEvents(revts);
+  }
+
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
     SciFiDigitPArray digits;
