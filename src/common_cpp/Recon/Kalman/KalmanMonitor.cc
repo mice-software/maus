@@ -175,6 +175,11 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
 
     std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
 
+   if ( id < 15 ) {
+     mc_x  = -mc_x;
+     mc_px = -mc_px;
+   }
+
     out2 // << a(0, 0)    << " " << C(0, 0) << " "
          // << a(1, 0)    << " " << C(1, 1) << " "
          // << res_x      << " " << res_y << " "
