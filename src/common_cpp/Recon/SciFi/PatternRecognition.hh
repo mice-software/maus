@@ -60,6 +60,19 @@ class PatternRecognition {
       */
     void process(SciFiEvent &evt);
 
+     /** @brief Small function to easily add trks to a SciFiEvent
+      *
+      *  Small utility function to easily add  both straight and helical trks to a SciFiEvent,
+      *  and to set the tracker number of all the tracks added
+      *
+      *  @param strks - The straight tracks vector
+      *  @param htrks - The helical tracks vector
+      *  @param evt - The tracker number
+      *  @param evt - The SciFi event
+      */
+    void add_tracks(int trker_no, std::vector<SciFiStraightPRTrack> &strks,
+                    std::vector<SciFiHelicalPRTrack> &htrks, SciFiEvent &evt);
+
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
      *
      *  Make a Pattern Recognition track/s when there are spacepoints

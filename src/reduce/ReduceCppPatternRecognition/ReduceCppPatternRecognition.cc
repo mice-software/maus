@@ -108,6 +108,7 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
     TCanvas *c_info = reinterpret_cast<TCanvas*> (gROOT->GetListOfCanvases()->FindObject("c_info"));
 
     TPaveText *pt = new TPaveText(.05, .1, .95, .95);
+    pt->SetTextAlign(12);
     TTree * p_spoints  = &_spoints;
     TTree * p_spoints_1spill = &_spoints_1spill;
 

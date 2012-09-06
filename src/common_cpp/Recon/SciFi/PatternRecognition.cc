@@ -104,40 +104,19 @@ void PatternRecognition::process(SciFiEvent &evt) {
         std::vector<SciFiStraightPRTrack> strks;
         std::vector<SciFiHelicalPRTrack> htrks;
         make_5tracks(spnts_by_station, strks, htrks);
-        for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
-          strks[i].set_tracker(trker_no);
-          evt.add_straightprtrack(strks[i]);
-        }
-        for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
-          htrks[i].set_tracker(trker_no);
-          evt.add_helicalprtrack(htrks[i]);
-        }
+        add_tracks(trker_no, strks, htrks, evt);
       }
       if (num_stations_hit > 3) {
         std::vector<SciFiStraightPRTrack> strks;
         std::vector<SciFiHelicalPRTrack> htrks;
         make_4tracks(spnts_by_station, strks, htrks);
-        for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
-          strks[i].set_tracker(trker_no);
-          evt.add_straightprtrack(strks[i]);
-        }
-        for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
-          htrks[i].set_tracker(trker_no);
-          evt.add_helicalprtrack(htrks[i]);
-        }
+        add_tracks(trker_no, strks, htrks, evt);
       }
       if (num_stations_hit > 2) {
         std::vector<SciFiStraightPRTrack> strks;
         std::vector<SciFiHelicalPRTrack> htrks;
         make_3tracks(spnts_by_station, strks, htrks);
-        for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
-          strks[i].set_tracker(trker_no);
-          evt.add_straightprtrack(strks[i]);
-        }
-        for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
-          htrks[i].set_tracker(trker_no);
-          evt.add_helicalprtrack(htrks[i]);
-        }
+        add_tracks(trker_no, strks, htrks, evt);
       }
     }// ~Loop over trackers
     std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
@@ -146,6 +125,18 @@ void PatternRecognition::process(SciFiEvent &evt) {
     std::cout << "No spacepoints in event" << std::endl;
   }
 };
+
+void PatternRecognition::add_tracks(int trker_no, std::vector<SciFiStraightPRTrack> &strks,
+                                    std::vector<SciFiHelicalPRTrack> &htrks, SciFiEvent &evt ) {
+  for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
+    strks[i].set_tracker(trker_no);
+    evt.add_straightprtrack(strks[i]);
+  }
+  for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
+    htrks[i].set_tracker(trker_no);
+    evt.add_helicalprtrack(htrks[i]);
+  }
+}
 
 void PatternRecognition::make_5tracks(
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station,
