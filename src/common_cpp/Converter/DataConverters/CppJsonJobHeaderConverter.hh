@@ -15,44 +15,42 @@
  *
  */
 
-#ifndef JSONCPPCONVERTER_H
-#define JSONCPPCONVERTER_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONHEADERCONVERTER_H_
+#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONHEADERCONVERTER_H_
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
+class JobHeaderData;
+
 /*!
- * \class JsonCppConverter
+ * \class CppJsonHeaderConverter
  *
- * \brief Converts JSON documents into corresponding binary Cpp fromat
+ * \brief Converts binary Cpp header into corresponding json type
  *
  * JsonCppConverter is build on \a ConverterBase as a specialisation to
  * handle the conversion of data from \a Json::Value to binary \a MausData
  * format. Since Json documents often come in the form of a string, these
  * too are accepted and parsed on the fly.
- *
- * \author Alexander Richards, Imperial College London
- * \date 06/01/2012
  */
-  class JsonCppConverter : public ConverterBase<Json::Value, Spill> {
+  class CppJsonHeaderConverter : public ConverterBase<JobHeaderData, Json::Value> {
   public:
-    JsonCppConverter()
-      : ConverterBase<Json::Value, Spill>("JsonCppConverter") {}
+    CppJsonHeaderConverter()
+      : ConverterBase<JobHeaderData, Json::Value>("CppJsonConverter") {}
 
   private:
     /*!
-     * \brief Convert Json value
-     * Overloaded process initiate the conversion process converting the
-     * \a Json::Value given as the argument into the output type \a MausData
+     * \brief Convert MausData
+     * Overloaded process initiates the conversion process converting the
+     * \a MausData given as the argument into the output type \a Json::Value
      *
-     * \param Json::Value& The root \a Json::Value object from the Json data
-     *        file
-     * \return a pointer to the MausData object
+     * \param MausData& The root \a MausData object from the cpp data structure
+     * \return a pointer to the Json::Value object
      */
-    Spill* _convert(const Json::Value*) const;
+    Json::Value* _convert(const JobHeaderData*) const;
+
   private:
 };
 }

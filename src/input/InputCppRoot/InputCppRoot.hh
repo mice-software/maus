@@ -23,13 +23,11 @@
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/API/InputBase.hh"
 
 class irstream;
 
 namespace MAUS {
-
-class CppJsonConverter;
 
 /** @class InputCppRoot
  *
@@ -38,7 +36,7 @@ class CppJsonConverter;
  *  JsonCppStreamer to read ROOT files and JsonCppConverter to convert from
  *  ROOT to json.
  */
-class InputCppRoot {
+class InputCppRoot : public InputBase<std::string> {
   public:
     /** Constructor for InputCppRoot, initialises all members to NULL
      *
@@ -46,36 +44,62 @@ class InputCppRoot {
      *         pulling a filename from the datacards at birth
      */
     explicit InputCppRoot(std::string filename = "");
+
     /** Destructor for InputCppRoot - calls death()
      */
     ~InputCppRoot();
 
+    void birth(const std::string& json_datacards) {
+        InputBase<std::string>::birth(json_datacards);
+    }
+
+    void death() {
+        InputBase<std::string>::death();
+    }
+
+
+  private:
     /** Initialise the inputter
      *
      *  @param json_datacards json formatted string containing the json datacards
      *  - takes root file from "root_input_filename" parameter
      */
-    bool birth(std::string json_datacards);
+    void _birth(const std::string& json_datacards);
 
     /** Deletes inputter member data
      */
-    bool death();
+    void _death();
 
     /** Gets the next event from the root file. If there are no more events,
      *  returns an empty string ("")
+     *
+     *  This will cycle through - first attempts to find a JobHeader, then a
+     *  RunHeader, then spill until the Spill number changes; then RunFooter,
+     *  then RunHeader, then spill until the Spill number changes ...
      */
-    std::string getNextEvent();
+    std::string _emitter_cpp();
 
-    /** The emitter - should be overloaded by SWIG script
+    std::string load_data();
+
+    std::string _load_job_header();
+
+    /** Gets an event from the root file.
+     *
+     *  If there are no more events of the given type, or the event could not be
+     *  resolved (data inconsistencies?) return ""
+     *
+     *  Note that if we are accessing a different branch from last time, we have
+     *  to reopen _infile with the new branch name (that's how irstream works). 
      */
-    std::string emitter() {
-      return "";
-    }
+    template <class ConverterT, class DataT>
+    std::string _load_event(std::string branch_name);
 
-  private:
+    /** _irstream holds root TFile.
+     *
+     *  Should always be open and pointing to Spill TTree or closed.
+     */
     irstream* _infile;
-    CppJsonConverter* _cppJsonConverter;
-    Data* _data;
+    std::string _infile_branch;
     std::string _filename;
     std::string _classname;
 };

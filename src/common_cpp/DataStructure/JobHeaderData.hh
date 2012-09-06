@@ -15,49 +15,49 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_DATA_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_DATA_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_JOBHEADERDATA_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_JOBHEADERDATA_HH_
 
 #include <string>
-
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
 
-class Spill;
+class JobHeader;
 
-/** Data is the root of the MAUS physics data structure
+/** JobHeaderData is the root of the MAUS job header structure
  *
- *  Data class is the root class for the MAUS physics data structure. It
- *  just holds a pointer to the spill.
+ *  JobHeaderData class is the root class for the MAUS job header structure. It
+ *  just holds a pointer to the header. This is to handle stupid way in which
+ *  ROOT does data structure stuff.
  */
-class Data : public MAUSEvent<Spill> {
+class JobHeaderData : public MAUSEvent<JobHeader> {
   public:
     /** Default constructor initialises everything to NULL */
-    Data();
+    JobHeaderData();
 
     /** Copy constructor (deepcopy) */
-    Data(const Data& data);
+    JobHeaderData(const JobHeaderData& data);
 
     /** Deepcopy from data to *this */
-    Data& operator=(const Data& data);
+    JobHeaderData& operator=(const JobHeaderData& data);
 
-    /** Deletes the spill data */
-    virtual ~Data();
+    /** Deletes the job_header data */
+    virtual ~JobHeaderData();
 
-    /** Set the spill data
+    /** Set the job_header data
      *
-     *  Data now takes ownership of memory allocated to spill
+     *  JobHeaderData now takes ownership of memory allocated to job header
      */
-    void SetSpill(Spill* spill);
+    void SetJobHeader(JobHeader* header);
 
-    /** Get the spill data
+    /** Get the job header data
      *
-     *  Data still owns this memory
+     *  JobHeaderData still owns this memory
      */
-    Spill* GetSpill() const;
+    JobHeader* GetJobHeader() const;
 
-    /** Returns sizeof the spill object
+    /** Returns sizeof the job header object
      *
      *  When setting up TTrees directly in ROOT, it is necessary to hand ROOT
      *  the size of the class member. This is difficult (impossible?) to access
@@ -66,29 +66,22 @@ class Data : public MAUSEvent<Spill> {
     int GetSizeOf() const;
 
     /** Get Event Type information 
-     *
-     *  Need to bring into base class for JsonCppProcessor
      */
     std::string GetEventType() const {return MAUSEvent::GetEventType();}
 
     /** Set Event Type information 
-     *
-     *  Need to bring into base class for JsonCppProcessor
      */
     void SetEventType(std::string type) {MAUSEvent::SetEventType(type);}
 
-    /** Wrapper for MAUSEvent
-     */
-    Spill* GetEvent() const {return GetSpill();}
+    /** Overload MAUSEvent function (wraps SetJobHeader)*/
+    void SetEvent(JobHeader* header) {SetJobHeader(header);}
 
-    /** Wrapper for MAUSEvent
-     */
-    void SetEvent(Spill* spill) {SetSpill(spill);}
+    /** Overload MAUSEvent function (wraps GetJobHeader)*/
+    JobHeader* GetEvent() const {return GetJobHeader();}
 
   private:
-    Spill* _spill;
-    std::string _event_type;
-    ClassDef(Data, 1)
+    JobHeader* _job_header;
+    ClassDef(JobHeaderData, 1)
 };
 }
 

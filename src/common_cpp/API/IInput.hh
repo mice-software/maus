@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,14 @@ namespace MAUS {
      * Pure virtual function to generate data
      * \return The data generated
      */
-    virtual T* emitter() = 0;
+    virtual T emitter_cpp() = 0;
+
+    /*!\brief Load the job header
+     *
+     * Pure virtual function to generate data
+     * \return The data generated
+     */
+    virtual T load_job_header() = 0;
   };
 
 }// end of namespace

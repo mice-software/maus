@@ -15,6 +15,7 @@
  *
  */
 
+#include <string.h>
 
 #include "JsonCppStreamer/ORStream.hh"
 #include "Interface/Squeal.hh"
@@ -51,10 +52,18 @@ void orstream::open(const char* fileName,
 		 "TFile object not opened properly",
 		 "void orstream::open(const char*, const char*, const char*, const char*)");
   }
-
-  m_tree = new TTree(treeName, treeTitle);
+  TObject* tree_search = m_file->Get(treeName);
+  if (tree_search != NULL) {
+      if (strcmp(tree_search->ClassName(), "TTree") != 0)
+          throw(Squeal(Squeal::recoverable,
+               "Attempt to open TTree with existing non-tree object in the way",
+               "void orstream::open(...)"));
+      m_tree = static_cast<TTree*>(tree_search);
+  } else {
+      m_tree = new TTree(treeName, treeTitle);
+  }
   strcpy(m_branchName, "");
-  m_evtCount = 0;
+  m_evtCount = m_tree->GetEntries();
 }
 
 

@@ -22,6 +22,7 @@
 #include "Rtypes.h"  // ROOT
 
 #include "src/common_cpp/DataStructure/DateTime.hh"
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace Json {
 class Value;

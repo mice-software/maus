@@ -23,91 +23,86 @@
 
 #include "src/input/InputCppRoot/InputCppRoot.hh"
 
-#include "src/common_cpp/DataStructure/DAQData.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
 
-#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 namespace MAUS {
 
-InputCppRoot::InputCppRoot(std::string filename) : _infile(NULL),
-              _cppJsonConverter(NULL),  _data(NULL), _filename(filename) {
+InputCppRoot::InputCppRoot(std::string filename)
+            : InputBase<std::string>("InputCppRoot"), _infile(NULL),
+              _filename(filename) {
 }
 
 InputCppRoot::~InputCppRoot() {
   death();
 }
 
-bool InputCppRoot::birth(std::string json_datacards) {
-  try {
-      Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
-      if (_filename == "") {
-        _filename = JsonWrapper::GetProperty(json_dc,
-                   "input_root_file_name", JsonWrapper::stringValue).asString();
-      }
-      _infile = new irstream(_filename.c_str(), "Spill");
-      _cppJsonConverter = new CppJsonConverter();
-      _data = new Data();
-      (*_infile) >> branchName("data") >> _data;
-  } catch(Squeal squee) {
-    death();
-    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-    return false;
-  } catch(std::exception exc) {
-    death();
-    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-    return false;
+void InputCppRoot::_birth(const std::string& json_datacards) {
+  Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
+  if (_filename == "") {
+    _filename = JsonWrapper::GetProperty(json_dc,
+               "input_root_file_name", JsonWrapper::stringValue).asString();
   }
-  return true;
+  _infile = new irstream(_filename.c_str(), "Spill");
 }
 
-bool InputCppRoot::death() {
-  // if _infile != NULL, _infile will delete spill
-  if (_infile == NULL && _data != NULL) {
-    delete _data;
-    _data = NULL;
-  }
-
+void InputCppRoot::_death() {
   if (_infile != NULL) {
     delete _infile;
     _infile = NULL;
   }
-
-  if (_cppJsonConverter != NULL) {
-    delete _cppJsonConverter;
-    _cppJsonConverter = NULL;
-  }
-  return true;
 }
 
-std::string InputCppRoot::getNextEvent() {
-  try {
-      if (_cppJsonConverter == NULL || _infile == NULL) {
-        throw(Squeal(
-          Squeal::recoverable,
-          "InputCppRoot was not initialised properly",
-          "InputCppRoot::getNextEvent"
-        ) );
-      }
-      if ((*_infile) >> readEvent == NULL) {
-        return "";
-      }
-      if (_data->GetSpill() == NULL) {
-	return "";
-      }
-      Json::Value* value = (*_cppJsonConverter)(_data->GetSpill());
-      Json::FastWriter writer;
-      std::string output = writer.write(*value);
-      delete value;
-      return output;
-  } catch(Squeal squee) {
-    CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-    return "";
-  } catch(std::exception exc) {
-    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-    return "";
-  }
+std::string InputCppRoot::_emitter_cpp() {
+    return load_data();
+}
+
+std::string InputCppRoot::load_data() {
+    return _load_event<CppJsonSpillConverter, Data>(std::string("data"));
+}
+
+std::string InputCppRoot::_load_job_header() {
+    return _load_event<CppJsonHeaderConverter, JobHeaderData>
+                                                    (std::string("job_header"));
+}
+
+template <class ConverterT, class DataT>
+std::string InputCppRoot::_load_event(std::string branch_name) {
+    if (_infile == NULL) {
+      throw(Squeal(
+        Squeal::recoverable,
+        "InputCppRoot was not initialised properly",
+        "InputCppRoot::getNextEvent"
+      ));
+    }
+    std::string output = "";
+    DataT data;
+    if (_infile_branch != data.GetEventType()) {
+        _infile->close();
+        _infile->open(_filename.c_str(), data.GetEventType().c_str());
+        _infile_branch = data.GetEventType();
+    }
+    try {
+        (*_infile) >> branchName(branch_name.c_str()) >> data;
+        if ((*_infile) >> readEvent == NULL) {
+            return output;
+        }
+        Json::Value* value = ConverterT()(&data);
+        if (value->isNull()) {
+            delete value;
+            return output;
+        }
+        Json::FastWriter writer;
+        output = writer.write(*value);
+        delete value;
+        return output;
+    } catch(...) {
+        throw;
+    }
 }
 }
 

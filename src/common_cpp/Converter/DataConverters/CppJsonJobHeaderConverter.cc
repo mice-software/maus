@@ -15,20 +15,19 @@
  *
  */
 
-// #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
 
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
 
 namespace MAUS {
 
-// Spill* JsonCppConverter::_convert(const Json::Value* data) const{
-//   return SpillProcessor().JsonToCpp(*data);
-// }
-
-Json::Value* CppJsonConverter::_convert(const Spill* data) const {
-  return SpillProcessor().CppToJson(*data);
+Json::Value* CppJsonHeaderConverter::_convert(const JobHeaderData* data) const {
+  if (data == NULL || data->GetJobHeader() == NULL)
+      return new Json::Value();
+  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
+  (*my_json)["maus_event_type"] = "JobHeader";
+  return my_json;
 }
 }
 

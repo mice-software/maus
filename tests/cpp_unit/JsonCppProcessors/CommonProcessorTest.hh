@@ -16,6 +16,8 @@
 
 #ifndef _TESTS_CPP_UNIT_JSONCPPPROCESSORS_COMMONPROCESSORTEST_HH_
 
+#include <string>
+
 namespace MAUS {
 namespace ProcessorTest {
 template <class TYPE>

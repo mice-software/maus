@@ -12,19 +12,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-// #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
-
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-
-namespace MAUS {
-
-Spill* JsonCppConverter::_convert(const Json::Value* data) const {
-  return SpillProcessor().JsonToCpp(*data);
-}
-}
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
 

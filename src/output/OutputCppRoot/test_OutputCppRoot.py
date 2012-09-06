@@ -53,17 +53,16 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
             "run_number":1,
             "daq_event_type":"physics_event",
             "recon_events":[],
-            "mc_events":[]
+            "mc_events":[],
         }
         self.test_header = {
-            "start_of_job":{"date_time":"1976-04-04T00:00:00.000000"},
-            "bzr_configuration":"",
-            "bzr_revision":"",
-            "bzr_status":"",
-            "maus_version_number":"",
-            "json_configuration":"output cpp root test"
-        }
-        print "\n"+json.dumps(self.test_header)+"\n"
+                "start_of_job":{"date_time":"1976-04-04T00:00:00.000000"},
+                "bzr_configuration":"",
+                "bzr_revision":"",
+                "bzr_status":"",
+                "maus_version_number":"",
+                "json_configuration":"output cpp root test",
+            }
         self.cards = Configuration.Configuration().getConfigJSON()
         self.cards = json.loads(self.cards)
         self.cards["output_root_file_name"] = self.outfile
@@ -131,17 +130,18 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.assertFalse(self.output.save_job_header(json.dumps({"":{}})))
         self.assertFalse(self.output.save_job_header(''))
 
-    def __check_entry(self, json_conf_text):
+    def __check_entry(self, json_conf_text, n_entries, entry):
         """
         Check that json_header entry has json_conf_text 
         """
         root_file = ROOT.TFile(self.outfile, "READ") # pylint: disable = E1101
-        job_header = ROOT.MAUS.JobHeader() # pylint: disable = E1101
+        job_header = ROOT.MAUS.JobHeaderData() # pylint: disable = E1101
         tree = root_file.Get("JobHeader")
         tree.SetBranchAddress("job_header", job_header)
-        self.assertEqual(tree.GetEntries(), 1L)
-        tree.GetEntry(0)
-        self.assertEqual(job_header.GetJsonConfiguration(), json_conf_text)
+        self.assertEqual(tree.GetEntries(), n_entries)
+        tree.GetEntry(entry)
+        self.assertEqual(job_header.GetJobHeader().GetJsonConfiguration(),
+                         json_conf_text)
         root_file.Close()
 
     def test_save_normal_job_header(self):
@@ -151,12 +151,33 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.assertTrue(self.output.save_job_header(
             json.dumps(self.test_header)
         ))
-        self.__check_entry("output cpp root test")
         self.test_header["json_configuration"] = "output cpp root test 2"
         self.assertTrue(self.output.save_job_header(
             json.dumps(self.test_header)
         ))
-        self.__check_entry("output cpp root test 2")
+        self.output.death()
+        self.__check_entry("output cpp root test", 2, 0)
+        self.__check_entry("output cpp root test 2", 2, 1)
+
+    def test_mixed_types(self):
+        """
+        test_OutputCppRoot.test_mixed_types check we can load alternating types
+        """
+        self.assertTrue(self.output.save_job_header(
+            json.dumps(self.test_header)
+        ))
+        self.assertTrue(self.output.save_spill(
+            json.dumps(self.test_data)
+        ))
+        self.test_header["json_configuration"] = "output cpp root test 2"
+        self.assertTrue(self.output.save_job_header(
+            json.dumps(self.test_header)
+        ))
+        self.assertTrue(self.output.save_spill(
+            json.dumps(self.test_data)
+        ))
+        self.__check_entry("output cpp root test", 2, 0)
+        self.__check_entry("output cpp root test 2", 2, 1)
 
 if __name__ == "__main__":
     unittest.main()

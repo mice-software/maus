@@ -20,12 +20,9 @@
 
 #include <string>
 
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/API/OutputBase.hh"
 
-class Data;
-class JsonCppConverter;
-class JobHeader;
-class JsonCppHeaderConverter;
 class orstream;
 
 namespace MAUS {
@@ -71,6 +68,20 @@ class OutputCppRoot : public OutputBase<std::string> {
 
   void _death();
 
+  /** Write a generic event based on type specifications
+
+   *  The lowest level of
+   *  the branch has to be a MAUSEvent<DataT> and ConverterT has to be of type
+   *  Converter<std::string, DataT>.
+   *
+   *  Reopens the _outfile if the DataT type has changed since the last read (we
+   *  put one Event type per TTree in MAUS, open() required to change the name
+   *  of _outfile).
+   */
+  template <class ConverterT, class DataT>
+  bool write_event
+        (MAUSEvent<DataT>* data_cpp, std::string data, std::string branch_name);
+
   /** Store a spill in the ROOT tree
    *
    * OutputBase provides public interface
@@ -88,15 +99,9 @@ class OutputCppRoot : public OutputBase<std::string> {
   bool _save_job_header(std::string json_header);
 
   orstream* _outfile;
-  orstream* _outfile_2;
-
-  Data* _spill;
-  JsonCppConverter* _jsonCppConverter;
-
-  JobHeader* _header;
-  JsonCppHeaderConverter* _jsonCppHeaderConverter;
 
   std::string _fname;
+  std::string _outfile_branch;
 };
 }
 

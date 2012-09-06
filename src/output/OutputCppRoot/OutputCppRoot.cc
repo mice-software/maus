@@ -24,15 +24,15 @@
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
 #include "src/common_cpp/DataStructure/JobHeader.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppHeaderConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppJobHeaderConverter.hh"
 
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
 OutputCppRoot::OutputCppRoot() : OutputBase<std::string>("OutputCppRoot"),
-     _outfile(NULL), _spill(NULL), _jsonCppConverter(NULL), _header(NULL),
-     _jsonCppHeaderConverter(NULL), _fname("") {
+     _outfile(NULL), _fname(""), _outfile_branch("") {
 }
 
 void OutputCppRoot::_birth(const std::string& json_datacards) {
@@ -45,67 +45,76 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     // Setup output stream
     _outfile = new orstream(_fname.c_str(), "Spill", "MAUS output data", "RECREATE");
-    _spill = new Data();
-    _jsonCppConverter = new JsonCppConverter();
-    _jsonCppHeaderConverter = new JsonCppHeaderConverter();
-    (*_outfile) << branchName("data") << _spill;
   } catch(std::exception& exc) {
     death();
     throw exc;
   }
 }
 
-bool OutputCppRoot::_save_spill(std::string json_spill_document) {
-    if (_jsonCppConverter == NULL || _spill == NULL || _outfile == NULL) {
-        throw(Squeal(Squeal(
-          Squeal::recoverable,
-          "OutputCppRoot was not initialised properly",
-          "OutputCppRoot::save_spill"
-        )));
-    }
-    if (!_outfile->is_open())
-        _outfile->open(_fname.c_str(), "Spill", "MAUS output data", "UPDATE");
-    if (json_spill_document != "") {
-        Json::Value json_spill = JsonWrapper::StringToJson(json_spill_document);
-        _spill->SetSpill( (*_jsonCppConverter)(&json_spill) );
-        (*_outfile) << fillEvent;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool OutputCppRoot::_save_job_header(std::string job_header) {
-    // watch for double frees (does close() delete _header)?
-    if (_jsonCppHeaderConverter == NULL || _header != NULL || _outfile == NULL) {
+template <class ConverterT, class DataT>
+bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
+                                std::string data_str,
+                                std::string branch_name) {
+    // watch for double frees (does close() delete data_cpp?)
+    if (_outfile == NULL) {
         throw(Squeal(Squeal(
           Squeal::recoverable,
           "OutputCppRoot was not initialised properly",
           "OutputCppRoot::save_job_header"
         )));
     }
-    if (job_header == "")
+    if (data_str == "" || branch_name == "")
         return false;
-    Json::Value json_header = JsonWrapper::StringToJson(job_header);
+    std::string data_type = data_cpp->GetEventType();
+    if (_outfile_branch != data_type) {
+        _outfile->close();
+        _outfile->open(_fname.c_str(), data_type.c_str(), "MAUS output data", "UPDATE");
+        _outfile_branch = data_type;
+        (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
+    }
+    // next two lines could be pulled into a converter<std::string, Spill>
+    Json::Value data_json = JsonWrapper::StringToJson(data_str);
+    data_cpp->SetEvent(ConverterT()(&data_json));
+    if (data_cpp->GetEvent() == NULL) {  // failed on conversion
+        return false;
+    }
     try {
-        if (_outfile->is_open()) {
-            _outfile->close();
-        }
-        _outfile->open(_fname.c_str(), "JobHeader", "MAUS output data", "UPDATE");
-        _header = (*_jsonCppHeaderConverter)(&json_header);
-        (*_outfile) << branchName("job_header") << _header;
         (*_outfile) << fillEvent;
-        _outfile->close();
     } catch(...) {
-        _outfile->close();
-        if (_header != NULL)
-            delete _header;  // double free?
-        _header = NULL;
+        if (data_cpp != NULL)
+            data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
     }
-    delete _header;  // double free?
-    _header = NULL;
+    data_cpp->SetEvent(NULL);  // double free?
     return true;
+}
+
+bool OutputCppRoot::_save_spill(std::string spill) {
+    bool success = false;
+    Data* spill_data = new Data();
+    try {
+        success = write_event<JsonCppConverter, Spill>
+                                                  (spill_data, spill, "data");
+    } catch(...) {
+        delete spill_data;
+        throw;
+    }
+    delete spill_data;
+    return success;
+}
+
+bool OutputCppRoot::_save_job_header(std::string job_header) {
+    bool success = false;
+    JobHeaderData* jh = new JobHeaderData();
+    try {
+        success = write_event<JsonCppHeaderConverter, JobHeader>
+                                               (jh, job_header, "job_header");
+    } catch(...) {
+        delete jh;
+        throw;
+    }
+    delete jh;
+    return success;
 }
 
 void OutputCppRoot::_death() {
@@ -114,14 +123,6 @@ void OutputCppRoot::_death() {
         _outfile->close();
     delete _outfile;
     _outfile = NULL;  // deletes spill
-    _spill = NULL;
-  } else if (_spill != NULL) {
-    delete _spill;
-    _spill = NULL;
-  }
-  if (_jsonCppConverter != NULL) {
-    delete _jsonCppConverter;
-    _jsonCppConverter = NULL;
   }
 }
 }

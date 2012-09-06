@@ -15,16 +15,15 @@
  *
  */
 
-// #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppJobHeaderConverter.hh"
 
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/JobHeader.hh"
+#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
 
 namespace MAUS {
 
-Spill* JsonCppConverter::_convert(const Json::Value* data) const {
-  return SpillProcessor().JsonToCpp(*data);
+JobHeader* JsonCppHeaderConverter::_convert(const Json::Value* data) const {
+  return JobHeaderProcessor().JsonToCpp(*data);
 }
 }
 

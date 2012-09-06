@@ -20,18 +20,21 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class MAUS::Spill+;
+#pragma link C++ class MAUS::MAUSEvent<MAUS::Spill>+;
 #pragma link C++ class MAUS::Data+;
+#pragma link C++ class MAUS::JobHeader+;
+#pragma link C++ class MAUS::MAUSEvent<MAUS::JobHeader>+;
+#pragma link C++ class MAUS::JobHeaderData+;
 
 #pragma link C++ class MAUS::ThreeVector+;
 #pragma link C++ class std::vector<int>;
 
 #pragma link C++ class MAUS::DateTime+;
-#pragma link C++ class MAUS::JobHeader+;
 #pragma link C++ class MAUS::JobFooter+;
 #pragma link C++ class MAUS::RunHeader+;
 #pragma link C++ class MAUS::RunFooter+;
 
-#pragma link C++ class MAUS::Spill+;
 #pragma link C++ class std::map<std::string, std::string>;
 #pragma link C++ class std::pair<std::string, std::string>;
 #pragma link C++ class std::vector<MCEvent*>;

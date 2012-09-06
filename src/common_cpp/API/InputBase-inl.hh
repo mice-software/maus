@@ -34,10 +34,10 @@ namespace MAUS {
   InputBase<T>::~InputBase() {}
 
   template <typename T>
-  T* InputBase<T>::emitter() {
-    T* o = 0;
+  T InputBase<T>::emitter_cpp() {
+    T o;
     try {
-      o = _emitter();
+      o = _emitter_cpp();
     }
     catch(Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -51,6 +51,23 @@ namespace MAUS {
     return o;
   }
 
-}// end of namespace
+  template <typename T>
+  T InputBase<T>::load_job_header() {
+    T o;
+    try {
+      o = _load_job_header();
+    }
+    catch(Squeal& s) {
+      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    }
+    catch(std::exception& e) {
+      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+    }
+    catch(...) {
+      throw UnhandledException(_classname);
+    }
+    return o;
+  }
+}  // end of namespace
 #endif
 

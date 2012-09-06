@@ -15,15 +15,15 @@
  *
  */
 
-#ifndef CPPJSONCONVERTER_H
-#define CPPJSONCONVERTER_H
+#ifndef CPPJSONSPILLCONVERTER_H
+#define CPPJSONSPILLCONVERTER_H
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-// #include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
+
+class Data;
 
 /*!
  * \class JsonCppConverter
@@ -38,23 +38,12 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-  class CppJsonConverter : public ConverterBase<Spill, Json::Value> {
+  class CppJsonSpillConverter : public ConverterBase<Data, Json::Value> {
   public:
-    CppJsonConverter()
-      : ConverterBase<Spill, Json::Value>("CppJsonConverter") {}
+    CppJsonSpillConverter()
+      : ConverterBase<Data, Json::Value>("CppJsonSpillConverter") {}
 
   private:
-    /*!
-     * \brief Convert Json value
-     * Overloaded process initiate the conversion process converting the
-     * \a Json::Value given as the argument into the output type \a MausData
-     *
-     * \param Json::Value& The root \a Json::Value object from the Json data
-     *        file
-     * \return a pointer to the MausData object
-     */
-//     Spill* _convert(const Json::Value*) const;
-
     /*!
      * \brief Convert MausData
      * Overloaded process initiates the conversion process converting the
@@ -62,8 +51,14 @@ namespace MAUS {
      *
      * \param MausData& The root \a MausData object from the cpp data structure
      * \return a pointer to the Json::Value object
+     *
+     * Some ugliness results from the fact that the Spill is written as the base
+     * top level in Json, but for reasons of stupidity (Rogers) the Data is
+     * written as the top level in ROOT. To make it worse, Spill doesn't always
+     * hold spill data - as DAQ sometimes spits out start_of_burst or
+     * calibration data.
      */
-    Json::Value* _convert(const Spill*) const;
+    Json::Value* _convert(const Data*) const;
 
   private:
 };

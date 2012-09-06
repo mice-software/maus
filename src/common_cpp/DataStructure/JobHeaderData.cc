@@ -15,54 +15,55 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/JobHeader.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
-#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
 
 namespace MAUS {
 
-Data::Data() : MAUSEvent("Spill"), _spill(NULL) {
+JobHeaderData::JobHeaderData() : MAUSEvent("JobHeader"), _job_header(NULL) {
 }
 
-Data::Data(const Data& data) : MAUSEvent(), _spill(NULL) {
+JobHeaderData::JobHeaderData(const JobHeaderData& data)
+                           : MAUSEvent("JobHeader"), _job_header(NULL) {
     *this = data;
 }
 
-Data::~Data() {
-    if (_spill != NULL) {
-        delete _spill;
-        _spill = NULL;
+JobHeaderData::~JobHeaderData() {
+    if (_job_header != NULL) {
+        delete _job_header;
+        _job_header = NULL;
     }
 }
 
-Data& Data::operator=(const Data& data) {
+JobHeaderData& JobHeaderData::operator=(const JobHeaderData& data) {
     if (this == & data) {
         return *this;
     }
-    if (data._spill == NULL) {
-        SetSpill(NULL);
+    if (data._job_header == NULL) {
+        SetJobHeader(NULL);
     } else {
-        SetSpill(new Spill(*data._spill));
+        SetJobHeader(new JobHeader(*data._job_header));
     }
     SetEventType(data.GetEventType());
     return *this;
 }
 
-void Data::SetSpill(Spill* spill) {
-    if (_spill != NULL) {
-        delete _spill;
-        _spill = NULL;
+void JobHeaderData::SetJobHeader(JobHeader* header) {
+    if (_job_header != NULL) {
+        delete _job_header;
+        _job_header = NULL;
     }
-    _spill = spill;
+    _job_header = header;
 }
 
-Spill* Data::GetSpill() const {
-    return _spill;
+JobHeader* JobHeaderData::GetJobHeader() const {
+    return _job_header;
 }
 
-int Data::GetSizeOf() const {
-  Data spill;
-  return sizeof(spill);
+int JobHeaderData::GetSizeOf() const {
+  JobHeaderData head;
+  return sizeof(head);
 }
 }
 
