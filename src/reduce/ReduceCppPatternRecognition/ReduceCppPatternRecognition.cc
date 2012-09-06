@@ -109,6 +109,7 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
 
     TPaveText *pt = new TPaveText(.05, .1, .95, .95);
     pt->SetTextAlign(12);
+    pt->SetFillColor(0);
     TTree * p_spoints  = &_spoints;
     TTree * p_spoints_1spill = &_spoints_1spill;
 
@@ -390,6 +391,8 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   pt->AddText(s1.c_str());
   ss1.str("");
 
+  pt->AddLine(.0, .875, 1., .875);
+
   int event_size = 0;
   int digit_size = 0;
   int cluster_size = 0;
@@ -436,6 +439,8 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   c1->cd(1);
   pt->AddText(s1.c_str());
   ss1.str("");
+
+  pt->AddLine(.0, .25, 1., .25);
 
   ss1 << "Cumulative spoints: " << get_num_spoints() + spoint_size;
   s1 = ss1.str();
