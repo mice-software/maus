@@ -81,12 +81,14 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
       construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
                        static_cast<int>(event_i), digits);
     }
+
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
+
     // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
     // otherwise make a new Recon event to hold the SciFiEvent
-    if ( spill.GetReconEvents()->at(event_i) ) {
+    if ( spill.GetReconEvents()->size() > event_i ) {
       spill.GetReconEvents()->at(event_i)->SetSciFiEvent(sf_evt);
     } else {
       ReconEvent *revt = new ReconEvent();
@@ -94,7 +96,6 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
       revt->SetSciFiEvent(sf_evt);
       spill.GetReconEvents()->push_back(revt);
     }
-    std::cout << "Number of recon events in spill: " << spill.GetReconEvents()->size() << "\n";
   }
   // ==========================================================
 

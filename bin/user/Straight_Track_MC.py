@@ -16,18 +16,19 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    my_input = MAUS.InputPySpillGenerator()
+    # my_input = MAUS.InputPySpillGenerator()
+    my_input = MAUS.InputCppRoot()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
     # GEANT4
-    my_map.append(MAUS.MapPyBeamMaker()) # beam construction
-    my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
+    # my_map.append(MAUS.MapPyBeamMaker()) # beam construction
+    # my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up
-    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    # my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
 
     # TOF
     #my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
@@ -41,13 +42,13 @@ def run():
     # Global Digits - post detector digitisation
 
     # my_reduce = MAUS.ReduceCppMCTracker()
-    # my_reduce = MAUS.ReduceCppPatternRecognition()
+    my_reduce = MAUS.ReduceCppPatternRecognition()
     # my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
-    my_reduce = MAUS.ReducePyDoNothing()
+    # my_reduce = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputPyJSON()
-    # my_output = MAUS.OutputCppRoot()
+    # my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
     # my_output = MAUS.OutputPyImage()
 
     # Can specify datacards here or by using appropriate command line calls.
