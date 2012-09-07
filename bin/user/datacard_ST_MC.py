@@ -46,7 +46,7 @@ output_root_file_name = "maus_output.root"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 4
+verbose_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise

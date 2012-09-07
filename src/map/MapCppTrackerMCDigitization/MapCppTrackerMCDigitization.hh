@@ -69,12 +69,6 @@ class MapCppTrackerMCDigitization {
    */
   std::string process(std::string document);
 
-  /** @brief sanity check
-   *
-   *  Checks the sanity of of the MC branch
-   */
-  bool check_sanity_mc(Json::Value mc);
-
   /** @brief reads in json data to a Spill object
    *
    */

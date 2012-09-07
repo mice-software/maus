@@ -48,34 +48,8 @@ bool MapCppTrackerMCDigitization::death() {
 
 std::string MapCppTrackerMCDigitization::process(std::string document) {
 
+  std::cout << "Begining tracker MC digitisation\n";
   Json::FastWriter writer;
-
-  // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  // Check if the JSON document has a MC branch, else return error only
-  if (!root.isMember("mc_events")) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "I need an MC branch to simulate.";
-    errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  // Check sanity of json input file and MC branch, and if bad return error only
-  Json::Value mc = root.get("mc_events", 0);
-  if ( !check_sanity_mc(mc) ) {
-    return writer.write(root);
-  }
 
   // Set up a spill object, then continue only if MC event array is initialised
   Spill spill = read_in_json(document);
@@ -93,11 +67,13 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
   // ================= Reconstruction =========================
 
+  // Check the Recon event array is initialised, and if not make it so
   if ( !spill.GetReconEvents() ) {
     ReconEventArray* revts = new ReconEventArray();
     spill.SetReconEvents(revts);
   }
 
+  // Construct digits from hits for each MC event
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
     SciFiDigitPArray digits;
@@ -105,11 +81,20 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
       construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
                        static_cast<int>(event_i), digits);
     }
+    // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
-    ReconEvent *revt = new ReconEvent();
-    revt->SetSciFiEvent(sf_evt);
-    spill.GetReconEvents()->push_back(revt);
+    // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
+    // otherwise make a new Recon event to hold the SciFiEvent
+    if ( spill.GetReconEvents()->at(event_i) ) {
+      spill.GetReconEvents()->at(event_i)->SetSciFiEvent(sf_evt);
+    } else {
+      ReconEvent *revt = new ReconEvent();
+      revt->SetPartEventNumber(event_i);
+      revt->SetSciFiEvent(sf_evt);
+      spill.GetReconEvents()->push_back(revt);
+    }
+    std::cout << "Number of recon events in spill: " << spill.GetReconEvents()->size() << "\n";
   }
   // ==========================================================
 
@@ -127,6 +112,7 @@ Spill MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     SpillProcessor spill_proc;
     spill = *spill_proc.JsonToCpp(root);
   } catch(...) {
+    std::cerr << "Bad json document" << std::endl;
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -135,19 +121,6 @@ Spill MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     writer.write(root);
   }
   return spill;
-}
-
-bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC branch isn't an array";
-    errors["bad_type"] = ss.str();
-    root["errors"] = errors;
-    return false;
-  }
-  return true;
 }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
