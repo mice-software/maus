@@ -16,19 +16,19 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    # my_input = MAUS.InputPySpillGenerator()
-    my_input = MAUS.InputCppRoot()
+    my_input = MAUS.InputPySpillGenerator()
+    # my_input = MAUS.InputCppRoot()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
     # GEANT4
-    # my_map.append(MAUS.MapPyBeamMaker()) # beam construction
-    # my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
+    my_map.append(MAUS.MapPyBeamMaker()) # beam construction
+    my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up
-    # my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
 
     # TOF
     #my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
