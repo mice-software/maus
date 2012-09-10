@@ -15,6 +15,8 @@
  *
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include <iostream>
+#include <fstream>
 
 namespace MAUS {
 
@@ -35,21 +37,15 @@ KalmanTrack::KalmanTrack() {
 
   _x0 = 0.0;
   _y0 = 0.0;
+
+  _chi2 = 0.0;
+  _ndf  = 0.0;
+  _tracker=-1;
 }
 
 //
 // ------- Prediction ------------
 //
-void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  std::cout <<" ----------------------- Projection ----------------------- \n";
-  TMatrixD a = old_site->get_a();
-
-  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
-
-  new_site->set_projected_a(a_projected);
-
-  a_projected.Print();
-}
 
 //
 // C_pred = _F * C * _Ft + _Q;
@@ -84,7 +80,7 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   double sig_beta = l/CHAN_WIDTH;
   double SIG_ALPHA = 1.0;
   _G.Zero();
-  _G(0, 0) = SIG_ALPHA*SIG_ALPHA;
+  _G(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
   _G(1, 1) = sig_beta*sig_beta/12.;
   _G.Invert();
   //_G.Print();
@@ -160,7 +156,6 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD K(5, 2);
   K = TMatrixD(temp3, TMatrixD::kMult, _G);
 
-/*
   std::cout << "Kalman Gain: \n";
   K.Print();
   std::cout << "Pull: \n";
@@ -169,7 +164,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   m.Print();
   std::cout << "Alpha projected \n";
   ha.Print();
-*/
+
   //////////////////////////////////////////////////////////////////////
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
@@ -250,6 +245,35 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD C_smooth(5, 5);
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
+}
+
+void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
+  int number_parameters = 5;
+  int number_of_sites = sites.size();
+  double sigma_measurement2 = 1./12.;
+  int id = sites[0].get_id();
+  if ( id <= 14 ) _tracker = 0;
+  if ( id > 14 ) _tracker = 1;
+
+  double alpha, model_alpha;
+  for ( int i = 0; i < number_of_sites; ++i ) {
+    KalmanSite site = sites[i];
+    // Convert smoothed value to alpha measurement.
+    TMatrixD a(5, 1);
+    a = site.get_smoothed_a();
+    TMatrixD ha(2, 1);
+    ha = TMatrixD(_H, TMatrixD::kMult, a);
+    model_alpha = ha(0, 0);
+    // Actual measurement.
+    alpha = site.get_alpha();
+    // Compute chi2.
+    _chi2 += pow(alpha-model_alpha,2.);
+  }
+  _chi2 = _chi2*(1./sigma_measurement2);
+  _ndf = number_of_sites - number_parameters;
+  std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
+  output << _tracker << " " << _chi2 << " " << _ndf << "\n";
+  output.close();
 }
 
 } // ~namespace MAUS

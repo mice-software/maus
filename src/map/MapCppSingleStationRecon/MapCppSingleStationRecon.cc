@@ -74,7 +74,7 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         if ( event->clusters().size() ) {
           spacepoint_recon(event);
         }
-        /*
+        //
         Hep3Vector tof0, tof1, se;
         // double tof0_x, tof0_y, tof1_x, tof1_y;
         // double tof0_time, tof1_time;
@@ -85,9 +85,9 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         }
         if ( success ) {
           std::cerr << "Starting Global Recon" << std::endl;
-          ++eff_counter;
+          //++eff_counter;
         }
-        */
+        //
         print_event_info(event, k);
         save_to_json(event, k);
       }
@@ -212,7 +212,8 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, 
                                                 Hep3Vector &tof1, bool &success) {
   double tof0_x, tof0_y, tof1_x, tof1_y;
   double tof0_time, tof1_time;
-  // assert(root["recon_events"][event_i].isMember("tof_event"));
+  assert(root.isMember("recon_events"));
+  assert(root["recon_events"][event_i].isMember("tof_event"));
   Json::Value tof0_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof0"];
   Json::Value tof1_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof1"];
   int numb_sp_tof_0 = tof0_sps.size();
@@ -224,14 +225,34 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, 
 
   // std::cerr << "EVENT: " << tof0_sps.size() << " " << tof1_sps.size() << std::endl;
 
-  if ( numb_sp_tof_0 == 1 && numb_sp_tof_1 == 1 ) {
+  double tof0_slabx;
+  double tof0_slaby;
+  double tof1_slabx;
+  double tof1_slaby;
+
+  bool found = false;
+  int index_value;
+
+  if ( numb_sp_tof_1 == 1 ) {
+    tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabx"].asDouble();
+    tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slaby"].asDouble();
+    for ( int i = 0; i < numb_sp_tof_0; ++i ) {
+      double time = root["recon_events"][event_i]["tof_event"]
+                        ["tof_space_points"]["tof0"]["time"].asDouble();
+      if ( time > -50. && time < 0.0 ) {
+        found = true;
+        index_value = i;
+      }
+    }
+  }
+
+  if ( found ) {
     // Do TOF reconstruction
-    double tof0_slabx = tof0_sps[(Json::Value::ArrayIndex)0]["slabx"].asDouble();
-    double tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)0]["slaby"].asDouble();
-    double tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabx"].asDouble();
-    double tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slaby"].asDouble();
-    tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
-    tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    tof0_slabx = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabx"].asDouble();
+    tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)index_value]["slaby"].asDouble();
+
+    // tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    // tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
 
     tof0_x = (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
     tof0_y = (tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
@@ -246,6 +267,7 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, 
     success = true;
   }
 }
+
 /*
 bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &event, int k) {
   int exp_events_t1 = root["space_points"]["tof1"][k].size();

@@ -109,7 +109,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
     drho_y_dy = -1.+old_r*cos(old_phi)*dphi_dy;
     drho_y_dR = sin(old_phi);
   }
-
+/*
   std::cout << "Track Parameters: " << "\n"
             << "circle centre:     " << _xc << " " << _yc << "\n"
             << "old x:     " << old_x << "\n"
@@ -129,15 +129,15 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
                                      << drho_x_dR << "\n"
             << "drhoy derivatives: " << drho_y_dx << " " << drho_y_dy << " "
                                      << drho_y_dR << std::endl;
-
+*/
   _projected_x = old_x+_xc+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
   _projected_y = old_y+_yc+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
-
+/*
   std::cout << "New Parameters: " << "\n"
             << "x:     " << _projected_x << "\n"
             << "y:     " << _projected_y << "\n";
   std::cout << "Signed Radius: " << _h*old_r << "\n";
-
+*/
   // Build _F.
   _F(0, 0) = 1.0 + drho_x_dx - _h*old_r*dphi_dx*(sin(old_phi)-sin(new_phi));
   _F(0, 1) = drho_x_dy - _h*old_r*dphi_dy*(sin(old_phi)-sin(new_phi));
@@ -153,19 +153,20 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 }
 
 void HelicalTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
+  std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
-  std::cout << "Old state filtered state: " << std::endl;
+  std::cout << "Old  filtered state: " << std::endl;
   a.Print();
   a(0, 0) = a(0, 0) - _xc;
   a(1, 0) = a(1, 0) - _yc;
-  a.Print();
+  //a.Print();
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   a_projected(0, 0) = a_projected(0, 0) + _xc;
   a_projected(1, 0) = a_projected(1, 0) + _yc;
   new_site->set_projected_a(a_projected);
 
-  _F.Print();
-  // std::cout << "New projected state: " << std::endl;
+  //_F.Print();
+  std::cout << "New projected state: " << std::endl;
   a_projected.Print();
 }
 

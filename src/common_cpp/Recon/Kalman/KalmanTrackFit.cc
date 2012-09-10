@@ -77,6 +77,8 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
       smooth(sites, track, i);
     }
 
+    track->compute_chi2(sites);
+
     KalmanMonitor monitor;
     // monitor.save(sites);
     monitor.save_mc(sites);
@@ -114,14 +116,16 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
       std::cerr << "Filtering site " << i << std::endl;
       filter(sites, track, i);
     }
-/*
+
     sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       std::cerr << "Smoothing site " << i << std::endl;
       smooth(sites, track, i);
     }
-*/
+
+    track->compute_chi2(sites);
+
     KalmanMonitor monitor;
     // monitor.save(sites);
     monitor.save_mc(sites);
@@ -209,12 +213,13 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   // std::cout << "Seed state: " << std::endl;
   // a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
+  double cov = 1000.0;
   TMatrixD C(5, 5);
-  C(0, 0) = 70.*70./12.;
-  C(1, 1) = 70.*70./12.;
-  C(2, 2) = 2.;
-  C(3, 3) = 2.;
-  C(4, 4) = 2.;
+  C(0, 0) = cov;
+  C(1, 1) = cov;
+  C(2, 2) = cov; // 2.
+  C(3, 3) = cov;
+  C(4, 4) = cov;
 
   // for ( int i = 0; i < 5; ++i ) {
   //   C(i, i) = 200; // dummy values
@@ -282,7 +287,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     //x  = (x_pr + mx*z);
    // y  = (y_pr + my*z);
     //x = clusters[numb_sites-1]->get_position().x();
-    mx = mx_pr;
+    mx = -mx_pr;
     my = -my_pr;
   } else if ( tracker == 1 ) {
     //z = 0;
@@ -301,12 +306,13 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   a(4, 0) = 1./p_pr;
   first_plane.set_projected_a(a);
 
+  double cov = 1000.0;
   TMatrixD C(5, 5);
-  C(0, 0) = 70.*70./12.;
-  C(1, 1) = 70.*70./12.;
-  C(2, 2) = 1.5*1.5/12.;
-  C(3, 3) = 1.5*1.5/12.;
-  C(4, 4) = 10.;
+  C(0, 0) = cov;
+  C(1, 1) = cov;
+  C(2, 2) = cov;
+  C(3, 3) = cov;
+  C(4, 4) = cov;
 
   first_plane.set_projected_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
@@ -456,7 +462,6 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
       clusters.push_back(cluster);
     }
   }
-
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
 }
 

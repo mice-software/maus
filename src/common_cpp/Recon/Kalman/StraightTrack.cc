@@ -39,6 +39,17 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   //_F.Print();
 }
 
+void StraightTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
+  std::cout <<" ----------------------- Projection ----------------------- \n";
+  TMatrixD a = old_site->get_a();
+
+  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+
+  new_site->set_projected_a(a_projected);
+
+  a_projected.Print();
+}
+
 void StraightTrack::calc_system_noise(KalmanSite *site) {
   TMatrixD a(5, 1);
   a = site->get_a();

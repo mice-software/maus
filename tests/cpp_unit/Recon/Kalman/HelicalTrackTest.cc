@@ -147,8 +147,8 @@ TEST_F(HelicalTrackTest, test_propagator_case_2) {
   MAUS::HelicalTrack *a_track = new MAUS::HelicalTrack(a_seed);
   double x_c = -1.48641;
   double y_c = 5.91146;
-  EXPECT_EQ(x_c, a_track->get_xc());
-  EXPECT_EQ(y_c, a_track->get_yc());
+  EXPECT_TRUE(x_c-a_track->get_xc() < err);
+  EXPECT_TRUE(y_c-a_track->get_yc() < err);
 
   a_track->update_propagator(&an_old_site, &a_new_site);
   a_track->calc_predicted_state(&an_old_site, &a_new_site);
