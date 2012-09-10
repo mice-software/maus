@@ -30,7 +30,8 @@ def run(data_path, run_num):
 
     datacards = io.StringIO(u"")
 
-    my_output = MAUS.OutputPyJSON()
+    # my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
 
     # my_reduce = MAUS.ReducePyDoNothing()
     my_reduce = MAUS.ReduceCppPatternRecognition()

@@ -8,7 +8,7 @@ digitize and reconstruct TOF and tracker hits to space points.
 """
 
 import io   #  generic python library for I/O
-
+import os
 import MAUS # MAUS libraries
 
 def run():
@@ -17,6 +17,7 @@ def run():
 
     # This input generates empty spills, to be filled by the beam maker later on
     my_input = MAUS.InputPySpillGenerator()
+    # my_input = MAUS.InputCppRoot()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -40,13 +41,32 @@ def run():
 
     # Global Digits - post detector digitisation
 
-    #my_reduce = MAUS.ReduceCppMCTracker()
+    # my_reduce = MAUS.ReduceCppMCTracker()
     my_reduce = MAUS.ReduceCppPatternRecognition()
-    #my_reduce = MAUS.ReducePyDoNothing()
+    # my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
+    # my_reduce = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputPyJSON()
-    #my_output = MAUS.OutputCppRoot()
+    # my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
+    # my_output = MAUS.OutputPyImage()
+
+    # Can specify datacards here or by using appropriate command line calls.
+    # datacards_list = []
+    # image type must be one of those supported by matplotlib
+    # (currently "svg", "ps", "emf", "rgba", "raw", "svgz", "pdf",
+    # "eps", "png"). Default: "eps".
+    # datacards_list.append("histogram_image_type='%s'\n" % "eps")
+    # Add auto-numbering to the image tags. If False then each 
+    # histogram output by ReducePyMatplotlibHistogram will have
+    # tags "tdcadc" and so the end result will be just one histogram 
+    # file. If True then there will be N files, one for each spill.
+    # datacards_list.append("histogram_auto_number=%s\n" % False)
+    # Prefix for file names. Default: auto-generated UUID.
+    # datacards_list.append("image_file_prefix='%s'\n" % "histogram")
+    # Directory for images. Default: current directory.
+    # datacards_list.append("image_directory='%s'\n" % os.getcwd())
+    # datacards = io.StringIO(unicode("".join(datacards_list)))
 
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")

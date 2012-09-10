@@ -23,7 +23,6 @@ template <class ChannelId>
 Hit<ChannelId>::Hit() : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
              _energy_deposited(0), _position(0, 0, 0), _momentum(0, 0, 0),
              _channel_id(NULL) {
-_channel_id = new ChannelId();
 }
 
 template <class ChannelId>

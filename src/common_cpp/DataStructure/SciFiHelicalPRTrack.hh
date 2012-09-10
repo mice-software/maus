@@ -65,6 +65,7 @@ class SciFiHelicalPRTrack {
 
     int get_tracker() const { return _tracker; }
     int get_num_points() const { return _num_points; }
+    int get_type() const { return _type; }
 
     double get_x0() const { return _x0; }
     double get_y0() const { return _y0; }
@@ -108,6 +109,7 @@ class SciFiHelicalPRTrack {
 
     int _tracker;
     int _num_points;
+    static const int _type = 1; // 0 for straight, 1 for helical
 
     SciFiSpacePointArray _spoints;
 

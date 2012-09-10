@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
@@ -21,22 +22,17 @@
 namespace MAUS {
 
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppTrackerMCDigitization";
 
-  // JsonCpp string -> JSON::Value converter
+  _classname = "MapCppTrackerMCDigitization";
   Json::Reader reader;
 
   // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
-  if (!parsingSuccessful) {
+  if (!reader.parse(argJsonConfigDocument, _configJSON))
     return false;
-  }
 
-  // Get the tracker modules; they will be necessary
-  // for the channel number calculation
+  // Get the tracker modules; they will be necessary for the channel number calculation
   assert(_configJSON.isMember("simulation_geometry_filename"));
-  std::string filename;
-  filename = _configJSON["simulation_geometry_filename"].asString();
+  std::string filename = _configJSON["simulation_geometry_filename"].asString();
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
@@ -51,135 +47,89 @@ bool MapCppTrackerMCDigitization::death() {
 }
 
 std::string MapCppTrackerMCDigitization::process(std::string document) {
-  // writes a line in the JSON document
+
+  std::cout << "Begining tracker MC digitisation\n";
   Json::FastWriter writer;
-  // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
+
+  // Set up a spill object, then continue only if MC event array is initialised
+  Spill spill = read_in_json(document);
+  if ( spill.GetMCEvents() ) {
+    std::cout << "Found " << spill.GetMCEventSize() << " MC events\n";
+  } else {
+    std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc_events")) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "I need an MC branch to simulate.";
+    ss << _classname << " says:" << "MC event array not initialised, aborting digitisation";
     errors["missing_branch"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }
 
-  Json::Value mc;
-  mc = root.get("mc_events", 0);
-  // check sanity of json input file and mc brach
-  if ( !check_sanity_mc(mc) ) {
-    // if bad, write error file
-    return writer.write(root);
-  }
-  MAUS::SciFiSpill spill;
-  Spill maus_spill;
-  maus_spill.SetReconEvents(new ReconEventArray);
-
-  // ==========================================================
-  //  Loop over particle events and fill Event object with digits.
-  for ( unsigned int i = 0; i < mc.size(); i++ ) {  // i-th particle
-    Json::Value json_event = mc[i];
-
-    if ( !json_event.isMember("sci_fi_hits") )
-      continue;
-
-    json_to_cpp(json_event, spill);
-  } // ends loop particles
   // ================= Reconstruction =========================
-  for ( unsigned int event_i = 0; event_i < spill.events().size(); event_i++ ) {
-    MAUS::SciFiEvent * event = spill.events()[event_i];
 
-    // std::cerr << "Hits in event: " << event.hits().size() << std::endl;
-    if ( event->hits().size() ) {
-      // for each fiber-hit, make a digit
-      int _nSpill = root["spill_number"].asInt();
-      construct_digits(*event, _nSpill, event_i);
-    }
-    ReconEvent *revt = new ReconEvent();
-    revt->SetSciFiEvent(event);
-    maus_spill.GetReconEvents()->push_back(revt);
-    // std::cerr << "Digits in Event: " << event.digits().size() << " " << std::endl;
+  // Check the Recon event array is initialised, and if not make it so
+  if ( !spill.GetReconEvents() ) {
+    ReconEventArray* revts = new ReconEventArray();
+    spill.SetReconEvents(revts);
   }
 
-  save_to_json(maus_spill);
+  // Construct digits from hits for each MC event
+  for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
+    MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
+    SciFiDigitPArray digits;
+    if ( mc_evt->GetSciFiHits() ) {
+      construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
+                       static_cast<int>(event_i), digits);
+    }
+
+    // Make a SciFiEvent to hold the digits produced
+    SciFiEvent *sf_evt = new SciFiEvent();
+    sf_evt->set_digits(digits);
+
+    // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
+    // otherwise make a new Recon event to hold the SciFiEvent
+    if ( spill.GetReconEvents()->size() > event_i ) {
+      spill.GetReconEvents()->at(event_i)->SetSciFiEvent(sf_evt);
+    } else {
+      ReconEvent *revt = new ReconEvent();
+      revt->SetPartEventNumber(event_i);
+      revt->SetSciFiEvent(sf_evt);
+      spill.GetReconEvents()->push_back(revt);
+    }
+  }
   // ==========================================================
+
+  save_to_json(spill);
   return writer.write(root);
 }
 
-void MapCppTrackerMCDigitization::
-     json_to_cpp(Json::Value js_event, MAUS::SciFiSpill &spill) {
-  MAUS::SciFiEvent* event = new MAUS::SciFiEvent();
-  Json::Value _hits = js_event["sci_fi_hits"];
-  // std::cout << "Number of hits fed in: " << _hits.size() << std::endl;
-  for ( unsigned int j = 0; j < _hits.size(); j++ ) {
-    Json::Value hit = _hits[j];
-    assert(hit.isMember("channel_id"));
-    Json::Value channel_id = hit["channel_id"];
+Spill MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
 
-    int tracker, plane, station, fibre;
-    double edep, time;
+  Json::FastWriter writer;
+  Spill spill;
 
-    tracker = channel_id["tracker_number"].asInt();
-    station = channel_id["station_number"].asInt();
-    plane   = channel_id["plane_number"].asInt();
-    fibre   = channel_id["fibre_number"].asInt();
-    edep    = hit["energy_deposited"].asDouble();
-    time    = hit["time"].asDouble();
-    MAUS::SciFiHit *a_hit = new MAUS::SciFiHit();
-    a_hit->GetChannelId()->SetTrackerNumber(tracker);
-    a_hit->GetChannelId()->SetStationNumber(station);
-    a_hit->GetChannelId()->SetPlaneNumber(plane);
-    a_hit->GetChannelId()->SetFibreNumber(fibre);
-    a_hit->SetEnergyDeposited(edep);
-    a_hit->SetTime(time);
-    event->add_hit(a_hit);
-
-    // .start. TO BE REMOVED .start.//
-    double px, py, pz, x, y, z;
-    px = hit["momentum"]["x"].asDouble();
-    py = hit["momentum"]["y"].asDouble();
-    pz = hit["momentum"]["z"].asDouble();
-    x  = hit["position"]["x"].asDouble();
-    y  = hit["position"]["y"].asDouble();
-    z  = hit["position"]["z"].asDouble();
-    ThreeVector position(x, y, z);
-    ThreeVector momentum(px, py, pz);
-    a_hit->SetPosition(position);
-    a_hit->SetMomentum(momentum);
-    // .end. TO BE REMOVED .end.//
-  }
-  spill.add_event(event);
-}
-
-bool MapCppTrackerMCDigitization::check_sanity_mc(Json::Value mc) {
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
+  try {
+    root = JsonWrapper::StringToJson(json_data);
+    SpillProcessor spill_proc;
+    spill = *spill_proc.JsonToCpp(root);
+  } catch(...) {
+    std::cerr << "Bad json document" << std::endl;
     Json::Value errors;
     std::stringstream ss;
-    ss << _classname << " says:" << "MC branch isn't an array";
-    errors["bad_type"] = ss.str();
+    ss << _classname << " says:" << reader.getFormatedErrorMessages();
+    errors["bad_json_document"] = ss.str();
     root["errors"] = errors;
-    return false;
+    writer.write(root);
   }
-  return true;
+  return spill;
 }
 
+void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
+                                                   int event_num, SciFiDigitPArray &digits) {
 
-void MapCppTrackerMCDigitization::construct_digits
-    (MAUS::SciFiEvent &evt, int spill_num, int evnt_num) {
-  int number_of_hits = evt.hits().size();
-  for ( int hit_i = 0; hit_i < number_of_hits; hit_i++ ) {
-    if ( !evt.hits()[hit_i]->GetChannelId()->GetUsed() ) {
-      MAUS::SciFiHit *a_hit = evt.hits()[hit_i];
+  for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
+    if ( !hits->at(hit_i).GetChannelId()->GetUsed() ) {
+      SciFiHit *a_hit = &hits->at(hit_i);
       a_hit->GetChannelId()->SetUsed(true);
 
       // Get nPE from this hit.
@@ -192,9 +142,9 @@ void MapCppTrackerMCDigitization::construct_digits
       int chanNo = compute_chan_no(a_hit);
 
       // loop over all the other hits
-      for ( int hit_j = hit_i+1; hit_j < number_of_hits; hit_j++ ) {
-        if ( check_param(evt.hits()[hit_i], evt.hits()[hit_j]) ) {
-          MAUS::SciFiHit *same_digit = evt.hits()[hit_j];
+      for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
+        if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
+          MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
           nPE  += compute_npe(edep_j);
           same_digit->GetChannelId()->SetUsed(true);
@@ -203,9 +153,8 @@ void MapCppTrackerMCDigitization::construct_digits
       int tracker = a_hit->GetChannelId()->GetTrackerNumber();
       int station = a_hit->GetChannelId()->GetStationNumber();
       int plane = a_hit->GetChannelId()->GetPlaneNumber();
-      int spill = spill_num;
-      int event = evnt_num;
-      SciFiDigit *a_digit = new SciFiDigit(spill, event,
+
+      SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
                                            tracker, station, plane, chanNo, nPE, time);
       // .start. TO BE REMOVED .start.//
       ThreeVector position = a_hit->GetPosition();
@@ -213,9 +162,9 @@ void MapCppTrackerMCDigitization::construct_digits
       a_digit->set_true_position(position);
       a_digit->set_true_momentum(momentum);
       // .end. TO BE REMOVED .end.//
-      evt.add_digit(a_digit);
+      digits.push_back(a_digit);
     }
-  }  // ends 'for' loop over hits
+  } // ends 'for' loop over hits
 }
 
 int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {

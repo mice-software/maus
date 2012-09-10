@@ -67,6 +67,7 @@ class SciFiStraightPRTrack {
 
     int get_tracker() const { return _tracker; }
     int get_num_points() const { return _num_points; }
+    int get_type() const { return _type; }
 
     // Setters
     void set_spacepoints(SciFiSpacePointArray spoints) { _spoints = spoints; }
@@ -96,6 +97,8 @@ class SciFiStraightPRTrack {
 
     int _tracker;
     int _num_points;
+    static const int _type = 0; // 0 for straight, 1 for helical
+
     ClassDef(SciFiStraightPRTrack, 1)
 };
 

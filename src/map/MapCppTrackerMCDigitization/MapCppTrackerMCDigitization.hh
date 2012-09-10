@@ -41,6 +41,7 @@
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -68,21 +69,15 @@ class MapCppTrackerMCDigitization {
    */
   std::string process(std::string document);
 
-  /** @brief sanity check
+  /** @brief reads in json data to a Spill object
    *
-   *  Checks the sanity of of the MC branch
    */
-  bool check_sanity_mc(Json::Value mc);
+  MAUS::Spill read_in_json(std::string json_data);
 
-  /** @brief sanity check
-   *
-   *  Checks the sanity of of the MC branch
+  /** @brief builds digits
    */
-  void json_to_cpp(Json::Value json_event, MAUS::SciFiSpill &spill);
-
-  /** @brief builds digits and stores them in the SciFiEvent
-   */
-  void construct_digits(MAUS::SciFiEvent &event, int spill_num, int evnt_num);
+  void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
+                        int event_num, MAUS::SciFiDigitPArray &digits);
 
   /** @brief computes npe from energy deposits.
    */

@@ -60,6 +60,19 @@ class PatternRecognition {
       */
     void process(SciFiEvent &evt);
 
+     /** @brief Small function to easily add trks to a SciFiEvent
+      *
+      *  Small utility function to easily add  both straight and helical trks to a SciFiEvent,
+      *  and to set the tracker number of all the tracks added
+      *
+      *  @param strks - The straight tracks vector
+      *  @param htrks - The helical tracks vector
+      *  @param evt - The tracker number
+      *  @param evt - The SciFi event
+      */
+    void add_tracks(int trker_no, std::vector<SciFiStraightPRTrack> &strks,
+                    std::vector<SciFiHelicalPRTrack> &htrks, SciFiEvent &evt);
+
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
      *
      *  Make a Pattern Recognition track/s when there are spacepoints
@@ -275,7 +288,7 @@ class PatternRecognition {
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
      *  Take an input vector of spacepoints and output a 2D vector of spacepoints
-     *  where the first index is the station the spacepoint is located.
+     *  where the first index is the station the spacepoint is located in.
      *
      *  @param spnts - A vector of all the input spacepoints
      *  @param spnts_by_station - Output 2D vector of spacepoints sorted by station
@@ -283,6 +296,17 @@ class PatternRecognition {
      */
     void sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
                          std::vector< std::vector<SciFiSpacePoint*> > &spnts_by_station);
+
+    /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker
+     *
+     *  Take an input vector of spacepoints and output a 2D vector of spacepoints
+     *  where the first index is the tracker the spacepoint is located in.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *
+     */
+    std::vector< std::vector<SciFiSpacePoint*> > sort_by_tracker(
+                                                    const std::vector<SciFiSpacePoint*> &spnts);
 
     /** @brief Count the number of stations that have unused spacepoint
      *

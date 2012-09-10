@@ -134,4 +134,10 @@ SciFiEvent::~SciFiEvent() {
   }
 }
 
+void SciFiEvent::set_spacepoints_used_flag(bool flag) {
+  for ( unsigned int i = 0; i < _scifispacepoints.size(); ++i ) {
+    _scifispacepoints[i]->set_used(flag);
+  }
+}
+
 } // ~namespace MAUS

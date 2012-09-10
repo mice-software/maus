@@ -72,6 +72,7 @@ class SciFiEvent {
     void set_spacepoints(SciFiSpacePointPArray scifispacepoints) {
                         _scifispacepoints = scifispacepoints; }
     SciFiSpacePointPArray spacepoints() const { return _scifispacepoints; }
+    void set_spacepoints_used_flag(bool flag);
 
     /** Seeds */
     void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
