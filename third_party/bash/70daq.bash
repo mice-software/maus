@@ -32,19 +32,21 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
 	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         mkdir "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+        mkdir "${MAUS_ROOT_DIR}/third_party/install/include/daq"
 	sleep 1
         tar xvf "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build/${directory}" > /dev/null
-        cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+        #cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
 	#sleep 1
 	#scons install
 
-        cp *.a "${MAUS_ROOT_DIR}/third_party/install/lib"
+        cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/libMDMonitor.a" "${MAUS_ROOT_DIR}/third_party/install/lib"
 	#cat MDmonitoring.hh |sed "s;#include \"monitor.h\";//#include \"monitor.h\";" | sed "s;#include \"event.h\";//#include \"event.h\";" > tmp.hh
 	#mv tmp.hh MDmonitoring.hh
-	cp *.h "${MAUS_ROOT_DIR}/third_party/install/include"
-	cp *.hh "${MAUS_ROOT_DIR}/third_party/install/include"
-	cd -
-	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	#cd -
+	#rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
 	echo
         echo "INFO: The package should be locally installed now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"
