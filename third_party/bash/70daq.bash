@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 version=0.3.2
-filename=daqlib.tgz
+filename=monitor_test.tar
 directory=daq-${version}
-url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_${version}/${filename}
+url=http://micewww.pp.rl.ac.uk/attachments/1187/monitor_test.tar
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -33,9 +33,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         mkdir "${MAUS_ROOT_DIR}/third_party/build/${directory}"
 	sleep 1
-        tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build/${directory}" > /dev/null
+        tar xvf "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build/${directory}" > /dev/null
         cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+	#sleep 1
+	#scons install
+
         cp *.a "${MAUS_ROOT_DIR}/third_party/install/lib"
+	#cat MDmonitoring.hh |sed "s;#include \"monitor.h\";//#include \"monitor.h\";" | sed "s;#include \"event.h\";//#include \"event.h\";" > tmp.hh
+	#mv tmp.hh MDmonitoring.hh
+	cp *.h "${MAUS_ROOT_DIR}/third_party/install/include"
 	cp *.hh "${MAUS_ROOT_DIR}/third_party/install/include"
 	cd -
 	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"

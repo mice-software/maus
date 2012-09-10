@@ -102,8 +102,9 @@ def maus_input_transform_process(maus_input_log):
     """
     print 'Starting reconstruction with log file ', maus_input_log,
     log = open(maus_input_log, 'w')
-    maus_inp = os.path.join(os.environ['MAUS_ROOT_DIR'],
-                                   'bin/online/analyze_data_online_input_transform.py')
+    maus_inp = \
+             os.path.join(os.environ['MAUS_ROOT_DIR'],
+                          'bin/online/analyze_data_online_input_transform.py')
     proc = subprocess.Popen(
                        ['python', maus_inp, '-mongodb_database_name=maus-new',
                         '-type_of_dataflow=multi_process_input_transform'],
@@ -134,7 +135,7 @@ def force_kill_maus_web_app():
     """
     hack_stdout = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'grep.out')
     fout = open(hack_stdout, 'w')
-    ps_proc = subprocess.Popen(['ps', '-e', '-F'], stdout=fout,\
+    ps_proc = subprocess.Popen(['ps', '-e', '-F'], stdout=fout, \
                                                        stderr=subprocess.STDOUT)
     ps_proc.wait()
     fout.close()
@@ -142,9 +143,9 @@ def force_kill_maus_web_app():
     pid = None
     for line in fin.readlines():
         if line.find('src/mausweb/manage.py') > -1:
-           words = line.split()
-           pid = int(words[1])
-           print "Found lurking maus-web-app process"
+            words = line.split()
+            pid = int(words[1])
+            print "Found lurking maus-web-app process"
     if pid != None:
         os.kill(pid, signal.SIGKILL)
         print "Killed", pid
@@ -184,9 +185,9 @@ def make_lockfile(PROCESSES):
     """
     print 'Making lockfile '+LOCKFILE
     fout = open(LOCKFILE, 'w')
-    print >>fout, os.getpid()
+    print >> fout, os.getpid()
     for proc in PROCESSES:
-       print >>fout, proc.pid
+        print >> fout, proc.pid
     fout.close()
 
 def cleanup():
@@ -232,7 +233,7 @@ def main():
         make_lockfile(PROCESSES)
         print '\nCTRL-C to quit\n'
         while poll_processes(PROCESSES):
-           time.sleep(POLL_TIME)
+            time.sleep(POLL_TIME)
     except KeyboardInterrupt:
         print "Closing"
     except Exception:

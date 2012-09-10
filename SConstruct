@@ -60,7 +60,8 @@ def setup_environment():
     tests = {'CheckCommand' : maus_build_tools.environment_tools.check_command}
     conf = Configure(env, tests) # pylint: disable=E0602
     # Setup the module builder
-    SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env, conf)
+    SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env,
+                                                                          conf)
 
     # check libraries exist; add them into the environment
     for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',

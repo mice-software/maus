@@ -37,7 +37,7 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Pick up JSON daq event.
   Json::Value _events = daq["single_station"];
-  //std::cout <<  _events.size() << std::endl;
+  // std::cout <<  _events.size() << std::endl;
   for ( unsigned int i = 1; i < _events.size(); ++i ) {
     SEEvent* event = new SEEvent();
 
@@ -62,9 +62,9 @@ void SEDigitization::process(SESpill &spill, Json::Value const &daq) {
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      //if ( !is_good_channel(bank, channel_ro) ) {
-        //continue;
-      //}
+      // if ( !is_good_channel(bank, channel_ro) ) {
+        // continue;
+      // }
 
       // Get pedestal and gain from calibration.
       assert(_calibration[bank][channel_ro].isMember("pedestal"));
