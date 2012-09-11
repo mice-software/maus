@@ -18,27 +18,27 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # Exit the script if ANY command fails
     set -e
-#    ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     if [ $? != 0 ]; then
         echo "FATAL: Found a bad MAUS_ROOT_DIR"
     fi
-#    ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/41cpplint.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/50cloc.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
-#    ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/41cpplint.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/50cloc.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
     ${MAUS_ROOT_DIR}/third_party/bash/70daq.bash
 
 else
