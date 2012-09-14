@@ -962,13 +962,6 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
   Phi_0 = calculate_Phi(x0, y0, circle);
 
-  std::cerr << "-------SUUUMMMMEEEERRRR--------" << "\n"
-            << "seed values are " << circle.get_x0() << " " << circle.get_y0() << " " << Phi_0 << " " << R << "\n"
-            << "Tracker:" << spnts[0]->get_tracker() << ", Station: " << spnts[0]->get_station() << "\n"
-            << "MC Truth: " << spnts[0]->get_channels()[0]->get_true_position().x() << ", " << spnts[0]->get_channels()[0]->get_true_position().y() << "\n"
-            << "Recon: " << spnts[0]->get_position().x() << ", " << spnts[0]->get_position().y() << "\n"
-            << "Seed: " << circle.get_x0()+R*cos(Phi_0) << ", " << circle.get_y0()+R*sin(Phi_0) << "\n";
-
   // For the linear fit in s-z, we care about the change in z vs change in s
   // So here we calculate the values dz_ji and dphi_ji (because ds_ji = R*dphi_ji)
   for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {

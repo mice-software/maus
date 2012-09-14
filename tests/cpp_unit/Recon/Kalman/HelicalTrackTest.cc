@@ -51,15 +51,16 @@ void HelicalTrackTest::set_up_seed() {
   pt = 1.2*radius; // MeV/c
   pz = 220.0;
   tan_lambda = pz/pt;
-  kappa = Q/pow(pt*pt+pz*pz,0.5);
+  kappa = Q/pow(pt*pt+pz*pz, 0.5);
   double theta = 3.14159265359/2.;
-  phi0 = atan2(radius*sin(theta)+dy,radius*cos(theta)+dx);
-  //phi0 = atan2(radius*sin(theta)+dy+yc,radius*cos(theta)+dx+xc);
+  phi0 = atan2(radius*sin(theta)+dy, radius*cos(theta)+dx);
+  // phi0 = atan2(radius*sin(theta)+dy+yc,radius*cos(theta)+dx+xc);
   double x0 = xc+radius*cos(phi0);
   double y0 = yc+radius*sin(phi0);
   // set_spacepoints(std::vector<SciFiSpacePoint> spoints) { _spoints = spoints; }
   // std::cerr << "Helical Test. Phi0 is " << phi0 << std::endl;
-  // std::cerr << "Computed from: " << radius*sin(theta)+dy << " " << radius*cos(theta)+dx << std::endl;
+  // std::cerr << "Computed from: " << radius*sin(theta)+dy << " "
+  // << radius*cos(theta)+dx << std::endl;
   seed.set_x0(x0);
   seed.set_y0(y0);
   seed.set_phi0(phi0);
@@ -76,8 +77,8 @@ void HelicalTrackTest::set_up_sites() {
   a.ResizeTo(5, 1);
   a(0, 0) = xc+radius*cos(phi0)+dx;
   a(1, 0) = yc+radius*sin(phi0)+dy;
-  //a(0, 0) = 2.2; //2.2
-  //a(1, 0) = 10.2; //10.2
+  // a(0, 0) = 2.2; //2.2
+  // a(1, 0) = 10.2; //10.2
   a(2, 0) = radius;
   a(3, 0) = kappa;
   a(4, 0) = tan_lambda;
@@ -94,16 +95,16 @@ TEST_F(HelicalTrackTest, test_propagator_case_1) {
 
   track->update_propagator(&old_site, &new_site);
   track->calc_predicted_state(&old_site, &new_site);
-  //TMatrixD F(5, 5);
-  //F = track->get_propagator();
+  // TMatrixD F(5, 5);
+  // F = track->get_propagator();
   TMatrixD a_temp(5, 1);
   // move to centre of helix
-  //a_temp(1, 0) = a_temp(1, 0) - x0;
-  //a_temp(2, 0) = a_temp(1, 0) - y0;
-  //a_temp = TMatrixD(F, TMatrixD::kMult, a);
-  //a.Print();
-  //F.Print();
-  //a_temp.Print();
+  // a_temp(1, 0) = a_temp(1, 0) - x0;
+  // a_temp(2, 0) = a_temp(1, 0) - y0;
+  // a_temp = TMatrixD(F, TMatrixD::kMult, a);
+  // a.Print();
+  // F.Print();
+  // a_temp.Print();
   double projected_x = track->get_projected_x();
   double projected_y = track->get_projected_y();
   // projected_x = projected_x+x0;
@@ -113,8 +114,6 @@ TEST_F(HelicalTrackTest, test_propagator_case_1) {
   std::cerr << projected_x << " " << projected_y << std::endl;
   EXPECT_TRUE(fabs(projected_x-a_temp(0, 0)) < err);
   EXPECT_TRUE(fabs(projected_y-a_temp(1, 0)) < err);
-//
-
 }
 
 TEST_F(HelicalTrackTest, test_propagator_case_2) {
@@ -152,16 +151,16 @@ TEST_F(HelicalTrackTest, test_propagator_case_2) {
 
   a_track->update_propagator(&an_old_site, &a_new_site);
   a_track->calc_predicted_state(&an_old_site, &a_new_site);
-  //TMatrixD F(5, 5);
-  //F = track->get_propagator();
+  // TMatrixD F(5, 5);
+  // F = track->get_propagator();
   TMatrixD a_temp(5, 1);
   // move to centre of helix
-  //a_temp(1, 0) = a_temp(1, 0) - x0;
-  //a_temp(2, 0) = a_temp(1, 0) - y0;
-  //a_temp = TMatrixD(F, TMatrixD::kMult, a);
-  //a.Print();
-  //F.Print();
-  //a_temp.Print();
+  // a_temp(1, 0) = a_temp(1, 0) - x0;
+  // a_temp(2, 0) = a_temp(1, 0) - y0;
+  // a_temp = TMatrixD(F, TMatrixD::kMult, a);
+  // a.Print();
+  // F.Print();
+  // a_temp.Print();
   double projected_x = a_track->get_projected_x();
   double projected_y = a_track->get_projected_y();
   // projected_x = projected_x+x0;

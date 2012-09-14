@@ -63,7 +63,7 @@ class KalmanTrackFit {
 
   void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites);
 
-  //void initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
+  // void initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
   //                             CLHEP::Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,

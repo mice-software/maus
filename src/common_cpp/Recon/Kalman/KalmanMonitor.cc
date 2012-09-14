@@ -175,10 +175,10 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
 
     std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
 
-   if ( id < 15 ) {
-     mc_x  = -mc_x;
-     mc_px = -mc_px;
-   }
+    if ( id < 15 ) {
+      mc_x  = -mc_x;
+      mc_px = -mc_px;
+    }
 
     out2 // << a(0, 0)    << " " << C(0, 0) << " "
          // << a(1, 0)    << " " << C(1, 1) << " "
@@ -188,8 +188,8 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
          // << pr_x0+pr_mx*site.get_z() << " " << pr_y0+pr_my*site.get_z() << " "
          << px << " " << py << " " << pz << " "
          << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
-         << a_projected(2, 0) << " " << mc_radius << " " << a_projected(3, 0) << " " << mc_phi << " "
-         << a_projected(4, 0) << " " << mc_tan_l << " "
+         << a_projected(2, 0) << " " << mc_radius << " " << a_projected(3, 0) << " "
+         << mc_phi << " " << a_projected(4, 0) << " " << mc_tan_l << " "
          << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }

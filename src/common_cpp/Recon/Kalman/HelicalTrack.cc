@@ -70,7 +70,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
 
   double my_xc = 0.0;
   double my_yc = 0.0;
-  double old_phi = atan2((old_y-my_yc),(old_x-my_xc));
+  double old_phi = atan2((old_y-my_yc), (old_x-my_xc));
   while (old_phi < 0.)      old_phi += 2.0*Pi;
   while (old_phi > 2.0*Pi)  old_phi -= 2.0*Pi;
 
@@ -159,20 +159,21 @@ void HelicalTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_si
   a.Print();
   a(0, 0) = a(0, 0) - _xc;
   a(1, 0) = a(1, 0) - _yc;
-  //a.Print();
+  // a.Print();
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
   a_projected(0, 0) = a_projected(0, 0) + _xc;
   a_projected(1, 0) = a_projected(1, 0) + _yc;
   new_site->set_projected_a(a_projected);
 
-  //_F.Print();
+  // _F.Print();
   std::cout << "New projected state: " << std::endl;
   a_projected.Print();
 }
 
 void HelicalTrack::calc_system_noise(KalmanSite *site) {
   _Q.Zero();
-/*  TMatrixD a(5, 1);
+/*
+  TMatrixD a(5, 1);
   a = site->get_a();
   double mx = a(2, 0);
   double my = a(3, 0);

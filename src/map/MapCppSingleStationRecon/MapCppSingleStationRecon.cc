@@ -78,13 +78,13 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         }
         //
         Hep3Vector tof0, tof1, PR_pos, PR_mom;
-        Hep3Vector ss(666.,666.,666.);
+        Hep3Vector ss(666., 666., 666.);
         // double tof0_x, tof0_y, tof1_x, tof1_y;
         // double tof0_time, tof1_time;
         bool success = false;
         if ( event->spacepoints().size() == 1 ) {
           std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
-          //std::cerr << "Clusters size: " << clusters.size() << "\n";
+          // std::cerr << "Clusters size: " << clusters.size() << "\n";
           int size = clusters.size();
           for ( int clust_i = 0; clust_i < size; ++clust_i ) {
             // std::cerr << clust_i << "\n";
@@ -233,8 +233,10 @@ void MapCppSingleStationRecon::save_to_json(SEEvent *evt, int event_i) {
                                                = sci_fi_space_points;
 }
 
-void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, Hep3Vector &tof0, Hep3Vector &tof1,
-                                                Hep3Vector &PR_pos, Hep3Vector &PR_mom, bool &success) {
+void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
+                                                Hep3Vector &tof0, Hep3Vector &tof1,
+                                                Hep3Vector &PR_pos, Hep3Vector &PR_mom,
+                                                bool &success) {
   // Define some constants.
   static const int tof0_num_slabs = 10;
   static const int tof1_num_slabs = 7;

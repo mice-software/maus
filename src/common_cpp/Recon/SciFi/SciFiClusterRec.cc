@@ -128,9 +128,9 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   assert(this_plane != NULL);
 
-  //dir  *= this_plane->globalRotation();
-  //perp *= this_plane->globalRotation();
-  //ThreeVector plane_position;
+  // dir  *= this_plane->globalRotation();
+  // perp *= this_plane->globalRotation();
+  // ThreeVector plane_position;
 /*
   if ( clust->get_tracker() == 0 ) {
     dir  *= this_plane->relativeRotation(tracker_solenoid_0);
@@ -158,10 +158,10 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 */
 
   // this is the rotation of the fibre array
-  //(*trot) = (*trot)*zflip;
+  // (*trot) = (*trot)*zflip;
   // G4RotationMatrix* trot = new G4RotationMatrix();
-  //Hep3Vector dir(0, 1, 0);
-  //dir *= *(trot);
+  // Hep3Vector dir(0, 1, 0);
+  // dir *= *(trot);
 
   if ( tracker == 0 ) {
     trot= trot*zflip;
@@ -169,13 +169,13 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
     perp *= trot;
     // dir.rotateY(pi*rad);
     // perp.rotateY(pi*rad);
-    //plane_position = this_plane->globalPosition();
+    // plane_position = this_plane->globalPosition();
   } else if ( tracker == 1 ) {
     dir  *= trot;
     perp *= trot;
-    //dir.rotateY(pi*rad);
-    //perp.rotateY(pi*rad);
-    //plane_position = this_plane->globalPosition();
+    // dir.rotateY(pi*rad);
+    // perp.rotateY(pi*rad);
+    // plane_position = this_plane->globalPosition();
   }
 
   double Pitch = this_plane->propertyDouble("Pitch");
@@ -190,7 +190,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   ThreeVector tracker_ref_frame_pos = position - reference;
 
-  //ThreeVector tracker_ref_frame_pos;
+  // ThreeVector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
     tracker_ref_frame_pos = - (position - reference);
   } else {
@@ -201,8 +201,8 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   clust->set_direction(dir);
   clust->set_relative_position(tracker_ref_frame_pos);
 
-  //clust->set_position(position);
-  //clust->set_relative_position(position);
+  // clust->set_position(position);
+  // clust->set_relative_position(position);
   // Set relative position & channel number for the Kalman Filter.
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.

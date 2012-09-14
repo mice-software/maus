@@ -87,7 +87,7 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   _V.Zero();
   _V = _G;
   _G.Invert();
-  //_G.Print();
+  // _G.Print();
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
@@ -136,7 +136,6 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   a_site->set_covariance_matrix(Cp);
   std::cout << "Updated Covariance \n";
   Cp.Print();
-
 }
 
 // h1(a_1^0)
@@ -209,7 +208,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
-  //std::cout << "Filtered state: " << std::endl;
+  // std::cout << "Filtered state: " << std::endl;
   // a_filt.Print();
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
