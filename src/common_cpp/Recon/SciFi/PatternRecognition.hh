@@ -364,7 +364,7 @@ class PatternRecognition {
     bool get_straight_pr_on() { return _straight_pr_on; }
 
   private:
-    static const int debug = 1; // Set output level, 0 = little, 1 = more couts, 2 = files as well
+    static const int debug = 0; // Set output level, 0 = little, 1 = more couts, 2 = files as well
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
