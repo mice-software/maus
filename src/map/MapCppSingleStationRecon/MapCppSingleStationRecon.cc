@@ -100,16 +100,16 @@ std::string MapCppSingleStationRecon::process(std::string document) {
           std::cerr << "SS position " << event->spacepoints()[0]->get_position().x() << " "
                     << event->spacepoints()[0]->get_position().y() << "\n";
 
-    std::ofstream out2("detectors.txt", std::ios::out | std::ios::app);
-    out2 << tof0(0)    << " " << tof0(1) << " " << tof1(0)    << " " << tof1(1) << " "
-         << event->spacepoints()[0]->get_position().x() << " "
-         << event->spacepoints()[0]->get_position().y() << "\n";
-    out2.close();
+          std::ofstream out2("detectors.txt", std::ios::out | std::ios::app);
+                 out2 << tof0(0)    << " " << tof0(1) << " " << tof1(0)    << " " << tof1(1) << " "
+                 << event->spacepoints()[0]->get_position().x() << " "
+                 << event->spacepoints()[0]->get_position().y() << "\n";
+                 out2.close();
 
 
           std::cerr << "Starting Global Recon" << std::endl;
           KalmanTrackFitSS fit;
-          // fit.process(tof0, ss, tof1, PR_pos, PR_mom);
+          fit.process(tof0, ss, tof1, PR_pos, PR_mom);
           // ++eff_counter;
         }
         //
@@ -281,12 +281,12 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i, 
     // tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
     // tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
 
-    tof0_x = (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
-    tof0_y = (tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
+    tof0_x = -(tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
+    tof0_y = (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
     Hep3Vector tof0_sp(tof0_x, tof0_y, tof0_time);
 
-    tof1_x = (tof1_slabx - (tof1_num_slabs - 1.)/2.)*tof1_a;
-    tof1_y = (tof1_slaby - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    tof1_x = -(tof1_slaby - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    tof1_y = (tof1_slabx - (tof1_num_slabs - 1.)/2.)*tof1_a;
     Hep3Vector tof1_sp(tof1_x, tof1_y, tof1_time);
 
     tof0 = tof0_sp;

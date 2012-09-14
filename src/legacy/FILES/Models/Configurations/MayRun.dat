@@ -54,7 +54,7 @@ Configuration MayRun
       Module SingleStation/SingleStation.dat
       {
             Position 0. 0. +3.29585 m
-            Rotation 0. 180. 0. degree
+            Rotation 0. 0. 0. degree
       }
 	Module TOF/TOF1.dat
 	{

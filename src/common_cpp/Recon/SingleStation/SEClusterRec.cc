@@ -107,7 +107,7 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   // if ( tracker == 1 ) {
   //  alpha = -alpha;
   // }
-  clust->set_alpha(-alpha);
+  clust->set_alpha(alpha);
 }
 
 bool SEClusterRec::are_neighbours(SEDigit *seed_i, SEDigit *seed_j) {
