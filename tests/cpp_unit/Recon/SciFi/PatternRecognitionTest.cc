@@ -181,4 +181,152 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_TRUE(compare_doubles(y_chisq, strks[0].get_y_chisq(), epsilon));
 }
 
+TEST_F(PatternRecognitionTest, test_process) {
+
+  int n_stations = 5;
+  PatternRecognition pr;
+
+  // Set up spacepoints corresponding to straight line
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
+  sp1->set_position(pos);
+  sp1->set_tracker(0);
+  sp1->set_station(1);
+  sp1->set_type("triplet");
+
+  pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
+  sp2->set_position(pos);
+  sp2->set_tracker(0);
+  sp2->set_station(2);
+  sp2->set_type("triplet");
+
+  pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
+  sp3->set_position(pos);
+  sp3->set_tracker(0);
+  sp3->set_station(3);
+  sp3->set_type("triplet");
+
+  pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
+  sp4->set_position(pos);
+  sp4->set_tracker(0);
+  sp4->set_station(4);
+  sp4->set_type("triplet");
+
+  pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
+  sp5->set_position(pos);
+  sp5->set_tracker(0);
+  sp5->set_station(5);
+  sp5->set_type("triplet");
+
+  // Set up the spacepoints vector
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp5);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp1);
+  spnts.push_back(sp4);
+
+  SciFiEvent evt;
+  evt.set_spacepoints(spnts);
+
+  pr.process(evt);
+
+  /*
+  SciFiHelicalPRTrack htrk = evt.helicalprtracks()[0];
+
+  std::cerr << " x0 is " << htrk.get_x0() << std::endl;
+  std::cerr << " y0 is " << htrk.get_y0() << std::endl;
+  std::cerr << " z0 is " << htrk.get_z0() << std::endl;
+  std::cerr << " phi0 is " << htrk.get_phi0() << std::endl;
+  std::cerr << " psi0 is " << htrk.get_psi0() << std::endl;
+  std::cerr << " ds/dz is " << htrk.get_dsdz() << std::endl;
+  std::cerr << " R is " << htrk.get_R() << std::endl;
+  std::cerr << " line_sz_chi2 is " << htrk.get_line_sz_chisq() << std::endl;
+  std::cerr << " circle_chi2 is " << htrk.get_circle_chisq() << std::endl;
+  std::cerr << " chi2 is " << htrk.get_chisq() << std::endl;
+  std::cerr << " chi2_dof is " << htrk.get_chisq_dof() << std::endl;
+  std::cerr << " num_points is " << htrk.get_num_points() << std::endl;
+  */
+
+  std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
+  std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
+
+  // The track parameters that should be reconstructed from the spacepoints
+  int num_points = 5;
+
+  // For a straight fit
+  double line_y0 = -58.85201389;
+  double line_x0 = -68.94108927;
+  double line_my = 0.03755825;
+  double line_mx = -0.02902014;
+  double line_x_chisq = 22.87148204;
+  double line_y_chisq = 20.99052559;
+
+  // For a circle fit
+  double helix_x0 = -68.2488;
+  double helix_y0 = -57.8109;
+  double helix_R = 136.335;
+
+  unsigned int trks_size = 0;
+  double true_par1 = 0.0;
+  double true_par2 = 0.0;
+  double true_par3 = 0.0;
+  double true_par4 = 0.0;
+  double true_par5 = 0.0;
+  double true_par6 = 0.0;
+  int true_par7 = 0;
+  double recon_par1 = 0.0;
+  double recon_par2 = 0.0;
+  double recon_par3 = 0.0;
+  double recon_par4 = 0.0;
+  double recon_par5 = 0.0;
+  double recon_par6 = 0.0;
+  int recon_par7 = 0;
+
+  if ( pr.get_helical_pr_on() ) {
+    trks_size = htrks.size();
+    true_par1 = helix_x0;
+    true_par2 = helix_y0;
+    true_par3 = helix_R;
+    true_par7 = num_points;
+    recon_par1 = htrks[0].get_x0();
+    recon_par2 = htrks[0].get_y0();
+    recon_par3 = htrks[0].get_R();
+    recon_par7 = htrks[0].get_num_points();
+  } else if ( pr.get_straight_pr_on() ) {
+    trks_size = strks.size();
+    true_par1 = line_x0;
+    true_par2 = line_mx;
+    true_par3 = line_x_chisq;
+    true_par4 = line_y0;
+    true_par5 = line_my;
+    true_par6 = line_y_chisq;
+    true_par7 = num_points;
+    recon_par1 = strks[0].get_x0();
+    recon_par2 = strks[0].get_mx();
+    recon_par3 = strks[0].get_x_chisq();
+    recon_par4 = strks[0].get_y0();
+    recon_par5 = strks[0].get_my();
+    recon_par6 = strks[0].get_y_chisq();
+    recon_par7 = strks[0].get_num_points();
+  }
+
+  // Check it matches to within a tolerance epsilon
+  double epsilon = 0.001;
+
+  EXPECT_EQ(1, trks_size);
+  EXPECT_NEAR(true_par1, recon_par1, epsilon);
+  EXPECT_NEAR(true_par2, recon_par2, epsilon);
+  EXPECT_NEAR(true_par3, recon_par3, epsilon);
+  EXPECT_NEAR(true_par4, recon_par4, epsilon);
+  EXPECT_NEAR(true_par5, recon_par5, epsilon);
+  EXPECT_NEAR(true_par6, recon_par6, epsilon);
+  EXPECT_EQ(true_par7, recon_par7);
+}
+
 } // ~namespace MAUS

@@ -182,6 +182,24 @@ TEST_F(SciFiEventTestDS, test_spoint_getters_setters) {
   EXPECT_EQ(spacepoint, evt->spacepoints()[0]);
 }
 
+TEST_F(SciFiEventTestDS, test_spoint_set_used_flag) {
+  SciFiEvent* evt = new SciFiEvent();
+  SciFiSpacePoint* spacepoint1 = new SciFiSpacePoint();
+  spacepoint1->set_used(false);
+  evt->add_spacepoint(spacepoint1);
+  SciFiSpacePoint* spacepoint2 = new SciFiSpacePoint();
+  evt->add_spacepoint(spacepoint2);
+  spacepoint2->set_used(false);
+  EXPECT_FALSE(evt->spacepoints()[0]->get_used());
+  EXPECT_FALSE(evt->spacepoints()[1]->get_used());
+  evt->set_spacepoints_used_flag(true);
+  EXPECT_TRUE(evt->spacepoints()[0]->get_used());
+  EXPECT_TRUE(evt->spacepoints()[1]->get_used());
+  evt->set_spacepoints_used_flag(false);
+  EXPECT_FALSE(evt->spacepoints()[0]->get_used());
+  EXPECT_FALSE(evt->spacepoints()[1]->get_used());
+}
+
 TEST_F(SciFiEventTestDS, test_seed_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiSpacePoint* seed = new SciFiSpacePoint();
