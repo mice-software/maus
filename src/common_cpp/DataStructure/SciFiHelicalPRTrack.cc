@@ -30,6 +30,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() {
   _dsdz = -1.0;
   _R = -1.0;
   _line_sz_chisq = -1.0;
+  _circle_x0 = -1.0;
+  _circle_y0 = -1.0;
   _circle_chisq = -1.0;
   _chisq = -1.0;
   _chisq_dof = -1.0;
@@ -64,6 +66,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep
   _phi0 = circle.get_turning_angle()[0];
   _R    = circle.get_R();
   _line_sz_chisq = line_sz.get_chisq();
+  _circle_x0 = circle.get_x0();
+  _circle_y0 = circle.get_y0();
   _circle_chisq = circle.get_chisq();
   _psi0 = -1.0;
   _dsdz = line_sz.get_m();
@@ -100,6 +104,8 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
   _dsdz = _htrk.get_dsdz();
   _line_sz_chisq = _htrk.get_line_sz_chisq();
   _circle_chisq = _htrk.get_circle_chisq();
+  _circle_x0 = _htrk.get_circle_x0();
+  _circle_y0 = _htrk.get_circle_y0();
   _chisq = _htrk.get_chisq();
   _chisq_dof = _htrk.get_chisq_dof();
   _num_points = _htrk.get_num_points();
@@ -110,8 +116,8 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)
   :  _x0(-1.0), _y0(-1.0), _z0(-1.0), _phi0(-1.0), _psi0(-1.0), _dsdz(-1.0), _R(-1.0),
-     _tracker(-1), _num_points(-1), _line_sz_chisq(-1.0), _circle_chisq(-1.0), _chisq(-1.0),
-     _spoints(0) {
+     _tracker(-1), _num_points(-1), _line_sz_chisq(-1.0), _circle_x0(-1.0), _circle_y0(-1.0),
+     _circle_chisq(-1.0), _chisq(-1.0), _spoints(0) {
   *this = _htrk;
 }
 

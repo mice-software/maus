@@ -47,6 +47,7 @@
 #include "TVirtualPad.h"
 #include "TFrame.h"
 #include "TF1.h"
+#include "TArc.h"
 #include "TPaveText.h"
 
 namespace MAUS {
@@ -75,7 +76,8 @@ class ReduceCppPatternRecognition {
   */
   std::string process(std::string document);
 
-  int const get_num_tracks() { return _tracks.GetEntries(); }
+  int const get_num_stracks() { return _stracks.GetEntries(); }
+  int const get_num_circles() { return _circles.GetEntries(); }
   int const get_num_spoints() { return _spoints.GetEntries(); }
   MAUS::Spill get_spill() { return _spill; }
 
@@ -105,20 +107,26 @@ class ReduceCppPatternRecognition {
   double _y;
   double _z;
 
-  TTree _tracks;
-  int _tracker_event;
-  int _num_points;
-  // int _station_hits
+  TTree _stracks;
+  int _num_points_str;
   double _mx;
   double _my;
   double _x0;
   double _y0;
+
+  TTree _circles;
+  int _num_points_circ;
+  double _circle_x0;
+  double _circle_y0;
+  double _circle_R;
 
   // Vectors to hold the tracks in each projection in each tracker
   std::vector<TF1> _trks_zx_trkr0;
   std::vector<TF1> _trks_zy_trkr0;
   std::vector<TF1> _trks_zx_trkr1;
   std::vector<TF1> _trks_zy_trkr1;
+  std::vector<TArc> _circles_xy_trkr0;
+  std::vector<TArc> _circles_xy_trkr1;
 
   // The current spill
   Spill _spill;
@@ -134,8 +142,10 @@ class ReduceCppPatternRecognition {
 
   void draw_histos(TTree * t1, TCanvas * c1);
   void draw_graphs(TTree * t1, TCanvas * c1);
-  void draw_tracks(TCanvas * c1);
-  TF1 make_track(double c, double m);
+  void draw_stracks(TCanvas * c1);
+  void draw_circles(TCanvas * c1);
+  TF1 make_strack(double c, double m);
+  TArc make_circle(double x0, double y0, double R);
   void clear_tracks();
 
   void Save();

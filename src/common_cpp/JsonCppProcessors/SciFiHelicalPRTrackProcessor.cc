@@ -49,12 +49,25 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("R", &_double_proc,
                         &SciFiHelicalPRTrack::get_R,
                         &SciFiHelicalPRTrack::set_R, true);
+    RegisterValueBranch("line_sz_chisq", &_double_proc,
+                        &SciFiHelicalPRTrack::get_line_sz_chisq,
+                        &SciFiHelicalPRTrack::set_line_sz_chisq, true);
+    RegisterValueBranch("circle_x0", &_double_proc,
+                        &SciFiHelicalPRTrack::get_circle_x0,
+                        &SciFiHelicalPRTrack::set_circle_x0, true);
+    RegisterValueBranch("circle_y0", &_double_proc,
+                        &SciFiHelicalPRTrack::get_circle_y0,
+                        &SciFiHelicalPRTrack::set_circle_y0, true);
+    RegisterValueBranch("circle_chisq", &_double_proc,
+                        &SciFiHelicalPRTrack::get_circle_chisq,
+                        &SciFiHelicalPRTrack::set_circle_chisq, true);
     RegisterValueBranch("chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_chisq,
                         &SciFiHelicalPRTrack::set_chisq, true);
     RegisterValueBranch("chisq_dof", &_double_proc,
                         &SciFiHelicalPRTrack::get_chisq_dof,
                         &SciFiHelicalPRTrack::set_chisq_dof, true);
+
 
     RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,

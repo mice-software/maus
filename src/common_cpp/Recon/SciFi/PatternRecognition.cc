@@ -157,22 +157,6 @@ void PatternRecognition::add_tracks(const int trker_no, std::vector<SciFiStraigh
   }
 }
 
-void PatternRecognition::add_straight_tracks(const int trker_no,
-                         std::vector<SciFiStraightPRTrack> &trks, SciFiEvent &evt ) {
-  for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
-    trks[i].set_tracker(trker_no);
-    evt.add_straightprtrack(trks[i]);
-  }
-}
-
-void PatternRecognition::add_helical_tracks(const int trker_no,
-                         std::vector<SciFiHelicalPRTrack> &trks, SciFiEvent &evt ) {
-  for ( int i = 0; i < static_cast<int>(trks.size()); ++i ) {
-    trks[i].set_tracker(trker_no);
-    evt.add_helicalprtrack(trks[i]);
-  }
-}
-
 void PatternRecognition::make_5tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack> &strks,
                                       std::vector<SciFiHelicalPRTrack> &htrks) {
@@ -778,7 +762,14 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                     SciFiHelicalPRTrack track(-1, num_points, pos_0, helix);
                     track.set_line_sz_chisq(line_sz.get_chisq());
+                    track.set_circle_x0(circle.get_x0());
+                    track.set_circle_y0(circle.get_y0());
                     track.set_circle_chisq(circle.get_chisq());
+                    /*
+                    std::cout << "Circle x0: " << track.get_circle_x0() << std::endl;
+                    std::cout << "Circle y0: " << track.get_circle_y0() << std::endl;
+                    std::cout << "Circle R: " << track.get_R() << std::endl;
+                    */
 
                     if ( debug > 1 ) {
                       std::ofstream outblank("sp_per_track.txt", std::ios::out | std::ios::app);

@@ -84,28 +84,7 @@ class PatternRecognition {
       *  @param trker_no - The tracker number
       *  @param evt - The SciFi event
       */
-    void add_straight_tracks(const int trker_no, std::vector<SciFiStraightPRTrack> &trks,
-                             SciFiEvent &evt);
 
-     /** @brief Small function to easily add helical trks to a SciFiEvent
-      *
-      *  Small utility function to easily add  both straight tracks to a SciFiEvent,
-      *  and to set the tracker number of all the tracks added
-      *
-      *  @param strks - The straight tracks vector
-      *  @param trker_no - The tracker number
-      *  @param evt - The SciFi event
-      */
-    void add_helical_tracks(const int trker_no, std::vector<SciFiHelicalPRTrack> &trks,
-                            SciFiEvent &evt);
-    /** @brief Make all tracks, with 5, 4 and 3 points
-     *
-     *  Function to call the make 5 make 4 and make 3 tracks routines
-     *  @param track_type - boolean, 0 for straight tracks, 1 for helical tracks
-     *  @param trker_no - the tracker number (0 or 1)
-     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
-     *  @param evt - The SciFiEvent object (the top level container for Pattern Recognintion) 
-     */
     void make_all_tracks(const bool track_type, const int trker_no,
                          SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt);
 
