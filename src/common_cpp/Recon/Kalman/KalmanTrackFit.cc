@@ -306,7 +306,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   a(4, 0) = 1./p_pr;
   first_plane.set_projected_a(a);
 
-  double cov = 1000.0;
+  double cov = 100.0;
   TMatrixD C(5, 5);
   C(0, 0) = cov;
   C(1, 1) = cov;
@@ -354,11 +354,11 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
   // Update H (depends on plane direction.
   track->update_H(a_site);
 
-  // Ck = ( (C_k^k-1)-1 + HT*G*H )-1
-  track->update_covariance(a_site);
-
   // a_k = a_k^k-1 + K_k x pull
   track->calc_filtered_state(a_site);
+
+  // Ck = ( (C_k^k-1)-1 + HT*G*H )-1
+  track->update_covariance(a_site);
 }
 
 void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {

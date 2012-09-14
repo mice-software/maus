@@ -141,15 +141,15 @@ std::string  ReduceCppTracker::process(std::string document) {
         digits_tree();
 
         // std::cerr << "Clusters..." << std::endl;
-        doublet_clusters_tree();
+        // doublet_clusters_tree();
 
         // std::cerr << "Spacepoints..." << std::endl;
-        spacepoints_tree();
+        // spacepoints_tree();
         // _spacepoints.Reset();
         // draw_spacepoints(root);
         // perform_alignment_study();
-        compute_stations_efficiencies();
-        show_efficiency();
+        // compute_stations_efficiencies();
+        // show_efficiency();
         json_daq.clear();
         json_digits.clear();
         json_clusters.clear();

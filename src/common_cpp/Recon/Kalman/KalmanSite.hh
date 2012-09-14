@@ -83,6 +83,10 @@ class KalmanSite {
 
   double get_alpha() const { return _alpha; }
 
+  void set_smoothed_alpha(double alpha_smoothed) { _alpha_smoothed = alpha_smoothed; }
+
+  double get_smoothed_alpha() const { return _alpha_smoothed; }
+
   void set_direction(CLHEP::Hep3Vector dir) { _direction = dir; }
 
   CLHEP::Hep3Vector get_direction() const { return _direction; }
@@ -143,7 +147,7 @@ class KalmanSite {
   /// The measurement.
   TMatrixD _v;
 
-  double _z, _alpha, _alpha_projected;
+  double _z, _alpha, _alpha_projected, _alpha_smoothed;
 
   int _id;
 

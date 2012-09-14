@@ -80,11 +80,11 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double dphi_dx = - a_factor*argument*1./(old_x-my_xc);
   double dphi_dy =  a_factor/(old_x-my_xc);
   // Compute d_rho.
-  double circle_x = my_xc+old_r*cos(old_phi);
-  double circle_y = my_yc+old_r*sin(old_phi);
+  double circle_x = my_xc + old_r*cos(old_phi);
+  double circle_y = my_yc + old_r*sin(old_phi);
 
-  double drho_x   = -( old_x - (my_xc + old_r*cos(old_phi)) );
-  double drho_y   = -( old_y - (my_yc + old_r*sin(old_phi)) );
+  double drho_x   = -( old_x - circle_x );
+  double drho_y   = -( old_y - circle_y );
 
   double delta_phi = _h*deltaZ/(old_r * old_tan_lambda);
   double new_phi   = (old_phi+delta_phi);

@@ -101,6 +101,13 @@ void SEClusterRec::construct(SECluster *clust, std::vector<const MiceModule*> mo
   // The position in the (x, y) plane.
   clust->set_position(position);
   clust->set_direction(dir);
+
+  double alpha = clust->get_channel() - CentralFibre;
+  // clust->set_relative_position(relative_position);
+  // if ( tracker == 1 ) {
+  //  alpha = -alpha;
+  // }
+  clust->set_alpha(-alpha);
 }
 
 bool SEClusterRec::are_neighbours(SEDigit *seed_i, SEDigit *seed_j) {

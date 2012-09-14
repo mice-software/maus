@@ -55,6 +55,7 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _id= site.get_id();
   _direction = site.get_direction();
   _alpha_projected = site.get_projected_alpha();
+  _alpha_smoothed  = site.get_smoothed_alpha();
   _residual_x = site.get_residual_x();
   _residual_y = site.get_residual_y();
 
@@ -79,6 +80,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _id= site.get_id();
   _direction = site.get_direction();
   _alpha_projected = site.get_projected_alpha();
+  _alpha_smoothed  = site.get_smoothed_alpha();
   _residual_x = site.get_residual_x();
   _residual_y = site.get_residual_y();
 

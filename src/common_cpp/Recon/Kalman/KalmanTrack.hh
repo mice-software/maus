@@ -71,6 +71,8 @@ class KalmanTrack {
  protected:
   TMatrixD _H;
 
+  TMatrixD _V;
+
   TMatrixD _G;
 
   TMatrixD _Q;
@@ -78,6 +80,8 @@ class KalmanTrack {
   TMatrixD _A;
 
   TMatrixD _F;
+
+  TMatrixD _K;
 
   double _x0, _y0, _chi2, _tracker, _ndf;
   // static const double sigma_x = 0.64; // x measurement resolution

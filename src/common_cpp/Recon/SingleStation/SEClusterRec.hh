@@ -68,7 +68,6 @@ class SEClusterRec {
   bool are_neighbours(SEDigit *seed_i, SEDigit *seed_j);
 
  private:
-
   int _size_exception;
 
   double _min_npe;

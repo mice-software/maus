@@ -27,10 +27,12 @@ const double KalmanTrack::CHAN_WIDTH = 1.333;
 
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
+  _V.ResizeTo(2, 2);
   _G.ResizeTo(2, 2);
   _H.ResizeTo(2, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
+  _K.ResizeTo(5, 2);
 
   _Q.ResizeTo(5, 5);
   _Q.Zero(); // mcs is off.
@@ -82,6 +84,8 @@ void KalmanTrack::update_G(KalmanSite *a_site) {
   _G.Zero();
   _G(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
   _G(1, 1) = sig_beta*sig_beta/12.;
+  _V.Zero();
+  _V = _G;
   _G.Invert();
   //_G.Print();
 }
@@ -103,6 +107,7 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
 void KalmanTrack::update_covariance(KalmanSite *a_site) {
   // calc_covariance_matrix_of_residual
   // Cp = ( C_inv + Ht*G*H )-1;
+/*
   TMatrixD C = a_site->get_projected_covariance_matrix();
   TMatrixD C_inv = C.Invert();
 
@@ -117,6 +122,21 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   std::cout << "Updated Covariance \n";
   Cp.Print();
   // assert(site.state() == "filtered");
+*/
+
+  // calc_covariance_matrix_of_residual
+  // Cp = (C-KHC)
+  TMatrixD C = a_site->get_projected_covariance_matrix();
+  TMatrixD temp1(5, 5);
+  TMatrixD temp2(5, 5);
+  temp1 = TMatrixD(_K, TMatrixD::kMult, _H);
+  temp2 = TMatrixD(temp1, TMatrixD::kMult, C);
+  TMatrixD Cp(5, 5);
+  Cp = TMatrixD(C, TMatrixD::kMinus, temp2);
+  a_site->set_covariance_matrix(Cp);
+  std::cout << "Updated Covariance \n";
+  Cp.Print();
+
 }
 
 // h1(a_1^0)
@@ -149,6 +169,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   //
   // Kalman Gain: K = Cp Ht G
   //
+/*
   TMatrixD C(5, 5);
   C = a_site->get_covariance_matrix();
   TMatrixD temp3(5, 2);
@@ -164,11 +185,27 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   m.Print();
   std::cout << "Alpha projected \n";
   ha.Print();
+*/
+  TMatrixD C(5, 5);
+  C = a_site->get_projected_covariance_matrix();
 
+  TMatrixD term1(5, 2);
+  term1 = TMatrixD(C, TMatrixD::kMultTranspose, _H);
+
+  TMatrixD temp3(2, 5);
+  temp3 = TMatrixD(_H, TMatrixD::kMult, C);
+  TMatrixD temp31(2, 2);
+  temp31 = TMatrixD(temp3, TMatrixD::kMultTranspose, _H);
+  TMatrixD term2(2, 2);
+  term2 = TMatrixD(temp31, TMatrixD::kPlus, _V);
+  term2.Invert();
+
+  _K.Zero();
+  _K = TMatrixD(term1, TMatrixD::kMult, term2);
   //////////////////////////////////////////////////////////////////////
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
-  temp4 = TMatrixD(K, TMatrixD::kMult, pull);
+  temp4 = TMatrixD(_K, TMatrixD::kMult, pull);
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
@@ -261,13 +298,14 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
     // Convert smoothed value to alpha measurement.
     TMatrixD a(5, 1);
     a = site.get_smoothed_a();
+    update_H(&site);
     TMatrixD ha(2, 1);
     ha = TMatrixD(_H, TMatrixD::kMult, a);
     model_alpha = ha(0, 0);
     // Actual measurement.
     alpha = site.get_alpha();
     // Compute chi2.
-    _chi2 += pow(alpha-model_alpha,2.);
+    _chi2 += pow(alpha-model_alpha, 2.);
   }
   _chi2 = _chi2*(1./sigma_measurement2);
   _ndf = number_of_sites - number_parameters;

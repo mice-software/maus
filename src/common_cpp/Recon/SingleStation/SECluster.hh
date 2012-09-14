@@ -84,6 +84,10 @@ class SECluster {
 
   double get_channel()  const { return _channel_w; }
 
+  void set_alpha(double alpha) { _alpha = alpha; }
+
+  double get_alpha()  const { return _alpha; }
+
   void set_used() { _used = true; }
 
   bool is_used() const { return _used; }
@@ -101,6 +105,8 @@ class SECluster {
   std::vector<SEDigit*> get_digits()  const { return _digits; }
 
  private:
+  int _alpha;
+
   int _spill, _event;
 
   bool _used;

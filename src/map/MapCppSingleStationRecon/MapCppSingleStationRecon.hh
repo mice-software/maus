@@ -49,6 +49,7 @@
 #include "src/common_cpp/Recon/SingleStation/SEDigit.hh"
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
+#include "src/common_cpp/Recon/SingleStation/KalmanTrackFitSS.hh"
 
 class MapCppSingleStationRecon {
  public:
@@ -95,7 +96,8 @@ class MapCppSingleStationRecon {
   void spacepoint_recon(SEEvent *evt);
 
   void reconstruct_tofs(Json::Value &root, int event_i, Hep3Vector &tof0,
-                        Hep3Vector &tof1, bool &success);
+                        Hep3Vector &tof1, Hep3Vector &pr_pos, Hep3Vector &pr_mom,
+                        bool &success);
 
 
   void save_to_json(SEEvent *evt, int event_num);
