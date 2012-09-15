@@ -76,6 +76,8 @@ class SciFiHelicalPRTrack {
     double get_R() const { return _R; }
     double get_line_sz_chisq() const { return _line_sz_chisq; }
     double get_circle_chisq() const { return _circle_chisq; }
+    double get_circle_x0() const { return _circle_x0; }
+    double get_circle_y0() const { return _circle_y0; }
     double get_chisq() const { return _chisq; }
     double get_chisq_dof() const { return _chisq_dof; }
 
@@ -90,8 +92,9 @@ class SciFiHelicalPRTrack {
     void set_psi0(double psi0) { _psi0 = psi0; }
     void set_dsdz(double dsdz) { _dsdz = dsdz; }
     void set_R(double R) { _R = R; }
-
     void set_line_sz_chisq(double line_sz_chisq) { _line_sz_chisq = line_sz_chisq; }
+    void set_circle_x0(double circle_x0) { _circle_x0 = circle_x0; }
+    void set_circle_y0(double circle_y0) { _circle_y0 = circle_y0; }
     void set_circle_chisq(double circle_chisq) { _circle_chisq = circle_chisq; }
     void set_chisq(double chisq) { _chisq = chisq; }
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
@@ -109,6 +112,8 @@ class SciFiHelicalPRTrack {
     double _dsdz;
     double _R;
     double _line_sz_chisq;
+    double _circle_x0;
+    double _circle_y0;
     double _circle_chisq;
     double _chisq;
     double _chisq_dof;

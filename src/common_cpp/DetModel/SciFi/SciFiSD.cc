@@ -49,7 +49,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
-  if ( fabs(pid) != 13 ) return false;
+  // if ( fabs(pid) != 13 ) return false;
   // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 

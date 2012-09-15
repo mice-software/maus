@@ -62,7 +62,7 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   _spoints.Branch("z", &_z, "z/D");
   _spoints.Branch("type", &_type, "type/I");
 
-  // Second TTre to hold spacepoints for just the current spill
+  // Second TTree to hold spacepoints for just the current spill
   _spoints_1spill.SetNameTitle("spacepoints_1spill", "spacepoints_1spill");
   _spoints_1spill.Branch("tracker", &_tracker, "tracker/I");
   _spoints_1spill.Branch("station", &_station, "station/I");
@@ -72,13 +72,21 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   _spoints_1spill.Branch("type", &_type, "type/I");
 
   // Set up TTree to hold Pattern Recognition straight tracks
-  _tracks.SetNameTitle("tracks", "tracks");
-  _tracks.Branch("tracker", &_tracker, "tracker/I");
-  _tracks.Branch("mx", &_mx, "mx/D");
-  _tracks.Branch("my", &_my, "my/D");
-  _tracks.Branch("x0", &_x0, "x0/D");
-  _tracks.Branch("y0", &_y0, "y0/D");
-  _tracks.Branch("n_sp", &_num_points, "n_sp/I");
+  _stracks.SetNameTitle("stracks", "stracks");
+  _stracks.Branch("tracker", &_tracker, "tracker/I");
+  _stracks.Branch("mx", &_mx, "mx/D");
+  _stracks.Branch("my", &_my, "my/D");
+  _stracks.Branch("x0", &_x0, "x0/D");
+  _stracks.Branch("y0", &_y0, "y0/D");
+  _stracks.Branch("n_sp", &_num_points_str, "n_sp/I");
+
+  // Set up TTree to hold Pattern Recognition circles from helix fit
+  _circles.SetNameTitle("circles", "circles");
+  _circles.Branch("tracker", &_tracker, "tracker/I");
+  _circles.Branch("x0", &_x0, "x0/D");
+  _circles.Branch("y0", &_y0, "y0/D");
+  _circles.Branch("R", &_my, "R/D");
+  _circles.Branch("n_sp", &_num_points_circ, "n_sp/I");
 
   // JsonCpp setup - check file parses correctly, if not return false
   Json::Value configJSON;
@@ -150,19 +158,32 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
             _mx = strk.get_mx();
             _y0 = strk.get_y0();
             _my = strk.get_my();
-            _num_points = strk.get_num_points();
+            _num_points_str = strk.get_num_points();
             _tracker = strk.get_tracker();
-            _tracks.Fill();
+            _stracks.Fill();
             if ( _tracker == 0 ) {
-              _trks_zx_trkr0.push_back(make_track(_x0, _mx));
-              _trks_zy_trkr0.push_back(make_track(_y0, _my));
+              _trks_zx_trkr0.push_back(make_strack(_x0, _mx));
+              _trks_zy_trkr0.push_back(make_strack(_y0, _my));
             } else if ( _tracker == 1 ) {
-              _trks_zx_trkr1.push_back(make_track(_x0, _mx));
-              _trks_zy_trkr1.push_back(make_track(_y0, _my));
+              _trks_zx_trkr1.push_back(make_strack(_x0, _mx));
+              _trks_zy_trkr1.push_back(make_strack(_y0, _my));
             }
-            // std::cout << " x0 = " << _x0 << " mx = " << _mx;
-            // std::cout << " y0 = " << _y0 << " my = " << _my << std::endl;
           } // ~Loop over straight tracks
+          // Loop over helical tracks
+          for ( unsigned int trk_i = 0; trk_i < event->helicalprtracks().size(); trk_i++ ) {
+            SciFiHelicalPRTrack htrk = event->helicalprtracks()[trk_i];
+            _circle_x0 = htrk.get_circle_x0();
+            _circle_y0 = htrk.get_circle_y0();
+            _circle_R = htrk.get_R();
+            _num_points_circ = htrk.get_num_points();
+            _tracker = htrk.get_tracker();
+            _circles.Fill();
+            if ( _tracker == 0 ) {
+              _circles_xy_trkr0.push_back(make_circle(_circle_x0, _circle_y0, _circle_R));
+            } else if ( _tracker == 1 ) {
+              _circles_xy_trkr1.push_back(make_circle(_circle_x0, _circle_y0, _circle_R));
+            }
+          }
         } // ~Loop over events
       } else {
         // std::cout << "No recon events found" << std::endl;
@@ -186,8 +207,13 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
       draw_graphs(p_spoints_1spill, sp_xy_1);
     }
 
-    if ( get_num_tracks() > 0 ) {
-      draw_tracks(sp_xy_1);
+    if ( get_num_stracks() > 0 ) {
+      draw_stracks(sp_xy_1);
+      sp_xy_1->Update();
+    }
+
+    if ( get_num_circles() > 0 ) {
+      draw_circles(sp_xy_1);
       sp_xy_1->Update();
     }
 
@@ -195,7 +221,9 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
 
     std::cout << "Finished spill " << _nSpills << std::endl;
     std::cout << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
-    std::cout << "Cumulative spacepoints: " << _spoints.GetEntries() << std::endl;
+    std::cout << "Straight tracks this spill: " << _stracks.GetEntries() << std::endl;
+    std::cout << "Helical tracks this spill: " << _circles.GetEntries() << std::endl;
+    // std::cout << "Cumulative spacepoints: " << _spoints.GetEntries() << std::endl;
   } else {
     std::cerr << "Failed to import json to spill\n";
   }
@@ -235,21 +263,30 @@ void ReduceCppPatternRecognition::Save() {
 
   _spoints.Write();
   _spoints_1spill.Write();
-  _tracks.Write();
+  _stracks.Write();
+  _circles.Write();
 
   datafile.Close();
   Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
 }
 
-TF1 ReduceCppPatternRecognition::make_track(double c, double m) {
+TF1 ReduceCppPatternRecognition::make_strack(double c, double m) {
   // Note: in the function expression, x is just the independent variable, which
   // in this case is the z coordinate in the tracker coordinate system
   TF1 trk = TF1("trk", "[0]+([1]*x)", _trk_lower_bound, _trk_upper_bound);
   trk.SetParameters(c, m);
+  trk.SetLineColor(kRed);
   return trk;
 }
 
-void ReduceCppPatternRecognition::draw_tracks(TCanvas * c1) {
+TArc ReduceCppPatternRecognition::make_circle(double x0, double y0, double R) {
+  TArc arc = TArc(x0, y0, R);
+  arc.SetFillStyle(0); // 0 - Transparent
+  arc.SetLineColor(kBlue);
+  return arc;
+}
+
+void ReduceCppPatternRecognition::draw_stracks(TCanvas * c1) {
 
   for (int i = 0; i < static_cast<int>(_trks_zx_trkr0.size()); ++i) {
     c1->cd(2);
@@ -276,11 +313,29 @@ void ReduceCppPatternRecognition::draw_tracks(TCanvas * c1) {
   }
 }
 
+void ReduceCppPatternRecognition::draw_circles(TCanvas * c1) {
+
+  for (int i = 0; i < static_cast<int>(_circles_xy_trkr0.size()); ++i) {
+    c1->cd(1);
+    _circles_xy_trkr0[i].Draw("same");
+    c1->Update();
+  }
+
+
+  for (int i = 0; i < static_cast<int>(_circles_xy_trkr1.size()); ++i) {
+    c1->cd(4);
+    _circles_xy_trkr1[i].Draw("same");
+    c1->Update();
+  }
+}
+
 void ReduceCppPatternRecognition::clear_tracks() {
   _trks_zx_trkr0.clear();
   _trks_zy_trkr0.clear();
   _trks_zx_trkr1.clear();
   _trks_zy_trkr1.clear();
+  _circles_xy_trkr0.clear();
+  _circles_xy_trkr1.clear();
 }
 
 void ReduceCppPatternRecognition::draw_histos(TTree * t1, TCanvas * c1) {
@@ -319,7 +374,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_xy1->GetXaxis()->SetTitle("x(mm)");
   gr_xy1->GetYaxis()->SetTitle("y(mm)");
   gr_xy1->SetMarkerStyle(20);
-  gr_xy1->SetMarkerColor(4);
+  gr_xy1->SetMarkerColor(kBlack);
   gr_xy1->Draw("AP");
   c1->Update();
 
@@ -330,7 +385,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_zx1->GetXaxis()->SetTitle("z(mm)");
   gr_zx1->GetYaxis()->SetTitle("x(mm)");
   gr_zx1->SetMarkerStyle(20);
-  gr_zx1->SetMarkerColor(4);
+  gr_zx1->SetMarkerColor(kBlack);
   gr_zx1->Draw("AP");
   c1->Update();
 
@@ -341,7 +396,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_zy1->GetXaxis()->SetTitle("z(mm)");
   gr_zy1->GetYaxis()->SetTitle("y(mm)");
   gr_zy1->SetMarkerStyle(20);
-  gr_zy1->SetMarkerColor(4);
+  gr_zy1->SetMarkerColor(kBlack);
   gr_zy1->Draw("AP");
   c1->Update();
 
@@ -352,7 +407,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_xy2->GetXaxis()->SetTitle("x(mm)");
   gr_xy2->GetYaxis()->SetTitle("y(mm)");
   gr_xy2->SetMarkerStyle(20);
-  gr_xy2->SetMarkerColor(4);
+  gr_xy2->SetMarkerColor(kBlack);
   gr_xy2->Draw("AP");
   c1->Update();
 
@@ -363,7 +418,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_zx2->GetXaxis()->SetTitle("z(mm)");
   gr_zx2->GetYaxis()->SetTitle("x(mm)");
   gr_zx2->SetMarkerStyle(20);
-  gr_zx2->SetMarkerColor(4);
+  gr_zx2->SetMarkerColor(kBlack);
   gr_zx2->Draw("AP");
   c1->Update();
 
@@ -374,7 +429,7 @@ void ReduceCppPatternRecognition::draw_graphs(TTree * t1, TCanvas * c1) {
   gr_zy2->GetXaxis()->SetTitle("z(mm)");
   gr_zy2->GetYaxis()->SetTitle("y(mm)");
   gr_zy2->SetMarkerStyle(20);
-  gr_zy2->SetMarkerColor(4);
+  gr_zy2->SetMarkerColor(kBlack);
   gr_zy2->Draw("AP");
   c1->Update();
 }
@@ -392,13 +447,14 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  pt->AddLine(.0, .875, 1., .875);
+  pt->AddLine(.0, .9, 1., .9);
 
   int event_size = 0;
   int digit_size = 0;
   int cluster_size = 0;
   int spoint_size = 0;
-  int track_size = 0;
+  int strack_size = 0;
+  int htrack_size = 0;
 
   if ( _spill.GetReconEvents() ) {
     event_size = _spill.GetReconEvents()->size();
@@ -407,7 +463,8 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
       digit_size += event->digits().size();
       cluster_size += event->clusters().size();
       spoint_size += event->spacepoints().size();
-      track_size += event->straightprtracks().size();
+      strack_size += event->straightprtracks().size();
+      htrack_size += event->helicalprtracks().size();
     }
   }
 
@@ -435,20 +492,31 @@ void ReduceCppPatternRecognition::update_info(TCanvas * c1, TPaveText *pt) {
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Tracks: " << track_size;
+  ss1 << "Str Tracks: " << strack_size;
   s1 = ss1.str();
   c1->cd(1);
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  pt->AddLine(.0, .25, 1., .25);
+  ss1 << "Helical Tracks: " << htrack_size;
+  s1 = ss1.str();
+  c1->cd(1);
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  pt->AddLine(.0, .3, 1., .3);
 
   ss1 << "Cumulative spoints: " << get_num_spoints() + spoint_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");
 
-  ss1 << "Cumulative tracks: " << get_num_tracks() + track_size;
+  ss1 << "Cumulative str tracks: " << get_num_stracks() + strack_size;
+  s1 = ss1.str();
+  pt->AddText(s1.c_str());
+  ss1.str("");
+
+  ss1 << "Cumulative helical tracks: " << get_num_circles() + htrack_size;
   s1 = ss1.str();
   pt->AddText(s1.c_str());
   ss1.str("");

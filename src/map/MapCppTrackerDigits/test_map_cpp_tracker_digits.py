@@ -42,7 +42,7 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
             The set up is called before each test function
             is called.
         """
-        self.mapper = MapCppTrackerRecon()
+        self.mapper = MapCppTrackerDigits()
         conf = json.loads(Configuration().getConfigJSON())
         conf["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
