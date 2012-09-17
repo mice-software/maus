@@ -48,17 +48,17 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
-                       const double z)
+                       const double z, const int pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
-      particle_id_(Particle::kNone), z_(z)
+      z_(z), particle_id_(pid)
 { }
 
 TrackPoint::TrackPoint(const Vector<double> & original_instance,
-                       const double z)
+                       const double z, const int pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
-      particle_id_(Particle::kNone), z_(z)
+      z_(z), particle_id_(pid)
 { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
@@ -136,7 +136,7 @@ const bool TrackPoint::operator>(const TrackPoint& rhs) const {
   return t() > rhs.t();
 }
 
-void TrackPoint::set_particle_id(int id) {
+void TrackPoint::set_particle_id(const int id) {
   particle_id_ = id;
 }
 
@@ -144,7 +144,7 @@ int TrackPoint::particle_id() const {
   return particle_id_;
 }
 
-void TrackPoint::set_detector_id(unsigned int id) {
+void TrackPoint::set_detector_id(const unsigned int id) {
   detector_id_ = id;
 }
 

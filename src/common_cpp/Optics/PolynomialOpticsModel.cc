@@ -21,7 +21,7 @@
 #include "Optics/PolynomialOpticsModel.hh"
 
 #include <cfloat>
-#include <math.h>
+#include <cmath>
 
 #include <iomanip>
 #include <sstream>
@@ -30,8 +30,12 @@
 #include "Interface/Squeal.hh"
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
+#include "Reconstruction/Global/TrackPoint.hh"
+#include "Simulation/MAUSGeant4Manager.hh"
 
 namespace MAUS {
+
+  using reconstruction::global::TrackPoint;
 
 const PolynomialOpticsModel::Algorithm
   PolynomialOpticsModel::Algorithm::kNone
@@ -67,6 +71,42 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
   deltas_ = PhaseSpaceVector(1, 1, 1, 1, 1, 1);
 }
 
+void PolynomialOpticsModel::Build() {
+  // Create some test hits at the desired First plane
+  const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
+
+  // Iterate through each First plane hit
+  MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
+  std::map<int, std::vector<TrackPoint> > station_hits_map;
+  std::vector<TrackPoint>::const_iterator first_plane_hit;
+  for (first_plane_hit = first_plane_hits.begin();
+       first_plane_hit < first_plane_hits.end();
+       ++first_plane_hit) {
+    // Simulate the current particle (First plane hit) through MICE.
+    simulator->RunParticle(
+      reconstruction::global::PrimaryGeneratorParticle(*first_plane_hit));
+
+    // Identify the hits by station and add them to the mappings from stations
+    // to the hits they recorded.
+    MapStationsToHits(station_hits_map);
+  }
+
+  // Iterate through each station
+  std::map<int, std::vector<TrackPoint> >::iterator station_hits;
+  for (station_hits = station_hits_map.begin();
+       station_hits != station_hits_map.end();
+       ++station_hits) {
+    // find the average z coordinate for the station
+    std::vector<TrackPoint>::iterator station_hit;
+
+    double station_plane = station_hits->second.begin()->z();
+
+    // Generate a transfer map between the First plane and the current station
+    // and map the station ID to the transfer map
+    transfer_maps_[station_plane]
+      = CalculateTransferMap(first_plane_hits, station_hits->second);
+  }
+}
 
 void PolynomialOpticsModel::SetupAlgorithm() {
   Json::Value algorithm_names = JsonWrapper::GetProperty(
@@ -98,6 +138,49 @@ void PolynomialOpticsModel::SetupAlgorithm() {
   } else {
     algorithm_ = Algorithm::kNone;
   }
+}
+
+/* Create a set of phase space vectors that produce a linearly independent
+ * set of N polynomial vectors where N is the number of polynomial coefficients
+ * for the desired number of variables (6) and polynomial order. This is
+ * necessary in order to solve the least squares problem which involves
+ * the calculation of a Moore-Penrose psuedo inverse.
+ */
+const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
+  size_t num_poly_coefficients
+    = PolynomialMap::NumberOfPolynomialCoefficients(6, polynomial_order_);
+
+    std::vector<TrackPoint> first_plane_hits;
+  for (size_t i = 0; i < 6; ++i) {
+    for (size_t j = i; j < 6; ++j) {
+      TrackPoint first_plane_hit;
+
+      for (size_t k = 0; k < i; ++k) {
+        first_plane_hit[k] = 1.;
+      }
+      first_plane_hit[j] = 1.;
+
+      first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
+                                 reference_particle_.z(),
+                                 reference_particle_.particle_id()));
+    }
+  }
+  size_t base_block_length = first_plane_hits.size();
+
+  int summand;
+  for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
+    summand = row / base_block_length;
+    TrackPoint first_plane_hit
+      = TrackPoint(first_plane_hits[row % base_block_length] + summand);
+
+    first_plane_hits.push_back(TrackPoint(first_plane_hit,
+                                reference_particle_.z(),
+                                reference_particle_.particle_id()));
+  }
+
+std::cout << "DEBUG PolynomialOpticsModel::BuildFirstPlaneHits(): "
+          << "# first plane hits = " << first_plane_hits.size() << std::endl;
+  return first_plane_hits;
 }
 
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(

@@ -391,6 +391,8 @@ class MatrixBase {
   void gsl_error_handler(const char * reason, const char * file,
                          int line, int gsl_errno);
 
+  GslType * matrix();
+
   GslType * matrix_;
 };
 
@@ -462,6 +464,8 @@ class Matrix<double> :  public MatrixBase<double, gsl_matrix> {
     : MatrixBase<double, gsl_matrix>(base_vector) {}
 
   friend Vector<complex> eigenvalues(const Matrix<double>& matrix);
+  friend Matrix<double> QR_least_squares(
+      const Matrix<double>& design_matrix, const Matrix<double>& value_matrix);
 };
 
 template<>

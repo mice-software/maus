@@ -57,6 +57,8 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
    */
   ~PolynomialOpticsModel() { }
 
+  void Build();
+
   /** @brief An algorithm identification class.
    * Use PolynomialOpticsModel::Algorithm::kWhateverAlgorithm
    * and the constructor calls Algorithm.id() to identify the algorithm.
@@ -92,6 +94,9 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   size_t polynomial_order_;
   std::vector<double> weights_;
   PhaseSpaceVector deltas_;
+
+  // override base class version
+  const std::vector<reconstruction::global::TrackPoint> BuildFirstPlaneHits();
 
   const TransferMap * CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,

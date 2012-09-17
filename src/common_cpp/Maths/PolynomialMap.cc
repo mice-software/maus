@@ -63,8 +63,9 @@ PolynomialMap::PolynomialMap(const PolynomialMap & original_instance) {
 }
 
 void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
-  int num_poly_coeff      = coeff.number_of_columns();
-  point_dimension_        = pointDim;
+  point_dimension_     = pointDim;
+  coefficient_matrix_  = coeff;
+  int num_poly_coeff   = coefficient_matrix_.number_of_columns();
   index_key_by_power_  = std::vector< std::vector<int> >();
   index_key_by_vector_ = std::vector< std::vector<int> >();
   polynomial_vector_ = std::vector<PolynomialCoefficient>();
@@ -81,12 +82,11 @@ void PolynomialMap::SetCoefficients(int pointDim, Matrix<double> coeff) {
           coefficient_matrix_(i+1, j+1) ) );
 }
 
-void PolynomialMap::SetCoefficients(
-    std::vector<PolynomialCoefficient> coeff) {
+void PolynomialMap::SetCoefficients(std::vector<PolynomialCoefficient> coeff) {
   point_dimension_        = 0;
   index_key_by_power_  = std::vector< std::vector<int> >();
   index_key_by_vector_ = std::vector< std::vector<int> >();
-  polynomial_vector_      = coeff;
+  polynomial_vector_   = coeff;
 
   int maxPolyOrder = 0;
   int valueDim     = 0;
@@ -252,8 +252,7 @@ double * PolynomialMap::UnmakePolynomialVector(double const * const polyVector,
 // Turn int index into a std::vector<int> 'a' of length 'd' with values
 //    x_1^a_1 x_2^a_2 ... x_d^a_d
 // e.g. x_1^4 x_2^3 = {4,3,0,0}
-std::vector<int> PolynomialMap::IndexByPower
-                                              (int index, int nInputVariables) {
+std::vector<int> PolynomialMap::IndexByPower(int index, int nInputVariables) {
     std::vector<int> powerIndex(nInputVariables, 0);
     std::vector<int> vectorIndex = IndexByVector(index, nInputVariables);
     for (size_t i = 0; i < vectorIndex.size(); ++i) {
@@ -264,8 +263,7 @@ std::vector<int> PolynomialMap::IndexByPower
 
 // Turn int index into an index for element of polynomial
 // e.g. x_1^4 x_2^3 = {1,1,1,1,2,2,2}
-std::vector<int> PolynomialMap::IndexByVector
-                                              (int index, int nInputVariables) {
+std::vector<int> PolynomialMap::IndexByVector(int index, int nInputVariables) {
     if (index == 0) return std::vector<int>();
     std::vector<int> indices(1, -1);
     nInputVariables--;
@@ -540,7 +538,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
 
   Matrix<double> design_matrix_transpose = transpose(design_matrix);
 
-  // F2 = A^T A, where A is the design matrix
+  // F2 = A^T A, where A is the design matrix with linearly independent columns
   Matrix<double> F2(nCoeffs, nCoeffs, 0.);
   F2 = design_matrix_transpose * weight_matrix * design_matrix;
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "

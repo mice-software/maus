@@ -203,10 +203,20 @@ std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::end
     // save the calculated track point in case this is the
     // last (best fitting) track
     track_->push_back(point);
+    
+    const double weights[36] = {
+      0., 0., 0., 0., 0., 0.,
+      0.0, 1., 0., 0., 0., 0.,
+      0.0, 0., 1., 0., 0., 0.,
+      0.0, 0., 0., 1., 0., 0.,
+      0.0, 0., 0., 0., 1., 0.,
+      0.0, 0., 0., 0., 0., 1.,
+    };
+    Matrix<double> weight_matrix(6, 6, weights);
 
     // Sum the squares of the differences between the calculated phase space
     // coordinates and the measured coordinates.
-    TrackPoint residual = TrackPoint(point - (*events));
+    TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
 std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
 std::cout << "DEBUG ScoreTrack(): Event: " << *events << std::endl;
 std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;

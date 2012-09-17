@@ -24,6 +24,7 @@
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "Reconstruction/Global/Particle.hh"
 
 namespace MAUS {
 
@@ -60,12 +61,12 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   /* @brief  Base class copy constructor.
    */
   explicit TrackPoint(const PhaseSpaceVector & original_instance,
-                      const double z = 0.0);
+                      const double z = 0.0, const int pid = Particle::kNone);
 
   /* @brief  Vector<double> copy constructor.
    */
   explicit TrackPoint(const Vector<double> & original_instance,
-                      const double z = 0.0);
+                      const double z = 0.0, const int pid = Particle::kNone);
 
   /* @brief Create with coordinates from an array.
      Order is t, E, x, Px, y, Py.
@@ -116,10 +117,10 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   //       Accessors
   // *************************
 
-  void set_particle_id(int id);
+  void set_particle_id(const int id);
   int particle_id() const;
 
-  void set_detector_id(unsigned int id);
+  void set_detector_id(const unsigned int id);
   unsigned int detector_id() const;
 
   void set_uncertainties(const CovarianceMatrix & uncertainties);
@@ -128,7 +129,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   double z()          const {return z_;}
   double z_momentum() const;
   double Pz()         const {return z_momentum();}
-  void set_z(double z)            {z_ = z;}
+  void set_z(const double z) {z_ = z;}
 
  protected:
   unsigned int detector_id_;  // = 0 if this was not measured in a detector

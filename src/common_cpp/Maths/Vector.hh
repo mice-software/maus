@@ -142,6 +142,8 @@ class VectorBase {
     const VectorBase<StdType, GslType>&                   rhs);
   VectorBase<StdType, GslType>& operator/=(
     const VectorBase<StdType, GslType>&                   rhs);
+  VectorBase<StdType, GslType>& operator+=(const StdType& rhs);
+  VectorBase<StdType, GslType>& operator-=(const StdType& rhs);
   VectorBase<StdType, GslType>& operator*=(const StdType& rhs);
   VectorBase<StdType, GslType>& operator/=(const StdType& rhs);
 
@@ -156,6 +158,8 @@ class VectorBase {
     const VectorBase<StdType, GslType>&                       rhs) const;
   const VectorBase<StdType, GslType> operator/(
     const VectorBase<StdType, GslType>&                       rhs) const;
+  const VectorBase<StdType, GslType> operator+(const StdType& rhs) const;
+  const VectorBase<StdType, GslType> operator-(const StdType& rhs) const;
   const VectorBase<StdType, GslType> operator*(const StdType& rhs) const;
   const VectorBase<StdType, GslType> operator/(const StdType& rhs) const;
 
@@ -191,6 +195,8 @@ class VectorBase {
   /** @brief create the GSL vector member of the given size
    */
   void build_vector(const size_t size, const bool initialize = true);
+
+  GslType * vector();
 
   GslType * vector_;
 };
@@ -251,6 +257,8 @@ class Vector<double> :  public VectorBase<double, gsl_vector> {
   const Vector<double> operator-(const Vector<double>& rhs) const;
   const Vector<double> operator*(const Vector<double>& rhs) const;
   const Vector<double> operator/(const Vector<double>& rhs) const;
+  const Vector<double> operator+(const double& rhs) const;
+  const Vector<double> operator-(const double& rhs) const;
   const Vector<double> operator*(const double& rhs) const;
   const Vector<double> operator/(const double& rhs) const;
 
@@ -258,6 +266,9 @@ class Vector<double> :  public VectorBase<double, gsl_vector> {
 
   Vector(const VectorBase<double, gsl_vector>& base_vector)
       : VectorBase<double, gsl_vector>(base_vector) {}
+
+  friend Matrix<double> QR_least_squares(
+      const Matrix<double>& design_matrix, const Matrix<double>& value_matrix);
 };
 
 template<>
@@ -283,6 +294,8 @@ class Vector<complex> : public VectorBase<complex, gsl_vector_complex> {
   const Vector<complex> operator-(const Vector<complex>& rhs) const;
   const Vector<complex> operator*(const Vector<complex>& rhs) const;
   const Vector<complex> operator/(const Vector<complex>& rhs) const;
+  const Vector<complex> operator+(const complex& rhs) const;
+  const Vector<complex> operator-(const complex& rhs) const;
   const Vector<complex> operator*(const complex& rhs) const;
   const Vector<complex> operator/(const complex& rhs) const;
 

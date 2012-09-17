@@ -690,8 +690,12 @@ template void MatrixBase<double, gsl_matrix>::gsl_error_handler(
 template void MatrixBase<complex, gsl_matrix_complex>::gsl_error_handler(
     const char * reason, const char * file, int line, int gsl_errno);
 
-template void MatrixBase<complex, gsl_matrix_complex>::gsl_error_handler(
-    const char * reason, const char * file, int line, int gsl_errno);
+template <typename StdType, typename GslType>
+GslType * MatrixBase<StdType, GslType>::matrix() {
+  return matrix_;
+}
+template gsl_matrix * MatrixBase<double, gsl_matrix>::matrix();
+template gsl_matrix_complex * MatrixBase<complex, gsl_matrix_complex>::matrix();
 
 // ############################
 //  Matrix (public)
@@ -1175,6 +1179,38 @@ Vector<complex> eigenvalues(const Matrix<double>& matrix) {
     rows);
   gsl_vector_complex_free(eigenvalues);
   return eigenvalue_vector;
+}
+
+Matrix<double> QR_least_squares(
+    const Matrix<double>& design_matrix, const Matrix<double>& value_matrix) {
+  size_t rows = design_matrix.number_of_rows();
+  size_t columns = design_matrix.number_of_columns();
+
+  Matrix<double> A(design_matrix);
+  Matrix<double> Y(value_matrix);
+  Matrix<double> Q(rows, rows);
+  Matrix<double> R(rows, columns);
+  size_t tau_size = columns;
+  if (rows < tau_size) {
+    tau_size = rows;
+  }
+  Vector<double> tau(tau_size);
+  gsl_permutation * p = gsl_permutation_alloc(columns);
+  int signum;
+  gsl_vector * norm = gsl_vector_alloc(columns);
+  gsl_linalg_QRPT_decomp2(A.matrix(), Q.matrix(), R.matrix(), tau.vector(),
+                          p, &signum, norm);
+
+  Matrix<double> P(columns, columns, 0.);
+  for (size_t index = 0; index < columns; ++index) {
+    P(index+1, gsl_permutation_get(p, index)+1) = 1.;
+  }
+  Matrix<double> C = transpose(P)*inverse(transpose(R)*R)
+                   * transpose(R)*transpose(Q)*Y;
+  gsl_vector_free(norm);
+  gsl_permutation_free(p);
+
+  return transpose(C);
 }
 
 std::pair<Vector<complex>, Matrix<complex> > eigensystem(
