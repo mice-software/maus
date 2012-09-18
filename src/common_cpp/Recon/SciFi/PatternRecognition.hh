@@ -180,15 +180,6 @@ class PatternRecognition {
                     SpacePoint2dPArray &spnts_by_station,
                     std::vector<SciFiHelicalPRTrack> &htrks);
 
-    /** @brief Find points from intermediate stations which fit to the "trial track"
-     *
-     * Calculate the radial deviation of intermediate station spacepoints from an
-     * initial circle formed with only 3 spacepoints.  Check if these delta_R's are
-     * acceptable with a cut, and if they are, append them to the trial track.
-     *
-     */
-    double delta_R(const SimpleCircle &circle, const ThreeVector &pos);
-
     /** @brief Fit a circle to spacepoints in x-y projection
      *
      *  Fit a circle of the form A*(x^2 + y^2) + b*x + c*y = 1 with least squares fit 

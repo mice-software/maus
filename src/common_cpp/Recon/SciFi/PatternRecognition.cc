@@ -549,6 +549,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
   int outer_st_num = -1, inner_st_num = -1, middle_st_num = -1;
   set_seed_stations(ignore_stations, outer_st_num, inner_st_num, middle_st_num);
 
+  // ******* Beginning nested loops to find unused spacepoints from each station available. *******
   // Loop over spacepoints in outer station
   for ( unsigned int st_outer_sp = 0;
        st_outer_sp <spnts_by_station[outer_st_num].size(); ++st_outer_sp ) {
@@ -583,66 +584,16 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
               int ignore_st_1 = -1, ignore_st_2 = -1;
               set_ignore_stations(ignore_stations, ignore_st_1, ignore_st_2);
 
-              // Collect the spacepoints into a vector so that we can pass it to circle_fit
-              SimpleCircle circle;
-              std::vector<SciFiSpacePoint*> tmp_spnts;
-              tmp_spnts.push_back(spnts_by_station[inner_st_num][st_inner_sp]);
-              tmp_spnts.push_back(spnts_by_station[middle_st_num][st_middle_sp]);
-              tmp_spnts.push_back(spnts_by_station[outer_st_num][st_outer_sp]);
-
-              // Fit a circle in the xy projection to 3 sp from inner, outer, and interm stations
-              bool good_radius = circle_fit(tmp_spnts, circle);
-
-              if ( !good_radius )
-                continue; // if radius calculated is too large, look for new seed stations
-
               // Loop over other intemediate stations so that we can try adding them to the circle
               for ( int st_num = inner_st_num + 1; st_num < outer_st_num; ++st_num ) {
                 if (st_num != middle_st_num && st_num != ignore_st_1 && st_num != ignore_st_2) {
 
-                  double best_from_this_station = 1000000;
-                  SciFiSpacePoint* tmp_best_sp = new SciFiSpacePoint();
-                  bool dR_passed = false;
-
                   for (unsigned int sp_no = 0; sp_no < spnts_by_station[st_num].size(); ++sp_no) {
                     // If the spacepoint has not already been used in a track fit
                     if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
-
-                      ThreeVector pos = spnts_by_station[st_num][sp_no]->get_position();
-                      double dR = delta_R(circle, pos); // Calculate the residual dR
-
-                      if ( debug > 1 ) {
-                        std::ofstream outdR_all("dR_all.txt", std::ios::out |
-                                                        std::ios::app);
-                        outdR_all << dR << "\t";
-                        outdR_all << spnts_by_station[st_num][sp_no]->get_tracker() << "\n";
-                      }
-                      if ( debug > 0 ) std::cout << dR << std::endl;
-
-                      // Apply roadcut to see if spacepoint belongs to same circle
-                      if ( fabs(dR) < _R_res_cut && fabs(dR) < fabs(best_from_this_station) ) {
-                         if ( debug > 1 ) {
-                           std::ofstream outdR_passed_cut("dR_passed_cut.txt", std::ios::out |
-                                                          std::ios::app);
-                           outdR_passed_cut << dR <<"\t";
-                           outdR_passed_cut << spnts_by_station[st_num][sp_no]->get_tracker();
-                           outdR_passed_cut << std::endl;
-                         }
-
-                         best_from_this_station = dR;
-                         dR_passed = true;
-                         // std::cout <<tmp_best_sp->get_position()<<std::endl;
-                         // std::cout << dR <<std::endl;
-                         tmp_best_sp = spnts_by_station[st_num][sp_no];
-                      } else if ( fabs(dR) > _R_res_cut || fabs(best_from_this_station) < (dR) ) {
-                        if ( debug > 0 ) std::cout << "dR test not passed..." <<std::endl;
-                        // bool dR_passed = false;
-                      }
-                    } // ~If intermediate station spacepoint is unused
-                  } // ~Loop over intermediate staion spacepoints
-                  // Found best sp from this intermediate station:
-                  if ( dR_passed )
-                    good_spnts.push_back(tmp_best_sp);
+                         good_spnts.push_back(spnts_by_station[st_num][sp_no]);
+                    }
+                  } // ~loop over intermediate station sp
                 } // ~if (st_num != ignore_station)
               } // ~Loop over intermediate stations not used in initial circle_fit
 
@@ -657,9 +608,6 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
               } else {
                 good_spnts.push_back(spnts_by_station[middle_st_num][st_middle_sp]);
               }
-
-              // Clear the circle object so we can reuse it
-              circle.clear();
 
               // Check we have at least 1 good spacepoint in each of the intermediate stations
               if ( debug > 0 )
@@ -681,8 +629,9 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                   std::cout << std::endl;
                 }
 
-                // Perform another circle fit now that we have found all of the good spnts
-                good_radius = circle_fit(good_spnts, circle);
+                // Perform a circle fit now that we have found a set of spacepoints
+                SimpleCircle circle;
+                bool good_radius = circle_fit(good_spnts, circle);
 
                 if ( !good_radius )
                   continue; // if the radius calculated is too large, force loop to iterate
@@ -920,19 +869,6 @@ bool PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   circle.set_chisq(chi2); // should I leave this un-reduced?
   return true;
 } // ~circle_fit(...)
-
-double PatternRecognition::delta_R(const SimpleCircle &circle, const ThreeVector &pos) {
-
-  double x0 = circle.get_x0();
-  double y0 = circle.get_y0();
-  double R = circle.get_R();
-
-  double R_i = sqrt((pos.x() - x0)*(pos.x() - x0) + (pos.y() - y0)*(pos.y() - y0));
-  double delta_R = R - R_i;
-  // std::cout << "dR =  " << delta_R << std::endl;
-
-  return delta_R;
-} // ~delta_R
 
 void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
                                             const SimpleCircle &circle, std::vector<double> &dphi,
