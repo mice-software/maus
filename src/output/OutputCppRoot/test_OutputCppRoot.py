@@ -54,6 +54,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
             "daq_event_type":"physics_event",
             "recon_events":[],
             "mc_events":[],
+            "maus_event_type":"Spill",
         }
         self.test_header = {
                 "start_of_job":{"date_time":"1976-04-04T00:00:00.000000"},
@@ -62,6 +63,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
                 "bzr_status":"",
                 "maus_version_number":"",
                 "json_configuration":"output cpp root test",
+                "maus_event_type":"JobHeader",
             }
         self.cards = Configuration.Configuration().getConfigJSON()
         self.cards = json.loads(self.cards)
@@ -96,13 +98,13 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Try saving a few standard events
         """
-        self.assertTrue(self.output.save_spill(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
-        self.assertTrue(self.output.save_spill(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
-        self.assertTrue(self.output.save_spill(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
         self.output.death() # close the ROOT file
@@ -120,15 +122,15 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Check that if passed a bad event, code fails gracefully
         """
-        self.assertFalse(self.output.save_spill(json.dumps({"no_branch":{}})))
-        self.assertFalse(self.output.save_spill(''))
+        self.assertFalse(self.output.save(json.dumps({"no_branch":{}})))
+        self.assertFalse(self.output.save(''))
 
     def test_save_bad_job_header(self):
         """
         Check that if passed a bad header, code fails gracefully
         """
-        self.assertFalse(self.output.save_job_header(json.dumps({"":{}})))
-        self.assertFalse(self.output.save_job_header(''))
+        self.assertFalse(self.output.save(json.dumps({"":{}})))
+        self.assertFalse(self.output.save(''))
 
     def __check_entry(self, json_conf_text, n_entries, entry):
         """
@@ -148,11 +150,11 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Try saving a standard header; check we can only save job header once
         """
-        self.assertTrue(self.output.save_job_header(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_header)
         ))
         self.test_header["json_configuration"] = "output cpp root test 2"
-        self.assertTrue(self.output.save_job_header(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_header)
         ))
         self.output.death()
@@ -163,17 +165,17 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         test_OutputCppRoot.test_mixed_types check we can load alternating types
         """
-        self.assertTrue(self.output.save_job_header(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_header)
         ))
-        self.assertTrue(self.output.save_spill(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
         self.test_header["json_configuration"] = "output cpp root test 2"
-        self.assertTrue(self.output.save_job_header(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_header)
         ))
-        self.assertTrue(self.output.save_spill(
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
         self.__check_entry("output cpp root test", 2, 0)

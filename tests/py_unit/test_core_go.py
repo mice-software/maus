@@ -22,7 +22,6 @@ import tempfile
 from io import StringIO
 import datetime
 import os
-import json
 
 from InputPyEmptyDocument import InputPyEmptyDocument
 from MapPyDoNothing import MapPyDoNothing
@@ -48,6 +47,16 @@ class FakeWorker(): #pylint: disable = W0232, R0903
         @return False always.
         """
         return False
+
+    def death(self): #pylint: disable = W0613, R0201, R0903
+        """  
+        Death function that always returns False.
+        @param self. Object reference.
+        @param some_arg Ignored.
+        @return False always.
+        """
+        return False
+
 
 class GoTestCase(unittest.TestCase): #pylint: disable = R0904
     """ Tests for src/common_py/Go.py. """
@@ -242,7 +251,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
             self.assertEqual(header['bzr_status'], '')
         self.assertEqual(header['maus_version'], 'some_version')
         self.assertEqual(header['json_configuration'], cards)
-        print json.dumps(header, indent=2)
+        self.assertEqual(header['maus_event_type'], 'JobHeader')
 
 if __name__ == '__main__':
     unittest.main()

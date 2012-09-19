@@ -73,15 +73,18 @@ class InputCppRoot : public InputBase<std::string> {
     /** Gets the next event from the root file. If there are no more events,
      *  returns an empty string ("")
      *
-     *  This will cycle through - first attempts to find a JobHeader, then a
+     *  This will cycle through different event types as follows:
+     *  First attempts to find all JobHeaders, then the first
      *  RunHeader, then spill until the Spill number changes; then RunFooter,
-     *  then RunHeader, then spill until the Spill number changes ...
+     *  then RunHeader, then spill until the Spill number changes, etc, then
+     *  finally all JobFooters. If there are no events of a particular type left,
+     *  then that event type is skipped and we move on to the next event type
+     *  until all events have been fired and we have no more data.
      */
     std::string _emitter_cpp();
 
-    std::string load_data();
+    std::string emitter() {throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));}
 
-    std::string _load_job_header();
 
     /** Gets an event from the root file.
      *
@@ -95,13 +98,13 @@ class InputCppRoot : public InputBase<std::string> {
     std::string _load_event(std::string branch_name);
 
     /** _irstream holds root TFile.
-     *
-     *  Should always be open and pointing to Spill TTree or closed.
      */
     irstream* _infile;
     std::string _infile_branch;
     std::string _filename;
     std::string _classname;
+
+    InputBase::event_type _next_event_type;
 };
 }
 

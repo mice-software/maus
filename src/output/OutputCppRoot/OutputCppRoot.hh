@@ -23,6 +23,9 @@
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/API/OutputBase.hh"
 
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
+
 class orstream;
 
 namespace MAUS {
@@ -79,29 +82,21 @@ class OutputCppRoot : public OutputBase<std::string> {
    *  of _outfile).
    */
   template <class ConverterT, class DataT>
-  bool write_event
-        (MAUSEvent<DataT>* data_cpp, std::string data, std::string branch_name);
+  bool write_event(MAUSEvent<DataT>* data_cpp,
+                   const Json::Value& data_json,
+                   std::string branch_name);
 
-  /** Store a spill in the ROOT tree
-   *
-   * OutputBase provides public interface
-   *
-   *  @returns True on success, False on failure
-   */
-  bool _save_spill(std::string json_spill_document);
+  event_type get_event_type(const Json::Value& data_json);
 
-  /** Store job header in the ROOT tree, overwriting current job header
-   *
-   * OutputBase provides public interface
-   *
-   *  @returns True on success, False on failure
-   */
-  bool _save_job_header(std::string json_header);
+
+  bool _save(std::string json_document);
 
   orstream* _outfile;
 
   std::string _fname;
   std::string _outfile_branch;
+  JobHeaderData _job_header_cpp;
+  Data _spill_cpp;
 };
 }
 

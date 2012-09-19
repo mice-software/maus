@@ -63,16 +63,7 @@ class OutputBase : public virtual IOutput<T>, public ModuleBase {
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    bool save_spill(T t);
-
-    /*!\brief Save header data
-     *
-     * Implementation of the interface. Wraps the _save function
-     * providing additional control/checking.
-     * \param T* Pointer to the input data
-     * \return boolean save status
-     */
-    bool save_job_header(T t);
+    bool save(T t);
 
   private:
     /*!\brief Save spill data
@@ -82,16 +73,7 @@ class OutputBase : public virtual IOutput<T>, public ModuleBase {
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    virtual bool _save_spill(T t) = 0;
-
-    /*!\brief Save job header data
-     *
-     * Pure virtual private function to be implemented by the
-     * derived outputter author to correctly save the input data type.
-     * \param T* Pointer to the input header data
-     * \return boolean save status
-     */
-    virtual bool _save_job_header(T t) = 0;
+    virtual bool _save(T t) = 0;
 };
 }// end of namespace
 

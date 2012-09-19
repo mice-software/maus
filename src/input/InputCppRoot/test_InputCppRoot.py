@@ -87,15 +87,23 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         inputter_3 = InputCppRoot.InputCppRoot()
         inputter_3.death()
 
-    def test_read_normal_event(self):
+    def test_read_events(self):
         """
         Try reading a spill event
         """
         inputter = InputCppRoot.InputCppRoot()
         inputter.birth(json.dumps({"input_root_file_name":self.fname}))
-        # bad event (no branches set)
+        # first job header
+        json_event = json.loads(inputter.emitter_cpp())
+        self.assertEqual(json_event["maus_event_type"], "JobHeader")
+        self.assertEqual(json_event["json_configuration"], "mushrooms")
+        # second job header
+        json_event = json.loads(inputter.emitter_cpp())
+        self.assertEqual(json_event["maus_event_type"], "JobHeader")
+        self.assertEqual(json_event["json_configuration"], "omelette")
+        # first spill (bad)
         self.assertEqual(inputter.emitter_cpp(), "")
-        # normal event
+        # second spill
         json_event = json.loads(inputter.emitter_cpp())
         self.assertEqual \
            (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
@@ -105,39 +113,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
            (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
         # out of events
         self.assertEqual(inputter.emitter_cpp(), "")
-
-    def test_load_job_header_bad_no_branch(self):
-        """
-        Try reading a bad job header
-        """
-        # set up file with no job_header
-        my_fname = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
-                                         "test_inputCppRoot_no_job_header.root")
-        root_file = ROOT.TFile(my_fname, "RECREATE") # pylint: disable = E1101
-        data = ROOT.MAUS.Data() # pylint: disable = E1101
-        tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
-        tree.Branch("data", data, data.GetSizeOf(), 1)
-        tree.Fill()
-        tree.Write()
-        root_file.Close()
-        # try reading
-        inputter = InputCppRoot.InputCppRoot()
-        inputter.birth(json.dumps({"input_root_file_name":my_fname}))
-        self.assertEqual(inputter.load_job_header(), "")
-        inputter.death()
-        # now an empty job header tree (no branch)
-        root_file = ROOT.TFile(my_fname, "UPDATE") # pylint: disable = E1101
-        tree2 = ROOT.TTree("JobHeader", "TTree") # pylint: disable = E1101
-        tree2.Write()
-        root_file.Close()
-        # try reading
-        inputter.birth(json.dumps({"input_root_file_name":my_fname}))
-        self.assertEqual(inputter.load_job_header(), "")
-        inputter.death()
-        # Nb: I tried a malformed job_header branch i.e. with Spill instead of
-        # JobHeader. It crashes with a segv, I think that's okay though...
-        # slight worry when it comes to backward compatibility (i.e. what
-        # happens if JobHeader gets new data added to it?).
 
 if __name__ == "__main__":
     unittest.main()

@@ -35,10 +35,10 @@ namespace MAUS {
   OutputBase<T>::~OutputBase() {}
 
   template <typename T>
-  bool OutputBase<T>::save_spill(T t) {
+  bool OutputBase<T>::save(T t) {
     bool ret = false;
     try {
-      ret = _save_spill(t);
+      ret = _save(t);
     }
     catch(Squeal& s) {
       CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
@@ -51,25 +51,6 @@ namespace MAUS {
     }
     return ret;
   }
-
-  template <typename T>
-  bool OutputBase<T>::save_job_header(T t) {
-    bool ret = false;
-    try {
-      ret = _save_job_header(t);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return ret;
-  }
-
 
 }// end of namespace
 #endif

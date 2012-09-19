@@ -31,14 +31,9 @@ namespace MAUS {
       virtual void _birth(const std::string&) {}
       virtual void _death() {}
 
-      virtual bool _save_spill(int* i) {
+      virtual bool _save(int* i) {
         if (!i) { throw NullInputException(_classname); }
         return *i == 27? true : false;
-      }
-
-      virtual bool _save_job_header(int* i) {
-        if (!i) { throw NullInputException(_classname); }
-        return *i == 42? true : false;
       }
 
     private:
@@ -51,16 +46,10 @@ namespace MAUS {
       MyOutputter_squeal() : MyOutputter() {}
 
     private:
-      virtual bool _save_spill(int* i) {
+      virtual bool _save(int* i) {
         throw Squeal(Squeal::recoverable,
            "Expected Test Squeal in _save",
-           "int* _save_spill(int* t) const");
-      }
-
-      virtual bool _save_job_header(int* i) {
-        throw Squeal(Squeal::recoverable,
-           "Expected Test Squeal in _save",
-           "int* _save_job_header(int* t) const");
+           "int* _save(int* t) const");
       }
   };
 
@@ -69,10 +58,7 @@ namespace MAUS {
       MyOutputter_exception() : MyOutputter() {}
 
     private:
-      virtual bool _save_spill(int* i) {
-        throw std::exception();
-      }
-      virtual bool _save_job_header(int* i) {
+      virtual bool _save(int* i) {
         throw std::exception();
       }
   };
@@ -82,8 +68,7 @@ namespace MAUS {
       MyOutputter_otherexcept() : MyOutputter() {}
 
     private:
-      virtual bool _save_spill(int* i) {throw 17;}
-      virtual bool _save_job_header(int* i) {throw -9;}
+      virtual bool _save(int* i) {throw 17;}
   };
 
   TEST(OutputBaseTest, TestConstructor) {
@@ -133,22 +118,22 @@ namespace MAUS {
     int* i1 = new int(27);
     int* i2 = new int(19);
 
-    ASSERT_TRUE(mm.save_spill(i1))
-      <<"Fail: _save method not called properly didn't return 'true' for save_spill(new int(27))"
+    ASSERT_TRUE(mm.save(i1))
+      <<"Fail: _save method not called properly didn't return 'true' for save(new int(27))"
       <<std::endl;
 
-    ASSERT_FALSE(mm.save_spill(i2))
-      <<"Fail: _save method not called properly didn't return 'false' for save_spill(new int(19))"
+    ASSERT_FALSE(mm.save(i2))
+      <<"Fail: _save method not called properly didn't return 'false' for save(new int(19))"
       <<std::endl;
 
     /////////////////////////////////////////////////////
     MyOutputter mm2;
     int* dub = 0;
-    ASSERT_FALSE(mm2.save_spill(dub));
+    ASSERT_FALSE(mm2.save(dub));
     /////////////////////////////////////////////////////
     MyOutputter_squeal mm_s;
     try {
-      mm_s.save_spill(i1);
+      mm_s.save(i1);
     }
     catch(...) {
       ASSERT_TRUE(false)
@@ -159,7 +144,7 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyOutputter_exception mm_e;
     try {
-      mm_e.save_spill(i1);
+      mm_e.save(i1);
     }
     catch(...) {
       ASSERT_TRUE(false)
@@ -170,7 +155,7 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyOutputter_otherexcept mm_oe;
     try {
-      mm_oe.save_spill(i1);
+      mm_oe.save(i1);
       ASSERT_TRUE(false)
         << "Fail: No exception thrown"
         << std::endl;
@@ -185,67 +170,4 @@ namespace MAUS {
     delete i1;
     delete i2;
   }
-
-  TEST(OutputBaseTest, TestSaveJobHeader) {
-    MyOutputter mm;
-
-    int* i1 = new int(42);
-    int* i2 = new int(-9);
-
-    ASSERT_TRUE(mm.save_job_header(i1))
-      << "Fail: _save method not called properly didn't return 'true' for "
-      << "save_job_header(new int(27))"
-      << std::endl;
-
-    ASSERT_FALSE(mm.save_job_header(i2))
-      << "Fail: _save method not called properly didn't return 'false' for "
-      << "save_job_header(new int(19))"
-      << std::endl;
-
-    /////////////////////////////////////////////////////
-    MyOutputter mm2;
-    int* dub = 0;
-    ASSERT_FALSE(mm2.save_job_header(dub));
-    /////////////////////////////////////////////////////
-    MyOutputter_squeal mm_s;
-    try {
-      mm_s.save_job_header(i1);
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Squeal should have been handled"
-        << std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyOutputter_exception mm_e;
-    try {
-      mm_e.save_job_header(i1);
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
-        << std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyOutputter_otherexcept mm_oe;
-    try {
-      mm_oe.save_job_header(i1);
-      ASSERT_TRUE(false)
-        << "Fail: No exception thrown"
-        << std::endl;
-    }
-    catch(UnhandledException& e) {}
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Expected exception of type UnhandledException to be thrown"
-        << std::endl;
-    }
-
-    delete i1;
-    delete i2;
-  }
-
-
 }// end of namespace

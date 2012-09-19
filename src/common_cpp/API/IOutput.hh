@@ -47,20 +47,12 @@ namespace MAUS {
   public:
     /*!\brief Save data
      *
-     * Pure virtual function to save the input spill data
+     * Pure virtual function to save the input data
      * and return the boolean status
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    virtual bool save_spill(T t) = 0;
-
-    /*!\brief Save data
-     *
-     * Pure virtual function to save the input header
-     * \param T* Pointer to the input data
-     * \return boolean save status - true if successful save
-     */
-    virtual bool save_job_header(T t) = 0;
+    virtual bool save(T t) = 0;
   };
 }// end of namespace
 #endif

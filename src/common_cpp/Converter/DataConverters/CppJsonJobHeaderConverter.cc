@@ -26,7 +26,6 @@ Json::Value* CppJsonHeaderConverter::_convert(const JobHeaderData* data) const {
   if (data == NULL || data->GetJobHeader() == NULL)
       return new Json::Value();
   Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
-  (*my_json)["maus_event_type"] = "JobHeader";
   return my_json;
 }
 }

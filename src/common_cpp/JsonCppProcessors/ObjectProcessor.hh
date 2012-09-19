@@ -139,6 +139,20 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
 
+    /** Register a branch for processing, where json value is always the same
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param child_value the branch will always be filled with this value
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     *
+     *  This method will never fill anything in the parent C++ class
+     */
+    void RegisterConstantBranch(std::string branch_name,
+                    Json::Value child_value,
+                    bool is_required);
+
+
     /** Return true if json value properties not the same as branches
      *
      *  Compare the list of properties on the json value and compare with the

@@ -34,7 +34,7 @@ namespace MAUS {
 
 InputCppRoot::InputCppRoot(std::string filename)
             : InputBase<std::string>("InputCppRoot"), _infile(NULL),
-              _filename(filename) {
+              _filename(filename), _next_event_type(_job_header_tp) {
 }
 
 InputCppRoot::~InputCppRoot() {
@@ -58,16 +58,22 @@ void InputCppRoot::_death() {
 }
 
 std::string InputCppRoot::_emitter_cpp() {
-    return load_data();
-}
-
-std::string InputCppRoot::load_data() {
-    return _load_event<CppJsonSpillConverter, Data>(std::string("data"));
-}
-
-std::string InputCppRoot::_load_job_header() {
-    return _load_event<CppJsonHeaderConverter, JobHeaderData>
+  std::string event = "";
+  switch (_next_event_type) {
+      case _job_header_tp:
+          try {
+              event = _load_event<CppJsonHeaderConverter, JobHeaderData>
                                                     (std::string("job_header"));
+              return event;
+          } catch(const std::exception& exc) {
+              _next_event_type = _spill_tp;
+              return _emitter_cpp();
+          }
+      case _spill_tp:
+          event = _load_event<CppJsonSpillConverter, Data>(std::string("data"));
+          return event;
+  }
+  return event;
 }
 
 template <class ConverterT, class DataT>
@@ -86,23 +92,21 @@ std::string InputCppRoot::_load_event(std::string branch_name) {
         _infile->open(_filename.c_str(), data.GetEventType().c_str());
         _infile_branch = data.GetEventType();
     }
-    try {
-        (*_infile) >> branchName(branch_name.c_str()) >> data;
-        if ((*_infile) >> readEvent == NULL) {
-            return output;
-        }
-        Json::Value* value = ConverterT()(&data);
-        if (value->isNull()) {
-            delete value;
-            return output;
-        }
-        Json::FastWriter writer;
-        output = writer.write(*value);
+    (*_infile) >> branchName(branch_name.c_str()) >> data;
+    if ((*_infile) >> readEvent == NULL) {
+        return output;
+    }
+    Json::Value* value = ConverterT()(&data);
+    if (value == NULL)
+        return output;
+    if (value->isNull()) {
         delete value;
         return output;
-    } catch(...) {
-        throw;
     }
+    Json::FastWriter writer;
+    output = writer.write(*value);
+    delete value;
+    return output;
 }
 }
 

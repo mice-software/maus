@@ -51,13 +51,6 @@ namespace MAUS {
      * \return The data generated
      */
     virtual T emitter_cpp() = 0;
-
-    /*!\brief Load the job header
-     *
-     * Pure virtual function to generate data
-     * \return The data generated
-     */
-    virtual T load_job_header() = 0;
   };
 
 }// end of namespace

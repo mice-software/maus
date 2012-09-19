@@ -50,24 +50,6 @@ namespace MAUS {
     }
     return o;
   }
-
-  template <typename T>
-  T InputBase<T>::load_job_header() {
-    T o;
-    try {
-      o = _load_job_header();
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
 }  // end of namespace
 #endif
 

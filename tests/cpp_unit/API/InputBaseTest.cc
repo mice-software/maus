@@ -35,10 +35,6 @@ namespace MAUS {
       return new int(27);
     }
 
-    virtual int* _load_job_header() {
-      return new int(26);
-    }
-
 
   private:
     FRIEND_TEST(InputBaseTest, TestConstructor);
@@ -53,12 +49,7 @@ namespace MAUS {
     virtual int* _emitter_cpp() {
       throw Squeal(Squeal::recoverable,
                    "Expected Test Squeal in _emitter_cpp",
-                   "int* _load_job_header(int* t) const");
-    }
-    virtual int* _load_job_header() {
-      throw Squeal(Squeal::recoverable,
-                   "Expected Test Squeal in _load_job_header",
-                   "int* _load_job_header(int* t) const");
+                   "int* _emitter_cpp()");
     }
   };
 
@@ -70,10 +61,6 @@ namespace MAUS {
     virtual int* _emitter_cpp() {
       throw std::exception();
     }
-
-    virtual int* _load_job_header() {
-      throw std::exception();
-    }
   };
 
   class MyInputter_otherexcept : public MyInputter {
@@ -82,8 +69,6 @@ namespace MAUS {
 
   private:
     virtual int* _emitter_cpp() {throw 17;}
-
-    virtual int* _load_job_header() {throw 19;}
   };
 
   TEST(InputBaseTest, TestConstructor) {
@@ -162,55 +147,6 @@ namespace MAUS {
     MyInputter_otherexcept mm_oe;
     try {
       mm_oe.emitter_cpp();
-      ASSERT_TRUE(false)
-        << "Fail: No exception thrown"
-        << std::endl;
-    }
-    catch(UnhandledException& e) {}
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Expected exception of type UnhandledException to be thrown"
-        << std::endl;
-    }
-
-    delete i;
-  }
-
-  TEST(InputBaseTest, TestLoadJobHeader) {
-    MyInputter mm;
-
-    int* i = mm.load_job_header();
-
-    ASSERT_TRUE(*i == 26)
-      << "Fail: _load_job_header method not called properly"
-      << std::endl;
-
-    /////////////////////////////////////////////////////
-    MyInputter_squeal mm_s;
-    try {
-      mm_s.load_job_header();
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Squeal should have been handled"
-        << std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyInputter_exception mm_e;
-    try {
-      mm_e.load_job_header();
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
-        << std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyInputter_otherexcept mm_oe;
-    try {
-      mm_oe.load_job_header();
       ASSERT_TRUE(false)
         << "Fail: No exception thrown"
         << std::endl;

@@ -44,6 +44,7 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                                                   &Spill::SetDaqEventType, true);
     RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
                                                   &Spill::SetErrors, false);
+    RegisterConstantBranch("maus_event_type", Json::Value("Spill"), true);
 }
 }
 

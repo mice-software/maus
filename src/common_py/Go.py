@@ -127,7 +127,7 @@ class Go: # pylint: disable=R0921, R0903
 
             # Execute the dataflow.
             print("Initiating Execution")
-            executor.execute()
+            executor.execute(self.get_job_header(json_config_dictionary))
         except:
             raise
         finally:
@@ -181,7 +181,7 @@ class Go: # pylint: disable=R0921, R0903
         """
         Generate the JobHeader object and send it to the output stream
         """
-        start_of_job = {"datetime":datetime.datetime.utcnow().isoformat(' ')}
+        start_of_job = {"date_time":datetime.datetime.utcnow().isoformat(' ')}
         bzr_dir = os.path.expandvars('$MAUS_ROOT_DIR/.bzr/branch/')
         bzr_configuration = ''
         try:
@@ -206,6 +206,7 @@ class Go: # pylint: disable=R0921, R0903
             "bzr_revision":bzr_revision,
             "bzr_status":bzr_status,
             "maus_version":maus_version,
-            "json_configuration":json_datacards
+            "json_configuration":json.dumps(json_datacards),
+            "maus_event_type":"JobHeader"
         }
 

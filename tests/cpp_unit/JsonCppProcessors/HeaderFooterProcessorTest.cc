@@ -33,7 +33,8 @@ std::string JOB_HEADER =
   std::string("{\"bzr_status\":\"\", \"maus_version_number\":\"\", ")+
   std::string("\"bzr_configuration\":\"\", \"bzr_revision\":\"\", ")+
   std::string("\"start_of_job\":{\"date_time\":\"1976-04-04T00:00:00.000000\"}, ")+
-  std::string("\"json_configuration\":\"output cpp root test\"")+
+  std::string("\"json_configuration\":\"output cpp root test\", ")+
+  std::string("\"maus_event_type\":\"JobHeader\"")+
   std::string("}");
 
 TEST(HeaderFooterProcessorTest, JobHeaderProcessorTest) {

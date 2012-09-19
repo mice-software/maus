@@ -27,7 +27,6 @@ Json::Value* CppJsonSpillConverter::_convert(const Data* data) const {
   if (data == NULL || data->GetSpill() == NULL)
       return new Json::Value();
   Json::Value* my_json = SpillProcessor().CppToJson(*data->GetSpill());
-  (*my_json)["maus_event_type"] = "Spill";
   return my_json;
 }
 }

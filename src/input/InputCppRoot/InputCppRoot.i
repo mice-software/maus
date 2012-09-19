@@ -1,5 +1,18 @@
-%include "std_string.i"
+%include std_string.i
 %include cpointer.i
+%include exception.i
+
+// any exceptions thrown following this declaration should make a python
+// exception
+%exception {
+  try {
+    $function
+  }
+  catch (const std::exception& exc) {
+    PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+    return NULL;
+  }
+}
 
 %{
 #include "src/common_cpp/API/IModule.hh"
@@ -26,6 +39,11 @@ using namespace std;
 
 %enddef
 
+%feature("shadow") MAUS::InputBase::emitter() %{
+def emitter(self):
+    yield self.emitter_cpp()
+%}
+
 using namespace std;
 INPUTBASE_WRAP(string)
 
@@ -33,18 +51,6 @@ INPUTBASE_WRAP(string)
 %{
 #include "InputCppRoot.hh"
 %}
-
-%feature("shadow") MAUS::InputCppRoot::emitter() %{
-def emitter(self):
-  next_event = "No Event"
-  while (next_event != ""):
-    next_event = self.emitter_cpp()
-    if next_event == "":
-        return
-    yield next_event
-%}
-
-
 
 %include "InputCppRoot.hh"
 

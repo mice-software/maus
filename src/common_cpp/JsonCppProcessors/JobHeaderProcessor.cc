@@ -33,12 +33,14 @@ JobHeaderProcessor::JobHeaderProcessor()
     RegisterValueBranch("bzr_status", &_string_proc,
                         &JobHeader::GetBzrStatus,
                         &JobHeader::SetBzrStatus, true);
-    RegisterValueBranch("maus_version_number", &_string_proc,
+    RegisterValueBranch("maus_version", &_string_proc,
                         &JobHeader::GetMausVersionNumber,
                         &JobHeader::SetMausVersionNumber, true);
+
     RegisterValueBranch("json_configuration", &_string_proc,
                         &JobHeader::GetJsonConfiguration,
                         &JobHeader::SetJsonConfiguration, true);
+    RegisterConstantBranch("maus_event_type", Json::Value("JobHeader"), true);
 }
 }  // namespace MAUS
 
