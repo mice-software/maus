@@ -77,7 +77,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
       smooth(sites, track, i);
     }
 
-    track->compute_chi2(sites);
+    //track->compute_chi2(sites);
 
     KalmanMonitor monitor;
     // monitor.save(sites);
@@ -124,7 +124,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
       smooth(sites, track, i);
     }
 
-    track->compute_chi2(sites);
+    //track->compute_chi2(sites);
 
     KalmanMonitor monitor;
     // monitor.save(sites);
@@ -289,7 +289,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     // y  = (y_pr + my*z);
     // x = clusters[numb_sites-1]->get_position().x();
     mx = -mx_pr;
-    my = -my_pr;
+    my = my_pr;
   } else if ( tracker == 1 ) {
     // z = 0;
     mx = mx_pr;
@@ -307,7 +307,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   a(4, 0) = 1./p_pr;
   first_plane.set_projected_a(a);
 
-  double cov = 100.0;
+  double cov = 10000.0;
   TMatrixD C(5, 5);
   C(0, 0) = cov;
   C(1, 1) = cov;

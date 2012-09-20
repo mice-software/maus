@@ -308,9 +308,9 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   }
   _chi2 = _chi2*(1./sigma_measurement2);
   _ndf = number_of_sites - number_parameters;
-  std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
-  output << _tracker << " " << _chi2 << " " << _ndf << "\n";
-  output.close();
+  //std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
+  //output << _tracker << " " << _chi2 << " " << _ndf << "\n";
+  //output.close();
 }
 
 } // ~namespace MAUS
