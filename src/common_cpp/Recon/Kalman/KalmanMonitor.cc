@@ -230,7 +230,7 @@ void KalmanMonitor::save_global_track(std::vector<KalmanSite> const &sites) {
     std::ofstream out2("kalman.txt", std::ios::out | std::ios::app);
     int id = site.get_id();
     out2 << a(0, 0)    << " " << C(0, 0) << " "
-         << a(1, 0)    << " " << C(1, 1) << " "
+         << a(2, 0)    << " " << C(2, 2) << " "
          << res_x      << " " << res_y << " "
          << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
          << pull << " " << pull2 << " " << id     << "\n";
