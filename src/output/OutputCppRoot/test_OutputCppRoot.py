@@ -61,9 +61,13 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
                 "bzr_configuration":"",
                 "bzr_revision":"",
                 "bzr_status":"",
-                "maus_version_number":"",
+                "maus_version":"",
                 "json_configuration":"output cpp root test",
                 "maus_event_type":"JobHeader",
+            }
+        self.test_footer = {
+                "end_of_job":{"date_time":"1977-04-04T00:00:00.000000"},
+                "maus_event_type":"JobFooter",
             }
         self.cards = Configuration.Configuration().getConfigJSON()
         self.cards = json.loads(self.cards)
@@ -132,7 +136,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.assertFalse(self.output.save(json.dumps({"":{}})))
         self.assertFalse(self.output.save(''))
 
-    def __check_entry(self, json_conf_text, n_entries, entry):
+    def __check_header(self, json_conf_text, n_entries, entry):
         """
         Check that json_header entry has json_conf_text 
         """
@@ -144,6 +148,20 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree.GetEntry(entry)
         self.assertEqual(job_header.GetJobHeader().GetJsonConfiguration(),
                          json_conf_text)
+        root_file.Close()
+
+    def __check_footer(self, datetime_string, n_entries, entry):
+        """
+        Check that json_footer entry has datetime_string
+        """
+        root_file = ROOT.TFile(self.outfile, "READ") # pylint: disable = E1101
+        job_footer = ROOT.MAUS.JobFooterData() # pylint: disable = E1101
+        tree = root_file.Get("JobFooter")
+        tree.SetBranchAddress("job_footer", job_footer)
+        self.assertEqual(tree.GetEntries(), n_entries)
+        tree.GetEntry(entry)
+        self.assertEqual(job_footer.GetJobFooter().GetEndOfJob().GetDateTime(),
+                         datetime_string)
         root_file.Close()
 
     def test_save_normal_job_header(self):
@@ -158,8 +176,8 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
             json.dumps(self.test_header)
         ))
         self.output.death()
-        self.__check_entry("output cpp root test", 2, 0)
-        self.__check_entry("output cpp root test 2", 2, 1)
+        self.__check_header("output cpp root test", 2, 0)
+        self.__check_header("output cpp root test 2", 2, 1)
 
     def test_mixed_types(self):
         """
@@ -176,10 +194,18 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904
             json.dumps(self.test_header)
         ))
         self.assertTrue(self.output.save(
+            json.dumps(self.test_footer)
+        ))
+        self.assertTrue(self.output.save(
             json.dumps(self.test_data)
         ))
-        self.__check_entry("output cpp root test", 2, 0)
-        self.__check_entry("output cpp root test 2", 2, 1)
+        self.assertTrue(self.output.save(
+            json.dumps(self.test_footer)
+        ))
+        self.output.death()
+        self.__check_header("output cpp root test", 2, 0)
+        self.__check_header("output cpp root test 2", 2, 1)
+        self.__check_footer("1977-04-04T00:00:00.000000", 2, 1)
 
 if __name__ == "__main__":
     unittest.main()

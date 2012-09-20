@@ -75,7 +75,7 @@ namespace MAUS {
     std::string _classname;
 
     /** event types that we can read */
-    enum event_type {_job_header_tp, _spill_tp};
+    enum event_type {_job_header_tp, _spill_tp, _job_footer_tp};
 
   private:
     /*!\brief Module initialisation

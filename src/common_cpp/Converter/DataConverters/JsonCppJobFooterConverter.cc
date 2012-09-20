@@ -12,29 +12,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-#ifndef _TESTS_CPP_UNIT_JSONCPPPROCESSORS_COMMONPROCESSORTEST_HH_
+#include "src/common_cpp/Converter/DataConverters/JsonCppJobFooterConverter.hh"
 
-#include <string>
+#include "src/common_cpp/DataStructure/JobFooter.hh"
+#include "src/common_cpp/JsonCppProcessors/JobFooterProcessor.hh"
 
 namespace MAUS {
-namespace ProcessorTest {
-template <class TYPE>
-void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
-    Json::Value json_in;
-    ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
-                                                                 << test_string;
-    TYPE* cpp_type = NULL;
-    cpp_type = proc->JsonToCpp(json_in);
-    Json::Value* json_out = NULL;
-    ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
-    EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
-    delete cpp_type;
-    delete json_out;
-}
-}
-}
 
-#endif
+JobFooter* JsonCppFooterConverter::_convert(const Json::Value* data) const {
+  return JobFooterProcessor().JsonToCpp(*data);
+}
+}
 

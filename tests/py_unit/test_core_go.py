@@ -22,6 +22,7 @@ import tempfile
 from io import StringIO
 import datetime
 import os
+import json
 
 from InputPyEmptyDocument import InputPyEmptyDocument
 from MapPyDoNothing import MapPyDoNothing
@@ -236,7 +237,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         """
         cards = {'maus_version':'some_version', 'cow':'moo'}
         header = Go.get_job_header(cards)
-        my_datetime = header["start_of_job"]["datetime"]
+        my_datetime = header["start_of_job"]["date_time"]
         start_time_as_dt = datetime.datetime.strptime(my_datetime,
                                                         "%Y-%m-%d %H:%M:%S.%f")
         self.assertLess(start_time_as_dt, datetime.datetime.utcnow())
@@ -250,7 +251,7 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
             self.assertEqual(header['bzr_revision'], '')
             self.assertEqual(header['bzr_status'], '')
         self.assertEqual(header['maus_version'], 'some_version')
-        self.assertEqual(header['json_configuration'], cards)
+        self.assertEqual(header['json_configuration'], json.dumps(cards))
         self.assertEqual(header['maus_event_type'], 'JobHeader')
 
 if __name__ == '__main__':

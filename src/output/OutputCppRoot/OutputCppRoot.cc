@@ -19,12 +19,15 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
 
 #include "src/common_cpp/DataStructure/JobHeader.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppJobHeaderConverter.hh"
+
+#include "src/common_cpp/DataStructure/JobFooter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppJobFooterConverter.hh"
 
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
@@ -43,8 +46,7 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     // Setup output stream
     _outfile = new orstream
-                  (_fname.c_str(), "JobHeader", "MAUS output data", "RECREATE");
-    _outfile_branch = "JobHeader";
+                  (_fname.c_str(), "", "MAUS output data", "RECREATE");
   } catch(...) {
     death();
     throw;
@@ -99,6 +101,9 @@ bool OutputCppRoot::_save(std::string data_str) {
         case _spill_tp:
             return write_event<JsonCppConverter, Spill>
                                                (&_spill_cpp, data_json, "data");
+        case _job_footer_tp:
+            return write_event<JsonCppFooterConverter, JobFooter>
+                                    (&_job_footer_cpp, data_json, "job_footer");
     }
     return false;
 }
@@ -111,6 +116,8 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
         return _spill_tp;
     } else if (type == "JobHeader") {
         return _job_header_tp;
+    } else if (type == "JobFooter") {
+        return _job_footer_tp;
     } else {
         throw Squeal(Squeal::recoverable,
                      "Failed to recognise maus_event_type "+type,

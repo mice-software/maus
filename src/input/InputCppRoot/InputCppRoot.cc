@@ -25,7 +25,9 @@
 
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/DataStructure/JobFooterData.hh"
 
+#include "src/common_cpp/Converter/DataConverters/CppJsonJobFooterConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -34,7 +36,8 @@ namespace MAUS {
 
 InputCppRoot::InputCppRoot(std::string filename)
             : InputBase<std::string>("InputCppRoot"), _infile(NULL),
-              _filename(filename), _next_event_type(_job_header_tp) {
+              _infile_tree(""), _filename(filename),
+              _next_event_type(_job_header_tp) {
 }
 
 InputCppRoot::~InputCppRoot() {
@@ -48,6 +51,7 @@ void InputCppRoot::_birth(const std::string& json_datacards) {
                "input_root_file_name", JsonWrapper::stringValue).asString();
   }
   _infile = new irstream(_filename.c_str(), "Spill");
+  _infile_tree = "Spill";
 }
 
 void InputCppRoot::_death() {
@@ -64,13 +68,31 @@ std::string InputCppRoot::_emitter_cpp() {
           try {
               event = _load_event<CppJsonHeaderConverter, JobHeaderData>
                                                     (std::string("job_header"));
+              if (event == "") {
+                  _next_event_type = _spill_tp;
+                  return _emitter_cpp();
+              }
               return event;
           } catch(const std::exception& exc) {
               _next_event_type = _spill_tp;
               return _emitter_cpp();
           }
       case _spill_tp:
-          event = _load_event<CppJsonSpillConverter, Data>(std::string("data"));
+          try {
+              event = _load_event<CppJsonSpillConverter, Data>
+                                                          (std::string("data"));
+              if (event == "") {
+                  _next_event_type = _job_footer_tp;
+                  return _emitter_cpp();
+              }
+              return event;
+          } catch(const std::exception& exc) {
+              _next_event_type = _job_footer_tp;
+              return _emitter_cpp();
+          }
+      case _job_footer_tp:
+          event = _load_event<CppJsonFooterConverter, JobFooterData>
+                                                    (std::string("job_footer"));
           return event;
   }
   return event;
@@ -87,12 +109,13 @@ std::string InputCppRoot::_load_event(std::string branch_name) {
     }
     std::string output = "";
     DataT data;
-    if (_infile_branch != data.GetEventType()) {
+    if (_infile_tree != data.GetEventType()) {
         _infile->close();
         _infile->open(_filename.c_str(), data.GetEventType().c_str());
-        _infile_branch = data.GetEventType();
+        _infile_tree = data.GetEventType();
     }
     (*_infile) >> branchName(branch_name.c_str()) >> data;
+
     if ((*_infile) >> readEvent == NULL) {
         return output;
     }

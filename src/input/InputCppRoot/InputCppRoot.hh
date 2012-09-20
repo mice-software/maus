@@ -100,7 +100,7 @@ class InputCppRoot : public InputBase<std::string> {
     /** _irstream holds root TFile.
      */
     irstream* _infile;
-    std::string _infile_branch;
+    std::string _infile_tree;
     std::string _filename;
     std::string _classname;
 

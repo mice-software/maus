@@ -36,7 +36,6 @@ JobHeaderProcessor::JobHeaderProcessor()
     RegisterValueBranch("maus_version", &_string_proc,
                         &JobHeader::GetMausVersionNumber,
                         &JobHeader::SetMausVersionNumber, true);
-
     RegisterValueBranch("json_configuration", &_string_proc,
                         &JobHeader::GetJsonConfiguration,
                         &JobHeader::SetJsonConfiguration, true);

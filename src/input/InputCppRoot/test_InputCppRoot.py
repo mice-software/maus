@@ -46,7 +46,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
-        tree.Fill()
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
         spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
@@ -68,6 +67,17 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         job_header.SetJsonConfiguration("omelette")
         tree2.Fill()
         tree2.Write()
+
+        job_footer_data = ROOT.MAUS.JobFooterData() # pylint: disable = E1101
+        job_footer = ROOT.MAUS.JobFooter() # pylint: disable = E1101
+        tree3 = ROOT.TTree("JobFooter", "TTree") # pylint: disable = E1101
+        tree3.Branch("job_footer", job_footer_data,
+                    job_footer_data.GetSizeOf(), 1)
+        job_footer_data.SetJobFooter(job_footer)
+        tree3.Fill()
+        tree3.Fill()
+        tree3.Write()
+
         root_file.Close()
 
     def test_birth_death(self):
@@ -89,7 +99,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
 
     def test_read_events(self):
         """
-        Try reading a spill event
+        Try reading a realistic data structure
         """
         inputter = InputCppRoot.InputCppRoot()
         inputter.birth(json.dumps({"input_root_file_name":self.fname}))
@@ -101,18 +111,28 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         json_event = json.loads(inputter.emitter_cpp())
         self.assertEqual(json_event["maus_event_type"], "JobHeader")
         self.assertEqual(json_event["json_configuration"], "omelette")
-        # first spill (bad)
-        self.assertEqual(inputter.emitter_cpp(), "")
-        # second spill
+        # first spill
         json_event = json.loads(inputter.emitter_cpp())
         self.assertEqual \
            (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
-        # normal event
+        # second event
         json_event = json.loads(inputter.emitter_cpp())
         self.assertEqual \
            (json_event["spill_number"], 1, msg=json.dumps(json_event, indent=2))
+        # first job footer
+        json_event = json.loads(inputter.emitter_cpp())
+        self.assertEqual(json_event["maus_event_type"], "JobFooter")
+        # second job footer
+        json_event = json.loads(inputter.emitter_cpp())
+        self.assertEqual(json_event["maus_event_type"], "JobFooter")
         # out of events
         self.assertEqual(inputter.emitter_cpp(), "")
+
+    def test_read_missing_branches(self):
+        """
+        Try reading a data structure with missing tree
+        """
+        self.assertTrue(False)
 
 if __name__ == "__main__":
     unittest.main()

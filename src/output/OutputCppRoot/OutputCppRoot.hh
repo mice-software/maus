@@ -25,6 +25,7 @@
 
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/DataStructure/JobFooterData.hh"
 
 class orstream;
 
@@ -97,6 +98,7 @@ class OutputCppRoot : public OutputBase<std::string> {
   std::string _outfile_branch;
   JobHeaderData _job_header_cpp;
   Data _spill_cpp;
+  JobFooterData _job_footer_cpp;
 };
 }
 

@@ -62,10 +62,6 @@ class PipelineSingleThreadDataflowExecutor:
             assert(self.inputer.birth(self.json_config_doc) == True or \
                    self.inputer.birth(self.json_config_doc) == None)
             emitter = self.inputer.emitter()
-            # This helps us time how long the setup that sometimes happens
-            # in the first event takes
-            print("HINT: MAUS will process 1 event only at first...")
-            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
             # NEEDS TO BE UNCOMMENTED - but only when I figure out how to
             # implement in multithreaded mode also
@@ -90,12 +86,20 @@ class PipelineSingleThreadDataflowExecutor:
 
             print("Processing JobHeader...")
             self.outputer.save(json.dumps(job_header))
+
+            # This helps us time how long the setup that sometimes happens
+            # in the first event takes
+            print("HINT: MAUS will process 1 event only at first...")
+            map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             
-            i = 1
+            i = 0
             while len(map_buffer) != 0:
                 for event in map_buffer:
-                    event = self.transformer.process(event)
-                    event = self.merger.process(event)
+                    event_json = json.loads(event)
+                    if "maus_event_type" in event_json and \
+                       event_json["maus_event_type"] == "Spill":
+                        event = self.transformer.process(event)
+                        event = self.merger.process(event)
                     self.outputer.save(event)
 
                 i += len(map_buffer)

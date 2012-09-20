@@ -41,7 +41,10 @@ using namespace std;
 
 %feature("shadow") MAUS::InputBase::emitter() %{
 def emitter(self):
-    yield self.emitter_cpp()
+    next_event = self.emitter_cpp()
+    while next_event != "":
+        yield next_event
+        next_event = self.emitter_cpp()
 %}
 
 using namespace std;
