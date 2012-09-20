@@ -18,7 +18,9 @@
 #include <string>
 
 #include "src/common_cpp/DataStructure/RunHeader.hh"
+#include "src/common_cpp/JsonCppProcessors/RunHeaderProcessor.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
+#include "src/common_cpp/JsonCppProcessors/RunFooterProcessor.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/RunActionManager.hh"
@@ -30,18 +32,22 @@ namespace PyRunActionManager {
 std::string StartOfRun_DocString =
   std::string("start_of_run(run_number)\n\n")+
   std::string("Call the start of run action for all RunActions registered ")+
-  std::string("with the run action manager.\n\n  - run_number is an integer ")+
-  std::string("corresponding to the run number of the new run.\n\n")+
-  std::string("  - returns None");
+  std::string("with the run action manager.\n\n")+
+  std::string("\\param run_number is an integer corresponding to the run ")+
+  std::string("number of the new run.\n\n")+
+  std::string("\\returns string representation of the RunHeader (json format)");
 
 std::string EndOfRun_DocString =
-  std::string("end_of_run()\n\n")+
+  std::string("end_of_run(run_number)\n\n")+
   std::string("Call the end of run action for all RunActions registered ")+
-  std::string("with the run action manager.\n\n  - takes no arguments.\n\n")+
-  std::string("  - returns None");
+  std::string("with the run action manager.\n\n")+
+  std::string("\\param run_number is an integer corresponding to the run ")+
+  std::string("number of the new run.\n\n")+
+  std::string("\\returns string representation of the RunFooter (json format)");
 
 PyObject* StartOfRun(PyObject *dummy, PyObject *args) {
   int run_number;
+  std::string head_str;
   if (!PyArg_ParseTuple(args, "i", &run_number)) {
     PyErr_SetString(PyExc_TypeError,
            "Failed to interpret start_of_run argument as an integer");
@@ -58,16 +64,26 @@ PyObject* StartOfRun(PyObject *dummy, PyObject *args) {
     RunHeader* run_header = new RunHeader();
     run_header->SetRunNumber(run_number);
     maus_run_action_manager->StartOfRun(run_header);
+    Json::Value* head_json = RunHeaderProcessor().CppToJson(*run_header);
+    Py_BuildValue("s", head_str.c_str());
+    head_str = JsonWrapper::JsonToString(*head_json);
+    delete head_json;
     delete run_header;
   } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
-  Py_INCREF(Py_None);
-  return Py_None;
+  return Py_BuildValue("s", head_str.c_str());
 }
 
 PyObject* EndOfRun(PyObject *dummy, PyObject *args) {
+  int run_number;
+  std::string foot_str;
+  if (!PyArg_ParseTuple(args, "i", &run_number)) {
+    PyErr_SetString(PyExc_TypeError,
+           "Failed to interpret end_of_run argument as an integer");
+    return NULL;
+  }
   try {
     RunActionManager* maus_run_action_manager =
                           Globals::GetInstance()->GetRunActionManager();
@@ -77,14 +93,18 @@ PyObject* EndOfRun(PyObject *dummy, PyObject *args) {
       return NULL;
     }
     RunFooter* run_footer = new RunFooter();
+    run_footer->SetRunNumber(run_number);
     maus_run_action_manager->EndOfRun(run_footer);
+    Json::Value* foot_json = RunFooterProcessor().CppToJson(*run_footer);
+    Py_BuildValue("s", foot_str.c_str());
+    foot_str = JsonWrapper::JsonToString(*foot_json);
+    delete foot_json;
     delete run_footer;
   } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
-  Py_INCREF(Py_None);
-  return Py_None;
+  return Py_BuildValue("s", foot_str.c_str());
 }
 
 static PyMethodDef methods[] = {

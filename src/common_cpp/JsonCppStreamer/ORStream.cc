@@ -15,10 +15,11 @@
    *
    */
 
-  #include <string.h>
+#include <stdio.h>
+#include <string>
 
-  #include "JsonCppStreamer/ORStream.hh"
-  #include "Interface/Squeal.hh"
+#include "JsonCppStreamer/ORStream.hh"
+#include "Interface/Squeal.hh"
 
   orstream::orstream(const char* fileName,
 		     const char* treeName,
@@ -68,7 +69,7 @@
         Squeak::mout(Squeak::debug)
                     << "Opening TFile using new tree " << treeName << std::endl;
     }
-    strcpy(m_branchName, "");
+    snprintf(m_branchName, sizeof(m_branchName), "%s", "");
     m_evtCount = m_tree->GetEntries();
   }
 
@@ -79,7 +80,7 @@
     m_tree->Write(m_tree->GetName(), TTree::kWriteDelete);
     m_file->Close();
     Squeak::mout(Squeak::info) << "Written " << m_evtCount << " event(s) to file." << std::endl;
-    strcpy(m_branchName, "");
+    snprintf(m_branchName, sizeof(m_branchName), "%s", "");
 
     if (m_file) {
         delete m_file;

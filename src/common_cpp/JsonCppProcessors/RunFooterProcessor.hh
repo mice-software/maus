@@ -12,22 +12,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_RUNFOOTERPROCESSOR_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_RUNFOOTERPROCESSOR_
 
-#include "src/common_cpp/DataStructure/JobHeaderData.hh"
-#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+
+#include "src/common_cpp/DataStructure/RunFooter.hh"
 
 namespace MAUS {
 
-Json::Value* CppJsonJobHeaderConverter::_convert
-                                             (const JobHeaderData* data) const {
-  if (data == NULL || data->GetJobHeader() == NULL)
-      return new Json::Value();
-  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
-  return my_json;
-}
-}
+/** @class RunFooterProcessor 
+ */
+class RunFooterProcessor : public ObjectProcessor<RunFooter> {
+  public:
+    /** Set up processors and register branches
+     *
+     *  Everything else is handled by the base class
+     */
+    RunFooterProcessor();
+
+  private:
+    IntProcessor _int_proc;
+};
+}  // namespace MAUS
+
+#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_RUNFOOTERPROCESSOR_
 

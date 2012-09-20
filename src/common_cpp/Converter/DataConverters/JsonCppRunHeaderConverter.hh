@@ -15,42 +15,43 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_JSONCPPJOBFOOTERCONVERTER_H
-#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_JSONCPPJOBFOOTERCONVERTER_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_JSONCPPRUNHEADERCONVERTER_H
+#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_JSONCPPRUNHEADERCONVERTER_H
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/JobFooter.hh"
+#include "src/common_cpp/DataStructure/RunHeader.hh"
 
 namespace MAUS {
 
 /*!
- * \class JsonCppFooterConverter
+ * \class JsonCppRunHeaderConverter
  *
- * \brief Converts JSON jobfooter documents into corresponding binary Cpp format
+ * \brief Converts JSON RunHeader documents into corresponding binary Cpp format
  *
- * JsonCppFooterConverter is built on \a ConverterBase as a specialisation to
- * handle the conversion of data from \a Json::Value to binary \a JobFooter
+ * JsonCppRunHeaderConverter is built on \a ConverterBase as a specialisation to
+ * handle the conversion of data from \a Json::Value to binary \a RunHeader
  * format. Since Json documents often come in the form of a string, these
  * too are accepted and parsed on the fly.
  */
-  class JsonCppJobFooterConverter
-                                : public ConverterBase<Json::Value, JobFooter> {
+  class JsonCppRunHeaderConverter : public ConverterBase<Json::Value, RunHeader> {
   public:
-    JsonCppJobFooterConverter()
-      : ConverterBase<Json::Value, JobFooter>("JsonCppFooterConverter") {}
+    JsonCppRunHeaderConverter()
+      : ConverterBase<Json::Value, RunHeader>("JsonCppRunHeaderConverter") {}
 
   private:
     /*!
      * \brief Convert Json value
      * Overloaded process initiate the conversion process converting the
-     * \a Json::Value given as the argument into the output type \a JobFooter
+     * \a Json::Value given as the argument into the output type \a RunHeader
      *
      * \param Json::Value& The root \a Json::Value object from the Json data
      *        file
-     * \return a pointer to the JobFooter object
+     * \return a pointer to the RunHeader object
      */
-    JobFooter* _convert(const Json::Value*) const;
+    RunHeader* _convert(const Json::Value*) const;
+
+  private:
 };
 }
 

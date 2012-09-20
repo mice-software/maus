@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONHEADERCONVERTER_H_
-#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONHEADERCONVERTER_H_
+#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONJOBHEADERCONVERTER_H_
+#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONJOBHEADERCONVERTER_H_
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
@@ -26,18 +26,18 @@ namespace MAUS {
 class JobHeaderData;
 
 /*!
- * \class CppJsonHeaderConverter
+ * \class CppJsonJobHeaderConverter
  *
- * \brief Converts binary Cpp header into corresponding json type
+ * \brief Converts binary Cpp JobHeader into corresponding json type
  *
  * JsonCppConverter is build on \a ConverterBase as a specialisation to
  * handle the conversion of data from \a Json::Value to binary \a MausData
  * format. Since Json documents often come in the form of a string, these
  * too are accepted and parsed on the fly.
  */
-  class CppJsonHeaderConverter : public ConverterBase<JobHeaderData, Json::Value> {
+  class CppJsonJobHeaderConverter : public ConverterBase<JobHeaderData, Json::Value> {
   public:
-    CppJsonHeaderConverter()
+    CppJsonJobHeaderConverter()
       : ConverterBase<JobHeaderData, Json::Value>("CppJsonConverter") {}
 
   private:

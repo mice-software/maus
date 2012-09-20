@@ -46,47 +46,41 @@ class PipelineSingleThreadDataflowExecutor:
         self.json_config_doc = json_config_doc
         #  Parse the configuration JSON
         self.json_config_dictionary = json.loads(self.json_config_doc)
+        self.run_number = "first" # used to register first run
 
-    def execute(self, job_header):
+    def execute(self, job_header, job_footer):
         """
-        Execute the dataflow - events are, in turn, read from the 
-        input, passed through the transform, merge and output.
+        Execute the dataflow
 
-        @param self Object reference.
+        Birth outputter, write job header, birth merger, transformer, inputter.
+        Read events from the input, pass through the transform, merge and
+        output. Death inputter, transformer, merger; write job footer; death
+        outputter.
+
+        Birth order is chosen because I want to write JobHeader as early as
+        possible and JobFooter as late as possible.
+
+        @param job_header JobHeader in python (i.e. dicts etc) format.
+        @param job_footer JobFooter in python (i.e. dicts etc) format.
         """
         # Note in all the assert statements - new style (API-compliant) modules
         # should raise an exception on fail and return void. Old style modules
         # would return true/false on success/failure of birth and death.
         try:
-            print("INPUT: Reading input")
-            assert(self.inputer.birth(self.json_config_doc) == True or \
-                   self.inputer.birth(self.json_config_doc) == None)
-            emitter = self.inputer.emitter()
-
-            # NEEDS TO BE UNCOMMENTED - but only when I figure out how to
-            # implement in multithreaded mode also
-            #print "START OF RUN: Calling start of run"
-            #run_number=DataflowUtilities.get_run_number
-            #                                        (json.loads(map_buffer[0]))
-            #maus_cpp.run_action_manager.start_of_run(run_number)
-
-            print("TRANSFORM: Setting up transformer")
-            assert(self.transformer.birth(self.json_config_doc) == True or \
-                   self.transformer.birth(self.json_config_doc) == None)
-
-            print("MERGE: Setting up merger")
-            assert(self.merger.birth(self.json_config_doc) == True or \
-                   self.merger.birth(self.json_config_doc) == None)
-
             print("OUTPUT: Setting up outputer")
             assert(self.outputer.birth(self.json_config_doc) == True or \
                    self.outputer.birth(self.json_config_doc) == None)
 
-            print("PIPELINE: Get event, TRANSFORM, MERGE, OUTPUT, repeat")
-
-            print("Processing JobHeader...")
+            print("Writing JobHeader...")
             self.outputer.save(json.dumps(job_header))
 
+            print("INPUT: Setting up input")
+            assert(self.inputer.birth(self.json_config_doc) == True or \
+                   self.inputer.birth(self.json_config_doc) == None)
+
+            print("PIPELINE: Get event, TRANSFORM, MERGE, OUTPUT, repeat")
+
+            emitter = self.inputer.emitter()
             # This helps us time how long the setup that sometimes happens
             # in the first event takes
             print("HINT: MAUS will process 1 event only at first...")
@@ -95,13 +89,7 @@ class PipelineSingleThreadDataflowExecutor:
             i = 0
             while len(map_buffer) != 0:
                 for event in map_buffer:
-                    event_json = json.loads(event)
-                    if "maus_event_type" in event_json and \
-                       event_json["maus_event_type"] == "Spill":
-                        event = self.transformer.process(event)
-                        event = self.merger.process(event)
-                    self.outputer.save(event)
-
+                    self.process_event(event)
                 i += len(map_buffer)
                 map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
@@ -117,19 +105,70 @@ class PipelineSingleThreadDataflowExecutor:
             print("INPUT: Shutting down inputer")
             assert(self.inputer.death() == True or \
                    self.inputer.death() == None)
-
-            print("TRANSFORM: Shutting down transformer")
-            assert(self.transformer.death() == True or \
-                   self.transformer.death() == None)
-
-            print("MERGE: Shutting down merger")
-            assert(self.merger.death() == True or \
-                   self.merger.death() == None)
+            if self.run_number == "first":
+                self.run_number = 0
+            self.end_of_run(self.run_number)
+            self.outputer.save(json.dumps(job_footer))
 
             print("OUTPUT: Shutting down outputer")
             assert(self.outputer.death() == True or \
                    self.outputer.death() == None)
-            maus_cpp.run_action_manager.end_of_run()
+
+    def process_event(self, event):
+        """
+        Process a single event
+        
+        Process a single event - if it is a Spill, check for run_number change
+        and call EndOfEvent/StartOfEvent if run_number has changed.
+        """
+        event_json = json.loads(event)
+        if DataflowUtilities.get_event_type(event_json) == "Spill":
+            current_run_number = DataflowUtilities.get_run_number(event_json)
+            if current_run_number != self.run_number:
+                if self.run_number != "first":
+                    self.end_of_run(self.run_number)
+                self.start_of_run(current_run_number)
+                self.run_number = current_run_number
+            event = self.transformer.process(event)
+            event = self.merger.process(event)
+        self.outputer.save(event)
+
+    def start_of_run(self, new_run_number):
+        """
+        At the start_of_run, we birth the merger and transformer, then
+        call start_of_run on the run_action_manager
+
+        @param new_run_number run number of the run that is starting
+        """
+        print("MERGE: Setting up merger")
+        assert(self.merger.birth(self.json_config_doc) == True or \
+               self.merger.birth(self.json_config_doc) == None)
+
+        print("TRANSFORM: Setting up transformer")
+        assert(self.transformer.birth(self.json_config_doc) == True or \
+               self.transformer.birth(self.json_config_doc) == None)
+
+        run_header = maus_cpp.run_action_manager.start_of_run(new_run_number)
+        self.outputer.save(run_header)
+
+    def end_of_run(self, old_run_number):
+        """
+        At the end_of_run, we death the transformer and merger, then call
+        end_of_run on the run_action_manager (note reverse ordering, not that it
+        should matter)
+
+        @param old_run_number run number of the run that is ending
+        """
+        print("TRANSFORM: Shutting down transformer")
+        assert(self.transformer.death() == True or \
+               self.transformer.death() == None)
+
+        print("MERGE: Shutting down merger")
+        assert(self.merger.death() == True or \
+               self.merger.death() == None)
+
+        run_footer = maus_cpp.run_action_manager.end_of_run(old_run_number)
+        self.outputer.save(run_footer)
 
     @staticmethod
     def get_dataflow_description():

@@ -20,11 +20,17 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
 
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
-
 #include "src/common_cpp/DataStructure/JobHeader.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppJobHeaderConverter.hh"
+
+#include "src/common_cpp/DataStructure/RunHeader.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppRunHeaderConverter.hh"
+
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
+
+#include "src/common_cpp/DataStructure/RunFooter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppRunFooterConverter.hh"
 
 #include "src/common_cpp/DataStructure/JobFooter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppJobFooterConverter.hh"
@@ -62,7 +68,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         throw(Squeal(Squeal(
           Squeal::recoverable,
           "OutputCppRoot was not initialised properly",
-          "OutputCppRoot::save_job_header"
+          "OutputCppRoot::write_event"
         )));
     }
     if (branch_name == "")
@@ -96,13 +102,19 @@ bool OutputCppRoot::_save(std::string data_str) {
     event_type my_tp = get_event_type(data_json);
     switch (my_tp) {
         case _job_header_tp:
-            return write_event<JsonCppHeaderConverter, JobHeader>
+            return write_event<JsonCppJobHeaderConverter, JobHeader>
                                     (&_job_header_cpp, data_json, "job_header");
+        case _run_header_tp:
+            return write_event<JsonCppRunHeaderConverter, RunHeader>
+                                    (&_run_header_cpp, data_json, "run_header");
         case _spill_tp:
-            return write_event<JsonCppConverter, Spill>
+            return write_event<JsonCppSpillConverter, Spill>
                                                (&_spill_cpp, data_json, "data");
+        case _run_footer_tp:
+            return write_event<JsonCppRunFooterConverter, RunFooter>
+                                    (&_run_footer_cpp, data_json, "run_footer");
         case _job_footer_tp:
-            return write_event<JsonCppFooterConverter, JobFooter>
+            return write_event<JsonCppJobFooterConverter, JobFooter>
                                     (&_job_footer_cpp, data_json, "job_footer");
     }
     return false;
@@ -118,6 +130,10 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
         return _job_header_tp;
     } else if (type == "JobFooter") {
         return _job_footer_tp;
+    } else if (type == "RunHeader") {
+        return _run_header_tp;
+    } else if (type == "RunFooter") {
+        return _run_footer_tp;
     } else {
         throw Squeal(Squeal::recoverable,
                      "Failed to recognise maus_event_type "+type,

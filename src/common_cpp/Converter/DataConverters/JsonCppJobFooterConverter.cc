@@ -21,8 +21,7 @@
 #include "src/common_cpp/JsonCppProcessors/JobFooterProcessor.hh"
 
 namespace MAUS {
-
-JobFooter* JsonCppFooterConverter::_convert(const Json::Value* data) const {
+JobFooter* JsonCppJobFooterConverter::_convert(const Json::Value* data) const {
   return JobFooterProcessor().JsonToCpp(*data);
 }
 }

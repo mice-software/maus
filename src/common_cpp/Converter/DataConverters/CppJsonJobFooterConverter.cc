@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-Json::Value* CppJsonFooterConverter::_convert(const JobFooterData* data) const {
+Json::Value* CppJsonJobFooterConverter::_convert(const JobFooterData* data) const {
   if (data == NULL || data->GetJobFooter() == NULL)
       return new Json::Value();
   Json::Value* my_json = JobFooterProcessor().CppToJson(*data->GetJobFooter());

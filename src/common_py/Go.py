@@ -127,7 +127,8 @@ class Go: # pylint: disable=R0921, R0903
 
             # Execute the dataflow.
             print("Initiating Execution")
-            executor.execute(self.get_job_header(json_config_dictionary))
+            executor.execute(self.get_job_header(json_config_dictionary),
+                             self.get_job_footer())
         except:
             raise
         finally:
@@ -209,4 +210,20 @@ class Go: # pylint: disable=R0921, R0903
             "json_configuration":json.dumps(json_datacards),
             "maus_event_type":"JobHeader"
         }
+
+    @staticmethod
+    def get_job_footer():
+        """
+        Generate the JobFooter object and send it to the output stream
+
+        Really to make this useful, it needs to be available to users in the
+        Globals (src/common_cpp/Utils/Globals.hh) object so that it can be
+        edited during running.
+        """
+        end_of_job = {"date_time":datetime.datetime.utcnow().isoformat(' ')}
+        return {
+            "end_of_job":end_of_job,
+            "maus_event_type":"JobFooter"
+        }
+
 

@@ -85,6 +85,21 @@ class DataflowUtilities: # pylint: disable=W0232
             run_number = spill["run_number"]
         return run_number
 
+    @staticmethod
+    def get_event_type(event):
+        """
+        Extract event type string from an event.
+
+        @param event MAUS event document as a dictionary.
+        @return event type (string) or None if none.
+        """
+        event_type = None
+        if event.has_key("maus_event_type"):
+            event_type = event["maus_event_type"]
+        return event_type
+
+
+
 class DocumentStoreUtilities: # pylint: disable=W0232
     """
     @class DocumentStoreUtilities.

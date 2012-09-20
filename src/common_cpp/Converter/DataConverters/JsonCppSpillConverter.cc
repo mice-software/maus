@@ -15,19 +15,15 @@
  *
  */
 
-#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 
-#include "src/common_cpp/DataStructure/JobHeaderData.hh"
-#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
-Json::Value* CppJsonJobHeaderConverter::_convert
-                                             (const JobHeaderData* data) const {
-  if (data == NULL || data->GetJobHeader() == NULL)
-      return new Json::Value();
-  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
-  return my_json;
+Spill* JsonCppSpillConverter::_convert(const Json::Value* data) const {
+  return SpillProcessor().JsonToCpp(*data);
 }
 }
 

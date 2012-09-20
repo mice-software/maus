@@ -39,7 +39,12 @@
 #pragma link C++ class MAUS::DateTime+;
 
 #pragma link C++ class MAUS::RunHeader+;
+#pragma link C++ class MAUS::MAUSEvent<MAUS::RunHeader>+;
+#pragma link C++ class MAUS::RunHeaderData+;
+
 #pragma link C++ class MAUS::RunFooter+;
+#pragma link C++ class MAUS::MAUSEvent<MAUS::RunFooter>+;
+#pragma link C++ class MAUS::RunFooterData+;
 
 #pragma link C++ class std::map<std::string, std::string>;
 #pragma link C++ class std::pair<std::string, std::string>;

@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-JobHeader* JsonCppHeaderConverter::_convert(const Json::Value* data) const {
+JobHeader* JsonCppJobHeaderConverter::_convert(const Json::Value* data) const {
   return JobHeaderProcessor().JsonToCpp(*data);
 }
 }

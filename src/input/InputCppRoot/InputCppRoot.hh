@@ -19,6 +19,9 @@
 #define _MAUS_SRC_INPUT_INPUTCPPROOT_INPUTCPPROOT_HH__
 
 #include <string>
+#include <map>
+
+#include "Rtypes.h"  // ROOT
 
 #include "json/json.h"
 
@@ -74,17 +77,24 @@ class InputCppRoot : public InputBase<std::string> {
      *  returns an empty string ("")
      *
      *  This will cycle through different event types as follows:
-     *  First attempts to find all JobHeaders, then the first
-     *  RunHeader, then spill until the Spill number changes; then RunFooter,
-     *  then RunHeader, then spill until the Spill number changes, etc, then
-     *  finally all JobFooters. If there are no events of a particular type left,
-     *  then that event type is skipped and we move on to the next event type
-     *  until all events have been fired and we have no more data.
+     *  First attempts to find all JobHeaders, then RunHeaders until run_number
+     *  changes, then spill until the run_number changes; then RunFooter until
+     *  run_number changes. Then starts back on RunHeader.
+     *
+     *  If there are no events of a particular type left, then that event type
+     *  is skipped and we move on to the next event type until all events have
+     *  been fired and we have no more data.
+     *
+     *  Bug: I don't check for consistent run numbers between data types, just
+     *  look for run number changing, so can get weirdness if there is a run
+     *  with no spill data
      */
     std::string _emitter_cpp();
 
-    std::string emitter() {throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));}
-
+    /** Should be overloaded in SWIG call */
+    std::string emitter() {
+        throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));
+    }
 
     /** Gets an event from the root file.
      *
@@ -95,7 +105,35 @@ class InputCppRoot : public InputBase<std::string> {
      *  to reopen _infile with the new branch name (that's how irstream works). 
      */
     template <class ConverterT, class DataT>
-    std::string _load_event(std::string branch_name);
+    std::string load_event(std::string branch_name);
+
+    /** Move to the next event type and return the event */
+    std::string advance_event_type();
+
+    /** Push an event to the cache.
+     *
+     *  If an event of this type is already cached, throw a Squeal
+     */
+    void cache_event(event_type type, std::string event);
+
+    /** Pop an event from the cache of the required type.
+     *
+     *  Returns "" if no event is cached
+     */
+    std::string uncache_event(event_type type);
+
+    /** Return true if there is an item of type in the cache
+     */
+    bool is_cached(event_type type);
+
+    /** Return true if we want to use this event; otherwise can cache
+     *
+     *  If the event number for this event has changed, and this is not a
+     *  run_footer, or the event is an empty string (no more events of this 
+     *  type), then we don't want to use this event so return false. If the
+     *  event is otherwise good, cache it.
+     */
+    bool use_event(std::string event);
 
     /** _irstream holds root TFile.
      */
@@ -104,7 +142,10 @@ class InputCppRoot : public InputBase<std::string> {
     std::string _filename;
     std::string _classname;
 
-    InputBase::event_type _next_event_type;
+    event_type _event_type;
+    std::map<event_type, std::string> _cache;
+    std::map<event_type, int> _current_run_number;
+    std::map<std::string, Long64_t> _current_event_number;
 };
 }
 

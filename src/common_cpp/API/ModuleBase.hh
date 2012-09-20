@@ -74,8 +74,16 @@ namespace MAUS {
      */
     std::string _classname;
 
-    /** event types that we can read */
-    enum event_type {_job_header_tp, _spill_tp, _job_footer_tp};
+    /** Event types that we can read 
+     *
+     *  Note the ordering here - this is the order that serialisation occurs
+     *  in e.g. InputCppRoot
+     */
+    enum event_type {_job_header_tp = 0,
+                     _run_header_tp = 1,
+                     _spill_tp = 2,
+                     _run_footer_tp = 3,
+                     _job_footer_tp = 4};
 
   private:
     /*!\brief Module initialisation

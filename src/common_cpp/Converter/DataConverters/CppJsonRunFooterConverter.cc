@@ -15,18 +15,17 @@
  *
  */
 
-#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonRunFooterConverter.hh"
 
-#include "src/common_cpp/DataStructure/JobHeaderData.hh"
-#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
+#include "src/common_cpp/DataStructure/RunFooterData.hh"
+#include "src/common_cpp/JsonCppProcessors/RunFooterProcessor.hh"
 
 namespace MAUS {
 
-Json::Value* CppJsonJobHeaderConverter::_convert
-                                             (const JobHeaderData* data) const {
-  if (data == NULL || data->GetJobHeader() == NULL)
+Json::Value* CppJsonRunFooterConverter::_convert(const RunFooterData* data) const {
+  if (data == NULL || data->GetRunFooter() == NULL)
       return new Json::Value();
-  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
+  Json::Value* my_json = RunFooterProcessor().CppToJson(*data->GetRunFooter());
   return my_json;
 }
 }

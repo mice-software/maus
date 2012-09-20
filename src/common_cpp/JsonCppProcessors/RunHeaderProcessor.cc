@@ -12,22 +12,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
-
-#include "src/common_cpp/DataStructure/JobHeaderData.hh"
-#include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/RunHeaderProcessor.hh"
 
 namespace MAUS {
 
-Json::Value* CppJsonJobHeaderConverter::_convert
-                                             (const JobHeaderData* data) const {
-  if (data == NULL || data->GetJobHeader() == NULL)
-      return new Json::Value();
-  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
-  return my_json;
+RunHeaderProcessor::RunHeaderProcessor()
+    : _int_proc() {
+    RegisterValueBranch("run_number", &_int_proc,
+                        &RunHeader::GetRunNumber,
+                        &RunHeader::SetRunNumber, true);
+    RegisterConstantBranch("maus_event_type", Json::Value("RunHeader"), true);
 }
-}
+}  // namespace MAUS
+
 
