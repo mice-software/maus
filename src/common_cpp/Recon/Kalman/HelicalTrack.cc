@@ -33,7 +33,7 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
 
   _Q.ResizeTo(5, 5);
   _Q.Zero(); // mcs is off.
-
+/*
   double x0 = seed.get_x0();
   double y0 = seed.get_y0();
   double r  = seed.get_R();
@@ -43,6 +43,7 @@ HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
   _yc = y0 - r *sin(phi_0);
 
   _h = -1;
+*/
 }
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
@@ -61,6 +62,71 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // Get old state vector...
   TMatrixD prev_site(5, 1);
   prev_site = old_site->get_a();
+
+  double old_kappa = prev_site(4, 0);
+  double old_px = prev_site(0, 0);
+  double old_py = prev_site(1, 0);
+
+  double Q = 1.;
+  double B = -4.;
+  double a = -0.2998*Q*B;
+
+  // @x/@x
+  _F(0, 0) = 1.;
+  // @x/@y
+  _F(0, 1) = 0.;
+  // @x/@px
+  _F(0, 2) = sin(a*deltaZ*old_kappa)/a;
+  // @x/@py
+  _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/a;
+  // @x/@kappa
+  _F(0, 4) = old_px*deltaZ*cos(a*deltaZ*old_kappa)-old_py*deltaZ*sin(a*deltaZ*old_kappa);
+
+  // @y/@x
+  _F(1, 0) = 0.;
+  // @y/@y
+  _F(1, 1) = 1.;
+  // @y/@px
+  _F(1, 2) = (1.-cos(a*deltaZ*old_kappa))/a;
+  // @y/@py
+  _F(1, 3) = sin(a*deltaZ*old_kappa)/a;
+  // @y/@kappa
+  _F(1, 4) = old_py*deltaZ*cos(a*deltaZ*old_kappa)+old_px*deltaZ*sin(a*deltaZ*old_kappa);
+
+  // @px/@x
+  _F(2, 0) = 0.;
+  // @px/@y
+  _F(2, 1) = 0.;
+  // @px/@px
+  _F(2, 2) = cos(a*deltaZ*old_kappa);
+  // @px/@py
+  _F(2, 3) = -sin(a*deltaZ*old_kappa);
+  // @px/@kappa
+  _F(2, 4) = -old_px*a*deltaZ*sin(a*deltaZ*old_kappa)-old_py*a*deltaZ*cos(a*deltaZ*old_kappa);
+
+  // @py/@x
+  _F(3, 0) = 0.;
+  // @py/@y
+  _F(3, 1) = 0.;
+  // @py/@px
+  _F(3, 2) = sin(a*deltaZ*old_kappa);
+  // @py/@py
+  _F(3, 3) = cos(a*deltaZ*old_kappa);
+  // @py/@kappa
+  _F(3, 4) = -old_py*a*deltaZ*sin(a*deltaZ*old_kappa)+old_px*a*deltaZ*cos(a*deltaZ*old_kappa);
+
+  // @kappa/@x
+  _F(4, 0) = 0.;
+  // @kappa/@y
+  _F(4, 1) = 0.;
+  // @kappa/@y
+  _F(4, 2) = 0.;
+  // @kappa/@y
+  _F(4, 3) = 0.;
+  // @kappa/@y
+  _F(4, 4) = 1.;
+
+/*
   // Change Coordinate reference frame to the centre of the circle.
   double old_x   = prev_site(0, 0)-_xc;
   double old_y   = prev_site(1, 0)-_yc;
@@ -109,6 +175,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
     drho_y_dy = -1.+old_r*cos(old_phi)*dphi_dy;
     drho_y_dR = sin(old_phi);
   }
+*/
+
 /*
   std::cout << "Track Parameters: " << "\n"
             << "circle centre:     " << _xc << " " << _yc << "\n"
@@ -130,8 +198,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
             << "drhoy derivatives: " << drho_y_dx << " " << drho_y_dy << " "
                                      << drho_y_dR << std::endl;
 */
-  _projected_x = old_x+_xc+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
-  _projected_y = old_y+_yc+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
+  //_projected_x = old_x+_xc+drho_x+_h*old_r*(cos(old_phi)-cos(new_phi));
+ // _projected_y = old_y+_yc+drho_y+_h*old_r*(sin(old_phi)-sin(new_phi));
 /*
   std::cout << "New Parameters: " << "\n"
             << "x:     " << _projected_x << "\n"
@@ -139,6 +207,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   std::cout << "Signed Radius: " << _h*old_r << "\n";
 */
   // Build _F.
+
+/*
   _F(0, 0) = 1.0 + drho_x_dx - _h*old_r*dphi_dx*(sin(old_phi)-sin(new_phi));
   _F(0, 1) = drho_x_dy - _h*old_r*dphi_dy*(sin(old_phi)-sin(new_phi));
   _F(0, 2) = drho_x_dR + _h*(cos(old_phi)-cos(new_phi));
@@ -150,25 +220,28 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(2, 2) = 1.0;
   _F(3, 3) = 1.0;
   _F(4, 4) = 1.0;
+*/
 }
 
+/*
 void HelicalTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
-  std::cout << "Old  filtered state: " << std::endl;
-  a.Print();
-  a(0, 0) = a(0, 0) - _xc;
-  a(1, 0) = a(1, 0) - _yc;
+  //std::cout << "Old  filtered state: " << std::endl;
+  //a.Print();
+  //a(0, 0) = a(0, 0) - _xc;
+  //a(1, 0) = a(1, 0) - _yc;
   // a.Print();
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
-  a_projected(0, 0) = a_projected(0, 0) + _xc;
-  a_projected(1, 0) = a_projected(1, 0) + _yc;
+  //a_projected(0, 0) = a_projected(0, 0) + _xc;
+  //a_projected(1, 0) = a_projected(1, 0) + _yc;
   new_site->set_projected_a(a_projected);
 
   // _F.Print();
-  std::cout << "New projected state: " << std::endl;
+  //std::cout << "New projected state: " << std::endl;
   a_projected.Print();
 }
+*/
 
 void HelicalTrack::calc_system_noise(KalmanSite *site) {
   _Q.Zero();

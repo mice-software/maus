@@ -77,12 +77,12 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
       smooth(sites, track, i);
     }
 
-    //track->compute_chi2(sites);
+    track->compute_chi2(sites);
 
     KalmanMonitor monitor;
     // monitor.save(sites);
     monitor.save_mc(sites);
-    // monitor.print_info(sites);
+    monitor.print_info(sites);
     delete track;
   }
 }
@@ -124,7 +124,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
       smooth(sites, track, i);
     }
 
-    //track->compute_chi2(sites);
+    track->compute_chi2(sites);
 
     KalmanMonitor monitor;
     // monitor.save(sites);
@@ -145,9 +145,9 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double pt = 0.3*4.*r;
   double tan_lambda = 1./dsdz;
   double pz = pt*tan_lambda;
-  double p  = pow(pt*pt+pz*pz, 0.5);
-  int Q = 1; // only mu+ for now...
-  double kappa = Q/p;
+  //double p  = pow(pt*pt+pz*pz, 0.5);
+  //int Q = 1; // only mu+ for now...
+  double kappa = fabs(1./pz);
 
   std::vector<SciFiCluster*> clusters;
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
@@ -163,13 +163,23 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   int _h = -1;
   double site_0_turning_angle, x, y;
 
+  double phi_0 = seed.get_phi0();
+  double phi;
+  double px, py;
+
   for ( int i = 0; i < spacepoints.size(); i++ ) {
     if ( tracker == 0 && spacepoints[i].get_station() == 5 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
+      phi = 180.-phi_0 + 1101.06/(r*tan_lambda);
+      px = pt*sin(phi);
+      py = pt*cos(phi);
     } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
+      phi = phi_0;
+      px = -pt*sin(phi);
+      py = pt*cos(phi);
     }
   }
 
@@ -201,24 +211,32 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   // out2.close();
 
   // std::cerr << "SEED: " << x << " " << y << " " << site_0_turning_angle << std::endl;
+//  double x0 = seed.get_x0();
+//  double y0 = seed.get_y0();
+//  double r  = seed.get_R();
+
+//  _xc = x0 - r *cos(phi_0);
+//  _yc = y0 - r *sin(phi_0);
+//  double phi = atan2(y, x);
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = y;
-  a(2, 0) = r;
-  a(3, 0) = kappa;
-  a(4, 0) = tan_lambda;
-  std::cerr << "First Plane" << std::endl;
-  a.Print();
+  a(2, 0) = px;
+  a(3, 0) = py;
+  a(4, 0) = kappa;
+  //std::cerr << "First Plane" << std::endl;
+  //a.Print();
   first_plane.set_projected_a(a);
   // std::cout << "Seed state: " << std::endl;
   // a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
   double cov = 1000.0;
   TMatrixD C(5, 5);
+  C.Zero();
   C(0, 0) = cov;
   C(1, 1) = cov;
-  C(2, 2) = cov; // 2.
+  C(2, 2) = cov;
   C(3, 3) = cov;
   C(4, 4) = cov;
 
@@ -256,7 +274,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   double y_pr = seed.get_y0();
   double mx_pr = seed.get_mx();
   double my_pr = seed.get_my();
-  double p_pr  = 210.0; // MeV/c
+  double pz  = 210.0; // MeV/c
 
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
@@ -277,8 +295,6 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
       y = spacepoints[i].get_position().y();
     }
   }
-  assert(x != 0);
-  assert(y != 0);
 
   // double z = (clusters[numb_sites-1]->get_position().z()) - (clusters[0]->get_position().z());
 
@@ -289,7 +305,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     // y  = (y_pr + my*z);
     // x = clusters[numb_sites-1]->get_position().x();
     mx = -mx_pr;
-    my = my_pr;
+    my = -my_pr;
   } else if ( tracker == 1 ) {
     // z = 0;
     mx = mx_pr;
@@ -304,7 +320,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   a(1, 0) = y;
   a(2, 0) = mx;
   a(3, 0) = my;
-  a(4, 0) = 1./p_pr;
+  a(4, 0) = 1./pz;
   first_plane.set_projected_a(a);
 
   double cov = 10000.0;

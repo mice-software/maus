@@ -37,8 +37,8 @@ KalmanTrack::KalmanTrack() {
   _Q.ResizeTo(5, 5);
   _Q.Zero(); // mcs is off.
 
-  _x0 = 0.0;
-  _y0 = 0.0;
+  //_x0 = 0.0;
+  //_y0 = 0.0;
 
   _chi2 = 0.0;
   _ndf  = 0.0;
@@ -48,6 +48,16 @@ KalmanTrack::KalmanTrack() {
 //
 // ------- Prediction ------------
 //
+void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
+  std::cout <<" ----------------------- Projection ----------------------- \n";
+  TMatrixD a = old_site->get_a();
+
+  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+
+  new_site->set_projected_a(a_projected);
+
+  a_projected.Print();
+}
 
 //
 // C_pred = _F * C * _Ft + _Q;
@@ -60,14 +70,14 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD temp2(5, 5);
   temp1 = TMatrixD(_F, TMatrixD::kMult, C);
   temp2 = TMatrixD(temp1, TMatrixD::kMultTranspose, _F);
-  _F.Print();
+  //_F.Print();
 
   TMatrixD C_pred(5, 5);
   _Q.Zero();
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
   // _Q.Print();
   new_site->set_projected_covariance_matrix(C_pred);
-  C_pred.Print();
+  //C_pred.Print();
 }
 
 //
@@ -134,8 +144,8 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C, TMatrixD::kMinus, temp2);
   a_site->set_covariance_matrix(Cp);
-  std::cout << "Updated Covariance \n";
-  Cp.Print();
+  //std::cout << "Updated Covariance \n";
+  //Cp.Print();
 }
 
 // h1(a_1^0)
@@ -216,11 +226,12 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);
-
+/*
   std::cout << "Filtered State: \n";
   a_filt.Print();
   std::cout << "x  residual: "  << res_x << "\n";
   std::cout << "y  residual: "  << res_y << "\n";
+*/
 }
 
 //
@@ -308,9 +319,9 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   }
   _chi2 = _chi2*(1./sigma_measurement2);
   _ndf = number_of_sites - number_parameters;
-  //std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
-  //output << _tracker << " " << _chi2 << " " << _ndf << "\n";
-  //output.close();
+  std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
+  output << _tracker << " " << _chi2 << " " << _ndf << "\n";
+  output.close();
 }
 
 } // ~namespace MAUS

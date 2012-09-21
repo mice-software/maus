@@ -39,6 +39,7 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   // _F.Print();
 }
 
+/*
 void StraightTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
@@ -49,8 +50,10 @@ void StraightTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_s
 
   a_projected.Print();
 }
+*/
 
 void StraightTrack::calc_system_noise(KalmanSite *site) {
+/*
   TMatrixD a(5, 1);
   a = site->get_a();
   double mx = a(2, 0);
@@ -69,6 +72,7 @@ void StraightTrack::calc_system_noise(KalmanSite *site) {
 
   _Q(4, 4) = kappa*kappa*my*my*C/(1.+mx*mx);
   _Q(3, 4) = kappa * my * (1.+mx*mx+my*my) * C /(1.+mx*mx);
+*/
 }
 
 } // ~namespace MAUS

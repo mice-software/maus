@@ -52,7 +52,7 @@ class KalmanTrack {
 
   void update_H(KalmanSite *a_site);
 
-  virtual void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) = 0;
+  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
   virtual void calc_system_noise(KalmanSite *site) = 0;
 
@@ -83,7 +83,8 @@ class KalmanTrack {
 
   TMatrixD _K;
 
-  double _x0, _y0, _chi2, _tracker, _ndf;
+  //double _x0, _y0, 
+  double _chi2, _tracker, _ndf;
   // static const double sigma_x = 0.64; // x measurement resolution
 
   static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
