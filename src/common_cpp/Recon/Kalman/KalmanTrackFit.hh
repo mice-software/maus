@@ -67,7 +67,7 @@ class KalmanTrackFit {
   //                             CLHEP::Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                        std::vector<SciFiCluster*> &clusters);
+                        std::vector<SciFiCluster*> &clusters, double &seed_pz);
 
   void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
@@ -80,7 +80,8 @@ class KalmanTrackFit {
 
   bool _helical_track, _straight_track;
 
-// private:
+ private:
+  double _seed_cov;
 };
 
 } // ~namespace MAUS

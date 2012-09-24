@@ -98,6 +98,7 @@ class SciFiDigit {
     ThreeVector _position, _p;
 
     int _spill, _event;
+
     int _tracker, _station, _plane, _channel;
 
     double _npe, _time;

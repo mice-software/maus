@@ -36,6 +36,7 @@ namespace MAUS {
 
 class StraightTrack : public KalmanTrack {
  public:
+  virtual ~StraightTrack();
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 

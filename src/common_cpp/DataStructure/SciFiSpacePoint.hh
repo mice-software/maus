@@ -78,9 +78,9 @@ class SciFiSpacePoint {
 
   double get_npe()     const { return _npe; }
 
-  // void set_time(double time) { _time = time; }
+  void set_time(double time) { _time = time; }
 
-  // double get_time()    const { return _time; }
+  double get_time()    const { return _time; }
 
   void set_type(std::string type) { _type = type; }
 
@@ -110,7 +110,8 @@ class SciFiSpacePoint {
   bool _used;
 
   int _spill, _event, _tracker, _station;
-  // int _time, _time_error, _time_res;
+
+  double _time, _time_error, _time_res;
 
   double _npe, _chi2;
 

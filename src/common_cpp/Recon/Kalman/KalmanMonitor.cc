@@ -19,65 +19,9 @@
 
 namespace MAUS {
 
-KalmanMonitor::KalmanMonitor() {
-  // histo = new TH1F("h","monitor; site; alpha",30, 0, 30);
-}
+KalmanMonitor::KalmanMonitor() {}
 
-KalmanMonitor::~KalmanMonitor() {
-  TFile f("hist.root", "update");
-  // file->Write();
-  TGraph *gr = new TGraph(30, &(_site[0]), &(_alpha_projected[0]));
-  gr->SetName("extrapolation");
-  TGraph *gr2 = new TGraph(30, &(_site[0]), &(_alpha_meas[0]));
-  gr2->SetName("measurement");
-  TMultiGraph *mgr = new TMultiGraph();
-  mgr->Add(gr, "p");
-  mgr->Add(gr2, "p");
-  mgr->Write();
-}
-
-void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
-  int numb_sites = sites.size();
-  _alpha_meas.resize(numb_sites);
-  _site.resize(numb_sites);
-  _alpha_projected.resize(numb_sites);
-
-  for ( int i = 0; i < numb_sites; ++i ) {
-    KalmanSite site = sites[i];
-    // std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    // std::cerr << "SITE extrap alpha: " << site.get_extrapolated_alpha() << std::endl;
-    // std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
-
-    _alpha_projected.at(i) = site.get_projected_alpha();
-    _site.at(i) = site.get_id();
-    _alpha_meas.at(i) = site.get_alpha();
-
-    double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    double alpha_smooth = get_smoothed_measurement(site);
-    double pull2 = _alpha_meas.at(i) - alpha_smooth;
-    // std::cerr << "PULL: " << _alpha_meas.at(i) << " " << _alpha_extrap.at(i) << std::endl;
-    TMatrixD a(5, 1);
-    a = site.get_a();
-    TMatrixD C(5, 5);
-    C = site.get_covariance_matrix();
-
-    TMatrixD a_smooth(5, 1);
-    a_smooth = site.get_smoothed_a();
-    double res_x = site.get_residual_x();
-    double res_y = site.get_residual_y();
-    // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
-    // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
-    // double chi2 = pow(observed-expected, 2.)/expected;
-    std::ofstream out2("kalman.txt", std::ios::out | std::ios::app);
-    int id = site.get_id();
-    out2 << a(0, 0)    << " " << C(0, 0) << " "
-         << a(1, 0)    << " " << C(1, 1) << " "
-         << res_x      << " " << res_y << " "
-         << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
-         << pull << " " << pull2 << " " << id     << "\n";
-    out2.close();
-  }
-}
+KalmanMonitor::~KalmanMonitor() {}
 
 void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
@@ -107,7 +51,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   }
 }
 
-void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
+void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
   _alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
@@ -125,11 +69,10 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
 
     TMatrixD a(5, 1);
     a = site.get_a();
-//    TMatrixD C(5, 5);
 
     TMatrixD a_smooth(5, 1);
     a_smooth = site.get_smoothed_a();
-    //C = site.get_covariance_matrix();
+
     double res_x = site.get_residual_x();
     double res_y = site.get_residual_y();
     // MC position and momentum.
@@ -138,36 +81,12 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
     double mc_px = site.get_true_momentum().x();
     double mc_py = site.get_true_momentum().y();
     double mc_pz = site.get_true_momentum().z();
-//    double mc_pt = pow(mc_px*mc_px+mc_py*mc_py, 0.5);
-    // double observed = pow(pow(a(0, 0), 2.)+pow(a(1, 0), 2.), 0.5);
-    // double expected = pow(pow(a_filt(0, 0), 2.)+pow(a_filt(1, 0), 2.), 0.5);
-    // double chi2 = pow(observed-expected, 2.)/expected;
 
     TMatrixD a_proj(5, 1);
     a_proj = site.get_projected_a();
-//    double pr_x0 = a_projected(0, 0);
-//    double pr_y0 = a_projected(1, 0);
-//    double pr_mx = a_projected(2, 0);
-//    double pr_my = a_projected(3, 0);
 
     int id = site.get_id();
-//    double pt, px, py, pz;
 
-//    if ( id < 15 ) {
-//      pt = a_smooth(2, 0)*4*0.3;
-//    } else {
-//      pt = -a_smooth(2, 0)*4*0.3;
-//    }
-//    double phi = a_smooth(3, 0);
-//    double tan_l = a_smooth(4, 0);
-//    px = pt*cos(phi);
-//    py = pt*sin(phi);
-//    pz = pt*tan_l;
-/*
-    double mc_radius = abs(mc_pt)/(4.*0.3);
-    double mc_tan_l  = mc_pz/mc_pt;
-    double mc_phi = asin(mc_py/mc_pt);
-*/
     std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
 
     if ( id < 15 ) {
@@ -175,12 +94,14 @@ void KalmanMonitor::save_mc(std::vector<KalmanSite> const &sites) {
       mc_px = -mc_px;
     }
 
-    out2 <<
-a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0) << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " " <<
-a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " " << a(3, 0) << " " << a(4, 0) << " " <<
-a_smooth(0, 0) << " " << a_smooth(1, 0) << " " << a_smooth(2, 0) << " " << a_smooth(3, 0) << " " << a_smooth(4, 0) << " " <<
-mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " " <<
-pull << " " << pull2 << " " << id     << "\n";
+    out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0) << " "
+         << a_proj(3, 0) << " " << a_proj(4, 0) << " "
+         << a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " "
+         << a(3, 0) << " " << a(4, 0) << " " << a_smooth(0, 0) << " "
+         << a_smooth(1, 0) << " " << a_smooth(2, 0) << " " << a_smooth(3, 0) << " "
+         << a_smooth(4, 0) << " "
+         << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
+         << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }
 }
@@ -193,9 +114,6 @@ void KalmanMonitor::save_global_track(std::vector<KalmanSite> const &sites) {
 
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    // std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    // std::cerr << "SITE extrap alpha: " << site.get_extrapolated_alpha() << std::endl;
-    // std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
 
     _alpha_projected.at(i) = site.get_projected_alpha();
     _site.at(i) = site.get_id();
@@ -247,6 +165,7 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
   double alpha_smooth = ha(0, 0);
   return alpha_smooth;
 }
+
 /*
   //////////////////////////////////////////////////////////////////////////
   std::cout <<  "******************* STATE VECTOR *******************" << std::endl;

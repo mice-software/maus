@@ -72,8 +72,8 @@ SciFiCluster::SciFiCluster(SciFiDigit *_scifidigit):_used(false),
                                                     _npe(_scifidigit->get_npe()),
                                                     _time(_scifidigit->get_time()) {
   _scifidigit->set_used(true);
-  _pos = _scifidigit->get_true_position();
-  _p   = _scifidigit->get_true_momentum();
+  _true_pos = _scifidigit->get_true_position();
+  _true_p   = _scifidigit->get_true_momentum();
 }
 
 // Destructor
@@ -84,8 +84,8 @@ SciFiCluster& SciFiCluster::operator=(const SciFiCluster &_scificluster) {
   if (this == &_scificluster) {
     return *this;
   }
-  _pos       = _scificluster.get_true_position();
-  _p         = _scificluster.get_true_momentum();
+  _true_pos  = _scificluster.get_true_position();
+  _true_p    = _scificluster.get_true_momentum();
   _used      = _scificluster.is_used();
   _spill     = _scificluster.get_spill();
   _event     = _scificluster.get_event();
@@ -110,6 +110,8 @@ void SciFiCluster::add_digit(SciFiDigit* neigh) {
   _npe += neigh->get_npe();
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
+  _time /= 2.0;
+  _time += (neigh->get_time())/2.0;
 }
 
 } // ~namespace MAUS

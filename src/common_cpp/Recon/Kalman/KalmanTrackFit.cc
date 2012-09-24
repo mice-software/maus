@@ -18,11 +18,11 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include <math.h>
 
-#define PI 3.14159265359
+// #define PI 3.14159265359
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit() {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -80,10 +80,11 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
     track->compute_chi2(sites);
 
     KalmanMonitor monitor;
-    // monitor.save(sites);
-    monitor.save_mc(sites);
+    monitor.save(sites);
     monitor.print_info(sites);
+    std::cerr << "Deleting track. \n";
     delete track;
+    std::cerr << "Deleted. \n";
   }
 }
 
@@ -97,7 +98,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     std::vector<KalmanSite> sites;
 
     SciFiHelicalPRTrack seed = helical_tracks[i];
-    KalmanTrack *track = new HelicalTrack(seed);
+    KalmanTrack *track = new HelicalTrack();
     initialise(seed, sites);
 
     // Filter the first state.
@@ -127,40 +128,40 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
     track->compute_chi2(sites);
 
     KalmanMonitor monitor;
-    // monitor.save(sites);
-    monitor.save_mc(sites);
+    monitor.save(sites);
     monitor.print_info(sites);
+    std::cerr << "Deleting track. \n";
     delete track;
+    std::cerr << "Deleted. \n";
   }
 }
 
 void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites) {
   // Get seed values.
-  // double x0 = seed.get_x0();
-  // double y0 = seed.get_y0();
   double r  = seed.get_R();
-  // double phi_0 = seed.get_phi0();
-  double dsdz  = seed.get_dsdz();
-
   double pt = 0.3*4.*r;
+
+  double dsdz  = seed.get_dsdz();
   double tan_lambda = 1./dsdz;
   double pz = pt*tan_lambda;
-  //double p  = pow(pt*pt+pz*pz, 0.5);
-  //int Q = 1; // only mu+ for now...
+  double seed_pz;
+
   double kappa = fabs(1./pz);
 
   std::vector<SciFiCluster*> clusters;
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
-  process_clusters(spacepoints, clusters);
+  process_clusters(spacepoints, clusters, seed_pz);
   // the clusters are sorted by plane number.
+
+  std::cerr << "Helical Pz: " << pz << " " << seed_pz << " "
+            << clusters[0]->get_true_momentum().z() << "\n";
 
   int numb_sites = clusters.size();
   int tracker = clusters[0]->get_tracker();
 
   // std::cerr << "PR: " << tracker << " " << x0 << " " << y0 << " " << r << " "
   //                    << phi_0 << " " << tan_lambda << std::endl;
-  KalmanSite first_plane;
-  int _h = -1;
+
   double site_0_turning_angle, x, y;
 
   double phi_0 = seed.get_phi0();
@@ -205,44 +206,25 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     //y = yc + r*sin(phi_0);
   }
 */
-  // std::ofstream out2("angles.txt", std::ios::out | std::ios::app);
-  // out2 << tracker << " " << phi_0 << " " << delta_phi << " "
-  // << site_0_turning_angle << " " << _angle = atan2(y, x)*180./PI << "\n";
-  // out2.close();
-
-  // std::cerr << "SEED: " << x << " " << y << " " << site_0_turning_angle << std::endl;
-//  double x0 = seed.get_x0();
-//  double y0 = seed.get_y0();
-//  double r  = seed.get_R();
-
-//  _xc = x0 - r *cos(phi_0);
-//  _yc = y0 - r *sin(phi_0);
-//  double phi = atan2(y, x);
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
-  a(1, 0) = y;
-  a(2, 0) = px;
+  a(1, 0) = px;
+  a(2, 0) = y;
   a(3, 0) = py;
   a(4, 0) = kappa;
-  //std::cerr << "First Plane" << std::endl;
-  //a.Print();
+
+  KalmanSite first_plane;
   first_plane.set_projected_a(a);
   // std::cout << "Seed state: " << std::endl;
   // a.Print();
   // first_plane.set_state_vector(x, y, tan_lambda, phi_0, kappa);
-  double cov = 1000.0;
   TMatrixD C(5, 5);
   C.Zero();
-  C(0, 0) = cov;
-  C(1, 1) = cov;
-  C(2, 2) = cov;
-  C(3, 3) = cov;
-  C(4, 4) = cov;
+  for ( int i = 0; i < 5; ++i ) {
+     C(i, i) = _seed_cov; // dummy values
+  }
 
-  // for ( int i = 0; i < 5; ++i ) {
-  //   C(i, i) = 200; // dummy values
-  // }
   first_plane.set_projected_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
   first_plane.set_direction(clusters[0]->get_direction());
@@ -274,11 +256,11 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   double y_pr = seed.get_y0();
   double mx_pr = seed.get_mx();
   double my_pr = seed.get_my();
-  double pz  = 210.0; // MeV/c
+  double seed_pz; // MeV/c
 
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   std::vector<SciFiCluster*> clusters;
-  process_clusters(spacepoints, clusters);
+  process_clusters(spacepoints, clusters, seed_pz);
   // the clusters are sorted by now.
 
   double x = 0.;
@@ -314,23 +296,21 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     // y  = (y_pr + my*z);
   }
 
-  KalmanSite first_plane;
   TMatrixD a(5, 1);
   a(0, 0) = x;
-  a(1, 0) = y;
-  a(2, 0) = mx;
+  a(1, 0) = mx;
+  a(2, 0) = y;
   a(3, 0) = my;
-  a(4, 0) = 1./pz;
-  first_plane.set_projected_a(a);
+  a(4, 0) = 1./seed_pz;
 
-  double cov = 10000.0;
   TMatrixD C(5, 5);
-  C(0, 0) = cov;
-  C(1, 1) = cov;
-  C(2, 2) = cov;
-  C(3, 3) = cov;
-  C(4, 4) = cov;
+  C.Zero();
+  for ( int i = 0; i < 5; ++i ) {
+     C(i, i) = _seed_cov; // dummy values
+  }
 
+  KalmanSite first_plane;
+  first_plane.set_projected_a(a);
   first_plane.set_projected_covariance_matrix(C);
   first_plane.set_measurement(clusters[0]->get_alpha());
   first_plane.set_direction(clusters[0]->get_direction());
@@ -356,6 +336,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     }
   }
 }
+
 //
 // General purpose routines.
 //
@@ -366,7 +347,7 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
 
   // Update measurement error:
   // (non-const std for the perp direction)
-  track->update_G(a_site);
+  track->update_V(a_site);
 
   // Update H (depends on plane direction.
   track->update_H(a_site);
@@ -374,7 +355,7 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
   // a_k = a_k^k-1 + K_k x pull
   track->calc_filtered_state(a_site);
 
-  // Ck = ( (C_k^k-1)-1 + HT*G*H )-1
+  // Cp = (C-KHC)
   track->update_covariance(a_site);
 }
 
@@ -394,8 +375,6 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   // Now, calculate prediction.
   track->calc_predicted_state(old_site, new_site);
 
-  // .. so has the sistem noise matrix...
-  // track.calc_system_noise(old_site, new_site);
   // ... so that we can compute the prediction for the
   // covariance matrix.
   track->calc_covariance(old_site, new_site);
@@ -465,7 +444,8 @@ Int_t KalmanTrackFit::GetNDF(Bool_t self)
 */
 
 void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                                      std::vector<SciFiCluster*> &clusters) {
+                                      std::vector<SciFiCluster*> &clusters,
+                                      double &seed_pz) {
   // This admits there is only one track...
   // SciFiStraightPRTrack seed = event.straightprtracks()[0];
   // std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints(); // Get CLUSTERS!
@@ -480,6 +460,26 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
     }
   }
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
+
+  // Compute pz from tracker timing.
+/*  int last_cluster = clusters.size();
+  double deltaT = clusters[0]->get_time() - clusters[last_cluster]->get_time();
+  double deltaZ = clusters[0]->get_position().z() - clusters[last_cluster]->get_position().z();
+
+  std::cerr << "dt and dz: " << deltaT << " " << deltaZ << "\n";
+  deltaZ /= 1000.; // mm -> m
+  deltaT /= 1000.; // ms -> s
+
+  deltaZ = fabs(deltaZ);
+  deltaT = fabs(deltaT);
+
+  double mass = 105.; // MeV/c2
+  double c = 300000000.; // m/s2
+  double gamma = 1./pow(1.-pow(deltaZ/(c*deltaT), 2.), 0.5);
+  seed_pz = gamma*mass*deltaZ/deltaT;
+  std::cerr << "Pz: " << gamma << " " << deltaZ << " " << deltaT << " " << seed_pz << " " << clusters[0]->get_true_momentum().z() << "\n";
+*/
+  seed_pz = 200.;
 }
 
 } // ~namespace MAUS

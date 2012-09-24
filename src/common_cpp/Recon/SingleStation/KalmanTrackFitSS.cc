@@ -118,8 +118,8 @@ void KalmanTrackFitSS::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &ss,
 */
 
   KalmanMonitor monitor;
-  monitor.save_global_track(sites);
-  // monitor.print_info(sites);
+  monitor.save(sites);
+  monitor.print_info(sites);
   delete track;
 }
 
@@ -152,11 +152,11 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   a(4, 0) = 1./p_z;
 
   TMatrixD C(5, 5);
-  C(0, 0) = 400.*400./12.;
-  C(1, 1) = 10./12.;
-  C(2, 2) = 40.*40./12.;
-  C(3, 3) = 10./12.;
-  C(4, 4) = 200./12.;
+  C(0, 0) = 1000.;
+  C(1, 1) = 1000.;
+  C(2, 2) = 1000.;
+  C(3, 3) = 1000.;
+  C(4, 4) = 1000.;
 
   KalmanSite first_site;
   first_site.set_projected_a(a);

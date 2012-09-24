@@ -49,7 +49,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
-  // if ( fabs(pid) != 13 ) return false;
   // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 
@@ -76,8 +75,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["charge"] =
                              aStep->GetTrack()->GetDefinition()->GetPDGCharge();
   _hits["sci_fi_hits"][hit_i]["particle_id"] = pid;
-  _hits["sci_fi_hits"][hit_i]["time"] =
-                                      aStep->GetPreStepPoint()->GetGlobalTime();
+  double time = aStep->GetPreStepPoint()->GetGlobalTime();
+  _hits["sci_fi_hits"][hit_i]["time"] = time;
   _hits["sci_fi_hits"][hit_i]["energy_deposited"] = edep;
   _hits["sci_fi_hits"][hit_i]["momentum"]["x"] = Mom.x();
   _hits["sci_fi_hits"][hit_i]["momentum"]["y"] = Mom.y();

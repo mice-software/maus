@@ -18,6 +18,8 @@
 
 namespace MAUS {
 
+StraightTrack::~StraightTrack() {}
+
 void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
   _F.Zero();
@@ -34,45 +36,8 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   for ( int i = 0; i < 5; i++ ) {
     _F(i, i) = 1.;
   }
-  _F(0, 2) = deltaZ;
-  _F(1, 3) = deltaZ;
-  // _F.Print();
-}
-
-/*
-void StraightTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  std::cout <<" ----------------------- Projection ----------------------- \n";
-  TMatrixD a = old_site->get_a();
-
-  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
-
-  new_site->set_projected_a(a_projected);
-
-  a_projected.Print();
-}
-*/
-
-void StraightTrack::calc_system_noise(KalmanSite *site) {
-/*
-  TMatrixD a(5, 1);
-  a = site->get_a();
-  double mx = a(2, 0);
-  double my = a(3, 0);
-  double kappa = a(4, 0);
-  double Z = 1.;
-  double r0 = 0.00167; // cm3/g
-  double p = 1./kappa; // MeV/c
-  double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
-
-  _Q(2, 2) = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(3, 3) = (1.+pow(my, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(2, 3) = mx*my*(1.+mx*mx+my*my)*C;
-  _Q(3, 2) = mx*my*(1.+mx*mx+my*my)*C;
-
-  _Q(4, 4) = kappa*kappa*my*my*C/(1.+mx*mx);
-  _Q(3, 4) = kappa * my * (1.+mx*mx+my*my) * C /(1.+mx*mx);
-*/
+  _F(0, 1) = deltaZ;
+  _F(2, 3) = deltaZ;
 }
 
 } // ~namespace MAUS

@@ -192,25 +192,29 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
 
   double chi2 = (dist*dist)/0.064;
   triplet->set_chi2(chi2);
-/*
+
     std::ofstream out2("spacepoints.txt", std::ios::out | std::ios::app);
-    out2 << xcluster->get_true_position().x() << " " << xcluster->get_true_position().y() << " " << xcluster->get_true_position().z() << " "
-         << position.x() << " " << position.y() << " " << position.z() << " " << xcluster->get_tracker() << " " << xcluster->get_station() << "\n";
+    out2 << xcluster->get_true_position().x() << " "
+         <<   xcluster->get_true_position().y() << " "
+         << xcluster->get_true_position().z() << " "
+         << position.x() << " " << position.y() << " "
+         << position.z() << " " << xcluster->get_tracker() << " "
+         << xcluster->get_station() << "\n";
     out2.close();
-*/
-/*
+
   // Determine time
-  // get_time(vcluster, xcluster, wcluster);
   double time_A = vcluster->get_time();
   double time_B = xcluster->get_time();
   double time_C = wcluster->get_time();
-  _time = (time_A+time_B+time_C)/3.0;
-  _time_error = 0.0;
-  _time_error += (time_A-_time)*time_A;
-  _time_error += (time_B-_time)*time_B;
-  _time_error += (time_C-_time)*time_C;
-  _time_error = sqrt(_time_error);
-  _time_res = time_A - _time;*/
+  std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << " " << time_C << "\n";
+  double time = (time_A + time_B + time_C) / 3.0;
+  double time_error = 0.0;
+  time_error += (time_A-time)*time_A;
+  time_error += (time_B-time)*time_B;
+  time_error += (time_C-time)*time_C;
+  time_error = sqrt(time_error);
+  double time_res = time_A - time;
+  triplet->set_time(time);
 }
 
 void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
@@ -224,16 +228,17 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
   ThreeVector position(p1);
   duplet->set_position(position);
 
-/*
   // Determine time
   double time_A = clusterA->get_time();
   double time_B = clusterB->get_time();
-  _time = (time_A+time_B)/2.0;
-  _time_error = 0.0;
-  _time_error += (time_A-_time)*time_A;
-  _time_error += (time_B-_time)*time_B;
-  _time_error = sqrt(_time_error);
-  _time_res = time_A - _time;*/
+  double time = (time_A + time_B) / 2.0;
+  std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << "\n";
+  double time_error = 0.0;
+  time_error += (time_A-time)*time_A;
+  time_error += (time_B-time)*time_B;
+  time_error = sqrt(time_error);
+  double time_res = time_A - time;
+  duplet->set_time(time);
 }
 
 // This function calculates the intersection position of two clusters.

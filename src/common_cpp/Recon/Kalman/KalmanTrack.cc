@@ -28,17 +28,11 @@ const double KalmanTrack::CHAN_WIDTH = 1.333;
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
   _V.ResizeTo(2, 2);
-  _G.ResizeTo(2, 2);
   _H.ResizeTo(2, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
   _K.ResizeTo(5, 2);
-
   _Q.ResizeTo(5, 5);
-  _Q.Zero(); // mcs is off.
-
-  //_x0 = 0.0;
-  //_y0 = 0.0;
 
   _chi2 = 0.0;
   _ndf  = 0.0;
@@ -49,14 +43,12 @@ KalmanTrack::KalmanTrack() {
 // ------- Prediction ------------
 //
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  std::cout <<" ----------------------- Projection ----------------------- \n";
+  // std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
 
   new_site->set_projected_a(a_projected);
-
-  a_projected.Print();
 }
 
 //
@@ -70,34 +62,51 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD temp2(5, 5);
   temp1 = TMatrixD(_F, TMatrixD::kMult, C);
   temp2 = TMatrixD(temp1, TMatrixD::kMultTranspose, _F);
-  //_F.Print();
 
   TMatrixD C_pred(5, 5);
-  _Q.Zero();
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
-  // _Q.Print();
   new_site->set_projected_covariance_matrix(C_pred);
-  //C_pred.Print();
+  // C_pred.Print();
+}
+
+void KalmanTrack::calc_system_noise(KalmanSite *site) {
+  _Q.Zero();
+/*
+  TMatrixD a(5, 1);
+  a = site->get_a();
+  double mx = a(2, 0);
+  double my = a(3, 0);
+  double kappa = a(4, 0);
+  double Z = 1.;
+  double r0 = 0.00167; // cm3/g
+  double p = 1/kappa; // MeV/c
+  double v = p/105.7;
+  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
+
+  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
+  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
+  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
+
+  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
+  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
+*/
 }
 
 //
 // ------- Filtering ------------
 //
-void KalmanTrack::update_G(KalmanSite *a_site) {
-  std::cout <<"Site ID:" << a_site->get_id() << "\n";
-  std::cout <<" ----------------------- Filtering ----------------------- \n";
+void KalmanTrack::update_V(KalmanSite *a_site) {
+  // std::cout <<"Site ID:" << a_site->get_id() << "\n";
+  // std::cout <<" ----------------------- Filtering ----------------------- \n";
   double alpha = (a_site->get_measurement())(0, 0);
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
   double sig_beta = l/CHAN_WIDTH;
   double SIG_ALPHA = 1.0;
-  _G.Zero();
-  _G(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
-  _G(1, 1) = sig_beta*sig_beta/12.;
   _V.Zero();
-  _V = _G;
-  _G.Invert();
-  // _G.Print();
+  _V(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
+  _V(1, 1) = sig_beta*sig_beta/12.;
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
@@ -105,36 +114,12 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
   double dx = dir.x();
   double dy = dir.y();
 
-  // if ( a_site->get_id() < 15 ) {
-  //  dx = -dx;
-  // }
-
   _H.Zero();
   _H(0, 0) = -A*dy;
-  _H(0, 1) =  A*dx;
+  _H(0, 2) =  A*dx;
 }
 
 void KalmanTrack::update_covariance(KalmanSite *a_site) {
-  // calc_covariance_matrix_of_residual
-  // Cp = ( C_inv + Ht*G*H )-1;
-/*
-  TMatrixD C = a_site->get_projected_covariance_matrix();
-  TMatrixD C_inv = C.Invert();
-
-  TMatrixD temp1(5, 2);
-  TMatrixD temp2(5, 5);
-  temp1 = TMatrixD(_H, TMatrixD::kTransposeMult, _G);
-  temp2 = TMatrixD(temp1, TMatrixD::kMult, _H);
-  TMatrixD Cp(5, 5);
-  Cp = TMatrixD(C_inv, TMatrixD::kPlus, temp2);
-  Cp.Invert();
-  a_site->set_covariance_matrix(Cp);
-  std::cout << "Updated Covariance \n";
-  Cp.Print();
-  // assert(site.state() == "filtered");
-*/
-
-  // calc_covariance_matrix_of_residual
   // Cp = (C-KHC)
   TMatrixD C = a_site->get_projected_covariance_matrix();
   TMatrixD temp1(5, 5);
@@ -144,11 +129,10 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C, TMatrixD::kMinus, temp2);
   a_site->set_covariance_matrix(Cp);
-  //std::cout << "Updated Covariance \n";
-  //Cp.Print();
+  // std::cout << "Updated Covariance \n";
+  // Cp.Print();
 }
 
-// h1(a_1^0)
 void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
@@ -176,41 +160,26 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   // pull.Print();
   /////////////////////////////////////////////////////////////////////
   //
-  // Kalman Gain: K = Cp Ht G
-  //
-/*
-  TMatrixD C(5, 5);
-  C = a_site->get_covariance_matrix();
-  TMatrixD temp3(5, 2);
-  temp3 = TMatrixD(C, TMatrixD::kMultTranspose, _H);
-  TMatrixD K(5, 2);
-  K = TMatrixD(temp3, TMatrixD::kMult, _G);
-
-  std::cout << "Kalman Gain: \n";
-  K.Print();
-  std::cout << "Pull: \n";
-  pull.Print();
-  std::cout << "Alpha measured \n";
-  m.Print();
-  std::cout << "Alpha projected \n";
-  ha.Print();
-*/
+  // Kalman Gain: K = C Ht (V + H C Ht)-1
+  //              K =  A   (V +  B )-1
   TMatrixD C(5, 5);
   C = a_site->get_projected_covariance_matrix();
 
-  TMatrixD term1(5, 2);
-  term1 = TMatrixD(C, TMatrixD::kMultTranspose, _H);
+  TMatrixD A(5, 2);
+  A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
 
-  TMatrixD temp3(2, 5);
-  temp3 = TMatrixD(_H, TMatrixD::kMult, C);
-  TMatrixD temp31(2, 2);
-  temp31 = TMatrixD(temp3, TMatrixD::kMultTranspose, _H);
-  TMatrixD term2(2, 2);
-  term2 = TMatrixD(temp31, TMatrixD::kPlus, _V);
-  term2.Invert();
+  TMatrixD temp1(2, 5);
+  temp1 = TMatrixD(_H, TMatrixD::kMult, C);
+  TMatrixD B(2, 2);
+  B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
+  TMatrixD temp2(2, 2);
+  temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
+  // double det;
+  temp2.Invert();
+  // assert(det != 0);
 
   _K.Zero();
-  _K = TMatrixD(term1, TMatrixD::kMult, term2);
+  _K = TMatrixD(A, TMatrixD::kMult, temp2);
   //////////////////////////////////////////////////////////////////////
   // ap = a + K*pull;
   TMatrixD temp4(5, 1);
@@ -222,7 +191,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   // a_filt.Print();
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
-  double res_y = a_filt(1, 0) - a(1, 0);
+  double res_y = a_filt(2, 0) - a(2, 0);
 
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);
