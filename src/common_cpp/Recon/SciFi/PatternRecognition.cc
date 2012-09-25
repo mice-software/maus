@@ -84,7 +84,12 @@ PatternRecognition::~PatternRecognition() {
   }
 };
 
-void PatternRecognition::process(SciFiEvent &evt) {
+void PatternRecognition::process(const bool helical_pr_on, const bool straight_pr_on,
+                                 SciFiEvent &evt) {
+
+  set_helical_pr_on(helical_pr_on);
+  set_straight_pr_on(straight_pr_on);
+
   if ( evt.spacepoints().size() > 0 ) {
 
     // Some setup
@@ -911,13 +916,22 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
 }
 
 // For linear Pattern Recognition use
-void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
+bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
                       int &outer_st_num, int &inner_st_num) {
 
   if ( static_cast<int>(ignore_stations.size()) == 0 ) { // 5pt track case
     outer_st_num = 4;
     inner_st_num = 0;
   } else if ( static_cast<int>(ignore_stations.size()) == 1 ) { // 4pt track case
+      // Check a valid station number has been supplied
+      bool ok = false;
+      for ( int i = 0; i < 5; ++i ) {
+        if ( ignore_stations[0] == i ) ok = true;
+      }
+      if ( !ok ) {
+        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        return false;
+      }
       // Set outer station number
       if ( ignore_stations[0] != 4 )
         outer_st_num = 4;
@@ -929,24 +943,35 @@ void PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
       else
         inner_st_num = 1;
   } else if ( static_cast<int>(ignore_stations.size()) == 2 ) { // 3pt track case
-      // std::cout << "stations " << ignore_stations[0] << " and " << ignore_stations[1] << "\n";
+      bool ok0 = false;
+      bool ok1 = false;
+      for ( int i = 0; i < 5; ++i ) {
+        if ( ignore_stations[0] == i ) ok0 = true;
+        if ( ignore_stations[1] == i ) ok1 = true;
+      }
+      if ( !ok0 || !ok1 ) {
+        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        return false;
+      }
       // Set outer station number
-      if ( ignore_stations[1] != 4 )
+      if ( ignore_stations[0] != 4 && ignore_stations[1] != 4 )
         outer_st_num = 4;
-      else if ( ignore_stations[0] != 3 )
+      else if ( ignore_stations[0] != 3 && ignore_stations[1] != 3)
         outer_st_num = 3;
       else
         outer_st_num = 2;
       // Set inner station number
-      if ( ignore_stations[0] != 0 )
+      if ( ignore_stations[0] != 0 && ignore_stations[1] != 0 )
         inner_st_num = 0;
-      else if ( ignore_stations[1] != 1 )
+      else if ( ignore_stations[0] != 1 && ignore_stations[1] != 1 )
         inner_st_num = 1;
       else
         inner_st_num = 2;
   } else {
-    if (debug > 0) std::cout << "Error: Invalid ignore station argument." << std::endl;
+    if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+    return false;
   }
+  return true;
 } // ~set_end_stations(...)
 
 // For helical Pattern Recognition use

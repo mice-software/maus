@@ -60,7 +60,7 @@ class PatternRecognition {
       *
       *  @param evt - The SciFi event
       */
-    void process(SciFiEvent &evt);
+    void process(const bool helical_pr_on, const bool straight_pr_on, SciFiEvent &evt);
 
      /** @brief Small function to easily add trks to a SciFiEvent
       *
@@ -274,12 +274,14 @@ class PatternRecognition {
      * 
      *  NB Stations are number 0 - 4 in the code, not 1 - 5 as in the outside world
      *
+     *  Returns true if successful, false if fails (due to a bad argument being passed)
+     *
      *  @param ignore_stations - Vector of ints, holding which stations should be ignored
      *  @param outer_station_num - The outermost station number used for a given track fit
      *  @param inner_station_num - The innermost station number used for a given track fit
      *
      */
-    void set_end_stations(const std::vector<int> ignore_stations,
+    bool set_end_stations(const std::vector<int> ignore_stations,
                           int &outer_station_num, int &inner_station_num);
 
     /** @brief Determine which three stations the initial circle should be fit to
@@ -358,6 +360,8 @@ class PatternRecognition {
 
     bool get_helical_pr_on() { return _helical_pr_on; }
     bool get_straight_pr_on() { return _straight_pr_on; }
+    void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+    void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
   private:
     static const int debug = 1; // Set output level, 0 = little, 1 = more couts, 2 = files as well
@@ -376,8 +380,8 @@ class PatternRecognition {
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    static const bool _helical_pr_on = 1;   // Flag to turn on helical pr (0 off, 1 on)
-    static const bool _straight_pr_on = 1;  // Flag to turn on straight pr (0 off, 1 on)
+    bool _helical_pr_on;   // Flag to turn on helical pr (0 off, 1 on)
+    bool _straight_pr_on;  // Flag to turn on straight pr (0 off, 1 on)
 
     static const double _Pt_max = 180.; // MeV/c max Pt for helical tracks (given by R_max = 150mm)
     static const double _Pz_min = 50.; // MeV/c min Pz for helical tracks (this is a guess)
