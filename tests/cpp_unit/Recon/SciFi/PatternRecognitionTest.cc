@@ -36,6 +36,129 @@ class PatternRecognitionTest : public ::testing::Test {
   bool compare_doubles(double a, double b, double epsilon) {return fabs(a - b) < epsilon;}
 };
 
+TEST_F(PatternRecognitionTest, test_AB_ratio) {
+
+  PatternRecognition pr;
+  double phi_i = 1.0;
+  double phi_j = 0.5;
+  double z_i = 200.0;
+  double z_j = 450.0;
+
+  double epsilon = 0.01;
+
+  bool result = pr.AB_ratio(phi_i, phi_j, z_i, z_j);
+  ASSERT_TRUE(result);
+  // EXPECT_NEAR(phi_i, 7.28319, epsilon);
+  // EXPECT_NEAR(phi_j, 6.783, epsilon);
+  EXPECT_EQ(z_i, 200.0);
+  EXPECT_EQ(z_j, 450.0);
+}
+
+TEST_F(PatternRecognitionTest, test_circle_fit) {
+
+  PatternRecognition pr;
+
+  // Set up spacepoints from an MC helical track
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  sp1->set_station(1);
+  sp2->set_station(2);
+  sp3->set_station(3);
+  sp4->set_station(4);
+  sp5->set_station(5);
+
+  ThreeVector pos(14.1978, 9.05992, 0.6523);
+  sp1->set_position(pos);
+  pos.set(-7.97067, 10.3542, 200.652);
+  sp2->set_position(pos);
+  pos.set(-11.4578, -16.3941, 450.652);
+  sp3->set_position(pos);
+  pos.set(19.9267, -12.0799, 750.652);
+  sp4->set_position(pos);
+  pos.set(-5.47983, 12.9427, 1100.65);
+  sp5->set_position(pos);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp5);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp1);
+  spnts.push_back(sp4);
+
+  SimpleCircle circle;
+  bool good_radius = pr.circle_fit(spnts, circle);
+
+  double epsilon = 0.01;
+
+  ASSERT_TRUE(good_radius);
+  EXPECT_NEAR(circle.get_x0(), 2.56, epsilon);
+  EXPECT_NEAR(circle.get_y0(), -4.62, epsilon);
+  EXPECT_NEAR(circle.get_R(), 18.56, epsilon);
+  EXPECT_NEAR(circle.get_chisq(), 0.0994, epsilon);
+}
+
+
+TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
+
+  PatternRecognition pr;
+
+  // Set up spacepoints from an MC helical track
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  sp1->set_station(1);
+  sp2->set_station(2);
+  sp3->set_station(3);
+  sp4->set_station(4);
+  sp5->set_station(5);
+
+  ThreeVector pos(14.1978, 9.05992, 0.6523);
+  sp1->set_position(pos);
+  pos.set(-7.97067, 10.3542, 200.652);
+  sp2->set_position(pos);
+  pos.set(-11.4578, -16.3941, 450.652);
+  sp3->set_position(pos);
+  pos.set(19.9267, -12.0799, 750.652);
+  sp4->set_position(pos);
+  pos.set(-5.47983, 12.9427, 1100.65);
+  sp5->set_position(pos);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp1);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp4);
+  spnts.push_back(sp5);
+
+  SimpleCircle circle;
+  bool good_radius = pr.circle_fit(spnts, circle);
+
+  double epsilon = 0.01;
+
+  ASSERT_TRUE(good_radius);
+  EXPECT_NEAR(circle.get_x0(), 2.56, epsilon);
+  EXPECT_NEAR(circle.get_y0(), -4.62, epsilon);
+  EXPECT_NEAR(circle.get_R(), 18.56, epsilon);
+  EXPECT_NEAR(circle.get_chisq(), 0.0994, epsilon);
+
+  SimpleLine line_sz;
+  std::vector<double> dphi;
+  double phi_0;
+
+  pr.calculate_dipangle(spnts, circle, dphi, line_sz, phi_0);
+
+  EXPECT_NEAR(line_sz.get_c(), -1.09, epsilon);
+  EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
+  EXPECT_NEAR(line_sz.get_chisq(), 0.440, epsilon);
+}
+
 TEST_F(PatternRecognitionTest, test_sort_by_station) {
 
   PatternRecognition pr;
@@ -161,7 +284,6 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   int num_points = 5;
   double x_chisq = 22.87148204;
   double y_chisq = 20.99052559;
-  int tracker = 0;
   double y0 = -58.85201389;
   double x0 = -68.94108927;
   double my = 0.03755825;
@@ -181,12 +303,12 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_TRUE(compare_doubles(y_chisq, strks[0].get_y_chisq(), epsilon));
 }
 
-TEST_F(PatternRecognitionTest, test_process) {
+TEST_F(PatternRecognitionTest, test_process_good) {
 
   int n_stations = 5;
   PatternRecognition pr;
 
-  // Set up spacepoints corresponding to straight line
+  // Set up spacepoints corresponding to a nearly straight line
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
   SciFiSpacePoint *sp2 = new SciFiSpacePoint();
   SciFiSpacePoint *sp3 = new SciFiSpacePoint();
@@ -235,23 +357,6 @@ TEST_F(PatternRecognitionTest, test_process) {
   evt.set_spacepoints(spnts);
 
   pr.process(evt);
-
-  /*
-  SciFiHelicalPRTrack htrk = evt.helicalprtracks()[0];
-
-  std::cerr << " x0 is " << htrk.get_x0() << std::endl;
-  std::cerr << " y0 is " << htrk.get_y0() << std::endl;
-  std::cerr << " z0 is " << htrk.get_z0() << std::endl;
-  std::cerr << " phi0 is " << htrk.get_phi0() << std::endl;
-  std::cerr << " psi0 is " << htrk.get_psi0() << std::endl;
-  std::cerr << " ds/dz is " << htrk.get_dsdz() << std::endl;
-  std::cerr << " R is " << htrk.get_R() << std::endl;
-  std::cerr << " line_sz_chi2 is " << htrk.get_line_sz_chisq() << std::endl;
-  std::cerr << " circle_chi2 is " << htrk.get_circle_chisq() << std::endl;
-  std::cerr << " chi2 is " << htrk.get_chisq() << std::endl;
-  std::cerr << " chi2_dof is " << htrk.get_chisq_dof() << std::endl;
-  std::cerr << " num_points is " << htrk.get_num_points() << std::endl;
-  */
 
   std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
   std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
@@ -328,5 +433,8 @@ TEST_F(PatternRecognitionTest, test_process) {
   EXPECT_NEAR(true_par6, recon_par6, epsilon);
   EXPECT_EQ(true_par7, recon_par7);
 }
+
+
+
 
 } // ~namespace MAUS

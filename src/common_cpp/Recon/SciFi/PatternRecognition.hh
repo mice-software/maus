@@ -194,7 +194,8 @@ class PatternRecognition {
     /** @brief Determine the dip angle of the helix
      *
      * Calculate the dip angle of the helix.  Output is a line, the slope of which
-     * is dsdz = 1/tanlambda.
+     * is dsdz = 1/tanlambda. Note: the function is sensitive to the order the
+     * spacepoints appear in the input vector (should be sp1 in index 0, sp2 in index 1, ...)
      *
      * @param spnts - A vector of all the input spacepoints
      * @param circle - The circle fit of spacepoints from x-y projection
@@ -203,16 +204,20 @@ class PatternRecognition {
      */
     void calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
                             const SimpleCircle &circle, std::vector<double> &dphi,
-                            SimpleLine &line_sz, double &Phi_0);
+                            SimpleLine &line_sz, double &phi_0);
 
-    /** @brief Calculate the turning angle of a spacepoint w.r.t. helix center
+    /** @brief Calculates the turning angle of a spacepoint w.r.t. the x axis
      *
+     * Calculates the turning angle from the x axis, returning (phi_i + phi_0). In the case that
+     * x0 and y0 are used, it returns phi_0. Do not confuse the returned angle with phi_i itself,
+     * the turning angle wrt the x' axis.
+     * 
      * @param xpos - x position of spacepoint
      * @param ypos - y position of  spacepoint
      * @param circle - Contains the helix center
      *
      */
-    double calculate_Phi(double xpos, double ypos, const SimpleCircle &circle);
+    double calc_turning_angle(double xpos, double ypos, const SimpleCircle &circle);
 
     /** @brief Account for possible 2*pi rotations between stations
      *
@@ -355,16 +360,18 @@ class PatternRecognition {
     bool get_straight_pr_on() { return _straight_pr_on; }
 
   private:
-    static const int debug = 0; // Set output level, 0 = little, 1 = more couts, 2 = files as well
+    static const int debug = 1; // Set output level, 0 = little, 1 = more couts, 2 = files as well
     static const int _n_trackers = 2;
     static const int _n_stations = 5;
     static const int _n_bins = 100;         // Number of bins in each residuals histogram
     static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
     static const double _sd_5 = 0.4298;     // Position error associated with station 5
+    static const double _sd_phi_5 = 1.0;
+    static const double _sd_phi_1to4 = 1.0;
     static const double _res_cut = 2;      // Road cut for linear fit in mm
-    static const double _R_res_cut = 50.;    // Road cut for circle radius in mm
+    static const double _R_res_cut = 50.0;    // Road cut for circle radius in mm
     static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
-    static const double _sz_chisq_cut = 300; // Cut on the sz chi^2 from least squares fit in mm
+    static const double _sz_chisq_cut = 30.0; // Cut on the sz chi^2 from least squares fit in mm
     static const double _helix_chisq_cut = 100;
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!

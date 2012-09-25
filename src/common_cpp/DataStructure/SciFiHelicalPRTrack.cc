@@ -56,21 +56,21 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, double x0,
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
-                                           SimpleCircle circle, SimpleLine line_sz) {
-
+                                         double phi0, double psi0, SimpleCircle circle,
+                                         SimpleLine line_sz) {
   _tracker = tracker;
   _num_points = num_points;
   _x0 = pos0.x();
   _y0 = pos0.y();
   _z0 = pos0.z();
-  _phi0 = circle.get_turning_angle()[0];
   _R    = circle.get_R();
+  _dsdz = line_sz.get_m();
   _line_sz_chisq = line_sz.get_chisq();
   _circle_x0 = circle.get_x0();
   _circle_y0 = circle.get_y0();
   _circle_chisq = circle.get_chisq();
-  _psi0 = -1.0;
-  _dsdz = line_sz.get_m();
+  _phi0 = phi0;
+  _psi0 = psi0;
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
