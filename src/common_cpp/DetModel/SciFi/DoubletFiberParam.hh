@@ -51,7 +51,7 @@ class DoubletFiberParam : public G4VPVParameterisation {
 
   /** @brief Calculate the dimensions of the fibres that make up a doublet layer
    */
-  void ComputeDimensions(G4Tubs* fiberElement,
+  void ComputeDimensions(G4Tubs& fiberElement,
                          const G4int copyNo,
                          const G4VPhysicalVolume* physVol) const;
 
