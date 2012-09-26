@@ -54,8 +54,6 @@ class KalmanTrackFit {
 
   void process(std::vector<SciFiStraightPRTrack> straight_tracks);
 
-  // void process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se, CLHEP::Hep3Vector &tof1);
-
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
@@ -74,11 +72,6 @@ class KalmanTrackFit {
   void filter(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
-
- private:
-  static const bool _mc_run = 1;
-
-  bool _helical_track, _straight_track;
 
  private:
   double _seed_cov;

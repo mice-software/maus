@@ -20,7 +20,7 @@
 namespace MAUS {
 
 KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
-                          _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)) {
+                          _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _C.ResizeTo(5, 5);
   _a.ResizeTo(5, 1);
   _v.ResizeTo(2, 1);
@@ -33,7 +33,7 @@ KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
 KalmanSite::~KalmanSite() {}
 
 KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
-                          _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)) {
+                          _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _a.ResizeTo(5, 1);
   _C.ResizeTo(5, 5);
   _v.ResizeTo(2, 1);
@@ -57,6 +57,7 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _alpha_smoothed  = site.get_smoothed_alpha();
   _residual_x = site.get_residual_x();
   _residual_y = site.get_residual_y();
+  _chi2 = site.get_chi2();
 
   _mc_pos = site.get_true_position();
   _mc_mom = site.get_true_momentum();
@@ -82,6 +83,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _alpha_smoothed  = site.get_smoothed_alpha();
   _residual_x = site.get_residual_x();
   _residual_y = site.get_residual_y();
+  _chi2 = site.get_chi2();
 
   _mc_pos = site.get_true_position();
   _mc_mom = site.get_true_momentum();

@@ -237,6 +237,102 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
                                                 Hep3Vector &tof0, Hep3Vector &tof1,
                                                 Hep3Vector &PR_pos, Hep3Vector &PR_mom,
                                                 bool &success) {
+  // Define some constants.
+  static const int tof0_num_slabs = 10;
+  static const int tof1_num_slabs = 7;
+  static const double tof0_a = 40.; // mm
+  static const double tof1_a = 60.; // mm
+  // assert(root.isMember("recon_events"));
+  // assert(root["recon_events"][event_i].isMember("tof_event"));
+  Json::Value tof0_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof0"];
+  Json::Value tof1_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof1"];
+  int numb_sp_tof_0 = tof0_sps.size();
+  int numb_sp_tof_1 = tof1_sps.size();
+
+  std::cerr << "Number of spacepoints " << numb_sp_tof_0 << " " << numb_sp_tof_1 << "\n";
+
+  // Run elementar TOF Recon.
+  double tof0_slabx, tof0_slaby;
+  double tof1_slabx, tof1_slaby;
+  double tof0_x, tof0_y, tof1_x, tof1_y;
+  double tof0_time, tof1_time;
+  bool found = false;
+  int index_value;
+
+  if ( numb_sp_tof_1 == 1 ) {
+    // Get TOF1 slab hits.
+    // std::cout << tof1_sps[(Json::Value::ArrayIndex)0] << std::endl;
+    tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabX"].asDouble();
+    tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slabY"].asDouble();
+    tof1_time  = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    // Find good TOF0 hit.
+    for ( int i = 0; i < numb_sp_tof_0; ++i ) {
+      tof0_time = tof0_sps[i]["time"].asDouble();
+      if ( tof0_time > -50. && tof0_time < 0.0 ) {
+        found = true;
+        index_value = i;
+      }
+    }
+  }
+
+  if ( found ) {
+    // Do TOF reconstruction
+    tof0_slabx = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabX"].asDouble();
+    tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabY"].asDouble();
+
+    // tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    // tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+
+    tof0_x = -(tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
+    tof0_y = (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
+    Hep3Vector tof0_sp(tof0_x, tof0_y, tof0_time);
+
+    tof1_x = -(tof1_slaby - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    tof1_y = (tof1_slabx - (tof1_num_slabs - 1.)/2.)*tof1_a;
+    Hep3Vector tof1_sp(tof1_x, tof1_y, tof1_time);
+
+    tof0 = tof0_sp;
+    tof1 = tof1_sp;
+    success = true;
+    // std::cerr << "TOF0 pos (mm): " << tof0_x << " " << tof0_y << "\n"
+    //          << "TOF1 pos (mm): " << tof1_x << " " << tof1_y << "\n";
+  }
+  // Basic PR
+  double tof0_z = 0.; // mm
+  double tof1_z = 3924.55+3899.55; // mm
+  const double m_pi = 139.570; // MeV/c2
+  double pr_x = tof0_x; // mm
+  double pr_y = tof0_y; // mm
+  double pr_z = tof0_z;
+
+  double delta_x = (tof1_x-tof0_x); // mm
+  double delta_y = (tof1_y-tof0_y); // mm
+  double delta_z = tof1_z-tof0_z;       // mm
+  double pr_mx   = delta_x/delta_z;
+  double pr_my   = delta_y/delta_z;
+  double pr_pz   = m_pi*delta_z/abs(tof0_time);
+
+/*
+  double pr_px   = m_pi*delta_x/abs(tof0_time);
+  double pr_py   = m_pi*delta_y/abs(tof0_time);
+  double pr_pz   = m_pi*delta_z/abs(tof0_time);
+*/
+  // Build track fit input parameters.
+  tof0.setX(tof0_slabx);
+  tof0.setY(tof0_slaby);
+  tof0.setZ(tof0_time);
+
+  tof1.setX(tof1_slabx);
+  tof1.setY(tof1_slaby);
+  tof1.setZ(tof1_time);
+
+  PR_pos.setX(pr_x);
+  PR_pos.setY(pr_y);
+  PR_pos.setZ(0.0);
+
+  PR_mom.setX(pr_mx);
+  PR_mom.setY(pr_my);
+  PR_mom.setZ(pr_pz);
 }
 
 /*

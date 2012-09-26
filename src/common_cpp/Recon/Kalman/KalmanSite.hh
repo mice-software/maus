@@ -111,6 +111,10 @@ class KalmanSite {
 
   double get_residual_y() const { return _residual_y; }
 
+  void set_chi2(double chi2) { _chi2 = chi2; }
+
+  double get_chi2() const { return _chi2; }
+
   /////////////////////////////////////
   void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
 
@@ -148,6 +152,8 @@ class KalmanSite {
   TMatrixD _v;
 
   double _z, _alpha, _alpha_projected, _alpha_smoothed;
+
+  double _chi2;
 
   int _id;
 

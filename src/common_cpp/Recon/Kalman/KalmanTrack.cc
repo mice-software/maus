@@ -24,6 +24,7 @@ namespace MAUS {
 const double KalmanTrack::A = 2./(7.*0.427);
 const double KalmanTrack::ACTIVE_RADIUS = 150.;
 const double KalmanTrack::CHAN_WIDTH = 1.333;
+const double KalmanTrack::SIGMA_ALPHA2 = 1./12.;
 
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
@@ -43,7 +44,6 @@ KalmanTrack::KalmanTrack() {
 // ------- Prediction ------------
 //
 void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  // std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
@@ -52,7 +52,7 @@ void KalmanTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_sit
 }
 
 //
-// C_pred = _F * C * _Ft + _Q;
+// C_proj = _F * C * _Ft + _Q;
 //
 void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD C(5, 5);
@@ -66,7 +66,6 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD C_pred(5, 5);
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
   new_site->set_projected_covariance_matrix(C_pred);
-  // C_pred.Print();
 }
 
 void KalmanTrack::calc_system_noise(KalmanSite *site) {
@@ -97,8 +96,6 @@ void KalmanTrack::calc_system_noise(KalmanSite *site) {
 // ------- Filtering ------------
 //
 void KalmanTrack::update_V(KalmanSite *a_site) {
-  // std::cout <<"Site ID:" << a_site->get_id() << "\n";
-  // std::cout <<" ----------------------- Filtering ----------------------- \n";
   double alpha = (a_site->get_measurement())(0, 0);
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
@@ -129,8 +126,6 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C, TMatrixD::kMinus, temp2);
   a_site->set_covariance_matrix(Cp);
-  // std::cout << "Updated Covariance \n";
-  // Cp.Print();
 }
 
 void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
@@ -142,22 +137,18 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
-  // std::cout << "Projected state: " << std::endl;
-  // a.Print();
   TMatrixD ha(2, 1);
-  // double beta  = 0;
-  // double alpha = a(0, 0)*_H(0, 0) + a(1, 0)*_H(0, 1);
-  // ha(0, 0) = alpha;
-  // ha(1, 0) = beta;
   ha = TMatrixD(_H, TMatrixD::kMult, a);
   // Extrapolation converted to expected measurement.
-  double alpha = ha(0, 0);
-  a_site->set_projected_alpha(alpha);
+  double alpha_model = ha(0, 0);
+  a_site->set_projected_alpha(alpha_model);
+  double alpha = m(0, 0);
+
+  double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
+  a_site->set_chi2(chi2_i);
 
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
-  // std::cout << "Pull: " << std::endl;
-  // pull.Print();
   /////////////////////////////////////////////////////////////////////
   //
   // Kalman Gain: K = C Ht (V + H C Ht)-1
@@ -187,20 +178,13 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a_filt(5, 1);
   a_filt = TMatrixD(a, TMatrixD::kPlus, temp4);
   a_site->set_a(a_filt);
-  // std::cout << "Filtered state: " << std::endl;
-  // a_filt.Print();
+
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
   double res_y = a_filt(2, 0) - a(2, 0);
 
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);
-/*
-  std::cout << "Filtered State: \n";
-  a_filt.Print();
-  std::cout << "x  residual: "  << res_x << "\n";
-  std::cout << "y  residual: "  << res_y << "\n";
-*/
 }
 
 //
@@ -236,9 +220,6 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD temp2(5, 1);
   temp2 = TMatrixD(_A, TMatrixD::kMult, temp1);
 
-  // _A.Print();
-  // temp2.Print();
-
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
   smoothing_site->set_smoothed_a(a_smooth);
@@ -266,27 +247,15 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   int number_parameters = 5;
   int number_of_sites = sites.size();
-  double sigma_measurement2 = 1./12.;
   int id = sites[0].get_id();
   if ( id <= 14 ) _tracker = 0;
   if ( id > 14 ) _tracker = 1;
 
-  double alpha, model_alpha;
+  //double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
-    // Convert smoothed value to alpha measurement.
-    TMatrixD a(5, 1);
-    a = site.get_smoothed_a();
-    update_H(&site);
-    TMatrixD ha(2, 1);
-    ha = TMatrixD(_H, TMatrixD::kMult, a);
-    model_alpha = ha(0, 0);
-    // Actual measurement.
-    alpha = site.get_alpha();
-    // Compute chi2.
-    _chi2 += pow(alpha-model_alpha, 2.);
+    _chi2 += site.get_chi2();
   }
-  _chi2 = _chi2*(1./sigma_measurement2);
   _ndf = number_of_sites - number_parameters;
   std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
   output << _tracker << " " << _chi2 << " " << _ndf << "\n";

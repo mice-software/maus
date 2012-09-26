@@ -16,7 +16,7 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 
 #include "gtest/gtest.h"
 
@@ -30,27 +30,26 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void TearDown() {}
   KalmanSite *a_site;
 };
-/*
-TEST_F(KalmanTrackTest, test_updateG) {
+
+TEST_F(KalmanTrackTest, test_constructor) {
   a_site->set_measurement(0);
-  KalmanTrack *track = new StraightTrack();
-  track->update_G(a_site);
+  KalmanTrack *track = new HelicalTrack();
+  EXPECT_EQ(track->get_chi2(), 0.0);
+  EXPECT_EQ(track->get_ndf(), 0.0);
+  EXPECT_EQ(track->get_tracker(), 0.0);
 }
 
-TEST_F(KalmanTrackTest, test_propagator) {
+//
+// ------- Projection ------------
+//
+TEST_F(KalmanTrackTest, test_projection_methods) {
 }
 
-void KalmanTrack::update_G(KalmanSite *a_site) {
-  double alpha = (a_site->get_measurement())(0, 0);
-  double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
-                 (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
-  double sig_beta = l/CHAN_WIDTH;
-  double SIG_ALPHA = 1.0;
-  _G.Zero();
-  _G(0, 0) = SIG_ALPHA*SIG_ALPHA;
-  _G(1, 1) = sig_beta*sig_beta;
-  _G.Invert();
+//
+// ------- Filtering ------------
+//
+TEST_F(KalmanTrackTest, test_filtering_methods) {
 }
-*/
+
 
 } // ~namespace MAUS

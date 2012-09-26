@@ -68,6 +68,12 @@ class KalmanTrack {
 
   void compute_chi2(const std::vector<KalmanSite> &sites);
 
+  double get_chi2() const { return _chi2; }
+
+  double get_ndf() const { return _ndf; }
+
+  double get_tracker() const { return _tracker; }
+
  protected:
   TMatrixD _H;
 
@@ -86,9 +92,11 @@ class KalmanTrack {
 
   static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
 
-  static const double ACTIVE_RADIUS;// = 150.;
+  static const double ACTIVE_RADIUS; // = 150.;
 
-  static const double CHAN_WIDTH;// = 1.333; // (1.4945) effective channel width without overlap
+  static const double CHAN_WIDTH; // = 1.333; // (1.4945) effective channel width without overlap
+
+  static const double SIGMA_ALPHA2;
 };
 
 } // ~namespace MAUS

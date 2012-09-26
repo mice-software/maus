@@ -44,7 +44,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
 
-  double deltaZ = new_z-old_z;
+  double deltaZ = (new_z-old_z)/1000.;
   if ( new_site->get_id() < 15 ) {
     deltaZ = - deltaZ;
   }
@@ -117,6 +117,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 3) = 0.;
   // @kappa/@kappa
   _F(4, 4) = 1.;
+
 }
 
 } // ~namespace MAUS

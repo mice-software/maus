@@ -48,11 +48,7 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
-      // int tracker = seed->get_tracker();
-      // int station = seed->get_station();
-      // int plane   = seed->get_plane();
-      // int fibre   = seed->get_channel();
-      double pe   = seed->get_npe();
+      double pe = seed->get_npe();
       // Look for a neighbour.
       for ( int j = i+1; j < seeds_size; j++ ) {
         if ( are_neighbours(seeds[i], seeds[j]) ) {
@@ -78,36 +74,10 @@ void SciFiClusterRec::process(SciFiEvent &evt, std::vector<const MiceModule*> mo
 
 void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModule*> modules) {
   ThreeVector perp(-1., 0., 0.);
-  ThreeVector dir(0, 1, 0);
+  ThreeVector dir(0., 1., 0.);
   int tracker = clust->get_tracker();
   int station = clust->get_station();
   int plane   = clust->get_plane();
-/*
-  const MiceModule* tracker_solenoid_0 = NULL;
-  for ( unsigned int j = 0; !tracker_solenoid_0 && j < modules.size(); j++ ) {
-    // Find the right module
-    if ( modules[j]->propertyExists("KalmanSolenoid", "int") &&
-         modules[j]->propertyExists("KalmanSolenoidNumber", "int") &&
-         modules[j]->propertyInt("KalmanSolenoid") ==1 &&
-         modules[j]->propertyInt("KalmanSolenoidNumber") ==0 ) {
-         // Save the module
-      tracker_solenoid_0 = modules[j];
-    }
-  }
-  assert(tracker_solenoid_0 != NULL);
-  const MiceModule* tracker_solenoid_1 = NULL;
-  for ( unsigned int j = 0; !tracker_solenoid_1 && j < modules.size(); j++ ) {
-    // Find the right module
-    if ( modules[j]->propertyExists("KalmanSolenoid", "int") &&
-         modules[j]->propertyExists("KalmanSolenoidNumber", "int") &&
-         modules[j]->propertyInt("KalmanSolenoid") ==1 &&
-         modules[j]->propertyInt("KalmanSolenoidNumber") ==1 ) {
-         // Save the module
-      tracker_solenoid_1 = modules[j];
-    }
-  }
-  assert(tracker_solenoid_1 != NULL);
-*/
 
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
@@ -128,54 +98,21 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
 
   assert(this_plane != NULL);
 
-  // dir  *= this_plane->globalRotation();
-  // perp *= this_plane->globalRotation();
-  // ThreeVector plane_position;
-/*
-  if ( clust->get_tracker() == 0 ) {
-    dir  *= this_plane->relativeRotation(tracker_solenoid_0);
-    perp *= this_plane->relativeRotation(tracker_solenoid_0);
-    plane_position = this_plane->relativePosition(tracker_solenoid_0);
-  } else if ( clust->get_tracker() == 1 ) {
-    dir  *= this_plane->relativeRotation(tracker_solenoid_1);
-    perp *= this_plane->relativeRotation(tracker_solenoid_1);
-    plane_position = this_plane->relativePosition(tracker_solenoid_1);
-  }
-*/
   CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0, 0);
-  const Hep3Vector rowy(0, 1., 0);
-  const Hep3Vector rowz(0, 0, -1.);
+  const Hep3Vector rowx(-1., 0., 0.);
+  const Hep3Vector rowy(0., 1., 0.);
+  const Hep3Vector rowz(0., 0., -1.);
   zflip.setRows(rowx, rowy, rowz);
 
   G4RotationMatrix trot(this_plane->globalRotation());
-
-/*
-  size_t found;
-  found=doubletName.find("Tracker1");
-  if (found!=G4String::npos)
-    (*trot) = (*trot)*zflip;
-*/
-
-  // this is the rotation of the fibre array
-  // (*trot) = (*trot)*zflip;
-  // G4RotationMatrix* trot = new G4RotationMatrix();
-  // Hep3Vector dir(0, 1, 0);
-  // dir *= *(trot);
 
   if ( tracker == 0 ) {
     trot= trot*zflip;
     dir  *= trot;
     perp *= trot;
-    // dir.rotateY(pi*rad);
-    // perp.rotateY(pi*rad);
-    // plane_position = this_plane->globalPosition();
   } else if ( tracker == 1 ) {
     dir  *= trot;
     perp *= trot;
-    // dir.rotateY(pi*rad);
-    // perp.rotateY(pi*rad);
-    // plane_position = this_plane->globalPosition();
   }
 
   double Pitch = this_plane->propertyDouble("Pitch");
@@ -201,27 +138,23 @@ void SciFiClusterRec::construct(SciFiCluster *clust, std::vector<const MiceModul
   clust->set_direction(dir);
   clust->set_relative_position(tracker_ref_frame_pos);
 
-  // clust->set_position(position);
-  // clust->set_relative_position(position);
   // Set relative position & channel number for the Kalman Filter.
   // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
   // with the displacement of the station centre subtracted.
-  // ThreeVector relative_position = position - this_plane->globalPosition();
   double alpha = clust->get_channel() - CentralFibre;
-  // clust->set_relative_position(relative_position);
   if ( tracker == 1 ) {
     alpha = -alpha;
   }
   clust->set_alpha(alpha);
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
-/*
+  /*
    std::cerr << "----------Clustering--------- \n"
             << "Site ID: " << id << "\n"
             << "Tracker " << tracker << ", station " << station << ", plane " << plane << "\n"
             << "Fibre direction: " << dir << "\n"
             << "Position: " << tracker_ref_frame_pos << "\n";
-*/
+  */
 }
 
 ThreeVector SciFiClusterRec::get_reference_frame_pos(int tracker,

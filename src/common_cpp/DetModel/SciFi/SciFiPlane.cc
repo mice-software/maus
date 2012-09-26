@@ -72,9 +72,9 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   //
 
   CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0, 0);
-  const Hep3Vector rowy(0, 1., 0);
-  const Hep3Vector rowz(0, 0, -1.);
+  const Hep3Vector rowx(-1., 0., 0.);
+  const Hep3Vector rowy(0., 1., 0.);
+  const Hep3Vector rowz(0., 0., -1.);
   zflip.setRows(rowx, rowy, rowz);
 
   G4RotationMatrix* trot = new G4RotationMatrix(mod->globalRotation());
