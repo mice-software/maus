@@ -652,6 +652,11 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                     double psi_0 = phi_0 + (CLHEP::pi / 2);
                     SciFiHelicalPRTrack track(-1, num_points, good_spnts[0]->get_position(),
                                               phi_0, psi_0, circle, line_sz);
+                    track.set_phi_i(dphi);
+                    for ( unsigned int i = 0; i < dphi.size(); ++i ) {
+                      std::cerr << "1phi_i[" << i << "] = " << dphi[i] << std::endl;
+                      std::cerr << "2phi_i[" << i << "] = " << track.get_phi_i()[i] << std::endl;
+                    }
 
                     // Set all the good sp to used and convert pointers to variables
                     std::vector<SciFiSpacePoint> good_spnts_variables;
