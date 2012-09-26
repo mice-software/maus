@@ -264,6 +264,16 @@ class PatternRecognition {
      */
     bool check_time_consistency(const std::vector<SciFiSpacePoint*>);
 
+    /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker
+     *
+     *  Take an input vector of spacepoints and output a 2D vector of spacepoints
+     *  where the first index is the tracker the spacepoint is located in.
+     *
+     *  @param spnts - A vector of all the input spacepoints
+     *
+     */
+    SpacePoint2dPArray sort_by_tracker(const std::vector<SciFiSpacePoint*> &spnts);
+
     /** @brief Determine which two stations the initial line should be drawn between
      * 
      *  The initial line is to be drawn between the two outermost stations being used.
@@ -317,24 +327,12 @@ class PatternRecognition {
     void sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
                          SpacePoint2dPArray &spnts_by_station);
 
-    /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker
-     *
-     *  Take an input vector of spacepoints and output a 2D vector of spacepoints
-     *  where the first index is the tracker the spacepoint is located in.
-     *
-     *  @param spnts - A vector of all the input spacepoints
-     *
-     */
-    SpacePoint2dPArray sort_by_tracker(
-                                                    const std::vector<SciFiSpacePoint*> &spnts);
-
     /** @brief Count the number of stations that have unused spacepoint
      *
      *  @param spnts_by_station - Input 2D vector of spacepoints sorted by station
      * 
      */
-    int num_stations_with_unused_spnts(
-        const SpacePoint2dPArray &spnts_by_station);
+    int num_stations_with_unused_spnts(const SpacePoint2dPArray &spnts_by_station);
 
     /** @brief Count and return how many tracker stations have at least 1 unused spacepoint
      *
@@ -344,19 +342,26 @@ class PatternRecognition {
      *  @param stations_not_hit - Output vector holding the numbers of each station with
      *                            no unused spacepoints
      */
-    void stations_with_unused_spnts(
-           const SpacePoint2dPArray &spnts_by_station,
-           std::vector<int> &stations_hit, std::vector<int> &stations_not_hit);
+    void stations_with_unused_spnts(const SpacePoint2dPArray &spnts_by_station,
+                                    std::vector<int> &stations_hit,
+                                    std::vector<int> &stations_not_hit);
 
-    void set_ignore_stations(const std::vector<int> &ignore_stations,
+    bool set_ignore_stations(const std::vector<int> &ignore_stations,
                              int &ignore_station_1, int &ignore_station_2);
 
+    /** @brief Take two spoints and return 2 straight lines connecting them, 1 in x-z, 1 in y-z
+     *
+     *  @param sp1 - The first spacepoint
+     *  @param sp2 - The second spacepoint
+     *  @param line_x - The output line in x-z
+     *  @param line_y - The output line in y-z
+     *
+     */
     void draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
                    SimpleLine &line_x, SimpleLine &line_y);
 
-    void calc_residual(const SciFiSpacePoint *sp,
-                       const SimpleLine &line_x, const SimpleLine &line_y,
-                       double &dx, double &dy);
+    void calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
+                       const SimpleLine &line_y, double &dx, double &dy);
 
     bool get_helical_pr_on() { return _helical_pr_on; }
     bool get_straight_pr_on() { return _straight_pr_on; }
