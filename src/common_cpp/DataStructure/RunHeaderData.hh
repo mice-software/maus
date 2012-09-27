@@ -67,11 +67,13 @@ class RunHeaderData : public MAUSEvent<RunHeader> {
 
     /** Get Event Type information 
      */
-    std::string GetEventType() const {return MAUSEvent::GetEventType();}
+    std::string GetEventType() const {
+        return MAUSEvent<RunHeader>::GetEventType();
+    }
 
     /** Set Event Type information 
      */
-    void SetEventType(std::string type) {MAUSEvent::SetEventType(type);}
+    void SetEventType(std::string type) {MAUSEvent<RunHeader>::SetEventType(type);}
 
     /** Overload MAUSEvent function (wraps SetRunHeader)*/
     void SetEvent(RunHeader* header) {SetRunHeader(header);}

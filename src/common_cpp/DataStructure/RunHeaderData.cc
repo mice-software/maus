@@ -21,11 +21,12 @@
 
 namespace MAUS {
 
-RunHeaderData::RunHeaderData() : MAUSEvent("RunHeader"), _run_header(NULL) {
+RunHeaderData::RunHeaderData()
+                        : MAUSEvent<RunHeader>("RunHeader"), _run_header(NULL) {
 }
 
 RunHeaderData::RunHeaderData(const RunHeaderData& data)
-                           : MAUSEvent("RunHeader"), _run_header(NULL) {
+                        : MAUSEvent<RunHeader>("RunHeader"), _run_header(NULL) {
     *this = data;
 }
 
