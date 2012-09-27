@@ -21,10 +21,10 @@
 
 namespace MAUS {
 
-Data::Data() : MAUSEvent("Spill"), _spill(NULL) {
+Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
 }
 
-Data::Data(const Data& data) : MAUSEvent(), _spill(NULL) {
+Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
     *this = data;
 }
 

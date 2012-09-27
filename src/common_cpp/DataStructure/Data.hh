@@ -69,13 +69,13 @@ class Data : public MAUSEvent<Spill> {
      *
      *  Need to bring into base class for JsonCppProcessor
      */
-    std::string GetEventType() const {return MAUSEvent::GetEventType();}
+    std::string GetEventType() const {return MAUSEvent<Spill>::GetEventType();}
 
     /** Set Event Type information 
      *
      *  Need to bring into base class for JsonCppProcessor
      */
-    void SetEventType(std::string type) {MAUSEvent::SetEventType(type);}
+    void SetEventType(std::string type) {MAUSEvent<Spill>::SetEventType(type);}
 
     /** Wrapper for MAUSEvent
      */

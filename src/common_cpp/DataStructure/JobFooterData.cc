@@ -21,11 +21,12 @@
 
 namespace MAUS {
 
-JobFooterData::JobFooterData() : MAUSEvent("JobFooter"), _job_footer(NULL) {
+JobFooterData::JobFooterData()
+        : MAUSEvent<JobFooter>("JobFooter"), _job_footer(NULL) {
 }
 
 JobFooterData::JobFooterData(const JobFooterData& data)
-                           : MAUSEvent("JobFooter"), _job_footer(NULL) {
+        : MAUSEvent<JobFooter>("JobFooter"), _job_footer(NULL) {
     *this = data;
 }
 

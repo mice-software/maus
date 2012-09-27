@@ -67,11 +67,15 @@ class RunFooterData : public MAUSEvent<RunFooter> {
 
     /** Get Event Type information 
      */
-    std::string GetEventType() const {return MAUSEvent::GetEventType();}
+    std::string GetEventType() const {
+        return MAUSEvent<RunFooter>::GetEventType();
+    }
 
     /** Set Event Type information 
      */
-    void SetEventType(std::string type) {MAUSEvent::SetEventType(type);}
+    void SetEventType(std::string type) {
+        MAUSEvent<RunFooter>::SetEventType(type);
+    }
 
     /** Overload MAUSEvent function (wraps SetRunFooter)*/
     void SetEvent(RunFooter* footer) {SetRunFooter(footer);}

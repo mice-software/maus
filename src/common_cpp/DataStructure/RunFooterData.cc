@@ -21,11 +21,12 @@
 
 namespace MAUS {
 
-RunFooterData::RunFooterData() : MAUSEvent("RunFooter"), _run_footer(NULL) {
+RunFooterData::RunFooterData()
+        : MAUSEvent<RunFooter>("RunFooter"), _run_footer(NULL) {
 }
 
 RunFooterData::RunFooterData(const RunFooterData& data)
-                           : MAUSEvent("RunFooter"), _run_footer(NULL) {
+        : MAUSEvent<RunFooter>("RunFooter"), _run_footer(NULL) {
     *this = data;
 }
 

@@ -67,11 +67,15 @@ class JobHeaderData : public MAUSEvent<JobHeader> {
 
     /** Get Event Type information 
      */
-    std::string GetEventType() const {return MAUSEvent::GetEventType();}
+    std::string GetEventType() const {
+        return MAUSEvent<JobHeader>::GetEventType();
+    }
 
     /** Set Event Type information 
      */
-    void SetEventType(std::string type) {MAUSEvent::SetEventType(type);}
+    void SetEventType(std::string type) {
+        MAUSEvent<JobHeader>::SetEventType(type);
+    }
 
     /** Overload MAUSEvent function (wraps SetJobHeader)*/
     void SetEvent(JobHeader* header) {SetJobHeader(header);}

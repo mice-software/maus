@@ -21,11 +21,12 @@
 
 namespace MAUS {
 
-JobHeaderData::JobHeaderData() : MAUSEvent("JobHeader"), _job_header(NULL) {
+JobHeaderData::JobHeaderData()
+      : MAUSEvent<JobHeader>("JobHeader"), _job_header(NULL) {
 }
 
 JobHeaderData::JobHeaderData(const JobHeaderData& data)
-                           : MAUSEvent("JobHeader"), _job_header(NULL) {
+      : MAUSEvent<JobHeader>("JobHeader"), _job_header(NULL) {
     *this = data;
 }
 
