@@ -99,7 +99,7 @@ std::string MapCppPatternRecognition::process(std::string document) {
           out << event.spacepoints()[l]->get_position().y() << "\t";
         }
         out << std::endl;
-        pattern_recognition(event);
+        pattern_recognition(true, true, event);
       }
 
       print_event_info(event);
@@ -169,9 +169,10 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
   } // ends loop over events.
 }
 
-void MapCppPatternRecognition::pattern_recognition(SciFiEvent &evt) {
+void MapCppPatternRecognition::pattern_recognition(const bool helical_pr_on,
+                                                   const bool straight_pr_on, SciFiEvent &evt) {
   PatternRecognition pr1;
-  pr1.process(evt);
+  pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
 void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {

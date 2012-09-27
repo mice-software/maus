@@ -59,6 +59,12 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("SciFiClustExcept"));
   ClustException = _configJSON["SciFiClustExcept"].asInt();
 
+  // Get the flags for turning straight and helical pr on or off
+  assert(_configJSON.isMember("SciFiPRHelicalOn"));
+  _helical_pr_on = _configJSON["SciFiPRHelicalOn"].asBool();
+  assert(_configJSON.isMember("SciFiPRStraightOn"));
+  _straight_pr_on = _configJSON["SciFiPRStraightOn"].asBool();
+
   return true;
 }
 
@@ -97,7 +103,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
           std::cout << "Calling Pattern Recognition..." << std::endl;
-          pattern_recognition(*event);
+          pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
@@ -245,9 +251,10 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
+                                             SciFiEvent &evt) {
   PatternRecognition pr1;
-  pr1.process(evt);
+  pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {

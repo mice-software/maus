@@ -21,7 +21,7 @@
 namespace MAUS {
 
 // Constructors
-SciFiHelicalPRTrack::SciFiHelicalPRTrack() {
+SciFiHelicalPRTrack::SciFiHelicalPRTrack() : _phi_i(0), _spoints(0) {
   _x0 = -1.0;
   _y0 = -1.0;
   _z0 = -1.0;
@@ -108,6 +108,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
   _circle_y0 = _htrk.get_circle_y0();
   _chisq = _htrk.get_chisq();
   _chisq_dof = _htrk.get_chisq_dof();
+  _phi_i = _htrk.get_phi_i();
   _num_points = _htrk.get_num_points();
   _tracker = _htrk.get_tracker();
   _spoints = _htrk.get_spacepoints();
@@ -117,7 +118,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)
   :  _x0(-1.0), _y0(-1.0), _z0(-1.0), _phi0(-1.0), _psi0(-1.0), _dsdz(-1.0), _R(-1.0),
      _tracker(-1), _num_points(-1), _line_sz_chisq(-1.0), _circle_x0(-1.0), _circle_y0(-1.0),
-     _circle_chisq(-1.0), _chisq(-1.0), _spoints(0) {
+     _circle_chisq(-1.0), _chisq(-1.0), _phi_i(0), _spoints(0) {
   *this = _htrk;
 }
 

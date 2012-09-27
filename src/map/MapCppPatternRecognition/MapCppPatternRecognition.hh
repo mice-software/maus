@@ -85,7 +85,8 @@ class MapCppPatternRecognition {
    */
   void make_SciFiSpill(Json::Value spacepoint_array, MAUS::SciFiSpill &spill);
 
-  void pattern_recognition(MAUS::SciFiEvent &evt);
+  void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
+                           MAUS::SciFiEvent &evt);
 
   // void track_fit(MAUS::SciFiEvent &evt);
 

@@ -98,7 +98,8 @@ class MapCppTrackerRecon {
    * 
    *  \param evt the current SciFiEvent
    */
-  void pattern_recognition(MAUS::SciFiEvent &evt);
+  void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
+                           MAUS::SciFiEvent &evt);
 
   // void make_seed_and_fit(MAUS::SciFiEvent &event);
 
@@ -147,6 +148,9 @@ class MapCppTrackerRecon {
   double minPE;
   /// Value above which reconstruction is aborted.
   int ClustException;
+  /// Pattern recognition flags
+  bool _helical_pr_on;
+  bool _straight_pr_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 
