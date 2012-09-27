@@ -14,9 +14,23 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include <iostream>
+#include <fstream>
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/DetModel/SciFi/DoubletFiberParam.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/G4PVParameterised.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4VisAttributes.hh"
+#include "Geant4/G4Colour.hh"
+#include "Geant4/G4ios.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4SDManager.hh"
 
 #include "gtest/gtest.h"
 
@@ -98,4 +112,54 @@ TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
   EXPECT_EQ(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch);
 }
 
+TEST_F(DoubletFiberParamTest, test_fiber_dimension) {
+  std::string filename = "Stage6.dat";
+  std::vector<const MiceModule*> modules;
+  MiceModule*      _module;
+  _module = new MiceModule(filename);
+  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+
+  const MiceModule* this_plane = NULL;
+  for ( unsigned int j = 0; !this_plane && j < modules.size(); ++j ) {
+  // find the module corresponding to this plane
+  if ( modules[j]->propertyExists("Tracker", "int") &&
+       modules[j]->propertyExists("Station", "int") &&
+       modules[j]->propertyExists("Plane", "int") &&
+       modules[j]->propertyInt("Tracker") == 0 &&
+       modules[j]->propertyInt("Station") == 1 &&
+       modules[j]->propertyInt("Plane") == 1 )
+      // save the module
+    this_plane = modules[j];
+  }
+  assert(this_plane != NULL);
+
+  // read values from the Mice Module...
+  G4double pSensitiveRadius = this_plane->propertyDouble("ActiveRadius");
+  G4double pActiveRadius    = this_plane->propertyDouble("ActiveRadius");
+  G4double pOuterDiameter   = this_plane->propertyDouble("CoreDiameter");
+  G4double pInnerDiameter   = 0.0;
+  G4double pFiberDiameter   = this_plane->propertyDouble("FibreDiameter");
+  G4double pFiberPitch = ( this_plane->propertyDouble("Pitch") ) /
+                         ( this_plane->propertyDouble("FibreDiameter") );
+
+  // set ComputeDimensions variables
+  G4Tubs* fiberElement = new G4Tubs("testFiber", 0.0, 0.35 * mm, 1.0 * mm, 0.0 * deg, 360.0 * deg);
+  int copyNo = 525;
+
+  G4Material* mater = new G4Material("Test", 1, 2, 1);
+  G4LogicalVolume* nullLogic = new G4LogicalVolume(fiberElement, mater, "testFiber", 0, 0, 0);
+  G4String name = "testFiber";
+  G4LogicalVolume* mother = 0;
+  G4RotationMatrix* rot = new G4RotationMatrix(CLHEP::HepRotationX(0.0*deg));
+
+  G4VPhysicalVolume* physVol = new G4PVPlacement(rot,
+                                                 G4ThreeVector(0., 0., 0.),
+                                                 nullLogic, name, mother, false, 0);
+
+  DoubletFiberParam(pSensitiveRadius, pActiveRadius, pOuterDiameter,
+                    pInnerDiameter, pFiberDiameter, pFiberPitch).
+                  ComputeDimensions(*fiberElement, copyNo, physVol);
+
+  EXPECT_EQ(0 , fiberElement->GetInnerRadius());
+  }
 } // namespace
