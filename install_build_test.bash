@@ -75,6 +75,8 @@ else
 fi
 
 echo "Have Scons cleanup the MAUS build state"
+echo $MAUS_ROOT_DIR
+echo $PATH
 which scons
 scons -c 2>&1 | tee -a $FILE_STDD
 if [ $? == 0 ]; then
