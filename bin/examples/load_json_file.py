@@ -47,7 +47,7 @@ def main():
     print "Generating some data"
     my_file_name = os.path.join\
              (os.environ["MAUS_ROOT_DIR"], "tmp", "example_load_json_file.json")
-    #generate_some_data(my_file_name)
+    generate_some_data(my_file_name)
     
     # now open the json file
     print "Loading json file", my_file_name
