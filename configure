@@ -84,6 +84,8 @@ if [ "${maus_third_party}" ]; then
     else
         eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
     fi
+    python_version=`env $DYLIB_VAR=${maus_third_party}/third_party/install/lib python -V 2>&1`
+
 else
     if [ -z "${PATH}" ]; then  # see if the variable exists yet
         PATH="${maus_root_dir}/third_party/install/bin"       # if not, initialize it
@@ -96,6 +98,7 @@ else
     else
         eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
     fi
+    python_version=`env $DYLIB_VAR=${maus_root_dir}/third_party/install/lib python -V 2>&1`
 fi
 
 # Check for Python
