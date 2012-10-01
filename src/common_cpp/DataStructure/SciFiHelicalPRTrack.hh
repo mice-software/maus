@@ -34,8 +34,6 @@
 
 namespace MAUS {
 
-typedef std::vector<double> DoubleArray;
-
 class SciFiHelicalPRTrack {
   public:
 
@@ -82,7 +80,7 @@ class SciFiHelicalPRTrack {
     double get_circle_y0() const { return _circle_y0; }
     double get_chisq() const { return _chisq; }
     double get_chisq_dof() const { return _chisq_dof; }
-    DoubleArray get_phi_i() const { return _phi_i; }
+    std::vector<double> get_phi_i() const { return _phi_i; }
 
     // Setters
     void set_tracker(int tracker) { _tracker = tracker; }
@@ -101,7 +99,7 @@ class SciFiHelicalPRTrack {
     void set_circle_chisq(double circle_chisq) { _circle_chisq = circle_chisq; }
     void set_chisq(double chisq) { _chisq = chisq; }
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
-    void set_phi_i(DoubleArray phi_i) { _phi_i = phi_i; }
+    void set_phi_i(std::vector<double> phi_i) { _phi_i = phi_i; }
 
     /** Print track parameters */
     void print_params();
@@ -121,7 +119,7 @@ class SciFiHelicalPRTrack {
     double _circle_chisq;
     double _chisq;
     double _chisq_dof;
-    DoubleArray _phi_i;
+    std::vector<double> _phi_i;
 
     int _tracker;
     int _num_points;

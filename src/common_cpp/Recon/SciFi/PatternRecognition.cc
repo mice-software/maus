@@ -792,6 +792,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
     // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
     dphi.push_back(theta_i - phi_0);
+    std::cerr << "Pushed " << theta_i - phi_0 << " into dphi, size is " << dphi.size() << "\n";
 
     // Set the error on phi
     double sd_phi = -1.0;
@@ -861,10 +862,7 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
   return true;
 } // ~turns_between_stations(...)
 
-bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji,
-                                  double dz_kj) {
-  // double A, B;
-
+bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji, double dz_kj) {
   for ( int n = 0; n < 10; ++n ) {
     for ( int m = 0; m < 10; ++m ) {
       // std::cerr << "n is " << n << " and m is " << m << std::endl;
@@ -920,7 +918,7 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
 
 // For linear Pattern Recognition use
 bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations,
-                      int &outer_st_num, int &inner_st_num) {
+                                          int &outer_st_num, int &inner_st_num) {
 
   if ( static_cast<int>(ignore_stations.size()) == 0 ) { // 5pt track case
     outer_st_num = 4;
