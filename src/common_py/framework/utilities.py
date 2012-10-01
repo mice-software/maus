@@ -18,6 +18,7 @@ MAUS framework utilities module.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import socket
+import sys
 
 from celery.task.control import discard_all
 from celery.task.control import inspect
@@ -157,6 +158,7 @@ class DocumentStoreUtilities: # pylint: disable=W0232
         try:
             doc_store.connect(config) 
         except Exception as exc:
+            sys.excepthook(*sys.exc_info())
             raise DocumentStoreException(exc)
         return doc_store
 

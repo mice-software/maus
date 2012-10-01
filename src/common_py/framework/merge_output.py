@@ -21,6 +21,7 @@ from datetime import datetime
 import json
 import signal
 import sys
+import time
 
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
@@ -224,6 +225,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         run_again = True # always run once
         while run_again:
             run_again = will_run_until_ctrl_c
+            #print datetime.fromtimestamp(time.time())
             try:
                 docs = self.doc_store.get_since(self.collection, last_time)
             except Exception as exc:
@@ -240,6 +242,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     break
                 except Exception as exc:
                     raise DocumentStoreException(exc)
+                #print '.',
                 doc_id = doc["_id"]
                 doc_time = doc["date"]
                 spill = doc["doc"]
@@ -263,7 +266,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 print "Executing Merge for spill %s\n" % doc_id,
                 merged_spill = self.merger.process(spill)
                 print "Executing Output for spill %s\n" % doc_id,
-                if not self.outputer.save(merged_spill):
+                print type(merged_spill)
+                if not self.outputer.save(str(merged_spill)):
                     print "Failed to execute Output"
                 self.spill_process_count += 1
                 print "Spills processed: %d" % self.spill_process_count

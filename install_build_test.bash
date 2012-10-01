@@ -55,29 +55,31 @@ fi
 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure $MAUS_THIRD_PARTY >& $FILE_STD
+	./configure $MAUS_THIRD_PARTY 2>&1 | tee -a $FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
+	source env.sh 2>&1 | tee -a $FILE_STD
 else
 	echo "The other loop"
-	./configure 2>>$FILE_STD 1>>$FILE_STD
+	./configure 2>&1 | tee -a $FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
+	source env.sh 2>&1 | tee -a $FILE_STD
 	echo "Building third party libraries (takes a while...)"
-	./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
+	./third_party/build_all.bash 2>&1 | tee -a $FILE_STD
 	echo "Resource the environment (catches the new ROOT version)"
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD
+	source env.sh 2>&1 | tee -a $FILE_STD
 fi
 
 echo "Have Scons cleanup the MAUS build state"
-scons -c 2>>$FILE_STD 1>>$FILE_STD
+scons -c 2>&1 | tee -a $FILE_STDD
 
 echo "Build MAUS"
 echo $FILE_STD
-(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
-if [ $? != 0 ]; then
-  echo "FAIL - failed 
+scons build 2>&1 | tee -a $FILE_STD
+if [ $? == 0 ]; then
+  echo "Failed to build MAUS library. See logs for more information." 2>&1 | tee -a $FILE_STD
+  exit 1
+fi
 
 echo "Run the tests"
-(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD
+(./tests/run_tests.bash || (echo "FAIL!  See logs" && exit 1)) 2>&1 | tee -a $FILE_STD
 
