@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_STD=install_log_std
+FILE_STD=$MAUS_ROOT_DIR/install_log_std
 
 if [ ! -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: Trying to build with \$MAUS_ROOT_DIR set. Please start a new"
@@ -12,6 +12,11 @@ fi
 if [ -f $FILE_STD ];
 then
     rm $FILE_STD
+fi
+echo "Welcome to MAUS build" | tee $FILE_STD
+if [ ! -f $FILE_STD ]; then
+    echo "Failed to write to $FILE_STD - aborting"
+    exit 1
 fi
 
 echo
@@ -31,6 +36,7 @@ echo "solved them.  Be sure to attach the files:"
 echo
 echo "   $FILE_STD"
 echo
+
 
 # Assign the location of the third party libraries  
 # In order of preference the location is set to:
