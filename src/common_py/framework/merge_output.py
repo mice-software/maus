@@ -28,6 +28,8 @@ from framework.utilities import DocumentStoreUtilities
 from framework.workers import WorkerBirthFailedException
 from framework.workers import WorkerDeathFailedException
 
+import maus_cpp.run_action_manager
+
 class MergeOutputExecutor: # pylint: disable=R0903, R0902
     """
     @class MergeOutputExecutor
@@ -100,6 +102,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws DocumentStoreException if there is a problem
         connecting to the document store.
         """
+        self.job_footer = None
         self.merger = merger
         self.outputer = outputer
         self.config_doc = config_doc
@@ -126,7 +129,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         else:   
             self.collection = collection_name
  
-    def start_run(self, run_number):
+    def start_run(self):
         """
         Prepare for a new run by updating the local run number then
         birthing the merger and outputer. 
@@ -135,15 +138,14 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
         """
-        self.run_number = run_number
         self.end_of_run = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
-        if (not self.merger.birth(self.config_doc)):
+        birth = self.merger.birth(self.config_doc)
+        if not(birth == True or birth == None): # new-style birth() returns None
             raise WorkerBirthFailedException(self.merger.__class__)
-        print("BIRTH outputer %s" % self.outputer.__class__)
-        if (not self.outputer.birth(self.config_doc)):
-            raise WorkerBirthFailedException(self.outputer.__class__)
+        run_header = maus_cpp.run_action_manager.start_of_run(self.run_number)
+        self.outputer.save(run_header)
 
     def end_run(self):
         """
@@ -161,28 +163,44 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         if (self.end_of_run == None):
             print "  Missing an end_of_run spill..."
             print "  ...creating one to flush the mergers!"
-            self.end_of_run = {"daq_data":None, \
-                "daq_event_type":"end_of_run", \
-                "run_number":self.run_number, \
-                "spill_num":-1}
+            self.end_of_run = {
+                "scalars":{},
+                "emr_spill_data":{},
+                "spill_number":-1,
+                "run_number":int(self.run_number),
+                "daq_event_type":"end_of_run",
+                "recon_events":[],
+                "mc_events":[],
+                "maus_event_type":"Spill",
+            }
         end_of_run_spill = json.dumps(self.end_of_run)
         spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
+        sys.stdout.flush()
+        sys.stdout.flush()
         print("DEATH merger %s" % self.merger.__class__)
-        if (not self.merger.death()):
+        death = self.merger.death()
+        if not(death == True or death == None): # new-style death() returns None
             raise WorkerDeathFailedException(self.merger.__class__)
-        print("DEATH outputer %s" % self.outputer.__class__)
-        if (not self.outputer.death()):
-            raise WorkerDeathFailedException(self.outputer.__class__)
+        run_footer = maus_cpp.run_action_manager.end_of_run(self.run_number)
+        self.outputer.save(run_footer)
         print "---------- END RUN %d ----------" % self.run_number
 
-    def execute(self):
+    def end_job(self):
+        self.outputer.save(json.dumps(self.job_footer))
+        print("DEATH outputer %s" % self.outputer.__class__)
+        death = self.outputer.death()
+        if not(death == True or death == None): # new-style death() returns None
+            raise WorkerDeathFailedException(self.outputer.__class__)
+
+    def execute(self, job_header, job_footer, will_run_until_ctrl_c=True):
         """
         Execute the dataflow. Retrieve spills from document store and
         submit to merge and output workers. A date query is run on
         the document store so that only the spills added since the
         previous query are processed on each iteration.
         @param self Object reference.
+        @param job_header JobHeader maus_event to be written at start_of_job
+        @param job_footer JobFooter maus_event to be written at end_of_job
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         @throws DocumentStoreException if there is a problem
         using the document store.
@@ -192,15 +210,24 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputting a spill, birthing or deathing the merger or
         outputer or merging an end_of_run spill.
         """
+        self.job_footer = job_footer
         print("-------- MERGE OUTPUT --------")
         # Register CTRL-C handler.
         signal.signal(signal.SIGINT, self.handle_ctrl_c) 
         is_birthed = False
         last_time = datetime(1970, 01, 01)
-        while True:
+        print("BIRTH outputer %s" % self.outputer.__class__)
+        birth = self.outputer.birth(self.config_doc)
+        if not(birth == True or birth == None): # new-style birth() returns None
+            raise WorkerBirthFailedException(self.outputer.__class__)
+        self.outputer.save(json.dumps(job_header))
+        run_again = True # always run once
+        while run_again:
+            run_again = will_run_until_ctrl_c
             try:
                 docs = self.doc_store.get_since(self.collection, last_time)
             except Exception as exc:
+                sys.excepthook(*sys.exc_info())
                 raise DocumentStoreException(exc)
             # Iterate using while, not for, since docs is an
             # iterator which streams data from database and we
@@ -221,8 +248,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     last_time = doc_time
                 # Check for change in run.
                 spill_doc = json.loads(spill)
-                spill_run_number = \
-                    DataflowUtilities.get_run_number(spill_doc) 
+                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
                 if (DataflowUtilities.is_end_of_run(spill_doc)):
                     self.end_of_run = spill_doc
                 if (spill_run_number != self.run_number):
@@ -230,20 +256,25 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     if (is_birthed):
                         # Death workers only if birthed.
                         self.end_run()
-                    self.start_run(spill_run_number)
+                    self.run_number = spill_run_number
+                    self.start_run()
                     is_birthed = True
                 # Handle current spill.
                 print "Executing Merge for spill %s\n" % doc_id,
                 merged_spill = self.merger.process(spill)
                 print "Executing Output for spill %s\n" % doc_id,
-                self.outputer.save(merged_spill)
+                if not self.outputer.save(merged_spill):
+                    print "Failed to execute Output"
                 self.spill_process_count += 1
                 print "Spills processed: %d" % self.spill_process_count
         # Finish the final run.
+        print "No more data and set to stop - ending run"
         self.end_run()
+        print "Ending job"
+        self.end_job()
 
     def handle_ctrl_c(self, signum, frame): # pylint: disable=W0613
-        """ 
+        """
         Handler to break out of execute loop when CTRL-C is
         pressed. The merger and outputer are deathed before
         sys.exit(0) is invoked
@@ -252,6 +283,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @param frame. Frame.
         """
         self.end_run()
+        self.end_job()
         sys.exit(0)
 
     @staticmethod

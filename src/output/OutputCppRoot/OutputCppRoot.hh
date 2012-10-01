@@ -18,6 +18,7 @@
 #ifndef _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
 #define _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
 
+#include <fstream>
 #include <string>
 
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
@@ -103,6 +104,7 @@ class OutputCppRoot : public OutputBase<std::string> {
   Data _spill_cpp;
   RunFooterData _run_footer_cpp;
   JobFooterData _job_footer_cpp;
+  std::ofstream log;
 };
 }
 

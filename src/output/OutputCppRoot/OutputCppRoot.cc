@@ -51,8 +51,7 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     _fname = JsonWrapper::GetProperty(datacards,
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     // Setup output stream
-    _outfile = new orstream
-                  (_fname.c_str(), "", "MAUS output data", "RECREATE");
+    _outfile = new orstream(_fname.c_str(), "", "MAUS output data", "RECREATE");
   } catch(...) {
     death();
     throw;
@@ -81,13 +80,12 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         _outfile_branch = data_type;
         (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
     }
-
     data_cpp->SetEvent(ConverterT()(&data_json));
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
     }
     try {
-        (*_outfile) << fillEvent;
+        (*_outfile) << fillEvent; //SEGV HERE
     } catch(...) {
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?

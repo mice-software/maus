@@ -107,7 +107,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         # Unique ID for execution.
         self.config_id = "%s-%s" % (socket.gethostname(), os.getpid())
         # Current run number (from spills).
-        self.run_number = None
+        self.run_number = "first"
         # Counts of spills input, processed, failed.
         self.spill_input_count = 0
         self.spill_process_count = 0
@@ -178,6 +178,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         """
         Submit a spill to Celery for transforming.
         @param self Object reference.
+        @param spill string representation of json document
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         """
         try:
@@ -189,7 +190,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         # Save asynchronous result object for checking task status. 
         self.celery_tasks.append(result)
 
-    def start_new_run(self, run_number):
+    def start_of_run(self, run_number):
         """
         Prepare for a new run by waiting for current Celery
         tasks to complete, updating the local run number then
@@ -211,6 +212,14 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             self.config_doc, self.config_id)
         print "Celery nodes configured!"
 
+    def end_of_run(self, run_number):
+        """
+        Kill the old run
+        @param self Object reference.
+        @param run_number Old run number.
+        """
+        CeleryUtilities.death_celery()
+
     def print_counts(self):
         """
         Print spill counts to date.
@@ -220,7 +229,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             (self.spill_input_count, self.spill_process_count,
              self.spill_fail_count)
 
-    def execute(self): # pylint: disable = R0914, R0912, R0915
+    def execute(self, _job_header, _job_footer): # pylint: disable = R0914, R0912, R0915
         """
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 
@@ -243,34 +252,23 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         num_nodes = CeleryUtilities.ping_celery_nodes()
         print("Number of active Celery nodes: %d" % num_nodes)
 
+        # reset input
         print("INPUT: Birth")
         if (not self.inputer.birth(self.config_doc)):
             raise WorkerBirthFailedException(self.inputer.__class__)
         emitter = self.inputer.emitter()
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
+
+        # reset counters
         self.spill_input_count = 0
         self.spill_process_count = 0
         self.spill_fail_count = 0
         self.celery_tasks = []
+
+        # process events
         while (len(map_buffer) != 0) or (len(self.celery_tasks) != 0):
             for spill in map_buffer:
-                print("INPUT: read next spill")
-                # Check run number.
-                spill_doc = json.loads(spill)
-                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
-                self.spill_input_count += 1
-                self.print_counts()
-                if (spill_run_number == None):
-                    # There was no run_num in spill so add a 0 (pure MC run).
-                    spill_run_number = 0
-                    spill_doc["run_number"] = spill_run_number
-                    spill = json.dumps(spill_doc)
-                if (spill_run_number != self.run_number):
-                    if (not DataflowUtilities.is_start_of_run(spill_doc)):
-                        print "  Missing a start_of_run spill!"
-                    self.start_new_run(spill_run_number)
-                    print("TRANSFORM: processing spills")
-                self.submit_spill_to_celery(spill)
+                self.process_event(spill)
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
             if (len(map_buffer) != 0):
                 print("%d spills left in buffer" % (len(map_buffer)))
@@ -279,13 +277,31 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         print "--------------------"
         # Invoke death 
         print "Requesting Celery nodes death transforms..."
-        CeleryUtilities.death_celery()
+        self.end_of_run(self.run_number)
         print "Celery node transforms deathed!"
         print("TRANSFORM: transform tasks completed")
         print("INPUT: Death")
         if (not self.inputer.death()):
             raise WorkerDeathFailedException(self.inputer.__class__)
         print "--------------------"
+
+    def process_event(self, event):
+        """
+        Process a single event
+        
+        Process a single event - if it is a Spill, check for run_number change
+        and call EndOfEvent/StartOfEvent if run_number has changed.
+        """
+        event_json = json.loads(event)
+        if DataflowUtilities.get_event_type(event_json) == "Spill":
+            current_run_number = DataflowUtilities.get_run_number(event_json)
+            if current_run_number != self.run_number:
+                self.spill_input_count += 1
+                if self.run_number != "first":
+                    self.end_of_run(self.run_number)
+                self.start_of_run(current_run_number)
+                self.run_number = current_run_number
+            self.submit_spill_to_celery(event)
 
     @staticmethod
     def get_dataflow_description():

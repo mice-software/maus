@@ -129,6 +129,8 @@ class Go: # pylint: disable=R0921, R0903
             print("Initiating Execution")
             executor.execute(self.get_job_header(json_config_dictionary),
                              self.get_job_footer())
+            # Finish with job_footer
+            #executor.finish(self.get_job_footer())
         except:
             raise
         finally:

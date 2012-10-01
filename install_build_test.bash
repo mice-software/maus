@@ -75,6 +75,8 @@ scons -c 2>>$FILE_STD 1>>$FILE_STD
 echo "Build MAUS"
 echo $FILE_STD
 (scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+if [ $? != 0 ]; then
+  echo "FAIL - failed 
 
 echo "Run the tests"
 (./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD
