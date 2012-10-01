@@ -65,7 +65,6 @@ if [ "$MAUS_THIRD_PARTY" ]; then
 	echo "Sourcing the environment..."
 	source env.sh 2>&1 | tee -a $FILE_STD
 else
-	echo "The other loop"
 	./configure 2>&1 | tee -a $FILE_STD
 	echo "Sourcing the environment..."
 	source env.sh 2>&1 | tee -a $FILE_STD
@@ -77,15 +76,23 @@ fi
 
 echo "Have Scons cleanup the MAUS build state"
 scons -c 2>&1 | tee -a $FILE_STDD
+if [ $? == 0 ]; then
+  echo "Failed to clean up MAUS library." 2>&1 | tee -a $FILE_STD
+  exit 1
+fi
 
 echo "Build MAUS"
 echo $FILE_STD
 scons build 2>&1 | tee -a $FILE_STD
 if [ $? == 0 ]; then
-  echo "Failed to build MAUS library. See logs for more information." 2>&1 | tee -a $FILE_STD
+  echo "Failed to build MAUS library." 2>&1 | tee -a $FILE_STD
   exit 1
 fi
 
 echo "Run the tests"
-(./tests/run_tests.bash || (echo "FAIL!  See logs" && exit 1)) 2>&1 | tee -a $FILE_STD
+./tests/run_tests.bash
+if [ $? == 0 ]; then
+  echo "Failed MAUS tests" 2>&1 | tee -a $FILE_STD
+  exit 1
+fi
 
