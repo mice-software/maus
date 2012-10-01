@@ -75,6 +75,7 @@ else
 fi
 
 echo "Have Scons cleanup the MAUS build state"
+which scons
 scons -c 2>&1 | tee -a $FILE_STDD
 if [ $? == 0 ]; then
   echo "Failed to clean up MAUS library." 2>&1 | tee -a $FILE_STD
