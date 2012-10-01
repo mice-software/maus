@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_STD=$MAUS_ROOT_DIR/install_log_std
+FILE_STD=install_log_std
 
 if [ ! -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: Trying to build with \$MAUS_ROOT_DIR set. Please start a new"
@@ -12,11 +12,6 @@ fi
 if [ -f $FILE_STD ];
 then
     rm $FILE_STD
-fi
-echo "Welcome to MAUS build" | tee $FILE_STD
-if [ ! -f $FILE_STD ]; then
-    echo "Failed to write to $FILE_STD - aborting"
-    exit 1
 fi
 
 echo
@@ -36,7 +31,6 @@ echo "solved them.  Be sure to attach the files:"
 echo
 echo "   $FILE_STD"
 echo
-
 
 # Assign the location of the third party libraries  
 # In order of preference the location is set to:
@@ -61,41 +55,30 @@ fi
 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure $MAUS_THIRD_PARTY 2>&1 | tee -a $FILE_STD
+	./configure $MAUS_THIRD_PARTY >& $FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh 2>&1 | tee -a $FILE_STD
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 else
-	./configure 2>&1 | tee -a $FILE_STD
+	echo "The other loop"
+	./configure 2>>$FILE_STD 1>>$FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh 2>&1 | tee -a $FILE_STD
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 	echo "Building third party libraries (takes a while...)"
-	./third_party/build_all.bash 2>&1 | tee -a $FILE_STD
+	./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
 	echo "Resource the environment (catches the new ROOT version)"
-	source env.sh 2>&1 | tee -a $FILE_STD
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
 
-echo "Have Scons cleanup the MAUS build state"
-echo $MAUS_ROOT_DIR
-echo $PATH
-which scons
-scons -c 2>&1 | tee -a $FILE_STDD
-if [ $? == 0 ]; then
-  echo "Failed to clean up MAUS library." 2>&1 | tee -a $FILE_STD
-  exit 1
-fi
+echo "Cleaning the MAUS build state"
+scons -c 2>>$FILE_STD 1>>$FILE_STD
 
-echo "Build MAUS"
-echo $FILE_STD
-scons build 2>&1 | tee -a $FILE_STD
-if [ $? == 0 ]; then
-  echo "Failed to build MAUS library." 2>&1 | tee -a $FILE_STD
+echo "Building MAUS"
+(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+if [ $? != 0 ]; then
+  echo "FAIL Failed to make MAUS using scons - exiting (check the log file)"
   exit 1
 fi
 
 echo "Run the tests"
-./tests/run_tests.bash
-if [ $? == 0 ]; then
-  echo "Failed MAUS tests" 2>&1 | tee -a $FILE_STD
-  exit 1
-fi
+(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD
 
