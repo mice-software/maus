@@ -251,7 +251,8 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         if os.path.exists(bzr_path): # assume this is a valid bzr revision
             self.assertGreater(len(header['bzr_configuration']), 0)
             self.assertGreater(len(header['bzr_revision']), 0)
-            self.assertGreater(len(header['bzr_status']), 0)
+            # clean bzr checkout has no output from bzr_status
+            self.assertEqual(type(header['bzr_status']), type(''))
         else:
             self.assertEqual(header['bzr_configuration'], '')
             self.assertEqual(header['bzr_revision'], '')
