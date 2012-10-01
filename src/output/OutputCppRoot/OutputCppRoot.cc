@@ -85,7 +85,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         return false;
     }
     try {
-        (*_outfile) << fillEvent; //SEGV HERE
+        (*_outfile) << fillEvent;
     } catch(...) {
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?

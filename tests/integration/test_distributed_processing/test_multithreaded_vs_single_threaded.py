@@ -26,6 +26,7 @@ import os
 import subprocess
 import signal
 import time
+import pymongo
 import unittest 
 
 import celery.task.control
@@ -33,7 +34,8 @@ import ROOT
 
 import libMausCpp # pylint: disable=W0611
 
-def run_simulate_mice(dataflow, output_file_pre, wait=True):
+def run_simulate_mice(dataflow, output_file_pre, wait=True,
+               docstore='docstore.InMemoryDocumentStore.InMemoryDocumentStore'):
     """
     Run simulate_mice.py
 
@@ -46,8 +48,7 @@ def run_simulate_mice(dataflow, output_file_pre, wait=True):
     proc = subprocess.Popen([sim,
                             '--type_of_dataflow', dataflow,
                             '--output_root_file_name', output_file_pre+'.root',
-                            #'--doc_store_class',
-                        #'docstore.InMemoryDocumentStore.InMemoryDocumentStore'
+                            '--doc_store_class', docstore,
                             ],
                             stdout = log, stderr=subprocess.STDOUT)
     if wait:
@@ -69,6 +70,13 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
             unittest.TestCase.skipTest(self, "Skip - RabbitMQ seems to be down")
         if (active_nodes == None):
             unittest.TestCase.skipTest(self, "Skip - No active Celery workers")
+        try:
+            test_connx = pymongo.Connection("localhost", 27017)
+        except pymongo.errors.AutoReconnect: # pylint: disable=W0702
+            unittest.TestCase.skipTest\
+                               (self, "Skip - MongoDB server is not accessible")
+        test_connx.disconnect()
+
 
     def _simulate_mice(self):
         """
@@ -83,11 +91,16 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
                                ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_in')
         split_name_out = os.path.expandvars \
                                ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_out')
+        # warning - can only use MongoDBDocumentStore with one concurrent run -
+        # no test for job that spawned the document!    
         print split_name_in
-        run_simulate_mice('multi_process_input_transform', split_name_in)
+        run_simulate_mice('multi_process_input_transform',
+                          split_name_in, False,
+                  docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')
         print split_name_out
-        out_proc = \
-          run_simulate_mice('multi_process_merge_output', split_name_out, False)
+        out_proc = run_simulate_mice('multi_process_merge_output',
+                                     split_name_out, False,
+                  docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')
         print single_name
         run_simulate_mice('pipeline_single_thread', single_name)
         print multi_name
@@ -151,6 +164,9 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
     def _get_spill_spill_number_list(self, root_file): # pylint: disable=R0201
         """
         Return a list of spill numbers for each spill in the file
+
+        We don't require processing order is the same, merely that the spills
+        are present - so sort before returning
         """
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = root_file.Get("Spill")
@@ -159,7 +175,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         for i in range(tree.GetEntries()):
             tree.GetEntry(i)
             spill_numbers.append(data.GetSpill().GetSpillNumber())
-        return spill_numbers
+        return sorted(spill_numbers)
 
     def test_simulate_mice(self):
         """

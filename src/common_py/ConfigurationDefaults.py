@@ -51,6 +51,16 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
+# set how headers and footers are handled - "append" will set to
+# append headers and footers to the output; dont_append will set to not append
+# headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
+# RunFooter
+#
+# For example, if the user wants to copy data from one format to another, he
+# should set to dont_append to avoid header and footer information being taken
+# to the output
+header_and_footer_mode = "append" #append or dont_append
+
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 

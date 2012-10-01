@@ -212,7 +212,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             self.config_doc, self.config_id)
         print "Celery nodes configured!"
 
-    def end_of_run(self, run_number):
+    def end_of_run(self, run_number): # pylint: disable=W0613, R0201
         """
         Kill the old run
         @param self Object reference.
@@ -229,7 +229,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             (self.spill_input_count, self.spill_process_count,
              self.spill_fail_count)
 
-    def execute(self, _job_header, _job_footer): # pylint: disable = R0914, R0912, R0915
+    def execute(self, _job_header, _job_footer): # pylint: disable = R0914, R0912, R0915, C0301
         """
         Set up MAUS input tasks and, on receipt of spills, submit
         to transform tasks accessed via a distributed task queue. 

@@ -45,7 +45,8 @@ class PipelineSingleThreadDataflowExecutor:
         self.outputer = outputer
         self.json_config_doc = json_config_doc
         #  Parse the configuration JSON
-        self.json_config_dictionary = json.loads(self.json_config_doc)
+        head_mode = json.loads(self.json_config_doc)["header_and_footer_mode"]
+        self.write_headers = head_mode == "append"
         self.run_number = "first" # used to register first run
 
     def execute(self, job_header, job_footer):
@@ -72,7 +73,8 @@ class PipelineSingleThreadDataflowExecutor:
                    self.outputer.birth(self.json_config_doc) == None)
 
             print("Writing JobHeader...")
-            self.outputer.save(json.dumps(job_header))
+            if self.write_headers:
+                self.outputer.save(json.dumps(job_header))
 
             print("INPUT: Setting up input")
             assert(self.inputer.birth(self.json_config_doc) == True or \
@@ -108,7 +110,8 @@ class PipelineSingleThreadDataflowExecutor:
             if self.run_number == "first":
                 self.run_number = 0
             self.end_of_run(self.run_number)
-            self.outputer.save(json.dumps(job_footer))
+            if self.write_headers:
+                self.outputer.save(json.dumps(job_footer))
 
             print("OUTPUT: Shutting down outputer")
             assert(self.outputer.death() == True or \
@@ -149,7 +152,8 @@ class PipelineSingleThreadDataflowExecutor:
                self.transformer.birth(self.json_config_doc) == None)
 
         run_header = maus_cpp.run_action_manager.start_of_run(new_run_number)
-        self.outputer.save(run_header)
+        if self.write_headers:
+            self.outputer.save(run_header)
 
     def end_of_run(self, old_run_number):
         """
@@ -168,7 +172,8 @@ class PipelineSingleThreadDataflowExecutor:
                self.merger.death() == None)
 
         run_footer = maus_cpp.run_action_manager.end_of_run(old_run_number)
-        self.outputer.save(run_footer)
+        if self.write_headers:
+            self.outputer.save(run_footer)
 
     @staticmethod
     def get_dataflow_description():

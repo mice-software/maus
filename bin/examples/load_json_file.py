@@ -47,7 +47,7 @@ def main():
     print "Generating some data"
     my_file_name = os.path.join\
              (os.environ["MAUS_ROOT_DIR"], "tmp", "example_load_json_file.json")
-    generate_some_data(my_file_name)
+    #generate_some_data(my_file_name)
     
     # now open the json file
     print "Loading json file", my_file_name
@@ -63,8 +63,12 @@ def main():
     tof1_digits_1_hist = ROOT.TH1D("tof1 digits_1", # pylint: disable = E1101
                                    "tof1 digits for plane 1;Slab number",
                                     7, -0.5, 6.5)
-    for line in json_file.readlines():
-        spill = json.loads(line)
+    # get all events - nb: this is python preferred way of extracting a list
+    # from another list
+    events = [json.loads(line) for line in json_file.readlines()]
+    # make a list of events with type 'Spill' (i.e. output from DAQ)
+    spills = [event for event in events if event['maus_event_type'] == 'Spill']
+    for spill in spills:
         # Print some basic information about the spill
         print "Found spill number", spill["spill_number"],
         print "in run number", spill["run_number"],

@@ -21,7 +21,6 @@ from datetime import datetime
 import json
 import signal
 import sys
-import time
 
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
@@ -103,6 +102,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws DocumentStoreException if there is a problem
         connecting to the document store.
         """
+        self.last_time = datetime(1970, 01, 01)
         self.job_footer = None
         self.merger = merger
         self.outputer = outputer
@@ -111,9 +111,10 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         # Current run number (from spills).
         self.run_number = None
         # Last end_of_run spill received.
-        self.end_of_run = None
+        self.end_of_run_spill = None
         # Counts of spills processed.
         self.spill_process_count = 0
+        self.write_headers = self.config["header_and_footer_mode"] == "append"
         # Connect to doc store.
         if (doc_store == None):
             self.doc_store = DocumentStoreUtilities.setup_doc_store(\
@@ -129,8 +130,23 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 self.collection = self.config["doc_collection_name"]
         else:   
             self.collection = collection_name
+
+    def start_of_job(self, job_header):
+        """
+        Birth the outputer and save job header
+        """
+        print("-------- MERGE OUTPUT --------")
+        # Register CTRL-C handler.
+        signal.signal(signal.SIGINT, self.handle_ctrl_c) 
+        print("BIRTH outputer %s" % self.outputer.__class__)
+        birth = self.outputer.birth(self.config_doc)
+        if not(birth == True or birth == None): # new-style birth() returns None
+            raise WorkerBirthFailedException(self.outputer.__class__)
+        if self.write_headers:
+            self.outputer.save(json.dumps(job_header))
+
  
-    def start_run(self):
+    def start_of_run(self):
         """
         Prepare for a new run by updating the local run number then
         birthing the merger and outputer. 
@@ -139,16 +155,17 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
         """
-        self.end_of_run = None
+        self.end_of_run_spill = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
         birth = self.merger.birth(self.config_doc)
         if not(birth == True or birth == None): # new-style birth() returns None
             raise WorkerBirthFailedException(self.merger.__class__)
         run_header = maus_cpp.run_action_manager.start_of_run(self.run_number)
-        self.outputer.save(run_header)
+        if self.write_headers:
+            self.outputer.save(run_header)
 
-    def end_run(self):
+    def end_of_run(self):
         """
         End a run by sending an end_of_run spill through the merger
         and outputer then death the merger and outputer. The end_of_run
@@ -161,10 +178,10 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         end_of_run through or when death is called.
         """
         print("Finishing current run...sending end_of_run to merger")
-        if (self.end_of_run == None):
+        if (self.end_of_run_spill == None):
             print "  Missing an end_of_run spill..."
             print "  ...creating one to flush the mergers!"
-            self.end_of_run = {
+            self.end_of_run_spill = {
                 "scalars":{},
                 "emr_spill_data":{},
                 "spill_number":-1,
@@ -174,20 +191,23 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 "mc_events":[],
                 "maus_event_type":"Spill",
             }
-        end_of_run_spill = json.dumps(self.end_of_run)
-        spill = self.merger.process(end_of_run_spill)
-        sys.stdout.flush()
-        sys.stdout.flush()
+        end_of_run_spill_str = json.dumps(self.end_of_run_spill)
+        self.merger.process(end_of_run_spill_str)
         print("DEATH merger %s" % self.merger.__class__)
         death = self.merger.death()
         if not(death == True or death == None): # new-style death() returns None
             raise WorkerDeathFailedException(self.merger.__class__)
         run_footer = maus_cpp.run_action_manager.end_of_run(self.run_number)
-        self.outputer.save(run_footer)
+        if self.write_headers:
+            self.outputer.save(run_footer)
         print "---------- END RUN %d ----------" % self.run_number
 
-    def end_job(self):
-        self.outputer.save(json.dumps(self.job_footer))
+    def end_of_job(self, job_footer):
+        """
+        Output footer and then death the outputer
+        """
+        if self.write_headers:
+            self.outputer.save(json.dumps(job_footer))
         print("DEATH outputer %s" % self.outputer.__class__)
         death = self.outputer.death()
         if not(death == True or death == None): # new-style death() returns None
@@ -212,22 +232,12 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputer or merging an end_of_run spill.
         """
         self.job_footer = job_footer
-        print("-------- MERGE OUTPUT --------")
-        # Register CTRL-C handler.
-        signal.signal(signal.SIGINT, self.handle_ctrl_c) 
-        is_birthed = False
-        last_time = datetime(1970, 01, 01)
-        print("BIRTH outputer %s" % self.outputer.__class__)
-        birth = self.outputer.birth(self.config_doc)
-        if not(birth == True or birth == None): # new-style birth() returns None
-            raise WorkerBirthFailedException(self.outputer.__class__)
-        self.outputer.save(json.dumps(job_header))
+        self.start_of_job(job_header)
         run_again = True # always run once
         while run_again:
             run_again = will_run_until_ctrl_c
-            #print datetime.fromtimestamp(time.time())
             try:
-                docs = self.doc_store.get_since(self.collection, last_time)
+                docs = self.doc_store.get_since(self.collection, self.last_time)
             except Exception as exc:
                 sys.excepthook(*sys.exc_info())
                 raise DocumentStoreException(exc)
@@ -242,40 +252,37 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     break
                 except Exception as exc:
                     raise DocumentStoreException(exc)
-                #print '.',
                 doc_id = doc["_id"]
                 doc_time = doc["date"]
                 spill = doc["doc"]
                 print "Read spill %s (dated %s)" % (doc_id, doc_time)
-                if (doc_time > last_time):
-                    last_time = doc_time
+                if (doc_time > self.last_time):
+                    self.last_time = doc_time
                 # Check for change in run.
                 spill_doc = json.loads(spill)
-                spill_run_number = DataflowUtilities.get_run_number(spill_doc) 
+                spill_run_number = DataflowUtilities.get_run_number(spill_doc)
                 if (DataflowUtilities.is_end_of_run(spill_doc)):
-                    self.end_of_run = spill_doc
+                    self.end_of_run_spill = spill_doc
                 if (spill_run_number != self.run_number):
                     print "Change of run detected"
-                    if (is_birthed):
+                    if (self.run_number != None):
                         # Death workers only if birthed.
-                        self.end_run()
+                        self.end_of_run()
                     self.run_number = spill_run_number
-                    self.start_run()
-                    is_birthed = True
+                    self.start_of_run()
                 # Handle current spill.
                 print "Executing Merge for spill %s\n" % doc_id,
                 merged_spill = self.merger.process(spill)
                 print "Executing Output for spill %s\n" % doc_id,
-                print type(merged_spill)
                 if not self.outputer.save(str(merged_spill)):
                     print "Failed to execute Output"
                 self.spill_process_count += 1
                 print "Spills processed: %d" % self.spill_process_count
         # Finish the final run.
         print "No more data and set to stop - ending run"
-        self.end_run()
+        self.end_of_run()
         print "Ending job"
-        self.end_job()
+        self.end_of_job(self.job_footer)
 
     def handle_ctrl_c(self, signum, frame): # pylint: disable=W0613
         """
@@ -286,8 +293,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @param signum Signal number.
         @param frame. Frame.
         """
-        self.end_run()
-        self.end_job()
+        self.end_of_run()
+        self.end_of_job(self.job_footer)
         sys.exit(0)
 
     @staticmethod

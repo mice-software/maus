@@ -370,3 +370,8 @@ The two leftmost colourless boxes do indeed represent an extension to the ladder
     \includegraphics[scale=0.35]{MausApiInheritanceLadder}
   \caption{Inheritance ladder}
 \end{figure}
+
+\section{Global Objects - Objects for Many Modules}
+There are some objects that sit outside the scope of the modular framework above. Typically these are objects that do not belong to any one module, but need to be accessed by many. Examples are the logging functionality (Squeak), ErrorHandler, Configuration datacards, field maps, geometry description and Geant4 interfaces. These are accessed through the static singleton class \emph{Globals} defined in \emph{src/common_cpp/Utils/Globals.hh}. Initialisation is handled in \emph{src/common_cpp/Globals/GlobalsManager.hh}. One Globals instance is initialised per subprocess when running in multiprocessing mode.
+
+
