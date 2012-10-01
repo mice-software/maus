@@ -22,17 +22,17 @@ namespace MAUS {
 
 // Initialize geometry constants.
 const double KalmanTrack::A = 2./(7.*0.427);
-const double KalmanTrack::ACTIVE_RADIUS = 150.;
-const double KalmanTrack::CHAN_WIDTH = 1.333;
+const double KalmanTrack::ACTIVE_RADIUS = 150.; // mm
+const double KalmanTrack::CHAN_WIDTH = 1.4945; // mm
 const double KalmanTrack::SIGMA_ALPHA2 = 1./12.;
 
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
-  _V.ResizeTo(2, 2);
-  _H.ResizeTo(2, 5);
+  _V.ResizeTo(1, 1);
+  _H.ResizeTo(1, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
-  _K.ResizeTo(5, 2);
+  _K.ResizeTo(5, 1);
   _Q.ResizeTo(5, 5);
 
   _chi2 = 0.0;
@@ -100,16 +100,21 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
   double sig_beta = l/CHAN_WIDTH;
+  std::cerr << "Chan measured: " << alpha << ". Lenght: " << l <<"; numb chan: " << sig_beta << "\n";
   double SIG_ALPHA = 1.0;
   _V.Zero();
   _V(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
-  _V(1, 1) = sig_beta*sig_beta/12.;
+  //_V(1, 1) = sig_beta*sig_beta/12.;
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
+
+  // if ( a_site->get_id() < 15 ) {
+    // dx = -dx;
+  // }
 
   _H.Zero();
   _H(0, 0) = -A*dy;
@@ -132,12 +137,14 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
   //
-  TMatrixD m(2, 1);
+  TMatrixD m(1, 1);
+  //TMatrixD m(2, 1);
   m = a_site->get_measurement();
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
-  TMatrixD ha(2, 1);
+  TMatrixD ha(1, 1);
+  //TMatrixD ha(2, 1);
   ha = TMatrixD(_H, TMatrixD::kMult, a);
   // Extrapolation converted to expected measurement.
   double alpha_model = ha(0, 0);
@@ -147,7 +154,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
   a_site->set_chi2(chi2_i);
 
-  TMatrixD pull(2, 1);
+  TMatrixD pull(1, 1);
+  //TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
   /////////////////////////////////////////////////////////////////////
   //
@@ -155,15 +163,23 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   //              K =  A   (V +  B )-1
   TMatrixD C(5, 5);
   C = a_site->get_projected_covariance_matrix();
-
+/*
   TMatrixD A(5, 2);
   A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
-
   TMatrixD temp1(2, 5);
   temp1 = TMatrixD(_H, TMatrixD::kMult, C);
   TMatrixD B(2, 2);
   B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
   TMatrixD temp2(2, 2);
+  temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
+*/
+  TMatrixD A(5, 1);
+  A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
+  TMatrixD temp1(1, 5);
+  temp1 = TMatrixD(_H, TMatrixD::kMult, C);
+  TMatrixD B(1, 1);
+  B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
+  TMatrixD temp2(1, 1);
   temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
   // double det;
   temp2.Invert();

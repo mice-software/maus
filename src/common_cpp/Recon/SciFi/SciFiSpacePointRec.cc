@@ -24,18 +24,23 @@ SciFiSpacePointRec::SciFiSpacePointRec() {}
 SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
 void SciFiSpacePointRec::process(SciFiEvent &evt) {
-  int tracker, station, plane;
   int clusters_size = evt.clusters().size();
   // Store clusters in a vector.
   std::vector<SciFiCluster*> clusters[2][6][3];
   for ( int cl = 0; cl < clusters_size; cl++ ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
-    tracker = a_cluster->get_tracker();
-    station = a_cluster->get_station();
-    plane   = a_cluster->get_plane();
+    int tracker = a_cluster->get_tracker();
+    int station = a_cluster->get_station();
+    int plane   = a_cluster->get_plane();
     clusters[tracker][station][plane].push_back(a_cluster);
   }
 
+  look_for_triplets(evt, clusters);
+
+  look_for_duplets(evt, clusters);
+}
+
+void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
   // For each tracker,
   for ( int Tracker = 0; Tracker < 2; Tracker++ ) {
     // For each station,
@@ -68,7 +73,9 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
       }  // ends plane 0
     }  // end loop over stations
   }  // end loop over trackers
+}
 
+void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
   // Run over left-overs and make duplets without any selection criteria
   for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
     for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
@@ -193,6 +200,7 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   double chi2 = (dist*dist)/0.064;
   triplet->set_chi2(chi2);
 
+/*
     std::ofstream out2("spacepoints.txt", std::ios::out | std::ios::app);
     out2 << xcluster->get_true_position().x() << " "
          <<   xcluster->get_true_position().y() << " "
@@ -201,12 +209,13 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
          << position.z() << " " << xcluster->get_tracker() << " "
          << xcluster->get_station() << "\n";
     out2.close();
+*/
 
   // Determine time
   double time_A = vcluster->get_time();
   double time_B = xcluster->get_time();
   double time_C = wcluster->get_time();
-  std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << " " << time_C << "\n";
+  // std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << " " << time_C << "\n";
   double time = (time_A + time_B + time_C) / 3.0;
   double time_error = 0.0;
   time_error += (time_A-time)*time_A;

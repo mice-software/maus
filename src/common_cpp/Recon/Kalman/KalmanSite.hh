@@ -76,7 +76,7 @@ class KalmanSite {
   TMatrixD get_smoothed_covariance_matrix() const { return _smoothed_C; }
 
   void set_measurement(double alpha) { _v(0, 0) = alpha;
-                                       _v(1, 0) = 0.0;
+                                       // _v(1, 0) = 0.0;
                                        _alpha   = alpha; }
 
   TMatrixD get_measurement() const { return _v; }

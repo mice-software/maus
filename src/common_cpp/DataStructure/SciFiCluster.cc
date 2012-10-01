@@ -77,7 +77,6 @@ SciFiCluster& SciFiCluster::operator=(const SciFiCluster &_scificluster) {
   _time      = _scificluster.get_time();
   _direction = _scificluster.get_direction();
   _position  = _scificluster.get_position();
-  _relat_pos = _scificluster.get_relative_position();
   _alpha     = _scificluster.get_alpha();
   _id        = _scificluster.get_id();
   return *this;

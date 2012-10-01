@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(100.) {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -180,15 +180,17 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     if ( tracker == 0 && spacepoints[i].get_station() == 5 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = 3.14- (phi_0 - deltaZ*constant*kappa);
+      phi = 3.14 - (phi_0+3.14/2. - deltaZ*constant*kappa);
       px = pt*sin(phi);
       py = pt*cos(phi);
     } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = phi_0;
-      px = -pt*sin(phi);
-      py = pt*cos(phi);
+      phi = phi_0+3.14/2.;
+      px = pt*cos(phi);
+      py = pt*sin(phi);
+      //px = -pt*sin(phi);
+      //py = pt*cos(phi);
     }
   }
 
@@ -288,7 +290,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     mx = -mx_pr;
     my = -my_pr;
   } else if ( tracker == 1 ) {
-    mx = mx_pr;
+    mx = -mx_pr;
     my = my_pr;
   }
 
@@ -350,6 +352,9 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
 
   // a_k = a_k^k-1 + K_k x pull
   track->calc_filtered_state(a_site);
+
+  // Update H (depends on plane direction.
+  track->update_H(a_site);
 
   // Cp = (C-KHC)
   track->update_covariance(a_site);

@@ -102,11 +102,7 @@ class SciFiCluster {
 
   ThreeVector get_position() const { return _position; }
 
-  void set_relative_position(ThreeVector rel_pos) { _relat_pos = rel_pos; }
-
   void set_alpha(double channel) { _alpha = channel; }
-
-  ThreeVector get_relative_position() const { return _relat_pos; }
 
   double get_alpha() const { return _alpha; }
 
@@ -131,7 +127,7 @@ class SciFiCluster {
 
   ThreeVector _true_pos, _true_p;
 
-  ThreeVector _direction, _position, _relat_pos;
+  ThreeVector _direction, _position;
 
   ClassDef(SciFiCluster, 1)
 }; // Don't forget this trailing colon!!!!

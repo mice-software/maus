@@ -50,9 +50,9 @@ void HelicalTrackTest::set_up_sites() {
   py1= 4.3604;
   kappa=1./200.;
 
-  old_site.set_z(z0);
-  new_site.set_z(z1);
-  new_site.set_id(20);
+  old_site.set_z(z1);
+  new_site.set_z(z0);
+  new_site.set_id(13);
 
   a.ResizeTo(5, 1);
   a(0, 0) = x0;
@@ -82,11 +82,11 @@ TEST_F(HelicalTrackTest, test_propagation) {
   TMatrixD a_projected(5, 1);
   a_projected = new_site.get_projected_a();
 
-  EXPECT_EQ(a_projected(0, 0), x1);
-  EXPECT_EQ(a_projected(1, 0), px1);
-  EXPECT_EQ(a_projected(2, 0), y1);
-  EXPECT_EQ(a_projected(3, 0), py1);
-  EXPECT_EQ(a_projected(4, 0), kappa);
+  EXPECT_EQ(x1, a_projected(0, 0));
+  EXPECT_EQ(px1, a_projected(1, 0));
+  EXPECT_EQ(y1, a_projected(2, 0));
+  EXPECT_EQ(py1, a_projected(3, 0));
+  EXPECT_EQ(kappa, a_projected(4, 0));
   //EXPECT_TRUE(fabs(projected_x-a_temp(0, 0)) < err);
   //EXPECT_TRUE(fabs(projected_y-a_temp(1, 0)) < err);
 

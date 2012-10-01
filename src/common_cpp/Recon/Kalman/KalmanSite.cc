@@ -23,7 +23,8 @@ KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _C.ResizeTo(5, 5);
   _a.ResizeTo(5, 1);
-  _v.ResizeTo(2, 1);
+  _v.ResizeTo(1, 1);
+  //_v.ResizeTo(2, 1);
   _projected_C.ResizeTo(5, 5);
   _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
@@ -36,7 +37,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _a.ResizeTo(5, 1);
   _C.ResizeTo(5, 5);
-  _v.ResizeTo(2, 1);
+  _v.ResizeTo(1, 1);
+  //_v.ResizeTo(2, 1);
   _projected_C.ResizeTo(5, 5);
   _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);

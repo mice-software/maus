@@ -89,13 +89,13 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   // G4RotationMatrix* trot = new G4RotationMatrix();
   // G4ThreeVector dir(0, 1, 0);
   // dir = dir*(*trot);
-/*
+  /*
   std::cerr << "Module name: " << doubletName << "\n"
             << "Module rotation: " << *(trot) << "\n"
             // << "Plane direction: " << dir << "\n"
             << "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
             << "Mothers rotation is: "      << *(mlv->GetRotation()) << "\n";
-*/
+  */
   // this is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,
@@ -109,7 +109,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                false, 0);
 
   // lenght of the tube of fibre
-  G4double tlen = 150.0 * mm;
+  G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
   _numFibres = (G4int)floor(2. * ar / (0.5 * fp));

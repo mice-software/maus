@@ -63,25 +63,23 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_parameter_constructor) {
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
+  double phi0 = 3.0;
+  double psi0 = -1.0;
   CLHEP::Hep3Vector pos0(1.0, 2.0, 1100.0);
   SimpleLine line_sz;
   SimpleCircle circle;
   line_sz.set_c(1.0);
   line_sz.set_m(0.03);
   line_sz.set_chisq(7.0);
-  std::vector<double> azm_angles;
-  azm_angles.push_back(3.0);
-  azm_angles.push_back(4.0);
-  circle.set_turning_angle(azm_angles);
   circle.set_R(13.0);
   circle.set_chisq(6.0);
 
-  SciFiHelicalPRTrack prtrack(0, 5, pos0, circle, line_sz);
+  SciFiHelicalPRTrack prtrack(0, 5, pos0, phi0, psi0, circle, line_sz);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_y0(), 2.0);
   EXPECT_EQ(prtrack.get_z0(), 1100.0);
-  EXPECT_EQ(prtrack.get_phi0(), 3.0);
-  EXPECT_EQ(prtrack.get_psi0(), -1.0);
+  EXPECT_EQ(prtrack.get_phi0(), phi0);
+  EXPECT_EQ(prtrack.get_psi0(), psi0);
   EXPECT_EQ(prtrack.get_dsdz(), 0.03);
   EXPECT_EQ(prtrack.get_R(), 13.0);
   EXPECT_EQ(prtrack.get_line_sz_chisq(), 7.0);

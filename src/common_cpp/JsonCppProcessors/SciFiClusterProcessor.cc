@@ -67,9 +67,6 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
     RegisterValueBranch("position", &_three_vec_proc,
                         &SciFiCluster::get_position,
                         &SciFiCluster::set_position, true);
-    RegisterValueBranch("position", &_three_vec_proc,
-                        &SciFiCluster::get_relative_position,
-                        &SciFiCluster::set_relative_position, true);
 }
 
 } // ~namespace MAUS

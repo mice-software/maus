@@ -36,6 +36,316 @@ class PatternRecognitionTest : public ::testing::Test {
   bool compare_doubles(double a, double b, double epsilon) {return fabs(a - b) < epsilon;}
 };
 
+TEST_F(PatternRecognitionTest, test_set_end_stations) {
+
+  PatternRecognition pr;
+  std::vector<int> ignore_stations(0);
+  int outer_st_num, inner_st_num;
+
+  // 5 pt track case
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  // 4 pt track case
+  ignore_stations.push_back(4);
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 3;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 2;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 1;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 0;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+
+  // 3 pt track case (not testing all possible combinations)
+  ignore_stations[0] = 4;
+  ignore_stations.push_back(3);
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(2, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 2;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 4;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(2, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 2;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+
+  ignore_stations[0] = 2;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+
+  ignore_stations[0] = 2;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+
+  ignore_stations[0] = 1;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(2, inner_st_num);
+
+  ignore_stations[0] = 0;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(2, inner_st_num);
+
+  // Test input error cases
+
+  // Same two stations numbers entered
+  ignore_stations[0] = 4;
+  ignore_stations.push_back(4);
+  EXPECT_FALSE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+
+  // Out of bounds station numbers
+  ignore_stations.resize(1);
+  ignore_stations[0] = 12;
+  EXPECT_FALSE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+
+  ignore_stations[0] = -1;
+  EXPECT_FALSE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+
+  // Too large ignore_stations vector
+  ignore_stations.resize(3);
+  EXPECT_FALSE(pr.set_end_stations(ignore_stations, outer_st_num, inner_st_num));
+}
+
+TEST_F(PatternRecognitionTest, test_stations_with_unused_sp) {
+
+  // Set up spacepoints, leaving station 3 empty to check function copes with an empty station
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  // SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4_1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  sp1->set_station(1);
+  sp2->set_station(2);
+  // sp3->set_station(3);
+  sp4->set_station(4);
+  sp4_1->set_station(4);
+  sp5->set_station(5);
+
+  sp1->set_used(true);
+  sp2->set_used(true);
+  // sp3->set_used(true);
+  sp4->set_used(false);
+  sp4_1->set_used(true);
+  sp5->set_used(false);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp5);
+  spnts.push_back(sp2);
+  // spnts.push_back(sp3);
+  spnts.push_back(sp1);
+  spnts.push_back(sp4);
+  spnts.push_back(sp4_1);
+
+  SpacePoint2dPArray spnts_by_station(5);
+
+  PatternRecognition pr;
+  pr.sort_by_station(spnts, spnts_by_station);
+  ASSERT_EQ(5, spnts_by_station.size());
+  ASSERT_EQ(1, spnts_by_station[0].size());
+  ASSERT_EQ(1, spnts_by_station[1].size());
+  ASSERT_EQ(2, spnts_by_station[3].size());
+  ASSERT_EQ(1, spnts_by_station[4].size());
+
+  std::vector<int> stations_hit, stations_not_hit;
+  pr.stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+
+  ASSERT_EQ(2, stations_hit.size());
+  ASSERT_EQ(3, stations_not_hit.size());
+  EXPECT_EQ(3, stations_hit[0]);
+  EXPECT_EQ(4, stations_hit[1]);
+  EXPECT_EQ(0, stations_not_hit[0]);
+  EXPECT_EQ(1, stations_not_hit[1]);
+  EXPECT_EQ(2, stations_not_hit[2]);
+
+  int stats_with_unused = pr.num_stations_with_unused_spnts(spnts_by_station);
+  EXPECT_EQ(2, stats_with_unused);
+}
+
+TEST_F(PatternRecognitionTest, test_AB_ratio) {
+
+  PatternRecognition pr;
+  double phi_i = 1.0;
+  double phi_j = 0.5;
+  double z_i = 200.0;
+  double z_j = 450.0;
+
+  double epsilon = 0.01;
+
+  bool result = pr.AB_ratio(phi_i, phi_j, z_i, z_j);
+  ASSERT_TRUE(result);
+  EXPECT_NEAR(phi_i, 7.28319, epsilon);
+  EXPECT_NEAR(phi_j, 6.783, epsilon);
+  EXPECT_EQ(z_i, 200.0);
+  EXPECT_EQ(z_j, 450.0);
+}
+
+TEST_F(PatternRecognitionTest, test_circle_fit) {
+
+  PatternRecognition pr;
+
+  // Set up spacepoints from an MC helical track
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  sp1->set_station(1);
+  sp2->set_station(2);
+  sp3->set_station(3);
+  sp4->set_station(4);
+  sp5->set_station(5);
+
+  ThreeVector pos(14.1978, 9.05992, 0.6523);
+  sp1->set_position(pos);
+  pos.set(-7.97067, 10.3542, 200.652);
+  sp2->set_position(pos);
+  pos.set(-11.4578, -16.3941, 450.652);
+  sp3->set_position(pos);
+  pos.set(19.9267, -12.0799, 750.652);
+  sp4->set_position(pos);
+  pos.set(-5.47983, 12.9427, 1100.65);
+  sp5->set_position(pos);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp5);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp1);
+  spnts.push_back(sp4);
+
+  SimpleCircle circle;
+  bool good_radius = pr.circle_fit(spnts, circle);
+
+  double epsilon = 0.01;
+
+  ASSERT_TRUE(good_radius);
+  EXPECT_NEAR(circle.get_x0(), 2.56, epsilon);
+  EXPECT_NEAR(circle.get_y0(), -4.62, epsilon);
+  EXPECT_NEAR(circle.get_R(), 18.56, epsilon);
+  EXPECT_NEAR(circle.get_chisq(), 0.0994, epsilon);
+}
+
+
+TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
+
+  PatternRecognition pr;
+
+  // Set up spacepoints from an MC helical track
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  sp1->set_station(1);
+  sp2->set_station(2);
+  sp3->set_station(3);
+  sp4->set_station(4);
+  sp5->set_station(5);
+
+  ThreeVector pos(14.1978, 9.05992, 0.6523);
+  sp1->set_position(pos);
+  pos.set(-7.97067, 10.3542, 200.652);
+  sp2->set_position(pos);
+  pos.set(-11.4578, -16.3941, 450.652);
+  sp3->set_position(pos);
+  pos.set(19.9267, -12.0799, 750.652);
+  sp4->set_position(pos);
+  pos.set(-5.47983, 12.9427, 1100.65);
+  sp5->set_position(pos);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp1);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp4);
+  spnts.push_back(sp5);
+
+  SimpleCircle circle;
+  bool good_radius = pr.circle_fit(spnts, circle);
+
+  double epsilon = 0.01;
+
+  ASSERT_TRUE(good_radius);
+  EXPECT_NEAR(circle.get_x0(), 2.56, epsilon);
+  EXPECT_NEAR(circle.get_y0(), -4.62, epsilon);
+  EXPECT_NEAR(circle.get_R(), 18.56, epsilon);
+  EXPECT_NEAR(circle.get_chisq(), 0.0994, epsilon);
+
+  SimpleLine line_sz;
+  std::vector<double> dphi;
+  double phi_0;
+
+  pr.calculate_dipangle(spnts, circle, dphi, line_sz, phi_0);
+
+  EXPECT_NEAR(line_sz.get_c(), -1.09, epsilon);
+  EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
+  EXPECT_NEAR(line_sz.get_chisq(), 0.440, epsilon);
+}
+
 TEST_F(PatternRecognitionTest, test_sort_by_station) {
 
   PatternRecognition pr;
@@ -161,7 +471,6 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   int num_points = 5;
   double x_chisq = 22.87148204;
   double y_chisq = 20.99052559;
-  int tracker = 0;
   double y0 = -58.85201389;
   double x0 = -68.94108927;
   double my = 0.03755825;
@@ -181,12 +490,12 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_TRUE(compare_doubles(y_chisq, strks[0].get_y_chisq(), epsilon));
 }
 
-TEST_F(PatternRecognitionTest, test_process) {
+TEST_F(PatternRecognitionTest, test_process_good) {
 
   int n_stations = 5;
   PatternRecognition pr;
 
-  // Set up spacepoints corresponding to straight line
+  // Set up spoints corresponding to a nearly straight line, which both helical and straight fit
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
   SciFiSpacePoint *sp2 = new SciFiSpacePoint();
   SciFiSpacePoint *sp3 = new SciFiSpacePoint();
@@ -231,14 +540,125 @@ TEST_F(PatternRecognitionTest, test_process) {
   spnts.push_back(sp1);
   spnts.push_back(sp4);
 
+  // For a straight fit
+  // ------------------
+  SciFiEvent evt1;
+  evt1.set_spacepoints(spnts);
+
+  pr.process(false, true, evt1); // Helical off, Straight on
+
+  std::vector<SciFiStraightPRTrack> strks = evt1.straightprtracks();
+  std::vector<SciFiHelicalPRTrack> htrks = evt1.helicalprtracks();
+
+  // The track parameters that should be reconstructed from the spacepoints
+  int num_points = 5;
+
+  double line_y0 = -58.85201389;
+  double line_x0 = -68.94108927;
+  double line_my = 0.03755825;
+  double line_mx = -0.02902014;
+  double line_x_chisq = 22.87148204;
+  double line_y_chisq = 20.99052559;
+
+  // Check it matches to within a tolerance epsilon
+  double epsilon = 0.001;
+  ASSERT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_NEAR(line_x0, strks[0].get_x0(), epsilon);
+  EXPECT_NEAR(line_mx, strks[0].get_mx(), epsilon);
+  EXPECT_NEAR(line_x_chisq, strks[0].get_x_chisq(), epsilon);
+  EXPECT_NEAR(line_y0, strks[0].get_y0(), epsilon);
+  EXPECT_NEAR(line_my, strks[0].get_my(), epsilon);
+  EXPECT_NEAR(line_y_chisq, strks[0].get_y_chisq(), epsilon);
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+
+  // For a helical fit
+  //------------------
+
+  sp1->set_used(false);
+  sp2->set_used(false);
+  sp3->set_used(false);
+  sp4->set_used(false);
+  sp5->set_used(false);
+
+  pr.process(true, false, evt1); // Helical on, Straight off
+
+  strks = evt1.straightprtracks();
+  htrks = evt1.helicalprtracks();
+
+  double helix_x0 = -68.2488;
+  double helix_y0 = -57.8109;
+  double helix_R = 136.335;
+  double helix_dsdz = -0.0470962; // Need to check this value is physical
+
+  ASSERT_EQ(1, htrks.size());
+  EXPECT_EQ(1, strks.size());
+  EXPECT_NEAR(helix_x0, htrks[0].get_x0(), epsilon);
+  EXPECT_NEAR(helix_y0, htrks[0].get_y0(), epsilon);
+  EXPECT_NEAR(helix_R, htrks[0].get_R(), epsilon);
+  EXPECT_NEAR(helix_dsdz, htrks[0].get_dsdz(), epsilon);
+  EXPECT_EQ(num_points, htrks[0].get_num_points());
+}
+
+/*
+TEST_F(PatternRecognitionTest, test_process_bad) {
+
+  PatternRecognition pr;
+
+  // Now give it random spacepoints and check it produces no tracks
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
+
+  ThreeVector pos(-50.0, -50.0, -0.652299999999741);
+  sp1->set_position(pos);
+  sp1->set_tracker(0);
+  sp1->set_station(1);
+  sp1->set_type("triplet");
+
+  pos.set(-20, -70, -200.6168999999991);
+  sp2->set_position(pos);
+  sp2->set_tracker(0);
+  sp2->set_station(2);
+  sp2->set_type("triplet");
+
+  pos.set(40.0, -80, -450.4798999999994);
+  sp3->set_position(pos);
+  sp3->set_tracker(0);
+  sp3->set_station(3);
+  sp3->set_type("triplet");
+
+  pos.set(-10.0, 90, -750.4801999999991);
+  sp4->set_position(pos);
+  sp4->set_tracker(0);
+  sp4->set_station(4);
+  sp4->set_type("triplet");
+
+  pos.set(1.0, 20.0, -1100.410099999999);
+  sp5->set_position(pos);
+  sp5->set_tracker(0);
+  sp5->set_station(5);
+  sp5->set_type("triplet");
+
+  // Set up the spacepoints vector
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp5);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+  spnts.push_back(sp1);
+  spnts.push_back(sp4);
+
   SciFiEvent evt;
   evt.set_spacepoints(spnts);
 
   pr.process(evt);
 
-  /*
-  SciFiHelicalPRTrack htrk = evt.helicalprtracks()[0];
+  std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
+  std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
 
+  SciFiHelicalPRTrack htrk = htrks[0];
   std::cerr << " x0 is " << htrk.get_x0() << std::endl;
   std::cerr << " y0 is " << htrk.get_y0() << std::endl;
   std::cerr << " z0 is " << htrk.get_z0() << std::endl;
@@ -247,86 +667,17 @@ TEST_F(PatternRecognitionTest, test_process) {
   std::cerr << " ds/dz is " << htrk.get_dsdz() << std::endl;
   std::cerr << " R is " << htrk.get_R() << std::endl;
   std::cerr << " line_sz_chi2 is " << htrk.get_line_sz_chisq() << std::endl;
+  std::cerr << " circle_x0 is " << htrk.get_circle_x0() << std::endl;
+  std::cerr << " circle_y0 is " << htrk.get_circle_y0() << std::endl;
   std::cerr << " circle_chi2 is " << htrk.get_circle_chisq() << std::endl;
   std::cerr << " chi2 is " << htrk.get_chisq() << std::endl;
   std::cerr << " chi2_dof is " << htrk.get_chisq_dof() << std::endl;
   std::cerr << " num_points is " << htrk.get_num_points() << std::endl;
-  */
 
-  std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
-  std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
-
-  // The track parameters that should be reconstructed from the spacepoints
-  int num_points = 5;
-
-  // For a straight fit
-  double line_y0 = -58.85201389;
-  double line_x0 = -68.94108927;
-  double line_my = 0.03755825;
-  double line_mx = -0.02902014;
-  double line_x_chisq = 22.87148204;
-  double line_y_chisq = 20.99052559;
-
-  // For a circle fit
-  double helix_x0 = -68.2488;
-  double helix_y0 = -57.8109;
-  double helix_R = 136.335;
-
-  unsigned int trks_size = 0;
-  double true_par1 = 0.0;
-  double true_par2 = 0.0;
-  double true_par3 = 0.0;
-  double true_par4 = 0.0;
-  double true_par5 = 0.0;
-  double true_par6 = 0.0;
-  int true_par7 = 0;
-  double recon_par1 = 0.0;
-  double recon_par2 = 0.0;
-  double recon_par3 = 0.0;
-  double recon_par4 = 0.0;
-  double recon_par5 = 0.0;
-  double recon_par6 = 0.0;
-  int recon_par7 = 0;
-
-  if ( pr.get_helical_pr_on() ) {
-    trks_size = htrks.size();
-    true_par1 = helix_x0;
-    true_par2 = helix_y0;
-    true_par3 = helix_R;
-    true_par7 = num_points;
-    recon_par1 = htrks[0].get_x0();
-    recon_par2 = htrks[0].get_y0();
-    recon_par3 = htrks[0].get_R();
-    recon_par7 = htrks[0].get_num_points();
-  } else if ( pr.get_straight_pr_on() ) {
-    trks_size = strks.size();
-    true_par1 = line_x0;
-    true_par2 = line_mx;
-    true_par3 = line_x_chisq;
-    true_par4 = line_y0;
-    true_par5 = line_my;
-    true_par6 = line_y_chisq;
-    true_par7 = num_points;
-    recon_par1 = strks[0].get_x0();
-    recon_par2 = strks[0].get_mx();
-    recon_par3 = strks[0].get_x_chisq();
-    recon_par4 = strks[0].get_y0();
-    recon_par5 = strks[0].get_my();
-    recon_par6 = strks[0].get_y_chisq();
-    recon_par7 = strks[0].get_num_points();
-  }
-
-  // Check it matches to within a tolerance epsilon
-  double epsilon = 0.001;
-
-  EXPECT_EQ(1, trks_size);
-  EXPECT_NEAR(true_par1, recon_par1, epsilon);
-  EXPECT_NEAR(true_par2, recon_par2, epsilon);
-  EXPECT_NEAR(true_par3, recon_par3, epsilon);
-  EXPECT_NEAR(true_par4, recon_par4, epsilon);
-  EXPECT_NEAR(true_par5, recon_par5, epsilon);
-  EXPECT_NEAR(true_par6, recon_par6, epsilon);
-  EXPECT_EQ(true_par7, recon_par7);
+  EXPECT_EQ(0, strks.size());
+  EXPECT_EQ(0, htrks.size());
 }
+*/
+
 
 } // ~namespace MAUS

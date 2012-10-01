@@ -59,6 +59,12 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("SciFiClustExcept"));
   ClustException = _configJSON["SciFiClustExcept"].asInt();
 
+  // Get the flags for turning straight and helical pr on or off
+  assert(_configJSON.isMember("SciFiPRHelicalOn"));
+  _helical_pr_on = _configJSON["SciFiPRHelicalOn"].asBool();
+  assert(_configJSON.isMember("SciFiPRStraightOn"));
+  _straight_pr_on = _configJSON["SciFiPRStraightOn"].asBool();
+
   return true;
 }
 
@@ -67,9 +73,8 @@ bool MapCppTrackerRecon::death() {
 }
 
 bool sort_by_station(SciFiSpacePoint *a, SciFiSpacePoint *b ) {
-  //  Ascending station number.
+  // Ascending station number.
   return ( a->get_station() < b->get_station() );
-  // }
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
@@ -97,7 +102,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
           std::cout << "Calling Pattern Recognition..." << std::endl;
-          pattern_recognition(*event);
+          pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
@@ -127,7 +132,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
 }
 
 Spill MapCppTrackerRecon::read_in_json(std::string json_data) {
-
   Json::FastWriter writer;
   Spill spill;
 
@@ -150,7 +154,7 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
   root = *spill_proc.CppToJson(spill);
 }
-
+/*
 void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   std::vector<SciFiSpacePoint*> spacepoints = evt.spacepoints();
   std::sort(spacepoints.begin(), spacepoints.end(), sort_by_station);
@@ -234,10 +238,10 @@ void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints,
   y_const = solve_y(0);
   y_slope = solve_y(1);
 }
-
+*/
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(ClustException, minPE);
-  clustering.process(evt, modules);
+  SciFiClusterRec clustering(ClustException, minPE, modules);
+  clustering.process(evt);
 }
 
 void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
@@ -245,9 +249,10 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
+                                             SciFiEvent &evt) {
   PatternRecognition pr1;
-  pr1.process(evt);
+  pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {

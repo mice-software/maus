@@ -75,7 +75,7 @@ void KalmanSSTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) 
 void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
   // Reset.
   _F.Zero();
-
+/*
   // Find dz between sites.
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
@@ -85,14 +85,50 @@ void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   // }
 
   // Build _F.
+  switch ( a_site->get_id() ) {
+    case 0 : case 1 :
+      _F = straight_line(deltaZ);
+    case 0 : case 1 :
+
+
+*/
+}
+/*
+TMatrixD KalmanSSTrack::straight_line(double deltaZ) {
+  TMatrixD F(5, 5);
+  F.Zero();
   for ( int i = 0; i < 5; i++ ) {
-    _F(i, i) = 1.;
+    F(i, i) = 1.;
   }
-  _F(0, 1) = deltaZ;
-  _F(2, 3) = deltaZ;
-  _F.Print();
+  F(0, 1) = deltaZ;
+  F(2, 3) = deltaZ;
+
+  return F;
 }
 
+TMatrixD KalmanSSTrack::triplet_magnet(double p) {
+
+  TMatrixD F(5, 5);
+  F.Zero();
+
+  double drift_length = 500.; // mm
+  double Q7_lenght = 2000.; //mm
+  double Q8_lenght = 2000.; //mm
+  double Q9_lenght = 2000.; //mm
+
+  double dBdx = 1.; // T/m
+  double c = 0.2998;
+  double p_GeV = p / 1000.; // p in MeV to GeV
+  double kappa = c*dBdx/p_GeV;
+
+  TMatrixD Mf(5, 5);
+  Mf.Zero();
+  Mf(0, 0) = cosh(kappa)*Q7_lenght
+
+  return F;
+
+}
+*/
 void KalmanSSTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
   std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();

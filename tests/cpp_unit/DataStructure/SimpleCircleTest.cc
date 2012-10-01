@@ -131,9 +131,6 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   double kappa_err = 0.8;
   double delta_R = 9.0;
   double chisq = 10.0;
-  std::vector<double> turning_angle;
-  turning_angle.push_back(11.0);
-  turning_angle.push_back(12.0);
 
   SimpleCircle circ1;
 
@@ -153,7 +150,6 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   circ1.set_kappa_err(kappa_err);
   circ1.set_delta_R(delta_R);
   circ1.set_chisq(chisq);
-  circ1.set_turning_angle(turning_angle);
 
   EXPECT_EQ(circ1.get_x0(), x0);
   EXPECT_EQ(circ1.get_x0_err(), x0_err);
@@ -171,9 +167,6 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   EXPECT_EQ(circ1.get_kappa_err(), kappa_err);
   EXPECT_EQ(circ1.get_delta_R(), delta_R);
   EXPECT_EQ(circ1.get_chisq(), chisq);
-  ASSERT_EQ(circ1.get_turning_angle().size(), 2);
-  EXPECT_EQ(circ1.get_turning_angle()[0], 11.0);
-  EXPECT_EQ(circ1.get_turning_angle()[1], 12.0);
 
   circ1.clear();
 

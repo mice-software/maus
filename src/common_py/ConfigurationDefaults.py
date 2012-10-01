@@ -202,6 +202,8 @@ SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
+SciFiPRHelicalOn = 1
+SciFiPRStraightOn = 1
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -210,12 +212,12 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuratio
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id 
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_run_number = 0
-geometry_download_id = 0
+geometry_download_id = 3
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
@@ -227,8 +229,8 @@ geometry_upload_valid_from = "" # date-time in format like: that the specified i
 geometry_upload_cleanup = True # set to True to clean up after upload
 
 #dates need to get geomtry ids
-get_ids_start_time = ""
-get_ids_stop_time = ""
+get_ids_start_time = "2012-05-08 09:00:00"
+get_ids_stop_time = "2012-05-22 15:47:34.856000"
 get_ids_create_file = True
 
 # this is used by ImputCppDAQData
