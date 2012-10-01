@@ -51,9 +51,6 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
-# Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False
-
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
@@ -81,9 +78,9 @@ kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,   
-                          "nu_e":False, "antu_nu_e":False,
-                          "nu_mu":False, "antu_nu_mu":False,
-                          "nu_tau":False, "antu_nu_tau":False,
+                          "nu_e":False, "anti_nu_e":False,
+                          "nu_mu":False, "anti_nu_mu":False,
+                          "nu_tau":False, "anti_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
 field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
