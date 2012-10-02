@@ -24,7 +24,6 @@
 class Squeak;
 class dataCards;
 class MICERun;
-class MiceMaterials;
 class MiceModule;
 class BTFieldConstructor;
 

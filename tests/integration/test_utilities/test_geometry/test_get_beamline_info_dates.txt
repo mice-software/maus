@@ -1,0 +1,5 @@
+#get beamline information
+get_beamline_by = "dates" #This sets the method which you would like to query the beamline database. Options are run_number, dates(to and from)...
+get_beamline_start_time = "2011-01-14 09:00:00"
+get_beamline_stop_time = "2012-01-14 09:00:00"
+

@@ -25,6 +25,7 @@ import os
 import json
 import unittest
 
+import Configuration
 from MapCppSimulation import MapCppSimulation
 
 class MapCppSimulationVisualisationTestCase(unittest.TestCase):
@@ -74,44 +75,10 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         for filename in glob.glob('g4_*.wrl'):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
 
-    configuration = {
-      "verbose_level":2,
-      "simulation_geometry_filename":"Test.dat",
-      "reconstruction_geometry_filename":"Test.dat",
-      "maximum_number_of_steps":1000,
-      "keep_steps":True,
-      "keep_tracks":True,
-      "simulation_reference_particle":{
-        "position":{"x":0.0, "y":-0.0, "z":-4700.0},
-        "momentum":{"x":0.0, "y":0.0, "z":1.0},
-        "particle_id":-13,
-        "energy":226.0,
-        "time":0.0,
-        "random_seed":10
-      },
-      "geant4_visualisation":True,
-      "visualisation_viewer":"VRML2FILE",
-      "visualisation_theta":90.,
-      "visualisation_phi":90.,
-      "visualisation_zoom":1.,
-      "accumulate_tracks":0,
-      "default_vis_colour":{"red":0. , "green":100.  ,"blue":0.},
-      "pi_plus_vis_colour":{"red":255. , "green":250.  ,"blue":240.},
-      "pi_minus_vis_colour":{"red":105. , "green":105.  ,"blue":105.},
-      "mu_plus_vis_colour":{"red":25. , "green":25.  ,"blue":112.},
-      "mu_minus_vis_colour":{"red":135. , "green":206.  ,"blue":250.},
-      "e_plus_vis_colour":{"red":250. , "green":0.  ,"blue":0.},
-      "e_minus_vis_colour":{"red":250. , "green":69.  ,"blue":0.},
-      "gamma_vis_colour":{"red":255. , "green":20.  ,"blue":147.},
-      "neutron_vis_colour":{"red":139. , "green":69.  ,"blue":19.},
-      "photon_vis_colour":{"red":255. , "green":255.  ,"blue":0.},
-      "physics_model":"QGSP_BERT",
-      "physics_processes":"standard",
-      "reference_physics_processes":"mean_energy_loss",
-      "particle_decay":True,
-      "charged_pion_half_life":-1.,
-      "muon_half_life":-1.,
-      "production_threshold":0.5,
-    }
+    configuration = json.loads(Configuration.Configuration().getConfigJSON())
+    configuration["verbose_level"] = 2
+    configuration["keep_steps"] = True
+    configuration["geant4_visualisation"] = True
+
 if __name__ == '__main__':
     unittest.main()

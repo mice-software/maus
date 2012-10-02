@@ -21,6 +21,7 @@
 #include <utility>
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
@@ -38,7 +39,7 @@ FieldPhaser::~FieldPhaser() {
 void FieldPhaser::SetUp() {
     MiceModule mod;
     _phaserVirtualPlanes.ConstructVirtualPlanes
-                           (MICERun::getInstance()->btFieldConstructor, &mod);
+                           (Globals::GetInstance()->GetMCFieldConstructor(), &mod);
     // set up
     std::vector<BTPhaser::FieldForPhasing*> cavities =
                            BTPhaser::GetInstance()->GetFieldsForPhasing();

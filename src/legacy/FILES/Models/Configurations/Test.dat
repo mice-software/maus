@@ -5,7 +5,7 @@
 
 Configuration Test
 {
-  Dimensions 1. 1. 1. m
+  Dimensions 1. 1. 50. m
   PropertyString Material Galactic
   PropertyDouble G4StepMax 100.0 mm
   Module Box

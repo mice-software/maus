@@ -26,7 +26,6 @@
 
 #include "json/value.h"
 
-#include "Utils/JsonWrapper.hh"
 #include "Interface/Squeal.hh"
 
 /// Squeak class is designed to redirect output to std::out or file
@@ -68,18 +67,28 @@ class Squeak {
   static std::ostream & mout(Squeal::exceptionLevel level);
 
   /// Set the ostream for a given error level (Squeal)
-  static void setOutput(errorLevel level, std::ostream& out);
+  static void setAnOutput(errorLevel level, std::ostream& out);
+
+  /// Set the ostream for all items below "verboseLevel" to /dev/null
+
+  /// If verboseLevel is less than or equal to
+  /// - Squeak::debug then mout(Squeak::debug) redirects to std::cout
+  /// - Squeak::info then mout(Squeak::info) redirects to std::clog
+  /// - Squeak::warning then mout(Squeak::warning) redirects to std::cerr
+  /// - Squeak::error then mout(Squeak::error) redirects to std::cerr
+  /// - Squeak::fatal then mout(Squeak::fatal) redirects to std::cerr
+  /// Note that the redirection is independent of setStandardOutputs status
+  static void setOutputs(int verboseLevel);
 
   /// Turn on/off std::cout, std::cerr, std::clog
 
   /// Set standard outputs to /dev/null depending on verboseLevel:
-  ///   * if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
-  ///   * if verboseLevel > int(Squeak::info), set std::clog to /dev/null
-  ///   * if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
-  ///   * if verboseLevel < 0, take default from int datacard "VerboseLevel"
+  /// - if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
+  /// - if verboseLevel > int(Squeak::info), set std::clog to /dev/null
+  /// - if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
   /// GEANT4 has very verbose output that hides important run control info, so
   /// we can just turn it off by redirecting std::cout here.
-  static void setStandardOutputs(int verboseLevel=-1);
+  static void setStandardOutputs(int verboseLevel);
 
   /// Activate std::cout
 
@@ -112,7 +121,6 @@ class Squeak {
   static std::ostream& cerrOut();
 
  private:
-  errorLevel GetVerboseLevel();
   // constructor is called by any call to mout
   // defines std::map output
   Squeak();
@@ -125,13 +133,11 @@ class Squeak {
   static std::ostream*                       stdout;
   static std::ostream*                       stdlog;
   static std::ostream*                       stderr;
+  static const errorLevel default_error_level;
   // pointer to the singleton instance of the class
   static Squeak * instance;
   // called automagically by mout
   static Squeak *   getInstance();
-  // mout tries to find the datacards in the MICERun, otherwise it operates
-  // verbose
-  static Json::Value* datacards;
   // Set outputs
   static void       initialiseOutputs();
   // Setup Squeal

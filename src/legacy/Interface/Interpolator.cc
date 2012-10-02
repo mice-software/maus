@@ -313,106 +313,6 @@ Interpolator3dSolenoidalTo3d::~Interpolator3dSolenoidalTo3d()
   if(_coordinates) _coordinates->Remove(this); 
 }
 
-void Interpolator3dGridTo1d::DeleteFunc(double*** func)      
-{
-	if(func == NULL) return;
-	for(int i=0; i<NumberOfXCoords(); i++) 
-	{
-		for(int j=0;j<NumberOfYCoords(); j++) 
-			delete [] func[i][j]; 
-		delete [] func[i]; 
-	}
-	delete [] func;
-	func = NULL;
-}
-
-TriLinearInterpolator::TriLinearInterpolator(const TriLinearInterpolator& lhs)
-{
-	_coordinates = new ThreeDGrid(*lhs._coordinates);
-	_F = new double**[_coordinates->xSize()];
-	for(int i=0; i<_coordinates->xSize(); i++)
-	{
-		_F[i] = new double*[_coordinates->ySize()];
-		for(int j=0; j<_coordinates->ySize(); j++)
-		{
-			_F[i][j] = new double[_coordinates->zSize()];
-			for(int k=0; k<_coordinates->zSize(); k++)
-				_F[i][j][k] = lhs._F[i][j][k];
-		}
-	}
-	_coordinates->Add(this);
-}
-
-void TriLinearInterpolator::F(const double Point[3], double Value[1]) const
-{
-	//for this interpolation i take a linear interpolation in x to make the problem 2d then in y to make it 1d
-	int i, j, k; //position index
-	_coordinates->LowerBound(Point[0], i, Point[1], j, Point[2], k);
-	if(i+2>_coordinates->xSize() || j+2>_coordinates->ySize() || k+2>_coordinates->zSize()) 
-	{Value[0]=0; return;}
-	if(i  < 0 || j < 0 || k<0)
-	{Value[0]=0; return;}
-	//interpolation in x
-	double dx = _coordinates->x(i+2)-_coordinates->x(i+1);
-	double f_x[2][2];
-	f_x[0][0] = (_F[i+1][j][k]     - _F[i][j][k]    )/dx*(Point[0]-_coordinates->x(i+1)) + _F[i][j][k];
-	f_x[1][0] = (_F[i+1][j+1][k]   - _F[i][j+1][k]  )/dx*(Point[0]-_coordinates->x(i+1)) + _F[i][j+1][k];
-	f_x[0][1] = (_F[i+1][j][k+1]   - _F[i][j][k+1]  )/dx*(Point[0]-_coordinates->x(i+1)) + _F[i][j][k+1];
-	f_x[1][1] = (_F[i+1][j+1][k+1] - _F[i][j+1][k+1])/dx*(Point[0]-_coordinates->x(i+1)) + _F[i][j+1][k+1];
-	//interpolation in y
-	double f_xy[2];
-	double dy = _coordinates->y(j+2) - _coordinates->y(j+1);
-	f_xy[0] = (f_x[1][0] - f_x[0][0])/dy*(Point[1]-_coordinates->y(j+1)) + f_x[0][0];
-	f_xy[1] = (f_x[1][1] - f_x[0][1])/dy*(Point[1]-_coordinates->y(j+1)) + f_x[0][1];
-	Value[0]  = (f_xy[1] - f_xy[0])/(_coordinates->z(k+2) - _coordinates->z(k+1))*(Point[2] - _coordinates->z(k+1))+f_xy[0];
-}
-
-Interpolator3dGridTo3d::Interpolator3dGridTo3d(const Interpolator3dGridTo3d& rhs)
-{
-	_coordinates = new ThreeDGrid(*rhs._coordinates);
-	for(int i=0; i<3; i++)
-		_interpolator[i] = rhs._interpolator[i]->Clone();
-}
-
-void Interpolator3dGridTo3d::F(const double Point[3], double Value[3]) const
-{
-	if(Point[0]>_coordinates->MaxX() || Point[0]<_coordinates->MinX() || 
-	   Point[1]>_coordinates->MaxY() || Point[1]<_coordinates->MinY() ||
-	   Point[2]>_coordinates->MaxZ() || Point[2]<_coordinates->MinZ() )
-	{Value[0] = 0; Value[1] = 0; Value[2] = 0; return;}
-
-	_interpolator[0]->F(Point, &Value[0]);
-	_interpolator[1]->F(Point, &Value[1]);
-	_interpolator[2]->F(Point, &Value[2]);
-}
-
-void Interpolator3dGridTo3d::Set(ThreeDGrid* grid, double *** Bx, double *** By, double *** Bz, interpolationAlgorithm algo)
-{
-	if(_coordinates!=NULL) _coordinates->Remove(this);
-	grid->Add(this);
-	_coordinates = grid;
-
-	for(int i=0; i<3; i++)
-		if(_interpolator[i] != NULL) delete _interpolator[i];
-
-	switch(algo)
-	{
-		case triLinear:
-			_interpolator[0] = new TriLinearInterpolator(grid, Bx);
-			_interpolator[1] = new TriLinearInterpolator(grid, By);
-			_interpolator[2] = new TriLinearInterpolator(grid, Bz);
-			break;
-		default:
-			throw(Squeal(Squeal::recoverable, "Did not recognise interpolation algorithm", "Interpolator3dGridTo3d::Set") );
-	}
-//	for(Mesh::Iterator it=_coordinates->Begin(); it<_coordinates->End(); it++)
-//	{
-//		for(int i=0; i<3; i++) std::cout << it.State()[i] << " ";
-//		std::cout << " ** ";
-//		for(int i=0; i<3; i++) std::cout << it.Position()[i] << " ";
-//		std::cout << std::endl;
-//	}
-}
 
 Interpolator3dSolenoidalTo3d::interpolationAlgorithm Interpolator3dSolenoidalTo3d::Algorithm(std::string algo)
 {
@@ -421,7 +321,6 @@ Interpolator3dSolenoidalTo3d::interpolationAlgorithm Interpolator3dSolenoidalTo3
 			return interpolationAlgorithm(i); 
 	throw( Squeal(Squeal::recoverable, "Did not recognise interpolation algorithm "+algo, "Interpolator3dSolenoidalTo3d::Algorithm") );
 }
-
 
 
 

@@ -26,7 +26,6 @@
 class Squeak;
 class dataCards;
 class MICERun;
-class MiceMaterials;
 class MiceModule;
 class BTFieldConstructor;
 
@@ -92,11 +91,24 @@ class Globals {
      */
     static dataCards* GetLegacyCards();
 
-    /** Get the BTFieldConstructor (controls access to field maps)
+    /** Get the Monte Carlo BTFieldConstructor (controls access to field maps)
      */
-    static BTFieldConstructor* GetBTFieldConstructor();
+    static BTFieldConstructor* GetMCFieldConstructor();
+
+    /** Get the Reconstruction BTFieldConstructor (controls access to field maps)
+     *
+     *  If simulation_geometry_filename is the same as 
+     *  reconstruction_geometry_filename, this really points at the same memory
+     *  (optimisation to avoid having to build the same thing twice)
+     */
+    static BTFieldConstructor* GetReconFieldConstructor();
+
 
     /** Get the Geant4Manager (controls access to G4 objects)
+     *
+     *  If simulation_geometry_filename is the same as 
+     *  reconstruction_geometry_filename, this really points at the same memory
+     *  (optimisation to avoid having to build the same thing twice)
      */
     static MAUSGeant4Manager* GetGeant4Manager();
 
@@ -107,6 +119,10 @@ class Globals {
      *
      *  Concept is to have reconstruction geometry and separate MC geometry so
      *  that we can do MC vs Recon studies
+     *
+     *  If simulation_geometry_filename is the same as 
+     *  reconstruction_geometry_filename, this really points at the same memory
+     *  (optimisation to avoid having to build the same thing twice)
      */
     static MiceModule* GetMonteCarloMiceModules();
 
@@ -117,6 +133,10 @@ class Globals {
      *
      *  Concept is to have reconstruction geometry and separate MC geometry so
      *  that we can do MC vs Recon studies
+     *
+     *  If simulation_geometry_filename is the same as 
+     *  reconstruction_geometry_filename, this really points at the same memory
+     *  (optimisation to avoid having to build the same thing twice)
      */
     static MiceModule* GetReconstructionMiceModules();
 
@@ -134,9 +154,9 @@ class Globals {
     RunActionManager* _run_action_manager;
     MiceModule* _mc_mods;
     MiceModule* _recon_mods;
-    BTFieldConstructor* _field_constructor;
+    BTFieldConstructor* _mc_field_constructor;
+    BTFieldConstructor* _recon_field_constructor;
     MAUSGeant4Manager* _maus_geant4_manager;
-    MiceMaterials* _mice_materials;
     static Globals* _process;
     // responsible for construction etc
     friend class GlobalsManager;
