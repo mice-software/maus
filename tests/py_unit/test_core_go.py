@@ -64,6 +64,12 @@ class FakeWorker(): #pylint: disable = W0232, R0903
         """
         return False
 
+    def process(self, data): #pylint: disable = W0613, R0201, R0903
+        """  
+        Process function that always returns False.
+        """
+        return False
+
 
 class GoTestCase(unittest.TestCase): #pylint: disable = R0904
     """ Tests for src/common_py/Go.py. """

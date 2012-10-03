@@ -250,6 +250,7 @@ digraph G {
       recon_events_array_item_tof_event_tof_space_points_tof2 -> recon_events_array_item_tof_event_tof_space_points_tof2_array_item
   }
 
+  maus_event_type [shape=record, label="{MausEventType|maus_event_type}"]
   scalars [shape=record, label="{Scalars|scalars}"]
   emr_spill_data [shape=record, label="{EMRSpillData|emr_spill_data}"]
   root_item [shape=record, label="{Spill|}"]
@@ -259,5 +260,7 @@ digraph G {
   root_item -> daq_data
   root_item -> scalars
   root_item -> emr_spill_data
+  root_item -> maus_event_type
+
 }
 

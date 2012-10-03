@@ -28,9 +28,9 @@ import signal
 import time
 import pymongo
 import unittest 
+import json
 
 import celery.task.control
-import ROOT
 
 import libMausCpp # pylint: disable=W0611
 
@@ -43,11 +43,12 @@ def run_simulate_mice(dataflow, output_file_pre, wait=True,
     @param output_file_pre prefix for output file; logs will be written to
            <output_file_pre>.log and root data to <output_file_pre>.root    
     """
-    sim = os.path.expandvars('$MAUS_ROOT_DIR/bin/simulate_mice.py')
+    sim = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
+                            'test_distributed_processing/simulate_mice_json.py')
     log = open(output_file_pre+'.log', 'w')
-    proc = subprocess.Popen([sim,
+    proc = subprocess.Popen(['python', sim,
                             '--type_of_dataflow', dataflow,
-                            '--output_root_file_name', output_file_pre+'.root',
+                            '--output_json_file_name', output_file_pre+'.json',
                             '--doc_store_class', docstore,
                             ],
                             stdout = log, stderr=subprocess.STDOUT)
@@ -105,10 +106,10 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         run_simulate_mice('pipeline_single_thread', single_name)
         print multi_name
         run_simulate_mice('multi_process', multi_name)
-        self.assertFalse(os.path.exists(split_name_in+'.root'))
-        file_names = [multi_name+'.root',
-                      single_name+'.root',
-                      split_name_out+'.root']
+        self.assertFalse(os.path.exists(split_name_in+'.json'))
+        file_names = [multi_name+'.json',
+                      single_name+'.json',
+                      split_name_out+'.json']
         # merge_output hopefully finished in the split multi - equivalent
         # process has run twice in the other two subprocesses + transforms
         print 'killing', split_name_out, 'job'
@@ -116,68 +117,29 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         time.sleep(1) # give a chance for signal and file close to come through
         return file_names
 
-    def _get_job_header_bzr_revision(self, root_file):
+    def sort_by_maus_event_type(self, lines): # pylint: disable = R0201
+        """
+        Sort a list of MAUS events by their event type
+        """
+        lines_sorted = {'Unknown':[], 'JobHeader':[], 'RunHeader':[],
+                        'Spill':[], 'RunFooter':[], 'JobFooter':[]}
+        for line in lines:
+            try:
+                lines_sorted[line['maus_event_type']].append(line)
+            except Exception: # pylint: disable = W0703
+                lines_sorted['Unknown'].append(line)
+        return lines_sorted
+            
+    def _get_data(self, files, event_type, data_key): # pylint: disable = R0201
         """
         Check that there is one entry and return bzr_revision in the JobHeader
         """
-        data = ROOT.MAUS.JobHeaderData() # pylint: disable = E1101
-        tree = root_file.Get("JobHeader")
-        tree.SetBranchAddress("job_header", data)
-        self.assertEqual(tree.GetEntries(), 1)
-        tree.GetEntry()
-        return data.GetJobHeader().GetBzrRevision()
+        data = {}
+        for file_name, events in files.iteritems():
+            data[file_name] = [event[data_key] for event in events[event_type]]
+        return data
 
-    def _get_run_header_run_number(self, root_file):
-        """
-        Check that there is one entry and return run_number in the RunHeader
-        """
-        data = ROOT.MAUS.RunHeaderData() # pylint: disable = E1101
-        tree = root_file.Get("RunHeader")
-        tree.SetBranchAddress("run_header", data)
-        self.assertEqual(tree.GetEntries(), 1)
-        tree.GetEntry()
-        return data.GetRunHeader().GetRunNumber()
-
-    def _get_run_footer_run_number(self, root_file):
-        """
-        Check that there is one entry and return run_number in the RunFooter
-        """
-        data = ROOT.MAUS.RunFooterData() # pylint: disable = E1101
-        tree = root_file.Get("RunFooter")
-        tree.SetBranchAddress("run_footer", data)
-        self.assertEqual(tree.GetEntries(), 1)
-        tree.GetEntry()
-        return data.GetRunFooter().GetRunNumber()
-
-    def _check_job_footer(self, root_file):
-        """
-        Check that there is one entry and time stamp > default
-        """
-        data = ROOT.MAUS.JobFooterData() # pylint: disable = E1101
-        tree = root_file.Get("JobFooter")
-        tree.SetBranchAddress("job_footer", data)
-        self.assertEqual(tree.GetEntries(), 1)
-        tree.GetEntry()
-        self.assertGreater(data.GetJobFooter().GetEndOfJob().GetDateTime(),
-                           '2000-01-01') # just check it isn't default (1976)
-
-    def _get_spill_spill_number_list(self, root_file): # pylint: disable=R0201
-        """
-        Return a list of spill numbers for each spill in the file
-
-        We don't require processing order is the same, merely that the spills
-        are present - so sort before returning
-        """
-        data = ROOT.MAUS.Data() # pylint: disable = E1101
-        tree = root_file.Get("Spill")
-        tree.SetBranchAddress("data", data)
-        spill_numbers = []
-        for i in range(tree.GetEntries()):
-            tree.GetEntry(i)
-            spill_numbers.append(data.GetSpill().GetSpillNumber())
-        return sorted(spill_numbers)
-
-    def test_simulate_mice(self):
+    def test_simulate_mice(self): # pylint: disable = R0914
         """
         Run the simulation and check that certain data in each tree is the same
 
@@ -186,25 +148,32 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         print 'Generating data'
         file_names = self._simulate_mice()
         print 'Checking data'
-        files = [ROOT.TFile(fname, "READ") for fname in file_names] # pylint: disable=E1101, C0301
-        for _file in files:
-            self.assertTrue(_file.IsOpen())
-        bzr_revs = [self._get_job_header_bzr_revision(_file) for _file in files]
-        for rev in bzr_revs[1:]:
-            self.assertEqual(bzr_revs[0], rev)
-        run_nums = [self._get_run_header_run_number(_file) for _file in files]
-        for num in run_nums[1:]:
-            self.assertEqual(run_nums[0], num)
-        run_nums = [self._get_run_footer_run_number(_file) for _file in files]
-        for num in run_nums[1:]:
-            self.assertEqual(run_nums[0], num)
-        for _file in files:
-            self._check_job_footer(_file)
-        spill_nums = \
-                   [self._get_spill_spill_number_list(_file) for _file in files]
-        for num_list in spill_nums[1:]:
-            self.assertEqual(spill_nums[0], num_list)
-
+        files = {}
+        for fname in file_names:
+            files[fname] = [json.loads(line) \
+                                            for line in open(fname).readlines()]
+            files[fname] = self.sort_by_maus_event_type(files[fname])
+        for name, _file in files.iteritems():
+            print name, len(_file)
+        bzr_revs = self._get_data(files, 'JobHeader', 'bzr_revision')
+        for rev in bzr_revs.values()[1:]:
+            self.assertEqual(bzr_revs.values()[0], rev)
+        run_nums = self._get_data(files, 'RunHeader', 'run_number')
+        for run_number_list in run_nums.values():
+            for number in run_number_list:
+                self.assertEqual(number, run_nums.values()[0][0])
+        run_nums = self._get_data(files, 'RunFooter', 'run_number')
+        for run_number_list in run_nums.values():
+            for number in run_number_list:
+                self.assertEqual(number, run_nums.values()[0][0])
+        dates = self._get_data(files, 'JobFooter', 'end_of_job')
+        spill_numbers = self._get_data(files, 'Spill', 'spill_number')
+        for spill_number in spill_numbers.values()[1:]:
+            self.assertEqual(sorted(spill_numbers.values()[0]),
+                             sorted(spill_number))
+        for end_of_job in dates.values():
+            self.assertEqual(len(end_of_job), 1)
+            self.assertGreater(end_of_job[0]['date_time'], '2000-01-01')
 
 if __name__ == "__main__":
     unittest.main()

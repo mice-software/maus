@@ -194,7 +194,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         """
         Prepare for a new run by waiting for current Celery
         tasks to complete, updating the local run number then
-        reconfiguring the Celery nodes.
+        reconfiguring the Celery nodes. Run headers are pushed through celery.
         @param self Object reference.
         @param run_number New run number.
         """
@@ -208,17 +208,22 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         print "---------- RUN %d ----------" % self.run_number
         print "Configuring Celery nodes and birthing transforms..."
         transform = WorkerUtilities.get_worker_names(self.transformer)
-        CeleryUtilities.birth_celery(transform,
-            self.config_doc, self.config_id)
+        run_header_list = CeleryUtilities.birth_celery(transform,
+            self.config_doc, self.config_id, self.run_number)
         print "Celery nodes configured!"
+        for header in run_header_list:
+            self.submit_spill_to_celery(header)
 
     def end_of_run(self, run_number): # pylint: disable=W0613, R0201
         """
-        Kill the old run
+        Kill the old run and push run headers through celery
         @param self Object reference.
         @param run_number Old run number.
+        @return None
         """
-        CeleryUtilities.death_celery()
+        run_footer_list = CeleryUtilities.death_celery(self.run_number)
+        for footer in run_footer_list:
+            self.submit_spill_to_celery(footer)
 
     def print_counts(self):
         """

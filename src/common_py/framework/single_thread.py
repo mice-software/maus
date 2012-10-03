@@ -21,7 +21,7 @@ import maus_cpp.run_action_manager
 
 from framework.utilities import DataflowUtilities
 
-class PipelineSingleThreadDataflowExecutor:
+class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
     """
     @class PipelineSingleThreadDataflowExecutor
     Execute MAUS dataflows as a single-threaded pipeline.
@@ -48,6 +48,7 @@ class PipelineSingleThreadDataflowExecutor:
         head_mode = json.loads(self.json_config_doc)["header_and_footer_mode"]
         self.write_headers = head_mode == "append"
         self.run_number = "first" # used to register first run
+        self.end_of_run_spill = None
 
     def execute(self, job_header, job_footer):
         """
@@ -69,16 +70,16 @@ class PipelineSingleThreadDataflowExecutor:
         # would return true/false on success/failure of birth and death.
         try:
             print("OUTPUT: Setting up outputer")
-            assert(self.outputer.birth(self.json_config_doc) == True or \
-                   self.outputer.birth(self.json_config_doc) == None)
+            birth = self.outputer.birth(self.json_config_doc)
+            assert(birth == True or birth == None)
 
             print("Writing JobHeader...")
             if self.write_headers:
                 self.outputer.save(json.dumps(job_header))
 
             print("INPUT: Setting up input")
-            assert(self.inputer.birth(self.json_config_doc) == True or \
-                   self.inputer.birth(self.json_config_doc) == None)
+            birth = self.inputer.birth(self.json_config_doc)
+            assert(birth == True or birth == None)
 
             print("PIPELINE: Get event, TRANSFORM, MERGE, OUTPUT, repeat")
 
@@ -104,18 +105,19 @@ class PipelineSingleThreadDataflowExecutor:
             raise
 
         finally:
-            print("INPUT: Shutting down inputer")
-            assert(self.inputer.death() == True or \
-                   self.inputer.death() == None)
             if self.run_number == "first":
                 self.run_number = 0
             self.end_of_run(self.run_number)
+
+            print("INPUT: Shutting down inputer")
+            death = self.inputer.death()
+            assert(death == True or death == None)
             if self.write_headers:
                 self.outputer.save(json.dumps(job_footer))
 
+            death = self.outputer.death()
             print("OUTPUT: Shutting down outputer")
-            assert(self.outputer.death() == True or \
-                   self.outputer.death() == None)
+            assert(death == True or death == None)
 
     def process_event(self, event):
         """
@@ -127,6 +129,8 @@ class PipelineSingleThreadDataflowExecutor:
         event_json = json.loads(event)
         if DataflowUtilities.get_event_type(event_json) == "Spill":
             current_run_number = DataflowUtilities.get_run_number(event_json)
+            if (DataflowUtilities.is_end_of_run(event_json)):
+                self.end_of_run_spill = event_json
             if current_run_number != self.run_number:
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
@@ -143,15 +147,15 @@ class PipelineSingleThreadDataflowExecutor:
 
         @param new_run_number run number of the run that is starting
         """
+        run_header = maus_cpp.run_action_manager.start_of_run(new_run_number)
+
         print("MERGE: Setting up merger")
-        assert(self.merger.birth(self.json_config_doc) == True or \
-               self.merger.birth(self.json_config_doc) == None)
+        birth = self.merger.birth(self.json_config_doc)
+        assert(birth == True or birth == None)
 
         print("TRANSFORM: Setting up transformer")
-        assert(self.transformer.birth(self.json_config_doc) == True or \
-               self.transformer.birth(self.json_config_doc) == None)
-
-        run_header = maus_cpp.run_action_manager.start_of_run(new_run_number)
+        birth = self.transformer.birth(self.json_config_doc)
+        assert(birth == True or birth == None)
         if self.write_headers:
             self.outputer.save(run_header)
 
@@ -163,13 +167,25 @@ class PipelineSingleThreadDataflowExecutor:
 
         @param old_run_number run number of the run that is ending
         """
+        if (self.end_of_run_spill == None):
+            print "  Missing an end_of_run spill..."
+            print "  ...creating one to flush the mergers!"
+            self.end_of_run_spill = {"daq_event_type":"physics_event",
+                                     "maus_event_type":"Spill",
+                                     "run_number":self.run_number,
+                                     "spill_number":-1}
+        end_of_run_spill_str = json.dumps(self.end_of_run_spill)
+        end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
+        self.outputer.save(end_of_run_spill_str)
+        self.end_of_run_spill = None
+
         print("TRANSFORM: Shutting down transformer")
-        assert(self.transformer.death() == True or \
-               self.transformer.death() == None)
+        death = self.transformer.death()
+        assert(death == True or death == None)
 
         print("MERGE: Shutting down merger")
-        assert(self.merger.death() == True or \
-               self.merger.death() == None)
+        death = self.merger.death()
+        assert(death == True or death == None)
 
         run_footer = maus_cpp.run_action_manager.end_of_run(old_run_number)
         if self.write_headers:

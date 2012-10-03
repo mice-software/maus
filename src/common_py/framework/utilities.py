@@ -214,7 +214,7 @@ class CeleryUtilities: # pylint: disable=W0232
             raise RabbitMQException(exc)
 
     @staticmethod
-    def birth_celery(transform, config, config_id, timeout = 1000):
+    def birth_celery(transform, config, config_id, run_number, timeout = 1000):
         """
         Set new configuration and transforms in Celery nodes, and
         birth the transforms. An initial ping is done to
@@ -238,14 +238,20 @@ class CeleryUtilities: # pylint: disable=W0232
             response = broadcast("birth", arguments={
                 "transform": transform, 
                 "configuration": config,
-                "config_id": config_id}, 
+                "config_id": config_id,
+                "run_number": run_number},
                 reply=True, timeout=timeout, limit=num_nodes)
         except socket.error as exc:
             raise RabbitMQException(exc)
         CeleryUtilities.validate_celery_response(response)
+        run_headers = []
+        for machines in response:
+            for name in machines.keys():
+                run_headers += machines[name]["run_headers"]
+        return run_headers
 
     @staticmethod
-    def death_celery():
+    def death_celery(run_number):
         """
         Call death on transforms in Celery nodes.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
@@ -253,10 +259,16 @@ class CeleryUtilities: # pylint: disable=W0232
         nodes fails to death.
         """
         try:
-            response = broadcast("death", reply=True)
+            response = broadcast("death", arguments={"run_number":run_number},
+                                 reply=True)
         except socket.error as exc:
             raise RabbitMQException(exc)
         CeleryUtilities.validate_celery_response(response)
+        run_footers = []
+        for machines in response:
+            for name in machines.keys():
+                run_footers += machines[name]["run_footers"]
+        return run_footers
 
     @staticmethod
     def validate_celery_response(response):
@@ -272,6 +284,7 @@ class CeleryUtilities: # pylint: disable=W0232
         nodes raised an error.
         """
         failed_nodes = []
+        print response
         for node in response:
             node_id = node.keys()[0]
             node_status = node[node_id]
