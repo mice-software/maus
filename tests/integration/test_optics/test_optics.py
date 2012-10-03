@@ -17,9 +17,11 @@ def run_optics(test):
     Runs optics application and produces some output
     """
     os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
-    print 'Running optics test', test,
+    print 'Running optics test', test, 
+    log = os.path.expandvars('$MAUS_ROOT_DIR/tmp/log.'+test)
+    print 'logging in ', log,
     proc = subprocess.Popen(['./optics', 'files/cards.'+test], \
-																						stdout = open('log.'+test, 'w'))
+																						stdout = open(log, 'w'))
     proc.wait()
     print 'with return code', proc.returncode
     return proc.returncode

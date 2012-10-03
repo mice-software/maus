@@ -19,15 +19,14 @@
 #include <sstream>
 
 #include "Interface/Squeak.hh"
-#include "Interface/MICERun.hh"
 
 std::ostream*                               Squeak::stdout    = NULL;
 std::ostream*                               Squeak::stdlog    = NULL;
 std::ostream*                               Squeak::stderr    = NULL;
 std::ostream*                               Squeak::voidout   = NULL;
 std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
-Json::Value*                                Squeak::datacards = NULL;
 Squeak *                                    Squeak::instance  = NULL;
+const Squeak::errorLevel Squeak::default_error_level = Squeak::warning;
 
 std::ostream & Squeak::mout() {
   getInstance();
@@ -48,48 +47,36 @@ std::ostream & Squeak::mout(Squeal::exceptionLevel level) {
     return (*output[Squeak::fatal]);
 }
 
-void  Squeak::setOutput(errorLevel level, std::ostream& out) {
+void  Squeak::setAnOutput(errorLevel level, std::ostream& out) {
   getInstance();
   output[level] = &out;
 }
 
 
 Squeak * Squeak::getInstance() {
-  // verbose level is set by datacards. If I use mout before datacards are
-  // defined, should still work; but then re-initialise once datacards defined
-  // to set the verbose level properly
-  if (datacards == NULL) {  // keep trying to find datacards
-    datacards = MICERun::getInstance()->jsonConfiguration;
-    if (datacards != NULL && instance != NULL) {
-      delete instance;
+  if (instance  == NULL) {
       instance = new Squeak();
-    }
+      initialiseOutputs();
+      setOutputs(default_error_level);
+      setStandardOutputs(default_error_level);
   }
-  if (instance  == NULL) instance  = new Squeak();
   return instance;
 }
 
 Squeak::Squeak() {
-  // verboseLevel defaults to warning if datacards not defined (config default)
-  int verboseLevel = 2;
-  if (datacards != NULL) {
-    if (!((*datacards)["verbose_level"].isNull()))
-      verboseLevel = (*datacards)["verbose_level"].asInt();
-  }
-  initialiseOutputs();
+}
 
+void Squeak::setOutputs(int verboseLevel) {
+  getInstance();
+  std::ostream* out[5] = {stdout, stdlog, stderr, stderr, stderr};
   for (int i = 0; i <= fatal; ++i) {
-    errorLevel error = errorLevel(i);
-    if (i >= verboseLevel) output[error] = stdout;
-    else                output[error] = voidout;
+    if (i >= verboseLevel) output[Squeak::errorLevel(i)] = out[i];
+    else                   output[Squeak::errorLevel(i)] = voidout;
   }
 }
 
 void Squeak::setStandardOutputs(int verboseLevel) {
   getInstance();
-  if (verboseLevel < 0 && instance->datacards != NULL) {
-    verboseLevel = (*datacards)["verbose_level"].asInt();
-  }
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
   activateCerr(verboseLevel <= Squeak::error);
@@ -116,15 +103,13 @@ void Squeak::activateClog(bool isActive) {
 
 void Squeak::initialiseOutputs() {
   // assume they are all uninitialised if one is (we always initialise together)
-  if (voidout == NULL) {
-    voidout = new std::ofstream();  // this points at /dev/null by default
-    stdout  = new std::ofstream();
-    stdout->rdbuf(std::cout.rdbuf());
-    stdlog  = new std::ofstream();
-    stdlog->rdbuf(std::clog.rdbuf());
-    stderr  = new std::ofstream();
-    stderr->rdbuf(std::cerr.rdbuf());
-  }
+  voidout = new std::ofstream();  // this points at /dev/null by default
+  stdout  = new std::ofstream();
+  stdout->rdbuf(std::cout.rdbuf());
+  stdlog  = new std::ofstream();
+  stdlog->rdbuf(std::clog.rdbuf());
+  stderr  = new std::ofstream();
+  stderr->rdbuf(std::cerr.rdbuf());
 }
 
 std::ostream& Squeak::nullOut() {

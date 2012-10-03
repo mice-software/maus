@@ -129,7 +129,7 @@ class Go: # pylint: disable=R0921, R0903
         except:
             raise
         finally:
-            print "Clearing Globals" 
+            print "Clearing Globals"
             maus_cpp.globals.death()
         print("DONE")
 

@@ -39,7 +39,8 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
         test_geometry = '/tests/py_unit/test_geometry/testCases/testGeometry/'
         fra = test_geometry+'fastradModel.gdml'
         mag = test_geometry+'FieldInfoTest.xml'
-        xslt = '/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl'
+        xslt = '/src/common_py/geometry/xsltScripts/'+\
+                                        'RotatedGeometryFileTranslation.xsl'
         output = '/tmp/OUTPUTFILE.txt'
         self.xml_in_1 = self.maus + fra
         self.xml_in_2 = self.maus + mag
