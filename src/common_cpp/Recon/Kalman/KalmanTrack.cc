@@ -28,11 +28,11 @@ const double KalmanTrack::SIGMA_ALPHA2 = 1./12.;
 
 KalmanTrack::KalmanTrack() {
   // Initialise member matrices:
-  _V.ResizeTo(1, 1);
-  _H.ResizeTo(1, 5);
+  _V.ResizeTo(2, 2);
+  _H.ResizeTo(2, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
-  _K.ResizeTo(5, 1);
+  _K.ResizeTo(5, 2);
   _Q.ResizeTo(5, 5);
 
   _chi2 = 0.0;
@@ -104,7 +104,7 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
   double SIG_ALPHA = 1.0;
   _V.Zero();
   _V(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
-  //_V(1, 1) = sig_beta*sig_beta/12.;
+  _V(1, 1) = sig_beta*sig_beta/12.;
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
@@ -137,25 +137,25 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
   //
-  TMatrixD m(1, 1);
-  //TMatrixD m(2, 1);
+  // TMatrixD m(1, 1);
+  TMatrixD m(2, 1);
   m = a_site->get_measurement();
 
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
-  TMatrixD ha(1, 1);
-  //TMatrixD ha(2, 1);
+  // TMatrixD ha(1, 1);
+  TMatrixD ha(2, 1);
   ha = TMatrixD(_H, TMatrixD::kMult, a);
   // Extrapolation converted to expected measurement.
   double alpha_model = ha(0, 0);
   a_site->set_projected_alpha(alpha_model);
-  double alpha = m(0, 0);
+  // double alpha = m(0, 0);
 
-  double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
-  a_site->set_chi2(chi2_i);
+  // double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
+  // a_site->set_chi2(chi2_i);
 
-  TMatrixD pull(1, 1);
-  //TMatrixD pull(2, 1);
+  // TMatrixD pull(1, 1);
+  TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
   /////////////////////////////////////////////////////////////////////
   //
@@ -163,7 +163,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   //              K =  A   (V +  B )-1
   TMatrixD C(5, 5);
   C = a_site->get_projected_covariance_matrix();
-/*
+
   TMatrixD A(5, 2);
   A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
   TMatrixD temp1(2, 5);
@@ -172,7 +172,8 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
   TMatrixD temp2(2, 2);
   temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
-*/
+
+/*
   TMatrixD A(5, 1);
   A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
   TMatrixD temp1(1, 5);
@@ -181,6 +182,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
   TMatrixD temp2(1, 1);
   temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
+*/
   // double det;
   temp2.Invert();
   // assert(det != 0);
@@ -239,6 +241,21 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
   smoothing_site->set_smoothed_a(a_smooth);
+
+  // Save chi2 for this site.
+  TMatrixD m(2, 1);
+  m = smoothing_site->get_measurement();
+  double alpha = m(0, 0);
+
+  TMatrixD ha(2, 1);
+  //TMatrixD ha(2, 1);
+  update_H(smoothing_site);
+  ha = TMatrixD(_H, TMatrixD::kMult, a_smooth);
+  // Extrapolation converted to expected measurement.
+  double alpha_model = ha(0, 0);
+
+  double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
+  smoothing_site->set_chi2(chi2_i);
 
   // do the same for covariance matrix
   TMatrixD C(5, 5);

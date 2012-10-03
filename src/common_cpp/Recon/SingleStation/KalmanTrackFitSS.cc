@@ -31,10 +31,12 @@ KalmanTrackFitSS::~KalmanTrackFitSS() {
 //
 // Global track fit.
 //
-void KalmanTrackFitSS::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &ss,
+void KalmanTrackFitSS::process(CLHEP::Hep3Vector &tof0,
+                               CLHEP::Hep3Vector &ss,
                                CLHEP::Hep3Vector &tof1,
-                               CLHEP::Hep3Vector &pr_pos, CLHEP::Hep3Vector &pr_mom) {
-  // for now, do only triplets
+                               CLHEP::Hep3Vector &pr_pos,
+                               CLHEP::Hep3Vector &pr_mom) {
+  // For now, do only triplets
   int numb_sites = 0;
   for ( int i = 0; i < 3; ++i ) {
     if ( ss(i) != 666 ) {
@@ -58,44 +60,55 @@ void KalmanTrackFitSS::process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &ss,
   extrapolate(sites, track, 1);
   std::cout << "Filtering site "        << 1 << std::endl;
   filter(sites, track, 1);
-/*
-  //Extrapolate to first virtual plane
+
+  //Extrapolate to Cherenkov A
   std::cout << "Extrapolating to site " << 2 << std::endl;
   extrapolate(sites, track, 2);
-  std::cout << "Filtering site "        << 2 << std::endl;
+  std::cout << "Filtering VIRTUAL site "        << 2 << std::endl;
   filter_virtual(sites, track, 2);
-  //Extrapolate to second virtual plane
+  //Extrapolate to Cherenkov B
   std::cout << "Extrapolating to site " << 3 << std::endl;
   extrapolate(sites, track, 3);
-  std::cout << "Filtering site "        << 3 << std::endl;
+  std::cout << "Filtering VIRTUAL site "        << 3 << std::endl;
   filter_virtual(sites, track, 3);
-*/
-  // Single Station
+
+  //Extrapolate to first virtual plane
   std::cout << "Extrapolating to site " << 4 << std::endl;
-  extrapolate(sites, track, 2);
-  std::cout << "Filtering site "        << 4 <<std::endl;
-  filter(sites, track, 2);
-
-  std::cout << "Extrapolating to site " << 5 << std::endl;
-  extrapolate(sites, track, 3);
-  std::cout << "Filtering site "        << 5 <<std::endl;
-  filter(sites, track, 3);
-
-  std::cout << "Extrapolating to site " << 6 << std::endl;
   extrapolate(sites, track, 4);
-  std::cout << "Filtering site "        << 6 <<std::endl;
-  filter(sites, track, 4);
-
-  // TOF1
-  std::cout << "Extrapolating to site " << 7 << std::endl;
+  std::cout << "Filtering VIRTUAL site "        << 4 << std::endl;
+  filter_virtual(sites, track, 4);
+  //Extrapolate to second virtual plane
+  std::cout << "Extrapolating to site " << 5 << std::endl;
   extrapolate(sites, track, 5);
-  std::cout << "Filtering site "        << 7 << std::endl;
-  filter(sites, track, 5);
+  std::cout << "Filtering VIRTUAL site "        << 5 << std::endl;
+  filter_virtual(sites, track, 5);
+
+  // Single Station
+  std::cout << "Extrapolating to site " << 6 << std::endl;
+  extrapolate(sites, track, 6);
+  std::cout << "Filtering site "        << 6 <<std::endl;
+  filter(sites, track, 6);
+
+  std::cout << "Extrapolating to site " << 7 << std::endl;
+  extrapolate(sites, track, 7);
+  std::cout << "Filtering site "        << 7 <<std::endl;
+  filter(sites, track, 7);
 
   std::cout << "Extrapolating to site " << 8 << std::endl;
-  extrapolate(sites, track, 6);
-  std::cout << "Filtering site "        << 8 << std::endl;
-  filter(sites, track, 6);
+  extrapolate(sites, track, 8);
+  std::cout << "Filtering site "        << 8 <<std::endl;
+  filter(sites, track, 8);
+
+  // TOF1
+  std::cout << "Extrapolating to site " << 9 << std::endl;
+  extrapolate(sites, track, 9);
+  std::cout << "Filtering site "        << 9 << std::endl;
+  filter(sites, track, 9);
+
+  std::cout << "Extrapolating to site " << 10 << std::endl;
+  extrapolate(sites, track, 10);
+  std::cout << "Filtering site "        << 10 << std::endl;
+  filter(sites, track, 10);
 
 /*
   int numb_measurements = sites.size();
@@ -189,6 +202,9 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   double tof1_vertical_z  = 3924.55+3899.55-12.5/2.;
   double tof1_horizontal_z= 3924.55+3899.55+12.5/2.;
 
+  double cherenkov_A_z = 1;
+  double cherenkov_B_z = 2;
+
   // Site 0 - tof0, horizontal
   first_site.set_measurement(tof0(0)-tof0_central_slab_number);
   first_site.set_direction(tof_hor);
@@ -202,7 +218,7 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   site_1.set_id(1);
   site_1.set_z(tof0_vertical_z);
   sites.push_back(site_1);
-/*
+
   // Site 2 - VIRTUAL
   KalmanSite site_2;
   site_2.set_measurement(0.0);
@@ -217,26 +233,26 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   site_3.set_id(3);
   site_3.set_z(vp2_z);
   sites.push_back(site_3);
-*/
+
   // Site 4 - plane2
   KalmanSite site_4;
   site_4.set_measurement(ss(2));
   site_4.set_direction(ss_2);
-  site_4.set_id(2);
+  site_4.set_id(4);
   site_4.set_z(ss_2_z);
   sites.push_back(site_4);
   // Site 5 - plane1
   KalmanSite site_5;
   site_5.set_measurement(ss(1));
   site_5.set_direction(ss_1);
-  site_5.set_id(3);
+  site_5.set_id(5);
   site_5.set_z(ss_1_z);
   sites.push_back(site_5);
   // Site 6 - plane0
   KalmanSite site_6;
   site_6.set_measurement(ss(0));
   site_6.set_direction(ss_0);
-  site_6.set_id(4);
+  site_6.set_id(6);
   site_6.set_z(ss_0_z);
   sites.push_back(site_6);
 
@@ -244,14 +260,14 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   KalmanSite site_7;
   site_7.set_measurement(6-tof1(1)-tof1_central_slab_number);
   site_7.set_direction(tof_ver);
-  site_7.set_id(5);
+  site_7.set_id(7);
   site_7.set_z(tof1_vertical_z);
   sites.push_back(site_7);
   // Site 8 - tof1, horizontal
   KalmanSite site_8;
   site_8.set_measurement(tof1(0)-tof1_central_slab_number);
   site_8.set_direction(tof_hor);
-  site_8.set_id(6);
+  site_8.set_id(8);
   site_8.set_z(tof1_horizontal_z);
   sites.push_back(site_8);
 /*
@@ -271,22 +287,11 @@ void KalmanTrackFitSS::filter_virtual(std::vector<KalmanSite> &sites,
   // Get Site...
   KalmanSite *a_site = &sites[current_site];
 
-  // Update measurement error:
-  // (non-const std for the perp direction)
-  // track->update_G(a_site);
-
-  // Update H (depends on plane direction.
-  // track->update_H(a_site);
-
-  // Ck = ( (C_k^k-1)-1 + HT*G*H )-1
-  // track->update_covariance(a_site);
-  // Copy projected cov matrix
-  TMatrixD C = a_site->get_projected_covariance_matrix();
+  // Filtered States = Projected States
+  TMatrixD C(5, 5);
+  C = a_site->get_projected_covariance_matrix();
   a_site->set_covariance_matrix(C);
 
-  // a_k = a_k^k-1 + K_k x pull
-  // track->calc_filtered_state(a_site);
-  // Copy projected state
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
   a_site->set_a(a);

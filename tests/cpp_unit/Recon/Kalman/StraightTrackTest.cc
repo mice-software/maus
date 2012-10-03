@@ -34,15 +34,15 @@ class StraightTrackTest : public ::testing::Test {
 void StraightTrackTest::set_up_sites() {
   deltaZ = 1100.0;
   new_site.set_id(0);
-  new_site.set_z(0.0);
-  old_site.set_z(deltaZ);
+  new_site.set_z(deltaZ);
+  old_site.set_z(0.0);
 
   mx = 2.0;
   my = 3.0;
   TMatrixD a(5, 1);
   a(0, 0) = 0.0;
-  a(1, 0) = 0.0;
-  a(2, 0) = mx;
+  a(1, 0) = mx;
+  a(2, 0) = 0.0;
   a(3, 0) = my;
   a(4, 0) = 1./200.;
   old_site.set_a(a);

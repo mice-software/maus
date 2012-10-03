@@ -39,20 +39,20 @@ class HelicalTrackTest : public ::testing::Test {
 
 void HelicalTrackTest::set_up_sites() {
   z0 = 0.;
-  z1 = 1998.;
+  z1 = 350.;
   x0 = 0.;
-  x1 = -8.8663;
+  x1 = -8.0019;
   y0 = 5.;
-  y1 = 0.19982;
+  y1 = 34.614;
   px0= 15.;
-  px1= 20.76;
+  px1= -20.513;
   py0= 15.;
-  py1= 4.3604;
+  py1= 5.4042;
   kappa=1./200.;
 
   old_site.set_z(z1);
   new_site.set_z(z0);
-  new_site.set_id(13);
+  new_site.set_id(16);
 
   a.ResizeTo(5, 1);
   a(0, 0) = x0;

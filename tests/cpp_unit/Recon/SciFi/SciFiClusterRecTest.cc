@@ -96,29 +96,27 @@ TEST_F(SciFiClusterRecTest, test_process) {
 }
 
 TEST_F(SciFiClusterRecTest, test_get_seeds) {
- // SciFiEvent evt;
-/*
-  SciFiEvent* evt = new SciFiEvent();
+  // SciFiEvent evt;
+/*  SciFiEvent* evt = new SciFiEvent();
   SciFiDigit *digit_1 = new SciFiDigit();
   digit_1->set_npe(3.0);
   evt->add_digit(digit_1);
 
   SciFiDigit *digit_2;
   digit_2->set_npe(3.0);
-  //evt->add_digit(digit_2);
+  // evt->add_digit(digit_2);
   SciFiDigit *digit_3;
   digit_3->set_npe(1.0);
-  //evt->add_digit(digit_3);
+  // evt->add_digit(digit_3);
   std::vector<SciFiDigit*> seeds;
 
   SciFiClusterRec *worker = new SciFiClusterRec(cluster_exception, min_npe, modules);
-  //seeds = worker->get_seeds(*evt);
+  // seeds = worker->get_seeds(*evt);
   EXPECT_EQ(2, seeds.size());
 */
 }
 
 TEST_F(SciFiClusterRecTest, test_construct) {
-/*
   SciFiCluster *clust;
   int tracker = 1;
   int station = 1;
@@ -137,7 +135,52 @@ TEST_F(SciFiClusterRecTest, test_construct) {
   double alpha;
 
   worker.construct(clust, this_plane, trf_dir, trf_pos, alpha);
-*/
+}
+
+TEST_F(SciFiClusterRecTest, test_find_plane) {
+  SciFiClusterRec worker(cluster_exception, min_npe, modules);
+  // Check that every tracker plane exists and that "find_plane()" finds it.
+  for ( int tracker = 0; tracker < 2; ++tracker ) {
+    for ( int station = 1; station < 6; ++station ) {
+      for ( int plane = 0; plane < 3; ++plane ) {
+        const MiceModule* a_plane = NULL;
+        a_plane = worker.find_plane(tracker, station, plane);
+        EXPECT_TRUE(a_plane);
+      }
+    }
+  }
+  // Check that "find_plane()" returns null is plane doesn't exist.
+  const MiceModule* a_plane = NULL;
+  int tracker = 0;
+  int station = 6;
+  int plane   = 0;
+  a_plane = worker.find_plane(tracker, station, plane);
+  EXPECT_FALSE(a_plane);
+}
+
+TEST_F(SciFiClusterRecTest, test_neighbours) {
+  int spill   = 1;
+  int event   = 1;
+  int tracker = 1;
+  int station = 1;
+  int plane   = 1;
+  int channel_1 = 1;
+  int channel_2 = 5;
+  int channel_3 = 2;
+  int npe     = 1;
+  int time    = 1;
+
+  SciFiDigit *digit1 = new SciFiDigit(spill, event, tracker, station, plane, channel_1, npe, time);
+  SciFiDigit *digit2 = new SciFiDigit(spill, event, tracker, station, plane, channel_2, npe, time);
+  SciFiDigit *digit3 = new SciFiDigit(spill, event, tracker, station, plane, channel_3, npe, time);
+
+  SciFiClusterRec worker(cluster_exception, min_npe, modules);
+  bool expect_false;
+  expect_false = worker.are_neighbours(digit1, digit2);
+  EXPECT_FALSE(expect_false);
+  bool expect_true;
+  expect_true = worker.are_neighbours(digit1, digit3);
+  EXPECT_TRUE(expect_true);
 }
 
 /*
@@ -146,8 +189,6 @@ TEST_F(SciFiClusterRecTest, test_construct) {
   ThreeVector get_reference_frame_pos(int tracker);
 
   bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
-
-  const MiceModule* find_plane(int tracker, int station, int plane);
 
   void construct(SciFiCluster *clust, const MiceModule* this_plane,
                  ThreeVector &dir, ThreeVector &tracker_ref_frame_pos, double &alpha);

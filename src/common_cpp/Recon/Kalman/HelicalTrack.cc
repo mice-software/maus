@@ -45,9 +45,9 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double old_z = old_site->get_z();
 
   double deltaZ = (new_z-old_z);// deltaZ in mm
-  if ( new_site->get_id() < 15 ) {
-    deltaZ = - deltaZ;
-  }
+  // if ( new_site->get_id() < 15 ) {
+ //   deltaZ = - deltaZ;
+  // }
 
   // Get old state vector...
   TMatrixD prev_site(5, 1);
@@ -118,8 +118,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @kappa/@kappa
   _F(4, 4) = 1.;
 
-  std::cerr << "This is F for deltaz = " << deltaZ << "\n";
-  _F.Print();
+  // std::cerr << "This is F for deltaz = " << deltaZ << "\n";
+  // _F.Print();
 }
 
 } // ~namespace MAUS

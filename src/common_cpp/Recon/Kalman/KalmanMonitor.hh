@@ -49,8 +49,6 @@ class KalmanMonitor {
 
   void save(std::vector<KalmanSite> const &sites);
 
-  void save_global_track(std::vector<KalmanSite> const &sites);
-
   void print_info(std::vector<KalmanSite> const &sites);
 
   double get_smoothed_measurement(KalmanSite &a_site);
