@@ -59,8 +59,8 @@ def run_get_beamlines(run_dates):
         file_name = os.environ['MAUS_ROOT_DIR']+\
                                          '/tmp/get_beamline_info_nothing_output'
         test_out = open(file_name, 'w')
-        subproc = subprocess.Popen([SIM_PATH],\
-                                     stdout = test_out, stderr=subprocess.STDOUT)
+        subproc = subprocess.Popen([SIM_PATH], \
+                                    stdout = test_out, stderr=subprocess.STDOUT)
         subproc.wait()
         test_out.close()
 
@@ -122,7 +122,7 @@ class TestGetBeamlineInfo(unittest.TestCase): #pylint:disable= R0904
         """ Check that get_beamline_info outputs the info by dates """
         run_get_beamlines('nothing')     
         geometry_id_file = os.path.join(TMP_PATH, \
-                                               "get_beamline_info_nothing_output")
+                                             "get_beamline_info_nothing_output")
         fin = open(geometry_id_file, 'r')
         geometry_lines_found = 0
         for lines in fin.readlines():
