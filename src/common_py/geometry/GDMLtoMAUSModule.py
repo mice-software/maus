@@ -20,7 +20,9 @@ import os
 from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
-                         "/src/common_py/geometry/xsltScripts/GDML2G4MICE.xsl"
+        "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
+ROTATEDXSL = os.environ["MAUS_ROOT_DIR"] + \
+        "/src/common_py/geometry/xsltScripts/RotatedGeometryFileTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
 
@@ -91,10 +93,14 @@ class GDMLtomaus(): #pylint: disable = R0903
         if os.path.exists(output) == False:
             raise IOError('Output path doesnt exist '+str(output))
         else:
-            outputfile = output + "/ParentGeometryFile.dat"
+            outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
+            outputfile2 = os.path.join(output, "RotatedGeometryFile.dat")
             config_file = CADImport(xmlin1 = str(self.config_file), \
-                           xsl = str(CONFIGXSL), output = str(outputfile))
+                           xsl = str(CONFIGXSL), output = str(outputfile1))
             config_file.parse_xslt()
+            rotated_file = CADImport(xmlin1 = str(self.config_file), \
+                           xsl = str(ROTATEDXSL), output = str(outputfile2))
+            rotated_file.parse_xslt()
             print "Configuration File Converted"
             length = len(self.step_files)
             for num in range(0, length):

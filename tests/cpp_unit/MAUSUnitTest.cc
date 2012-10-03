@@ -54,15 +54,27 @@ Json::Value SetupConfig() {
     std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
     std::string("\"random_seed\":10}")
   );
+  config["stepping_algorithm"] = "ClassicalRK4";
+  config["delta_one_step"] = -1.;
+  config["delta_intersection"] = -1.;
+  config["epsilon_min"] = -1.;
+  config["epsilon_max"] = -1.;
+  config["miss_distance"] = -1.;
+  config["everything_special_virtual"] = false;
+  config["field_tracker_absolute_error"] = 1.e-4;
+  config["field_tracker_relative_error"] = 1.e-4;
+
   return config;
 }
 
 int main(int argc, char **argv) {
   int test_out = -1;
   try {
+      std::cout << "Initialising Globals" << std::endl;
       MAUS::GlobalsManager::InitialiseGlobals
-                                         (JsonWrapper::JsonToString(SetupConfig()));
+                                     (JsonWrapper::JsonToString(SetupConfig()));
       ::testing::InitGoogleTest(&argc, argv);
+      std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();
   } catch(Squeal squee) {
       std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"

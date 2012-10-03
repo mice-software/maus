@@ -15,37 +15,12 @@
 #include "Interface/Squeal.hh"
 #include "Interface/Mesh.hh"
 #include "Interface/Spline1D.hh"
+#include "Interface/Interpolation/VectorMap.hh"
+#include "Interface/Interpolation/Interpolator3dGridTo1d.hh"
+#include "Interface/Interpolation/TriLinearInterpolator.hh"
+#include "Interface/Interpolation/Interpolator3dGridTo3d.hh"
 
 #include "gsl/gsl_sf_gamma.h"
-
-///// VectorMap  /////
-
-//Abstract base class
-//Maps from arbitrary length array of doubles to arbitrary length array of double e.g. map position vector to field vector
-class VectorMap
-{
-public:
-	//return map value; vectors NOT checked for size
-	virtual void  F    (const double*   point,       double* value)              const = 0;
-	virtual void  F    (const Mesh::Iterator& point, double* value)              const //overload if mesh::pointdimension != vectormap::pointdimension 
-	{double* PointA = new double[this->PointDimension()]; point.Position(PointA); F(PointA, value); delete PointA;}
-  //Compare the length of in and out; if in is longer, append new items in out until they are the same length NOT TESTED YET
-  virtual void FAppend(const std::vector< std::vector<double> >& point_vec, std::vector< std::vector<double> >& value_vec) const;
-	//Checks for self-consistency
-	inline virtual bool  CheckPoint(const std::vector<double>& point) const {return (point.size() == PointDimension());}
-	inline virtual bool  CheckValue(const std::vector<double>& value) const {return (value.size() == ValueDimension());}
-	//Tell me the required dimension of the input point and output value
-	virtual unsigned int PointDimension()         const = 0; //would like to make static! But can't inherit static functions
-	virtual unsigned int ValueDimension()         const = 0;
-	//Read and write operations
-	virtual              VectorMap* Clone()       const = 0; //copy function
-	virtual             ~VectorMap() {;}
-
-	//If VectorMap uses a Mesh return it else return NULL
-	virtual Mesh*        GetMesh()                const {return NULL;}
-private:
-};
-
 
 ///// Function //////
 
@@ -253,105 +228,5 @@ public:
 private:
 	std::vector<Spline1D> _splines;
 };
-
-//////// Interpolator3dGridTo1d ////////
-class Interpolator3dGridTo1d : public VectorMap
-{
-public:
-	//Constructor for grids with constant spacing; 3D arrays go like [index_x][index_y][index_z]
-	Interpolator3dGridTo1d(ThreeDGrid* grid, double ***F) : _coordinates(NULL), _F(NULL)
-	{Set(grid, F);}
-	Interpolator3dGridTo1d() : _coordinates(NULL), _F(NULL) {}
-
-	virtual ~Interpolator3dGridTo1d() {Clear();}
-
-	virtual void F(const double Point[3], double Value[1]) const = 0;
-	virtual Interpolator3dGridTo1d* Clone() const = 0;
-
-
-	inline int       NumberOfXCoords() const {return _coordinates->xSize();}
-	inline int       NumberOfYCoords() const {return _coordinates->ySize();}
-	inline int       NumberOfZCoords() const {return _coordinates->zSize();}
-	unsigned int     PointDimension()  const {return 3;}
-	unsigned int     ValueDimension()  const {return 1;}
-
-	ThreeDGrid* GetMesh()                     {return _coordinates;}
-	ThreeDGrid* GetGrid()                     {return _coordinates;}
-	void      SetGrid(ThreeDGrid* grid)       {if(_coordinates!=NULL) _coordinates->Remove(this); grid->Add(this); _coordinates = grid;}
-	void      SetX(int nCoords, double* x)    {if(_coordinates!=NULL) _coordinates->SetX(nCoords, x);}
-	void      SetY(int nCoords, double* y)    {if(_coordinates!=NULL) _coordinates->SetY(nCoords, y);}
-	void      SetZ(int nCoords, double* z)    {if(_coordinates!=NULL) _coordinates->SetZ(nCoords, z);}
-	void      SetF      (double*** inF)       {DeleteFunc(_F); _F = inF;}
-	void      DeleteFunc(double*** func);
-
-	inline double*** F()         const {return _F;}
-	void             Set(ThreeDGrid* grid, double *** F) {SetGrid(grid); SetF(F);}
-
-	void             Clear() { DeleteFunc(_F); _coordinates->Remove(this);}
-
-	enum             interpolationAlgorithm{biCubic, linearCubic};
-protected:
-	ThreeDGrid   *_coordinates;
-	double     ***_F;
-};
-
-//////// TriLinearInterpolator ///////
-class TriLinearInterpolator : public Interpolator3dGridTo1d
-{
-public:
-	TriLinearInterpolator(ThreeDGrid *grid, double ***F) : Interpolator3dGridTo1d(grid, F) {}
-	TriLinearInterpolator(const TriLinearInterpolator&);
-	~TriLinearInterpolator() {;}
-	void F(const double Point[3], double Value[1]) const;
-	TriLinearInterpolator* Clone() const {return new TriLinearInterpolator(*this);}
-
-};
-
-//////// Interpolator3dGridTo3d //////////
-class Interpolator3dGridTo3d : public VectorMap
-{
-public:
-	enum        interpolationAlgorithm{triLinear};
-
-	//Constructor for grids with constant spacing; 3D arrays go like [index_x][index_y][index_z]
-  //Takes ownership of memory of Bx, By, Bz
-  Interpolator3dGridTo3d(ThreeDGrid* grid, double ***Bx, double ***By, double ***Bz, interpolationAlgorithm algo=triLinear) : _coordinates(NULL)
-	{for(int i=0; i<3; i++) _interpolator[i] = NULL; Set(grid, Bx, By, Bz);}
-	Interpolator3dGridTo3d(const Interpolator3dGridTo3d&);
-	~Interpolator3dGridTo3d() {Clear();}
-	Interpolator3dGridTo3d* Clone() const {return new Interpolator3dGridTo3d(*this);}
-
-	void F(const double Point[3], double Value[3]) const;
-
-	inline int       NumberOfXCoords() const {return _coordinates->xSize();}
-	inline int       NumberOfYCoords() const {return _coordinates->ySize();}
-	inline int       NumberOfZCoords() const {return _coordinates->zSize();}
-	unsigned int     PointDimension()  const {return 3;}
-	unsigned int     ValueDimension()  const {return 3;}
-
-	ThreeDGrid* GetMesh()                    {return _coordinates;}
-	ThreeDGrid* GetGrid()                    {return _coordinates;}
-	void        SetGrid(ThreeDGrid* grid)       {if(_coordinates!=NULL) _coordinates->Remove(this); grid->Add(this); _coordinates = grid;}
-	void        SetX(int nCoords, double* x)    {if(_coordinates!=NULL) _coordinates->SetX(nCoords, x);}
-	void        SetY(int nCoords, double* y)    {if(_coordinates!=NULL) _coordinates->SetY(nCoords, y);}
-	void        SetZ(int nCoords, double* z)    {if(_coordinates!=NULL) _coordinates->SetZ(nCoords, z);}
-
-	void        Set(ThreeDGrid* grid, double *** Bx, double *** By, double *** Bz, interpolationAlgorithm algo=triLinear);
-	void        Clear() {for(int i=0; i<3; i++) delete _interpolator[i]; _coordinates->Remove(this);}
-
-protected:
-	ThreeDGrid             *_coordinates;
-	Interpolator3dGridTo1d *_interpolator[3];
-};
-
-inline void VectorMap::FAppend(const std::vector< std::vector<double> >& point_vec, std::vector< std::vector<double> >& value_vec) const
-{
-  for(size_t i=value_vec.size(); i<point_vec.size(); i++) {
-    value_vec.push_back(std::vector<double>(ValueDimension()) );
-    F( &point_vec[i][0], &value_vec[i][0] );
-  }
-}
-
-
 
 #endif

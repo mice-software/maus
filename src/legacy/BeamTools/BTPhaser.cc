@@ -1,8 +1,8 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTPhaser.hh"
 #include "Interface/Squeak.hh"
-#include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 BTPhaser * BTPhaser::_instance = NULL;
 
@@ -22,7 +22,7 @@ bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
 	bool   _thisPhaseSet = true;
 	std::string phase    = " succeeded";
 	RFData anRFPhase;
-	anRFPhase = MICERun::getInstance()->btFieldConstructor->SetThePhase(Position, time, 0.);
+	anRFPhase = MAUS::Globals::GetInstance()->GetMCFieldConstructor()->SetThePhase(Position, time, 0.);
 	double dt = anRFPhase.GetPhaseError();
 	if(fabs(dt) < _phaseTolerance)
 	{
@@ -38,7 +38,7 @@ bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
 }
 
 bool BTPhaser::IsPhaseSet() {
-  return MICERun::getInstance()->btFieldConstructor->IsPhaseSet();
+  return MAUS::Globals::GetInstance()->GetMCFieldConstructor()->IsPhaseSet();
 }
 
 std::vector<RFData*> BTPhaser::GetRFData()
