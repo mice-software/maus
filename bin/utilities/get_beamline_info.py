@@ -32,6 +32,9 @@ def main():
     configuration = Configreader()
     server = cdb.Beamline()
     print "Server status is " + server.get_status()
+    if configuration.get_beamline_by != 'run_number' or \
+                      configuration.get_beamline_by != 'dates':
+        raise IOError('Please specify query method in a Configuration File') 
     if configuration.get_beamline_by == 'run_number':
         run = configuration.get_beamline_run_number
         id_dict = server.get_beamline_for_run(run)
