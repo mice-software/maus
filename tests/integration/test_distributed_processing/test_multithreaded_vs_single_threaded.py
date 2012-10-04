@@ -158,6 +158,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         bzr_revs = self._get_data(files, 'JobHeader', 'bzr_revision')
         for rev in bzr_revs.values()[1:]:
             self.assertEqual(bzr_revs.values()[0], rev)
+        # we get a run_header/footer for each subprocess in multithreaded mode
         run_nums = self._get_data(files, 'RunHeader', 'run_number')
         for run_number_list in run_nums.values():
             for number in run_number_list:
