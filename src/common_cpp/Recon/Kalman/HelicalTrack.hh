@@ -37,40 +37,10 @@ namespace MAUS {
 
 class HelicalTrack : public KalmanTrack {
  public:
-  explicit HelicalTrack(SciFiHelicalPRTrack const &seed);
+
+  virtual ~HelicalTrack();
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
-
-  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
-
-  void calc_system_noise(KalmanSite *site);
-
-  double get_xc() const { return _xc; }
-
-  double get_yc() const { return _yc; }
-
-  double get_r() const { return _r; }
-
-  double get_projected_x() const { return _projected_x; }
-
-  double get_projected_y() const { return _projected_y; }
-
- private:
-  double _xc, _yc, _r;
-
-  double _B, _q;
-
-  int _tracker, _sign, _h;
-
-  static const double _alpha;
-
-  static const double Pi;
-
-  double _projected_x;
-
-  double _projected_y;
-
-  // static const double ALPHA = -1.0/(300000000.*4.);
 };
 
 } // ~namespace MAUS

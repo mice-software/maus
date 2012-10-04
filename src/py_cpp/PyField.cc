@@ -44,7 +44,7 @@ PyObject* GetFieldValue(PyObject *dummy, PyObject *args) {
   }
   try {
     BTFieldConstructor* maus_field =
-                          Globals::GetInstance()->GetBTFieldConstructor();
+                          Globals::GetInstance()->GetMCFieldConstructor();
     if (maus_field == NULL) {
       PyErr_SetString(PyExc_RuntimeError,
             "Error - somehow MAUS library was initialised but fields are not.");

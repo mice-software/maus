@@ -73,9 +73,8 @@ bool MapCppTrackerRecon::death() {
 }
 
 bool sort_by_station(SciFiSpacePoint *a, SciFiSpacePoint *b ) {
-  //  Ascending station number.
+  // Ascending station number.
   return ( a->get_station() < b->get_station() );
-  // }
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
@@ -107,9 +106,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
-        // if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-        //  track_fit(*event);
-        // }
+         if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+          track_fit(*event);
+         }
         // Perform alignment study.
         // if ( event->spacepoints().size() == 5 ) {
         //  perform_alignment_study(*event);
@@ -133,7 +132,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
 }
 
 Spill MapCppTrackerRecon::read_in_json(std::string json_data) {
-
   Json::FastWriter writer;
   Spill spill;
 
@@ -156,7 +154,7 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
   root = *spill_proc.CppToJson(spill);
 }
-
+/*
 void MapCppTrackerRecon::perform_alignment_study(SciFiEvent &evt) {
   std::vector<SciFiSpacePoint*> spacepoints = evt.spacepoints();
   std::sort(spacepoints.begin(), spacepoints.end(), sort_by_station);
@@ -240,10 +238,10 @@ void MapCppTrackerRecon::fit(std::vector<SciFiSpacePoint*> spacepoints,
   y_const = solve_y(0);
   y_slope = solve_y(1);
 }
-
+*/
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(ClustException, minPE);
-  clustering.process(evt, modules);
+  SciFiClusterRec clustering(ClustException, minPE, modules);
+  clustering.process(evt);
 }
 
 void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {

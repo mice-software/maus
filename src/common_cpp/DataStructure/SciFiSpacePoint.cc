@@ -28,7 +28,8 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
                                     _npe(0.0),
                                     _chi2(0.0),
                                     _type(""),
-                                    _position(0, 0, 0)  {
+                                    _position(0, 0, 0),
+                                    _time(0.)  {
 }
 
 // Copy contructor
@@ -50,6 +51,7 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
   _chi2      = _scifispacepoint.get_chi2();
   _type      = _scifispacepoint.get_type();
   _position  = _scifispacepoint.get_position();
+  _time      = _scifispacepoint.get_time();
 
   _channels.resize(_scifispacepoint._channels.size());
   for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {
@@ -59,7 +61,7 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
   *this = _scifispacepoint;
 }
 
-// Two cluster constructor
+// Three cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
   _used = false;
   _type = "triplet";
@@ -78,12 +80,12 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
 
   _chi2 = 0;
   // _position(0, 0, 0);
-  // _time = 0;
+  _time = 0;
   // _time_error = 0;
   // _time_res   = 0;
 }
 
-// Three cluster constructor
+// Two cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _used = false;
   _type = "duplet";
@@ -100,7 +102,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _chi2 = -10.0;
 
   // _position(0, 0, 0);
-  // _time = 0;
+  _time = 0;
   // _time_error = 0;
   // _time_res   = 0;
 }
@@ -122,6 +124,7 @@ SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &_scifispacepo
   _chi2      = _scifispacepoint.get_chi2();
   _type      = _scifispacepoint.get_type();
   _position  = _scifispacepoint.get_position();
+  _time      = _scifispacepoint.get_time();
 
   _channels.resize(_scifispacepoint._channels.size());
   for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {

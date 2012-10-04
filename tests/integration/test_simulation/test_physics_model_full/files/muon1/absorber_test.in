@@ -1,0 +1,24 @@
+{
+Used for testing cooling component
+}
+
+{Beam Population Species Type vz Energy radius divergence}
+PencilBeam __nev__ __pid__ circular 1 __momentum__MeV 1e-6mm 1e-6mrad
+
+{Parameter Value}
+t_max 1us
+scattering_off 0
+
+{Cylinder-blockage Length Radius Bore ScatterData}
+Absorber __thickness__mm 1000.0mm 1000.0mm __material__
+
+{Output-aperture radius OutputFile}
+OUTDC 1000.0mm 'muon1_output.csv'
+
+{Drift Length}
+TinyDrift 1cm
+
+{Output-aperture radius stopping}
+ENDOUT 1001.0mm 1
+
+PencilBeam,Absorber,OUTDC,ENDOUT;

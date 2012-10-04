@@ -95,7 +95,7 @@ class MapCppTrackerRecon {
    *
    *  Pattern Recogntion identifies which spacepoints are associate with particle tracks,
    *  then fits functions to the tracks using simple least squared fitting 
-   * 
+   *
    *  \param evt the current SciFiEvent
    */
   void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
@@ -129,11 +129,11 @@ class MapCppTrackerRecon {
 
   std::string JsonToString(Json::Value json_in);
 
-  void perform_alignment_study(MAUS::SciFiEvent &evt);
+  // void perform_alignment_study(MAUS::SciFiEvent &evt);
 
-  void fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
-                             double &x_const, double &x_slope,
-                             double &y_const, double &y_slope);
+  // void fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
+  //                           double &x_const, double &x_slope,
+  //                           double &y_const, double &y_slope);
 
  private:
   /// This should be the classname

@@ -76,43 +76,6 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         if ( event->clusters().size() ) {
           spacepoint_recon(event);
         }
-        /*
-        Hep3Vector tof0, tof1, PR_pos, PR_mom;
-        Hep3Vector ss(666., 666., 666.);
-        // double tof0_x, tof0_y, tof1_x, tof1_y;
-        // double tof0_time, tof1_time;
-        bool success = false;
-        if ( event->spacepoints().size() == 1 ) {
-          std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
-          // std::cerr << "Clusters size: " << clusters.size() << "\n";
-          int size = clusters.size();
-          for ( int clust_i = 0; clust_i < size; ++clust_i ) {
-            // std::cerr << clust_i << "\n";
-            if ( clusters[clust_i]->get_plane() == 0 ) ss.setX(clusters[clust_i]->get_alpha());
-            if ( clusters[clust_i]->get_plane() == 1 ) ss.setY(clusters[clust_i]->get_alpha());
-            if ( clusters[clust_i]->get_plane() == 2 ) ss.setZ(clusters[clust_i]->get_alpha());
-          }
-          reconstruct_tofs(root, k, tof0, tof1, PR_pos, PR_mom, success);
-        }
-        if ( success ) {
-          std::cerr << "TOF0 " << tof0(0) << " " << tof0(1) << "\n"
-                    << "TOF1 " << tof1(0) << " " << tof1(1) << "\n";
-          std::cerr << "SS position " << event->spacepoints()[0]->get_position().x() << " "
-                    << event->spacepoints()[0]->get_position().y() << "\n";
-
-          std::ofstream out2("detectors.txt", std::ios::out | std::ios::app);
-                 out2 << tof0(0)    << " " << tof0(1) << " " << tof1(0)    << " " << tof1(1) << " "
-                 << event->spacepoints()[0]->get_position().x() << " "
-                 << event->spacepoints()[0]->get_position().y() << "\n";
-                 out2.close();
-
-
-          std::cerr << "Starting Global Recon" << std::endl;
-          KalmanTrackFitSS fit;
-          fit.process(tof0, ss, tof1, PR_pos, PR_mom);
-          // ++eff_counter;
-        }
-        */
         print_event_info(event, k);
         save_to_json(event, k);
       }

@@ -102,11 +102,7 @@ class SciFiCluster {
 
   ThreeVector get_position() const { return _position; }
 
-  void set_relative_position(ThreeVector rel_pos) { _relat_pos = rel_pos; }
-
   void set_alpha(double channel) { _alpha = channel; }
-
-  ThreeVector get_relative_position() const { return _relat_pos; }
 
   double get_alpha() const { return _alpha; }
 
@@ -114,13 +110,13 @@ class SciFiCluster {
 
   int get_id() const { return _id; }
 
-  void set_true_momentum(ThreeVector p) { _p = p; }
+  void set_true_momentum(ThreeVector p) { _true_p = p; }
 
-  ThreeVector get_true_momentum() const { return _p; }
+  ThreeVector get_true_momentum() const { return _true_p; }
 
-  void set_true_position(ThreeVector position) { _pos = position; }
+  void set_true_position(ThreeVector position) { _true_pos = position; }
 
-  ThreeVector get_true_position() const { return _pos; }
+  ThreeVector get_true_position() const { return _true_pos; }
 
  private:
   bool _used;
@@ -129,8 +125,9 @@ class SciFiCluster {
 
   double _channel_w, _npe, _time, _alpha;
 
-  ThreeVector _pos, _p;
-  ThreeVector _direction, _position, _relat_pos;
+  ThreeVector _true_pos, _true_p;
+
+  ThreeVector _direction, _position;
 
   ClassDef(SciFiCluster, 1)
 }; // Don't forget this trailing colon!!!!

@@ -87,7 +87,7 @@ void SectorMagneticFieldMap::SetInterpolator
     }
     _interpolator = interpolator;
     if (_interpolator != NULL) {
-        ThreeDGrid* grid = _interpolator->GetGrid();
+        ThreeDGrid* grid = _interpolator->GetMesh();
         SectorField::SetPolarBoundingBox
                                     (grid->MinX(), grid->MinY(), grid->MinZ(),
                                      grid->MaxX(), grid->MaxY(), grid->MaxZ());

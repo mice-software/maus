@@ -46,15 +46,15 @@ class KalmanTrack {
 
   void calc_filtered_state(KalmanSite *a_site);
 
-  void update_G(KalmanSite *a_site);
+  void update_V(KalmanSite *a_site);
 
   void update_covariance(KalmanSite *a_site);
 
   void update_H(KalmanSite *a_site);
 
-  virtual void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) = 0;
+  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
-  virtual void calc_system_noise(KalmanSite *site) = 0;
+  void calc_system_noise(KalmanSite *site);
 
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
@@ -68,12 +68,16 @@ class KalmanTrack {
 
   void compute_chi2(const std::vector<KalmanSite> &sites);
 
+  double get_chi2() const { return _chi2; }
+
+  double get_ndf() const { return _ndf; }
+
+  double get_tracker() const { return _tracker; }
+
  protected:
   TMatrixD _H;
 
   TMatrixD _V;
-
-  TMatrixD _G;
 
   TMatrixD _Q;
 
@@ -83,14 +87,16 @@ class KalmanTrack {
 
   TMatrixD _K;
 
-  double _x0, _y0, _chi2, _tracker, _ndf;
-  // static const double sigma_x = 0.64; // x measurement resolution
+  double _chi2, _tracker, _ndf;
+  // static const double sigma_x = 0.64; // x measurement resolution (mm)
 
   static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
 
-  static const double ACTIVE_RADIUS;// = 150.;
+  static const double ACTIVE_RADIUS; // = 150.;
 
-  static const double CHAN_WIDTH;// = 1.333; // (1.4945) effective channel width without overlap
+  static const double CHAN_WIDTH; // = 1.333; // (1.4945) effective channel width without overlap
+
+  static const double SIGMA_ALPHA2;
 };
 
 } // ~namespace MAUS

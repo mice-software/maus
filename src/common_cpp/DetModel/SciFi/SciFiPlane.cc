@@ -72,9 +72,9 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   //
 
   CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0, 0);
-  const Hep3Vector rowy(0, 1., 0);
-  const Hep3Vector rowz(0, 0, -1.);
+  const Hep3Vector rowx(-1., 0., 0.);
+  const Hep3Vector rowy(0., 1., 0.);
+  const Hep3Vector rowz(0., 0., -1.);
   zflip.setRows(rowx, rowy, rowz);
 
   G4RotationMatrix* trot = new G4RotationMatrix(mod->globalRotation());
@@ -89,13 +89,13 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   // G4RotationMatrix* trot = new G4RotationMatrix();
   // G4ThreeVector dir(0, 1, 0);
   // dir = dir*(*trot);
-/*
+  /*
   std::cerr << "Module name: " << doubletName << "\n"
             << "Module rotation: " << *(trot) << "\n"
             // << "Plane direction: " << dir << "\n"
             << "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
             << "Mothers rotation is: "      << *(mlv->GetRotation()) << "\n";
-*/
+  */
   // this is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,

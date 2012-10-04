@@ -59,4 +59,9 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.get_ids_start_time = config_dict['get_ids_start_time']
         self.get_ids_stop_time = config_dict['get_ids_stop_time']
         self.get_ids_create_file = config_dict['get_ids_create_file']
+        self.get_beamline_by = config_dict['get_beamline_by']
+        self.get_beamline_run_number = config_dict['get_beamline_run_number']
+        self.get_beamline_start_time = config_dict['get_beamline_start_time']
+        self.get_beamline_stop_time = config_dict['get_beamline_stop_time']
+
 

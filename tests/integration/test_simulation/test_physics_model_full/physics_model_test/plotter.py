@@ -121,15 +121,21 @@ def group_tests(geometry_list):
                     test_dict[test] = geo
     return (test_lists, test_dict)
 
-def build_legend(canvas, histograms, legends):
+def build_legend(canvas, tests, test_dict, histograms):
     """
     Build a legend for the canvas
     """
+    legends = [code_name(test_dict[a_test]) for a_test in tests]
+    for index, leg in enumerate(legends):
+        rms = str("RMS %.4g" % histograms[index].GetRMS())
+        mean = str("Mean %.6g" % histograms[index].GetMean())
+        legends[index] = '#splitline{'+legends[index]+'}'+'{'+mean+' '+rms+'}'
     canvas.cd()
-    leg_min =  0.89-0.07*len(histograms)
+    leg_min =  0.89-0.08*len(histograms)
     if leg_min < 0.1:
         leg_min = 0.1
-    leg = ROOT.TLegend(0.13, leg_min, 0.5, 0.89) # pylint: disable=E1101
+    leg = ROOT.TLegend(0.0, leg_min, 0.4, 0.90) # pylint: disable=E1101
+    leg.SetEntrySeparation(0.6)
     for i, hist in enumerate(histograms):
         leg.AddEntry(hist, legends[i])
     leg.SetFillColor(10)
@@ -137,6 +143,15 @@ def build_legend(canvas, histograms, legends):
     leg.Draw()
     canvas.Update()
     LEGENDS.append(leg)
+
+def set_margins(canvas):
+    """
+    Make some clearance for the legend
+    """
+    canvas.SetLeftMargin(0.4)
+    canvas.SetRightMargin(0.05)
+    canvas.Update()
+    
 
 def build_title(canvas, name):
     """
@@ -150,7 +165,6 @@ def build_title(canvas, name):
     leg2.Draw()
     canvas.Update()
     LEGENDS.append(leg2)
-
 
 def plot(file_list):
     """
@@ -167,9 +181,9 @@ def plot(file_list):
         (test_group, test_dict) = group_tests(geo_list)
         for test_list in test_group:
             (canv, h_list) = KSTest.make_plots(test_list)
-            legends = [code_name(test_dict[test]) for test in test_list]
-            build_legend(canv, h_list[1:], legends)
+            build_legend(canv, test_list, test_dict, h_list[1:])
             build_title(canv, test_dict[test_list[0]])
+            set_margins(canv)
             fname = file_name(test_dict[test_list[0]], test_list[0])
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)

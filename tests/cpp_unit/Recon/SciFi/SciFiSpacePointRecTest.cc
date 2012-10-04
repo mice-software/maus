@@ -100,4 +100,33 @@ TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
   EXPECT_FALSE(test_2);
 }
 
+/*
+  void process(SciFiEvent &evt);
+
+  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+
+  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+
+  void build_duplet(SciFiSpacePoint* duplet);
+
+  void build_triplet(SciFiSpacePoint* triplet);
+
+  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+
+  bool kuno_accepts(SciFiCluster* cluster1,
+                    SciFiCluster* cluster2,
+                    SciFiCluster* cluster3);
+
+
+  bool clusters_are_not_used(SciFiCluster* candidate_A,
+                             SciFiCluster* candidate_B);
+
+  bool clusters_are_not_used(SciFiCluster* candidate_A,
+                             SciFiCluster* candidate_B,
+                             SciFiCluster* candidate_C);
+
+  bool duplet_within_radius(SciFiCluster* candidate_A,
+                            SciFiCluster* candidate_B);
+*/
+
 } // ~namespace MAUS

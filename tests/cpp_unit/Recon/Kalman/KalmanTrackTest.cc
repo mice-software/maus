@@ -16,7 +16,8 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
 #include "gtest/gtest.h"
 
@@ -28,29 +29,62 @@ class KalmanTrackTest : public ::testing::Test {
   virtual ~KalmanTrackTest() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
-  KalmanSite *a_site;
+  MAUS::KalmanSite *a_site;
 };
+
+TEST_F(KalmanTrackTest, test_constructor) {
+  // a_site->set_measurement(0);
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
+  EXPECT_EQ(track->get_chi2(), 0.0);
+  EXPECT_EQ(track->get_ndf(), 0.0);
+  EXPECT_EQ(track->get_tracker(), -1);
+}
+
+//
+// ------- Projection ------------
+//
+TEST_F(KalmanTrackTest, test_projection_methods) {
+}
+
+//
+// ------- Filtering ------------
+//
+TEST_F(KalmanTrackTest, test_filtering_methods) {
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
+  CLHEP::Hep3Vector direction_plane0_tracker0 = (0., 1., 0.);
+  CLHEP::Hep3Vector direction_plane1_tracker0 = (-0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker0 = (0.866, -0.5, 0.0);
+
+  CLHEP::Hep3Vector direction_plane0_tracker1 = (0., 1., 0.);
+  CLHEP::Hep3Vector direction_plane1_tracker1 = (0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker1 = (-0.866, -0.5, 0.0);
+
+  // KalmanSite *a_site;
+  // a_site->set_direction(direction_plane0_tracker0);
+  // a_site->set_measurement(0.0);
 /*
-TEST_F(KalmanTrackTest, test_updateG) {
-  a_site->set_measurement(0);
-  KalmanTrack *track = new StraightTrack();
-  track->update_G(a_site);
-}
+  double x, px, y, py, kappa;
+  x =
+  TMatrixD projected_a(5, 1);
+  projected_a(0, 0) = x;
+  projected_a(0, 0) = px;
+  projected_a(0, 0) = y;
+  projected_a(0, 0) = py;
+  projected_a(0, 0) = kappa;
 
-TEST_F(KalmanTrackTest, test_propagator) {
-}
+  a_site->set_projected_a();
+  a_site->set_projected_covariance_matrix();
 
-void KalmanTrack::update_G(KalmanSite *a_site) {
-  double alpha = (a_site->get_measurement())(0, 0);
-  double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
-                 (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
-  double sig_beta = l/CHAN_WIDTH;
-  double SIG_ALPHA = 1.0;
-  _G.Zero();
-  _G(0, 0) = SIG_ALPHA*SIG_ALPHA;
-  _G(1, 1) = sig_beta*sig_beta;
-  _G.Invert();
-}
+
+  a_site->get_a(a_filt);
+  a_site->get_projected_alpha(alpha_model);
+
+
+
+  track->update_H(&a_site);
+  track->calc_filtered_state
 */
+}
+
 
 } // ~namespace MAUS

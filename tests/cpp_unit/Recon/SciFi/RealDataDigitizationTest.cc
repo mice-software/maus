@@ -19,6 +19,7 @@
 
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 

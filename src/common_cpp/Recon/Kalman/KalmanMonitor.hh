@@ -49,23 +49,12 @@ class KalmanMonitor {
 
   void save(std::vector<KalmanSite> const &sites);
 
-  void save_mc(std::vector<KalmanSite> const &sites);
-
-  void save_global_track(std::vector<KalmanSite> const &sites);
-
   void print_info(std::vector<KalmanSite> const &sites);
 
   double get_smoothed_measurement(KalmanSite &a_site);
 
  private:
   std::vector<double> _alpha_meas, _site, _alpha_projected;
-
- /* double _alpha_extrap[30], _alpha_std[30];
-
-  double _alpha_smoothed[30], _alpha_std_smoothed[30];
-
-  double _site[30], _err[30];
-*/
 };
 
 } // ~namespace MAUS

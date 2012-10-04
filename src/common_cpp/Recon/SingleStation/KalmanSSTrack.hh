@@ -46,6 +46,10 @@ class KalmanSSTrack {
 
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 
+  void magnet_drift();
+
+  void straight_line(double deltaZ);
+
   void calc_filtered_state(KalmanSite *a_site);
 
   void update_G(KalmanSite *a_site);

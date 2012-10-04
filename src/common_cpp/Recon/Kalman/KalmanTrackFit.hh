@@ -36,7 +36,6 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
-#include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 
@@ -54,8 +53,6 @@ class KalmanTrackFit {
 
   void process(std::vector<SciFiStraightPRTrack> straight_tracks);
 
-  // void process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se, CLHEP::Hep3Vector &tof1);
-
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
@@ -67,7 +64,7 @@ class KalmanTrackFit {
   //                             CLHEP::Hep3Vector &tof1, std::vector<KalmanSite> &sites);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                        std::vector<SciFiCluster*> &clusters);
+                        std::vector<SciFiCluster*> &clusters, double &seed_pz);
 
   void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
@@ -76,11 +73,7 @@ class KalmanTrackFit {
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
  private:
-  static const bool _mc_run = 1;
-
-  bool _helical_track, _straight_track;
-
-// private:
+  double _seed_cov;
 };
 
 } // ~namespace MAUS

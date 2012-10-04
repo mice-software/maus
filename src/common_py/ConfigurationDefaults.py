@@ -51,9 +51,6 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
-# Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False
-
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
@@ -67,6 +64,7 @@ simulation_reference_particle = { # used for setting particle phase
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+everything_special_virtual = False
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
@@ -80,11 +78,20 @@ kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,   
-                          "nu_e":False, "antu_nu_e":False,
-                          "nu_mu":False, "antu_nu_mu":False,
-                          "nu_tau":False, "antu_nu_tau":False,
+                          "nu_e":False, "anti_nu_e":False,
+                          "nu_mu":False, "anti_nu_mu":False,
+                          "nu_tau":False, "anti_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+
+stepping_algorithm = "ClassicalRK4" # numerical integration routine
+delta_one_step = -1. # Geant4 step accuracy parameter
+delta_intersection = -1.
+epsilon_min = -1.
+epsilon_max = -1.
+miss_distance = -1.
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -212,12 +219,12 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuratio
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id 
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_run_number = 0
-geometry_download_id = 0
+geometry_download_id = 3
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
@@ -227,13 +234,20 @@ geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_RO
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 geometry_upload_cleanup = True # set to True to clean up after upload
+technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 
 #dates need to get geomtry ids
-get_ids_start_time = ""
-get_ids_stop_time = ""
+get_ids_start_time = "2012-05-08 09:00:00"
+get_ids_stop_time = "2012-05-22 15:47:34.856000"
 get_ids_create_file = True
 
-# this is used by ImputCppDAQData
+#get beamline information
+get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
+get_beamline_run_number = ""
+get_beamline_start_time = ""
+get_beamline_stop_time = ""
+
+# this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
 Calib_Events_Only = False

@@ -24,6 +24,7 @@
 
 #pragma link C++ class MAUS::ThreeVector+;
 #pragma link C++ class std::vector<int>;
+#pragma link C++ class std::vector<double>+;
 
 #pragma link C++ class MAUS::RunHeader+;
 #pragma link C++ class MAUS::RunFooter+;
@@ -117,6 +118,7 @@
 #pragma link C++ class MAUS::SciFiDigit+;
 #pragma link C++ class MAUS::SciFiCluster+;
 #pragma link C++ class MAUS::SciFiSpacePoint+;
+#pragma link C++ class std::vector<SciFiSpacePoint*>+;
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
 
