@@ -1,3 +1,5 @@
+// generate using "dot file_structure.dot -Tpng -o file_structure.png"
+
 digraph G {
   node [shape=record];
   subgraph DAQ {

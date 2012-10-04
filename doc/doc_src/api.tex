@@ -372,20 +372,20 @@ The two leftmost colourless boxes do indeed represent an extension to the ladder
 \end{figure}
 
 \section{Module Initialisation and Destruction}
-MAUS has two execution concepts. A \emph{Job} refers to a single execution of the code, while a \emph{Run} refers to the processing of data for a MICE data run or Monte Carlo run.
+MAUS has two execution concepts. A \verb|Job| refers to a single execution of the code, while a \verb|Run| refers to the processing of data for a MICE data run or Monte Carlo run.
 
-In MAUS, Inputters, Mappers, Reducers and Outputters are initialised at the start of every Job and destructed at the end of every Job. \emph{birth(...)} for Inputters and Outputters is called at the start of every Job and \emph{death()} is called at the end of every Job. The \emph{birth(...)} for Mappers and Reducers is called at the start of every Run and \emph{death()} is called at the end of every Run.
+In MAUS, Inputters, Mappers, Reducers and Outputters are initialised at the start of every Job and destructed at the end of every Job. \verb|birth(...)| for Inputters and Outputters is called at the start of every Job and \verb|death()| is called at the end of every Job. The \verb|birth(...)| for Mappers and Reducers is called at the start of every Run and \verb|death()| is called at the end of every Run.
 
 The logic is that for each code execution we typically want to access data from a single data source and output data to a single data file. But mappers and reducers are reinitialised for each run to enable loading of new calibrations, etc. It is required that all transient information about the reconstruction pertaining to a run - particularly ID of the calibration and cabling used - is recorded in the StartOfRun data structure. Any summary information on code execution during the run may be stored in the EndOfRun data structure. All transient information pertaining to a job - for example code version or bzr branch - should be recorded in the StartOfJob data structure. Any summary information on code execution during the job may be stored in the EndOfJob data structure.
 
 \section{Global Objects - Objects for Many Modules}
-There are some objects that sit outside the scope of the modular framework described above. Typically these are objects that do not belong to any one module, but need to be accessed by many. Examples are the logging functionality (Squeak), ErrorHandler, Configuration datacards, field maps, geometry description and Geant4 interfaces. These are accessed through the static singleton class \emph{Globals} defined in \emph{src/common_cpp/Utils/Globals.hh}. Initialisation is handled in \emph{src/common_cpp/Globals/GlobalsManager.hh}. One Globals instance is initialised per subprocess when running in multiprocessing mode.
+There are some objects that sit outside the scope of the modular framework described above. Typically these are objects that do not belong to any one module, but need to be accessed by many. Examples are the logging functionality (Squeak), ErrorHandler, Configuration datacards, field maps, geometry description and Geant4 interfaces. These are accessed through the static singleton class \verb|Globals| defined in \verb|src/common_cpp/Utils/Globals.hh|. Initialisation is handled in \verb|src/common_cpp/Globals/GlobalsManager.hh|. One Globals instance is initialised per subprocess when running in multiprocessing mode.
 
-For python users, some Global objects can be accessed by reference to the maus_cpp.globals module.
+For python users, some Global objects can be accessed by reference to the \verb|maus_cpp.globals module|.
 
 \subsection{Global Object Initialisation}
-Global objects are initialised before any modules in Go.py and deleted after all modules are deathed. Global object initialisation and destruction is handled at the Job level by \emph{src/common_cpp/Globals/GlobalManager.hh} and called in python via \emph{maus_cpp.globals} as above.
+Global objects are initialised before any modules in Go.py and deleted after all modules are deathed. Global object initialisation and destruction is handled at the Job level by \verb|src/common_cpp/Globals/GlobalManager.hh| and called in python via \verb|maus_cpp.globals| as above.
 
-Run-by-run initialisation is handled by the RunActionManager, defined in \emph{src/common_cpp/Utils/RunActionManager.hh}. The RunActionManager holds a list of objects inheriting from \emph{RunActionBase} each of which defines functions to call at the start and end of each run.
+Run-by-run initialisation is handled by the RunActionManager, defined in \verb|src/common_cpp/Utils/RunActionManager.hh|. The RunActionManager holds a list of objects inheriting from \verb|RunActionBase| each of which defines functions to call at the start and end of each run.
 
 

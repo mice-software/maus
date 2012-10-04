@@ -25,6 +25,8 @@ bin/simulate_mice.py --configuration_file my_configuration.py
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# NOTE: please use lower_case_and_underscores for new configuration cards
+
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
