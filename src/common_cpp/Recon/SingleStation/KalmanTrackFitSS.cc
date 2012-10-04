@@ -61,23 +61,23 @@ void KalmanTrackFitSS::process(CLHEP::Hep3Vector &tof0,
   std::cout << "Filtering site "        << 1 << std::endl;
   filter(sites, track, 1);
 
-  //Extrapolate to Cherenkov A
+  // Extrapolate to Cherenkov A
   std::cout << "Extrapolating to site " << 2 << std::endl;
   extrapolate(sites, track, 2);
   std::cout << "Filtering VIRTUAL site "        << 2 << std::endl;
   filter_virtual(sites, track, 2);
-  //Extrapolate to Cherenkov B
+  // Extrapolate to Cherenkov B
   std::cout << "Extrapolating to site " << 3 << std::endl;
   extrapolate(sites, track, 3);
   std::cout << "Filtering VIRTUAL site "        << 3 << std::endl;
   filter_virtual(sites, track, 3);
 
-  //Extrapolate to first virtual plane
+  // Extrapolate to first virtual plane
   std::cout << "Extrapolating to site " << 4 << std::endl;
   extrapolate(sites, track, 4);
   std::cout << "Filtering VIRTUAL site "        << 4 << std::endl;
   filter_virtual(sites, track, 4);
-  //Extrapolate to second virtual plane
+  // Extrapolate to second virtual plane
   std::cout << "Extrapolating to site " << 5 << std::endl;
   extrapolate(sites, track, 5);
   std::cout << "Filtering VIRTUAL site "        << 5 << std::endl;
@@ -192,6 +192,7 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   CLHEP::Hep3Vector ss_2(-0.86, -.5, 0.);
   CLHEP::Hep3Vector ss_1(0.86, -.5, 0.);
   CLHEP::Hep3Vector ss_0(0., 1., 0.);
+
   double tof0_horizontal_z = 0.;
   double tof0_vertical_z   = 12.5;
   double vp1_z = 3911.85055;
@@ -202,8 +203,8 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   double tof1_vertical_z  = 3924.55+3899.55-12.5/2.;
   double tof1_horizontal_z= 3924.55+3899.55+12.5/2.;
 
-  double cherenkov_A_z = 1;
-  double cherenkov_B_z = 2;
+  double cherenkov_A_z = 1.;
+  double cherenkov_B_z = 2.;
 
   // Site 0 - tof0, horizontal
   first_site.set_measurement(tof0(0)-tof0_central_slab_number);
@@ -219,67 +220,81 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   site_1.set_z(tof0_vertical_z);
   sites.push_back(site_1);
 
-  // Site 2 - VIRTUAL
+  // Site 2 - CHERENKOV A
   KalmanSite site_2;
   site_2.set_measurement(0.0);
-  site_2.set_direction((0., 1., 0.));
+  site_2.set_direction((0., 0., 0.));
   site_2.set_id(2);
-  site_2.set_z(vp1_z);
+  site_2.set_z(cherenkov_A_z);
   sites.push_back(site_2);
-  // Site 3 - VIRTUAL
+  // Site 3 - CHERENKOV B
   KalmanSite site_3;
   site_3.set_measurement(0.0);
-  site_3.set_direction((0., 1., 0.));
+  site_3.set_direction((0., 0., 0.));
   site_3.set_id(3);
-  site_3.set_z(vp2_z);
+  site_3.set_z(cherenkov_B_z);
   sites.push_back(site_3);
 
-  // Site 4 - plane2
+  // Site 4 - VIRTUAL
   KalmanSite site_4;
-  site_4.set_measurement(ss(2));
-  site_4.set_direction(ss_2);
+  site_4.set_measurement(0.0);
+  site_4.set_direction((0., 0., 0.));
   site_4.set_id(4);
-  site_4.set_z(ss_2_z);
+  site_4.set_z(vp1_z);
   sites.push_back(site_4);
-  // Site 5 - plane1
+  // Site 3 - VIRTUAL
   KalmanSite site_5;
-  site_5.set_measurement(ss(1));
-  site_5.set_direction(ss_1);
+  site_5.set_measurement(0.0);
+  site_5.set_direction((0., 1., 0.));
   site_5.set_id(5);
-  site_5.set_z(ss_1_z);
+  site_5.set_z(vp2_z);
   sites.push_back(site_5);
-  // Site 6 - plane0
+
+  // Site 4 - plane2
   KalmanSite site_6;
-  site_6.set_measurement(ss(0));
-  site_6.set_direction(ss_0);
+  site_6.set_measurement(ss(2));
+  site_6.set_direction(ss_2);
   site_6.set_id(6);
-  site_6.set_z(ss_0_z);
+  site_6.set_z(ss_2_z);
   sites.push_back(site_6);
+  // Site 5 - plane1
+  KalmanSite site_7;
+  site_7.set_measurement(ss(1));
+  site_7.set_direction(ss_1);
+  site_7.set_id(7);
+  site_7.set_z(ss_1_z);
+  sites.push_back(site_7);
+  // Site 6 - plane0
+  KalmanSite site_8;
+  site_8.set_measurement(ss(0));
+  site_8.set_direction(ss_0);
+  site_8.set_id(8);
+  site_8.set_z(ss_0_z);
+  sites.push_back(site_8);
 
   // Site 7 - tof1, vertical
-  KalmanSite site_7;
-  site_7.set_measurement(6-tof1(1)-tof1_central_slab_number);
-  site_7.set_direction(tof_ver);
-  site_7.set_id(7);
-  site_7.set_z(tof1_vertical_z);
-  sites.push_back(site_7);
+  KalmanSite site_9;
+  site_9.set_measurement(6-tof1(1)-tof1_central_slab_number);
+  site_9.set_direction(tof_ver);
+  site_9.set_id(9);
+  site_9.set_z(tof1_vertical_z);
+  sites.push_back(site_9);
   // Site 8 - tof1, horizontal
-  KalmanSite site_8;
-  site_8.set_measurement(tof1(0)-tof1_central_slab_number);
-  site_8.set_direction(tof_hor);
-  site_8.set_id(8);
-  site_8.set_z(tof1_horizontal_z);
-  sites.push_back(site_8);
-/*
-  for ( int j = 1; j < numb_sites; ++j ) {
+  KalmanSite site_10;
+  site_10.set_measurement(tof1(0)-tof1_central_slab_number);
+  site_10.set_direction(tof_hor);
+  site_10.set_id(10);
+  site_10.set_z(tof1_horizontal_z);
+  sites.push_back(site_10);
+
+/*for ( int j = 1; j < numb_sites; ++j ) {
     KalmanSite a_site;
     a_site.set_measurement(clusters[j]->get_alpha());
     a_site.set_direction(clusters[j]->get_direction());
     a_site.set_z(clusters[j]->get_position().z());
     a_site.set_id(clusters[j]->get_id());
     sites.push_back(a_site);
-  }
-*/
+  }*/
 }
 
 void KalmanTrackFitSS::filter_virtual(std::vector<KalmanSite> &sites,

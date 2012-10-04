@@ -222,10 +222,10 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
 
     clear_tracks();
 
-    std::cout << "Finished spill " << _nSpills << std::endl;
-    std::cout << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
-    std::cout << "Straight tracks this spill: " << _stracks.GetEntries() << std::endl;
-    std::cout << "Helical tracks this spill: " << _circles.GetEntries() << std::endl;
+    std::cerr << "Finished spill " << _nSpills << std::endl;
+    std::cerr << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
+    std::cerr << "Straight tracks this spill: " << _stracks.GetEntries() << std::endl;
+    std::cerr << "Helical tracks this spill: " << _circles.GetEntries() << std::endl;
     // std::cout << "Cumulative spacepoints: " << _spoints.GetEntries() << std::endl;
   } else {
     std::cerr << "Failed to import json to spill\n";

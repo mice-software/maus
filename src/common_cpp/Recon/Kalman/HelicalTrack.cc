@@ -20,20 +20,6 @@
 
 namespace MAUS {
 
-// const double HelicalTrack::_alpha = 1.0/(0.3*4.);
-
-// const double HelicalTrack::Pi = 3.14159265;
-/*
-HelicalTrack::HelicalTrack(SciFiHelicalPRTrack const &seed) {
-  // Initialise straight-track member matrices:
-  _V.ResizeTo(2, 2);
-  _H.ResizeTo(2, 5);
-  _F.ResizeTo(5, 5);
-  _A.ResizeTo(5, 5);
-
-  _Q.ResizeTo(5, 5);
-}
-*/
 HelicalTrack::~HelicalTrack() {}
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
@@ -44,10 +30,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
 
-  double deltaZ = (new_z-old_z);// deltaZ in mm
-  // if ( new_site->get_id() < 15 ) {
- //   deltaZ = - deltaZ;
-  // }
+  double deltaZ = (new_z-old_z); // deltaZ in mm
 
   // Get old state vector...
   TMatrixD prev_site(5, 1);
@@ -70,7 +53,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @x/@py
   _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/a;
   // @x/@kappa
-  _F(0, 4) = 0.; // old_px*deltaZ*cos(a*deltaZ*old_kappa)-old_py*deltaZ*sin(a*deltaZ*old_kappa);
+  _F(0, 4) = 0.;
 
   // @px/@x
   _F(1, 0) = 0.;
@@ -81,8 +64,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @px/@py
   _F(1, 3) = -sin(a*deltaZ*old_kappa);
   // @px/@kappa
-  _F(1, 4) = 0.; // -old_px*a*deltaZ*sin(a*deltaZ*old_kappa)-old_py*a*deltaZ*cos(a*deltaZ*old_kappa);
-
+  _F(1, 4) = 0.;
 
   // @y/@x
   _F(2, 0) = 0.;
@@ -93,7 +75,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @y/@py
   _F(2, 3) = sin(a*deltaZ*old_kappa)/a;
   // @y/@kappa
-  _F(2, 4) = 0.; // old_py*deltaZ*cos(a*deltaZ*old_kappa)+old_px*deltaZ*sin(a*deltaZ*old_kappa);
+  _F(2, 4) = 0.;
 
 
   // @py/@x
@@ -105,7 +87,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @py/@py
   _F(3, 3) = cos(a*deltaZ*old_kappa);
   // @py/@kappa
-  _F(3, 4) = 0.; // -old_py*a*deltaZ*sin(a*deltaZ*old_kappa)+old_px*a*deltaZ*cos(a*deltaZ*old_kappa);
+  _F(3, 4) = 0.;
 
   // @kappa/@x
   _F(4, 0) = 0.;
@@ -117,9 +99,6 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 3) = 0.;
   // @kappa/@kappa
   _F(4, 4) = 1.;
-
-  // std::cerr << "This is F for deltaz = " << deltaZ << "\n";
-  // _F.Print();
 }
 
 } // ~namespace MAUS

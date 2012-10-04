@@ -15,8 +15,11 @@
  *
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
+#include <algorithm>
+
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4RotationMatrix.hh"
+
 
 namespace MAUS {
 

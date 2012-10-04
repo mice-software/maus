@@ -100,7 +100,8 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
   double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
                  (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
   double sig_beta = l/CHAN_WIDTH;
-  std::cerr << "Chan measured: " << alpha << ". Lenght: " << l <<"; numb chan: " << sig_beta << "\n";
+  std::cerr << "Chan measured: " << alpha << ". Lenght: " << l
+            <<"; numb chan: " << sig_beta << "\n";
   double SIG_ALPHA = 1.0;
   _V.Zero();
   _V(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
@@ -111,10 +112,6 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
-
-  // if ( a_site->get_id() < 15 ) {
-    // dx = -dx;
-  // }
 
   _H.Zero();
   _H(0, 0) = -A*dy;
@@ -149,12 +146,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   // Extrapolation converted to expected measurement.
   double alpha_model = ha(0, 0);
   a_site->set_projected_alpha(alpha_model);
-  // double alpha = m(0, 0);
 
-  // double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
-  // a_site->set_chi2(chi2_i);
-
-  // TMatrixD pull(1, 1);
   TMatrixD pull(2, 1);
   pull = TMatrixD(m, TMatrixD::kMinus, ha);
   /////////////////////////////////////////////////////////////////////
@@ -173,16 +165,6 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD temp2(2, 2);
   temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
 
-/*
-  TMatrixD A(5, 1);
-  A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
-  TMatrixD temp1(1, 5);
-  temp1 = TMatrixD(_H, TMatrixD::kMult, C);
-  TMatrixD B(1, 1);
-  B = TMatrixD(temp1, TMatrixD::kMultTranspose, _H);
-  TMatrixD temp2(1, 1);
-  temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
-*/
   // double det;
   temp2.Invert();
   // assert(det != 0);
@@ -248,7 +230,6 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   double alpha = m(0, 0);
 
   TMatrixD ha(2, 1);
-  //TMatrixD ha(2, 1);
   update_H(smoothing_site);
   ha = TMatrixD(_H, TMatrixD::kMult, a_smooth);
   // Extrapolation converted to expected measurement.
@@ -284,7 +265,7 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   if ( id <= 14 ) _tracker = 0;
   if ( id > 14 ) _tracker = 1;
 
-  //double alpha, model_alpha;
+  // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
     _chi2 += site.get_chi2();

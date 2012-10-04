@@ -28,9 +28,6 @@ void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
   double deltaZ = new_z-old_z;
-  // if ( new_site->get_id() < 15 ) {
-  //  deltaZ = - deltaZ;
-  // }
 
   // Build _F.
   for ( int i = 0; i < 5; i++ ) {

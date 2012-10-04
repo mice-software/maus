@@ -147,9 +147,10 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   std::vector<SciFiCluster*> clusters;
   std::vector<SciFiSpacePoint> spacepoints = seed.get_spacepoints();
   process_clusters(spacepoints, clusters, seed_pz);
-  // the clusters are sorted by plane number.
+  // The clusters are sorted by plane number.
 
-  std::cerr << "Helical Pz: " << pz << " " << seed_pz << " " <<clusters[0]->get_true_momentum().z() << "\n";
+  std::cerr << "Helical Pz: " << pz << " " << seed_pz << " "
+            << clusters[0]->get_true_momentum().z() << "\n";
 
   int numb_sites = clusters.size();
 
@@ -401,7 +402,9 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   double c = 300000000.; // m/s2
   double gamma = 1./pow(1.-pow(deltaZ/(c*deltaT), 2.), 0.5);
   seed_pz = gamma*mass*deltaZ/deltaT;
-  std::cerr << "Pz: " << gamma << " " << deltaZ << " " << deltaT << " " << seed_pz << " " << clusters[0]->get_true_momentum().z() << "\n";
+  std::cerr << "Pz: " << gamma << " " << deltaZ << " "
+            << deltaT << " " << seed_pz << " "
+            << clusters[0]->get_true_momentum().z() << "\n";
 
   // seed_pz = 200.;
 }

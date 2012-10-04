@@ -94,12 +94,13 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
       mc_px = -mc_px;
     }
 
-    out2 <<
-a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0) << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " " <<
-a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " " << a(3, 0) << " " << a(4, 0) << " " <<
-a_smooth(0, 0) << " " << a_smooth(1, 0) << " " << a_smooth(2, 0) << " " << a_smooth(3, 0) << " " << a_smooth(4, 0) << " " <<
-mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " " <<
-pull << " " << pull2 << " " << id     << "\n";
+    out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
+         << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " "
+         << a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " " << a(3, 0)
+         << " " << a(4, 0) << " " << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
+         << a_smooth(2, 0) << " " << a_smooth(3, 0) << " " << a_smooth(4, 0) << " "
+         << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
+         << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }
 }
@@ -112,7 +113,7 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
 
   TMatrixD H(2, 5);
   H.Zero();
-  H(0, 0) = - A*dy;
+  H(0, 0) = -A*dy;
   H(0, 2) =  A*dx;
 
   TMatrixD a_smooth(5, 1);

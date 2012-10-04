@@ -59,9 +59,9 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   CLHEP::Hep3Vector direction_plane1_tracker1 = (0.866, -0.5, 0.0);
   CLHEP::Hep3Vector direction_plane2_tracker1 = (-0.866, -0.5, 0.0);
 
-  //KalmanSite *a_site;
-  //a_site->set_direction(direction_plane0_tracker0);
-  //a_site->set_measurement(0.0);
+  // KalmanSite *a_site;
+  // a_site->set_direction(direction_plane0_tracker0);
+  // a_site->set_measurement(0.0);
 /*
   double x, px, y, py, kappa;
   x =

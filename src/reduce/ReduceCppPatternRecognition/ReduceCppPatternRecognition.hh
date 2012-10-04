@@ -81,6 +81,26 @@ class ReduceCppPatternRecognition {
   int const get_num_spoints() { return _spoints.GetEntries(); }
   MAUS::Spill get_spill() { return _spill; }
 
+  /** Takes json data and returns a Spill
+  *
+  *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+  *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+  *
+  *  \param json_data a string holding spill's worth of data in json format
+  */
+  bool read_in_json(std::string json_data);
+
+  void draw_histos(TTree * t1, TCanvas * c1);
+  void draw_graphs(TTree * t1, TCanvas * c1);
+  void draw_stracks(TCanvas * c1);
+  void draw_circles(TCanvas * c1);
+  TF1 make_strack(double c, double m);
+  TArc make_circle(double x0, double y0, double R);
+  void clear_tracks();
+
+  void Save();
+  void update_info(TCanvas * c1, TPaveText *pt);
+
  private:
 
   Json::Value root;
@@ -130,26 +150,6 @@ class ReduceCppPatternRecognition {
 
   // The current spill
   Spill _spill;
-
-  /** Takes json data and returns a Spill
-   *
-   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
-   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
-   *
-   *  \param json_data a string holding spill's worth of data in json format
-   */
-  bool read_in_json(std::string json_data);
-
-  void draw_histos(TTree * t1, TCanvas * c1);
-  void draw_graphs(TTree * t1, TCanvas * c1);
-  void draw_stracks(TCanvas * c1);
-  void draw_circles(TCanvas * c1);
-  TF1 make_strack(double c, double m);
-  TArc make_circle(double x0, double y0, double R);
-  void clear_tracks();
-
-  void Save();
-  void update_info(TCanvas * c1, TPaveText *pt);
 };
 
 } // ~namespace MAUS

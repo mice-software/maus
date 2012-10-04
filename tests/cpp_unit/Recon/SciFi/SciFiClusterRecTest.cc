@@ -41,9 +41,9 @@ class SciFiClusterRecTest : public ::testing::Test {
     _module = new MiceModule(filename);
     modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
-    //SciFiCluster *cluster = new SciFiCluster();
+    // SciFiCluster *cluster = new SciFiCluster();
 
-    //event.add_cluster(cluster);
+    // event.add_cluster(cluster);
   }
   virtual ~SciFiClusterRecTest() {}
   virtual void SetUp()    {}
@@ -57,7 +57,7 @@ class SciFiClusterRecTest : public ::testing::Test {
 
 // process(SciFiEvent &evt, std::vector<const MiceModule*> modules)
 void SciFiClusterRecTest::create_scifievent_digits() {
- // evt.digits();
+  // evt.digits();
   // Create 15 good digits + 2 digits to be merged + 1 digit to be left over (noise)
 /*
 get_npe
@@ -68,8 +68,6 @@ get_tracker()
 get_station() 
 get_plane()
 get_channel()
-
-
 */
 }
 
@@ -117,6 +115,7 @@ TEST_F(SciFiClusterRecTest, test_get_seeds) {
 }
 
 TEST_F(SciFiClusterRecTest, test_construct) {
+/*
   SciFiCluster *clust;
   int tracker = 1;
   int station = 1;
@@ -132,9 +131,10 @@ TEST_F(SciFiClusterRecTest, test_construct) {
   // compute it's direction & position in TRF...
   ThreeVector trf_dir(0., 1., 0.);
   ThreeVector trf_pos(0., 0., 0.);
-  double alpha;
+  // double alpha;
 
-  worker.construct(clust, this_plane, trf_dir, trf_pos, alpha);
+  // worker.construct(clust, this_plane, trf_dir, trf_pos, alpha);
+*/
 }
 
 TEST_F(SciFiClusterRecTest, test_find_plane) {
@@ -199,6 +199,4 @@ TEST_F(SciFiClusterRecTest, test_neighbours) {
 
   void make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds);
 */
-
-
 } // ~namespace MAUS

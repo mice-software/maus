@@ -40,7 +40,8 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
   look_for_duplets(evt, clusters);
 }
 
-void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,
+                                           std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
   // For each tracker,
   for ( int Tracker = 0; Tracker < 2; Tracker++ ) {
     // For each station,
@@ -75,7 +76,8 @@ void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt, std::vector<SciFiClu
   }  // end loop over trackers
 }
 
-void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt,
+                                          std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
   // Run over left-overs and make duplets without any selection criteria
   for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
     for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
