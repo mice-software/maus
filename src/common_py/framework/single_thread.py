@@ -177,7 +177,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             end_of_run_spill_str = json.dumps(self.end_of_run_spill)
             end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
             if self.write_headers: # write to disk only if write_headers is set
-                self.outputer.save(self.end_of_run_spill)
+                self.outputer.save(self.end_of_run_spill_str)
         self.end_of_run_spill = None
 
         print("TRANSFORM: Shutting down transformer")
