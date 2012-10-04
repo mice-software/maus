@@ -55,38 +55,30 @@ fi
 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure $MAUS_THIRD_PARTY 2>&1 | tee -a $FILE_STD
+	./configure $MAUS_THIRD_PARTY >& $FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh 
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 else
 	echo "The other loop"
-	./configure 2>&1 | tee -a $FILE_STD
+	./configure 2>>$FILE_STD 1>>$FILE_STD
 	echo "Sourcing the environment..."
-	source env.sh
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 	echo "Building third party libraries (takes a while...)"
-	./third_party/build_all.bash | tee -a $FILE_STD
+	./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
 	echo "Resource the environment (catches the new ROOT version)"
-	source env.sh
+	source env.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
 
 echo "Cleaning the MAUS build state"
-scons -c -s 2>&1 | tee -a $FILE_STD
-if [ $? != 0 ]; then
-  echo "FAIL Failed to clean MAUS using scons - exiting"
-  exit 1
-fi
+scons -c 2>>$FILE_STD 1>>$FILE_STD
 
 echo "Building MAUS"
-scons build -s 2>&1 | tee -a $FILE_STD
+(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
-  echo "FAIL Failed to make MAUS using scons - exiting "
+  echo "FAIL Failed to make MAUS using scons - exiting (check the log file)"
   exit 1
 fi
 
 echo "Run the tests"
-./tests/run_tests.bash 2>&1 | tee -a $FILE_STD
-if [ $? != 0 ]; then
-  echo "FAIL Tests failed"
-  exit 1
-fi
+(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD
 
