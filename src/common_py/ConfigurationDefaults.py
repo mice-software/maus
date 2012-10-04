@@ -53,7 +53,6 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
-<<<<<<< TREE
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
 # headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
@@ -67,8 +66,6 @@ header_and_footer_mode = "append" #append or dont_append
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
-=======
->>>>>>> MERGE-SOURCE
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
