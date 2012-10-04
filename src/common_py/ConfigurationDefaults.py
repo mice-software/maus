@@ -53,6 +53,7 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
+<<<<<<< TREE
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
 # headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
@@ -66,6 +67,8 @@ header_and_footer_mode = "append" #append or dont_append
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
+=======
+>>>>>>> MERGE-SOURCE
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
@@ -93,9 +96,9 @@ kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,   
-                          "nu_e":False, "antu_nu_e":False,
-                          "nu_mu":False, "antu_nu_mu":False,
-                          "nu_tau":False, "antu_nu_tau":False,
+                          "nu_e":False, "anti_nu_e":False,
+                          "nu_mu":False, "anti_nu_mu":False,
+                          "nu_tau":False, "anti_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
 field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
@@ -247,11 +250,18 @@ geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_RO
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 geometry_upload_cleanup = True # set to True to clean up after upload
+technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 
 #dates need to get geomtry ids
 get_ids_start_time = ""
 get_ids_stop_time = ""
 get_ids_create_file = True
+
+#get beamline information
+get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
+get_beamline_run_number = ""
+get_beamline_start_time = ""
+get_beamline_stop_time = ""
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
