@@ -15,20 +15,18 @@
  *
  */
 
-// #include "src/common_cpp/JsonCppStreamer/JsonCppConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonRunHeaderConverter.hh"
 
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/JsonCppProcessors/RunHeaderProcessor.hh"
 
 namespace MAUS {
 
-// Spill* JsonCppConverter::_convert(const Json::Value* data) const{
-//   return SpillProcessor().JsonToCpp(*data);
-// }
-
-Json::Value* CppJsonConverter::_convert(const Spill* data) const {
-  return SpillProcessor().CppToJson(*data);
+Json::Value* CppJsonRunHeaderConverter::_convert(const RunHeaderData* data) const {
+  if (data == NULL || data->GetRunHeader() == NULL)
+      return new Json::Value();
+  Json::Value* my_json = RunHeaderProcessor().CppToJson(*data->GetRunHeader());
+  return my_json;
 }
 }
 

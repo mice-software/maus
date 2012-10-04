@@ -25,6 +25,8 @@ bin/simulate_mice.py --configuration_file my_configuration.py
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# NOTE: please use lower_case_and_underscores for new configuration cards
+
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
@@ -50,6 +52,19 @@ verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+
+# set how headers and footers are handled - "append" will set to
+# append headers and footers to the output; dont_append will set to not append
+# headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
+# RunFooter
+#
+# For example, if the user wants to copy data from one format to another, he
+# should set to dont_append to avoid header and footer information being taken
+# to the output
+header_and_footer_mode = "append" #append or dont_append
+
+# Used by MapPyRemoveTracks.
+keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track

@@ -21,19 +21,20 @@
 namespace MAUS {
 
 
-  class MyInputter : public InputBase<int> {
+  class MyInputter : public InputBase<int*> {
   public:
-    MyInputter() : InputBase<int>("TestClass") {}
-    MyInputter(const MyInputter& mr) : InputBase<int>(mr) {}
+    MyInputter() : InputBase<int*>("TestClass") {}
+    MyInputter(const MyInputter& mr) : InputBase<int*>(mr) {}
     virtual ~MyInputter() {}
 
   private:
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _emitter() {
+    virtual int* _emitter_cpp() {
       return new int(27);
     }
+
 
   private:
     FRIEND_TEST(InputBaseTest, TestConstructor);
@@ -45,10 +46,10 @@ namespace MAUS {
     MyInputter_squeal() : MyInputter() {}
 
   private:
-    virtual int* _emitter() {
+    virtual int* _emitter_cpp() {
       throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _emitter",
-		   "int* _emitter(int* t) const");
+                   "Expected Test Squeal in _emitter_cpp",
+                   "int* _emitter_cpp()");
     }
   };
 
@@ -57,7 +58,7 @@ namespace MAUS {
     MyInputter_exception() : MyInputter() {}
 
   private:
-    virtual int* _emitter() {
+    virtual int* _emitter_cpp() {
       throw std::exception();
     }
   };
@@ -67,7 +68,7 @@ namespace MAUS {
     MyInputter_otherexcept() : MyInputter() {}
 
   private:
-    virtual int* _emitter() {throw 17;}
+    virtual int* _emitter_cpp() {throw 17;}
   };
 
   TEST(InputBaseTest, TestConstructor) {
@@ -94,8 +95,8 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<<"Fail: Birth function failed. Check ModuleBaseTest"
-	<< std::endl;
+        << "Fail: Birth function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
@@ -106,55 +107,55 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<<"Fail: Death function failed. Check ModuleBaseTest"
-	<< std::endl;
+        << "Fail: Death function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
   TEST(InputBaseTest, TestEmitter) {
     MyInputter mm;
 
-    int* i = mm.emitter();
+    int* i = mm.emitter_cpp();
 
     ASSERT_TRUE(*i == 27)
-      <<"Fail: _emitter method not called properly"
-      <<std::endl;
+      << "Fail: _emitter_cpp method not called properly"
+      << std::endl;
 
     /////////////////////////////////////////////////////
     MyInputter_squeal mm_s;
     try {
-      mm_s.emitter();
+      mm_s.emitter_cpp();
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
-	<< std::endl;
+        << "Fail: Squeal should have been handled"
+        << std::endl;
     }
 
     /////////////////////////////////////////////////////
     MyInputter_exception mm_e;
     try {
-      mm_e.emitter();
+      mm_e.emitter_cpp();
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
-	<< std::endl;
+        << "Fail: Exception should have been handled"
+        << std::endl;
     }
 
     /////////////////////////////////////////////////////
     MyInputter_otherexcept mm_oe;
     try {
-      mm_oe.emitter();
+      mm_oe.emitter_cpp();
       ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
+        << "Fail: No exception thrown"
+        << std::endl;
     }
     catch(UnhandledException& e) {}
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
+        << "Fail: Expected exception of type UnhandledException to be thrown"
+        << std::endl;
     }
 
     delete i;

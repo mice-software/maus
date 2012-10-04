@@ -15,46 +15,32 @@
  *
  */
 
-#ifndef CPPJSONCONVERTER_H
-#define CPPJSONCONVERTER_H
+#ifndef _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONJOBFOOTERCONVERTER_H_
+#define _SRC_COMMON_CPP_CONVERTER_DATACONVERTERS_CPPJSONJOBFOOTERCONVERTER_H_
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-// #include "src/common_cpp/JsonCppStreamer/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
 
+class JobFooterData;
+
 /*!
- * \class JsonCppConverter
+ * \class CppJsonJobFooterConverter
  *
- * \brief Converts JSON documents into corresponding binary Cpp fromat
+ * \brief Converts binary Cpp footer into corresponding json type
  *
  * JsonCppConverter is build on \a ConverterBase as a specialisation to
  * handle the conversion of data from \a Json::Value to binary \a MausData
  * format. Since Json documents often come in the form of a string, these
  * too are accepted and parsed on the fly.
- *
- * \author Alexander Richards, Imperial College London
- * \date 06/01/2012
  */
-  class CppJsonConverter : public ConverterBase<Spill, Json::Value> {
+  class CppJsonJobFooterConverter : public ConverterBase<JobFooterData, Json::Value> {
   public:
-    CppJsonConverter()
-      : ConverterBase<Spill, Json::Value>("CppJsonConverter") {}
+    CppJsonJobFooterConverter()
+      : ConverterBase<JobFooterData, Json::Value>("CppJsonConverter") {}
 
   private:
-    /*!
-     * \brief Convert Json value
-     * Overloaded process initiate the conversion process converting the
-     * \a Json::Value given as the argument into the output type \a MausData
-     *
-     * \param Json::Value& The root \a Json::Value object from the Json data
-     *        file
-     * \return a pointer to the MausData object
-     */
-//     Spill* _convert(const Json::Value*) const;
-
     /*!
      * \brief Convert MausData
      * Overloaded process initiates the conversion process converting the
@@ -63,7 +49,7 @@ namespace MAUS {
      * \param MausData& The root \a MausData object from the cpp data structure
      * \return a pointer to the Json::Value object
      */
-    Json::Value* _convert(const Spill*) const;
+    Json::Value* _convert(const JobFooterData*) const;
 
   private:
 };
