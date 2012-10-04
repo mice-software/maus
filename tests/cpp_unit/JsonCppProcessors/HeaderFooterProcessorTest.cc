@@ -19,6 +19,9 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/JsonCppProcessors/JobHeaderProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/RunHeaderProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/RunFooterProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/JobFooterProcessor.hh"
 #include "tests/cpp_unit/JsonCppProcessors/CommonProcessorTest.hh"
 
 // Test the headers and footers (JobHeader, JobFooter, RunHeader, RunFooter)...
@@ -40,9 +43,43 @@ std::string JOB_HEADER =
   std::string("\"maus_event_type\":\"JobHeader\"")+
   std::string("}");
 
+std::string JOB_FOOTER =
+  std::string("{")+
+  std::string("\"end_of_job\":{\"date_time\":\"1976-04-04T00:00:00.000000\"}, ")+
+  std::string("\"maus_event_type\":\"JobFooter\"")+
+  std::string("}");
+
+std::string RUN_HEADER =
+  std::string("{")+
+  std::string("\"run_number\":-7, ")+
+  std::string("\"maus_event_type\":\"RunHeader\"")+
+  std::string("}");
+
+std::string RUN_FOOTER =
+  std::string("{")+
+  std::string("\"run_number\":-7, ")+
+  std::string("\"maus_event_type\":\"RunFooter\"")+
+  std::string("}");
+
+
 TEST(HeaderFooterProcessorTest, JobHeaderProcessorTest) {
     JobHeaderProcessor proc;
     ProcessorTest::test_value(&proc, JOB_HEADER);
+}
+
+TEST(HeaderFooterProcessorTest, JobFooterProcessorTest) {
+    JobFooterProcessor proc;
+    ProcessorTest::test_value(&proc, JOB_FOOTER);
+}
+
+TEST(HeaderFooterProcessorTest, RunHeaderProcessorTest) {
+    RunHeaderProcessor proc;
+    ProcessorTest::test_value(&proc, RUN_HEADER);
+}
+
+TEST(HeaderFooterProcessorTest, RunFooterProcessorTest) {
+    RunFooterProcessor proc;
+    ProcessorTest::test_value(&proc, RUN_FOOTER);
 }
 }
 }

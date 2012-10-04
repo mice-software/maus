@@ -64,10 +64,8 @@ rstream::~rstream() {
 }
 
 bool rstream::is_open() {
-    std::cerr << "rstream::is_open() 1" << this << " " << m_file << std::endl;
     if (m_file == NULL)
         return false;
-    std::cerr << "rstream::is_open() 2" << std::endl;
     return m_file->IsOpen();
 }
 

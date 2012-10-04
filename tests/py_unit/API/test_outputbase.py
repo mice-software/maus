@@ -32,11 +32,8 @@ class OutputBaseDummy(OutputBase):
     def _death(self):
         '''_death'''
         pass
-    def _save_spill(self, data):
+    def _save(self, data):
         return True
-    def _save_job_header(self, data):
-        return True
-
 
 class TestOutputBase(unittest.TestCase):#pylint: disable=R0904
     """
@@ -59,30 +56,17 @@ class TestOutputBase(unittest.TestCase):#pylint: disable=R0904
         except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
-    def test_save_spill(self):
-        """Test save_spill"""
+    def test_save(self):
+        """Test save"""
         mmm = OutputBaseDummy()
-        self.assertTrue(mmm.save_spill('MyData'), 'save method not '\
-                        'calling _save_spill properly')
+        self.assertTrue(mmm.save('MyData'), 'save method not '\
+                        'calling _save properly')
 
-    def test__save_spill(self):
-        """Test _save_spill"""
+    def test__save(self):
+        """Test _save"""
         mmm = OutputBase()
         self.assertRaises(NotImplementedError,
-                          mmm._save_spill, 'data')#pylint: disable=W0212
-
-    def test_save_job_header(self):
-        """Test save_spill"""
-        mmm = OutputBaseDummy()
-        self.assertTrue(mmm.save_job_header('MyData'), 'save method not '\
-                        'calling _save_job_header properly')
-
-    def test__save_job_header(self):
-        """Test _save_job_header"""
-        mmm = OutputBase()
-        self.assertRaises(NotImplementedError,
-                          mmm._save_job_header, 'data')#pylint: disable=W0212
-
+                          mmm._save, 'data')#pylint: disable=W0212
 
 if __name__ == '__main__':
     unittest.main()

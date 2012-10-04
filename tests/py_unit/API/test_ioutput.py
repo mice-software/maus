@@ -34,15 +34,10 @@ class TestIOutput(unittest.TestCase):#pylint: disable=R0904
         except: #pylint: disable=W0702
             self.assertTrue(False, 'Exception thrown when constructing')
 
-    def test_save_spill(self):
+    def test_save(self):
         """Test save"""
         mmm = IOutput()
-        self.assertRaises(NotImplementedError, mmm.save_spill, 'data')
-
-    def test_save_job_header(self):
-        """Test save"""
-        mmm = IOutput()
-        self.assertRaises(NotImplementedError, mmm.save_job_header, 'data')
+        self.assertRaises(NotImplementedError, mmm.save, 'data')
 
 if __name__ == '__main__':
     unittest.main()
