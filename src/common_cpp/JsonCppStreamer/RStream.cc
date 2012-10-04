@@ -63,6 +63,12 @@ rstream::~rstream() {
   }
 }
 
+bool rstream::is_open() {
+    if (m_file == NULL)
+        return false;
+    return m_file->IsOpen(); 
+}
+
 rstream& rstream::setBranch(rstream& rs, const char* name) {
   strcpy(rs.m_branchName, name);
   return rs;
