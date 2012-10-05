@@ -20,8 +20,8 @@ import MAUS
 
 def run():
 
-    my_input = MAUS.InputCppDAQOfflineData()
-    # my_input = MAUS.InputPyJSON()
+    # my_input = MAUS.InputCppDAQOfflineData()
+    my_input = MAUS.InputPyJSON()
 
     my_map = MAUS.MapPyGroup()
 
@@ -31,8 +31,8 @@ def run():
 
     datacards = io.StringIO(u"")
 
-    # my_output = MAUS.OutputPyJSON()
-    my_output = MAUS.OutputCppRoot()
+    my_output = MAUS.OutputPyJSON()
+    # my_output = MAUS.OutputCppRoot()
 
     # my_reduce = MAUS.ReducePyDoNothing()
     my_reduce = MAUS.ReduceCppPatternRecognition()
