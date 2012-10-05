@@ -208,14 +208,19 @@ TEST_F(SciFiEventTestDS, test_seed_getters_setters) {
   EXPECT_EQ(seed, evt->seeds()[0]);
 }
 
-TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
+TEST_F(SciFiEventTestDS, test_add_straightprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiStraightPRTrack trk;
   trk.set_x0(5.0);
   evt->add_straightprtrack(trk);
   EXPECT_EQ(1, evt->straightprtracks().size());
   EXPECT_EQ(5.0, evt->straightprtracks()[0].get_x0());
+}
 
+TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
+  SciFiEvent* evt = new SciFiEvent();
+  SciFiStraightPRTrack trk;
+  trk.set_x0(5.0);
   SciFiStraightPRTrack trk2;
   trk2.set_x0(10.0);
   std::vector<SciFiStraightPRTrack> trks;
@@ -227,14 +232,19 @@ TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
   EXPECT_EQ(10.0, evt->straightprtracks()[1].get_x0());
 }
 
-TEST_F(SciFiEventTestDS, test_helicalprtrack_getters_setters) {
+TEST_F(SciFiEventTestDS, test_add_helicalprtrack) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiHelicalPRTrack trk;
   trk.set_x0(5.0);
   evt->add_helicalprtrack(trk);
   EXPECT_EQ(1, evt->helicalprtracks().size());
   EXPECT_EQ(5.0, evt->helicalprtracks()[0].get_x0());
+}
 
+TEST_F(SciFiEventTestDS, test_helicalprtrack_getters_setters) {
+  SciFiEvent* evt = new SciFiEvent();
+  SciFiHelicalPRTrack trk;
+  trk.set_x0(5.0);
   SciFiHelicalPRTrack trk2;
   trk2.set_x0(10.0);
   std::vector<SciFiHelicalPRTrack> trks;

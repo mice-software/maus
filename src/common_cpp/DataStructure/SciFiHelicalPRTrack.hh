@@ -101,9 +101,6 @@ class SciFiHelicalPRTrack {
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
     void set_phi_i(std::vector<double> phi_i) { _phi_i = phi_i; }
 
-    /** Print track parameters */
-    void print_params();
-
   private:
 
     double _x0;

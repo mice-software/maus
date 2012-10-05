@@ -148,6 +148,48 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);
 }
 
+TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
+  int tracker = 0;
+  int num_points = 3;
+  double x0 = 1.0;
+  double y0 = 2.0;
+  double z0 = 1100.0;
+  double phi0 = 4.0;
+  double dsdz = 0.02;
+  double R = 15.0;
+  double chisq = 30.0;
+  double chisq_dof = 10.0;
+
+  SimpleHelix hlx;
+  hlx.set_R(R);
+  hlx.set_Phi_0(phi0);
+  hlx.set_dsdz(dsdz);
+  hlx.set_chisq(chisq);
+  hlx.set_chisq_dof(chisq_dof);
+
+  ThreeVector pos(x0, y0, z0);
+
+  SciFiHelicalPRTrack prtrack(tracker, num_points, pos, hlx);
+
+  EXPECT_EQ(prtrack.get_x0(), x0);
+  EXPECT_EQ(prtrack.get_y0(), y0);
+  EXPECT_EQ(prtrack.get_z0(), z0);
+  EXPECT_EQ(prtrack.get_phi0(), phi0);
+  EXPECT_EQ(prtrack.get_psi0(), -1);
+  EXPECT_EQ(prtrack.get_dsdz(), dsdz);
+  EXPECT_EQ(prtrack.get_R(), R);
+  EXPECT_EQ(prtrack.get_chisq(), chisq);
+  EXPECT_EQ(prtrack.get_chisq_dof(), chisq_dof);
+  EXPECT_EQ(prtrack.get_line_sz_chisq(), -1);
+  EXPECT_EQ(prtrack.get_circle_x0(), -1);
+  EXPECT_EQ(prtrack.get_circle_y0(), -1);
+  EXPECT_EQ(prtrack.get_circle_chisq(), -1);
+  EXPECT_EQ(prtrack.get_phi_i().size(), 0);
+  EXPECT_EQ(prtrack.get_spacepoints().size(), 0);
+  EXPECT_EQ(prtrack.get_tracker(), tracker);
+  EXPECT_EQ(prtrack.get_num_points(), num_points);
+}
+
 TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   int tracker = 0;
   int num_points = 3;
