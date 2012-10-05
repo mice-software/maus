@@ -193,18 +193,17 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   CLHEP::Hep3Vector ss_1(0.86, -.5, 0.);
   CLHEP::Hep3Vector ss_0(0., 1., 0.);
 
-  double tof0_horizontal_z = 0.;
-  double tof0_vertical_z   = 12.5;
-  double vp1_z = 3911.85055;
-  double vp2_z = 7078.6;
-  double ss_2_z  = 7207.9-0.6273;
-  double ss_1_z  = 7207.9;
-  double ss_0_z  = 7207.9+0.6273;
-  double tof1_vertical_z  = 3924.55+3899.55-12.5/2.;
-  double tof1_horizontal_z= 3924.55+3899.55+12.5/2.;
-
-  double cherenkov_A_z = 1.;
-  double cherenkov_B_z = 2.;
+  double tof0_horizontal_z = 569.5;
+  double tof0_vertical_z   = 594.5;
+  double cherenkov_A_z = 792.8;
+  double cherenkov_B_z = 1281.3;
+  double vp1_z = 3684.1;
+  double vp2_z = 6857.1;
+  double ss_2_z  = 7514.05;
+  double ss_1_z  = 7514.7;
+  double ss_0_z  = 7515.35;
+  double tof1_vertical_z  = 8002.2;
+  double tof1_horizontal_z= 8027.2;
 
   // Site 0 - tof0, horizontal
   first_site.set_measurement(tof0(0)-tof0_central_slab_number);
@@ -214,7 +213,7 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   sites.push_back(first_site);
   // Site 1 - tof0, vertical
   KalmanSite site_1;
-  site_1.set_measurement(9-tof0(1)-tof0_central_slab_number);
+  site_1.set_measurement(-(tof0(1)-tof0_central_slab_number));
   site_1.set_direction(tof_ver);
   site_1.set_id(1);
   site_1.set_z(tof0_vertical_z);
@@ -245,26 +244,26 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   // Site 3 - VIRTUAL
   KalmanSite site_5;
   site_5.set_measurement(0.0);
-  site_5.set_direction((0., 1., 0.));
+  site_5.set_direction((0., 0., 0.));
   site_5.set_id(5);
   site_5.set_z(vp2_z);
   sites.push_back(site_5);
 
-  // Site 4 - plane2
+  // Site 6 - plane2
   KalmanSite site_6;
   site_6.set_measurement(ss(2));
   site_6.set_direction(ss_2);
   site_6.set_id(6);
   site_6.set_z(ss_2_z);
   sites.push_back(site_6);
-  // Site 5 - plane1
+  // Site 7 - plane1
   KalmanSite site_7;
   site_7.set_measurement(ss(1));
   site_7.set_direction(ss_1);
   site_7.set_id(7);
   site_7.set_z(ss_1_z);
   sites.push_back(site_7);
-  // Site 6 - plane0
+  // Site 8 - plane0
   KalmanSite site_8;
   site_8.set_measurement(ss(0));
   site_8.set_direction(ss_0);
@@ -272,14 +271,14 @@ void KalmanTrackFitSS::initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::H
   site_8.set_z(ss_0_z);
   sites.push_back(site_8);
 
-  // Site 7 - tof1, vertical
+  // Site 9 - tof1, vertical
   KalmanSite site_9;
-  site_9.set_measurement(6-tof1(1)-tof1_central_slab_number);
+  site_9.set_measurement(-(tof1(1)-tof1_central_slab_number));
   site_9.set_direction(tof_ver);
   site_9.set_id(9);
   site_9.set_z(tof1_vertical_z);
   sites.push_back(site_9);
-  // Site 8 - tof1, horizontal
+  // Site 10 - tof1, horizontal
   KalmanSite site_10;
   site_10.set_measurement(tof1(0)-tof1_central_slab_number);
   site_10.set_direction(tof_hor);

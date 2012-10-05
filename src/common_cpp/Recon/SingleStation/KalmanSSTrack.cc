@@ -34,14 +34,10 @@ KalmanSSTrack::KalmanSSTrack() {
   _K.ResizeTo(5, 2);
 
   _Q.ResizeTo(5, 5);
-  _Q.Zero(); // mcs is off.
 
-  _x0 = 0.0;
-  _y0 = 0.0;
-
-  _chi2 = 0.0;
-  _ndf  = 0.0;
-  _tracker=-1;
+  _chi2    = 0.0;
+  _ndf     = 0.0;
+  _tracker = -1;
 }
 
 KalmanSSTrack::~KalmanSSTrack() {}
@@ -61,14 +57,14 @@ void KalmanSSTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) 
   TMatrixD temp2(5, 5);
   temp1 = TMatrixD(_F, TMatrixD::kMult, C);
   temp2 = TMatrixD(temp1, TMatrixD::kMultTranspose, _F);
-  _F.Print();
+  // _F.Print();
 
   TMatrixD C_pred(5, 5);
   _Q.Zero();
   C_pred = TMatrixD(temp2, TMatrixD::kPlus, _Q);
   // _Q.Print();
   new_site->set_projected_covariance_matrix(C_pred);
-  C_pred.Print();
+  // C_pred.Print();
 }
 
 // Only straight lines for now
@@ -81,7 +77,7 @@ void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   // Reset.
   _F.Zero();
   bool magnets_on = true;
-  if ( magnets_on && old_site->get_id() == 2 ) {
+  if ( magnets_on && old_site->get_id() == 4 ) {
     magnet_drift();
   } else {
     straight_line(deltaZ);
@@ -100,16 +96,16 @@ void KalmanSSTrack::magnet_drift() {
   TMatrixD M_Q9(5, 5);
   M_Q9.Zero();
 
-  double kappa_q7 = 1.0;
-  double sqrt_kappa_q7 = pow(kappa_q7, 0.5);
-  double kappa_q8 = 1.0;
-  double sqrt_kappa_q8 = pow(kappa_q8, 0.5);
-  double kappa_q9 = 1.0;
-  double sqrt_kappa_q9 = pow(kappa_q9, 0.5);
+  double kappa_q7 = 1.0;  // m2
+  double sqrt_kappa_q7 = pow(kappa_q7, 0.5)/1000.; // m-1 -> mm-1
+  double kappa_q8 = 1.52; // m2
+  double sqrt_kappa_q8 = pow(kappa_q8, 0.5)/1000.; // m-1 -> mm-1
+  double kappa_q9 = 1.3;  // m2
+  double sqrt_kappa_q9 = pow(kappa_q9, 0.5)/1000.; // m-1 -> mm-1
 
-  double L = 660.; // mm
-  double D_0 = 100.; // mm
-  double D_1 = 100.; // mm
+  double L = 660.;   // mm
+  double D_0 = 500.; // mm
+  double D_1 = 500.; // mm
 
   for ( int i = 0; i < 5; i++ ) {
     M_0(i, i) = 1.;
@@ -121,37 +117,43 @@ void KalmanSSTrack::magnet_drift() {
   M_1(2, 3) = D_1;
 
   // Q 7 focusses in x...
-  M_Q7(0, 0) = cos(sqrt_kappa_q7)*L;
-  M_Q7(0, 1) = sin(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q7(1, 0) = -sin(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q7(1, 1) = cos(sqrt_kappa_q7)*L;
+  double phi_q7 = sqrt_kappa_q7*L;
+  M_Q7(0, 0) = cos(phi_q7);
+  M_Q7(0, 1) = sin(phi_q7)/sqrt_kappa_q7;
+  M_Q7(1, 0) =-sin(phi_q7)*sqrt_kappa_q7;
+  M_Q7(1, 1) = cos(phi_q7);
   // Q 7 de-focusses in y...
-  M_Q7(2, 2) = cosh(sqrt_kappa_q7)*L;
-  M_Q7(2, 3) = sinh(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q7(3, 2) = sqrt_kappa_q7*sin(sqrt_kappa_q7)*L;
-  M_Q7(3, 3) = cosh(sqrt_kappa_q7)*L;
+  M_Q7(2, 2) = cosh(phi_q7);
+  M_Q7(2, 3) = sinh(phi_q7)/sqrt_kappa_q7;
+  M_Q7(3, 2) = sqrt_kappa_q7*sinh(phi_q7);
+  M_Q7(3, 3) = cosh(phi_q7);
+  M_Q7(4, 4) = 1.;
 
   // Q 8 focusses in y...
-  M_Q8(2, 2) = cos(sqrt_kappa_q7)*L;
-  M_Q8(2, 3) = sin(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q8(3, 2) = -sin(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q8(3, 3) = cos(sqrt_kappa_q7)*L;
+  double phi_q8 = sqrt_kappa_q8*L;
+  M_Q8(2, 2) = cos(phi_q8);
+  M_Q8(2, 3) = sin(phi_q8)/sqrt_kappa_q8;
+  M_Q8(3, 2) = -sin(phi_q8)*sqrt_kappa_q8;
+  M_Q8(3, 3) = cos(phi_q8);
   // Q 8 de-focusses in x...
-  M_Q8(0, 0) = cosh(sqrt_kappa_q7)*L;
-  M_Q8(0, 1) = sinh(sqrt_kappa_q7)*L/sqrt_kappa_q7;
-  M_Q8(1, 0) = sqrt_kappa_q7*sin(sqrt_kappa_q7)*L;
-  M_Q8(1, 1) = cosh(sqrt_kappa_q7)*L;
+  M_Q8(0, 0) = cosh(phi_q8);
+  M_Q8(0, 1) = sinh(phi_q8)/sqrt_kappa_q8;
+  M_Q8(1, 0) = sqrt_kappa_q7*sinh(phi_q8);
+  M_Q8(1, 1) = cosh(phi_q8);
+  M_Q8(4, 4) = 1.;
 
   // Q 9 focusses in x...
-  M_Q9(0, 0) = cos(sqrt_kappa_q9)*L;
-  M_Q9(0, 1) = sin(sqrt_kappa_q9)*L/sqrt_kappa_q9;
-  M_Q9(1, 0) = -sin(sqrt_kappa_q9)*L/sqrt_kappa_q9;
-  M_Q9(1, 1) = cos(sqrt_kappa_q9)*L;
+  double phi_q9 = sqrt_kappa_q9*L;
+  M_Q9(0, 0) = cos(phi_q9);
+  M_Q9(0, 1) = sin(phi_q9)/sqrt_kappa_q9;
+  M_Q9(1, 0) = -sin(phi_q9)*sqrt_kappa_q9;
+  M_Q9(1, 1) = cos(phi_q9);
   // Q 9 de-focusses in y...
-  M_Q9(2, 2) = cosh(sqrt_kappa_q9)*L;
-  M_Q9(2, 3) = sinh(sqrt_kappa_q9)*L/sqrt_kappa_q9;
-  M_Q9(3, 2) = sqrt_kappa_q9*sin(sqrt_kappa_q9)*L;
-  M_Q9(3, 3) = cosh(sqrt_kappa_q9)*L;
+  M_Q9(2, 2) = cosh(phi_q9);
+  M_Q9(2, 3) = sinh(phi_q9)/sqrt_kappa_q9;
+  M_Q9(3, 2) = sqrt_kappa_q9*sinh(phi_q9);
+  M_Q9(3, 3) = cosh(phi_q9);
+  M_Q9(4, 4) = 1.;
 
   TMatrixD temp1(5, 5);
   temp1 = TMatrixD(M_Q7, TMatrixD::kMult, M_0);
@@ -161,6 +163,14 @@ void KalmanSSTrack::magnet_drift() {
   temp3 = TMatrixD(temp2, TMatrixD::kMult, M_1);
   // F = M_Q7 * M_0 * M_Q8 * M_1 * M_Q9
   _F = TMatrixD(temp3, TMatrixD::kMult, M_Q9);
+  M_Q7.Print();
+  M_0.Print();
+  M_Q8.Print();
+  M_1.Print();
+  M_Q9.Print();
+  std::cerr << "Triplet Projection Matrix is: " << "\n";
+  _F.Print();
+
 }
 
 void KalmanSSTrack::straight_line(double deltaZ) {
@@ -170,39 +180,16 @@ void KalmanSSTrack::straight_line(double deltaZ) {
   _F(0, 1) = deltaZ;
   _F(2, 3) = deltaZ;
 }
-/*
-TMatrixD KalmanSSTrack::triplet_magnet(double p) {
 
-  TMatrixD F(5, 5);
-  F.Zero();
-
-  double drift_length = 500.; // mm
-  double Q7_lenght = 2000.; //mm
-  double Q8_lenght = 2000.; //mm
-  double Q9_lenght = 2000.; //mm
-
-  double dBdx = 1.; // T/m
-  double c = 0.2998;
-  double p_GeV = p / 1000.; // p in MeV to GeV
-  double kappa = c*dBdx/p_GeV;
-
-  TMatrixD Mf(5, 5);
-  Mf.Zero();
-  Mf(0, 0) = cosh(kappa)*Q7_lenght
-
-  return F;
-
-}
-*/
 void KalmanSSTrack::calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site) {
-  std::cout <<" ----------------------- Projection ----------------------- \n";
+  // std::cout <<" ----------------------- Projection ----------------------- \n";
   TMatrixD a = old_site->get_a();
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
 
   new_site->set_projected_a(a_projected);
 
-  a_projected.Print();
+  // a_projected.Print();
 }
 
 void KalmanSSTrack::calc_system_noise(KalmanSite *site) {
@@ -232,15 +219,15 @@ void KalmanSSTrack::calc_system_noise(KalmanSite *site) {
 // ------- Filtering ------------
 //
 void KalmanSSTrack::update_G(KalmanSite *a_site) {
-  std::cout <<"Site ID:" << a_site->get_id() << "\n";
-  std::cout <<" ----------------------- Filtering ----------------------- \n";
+  // std::cout <<"Site ID:" << a_site->get_id() << "\n";
+  // std::cout <<" ----------------------- Filtering ----------------------- \n";
   double sig_beta, SIG_ALPHA;
   switch ( a_site->get_id() ) {
     case 0 : case 1: // TOF0
       SIG_ALPHA = 40./sqrt(12.);
       sig_beta  = 400./sqrt(12.);
       break;
-    case 5 : case 6: // TOF1
+    case 9 : case 10: // TOF1
       SIG_ALPHA = 60./sqrt(12.);
       sig_beta  = 420./sqrt(12.);
       break;
@@ -272,7 +259,7 @@ void KalmanSSTrack::update_H(KalmanSite *a_site) {
       _H(0, 0) =  dy/A;
       _H(0, 2) =  dx/A;
       break;
-    case 5: case 6 :
+    case 9: case 10 :
       A = 60.;
       _H.Zero();
       _H(0, 0) =  dy/A;
@@ -316,8 +303,8 @@ void KalmanSSTrack::update_covariance(KalmanSite *a_site) {
   TMatrixD Cp(5, 5);
   Cp = TMatrixD(C, TMatrixD::kMinus, temp2);
   a_site->set_covariance_matrix(Cp);
-  std::cout << "Updated Covariance \n";
-  Cp.Print();
+  // std::cout << "Updated Covariance \n";
+  // Cp.Print();
 }
 
 // h1(a_1^0)
@@ -362,12 +349,12 @@ void KalmanSSTrack::calc_filtered_state(KalmanSite *a_site) {
   K.Print();
 */
 
-  std::cout << "Pull: \n";
-  pull.Print();
-  std::cout << "Alpha measured \n";
-  m.Print();
-  std::cout << "Alpha projected \n";
-  ha.Print();
+  // std::cout << "Pull: \n";
+  // pull.Print();
+  // std::cout << "Alpha measured \n";
+  // m.Print();
+  // std::cout << "Alpha projected \n";
+  // ha.Print();
 
   TMatrixD C(5, 5);
   C = a_site->get_projected_covariance_matrix();
@@ -401,10 +388,10 @@ void KalmanSSTrack::calc_filtered_state(KalmanSite *a_site) {
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);
 
-  std::cout << "Filtered State: \n";
-  a_filt.Print();
-  std::cout << "x  residual: "  << res_x << "\n";
-  std::cout << "y  residual: "  << res_y << "\n";
+  // std::cout << "Filtered State: \n";
+  // a_filt.Print();
+  // std::cout << "x  residual: "  << res_x << "\n";
+  // std::cout << "y  residual: "  << res_y << "\n";
 }
 
 //
