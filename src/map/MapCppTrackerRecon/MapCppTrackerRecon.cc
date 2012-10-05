@@ -47,6 +47,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
+  std::cerr << "Using geomtry: " << filename << std::endl;
   MiceModule* _module;
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
@@ -82,8 +83,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
 
   // Read in json data
-  Spill spill = read_in_json(document);
-
+  Spill spill;
+  bool success = read_in_json(document, spill);
+  if (!success)
+    return writer.write(root);
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -131,14 +134,16 @@ std::string MapCppTrackerRecon::process(std::string document) {
   return writer.write(root);
 }
 
-Spill MapCppTrackerRecon::read_in_json(std::string json_data) {
+bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
+
+  Json::Reader reader;
   Json::FastWriter writer;
-  Spill spill;
 
   try {
     root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     spill = *spill_proc.JsonToCpp(root);
+    return true;
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -146,8 +151,8 @@ Spill MapCppTrackerRecon::read_in_json(std::string json_data) {
     errors["bad_json_document"] = ss.str();
     root["errors"] = errors;
     writer.write(root);
+    return false;
   }
-  return spill;
 }
 
 void MapCppTrackerRecon::save_to_json(Spill &spill) {
