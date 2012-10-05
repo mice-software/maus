@@ -24,7 +24,6 @@ import Configuration
 import MAUS
 
 class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
-
     """Tests for MapCppTrackerRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
@@ -35,12 +34,10 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
-        print 'Setting up'
         cls.mapper = MAUS.MapCppTrackerRecon()
 
     def testEmpty(self):
         """Check can handle empty configuration and data"""
-        print 'Test empty'
         result = self.mapper.birth("")
         self.assertFalse(result)
         result = self.mapper.process("")
@@ -50,13 +47,11 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def testInit(self):
         """Check birth"""
-        print 'Test birth'
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
 
     def testGoodProcess(self):
         """Check that Tracker Recon process function produces expected output with good data"""
-        print 'Test good process'
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
         # Read in a spill of cosmic data containing 3 events
@@ -79,6 +74,32 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(5, len(revt['sci_fi_event']['spacepoints']))
         self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(1, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
+        # Check the second event
+        revt = spill_out['recon_events'][1]
+        self.assertTrue('sci_fi_event' in revt)
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(76, len(revt['sci_fi_event']['digits']))
+        self.assertTrue('clusters' in revt['sci_fi_event'])
+        self.assertEqual(34, len(revt['sci_fi_event']['clusters']))
+        self.assertTrue('spacepoints' in revt['sci_fi_event'])
+        self.assertEqual(11, len(revt['sci_fi_event']['spacepoints']))
+        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(2, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
+        # Check the third event
+        revt = spill_out['recon_events'][2]
+        self.assertTrue('sci_fi_event' in revt)
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(45, len(revt['sci_fi_event']['digits']))
+        self.assertTrue('clusters' in revt['sci_fi_event'])
+        self.assertEqual(3, len(revt['sci_fi_event']['clusters']))
+        self.assertTrue('spacepoints' in revt['sci_fi_event'])
+        self.assertEqual(1, len(revt['sci_fi_event']['spacepoints']))
+        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['straight_pr_tracks']))
         self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
 
