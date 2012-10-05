@@ -82,8 +82,6 @@ class SciFiStraightPRTrack {
 
     void set_tracker(int tracker) { _tracker = tracker; }
     void set_num_points(int num_points) { _num_points = num_points; }
-    // Print track parameters
-    void print_params();
 
   private:
     SciFiSpacePointArray _spoints;

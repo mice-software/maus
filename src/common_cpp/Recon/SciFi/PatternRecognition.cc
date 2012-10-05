@@ -229,7 +229,7 @@ void PatternRecognition::make_4tracks(const bool track_type, SpacePoint2dPArray 
     if ( debug > 0 )
       std::cerr << "Wrong number of stations with spacepoints, aborting 4 pt track.\n";
   }
-  if ( debug > 0 ) std::cerr << "Finished making 4 pt tracks" << std::endl;
+  if ( debug > 0 ) std::cout << "Finished making 4 pt tracks" << std::endl;
 } // ~make_straight_4tracks(...)
 
 void PatternRecognition::make_3tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
@@ -288,12 +288,14 @@ void PatternRecognition::make_3tracks(const bool track_type, SpacePoint2dPArray 
         // If there are enough occupied stations left to make a 4 point track, keep making tracks
         if ( num_stations_hit  >= num_points ) {
           ignore_stations.clear();
-          ignore_stations.push_back(stations_not_hit[0]);
-          ignore_stations.push_back(i);
-          if ( track_type == 0 )
-            make_straight_tracks(num_points, ignore_stations, spnts_by_station, strks);
-          if ( track_type == 1 )
-            make_helix(num_points, ignore_stations, spnts_by_station, htrks);
+          if ( stations_not_hit[0] != i ) { // Don't send the same 2 ignore stations
+            ignore_stations.push_back(stations_not_hit[0]);
+            ignore_stations.push_back(i);
+            if ( track_type == 0 )
+              make_straight_tracks(num_points, ignore_stations, spnts_by_station, strks);
+            if ( track_type == 1 )
+              make_helix(num_points, ignore_stations, spnts_by_station, htrks);
+          }
         } else {
           break;
         }
@@ -319,7 +321,6 @@ void PatternRecognition::make_3tracks(const bool track_type, SpacePoint2dPArray 
         std::cerr << "aborting 3 pt track." << std::endl;
       }
     }
-
   } else if ( num_stations_hit < 3 ) {
     if ( debug > 0 )
       std::cout << "Not enough unused spacepoints, quiting 3 point track." << std::endl;
@@ -545,10 +546,13 @@ void PatternRecognition::linear_fit(const std::vector<double> &_x, const std::ve
 void PatternRecognition::make_helix(const int num_points, const std::vector<int> ignore_stations,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack> &htrks) {
-
   // Set inner and outer stations
   int outer_st_num = -1, inner_st_num = -1, mid_st_num = -1;
-  set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num);
+  bool success = set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num);
+  if ( !success ) {
+    std::cerr << "Failed to set seed station, aborting making helices" << std::endl;
+    return;
+  }
 
   // ** Beginning nested loops to find unused spacepoints from each station available. **
   // Loop over spacepoints in outer station
@@ -645,18 +649,19 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
                   // Check linear fit passes chisq test, then perform make a helical track
                   if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
 
-                    double pt = circle.get_R() * 1.2;
-                    double pz = pt / line_sz.get_m();
+                    // double pt = circle.get_R() * 1.2;
+                    // double pz = pt / line_sz.get_m();
                     if ( debug > 0 ) std::cerr << "dsdz = " << line_sz.get_m() << std:: endl;
 
                     double psi_0 = phi_0 + (CLHEP::pi / 2);
                     SciFiHelicalPRTrack track(-1, num_points, good_spnts[0]->get_position(),
                                               phi_0, psi_0, circle, line_sz);
                     track.set_phi_i(dphi);
+                    /*
                     for ( unsigned int i = 0; i < dphi.size(); ++i ) {
                       std::cerr << "1phi_i[" << i << "] = " << dphi[i] << std::endl;
                       std::cerr << "2phi_i[" << i << "] = " << track.get_phi_i()[i] << std::endl;
-                    }
+                    }*/
 
                     // Set all the good sp to used and convert pointers to variables
                     std::vector<SciFiSpacePoint> good_spnts_variables;
@@ -944,12 +949,14 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
       else
         inner_st_num = 1;
   } else if ( static_cast<int>(ignore_stations.size()) == 2 ) { // 3pt track case
+      // Check valid station numbers have been supplied
       bool ok0 = false;
       bool ok1 = false;
       for ( int i = 0; i < 5; ++i ) {
         if ( ignore_stations[0] == i ) ok0 = true;
         if ( ignore_stations[1] == i ) ok1 = true;
       }
+      if ( ignore_stations[0] == ignore_stations[1] ) ok0 = false;
       if ( !ok0 || !ok1 ) {
         if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
         return false;
@@ -976,15 +983,24 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
 } // ~set_end_stations(...)
 
 // For helical Pattern Recognition use
-void PatternRecognition::set_seed_stations(const std::vector<int> ignore_stations,
+bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_stations,
                       int &outer_st_num, int &inner_st_num, int &mid_st_num) {
   if ( static_cast<int>(ignore_stations.size()) == 0 ) { // 5pt track case
     outer_st_num = 4;
     inner_st_num = 0;
     mid_st_num = 2;
   } else if ( static_cast<int>(ignore_stations.size()) == 1 ) { // 4pt track case
+      // Check a valid station number has been supplied
+      bool ok = false;
+      for ( int i = 0; i < 5; ++i ) {
+        if ( ignore_stations[0] == i ) ok = true;
+      }
+      if ( !ok ) {
+        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        return false;
+      }
       // Set outer station number
-      if ( ignore_stations[0] != 4 )
+      if ( ignore_stations[0] != 4  )
         outer_st_num = 4;
       else
         outer_st_num = 3;
@@ -999,36 +1015,73 @@ void PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
        else
          mid_st_num = 1;
   } else if ( static_cast<int>(ignore_stations.size()) == 2 ) { // 3pt track case
-      // Set outer station number
-      if ( ignore_stations[1] != 4 )
+      // Check valid station numbers have been supplied
+      bool ok0 = false;
+      bool ok1 = false;
+      for ( int i = 0; i < 5; ++i ) {
+        if ( ignore_stations[0] == i ) ok0 = true;
+        if ( ignore_stations[1] == i ) ok1 = true;
+      }
+      if ( ignore_stations[0] == ignore_stations[1] ) ok0 = false;
+      if ( !ok0 || !ok1 ) {
+        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        return false;
+      }
+
+      if ( ignore_stations[0] == 4 || ignore_stations[1] == 4 ) { // 1 of ignore stats is 4
+        if ( ignore_stations[0] == 3 || ignore_stations[1] == 3 ) {
+          outer_st_num = 2;
+          mid_st_num = 1;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 2 || ignore_stations[1] == 2 ) {
+          outer_st_num = 3;
+          mid_st_num = 1;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 1 || ignore_stations[1] == 1 ) {
+          outer_st_num = 3;
+          mid_st_num = 2;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 0 || ignore_stations[1] == 0 ) {
+          outer_st_num = 3;
+          mid_st_num = 2;
+          inner_st_num = 1;
+        }
+      } else if ( ignore_stations[0] == 3 || ignore_stations[1] == 3 ) {// 1 of ignore stats is 3
+        if ( ignore_stations[0] == 2 || ignore_stations[1] == 2 ) {
+          outer_st_num = 4;
+          mid_st_num = 1;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 1 || ignore_stations[1] == 1 ) {
+          outer_st_num = 4;
+          mid_st_num = 2;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 0 || ignore_stations[1] == 0 ) {
+          outer_st_num = 4;
+          mid_st_num = 2;
+          inner_st_num = 1;
+        }
+      } else if ( ignore_stations[0] == 2 || ignore_stations[1] == 2 ) {// 1 of ignore stats is 2
+        if ( ignore_stations[0] == 1 || ignore_stations[1] == 1 ) {
+          outer_st_num = 4;
+          mid_st_num = 3;
+          inner_st_num = 0;
+        } else if ( ignore_stations[0] == 0 || ignore_stations[1] == 0 ) {
+          outer_st_num = 4;
+          mid_st_num = 3;
+          inner_st_num = 1;
+        }
+      } else if ( ignore_stations[0] == 1 || ignore_stations[1] == 1 ) {// 1 of ignore stats is 1
+        if ( ignore_stations[0] == 0 || ignore_stations[1] == 0 ) {
         outer_st_num = 4;
-      else if ( ignore_stations[0] != 3 )
-        outer_st_num = 3;
-      else
-        outer_st_num = 2;
-      // Set inner station number
-      if ( ignore_stations[0] != 0 )
-        inner_st_num = 0;
-      else if ( ignore_stations[1] != 1 )
-        inner_st_num = 1;
-      else
+        mid_st_num = 3;
         inner_st_num = 2;
-      // Set middle station number
-      if ( ignore_stations[0] != 0 && ignore_stations[1] != 1 )
-        mid_st_num = 1;
-      else if ( ignore_stations[0] != 0 && ignore_stations[1] != 2 )
-        mid_st_num = 2;
-      else if ( ignore_stations[0] != 0 && ignore_stations[1] != 3 )
-        mid_st_num = 3;
-      else if ( ignore_stations[0] != 1 && ignore_stations[1] != 2 )
-        mid_st_num = 2;
-      else if ( ignore_stations[0] != 1 && ignore_stations[1] != 3 )
-        mid_st_num = 3;
-      else // case where   ignore_stations[0] != 2 && ignore_stations[1] != 3
-        mid_st_num = 3;
+        }
+      }
     } else {
     if (debug > 0) std::cout << "Error: Invalid ignore station argument." << std::endl;
+    return false;
   }
+  return true;
 } // ~set_seed_stations(...)
 
 void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
