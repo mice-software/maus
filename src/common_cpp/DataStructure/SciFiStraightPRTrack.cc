@@ -87,13 +87,4 @@ SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack
     return *this;
 }
 
-// Other
-void SciFiStraightPRTrack::print_params() {
-  std::cout << " x0 is " << _x0 << std::endl;
-  std::cout << " mx is " << _mx << std::endl;
-  std::cout << " x_chisq is " << _x_chisq << std::endl;
-  std::cout << " y0 is " << _y0 << std::endl;
-  std::cout << " my is " << _my << std::endl;
-  std::cout << " y_chisq is " << _y_chisq << std::endl;
-}
 } // ~namespace MAUS

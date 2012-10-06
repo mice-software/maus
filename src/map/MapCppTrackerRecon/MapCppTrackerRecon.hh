@@ -51,7 +51,6 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-// #include "src/common_cpp/Recon/SciFi/SeedFinder.hh"
 
 namespace MAUS {
 
@@ -124,16 +123,6 @@ class MapCppTrackerRecon {
   void save_to_json(MAUS::Spill &spill);
 
   void print_event_info(MAUS::SciFiEvent &event);
-
-  Json::Value ConvertToJson(std::string jsonString);
-
-  std::string JsonToString(Json::Value json_in);
-
-  // void perform_alignment_study(MAUS::SciFiEvent &evt);
-
-  // void fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
-  //                           double &x_const, double &x_slope,
-  //                           double &y_const, double &y_slope);
 
  private:
   /// This should be the classname

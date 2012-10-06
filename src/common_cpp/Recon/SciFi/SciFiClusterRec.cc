@@ -31,9 +31,7 @@ SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe,
                                   _min_npe(min_npe),
                                   _modules(modules) {}
 
-SciFiClusterRec::~SciFiClusterRec() {
-  std::cerr << "Destructor." << "\n";
-}
+SciFiClusterRec::~SciFiClusterRec() {}
 
 bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
   return ( a->get_npe() > b->get_npe() );

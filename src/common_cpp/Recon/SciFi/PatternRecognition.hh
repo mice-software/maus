@@ -131,7 +131,7 @@ class PatternRecognition {
      *  @param htrks - A vector of the output Pattern Recognition helical tracks
      */
     void make_3tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack>& strks,
+                      std::vector<SciFiStraightPRTrack> &strks,
                       std::vector<SciFiHelicalPRTrack> &htrks);
 
     /** @brief Fits a straight track for a given set of stations
@@ -312,7 +312,7 @@ class PatternRecognition {
      *  @param middle_station_num - the middle station number used for a given track fit
      *
      */
-    void set_seed_stations(const std::vector<int> ignore_stations, int &outer_station_num,
+    bool set_seed_stations(const std::vector<int> ignore_stations, int &outer_station_num,
                            int &inner_station_num, int &middle_station_num);
 
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station

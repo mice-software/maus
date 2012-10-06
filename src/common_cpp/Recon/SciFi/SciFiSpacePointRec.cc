@@ -23,10 +23,19 @@ SciFiSpacePointRec::SciFiSpacePointRec() {}
 
 SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
-void SciFiSpacePointRec::process(SciFiEvent &evt) {
-  int clusters_size = evt.clusters().size();
-  // Store clusters in a vector.
+void SciFiSpacePointRec::process(SciFiEvent &event) {
   std::vector<SciFiCluster*> clusters[2][6][3];
+
+  make_cluster_container(event, clusters);
+
+  look_for_triplets(event, clusters);
+
+  look_for_duplets(event, clusters);
+}
+
+void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
+                                                std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+  int clusters_size = evt.clusters().size();
   for ( int cl = 0; cl < clusters_size; cl++ ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
     int tracker = a_cluster->get_tracker();
@@ -34,10 +43,6 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
     int plane   = a_cluster->get_plane();
     clusters[tracker][station][plane].push_back(a_cluster);
   }
-
-  look_for_triplets(evt, clusters);
-
-  look_for_duplets(evt, clusters);
 }
 
 void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,

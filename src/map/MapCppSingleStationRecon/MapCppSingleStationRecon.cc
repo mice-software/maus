@@ -76,40 +76,12 @@ std::string MapCppSingleStationRecon::process(std::string document) {
         if ( event->clusters().size() ) {
           spacepoint_recon(event);
         }
-        //
-        Hep3Vector tof0, tof1, PR_pos, PR_mom;
-        Hep3Vector ss(666., 666., 666.);
-        // double tof0_x, tof0_y, tof1_x, tof1_y;
-        // double tof0_time, tof1_time;
-        bool success = false;
         if ( event->spacepoints().size() == 1 ) {
-          std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
-          // std::cerr << "Clusters size: " << clusters.size() << "\n";
-          int size = clusters.size();
-          for ( int clust_i = 0; clust_i < size; ++clust_i ) {
-            // std::cerr << clust_i << "\n";
-            if ( clusters[clust_i]->get_plane() == 0 ) ss.setX(clusters[clust_i]->get_alpha());
-            if ( clusters[clust_i]->get_plane() == 1 ) ss.setY(clusters[clust_i]->get_alpha());
-            if ( clusters[clust_i]->get_plane() == 2 ) ss.setZ(clusters[clust_i]->get_alpha());
+          Json::Value json_event = set_up_json(root, k, event);
+          if ( is_good_for_tracking(json_event) ) {
+            KalmanTrackFitSS fit;
+            fit.process(json_event);
           }
-          reconstruct_tofs(root, k, tof0, tof1, PR_pos, PR_mom, success);
-        }
-        if ( success ) {
-          std::cerr << "TOF0 " << tof0(0) << " " << tof0(1) << "\n"
-                    << "TOF1 " << tof1(0) << " " << tof1(1) << "\n";
-          std::cerr << "SS position " << event->spacepoints()[0]->get_position().x() << " "
-                    << event->spacepoints()[0]->get_position().y() << "\n";
-
-          std::ofstream out2("detectors.txt", std::ios::out | std::ios::app);
-                 out2 << tof0(0)    << " " << tof0(1) << " " << tof1(0)    << " " << tof1(1) << " "
-                 << event->spacepoints()[0]->get_position().x() << " "
-                 << event->spacepoints()[0]->get_position().y() << "\n";
-                 out2.close();
-
-          std::cerr << "Starting Global Recon" << std::endl;
-          KalmanTrackFitSS fit;
-          fit.process(tof0, ss, tof1, PR_pos, PR_mom);
-          // ++eff_counter;
         }
         print_event_info(event, k);
         save_to_json(event, k);
@@ -231,35 +203,18 @@ void MapCppSingleStationRecon::save_to_json(SEEvent *evt, int event_i) {
                                                = sci_fi_space_points;
 }
 
-void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
-                                                Hep3Vector &tof0, Hep3Vector &tof1,
-                                                Hep3Vector &PR_pos, Hep3Vector &PR_mom,
-                                                bool &success) {
-  // Define some constants.
-  static const int tof0_num_slabs = 10;
-  static const int tof1_num_slabs = 7;
-  static const double tof0_a = 40.; // mm
-  static const double tof1_a = 60.; // mm
-  // assert(root.isMember("recon_events"));
-  // assert(root["recon_events"][event_i].isMember("tof_event"));
+Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i, SEEvent *event) {
   Json::Value tof0_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof0"];
   Json::Value tof1_sps = root["recon_events"][event_i]["tof_event"]["tof_space_points"]["tof1"];
   int numb_sp_tof_0 = tof0_sps.size();
   int numb_sp_tof_1 = tof1_sps.size();
 
-  std::cerr << "Number of spacepoints " << numb_sp_tof_0 << " " << numb_sp_tof_1 << "\n";
-
-  // Run elementar TOF Recon.
-  double tof0_slabx, tof0_slaby;
-  double tof1_slabx, tof1_slaby;
-  double tof0_x, tof0_y, tof1_x, tof1_y;
-  double tof0_time, tof1_time;
+  Json::Value json_event;
   bool found = false;
   int index_value;
-
+  double tof1_slabx,tof1_slaby, tof1_time, tof0_slabx, tof0_slaby, tof0_time;
   if ( numb_sp_tof_1 == 1 ) {
     // Get TOF1 slab hits.
-    // std::cout << tof1_sps[(Json::Value::ArrayIndex)0] << std::endl;
     tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabX"].asDouble();
     tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slabY"].asDouble();
     tof1_time  = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
@@ -271,91 +226,45 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
         index_value = i;
       }
     }
+    json_event["TOF1"]["slabX"] = tof1_slabx;
+    json_event["TOF1"]["slabY"] = tof1_slaby;
+    json_event["TOF1"]["time"]  = tof1_time;
+    json_event["TOF0"]["time"]  = tof0_time;
   }
 
   if ( found ) {
-    // Do TOF reconstruction
     tof0_slabx = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabX"].asDouble();
     tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabY"].asDouble();
-
-    // tof0_time         = tof0_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
-    // tof1_time         = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
-
-    tof0_x = -(tof0_slaby - (tof0_num_slabs - 1.)/2.)*tof0_a;
-    tof0_y =  (tof0_slabx - (tof0_num_slabs - 1.)/2.)*tof0_a;
-    Hep3Vector tof0_sp(tof0_x, tof0_y, tof0_time);
-
-    tof1_x = -(tof1_slaby - (tof1_num_slabs - 1.)/2.)*tof1_a;
-    tof1_y =  (tof1_slabx - (tof1_num_slabs - 1.)/2.)*tof1_a;
-    Hep3Vector tof1_sp(tof1_x, tof1_y, tof1_time);
-
-    tof0 = tof0_sp;
-    tof1 = tof1_sp;
-    success = true;
-    // std::cerr << "TOF0 pos (mm): " << tof0_x << " " << tof0_y << "\n"
-    //          << "TOF1 pos (mm): " << tof1_x << " " << tof1_y << "\n";
+    json_event["TOF0"]["slabX"] = tof0_slabx;
+    json_event["TOF0"]["slabY"] = tof0_slaby;
   }
-  // Basic PR
-  double tof0_z = 0.; // mm
-  double tof1_z = 3924.55+3899.55; // mm
-  const double m_pi = 139.570; // MeV/c2
-  double pr_x = tof0_x; // mm
-  double pr_y = tof0_y; // mm
-  double pr_z = tof0_z;
 
-  double delta_x = (tof1_x-tof0_x); // mm
-  double delta_y = (tof1_y-tof0_y); // mm
-  double delta_z = tof1_z-tof0_z;       // mm
-  double pr_mx   = delta_x/delta_z;
-  double pr_my   = delta_y/delta_z;
-  double pr_pz   = m_pi*delta_z/abs(tof0_time);
-/*
-  double pr_px   = m_pi*delta_x/abs(tof0_time);
-  double pr_py   = m_pi*delta_y/abs(tof0_time);
-  double pr_pz   = m_pi*delta_z/abs(tof0_time);
-*/
-  // Build track fit input parameters.
-  tof0.setX(tof0_slabx);
-  tof0.setY(tof0_slaby);
-  tof0.setZ(tof0_time);
+  std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
+  int size = clusters.size();
+  for ( int clust_i = 0; clust_i < size; ++clust_i ) {
+    if ( clusters[clust_i]->get_plane() == 0 ) json_event["SS"]["Plane0"] = clusters[clust_i]->get_alpha();
+    if ( clusters[clust_i]->get_plane() == 1 ) json_event["SS"]["Plane1"] = clusters[clust_i]->get_alpha();
+    if ( clusters[clust_i]->get_plane() == 2 ) json_event["SS"]["Plane2"] = clusters[clust_i]->get_alpha();
+  }
 
-  tof1.setX(tof1_slabx);
-  tof1.setY(tof1_slaby);
-  tof1.setZ(tof1_time);
-
-  PR_pos.setX(pr_x);
-  PR_pos.setY(pr_y);
-  PR_pos.setZ(0.0);
-
-  PR_mom.setX(pr_mx);
-  PR_mom.setY(pr_my);
-  PR_mom.setZ(pr_pz);
+  return json_event;
 }
 
-/*
-bool MapCppSingleStationRecon::is_good_for_track(Json::Value root, SEEvent &event, int k) {
-  int exp_events_t1 = root["space_points"]["tof1"][k].size();
-  int tof1_spacepoints = 0;
-  for ( int sp_i = 0; sp_i < exp_events_t1; sp_i++ ) {
-    if ( !root["space_points"]["tof1"][k][sp_i].isNull() ) {
-      tof1_spacepoints += 1;
-    }
-  }
-  int exp_events_t0 = root["space_points"]["tof0"].size();
-  int tof0_spacepoints = 0;
-  for ( int sp_i = 0; sp_i < exp_events_t0; sp_i++ ) {
-    if ( !root["space_points"]["tof0"][k][sp_i].isNull() ) {
-      tof0_spacepoints += 1;
-    }
+void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
+                                                Hep3Vector &tof0, Hep3Vector &tof1,
+                                                Hep3Vector &PR_pos, Hep3Vector &PR_mom,
+                                                bool &success) {}
+
+bool MapCppSingleStationRecon::is_good_for_tracking(Json::Value json_event) {
+  bool goodness = false;
+  if ( json_event.isMember("TOF0") && json_event.isMember("TOF1") &&
+       json_event["SS"].isMember("Plane0") && json_event["SS"].isMember("Plane1") &&
+       json_event["SS"].isMember("Plane2") ) {
+    goodness = true;
   }
 
-  if ( tof0_spacepoints == 1 && tof1_spacepoints == 1 && event.spacepoints().size() == 1 ) {
-    return true;
-  } else {
-    return false;
-  }
+  return goodness;
 }
-*/
 
 void MapCppSingleStationRecon::print_event_info(SEEvent *event, int k) {
   std::cout << event->digits().size() << " "

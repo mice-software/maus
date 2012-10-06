@@ -17,7 +17,8 @@
 
 #include "src/common_cpp/Recon/SingleStation/KalmanSSTrack.hh"
 #include <math.h>
-
+#include <iostream>
+#include <fstream>
 
 // Initialize geometry constants.
 // const double KalmanSSTrack::A = 2./(7.*0.427);
@@ -427,12 +428,38 @@ void KalmanSSTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_
   TMatrixD temp2(5, 1);
   temp2 = TMatrixD(_A, TMatrixD::kMult, temp1);
 
-  // _A.Print();
-  // temp2.Print();
-
   TMatrixD a_smooth(5, 1);
   a_smooth =  TMatrixD(a, TMatrixD::kPlus, temp2);
   smoothing_site->set_smoothed_a(a_smooth);
+
+  // Save chi2 for this site.
+  TMatrixD m(2, 1);
+  m = smoothing_site->get_measurement();
+  double alpha = m(0, 0);
+
+  TMatrixD ha(2, 1);
+  update_H(smoothing_site);
+  ha = TMatrixD(_H, TMatrixD::kMult, a_smooth);
+  // Extrapolation converted to expected measurement.
+  double alpha_model = ha(0, 0);
+
+  double sigma_measurent_squared;
+  double chi2_i;
+  int id = smoothing_site->get_id();
+  if ( id == 0 || id == 1 ) {
+    sigma_measurent_squared = 11.5*11.5; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else if ( id == 9 || id == 10 ) {
+    sigma_measurent_squared = 17.3*17.3; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else if ( id == 6 || id == 7 || id == 8 ) {
+    sigma_measurent_squared = 1./12.; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else {
+    chi2_i = 0.;
+  }
+
+  smoothing_site->set_chi2(chi2_i);
 
   // do the same for covariance matrix
   TMatrixD C(5, 5);
@@ -456,30 +483,17 @@ void KalmanSSTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_
 
 void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   int number_parameters = 5;
-  int number_of_sites = sites.size();
-  double sigma_measurement2 = 1./12.;
+  int number_of_sites = 7;
   int id = sites[0].get_id();
-  if ( id <= 14 ) _tracker = 0;
-  if ( id > 14 ) _tracker = 1;
+  _tracker = 0;
 
-  double alpha, model_alpha;
+  // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
-    // Convert smoothed value to alpha measurement.
-    TMatrixD a(5, 1);
-    a = site.get_smoothed_a();
-    update_H(&site);
-    TMatrixD ha(2, 1);
-    ha = TMatrixD(_H, TMatrixD::kMult, a);
-    model_alpha = ha(0, 0);
-    // Actual measurement.
-    alpha = site.get_alpha();
-    // Compute chi2.
-    _chi2 += pow(alpha-model_alpha, 2.);
+    _chi2 += site.get_chi2();
   }
-  _chi2 = _chi2*(1./sigma_measurement2);
   _ndf = number_of_sites - number_parameters;
-  // std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
-  // output << _tracker << " " << _chi2 << " " << _ndf << "\n";
-  // output.close();
+  std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
+  output << _tracker << " " << _chi2 << " " << _ndf << "\n";
+  output.close();
 }

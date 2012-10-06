@@ -74,7 +74,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
-                                         SimpleHelix helix) {
+                                         SimpleHelix helix) : _phi_i(0), _spoints(0)  {
   _tracker = tracker;
   _num_points = num_points;
   _x0        = pos0.x();
@@ -85,6 +85,12 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep
   _dsdz      = helix.get_dsdz();
   _chisq     = helix.get_chisq();
   _chisq_dof = helix.get_chisq_dof(); // already reduced chisq
+
+  _psi0 = -1.0;
+  _line_sz_chisq = -1.0;
+  _circle_x0 = -1.0;
+  _circle_y0 = -1.0;
+  _circle_chisq = -1.0;
 }
 
 // Destructor
@@ -120,16 +126,6 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)
      _tracker(-1), _num_points(-1), _line_sz_chisq(-1.0), _circle_x0(-1.0), _circle_y0(-1.0),
      _circle_chisq(-1.0), _chisq(-1.0), _phi_i(0), _spoints(0) {
   *this = _htrk;
-}
-
-void SciFiHelicalPRTrack::print_params() {
-  std::cout << " x0 is " << _x0 << std::endl;
-  std::cout << " y0 is " << _y0 << std::endl;
-  std::cout << " z0 is " << _z0 << std::endl;
-  std::cout << " phi0 is " << _phi0 << std::endl;
-  std::cout << " psi0 is " << _psi0 << std::endl;
-  std::cout << " dz/ds is " << _dsdz << std::endl;
-  std::cout << " R is " << _R << std::endl;
 }
 
 } // ~namespace MAUS
