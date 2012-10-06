@@ -33,7 +33,55 @@ class PatternRecognitionTest : public ::testing::Test {
   virtual ~PatternRecognitionTest() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
-  bool compare_doubles(double a, double b, double epsilon) {return fabs(a - b) < epsilon;}
+
+  void set_up_spacepoints() {
+    _sp1 = new SciFiSpacePoint();
+    _sp2 = new SciFiSpacePoint();
+    _sp3 = new SciFiSpacePoint();
+    _sp4 = new SciFiSpacePoint();
+    _sp5 = new SciFiSpacePoint();
+
+    ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
+    _sp1->set_position(pos);
+    _sp1->set_tracker(0);
+    _sp1->set_station(1);
+    _sp1->set_type("triplet");
+    _sp1->set_used(false);
+
+    pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
+    _sp2->set_position(pos);
+    _sp2->set_tracker(0);
+    _sp2->set_station(2);
+    _sp2->set_type("triplet");
+    _sp2->set_used(false);
+
+    pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
+    _sp3->set_position(pos);
+    _sp3->set_tracker(0);
+    _sp3->set_station(3);
+    _sp3->set_type("triplet");
+    _sp3->set_used(false);
+
+    pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
+    _sp4->set_position(pos);
+    _sp4->set_tracker(0);
+    _sp4->set_station(4);
+    _sp4->set_type("triplet");
+    _sp4->set_used(false);
+
+    pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
+    _sp5->set_position(pos);
+    _sp5->set_tracker(0);
+    _sp5->set_station(5);
+    _sp5->set_type("triplet");
+    _sp5->set_used(false);
+  }
+
+  SciFiSpacePoint *_sp1;
+  SciFiSpacePoint *_sp2;
+  SciFiSpacePoint *_sp3;
+  SciFiSpacePoint *_sp4;
+  SciFiSpacePoint *_sp5;
 };
 
 TEST_F(PatternRecognitionTest, test_process_good) {
@@ -41,50 +89,14 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   int n_stations = 5;
   PatternRecognition pr;
 
-  // Set up spoints corresponding to a nearly straight line, which both helical and straight fit
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
-
-  ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
-  sp1->set_position(pos);
-  sp1->set_tracker(0);
-  sp1->set_station(1);
-  sp1->set_type("triplet");
-
-  pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
-  sp2->set_position(pos);
-  sp2->set_tracker(0);
-  sp2->set_station(2);
-  sp2->set_type("triplet");
-
-  pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
-  sp3->set_position(pos);
-  sp3->set_tracker(0);
-  sp3->set_station(3);
-  sp3->set_type("triplet");
-
-  pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
-  sp4->set_position(pos);
-  sp4->set_tracker(0);
-  sp4->set_station(4);
-  sp4->set_type("triplet");
-
-  pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
-  sp5->set_position(pos);
-  sp5->set_tracker(0);
-  sp5->set_station(5);
-  sp5->set_type("triplet");
-
   // Set up the spacepoints vector
+  set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp5);
-  spnts.push_back(sp2);
-  spnts.push_back(sp3);
-  spnts.push_back(sp1);
-  spnts.push_back(sp4);
+  spnts.push_back(_sp5);
+  spnts.push_back(_sp2);
+  spnts.push_back(_sp3);
+  spnts.push_back(_sp1);
+  spnts.push_back(_sp4);
 
   // For a straight fit
   // ------------------
@@ -120,12 +132,11 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 
   // For a helical fit
   //------------------
-
-  sp1->set_used(false);
-  sp2->set_used(false);
-  sp3->set_used(false);
-  sp4->set_used(false);
-  sp5->set_used(false);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp4->set_used(false);
+  _sp5->set_used(false);
 
   pr.process(true, false, evt1); // Helical on, Straight off
 
@@ -148,47 +159,12 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 
 TEST_F(PatternRecognitionTest, test_make_tracks) {
 
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
-
-  ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
-  sp1->set_position(pos);
-  sp1->set_tracker(0);
-  sp1->set_station(1);
-  sp1->set_type("triplet");
-
-  pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
-  sp2->set_position(pos);
-  sp2->set_tracker(0);
-  sp2->set_station(2);
-  sp2->set_type("triplet");
-
-  pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
-  sp3->set_position(pos);
-  sp3->set_tracker(0);
-  sp3->set_station(3);
-  sp3->set_type("triplet");
-
-  pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
-  sp4->set_position(pos);
-  sp4->set_tracker(0);
-  sp4->set_station(4);
-  sp4->set_type("triplet");
-
-  pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
-  sp5->set_position(pos);
-  sp5->set_tracker(0);
-  sp5->set_station(5);
-  sp5->set_type("triplet");
-
   // Set up the spacepoints vector
+  set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp5);
-  spnts.push_back(sp2);
-  spnts.push_back(sp1);
+  spnts.push_back(_sp5);
+  spnts.push_back(_sp2);
+  spnts.push_back(_sp1);
 
   PatternRecognition pr;
   int n_stations = 5;
@@ -229,11 +205,11 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
 
   // Make a 4 point track
   // ---------------------
-  spnts.push_back(sp3);
-  sp1->set_used(false);
-  sp2->set_used(false);
-  sp3->set_used(false);
-  sp5->set_used(false);
+  spnts.push_back(_sp3);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp5->set_used(false);
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -258,12 +234,12 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
 
   // Make a 5 point track
   // ---------------------
-  spnts.push_back(sp4);
-  sp1->set_used(false);
-  sp2->set_used(false);
-  sp3->set_used(false);
-  sp4->set_used(false);
-  sp5->set_used(false);
+  spnts.push_back(_sp4);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp4->set_used(false);
+  _sp5->set_used(false);
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -287,67 +263,213 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   EXPECT_NEAR(y_chisq, strks[0].get_y_chisq(), 0.1);
 }
 
+TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
+
+  // Set up the spacepoints vector
+  set_up_spacepoints();
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(_sp5);
+  spnts.push_back(_sp3);
+  spnts.push_back(_sp2);
+  spnts.push_back(_sp1);
+
+  PatternRecognition pr;
+  int n_stations = 5;
+
+  // Set up the spacepoints by station 2D vector
+  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+
+  SciFiEvent evt;
+  bool track_type = 0; // Straight tracks
+
+  // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
+  int num_points = 4;
+  double y0 = -58.85201389;
+  double x0 = -68.94108927;
+  double my = 0.03755825;
+  double mx = -0.02902014;
+  std::vector<SciFiHelicalPRTrack> htrks;
+  std::vector<SciFiStraightPRTrack> strks;
+
+  // Make a 4 point track with 4 spacepoints
+  // ---------------------------------------
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp5->set_used(false);
+
+  spnts_by_station.clear();
+  spnts_by_station.resize(0);
+  spnts_by_station.resize(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+  strks.resize(0);
+
+  pr.make_4tracks(track_type, spnts_by_station, strks, htrks);
+
+  // Check it matches to within a tolerance
+  EXPECT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
+  EXPECT_NEAR(17.5, strks[0].get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
+  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
+  EXPECT_NEAR(15.9, strks[0].get_y_chisq(), 0.1);
+
+    // Make a 4 point track with 5 spacepoints
+  // ---------------------------------------
+  spnts.push_back(_sp4);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp4->set_used(false);
+  _sp5->set_used(false);
+
+  spnts_by_station.clear();
+  spnts_by_station.resize(0);
+  spnts_by_station.resize(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+  strks.resize(0);
+
+  pr.make_4tracks(track_type, spnts_by_station, strks, htrks);
+
+  // Check it matches to within a tolerance
+  EXPECT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0].get_mx(), 0.01); // Needed a wider tolerance than the others
+  EXPECT_NEAR(16.3, strks[0].get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
+  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
+  EXPECT_NEAR(4.5, strks[0].get_y_chisq(), 0.1);
+}
+
+TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
+
+  // Set up the spacepoints vector
+  set_up_spacepoints();
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(_sp5);
+  spnts.push_back(_sp2);
+  spnts.push_back(_sp1);
+
+  PatternRecognition pr;
+  int n_stations = 5;
+
+  // Set up the spacepoints by station 2D vector
+  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+
+  SciFiEvent evt;
+  bool track_type = 0; // Straight tracks
+
+  // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
+  int num_points = 3;
+  double y0 = -58.85201389;
+  double x0 = -68.94108927;
+  double my = 0.03755825;
+  double mx = -0.02902014;
+  std::vector<SciFiHelicalPRTrack> htrks;
+  std::vector<SciFiStraightPRTrack> strks;
+
+  // Make a 3 point track with 3 spacepoints
+  // ---------------------------------------
+  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+
+  // Check it matches to within a tolerance
+  EXPECT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
+  EXPECT_NEAR(0.9, strks[0].get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
+  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
+  EXPECT_NEAR(13.3, strks[0].get_y_chisq(), 0.1);
+
+  // Make a 3 point track with 4 spacepoints
+  // ---------------------------------------
+  spnts.push_back(_sp3);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp5->set_used(false);
+
+  spnts_by_station.clear();
+  spnts_by_station.resize(0);
+  spnts_by_station.resize(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+  strks.resize(0);
+
+  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+
+  // Check it matches to within a tolerance
+  EXPECT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
+  EXPECT_NEAR(11.3, strks[0].get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
+  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
+  EXPECT_NEAR(0.0015, strks[0].get_y_chisq(), 0.001);
+
+    // Make a 3 point track with 5 spacepoints
+  // ---------------------------------------
+  spnts.push_back(_sp4);
+  _sp1->set_used(false);
+  _sp2->set_used(false);
+  _sp3->set_used(false);
+  _sp4->set_used(false);
+  _sp5->set_used(false);
+
+  spnts_by_station.clear();
+  spnts_by_station.resize(0);
+  spnts_by_station.resize(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+  strks.resize(0);
+
+  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+
+  // Check it matches to within a tolerance
+  EXPECT_EQ(1, strks.size());
+  EXPECT_EQ(0, htrks.size());
+  EXPECT_EQ(num_points, strks[0].get_num_points());
+  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0].get_mx(), 0.01); // Needed a wider tolerance than the others
+  EXPECT_NEAR(1.8, strks[0].get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
+  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
+  EXPECT_NEAR(4.2, strks[0].get_y_chisq(), 0.1);
+}
 
 TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
 
   int n_stations = 5;
   PatternRecognition pr;
 
-  // Set up spacepoints corresponding to straight line
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
-
-  ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
-  sp1->set_position(pos);
-  sp1->set_tracker(0);
-  sp1->set_station(1);
-  sp1->set_type("triplet");
-
-  pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
-  sp2->set_position(pos);
-  sp2->set_tracker(0);
-  sp2->set_station(2);
-  sp2->set_type("triplet");
-
-  pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
-  sp3->set_position(pos);
-  sp3->set_tracker(0);
-  sp3->set_station(3);
-  sp3->set_type("triplet");
-
-  pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
-  sp4->set_position(pos);
-  sp4->set_tracker(0);
-  sp4->set_station(4);
-  sp4->set_type("triplet");
-
-  pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
-  sp5->set_position(pos);
-  sp5->set_tracker(0);
-  sp5->set_station(5);
-  sp5->set_type("triplet");
-
   // Set up the spacepoints vector
+  set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp5);
-  spnts.push_back(sp2);
-  spnts.push_back(sp3);
-  spnts.push_back(sp1);
-  spnts.push_back(sp4);
+  spnts.push_back(_sp5);
+  spnts.push_back(_sp2);
+  spnts.push_back(_sp3);
+  spnts.push_back(_sp1);
+  spnts.push_back(_sp4);
 
   // Set up the spacepoints by station 2D vector
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
 
   // Check the spacepoints have setup correctly
-  EXPECT_EQ(sp1, spnts_by_station[0][0]);
-  EXPECT_EQ(sp2, spnts_by_station[1][0]);
-  EXPECT_EQ(sp3, spnts_by_station[2][0]);
-  EXPECT_EQ(sp4, spnts_by_station[3][0]);
-  EXPECT_EQ(sp5, spnts_by_station[4][0]);
+  EXPECT_EQ(_sp1, spnts_by_station[0][0]);
+  EXPECT_EQ(_sp2, spnts_by_station[1][0]);
+  EXPECT_EQ(_sp3, spnts_by_station[2][0]);
+  EXPECT_EQ(_sp4, spnts_by_station[3][0]);
+  EXPECT_EQ(_sp5, spnts_by_station[4][0]);
   EXPECT_EQ(-68.24883333333334, spnts_by_station[0][0]->get_position().x());
 
   std::vector<int> ignore_stations;
@@ -368,12 +490,12 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   // Check it matches to within a tolerance epsilon
   double epsilon = 0.000001;
   EXPECT_EQ(1, strks.size());
-  EXPECT_TRUE(compare_doubles(x0, strks[0].get_x0(), epsilon));
-  EXPECT_TRUE(compare_doubles(mx, strks[0].get_mx(), epsilon));
-  EXPECT_TRUE(compare_doubles(x_chisq, strks[0].get_x_chisq(), epsilon));
-  EXPECT_TRUE(compare_doubles(y0, strks[0].get_y0(), epsilon));
-  EXPECT_TRUE(compare_doubles(my, strks[0].get_my(), epsilon));
-  EXPECT_TRUE(compare_doubles(y_chisq, strks[0].get_y_chisq(), epsilon));
+  EXPECT_NEAR(x0, strks[0].get_x0(), epsilon);
+  EXPECT_NEAR(mx, strks[0].get_mx(), epsilon);
+  EXPECT_NEAR(x_chisq, strks[0].get_x_chisq(), epsilon);
+  EXPECT_NEAR(y0, strks[0].get_y0(), epsilon);
+  EXPECT_NEAR(my, strks[0].get_my(), epsilon);
+  EXPECT_NEAR(y_chisq, strks[0].get_y_chisq(), epsilon);
 }
 
 TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
@@ -401,6 +523,155 @@ TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
   EXPECT_EQ(-1, is1);
   EXPECT_EQ(-1, is2);
 }
+
+TEST_F(PatternRecognitionTest, test_set_seed_stations) {
+
+  PatternRecognition pr;
+  std::vector<int> ignore_stations(0);
+  int outer_st_num, inner_st_num, mid_st_num;
+
+  // 5 pt track case
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  // 4 pt track case
+  ignore_stations.push_back(4);
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 3;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 2;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(1, mid_st_num);
+
+  ignore_stations[0] = 1;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 0;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  // 3 pt track case (not testing all possible combinations)
+  ignore_stations[0] = 4;
+  ignore_stations.push_back(3);
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(2, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(1, mid_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 2;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(1, mid_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 4;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(3, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 4;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(2, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(1, mid_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 2;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(1, mid_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 3;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+  EXPECT_EQ(2, mid_st_num);
+
+  ignore_stations[0] = 2;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(0, inner_st_num);
+  EXPECT_EQ(3, mid_st_num);
+
+  ignore_stations[0] = 2;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(1, inner_st_num);
+  EXPECT_EQ(3, mid_st_num);
+
+  ignore_stations[0] = 1;
+  ignore_stations[1] = 0;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(2, inner_st_num);
+  EXPECT_EQ(3, mid_st_num);
+
+  ignore_stations[0] = 0;
+  ignore_stations[1] = 1;
+  EXPECT_TRUE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+  EXPECT_EQ(4, outer_st_num);
+  EXPECT_EQ(2, inner_st_num);
+  EXPECT_EQ(3, mid_st_num);
+
+  // Test input error cases
+
+  // Same two stations numbers entered
+  ignore_stations[0] = 4;
+  ignore_stations.push_back(4);
+  EXPECT_FALSE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+
+  // Out of bounds station numbers
+  ignore_stations.resize(1);
+  ignore_stations[0] = 12;
+  EXPECT_FALSE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+
+  ignore_stations[0] = -1;
+  EXPECT_FALSE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+
+  // Too large ignore_stations vector
+  ignore_stations.resize(3);
+  EXPECT_FALSE(pr.set_seed_stations(ignore_stations, outer_st_num, inner_st_num, mid_st_num));
+}
+
 
 TEST_F(PatternRecognitionTest, test_set_end_stations) {
 
