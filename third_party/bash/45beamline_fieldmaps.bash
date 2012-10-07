@@ -26,8 +26,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         echo "INFO: Unpacking:"
         echo
-        rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/
 
         ################################################## 
