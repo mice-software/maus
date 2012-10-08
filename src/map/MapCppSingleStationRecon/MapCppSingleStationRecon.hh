@@ -104,6 +104,10 @@ class MapCppSingleStationRecon {
 
   void print_event_info(SEEvent *event, int k);
 
+  Json::Value set_up_json(Json::Value &root, int event_i, SEEvent *event);
+
+  bool is_good_for_tracking(Json::Value json_event);
+
   Json::Value ConvertToJson(std::string jsonString);
 
   std::string JsonToString(Json::Value json_in);
@@ -123,5 +127,10 @@ class MapCppSingleStationRecon {
   int ClustException;
   ///  Vector with the MICE SE Modules.
   std::vector<const MiceModule*> modules;
+  /// TOF constants
+  static const int tof0_num_slabs = 10;
+  static const int tof1_num_slabs = 7;
+  static const double tof0_a = 40.; // mm
+  static const double tof1_a = 60.; // mm
 }; // Don't forget this trailing colon!!!!
 #endif

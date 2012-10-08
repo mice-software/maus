@@ -20,8 +20,8 @@ import MAUS
 
 def run():
 
-    # my_input = MAUS.InputCppDAQOfflineData()
-    my_input = MAUS.InputPyJSON()
+    my_input = MAUS.InputCppDAQOfflineData()
+    # my_input = MAUS.InputPyJSON()
 
     my_map = MAUS.MapPyGroup()
 

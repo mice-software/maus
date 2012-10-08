@@ -98,20 +98,6 @@ void MapCppTrackerDigits::sfspill_to_mausspill(SciFiSpill &sfspill, Spill &mspil
   }
 }
 
-// The following two functions are added for testing purposes only
-Json::Value MapCppTrackerDigits::ConvertToJson(std::string jsonString) {
-  Json::Value newJson;
-  // JsonCpp string -> JSON::Value converter
-  Json::Reader reader;
 
-  newJson = JsonWrapper::StringToJson(jsonString);
-  return newJson;
-}
-
-std::string MapCppTrackerDigits::JsonToString(Json::Value json_in) {
-  std::stringstream ss_io;
-  JsonWrapper::Print(ss_io, json_in);
-  return ss_io.str();
-}
 
 } // ~namespace MAUS

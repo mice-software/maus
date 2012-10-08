@@ -76,10 +76,6 @@ class MapCppTrackerDigits {
 
   void sfspill_to_mausspill(MAUS::SciFiSpill &sfspill, MAUS::Spill &mspill);
 
-  Json::Value ConvertToJson(std::string jsonString);
-
-  std::string JsonToString(Json::Value json_in);
-
  private:
   /// This should be the classname
   std::string _classname;

@@ -36,7 +36,7 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/SingleStation/KalmanSSTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
-
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 // namespace ublas = boost::numeric::ublas;
 
 // namespace MAUS {
@@ -47,8 +47,7 @@ class KalmanTrackFitSS {
 
   ~KalmanTrackFitSS();
 
-  void process(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se, CLHEP::Hep3Vector &tof1,
-               CLHEP::Hep3Vector &pr_pos, CLHEP::Hep3Vector &pr_mom);
+  void process(Json::Value event);
 
   typedef MAUS::KalmanSite KalmanSite;
 
@@ -56,10 +55,8 @@ class KalmanTrackFitSS {
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
-  void initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
-                               CLHEP::Hep3Vector &tof1,
-                               CLHEP::Hep3Vector &pr_pos, CLHEP::Hep3Vector &pr_mom,
-                               std::vector<KalmanSite> &sites);
+  void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites,
+                               double particle_mass);
 
   void filter(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 
@@ -68,13 +65,22 @@ class KalmanTrackFitSS {
   void filter_virtual(std::vector<KalmanSite> &sites,
                       KalmanSSTrack *track, int current_site);
 
+  void perform_elementar_pattern_recon(Json::Value event, double mass,
+                                       double &x_pr, double &y_pr,
+                                       double &mx_pr, double &my_pr, double &p_z);
+
+  void smooth(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 /*
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters);
 
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 */
-// private:
+ private:
+  static const int tof0_num_slabs = 10;
+  static const int tof1_num_slabs = 7;
+  static const double tof0_a = 40.; // mm
+  static const double tof1_a = 60.; // mm
 };
 
 // } // ~namespace MAUS
