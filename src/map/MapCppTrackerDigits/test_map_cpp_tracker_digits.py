@@ -50,12 +50,28 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
-
-    def test_death(self):
+    def testDeath(self):
         """ Test to make sure death occurs """
         self.assertTrue(self.mapper.death())
 
-    def test_process(self):
+    def testEmpty(self):
+        """Check can handle empty configuration and empty data"""
+        result = self.mapper.birth("")
+        self.assertFalse(result)
+        result = self.mapper.process("")
+        spill_out = json.loads(result)
+        self.assertTrue('errors' in spill_out)
+        self.assertTrue("bad_json_document" in spill_out['errors'])
+        self.assertFalse("recon_events" in spill_out)
+
+    def testBadData(self):
+        """Check can handle nonsense json input data"""
+        result = self.mapper.process("blah")
+        spill_out = json.loads(result)
+        self.assertTrue('errors' in spill_out)
+        self.assertTrue("bad_json_document" in spill_out['errors'])
+
+    def testProcess(self):
         """ Test of the process function """
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
