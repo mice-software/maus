@@ -77,7 +77,7 @@ void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
 
   // Reset.
   _F.Zero();
-  bool magnets_on = true;
+  bool magnets_on = false;
   if ( magnets_on && old_site->get_id() == 4 ) {
     magnet_drift();
   } else {
@@ -171,7 +171,6 @@ void KalmanSSTrack::magnet_drift() {
   M_Q9.Print();
   std::cerr << "Triplet Projection Matrix is: " << "\n";
   _F.Print();
-
 }
 
 void KalmanSSTrack::straight_line(double deltaZ) {
@@ -251,7 +250,7 @@ void KalmanSSTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
-  std::cerr << "dir" << dx << " " << dy << "\n";
+  // std::cerr << "dir" << dx << " " << dy << "\n";
   double A; // mm to channel conversion factor.
   switch ( a_site->get_id() ) {
     case 0 : case 1 :
@@ -384,7 +383,7 @@ void KalmanSSTrack::calc_filtered_state(KalmanSite *a_site) {
   // a_filt.Print();
   // Residuals. x and y.
   double res_x = a_filt(0, 0) - a(0, 0);
-  double res_y = a_filt(1, 0) - a(1, 0);
+  double res_y = a_filt(2, 0) - a(2, 0);
 
   a_site->set_residual_x(res_x);
   a_site->set_residual_y(res_y);

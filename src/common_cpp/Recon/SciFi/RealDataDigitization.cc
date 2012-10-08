@@ -19,7 +19,36 @@
 
 namespace MAUS {
 
-RealDataDigitization::RealDataDigitization() {}
+const int RealDataDigitization::_number_channels = 128;
+const int RealDataDigitization::_number_banks    = 4;
+const int RealDataDigitization::_number_boards   = 16;
+const int RealDataDigitization::_total_number_channels = 6403;
+
+RealDataDigitization::RealDataDigitization() {
+/*
+  _board.resize(_total_number_channels);
+  _bank.resize(_total_number_channels);
+  _chan_ro.resize(_total_number_channels);
+  _tracker.resize(_total_number_channels);
+  _station.resize(_total_number_channels);
+  _view.resize(_total_number_channels);
+  _fibre.resize(_total_number_channels);
+  _extWG.resize(_total_number_channels);
+  _inWG.resize(_total_number_channels);
+  _WGfib.resize(_total_number_channels);
+
+  _calibration.resize(_number_boards);
+  _good_chan.resize(_number_boards);
+  for (int i = 0; i < _number_boards; i++) {
+    _calibration[i].resize(_number_banks);
+    _good_chan[i].resize(_number_banks);
+    for (int j = 0; j < _number_channels; j++) {
+      _calibration[i][j].resize(_number_channels);
+      _good_chan[i][j].resize(_number_channels);
+    }
+  }
+*/
+}
 
 RealDataDigitization::~RealDataDigitization() {}
 
@@ -76,10 +105,10 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       }
 
       // Get pedestal and gain from calibration.
-      assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
-      assert(_calibration[board][bank][channel_ro].isMember("gain"));
-      double pedestal =  _calibration[board][bank][channel_ro]["pedestal"].asDouble();
-      double gain     = _calibration[board][bank][channel_ro]["gain"].asDouble();
+      // assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
+      // assert(_calibration[board][bank][channel_ro].isMember("gain"));
+      double pedestal =  _calibration_pedestal[board][bank][channel_ro];
+      double gain     =  _calibration_gain[board][bank][channel_ro];
 
       // Calculate the number of photoelectrons.
       double pe;
@@ -132,25 +161,21 @@ bool RealDataDigitization::load_calibration(std::string file) {
 
 void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
   std::string line;
-
-  // run over all boards
+  // Run over all boards.
   for ( int i = 0; i < 16; ++i ) {
-    // run over banks
+    // Run over banks.
     for ( int j = 0; j < 4; ++j ) {
-      // run over channels
-      for ( int k = 0; k < 128; ++k ) { // running over channels
+      // Run over channels.
+      for ( int k = 0; k < 128; ++k ) {
         int unique_chan_no, board, bank, chan;
-        double p, g;
+        double ped, gain;
 
         getline(inf, line);
         std::istringstream ist1(line.c_str());
-        ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
-
-        Json::Value channel;
-        channel["pedestal"]=p;
-        channel["gain"]=g;
-        channel["unique_chan"]=unique_chan_no;
-        _calibration[i][j].push_back(channel);
+        ist1 >> unique_chan_no >> board >> bank >> chan >> ped >> gain;
+        _calibration_pedestal[board][bank][chan] = ped;
+        _calibration_gain[board][bank][chan]     = gain;
+        _calibration_unique_chan_number[board][bank][chan] = unique_chan_no;
       }
     }
   }
@@ -167,7 +192,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
   }
 
   std::string line;
-  for ( int i = 1; i < 6403; ++i ) {
+  for ( int i = 1; i < _total_number_channels; ++i ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
 
@@ -209,8 +234,8 @@ bool RealDataDigitization::
 
 bool RealDataDigitization::is_good_channel(const int board, const int bank,
                                            const int chan_ro) const {
-  if ( board < 16 && bank < 4 && chan_ro < 128 ) {
-    return good_chan[board][bank][chan_ro];
+  if ( board < _number_boards && bank < _number_banks && chan_ro < _number_channels ) {
+    return _good_chan[board][bank][chan_ro];
   } else {
     return false;
   }
@@ -226,10 +251,10 @@ bool RealDataDigitization::load_bad_channels() {
     return false;
   }
 
-  for ( int board = 0; board < 16; ++board ) {
-    for ( int bank = 0; bank < 4; ++bank ) {
-      for ( int chan_ro = 0; chan_ro < 128; ++chan_ro ) {
-        good_chan[board][bank][chan_ro] = true;
+  for ( int board = 0; board < _number_boards; ++board ) {
+    for ( int bank = 0; bank < _number_banks; ++bank ) {
+      for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
+        _good_chan[board][bank][chan_ro] = true;
       }
     }
   }
@@ -238,7 +263,7 @@ bool RealDataDigitization::load_bad_channels() {
 
   while ( !inf.eof() ) {
     inf >> bad_board >> bad_bank >> bad_chan_ro;
-    good_chan[bad_board][bad_bank][bad_chan_ro] = false;
+    _good_chan[bad_board][bad_bank][bad_chan_ro] = false;
   }
   return true;
 }

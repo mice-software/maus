@@ -37,10 +37,6 @@ namespace MAUS {
   virtual void TearDown() {}
 };
 
-// TEST_F(SciFiSpacePointRecTest, test_process) {
-// }
-
-
 TEST_F(SciFiSpacePointRecTest, test_process) {
   int tracker = 1;
   int station = 2;
@@ -79,8 +75,6 @@ TEST_F(SciFiSpacePointRecTest, test_process) {
   Cluster2->set_time(time);
   Cluster2->set_direction(direction);
   Cluster2->set_position(position);
-
-
 }
 
 TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
@@ -131,8 +125,30 @@ TEST_F(SciFiSpacePointRecTest, test_clusters_arent_used) {
 }
 
 TEST_F(SciFiSpacePointRecTest, test_kuno_test) {
+  SciFiCluster* c1 = new SciFiCluster();
+  SciFiCluster* c2 = new SciFiCluster();
+  SciFiCluster* c3 = new SciFiCluster();
 
+  c1->set_tracker(0);
+  c2->set_tracker(0);
+  c3->set_tracker(0);
+  c1->set_station(1);
+  c2->set_station(1);
+  c3->set_station(1);
+  c1->set_plane(0);
+  c2->set_plane(1);
+  c3->set_plane(2);
+  c1->set_channel(106);
+  c2->set_channel(106);
+  c3->set_channel(106);
 
+  SciFiSpacePointRec a_test;
+  bool expect_true = a_test.kuno_accepts(c1, c2, c3);
+  EXPECT_TRUE(expect_true);
+
+  c1->set_station(4);
+  bool expect_false = a_test.kuno_accepts(c1, c2, c3);
+  EXPECT_FALSE(expect_false);
 }
 
 
@@ -177,36 +193,26 @@ TEST_F(SciFiSpacePointRecTest, test_make_cluster_container) {
   }
 }
 
-TEST_F(SciFiSpacePointRecTest, test_builds) {
 /*
+TEST_F(SciFiSpacePointRecTest, test_builds) {
   SciFiCluster* c1 = new SciFiCluster();
   SciFiCluster* c2 = new SciFiCluster();
   SciFiCluster* c3 = new SciFiCluster();
+  c1->set_spill(1);
+  c1->set_event(1);
+  c1->set_npe(3.);
+  c2->set_npe(3.);
+  c3->set_npe(3.);
 
   SciFiSpacePoint* triplet(c1, c2, c3);
 
   SciFiSpacePointRec a_test;
+  a_test.build_triplet(triplet);
 
-*/
+
+  _tracker = clust1->get_tracker();
+  _station = clust1->get_station();
 }
-
-/*
-  void process(SciFiEvent &evt);
-
-  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
-
-  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
-
-  void build_duplet(SciFiSpacePoint* duplet);
-
-  void build_triplet(SciFiSpacePoint* triplet);
-
-  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
-
-  bool kuno_accepts(SciFiCluster* cluster1,
-                    SciFiCluster* cluster2,
-                    SciFiCluster* cluster3);
-
 */
 
 } // ~namespace MAUS

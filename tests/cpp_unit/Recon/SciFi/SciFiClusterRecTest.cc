@@ -100,7 +100,7 @@ TEST_F(SciFiClusterRecTest, test_get_seeds) {
   digit_1->set_npe(3.0);
   evt->add_digit(digit_1);
 
-  SciFiDigit *digit_2;
+  SciFiDigit *digit_2 = new SciFiDigit();
   digit_2->set_npe(3.0);
   evt->add_digit(digit_2);
   // SciFiDigit *digit_3;

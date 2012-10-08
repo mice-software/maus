@@ -60,73 +60,77 @@ void KalmanTrackFitSS::process(Json::Value event) {
     std::cout << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
 
+    for ( int site_i = 1; site_i < 11; site_i++ ) {
+      std::cout << "Extrapolating to site " << site_i << std::endl;
+      extrapolate(sites, track, site_i);
+      if ( site_i == 1 || site_i == 6 || site_i == 7 ||
+           site_i == 8 || site_i == 9 || site_i == 10 ) {
+        std::cout << "Filtering site "        << site_i << std::endl;
+        filter(sites, track, site_i);
+      } else {
+        std::cout << "Filtering VIRTUAL site "        << 2 << std::endl;
+        filter_virtual(sites, track, site_i);
+      }
+    }
+/*
     // Extrapolate to TOF0 horizontal slabs
     std::cout << "Extrapolating to site " << 1 << std::endl;
     extrapolate(sites, track, 1);
     std::cout << "Filtering site "        << 1 << std::endl;
     filter(sites, track, 1);
 
-  // Extrapolate to Cherenkov A
-  std::cout << "Extrapolating to site " << 2 << std::endl;
-  extrapolate(sites, track, 2);
-  std::cout << "Filtering VIRTUAL site "        << 2 << std::endl;
-  filter_virtual(sites, track, 2);
-  // Extrapolate to Cherenkov B
-  std::cout << "Extrapolating to site " << 3 << std::endl;
-  extrapolate(sites, track, 3);
-  std::cout << "Filtering VIRTUAL site "        << 3 << std::endl;
-  filter_virtual(sites, track, 3);
+    // Extrapolate to Cherenkov A
+    std::cout << "Extrapolating to site " << 2 << std::endl;
+    extrapolate(sites, track, 2);
+    std::cout << "Filtering VIRTUAL site "        << 2 << std::endl;
+    filter_virtual(sites, track, 2);
+    // Extrapolate to Cherenkov B
+    std::cout << "Extrapolating to site " << 3 << std::endl;
+    extrapolate(sites, track, 3);
+    std::cout << "Filtering VIRTUAL site "        << 3 << std::endl;
+    filter_virtual(sites, track, 3);
 
-  // Extrapolate to first virtual plane
-  std::cout << "Extrapolating to site " << 4 << std::endl;
-  extrapolate(sites, track, 4);
-  std::cout << "Filtering VIRTUAL site "        << 4 << std::endl;
-  filter_virtual(sites, track, 4);
-  // Extrapolate to second virtual plane
-  std::cout << "Extrapolating to site " << 5 << std::endl;
-  extrapolate(sites, track, 5);
-  std::cout << "Filtering VIRTUAL site "        << 5 << std::endl;
-  filter_virtual(sites, track, 5);
+    // Extrapolate to first virtual plane
+    std::cout << "Extrapolating to site " << 4 << std::endl;
+    extrapolate(sites, track, 4);
+    std::cout << "Filtering VIRTUAL site "        << 4 << std::endl;
+    filter_virtual(sites, track, 4);
+    // Extrapolate to second virtual plane
+    std::cout << "Extrapolating to site " << 5 << std::endl;
+    extrapolate(sites, track, 5);
+    std::cout << "Filtering VIRTUAL site "        << 5 << std::endl;
+    filter_virtual(sites, track, 5);
 
-  // Single Station
-  std::cout << "Extrapolating to site " << 6 << std::endl;
-  extrapolate(sites, track, 6);
-  std::cout << "Filtering site "        << 6 <<std::endl;
-  filter(sites, track, 6);
+    // Single Station
+    std::cout << "Extrapolating to site " << 6 << std::endl;
+    extrapolate(sites, track, 6);
+    std::cout << "Filtering site "        << 6 <<std::endl;
+    filter(sites, track, 6);
 
-  std::cout << "Extrapolating to site " << 7 << std::endl;
-  extrapolate(sites, track, 7);
-  std::cout << "Filtering site "        << 7 <<std::endl;
-  filter(sites, track, 7);
+    std::cout << "Extrapolating to site " << 7 << std::endl;
+    extrapolate(sites, track, 7);
+    std::cout << "Filtering site "        << 7 <<std::endl;
+    filter(sites, track, 7);
 
-  std::cout << "Extrapolating to site " << 8 << std::endl;
-  extrapolate(sites, track, 8);
-  std::cout << "Filtering site "        << 8 <<std::endl;
-  filter(sites, track, 8);
+    std::cout << "Extrapolating to site " << 8 << std::endl;
+    extrapolate(sites, track, 8);
+    std::cout << "Filtering site "        << 8 <<std::endl;
+    filter(sites, track, 8);
 
-  // TOF1
-  std::cout << "Extrapolating to site " << 9 << std::endl;
-  extrapolate(sites, track, 9);
-  std::cout << "Filtering site "        << 9 << std::endl;
-  filter(sites, track, 9);
+    // TOF1
+    std::cout << "Extrapolating to site " << 9 << std::endl;
+    extrapolate(sites, track, 9);
+    std::cout << "Filtering site "        << 9 << std::endl;
+    filter(sites, track, 9);
 
     std::cout << "Extrapolating to site " << 10 << std::endl;
     extrapolate(sites, track, 10);
     std::cout << "Filtering site "        << 10 << std::endl;
     filter(sites, track, 10);
-
+*/
 /*
-  int numb_measurements = sites.size();
-  assert(numb_measurements == 3);
-
-  for ( int i = 1; i < numb_measurements; ++i ) {
-    // Predict the state vector at site i...
-    std::cout << "Extrapolating to site " << i << std::endl;
-    extrapolate(sites, track, i);
-    // ... Filter...
-    std::cout << "Filtering site " << i << std::endl;
-    filter(sites, track, i);
-  }
+    int numb_measurements = sites.size();
+  // assert(numb_measurements == 3);
 
   // ...and Smooth back all sites.
   for ( int i = numb_measurements-2; i >= 0; --i ) {
@@ -163,11 +167,11 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   a(4, 0) = 1./p_z;
 
   TMatrixD C(5, 5);
-  C(0, 0) = 1000.;
-  C(1, 1) = 1000.;
-  C(2, 2) = 1000.;
-  C(3, 3) = 1000.;
-  C(4, 4) = 1000.;
+  C(0, 0) = 100.;
+  C(1, 1) = 100.;
+  C(2, 2) = 100.;
+  C(3, 3) = 100.;
+  C(4, 4) = 100.;
 
   KalmanSite first_site;
   first_site.set_projected_a(a);
@@ -207,7 +211,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   double tof0_slaby = event["TOF0"]["slabY"].asDouble();
 
   double tof1_slabx = event["TOF1"]["slabX"].asDouble();
-  double tof1_slaby = event["TOF1"]["slabX"].asDouble();
+  double tof1_slaby = event["TOF1"]["slabY"].asDouble();
   double ss_plane0  = event["SS"]["Plane0"].asDouble();
   double ss_plane1  = event["SS"]["Plane1"].asDouble();
   double ss_plane2  = event["SS"]["Plane2"].asDouble();
@@ -248,7 +252,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_4.set_id(4);
   site_4.set_z(vp1_z);
   sites.push_back(site_4);
-  // Site 3 - VIRTUAL
+  // Site 5 - VIRTUAL
   KalmanSite site_5;
   site_5.set_measurement(0.0);
   site_5.set_direction((0., 0., 0.));
@@ -397,7 +401,8 @@ void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event, double
   //  Hep3Vector tof1_sp(tof1_x, tof1_y, tof1_time);
 
   // Basic PR
-  double distance_TOFs = 7432.7; // mm
+  // 7432.7 -> configDB
+  double distance_TOFs = 7824.1;    // mm
   double delta_x = (tof1_x-tof0_x); // mm
   double delta_y = (tof1_y-tof0_y); // mm
   double delta_z = distance_TOFs;   // mm

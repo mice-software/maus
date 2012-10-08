@@ -212,7 +212,7 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
   Json::Value json_event;
   bool found = false;
   int index_value;
-  double tof1_slabx,tof1_slaby, tof1_time, tof0_slabx, tof0_slaby, tof0_time;
+  double tof1_slabx, tof1_slaby, tof1_time, tof0_slabx, tof0_slaby, tof0_time;
   if ( numb_sp_tof_1 == 1 ) {
     // Get TOF1 slab hits.
     tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabX"].asDouble();
@@ -242,9 +242,12 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
   std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
   int size = clusters.size();
   for ( int clust_i = 0; clust_i < size; ++clust_i ) {
-    if ( clusters[clust_i]->get_plane() == 0 ) json_event["SS"]["Plane0"] = clusters[clust_i]->get_alpha();
-    if ( clusters[clust_i]->get_plane() == 1 ) json_event["SS"]["Plane1"] = clusters[clust_i]->get_alpha();
-    if ( clusters[clust_i]->get_plane() == 2 ) json_event["SS"]["Plane2"] = clusters[clust_i]->get_alpha();
+    if ( clusters[clust_i]->get_plane() == 0 )
+      json_event["SS"]["Plane0"] = clusters[clust_i]->get_alpha();
+    if ( clusters[clust_i]->get_plane() == 1 )
+      json_event["SS"]["Plane1"] = clusters[clust_i]->get_alpha();
+    if ( clusters[clust_i]->get_plane() == 2 )
+      json_event["SS"]["Plane2"] = clusters[clust_i]->get_alpha();
   }
 
   return json_event;

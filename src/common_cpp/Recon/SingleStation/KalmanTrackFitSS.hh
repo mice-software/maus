@@ -55,7 +55,8 @@ class KalmanTrackFitSS {
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
-  void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites, double particle_mass);
+  void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites,
+                               double particle_mass);
 
   void filter(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 

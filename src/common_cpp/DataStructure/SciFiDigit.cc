@@ -21,7 +21,7 @@ namespace MAUS {
 
 SciFiDigit::SciFiDigit():_spill(0), _event(0),
                          _tracker(0), _station(0), _plane(0),
-                         _channel(0), _npe(0), _time(0), _used(false) {
+                         _channel(0), _npe(0.), _time(0.), _used(false) {
   _position = (0., 0., 0.);
   _p = (0., 0., 0.);
 }

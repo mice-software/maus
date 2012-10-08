@@ -58,6 +58,7 @@ class SciFiSpacePoint {
   /** Assignment operator - any pointers are deep copied */
   SciFiSpacePoint& operator=(const SciFiSpacePoint &_scifispacepoint);
 
+  /** Getters and setters for Spacepoint ID: spill, event, tracker, station */
   void set_spill(int spill) { _spill = spill; }
 
   int get_spill()   const { return _spill; }
@@ -74,6 +75,7 @@ class SciFiSpacePoint {
 
   int get_station() const { return _station; }
 
+  /** Getters and setters for Spacepoint properties: npe, time, type... */
   void set_npe(double nPE) { _npe = nPE; }
 
   double get_npe()     const { return _npe; }

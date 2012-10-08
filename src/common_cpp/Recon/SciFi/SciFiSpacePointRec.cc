@@ -136,6 +136,12 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
   int tracker = cluster1->get_tracker();
   int station = cluster1->get_station();
 
+  if ( cluster2->get_tracker() != tracker || cluster2->get_station() != station )
+    return false;
+
+  if ( cluster3->get_tracker() != tracker || cluster3->get_station() != station )
+    return false;
+
   double uvwSum = cluster1->get_channel() +
                   cluster2->get_channel() +
                   cluster3->get_channel();
