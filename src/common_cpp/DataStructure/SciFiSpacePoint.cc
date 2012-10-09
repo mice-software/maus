@@ -62,7 +62,11 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
 }
 
 // Three cluster constructor
-SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3) {
+SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3)
+                : _chi2(0.0),
+                  _position(0, 0, 0),
+                  _time(0.0) {
+
   _used = false;
   _type = "triplet";
   clust1->set_used(true);
@@ -78,15 +82,14 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
 
-  _chi2 = 0;
-  // _position(0, 0, 0);
-  _time = 0;
   // _time_error = 0;
   // _time_res   = 0;
 }
 
 // Two cluster constructor
-SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
+SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) : _chi2(0.0),
+                                                                               _position(0, 0, 0),
+                                                                               _time(0.0) {
   _used = false;
   _type = "duplet";
   clust1->set_used(true);
@@ -99,10 +102,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) {
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
-  _chi2 = -10.0;
 
-  // _position(0, 0, 0);
-  _time = 0;
   // _time_error = 0;
   // _time_res   = 0;
 }

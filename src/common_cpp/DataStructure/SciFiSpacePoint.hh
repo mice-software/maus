@@ -47,10 +47,10 @@ class SciFiSpacePoint {
   SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint);
 
   /** Two cluster constructor  */
-  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
+  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
 
   /** Three cluster constructor  */
-  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2);
+  SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3);
 
   /** Destructor  */
   virtual ~SciFiSpacePoint();
