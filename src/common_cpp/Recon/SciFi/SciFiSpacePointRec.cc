@@ -23,10 +23,19 @@ SciFiSpacePointRec::SciFiSpacePointRec() {}
 
 SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
-void SciFiSpacePointRec::process(SciFiEvent &evt) {
-  int clusters_size = evt.clusters().size();
-  // Store clusters in a vector.
+void SciFiSpacePointRec::process(SciFiEvent &event) {
   std::vector<SciFiCluster*> clusters[2][6][3];
+
+  make_cluster_container(event, clusters);
+
+  look_for_triplets(event, clusters);
+
+  look_for_duplets(event, clusters);
+}
+
+void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
+                                                std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+  int clusters_size = evt.clusters().size();
   for ( int cl = 0; cl < clusters_size; cl++ ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
     int tracker = a_cluster->get_tracker();
@@ -34,10 +43,6 @@ void SciFiSpacePointRec::process(SciFiEvent &evt) {
     int plane   = a_cluster->get_plane();
     clusters[tracker][station][plane].push_back(a_cluster);
   }
-
-  look_for_triplets(evt, clusters);
-
-  look_for_duplets(evt, clusters);
 }
 
 void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,
@@ -130,6 +135,12 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
   // to the same station, only the planes are different
   int tracker = cluster1->get_tracker();
   int station = cluster1->get_station();
+
+  if ( cluster2->get_tracker() != tracker || cluster2->get_station() != station )
+    return false;
+
+  if ( cluster3->get_tracker() != tracker || cluster3->get_station() != station )
+    return false;
 
   double uvwSum = cluster1->get_channel() +
                   cluster2->get_channel() +

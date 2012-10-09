@@ -95,23 +95,22 @@ TEST_F(SciFiClusterRecTest, test_process) {
 
 TEST_F(SciFiClusterRecTest, test_get_seeds) {
   // SciFiEvent evt;
-/*  SciFiEvent* evt = new SciFiEvent();
+  SciFiEvent* evt = new SciFiEvent();
   SciFiDigit *digit_1 = new SciFiDigit();
   digit_1->set_npe(3.0);
   evt->add_digit(digit_1);
 
-  SciFiDigit *digit_2;
+  SciFiDigit *digit_2 = new SciFiDigit();
   digit_2->set_npe(3.0);
-  // evt->add_digit(digit_2);
-  SciFiDigit *digit_3;
-  digit_3->set_npe(1.0);
+  evt->add_digit(digit_2);
+  // SciFiDigit *digit_3;
+  // digit_3->set_npe(1.0);
   // evt->add_digit(digit_3);
   std::vector<SciFiDigit*> seeds;
 
   SciFiClusterRec *worker = new SciFiClusterRec(cluster_exception, min_npe, modules);
-  // seeds = worker->get_seeds(*evt);
+  seeds = worker->get_seeds(*evt);
   EXPECT_EQ(2, seeds.size());
-*/
 }
 
 TEST_F(SciFiClusterRecTest, test_construct) {
@@ -184,11 +183,7 @@ TEST_F(SciFiClusterRecTest, test_neighbours) {
 }
 
 /*
-  std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt);
-
   ThreeVector get_reference_frame_pos(int tracker);
-
-  bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
 
   void construct(SciFiCluster *clust, const MiceModule* this_plane,
                  ThreeVector &dir, ThreeVector &tracker_ref_frame_pos, double &alpha);

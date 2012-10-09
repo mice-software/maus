@@ -69,8 +69,8 @@ spill_generator_number_of_spills = 5
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":3, # number of coin tosses
-    "binomial_p":0.8, # probability of making a particle on each toss
+    "binomial_n":1, # number of coin tosses
+    "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
     "definitions":[
@@ -114,6 +114,8 @@ SciFinStations = 5
 SciFinTrackers = 2
 SciFiNPECut = 2
 SciFiClustExcept = 100
+SciFiHelicalPROn = 1
+SciFiStraightPROn = 0
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads

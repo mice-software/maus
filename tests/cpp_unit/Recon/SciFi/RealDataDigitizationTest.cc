@@ -38,20 +38,20 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
   RealDataDigitization test_case_2;
   bool good_calib = test_case_2.load_calibration("scifi_calibration_30_09_2011.txt");
   EXPECT_TRUE(good_calib);
-/*
-  std::vector<Json::Value> calibration_data[16][4];
-  calibration_data = test_case_2.get_calibration();
-  int num_boards = 16;
-  int num_banks = 4;
-  int num_channels = 128;
-  EXPECT_EQ(num_boards, calibration_data.size());
-  for ( int board_i = 0; board_i < num_boards; board_i++ ) {
-    EXPECT_EQ(num_banks, calibration_data[board_i].size());
-    for ( int bank_i = 0; bank_i < num_banks; bank_i++ ) {
-      EXPECT_EQ(num_channels, calibration_data[board_i][bank_i].size());
+
+  for ( int board = 0; board < 16; ++board ) {
+    for ( int bank = 0; bank < 4; ++bank ) {
+      for ( int channel = 0; channel < 128; ++channel ) {
+        int my_board = board;
+        if ( board > 7 ) {
+          my_board = board-8;
+        }
+        int return_value = test_case_2.get_calibration_unique_chan_numb(board, bank, channel);
+        int unique_channel = channel + bank*128 + my_board*512;
+        EXPECT_EQ(unique_channel, return_value);
+      }
     }
   }
-*/
 }
 
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
@@ -106,16 +106,6 @@ TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   EXPECT_FALSE(test_case.is_good_channel(bad_channel[0], bad_channel[1], bad_channel[2]));
   EXPECT_TRUE(test_case.is_good_channel(good_channel[0], good_channel[1], good_channel[2]));
   EXPECT_FALSE(test_case.is_good_channel(out_of_range[0], out_of_range[1], out_of_range[2]));
-}
-
-TEST_F(RealDataDigitizationTest, test_read_in_all_boards) {
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string file="scifi_calibration_30_09_2011.txt";
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
-  std::ifstream inf(fname.c_str());
-
-  RealDataDigitization test_case;
-  test_case.read_in_all_Boards(inf);
 }
 
 TEST_F(RealDataDigitizationTest, test_process) {
