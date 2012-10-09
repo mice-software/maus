@@ -25,40 +25,45 @@
 #include "TDecompSVD.h"
 #include "TF1.h"
 
-
 namespace MAUS {
 
-  bool MapCppTrackerVirtualRecon::birth(std::string argJsonConfigDocument) {
-    _classname = "MapCppTrackerVirtualRecon";
-    Json::Reader reader;
-    // Check if the JSON document can be parsed, else return error only.
-    bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
-    if (!parsingSuccessful) {
-      return false;
-    }
-
-    // Get the tracker modules.
-    assert(_configJSON.isMember("reconstruction_geometry_filename"));
-    std::string filename;
-    filename = _configJSON["reconstruction_geometry_filename"].asString();
-    MiceModule* _module;
-    _module = new MiceModule(filename);
-    modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-    // Get minPE cut value.
-    assert(_configJSON.isMember("SciFiNPECut"));
-    minPE = _configJSON["SciFiNPECut"].asDouble();
-
-    // Get the value above which an Exception is thrown
-    assert(_configJSON.isMember("SciFiClustExcept"));
-    ClustException = _configJSON["SciFiClustExcept"].asInt();
-
-
-    return true;}
-
-  bool MapCppTrackerVirtualRecon::death() {
-    return true;
+bool MapCppTrackerVirtualRecon::birth(std::string argJsonConfigDocument) {
+  _classname = "MapCppTrackerVirtualRecon";
+  Json::Reader reader;
+  // Check if the JSON document can be parsed, else return error only.
+  bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
+  if (!parsingSuccessful) {
+    return false;
   }
+
+  // Get the tracker modules.
+  assert(_configJSON.isMember("reconstruction_geometry_filename"));
+  std::string filename;
+  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  MiceModule* _module;
+  _module = new MiceModule(filename);
+  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+
+  // Get minPE cut value.
+  assert(_configJSON.isMember("SciFiNPECut"));
+  minPE = _configJSON["SciFiNPECut"].asDouble();
+
+  // Get the value above which an Exception is thrown
+  assert(_configJSON.isMember("SciFiClustExcept"));
+  ClustException = _configJSON["SciFiClustExcept"].asInt();
+
+  // Get the flags for turning straight and helical pr on or off
+  assert(_configJSON.isMember("SciFiPRHelicalOn"));
+  _helical_pr_on = _configJSON["SciFiPRHelicalOn"].asBool();
+  assert(_configJSON.isMember("SciFiPRStraightOn"));
+  _straight_pr_on = _configJSON["SciFiPRStraightOn"].asBool();
+
+  return true;
+}
+
+bool MapCppTrackerVirtualRecon::death() {
+  return true;
+}
 
 std::string MapCppTrackerVirtualRecon::process(std::string document) {
   // Writes a line in the JSON document.
@@ -94,8 +99,8 @@ std::string MapCppTrackerVirtualRecon::process(std::string document) {
       // Pattern Recognition.
       if ( event.spacepoints().size() ) {
         std::cout << "Calling Pattern Recognition..." << std::endl;
-	std::cout << "This event has: " << event.spacepoints().size() <<"spacepoints" << std::endl;
-        pattern_recognition(event);
+        std::cout << "This event has: " << event.spacepoints().size() <<"spacepoints\n";
+        pattern_recognition(_helical_pr_on, _straight_pr_on, event);
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
@@ -111,18 +116,19 @@ std::string MapCppTrackerVirtualRecon::process(std::string document) {
 
       save_to_json_recon(event, k);
     }
-  }  catch(...) {return "";
+  } catch(...) {
+    return "";
   }
   // =================Looks at Virtual Hits=================================
   num_event_spill2 = 0;
   num_event_spill2 = spill2.events().size();
 
   try { // ================= Reconstruction =========================
-
     for ( unsigned int k = 0; k < spill2.events().size(); k++ ) {
-
       SciFiEvent event = *(spill2.events()[k]);
-      if ( event.spacepoints().size() ) {pattern_recognition(event);}
+      if ( event.spacepoints().size() ) {
+        pattern_recognition(_helical_pr_on, _straight_pr_on, event);
+      }
       print_event_info_mc(event);
       save_to_json_mc(event, k);
     }  // ==========================================================
@@ -132,75 +138,70 @@ std::string MapCppTrackerVirtualRecon::process(std::string document) {
   return writer.write(root);
 }
 
+// fill our virtual hits
+void MapCppTrackerVirtualRecon::fill_virtualhits_vector(Json::Value &virtualhits,
+                                                        MAUS::SciFiSpill &a_spill) {
+  // vector of virtual hits
+  for ( unsigned int event_i = 0; event_i < virtualhits.size(); event_i++ ) {
+    SciFiEvent* an_event = new SciFiEvent();
+    Json::Value _virtualhits = virtualhits[event_i]["virtual_hits"];
+    for ( unsigned int j = 0; j < _virtualhits.size(); j++ ) {
+      Json::Value hit;
+      hit = _virtualhits[j];
+      int  spill, event;
+      double x, y, z;
+      x = hit["position"]["x"].asDouble();
+      y = hit["position"]["y"].asDouble();
+      z = hit["position"]["z"].asDouble();
+      spill   = hit["phys_evt_num"].asInt();
+      event   = hit["part_evt_num"].asInt();
+      ThreeVector position(x, y, z);
+      SciFiSpacePoint* scifi_sp = new SciFiSpacePoint();
+      find_tracker_station(*scifi_sp, static_cast<double>(z));
+      scifi_sp->set_spill(spill);
+      scifi_sp->set_event(event);
+      scifi_sp->set_position(position);
+      scifi_sp->set_used(false);
+      scifi_sp->set_type("triplet");
+      an_event->add_spacepoint(scifi_sp);
+    } // ends loop over virtual hits in the event
+    a_spill.add_event(an_event);
+  } // ends loop over events
+}
 
-  void MapCppTrackerVirtualRecon::fill_virtualhits_vector(Json::Value &virtualhits,
-	MAUS::SciFiSpill &a_spill) // fill our virtual hits {
-
-    // vector of virtual hits
-    int number_events = virtualhits.size();
-    for (unsigned int event_i = 0; event_i < number_events; event_i++) {
-      SciFiEvent* an_event = new SciFiEvent();
-      Json::Value _virtualhits = virtualhits[event_i]["virtual_hits"];
-      for (unsigned int j = 0; j < _virtualhits.size(); j++) {
-	Json::Value hit;
-	hit = _virtualhits[j];
-	int  spill, event;
-
-	double x, y, z;
-	x = hit["position"]["x"].asDouble();
-	y = hit["position"]["y"].asDouble();
-	z = hit["position"]["z"].asDouble();
-	spill   = hit["phys_evt_num"].asInt();
-	event   = hit["part_evt_num"].asInt();
-	ThreeVector position(x, y, z);
-
-	SciFiSpacePoint* scifi_sp = new SciFiSpacePoint();
-	find_tracker_station(*scifi_sp, static_cast<double>(z));
-	scifi_sp->set_spill(spill);
-	scifi_sp->set_event(event);
-	scifi_sp->set_position(position);
-	scifi_sp->set_used(false);
-	scifi_sp->set_type("triplet");
-	an_event->add_spacepoint(scifi_sp);
-      } // ends loop over virtual hits in the event
-      a_spill.add_event(an_event);
-    } // ends loop over events
+void MapCppTrackerVirtualRecon::find_tracker_station(SciFiSpacePoint &spacepoint,
+                                                     double z_value) {
+  if (z_value > -5800 && z_value < -4600) {
+    spacepoint.set_tracker(0);
+    if (z_value > -4700 && z_value < -4600)
+      spacepoint.set_station(1);
+    else if (z_value >-4900 && z_value < -4800)
+      spacepoint.set_station(2);
+    else if (z_value > -5150 && z_value< -5050)
+      spacepoint.set_station(3);
+    else if (z_value> -5450 && z_value< -5350)
+      spacepoint.set_station(4);
+    else
+      spacepoint.set_station(5);
   }
-
-  void MapCppTrackerVirtualRecon::find_tracker_station(MAUS::SciFiSpacePoint &spacepoint,
-double z_value) {
-    if (z_value > -5800 && z_value < -4600) {
-	spacepoint.set_tracker(0);
-	if (z_value > -4700 && z_value < -4600)
-	  spacepoint.set_station(1);
-	else if (z_value >-4900 && z_value < -4800)
-	  spacepoint.set_station(2);
-	else if (z_value > -5150 && z_value< -5050)
-	  spacepoint.set_station(3);
-	else if (z_value> -5450 && z_value< -5350)
-	  spacepoint.set_station(4);
-	else
-	  spacepoint.set_station(5);
-      }
-    if (z_value > -983.5 && z_value < 216.5) {
-	spacepoint.set_tracker(1);
-	if ( z_value > 116.5 && z_value < 216.5 )
-	  spacepoint.set_station(5);
-	if ( z_value > -233.5 && z_value < -133.5)
-	  spacepoint.set_station(4);
-	if ( z_value > -533.5 && z_value < -433.5)
-	  spacepoint.set_station(3);
-	if ( z_value > -783.5 && z_value < -683.5)
-	  spacepoint.set_station(2);
-	if (z_value > -983.5 && z_value < -883.5)
-	  spacepoint.set_station(1);
-      }
+  if (z_value > -983.5 && z_value < 216.5) {
+    spacepoint.set_tracker(1);
+    if ( z_value > 116.5 && z_value < 216.5 )
+      spacepoint.set_station(5);
+    if ( z_value > -233.5 && z_value < -133.5)
+      spacepoint.set_station(4);
+    if ( z_value > -533.5 && z_value < -433.5)
+      spacepoint.set_station(3);
+    if ( z_value > -783.5 && z_value < -683.5)
+      spacepoint.set_station(2);
+    if (z_value > -983.5 && z_value < -883.5)
+      spacepoint.set_station(1);
   }
+}
 
 
 void MapCppTrackerVirtualRecon::fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill) {
-  int number_events = digits.size();
-  for ( unsigned int event_i = 0; event_i < number_events; event_i++ ) {
+  for ( unsigned int event_i = 0; event_i < digits.size(); event_i++ ) {
     SciFiEvent* an_event = new SciFiEvent();
     Json::Value digits_tracker0 = digits[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker0"];
     Json::Value digits_tracker1 = digits[event_i]["sci_fi_event"]["sci_fi_digits"]["tracker1"];
@@ -289,9 +290,9 @@ void MapCppTrackerVirtualRecon::fit(std::vector<SciFiSpacePoint*> spacepoints,
   y_slope = solve_y(1);
 }
 
-  void MapCppTrackerVirtualRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(ClustException, minPE);
-  clustering.process(evt, modules);
+void MapCppTrackerVirtualRecon::cluster_recon(SciFiEvent &evt) {
+  SciFiClusterRec clustering(ClustException, minPE, modules);
+  clustering.process(evt);
 }
 
 void MapCppTrackerVirtualRecon::spacepoint_recon(SciFiEvent &evt) {
@@ -299,9 +300,10 @@ void MapCppTrackerVirtualRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerVirtualRecon::pattern_recognition(SciFiEvent &evt) {
+void MapCppTrackerVirtualRecon::pattern_recognition(const bool helical_pr_on,
+                                                    const bool straight_pr_on, SciFiEvent &evt) {
   PatternRecognition pr1;
-  pr1.process(evt);
+  pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
 void MapCppTrackerVirtualRecon::track_fit(SciFiEvent &evt) {
@@ -439,20 +441,21 @@ void MapCppTrackerVirtualRecon::save_to_json_recon(SciFiEvent &evt, int event_i)
                                                = h_tracks_tracker1;
 }
 
-  void MapCppTrackerVirtualRecon::print_event_info_recon(SciFiEvent &event) {
+void MapCppTrackerVirtualRecon::print_event_info_recon(SciFiEvent &event) {
   std::cout << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << "; "
             << event.straightprtracks().size() << " "
             << event.helicalprtracks().size() << " " << std::endl;
-  }
-  void MapCppTrackerVirtualRecon::print_event_info_mc(MAUS::SciFiEvent &event) {
+}
+
+void MapCppTrackerVirtualRecon::print_event_info_mc(MAUS::SciFiEvent &event) {
     std::cout << event.spacepoints().size() << "; "
 	      << event.straightprtracks().size() << " "
 	      << event.helicalprtracks().size() << " " << std::endl;
-  }
+}
 
-  void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event_i) {
+void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event_i) {
     std::ofstream output_file("virtual_mc_output.json", std::ios::out | std::ios::app);
     if (event_i ==0)
       {  output_file << "{";
