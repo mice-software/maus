@@ -86,18 +86,4 @@ void MapCppTrackerDigits::save_to_json(Spill &spill) {
   root = *spill_proc.CppToJson(spill);
 }
 
-void MapCppTrackerDigits::sfspill_to_mausspill(SciFiSpill &sfspill, Spill &mspill) {
-
-  mspill.SetReconEvents(new ReconEventArray());
-
-  for ( unsigned int event_i = 0; event_i < sfspill.events().size(); ++event_i ) {
-    ReconEvent * revt = new ReconEvent();
-    // Pointers should be deep copied
-    revt->SetSciFiEvent(new SciFiEvent(*(sfspill.events()[event_i])));
-    mspill.GetReconEvents()->push_back(revt);
-  }
-}
-
-
-
 } // ~namespace MAUS

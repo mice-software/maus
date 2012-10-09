@@ -31,6 +31,7 @@ class SciFiHelicalPRTrackTestDS : public ::testing::Test {
 };
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_default_constructor) {
+  unsigned int size = 0;
   SciFiHelicalPRTrack prtrack;
   EXPECT_EQ(prtrack.get_x0(), -1.0);
   EXPECT_EQ(prtrack.get_y0(), -1.0);
@@ -47,8 +48,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_circle_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_tracker(), -1);
   EXPECT_EQ(prtrack.get_num_points(), -1);
-  EXPECT_EQ(prtrack.get_phi_i().size(), 0);
-  EXPECT_EQ(prtrack.get_spacepoints().size(), 0);
+  EXPECT_EQ(prtrack.get_phi_i().size(), size);
+  EXPECT_EQ(prtrack.get_spacepoints().size(), size);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_parameter_constructor) {
@@ -171,6 +172,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
 
   SciFiHelicalPRTrack prtrack(tracker, num_points, pos, hlx);
 
+  unsigned int size = 0;
+
   EXPECT_EQ(prtrack.get_x0(), x0);
   EXPECT_EQ(prtrack.get_y0(), y0);
   EXPECT_EQ(prtrack.get_z0(), z0);
@@ -185,7 +188,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
   EXPECT_EQ(prtrack.get_circle_y0(), -1);
   EXPECT_EQ(prtrack.get_circle_chisq(), -1);
   EXPECT_EQ(prtrack.get_phi_i().size(), 0);
-  EXPECT_EQ(prtrack.get_spacepoints().size(), 0);
+  EXPECT_EQ(prtrack.get_spacepoints().size(), size);
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
 }
@@ -228,6 +231,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   SciFiHelicalPRTrack trk2;
   trk2 = trk1;
 
+  unsigned int size = 2;
+
   EXPECT_EQ(trk2.get_x0(), x0);
   EXPECT_EQ(trk2.get_y0(), y0);
   EXPECT_EQ(trk2.get_z0(), z0);
@@ -243,7 +248,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(trk2.get_circle_chisq(), circle_chisq);
   EXPECT_EQ(trk2.get_tracker(), tracker);
   EXPECT_EQ(trk2.get_num_points(), num_points);
-  ASSERT_EQ(trk2.get_phi_i().size(), 2);
+  ASSERT_EQ(trk2.get_phi_i().size(), size);
   EXPECT_EQ(trk2.get_phi_i()[0], 1.0);
   EXPECT_EQ(trk2.get_phi_i()[1], -2.0);
   EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);

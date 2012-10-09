@@ -42,7 +42,6 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/DataStructure/SciFiSpill.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
@@ -73,8 +72,6 @@ class MapCppTrackerDigits {
   std::string process(std::string document);
 
   void save_to_json(MAUS::Spill &spill);
-
-  void sfspill_to_mausspill(MAUS::SciFiSpill &sfspill, MAUS::Spill &mspill);
 
  private:
   /// This should be the classname

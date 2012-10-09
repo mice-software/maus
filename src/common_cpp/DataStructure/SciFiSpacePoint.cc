@@ -25,11 +25,11 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
                                     _event(0),
                                     _tracker(0),
                                     _station(0),
+                                    _time(0.0),
                                     _npe(0.0),
                                     _chi2(0.0),
                                     _type(""),
-                                    _position(0, 0, 0),
-                                    _time(0.)  {
+                                    _position(0, 0, 0) {
 }
 
 // Copy contructor
@@ -38,6 +38,7 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
                                                                           _event(0),
                                                                           _tracker(0),
                                                                           _station(0),
+                                                                          _time(0),
                                                                           _npe(0.0),
                                                                           _chi2(0.0),
                                                                           _type(""),
@@ -47,11 +48,11 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
   _event     = _scifispacepoint.get_event();
   _tracker   = _scifispacepoint.get_tracker();
   _station   = _scifispacepoint.get_station();
+  _time      = _scifispacepoint.get_time();
   _npe       = _scifispacepoint.get_npe();
   _chi2      = _scifispacepoint.get_chi2();
   _type      = _scifispacepoint.get_type();
   _position  = _scifispacepoint.get_position();
-  _time      = _scifispacepoint.get_time();
 
   _channels.resize(_scifispacepoint._channels.size());
   for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {
@@ -63,10 +64,7 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &_scifispacepoint):_used(
 
 // Three cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3)
-                : _chi2(0.0),
-                  _position(0, 0, 0),
-                  _time(0.0) {
-
+                : _time(0.0), _chi2(0.0), _position(0, 0, 0) {
   _used = false;
   _type = "triplet";
   clust1->set_used(true);
@@ -87,9 +85,9 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
 }
 
 // Two cluster constructor
-SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2) : _chi2(0.0),
-                                                                               _position(0, 0, 0),
-                                                                               _time(0.0) {
+SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
+                : _time(0.0), _chi2(0.0), _position(0, 0, 0) {
+
   _used = false;
   _type = "duplet";
   clust1->set_used(true);
@@ -120,11 +118,11 @@ SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &_scifispacepo
   _event     = _scifispacepoint.get_event();
   _tracker   = _scifispacepoint.get_tracker();
   _station   = _scifispacepoint.get_station();
+  _time      = _scifispacepoint.get_time();
   _npe       = _scifispacepoint.get_npe();
   _chi2      = _scifispacepoint.get_chi2();
   _type      = _scifispacepoint.get_type();
   _position  = _scifispacepoint.get_position();
-  _time      = _scifispacepoint.get_time();
 
   _channels.resize(_scifispacepoint._channels.size());
   for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {
