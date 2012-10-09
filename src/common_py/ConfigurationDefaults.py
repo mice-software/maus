@@ -25,8 +25,6 @@ bin/simulate_mice.py --configuration_file my_configuration.py
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-# NOTE: please use lower_case_and_underscores for new configuration cards
-
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
@@ -53,16 +51,6 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
-# set how headers and footers are handled - "append" will set to
-# append headers and footers to the output; dont_append will set to not append
-# headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
-# RunFooter
-#
-# For example, if the user wants to copy data from one format to another, he
-# should set to dont_append to avoid header and footer information being taken
-# to the output
-header_and_footer_mode = "append" #append or dont_append
-
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
@@ -79,7 +67,6 @@ simulation_reference_particle = { # used for setting particle phase
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
-everything_special_virtual = False
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
@@ -93,20 +80,11 @@ kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,   
-                          "nu_e":False, "anti_nu_e":False,
-                          "nu_mu":False, "anti_nu_mu":False,
-                          "nu_tau":False, "anti_nu_tau":False,
+                          "nu_e":False, "antu_nu_e":False,
+                          "nu_mu":False, "antu_nu_mu":False,
+                          "nu_tau":False, "antu_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
-field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
-field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
-
-stepping_algorithm = "ClassicalRK4" # numerical integration routine
-delta_one_step = -1. # Geant4 step accuracy parameter
-delta_intersection = -1.
-epsilon_min = -1.
-epsilon_max = -1.
-miss_distance = -1.
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -246,8 +224,8 @@ geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used 
 geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
-geometry_upload_cleanup = True # set to True to clean up after upload
 technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
+geometry_upload_cleanup = True # set to True to clean up after upload
 
 #dates need to get geomtry ids
 get_ids_start_time = ""
@@ -255,7 +233,14 @@ get_ids_stop_time = ""
 get_ids_create_file = True
 
 #get beamline information
-get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
+# This executable will give the run numbers of the runs which the CDB has information on.
+# The information is the magnet currents, reasons for run and other information which
+# is specific to that run. When downloading a geometry by run number the beamline 
+# information is merged with the geometrical infomation. Options for querying
+# beamline information are; 'all_entries' returns a list of all run numbers with beamline info.
+#                           'run_number'  prints whether info is held for this run number or not.
+#                           'dates'       returns a list of run numbers with info during specified time period.
+get_beamline_by = "all_entries" 
 get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""

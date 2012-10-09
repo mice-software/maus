@@ -64,7 +64,6 @@ def run_get_beamlines(run_dates):
         subproc.wait()
         test_out.close()
 
-            
 class TestGetBeamlineInfo(unittest.TestCase): #pylint:disable= R0904
     """
     This test calls the get_beamline_info specifying the executable to
@@ -126,8 +125,10 @@ class TestGetBeamlineInfo(unittest.TestCase): #pylint:disable= R0904
         fin = open(geometry_id_file, 'r')
         geometry_lines_found = 0
         for lines in fin.readlines():
-            if lines.find('IOError:')>= 0:
-                geometry_lines_found += 2
+            if lines.find('Server status is OK')>= 0:
+                geometry_lines_found += 1
+            if lines.find('4118')>= 0:
+                geometry_lines_found += 1
         self.assertEqual(geometry_lines_found, 2, \
                            'Should have raised and IOError')
 
