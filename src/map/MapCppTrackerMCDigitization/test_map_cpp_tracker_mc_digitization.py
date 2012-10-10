@@ -58,7 +58,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         """
         self.mapper = MapCppTrackerMCDigitization()
         conf = json.loads(Configuration().getConfigJSON())
-        conf["reconstruction_geometry_filename"] = "Stage4.dat"
+        conf["simulation_geometry_filename"] = "Stage4.dat"
         # Test whether the configuration files were loaded correctly at birth
         success = self.mapper.birth(json.dumps(conf))
         if not success:
@@ -84,7 +84,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         output_1 = self.mapper.process(spill_1)
         self.assertTrue("errors" in json.loads(output_1))
         # Spill 2 is sane.
-        spill_2 = _file.readline().rstrip()
+        spill_2 = _file.readline()
         output_2 = self.mapper.process(spill_2)
         self.assertTrue("recon_events" in json.loads(output_2))
         # spill 3 is end of event
