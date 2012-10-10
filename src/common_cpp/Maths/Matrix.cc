@@ -31,13 +31,16 @@
 
 #include <iostream>
 #include <limits>
+#include <sstream>
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
+#include "json/json.h"
 
 #include "Interface/Squeal.hh"
 #include "Maths/Vector.hh"
+#include "Utils/JsonWrapper.hh"
 
 using MAUS::complex;
 using MAUS::Vector;
@@ -1350,9 +1353,29 @@ std::ostream& operator<<(std::ostream&            out,
   return out;
 }
 template std::ostream& operator<<(
-  std::ostream& out, const Matrix<double>& matrix);
-template std::ostream& operator<<(
   std::ostream& out, const Matrix<complex>& matrix);
+
+template <> std::ostream& operator<<(
+    std::ostream& out, const Matrix<double>& matrix) {
+  size_t rows = matrix.number_of_rows();
+  size_t columns = matrix.number_of_columns();
+  out << "[";
+  for (size_t row = 1; row <= rows; ++row) {
+    out << "[";
+    for (size_t column = 1; column <= columns; ++column) {
+      out << matrix(row, column);
+      if (column < columns) {
+        out << ", ";
+      }
+    }
+    out << "]";
+    if (row < rows) {
+      out << "," << std::endl;
+    }
+  }
+  out << "]";
+  return out;
+}
 
 template <typename StdType>
 std::istream& operator>>(std::istream&    in,
@@ -1369,8 +1392,35 @@ std::istream& operator>>(std::istream&    in,
   return in;
 }
 template std::istream& operator>>(
-  std::istream& in, Matrix<double>& matrix);
-template std::istream& operator>>(
   std::istream& in, Matrix<complex>& matrix);
+
+template <> std::istream& operator>>(
+    std::istream& in, Matrix<double>& matrix){
+  std::streamsize buffer_size = 1024;
+  char buffer[buffer_size];
+  std::stringbuf document;
+  while (!in.eof()) {
+    in.read(buffer, buffer_size);
+    std::streamsize read_bytes_count = in.gcount();
+    document.sputn(buffer, read_bytes_count);
+  }
+
+  Json::Value json_document = JsonWrapper::StringToJson(document.str());
+  Json::Value::ArrayIndex rows = json_document.size();
+  Json::Value::ArrayIndex columns;
+  if (rows > 0) {
+    columns = json_document[Json::Value::UInt(0)].size();
+    matrix = Matrix<double>(rows, columns);
+    for (size_t row = 1; row <= rows; ++row) {
+      Json::Value json_row = json_document[row-1];
+      for (size_t column = 1; column <= columns; ++column) {
+        Json::Value json_element = json_row[column-1];
+        matrix(row, column) = json_element.asDouble();
+      }
+    }
+  }
+
+  return in;
+}
 
 }  // namespace MAUS

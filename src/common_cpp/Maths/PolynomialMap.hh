@@ -522,6 +522,12 @@ size_t PolynomialMap::NumberOfPolynomialCoefficients() {
   return NumberOfPolynomialCoefficients(point_dimension_, PolynomialOrder());
 }
 
+Vector<double> generate_polynomial_2D(const PolynomialMap & map,
+                                      const size_t variable_index,
+                                      const double input_min,
+                                      const double input_max,
+                                      const double input_increment);
+
 } // namespace MAUS
 
 #endif

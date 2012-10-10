@@ -151,6 +151,23 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
     = PolynomialMap::NumberOfPolynomialCoefficients(6, polynomial_order_);
 
     std::vector<TrackPoint> first_plane_hits;
+/*
+  for (int i = 0; i < 7; ++i) {
+    int first_index = i-1;
+    if (first_index < 0) first_index = 0;
+    int second_index = i;
+    if (second_index > 5) second_index = 5;
+    for (int j = first_index; j <= second_index; ++j) {
+      TrackPoint first_plane_hit;
+
+      first_plane_hit[j] = 1.;
+
+      first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
+                                 reference_particle_.z(),
+                                 reference_particle_.particle_id()));
+    }
+  }
+*/
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
       TrackPoint first_plane_hit;
@@ -167,6 +184,12 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
   }
   size_t base_block_length = first_plane_hits.size();
 
+  // adjust for the case where the base block size is greater than N(n, v)
+  while (base_block_length > num_poly_coefficients) {
+    first_plane_hits.pop_back();
+    base_block_length = first_plane_hits.size();
+  }
+
   int summand;
   for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
     summand = row / base_block_length;
@@ -177,12 +200,13 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
                                 reference_particle_.z(),
                                 reference_particle_.particle_id()));
   }
-
 std::cout << "DEBUG PolynomialOpticsModel::BuildFirstPlaneHits(): "
           << "# first plane hits = " << first_plane_hits.size() << std::endl;
   return first_plane_hits;
 }
 
+/* Calculate a transfer matrix from an equal number of inputs and output.
+ */
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
     const std::vector<reconstruction::global::TrackPoint> & station_hits)
@@ -221,8 +245,18 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
                    "PolynomialOpticsModel::CalculateTransferMap()"));
   } else if (algorithm_ == Algorithm::kLeastSquares) {
     // unconstrained least squares
+/*
     polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
         points, values, polynomial_order_, weights_);
+*/
+    polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
+        points, values, 1, weights_);
+    if (polynomial_order_ > 1) {
+      PolynomialMap * linear_polynomial_map = polynomial_map;
+      polynomial_map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+          points, values, polynomial_order_,
+          linear_polynomial_map->GetCoefficientsAsVector(), weights_);
+    }
   } else if (algorithm_ == Algorithm::kConstrainedLeastSquares) {
     // constrained least squares
     // ConstrainedLeastSquaresFit(...);
@@ -256,6 +290,11 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
                   "Unrecognized fitting algorithm in configuration.",
                   "PolynomialOpticsModel::CalculateTransferMap()"));
   }
+
+  Vector<double> x_map_plot = generate_polynomial_2D(
+      *polynomial_map, 2, -10., 10., 0.1);
+  std::cout << "DEBUG PolynomialOpticsModel::CalculateTransferMap: "
+            << "plot data for x = " << x_map_plot << std::endl;
 
   TransferMap * transfer_map = new PolynomialTransferMap(
     *polynomial_map, reference_particle_);

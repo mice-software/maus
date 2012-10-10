@@ -449,12 +449,13 @@ SymmetricMatrix PolynomialMap::Covariances(
   }
   return covariances;
 }
-
+ 
 PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
     unsigned int                              polynomialOrder,
-    const VectorMap*                          weightFunction) {
+    const VectorMap*                      
+    weightFunction) {
 
   if (weightFunction == NULL) {
     // use default value for weights defined in PolnomialMap.hh
@@ -492,27 +493,48 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   PolynomialMap * polynomial_map = new PolynomialMap(pointDim, dummy);
 
   // Create the design matrix
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "A = [" << std::endl;
   std::vector<double> point_poly_vector(nCoeffs, 0);
   Matrix<double> design_matrix(nPoints, nCoeffs, 0.);  // design matrix
   for (size_t row = 0; row < nPoints; ++row) {
+std::cout << "[";
     polynomial_map->MakePolynomialVector(&points[row][0],
                                          &point_poly_vector[0]);
     for (size_t column = 0; column < nCoeffs; ++column) {
       design_matrix(row+1, column+1) = point_poly_vector[column];
-    }
+//if ((column > 0) && (column < pointDim+1)) {
+  std::cout << design_matrix(row+1, column+1);
+  //if (column < pointDim) {
+  if (column < nCoeffs-1) {
+    std::cout << ", ";
   }
-std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "A = " << std::endl << design_matrix;
+//}
+    }
+std::cout << "]" << std::endl;
+  }
+std::cout << "]" << std::endl;
 
   // Create the value matrix
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << "Y = [" << std::endl;
   Matrix<double> value_matrix(nPoints, valueDim, 0.);  // value matrix
   for (size_t row = 0; row < nPoints; ++row) {
+std::cout << "[";
     for (size_t column = 0; column < valueDim; ++column) {
       value_matrix(row+1, column+1) = values[row][column];
+std::cout << value_matrix(row+1, column+1);
+if (column < valueDim-1) {
+  std::cout << ", ";
+}
     }
+std::cout << "]";
+if (row < nPoints-1) {
+  std::cout << ",";
+}
+std::cout << std::endl;
   }
-std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
-          << "Y = " << std::endl << value_matrix;
+std::cout << "]" << std::endl;
 
   // Create the weight matrix (diagonal are the per-point/value weights)
   Vector<double> weight_vector(nPoints, 1.);
@@ -668,6 +690,8 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
         A(coeffs[i].OutVariable()+1, j+1) = coeffs[i].Coefficient();
       }
 
+std::cout << "DEBUG PolynomialMap::ConstrainedPolynomialLeastSquaresFit() "
+          << "Transfer Matrix = " << std::endl << A;
   return new PolynomialMap(pointDim, A);
 }
 
@@ -932,6 +956,7 @@ double PolynomialMap::GetAvgChi2OfDifference(
   return chi2;
 }
 
+
 // Make a shell of points on the outside of a hypercube with dimension same as
 // delta length, corners of hypercube are at delta[0], delta[1], ... delta[n]
 // and -delta[0], ..., -delta[n] number of points is at least
@@ -993,6 +1018,29 @@ std::vector< std::vector<double> > PolynomialMap::PointShell(
     }
   }
   return point_box;
+}
+
+Vector<double> generate_polynomial_2D(
+    const PolynomialMap & map,
+    const size_t variable_index,
+    const double input_min,
+    const double input_max,
+    const double input_increment) {
+  const size_t point_dimension = map.ValueDimension();
+  const size_t value_dimension = map.ValueDimension();
+  Vector<double> input(point_dimension, 0.);
+  Vector<double> output(value_dimension);
+
+  size_t plot_size = size_t((input_max - input_min) / input_increment + 1);
+  Vector<double> plot(plot_size);
+  size_t plot_index = 0;
+  for (double value = input_min; value <= input_max; value += input_increment) {
+    input[variable_index] = value;
+    map.F(input, output);
+    plot[plot_index++] = output[variable_index];
+  }
+
+  return plot;
 }
 
 }  // namespace MAUS

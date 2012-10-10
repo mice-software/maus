@@ -22,6 +22,7 @@
 
 #include <iostream>
 
+#include "DataStructure/Step.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Reconstruction/Global/Particle.hh"
@@ -47,7 +48,7 @@ class Detector;
  * mass parameter. If t >= 0 and z < 0, it fills in z and Pz from t, E, and
  * the mass.
  */
-class TrackPoint : public MAUS::PhaseSpaceVector {
+class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
  public:
   /* @brief	Construct with all elements initialized to zero and phase space type
    *        temporal.

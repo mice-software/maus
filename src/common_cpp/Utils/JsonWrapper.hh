@@ -69,7 +69,7 @@ class JsonWrapper {
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  static Json::Value StringToJson(std::string json_in) throw(Squeal);
+  static Json::Value StringToJson(const std::string& json_in) throw(Squeal);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
@@ -86,8 +86,8 @@ class JsonWrapper {
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
    *  failure
    */
-  static Json::Value GetItem(Json::Value array, size_t value_index,
-                                            JsonType value_type) throw(Squeal);
+  static Json::Value GetItem(const Json::Value& array, const size_t value_index,
+                             const JsonType value_type) throw(Squeal);
 
   /** @brief Get a property from a Json object (hash)
    *
@@ -98,9 +98,9 @@ class JsonWrapper {
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
    */
-  static Json::Value GetProperty
-     (Json::Value object, std::string value_name,
-                          JsonType value_type) throw(Squeal);
+  static Json::Value GetProperty(const Json::Value& object,
+                                 const std::string& value_name,
+                                 const JsonType value_type) throw(Squeal);
 
 
   /** @brief Convert from a json three vector to a CLHEP three vector
@@ -108,24 +108,24 @@ class JsonWrapper {
    *  @param json_vec objectValue with realValue children "x", "y", "z". Throws
    *         an exception if the conversion fails.
    */
-  static CLHEP::Hep3Vector JsonToThreeVector
-                                       (Json::Value json_vec) throw(Squeal);
+  static CLHEP::Hep3Vector JsonToThreeVector(const Json::Value& json_vec)
+      throw(Squeal);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
-  static JsonType ValueTypeToJsonType(Json::ValueType tp);
+  static JsonType ValueTypeToJsonType(const Json::ValueType tp);
 
   /** @brief Convert from Json::Value type to string
    */
-  static std::string ValueTypeToString(Json::ValueType tp);
+  static std::string ValueTypeToString(const Json::ValueType tp);
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  static Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
+  static Json::ValueType JsonTypeToValueType(const JsonType tp) throw(Squeal);
 
   /** @brief Return true if types are equal or anyValue
    */
-  static bool SimilarType(JsonType jt1, JsonType jt2);
+  static bool SimilarType(const JsonType jt1, const JsonType jt2);
 
   /** @brief Print the Json value to an ostream
    *
@@ -143,24 +143,27 @@ class JsonWrapper {
    *  @param tolerance float tolerance - requirement is that
    *         fabs(float_1-float_2) < tolerance
    */
-  static bool AlmostEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  static bool AlmostEqual(const Json::Value& value_1,
+                          const Json::Value& value_2,
+                          const double tolerance);
 
   /** @brief Check for equality between json arrays
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  static bool ArrayEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  static bool ArrayEqual(const Json::Value& value_1,
+                         const Json::Value& value_2,
+                         const double tolerance);
 
   /** @brief Check for equality between json objects
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  static bool ObjectEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  static bool ObjectEqual(const Json::Value& value_1,
+                          const Json::Value& value_2,
+                          const double tolerance);
 
 
   /** @brief Merge two json objects
@@ -171,13 +174,15 @@ class JsonWrapper {
    *  object but not the other put it in the merged object; if the property
    *  exists in both objects but is not an array, throw an exception.
    */
-  static Json::Value ObjectMerge(Json::Value object_1, Json::Value object_2);
+  static Json::Value ObjectMerge(const Json::Value& object_1,
+                                 const Json::Value& object_2);
 
   /** @brief Merge two json arrays
    *
    *  Put items from array_2 onto the back of array_1
    */
-  static Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
+  static Json::Value ArrayMerge(const Json::Value& array_1,
+                                const Json::Value& array_2);
 
  private:
 

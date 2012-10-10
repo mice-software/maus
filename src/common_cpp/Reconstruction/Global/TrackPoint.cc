@@ -22,6 +22,7 @@
 #include <cmath>
 #include "CLHEP/Units/PhysicalConstants.h"
 
+#include "DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Maths/Vector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Interface/Squeak.hh"
@@ -41,24 +42,50 @@ TrackPoint::TrackPoint()
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
+      Step(),
       detector_id_(original_instance.detector_id_),
       uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
       particle_id_(original_instance.particle_id_),
       z_(original_instance.z_)
-{ }
+{
+  double x = original_instance.x();
+  double y = original_instance.y();
+  double z = original_instance.z();
+  SetPosition(ThreeVector(x, y, z));
+
+  double px = original_instance.Px();
+  double py = original_instance.Py();
+  double pz = original_instance.Pz();
+  SetMomentum(ThreeVector(px, py, pz));
+  
+  double energy = original_instance.energy();
+  SetEnergy(energy);
+  SetEnergyDeposited(energy);  // FIXME(plane1@hawk.iit.edu)
+
+  double distance = ::sqrt(x*x + y*y + z*z);
+  double momentum = ::sqrt(px*px + py*py + pz*pz);
+  double time = distance * energy / momentum;
+  SetTime(time);
+
+  const double mass = Particle::GetInstance()->GetMass(particle_id_);
+  double proper_time = time * mass / momentum;
+  SetProperTime(proper_time);
+
+  // SetPathLength();
+}
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
                        const double z, const int pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
-      z_(z), particle_id_(pid)
+      particle_id_(pid), z_(z)
 { }
 
 TrackPoint::TrackPoint(const Vector<double> & original_instance,
                        const double z, const int pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
-      z_(z), particle_id_(pid)
+      particle_id_(pid), z_(z)
 { }
 
 TrackPoint::TrackPoint(const double time, const double energy,

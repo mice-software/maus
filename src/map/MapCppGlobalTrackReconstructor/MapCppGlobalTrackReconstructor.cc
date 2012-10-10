@@ -263,8 +263,6 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
       JsonWrapper::stringValue);
   if (data_acquisition_mode == "Random") {
     LoadRandomData();
-  } else if (data_acquisition_mode == "Testing") {
-    LoadTestingData();
   } else if (data_acquisition_mode == "Simulation") {
     LoadSimulationData();
   } else if (data_acquisition_mode == "Smeared") {
@@ -394,179 +392,6 @@ void MapCppGlobalTrackReconstructor::LoadRandomData() {
                                                   events);
 }
 
-void MapCppGlobalTrackReconstructor::LoadTestingData() {
-  // Load some pre-generated MC data with TOF and Tracker hits
-
-  bool beam_polarity_negative = false;
-  std::map<int, Detector> detectors;
-  std::vector<TrackPoint> events;
-
-  try {
-    Json::Value testing_data = JsonWrapper::GetProperty(
-        configuration_, "testing_data", JsonWrapper::objectValue);
-
-    const Json::Value beam_polarity_negative_json = JsonWrapper::GetProperty(
-        testing_data, "beam_polarity_negative", JsonWrapper::booleanValue);
-    beam_polarity_negative = beam_polarity_negative_json.asBool();
-
-    // *** Get detector info ***
-    const Json::Value detectors_json = JsonWrapper::GetProperty(
-        testing_data, "detectors", JsonWrapper::arrayValue);
-    const Json::Value::UInt detector_count = detectors_json.size();
-    for (Json::Value::UInt index = 0; index < detector_count; ++index) {
-      const Json::Value detector_json = detectors_json[index];
-      const Json::Value id_json = JsonWrapper::GetProperty(
-          detector_json, "id", JsonWrapper::intValue);
-      const int id = id_json.asInt();
-
-      const Json::Value plane_json = JsonWrapper::GetProperty(
-          detector_json, "plane", JsonWrapper::realValue);
-      const double plane = plane_json.asDouble();
-
-      const Json::Value uncertainties_json = JsonWrapper::GetProperty(
-          detector_json, "uncertainties", JsonWrapper::arrayValue);
-      const CovarianceMatrix uncertainties
-          = GetJsonCovarianceMatrix(uncertainties_json);
-
-      const Detector detector(id, plane, uncertainties);
-      detectors.insert(std::pair<int, Detector>(id, detector));
-    }
-
-    const Json::Value mc_events = JsonWrapper::GetProperty(
-        testing_data, "mc_events", JsonWrapper::arrayValue);
-    const Json::Value mc_event = mc_events[Json::Value::UInt(0)];
-
-    const Json::Value sci_fi_hits = JsonWrapper::GetProperty(
-        mc_event, "sci_fi_hits", JsonWrapper::arrayValue);
-    const size_t sci_fi_hit_count = sci_fi_hits.size();
-    for (size_t index = 0; index < sci_fi_hit_count; ++index) {
-      const Json::Value sci_fi_hit = sci_fi_hits[index];
-
-      double coordinates[6];
-
-      const Json::Value time = JsonWrapper::GetProperty(
-          sci_fi_hit, "time", JsonWrapper::realValue);
-
-      const Json::Value position_json = JsonWrapper::GetProperty(
-          sci_fi_hit, "position", JsonWrapper::objectValue);
-      const Json::Value x = JsonWrapper::GetProperty(
-          position_json, "x", JsonWrapper::realValue);
-      coordinates[0] = x.asDouble();
-      const Json::Value y = JsonWrapper::GetProperty(
-          position_json, "y", JsonWrapper::realValue);
-      coordinates[2] = y.asDouble();
-      const Json::Value z = JsonWrapper::GetProperty(
-          position_json, "z", JsonWrapper::realValue);
-      coordinates[4] = z.asDouble();
-
-      const Json::Value energy = JsonWrapper::GetProperty(
-          sci_fi_hit, "energy", JsonWrapper::realValue);
-
-      const Json::Value momentum_json = JsonWrapper::GetProperty(
-          sci_fi_hit, "momentum", JsonWrapper::objectValue);
-      const Json::Value px = JsonWrapper::GetProperty(
-          momentum_json, "x", JsonWrapper::realValue);
-      coordinates[1] = px.asDouble();
-      const Json::Value py = JsonWrapper::GetProperty(
-          momentum_json, "y", JsonWrapper::realValue);
-      coordinates[3] = py.asDouble();
-      const Json::Value pz = JsonWrapper::GetProperty(
-          momentum_json, "z", JsonWrapper::realValue);
-      coordinates[5] = pz.asDouble();
-
-      TrackPoint track_point(coordinates);
-
-      const Json::Value channel_id = JsonWrapper::GetProperty(
-          sci_fi_hit, "channel_id", JsonWrapper::objectValue);
-      const Json::Value tracker_number_json = JsonWrapper::GetProperty(
-          channel_id, "tracker_number", JsonWrapper::intValue);
-      const size_t tracker_number = tracker_number_json.asUInt();
-      const Json::Value station_number_json = JsonWrapper::GetProperty(
-          channel_id, "station_number", JsonWrapper::intValue);
-      const size_t station_number = tracker_number_json.asUInt();
-      const size_t detector_id = tracker_number + 4 + station_number;
-
-      track_point.set_detector_id(detector_id);
-      std::map<int, Detector>::const_iterator detector
-        = detectors.find(detector_id);
-      track_point.set_uncertainties(detector->second.uncertainties());
-
-      events.push_back(track_point);
-    }
-
-    const Json::Value tof_hits = JsonWrapper::GetProperty(
-        mc_event, "tof_hits", JsonWrapper::arrayValue);
-    const size_t tof_hit_count = tof_hits.size();
-    for (size_t index = 0; index < tof_hit_count; ++index) {
-      const Json::Value tof_hit = tof_hits[index];
-
-      double coordinates[6];
-
-      const Json::Value time = JsonWrapper::GetProperty(
-          tof_hit, "time", JsonWrapper::realValue);
-      coordinates[0] = time.asDouble();
-      const Json::Value position_json = JsonWrapper::GetProperty(
-          tof_hit, "position", JsonWrapper::objectValue);
-      const Json::Value x = JsonWrapper::GetProperty(
-          position_json, "x", JsonWrapper::realValue);
-      coordinates[2] = x.asDouble();
-      const Json::Value y = JsonWrapper::GetProperty(
-          position_json, "y", JsonWrapper::realValue);
-      coordinates[4] = y.asDouble();
-      const Json::Value z = JsonWrapper::GetProperty(
-          position_json, "z", JsonWrapper::realValue);
-
-      const Json::Value energy = JsonWrapper::GetProperty(
-          tof_hit, "energy", JsonWrapper::realValue);
-      coordinates[1] = energy.asDouble();
-      const Json::Value momentum_json = JsonWrapper::GetProperty(
-          tof_hit, "momentum", JsonWrapper::objectValue);
-      const Json::Value px = JsonWrapper::GetProperty(
-          momentum_json, "x", JsonWrapper::realValue);
-      coordinates[3] = px.asDouble();
-      const Json::Value py = JsonWrapper::GetProperty(
-          momentum_json, "y", JsonWrapper::realValue);
-      coordinates[5] = py.asDouble();
-
-      TrackPoint track_point(coordinates, z.asDouble());
-
-      const Json::Value channel_id = JsonWrapper::GetProperty(
-          tof_hit, "channel_id", JsonWrapper::objectValue);
-      const Json::Value station_number_json = JsonWrapper::GetProperty(
-          channel_id, "station_number", JsonWrapper::intValue);
-      const size_t station_number = station_number_json.asUInt();
-      // FIXME set plane
-      const size_t plane = 0;
-      int detector_id = Detector::kNone;
-      switch (station_number) {
-       case 0: detector_id = Detector::kTOF0_1 + plane; break;
-       case 1: detector_id = Detector::kTOF1_1 + plane; break;
-       case 2: detector_id = Detector::kTOF2_1 + plane; break;
-      }
-
-      track_point.set_detector_id(detector_id);
-      std::map<int, Detector>::const_iterator detector
-        = detectors.find(detector_id);
-      track_point.set_uncertainties(detector->second.uncertainties());
-
-      events.push_back(track_point);
-    }
-  } catch(Squeal& squee) {
-    run_data_ = MAUS::CppErrorHandler::getInstance()->HandleSqueal(
-        run_data_, squee, "MAUS::MapCppGlobalTrackReconstructor");
-  } catch(std::exception& exc) {
-    run_data_ = MAUS::CppErrorHandler::getInstance()->HandleStdExc(
-        run_data_, exc, "MAUS::MapCppGlobalTrackReconstructor");
-  }
-
-  // TODO(plan1@hawk.iit.edu) do an insertion sort instead of sorting afterwards
-  std::sort(events.begin(), events.end());  // sort in chronological order
-
-  reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
-                                                  detectors,
-                                                  events);
-}
-
 void MapCppGlobalTrackReconstructor::LoadSimulationData() {
   LoadSimulationData("mc_events");
 }
@@ -605,15 +430,14 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
   try {
     // FIXME(plane1@hawk.iit.edu) Once the detector groups provide this
     // information this will need to be changed
-    Json::Value testing_data = JsonWrapper::GetProperty(
-        configuration_, "testing_data", JsonWrapper::objectValue);
+    Json::Value detector_attributes_json = JsonWrapper::GetProperty(
+        configuration_, "reconstruction_detector_attributes",
+        JsonWrapper::arrayValue);
 
     // *** Get detector info ***
-    const Json::Value detectors_json = JsonWrapper::GetProperty(
-        testing_data, "detectors", JsonWrapper::arrayValue);
-    const Json::Value::UInt detector_count = detectors_json.size();
+    const Json::Value::UInt detector_count = detector_attributes_json.size();
     for (Json::Value::UInt index = 0; index < detector_count; ++index) {
-      const Json::Value detector_json = detectors_json[index];
+      const Json::Value detector_json = detector_attributes_json[index];
       const Json::Value id_json = JsonWrapper::GetProperty(
           detector_json, "id", JsonWrapper::intValue);
       const int id = id_json.asInt();
@@ -641,17 +465,22 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
   }
 }
 
+/* Currently we just glob all spills together since we have to sort out
+ * multiple particles per spill anyway.
+ */
 void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
     const std::string               branch_name,
     std::vector<TrackPoint> &       events,
     const std::map<int, Detector> & detectors) {
+  // FIXME(plane1@hawk.iit.edu) Get data from configuration
   try {
     // MC event branch
+    /*
     Json::Value testing_data = JsonWrapper::GetProperty(
         configuration_, "testing_data", JsonWrapper::objectValue);
+    */
     const Json::Value mc_events = JsonWrapper::GetProperty(
-        testing_data, branch_name, JsonWrapper::arrayValue);
-        // run_data_, branch_name, JsonWrapper::arrayValue);
+        run_data_, branch_name, JsonWrapper::arrayValue);
     for (Json::Value::UInt particle_index = Json::Value::UInt(0);
          particle_index < mc_events.size();
          ++particle_index) {
@@ -762,6 +591,10 @@ void MapCppGlobalTrackReconstructor::LoadLiveData() {
 }
 
 
+/* We assume that muons traverse the MICE lattice one at a time, so we can
+ * sort out tracks based on the requirement that hits will occur in the same
+ * order as the detector positions.
+ */
 void MapCppGlobalTrackReconstructor::CorrelateTrackPoints(
     std::vector<Track> & tracks) {
   const std::vector<TrackPoint> & track_points
@@ -777,6 +610,7 @@ void MapCppGlobalTrackReconstructor::CorrelateTrackPoints(
       // reject particles with energy < muon mass (electrons)
       continue;
     } else if (event->detector_id() < last_detector) {
+      // A new track begins when a hit is upstream from the last hit
       tracks.push_back(track);
       track.clear();
       track.push_back(*event);
