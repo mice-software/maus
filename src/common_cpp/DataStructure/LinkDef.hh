@@ -24,7 +24,6 @@
 
 #pragma link C++ class MAUS::ThreeVector+;
 #pragma link C++ class std::vector<int>;
-#pragma link C++ class std::vector<double>+;
 
 #pragma link C++ class MAUS::RunHeader+;
 #pragma link C++ class MAUS::RunFooter+;

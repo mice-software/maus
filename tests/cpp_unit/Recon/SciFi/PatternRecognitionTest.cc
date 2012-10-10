@@ -86,7 +86,6 @@ class PatternRecognitionTest : public ::testing::Test {
 
 TEST_F(PatternRecognitionTest, test_process_good) {
 
-  int n_stations = 5;
   PatternRecognition pr;
 
   // Set up the spacepoints vector
@@ -178,7 +177,6 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   int tracker_num = 0;
 
   // The track parameters that should be reconstructed from the spacepoints
-  int num_points = 5;
   double x_chisq = 22.87148204;
   double y_chisq = 20.99052559;
   double y0 = -58.85201389;

@@ -30,11 +30,11 @@ namespace MAUS {
 bool MapCppTrackerVirtualRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerVirtualRecon";
   Json::Reader reader;
+
   // Check if the JSON document can be parsed, else return error only.
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
-  if (!parsingSuccessful) {
+  if (!parsingSuccessful)
     return false;
-  }
 
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
@@ -107,13 +107,8 @@ std::string MapCppTrackerVirtualRecon::process(std::string document) {
       if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
         track_fit(event);
       }
-      // Perform alignment study.
-      // if ( event.spacepoints().size() == 5 ) {
-      //  perform_alignment_study(event);
-      // }
 
       print_event_info_recon(event);
-
       save_to_json_recon(event, k);
     }
   } catch(...) {
@@ -417,7 +412,6 @@ void MapCppTrackerVirtualRecon::save_to_json_recon(SciFiEvent &evt, int event_i)
       h_tracks_tracker1.append(track);
     }
   }
-
   //
   // Save everything in data structrure tree.
   //
@@ -451,60 +445,60 @@ void MapCppTrackerVirtualRecon::print_event_info_recon(SciFiEvent &event) {
 
 void MapCppTrackerVirtualRecon::print_event_info_mc(MAUS::SciFiEvent &event) {
     std::cout << event.spacepoints().size() << "; "
-	      << event.straightprtracks().size() << " "
-	      << event.helicalprtracks().size() << " " << std::endl;
+              << event.straightprtracks().size() << " "
+              << event.helicalprtracks().size() << " " << std::endl;
 }
 
 void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event_i) {
-    std::ofstream output_file("virtual_mc_output.json", std::ios::out | std::ios::app);
+    std::ofstream out_file("virtual_mc_output.json", std::ios::out | std::ios::app);
     if (event_i ==0)
-      {  output_file << "{";
-	output_file << "\"daq_event_type\": \"physics_event\",";
-	output_file <<"\"recon_events\": [";
+      {  out_file << "{";
+        out_file << "\"daq_event_type\": \"physics_event\",";
+        out_file <<"\"recon_events\": [";
       } else {
-      	output_file <<",";
-      }// was }, -but wrong?
-    output_file << "{"; // added this, removed it from if statement above //
-    output_file << "\"part_event_number\":" << event_i << ",";
-    output_file << "\"sci_fi_event\":{";
-    output_file << "\"sci_fi_pr_tracks\":{";
+        out_file <<",";
+      } // was }, -but wrong?
+    out_file << "{"; // added this, removed it from if statement above //
+    out_file << "\"part_event_number\":" << event_i << ",";
+    out_file << "\"sci_fi_event\":{";
+    out_file << "\"sci_fi_pr_tracks\":{";
     // ------- TRACKS ----------------------------------------------------
     //=========== Straight tracks: Needs to be filled here=============
-    output_file <<"\"straight\":{";
+    out_file <<"\"straight\":{";
     int tracker0_hits_s = 0;
     if (evt.straightprtracks().size() == 0) {
-	output_file << "\"tracker0\":null,";
-	output_file << "\"tracker1\":null},";
-      }
+      out_file << "\"tracker0\":null,";
+      out_file << "\"tracker1\":null},";
+    }
     // Only look at tracks in tracker 0 //
     for (unsigned int track_i_s = 0; track_i_s < evt.straightprtracks().size(); track_i_s++) {
       int tracker_s = evt.straightprtracks()[track_i_s].get_tracker();
       std::cout << evt.straightprtracks()[track_i_s].get_tracker();
       if (tracker_s ==0) {
-	  tracker0_hits_s++;
-	  if (tracker0_hits_s == 1) {
-	      output_file << "\"tracker0\":[";
-	      output_file << "{";
-	    }
-	  Json::Value track;
-	  track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
-	  track["my"] = evt.straightprtracks()[track_i_s].get_my();
-	  track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
-	  track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
-	  track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
-	  track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
-	  track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
-	  output_file << "\"mx\":" <<evt.straightprtracks()[track_i_s].get_mx() << ",";
-	  output_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
-	  output_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() << ",";
-	  output_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
-	  output_file << "\"x_chisq\":" << evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
-	  output_file << "\"y0\":" <<evt.straightprtracks()[track_i_s].get_y0() << ",";
-	  output_file << "\"y_chisq\":" <<evt.straightprtracks()[track_i_s].get_y_chisq();
-	  output_file << "}]" << ",";
-	}
-      if (tracker0_hits_s == 0)
-	output_file << "\"tracker0\":null,";
+        tracker0_hits_s++;
+        if (tracker0_hits_s == 1) {
+            out_file << "\"tracker0\":[";
+            out_file << "{";
+          }
+        Json::Value track;
+        track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
+        track["my"] = evt.straightprtracks()[track_i_s].get_my();
+        track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
+        track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
+        track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
+        track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
+        track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
+        out_file << "\"mx\":" <<evt.straightprtracks()[track_i_s].get_mx() << ",";
+        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
+        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() << ",";
+        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
+        out_file << "\"x_chisq\":" << evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
+        out_file << "\"y0\":" <<evt.straightprtracks()[track_i_s].get_y0() << ",";
+        out_file << "\"y_chisq\":" <<evt.straightprtracks()[track_i_s].get_y_chisq();
+        out_file << "}]" << ",";
+      }
+    if (tracker0_hits_s == 0)
+      out_file << "\"tracker0\":null,";
     }
 
     /////////////////////// TRACKER 1 TRACKS //////////////////
@@ -512,109 +506,106 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
     for (unsigned int track_i_s = 0; track_i_s <evt.straightprtracks().size(); track_i_s++) {
       int tracker = evt.straightprtracks()[track_i_s].get_tracker();
       if (tracker == 1) {
-	  tracker1_hits_s++;
-	  if (tracker1_hits_s == 1) {
-	      output_file << "\"tracker1\":[";
-	      output_file << "{";
-	    }
-	  Json::Value track;
-	  track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
-	  track["my"] = evt.straightprtracks()[track_i_s].get_my();
-	  track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
-	  track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
-	  track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
-	  track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
-	  track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
-	  output_file << "\"mx\":" << evt.straightprtracks()[track_i_s].get_mx() << ",";
-	  output_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
-	  output_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() <<",";
-	  output_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
-	  output_file << "\"x_chisq\":" <<evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
-	  output_file << "\"y0\":" << evt.straightprtracks()[track_i_s].get_y0() << ",";
-	  output_file << "\"y_chisq\":" << evt.straightprtracks()[track_i_s].get_y_chisq();
-	  output_file << "}]" << "},";
-	    }
-	  if (tracker1_hits_s == 0)
-	    output_file << "\"tracker1\":null}";
-	}
+        tracker1_hits_s++;
+        if (tracker1_hits_s == 1) {
+          out_file << "\"tracker1\":[";
+          out_file << "{";
+        }
+        Json::Value track;
+        track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
+        track["my"] = evt.straightprtracks()[track_i_s].get_my();
+        track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
+        track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
+        track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
+        track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
+        track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
+        out_file << "\"mx\":" << evt.straightprtracks()[track_i_s].get_mx() << ",";
+        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
+        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() <<",";
+        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
+        out_file << "\"x_chisq\":" <<evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
+        out_file << "\"y0\":" << evt.straightprtracks()[track_i_s].get_y0() << ",";
+        out_file << "\"y_chisq\":" << evt.straightprtracks()[track_i_s].get_y_chisq();
+        out_file << "}]" << "},";
+      }
+        if (tracker1_hits_s == 0)
+          out_file << "\"tracker1\":null}";
+    }
 
 
     // =================HELICAL TRACKS==================
-    output_file <<"\"helical\":{";
+    out_file <<"\"helical\":{";
     int tracker0_hits = 0;
     if (evt.helicalprtracks().size() ==0) {
-	output_file << "\"tracker0\":null,";
-	output_file << "\"tracker1\":null}},";
-      }
+      out_file << "\"tracker0\":null,";
+      out_file << "\"tracker1\":null}},";
+    }
 
     // Only look at tracks in tracker0
     for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
       int tracker = evt.helicalprtracks()[track_i].get_tracker();
       std::cout << evt.helicalprtracks()[track_i].get_tracker();
       if (tracker ==0) {
-	  tracker0_hits++;
-	  if  (tracker0_hits ==1) {
-	      output_file << "\"tracker0\":[";
-	      output_file << "{";
-	    }
-	  Json::Value track;
-	  track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-	  track["R"]          = evt.helicalprtracks()[track_i].get_R();
-	  track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-	  track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-	  track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-	  track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-	  track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+        tracker0_hits++;
+        if  (tracker0_hits ==1) {
+          out_file << "\"tracker0\":[";
+          out_file << "{";
+        }
+        Json::Value track;
+        track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
+        track["R"]          = evt.helicalprtracks()[track_i].get_R();
+        track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
+        track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
+        track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
+        track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
+        track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
 
-	  output_file << "\"num_points\":" << evt.helicalprtracks()[track_i].get_num_points() << ",";
-	  output_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
-	  output_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz() << ",";
-	  output_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0() <<",";
-	  output_file << "\"x\":" << evt.helicalprtracks()[track_i].get_x0() << ",";
-	  output_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0() << ",";
-
-	  output_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]" << ",";
-	}
-
+        out_file << "\"num_points\":" << evt.helicalprtracks()[track_i].get_num_points() << ",";
+        out_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
+        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz() << ",";
+        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0() <<",";
+        out_file << "\"x\":" << evt.helicalprtracks()[track_i].get_x0() << ",";
+        out_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0() << ",";
+        out_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]" << ",";
+      }
       if (tracker0_hits == 0)
-	output_file << "\"tracker0\":null,";
+        out_file << "\"tracker0\":null,";
     }
 
-    // //////////////////////////////////////TRACKER 1 TRACKS:
+    // TRACKER 1 TRACKS:
     int tracker1_hits = 0;
     for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
       int tracker = evt.helicalprtracks()[track_i].get_tracker();
       if (tracker ==1) {
-	  tracker1_hits++;
-	  if  (tracker1_hits ==1) {
-	      output_file << "\"tracker1\":[";
-	      output_file << "{";
-	    }
-	  Json::Value track;
-	  track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-	  track["R"]          = evt.helicalprtracks()[track_i].get_R();
-	  track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-	  track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-	  track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-	  track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-	  track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+        tracker1_hits++;
+        if  (tracker1_hits ==1) {
+          out_file << "\"tracker1\":[";
+          out_file << "{";
+         }
+        Json::Value track;
+        track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
+        track["R"]          = evt.helicalprtracks()[track_i].get_R();
+        track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
+        track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
+        track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
+        track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
+        track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
 
-	  output_file << "\"num_points\":" <<evt.helicalprtracks()[track_i].get_num_points() <<",";
-	  output_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
-	  output_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz()  <<",";
-	  output_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0()  <<",";
-	  output_file << "\"x\":" <<evt.helicalprtracks()[track_i].get_x0()  <<",";
-	  output_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0()  <<",";
-	  output_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]}},";
-	}
-      if (tracker1_hits == 0)
-	output_file << "\"tracker1\":null}},";
-    }
-    output_file <<"\"sci_fi_spacepoints\":{";
-    if (evt.spacepoints().size() ==0) {
-	output_file << "\"tracker0\":null,";
-	output_file << "\"tracker1\":null},";
+        out_file << "\"num_points\":" <<evt.helicalprtracks()[track_i].get_num_points() <<",";
+        out_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
+        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz()  <<",";
+        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0()  <<",";
+        out_file << "\"x\":" <<evt.helicalprtracks()[track_i].get_x0()  <<",";
+        out_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0()  <<",";
+        out_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]}},";
       }
+      if (tracker1_hits == 0) out_file << "\"tracker1\":null}},";
+    }
+    out_file <<"\"sci_fi_spacepoints\":{";
+    if (evt.spacepoints().size() ==0) {
+      out_file << "\"tracker0\":null,";
+      out_file << "\"tracker1\":null},";
+    }
 
     // ------- SPACEPOINTS --TRACKER 0------------------------------------------
     int spacepoint_tracker_0 = 0;
@@ -624,9 +615,9 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
       int tracker = evt.spacepoints()[sp_i]->get_tracker();
       // Json::Value spacepoint;
       if (tracker ==0)
-	spacepoint_tracker_0++;
+        spacepoint_tracker_0++;
       else
-	spacepoint_tracker_1++;
+        spacepoint_tracker_1++;
     }
 
     int spacepoint_0 =0;
@@ -634,66 +625,65 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
       // spacepoints_in_event["time"]   = evt.spacepoints()[evt_i]->get_time();
       int tracker = evt.spacepoints()[sp_i]->get_tracker();
       if (tracker == 0) {
-	spacepoint_0++;
-	if  (spacepoint_0 ==1) {
-	    output_file << "\"tracker0\":[";
-	  }
-	Hep3Vector pos = evt.spacepoints()[sp_i]->get_position();
-	output_file << "{";
-	output_file << "\"npe\":0" << ",";
-	output_file << "\"part_event_number\":" << evt.spacepoints()[sp_i]->get_event() << ",";
-	output_file << "\"phys_event_number\":" << evt.spacepoints()[sp_i]->get_spill() << ",";
-	output_file << "\"position\":{";
-	output_file << "\"x\":" << pos.x() << ",";
-	output_file << "\"y\":" <<pos.y()  <<",";
-	output_file << "\"z\":" <<pos.z()<< "}"  <<",";
-	output_file << "\"station\":" << evt.spacepoints()[sp_i]->get_station()  <<",";
-	output_file << "\"tracker\":" << tracker  <<",";
-	if (spacepoint_0 == spacepoint_tracker_0) {
-	    output_file << "\"type\":\"triplet\"}],";
-	  } else {
-	  output_file << "\"type\":\"triplet\"},";
-          }
+        spacepoint_0++;
+        if  (spacepoint_0 ==1) {
+          out_file << "\"tracker0\":[";
+        }
+        Hep3Vector pos = evt.spacepoints()[sp_i]->get_position();
+        out_file << "{";
+        out_file << "\"npe\":0" << ",";
+        out_file << "\"part_event_number\":" << evt.spacepoints()[sp_i]->get_event() << ",";
+        out_file << "\"phys_event_number\":" << evt.spacepoints()[sp_i]->get_spill() << ",";
+        out_file << "\"position\":{";
+        out_file << "\"x\":" << pos.x() << ",";
+        out_file << "\"y\":" <<pos.y()  <<",";
+        out_file << "\"z\":" <<pos.z()<< "}"  <<",";
+        out_file << "\"station\":" << evt.spacepoints()[sp_i]->get_station()  <<",";
+        out_file << "\"tracker\":" << tracker  <<",";
+        if (spacepoint_0 == spacepoint_tracker_0) {
+          out_file << "\"type\":\"triplet\"}],";
+        } else {
+          out_file << "\"type\":\"triplet\"},";
+        }
       }
       if (spacepoint_tracker_0 ==0) {
-	  output_file << "\"tracker0\":null,";
-	}
+        out_file << "\"tracker0\":null,";
+      }
     }
 
     int spacepoint_1 = 0;
-
     for ( unsigned int sp_i = 0; sp_i < evt.spacepoints().size(); sp_i++ ) {
       int tracker = evt.spacepoints()[sp_i]->get_tracker();
       if (tracker == 1) {
-	spacepoint_1++;
-	if  (spacepoint_1 ==1) {
-	    output_file << "\"tracker1\":[";
-	  }
-	Hep3Vector pos = evt.spacepoints()[sp_i]->get_position();
-	output_file << "{";
-	output_file << "\"npe\":0" << ",";
-	output_file << "\"part_event_number\":" << evt.spacepoints()[sp_i]->get_event() << ",";
-	output_file << "\"phys_event_number\":" << evt.spacepoints()[sp_i]->get_spill() << ",";
-	output_file << "\"position\":{";
-	output_file << "\"x\":" << pos.x()  <<",";
-	output_file << "\"y\":" <<pos.y()  <<",";
-	output_file << "\"z\":" <<pos.z()<< "}"  <<",";
-	output_file << "\"station\":" << evt.spacepoints()[sp_i]->get_station()  <<",";
-	output_file << "\"tracker\":" << tracker <<",";
-	// for last spacepoint
-	if (spacepoint_1 == spacepoint_tracker_1) {
-	    output_file << "\"type\":\"triplet\"}]}}}";// was }]}}
-	  } else {
-	  output_file << "\"type\":\"triplet\"},";
-          }
+        spacepoint_1++;
+        if  (spacepoint_1 ==1) {
+          out_file << "\"tracker1\":[";
+        }
+        Hep3Vector pos = evt.spacepoints()[sp_i]->get_position();
+        out_file << "{";
+        out_file << "\"npe\":0" << ",";
+        out_file << "\"part_event_number\":" << evt.spacepoints()[sp_i]->get_event() << ",";
+        out_file << "\"phys_event_number\":" << evt.spacepoints()[sp_i]->get_spill() << ",";
+        out_file << "\"position\":{";
+        out_file << "\"x\":" << pos.x()  <<",";
+        out_file << "\"y\":" <<pos.y()  <<",";
+        out_file << "\"z\":" <<pos.z()<< "}"  <<",";
+        out_file << "\"station\":" << evt.spacepoints()[sp_i]->get_station()  <<",";
+        out_file << "\"tracker\":" << tracker <<",";
+        // for last spacepoint
+        if (spacepoint_1 == spacepoint_tracker_1) {
+          out_file << "\"type\":\"triplet\"}]}}}";// was }]}}
+        } else {
+          out_file << "\"type\":\"triplet\"},";
+        }
       }
       if (spacepoint_tracker_1 == 0) {
-	  output_file << "\"tracker1\":null}}},";
-	}
+        out_file << "\"tracker1\":null}}},";
+      }
     }
     if (num_event_spill2-1 == event_i) {
-	output_file << "]}\n"; // was other way
-      }
-    output_file.close();
+      out_file << "]}\n"; // was other way
+    }
+    out_file.close();
   }
 }

@@ -110,7 +110,8 @@ TEST_F(SciFiClusterRecTest, test_get_seeds) {
 
   SciFiClusterRec *worker = new SciFiClusterRec(cluster_exception, min_npe, modules);
   seeds = worker->get_seeds(*evt);
-  EXPECT_EQ(2, seeds.size());
+  unsigned int size = 2;  // Do like this to remove compiler warning
+  EXPECT_EQ(size, seeds.size());
 }
 
 TEST_F(SciFiClusterRecTest, test_construct) {
