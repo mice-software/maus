@@ -16,8 +16,8 @@
  */
 
 #include "src/map/MapCppSingleStationRecon/MapCppSingleStationRecon.hh"
-#include <iostream>
-#include <fstream>
+
+namespace MAUS {
 
 bool MapCppSingleStationRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppSingleStationRecon";
@@ -210,6 +210,9 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
   int numb_sp_tof_1 = tof1_sps.size();
 
   Json::Value json_event;
+
+  int tof1_spill, tof1_event, tof0_spill, tof0_event, ss_spill, ss_event;
+
   bool found = false;
   int index_value;
   double tof1_slabx, tof1_slaby, tof1_time, tof0_slabx, tof0_slaby, tof0_time;
@@ -218,18 +221,19 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
     tof1_slabx = tof1_sps[(Json::Value::ArrayIndex)0]["slabX"].asDouble();
     tof1_slaby = tof1_sps[(Json::Value::ArrayIndex)0]["slabY"].asDouble();
     tof1_time  = tof1_sps[(Json::Value::ArrayIndex)0]["time"].asDouble();
+    tof1_spill = tof1_sps[(Json::Value::ArrayIndex)0]["phys_event_number"].asDouble();
+    tof1_event = tof1_sps[(Json::Value::ArrayIndex)0]["part_event_number"].asDouble();
     // Find good TOF0 hit.
     for ( int i = 0; i < numb_sp_tof_0; ++i ) {
       tof0_time = tof0_sps[i]["time"].asDouble();
-      if ( tof0_time > -50. && tof0_time < 0.0 ) {
+      tof0_spill = tof0_sps[i]["phys_event_number"].asDouble();
+      tof0_event = tof0_sps[i]["part_event_number"].asDouble();
+      double deltaT = tof1_time-tof0_time;
+      if ( deltaT > 24.78 ) {
         found = true;
         index_value = i;
       }
     }
-    json_event["TOF1"]["slabX"] = tof1_slabx;
-    json_event["TOF1"]["slabY"] = tof1_slaby;
-    json_event["TOF1"]["time"]  = tof1_time;
-    json_event["TOF0"]["time"]  = tof0_time;
   }
 
   if ( found ) {
@@ -237,6 +241,12 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
     tof0_slaby = tof0_sps[(Json::Value::ArrayIndex)index_value]["slabY"].asDouble();
     json_event["TOF0"]["slabX"] = tof0_slabx;
     json_event["TOF0"]["slabY"] = tof0_slaby;
+    json_event["TOF1"]["slabX"] = tof1_slabx;
+    json_event["TOF1"]["slabY"] = tof1_slaby;
+    json_event["TOF1"]["time"]  = tof1_time;
+    json_event["TOF0"]["time"]  = tof0_time;
+  } else {
+    return json_event;
   }
 
   std::vector<SECluster*> clusters = event->spacepoints()[0]->get_channels();
@@ -249,6 +259,18 @@ Json::Value MapCppSingleStationRecon::set_up_json(Json::Value &root, int event_i
     if ( clusters[clust_i]->get_plane() == 2 )
       json_event["SS"]["Plane2"] = clusters[clust_i]->get_alpha();
   }
+  int numb_spacepoints = event->spacepoints().size();
+  json_event["number_ss_spacepoints"] = numb_spacepoints;
+  Hep3Vector position = event->spacepoints()[0]->get_position();
+  json_event["SS"]["position"]["x"] = position.x();
+  json_event["SS"]["position"]["y"] = position.y();
+  ss_spill = event->spacepoints()[0]->get_spill();
+  ss_event = event->spacepoints()[0]->get_event();
+
+  std::ofstream out2("part_event.txt", std::ios::out | std::ios::app);
+  out2  << tof0_spill << " " << tof1_spill << " " << ss_spill <<  " "
+        << tof0_event << " " << tof1_event << " " << ss_event << "\n";
+  out2.close();
 
   return json_event;
 }
@@ -260,10 +282,19 @@ void MapCppSingleStationRecon::reconstruct_tofs(Json::Value &root, int event_i,
 
 bool MapCppSingleStationRecon::is_good_for_tracking(Json::Value json_event) {
   bool goodness = false;
+
   if ( json_event.isMember("TOF0") && json_event.isMember("TOF1") &&
        json_event["SS"].isMember("Plane0") && json_event["SS"].isMember("Plane1") &&
        json_event["SS"].isMember("Plane2") ) {
     goodness = true;
+  }
+
+  double time_tof_0 = json_event["TOF0"]["time"].asDouble();
+  double time_tof_1 = json_event["TOF1"]["time"].asDouble();
+  double deltat = time_tof_1 - time_tof_0;
+
+  if ( deltat < 24.78 ) {
+    goodness = false;
   }
 
   return goodness;
@@ -289,4 +320,6 @@ std::string MapCppSingleStationRecon::JsonToString(Json::Value json_in) {
   std::stringstream ss_io;
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
+}
+
 }

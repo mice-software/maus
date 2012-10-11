@@ -25,7 +25,6 @@ SEEvent::SEEvent() {
 }
 
 SEEvent::~SEEvent() {
-  std::cerr << "SEEVENT DESTRUCTOR CALLED" << std::endl;
   std::vector<SEDigit*>::iterator digit;
   for (digit = _SEdigits.begin(); digit!= _SEdigits.end(); ++digit) {
     delete (*digit);

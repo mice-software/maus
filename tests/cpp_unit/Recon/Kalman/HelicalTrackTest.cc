@@ -80,13 +80,13 @@ TEST_F(HelicalTrackTest, test_propagation) {
 
   TMatrixD a_projected(5, 1);
   a_projected = new_site.get_projected_a();
-/* needs work..
-  EXPECT_EQ(x1, a_projected(0, 0));
-  EXPECT_EQ(px1, a_projected(1, 0));
-  EXPECT_EQ(y1, a_projected(2, 0));
-  EXPECT_EQ(py1, a_projected(3, 0));
-  EXPECT_EQ(kappa, a_projected(4, 0));
-*/
+// needs work..
+  EXPECT_NEAR(x1, a_projected(0, 0), 1e-3);
+  EXPECT_NEAR(px1, a_projected(1, 0), 1e-3);
+  EXPECT_NEAR(y1, a_projected(2, 0), 1e-3);
+  EXPECT_NEAR(py1, a_projected(3, 0), 1e-3);
+  EXPECT_NEAR(kappa, a_projected(4, 0), 1e-3);
+
   // EXPECT_TRUE(fabs(projected_x-a_temp(0, 0)) < err);
   // EXPECT_TRUE(fabs(projected_y-a_temp(1, 0)) < err);
 

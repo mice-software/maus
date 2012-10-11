@@ -40,6 +40,8 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
               << site.get_residual_y() << std::endl;
     std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
+    double alpha_smooth = get_smoothed_measurement(site);
+    std::cerr << "SITE smoothed alpha: " << alpha_smooth << std::endl;
     std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
     std::cerr << "================Projection================" << std::endl;
     site.get_projected_a().Print();
@@ -109,12 +111,30 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
   CLHEP::Hep3Vector dir = a_site.get_direction();
   double dx = dir.x();
   double dy = dir.y();
-  static const double A = 2./(7.*0.427);
+  // static const double A = 2./(7.*0.427);
 
+  // std::cerr << "dir" << dx << " " << dy << "\n";
+  double A; // = a_site->get_conversion_factor(); // mm to channel conversion factor.
   TMatrixD H(2, 5);
-  H.Zero();
-  H(0, 0) = -A*dy;
-  H(0, 2) =  A*dx;
+  switch ( a_site.get_id() ) {
+    case 0 : case 1 :
+      A = 40.;
+      H.Zero();
+      H(0, 0) =  dy/A;
+      H(0, 2) =  dx/A;
+      break;
+    case 9: case 10 :
+      A = 60.;
+      H.Zero();
+      H(0, 0) =  dy/A;
+      H(0, 2) =  dx/A;
+      break;
+    default :
+      A = 2./(7.*0.427);
+      H.Zero();
+      H(0, 0) = -A*dy;
+      H(0, 2) =  A*dx;
+  }
 
   TMatrixD a_smooth(5, 1);
   a_smooth = a_site.get_smoothed_a();

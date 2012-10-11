@@ -23,6 +23,9 @@
 #include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
 #include <algorithm>
+#include <math.h>
+#include <iostream>
+#include <fstream>
 
 // C++ headers
 #include <string>
@@ -30,46 +33,43 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-// #include "src/common_cpp/DataStructure/SciFiEvent.hh"
-// #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-// #include "src/common_cpp/Recon/Kalman/GlobalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/SingleStation/KalmanSSTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-// namespace ublas = boost::numeric::ublas;
 
-// namespace MAUS {
+namespace MAUS {
 
-class KalmanTrackFitSS {
+class KalmanTrackFitSS : public KalmanTrackFit {
  public:
-  KalmanTrackFitSS();
+  // KalmanTrackFitSS();
 
-  ~KalmanTrackFitSS();
+  virtual ~KalmanTrackFitSS();
 
   void process(Json::Value event);
 
-  typedef MAUS::KalmanSite KalmanSite;
+  // typedef MAUS::KalmanSite KalmanSite;
 
-  typedef MAUS::KalmanMonitor KalmanMonitor;
+  // typedef MAUS::KalmanMonitor KalmanMonitor;
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
   void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites,
-                               double particle_mass);
-
+                               double &particle_mass, double &particle_momentum);
+/*
   void filter(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 
   void extrapolate(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
-
+*/
   void filter_virtual(std::vector<KalmanSite> &sites,
-                      KalmanSSTrack *track, int current_site);
+                      int current_site);
 
-  void perform_elementar_pattern_recon(Json::Value event, double mass,
+  void perform_elementar_pattern_recon(Json::Value event,
                                        double &x_pr, double &y_pr,
-                                       double &mx_pr, double &my_pr, double &p_z);
+                                       double &mx_pr, double &my_pr, double &p_z, double &mass);
 
-  void smooth(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
+ // void smooth(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 /*
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters);
@@ -83,6 +83,6 @@ class KalmanTrackFitSS {
   static const double tof1_a = 60.; // mm
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

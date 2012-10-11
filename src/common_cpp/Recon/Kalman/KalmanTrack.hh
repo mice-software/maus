@@ -54,7 +54,9 @@ class KalmanTrack {
 
   void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
-  void calc_system_noise(KalmanSite *site);
+  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
+
+  void calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
 
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
@@ -74,6 +76,14 @@ class KalmanTrack {
 
   double get_tracker() const { return _tracker; }
 
+  void set_mass(double mass) { _mass = mass; }
+
+  double get_mass() const { return _mass; }
+
+  void set_momentum(double momentum) { _momentum = momentum; }
+
+  double get_momentum() const { return _momentum; }
+
  protected:
   TMatrixD _H;
 
@@ -88,15 +98,17 @@ class KalmanTrack {
   TMatrixD _K;
 
   double _chi2, _tracker, _ndf;
+
+  double _mass, _momentum;
+
   // static const double sigma_x = 0.64; // x measurement resolution (mm)
+  double _conv_factor; // = 2./(7.*0.427); // mm to channel convertion factor.
 
-  static const double A; // = 2./(7.*0.427); // mm to channel convertion factor.
+  double _active_radius; // = 150.;
 
-  static const double ACTIVE_RADIUS; // = 150.;
+  double _channel_width; // = 1.333; // (1.4945) effective channel width without overlap
 
-  static const double CHAN_WIDTH; // = 1.333; // (1.4945) effective channel width without overlap
-
-  static const double SIGMA_ALPHA2;
+  double _sigma_alpha2;
 };
 
 } // ~namespace MAUS

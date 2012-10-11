@@ -20,24 +20,21 @@
 
 namespace MAUS {
 
-// Initialize geometry constants.
-const double KalmanTrack::A = 2./(7.*0.427);
-const double KalmanTrack::ACTIVE_RADIUS = 150.; // mm
-const double KalmanTrack::CHAN_WIDTH = 1.4945; // mm
-const double KalmanTrack::SIGMA_ALPHA2 = 1./12.;
-
-KalmanTrack::KalmanTrack() {
-  // Initialise member matrices:
-  _V.ResizeTo(2, 2);
+KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
+                                 _mass(0.), _momentum(0.) {
   _H.ResizeTo(2, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
+  _V.ResizeTo(2, 2);
   _K.ResizeTo(5, 2);
   _Q.ResizeTo(5, 5);
 
-  _chi2 = 0.0;
-  _ndf  = 0.0;
-  _tracker=-1;
+  // Initialize geometry constants.
+  // Default Values are TRACKER values.
+  _conv_factor   = (7.*0.427)/2.;
+  _active_radius = 150.;   // mm
+  _channel_width = 1.4945; // mm
+  _sigma_alpha2  = 1./12.;
 }
 
 //
@@ -68,28 +65,62 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   new_site->set_projected_covariance_matrix(C_pred);
 }
 
-void KalmanTrack::calc_system_noise(KalmanSite *site) {
-  _Q.Zero();
-/*
+void KalmanTrack::calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
+
+}
+
+void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
+  // Find dz.
+  double new_z = new_site->get_z();
+  double old_z = old_site->get_z();
+
+  double deltaZ = (new_z-old_z); // deltaZ in mm
+  double deltaZ_squared = deltaZ*deltaZ;
+
   TMatrixD a(5, 1);
-  a = site->get_a();
-  double mx = a(2, 0);
-  double my = a(3, 0);
+  a = old_site->get_a();
+  double mx    = a(1, 0);
+  double my    = a(3, 0);
   double kappa = a(4, 0);
+
   double Z = 1.;
   double r0 = 0.00167; // cm3/g
-  double p = 1/kappa; // MeV/c
+  double p = 1./kappa; // MeV/c
   double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1+0.038*log(r0))/(v*p);
+  double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
+  double C2 = C*C;
 
-  _Q(2, 2) = (1+pow(mx, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(3, 3) = (1+pow(my, 2.))*(1+pow(mx, 2.)+pow(my, 2.))*C;
-  _Q(2, 3) = mx*my*(1+mx*mx+my*my)*C;
-  _Q(3, 2) = mx*my*(1+mx*mx+my*my)*C;
+  double c_mx_mx = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
+  double c_my_my = (1.+pow(my, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
+  double c_mx_my = mx*my*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
 
-  _Q(4, 4) = kappa*kappa*my*my*C/(1+mx*mx);
-  _Q(3, 4) = kappa * my * (1+mx*mx+my*my) * C /(1+mx*mx);
-*/
+  _Q.Zero();
+  // x x
+  _Q(0, 0) = deltaZ_squared*c_mx_mx;
+  // x mx
+  _Q(0, 1) = deltaZ*c_mx_mx;
+  _Q(1, 0) = deltaZ*c_mx_mx;
+  // x y
+  _Q(0, 2) = deltaZ_squared*c_mx_my;
+  _Q(2, 0) = deltaZ_squared*c_mx_my;
+  // x my
+  _Q(0, 3) = deltaZ*c_mx_my;
+  _Q(3, 0) = deltaZ*c_mx_my;
+  // mx mx
+  _Q(1, 1) = c_mx_mx;
+  // mx y
+  _Q(1, 2) = deltaZ*c_mx_my;
+  _Q(2, 1) = deltaZ*c_mx_my;
+  // mx my
+  _Q(1, 3) = c_mx_my;
+  _Q(3, 1) = c_mx_my;
+  // y y
+  _Q(2, 2) = deltaZ_squared*c_my_my;
+  // y my
+  _Q(2, 3) = deltaZ*c_my_my;
+  _Q(3, 2) = deltaZ*c_my_my;
+  // my my
+  _Q(3, 3) = c_my_my;
 }
 
 //
@@ -97,9 +128,9 @@ void KalmanTrack::calc_system_noise(KalmanSite *site) {
 //
 void KalmanTrack::update_V(KalmanSite *a_site) {
   double alpha = (a_site->get_measurement())(0, 0);
-  double l = pow(ACTIVE_RADIUS*ACTIVE_RADIUS -
-                 (alpha*CHAN_WIDTH)*(alpha*CHAN_WIDTH), 0.5);
-  double sig_beta = l/CHAN_WIDTH;
+  double l = pow(_active_radius*_active_radius -
+                 (alpha*_channel_width)*(alpha*_channel_width), 0.5);
+  double sig_beta = l/_channel_width;
   std::cerr << "Chan measured: " << alpha << ". Lenght: " << l
             <<"; numb chan: " << sig_beta << "\n";
   double SIG_ALPHA = 1.0;
@@ -114,8 +145,8 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
   double dy = dir.y();
 
   _H.Zero();
-  _H(0, 0) = -A*dy;
-  _H(0, 2) =  A*dx;
+  _H(0, 0) = -dy/_conv_factor;
+  _H(0, 2) =  dx/_conv_factor;
 }
 
 void KalmanTrack::update_covariance(KalmanSite *a_site) {

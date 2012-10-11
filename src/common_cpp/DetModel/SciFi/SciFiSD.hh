@@ -45,10 +45,17 @@ class SciFiSD : public MAUS::MAUSSD {
      *  determine the fibre number based on the position in the tracker and the
      *  MiceModule information about the fibre orientation and numbering scheme
      */
-    int legacy_chanNo(G4Step* aStep);
+    // int legacy_chanNo(G4Step* aStep);
+
+
+    void set_fibre_number(G4int fibre) { _fiberNumber = fibre; }
+
+    G4int get_fibre_number() const { return _fiberNumber; }
 
   private:
     int nChans;
+
+    G4int _fiberNumber;
 };
 
 #endif

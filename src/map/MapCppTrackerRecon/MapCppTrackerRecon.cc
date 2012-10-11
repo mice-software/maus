@@ -114,6 +114,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
+
+//  } catch(Squeal& squee)(Squeal& squee) {
+//    spill = MAUS::CppErrorHandler::getInstance()
+//                                       ->HandleSqueal(spill, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;

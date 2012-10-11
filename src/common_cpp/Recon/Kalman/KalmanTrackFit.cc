@@ -70,7 +70,12 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
       // std::cerr << "Filtering site " << i << std::endl;
       filter(sites, track, i);
     }
-    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
+  TMatrixD a_smooth(5, 1);
+  a_smooth = sites[numb_measurements-1].get_a();
+  TMatrixD C_smooth(5, 5);
+  C_smooth = sites[numb_measurements-1].get_covariance_matrix();
+  sites[numb_measurements-1].set_smoothed_a(a_smooth);
+  sites[numb_measurements-1].set_smoothed_covariance_matrix(C_smooth);
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       // std::cerr << "Smoothing site " << i << std::endl;
@@ -116,7 +121,12 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
       filter(sites, track, i);
     }
 
-    sites[numb_measurements-1].set_smoothed_a(sites[numb_measurements-1].get_a());
+    TMatrixD a_smooth(5, 1);
+    a_smooth = sites[numb_measurements-1].get_a();
+    TMatrixD C_smooth(5, 5);
+    C_smooth = sites[numb_measurements-1].get_covariance_matrix();
+    sites[numb_measurements-1].set_smoothed_a(a_smooth);
+    sites[numb_measurements-1].set_smoothed_covariance_matrix(C_smooth);
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       // std::cerr << "Smoothing site " << i << std::endl;
@@ -323,9 +333,6 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
   // a_k = a_k^k-1 + K_k x pull
   track->calc_filtered_state(a_site);
 
-  // Update H (depends on plane direction.
-  track->update_H(a_site);
-
   // Cp = (C-KHC)
   track->update_covariance(a_site);
 }
@@ -338,7 +345,10 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   KalmanSite *old_site = &sites[i-1];
 
   // Calculate the system noise...
-  track->calc_system_noise(old_site);
+  track->calc_system_noise(old_site, new_site);
+
+  // Calculate the energy loss...
+  track->calc_energy_loss(old_site, new_site);
 
   // The propagator matrix...
   track->update_propagator(old_site, new_site);

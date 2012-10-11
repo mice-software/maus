@@ -47,7 +47,7 @@ class KalmanTrackFit {
  public:
   KalmanTrackFit();
 
-  ~KalmanTrackFit();
+  virtual ~KalmanTrackFit();
 
   void process(std::vector<SciFiHelicalPRTrack> helical_tracks);
 
@@ -72,7 +72,7 @@ class KalmanTrackFit {
 
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
- private:
+ protected:
   double _seed_cov;
 };
 
