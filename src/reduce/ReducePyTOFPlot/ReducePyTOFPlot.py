@@ -119,6 +119,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.refresh_rate = 5
         # Histogram initializations. they are defined explicitly in
         # init_histos.
+        self.legend = None
         self._ht01 = None
         self._ht02 = None
         self._ht12 = None
@@ -177,21 +178,32 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
-        if (spill.has_key("daq_event_type") and
-            spill["daq_event_type"] == "end_of_run"):
+
+        if not spill.has_key("daq_event_type"):
+            raise ValueError("No event type")
+        if spill["daq_event_type"] == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
                 return [{}]
+        # elif spill["daq_event_type"] != "physics_event":
+        #    return spill
+
+        # do not try to get data from start/end spill markers
+        data_spill = True
+        if spill["daq_event_type"] == "start_of_run" \
+              or spill["daq_event_type"] == "start_of_burst" \
+              or spill["daq_event_type"] == "end_of_burst":
+            data_spill = False
 
         # Get TOF slab hits & fill the relevant histograms.
-        if not self.get_slab_hits(spill): 
+        if data_spill and not self.get_slab_hits(spill): 
             raise ValueError("slab_hits not in spill")
 
         # Get TOF space points & fill histograms.
-        if not self.get_space_points(spill):
+        if data_spill and not self.get_space_points(spill):
             raise ValueError("space_points not in spill")
 
         # Refresh canvases at requested frequency.
@@ -210,38 +222,49 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "slab_hits" in
         the spill.
         """
-        # Return if we cannot find slab_hits in the spill.
-        if 'slab_hits' not in spill:
-            return False
+        if 'recon_events' not in spill:
+            raise ValueError("recon_events not in spill")
+        # print 'nevt = ', len(spill['recon_events']), spill['recon_events']
+        for evn in range(len(spill['recon_events'])):
+            if 'tof_event' not in spill['recon_events'][evn]:
+                # print 'no tof event'
+                raise ValueError("tof_event not in recon_events")
+            # Return if we cannot find slab_hits in the event.
+            if 'tof_slab_hits' not in spill['recon_events'][evn]['tof_event']:
+                return False
 
-        slabhits = spill['slab_hits']
+            slabhits = spill['recon_events'][evn]['tof_event']['tof_slab_hits']
 
-        # setup the detectors for which we want to look at hits
-        dets = ['tof0', 'tof1', 'tof2']
+            # setup the detectors for which we want to look at hits
+            dets = ['tof0', 'tof1', 'tof2']
                    
-        # loop over detector stations ie tof0,tof1,tof2
-        for index, station in enumerate(dets):
-            # leave if we cannot find slab hits for this detector
-            if station not in slabhits:
-                continue
-            dethits = slabhits[station]
-            # loop over all slab hits for this detector station
-            for i in range(len(dethits)):
-                # make sure it is not null
-                if (dethits[i]):
-                    for j in range(len(dethits[i])): #loop over planes
-                        pos = dethits[i][j]['slab']
-                        plane_num = dethits[i][j]["plane"]
+            # loop over detector stations ie tof0,tof1,tof2
+            for index, station in enumerate(dets):
+                # leave if we cannot find slab hits for this detector
+                if station not in slabhits:
+                    continue
+                dethits = slabhits[station]
+                # print 'idx,stn: ',index,station,len(dethits),dethits
+                # loop over all slab hits for this detector station
+                if dethits == None:
+                    continue
+                for i in range(len(dethits)):
+                    # make sure it is not null
+                    if (dethits[i]):
+                        # wrong. no further loop. ie no j
+                        # for j in range(len(dethits[i])): #loop over planes
+                        pos = dethits[i]['slab']
+                        plane_num = dethits[i]["plane"]
                         # make sure the plane number is valid so 
                         # we don't overflow bounds
                         if plane_num < 0 or plane_num > 1:
                             return False
                         self.hslabhits[index][plane_num].Fill(pos)
-                        #plane 0, pmt0 hit for this slab
-                        if ("pmt0" in dethits[i][j]):
+                        # plane 0, pmt0 hit for this slab
+                        if ("pmt0" in dethits[i]):
                             self.hpmthits[index][plane_num][0].Fill(pos)
-                        #plane 0, pmt1 hit for this slab
-                        if ("pmt1" in dethits[i][j]):
+                        # plane 0, pmt1 hit for this slab
+                        if ("pmt1" in dethits[i]):
                             self.hpmthits[index][plane_num][1].Fill(pos)
         return True
 
@@ -261,85 +284,109 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "space_points" in
         the spill.
         """
-        if 'space_points' not in spill:
+        if 'recon_events' not in spill:
+            # print 'no reco'
             return False
 
-        # check for NoneType --there are events with no reconstructed SP
-        if spill['space_points'] is None:
-            return False
+        for evn in range(len(spill['recon_events'])):
+            if 'tof_event' not in spill['recon_events'][evn]:
+                # print 'no tof event'
+                return False
+                # print spill['recon_events'][evn]['tof_event']
+                # Return if we cannot find slab_hits in the spill.
+            if 'tof_space_points' not in \
+                  spill['recon_events'][evn]['tof_event']:
+                return False
+            space_points = \
+                  spill['recon_events'][evn]['tof_event']['tof_space_points']
 
-        space_points = spill['space_points']
+            # print 'evt: ', evn, ' nsp: ',len(space_points)
+            # if there are no TOF0,1,2 space point objects, return false
+            sp_tof0 = None
+            sp_tof1 = None
+            sp_tof2 = None
 
-        # if there are no TOF0,1,2 space point objects, return false
-        # not sure if we require all 3, 
-        # -- but currently returning false unless we get all 3 detectors
-        if 'tof0' not in space_points:
-            return False
-        sp_tof0 = space_points['tof0']
+            if 'tof0' in space_points:
+                sp_tof0 = space_points['tof0']
 
-        if 'tof1' not in space_points:
-            return False
-        sp_tof1 = space_points['tof1']
+            if 'tof1' in space_points:
+                sp_tof1 = space_points['tof1']
 
-        if 'tof2' not in space_points:
-            return False
-        sp_tof2 = space_points['tof2']
+            if 'tof2' in space_points:
+                sp_tof2 = space_points['tof2']
 
-        
-        # TOF0 
-        for i in range(len(sp_tof0)):
-            if sp_tof0[i]:
-                self.hnsp_0.Fill(len(sp_tof0[i]))
+            # print 'nsp012= ', len(sp_tof0), len(sp_tof1), len(sp_tof2)
+         
+            # TOF0
+            if sp_tof0:
+                # print '..evt ',evn,' nsp0: ',len(sp_tof0)
+                self.hnsp_0.Fill(len(sp_tof0))
+                for i in range(len(sp_tof0)):
+                    if sp_tof0[i]:
+                        # print 'nsp0: ',i,sp_tof0[i]
+                        spnt_x = sp_tof0[i]["slabX"]
+                        spnt_y = sp_tof0[i]["slabY"]
+                        self.hspxy[0].Fill(spnt_x, spnt_y)
+                        self.hspslabx_0.Fill(spnt_x)
+                        self.hspslaby_0.Fill(spnt_y)
+                        # print '... ', i
+                        if sp_tof1 is not None :
+                            if len(sp_tof0)==1 and len(sp_tof1)==1:
+                                t_0 = sp_tof0[i]["time"]
+                                t_1 = sp_tof1[i]["time"]
             else:
                 self.hnsp_0.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
-                    spnt_x = sp_tof0[i][0]["slabX"]
-                    spnt_y = sp_tof0[i][0]["slabY"]
-                    self.hspxy[0].Fill(spnt_x, spnt_y)
-                    self.hspslabx_0.Fill(spnt_x)
-                    self.hspslaby_0.Fill(spnt_y)
-                    
-        # TOF 2
-        for i in range(len(sp_tof2)):
-            if sp_tof2[i]:
-                self.hnsp_2.Fill(len(sp_tof2[i]))
+
+            # TOF 2
+            if sp_tof2:
+                # print '..evt ', evn, ' nsp2: ', len(sp_tof2)
+                self.hnsp_2.Fill(len(sp_tof2))
+                for i in range(len(sp_tof2)):
+                    if sp_tof2[i]:
+                        spnt_x = sp_tof2[i]["slabX"]
+                        spnt_y = sp_tof2[i]["slabY"]
+                        self.hspxy[2].Fill(spnt_x, spnt_y)
+                        self.hspslabx_2.Fill(spnt_x)
+                        self.hspslaby_2.Fill(spnt_y)
+                        if sp_tof1 is not None :
+                            # print '2&1: ', len(sp_tof1)
+                            if len(sp_tof2)==1 and len(sp_tof1)==1:
+                                t_2 = sp_tof2[i]["time"]
+                                t_1 = sp_tof1[i]["time"]
+                                self._ht12.Fill(t_1-t_1)
+                                # print 'tof: ', t_2-t_1
+
+                        if sp_tof0 is not None :
+                            if len(sp_tof2)==1 and len(sp_tof0)==1:
+                                t_2 = sp_tof2[i]["time"]
+                                t_0 = sp_tof0[i]["time"]
+                                self._ht02.Fill(t_2-t_0)
             else:
                 self.hnsp_2.Fill(0)
-            if sp_tof2[i] and sp_tof1[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof1[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
-                    spnt_x = sp_tof2[i][0]["slabX"]
-                    spnt_y = sp_tof2[i][0]["slabY"]
-                    self.hspxy[2].Fill(spnt_x, spnt_y)
-                    self.hspslabx_2.Fill(spnt_x)
-                    self.hspslaby_2.Fill(spnt_y)
-                    self._ht12.Fill(t_2-t_1)
-            if sp_tof2[i] and sp_tof0[i] :
-                if len(sp_tof2[i])==1 and len(sp_tof0[i])==1:
-                    t_2 = sp_tof2[i][0]["time"]
-                    t_0 = sp_tof0[i][0]["time"]
-                    self._ht02.Fill(t_2-t_0)
 
-        # TOF 1
-        for i in range(len(sp_tof1)):
-            if sp_tof1[i]:
-                self.hnsp_1.Fill(len(sp_tof1[i]))
+            # TOF 1
+            if sp_tof1:
+                # print '..evt ',evn,' nsp1: ',len(sp_tof1)
+                self.hnsp_1.Fill(len(sp_tof1))
+                for i in range(len(sp_tof1)):
+                    if sp_tof1[i]:
+                        # print 'nsp1: ', i, sp_tof1[i]
+                        spnt_x = sp_tof1[i]["slabX"]
+                        spnt_y = sp_tof1[i]["slabY"]
+                        self.hspxy[1].Fill(spnt_x, spnt_y)
+                        self.hspslabx_1.Fill(spnt_x)
+                        self.hspslaby_1.Fill(spnt_y)
+                        # print '... ', i
+                        if sp_tof0 is not None :
+                            if len(sp_tof1)==1 and len(sp_tof0)==1:
+                                # print '>>>> ok'
+                                t_0 = sp_tof0[i]["time"]
+                                t_1 = sp_tof1[i]["time"]
+                                self._ht01.Fill(t_1-t_0)
+                                # print 'tof01: ', t_1-t_0
             else:
                 self.hnsp_1.Fill(0)           
-            if sp_tof0[i] and sp_tof1[i] :
-                if len(sp_tof0[i])==1 and len(sp_tof1[i])==1:
-                    t_0 = sp_tof0[i][0]["time"]
-                    t_1 = sp_tof1[i][0]["time"]
-                    spnt_x = sp_tof1[i][0]["slabX"]
-                    spnt_y = sp_tof1[i][0]["slabY"]
-                    self._ht01.Fill(t_1-t_0)
-                    self.hspxy[1].Fill(spnt_x, spnt_y)
-                    self.hspslabx_1.Fill(spnt_x)
-                    self.hspslaby_1.Fill(spnt_y)
+
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914
@@ -363,38 +410,50 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # xy grid on canvas
         ROOT.gStyle.SetPadGridX(1)
         ROOT.gStyle.SetPadGridY(1)
-        
+        self.legend = ROOT.TLegend(0.6, 0.7, 0.89, 0.89)
+        ROOT.SetOwnership( self.legend, 1 ) 
+        ROOT.gStyle.SetFillColor(0)
         # define histograms
         self._ht01 = ROOT.TH1F("ht01", "TOF0->1;Time (ns);;", 200, 20, 40)
         self._ht12 = ROOT.TH1F("ht12", "TOF1->2;Time (ns);;", 200, 0, 20)
         self._ht02 = ROOT.TH1F("ht02", "TOF0->2;Time (ns);;", 200, 30, 50)
         
         
-        self.hspslabx_0 = ROOT.TH1F("spx0", "SpacePoints X slabs hit;SlabX;",
+        self.hspslabx_0 = ROOT.TH1F("spx0", "SpacePoints X-plane;SlabX;",
                                      10, -0.5, 9.5)
-        self.hspslaby_0 = ROOT.TH1F("spy0", "SpacePoints Y slabs hit;SlabY;",
+        self.hspslaby_0 = ROOT.TH1F("spy0", "SpacePoints Y-plane;SlabY;",
                                      10, -0.5, 9.5)
-        self.hspslabx_1 = ROOT.TH1F("spx1", "SpacePoints X slabs hit;SlabX;",
+        self.hspslabx_1 = ROOT.TH1F("spx1", "SpacePoints X-plane;SlabX;",
                                      10, -0.5, 9.5)
-        self.hspslaby_1 = ROOT.TH1F("spy1", "SpacePoints Y slabs hit;SlabY;",
+        self.hspslaby_1 = ROOT.TH1F("spy1", "SpacePoints Y-plane;SlabY;",
                                      10, -0.5, 9.5)
         self.hspslabx_1.SetFillColor(2)
+        self.hspslabx_1.SetLineColor(2)
         self.hspslaby_1.SetFillColor(2) 
-        self.hspslabx_2 = ROOT.TH1F("spx2", "SpacePoints X slabs hit;SlabX;",
+        self.hspslaby_1.SetLineColor(2) 
+        self.hspslabx_2 = ROOT.TH1F("spx2", "SpacePoints X-plane;SlabX;",
                                      10, -0.5, 9.5)
-        self.hspslaby_2 = ROOT.TH1F("spy2", "SpacePoints Y slabs hit;SlabY;",
+        self.hspslaby_2 = ROOT.TH1F("spy2", "SpacePoints Y-plane;SlabY;",
                                      10, -0.5, 9.5)
         self.hspslabx_2.SetFillColor(4)
+        self.hspslabx_2.SetLineColor(4)
         self.hspslaby_2.SetFillColor(4) 
+        self.hspslaby_2.SetLineColor(4) 
         
-        self.hnsp_0 = ROOT.TH1F("hnsp_0", ";#space points in particle event;;",
+        self.hnsp_0 = ROOT.TH1F("hnsp_0", 
+                                "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
-        self.hnsp_1 = ROOT.TH1F("hnsp_1", ";#space points in particle event;;",
+        self.hnsp_1 = ROOT.TH1F("hnsp_1", 
+                                "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
         self.hnsp_1.SetFillColor(2)
-        self.hnsp_2 = ROOT.TH1F("hnsp_2", ";#space points in particle event;;",
+        self.hnsp_1.SetLineColor(2)
+        self.hnsp_1.SetFillStyle(4000)
+        self.hnsp_2 = ROOT.TH1F("hnsp_2", 
+                                 "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
         self.hnsp_2.SetFillColor(4)
+        self.hnsp_2.SetLineColor(4)
 
         self.hslabhits = [[]]
         for i in range (0, 3):
@@ -402,16 +461,20 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             for j in range (0, 2):
                 histname = "hslabhits%d%d" % (i, j)
                 if (j == 0): 
-                    title = "Raw Slab Hits X; SlabX;"
+                    title = "Slab Hits X-plane; SlabX;"
                 if (j == 1): 
-                    title = "Raw Slab Hits Y;SlabY;"
+                    title = "Slab Hits Y-plane;SlabY;"
                 nbins = 10
                 xlo = -0.5
                 xhi = 9.5
                 self.hslabhits[i].append(ROOT.TH1F(histname,
                                                    title,
                                                    nbins, xlo, xhi))
-                self.hslabhits[i][j].SetFillColor(2*i)
+                if i == 0:
+                    self.hslabhits[i][j].SetLineColor(i+1)
+                else:
+                    self.hslabhits[i][j].SetFillColor(2*i)
+                    self.hslabhits[i][j].SetLineColor(2*i)
 
         self.hpmthits = [[[]]]
         for i in range (0, 3):
@@ -427,8 +490,11 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     self.hpmthits[i][j].append(ROOT.TH1F(histname, 
                                                          title,
                                                          nbins, xlo, xhi))
-                    self.hpmthits[i][j][k].SetFillColor(2*i)
-
+                    if i == 0:
+                        self.hpmthits[i][j][k].SetLineColor(i+1)
+                    else:
+                        self.hpmthits[i][j][k].SetFillColor(2*i)
+                        self.hpmthits[i][j][k].SetLineColor(2*i)
 
         # Create canvases
         #
@@ -447,6 +513,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self._ht12.Draw()
         self.canvas_tof[2].cd()
         self._ht02.Draw()
+
         
         # Slab Hits x
         self.canvas_hits_x = ROOT.TCanvas("hits_x", "hits_x", 800, 800)
@@ -525,14 +592,60 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         number of spills is divisible by the refresh rate.
         @param self Object reference.
         """
+
+        #ll = ROOT.TLegend(0.6, 0.7, 0.89, 0.89)
+        self.canvas_hits_x.cd()
+        leg = self.canvas_hits_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hslabhits[0][0], "TOF0", "l")
+        leg.AddEntry(self.hslabhits[1][0], "TOF1", "l")
+        leg.AddEntry(self.hslabhits[2][0], "TOF2", "l")
+        leg.SetBorderSize(0)
+        leg.SetFillColor(0)
+        leg.Draw()
         self.canvas_hits_x.Update()
+
+        self.canvas_hits_y.cd()
+        leg = self.canvas_hits_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hslabhits[0][1], "TOF0", "l")
+        leg.AddEntry(self.hslabhits[1][1], "TOF1", "l")
+        leg.AddEntry(self.hslabhits[2][1], "TOF2", "l")
+        leg.SetBorderSize(0)
+        leg.SetFillColor(0)
+        leg.Draw()
         self.canvas_hits_y.Update()
+
         for plane in range (2):
             for pmt in range (2):
                 ind = 2*plane + pmt
+                leg = self.canvas_pmt[ind].BuildLegend(0.6, 0.7, 0.89, 0.89)
+                leg.Clear()
+                
+                pnum = "Plane%d,PMT%d" % (plane, pmt)
+                leg.AddEntry(self.hpmthits[0][plane][pmt], "TOF0,"+pnum, "l")
+                leg.AddEntry(self.hpmthits[1][plane][pmt], "TOF1,"+pnum, "l")
+                leg.AddEntry(self.hpmthits[2][plane][pmt], "TOF2,"+pnum, "l")
                 self.canvas_pmt[ind].Update()
+
+        leg = self.canvas_nsp.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hnsp_0, "TOF0", "l")
+        leg.AddEntry(self.hnsp_1, "TOF1", "l")
+        leg.AddEntry(self.hnsp_2, "TOF2", "l")
         self.canvas_nsp.Update()
+
+        leg = self.canvas_sp_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hspslabx_0, "TOF0", "l")
+        leg.AddEntry(self.hspslabx_1, "TOF1", "l")
+        leg.AddEntry(self.hspslabx_2, "TOF2", "l")
         self.canvas_sp_x.Update()
+        leg = self.canvas_sp_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hspslaby_0, "TOF0", "l")
+        leg.AddEntry(self.hspslaby_1, "TOF1", "l")
+        leg.AddEntry(self.hspslaby_2, "TOF2", "l")
         self.canvas_sp_y.Update()
         for i in range (3):
             self.canvas_sp_xy[i].Update()
@@ -542,24 +655,23 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     def get_histogram_images(self):       
         """
         Get histograms as JSON documents.
-        @param self Object reference.
         @returns list of 3 JSON documents containing the images.
         """
         image_list = []
 
-        # Raw Hits X
+        # Slab Hits X
         # file label = tof_hit_x.eps
-        tag = "tof_hit_x"
+        tag = "tof_SlabHits_X"
         keywords = ["TOF", "raw", "hits"]
-        description = "TOF Raw Hits X"
+        description = "TOF Slab Hits X"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_hits_x)
         image_list.append(doc)
 
-        # Raw Hits Y
+        # Slab Hits Y
         # file label = tof_hit_y.eps
-        tag = "tof_hit_y"
-        description = "TOF Raw Hits Y"
+        tag = "tof_SlabHits_Y"
+        description = "TOF Slab Hits Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_hits_y)
         image_list.append(doc)
@@ -571,7 +683,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         for plane in range (2):
             for pmt in range (2):
                 ind = 2*plane + pmt
-                tag = "tof_pmt%d%d" % (plane, pmt)
+                tag = "tof_pmtHits_Plane%dPMT%d" % (plane, pmt)
                 description = "TOF PMT Plane%d PMT%d" % (plane, pmt)
                 doc = ReducePyROOTHistogram.get_image_doc( \
                     self, keywords, description, tag, self.canvas_pmt[ind])
@@ -579,7 +691,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # number of space points
         # file label = tof_nsp.eps
-        tag = "tof_nsp"
+        tag = "tof_nSpacePoints"
         keywords = ["TOF", "space", "points"]
         description = "TOF Number of Space Points"
         doc = ReducePyROOTHistogram.get_image_doc( \
@@ -588,7 +700,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # Spacepoints X
         # file label = tof_sp_x.eps
-        tag = "tof_sp_x"
+        tag = "tof_SpacePoints_X"
         description = "TOF Space Points X"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_sp_x)
@@ -596,7 +708,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # Spacepoints Y
         # file label = tof_sp_y.eps
-        tag = "tof_sp_y"
+        tag = "tof_SpacePoints_Y"
         description = "TOF Space Points Y"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_sp_y)
@@ -605,7 +717,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # space point 2d output
         # the files are labeled: tof_xy_0, tof_xy_1, tof_xy_2 .eps
         for i in range (3):
-            tag = "tof_xy_%d" % (i)
+            tag = "tof_SpacePoints_XY_tof%d" % (i)
             description = "TOF%d Space Points 2d" % (i)
             doc = ReducePyROOTHistogram.get_image_doc( \
                 self, keywords, description, tag, self.canvas_sp_xy[i])
@@ -616,11 +728,11 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         keywords = ["TOF", "time", "flight"]
         for i in range (3):
             if (i < 2):
-                tag = "tof_time_%d%d" % (i, i+1)
-                description = "TOF%d%d Time" % (i, i+1)
+                tag = "tof_time_tof%d-tof%d" % (i, i+1)
+                description = "TOF%d->TOF%d Time" % (i, i+1)
             else:
-                tag = "tof_time_02"
-                description = "TOF02 Time"
+                tag = "tof_time_tof0-tof2"
+                description = "TOF0->TOF2 Time"
             doc = ReducePyROOTHistogram.get_image_doc( \
                 self, keywords, description, tag, self.canvas_tof[i])
             image_list.append(doc)
