@@ -131,8 +131,8 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
     case 2 :  // SciFi
       A = 2./(7.*0.427);
       H.Zero();
-      H(0, 0) = -A*dy;
-      H(0, 2) =  A*dx;
+      H(0, 0) = -dy/A;
+      H(0, 2) =  dx/A;
       break;
     default :
       return 0;

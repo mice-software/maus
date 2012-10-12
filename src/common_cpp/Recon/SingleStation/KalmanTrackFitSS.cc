@@ -78,7 +78,7 @@ void KalmanTrackFitSS::process(Json::Value event) {
 
   KalmanMonitor monitor;
   monitor.save(sites);
-  // monitor.print_info(sites);
+  monitor.print_info(sites);
   delete track;
   // }
 }

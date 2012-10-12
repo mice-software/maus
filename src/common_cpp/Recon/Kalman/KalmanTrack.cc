@@ -59,7 +59,10 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   new_site->set_projected_covariance_matrix(C_pred);
 }
 
-void KalmanTrack::calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {}
+void KalmanTrack::calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
+  double minimum_ionization_energy = 1.; // MeV cm2 / g
+  double 
+}
 
 void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
   // Find dz.

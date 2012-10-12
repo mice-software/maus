@@ -39,7 +39,7 @@
 #include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
-  _fiberNumber = -1;
+  // _fiberNumber = -1;
 }
 
 
@@ -58,10 +58,10 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"].append(Json::Value());
 
   // Fibre Number defined like this for testing purposes.
-  if ( _fiberNumber == -1 ) {
-    G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
-    _fiberNumber = theTouchable->GetCopyNumber();  // get the fiber copy number
-  }
+  // if ( _fiberNumber == -1 ) {
+  G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
+  G4double _fiberNumber = theTouchable->GetCopyNumber();  // get the fiber copy number
+  // }
 
   G4ThreeVector Pos = aStep->GetPreStepPoint()->GetPosition();  // true MC position
   G4ThreeVector Mom = aStep->GetTrack()->GetMomentum();  // true momentum

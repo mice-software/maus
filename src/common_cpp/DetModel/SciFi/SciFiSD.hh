@@ -48,14 +48,14 @@ class SciFiSD : public MAUS::MAUSSD {
     // int legacy_chanNo(G4Step* aStep);
 
 
-    void set_fibre_number(G4int fibre) { _fiberNumber = fibre; }
+    // void set_fibre_number(G4int fibre) { _fiberNumber = fibre; }
 
-    G4int get_fibre_number() const { return _fiberNumber; }
+    // G4int get_fibre_number() const { return _fiberNumber; }
 
   private:
     int nChans;
 
-    G4int _fiberNumber;
+    // G4int _fiberNumber;
 };
 
 #endif
