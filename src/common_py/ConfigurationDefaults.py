@@ -51,9 +51,6 @@ errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
 
-# Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False
-
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
@@ -67,6 +64,7 @@ simulation_reference_particle = { # used for setting particle phase
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
+everything_special_virtual = False
 
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
@@ -80,11 +78,20 @@ kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,   
-                          "nu_e":False, "antu_nu_e":False,
-                          "nu_mu":False, "antu_nu_mu":False,
-                          "nu_tau":False, "antu_nu_tau":False,
+                          "nu_e":False, "anti_nu_e":False,
+                          "nu_mu":False, "anti_nu_mu":False,
+                          "nu_tau":False, "anti_nu_tau":False,
 }
 kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
+
+stepping_algorithm = "ClassicalRK4" # numerical integration routine
+delta_one_step = -1. # Geant4 step accuracy parameter
+delta_intersection = -1.
+epsilon_min = -1.
+epsilon_max = -1.
+miss_distance = -1.
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -226,6 +233,7 @@ geometry_upload_note = "" # note, pushed to the server to describe the geometry.
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
 technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 geometry_upload_cleanup = True # set to True to clean up after upload
+technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 
 #dates need to get geomtry ids
 get_ids_start_time = ""
