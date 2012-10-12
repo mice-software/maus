@@ -86,32 +86,4 @@ void MapCppTrackerDigits::save_to_json(Spill &spill) {
   root = *spill_proc.CppToJson(spill);
 }
 
-void MapCppTrackerDigits::sfspill_to_mausspill(SciFiSpill &sfspill, Spill &mspill) {
-
-  mspill.SetReconEvents(new ReconEventArray());
-
-  for ( unsigned int event_i = 0; event_i < sfspill.events().size(); ++event_i ) {
-    ReconEvent * revt = new ReconEvent();
-    // Pointers should be deep copied
-    revt->SetSciFiEvent(new SciFiEvent(*(sfspill.events()[event_i])));
-    mspill.GetReconEvents()->push_back(revt);
-  }
-}
-
-// The following two functions are added for testing purposes only
-Json::Value MapCppTrackerDigits::ConvertToJson(std::string jsonString) {
-  Json::Value newJson;
-  // JsonCpp string -> JSON::Value converter
-  Json::Reader reader;
-
-  newJson = JsonWrapper::StringToJson(jsonString);
-  return newJson;
-}
-
-std::string MapCppTrackerDigits::JsonToString(Json::Value json_in) {
-  std::stringstream ss_io;
-  JsonWrapper::Print(ss_io, json_in);
-  return ss_io.str();
-}
-
 } // ~namespace MAUS

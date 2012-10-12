@@ -651,7 +651,7 @@ void PatternRecognition::make_helix(const int num_points, const std::vector<int>
 
                     // double pt = circle.get_R() * 1.2;
                     // double pz = pt / line_sz.get_m();
-                    if ( debug > 0 ) std::cerr << "dsdz = " << line_sz.get_m() << std:: endl;
+                    if ( debug > 0 ) std::cout << "dsdz = " << line_sz.get_m() << std:: endl;
 
                     double psi_0 = phi_0 + (CLHEP::pi / 2);
                     SciFiHelicalPRTrack track(-1, num_points, good_spnts[0]->get_position(),
@@ -797,7 +797,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
     // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
     dphi.push_back(theta_i - phi_0);
-    std::cerr << "Pushed " << theta_i - phi_0 << " into dphi, size is " << dphi.size() << "\n";
+    // std::cerr << "Pushed " << theta_i - phi_0 << " into dphi, size is " << dphi.size() << "\n";
 
     // Set the error on phi
     double sd_phi = -1.0;
@@ -815,11 +815,11 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   if ( dphi_ok ) {
     std::vector<double> ds;
     dphi_to_ds(circle.get_R(), dphi, ds);
-    if ( debug > 0 ) {
+    /* if ( debug > 0 ) {
       for ( unsigned int i = 0; i < ds.size(); i++ ) {
         std::cerr << "ds = " << ds[i] << ", dz = " << dz[i] << std::endl;
       }
-    }
+    } */
     // Peform a linear fit in s - z
     linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
   }

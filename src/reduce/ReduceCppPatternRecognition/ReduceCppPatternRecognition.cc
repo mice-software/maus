@@ -183,9 +183,10 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
             } else if ( _tracker == 1 ) {
               _circles_xy_trkr1.push_back(make_circle(_circle_x0, _circle_y0, _circle_R));
             }
-            for ( unsigned int i = 0; i < htrk.get_phi_i().size(); ++i ) {
+            /*
+            for ( unsigned int i = 0; i < htrk.get_phi_i().size(); ++i )
               std::cerr << "Reducer: phi_i[" << i << "] = " << htrk.get_phi_i()[i] << std::endl;
-            }
+            */
           }
         } // ~Loop over events
       } else {
@@ -222,10 +223,10 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
 
     clear_tracks();
 
-    std::cerr << "Finished spill " << _nSpills << std::endl;
-    std::cerr << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
-    std::cerr << "Straight tracks this spill: " << _stracks.GetEntries() << std::endl;
-    std::cerr << "Helical tracks this spill: " << _circles.GetEntries() << std::endl;
+    std::cout << "Finished spill " << _nSpills << std::endl;
+    std::cout << "Spacepoints this spill: " << _spoints_1spill.GetEntries() << std::endl;
+    std::cout << "Straight tracks this spill: " << _stracks.GetEntries() << std::endl;
+    std::cout << "Helical tracks this spill: " << _circles.GetEntries() << std::endl;
     // std::cout << "Cumulative spacepoints: " << _spoints.GetEntries() << std::endl;
   } else {
     std::cerr << "Failed to import json to spill\n";

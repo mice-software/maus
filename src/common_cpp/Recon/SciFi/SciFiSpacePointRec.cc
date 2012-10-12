@@ -233,7 +233,7 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   time_error += (time_B-time)*time_B;
   time_error += (time_C-time)*time_C;
   time_error = sqrt(time_error);
-  double time_res = time_A - time;
+  // double time_res = time_A - time;
   triplet->set_time(time);
 }
 
@@ -257,7 +257,7 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
   time_error += (time_A-time)*time_A;
   time_error += (time_B-time)*time_B;
   time_error = sqrt(time_error);
-  double time_res = time_A - time;
+  // double time_res = time_A - time;
   duplet->set_time(time);
 }
 
