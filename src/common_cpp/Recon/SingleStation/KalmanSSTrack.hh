@@ -41,9 +41,7 @@ class KalmanSSTrack : public KalmanTrack {
  public:
   virtual ~KalmanSSTrack();
 
-  ///* Prediction */
-  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
-
+  //  Prediction
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 
   void magnet_drift();
@@ -52,19 +50,8 @@ class KalmanSSTrack : public KalmanTrack {
 
   void straight_line(double deltaZ);
 
-  ///* Filtering */
-  void update_V(KalmanSite *a_site);
-
-  void update_H(KalmanSite *a_site);
-
-  ///* Smoothing */
-  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-
-  ///* Acessors */
+  // Acessors
   void compute_chi2(const std::vector<KalmanSite> &sites);
-
- // private:
- // double _mass, _momentum;
 };
 
 } // ~namespace MAUS

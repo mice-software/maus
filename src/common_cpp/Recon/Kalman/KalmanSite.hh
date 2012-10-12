@@ -129,6 +129,9 @@ class KalmanSite {
 
   double get_conversion_factor() const { return _conversion_factor; }
 
+  void set_type(int type) { _type = type; }
+
+  int get_type() const { return _type; }
 
  private:
   CLHEP::Hep3Vector _mc_pos;
@@ -161,6 +164,8 @@ class KalmanSite {
   double _chi2;
 
   int _id;
+
+  int _type;
 
   CLHEP::Hep3Vector _direction;
 

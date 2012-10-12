@@ -21,20 +21,14 @@
 namespace MAUS {
 
 KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
-                                 _mass(0.), _momentum(0.) {
+                             _mass(0.), _momentum(0.), _conv_factor(0.),
+                             _active_radius(150.), _channel_width(1.4945) {
   _H.ResizeTo(2, 5);
   _F.ResizeTo(5, 5);
   _A.ResizeTo(5, 5);
   _V.ResizeTo(2, 2);
   _K.ResizeTo(5, 2);
   _Q.ResizeTo(5, 5);
-
-  // Initialize geometry constants.
-  // Default Values are TRACKER values.
-  _conv_factor   = (7.*0.427)/2.;
-  _active_radius = 150.;   // mm
-  _channel_width = 1.4945; // mm
-  _sigma_alpha2  = 1./12.;
 }
 
 //
@@ -65,9 +59,7 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   new_site->set_projected_covariance_matrix(C_pred);
 }
 
-void KalmanTrack::calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
-
-}
+void KalmanTrack::calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {}
 
 void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
   // Find dz.
@@ -121,32 +113,65 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   _Q(3, 2) = deltaZ*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
+
+  _Q.Zero();
 }
 
 //
 // ------- Filtering ------------
 //
 void KalmanTrack::update_V(KalmanSite *a_site) {
-  double alpha = (a_site->get_measurement())(0, 0);
-  double l = pow(_active_radius*_active_radius -
+  double sig_beta, SIG_ALPHA;
+  switch ( a_site->get_type() ) {
+    case 0 : // TOF0
+      SIG_ALPHA = 1.0/sqrt(12.);
+      sig_beta = 10./sqrt(12.);
+      // SIG_ALPHA = 40./sqrt(12.);
+      // sig_beta  = 400./sqrt(12.);
+      break;
+    case 1 : // TOF1
+      SIG_ALPHA = 1.0/sqrt(12.);
+      sig_beta = 7./sqrt(12.);
+      // SIG_ALPHA = 60./sqrt(12.);
+      // sig_beta  = 420./sqrt(12.);
+      break;
+    case 2 : // SciFi
+      double alpha = (a_site->get_measurement())(0, 0);
+      double l = pow(_active_radius*_active_radius -
                  (alpha*_channel_width)*(alpha*_channel_width), 0.5);
-  double sig_beta = l/_channel_width;
-  std::cerr << "Chan measured: " << alpha << ". Lenght: " << l
-            <<"; numb chan: " << sig_beta << "\n";
-  double SIG_ALPHA = 1.0;
+      sig_beta = (l/_channel_width)/sqrt(12.);
+      SIG_ALPHA = 1.0/sqrt(12.);
+  }
   _V.Zero();
-  _V(0, 0) = SIG_ALPHA*SIG_ALPHA/12.;
-  _V(1, 1) = sig_beta*sig_beta/12.;
+  _V(0, 0) = SIG_ALPHA*SIG_ALPHA;
+  _V(1, 1) = sig_beta*sig_beta;
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
-
-  _H.Zero();
-  _H(0, 0) = -dy/_conv_factor;
-  _H(0, 2) =  dx/_conv_factor;
+  // std::cerr << "dir" << dx << " " << dy << "\n";
+  // double A; // = a_site->get_conversion_factor(); // mm to channel conversion factor.
+  switch ( a_site->get_type() ) {
+    case 0 :
+      _conv_factor = 40.;
+      _H.Zero();
+      _H(0, 0) =  dy/_conv_factor;
+      _H(0, 2) =  dx/_conv_factor;
+      break;
+    case 1 :
+      _conv_factor = 60.;
+      _H.Zero();
+      _H(0, 0) =  dy/_conv_factor;
+      _H(0, 2) =  dx/_conv_factor;
+      break;
+    case 2 :
+      _conv_factor = (7.*0.427)/2.;
+      _H.Zero();
+      _H(0, 0) = -dy/_conv_factor;
+      _H(0, 2) =  dx/_conv_factor;
+  }
 }
 
 void KalmanTrack::update_covariance(KalmanSite *a_site) {
@@ -263,10 +288,26 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD ha(2, 1);
   update_H(smoothing_site);
   ha = TMatrixD(_H, TMatrixD::kMult, a_smooth);
+
   // Extrapolation converted to expected measurement.
   double alpha_model = ha(0, 0);
 
-  double chi2_i = pow(alpha-alpha_model, 2.)/SIGMA_ALPHA2;
+  double sigma_measurent_squared;
+  double chi2_i;
+  int type = smoothing_site->get_type();
+  if ( type == 0 ) {
+    sigma_measurent_squared = 11.5*11.5; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else if ( type == 1 ) {
+    sigma_measurent_squared = 17.3*17.3; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else if ( type == 2 ) {
+    sigma_measurent_squared = 1./12.; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+  } else {
+    chi2_i = 0.;
+  }
+
   smoothing_site->set_chi2(chi2_i);
 
   // do the same for covariance matrix

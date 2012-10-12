@@ -31,10 +31,9 @@
 // C++ headers
 #include <iostream>
 #include <fstream>
-#include <cmath>
-#include <iostream>
-#include <string>
 #include <sstream>
+#include <cmath>
+#include <string>
 #include <vector>
 
 // Other headers

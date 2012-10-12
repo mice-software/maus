@@ -68,7 +68,7 @@ class KalmanTrack {
 
   TMatrixD get_system_noise() { return _Q; }
 
-  void compute_chi2(const std::vector<KalmanSite> &sites);
+  virtual void compute_chi2(const std::vector<KalmanSite> &sites);
 
   double get_chi2() const { return _chi2; }
 
@@ -97,7 +97,9 @@ class KalmanTrack {
 
   TMatrixD _K;
 
-  double _chi2, _tracker, _ndf;
+  double _chi2, _ndf;
+
+  int _tracker;
 
   double _mass, _momentum;
 
@@ -107,8 +109,6 @@ class KalmanTrack {
   double _active_radius; // = 150.;
 
   double _channel_width; // = 1.333; // (1.4945) effective channel width without overlap
-
-  double _sigma_alpha2;
 };
 
 } // ~namespace MAUS

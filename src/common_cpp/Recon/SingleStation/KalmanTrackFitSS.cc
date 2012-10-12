@@ -78,7 +78,7 @@ void KalmanTrackFitSS::process(Json::Value event) {
 
   KalmanMonitor monitor;
   monitor.save(sites);
-  monitor.print_info(sites);
+  // monitor.print_info(sites);
   delete track;
   // }
 }
@@ -157,6 +157,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   first_site.set_measurement(tof0_slabx-tof0_central_slab_number);
   first_site.set_direction(tof_hor);
   first_site.set_id(0);
+  first_site.set_type(0);
   first_site.set_z(tof0_horizontal_z);
   sites.push_back(first_site);
   // Site 1 - tof0, vertical
@@ -164,6 +165,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_1.set_measurement(-(tof0_slaby-tof0_central_slab_number));
   site_1.set_direction(tof_ver);
   site_1.set_id(1);
+  site_1.set_type(0);
   site_1.set_z(tof0_vertical_z);
   sites.push_back(site_1);
 
@@ -202,6 +204,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_6.set_measurement(ss_plane2);
   site_6.set_direction(ss_2);
   site_6.set_id(6);
+  site_6.set_type(2);
   site_6.set_z(ss_2_z);
   sites.push_back(site_6);
   // Site 7 - plane1
@@ -209,6 +212,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_7.set_measurement(ss_plane1);
   site_7.set_direction(ss_1);
   site_7.set_id(7);
+  site_7.set_type(2);
   site_7.set_z(ss_1_z);
   sites.push_back(site_7);
   // Site 8 - plane0
@@ -216,6 +220,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_8.set_measurement(ss_plane0);
   site_8.set_direction(ss_0);
   site_8.set_id(8);
+  site_8.set_type(2);
   site_8.set_z(ss_0_z);
   sites.push_back(site_8);
 
@@ -224,6 +229,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_9.set_measurement(-(tof1_slaby-tof1_central_slab_number));
   site_9.set_direction(tof_ver);
   site_9.set_id(9);
+  site_9.set_type(1);
   site_9.set_z(tof1_vertical_z);
   sites.push_back(site_9);
   // Site 10 - tof1, horizontal
@@ -231,6 +237,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   site_10.set_measurement(tof1_slabx-tof1_central_slab_number);
   site_10.set_direction(tof_hor);
   site_10.set_id(10);
+  site_10.set_type(1);
   site_10.set_z(tof1_horizontal_z);
   sites.push_back(site_10);
 }
@@ -313,5 +320,4 @@ void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
         << tof1_x << " " << tof1_y << " " << ss_x << " " << ss_y << "\n";
   out2.close();
 }
-
 }

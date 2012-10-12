@@ -225,6 +225,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   first_plane.set_direction(clusters[0]->get_direction());
   first_plane.set_z(clusters[0]->get_position().z());
   first_plane.set_id(clusters[0]->get_id());
+  first_plane.set_type(2);
   // first_plane
   sites.push_back(first_plane);
 
@@ -234,6 +235,7 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     a_site.set_direction(clusters[j]->get_direction());
     a_site.set_z(clusters[j]->get_position().z());
     a_site.set_id(clusters[j]->get_id());
+    a_site.set_type(2);
     sites.push_back(a_site);
   }
 
@@ -295,6 +297,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
   first_plane.set_direction(clusters[0]->get_direction());
   first_plane.set_z(clusters[0]->get_position().z());
   first_plane.set_id(clusters[0]->get_id());
+  first_plane.set_type(2);
   // first_plane
   sites.push_back(first_plane);
 
@@ -304,6 +307,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack &seed, std::vector<KalmanSi
     a_site.set_direction(clusters[j]->get_direction());
     a_site.set_z(clusters[j]->get_position().z());
     a_site.set_id(clusters[j]->get_id());
+    a_site.set_type(2);
     sites.push_back(a_site);
   }
 

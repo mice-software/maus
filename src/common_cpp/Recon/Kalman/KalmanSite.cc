@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _conversion_factor(0.),
+KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _type(-1), _conversion_factor(0.),
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _C.ResizeTo(5, 5);
   _a.ResizeTo(5, 1);
@@ -33,7 +33,7 @@ KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _con
 KalmanSite::~KalmanSite() {}
 
 KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
-                                               _conversion_factor(0.),
+                                               _type(-1), _conversion_factor(0.),
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
   _a.ResizeTo(5, 1);
   _C.ResizeTo(5, 5);
@@ -64,6 +64,7 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _mc_mom = site.get_true_momentum();
 
   _conversion_factor = site.get_conversion_factor();
+  _type = site.get_type();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
@@ -92,6 +93,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _mc_mom = site.get_true_momentum();
 
   _conversion_factor = site.get_conversion_factor();
+  _type = site.get_type();
 
   return *this;
 }

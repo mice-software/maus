@@ -22,12 +22,13 @@
 // C headers
 #include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
-#include <algorithm>
 #include <math.h>
-#include <iostream>
-#include <fstream>
 
 // C++ headers
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+
 #include <string>
 #include <vector>
 #include "TMath.h"
@@ -43,25 +44,16 @@ namespace MAUS {
 
 class KalmanTrackFitSS : public KalmanTrackFit {
  public:
-  // KalmanTrackFitSS();
-
   virtual ~KalmanTrackFitSS();
 
   void process(Json::Value event);
 
-  // typedef MAUS::KalmanSite KalmanSite;
-
-  // typedef MAUS::KalmanMonitor KalmanMonitor;
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
   void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites,
                                double &particle_mass, double &particle_momentum);
-/*
-  void filter(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
 
-  void extrapolate(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
-*/
   void filter_virtual(std::vector<KalmanSite> &sites,
                       int current_site);
 
@@ -69,13 +61,6 @@ class KalmanTrackFitSS : public KalmanTrackFit {
                                        double &x_pr, double &y_pr,
                                        double &mx_pr, double &my_pr, double &p_z, double &mass);
 
- // void smooth(std::vector<KalmanSite> &sites, KalmanSSTrack *track, int current_site);
-/*
-  void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                        std::vector<SciFiCluster*> &clusters);
-
-  void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
-*/
  private:
   static const int tof0_num_slabs = 10;
   static const int tof1_num_slabs = 7;

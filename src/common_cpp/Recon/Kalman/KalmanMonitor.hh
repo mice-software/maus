@@ -28,8 +28,6 @@
 #include <string>
 #include <vector>
 #include "CLHEP/Vector/ThreeVector.h"
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/matrix.hpp"
-// #include "/home/edward/boost_1_49_0/boost/numeric/ublas/lu.hpp"
 #include "TMath.h"
 #include "TMatrixD.h"
 #include "TFile.h"
@@ -37,7 +35,6 @@
 #include "TMultiGraph.h"
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-// namespace ublas = boost::numeric::ublas;
 
 namespace MAUS {
 

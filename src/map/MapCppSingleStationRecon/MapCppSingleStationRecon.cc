@@ -321,5 +321,4 @@ std::string MapCppSingleStationRecon::JsonToString(Json::Value json_in) {
   JsonWrapper::Print(ss_io, json_in);
   return ss_io.str();
 }
-
 }

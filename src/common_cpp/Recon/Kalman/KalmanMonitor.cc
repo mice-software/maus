@@ -75,8 +75,6 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     TMatrixD a_smooth(5, 1);
     a_smooth = site.get_smoothed_a();
 
-    double res_x = site.get_residual_x();
-    double res_y = site.get_residual_y();
     // MC position and momentum.
     double mc_x  = site.get_true_position().x();
     double mc_y  = site.get_true_position().y();
@@ -94,6 +92,7 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     if ( id < 15 ) {
       mc_x  = -mc_x;
       mc_px = -mc_px;
+      mc_pz = -mc_pz;
     }
 
     out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
@@ -116,24 +115,28 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
   // std::cerr << "dir" << dx << " " << dy << "\n";
   double A; // = a_site->get_conversion_factor(); // mm to channel conversion factor.
   TMatrixD H(2, 5);
-  switch ( a_site.get_id() ) {
-    case 0 : case 1 :
+  switch ( a_site.get_type() ) {
+    case 0 :  // TOF0
       A = 40.;
       H.Zero();
       H(0, 0) =  dy/A;
       H(0, 2) =  dx/A;
       break;
-    case 9: case 10 :
+    case 1 :  // TOF1
       A = 60.;
       H.Zero();
       H(0, 0) =  dy/A;
       H(0, 2) =  dx/A;
       break;
-    default :
+    case 2 :  // SciFi
       A = 2./(7.*0.427);
       H.Zero();
       H(0, 0) = -A*dy;
       H(0, 2) =  A*dx;
+      break;
+    default :
+      return 0;
+
   }
 
   TMatrixD a_smooth(5, 1);
