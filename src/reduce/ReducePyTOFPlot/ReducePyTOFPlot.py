@@ -353,7 +353,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                             if len(sp_tof2)==1 and len(sp_tof1)==1:
                                 t_2 = sp_tof2[i]["time"]
                                 t_1 = sp_tof1[i]["time"]
-                                self._ht12.Fill(t_1-t_1)
+                                self._ht12.Fill(t_2-t_1)
                                 # print 'tof: ', t_2-t_1
 
                         if sp_tof0 is not None :
@@ -443,12 +443,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.hnsp_0 = ROOT.TH1F("hnsp_0", 
                                 "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
+        self.hnsp_0.SetLineColor(1)
         self.hnsp_1 = ROOT.TH1F("hnsp_1", 
                                 "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
         self.hnsp_1.SetFillColor(2)
         self.hnsp_1.SetLineColor(2)
-        self.hnsp_1.SetFillStyle(4000)
+        #self.hnsp_1.SetFillStyle(4000)
         self.hnsp_2 = ROOT.TH1F("hnsp_2", 
                                  "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
