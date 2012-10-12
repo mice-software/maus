@@ -292,21 +292,22 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   // Extrapolation converted to expected measurement.
   double alpha_model = ha(0, 0);
 
-  double sigma_measurent_squared;
+  double sigma_measurement_squared;
   double chi2_i;
-  int type = smoothing_site->get_type();
+  /* int type = smoothing_site->get_type();
   if ( type == 0 ) {
-    sigma_measurent_squared = 11.5*11.5; // mm
-    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
+    sigma_measurement_squared = 11.5*11.5; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurement_squared;
   } else if ( type == 1 ) {
-    sigma_measurent_squared = 17.3*17.3; // mm
-    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
-  } else if ( type == 2 ) {
-    sigma_measurent_squared = 1./12.; // mm
-    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurent_squared;
-  } else {
-    chi2_i = 0.;
-  }
+    sigma_measurement_squared = 17.3*17.3; // mm
+    chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurement_squared;
+  } else if ( type == 2 ) { 
+*/
+  sigma_measurement_squared = 1./12.;
+  chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurement_squared;
+  // } else {
+  //  chi2_i = 0.;
+  // }
 
   smoothing_site->set_chi2(chi2_i);
 
@@ -315,7 +316,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   C = smoothing_site->get_covariance_matrix();
 
   TMatrixD C_opt(5, 5);
-  C_opt = optimum_site->get_covariance_matrix();
+  C_opt = optimum_site->get_smoothed_covariance_matrix();
   TMatrixD Cp(5, 5);
   Cp = optimum_site->get_projected_covariance_matrix();
   TMatrixD temp3(5, 5);

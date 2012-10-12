@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(100.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -31,14 +31,8 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
-  // int tracker = a->get_tracker();
-  // if ( tracker == 0 ) {
-  //  Descending site number.
-  // return ( a->get_id() > b->get_id() );
-  // } else if ( tracker == 1 ) {
-  //  Ascending site number.
+  // Ascending site number.
   return ( a->get_id() < b->get_id() );
-  // }
 }
 
 //
@@ -60,7 +54,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
 
     int numb_measurements = sites.size();
 
-    assert(numb_measurements < 16);
+    // assert(numb_measurements < 16);
 
     for ( int i = 1; i < numb_measurements; ++i ) {
       // Predict the state vector at site i...
@@ -145,7 +139,8 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
 void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites) {
   // Get seed values.
   double r  = seed.get_R();
-  double pt = 0.3*4.*r;
+  double B = -4.;
+  double pt = 0.3*B*r;
 
   double dsdz  = seed.get_dsdz();
   double tan_lambda = 1./dsdz;
@@ -172,34 +167,17 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
   double phi;
   double px, py;
 
-/*
-  // std::cerr << numb_sites << "\n";
-  double z_i = (clusters.at(0))->get_position().z();
-  // std::cerr << z_i << "\n";
-  double z_f = (clusters.at(numb_sites-1))->get_position().z();
-  // std::cerr << z_f << "\n";
-
-  double deltaZ = (z_i-z_f)/1000.;;
-  // if ( new_site->get_id() < 15 ) {
-  //  deltaZ = - deltaZ;
-  // }
-
-  double Q = 1.;
-  double B = -4.;
-  double constant = -0.2998*Q*B;
-*/
-
   for ( unsigned int i = 0; i < spacepoints.size(); i++ ) {
     if ( tracker == 0 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = phi_0+3.14/2.;
+      // phi = phi_0+3.14/2.;
       px = pt*sin(phi);
       py = pt*cos(phi);
     } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = phi_0+3.14/2.;
+      // phi = phi_0+3.14/2.;
       px = pt*cos(phi);
       py = pt*sin(phi);
     }
@@ -331,7 +309,7 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
   // (non-const std for the perp direction)
   track->update_V(a_site);
 
-  // Update H (depends on plane direction.
+  // Update H (depends on plane direction.)
   track->update_H(a_site);
 
   // a_k = a_k^k-1 + K_k x pull
@@ -352,7 +330,7 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   track->calc_system_noise(old_site, new_site);
 
   // Calculate the energy loss...
-  track->calc_energy_loss(old_site, new_site);
+  // track->calc_energy_loss(old_site, new_site);
 
   // The propagator matrix...
   track->update_propagator(old_site, new_site);

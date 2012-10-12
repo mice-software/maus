@@ -28,6 +28,9 @@ KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _typ
   _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
   _smoothed_a.ResizeTo(5, 1);
+
+  _mc_pos = (0., 0., 0.);
+  _mc_mom = (0., 0., 0.);
 }
 
 KalmanSite::~KalmanSite() {}

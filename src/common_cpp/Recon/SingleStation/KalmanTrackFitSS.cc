@@ -87,7 +87,10 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
                                                std::vector<KalmanSite> &sites,
                                                double &momentum, double &mass) {
   double x_pr, y_pr, mx_pr, my_pr;
-  perform_elementar_pattern_recon(event, x_pr, y_pr, mx_pr, my_pr, momentum, mass);
+  perform_elementar_pattern_recon(event,
+                                  x_pr, y_pr,
+                                  mx_pr, my_pr,
+                                  momentum, mass);
 
 /*
   std::cerr << "Pattern Recognition: " << x_pr << " " << y_pr << " "
@@ -113,16 +116,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   KalmanSite first_site;
   first_site.set_projected_a(a);
   first_site.set_projected_covariance_matrix(C);
-  // first_site.set_z(clusters[0]->get_position().z());
-/*
-  int numb_sites = 4;
-  for ( int i = 0; i < 3; ++i ) {
-    if ( ss(i) != 666 ) {
-      numb_sites += 1;
-    }
-  }
-*/
-  // std::cerr << "Number of sites: " << numb_sites << std::endl;
+
   // TOFs channel-renumbering factors
   double tof0_central_slab_number = (10.-1.)/2.;
   double tof1_central_slab_number = (7.-1.)/2.;
