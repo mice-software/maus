@@ -19,8 +19,9 @@
 
 namespace MAUS {
 
-KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _type(-1), _conversion_factor(0.),
-                          _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)), _chi2(0.) {
+KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _type(-1),
+                          _conversion_factor(0.), _residual_x(0.), _residual_y(0.),
+                          _direction((0., 0., 0.)), _chi2(0.) {
   _C.ResizeTo(5, 5);
   _a.ResizeTo(5, 1);
   _v.ResizeTo(2, 1);

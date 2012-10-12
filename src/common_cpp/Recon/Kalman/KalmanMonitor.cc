@@ -136,7 +136,6 @@ double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
       break;
     default :
       return 0;
-
   }
 
   TMatrixD a_smooth(5, 1);
