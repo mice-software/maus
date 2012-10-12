@@ -107,7 +107,9 @@ def maus_input_transform_process(maus_input_log):
                           'bin/online/analyze_data_online_input_transform.py')
     proc = subprocess.Popen(
                        ['python', maus_inp, '-mongodb_database_name=maus-new',
-                        '-type_of_dataflow=multi_process_input_transform'],
+                        '-type_of_dataflow=multi_process_input_transform',
+				        '-verbose_level=0',
+						'-DAQ_hostname=miceraid5'],
                        stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid
     return proc
@@ -225,7 +227,7 @@ def main():
         PROCESSES.append(celeryd_process(celery_log))
         PROCESSES.append(maus_web_app_process(maus_web_log))
         PROCESSES.append(maus_input_transform_process(input_log))
-        for reducer in REDUCER_LIST:
+        for reducer in  	REDUCER_LIST:
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
                                                        reducer))
