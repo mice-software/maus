@@ -455,7 +455,7 @@ int fADCDataProcessor::get_area() {
 
 void fADCDataProcessor::set_pedestal() {
   double area = 0;
-  unsigned int pedBins = 20;
+  unsigned int pedBins = 10;
   if (_data.size() > pedBins) {
     for (unsigned int i = 0; i < pedBins; i++) {
        area += _data[i];
@@ -486,10 +486,11 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
   min = min_element(_data.begin(), _data.end());
   pos = distance(_data.begin(), min);
 
-  if (pos > 10) {
+  if (pos > 15) { // was: pos > 10
     it = min -  10;
-    while (it < min + 20 && it < _data.end()) {
-      area += abs(*it - _pedestal);
+    while (it < min + 30 && it < _data.end()) {
+      // area += abs(*it - _pedestal);
+      area += _pedestal- *it;
       it++;
     }
   }
