@@ -30,6 +30,7 @@
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 
+class BTFieldConstructor;
 
 namespace MAUS {
 
@@ -137,6 +138,9 @@ class MAUSGeant4Manager {
      *  Visualisation requires use_visualisation configuration variable set
      */
     MAUSVisManager* GetVisManager() {return _visManager;}
+
+    BTFieldConstructor* GetField() {return _detector->GetField();}
+
 
     /** Delete the manager and close any existing simulation
      *

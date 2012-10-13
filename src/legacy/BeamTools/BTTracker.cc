@@ -2,7 +2,7 @@
 #include "BTField.hh"
 #include "BTTracker.hh"
 #include "Interface/Squeal.hh"
-#include "Interface/MICERun.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
@@ -26,7 +26,6 @@ int    BTTracker::_maxNSteps     = 10000;
 int                 BTTracker::_nevents    = 0;    //number of events in the tracking
 double*             BTTracker::_charges    = NULL;    //charge for tracking
 double*             BTTracker::_macro_size = NULL; //macroparticle size for space charge
-BTSpaceChargeField* BTTracker::_sc         = NULL;
 
 
 void BTTracker::integrate(double target_indie, double* y, const BTField* field, BTTracker::var indep, double step_size, double charge,
@@ -56,8 +55,8 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
   _rotback = rot.inverse();
 
   //Probably not the most efficient, but only does it once per integrate call
-  _absoluteError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualAbsoluteError");
-  _relativeError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualRelativeError");
+  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_absolute_error"].asDouble();
+  _relativeError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
 
   double indie  = 0.;
   switch (indep)
@@ -371,7 +370,7 @@ void BTTracker::symplecticIntegrateStep2(double* x, double* p, const BTField* fi
 
 
 void BTTracker::integrateMany(double target_indie, int n_events, double* y, double* macro_size, double* charge, const BTField* field, BTTracker::var indep, 
-                double step_size, BTSpaceChargeField* spaceCharge)
+                double step_size)
 {
   _field = field;
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
@@ -381,14 +380,13 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
   int (*FuncEqM)(double z, const double y[], double f[], void *params)=NULL;
 
   //Probably not the most efficient, but only does it once per integrate call
-  _absoluteError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualAbsoluteError");
-  _relativeError = MICERun::getInstance()->DataCards->fetchValueDouble("VirtualRelativeError");
-  _maxNSteps     = MICERun::getInstance()->DataCards->fetchValueInt("MaxStepsWOELoss");
+  _absoluteError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_absolute_error"].asDouble();
+  _relativeError = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["field_tracker_relative_error"].asDouble();
+  _maxNSteps     = (*MAUS::Globals::GetInstance()->GetConfigurationCards())["maximum_number_of_steps"].asInt();
 
   _nevents    = n_events;
   _charges    = charge;
   _macro_size = macro_size;
-  _sc         = spaceCharge;
 
 
   double indie  = 0.;
@@ -429,7 +427,6 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
 
 int BTTracker::t_equations_motion_many       (double t,   const double x[], double dxdt[], void* params)
 {
-  if(_sc) _sc->CalculateField(_nevents, x, _charges, _macro_size);
   for(int i=0; i<_nevents; i++)
   {
     const double* x0 = &x   [i*8];

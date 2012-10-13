@@ -19,7 +19,6 @@ Multi-process dataflows module.
 
 from datetime import datetime
 import json
-import signal
 import sys
 
 from docstore.DocumentStore import DocumentStoreException
@@ -27,6 +26,8 @@ from framework.utilities import DataflowUtilities
 from framework.utilities import DocumentStoreUtilities
 from framework.workers import WorkerBirthFailedException
 from framework.workers import WorkerDeathFailedException
+
+import maus_cpp.run_action_manager
 
 class MergeOutputExecutor: # pylint: disable=R0903, R0902
     """
@@ -100,6 +101,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws DocumentStoreException if there is a problem
         connecting to the document store.
         """
+        self.last_time = datetime(1970, 01, 01)
+        self.job_footer = None
         self.merger = merger
         self.outputer = outputer
         self.config_doc = config_doc
@@ -107,9 +110,10 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         # Current run number (from spills).
         self.run_number = None
         # Last end_of_run spill received.
-        self.end_of_run = None
+        self.end_of_run_spill = None
         # Counts of spills processed.
         self.spill_process_count = 0
+        self.write_headers = self.config["header_and_footer_mode"] == "append"
         # Connect to doc store.
         if (doc_store == None):
             self.doc_store = DocumentStoreUtilities.setup_doc_store(\
@@ -125,27 +129,39 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 self.collection = self.config["doc_collection_name"]
         else:   
             self.collection = collection_name
+
+    def start_of_job(self, job_header):
+        """
+        Birth the outputer and save job header
+        """
+        # Register CTRL-C handler.
+        # signal.signal(signal.SIGINT, self.handle_ctrl_c) 
+        birth = self.outputer.birth(self.config_doc)
+        if not(birth == True or birth == None): # new-style birth() returns None
+            raise WorkerBirthFailedException(self.outputer.__class__)
+        if self.write_headers:
+            self.outputer.save(json.dumps(job_header))
+
  
-    def start_run(self, run_number):
+    def start_of_run(self):
         """
         Prepare for a new run by updating the local run number then
         birthing the merger and outputer. 
         @param self Object reference.
-        @param run_number New run number.
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
         """
-        self.run_number = run_number
-        self.end_of_run = None
+        self.end_of_run_spill = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
-        if (not self.merger.birth(self.config_doc)):
+        birth = self.merger.birth(self.config_doc)
+        if not(birth == True or birth == None): # new-style birth() returns None
             raise WorkerBirthFailedException(self.merger.__class__)
-        print("BIRTH outputer %s" % self.outputer.__class__)
-        if (not self.outputer.birth(self.config_doc)):
-            raise WorkerBirthFailedException(self.outputer.__class__)
+        run_header = maus_cpp.run_action_manager.start_of_run(self.run_number)
+        if self.write_headers:
+            self.outputer.save(run_header)
 
-    def end_run(self):
+    def end_of_run(self):
         """
         End a run by sending an end_of_run spill through the merger
         and outputer then death the merger and outputer. The end_of_run
@@ -157,32 +173,71 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws Exception if there is a problem when passing the
         end_of_run through or when death is called.
         """
-        print("Finishing current run...sending end_of_run to merger")
-        if (self.end_of_run == None):
+        if (self.end_of_run_spill == None):
             print "  Missing an end_of_run spill..."
             print "  ...creating one to flush the mergers!"
-            self.end_of_run = {"daq_data":None, \
-                "daq_event_type":"end_of_run", \
-                "run_number":self.run_number, \
-                "spill_num":-1}
-        end_of_run_spill = json.dumps(self.end_of_run)
-        spill = self.merger.process(end_of_run_spill)
-        self.outputer.save(spill)
-        print("DEATH merger %s" % self.merger.__class__)
-        if (not self.merger.death()):
+            self.end_of_run_spill = {"daq_event_type":"physics_event",
+                                     "maus_event_type":"Spill",
+                                     "run_number":self.run_number,
+                                     "spill_number":-1}
+        end_of_run_spill_str = json.dumps(self.end_of_run_spill)
+        end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
+        self.outputer.save(end_of_run_spill_str)
+        death = self.merger.death()
+        if not(death == True or death == None): # new-style death() returns None
             raise WorkerDeathFailedException(self.merger.__class__)
-        print("DEATH outputer %s" % self.outputer.__class__)
-        if (not self.outputer.death()):
-            raise WorkerDeathFailedException(self.outputer.__class__)
+        run_footer = maus_cpp.run_action_manager.end_of_run(self.run_number)
+        if self.write_headers:
+            self.outputer.save(run_footer)
         print "---------- END RUN %d ----------" % self.run_number
 
-    def execute(self):
+    def end_of_job(self, job_footer):
+        """
+        Output footer and then death the outputer
+        """
+        if self.write_headers:
+            self.outputer.save(json.dumps(job_footer))
+        death = self.outputer.death()
+        if not(death == True or death == None): # new-style death() returns None
+            raise WorkerDeathFailedException(self.outputer.__class__)
+
+    def process_event(self, spill):
+        """
+        Process the spill
+        """
+        spill_doc = json.loads(spill)
+        if not "maus_event_type" in spill_doc.keys():
+            raise KeyError("Event with no maus_event_type")
+        if spill_doc["maus_event_type"] != "Spill":
+            if not self.outputer.save(str(spill)):
+                print "Failed to execute Output"
+        else:
+            # Check for change in run.
+            spill_run_number = DataflowUtilities.get_run_number(spill_doc)
+            if (DataflowUtilities.is_end_of_run(spill_doc)):
+                self.end_of_run_spill = spill_doc
+            if (spill_run_number != self.run_number):
+                if (self.run_number != None):
+                    # Death workers only if birthed.
+                    self.end_of_run()
+                self.run_number = spill_run_number
+                self.start_of_run()
+           # Handle current spill.
+            merged_spill = self.merger.process(spill)
+            if not self.outputer.save(str(merged_spill)):
+                print "Failed to execute Output"
+            self.spill_process_count += 1
+            print "Spills processed: %d" % self.spill_process_count
+
+    def execute(self, job_header, job_footer, will_run_until_ctrl_c=True):
         """
         Execute the dataflow. Retrieve spills from document store and
         submit to merge and output workers. A date query is run on
         the document store so that only the spills added since the
         previous query are processed on each iteration.
         @param self Object reference.
+        @param job_header JobHeader maus_event to be written at start_of_job
+        @param job_footer JobFooter maus_event to be written at end_of_job
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         @throws DocumentStoreException if there is a problem
         using the document store.
@@ -192,67 +247,56 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputting a spill, birthing or deathing the merger or
         outputer or merging an end_of_run spill.
         """
-        print("-------- MERGE OUTPUT --------")
-        # Register CTRL-C handler.
-        signal.signal(signal.SIGINT, self.handle_ctrl_c) 
-        is_birthed = False
-        last_time = datetime(1970, 01, 01)
-        while True:
-            try:
-                docs = self.doc_store.get_since(self.collection, last_time)
-            except Exception as exc:
-                raise DocumentStoreException(exc)
-            # Iterate using while, not for, since docs is an
-            # iterator which streams data from database and we
-            # want to detect database errors.
-            while True:
+        # Darkness and sinister evil - somewhere in the combination of ROOT,
+        # SWIG, Python; I get a segmentation fault from OutputCppRoot fillevent
+        # (*_outfile) << fillEvent; command depending
+        # on which function I call outputer.save(...) from when outputer is
+        # OutputCppRoot. I think I'm going to be sick (some scoping/garbage
+        # collection issue?)
+        #
+        # Requirement: all outputer.save calls must be made from this execute
+        # function to work around this  - Rogers
+        try:
+            self.job_footer = job_footer
+            self.start_of_job(job_header)
+            run_again = True # always run once
+            while run_again:
+                run_again = will_run_until_ctrl_c
                 try:
-                    doc = docs.next()
-                except StopIteration:
-                    # No more data so exit inner loop.
-                    break
+                    docs = self.doc_store.get_since(self.collection,
+                                                    self.last_time)
                 except Exception as exc:
+                    sys.excepthook(*sys.exc_info())
                     raise DocumentStoreException(exc)
-                doc_id = doc["_id"]
-                doc_time = doc["date"]
-                spill = doc["doc"]
-                print "Read spill %s (dated %s)" % (doc_id, doc_time)
-                if (doc_time > last_time):
-                    last_time = doc_time
-                # Check for change in run.
-                spill_doc = json.loads(spill)
-                spill_run_number = \
-                    DataflowUtilities.get_run_number(spill_doc) 
-                if (DataflowUtilities.is_end_of_run(spill_doc)):
-                    self.end_of_run = spill_doc
-                if (spill_run_number != self.run_number):
-                    print "Change of run detected"
-                    if (is_birthed):
-                        # Death workers only if birthed.
-                        self.end_run()
-                    self.start_run(spill_run_number)
-                    is_birthed = True
-                # Handle current spill.
-                print "Executing Merge for spill %s\n" % doc_id,
-                merged_spill = self.merger.process(str(spill))
-                print "Executing Output for spill %s\n" % doc_id,
-                self.outputer.save(merged_spill)
-                self.spill_process_count += 1
-                print "Spills processed: %d" % self.spill_process_count
-        # Finish the final run.
-        self.end_run()
-
-    def handle_ctrl_c(self, signum, frame): # pylint: disable=W0613
-        """ 
-        Handler to break out of execute loop when CTRL-C is
-        pressed. The merger and outputer are deathed before
-        sys.exit(0) is invoked
-        @param self Object reference.
-        @param signum Signal number.
-        @param frame. Frame.
-        """
-        self.end_run()
-        sys.exit(0)
+                # Iterate using while, not for, since docs is an
+                # iterator which streams data from database and we
+                # want to detect database errors.
+                while True:
+                    try:
+                        doc = docs.next()
+                    except StopIteration:
+                        # No more data so exit inner loop.
+                        break
+                    except Exception as exc:
+                        raise DocumentStoreException(exc)
+                    doc_id = doc["_id"]
+                    doc_time = doc["date"]
+                    spill = doc["doc"]
+                    print "Read event %s (dated %s)" % (doc_id, doc_time)
+                    if (doc_time > self.last_time):
+                        self.last_time = doc_time
+                    self.process_event(spill)
+        except KeyboardInterrupt:
+            print "Received SIGINT - closing"
+            sys.exit(0)
+        except:
+            raise
+        finally:
+            # Finish the final run.
+            print "No more data and set to stop - ending run"
+            self.end_of_run()
+            print "Ending job"
+            self.end_of_job(self.job_footer)
 
     @staticmethod
     def get_dataflow_description():

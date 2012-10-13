@@ -79,6 +79,12 @@ TEST(STLUtilsTest, ReplaceVariablesTest) {
                                          "some_string_"+mrd);
     EXPECT_THROW(STLUtils::ReplaceVariables
                       ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), Squeal);
+    EXPECT_THROW(STLUtils::ReplaceVariables
+                      ("some_string_$MAUS_ROOT_DIR}"), Squeal);
+    EXPECT_THROW(STLUtils::ReplaceVariables
+                      ("some_string_${MAUS_ROOT_DIR"), Squeal);
+    EXPECT_THROW(STLUtils::ReplaceVariables
+                      ("some_string_$MAUS_ROOT_DIR"), Squeal);
 }
 }
 

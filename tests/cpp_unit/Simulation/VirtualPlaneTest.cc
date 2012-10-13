@@ -140,14 +140,14 @@ G4Track* SetG4TrackAndStep(G4Step* step) {
   step->GetPreStepPoint()->SetMass(dyn->GetMass());
   step->GetPreStepPoint()->SetKineticEnergy(100.);
   step->GetPreStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
+                                  (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
 
   step->GetPostStepPoint()->SetGlobalTime(2.);
   step->GetPostStepPoint()->SetPosition(CLHEP::Hep3Vector(3., 4., 8.));
   step->GetPostStepPoint()->SetMass(dyn->GetMass());
   step->GetPostStepPoint()->SetKineticEnergy(110.);
   step->GetPostStepPoint()->SetMomentumDirection
-                                    (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
+                                  (CLHEP::Hep3Vector(0., 0.1, 1.)/::sqrt(1.01));
   return track;
 }
 
@@ -157,7 +157,8 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
 
   BTConstantField field(10., 100., CLHEP::Hep3Vector(0, 0, 0.001)); // 1 Tesla
   VirtualPlaneManager vpm;
-  vpm.ConstructVirtualPlanes(&field, MICERun::getInstance()->miceModule);
+  vpm.ConstructVirtualPlanes(&field,
+                     MAUS::Globals::GetInstance()->GetMonteCarloMiceModules());
   G4Step*  step  = new G4Step();
   SetG4TrackAndStep(step);
   VirtualHit hit = vp_z.BuildNewHit(step, 99);

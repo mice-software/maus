@@ -225,24 +225,16 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         """
         Return the maximum and minimum of the histogram
         """
-        (lower, upper) = -1, -1
+        (lower, upper) = None, None
         for ks_test in ks_test_list:
-            index = 0
-            data_max = max(ks_test.content) #Probably 1
-            while ks_test.content[index] < 0.01*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] < lower or lower < 0:
-                lower = ks_test.bins[index]
-            while ks_test.content[index] < 0.99*data_max and \
-                  index < len(ks_test.content):
-                index += 1
-            if ks_test.bins[index] > upper or upper < 0:
-                upper = ks_test.bins[index+1]
+            if lower == None or ks_test.bins[0] < lower:
+                lower = ks_test.bins[0]
+            if upper == None or ks_test.bins[-1] > upper:
+                upper = ks_test.bins[-1]
         return lower, upper
     hist_width = staticmethod(hist_width)
 
-    def __get_bins(bins):
+    def _get_bins(bins):
         """
         Get ctypes array from a list of bins
         """
@@ -251,7 +243,19 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         for i in range(len(bins)):
             my_array[i] = ctypes.c_double(bins[i])
         return my_array
-    __get_bins = staticmethod(__get_bins)
+    _get_bins = staticmethod(_get_bins)
+
+    def _get_min_non_zero_bin(test_list, float_tolerance=1e-9):
+        """
+        Get the content of the minimum bin that is not zero
+        """
+        running_min = 1.
+        for test in test_list:
+            for bin_cont in test.content:
+                if bin_cont < running_min and bin_cont > float_tolerance:
+                    running_min = bin_cont
+        return running_min
+    _get_min_non_zero_bin = staticmethod(_get_min_non_zero_bin)
 
     def make_plots(ks_test_list):
         """
@@ -262,20 +266,19 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
             name += ' ['+ks_test_list[0].units+']'
         canv = Common.make_root_canvas(name)
 
-        bad_colors = [5, 10] #5 is yellow, 10 is white
-
         lower, upper = KSTest.hist_width(ks_test_list)
 
         h_start = len(BaseTest._hists)
+        my_ymin = KSTest._get_min_non_zero_bin(ks_test_list)
         hist = xboa.Common.make_root_histogram(
                   name+'-'+str(len(BaseTest._hists)),
-                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper, ymin=0.,
-                  line_color=10)
-        hist.Draw()
+                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper,
+                  ymin=my_ymin/2., line_color=10)
+        hist.Draw('Y+')
         BaseTest._hists.append(hist)
         # ack need complicated bin widths
         for k, test in  enumerate(ks_test_list): 
-            bin_array = KSTest.__get_bins(test.bins)
+            bin_array = KSTest._get_bins(test.bins)
             hist = ROOT.TH1D(name+'-'+str(len(BaseTest._hists)),  # pylint: disable = E1101, C0301
                              ';'+name, len(test.bins)-1, bin_array)
             if test.content[-1] != 0.:
@@ -284,7 +287,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
                     hist.SetBinContent(i+1, value)
             BaseTest._hists.append(hist)
             color = k+1
-            while color in bad_colors: 
+            while color in [5, 10]: # yellow, white
                 color += 1
             hist.SetLineColor(color)
             hist.SetStats(False)

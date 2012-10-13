@@ -21,6 +21,8 @@ Map for use in testing other components.
 
 import json
 
+import maus_cpp.globals
+
 class MapPyTestMap: # pylint:disable = R0902
     """
     Simple map class for testing purposes.
@@ -71,6 +73,7 @@ class MapPyTestMap: # pylint:disable = R0902
             self.__process_result = config["process_result"]
         if (config.has_key("death_result")):
             self.__death_result = config["death_result"]
+        assert(maus_cpp.globals.has_instance())
         return True
 
     def process(self, spill_doc): # pylint:disable = R0201
@@ -110,3 +113,4 @@ class MapPyTestMap: # pylint:disable = R0902
         if (self.__death_result == MapPyTestMap.EXCEPTION):
             raise ValueError("Death exception")
         return True
+

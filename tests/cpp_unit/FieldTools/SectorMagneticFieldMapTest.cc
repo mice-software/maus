@@ -41,7 +41,7 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapNoSymmetry) {
 
     Interpolator3dGridTo3d* interpolator_none = SectorMagneticFieldMapIO::
                                ReadMap(map_file, "tosca_sector_1", units, "None");
-    ThreeDGrid* grid_none = interpolator_none->GetGrid();
+    ThreeDGrid* grid_none = interpolator_none->GetMesh();
     EXPECT_NEAR(grid_none->MinX(), 2100., 1.);
     EXPECT_NEAR(grid_none->MaxX(), 2120., 1.);
     EXPECT_NEAR(grid_none->MinY(), 0., 1.);
@@ -73,7 +73,7 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapDipoleSymmetry) {
 
     Interpolator3dGridTo3d* interpolator_dipole = SectorMagneticFieldMapIO::
                              ReadMap(map_file, "tosca_sector_1", units, "Dipole");
-    ThreeDGrid* grid_dip = interpolator_dipole->GetGrid();
+    ThreeDGrid* grid_dip = interpolator_dipole->GetMesh();
     EXPECT_NEAR(grid_dip->MinX(), 2100., 1.);
     EXPECT_NEAR(grid_dip->MaxX(), 2120., 1.);
     EXPECT_NEAR(grid_dip->MinY(), -10., 1.);

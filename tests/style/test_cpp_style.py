@@ -335,7 +335,7 @@ beamtools_files = [
 ]
 
 simulation_files = [
-'MICEPhysicsList.cc', 'MiceMessenger.cc', 'MICERunAction.hh', 'StripSpecialHits.cc', 'MICEBGPlane.hh', 'MICEVisManager.hh', 'MiceMessenger.hh', 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'MICEStepStatistics.hh', 'MICEPrimaryGeneratorAction.hh', 'MICESteppingAction.cc', 'MICEPhysicsList.hh', 'MICEVisManager.cc', 'FillMaterials.hh', 'MICEBGPlane.cc', 'MICEStepStatistics.cc', 'StripSpecialHits.hh', 'MICEEventAction.hh', 'MICESteppingAction.hh', 'MICERunAction.cc', 'MICEDetectorConstruction.cc', 'MICEEventAction.cc',
+'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'FillMaterials.hh', 'MICEDetectorConstruction.cc'
 ]
 
 recon_files = [

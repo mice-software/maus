@@ -18,18 +18,20 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_DATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_MAUS_DATA_HH_
 
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include <string>
+
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
 
-/** Data is the root of the MAUS data structure
+class Spill;
+
+/** Data is the root of the MAUS physics data structure
  *
- *  Data class is the root class for the MAUS data structure. At the moment it
- *  just holds a pointer to the spill. Note that the bottom of any ROOT data
- *  structure has to be outside the json data structure as we usually allocate 
- *  new memory whenever we load a new spill - which ROOT does not like.
+ *  Data class is the root class for the MAUS physics data structure. It
+ *  just holds a pointer to the spill.
  */
-class Data {
+class Data : public MAUSEvent<Spill> {
   public:
     /** Default constructor initialises everything to NULL */
     Data();
@@ -61,10 +63,31 @@ class Data {
      *  the size of the class member. This is difficult (impossible?) to access
      *  from python, so we provide a convenience function here.
      */
-    int my_sizeof();
+    int GetSizeOf() const;
+
+    /** Get Event Type information 
+     *
+     *  Need to bring into base class for JsonCppProcessor
+     */
+    std::string GetEventType() const {return MAUSEvent<Spill>::GetEventType();}
+
+    /** Set Event Type information 
+     *
+     *  Need to bring into base class for JsonCppProcessor
+     */
+    void SetEventType(std::string type) {MAUSEvent<Spill>::SetEventType(type);}
+
+    /** Wrapper for MAUSEvent
+     */
+    Spill* GetEvent() const {return GetSpill();}
+
+    /** Wrapper for MAUSEvent
+     */
+    void SetEvent(Spill* spill) {SetSpill(spill);}
 
   private:
     Spill* _spill;
+    std::string _event_type;
     ClassDef(Data, 1)
 };
 }

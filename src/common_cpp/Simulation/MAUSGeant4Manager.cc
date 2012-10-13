@@ -51,7 +51,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
-    _detector   = new MICEDetectorConstruction(*MICERun::getInstance());
+    MiceModule* model = Globals::GetInstance()->GetMonteCarloMiceModules();
+    Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+    _detector   = new MICEDetectorConstruction(model, cards );
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
@@ -69,11 +71,10 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(
-      MICERun::getInstance()->btFieldConstructor,
-      MICERun::getInstance()->miceModule
+      GetField(),
+      model
     );
     _runManager->Initialize();
-    FieldPhaser().SetPhases();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -92,7 +93,7 @@ void MAUSGeant4Manager::SetPhases() {
 MAUSPrimaryGeneratorAction::PGParticle
                                      MAUSGeant4Manager::GetReferenceParticle() {
     MAUSPrimaryGeneratorAction::PGParticle p;
-    Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
+    Json::Value* conf = Globals::GetInstance()->GetConfigurationCards();
     Json::Value ref = JsonWrapper::GetProperty
              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);
@@ -138,7 +139,10 @@ Json::Value MAUSGeant4Manager::Tracking
     event["primary"] = p.WriteJson();
     event_array.append(event);
     _eventAct->SetEvents(event_array);
+    Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
+    Globals::GetMCFieldConstructor()->Print(Squeak::mout(Squeak::debug));
     GetRunManager()->BeamOn(1);
+    Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
     return _eventAct->GetEvents()[Json::Value::UInt(0)];
 }
 
