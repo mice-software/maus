@@ -59,14 +59,17 @@ class KalmanTrackFitSS : public KalmanTrackFit {
 
   void perform_elementar_pattern_recon(Json::Value event,
                                        double &x_pr, double &y_pr,
-                                       double &mx_pr, double &my_pr, double &p_z, double &mass);
+                                       double &mx_pr, double &my_pr,
+                                       double &p_z, double &mass);
 
 
-  void initialise_prove_track(std::vector<KalmanSite> &old_sites, std::vector<KalmanSite> &new_sites);
+  void initialise_prove_track(std::vector<KalmanSite> &old_sites,
+                              std::vector<KalmanSite> &new_sites);
 
-  void prove_origin_large_residuals(std::vector<KalmanSite> old_sites, double particle_momentum, double particle_mass);
+  void prove_origin_large_residuals(std::vector<KalmanSite> old_sites,
+                                    double particle_momentum, double particle_mass);
 
-  void save(std::vector<KalmanSite> const &sites); 
+  void save(std::vector<KalmanSite> const &sites);
 
  private:
   static const int tof0_num_slabs = 10;

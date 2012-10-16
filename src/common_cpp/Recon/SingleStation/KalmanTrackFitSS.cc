@@ -40,6 +40,8 @@ void KalmanTrackFitSS::process(Json::Value event) {
   // Pass measurements and PR to sites.
   initialise_global_track(event, sites, particle_momentum, particle_mass);
 
+  if (particle_mass > 150.) return;
+  if (particle_momentum < 100.) return;
   track->set_mass(particle_mass);
   track->set_momentum(particle_momentum);
 
@@ -62,12 +64,8 @@ void KalmanTrackFitSS::process(Json::Value event) {
 
   int numb_measurements = sites.size();
   // assert(numb_measurements == 3);
-  TMatrixD a_smooth(5, 1);
-  a_smooth = sites[numb_measurements-1].get_a();
-  TMatrixD C_smooth(5, 5);
-  C_smooth = sites[numb_measurements-1].get_covariance_matrix();
-  sites[numb_measurements-1].set_smoothed_a(a_smooth);
-  sites[numb_measurements-1].set_smoothed_covariance_matrix(C_smooth);
+
+  track->prepare_for_smoothing(sites);
   // ...and Smooth back all sites.
   for ( int i = numb_measurements-2; i >= 0; --i ) {
       std::cerr << "Smoothing site " << i << std::endl;
@@ -80,14 +78,15 @@ void KalmanTrackFitSS::process(Json::Value event) {
   monitor.print_info(sites);
   monitor.save(sites);
 
-  prove_origin_large_residuals(sites, particle_momentum, particle_mass);
+  // prove_origin_large_residuals(sites, particle_momentum, particle_mass);
 
   delete track;
   // }
 }
 
 void KalmanTrackFitSS::prove_origin_large_residuals(std::vector<KalmanSite> old_sites,
-                                                    double particle_momentum, double particle_mass) {
+                                                    double particle_momentum,
+                                                    double particle_mass) {
   std::vector<KalmanSite> new_sites;
   KalmanTrack *new_track = new KalmanSSTrack();
 
@@ -130,9 +129,6 @@ void KalmanTrackFitSS::prove_origin_large_residuals(std::vector<KalmanSite> old_
 
   new_track->compute_chi2(new_sites);
   save(new_sites);
-  //KalmanMonitor monitor;
-  //monitor.print_info(sites);
-  //monitor.save(sites);
 }
 
 
@@ -150,7 +146,7 @@ void KalmanTrackFitSS::save(std::vector<KalmanSite> const &sites) {
     _alpha_meas.at(i) = site.get_alpha();
 
     double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    double alpha_smooth = site.get_smoothed_alpha(); //get_smoothed_measurement(site);
+    double alpha_smooth = site.get_smoothed_alpha();
     double pull2 = _alpha_meas.at(i) - alpha_smooth;
 
     TMatrixD a(5, 1);
@@ -197,7 +193,7 @@ void KalmanTrackFitSS::initialise_prove_track(std::vector<KalmanSite> &old_sites
   double x_pr, y_pr, mx_pr, my_pr;
   KalmanSite seed_site = old_sites.at(0);
   assert(seed_site.get_id() == 0);
-  TMatrixD a_pr(5, 1); 
+  TMatrixD a_pr(5, 1);
   a_pr = seed_site.get_smoothed_a();
   x_pr = a_pr(0, 0);
   mx_pr= a_pr(1, 0);
@@ -516,6 +512,9 @@ void KalmanTrackFitSS::filter_virtual(std::vector<KalmanSite> &sites,
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
   a_site->set_a(a);
+  if ( current_site == 4 || current_site == 5 ) {
+    assert(a(0, 0) < 160. && a(2, 0) < 160. && "Assert extrapolation is reasonable.");
+  }
 }
 
 void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
@@ -559,14 +558,17 @@ void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
   mx_pr   = delta_x/delta_z;
   my_pr   = delta_y/delta_z;
 
+  std::cerr << "DeltaT: " << deltaT << "\n";
   if ( deltaT > 25. && deltaT < 26.5 ) {
     mass = positron_mass;
   } else if ( deltaT > 25. && deltaT < 29.5 ) {
     mass = muon_mass;
   } else if ( deltaT > 29.5 && deltaT < 40. ) {
     mass = pion_mass;
-  } else { // ( deltaT > 40. )
+  } else if ( deltaT > 40. ) {
     mass = protron_mass;
+  } else {
+    assert(false && "timing issue");
   }
 
   double v_z = (distance_TOFs/deltaT)*1000000.;

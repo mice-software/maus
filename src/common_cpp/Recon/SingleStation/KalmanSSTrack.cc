@@ -36,6 +36,7 @@ void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   if ( magnets_on && ( (old_site->get_id() == 4 &&  new_site->get_id() == 5) ||
                        (old_site->get_id() == 5 &&  new_site->get_id() == 4) ) ) {
     magnet_drift();
+    _F.Print();
   } else {
     straight_line(deltaZ);
   }
@@ -57,6 +58,8 @@ void KalmanSSTrack::magnet_drift() {
   double q8_current = 214.3; // A
   double q9_current = 182.9; // A
   double momentum = _momentum;
+
+  std::cerr << "momentum: " << _momentum << ", mass = " << _mass << "\n";
 
   double kappa_q7 = compute_kappa(q7_current, momentum); // 1.0;  // m2
   double sqrt_kappa_q7 = pow(kappa_q7, 0.5)/1000.; // m-1 -> mm-1
@@ -152,17 +155,24 @@ void KalmanSSTrack::straight_line(double deltaZ) {
 }
 
 void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
+  int number_of_sites = sites.size();
   int number_parameters = 5;
-  int number_of_sites = 7;
+  int number_of_measurement_sites = 7;
   int id = sites[0].get_id();
-  _tracker = 3;
+  _tracker = 1;
 
+  double sum = sites[6].get_smoothed_alpha() +
+               sites[7].get_smoothed_alpha() +
+               sites[8].get_smoothed_alpha();
+
+  assert(sum > -4 && sum < 4 && "Bad space point");
   // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
+    std::cerr << site.get_chi2() << std::endl;
     _chi2 += site.get_chi2();
   }
-  _ndf = number_of_sites - number_parameters;
+  _ndf = number_of_measurement_sites - number_parameters;
   std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
   output << _tracker << " " << _chi2 << " " << _ndf << "\n";
   output.close();

@@ -84,7 +84,8 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
   double thickness, density;
   get_site_properties(old_site, thickness, density);
 
-  double F_tau = pow(1.+tau_squared, 1.5)/(11.528*tau*tau*tau)*(9.0872+2.*log(tau)-tau_squared/(1.+tau_squared));
+  double F_tau = pow(1.+tau_squared, 1.5)/(11.528*tau*tau*tau)*
+                 (9.0872+2.*log(tau)-tau_squared/(1.+tau_squared));
 
   double delta_p =minimum_ionization_energy*density*thickness*F_tau;
   TMatrixD a_new(5, 1);
@@ -109,19 +110,19 @@ void KalmanTrack::get_site_properties(KalmanSite *site, double &thickness, doubl
   switch ( site->get_type() ) {
     case 0 :
       thickness = 25.;
-      density = 1.0;
+      density = 1.023; // density of EJ-204
       break;
     case 1 :
       thickness = 25.;
-      density   = 1.0;
+      density   = 1.023;
       break;
     case 2 :
       thickness = 0.670;
       density   = 1.0;
       break;
     case 3 : // Cherenkov
-      thickness = 2.;
-      density   = 1.0;
+      thickness = 0.1*5000.; // 5 mil sheets of 0.1 mm
+      density   = 0.934; // g/cm3
       break;
     default :
       thickness = 0.0;
@@ -240,9 +241,8 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
       _H(0, 0) = -dy/_conv_factor;
       _H(0, 2) =  dx/_conv_factor;
       break;
-    default :
-      std::cerr << a_site->get_id() << std::endl; 
-      assert(false && "Break if site type is missing.");
+    default : // not a detector. H and measurement are 0.
+      _H.Zero();
   }
 }
 
@@ -332,6 +332,35 @@ void KalmanTrack::update_back_transportation_matrix(KalmanSite *optimum_site,
   _A = TMatrixD(temp, TMatrixD::kMult, Cp);
 }
 
+void KalmanTrack::prepare_for_smoothing(std::vector<KalmanSite> &sites) {
+  int numb_measurements = sites.size();
+  KalmanSite *smoothing_site = &sites[numb_measurements-1];
+
+  TMatrixD a_smooth(5, 1);
+  a_smooth = smoothing_site->get_a();
+  smoothing_site->set_smoothed_a(a_smooth);
+
+  TMatrixD C_smooth(5, 5);
+  C_smooth = smoothing_site->get_covariance_matrix();
+  smoothing_site->set_smoothed_covariance_matrix(C_smooth);
+
+  // Save chi2 for this site.
+  TMatrixD m(2, 1);
+  m = smoothing_site->get_measurement();
+  double alpha = m(0, 0);
+
+  TMatrixD ha(2, 1);
+  update_H(smoothing_site);
+  ha = TMatrixD(_H, TMatrixD::kMult, a_smooth);
+
+  // Extrapolation converted to expected measurement.
+  double alpha_model = ha(0, 0);
+  smoothing_site->set_smoothed_alpha(alpha_model);
+  double sigma_measurement_squared = 1./12.;
+  double chi2_i = pow(alpha-alpha_model, 2.)/sigma_measurement_squared;
+  smoothing_site->set_chi2(chi2_i);
+}
+
 void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site) {
   TMatrixD a(5, 1);
   a = smoothing_site->get_a();
@@ -392,6 +421,7 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   int number_parameters = 5;
   int number_of_sites = sites.size();
   int id = sites[0].get_id();
+
   if ( id <= 14 ) _tracker = 0;
   if ( id > 14 ) _tracker = 1;
 

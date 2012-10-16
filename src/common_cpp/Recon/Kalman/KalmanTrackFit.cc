@@ -69,12 +69,8 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
       // std::cerr << "Filtering site " << i << std::endl;
       filter(sites, track, i);
     }
-  TMatrixD a_smooth(5, 1);
-  a_smooth = sites[numb_measurements-1].get_a();
-  TMatrixD C_smooth(5, 5);
-  C_smooth = sites[numb_measurements-1].get_covariance_matrix();
-  sites[numb_measurements-1].set_smoothed_a(a_smooth);
-  sites[numb_measurements-1].set_smoothed_covariance_matrix(C_smooth);
+
+    track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       // std::cerr << "Smoothing site " << i << std::endl;
@@ -124,12 +120,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
       filter(sites, track, i);
     }
 
-    TMatrixD a_smooth(5, 1);
-    a_smooth = sites[numb_measurements-1].get_a();
-    TMatrixD C_smooth(5, 5);
-    C_smooth = sites[numb_measurements-1].get_covariance_matrix();
-    sites[numb_measurements-1].set_smoothed_a(a_smooth);
-    sites[numb_measurements-1].set_smoothed_covariance_matrix(C_smooth);
+    track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       // std::cerr << "Smoothing site " << i << std::endl;
@@ -145,7 +136,8 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
   }
 }
 
-void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites, double &momentum) {
+void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites,
+                                double &momentum) {
   // Get seed values.
   double r  = seed.get_R();
   double B = -4.;

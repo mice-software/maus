@@ -86,6 +86,8 @@ class KalmanTrack {
 
   void get_site_properties(KalmanSite *site, double &thickess, double &density);
 
+  void prepare_for_smoothing(std::vector<KalmanSite> &sites);
+
  protected:
   TMatrixD _H;
 

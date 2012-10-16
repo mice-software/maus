@@ -786,6 +786,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   // Calculate phi_0, the rotation when moving from x to x'
   phi_0 = calc_turning_angle(spnts[0]->get_position().x(), spnts[0]->get_position().y(), circle);
 
+  // std::cerr << spnts[0]->get_tracker() << std::endl;
   // Loop over spacepoints
   for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
 
@@ -815,14 +816,14 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   if ( dphi_ok ) {
     std::vector<double> ds;
     dphi_to_ds(circle.get_R(), dphi, ds);
-    /* if ( debug > 0 ) { */
+    /* if ( debug > 0 ) {
       for ( unsigned int i = 0; i < ds.size(); i++ ) {
         std::cerr << "ds = " << ds[i] << ", dz = " << dz[i] << std::endl;
       }
-   /* } */
+    } */
     // Peform a linear fit in s - z
     linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
-    std::cerr << line_sz.get_m() << std::endl;
+    // std::cerr << line_sz.get_m() << std::endl;
   }
 } // ~calculate_dipangle(...)
 
