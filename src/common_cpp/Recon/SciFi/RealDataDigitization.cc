@@ -17,28 +17,58 @@
 
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
-RealDataDigitization::RealDataDigitization() {}
+const int RealDataDigitization::_number_channels = 128;
+const int RealDataDigitization::_number_banks    = 4;
+const int RealDataDigitization::_number_boards   = 16;
+const int RealDataDigitization::_total_number_channels = 6403;
+
+RealDataDigitization::RealDataDigitization() {
+/*
+  _board.resize(_total_number_channels);
+  _bank.resize(_total_number_channels);
+  _chan_ro.resize(_total_number_channels);
+  _tracker.resize(_total_number_channels);
+  _station.resize(_total_number_channels);
+  _view.resize(_total_number_channels);
+  _fibre.resize(_total_number_channels);
+  _extWG.resize(_total_number_channels);
+  _inWG.resize(_total_number_channels);
+  _WGfib.resize(_total_number_channels);
+
+  _calibration.resize(_number_boards);
+  _good_chan.resize(_number_boards);
+  for (int i = 0; i < _number_boards; i++) {
+    _calibration[i].resize(_number_banks);
+    _good_chan[i].resize(_number_banks);
+    for (int j = 0; j < _number_channels; j++) {
+      _calibration[i][j].resize(_number_channels);
+      _good_chan[i][j].resize(_number_channels);
+    }
+  }
+*/
+}
 
 RealDataDigitization::~RealDataDigitization() {}
 
-void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
+void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
+  // Check to see if the spill ReconEventArray pointer has been initialised
+  if (spill.GetReconEvents() == NULL)
+    spill.SetReconEvents(new ReconEventArray());
+
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
-  assert(calib);
-  bool map = load_mapping("mapping_2.txt");
-  assert(map);
-  bool bad_channels = load_bad_channels();
-  assert(bad_channels);
+  assert(load_calibration("scifi_calibration_30_09_2011.txt"));
+  assert(load_mapping("mapping_7.txt"));
+  assert(load_bad_channels());
   // -------------------------------------------------
 
   // Pick up JSON daq event.
   Json::Value tracker_event = daq["tracker1"];
 
-  for ( unsigned int i = 1; i < tracker_event.size(); ++i ) {
+  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) {
     SciFiEvent* event = new SciFiEvent();
 
     Json::Value input_event = tracker_event[i]["VLSB_C"];
@@ -59,8 +89,8 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       assert(channel_in.isMember("tdc"));
       // assert(channel_in.isMember("discr"));
 
-      // int spill = channel_in["phys_event_number"].asInt();
-      // int eventNo = channel_in["part_event_number"].asInt();
+      int spill = channel_in["phys_event_number"].asInt();
+      int eventNo = channel_in["part_event_number"].asInt();
       int board = channel_in["geo"].asInt()-1;
       int bank = channel_in["bank"].asInt();
       int channel_ro = channel_in["channel"].asInt();
@@ -72,10 +102,10 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
       }
 
       // Get pedestal and gain from calibration.
-      assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
-      assert(_calibration[board][bank][channel_ro].isMember("gain"));
-      double pedestal =  _calibration[board][bank][channel_ro]["pedestal"].asDouble();
-      double gain     = _calibration[board][bank][channel_ro]["gain"].asDouble();
+      // assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
+      // assert(_calibration[board][bank][channel_ro].isMember("gain"));
+      double pedestal =  _calibration_pedestal[board][bank][channel_ro];
+      double gain     =  _calibration_gain[board][bank][channel_ro];
 
       // Calculate the number of photoelectrons.
       double pe;
@@ -88,21 +118,24 @@ void RealDataDigitization::process(SciFiSpill &spill, Json::Value const &daq) {
 
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
-      get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
+      bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
 
       // Exclude missing modules.
-      if ( pe > 1.0 && tracker != -1 ) {
-        SciFiDigit *digit = new SciFiDigit(tracker, station, plane, channel, pe, tdc);
+      if ( found ) { // pe > 1.0 &&
+        SciFiDigit *digit = new SciFiDigit(spill, eventNo,
+                                           tracker, station, plane, channel, pe, tdc);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)
-    spill.add_event(event);
+    ReconEvent * revt = new ReconEvent();
+    revt->SetSciFiEvent(new SciFiEvent(*event));
+    spill.GetReconEvents()->push_back(revt);
   }  // ends loop over events (i)
 }
 
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
 
   std::ifstream inf(fname.c_str());
 
@@ -125,27 +158,21 @@ bool RealDataDigitization::load_calibration(std::string file) {
 
 void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
   std::string line;
-
-  // run over all boards
+  // Run over all boards.
   for ( int i = 0; i < 16; ++i ) {
-    // run over banks
+    // Run over banks.
     for ( int j = 0; j < 4; ++j ) {
-      // run over channels
-      for ( int k = 0; k < 128; ++k ) { // running over channels
+      // Run over channels.
+      for ( int k = 0; k < 128; ++k ) {
         int unique_chan_no, board, bank, chan;
-        double p, g;
+        double ped, gain;
 
         getline(inf, line);
         std::istringstream ist1(line.c_str());
-        ist1 >> unique_chan_no >> board >> bank >> chan >> p >> g;
-
-        // int temp = unique_chan_no;
-
-        Json::Value channel;
-        channel["pedestal"]=p;
-        channel["gain"]=g;
-        channel["unique_chan"]=unique_chan_no;
-        _calibration[i][j].push_back(channel);
+        ist1 >> unique_chan_no >> board >> bank >> chan >> ped >> gain;
+        _calibration_pedestal[board][bank][chan] = ped;
+        _calibration_gain[board][bank][chan]     = gain;
+        _calibration_unique_chan_number[board][bank][chan] = unique_chan_no;
       }
     }
   }
@@ -153,7 +180,7 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
 
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -162,7 +189,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
   }
 
   std::string line;
-  for ( int i = 1; i < 6403; ++i ) {
+  for ( int i = 1; i < _total_number_channels; ++i ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
 
@@ -184,9 +211,9 @@ bool RealDataDigitization::load_mapping(std::string file) {
   return true;
 }
 
-void RealDataDigitization::
+bool RealDataDigitization::
      get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                          int& tracker, int& station, int& plane, int& channel) {
+                          int& tracker, int& station, int& plane, int& channel) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
@@ -199,17 +226,21 @@ void RealDataDigitization::
       found = true;
     }
   }
-
-  // assert(found);
+  return found;
 }
 
-bool RealDataDigitization::is_good_channel(const int board, const int bank, const int chan_ro) {
-  return good_chan[board][bank][chan_ro];
+bool RealDataDigitization::is_good_channel(const int board, const int bank,
+                                           const int chan_ro) const {
+  if ( board < _number_boards && bank < _number_banks && chan_ro < _number_channels ) {
+    return _good_chan[board][bank][chan_ro];
+  } else {
+    return false;
+  }
 }
 
 bool RealDataDigitization::load_bad_channels() {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/bad_chan_list.txt";
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/bad_chan_list.txt";
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -217,10 +248,10 @@ bool RealDataDigitization::load_bad_channels() {
     return false;
   }
 
-  for ( int board = 0; board < 16; ++board ) {
-    for ( int bank = 0; bank < 4; ++bank ) {
-      for ( int chan_ro = 0; chan_ro < 128; ++chan_ro ) {
-        good_chan[board][bank][chan_ro] = true;
+  for ( int board = 0; board < _number_boards; ++board ) {
+    for ( int bank = 0; bank < _number_banks; ++bank ) {
+      for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
+        _good_chan[board][bank][chan_ro] = true;
       }
     }
   }
@@ -229,8 +260,9 @@ bool RealDataDigitization::load_bad_channels() {
 
   while ( !inf.eof() ) {
     inf >> bad_board >> bad_bank >> bad_chan_ro;
-    good_chan[bad_board][bad_bank][bad_chan_ro] = false;
+    _good_chan[bad_board][bad_bank][bad_chan_ro] = false;
   }
   return true;
 }
-// } // ~namespace MAUS
+
+} // ~namespace MAUS

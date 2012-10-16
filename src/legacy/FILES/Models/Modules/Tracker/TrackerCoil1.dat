@@ -12,30 +12,30 @@ Module TrackerCoil
   {
     Position 0.0 0.0 1148 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 104.6115
+    ScaleFactor 0
   }
   Module Tracker/MatchCoil2.dat
   {
     Position 0.0 0.0 707.5 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 161.3
+    ScaleFactor 0
   }
   Module Tracker/EndCoil1.dat
   {
     Position 0.0 0.0 308.0 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 136.80 
+    ScaleFactor 0 
   }
   Module Tracker/CenterCoil.dat
   {
     Position 0.0 0.0 -442.0 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 146.9
+    ScaleFactor 0
   }
   Module Tracker/EndCoil2.dat
   {
     Position 0.0 0.0 -1192.0 mm
     Rotation 0.0 0.0 0.0 degree
-    ScaleFactor 142.492
+    ScaleFactor 0
   }
 }

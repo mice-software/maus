@@ -293,6 +293,7 @@ TEST(MCEventTest, HitTest) {
     // check that we handle copy of NULL channel id okay
     // (i.e. don't attempt to copy!)
     SciFiHit default_hit;
+    default_hit.SetChannelId(NULL);
     my_hit_equal = default_hit;
     EXPECT_EQ(channel_id_null, my_hit_equal.GetChannelId());
 }
@@ -408,18 +409,18 @@ TEST(MCEventTest, SciFiChannelIdTest) {
     // Accessors/mutators
     SciFiChannelId my_id;
     my_id.SetStationNumber(1);
-    my_id.SetFiberNumber(2);
+    my_id.SetFibreNumber(2);
     my_id.SetTrackerNumber(3);
     my_id.SetPlaneNumber(4);
     EXPECT_EQ(my_id.GetStationNumber(), 1);
-    EXPECT_EQ(my_id.GetFiberNumber(), 2);
+    EXPECT_EQ(my_id.GetFibreNumber(), 2);
     EXPECT_EQ(my_id.GetTrackerNumber(), 3);
     EXPECT_EQ(my_id.GetPlaneNumber(), 4);
 
     // copy_constructor
     SciFiChannelId my_id_copy(my_id);
     EXPECT_EQ(my_id.GetStationNumber(), my_id_copy.GetStationNumber());
-    EXPECT_EQ(my_id.GetFiberNumber(), my_id_copy.GetFiberNumber());
+    EXPECT_EQ(my_id.GetFibreNumber(), my_id_copy.GetFibreNumber());
     EXPECT_EQ(my_id.GetTrackerNumber(), my_id_copy.GetTrackerNumber());
     EXPECT_EQ(my_id.GetPlaneNumber(), my_id_copy.GetPlaneNumber());
 
@@ -427,7 +428,7 @@ TEST(MCEventTest, SciFiChannelIdTest) {
     SciFiChannelId my_id_equal;
     my_id_equal = my_id;
     EXPECT_EQ(my_id.GetStationNumber(), my_id_equal.GetStationNumber());
-    EXPECT_EQ(my_id.GetFiberNumber(), my_id_equal.GetFiberNumber());
+    EXPECT_EQ(my_id.GetFibreNumber(), my_id_equal.GetFibreNumber());
     EXPECT_EQ(my_id.GetTrackerNumber(), my_id_equal.GetTrackerNumber());
     EXPECT_EQ(my_id.GetPlaneNumber(), my_id_equal.GetPlaneNumber());
 

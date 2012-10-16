@@ -18,8 +18,24 @@
 
 namespace MAUS {
 
-SciFiEventProcessor::SciFiEventProcessor() {
-}
-}  // namespace MAUS
+SciFiEventProcessor::SciFiEventProcessor()
+                    : _sf_digit_array_proc(new SciFiDigitProcessor),
+                      _sf_cluster_array_proc(new SciFiClusterProcessor),
+                      _sf_spoint_array_proc(new SciFiSpacePointProcessor),
+                      _sf_sprtrk_array_proc(new SciFiStraightPRTrackProcessor),
+                      _sf_hprtrk_array_proc(new SciFiHelicalPRTrackProcessor)  {
 
+  RegisterValueBranch("digits", &_sf_digit_array_proc,
+                      &SciFiEvent::digits, &SciFiEvent::set_digits, false);
+  RegisterValueBranch("clusters", &_sf_cluster_array_proc,
+                      &SciFiEvent::clusters, &SciFiEvent::set_clusters, false);
+  RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
+                      &SciFiEvent::spacepoints, &SciFiEvent::set_spacepoints, false);
+  RegisterValueBranch("straight_pr_tracks", &_sf_sprtrk_array_proc,
+                      &SciFiEvent::straightprtracks, &SciFiEvent::set_straightprtrack, false);
+  RegisterValueBranch("helical_pr_tracks", &_sf_hprtrk_array_proc,
+                      &SciFiEvent::helicalprtracks, &SciFiEvent::set_helicalprtrack, false);
+}
+
+} // ~namespace MAUS
 
