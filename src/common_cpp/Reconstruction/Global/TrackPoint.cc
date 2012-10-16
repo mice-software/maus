@@ -156,11 +156,11 @@ const bool TrackPoint::operator==(const TrackPoint& rhs) const {
 }
 
 const bool TrackPoint::operator<(const TrackPoint& rhs) const {
-  return t() < rhs.t();
+  return z() < rhs.z();
 }
 
 const bool TrackPoint::operator>(const TrackPoint& rhs) const {
-  return t() > rhs.t();
+  return z() > rhs.z();
 }
 
 void TrackPoint::set_particle_id(const int id) {

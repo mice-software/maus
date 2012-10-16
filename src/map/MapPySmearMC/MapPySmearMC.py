@@ -72,7 +72,7 @@ class MapPySmearMC:
                         position = hit["position"]
                         position["x"] += numpy.random.normal(scale=0.5)
                         position["y"] += numpy.random.normal(scale=0.5)
-                        position["z"] += numpy.random.normal(scale=0.5)
+                        # position["z"] += numpy.random.normal(scale=0.5)
 
                         momentum = hit["momentum"]
                         momentum["x"] += numpy.random.normal(scale=3)

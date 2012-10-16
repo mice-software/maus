@@ -27,6 +27,7 @@
 
 // External
 #include "TMinuit.h"
+#include "CLHEP/Units/PhysicalConstants.h"
 #include "json/json.h"
 
 // Legacy/G4MICE
@@ -59,14 +60,10 @@ using MAUS::reconstruction::global::TrackFitter;
 using MAUS::reconstruction::global::TrackPoint;
 
 MapCppGlobalTrackReconstructor::MapCppGlobalTrackReconstructor()
-    : optics_model_(NULL), track_fitter_(NULL), reconstruction_input_(NULL) {
+    : optics_model_(NULL), track_fitter_(NULL) {
 }
 
 MapCppGlobalTrackReconstructor::~MapCppGlobalTrackReconstructor() {
-  if (reconstruction_input_ != NULL) {
-    delete reconstruction_input_;
-  }
-
   if (optics_model_ != NULL) {
     delete optics_model_;
   }
@@ -74,6 +71,7 @@ MapCppGlobalTrackReconstructor::~MapCppGlobalTrackReconstructor() {
   if (track_fitter_ != NULL) {
     delete track_fitter_;
   }
+
 }
 
 bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
@@ -277,7 +275,9 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
                  "MapCppGlobalTrackReconstructor::process()"));
   }
 
-  if (reconstruction_input_ == NULL) {
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
+          << "Loaded " << tracks_.size() << " tracks." << std::endl;
+  if (tracks_.size() == 0) {
 /*
     Json::FastWriter writer;
     std::string output = writer.write(run_data_);
@@ -292,14 +292,21 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   //  in addition to Minuit, and select between them based on the configuration
 
   // associate tracks with individual particles
-  std::vector<MAUS::reconstruction::global::Track> tracks;
-  CorrelateTrackPoints(tracks);
+  //std::vector<MAUS::reconstruction::global::Track> tracks;
+  //CorrelateTrackPoints(tracks);
 
-  int particle_id;
-  if (reconstruction_input_->beam_polarity_negative()) {
+
+  int particle_id = Particle::kMuPlus;
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  int charge = Particle::GetInstance()->GetCharge(reference_pgparticle.pid);
+  if (charge < 0) {
     particle_id = Particle::kMuMinus;
-  } else {
-    particle_id = Particle::kMuPlus;
+  } else if (charge == 0) {
+    throw(Squeal(Squeal::recoverable,
+                  "Reference particle has no charge. Assuming a positive beam.",
+                  "MapCppGlobalTrackReconstructor::LoadSimulationData()"));
   }
 
   Json::Value global_tracks;
@@ -307,8 +314,8 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   // Find the best fit track for each particle traversing the lattice
   size_t track_count = 0;
   for (std::vector<MAUS::reconstruction::global::Track>::const_iterator
-          measured_track = tracks.begin();
-       measured_track < tracks.end();
+          measured_track = tracks_.begin();
+       measured_track < tracks_.end();
        ++measured_track) {
     MAUS::reconstruction::global::Track best_fit_track(particle_id);
 
@@ -316,6 +323,9 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
     // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
     //  specified in the configuration.
 
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
+          << "Appending a best fit track of size " << best_fit_track.size()
+          << " to global_tracks" << std::endl;
     global_tracks.append(TrackToJson(best_fit_track));
     track_count += best_fit_track.size() - 1;
   }
@@ -334,13 +344,11 @@ void MapCppGlobalTrackReconstructor::LoadRandomData() {
   // Create random track points for TOF0, TOF1, Tracker 1, Tracker 2, and TOF 2
   srand((unsigned)time(NULL));
 
-  const bool beam_polarity_negative = false;  // mu+
-
   std::map<int, Detector> detectors;
   double plane;
   double uncertainty_data[36];
-  std::vector<TrackPoint> events;
   double position[3], momentum[3];
+  Track track;
 
   // generate mock detector info and random muon detector event data
   for (size_t id = Detector::kTOF0_1; id <= Detector::kCalorimeter; ++id) {
@@ -372,24 +380,19 @@ void MapCppGlobalTrackReconstructor::LoadRandomData() {
     }
 
     // force the positions to be monotonically increasing
-    if (!events.empty()) {
-      TrackPoint const & last_point = events.back();
+    if (!track.empty()) {
+      TrackPoint const & last_point = track.back();
       position[0] += last_point.t();
       position[1] += last_point.x();
       position[2] += last_point.y();
     }
 
-    TrackPoint track_point(position[0], momentum[0]/100.0,
-                           position[1], momentum[1]/100.0,
-                           position[2], momentum[2],
-                           detector);
-    events.push_back(track_point);
+    track.push_back(TrackPoint(position[0], momentum[0]/100.0,
+                               position[1], momentum[1]/100.0,
+                               position[2], momentum[2],
+                               detector));
   }
-
-
-  reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
-                                                  detectors,
-                                                  events);
+  tracks_.push_back(track);
 }
 
 void MapCppGlobalTrackReconstructor::LoadSimulationData() {
@@ -402,27 +405,9 @@ void MapCppGlobalTrackReconstructor::LoadSmearedData() {
 
 void MapCppGlobalTrackReconstructor::LoadSimulationData(
     const std::string mc_branch_name) {
-  bool beam_polarity_negative = false;
   std::map<int, Detector> detectors;
-  std::vector<TrackPoint> events;
-
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
-  int charge = Particle::GetInstance()->GetCharge(reference_pgparticle.pid);
-  if (charge < 0) {
-    beam_polarity_negative = true;
-  } else if (charge == 0) {
-    throw(Squeal(Squeal::recoverable,
-                  "Reference particle has no charge. Assuming a positive beam.",
-                  "MapCppGlobalTrackReconstructor::LoadSimulationData()"));
-  }
-
   LoadDetectorConfiguration(detectors);
-  LoadMonteCarloData(mc_branch_name, events, detectors);
-  reconstruction_input_ = new ReconstructionInput(beam_polarity_negative,
-                                                  detectors,
-                                                  events);
+  LoadMonteCarloData(mc_branch_name, detectors);
 }
 
 void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
@@ -465,25 +450,21 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
   }
 }
 
-/* Currently we just glob all spills together since we have to sort out
- * multiple particles per spill anyway.
+/* Currently we just glob all spills together.
  */
 void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
     const std::string               branch_name,
-    std::vector<TrackPoint> &       events,
     const std::map<int, Detector> & detectors) {
-  // FIXME(plane1@hawk.iit.edu) Get data from configuration
+
   try {
-    // MC event branch
-    /*
-    Json::Value testing_data = JsonWrapper::GetProperty(
-        configuration_, "testing_data", JsonWrapper::objectValue);
-    */
     const Json::Value mc_events = JsonWrapper::GetProperty(
         run_data_, branch_name, JsonWrapper::arrayValue);
     for (Json::Value::UInt particle_index = Json::Value::UInt(0);
          particle_index < mc_events.size();
          ++particle_index) {
+      Track track;
+      TrackPoint tof0_track_point;
+      TrackPoint tof1_track_point;
       const Json::Value mc_event = mc_events[particle_index];
       std::vector<std::string> hit_group_names = mc_event.getMemberNames();
       std::vector<std::string>::const_iterator hit_group_name;
@@ -493,6 +474,7 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
         const Json::Value hit_group = mc_event[*hit_group_name];
         // if (!hit_group.isArray()) {
         if ((*hit_group_name == "primary") ||
+            (*hit_group_name == "virtual_hits") ||
             (*hit_group_name == "special_virtual_hits")) {
           // ignore hit groups we don't care about
           continue;
@@ -537,7 +519,7 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
             x.asDouble(), px.asDouble(),
             y.asDouble(), py.asDouble(),
             particle_id.asInt(), z.asDouble());
-
+            
           const Json::Value channel_id = JsonWrapper::GetProperty(
               *hit, "channel_id", JsonWrapper::objectValue);
           size_t detector_id = Detector::kNone;
@@ -558,8 +540,16 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
                 channel_id, "plane", JsonWrapper::intValue);
             const size_t plane = plane_json.asUInt();
             switch (station_number) {
-              case 0: detector_id = Detector::kTOF0_1 + plane; break;
-              case 1: detector_id = Detector::kTOF1_1 + plane; break;
+              case 0: {
+                detector_id = Detector::kTOF0_1 + plane;
+                tof0_track_point = track_point;
+                break;
+              }
+              case 1: {
+                detector_id = Detector::kTOF1_1 + plane;
+                tof1_track_point = track_point;
+                break;
+              }
               case 2: detector_id = Detector::kTOF2_2 + plane; break;
             }
           }
@@ -568,8 +558,34 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
             = detectors.find(detector_id);
           track_point.set_uncertainties(detector->second.uncertainties());
 
-          events.push_back(track_point);
+            track.push_back(track_point);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+          << "pushed the following hit:" << std::endl << track_point
+          << std::endl;
         }
+      }
+
+      double delta_x = tof1_track_point.x() - tof0_track_point.x();
+      double delta_y = tof1_track_point.y() - tof0_track_point.y();
+      double delta_z = tof1_track_point.z() - tof0_track_point.z();
+      double distance = ::sqrt(delta_x*delta_x + delta_y*delta_y
+                                + delta_z*delta_z);
+      double delta_t = tof1_track_point.time() - tof0_track_point.time();
+      double velocity = distance / delta_t;
+      double beta = velocity / ::CLHEP::c_light;
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+      << "beta:" << beta << std::endl;
+
+      // Make a cut on beta = P/E that excludes electrons between about
+      // 3 MeV to 530 MeV
+      if (beta < 0.98) {
+        // TODO(plan1@hawk.iit.edu) do an insertion sort instead of
+        // sorting afterwards
+        std::sort(track.begin(), track.end());  // sort in chronological order
+        tracks_.push_back(track);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+          << "pushed the following track:" << std::endl << track
+          << std::endl;
       }
     }
   } catch(Squeal& squee) {
@@ -581,9 +597,6 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
         run_data_, exc,
         "MAUS::MapCppGlobalTrackReconstructor::LoadMonteCarloData()");
   }
-
-  // TODO(plan1@hawk.iit.edu) do an insertion sort instead of sorting afterwards
-  std::sort(events.begin(), events.end());  // sort in chronological order
 }
 
 void MapCppGlobalTrackReconstructor::LoadLiveData() {
@@ -595,35 +608,63 @@ void MapCppGlobalTrackReconstructor::LoadLiveData() {
  * sort out tracks based on the requirement that hits will occur in the same
  * order as the detector positions.
  */
+/*
 void MapCppGlobalTrackReconstructor::CorrelateTrackPoints(
     std::vector<Track> & tracks) {
   const std::vector<TrackPoint> & track_points
       = reconstruction_input_->events();
 
+  if (track_points.size() == 0) {
+    return;
+  }
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "correlating " << track_points.size() << " track points ..."
+          << std::endl;
+
+  const double muon_mass
+    = Particle::GetInstance()->GetMass(Particle::kMuMinus);
+
+  // TODO(plane1@hawk.iit.edu) Handle multiple particles per spill, still
+  // assuming the particles navigate the MICE lattice one at a time
   Track track;
-  size_t last_detector = Detector::kNone;
+  double last_z = track_points[0].z();
   std::vector<TrackPoint>::const_iterator event;
-  for (event = track_points.begin(); event != track_points.end(); ++event) {
-    const double muon_mass
-      = Particle::GetInstance()->GetMass(Particle::kMuMinus);
+  for (event = track_points.begin(); event < track_points.end(); ++event) {
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "correlating the following track point:" << std::endl
+          << *event << std::endl;
     if (event->energy() < muon_mass) {
       // reject particles with energy < muon mass (electrons)
       continue;
-    } else if (event->detector_id() < last_detector) {
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "rejected particle with energy < muon mass" << std::endl;
+    } else if (event->z() < last_z) {
       // A new track begins when a hit is upstream from the last hit
       tracks.push_back(track);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "completed a track with " << track.size() << "track points."
+          << std::endl;
       track.clear();
       track.push_back(*event);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "pushed the following track point:" << std::endl
+          << *event << std::endl;
     } else {
       track.push_back(*event);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "pushed the following track point:" << std::endl
+          << *event << std::endl;
     }
-    last_detector = event->detector_id();
+    last_z = event->z();
   }
   if (track.size() > 0) {
     tracks.push_back(track);
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
+          << "completed a track with " << track.size() << "track points."
+          << std::endl;
   }
 }
-
+*/
 bool MapCppGlobalTrackReconstructor::death() {
   return true;  // successful
 }

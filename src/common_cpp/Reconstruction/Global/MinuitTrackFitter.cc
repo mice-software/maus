@@ -127,21 +127,27 @@ MinuitTrackFitter::~MinuitTrackFitter() {
   delete common_cpp_optics_reconstruction_minuit_track_fitter_minuit;
 }
 
-void MinuitTrackFitter::Fit(const Track & detector_events, Track & track) {
+void MinuitTrackFitter::Fit(Track const & detector_events, Track & track) {
 std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
 std::cout.flush();
   detector_events_ = &detector_events;
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl; std::cout.flush();
+std::cout << "DEBUG ScoreTrack(): Fitting track with "
+          << detector_events_->size() << "track points." << std::endl;
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl; std::cout.flush();
   track_ = &track;
 
   // TODO(plane1@hawk.iit.edu) Fit to multiple masses or use mass as a fit
   // parameter to find the likely particle identity
   particle_id_ = Particle::kMuMinus;
 
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl; std::cout.flush();
   if (detector_events_->size() < 2) {
     throw(Squeal(Squeal::recoverable,
                  "Not enough track points to fit track (need at least two).",
                  "MAUS::MinuitTrackFitter::Fit()"));
   }
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 2" << std::endl; std::cout.flush();
 
   // Find the start plane coordinates that minimize the score for the calculated
   // track based off of this track point (i.e. best fits the measured track
@@ -162,6 +168,8 @@ std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
   track_->clear();
+std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
+          << std::endl;
 
   // Setup the start plane track point based on the Minuit initial conditions
   CovarianceMatrix null_uncertainties;
@@ -203,6 +211,8 @@ std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::end
     // save the calculated track point in case this is the
     // last (best fitting) track
     track_->push_back(point);
+std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
+          << std::endl;
     
     const double weights[36] = {
       0., 0., 0., 0., 0., 0.,

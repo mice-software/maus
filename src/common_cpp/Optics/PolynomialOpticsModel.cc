@@ -68,7 +68,8 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 
   // TODO(plane1@hawk.iit.edu) Get from configuration
   const std::vector<double> weights_(6, 1.);
-  deltas_ = PhaseSpaceVector(1, 1, 1, 1, 1, 1);
+std::cout << "DEBUG PolynomialOpticsModel::PolynomialOpticsModel(): "
+          << "deltas_ = " << deltas_ << std::endl;
 }
 
 void PolynomialOpticsModel::Build() {
@@ -175,7 +176,9 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
       for (size_t k = 0; k < i; ++k) {
         first_plane_hit[k] = 1.;
       }
-      first_plane_hit[j] = 1.;
+      double delta = deltas_[j];
+      fprintf(stdout, "Delta %d: %f\n", j, deltas_[j]); fflush(stdout);
+      first_plane_hit[j] = delta;
 
       first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
                                  reference_particle_.z(),

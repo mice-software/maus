@@ -93,7 +93,6 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   Algorithm algorithm_;
   size_t polynomial_order_;
   std::vector<double> weights_;
-  PhaseSpaceVector deltas_;
 
   // override base class version
   const std::vector<reconstruction::global::TrackPoint> BuildFirstPlaneHits();

@@ -94,7 +94,8 @@ class MapCppGlobalTrackReconstructor {
   MAUS::reconstruction::global::TrackFitter * track_fitter_;
 
   Json::Value run_data_;
-  MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
+  //MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
+  std::vector<MAUS::reconstruction::global::Track> tracks_;
 
   static const std::string kClassname;
   BTField * electromagnetic_field_;
@@ -114,7 +115,6 @@ class MapCppGlobalTrackReconstructor {
     std::map<int, MAUS::reconstruction::global::Detector> & detectors);
   void LoadMonteCarloData(
     const std::string                                             branch_name,
-    std::vector<MAUS::reconstruction::global::TrackPoint> &       events,
     const std::map<int, MAUS::reconstruction::global::Detector> & detectors);
 
   static CovarianceMatrix const GetJsonCovarianceMatrix(

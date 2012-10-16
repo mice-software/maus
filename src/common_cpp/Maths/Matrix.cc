@@ -1373,7 +1373,7 @@ template <> std::ostream& operator<<(
       out << "," << std::endl;
     }
   }
-  out << "]";
+  out << "]" << std::endl;
   return out;
 }
 
