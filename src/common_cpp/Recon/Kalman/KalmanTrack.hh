@@ -56,7 +56,7 @@ class KalmanTrack {
 
   void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
 
-  void calc_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
+  void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
 
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
@@ -83,6 +83,8 @@ class KalmanTrack {
   void set_momentum(double momentum) { _momentum = momentum; }
 
   double get_momentum() const { return _momentum; }
+
+  void get_site_properties(KalmanSite *site, double &thickess, double &density);
 
  protected:
   TMatrixD _H;

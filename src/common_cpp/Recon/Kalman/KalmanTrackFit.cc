@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(200.) {
   std::cout << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -48,6 +48,11 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
     KalmanTrack *track = new StraightTrack();
     initialise(seed, sites);
 
+    // muon assumption for now.
+    double muon_mass    = 105.7; // MeV/c
+    track->set_mass(muon_mass);
+    double momentum    = 200.; // MeV/c
+    track->set_momentum(momentum);
     // Filter the first state.
     // std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
@@ -96,8 +101,12 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
 
     SciFiHelicalPRTrack seed = helical_tracks[i];
     KalmanTrack *track = new HelicalTrack();
-    initialise(seed, sites);
-
+    double momentum;
+    initialise(seed, sites, momentum);
+    // muon assumption for now.
+    double muon_mass    = 105.7; // MeV/c
+    track->set_mass(muon_mass);
+    track->set_momentum(momentum);
     // Filter the first state.
     // std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
@@ -136,17 +145,18 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
   }
 }
 
-void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSite> &sites, double &momentum) {
   // Get seed values.
   double r  = seed.get_R();
   double B = -4.;
-  double pt = 0.3*B*r;
+  double pt = -0.3*B*r;
 
   double dsdz  = seed.get_dsdz();
   double tan_lambda = 1./dsdz;
   double pz = pt*tan_lambda;
   double seed_pz;
 
+  momentum = pow(pt*pt+pz*pz, 0.5);
   double kappa = fabs(1./pz);
 
   std::vector<SciFiCluster*> clusters;
@@ -171,13 +181,13 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
     if ( tracker == 0 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      // phi = phi_0+3.14/2.;
-      px = pt*sin(phi);
-      py = pt*cos(phi);
+      phi = phi_0+3.14/2.;
+      px = pt*cos(phi);
+      py = pt*sin(phi);
     } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      // phi = phi_0+3.14/2.;
+      phi = phi_0+3.14/2.;
       px = pt*cos(phi);
       py = pt*sin(phi);
     }
@@ -327,16 +337,16 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   KalmanSite *old_site = &sites[i-1];
 
   // Calculate the system noise...
-  track->calc_system_noise(old_site, new_site);
-
-  // Calculate the energy loss...
-  // track->calc_energy_loss(old_site, new_site);
+  // track->calc_system_noise(old_site, new_site);
 
   // The propagator matrix...
   track->update_propagator(old_site, new_site);
 
   // Now, calculate prediction.
   track->calc_predicted_state(old_site, new_site);
+
+  // Calculate the energy loss
+  // track->subtract_energy_loss(old_site, new_site);
 
   // ... so that we can compute the prediction for the
   // covariance matrix.

@@ -815,13 +815,14 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   if ( dphi_ok ) {
     std::vector<double> ds;
     dphi_to_ds(circle.get_R(), dphi, ds);
-    /* if ( debug > 0 ) {
+    /* if ( debug > 0 ) { */
       for ( unsigned int i = 0; i < ds.size(); i++ ) {
         std::cerr << "ds = " << ds[i] << ", dz = " << dz[i] << std::endl;
       }
-    } */
+   /* } */
     // Peform a linear fit in s - z
     linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
+    std::cerr << line_sz.get_m() << std::endl;
   }
 } // ~calculate_dipangle(...)
 

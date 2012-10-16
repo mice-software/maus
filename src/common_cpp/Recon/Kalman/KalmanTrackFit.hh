@@ -58,7 +58,7 @@ class KalmanTrackFit {
   // Add plane measurents to all sites;
   void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
-  void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites);
+  void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites, double &momentum);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters, double &seed_pz);

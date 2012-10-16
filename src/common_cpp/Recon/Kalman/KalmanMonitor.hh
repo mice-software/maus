@@ -48,8 +48,6 @@ class KalmanMonitor {
 
   void print_info(std::vector<KalmanSite> const &sites);
 
-  double get_smoothed_measurement(KalmanSite &a_site);
-
  private:
   std::vector<double> _alpha_meas, _site, _alpha_projected;
 };

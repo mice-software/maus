@@ -39,7 +39,6 @@
 #include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
-  // _fiberNumber = -1;
 }
 
 
@@ -57,17 +56,13 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   int hit_i = _hits["sci_fi_hits"].size();
   _hits["sci_fi_hits"].append(Json::Value());
 
-  // Fibre Number defined like this for testing purposes.
-  // if ( _fiberNumber == -1 ) {
   G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
-  G4double _fiberNumber = theTouchable->GetCopyNumber();  // get the fiber copy number
-  // }
-
+  G4int fiberNumber = theTouchable->GetCopyNumber();  // get the fiber copy number
   G4ThreeVector Pos = aStep->GetPreStepPoint()->GetPosition();  // true MC position
   G4ThreeVector Mom = aStep->GetTrack()->GetMomentum();  // true momentum
 
   Json::Value channel_id;
-  channel_id["fibre_number"] = _fiberNumber;
+  channel_id["fibre_number"] = fiberNumber;
   channel_id["tracker_number"] = _module->propertyInt("Tracker");
   channel_id["station_number"] = _module->propertyInt("Station");
   channel_id["plane_number"] = _module->propertyInt("Plane");
@@ -87,19 +82,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["position"]["x"] = Pos.x();
   _hits["sci_fi_hits"][hit_i]["position"]["y"] = Pos.y();
   _hits["sci_fi_hits"][hit_i]["position"]["z"] = Pos.z();
-
-/*
-  int chanNo;
-  int numbFibres = static_cast<int> (7*2*(_module->propertyDouble("CentralFibre")+0.5));
-  if ( _module->propertyInt("Tracker") == 0 ) {
-    chanNo = static_cast<int> (floor((numbFibres-fiberNumber)/7));
-  } else {
-    chanNo = static_cast<int> (floor(fiberNumber/7));
-  }
-*/
-  // assert agreement on chanNo with legacy calculation
-  // std::cerr << chanNo << " " << old_chanNo << "\n";
-  // assert(abs(chanNo-old_chanNo) < 2);
 
   return true;
 }
