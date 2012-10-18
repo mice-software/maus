@@ -129,7 +129,7 @@ class KalmanSite {
 
   double get_conversion_factor() const { return _conversion_factor; }
 
-  void set_type(int type) { _type = type; }
+  void set_type(int type); // { _type = type; }
 
   int get_type() const { return _type; }
 

@@ -70,13 +70,24 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
 
   TMatrixD a_old_site(5, 1);
   a_old_site = old_site->get_a();
+  /*
   double mx = a_old_site(1, 0);
   double my = a_old_site(3, 0);
   double kappa = a_old_site(4, 0);
   double pz = 1./kappa;
   double px = mx*pz;
   double py = my*pz;
+  */
+  double px = a_old_site(1, 0);
+  double py = a_old_site(3, 0);
+  double kappa = a_old_site(4, 0);
+  double pz = 1./kappa;
+
+  // assert(pz > 80. && "Previous site Pz is bad.");
+
   double momentum = pow(px*px+py*py+pz*pz, 0.5);
+  // assert(momentum < 10000.);
+  assert(_mass == _mass && "mass is not defined");
 
   double tau = momentum/_mass;
   double tau_squared = tau*tau;
@@ -87,23 +98,44 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
   double F_tau = pow(1.+tau_squared, 1.5)/(11.528*tau*tau*tau)*
                  (9.0872+2.*log(tau)-tau_squared/(1.+tau_squared));
 
-  double delta_p =minimum_ionization_energy*density*thickness*F_tau;
-  TMatrixD a_new(5, 1);
-  a_new = new_site->get_projected_a();
-  double x  = a_new(0, 0);
-  double new_mx = a_new(1, 0);
-  double y  = a_new(2, 0);
-  double new_my = a_new(3, 0);
-  double new_kappa = a_new(4, 0);
+  double delta_p =minimum_ionization_energy*density*thickness*F_tau/6.;
+
+  double lambda = atan(pow(px*px+py*py,0.5)/pz);
+  // assert(tan(lambda)<1 && "Lambda: pt < pz");
+
+  double delta_pt = delta_p * tan(lambda);
+  double delta_pz = delta_p * cos(lambda);
+
+  double pt = tan(lambda)*pz;
+  double phi = acos(px/pt);
+  double delta_px = delta_pt*cos(phi);
+  double delta_py = delta_pt*sin(phi);
+
+  TMatrixD a_projected(5, 1);
+  a_projected = new_site->get_projected_a();
+  double x  = a_projected(0, 0);
+  double px_projected = a_projected(1, 0);
+  double y  = a_projected(2, 0);
+  double py_projected = a_projected(3, 0) - delta_py;
+  double kappa_projected = a_projected(4, 0);
+
+  double new_px = px_projected - delta_px;
+  double new_py = py_projected - delta_py;
+  double new_kappa = 1./(1./kappa_projected - delta_pz);
 
   TMatrixD a_subtracted(5, 1);
   a_subtracted(0, 0) = x;
-  a_subtracted(1, 0) = new_mx;
+  a_subtracted(1, 0) = new_px;
   a_subtracted(2, 0) = y;
-  a_subtracted(3, 0) = new_my;
-  a_subtracted(4, 0) = 1./(1./new_kappa - delta_p);
+  a_subtracted(3, 0) = new_py;
+  a_subtracted(4, 0) = new_kappa;
 
   new_site->set_projected_a(a_subtracted);
+
+  std::ofstream out2("e_loss.txt", std::ios::out | std::ios::app);
+  out2 << new_site->get_id() << " " << px << " " << delta_px << " " << py << " "
+       << delta_py << " " << pz << " " << delta_pz << "\n";
+  out2.close();
 }
 
 void KalmanTrack::get_site_properties(KalmanSite *site, double &thickness, double &density) {
@@ -144,16 +176,21 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   double my    = a(3, 0);
   double kappa = a(4, 0);
 
-  double Z = 1.;
+  double Z = 9.;
   double r0 = 0.00167; // cm3/g
-  double p = 1./kappa; // MeV/c
-  double v = p/105.7;
+  double pz = 1./kappa; // MeV/c
+  double px = mx/kappa;
+  double py = my/kappa;
+  double p = pow(px*px+py*py+pz*pz, 0.5);
+
+  double v = p/_mass;
   double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
   double C2 = C*C;
+  double grad_to_mom = 1.; // pow(1./kappa, 1.); // convertion factor: gradients to momentum
 
-  double c_mx_mx = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
-  double c_my_my = (1.+pow(my, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
-  double c_mx_my = mx*my*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
+  double c_mx_mx = grad_to_mom*(1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
+  double c_my_my = grad_to_mom*(1.+pow(my, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
+  double c_mx_my = grad_to_mom*mx*my*(1.+pow(mx, 2.)+pow(my, 2.))*C2;
 
   _Q.Zero();
   // x x
@@ -183,66 +220,48 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   // my my
   _Q(3, 3) = c_my_my;
 
-  _Q.Zero();
+  // _Q.Zero();
 }
 
 //
 // ------- Filtering ------------
 //
 void KalmanTrack::update_V(KalmanSite *a_site) {
-  double sig_beta, SIG_ALPHA;
+  double sigma_beta;
   switch ( a_site->get_type() ) {
     case 0 : // TOF0
-      SIG_ALPHA = 1.0/sqrt(12.);
-      sig_beta = 10./sqrt(12.);
-      // SIG_ALPHA = 40./sqrt(12.);
-      // sig_beta  = 400./sqrt(12.);
+      sigma_beta = 10./sqrt(12.);
       break;
     case 1 : // TOF1
-      SIG_ALPHA = 1.0/sqrt(12.);
-      sig_beta = 7./sqrt(12.);
-      // SIG_ALPHA = 60./sqrt(12.);
-      // sig_beta  = 420./sqrt(12.);
+      sigma_beta = 7./sqrt(12.);
       break;
     case 2 : // SciFi
       double alpha = (a_site->get_measurement())(0, 0);
       double l = pow(_active_radius*_active_radius -
                  (alpha*_channel_width)*(alpha*_channel_width), 0.5);
       if ( l != l ) l = 150.;
-      sig_beta = (l/_channel_width)/sqrt(12.);
-      SIG_ALPHA = 1.0/sqrt(12.);
+      sigma_beta = (l/_channel_width)/sqrt(12.);
   }
+
+  double sigma_alpha = 1.0/sqrt(12.);
+
   _V.Zero();
-  _V(0, 0) = SIG_ALPHA*SIG_ALPHA;
-  _V(1, 1) = sig_beta*sig_beta;
+  _V(0, 0) = sigma_alpha*sigma_alpha;
+  _V(1, 1) = sigma_beta*sigma_beta;
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
+  double conv_factor = a_site->get_conversion_factor();
 
-  switch ( a_site->get_type() ) {
-    case 0 :
-      _conv_factor = 40.;
-      _H.Zero();
-      _H(0, 0) =  dy/_conv_factor;
-      _H(0, 2) =  dx/_conv_factor;
-      break;
-    case 1 :
-      _conv_factor = 60.;
-      _H.Zero();
-      _H(0, 0) =  dy/_conv_factor;
-      _H(0, 2) =  dx/_conv_factor;
-      break;
-    case 2 :
-      _conv_factor = (7.*0.427)/2.;
-      _H.Zero();
-      _H(0, 0) = -dy/_conv_factor;
-      _H(0, 2) =  dx/_conv_factor;
-      break;
-    default : // not a detector. H and measurement are 0.
-      _H.Zero();
+  if ( conv_factor ) {
+    _H.Zero();
+    _H(0, 0) =  -dy/conv_factor;
+    _H(0, 2) =  dx/conv_factor;
+  } else {
+    _H.Zero();
   }
 }
 
@@ -293,9 +312,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD temp2(2, 2);
   temp2 = TMatrixD(_V, TMatrixD::kPlus, B);
 
-  // double det;
   temp2.Invert();
-  // assert(det != 0);
 
   _K.Zero();
   _K = TMatrixD(A, TMatrixD::kMult, temp2);

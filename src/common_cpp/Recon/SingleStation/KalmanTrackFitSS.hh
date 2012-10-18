@@ -52,7 +52,7 @@ class KalmanTrackFitSS : public KalmanTrackFit {
   // Set covariance matrix;
   // Add plane measurents to all sites;
   void initialise_global_track(Json::Value event, std::vector<KalmanSite> &sites,
-                               double &particle_mass, double &particle_momentum);
+                               double &particle_mass, double &particle_momentum, double displacement);
 
   void filter_virtual(std::vector<KalmanSite> &sites,
                       int current_site);
@@ -60,7 +60,7 @@ class KalmanTrackFitSS : public KalmanTrackFit {
   void perform_elementar_pattern_recon(Json::Value event,
                                        double &x_pr, double &y_pr,
                                        double &mx_pr, double &my_pr,
-                                       double &p_z, double &mass);
+                                       double &p_z, double &mass, double ss_displacement);
 
 
   void initialise_prove_track(std::vector<KalmanSite> &old_sites,

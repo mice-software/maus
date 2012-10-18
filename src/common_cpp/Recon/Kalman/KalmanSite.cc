@@ -36,6 +36,18 @@ KalmanSite::KalmanSite(): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0), _typ
 
 KalmanSite::~KalmanSite() {}
 
+void KalmanSite::set_type(int type) {
+  _type = type;
+  if ( type == 0 ) { // TOF0
+    _conversion_factor = 40.;
+  } else if ( type == 1 ) { // TOF1
+    _conversion_factor = 60.;
+  } else if ( type == 2 ) { // SS
+    _conversion_factor = (7.*0.427)/2.;
+  }
+}
+
+
 KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
                                                _type(-1), _conversion_factor(0.),
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)),

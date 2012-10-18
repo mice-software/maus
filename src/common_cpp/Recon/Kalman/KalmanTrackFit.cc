@@ -145,7 +145,9 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
 
   double dsdz  = seed.get_dsdz();
   double tan_lambda = 1./dsdz;
-  double pz = pt*tan_lambda;
+  // PR doesnt see Eloss, so overstimates pz.
+  // Total Eloss = 2 MeV/c.
+  double pz = pt*tan_lambda - 2./sqrt(12.);
   double seed_pz;
 
   momentum = pow(pt*pt+pz*pz, 0.5);
@@ -165,23 +167,19 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack &seed, std::vector<KalmanSit
 
   double x, y;
 
+  double pi = acos(-1.);
   double phi_0 = seed.get_phi0();
-  double phi;
-  double px, py;
+  double phi = phi_0 + pi/2.;
+  double px  = pt*cos(phi);
+  double py  = pt*sin(phi);
 
   for ( unsigned int i = 0; i < spacepoints.size(); i++ ) {
     if ( tracker == 0 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = phi_0+3.14/2.;
-      px = pt*cos(phi);
-      py = pt*sin(phi);
     } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
       x = spacepoints[i].get_position().x();
       y = spacepoints[i].get_position().y();
-      phi = phi_0+3.14/2.;
-      px = pt*cos(phi);
-      py = pt*sin(phi);
     }
   }
 
@@ -328,17 +326,17 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   // ... and the site we will extrapolate from.
   KalmanSite *old_site = &sites[i-1];
 
-  // Calculate the system noise...
-  // track->calc_system_noise(old_site, new_site);
-
   // The propagator matrix...
   track->update_propagator(old_site, new_site);
 
   // Now, calculate prediction.
   track->calc_predicted_state(old_site, new_site);
 
-  // Calculate the energy loss
-  // track->subtract_energy_loss(old_site, new_site);
+  // Calculate the energy loss for the projected state.
+  track->subtract_energy_loss(old_site, new_site);
+
+  // Calculate the system noise...
+  track->calc_system_noise(old_site, new_site);
 
   // ... so that we can compute the prediction for the
   // covariance matrix.
@@ -379,7 +377,7 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
     }
   }
   std::sort(clusters.begin(), clusters.end(), sort_by_id);
-
+  /*
   // Compute pz from tracker timing.
   int last_cluster = clusters.size();
   double deltaT = clusters[0]->get_time() - clusters[last_cluster-1]->get_time();
@@ -399,7 +397,7 @@ void KalmanTrackFit::process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   std::cerr << "Pz: " << gamma << " " << deltaZ << " "
             << deltaT << " " << seed_pz << " "
             << clusters[0]->get_true_momentum().z() << "\n";
-
+  */
   // seed_pz = 200.;
 }
 

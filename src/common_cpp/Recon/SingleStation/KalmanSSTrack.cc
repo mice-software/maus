@@ -36,7 +36,6 @@ void KalmanSSTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site
   if ( magnets_on && ( (old_site->get_id() == 4 &&  new_site->get_id() == 5) ||
                        (old_site->get_id() == 5 &&  new_site->get_id() == 4) ) ) {
     magnet_drift();
-    _F.Print();
   } else {
     straight_line(deltaZ);
   }
@@ -68,7 +67,7 @@ void KalmanSSTrack::magnet_drift() {
   double kappa_q9 = compute_kappa(q9_current, momentum); // 1.3;  // m2
   double sqrt_kappa_q9 = pow(kappa_q9, 0.5)/1000.; // m-1 -> mm-1
 
-  double L = 660.;   // mm
+  double L   = 660.; // mm
   double D_0 = 500.; // mm
   double D_1 = 500.; // mm
 
@@ -165,7 +164,11 @@ void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
                sites[7].get_smoothed_alpha() +
                sites[8].get_smoothed_alpha();
 
-  assert(sum > -4 && sum < 4 && "Bad space point");
+  std::cerr << "Spacepoint sum: " << sum << std::endl;
+  if (sum < -4 && sum > 4 ) {
+    std::cerr << "Bad space point!" << std::endl;
+    _chi2+=9999.;
+  }
   // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
@@ -176,6 +179,25 @@ void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   std::ofstream output("chi2.txt", std::ios::out | std::ios::app);
   output << _tracker << " " << _chi2 << " " << _ndf << "\n";
   output.close();
+
+  // CM35 analysis.
+  assert(sites[4].get_id() == 4);
+  TMatrixD triplet_face_0(5, 1);
+  triplet_face_0 = sites[4].get_a();
+  double x  = triplet_face_0(0, 0);
+  double xp = triplet_face_0(1, 0);
+  double y  = triplet_face_0(2, 0);
+  double yp = triplet_face_0(3, 0);
+  double kappa = triplet_face_0(4, 0);
+  double px = xp/kappa;
+  double py = yp/kappa;
+
+  double r = pow(x*x+y*y, 0.5);
+  double tranvs = pow(px*px+py*py, 0.5);
+
+  std::ofstream output2("emittance_chi2.txt", std::ios::out | std::ios::app);
+  output2 << r << " " << tranvs << " " << _chi2 << " " << _ndf  << "\n";
+  output2.close();
 }
 
 } // namespace MAUS

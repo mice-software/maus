@@ -94,8 +94,8 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
       mc_px = -mc_px;
       mc_pz = -mc_pz;
     }
-    assert(a_smooth(0, 0) ==  a_smooth(0, 0));
-    assert(a_proj(0, 0) == a_proj(0, 0));
+    // assert(a_smooth(0, 0) ==  a_smooth(0, 0));
+    // assert(a_proj(0, 0) == a_proj(0, 0));
 
     out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
          << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " "

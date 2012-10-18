@@ -21,9 +21,6 @@ namespace MAUS {
 
 KalmanTrackFitSS::~KalmanTrackFitSS() {}
 
-//
-// Global track fit.
-//
 void KalmanTrackFitSS::process(Json::Value event) {
   // std::vector<double> masses;
 
@@ -31,16 +28,17 @@ void KalmanTrackFitSS::process(Json::Value event) {
   // masses.push_back(muon_mass);
   // for ( int i = 0; i < masses.size(); ++i ) {
   // double particle_mass = masses[i];
-
+  // for ( double displacement = -200.; displacement < 200.; displacement+=2. ) {
+  double displacement = 0.0;
   double particle_momentum, particle_mass;
 
   std::vector<KalmanSite> sites;
   KalmanTrack *track = new KalmanSSTrack();
 
   // Pass measurements and PR to sites.
-  initialise_global_track(event, sites, particle_momentum, particle_mass);
+  initialise_global_track(event, sites, particle_momentum, particle_mass, displacement);
 
-  if (particle_mass > 150.) return;
+  // if (particle_mass > 150.) return;
   if (particle_momentum < 100.) return;
   track->set_mass(particle_mass);
   track->set_momentum(particle_momentum);
@@ -73,6 +71,11 @@ void KalmanTrackFitSS::process(Json::Value event) {
   }
 
   track->compute_chi2(sites);
+  double chi2 = track->get_chi2();
+
+  std::ofstream out2("displacements.txt", std::ios::out | std::ios::app);
+  out2  << displacement << " " << chi2 << "\n";
+  out2.close();
 
   KalmanMonitor monitor;
   monitor.print_info(sites);
@@ -348,12 +351,12 @@ void KalmanTrackFitSS::initialise_prove_track(std::vector<KalmanSite> &old_sites
 
 void KalmanTrackFitSS::initialise_global_track(Json::Value event,
                                                std::vector<KalmanSite> &sites,
-                                               double &momentum, double &mass) {
+                                               double &momentum, double &mass, double displacement) {
   double x_pr, y_pr, mx_pr, my_pr;
   perform_elementar_pattern_recon(event,
                                   x_pr, y_pr,
                                   mx_pr, my_pr,
-                                  momentum, mass);
+                                  momentum, mass, displacement);
 
 /*
   std::cerr << "Pattern Recognition: " << x_pr << " " << y_pr << " "
@@ -373,7 +376,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   TMatrixD C(5, 5);
   C.Zero();
   for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = _seed_cov; // dummy values
+     C(i, i) = _seed_cov/20.; // dummy values
   }
 
   KalmanSite first_site;
@@ -395,9 +398,9 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   double cherenkov_B_z = 1281.3;
   double vp1_z = 3684.1;
   double vp2_z = 6857.1;
-  double ss_2_z  = 7514.05;
-  double ss_1_z  = 7514.7;
-  double ss_0_z  = 7515.35;
+  double ss_2_z  = 7514.05+ displacement;
+  double ss_1_z  = 7514.7 + displacement;
+  double ss_0_z  = 7515.35+ displacement;
   double tof1_vertical_z  = 8002.2;
   double tof1_horizontal_z= 8027.2;
 
@@ -419,7 +422,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
   sites.push_back(first_site);
   // Site 1 - tof0, vertical
   KalmanSite site_1;
-  site_1.set_measurement(-(tof0_slaby-tof0_central_slab_number));
+  site_1.set_measurement((tof0_slaby-tof0_central_slab_number));
   site_1.set_direction(tof_ver);
   site_1.set_id(1);
   site_1.set_type(0);
@@ -483,7 +486,7 @@ void KalmanTrackFitSS::initialise_global_track(Json::Value event,
 
   // Site 9 - tof1, vertical
   KalmanSite site_9;
-  site_9.set_measurement(-(tof1_slaby-tof1_central_slab_number));
+  site_9.set_measurement((tof1_slaby-tof1_central_slab_number));
   site_9.set_direction(tof_ver);
   site_9.set_id(9);
   site_9.set_type(1);
@@ -513,14 +516,14 @@ void KalmanTrackFitSS::filter_virtual(std::vector<KalmanSite> &sites,
   a = a_site->get_projected_a();
   a_site->set_a(a);
   if ( current_site == 4 || current_site == 5 ) {
-    assert(a(0, 0) < 160. && a(2, 0) < 160. && "Assert extrapolation is reasonable.");
+    assert(a(0, 0) < 200. && a(2, 0) < 200. && "Assert extrapolation is reasonable.");
   }
 }
 
 void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
                                                        double &x_pr, double &y_pr,
                                                        double &mx_pr, double &my_pr,
-                                                       double &p_z, double &mass) {
+                                                       double &p_z, double &mass, double ss_displacement) {
   double protron_mass = 938.272; // MeV/c
   double pion_mass    = 139.6; // MeV/c
   double muon_mass    = 105.7; // MeV/c
@@ -548,17 +551,23 @@ void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
   // Basic PR
   // 7824.1 -> my old guess
   double distance_TOFs = 7432.7;    // mm
-  double distance_TOF0_SS = distance_TOFs - 500.; // mm
-  double delta_x = (ss_x-tof0_x); // mm
-  double delta_y = (ss_y-tof0_y); // mm
-  double delta_z = distance_TOF0_SS;     // mm
+  double distance_TOF0_SS = distance_TOFs - 500.+ss_displacement; // mm
+  double delta_x = (tof1_x-tof0_x); // mm
+  double delta_y = (tof1_y-tof0_y); // mm
+  double delta_z = distance_TOFs;   // mm
   double deltaT = tof1_time - tof0_time; // ns
   x_pr = tof0_x; // mm
   y_pr = tof0_y; // mm
   mx_pr   = delta_x/delta_z;
   my_pr   = delta_y/delta_z;
 
-  std::cerr << "DeltaT: " << deltaT << "\n";
+  std::cerr << tof1_x << " " << tof0_x+distance_TOFs*mx_pr << "\n";
+  std::cerr << tof1_y << " " << tof0_y+distance_TOFs*my_pr << "\n";
+
+  assert(tof1_x == tof0_x+distance_TOFs*mx_pr);
+  assert(tof1_y == tof0_y+distance_TOFs*my_pr);
+
+  // std::cerr << "DeltaT: " << deltaT << "\n";
   if ( deltaT > 25. && deltaT < 26.5 ) {
     mass = positron_mass;
   } else if ( deltaT > 25. && deltaT < 29.5 ) {
