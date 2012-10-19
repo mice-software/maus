@@ -26,6 +26,7 @@
 #include "Reconstruction/Global/Particle.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
+#include "Simulation/MAUSPhysicsList.hh"
 
 #include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/legacy/Interface/MICERun.hh"
@@ -60,7 +61,7 @@ std::cout << "DEBUG TransferMapOpticsModel::TransferMapOpticsModel(): "
     reference_pgparticle_.time, reference_pgparticle_.energy,
     reference_pgparticle_.x, reference_pgparticle_.px,
     reference_pgparticle_.y, reference_pgparticle_.py,
-    reference_pgparticle_.pid, reference_pgparticle_.z);
+    Particle::ID(reference_pgparticle_.pid), reference_pgparticle_.z);
 
 std::cout << "DEBUG TransferMapOpticsModel::TransferMapOpticsModel(): "
           << "Reference Particle Z = " << reference_particle_.z()
@@ -99,6 +100,10 @@ void TransferMapOpticsModel::Build() {
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
+  // Set RF cavity phases, and as side effect set stochastics
+  //simulator->SetPhases();
+  simulator->GetPhysicsList()->BeginOfRunAction();
+  //simulator->GetPhysicsList()->Setup();
   std::map<int, std::vector<TrackPoint> > station_hits_map;
   std::vector<TrackPoint>::const_iterator first_plane_hit;
   for (first_plane_hit = first_plane_hits.begin();
@@ -236,7 +241,8 @@ std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits(): "
           << "# Hits = " << hits.size() << std::endl;
     for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
       const Json::Value hit = hits[hit_index];
-      const int particle_id = hit["particle_id"].asInt();
+      const Particle::ID particle_id
+        = Particle::ID(hit["particle_id"].asInt());
       const double mass = Particle::GetInstance()->GetMass(particle_id);
       const double px = hit["momentum"]["x"].asDouble();
       const double py = hit["momentum"]["y"].asDouble();

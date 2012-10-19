@@ -215,18 +215,20 @@ std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
           << std::endl;
     
     const double weights[36] = {
-      0., 0., 0., 0., 0., 0.,
-      0.0, 1., 0., 0., 0., 0.,
-      0.0, 0., 1., 0., 0., 0.,
-      0.0, 0., 0., 1., 0., 0.,
-      0.0, 0., 0., 0., 1., 0.,
-      0.0, 0., 0., 0., 0., 1.,
+      1., 0., 0., 0., 0., 0.,
+      0., 1., 0., 0., 0., 0.,
+      0., 0., 1., 0., 0., 0.,
+      0., 0., 0., 1., 0., 0.,
+      0., 0., 0., 0., 1., 0.,
+      0., 0., 0., 0., 0., 1.,
     };
     Matrix<double> weight_matrix(6, 6, weights);
 
     // Sum the squares of the differences between the calculated phase space
-    // coordinates and the measured coordinates.
-    TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
+    // coordinates (point) and the measured coordinates (event).
+    //TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
+    TrackPoint residual = TrackPoint(weight_matrix * (*events - point)
+                                     / *events);
 std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
 std::cout << "DEBUG ScoreTrack(): Event: " << *events << std::endl;
 std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;

@@ -112,10 +112,12 @@ class MapCppGlobalTrackReconstructor {
   void LoadSimulationData(const std::string mc_branch_name);
 
   void LoadDetectorConfiguration(
-    std::map<int, MAUS::reconstruction::global::Detector> & detectors);
+    std::map<MAUS::reconstruction::global::Detector::ID,
+    MAUS::reconstruction::global::Detector> & detectors);
   void LoadMonteCarloData(
     const std::string                                             branch_name,
-    const std::map<int, MAUS::reconstruction::global::Detector> & detectors);
+    const std::map<MAUS::reconstruction::global::Detector::ID,
+                   MAUS::reconstruction::global::Detector> & detectors);
 
   static CovarianceMatrix const GetJsonCovarianceMatrix(
       Json::Value const & value);

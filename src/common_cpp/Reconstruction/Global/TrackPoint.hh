@@ -26,6 +26,7 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Reconstruction/Global/Particle.hh"
+#include "Reconstruction/Global/Detector.hh"
 
 namespace MAUS {
 
@@ -34,8 +35,6 @@ class Vector<double>;
 
 namespace reconstruction {
 namespace global {
-
-class Detector;
 
 /* @class TrackPoint a phase space vector with redundant t/E and z/Pz
  * coordinates as well as an ID that links the track to the detector that
@@ -62,12 +61,14 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
   /* @brief  Base class copy constructor.
    */
   explicit TrackPoint(const PhaseSpaceVector & original_instance,
-                      const double z = 0.0, const int pid = Particle::kNone);
+                      const double z = 0.0,
+                      const Particle::ID pid = Particle::kNone);
 
   /* @brief  Vector<double> copy constructor.
    */
   explicit TrackPoint(const Vector<double> & original_instance,
-                      const double z = 0.0, const int pid = Particle::kNone);
+                      const double z = 0.0,
+                      const Particle::ID pid = Particle::kNone);
 
   /* @brief Create with coordinates from an array.
      Order is t, E, x, Px, y, Py.
@@ -98,7 +99,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
   TrackPoint(const double time, const double energy,
              const double x, const double px,
              const double y, const double py,
-             const int particle_id, const double z = 0.0);
+             const Particle::ID particle_id, const double z = 0.0);
 
   ~TrackPoint();
 
@@ -118,11 +119,11 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
   //       Accessors
   // *************************
 
-  void set_particle_id(const int id);
-  int particle_id() const;
+  void set_particle_id(const Particle::ID id);
+  Particle::ID particle_id() const;
 
-  void set_detector_id(const unsigned int id);
-  unsigned int detector_id() const;
+  void set_detector_id(const Detector::ID id);
+  Detector::ID detector_id() const;
 
   void set_uncertainties(const CovarianceMatrix & uncertainties);
   const CovarianceMatrix & uncertainties() const;
@@ -133,9 +134,9 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
   void set_z(const double z) {z_ = z;}
 
  protected:
-  unsigned int detector_id_;  // = 0 if this was not measured in a detector
+  Detector::ID detector_id_;  // = 0 if this was not measured in a detector
   CovarianceMatrix * uncertainties_;
-  int particle_id_;
+  Particle::ID particle_id_;
   double z_;
 };
 

@@ -32,6 +32,7 @@
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
 #include "Reconstruction/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
+#include "Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
@@ -78,6 +79,7 @@ void PolynomialOpticsModel::Build() {
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
+  simulator->GetPhysicsList()->BeginOfRunAction();
   std::map<int, std::vector<TrackPoint> > station_hits_map;
   std::vector<TrackPoint>::const_iterator first_plane_hit;
   for (first_plane_hit = first_plane_hits.begin();
@@ -177,7 +179,7 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
         first_plane_hit[k] = 1.;
       }
       double delta = deltas_[j];
-      fprintf(stdout, "Delta %d: %f\n", j, deltas_[j]); fflush(stdout);
+      fprintf(stdout, "Delta %d: %f\n", size_t(j), deltas_[j]); fflush(stdout);
       first_plane_hit[j] = delta;
 
       first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
@@ -252,6 +254,8 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
         points, values, polynomial_order_, weights_);
 */
+    // Fit to first order and then fit to higher orders with the
+    // first order map as a constraint
     polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
         points, values, 1, weights_);
     if (polynomial_order_ > 1) {

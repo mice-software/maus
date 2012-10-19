@@ -27,6 +27,7 @@
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "Reconstruction/Global/TrackFitter.hh"
+#include "Reconstruction/Global/Particle.hh"
 
 namespace MAUS {
 
@@ -63,7 +64,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
 
   Track const * detector_events_;
   Track * track_;
-  int particle_id_;
+  Particle::ID particle_id_;
 
   bool ValidGuess(const TrackPoint & guess) const;
   MinuitTrackFitter();

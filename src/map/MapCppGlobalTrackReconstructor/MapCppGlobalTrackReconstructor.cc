@@ -78,16 +78,17 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
   // parse the JSON document.
   try {
     configuration_ = JsonWrapper::StringToJson(configuration);
-
+/*
     Json::Value physics_processes = configuration_["physics_processes"];
-    if (physics_processes != Json::Value("mean_energy_loss")) {
+    if ((physics_processes != Json::Value("mean_energy_loss"))
+        && (physics_processes != Json::Value("none"))) {
       throw(Squeal(Squeal::nonRecoverable,
                   "The \"physics_processes\" configuration variable should be "
-                  "set to \"mean_energy_loss\" to avoid collisions of the test "
-                  "particles with walls.",
+                  "set to \"mean_energy_loss\" or \"none\" to avoid collisions "
+                  "of the test particles with walls.",
                   "MAUS::MapCppGlobalTrackReconstructor::birth()"));
     }
-
+*/
     SetupOpticsModel();
     SetupTrackFitter();
   } catch(Squeal& squee) {
@@ -296,18 +297,10 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
   //CorrelateTrackPoints(tracks);
 
 
-  int particle_id = Particle::kMuPlus;
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
-  int charge = Particle::GetInstance()->GetCharge(reference_pgparticle.pid);
-  if (charge < 0) {
-    particle_id = Particle::kMuMinus;
-  } else if (charge == 0) {
-    throw(Squeal(Squeal::recoverable,
-                  "Reference particle has no charge. Assuming a positive beam.",
-                  "MapCppGlobalTrackReconstructor::LoadSimulationData()"));
-  }
+  Particle::ID particle_id = Particle::ID(reference_pgparticle.pid);
 
   Json::Value global_tracks;
 
@@ -359,8 +352,9 @@ void MapCppGlobalTrackReconstructor::LoadRandomData() {
                               * 100.0;
     }
     CovarianceMatrix uncertainties(uncertainty_data);
-    Detector detector(id, plane, uncertainties);
-    detectors.insert(std::pair<int, Detector>(id, detector));
+    Detector detector(Detector::ID(id), plane, uncertainties);
+    detectors.insert(std::pair<Detector::ID, Detector>(Detector::ID(id),
+                                                       detector));
 
     // skip detectors we're not using
     if ((id == Detector::kCherenkov1) ||
@@ -405,13 +399,13 @@ void MapCppGlobalTrackReconstructor::LoadSmearedData() {
 
 void MapCppGlobalTrackReconstructor::LoadSimulationData(
     const std::string mc_branch_name) {
-  std::map<int, Detector> detectors;
+  std::map<Detector::ID, Detector> detectors;
   LoadDetectorConfiguration(detectors);
   LoadMonteCarloData(mc_branch_name, detectors);
 }
 
 void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
-    std::map<int, Detector> & detectors) {
+    std::map<Detector::ID, Detector> & detectors) {
   try {
     // FIXME(plane1@hawk.iit.edu) Once the detector groups provide this
     // information this will need to be changed
@@ -425,7 +419,7 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
       const Json::Value detector_json = detector_attributes_json[index];
       const Json::Value id_json = JsonWrapper::GetProperty(
           detector_json, "id", JsonWrapper::intValue);
-      const int id = id_json.asInt();
+      const Detector::ID id = Detector::ID(id_json.asInt());
 
       const Json::Value plane_json = JsonWrapper::GetProperty(
           detector_json, "plane", JsonWrapper::realValue);
@@ -437,7 +431,7 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
           = GetJsonCovarianceMatrix(uncertainties_json);
 
       const Detector detector(id, plane, uncertainties);
-      detectors.insert(std::pair<int, Detector>(id, detector));
+      detectors.insert(std::pair<Detector::ID, Detector>(id, detector));
     }
   } catch(Squeal& squee) {
     run_data_ = MAUS::CppErrorHandler::getInstance()->HandleSqueal(
@@ -454,7 +448,7 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
  */
 void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
     const std::string               branch_name,
-    const std::map<int, Detector> & detectors) {
+    const std::map<Detector::ID, Detector> & detectors) {
 
   try {
     const Json::Value mc_events = JsonWrapper::GetProperty(
@@ -518,11 +512,11 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
             time.asDouble(), energy.asDouble(),
             x.asDouble(), px.asDouble(),
             y.asDouble(), py.asDouble(),
-            particle_id.asInt(), z.asDouble());
+            Particle::ID(particle_id.asInt()), z.asDouble());
             
           const Json::Value channel_id = JsonWrapper::GetProperty(
               *hit, "channel_id", JsonWrapper::objectValue);
-          size_t detector_id = Detector::kNone;
+          Detector::ID detector_id = Detector::kNone;
           if ((*hit_group_name) == "sci_fi_hits") {
             const Json::Value tracker_number_json = JsonWrapper::GetProperty(
                 channel_id, "tracker_number", JsonWrapper::intValue);
@@ -531,7 +525,7 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
                 channel_id, "station_number", JsonWrapper::intValue);
             const size_t station_number = tracker_number_json.asUInt();
             // FIXME detector IDs have changed
-            detector_id = tracker_number + 4 + station_number;
+            detector_id = Detector::ID(tracker_number + 4 + station_number);
           } else if ((*hit_group_name) == "tof_hits") {
             const Json::Value station_number_json = JsonWrapper::GetProperty(
                 channel_id, "station_number", JsonWrapper::intValue);
@@ -541,20 +535,23 @@ void MapCppGlobalTrackReconstructor::LoadMonteCarloData(
             const size_t plane = plane_json.asUInt();
             switch (station_number) {
               case 0: {
-                detector_id = Detector::kTOF0_1 + plane;
+                detector_id = Detector::ID(Detector::kTOF0_1 + plane);
                 tof0_track_point = track_point;
                 break;
               }
               case 1: {
-                detector_id = Detector::kTOF1_1 + plane;
+                detector_id = Detector::ID(Detector::kTOF1_1 + plane);
                 tof1_track_point = track_point;
                 break;
               }
-              case 2: detector_id = Detector::kTOF2_2 + plane; break;
+              case 2: {
+                detector_id = Detector::ID(Detector::kTOF2_2 + plane);
+                break;
+              }
             }
           }
           track_point.set_detector_id(detector_id);
-          std::map<int, Detector>::const_iterator detector
+          std::map<Detector::ID, Detector>::const_iterator detector
             = detectors.find(detector_id);
           track_point.set_uncertainties(detector->second.uncertainties());
 
@@ -564,6 +561,22 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
           << std::endl;
         }
       }
+
+/*
+      double trigger_time = tof1_track_point.t();
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+      << "Trigger Time: " << trigger_time << std::endl;
+      std::vector<TrackPoint>::iterator track_point;
+      for (track_point = track.begin();
+           track_point < track.end();
+           ++track_point) {
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+      << "Initial Track Point Time: " << (*track_point)[0] << std::endl;
+        (*track_point)[0] = (*track_point)[0] - trigger_time;
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
+      << "Final Track Point Time: " << (*track_point)[0] << std::endl;
+      }
+*/
 
       double delta_x = tof1_track_point.x() - tof0_track_point.x();
       double delta_y = tof1_track_point.y() - tof0_track_point.y();
@@ -628,8 +641,6 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
   // assuming the particles navigate the MICE lattice one at a time
   Track track;
   double last_z = track_points[0].z();
-  std::vector<TrackPoint>::const_iterator event;
-  for (event = track_points.begin(); event < track_points.end(); ++event) {
 std::cout << "DEBUG MapCppGlobalTrackReconstructor::CorrelateTrackPoints: "
           << "correlating the following track point:" << std::endl
           << *event << std::endl;

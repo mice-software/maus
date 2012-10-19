@@ -32,55 +32,34 @@ namespace global {
 
 class Particle {
  public:
-  static Particle const * GetInstance();
+  enum ID {kNone, kEMinus=11, kElectronNeutrino, kMuMinus, kMuonNeutrino,
+           kPhoton=22, kPi0=111, kPiPlus=211, kKPlus=321, kNeutron=2112,
+           kProton=2212, kDeuterium=1000010020, kTritium=1000010030,
+           kHelium3=1000020030, kHelium4=1000020040, kKLong=130, kKShort=310,
+           kK0=311, kLambda=3122, kMuonAntineutrino=-14, kMuPlus,
+           kElectronAntineutrino, kEPlus, kPiMinus=-211, kKMinus=-321,
+           kAntineutron=-2112, kAntiproton=-2212, kAntilambda=-3122};
+
+   static Particle const * GetInstance();
   ~Particle();
 
   /* @brief returns the unique name of the particle referenced by id.
    */
-  std::string GetName(int id) const;
+  std::string GetName(const ID id) const;
 
   /* @brief returns the mass (MeV/c^2) of the particle referenced by id.
    */
-  double GetMass(int id) const;
+  double GetMass(const ID id) const;
 
   /* @brief returns the charge (e) of the particle reference by id.
    */
-  int GetCharge(int id) const;
-
-  static const int kNone;
-  static const int kEMinus;
-  static const int kElectronNeutrino;
-  static const int kMuMinus;
-  static const int kMuonNeutrino;
-  static const int kPhoton;
-  static const int kPi0;
-  static const int kPiPlus;
-  static const int kKPlus;
-  static const int kNeutron;
-  static const int kProton;
-  static const int kDeuterium;
-  static const int kTritium;
-  static const int kHelium3;
-  static const int kHelium4;
-  static const int kKLong;
-  static const int kKShort;
-  static const int kK0;
-  static const int kLambda;
-  static const int kEPlus;
-  static const int kElectronAntineutrino;
-  static const int kMuPlus;
-  static const int kMuonAntineutrino;
-  static const int kPiMinus;
-  static const int kKMinus;
-  static const int kAntineutron;
-  static const int kAntiproton;
-  static const int kAntilambda;
+  int GetCharge(const ID id) const;
  protected:
   Particle();
   static const Particle kSingleton;
-  std::map<int, std::string> names_;
-  std::map<int, double> masses_;
-  std::map<int, int> charges_;
+  std::map<ID, std::string> names_;
+  std::map<ID, double> masses_;
+  std::map<ID, int> charges_;
 };
 
 std::ostream& operator<<(std::ostream& out, const Particle& vector);

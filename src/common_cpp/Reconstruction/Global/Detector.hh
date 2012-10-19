@@ -30,9 +30,14 @@ namespace global {
 
 class Detector {
  public:
+  enum ID {kNone, kTOF0_1, kTOF0_2, kCherenkov1, kTOF1_1, kTOF1_2, kTracker1_1,
+           kTracker1_2, kTracker1_3, kTracker1_4, kTracker1_5, kTracker2_1,
+           kTracker2_2, kTracker2_3, kTracker2_4, kTracker2_5, kTOF2_1,
+           kTOF2_2, kCherenkov2, kCalorimeter, kEMR};
+
   /* @brief	Create with the given input values.
    */
-  Detector(const unsigned int id,
+  Detector(const ID id,
            const double plane,
            const CovarianceMatrix & uncertainties);
 
@@ -42,34 +47,13 @@ class Detector {
 
   ~Detector();
 
-  const unsigned int id() const;
+  const ID id() const;
   const double plane() const;
   const CovarianceMatrix & uncertainties() const;
-
-  static const unsigned int kNone;
-  static const unsigned int kTOF0_1;
-  static const unsigned int kTOF0_2;
-  static const unsigned int kCherenkov1;
-  static const unsigned int kTOF1_1;
-  static const unsigned int kTOF1_2;
-  static const unsigned int kTracker1_1;
-  static const unsigned int kTracker1_2;
-  static const unsigned int kTracker1_3;
-  static const unsigned int kTracker1_4;
-  static const unsigned int kTracker1_5;
-  static const unsigned int kTracker2_1;
-  static const unsigned int kTracker2_2;
-  static const unsigned int kTracker2_3;
-  static const unsigned int kTracker2_4;
-  static const unsigned int kTracker2_5;
-  static const unsigned int kTOF2_1;
-  static const unsigned int kTOF2_2;
-  static const unsigned int kCherenkov2;
-  static const unsigned int kCalorimeter;
  protected:
   Detector();
 
-  unsigned int id_;
+  ID id_;
   double plane_;
   CovarianceMatrix uncertainties_;
 };
