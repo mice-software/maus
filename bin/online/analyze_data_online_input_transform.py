@@ -53,6 +53,8 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
+    # add ReconSetup map -- analyze_data_offline seems to have it already
+    my_map.append(MAUS.MapPyReconSetup())
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
@@ -62,7 +64,8 @@ def run():
     reducer = MAUS.ReducePyCkov()
     #reducer = MAUS.ReducePyDoNothing()
     # Save images as EPS and meta-data as JSON.
-    output_worker = MAUS.OutputPyImage()
+    #output_worker = MAUS.OutputPyImage()
+    output_worker = MAUS.OutputCppRoot()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 
