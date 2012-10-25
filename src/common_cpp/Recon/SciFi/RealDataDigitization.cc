@@ -60,9 +60,13 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  assert(load_calibration("scifi_calibration_30_09_2011.txt"));
-  assert(load_mapping("mapping_7.txt"));
-  assert(load_bad_channels());
+    bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
+    assert(calib);
+    bool map = load_mapping("mapping_7.txt");
+    assert(map);
+    bool bad_channels = load_bad_channels();
+    assert(bad_channels);
+
   // -------------------------------------------------
 
   // Pick up JSON daq event.
