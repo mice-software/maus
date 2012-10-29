@@ -21,7 +21,6 @@
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/Hit.hh"
 
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
@@ -47,7 +46,6 @@ class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {
     SciFiEventProcessor();
 
   private:
-    PointerArrayProcessor<SciFiHit> _sf_hit_array_proc;
     PointerArrayProcessor<SciFiDigit> _sf_digit_array_proc;
     PointerArrayProcessor<SciFiCluster> _sf_cluster_array_proc;
     PointerArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;

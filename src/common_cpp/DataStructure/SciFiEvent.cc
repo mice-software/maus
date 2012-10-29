@@ -20,7 +20,6 @@
 namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
-  _scifihits.resize(0);
   _scifidigits.resize(0);
   _scificlusters.resize(0);
   _scifispacepoints.resize(0);
@@ -30,10 +29,6 @@ SciFiEvent::SciFiEvent() {
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-    _scifihits.resize(_scifievent._scifihits.size());
-    for (unsigned int i = 0; i < _scifievent._scifihits.size(); ++i) {
-      _scifihits[i] = new SciFiHit(*_scifievent._scifihits[i]);
-    }
 
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
@@ -73,11 +68,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
         return *this;
     }
 
-    _scifihits.resize(_scifievent._scifihits.size());
-    for (unsigned int i = 0; i < _scifievent._scifihits.size(); ++i) {
-      _scifihits[i] = new SciFiHit(*_scifievent._scifihits[i]);
-    }
-
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
       _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
@@ -107,11 +97,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
 }
 
 SciFiEvent::~SciFiEvent() {
-
-  std::vector<SciFiHit*>::iterator hit;
-  for (hit = _scifihits.begin(); hit!= _scifihits.end(); ++hit) {
-    delete (*hit);
-  }
 
   std::vector<SciFiDigit*>::iterator digit;
   for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
