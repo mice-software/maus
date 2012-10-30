@@ -24,7 +24,6 @@
 #include "Rtypes.h"
 
 // MAUS headers
-#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -51,11 +50,6 @@ class SciFiEvent {
 
     /** Destructor - any member pointers are deleted */
     virtual ~SciFiEvent();
-
-    /** Hits */
-    void add_hit(SciFiHit* hit) { _scifihits.push_back(hit); }
-    void set_hits(SciFiHitPArray scifihits) { _scifihits = scifihits; }
-    SciFiHitPArray hits() const { return _scifihits; }
 
     /** Digits */
     void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
@@ -91,9 +85,6 @@ class SciFiEvent {
 
 
   private:
-
-    /** Hits in an event */
-    SciFiHitPArray                      _scifihits;
 
     /** Digits in an event */
     SciFiDigitPArray                    _scifidigits;
