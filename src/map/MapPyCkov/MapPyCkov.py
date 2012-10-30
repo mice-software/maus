@@ -26,7 +26,7 @@ class MapPyCkov:
     def __init__(self):
         """Constructor"""
         self._position_threshold = 40
-        self._pulse_area_threshold = 1
+        self._pulse_area_threshold = 0
         self._window_min = 19
         self._window_max = 80
         

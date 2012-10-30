@@ -1,0 +1,21 @@
+// FILES/Models/Modules/Tracker/TrackerSolenoid1_ST.dat
+//
+// A Tracker inside a Solenoid Magnet. Designed for study of Straight Track recon
+//
+//-4.0
+
+Module TrackerSolenoid1_ST
+{
+  Volume Cylinder
+  Dimensions 702.0 2733.0 mm
+  PropertyHep3Vector MagneticField 0.0 0.0 0.0 tesla
+  PropertyString Material Galactic
+  PropertyBool Invisible 1
+  PropertyInt KalmanSolenoid 1
+  PropertyInt KalmanSolenoidNumber 1
+  Module Tracker/Tracker1_ST.dat
+  {
+    Position 0.0 0.0 416.5 mm
+    Rotation 0.0 180.0 0.0 degree
+  }
+}

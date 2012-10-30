@@ -20,20 +20,109 @@
 namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
+  _scifidigits.resize(0);
+  _scificlusters.resize(0);
+  _scifispacepoints.resize(0);
+  _scifiseeds.resize(0);
+  _scifistraightprtracks.resize(0);
+  _scifihelicalprtracks.resize(0);
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-    *this = _scifievent;
+
+    _scifidigits.resize(_scifievent._scifidigits.size());
+    for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
+      _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
+    }
+
+    _scificlusters.resize(_scifievent._scificlusters.size());
+    for (unsigned int i = 0; i < _scifievent._scificlusters.size(); ++i) {
+      _scificlusters[i] = new SciFiCluster(*_scifievent._scificlusters[i]);
+    }
+
+    _scifispacepoints.resize(_scifievent._scifispacepoints.size());
+    for (unsigned int i = 0; i < _scifievent._scifispacepoints.size(); ++i) {
+      _scifispacepoints[i] = new SciFiSpacePoint(*_scifievent._scifispacepoints[i]);
+    }
+
+    _scifiseeds.resize(_scifievent._scifiseeds.size());
+    for (unsigned int i = 0; i < _scifievent._scifiseeds.size(); ++i) {
+      _scifiseeds[i] = new SciFiSpacePoint(*_scifievent._scifiseeds[i]);
+    }
+
+    _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
+      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+    }
+
+    _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
+      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+    }
+
+    // *this = _scifievent;
 }
 
 SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
     if (this == &_scifievent) {
         return *this;
     }
+
+    _scifidigits.resize(_scifievent._scifidigits.size());
+    for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
+      _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
+    }
+
+        _scifispacepoints.resize(_scifievent._scifispacepoints.size());
+    for (unsigned int i = 0; i < _scifievent._scifispacepoints.size(); ++i) {
+      _scifispacepoints[i] = new SciFiSpacePoint(*_scifievent._scifispacepoints[i]);
+    }
+
+    _scifiseeds.resize(_scifievent._scifiseeds.size());
+    for (unsigned int i = 0; i < _scifievent._scifiseeds.size(); ++i) {
+      _scifiseeds[i] = new SciFiSpacePoint(*_scifievent._scifiseeds[i]);
+    }
+
+    _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
+      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+    }
+
+    _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
+      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+    }
+
     return *this;
 }
 
 SciFiEvent::~SciFiEvent() {
-}
+
+  std::vector<SciFiDigit*>::iterator digit;
+  for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
+    delete (*digit);
+  }
+
+  std::vector<SciFiCluster*>::iterator cluster;
+  for (cluster = _scificlusters.begin(); cluster!= _scificlusters.end(); ++cluster) {
+    delete (*cluster);
+  }
+
+  std::vector<SciFiSpacePoint*>::iterator spoint;
+  for (spoint = _scifispacepoints.begin(); spoint!= _scifispacepoints.end(); ++spoint) {
+    delete (*spoint);
+  }
+
+  std::vector<SciFiSpacePoint*>::iterator seed;
+  for (seed = _scifiseeds.begin(); seed!= _scifiseeds.end(); ++seed) {
+    delete (*seed);
+  }
 }
 
+void SciFiEvent::set_spacepoints_used_flag(bool flag) {
+  for ( unsigned int i = 0; i < _scifispacepoints.size(); ++i ) {
+    _scifispacepoints[i]->set_used(flag);
+  }
+}
+
+} // ~namespace MAUS

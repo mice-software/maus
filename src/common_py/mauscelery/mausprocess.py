@@ -44,6 +44,17 @@ from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 
 import ErrorHandler
+import maus_cpp.globals
+import maus_cpp.run_action_manager
+
+# Rogers - call structure is confused. Simpler would be to have a
+# start_of_job (transform initialisation, globals birth)
+# start_of_run (transform birth, StartOfRunAction)
+# process (transform a maus_event)
+# end_of_run (transform death, EndOfRunAction)
+# end_of_job (transform destruction, globals death)
+# The celery nodes should and input_transform/merge_reduce should all have the
+# same call structure as single_thread.
 
 def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     """
@@ -59,13 +70,16 @@ def worker_process_init_callback(**kwargs): # pylint:disable = W0613
     if logger.isEnabledFor(logging.INFO):
         logger.info("Setting MAUS ErrorHandler to raise exceptions")
     ErrorHandler.DefaultHandler().on_error = 'raise'
+    if not maus_cpp.globals.has_instance() and \
+       MausConfiguration.configuration != '{}':
+        maus_cpp.globals.birth(MausConfiguration.configuration)
     MausTransform.initialize(MausConfiguration.transform)
     MausTransform.birth(MausConfiguration.configuration)
 
 # Bind the callback method to the Celery worker_process_init signal.
 worker_process_init.connect(worker_process_init_callback) 
 
-def process_birth(pids, config_id, transform, configuration):
+def process_birth(pids, config_id, transform, configuration, run_number):
     """
     Create and birth a new transform. This is invoked in a sub-process
     via a call from the Celery master process. Any existing transform
@@ -84,11 +98,17 @@ def process_birth(pids, config_id, transform, configuration):
     the sub-process ID. This lets the master process know that the
     sub-process has executed this operation. 
     """
+    run_header = ""
     status = None
     logger = logging.getLogger(__name__)
     # Check if processed already.  
     if (not os.getpid() in pids):
         try:
+            if not maus_cpp.globals.has_instance():
+                maus_cpp.globals.birth(configuration)
+            if logger.isEnabledFor(logging.INFO):
+                logger.info("Start of run action")
+            run_header = maus_cpp.run_action_manager.start_of_run(run_number)
             if logger.isEnabledFor(logging.INFO):
                 logger.info("Birthing transform %s" % transform)
             MausTransform.initialize(transform)
@@ -103,9 +123,9 @@ def process_birth(pids, config_id, transform, configuration):
             status["message"] = str(exc)
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Status: %s " % status)
-    return (os.getpid(), status)
+    return (os.getpid(), status, run_header)
 
-def process_death(pids):
+def process_death(pids, run_number):
     """
     Execute death on the current transform. This is invoked in a
     sub-process via a call from the Celery master process. If death
@@ -118,6 +138,7 @@ def process_death(pids):
     the sub-process ID. This lets the master process know that the
     sub-process has executed this operation. 
     """
+    run_footer = ""
     status = None
     logger = logging.getLogger(__name__)
     # Check if processed already.
@@ -126,12 +147,13 @@ def process_death(pids):
         if (not MausTransform.is_dead):
             try:
                 if logger.isEnabledFor(logging.INFO):
-                    logger.info("Deathing transform")
+                    logger.info("Deathing transform "+str(run_number))
                 MausTransform.death()
+                run_footer = maus_cpp.run_action_manager.end_of_run(run_number)
             except Exception as exc: # pylint:disable = W0703
                 status = {}
                 status["error"] = str(exc.__class__)
                 status["message"] = str(exc)
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Status: %s " % status)
-    return (os.getpid(), status)
+    return (os.getpid(), status, run_footer)

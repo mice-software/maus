@@ -22,7 +22,7 @@ namespace MAUS {
 RunHeader::RunHeader() : _run_number(0) {
 }
 
-RunHeader::RunHeader(const RunHeader& _run_header) {
+RunHeader::RunHeader(const RunHeader& _run_header) : _run_number(0) {
     *this = _run_header;
 }
 

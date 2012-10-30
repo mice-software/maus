@@ -22,6 +22,7 @@
 
 #ifndef SCIFICLUSTERREC_HH
 #define SCIFICLUSTERREC_HH
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,16 +41,17 @@
 #include "CLHEP/Vector/Rotation.h"
 
 #include "src/legacy/Config/MiceModule.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class SciFiClusterRec {
  public:
   SciFiClusterRec(); // Default constructor
 
-  SciFiClusterRec(int cluster_exception, double min_npe);
+  SciFiClusterRec(int cluster_exception, double min_npe, std::vector<const MiceModule*> modules);
 
   ~SciFiClusterRec();
 
@@ -57,22 +59,38 @@ class SciFiClusterRec {
    * @arg evt a SciFiEvent to be filled with SciFiClusters
    * @arg modules the SciFi MICE modules
    */
-  void process(SciFiEvent &evt, std::vector<const MiceModule*> modules);
+  void process(SciFiEvent &evt);
 
   /** @brief Finds the position and direction of the clusters.
    * @arg clust a SciFiCluster
-   * @arg modules the MICE modules
    */
-  void construct(SciFiCluster *clust, std::vector<const MiceModule*> modules);
+  void process_cluster(SciFiCluster *clust);
 
-  Hep3Vector get_reference_frame_pos(int tracker, std::vector<const MiceModule*> modules);
+  ThreeVector get_reference_frame_pos(int tracker);
+
+  bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
+
+  std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt);
+
+  void make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds);
+
+  const MiceModule* find_plane(int tracker, int station, int plane);
+
+  // Set relative position & channel number for the Kalman Filter.
+  // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
+  // with the displacement of the station centre subtracted.
+  void construct(SciFiCluster *clust, const MiceModule* this_plane,
+                 ThreeVector &dir, ThreeVector &tracker_ref_frame_pos, double &alpha);
 
  private:
 
   int _size_exception;
 
   double _min_npe;
+
+  std::vector<const MiceModule*> _modules;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif

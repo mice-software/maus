@@ -21,53 +21,54 @@
 namespace MAUS {
 
 
-  class MyOutputter : public OutputBase<int> {
-  public:
-    MyOutputter() : OutputBase<int>("TestClass") {}
-    MyOutputter(const MyOutputter& mr) : OutputBase<int>(mr) {}
-    virtual ~MyOutputter() {}
+  class MyOutputter : public OutputBase<int*> {
+    public:
+      MyOutputter() : OutputBase<int*>("TestClass") {}
+      MyOutputter(const MyOutputter& mr) : OutputBase<int*>(mr) {}
+      virtual ~MyOutputter() {}
 
-  private:
-    virtual void _birth(const std::string&) {}
-    virtual void _death() {}
+    private:
+      virtual void _birth(const std::string&) {}
+      virtual void _death() {}
 
-    virtual bool _save(int* i) {
-      return *i == 27? true : false;
-    }
+      virtual bool _save(int* i) {
+        if (!i) { throw NullInputException(_classname); }
+        return *i == 27? true : false;
+      }
 
-  private:
-    FRIEND_TEST(OutputBaseTest, TestConstructor);
-    FRIEND_TEST(OutputBaseTest, TestCopyConstructor);
+    private:
+      FRIEND_TEST(OutputBaseTest, TestConstructor);
+      FRIEND_TEST(OutputBaseTest, TestCopyConstructor);
   };
 
   class MyOutputter_squeal : public MyOutputter {
-  public:
-    MyOutputter_squeal() : MyOutputter() {}
+    public:
+      MyOutputter_squeal() : MyOutputter() {}
 
-  private:
-    virtual bool _save(int* i) {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _save",
-		   "int* _save(int* t) const");
-    }
+    private:
+      virtual bool _save(int* i) {
+        throw Squeal(Squeal::recoverable,
+           "Expected Test Squeal in _save",
+           "int* _save(int* t) const");
+      }
   };
 
   class MyOutputter_exception : public MyOutputter {
-  public:
-    MyOutputter_exception() : MyOutputter() {}
+    public:
+      MyOutputter_exception() : MyOutputter() {}
 
-  private:
-    virtual bool _save(int* i) {
-      throw std::exception();
-    }
+    private:
+      virtual bool _save(int* i) {
+        throw std::exception();
+      }
   };
 
   class MyOutputter_otherexcept : public MyOutputter {
-  public:
-    MyOutputter_otherexcept() : MyOutputter() {}
+    public:
+      MyOutputter_otherexcept() : MyOutputter() {}
 
-  private:
-    virtual bool _save(int* i) {throw 17;}
+    private:
+      virtual bool _save(int* i) {throw 17;}
   };
 
   TEST(OutputBaseTest, TestConstructor) {
@@ -94,8 +95,8 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<<"Fail: Birth function failed. Check ModuleBaseTest"
-	<< std::endl;
+        <<"Fail: Birth function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
@@ -106,12 +107,12 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<<"Fail: Death function failed. Check ModuleBaseTest"
-	<< std::endl;
+        <<"Fail: Death function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
-  TEST(OutputBaseTest, TestSave) {
+  TEST(OutputBaseTest, TestSaveSpill) {
     MyOutputter mm;
 
     int* i1 = new int(27);
@@ -127,19 +128,8 @@ namespace MAUS {
 
     /////////////////////////////////////////////////////
     MyOutputter mm2;
-    try {
-      int* dub = 0;
-      mm2.save(dub);
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
-    }
-    catch(NullInputException& e) {}
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type NullInputException to be thrown"
-	<< std::endl;
-    }
+    int* dub = 0;
+    ASSERT_FALSE(mm2.save(dub));
     /////////////////////////////////////////////////////
     MyOutputter_squeal mm_s;
     try {
@@ -147,8 +137,8 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
-	<< std::endl;
+        << "Fail: Squeal should have been handled"
+        << std::endl;
     }
 
     /////////////////////////////////////////////////////
@@ -158,8 +148,8 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
-	<< std::endl;
+        << "Fail: Exception should have been handled"
+        << std::endl;
     }
 
     /////////////////////////////////////////////////////
@@ -167,18 +157,17 @@ namespace MAUS {
     try {
       mm_oe.save(i1);
       ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
+        << "Fail: No exception thrown"
+        << std::endl;
     }
     catch(UnhandledException& e) {}
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
+        << "Fail: Expected exception of type UnhandledException to be thrown"
+        << std::endl;
     }
 
     delete i1;
     delete i2;
   }
-
 }// end of namespace
