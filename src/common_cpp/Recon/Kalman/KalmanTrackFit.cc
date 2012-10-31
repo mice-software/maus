@@ -40,6 +40,7 @@ bool sort_by_id(SciFiCluster *a, SciFiCluster *b ) {
 //
 void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) {
   int num_tracks = straight_tracks.size();
+  KalmanMonitor monitor;
 
   for ( int i = 0; i < num_tracks; ++i ) {
     std::vector<KalmanSite> sites;
@@ -79,8 +80,8 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
 
     track->compute_chi2(sites);
 
-    KalmanMonitor monitor;
-    monitor.save(sites);
+
+    monitor.fill(sites);
     // monitor.print_info(sites);
     delete track;
   }
@@ -91,6 +92,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
 //
 void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
   int num_tracks  = helical_tracks.size();
+  KalmanMonitor monitor;
 
   for ( int i = 0; i < num_tracks; ++i ) {
     std::vector<KalmanSite> sites;
@@ -129,8 +131,7 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack> helical_tracks) {
 
     track->compute_chi2(sites);
 
-    KalmanMonitor monitor;
-    monitor.save(sites);
+    monitor.fill(sites);
     // monitor.print_info(sites);
     delete track;
   }

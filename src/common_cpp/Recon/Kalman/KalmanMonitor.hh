@@ -33,6 +33,10 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"
+#include "TH1.h"
+#include "TF1.h"
+#include "TH2F.h"
+#include "TH1F.h"
 
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
@@ -44,12 +48,51 @@ class KalmanMonitor {
 
   ~KalmanMonitor();
 
-  void save(std::vector<KalmanSite> const &sites);
+  void fill(std::vector<KalmanSite> const &sites);
 
   void print_info(std::vector<KalmanSite> const &sites);
 
  private:
   std::vector<double> _alpha_meas, _site, _alpha_projected;
+
+   TH2F *pull_hist;
+   TH2F *pull2_hist;
+
+   TH2F *x_proj_h;
+   TH2F *y_proj_h;
+   TH2F *px_proj_h;
+   TH2F *py_proj_h;
+   TH2F *pz_proj_h;
+
+   TH2F *x_filt_h;
+   TH2F *y_filt_h;
+   TH2F *px_filt_h;
+   TH2F *py_filt_h;
+   TH2F *pz_filt_h;
+
+   TH2F *x_smooth_h;
+   TH2F *y_smooth_h;
+   TH2F *px_smooth_h;
+   TH2F *py_smooth_h;
+   TH2F *pz_smooth_h;
+///////////////
+   TH1F *x_proj_h1;
+   TH1F *y_proj_h1;
+   TH1F *px_proj_h1;
+   TH1F *py_proj_h1;
+   TH1F *pz_proj_h1;
+
+   TH1F *x_filt_h1;
+   TH1F *y_filt_h1;
+   TH1F *px_filt_h1;
+   TH1F *py_filt_h1;
+   TH1F *pz_filt_h1;
+
+   TH1F *x_smooth_h1;
+   TH1F *y_smooth_h1;
+   TH1F *px_smooth_h1;
+   TH1F *py_smooth_h1;
+   TH1F *pz_smooth_h1;
 };
 
 } // ~namespace MAUS

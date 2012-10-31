@@ -21,20 +21,27 @@
 namespace MAUS {
 
 KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
-                             _mass(0.), _momentum(0.), _conv_factor(0.),
-                             _active_radius(150.), _channel_width(1.4945) {
+                             _mass(0.), _momentum(0.),
+                             _active_radius(150.) {
+  // Measurement equation.
   _H.ResizeTo(2, 5);
   _H.Zero();
+  // Propagator.
   _F.ResizeTo(5, 5);
   _F.Zero();
+  // Back transport.
   _A.ResizeTo(5, 5);
   _A.Zero();
+  // Measurement error.
   _V.ResizeTo(2, 2);
   _V.Zero();
+  // Kalman gain.
   _K.ResizeTo(5, 2);
   _K.Zero();
+  // MCS error.
   _Q.ResizeTo(5, 5);
   _Q.Zero();
+  // Alignment
 }
 
 //
@@ -237,10 +244,11 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
       break;
     case 2 : // SciFi
       double alpha = (a_site->get_measurement())(0, 0);
+      double pitch = a_site->get_pitch();
       double l = pow(_active_radius*_active_radius -
-                 (alpha*_channel_width)*(alpha*_channel_width), 0.5);
+                 (alpha*pitch)*(alpha*pitch), 0.5);
       if ( l != l ) l = 150.;
-      sigma_beta = (l/_channel_width)/sqrt(12.);
+      sigma_beta = (l/pitch)/sqrt(12.);
   }
 
   double sigma_alpha = 1.0/sqrt(12.);
@@ -254,12 +262,12 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
   CLHEP::Hep3Vector dir = a_site->get_direction();
   double dx = dir.x();
   double dy = dir.y();
-  double conv_factor = a_site->get_conversion_factor();
+  double pitch = a_site->get_pitch();
 
-  if ( conv_factor ) {
+  if ( pitch ) {
     _H.Zero();
-    _H(0, 0) =  -dy/conv_factor;
-    _H(0, 2) =  dx/conv_factor;
+    _H(0, 0) =  -dy/pitch;
+    _H(0, 2) =  dx/pitch;
   } else {
     _H.Zero();
   }
