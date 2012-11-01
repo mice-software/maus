@@ -1,0 +1,169 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
+
+#include <string>
+
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
+namespace MAUS {
+
+template <class ObjectType>
+ObjectProcessor<ObjectType>::ObjectProcessor()
+    : _throws_if_unknown_branches(true), _items() {
+}
+
+template <class ObjectType>
+template <class ChildType>
+void ObjectProcessor<ObjectType>::RegisterPointerBranch(
+                std::string branch_name,
+                ProcessorBase<ChildType>* child_processor,
+                ChildType* (ObjectType::*GetMethod)() const,
+                void (ObjectType::*SetMethod)(ChildType* value),
+                bool is_required) {
+    BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>
+              (branch_name, child_processor, GetMethod, SetMethod, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+template <class ChildType>
+void ObjectProcessor<ObjectType>::RegisterPointerReference(
+                std::string branch_name,
+                ProcessorBase<ChildType>* child_processor,
+                ChildType* (ObjectType::*GetMethod)() const,
+                void (ObjectType::*SetMethod)(ChildType* value),
+                bool is_required) {
+    BaseItem<ObjectType>* item = new PointerRefItem<ObjectType, ChildType>
+              (branch_name, child_processor, GetMethod, SetMethod, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+template <class ChildType>
+void ObjectProcessor<ObjectType>::RegisterValueBranch(
+                std::string branch_name,
+                ProcessorBase<ChildType>* child_processor,
+                ChildType (ObjectType::*GetMethod)() const,
+                void (ObjectType::*SetMethod)(ChildType value),
+                bool is_required) {
+    BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
+              (branch_name, child_processor, GetMethod, SetMethod, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+void ObjectProcessor<ObjectType>::RegisterConstantBranch(
+                    std::string branch_name,
+                    Json::Value child_value,
+                    bool is_required) {
+    BaseItem<ObjectType>* item = new ConstantItem<ObjectType>
+              (branch_name, child_value, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+    if (json_object.type() != Json::objectValue) {
+        std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to pass a json "+tp+" type as an object",
+                     "ObjectProcessor<ObjectType>::JsonToCpp"));
+    }
+    if (_throws_if_unknown_branches && HasUnknownBranches(json_object)) {
+        throw(Squeal(Squeal::recoverable,
+                     "Failed to recognise all json properties",
+                     "ObjectProcessor<ObjectType>::JsonToCpp"));
+    }
+    ObjectType* cpp_object = new ObjectType();
+    for (my_iter it = _items.begin(); it != _items.end(); ++it) {
+        try {
+            it->second->SetCppChild(json_object, *cpp_object);
+        } catch(Squeal squee) {
+            delete cpp_object;
+            squee.SetMessage("In branch "+it->first+"\n"
+                            +squee.GetMessage());
+            throw squee;
+        }
+    }
+    return cpp_object;
+}
+
+template <class ObjectType>
+Json::Value* ObjectProcessor<ObjectType>::CppToJson
+                              (const ObjectType& cpp_object) {
+    return CppToJson(cpp_object, "");
+}
+
+template <class ObjectType>
+Json::Value* ObjectProcessor<ObjectType>::CppToJson
+                              (const ObjectType& cpp_object, std::string path) {
+    Json::Value* json_object = new Json::Value(Json::objectValue);
+    JsonWrapper::SetPath(*json_object, path);
+    for (my_iter it = _items.begin(); it != _items.end(); ++it) {
+        try {
+            it->second->SetJsonChild(cpp_object, *json_object);
+        } catch(Squeal squee) {
+            delete json_object;
+            squee.SetMessage("In branch "+it->first+"\n"
+                            +squee.GetMessage());
+            throw squee;
+        }
+    }
+    
+    return json_object;
+}
+
+template <class ObjectType>
+ObjectProcessor<ObjectType>::~ObjectProcessor() {
+    for (my_iter it = _items.begin(); it != _items.end(); ++it) {
+        delete it->second;
+    }
+}
+
+template <class ObjectType>
+bool ObjectProcessor<ObjectType>::HasUnknownBranches
+                                              (const Json::Value& value) const {
+    if (!value.isObject()) {
+        std::string tp = JsonWrapper::ValueTypeToString(value.type());
+        throw(Squeal(Squeal::recoverable,
+                     "Comparison value must be a json object type - found "+tp,
+                     "ObjectProcessor::HasUnknownBranches(...)"));
+    }
+    Json::Value::Members members = value.getMemberNames();
+    for (Json::Value::Members::iterator it = members.begin();
+                                                    it != members.end(); ++it) {
+        if (_items.find(*it) == _items.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+template <class ObjectType>
+void ObjectProcessor<ObjectType>::SetThrowsIfUnknownBranches(bool will_throw) {
+    _throws_if_unknown_branches = will_throw;
+}
+
+template <class ObjectType>
+bool ObjectProcessor<ObjectType>::GetThrowsIfUnknownBranches() const {
+    return _throws_if_unknown_branches;
+}
+}  // namespace MAUS
+#endif  // #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSOR_INL_HH_
+

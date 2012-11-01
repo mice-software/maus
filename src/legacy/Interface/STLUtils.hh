@@ -106,6 +106,17 @@ std::string ToStringP(TEMP_CLASS value, int precision);
 template <class TEMP_CLASS>
 std::string ToString(TEMP_CLASS value);
 
+/** Convert value from a std::string.
+ *
+ *  Convert from string type to Template type.
+ * 
+ *  The following operations must be defined for TEMP_CLASS
+ *    - std::istream& operator>>(Temp, std::istream&)
+ */ 
+template <class TEMP_CLASS>
+TEMP_CLASS FromString(std::string value);
+
+
 /** Find and replace environment variables in a string
  *
  *  Search through a string looking for environment variables with format like
@@ -152,6 +163,15 @@ template <class TEMP_CLASS> std::string ToString
   ss << value;
   return ss.str();
 }
+
+template <class TEMP_CLASS>
+TEMP_CLASS FromString(std::string value) {
+  std::stringstream ss(value);
+  TEMP_CLASS out;
+  ss >> out;
+  return out;
+}
+
 }
 
 /**  A macro to disallow the copy constructor and operator= functions

@@ -261,5 +261,44 @@ TEST(JsonWrapperTest, JsonValueTypeToStringTest) {
   EXPECT_EQ(JsonWrapper::ValueTypeToString(Json::nullValue), "nullValue");
 }
 
+TEST(JsonWrapperTest, PathHandlingTest) {
+  Json::Value test("test_value");
+  EXPECT_EQ(JsonWrapper::GetPath(test), "");
+  JsonWrapper::SetPath(test, "#test");
+  EXPECT_EQ(JsonWrapper::GetPath(test), "#test");
+  JsonWrapper::AppendPath(test, "append");
+  EXPECT_EQ(JsonWrapper::GetPath(test), "#test/append");
+  JsonWrapper::AppendPath(test, 1);
+  EXPECT_EQ(JsonWrapper::GetPath(test), "#test/append/1");
+  EXPECT_THROW(JsonWrapper::AppendPath(test, "append/"), Squeal);
+  Json::Value test_2;
+  JsonWrapper::AppendPath(test_2, "append");
+  EXPECT_EQ(JsonWrapper::GetPath(test_2), "#append");
+  
+}
+
+TEST(JsonWrapperTest, PathDereferenceTest) {
+  Json::Value test(Json::objectValue);
+  test["object_0"] = Json::Value(Json::arrayValue);
+  test["object_0"][Json::Value::UInt(0)] = Json::Value("test_0");
+  test["object_0"][Json::Value::UInt(1)] = Json::Value("test_1");
+  test["object_1"] = Json::Value(Json::arrayValue);
+  test["object_1"][Json::Value::UInt(0)] = Json::Value();
+  test["object_1"][Json::Value::UInt(1)] = Json::Value("test_2");
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, ""), test);
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "#object_0/0"), Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "object_0/0"), Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "#object_0/0/"), Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "#object_0/1"), Json::Value("test_1"));
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "#object_1/0"), Json::Value());
+  EXPECT_EQ(JsonWrapper::DereferencePath(test, "#object_1/1"), Json::Value("test_2"));
+  // not an object or array
+  Json::Value not_branch(1);
+  EXPECT_THROW(JsonWrapper::DereferencePath(not_branch, "#1"), Squeal);
+  // branch does not exist
+  EXPECT_THROW(JsonWrapper::DereferencePath(test, "#no_branch"), Squeal);
+  // array element does not exist
+  EXPECT_THROW(JsonWrapper::DereferencePath(test, "#object_0/2"), Squeal);
+}
 }
 

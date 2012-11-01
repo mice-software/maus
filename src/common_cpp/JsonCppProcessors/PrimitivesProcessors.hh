@@ -38,6 +38,11 @@ class DoubleProcessor : public ProcessorBase<double> {
     /** Convert from double to Json::numericValue
      */
     virtual Json::Value* CppToJson(const double& cpp_double);
+
+    /** Convert from double to Json::numericValue passing path
+     */
+    virtual Json::Value* CppToJson(const double& cpp_double, std::string path);
+
 };
 
 /** Processor to convert between C++ std::string and Json::stringValue
@@ -53,6 +58,12 @@ class StringProcessor : public ProcessorBase<std::string> {
     /** Convert from std::string to Json::stringValue
      */
     virtual Json::Value* CppToJson(const std::string& cpp_string);
+
+
+    /** Convert from std::string to Json::stringValue passing path information
+     */
+    virtual Json::Value* CppToJson
+                              (const std::string& cpp_string, std::string path);
 };
 
 /** Processor to convert between C++ int and Json::intValue
@@ -68,6 +79,10 @@ class IntProcessor : public ProcessorBase<int> {
     /** Convert from int to Json::intValue
      */
     virtual Json::Value* CppToJson(const int& cpp_int);
+
+    /** Convert from int to Json::intValue passing path information
+     */
+    virtual Json::Value* CppToJson(const int& cpp_int, std::string path);
 };
 
 /** Processor to convert between C++ uint and Json::intValue or Json::uintValue
@@ -83,6 +98,12 @@ class UIntProcessor : public ProcessorBase<unsigned int> {
     /** Convert from unsigned int to Json::uintValue
      */
     virtual Json::Value* CppToJson(const unsigned int& cpp_double);
+
+    /** Convert from unsigned int to Json::uintValue passing path information
+     */
+    virtual Json::Value* CppToJson
+                             (const unsigned int& cpp_double, std::string path);
+
 };
 
 /** Processor to convert between C++ nool and Json::boolValue
@@ -95,11 +116,16 @@ class BoolProcessor : public ProcessorBase<bool> {
      */
     virtual bool* JsonToCpp(const Json::Value& json_bool);
 
-    /** Convert from bool to Json::boolValue
-     *
-     *  If json_bool cannot be converted to a Json::boolValue, throw a Squeal
+
+    /** Convert from bool to Json::boolValue passing
      */
     virtual Json::Value* CppToJson(const bool& cpp_bool);
+
+
+    /** Convert from bool to Json::boolValue passing path information
+     */
+    virtual Json::Value* CppToJson(const bool& cpp_bool, std::string path);
+
 };
 }
 

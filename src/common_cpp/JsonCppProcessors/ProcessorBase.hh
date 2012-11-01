@@ -59,9 +59,6 @@ class IProcessor {
  *  data. Json data is represented by Json::Value while cpp data is represented
  *  by CppRepresentation type.
  *
- *  This class is provided because at some point I want to provide some more
- *  sophisticated error handling.
- *
  */
 template <class CppRepresentation>
 class ProcessorBase : IProcessor<CppRepresentation> {
@@ -71,8 +68,24 @@ class ProcessorBase : IProcessor<CppRepresentation> {
     virtual Json::Value* CppToJson
                               (const CppRepresentation& cpp_representation) = 0;
 
+    /** Convert from C++ to Json passing additional path information
+     *
+     *  When converting from json to C++ it is necessary to pass path
+     *  information in order to set up json references. Overload this method in
+     *  order to handle path (=> references) in this and child instances.
+     */
+    virtual Json::Value* CppToJson
+              (const CppRepresentation& cpp_representation, std::string path);
+
   protected:
+    std::string _path;
 };
+
+template <class CppRepresentation>
+Json::Value* ProcessorBase<CppRepresentation>::CppToJson
+              (const CppRepresentation& cpp_representation, std::string JsonID) {
+    return CppToJson(cpp_representation);
+}
 }
 
 #endif

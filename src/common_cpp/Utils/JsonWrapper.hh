@@ -179,6 +179,41 @@ class JsonWrapper {
    */
   static Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
 
+  /** @brief Get the path from a json value
+   *
+   *  Path is stored in the comment field
+   */
+  static std::string GetPath(Json::Value json);
+
+  /** @brief Set the path to a json value
+   *
+   *  Path is stored in the comment field
+   */
+  static void SetPath(Json::Value& json, std::string path);
+
+  /** @brief Append the path to a json value
+   *
+   *  Path is stored in the comment field
+   *  \param json Json::Value to which the path should be appended
+   *  \param branch_name name of a branch in a Json object
+   */
+  static void AppendPath(Json::Value& json, std::string branch_name);
+
+  /** @brief Append the path to a json value
+   *
+   *  Path is stored in the comment field
+   *  \param json Json::Value to which the path should be appended
+   *  \param array_index index of a branch in a Json array
+   */
+  static void AppendPath(Json::Value& json, size_t array_index);
+
+  /** @brief Return the json value corresponding to a given path
+   *
+   *  Return the json value located at a given path. If the path cannot be
+   *  accessed, throw a Squeal.
+   */
+  static Json::Value& DereferencePath(Json::Value& json, std::string path);
+
  private:
 
   JsonWrapper();
