@@ -176,9 +176,13 @@ class PointerRefItem : public BaseItem<ParentType> {
             }
         }
         Json::Value child_json = parent_json[_branch];
-        ChildType* child_cpp = _processor->JsonToCpp(child_json);
+        std::string data_path = JsonWrapper::GetProperty
+                      (child_json, "$ref", JsonWrapper::stringValue).asString();
+        typedef ReferenceResolver::FullyTypedJsonToCppResolver<ParentType, ChildType> Res;
+        Res* res = new Res(data_path, _setter, &parent_cpp);
+        ReferenceResolver::JsonToCppManager::GetInstance().AddReference(res);
         // syntax is (_object.*_function)(args);
-        (parent_cpp.*_setter)(child_cpp);
+        (parent_cpp.*_setter)(NULL);
     }
 
     /** SetJsonChild fills the branch with a Null json value and stores the
@@ -287,6 +291,7 @@ class PointerItem : public BaseItem<ParentType> {
         }
         Json::Value child_json = parent_json[_branch];
         ChildType* child_cpp = _processor->JsonToCpp(child_json);
+        ReferenceResolver::ChildTypedJsonToCppResolver<ChildType>::AddData(JsonWrapper::GetPath(parent_json[_branch]), child_cpp);
         // syntax is (_object.*_function)(args);
         (parent_cpp.*_setter)(child_cpp);
     }
@@ -311,10 +316,10 @@ class PointerItem : public BaseItem<ParentType> {
         std::string path = BaseItem<ParentType>::GetPath(parent_json);
         Json::Value* child_json = _processor->CppToJson(*child_cpp, path);
         parent_json[_branch] = *child_json;
-        // slightly worrying, the path doesn't seem to get pulled through here
-        JsonWrapper::SetPath(parent_json[_branch], path);
-        ReferenceResolver::TypedCppToJsonResolver<ChildType>::AddData(child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
         delete child_json;
+        // slightly worrying, the path doesn't seem to get pulled through here
+        BaseItem<ParentType>::SetPath(parent_json);
+        ReferenceResolver::TypedCppToJsonResolver<ChildType>::AddData(child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
     }
 
     /** Get the branch name */
@@ -398,6 +403,8 @@ class ValueItem : public BaseItem<ParentType> {
         Json::Value* child_json = _processor->CppToJson(child_cpp, path);
         parent_json[_branch] = *child_json;
         delete child_json;
+        // slightly worrying, the path doesn't seem to get pulled through here
+        BaseItem<ParentType>::SetPath(parent_json);
     }
 
     /** Get the branch name */

@@ -73,7 +73,16 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
 template <class ArrayContents>
 Json::Value* PointerArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents*>& cpp_array) {
+    return CppToJson(cpp_array, "");
+}
+
+
+template <class ArrayContents>
+Json::Value* PointerArrayProcessor<ArrayContents>::
+                      CppToJson(const std::vector<ArrayContents*>& cpp_array,
+                                std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
+    JsonWrapper::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
@@ -82,9 +91,10 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             if (cpp_array[i] == NULL) {
                 data = new Json::Value();  // that is a NULL value
             } else {
-                data = _proc->CppToJson(*cpp_array[i]);
+                data = _proc->CppToJson(*cpp_array[i], GetPath(path, i));
             }
-            (*json_array)[i] = *data; // json copies memory here
+            (*json_array)[i] = *data; // json copies memory here but not path
+            JsonWrapper::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -93,6 +103,12 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
         }
     }
     return json_array;
+}
+
+template <class ArrayContents>
+std::string PointerArrayProcessor<ArrayContents>::GetPath
+                                              (std::string path, size_t index) {
+    return path+"/"+STLUtils::ToString(index);
 }
 ///////////
 
@@ -145,13 +161,23 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
 template <class ArrayContents>
 Json::Value* ValueArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents>& cpp_array) {
+    return CppToJson(cpp_array, "");
+}
+
+template <class ArrayContents>
+Json::Value* ValueArrayProcessor<ArrayContents>::
+                      CppToJson(const std::vector<ArrayContents>& cpp_array,
+                                std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
+    JsonWrapper::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
-            Json::Value* data = _proc->CppToJson(cpp_array[i]);
-            (*json_array)[i] = *data; // json copies memory here
+            Json::Value* data = _proc->CppToJson(cpp_array[i],
+                                                 GetPath(path, i));
+            (*json_array)[i] = *data; // json copies memory but not path
+            JsonWrapper::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -160,6 +186,12 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
         }
     }
     return json_array;
+}
+
+template <class ArrayContents>
+std::string ValueArrayProcessor<ArrayContents>::GetPath
+                                              (std::string path, size_t index) {
+    return path+"/"+STLUtils::ToString(index);
 }
 }
 

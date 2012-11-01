@@ -20,6 +20,7 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 
 namespace MAUS {
@@ -38,6 +39,9 @@ TEST(PrimitivesProcessorsTest, DoubleCppToJson) {
   Json::Value* value_json = proc.CppToJson(value_cpp);
   EXPECT_EQ(value_json->asDouble(), value_cpp);
   delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  delete value_json;
 }
 
 TEST(PrimitivesProcessorsTest, BoolJsonToCpp) {
@@ -53,6 +57,9 @@ TEST(PrimitivesProcessorsTest, BoolCppToJson) {
   bool value_cpp = true;
   Json::Value* value_json = proc.CppToJson(value_cpp);
   EXPECT_EQ(value_json->asBool(), value_cpp);
+  delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -70,6 +77,9 @@ TEST(PrimitivesProcessorsTest, StringCppToJson) {
   Json::Value* value_json = proc.CppToJson(value_cpp);
   EXPECT_EQ(value_json->asString(), value_cpp);
   delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  delete value_json;
 }
 
 TEST(PrimitivesProcessorsTest, IntJsonToCpp) {
@@ -85,6 +95,9 @@ TEST(PrimitivesProcessorsTest, IntCppToJson) {
   int value_cpp = 1;
   Json::Value* value_json = proc.CppToJson(value_cpp);
   EXPECT_EQ(value_json->asInt(), value_cpp);
+  delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -105,6 +118,9 @@ TEST(PrimitivesProcessorsTest, UIntCppToJson) {
   unsigned int value_cpp = 1.;
   Json::Value* value_json = proc.CppToJson(value_cpp);
   EXPECT_EQ(value_json->asUInt(), value_cpp);
+  delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
   delete value_json;
 }
 }

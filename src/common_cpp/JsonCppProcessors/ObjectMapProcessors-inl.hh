@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+
 namespace MAUS {
 
 template <class MapSecond>
@@ -62,21 +64,36 @@ std::map<std::string, MapSecond>* ObjectMapValueProcessor<MapSecond>::JsonToCpp
 template <class MapSecond>
 Json::Value* ObjectMapValueProcessor<MapSecond>::CppToJson
                              (const std::map<std::string, MapSecond>& cpp_map) {
+    return CppToJson(cpp_map, "");
+}
+
+template <class MapSecond>
+Json::Value* ObjectMapValueProcessor<MapSecond>::CppToJson
+                             (const std::map<std::string, MapSecond>& cpp_map,
+                              std::string path) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
+    JsonWrapper::SetPath(*json_object, path);
     // pull this out of the loop def because it is a syntactic mouthful...
     typename std::map<std::string, MapSecond>::const_iterator it;
     for (it = cpp_map.begin(); it != cpp_map.end(); ++it) {
         Json::Value* json_out;
+        std::string child_path = GetPath(path, it->first);
         try {
-            json_out = _proc->CppToJson(it->second);
+            json_out = _proc->CppToJson(it->second, child_path);
         } catch(Squeal squee) {
             delete json_object;
             throw squee;
         }
         (*json_object)[it->first] = *json_out;
+        JsonWrapper::SetPath((*json_object)[it->first], child_path);
         delete json_out;
     }
     return json_object;
+}
+template <class MapSecond>
+std::string ObjectMapValueProcessor<MapSecond>::
+                                 GetPath(std::string path, std::string branch) {
+    return path+"/"+branch;
 }
 }
 #endif

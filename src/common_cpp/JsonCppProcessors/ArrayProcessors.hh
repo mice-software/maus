@@ -67,6 +67,30 @@ class PointerArrayProcessor : public ProcessorBase<std::vector<ArrayContents*> >
      *  the json representation.
      */
     Json::Value* CppToJson(const std::vector<ArrayContents*>& cpp_array);
+
+
+    /** Convert from a C++ vector type to a json array type.
+     *
+     *  @param cpp_array C++ vector
+     *  @param path path to this element
+     *
+     *  @returns Json::Value arrayValue with vector contents in Json
+     *  representation. As with all processors, caller has ownership of this
+     *  memory. NULL values in the cpp representation always give NULL values in
+     *  the json representation.
+     */
+    Json::Value* CppToJson(const std::vector<ArrayContents*>& cpp_array,
+                           std::string path);
+
+    /** Return string for ith array item given array path 
+     *
+     *  @param path json path to the array
+     *  @param index position of the element in the array
+     *
+     *  @returns string like path+"/"+index
+     */
+    std::string GetPath(std::string path, size_t index);
+
   private:
     ProcessorBase<ArrayContents>* _proc;
 };
@@ -112,6 +136,28 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
      *  memory.
      */
     Json::Value* CppToJson(const std::vector<ArrayContents>& cpp_array);
+
+    /** Convert from a C++ vector type to a json array type.
+     *
+     *  @param cpp_array C++ vector
+     *  @param path path to this element
+     *
+     *  @returns Json::Value arrayValue with vector contents in Json
+     *  representation. As with all processors, caller has ownership of this
+     *  memory.
+     */
+    Json::Value* CppToJson(const std::vector<ArrayContents>& cpp_array,
+                           std::string path);
+
+    /** Return string for ith array item given array path 
+     *
+     *  @param path json path to the array
+     *  @param index position of the element in the array
+     *
+     *  @returns string like path+"/"+index
+     */
+    std::string GetPath(std::string path, size_t index);
+
   private:
     ProcessorBase<ArrayContents>* _proc;
 };

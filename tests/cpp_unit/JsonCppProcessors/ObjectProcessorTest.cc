@@ -231,5 +231,13 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
   EXPECT_FALSE(json_value->isMember("branch_b"));
   delete json_value;
 }
+
+TEST_F(ObjectProcessorTest, PathTest) {
+  Json::Value* json_value = req_proc.CppToJson(test, "#path");
+  EXPECT_EQ(JsonWrapper::GetPath((*json_value)), "#path");
+  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_a"]), "#path/branch_a");
+  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_b"]), "#path/branch_b");
+  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_c"]), "#path/branch_c");
+}
 }
 

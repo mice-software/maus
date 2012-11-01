@@ -50,7 +50,7 @@ class IProcessor {
      *  memory.
      */
     virtual Json::Value* CppToJson
-                              (const CppRepresentation& cpp_representation) = 0;
+            (const CppRepresentation& cpp_representation, std::string path) = 0;
 };
 
 /** @class ProcessorBase
@@ -65,8 +65,6 @@ class ProcessorBase : IProcessor<CppRepresentation> {
   public:
     virtual CppRepresentation* JsonToCpp
                                    (const Json::Value& json_representation) = 0;
-    virtual Json::Value* CppToJson
-                              (const CppRepresentation& cpp_representation) = 0;
 
     /** Convert from C++ to Json passing additional path information
      *
@@ -75,17 +73,10 @@ class ProcessorBase : IProcessor<CppRepresentation> {
      *  order to handle path (=> references) in this and child instances.
      */
     virtual Json::Value* CppToJson
-              (const CppRepresentation& cpp_representation, std::string path);
-
+            (const CppRepresentation& cpp_representation, std::string path) = 0;
   protected:
     std::string _path;
 };
-
-template <class CppRepresentation>
-Json::Value* ProcessorBase<CppRepresentation>::CppToJson
-              (const CppRepresentation& cpp_representation, std::string JsonID) {
-    return CppToJson(cpp_representation);
-}
 }
 
 #endif

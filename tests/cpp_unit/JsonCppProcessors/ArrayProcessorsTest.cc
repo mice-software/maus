@@ -70,7 +70,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppNullTest) {
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value());
     std::vector<double*>* vec_out = proc.JsonToCpp(json_array);
-    EXPECT_EQ(vec_out->size(), 1);
+    EXPECT_EQ(vec_out->size(), size_t(1));
     double* null_double = NULL;
     EXPECT_EQ((*vec_out)[0], null_double);
     delete vec_out;
@@ -103,6 +103,13 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonTest) {
     ASSERT_EQ(vec.size(), json_array->size());
     for (int i = 0; i < 3; ++i) {
         EXPECT_DOUBLE_EQ( *(vec[i]), (*json_array)[i].asDouble() );
+    }
+    delete json_array;
+    json_array = proc.CppToJson(vec, "path");
+    EXPECT_EQ(JsonWrapper::GetPath(*json_array), "path");
+    for (int i = 0; i < 3; ++i) {
+        std::string path = "path/"+STLUtils::ToString(i);
+        EXPECT_EQ(JsonWrapper::GetPath((*json_array)[i]), path);
         delete vec[i];
     }
     delete json_array;
@@ -118,6 +125,14 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonNullTest) {
     Json::Value* test_value = proc.CppToJson(vec);
     for (int i = 0; i < 3; ++i) {
         EXPECT_EQ((*test_value)[i], Json::Value());
+    }
+    delete test_value;
+    test_value = proc.CppToJson(vec, "path");
+    EXPECT_EQ(JsonWrapper::GetPath(*test_value), "path");
+    for (int i = 0; i < 3; ++i) {
+        std::string path = "path/"+STLUtils::ToString(i);
+        EXPECT_EQ( JsonWrapper::GetPath((*test_value)[i]), path);
+        delete vec[i];
     }
     delete test_value;
 }
@@ -193,6 +208,14 @@ TEST(ArrayProcessorsTest, ValueArrayCppToJsonTest) {
         EXPECT_DOUBLE_EQ( vec[i], (*json_array)[i].asDouble() );
     }
     delete json_array;
+    json_array = proc.CppToJson(vec, "path");
+    EXPECT_EQ(JsonWrapper::GetPath(*json_array), "path");
+    for (int i = 0; i < 3; ++i) {
+        std::string path = "path/"+STLUtils::ToString(i);
+        EXPECT_EQ(JsonWrapper::GetPath((*json_array)[i]), path);
+    }
+    delete json_array;
+
 }
 }
 

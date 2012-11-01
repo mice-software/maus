@@ -28,5 +28,14 @@ CppToJsonManager& CppToJsonManager::GetInstance() {
 }
 
 CppToJsonManager* CppToJsonManager::_instance(NULL);
+
+JsonToCppManager& JsonToCppManager::GetInstance() {
+    if (_instance == NULL) {
+        _instance = new JsonToCppManager();
+    }
+    return *_instance;
+}
+
+JsonToCppManager* JsonToCppManager::_instance(NULL);
 }  // namespace ReferenceResolver
 }  // namespace MAUS

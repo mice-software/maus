@@ -40,7 +40,6 @@ Json::Value* DoubleProcessor::CppToJson
                                   (const double& cpp_double, std::string path) {
   Json::Value* json_double = new Json::Value(cpp_double);
   JsonWrapper::SetPath(*json_double, path);
-  std::cerr << "JSON DOUBLE PATH " << JsonWrapper::GetPath(*json_double) << " " << this << std::endl;
   return json_double;
 }
 
