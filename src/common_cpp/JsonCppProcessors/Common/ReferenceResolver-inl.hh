@@ -22,41 +22,40 @@
 
 namespace MAUS {
 namespace ReferenceResolver {
-
+namespace CppToJson {
 template <class ChildType>
-TypedCppToJsonResolver<ChildType>::TypedCppToJsonResolver
+TypedResolver<ChildType>::TypedResolver
 (ChildType* ref_cpp_address, std::string ref_json_address)
   : _cpp_pointer(ref_cpp_address), _json_pointer(ref_json_address) {
-  std::cerr << "TypedConstructor for " << _cpp_pointer << std::endl;
 }
 
 template <class ChildType>
-void TypedCppToJsonResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
+void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
     if (_data_hash.find(_cpp_pointer) == _data_hash.end()) {
         Json::Value& child = JsonWrapper::DereferencePath(json_root, _json_pointer);
         child = Json::Value();
     } else {
-        std::cerr << "Attempting to allocate new value to " << _json_pointer << std::endl;
         Json::Value& child = JsonWrapper::DereferencePath(json_root, _json_pointer);
         Json::Value reference_value(Json::objectValue);
         reference_value["$ref"] = _data_hash[_cpp_pointer]; // set json reference to point at json value 
         child = reference_value;
-        std::cerr << "Resolved " << _cpp_pointer << " as " << reference_value << std::endl;
     }
 }
 
 template <class ChildType>
-void TypedCppToJsonResolver<ChildType>::AddData(ChildType* data_cpp_address, std::string data_json_address) {
-    std::cerr << "AddData for " << data_cpp_address << " address " << data_json_address << std::endl;
+void TypedResolver<ChildType>::AddData(ChildType* data_cpp_address, std::string data_json_address) {
     _data_hash[data_cpp_address] = data_json_address;
 }
 
 template <class ChildType>
-void TypedCppToJsonResolver<ChildType>::ClearData() const {
+std::map<ChildType*, std::string> TypedResolver<ChildType>::_data_hash;
+
+template <class ChildType>
+void TypedResolver<ChildType>::ClearData() const {
     _data_hash = std::map<ChildType*, std::string>();
 }
 
-CppToJsonManager::~CppToJsonManager() {
+RefManager::~RefManager() {
     for (size_t i = 0; i < _references.size(); ++i) {
         _references[i]->ClearData();
         delete _references[i];
@@ -66,46 +65,43 @@ CppToJsonManager::~CppToJsonManager() {
     }
 }
 
-void CppToJsonManager::ResolveReferences(Json::Value& json_root) {
-    std::cerr << "Resolving " << std::endl;
+void RefManager::ResolveReferences(Json::Value& json_root) {
     for (size_t i = 0; i < _references.size(); ++i) {
         _references[i]->ResolveReferences(json_root);
     }
 }
 
-void CppToJsonManager::AddReference(CppToJsonResolver* reference) {
+void RefManager::AddReference(Resolver* reference) {
     if (reference == NULL) return;
     _references.push_back(reference);
 }
+}  // namespace CppToJson
 
 ///////////////////////////////////////////////////////////////
 
+namespace JsonToCpp {
 template <class ParentType, class ChildType>
-FullyTypedJsonToCppResolver<ParentType, ChildType>::FullyTypedJsonToCppResolver(
+FullyTypedResolver<ParentType, ChildType>::FullyTypedResolver(
       std::string ref_json_address,
-      FullyTypedJsonToCppResolver<ParentType, ChildType>::SetMethod cpp_setter,
+      FullyTypedResolver<ParentType, ChildType>::SetMethod cpp_setter,
       ParentType* ref_cpp_parent)
   : _cpp_setter(cpp_setter), _ref_json_address(ref_json_address),
     _ref_cpp_parent(ref_cpp_parent) {
-    std::cerr << "JsonToCpp Ref address " << ref_json_address << std::endl;
 }
 
 template <class ParentType, class ChildType>
-void FullyTypedJsonToCppResolver<ParentType, ChildType>::ResolveReferences() {
+void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
     std::map<std::string, ChildType*>& data_hash =
-                             ChildTypedJsonToCppResolver<ChildType>::_data_hash;
+                             ChildTypedResolver<ChildType>::_data_hash;
     if (data_hash.find(_ref_json_address) == data_hash.end()) {
-        std::cerr << "Setting cpp address for " << _ref_json_address << " to NULL" << std::endl;
         (*_ref_cpp_parent.*_cpp_setter)(NULL);
     } else {
-        std::cerr << "Setting cpp address for " << _ref_json_address << " to " << data_hash[_ref_json_address] << std::endl;
         (*_ref_cpp_parent.*_cpp_setter)(data_hash[_ref_json_address]);
     }
 }
 
 ////////////////////////////////////////////////////////////////
 
-namespace JsonToCpp {
 template <class ChildType>
 VectorResolver<ChildType>::VectorResolver(
                             std::string ref_json_address,
@@ -117,62 +113,51 @@ VectorResolver<ChildType>::VectorResolver(
 template <class ChildType>
 void VectorResolver<ChildType>::ResolveReferences() {
     std::map<std::string, ChildType*>& data_hash = 
-                             ChildTypedJsonToCppResolver<ChildType>::_data_hash;
+                             ChildTypedResolver<ChildType>::_data_hash;
     if (_index >= _vector.size())
         throw(Squeal(Squeal::recoverable,
                      "Index out of range while resolving pointer to array "+
                      _ref_json_address,
                      "VectorResolver<ChildType>::ResolverReferences"));
     if (data_hash.find(_ref_json_address) == data_hash.end()) {
-        std::cerr << "Setting cpp address for " << _ref_json_address << " to NULL" << std::endl;
         _vector[_index] = NULL;
     } else {
-        std::cerr << "Setting cpp address for " << _ref_json_address << " to " << data_hash[_ref_json_address] << std::endl;
         _vector[_index] = data_hash[_ref_json_address];
     }
 }
-}
-////////////////////////////////////////////////////////////////////
 
-template <class ChildType>
-void ChildTypedJsonToCppResolver<ChildType>::AddData(std::string data_json_address, ChildType* data_cpp_address) {
-    _data_hash[data_json_address] = data_cpp_address;
-    std::cerr << "JsonToCpp Data address " << data_json_address << std::endl;
-}
-
-template <class ChildType>
-void ChildTypedJsonToCppResolver<ChildType>::ClearData() const {
-    _data_hash = std::map<std::string, ChildType*>();
-}
-
-void JsonToCppManager::ResolveReferences() {
-    std::cerr << "Resolving " << std::endl;
+void RefManager::ResolveReferences() {
     for (size_t i = 0; i < _references.size(); ++i) {
         _references[i]->ResolveReferences();
     }
 }
 
-void JsonToCppManager::AddReference(JsonToCppResolver* reference) {
+void RefManager::AddReference(Resolver* reference) {
     if (reference == NULL) return;
     _references.push_back(reference);
 }
 
-JsonToCppManager::~JsonToCppManager() {
+RefManager::~RefManager() {
     for (size_t i = 0; i < _references.size(); ++i) {
         _references[i]->ClearData();
         delete _references[i];
     }
-    if (this == _instance) {
-        _instance = NULL;
-    }
 }
 
 template <class ChildType>
-std::map<ChildType*, std::string> TypedCppToJsonResolver<ChildType>::_data_hash;
+void ChildTypedResolver<ChildType>::AddData
+                  (std::string data_json_address, ChildType* data_cpp_address) {
+    _data_hash[data_json_address] = data_cpp_address;
+}
 
 template <class ChildType>
-std::map<std::string, ChildType*> 
-                             ChildTypedJsonToCppResolver<ChildType>::_data_hash;
+void ChildTypedResolver<ChildType>::ClearData() const {
+    _data_hash = std::map<std::string, ChildType*>();
+}
+
+template <class ChildType>
+std::map<std::string, ChildType*> ChildTypedResolver<ChildType>::_data_hash;
+}  // namespace JsonToCpp
 }  // namespace ReferenceResolver
 }  // namespace MAUS
 

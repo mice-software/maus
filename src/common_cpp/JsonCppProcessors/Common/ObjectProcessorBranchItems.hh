@@ -52,7 +52,6 @@ class BaseItem {
      */
     virtual void SetJsonChild
                   (const ParentType& parent_cpp, Json::Value& parent_json) {
-        std::cerr << "SetJsonChild " << &parent_cpp << std::endl;
         _SetJsonChild(parent_cpp, parent_json);
     }
 
@@ -73,7 +72,6 @@ class BaseItem {
         Json::Value test;
         JsonWrapper::SetPath(test, JsonWrapper::GetPath(parent));
         JsonWrapper::AppendPath(test, GetBranchName());
-        std::cerr << "GetPath " <<  JsonWrapper::GetPath(parent) << "->" << JsonWrapper::GetPath(test) << std::endl;
         return JsonWrapper::GetPath(test);
     }
 
@@ -82,7 +80,6 @@ class BaseItem {
         Json::Value test;
         JsonWrapper::SetPath(parent[branch], JsonWrapper::GetPath(parent));
         JsonWrapper::AppendPath(parent[branch], GetBranchName());
-        std::cerr << "SetPath " <<  JsonWrapper::GetPath(parent) << "->" << JsonWrapper::GetPath(test) << std::endl;
     }
 };
 
@@ -178,9 +175,13 @@ class PointerRefItem : public BaseItem<ParentType> {
         Json::Value child_json = parent_json[_branch];
         std::string data_path = JsonWrapper::GetProperty
                       (child_json, "$ref", JsonWrapper::stringValue).asString();
-        typedef ReferenceResolver::FullyTypedJsonToCppResolver<ParentType, ChildType> Res;
-        Res* res = new Res(data_path, _setter, &parent_cpp);
-        ReferenceResolver::JsonToCppManager::GetInstance().AddReference(res);
+        using namespace ReferenceResolver::JsonToCpp;
+        if (RefManager::HasInstance()) {
+            FullyTypedResolver<ParentType, ChildType>* res =
+                                   new FullyTypedResolver<ParentType, ChildType>
+                                              (data_path, _setter, &parent_cpp);
+            RefManager::GetInstance().AddReference(res);
+        }
         // syntax is (_object.*_function)(args);
         (parent_cpp.*_setter)(NULL);
     }
@@ -205,8 +206,12 @@ class PointerRefItem : public BaseItem<ParentType> {
         }
         parent_json[_branch] = Json::Value();
         BaseItem<ParentType>::SetPath(parent_json);
-        ReferenceResolver::TypedCppToJsonResolver<ChildType>* res = new ReferenceResolver::TypedCppToJsonResolver<ChildType>(child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
-        ReferenceResolver::CppToJsonManager::GetInstance().AddReference(res);
+        using namespace ReferenceResolver::CppToJson;
+        if (RefManager::HasInstance()) {
+            TypedResolver<ChildType>* res = new TypedResolver<ChildType>
+                        (child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
+            RefManager::GetInstance().AddReference(res);
+        }
     }
 
     /** Get the branch name */
@@ -291,7 +296,10 @@ class PointerItem : public BaseItem<ParentType> {
         }
         Json::Value child_json = parent_json[_branch];
         ChildType* child_cpp = _processor->JsonToCpp(child_json);
-        ReferenceResolver::ChildTypedJsonToCppResolver<ChildType>::AddData(JsonWrapper::GetPath(parent_json[_branch]), child_cpp);
+        using namespace ReferenceResolver::JsonToCpp;
+        if (RefManager::HasInstance())
+            ChildTypedResolver<ChildType>
+               ::AddData(JsonWrapper::GetPath(parent_json[_branch]), child_cpp);
         // syntax is (_object.*_function)(args);
         (parent_cpp.*_setter)(child_cpp);
     }
@@ -319,7 +327,10 @@ class PointerItem : public BaseItem<ParentType> {
         delete child_json;
         // slightly worrying, the path doesn't seem to get pulled through here
         BaseItem<ParentType>::SetPath(parent_json);
-        ReferenceResolver::TypedCppToJsonResolver<ChildType>::AddData(child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
+        using namespace ReferenceResolver::CppToJson;
+        if (RefManager::HasInstance())
+            TypedResolver<ChildType>::
+                 AddData(child_cpp, JsonWrapper::GetPath(parent_json[_branch]));
     }
 
     /** Get the branch name */

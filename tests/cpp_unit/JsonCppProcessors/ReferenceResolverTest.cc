@@ -25,8 +25,8 @@ TEST(ReferenceResolverTest, TypedCppToJsonResolver) {
     double child(0);
     Json::Value parent(Json::objectValue);
     parent["test"] = Json::Value();
-    TypedCppToJsonResolver<double> res(&child, "#test");
-    TypedCppToJsonResolver<double>::AddData(&child, "PATH TO BRANCH");
+    CppToJson::TypedResolver<double> res(&child, "#test");
+    CppToJson::TypedResolver<double>::AddData(&child, "PATH TO BRANCH");
     res.ResolveReferences(parent);
      
     Json::Value test(Json::objectValue);
@@ -46,11 +46,12 @@ class TestClass {
 };
 
 TEST(ReferenceResolverTest, JsonToCppResolver) {
+    using namespace JsonToCpp;
     double child(99);
     TestClass test;
-    FullyTypedJsonToCppResolver<TestClass, double> res
+    FullyTypedResolver<TestClass, double> res
                                           ("#data", &TestClass::SetData, &test);
-    ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
+    ChildTypedResolver<double>::AddData("#data", &child);
     res.ResolveReferences();
     EXPECT_TRUE(test._data == &child);
     res.ClearData();
@@ -59,23 +60,38 @@ TEST(ReferenceResolverTest, JsonToCppResolver) {
 }
 
 TEST(ReferenceResolverTest, JsonToCppVectorResolver) {
+    using namespace JsonToCpp;
     double child(99);
     std::vector<double*> vec;
     vec.push_back(NULL);
-    JsonToCpp::VectorResolver<double> res("#data", vec, 0);
-    ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
+    VectorResolver<double> res("#data", vec, 0);
+    ChildTypedResolver<double>::AddData("#data", &child);
     res.ResolveReferences();
     EXPECT_TRUE(vec[0] == &child);
-    JsonToCpp::VectorResolver<double> res2("#data", vec, 1);
+    VectorResolver<double> res2("#data", vec, 1);
     EXPECT_THROW(res2.ResolveReferences(), Squeal);
     res.ClearData();
     res.ResolveReferences();
     EXPECT_TRUE(vec[0] == NULL);
 }
 
+
+TEST(ReferenceResolverTest, CppToJsonManagerBirth) {
+    EXPECT_FALSE(CppToJson::RefManager::HasInstance());
+    CppToJson::RefManager::Birth();
+    EXPECT_TRUE(CppToJson::RefManager::HasInstance());
+    EXPECT_THROW(CppToJson::RefManager::Birth(), Squeal);
+    CppToJson::RefManager::Death();
+    EXPECT_FALSE(CppToJson::RefManager::HasInstance());
+    EXPECT_THROW(CppToJson::RefManager::Death(), Squeal);
+    EXPECT_THROW(CppToJson::RefManager::GetInstance(), Squeal);
+    CppToJson::RefManager::Birth();
+    EXPECT_NO_THROW(CppToJson::RefManager::GetInstance());
+    CppToJson::RefManager::Death();   
+}
+
 TEST(ReferenceResolverTest, CppToJsonManager) {
-    delete &CppToJsonManager::GetInstance();
-    CppToJsonManager* man = new CppToJsonManager();
+    CppToJson::RefManager* man = new CppToJson::RefManager();
     Json::Value test(Json::objectValue);
     test["$ref"] = Json::Value("PATH TO BRANCH");
 
@@ -83,66 +99,41 @@ TEST(ReferenceResolverTest, CppToJsonManager) {
     Json::Value parent(Json::objectValue);
     parent["test_1"] = Json::Value(1);
     parent["test_2"] = Json::Value(2);
-    TypedCppToJsonResolver<double>* res =
-              new TypedCppToJsonResolver<double>(&child, "#test_1");
+    CppToJson::TypedResolver<double>* res =
+                        new CppToJson::TypedResolver<double>(&child, "#test_1");
     res->AddData(&child, "PATH TO BRANCH");
     man->AddReference(res);
     man->ResolveReferences(parent);
     EXPECT_EQ(parent["test_1"], test);
     delete man; // res should now be deleted;
+}
 
-    parent["test_1"] = Json::Value(1); // reset
-    man = &CppToJsonManager::GetInstance();
-    man->ResolveReferences(parent);
-    // we don't add the reference this time; should be cleared by delete so
-    // ResolveReferences should fail (no change to branch)
-    EXPECT_EQ(parent["test_1"], Json::Value(1));
-    // this resolver should do nothing (should be deleted immediately)
-    res = new TypedCppToJsonResolver<double>(&child, "#test_1");
-    delete man;
-
-    man = &CppToJsonManager::GetInstance();
-    res = new TypedCppToJsonResolver<double>(&child, "#test_2");
-    res->AddData(&child, "PATH TO BRANCH");
-    man->AddReference(res);
-    man->ResolveReferences(parent);
-    // we added the reference this time; so should fill the data okay - but the
-    // manager should have been deleted so test_2 branch not filled
-    EXPECT_EQ(parent["test_1"], Json::Value(1));
-    EXPECT_EQ(parent["test_2"], test);
-    delete man;
+TEST(ReferenceResolverTest, JsonToCppManagerBirth) {
+    EXPECT_FALSE(JsonToCpp::RefManager::HasInstance());
+    JsonToCpp::RefManager::Birth();
+    EXPECT_TRUE(JsonToCpp::RefManager::HasInstance());
+    EXPECT_THROW(JsonToCpp::RefManager::Birth(), Squeal);
+    JsonToCpp::RefManager::Death();
+    EXPECT_FALSE(JsonToCpp::RefManager::HasInstance());
+    EXPECT_THROW(JsonToCpp::RefManager::Death(), Squeal);
+    EXPECT_THROW(JsonToCpp::RefManager::GetInstance(), Squeal);
+    JsonToCpp::RefManager::Birth();
+    EXPECT_NO_THROW(JsonToCpp::RefManager::GetInstance());
+    JsonToCpp::RefManager::Death();   
 }
 
 TEST(ReferenceResolverTest, JsonToCppManager) {
-    delete &JsonToCppManager::GetInstance();
-    JsonToCppManager* man = new JsonToCppManager();
+    using namespace JsonToCpp;
+    RefManager* man = new RefManager();
     double child(99);
     TestClass test;
-    FullyTypedJsonToCppResolver<TestClass, double>* res = new 
-                                  FullyTypedJsonToCppResolver<TestClass, double>
-                                          ("#data", &TestClass::SetData, &test);
+    FullyTypedResolver<TestClass, double>* res = new FullyTypedResolver
+                       <TestClass, double>("#data", &TestClass::SetData, &test);
     man->AddReference(res);
-    ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
+    ChildTypedResolver<double>::AddData("#data", &child);
     man->ResolveReferences();
     EXPECT_TRUE(test._data == &child);
     delete man;  // res should now be deleted
-
-    man = &JsonToCppManager::GetInstance();
-    res = new FullyTypedJsonToCppResolver<TestClass, double>
-                                          ("#data", &TestClass::SetData, &test);
-    man->AddReference(res);
-    man->ResolveReferences();
-    EXPECT_TRUE(test._data == NULL); // we never called AddData - should fail
-    delete man; // _instance should now be NULL;
-
-    res = new FullyTypedJsonToCppResolver<TestClass, double>
-                                          ("#data", &TestClass::SetData, &test);
-    man = &JsonToCppManager::GetInstance();
-    man->AddReference(res);
-    ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
-    man->ResolveReferences();
-    EXPECT_TRUE(test._data == &child);
-    delete man;
 }
 }
 }

@@ -142,6 +142,8 @@ class TestObject_3 {
 };
 
 TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
+  ReferenceResolver::JsonToCpp::RefManager::Birth();
+  ReferenceResolver::CppToJson::RefManager::Birth();
   // setup C++ tree
   TestObject_3 test_3;
   test_3.SetPointer(new double(1));
@@ -169,22 +171,23 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
   Json::Value* test_3_json = test_3_proc.CppToJson(test_3);
   std::cerr << "REF" << std::endl;
   std::cerr << "TEST_3 in json\n" << *test_3_json << std::endl;
-  ReferenceResolver::CppToJsonManager::GetInstance().ResolveReferences(*test_3_json);
+  ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(*test_3_json);
   std::cerr << "TEST_3 after resolve references\n" << *test_3_json << std::endl;
   EXPECT_EQ((*test_3_json)["child_1"]["reference"]["$ref"], Json::Value("#pointer"));
   EXPECT_EQ((*test_3_json)["child_2"]["reference"]["$ref"], Json::Value("#pointer"));
 
   // check Json to C++ conversion
   TestObject_3* test_3_out = test_3_proc.JsonToCpp(*test_3_json);
-  ReferenceResolver::JsonToCppManager::GetInstance().ResolveReferences();
+  ReferenceResolver::JsonToCpp::RefManager::GetInstance().ResolveReferences();
   EXPECT_EQ(test_3_out->GetChild1()->GetReference(),
             test_3_out->GetPointer());
   EXPECT_EQ(test_3_out->GetChild2()->GetReference(),
             test_3_out->GetPointer());
   EXPECT_EQ(*(test_3_out->GetPointer()), *(test_3.GetPointer())); 
-  delete &ReferenceResolver::JsonToCppManager::GetInstance();
   delete test_3_json;
   delete test_3_out;
+  ReferenceResolver::CppToJson::RefManager::Death();
+  ReferenceResolver::JsonToCpp::RefManager::Death();
 }
 
 MAUS::ObjectProcessor<TestObject_2> GetTest2Proc

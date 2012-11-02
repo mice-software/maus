@@ -23,7 +23,10 @@
 namespace MAUS {
 
 Spill* JsonCppSpillConverter::_convert(const Json::Value* data) const {
-  return SpillProcessor().JsonToCpp(*data);
+  ReferenceResolver::JsonToCpp::RefManager::Birth();
+  Spill* spill = SpillProcessor().JsonToCpp(*data);
+  ReferenceResolver::JsonToCpp::RefManager::Death();
+  return spill;
 }
 }
 

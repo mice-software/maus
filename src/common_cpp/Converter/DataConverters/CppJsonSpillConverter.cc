@@ -26,7 +26,9 @@ namespace MAUS {
 Json::Value* CppJsonSpillConverter::_convert(const Data* data) const {
   if (data == NULL || data->GetSpill() == NULL)
       return new Json::Value();
+  ReferenceResolver::CppToJson::RefManager::Birth();
   Json::Value* my_json = SpillProcessor().CppToJson(*data->GetSpill());
+  ReferenceResolver::CppToJson::RefManager::Death();
   return my_json;
 }
 }

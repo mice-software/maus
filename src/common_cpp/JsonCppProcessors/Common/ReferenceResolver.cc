@@ -18,24 +18,76 @@
 
 namespace MAUS {
 namespace ReferenceResolver {
-
-
-CppToJsonManager& CppToJsonManager::GetInstance() {
+namespace CppToJson { // humm, could probably abstract out...
+RefManager& RefManager::GetInstance() {
     if (_instance == NULL) {
-        _instance = new CppToJsonManager();
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to get RefManager before initialisation",
+                    "ReferenceResolver::CppToJson::RefManager::GetInstance()"));
     }
     return *_instance;
 }
 
-CppToJsonManager* CppToJsonManager::_instance(NULL);
+bool RefManager::HasInstance() {
+    return _instance != NULL;
+}
 
-JsonToCppManager& JsonToCppManager::GetInstance() {
+void RefManager::Birth() {
+    if (_instance != NULL) {
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to birth RefManager when it was already birthed",
+                    "ReferenceResolver::CppToJson::RefManager::Birth()"));
+    }
+    _instance = new RefManager();
+}
+
+void RefManager::Death() {
     if (_instance == NULL) {
-        _instance = new JsonToCppManager();
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to death RefManager before initialisation",
+                    "ReferenceResolver::CppToJson::RefManager::Death()"));
+    }
+    delete _instance;
+    _instance = NULL;
+}
+
+RefManager* RefManager::_instance(NULL);
+}  // namespace CppTojson
+
+namespace JsonToCpp {
+RefManager& RefManager::GetInstance() {
+    if (_instance == NULL) {
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to get RefManager before initialisation",
+                    "ReferenceResolver::JsonToCpp::RefManager::GetInstance()"));
     }
     return *_instance;
 }
 
-JsonToCppManager* JsonToCppManager::_instance(NULL);
+bool RefManager::HasInstance() {
+    return _instance != NULL;
+}
+
+void RefManager::Birth() {
+    if (_instance != NULL) {
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to birth RefManager when it was already birthed",
+                    "ReferenceResolver::JsonToCpp::RefManager::Birth()"));
+    }
+    _instance = new RefManager();
+}
+
+void RefManager::Death() {
+    if (_instance == NULL) {
+        throw(Squeal(Squeal::recoverable,
+                    "Attempt to death RefManager before initialisation",
+                    "ReferenceResolver::JsonToCpp::RefManager::Death()"));
+    }
+    delete _instance;
+    _instance = NULL;
+}
+
+RefManager* RefManager::_instance(NULL);
+}  // namespace JsonToCpp
 }  // namespace ReferenceResolver
 }  // namespace MAUS

@@ -25,19 +25,20 @@
 
 namespace MAUS {
 namespace ReferenceResolver {
+namespace CppToJson {
 
-class CppToJsonResolver {
+class Resolver {
   public:
-      ~CppToJsonResolver() {}
+      ~Resolver() {}
       virtual void ResolveReferences(Json::Value& json_root) = 0;
       virtual void ClearData() const = 0;
 };
 
 template <class ChildType>
-class TypedCppToJsonResolver : public CppToJsonResolver {
+class TypedResolver : public Resolver {
   public:
-      TypedCppToJsonResolver(ChildType* ref_cpp_address, std::string ref_json_address);
-      ~TypedCppToJsonResolver() {}
+      TypedResolver(ChildType* ref_cpp_address, std::string ref_json_address);
+      ~TypedResolver() {}
       void ResolveReferences(Json::Value& json_root);
       static void AddData(ChildType* data_cpp_address, std::string data_json_address);
       void ClearData() const;
@@ -48,29 +49,34 @@ class TypedCppToJsonResolver : public CppToJsonResolver {
       static std::map<ChildType*, std::string> _data_hash;
 };
 
-class CppToJsonManager {
+class RefManager {
     public:
-        static CppToJsonManager& GetInstance();
-        inline ~CppToJsonManager();
+        static RefManager& GetInstance();
+        static bool HasInstance();
+        static void Birth();
+        static void Death();
+        inline ~RefManager();
         inline void ResolveReferences(Json::Value& json_root);
-        inline void AddReference(CppToJsonResolver* reference);
+        inline void AddReference(Resolver* reference);
         
     private:
-        std::vector<CppToJsonResolver*> _references;
-        static CppToJsonManager* _instance;
+        std::vector<Resolver*> _references;
+        static RefManager* _instance;
 };
+}  // namespace CppToJson
 
-class JsonToCppResolver {
+namespace JsonToCpp {
+class Resolver {
   public:
-    ~JsonToCppResolver() {}
+    ~Resolver() {}
     virtual void ResolveReferences() = 0;
     virtual void ClearData() const = 0;
 };
 
 template <class ChildType>
-class ChildTypedJsonToCppResolver : public JsonToCppResolver {
+class ChildTypedResolver : public Resolver {
   public:
-    ~ChildTypedJsonToCppResolver() {}
+    ~ChildTypedResolver() {}
     void ResolveReferences() = 0;
     static void AddData(std::string data_json_address, ChildType* data_cpp_address);
     void ClearData() const;
@@ -80,14 +86,14 @@ class ChildTypedJsonToCppResolver : public JsonToCppResolver {
 };
 
 template <class ParentType, class ChildType>
-class FullyTypedJsonToCppResolver : public ChildTypedJsonToCppResolver<ChildType> {
+class FullyTypedResolver : public ChildTypedResolver<ChildType> {
   public:
     typedef void (ParentType::*SetMethod)(ChildType* value);
 
-    FullyTypedJsonToCppResolver(std::string ref_json_address,
+    FullyTypedResolver(std::string ref_json_address,
                                 SetMethod ref_cpp_set_func,
                                 ParentType* ref_cpp_parent);
-    ~FullyTypedJsonToCppResolver() {}
+    ~FullyTypedResolver() {}
     void ResolveReferences();
 
   private:
@@ -96,9 +102,8 @@ class FullyTypedJsonToCppResolver : public ChildTypedJsonToCppResolver<ChildType
     ParentType* _ref_cpp_parent;
 };
 
-namespace JsonToCpp {
 template <class ChildType>
-class VectorResolver : public ChildTypedJsonToCppResolver<ChildType> {
+class VectorResolver : public ChildTypedResolver<ChildType> {
   public:
     VectorResolver(std::string ref_json_address,
                             std::vector<ChildType*>& vector,
@@ -111,20 +116,22 @@ class VectorResolver : public ChildTypedJsonToCppResolver<ChildType> {
     std::vector<ChildType*>& _vector;
     size_t _index;
 };
-}
 
-class JsonToCppManager {
+class RefManager {
     public:
-        static JsonToCppManager& GetInstance();
-        inline ~JsonToCppManager();
+        static RefManager& GetInstance();
+        static bool HasInstance();
+        static void Birth();
+        static void Death();
+        inline ~RefManager();
         inline void ResolveReferences();
-        inline void AddReference(JsonToCppResolver* reference);
+        inline void AddReference(Resolver* reference);
         
     private:
-        std::vector<JsonToCppResolver*> _references;
-        static JsonToCppManager* _instance;
+        std::vector<Resolver*> _references;
+        static RefManager* _instance;
 };
-
+}  // namespace JsonToCpp
 }  // namespace ReferenceResolver
 }  // namespace MAUS
 

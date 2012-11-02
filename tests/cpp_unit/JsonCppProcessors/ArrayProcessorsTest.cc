@@ -226,6 +226,8 @@ TEST(ArrayProcessorsTest, RefArrayConstructorDestructorTest) {
 
 TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     using namespace ReferenceResolver;
+    CppToJson::RefManager::Birth();
+    JsonToCpp::RefManager::Birth();
     std::vector<int*> data_array;
     std::vector<int*> ref_array;
     int data[] = {1, 2, 3};
@@ -244,24 +246,24 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     obj["pointers"] = *pointers;
     obj["ref"][1] = *refs;
     JsonWrapper::SetPath(obj["ref"][1], JsonWrapper::GetPath(*refs));
-    CppToJsonManager::GetInstance().ResolveReferences(obj);
+    CppToJson::RefManager::GetInstance().ResolveReferences(obj);
     std::string ref_paths[] = {"0", "1", "1", "0"};
     for (size_t i = 0; i < refs->size(); ++i)
         EXPECT_EQ(obj["ref"][1][i]["$ref"], "#pointers/"+ref_paths[i]);
-    delete &CppToJsonManager::GetInstance();
 
     std::cerr << "REFERENCES " << *refs << "\n" << obj["ref"][1] << std::endl;
     std::cerr << "POINTERS " << *pointers << "\n" << obj["pointers"] << std::endl;
     std::vector<int*>* data_out = pointer_proc.JsonToCpp(*pointers);
     std::vector<int*>* ref_out = ref_proc.JsonToCpp(obj["ref"][1]);
-    JsonToCppManager::GetInstance().ResolveReferences();
+    JsonToCpp::RefManager::GetInstance().ResolveReferences();
     
     int ref_data[] = {0, 1, 1, 0};
     for (size_t i = 0; i < ref_out->size(); ++i)
         EXPECT_EQ((*ref_out)[i], (*data_out)[ref_data[i]]);
-    delete &JsonToCppManager::GetInstance();
     delete refs;
     delete pointers;        
+    JsonToCpp::RefManager::Death();
+    CppToJson::RefManager::Death();
 }
 }
 
