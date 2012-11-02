@@ -215,7 +215,53 @@ TEST(ArrayProcessorsTest, ValueArrayCppToJsonTest) {
         EXPECT_EQ(JsonWrapper::GetPath((*json_array)[i]), path);
     }
     delete json_array;
+}
 
+//////////
+TEST(ArrayProcessorsTest, RefArrayConstructorDestructorTest) {
+    ReferenceArrayProcessor<int>* proc = new ReferenceArrayProcessor<int>();
+    delete proc;  // I guess look for segv, and run through valgrind to check
+                  // no memory leaks
+}
+
+TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
+    using namespace ReferenceResolver;
+    std::vector<int*> data_array;
+    std::vector<int*> ref_array;
+    int data[] = {1, 2, 3};
+    data_array.push_back(&data[0]);
+    data_array.push_back(&data[1]);
+    data_array.push_back(&data[2]);
+    ref_array.push_back(data_array[0]);
+    ref_array.push_back(data_array[1]);
+    ref_array.push_back(data_array[1]);
+    ref_array.push_back(data_array[0]);
+    ReferenceArrayProcessor<int> ref_proc;
+    PointerArrayProcessor<int> pointer_proc(new IntProcessor());
+    Json::Value* pointers = pointer_proc.CppToJson(data_array, "#pointers");
+    Json::Value* refs = ref_proc.CppToJson(ref_array, "#ref/1");
+    Json::Value obj(Json::objectValue);
+    obj["pointers"] = *pointers;
+    obj["ref"][1] = *refs;
+    JsonWrapper::SetPath(obj["ref"][1], JsonWrapper::GetPath(*refs));
+    CppToJsonManager::GetInstance().ResolveReferences(obj);
+    std::string ref_paths[] = {"0", "1", "1", "0"};
+    for (size_t i = 0; i < refs->size(); ++i)
+        EXPECT_EQ(obj["ref"][1][i]["$ref"], "#pointers/"+ref_paths[i]);
+    delete &CppToJsonManager::GetInstance();
+
+    std::cerr << "REFERENCES " << *refs << "\n" << obj["ref"][1] << std::endl;
+    std::cerr << "POINTERS " << *pointers << "\n" << obj["pointers"] << std::endl;
+    std::vector<int*>* data_out = pointer_proc.JsonToCpp(*pointers);
+    std::vector<int*>* ref_out = ref_proc.JsonToCpp(obj["ref"][1]);
+    JsonToCppManager::GetInstance().ResolveReferences();
+    
+    int ref_data[] = {0, 1, 1, 0};
+    for (size_t i = 0; i < ref_out->size(); ++i)
+        EXPECT_EQ((*ref_out)[i], (*data_out)[ref_data[i]]);
+    delete &JsonToCppManager::GetInstance();
+    delete refs;
+    delete pointers;        
 }
 }
 

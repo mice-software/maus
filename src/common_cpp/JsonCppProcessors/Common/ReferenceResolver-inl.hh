@@ -92,7 +92,8 @@ FullyTypedJsonToCppResolver<ParentType, ChildType>::FullyTypedJsonToCppResolver(
 
 template <class ParentType, class ChildType>
 void FullyTypedJsonToCppResolver<ParentType, ChildType>::ResolveReferences() {
-    std::map<std::string, ChildType*>& data_hash = ChildTypedJsonToCppResolver<ChildType>::_data_hash;
+    std::map<std::string, ChildType*>& data_hash =
+                             ChildTypedJsonToCppResolver<ChildType>::_data_hash;
     if (data_hash.find(_ref_json_address) == data_hash.end()) {
         std::cerr << "Setting cpp address for " << _ref_json_address << " to NULL" << std::endl;
         (*_ref_cpp_parent.*_cpp_setter)(NULL);
@@ -101,6 +102,37 @@ void FullyTypedJsonToCppResolver<ParentType, ChildType>::ResolveReferences() {
         (*_ref_cpp_parent.*_cpp_setter)(data_hash[_ref_json_address]);
     }
 }
+
+////////////////////////////////////////////////////////////////
+
+namespace JsonToCpp {
+template <class ChildType>
+VectorResolver<ChildType>::VectorResolver(
+                            std::string ref_json_address,
+                            std::vector<ChildType*>& vector,
+                            size_t vector_index)
+  : _ref_json_address(ref_json_address), _vector(vector), _index(vector_index) {   
+}
+
+template <class ChildType>
+void VectorResolver<ChildType>::ResolveReferences() {
+    std::map<std::string, ChildType*>& data_hash = 
+                             ChildTypedJsonToCppResolver<ChildType>::_data_hash;
+    if (_index >= _vector.size())
+        throw(Squeal(Squeal::recoverable,
+                     "Index out of range while resolving pointer to array "+
+                     _ref_json_address,
+                     "VectorResolver<ChildType>::ResolverReferences"));
+    if (data_hash.find(_ref_json_address) == data_hash.end()) {
+        std::cerr << "Setting cpp address for " << _ref_json_address << " to NULL" << std::endl;
+        _vector[_index] = NULL;
+    } else {
+        std::cerr << "Setting cpp address for " << _ref_json_address << " to " << data_hash[_ref_json_address] << std::endl;
+        _vector[_index] = data_hash[_ref_json_address];
+    }
+}
+}
+////////////////////////////////////////////////////////////////////
 
 template <class ChildType>
 void ChildTypedJsonToCppResolver<ChildType>::AddData(std::string data_json_address, ChildType* data_cpp_address) {

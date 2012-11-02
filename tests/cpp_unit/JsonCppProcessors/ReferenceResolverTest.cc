@@ -48,13 +48,29 @@ class TestClass {
 TEST(ReferenceResolverTest, JsonToCppResolver) {
     double child(99);
     TestClass test;
-    FullyTypedJsonToCppResolver<TestClass, double> res("#data", &TestClass::SetData, &test);
+    FullyTypedJsonToCppResolver<TestClass, double> res
+                                          ("#data", &TestClass::SetData, &test);
     ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
     res.ResolveReferences();
     EXPECT_TRUE(test._data == &child);
     res.ClearData();
     res.ResolveReferences();
     EXPECT_TRUE(test._data == NULL);
+}
+
+TEST(ReferenceResolverTest, JsonToCppVectorResolver) {
+    double child(99);
+    std::vector<double*> vec;
+    vec.push_back(NULL);
+    JsonToCpp::VectorResolver<double> res("#data", vec, 0);
+    ChildTypedJsonToCppResolver<double>::AddData("#data", &child);
+    res.ResolveReferences();
+    EXPECT_TRUE(vec[0] == &child);
+    JsonToCpp::VectorResolver<double> res2("#data", vec, 1);
+    EXPECT_THROW(res2.ResolveReferences(), Squeal);
+    res.ClearData();
+    res.ResolveReferences();
+    EXPECT_TRUE(vec[0] == NULL);
 }
 
 TEST(ReferenceResolverTest, CppToJsonManager) {
@@ -127,7 +143,6 @@ TEST(ReferenceResolverTest, JsonToCppManager) {
     man->ResolveReferences();
     EXPECT_TRUE(test._data == &child);
     delete man;
-    
 }
 }
 }

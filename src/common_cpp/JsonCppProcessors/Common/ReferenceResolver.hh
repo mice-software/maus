@@ -96,6 +96,23 @@ class FullyTypedJsonToCppResolver : public ChildTypedJsonToCppResolver<ChildType
     ParentType* _ref_cpp_parent;
 };
 
+namespace JsonToCpp {
+template <class ChildType>
+class VectorResolver : public ChildTypedJsonToCppResolver<ChildType> {
+  public:
+    VectorResolver(std::string ref_json_address,
+                            std::vector<ChildType*>& vector,
+                            size_t vector_index);
+    ~VectorResolver() {}
+    void ResolveReferences();
+
+  private:
+    std::string _ref_json_address;
+    std::vector<ChildType*>& _vector;
+    size_t _index;
+};
+}
+
 class JsonToCppManager {
     public:
         static JsonToCppManager& GetInstance();
