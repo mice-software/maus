@@ -57,9 +57,9 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 ArrayContents* data = _proc->JsonToCpp(json_array[i]);
                 (*vec)[i] = data;
                 using namespace ReferenceResolver::JsonToCpp;
+                std::string path = JsonWrapper::Path::GetPath(json_array[i]);
                 if (RefManager::HasInstance())
-                    ChildTypedResolver<ArrayContents>
-                      ::AddData(JsonWrapper::GetPath(json_array[i]), (*vec)[i]);
+                    ChildTypedResolver<ArrayContents>::AddData(path, (*vec)[i]);
             }
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -86,7 +86,7 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents*>& cpp_array,
                                 std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
-    JsonWrapper::SetPath(*json_array, path);
+    JsonWrapper::Path::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
@@ -98,12 +98,12 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
                 data = _proc->CppToJson(*cpp_array[i], GetPath(path, i));
             }
             (*json_array)[i] = *data; // json copies memory here but not path
-            JsonWrapper::SetPath((*json_array)[i], GetPath(path, i));
+            JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
             using namespace ReferenceResolver::CppToJson;
             if (RefManager::HasInstance())
                 TypedResolver<ArrayContents>::
-                  AddData(cpp_array[i], JsonWrapper::GetPath((*json_array)[i]));
+                                        AddData(cpp_array[i], GetPath(path, i));
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
@@ -177,15 +177,15 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents>& cpp_array,
                                 std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
-    JsonWrapper::SetPath(*json_array, path);
+    JsonWrapper::Path::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
             Json::Value* data = _proc->CppToJson(cpp_array[i],
-                                                 GetPath(path, i));
+                                                              GetPath(path, i));
             (*json_array)[i] = *data; // json copies memory but not path
-            JsonWrapper::SetPath((*json_array)[i], GetPath(path, i));
+            JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -244,15 +244,16 @@ Json::Value* ReferenceArrayProcessor<ArrayContents>::CppToJson(
                            std::string path) {
     using namespace ReferenceResolver::CppToJson;
     Json::Value* array = new Json::Value(Json::arrayValue);
-    JsonWrapper::SetPath(*array, path);
+    JsonWrapper::Path::SetPath(*array, path);
     array->resize(cpp_array.size());
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         (*array)[i] = Json::Value();
-        JsonWrapper::SetPath((*array)[i], path);
-        JsonWrapper::AppendPath((*array)[i], i);
+        JsonWrapper::Path::SetPath((*array)[i], path);
+        JsonWrapper::Path::AppendPath((*array)[i], i);
         if (RefManager::HasInstance()) {
+            std::string arr_path = JsonWrapper::Path::GetPath((*array)[i]);
             TypedResolver<ArrayContents>* res = new TypedResolver
-               <ArrayContents>(cpp_array[i], JsonWrapper::GetPath((*array)[i]));
+                                        <ArrayContents>(cpp_array[i], arr_path);
             RefManager::GetInstance().AddReference(res);
         }
     }

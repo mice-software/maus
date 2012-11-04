@@ -282,7 +282,7 @@ std::string JsonWrapper::ValueTypeToString(Json::ValueType tp) {
   return "";
 }
 
-std::string JsonWrapper::GetPath(Json::Value json) {
+std::string JsonWrapper::Path::GetPath(Json::Value json) {
     if (!json.hasComment(Json::commentAfter)) {
         return "";
     }
@@ -291,13 +291,13 @@ std::string JsonWrapper::GetPath(Json::Value json) {
     return comment_json["path"].asString();
 }
 
-void JsonWrapper::SetPath(Json::Value& json, std::string path) {
+void JsonWrapper::Path::SetPath(Json::Value& json, std::string path) {
     Json::Value comment(Json::objectValue);
     comment["path"] = path;
     json.setComment("// "+JsonToString(comment), Json::commentAfter);
 }
 
-void JsonWrapper::AppendPath(Json::Value& json, std::string branch_name) {
+void JsonWrapper::Path::AppendPath(Json::Value& json, std::string branch_name) {
     if (branch_name.find("/") != std::string::npos)
         throw(Squeal(Squeal::recoverable,
                      "/ not allowed in branch names",
@@ -310,11 +310,12 @@ void JsonWrapper::AppendPath(Json::Value& json, std::string branch_name) {
     }    
 }
 
-void JsonWrapper::AppendPath(Json::Value& json, size_t array_index) {
+void JsonWrapper::Path::AppendPath(Json::Value& json, size_t array_index) {
     AppendPath(json, STLUtils::ToString(array_index));
 }
 
-Json::Value& JsonWrapper::DereferencePath(Json::Value& json, std::string path) {
+Json::Value& JsonWrapper::Path::DereferencePath
+                                         (Json::Value& json, std::string path) {
     if (path[0] == '#')
         path = path.substr(1, path.size()); //lstrip #
     if (path[path.size()-1] == '/')

@@ -72,7 +72,7 @@ Json::Value* ObjectMapValueProcessor<MapSecond>::CppToJson
                              (const std::map<std::string, MapSecond>& cpp_map,
                               std::string path) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
-    JsonWrapper::SetPath(*json_object, path);
+    JsonWrapper::Path::SetPath(*json_object, path);
     // pull this out of the loop def because it is a syntactic mouthful...
     typename std::map<std::string, MapSecond>::const_iterator it;
     for (it = cpp_map.begin(); it != cpp_map.end(); ++it) {
@@ -85,7 +85,7 @@ Json::Value* ObjectMapValueProcessor<MapSecond>::CppToJson
             throw squee;
         }
         (*json_object)[it->first] = *json_out;
-        JsonWrapper::SetPath((*json_object)[it->first], child_path);
+        JsonWrapper::Path::SetPath((*json_object)[it->first], child_path);
         delete json_out;
     }
     return json_object;

@@ -31,13 +31,15 @@ TypedResolver<ChildType>::TypedResolver
 
 template <class ChildType>
 void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
-    if (_data_hash.find(_cpp_pointer) == _data_hash.end()) {
-        Json::Value& child = JsonWrapper::DereferencePath(json_root, _json_pointer);
+    if (_data_hash.find(_cpp_pointer) == _data_hash.end()) {  // NullValue
+        Json::Value& child =
+                   JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
         child = Json::Value();
-    } else {
-        Json::Value& child = JsonWrapper::DereferencePath(json_root, _json_pointer);
-        Json::Value reference_value(Json::objectValue);
-        reference_value["$ref"] = _data_hash[_cpp_pointer]; // set json reference to point at json value 
+    } else {  // set json reference to point at json value
+        Json::Value& child =
+                   JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
+        Json::Value reference_value(Json::objectValue); 
+        reference_value["$ref"] = _data_hash[_cpp_pointer];
         child = reference_value;
     }
 }

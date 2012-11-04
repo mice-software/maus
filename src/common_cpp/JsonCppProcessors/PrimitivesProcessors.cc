@@ -39,7 +39,7 @@ Json::Value* DoubleProcessor::CppToJson(const double& cpp_double) {
 Json::Value* DoubleProcessor::CppToJson
                                   (const double& cpp_double, std::string path) {
   Json::Value* json_double = new Json::Value(cpp_double);
-  JsonWrapper::SetPath(*json_double, path);
+  JsonWrapper::Path::SetPath(*json_double, path);
   return json_double;
 }
 
@@ -62,7 +62,7 @@ Json::Value* StringProcessor::CppToJson(const std::string& cpp_string) {
 Json::Value* StringProcessor::CppToJson
                              (const std::string& cpp_string, std::string path) {
   Json::Value* json_string = new Json::Value(cpp_string);
-  JsonWrapper::SetPath(*json_string, path);
+  JsonWrapper::Path::SetPath(*json_string, path);
   return json_string;
 }
 
@@ -85,7 +85,7 @@ Json::Value* IntProcessor::CppToJson(const int& cpp_int) {
 Json::Value* IntProcessor::CppToJson
                                   (const int& cpp_int, std::string path) {
   Json::Value* json_int = new Json::Value(cpp_int);
-  JsonWrapper::SetPath(*json_int, path);
+  JsonWrapper::Path::SetPath(*json_int, path);
   return json_int;
 }
 
@@ -110,7 +110,7 @@ Json::Value* UIntProcessor::CppToJson(const unsigned int& cpp_uint) {
 Json::Value* UIntProcessor::CppToJson
                               (const unsigned int& cpp_uint, std::string path) {
   Json::Value* json_uint = new Json::Value(cpp_uint);
-  JsonWrapper::SetPath(*json_uint, path);
+  JsonWrapper::Path::SetPath(*json_uint, path);
   return json_uint;
 }
 
@@ -133,7 +133,7 @@ Json::Value* BoolProcessor::CppToJson(const bool& cpp_bool) {
 Json::Value* BoolProcessor::CppToJson
                                   (const bool& cpp_bool, std::string path) {
   Json::Value* json_bool = new Json::Value(cpp_bool);
-  JsonWrapper::SetPath(*json_bool, path);
+  JsonWrapper::Path::SetPath(*json_bool, path);
   return json_bool;
 }
 }

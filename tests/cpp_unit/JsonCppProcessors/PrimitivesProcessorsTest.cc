@@ -40,7 +40,7 @@ TEST(PrimitivesProcessorsTest, DoubleCppToJson) {
   EXPECT_EQ(value_json->asDouble(), value_cpp);
   delete value_json;
   value_json = proc.CppToJson(value_cpp, "path");
-  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -59,7 +59,7 @@ TEST(PrimitivesProcessorsTest, BoolCppToJson) {
   EXPECT_EQ(value_json->asBool(), value_cpp);
   delete value_json;
   value_json = proc.CppToJson(value_cpp, "path");
-  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -78,7 +78,7 @@ TEST(PrimitivesProcessorsTest, StringCppToJson) {
   EXPECT_EQ(value_json->asString(), value_cpp);
   delete value_json;
   value_json = proc.CppToJson(value_cpp, "path");
-  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -97,7 +97,7 @@ TEST(PrimitivesProcessorsTest, IntCppToJson) {
   EXPECT_EQ(value_json->asInt(), value_cpp);
   delete value_json;
   value_json = proc.CppToJson(value_cpp, "path");
-  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
 }
 
@@ -120,7 +120,7 @@ TEST(PrimitivesProcessorsTest, UIntCppToJson) {
   EXPECT_EQ(value_json->asUInt(), value_cpp);
   delete value_json;
   value_json = proc.CppToJson(value_cpp, "path");
-  EXPECT_EQ(JsonWrapper::GetPath(*value_json), "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
 }
 }

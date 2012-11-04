@@ -114,7 +114,7 @@ template <class ObjectType>
 Json::Value* ObjectProcessor<ObjectType>::CppToJson
                               (const ObjectType& cpp_object, std::string path) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
-    JsonWrapper::SetPath(*json_object, path);
+    JsonWrapper::Path::SetPath(*json_object, path);
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetJsonChild(cpp_object, *json_object);

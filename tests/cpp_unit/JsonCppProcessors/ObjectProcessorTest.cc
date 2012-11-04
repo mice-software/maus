@@ -234,10 +234,13 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
 
 TEST_F(ObjectProcessorTest, PathTest) {
   Json::Value* json_value = req_proc.CppToJson(test, "#path");
-  EXPECT_EQ(JsonWrapper::GetPath((*json_value)), "#path");
-  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_a"]), "#path/branch_a");
-  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_b"]), "#path/branch_b");
-  EXPECT_EQ(JsonWrapper::GetPath((*json_value)["branch_c"]), "#path/branch_c");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)), "#path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_a"]),
+            "#path/branch_a");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_b"]),
+            "#path/branch_b");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_c"]),
+            "#path/branch_c");
 }
 }
 

@@ -72,10 +72,11 @@ TEST(ObjectMapProcessorsTest, ObjectMapValueCppToJsonTest) {
     delete value_out;
 
     value_out = test.CppToJson(map_in, "path");
-    EXPECT_EQ(JsonWrapper::GetPath(*value_out), "path");
-    EXPECT_EQ(JsonWrapper::GetPath((*value_out)["one"]), "path/one");
-    EXPECT_EQ(JsonWrapper::GetPath((*value_out)["two"]), "path/two");
-    EXPECT_EQ(JsonWrapper::GetPath((*value_out)["minus_one"]), "path/minus_one");
+    EXPECT_EQ(JsonWrapper::Path::GetPath(*value_out), "path");
+    EXPECT_EQ(JsonWrapper::Path::GetPath((*value_out)["one"]), "path/one");
+    EXPECT_EQ(JsonWrapper::Path::GetPath((*value_out)["two"]), "path/two");
+    EXPECT_EQ(JsonWrapper::Path::GetPath((*value_out)["minus_one"]),
+              "path/minus_one");
     delete value_out;
 }
 }

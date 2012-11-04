@@ -106,10 +106,10 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonTest) {
     }
     delete json_array;
     json_array = proc.CppToJson(vec, "path");
-    EXPECT_EQ(JsonWrapper::GetPath(*json_array), "path");
+    EXPECT_EQ(JsonWrapper::Path::GetPath(*json_array), "path");
     for (int i = 0; i < 3; ++i) {
         std::string path = "path/"+STLUtils::ToString(i);
-        EXPECT_EQ(JsonWrapper::GetPath((*json_array)[i]), path);
+        EXPECT_EQ(JsonWrapper::Path::GetPath((*json_array)[i]), path);
         delete vec[i];
     }
     delete json_array;
@@ -128,10 +128,10 @@ TEST(ArrayProcessorsTest, PointerArrayCppToJsonNullTest) {
     }
     delete test_value;
     test_value = proc.CppToJson(vec, "path");
-    EXPECT_EQ(JsonWrapper::GetPath(*test_value), "path");
+    EXPECT_EQ(JsonWrapper::Path::GetPath(*test_value), "path");
     for (int i = 0; i < 3; ++i) {
         std::string path = "path/"+STLUtils::ToString(i);
-        EXPECT_EQ( JsonWrapper::GetPath((*test_value)[i]), path);
+        EXPECT_EQ( JsonWrapper::Path::GetPath((*test_value)[i]), path);
         delete vec[i];
     }
     delete test_value;
@@ -209,10 +209,10 @@ TEST(ArrayProcessorsTest, ValueArrayCppToJsonTest) {
     }
     delete json_array;
     json_array = proc.CppToJson(vec, "path");
-    EXPECT_EQ(JsonWrapper::GetPath(*json_array), "path");
+    EXPECT_EQ(JsonWrapper::Path::GetPath(*json_array), "path");
     for (int i = 0; i < 3; ++i) {
         std::string path = "path/"+STLUtils::ToString(i);
-        EXPECT_EQ(JsonWrapper::GetPath((*json_array)[i]), path);
+        EXPECT_EQ(JsonWrapper::Path::GetPath((*json_array)[i]), path);
     }
     delete json_array;
 }
@@ -245,7 +245,7 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     Json::Value obj(Json::objectValue);
     obj["pointers"] = *pointers;
     obj["ref"][1] = *refs;
-    JsonWrapper::SetPath(obj["ref"][1], JsonWrapper::GetPath(*refs));
+    JsonWrapper::Path::SetPath(obj["ref"][1], JsonWrapper::Path::GetPath(*refs));
     CppToJson::RefManager::GetInstance().ResolveReferences(obj);
     std::string ref_paths[] = {"0", "1", "1", "0"};
     for (size_t i = 0; i < refs->size(); ++i)
