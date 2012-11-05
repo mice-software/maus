@@ -179,6 +179,9 @@ namespace JsonWrapper {
   Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
 
 namespace Path {
+  // Nb: Path could be a class? But then we lose "using" functionality; OTOH we
+  // can make things properly private...
+
   /** @brief Get the path from a json value
    *
    *  Path is stored in the comment field
@@ -213,6 +216,24 @@ namespace Path {
    *  accessed, throw a Squeal.
    */
   Json::Value& DereferencePath(Json::Value& json, std::string path);
+
+  /** @brief walk the Json structure setting path on all data
+   *
+   *  @param value json tree that will have path set
+   *  @param root_path path from root; all subsequent paths will be appended to
+   *         this one (set to "" to start from root)
+   */
+  void SetPathRecursive(Json::Value& json, std::string root_path);
+
+  /** @brief walk the Json structure stripping comments from all data
+   *
+   *  Metadata on json objects is stored in path information. This function
+   *  walks the data structure and strips out those comments.
+   */
+  void StripPathRecursive(Json::Value& json);
+
+  /** Private - do not call */
+  void _SetPathRecursive(Json::Value& json);
 }  // namespace Path
 }  // namespace JsonWrapper
 

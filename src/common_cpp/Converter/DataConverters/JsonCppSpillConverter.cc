@@ -24,6 +24,8 @@ namespace MAUS {
 
 Spill* JsonCppSpillConverter::_convert(const Json::Value* data) const {
   ReferenceResolver::JsonToCpp::RefManager::Birth();
+  Json::Value my_data = *data;
+  JsonWrapper::Path::SetPathRecursive(my_data, "");
   Spill* spill = SpillProcessor().JsonToCpp(*data);
   ReferenceResolver::JsonToCpp::RefManager::Death();
   return spill;

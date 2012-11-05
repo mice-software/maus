@@ -351,4 +351,43 @@ Json::Value& JsonWrapper::Path::DereferencePath
                  "JsonWrapper::DereferencePath"));
 }
 
+void JsonWrapper::Path::SetPathRecursive(Json::Value& json,
+                                         std::string root_path) {
+  SetPath(json, root_path);
+  _SetPathRecursive(json);
+}
+
+void JsonWrapper::Path::_SetPathRecursive(Json::Value& tree) {
+  std::string path = GetPath(tree);
+  switch (tree.type()) {
+      case Json::arrayValue: {
+          for (size_t i = 0; i < tree.size(); ++i) {
+              SetPath(tree[i], path);
+              AppendPath(tree[i], i);
+              _SetPathRecursive(tree[i]);
+          }
+          break;
+      }
+      case Json::objectValue: {
+          std::vector<std::string> properties = tree.getMemberNames();
+          for (size_t i = 0; i < properties.size(); ++i) {
+              SetPath(tree[properties[i]], path);
+              AppendPath(tree[properties[i]], properties[i]);
+              _SetPathRecursive(tree[properties[i]]);
+          }
+          break;
+      }
+      default: {
+          break;
+      }
+  }
+}
+
+void JsonWrapper::Path::StripPathRecursive(Json::Value& tree) {
+      tree.setComment("", Json::commentAfter);
+      for (Json::Value::iterator it = tree.begin(); it != tree.end(); ++it) {
+          StripPathRecursive(*it);
+      }
+}
+
 
