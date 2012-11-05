@@ -126,7 +126,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
 }
 
 bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
-
   Json::Reader reader;
   Json::FastWriter writer;
 

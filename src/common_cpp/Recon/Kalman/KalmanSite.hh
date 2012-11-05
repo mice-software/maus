@@ -133,6 +133,15 @@ class KalmanSite {
 
   int get_type() const { return _type; }
 
+  // Misalignments
+  TMatrixD get_shifts() const { return _s; }
+
+  void set_shifts(TMatrixD shift) { _s = shift; }
+
+  TMatrixD get_rotations() const { return _r; }
+
+  void set_rotations(TMatrixD rot) { _r = rot; }
+
  private:
   CLHEP::Hep3Vector _mc_pos;
 
@@ -158,6 +167,12 @@ class KalmanSite {
 
   /// The measurement.
   TMatrixD _v;
+
+  /// shifts
+  TMatrixD _s;
+
+  /// rotations
+  TMatrixD _r;
 
   double _z, _alpha, _alpha_projected, _alpha_smoothed;
 

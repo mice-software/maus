@@ -41,7 +41,12 @@ KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
   // MCS error.
   _Q.ResizeTo(5, 5);
   _Q.Zero();
-  // Alignment
+  // Alignment shifts
+  _S.ResizeTo(2, 3);
+  _S.Zero();
+  // Alignment rotations
+  _R.ResizeTo(2, 3);
+  _R.Zero();
 }
 
 //
@@ -259,17 +264,46 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
 }
 
 void KalmanTrack::update_H(KalmanSite *a_site) {
-  CLHEP::Hep3Vector dir = a_site->get_direction();
-  double dx = dir.x();
-  double dy = dir.y();
   double pitch = a_site->get_pitch();
+
+  CLHEP::Hep3Vector dir = a_site->get_direction();
+  double sin_theta = dir.x();
+  double cos_theta = dir.y();
+
+  TMatrixD a(5, 1);
+  a = a_site->get_a();
+  double x_0 = a(0, 0);
+  double y_0 = a(2, 0);
+
+  TMatrixD shift_misalign(3,1);
+  shift_misalign = a_site->get_shifts();
+  TMatrixD rotation_misalign(3,1);
+  rotation_misalign = a_site->get_rotations();
+
+  double x_d = shift_misalign(0, 0);
+  double y_d = shift_misalign(1, 0);
+  double theta_y = rotation_misalign(1, 0);
+
+  // Define useful factors
+  double cos_theta_cos_thetay = cos_theta*cos(theta_y);
+  double sin_theta_sin_thetay = sin_theta*sin(theta_y);
+  double sin_theta_cos_thetay = sin_theta*cos(theta_y);
+  double cos_theta_sin_thetay = cos_theta*sin(theta_y);
 
   if ( pitch ) {
     _H.Zero();
-    _H(0, 0) =  -dy/pitch;
-    _H(0, 2) =  dx/pitch;
+    _H(0, 0) = - (cos_theta_cos_thetay+sin_theta_sin_thetay)/pitch;
+    _H(0, 2) =   (sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
+    _S.Zero();
+    _S(0, 0) = (cos_theta_cos_thetay-sin_theta_sin_thetay)/pitch;
+    _S(0, 1) = -(sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
+    _R.Zero();
+    _R(0, 1) = -((x_0-x_d)/pitch)*(-cos_theta_sin_thetay+sin_theta_cos_thetay)+
+                ((y_0-y_d)/pitch)*(-sin_theta_sin_thetay-cos_theta_cos_thetay);
   } else {
     _H.Zero();
+    _S.Zero();
+    _R.Zero();
   }
 }
 
@@ -285,6 +319,32 @@ void KalmanTrack::update_covariance(KalmanSite *a_site) {
   a_site->set_covariance_matrix(Cp);
 }
 
+TMatrixD KalmanTrack::solve_measurement_equation(KalmanSite *site) {
+  TMatrixD a(5, 1);
+  a = site->get_projected_a();
+  TMatrixD ha(2, 1);
+  ha = TMatrixD(_H, TMatrixD::kMult, a);
+
+  TMatrixD s(3, 1);
+  s = site->get_shifts();
+  TMatrixD Ss(2, 1);
+  Ss = TMatrixD(_S, TMatrixD::kMult, s);
+
+  TMatrixD r(3, 1);
+  r = site->get_rotations();
+  TMatrixD Rr(2, 1);
+  Rr = TMatrixD(_R, TMatrixD::kMult, r);
+
+  TMatrixD measurement(2, 1);
+  TMatrixD temp1(2, 1);
+
+  temp1 = TMatrixD(ha,TMatrixD::kPlus,Ss);
+  measurement = TMatrixD(temp1,TMatrixD::kPlus,Rr);
+
+  std::cerr << "Solved f.\n";
+  return measurement;
+}
+
 void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   /////////////////////////////////////////////////////////////////////
   // PULL = m - ha
@@ -296,14 +356,16 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   TMatrixD a(5, 1);
   a = a_site->get_projected_a();
   // TMatrixD ha(1, 1);
-  TMatrixD ha(2, 1);
-  ha = TMatrixD(_H, TMatrixD::kMult, a);
+  TMatrixD f(2, 1);
+  std::cerr << "about to solve f.\n";
+  f = solve_measurement_equation(a_site);
+  f.Print();
   // Extrapolation converted to expected measurement.
-  double alpha_model = ha(0, 0);
+  double alpha_model = f(0, 0);
   a_site->set_projected_alpha(alpha_model);
 
   TMatrixD pull(2, 1);
-  pull = TMatrixD(m, TMatrixD::kMinus, ha);
+  pull = TMatrixD(m, TMatrixD::kMinus, f);
   /////////////////////////////////////////////////////////////////////
   //
   // Kalman Gain: K = C Ht (V + H C Ht)-1

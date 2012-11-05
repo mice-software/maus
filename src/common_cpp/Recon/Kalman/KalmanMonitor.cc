@@ -61,7 +61,7 @@ KalmanMonitor::KalmanMonitor() {
 }
 
 KalmanMonitor::~KalmanMonitor() {
-  TFile f("kalman_histograms.root", "new");
+  TFile f("kalman_histograms.root", "RECREATE");
   f.Write();
 }
 
@@ -129,7 +129,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
 
     int id = site.get_id();
 
-    std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
+    //std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
 
     if ( id < 15 ) {
       mc_x  = -mc_x;

@@ -32,6 +32,8 @@ KalmanSite::KalmanSite(): _z(0.), _id(0), _type(-1), _pitch(0.),
   _smoothed_a.ResizeTo(5, 1);
 
   _v.ResizeTo(2, 1);
+  _s.ResizeTo(3, 1);
+  _r.ResizeTo(3, 1);
 
   _mc_pos = (0., 0., 0.);
   _mc_mom = (0., 0., 0.);
@@ -59,6 +61,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _a.ResizeTo(5, 1);
   _C.ResizeTo(5, 5);
   _v.ResizeTo(2, 1);
+  _s.ResizeTo(3, 1);
+  _r.ResizeTo(3, 1);
   _projected_C.ResizeTo(5, 5);
   _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
@@ -67,6 +71,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _a = site.get_a();
   _C = site.get_covariance_matrix();
   _v = site.get_measurement();
+  _s = site.get_shifts();
+  _r = site.get_rotations();
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
   _smoothed_C  = site.get_smoothed_covariance_matrix();
@@ -96,6 +102,8 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _a = site.get_a();
   _C = site.get_covariance_matrix();
   _v = site.get_measurement();
+  _s = site.get_shifts();
+  _r = site.get_rotations();
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
   _smoothed_C  = site.get_smoothed_covariance_matrix();
@@ -118,5 +126,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
 
   return *this;
 }
+
+
 
 } // ~namespace MAUS
