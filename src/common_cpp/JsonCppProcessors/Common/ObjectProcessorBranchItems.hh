@@ -43,17 +43,14 @@ class BaseItem {
     /** SetCppChild set the child data on the C++ representation
      */
     virtual void SetCppChild
-                  (const Json::Value& parent_json, ParentType& parent_cpp) {
-        _SetCppChild(parent_json, parent_cpp);
-    }
+                  (const Json::Value& parent_json, ParentType& parent_cpp);
+
     /** SetCppChild set the child data on the json representation
      *
      *  Uses the json comment field to store metadata (e.g. path)
      */
     virtual void SetJsonChild
-                  (const ParentType& parent_cpp, Json::Value& parent_json) {
-        _SetJsonChild(parent_cpp, parent_json);
-    }
+                  (const ParentType& parent_cpp, Json::Value& parent_json);
 
     /** Get the branch name */
     virtual std::string GetBranchName() const = 0;
@@ -67,24 +64,14 @@ class BaseItem {
     virtual void _SetJsonChild
                   (const ParentType& parent_cpp, Json::Value& parent_json) = 0;
 
-    std::string GetPath(Json::Value& parent) {
-        std::string branch = GetBranchName();
-        Json::Value test;
-        JsonWrapper::Path::SetPath(test, JsonWrapper::Path::GetPath(parent));
-        JsonWrapper::Path::AppendPath(test, GetBranchName());
-        return JsonWrapper::Path::GetPath(test);
-    }
+    /** Get the path to the child branch based on parent path and branch name */
+    std::string GetPath(Json::Value& parent);
 
-    void SetPath(Json::Value& parent) {
-        std::string branch = GetBranchName();
-        Json::Value test;
-        JsonWrapper::Path::SetPath(parent[branch],
-                                            JsonWrapper::Path::GetPath(parent));
-        JsonWrapper::Path::AppendPath(parent[branch], GetBranchName());
-    }
+    /** Set the path to the child branch based on parent path and branch name */
+    void SetPath(Json::Value& parent);
 };
 
-/** @class PointerRefItem pointer branch for a Cpp object
+/** @class PointerRefItem pointer reference branch for a Cpp object
  *
  *  Probably don't want to use this class, instead use Register...Branch methods
  *  directly on ObjectProcessor
@@ -93,31 +80,7 @@ class BaseItem {
  *  @tparam ChildType type of the child object referenced by the branch. Should
  *  use the actual type even if the target is a pointer
  *
- *  For resolving references; logic is - for conversion from Json to C++
- *
- *  At first pass conversion
- *
- *  \li We store a C++ pointer, Json::Value pair 
- *  \li We store the Json address of the target (as string)
- *  \li We store the C++ pointer of the target (as string)
- *
- *  On the PointerItem,
- *
- *  \li We store a static map of Json address to C++ pointer
- *
- *  We store a static list of PointerRefs. 
- *
- *  When we attempt to resolve references; 
- *  for pointer_ref in PointerRefs:
- *    get json address from pointer_ref;
- *    extract C++ pointer from pointer item map;
- *    fill C++ pointer
- *  
- *  Problem: how do we deal with types? Abstraction which has 
- *  ResolveReferences() function... the caller doesn't need to know the pointer
- *  type, only the child class does (so templates are all in the child class);
- *  then we store a vector of reference resolvers and list of PointerRefItems.
- *  Propose then this is wrapped up in a reference manager class.
+ *  References the location of a PointerValueItem type branch.
  */
 template <class ParentType, class ChildType>
 class PointerRefItem : public BaseItem<ParentType> {
@@ -142,50 +105,20 @@ class PointerRefItem : public BaseItem<ParentType> {
                    ProcessorBase<ChildType>* child_processor,
                    GetMethod getter,
                    SetMethod setter,
-                   bool is_required)
-        : BaseItem<ParentType>(), _branch(branch_name),
-          _processor(child_processor), _setter(setter),
-          _getter(getter), _required(is_required) {
-    }
+                   bool is_required);
 
     /** SetCppChild using data from parent_json
      *
      *  @param parent_json json object whose child branch is used to make C++
      *  representation
      *  @param parent_cpp C++ object where C++ data is put
+     *
+     *  Performs some error checking then adds a reference to the RefManager. If
+     *  RefManager has not been birthed then does nothing. Actual pointer
+     *  allocation is done after the entire tree has been parsed by
+     *  RefManager::SetReferences()
      */
-    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
-        if (!parent_json.isMember(_branch)) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Missing required branch "+_branch+" converting json->cpp",
-                "PointerRefItem::SetCppChild");
-            } else {
-                return;
-            }
-        }
-        if (parent_json[_branch].isNull()) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Null branch "+_branch+" converting json->cpp",
-                "PointerRefItem::SetCppChild");
-            } else {
-                return;
-            }
-        }
-        Json::Value child_json = parent_json[_branch];
-        std::string data_path = JsonWrapper::GetProperty
-                      (child_json, "$ref", JsonWrapper::stringValue).asString();
-        using namespace ReferenceResolver::JsonToCpp;
-        if (RefManager::HasInstance()) {
-            FullyTypedResolver<ParentType, ChildType>* res =
-                                   new FullyTypedResolver<ParentType, ChildType>
-                                              (data_path, _setter, &parent_cpp);
-            RefManager::GetInstance().AddReference(res);
-        }
-        // syntax is (_object.*_function)(args);
-        (parent_cpp.*_setter)(NULL);
-    }
+    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
 
     /** SetJsonChild fills the branch with a Null json value and stores the
      *  branch location and pointer in the reference manager for filling later.
@@ -193,27 +126,13 @@ class PointerRefItem : public BaseItem<ParentType> {
      *  @param parent_cpp C++ object from whence C++ data is got
      *  @param parent_json json object whose child branch is set using C++
      *  representation
+     *
+     *  Performs some error checking then adds a reference to the RefManager. If
+     *  RefManager has not been birthed then does nothing. Actual pointer
+     *  allocation is done after the entire tree has been parsed by
+     *  RefManager::SetReferences()
      */
-    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
-        ChildType* child_cpp = (parent_cpp.*_getter)();
-        if (child_cpp == NULL) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Failed to find branch "+_branch+": class data was NULL",
-                "PointerRefItem::GetCppChild");
-            } else {
-                return;
-            }
-        }
-        parent_json[_branch] = Json::Value();
-        BaseItem<ParentType>::SetPath(parent_json);
-        using namespace ReferenceResolver::CppToJson;
-        if (RefManager::HasInstance()) {
-            TypedResolver<ChildType>* res = new TypedResolver<ChildType>
-                  (child_cpp, JsonWrapper::Path::GetPath(parent_json[_branch]));
-            RefManager::GetInstance().AddReference(res);
-        }
-    }
+    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
 
     /** Get the branch name */
     std::string GetBranchName() const {return _branch;}
@@ -224,15 +143,6 @@ class PointerRefItem : public BaseItem<ParentType> {
     SetMethod _setter;
     GetMethod _getter;
     bool      _required;
-    // for CppToJson, we want to map the cpp pointer to the address of the json
-    // data which needs to be filled; and map the json path to the cpp pointer.
-    // as we can have many references to the same cpp pointer, this needs to be
-    // a multimap; but the pointer only exists once, so this is a map.
-    //
-    // When we are ready to fill pointers, we loop over items in the multimap;
-    // and for each ChildType* we look for the appropriate string pointer on the
-    // PointerItem... if it can't be found then we wait; else we Set the
-    // ChildType and pop that pair off the multimap
 };
 
 /** @class PointerItem pointer branch for a Cpp object
@@ -264,11 +174,7 @@ class PointerItem : public BaseItem<ParentType> {
      *  Set...Child methods are called
      */
     PointerItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
-                GetMethod getter, SetMethod setter, bool is_required)
-        : BaseItem<ParentType>(), _branch(branch_name),
-          _processor(child_processor), _setter(setter),
-          _getter(getter), _required(is_required) {
-    }
+                GetMethod getter, SetMethod setter, bool is_required);
 
     /** _SetCppChild using data from parent_json
      *
@@ -276,35 +182,7 @@ class PointerItem : public BaseItem<ParentType> {
      *  representation
      *  @param parent_cpp C++ object where C++ data is put
      */
-    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
-        if (!parent_json.isMember(_branch)) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Missing required branch "+_branch+" converting json->cpp",
-                "PointerItem::_SetCppChild");
-            } else {
-                return;
-            }
-        }
-        if (parent_json[_branch].isNull()) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Null branch "+_branch+" converting json->cpp",
-                "PointerItem::_SetCppChild");
-            } else {
-                return;
-            }
-        }
-        Json::Value child_json = parent_json[_branch];
-        ChildType* child_cpp = _processor->JsonToCpp(child_json);
-        using namespace ReferenceResolver::JsonToCpp;
-        if (RefManager::HasInstance()) {
-            std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
-            ChildTypedResolver<ChildType>::AddData(pth, child_cpp);
-        }
-        // syntax is (_object.*_function)(args);
-        (parent_cpp.*_setter)(child_cpp);
-    }
+    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
 
     /** SetJsonChild using data from parent_cpp
      *
@@ -312,29 +190,7 @@ class PointerItem : public BaseItem<ParentType> {
      *  @param parent_json json object whose child branch is set using C++
      *  representation
      */
-    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
-        ChildType* child_cpp = (parent_cpp.*_getter)();
-        if (child_cpp == NULL) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Failed to find branch "+_branch+": class data was NULL",
-                "PointerItem::GetCppChild");
-            } else {
-                return;
-            }
-        }
-        std::string path = BaseItem<ParentType>::GetPath(parent_json);
-        Json::Value* child_json = _processor->CppToJson(*child_cpp, path);
-        parent_json[_branch] = *child_json;
-        delete child_json;
-        // slightly worrying, the path doesn't seem to get pulled through here
-        BaseItem<ParentType>::SetPath(parent_json);
-        using namespace ReferenceResolver::CppToJson;
-        if (RefManager::HasInstance()) {
-            std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
-            TypedResolver<ChildType>::AddData(child_cpp, pth);
-        }
-    }
+    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
 
     /** Get the branch name */
     std::string GetBranchName() const {return _branch;}
@@ -375,11 +231,7 @@ class ValueItem : public BaseItem<ParentType> {
      *  is_required is set to true
      */
     ValueItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,
-                GetMethod getter, SetMethod setter, bool is_required)
-                          : BaseItem<ParentType>(), _branch(branch_name),
-                            _processor(child_processor), _setter(setter),
-      _getter(getter), _required(is_required) {
-    }
+                GetMethod getter, SetMethod setter, bool is_required);
 
     // Set the child in the ParentInstance
     /** _SetCppChild using data from parent_json
@@ -388,22 +240,7 @@ class ValueItem : public BaseItem<ParentType> {
      *  representation
      *  @param parent_cpp C++ object where C++ data is put
      */
-    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
-        if (!parent_json.isMember(_branch)) {
-            if (_required) {
-                throw Squeal(Squeal::recoverable,
-                "Missing required branch "+_branch+" converting json->cpp",
-                "ValueItem::_SetCppChild");
-            } else {
-                return;
-            }
-        }
-        Json::Value child_json = parent_json[_branch];
-        ChildType* child_cpp = _processor->JsonToCpp(child_json);
-        // syntax is (_object.*_function)(args);
-        (parent_cpp.*_setter)(*child_cpp);
-        delete child_cpp;
-    }
+    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
 
     /** SetJsonChild using data from parent_cpp
      *
@@ -411,15 +248,7 @@ class ValueItem : public BaseItem<ParentType> {
      *  @param parent_json json object whose child branch is set using C++
      *  representation
      */
-    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
-        ChildType child_cpp = (parent_cpp.*_getter)();
-        std::string path = BaseItem<ParentType>::GetPath(parent_json);
-        Json::Value* child_json = _processor->CppToJson(child_cpp, path);
-        parent_json[_branch] = *child_json;
-        delete child_json;
-        // slightly worrying, the path doesn't seem to get pulled through here
-        BaseItem<ParentType>::SetPath(parent_json);
-    }
+    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
 
     /** Get the branch name */
     std::string GetBranchName() const {return _branch;}
@@ -449,10 +278,7 @@ class ConstantItem : public BaseItem<ParentType> {
      *  @param is_required if the branch doesnt exist in json, throw Squeal if
      *  is_required is set to true
      */
-    ConstantItem(std::string branch_name, Json::Value child_value, bool is_required)
-                          : BaseItem<ParentType>(), _branch(branch_name),
-                            _child_value(child_value), _required(is_required) {
-    }
+    ConstantItem(std::string branch_name, Json::Value child_value, bool is_required);
 
     /** _SetCppChild using data from parent_json
      *
@@ -463,19 +289,7 @@ class ConstantItem : public BaseItem<ParentType> {
      *  representation
      *  @param parent_cpp C++ object - ignored in this case
      */
-    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
-        if (_required && !parent_json.isMember(_branch)) {
-                throw Squeal(Squeal::recoverable,
-                "Missing required branch "+_branch+" converting json->cpp",
-                "ConstantItem::_SetCppChild");
-        } else if (parent_json.isMember(_branch) && !JsonWrapper::AlmostEqual
-                                   (parent_json[_branch], _child_value, 1e-9)) {
-                throw Squeal(Squeal::recoverable,
-                "Wrong value in branch "+_branch+": "+
-                                JsonWrapper::JsonToString(parent_json[_branch]),
-                "ConstantItem::_SetCppChild");
-        }
-    }
+    void _SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp);
 
     /** SetJsonChild using data from parent_cpp
      *
@@ -483,10 +297,7 @@ class ConstantItem : public BaseItem<ParentType> {
      *  @param parent_json json object whose child branch is set using C++
      *  representation
      */
-    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
-        parent_json[_branch] = _child_value;
-        BaseItem<ParentType>::SetPath(parent_json);
-    }
+    void _SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json);
 
     /** Get the branch name */
     std::string GetBranchName() const {return _branch;}
@@ -498,4 +309,6 @@ class ConstantItem : public BaseItem<ParentType> {
 };
 // }  // namespace ObjectProcessorNS
 }  // namespace MAUS
+
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorBranchItems-inl.hh"
 #endif
