@@ -76,14 +76,12 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack> straight_tracks) 
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
       // std::cerr << "Smoothing site " << i << std::endl;
-      //smooth(sites, track, i);
+      smooth(sites, track, i);
     }
-
     track->compute_chi2(sites);
 
-
     monitor.fill(sites);
-    // monitor.print_info(sites);
+    monitor.print_info(sites);
     //if ( track->get_chi2() < 2. ) {
     //  update_alignment_parameters(sites);
    // }

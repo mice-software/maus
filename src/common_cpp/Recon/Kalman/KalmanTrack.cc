@@ -357,9 +357,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   a = a_site->get_projected_a();
   // TMatrixD ha(1, 1);
   TMatrixD f(2, 1);
-  std::cerr << "about to solve f.\n";
   f = solve_measurement_equation(a_site);
-  f.Print();
   // Extrapolation converted to expected measurement.
   double alpha_model = f(0, 0);
   a_site->set_projected_alpha(alpha_model);

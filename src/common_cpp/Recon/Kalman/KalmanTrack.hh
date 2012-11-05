@@ -92,7 +92,9 @@ class KalmanTrack {
 
  protected:
   TMatrixD _H;
+
   TMatrixD _S;
+
   TMatrixD _R;
 
   TMatrixD _V;
@@ -112,11 +114,11 @@ class KalmanTrack {
   double _mass, _momentum;
 
   // static const double sigma_x = 0.64; // x measurement resolution (mm)
-  double _conv_factor; // = 2./(7.*0.427); // mm to channel convertion factor.
+  // double _conv_factor; // = 2./(7.*0.427); // mm to channel convertion factor.
 
   double _active_radius; // = 150.;
 
-  double _channel_width; // = 1.333; // (1.4945) effective channel width without overlap
+  //double _channel_width; // = 1.333; // (1.4945) effective channel width without overlap
 };
 
 } // ~namespace MAUS

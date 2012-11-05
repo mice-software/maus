@@ -20,6 +20,8 @@
 namespace MAUS {
 
 KalmanMonitor::KalmanMonitor() {
+  _counter = 0;
+
   pull_hist = new TH2F("hist","Kalman Monitor",30,0,29,70,-30,30);
   pull2_hist = new TH2F("hist2","Kalman Monitor2",30,0,29,30,-50,50);
 
@@ -61,8 +63,7 @@ KalmanMonitor::KalmanMonitor() {
 }
 
 KalmanMonitor::~KalmanMonitor() {
-  TFile f("kalman_histograms.root", "RECREATE");
-  f.Write();
+  save();
 }
 
 void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
@@ -206,6 +207,16 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     py_smooth_h->Fill(id, py_smooth-mc_py/mc_pz);
     pz_smooth_h->Fill(id, (1./kappa_smooth)-mc_pz);
   }
+
+  _counter +=1;
+  if ( !(_counter%20) ) {
+    save();
+  }
+}
+
+void KalmanMonitor::save() {
+  TFile f("kalman_histograms.root", "RECREATE");
+  f.Write();
 }
 
 } // ~namespace MAUS

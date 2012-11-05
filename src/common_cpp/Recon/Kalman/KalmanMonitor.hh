@@ -52,7 +52,11 @@ class KalmanMonitor {
 
   void print_info(std::vector<KalmanSite> const &sites);
 
+  void save();
+
  private:
+  int _counter;
+
   std::vector<double> _alpha_meas, _site, _alpha_projected;
 
    TH2F *pull_hist;
