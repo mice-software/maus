@@ -76,6 +76,7 @@ void PointerRefItem<ParentType, ChildType>::_SetCppChild
             "Missing required branch "+_branch+" converting json->cpp",
             "PointerRefItem::SetCppChild");
         } else {
+            (parent_cpp.*_setter)(NULL);
             return;
         }
     }
@@ -85,9 +86,21 @@ void PointerRefItem<ParentType, ChildType>::_SetCppChild
             "Null branch "+_branch+" converting json->cpp",
             "PointerRefItem::SetCppChild");
         } else {
+            (parent_cpp.*_setter)(NULL);
             return;
         }
     }
+    if (parent_json[_branch]["$ref"].isNull()) {
+        if (_required) {
+            throw Squeal(Squeal::recoverable,
+            "Null branch "+_branch+" converting json->cpp",
+            "PointerRefItem::SetCppChild");
+        } else {
+            (parent_cpp.*_setter)(NULL);
+            return;
+        }
+    }
+
     Json::Value child_json = parent_json[_branch];
     std::string data_path = JsonWrapper::GetProperty
                   (child_json, "$ref", JsonWrapper::stringValue).asString();
@@ -112,6 +125,7 @@ void PointerRefItem<ParentType, ChildType>::_SetJsonChild
             "Failed to find branch "+_branch+": class data was NULL",
             "PointerRefItem::GetCppChild");
         } else {
+            parent_json[_branch] = Json::Value();
             return;
         }
     }
@@ -124,6 +138,8 @@ void PointerRefItem<ParentType, ChildType>::_SetJsonChild
         RefManager::GetInstance().AddReference(res);
     }
 }
+
+//////////////////////////////////////////////////////////////
 
 template <class ParentType, class ChildType>
 PointerItem<ParentType, ChildType>::PointerItem(

@@ -94,7 +94,8 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      */
     Json::Value* CppToJson(const ObjectType& cpp_instance);
 
-    /** Register a branch for processing
+    /** Register a branch for processing, where the data is stored in a pointer
+     *  and the ParentType owns the memory pointed to. 
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
@@ -118,14 +119,15 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);
 
-    /** Register a branch reference for processing
+    /** Register a branch reference for processing, where the data is stored in
+     *  a pointer and another class in the tree owns the memory pointed to. 
      *
-     *  Here a reference is distinct from a value because we really only convert
-     *  the address and assume that the value is passed elsewhere in the tree
-     *  as a PointerBranch. Pointers are resolved after all other processing is
-     *  complete. Memory is assumed to be owned by the ParentType of the
-     *  RegisterPointerBranch, NOT the ParentType of this 
-     *  RegisterPointerReference.
+     *  For a PointerReference we only convert the address and assume that the
+     *  value is passed elsewhere in the tree as a PointerBranch.
+     *  
+     *  Pointers are resolved after all other processing is complete. Memory is
+     *  assumed to be owned by the ParentType of the RegisterPointerBranch, NOT
+     *  the ParentType of this RegisterPointerReference.
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer (i.e. 
@@ -138,8 +140,9 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  where memory is still owned by the ParentType
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is owned by the PointerBranch parent
-     *  @param is_required if the branch doesnt exist in json or is NULL in C++,
-     *  throw Squeal if is_required is set to true
+     *  @param is_required if the branch doesnt exist in json, is None in json,
+     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  the branch to NULL/None as appropriate
      *
      *  Note: don't forget Get method has to be const
      */
@@ -150,7 +153,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);
 
-    /** Register a branch for processing
+    /** Register a branch for processing where the data is stored by value.
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer

@@ -17,6 +17,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolver.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 namespace MAUS {
 namespace ReferenceResolver {
@@ -27,15 +28,16 @@ TEST(ReferenceResolverTest, TypedCppToJsonResolver) {
     parent["test"] = Json::Value();
     CppToJson::TypedResolver<double> res(&child, "#test");
     CppToJson::TypedResolver<double>::AddData(&child, "PATH TO BRANCH");
+    EXPECT_THROW(CppToJson::TypedResolver<double>::
+                                     AddData(&child, "PATH TO BRANCH"), Squeal);
     res.ResolveReferences(parent);
      
     Json::Value test(Json::objectValue);
     test["$ref"] = Json::Value("PATH TO BRANCH");
-    // the actual test...
     EXPECT_EQ(parent["test"], test);
     res.ClearData();
     parent["test"] = Json::Value("bob");
-    res.ResolveReferences(parent);
+    EXPECT_THROW(res.ResolveReferences(parent), Squeal);
     EXPECT_EQ(parent["test"], Json::Value()) << parent["test"];
 }
 
@@ -52,10 +54,11 @@ TEST(ReferenceResolverTest, JsonToCppResolver) {
     FullyTypedResolver<TestClass, double> res
                                           ("#data", &TestClass::SetData, &test);
     ChildTypedResolver<double>::AddData("#data", &child);
+    EXPECT_THROW(ChildTypedResolver<double>::AddData("#data", &child), Squeal);
     res.ResolveReferences();
     EXPECT_TRUE(test._data == &child);
     res.ClearData();
-    res.ResolveReferences();
+    EXPECT_THROW(res.ResolveReferences(), Squeal);
     EXPECT_TRUE(test._data == NULL);
 }
 
@@ -71,7 +74,7 @@ TEST(ReferenceResolverTest, JsonToCppVectorResolver) {
     VectorResolver<double> res2("#data", vec, 1);
     EXPECT_THROW(res2.ResolveReferences(), Squeal);
     res.ClearData();
-    res.ResolveReferences();
+    EXPECT_THROW(res.ResolveReferences(), Squeal);
     EXPECT_TRUE(vec[0] == NULL);
 }
 

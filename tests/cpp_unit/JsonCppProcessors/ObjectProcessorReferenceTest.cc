@@ -151,8 +151,6 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
   test_3.GetChild1()->SetReference(test_3.GetPointer());
   test_3.SetChild2(new TestObject_4());
   test_3.GetChild2()->SetReference(test_3.GetPointer());
-  std::cerr << "TEST_3 " << &test_3 << "\nPOINTER " << test_3.GetPointer()
-            << "\nChild1 " << test_3.GetChild1() << "\nChild2 " << test_3.GetChild2() << std::endl;
 
   // setup processors
   DoubleProcessor double_proc;
@@ -169,12 +167,12 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
   
   // test C++ to Json conversion
   Json::Value* test_3_json = test_3_proc.CppToJson(test_3);
-  std::cerr << "REF" << std::endl;
-  std::cerr << "TEST_3 in json\n" << *test_3_json << std::endl;
-  ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(*test_3_json);
-  std::cerr << "TEST_3 after resolve references\n" << *test_3_json << std::endl;
-  EXPECT_EQ((*test_3_json)["child_1"]["reference"]["$ref"], Json::Value("#pointer"));
-  EXPECT_EQ((*test_3_json)["child_2"]["reference"]["$ref"], Json::Value("#pointer"));
+  ReferenceResolver::CppToJson::RefManager::
+                                 GetInstance().ResolveReferences(*test_3_json);
+  EXPECT_EQ((*test_3_json)["child_1"]["reference"]["$ref"],
+            Json::Value("#pointer"));
+  EXPECT_EQ((*test_3_json)["child_2"]["reference"]["$ref"],
+            Json::Value("#pointer"));
 
   // check Json to C++ conversion
   TestObject_3* test_3_out = test_3_proc.JsonToCpp(*test_3_json);
@@ -184,10 +182,38 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
   EXPECT_EQ(test_3_out->GetChild2()->GetReference(),
             test_3_out->GetPointer());
   EXPECT_EQ(*(test_3_out->GetPointer()), *(test_3.GetPointer())); 
+
   delete test_3_json;
   delete test_3_out;
   ReferenceResolver::CppToJson::RefManager::Death();
   ReferenceResolver::JsonToCpp::RefManager::Death();
+}
+
+TEST(ObjectProcessorReferenceTest, RequiredTest) {
+  DoubleProcessor double_proc;
+  ObjectProcessor<TestObject_4> test_4_req_proc;
+  test_4_req_proc.RegisterPointerReference("reference", &double_proc,
+               &TestObject_4::GetReference, &TestObject_4::SetReference, true);
+  ObjectProcessor<TestObject_4> test_4_not_proc;
+  test_4_not_proc.RegisterPointerReference("reference", &double_proc,
+               &TestObject_4::GetReference, &TestObject_4::SetReference, false);
+
+  TestObject_4 test_4_cpp;
+  test_4_cpp.SetReference(NULL);
+  EXPECT_THROW(test_4_req_proc.CppToJson(test_4_cpp), Squeal);
+  delete test_4_not_proc.CppToJson(test_4_cpp);  // shouldnt throw
+
+  Json::Value test_4_json(Json::objectValue);
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Squeal);
+  delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
+
+  test_4_json["reference"] = Json::Value();
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Squeal);
+  delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
+
+  test_4_json["reference"]["$ref"] = Json::Value();
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Squeal);
+  delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
 }
 
 MAUS::ObjectProcessor<TestObject_2> GetTest2Proc

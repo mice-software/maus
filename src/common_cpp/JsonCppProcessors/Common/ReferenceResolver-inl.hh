@@ -19,6 +19,8 @@
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/legacy/Interface/STLUtils.hh"
 
 namespace MAUS {
 namespace ReferenceResolver {
@@ -35,17 +37,30 @@ void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
         Json::Value& child =
                    JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
         child = Json::Value();
+        throw(Squeal(Squeal::recoverable,
+              "Failed to resolve reference at "+_json_pointer+
+              " with C++ address "+STLUtils::ToString(_cpp_pointer),
+              "ReferenceResolver::TypedResolver::ResolveReferences"));
     } else {  // set json reference to point at json value
         Json::Value& child =
                    JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
-        Json::Value reference_value(Json::objectValue); 
+        Json::Value reference_value(Json::objectValue);
         reference_value["$ref"] = _data_hash[_cpp_pointer];
         child = reference_value;
     }
 }
 
 template <class ChildType>
-void TypedResolver<ChildType>::AddData(ChildType* data_cpp_address, std::string data_json_address) {
+void TypedResolver<ChildType>::AddData(ChildType* data_cpp_address,
+                                       std::string data_json_address) {
+    if (_data_hash.find(data_cpp_address) != _data_hash.end()) {
+        throw(Squeal(Squeal::recoverable,
+              "Attempt to register "+STLUtils::ToString(data_cpp_address)+
+              " to "+data_json_address+" when it was already registered to "+
+              _data_hash[data_cpp_address],
+              "ReferenceResolver::TypedResolver::AddData"));
+        
+    }
     _data_hash[data_cpp_address] = data_json_address;
 }
 
@@ -97,6 +112,11 @@ void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
                              ChildTypedResolver<ChildType>::_data_hash;
     if (data_hash.find(_ref_json_address) == data_hash.end()) {
         (*_ref_cpp_parent.*_cpp_setter)(NULL);
+        throw(Squeal(Squeal::recoverable,
+              "Failed to resolve reference at "+_ref_json_address+
+              " on C++ object "+STLUtils::ToString(_ref_cpp_parent),
+              "ReferenceResolver::FullyTypedResolver::ResolveReferences"));
+
     } else {
         (*_ref_cpp_parent.*_cpp_setter)(data_hash[_ref_json_address]);
     }
@@ -120,9 +140,14 @@ void VectorResolver<ChildType>::ResolveReferences() {
         throw(Squeal(Squeal::recoverable,
                      "Index out of range while resolving pointer to array "+
                      _ref_json_address,
-                     "VectorResolver<ChildType>::ResolverReferences"));
+                     "ReferenceResolver::VectorResolver::ResolveReferences"));
     if (data_hash.find(_ref_json_address) == data_hash.end()) {
         _vector[_index] = NULL;
+        throw(Squeal(Squeal::recoverable,
+              "Failed to resolve reference at "+_ref_json_address+
+              " on C++ vector "+STLUtils::ToString(&_vector)+" element "+
+              STLUtils::ToString(_index),
+              "ReferenceResolver::VectorResolver::ResolveReferences"));
     } else {
         _vector[_index] = data_hash[_ref_json_address];
     }
@@ -149,6 +174,16 @@ RefManager::~RefManager() {
 template <class ChildType>
 void ChildTypedResolver<ChildType>::AddData
                   (std::string data_json_address, ChildType* data_cpp_address) {
+    if (_data_hash.find(data_json_address) != _data_hash.end()) {
+        throw(Squeal(Squeal::recoverable,
+              "Attempt to register "+data_json_address+
+              " to "+STLUtils::ToString(data_cpp_address)+
+              " when it was already registered to "+
+              STLUtils::ToString(_data_hash[data_json_address]),
+              "ReferenceResolver::TypedResolver::AddData"));
+        
+    }
+
     _data_hash[data_json_address] = data_cpp_address;
 }
 
