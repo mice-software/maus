@@ -204,6 +204,7 @@ namespace MAUS {
     std::string minimal_spill =
         std::string("{\"spill_number\":1, \"run_number\":-1, ")+
         std::string("\"daq_event_type\":\"physics_event\", ")+
+        std::string("\"maus_event_type\":\"Spill\", ")+
         std::string("\"errors\":{\"an_error\":\"message\"}}");
     Json::Value json_in;
     ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(minimal_spill))

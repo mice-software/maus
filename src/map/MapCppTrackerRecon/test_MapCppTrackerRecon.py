@@ -1,96 +1,123 @@
-"""  Test for MapCppTrackerRecon """
+# This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+# MAUS is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# MAUS is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Tests for MapCppTrackerRecon"""
+
+# pylint: disable = C0103
+
+import os
 import json
 import unittest
-import os
-import random
-from Configuration import Configuration
+import Configuration
+import MAUS
 
-from MapCppTrackerRecon import MapCppTrackerRecon
+class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
+    """Tests for MapCppTrackerRecon"""
 
-# Disable: Too many public methods
-# pylint: disable-msg=R0904
-# Disable: Invalid name
-# pylint: disable-msg=C0103
-# Disable: Class method should have 'cls' as first argument
-# pylint: disable-msg=C0202
-
-class MapCppTrackerReconTestCase(unittest.TestCase):
-    """ The MapCppTrackerRecon test.
-    Member functions are:
-
-    - bool birth(std::string argJsonConfigDocument);
-    - bool death();
-    - std::string process(std::string document);
-    - void digitization(SciFiSpill &spill, Json::Value &root);
-    - void fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill);
-    - void cluster_recon(SciFiEvent &evt);
-    - void spacepoint_recon(SciFiEvent &evt);
-    - void save_to_json(SciFiEvent &evt);
-    - void print_event_info(SciFiEvent &event);
-    Functions added for testing purpose only:
-    - JsonToString(Json::Value json_in);
-    - ConvertToJson(std::string jsonString);
-
-    The functions listed above are not elementar; the rely upon calls
-    to other functions, for which we have cpp unit tests
-    (check the tests/cpp_unit/Recon/ directory).
-
-    This python test will work over the process
-    """    
-    @classmethod
-    def setUpClass(self):
-        """ Class Initializer.
-            The set up is called before each test function
-            is called.
-        """
-        self.mapper = MapCppTrackerRecon()
-        conf = json.loads(Configuration().getConfigJSON())
-        conf["reconstruction_geometry_filename"] = "Stage6.dat"
-        # Test whether the configuration files were loaded correctly at birth
-        success = self.mapper.birth(json.dumps(conf))
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-
-
-    def test_death(self):
-        """ Test to make sure death occurs """
-        self.assertTrue(self.mapper.death())
-
-    def test_process(self):
-        """ Test of the process function """
-        root_dir = os.environ.get("MAUS_ROOT_DIR")
-        assert root_dir != None
-        assert os.path.isdir(root_dir)
-        _filename = \
-        '%s/src/map/MapCppTrackerRecon/lab7_unpacked' % root_dir
-        assert os.path.isfile(_filename)
-        _file = open(_filename, 'r')
-        # File is open.
-        # Spill 1 is corrupted.
-        spill_1 = _file.readline().rstrip()
-        output_1 = self.mapper.process(spill_1)
-        self.assertTrue("errors" in json.loads(output_1))
-        # Spill 2 is sain.
-        spill_2 = _file.readline().rstrip()
-        output_2 = self.mapper.process(spill_2)
-        self.assertTrue("digits" in json.loads(output_2))
-        self.assertTrue("space_points" in json.loads(output_2))
-        # spill 3 is end of event
-        spill_3 = _file.readline().rstrip()
-        output_3 = self.mapper.process(spill_3)
-        self.assertTrue("END_OF_RUN" in json.loads(output_3))
-        # self.assertFalse("errors" in json.loads(output_3))
-        self.assertFalse("space_points" in json.loads(output_3))
-        # Close file.
-        _file.close()
+    cfg = json.loads(Configuration.Configuration().getConfigJSON())
+    cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
+    cfg['SciFiPRHelicalOn'] = 0
+    cfg['SciFiStraightOn'] = 0
 
     @classmethod
-    def tear_down_class(self):
-        """___"""
-        success = self.mapper.death()
+    def setUpClass(cls): # pylint: disable = C0103
+        """Sets a mapper and configuration"""
+        cls.mapper = MAUS.MapCppTrackerRecon()
+
+    def testEmpty(self):
+        """Check can handle empty configuration and data"""
+        result = self.mapper.birth("")
+        self.assertFalse(result)
+        result = self.mapper.process("")
+        spill_out = json.loads(result)
+        self.assertTrue('errors' in spill_out)
+        self.assertTrue("bad_json_document" in spill_out['errors'])
+
+    def testInit(self):
+        """Check birth"""
+        success = self.mapper.birth(json.dumps(self.cfg))
+        self.assertTrue(success)
+
+    def testGoodStraightProcess(self):
+        """Check that tracker recon  process produces expected
+           output with good straight track data"""
+        self.cfg['SciFiPRHelicalOn'] = 0
+        self.cfg['SciFiStraightOn'] = 1
+        success = self.mapper.birth(json.dumps(self.cfg))
+        self.assertTrue(success)
+        # Read in a spill of mc data containing 5 straight tracks
+        test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test1,'r')
+        # Check the first spill (straights)
+        data = fin.readline()
+        result = self.mapper.process(data)
+        spill_out = json.loads(result)
+        self.assertTrue('recon_events' in spill_out)
+        self.assertEqual(5, len(spill_out['recon_events']))
+        # Check the first event
+        revt = spill_out['recon_events'][0]
+        self.assertTrue('sci_fi_event' in revt)
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(15, len(revt['sci_fi_event']['digits']))
+        self.assertTrue('clusters' in revt['sci_fi_event'])
+        self.assertEqual(15, len(revt['sci_fi_event']['clusters']))
+        self.assertTrue('spacepoints' in revt['sci_fi_event'])
+        self.assertEqual(5, len(revt['sci_fi_event']['spacepoints']))
+        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(1, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
+
+    def testGoodHelicalProcess(self):
+        """Check that tracker recon  process produces expected
+        output with good helical track data"""
+        self.cfg['SciFiPRHelicalOn'] = 1
+        self.cfg['SciFiStraightOn'] = 0
+        success = self.mapper.birth(json.dumps(self.cfg))
+        self.assertTrue(success)
+        # Read in a spill of mc data containing 5 straight tracks
+        test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test1,'r')
+        # Check the first spill (helices)
+        data = fin.readline()
+        result = self.mapper.process(data)
+        spill_out = json.loads(result)
+        self.assertTrue('recon_events' in spill_out)
+        self.assertEqual(2, len(spill_out['recon_events']))
+        # Check the first event
+        revt = spill_out['recon_events'][0]
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        self.assertTrue('clusters' in revt['sci_fi_event'])
+        self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
+        self.assertTrue('spacepoints' in revt['sci_fi_event'])
+        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
+        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(2, len(revt['sci_fi_event']['helical_pr_tracks']))
+
+    @classmethod
+    def tearDownClass(cls): # pylint: disable = C0103
+        """Check that we can death() MapCppTrackerRecon"""
+        success = cls.mapper.death()
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
-        self.mapper = None
+        cls.mapper = None
 
 if __name__ == '__main__':
     unittest.main()

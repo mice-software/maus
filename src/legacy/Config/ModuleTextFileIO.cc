@@ -462,6 +462,17 @@ void ModuleTextFileIO::repeatModule (MiceModule* first, Hep3Vector translation, 
 void ModuleTextFileIO::repeatModule2 (MiceModule* first, unsigned int numberOfRepeats)
 {
   MiceModule * mod = NULL;
+  MiceModule* mother = first->mother();
+  while (mother != NULL) {
+      if (mother->propertyExistsThis("RepeatModule2", "bool") &&
+          mother->propertyBoolThis("RepeatModule2")) {
+          throw(Squeal(Squeal::recoverable,
+                       "Nested RepeatModule2 is not allowed - found in module "+
+                       first->name()+" and ancestor "+mother->name(),
+                       "ModuleTextFileIO::repeatModule2"));
+      }
+      mother = mother->mother();
+  }
   first->addParameter("@RepeatNumber", 0);
   if(numberOfRepeats > 0) 
   {

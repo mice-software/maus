@@ -15,6 +15,7 @@
  *
  */
 
+#include <stdio.h>
 
 #include "JsonCppStreamer/IRStream.hh"
 #include "Interface/Squeal.hh"
@@ -72,13 +73,13 @@ void irstream::open(const char* fileName,
 		 "void irstream::open(const char*, const char*, const char*)");
   }
 
-  strcpy(m_branchName, "");
+  snprintf(m_branchName, sizeof(m_branchName), "%s", "");
   m_evtCount = 0;
 }
 
 void irstream::close() {
   m_file->Close();
-  strcpy(m_branchName, "");
+  snprintf(m_branchName, sizeof(m_branchName), "%s", "");
   if (m_file) {
     delete m_file;
     m_file = 0;
@@ -89,23 +90,24 @@ void irstream::close() {
   }
 }
 
+void irstream::set_current_event(Long64_t event) {
+  m_evtCount = event;
+}
+
 irstream* irstream::operator>>(irstream* (*manip_pointer)(irstream&)) {
   return manip_pointer(*this);
 }
 
-
 irstream* readEvent(irstream& irs) {
-  long nextEvent = irs.m_tree->GetReadEntry() + 1;
-
-  if (nextEvent >= irs.m_tree->GetEntries()) {
+  if (irs.m_evtCount >= irs.m_tree->GetEntries()) {
     Squeak::mout(Squeak::info)
-      << "Read "
+      << "Failed to find event "
       << irs.m_evtCount
-      << " event(s) from file."
+      << " in file."
       << std::endl;
     return 0;
   }
-  irs.m_tree->GetEntry(nextEvent);
+  irs.m_tree->GetEntry(irs.m_evtCount);
   ++irs.m_evtCount;
 
   return &irs;

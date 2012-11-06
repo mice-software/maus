@@ -66,12 +66,12 @@ class MultiProcessExecutor:
            merger, outputer, config_doc, self.doc_store,
            self.input_transform.collection)
   
-    def execute(self):
+    def execute(self, job_header, job_footer):
         """
         Execute the dataflow - delegate to
         InputTransfomExecutor.execute and
         MergeOutputExecutor.execute. 
-         @param self Object reference.
+        @param self Object reference.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         @throws NoCeleryNodeException if no Celery nodes.
         @throws CeleryNodeException if Celery nodes fail to 
@@ -79,8 +79,8 @@ class MultiProcessExecutor:
         @throws DocumentStoreException if there is a problem
         using the document store.
         """
-        self.input_transform.execute()
-        self.merge_output.execute()
+        self.input_transform.execute(job_header, job_footer)
+        self.merge_output.execute(job_header, job_footer, False)
 
     @staticmethod
     def get_dataflow_description():

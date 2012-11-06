@@ -15,10 +15,6 @@
  *
  */
 
-// Will run tests in all files included below
-// If you just want to run against a subset of files
-// comment the rest out and recompile
-
 #include <string>
 
 #include "gtest/gtest.h"

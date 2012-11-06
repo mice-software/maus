@@ -65,6 +65,7 @@ class InputPySpillGenerator:
             next_value["spill_number"] = self._current_event+1
             next_value["run_number"] = self._run_number
             next_value["daq_event_type"] = "physics_event"
+            next_value["maus_event_type"] = "Spill"
             self._current_event += 1
             # yield the current event (google 'python generators' if confused)
             yield json.dumps(next_value)

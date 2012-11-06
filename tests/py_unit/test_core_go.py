@@ -20,6 +20,9 @@ import sys
 import copy
 import tempfile
 from io import StringIO
+import datetime
+import os
+import json
 
 from InputPyEmptyDocument import InputPyEmptyDocument
 from MapPyDoNothing import MapPyDoNothing
@@ -45,6 +48,28 @@ class FakeWorker(): #pylint: disable = W0232, R0903
         @return False always.
         """
         return False
+
+    def death(self): #pylint: disable = W0613, R0201, R0903
+        """  
+        Death function that always returns False.
+        @param self. Object reference.
+        @param some_arg Ignored.
+        @return False always.
+        """
+        return False
+
+    def save(self, data): #pylint: disable = W0613, R0201, R0903
+        """  
+        Death function that always returns False.
+        """
+        return False
+
+    def process(self, data): #pylint: disable = W0613, R0201, R0903
+        """  
+        Process function that always returns False.
+        """
+        return False
+
 
 class GoTestCase(unittest.TestCase): #pylint: disable = R0904
     """ Tests for src/common_py/Go.py. """
@@ -217,6 +242,30 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         Check that initialisation of MAUS is okay
         """
         pass
+
+    def test_get_job_header(self):
+        """
+        Check that the job header is initialised okay
+        """
+        cards = {'maus_version':'some_version', 'cow':'moo'}
+        header = Go.get_job_header(cards)
+        my_datetime = header["start_of_job"]["date_time"]
+        start_time_as_dt = datetime.datetime.strptime(my_datetime,
+                                                        "%Y-%m-%d %H:%M:%S.%f")
+        self.assertLess(start_time_as_dt, datetime.datetime.utcnow())
+        bzr_path = os.path.expandvars("$MAUS_ROOT_DIR/.bzr/branch/")
+        if os.path.exists(bzr_path): # assume this is a valid bzr revision
+            self.assertGreater(len(header['bzr_configuration']), 0)
+            self.assertGreater(len(header['bzr_revision']), 0)
+            # clean bzr checkout has no output from bzr_status
+            self.assertEqual(type(header['bzr_status']), type(''))
+        else:
+            self.assertEqual(header['bzr_configuration'], '')
+            self.assertEqual(header['bzr_revision'], '')
+            self.assertEqual(header['bzr_status'], '')
+        self.assertEqual(header['maus_version'], 'some_version')
+        self.assertEqual(header['json_configuration'], json.dumps(cards))
+        self.assertEqual(header['maus_event_type'], 'JobHeader')
 
 if __name__ == '__main__':
     unittest.main()

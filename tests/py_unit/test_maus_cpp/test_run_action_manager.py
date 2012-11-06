@@ -21,6 +21,7 @@ Test maus_cpp.run_action_manager
 
 import StringIO
 import unittest
+import json
 
 import Configuration
 
@@ -42,8 +43,11 @@ reconstruction_geometry_filename = "Test.dat"
     def test_start_end_of_run(self):
         """Test maus_cpp.run_action_manager.start_of_run(...)"""
         maus_cpp.globals.birth(self.config)
-        maus_cpp.run_action_manager.start_of_run(1)
-        maus_cpp.run_action_manager.end_of_run()
+        run_header = json.loads(maus_cpp.run_action_manager.start_of_run(1))
+        self.assertEqual(run_header["maus_event_type"], "RunHeader")
+        run_footer = json.loads(maus_cpp.run_action_manager.end_of_run(1))
+        self.assertEqual(run_footer["maus_event_type"], "RunFooter")
         
-
+if __name__ == "__main__":
+    unittest.main()
 
