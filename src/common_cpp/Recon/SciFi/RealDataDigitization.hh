@@ -47,14 +47,21 @@
 // from old file
 #include "Config/MiceModule.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class RealDataDigitization {
  public:
+  // typedef std::vector< std::vector< std::vector< Json::Value > > > JsonBoardBankChannelArray;
+
+  // typedef std::vector< std::vector< std::vector< bool > > > BoolBoardBankChannelArray;
+
+  typedef std::vector<int> IntChannelArray;
+
   RealDataDigitization();
 
   ~RealDataDigitization();
@@ -63,7 +70,7 @@ class RealDataDigitization {
    *  @params spill A SciFiSpill to be filled
    *  @params input_event The DAQ JSON Tracker Event
    */
-  void process(SciFiSpill &spill, Json::Value const &input_event);
+  void process(Spill &spill, Json::Value const &input_event);
 
   /** @brief Reads in the calibration.
    */
@@ -79,8 +86,8 @@ class RealDataDigitization {
 
   /** @brief Converts read-out map into SciFi Fibre map
    */
-  void get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
-                            int &tracker, int &station, int &plane, int &channel);
+  bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
+                            int &tracker, int &station, int &plane, int &channel) const;
 
   /** @brief Reads the bad channel list from file.
    */
@@ -88,28 +95,41 @@ class RealDataDigitization {
 
   /** @brief Returns value depends on the goodness of the channel.
    */
-  bool is_good_channel(int board, int bank, int chan_ro);
+  bool is_good_channel(int board, int bank, int chan_ro) const;
+
+  int get_calibration_unique_chan_numb(int board, int bank, int chan) const {
+                                       return _calibration_unique_chan_number[board][bank][chan]; }
 
  private:
-  /// A vector containing calibration values for every 4 banks of the 16 boards.
-  std::vector<Json::Value> _calibration[16][4];
+  static const int _number_channels;
+  static const int _number_banks;
+  static const int _number_boards;
+  static const int _total_number_channels;
 
-  /// This is a vector storing the goodness of each channel.
-  bool good_chan[16][4][128];
+  /// A vector containing calibration values for every 4 banks of the 16 boards.
+  double _calibration_pedestal[16][4][128];
+
+  double _calibration_gain[16][4][128];
+
+  int _calibration_unique_chan_number[16][4][128];
+
+  /// This is an array storing the goodness of each channel.
+  bool _good_chan[16][4][128];
 
   // std::vector<int> _cryo;
   // std::vector<int> _cass;
-  std::vector<int> _board;
-  std::vector<int> _bank;
-  std::vector<int> _chan_ro;
-  std::vector<int> _tracker;
-  std::vector<int> _station;
-  std::vector<int> _view;
-  std::vector<int> _fibre;
-  std::vector<int> _extWG;
-  std::vector<int> _inWG;
-  std::vector<int> _WGfib;
+  IntChannelArray _board;
+  IntChannelArray _bank;
+  IntChannelArray _chan_ro;
+  IntChannelArray _tracker;
+  IntChannelArray _station;
+  IntChannelArray _view;
+  IntChannelArray _fibre;
+  IntChannelArray _extWG;
+  IntChannelArray _inWG;
+  IntChannelArray _WGfib;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif

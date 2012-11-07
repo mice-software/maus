@@ -21,13 +21,13 @@
 #include <map>
 #include <vector>
 
-#include "src/common_cpp/Recon/Global/ReconInput.hh"
+#include "src/common_cpp/Recon/Global/ReconstructionInput.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
 
-ReconInput::ReconInput(
+ReconstructionInput::ReconstructionInput(
     const bool beam_polarity_negative,
     const std::map<int, Detector> & detectors,
     const std::vector<TrackPoint> & events)
@@ -35,15 +35,15 @@ ReconInput::ReconInput(
       detectors_(detectors), events_(events) {
 }
 
-bool ReconInput::beam_polarity_negative() {
+bool ReconstructionInput::beam_polarity_negative() {
   return beam_polarity_negative_;
 }
 
-const std::map<int, Detector> & ReconInput::detectors() {
+const std::map<int, Detector> & ReconstructionInput::detectors() {
   return detectors_;
 }
 
-const std::vector<TrackPoint> & ReconInput::events() {
+const std::vector<TrackPoint> & ReconstructionInput::events() {
   return events_;
 }
 

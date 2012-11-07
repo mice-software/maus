@@ -26,9 +26,12 @@
 #ifndef _COMMONCPP_DETMODEL_MAUSSD_H_
 #define _COMMONCPP_DETMODEL_MAUSSD_H_
 
-#include <json/json.h>
-#include <G4VSensitiveDetector.hh>
 #include <vector>
+
+#include "json/json.h"
+
+#include "Geant4/G4VSensitiveDetector.hh"
+
 #include "Config/MiceModule.hh"
 
 namespace MAUS {

@@ -15,13 +15,16 @@
  *
  */
 
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
 namespace MAUS {
 
-Data::Data() : _spill(NULL) {}
+Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
+}
 
-Data::Data(const Data& data) : _spill(NULL) {
+Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
     *this = data;
 }
 
@@ -41,6 +44,7 @@ Data& Data::operator=(const Data& data) {
     } else {
         SetSpill(new Spill(*data._spill));
     }
+    SetEventType(data.GetEventType());
     return *this;
 }
 
@@ -56,7 +60,7 @@ Spill* Data::GetSpill() const {
     return _spill;
 }
 
-int Data::my_sizeof() {
+int Data::GetSizeOf() const {
   Data spill;
   return sizeof(spill);
 }

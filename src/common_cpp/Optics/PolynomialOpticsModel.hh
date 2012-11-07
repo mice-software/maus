@@ -95,11 +95,11 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   std::vector<double> weights_;
 
   // override base class version
-  const std::vector<reconstruction::global::TrackPoint> BuildFirstPlaneHits();
+  const std::vector<recon::global::TrackPoint> BuildFirstPlaneHits();
 
   const TransferMap * CalculateTransferMap(
-    const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
-    const std::vector<reconstruction::global::TrackPoint> & station_hits)
+    const std::vector<recon::global::TrackPoint> & start_plane_hits,
+    const std::vector<recon::global::TrackPoint> & station_hits)
     const;
 
   void SetupAlgorithm();

@@ -30,13 +30,13 @@
 #include "Interface/Squeal.hh"
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
-#include "Reconstruction/Global/TrackPoint.hh"
+#include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
-  using reconstruction::global::TrackPoint;
+  using recon::global::TrackPoint;
 
 const PolynomialOpticsModel::Algorithm
   PolynomialOpticsModel::Algorithm::kNone
@@ -87,7 +87,7 @@ void PolynomialOpticsModel::Build() {
        ++first_plane_hit) {
     // Simulate the current particle (First plane hit) through MICE.
     simulator->RunParticle(
-      reconstruction::global::PrimaryGeneratorParticle(*first_plane_hit));
+      recon::global::PrimaryGeneratorParticle(*first_plane_hit));
 
     // Identify the hits by station and add them to the mappings from stations
     // to the hits they recorded.
@@ -213,8 +213,8 @@ std::cout << "DEBUG PolynomialOpticsModel::BuildFirstPlaneHits(): "
 /* Calculate a transfer matrix from an equal number of inputs and output.
  */
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
-    const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
-    const std::vector<reconstruction::global::TrackPoint> & station_hits)
+    const std::vector<recon::global::TrackPoint> & start_plane_hits,
+    const std::vector<recon::global::TrackPoint> & station_hits)
     const {
 
   if (start_plane_hits.size() != station_hits.size()) {

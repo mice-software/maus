@@ -45,7 +45,7 @@ namespace recon {
 namespace global {
 
 class TrackFitter;
-class ReconInput;
+class ReconstructionInput;
 
 }  // namespace global
 }  // namespace recon
@@ -94,7 +94,7 @@ class MapCppGlobalTrackReconstructor {
   MAUS::recon::global::TrackFitter * track_fitter_;
 
   Json::Value run_data_;
-  //MAUS::recon::global::ReconInput * recon_input_;
+  //MAUS::recon::global::ReconstructionInput * recon_input_;
   std::vector<MAUS::recon::global::Track> tracks_;
 
   static const std::string kClassname;

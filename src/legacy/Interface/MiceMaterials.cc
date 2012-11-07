@@ -104,30 +104,30 @@ MiceMaterials::MiceMaterials( bool noG4 )
         sline = std::string( line );
         std::stringstream line10( sline );
         line10 >> value >> value >> ZNum;
-	
+
         inf.getline( line, 250 );
         sline = std::string( line );
         std::stringstream line11( sline );
         line11 >> value >> value >> ANum;
-	
+
         inf.getline( line, 250 );
         sline = std::string( line );
         std::stringstream line12( sline );
         line12 >> value >> value >> value >> meanExE >> units;
-	
+
         inf.getline( line, 250 );
         sline = std::string( line );
         std::stringstream line13( sline );
         line13 >> value >> value >> value >> value >> value >> value >> value >> value >> densityCor;
-	
-	// skip dEdx line as that is calculated
+
+        // skip dEdx line as that is calculated
         inf.getline( line, 250 );
 
         if( name != "" && name[0] != ' ' )
         {
-	  _materials[ name ] = NULL;
+          _materials[ name ] = NULL;
           updateProperties( name, chemical, density * g / mm3, state, temp * kelvin, press * atmosphere, edens / mm3, X0 * mm, L0 * mm, ZNum, ANum, meanExE * eV, densityCor  );
-	}
+        }
       }
     }
     else
@@ -135,13 +135,16 @@ MiceMaterials::MiceMaterials( bool noG4 )
   }
 }
 
-void		MiceMaterials::addMaterial( G4Material* mat, std::string name )
+void MiceMaterials::addMaterial( G4Material* mat, std::string name )
 {
   _materials[name] = mat;
 }
 
-G4Material*	MiceMaterials::materialByName( std::string mat ) const
+G4Material* MiceMaterials::materialByName( std::string mat ) const
 {
+  if ( _materials.find( mat ) == _materials.end() ) {
+    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+  }
   G4Material* matter = _materials.find( mat )->second;
 
   if( ! matter ) // can't find this material!
@@ -213,7 +216,7 @@ double           MiceMaterials::interactionLength( std::string name ) const
   return _interactionLength.find( name )->second;
 }
 
-double		 MiceMaterials::dEdx( std::string name ) const
+double MiceMaterials::dEdx( std::string name ) const
 {
   double dEdx = 0;
 
@@ -234,7 +237,7 @@ double		 MiceMaterials::dEdx( std::string name ) const
   return dEdx;
 }
 
-double		MiceMaterials::dEdxLength( std::string name ) const
+double MiceMaterials::dEdxLength( std::string name ) const
 {
   
   double dEds = 0;
@@ -247,7 +250,7 @@ double		MiceMaterials::dEdxLength( std::string name ) const
   return dEds;
 }
 
-void		MiceMaterials::listMaterials() const
+void MiceMaterials::listMaterials() const
 {
   for( std::map<std::string,G4Material*>::const_iterator it = _materials.begin(); it != _materials.end(); ++it )
   {
@@ -269,7 +272,7 @@ void		MiceMaterials::listMaterials() const
   }
 }
 
-void		MiceMaterials::updateProperties( std::string name, std::string chemical, double density, std::string state, double temp, double press, double edens, double X0, double L0, double ZNum, double ANum, double meanExE , double densityCor )
+void MiceMaterials::updateProperties( std::string name, std::string chemical, double density, std::string state, double temp, double press, double edens, double X0, double L0, double ZNum, double ANum, double meanExE , double densityCor )
 {
   _formula[ name ] = chemical;
   _density[ name ] = density;

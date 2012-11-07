@@ -23,8 +23,8 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
-#include "Reconstruction/Global/Particle.hh"
-#include "Reconstruction/Global/TrackPoint.hh"
+#include "Recon/Global/Particle.hh"
+#include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
@@ -34,8 +34,8 @@
 
 namespace MAUS {
 
-using reconstruction::global::TrackPoint;
-using reconstruction::global::Particle;
+using recon::global::TrackPoint;
+using recon::global::Particle;
 
 // ##############################
 //  TransferMapOpticsModel public
@@ -111,7 +111,7 @@ void TransferMapOpticsModel::Build() {
        ++first_plane_hit) {
     // Simulate the current particle (First plane hit) through MICE.
     simulator->RunParticle(
-      reconstruction::global::PrimaryGeneratorParticle(*first_plane_hit));
+      recon::global::PrimaryGeneratorParticle(*first_plane_hit));
 
     // Identify the hits by station and add them to the mappings from stations
     // to the hits they recorded.

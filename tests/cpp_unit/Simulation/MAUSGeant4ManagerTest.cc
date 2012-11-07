@@ -18,11 +18,12 @@
 
 #include "gtest/gtest.h"
 
-#include <G4RunManager.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4RunManager.hh"
+#include "Geant4/G4SDManager.hh"
 
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 using namespace MAUS;
 
@@ -44,7 +45,7 @@ TEST(MAUSGeant4ManagerTest, GetSetTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
-    Json::Value* conf = MICERun::getInstance()->jsonConfiguration;
+    Json::Value* conf = MAUS::Globals::GetInstance()->GetConfigurationCards();
     Json::Value pos(Json::objectValue);
     pos["x"] = pos["y"] = pos["z"] = 0.;
 

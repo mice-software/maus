@@ -22,6 +22,8 @@ import logging
 import unittest
 import ROOT
 
+import Configuration
+import maus_cpp.globals
 from framework.workers import WorkerBirthFailedException
 from framework.workers import WorkerDeathFailedException
 from framework.workers import WorkerDeadException
@@ -39,6 +41,9 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Reset MausTransform and set logging.
         @param self Object reference.
         """
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(
+                                  Configuration.Configuration().getConfigJSON())
         MausTransform.transform = None
         MausTransform.is_dead = True
         # Configure lowest logging level so all logging statements

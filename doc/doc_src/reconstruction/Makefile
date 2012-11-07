@@ -7,5 +7,6 @@ all:
 	cp global_track_reconstruction_specification.pdf ../../
 
 clean:
-	rm -f global_track_reconstruction_specification.aux global_track_reconstruction_specification.dvi global_track_reconstruction_specification.log global_track_reconstruction_specification.toc global_track_reconstruction_specification.pdf
+	rm -f global_track_reconstruction_specification.aux global_track_reconstruction_specification.dvi global_track_reconstruction_specification.log global_track_reconstruction_specification.toc global_track_reconstruction_specification.pdf class_hierarchy_main.eps class_hierarchy_interfaces.jpg  class_hierarchy_main.jpg class_hierarchy_interfaces.pdf  class_hierarchy_main.pdf class_hierarchy_interfaces.png  class_hierarchy_main.png class_hierarchy_main.svg
+
 

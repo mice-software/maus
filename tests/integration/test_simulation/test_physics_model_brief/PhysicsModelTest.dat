@@ -1,0 +1,64 @@
+// Dummy configuration for most unit tests
+//
+// For testing details of MiceModules, tracking, field maps, detector models you
+// will want obviously something more sophisticated.
+
+Configuration Test
+{
+  Dimensions 10000. 10000. 300. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 200. m
+
+  MiceModule Virtual
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    Position 0.0 0.0 1. m
+  }
+
+  MiceModule Material // check stochastic processes by putting some material in
+  {
+    PropertyString Volume Cylinder
+    Dimensions 100. 10. mm
+    PropertyString Material Al
+    Position 0.0 0.0 2. m
+  }
+
+  MiceModule Virtual
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    Position 0.0 0.0 98. m
+  }
+  MiceModule RF // check reference particle does what we expect by putting an 
+                // RF cavity in the geometry (we can't see reference particle output directly)
+  {
+    PropertyString Volume Cylinder
+    Dimensions 100. 1.001 mm
+    PropertyString Material Galactic
+    MiceModule RF // check reference particle does what we expect by putting an 
+                  // RF cavity in the geometry (we can't see reference particle output directly)
+    {
+      PropertyString Volume Cylinder
+      Dimensions 100. 0.999 mm
+      PropertyString Material Galactic
+      // field definition
+      PropertyHep3Vector Position 0. 0. 50. m
+      PropertyString FieldType PillBox
+      PropertyDouble Length 1. mm
+      PropertyString CavityMode Unphased
+      PropertyString FieldDuringPhasing TimeVarying
+      PropertyDouble Frequency 201.25 MHz
+      PropertyDouble PeakEField 1000. MV/m 
+      PropertyDouble ReferenceParticlePhase 0 degree
+    }
+  }
+  MiceModule Virtual
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    Position 0.0 0.0 100. m
+  }
+
+}
+

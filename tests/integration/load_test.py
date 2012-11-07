@@ -46,7 +46,6 @@ def run():
     else:
         print 'Using fake simulation data'
         map_group.append(MAUS.MapPyFakeTestSimulation())
-        map_group.append(MAUS.MapPyRemoveTracks())
         
     print("Testing with %d events..." % big_number)
 

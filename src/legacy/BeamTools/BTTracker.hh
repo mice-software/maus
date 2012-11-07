@@ -3,7 +3,6 @@
 #define BTTRACKER_HH
 
 #include "CLHEP/Vector/Rotation.h"
-#include "BTSpaceChargeField.hh"
 
 class BTField;
 
@@ -35,9 +34,8 @@ public:
   //charge is an array of size n storing the particle charges for tracking
   //n_events is the number of hits N in x_in
   //step_size is initial step size
-  //BTSpaceChargeField* is a pointer to a BTSpaceChargeField object - set to NULL to deactivate space charge
-  static void integrateMany(double target_indie, int n_events, double* x_in, double* macro_size, double* charge, const BTField* field, BTTracker::var indep, double step_size,
-                        BTSpaceChargeField* spaceCharge=NULL);
+  //used to have also a pointer for space charge fields, although this was removed
+  static void integrateMany(double target_indie, int n_events, double* x_in, double* macro_size, double* charge, const BTField* field, BTTracker::var indep, double step_sizeL);
 
   //integrate using Hamiltonian H=(p-qA/c)^2/m from x_in, through field BTField* using proper time tau as the variable of integration
   //x_in is a vector of size 8, going like t,x,y,z; E^c,px^c,py^c,pz^c *** momenta are canonical momenta ***
@@ -87,7 +85,6 @@ private:
   static int                 _nevents;    //number of events in the tracking
   static double*             _charges;    //charge for tracking
   static double*             _macro_size; //macroparticle size for space charge
-  static BTSpaceChargeField* _sc;
   //multiparticle equations of motion
   static int  t_equations_motion_many       (double t,   const double x[],  double dxdt[], void* params);
 

@@ -30,21 +30,21 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-class ReconInput {
+class ReconstructionInput {
  public:
   /* @brief	Create with the given input values.
    */
-  ReconInput(const bool beam_polarity_negative,
+  ReconstructionInput(const bool beam_polarity_negative,
                       const std::map<int, Detector> & detectors,
                       const std::vector<TrackPoint> & events);
 
-  ~ReconInput() { }
+  ~ReconstructionInput() { }
 
   bool beam_polarity_negative();
   const std::map<int, Detector> & detectors();
   const std::vector<TrackPoint> & events();
  protected:
-  ReconInput();
+  ReconstructionInput();
 
   bool beam_polarity_negative_;
   std::map<int, Detector> detectors_;

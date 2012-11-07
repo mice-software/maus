@@ -27,7 +27,7 @@
 
 namespace MAUS {
 
-namespace reconstruction {
+namespace recon {
 namespace global {
   class TrackPoint;
 }
@@ -46,8 +46,8 @@ class LinearApproximationOpticsModel : public TransferMapOpticsModel {
 
  protected:
   const TransferMap * CalculateTransferMap(
-      const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
-      const std::vector<reconstruction::global::TrackPoint> & station_hits)
+      const std::vector<recon::global::TrackPoint> & start_plane_hits,
+      const std::vector<recon::global::TrackPoint> & station_hits)
       const;
 };
 

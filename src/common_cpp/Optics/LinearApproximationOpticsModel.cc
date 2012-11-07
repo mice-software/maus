@@ -25,7 +25,7 @@
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
-#include "src/common_cpp/Reconstruction/Global/Particle.hh"
+#include "src/common_cpp/Recon/Global/Particle.hh"
 #include "Maths/Vector.hh"
 
 #include "Interface/Squeal.hh"
@@ -33,23 +33,23 @@
 namespace MAUS {
 
 const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
-    const std::vector<reconstruction::global::TrackPoint> & start_plane_hits,
-    const std::vector<reconstruction::global::TrackPoint> & station_hits)
+    const std::vector<recon::global::TrackPoint> & start_plane_hits,
+    const std::vector<recon::global::TrackPoint> & station_hits)
     const {
-  const reconstruction::global::Particle::ID particle_id
-    = reconstruction::global::Particle::ID(start_plane_hits[0].particle_id());
+  const recon::global::Particle::ID particle_id
+    = recon::global::Particle::ID(start_plane_hits[0].particle_id());
 
   double start_plane = start_plane_hits[0].z();
 
   double hit_total = 0.0;
-  std::vector<reconstruction::global::TrackPoint>::const_iterator hit;
+  std::vector<recon::global::TrackPoint>::const_iterator hit;
   for (hit = station_hits.begin(); hit != station_hits.end(); ++hit) {
     hit_total += hit->z();
   }
   double end_plane = hit_total / station_hits.size();
 
   const double mass
-    = reconstruction::global::Particle::GetInstance()->GetMass(particle_id);
+    = recon::global::Particle::GetInstance()->GetMass(particle_id);
 
   return new LinearApproximationTransferMap(start_plane, end_plane, mass);
 }

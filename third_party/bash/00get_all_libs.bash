@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-version=`grep "version" README | sed s/\ /_/g`
+version=`grep "version" $MAUS_ROOT_DIR/README | sed s/\ /_/g`
 filename=third_party_libraries.tar.gz
 url=http://micewww.pp.rl.ac.uk/maus/${version}/${filename}
 
@@ -18,7 +18,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Source archive exists."
         echo "INFO: Unpacking:"
         echo
-        tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/source"
+        tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/"
     else
         echo "ERROR: Failed to get source archive"
         exit 1

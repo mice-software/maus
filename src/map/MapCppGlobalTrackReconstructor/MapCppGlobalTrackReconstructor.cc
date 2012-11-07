@@ -41,7 +41,7 @@
 #include "src/common_cpp/Recon/Global/Detector.hh"
 #include "src/common_cpp/Recon/Global/MinuitTrackFitter.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Recon/Global/ReconInput.hh"
+#include "src/common_cpp/Recon/Global/ReconstructionInput.hh"
 #include "src/common_cpp/Recon/Global/Track.hh"
 #include "src/common_cpp/Recon/Global/TrackFitter.hh"
 #include "src/common_cpp/Recon/Global/TrackPoint.hh"
@@ -54,7 +54,7 @@ namespace MAUS {
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::MinuitTrackFitter;
 using MAUS::recon::global::Particle;
-using MAUS::recon::global::ReconInput;
+using MAUS::recon::global::ReconstructionInput;
 using MAUS::recon::global::Track;
 using MAUS::recon::global::TrackFitter;
 using MAUS::recon::global::TrackPoint;
@@ -251,7 +251,7 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-  // Populate ReconInput instance from JSON data
+  // Populate ReconstructionInput instance from JSON data
   Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
       configuration_,
       "data_acquisition_modes",
@@ -613,7 +613,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
 }
 
 void MapCppGlobalTrackReconstructor::LoadLiveData() {
-  // recon_input_ = new ReconInput(...);
+  // recon_input_ = new ReconstructionInput(...);
 }
 
 

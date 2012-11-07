@@ -18,6 +18,7 @@ to invoke a transform on a spill.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import json
 
 from celery.task import task
 from celery.task import Task
@@ -42,7 +43,12 @@ def execute_transform(spill, client_id = "Unknown"):
     if logger.isEnabledFor(logging.INFO):
         logger.info("Task invoked by %s" % client_id)
     try:
-        return MausTransform.process(spill)
+        spill_json = json.loads(spill)
+        if "maus_event_type" in spill_json.keys() and \
+           spill_json["maus_event_type"] != "spill":
+            return spill
+        else:
+            return MausTransform.process(spill)
     except Exception as exc: # pylint:disable = W0703
         # Filter exceptions so no unPicklable exception causes
         # problems.

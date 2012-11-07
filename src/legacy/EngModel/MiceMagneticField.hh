@@ -8,7 +8,7 @@
 #define MICEMAGNETICFIELD_HH
 
 #include "BeamTools/BTFieldConstructor.hh"
-#include "G4MagneticField.hh"
+#include "Geant4/G4MagneticField.hh"
 
 class MiceMagneticField : public G4MagneticField
 {

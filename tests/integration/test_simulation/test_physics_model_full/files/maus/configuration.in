@@ -1,0 +1,29 @@
+import xboa
+
+momentum = __momentum__
+pid = __pid__
+number_of_events = __nev__
+
+energy = (momentum**2.+xboa.Common.pdg_pid_to_mass[abs(pid)]**2.)**0.5
+
+spill_generator_number_of_spills =  number_of_events/100
+beam = {
+    "particle_generator":"counter", # routine for generating empty primaries
+    "random_seed":0, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+    "definitions":[{
+        "random_seed_algorithm":"incrementing_random",
+        "n_particles_per_spill":100,
+        "reference":{
+            "position":{"x":0.0, "y":0.0, "z":0.0},
+            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "energy":energy, "particle_id":pid, "time":0., "random_seed":0
+        },
+        "transverse":{"transverse_mode":"pencil"},
+        "longitudinal":{"longitudinal_mode":"pencil", "momentum_variable":"p"},
+        "coupling":{"coupling_mode":"none"}
+    }]
+}
+verbose_level = 1
+production_threshold = 5.0
+

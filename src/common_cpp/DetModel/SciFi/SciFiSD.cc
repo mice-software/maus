@@ -14,27 +14,29 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
-
-#include <G4TransportationManager.hh>
-#include <G4FieldManager.hh>
-#include <G4Field.hh>
-#include <G4HCofThisEvent.hh>
-#include <G4Step.hh>
-#include <G4ThreeVector.hh>
-#include <G4SDManager.hh>
-#include <G4ios.hh>
 
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "Interface/MICEEvent.hh"
-#include "src/legacy/Config/MiceModule.hh"
+
+
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4Field.hh"
+#include "Geant4/G4HCofThisEvent.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4ios.hh"
 
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
+
+#include "Interface/MICEEvent.hh"
+#include "src/legacy/Config/MiceModule.hh"
+#include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
 }
@@ -47,7 +49,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
   if ( edep == 0. ) return false;
-  if ( fabs(pid) != 13 ) return false;
   // the old chanNo, held for comparison
   int old_chanNo = legacy_chanNo(aStep);
 
@@ -74,8 +75,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["charge"] =
                              aStep->GetTrack()->GetDefinition()->GetPDGCharge();
   _hits["sci_fi_hits"][hit_i]["particle_id"] = pid;
-  _hits["sci_fi_hits"][hit_i]["time"] =
-                                      aStep->GetPreStepPoint()->GetGlobalTime();
+  double time = aStep->GetPreStepPoint()->GetGlobalTime();
+  _hits["sci_fi_hits"][hit_i]["time"] = time;
   _hits["sci_fi_hits"][hit_i]["energy_deposited"] = edep;
   _hits["sci_fi_hits"][hit_i]["momentum"]["x"] = Mom.x();
   _hits["sci_fi_hits"][hit_i]["momentum"]["y"] = Mom.y();
@@ -92,7 +93,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
     chanNo = static_cast<int> (floor(fiberNumber/7));
   }
   // assert agreement on chanNo with legacy calculation
-  assert(abs(chanNo-old_chanNo) < 2);
+  // std::cerr << chanNo << " " << old_chanNo << "\n";
+  // assert(abs(chanNo-old_chanNo) < 2);
 
   return true;
 }
@@ -106,19 +108,22 @@ int SciFiSD::legacy_chanNo(G4Step* aStep) {
   Hep3Vector perp(-1., 0., 0.);
   double chanWidth = 1.4945; // effective channel width without overlap
   perp *= _module->globalRotation();
+
   Hep3Vector delta = aStep->GetPreStepPoint()->GetPosition() - pos;
   double dist = delta.x() * perp.x() + delta.y() * perp.y() + delta.z() * perp.z();
   double fibre = _module->propertyDouble("CentralFibre") + dist * 2.0 /
                 ( _module->propertyDouble("Pitch") * 7.0 );
 
-  double centFibre = _module->propertyDouble("CentralFibre");
   int  firstChan = static_cast<int> (fibre + 0.5);
+/*
+  double centFibre = _module->propertyDouble("CentralFibre");
   int secondChan(-1);
   double overlap = chanWidth - (0.1365/2.0);
   double underlap = (0.1365/2.0);
   // int nChans(1);
   nChans = 1;
   double distInChan = ((firstChan - centFibre)*chanWidth) - dist;
+
   // distance in channel greater than section which does not overlap
   if ((sqrt(distInChan*distInChan) > overlap) || (sqrt(distInChan*distInChan) < underlap)) {
     nChans = 2;
@@ -128,5 +133,6 @@ int SciFiSD::legacy_chanNo(G4Step* aStep) {
       secondChan = firstChan + 1;
     }
   }
+*/
   return firstChan;
 }

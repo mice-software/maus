@@ -18,8 +18,8 @@
 #define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 
 namespace Json {
   class Value;
@@ -84,16 +84,16 @@ namespace MAUS {
   IConverter<Json::Value, Spill>* ConverterFactory::getConverter<Json::Value, Spill>() const
     throw(ConverterNotFoundException) {
 
-    return new JsonCppConverter();
+    return new JsonCppSpillConverter();
   }
 
-  // DAMN cant do this as JsonCppConverter only inherits from one type of Converter base
+  // DAMN cant do this as JsonCppSpillConverter only inherits from one type of Converter base
   // Must split it up
   template <>
-  IConverter<Spill, Json::Value>* ConverterFactory::getConverter<Spill, Json::Value>() const
+  IConverter<Data, Json::Value>* ConverterFactory::getConverter<Data, Json::Value>() const
     throw(ConverterNotFoundException) {
 
-    return new CppJsonConverter();
+    return new CppJsonSpillConverter();
   }
 //   template <>
 //   IConverter<int,double>* ConverterFactory::getConverter<double, int>() const

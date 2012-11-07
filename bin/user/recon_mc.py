@@ -21,7 +21,7 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    input_file = open('simulation_stage4', 'r')
+    input_file = open('maus_output.json', 'r')
     #
     my_input = MAUS.InputPyJSON(input_file)
     #my_input = MAUS.InputPySpillGenerator()

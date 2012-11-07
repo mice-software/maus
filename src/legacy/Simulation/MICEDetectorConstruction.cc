@@ -9,54 +9,54 @@
 
 #include "MICEDetectorConstruction.hh"
 #include "Interface/dataCards.hh"
-#include "Config/CoolingChannelGeom.hh"
 #include "EngModel/Polycone.hh"
 #include "EngModel/MultipoleAperture.hh"
 #include "EngModel/MiceModToG4Solid.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
-#include "G4VSolid.hh"
-#include "G4Material.hh"
-#include "G4Element.hh"
-#include "G4LogicalVolume.hh"
-#include "G4ThreeVector.hh"
-#include "G4PVPlacement.hh"
-#include "globals.hh"
-#include "G4FieldManager.hh"
-#include "G4UniformMagField.hh"
-#include "G4ChordFinder.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4UserLimits.hh"
-#include "G4EquationOfMotion.hh"
-#include "G4EqMagElectricField.hh"
-#include "G4Mag_UsualEqRhs.hh"
+#include "Geant4/G4VSolid.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Element.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4UniformMagField.hh"
+#include "Geant4/G4ChordFinder.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4EquationOfMotion.hh"
+#include "Geant4/G4EqMagElectricField.hh"
+#include "Geant4/G4Mag_UsualEqRhs.hh"
 //Electromagnetic steppers:W
-#include "G4ClassicalRK4.hh"
-#include "G4SimpleHeum.hh"
-#include "G4ImplicitEuler.hh"
-#include "G4SimpleRunge.hh"
-#include "G4ExplicitEuler.hh"
-#include "G4CashKarpRKF45.hh"
+#include "Geant4/G4ClassicalRK4.hh"
+#include "Geant4/G4SimpleHeum.hh"
+#include "Geant4/G4ImplicitEuler.hh"
+#include "Geant4/G4SimpleRunge.hh"
+#include "Geant4/G4ExplicitEuler.hh"
+#include "Geant4/G4CashKarpRKF45.hh"
 //Magnetic only steppers:
-#include "G4HelixImplicitEuler.hh"
-#include "G4HelixExplicitEuler.hh"
-#include "G4HelixSimpleRunge.hh"
-#include "G4HelixHeum.hh"
+#include "Geant4/G4HelixImplicitEuler.hh"
+#include "Geant4/G4HelixExplicitEuler.hh"
+#include "Geant4/G4HelixSimpleRunge.hh"
+#include "Geant4/G4HelixHeum.hh"
 
-#include "G4PVPlacement.hh"
+#include "Geant4/G4PVPlacement.hh"
 //#ifdef G4VIS_USE
-#include "G4VisAttributes.hh"
-#include "G4Colour.hh"
+#include "Geant4/G4VisAttributes.hh"
+#include "Geant4/G4Colour.hh"
 //#endif*/
 
 #include <sstream>
 #include <fstream>
 
 #include "Interface/MICEEvent.hh"
-#include "Interface/MICERun.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MiceMaterials.hh"
+#include "Simulation/FillMaterials.hh"
 
 #include "DetModel/SciFi/SciFiPlane.hh"
 #include "DetModel/KL/KLGlue.hh"
@@ -70,19 +70,21 @@
 #include "DetModel/KL/KLSD.hh"
 #include "DetModel/Virtual/SpecialVirtualSD.hh"
 
-const double MICEDetectorConstruction::_pillBoxSpecialVirtualLength = 1.e-6*mm;
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
-MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MICERun::getInstance()), _checkVolumes(false)
+MICEDetectorConstruction::MICEDetectorConstruction(MiceModule* model, Json::Value* cards) : _checkVolumes(false)
 {
   _event = new MICEEvent();
-  _model = run.miceModule;
-  _materials = run.miceMaterials;
-  if (_simRun.DataCards == NULL)
+  _model = model;
+  _cards = cards;
+ 
+  _materials = fillMaterials(NULL);
+  _checkVolumes = JsonWrapper::GetProperty
+        (*_cards, "check_volume_overlaps", JsonWrapper::booleanValue).asBool();
+  if (_cards == NULL)
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire datacards",
-                 "MICEDetectorConstruction::MICEDetectorConstruction()"));
-  _checkVolumes = (_simRun.DataCards->fetchValueInt("CheckVolumeOverlaps") == 1);
-  _hasBTFields = false;
+                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
 
   if (_model == NULL)
     throw(Squeal(Squeal::recoverable,
@@ -92,23 +94,22 @@ MICEDetectorConstruction::MICEDetectorConstruction( MICERun& run ) : _simRun(*MI
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire MiceMaterials",
                  "MiceDetectorConstruction::MiceDetectorConstruction()"));
-
-  magField = new G4UniformMagField( 0., 0., 0. );
 }
 
-MICEDetectorConstruction::~MICEDetectorConstruction()
-{
+MICEDetectorConstruction::~MICEDetectorConstruction() {
 }
 
 G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 {
-  G4Box* MICEExpHallBox = new G4Box( _model->name(), _model->dimensions().x(), _model->dimensions().y(), _model->dimensions().z() );
+  G4Box* MICEExpHallBox = new G4Box( _model->name(), _model->dimensions().x(),
+                           _model->dimensions().y(), _model->dimensions().z() );
+  G4Material* hallMat = _materials->materialByName
+                                       ( _model->propertyString( "Material" ) );
+  MICEExpHallLog = new G4LogicalVolume
+                           ( MICEExpHallBox, hallMat, _model->name(), 0, 0, 0 );
 
-  G4Material* hallMat = _materials->materialByName( _model->propertyString( "Material" ) );
-
-  MICEExpHallLog = new G4LogicalVolume( MICEExpHallBox, hallMat, _model->name(), 0, 0, 0 );
-
-  G4PVPlacement* MICEExpHall = new G4PVPlacement( 0, G4ThreeVector(), _model->name(), MICEExpHallLog, 0, false, 0, _checkVolumes);
+  G4PVPlacement* MICEExpHall = new G4PVPlacement( 0, G4ThreeVector(),
+                   _model->name(), MICEExpHallLog, 0, false, 0, _checkVolumes);
 
   G4VisAttributes* vis = new G4VisAttributes( false );
 
@@ -116,26 +117,13 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   setUserLimits( MICEExpHallLog, _model );
 
-  G4FieldManager* globalFieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-
-  Hep3Vector field( 0., 0., 0. );
-
-  _hasBTFields = BTFieldConstructor::HasBTFields();
-
-  if(_hasBTFields)
-    setBTMagneticField( _model );
-  else
-  {
-    if( _model->propertyExistsThis( "MagneticField", "Hep3Vector" ) )
-      field = _model->propertyHep3Vector( "MagneticField" );
-    G4UniformMagField* magField = new G4UniformMagField( field );
-    globalFieldMgr->SetDetectorField ( magField );
-    globalFieldMgr->CreateChordFinder( magField );
-  }
-
+  setBTMagneticField( _model );
+  // turn on cout if check volumes is active
+  if(_checkVolumes) Squeak::setStandardOutputs(0);
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
-
+  // turn cout back to default mode if check volumes is active
+  if(_checkVolumes) Squeak::setStandardOutputs(-1);
   return MICEExpHall;
 }
 
@@ -190,10 +178,22 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
     place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
+    Squeak::errorLevel my_err = Squeak::debug;
+    if(mod->mother()->isRoot()) my_err = Squeak::info;
+    Squeak::mout(my_err) << "Placing " << mod->name() << " of type " 
+                        << mod->volType() << " position: " 
+                        << mod->globalPosition() << " rotationVector: " 
+                        << mod->globalRotation().getAxis() 
+                        << " angle: "  << mod->globalRotation().delta()/degree 
+                        << " volume: "
+                        << solid->GetCubicVolume()/meter/meter/meter << " m^3 ";
+    if(mod->propertyExistsThis("Material", "string"))
+        Squeak::mout(my_err)  << " material: "
+                             << mod->propertyStringThis("Material") << std::endl;
+    else
+        Squeak::mout(my_err)  << std::endl;
   }
 
-  if(!_hasBTFields)
-    setMagneticField( logic, mod );
   setUserLimits( logic, mod ); //CARE!
 
   bool vis = true;
@@ -215,8 +215,8 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
   else
     logic->SetVisAttributes( new G4VisAttributes( false ) );
 
-  if( _simRun.DataCards->fetchValueString("EverythingSpecialVirtual") == "true" )
-  {
+  if( JsonWrapper::GetProperty(*_cards, "everything_special_virtual",
+                                         JsonWrapper::booleanValue).asBool() ) {
     G4SDManager *MICESDMan = G4SDManager::GetSDMpointer();
     SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
     MICESDMan->AddNewDetector  ( specVirtSD );
@@ -227,7 +227,9 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     std::string sdName = mod->propertyStringThis( "SensitiveDetector" );
     G4SDManager *MICESDMan = G4SDManager::GetSDMpointer();
     bool cut = true;
-    if( _simRun.DataCards->fetchValueString( "EnergyLossModel" ) == "none" )
+    std::string physics_model = JsonWrapper::GetProperty(*_cards,
+                     "physics_processes", JsonWrapper::stringValue).asString();
+    if(physics_model == "none" )
       cut = false;
     if( sdName == "TOF" )
     {
@@ -295,33 +297,14 @@ void    MICEDetectorConstruction::setUserLimits( G4LogicalVolume* logic, MiceMod
     logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
 }
 
-void    MICEDetectorConstruction::setMagneticField( G4LogicalVolume* logic, MiceModule* module )
-{
-  if( ! module->propertyExistsThis( "MagneticField", "Hep3Vector" ) )
-    return;
-
-  G4UniformMagField* magField = new G4UniformMagField( module->propertyHep3Vector( "MagneticField" ) );
-
-  G4FieldManager* localFieldMgr = new G4FieldManager( magField );
-
-  logic->SetFieldManager( localFieldMgr, true );
-}
-
 
 void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
 {
-  MICERun::getInstance()->btFieldConstructor = new BTFieldConstructor(rootModule);
-  _btField = MICERun::getInstance()->btFieldConstructor;
-  if(_btField->GetNumberOfFields()==0)
-  {
-    return;
-  }
-
+  _btField = new BTFieldConstructor(rootModule);
   _miceMagneticField = new MiceMagneticField(_btField);
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
   setSteppingAlgorithm();
   setSteppingAccuracy();
-
 }
 
 //Set G4 Stepping Algorithm for BTFields
@@ -333,7 +316,8 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
   G4EqMagElectricField*  fEquationE   = NULL;
   G4Mag_UsualEqRhs*      fEquationM   = NULL;
   G4FieldManager*        fieldMgr     = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  std::string stepperType = CoolingChannelGeom::getInstance()->FieldTrackStepper();
+  std::string stepperType = JsonWrapper::GetProperty(*_cards,
+                     "stepping_algorithm", JsonWrapper::stringValue).asString();
 
   if (!_btField->HasRF())
   { // No rf field, default integration
@@ -348,7 +332,7 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
   }
 
   //Scan through the list of steppers
-  if(stepperType == "Classic" || stepperType=="ClassicalRK4" || pStepper == NULL)
+  if(stepperType == "Classic" || stepperType=="ClassicalRK4")
   {
     if(!_btField->HasRF()) pStepper = new G4ClassicalRK4(fEquationM);
     else                   pStepper = new G4ClassicalRK4(fEquationE, 8);
@@ -421,14 +405,17 @@ void MICEDetectorConstruction::setSteppingAccuracy()
 {
   G4FieldManager* fieldMgr
     = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  CoolingChannelGeom* ChanGeom    = CoolingChannelGeom::getInstance();
 
-  //notes on what each thing means in dataCards.cc or G4 docs
-  G4double deltaOneStep      = ChanGeom->DeltaOneStep();
-  G4double deltaIntersection = ChanGeom->DeltaIntersection();
-  G4double epsilonMin        = ChanGeom->EpsilonMin();
-  G4double epsilonMax        = ChanGeom->EpsilonMax();
-  G4double missDistance      = ChanGeom->MissDistance();
+  G4double deltaOneStep = JsonWrapper::GetProperty(*_cards, "delta_one_step",
+                                          JsonWrapper::realValue).asDouble();
+  G4double deltaIntersection = JsonWrapper::GetProperty(*_cards,
+                      "delta_intersection", JsonWrapper::realValue).asDouble();
+  G4double epsilonMin = JsonWrapper::GetProperty(*_cards,
+                              "epsilon_min", JsonWrapper::realValue).asDouble();
+  G4double epsilonMax = JsonWrapper::GetProperty(*_cards,
+                              "epsilon_max", JsonWrapper::realValue).asDouble();
+  G4double missDistance = JsonWrapper::GetProperty(*_cards,
+                            "miss_distance", JsonWrapper::realValue).asDouble();
 
   if(deltaOneStep > 0)
     fieldMgr->SetDeltaOneStep( deltaOneStep );
@@ -443,7 +430,7 @@ void MICEDetectorConstruction::setSteppingAccuracy()
 }
 
 Json::Value MICEDetectorConstruction::GetSDHits(int i){
-  if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]){
+  if (i >= 0 and ((size_t) i) < _SDs.size() and _SDs[i]) {
     if (_SDs[i]->isHit()) {
       return _SDs[i]->GetHits();
     }

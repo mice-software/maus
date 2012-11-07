@@ -24,6 +24,7 @@ import unittest
 import os
 import subprocess
 
+import Configuration
 from MapCppSimulation import MapCppSimulation
 
 class MapCppSimulationTestCase(unittest.TestCase):
@@ -67,7 +68,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
     def test_birth(self):  # pylint: disable=R0201
         """Check we get an error for bad input to birth"""
         test_mapper = MapCppSimulation()
-        assert(test_mapper.birth(json.dumps("{")) == False)
+        self.assertTrue(test_mapper.birth(json.dumps(self.configuration)))
 
     def test_empty(self):
         """Check mapper runs for empty string, returning an error"""
@@ -134,30 +135,10 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.assertEqual(ps.returncode, 0, msg='Failed to run visualisation')
 
 
-    configuration = {
-      "verbose_level":2,
-      "simulation_geometry_filename":"Test.dat",
-      "maximum_number_of_steps":1000,
-      "keep_steps":True,
-      "keep_tracks":True,
-      "simulation_reference_particle":{
-         "position":{"x":0.0, "y":-0.0, "z":-4700.0},
-         "momentum":{"x":0.0, "y":0.0, "z":1.0},
-         "particle_id":-13,
-         "energy":226.0,
-         "time":0.0,
-         "random_seed":10
-      },
-      "geant4_visualisation":False,
-      "physics_model":"QGSP_BERT",
-      "physics_processes":"standard",
-      "reference_physics_processes":"mean_energy_loss",
-      "particle_decay":True,
-      "charged_pion_half_life":-1.,
-      "muon_half_life":-1.,
-      "production_threshold":0.5,
-    }
-
+    configuration = json.loads(Configuration.Configuration().getConfigJSON())
+    configuration["verbose_level"] = 2
+    configuration["keep_steps"] = True
+    
 
 
 if __name__ == '__main__':

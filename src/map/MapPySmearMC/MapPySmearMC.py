@@ -28,60 +28,60 @@ import numpy
 class MapPySmearMC:
     """ A class to smear MC data for analysis tests """
     def __init__(self):
-      """ NO-OP constructor method """
-      pass
+        """ NO-OP constructor method """
+        pass
 
     @classmethod
     def birth(cls, config_document):
-      """ NO-OP MAUS map/reduce API constructor method """
-      try:
-        json.loads(config_document)
-      except ValueError:
-        return False
-      return True
+        """ NO-OP MAUS map/reduce API constructor method """
+        try:
+            json.loads(config_document)
+        except ValueError:
+            return False
+        return True
 
     @classmethod
     def process(cls, run_document):
-      """ MAUS map/reduce API method called when mapper processes input """
-      try:
-        doc = json.loads(run_document)
-      except ValueError:
-        doc = {"errors":\
-               {"bad_json_document": "unable to do json.loads on input"} }
+        """ MAUS map/reduce API method called when mapper processes input """
+        try:
+            doc = json.loads(run_document)
+        except ValueError:
+            doc = {"errors":\
+                  {"bad_json_document": "unable to do json.loads on input"} }
+            return json.dumps(doc)
+
+        if "mc_events" not in doc:
+            if 'errors' not in doc:
+                doc['errors'] = {}
+            doc['errors']['missing_branch'] = 'Missing MC events branch'
+
+            return json.dumps(doc)
+
+        assert isinstance(doc["mc_events"], list)
+
+        doc["mc_smeared"] = copy.deepcopy(doc["mc_events"])
+
+        # iterate through each MC particle
+        for particle_index in range(len(doc["mc_smeared"])):
+            # iterate through 
+            for key in doc["mc_smeared"][particle_index]:
+                key_str = key.encode('ascii','ignore')
+                if (key_str.find('hits') != -1):
+                    hit_group = doc["mc_smeared"][particle_index][key]
+                    for hit in hit_group:
+                        hit["time"] += numpy.random.normal(scale=0.06)
+                        hit["energy"] += numpy.random.normal(scale=2)
+
+                        position = hit["position"]
+                        position["x"] += numpy.random.normal(scale=10)
+                        position["y"] += numpy.random.normal(scale=10)
+                        # position["z"] += numpy.random.normal(scale=3)
+
+                        momentum = hit["momentum"]
+                        momentum["x"] += numpy.random.normal(scale=2)
+                        momentum["y"] += numpy.random.normal(scale=2)
+                        #momentum["z"] += numpy.random.normal(scale=5)
         return json.dumps(doc)
-
-      if "mc_events" not in doc:
-        if 'errors' not in doc:
-          doc['errors'] = {}
-        doc['errors']['missing_branch'] = 'Missing MC events branch'
-          
-        return json.dumps(doc)
-
-      assert isinstance(doc["mc_events"], list)
-
-      doc["mc_smeared"] = copy.deepcopy(doc["mc_events"])
-
-      # iterate through each MC particle
-      for particle_index in range(len(doc["mc_smeared"])):
-        # iterate through 
-        for key in doc["mc_smeared"][particle_index]:
-          key_str = key.encode('ascii','ignore')
-          if (key_str.find('hits') != -1):
-            hit_group = doc["mc_smeared"][particle_index][key]
-            for hit in hit_group:
-              hit["time"] += numpy.random.normal(scale=0.06)
-              hit["energy"] += numpy.random.normal(scale=2)
-
-              position = hit["position"]
-              position["x"] += numpy.random.normal(scale=10)
-              position["y"] += numpy.random.normal(scale=10)
-              # position["z"] += numpy.random.normal(scale=3)
-
-              momentum = hit["momentum"]
-              momentum["x"] += numpy.random.normal(scale=2)
-              momentum["y"] += numpy.random.normal(scale=2)
-              #momentum["z"] += numpy.random.normal(scale=5)
-      return json.dumps(doc)
 
     @classmethod
     def death(cls):
