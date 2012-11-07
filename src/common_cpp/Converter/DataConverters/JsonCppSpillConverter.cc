@@ -25,16 +25,16 @@ namespace MAUS {
 Spill* JsonCppSpillConverter::_convert(const Json::Value* data) const {
   try {
     ReferenceResolver::JsonToCpp::RefManager::Birth();
-    Json::Value my_data = *data;
+    Json::Value my_data = *data;  // need non-const copy to set path data
     JsonWrapper::Path::SetPathRecursive(my_data, "");
-    Spill* spill = SpillProcessor().JsonToCpp(*data);
+    Spill* spill = SpillProcessor().JsonToCpp(my_data);
     ReferenceResolver::JsonToCpp::RefManager::Death();
     return spill;
   }
-  catch(std::exception& exc) {
+  catch(...) {
     if (ReferenceResolver::JsonToCpp::RefManager::HasInstance())
       ReferenceResolver::JsonToCpp::RefManager::Death();
-    throw exc;
+    throw;
   }
 }
 }

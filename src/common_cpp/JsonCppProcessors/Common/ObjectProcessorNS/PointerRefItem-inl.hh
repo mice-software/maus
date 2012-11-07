@@ -17,6 +17,7 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSORNS_POINTERREFITEM_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSORNS_POINTERREFITEM_INL_HH_
 
+#include <set>
 #include <string>
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"

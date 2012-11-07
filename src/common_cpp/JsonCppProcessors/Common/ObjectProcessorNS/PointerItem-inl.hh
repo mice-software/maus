@@ -57,10 +57,9 @@ void PointerItem<ParentType, ChildType>::_SetCppChild
     Json::Value child_json = parent_json[_branch];
     ChildType* child_cpp = _processor->JsonToCpp(child_json);
     using ReferenceResolver::JsonToCpp::RefManager;
-    using ReferenceResolver::JsonToCpp::ChildTypedResolver;
     if (RefManager::HasInstance()) {
-        std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
-        ChildTypedResolver<ChildType>::AddData(pth, child_cpp);
+        std::string path = JsonWrapper::Path::GetPath(parent_json[_branch]);
+        RefManager::GetInstance().SetPointerAsValue(path, child_cpp);
     }
     // syntax is (_object.*_function)(args);
     (parent_cpp.*_setter)(child_cpp);
@@ -86,10 +85,9 @@ void PointerItem<ParentType, ChildType>::_SetJsonChild
     // slightly worrying, the path doesn't seem to get pulled through here
     BaseItem<ParentType>::SetPath(parent_json);
     using ReferenceResolver::CppToJson::RefManager;
-    using ReferenceResolver::CppToJson::TypedResolver;
     if (RefManager::HasInstance()) {
         std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
-        TypedResolver<ChildType>::AddData(child_cpp, pth);
+        RefManager::GetInstance().SetPointerAsValue(child_cpp, pth);
     }
 }
 }  // namespace ObjectProcessorNS

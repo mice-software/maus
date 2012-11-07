@@ -93,7 +93,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
     }
-    // data_cpp->SetEvent(NULL);  // double free?
     return true;
 }
 

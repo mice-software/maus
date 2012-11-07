@@ -32,10 +32,10 @@ Json::Value* CppJsonSpillConverter::_convert(const Data* data) const {
     ReferenceResolver::CppToJson::RefManager::Death();
     return my_json;
   }
-  catch(std::exception& exc) {
+  catch(...) {
     if (ReferenceResolver::CppToJson::RefManager::HasInstance())
       ReferenceResolver::CppToJson::RefManager::Death();
-    throw exc;
+    throw;
   }
 }
 }

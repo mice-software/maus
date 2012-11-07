@@ -31,32 +31,40 @@ class TestClass {
 };
 
 TEST(ReferenceResolverJsonToCppTest, ResolverTest) {
+    RefManager::Birth();
     double child(99);
     TestClass test;
     FullyTypedResolver<TestClass, double> res
                                           ("#data", &TestClass::SetData, &test);
-    ChildTypedResolver<double>::AddData("#data", &child);
-    EXPECT_THROW(ChildTypedResolver<double>::AddData("#data", &child), Squeal);
+    RefManager::GetInstance().SetPointerAsValue("#data", &child);
+    EXPECT_THROW(RefManager::GetInstance().SetPointerAsValue("#data", &child),
+                 Squeal);
     res.ResolveReferences();
     EXPECT_TRUE(test._data == &child);
-    res.ClearData();
+
+    RefManager::Death();
+    RefManager::Birth();
     EXPECT_THROW(res.ResolveReferences(), Squeal);
     EXPECT_TRUE(test._data == NULL);
+    RefManager::Death();
 }
 
 TEST(ReferenceResolverJsonToCppTest, VectorResolverTest) {
+    RefManager::Birth();
     double child(99);
     std::vector<double*> vec;
     vec.push_back(NULL);
     VectorResolver<double> res("#data", vec, 0);
-    ChildTypedResolver<double>::AddData("#data", &child);
+    RefManager::GetInstance().SetPointerAsValue("#data", &child);
     res.ResolveReferences();
     EXPECT_TRUE(vec[0] == &child);
+    RefManager::Death();
+    RefManager::Birth();
     VectorResolver<double> res2("#data", vec, 1);
     EXPECT_THROW(res2.ResolveReferences(), Squeal);
-    res.ClearData();
     EXPECT_THROW(res.ResolveReferences(), Squeal);
     EXPECT_TRUE(vec[0] == NULL);
+    RefManager::Death();
 }
 
 
@@ -75,37 +83,40 @@ TEST(ReferenceResolverJsonToCppTest, RefManagerBirthTest) {
 }
 
 TEST(ReferenceResolverJsonToCppTest, RefManagerTest) {
-    RefManager* man = new RefManager();
+    RefManager::Birth();
     double child(99);
     TestClass test;
     FullyTypedResolver<TestClass, double>* res = new FullyTypedResolver
                        <TestClass, double>("#data", &TestClass::SetData, &test);
-    man->AddReference(res);
-    ChildTypedResolver<double>::AddData("#data", &child);
-    man->ResolveReferences();
+    RefManager::GetInstance().AddReference(res);
+    RefManager::GetInstance().SetPointerAsValue("#data", &child);
+    RefManager::GetInstance().ResolveReferences();
     EXPECT_TRUE(test._data == &child);
-    delete man;  // res should now be deleted
+    RefManager::Death();
 }
 }
 
 namespace CppToJson {
 TEST(ReferenceResolverCppToJsonTest, TypedResolverTest) {
+    RefManager::Birth();
     double child(0);
     Json::Value parent(Json::objectValue);
     parent["test"] = Json::Value();
     TypedResolver<double> res(&child, "#test");
-    TypedResolver<double>::AddData(&child, "PATH TO BRANCH");
-    EXPECT_THROW(TypedResolver<double>::
-                                     AddData(&child, "PATH TO BRANCH"), Squeal);
+    RefManager::GetInstance().SetPointerAsValue(&child, "PATH TO BRANCH");
+    EXPECT_THROW(RefManager::GetInstance().
+                           SetPointerAsValue(&child, "PATH TO BRANCH"), Squeal);
     res.ResolveReferences(parent);
 
     Json::Value test(Json::objectValue);
     test["$ref"] = Json::Value("PATH TO BRANCH");
     EXPECT_EQ(parent["test"], test);
-    res.ClearData();
+    RefManager::Death(); // clear static data
+    RefManager::Birth();
     parent["test"] = Json::Value("bob");
     EXPECT_THROW(res.ResolveReferences(parent), Squeal);
     EXPECT_EQ(parent["test"], Json::Value()) << parent["test"];
+    RefManager::Death();
 }
 
 TEST(ReferenceResolverCppToJsonTest, RefManagerBirthTest) {
@@ -123,7 +134,7 @@ TEST(ReferenceResolverCppToJsonTest, RefManagerBirthTest) {
 }
 
 TEST(ReferenceResolverCppToJsonTest, RefManagerTest) {
-    RefManager* man = new RefManager();
+    RefManager::Birth();
     Json::Value test(Json::objectValue);
     test["$ref"] = Json::Value("PATH TO BRANCH");
 
@@ -132,11 +143,11 @@ TEST(ReferenceResolverCppToJsonTest, RefManagerTest) {
     parent["test_1"] = Json::Value(1);
     parent["test_2"] = Json::Value(2);
     TypedResolver<double>* res = new TypedResolver<double>(&child, "#test_1");
-    res->AddData(&child, "PATH TO BRANCH");
-    man->AddReference(res);
-    man->ResolveReferences(parent);
+    RefManager::GetInstance().SetPointerAsValue(&child, "PATH TO BRANCH");
+    RefManager::GetInstance().AddReference(res);
+    RefManager::GetInstance().ResolveReferences(parent);
     EXPECT_EQ(parent["test_1"], test);
-    delete man; // res should now be deleted;
+    RefManager::Death(); // res should now be deleted;
 }
 }
 }

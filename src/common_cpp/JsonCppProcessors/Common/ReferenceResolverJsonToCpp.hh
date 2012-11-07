@@ -17,6 +17,7 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_HH_
 
+#include <set>
 #include <map>
 #include <string>
 #include <vector>
@@ -26,7 +27,6 @@
 namespace MAUS {
 namespace ReferenceResolver {
 namespace JsonToCpp {
-
 /** @class Resolver abstract type for resolving references
  *
  *  By having an untyped base class, we can put all references in the same
@@ -39,49 +39,6 @@ class Resolver {
 
     /** Convert from Json pointer to C++ pointer*/
     virtual void ResolveReferences() = 0;
-
-    /** Clear static list of pointers-by-value (called by RefManager delete)
-     *
-     *  Note this has to be non-static so that it can be called from the base
-     *  class and inherited okay. virtual functions can't  be static.
-     */
-    virtual void ClearData() const = 0;
-};
-
-/** @class ChildTypedResolver
- *
- *  Stores a static map of json addresses to C++ addresses. We only need one
- *  type here (the type of the pointer).
- *
- *  @tparam ChildType type of the object pointed to
- */
-template <class ChildType>
-class ChildTypedResolver : public Resolver {
-  public:
-    /** Destructor does nothing */
-    ~ChildTypedResolver() {}
-
-    /** As parent */
-    void ResolveReferences() = 0;
-
-    /** Add a pointer-as-data to the hash table for subsequent dereferencing
-     *
-     *  @param data_json_address json path to the data
-     *  @param data_cpp_address C++ address of the data
-     *
-     *  throws an exception if the data is already in the hash table - as this
-     *  can lead to incorrect resolution of pointer-by-reference and memory
-     *  duplication.
-     */
-    static void AddData(std::string data_json_address,
-                        ChildType* data_cpp_address);
-
-    /** Clear the hash table - ready to parse a new data tree
-     */
-    void ClearData() const;
-
-  protected:
-    static std::map<std::string, ChildType*> _data_hash;
 };
 
 /** @class FullyTypedResolver
@@ -92,7 +49,7 @@ class ChildTypedResolver : public Resolver {
  *  @tparam ChildType type of object pointed to 
  */
 template <class ParentType, class ChildType>
-class FullyTypedResolver : public ChildTypedResolver<ChildType> {
+class FullyTypedResolver : public Resolver {
   public:
     /** SetMethod function pointer for setting the C++ pointer during
      *  dereference operation
@@ -116,7 +73,7 @@ class FullyTypedResolver : public ChildTypedResolver<ChildType> {
 
     /** Resolve this reference
      *
-     *  Lookup the json address in the hash table; call SetMethod to allocate
+     *  Lookup the json address on the RefManager; call SetMethod to allocate
      *  the resultant C++ pointer to the parent object.
      *
      *  Note that as we store the addresses of C++ objects, deep copy of the C++
@@ -138,7 +95,7 @@ class FullyTypedResolver : public ChildTypedResolver<ChildType> {
  *  @tparam ChildType type of object pointed to; so a std::vector<ChildType*>
  */
 template <class ChildType>
-class VectorResolver : public ChildTypedResolver<ChildType> {
+class VectorResolver : public Resolver {
   public:
     /** Constructor
      *
@@ -155,7 +112,7 @@ class VectorResolver : public ChildTypedResolver<ChildType> {
 
     /** Resolve this reference
      *
-     *  Lookup the json address in the hash table; call vector subscript
+     *  Lookup the json address on the RefManager; call vector subscript
      *  operator to allocate the resultant C++ pointer to the parent object.
      *
      *  Note that as we store the addresses of C++ objects, deep copy of the C++
@@ -194,9 +151,6 @@ class RefManager {
      */
     static void Death();
 
-    /** Destructor - also cleans up static hash tables */
-    inline ~RefManager();
-
     /** Resolve references stored on the refmanager
      *
      *  Iterate over the references and call ResolveReferences() on each
@@ -204,13 +158,35 @@ class RefManager {
      */
     inline void ResolveReferences();
 
-    /** Append a reference to the manager
-     */
+    /** Append a reference to the manager */
     inline void AddReference(Resolver* reference);
 
+    /** Add a mapping from Json address to C++ pointer to the manager */
+    template <class PointerType>
+    void SetPointerAsValue(std::string json_address, PointerType* pointer);
+
+    /** Access the C++ representation of a json address */
+    template <class PointerType>
+    PointerType* GetPointerAsValue(std::string json_address);
+
   private:
+    class PointerValueTable;
+    template <class PointerType>
+    class TypedPointerValueTable;
+
+    template <class PointerType>
+    TypedPointerValueTable<PointerType>* GetTypedPointerValueTable();
+
+    std::set<PointerValueTable*> _value_tables;
     std::vector<Resolver*> _references;
     static RefManager* _instance;
+
+    RefManager() {}
+    inline ~RefManager();
+
+    // disabled
+    RefManager& operator=(const RefManager&);
+    RefManager(const RefManager&);
 };
 }  // namespace JsonToCpp
 }  // namespace ReferenceResolver

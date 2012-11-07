@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_HH_
 
-#include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -39,20 +39,13 @@ class Resolver {
 
     /** Convert from Cpp pointer to json pointer*/
     virtual void ResolveReferences(Json::Value& json_root) = 0;
-
-    /** Clear static list of pointers-by-value (called by RefManager delete)
-     *
-     *  Note this has to be non-static so that it can be called from the base
-     *  class and inherited okay. virtual functions can't  be static.
-     */
-    virtual void ClearData() const = 0;
 };
 
 /** @class TypedResolver real type for resolving references
  *
- *  Holds C++ pointer-by-reference of type ChildType* to a Json object and a
- *  static map of all pointers-by-value to associated json object. When the data
- *  tree is filled we can call ResolveReferences to fill the references.
+ *  Holds C++ pointer-by-reference of type ChildType* to a Json object. When the
+ *  data tree is filled we can call ResolveReferences to fill the references
+ *  using the pointer-by-value information on the refManager
  *
  *  @tparam ChildType the type pointed to by the C++ pointer-by-reference
  */
@@ -85,39 +78,22 @@ class TypedResolver : public Resolver {
      */
     void ResolveReferences(Json::Value& json_root);
 
-    /** Add a pointer-as-data to the map for subsequent dereferencing
-     *
-     *  @param data_cpp_address C++ address of the data
-     *  @param data_json_address json path to the data
-     *
-     *  throws an exception if the data is already in the hash table - as this
-     *  can lead to incorrect resolution of pointer-by-reference and memory
-     *  duplication.
-     */
-    static void AddData(ChildType* data_cpp_address,
-                        std::string data_json_address);
-
-    /** @copydoc
-     *  as parent
-     */
-    void ClearData() const;
-
   private:
     ChildType* _cpp_pointer;
     std::string _json_pointer;
-    static std::map<ChildType*, std::string> _data_hash;
 };
 
-/** @class RefManager stores and subsequently resolves a list of references
+/** @class RefManager stores and subsequently resolves a list of 
+ *  pointer-as-reference and a (set of) map of pointer-as-value.
  *
  *  As we traverse the data tree we collect a list of pointer-by-references to 
  *  json and a map of pointer-by-values to json. When the data tree is fully
  *  traversed we can resolve the pointer-by-references to the appropriate json
  *  address.
  *
- *  Probably should be called statically using GetInstance() but this is not
- *  enforced. The issue here is the static data on child references is stored
- *  and cleared globally - if several data trees need to be resolved at the same
+ *  Should be called statically using GetInstance(). The issue here is
+ *  that I use function overloading to determine type leading to static storage
+ *  of pointer-as-value - if several data trees need to be resolved at the same
  *  time then it is possible to get them confused.
  *
  *  Call Birth() before parsing the data tree and Death() when you are finished
@@ -151,9 +127,8 @@ class RefManager {
     static void Death();
 
     /** delete RefManager; if this == static instance, delete the static
-     *  instance also
+     *  instance also. At the same time clears the PointerAsValue tables.
      */
-    inline ~RefManager();
 
     /** Resolve references
      *
@@ -171,9 +146,42 @@ class RefManager {
      */
     inline void AddReference(Resolver* reference);
 
+    /** Add a mapping from Json address to C++ pointer to the manager 
+     *
+     *  @param json_address Json representation of the pointer-as-value (path to
+     *  the data
+     *  @param pointer C++ representation of the pointer-as-value
+     */
+    template <class PointerType>
+    void SetPointerAsValue(PointerType* pointer, std::string json_address);
+
+    /** Access the C++ representation of a json address
+     *
+     *  @param cpp_address C++ address of the data
+     *
+     *  @returns Json representation of the pointer-as-value (path to the data)
+     */
+    template <class PointerType>
+    std::string GetPointerAsValue(PointerType* cpp_address);
+
   private:
+    class PointerValueTable;
+    template <class PointerType>
+    class TypedPointerValueTable;
+
+    template <class PointerType>
+    TypedPointerValueTable<PointerType>* GetTypedPointerValueTable();
+
+    std::set<PointerValueTable*> _value_tables;
     std::vector<Resolver*> _references;
     static RefManager* _instance;
+
+    RefManager() {}
+    inline ~RefManager();
+
+    // disabled
+    RefManager& operator=(const RefManager&);
+    RefManager(const RefManager&);
 };
 }  // namespace CppToJson
 }  // namespace ReferenceResolver

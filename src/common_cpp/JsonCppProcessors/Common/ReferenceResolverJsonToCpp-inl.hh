@@ -17,6 +17,7 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_INL_HH_
 
+#include <set>
 #include <map>
 #include <string>
 #include <vector>
@@ -29,29 +30,6 @@
 namespace MAUS {
 namespace ReferenceResolver {
 namespace JsonToCpp {
-template <class ChildType>
-void ChildTypedResolver<ChildType>::AddData
-                  (std::string data_json_address, ChildType* data_cpp_address) {
-    if (_data_hash.find(data_json_address) != _data_hash.end()) {
-        throw(Squeal(Squeal::recoverable,
-              "Attempt to register "+data_json_address+
-              " to "+STLUtils::ToString(data_cpp_address)+
-              " when it was already registered to "+
-              STLUtils::ToString(_data_hash[data_json_address]),
-              "ReferenceResolver::TypedResolver::AddData"));
-    }
-    _data_hash[data_json_address] = data_cpp_address;
-}
-
-template <class ChildType>
-void ChildTypedResolver<ChildType>::ClearData() const {
-    _data_hash = std::map<std::string, ChildType*>();
-}
-
-template <class ChildType>
-std::map<std::string, ChildType*> ChildTypedResolver<ChildType>::_data_hash;
-
-///////////////////////////////////////////////////////////////////////////////
 
 template <class ParentType, class ChildType>
 FullyTypedResolver<ParentType, ChildType>::FullyTypedResolver(
@@ -64,18 +42,14 @@ FullyTypedResolver<ParentType, ChildType>::FullyTypedResolver(
 
 template <class ParentType, class ChildType>
 void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
-    std::map<std::string, ChildType*>& data_hash =
-                             ChildTypedResolver<ChildType>::_data_hash;
-    if (data_hash.find(_ref_json_address) == data_hash.end()) {
-        (*_ref_cpp_parent.*_cpp_setter)(NULL);
+    ChildType* data_address = RefManager::GetInstance().
+                                GetPointerAsValue<ChildType>(_ref_json_address);
+    (*_ref_cpp_parent.*_cpp_setter)(data_address);
+    if (data_address == NULL)
         throw(Squeal(Squeal::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
               " on C++ object "+STLUtils::ToString(_ref_cpp_parent),
               "ReferenceResolver::FullyTypedResolver::ResolveReferences"));
-
-    } else {
-        (*_ref_cpp_parent.*_cpp_setter)(data_hash[_ref_json_address]);
-    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -90,31 +64,73 @@ VectorResolver<ChildType>::VectorResolver(
 
 template <class ChildType>
 void VectorResolver<ChildType>::ResolveReferences() {
-    std::map<std::string, ChildType*>& data_hash =
-                             ChildTypedResolver<ChildType>::_data_hash;
     if (_index >= _vector.size())
         throw(Squeal(Squeal::recoverable,
                      "Index out of range while resolving pointer to array "+
                      _ref_json_address,
                      "ReferenceResolver::VectorResolver::ResolveReferences"));
-    if (data_hash.find(_ref_json_address) == data_hash.end()) {
-        _vector[_index] = NULL;
+    ChildType* data_address = RefManager::GetInstance().
+                                GetPointerAsValue<ChildType>(_ref_json_address);
+    _vector[_index] = data_address;
+    if (data_address == NULL)
         throw(Squeal(Squeal::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
               " on C++ vector "+STLUtils::ToString(&_vector)+" element "+
               STLUtils::ToString(_index),
               "ReferenceResolver::VectorResolver::ResolveReferences"));
-    } else {
-        _vector[_index] = data_hash[_ref_json_address];
-    }
-}
+  }
 
 //////////////////////////////////////////////////////////////////
+
+class RefManager::PointerValueTable {
+  public:
+    virtual ~PointerValueTable() {}
+    virtual void ClearData() = 0;
+  private:
+};
+
+template <class PointerType>
+class RefManager::TypedPointerValueTable : public RefManager::PointerValueTable {
+  public:
+    virtual ~TypedPointerValueTable() {}
+    void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}
+    std::map<std::string, PointerType*> _data_hash;
+};
 
 void RefManager::ResolveReferences() {
     for (size_t i = 0; i < _references.size(); ++i) {
         _references[i]->ResolveReferences();
     }
+}
+
+template <class PointerType>
+void RefManager::SetPointerAsValue
+                              (std::string json_address, PointerType* pointer) {
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(json_address) != table->_data_hash.end())
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to add json pointer "+json_address+
+                     " to hash table when it was already added",
+                     "JsonToCpp::RefManager::SetPointerAsValue(...)"));
+    table->_data_hash[json_address] = pointer;
+}
+
+template <class PointerType>
+PointerType* RefManager::GetPointerAsValue(std::string json_address) {
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(json_address) == table->_data_hash.end())
+        return NULL;
+    return table->_data_hash[json_address];
+}
+
+template <class PointerType>
+RefManager::TypedPointerValueTable<PointerType>*
+                                       RefManager::GetTypedPointerValueTable() {
+    static TypedPointerValueTable<PointerType> table;
+    _value_tables.insert(&table);
+    return &table;
 }
 
 void RefManager::AddReference(Resolver* reference) {
@@ -124,8 +140,12 @@ void RefManager::AddReference(Resolver* reference) {
 
 RefManager::~RefManager() {
     for (size_t i = 0; i < _references.size(); ++i) {
-        _references[i]->ClearData();
         delete _references[i];
+    }
+    for (std::set<PointerValueTable*>::iterator it = _value_tables.begin();
+         it != _value_tables.end();
+         ++it) {
+        (*it)->ClearData();
     }
 }
 }  // namespace JsonToCpp

@@ -59,10 +59,9 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 ArrayContents* data = _proc->JsonToCpp(json_array[i]);
                 (*vec)[i] = data;
                 using ReferenceResolver::JsonToCpp::RefManager;
-                using ReferenceResolver::JsonToCpp::ChildTypedResolver;
                 std::string path = JsonWrapper::Path::GetPath(json_array[i]);
                 if (RefManager::HasInstance())
-                    ChildTypedResolver<ArrayContents>::AddData(path, (*vec)[i]);
+                    RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -104,10 +103,9 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
             using ReferenceResolver::CppToJson::RefManager;
-            using ReferenceResolver::CppToJson::TypedResolver;
             if (RefManager::HasInstance())
-                TypedResolver<ArrayContents>::
-                                        AddData(cpp_array[i], GetPath(path, i));
+                RefManager::GetInstance().SetPointerAsValue
+                                               (cpp_array[i], GetPath(path, i));
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;

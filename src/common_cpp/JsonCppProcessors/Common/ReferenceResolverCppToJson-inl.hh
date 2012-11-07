@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_INL_HH_
 
 #include <map>
+#include <set>
 #include <string>
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
@@ -36,48 +37,78 @@ TypedResolver<ChildType>::TypedResolver
 
 template <class ChildType>
 void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
-    if (_data_hash.find(_cpp_pointer) == _data_hash.end()) {  // NullValue
-        Json::Value& child =
+    Json::Value& child =
                    JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
-        child = Json::Value();
+    child = Json::Value();
+    // will throw if pointer is not in the RefManager
+    std::string json_address =
+                      RefManager::GetInstance().GetPointerAsValue(_cpp_pointer);
+    child["$ref"] = Json::Value(json_address);
+}
+
+
+///////////////////////////////////////////////////////
+
+class RefManager::PointerValueTable {
+  public:
+    virtual ~PointerValueTable() {}
+    virtual void ClearData() = 0;
+  private:
+};
+
+template <class PointerType>
+class RefManager::TypedPointerValueTable : public RefManager::PointerValueTable {
+  public:
+    virtual ~TypedPointerValueTable() {}
+    void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}
+    std::map<PointerType*, std::string> _data_hash;
+};
+
+template <class PointerType>
+void RefManager::SetPointerAsValue
+                              (PointerType* pointer, std::string json_address) {
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(pointer) != table->_data_hash.end())
         throw(Squeal(Squeal::recoverable,
-              "Failed to resolve reference at "+_json_pointer+
-              " with C++ address "+STLUtils::ToString(_cpp_pointer),
-              "ReferenceResolver::TypedResolver::ResolveReferences"));
-    } else {  // set json reference to point at json value
-        Json::Value& child =
-                   JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
-        Json::Value reference_value(Json::objectValue);
-        reference_value["$ref"] = _data_hash[_cpp_pointer];
-        child = reference_value;
-    }
+                     "Attempt to add pointer for C++ address "+
+                     STLUtils::ToString(pointer)+
+                     " to hash table when it was already added",
+                     "CppToJson::RefManager::SetPointerAsValue(...)"));
+    table->_data_hash[pointer] = json_address;
 }
 
-template <class ChildType>
-void TypedResolver<ChildType>::AddData(ChildType* data_cpp_address,
-                                       std::string data_json_address) {
-    if (_data_hash.find(data_cpp_address) != _data_hash.end()) {
+template <class PointerType>
+std::string RefManager::GetPointerAsValue(PointerType* pointer) {
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(pointer) == table->_data_hash.end())
         throw(Squeal(Squeal::recoverable,
-              "Attempt to register "+STLUtils::ToString(data_cpp_address)+
-              " to "+data_json_address+" when it was already registered to "+
-              _data_hash[data_cpp_address],
-              "ReferenceResolver::TypedResolver::AddData"));
-    }
-    _data_hash[data_cpp_address] = data_json_address;
+                     "Attempt to get pointer for json address "+
+                     STLUtils::ToString(pointer)+
+                     " when it was never added",
+                     "CppToJson::RefManager::GetPointerAsValue(...)"));
+    return table->_data_hash[pointer];
 }
 
-template <class ChildType>
-std::map<ChildType*, std::string> TypedResolver<ChildType>::_data_hash;
-
-template <class ChildType>
-void TypedResolver<ChildType>::ClearData() const {
-    _data_hash = std::map<ChildType*, std::string>();
+template <class PointerType>
+RefManager::TypedPointerValueTable<PointerType>*
+                                       RefManager::GetTypedPointerValueTable() {
+    static TypedPointerValueTable<PointerType> table;
+    _value_tables.insert(&table);
+    return &table;
 }
+
+////////////////////////////////////////////////////////
 
 RefManager::~RefManager() {
     for (size_t i = 0; i < _references.size(); ++i) {
-        _references[i]->ClearData();
         delete _references[i];
+    }
+    for (std::set<PointerValueTable*>::iterator it = _value_tables.begin();
+         it != _value_tables.end();
+         ++it) {
+        (*it)->ClearData();
     }
     if (this == _instance) {
         _instance = NULL;
