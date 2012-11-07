@@ -171,7 +171,6 @@ TEMP_CLASS FromString(std::string value) {
   ss >> out;
   return out;
 }
-
 }
 
 /**  A macro to disallow the copy constructor and operator= functions

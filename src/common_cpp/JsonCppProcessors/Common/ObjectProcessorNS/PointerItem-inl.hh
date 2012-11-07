@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSORNS_POINTERITEM_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_OBJECTPROCESSORNS_POINTERITEM_INL_HH_
 
+#include <string>
+
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
@@ -54,7 +56,8 @@ void PointerItem<ParentType, ChildType>::_SetCppChild
     }
     Json::Value child_json = parent_json[_branch];
     ChildType* child_cpp = _processor->JsonToCpp(child_json);
-    using namespace ReferenceResolver::JsonToCpp;
+    using ReferenceResolver::JsonToCpp::RefManager;
+    using ReferenceResolver::JsonToCpp::ChildTypedResolver;
     if (RefManager::HasInstance()) {
         std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
         ChildTypedResolver<ChildType>::AddData(pth, child_cpp);
@@ -82,7 +85,8 @@ void PointerItem<ParentType, ChildType>::_SetJsonChild
     delete child_json;
     // slightly worrying, the path doesn't seem to get pulled through here
     BaseItem<ParentType>::SetPath(parent_json);
-    using namespace ReferenceResolver::CppToJson;
+    using ReferenceResolver::CppToJson::RefManager;
+    using ReferenceResolver::CppToJson::TypedResolver;
     if (RefManager::HasInstance()) {
         std::string pth = JsonWrapper::Path::GetPath(parent_json[_branch]);
         TypedResolver<ChildType>::AddData(child_cpp, pth);

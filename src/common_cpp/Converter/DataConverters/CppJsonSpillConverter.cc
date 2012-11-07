@@ -36,7 +36,7 @@ Json::Value* CppJsonSpillConverter::_convert(const Data* data) const {
     if (ReferenceResolver::CppToJson::RefManager::HasInstance())
       ReferenceResolver::CppToJson::RefManager::Death();
     throw exc;
-  } 
+  }
 }
 }
 

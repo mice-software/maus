@@ -163,7 +163,7 @@ namespace Optimiser
   //Run the optics package
   void   RunOptics(int& npar, double * gin, double& f, double* x, int flag);
   //Push parameters onto the MiceModules
-  void   PushParameters(MiceModule* mod, std::vector<Parameter*> parameters);
+  void   PushParameters(std::vector<Parameter*> parameters);
   //Calculate scores based on optics output
   std::vector<double> GetScore();
   void GetScore(CovarianceMatrix mat, const MiceModule* mod, std::map<std::string, double>& scores);

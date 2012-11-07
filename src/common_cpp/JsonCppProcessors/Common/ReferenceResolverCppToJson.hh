@@ -35,7 +35,7 @@ namespace CppToJson {
 class Resolver {
   public:
     /** Destructor does nothing */
-    ~Resolver() {}
+    virtual ~Resolver() {}
 
     /** Convert from Cpp pointer to json pointer*/
     virtual void ResolveReferences(Json::Value& json_root) = 0;
@@ -170,7 +170,7 @@ class RefManager {
      *  @param reference Append this reference to the list of references
      */
     inline void AddReference(Resolver* reference);
-    
+
   private:
     std::vector<Resolver*> _references;
     static RefManager* _instance;

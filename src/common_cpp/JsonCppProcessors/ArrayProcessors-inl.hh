@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include <vector>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -57,7 +58,8 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
             } else {
                 ArrayContents* data = _proc->JsonToCpp(json_array[i]);
                 (*vec)[i] = data;
-                using namespace ReferenceResolver::JsonToCpp;
+                using ReferenceResolver::JsonToCpp::RefManager;
+                using ReferenceResolver::JsonToCpp::ChildTypedResolver;
                 std::string path = JsonWrapper::Path::GetPath(json_array[i]);
                 if (RefManager::HasInstance())
                     ChildTypedResolver<ArrayContents>::AddData(path, (*vec)[i]);
@@ -101,7 +103,8 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             (*json_array)[i] = *data; // json copies memory here but not path
             JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
-            using namespace ReferenceResolver::CppToJson;
+            using ReferenceResolver::CppToJson::RefManager;
+            using ReferenceResolver::CppToJson::TypedResolver;
             if (RefManager::HasInstance())
                 TypedResolver<ArrayContents>::
                                         AddData(cpp_array[i], GetPath(path, i));
@@ -207,7 +210,8 @@ std::string ValueArrayProcessor<ArrayContents>::GetPath
 template <class ArrayContents>
 std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
-    using namespace ReferenceResolver::JsonToCpp;
+    using ReferenceResolver::JsonToCpp::RefManager;
+    using ReferenceResolver::JsonToCpp::VectorResolver;
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
         throw(Squeal(Squeal::recoverable,
@@ -243,7 +247,9 @@ template <class ArrayContents>
 Json::Value* ReferenceArrayProcessor<ArrayContents>::CppToJson(
                            const std::vector<ArrayContents*>& cpp_array,
                            std::string path) {
-    using namespace ReferenceResolver::CppToJson;
+    using ReferenceResolver::CppToJson::RefManager;
+    using ReferenceResolver::CppToJson::TypedResolver;
+
     Json::Value* array = new Json::Value(Json::arrayValue);
     JsonWrapper::Path::SetPath(*array, path);
     array->resize(cpp_array.size());
@@ -260,6 +266,5 @@ Json::Value* ReferenceArrayProcessor<ArrayContents>::CppToJson(
     }
     return array;
 }
-
 }
 

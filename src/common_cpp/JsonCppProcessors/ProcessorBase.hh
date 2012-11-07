@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
 
+#include <string>
+
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
@@ -74,8 +76,6 @@ class ProcessorBase : IProcessor<CppRepresentation> {
      */
     virtual Json::Value* CppToJson
             (const CppRepresentation& cpp_representation, std::string path) = 0;
-  protected:
-    std::string _path;
 };
 }
 

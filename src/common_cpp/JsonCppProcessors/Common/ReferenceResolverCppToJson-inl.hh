@@ -17,6 +17,9 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_INL_HH_
 
+#include <map>
+#include <string>
+
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/legacy/Interface/Squeal.hh"
@@ -59,7 +62,6 @@ void TypedResolver<ChildType>::AddData(ChildType* data_cpp_address,
               " to "+data_json_address+" when it was already registered to "+
               _data_hash[data_cpp_address],
               "ReferenceResolver::TypedResolver::AddData"));
-        
     }
     _data_hash[data_cpp_address] = data_json_address;
 }

@@ -98,7 +98,7 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
                 &TestObject_3::GetChild2, &TestObject_3::SetChild2, true);
   test_3_proc.RegisterPointerBranch("pointer", &double_proc,
                 &TestObject_3::GetPointer, &TestObject_3::SetPointer, true);
-  
+
   // test C++ to Json conversion
   Json::Value* test_3_json = test_3_proc.CppToJson(test_3);
   ReferenceResolver::CppToJson::RefManager::
@@ -115,7 +115,7 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
             test_3_out->GetPointer());
   EXPECT_EQ(test_3_out->GetChild2()->GetReference(),
             test_3_out->GetPointer());
-  EXPECT_EQ(*(test_3_out->GetPointer()), *(test_3.GetPointer())); 
+  EXPECT_EQ(*(test_3_out->GetPointer()), *(test_3.GetPointer()));
 
   delete test_3_json;
   delete test_3_out;

@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_ARRAYPROCESSOR_HH_
 
 #include <vector>
+#include <string>
 
 #include "json/json.h"
 

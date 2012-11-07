@@ -17,6 +17,10 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_INL_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERJSONTOCPP_INL_HH_
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/legacy/Interface/Squeal.hh"
@@ -35,9 +39,7 @@ void ChildTypedResolver<ChildType>::AddData
               " when it was already registered to "+
               STLUtils::ToString(_data_hash[data_json_address]),
               "ReferenceResolver::TypedResolver::AddData"));
-        
     }
-
     _data_hash[data_json_address] = data_cpp_address;
 }
 
@@ -83,12 +85,12 @@ VectorResolver<ChildType>::VectorResolver(
                             std::string ref_json_address,
                             std::vector<ChildType*>& vector,
                             size_t vector_index)
-  : _ref_json_address(ref_json_address), _vector(vector), _index(vector_index) {   
+  : _ref_json_address(ref_json_address), _vector(vector), _index(vector_index) {
 }
 
 template <class ChildType>
 void VectorResolver<ChildType>::ResolveReferences() {
-    std::map<std::string, ChildType*>& data_hash = 
+    std::map<std::string, ChildType*>& data_hash =
                              ChildTypedResolver<ChildType>::_data_hash;
     if (_index >= _vector.size())
         throw(Squeal(Squeal::recoverable,

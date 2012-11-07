@@ -307,7 +307,7 @@ void JsonWrapper::Path::AppendPath(Json::Value& json, std::string branch_name) {
         SetPath(json, "#"+branch_name);
     } else {
         SetPath(json, old_path+"/"+branch_name);
-    }    
+    }
 }
 
 void JsonWrapper::Path::AppendPath(Json::Value& json, size_t array_index) {
@@ -317,9 +317,9 @@ void JsonWrapper::Path::AppendPath(Json::Value& json, size_t array_index) {
 Json::Value& JsonWrapper::Path::DereferencePath
                                          (Json::Value& json, std::string path) {
     if (path[0] == '#')
-        path = path.substr(1, path.size()); //lstrip #
+        path = path.substr(1, path.size());  // lstrip #
     if (path[path.size()-1] == '/')
-        path = path.substr(0, path.size()-1); //rstrip /
+        path = path.substr(0, path.size()-1);  // rstrip /
     if (path == "")
         return json;
     std::string this_path = path;

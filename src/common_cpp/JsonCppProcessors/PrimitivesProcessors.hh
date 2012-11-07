@@ -42,7 +42,6 @@ class DoubleProcessor : public ProcessorBase<double> {
     /** Convert from double to Json::numericValue passing path
      */
     virtual Json::Value* CppToJson(const double& cpp_double, std::string path);
-
 };
 
 /** Processor to convert between C++ std::string and Json::stringValue
@@ -103,7 +102,6 @@ class UIntProcessor : public ProcessorBase<unsigned int> {
      */
     virtual Json::Value* CppToJson
                              (const unsigned int& cpp_double, std::string path);
-
 };
 
 /** Processor to convert between C++ nool and Json::boolValue
@@ -125,7 +123,6 @@ class BoolProcessor : public ProcessorBase<bool> {
     /** Convert from bool to Json::boolValue passing path information
      */
     virtual Json::Value* CppToJson(const bool& cpp_bool, std::string path);
-
 };
 }
 
