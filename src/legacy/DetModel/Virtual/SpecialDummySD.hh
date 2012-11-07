@@ -29,7 +29,7 @@
 #ifndef SpecialDummySD_h
 #define SpecialDummySD_h 1
 
-#include "G4VSensitiveDetector.hh"
+#include "Geant4/G4VSensitiveDetector.hh"
 
 #include "Interface/Memory.hh" 
 

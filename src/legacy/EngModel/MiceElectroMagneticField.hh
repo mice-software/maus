@@ -9,7 +9,7 @@
 
 #include "BeamTools/BTFieldConstructor.hh"
 #include "BeamTools/BTField.hh"
-#include "G4ElectroMagneticField.hh"
+#include "Geant4/G4ElectroMagneticField.hh"
 
 class MiceElectroMagneticField : public G4ElectroMagneticField
 {

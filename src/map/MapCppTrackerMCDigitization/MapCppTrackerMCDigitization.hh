@@ -22,6 +22,7 @@
 
 #ifndef _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
 #define _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -38,9 +39,12 @@
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiHit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
+namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
@@ -64,21 +68,15 @@ class MapCppTrackerMCDigitization {
    */
   std::string process(std::string document);
 
-  /** @brief sanity check
+  /** @brief reads in json data to a Spill object
    *
-   *  Checks the sanity of of the MC branch
    */
-  bool check_sanity_mc(Json::Value mc);
+  MAUS::Spill read_in_json(std::string json_data);
 
-  /** @brief sanity check
-   *
-   *  Checks the sanity of of the MC branch
+  /** @brief builds digits
    */
-  void json_to_cpp(Json::Value json_event, SciFiSpill &spill);
-
-  /** @brief builds digits and stores them in the SciFiEvent
-   */
-  void construct_digits(SciFiEvent &event);
+  void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
+                        int event_num, MAUS::SciFiDigitPArray &digits);
 
   /** @brief computes npe from energy deposits.
    */
@@ -86,7 +84,7 @@ class MapCppTrackerMCDigitization {
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
-  int compute_chan_no(SciFiHit *ahit);
+  int compute_chan_no(MAUS::SciFiHit *ahit);
 
   /** @brief computes tdc from time.
    */
@@ -98,11 +96,11 @@ class MapCppTrackerMCDigitization {
 
   /** @brief checks if hits belong to the same scifi channel.
    */
-  bool check_param(SciFiHit *hit1, SciFiHit *hit2);
+  bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2);
 
   /** @brief saves digits to json.
    */
-  void save_to_json(SciFiEvent &evt);
+  void save_to_json(MAUS::Spill &spill);
 
  private:
   /// This is the Mice Module
@@ -121,5 +119,7 @@ class MapCppTrackerMCDigitization {
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
 };  // Don't forget this trailing colon!!!!
+
+} // ~namespace MAUS
 
 #endif

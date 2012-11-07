@@ -235,6 +235,71 @@ class ValueItem : public BaseItem<ParentType> {
     bool      _required;
 };
 
+/** @class ConstantItem constant branch for a Cpp object
+ *
+ *  Probably don't want to use this class, instead use Register...Branch methods
+ *  directly on ObjectProcessor
+ *
+ *  @tparam ParentType type of the parent object
+ */
+template <class ParentType>
+class ConstantItem : public BaseItem<ParentType> {
+  public:
+    /** Constructor
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param json_value value that will always be filled in this branch
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     */
+    ConstantItem(std::string branch_name, Json::Value child_value, bool is_required)
+                          : BaseItem<ParentType>(), _branch(branch_name),
+                            _child_value(child_value), _required(is_required) {
+    }
+
+    /** SetCppChild using data from parent_json
+     *
+     *  Merely throws if is_required is set and parent_json does not contain the
+     *  branch with the correct value. Else does nothing.
+     *
+     *  @param parent_json json object whose child branch is used to make C++
+     *  representation
+     *  @param parent_cpp C++ object - ignored in this case
+     */
+    void SetCppChild(const Json::Value& parent_json, ParentType& parent_cpp) {
+        if (_required && !parent_json.isMember(_branch)) {
+                throw Squeal(Squeal::recoverable,
+                "Missing required branch "+_branch+" converting json->cpp",
+                "ConstantItem::SetCppChild");
+        } else if (parent_json.isMember(_branch) && !JsonWrapper::AlmostEqual
+                                   (parent_json[_branch], _child_value, 1e-9)) {
+                throw Squeal(Squeal::recoverable,
+                "Wrong value in branch "+_branch+": "+
+                                JsonWrapper::JsonToString(parent_json[_branch]),
+                "ConstantItem::SetCppChild");
+        }
+    }
+
+    /** SetJsonChild using data from parent_cpp
+     *
+     *  @param parent_cpp C++ object from whence C++ data is got
+     *  @param parent_json json object whose child branch is set using C++
+     *  representation
+     */
+    void SetJsonChild(const ParentType& parent_cpp, Json::Value& parent_json) {
+        parent_json[_branch] = _child_value;
+    }
+
+    /** Get the branch name */
+    std::string GetBranchName() const {return _branch;}
+
+  private:
+    std::string _branch;
+    Json::Value _child_value;
+    bool      _required;
+};
+
+
 
 template <class ObjectType>
 ObjectProcessor<ObjectType>::ObjectProcessor()
@@ -264,6 +329,16 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
                 bool is_required) {
     BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+void ObjectProcessor<ObjectType>::RegisterConstantBranch(
+                    std::string branch_name,
+                    Json::Value child_value,
+                    bool is_required) {
+    BaseItem<ObjectType>* item = new ConstantItem<ObjectType>
+              (branch_name, child_value, is_required);
     _items[branch_name] = item;
 }
 

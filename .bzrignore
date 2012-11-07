@@ -52,7 +52,8 @@ doc/doc_src/detectors/*.log
 doc/coverage
 src/common_cpp/DataStructure/MausDataStructure.cc
 src/common_cpp/DataStructure/MausDataStructure.h
-
+src/legacy/FILES/Models/Modules/BeamLine/*.table
 third_party/install/man/man1
 third_party/install/man/man3
 install_log_std
+env_geant4.9.5.p01.sh

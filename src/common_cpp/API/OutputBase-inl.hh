@@ -35,8 +35,7 @@ namespace MAUS {
   OutputBase<T>::~OutputBase() {}
 
   template <typename T>
-  bool OutputBase<T>::save(T* t) {
-    if (!t) { throw NullInputException(_classname); }
+  bool OutputBase<T>::save(T t) {
     bool ret = false;
     try {
       ret = _save(t);

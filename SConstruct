@@ -36,7 +36,7 @@ uses scons library to handle builds. We have three submodules
 # this import fails if calling as a python script - call with scons
 from SCons.Script.SConscript import SConsEnvironment # pylint: disable=F0401
 
-import maus_build_tools.environment_tools
+import maus_build_tools.environment_tools 
 import maus_build_tools.core_builder
 import maus_build_tools.module_builder
 

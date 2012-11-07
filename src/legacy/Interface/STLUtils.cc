@@ -28,10 +28,22 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
           ++pos;
           if (fileName[pos] == '{') {
               ++pos;
+          } else {
+              throw(Squeal(Squeal::recoverable,
+                "Error - environment variable must be written like ${VARIABLE}"+
+                std::string(" in file "+fileName),
+                "STLUtils::ReplaceVariables"));
           }
           int end = pos +1;
-          while (fileName[end] != '}') {
+          while (fileName[end] != '}' &&
+                 end < static_cast<int>(fileName.size())) {
               ++end;
+          }
+          if (end == static_cast<int>(fileName.size())) {
+              throw(Squeal(Squeal::recoverable,
+                "Error - environment variable must be written like ${VARIABLE}"+
+                std::string(" in file "+fileName),
+                "STLUtils::ReplaceVariables"));
           }
           std::string variable;
           for (int vpos = pos; vpos < end; ++vpos) {

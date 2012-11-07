@@ -18,9 +18,9 @@
 #ifndef DoubletFiberParam_H
 #define DoubletFiberParam_H 1
 
-#include <G4RotationMatrix.hh>
-#include <globals.hh>
-#include <G4VPVParameterisation.hh>
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4VPVParameterisation.hh"
 
 class G4VPhysicalVolume;
 class G4Tubs;
@@ -51,7 +51,7 @@ class DoubletFiberParam : public G4VPVParameterisation {
 
   /** @brief Calculate the dimensions of the fibres that make up a doublet layer
    */
-  void ComputeDimensions(G4Tubs* fiberElement,
+  void ComputeDimensions(G4Tubs& fiberElement,
                          const G4int copyNo,
                          const G4VPhysicalVolume* physVol) const;
 

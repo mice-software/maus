@@ -17,11 +17,14 @@ def run_optics(test):
     Runs optics application and produces some output
     """
     os.chdir(os.getenv('MAUS_ROOT_DIR')+'/tests/integration/test_optics')
-    print 'Running optics test', test,
+    print 'Running optics test', test, 
+    log = os.path.expandvars('$MAUS_ROOT_DIR/tmp/log.'+test)
+    print 'logging in ', log,
     proc = subprocess.Popen(['./optics', 'files/cards.'+test], \
-																						stdout = open('log.'+test, 'w'))
+																						stdout = open(log, 'w'))
     proc.wait()
     print 'with return code', proc.returncode
+    return proc.returncode
 
 def get_data(test):
     """
@@ -70,7 +73,8 @@ class TestOptics(unittest.TestCase): # pylint: disable=R0904
         beta function.
         """
         for test in TEST_NAMES:
-            run_optics(test)
+            return_code = run_optics(test)
+            self.assertEqual(return_code, 0)
             (z_out, beta) = get_data(test)
             if 'MAUS_TEST_PLOT_DIR' in os.environ:
                 plot_data(test, z_out, beta, os.environ['MAUS_TEST_PLOT_DIR'])

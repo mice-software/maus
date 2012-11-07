@@ -5,10 +5,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     rm -Rf scons-2.1.0.alpha.20110323.tar.gz
     rm -Rf scons-2.1.0.alpha.20110323
     wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source  http://downloads.sourceforge.net/project/scons/scons/2.1.0.alpha.20110323/scons-2.1.0.alpha.20110323.tar.gz
+    cd "${MAUS_ROOT_DIR}/third_party/source"
+    md5sum -c scons-2.1.0.alpha.20110323.tar.gz.md5 || { echo "FATAL: Failed to download scons"; echo "FATAL: MD5 checksum failed."; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f scons-2.1.0.alpha.20110323.tar.gz; exit 1; }
     tar xvfz ${MAUS_ROOT_DIR}/third_party/source/scons-2.1.0.alpha.20110323.tar.gz --directory ${MAUS_ROOT_DIR}/third_party/build/
     easy_install ${MAUS_ROOT_DIR}/third_party/build/scons-2.1.0.alpha.20110323
 
-    easy_install suds validictory nose coverage readline ipython doxypy
+    easy_install suds validictory nose nose-exclude coverage readline ipython doxypy
     easy_install "pylint==0.25.1"
     easy_install "numpy==1.5"
     easy_install "validictory==0.7.0"

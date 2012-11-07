@@ -1,0 +1,25 @@
+// generate using "dot file_structure.dot -Tpng -o file_structure.png"
+
+digraph G {
+  node [shape=record];
+  subgraph file_structure {
+    start_of_job [shape=record, label="{StartOfJob|start_of_job}"]
+    job_header [shape=record, label="{JobHeader TTree|\<new line\>}"]
+    job_footer [shape=record, label="{JobFooter TTree|\<new line\>}"]
+    end_of_job [shape=record, label="{EndOfJob|end_of_job}"]
+    run_header [shape=record, label="{RunHeader TTree|\<new line\>}"]
+    run_footer [shape=record, label="{RunFooter TTree|\<new line\>}"]
+    spill [shape=record, label="{Spill TTree|\<new line\>}"]
+    spill_data [shape=record, label="{\<spill data\>}"]
+    file [shape=record, label="{TFile (default maus_output.root)|ascii file (default maus_output.json)}"]
+  }
+
+  file -> job_header
+  job_header -> start_of_job
+  file -> run_header
+  file -> spill
+  spill -> spill_data
+  file -> run_footer
+  file -> job_footer
+  job_footer -> end_of_job 
+}

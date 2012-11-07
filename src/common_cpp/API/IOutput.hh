@@ -52,8 +52,7 @@ namespace MAUS {
      * \param T* Pointer to the input data
      * \return boolean save status
      */
-    virtual bool save(T* t) = 0;
+    virtual bool save(T t) = 0;
   };
-
 }// end of namespace
 #endif

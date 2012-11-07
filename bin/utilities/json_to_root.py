@@ -26,9 +26,9 @@ import MAUS
 def run():
     """Run the macro"""
 
-    # This input generates spills from json document
+    # This generates events (usually spills) from a json-formatted ascii file
     my_input = MAUS.InputPyJSON()
-    # This input outputs spills to root file
+    # This outputs events (usually spills) to a root-formatted binary file
     my_output = MAUS.OutputCppRoot()
 
     # Execute inputter and outputter

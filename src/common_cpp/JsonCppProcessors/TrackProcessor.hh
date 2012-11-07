@@ -34,6 +34,7 @@ class TrackProcessor : public ObjectProcessor<Track> {
 
   private:
     IntProcessor _int_proc;
+    StringProcessor _string_proc;
     ThreeVectorProcessor _three_vec_proc;
     ValueArrayProcessor<Step> _step_proc;
 };

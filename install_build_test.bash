@@ -69,12 +69,15 @@ else
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
 
-echo "Have Scons cleanup the MAUS build state"
+echo "Cleaning the MAUS build state"
 scons -c 2>>$FILE_STD 1>>$FILE_STD
 
-echo "Build MAUS"
-echo $FILE_STD
+echo "Building MAUS"
 (scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+if [ $? != 0 ]; then
+  echo "FAIL Failed to make MAUS using scons - exiting (check the log file)"
+  exit 1
+fi
 
 echo "Run the tests"
 (./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD

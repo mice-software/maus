@@ -21,14 +21,16 @@ namespace MAUS {
 Track::Track() : _steps(NULL), _initial_position(0, 0, 0),
                  _final_position(0, 0, 0),
                  _initial_momentum(0, 0, 0), _final_momentum(0, 0, 0),
-                 _particle_id(0), _track_id(0), _parent_track_id(0) {
+                 _particle_id(0), _track_id(0), _parent_track_id(0),
+                 _kill_reason("")  {
 }
 
 Track::Track(const Track& track)
                : _steps(NULL), _initial_position(0, 0, 0),
                  _final_position(0, 0, 0),
                  _initial_momentum(0, 0, 0), _final_momentum(0, 0, 0),
-                 _particle_id(0), _track_id(0), _parent_track_id(0)  {
+                 _particle_id(0), _track_id(0), _parent_track_id(0),
+                 _kill_reason("")  {
     *this = track;
 }
 
@@ -51,6 +53,7 @@ Track& Track::operator=(const Track& track) {
     _particle_id = track._particle_id;
     _track_id = track._track_id;
     _parent_track_id = track._parent_track_id;
+    _kill_reason = track._kill_reason;
     return *this;
 }
 
@@ -124,5 +127,12 @@ StepArray* Track::GetSteps() const {
 void Track::SetSteps(StepArray* steps) {
     _steps = steps;
 }
+
+std::string Track::GetKillReason() const {
+    return _kill_reason;
 }
 
+void Track::SetKillReason(std::string reason) {
+    _kill_reason = reason;
+}
+}  // namespace MAUS

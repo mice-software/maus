@@ -1,9 +1,9 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "EngModel/MultipoleAperture.hh"
-#include "G4Box.hh"
-#include "G4Tubs.hh"
-#include "G4SubtractionSolid.hh"
-#include "G4UnionSolid.hh"
+#include "Geant4/G4Box.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4SubtractionSolid.hh"
+#include "Geant4/G4UnionSolid.hh"
 #include "Interface/Squeal.hh"
 
 MultipoleAperture::MultipoleAperture(MiceModule * mod)

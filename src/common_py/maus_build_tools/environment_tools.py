@@ -308,41 +308,30 @@ def get_root_libs():
                 'm', \
                 'pthread']
 
-def set_root(conf, env):
+def set_root(conf, env): # pylint: disable=W0613
     """
     Setup root
     """
     if not conf.CheckCommand('root'):
-        print "Cound't find root.  If you want it, after installing GSL, run:"
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/21root.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
-        print ("where you can install GSL by running:")
-        print ("     MAUS_ROOT_DIR=%s ./third_party/bash/20gsl.bash" \
-                   % os.environ['MAUS_ROOT_DIR'])
+        print "Fatal - couldn't find root library."
         my_exit(1)
 
-    else:
-        print
-        print "!! Found the program 'root', so MAUS will use it."
-        print
-        env['USE_ROOT'] = True
+    if not conf.CheckCommand('root-config'):
+        my_exit(1)
 
-        if not conf.CheckCommand('root-config'):
+    conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+
+    root_libs = get_root_libs()
+
+    for lib in root_libs:
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        conf.env.ParseConfig("root-config --cflags --ldflags --libs")
+    if not conf.CheckCXXHeader('TH1F.h'):
+        my_exit(1)
 
-        root_libs = get_root_libs()
-
-        for lib in root_libs:
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        if not conf.CheckCXXHeader('TH1F.h'):
-            my_exit(1)
-
-        if not conf.CheckCXXHeader('TMinuit.h'):
-            my_exit(1)
+    if not conf.CheckCXXHeader('TMinuit.h'):
+        my_exit(1)
 
 def set_clhep(conf, env): # pylint: disable=W0613
     """
@@ -358,7 +347,8 @@ def get_g4_libs(): # pylint: disable=W0511
     """
     List of geant4 libraries
     """
-    return [ 'G4FR', 
+    if os.environ['G4VERS'] == 'geant4.9.2.p04':
+        return [ 'G4FR', 
              'G4RayTracer',
              'G4Tree',
              'G4UIGAG',
@@ -468,6 +458,38 @@ def get_g4_libs(): # pylint: disable=W0511
              'G4vis_management',
              'G4volumes',
              'G4xrays']
+    else:
+        return ['G4analysis',
+            'G4error_propagation',
+            'G4geometry',
+            'G4graphics_reps',
+            'G4materials',
+            'G4particles',
+            'G4processes',
+            'G4run',
+            'G4Tree',
+            'G4visXXX', # pylint: disable = W0511
+            'G4clhep',
+            'G4event',
+            'G4global',
+            'G4intercoms',
+            'G4modeling',
+            'G4persistency',
+            'G4RayTracer',
+            'G4tracking',
+            'G4visHepRep',
+            'G4VRML',
+            'G4digits_hits',
+            'G4FR',
+            'G4GMocren',
+            'G4interfaces',
+            'G4parmodels',
+            'G4physicslists',
+            'G4readout',
+            'G4track',
+            'G4vis_management',
+            'G4zlib',
+            ]
 
 
 def set_geant4(conf, env):
@@ -477,30 +499,19 @@ def set_geant4(conf, env):
     Nb: sometimes geant4 builds some but not all libraries - so we really do
     need to check for every one.
     """
-    if 'G4INSTALL' not in os.environ or \
-        (not os.path.exists(os.environ.get('G4INSTALL'))):
-        print "ERROR: Cound't find geant4"
+    g4_include = os.getenv('G4INCLUDE')
+    if g4_include != '' and g4_include != None:
+        env.Append(CPPPATH=[g4_include])
+    if not conf.CheckCXXHeader('Geant4/G4EventManager.hh'):
         my_exit(1)
-    else:
-        print
-        print "!! Found the package 'geant4', so assume you want to use it."
-        print
-        env['USE_G4'] = True
 
-        env.Append(LIBPATH = ["%s/%s" % (os.environ.get('G4LIB'),
-                              os.environ.get('G4SYSTEM'))])
-        env.Append(CPPPATH=[os.environ.get("G4INCLUDE")])
+    env.Append(LIBS=get_g4_libs())
 
-        if not conf.CheckCXXHeader('G4EventManager.hh'):
+    for lib in get_g4_libs():
+        if not conf.CheckLib(lib, language='c++'):
             my_exit(1)
 
-        env.Append(LIBS=get_g4_libs())
-
-        for lib in get_g4_libs():
-            if not conf.CheckLib(lib, language='c++'):
-                my_exit(1)
-
-        geant4_extras(env, conf)
+    geant4_extras(env, conf)
 
 def set_gtest(conf, env): # pylint: disable=W0613
     """

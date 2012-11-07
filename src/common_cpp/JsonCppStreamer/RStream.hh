@@ -61,7 +61,7 @@ class rstream {
   /*!\brief check if the file is open
    * \return boolean value indicating the presence of an open file.
    */
-  virtual bool is_open() { return !m_file? false : m_file->IsOpen(); }
+  virtual bool is_open();
   // ! Destructor
   virtual ~rstream();
   // ! Close the file and cleanup, pure virtual function.

@@ -2,7 +2,6 @@
 #include "BTField.hh"
 #include "Interface/RFData.hh"
 #include <iostream>
-#include "Interface/MICERun.hh"
 
 #ifndef BTPHASER_HH
 #define BTPHASER_HH

@@ -15,25 +15,29 @@
  *
  */
 
-#include <G4Material.hh>
-#include <G4Tubs.hh>
-#include <G4LogicalVolume.hh>
-#include <G4PVPlacement.hh>
-#include <G4PVParameterised.hh>
-#include <G4UserLimits.hh>
-#include <G4VisAttributes.hh>
-#include <G4Colour.hh>
-#include <G4ios.hh>
-#include <G4ThreeVector.hh>
-#include <G4RotationMatrix.hh>
-#include <globals.hh>
-#include <G4SDManager.hh>
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4Tubs.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4PVPlacement.hh"
+#include "Geant4/G4PVParameterised.hh"
+#include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4VisAttributes.hh"
+#include "Geant4/G4Colour.hh"
+#include "Geant4/G4ios.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/globals.hh"
+#include "Geant4/G4SDManager.hh"
+
+#include "CLHEP/Units/PhysicalConstants.h"
+#include "CLHEP/Matrix/Matrix.h"
+#include "CLHEP/Vector/Rotation.h"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 #include "DetModel/SciFi/SciFiPlane.hh"
 #include "DetModel/SciFi/SciFiSD.hh"
 #include "DetModel/SciFi/DoubletFiberParam.hh"
 
-#include "CLHEP/Vector/Rotation.h"
 
 // NOTE: not sure how Geant4 deals with the deletion
 // of Logical and Solid Volumes;
@@ -68,15 +72,30 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   //
 
   CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0, 0);
-  const Hep3Vector rowy(0, 1., 0);
-  const Hep3Vector rowz(0, 0, -1.);
+  const Hep3Vector rowx(-1., 0., 0.);
+  const Hep3Vector rowy(0., 1., 0.);
+  const Hep3Vector rowz(0., 0., -1.);
   zflip.setRows(rowx, rowy, rowz);
 
   G4RotationMatrix* trot = new G4RotationMatrix(mod->globalRotation());
-  // this is the rotation of the fibre array
-  (*trot) = (*trot)*zflip;
 
+  size_t found;
+  found = doubletName.find("Tracker1");
+  if (found != G4String::npos)
+    (*trot) = (*trot)*zflip;
+
+  // this is the rotation of the fibre array
+  // (*trot) = (*trot)*zflip;
+  // G4RotationMatrix* trot = new G4RotationMatrix();
+  // G4ThreeVector dir(0, 1, 0);
+  // dir = dir*(*trot);
+  /*
+  std::cerr << "Module name: " << doubletName << "\n"
+            << "Module rotation: " << *(trot) << "\n"
+            // << "Plane direction: " << dir << "\n"
+            << "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
+            << "Mothers rotation is: "      << *(mlv->GetRotation()) << "\n";
+  */
   // this is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,
@@ -90,7 +109,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                false, 0);
 
   // lenght of the tube of fibre
-  G4double tlen = 190.0 * mm;
+  G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
   _numFibres = (G4int)floor(2. * ar / (0.5 * fp));

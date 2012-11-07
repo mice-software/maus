@@ -12,18 +12,18 @@
 
 #include "Interface/MiceMaterials.hh"
 #include "Interface/dataCards.hh"
-#include "G4Material.hh"
-#include "G4IonisParamMat.hh"
-#include "G4Element.hh"
+#include "Geant4/G4Material.hh"
+#include "Geant4/G4IonisParamMat.hh"
+#include "Geant4/G4Element.hh"
 
-#include "G4NistManager.hh"
+#include "Geant4/G4NistManager.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include <math.h>
 
-void  fillMaterials( MICERun& run )
+MiceMaterials* fillMaterials(MiceMaterials* materials_list)
 {
-  if( ! run.miceMaterials )
-    run.miceMaterials = new MiceMaterials();
+  if( ! materials_list )
+    materials_list = new MiceMaterials();
 
   // fill materials from the list of NIST materials
 
@@ -70,7 +70,7 @@ void  fillMaterials( MICERun& run )
     std::string g4name = "G4_" + materials[i];
     G4Material* mater = man->FindOrBuildMaterial( g4name );
     if( mater )
-      run.miceMaterials->addMaterial( mater, materials[i] );
+      materials_list->addMaterial( mater, materials[i] );
   }
   G4int nComp;
 
@@ -82,7 +82,7 @@ void  fillMaterials( MICERun& run )
   G4Material* water = man->FindOrBuildMaterial( "G4_WATER" );
   aerogel0_2->AddMaterial(quartz, 0.97);
   aerogel0_2->AddMaterial(water, 0.03);
-  run.miceMaterials->addMaterial( aerogel0_2, name );
+  materials_list->addMaterial( aerogel0_2, name );
 
   // BC600, here represented only as bisphenol (rho_bisphenol=1.20gcm-3)
   density = 1.18*g/cm3; // refractive index = 1.56
@@ -94,7 +94,7 @@ void  fillMaterials( MICERun& run )
   bc600->AddElement(elH, 16);
   G4Element* elO = man->FindOrBuildElement("O");
   bc600->AddElement(elO, 12);		//ME - Tamas thinks this should be 2, not 12!!!
-  run.miceMaterials->addMaterial( bc600, name );
+  materials_list->addMaterial( bc600, name );
 
   // Stainless steel, using generic 304 
   density = 8.06*g/cm3;
@@ -113,7 +113,7 @@ void  fillMaterials( MICERun& run )
   steel304->AddMaterial(matSi, 0.01);
   steel304->AddMaterial(matCr, 0.18);
   steel304->AddMaterial(matNi, 0.08);
-  run.miceMaterials->addMaterial( steel304, name );
+  materials_list->addMaterial( steel304, name );
 
 
   // Polyacetal for CKOV1 Window
@@ -123,7 +123,7 @@ void  fillMaterials( MICERun& run )
   polyacetal->AddElement(elC, 37.5*perCent);
   polyacetal->AddElement(elH, 12.5*perCent);
   polyacetal->AddElement(elO, 50.0*perCent);
-  run.miceMaterials->addMaterial( polyacetal, name );
+  materials_list->addMaterial( polyacetal, name );
 
   const G4int num = 2;
   G4double PhotonEnergy[num] = {1.7*eV, 4.7*eV};
@@ -144,7 +144,7 @@ void  fillMaterials( MICERun& run )
   b270->AddElement(elK,   9.9*perCent);
   b270->AddElement(elCa,  0.7*perCent);
 
-  run.miceMaterials->addMaterial( b270, name );
+  materials_list->addMaterial( b270, name );
 
 	//Optical Air mounted in the CKOV
   G4double a;  // atomic mass
@@ -157,7 +157,7 @@ void  fillMaterials( MICERun& run )
   G4Material* OptAir = new G4Material(name, density=1.29e-3*mg/cm3, nelements=2);
   OptAir->AddElement(N, 70.*perCent);
   OptAir->AddElement(O, 30.*perCent);
-  run.miceMaterials->addMaterial( OptAir, name );
+  materials_list->addMaterial( OptAir, name );
 
   G4double RefractiveIndexAir[num] = { 1.00, 1.00 };
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();
@@ -178,7 +178,7 @@ void  fillMaterials( MICERun& run )
   GlassMPT1->AddProperty("RINDEX", PhotonEnergy, RefractiveIndexGlass, num);
   GlassMPT1->AddProperty("ABSLENGTH", PhotonEnergyGlass, Absorption2, 15);
   OptGlass->SetMaterialPropertiesTable(GlassMPT1);
-  run.miceMaterials->addMaterial( OptGlass, name );
+  materials_list->addMaterial( OptGlass, name );
 
 	//Optical Glass mounted in PMT Windows for CKOV
   name="OptPMTGlass";
@@ -188,7 +188,7 @@ void  fillMaterials( MICERun& run )
   G4MaterialPropertiesTable* GlassMPT2 = new G4MaterialPropertiesTable();
   GlassMPT2->AddProperty("RINDEX", PhotonEnergy, RefractiveIndexGlass, num);
   OptGlassPMT->SetMaterialPropertiesTable(GlassMPT2);
-  run.miceMaterials->addMaterial( OptGlassPMT, name );
+  materials_list->addMaterial( OptGlassPMT, name );
 
   // Aerogel mounted in Vessel1 for CKOV1
   density = 0.251*g/cm3;
@@ -219,7 +219,7 @@ void  fillMaterials( MICERun& run )
   a1_mt->AddProperty("RAYLEIGH",     RayleighPhotE, RayleighSL,63);
   aero1->SetMaterialPropertiesTable(a1_mt);
 
-  run.miceMaterials->addMaterial( aero1, name );
+  materials_list->addMaterial( aero1, name );
 
   // Aerogel mounted in Vessel2 for CKOV1
   density = 0.430*g/cm3;
@@ -234,7 +234,7 @@ void  fillMaterials( MICERun& run )
   a2_mt->AddProperty("ABSLENGTH",    PhotonEnergy, Absorption1,    num);
   a2_mt->AddProperty("RAYLEIGH",     RayleighPhotE, RayleighSL,63);
   aero2->SetMaterialPropertiesTable(a2_mt);
-  run.miceMaterials->addMaterial( aero2, name );
+  materials_list->addMaterial( aero2, name );
 
 	 // Matsushita Aerogel 103a tested at Fermi
   density = 0.113*g/cm3;
@@ -242,7 +242,7 @@ void  fillMaterials( MICERun& run )
   G4Material* aero103 = new G4Material(name,density, nComp=2, kStateSolid);
   aero103->AddElement(elSi, 46.7*perCent);
   aero103->AddElement(elO,  53.3*perCent);
-  run.miceMaterials->addMaterial( aero103, name );
+  materials_list->addMaterial( aero103, name );
   
   // Matsushita Aerogel 107a tested at Fermi 
   density = 0.261*g/cm3;
@@ -250,7 +250,7 @@ void  fillMaterials( MICERun& run )
   G4Material* aero107 = new G4Material(name,density, nComp=2, kStateSolid);
   aero107->AddElement(elSi, 46.7*perCent);
   aero107->AddElement(elO,  53.3*perCent);
-  run.miceMaterials->addMaterial( aero107, name );
+  materials_list->addMaterial( aero107, name );
   
   // Matsushita Aerogel 112a tested at Fermi 
   density = 0.371*g/cm3;
@@ -258,7 +258,7 @@ void  fillMaterials( MICERun& run )
   G4Material* aero112 = new G4Material(name,density, nComp=2, kStateSolid);
   aero112->AddElement(elSi, 46.7*perCent);
   aero112->AddElement(elO,  53.3*perCent);
-  run.miceMaterials->addMaterial( aero112, name );
+  materials_list->addMaterial( aero112, name );
 
   // Be with PDG properties
   density = 1.848 * g/cm3;//at r.t
@@ -266,7 +266,7 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgBe = new G4Material(name,density, nComp=1, kStateSolid);
   G4Element* elBe = man->FindOrBuildElement("Be");
   pdgBe->AddElement(elBe, 100*perCent);
-  run.miceMaterials->addMaterial( pdgBe, name );
+  materials_list->addMaterial( pdgBe, name );
 
  // lH2,Liquid Hydrogen with PDG properties
   density = 0.0708 * g/cm3; //at what T p?
@@ -274,7 +274,7 @@ void  fillMaterials( MICERun& run )
   G4double temp=20.39 * kelvin;//in K
   G4Material* pdglH = new G4Material(name,density, nComp=1, kStateLiquid,temp);
   pdglH->AddElement(elH, 100*perCent);
-  run.miceMaterials->addMaterial( pdglH, name );
+  materials_list->addMaterial( pdglH, name );
 
 // lHe, Liquid Helium with PDG properties
   G4Element* elHe = man->FindOrBuildElement("He");
@@ -283,7 +283,7 @@ void  fillMaterials( MICERun& run )
   temp=4.224 * kelvin;
   G4Material* pdglHe = new G4Material(name,density, nComp=1, kStateLiquid, temp);
   pdglHe->AddElement(elHe, 100*perCent);
-  run.miceMaterials->addMaterial( pdglHe, name);
+  materials_list->addMaterial( pdglHe, name);
 
   // Al with PDG properties
   density = 2.700 * g/cm3;//at r.t
@@ -291,7 +291,7 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgAl = new G4Material(name,density, nComp=1, kStateSolid);
   G4Element* elAl = man->FindOrBuildElement("Al");
   pdgAl->AddElement(elAl, 100*perCent);
-  run.miceMaterials->addMaterial( pdgAl, name );
+  materials_list->addMaterial( pdgAl, name );
 
  // Cu with PDG properties
   density = 8.960 * g/cm3;//at r.t
@@ -299,7 +299,7 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgCu = new G4Material(name,density, nComp=1, kStateSolid);
   G4Element* elCu = man->FindOrBuildElement("Cu");
   pdgCu->AddElement(elCu, 100*perCent);
-  run.miceMaterials->addMaterial( pdgCu, name );
+  materials_list->addMaterial( pdgCu, name );
 
  // Fe with PDG properties
   density = 7.87 * g/cm3;//at r.t
@@ -307,7 +307,7 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgFe = new G4Material(name,density, nComp=1, kStateSolid);
   G4Element* elFe = man->FindOrBuildElement("Fe");
   pdgFe->AddElement(elFe, 100*perCent);
-  run.miceMaterials->addMaterial( pdgFe, name );
+  materials_list->addMaterial( pdgFe, name );
 
  // Pb with PDG properties
   density = 11.35 * g/cm3;//at r.t
@@ -315,7 +315,7 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgPb = new G4Material(name,density, nComp=1, kStateSolid);
   G4Element* elPb = man->FindOrBuildElement("Pb");
   pdgPb->AddElement(elPb, 100*perCent);
-  run.miceMaterials->addMaterial( pdgPb, name );
+  materials_list->addMaterial( pdgPb, name );
 
 
  // AIR with PDG properties
@@ -324,11 +324,11 @@ void  fillMaterials( MICERun& run )
   G4Material* pdgAIR = new G4Material(name,density, nComp=1, kStateGas);
   G4Material* mAIR = man->FindOrBuildMaterial("G4_AIR");
   pdgAIR->AddMaterial(mAIR, 100*perCent);
-  run.miceMaterials->addMaterial( pdgAIR, name );
+  materials_list->addMaterial( pdgAIR, name );
 
   // now fill in the other maps of the material properties
 
-  const std::map<std::string,G4Material*> _materials = run.miceMaterials->materialMap();
+  const std::map<std::string,G4Material*> _materials = materials_list->materialMap();
 
   for( std::map<std::string,G4Material*>::const_iterator it = _materials.begin(); it != _materials.end(); ++it )
   {
@@ -355,8 +355,9 @@ void  fillMaterials( MICERun& run )
 //    double ANum = it->second->GetA();
     double meanExE = it->second->GetIonisation()->GetMeanExcitationEnergy();
     double densityCor = it->second->GetIonisation()->GetAdensity();
-    run.miceMaterials->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, -1, -1, meanExE, densityCor );
-//    run.miceMaterials->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, ZNum, ANum, meanExE, densityCor );
+    materials_list->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, -1, -1, meanExE, densityCor );
+//    materials_list->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, ZNum, ANum, meanExE, densityCor );
   }
+  return materials_list;
 }
 
