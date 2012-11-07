@@ -20,6 +20,7 @@
 
 #include "Maths/PolynomialMap.hh"
 
+#include <limits>
 #include <math.h>
 
 #include <iomanip>
@@ -494,6 +495,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
 
   // Create the design matrix
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
           << "A = [" << std::endl;
   std::vector<double> point_poly_vector(nCoeffs, 0);
   Matrix<double> design_matrix(nPoints, nCoeffs, 0.);  // design matrix
@@ -517,6 +519,7 @@ std::cout << "]" << std::endl;
 
   // Create the value matrix
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
           << "Y = [" << std::endl;
   Matrix<double> value_matrix(nPoints, valueDim, 0.);  // value matrix
   for (size_t row = 0; row < nPoints; ++row) {
@@ -556,6 +559,7 @@ std::cout << "]" << std::endl;
     weight_matrix(index+1, index+1) = weight_vector[index];
   }
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
           << "W = " << std::endl << weight_matrix;
 
   Matrix<double> design_matrix_transpose = transpose(design_matrix);
@@ -564,6 +568,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   Matrix<double> F2(nCoeffs, nCoeffs, 0.);
   F2 = design_matrix_transpose * weight_matrix * design_matrix;
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
           << "F2 = " << std::endl << F2;
 
   // Fy = A^T Y, where A is the design matrix and Y is the value matrix
@@ -585,10 +590,14 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
                  message.str(),
                  "PolynomialMap::PolynomialLeastSquaresFit"));
   }
+std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
+          << "F2 inverse = " << std::endl << F2_inverse;
 
   // C = (A^T A)^(-1) A^T Y, where A is the design matrix and Y is the value matrix
   Matrix<double> coefficient_matrix = transpose(F2_inverse * Fy);
 std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
+          << std::setprecision(std::numeric_limits<double>::digits10)
           << "Transfer Matrix = " << std::endl << coefficient_matrix;
   polynomial_map->SetCoefficients(pointDim, coefficient_matrix);
   return polynomial_map;

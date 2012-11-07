@@ -32,23 +32,23 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
-#include "Reconstruction/Global/Detector.hh"
-#include "Reconstruction/Global/Track.hh"
-#include "Reconstruction/Global/TrackPoint.hh"
+#include "Recon/Global/Detector.hh"
+#include "Recon/Global/Track.hh"
+#include "Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 
 class OpticsModel;
 class CovarianceMatrix;
 
-namespace reconstruction {
+namespace recon {
 namespace global {
 
 class TrackFitter;
-class ReconstructionInput;
+class ReconInput;
 
 }  // namespace global
-}  // namespace reconstruction
+}  // namespace recon
 
 /** @class MapCppGlobalTrackReconstructor
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
@@ -82,7 +82,7 @@ class MapCppGlobalTrackReconstructor {
   /** @brief Generate a list of reconstructed tracks.
    *
    *  This function takes a single spill and generates a list of tracks based
-   *  on the desired method of reconstruction.
+   *  on the desired method of recon.
    *
    * @param document a JSON document for a spill
    */
@@ -91,11 +91,11 @@ class MapCppGlobalTrackReconstructor {
  private:
   Json::Value configuration_;
   OpticsModel * optics_model_;
-  MAUS::reconstruction::global::TrackFitter * track_fitter_;
+  MAUS::recon::global::TrackFitter * track_fitter_;
 
   Json::Value run_data_;
-  //MAUS::reconstruction::global::ReconstructionInput * reconstruction_input_;
-  std::vector<MAUS::reconstruction::global::Track> tracks_;
+  //MAUS::recon::global::ReconInput * recon_input_;
+  std::vector<MAUS::recon::global::Track> tracks_;
 
   static const std::string kClassname;
   BTField * electromagnetic_field_;
@@ -112,23 +112,23 @@ class MapCppGlobalTrackReconstructor {
   void LoadSimulationData(const std::string mc_branch_name);
 
   void LoadDetectorConfiguration(
-    std::map<MAUS::reconstruction::global::Detector::ID,
-    MAUS::reconstruction::global::Detector> & detectors);
+    std::map<MAUS::recon::global::Detector::ID,
+    MAUS::recon::global::Detector> & detectors);
   void LoadMonteCarloData(
     const std::string                                             branch_name,
-    const std::map<MAUS::reconstruction::global::Detector::ID,
-                   MAUS::reconstruction::global::Detector> & detectors);
+    const std::map<MAUS::recon::global::Detector::ID,
+                   MAUS::recon::global::Detector> & detectors);
 
   static CovarianceMatrix const GetJsonCovarianceMatrix(
       Json::Value const & value);
 
   void CorrelateTrackPoints(
-      std::vector<MAUS::reconstruction::global::Track> & tracks);
+      std::vector<MAUS::recon::global::Track> & tracks);
 
   static Json::Value TrackToJson(
-      const MAUS::reconstruction::global::Track & track);
+      const MAUS::recon::global::Track & track);
   static Json::Value TrackPointToJson(
-      const MAUS::reconstruction::global::TrackPoint & track_point);
+      const MAUS::recon::global::TrackPoint & track_point);
 };
 
 }  // namespace MAUS

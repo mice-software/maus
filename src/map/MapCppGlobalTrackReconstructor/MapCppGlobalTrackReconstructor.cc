@@ -38,26 +38,26 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
-#include "src/common_cpp/Reconstruction/Global/Detector.hh"
-#include "src/common_cpp/Reconstruction/Global/MinuitTrackFitter.hh"
-#include "src/common_cpp/Reconstruction/Global/Particle.hh"
-#include "src/common_cpp/Reconstruction/Global/ReconstructionInput.hh"
-#include "src/common_cpp/Reconstruction/Global/Track.hh"
-#include "src/common_cpp/Reconstruction/Global/TrackFitter.hh"
-#include "src/common_cpp/Reconstruction/Global/TrackPoint.hh"
+#include "src/common_cpp/Recon/Global/Detector.hh"
+#include "src/common_cpp/Recon/Global/MinuitTrackFitter.hh"
+#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Recon/Global/ReconInput.hh"
+#include "src/common_cpp/Recon/Global/Track.hh"
+#include "src/common_cpp/Recon/Global/TrackFitter.hh"
+#include "src/common_cpp/Recon/Global/TrackPoint.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
-using MAUS::reconstruction::global::Detector;
-using MAUS::reconstruction::global::MinuitTrackFitter;
-using MAUS::reconstruction::global::Particle;
-using MAUS::reconstruction::global::ReconstructionInput;
-using MAUS::reconstruction::global::Track;
-using MAUS::reconstruction::global::TrackFitter;
-using MAUS::reconstruction::global::TrackPoint;
+using MAUS::recon::global::Detector;
+using MAUS::recon::global::MinuitTrackFitter;
+using MAUS::recon::global::Particle;
+using MAUS::recon::global::ReconInput;
+using MAUS::recon::global::Track;
+using MAUS::recon::global::TrackFitter;
+using MAUS::recon::global::TrackPoint;
 
 MapCppGlobalTrackReconstructor::MapCppGlobalTrackReconstructor()
     : optics_model_(NULL), track_fitter_(NULL) {
@@ -109,11 +109,11 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n");
 fflush(stdout);
   Json::Value optics_model_names = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_optics_models",
+      "recon_optics_models",
       JsonWrapper::arrayValue);
   Json::Value optics_model_name = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_optics_model",
+      "recon_optics_model",
       JsonWrapper::stringValue);
   size_t model;
   for (model = 0; model < optics_model_names.size(); ++model) {
@@ -171,7 +171,7 @@ fflush(stdout);
     default: {
       std::string message("Unsupported optics model \"");
       message += optics_model_name.asString();
-      message += std::string("\" in reconstruction configuration.");
+      message += std::string("\" in recon configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
@@ -190,11 +190,11 @@ fflush(stdout);
 void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
   Json::Value fitter_names = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_track_fitters",
+      "recon_track_fitters",
       JsonWrapper::arrayValue);
   Json::Value fitter_name = JsonWrapper::GetProperty(
       configuration_,
-      "reconstruction_track_fitter",
+      "recon_track_fitter",
       JsonWrapper::stringValue);
   size_t fitter;
   for (fitter = 0; fitter < fitter_names.size(); ++fitter) {
@@ -233,7 +233,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
     default: {
       std::string message("Unsupported track fitter \"");
       message += fitter_name.asString();
-      message += std::string("\" in reconstruction configuration.");
+      message += std::string("\" in recon configuration.");
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
@@ -251,7 +251,7 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-  // Populate ReconstructionInput instance from JSON data
+  // Populate ReconInput instance from JSON data
   Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
       configuration_,
       "data_acquisition_modes",
@@ -285,7 +285,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
     return output;
 */
     throw(Squeal(Squeal::recoverable,
-                 "Null reconstruction input.",
+                 "Null recon input.",
                  "MapCppGlobalTrackReconstructor::process()"));
   }
 
@@ -293,7 +293,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
   //  in addition to Minuit, and select between them based on the configuration
 
   // associate tracks with individual particles
-  //std::vector<MAUS::reconstruction::global::Track> tracks;
+  //std::vector<MAUS::recon::global::Track> tracks;
   //CorrelateTrackPoints(tracks);
 
 
@@ -306,11 +306,11 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
 
   // Find the best fit track for each particle traversing the lattice
   size_t track_count = 0;
-  for (std::vector<MAUS::reconstruction::global::Track>::const_iterator
+  for (std::vector<MAUS::recon::global::Track>::const_iterator
           measured_track = tracks_.begin();
        measured_track < tracks_.end();
        ++measured_track) {
-    MAUS::reconstruction::global::Track best_fit_track(particle_id);
+    MAUS::recon::global::Track best_fit_track(particle_id);
 
     track_fitter_->Fit(*measured_track, best_fit_track);
     // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
@@ -323,7 +323,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
     track_count += best_fit_track.size() - 1;
   }
 
-  // TODO(plane1@hawk.iit.edu) Update the run data with reconstruction results.
+  // TODO(plane1@hawk.iit.edu) Update the run data with recon results.
   run_data_["global_tracks"] = global_tracks;
 
   // pass on the updated run data to the next map in the workflow
@@ -410,7 +410,7 @@ void MapCppGlobalTrackReconstructor::LoadDetectorConfiguration(
     // FIXME(plane1@hawk.iit.edu) Once the detector groups provide this
     // information this will need to be changed
     Json::Value detector_attributes_json = JsonWrapper::GetProperty(
-        configuration_, "reconstruction_detector_attributes",
+        configuration_, "recon_detector_attributes",
         JsonWrapper::arrayValue);
 
     // *** Get detector info ***
@@ -613,7 +613,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
 }
 
 void MapCppGlobalTrackReconstructor::LoadLiveData() {
-  // reconstruction_input_ = new ReconstructionInput(...);
+  // recon_input_ = new ReconInput(...);
 }
 
 
@@ -625,7 +625,7 @@ void MapCppGlobalTrackReconstructor::LoadLiveData() {
 void MapCppGlobalTrackReconstructor::CorrelateTrackPoints(
     std::vector<Track> & tracks) {
   const std::vector<TrackPoint> & track_points
-      = reconstruction_input_->events();
+      = recon_input_->events();
 
   if (track_points.size() == 0) {
     return;
