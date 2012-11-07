@@ -27,73 +27,254 @@ namespace MAUS {
 namespace ReferenceResolver {
 namespace CppToJson {
 
+/** @class Resolver abstract type for resolving references
+ *
+ *  By having an untyped base class, we can put all references in the same
+ *  vector and iterate without knowing about the type of the pointer referenced
+ */
 class Resolver {
   public:
-      ~Resolver() {}
-      virtual void ResolveReferences(Json::Value& json_root) = 0;
-      virtual void ClearData() const = 0;
+    /** Destructor does nothing */
+    ~Resolver() {}
+
+    /** Convert from Cpp pointer to json pointer*/
+    virtual void ResolveReferences(Json::Value& json_root) = 0;
+
+    /** Clear static list of pointers-by-value (called by RefManager delete)
+     *
+     *  Note this has to be non-static so that it can be called from the base
+     *  class and inherited okay. virtual functions can't  be static.
+     */
+    virtual void ClearData() const = 0;
 };
 
+/** @class TypedResolver real type for resolving references
+ *
+ *  Holds C++ pointer-by-reference of type ChildType* to a Json object and a
+ *  static map of all pointers-by-value to associated json object. When the data
+ *  tree is filled we can call ResolveReferences to fill the references.
+ *
+ *  @tparam ChildType the type pointed to by the C++ pointer-by-reference
+ */
 template <class ChildType>
 class TypedResolver : public Resolver {
   public:
-      TypedResolver(ChildType* ref_cpp_address, std::string ref_json_address);
-      ~TypedResolver() {}
-      void ResolveReferences(Json::Value& json_root);
-      static void AddData(ChildType* data_cpp_address, std::string data_json_address);
-      void ClearData() const;
+    /** Constructor
+     *
+     *  @param ref_cpp_address C++ address of the reference
+     *  @param ref_json_address path through the json tree to the point where
+     *  the reference should be written
+     */
+    TypedResolver(ChildType* ref_cpp_address, std::string ref_json_address);
+
+    /** Destructor does nothing */
+    ~TypedResolver() {}
+
+    /** Resolve this reference
+     *
+     *  Lookup the C++ pointer-as-reference in the hash table and find the
+     *  json path where the data is stored. Write the path to the data at
+     *  the reference position in the json data structure (walking up from
+     *  json_root).
+     *
+     *  @param json_root the ref_json_address is dereferenced using json_root
+     *  as the root of the json tree.
+     *
+     *  throws an exception if the reference isn't in the hash table - i.e. a
+     *  pointer-by-reference was stored but no pointer-by-value
+     */
+    void ResolveReferences(Json::Value& json_root);
+
+    /** Add a pointer-as-data to the map for subsequent dereferencing
+     *
+     *  @param data_cpp_address C++ address of the data
+     *  @param data_json_address json path to the data
+     *
+     *  throws an exception if the data is already in the hash table - as this
+     *  can lead to incorrect resolution of pointer-by-reference and memory
+     *  duplication.
+     */
+    static void AddData(ChildType* data_cpp_address,
+                        std::string data_json_address);
+
+    /** @copydoc
+     *  as parent
+     */
+    void ClearData() const;
 
   private:
-      ChildType* _cpp_pointer;
-      std::string _json_pointer;
-      static std::map<ChildType*, std::string> _data_hash;
+    ChildType* _cpp_pointer;
+    std::string _json_pointer;
+    static std::map<ChildType*, std::string> _data_hash;
 };
 
+/** @class RefManager stores and subsequently resolves a list of references
+ *
+ *  As we traverse the data tree we collect a list of pointer-by-references to 
+ *  json and a map of pointer-by-values to json. When the data tree is fully
+ *  traversed we can resolve the pointer-by-references to the appropriate json
+ *  address.
+ *
+ *  Probably should be called statically using GetInstance() but this is not
+ *  enforced. The issue here is the static data on child references is stored
+ *  and cleared globally - if several data trees need to be resolved at the same
+ *  time then it is possible to get them confused.
+ *
+ *  Call Birth() before parsing the data tree and Death() when you are finished
+ *  parsing. Otherwise you will leave stray data that MAUS will attempt to reuse
+ *  next time ResolveReferences() is called. We are reasonably strict about
+ *  throwing Squeals to encourage the user to be careful about Birth() and
+ *  Death() for this reason.
+ */
 class RefManager {
-    public:
-        static RefManager& GetInstance();
-        static bool HasInstance();
-        static void Birth();
-        static void Death();
-        inline ~RefManager();
-        inline void ResolveReferences(Json::Value& json_root);
-        inline void AddReference(Resolver* reference);
-        
-    private:
-        std::vector<Resolver*> _references;
-        static RefManager* _instance;
+  public:
+    /** Get the static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has not been Birthed.
+     */
+    static RefManager& GetInstance();
+
+    /** Return true if RefManager has been birthed
+     */
+    static bool HasInstance();
+
+    /** Allocate a static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has already been birthed
+     */
+    static void Birth();
+
+    /** Delete the static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has not been birthed
+     */
+    static void Death();
+
+    /** delete RefManager; if this == static instance, delete the static
+     *  instance also
+     */
+    inline ~RefManager();
+
+    /** Resolve references
+     *
+     *  Iterate over the list of references and call ResolveReferences on
+     *  each child reference.
+     *
+     *  @param json_root the paths of the json references will be
+     *  dereferenced starting from json_root.
+     */
+    inline void ResolveReferences(Json::Value& json_root);
+
+    /** Add a new reference
+     *
+     *  @param reference Append this reference to the list of references
+     */
+    inline void AddReference(Resolver* reference);
+    
+  private:
+    std::vector<Resolver*> _references;
+    static RefManager* _instance;
 };
 }  // namespace CppToJson
 
 namespace JsonToCpp {
+
+/** @class Resolver abstract type for resolving references
+ *
+ *  By having an untyped base class, we can put all references in the same
+ *  vector and iterate without knowing about the type of the pointer referenced
+ */
 class Resolver {
   public:
+     /** Destructor does nothing */
     ~Resolver() {}
+
+    /** Convert from Json pointer to C++ pointer*/
     virtual void ResolveReferences() = 0;
+
+    /** Clear static list of pointers-by-value (called by RefManager delete)
+     *
+     *  Note this has to be non-static so that it can be called from the base
+     *  class and inherited okay. virtual functions can't  be static.
+     */
     virtual void ClearData() const = 0;
 };
 
+/** @class ChildTypedResolver
+ *
+ *  Stores a static map of json addresses to C++ addresses. We only need one
+ *  type here (the type of the pointer).
+ *
+ *  @tparam ChildType type of the object pointed to
+ */
 template <class ChildType>
 class ChildTypedResolver : public Resolver {
   public:
+    /** Destructor does nothing */
     ~ChildTypedResolver() {}
+
+    /** As parent */
     void ResolveReferences() = 0;
-    static void AddData(std::string data_json_address, ChildType* data_cpp_address);
+
+    /** Add a pointer-as-data to the hash table for subsequent dereferencing
+     *
+     *  @param data_json_address json path to the data
+     *  @param data_cpp_address C++ address of the data
+     *
+     *  throws an exception if the data is already in the hash table - as this
+     *  can lead to incorrect resolution of pointer-by-reference and memory
+     *  duplication.
+     */
+    static void AddData(std::string data_json_address,
+                        ChildType* data_cpp_address);
+
+    /** Clear the hash table - ready to parse a new data tree
+     */
     void ClearData() const;
 
   protected:
     static std::map<std::string, ChildType*> _data_hash;
 };
 
+/** @class FullyTypedResolver
+ *
+ *  Converts a Json pointer to a C++ pointer
+ *
+ *  @tparam ParentType type of object that holds the pointer
+ *  @tparam ChildType type of object pointed to 
+ */
 template <class ParentType, class ChildType>
 class FullyTypedResolver : public ChildTypedResolver<ChildType> {
   public:
+    /** SetMethod function pointer for setting the C++ pointer during
+     *  dereference operation
+     */
     typedef void (ParentType::*SetMethod)(ChildType* value);
 
+    /** Constructor
+     *
+     *  @param ref_json_address path to the json pointer-by-value (i.e. actual
+     *  data in the json tree. This is stored in the "$ref" field of the json
+     *  pointer-by-reference
+     *  @param ref_cpp_set_func SetMethod that is used to set the C++ pointer
+     *  @param ref_cpp_parent C++ object that will store the C++ pointer.
+     */
     FullyTypedResolver(std::string ref_json_address,
-                                SetMethod ref_cpp_set_func,
-                                ParentType* ref_cpp_parent);
+                       SetMethod ref_cpp_set_func,
+                       ParentType* ref_cpp_parent);
+
+    /** Destructor does nothing */
     ~FullyTypedResolver() {}
+
+    /** Resolve this reference
+     *
+     *  Lookup the json address in the hash table; call SetMethod to allocate
+     *  the resultant C++ pointer to the parent object.
+     *
+     *  Note that as we store the addresses of C++ objects, deep copy of the C++
+     *  data is not allowed during processing of the data tree until after we
+     *  have called ResolveReferences (otherwise reference resolution will fail)
+     */
     void ResolveReferences();
 
   private:
@@ -102,13 +283,37 @@ class FullyTypedResolver : public ChildTypedResolver<ChildType> {
     ParentType* _ref_cpp_parent;
 };
 
+/** @class VectorResolver
+ *
+ *  Converts a Json pointer to a C++ pointer in an array (std::vector)
+ *
+ *  @tparam ChildType type of object pointed to; so a std::vector<ChildType*>
+ */
 template <class ChildType>
 class VectorResolver : public ChildTypedResolver<ChildType> {
   public:
+    /** Constructor
+     *
+     *  @param ref_json_address Address of json object
+     *  @param vector The vector holding child data
+     *  @param vector_index Location in the vector holding child data
+     */
     VectorResolver(std::string ref_json_address,
-                            std::vector<ChildType*>& vector,
-                            size_t vector_index);
+                   std::vector<ChildType*>& vector,
+                   size_t vector_index);
+
+    /** Destructor - does nothing */
     ~VectorResolver() {}
+
+    /** Resolve this reference
+     *
+     *  Lookup the json address in the hash table; call vector subscript
+     *  operator to allocate the resultant C++ pointer to the parent object.
+     *
+     *  Note that as we store the addresses of C++ objects, deep copy of the C++
+     *  data is not allowed during processing of the data tree until after we
+     *  have called ResolveReferences (otherwise reference resolution will fail)
+     */
     void ResolveReferences();
 
   private:
@@ -118,18 +323,46 @@ class VectorResolver : public ChildTypedResolver<ChildType> {
 };
 
 class RefManager {
-    public:
-        static RefManager& GetInstance();
-        static bool HasInstance();
-        static void Birth();
-        static void Death();
-        inline ~RefManager();
-        inline void ResolveReferences();
-        inline void AddReference(Resolver* reference);
-        
-    private:
-        std::vector<Resolver*> _references;
-        static RefManager* _instance;
+  public:
+    /** Get the static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has not been Birthed.
+     */
+    static RefManager& GetInstance();
+
+    /** Return true if RefManager has been birthed
+     */
+    static bool HasInstance();
+
+    /** Allocate a static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has already been birthed
+     */
+    static void Birth();
+
+    /** Delete the static instance of the RefManager
+     *
+     *  throws a Squeal if RefManager has not been birthed
+     */
+    static void Death();
+
+    /** Destructor - also cleans up static hash tables */
+    inline ~RefManager();
+
+    /** Resolve references stored on the refmanager
+     *
+     *  Iterate over the references and call ResolveReferences() on each
+     *  reference
+     */
+    inline void ResolveReferences();
+
+    /** Append a reference to the manager
+     */
+    inline void AddReference(Resolver* reference);
+    
+  private:
+    std::vector<Resolver*> _references;
+    static RefManager* _instance;
 };
 }  // namespace JsonToCpp
 }  // namespace ReferenceResolver
