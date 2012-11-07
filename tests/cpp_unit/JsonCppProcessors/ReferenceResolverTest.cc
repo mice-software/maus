@@ -16,7 +16,8 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolver.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverJsonToCpp.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
 namespace MAUS {

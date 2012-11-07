@@ -21,73 +21,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 
 namespace MAUS {
-
-class TestObject_1;
-
-class TestObject_2 {
-  public:
-    TestObject_2() : _d(NULL) {}
-    ~TestObject_2();
-
-    TestObject_1* GetD() const {return _d;}
-    void SetD(TestObject_1* data);
-
-  private:
-    TestObject_1* _d;
-};
-
-class TestObject_1 {
-  public:
-    TestObject_1() : _a(NULL), _b(NULL), _c(NULL) {}
-    ~TestObject_1() {
-      if (_a != NULL)
-        delete _a;
-      if (_b != NULL)
-        delete _b;
-      if (_c != NULL)
-        delete _c;
-    }
-
-    TestObject_2* GetA() const {return _a;}
-    void SetA(TestObject_2* data) {
-      _a = data;
-    }
-
-    TestObject_2* GetB() const {return _b;}
-    void SetB(TestObject_2* data) {
-      if (_b != NULL) {
-        delete _b;
-      }
-      _b = data;
-    }
-
-    TestObject_2* GetC() const {return _c;}
-    void SetC(TestObject_2* data) {
-      if (_c != NULL) {
-        delete _c;
-      }
-      _c = data;
-    }
-
-  private:
-    TestObject_2* _a;
-    TestObject_2* _b;
-    TestObject_2* _c;
-};
-
-TestObject_2::~TestObject_2() {
-  if (_d != NULL)
-    delete _d;
-}
-
-void TestObject_2::SetD(TestObject_1* data) {
-  if (_d != NULL) {
-    delete _d;
-  }
-  _d = data;
-}
-
-
+// TestObject_1 and TestObject_2? Have been summarily executed...
 class TestObject_4 {
   public:
     TestObject_4() : _reference(NULL) {}
@@ -215,35 +149,5 @@ TEST(ObjectProcessorReferenceTest, RequiredTest) {
   EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Squeal);
   delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
 }
-
-MAUS::ObjectProcessor<TestObject_2> GetTest2Proc
-                           (MAUS::ObjectProcessor<TestObject_1>* test_1_proc) {
-  MAUS::ObjectProcessor<TestObject_2> test_2_proc;
-  test_2_proc.RegisterPointerReference("d", test_1_proc, &TestObject_2::GetD,
-                                                     &TestObject_2::SetD, true);
-  return test_2_proc;
-}
-
-TEST(ObjectProcessorReferenceTest, CircularTest) {
-  ASSERT_TRUE(false);
-  TestObject_1 test_1;
-  test_1.SetA(new TestObject_2());
-  test_1.SetB(test_1.GetA());
-  test_1.SetC(test_1.GetA());
-
-  MAUS::ObjectProcessor<TestObject_1> test_1_proc;
-  MAUS::ObjectProcessor<TestObject_2> test_2_proc = GetTest2Proc(&test_1_proc); 
-  test_1_proc.RegisterPointerBranch("a", &test_2_proc, &TestObject_1::GetA,
-                                                     &TestObject_1::SetA, true);
-  test_1_proc.RegisterPointerBranch("b", &test_2_proc, &TestObject_1::GetB,
-                                                     &TestObject_1::SetB, true);
-  test_1_proc.RegisterPointerBranch("c", &test_2_proc, &TestObject_1::GetC,
-                                                     &TestObject_1::SetC, true);
-
-  Json::Value* test_1_json = test_1_proc.CppToJson(test_1);
-
-  std::cerr << JsonWrapper::JsonToString(*test_1_json) << std::endl;
-}
-
 }
 
