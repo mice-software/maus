@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolver.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
 
 namespace MAUS {
 namespace ReferenceResolver {
@@ -53,41 +53,5 @@ void RefManager::Death() {
 
 RefManager* RefManager::_instance(NULL);
 }  // namespace CppTojson
-
-namespace JsonToCpp {
-RefManager& RefManager::GetInstance() {
-    if (_instance == NULL) {
-        throw(Squeal(Squeal::recoverable,
-                    "Attempt to get RefManager before initialisation",
-                    "ReferenceResolver::JsonToCpp::RefManager::GetInstance()"));
-    }
-    return *_instance;
-}
-
-bool RefManager::HasInstance() {
-    return _instance != NULL;
-}
-
-void RefManager::Birth() {
-    if (_instance != NULL) {
-        throw(Squeal(Squeal::recoverable,
-                    "Attempt to birth RefManager when it was already birthed",
-                    "ReferenceResolver::JsonToCpp::RefManager::Birth()"));
-    }
-    _instance = new RefManager();
-}
-
-void RefManager::Death() {
-    if (_instance == NULL) {
-        throw(Squeal(Squeal::recoverable,
-                    "Attempt to death RefManager before initialisation",
-                    "ReferenceResolver::JsonToCpp::RefManager::Death()"));
-    }
-    delete _instance;
-    _instance = NULL;
-}
-
-RefManager* RefManager::_instance(NULL);
-}  // namespace JsonToCpp
 }  // namespace ReferenceResolver
 }  // namespace MAUS

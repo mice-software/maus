@@ -24,7 +24,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
-#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorBranchItems.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/BaseItem.hh"
 
 namespace MAUS {
 /** @class ObjectProcessor processes json object types into C++ classes
@@ -143,7 +143,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param is_required if the branch doesnt exist in json, is None in json,
      *  or is NULL in C++, throw Squeal if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
-     *
+     *item
      *  Note: don't forget Get method has to be const
      */
     template <class ChildType>
@@ -230,12 +230,13 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
     void SetPath();
 
   private:
-    typedef typename std::map< std::string, BaseItem<ObjectType>* >::iterator my_iter;
-    std::map< std::string, BaseItem<ObjectType>* > _items;
+    typedef typename std::map< std::string,
+                   ObjectProcessorNS::BaseItem<ObjectType>* >::iterator my_iter;
+    std::map< std::string, ObjectProcessorNS::BaseItem<ObjectType>* > _items;
 };
 } // namespace MAUS
 
-#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessor-inl.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectProcessor-inl.hh"
 
 #endif
 

@@ -17,7 +17,8 @@
 #include <vector>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolver.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverJsonToCpp.hh"
 
 namespace MAUS {
 

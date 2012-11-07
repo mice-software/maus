@@ -20,6 +20,11 @@
 #include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/BaseItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ConstantItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ValueItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerRefItem.hh"
 
 namespace MAUS {
 
@@ -36,6 +41,7 @@ void ObjectProcessor<ObjectType>::RegisterPointerBranch(
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
+    using namespace ObjectProcessorNS;
     BaseItem<ObjectType>* item = new PointerItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
     _items[branch_name] = item;
@@ -49,6 +55,7 @@ void ObjectProcessor<ObjectType>::RegisterPointerReference(
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
+    using namespace ObjectProcessorNS;
     BaseItem<ObjectType>* item = new PointerRefItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
     _items[branch_name] = item;
@@ -62,6 +69,7 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
                 ChildType (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType value),
                 bool is_required) {
+    using namespace ObjectProcessorNS;
     BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
     _items[branch_name] = item;
@@ -72,6 +80,7 @@ void ObjectProcessor<ObjectType>::RegisterConstantBranch(
                     std::string branch_name,
                     Json::Value child_value,
                     bool is_required) {
+    using namespace ObjectProcessorNS;
     BaseItem<ObjectType>* item = new ConstantItem<ObjectType>
               (branch_name, child_value, is_required);
     _items[branch_name] = item;
