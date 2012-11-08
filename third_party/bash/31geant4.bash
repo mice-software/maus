@@ -2,7 +2,8 @@
 
 directory=geant4.9.2.p04
 filename=${directory}.tar.gz
-url=http://www.geant4.org/geant4/support/source/${filename}
+#url=http://www.geant4.org/geant4/support/source/${filename}
+url=http://geant4.web.cern.ch/geant4/support/source/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
