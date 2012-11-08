@@ -63,6 +63,10 @@
 #pragma link C++ class std::vector<Unknown*>;
 #pragma link C++ class std::vector<Tag*>;
 
+#pragma link C++ class MAUS::TestBranch+;
+#pragma link C++ class MAUS::TestChild+;
+#pragma link C++ class std::vector<MAUS::TestChild*>;
+
 #pragma link C++ class MAUS::ReconEvent+;
 
 #pragma link C++ class MAUS::TOFEvent+;

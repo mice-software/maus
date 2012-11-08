@@ -100,11 +100,12 @@ class VectorResolver : public Resolver {
     /** Constructor
      *
      *  @param ref_json_address Address of json object
-     *  @param vector The vector holding child data
+     *  @param vector The vector holding child data - note that this has to be
+     *  a Pointer-by-value (as we use the address of the vector to access it)
      *  @param vector_index Location in the vector holding child data
      */
     VectorResolver(std::string ref_json_address,
-                   std::vector<ChildType*>& vector,
+                   std::vector<ChildType*>* vector,
                    size_t vector_index);
 
     /** Destructor - does nothing */
@@ -123,7 +124,7 @@ class VectorResolver : public Resolver {
 
   private:
     std::string _ref_json_address;
-    std::vector<ChildType*>& _vector;
+    std::vector<ChildType*>* _vector;
     size_t _index;
 };
 

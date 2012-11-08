@@ -78,7 +78,9 @@ void PointerItem<ParentType, ChildType>::_SetJsonChild
             return;
         }
     }
+    std::cerr << "PointerItem::SetJsonChild GetPath" << std::endl;
     std::string path = BaseItem<ParentType>::GetPath(parent_json);
+    std::cerr << "PointerItem::SetJsonChild Alloc" << std::endl;
     Json::Value* child_json = _processor->CppToJson(*child_cpp, path);
     parent_json[_branch] = *child_json;
     delete child_json;

@@ -54,13 +54,13 @@ TEST(ReferenceResolverJsonToCppTest, VectorResolverTest) {
     double child(99);
     std::vector<double*> vec;
     vec.push_back(NULL);
-    VectorResolver<double> res("#data", vec, 0);
+    VectorResolver<double> res("#data", &vec, 0);
     RefManager::GetInstance().SetPointerAsValue("#data", &child);
     res.ResolveReferences();
     EXPECT_TRUE(vec[0] == &child);
     RefManager::Death();
     RefManager::Birth();
-    VectorResolver<double> res2("#data", vec, 1);
+    VectorResolver<double> res2("#data", &vec, 1);
     EXPECT_THROW(res2.ResolveReferences(), Squeal);
     EXPECT_THROW(res.ResolveReferences(), Squeal);
     EXPECT_TRUE(vec[0] == NULL);

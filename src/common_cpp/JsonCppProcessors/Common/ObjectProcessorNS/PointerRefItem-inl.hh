@@ -94,7 +94,7 @@ void PointerRefItem<ParentType, ChildType>::_SetJsonChild
         if (_required) {
             throw Squeal(Squeal::recoverable,
             "Failed to find branch "+_branch+": class data was NULL",
-            "PointerRefItem::GetCppChild");
+            "PointerRefItem::SetJsonChild");
         } else {
             parent_json[_branch] = Json::Value();
             return;

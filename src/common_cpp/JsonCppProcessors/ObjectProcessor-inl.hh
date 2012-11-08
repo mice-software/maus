@@ -119,12 +119,6 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_objec
 
 template <class ObjectType>
 Json::Value* ObjectProcessor<ObjectType>::CppToJson
-                              (const ObjectType& cpp_object) {
-    return CppToJson(cpp_object, "");
-}
-
-template <class ObjectType>
-Json::Value* ObjectProcessor<ObjectType>::CppToJson
                               (const ObjectType& cpp_object, std::string path) {
     Json::Value* json_object = new Json::Value(Json::objectValue);
     JsonWrapper::Path::SetPath(*json_object, path);

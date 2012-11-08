@@ -167,6 +167,10 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
 
 /** @class ReferenceArrayProcessor
  *
+ *  Note that ReferenceArrayProcessor should only be used on an array that is
+ *  stored in C++ as a pointer-by-value. Otherwise you will get a
+ *  segmentation fault (ack).
+ *
  *  ReferenceArrayProcessor provides bindings for converting between a C++
  *  vector of pointers and a json array (json's vector type). Note that here the
  *  pointers are distinct from PointerArrayProcessor because the std::vector
@@ -174,7 +178,9 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
  *  other data type (either another class or another array) should own the
  *  memory.
  *
- *  In json we store a reference to the data; in C++ we store a pointer.
+ *  In json we store a reference to the data; in C++ we store a pointer. Needs
+ *  the vector memory address to be persistent as this is how we reference the
+ *  vector, hence need a pointer-by-value
  */
 template <class ArrayContents>
 class ReferenceArrayProcessor

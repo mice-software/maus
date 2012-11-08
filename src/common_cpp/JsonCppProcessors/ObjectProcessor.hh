@@ -88,12 +88,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      */
     Json::Value* CppToJson(const ObjectType& cpp_instance, std::string path);
 
-    /** Convert from a C++ instance to the json object
-     *
-     *  As above but path defaults to ""
-     */
-    Json::Value* CppToJson(const ObjectType& cpp_instance);
-
     /** Register a branch for processing, where the data is stored in a pointer
      *  and the ParentType owns the memory pointed to. 
      *

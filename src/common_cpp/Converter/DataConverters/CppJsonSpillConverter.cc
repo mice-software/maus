@@ -28,7 +28,7 @@ Json::Value* CppJsonSpillConverter::_convert(const Data* data) const {
       return new Json::Value();
   try {
     ReferenceResolver::CppToJson::RefManager::Birth();
-    Json::Value* my_json = SpillProcessor().CppToJson(*data->GetSpill());
+    Json::Value* my_json = SpillProcessor().CppToJson(*data->GetSpill(), "");
     ReferenceResolver::CppToJson::RefManager::Death();
     return my_json;
   }

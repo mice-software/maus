@@ -57,25 +57,27 @@ void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
 template <class ChildType>
 VectorResolver<ChildType>::VectorResolver(
                             std::string ref_json_address,
-                            std::vector<ChildType*>& vector,
+                            std::vector<ChildType*>* vector,
                             size_t vector_index)
   : _ref_json_address(ref_json_address), _vector(vector), _index(vector_index) {
 }
 
 template <class ChildType>
 void VectorResolver<ChildType>::ResolveReferences() {
-    if (_index >= _vector.size())
+    if (_vector == NULL)
+        return;
+    if (_index >= _vector->size())
         throw(Squeal(Squeal::recoverable,
                      "Index out of range while resolving pointer to array "+
                      _ref_json_address,
                      "ReferenceResolver::VectorResolver::ResolveReferences"));
     ChildType* data_address = RefManager::GetInstance().
                                 GetPointerAsValue<ChildType>(_ref_json_address);
-    _vector[_index] = data_address;
+    (*_vector)[_index] = data_address;
     if (data_address == NULL)
         throw(Squeal(Squeal::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
-              " on C++ vector "+STLUtils::ToString(&_vector)+" element "+
+              " on C++ vector "+STLUtils::ToString(_vector)+" element "+
               STLUtils::ToString(_index),
               "ReferenceResolver::VectorResolver::ResolveReferences"));
   }

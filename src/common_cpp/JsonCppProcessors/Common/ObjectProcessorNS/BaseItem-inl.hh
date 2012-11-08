@@ -40,9 +40,11 @@ template <class ParentType>
 std::string BaseItem<ParentType>::GetPath(Json::Value& parent) {
     std::string branch = GetBranchName();
     Json::Value test;
-    JsonWrapper::Path::SetPath(test, JsonWrapper::Path::GetPath(parent));
+    std::string parent_path = JsonWrapper::Path::GetPath(parent);
+    JsonWrapper::Path::SetPath(test, parent_path);
     JsonWrapper::Path::AppendPath(test, GetBranchName());
-    return JsonWrapper::Path::GetPath(test);
+    std::string test_path = JsonWrapper::Path::GetPath(test);
+    return test_path;
 }
 
 template <class ParentType>

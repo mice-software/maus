@@ -100,7 +100,7 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
                 &TestObject_3::GetPointer, &TestObject_3::SetPointer, true);
 
   // test C++ to Json conversion
-  Json::Value* test_3_json = test_3_proc.CppToJson(test_3);
+  Json::Value* test_3_json = test_3_proc.CppToJson(test_3, "");
   ReferenceResolver::CppToJson::RefManager::
                                  GetInstance().ResolveReferences(*test_3_json);
   EXPECT_EQ((*test_3_json)["child_1"]["reference"]["$ref"],
@@ -134,8 +134,8 @@ TEST(ObjectProcessorReferenceTest, RequiredTest) {
 
   TestObject_4 test_4_cpp;
   test_4_cpp.SetReference(NULL);
-  EXPECT_THROW(test_4_req_proc.CppToJson(test_4_cpp), Squeal);
-  delete test_4_not_proc.CppToJson(test_4_cpp);  // shouldnt throw
+  EXPECT_THROW(test_4_req_proc.CppToJson(test_4_cpp, ""), Squeal);
+  delete test_4_not_proc.CppToJson(test_4_cpp, "");  // shouldnt throw
 
   Json::Value test_4_json(Json::objectValue);
   EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Squeal);
