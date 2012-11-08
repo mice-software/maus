@@ -17,9 +17,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TESTBRANCH_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TESTBRANCH_HH_
 
-#include "Rtypes.h"
-
 #include <vector>
+
+#include "Rtypes.h"
 
 #include "src/common_cpp/DataStructure/TestChild.hh"
 

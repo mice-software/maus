@@ -19,8 +19,6 @@
 
 #include "Rtypes.h"
 
-#include <vector>
-
 namespace MAUS {
 
 /** Empty test object - ROOT doesnt like pointers to primitive types apparently

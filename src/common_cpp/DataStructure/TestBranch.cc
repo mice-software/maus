@@ -29,7 +29,6 @@ TestBranch::TestBranch() : _double_by_reference(NULL), _double_by_value(NULL),
     _test_pointer_array->push_back(NULL);
     _test_pointer_array->push_back(_double_by_value);
     _test_pointer_array->push_back(_double_by_value);
-  
 }
 
 TestBranch::TestBranch(const TestBranch& md) : _double_by_reference(NULL),

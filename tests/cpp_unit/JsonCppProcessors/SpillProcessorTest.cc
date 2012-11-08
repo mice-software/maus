@@ -91,7 +91,7 @@ std::string TOF_HIT = HIT_SEED+TOF_CHANNEL_ID+"}";
 
 std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
 
-std::string TEST_BRANCH(std::string path) { 
+std::string TEST_BRANCH(std::string path) {
     std::string ref = "{\"$ref\":\"#"+path+"test_child_by_value\"}";
     return std::string("{\"test_child_by_value\":{}, ")+
            std::string("\"test_child_by_ref\":")+ref+", "+
