@@ -33,7 +33,6 @@ def install_python_tests(maus_root_dir, env):
     into build/, preserving directory structure below tests/py_unit. Also 
     installs files tests/style/*.py into build/ 
     """
-    style = "%s/tests/style/" % maus_root_dir
     target = "%s/tests/py_unit/" % maus_root_dir
     build  = "%s/build/" % maus_root_dir
     files = glob.glob(target+'test_*.py')

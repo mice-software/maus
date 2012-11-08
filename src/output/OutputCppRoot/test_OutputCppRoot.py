@@ -46,7 +46,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         self.outfile = os.path.join \
                  (os.environ["MAUS_ROOT_DIR"], "tmp", "test_outputCppRoot.root")
         self.on_error_standard = ErrorHandler.DefaultHandler().on_error
-        ref = {"$ref":"#test_branch/double_by_value"}
+        #ref = {"$ref":"#test_branch/double_by_value"}
         self.test_data = {
             "scalars":{},
             "emr_spill_data":{},
