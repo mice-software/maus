@@ -20,10 +20,9 @@
 
 #include "Maths/PolynomialMap.hh"
 
-#include <limits>
-#include <math.h>
-
+#include <cmath>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -450,13 +449,12 @@ SymmetricMatrix PolynomialMap::Covariances(
   }
   return covariances;
 }
- 
+
 PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
     unsigned int                              polynomialOrder,
-    const VectorMap*                      
-    weightFunction) {
+    const VectorMap*                          weightFunction) {
 
   if (weightFunction == NULL) {
     // use default value for weights defined in PolnomialMap.hh
@@ -486,7 +484,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   size_t nPoints  = points.size();
   size_t nCoeffs  = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
 
-  // create 
+  // create
   Matrix<double> dummy(valueDim, nCoeffs, 0.);
   for (size_t i = 0; i < valueDim; ++i)
     for (size_t j = 0; j < nCoeffs; ++j)
@@ -505,13 +503,13 @@ std::cout << "[";
                                          &point_poly_vector[0]);
     for (size_t column = 0; column < nCoeffs; ++column) {
       design_matrix(row+1, column+1) = point_poly_vector[column];
-//if ((column > 0) && (column < pointDim+1)) {
+// if ((column > 0) && (column < pointDim+1)) {
   std::cout << design_matrix(row+1, column+1);
-  //if (column < pointDim) {
+  // if (column < pointDim) {
   if (column < nCoeffs-1) {
     std::cout << ", ";
   }
-//}
+// }
     }
 std::cout << "]" << std::endl;
   }

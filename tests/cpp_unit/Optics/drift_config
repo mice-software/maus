@@ -1,0 +1,40 @@
+{
+"output_json_file_name": "tests/cpp_unit/Optics/drift_output.json",
+"output_json_file_type": "text",
+"simulation_geometry_filename": "tests/cpp_unit/Optics/Drift.dat",
+"verbose_level": 0,
+"physics_processes": "none",
+"reference_physics_processes": "none",
+"particle_decay": false,
+"spill_generator_number_of_spills":1,
+"simulation_reference_particle": {
+    "position":{"x":0.0, "y":0.0, "z":-1000.0},
+    "momentum":{"x":0.0, "y":0.0, "z":200.0},
+    "particle_id":-13, "energy":226.1939223, "time":0.0, "random_seed":2
+},
+"TransferMapOpticsModel_EllipseDefinition": {
+    "Emittance_T": 10.0,
+    "Emittance_L": 0.01,
+    "Beta_T":      650.,
+    "Beta_L":      5.,
+    "Alpha_T":     0.,
+    "Alpha_L":     0.,
+   "NormalisedAngularMomentum": 0.,
+    "Bz":             0.
+},
+"TransferMapOpticsModel_Deltas": {
+  "t":1,
+  "E":1,
+  "x":1,
+  "Px":1,
+  "y":1,
+  "Py":1
+},
+"PolynomialOpticsModel_algorithms": ["Least Squares",
+                                    "Constrained Least Squares",
+                                    "Constrained Chi Squared",
+                                    "Sweeping Chi Squared",
+                                    "Sweeping Chi Squared Variable Walls"],
+"PolynomialOpticsModel_algorithm": "Least Squares",
+"PolynomialOpticsModel_order": 1
+}

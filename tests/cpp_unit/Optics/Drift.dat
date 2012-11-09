@@ -1,0 +1,21 @@
+Configuration Drift
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 1.0 mm
+  Module DriftStart
+  {
+    Volume None
+		Position 0. 0. -1.0 m
+    PropertyString SensitiveDetector   Virtual
+    PropertyString IndependentVariable Z
+  }
+  Module DriftEnd
+  {
+    Volume None
+		Position 0. 0. 1.0 m
+    PropertyString SensitiveDetector   Virtual
+    PropertyString IndependentVariable Z
+  }
+}
+

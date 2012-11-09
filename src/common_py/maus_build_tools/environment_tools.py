@@ -233,6 +233,7 @@ def cpp_extras(env):
         env.Append(LIBS=['gcov'])
         env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""",
                             """-fno-inline""", """-fno-default-inline"""])
+        print "Setting profiling flags"
 
     if debug:
         env.Append(CCFLAGS=["""-g"""])
