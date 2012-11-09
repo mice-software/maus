@@ -24,7 +24,8 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
+Json::Value JsonWrapper::StringToJson(const std::string& json_in)
+    throw(Squeal) {
   Json::Reader reader;
   Json::Value  json_out;
   bool parsingSuccessful = reader.parse(json_in, json_out);
@@ -43,8 +44,10 @@ std::string JsonWrapper::JsonToString(const Json::Value& val) {
     return json_out.substr(0, json_out.size()-1);  // strip carriage return
 }
 
-Json::Value JsonWrapper::GetItem
-    (Json::Value array, size_t value_index, JsonType value_type) throw(Squeal) {
+Json::Value JsonWrapper::GetItem(const Json::Value & array,
+                                 const size_t value_index,
+                                 const JsonType value_type)
+    throw(Squeal) {
   if (array.type() != Json::arrayValue) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to find Json item but not an array",
@@ -63,8 +66,10 @@ Json::Value JsonWrapper::GetItem
                "JsonWrapper::GetItemStrict"));
 }
 
-Json::Value JsonWrapper::GetProperty
-     (Json::Value object, std::string name, JsonType value_type) throw(Squeal) {
+Json::Value JsonWrapper::GetProperty(const Json::Value & object,
+                                     const std::string& name,
+                                     const JsonType value_type)
+    throw(Squeal) {
   if (object.type() != Json::objectValue) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to find Json property "+name+" but not an object",
@@ -85,7 +90,7 @@ Json::Value JsonWrapper::GetProperty
   }
 }
 
-JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
+JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(const Json::ValueType tp) {
   switch (tp) {
     case Json::nullValue: return nullValue;
     case Json::intValue: return intValue;
@@ -103,7 +108,7 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
 }
 
 Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
-                                                                throw(Squeal) {
+    throw(Squeal) {
   switch (tp) {
     case nullValue:    return Json::nullValue;
     case intValue:     return Json::intValue;
@@ -121,18 +126,23 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
   return Json::nullValue;  // appease gcc
 }
 
-CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector
-                                       (Json::Value j_vec) throw(Squeal) {
-    if (!j_vec.isObject())
-      throw(Squeal(Squeal::recoverable,
-                  "Could not convert Json value of non-object type to three vector",
-                  "JsonWrapper::JsonToThreeVector(...)"
-            ));
-    CLHEP::Hep3Vector c_vec;
-    c_vec[0] = JsonWrapper::GetProperty(j_vec, "x", JsonWrapper::realValue).asDouble();
-    c_vec[1] = JsonWrapper::GetProperty(j_vec, "y", JsonWrapper::realValue).asDouble();
-    c_vec[2] = JsonWrapper::GetProperty(j_vec, "z", JsonWrapper::realValue).asDouble();
-    return c_vec;
+CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector(const Json::Value& j_vec)
+    throw(Squeal) {
+  if (!j_vec.isObject())
+    throw(Squeal(Squeal::recoverable,
+                "Could not convert Json value of non-object type "
+                "to three vector",
+                "JsonWrapper::JsonToThreeVector(...)"
+          ));
+  CLHEP::Hep3Vector c_vec;
+  Json::Value property;
+  property = JsonWrapper::GetProperty(j_vec, "x", JsonWrapper::realValue);
+  c_vec[0] = property.asDouble();
+  property = JsonWrapper::GetProperty(j_vec, "y", JsonWrapper::realValue);
+  c_vec[1] = property.asDouble();
+  property = JsonWrapper::GetProperty(j_vec, "z", JsonWrapper::realValue);
+  c_vec[2] = property.asDouble();
+  return c_vec;
 }
 
 bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
@@ -146,7 +156,9 @@ void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
     out << writer.write(val);
 }
 
-bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::AlmostEqual(const Json::Value& value_1,
+                              const Json::Value& value_2,
+                              double tolerance) {
     if (value_1.type() != value_2.type()) {
         return false;
     }
@@ -172,8 +184,9 @@ bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double t
     }
 }
 
-bool JsonWrapper::ObjectEqual
-                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::ObjectEqual(const Json::Value& value_1,
+                              const Json::Value& value_2,
+                              double tolerance) {
     // get keys, assure that ordering is same
     std::vector<std::string> keys_1 = value_1.getMemberNames();
     std::vector<std::string> keys_2 = value_2.getMemberNames();
@@ -193,8 +206,9 @@ bool JsonWrapper::ObjectEqual
     return true;
 }
 
-bool JsonWrapper::ArrayEqual
-                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
+                             const Json::Value& value_2,
+                             double tolerance) {
     // check length is same
     if (value_1.size() != value_2.size()) {
         return false;
@@ -208,8 +222,8 @@ bool JsonWrapper::ArrayEqual
     return true;
 }
 
-Json::Value JsonWrapper::ObjectMerge
-                                  (Json::Value object_1, Json::Value object_2) {
+Json::Value JsonWrapper::ObjectMerge(const Json::Value& object_1,
+                                     const Json::Value& object_2) {
     // check we have objects
     if (object_1.type() != Json::objectValue ||
         object_2.type() != Json::objectValue) {
@@ -250,12 +264,13 @@ Json::Value JsonWrapper::ObjectMerge
     return object_merged;
 }
 
-Json::Value JsonWrapper::ArrayMerge(Json::Value array_1, Json::Value array_2) {
+Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
+                                    const Json::Value& array_2) {
     if (array_1.type() != Json::arrayValue ||
         array_2.type() != Json::arrayValue) {
         throw(Squeal(Squeal::recoverable,
                      "Expecting array type for array merge",
-                     "JsonWrapper::ArrayMerge"));
+                     "JsonWrapper::ApropertyrrayMerge"));
     }
     Json::Value array_merge(array_1);
     for (size_t i = 0; i < array_2.size(); ++i) {

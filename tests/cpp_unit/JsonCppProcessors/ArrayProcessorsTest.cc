@@ -70,7 +70,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppNullTest) {
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value());
     std::vector<double*>* vec_out = proc.JsonToCpp(json_array);
-    EXPECT_EQ(vec_out->size(), 1);
+    EXPECT_EQ(vec_out->size(), size_t(1));
     double* null_double = NULL;
     EXPECT_EQ((*vec_out)[0], null_double);
     delete vec_out;

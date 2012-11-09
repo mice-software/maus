@@ -27,6 +27,8 @@
 #include <string>
 
 #include "json/json.h"
+#include "CLHEP/Vector/Rotation.h"
+#include "CLHEP/Vector/ThreeVector.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
@@ -95,8 +97,8 @@ class VirtualPlane {
    *  @params allowBackwards; set to True to register hits for backwards going
    *          particles as well as forwards going particles.
    */
-  static VirtualPlane BuildVirtualPlane(CLHEP::HepRotation rot,
-                      CLHEP::Hep3Vector pos, double radialExtent,
+  static VirtualPlane BuildVirtualPlane(::CLHEP::HepRotation rot,
+                      ::CLHEP::Hep3Vector pos, double radialExtent,
                       bool globalCoordinates, double indie, BTTracker::var type,
                       multipass_handler mp, bool allowBackwards);
 
@@ -160,7 +162,7 @@ class VirtualPlane {
    *
    *  @returns true if the particle is in the cut
    */
-  bool InRadialCut(CLHEP::Hep3Vector position) const;
+  bool InRadialCut(::CLHEP::Hep3Vector position) const;
 
   /** @brief return the type of independent variable of the plane
    */
@@ -185,11 +187,11 @@ class VirtualPlane {
 
   /** @brief returns the plane rotation
    */
-  CLHEP::HepRotation GetRotation() {return _rotation;}
+  ::CLHEP::HepRotation GetRotation() {return _rotation;}
 
   /** @brief returns the plane position
    */
-  CLHEP::Hep3Vector GetPosition() {return _position;}
+  ::CLHEP::Hep3Vector GetPosition() {return _position;}
 
   /** @brief return true if backwards going particles are registered on the
    *         plane; false otherwise
@@ -216,8 +218,8 @@ class VirtualPlane {
   static const BTField*    _field;
   static stepping    _stepping;
 
-  CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
-  CLHEP::HepRotation _rotation;  // if var is u, then this will give rotation
+  ::CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
+  ::CLHEP::HepRotation _rotation;  // if var is u, then this will give rotation
   bool               _allowBackwards;
   friend class VirtualPlaneManager;
 };
@@ -375,7 +377,7 @@ class VirtualPlaneManager {
   VirtualPlane ConstructFromModule(const MiceModule* mod);
   VirtualPlane* PlaneFromStation(int station);  // get plane from station number
 
-  CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
+  ::CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
 
   const BTField*            _field;
   bool                      _useVirtualPlanes;
