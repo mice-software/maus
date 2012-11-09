@@ -100,6 +100,7 @@ namespace CppToJson {
 TEST(ReferenceResolverCppToJsonTest, TypedResolverTest) {
     RefManager::Birth();
     double child(0);
+    double* null = NULL;
     Json::Value parent(Json::objectValue);
     parent["test"] = Json::Value();
     TypedResolver<double> res(&child, "#test");
@@ -116,6 +117,13 @@ TEST(ReferenceResolverCppToJsonTest, TypedResolverTest) {
     parent["test"] = Json::Value("bob");
     EXPECT_THROW(res.ResolveReferences(parent), Squeal);
     EXPECT_EQ(parent["test"], Json::Value()) << parent["test"];
+
+    // NULL handling
+    TypedResolver<double> res_null(null, "#test");
+    RefManager::GetInstance().SetPointerAsValue(null, "SHOULD IGNORE");
+    RefManager::GetInstance().SetPointerAsValue(null, "SHOULD IGNORE");
+    EXPECT_THROW(RefManager::GetInstance().GetPointerAsValue(null), Squeal);
+
     RefManager::Death();
 }
 

@@ -67,6 +67,8 @@ class RefManager::TypedPointerValueTable : public RefManager::PointerValueTable 
 template <class PointerType>
 void RefManager::SetPointerAsValue
                               (PointerType* pointer, std::string json_address) {
+    if (pointer == NULL)
+        return;
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (table->_data_hash.find(pointer) != table->_data_hash.end())
