@@ -24,6 +24,12 @@
 #include <streambuf>
 #include <string>
 
+#include <cstdlib>
+/*
+#include <unistd.h>
+#include <sys/param.h> // MAXPATHLEN definition
+*/
+
 #include "gtest/gtest.h"
 
 #include "Interface/Squeal.hh"
@@ -37,7 +43,15 @@ using MAUS::LinearApproximationOpticsModel;
 class LinearApproximationOpticsModelTest : public testing::Test {
  public:
   LinearApproximationOpticsModelTest() {
-    std::ifstream config_file(kConfigFilename.c_str());
+    /*
+    char path1[MAXPATHLEN]; // This is a buffer for the text
+    getcwd(path1, MAXPATHLEN);
+    std::cout << "CWD: " << path1 << std::endl;
+    */
+    const std::string maus_root_dir(getenv("MAUS_ROOT_DIR"));
+    const std::string filename = maus_root_dir + "/" + kConfigFilename;
+
+    std::ifstream config_file(filename.c_str());
     if (!config_file.good()) {
       throw(Squeal(Squeal::nonRecoverable,
                   "Unable to load configuration file.",
