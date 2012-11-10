@@ -47,8 +47,8 @@ def run_simulation(has_rf, stepping_algorithm):
       "--stepping_algorithm", str(stepping_algorithm),
       "--spill_generator_number_of_spills", str(1)],
       stdout=log_file, stderr=subprocess.STDOUT)
-    proc.wait()
-    return proc.returncode
+    proc.wait() # pylint: disable = E1101
+    return proc.returncode # pylint: disable = E1101
 
 class SteppingAlgorithmTest(unittest.TestCase): # pylint: disable = R0904
     """
