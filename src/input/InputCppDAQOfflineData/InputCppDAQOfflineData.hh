@@ -20,7 +20,10 @@
 
 #include <string>
 
+#include "unpacking/MDfileManager.h"
+
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
+
 
 class InputCppDAQOfflineData : public InputCppDAQData {
 
@@ -53,6 +56,20 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   bool readNextEvent();
 
  private:
+
+  /** File manager object. */
+  MDfileManager _dataFileManager;
+
+  /** Paths to the data.
+  * This string has to contain one or more space separated paths.
+  */
+  std::string _dataPaths;
+
+  /** File and run names within _dataPaths.
+  * This string has to contain one or more space separated
+  * file names or run numbers.
+  */
+  std::string _datafiles;
 
  /** Max number of DAQ events to be processed.
   */ 

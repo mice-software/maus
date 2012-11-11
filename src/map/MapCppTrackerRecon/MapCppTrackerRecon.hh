@@ -22,6 +22,7 @@
 
 #ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
 #define _SRC_MAP_MAPCPPTrackerRecon_H_
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -40,15 +41,17 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiSpill.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiDigit.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+
+namespace MAUS {
 
 class MapCppTrackerRecon {
  public:
@@ -65,51 +68,49 @@ class MapCppTrackerRecon {
    */
   bool death();
 
-  /** process JSON document
+  /** Process JSON document
    *
-   *  Receive a document with MC hits and return
-   *  a document with digits
+   *  Receive a document with digits (either MC or real) and then call the higher level
+   *  reconstruction algorithms
+   * 
    * \param document a line/spill from the JSON input
    */
   std::string process(std::string document);
 
-  /** makes digits
-   *
-   *  Digits are made by either picking up
-   *  daq or MC.
-   *  \param spill a SciFiSpill object
-   *  \param root the parsed JSON input
-   */
-  void digitization(SciFiSpill &spill, Json::Value &root);
-
-  /** fills digits from MC digitization
-   *
-   *  \param digits the MC digits
-   *  \param a_spill the SciFiSpill we are processing
-   */
-  void fill_digits_vector(Json::Value &digits, SciFiSpill &a_spill);
-
-  /** performs the cluster reconstruction
+  /** Performs the cluster reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void cluster_recon(SciFiEvent &evt);
+  void cluster_recon(MAUS::SciFiEvent &evt);
 
-  /** performs the spacepoint reconstruction
+  /** Performs the spacepoint reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void spacepoint_recon(SciFiEvent &evt);
+  void spacepoint_recon(MAUS::SciFiEvent &evt);
 
-  void pattern_recognition(SciFiEvent &evt);
+  /** Performs the pattern recogniton
+   *
+   *  Pattern Recogntion identifies which spacepoints are associate with particle tracks,
+   *  then fits functions to the tracks using simple least squared fitting 
+   *
+   *  \param evt the current SciFiEvent
+   */
+  void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
+                           MAUS::SciFiEvent &evt);
 
-  void save_to_json(SciFiEvent &evt);
+  /** Takes json data and returns a Sc
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param evt the current SciFiEvent
+   */
+  bool read_in_json(std::string json_data, MAUS::Spill &spill);
 
-  void print_event_info(SciFiEvent &event);
+  void save_to_json(MAUS::Spill &spill);
 
-  Json::Value ConvertToJson(std::string jsonString);
-
-  std::string JsonToString(Json::Value json_in);
+  void print_event_info(MAUS::SciFiEvent &event);
 
  private:
   /// This should be the classname
@@ -124,7 +125,15 @@ class MapCppTrackerRecon {
   double minPE;
   /// Value above which reconstruction is aborted.
   int ClustException;
+  /// Pattern recognition flags
+  bool _helical_pr_on;
+  bool _straight_pr_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
+
+  int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
+
+} // ~namespace MAUS
+
 #endif

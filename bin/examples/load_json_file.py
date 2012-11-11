@@ -76,8 +76,6 @@ def main():
         # bureaucracy
         print "DAQ event type", spill["daq_event_type"]
         if spill["daq_event_type"] == "physics_event":
-            # note PyROOT gives a segmentation fault if we try to call the STL
-            # vector directly
             for event in spill["recon_events"]:
                 tof_event = event["tof_event"]
                 digits = tof_event["tof_digits"]
