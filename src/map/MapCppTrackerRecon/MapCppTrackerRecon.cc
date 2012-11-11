@@ -144,7 +144,7 @@ bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
 
 void MapCppTrackerRecon::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill);
+  root = *spill_proc.CppToJson(spill, "");
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
