@@ -66,7 +66,7 @@ public:
 	void BuildFields(MiceModule * rootModule);
   /// Returns true if any child field changes energy - used to tell whether we
   /// need an electric field by geant4
-	bool DoesFieldChangeEnergy() {return BTFieldGroup::DoesFieldChangeEnergy();}
+	bool DoesFieldChangeEnergy() const {return BTFieldGroup::DoesFieldChangeEnergy();}
   /// Returns true if the module is an RF cavity
   ///
   /// Detected by looking for a CavityMode property string (probably not the 

@@ -22,6 +22,7 @@
 
 #include "json/value.h"
 
+#include "src/common_cpp/JsonCppProcessors/TestBranchProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/DAQDataProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ScalarsProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
@@ -45,6 +46,7 @@ class SpillProcessor : public ObjectProcessor<Spill> {
     SpillProcessor();
 
  private:
+    TestBranchProcessor _test_branch_proc;
     ScalarsProcessor _scal_proc;
     DAQDataProcessor _daq_proc;
     EMRSpillDataProcessor _emr_proc;

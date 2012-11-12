@@ -29,12 +29,12 @@ def glob_maus_root_dir(glob_string):
     @returns list of paths matching glob string, relative to maus_root_dir
     """
     here = os.getcwd()
-    os.chdir(maus_root_dir)
+    os.chdir(MAUS_ROOT_DIR)
     globs = glob.glob(glob_string)
     os.chdir(here)
     return globs
 
-def walker(maus_root_dir, exclude_dirs, exclude_files, filename):
+def walker(_maus_root_dir, _exclude_dirs, _exclude_files, _filename):
     """
     @brief walk up from maus_root_dir and run cpplint
 
@@ -46,15 +46,15 @@ def walker(maus_root_dir, exclude_dirs, exclude_files, filename):
 
     @returns number of errors found by cpplint
     """
-    fh = open(filename, 'w')
-    cpplint._cpplint_state.SetOutputHandler(fh)
+    file_handle = open(_filename, 'w')
+    cpplint._cpplint_state.SetOutputHandler(file_handle)
     errors = 0
-    for root_dir, ls_dirs, ls_files in os.walk(maus_root_dir):
-        maus_dir = root_dir[len(maus_root_dir)+1:] #root_dir relative to maus
-        path_exclude(exclude_dirs, maus_dir, ls_dirs)
-        path_exclude(exclude_files, maus_dir, ls_files)
+    for root_dir, ls_dirs, ls_files in os.walk(_maus_root_dir):
+        maus_dir = root_dir[len(_maus_root_dir)+1:] #root_dir relative to maus
+        path_exclude(_exclude_dirs, maus_dir, ls_dirs)
+        path_exclude(_exclude_files, maus_dir, ls_files)
         errors += run_cpplint(root_dir, ls_files)
-    fh.flush()
+    file_handle.flush()
     return errors
 
 def path_exclude(exclude_paths, path_root, path_list):
@@ -75,7 +75,7 @@ def path_exclude(exclude_paths, path_root, path_list):
         else:
             i += 1
 
-cpplint_suffixes = ['.hh', '.h', '.cpp', '.cc']
+CPPLINT_SUFFIXES = ['.hh', '.h', '.cpp', '.cc']
 def run_cpplint(root_dir, file_list):
     """
     @brief Run cpplint style checking script against a list of files
@@ -86,21 +86,20 @@ def run_cpplint(root_dir, file_list):
     @returns number of errors found
 
     Note that this only runs against files with suffixes in the list:
+              ['.hh', '.h', '.cpp', '.cc']
     """
     cpplint._cpplint_state.ResetErrorCounts()
     for a_file in file_list:
         target = os.path.join(root_dir, a_file)
-        for suffix in cpplint_suffixes:
+        for suffix in CPPLINT_SUFFIXES:
             if target.endswith(suffix):
                 cpplint.ProcessFile(target, 3)
     return cpplint._cpplint_state.error_count
-run_cpplint.__doc__ += str(cpplint_suffixes)
 
-
-class cpplint_postprocessor:
+class CpplintPostProcessor:
     """
-    @class cpplint_postprocessor
-    cpplint_postprocessor is really just a collection of functions associated
+    @class CpplintPostProcessor
+    CpplintPostProcessor is really just a collection of functions associated
     with postprocessing the cpplint file - i.e. subtracting known errors that
     should pass cpplint.
     """
@@ -108,7 +107,7 @@ class cpplint_postprocessor:
         """Does nothing"""
         pass
 
-    def get_line_numbers(self, cpplint_output_filename):
+    def get_line_numbers(self, cpplint_output_filename): # pylint: disable=R0201
         """
         @brief Read cpplint output file
 
@@ -117,9 +116,9 @@ class cpplint_postprocessor:
         @returns a dict like {filename:[cpplint_error, line_number, '']
         """
         file_to_error = {}
-        filename = os.path.join(maus_root_dir, cpplint_output_filename)
-        fh = open(filename)
-        lines = fh.readlines()
+        filename = os.path.join(MAUS_ROOT_DIR, cpplint_output_filename)
+        file_handle = open(filename)
+        lines = file_handle.readlines()
         for line in lines:
             line = line.rstrip('\n')
             words = line.split(' ')
@@ -129,12 +128,13 @@ class cpplint_postprocessor:
                     line_number = int(file_path[file_path.rfind(':')+1:])
                 except:
                     raise IOError(str(line)+' not in file '+filename)
-                file_path = file_path[len(maus_root_dir)+1:file_path.rfind(':')]
-                if file_path not in file_to_error: file_to_error[file_path] = []
+                file_path = file_path[len(MAUS_ROOT_DIR)+1:file_path.rfind(':')]
+                if file_path not in file_to_error:
+                    file_to_error[file_path] = []
                 file_to_error[file_path].append([line, line_number, ''])
         return file_to_error
 
-    def get_line_strings(self, file_to_error):
+    def get_line_strings(self, file_to_error): # pylint: disable=R0201
         """
         @brief Find lines of source code corresponding to a given error message
 
@@ -145,38 +145,39 @@ class cpplint_postprocessor:
         @returns a dict like {filename:[cpplint_error, line_number, line_text]}
         """
         for key in file_to_error.keys():
-            fh_out = open(os.path.join(maus_root_dir, key))
+            fh_out = open(os.path.join(MAUS_ROOT_DIR, key))
             lines = fh_out.readlines()
-            for i,value in enumerate(file_to_error[key]):
+            for i, value in enumerate(file_to_error[key]):
                 if value[1]-1 >= 0: #line 0 can sometimes be error
                     file_to_error[key][i][2] = lines[value[1]-1].rstrip('\n')
         return file_to_error
 
-    def print_error(self, file_to_error, fh=sys.stdout):
+    def print_error(self, file_to_error, file_handle=sys.stdout): # pylint: disable=R0201
         """
         @brief Print formatted output
 
         @params file_to_error dict like {filename:[cpplint_error, line_number, 
                 line_text]}
-        @params fh filehandle to which we write
+        @params file_handle filehandle to which we write
         """
-        for f,key in file_to_error.iteritems():
-            print >>fh,'File',f
-            for line in key: print >>fh,'   ',line[0]
+        for my_files, key in file_to_error.iteritems():
+            print >> file_handle, 'File', my_files
+            for line in key:
+                print >> file_handle, '   ', line[0]
 
-    def print_files_with_errors(self, file_to_error, fh):
+    def print_files_with_errors(self, file_to_error, file_handle): # pylint: disable=R0201
         """
         @brief Print list of files that have errors (hack used below to create
                exclude_files lists)
         """
-        print >>fh,'['
+        print >> file_handle, '['
         keys = sorted(file_to_error.keys())
         for key in keys:
             out_string = key.split('/')[-1]
-            print >>fh,"'"+out_string+"',",
-        print >>fh,'\n]'
+            print >> file_handle, "'"+out_string+"',",
+        print >> file_handle, '\n]'
 
-    def strip_ref_dict(self, ref_dict):
+    def strip_ref_dict(self, ref_dict): # pylint: disable=R0201
         """
         @brief strip the comment and name from reference values
 
@@ -185,9 +186,9 @@ class cpplint_postprocessor:
         @returns dict like {filename:[line]}
         """
         ref_dict_2 = {}
-        for fname,error_list in ref_dict.iteritems():
+        for fname, error_list in ref_dict.iteritems():
             error_list_2 = []
-            for i,error in enumerate(error_list):
+            for i, error in enumerate(error_list): # pylint: disable=W0612
                 error_list_2.append(error_list[i][0])
             ref_dict_2[fname] = error_list_2
         return ref_dict_2
@@ -203,23 +204,24 @@ class cpplint_postprocessor:
         """
         n_errors = 0
         ref_dict_2 = self.strip_ref_dict(ref_dict)
-        for key,test_item in test_dict.iteritems():
+        for key, test_item in test_dict.iteritems():
             n_errors += len(test_item)
             if key in ref_dict:
                 test_item_cp = copy.deepcopy(test_item)
-                for i,[error, line_number, line] in enumerate(test_item_cp):
+                for [error, line_number, line] in test_item_cp:
                     if line in ref_dict_2[key]:
                         test_item.remove([error, line_number, line])
                         n_errors -= 1
-        return n_errors,test_dict
+        return n_errors, test_dict
 
-    def process(self, cpplint_output_filename, cpplint_exceptions, processed_output_filename=None):
+    def process(self, cpplint_output_filename, _cpplint_exceptions,
+                processed_output_filename=None):
         """
         @brief Parse the cpplint output and check for exceptions
 
         @params cpplint_output_filename go through the cpplint output in this 
                 file and look for exceptions
-        @params cpplint_exceptions list of exceptions for the cpplint output
+        @params _cpplint_exceptions list of exceptions for the cpplint output
         @params processed_output_filename if not set to None, output will be 
                 written to this file
 
@@ -228,15 +230,14 @@ class cpplint_postprocessor:
         """
         file_to_error = self.get_line_numbers(cpplint_output_filename)
         file_to_error = self.get_line_strings(file_to_error)
-        n_errors,test_dict = self.compare_strings(file_to_error, cpplint_exceptions)
+        n_errors, test_dict = self.compare_strings(file_to_error, _cpplint_exceptions) # pylint: disable=W0612
         if processed_output_filename != None:
-            fh = open(processed_output_filename, 'w')
-            self.print_error(file_to_error, fh)
-            fh.close()
+            file_handle = open(processed_output_filename, 'w')
+            self.print_error(file_to_error, file_handle)
+            file_handle.close()
         return n_errors
 
-
-class test_cpp_style(unittest.TestCase): #pylint: disable=R0904
+class TestCppStyle(unittest.TestCase): #pylint: disable=R0904
     """@brief Interface to unittest module"""
     def test_glob_maus_root_dir(self):
         """
@@ -251,7 +252,7 @@ class test_cpp_style(unittest.TestCase): #pylint: disable=R0904
         @brief self check - test we walk the path correctly, excluding relevant 
               files and directories
         """
-        test_root_dir = os.path.join(maus_root_dir, 'tests', 'style')
+        test_root_dir = os.path.join(MAUS_ROOT_DIR, 'tests', 'style')
         test_exclude_dirs = \
                       [os.path.join('cpplint_test', 'cpplint_test_exclude_dir')]
         test_exclude_files = [os.path.join('cpplint_test', 'force_fail.cc')]
@@ -265,16 +266,21 @@ class test_cpp_style(unittest.TestCase): #pylint: disable=R0904
         """
         #First we make some errors
         style_dir = os.path.join \
-                              (maus_root_dir, 'tests', 'style', 'cpplint_test')
-        file_name = os.path.join(maus_root_dir, 'tmp', 'test_cpplint.out')
+                              (MAUS_ROOT_DIR, 'tests', 'style', 'cpplint_test')
+        file_name = os.path.join(MAUS_ROOT_DIR, 'tmp', 'test_cpplint.out')
         walker(style_dir, [], [], file_name)
         # now we try to postprocess
         test_exceptions = {'tests/style/cpplint_test/force_fail.cc':[
-                ('//No space at start - should fail', 'Deliberately broken for testing', 'Chris Rogers'),
-                ('//                                                                               more than 80 lines and space at end - should fail ', 'Deliberately broken for testing', 'Chris Rogers')
+                ('//No space at start - should fail',
+                 'Deliberately broken for testing', 'Chris Rogers'),
+                ('//                                                        '+ \
+                 '                       more than 80 lines and space at end '+\
+                 '- should fail ', 'Deliberately broken for testing',
+                 'Chris Rogers')
             ]
         }
-        n_errors = cpplint_postprocessor().process(file_name, test_exceptions, os.path.join(maus_root_dir, 'tmp', 'test_cpplint_out.out'))
+        n_errors = CpplintPostProcessor().process(file_name, test_exceptions,
+                     os.path.join(MAUS_ROOT_DIR, 'tmp', 'test_cpplint_out.out'))
         self.assertEqual(n_errors, 6)
 
     def test_cpp_style(self):
@@ -282,20 +288,22 @@ class test_cpp_style(unittest.TestCase): #pylint: disable=R0904
         @brief This is the main test - walks the directory structure and looks 
         for errors using cpplint
         """
-        file_name = os.path.join(maus_root_dir, 'tmp', 'cpplint.out')
-        walker(maus_root_dir, exclude_dirs, exclude_files, file_name)
-        test_result = cpplint_postprocessor().process(file_name, cpplint_exceptions.exceptions, processed_output_filename=file_name)
+        file_name = os.path.join(MAUS_ROOT_DIR, 'tmp', 'cpplint.out')
+        walker(MAUS_ROOT_DIR, EXCLUDE_DIRS, EXCLUDE_FILES, file_name)
+        test_result = CpplintPostProcessor().process(file_name,
+                      cpplint_exceptions.exceptions,
+                      processed_output_filename=file_name)
         self.assertEqual(test_result, 0,
             msg="Failed cpp style test - detailed output in file:\n"+file_name)
 
 
-maus_root_dir = os.environ['MAUS_ROOT_DIR']
+MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
 
 # exclude_dirs are directories that are explicitly excluded from the style
 # check, usually third party code and stuff hanging around from the build
 # process. Note you MUST get explicit approval from Chris Rogers
 # before adding something to exclude_dirs.
-exclude_dirs = [
+EXCLUDE_DIRS = [
 'third_party',
 'build',
 'doc',
@@ -314,77 +322,78 @@ os.path.join('tests', 'integration', 'test_optics', 'src'),
 #
 # If you do fix a file, please remove the file from this list (so it is included
 # in future regression tests)
-exclude_files = []
+EXCLUDE_FILES = []
 
 def file_append(path, file_list):
+    """Append path to file names in file_list"""
     exclude_list = []
-    for f in file_list:
-        exclude_list.append(os.path.join(path, f))
+    for a_file in file_list:
+        exclude_list.append(os.path.join(path, a_file))
     return exclude_list
 
-interface_files = [
+INTERFACE_FILES = [
 'Spline1D.cc', 'For003Bank.hh', 'For009Bank.hh', 'MiceEventManager.hh', 'VmeAdcHit.cc', 'MICESpill.hh', 'VirtualHit.cc', 'DataBaseAPI.hh', 'MCParticle.hh', 'Memory.cc', 'VmeTdcHit.hh', 'EventLoader.hh', 'AnalysisPlaneBank.hh', 'Differentiator.hh', 'VlpcEventTime.hh', 'TurtleBank.hh', 'Interpolator.hh', 'MiceEventManager.cc', 'DataBaseReader.cc', 'SplineInterpolator.cc', 'RFFieldMap.cc', 'RunFooter.cc', 'MCVertex.cc', 'EMRHit.hh', 'KLDigit.cc', 'MICESpill.cc', 'Reader.hh', 'VmeBaseHit.hh', 'MCHit.cc', 'SplineInterpolator.hh', 'Interpolator.cc', 'VmefAdcHit.hh', 'VmeBaseHit.cc', 'MICEEvent.cc', 'SciFiHit.hh', 'DataBaseReader.hh', 'VmeScalerData.hh', 'KillHit.hh', 'MVector.hh', 'CkovDigit.hh', 'MICERun.cc', 'dataCards.hh', 'Memory.hh', 'For003Bank.cc', 'MCParticle.cc', 'KLDigit.hh', 'TriangularMesh.cc', 'RFData.hh', 'CkovDigit.cc', 'CppErrorHandler.cc', 'MMatrixToCLHEP.cc', 'MiceMaterials.hh', 'TofHit.cc', 'RunHeader.hh', 'VmeScalerData.cc', 'ThreeDFieldMap.hh', 'AnalysisPlaneBank.cc', 'SpecialHit.hh', 'CkovHit.cc', 'For009Bank.cc', 'VlpcHit.cc', 'VmeAdcHit.hh', 'PolynomialVector.hh', 'EMRDigit.cc', 'TofDigit.hh', 'MICEUnits.cc', 'AnalysisEventBank.hh', 'PolynomialVector.cc', 'ZustandVektor.cc', 'MCHit.hh', 'CkovHit.hh', 'MMatrix.cc', 'MiceMaterials.cc', 'BetaFuncBank.hh', 'SciFiDigit.hh', 'G4BLBank.cc', 'VirtualHit.hh', 'TofHit.hh', 'StagePosition.hh', 'RunFooter.hh', 'KLHit.hh', 'Differentiator.cc', 'MVector.cc', 'XMLMessage.cc', 'Spline1D.hh', 'SciFiHit.cc', 'ZustandVektor.hh', 'RunHeader.cc', 'VlpcHit.hh', 'BetaFuncBank.cc', 'VersionInfo.hh', 'AnalysisEventBank.cc', 'MICEUnits.hh', 'MICERun.hh', 'MMatrixToCLHEP.hh', 'RFData.cc', 'RFFieldMap.hh', 'Mesh.cc', 'CppErrorHandler.hh', 'EMRDigit.hh', 'MCVertex.hh', 'MMatrix.hh', 'EventTime.hh', 'KLHit.cc', 'dataCards.cc', 'TriangularMesh.hh', 'MagFieldMap.cc', 'VersionInfo.cc', 'VmeTdcHit.cc', 'TurtleBank.cc', 'EMRHit.cc', 'ThreeDFieldMap.cc', 'EventTime.cc', 'VmefAdcHit.cc', 'MICEEvent.hh', 'G4BLBank.hh', 'MagFieldMap.hh', 'SciFiDigit.cc', 'SpecialHit.cc', 'Mesh.hh', 'XMLMessage.hh', 'TofDigit.cc', 'DataBaseAPI.cc',
 ]
 
-engmodel_files = [
+ENGMODEL_FILES = [
 'Polycone.cc', 'MiceElectroMagneticField.hh', 'Q35.cc', 'MultipoleAperture.cc', 'Polycone.hh', 'MultipoleAperture.hh', 'MiceModToG4Solid.hh', 'Q35.hh', 'MiceModToG4Solid.cc', 'MiceMagneticField.hh',
 ]
 
-beamtools_files = [
+BEAMTOOLS_FILES = [
 'BTConstantField.cc', 'BTPillBox.cc', 'BTMagFieldMap.hh', 'micegsl.cc', 'BT3dFieldMap.hh', 'BTQuad.hh', 'BTSheet.hh', 'BTPillBox.hh', 'BTFieldConstructor.cc', 'BTRFFieldMap.hh', 'BTFastSolenoid.cc', 'BTCombinedFunction.cc', 'BTTracker.cc', 'BTMagFieldMap.cc', 'BTFieldGroup.hh', 'micegsl.hh', 'BTConstantField.hh', 'BTFieldConstructor.hh', 'BTSpaceChargeField.hh', 'BTField.hh', 'BTPhaser.hh', 'BTMidplaneMap.cc', 'BTSheet.cc', 'BTFastSolenoid.hh', 'BTPhaser.cc', 'BTMidplaneMap.hh', 'BTField.cc', 'BTTracker.hh', 'BTCombinedFunction.hh', 'BTFieldGroup.cc', 'BTSpaceChargeField.cc', 'BT3dFieldMap.cc', 'BTQuad.cc', 'BTSolenoid.cc', 'BTRFFieldMap.cc', 'BTSolenoid.hh',
 ]
 
-simulation_files = [
+SIMULATION_FILES = [
 'MICEDetectorConstruction.hh', 'FillMaterials.cc', 'FillMaterials.hh', 'MICEDetectorConstruction.cc'
 ]
 
-recon_files = [
+RECON_FILES = [
 'SciFiDoubletCluster.cc', 'SciFiClusterRec.hh', 'TriggerKey.hh', 'TofPid.cc', 'KLChannelMap.hh', 'SciFiSeed.cc', 'Extrapolation.cc', 'TofRec.cc', 'PmtKey.cc', 'SciFiCMN.hh', 'SciFiTrack.hh', 'MousePid.hh', 'CkovChannelMap.hh', 'SciFiFieldMap.cc', 'SciFiNtupleFill.hh', 'SciFiPointRec.hh', 'SciFiDigitRec.hh', 'TofChannelMap.cc', 'KLCellHit.hh', 'KLRec.hh', 'TofCalibrationMap.hh', 'MouseTrack.hh', 'SciFiStraightTrackRec.cc', 'GlobalRec.hh', 'SciFiBadChans.cc', 'TofChannelMap.hh', 'TofTrigger.hh', 'PmtKey.hh', 'SciFiSeed.hh', 'TofSpacePoint.cc', 'SciFiDoubletCluster.hh', 'TofSpacePoint.hh', 'TriggerKey.cc', 'TofTrack.cc', 'SciFiRec.cc', 'EMRRec.cc', 'TofPid.hh', 'KalmanSeed.hh', 'SciFiKalTrack.cc', 'FProjector.cc', 'SciFiHelixTrackRec.cc', 'SciFiBadChans.hh', 'SciFiExtrap.hh', 'GlobalRec.cc', 'TofCalibrationMap.cc', 'SciFiHelixTrackRec.hh', 'TofTrack.hh', 'SciFiNtuple.hh', 'SciFiPointRec.cc', 'SciFiKalTrack.hh', 'SetupKalmanRec.hh', 'TofTrigger.cc', 'MouseTrack.cc', 'Extrapolation.hh', 'SciFiTrack.cc', 'SciFiCMN.cc', 'CkovChannelMap.cc', 'TofSlabHit.cc', 'SciFiStraightTrackRec.hh', 'SciFiDoubletMeas.hh', 'SciFiDigitRec.cc', 'CkovRec.cc', 'KLChannelMap.cc', 'TofRec.hh', 'TofSlabHit.hh', 'CkovRec.hh', 'KLCellHit.cc', 'EMRRec.hh', 'SciFiExtrap.cc', 'SciFiClusterRec.cc', 'SciFiRec.hh', 'KLRec.cc', 'SciFiSpacePoint.cc', 'SciFiDoubletMeas.cc', 'SciFiSpacePoint.hh', 'SetupKalmanRec.cc', 'SciFiFieldMap.hh', 'FProjector.hh',
 ]
 
-detmodel_files = [
+DETMODEL_FILES = [
 'MAUSSD.hh', 'MAUSSD.cc', 'KLSD.hh', 'DoubletFiberParam.cc', 'SpecialVirtualSD.hh', 'SpecialDummySD.hh', 'EMRSD.cc', 'TofSD.cc', 'CkovMirror.cc', 'CKOVSD.cc', 'SciFiSD.hh', 'KLFiber.cc', 'TofSD.hh', 'KLGlue.hh', 'DoubletFiberParam.hh', 'KLFiber.hh', 'KLSD.cc', 'EMRSD.hh', 'SciFiPlane.cc', 'SpecialVirtualSD.cc', 'KLGlue.cc', 'SciFiSD.cc', 'SciFiPlane.hh', 'CkovMirror.hh', 'CKOVSD.hh',
 ]
 
-calib_files = [
+CALIB_FILES = [
 'TpgDigitsParameters.hh', 'TofCalib.cc', 'VlpcCalib.hh', 'SciFiDigitizationParams.hh', 'VlpcCalib.cc', 'TofReconParams.cc', 'CKOV1DigitsParams.hh', 'TofDigitizationParams.cc', 'TpgReconstructionParams.hh', 'AnaParams.cc', 'CKOV1DigitsParams.cc', 'SciFiReconstructionParams.cc', 'TofDigitizationParams.hh', 'TpgDigitsParameters.cc', 'AnaParams.hh', 'CKOVDigitsParams.hh', 'CKOV2DigitsParams.cc', 'TofCalib.hh', 'TofReconParams.hh', 'SciFiDigitizationParams.cc', 'TpgReconstructionParams.cc', 'SciFiReconstructionParams.hh', 'CKOV2DigitsParams.hh', 'CKOVDigitsParams.cc',
 ]
 
-config_files = [
+CONFIG_FILES = [
 'BeamlineParameters.cc', 'ModuleTextFileIO.hh', 'SciFiCableManager.hh', 'CoolingChannelGeom.cc', 'VlpcCableOsaka2.cc', 'TofCable.cc', 'ModuleConverter.cc', 'ModuleConverter.hh', 'VlpcCableOsaka3.cc', 'RFBackgroundParameters.cc', 'TofCable.hh', 'BeamlineGeometry.hh', 'BeamlineGeometry.cc', 'VlpcCableOsaka.hh', 'SciFiCableManager.cc', 'RFParameters.hh', 'MagnetParameters.hh', 'BeamlineParameters.hh', 'BeamParameters.cc', 'MiceModule.hh', 'VlpcCableOsaka2.hh', 'CoolingChannelGeom.hh', 'VlpcCableImperial.hh', 'MagnetParameters.cc', 'ModuleTextFileIO.cc', 'VlpcCableImperial.cc', 'BeamParameters.hh', 'RFParameters.cc', 'VlpcCable.hh', 'VlpcCableOsaka3.hh', 'RFBackgroundParameters.hh', 'VlpcCableOsaka.cc', 'MiceModule.cc',
 ]
 
-optics_files = [
+OPTICS_FILES = [
 'AnalysisPlaneBank.cc', 'CovarianceMatrix.cc', 'Material.cc', 'MICEStackingAction.cc', 'MICETrackingAction.cc', 'OpticsModel.cc', 'PhaseSpaceVector.cc', 'Tensor3.cc', 'Tensor.cc', 'TransferMapCalculator.cc', 'TransferMap.cc', 'TransportManager.cc',
 'AnalysisPlaneBank.hh', 'CovarianceMatrix.hh', 'Material.hh', 'MICEStackingAction.hh', 'MICETrackingAction.hh', 'OpticsModel.hh', 'PhaseSpaceVector.hh', 'Tensor3.hh', 'Tensor.hh', 'TransferMapCalculator.hh', 'TransferMap.hh', 'TransportManager.hh',
 ]
 
-cpp_unit_files = [
+CPP_UNIT_FILES = [
 'MeshTest.cc', 'MAUSPrimaryGeneratorActionTest.cc', 'BTSolenoidTest.cc', 'JsonWrapperTest.cc', 'MAUSTrackingActionTest.cc', 'MAUSGeant4ManagerTest.cc', 'BTMultipoleTest.cc', 'MVectorTest.cc', 'DifferentiatorTest.cc', 'BTFieldConstructorTest.cc', 'MMatrixTest.cc', 'MiceModToG4SolidTest.cc', 'PolynomialTest.cc', 'BTTrackerTest.cc', 'MAUSSteppingActionTest.cc', 'CppErrorHandlerTest.cc', 'MiceModuleTest.cc', 'TriangularMeshTest.cc', 'dataCardsTest.cc',
 ]
 
-cp = os.path.join('src', 'legacy')
-test = os.path.join('tests', 'cpp_unit')
+CPP = os.path.join('src', 'legacy')
+TEST = os.path.join('tests', 'cpp_unit')
 
 # glob files here because of
-glob_files = []
-glob_files += file_append(os.path.join(cp, 'Recon', '*'), recon_files)
-glob_files += file_append(os.path.join(cp, 'DetModel'), detmodel_files)
-glob_files += file_append(os.path.join(cp, 'DetModel', '*'), detmodel_files)
-glob_files += file_append(os.path.join(test, '*'), cpp_unit_files)
+GLOB_FILES = []
+GLOB_FILES += file_append(os.path.join(CPP, 'Recon', '*'), RECON_FILES)
+GLOB_FILES += file_append(os.path.join(CPP, 'DetModel'), DETMODEL_FILES)
+GLOB_FILES += file_append(os.path.join(CPP, 'DetModel', '*'), DETMODEL_FILES)
+GLOB_FILES += file_append(os.path.join(TEST, '*'), CPP_UNIT_FILES)
 
-for f in glob_files:
-    exclude_files += glob_maus_root_dir(f)
+for f in GLOB_FILES:
+    EXCLUDE_FILES += glob_maus_root_dir(f)
 
-exclude_files += file_append(os.path.join(cp, 'Interface'), interface_files)
-exclude_files += file_append(os.path.join(cp, 'EngModel'), engmodel_files)
-exclude_files += file_append(os.path.join(cp, 'BeamTools'), beamtools_files)
-exclude_files += file_append(os.path.join(cp, 'Simulation'), simulation_files)
-exclude_files += file_append(os.path.join(cp, 'Calib'), calib_files)
-exclude_files += file_append(os.path.join(cp, 'Config'), config_files)
-exclude_files += file_append(os.path.join(cp, 'Optics'), optics_files)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'Interface'), INTERFACE_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'EngModel'), ENGMODEL_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'BeamTools'), BEAMTOOLS_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'Simulation'), SIMULATION_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'Calib'), CALIB_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'Config'), CONFIG_FILES)
+EXCLUDE_FILES += file_append(os.path.join(CPP, 'Optics'), OPTICS_FILES)
 
-exclude_files += file_append \
+EXCLUDE_FILES += file_append \
   (os.path.join('src', 'common_cpp', 'DataStructure'), ['MausDataStructure.cc'])
 
 if __name__ == "__main__":

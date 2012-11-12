@@ -19,6 +19,7 @@
 #include "src/legacy/Interface/SpecialHit.hh"
 #include "src/legacy/Interface/MiceEventManager.hh"
 #include "src/legacy/Optics/TransferMap.hh"
+#include "src/legacy/Config/MiceModule.hh"
 #include "Maths/Complex.hh"
 
 using MAUS::Matrix;
@@ -97,11 +98,11 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["field_tracker_absolute_error"] = 1.e-4;
   json_config["field_tracker_relative_error"] = 1.e-4;
 
-
   std::string str_config = JsonWrapper::JsonToString(json_config);
   MAUS::GlobalsManager::InitialiseGlobals(str_config);
   g4Manager = MAUS::Globals::GetInstance()->GetGeant4Manager();
   MAUS::GlobalsManager::SetLegacyCards(&MyDataCards);
+  Squeak::setStandardOutputs(json_config["verbose_level"].asInt());
   return MAUS::Globals::GetMonteCarloMiceModules();
 }
 
@@ -847,7 +848,7 @@ namespace Optimiser
   {
     f = 0;
     for(int i=0; i<npar; i++) g_parameters[i]->value = x[i];
-    PushParameters(g_root_mod, g_parameters);
+    PushParameters(g_parameters);
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
@@ -878,15 +879,13 @@ namespace Optimiser
   }
 
   //Recursively push parameters onto the MiceModules
-  void PushParameters(MiceModule* mod, std::vector<Parameter*> parameters)
+  void PushParameters(std::vector<Parameter*> parameters)
   {
-    std::vector<MiceModule*> daughters = mod->allDaughters();
-    for(int i=0; i<int(daughters.size()); i++)
-    {
-      for(int j=0; j<int(parameters.size()); j++) 
-        daughters[i]->addParameter(parameters[j]->name, parameters[j]->value);
-      PushParameters(daughters[i], parameters);
+    std::map<std::string, double> parameter_map;
+    for(int j=0; j<int(parameters.size()); j++) {
+        parameter_map[parameters[j]->name] = parameters[j]->value;
     }
+    ModuleTextFileIO::setEvaluator(parameter_map);
   }
 
   //Calculate scores based on optics output
@@ -968,25 +967,24 @@ int main(int argc, char **argv)
   Squeak::mout() << "||   Optics   ||" << std::endl;
   Squeak::mout() << "\\\\============//" << std::endl;
   Squeak::mout() << "Parsing control files" << std::endl;
-  MiceModule* root   = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
+  MiceModule* root = new MiceModule(MyDataCards.fetchValueString("MiceModel"));
   std::vector<MiceModule*> optim = root->findModulesByPropertyExistsNC("string", "Optimiser");
   if(optim.size()>0)
-  {
     Optimiser::g_parameters = Optimiser::BuildParameters(optim[0]);
-    Optimiser::PushParameters(root, Optimiser::g_parameters);
-  }
+  Optimiser::PushParameters(Optimiser::g_parameters);
+  delete root;
   Squeak::mout(Squeak::info) << "Building geometry" << std::endl;
-
+  MiceModule* mc = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
   //Try to run the optimiser
   Squeak::mout(Squeak::info) << "Looking for optimisation requests" << std::endl;
-  Optimiser::RunOptimiser(root);
+  Optimiser::RunOptimiser(mc);
   //Run an envelope through
   Squeak::mout(Squeak::info) << "Running beam envelope through" << std::endl;
   std::vector< ::CovarianceMatrix>  envelope;
   std::vector< ::TransferMap*>      tms;
-  Optics::Envelope(root, envelope, tms);
+  Optics::Envelope(mc, envelope, tms);
   //Write output
-  Output::MakeOutput(envelope, tms, root->findModulesByPropertyExists("string", "EnvelopeType")[0]);
+  Output::MakeOutput(envelope, tms, mc->findModulesByPropertyExists("string", "EnvelopeType")[0]);
   
 
   for(int i=0; i<int(tms.size()); i++) delete tms[i];

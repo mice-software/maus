@@ -40,8 +40,7 @@
 #include "src/legacy/Interface/STLUtils.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
-class JsonWrapper {
- public:
+namespace JsonWrapper {
   /** @brief List of data types allowed by json
    *
    *  List of data types allowed by json, with additional type "anyValue" for
@@ -69,13 +68,13 @@ class JsonWrapper {
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  static Json::Value StringToJson(std::string json_in) throw(Squeal);
+  Json::Value StringToJson(std::string json_in) throw(Squeal);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
    *  @param json_in Json::Value to convert to a string
    */
-  static std::string JsonToString(const Json::Value& val);
+  std::string JsonToString(const Json::Value& val);
 
   /** @brief Get an item from a Json array (variable length array)
    *
@@ -86,7 +85,7 @@ class JsonWrapper {
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
    *  failure
    */
-  static Json::Value GetItem(Json::Value array, size_t value_index,
+  Json::Value GetItem(Json::Value array, size_t value_index,
                                             JsonType value_type) throw(Squeal);
 
   /** @brief Get a property from a Json object (hash)
@@ -98,7 +97,7 @@ class JsonWrapper {
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
    */
-  static Json::Value GetProperty
+  Json::Value GetProperty
      (Json::Value object, std::string value_name,
                           JsonType value_type) throw(Squeal);
 
@@ -108,31 +107,31 @@ class JsonWrapper {
    *  @param json_vec objectValue with realValue children "x", "y", "z". Throws
    *         an exception if the conversion fails.
    */
-  static CLHEP::Hep3Vector JsonToThreeVector
+  CLHEP::Hep3Vector JsonToThreeVector
                                        (Json::Value json_vec) throw(Squeal);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
-  static JsonType ValueTypeToJsonType(Json::ValueType tp);
+  JsonType ValueTypeToJsonType(Json::ValueType tp);
 
   /** @brief Convert from Json::Value type to string
    */
-  static std::string ValueTypeToString(Json::ValueType tp);
+  std::string ValueTypeToString(Json::ValueType tp);
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  static Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
+  Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
 
   /** @brief Return true if types are equal or anyValue
    */
-  static bool SimilarType(JsonType jt1, JsonType jt2);
+  bool SimilarType(JsonType jt1, JsonType jt2);
 
   /** @brief Print the Json value to an ostream
    *
    *  Prints in json format to ostream out; so if passed to a stringstream, then
    *  StringToJson should read back in with no change
    */
-  static void Print(std::ostream& out, const Json::Value& val);
+  void Print(std::ostream& out, const Json::Value& val);
 
   /** @brief Check for equality between json values
    *
@@ -143,7 +142,7 @@ class JsonWrapper {
    *  @param tolerance float tolerance - requirement is that
    *         fabs(float_1-float_2) < tolerance
    */
-  static bool AlmostEqual
+  bool AlmostEqual
                    (Json::Value value_1, Json::Value value_2, double tolerance);
 
   /** @brief Check for equality between json arrays
@@ -151,7 +150,7 @@ class JsonWrapper {
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  static bool ArrayEqual
+  bool ArrayEqual
                    (Json::Value value_1, Json::Value value_2, double tolerance);
 
   /** @brief Check for equality between json objects
@@ -159,7 +158,7 @@ class JsonWrapper {
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  static bool ObjectEqual
+  bool ObjectEqual
                    (Json::Value value_1, Json::Value value_2, double tolerance);
 
 
@@ -171,20 +170,72 @@ class JsonWrapper {
    *  object but not the other put it in the merged object; if the property
    *  exists in both objects but is not an array, throw an exception.
    */
-  static Json::Value ObjectMerge(Json::Value object_1, Json::Value object_2);
+  Json::Value ObjectMerge(Json::Value object_1, Json::Value object_2);
 
   /** @brief Merge two json arrays
    *
    *  Put items from array_2 onto the back of array_1
    */
-  static Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
+  Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
 
- private:
+namespace Path {
+  // Nb: Path could be a class? But then we lose "using" functionality; OTOH we
+  // can make things properly private...
 
-  JsonWrapper();
-  ~JsonWrapper();
-  DISALLOW_COPY_AND_ASSIGN(JsonWrapper);
-};
+  /** @brief Get the path from a json value
+   *
+   *  Path is stored in the comment field
+   */
+  std::string GetPath(Json::Value json);
+
+  /** @brief Set the path to a json value
+   *
+   *  Path is stored in the comment field
+   */
+  void SetPath(Json::Value& json, std::string path);
+
+  /** @brief Append the path to a json value
+   *
+   *  Path is stored in the comment field
+   *  \param json Json::Value to which the path should be appended
+   *  \param branch_name name of a branch in a Json object
+   */
+  void AppendPath(Json::Value& json, std::string branch_name);
+
+  /** @brief Append the path to a json value
+   *
+   *  Path is stored in the comment field
+   *  \param json Json::Value to which the path should be appended
+   *  \param array_index index of a branch in a Json array
+   */
+  void AppendPath(Json::Value& json, size_t array_index);
+
+  /** @brief Return the json value corresponding to a given path
+   *
+   *  Return the json value located at a given path. If the path cannot be
+   *  accessed, throw a Squeal.
+   */
+  Json::Value& DereferencePath(Json::Value& json, std::string path);
+
+  /** @brief walk the Json structure setting path on all data
+   *
+   *  @param value json tree that will have path set
+   *  @param root_path path from root; all subsequent paths will be appended to
+   *         this one (set to "" to start from root)
+   */
+  void SetPathRecursive(Json::Value& json, std::string root_path);
+
+  /** @brief walk the Json structure stripping comments from all data
+   *
+   *  Metadata on json objects is stored in path information. This function
+   *  walks the data structure and strips out those comments.
+   */
+  void StripPathRecursive(Json::Value& json);
+
+  /** Private - do not call */
+  void _SetPathRecursive(Json::Value& json);
+}  // namespace Path
+}  // namespace JsonWrapper
 
 #endif
 

@@ -282,4 +282,112 @@ std::string JsonWrapper::ValueTypeToString(Json::ValueType tp) {
   return "";
 }
 
+std::string JsonWrapper::Path::GetPath(Json::Value json) {
+    if (!json.hasComment(Json::commentAfter)) {
+        return "";
+    }
+    std::string comment = json.getComment(Json::commentAfter);
+    Json::Value comment_json = StringToJson(comment.substr(3, comment.size()));
+    return comment_json["path"].asString();
+}
+
+void JsonWrapper::Path::SetPath(Json::Value& json, std::string path) {
+    Json::Value comment(Json::objectValue);
+    comment["path"] = path;
+    json.setComment("// "+JsonToString(comment), Json::commentAfter);
+}
+
+void JsonWrapper::Path::AppendPath(Json::Value& json, std::string branch_name) {
+    if (branch_name.find("/") != std::string::npos)
+        throw(Squeal(Squeal::recoverable,
+                     "/ not allowed in branch names",
+                     "JsonWrapper::AppendPath"));
+    std::string old_path = GetPath(json);
+    if (old_path == "") {
+        SetPath(json, "#"+branch_name);
+    } else {
+        SetPath(json, old_path+"/"+branch_name);
+    }
+}
+
+void JsonWrapper::Path::AppendPath(Json::Value& json, size_t array_index) {
+    AppendPath(json, STLUtils::ToString(array_index));
+}
+
+Json::Value& JsonWrapper::Path::DereferencePath
+                                         (Json::Value& json, std::string path) {
+    if (path[0] == '#')
+        path = path.substr(1, path.size());  // lstrip #
+    if (path[path.size()-1] == '/')
+        path = path.substr(0, path.size()-1);  // rstrip /
+    if (path == "")
+        return json;
+    std::string this_path = path;
+    std::string child_path = "";
+    if (path.find("/") != std::string::npos) {
+        this_path = path.substr(0, path.find('/'));
+        child_path = path.substr(path.find('/')+1, path.size());
+    }
+    switch (json.type()) {
+        case Json::arrayValue: {
+            Json::Value::UInt index = STLUtils::FromString<size_t>(this_path);
+            if (json.isValidIndex(index)) {
+                return DereferencePath(json[index], child_path);
+            }
+            break;
+        }
+        case Json::objectValue: {
+            if (json.isMember(this_path)) {
+                return DereferencePath(json[this_path], child_path);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    throw(Squeal(Squeal::recoverable,
+                 "Could not dig through path "+path+
+                 " from json value "+JsonToString(json),
+                 "JsonWrapper::DereferencePath"));
+}
+
+void JsonWrapper::Path::SetPathRecursive(Json::Value& json,
+                                         std::string root_path) {
+  SetPath(json, root_path);
+  _SetPathRecursive(json);
+}
+
+void JsonWrapper::Path::_SetPathRecursive(Json::Value& tree) {
+  std::string path = GetPath(tree);
+  switch (tree.type()) {
+      case Json::arrayValue: {
+          for (size_t i = 0; i < tree.size(); ++i) {
+              SetPath(tree[i], path);
+              AppendPath(tree[i], i);
+              _SetPathRecursive(tree[i]);
+          }
+          break;
+      }
+      case Json::objectValue: {
+          std::vector<std::string> properties = tree.getMemberNames();
+          for (size_t i = 0; i < properties.size(); ++i) {
+              SetPath(tree[properties[i]], path);
+              AppendPath(tree[properties[i]], properties[i]);
+              _SetPathRecursive(tree[properties[i]]);
+          }
+          break;
+      }
+      default: {
+          break;
+      }
+  }
+}
+
+void JsonWrapper::Path::StripPathRecursive(Json::Value& tree) {
+      tree.setComment("", Json::commentAfter);
+      for (Json::Value::iterator it = tree.begin(); it != tree.end(); ++it) {
+          StripPathRecursive(*it);
+      }
+}
+
 
