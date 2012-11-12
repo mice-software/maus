@@ -100,7 +100,8 @@ class PatternRecognition {
      *  @param strks - A vector of the output Pattern Recognition straight tracks
      *  @param htrks - A vector of the output Pattern Recognition helical tracks
      */
-    void make_5tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
+    void make_5tracks(const bool track_type, const int trker_no,
+                      SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &strks,
                       std::vector<SciFiHelicalPRTrack> &htrks);
 
@@ -115,7 +116,8 @@ class PatternRecognition {
      *  @param strks - A vector of the output Pattern Recognition straight tracks
      *  @param htrks - A vector of the output Pattern Recognition helical tracks
      */
-    void make_4tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
+    void make_4tracks(const bool track_type, const int trker_no,
+                      SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &strks,
                       std::vector<SciFiHelicalPRTrack> &htrks);
 
@@ -130,7 +132,8 @@ class PatternRecognition {
      *  @param strks - A vector of the output Pattern Recognition straight tracks
      *  @param htrks - A vector of the output Pattern Recognition helical tracks
      */
-    void make_3tracks(const bool track_type, SpacePoint2dPArray &spnts_by_station,
+    void make_3tracks(const bool track_type, const int trker_no,
+                      SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack> &strks,
                       std::vector<SciFiHelicalPRTrack> &htrks);
 
@@ -144,9 +147,10 @@ class PatternRecognition {
      *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
      *  @param trks - A vector of the output Pattern Recognition tracks
      */
-    void make_straight_tracks(const int num_points, const std::vector<int> ignore_stations,
-                     SpacePoint2dPArray &spnts_by_station,
-                     std::vector<SciFiStraightPRTrack> &strks);
+    void make_straight_tracks(const int num_points, const int trker_no,
+                              const std::vector<int> ignore_stations,
+                              SpacePoint2dPArray &spnts_by_station,
+                              std::vector<SciFiStraightPRTrack> &strks);
 
     /** @brief Least-squares straight line fit
      *
@@ -176,7 +180,8 @@ class PatternRecognition {
      *  @param trks The track holding the initial helix parameters and spacepoints used
      *
      */
-    void make_helix(const int num_points, const std::vector<int> ignore_stations,
+    void make_helix(const int num_points, const int trker_no,
+                    const std::vector<int> ignore_stations,
                     SpacePoint2dPArray &spnts_by_station,
                     std::vector<SciFiHelicalPRTrack> &htrks);
 

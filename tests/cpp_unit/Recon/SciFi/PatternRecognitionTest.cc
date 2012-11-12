@@ -118,7 +118,7 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   double line_y_chisq = 20.99052559;
 
   // Check it matches to within a tolerance epsilon
-  double epsilon = 0.001;
+  double epsilon = 0.1;
   ASSERT_EQ(1, strks.size());
   EXPECT_EQ(0, htrks.size());
   EXPECT_NEAR(line_x0, strks[0].get_x0(), epsilon);
@@ -283,6 +283,7 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
 
   // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
   int num_points = 4;
+  int tracker_num = 0;
   double y0 = -58.85201389;
   double x0 = -68.94108927;
   double my = 0.03755825;
@@ -303,7 +304,7 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_4tracks(track_type, spnts_by_station, strks, htrks);
+  pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1, strks.size());
@@ -331,7 +332,7 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_4tracks(track_type, spnts_by_station, strks, htrks);
+  pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1, strks.size());
@@ -366,6 +367,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 
   // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
   int num_points = 3;
+  int tracker_num = 0;
   double y0 = -58.85201389;
   double x0 = -68.94108927;
   double my = 0.03755825;
@@ -375,7 +377,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 
   // Make a 3 point track with 3 spacepoints
   // ---------------------------------------
-  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1, strks.size());
@@ -402,7 +404,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1, strks.size());
@@ -415,7 +417,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   EXPECT_NEAR(my, strks[0].get_my(), 0.005);
   EXPECT_NEAR(0.0015, strks[0].get_y_chisq(), 0.001);
 
-    // Make a 3 point track with 5 spacepoints
+  // Make a 3 point track with 5 spacepoints
   // ---------------------------------------
   spnts.push_back(_sp4);
   _sp1->set_used(false);
@@ -430,7 +432,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_3tracks(track_type, spnts_by_station, strks, htrks);
+  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1, strks.size());
@@ -447,6 +449,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
 
   int n_stations = 5;
+  int tracker_num = 0;
   PatternRecognition pr;
 
   // Set up the spacepoints vector
@@ -483,7 +486,7 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   double mx = -0.02902014;
 
   // Make the track from the spacepoints
-  pr.make_straight_tracks(num_points, ignore_stations, spnts_by_station, strks);
+  pr.make_straight_tracks(num_points, tracker_num, ignore_stations, spnts_by_station, strks);
 
   // Check it matches to within a tolerance epsilon
   double epsilon = 0.000001;

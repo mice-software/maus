@@ -42,13 +42,13 @@ def run():
     # Global Digits - post detector digitisation
 
     # my_reduce = MAUS.ReduceCppMCTracker()
-    # my_reduce = MAUS.ReduceCppPatternRecognition()
+    my_reduce = MAUS.ReduceCppPatternRecognition()
     # my_reduce = MAUS.ReducePyHistogramTDCADCCounts()
-    my_reduce = MAUS.ReducePyDoNothing()
+    # my_reduce = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputPyJSON()
-    # my_output = MAUS.OutputCppRoot()
+    # my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
     # my_output = MAUS.OutputPyImage()
 
     # Can specify datacards here or by using appropriate command line calls.
