@@ -47,7 +47,7 @@ class GDMLtomaus(): #pylint: disable = R0903
         @param Path This is the path to the folder which contains the GDMLS to 
                     be converted.            
         """
-        self.field_file = None
+        self.maus_information_file = None
         self.config_file = None
         self.material_file = None
         self.material_file_path = None
@@ -66,13 +66,13 @@ class GDMLtomaus(): #pylint: disable = R0903
             if fname == 'fastradModel.gdml' or fname == 'FastradModel.gdml':
                 found_file = self.path + '/' + fname
                 self.config_file = found_file
-            if fname.find('Field') >= 0:
+            if fname.find('Maus_Information') >= 0:
                 found_file = self.path + '/' + fname
-                self.field_file = found_file
+                self.maus_information_file = found_file
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Fastrad') < 0 \
-               and fname.find('Field') < 0 \
+               and fname.find('Maus_Information') < 0 \
                and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml':
                 stepfile = self.path + '/' + fname
