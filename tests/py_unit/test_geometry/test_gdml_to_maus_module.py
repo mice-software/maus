@@ -47,10 +47,13 @@ class  TestGDMLToMausModule(unittest.TestCase):#pylint:disable = C0103,R0904
         config_file = test_cases_dir+'/testGDMLtoMAUSModule/fastradModel.gdml'
         shutil.copyfile(self.copy_files.config_file, config_file)
         length = len(self.copy_files.step_files)
+        print length
         for num in range (0, length):
             step_file = test_cases_dir+'/testGDMLtoMAUSModule/Step_' + \
                                                               str(num) + '.gdml'
+            print step_file
             shutil.copyfile(self.copy_files.step_files[num], step_file)
+            
         self.testcase = test_cases_dir+'/testGDMLtoMAUSModule'
         self.test_conversion = GDMLtomaus(self.testcase)
         
