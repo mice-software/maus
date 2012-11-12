@@ -45,7 +45,7 @@ class Formatter: #pylint: disable = R0902
         self.path_in = path_in
         self.path_out = path_out + '/'
         self.beamline_file = None
-        self.field_file = None
+        self.maus_information_file = None
         self.configuration_file = None
         self.material_file = None
         self.stepfiles = []
@@ -64,21 +64,24 @@ class Formatter: #pylint: disable = R0902
                         os.path.join(self.path_out, fname)   )
             elif fname.find('fastrad') >= 0 or fname.find('Fastrad') >= 0:
                 self.configuration_file = fname
-            elif fname.find('Field') >= 0 or fname.find('field') >= 0:
-                self.field_file = fname
+            elif fname.find('Maus_Information') >= 0 or \
+                                            fname.find('maus_information') >= 0\
+                        or fname.find('Field') >= 0 or fname.find('field') >= 0:
+                self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
             else:
                 self.stepfiles.append(fname)
-        if self.field_file == None:
-            self.field_file = 'Field.gdml'
-            field_location = os.environ['MAUS_ROOT_DIR'] + \
+        if self.maus_information_file == None:
+            self.maus_information_file = 'Maus_Information.gdml'
+            maus_information_location = os.environ['MAUS_ROOT_DIR'] + \
             '/tests/py_unit/test_geometry/testCases/mausModuleSource'
-            shutil.copy(os.path.join(field_location, self.field_file), 
-                        os.path.join(self.path_in, self.field_file)  )
+            shutil.copy(os.path.join(maus_information_location, \
+                                               self.maus_information_file), 
+                        os.path.join(self.path_in, self.maus_information_file) )
             print 'Maus_Information file not found' + \
-                  'Field.gdml has been copied from ' + \
-                  field_location
+                  'Maus_Information.gdml has been copied from ' + \
+                  maus_information_location
                     
     def format_schema_location(self, gdmlfile):
         """
@@ -106,6 +109,11 @@ class Formatter: #pylint: disable = R0902
         This is mainly so we can add computer specific environment
         variables into the translated gdml files.
         """
+        maus_information = minidom.parse(os.path.join(self.path_out, \
+                                                    self.maus_information_file))
+        file_numbers = None
+        for node in maus_information.getElementsByTagName("FileNumbers"):
+            file_numbers = node
         doc = minidom.Document()
         top_node = doc.createElement("Other_Information")
         doc.appendChild(top_node)
@@ -116,25 +124,30 @@ class Formatter: #pylint: disable = R0902
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))
         top_node.appendChild(g4_step)
-        field = minidom.parse(os.path.join(self.path_out, self.field_file))
-        old_node = field.childNodes[0].childNodes[7]
+        if file_numbers != None:
+            top_node.appendChild(file_numbers)
+        maus_information = minidom.parse(os.path.join(self.path_out, \
+                                                   self.maus_information_file))
+        old_node = maus_information.childNodes[0].childNodes[7]
         new_node = doc.childNodes[0]
-        base_node = field.childNodes[0]
+        base_node = maus_information.childNodes[0]
         base_node.replaceChild(new_node, old_node)
-        fout = open(os.path.join(self.path_out, self.field_file), 'w')
-        field.writexml(fout)
+        fout = open(os.path.join(self.path_out, self.maus_information_file),'w')
+        maus_information.writexml(fout)
         fout.close()
          
     def merge_maus_info(self, gdmlfile):
         """
         @method merge_maus_info
         
-        This method adds the field information to the configuration GDML.
+        This method adds the maus_information information to the 
+        configuration GDML.
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile)) 
-        field = minidom.parse(os.path.join(self.path_out, self.field_file))
-        for node in field.getElementsByTagName("MICE_Information"):
+        maus_information = minidom.parse(os.path.join(self.path_out, \
+                                                    self.maus_information_file))
+        for node in maus_information.getElementsByTagName("MICE_Information"):
             maus_info = node
         root_node = config.childNodes[2]
         root_node.insertBefore(maus_info, root_node.childNodes[9])
@@ -146,7 +159,7 @@ class Formatter: #pylint: disable = R0902
         """
         @method merge_maus_info
         
-        This method adds the run information to the field GDML.
+        This method adds the run information to the maus_information_file GDML.
         """
         run_info = False
         fin = open(os.path.join(self.path_in, gdmlfile))
@@ -155,7 +168,8 @@ class Formatter: #pylint: disable = R0902
                 run_info = True
         fin.close()
         if run_info == False:
-            field = minidom.parse(os.path.join(self.path_in, gdmlfile))
+            maus_information = \
+                             minidom.parse(os.path.join(self.path_in, gdmlfile))
             beamline_path = os.path.join(self.path_in, self.beamline_file)
             beamline = minidom.parse(beamline_path)
             for node in beamline.getElementsByTagName("run"):
@@ -163,10 +177,10 @@ class Formatter: #pylint: disable = R0902
             if type(run_info) == bool:
                 raise IOError("Run number you have selected is not on the CDB")
             else:
-                root_node = field.childNodes[0].childNodes[1]
+                root_node = maus_information.childNodes[0].childNodes[1]
                 root_node.insertBefore(run_info, root_node.childNodes[0])
                 fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-                field.writexml(fout)
+                maus_information.writexml(fout)
                 fout.close()
         print 'Run information merged!'
      
@@ -254,12 +268,12 @@ class Formatter: #pylint: disable = R0902
         the class constructor.
         """
         self.format_check(self.configuration_file)
-
+        
         if self.beamline_file != None:
-            self.merge_run_info(self.field_file)
+            self.merge_run_info(self.maus_information_file)
         else:
-            shutil.copy(os.path.join(self.path_in, self.field_file), 
-                       os.path.join(self.path_out, self.field_file))
+            shutil.copy(os.path.join(self.path_in, self.maus_information_file), 
+                       os.path.join(self.path_out, self.maus_information_file))
 
         if self.formatted == False:
             self.format_schema_location(self.configuration_file)
