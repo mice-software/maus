@@ -38,8 +38,7 @@
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMonitor.hh"
-
-// namespace ublas = boost::numeric::ublas;
+#include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
 
 namespace MAUS {
 
@@ -56,7 +55,7 @@ class KalmanTrackFit {
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
-  void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
+  void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites, KalmanSciFiAlignment &kalman_align);
 
   void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites, double &momentum);
 
@@ -67,13 +66,15 @@ class KalmanTrackFit {
 
   void filter(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
+  void filter_updating_misalignments(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+
+  void update_alignment_parameters(std::vector<KalmanSite> &sites, KalmanTrack *track,
+                                   KalmanSciFiAlignment &kalman_align);
 
  protected:
   double _seed_cov;
-
-
-
 };
 
 } // ~namespace MAUS

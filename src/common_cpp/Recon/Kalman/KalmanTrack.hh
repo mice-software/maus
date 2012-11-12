@@ -46,11 +46,15 @@ class KalmanTrack {
 
   void calc_filtered_state(KalmanSite *a_site);
 
+  void update_misaligments(KalmanSite *a_site);
+
   void update_V(KalmanSite *a_site);
 
   void update_covariance(KalmanSite *a_site);
 
   void update_H(KalmanSite *a_site);
+
+  void update_W(KalmanSite *a_site);
 
   void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
 
@@ -90,6 +94,10 @@ class KalmanTrack {
 
   void prepare_for_smoothing(std::vector<KalmanSite> &sites);
 
+  TMatrixD get_pull(KalmanSite *a_site);
+
+  TMatrixD get_kalman_gain(KalmanSite *a_site);
+
  protected:
   TMatrixD _H;
 
@@ -107,18 +115,15 @@ class KalmanTrack {
 
   TMatrixD _K;
 
+  TMatrixD _W;
+
   double _chi2, _ndf;
 
   int _tracker;
 
   double _mass, _momentum;
 
-  // static const double sigma_x = 0.64; // x measurement resolution (mm)
-  // double _conv_factor; // = 2./(7.*0.427); // mm to channel convertion factor.
-
   double _active_radius; // = 150.;
-
-  //double _channel_width; // = 1.333; // (1.4945) effective channel width without overlap
 };
 
 } // ~namespace MAUS

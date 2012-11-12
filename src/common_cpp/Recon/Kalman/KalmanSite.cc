@@ -35,6 +35,9 @@ KalmanSite::KalmanSite(): _z(0.), _id(0), _type(-1), _pitch(0.),
   _s.ResizeTo(3, 1);
   _r.ResizeTo(3, 1);
 
+  _Cov_s.ResizeTo(3, 3);
+  _Cov_r.ResizeTo(3, 3);
+
   _mc_pos = (0., 0., 0.);
   _mc_mom = (0., 0., 0.);
 }
@@ -53,7 +56,6 @@ void KalmanSite::set_type(int type) {
   }
 }
 
-
 KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_projected(0.), _id(0),
                                                _type(-1), _pitch(0.),
                           _residual_x(0.), _residual_y(0.), _direction((0., 0., 0.)),
@@ -63,6 +65,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _v.ResizeTo(2, 1);
   _s.ResizeTo(3, 1);
   _r.ResizeTo(3, 1);
+  _Cov_s.ResizeTo(3, 3);
+  _Cov_r.ResizeTo(3, 3);
   _projected_C.ResizeTo(5, 5);
   _smoothed_C.ResizeTo(5, 5);
   _projected_a.ResizeTo(5, 1);
@@ -76,6 +80,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
   _smoothed_C  = site.get_smoothed_covariance_matrix();
+  _Cov_s = site.get_S_covariance();
+  _Cov_r = site.get_R_covariance();
   _projected_a = site.get_projected_a();
   _smoothed_a  = site.get_smoothed_a();
   _z = site.get_z();
@@ -107,6 +113,8 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _alpha = _v(0, 0);
   _projected_C = site.get_projected_covariance_matrix();
   _smoothed_C  = site.get_smoothed_covariance_matrix();
+  _Cov_s = site.get_S_covariance();
+  _Cov_r = site.get_R_covariance();
   _projected_a = site.get_projected_a();
   _smoothed_a  = site.get_smoothed_a();
   _z = site.get_z();
@@ -127,6 +135,14 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   return *this;
 }
 
+/*
+void KalmanSite::set_misalignments(KalmanSciFiAlignment &kalman_align) {
+  int id = this->get_id();
 
-
+  _s = kalman_align.get_shifts(id);
+  _r = kalman_align.get_rotations(id);
+  _Cov_s = kalman_align.get_cov_shifts(id);
+  _Cov_r = kalman_align.get_cov_rotat(id);
+}
+*/
 } // ~namespace MAUS

@@ -85,12 +85,12 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
     std::cerr << "SITE smoothed alpha: " << site.get_smoothed_alpha() << std::endl;
     std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
-    std::cerr << "================Projection================" << std::endl;
-    site.get_projected_a().Print();
-    site.get_projected_covariance_matrix().Print();
-    std::cerr << "=================Filtered=================" << std::endl;
-    site.get_a().Print();
-    site.get_covariance_matrix().Print();
+    // std::cerr << "================Projection================" << std::endl;
+    // site.get_projected_a().Print();
+    // site.get_projected_covariance_matrix().Print();
+    // std::cerr << "=================Filtered=================" << std::endl;
+    // site.get_a().Print();
+    // site.get_covariance_matrix().Print();
     std::cerr << "==========================================" << std::endl;
   }
 }
@@ -130,16 +130,15 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
 
     int id = site.get_id();
 
-    //std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
-
     if ( id < 15 ) {
       mc_x  = -mc_x;
       mc_px = -mc_px;
       mc_pz = -mc_pz;
     }
-    // assert(a_smooth(0, 0) ==  a_smooth(0, 0));
-    // assert(a_proj(0, 0) == a_proj(0, 0));
+    // assert(a_smooth(0, 0) ==  a_smooth(0, 0) && "Sanity check - smoothing");
+    // assert(a_proj(0, 0)   == a_proj(0, 0)    && "Sanity check - projection.");
 /*
+    std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
     out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
          << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " "
          << a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " " << a(3, 0)
@@ -149,22 +148,22 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
          << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
 */
-    double x_proj = a_proj(0, 0);
-    double y_proj =a_proj(2, 0);
-    double px_proj=a_proj(1, 0);
-    double py_proj=a_proj(3, 0);
+    double x_proj    = a_proj(0, 0);
+    double y_proj    = a_proj(2, 0);
+    double px_proj   = a_proj(1, 0);
+    double py_proj   = a_proj(3, 0);
     double kappa_proj= a_proj(4, 0);
 
-    double x_filt=a(0, 0);
-    double y_filt=a(2, 0);
-    double px_filt=a(1, 0);
-    double py_filt=a(3, 0);
-    double kappa_filt=a(4, 0);
+    double x_filt    = a(0, 0);
+    double y_filt    = a(2, 0);
+    double px_filt   = a(1, 0);
+    double py_filt   = a(3, 0);
+    double kappa_filt= a(4, 0);
 
-    double x_smooth=a_smooth(0, 0);
-    double y_smooth=a_smooth(2, 0);
-    double px_smooth=a_smooth(1, 0);
-    double py_smooth=a_smooth(3, 0);
+    double x_smooth  = a_smooth(0, 0);
+    double y_smooth  = a_smooth(2, 0);
+    double px_smooth = a_smooth(1, 0);
+    double py_smooth = a_smooth(3, 0);
     double kappa_smooth=a_smooth(4, 0);
 
     pull_hist->Fill(id, pull);
@@ -216,7 +215,46 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
 
 void KalmanMonitor::save() {
   TFile f("kalman_histograms.root", "RECREATE");
-  f.Write();
+  pull_hist->Write();
+  pull2_hist->Write();
+
+  x_proj_h->Write();
+  y_proj_h->Write();
+  px_proj_h->Write();
+  py_proj_h->Write();
+  pz_proj_h->Write();
+
+  x_filt_h->Write();
+  y_filt_h->Write();
+  px_filt_h->Write();
+  py_filt_h->Write();
+  pz_filt_h->Write();
+
+  x_smooth_h->Write();
+  y_smooth_h->Write();
+  px_smooth_h->Write();
+  py_smooth_h->Write();
+  pz_smooth_h->Write();
+  ///////////////
+  x_proj_h1->Write();
+  y_proj_h1->Write();
+  px_proj_h1->Write();
+  py_proj_h1->Write();
+  pz_proj_h1->Write();
+
+  x_filt_h1->Write();
+  y_filt_h1->Write();
+  px_filt_h1->Write();
+  py_filt_h1->Write();
+  pz_filt_h1->Write();
+
+  x_smooth_h1->Write();
+  y_smooth_h1->Write();
+  px_smooth_h1->Write();
+  py_smooth_h1->Write();
+  pz_smooth_h1->Write();
+
+  f.Close();
 }
 
 } // ~namespace MAUS
