@@ -89,7 +89,7 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
-
+  
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
 

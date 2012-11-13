@@ -77,7 +77,6 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
   // parse the JSON document.
   try {
     configuration_ = JsonWrapper::StringToJson(configuration);
-/*
     Json::Value physics_processes = configuration_["physics_processes"];
     if ((physics_processes != Json::Value("mean_energy_loss"))
         && (physics_processes != Json::Value("none"))) {
@@ -87,7 +86,6 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
                   "of the test particles with walls.",
                   "MAUS::MapCppGlobalTrackReconstructor::birth()"));
     }
-*/
     SetupOpticsModel();
     SetupTrackFitter();
   } catch(Squeal& squee) {

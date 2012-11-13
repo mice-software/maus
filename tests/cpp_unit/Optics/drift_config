@@ -1,7 +1,7 @@
 {
-"output_json_file_name": "tests/cpp_unit/Optics/drift_output.json",
+"output_json_file_name": "${MAUS_ROOT_DIR}/tests/cpp_unit/Optics/drift_output.json",
 "output_json_file_type": "text",
-"simulation_geometry_filename": "tests/cpp_unit/Optics/Drift.dat",
+"simulation_geometry_filename": "${MAUS_ROOT_DIR}/tests/cpp_unit/Optics/Drift.dat",
 "verbose_level": 0,
 "physics_processes": "none",
 "reference_physics_processes": "none",

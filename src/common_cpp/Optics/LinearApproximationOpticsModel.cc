@@ -26,6 +26,7 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Recon/Global/TrackPoint.hh"
 #include "Maths/Vector.hh"
 
 #include "Interface/Squeal.hh"
@@ -67,49 +68,38 @@ CovarianceMatrix LinearApproximationTransferMap::Transport(
 
 PhaseSpaceVector LinearApproximationTransferMap::Transport(
     const PhaseSpaceVector & vector) const {
-fprintf(stdout, "CHECKPOINT Transport() 0\n");
-fflush(stdout);
   // Use the energy and momentum to determine when and where the particle would
   // be if it were traveling in free space from start_plane_ to end_plane_.
   PhaseSpaceVector transported_vector(vector);
   double delta_z = end_plane_ - start_plane_;
-std::cout << "Delta Z: " << delta_z << " mm" << std::endl;
 
   const double px = vector.Px();
   const double py = vector.Py();
 
-  double time = vector.t();
-std::cout << "Time: " << time << " ns" << std::endl;
   double energy = vector.E();
-std::cout << "Energy: " << energy << " MeV" << std::endl;
+  if (mass_ > energy) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "Attempting to transport a particle that is off mass shell.",
+                 "MAUS::LinearApproximationOpticsModel::Transport()"));
+  }
   const double momentum = ::sqrt(energy*energy - mass_*mass_);
-std::cout << "Momentum: " << momentum << " MeV/c" << std::endl;
   const double beta = momentum / energy;
-std::cout << "Beta: " << beta << std::endl;
-std::cout << "c: " << ::CLHEP::c_light << " mm/ns" << std::endl;
-std::cout << "Velocity: " << beta * ::CLHEP::c_light << " mm/ns" << std::endl;
 
   // delta_t = delta_z / v_z ~= delta_z / velocity
   double delta_t = delta_z / beta / ::CLHEP::c_light;
-std::cout << "Delta T: " << delta_t << " ns" << std::endl;
 
   const double gamma = energy / mass_;
-std::cout << "Gamma: " << gamma << std::endl;
 
   // delta_x = v_x * delta_t, px = gamma * m * v_x
   double delta_x = px * delta_t / gamma / mass_;
-std::cout << "Delta X: " << delta_x << " mm" << std::endl;
 
   // delta_y = v_y * delta_t, py = gamma * m v_y
   double delta_y = py * delta_t / gamma / mass_;
-std::cout << "Delta Y: " << delta_y << " mm" << std::endl;
 
   transported_vector[0] += delta_t;
   transported_vector[2] += delta_x;
   transported_vector[4] += delta_y;
 
-fprintf(stdout, "CHECKPOINT Transport() 999\n");
-fflush(stdout);
   return transported_vector;
 }
 

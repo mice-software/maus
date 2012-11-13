@@ -6,14 +6,14 @@ Configuration Drift
   Module DriftStart
   {
     Volume None
-		Position 0. 0. -1.0 m
+    Position 0. 0. -1.0 m
     PropertyString SensitiveDetector   Virtual
     PropertyString IndependentVariable Z
   }
   Module DriftEnd
   {
     Volume None
-		Position 0. 0. 1.0 m
+    Position 0. 0. 1.0 m
     PropertyString SensitiveDetector   Virtual
     PropertyString IndependentVariable Z
   }
