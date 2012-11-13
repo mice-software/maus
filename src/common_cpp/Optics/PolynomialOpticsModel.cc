@@ -182,7 +182,7 @@ const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
     TrackPoint first_plane_hit
       = TrackPoint(first_plane_hits[row % base_block_length] + summand);
 
-    first_plane_hits.push_back(TrackPoint(first_plane_hit,
+    first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
                                 reference_particle_.z(),
                                 reference_particle_.particle_id()));
   }

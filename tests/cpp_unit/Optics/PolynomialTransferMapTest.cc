@@ -103,31 +103,35 @@ const double PolynomialTransferMapTest::reflected_covariance_matrix_data_[36] = 
 const MAUS::Matrix<double>
 PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_
   = MAUS::Matrix<double>(6, 7,
-      PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_data_);
+    PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_data_);
 
 const MAUS::PolynomialMap PolynomialTransferMapTest::reflection_polynomial_map_
   = MAUS::PolynomialMap(6,
       PolynomialTransferMapTest::reflection_polynomial_coefficient_matrix_);
 
-const MAUS::PhaseSpaceVector PolynomialTransferMapTest::null_reference_trajectory_
+const MAUS::PhaseSpaceVector
+PolynomialTransferMapTest::null_reference_trajectory_
   = MAUS::PhaseSpaceVector(
       PolynomialTransferMapTest::null_reference_trajectory_data_);
 
 const MAUS::PhaseSpaceVector PolynomialTransferMapTest::phase_space_vector_
   = MAUS::PhaseSpaceVector(PolynomialTransferMapTest::phase_space_vector_data_);
 
-const MAUS::PhaseSpaceVector PolynomialTransferMapTest::reflected_phase_space_vector_
+const MAUS::PhaseSpaceVector
+PolynomialTransferMapTest::reflected_phase_space_vector_
   = MAUS::PhaseSpaceVector(PolynomialTransferMapTest::
       reflected_phase_space_vector_data_);
 
 const MAUS::CovarianceMatrix PolynomialTransferMapTest::covariance_matrix_
   = MAUS::CovarianceMatrix(PolynomialTransferMapTest::covariance_matrix_data_);
 
-const MAUS::CovarianceMatrix PolynomialTransferMapTest::reflected_covariance_matrix_
+const MAUS::CovarianceMatrix
+PolynomialTransferMapTest::reflected_covariance_matrix_
   = MAUS::CovarianceMatrix(
       PolynomialTransferMapTest::reflected_covariance_matrix_data_);
 
-const MAUS::PolynomialTransferMap PolynomialTransferMapTest::reflection_transfer_map_
+const MAUS::PolynomialTransferMap
+PolynomialTransferMapTest::reflection_transfer_map_
   = MAUS::PolynomialTransferMap(
       PolynomialTransferMapTest::reflection_polynomial_map_,
       PolynomialTransferMapTest::null_reference_trajectory_);
@@ -137,36 +141,32 @@ const MAUS::PolynomialTransferMap PolynomialTransferMapTest::reflection_transfer
 // ***********
 
 TEST_F(PolynomialTransferMapTest, PhaseSpaceVectorTransport) {
-  // test delta-only transport (reference trajectory == transported vector)
-  MAUS::PolynomialTransferMap no_delta_map(PolynomialTransferMapTest::reflection_polynomial_map_,
-                                 PolynomialTransferMapTest::phase_space_vector_);
-  MAUS::PhaseSpaceVector transported_phase_space_vector
-    = no_delta_map.Transport(phase_space_vector_);
-  EXPECT_TRUE(transported_phase_space_vector == phase_space_vector_);
-
   // test simple reflection transport of a phase space vector
-  transported_phase_space_vector
+  MAUS::PhaseSpaceVector transported_phase_space_vector
     = reflection_transfer_map_.Transport(phase_space_vector_);
-  EXPECT_TRUE(transported_phase_space_vector == reflected_phase_space_vector_);
+  EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
 }
 
 TEST_F(PolynomialTransferMapTest, Constructors) {
-  MAUS::PolynomialTransferMap no_delta_map(PolynomialTransferMapTest::reflection_polynomial_map_,
-                                 PolynomialTransferMapTest::phase_space_vector_,
-                                 PolynomialTransferMapTest::phase_space_vector_);
+  MAUS::PolynomialTransferMap no_delta_map(
+      PolynomialTransferMapTest::reflection_polynomial_map_,
+      PolynomialTransferMapTest::phase_space_vector_,
+      PolynomialTransferMapTest::phase_space_vector_);
   MAUS::PhaseSpaceVector transported_phase_space_vector
     = no_delta_map.Transport(phase_space_vector_);
-  EXPECT_TRUE(transported_phase_space_vector == phase_space_vector_);
+  // EXPECT_EQ(phase_space_vector_, transported_phase_space_vector);
+  EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
 
   MAUS::PolynomialTransferMap no_delta_map_copy(no_delta_map);
   transported_phase_space_vector
     = no_delta_map_copy.Transport(phase_space_vector_);
-  EXPECT_TRUE(transported_phase_space_vector == phase_space_vector_);
+  // EXPECT_EQ(phase_space_vector_, transported_phase_space_vector);
+  EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
 }
 
 TEST_F(PolynomialTransferMapTest, FirstOrderCovarianceMatrixTransport) {
   // test simple reflection transport a covariance matrix
   MAUS::CovarianceMatrix transported_covariance_matrix
     = reflection_transfer_map_.Transport(covariance_matrix_);
-  EXPECT_TRUE(transported_covariance_matrix == reflected_covariance_matrix_);
+  EXPECT_EQ(reflected_covariance_matrix_, transported_covariance_matrix);
 }
