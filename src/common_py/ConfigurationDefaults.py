@@ -211,6 +211,13 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFiPRHelicalOn = 1
 SciFiPRStraightOn = 1
+SciFiPerChanFlag = 0
+SciFiNoiseFlag = 0
+SciFiDigitNPECut = 1.5 # photoelectrons
+SciFiCrossTalkSigma = 10.0
+SciFiCrossTalkAmplitude = 2.0
+SciFiDarkCountProababilty = 0.02 #probability of dark count due to thermal electron
+SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
