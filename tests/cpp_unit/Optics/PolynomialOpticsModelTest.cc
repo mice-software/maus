@@ -229,4 +229,62 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
+
+  // Check transport from mid plane to end plane (should fail because the
+  // Inverse() function in PolynomialMap is not implemented)
+  bool transport_failed = false;
+  try {
+    output_vector = optics_model.Transport(input_vector, 0., 1000.);
+  } catch (Squeal squeal) {
+    transport_failed = true;
+  }
+  EXPECT_TRUE(transport_failed);
+}
+
+/* This test fails, but higher order maps should be more accurate.
+ *
+TEST_F(PolynomialOpticsModelTest, SecondOrderTransport) {
+  // Test higher order polynomial map transport to end plane
+  Json::Value * config = MAUS::Globals::GetConfigurationCards();
+  (*config)["PolynomialOpticsModel_order"] = Json::Value(2);
+  std::string config_string = JsonWrapper::JsonToString(*config);
+  MAUS::GlobalsManager::DeleteGlobals();
+  MAUS::GlobalsManager::InitialiseGlobals(config_string);
+  PolynomialOpticsModel optics_model(*config);
+  optics_model.Build();
+
+  MAUS::PhaseSpaceVector input_vector(0., 226., 1., 0., 3., 0.);
+  MAUS::PhaseSpaceVector expected_vector(7.5466, 226., 1., 0., 3., 0.);
+  MAUS::PhaseSpaceVector output_vector
+      = optics_model.Transport(input_vector, 1000.);
+  for (int index = 0; index < 6; ++index) {
+    EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
+  }
+}
+*/
+
+TEST_F(PolynomialOpticsModelTest, UnsupportedAlgorithms) {
+  // Make sure unsupported algorithms throw exceptions
+  std::vector<std::string> algorithms;
+  algorithms.push_back(std::string("Constrained Least Squares"));
+  algorithms.push_back(std::string("Constrained Chi Squared"));
+  algorithms.push_back(std::string("Sweeping Chi Squared"));
+  algorithms.push_back(std::string("Sweeping Chi Squared Variable Walls"));
+  Json::Value * config = MAUS::Globals::GetConfigurationCards();
+  (*config)["PolynomialOpticsModel_order"] = Json::Value(1);
+  for (std::vector<std::string>::const_iterator iter = algorithms.begin();
+       iter < algorithms.end();
+       ++iter) {
+    (*config)["PolynomialOpticsModel_algorithm"] = Json::Value(*iter);
+    PolynomialOpticsModel optics_model(*config);
+    bool algorithm_failed = false;
+    try {
+      optics_model.Build();
+    } catch (Squeal squeal) {
+      algorithm_failed = true;
+      std::cout << "DEBUG PolynomialOpticsModelTest_UnsupportedAlgorithms: "
+                << "Algorithm \"" << *iter << "\" failed." << std::endl;
+    }
+    EXPECT_TRUE(algorithm_failed);
+  }
 }

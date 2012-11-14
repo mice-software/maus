@@ -188,16 +188,17 @@ unsigned int PolynomialMap::PolynomialOrder() const {
 }
 
 PolynomialMap * PolynomialMap::Inverse() const {
-  // Compute the Moore-Penrose Pseudoinverse of the coefficient matrix
-  Matrix<double> transpose_matrix = transpose(coefficient_matrix_);
-  Matrix<double> pseudoinverse = inverse(transpose_matrix * coefficient_matrix_)
-                               * transpose_matrix;
-  return new PolynomialMap(pseudoinverse.number_of_rows(), pseudoinverse);
+  // FIXME(plane1@hawk.iit.edu): implement
+  throw(Squeal(Squeal::recoverable,
+               "Not implemented.",
+               "PolynomialMap::Inverse()"));
 }
 
 PolynomialMap PolynomialMap::Inverse(int max_order) const {
   // FIXME(plane1@hawk.iit.edu): implement
-  return *this;
+  throw(Squeal(Squeal::recoverable,
+               "Not implemented.",
+               "PolynomialMap::Inverse(int)"));
 }
 
 PolynomialMap * PolynomialMap::Clone() const {

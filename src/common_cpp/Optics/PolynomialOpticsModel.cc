@@ -37,29 +37,10 @@
 
 namespace MAUS {
 
-  using recon::global::TrackPoint;
-
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kNone
-    = Algorithm(0);
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kLeastSquares
-    = Algorithm(1);
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kConstrainedLeastSquares
-    = Algorithm(2);
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kConstrainedChiSquared
-    = Algorithm(3);
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kSweepingChiSquared
-    = Algorithm(4);
-const PolynomialOpticsModel::Algorithm
-  PolynomialOpticsModel::Algorithm::kSweepingChiSquaredWithVariableWalls
-    = Algorithm(5);
+using recon::global::TrackPoint;
 
 PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
-      : TransferMapOpticsModel(configuration), algorithm_(Algorithm::kNone) {
+      : TransferMapOpticsModel(configuration), algorithm_(kNone) {
   // Determine which fitting algorithm to use
   SetupAlgorithm();
 
@@ -120,25 +101,29 @@ void PolynomialOpticsModel::SetupAlgorithm() {
       "PolynomialOpticsModel_algorithm",
       JsonWrapper::stringValue);
   size_t algorithm;
-  for (algorithm = 0; algorithm < algorithm_names.size(); ++algorithm) {
+  for (algorithm = 0; algorithm <= algorithm_names.size(); ++algorithm) {
     if (algorithm_name == algorithm_names[algorithm]) {
       break;  // leave the current index into algorithm_names in algorithm
     }
   }
-  ++algorithm;  // first algorithm constant is kNone
 
-  if (algorithm == Algorithm::kLeastSquares.id()) {
-    algorithm_ = Algorithm::kLeastSquares;
-  } else if (algorithm == Algorithm::kConstrainedLeastSquares.id()) {
-    algorithm_ = Algorithm::kConstrainedLeastSquares;
-  } else if (algorithm == Algorithm::kConstrainedChiSquared.id()) {
-    algorithm_ = Algorithm::kConstrainedChiSquared;
-  } else if (algorithm == Algorithm::kSweepingChiSquared.id()) {
-    algorithm_ = Algorithm::kSweepingChiSquared;
-  } else if (algorithm == Algorithm::kSweepingChiSquaredWithVariableWalls.id()) {
-    algorithm_ = Algorithm::kSweepingChiSquaredWithVariableWalls;
-  } else {
-    algorithm_ = Algorithm::kNone;
+  switch (++algorithm) {  // the first element in Algorithm is kNone
+    case kLeastSquares:
+      algorithm_ = kLeastSquares;
+      break;
+    case kConstrainedLeastSquares:
+      algorithm_ = kConstrainedLeastSquares;
+      break;
+    case kConstrainedChiSquared:
+      algorithm_ = kConstrainedChiSquared;
+      break;
+    case kSweepingChiSquared:
+      algorithm_ = kSweepingChiSquared;
+      break;
+    case kSweepingChiSquaredWithVariableWalls:
+      algorithm_ = kSweepingChiSquaredWithVariableWalls;
+      break;
+    default: algorithm_ = kNone;
   }
 }
 
@@ -223,58 +208,55 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   PolynomialMap * polynomial_map = NULL;
 
-  if (algorithm_ == Algorithm::kNone) {
+  switch (algorithm_) {
+    case kNone:
       throw(Squeal(Squeal::nonRecoverable,
-                   "No fitting algorithm specified in configuration.",
-                   "PolynomialOpticsModel::CalculateTransferMap()"));
-  } else if (algorithm_ == Algorithm::kLeastSquares) {
-    // unconstrained least squares
-/*
-    polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, polynomial_order_, weights_);
-*/
-    // Fit to first order and then fit to higher orders with the
-    // first order map as a constraint
-    polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, 1, weights_);
-    if (polynomial_order_ > 1) {
-      PolynomialMap * linear_polynomial_map = polynomial_map;
-      polynomial_map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-          points, values, polynomial_order_,
-          linear_polynomial_map->GetCoefficientsAsVector(), weights_);
-    }
-  } else if (algorithm_ == Algorithm::kConstrainedLeastSquares) {
-    // constrained least squares
-    // ConstrainedLeastSquaresFit(...);
-    throw(Squeal(Squeal::nonRecoverable,
-                  "Constrained Polynomial fitting algorithm "
-                  "is not yet implemented.",
-                  "PolynomialOpticsModel::CalculateTransferMap()"));
-  } else if (algorithm_ == Algorithm::kConstrainedChiSquared) {
-    // constrained chi squared least squares
-    // Chi2ConstrainedLeastSquaresFit(...);
-    throw(Squeal(Squeal::nonRecoverable,
-                  "Constrained Chi Squared fitting algorithm "
-                  "is not yet implemented.",
-                  "PolynomialOpticsModel::CalculateTransferMap()"));
-  } else if (algorithm_ == Algorithm::kSweepingChiSquared) {
-    // sweeping chi squared least squares
-    // Chi2SweepingLeastSquaresFit(...);
-    throw(Squeal(Squeal::nonRecoverable,
-                  "Sweeping Chi Squared fitting algorithm "
-                  "is not yet implemented.",
-                  "PolynomialOpticsModel::CalculateTransferMap()"));
-  } else if (algorithm_ == Algorithm::kSweepingChiSquaredWithVariableWalls) {
-    // sweeping chi squared with variable walls
-    // Chi2SweepingLeastSquaresFitVariableWalls(...);
-    throw(Squeal(Squeal::nonRecoverable,
-                  "Sweeping Chi Squared Variable Walls fitting algorithm "
-                  "is not yet implemented.",
-                  "PolynomialOpticsModel::CalculateTransferMap()"));
-  } else {
-    throw(Squeal(Squeal::nonRecoverable,
-                  "Unrecognized fitting algorithm in configuration.",
-                  "PolynomialOpticsModel::CalculateTransferMap()"));
+                    "No fitting algorithm specified in configuration.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
+    case kLeastSquares:
+      // Fit to first order and then fit to higher orders with the
+      // first order map as a constraint
+      polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
+          points, values, 1, weights_);
+      if (polynomial_order_ > 1) {
+        PolynomialMap * linear_polynomial_map = polynomial_map;
+        polynomial_map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+            points, values, polynomial_order_,
+            linear_polynomial_map->GetCoefficientsAsVector(), weights_);
+      }
+      break;
+    case kConstrainedLeastSquares:
+      // constrained least squares
+      // ConstrainedLeastSquaresFit(...);
+      throw(Squeal(Squeal::nonRecoverable,
+                    "Constrained Polynomial fitting algorithm "
+                    "is not yet implemented.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
+    case kConstrainedChiSquared:
+      // constrained chi squared least squares
+      // Chi2ConstrainedLeastSquaresFit(...);
+      throw(Squeal(Squeal::nonRecoverable,
+                    "Constrained Chi Squared fitting algorithm "
+                    "is not yet implemented.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
+    case kSweepingChiSquared:
+      // sweeping chi squared least squares
+      // Chi2SweepingLeastSquaresFit(...);
+      throw(Squeal(Squeal::nonRecoverable,
+                    "Sweeping Chi Squared fitting algorithm "
+                    "is not yet implemented.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
+    case kSweepingChiSquaredWithVariableWalls:
+      // sweeping chi squared with variable walls
+      // Chi2SweepingLeastSquaresFitVariableWalls(...);
+      throw(Squeal(Squeal::nonRecoverable,
+                    "Sweeping Chi Squared Variable Walls fitting algorithm "
+                    "is not yet implemented.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
+    default:
+      throw(Squeal(Squeal::nonRecoverable,
+                    "Unrecognized fitting algorithm in configuration.",
+                    "PolynomialOpticsModel::CalculateTransferMap()"));
   }
 
   TransferMap * transfer_map = new PolynomialTransferMap(

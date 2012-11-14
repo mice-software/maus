@@ -47,6 +47,9 @@ class TransferMap;
 
 class PolynomialOpticsModel : public TransferMapOpticsModel {
  public:
+  enum Algorithm {kNone, kLeastSquares, kConstrainedLeastSquares,
+                  kConstrainedChiSquared, kSweepingChiSquared,
+                  kSweepingChiSquaredWithVariableWalls};
   // *************************
   //  Constructors
   // *************************
@@ -58,36 +61,6 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   ~PolynomialOpticsModel() { }
 
   void Build();
-
-  /** @brief An algorithm identification class.
-   * Use PolynomialOpticsModel::Algorithm::kWhateverAlgorithm
-   * and the constructor calls Algorithm.id() to identify the algorithm.
-   */
-  class Algorithm {
-   public:
-    const size_t id() const {
-      return id_;
-    }
-
-    const bool operator==(const Algorithm & rhs) const {
-      return id_ == rhs.id_;
-    }
-
-    const bool operator!=(const Algorithm & rhs) const {
-      return id_ != rhs.id_;
-    }
-
-    static const Algorithm kNone;
-    static const Algorithm kLeastSquares;
-    static const Algorithm kConstrainedLeastSquares;
-    static const Algorithm kConstrainedChiSquared;
-    static const Algorithm kSweepingChiSquared;
-    static const Algorithm kSweepingChiSquaredWithVariableWalls;
-   private:
-    Algorithm() : id_(0) {}
-    explicit Algorithm(size_t id) : id_(id) {}
-    size_t id_;
-  };
 
  protected:
   Algorithm algorithm_;

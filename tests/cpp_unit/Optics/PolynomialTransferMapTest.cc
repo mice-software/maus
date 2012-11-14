@@ -140,13 +140,6 @@ PolynomialTransferMapTest::reflection_transfer_map_
 // test cases
 // ***********
 
-TEST_F(PolynomialTransferMapTest, PhaseSpaceVectorTransport) {
-  // test simple reflection transport of a phase space vector
-  MAUS::PhaseSpaceVector transported_phase_space_vector
-    = reflection_transfer_map_.Transport(phase_space_vector_);
-  EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
-}
-
 TEST_F(PolynomialTransferMapTest, Constructors) {
   MAUS::PolynomialTransferMap no_delta_map(
       PolynomialTransferMapTest::reflection_polynomial_map_,
@@ -161,6 +154,13 @@ TEST_F(PolynomialTransferMapTest, Constructors) {
   transported_phase_space_vector
     = no_delta_map_copy.Transport(phase_space_vector_);
   // EXPECT_EQ(phase_space_vector_, transported_phase_space_vector);
+  EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
+}
+
+TEST_F(PolynomialTransferMapTest, PhaseSpaceVectorTransport) {
+  // test simple reflection transport of a phase space vector
+  MAUS::PhaseSpaceVector transported_phase_space_vector
+    = reflection_transfer_map_.Transport(phase_space_vector_);
   EXPECT_EQ(reflected_phase_space_vector_, transported_phase_space_vector);
 }
 
