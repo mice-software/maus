@@ -242,7 +242,6 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
 
       double dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
       while (dark_count > 1) {
-        std::cerr << "Spooky Crisps!!\n";
         numPE += 1.0;
         dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
       }
