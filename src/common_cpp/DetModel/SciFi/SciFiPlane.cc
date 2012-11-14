@@ -85,11 +85,10 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
     (*trot) = (*trot)*zflip;
 
   // this is the rotation of the fibre array
-  // (*trot) = (*trot)*zflip;
-  // G4RotationMatrix* trot = new G4RotationMatrix();
-  // G4ThreeVector dir(0, 1, 0);
-  // dir = dir*(*trot);
   /*
+  G4ThreeVector dir(0, 1, 0);
+  dir = dir*(*trot);
+
   std::cerr << "Module name: " << doubletName << "\n"
             << "Module rotation: " << *(trot) << "\n"
             // << "Plane direction: " << dir << "\n"

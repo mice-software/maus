@@ -22,6 +22,9 @@
 // C headers
 #include <assert.h>
 #include <CLHEP/Vector/ThreeVector.h>
+#include <math.h>
+#include <iostream>
+#include <fstream>
 
 // C++ headers
 #include <string>
@@ -30,76 +33,27 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
-// class KalmanSite;
-
-class KalmanSSTrack {
+class KalmanSSTrack : public KalmanTrack {
  public:
-  KalmanSSTrack();
+  virtual ~KalmanSSTrack();
 
-  ~KalmanSSTrack();
-
-  typedef MAUS::KalmanSite KalmanSite;
-
+  //  Prediction
   void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
 
   void magnet_drift();
 
+  double compute_kappa(double current, double momentum);
+
   void straight_line(double deltaZ);
 
-  void calc_filtered_state(KalmanSite *a_site);
-
-  void update_G(KalmanSite *a_site);
-
-  void update_covariance(KalmanSite *a_site);
-
-  void update_H(KalmanSite *a_site);
-
-  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
-
-  void calc_system_noise(KalmanSite *site);
-
-  void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
-
-  void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-
-  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-
-  TMatrixD get_propagator() { return _F; }
-
-  TMatrixD get_system_noise() { return _Q; }
-
+  // Acessors
   void compute_chi2(const std::vector<KalmanSite> &sites);
-
- protected:
-  TMatrixD _H;
-
-  TMatrixD _G;
-
-  TMatrixD _Q;
-
-  TMatrixD _A;
-
-  TMatrixD _F;
-
-  TMatrixD _V;
-
-  TMatrixD _K;
-
-  double _x0, _y0, _chi2, _tracker, _ndf;
-  // static const double sigma_x = 0.64; // x measurement resolution
-
-  // static const double A;//= 2./(7.*0.427); // mm to channel convertion factor.
-
-  static const double ACTIVE_RADIUS; // = 150.;
-
-  // (1.4945) effective channel width without overlap
-  static const double CHAN_WIDTH; // = 1.333;
 };
 
-// } // ~namespace MAUS
+} // ~namespace MAUS
 
 #endif

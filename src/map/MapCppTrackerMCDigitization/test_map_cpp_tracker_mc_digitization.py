@@ -78,21 +78,23 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         '%s/src/map/MapCppTrackerMCDigitization/maus_output.json' % root_dir
         assert os.path.isfile(_filename)
         _file = open(_filename, 'r')
-        # File is open.
-        # Spill 1 is corrupted.
-        spill_1 = _file.readline().rstrip()
-        output_1 = self.mapper.process(spill_1)
+        # First line is just info, use to check we get errors
+        line_1 = _file.readline().rstrip()
+        output_1 = self.mapper.process(line_1)
         self.assertTrue("errors" in json.loads(output_1))
-        # Spill 2 is sane.
-        spill_2 = _file.readline()
-        output_2 = self.mapper.process(spill_2)
-        self.assertTrue("recon_events" in json.loads(output_2))
-        # spill 3 is end of event
-        # spill_3 = _file.readline().rstrip()
-        # output_3 = self.mapper.process(spill_3)
-        # self.assertTrue("END_OF_RUN" in json.loads(output_3))
-        # self.assertFalse("errors" in json.loads(output_3))
-        # Close file.
+        # Line 2 is run header; throw away
+        _file.readline()
+        # Line 3 is good data
+        line_3 = _file.readline()
+        output_3 = self.mapper.process(line_3)
+        self.assertTrue("recon_events" in json.loads(output_3))
+        # Check the digits have been made
+        spill_out = json.loads(output_3)
+        revt = spill_out['recon_events'][0]
+        self.assertTrue('sci_fi_event' in revt)
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(33, len(revt['sci_fi_event']['digits']))
+        # Close file
         _file.close()
 
     @classmethod

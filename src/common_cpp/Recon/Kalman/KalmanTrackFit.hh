@@ -47,7 +47,7 @@ class KalmanTrackFit {
  public:
   KalmanTrackFit();
 
-  ~KalmanTrackFit();
+  virtual ~KalmanTrackFit();
 
   void process(std::vector<SciFiHelicalPRTrack> helical_tracks);
 
@@ -58,10 +58,7 @@ class KalmanTrackFit {
   // Add plane measurents to all sites;
   void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
 
-  void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites);
-
-  // void initialise_global_track(CLHEP::Hep3Vector &tof0, CLHEP::Hep3Vector &se,
-  //                             CLHEP::Hep3Vector &tof1, std::vector<KalmanSite> &sites);
+  void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites, double &momentum);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters, double &seed_pz);
@@ -72,7 +69,7 @@ class KalmanTrackFit {
 
   void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
 
- private:
+ protected:
   double _seed_cov;
 };
 

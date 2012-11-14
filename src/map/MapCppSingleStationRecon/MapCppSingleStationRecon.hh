@@ -29,10 +29,11 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 // C++ headers
-#include <cmath>
 #include <iostream>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <cmath>
+#include <string>
 #include <vector>
 
 // Other headers
@@ -50,6 +51,8 @@
 #include "src/common_cpp/Recon/SingleStation/SECluster.hh"
 #include "src/common_cpp/Recon/SingleStation/SESpacePoint.hh"
 #include "src/common_cpp/Recon/SingleStation/KalmanTrackFitSS.hh"
+
+namespace MAUS {
 
 class MapCppSingleStationRecon {
  public:
@@ -134,3 +137,6 @@ class MapCppSingleStationRecon {
   static const double tof1_a = 60.; // mm
 }; // Don't forget this trailing colon!!!!
 #endif
+
+} // namespace MAUS
+

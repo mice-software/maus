@@ -36,7 +36,6 @@ class SciFiEventTestDS : public ::testing::Test {
 
 TEST_F(SciFiEventTestDS, test_default_contructor) {
   SciFiEvent* evt = new SciFiEvent();
-  EXPECT_EQ(0, evt->hits().size());
   EXPECT_EQ(0, evt->digits().size());
   EXPECT_EQ(0, evt->clusters().size());
   EXPECT_EQ(0, evt->spacepoints().size());
@@ -49,11 +48,6 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
 
   // Create a first SciFiEvent
   SciFiEvent* evt1 = new SciFiEvent();
-
-  // Setup a SciFiHit
-  SciFiHit *hit = new SciFiHit();
-  SciFiChannelId* sf_id = new SciFiChannelId();
-  hit->SetChannelId(sf_id);
 
   // Set up a digit and give its parameters non-default values
   int spill = 1;
@@ -74,7 +68,6 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   SciFiHelicalPRTrack htrk;
 
   // Add the hits etc to the first event
-  evt1->add_hit(hit);
   evt1->add_digit(digit);
   evt1->add_cluster(cluster);
   evt1->add_spacepoint(spoint);
@@ -89,9 +82,6 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   delete evt1;
 
   // Run the tests, checking digits thoroughly, the rest with just one parameter
-  ASSERT_EQ(evt2.hits().size(), 1);
-  EXPECT_EQ(evt2.hits()[0]->GetChannelId()->GetFibreNumber(), 0);
-
   ASSERT_EQ(evt2.digits().size(), 1);
   EXPECT_EQ(evt2.digits()[0]->get_spill(), spill);
   EXPECT_EQ(evt2.digits()[0]->get_event(), event);
@@ -147,15 +137,6 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   EXPECT_EQ(evt2->digits()[0]->get_npe(), npe);
   EXPECT_EQ(evt2->digits()[0]->get_time(), time);
   EXPECT_FALSE(evt2->digits()[0]->is_used());
-}
-
-
-TEST_F(SciFiEventTestDS, test_hit_getters_setters) {
-  SciFiEvent* evt = new SciFiEvent();
-  SciFiHit* hit = new SciFiHit();
-  evt->add_hit(hit);
-  EXPECT_EQ(1, evt->hits().size());
-  EXPECT_EQ(hit, evt->hits()[0]);
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {

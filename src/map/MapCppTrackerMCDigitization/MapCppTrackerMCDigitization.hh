@@ -40,7 +40,6 @@
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
-#include "src/common_cpp/DataStructure/SciFiSpill.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"

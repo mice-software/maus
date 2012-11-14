@@ -125,6 +125,14 @@ class KalmanSite {
   CLHEP::Hep3Vector get_true_position() const { return _mc_pos; }
   /////////////////////////////////////
 
+  void set_conversion_factor(double factor) { _conversion_factor = factor; }
+
+  double get_conversion_factor() const { return _conversion_factor; }
+
+  void set_type(int type) { _type = type; }
+
+  int get_type() const { return _type; }
+
  private:
   CLHEP::Hep3Vector _mc_pos;
 
@@ -157,10 +165,14 @@ class KalmanSite {
 
   int _id;
 
+  int _type;
+
   CLHEP::Hep3Vector _direction;
 
   /// The residual at this site. (filtered-meas)
   double _residual_x, _residual_y;
+
+  double _conversion_factor;
 
   // enum state { INVALID = 0, PROJECTED, FILTERED, SMOOTHED };
 

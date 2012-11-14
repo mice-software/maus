@@ -16,7 +16,6 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
-#define PI 3.14159265
 
 namespace MAUS {
 
@@ -76,7 +75,6 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(2, 3) = sin(a*deltaZ*old_kappa)/a;
   // @y/@kappa
   _F(2, 4) = 0.;
-
 
   // @py/@x
   _F(3, 0) = 0.;

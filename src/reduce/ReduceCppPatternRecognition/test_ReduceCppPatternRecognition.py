@@ -48,9 +48,9 @@ class ReduceCppPatternRecognitionTestCase(unittest.TestCase):
 
     def test_process(self):
         """Check ReduceCppPatternRecognition process function"""
-        test2 = ('%s/src/reduce/ReduceCppPatternRecognition/test_spills.json' %
+        fname = ('%s/src/reduce/ReduceCppPatternRecognition/test_spills.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test2, 'r')
+        fin = open(fname, 'r')
         # Add some helical track events
         data = fin.readline()
         self.reducer.process(data)
@@ -64,10 +64,10 @@ class ReduceCppPatternRecognitionTestCase(unittest.TestCase):
         self.reducer.death()
         #pylint: disable = E1101
         foutput = ROOT.TFile('reduce_pattern_recognition.root')
-        circles = foutput.Get('circles')
-        self.assertEqual(circles.GetEntries(), 20)
+        htracks = foutput.Get('htracks')
+        self.assertEqual(htracks.GetEntries(), 8)
         strks = foutput.Get('stracks')
-        self.assertEqual(strks.GetEntries(), 5)
+        self.assertEqual(strks.GetEntries(), 2)
 
     def tearDown(self): #pylint: disable = C0103
         """Check death works"""

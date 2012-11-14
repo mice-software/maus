@@ -213,7 +213,6 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   double chi2 = (dist*dist)/0.064;
   triplet->set_chi2(chi2);
 
-/*
     std::ofstream out2("spacepoints.txt", std::ios::out | std::ios::app);
     out2 << xcluster->get_true_position().x() << " "
          <<   xcluster->get_true_position().y() << " "
@@ -222,7 +221,6 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
          << position.z() << " " << xcluster->get_tracker() << " "
          << xcluster->get_station() << "\n";
     out2.close();
-*/
 
   // Determine time
   double time_A = vcluster->get_time();

@@ -40,6 +40,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
               << site.get_residual_y() << std::endl;
     std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
+    std::cerr << "SITE smoothed alpha: " << site.get_smoothed_alpha() << std::endl;
     std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
     std::cerr << "================Projection================" << std::endl;
     site.get_projected_a().Print();
@@ -52,6 +53,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
 }
 
 void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
+  std::vector<double> _alpha_meas, _site, _alpha_projected;
   int numb_sites = sites.size();
   _alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
@@ -64,7 +66,7 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     _alpha_meas.at(i) = site.get_alpha();
 
     double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    double alpha_smooth = get_smoothed_measurement(site);
+    double alpha_smooth = site.get_smoothed_alpha(); // get_smoothed_measurement(site);
     double pull2 = _alpha_meas.at(i) - alpha_smooth;
 
     TMatrixD a(5, 1);
@@ -73,8 +75,6 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     TMatrixD a_smooth(5, 1);
     a_smooth = site.get_smoothed_a();
 
-    double res_x = site.get_residual_x();
-    double res_y = site.get_residual_y();
     // MC position and momentum.
     double mc_x  = site.get_true_position().x();
     double mc_y  = site.get_true_position().y();
@@ -92,7 +92,10 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
     if ( id < 15 ) {
       mc_x  = -mc_x;
       mc_px = -mc_px;
+      mc_pz = -mc_pz;
     }
+    assert(a_smooth(0, 0) ==  a_smooth(0, 0));
+    assert(a_proj(0, 0) == a_proj(0, 0));
 
     out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
          << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " "
@@ -103,26 +106,6 @@ void KalmanMonitor::save(std::vector<KalmanSite> const &sites) {
          << pull << " " << pull2 << " " << id     << "\n";
     out2.close();
   }
-}
-
-double KalmanMonitor::get_smoothed_measurement(KalmanSite &a_site) {
-  CLHEP::Hep3Vector dir = a_site.get_direction();
-  double dx = dir.x();
-  double dy = dir.y();
-  static const double A = 2./(7.*0.427);
-
-  TMatrixD H(2, 5);
-  H.Zero();
-  H(0, 0) = -A*dy;
-  H(0, 2) =  A*dx;
-
-  TMatrixD a_smooth(5, 1);
-  a_smooth = a_site.get_smoothed_a();
-  TMatrixD ha(2, 1);
-  ha = TMatrixD(H, TMatrixD::kMult, a_smooth);
-  // Extrapolation converted to expected measurement.
-  double alpha_smooth = ha(0, 0);
-  return alpha_smooth;
 }
 
 } // ~namespace MAUS
