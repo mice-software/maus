@@ -39,7 +39,7 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("SciFiDigitNPECut"));
   SciFiNPECut = _configJSON["SciFiDigitNPECut"].asDouble();
 
-  //Checks for individual channel calibrations, if so, then loads them
+  // Checks for individual channel calibrations, if so, then loads them
   assert(_configJSON.isMember("SciFiPerChanFlag"));
   if (_configJSON["SciFiPerChanFlag"].asInt()) {
     std::ifstream calib_file;
@@ -50,7 +50,7 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
       argCal += temp;
     }
     calib_reader.parse(argCal, _calib_list);
-    //std::cerr << _calib_list["entries"][1]["good"] <<"\n";
+    // std::cerr << _calib_list["entries"][1]["good"] <<"\n";
   }
 
   return true;
@@ -156,7 +156,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
 
        // Get nPE from this hit.
       double edep = a_hit->GetEnergyDeposited();
-      double nPE = compute_npe(edep);//, chanNo, a_hit);
+      double nPE = compute_npe(edep); // ,chanNo, a_hit);
 
       // Compute tdc count.
       double time   = a_hit->GetTime();
@@ -167,7 +167,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
           MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
-          nPE += compute_npe(edep_j);//, chanNo, a_hit);
+          nPE += compute_npe(edep_j); // ,chanNo, a_hit);
           same_digit->GetChannelId()->SetUsed(true);
         } // if-statement
       } // ends l-loop over all the array
@@ -195,7 +195,7 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
   double cross_sigma, cross_amp, dark_prob;
   double time = 0.;
 
-  srand ( std::time(NULL) );
+  srand(std::time(NULL));
   for ( int i = 0; i < modules.size(); i++ ) {
     int nChannels = 2*((modules[i]->propertyDouble("CentralFibre"))+0.5);
     for ( int j = 0; j < nChannels; j++ ) {
@@ -236,21 +236,21 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
          dark_prob   = _configJSON["SciFiDarkCountProababilty"].asDouble();
       }
 
-      double param = ((double)rand() / RAND_MAX);
+      double param = (static_cast<double>(rand()) / RAND_MAX);
       double cross_param = -cross_sigma*(param - 1.0)*(param - 1.0);
       numPE += cross_amp * exp(cross_param);
 
-      double dark_count = ((double)rand() / RAND_MAX) + dark_prob;
+      double dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
       while (dark_count > 1) {
         std::cerr << "Spooky Crisps!!\n";
         numPE += 1.0;
-        dark_count = ((double)rand() / RAND_MAX) + dark_prob;
+        dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
       }
       if ( exist_flag ) {
-        digits[entry]->set_npe ( numPE );
+        digits[entry]->set_npe(numPE);
         continue;
       }
-      if ( numPE > SciFiNPECut) {
+      if (numPE > SciFiNPECut) {
         SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
                                              tracker, station, plane,
                                              j, numPE, time);
@@ -277,7 +277,6 @@ int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
 
   int tdcCounts = static_cast <int> (floor(tmpcounts));
   return tdcCounts;
-
 }
 
 int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
@@ -315,10 +314,10 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   return chanNo;
 }
 
-double MapCppTrackerMCDigitization::compute_npe(double edep) {//,
-                                                //int chanNo,
-                                                //MAUS::SciFiHit *ahit) {
-/*  Json::Value _calUsed = _configJSON;
+double MapCppTrackerMCDigitization::compute_npe(double edep) {// ,
+                                                // int chanNo,
+                                                // MAUS::SciFiHit *ahit) {
+/* Json::Value _calUsed = _configJSON;
   
 
     assert(_configJSON.isMember("SciFiPerChanFlag"));
@@ -371,7 +370,6 @@ double MapCppTrackerMCDigitization::compute_npe(double edep) {//,
       numbPE *= _configJSON["SciFivlpcQE"].asDouble();
 
       return numbPE;
-
 }
 
 int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
