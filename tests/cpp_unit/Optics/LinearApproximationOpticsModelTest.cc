@@ -17,11 +17,11 @@
 /* Author: Peter Lane
  */
 
+#include <streambuf>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <streambuf>
 #include <string>
 
 #include <cstdlib>
@@ -171,7 +171,7 @@ const double LinearApproximationOpticsModelTest::kCovariances[36] = {
 const MAUS::CovarianceMatrix
 LinearApproximationOpticsModelTest::kCovarianceMatrix(
   LinearApproximationOpticsModelTest::kCovariances);
-  
+
 // ***********
 // test cases
 // ***********

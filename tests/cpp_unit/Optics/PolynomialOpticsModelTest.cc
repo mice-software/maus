@@ -17,11 +17,11 @@
 /* Author: Peter Lane
  */
 
+#include <streambuf>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <streambuf>
 #include <string>
 
 #include <cstdlib>
@@ -104,7 +104,7 @@ class PolynomialOpticsModelTest : public testing::Test {
     (*config)["PolynomialOpticsModel_algorithms"] = algorithms;
     (*config)["PolynomialOpticsModel_algorithm"] = Json::Value("Least Squares");
     (*config)["PolynomialOpticsModel_order"] = Json::Value(1);
-    
+
     std::string config_string = JsonWrapper::JsonToString(*config);
     MAUS::GlobalsManager::DeleteGlobals();
     MAUS::GlobalsManager::InitialiseGlobals(config_string);
@@ -171,7 +171,7 @@ const double PolynomialOpticsModelTest::kCovariances[36] = {
 const MAUS::CovarianceMatrix
 PolynomialOpticsModelTest::kCovarianceMatrix(
   PolynomialOpticsModelTest::kCovariances);
-  
+
 // ***********
 // test cases
 // ***********
@@ -229,11 +229,4 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
-
-  /* Check transport between mid plane and end plane
-  output_vector = optics_model.Transport(input_vector, 0., 1000.);
-  for (int index = 0; index < 6; ++index) {
-    EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
-  }
-  */
 }

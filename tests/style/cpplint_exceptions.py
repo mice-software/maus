@@ -172,6 +172,6 @@ exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
 
 exceptions[os.path.join(TST, 'Optics',
                         'LinearApproximationOpticsModelTest.cc')] = [
-('#include <streambuf>',
- 'streambuf is not a C header', 'lane'),
+('  } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
