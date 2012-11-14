@@ -156,7 +156,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
 
        // Get nPE from this hit.
       double edep = a_hit->GetEnergyDeposited();
-      double nPE = compute_npe(edep); // ,chanNo, a_hit);
+      double nPE = compute_npe(edep, chanNo, a_hit);
 
       // Compute tdc count.
       double time   = a_hit->GetTime();
@@ -167,7 +167,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
           MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
-          nPE += compute_npe(edep_j); // ,chanNo, a_hit);
+          nPE += compute_npe(edep_j, chanNo, a_hit);
           same_digit->GetChannelId()->SetUsed(true);
         } // if-statement
       } // ends l-loop over all the array
@@ -217,16 +217,21 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
         }
       }
 
-      if ( _configJSON["SciFiPerChanFlag"].asInt() ) {
-        assert(_calib_list != NULL);
+      if (_configJSON["SciFiPerChanFlag"].asInt()) {
         for ( int l = 0; l < _calib_list.size(); l++ ) {
           if ( _calib_list[l]["tracker"].asInt() == tracker &&
                _calib_list[l]["station"].asInt() == station &&
                _calib_list[l]["plane"].asInt()   == plane   &&
                _calib_list[l]["channel"].asInt() == j ) {
-            cross_sigma = _calib_list[l]["SciFiCrossTalkSigma"].asDouble();
-            cross_amp   = _calib_list[l]["SciFiCrossTalkAmplitude"].asDouble();
-            dark_prob   = _calib_list[l]["SciFiDarkCountProababilty"].asDouble();
+            if (_calib_list[l].isMember("SciFiCrossTalkSigma")) {
+              cross_sigma = _calib_list[l]["SciFiCrossTalkSigma"].asDouble();
+            } else { cross_sigma = _configJSON["SciFiCrossTalkSigma"].asDouble(); }
+            if (_calib_list[l].isMember("SciFiCrossTalkAmplitude")) {
+              cross_amp   = _calib_list[l]["SciFiCrossTalkAmplitude"].asDouble();
+            } else { cross_amp   = _configJSON["SciFiCrossTalkAmplitude"].asDouble(); }
+            if (_calib_list[l].isMember("SciFiDarkCountProababilty")) {
+              dark_prob   = _calib_list[l]["SciFiDarkCountProababilty"].asDouble();
+            } else { dark_prob   = _configJSON["SciFiDarkCountProababilty"].asDouble(); }
             continue;
           }
         }
@@ -313,60 +318,77 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   return chanNo;
 }
 
-double MapCppTrackerMCDigitization::compute_npe(double edep) {// ,
-                                                // int chanNo,
-                                                // MAUS::SciFiHit *ahit) {
-/* Json::Value _calUsed = _configJSON;
-  
+double MapCppTrackerMCDigitization::compute_npe(double edep,
+                                                int chanNo,
+                                                MAUS::SciFiHit *ahit) {
+  int tracker, plane, station, channel;
+  Json::Value _calibrations;
+  tracker = ahit->GetChannelId()->GetTrackerNumber();
+  station = ahit->GetChannelId()->GetStationNumber();
+  plane   = ahit->GetChannelId()->GetPlaneNumber();
 
-    assert(_configJSON.isMember("SciFiPerChanFlag"));
-    int _tracker = a_hit->GetChannelId()->GetTrackerNumber();
-    int _station = a_hit->GetChannelId()->GetStationNumber();
-    int _plane   = a_hit->GetChannelId()->GetPlaneNumber();
+  assert(_configJSON.isMember("SciFiFiberConvFactor"));
+  assert(_configJSON.isMember("SciFiFiberTrappingEff"));
+  assert(_configJSON.isMember("SciFiFiberMirrorEff"));
+  assert(_configJSON.isMember("SciFiFiberTransmissionEff"));
+  assert(_configJSON.isMember("SciFiMUXTransmissionEff"));
+  assert(_configJSON.isMember("SciFivlpcQE"));
 
-    if ( _configJSON["SciFiPerChanFlag"].asInt() &&
-         _calChanJSON["Tracker"].asInt() == _tracker &&
-         _calChanJSON["Station"].asInt() == _station &&
-         _calChanJSON["Plane"].asInt == _plane &&
-         _calChanJSON["ChanNo"].asInt == chanNo) {
-      assert(_calChanJSON.isMember("SciFiFiberConvFactor"));
-      double numbPE = _calChanJSON["SciFiFiberConvFactor"].asDouble() * edep;
+  if (_configJSON["SciFiPerChanFlag"].asInt()) {
+    for (int i = 0; i < _calib_list.size(); i++) {
+      if (_calib_list[i]["tracker"].asInt() == tracker &&
+          _calib_list[i]["station"].asInt() == station &&
+          _calib_list[i]["plane"].asInt()   == plane   &&
+          _calib_list[i]["channel"].asInt() == chanNo) {
+        if (_calib_list[i].isMember("SciFiFiberConvFactor")) {
+          _calibrations["SciFiFiberConvFactor"] =
+          _calib_list[i]["SciFiFiberConvFactor"];
+        } else {_calibrations["SciFiFiberConvFactor"] =
+                _configJSON["SciFiFiberConvFactor"];}
+        if (_calib_list[i].isMember("SciFiFiberTrappingEff")) {
+          _calibrations["SciFiFiberTrappingEff"] =
+          _calib_list[i]["SciFiFiberTrappingEff"];
+        } else {_calibrations["SciFiFiberTrappingEff"] =
+                _configJSON["SciFiFiberTrappingEff"];}
+        if (_calib_list[i].isMember("SciFiFiberMirrorEff")) {
+          _calibrations["SciFiFiberMirrorEff"] =
+          _calib_list[i]["SciFiFiberMirrorEff"];
+        } else {_calibrations["SciFiFiberMirrorEff"] =
+                _configJSON["SciFiFiberMirrorEff"];}
+        if (_calib_list[i].isMember("SciFiFiberTransmissionEff")) {
+          _calibrations["SciFiFiberTransmissionEff"] =
+          _calib_list[i]["SciFiFiberTransmissionEff"];
+        } else {_calibrations["SciFiFiberTransmissionEff"] =
+                _configJSON["SciFiFiberTransmissionEff"];}
+        if (_calib_list[i].isMember("SciFiMUXTransmissionEff")) {
+          _calibrations["SciFiMUXTransmissionEff"] =
+          _calib_list[i]["SciFiMUXTransmissionEff"];
+        } else {_calibrations["SciFiMUXTransmissionEff"] =
+                _configJSON["SciFiMUXTransmissionEff"];}
+        if (_calib_list[i].isMember("SciFiMUXTransmissionEff")) {
+          _calibrations["SciFivlpcQE"] =
+          _calib_list[i]["SciFivlpcQE"];
+        } else {_calibrations["SciFivlpcQE"] =
+                _configJSON["SciFivlpcQE"];}
+        continue;
+      }
+    }
+  } else {
+      _calibrations["SciFiFiberConvFactor"]      = _configJSON["SciFiFiberConvFactor"];
+      _calibrations["SciFiFiberTrappingEff"]     = _configJSON["SciFiFiberTrappingEff"];
+      _calibrations["SciFiFiberMirrorEff"]       = _configJSON["SciFiFiberMirrorEff"];
+      _calibrations["SciFiFiberTransmissionEff"] = _configJSON["SciFiFiberTransmissionEff"];
+      _calibrations["SciFiMUXTransmissionEff"]   = _configJSON["SciFiMUXTransmissionEff"];
+      _calibrations["SciFivlpcQE"]               = _configJSON["SciFivlpcQE"];
+  }
 
-      assert(_calChanJSON.isMember("SciFiFiberTrappingEff"));
-      numbPE *= _calChanJSON["SciFiFiberTrappingEff"].asDouble();
 
-      assert(_calChanJSON.isMember("SciFiFiberMirrorEff"));
-      numbPE *= ( 1.0 + _calChanJSON["SciFiFiberMirrorEff"].asDouble());
-
-      assert(_calChanJSON.isMember("SciFiFiberTransmissionEff"));
-      numbPE *= _calChanJSON["SciFiFiberTransmissionEff"].asDouble();
-
-      assert(_calChanJSON.isMember("SciFiMUXTransmissionEff"));
-      numbPE *= _calChanJSON["SciFiMUXTransmissionEff"].asDouble();
-
-      assert(_calChanJSON.isMember("SciFivlpcQE"));
-      numbPE *= _calChanJSON["SciFivlpcQE"].asDouble();
-
-      return numbPE;
-      }*/
-
-      assert(_configJSON.isMember("SciFiFiberConvFactor"));
-      double numbPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
-
-      assert(_configJSON.isMember("SciFiFiberTrappingEff"));
-      numbPE *= _configJSON["SciFiFiberTrappingEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFiFiberMirrorEff"));
-      numbPE *= ( 1.0 + _configJSON["SciFiFiberMirrorEff"].asDouble());
-
-      assert(_configJSON.isMember("SciFiFiberTransmissionEff"));
-      numbPE *= _configJSON["SciFiFiberTransmissionEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFiMUXTransmissionEff"));
-      numbPE *= _configJSON["SciFiMUXTransmissionEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFivlpcQE"));
-      numbPE *= _configJSON["SciFivlpcQE"].asDouble();
+      double numbPE = _calibrations["SciFiFiberConvFactor"].asDouble() * edep;
+      numbPE *= _calibrations["SciFiFiberTrappingEff"].asDouble();
+      numbPE *= ( 1.0 + _calibrations["SciFiFiberMirrorEff"].asDouble());
+      numbPE *= _calibrations["SciFiFiberTransmissionEff"].asDouble();
+      numbPE *= _calibrations["SciFiMUXTransmissionEff"].asDouble();
+      numbPE *= _calibrations["SciFivlpcQE"].asDouble();
 
       return numbPE;
 }

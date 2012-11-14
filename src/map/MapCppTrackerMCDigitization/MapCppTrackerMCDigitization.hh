@@ -84,7 +84,7 @@ class MapCppTrackerMCDigitization {
                       int event_num);
   /** @brief simulates signal noise.
    */
-  double compute_npe(double edep);
+  double compute_npe(double edep, int chanNo, MAUS::SciFiHit *ahit);
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
