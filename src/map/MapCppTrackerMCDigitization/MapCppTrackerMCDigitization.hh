@@ -80,7 +80,11 @@ class MapCppTrackerMCDigitization {
 
   /** @brief computes npe from energy deposits.
    */
-  double compute_npe(double edep);
+  void add_elec_noise(MAUS::SciFiDigitPArray &digits, int spill_num,
+                      int event_num);
+  /** @brief simulates signal noise.
+   */
+  double compute_npe(double edep, int chanNo, MAUS::SciFiHit *ahit);
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
@@ -113,6 +117,9 @@ class MapCppTrackerMCDigitization {
   Json::Value root;
   ///  JsonCpp setup
   Json::Reader reader;
+  Json::Reader calib_reader;
+  std::string argCal;
+  Json::Value _calib_list;
 
   double SciFiNPECut;
 
