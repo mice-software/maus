@@ -24,7 +24,7 @@ Module Tracker0_ST
   }
   Module Tracker/TrackerStation2.dat
   {
-    Position -0.5709 -0.7375 349.9143 mm
+    Position -10.5709 -0.7375 349.9143 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerStation3.dat
