@@ -87,7 +87,7 @@ bool ReduceCppPatternRecognition::birth(std::string argJsonConfigDocument) {
   _htracks.Branch("y0", &_y0, "y0/D");
   _htracks.Branch("_circle_x0", &_circle_x0, "x0/D");
   _htracks.Branch("_circle_y0", &_circle_y0, "y0/D");
-  _htracks.Branch("R", &_my, "R/D");
+  _htracks.Branch("R", &_circle_R, "R/D");
   _htracks.Branch("dsdz", &_dsdz, "dsdz/D");
   _htracks.Branch("phi0", &_phi0, "phi0/D");
   _htracks.Branch("n_sp", &_num_points_hlx, "n_sp/I");

@@ -125,8 +125,6 @@ class MapCppTrackerReconTest {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
-  void vhits_to_ascii(MAUS::VirtualHitArray * hits);
-
  private:
   /// This should be the classname
   std::string _classname;
@@ -145,10 +143,8 @@ class MapCppTrackerReconTest {
   bool _straight_pr_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
-  /// File stream for writing  MC data
-  ofstream _of1;
-  ofstream _of2;
-  ofstream _of3;
+  /// File streams for writing data
+  ofstream _of1, _of2, _of3, _of4;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
