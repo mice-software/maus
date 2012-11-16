@@ -183,3 +183,9 @@ exceptions[os.path.join(TST, 'Optics',
 ('    } catch (Squeal squeal) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
+
+exceptions[os.path.join(TST, 'Recon/Global',
+                        'TrackPointTest.cc')] = [
+('  } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]

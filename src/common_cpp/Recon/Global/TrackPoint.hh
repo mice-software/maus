@@ -47,7 +47,7 @@ namespace global {
  * mass parameter. If t >= 0 and z < 0, it fills in z and Pz from t, E, and
  * the mass.
  */
-class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
+class TrackPoint : public MAUS::PhaseSpaceVector {
  public:
   /* @brief	Construct with all elements initialized to zero and phase space type
    *        temporal.
@@ -107,6 +107,8 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
 
   const bool operator==(const TrackPoint& rhs) const;
 
+  const bool operator!=(const TrackPoint& rhs) const;
+
   /* @brief Determines if the track point occurs earlier in time than another.
    */
   const bool operator<(const TrackPoint& rhs) const;
@@ -135,7 +137,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector, public MAUS::Step {
 
  protected:
   Detector::ID detector_id_;  // = 0 if this was not measured in a detector
-  CovarianceMatrix * uncertainties_;
+  CovarianceMatrix uncertainties_;
   Particle::ID particle_id_;
   double z_;
 };

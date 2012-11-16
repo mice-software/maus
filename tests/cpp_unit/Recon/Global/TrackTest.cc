@@ -91,6 +91,12 @@ TEST_F(TrackTest, DefaultConstructor) {
   ASSERT_EQ(Particle::kNone, empty_track.particle_id());
 }
 
+TEST_F(TrackTest, Accessors) {
+  Track track;
+  track.set_particle_id(Particle::kMuPlus);
+  EXPECT_EQ(Particle::kMuPlus, track.particle_id());
+}
+
 TEST_F(TrackTest, IdentifiedConstructor) {
   Track track(Particle::kMuMinus);
 
@@ -114,11 +120,27 @@ TEST_F(TrackTest, ContentConstructor) {
   ASSERT_EQ(Particle::kMuMinus, track.particle_id());
 }
 
-/* TODO(plane1@hawk.iit.edu)
 TEST_F(TrackTest, CopyConstructor) {
-}
+  const TrackPoint track_point_array[2] = {
+    TrackPoint(1., 2., 3., 4., 5., 6., TrackTest::kUncertainties, 7.),
+    TrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
+  };
+  std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
+  Track track(track_points, Particle::kMuMinus);
+  Track track_copy(track);
 
-TEST_F(TrackTest, ParticleIDAccessor) {
+  for (int index = 0; index < 2; ++index) {
+    TrackPoint track_point = track[index];
+    TrackPoint track_point_copy = track[index];
+    EXPECT_EQ(track_point, track_point_copy);
+  }
+  EXPECT_EQ(track.particle_id(), track_copy.particle_id());
+
+  // shamelessly useless test designed solely to increase test coverage
+  std::stringstream stream_copy;
+  stream_copy << track_copy;
+  std::stringstream stream;
+  stream << track;
+  ASSERT_EQ(stream_copy.str(), stream.str());
 }
-*/
 

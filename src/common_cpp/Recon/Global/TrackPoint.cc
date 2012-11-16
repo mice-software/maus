@@ -36,54 +36,29 @@ namespace global {
 TrackPoint::TrackPoint()
     : PhaseSpaceVector(),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix()),
-      particle_id_(Particle::kNone), z_(0.0)
+      particle_id_(Particle::kNone),
+      z_(0.0)
 { }
 
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
-      Step(),
       detector_id_(original_instance.detector_id_),
-      uncertainties_(new CovarianceMatrix(*original_instance.uncertainties_)),
       particle_id_(original_instance.particle_id_),
-      z_(original_instance.z_) {
-  double x = original_instance.x();
-  double y = original_instance.y();
-  double z = original_instance.z();
-  SetPosition(ThreeVector(x, y, z));
-
-  double px = original_instance.Px();
-  double py = original_instance.Py();
-  double pz = original_instance.Pz();
-  SetMomentum(ThreeVector(px, py, pz));
-
-  double energy = original_instance.energy();
-  SetEnergy(energy);
-  SetEnergyDeposited(energy);  // FIXME(plane1@hawk.iit.edu)
-
-  double distance = ::sqrt(x*x + y*y + z*z);
-  double momentum = ::sqrt(px*px + py*py + pz*pz);
-  double time = distance * energy / momentum;
-  SetTime(time);
-
-  const double mass = Particle::GetInstance()->GetMass(particle_id_);
-  double proper_time = time * mass / momentum;
-  SetProperTime(proper_time);
-
-  // SetPathLength();
-}
+      z_(original_instance.z_),
+      uncertainties_(original_instance.uncertainties_)
+{ }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
                        const double z, const Particle::ID pid)
     : PhaseSpaceVector(original_instance),
-      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
+      detector_id_(Detector::kNone),
       particle_id_(pid), z_(z)
 { }
 
 TrackPoint::TrackPoint(const Vector<double> & original_instance,
                        const double z, const Particle::ID pid)
     : PhaseSpaceVector(original_instance),
-      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
+      detector_id_(Detector::kNone),
       particle_id_(pid), z_(z)
 { }
 
@@ -94,7 +69,7 @@ TrackPoint::TrackPoint(const double time, const double energy,
                        const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix(uncertainties)),
+      uncertainties_(uncertainties),
       particle_id_(Particle::kNone), z_(z) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
@@ -104,7 +79,7 @@ TrackPoint::TrackPoint(const double time, const double energy,
                        const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(detector.id()),
-      uncertainties_(new CovarianceMatrix(detector.uncertainties())),
+      uncertainties_(detector.uncertainties()),
       particle_id_(Particle::kNone), z_(z) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
@@ -114,44 +89,46 @@ TrackPoint::TrackPoint(const double time, const double energy,
                        const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(Detector::kNone),
-      uncertainties_(new CovarianceMatrix()),
       particle_id_(particle_id), z_(z) { }
 
 TrackPoint::TrackPoint(double const * const array,
                        const double z)
     : PhaseSpaceVector(array),
-      detector_id_(Detector::kNone), uncertainties_(new CovarianceMatrix()),
+      detector_id_(Detector::kNone),
       particle_id_(Particle::kNone), z_(z) {
 }
 
 TrackPoint::~TrackPoint() {
-  delete uncertainties_;
 }
 
 TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
-  detector_id_ = rhs.detector_id_;
-  particle_id_ = rhs.particle_id_;
   z_ = rhs.z_;
-
-  delete uncertainties_;
-  uncertainties_ = new CovarianceMatrix(*rhs.uncertainties_);
+  particle_id_ = rhs.particle_id_;
+  detector_id_ = rhs.detector_id_;
+  uncertainties_ = rhs.uncertainties_;
 
   return *this;
 }
 
 const bool TrackPoint::operator==(const TrackPoint& rhs) const {
-  if ((*this) != ((PhaseSpaceVector) rhs)) {
+  if (static_cast<PhaseSpaceVector const * const>(this)->operator!=(rhs)) {
+    return false;
+  } else if (rhs.z_ != z_) {
     return false;
   } else if (rhs.particle_id_ != particle_id_) {
     return false;
   } else if (rhs.detector_id_ != detector_id_) {
     return false;
-  } else if ((*rhs.uncertainties_) != (*uncertainties_)) {
+  } else if (rhs.uncertainties_ != uncertainties_) {
     return false;
   }
 
   return true;
+}
+
+const bool TrackPoint::operator!=(const TrackPoint& rhs) const {
+  return !operator==(rhs);
 }
 
 const bool TrackPoint::operator<(const TrackPoint& rhs) const {
@@ -179,19 +156,30 @@ Detector::ID TrackPoint::detector_id() const {
 }
 
 void TrackPoint::set_uncertainties(const CovarianceMatrix & uncertainties) {
-  delete uncertainties_;
-  uncertainties_ = new CovarianceMatrix(uncertainties);
+  uncertainties_ = uncertainties;
 }
 
 const CovarianceMatrix & TrackPoint::uncertainties() const {
-  return *uncertainties_;
+  return uncertainties_;
 }
 
 double TrackPoint::z_momentum() const {
+  if (particle_id_ == Particle::kNone) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to calculate the momentum of a non-particle",
+                 "MAUS::recon::global::TrackPoint::z_momentum()"));
+  }
   const double mass = Particle::GetInstance()->GetMass(particle_id_);
   const double energy = (*this)[1];
   const double px = (*this)[3];
   const double py = (*this)[5];
+
+  if (energy < mass) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to calculate the momentum of a "
+                 "particle that is off mass shell.",
+                 "MAUS::recon::global::TrackPoint::z_momentum()"));
+  }
 
   return ::sqrt(energy*energy - mass*mass - px*px - py*py);
 }
@@ -214,10 +202,12 @@ PrimaryGeneratorParticle(const TrackPoint & point) {
 }
 
 std::ostream& operator<<(std::ostream& out, const TrackPoint& point) {
-  out << "t: " << point.time() << "E: "  << point.energy()
-      << "x: " << point.x()    << "Px: " << point.Px()
-      << "y: " << point.y()    << "Py: " << point.Py()
-      << "z: " << point.z()    << "Pz: " << point.Pz();
+  out << "t: " << point.time() << "  E: "  << point.energy()
+      << "  x: " << point.x()    << "  Px: " << point.Px()
+      << "  y: " << point.y()    << "  Py: " << point.Py()
+      << "  z: " << point.z()
+      << "  PID: " << point.particle_id() << "  DID: " << point.detector_id()
+      << "  Uncertainties: " << point.uncertainties();
 
   return out;
 }
