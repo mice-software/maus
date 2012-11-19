@@ -20,7 +20,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 namespace MAUS {
-typedef CLHEP::Hep3Vector ThreeVector;
+typedef ::CLHEP::Hep3Vector ThreeVector;
 }
 
 #endif

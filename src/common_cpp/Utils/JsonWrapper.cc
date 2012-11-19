@@ -24,7 +24,8 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-Json::Value JsonWrapper::StringToJson(std::string json_in) throw(Squeal) {
+Json::Value JsonWrapper::StringToJson(const std::string& json_in)
+    throw(Squeal) {
   Json::Reader reader;
   Json::Value  json_out;
   bool parsingSuccessful = reader.parse(json_in, json_out);
@@ -43,8 +44,10 @@ std::string JsonWrapper::JsonToString(const Json::Value& val) {
     return json_out.substr(0, json_out.size()-1);  // strip carriage return
 }
 
-Json::Value JsonWrapper::GetItem
-    (Json::Value array, size_t value_index, JsonType value_type) throw(Squeal) {
+Json::Value JsonWrapper::GetItem(const Json::Value & array,
+                                 const size_t value_index,
+                                 const JsonType value_type)
+    throw(Squeal) {
   if (array.type() != Json::arrayValue) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to find Json item but not an array",
@@ -63,8 +66,10 @@ Json::Value JsonWrapper::GetItem
                "JsonWrapper::GetItemStrict"));
 }
 
-Json::Value JsonWrapper::GetProperty
-     (Json::Value object, std::string name, JsonType value_type) throw(Squeal) {
+Json::Value JsonWrapper::GetProperty(const Json::Value& object,
+                                     const std::string& name,
+                                     const JsonType value_type)
+    throw(Squeal) {
   if (object.type() != Json::objectValue) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to find Json property "+name+" but not an object",
@@ -85,7 +90,8 @@ Json::Value JsonWrapper::GetProperty
   }
 }
 
-JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
+JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(
+    const Json::ValueType tp) {
   switch (tp) {
     case Json::nullValue: return nullValue;
     case Json::intValue: return intValue;
@@ -102,8 +108,8 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(Json::ValueType tp) {
   }
 }
 
-Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
-                                                                throw(Squeal) {
+Json::ValueType JsonWrapper::JsonTypeToValueType(const JsonWrapper::JsonType tp)
+    throw(Squeal) {
   switch (tp) {
     case nullValue:    return Json::nullValue;
     case intValue:     return Json::intValue;
@@ -121,22 +127,27 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(JsonWrapper::JsonType tp)
   return Json::nullValue;  // appease gcc
 }
 
-CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector
-                                       (Json::Value j_vec) throw(Squeal) {
-    if (!j_vec.isObject())
-      throw(Squeal(Squeal::recoverable,
-                  "Could not convert Json value of non-object type to three vector",
-                  "JsonWrapper::JsonToThreeVector(...)"
-            ));
-    CLHEP::Hep3Vector c_vec;
-    c_vec[0] = JsonWrapper::GetProperty(j_vec, "x", JsonWrapper::realValue).asDouble();
-    c_vec[1] = JsonWrapper::GetProperty(j_vec, "y", JsonWrapper::realValue).asDouble();
-    c_vec[2] = JsonWrapper::GetProperty(j_vec, "z", JsonWrapper::realValue).asDouble();
-    return c_vec;
+CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector(const Json::Value& j_vec)
+    throw(Squeal) {
+  if (!j_vec.isObject())
+    throw(Squeal(Squeal::recoverable,
+                "Could not convert Json value of non-object type "
+                "to three vector",
+                "JsonWrapper::JsonToThreeVector(...)"
+          ));
+  CLHEP::Hep3Vector c_vec;
+  Json::Value property;
+  property = JsonWrapper::GetProperty(j_vec, "x", JsonWrapper::realValue);
+  c_vec[0] = property.asDouble();
+  property = JsonWrapper::GetProperty(j_vec, "y", JsonWrapper::realValue);
+  c_vec[1] = property.asDouble();
+  property = JsonWrapper::GetProperty(j_vec, "z", JsonWrapper::realValue);
+  c_vec[2] = property.asDouble();
+  return c_vec;
 }
 
-bool JsonWrapper::SimilarType(JsonWrapper::JsonType jt1,
-                              JsonWrapper::JsonType jt2) {
+bool JsonWrapper::SimilarType(const JsonWrapper::JsonType jt1,
+                              const JsonWrapper::JsonType jt2) {
     return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
                        || jt2 == JsonWrapper::anyValue);
 }
@@ -146,7 +157,9 @@ void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
     out << writer.write(val);
 }
 
-bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::AlmostEqual(const Json::Value& value_1,
+                              const Json::Value& value_2,
+                              const double tolerance) {
     if (value_1.type() != value_2.type()) {
         return false;
     }
@@ -172,8 +185,9 @@ bool JsonWrapper::AlmostEqual(Json::Value value_1, Json::Value value_2, double t
     }
 }
 
-bool JsonWrapper::ObjectEqual
-                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::ObjectEqual(const Json::Value& value_1,
+                              const Json::Value& value_2,
+                              const double tolerance) {
     // get keys, assure that ordering is same
     std::vector<std::string> keys_1 = value_1.getMemberNames();
     std::vector<std::string> keys_2 = value_2.getMemberNames();
@@ -193,8 +207,9 @@ bool JsonWrapper::ObjectEqual
     return true;
 }
 
-bool JsonWrapper::ArrayEqual
-                  (Json::Value value_1, Json::Value value_2, double tolerance) {
+bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
+                             const Json::Value& value_2,
+                             const double tolerance) {
     // check length is same
     if (value_1.size() != value_2.size()) {
         return false;
@@ -208,8 +223,8 @@ bool JsonWrapper::ArrayEqual
     return true;
 }
 
-Json::Value JsonWrapper::ObjectMerge
-                                  (Json::Value object_1, Json::Value object_2) {
+Json::Value JsonWrapper::ObjectMerge(const Json::Value& object_1,
+                                     const Json::Value& object_2) {
     // check we have objects
     if (object_1.type() != Json::objectValue ||
         object_2.type() != Json::objectValue) {
@@ -250,7 +265,8 @@ Json::Value JsonWrapper::ObjectMerge
     return object_merged;
 }
 
-Json::Value JsonWrapper::ArrayMerge(Json::Value array_1, Json::Value array_2) {
+Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
+                                    const Json::Value& array_2) {
     if (array_1.type() != Json::arrayValue ||
         array_2.type() != Json::arrayValue) {
         throw(Squeal(Squeal::recoverable,
@@ -264,7 +280,7 @@ Json::Value JsonWrapper::ArrayMerge(Json::Value array_1, Json::Value array_2) {
     return array_merge;
 }
 
-std::string JsonWrapper::ValueTypeToString(Json::ValueType tp) {
+std::string JsonWrapper::ValueTypeToString(const Json::ValueType tp) {
   switch (tp) {
     case Json::nullValue: return "nullValue";
     case Json::intValue: return "intValue";
@@ -282,7 +298,7 @@ std::string JsonWrapper::ValueTypeToString(Json::ValueType tp) {
   return "";
 }
 
-std::string JsonWrapper::Path::GetPath(Json::Value json) {
+std::string JsonWrapper::Path::GetPath(const Json::Value& json) {
     if (!json.hasComment(Json::commentAfter)) {
         return "";
     }
@@ -291,13 +307,14 @@ std::string JsonWrapper::Path::GetPath(Json::Value json) {
     return comment_json["path"].asString();
 }
 
-void JsonWrapper::Path::SetPath(Json::Value& json, std::string path) {
+void JsonWrapper::Path::SetPath(Json::Value& json, const std::string& path) {
     Json::Value comment(Json::objectValue);
     comment["path"] = path;
     json.setComment("// "+JsonToString(comment), Json::commentAfter);
 }
 
-void JsonWrapper::Path::AppendPath(Json::Value& json, std::string branch_name) {
+void JsonWrapper::Path::AppendPath(Json::Value& json,
+                                   const std::string& branch_name) {
     if (branch_name.find("/") != std::string::npos)
         throw(Squeal(Squeal::recoverable,
                      "/ not allowed in branch names",
@@ -310,49 +327,57 @@ void JsonWrapper::Path::AppendPath(Json::Value& json, std::string branch_name) {
     }
 }
 
-void JsonWrapper::Path::AppendPath(Json::Value& json, size_t array_index) {
+void JsonWrapper::Path::AppendPath(Json::Value& json,
+                                   const size_t array_index) {
     AppendPath(json, STLUtils::ToString(array_index));
 }
 
-Json::Value& JsonWrapper::Path::DereferencePath
-                                         (Json::Value& json, std::string path) {
-    if (path[0] == '#')
-        path = path.substr(1, path.size());  // lstrip #
-    if (path[path.size()-1] == '/')
-        path = path.substr(0, path.size()-1);  // rstrip /
-    if (path == "")
-        return json;
-    std::string this_path = path;
-    std::string child_path = "";
-    if (path.find("/") != std::string::npos) {
-        this_path = path.substr(0, path.find('/'));
-        child_path = path.substr(path.find('/')+1, path.size());
+Json::Value& JsonWrapper::Path::DereferencePath(Json::Value& json,
+                                                const std::string& path) {
+  std::string dereferenced_path(path);
+  if (dereferenced_path[0] == '#') {
+    // lstrip #
+    dereferenced_path = dereferenced_path.substr(1, dereferenced_path.size());
+  }
+  if (dereferenced_path[path.size()-1] == '/') {
+    // rstrip
+    dereferenced_path = dereferenced_path.substr(0, dereferenced_path.size()-1);
+  }
+  if (dereferenced_path == "") {
+    return json;
+  }
+  std::string this_path = dereferenced_path;
+  std::string child_path = "";
+  if (dereferenced_path.find("/") != std::string::npos) {
+    this_path = dereferenced_path.substr(0, dereferenced_path.find('/'));
+    child_path = dereferenced_path.substr(dereferenced_path.find('/')+1,
+                                          dereferenced_path.size());
+  }
+  switch (json.type()) {
+    case Json::arrayValue: {
+      Json::Value::UInt index = STLUtils::FromString<size_t>(this_path);
+      if (json.isValidIndex(index)) {
+        return DereferencePath(json[index], child_path);
+      }
+      break;
     }
-    switch (json.type()) {
-        case Json::arrayValue: {
-            Json::Value::UInt index = STLUtils::FromString<size_t>(this_path);
-            if (json.isValidIndex(index)) {
-                return DereferencePath(json[index], child_path);
-            }
-            break;
-        }
-        case Json::objectValue: {
-            if (json.isMember(this_path)) {
-                return DereferencePath(json[this_path], child_path);
-            }
-            break;
-        }
-        default:
-            break;
+    case Json::objectValue: {
+      if (json.isMember(this_path)) {
+        return DereferencePath(json[this_path], child_path);
+      }
+      break;
     }
-    throw(Squeal(Squeal::recoverable,
-                 "Could not dig through path "+path+
-                 " from json value "+JsonToString(json),
-                 "JsonWrapper::DereferencePath"));
+    default:
+      break;
+  }
+  throw(Squeal(Squeal::recoverable,
+               "Could not dig through path "+dereferenced_path+
+               " from json value "+JsonToString(json),
+               "JsonWrapper::DereferencePath"));
 }
 
 void JsonWrapper::Path::SetPathRecursive(Json::Value& json,
-                                         std::string root_path) {
+                                         const std::string& root_path) {
   SetPath(json, root_path);
   _SetPathRecursive(json);
 }

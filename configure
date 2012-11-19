@@ -174,13 +174,23 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 
-     export maus_no_optimize=0 # force gcc not to optimise
-     export maus_lcov=0 # enable cpp coverage - requires lcov
-     export maus_debug=0 # enable debugging
-     export maus_gprof=0 # enable cpp profiling of cpp unit tests 
-                         # requires gprof
-     export maus_assert_active=0 # enable assert() command - disabled by default
-                                 # as better to use exceptions
+     if [ -z "\${maus_no_optimize}" ]; then  # see if the variable exists
+        export maus_no_optimize=0 # force gcc not to optimise
+     fi
+     if [ -z "\${maus_lcov}" ]; then  # see if the variable exists
+        export maus_lcov=0 # enable cpp coverage - requires lcov
+     fi
+     if [ -z "\${maus_debug}" ]; then  # see if the variable exists
+        export maus_debug=0 # enable debugging
+     fi
+     if [ -z "\${maus_gprof}" ]; then  # see if the variable exists
+        export maus_gprof=0 # enable cpp profiling of cpp unit tests 
+                            # requires gprof
+     fi
+     if [ -z "\${maus_assert_active}" ]; then  # see if the variable exists
+        export maus_assert_active=0 # enable assert() command - disabled by default
+                                    # as better to use exceptions
+     fi
 
      echo "SUCCESS: MAUS setup"
 else

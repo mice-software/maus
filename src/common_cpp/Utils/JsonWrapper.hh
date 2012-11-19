@@ -68,7 +68,7 @@ namespace JsonWrapper {
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  Json::Value StringToJson(std::string json_in) throw(Squeal);
+  Json::Value StringToJson(const std::string& json_in) throw(Squeal);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
@@ -85,8 +85,9 @@ namespace JsonWrapper {
    *  Returns the Json::Value on success. Throws an exception of type Squeal on
    *  failure
    */
-  Json::Value GetItem(Json::Value array, size_t value_index,
-                                            JsonType value_type) throw(Squeal);
+  Json::Value GetItem(const Json::Value& array,
+                      const size_t value_index,
+                      const JsonType value_type) throw(Squeal);
 
   /** @brief Get a property from a Json object (hash)
    *
@@ -97,9 +98,9 @@ namespace JsonWrapper {
    *  Attempt to access a branch from Json. If the branch is not found, throw a
    *  Squeal.
    */
-  Json::Value GetProperty
-     (Json::Value object, std::string value_name,
-                          JsonType value_type) throw(Squeal);
+  Json::Value GetProperty(const Json::Value& object,
+                          const std::string& value_name,
+                          const JsonType value_type) throw(Squeal);
 
 
   /** @brief Convert from a json three vector to a CLHEP three vector
@@ -107,24 +108,24 @@ namespace JsonWrapper {
    *  @param json_vec objectValue with realValue children "x", "y", "z". Throws
    *         an exception if the conversion fails.
    */
-  CLHEP::Hep3Vector JsonToThreeVector
-                                       (Json::Value json_vec) throw(Squeal);
+  CLHEP::Hep3Vector JsonToThreeVector(const Json::Value& json_vec)
+      throw(Squeal);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
-  JsonType ValueTypeToJsonType(Json::ValueType tp);
+  JsonType ValueTypeToJsonType(const Json::ValueType tp);
 
   /** @brief Convert from Json::Value type to string
    */
-  std::string ValueTypeToString(Json::ValueType tp);
+  std::string ValueTypeToString(const Json::ValueType tp);
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  Json::ValueType JsonTypeToValueType(JsonType tp) throw(Squeal);
+  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(Squeal);
 
   /** @brief Return true if types are equal or anyValue
    */
-  bool SimilarType(JsonType jt1, JsonType jt2);
+  bool SimilarType(const JsonType jt1, const JsonType jt2);
 
   /** @brief Print the Json value to an ostream
    *
@@ -142,24 +143,27 @@ namespace JsonWrapper {
    *  @param tolerance float tolerance - requirement is that
    *         fabs(float_1-float_2) < tolerance
    */
-  bool AlmostEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  bool AlmostEqual(const Json::Value& value_1,
+                   const Json::Value& value_2,
+                   const double tolerance);
 
   /** @brief Check for equality between json arrays
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  bool ArrayEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  bool ArrayEqual(const Json::Value& value_1,
+                  const Json::Value& value_2,
+                  const double tolerance);
 
   /** @brief Check for equality between json objects
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
    */
-  bool ObjectEqual
-                   (Json::Value value_1, Json::Value value_2, double tolerance);
+  bool ObjectEqual(const Json::Value& value_1,
+                   const Json::Value& value_2,
+                   const double tolerance);
 
 
   /** @brief Merge two json objects
@@ -170,13 +174,15 @@ namespace JsonWrapper {
    *  object but not the other put it in the merged object; if the property
    *  exists in both objects but is not an array, throw an exception.
    */
-  Json::Value ObjectMerge(Json::Value object_1, Json::Value object_2);
+  Json::Value ObjectMerge(const Json::Value& object_1,
+                          const Json::Value& object_2);
 
   /** @brief Merge two json arrays
    *
    *  Put items from array_2 onto the back of array_1
    */
-  Json::Value ArrayMerge(Json::Value array_1, Json::Value array_2);
+  Json::Value ArrayMerge(const Json::Value& array_1,
+                         const Json::Value& array_2);
 
 namespace Path {
   // Nb: Path could be a class? But then we lose "using" functionality; OTOH we
@@ -186,13 +192,13 @@ namespace Path {
    *
    *  Path is stored in the comment field
    */
-  std::string GetPath(Json::Value json);
+  std::string GetPath(const Json::Value& json);
 
   /** @brief Set the path to a json value
    *
    *  Path is stored in the comment field
    */
-  void SetPath(Json::Value& json, std::string path);
+  void SetPath(Json::Value& json, const std::string& path);
 
   /** @brief Append the path to a json value
    *
@@ -200,7 +206,7 @@ namespace Path {
    *  \param json Json::Value to which the path should be appended
    *  \param branch_name name of a branch in a Json object
    */
-  void AppendPath(Json::Value& json, std::string branch_name);
+  void AppendPath(Json::Value& json, const std::string& branch_name);
 
   /** @brief Append the path to a json value
    *
@@ -208,14 +214,14 @@ namespace Path {
    *  \param json Json::Value to which the path should be appended
    *  \param array_index index of a branch in a Json array
    */
-  void AppendPath(Json::Value& json, size_t array_index);
+  void AppendPath(Json::Value& json, const size_t array_index);
 
   /** @brief Return the json value corresponding to a given path
    *
    *  Return the json value located at a given path. If the path cannot be
    *  accessed, throw a Squeal.
    */
-  Json::Value& DereferencePath(Json::Value& json, std::string path);
+  Json::Value& DereferencePath(Json::Value& json, const std::string& path);
 
   /** @brief walk the Json structure setting path on all data
    *
@@ -223,7 +229,7 @@ namespace Path {
    *  @param root_path path from root; all subsequent paths will be appended to
    *         this one (set to "" to start from root)
    */
-  void SetPathRecursive(Json::Value& json, std::string root_path);
+  void SetPathRecursive(Json::Value& json, const std::string& root_path);
 
   /** @brief walk the Json structure stripping comments from all data
    *

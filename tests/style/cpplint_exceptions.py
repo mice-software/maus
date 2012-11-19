@@ -164,3 +164,28 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
 ('    strcpy(t.m_branchName, "TestBranch2");', '', 'richards'),
 
 ]
+
+exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
+('  } catch (Squeal squeal) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(TST, 'Optics',
+                        'LinearApproximationOpticsModelTest.cc')] = [
+('  } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(TST, 'Optics',
+                        'PolynomialOpticsModelTest.cc')] = [
+('  } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+('    } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(TST, 'Recon/Global',
+                        'TrackPointTest.cc')] = [
+('  } catch (Squeal squeal) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
