@@ -1,8 +1,9 @@
+# pylint: disable=C0103
 """  Test for MapCppTrackerRecon """
 import json
 import unittest
 import os
-import random
+# import random
 from Configuration import Configuration
 
 from MapCppTrackerRecon import MapCppTrackerRecon

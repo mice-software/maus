@@ -89,10 +89,14 @@ exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
 ]
 
 exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.hh')] = [
-('template<>           orstream& orstream::operator<< <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           orstream& orstream::operator<< <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           orstream& orstream::operator<< <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           orstream& orstream::operator<< <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <short> (short&  d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long&   d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <short> (short* &  d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           orstream& orstream::operator<< <long>  (long* &   d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
 
 ]
 
@@ -110,15 +114,20 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','ORStreamTest.cc')] = [
 ('  long nevent = 0;', 'root uses longs', 'richards'),
 ]
 exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.hh')] = [
-('template<>           irstream& irstream::operator>> <short> (short&  d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           irstream& irstream::operator>> <long>  (long&   d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           irstream& irstream::operator>> <short> (short* &  d) {', 'doesnt like the necessary specialisation', 'richards'),
-('template<>           irstream& irstream::operator>> <long>  (long* &   d) {', 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <short> (short&  d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long&   d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <short> (short* &  d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
+('template<>           irstream& irstream::operator>> <long>  (long* &   d) {',
+ 'doesnt like the necessary specialisation', 'richards'),
 
 ]
 
 exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','IRStream.cc')] = [
-('  long nextEvent = irs.m_tree->GetReadEntry() + 1;', 'root can return a long', 'richards'),
+('  long nextEvent = irs.m_tree->GetReadEntry() + 1;',
+ 'root can return a long', 'richards'),
 ('  strcpy(m_branchName, "");', '', 'richards'),
 ('  strcpy(m_branchName, "");', '', 'richards')
 

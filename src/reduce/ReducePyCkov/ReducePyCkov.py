@@ -353,7 +353,8 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
         try:
             doc = ReducePyROOTHistogram.get_image_doc(self, [], content, tag, self.canvas_charge)
             image_list.append(doc)
-        except:
+        except: #pylint: disable =W0702
+            import sys
             sys.excepthook(*sys.exc_info())
 
         #ArrivalTimes

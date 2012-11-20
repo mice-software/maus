@@ -162,7 +162,8 @@ def build_data_structure(env):
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
-    data_items = filter(lambda x: x[-7:] != '-inl.hh', data_items)
+    data_items = filter(lambda x: x[-7:] != '-inl.hh',#pylint:disable=W0141
+                        data_items)
     dict_target = (data_struct+'/MausDataStructure.cc')
     proc_target = ['rootcint']+['-f', dict_target, '-c']
     for include in env['CPPPATH']:

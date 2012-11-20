@@ -344,7 +344,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "uniform_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_UNIFORM_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_UNIFORM_T["t_end"])
-        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
+        self.assertAlmostEqual(self._beam.beam_matrix[5, 5], 1.e4)
         self.assertRaises(ValueError, 
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_UNIFORM_T_F1)
@@ -353,7 +353,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "sawtooth_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_SAWTOOTH_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_SAWTOOTH_T["t_end"])
-        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
+        self.assertAlmostEqual(self._beam.beam_matrix[5, 5], 1.e4)
 
     def test_birth_trans_long_coupling(self):
         """Beam transverse - longitudinal coupling"""

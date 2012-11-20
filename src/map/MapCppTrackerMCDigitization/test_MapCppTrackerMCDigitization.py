@@ -1,3 +1,4 @@
+# pylint: disable=R0904,C0103
 """Test for MapCppTrackerMCDigitization """
 import json
 import unittest
@@ -31,7 +32,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
     This python test will work over the process
     """
     @classmethod
-    def setUpClass(self):  # pylint: disable-msg=C0103
+    def setUpClass(self):  # pylint: disable-msg=C0103,C0202
         """ Class Initializer.
             The set up is called before each test function
             is called.
@@ -54,29 +55,29 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
-        self._filename = \
+        _filename = \
         '%s/src/map/MapCppTrackerMCDigitization/simulation_sample' % root_dir
-        assert os.path.isfile(self._filename)
-        self._file = open(self._filename, 'r')
+        assert os.path.isfile(_filename)
+        _file = open(_filename, 'r')
         # File is open.
         # Spill 1 is corrupted.
-        spill_1 = self._file.readline().rstrip()
+        spill_1 = _file.readline().rstrip()
         output_1 = self.mapper.process(spill_1)
         self.assertTrue("errors" in json.loads(output_1))
         # Spill 2 is sain.
-        spill_2 = self._file.readline().rstrip()
+        spill_2 = _file.readline().rstrip()
         output_2 = self.mapper.process(spill_2)
         self.assertTrue("tracker_digits" in json.loads(output_2))
         # spill 3 is end of event
-        spill_3 = self._file.readline().rstrip()
+        spill_3 = _file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)
         self.assertTrue("END_OF_RUN" in json.loads(output_3))
         # self.assertFalse("errors" in json.loads(output_3))
         # Close file.
-        self._file.close()
+        _file.close()
 
     @classmethod
-    def tear_down_class(self):
+    def tear_down_class(self):# pylint: disable-msg=C0202
         """___"""
         success = self.mapper.death()
         if not success:

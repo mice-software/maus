@@ -39,9 +39,9 @@ kill all child processes.
 import sys
 import os
 import signal
-import xboa.Common
+# import xboa.Common
 import subprocess
-import multiprocessing
+# import multiprocessing
 import time
 
 LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
@@ -181,7 +181,7 @@ Kill existing session? (y/N)"""
         force_kill_maus_web_app()
         time.sleep(3)
 
-def make_lockfile(PROCESSES):
+def make_lockfile(PROCESSES):# pylint:disable = C0103, W0621
     """
     Make a lock file listing pid of this process and all children
     """

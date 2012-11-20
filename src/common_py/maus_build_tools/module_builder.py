@@ -50,11 +50,12 @@ class ModuleBuilder:
         self.local_environments = {}
 
     # sets up the sconscript file for a given sub-project
-    def subproject(self, project, env, conf): #pylint: disable=C0103, R0201
+    def subproject(self, project, env, conf):#pylint: disable=C0103, R0201,W0613
         """
         Build the Subproject with name project
         """
-        SConscript(sconscript_path(project), exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
+        SConscript(sconscript_path(project),
+                   exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
 
     #sets up the build for a given project

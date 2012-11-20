@@ -39,7 +39,7 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
                             os.environ.get("MAUS_ROOT_DIR")
         datafile = '02873.003'
         self.mon =  datapath + datafile
-        """ Get the default configuration """
+        # """ Get the default configuration """
         self._test_configuration = Configuration().getConfigJSON()
         test_conf_json = json.loads(self._test_configuration)
         test_conf_json['DAQ_monitor_name'] = 'MICE_Online_Test'
@@ -55,7 +55,7 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         self.assertTrue(self.mapper.readNextEvent())
         data = self.mapper.getCurEvent()
         # Data shold be 80 (first event is start of burst)
-        self.assertEqual(len(data), 80)
+        self.assertEqual(len(data), 96)
         self.assertTrue(self.mapper.death())
         return
 
@@ -70,7 +70,7 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         digester = md5.new()
 
         for i in self.mapper.emitter():
-            digester.update(i)
+            digester.update(i) # pylint:disable=E1101
             event_count = event_count + 1
 
         # We should now have processed 26 events
@@ -79,7 +79,7 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # Check the md5 sum matches the expected value
         # changed checksum to reflect the run_num addition
         self.assertEqual(digester.hexdigest(), \
-                         '426cc54172fc1091185f4eaacdd8b85a')
+                         'ca8fb803f65c2ef93327379bee9399d0')
 
         self.assertTrue(self.mapper.death())
 

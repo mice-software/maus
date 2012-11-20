@@ -97,7 +97,7 @@ def run_cpplint(root_dir, file_list):
 run_cpplint.__doc__ += str(cpplint_suffixes)
 
 
-class cpplint_postprocessor:
+class cpplint_postprocessor:#pylint: disable =C0103
     """
     @class cpplint_postprocessor
     cpplint_postprocessor is really just a collection of functions associated
@@ -108,7 +108,7 @@ class cpplint_postprocessor:
         """Does nothing"""
         pass
 
-    def get_line_numbers(self, cpplint_output_filename):
+    def get_line_numbers(self, cpplint_output_filename):#pylint: disable =R0201
         """
         @brief Read cpplint output file
 
@@ -118,8 +118,8 @@ class cpplint_postprocessor:
         """
         file_to_error = {}
         filename = os.path.join(maus_root_dir, cpplint_output_filename)
-        fh = open(filename)
-        lines = fh.readlines()
+        fileh = open(filename)
+        lines = fileh.readlines()
         for line in lines:
             line = line.rstrip('\n')
             words = line.split(' ')
@@ -130,11 +130,12 @@ class cpplint_postprocessor:
                 except:
                     raise IOError(str(line)+' not in file '+filename)
                 file_path = file_path[len(maus_root_dir)+1:file_path.rfind(':')]
-                if file_path not in file_to_error: file_to_error[file_path] = []
+                if file_path not in file_to_error:
+                    file_to_error[file_path] = []
                 file_to_error[file_path].append([line, line_number, ''])
         return file_to_error
 
-    def get_line_strings(self, file_to_error):
+    def get_line_strings(self, file_to_error):#pylint: disable =R0201
         """
         @brief Find lines of source code corresponding to a given error message
 
@@ -147,12 +148,12 @@ class cpplint_postprocessor:
         for key in file_to_error.keys():
             fh_out = open(os.path.join(maus_root_dir, key))
             lines = fh_out.readlines()
-            for i,value in enumerate(file_to_error[key]):
+            for i, value in enumerate(file_to_error[key]):
                 if value[1]-1 >= 0: #line 0 can sometimes be error
                     file_to_error[key][i][2] = lines[value[1]-1].rstrip('\n')
         return file_to_error
 
-    def print_error(self, file_to_error, fh=sys.stdout):
+    def print_error(self, file_to_error, fileh=sys.stdout):#pylint: disable =R0201
         """
         @brief Print formatted output
 
@@ -160,21 +161,22 @@ class cpplint_postprocessor:
                 line_text]}
         @params fh filehandle to which we write
         """
-        for f,key in file_to_error.iteritems():
-            print >>fh,'File',f
-            for line in key: print >>fh,'   ',line[0]
+        for _file, key in file_to_error.iteritems():
+            print >> fileh, 'File', _file
+            for line in key:
+                print >> fileh, '   ', line[0]
 
-    def print_files_with_errors(self, file_to_error, fh):
+    def print_files_with_errors(self, file_to_error, fileh):
         """
         @brief Print list of files that have errors (hack used below to create
                exclude_files lists)
         """
-        print >>fh,'['
+        print >> fileh,'['
         keys = sorted(file_to_error.keys())
         for key in keys:
             out_string = key.split('/')[-1]
-            print >>fh,"'"+out_string+"',",
-        print >>fh,'\n]'
+            print >> fileh, "'" + out_string + "',",
+        print >> fileh, '\n]'
 
     def strip_ref_dict(self, ref_dict):
         """

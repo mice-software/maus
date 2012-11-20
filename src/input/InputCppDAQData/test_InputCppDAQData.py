@@ -18,16 +18,16 @@
 # pylint: disable = C0103
 
 import os
-import md5
+# import md5
 import unittest
-import json
+# import json
 from Configuration import Configuration
 from InputCppDAQData import InputCppDAQData
 
 class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for InputCppDAQData"""
     @classmethod
-    def setUpClass(self): # pylint: disable = C0103
+    def setUpClass(self): # pylint: disable = C0103, C0202
         """Sets a mapper and configuration"""
         if not os.environ.get("MAUS_ROOT_DIR"):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
@@ -37,28 +37,26 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
-
+        self._mapper = InputCppDAQData(self._datapath, \
+                                       self._datafile)
     def test_init(self):
         """Check birth with default configuration"""
-        self.mapper = InputCppDAQData(self._datapath, \
-                                       self._datafile)
-        self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
+
+        self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))
         # Check re-init without closing fails
-        self.assertFalse(self.mapper.birth( self._c.getConfigJSON() ))
-        self.assertTrue(self.mapper.death())
+        self.assertFalse(self._mapper.birth( self._c.getConfigJSON() ))
+        self.assertTrue(self._mapper.death())
         return
 
     def test_single(self):
         """Test a single event"""
-        self.mapper = InputCppDAQData(self._datapath, \
-                                       self._datafile)
-        self.assertTrue(self.mapper.birth(self. _c.getConfigJSON() ))
+        self.assertTrue(self._mapper.birth(self. _c.getConfigJSON() ))
         # Get a single event and check it's the right size
-        self.assertFalse(self.mapper.readNextEvent())
+        self.assertFalse(self._mapper.readNextEvent())
         return
 
     @classmethod
-    def tearDownClass(self): # pylint: disable = C0103
+    def tearDownClass(self): # pylint: disable = C0103,C0202
         """Check that we can death() MapCppTOFDigits"""
         pass
 

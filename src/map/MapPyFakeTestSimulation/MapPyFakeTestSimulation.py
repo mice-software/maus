@@ -22,35 +22,40 @@
 #  This is useful for testing mappers that work on simulation
 #  data or doing load testing.  
 #
+"""MapPyFakeTestSimulation.py"""
 import json
-import types
+# import types
 import os
 
 class MapPyFakeTestSimulation:
-    """ ___ """ 
-    def birth(self, configJSON):
+    """ ___ """
+    def __init__(self):
+        """__init__"""
+        pass
+    
+    def birth(self, configJSON):#pylint: disable =C0103
         """ Setting env variables and prototype json file """
-        config = json.loads(configJSON)
+        config = json.loads(configJSON)#pylint: disable =W0612
  
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
 
-        self._filename = \
+        _filename = \
         '%s/src/map/MapPyFakeTestSimulation/mausput_digits' % root_dir
-        assert os.path.isfile(self._filename)
+        assert os.path.isfile(_filename)
 
-        self._file = open(self._filename, 'r')
-        self._document = self._file.readline().rstrip()
-        self._file.close()
+        _file = open(_filename, 'r')
+        self._document = _file.readline().rstrip()#pylint: disable =W0201
+        _file.close()
 
         return True
 
-    def process(self, str):
+    def process(self, process_str):#pylint: disable =W0613
         """ The process """
         return self._document
 
-    def death(self):
+    def death(self):#pylint: disable =R0201
         """ Destructor """
         return True
 

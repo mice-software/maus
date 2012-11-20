@@ -26,16 +26,16 @@ class Beamline(): #pylint: disable = R0903
         if CDB_STATUS != None:
             raise CdbPermanentError("error") #pylint: disable = E0702
 
-    def get_beamline_for_run(self, run_number):
+    def get_beamline_for_run(self, run_number):#pylint: disable =R0201,W0613
         """Raise CDB_Status if CDB_STATUS is not None. Else return toy dict"""
         if CDB_STATUS != None:
-            raise CDB_STATUS
+            raise CDB_STATUS#pylint: disable =E0702
         return Beamline.bl_dict
 
-    def get_beamline_for_run_xml(self, run_number):
+    def get_beamline_for_run_xml(self, run_number):#pylint: disable =R0201,W0613
         """Raise CDB_Status if CDB_STATUS is not None. Else return toy xml"""
         if CDB_STATUS != None:
-            raise CDB_STATUS
+            raise CDB_STATUS#pylint: disable =E0702
         return Beamline.bl_xml
 
     bl_xml = """
