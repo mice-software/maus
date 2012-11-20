@@ -70,7 +70,7 @@ class PolynomialOpticsModelTest : public testing::Test {
     simulation->GetPhysicsList()->Setup();
 
     (*config)["simulation_reference_particle"] = JsonWrapper::StringToJson(
-      std::string("{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":-1000.0},")+
+      std::string("{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":1000.0},")+
       std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},")+
       std::string("\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,")+
       std::string("\"random_seed\":2}")
@@ -114,18 +114,18 @@ class PolynomialOpticsModelTest : public testing::Test {
 
     simulation->SetVirtualPlanes(&virtual_planes_);
     MAUS::VirtualPlane start_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., -1000.), -1, true,
-        -1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 1000.), -1, true,
+        1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes_.AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
 
     MAUS::VirtualPlane mid_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 0.), -1, true,
-        0., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
+        2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes_.AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
 
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 1000.), -1, true,
-        1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 3000.), -1, true,
+        3000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes_.AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
   }
 
@@ -185,30 +185,30 @@ TEST_F(PolynomialOpticsModelTest, Accessors) {
   PolynomialOpticsModel optics_model(
       *MAUS::Globals::GetConfigurationCards());
   double first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(-1000., first_plane);
+  ASSERT_DOUBLE_EQ(1000., first_plane);
 
-  optics_model.set_first_plane(0.);
+  optics_model.set_first_plane(2000.);
   first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(0., first_plane);
+  ASSERT_DOUBLE_EQ(2000., first_plane);
 }
 
 TEST_F(PolynomialOpticsModelTest, Transport) {
   PolynomialOpticsModel optics_model(
       *MAUS::Globals::GetConfigurationCards());
 
-  // The configuration specifies a 2m drift between -1m and +1 m.
+  // The configuration specifies a 2m drift between 1m and 3m.
   optics_model.Build();
 
   // Check transport to start plane
   MAUS::PhaseSpaceVector input_vector(0., 226., 1., 0., 3., 0.);
   MAUS::PhaseSpaceVector output_vector = optics_model.Transport(input_vector,
-                                                                -1000.);
+                                                                1000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(input_vector[index], output_vector[index], 1.0e-4);
   }
 
   MAUS::CovarianceMatrix output_errors
-      = optics_model.Transport(kCovarianceMatrix, -1000.);
+      = optics_model.Transport(kCovarianceMatrix, 1000.);
   for (int row = 1; row <= 6; ++row) {
     for (int column = 1; column <= 6; ++column) {
       EXPECT_NEAR(kCovarianceMatrix(row, column), output_errors(row, column),
@@ -218,14 +218,14 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
 
   // Check transport to end plane
   MAUS::PhaseSpaceVector expected_vector(7.5466, 226., 1., 0., 3., 0.);
-  output_vector = optics_model.Transport(input_vector, 1000.);
+  output_vector = optics_model.Transport(input_vector, 3000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
   // Check transport to mid plane
   expected_vector = MAUS::PhaseSpaceVector(3.7733, 226., 1., 0., 3., 0.);
-  output_vector = optics_model.Transport(input_vector, 0.);
+  output_vector = optics_model.Transport(input_vector, 2000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
@@ -234,7 +234,7 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
   // Inverse() function in PolynomialMap is not implemented)
   bool transport_failed = false;
   try {
-    output_vector = optics_model.Transport(input_vector, 0., 1000.);
+    output_vector = optics_model.Transport(input_vector, 2000., 3000.);
   } catch (Squeal squeal) {
     transport_failed = true;
   }
