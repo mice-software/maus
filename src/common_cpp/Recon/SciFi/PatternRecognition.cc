@@ -634,7 +634,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                   // std::cerr << "Found a good circle using spacepoints:\n";
                   for (unsigned int i = 0; i < good_spnts.size(); ++i) {
                     ThreeVector pos = good_spnts[i]->get_position();
-                    std::cerr << pos.x() << " " << pos.y() << " " << pos.z() << std::endl;
+                    // std::cerr << pos.x() << " " << pos.y() << " " << pos.z() << std::endl;
                   }
                   /* std::cerr << " circle_x0 is " << circle.get_x0() << std::endl;
                   std::cerr << " circle_y0 is " << circle.get_y0() << std::endl;
@@ -793,19 +793,32 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
   std::vector<double> dz;
   std::vector<double> dphi_err;
+  std::vector<SciFiSpacePoint*> spnts_by_zed;
+
+  int spnts_size = spnts.size();
+  if (spnts[0]->get_tracker() == 0) {
+    for (int i = 0; i < spnts_size; i++) {
+      int swith = spnts_size - i - 1;
+      spnts_by_zed.push_back(spnts[swith]);
+    }
+  } else { spnts_by_zed = spnts; }
 
   // Calculate phi_0, the rotation when moving from x to x'
-  phi_0 = calc_turning_angle(spnts[0]->get_position().x(), spnts[0]->get_position().y(), circle);
+  phi_0 = calc_turning_angle(spnts_by_zed[0]->get_position().x(),
+                             spnts_by_zed[0]->get_position().y(),
+                             circle);
 
-  // std::cerr << spnts[0]->get_tracker() << std::endl;
   // Loop over spacepoints
-  for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
-
-    dz.push_back(spnts[i]->get_position().z() - spnts[0]->get_position().z());
+  for ( int i = 1; i < static_cast<int>(spnts_by_zed.size()); ++i ) {
+    if (spnts[0]->get_tracker() == 0) {
+      dz.push_back(spnts_by_zed[0]->get_position().z() -
+                   spnts_by_zed[i]->get_position().z());
+    } else {dz.push_back(spnts_by_zed[i]->get_position().z() -
+                         spnts_by_zed[0]->get_position().z());}
 
     // theta_i is defined as phi_i + phi_0 i.e. the turning angle wrt the x (not x') axis
-    double theta_i = calc_turning_angle(spnts[i]->get_position().x(),
-                                        spnts[i]->get_position().y(), circle);
+    double theta_i = calc_turning_angle(spnts_by_zed[i]->get_position().x(),
+                                        spnts_by_zed[i]->get_position().y(), circle);
 
     // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
     dphi.push_back(theta_i - phi_0);
@@ -813,7 +826,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
     // Set the error on phi
     double sd_phi = -1.0;
-    if ( (spnts[i]->get_station() == 5) )
+    if ( (spnts_by_zed[i]->get_station() == 5) )
       sd_phi = _sd_phi_5;
     else
       sd_phi = _sd_phi_1to4;

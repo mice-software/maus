@@ -43,35 +43,35 @@ class PatternRecognitionTest : public ::testing::Test {
 
     ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
     _sp1->set_position(pos);
-    _sp1->set_tracker(0);
+    _sp1->set_tracker(1);
     _sp1->set_station(1);
     _sp1->set_type("triplet");
     _sp1->set_used(false);
 
     pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
     _sp2->set_position(pos);
-    _sp2->set_tracker(0);
+    _sp2->set_tracker(1);
     _sp2->set_station(2);
     _sp2->set_type("triplet");
     _sp2->set_used(false);
 
     pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
     _sp3->set_position(pos);
-    _sp3->set_tracker(0);
+    _sp3->set_tracker(1);
     _sp3->set_station(3);
     _sp3->set_type("triplet");
     _sp3->set_used(false);
 
     pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
     _sp4->set_position(pos);
-    _sp4->set_tracker(0);
+    _sp4->set_tracker(1);
     _sp4->set_station(4);
     _sp4->set_type("triplet");
     _sp4->set_used(false);
 
     pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
     _sp5->set_position(pos);
-    _sp5->set_tracker(0);
+    _sp5->set_tracker(1);
     _sp5->set_station(5);
     _sp5->set_type("triplet");
     _sp5->set_used(false);
@@ -979,6 +979,12 @@ TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
   sp3->set_station(3);
   sp4->set_station(4);
   sp5->set_station(5);
+
+  sp1->set_tracker(1);
+  sp2->set_tracker(1);
+  sp3->set_tracker(1);
+  sp4->set_tracker(1);
+  sp5->set_tracker(1);
 
   ThreeVector pos(14.1978, 9.05992, 0.6523);
   sp1->set_position(pos);
