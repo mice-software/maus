@@ -119,11 +119,13 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   setBTMagneticField( _model );
   // turn on cout if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(0);
+  bool cout_alive = Squeak::coutIsActive();
+  if(_checkVolumes && !cout_alive)
+      Squeak::activateCout(true);
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
   // turn cout back to default mode if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(-1);
+  Squeak::activateCout(cout_alive);
   return MICEExpHall;
 }
 

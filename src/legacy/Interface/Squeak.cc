@@ -75,7 +75,19 @@ void Squeak::setOutputs(int verboseLevel) {
   }
 }
 
+#include <execinfo.h>
 void Squeak::setStandardOutputs(int verboseLevel) {
+  std::cerr << "SET STANDARD OUTPUTS " << verboseLevel << std::endl;
+
+  size_t stackSize;
+  void * stackAddress[100];
+  char **stackNames;
+  stackSize  = backtrace(stackAddress, 100);
+  stackNames = backtrace_symbols(stackAddress, stackSize);
+
+  for (size_t i = 0; i < stackSize; i++) 
+    std::cerr << stackNames[i] << std::endl;
+
   getInstance();
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
@@ -88,17 +100,31 @@ void Squeak::activateCout(bool isActive) {
   else         std::cout.rdbuf(voidout->rdbuf());
 }
 
+bool Squeak::coutIsActive() {
+  getInstance();
+  return std::cout.rdbuf() != voidout->rdbuf();
+}
+
 void Squeak::activateCerr(bool isActive) {
   getInstance();
   if (isActive) std::cerr.rdbuf(stdlog->rdbuf());
   else          std::cerr.rdbuf(voidout->rdbuf());
 }
 
+bool Squeak::cerrIsActive() {
+  getInstance();
+  return std::cerr.rdbuf() != voidout->rdbuf();
+}
 
 void Squeak::activateClog(bool isActive) {
   getInstance();
   if (isActive) std::clog.rdbuf(stdlog->rdbuf());
   else         std::clog.rdbuf(voidout->rdbuf());
+}
+
+bool Squeak::clogIsActive() {
+  getInstance();
+  return std::clog.rdbuf() != voidout->rdbuf();
 }
 
 void Squeak::initialiseOutputs() {
