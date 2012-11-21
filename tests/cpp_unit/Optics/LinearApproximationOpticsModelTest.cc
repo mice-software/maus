@@ -72,7 +72,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     */
 
     Json::Value * config = MAUS::Globals::GetConfigurationCards();
-    (*config)["verbose_level"] = Json::Value(0);
+    (*config)["verbose_level"] = Json::Value(2);
 
     (*config)["reference_physics_processes"] = Json::Value("none");
     (*config)["physics_processes"] = Json::Value("none");
