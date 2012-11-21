@@ -77,17 +77,6 @@ void Squeak::setOutputs(int verboseLevel) {
 
 #include <execinfo.h>
 void Squeak::setStandardOutputs(int verboseLevel) {
-  std::cerr << "SET STANDARD OUTPUTS " << verboseLevel << std::endl;
-
-  size_t stackSize;
-  void * stackAddress[100];
-  char **stackNames;
-  stackSize  = backtrace(stackAddress, 100);
-  stackNames = backtrace_symbols(stackAddress, stackSize);
-
-  for (size_t i = 0; i < stackSize; i++) 
-    std::cerr << stackNames[i] << std::endl;
-
   getInstance();
   activateCout(verboseLevel <= Squeak::debug);
   activateClog(verboseLevel <= Squeak::info);
