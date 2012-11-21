@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
@@ -46,13 +47,17 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
 
   // Initialise output file streams
   _of1.open("seed_data.dat");
-  _of1 << "spill\ttracker\tstation\tx\ty\tz\tt\n";
+  _of1 << "spill\tevent\ttrack\ttracker\tstation\tx\ty\tz\tt\n";
 
   _of2.open("virtualhit_data.dat");
-  _of2 << "spill\ttrack_ID\tPDG_ID\tdet_ID\tB_z\tx\ty\tz\tt\tpx\tpy\tpz\n";
+  _of2 << "spill\tmc_event\ttrack_ID\tPDG_ID\tdet_ID\tB_z\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   _of3.open("track_data.dat");
-  _of3 << "spill\tn_points\ttracker\tx0\ty0\tcirc_x0\tcirc_y0\trad\tpsi0\tdsdz\n";
+  _of3 << "spill\tevent\ttrack\tn_points\ttracker\tx0\ty0\tcirc_x0\tcirc_y0\trad\tpsi0\tdsdz\n";
+
+  _of4.open("momentum_data.dat");
+  _of4 << "spill\tevent\tpt_mc_t1\tpz_mc_t1\tpt_mc_t2\tpz_mc_t2\t";
+  _of4 << "pt_rec_t1\tpz_rec_t1\tpt_rec_t2\tpz_rec_t2\n";
 
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
@@ -119,47 +124,88 @@ std::string MapCppTrackerReconTest::process(std::string document) {
           std::cout << "Pattern Recognition complete." << std::endl;
         }
 
+        // ================= VirtualHit data dump =========================
+        double pt_mc_t1 = 0.0;
+        double pz_mc_t1 = 0.0;
+        double pt_mc_t2 = 0.0;
+        double pz_mc_t2 = 0.0;
+        int num_hits_t1 = 0;
+        int num_hits_t2 = 0;
+        if ( spill.GetMCEvents()->at(i) ) {
+          // Write virtual hit data
+          VirtualHitArray* hits = spill.GetMCEvents()->at(i)->GetVirtualHits();
+          for ( unsigned int j = 0; j < hits->size(); j++ ) {
+            VirtualHit hit = hits->at(j);
+            ThreeVector pos = hit.GetPosition();
+            ThreeVector mom = hit.GetMomentum();
+            _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
+            _of2 << hit.GetParticleId() << "\t" << hit.GetStationId() << "\t";
+            _of2 << hit.GetBField().z() << "\t";
+            _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
+            _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
+            // Write MC momentum data in tracker 1
+            if ( hit.GetStationId() < 6 ) {
+              pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+              pz_mc_t1 += mom.z();
+              ++num_hits_t1;
+            } else { // Write MC momentum data in tracker 2
+              pt_mc_t2 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+              pz_mc_t2 += mom.z();
+              ++num_hits_t2;
+            }
+          } // ends loop over vhits
+          pt_mc_t1 /= num_hits_t1;
+          pz_mc_t1 /= num_hits_t1;
+          pt_mc_t2 /= num_hits_t2;
+          pz_mc_t2 /= num_hits_t2;
+        }
+        _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
+        _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
+
+        double pt_rec_t1 = 0.0;
+        double pz_rec_t1 = 0.0;
+        double pt_rec_t2 = 0.0;
+        double pz_rec_t2 = 0.0;
+        bool t1_set = false;
+        bool t2_set = false;
+        // ================= Reconstruction data dump =========================
         if ( event->helicalprtracks().size() ) {
+          // Write out track data
           for ( unsigned int j = 0; j < event->helicalprtracks().size(); ++j ) {
             SciFiHelicalPRTrack trk = event->helicalprtracks()[j];
-            _of3 << spill.GetSpillNumber() << "\t" << trk.get_num_points() << "\t";
-            _of3 << trk.get_tracker() << "\t" << trk.get_x0() << "\t" << trk.get_y0() << "\t";
+            _of3 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
+            _of3 << trk.get_num_points() << "\t" << trk.get_tracker() << "\t";
+            _of3 << trk.get_x0() << "\t" << trk.get_y0() << "\t";
             _of3 << trk.get_circle_x0() << "\t" << trk.get_circle_y0() << "\t";
             _of3 << trk.get_R() << "\t" << trk.get_psi0() << "\t" << trk.get_dsdz() << "\n";
+            // Write momentum data for the first track in the event only
+            if ( !t1_set && trk.get_tracker() == 0 ) {
+              pt_rec_t1 = 1.2 * trk.get_R();
+              pz_rec_t1 = pt_rec_t1 / trk.get_dsdz();
+              t1_set = true;
+            } else if ( !t2_set && trk.get_tracker() == 1 ) {
+              pt_rec_t2 = 1.2 * trk.get_R();
+              pz_rec_t2 = pt_rec_t2 / trk.get_dsdz();
+              t2_set = true;
+            }
+            // Write spacepoint seed data
             for ( unsigned int k = 0; k < trk.get_spacepoints().size(); ++k ) {
               SciFiSpacePoint sp = trk.get_spacepoints()[k];
               ThreeVector pos = sp.get_position();
-              _of1 << spill.GetSpillNumber() << "\t" << sp.get_tracker() << "\t";
-              _of1 << sp.get_station() << "\t";
+              _of1 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
+              _of1 << sp.get_tracker() << "\t" << sp.get_station() << "\t";
               _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
               _of1 << sp.get_time() << "\n";
             }
           }
         }
-
+        _of4 << pt_rec_t1 << "\t" << pz_rec_t1 << "\t" << pt_rec_t2 << "\t" << pz_rec_t2 << "\n";
         print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
-
-    // ================= VirtualHit Reconstruction =========================
-    if ( spill.GetMCEvents() ) {
-      for ( unsigned int k = 0; k < spill.GetMCEvents()->size(); k++ ) {
-        VirtualHitArray* hits = spill.GetMCEvents()->at(k)->GetVirtualHits();
-        for ( unsigned int i = 0; i < hits->size(); i++ ) {
-          VirtualHit hit = hits->at(i);
-          ThreeVector pos = hit.GetPosition();
-          ThreeVector mom = hit.GetMomentum();
-          _of2 << spill.GetSpillNumber() << "\t" << hit.GetTrackId() << "\t";
-          _of2 << hit.GetParticleId() << "\t" << hit.GetStationId() << "\t";
-          _of2 << hit.GetBField().z() << "\t";
-          _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
-          _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
-        } // ends loop over vhits
-      }
-    }
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -229,19 +275,6 @@ void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
             << event.straightprtracks().size() << " "
             << event.helicalprtracks().size() << " " << std::endl;
 }
-
-void MapCppTrackerReconTest::vhits_to_ascii(VirtualHitArray * hits) {
-  ofstream of2("virtualhit_data.dat");
-  for ( unsigned int i = 0; i < hits->size(); i++ ) {
-    VirtualHit hit = hits->at(i);
-    double x = hit.GetPosition().x();
-    double y = hit.GetPosition().x();
-    double z = hit.GetPosition().z();
-    of2 << x << "\t" << y << "\t" << z << std::endl;
-  } // ends loop over vhits
-  of2.close();
-}
-
 
 } // ~namespace MAUS
 
