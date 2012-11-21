@@ -75,7 +75,6 @@ void Squeak::setOutputs(int verboseLevel) {
   }
 }
 
-#include <execinfo.h>
 void Squeak::setStandardOutputs(int verboseLevel) {
   getInstance();
   activateCout(verboseLevel <= Squeak::debug);
