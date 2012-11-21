@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 
 namespace MAUS {
@@ -35,6 +36,13 @@ Json::Value* DoubleProcessor::CppToJson(const double& cpp_double) {
   return new Json::Value(cpp_double);
 }
 
+Json::Value* DoubleProcessor::CppToJson
+                                  (const double& cpp_double, std::string path) {
+  Json::Value* json_double = new Json::Value(cpp_double);
+  JsonWrapper::Path::SetPath(*json_double, path);
+  return json_double;
+}
+
 std::string* StringProcessor::JsonToCpp(const Json::Value& json_string) {
   if (json_string.isString()) {
       return new std::string (json_string.asString());
@@ -51,6 +59,13 @@ Json::Value* StringProcessor::CppToJson(const std::string& cpp_string) {
   return new Json::Value(cpp_string);
 }
 
+Json::Value* StringProcessor::CppToJson
+                             (const std::string& cpp_string, std::string path) {
+  Json::Value* json_string = new Json::Value(cpp_string);
+  JsonWrapper::Path::SetPath(*json_string, path);
+  return json_string;
+}
+
 int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
   if (json_int.isInt()) {
       return new int (json_int.asInt());
@@ -65,6 +80,13 @@ int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
 
 Json::Value* IntProcessor::CppToJson(const int& cpp_int) {
   return new Json::Value(cpp_int);
+}
+
+Json::Value* IntProcessor::CppToJson
+                                  (const int& cpp_int, std::string path) {
+  Json::Value* json_int = new Json::Value(cpp_int);
+  JsonWrapper::Path::SetPath(*json_int, path);
+  return json_int;
 }
 
 unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
@@ -85,6 +107,13 @@ Json::Value* UIntProcessor::CppToJson(const unsigned int& cpp_uint) {
   return new Json::Value(cpp_uint);
 }
 
+Json::Value* UIntProcessor::CppToJson
+                              (const unsigned int& cpp_uint, std::string path) {
+  Json::Value* json_uint = new Json::Value(cpp_uint);
+  JsonWrapper::Path::SetPath(*json_uint, path);
+  return json_uint;
+}
+
 bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
   if (json_bool.isBool()) {
       return new bool (json_bool.asBool());
@@ -99,6 +128,13 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
 
 Json::Value* BoolProcessor::CppToJson(const bool& cpp_bool) {
   return new Json::Value(cpp_bool);
+}
+
+Json::Value* BoolProcessor::CppToJson
+                                  (const bool& cpp_bool, std::string path) {
+  Json::Value* json_bool = new Json::Value(cpp_bool);
+  JsonWrapper::Path::SetPath(*json_bool, path);
+  return json_bool;
 }
 }
 

@@ -19,7 +19,11 @@
 
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
-#include "Interface/Squeak.hh"
+#include <cmath>
+#include <iostream>
+#include "CLHEP/Units/PhysicalConstants.h"
+
+#include "Interface/Squeal.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -46,26 +50,33 @@ PhaseSpaceVector::PhaseSpaceVector(const PhaseSpaceVector& original_instance)
     : Vector<double>(original_instance)
 { }
 
+PhaseSpaceVector::PhaseSpaceVector(double const * const array)
+    : Vector<double>(array, 6)
+{ }
+
 PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
-                                   const double x, const double Px,
-                                   const double y, const double Py)
+                                   const double x, const double px,
+                                   const double y, const double py)
     : Vector<double>() {
   const double data[6] = {
-    t, E, x, Px, y, Py
+    t, E, x, px, y, py
   };
   build_vector(6, data);
 }
 
-PhaseSpaceVector::PhaseSpaceVector(double const * const array)
-    :Vector<double>(array, 6)
-{ }
-
 PhaseSpaceVector::~PhaseSpaceVector() { }
+
+PhaseSpaceVector & PhaseSpaceVector::operator=(const PhaseSpaceVector & rhs) {
+  (*this).Vector<double>::operator=(rhs);
+
+  return *this;
+}
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {
   out << "t: " << vector[0] << "E: "   << vector[1]
       << "x: " << vector[2] << "Px: "  << vector[3]
       << "y: " << vector[4] << "Py: "  << vector[5];
+
   return out;
 }
 }  // namespace MAUS

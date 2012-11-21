@@ -26,7 +26,7 @@ Json::Value* CppJsonJobHeaderConverter::_convert
                                              (const JobHeaderData* data) const {
   if (data == NULL || data->GetJobHeader() == NULL)
       return new Json::Value();
-  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader());
+  Json::Value* my_json = JobHeaderProcessor().CppToJson(*data->GetJobHeader(), "");
   return my_json;
 }
 }

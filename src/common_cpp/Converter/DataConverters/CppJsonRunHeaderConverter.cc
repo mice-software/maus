@@ -25,7 +25,7 @@ namespace MAUS {
 Json::Value* CppJsonRunHeaderConverter::_convert(const RunHeaderData* data) const {
   if (data == NULL || data->GetRunHeader() == NULL)
       return new Json::Value();
-  Json::Value* my_json = RunHeaderProcessor().CppToJson(*data->GetRunHeader());
+  Json::Value* my_json = RunHeaderProcessor().CppToJson(*data->GetRunHeader(), "");
   return my_json;
 }
 }

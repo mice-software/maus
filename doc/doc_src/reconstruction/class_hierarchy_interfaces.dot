@@ -17,11 +17,11 @@ digraph G {
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
   ]
 
   TrackFitter [
-    label = "{\<\<interface\>\>\n\N}"
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(DetectorEvent[], Track *)}"
   ]
 
   RungeKuttaOpticsModel [
@@ -37,7 +37,7 @@ digraph G {
   ]
 
   TransferMap [
-    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
     pos = "10,50"
   ]
 
@@ -51,14 +51,12 @@ digraph G {
   ]
 
   MinuitTrackFitter [
-    label = "{\N|transferMap: TransferMap}"
   ]
 
   TOFTrackFitter [
   ]
 
   KalmanFilterTrackFitter [
-    label = "{\N|transferMap: TransferMap}"
   ]
 
   edge [
@@ -87,8 +85,4 @@ digraph G {
 
     headlabel = "1"
   ]
-
-  OpticsModel -> TransferMap
-  MinuitTrackFitter -> TransferMap
-  KalmanFilterTrackFitter -> TransferMap
 }

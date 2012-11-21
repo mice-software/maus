@@ -3,7 +3,7 @@
 #define Differentiator_hh 1
 
 #include "Interface/Interpolator.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/Matrix.hh"
 #include <map>
 
 //Differentiator.hh
@@ -25,6 +25,10 @@
 //Differentiator
 //Finds arbitrary order differentials for an arbitrary VectorMap or function pointer
 
+namespace MAUS {
+class PolynomialMap;
+}
+
 class Differentiator : public VectorMap
 {
 public:
@@ -40,7 +44,7 @@ public:
     void  Y    (const double* point,    double* value)                  const {return _y->F(point, value);}
     //Return coefficients for polynomial fit to taylor expansion around point
     //PolynomialMap returns coefficients for polynomial about 0 that has correct values at point
-    MAUS::Matrix<double>  PolynomialMap       (const MAUS::Vector<double>& point) const;
+    MAUS::Matrix<double>  PolynomialMap(const MAUS::Vector<double>& point) const;
     //CentredPolynomialMap returns coeffs for polynomial about inPoint that has correct values at point
     MAUS::Matrix<double>  CentredPolynomialMap(const MAUS::Vector<double>& point) const;
     //Tell me the required dimension of the input point and output value
@@ -52,8 +56,8 @@ public:
     //Return the original function ("0th differential")
     VectorMap*   FunctionMap()     const { return _y; }
     //Make a polynomial using the differential coefficients
-    MAUS::PolynomialVector* PolynomialFromDifferentials(const MAUS::Vector<double>& point) const;
-    MAUS::PolynomialVector* PolynomialFromDifferentials(double* point)                 const;
+    MAUS::PolynomialMap* PolynomialFromDifferentials(const MAUS::Vector<double>& point) const;
+    MAUS::PolynomialMap* PolynomialFromDifferentials(double* point)                 const;
 
     friend std::ostream& operator<<(std::ostream&, const Differentiator&); 
 
@@ -71,7 +75,7 @@ private:
     std::vector<double>             _magnitude;
     int                             _diffOrder;
     VectorMap*                      _y;
-    MAUS::Matrix<double>                 _polyDiffCoefficient; //d(n)y/dx = a x^n
+    MAUS::Matrix<double>            _polyDiffCoefficient; //d(n)y/dx = a x^n
 };
 std::ostream& operator<<(std::ostream&, const Differentiator&); 
 
@@ -102,16 +106,14 @@ public:
     unsigned int DifferentialOrder()      const {return _differentialOrder;} //polynomial "order" to be contributed by differentials
     unsigned int NumberOfPoints()         const {return int(ceil(NumberOfIndices()/NumberOfDiffIndices())); } //number of points needed for each interpolation
     unsigned int PointOrder()             const {return _totalOrder - _differentialOrder;} //polynomial "order" to be contributed by points
-    unsigned int NumberOfDiffIndices()    const 
-    {return MAUS::PolynomialVector::NumberOfPolynomialCoefficients(PointDimension(), DifferentialOrder()+1); } //number of differentials at each point
-    unsigned int NumberOfIndices()        const
-    {return MAUS::PolynomialVector::NumberOfPolynomialCoefficients(_inSize, _totalOrder+1);} //number of rows in the interpolation
+    unsigned int NumberOfDiffIndices()    const;  // number of differentials at each point
+    unsigned int NumberOfIndices()        const;  // number of rows in the interpolation
     //Read and write operations
     PolynomialInterpolator* Clone()       const; //copy function
     ~PolynomialInterpolator();
 
     //The polynomial vector at a point on the mesh
-    MAUS::PolynomialVector* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
+    MAUS::PolynomialMap* PolyVec(Mesh::Iterator it) const {return _points[it.ToInteger()];}
     VectorMap*        Function()                       {return _func;}
     Mesh*             GetMesh()                  const {return _mesh;}
 
@@ -120,7 +122,7 @@ public:
 private:
 
     Mesh*                _mesh;
-    MAUS::PolynomialVector**   _points;
+    MAUS::PolynomialMap**   _points;
     VectorMap*           _func;
     int                  _differentialOrder;
     int                  _totalOrder;
@@ -139,7 +141,7 @@ private:
     static PIMMap        _meshCounter;
 
     void                          BuildFixedMeshPolynomials(VectorMap* F);
-    MAUS::PolynomialVector*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
+    MAUS::PolynomialMap*             PolynomialFromDiffs(Mesh::Iterator point, Differentiator* diffs);
     std::vector< Mesh::Iterator > GetFixedMeshPoints(Mesh::Iterator dualIterator, int polySize);
     MAUS::Matrix<double>               GetX(std::vector< Mesh::Iterator> points );
     MAUS::Matrix<double>               GetD(std::vector< Mesh::Iterator> points, Differentiator* diff );
