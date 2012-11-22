@@ -23,6 +23,7 @@
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 using namespace MAUS;
@@ -110,19 +111,6 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
-
-    // test that we make a sensitive detector hit
-    // note dependency on random seed (require we get the same hit twice)
-    /* FIXME(plane1@hawk.iit.edu) This test is not consistent. Sometimes it
-       passes. Sometimes it fails. Either a fix needs to be implemented that
-       guarantees the same hit twice, or it needs to be removed.
-    Json::Value val_sd_1 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    Json::Value val_sd_2 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val_sd_1["special_virtual_hits"].isArray());
-    EXPECT_TRUE(val_sd_1["special_virtual_hits"].size() > 0) << val_sd_1;
-    EXPECT_EQ(val_sd_1["special_virtual_hits"].size(),
-              val_sd_2["special_virtual_hits"].size());
-    */
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
@@ -169,7 +157,7 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
     }
 }
 
-TEST(MAUSGeant4ManagerTest, NoScatteringTest) {
+TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 0.;
     part_in.y = 0.;
@@ -194,16 +182,41 @@ TEST(MAUSGeant4ManagerTest, NoScatteringTest) {
     virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
     simulator->SetVirtualPlanes(virtual_planes);
     simulator->GetStepping()->SetWillKeepSteps(false);
-    const Json::Value event = simulator->RunParticle(part_in);
+
+    Json::Value hits(Json::arrayValue);
+    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+    // move now into lH2
+    part_in.z = 0.;
+    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+    simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
+    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+    simulator->GetPhysicsList()->BeginOfRunAction();
+    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+
     simulator->SetVirtualPlanes(
         const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
     delete virtual_planes;
+    for (size_t i = 0; i < 4; ++i)
+        ASSERT_EQ(1u, hits[i].size());
 
-    const Json::Value hits = event["virtual_hits"];
-    ASSERT_EQ(static_cast<size_t>(1), hits.size());
-    const Json::Value hit = hits[static_cast<Json::Value::UInt>(0)];
-    EXPECT_NEAR(0., hit["momentum"]["x"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(0., hit["momentum"]["y"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(200., hit["momentum"]["z"].asDouble(), 1.0e-3);
+    // full physics and vacuum
+    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(200., hits[0u][0u]["momentum"]["z"].asDouble(), 1.0e-3);
+
+    // full physics and lh2
+    EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["x"].asDouble()), 1.0e-3);
+    EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["y"].asDouble()), 1.0e-3);
+    EXPECT_GE(fabs(200.-hits[1u][0u]["momentum"]["z"].asDouble()), 1.0e-3);
+
+    // reference physics (mean dedx and no stochastics)
+    EXPECT_NEAR(0., hits[2u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(0., hits[2u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
+    EXPECT_GE(fabs(200.-hits[2u][0u]["momentum"]["z"].asDouble()), 1.0e-3);
+
+    // full physics and vacuum
+    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(200., hits[0u][0u]["momentum"]["z"].asDouble(), 1.0e-3);
 }
 }
