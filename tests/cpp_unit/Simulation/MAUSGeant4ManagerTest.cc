@@ -157,7 +157,18 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
     }
 }
 
+#include "src/legacy/Interface/Squeak.hh"
+double get_energy(Json::Value virtual_hit) {
+    double m =virtual_hit["mass"].asDouble();
+    double px =virtual_hit["momentum"]["x"].asDouble();
+    double py =virtual_hit["momentum"]["y"].asDouble();
+    double pz =virtual_hit["momentum"]["z"].asDouble();
+    return sqrt(m*m+px*px+py*py+pz*pz);
+}
+
 TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
+    Squeak::setOutputs(0);
+    Squeak::setStandardOutputs(0);
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 0.;
     part_in.y = 0.;
@@ -165,8 +176,8 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     part_in.time = 0.;
     part_in.px = 0.;
     part_in.py = 0.;
-    part_in.pz = 200.;
-    part_in.energy = 226.1939223;
+    part_in.pz = 1.; // just a direction
+    part_in.energy = 5000.;
     part_in.seed = 10;
     part_in.pid = -13;
 
@@ -183,40 +194,58 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     simulator->SetVirtualPlanes(virtual_planes);
     simulator->GetStepping()->SetWillKeepSteps(false);
 
-    Json::Value hits(Json::arrayValue);
-    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-    // move now into lH2
-    part_in.z = 0.;
-    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-    simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
-    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-    simulator->GetPhysicsList()->BeginOfRunAction();
-    hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+    // mu+, mu-, e+, e0, pi-, pi+, p, 4He, K+, K-
+    int pid_list[] = {-13, 13, -11, 11, -211, 211, 2212, 1000020040, 321, -321};
+    // could add neutrons, antiprotons (though not for MICE)
+    for (size_t pid_index = 0; pid_index < 10; ++pid_index) {
+        part_in.pid = pid_list[pid_index];
+        Json::Value hits(Json::arrayValue);
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        // move now into lH2
+        part_in.z = 0.;
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        simulator->GetPhysicsList()->BeginOfRunAction();
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        part_in.z = 1000.;
+        for (size_t i = 0; i < 4; ++i)
+            ASSERT_EQ(1u, hits[i].size());
 
+        // full physics and vacuum
+        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(5000., get_energy(hits[0u][0u]), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // full physics and lh2
+        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[1u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // reference physics (mean dedx and no stochastics)
+        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[2u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // full physics and lh2
+        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[3u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+    }
     simulator->SetVirtualPlanes(
         const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
     delete virtual_planes;
-    for (size_t i = 0; i < 4; ++i)
-        ASSERT_EQ(1u, hits[i].size());
-
-    // full physics and vacuum
-    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(200., hits[0u][0u]["momentum"]["z"].asDouble(), 1.0e-3);
-
-    // full physics and lh2
-    EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["x"].asDouble()), 1.0e-3);
-    EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["y"].asDouble()), 1.0e-3);
-    EXPECT_GE(fabs(200.-hits[1u][0u]["momentum"]["z"].asDouble()), 1.0e-3);
-
-    // reference physics (mean dedx and no stochastics)
-    EXPECT_NEAR(0., hits[2u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(0., hits[2u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
-    EXPECT_GE(fabs(200.-hits[2u][0u]["momentum"]["z"].asDouble()), 1.0e-3);
-
-    // full physics and vacuum
-    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3);
-    EXPECT_NEAR(200., hits[0u][0u]["momentum"]["z"].asDouble(), 1.0e-3);
 }
 }

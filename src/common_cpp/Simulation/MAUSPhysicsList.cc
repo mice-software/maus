@@ -38,13 +38,13 @@
 namespace MAUS {
 
 const std::string MAUSPhysicsList::_scatNames[] = {"muBrems", "hBrems",
-                  "eBrems", "muPairProd", "ePairProd", "hPairProd",
-                  "ElectroNuclear", "msc"};
+                  "eBrems", "eBrem", "muPairProd", "ePairProd", "hPairProd",
+                  "ElectroNuclear", "msc", "muMsc", "CoulombScat"};
 const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
-                  "eBrems", "muPairProd", "ePairProd", "hPairProd", "muIoni",
-                  "hIoni",  "eIoni"};
-const int         MAUSPhysicsList::_nScatNames   = 8;
-const int         MAUSPhysicsList::_nELossNames  = 9;
+                  "eBrems", "eBrem", "muPairProd", "ePairProd", "hPairProd",
+                  "muIoni", "hIoni",  "eIoni"};
+const int         MAUSPhysicsList::_nScatNames   = 11;
+const int         MAUSPhysicsList::_nELossNames  = 10;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
                                                        : G4VUserPhysicsList() {
@@ -142,7 +142,6 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
     uiCommand.push_back("/process/"+elossActive+" "+_eLossNames[i]);
 
   for (size_t i = 0; i < uiCommand.size(); i++) {
-    Squeak::mout(Squeak::debug) << "Applying " << uiCommand[i] << std::endl;
     UIApplyCommand(uiCommand[i]);
   }
 }
@@ -160,9 +159,7 @@ void MAUSPhysicsList::SetScattering(scat scatteringModel) {
   }
 
   for (int i = 0; i < _nScatNames; i++) {
-    Squeak::mout(Squeak::debug) << "Applying " << activation+_scatNames[i]
-                                << std::endl;
-    UIApplyCommand(activation+_scatNames[i]);
+     UIApplyCommand(activation+_scatNames[i]);
   }
 }
 
@@ -181,7 +178,6 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
                                                        FindProcesses(fHadronic);
   for (int i = 0; i < pvec->size(); i++) {
     std::string pname = (*pvec)[i]->GetProcessName();
-    Squeak::mout(Squeak::debug) << "Applying " << activation+pname << std::endl;
     UIApplyCommand(activation+pname);
   }
 }
