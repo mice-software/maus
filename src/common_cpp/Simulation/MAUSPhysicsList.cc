@@ -37,14 +37,17 @@
 
 namespace MAUS {
 
+// Note muMsc and CoulombScat make an error message from G4.9.2 - but are needed
+// for G4.9.5 so we leave them in... I could do some logic checking for G4
+// version if it is a problem (Rogers)
 const std::string MAUSPhysicsList::_scatNames[] = {"muBrems", "hBrems",
-                  "eBrems", "eBrem", "muPairProd", "ePairProd", "hPairProd",
+                  "eBrem", "muPairProd", "hPairProd",
                   "ElectroNuclear", "msc", "muMsc", "CoulombScat"};
 const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
-                  "eBrems", "eBrem", "muPairProd", "ePairProd", "hPairProd",
+                  "eBrem", "muPairProd", "hPairProd",
                   "muIoni", "hIoni",  "eIoni"};
-const int         MAUSPhysicsList::_nScatNames   = 11;
-const int         MAUSPhysicsList::_nELossNames  = 10;
+const int         MAUSPhysicsList::_nScatNames   = 9;
+const int         MAUSPhysicsList::_nELossNames  = 8;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
                                                        : G4VUserPhysicsList() {

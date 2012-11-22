@@ -167,8 +167,6 @@ double get_energy(Json::Value virtual_hit) {
 }
 
 TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
-    Squeak::setOutputs(0);
-    Squeak::setStandardOutputs(0);
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 0.;
     part_in.y = 0.;
