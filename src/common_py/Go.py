@@ -200,8 +200,9 @@ class Go: # pylint: disable=R0921, R0903
         except (OSError, IOError):
             pass
         try:
-            proc = subprocess.Popen(['bzr', 'status'], stdout=subprocess.PIPE,
-                                                      stderr=subprocess.STDOUT)
+            mrd = os.environ["MAUS_ROOT_DIR"]
+            proc = subprocess.Popen(['bzr', 'status', mrd],
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             proc.wait()
             bzr_status = proc.stdout.read()
         except (OSError, IOError):
