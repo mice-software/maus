@@ -186,22 +186,26 @@ class Go: # pylint: disable=R0921, R0903
         """
         start_of_job = {"date_time":datetime.datetime.utcnow().isoformat(' ')}
         bzr_dir = os.path.expandvars('$MAUS_ROOT_DIR/.bzr/branch/')
-        bzr_configuration = ''
+        bzr_configuration = 'bzr configuration not found'
+        bzr_revision = 'bzr revision not found'
+        bzr_status = 'bzr executable not found'
         try:
             bzr_conf_file = open(os.path.join(bzr_dir, 'branch.conf'))
             bzr_configuration = bzr_conf_file.read()
-        except OSError:
+        except (OSError, IOError):
             pass
-        bzr_revision = ''
         try:
             bzr_rev_file = open(os.path.join(bzr_dir, 'last-revision'))
             bzr_revision = bzr_rev_file.read()
-        except OSError:
+        except (OSError, IOError):
             pass
-        proc = subprocess.Popen(['bzr', 'status'], stdout=subprocess.PIPE,
+        try:
+            proc = subprocess.Popen(['bzr', 'status'], stdout=subprocess.PIPE,
                                                       stderr=subprocess.STDOUT)
-        proc.wait()
-        bzr_status = proc.stdout.read()
+            proc.wait()
+            bzr_status = proc.stdout.read()
+        except (OSError, IOError):
+            pass
         maus_version = json_datacards["maus_version"]
         return {
             "start_of_job":start_of_job,
