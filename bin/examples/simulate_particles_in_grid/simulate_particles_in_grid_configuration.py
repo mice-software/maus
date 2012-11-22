@@ -1,0 +1,44 @@
+
+def get_beam_def(x, y):
+    import xboa.Common
+    total_energy = 1.5e3*xboa.Common.units['GeV']
+    x *= xboa.Common.units['mm']
+    y *= xboa.Common.units['mm']
+    beam_def = {
+          "reference":{
+              "position":{"x":x, "y":y, "z":-1.e-9},
+              "momentum":{"x":0., "y":0.0, "z":1.},
+              "particle_id":2212, "energy":total_energy, "time":0.0,
+              "random_seed":1,
+           },
+          "random_seed_algorithm":"incrementing_random",
+          "n_particles_per_spill":1,
+          "transverse":{
+              "transverse_mode":"pencil",
+          },
+          "longitudinal":{
+              "longitudinal_mode":"pencil",
+              "momentum_variable":"p",
+          },
+          "coupling":{"coupling_mode":"none"}
+    }
+    return beam_def
+
+beam_defs = []
+for x in range(-100, 101, 10):
+    for y in range(-100, 101, 10):
+        beam_defs.append(get_beam_def(float(x), float(y)))
+
+simulation_geometry_filename = os.path.join(os.environ['MAUS_ROOT_DIR'],
+                                 'bin', 'examples',
+                                 'simulate_particles_in_grid', "solenoid.dat")
+check_overlaps = True
+verbose_level = 0
+spill_generator_number_of_spills = 1
+beam = {
+    "particle_generator":"counter", # routine for generating empty primaries
+    "random_seed":0, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+    "definitions":beam_defs
+}
+
