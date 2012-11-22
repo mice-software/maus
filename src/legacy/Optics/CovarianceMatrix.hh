@@ -12,7 +12,7 @@
 #include "PhaseSpaceVector.hh"
 #include "AnalysisPlaneBank.hh"
 
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 
 class MiceModule;
 
@@ -197,7 +197,7 @@ public:
   int              MaxOrder() const {return m_higherMoments.size() + 2;}
   //Return the polynomial w(\vec{u}) that returns a statistical weight w for a phase space vector u
   //that maps the moments in to the moments target
-  static MAUS::PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
+  static MAUS::PolynomialMap Weighting(MomentHeap in, MomentHeap target, int order);
 
 private:
   double        m_mass;
@@ -225,10 +225,10 @@ public:
   int              MaxOrder() const;
   //Return the polynomial w(\vec{u}) that returns a statistical weight w for a phase space vector u
   //that maps the moments in to the moments target
-  static MAUS::PolynomialVector Weighting(MomentHeap in, MomentHeap target, int order);
+  static MAUS::PolynomialMap Weighting(MomentHeap in, MomentHeap target, int order);
 
 private:
-  MAUS::PolynomialVector * moments;
+  MAUS::PolynomialMap * moments;
 };
 */
 

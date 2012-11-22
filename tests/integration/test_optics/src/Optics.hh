@@ -115,6 +115,10 @@ namespace Optics
   void                    CloseGzFile        ();
   //Function for PolyFit
   void                   SetPolyFitModule(const MiceModule* root);
+  /* @brief Provides a mapping between phase space vectors at one plane to
+   * phase space vectors at the PolyFitDetector plane by simulating the passage
+   * of a particle with the starting phase space vector through MICE.
+   */
   void                   PolyFitFunction (const double* psv_in, double* psv_out);
   StationId                                           g_polyfit_module;
   std::vector<PhaseSpaceVector>                       g_hitsIn;

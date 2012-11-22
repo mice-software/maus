@@ -53,10 +53,6 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
 
   physVol->SetRotation(coreRotation);
   physVol->SetTranslation(G4ThreeVector(xPos, yPos, zPos));
-  /*if ( copyNo == 525 ) {
-    std::cerr << "Rotation: " <<  *physVol->GetRotation() << "\n";
-    std::cerr << "Translation: " <<  physVol->GetTranslation() << "\n";
-  }*/
 }
 
 void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
@@ -65,7 +61,7 @@ void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
   // This is the number of fibers
   G4double nFiber = 2*floor(activeRadius/(fiberDiameter*fiberPitch/2));
 
-  G4double xPos = 2*activeRadius*(copyNo/nFiber)
+  G4double xPos = copyNo * (fiberDiameter*fiberPitch/2)
                   -(activeRadius-fiberDiameter/2);
 
   G4double fiberHalfLen = 0.;
@@ -73,17 +69,9 @@ void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
   if ( sensitiveRadius > fabs( xPos ) )
     fiberHalfLen = sqrt(sensitiveRadius * sensitiveRadius - xPos * xPos);
 
-    fiberElement.SetInnerRadius(innerDiameter/2);
-    fiberElement.SetOuterRadius(outerDiameter/2);
-    fiberElement.SetZHalfLength(fiberHalfLen);
-    fiberElement.SetStartPhiAngle(0.0*deg);
-    fiberElement.SetDeltaPhiAngle(360.0*deg);
-
-  /* if ( copyNo == 525 ) {
-    std::cerr << "InnerRadius: " <<  fiberElement.GetInnerRadius() << "\n";
-    std::cerr << "OuterRadius: " <<  fiberElement.GetOuterRadius() << "\n";
-    std::cerr << "ZHalfLength: " <<  fiberElement.GetZHalfLength() << "\n";
-    std::cerr << "StartPhiAngle: " <<  fiberElement.GetStartPhiAngle() << "\n";
-    std::cerr << "DeltaPhiAngle: " << fiberElement.GetDeltaPhiAngle() << "\n";
-  }*/
+  fiberElement.SetInnerRadius(innerDiameter/2);
+  fiberElement.SetOuterRadius(outerDiameter/2);
+  fiberElement.SetZHalfLength(fiberHalfLen);
+  fiberElement.SetStartPhiAngle(0.0*deg);
+  fiberElement.SetDeltaPhiAngle(360.0*deg);
 }

@@ -308,7 +308,6 @@ EXCLUDE_DIRS = [
 'build',
 'doc',
 '.sconf_temp',
-os.path.join('src', 'map', 'MapCppTOFDigitization'),
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'style'),
 os.path.join('tests', 'integration', 'test_optics', 'src'),

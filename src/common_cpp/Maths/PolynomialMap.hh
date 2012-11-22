@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_COMMON_CPP_MATHS_POLYNOMIAL_VECTOR_HH
-#define SRC_COMMON_CPP_MATHS_POLYNOMIAL_VECTOR_HH
+#ifndef SRC_COMMON_CPP_MATHS_POLYNOMIAL_MAP_HH
+#define SRC_COMMON_CPP_MATHS_POLYNOMIAL_MAP_HH
 
 #include <map>
 #include <vector>
@@ -27,15 +27,15 @@
 
 namespace MAUS {
 
-/** PolynomialVector, an arbitrary order polynomial vector class.
+/** PolynomialMap, an arbitrary order polynomial vector class.
  *
- *  PolynomialVector describes a vector of multivariate polynomials
+ *  PolynomialMap describes a vector of multivariate polynomials
  *  \f$y_i = a_0 + Sum (a_j x^j)\f$
  *  i.e. maps a vector \f$\vec{x}\f$ onto a vector \f$\vec{y}\f$ with
  *  \f$\vec{y} = a_0 + sum(a_{j_1j_2...j_n} x_1^{j_1} x_2^{j_2}...x_n^{j_n})\f$.
  *  Also algorithms to map a single index J into \f$j_1...j_n\f$.\n
  *  \n
- *  PolynomialVector represents the polynomial coefficients as a matrix of
+ *  PolynomialMap represents the polynomial coefficients as a matrix of
  *  doubles so that\n
  *  \f$ \vec{y} = \mathbf{A} \vec{w} \f$\n
  *  where \f$\vec{w}\f$ is a vector with elements given by \n
@@ -47,7 +47,7 @@ namespace MAUS {
  *  While IndexByVector gives an index like:\n
  *  \f$ w_i = x_{i_1}x_{i_2} \ldots x_{i_n} \f$ \n
  *  \n
- *  PolynomialVector includes several functions to do least squares fits.
+ *  PolynomialMap includes several functions to do least squares fits.
  *  Here we find a polynomial of arbitrary dimension and order from a set of
  *  points by the method of least squares.
  *  Note that the problem must be overspecified, so the number of points must be
@@ -56,9 +56,7 @@ namespace MAUS {
  * \n
  */
 
-// TODO: divorce the actual vector from the collection of vectors that form a
-//       transform
-class PolynomialVector : public VectorMap {
+class PolynomialMap : public VectorMap {
  public:
   // forward declaration of embedded class
   class PolynomialCoefficient;
@@ -70,7 +68,7 @@ class PolynomialVector : public VectorMap {
   /** @brief  Construct a polynomial vector, passing polynomial coefficients
    *          as a matrix.
    */
-  PolynomialVector(int pointDimension, Matrix<double> polynomialCoefficients);
+  PolynomialMap(int pointDimension, Matrix<double> polynomialCoefficients);
 
   /** @brief  Construct polynomial vector passing polynomial coefficients as
    *          a list of PolynomialCoefficient objects. Any coefficients
@@ -78,11 +76,16 @@ class PolynomialVector : public VectorMap {
    *          polynomial is given by the  maximum order of the coefficients
    *          in the vector.
    */
-  explicit PolynomialVector(std::vector<PolynomialCoefficient> coefficients);
+  explicit PolynomialMap(std::vector<PolynomialCoefficient> coefficients);
 
   /** @brief no memory allocated so doesn't do anything.
    */
-  ~PolynomialVector() { }
+  ~PolynomialMap() { }
+
+  /** @brief  Construct a polynomial vector, passing polynomial coefficients
+   *          as a matrix.
+   */
+  PolynomialMap(const PolynomialMap & original_instance);
 
   /** @brief  Reinitialise the polynomial vector with new point (x) dimension
    *          and coefficients.
@@ -142,38 +145,60 @@ class PolynomialVector : public VectorMap {
    *          and it will create a vectorMap of the appropriate child type
    *          without the caller needing to know what type vectorMap actually is.
    */
-  PolynomialVector * Clone() const;
+  PolynomialMap * Clone() const;
 
   /** @brief  Return a copy, centred on point.
    */
-  PolynomialVector * Recentred(double* point) const;
+  PolynomialMap * Recentred(double* point) const;
 
   /** @brief  Return operator \f$ R = P(Q) \f$ - NOT IMPLEMENTED
    */
-  PolynomialVector Chain(const PolynomialVector& Q) const;
+  PolynomialMap Chain(const PolynomialMap& Q) const;
+
+  /** @brief  Return pseudoinverse of the coefficient matrix.
+   */
+  PolynomialMap * Inverse() const;
 
   /** @brief  Return inverse of the polynomial truncated at order n (in general
    *          an infinite series that does not converge, so beware!)
    *          - NOT IMPLEMENTED
    */
-  PolynomialVector  Inverse(int max_order) const;
+  PolynomialMap Inverse(int max_order) const;
 
   /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
-   *  @param[in] polyVector  should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
    *
    *  could be static but faster as member function (use lookup table for
    *  _polyKey).
    */
-  Vector<double>& MakePolyVector(const Vector<double>& point,
-                                 Vector<double>& polyVector) const;
+  Vector<double>& MakePolynomialVector(const Vector<double> & point,
+                                       Vector<double>& polyVector) const;
 
   /** @brief  Make a vector like \f$(c, x, x^2, x^3...)\f$.
+   *  @param[in] point      should be of size PointDimension().
    *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
    *
    *  Could be static but faster as member function (use lookup table for
    *  _polyKey).
    */
-  double* MakePolyVector(const double* point, double* polyVector) const;
+  double * MakePolynomialVector(double const * const polyVector, double* point)
+      const;
+
+  /** @brief  Take a vector like \f$(c, x, x^2, x^3...)\f$ and extract the
+   *    first order values (i.e. x, y, z, ...).
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   */
+  Vector<double>& UnmakePolynomialVector(const Vector<double>& polyVector,
+                                       Vector<double>& point) const;
+
+  /** @brief  Take a vector like \f$(c, x, x^2, x^3...)\f$ and extract the
+   *    first order values (i.e. x, y, z, ...).
+   *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
+   *  @param[in] point      should be of size PointDimension().
+   */
+  double* UnmakePolynomialVector(const double* point, double* polyVector) const;
 
   /** Transforms from a 1d index of polynomial coefficients to an nd index.
    *  This is slow - you should use it to build a lookup table.
@@ -196,12 +221,12 @@ class PolynomialVector : public VectorMap {
   static size_t  NumberOfPolynomialCoefficients(int pointDimension, int order);
   inline size_t  NumberOfPolynomialCoefficients();
 
-  /** Write out the PolynomialVector (effectively just polyCoeffs).
+  /** Write out the PolynomialMap (effectively just polyCoeffs).
    */
-  friend std::ostream& operator<<(std::ostream&,  const PolynomialVector&);
+  friend std::ostream& operator<<(std::ostream&,  const PolynomialMap&);
 
   /** Control the formatting of the polynomial vector. If PrintHeaders is true,
-   *  then every time I write a PolynomialVector it will write the header also
+   *  then every time I write a PolynomialMap it will write the header also
    *  (default).
    */
   static void PrintHeaders(bool willPrintHeaders) {print_headers_ = willPrintHeaders;}
@@ -226,13 +251,13 @@ class PolynomialVector : public VectorMap {
    * values[i] should all be the same length weight function should be a vector
    * map that has PointDimension of points and returns a weight of dimension 1
    */
-  static PolynomialVector* PolynomialLeastSquaresFit(
+  static PolynomialMap* PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
     unsigned int                                        polynomialOrder,
     const VectorMap*                          weightFunction);
 
-  static PolynomialVector* PolynomialLeastSquaresFit(
+  static PolynomialMap* PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
     unsigned int                                        polynomialOrder,
@@ -242,7 +267,7 @@ class PolynomialVector : public VectorMap {
    *  already (stored in coeffs). For example, say I know the polynomial to 
    *  2nd order, I want to extend to 3rd order using a least squares fit.
    */
-  static PolynomialVector* ConstrainedPolynomialLeastSquaresFit
+  static PolynomialMap* ConstrainedPolynomialLeastSquaresFit
       (const std::vector< std::vector<double> >&  points,
        const std::vector< std::vector<double> >& values,
        unsigned int polynomialOrder,
@@ -265,11 +290,11 @@ class PolynomialVector : public VectorMap {
    *  if \f$\chi^2_{start} < 0,\f$ start with maximum chi^2; if
    *  chi2End != NULL, put the final value in chi2End
    */
-  static PolynomialVector* Chi2ConstrainedLeastSquaresFit
+  static PolynomialMap* Chi2ConstrainedLeastSquaresFit
       (const std::vector< std::vector<double> >&  xin,
        const std::vector< std::vector<double> >& xout,
        unsigned int polynomialOrder,
-       std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
+       std::vector< PolynomialMap::PolynomialCoefficient > coeffs,
        double chi2Start, double discardStep, double* chi2End, double chi2Limit,
        std::vector<double> weights, bool firstIsMean = false);
 
@@ -282,9 +307,9 @@ class PolynomialVector : public VectorMap {
    *  I can't find any fit at all, will return NULL. On return, delta holds the
    *  value of delta at the limit of validity
    */
-  static PolynomialVector* Chi2SweepingLeastSquaresFit
+  static PolynomialMap* Chi2SweepingLeastSquaresFit
       (const VectorMap& vec, unsigned int polynomialOrder,
-       std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
+       std::vector< PolynomialMap::PolynomialCoefficient > coeffs,
        double chi2Max, std::vector<double>& delta, double deltaFactor,
        int maxNumberOfSteps);
 
@@ -295,9 +320,9 @@ class PolynomialVector : public VectorMap {
    *  in each direction. Idea is to make a good fit even in the case that delta
    *  doesn't scale appropriately between different directions
    */
-  static PolynomialVector* Chi2SweepingLeastSquaresFitVariableWalls
+  static PolynomialMap* Chi2SweepingLeastSquaresFitVariableWalls
       (const VectorMap& vec, unsigned int polynomialOrder,
-       std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
+       std::vector< PolynomialMap::PolynomialCoefficient > coeffs,
        double chi2Max, std::vector<double>& delta, double deltaFactor,
        int maxNumberOfSteps, std::vector<double> max_delta);
 
@@ -384,7 +409,7 @@ class PolynomialVector : public VectorMap {
   // (e.g. become an iterator etc)
 
   /** Polynomial coefficient sub class represents a coefficient in a
-   *  PolynomialVector object. Each coefficient has an input variable that it
+   *  PolynomialMap object. Each coefficient has an input variable that it
    *  represents (i.e. powers on x), an output variable that it yields (i.e.
    *  the y value) and a value.
    */
@@ -473,12 +498,12 @@ class PolynomialVector : public VectorMap {
   static bool                        print_headers_;
 };
 
-std::ostream& operator<<(std::ostream&, const PolynomialVector&);
+std::ostream& operator<<(std::ostream&, const PolynomialMap&);
 
 
 // template functions
 template <class TEMP_CLASS, class TEMP_ITER>
-bool PolynomialVector::IterableEquality
+bool PolynomialMap::IterableEquality
                                       (const TEMP_CLASS& a, const TEMP_CLASS& b,
                                        TEMP_ITER a_begin, TEMP_ITER a_end,
                                        TEMP_ITER b_begin, TEMP_ITER b_end) {
@@ -493,10 +518,15 @@ bool PolynomialVector::IterableEquality
   return true;
 }
 
-size_t PolynomialVector::NumberOfPolynomialCoefficients() {
+size_t PolynomialMap::NumberOfPolynomialCoefficients() {
   return NumberOfPolynomialCoefficients(point_dimension_, PolynomialOrder());
 }
 
+Vector<double> generate_polynomial_2D(const PolynomialMap & map,
+                                      const size_t variable_index,
+                                      const double input_min,
+                                      const double input_max,
+                                      const double input_increment);
 
 } // namespace MAUS
 
