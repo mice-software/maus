@@ -26,16 +26,14 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/BeamTools/BTConstantField.hh"
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 
-// FORCE G4 setup first so that we can make G4 particle table ok
-#include "tests/cpp_unit/Simulation/MAUSGeant4ManagerTest.cc"
-
-namespace {
+namespace MAUS {
 
 /////////////////////// VIRTUALPLANE /////////////////////////////////////////
 
