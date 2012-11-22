@@ -21,7 +21,6 @@ import copy
 import tempfile
 from io import StringIO
 import datetime
-import os
 import json
 
 from InputPyEmptyDocument import InputPyEmptyDocument
@@ -253,16 +252,10 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         start_time_as_dt = datetime.datetime.strptime(my_datetime,
                                                         "%Y-%m-%d %H:%M:%S.%f")
         self.assertLess(start_time_as_dt, datetime.datetime.utcnow())
-        bzr_path = os.path.expandvars("$MAUS_ROOT_DIR/.bzr/branch/")
-        if os.path.exists(bzr_path): # assume this is a valid bzr revision
-            self.assertGreater(len(header['bzr_configuration']), 0)
-            self.assertGreater(len(header['bzr_revision']), 0)
-            # clean bzr checkout has no output from bzr_status
-            self.assertEqual(type(header['bzr_status']), type(''))
-        else:
-            self.assertEqual(header['bzr_configuration'], '')
-            self.assertEqual(header['bzr_revision'], '')
-            self.assertEqual(header['bzr_status'], '')
+        self.assertGreater(len(header['bzr_configuration']), 0)
+        self.assertGreater(len(header['bzr_revision']), 0)
+        # clean bzr checkout has no output from bzr_status
+        self.assertEqual(type(header['bzr_status']), type(''))
         self.assertEqual(header['maus_version'], 'some_version')
         self.assertEqual(header['json_configuration'], json.dumps(cards))
         self.assertEqual(header['maus_event_type'], 'JobHeader')
