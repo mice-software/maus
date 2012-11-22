@@ -19,6 +19,7 @@
 #include "src/common_cpp/Optics/TransferMapOpticsModel.hh"
 
 #include <sstream>
+#include <ctime>
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
@@ -89,6 +90,32 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
+  std::stringstream primaries_string;
+  primaries_string.setf(ios::fixed, ios::floatfield);
+  primaries_string.precision(1);
+  primaries_string << "[";
+  for (size_t index = 0; index < first_plane_hits.size(); ++index) {
+    const TrackPoint & primary = first_plane_hits[index];
+    primaries_string << "{\"primary\":{"
+                     << "\"position\":{"
+                     << "\"x\":" << primary.x() << ", "
+                     << "\"y\":" << primary.y() << ", "
+                     << "\"z\":" << primary.z() << "}, "
+                     << "\"momentum\":{"
+                     << "\"x\":" << primary.Px() << ", "
+                     << "\"y\":" << primary.Py() << ", "
+                     << "\"z\":" << primary.Pz() << "}, "
+                     << "\"particle_id\":" << primary.particle_id() << ", "
+                     << "\"time\":" << primary.t() << ", ";
+    primaries_string.precision(7);
+    primaries_string << "\"energy\":" << primary.E() << ", "
+                     << "\"random_seed\":10}}";
+    if (index < (first_plane_hits.size()-1)) {
+      primaries_string << ",";
+    }
+  }
+  primaries_string << "]";
+  Json::Value primaries = JsonWrapper::StringToJson(primaries_string.str());
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
@@ -98,16 +125,18 @@ void TransferMapOpticsModel::Build() {
 
   std::map<int, std::vector<TrackPoint> > station_hits_map;
   std::vector<TrackPoint>::const_iterator first_plane_hit;
-  for (first_plane_hit = first_plane_hits.begin();
-       first_plane_hit < first_plane_hits.end();
-       ++first_plane_hit) {
-    // Simulate the current particle (First plane hit) through MICE.
-    simulator->RunParticle(
-      recon::global::PrimaryGeneratorParticle(*first_plane_hit));
+  const Json::Value events
+      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries);
+  if (events.size() == 0) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "No events were generated during simulation.",
+                 "MAUS::TransferMapOpticsModel::Build()"));
+  }
 
-    // Identify the hits by station and add them to the mappings from stations
-    // to the hits they recorded.
-    MapStationsToHits(station_hits_map);
+  for (Json::Value::const_iterator event = events.begin();
+       event != events.end();
+       ++event) {
+    MapStationsToHits(station_hits_map, *event);
   }
 
   // Iterate through each station
@@ -207,38 +236,29 @@ const std::vector<TrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
 }
 
 void TransferMapOpticsModel::MapStationsToHits(
-    std::map<int, std::vector<TrackPoint> > & station_hits) {
+    std::map<int, std::vector<TrackPoint> > & station_hits,
+    const Json::Value & event) {
   // Iterate through each event of the simulation
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  const Json::Value events = simulator->GetEventAction()->GetEvents();
-  if (events.size() == 0) {
-    throw(Squeal(Squeal::nonRecoverable,
-                 "No events were generated during simulation.",
-                 "MAUS::TransferMapOpticsModel::MapStationsToHits()"));
-  }
-  for (size_t event_index = 0; event_index < events.size(); ++event_index) {
-    // Iterate through each hit recorded during the current event
-    const Json::Value hits = events[event_index]["virtual_hits"];
-    for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
-      const Json::Value hit = hits[hit_index];
-      const Particle::ID particle_id
-        = Particle::ID(hit["particle_id"].asInt());
-      const double mass = Particle::GetInstance()->GetMass(particle_id);
-      const double px = hit["momentum"]["x"].asDouble();
-      const double py = hit["momentum"]["y"].asDouble();
-      const double pz = hit["momentum"]["z"].asDouble();
-      const double momentum = ::sqrt(px*px + py*py + pz*pz);
-      const double energy = ::sqrt(mass*mass + momentum*momentum);
+  const Json::Value hits = event["virtual_hits"];
+  for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
+    const Json::Value hit = hits[hit_index];
+    const Particle::ID particle_id
+      = Particle::ID(hit["particle_id"].asInt());
+    const double mass = Particle::GetInstance()->GetMass(particle_id);
+    const double px = hit["momentum"]["x"].asDouble();
+    const double py = hit["momentum"]["y"].asDouble();
+    const double pz = hit["momentum"]["z"].asDouble();
+    const double momentum = ::sqrt(px*px + py*py + pz*pz);
+    const double energy = ::sqrt(mass*mass + momentum*momentum);
 
-      TrackPoint hit_vector(
-        hit["time"].asDouble(), energy,
-        hit["position"]["x"].asDouble(), px,
-        hit["position"]["y"].asDouble(), py,
-        particle_id,
-        hit["position"]["z"].asDouble());
-      const int station_id = hit["station_id"].asInt();
-      station_hits[station_id].push_back(hit_vector);
-    }
+    TrackPoint hit_vector(
+      hit["time"].asDouble(), energy,
+      hit["position"]["x"].asDouble(), px,
+      hit["position"]["y"].asDouble(), py,
+      particle_id,
+      hit["position"]["z"].asDouble());
+    const int station_id = hit["station_id"].asInt();
+    station_hits[station_id].push_back(hit_vector);
   }
 }
 

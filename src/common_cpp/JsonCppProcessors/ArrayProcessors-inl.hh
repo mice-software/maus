@@ -14,9 +14,12 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include <vector>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverJsonToCpp.hh"
 
 namespace MAUS {
 
@@ -55,6 +58,10 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
             } else {
                 ArrayContents* data = _proc->JsonToCpp(json_array[i]);
                 (*vec)[i] = data;
+                using ReferenceResolver::JsonToCpp::RefManager;
+                std::string path = JsonWrapper::Path::GetPath(json_array[i]);
+                if (RefManager::HasInstance())
+                    RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -73,7 +80,15 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
 template <class ArrayContents>
 Json::Value* PointerArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents*>& cpp_array) {
+    return CppToJson(cpp_array, "");
+}
+
+template <class ArrayContents>
+Json::Value* PointerArrayProcessor<ArrayContents>::
+                      CppToJson(const std::vector<ArrayContents*>& cpp_array,
+                                std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
+    JsonWrapper::Path::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
@@ -82,10 +97,15 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             if (cpp_array[i] == NULL) {
                 data = new Json::Value();  // that is a NULL value
             } else {
-                data = _proc->CppToJson(*cpp_array[i]);
+                data = _proc->CppToJson(*cpp_array[i], GetPath(path, i));
             }
-            (*json_array)[i] = *data; // json copies memory here
+            (*json_array)[i] = *data; // json copies memory here but not path
+            JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
+            using ReferenceResolver::CppToJson::RefManager;
+            if (RefManager::HasInstance())
+                RefManager::GetInstance().SetPointerAsValue
+                                               (cpp_array[i], GetPath(path, i));
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
@@ -93,6 +113,12 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
         }
     }
     return json_array;
+}
+
+template <class ArrayContents>
+std::string PointerArrayProcessor<ArrayContents>::GetPath
+                                              (std::string path, size_t index) {
+    return path+"/"+STLUtils::ToString(index);
 }
 ///////////
 
@@ -145,13 +171,23 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
 template <class ArrayContents>
 Json::Value* ValueArrayProcessor<ArrayContents>::
                       CppToJson(const std::vector<ArrayContents>& cpp_array) {
+    return CppToJson(cpp_array, "");
+}
+
+template <class ArrayContents>
+Json::Value* ValueArrayProcessor<ArrayContents>::
+                      CppToJson(const std::vector<ArrayContents>& cpp_array,
+                                std::string path) {
     Json::Value* json_array = new Json::Value(Json::arrayValue);
+    JsonWrapper::Path::SetPath(*json_array, path);
     json_array->resize(cpp_array.size());
 
     for (size_t i = 0; i < cpp_array.size(); ++i) {
         try {
-            Json::Value* data = _proc->CppToJson(cpp_array[i]);
-            (*json_array)[i] = *data; // json copies memory here
+            Json::Value* data = _proc->CppToJson(cpp_array[i],
+                                                              GetPath(path, i));
+            (*json_array)[i] = *data; // json copies memory but not path
+            JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
         } catch(Squeal squee) {
             // if there's a problem, clean up before rethrowing the exception
@@ -160,6 +196,77 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
         }
     }
     return json_array;
+}
+
+template <class ArrayContents>
+std::string ValueArrayProcessor<ArrayContents>::GetPath
+                                              (std::string path, size_t index) {
+    return path+"/"+STLUtils::ToString(index);
+}
+
+////////////////////////////
+template <class ArrayContents>
+std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
+                                               (const Json::Value& json_array) {
+    using ReferenceResolver::JsonToCpp::RefManager;
+    using ReferenceResolver::JsonToCpp::VectorResolver;
+    if (!json_array.isConvertibleTo(Json::arrayValue)) {
+        // no memory allocated yet...
+        throw(Squeal(Squeal::recoverable,
+                    "Failed to resolve Json::Value of type "+
+                    JsonWrapper::ValueTypeToString(json_array.type())+
+                    " to array",
+                    "ValueArrayProcessor::JsonToCpp()"
+                    ) );
+    }
+    std::vector<ArrayContents*>* vec
+                     = new std::vector<ArrayContents*>(json_array.size(), NULL);
+
+    for (size_t i = 0; i < json_array.size(); ++i) {
+        try {
+            (*vec)[i] = NULL;
+            if (json_array[i].type() != Json::nullValue) {
+                std::string data_path = JsonWrapper::GetProperty
+                   (json_array[i], "$ref", JsonWrapper::stringValue).asString();
+                // allocate the vector
+                if (RefManager::HasInstance()) {
+                    VectorResolver<ArrayContents>* res =
+                          new VectorResolver<ArrayContents>(data_path, vec, i);
+                    RefManager::GetInstance().AddReference(res);
+                }
+            }
+        } catch(Squeal squee) {
+            // if there's a problem, clean up before rethrowing the exception
+            delete vec;
+            throw squee;
+        }
+    }
+    return vec;
+}
+
+template <class ArrayContents>
+Json::Value* ReferenceArrayProcessor<ArrayContents>::CppToJson(
+                           const std::vector<ArrayContents*>& cpp_array,
+                           std::string path) {
+    using ReferenceResolver::CppToJson::RefManager;
+    using ReferenceResolver::CppToJson::TypedResolver;
+    Json::Value* array = new Json::Value(Json::arrayValue);
+    JsonWrapper::Path::SetPath(*array, path);
+    array->resize(cpp_array.size());
+    for (size_t i = 0; i < cpp_array.size(); ++i) {
+        (*array)[i] = Json::Value();
+        if (cpp_array[i] != NULL) {
+            JsonWrapper::Path::SetPath((*array)[i], path);
+            JsonWrapper::Path::AppendPath((*array)[i], i);
+            if (RefManager::HasInstance()) {
+                std::string arr_path = JsonWrapper::Path::GetPath((*array)[i]);
+                TypedResolver<ArrayContents>* res = new TypedResolver
+                                        <ArrayContents>(cpp_array[i], arr_path);
+                RefManager::GetInstance().AddReference(res);
+            }
+        }
+    }
+    return array;
 }
 }
 

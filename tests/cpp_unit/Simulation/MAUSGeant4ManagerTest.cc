@@ -64,6 +64,8 @@ TEST(MAUSGeant4ManagerTest, SetPhasesTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 0" << std::endl).flush();
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 1.;
     part_in.y = 2.;
@@ -76,6 +78,8 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     part_in.seed = 10;
     part_in.pid = -11; // e- so no decays etc
 
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 1" << std::endl).flush();
     // test that track is set ok
     Json::Value val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     ASSERT_TRUE(val["tracks"].isArray());
@@ -85,6 +89,8 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
     EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
 
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 2" << std::endl).flush();
     // test that tracks can be switched on and off
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(false);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
@@ -93,6 +99,8 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["tracks"].type(), Json::arrayValue);
 
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 3" << std::endl).flush();
     // test that steps can be switched on and off
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
@@ -101,6 +109,8 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["tracks"][Json::Value::UInt(0)]["steps"].type(), Json::arrayValue);
 
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 4" << std::endl).flush();
     // test that virtuals can be switched on and off
     MAUSGeant4Manager::GetInstance()->
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
@@ -111,6 +121,8 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
 
+(std::cout << "DEBUG MAUSGeant4ManagerTest_RunParticlePGTest: "
+           << "CHECKPOINT 5" << std::endl).flush();
     // test that we make a sensitive detector hit
     // note dependency on random seed (require we get the same hit twice)
     /* FIXME(plane1@hawk.iit.edu) This test is not consistent. Sometimes it
@@ -167,5 +179,43 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
       EXPECT_NEAR(out[i]["primary"]["position"]["y"].asDouble(), 2., 1e-9);
       EXPECT_NEAR(out[i]["primary"]["position"]["z"].asDouble(), 3., 1e-9);
     }
+}
+
+TEST(MAUSGeant4ManagerTest, NoScatteringTest) {
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+    part_in.x = 0.;
+    part_in.y = 0.;
+    part_in.z = 1000.;
+    part_in.time = 0.;
+    part_in.px = 0.;
+    part_in.py = 0.;
+    part_in.pz = 200.;
+    part_in.energy = 226.1939223;
+    part_in.seed = 10;
+    part_in.pid = -13;
+
+    MAUS::MAUSGeant4Manager * const simulator
+        = MAUS::MAUSGeant4Manager::GetInstance();
+    MAUS::VirtualPlaneManager const * const old_virtual_planes
+        = simulator->GetVirtualPlanes();
+    MAUS::VirtualPlaneManager * const virtual_planes
+        = new MAUS::VirtualPlaneManager;
+    MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
+        2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+    virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    simulator->SetVirtualPlanes(virtual_planes);
+    const Json::Value event = simulator->RunParticle(part_in);
+    simulator->SetVirtualPlanes(
+        const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
+    delete virtual_planes;
+
+    EXPECT_EQ(event["virtual_hits"].type(), Json::arrayValue);
+    const Json::Value hits = event["virtual_hits"];
+    ASSERT_EQ(static_cast<size_t>(1), hits.size());
+    const Json::Value hit = hits[static_cast<Json::Value::UInt>(0)];
+    EXPECT_EQ(0., hit["momentum"]["x"].asDouble());
+    EXPECT_EQ(0., hit["momentum"]["y"].asDouble());
+    EXPECT_NEAR(200., hit["momentum"]["z"].asDouble(), 1.0e-4);
 }
 }

@@ -1,4 +1,4 @@
-MiceModel    files/SingleParticleTest.dat
+MiceModel    SingleParticleTest.dat
 BeamType     MiceModule
 numEvts      10000
 

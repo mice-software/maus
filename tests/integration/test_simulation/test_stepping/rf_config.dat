@@ -1,0 +1,30 @@
+// Dummy configuration with minimal field map for stepping tests
+
+Configuration Test
+{
+  Dimensions 1. 1. 20. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+  Module VirtualPlane
+  {
+    Volume None
+    PropertyHep3Vector Position 0. 0. 2000. mm
+    PropertyString SensitiveDetector Virtual
+  }
+  Module Cavity
+  {
+    Volume None
+    PropertyHep3Vector Position 0. 0. 1000. mm     
+    PropertyString Material           Galactic
+    PropertyDouble Invisible          1
+    PropertyString FieldType          PillBox
+    PropertyString CavityMode         Phased
+    PropertyDouble Length             43.0    cm
+    PropertyString FieldDuringPhasing TimeVarying
+    PropertyDouble TimeDelay          0.0 ns
+    PropertyDouble PeakEField         9       MV/m
+    PropertyDouble EnergyGain         3.2     MeV //Used when FieldDuringPhasing is EnergyGainOptimised
+    PropertyDouble Frequency          0.20125
+  }
+}
+

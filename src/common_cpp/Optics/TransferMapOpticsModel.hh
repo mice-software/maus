@@ -110,8 +110,8 @@ class TransferMapOpticsModel : public OpticsModel {
    * from station ID to hits recorded by that station.
    */
   void MapStationsToHits(
-      std::map<int, std::vector<recon::global::TrackPoint> > &
-        station_hits);
+      std::map<int, std::vector<recon::global::TrackPoint> > & station_hits,
+      const Json::Value & event);
 
   const TransferMap * FindTransferMap(const double end_plane) const;
 

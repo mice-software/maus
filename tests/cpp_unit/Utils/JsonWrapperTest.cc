@@ -261,5 +261,77 @@ TEST(JsonWrapperTest, JsonValueTypeToStringTest) {
   EXPECT_EQ(JsonWrapper::ValueTypeToString(Json::nullValue), "nullValue");
 }
 
+TEST(JsonWrapperTest, PathHandlingTest) {
+  Json::Value test("test_value");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test), "");
+  JsonWrapper::Path::SetPath(test, "#test");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test), "#test");
+  JsonWrapper::Path::AppendPath(test, "append");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test), "#test/append");
+  JsonWrapper::Path::AppendPath(test, 1);
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test), "#test/append/1");
+  EXPECT_THROW(JsonWrapper::Path::AppendPath(test, "append/"), Squeal);
+  Json::Value test_2;
+  JsonWrapper::Path::AppendPath(test_2, "append");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test_2), "#append");
+  
+}
+
+TEST(JsonWrapperTest, PathDereferenceTest) {
+  Json::Value test(Json::objectValue);
+  test["object_0"] = Json::Value(Json::arrayValue);
+  test["object_0"][Json::Value::UInt(0)] = Json::Value("test_0");
+  test["object_0"][Json::Value::UInt(1)] = Json::Value("test_1");
+  test["object_1"] = Json::Value(Json::arrayValue);
+  test["object_1"][Json::Value::UInt(0)] = Json::Value();
+  test["object_1"][Json::Value::UInt(1)] = Json::Value("test_2");
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, ""), test);
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "#object_0/0"),
+            Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "object_0/0"),
+            Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "#object_0/0/"),
+            Json::Value("test_0"));
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "#object_0/1"),
+            Json::Value("test_1"));
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "#object_1/0"),
+            Json::Value());
+  EXPECT_EQ(JsonWrapper::Path::DereferencePath(test, "#object_1/1"),
+            Json::Value("test_2"));
+  // not an object or array
+  Json::Value not_branch(1);
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(not_branch, "#1"), Squeal);
+  // branch does not exist
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#no_branch"), Squeal);
+  // array element does not exist
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#object_0/2"), Squeal);
+}
+
+TEST(JsonWrapperTest, SetPathRecursiveTest) {
+  Json::Value test(Json::objectValue);
+  test["object_0"] = Json::Value(Json::objectValue);
+  test["object_0"]["a"] = Json::Value("test_0");
+  test["object_0"]["b"] = Json::Value("test_1");
+  test["object_1"] = Json::Value(Json::arrayValue);
+  test["object_1"][Json::Value::UInt(0)] = Json::Value();
+  test["object_1"][Json::Value::UInt(1)] = Json::Value("test_2");
+  JsonWrapper::Path::SetPathRecursive(test, "");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test), "");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test["object_0"]), "#object_0");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test["object_0"]["a"]), "#object_0/a");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test["object_0"]["b"]), "#object_0/b");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test["object_1"][0u]), "#object_1/0");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(test["object_1"][1]), "#object_1/1");
+
+  JsonWrapper::Path::StripPathRecursive(test);
+
+  EXPECT_EQ(test.getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_0"].getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_0"]["a"].getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_0"]["b"].getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_1"].getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_1"][0u].getComment(Json::commentAfter), "");
+  EXPECT_EQ(test["object_1"][1].getComment(Json::commentAfter), "");
+}
 }
 

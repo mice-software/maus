@@ -293,7 +293,7 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
 
 void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill);
+  root = *spill_proc.CppToJson(spill, "");
 }
 
 } // ~namespace MAUS

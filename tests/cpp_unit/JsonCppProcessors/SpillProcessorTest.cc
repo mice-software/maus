@@ -91,6 +91,13 @@ std::string TOF_HIT = HIT_SEED+TOF_CHANNEL_ID+"}";
 
 std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
 
+std::string TEST_BRANCH(std::string path) {
+    std::string ref = "{\"$ref\":\"#"+path+"test_child_by_value\"}";
+    return std::string("{\"test_child_by_value\":{}, ")+
+           std::string("\"test_child_by_ref\":")+ref+", "+
+           std::string("\"test_child_array\":[")+ref+", "+ref+", null]}";
+}
+
 std::string VIRTUAL_HIT =
     std::string("{\"particle_id\":1,\"track_id\":2,\"station_id\":3,")+
     std::string("\"time\":5.,\"mass\":6.,\"charge\":7.,")+
@@ -119,7 +126,8 @@ std::string SPILL_SEED =
 
 std::string SPILL_ALL = SPILL_SEED+","+
     std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
-    std::string("\"mc_events\":[], \"recon_events\":[]}");
+    std::string("\"mc_events\":[], \"recon_events\":[], \"test_branch\":"+
+                TEST_BRANCH("test_branch/")+"}");
 
 std::string SPILL_MINIMAL = SPILL_SEED+"}";
 
@@ -188,6 +196,11 @@ TEST(SpillProcessorTest, MCEventProcessorTest) {
 TEST(SpillProcessorTest, ReconEventProcessorTest) {
     ReconEventProcessor proc;  // just a minimal recon event here
     ProcessorTest::test_value(&proc, RECON_EVENT);
+}
+
+TEST(SpillProcessorTest, TestBranchProcessorTest) {
+    TestBranchProcessor proc;  // see how we do evaluating references
+    ProcessorTest::test_value(&proc, TEST_BRANCH(""));
 }
 
 TEST(SpillProcessorTest, SpillProcessorTest) {

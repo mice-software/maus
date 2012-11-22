@@ -56,22 +56,52 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 void PolynomialOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
+  std::stringstream primaries_string;
+  primaries_string.setf(ios::fixed, ios::floatfield);
+  primaries_string.precision(7);
+  primaries_string << "[";
+  for (size_t index = 0; index < first_plane_hits.size(); ++index) {
+    const TrackPoint & primary = first_plane_hits[index];
+    primaries_string << "{\"primary\":{"
+                     << "\"position\":{"
+                     << "\"x\":" << primary.x() << ", "
+                     << "\"y\":" << primary.y() << ", "
+                     << "\"z\":" << primary.z() << "}, "
+                     << "\"momentum\":{"
+                     << "\"x\":" << primary.Px() << ", "
+                     << "\"y\":" << primary.Py() << ", "
+                     << "\"z\":" << primary.Pz() << "}, "
+                     << "\"particle_id\":" << primary.particle_id() << ", "
+                     << "\"time\":" << primary.t() << ", "
+                     << "\"energy\":" << primary.E() << ", "
+                     << "\"random_seed\":10}}";
+    if (index < (first_plane_hits.size()-1)) {
+      primaries_string << ",";
+    }
+  }
+  primaries_string << "]";
+  Json::Value primaries = JsonWrapper::StringToJson(primaries_string.str());
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
+
+  // Force setting of stochastics
   simulator->GetPhysicsList()->BeginOfRunAction();
+
   std::map<int, std::vector<TrackPoint> > station_hits_map;
   std::vector<TrackPoint>::const_iterator first_plane_hit;
-  for (first_plane_hit = first_plane_hits.begin();
-       first_plane_hit < first_plane_hits.end();
-       ++first_plane_hit) {
-    // Simulate the current particle (First plane hit) through MICE.
-    simulator->RunParticle(
-      recon::global::PrimaryGeneratorParticle(*first_plane_hit));
+  const Json::Value events
+      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries);
+  if (events.size() == 0) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "No events were generated during simulation.",
+                 "MAUS::TransferMapOpticsModel::Build()"));
+  }
 
-    // Identify the hits by station and add them to the mappings from stations
-    // to the hits they recorded.
-    MapStationsToHits(station_hits_map);
+  for (Json::Value::const_iterator event = events.begin();
+       event != events.end();
+       ++event) {
+    MapStationsToHits(station_hits_map, *event);
   }
 
   // Iterate through each station

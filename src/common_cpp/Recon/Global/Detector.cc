@@ -17,10 +17,10 @@
 /* Author: Peter Lane
  */
 
+#include "src/common_cpp/Recon/Global/Detector.hh"
+
 #include <iostream>
 #include <vector>
-
-#include "src/common_cpp/Recon/Global/ReconstructionInput.hh"
 
 namespace MAUS {
 namespace recon {

@@ -330,6 +330,9 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
     fieldMgr->SetDetectorField(_miceElectroMagneticField);
     fEquationE = new G4EqMagElectricField(_miceElectroMagneticField);
   }
+  std::string mag_only = "stepping_algorithm '"+stepperType+
+      "' for magnets only - called when RF was present";
+
 
   //Scan through the list of steppers
   if(stepperType == "Classic" || stepperType=="ClassicalRK4")
@@ -362,43 +365,13 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
     if(!_btField->HasRF()) pStepper = new G4CashKarpRKF45(fEquationM);
     else                   pStepper = new G4CashKarpRKF45(fEquationE, 8);
   }
-  else if(stepperType == "HelixImplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixImplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixHeum")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixHeum(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixSimpleRunge")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixSimpleRunge(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixExplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixExplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
+  else throw(Squeal(Squeal::recoverable,
+                    "stepping_algorithm '"+stepperType+"' not found",
+                    "MICEDetectorConstruction::setSteppingAlgorithm()"));
 
-  if(pStepper == NULL)
-  {
-    std::cerr << "Stepper not found - using ClassicalRK4" << std::endl;
-    if(!_btField->HasRF()) pStepper = new G4ClassicalRK4(fEquationM);
-    else                   pStepper = new G4ClassicalRK4(fEquationE, 8);
-  }
-
-  if(!_btField->HasRF())
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-  else
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-
+  pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1*mm, pStepper);
   fieldMgr->SetChordFinder(pChordFinder);
-
 }
-
 
 //Set G4 Stepping Accuracy parameters
 void MICEDetectorConstruction::setSteppingAccuracy()

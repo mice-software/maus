@@ -43,9 +43,9 @@ TrackPoint::TrackPoint()
 TrackPoint::TrackPoint(const TrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       detector_id_(original_instance.detector_id_),
+      uncertainties_(original_instance.uncertainties_),
       particle_id_(original_instance.particle_id_),
-      z_(original_instance.z_),
-      uncertainties_(original_instance.uncertainties_)
+      z_(original_instance.z_)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
@@ -103,10 +103,10 @@ TrackPoint::~TrackPoint() {
 
 TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
-  z_ = rhs.z_;
   particle_id_ = rhs.particle_id_;
-  detector_id_ = rhs.detector_id_;
   uncertainties_ = rhs.uncertainties_;
+  detector_id_ = rhs.detector_id_;
+  z_ = rhs.z_;
 
   return *this;
 }
@@ -114,13 +114,13 @@ TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
 const bool TrackPoint::operator==(const TrackPoint& rhs) const {
   if (static_cast<PhaseSpaceVector const * const>(this)->operator!=(rhs)) {
     return false;
-  } else if (rhs.z_ != z_) {
-    return false;
-  } else if (rhs.particle_id_ != particle_id_) {
-    return false;
   } else if (rhs.detector_id_ != detector_id_) {
     return false;
   } else if (rhs.uncertainties_ != uncertainties_) {
+    return false;
+  } else if (rhs.particle_id_ != particle_id_) {
+    return false;
+  } else if (rhs.z_ != z_) {
     return false;
   }
 
