@@ -168,4 +168,42 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
       EXPECT_NEAR(out[i]["primary"]["position"]["z"].asDouble(), 3., 1e-9);
     }
 }
+
+TEST(MAUSGeant4ManagerTest, NoScatteringTest) {
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+    part_in.x = 0.;
+    part_in.y = 0.;
+    part_in.z = 1000.;
+    part_in.time = 0.;
+    part_in.px = 0.;
+    part_in.py = 0.;
+    part_in.pz = 200.;
+    part_in.energy = 226.1939223;
+    part_in.seed = 10;
+    part_in.pid = -13;
+
+    MAUS::MAUSGeant4Manager * const simulator
+                                       = MAUS::MAUSGeant4Manager::GetInstance();
+    MAUS::VirtualPlaneManager const * const old_virtual_planes
+                                                = simulator->GetVirtualPlanes();
+    MAUS::VirtualPlaneManager * const virtual_planes
+                                                = new MAUS::VirtualPlaneManager;
+    MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
+        2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+    virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    simulator->SetVirtualPlanes(virtual_planes);
+    simulator->GetStepping()->SetWillKeepSteps(false);
+    const Json::Value event = simulator->RunParticle(part_in);
+    simulator->SetVirtualPlanes(
+        const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
+    delete virtual_planes;
+
+    const Json::Value hits = event["virtual_hits"];
+    ASSERT_EQ(static_cast<size_t>(1), hits.size());
+    const Json::Value hit = hits[static_cast<Json::Value::UInt>(0)];
+    EXPECT_NEAR(0., hit["momentum"]["x"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(0., hit["momentum"]["y"].asDouble(), 1.0e-3);
+    EXPECT_NEAR(200., hit["momentum"]["z"].asDouble(), 1.0e-3);
+}
 }
