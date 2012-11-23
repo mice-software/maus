@@ -46,9 +46,13 @@ ModuleTextFileIO::ModuleTextFileIO(MiceModule* parent, std::string name, std::is
 
 ModuleTextFileIO::ModuleTextFileIO( std::string fname ) : _this(NULL), _hasFile("")
 {
+  if (fname == "")
+		throw(Squeal(Squeal::recoverable,
+                 "Attempting to open MiceModule with no filename",
+                 "ModuleTextFileIO::ModuleTextFileIO"));
 	_this = new MiceModule(NULL, stripDirs(fname));
 	if(getenv( "MICEFILES" ) == NULL) 
-		throw(Squeal(Squeal::recoverable, "Error - MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
+		throw(Squeal(Squeal::recoverable, "MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
 	std::string fnam = std::string(getenv( "MICEFILES" )) + "/Models/Configurations/" + fname;
 	std::ifstream fin(fnam.c_str());
 	if(!fin) 

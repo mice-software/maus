@@ -21,6 +21,7 @@
 #define COMMON_CPP_OPTICS_COVARIANCE_MATRIX_HH
 
 #include <vector>
+#include <iostream>
 
 #include "Maths/SymmetricMatrix.hh"
 #include "Optics/PhaseSpaceVector.hh"

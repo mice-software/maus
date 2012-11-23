@@ -42,7 +42,7 @@ TransferMap::TransferMap() : _optics(NULL)
   _order = 0;
   for(int i=1; i<coeffs.num_col(); i++)
   {
-    std::vector<int> index = G4MICE::PolynomialVector::IndexByVector(i, coeffs.num_row());
+    std::vector<int> index = G4MICE::PolynomialMap::IndexByVector(i, coeffs.num_row());
     if(index.size() > uint(_order))
     {
       _order++;
@@ -164,7 +164,7 @@ TransferMap TransferMap::Inv(int& failflag) const
 std::ostream& operator<<(std::ostream& out, TransferMap tm)
 {
 	out << tm.GetReferenceIn() << "\n" << tm.GetReferenceOut() << "\n";
-	if(tm.GetPolynomialVector() != NULL) {out << *tm._polynomial << std::endl; return out;}
+	if(tm.GetPolynomialMap() != NULL) {out << *tm._polynomial << std::endl; return out;}
 	out << tm.GetFirstOrderMap();
 	if(tm.GetOrder() > 1)
 		out << tm.GetSecondOrderMap();
@@ -301,7 +301,13 @@ double TransferMap::PhaseAdvance(int axis) const
 	return    phaseAdvance;
 }
 
+MAUS::PolynomialMap* TransferMap::GetPolynomialMap() {
+  return _polynomial;
+}
 
+void TransferMap::SetPolynomialMap(MAUS::PolynomialMap* poly) {
+  _polynomial = poly;
+}
 
 
 

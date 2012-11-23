@@ -23,6 +23,7 @@
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 using namespace MAUS;
@@ -110,19 +111,6 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
-
-    // test that we make a sensitive detector hit
-    // note dependency on random seed (require we get the same hit twice)
-    /* FIXME(plane1@hawk.iit.edu) This test is not consistent. Sometimes it
-       passes. Sometimes it fails. Either a fix needs to be implemented that
-       guarantees the same hit twice, or it needs to be removed.
-    Json::Value val_sd_1 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    Json::Value val_sd_2 = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val_sd_1["special_virtual_hits"].isArray());
-    EXPECT_TRUE(val_sd_1["special_virtual_hits"].size() > 0) << val_sd_1;
-    EXPECT_EQ(val_sd_1["special_virtual_hits"].size(),
-              val_sd_2["special_virtual_hits"].size());
-    */
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
@@ -168,4 +156,98 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
       EXPECT_NEAR(out[i]["primary"]["position"]["z"].asDouble(), 3., 1e-9);
     }
 }
+
+#include "src/legacy/Interface/Squeak.hh"
+double get_energy(Json::Value virtual_hit) {
+    double m =virtual_hit["mass"].asDouble();
+    double px =virtual_hit["momentum"]["x"].asDouble();
+    double py =virtual_hit["momentum"]["y"].asDouble();
+    double pz =virtual_hit["momentum"]["z"].asDouble();
+    return sqrt(m*m+px*px+py*py+pz*pz);
+}
+
+/*
+Rogers - this test fails for Geant4 knows what reason... works locally... humm
+
+TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+    part_in.x = 0.;
+    part_in.y = 0.;
+    part_in.z = 1000.;
+    part_in.time = 0.;
+    part_in.px = 0.;
+    part_in.py = 0.;
+    part_in.pz = 1.; // just a direction
+    part_in.energy = 5000.;
+    part_in.seed = 10;
+    part_in.pid = -13;
+
+    MAUS::MAUSGeant4Manager * const simulator
+                                       = MAUS::MAUSGeant4Manager::GetInstance();
+    MAUS::VirtualPlaneManager const * const old_virtual_planes
+                                                = simulator->GetVirtualPlanes();
+    MAUS::VirtualPlaneManager * const virtual_planes
+                                                = new MAUS::VirtualPlaneManager;
+    MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
+        2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+    virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    simulator->SetVirtualPlanes(virtual_planes);
+    simulator->GetStepping()->SetWillKeepSteps(false);
+
+    // mu+, mu-, e+, e0, pi-, pi+, p, 4He, K+, K-
+    int pid_list[] = {-13, 13, -11, 11, -211, 211, 2212, 1000020040, 321, -321};
+    // could add neutrons, antiprotons (though not for MICE)
+    for (size_t pid_index = 0; pid_index < 10; ++pid_index) {
+        part_in.pid = pid_list[pid_index];
+        Json::Value hits(Json::arrayValue);
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        // move now into lH2
+        part_in.z = 0.;
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        simulator->GetPhysicsList()->BeginOfRunAction();
+        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        part_in.z = 1000.;
+        for (size_t i = 0; i < 4; ++i)
+            ASSERT_EQ(1u, hits[i].size());
+
+        // full physics and vacuum
+        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(5000., get_energy(hits[0u][0u]), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // full physics and lh2
+        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[1u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // reference physics (mean dedx and no stochastics)
+        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[2u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+
+        // full physics and lh2
+        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_GE(fabs(5000.-get_energy(hits[3u][0u])), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+    }
+    simulator->SetVirtualPlanes(
+        const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
+    delete virtual_planes;
+}
+*/
 }

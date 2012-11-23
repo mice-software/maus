@@ -6,7 +6,7 @@
 #include "Config/MiceModule.hh"
 #include "Config/ModuleConverter.hh"
 #include "Interface/Differentiator.hh"
-#include "Maths/PolynomialVector.hh"
+#include "Maths/PolynomialMap.hh"
 #include "src/legacy/Optics/PhaseSpaceVector.hh"
 
 
@@ -798,12 +798,13 @@ std::ostream& MomentHeap::Print(std::ostream& out) const
   out << m_vars << "\n ************* " << std::endl;
   for(unsigned int i=0; i<m_higherMoments.size(); i++)
     out << *(m_higherMoments[i]) << "\n ************* " << std::endl;*/
-  for(int i=1; i<MaxOrder()+1; i++) 
+  for(int i = 0; i < MaxOrder(); ++i) 
   {
     int kvec_front = 1;
-    for(unsigned int j=MAUS::PolynomialVector::NumberOfPolynomialCoefficients(6, i); j<MAUS::PolynomialVector::NumberOfPolynomialCoefficients(6, i+1); j++) 
-    {
-      std::vector<int> kvec = MAUS::PolynomialVector::IndexByVector(j, 6);
+    for(size_t j = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i);
+        j < MAUS::PolynomialMap::NumberOfPolynomialCoefficients(6, i+1);
+        ++j) {
+      std::vector<int> kvec = MAUS::PolynomialMap::IndexByVector(j, 6);
       if(kvec.front() != kvec_front) {std::cout << "\n"; kvec_front = kvec.front();}
       for(unsigned int k=0; k<kvec.size()-1; k++) std::cout << kvec[k] << ".";
       double mom = GetMoment(kvec);
@@ -822,19 +823,20 @@ std::ostream& operator<<(std::ostream& out, const MomentHeap& heap)
   return heap.Print(out);
 }
 
-MAUS::PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
+MAUS::PolynomialMap MomentHeap::Weighting(MomentHeap in, MomentHeap target, int order)
 {
   size_t dimension = 6;
-  size_t size      = MAUS::PolynomialVector::NumberOfPolynomialCoefficients(dimension, order+1);
+  size_t size = MAUS::PolynomialMap::NumberOfPolynomialCoefficients(
+      dimension, order);
   MAUS::Vector<double> u(size-1);
   MAUS::Matrix<double> M(size-1, size-1);
   for(size_t i=1; i<size; i++)
   {
-    std::vector<int> index1 = MAUS::PolynomialVector::IndexByVector(i, dimension);
+    std::vector<int> index1 = MAUS::PolynomialMap::IndexByVector(i, dimension);
     u(i)                  = target.GetMoment(index1) - in.GetMoment(index1);
     for(size_t j=1; j<size; j++)
     {
-      std::vector<int> index2 = MAUS::PolynomialVector::IndexByVector(j, dimension);
+      std::vector<int> index2 = MAUS::PolynomialMap::IndexByVector(j, dimension);
       std::vector<int> index3 = index2;
       index3.insert(index3.begin(), index1.begin(), index1.end());
       M(j,i)             = in.GetMoment(index3) - in.GetMoment(index1)*target.GetMoment(index2);
@@ -843,5 +845,5 @@ MAUS::PolynomialVector MomentHeap::Weighting(MomentHeap in, MomentHeap target, i
   MAUS::Vector<double> a  = inverse(M) * u;
   MAUS::Vector<double> a2 = MAUS::Vector<double>(a.size()+1, 1.);
   for(size_t i=0; i<a.size(); i++) a2(i+2) = a(i+1);
-  return MAUS::PolynomialVector(dimension, transpose(a2) );
+  return MAUS::PolynomialMap(dimension, transpose(a2) );
 }

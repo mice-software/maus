@@ -63,6 +63,11 @@ TEST(STLUtilsTest, ToStringTest) {
                                       << STLUtils::ToStringP(13.14159265359, 3);
 }
 
+TEST(STLUtilsTest, FromStringTest) {
+  EXPECT_EQ(STLUtils::FromString<int>("1"), 1);
+  EXPECT_EQ(STLUtils::FromString<std::string>("1"), std::string("1"));
+}
+
 TEST(STLUtilsTest, ReplaceVariablesTest) {
     char* mrd_c = getenv("MAUS_ROOT_DIR");
     if (mrd_c == NULL) {

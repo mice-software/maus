@@ -18,20 +18,29 @@
 
 #include <string>
 
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
+
 namespace MAUS {
 namespace ProcessorTest {
 template <class TYPE>
 void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
+    ReferenceResolver::JsonToCpp::RefManager::Birth();
+    ReferenceResolver::CppToJson::RefManager::Birth();
     Json::Value json_in;
     ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
                                                                  << test_string;
+    ASSERT_NO_THROW(JsonWrapper::Path::SetPathRecursive(json_in, ""));
     TYPE* cpp_type = NULL;
-    ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in));
+    cpp_type = proc->JsonToCpp(json_in);
+    ReferenceResolver::JsonToCpp::RefManager::GetInstance().ResolveReferences();
     Json::Value* json_out = NULL;
-    ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
+    json_out = proc->CppToJson(*cpp_type, "");
+    ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(*json_out);
     EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
     delete cpp_type;
     delete json_out;
+    ReferenceResolver::JsonToCpp::RefManager::Death();
+    ReferenceResolver::CppToJson::RefManager::Death();
 }
 }
 }

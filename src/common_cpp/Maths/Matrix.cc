@@ -29,14 +29,18 @@
 
 #include "Maths/Matrix.hh"
 
+#include <iostream>
 #include <limits>
+#include <sstream>
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
+#include "json/json.h"
 
 #include "Interface/Squeal.hh"
 #include "Maths/Vector.hh"
+#include "Utils/JsonWrapper.hh"
 
 using MAUS::complex;
 using MAUS::Vector;
@@ -632,7 +636,7 @@ void MatrixBase<complex, gsl_matrix_complex>::delete_matrix() {
 
 template <>
 void MatrixBase<double, gsl_matrix>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize) {
+    const size_t rows, const size_t columns, const bool initialize) {
   delete_matrix();
 
   if ((rows > (size_t) 0) && (columns > (size_t) 0)) {
@@ -646,7 +650,7 @@ void MatrixBase<double, gsl_matrix>::build_matrix(
 
 template <>
 void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
-  const size_t rows, const size_t columns, const bool initialize) {
+    const size_t rows, const size_t columns, const bool initialize) {
   delete_matrix();
 
   if ((rows > (size_t) 0) && (columns > (size_t) 0)) {
@@ -673,6 +677,28 @@ template void MatrixBase<double, gsl_matrix>::build_matrix(
   const size_t rows, const size_t columns, double const * const data);
 template void MatrixBase<complex, gsl_matrix_complex>::build_matrix(
   const size_t rows, const size_t columns, complex const * const data);
+
+template <typename StdType, typename GslType>
+void MatrixBase<StdType, GslType>::gsl_error_handler(const char *   reason,
+                                                     const char *   file,
+                                                     int            line,
+                                                     int            gsl_errno) {
+  throw(Squeal(
+      Squeal::recoverable,
+      reason,
+      "MatrixBase<StdType, GslType>::gsl_error_handler()"));
+}
+template void MatrixBase<double, gsl_matrix>::gsl_error_handler(
+    const char * reason, const char * file, int line, int gsl_errno);
+template void MatrixBase<complex, gsl_matrix_complex>::gsl_error_handler(
+    const char * reason, const char * file, int line, int gsl_errno);
+
+template <typename StdType, typename GslType>
+GslType * MatrixBase<StdType, GslType>::matrix() {
+  return matrix_;
+}
+template gsl_matrix * MatrixBase<double, gsl_matrix>::matrix();
+template gsl_matrix_complex * MatrixBase<complex, gsl_matrix_complex>::matrix();
 
 // ############################
 //  Matrix (public)
@@ -1006,9 +1032,15 @@ Matrix<double> inverse(
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempt to get inverse of non-square matrix",
+                 "Attempted to get inverse of non-square matrix",
                  "MAUS::inverse()"));
   }
+  if (determinant(matrix) == 0.) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempted to get inverse of singular matrix",
+                 "MAUS::inverse()"));
+  }
+
   Matrix<double> inverse(matrix);
   gsl_permutation* perm = gsl_permutation_alloc(rows);
   Matrix<double> lu(matrix);  // hold LU decomposition
@@ -1152,6 +1184,38 @@ Vector<complex> eigenvalues(const Matrix<double>& matrix) {
   return eigenvalue_vector;
 }
 
+Matrix<double> QR_least_squares(
+    const Matrix<double>& design_matrix, const Matrix<double>& value_matrix) {
+  size_t rows = design_matrix.number_of_rows();
+  size_t columns = design_matrix.number_of_columns();
+
+  Matrix<double> A(design_matrix);
+  Matrix<double> Y(value_matrix);
+  Matrix<double> Q(rows, rows);
+  Matrix<double> R(rows, columns);
+  size_t tau_size = columns;
+  if (rows < tau_size) {
+    tau_size = rows;
+  }
+  Vector<double> tau(tau_size);
+  gsl_permutation * p = gsl_permutation_alloc(columns);
+  int signum;
+  gsl_vector * norm = gsl_vector_alloc(columns);
+  gsl_linalg_QRPT_decomp2(A.matrix(), Q.matrix(), R.matrix(), tau.vector(),
+                          p, &signum, norm);
+
+  Matrix<double> P(columns, columns, 0.);
+  for (size_t index = 0; index < columns; ++index) {
+    P(index+1, gsl_permutation_get(p, index)+1) = 1.;
+  }
+  Matrix<double> C = transpose(P)*inverse(transpose(R)*R)
+                   * transpose(R)*transpose(Q)*Y;
+  gsl_vector_free(norm);
+  gsl_permutation_free(p);
+
+  return transpose(C);
+}
+
 std::pair<Vector<complex>, Matrix<complex> > eigensystem(
     const Matrix<double>& matrix) {
   size_t rows = matrix.number_of_rows();
@@ -1289,9 +1353,29 @@ std::ostream& operator<<(std::ostream&            out,
   return out;
 }
 template std::ostream& operator<<(
-  std::ostream& out, const Matrix<double>& matrix);
-template std::ostream& operator<<(
   std::ostream& out, const Matrix<complex>& matrix);
+
+template <> std::ostream& operator<<(
+    std::ostream& out, const Matrix<double>& matrix) {
+  size_t rows = matrix.number_of_rows();
+  size_t columns = matrix.number_of_columns();
+  out << "[";
+  for (size_t row = 1; row <= rows; ++row) {
+    out << "[";
+    for (size_t column = 1; column <= columns; ++column) {
+      out << matrix(row, column);
+      if (column < columns) {
+        out << ", ";
+      }
+    }
+    out << "]";
+    if (row < rows) {
+      out << "," << std::endl;
+    }
+  }
+  out << "]" << std::endl;
+  return out;
+}
 
 template <typename StdType>
 std::istream& operator>>(std::istream&    in,
@@ -1308,8 +1392,35 @@ std::istream& operator>>(std::istream&    in,
   return in;
 }
 template std::istream& operator>>(
-  std::istream& in, Matrix<double>& matrix);
-template std::istream& operator>>(
   std::istream& in, Matrix<complex>& matrix);
+
+template <> std::istream& operator>>(
+    std::istream& in, Matrix<double>& matrix) {
+  std::streamsize buffer_size = 1024;
+  char buffer[buffer_size];
+  std::stringbuf document;
+  while (!in.eof()) {
+    in.read(buffer, buffer_size);
+    std::streamsize read_bytes_count = in.gcount();
+    document.sputn(buffer, read_bytes_count);
+  }
+
+  Json::Value json_document = JsonWrapper::StringToJson(document.str());
+  Json::Value::ArrayIndex rows = json_document.size();
+  Json::Value::ArrayIndex columns;
+  if (rows > 0) {
+    columns = json_document[Json::Value::UInt(0)].size();
+    matrix = Matrix<double>(rows, columns);
+    for (size_t row = 1; row <= rows; ++row) {
+      Json::Value json_row = json_document[row-1];
+      for (size_t column = 1; column <= columns; ++column) {
+        Json::Value json_element = json_row[column-1];
+        matrix(row, column) = json_element.asDouble();
+      }
+    }
+  }
+
+  return in;
+}
 
 }  // namespace MAUS
