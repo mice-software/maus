@@ -191,7 +191,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
         export maus_assert_active=0 # enable assert() command - disabled by default
                                     # as better to use exceptions
      fi
-
+     if [ -z "\${GTEST_SHUFFLE}" ]; then  # see if the variable exists
+         export GTEST_SHUFFLE=0 # randomize test execution order
+     fi
      echo "SUCCESS: MAUS setup"
 else
      echo "WARNING: MAUS already setup"
