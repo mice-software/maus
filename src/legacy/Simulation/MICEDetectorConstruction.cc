@@ -119,11 +119,13 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   setBTMagneticField( _model );
   // turn on cout if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(0);
+  bool cout_alive = Squeak::coutIsActive();
+  if(_checkVolumes && !cout_alive)
+      Squeak::activateCout(true);
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
   // turn cout back to default mode if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(-1);
+  Squeak::activateCout(cout_alive);
   return MICEExpHall;
 }
 
@@ -177,7 +179,10 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
   {
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
-    place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
+    // who owns memory allocated to rot? This is making a bug... not defined in
+    // G4 docs
+    G4RotationMatrix * rot = new G4RotationMatrix(mod->rotation());
+    place = new G4PVPlacement(rot, mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
     Squeak::errorLevel my_err = Squeak::debug;
     if(mod->mother()->isRoot()) my_err = Squeak::info;
     Squeak::mout(my_err) << "Placing " << mod->name() << " of type " 

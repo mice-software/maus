@@ -41,7 +41,8 @@ def run():
     # Global Digits - post detector digitisation
 
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputCppRoot()
+    #my_output = MAUS.OutputCppRoot()
+    my_output = MAUS.OutputPyJSON()
 
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")

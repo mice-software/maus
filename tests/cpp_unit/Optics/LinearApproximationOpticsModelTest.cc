@@ -25,10 +25,6 @@
 #include <string>
 
 #include <cstdlib>
-/*
-#include <unistd.h>
-#include <sys/param.h> // MAXPATHLEN definition
-*/
 
 #include "gtest/gtest.h"
 #include "CLHEP/Vector/Rotation.h"

@@ -37,14 +37,17 @@
 
 namespace MAUS {
 
+// Note muMsc and CoulombScat make an error message from G4.9.2 - but are needed
+// for G4.9.5 so we leave them in... I could do some logic checking for G4
+// version if it is a problem (Rogers)
 const std::string MAUSPhysicsList::_scatNames[] = {"muBrems", "hBrems",
-                  "eBrems", "muPairProd", "ePairProd", "hPairProd",
-                  "ElectroNuclear", "msc"};
+                  "eBrem", "muPairProd", "hPairProd",
+                  "ElectroNuclear", "msc", "muMsc", "CoulombScat"};
 const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
-                  "eBrems", "muPairProd", "ePairProd", "hPairProd", "muIoni",
-                  "hIoni",  "eIoni"};
-const int         MAUSPhysicsList::_nScatNames   = 8;
-const int         MAUSPhysicsList::_nELossNames  = 9;
+                  "eBrem", "muPairProd", "hPairProd",
+                  "muIoni", "hIoni",  "eIoni"};
+const int         MAUSPhysicsList::_nScatNames   = 9;
+const int         MAUSPhysicsList::_nELossNames  = 8;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
                                                        : G4VUserPhysicsList() {
@@ -142,7 +145,6 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
     uiCommand.push_back("/process/"+elossActive+" "+_eLossNames[i]);
 
   for (size_t i = 0; i < uiCommand.size(); i++) {
-    Squeak::mout(Squeak::debug) << "Applying " << uiCommand[i] << std::endl;
     UIApplyCommand(uiCommand[i]);
   }
 }
@@ -160,9 +162,7 @@ void MAUSPhysicsList::SetScattering(scat scatteringModel) {
   }
 
   for (int i = 0; i < _nScatNames; i++) {
-    Squeak::mout(Squeak::debug) << "Applying " << activation+_scatNames[i]
-                                << std::endl;
-    UIApplyCommand(activation+_scatNames[i]);
+     UIApplyCommand(activation+_scatNames[i]);
   }
 }
 
@@ -181,7 +181,6 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
                                                        FindProcesses(fHadronic);
   for (int i = 0; i < pvec->size(); i++) {
     std::string pname = (*pvec)[i]->GetProcessName();
-    Squeak::mout(Squeak::debug) << "Applying " << activation+pname << std::endl;
     UIApplyCommand(activation+pname);
   }
 }
