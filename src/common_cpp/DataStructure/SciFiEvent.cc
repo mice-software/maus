@@ -52,12 +52,14 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
 
     _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+      _scifistraightprtracks[i] =
+          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
     }
 
     _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+      _scifihelicalprtracks[i] =
+          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
     }
 
     // *this = _scifievent;
@@ -85,12 +87,14 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
 
     _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+      _scifistraightprtracks[i] =
+          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
     }
 
     _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+      _scifihelicalprtracks[i] =
+          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
     }
 
     return *this;
@@ -116,6 +120,18 @@ SciFiEvent::~SciFiEvent() {
   std::vector<SciFiSpacePoint*>::iterator seed;
   for (seed = _scifiseeds.begin(); seed!= _scifiseeds.end(); ++seed) {
     delete (*seed);
+  }
+
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = _scifistraightprtracks.begin();
+       strack!= _scifistraightprtracks.end(); ++strack) {
+    delete (*strack);
+  }
+
+  std::vector<SciFiHelicalPRTrack*>::iterator htrack;
+  for (htrack = _scifihelicalprtracks.begin();
+       htrack!= _scifihelicalprtracks.end(); ++htrack) {
+    delete (*htrack);
   }
 }
 
