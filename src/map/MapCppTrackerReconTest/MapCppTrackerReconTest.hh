@@ -125,6 +125,17 @@ class MapCppTrackerReconTest {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
+  /** Converts the station id associated with a virtual plane to a tracker station number
+   *
+   *
+   *  \param vhit_stat_id The virtual hit station id (should be value from 1 to 10)
+   */
+  int stat_id_to_stat_num(const int vhit_stat_id);
+
+  void n_spoints(std::vector<MAUS::SciFiSpacePoint*> spoints, int &n_sp_t1, int &n_sp_t2);
+
+  void vhits_per_tracker(MAUS::VirtualHitArray* hits, int &t1, int &t2);
+
  private:
   /// This should be the classname
   std::string _classname;
@@ -145,6 +156,8 @@ class MapCppTrackerReconTest {
   std::vector<const MiceModule*> modules;
   /// File streams for writing data
   ofstream _of1, _of2, _of3, _of4;
+  /// The cut used to determine if a spacepoint partners a virtual hit (mm)
+  static const double _cut1 = 2.0;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
