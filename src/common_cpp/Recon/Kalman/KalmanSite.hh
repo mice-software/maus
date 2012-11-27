@@ -65,6 +65,7 @@ class KalmanSite {
   void set_pitch(double factor)                    { _pitch = factor; }
   void set_type(int type);
 
+  void set_pull(TMatrixD pull)                     { _pull = pull; }
   void set_residual_x(double residual_x)           { _residual_x = residual_x; }
   void set_residual_y(double residual_y)           { _residual_y = residual_y; }
   void set_chi2(double chi2)                       { _chi2 = chi2; }
@@ -75,6 +76,7 @@ class KalmanSite {
   void set_S_covariance(TMatrixD cov_s)            { _Cov_s = cov_s; }
   void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
   void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
+  void set_residual(TMatrixD res)                     { _residual = res; }
 
   /// Returns PROJECTED state vector at the site.
   TMatrixD get_projected_a()                 const { return _projected_a; }
@@ -84,6 +86,7 @@ class KalmanSite {
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
   TMatrixD get_smoothed_covariance_matrix()  const { return _smoothed_C; }
   TMatrixD get_measurement()                 const { return _v; }
+  TMatrixD get_pull()                        const { return _pull; }
 
   double get_alpha()                         const { return _alpha; }
   double get_smoothed_alpha()                const { return _alpha_smoothed; }
@@ -95,6 +98,8 @@ class KalmanSite {
   double get_residual_y()                    const { return _residual_y; }
   double get_chi2()                          const { return _chi2; }
   double get_pitch()                         const { return _pitch; }
+  TMatrixD get_residual()                      const { return _residual; }
+
   CLHEP::Hep3Vector get_direction()          const { return _direction; }
   CLHEP::Hep3Vector get_true_momentum()      const { return _mc_mom; }
   CLHEP::Hep3Vector get_true_position()      const { return _mc_pos; }
@@ -130,6 +135,8 @@ class KalmanSite {
   /// The measurement.
   TMatrixD _v;
 
+  TMatrixD _pull;
+  TMatrixD _residual;
   /// shifts
   TMatrixD _s;
   TMatrixD _Cov_s;

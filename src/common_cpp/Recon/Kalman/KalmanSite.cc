@@ -31,6 +31,9 @@ KalmanSite::KalmanSite(): _z(0.), _id(0), _type(-1), _pitch(0.),
   _a.ResizeTo(5, 1);
   _smoothed_a.ResizeTo(5, 1);
 
+  _pull.ResizeTo(2, 1);
+  _residual.ResizeTo(2, 1);
+
   _v.ResizeTo(2, 1);
   _s.ResizeTo(3, 1);
   _r.ResizeTo(3, 1);
@@ -51,7 +54,7 @@ void KalmanSite::set_type(int type) {
     _pitch = 40.;
   } else if ( type == 1 ) { // TOF1
     _pitch = 60.;
-  } else if ( type == 2 ) { // SS
+  } else if ( type == 2 ) { // SciFi
     _pitch = (7.*0.427)/2.;
   }
 }
@@ -65,6 +68,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _v.ResizeTo(2, 1);
   _s.ResizeTo(3, 1);
   _r.ResizeTo(3, 1);
+  _pull.ResizeTo(2, 1);
+  _residual.ResizeTo(2, 1);
   _Cov_s.ResizeTo(3, 3);
   _Cov_r.ResizeTo(3, 3);
   _projected_C.ResizeTo(5, 5);
@@ -92,12 +97,13 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _alpha(0.), _alpha_proje
   _residual_x = site.get_residual_x();
   _residual_y = site.get_residual_y();
   _chi2 = site.get_chi2();
-
+  _pull = site.get_pull();
   _mc_pos = site.get_true_position();
   _mc_mom = site.get_true_momentum();
 
   _pitch = site.get_pitch();
   _type = site.get_type();
+  _residual = site.get_residual();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
@@ -111,6 +117,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
   _s = site.get_shifts();
   _r = site.get_rotations();
   _alpha = _v(0, 0);
+  _pull = site.get_pull();
   _projected_C = site.get_projected_covariance_matrix();
   _smoothed_C  = site.get_smoothed_covariance_matrix();
   _Cov_s = site.get_S_covariance();
@@ -131,6 +138,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
 
   _pitch = site.get_pitch();
   _type = site.get_type();
+  _residual = site.get_residual();
 
   return *this;
 }

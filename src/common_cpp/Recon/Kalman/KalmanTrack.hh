@@ -61,42 +61,30 @@ class KalmanTrack {
   TMatrixD solve_measurement_equation(KalmanSite *site);
 
   void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
-
   void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
-
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
   void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-
   void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
+  void prepare_for_smoothing(std::vector<KalmanSite> &sites);
 
   TMatrixD get_propagator() { return _F; }
-
+  TMatrixD get_pull(KalmanSite *a_site);
   TMatrixD get_system_noise() { return _Q; }
-
-  virtual void compute_chi2(const std::vector<KalmanSite> &sites);
-
+  TMatrixD get_kalman_gain(KalmanSite *a_site);
   double get_chi2() const { return _chi2; }
-
   double get_ndf() const { return _ndf; }
-
   double get_tracker() const { return _tracker; }
-
-  void set_mass(double mass) { _mass = mass; }
-
   double get_mass() const { return _mass; }
-
-  void set_momentum(double momentum) { _momentum = momentum; }
-
   double get_momentum() const { return _momentum; }
 
   void get_site_properties(KalmanSite *site, double &thickess, double &density);
 
-  void prepare_for_smoothing(std::vector<KalmanSite> &sites);
+  void set_mass(double mass) { _mass = mass; }
 
-  TMatrixD get_pull(KalmanSite *a_site);
+  void set_momentum(double momentum) { _momentum = momentum; }
 
-  TMatrixD get_kalman_gain(KalmanSite *a_site);
+  virtual void compute_chi2(const std::vector<KalmanSite> &sites);
 
  protected:
   TMatrixD _H;

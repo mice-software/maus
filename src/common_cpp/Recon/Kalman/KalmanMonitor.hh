@@ -55,9 +55,16 @@ class KalmanMonitor {
   void save();
 
  private:
+  TFile *file;
+
   int _counter;
 
   std::vector<double> _alpha_meas, _site, _alpha_projected;
+
+  TH1F *chi2_tracker0;
+  TH1F *chi2_tracker1;
+  TGraph *gr8;
+  TGraph *gr21;
 
   TH2F *pull_hist;
   TH2F *pull2_hist;
