@@ -172,25 +172,25 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         if ( event->helicalprtracks().size() ) {
           // Write out track data
           for ( unsigned int j = 0; j < event->helicalprtracks().size(); ++j ) {
-            SciFiHelicalPRTrack trk = event->helicalprtracks()[j];
+            SciFiHelicalPRTrack* trk = event->helicalprtracks()[j];
             _of3 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
-            _of3 << trk.get_num_points() << "\t" << trk.get_tracker() << "\t";
-            _of3 << trk.get_x0() << "\t" << trk.get_y0() << "\t";
-            _of3 << trk.get_circle_x0() << "\t" << trk.get_circle_y0() << "\t";
-            _of3 << trk.get_R() << "\t" << trk.get_psi0() << "\t" << trk.get_dsdz() << "\n";
+            _of3 << trk->get_num_points() << "\t" << trk->get_tracker() << "\t";
+            _of3 << trk->get_x0() << "\t" << trk->get_y0() << "\t";
+            _of3 << trk->get_circle_x0() << "\t" << trk->get_circle_y0() << "\t";
+            _of3 << trk->get_R() << "\t" << trk->get_psi0() << "\t" << trk->get_dsdz() << "\n";
             // Write momentum data for the first track in the event only
-            if ( !t1_set && trk.get_tracker() == 0 ) {
-              pt_rec_t1 = 1.2 * trk.get_R();
-              pz_rec_t1 = pt_rec_t1 / trk.get_dsdz();
+            if ( !t1_set && trk->get_tracker() == 0 ) {
+              pt_rec_t1 = 1.2 * trk->get_R();
+              pz_rec_t1 = pt_rec_t1 / trk->get_dsdz();
               t1_set = true;
-            } else if ( !t2_set && trk.get_tracker() == 1 ) {
-              pt_rec_t2 = 1.2 * trk.get_R();
-              pz_rec_t2 = pt_rec_t2 / trk.get_dsdz();
+            } else if ( !t2_set && trk->get_tracker() == 1 ) {
+              pt_rec_t2 = 1.2 * trk->get_R();
+              pz_rec_t2 = pt_rec_t2 / trk->get_dsdz();
               t2_set = true;
             }
             // Write spacepoint seed data
-            for ( unsigned int k = 0; k < trk.get_spacepoints().size(); ++k ) {
-              SciFiSpacePoint sp = trk.get_spacepoints()[k];
+            for ( unsigned int k = 0; k < trk->get_spacepoints().size(); ++k ) {
+              SciFiSpacePoint sp = trk->get_spacepoints()[k];
               ThreeVector pos = sp.get_position();
               _of1 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
               _of1 << sp.get_tracker() << "\t" << sp.get_station() << "\t";

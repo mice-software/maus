@@ -159,8 +159,8 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       double nPE = compute_npe(edep, chanNo, a_hit);
 
       // Compute tdc count.
-      double time   = a_hit->GetTime();
-      // int tdcCounts = compute_tdc_counts(time);
+      double time1   = a_hit->GetTime();
+      // int tdcCounts = compute_tdc_counts(time1);
 
       // loop over all the other hits
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
@@ -176,7 +176,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       int plane = a_hit->GetChannelId()->GetPlaneNumber();
 
       SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
-                                           tracker, station, plane, chanNo, nPE, time);
+                                           tracker, station, plane, chanNo, nPE, time1);
       // .start. TO BE REMOVED .start.//
       ThreeVector position = a_hit->GetPosition();
       ThreeVector momentum = a_hit->GetMomentum();
@@ -193,9 +193,9 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
   double numPE;
   int exist_flag, entry;
   double cross_sigma, cross_amp, dark_prob;
-  double time = 0.;
+  double time1 = 0.;
 
-  srand(std::time(NULL));
+  srand(time(NULL));
   for ( int i = 0; i < modules.size(); i++ ) {
     int nChannels = 2*((modules[i]->propertyDouble("CentralFibre"))+0.5);
     for ( int j = 0; j < nChannels; j++ ) {
@@ -257,7 +257,7 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
       if (numPE > SciFiNPECut) {
         SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
                                              tracker, station, plane,
-                                             j, numPE, time);
+                                             j, numPE, time1);
         digits.push_back(a_digit);
       }
     }
@@ -265,11 +265,11 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
 }
 
 
-int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
+int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
   double tmpcounts;
   assert(_configJSON.isMember("SciFivlpcTimeRes"));
   assert(_configJSON.isMember("SciFitdcFactor"));
-  tmpcounts = CLHEP::RandGauss::shoot(time,
+  tmpcounts = CLHEP::RandGauss::shoot(time1,
                                       _configJSON["SciFivlpcTimeRes"].asDouble())*
                                       _configJSON["SciFitdcFactor"].asDouble();
 

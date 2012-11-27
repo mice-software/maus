@@ -157,13 +157,13 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
           } // ~Loop over spacepoints
           // Loop over straight tracks
           for ( unsigned int trk_i = 0; trk_i < event->straightprtracks().size(); trk_i++ ) {
-            SciFiStraightPRTrack strk = event->straightprtracks()[trk_i];
-            _x0 = strk.get_x0();
-            _mx = strk.get_mx();
-            _y0 = strk.get_y0();
-            _my = strk.get_my();
-            _num_points_str = strk.get_num_points();
-            _tracker = strk.get_tracker();
+            SciFiStraightPRTrack* strk = event->straightprtracks()[trk_i];
+            _x0 = strk->get_x0();
+            _mx = strk->get_mx();
+            _y0 = strk->get_y0();
+            _my = strk->get_my();
+            _num_points_str = strk->get_num_points();
+            _tracker = strk->get_tracker();
             _stracks.Fill();
             if ( _tracker == 0 ) {
               _strks_zx_trkr0.push_back(make_strack(_x0, _mx));
@@ -175,16 +175,16 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
           } // ~Loop over straight tracks
           // Loop over helical tracks
           for ( unsigned int trk_i = 0; trk_i < event->helicalprtracks().size(); trk_i++ ) {
-            SciFiHelicalPRTrack htrk = event->helicalprtracks()[trk_i];
-            _x0 = htrk.get_x0();
-            _y0 = htrk.get_y0();
-            _circle_x0 = htrk.get_circle_x0();
-            _circle_y0 = htrk.get_circle_y0();
-            _circle_R = htrk.get_R();
-            _dsdz = htrk.get_dsdz();
-            _phi0 = htrk.get_phi0();
-            _num_points_hlx = htrk.get_num_points();
-            _tracker = htrk.get_tracker();
+            SciFiHelicalPRTrack* htrk = event->helicalprtracks()[trk_i];
+            _x0 = htrk->get_x0();
+            _y0 = htrk->get_y0();
+            _circle_x0 = htrk->get_circle_x0();
+            _circle_y0 = htrk->get_circle_y0();
+            _circle_R = htrk->get_R();
+            _dsdz = htrk->get_dsdz();
+            _phi0 = htrk->get_phi0();
+            _num_points_hlx = htrk->get_num_points();
+            _tracker = htrk->get_tracker();
             std::cout << "Red: x0 = " << _x0 << " y0 = " << _y0 << " phi0 = " << _phi0 << "\n";
             _htracks.Fill();
             if ( _tracker == 0 ) {
@@ -197,8 +197,8 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
               _htrks_zy_trkr1.push_back(make_htrack_y(_y0, _circle_R, _dsdz, _phi0));
             }
             /*
-            for ( unsigned int i = 0; i < htrk.get_phi_i().size(); ++i )
-              std::cerr << "Reducer: phi_i[" << i << "] = " << htrk.get_phi_i()[i] << std::endl;
+            for ( unsigned int i = 0; i < htrk->get_phi_i().size(); ++i )
+              std::cerr << "Reducer: phi_i[" << i << "] = " << htrk->get_phi_i()[i] << std::endl;
             */
           }
         } // ~Loop over events
