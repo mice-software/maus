@@ -75,7 +75,7 @@ check_volume_overlaps = False
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
-    "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+    "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
@@ -161,7 +161,7 @@ beam = {
     ##### PIONS #####
     { # as above...
        "reference":{
-           "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+           "position":{"x":0.0, "y":-0.0, "z":-6400.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
            "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
        },
@@ -179,7 +179,7 @@ beam = {
     ##### ELECTRONS #####
     { # as above...
         "reference":{
-            "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+            "position":{"x":0.0, "y":-0.0, "z":-6400.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
         },
