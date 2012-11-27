@@ -92,10 +92,10 @@ std::string MapCppPatternRecognition::process(std::string document) {
           out1 << "Less than 3 spacepoints in event" << std::endl;
         }
         std::ofstream out("circle.txt", std::ios::out | std::ios::app);
-        for ( int l = 0; l < event.spacepoints().size(); ++l ) {
+        for ( unsigned int l = 0; l < event.spacepoints().size(); ++l ) {
           out << event.spacepoints()[l]->get_position().x() << "\t";
         }
-        for ( int l = 0; l < event.spacepoints().size(); ++l ) {
+        for ( unsigned int l = 0; l < event.spacepoints().size(); ++l ) {
           out << event.spacepoints()[l]->get_position().y() << "\t";
         }
         out << std::endl;
@@ -137,12 +137,12 @@ void MapCppPatternRecognition::make_SciFiSpill(Json::Value spacepoint_array, Sci
           int tmpx = spacepoint["position"]["x"].asInt();
           _x = static_cast<double>(tmpx);
           _x +=.0001;
-          double _y = spacepoint["position"]["y"].asDouble();
+          _y = spacepoint["position"]["y"].asDouble();
         } else if ( spacepoint["position"]["y"].isInt() ) {
           int tmpy = spacepoint["position"]["y"].asInt();
           _y = static_cast<double>(tmpy);
           _y +=.0001;
-          double _x = spacepoint["position"]["x"].asDouble();
+          _x = spacepoint["position"]["x"].asDouble();
         } else if ( spacepoint["position"]["x"].isInt() && spacepoint["position"]["y"].isInt() ) {
           int tmpx = spacepoint["position"]["x"].asInt();
           _x = static_cast<double>(tmpx);
@@ -217,16 +217,16 @@ void MapCppPatternRecognition::save_to_json(SciFiEvent &evt) {
   Json::Value h_tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
     Json::Value a_track;
-    a_track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-    a_track["R"]          = evt.helicalprtracks()[track_i].get_R();
-    a_track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-    a_track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-    a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-    a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-    a_track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
-    if ( evt.helicalprtracks()[track_i].get_tracker() == 0 ) {
+    a_track["num_points"] = evt.helicalprtracks()[track_i]->get_num_points();
+    a_track["R"]          = evt.helicalprtracks()[track_i]->get_R();
+    a_track["dsdz"]       = evt.helicalprtracks()[track_i]->get_dsdz();
+    a_track["Phi_0"]      = evt.helicalprtracks()[track_i]->get_phi0();
+    a_track["starting_point"]["x"] = evt.helicalprtracks()[track_i]->get_x0();
+    a_track["starting_point"]["y"] = evt.helicalprtracks()[track_i]->get_y0();
+    a_track["starting_point"]["z"] = evt.helicalprtracks()[track_i]->get_z0();
+    if ( evt.helicalprtracks()[track_i]->get_tracker() == 0 ) {
       h_tracks_tracker0.append(a_track);
-    } else if ( evt.helicalprtracks()[track_i].get_tracker() == 1 ) {
+    } else if ( evt.helicalprtracks()[track_i]->get_tracker() == 1 ) {
       h_tracks_tracker1.append(a_track);
     }
   }

@@ -49,16 +49,16 @@ class KalmanTrackFit {
 
   virtual ~KalmanTrackFit();
 
-  void process(std::vector<SciFiHelicalPRTrack> helical_tracks);
+  void process(std::vector<SciFiHelicalPRTrack*> helical_tracks);
 
-  void process(std::vector<SciFiStraightPRTrack> straight_tracks);
+  void process(std::vector<SciFiStraightPRTrack*> straight_tracks);
 
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
-  void initialise(SciFiStraightPRTrack &evt, std::vector<KalmanSite> &sites);
+  void initialise(SciFiStraightPRTrack* evt, std::vector<KalmanSite> &sites);
 
-  void initialise(SciFiHelicalPRTrack &evt, std::vector<KalmanSite> &sites, double &momentum);
+  void initialise(SciFiHelicalPRTrack* evt, std::vector<KalmanSite> &sites, double &momentum);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                         std::vector<SciFiCluster*> &clusters, double &seed_pz);

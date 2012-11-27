@@ -36,12 +36,12 @@ class SciFiEventTestDS : public ::testing::Test {
 
 TEST_F(SciFiEventTestDS, test_default_contructor) {
   SciFiEvent* evt = new SciFiEvent();
-  EXPECT_EQ(0, evt->digits().size());
-  EXPECT_EQ(0, evt->clusters().size());
-  EXPECT_EQ(0, evt->spacepoints().size());
-  EXPECT_EQ(0, evt->seeds().size());
-  EXPECT_EQ(0, evt->straightprtracks().size());
-  EXPECT_EQ(0, evt->helicalprtracks().size());
+  EXPECT_TRUE(evt->digits().empty());
+  EXPECT_TRUE(evt->clusters().empty());
+  EXPECT_TRUE(evt->spacepoints().empty());
+  EXPECT_TRUE(evt->seeds().empty());
+  EXPECT_TRUE(evt->straightprtracks().empty());
+  EXPECT_TRUE(evt->helicalprtracks().empty());
 }
 
 TEST_F(SciFiEventTestDS, test_copy_constructor) {
@@ -64,8 +64,8 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   SciFiCluster *cluster = new SciFiCluster();
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
   SciFiSpacePoint *seed = new SciFiSpacePoint();
-  SciFiStraightPRTrack strk;
-  SciFiHelicalPRTrack htrk;
+  SciFiStraightPRTrack *strk = new SciFiStraightPRTrack();
+  SciFiHelicalPRTrack *htrk =  new SciFiHelicalPRTrack();
 
   // Add the hits etc to the first event
   evt1->add_digit(digit);
@@ -82,7 +82,7 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   delete evt1;
 
   // Run the tests, checking digits thoroughly, the rest with just one parameter
-  ASSERT_EQ(evt2.digits().size(), 1);
+  ASSERT_EQ(evt2.digits().size(), 1u);
   EXPECT_EQ(evt2.digits()[0]->get_spill(), spill);
   EXPECT_EQ(evt2.digits()[0]->get_event(), event);
   EXPECT_EQ(evt2.digits()[0]->get_tracker(), tracker);
@@ -93,20 +93,20 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   EXPECT_EQ(evt2.digits()[0]->get_time(), time);
   EXPECT_FALSE(evt2.digits()[0]->is_used());
 
-  ASSERT_EQ(evt2.clusters().size(), 1);
+  ASSERT_EQ(evt2.clusters().size(), 1u);
   EXPECT_EQ(evt2.clusters()[0]->get_tracker(), 0);
 
-  ASSERT_EQ(evt2.spacepoints().size(), 1);
+  ASSERT_EQ(evt2.spacepoints().size(), 1u);
   EXPECT_EQ(evt2.spacepoints()[0]->get_tracker(), 0);
 
-  ASSERT_EQ(evt2.seeds().size(), 1);
+  ASSERT_EQ(evt2.seeds().size(), 1u);
   EXPECT_EQ(evt2.seeds()[0]->get_tracker(), 0);
 
-  ASSERT_EQ(evt2.straightprtracks().size(), 1);
-  EXPECT_EQ(evt2.straightprtracks()[0].get_tracker(), -1);
+  ASSERT_EQ(evt2.straightprtracks().size(), 1u);
+  EXPECT_EQ(evt2.straightprtracks()[0]->get_tracker(), -1);
 
-  ASSERT_EQ(evt2.helicalprtracks().size(), 1);
-  EXPECT_EQ(evt2.helicalprtracks()[0].get_tracker(), -1);
+  ASSERT_EQ(evt2.helicalprtracks().size(), 1u);
+  EXPECT_EQ(evt2.helicalprtracks()[0]->get_tracker(), -1);
 }
 
 TEST_F(SciFiEventTestDS, test_assignment_operator) {
@@ -143,7 +143,7 @@ TEST_F(SciFiEventTestDS, test_digit_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiDigit* digit = new SciFiDigit();
   evt->add_digit(digit);
-  EXPECT_EQ(1, evt->digits().size());
+  EXPECT_EQ(1u, evt->digits().size());
   EXPECT_EQ(digit, evt->digits()[0]);
 }
 
@@ -151,7 +151,7 @@ TEST_F(SciFiEventTestDS, test_cluster_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiCluster* cluster = new SciFiCluster();
   evt->add_cluster(cluster);
-  EXPECT_EQ(1, evt->clusters().size());
+  EXPECT_EQ(1u, evt->clusters().size());
   EXPECT_EQ(cluster, evt->clusters()[0]);
 }
 
@@ -159,7 +159,7 @@ TEST_F(SciFiEventTestDS, test_spoint_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiSpacePoint* spacepoint = new SciFiSpacePoint();
   evt->add_spacepoint(spacepoint);
-  EXPECT_EQ(1, evt->spacepoints().size());
+  EXPECT_EQ(1u, evt->spacepoints().size());
   EXPECT_EQ(spacepoint, evt->spacepoints()[0]);
 }
 
@@ -185,56 +185,56 @@ TEST_F(SciFiEventTestDS, test_seed_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiSpacePoint* seed = new SciFiSpacePoint();
   evt->add_seeds(seed);
-  EXPECT_EQ(1, evt->seeds().size());
+  EXPECT_EQ(1u, evt->seeds().size());
   EXPECT_EQ(seed, evt->seeds()[0]);
 }
 
 TEST_F(SciFiEventTestDS, test_add_straightprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
-  SciFiStraightPRTrack trk;
-  trk.set_x0(5.0);
+  SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
+  trk->set_x0(5.0);
   evt->add_straightprtrack(trk);
-  EXPECT_EQ(1, evt->straightprtracks().size());
-  EXPECT_EQ(5.0, evt->straightprtracks()[0].get_x0());
+  EXPECT_EQ(1u, evt->straightprtracks().size());
+  EXPECT_EQ(5.0, evt->straightprtracks()[0]->get_x0());
 }
 
 TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
-  SciFiStraightPRTrack trk;
-  trk.set_x0(5.0);
-  SciFiStraightPRTrack trk2;
-  trk2.set_x0(10.0);
-  std::vector<SciFiStraightPRTrack> trks;
+  SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
+  trk->set_x0(5.0);
+  SciFiStraightPRTrack* trk2 = new SciFiStraightPRTrack();
+  trk2->set_x0(10.0);
+  std::vector<SciFiStraightPRTrack*> trks;
   trks.push_back(trk);
   trks.push_back(trk2);
   evt->set_straightprtrack(trks);
-  EXPECT_EQ(2, evt->straightprtracks().size());
-  EXPECT_EQ(5.0, evt->straightprtracks()[0].get_x0());
-  EXPECT_EQ(10.0, evt->straightprtracks()[1].get_x0());
+  EXPECT_EQ(2u, evt->straightprtracks().size());
+  EXPECT_EQ(5.0, evt->straightprtracks()[0]->get_x0());
+  EXPECT_EQ(10.0, evt->straightprtracks()[1]->get_x0());
 }
 
 TEST_F(SciFiEventTestDS, test_add_helicalprtrack) {
   SciFiEvent* evt = new SciFiEvent();
-  SciFiHelicalPRTrack trk;
-  trk.set_x0(5.0);
+  SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
+  trk->set_x0(5.0);
   evt->add_helicalprtrack(trk);
-  EXPECT_EQ(1, evt->helicalprtracks().size());
-  EXPECT_EQ(5.0, evt->helicalprtracks()[0].get_x0());
+  EXPECT_EQ(1u, evt->helicalprtracks().size());
+  EXPECT_EQ(5.0, evt->helicalprtracks()[0]->get_x0());
 }
 
 TEST_F(SciFiEventTestDS, test_helicalprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
-  SciFiHelicalPRTrack trk;
-  trk.set_x0(5.0);
-  SciFiHelicalPRTrack trk2;
-  trk2.set_x0(10.0);
-  std::vector<SciFiHelicalPRTrack> trks;
+  SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
+  trk->set_x0(5.0);
+  SciFiHelicalPRTrack* trk2 = new SciFiHelicalPRTrack();
+  trk2->set_x0(10.0);
+  std::vector<SciFiHelicalPRTrack*> trks;
   trks.push_back(trk);
   trks.push_back(trk2);
   evt->set_helicalprtrack(trks);
-  EXPECT_EQ(2, evt->helicalprtracks().size());
-  EXPECT_EQ(5.0, evt->helicalprtracks()[0].get_x0());
-  EXPECT_EQ(10.0, evt->helicalprtracks()[1].get_x0());
+  EXPECT_EQ(2u, evt->helicalprtracks().size());
+  EXPECT_EQ(5.0, evt->helicalprtracks()[0]->get_x0());
+  EXPECT_EQ(10.0, evt->helicalprtracks()[1]->get_x0());
 }
 
 } // ~namespace MAUS

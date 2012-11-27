@@ -376,14 +376,14 @@ void MapCppTrackerVirtualRecon::save_to_json_recon(SciFiEvent &evt, int event_i)
   Json::Value s_tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.straightprtracks().size(); track_i++ ) {
     Json::Value track;
-    track["num_points"] = evt.straightprtracks()[track_i].get_num_points();
-    track["x0"] = evt.straightprtracks()[track_i].get_x0();
-    track["y0"] = evt.straightprtracks()[track_i].get_y0();
-    track["mx"] = evt.straightprtracks()[track_i].get_mx();
-    track["my"] = evt.straightprtracks()[track_i].get_my();
-    track["x_chisq"] = evt.straightprtracks()[track_i].get_x_chisq();
-    track["y_chisq"] = evt.straightprtracks()[track_i].get_y_chisq();
-    int tracker = evt.straightprtracks()[track_i].get_tracker();
+    track["num_points"] = evt.straightprtracks()[track_i]->get_num_points();
+    track["x0"] = evt.straightprtracks()[track_i]->get_x0();
+    track["y0"] = evt.straightprtracks()[track_i]->get_y0();
+    track["mx"] = evt.straightprtracks()[track_i]->get_mx();
+    track["my"] = evt.straightprtracks()[track_i]->get_my();
+    track["x_chisq"] = evt.straightprtracks()[track_i]->get_x_chisq();
+    track["y_chisq"] = evt.straightprtracks()[track_i]->get_y_chisq();
+    int tracker = evt.straightprtracks()[track_i]->get_tracker();
     track["tracker"] = tracker;
     if ( tracker == 0 ) {
       s_tracks_tracker0.append(track);
@@ -397,14 +397,14 @@ void MapCppTrackerVirtualRecon::save_to_json_recon(SciFiEvent &evt, int event_i)
   Json::Value h_tracks_tracker1;
   for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
     Json::Value track;
-    track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-    track["R"]          = evt.helicalprtracks()[track_i].get_R();
-    track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-    track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-    track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-    track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-    track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
-    int tracker = evt.helicalprtracks()[track_i].get_tracker();
+    track["num_points"] = evt.helicalprtracks()[track_i]->get_num_points();
+    track["R"]          = evt.helicalprtracks()[track_i]->get_R();
+    track["dsdz"]       = evt.helicalprtracks()[track_i]->get_dsdz();
+    track["Phi_0"]      = evt.helicalprtracks()[track_i]->get_phi0();
+    track["starting_point"]["x"] = evt.helicalprtracks()[track_i]->get_x0();
+    track["starting_point"]["y"] = evt.helicalprtracks()[track_i]->get_y0();
+    track["starting_point"]["z"] = evt.helicalprtracks()[track_i]->get_z0();
+    int tracker = evt.helicalprtracks()[track_i]->get_tracker();
     track["tracker"] = tracker;
     if ( tracker == 0 ) {
       h_tracks_tracker0.append(track);
@@ -472,8 +472,8 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
     }
     // Only look at tracks in tracker 0 //
     for (unsigned int track_i_s = 0; track_i_s < evt.straightprtracks().size(); track_i_s++) {
-      int tracker_s = evt.straightprtracks()[track_i_s].get_tracker();
-      std::cout << evt.straightprtracks()[track_i_s].get_tracker();
+      int tracker_s = evt.straightprtracks()[track_i_s]->get_tracker();
+      std::cout << evt.straightprtracks()[track_i_s]->get_tracker();
       if (tracker_s ==0) {
         tracker0_hits_s++;
         if (tracker0_hits_s == 1) {
@@ -481,20 +481,20 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
             out_file << "{";
           }
         Json::Value track;
-        track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
-        track["my"] = evt.straightprtracks()[track_i_s].get_my();
-        track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
-        track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
-        track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
-        track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
-        track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
-        out_file << "\"mx\":" <<evt.straightprtracks()[track_i_s].get_mx() << ",";
-        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
-        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() << ",";
-        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
-        out_file << "\"x_chisq\":" << evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
-        out_file << "\"y0\":" <<evt.straightprtracks()[track_i_s].get_y0() << ",";
-        out_file << "\"y_chisq\":" <<evt.straightprtracks()[track_i_s].get_y_chisq();
+        track["mx"] = evt.straightprtracks()[track_i_s]->get_mx();
+        track["my"] = evt.straightprtracks()[track_i_s]->get_my();
+        track["num_points"] = evt.straightprtracks()[track_i_s]->get_num_points();
+        track["x0"] = evt.straightprtracks()[track_i_s]->get_x0();
+        track["x_chisq"] = evt.straightprtracks()[track_i_s]->get_x_chisq();
+        track["y0"] = evt.straightprtracks()[track_i_s]->get_y0();
+        track["y_chisq"] = evt.straightprtracks()[track_i_s]->get_y_chisq();
+        out_file << "\"mx\":" <<evt.straightprtracks()[track_i_s]->get_mx() << ",";
+        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s]->get_my() << ",";
+        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s]->get_num_points() << ",";
+        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s]->get_x0() << ",";
+        out_file << "\"x_chisq\":" << evt.straightprtracks()[track_i_s]->get_x_chisq() << ",";
+        out_file << "\"y0\":" <<evt.straightprtracks()[track_i_s]->get_y0() << ",";
+        out_file << "\"y_chisq\":" <<evt.straightprtracks()[track_i_s]->get_y_chisq();
         out_file << "}]" << ",";
       }
     if (tracker0_hits_s == 0)
@@ -504,7 +504,7 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
     /////////////////////// TRACKER 1 TRACKS //////////////////
     int tracker1_hits_s = 0;
     for (unsigned int track_i_s = 0; track_i_s <evt.straightprtracks().size(); track_i_s++) {
-      int tracker = evt.straightprtracks()[track_i_s].get_tracker();
+      int tracker = evt.straightprtracks()[track_i_s]->get_tracker();
       if (tracker == 1) {
         tracker1_hits_s++;
         if (tracker1_hits_s == 1) {
@@ -512,20 +512,20 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
           out_file << "{";
         }
         Json::Value track;
-        track["mx"] = evt.straightprtracks()[track_i_s].get_mx();
-        track["my"] = evt.straightprtracks()[track_i_s].get_my();
-        track["num_points"] = evt.straightprtracks()[track_i_s].get_num_points();
-        track["x0"] = evt.straightprtracks()[track_i_s].get_x0();
-        track["x_chisq"] = evt.straightprtracks()[track_i_s].get_x_chisq();
-        track["y0"] = evt.straightprtracks()[track_i_s].get_y0();
-        track["y_chisq"] = evt.straightprtracks()[track_i_s].get_y_chisq();
-        out_file << "\"mx\":" << evt.straightprtracks()[track_i_s].get_mx() << ",";
-        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s].get_my() << ",";
-        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s].get_num_points() <<",";
-        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s].get_x0() << ",";
-        out_file << "\"x_chisq\":" <<evt.straightprtracks()[track_i_s].get_x_chisq() << ",";
-        out_file << "\"y0\":" << evt.straightprtracks()[track_i_s].get_y0() << ",";
-        out_file << "\"y_chisq\":" << evt.straightprtracks()[track_i_s].get_y_chisq();
+        track["mx"] = evt.straightprtracks()[track_i_s]->get_mx();
+        track["my"] = evt.straightprtracks()[track_i_s]->get_my();
+        track["num_points"] = evt.straightprtracks()[track_i_s]->get_num_points();
+        track["x0"] = evt.straightprtracks()[track_i_s]->get_x0();
+        track["x_chisq"] = evt.straightprtracks()[track_i_s]->get_x_chisq();
+        track["y0"] = evt.straightprtracks()[track_i_s]->get_y0();
+        track["y_chisq"] = evt.straightprtracks()[track_i_s]->get_y_chisq();
+        out_file << "\"mx\":" << evt.straightprtracks()[track_i_s]->get_mx() << ",";
+        out_file << "\"my\":" <<evt.straightprtracks()[track_i_s]->get_my() << ",";
+        out_file << "\"num_points\":" <<evt.straightprtracks()[track_i_s]->get_num_points() <<",";
+        out_file << "\"x0\":" <<evt.straightprtracks()[track_i_s]->get_x0() << ",";
+        out_file << "\"x_chisq\":" <<evt.straightprtracks()[track_i_s]->get_x_chisq() << ",";
+        out_file << "\"y0\":" << evt.straightprtracks()[track_i_s]->get_y0() << ",";
+        out_file << "\"y_chisq\":" << evt.straightprtracks()[track_i_s]->get_y_chisq();
         out_file << "}]" << "},";
       }
         if (tracker1_hits_s == 0)
@@ -543,8 +543,8 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
 
     // Only look at tracks in tracker0
     for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
-      int tracker = evt.helicalprtracks()[track_i].get_tracker();
-      std::cout << evt.helicalprtracks()[track_i].get_tracker();
+      int tracker = evt.helicalprtracks()[track_i]->get_tracker();
+      std::cout << evt.helicalprtracks()[track_i]->get_tracker();
       if (tracker ==0) {
         tracker0_hits++;
         if  (tracker0_hits ==1) {
@@ -552,21 +552,21 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
           out_file << "{";
         }
         Json::Value track;
-        track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-        track["R"]          = evt.helicalprtracks()[track_i].get_R();
-        track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-        track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-        track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-        track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-        track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+        track["num_points"] = evt.helicalprtracks()[track_i]->get_num_points();
+        track["R"]          = evt.helicalprtracks()[track_i]->get_R();
+        track["dsdz"]       = evt.helicalprtracks()[track_i]->get_dsdz();
+        track["Phi_0"]      = evt.helicalprtracks()[track_i]->get_phi0();
+        track["starting_point"]["x"] = evt.helicalprtracks()[track_i]->get_x0();
+        track["starting_point"]["y"] = evt.helicalprtracks()[track_i]->get_y0();
+        track["starting_point"]["z"] = evt.helicalprtracks()[track_i]->get_z0();
 
-        out_file << "\"num_points\":" << evt.helicalprtracks()[track_i].get_num_points() << ",";
-        out_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
-        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz() << ",";
-        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0() <<",";
-        out_file << "\"x\":" << evt.helicalprtracks()[track_i].get_x0() << ",";
-        out_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0() << ",";
-        out_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]" << ",";
+        out_file << "\"num_points\":" << evt.helicalprtracks()[track_i]->get_num_points() << ",";
+        out_file << "\"R\":" <<evt.helicalprtracks()[track_i]->get_R() <<",";
+        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i]->get_dsdz() << ",";
+        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i]->get_phi0() <<",";
+        out_file << "\"x\":" << evt.helicalprtracks()[track_i]->get_x0() << ",";
+        out_file << "\"y\":" <<evt.helicalprtracks()[track_i]->get_y0() << ",";
+        out_file << "\"z\":" <<evt.helicalprtracks()[track_i]->get_z0() << "}]" << ",";
       }
       if (tracker0_hits == 0)
         out_file << "\"tracker0\":null,";
@@ -575,7 +575,7 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
     // TRACKER 1 TRACKS:
     int tracker1_hits = 0;
     for ( unsigned int track_i = 0; track_i < evt.helicalprtracks().size(); track_i++ ) {
-      int tracker = evt.helicalprtracks()[track_i].get_tracker();
+      int tracker = evt.helicalprtracks()[track_i]->get_tracker();
       if (tracker ==1) {
         tracker1_hits++;
         if  (tracker1_hits ==1) {
@@ -583,21 +583,21 @@ void MapCppTrackerVirtualRecon::save_to_json_mc(MAUS::SciFiEvent &evt, int event
           out_file << "{";
          }
         Json::Value track;
-        track["num_points"] = evt.helicalprtracks()[track_i].get_num_points();
-        track["R"]          = evt.helicalprtracks()[track_i].get_R();
-        track["dsdz"]       = evt.helicalprtracks()[track_i].get_dsdz();
-        track["Phi_0"]      = evt.helicalprtracks()[track_i].get_phi0();
-        track["starting_point"]["x"] = evt.helicalprtracks()[track_i].get_x0();
-        track["starting_point"]["y"] = evt.helicalprtracks()[track_i].get_y0();
-        track["starting_point"]["z"] = evt.helicalprtracks()[track_i].get_z0();
+        track["num_points"] = evt.helicalprtracks()[track_i]->get_num_points();
+        track["R"]          = evt.helicalprtracks()[track_i]->get_R();
+        track["dsdz"]       = evt.helicalprtracks()[track_i]->get_dsdz();
+        track["Phi_0"]      = evt.helicalprtracks()[track_i]->get_phi0();
+        track["starting_point"]["x"] = evt.helicalprtracks()[track_i]->get_x0();
+        track["starting_point"]["y"] = evt.helicalprtracks()[track_i]->get_y0();
+        track["starting_point"]["z"] = evt.helicalprtracks()[track_i]->get_z0();
 
-        out_file << "\"num_points\":" <<evt.helicalprtracks()[track_i].get_num_points() <<",";
-        out_file << "\"R\":" <<evt.helicalprtracks()[track_i].get_R() <<",";
-        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i].get_dsdz()  <<",";
-        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i].get_phi0()  <<",";
-        out_file << "\"x\":" <<evt.helicalprtracks()[track_i].get_x0()  <<",";
-        out_file << "\"y\":" <<evt.helicalprtracks()[track_i].get_y0()  <<",";
-        out_file << "\"z\":" <<evt.helicalprtracks()[track_i].get_z0() << "}]}},";
+        out_file << "\"num_points\":" <<evt.helicalprtracks()[track_i]->get_num_points() <<",";
+        out_file << "\"R\":" <<evt.helicalprtracks()[track_i]->get_R() <<",";
+        out_file << "\"dsdz\":" <<evt.helicalprtracks()[track_i]->get_dsdz()  <<",";
+        out_file << "\"Phi_0\":" <<evt.helicalprtracks()[track_i]->get_phi0()  <<",";
+        out_file << "\"x\":" <<evt.helicalprtracks()[track_i]->get_x0()  <<",";
+        out_file << "\"y\":" <<evt.helicalprtracks()[track_i]->get_y0()  <<",";
+        out_file << "\"z\":" <<evt.helicalprtracks()[track_i]->get_z0() << "}]}},";
       }
       if (tracker1_hits == 0) out_file << "\"tracker1\":null}},";
     }

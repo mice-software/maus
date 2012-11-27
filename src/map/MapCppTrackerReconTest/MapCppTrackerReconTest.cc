@@ -107,13 +107,10 @@ std::string MapCppTrackerReconTest::process(std::string document) {
     return writer.write(root);
 
   try {
-
     // If we have both Recon and MC events (or at least the array pointers are initialised)
     if ( spill.GetReconEvents() && spill.GetMCEvents() ) {
-
       // Loop over MC events
       for ( unsigned int i = 0; i < spill.GetMCEvents()->size(); i++ ) {
-
         // ================= Compute VirtualHit Data=========================
         double pt_mc_t1 = 0.0;
         double pz_mc_t1 = 0.0;
@@ -160,6 +157,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         double pz_rec_t1 = 0.0;
         double pt_rec_t2 = 0.0;
         double pz_rec_t2 = 0.0;
+
         int n_matched_sp_evt_t1 = 0;
         int n_matched_sp_evt_t2 = 0;
         int n_sp_avail_t1 = 0;
@@ -195,20 +193,20 @@ std::string MapCppTrackerReconTest::process(std::string document) {
           if ( event->helicalprtracks().size() ) {
             // Loop over the helical tracks in the recon event
             for ( unsigned int j = 0; j < event->helicalprtracks().size(); ++j ) {
-              SciFiHelicalPRTrack trk = event->helicalprtracks()[j];
+              SciFiHelicalPRTrack * trk = event->helicalprtracks()[j];
               _of3 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
-              _of3 << trk.get_num_points() << "\t" << trk.get_tracker() << "\t";
-              _of3 << trk.get_x0() << "\t" << trk.get_y0() << "\t";
-              _of3 << trk.get_circle_x0() << "\t" << trk.get_circle_y0() << "\t";
-              _of3 << trk.get_R() << "\t" << trk.get_psi0() << "\t" << trk.get_dsdz() << "\t";
+              _of3 << trk->get_num_points() << "\t" << trk->get_tracker() << "\t";
+              _of3 << trk->get_x0() << "\t" << trk->get_y0() << "\t";
+              _of3 << trk->get_circle_x0() << "\t" << trk->get_circle_y0() << "\t";
+              _of3 << trk->get_R() << "\t" << trk->get_psi0() << "\t" << trk->get_dsdz() << "\t";
               // Write momentum data for the first track in the event only
-              if ( !t1_set && trk.get_tracker() == 0 ) {
-                pt_rec_t1 = 1.2 * trk.get_R();
-                pz_rec_t1 = pt_rec_t1 / trk.get_dsdz();
+              if ( !t1_set && trk->get_tracker() == 0 ) {
+                pt_rec_t1 = 1.2 * trk->get_R();
+                pz_rec_t1 = pt_rec_t1 / trk->get_dsdz();
                 t1_set = true;
-              } else if ( !t2_set && trk.get_tracker() == 1 ) {
-                pt_rec_t2 = 1.2 * trk.get_R();
-                pz_rec_t2 = pt_rec_t2 / trk.get_dsdz();
+              } else if ( !t2_set && trk->get_tracker() == 1 ) {
+                pt_rec_t2 = 1.2 * trk->get_R();
+                pz_rec_t2 = pt_rec_t2 / trk->get_dsdz();
                 t2_set = true;
               }
 
@@ -216,8 +214,8 @@ std::string MapCppTrackerReconTest::process(std::string document) {
               int n_matched_sp_t1 = 0;
               int n_matched_sp_t2 = 0;
               // Loop over spacepoints in the track
-              for ( unsigned int k = 0; k < trk.get_spacepoints().size(); ++k ) {
-                SciFiSpacePoint sp = trk.get_spacepoints()[k];
+              for ( unsigned int k = 0; k < trk->get_spacepoints().size(); ++k ) {
+                SciFiSpacePoint sp = trk->get_spacepoints()[k];
                 ThreeVector pos = sp.get_position();
                 _of1 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
                 _of1 << sp.get_tracker() << "\t" << sp.get_station() << "\t";

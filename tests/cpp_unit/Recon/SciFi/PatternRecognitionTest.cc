@@ -104,8 +104,8 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 
   pr.process(false, true, evt1); // Helical off, Straight on
 
-  std::vector<SciFiStraightPRTrack> strks = evt1.straightprtracks();
-  std::vector<SciFiHelicalPRTrack> htrks = evt1.helicalprtracks();
+  std::vector<SciFiStraightPRTrack*> strks = evt1.straightprtracks();
+  std::vector<SciFiHelicalPRTrack*> htrks = evt1.helicalprtracks();
 
   // The track parameters that should be reconstructed from the spacepoints
   int num_points = 5;
@@ -119,15 +119,15 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 
   // Check it matches to within a tolerance epsilon
   double epsilon = 0.1;
-  ASSERT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_NEAR(line_x0, strks[0].get_x0(), epsilon);
-  EXPECT_NEAR(line_mx, strks[0].get_mx(), epsilon);
-  EXPECT_NEAR(line_x_chisq, strks[0].get_x_chisq(), epsilon);
-  EXPECT_NEAR(line_y0, strks[0].get_y0(), epsilon);
-  EXPECT_NEAR(line_my, strks[0].get_my(), epsilon);
-  EXPECT_NEAR(line_y_chisq, strks[0].get_y_chisq(), epsilon);
-  EXPECT_EQ(num_points, strks[0].get_num_points());
+  ASSERT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_NEAR(line_x0, strks[0]->get_x0(), epsilon);
+  EXPECT_NEAR(line_mx, strks[0]->get_mx(), epsilon);
+  EXPECT_NEAR(line_x_chisq, strks[0]->get_x_chisq(), epsilon);
+  EXPECT_NEAR(line_y0, strks[0]->get_y0(), epsilon);
+  EXPECT_NEAR(line_my, strks[0]->get_my(), epsilon);
+  EXPECT_NEAR(line_y_chisq, strks[0]->get_y_chisq(), epsilon);
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
 
   // For a helical fit
   //------------------
@@ -147,13 +147,13 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   double helix_R = 136.335;
   double helix_dsdz = -0.0470962; // Need to check this value is physical
 
-  ASSERT_EQ(1, htrks.size());
-  EXPECT_EQ(1, strks.size());
-  EXPECT_NEAR(helix_x0, htrks[0].get_x0(), epsilon);
-  EXPECT_NEAR(helix_y0, htrks[0].get_y0(), epsilon);
-  EXPECT_NEAR(helix_R, htrks[0].get_R(), epsilon);
-  EXPECT_NEAR(helix_dsdz, htrks[0].get_dsdz(), epsilon);
-  EXPECT_EQ(num_points, htrks[0].get_num_points());
+  ASSERT_EQ(1u, htrks.size());
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_NEAR(helix_x0, htrks[0]->get_x0(), epsilon);
+  EXPECT_NEAR(helix_y0, htrks[0]->get_y0(), epsilon);
+  EXPECT_NEAR(helix_R, htrks[0]->get_R(), epsilon);
+  EXPECT_NEAR(helix_dsdz, htrks[0]->get_dsdz(), epsilon);
+  EXPECT_EQ(num_points, htrks[0]->get_num_points());
 }
 
 TEST_F(PatternRecognitionTest, test_make_tracks) {
@@ -187,19 +187,19 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   // Make a 3 point track
   // ---------------------
   pr.make_all_tracks(track_type, tracker_num, spnts_by_station, evt);
-  std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
-  std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
+  std::vector<SciFiStraightPRTrack*> strks = evt.straightprtracks();
+  std::vector<SciFiHelicalPRTrack*> htrks = evt.helicalprtracks();
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(3, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 1);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.001);
-  EXPECT_NEAR(0.9, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 1);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.001);
-  EXPECT_NEAR(13.3, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(3, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 1);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.001);
+  EXPECT_NEAR(0.9, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 1);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
+  EXPECT_NEAR(13.3, strks[0]->get_y_chisq(), 0.1);
 
   // Make a 4 point track
   // ---------------------
@@ -220,15 +220,15 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   htrks = evt.helicalprtracks();
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(4, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 1);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.001);
-  EXPECT_NEAR(17.5, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 1);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.001);
-  EXPECT_NEAR(16.0, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(4, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 1);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.001);
+  EXPECT_NEAR(17.5, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 1);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
+  EXPECT_NEAR(16.0, strks[0]->get_y_chisq(), 0.1);
 
   // Make a 5 point track
   // ---------------------
@@ -250,15 +250,15 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   htrks = evt.helicalprtracks();
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(5, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 1);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.001);
-  EXPECT_NEAR(x_chisq, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 1);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.001);
-  EXPECT_NEAR(y_chisq, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(5, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 1);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.001);
+  EXPECT_NEAR(x_chisq, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 1);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
+  EXPECT_NEAR(y_chisq, strks[0]->get_y_chisq(), 0.1);
 }
 
 TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
@@ -288,8 +288,8 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   double x0 = -68.94108927;
   double my = 0.03755825;
   double mx = -0.02902014;
-  std::vector<SciFiHelicalPRTrack> htrks;
-  std::vector<SciFiStraightPRTrack> strks;
+  std::vector<SciFiHelicalPRTrack*> htrks;
+  std::vector<SciFiStraightPRTrack*> strks;
 
   // Make a 4 point track with 4 spacepoints
   // ---------------------------------------
@@ -307,15 +307,15 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(num_points, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
-  EXPECT_NEAR(17.5, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
-  EXPECT_NEAR(15.9, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.002);
+  EXPECT_NEAR(17.5, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
+  EXPECT_NEAR(15.9, strks[0]->get_y_chisq(), 0.1);
 
     // Make a 4 point track with 5 spacepoints
   // ---------------------------------------
@@ -335,15 +335,15 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(num_points, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.01); // Needed a wider tolerance than the others
-  EXPECT_NEAR(16.3, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
-  EXPECT_NEAR(4.5, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.01); // Needed a wider tolerance than the others
+  EXPECT_NEAR(16.3, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
+  EXPECT_NEAR(4.5, strks[0]->get_y_chisq(), 0.1);
 }
 
 TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
@@ -372,23 +372,23 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   double x0 = -68.94108927;
   double my = 0.03755825;
   double mx = -0.02902014;
-  std::vector<SciFiHelicalPRTrack> htrks;
-  std::vector<SciFiStraightPRTrack> strks;
+  std::vector<SciFiHelicalPRTrack*> htrks;
+  std::vector<SciFiStraightPRTrack*> strks;
 
   // Make a 3 point track with 3 spacepoints
   // ---------------------------------------
   pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(num_points, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
-  EXPECT_NEAR(0.9, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
-  EXPECT_NEAR(13.3, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.002);
+  EXPECT_NEAR(0.9, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
+  EXPECT_NEAR(13.3, strks[0]->get_y_chisq(), 0.1);
 
   // Make a 3 point track with 4 spacepoints
   // ---------------------------------------
@@ -407,15 +407,15 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(num_points, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.002);
-  EXPECT_NEAR(11.3, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
-  EXPECT_NEAR(0.0015, strks[0].get_y_chisq(), 0.001);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.002);
+  EXPECT_NEAR(11.3, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
+  EXPECT_NEAR(0.0015, strks[0]->get_y_chisq(), 0.001);
 
   // Make a 3 point track with 5 spacepoints
   // ---------------------------------------
@@ -435,15 +435,15 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1, strks.size());
-  EXPECT_EQ(0, htrks.size());
-  EXPECT_EQ(num_points, strks[0].get_num_points());
-  EXPECT_NEAR(x0, strks[0].get_x0(), 3);
-  EXPECT_NEAR(mx, strks[0].get_mx(), 0.01); // Needed a wider tolerance than the others
-  EXPECT_NEAR(1.8, strks[0].get_x_chisq(), 0.1);
-  EXPECT_NEAR(y0, strks[0].get_y0(), 3);
-  EXPECT_NEAR(my, strks[0].get_my(), 0.005);
-  EXPECT_NEAR(4.2, strks[0].get_y_chisq(), 0.1);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(0u, htrks.size());
+  EXPECT_EQ(num_points, strks[0]->get_num_points());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), 0.01); // Needed a wider tolerance than the others
+  EXPECT_NEAR(1.8, strks[0]->get_x_chisq(), 0.1);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
+  EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
+  EXPECT_NEAR(4.2, strks[0]->get_y_chisq(), 0.1);
 }
 
 TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
@@ -474,7 +474,7 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_EQ(-68.24883333333334, spnts_by_station[0][0]->get_position().x());
 
   std::vector<int> ignore_stations;
-  std::vector<SciFiStraightPRTrack> strks;
+  std::vector<SciFiStraightPRTrack*> strks;
 
   // The track parameters that should be reconstructed from the spacepoints
   int num_points = 5;
@@ -490,13 +490,13 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
 
   // Check it matches to within a tolerance epsilon
   double epsilon = 0.000001;
-  EXPECT_EQ(1, strks.size());
-  EXPECT_NEAR(x0, strks[0].get_x0(), epsilon);
-  EXPECT_NEAR(mx, strks[0].get_mx(), epsilon);
-  EXPECT_NEAR(x_chisq, strks[0].get_x_chisq(), epsilon);
-  EXPECT_NEAR(y0, strks[0].get_y0(), epsilon);
-  EXPECT_NEAR(my, strks[0].get_my(), epsilon);
-  EXPECT_NEAR(y_chisq, strks[0].get_y_chisq(), epsilon);
+  EXPECT_EQ(1u, strks.size());
+  EXPECT_NEAR(x0, strks[0]->get_x0(), epsilon);
+  EXPECT_NEAR(mx, strks[0]->get_mx(), epsilon);
+  EXPECT_NEAR(x_chisq, strks[0]->get_x_chisq(), epsilon);
+  EXPECT_NEAR(y0, strks[0]->get_y0(), epsilon);
+  EXPECT_NEAR(my, strks[0]->get_my(), epsilon);
+  EXPECT_NEAR(y_chisq, strks[0]->get_y_chisq(), epsilon);
 }
 
 TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
@@ -872,17 +872,17 @@ TEST_F(PatternRecognitionTest, test_stations_with_unused_sp) {
 
   PatternRecognition pr;
   pr.sort_by_station(spnts, spnts_by_station);
-  ASSERT_EQ(5, spnts_by_station.size());
-  ASSERT_EQ(1, spnts_by_station[0].size());
-  ASSERT_EQ(1, spnts_by_station[1].size());
-  ASSERT_EQ(2, spnts_by_station[3].size());
-  ASSERT_EQ(1, spnts_by_station[4].size());
+  ASSERT_EQ(5u, spnts_by_station.size());
+  ASSERT_EQ(1u, spnts_by_station[0].size());
+  ASSERT_EQ(1u, spnts_by_station[1].size());
+  ASSERT_EQ(2u, spnts_by_station[3].size());
+  ASSERT_EQ(1u, spnts_by_station[4].size());
 
   std::vector<int> stations_hit, stations_not_hit;
   pr.stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
 
-  ASSERT_EQ(2, stations_hit.size());
-  ASSERT_EQ(3, stations_not_hit.size());
+  ASSERT_EQ(2u, stations_hit.size());
+  ASSERT_EQ(3u, stations_not_hit.size());
   EXPECT_EQ(3, stations_hit[0]);
   EXPECT_EQ(4, stations_hit[1]);
   EXPECT_EQ(0, stations_not_hit[0]);
