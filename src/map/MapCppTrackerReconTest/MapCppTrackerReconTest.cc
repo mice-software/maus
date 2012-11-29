@@ -50,8 +50,9 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of1.open("seed_data.dat");
   _of1 << "spill\tevent\ttrack\ttracker\tstation\tx\ty\tz\tt\n";
 
-  _of2.open("virtualhit_data.dat");
-  _of2 << "spill\tmc_event\ttrack_ID\tPDG_ID\tdet_ID\tB_z\tx\ty\tz\tt\tpx\tpy\tpz\n";
+  _of2.open("scifihit_data.dat");
+  _of2 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
+  _of2 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   _of3.open("track_data.dat");
   _of3 << "spill\tevent\ttrack\tn_points\ttracker\tx0\ty0\t";
@@ -61,6 +62,10 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of4 << "spill\tevent\tpt_mc_t1\tpz_mc_t1\tpt_mc_t2\tpz_mc_t2\t";
   _of4 << "pt_rec_t1\tpz_rec_t1\tpt_rec_t2\tpz_rec_t2\tn_matched_t1\tn_avail_t1\t";
   _of4 << "n_matched_t2\tn_avail_t2\tn_hits_t1\tn_hits_t2\n";
+
+  _of5.open("MCSpace_data.dat");
+  _of5 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
+  _of5 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
@@ -93,6 +98,7 @@ bool MapCppTrackerReconTest::death() {
   _of2.close();
   _of3.close();
   _of4.close();
+  _of5.close();
   return true;
 }
 
@@ -111,7 +117,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
     if ( spill.GetReconEvents() && spill.GetMCEvents() ) {
       // Loop over MC events
       for ( unsigned int i = 0; i < spill.GetMCEvents()->size(); i++ ) {
-        // ================= Compute VirtualHit Data=========================
+        // ================= Compute SciFiHit Data=========================
         double pt_mc_t1 = 0.0;
         double pz_mc_t1 = 0.0;
         double pt_mc_t2 = 0.0;
@@ -119,29 +125,70 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         int num_hits_t1 = 0;
         int num_hits_t2 = 0;
 
-        VirtualHitArray* hits = spill.GetMCEvents()->at(i)->GetVirtualHits();
-        // Loop over virtual hits
+        SciFiHitArray* hits = spill.GetMCEvents()->at(i)->GetSciFiHits();
+        std::vector<SciFiHit> virt_scifi_hit;
+        std::vector<double> num_virt;
+
+        // Loop over scifi hits
         for ( unsigned int j = 0; j < hits->size(); j++ ) {
-          VirtualHit hit = hits->at(j);
+          SciFiHit hit = hits->at(j);
           ThreeVector pos = hit.GetPosition();
           ThreeVector mom = hit.GetMomentum();
-          _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
-          _of2 << hit.GetParticleId() << "\t" << hit.GetStationId() << "\t";
-          _of2 << hit.GetBField().z() << "\t";
-          _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
-          _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
-          // Write MC momentum data in tracker 1
-          if ( hit.GetStationId() < 6 ) {
-            pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
-            pz_mc_t1 += mom.z();
-            ++num_hits_t1;
-          } else { // Write MC momentum data in tracker 2
-            pt_mc_t2 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
-            pz_mc_t2 += mom.z();
-            ++num_hits_t2;
+          if ( mom.z() > 50. ) {
+            _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
+            _of2 << hit.GetParticleId() << "\t" << hit.GetChannelId()->GetTrackerNumber() << "\t";
+            _of2 << hit.GetChannelId()->GetStationNumber() << "\t";
+            _of2 << hit.GetChannelId()->GetPlaneNumber() << "\t";
+            _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
+            _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
+            _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
+            int g = 0;
+            if ( virt_scifi_hit.size() == 0 ) {
+            virt_scifi_hit.push_back(hit);
+            num_virt.push_back(1.);
+            } else {
+              for ( unsigned int h = 0; h < virt_scifi_hit.size(); h++ ) {
+                if ( virt_scifi_hit[h].GetChannelId()->GetTrackerNumber()   ==
+                     hit.GetChannelId()->GetTrackerNumber()    &&
+                     virt_scifi_hit[h].GetChannelId()->GetStationNumber()   ==
+                     hit.GetChannelId()->GetStationNumber()    &&
+                     virt_scifi_hit[h].GetParticleId() == hit.GetParticleId() &&
+                     virt_scifi_hit[h].GetTrackId() == hit.GetTrackId() &&
+                     fabs(virt_scifi_hit[h].GetTime() - hit.GetTime()) < 2. &&
+                     fabs(virt_scifi_hit[h].GetPosition().x() - hit.GetPosition().x()) < 0.5 &&
+                     fabs(virt_scifi_hit[h].GetPosition().y() - hit.GetPosition().y()) < 0.5 &&
+                     fabs(virt_scifi_hit[h].GetPosition().z() - hit.GetPosition().z()) < 10. ) {
+                  virt_scifi_hit[h].SetTime((virt_scifi_hit[h].GetTime() +
+                                            (hit.GetTime()/num_virt[h])) /
+                                            ((num_virt[h]+1.)/num_virt[h]));
+                  virt_scifi_hit[h].SetPosition((virt_scifi_hit[h].GetPosition() +
+                                                (hit.GetPosition()/num_virt[h])) /
+                                                ((num_virt[h]+1.)/num_virt[h]));
+                  virt_scifi_hit[h].SetMomentum((virt_scifi_hit[h].GetMomentum() +
+                                                (hit.GetMomentum()/num_virt[h])) /
+                                                ((num_virt[h]+1.)/num_virt[h]));
+                  num_virt[h]++;
+                  g = 1;
+                  continue;
+                }
+              }
+              if ( g == 0 ) {
+                virt_scifi_hit.push_back(hit);
+                num_virt.push_back(1.);
+              }
+            }
+            // Write MC momentum data in tracker 1
+            if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
+              pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+              pz_mc_t1 += mom.z();
+              ++num_hits_t1;
+            } else { // Write MC momentum data in tracker 2
+              pt_mc_t2 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+              pz_mc_t2 += mom.z();
+              ++num_hits_t2;
+            }
           }
-        } // Ends loop over vhits
-
+        } // Ends loop over scifihits
         // Calculate the average MC truth momentum per tracker
         pt_mc_t1 /= num_hits_t1;
         pz_mc_t1 /= num_hits_t1;
@@ -151,6 +198,21 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         // Write the MC truth momentum to the current event file
         _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
         _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
+
+        for ( unsigned int l = 0; l < virt_scifi_hit.size(); l++ ) {
+            ThreeVector v_pos = virt_scifi_hit[l].GetPosition();
+            ThreeVector v_mom = virt_scifi_hit[l].GetMomentum();
+            _of5 << spill.GetSpillNumber() << "\t" << l << "\t";
+            _of5 << virt_scifi_hit[l].GetTrackId() << "\t";
+            _of5 << virt_scifi_hit[l].GetParticleId() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetTrackerNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetStationNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetPlaneNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetFibreNumber() << "\t";
+            _of5 << v_pos.x() << "\t" << v_pos.y() << "\t" << v_pos.z() << "\t";
+            _of5 << virt_scifi_hit[l].GetTime() << "\t";
+            _of5 << v_mom.x() << "\t" << v_mom.y() << "\t" << v_mom.z() << "\n";
+        }
 
         // ================= Normal Tracker Reconstruction =========================
         double pt_rec_t1 = 0.0;
@@ -222,16 +284,18 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
                 _of1 << sp.get_time() << "\n";
                 for ( unsigned int j = 0; j < hits->size(); j++ ) {
-                  VirtualHit hit = hits->at(j);
+                  SciFiHit hit = hits->at(j);
                   // Is the vhit in the same tracker and station as the spacepoint
-                  if ( ( sp.get_tracker() == 0 &&
-                         sp.get_station() == stat_id_to_stat_num(hit.GetStationId()) ) ) {
+                  if ( sp.get_tracker() == 0 &&
+                       hit.GetChannelId()->GetTrackerNumber() == 0 &&
+                       sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
                     if ( ( fabs(- pos.x() - hit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - hit.GetPosition().y()) < _cut1) ) {
                       ++n_matched_sp_t1;
                     }
                   } else if ( sp.get_tracker() == 1 &&
-                              sp.get_station() == stat_id_to_stat_num(hit.GetStationId()) ) {
+                              hit.GetChannelId()->GetTrackerNumber() == 1 &&
+                              sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
                     if ( ( fabs(pos.x() - hit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - hit.GetPosition().y()) < _cut1 ) ) {
                       ++n_matched_sp_t2;
@@ -272,16 +336,16 @@ std::string MapCppTrackerReconTest::process(std::string document) {
   return writer.write(root);
 }
 
-void MapCppTrackerReconTest::vhits_per_tracker(VirtualHitArray* hits, int &t1, int &t2) {
+void MapCppTrackerReconTest::vhits_per_tracker(SciFiHitArray* hits, int &t1, int &t2) {
   t1 = 0;
   t2 = 0;
 
   if ( hits ) {
     for ( unsigned int i = 0; i < hits->size(); ++i ) {
-      VirtualHit hit = hits->at(i);
-      if ( hit.GetStationId() < 6 ) {
+      SciFiHit hit = hits->at(i);
+      if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
         ++t1;
-      } else if ( hit.GetStationId() > 5 ) {
+      } else if ( hit.GetChannelId()->GetTrackerNumber() == 1 ) {
         ++t2;
       }
     }
