@@ -30,12 +30,12 @@ namespace global {
 
 class Detector {
  public:
-  enum ID {kNone, kTOF0_1, kTOF0_2, kCherenkov1, kTOF1_1, kTOF1_2, kTracker1_1,
+  enum ID {kNone, kTOF0 kCherenkov1, kTOF1 kTracker1_1,
            kTracker1_2, kTracker1_3, kTracker1_4, kTracker1_5, kTracker2_1,
-           kTracker2_2, kTracker2_3, kTracker2_4, kTracker2_5, kTOF2_1,
-           kTOF2_2, kCherenkov2, kCalorimeter, kEMR};
+           kTracker2_2, kTracker2_3, kTracker2_4, kTracker2_5, kTOF2,
+           kCherenkov2, kCalorimeter, kEMR};
 
-  /* @brief	Create with the given input values.
+  /* @brief Create with the given input values.
    */
   Detector(const ID id,
            const double plane,

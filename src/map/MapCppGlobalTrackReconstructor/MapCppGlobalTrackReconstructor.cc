@@ -35,7 +35,8 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/Optics/CovarianceMatrix.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFSpacePointProcessor.hh"
+##include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
 #include "src/common_cpp/Recon/Global/Detector.hh"
@@ -242,35 +243,35 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   // parse the JSON document.
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
+
+    // Populate ReconstructionInput instance from JSON data
+    Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
+        configuration_,
+        "data_acquisition_modes",
+        JsonWrapper::arrayValue);
+    Json::Value data_acquisition_mode = JsonWrapper::GetProperty(
+        configuration_,
+        "data_acquisition_mode",
+        JsonWrapper::stringValue);
+    if (data_acquisition_mode == "Random") {
+      LoadRandomData();
+    } else if (data_acquisition_mode == "Simulation") {
+      LoadSimulationData();
+    } else if (data_acquisition_mode == "Smeared") {
+      LoadSmearedData();
+    } else if (data_acquisition_mode == "Live") {
+      LoadLiveData();
+    } else {
+      std::string message = "Invalid data acquisition mode: ";
+      message += data_acquisition_mode.asString();
+      throw(Squeal(Squeal::recoverable,
+                  message,
+                  "MapCppGlobalTrackReconstructor::process()"));
+    }
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
-  }
-
-  // Populate ReconstructionInput instance from JSON data
-  Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
-      configuration_,
-      "data_acquisition_modes",
-      JsonWrapper::arrayValue);
-  Json::Value data_acquisition_mode = JsonWrapper::GetProperty(
-      configuration_,
-      "data_acquisition_mode",
-      JsonWrapper::stringValue);
-  if (data_acquisition_mode == "Random") {
-    LoadRandomData();
-  } else if (data_acquisition_mode == "Simulation") {
-    LoadSimulationData();
-  } else if (data_acquisition_mode == "Smeared") {
-    LoadSmearedData();
-  } else if (data_acquisition_mode == "Live") {
-    LoadLiveData();
-  } else {
-    std::string message = "Invalid data acquisition mode: ";
-    message += data_acquisition_mode.asString();
-    throw(Squeal(Squeal::recoverable,
-                 message,
-                 "MapCppGlobalTrackReconstructor::process()"));
   }
 
 std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
@@ -609,8 +610,198 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::LoadMonteCarloData: "
   }
 }
 
+/*
+void ExtractTOFSpacePoints(
+    const Json::Value& tof_space_points,
+    std::vector<MAUS::TOFSpacePoint>& tof0_space_points,
+    std::vector<MAUS::TOFSpacePoint>& tof1_space_points,
+    std::vector<MAUS::TOFSpacePoint>& tof2_space_points) {
+  stations.push_back(JsonWrapper::GetProperty(tof_space_points,
+                                              "tof0",
+                                              JsonWrapper::arrayValue));
+  stations.push_back(JsonWrapper::GetProperty(tof_space_points,
+                                              "tof1",
+                                              JsonWrapper::arrayValue));
+
+  for (unsigned int station = 0; station <=2; ++station) {
+    std::stringstream station_name
+    station_name << "tof" << station;
+    Json::Value space_points = JsonWrapper::GetProperty(
+        tof_space_points,
+        station_name.str(),
+        JsonWrapper::arrayValue);
+    std::vector<MAUS::TOFSpacePoint>& tofn_space_points;
+    switch {
+      case 0: tofn_space_points = tof0_space_points; break;
+      case 1: tofn_space_points = tof1_space_points; break;
+      case 2: tofn_space_points = tof2_space_points; break;
+    }
+
+    for (size_t point_index = 0;
+          point_index < space_points.size();
+          ++point_index) {
+      Json::Value space_point_json = JsonWrapper::GetItem(
+          space_points,
+          point_index,
+          JsonWrapper::objectValue);
+      TOFSpacePoint space_point;
+
+      Json::Value time_json = JsonWrapper::GetProperty(
+          _json,
+          "time",
+          JsonWrapper::realValue);
+      const double time = time_json.asDouble();
+
+      Json::Value station = JsonWrapper::GetProperty(
+          _json,
+          "station",
+          JsonWrapper::uintValue);
+      unsigned int tof_station = station.asUInt();
+
+      Json::Value x_slab = JsonWrapper::GetProperty(
+          _json,
+          "slabX",
+          JsonWrapper::uintValue);
+      space_point.SetSlabx(y_slab.asInt());
+      double max_x_value = 0.;
+      double x_slab_half_width = 0.;
+      switch (tof_station) {
+        // 10 4cm-wide slabs between -18cm and +18cm
+        case 0:
+          max_x_value = -180.;
+          x_slab_half_width = 2.;
+          break;
+        // 7 6cm-wide slabs between -18cm and +18cm
+        case 1:
+          max_x_value = -180.;
+          x_slab_half_width = 3.;
+          break;
+        // 10 6cm-wide slabs between -27cm and +27cm
+        case 2:
+          max_x_value = -270.;
+          x_slab_half_width = 3.;
+          break;
+      }
+      const double x = max_x_value + x_slab_half_width * x_slab.asUInt();
+
+      Json::Value y_slab = JsonWrapper::GetProperty(
+          _json,
+          "slabY",
+          JsonWrapper::uintValue);
+      double max_y_value = 0.;
+      double y_slab_half_width = 0.;
+      switch (tof_station) {
+        // 10 4cm-wide slabs between -18cm and +18cm
+        case 0:
+          max_y_value = -180.;
+          y_slab_half_width = 2.;
+          break;
+        // 7 6cm-wide slabs between -18cm and +18cm
+        case 1:
+          max_y_value = -180.;
+          y_slab_half_width = 3.;
+          break;
+        // 10 6cm-wide slabs between -27cm and +27cm
+        case 2:
+          max_y_value = -270.;
+          y_slab_half_width = 3.;
+          break;
+      }
+      const double y = max_y_value + y_slab_half_width * y_slab.asUInt();
+
+      tofn_space_points.
+    }
+  }
+}
+*/
+
+void MapCppGlobalTrackReconstructor::LoadTOFTracks(
+    std::map<Detector::ID, Detector>& detectors,
+    Json::Value& event,
+    std::vector<Track>& tof_tracks) {
+  Json::Value tof_event = JsonWrapper::GetProperty(
+      recon_event,
+      "tof_event",
+      JsonWrapper::objectValue);
+  Json::Value tof_space_points_json = JsonWrapper::GetProperty(
+      tof_event,
+      "tof_space_points",
+      JsonWrapper::objectValue);
+  TOFEventSpacePointProcessor deserializer;
+  const TOFEventSpacePoint * tof_space_points = deserializer.JsonToCpp(
+      tof_space_points_json);
+  /*
+  std::vector<MAUS::TOFSpacePoint> tof0_space_points;
+  std::vector<MAUS::TOFSpacePoint> tof1_space_points;
+  std::vector<MAUS::TOFSpacePoint> tof2_space_points;
+  ExtractTOFSpacePoints(tof_space_points,
+                        tof0_space_points,
+                        tof1_space_points,
+                        tof2_space_points);
+  */
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const size_t num_space_points
+      = tof_space_points->GetTOF0SpacePointArraySize();
+  // TODO(Lane) match up tof0, tof1, and tof2 space points based on DAQ window
+  // For now assume an equal number of space points for each TOF detector
+  for (size_t index = 0; index < tof_space_points->GetTOF0SpacePointArraySize();
+       ++index) {
+    // Use TOF0 and TOF1 to calculate the velocity of the particle
+    const TOFSpacePoint tof0_space_point
+        = tof_space_points->GetTOF0SpacePointArrayElement(index);
+    const TOFSpacePoint tof1_space_point
+        = tof_space_points->GetTOF0SpacePointArrayElement(index);
+    const double delta_t
+        = tof1_space_point.GetTime() - tof0_space_point.GetTime();
+    const Detector& tof0 = detectors.find(Detector::kTOF0)->second;
+    const Detector& tof1 = detectors.find(Detector::kTOF1)->second;
+    const double delta_z = tof1.plane() - tof0.plane();
+    const double beta = delta_z / delta_t / ::CLHEP::c_light;
+    const double gamma = 1. / ::sqrt(1 - beta*beta);
+
+    // Assume particle is a muon and calculate energy and momentum.
+    const double mass = Particle::GetInstance()->GetMass(Particle::kMuMinus);
+    const double energy = gamma * mass;
+    const double momentum = beta * energy;
+
+    // Ignore if the energy or momentum inconsistant with a muon.
+    const double reference_energy = reference_pgparticle.energy;
+    const double reference_momentum = reference_pgparticle.pz;  // good enough
+    // m_mu / m_pi = 0.7572 and m_mu / m_e = 206.8
+    const double energy_ratio = reference_energy / energy;
+    const double momentum_ratio = reference_momentum / momentum;
+    if ((energy_ratio < 0.8) || (energy_ratio > 10.) ||
+        (momentum_ratio < 0.8) || (momentum_ratio > 10.)) {
+      return;
+    }
+
+    // Otherwise, populate TrackPoints for each space point
+  }
+}
+
 void MapCppGlobalTrackReconstructor::LoadLiveData() {
-  // recon_input_ = new ReconstructionInput(...);
+  Json::Value event_type = JsonWrapper::GetProperty(run_data_,
+                                                    "daq_event_type",
+                                                    JsonWrapper::stringValue);
+  std::map<Detector::ID, Detector> detectors;
+  LoadDetectorConfiguration(detectors);
+
+  if (event_type == "physics_event") {
+    Json::Value recon_events = JsonWrapper::GetProperty(
+        run_data_,
+        "recon_events",
+        JsonWrapper::arrayValue);
+    for (size_t event_index = 0; event < recon_events.size() ++event_index) {
+      Json::Value recon_event = JsonWrapper::GetItem(
+          recon_events,
+          event_index,
+          JsonWrapper::objectValue);
+      std::vector<Track> tof_tracks;
+      LoadTOFTracks(detectors, recon_event, tof_tracks);
+    }
+  }
 }
 
 
