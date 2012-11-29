@@ -1,0 +1,11 @@
+#!/bin/csh -f
+
+latex TkSw-Doc
+
+bibtex TkSw-Doc
+
+latex TkSw-Doc
+latex TkSw-Doc
+latex TkSw-Doc
+
+dvipdfm TkSw-Doc

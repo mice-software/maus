@@ -1,0 +1,56 @@
+\documentclass{article}
+
+\input 99-Styles/GetPackages
+
+\begin{document}
+
+\makeatletter
+
+\parindent 10pt
+\pagenumbering{arabic}                   
+\pagestyle{plain}
+
+\thispagestyle{empty}
+\input 00a-Title-page/00a-Title-page
+\cleardoublepage
+
+\parindent 10pt
+\pagenumbering{roman}                   
+\setcounter{page}{1}
+\thispagestyle{plain}
+\pagestyle{plain}
+
+\cleardoublepage
+\tableofcontents
+\cleardoublepage
+
+
+\pagenumbering{arabic}                   
+\setcounter{page}{1}
+
+\input 01-Introduction/01-Introduction
+\input 02-Definitions/02-Definitions
+\input 03-Reference-surfaces-and-coordinate-systems/03-Reference-surfaces-and-coordinate-systems
+\input 04-Reconstruction/04-Reconstruction
+\input 05-DataStructure/05-DataStructure
+\input 06-Algorithms/06-Algorithms
+\input 07-ConfigDB/07-ConfigDB
+\input 08-MonteCarlo/08-MonteCarlo
+\input 09-Performance/09-Performance
+
+\cleardoublepage
+\input 10-Acknowledgements/10-Acknowledgements
+\cleardoublepage
+
+%\bibliographystyle{styles/utcaps}
+%\bibliography{TkSw-Doc}
+
+\appendix
+\input 11-Appendix-1-Kuno-conjecture/11-Appendix-1-Kuno-conjecture
+\input 12-Appendix-2-Space-point-standard-deviation/12-Appendix-2-Space-point-standard-deviation
+%\input 13-Appendix-3-Straight-track-pattern-recognition/13-Appendix-3-Straight-track-pattern-recognition
+\input 14-Appendix-4-Helix-track-pattern-recognition/14-Appendix-4-Helix-track-pattern-recognition
+\input 15-Appendix-5-Circle-fit/15-Appendix-5-Circle-fit
+
+\end{document}
+

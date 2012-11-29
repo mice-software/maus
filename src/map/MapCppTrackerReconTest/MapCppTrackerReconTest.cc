@@ -50,9 +50,8 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of1.open("seed_data.dat");
   _of1 << "spill\tevent\ttrack\ttracker\tstation\tx\ty\tz\tt\n";
 
-  _of2.open("scifihit_data.dat");
-  _of2 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
-  _of2 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
+  _of2.open("virtualhit_data.dat");
+  _of2 << "spill\tmc_event\ttrack_ID\tPDG_ID\tdet_ID\tB_z\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   _of3.open("track_data.dat");
   _of3 << "spill\tevent\ttrack\tn_points\ttracker\tx0\ty0\t";
@@ -62,9 +61,6 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of4 << "spill\tevent\tpt_mc_t1\tpz_mc_t1\tpt_mc_t2\tpz_mc_t2\t";
   _of4 << "pt_rec_t1\tpz_rec_t1\tpt_rec_t2\tpz_rec_t2\tn_matched_t1\tn_avail_t1\t";
   _of4 << "n_matched_t2\tn_avail_t2\tn_hits_t1\tn_hits_t2\n";
-
-  _of5.open("virtualhit_data.dat");
-  _of5 << "spill\ttrack_ID\tPDG_ID\ttracker\tstation\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
@@ -97,7 +93,6 @@ bool MapCppTrackerReconTest::death() {
   _of2.close();
   _of3.close();
   _of4.close();
-  _of5.close();
   return true;
 }
 
@@ -116,7 +111,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
     if ( spill.GetReconEvents() && spill.GetMCEvents() ) {
       // Loop over MC events
       for ( unsigned int i = 0; i < spill.GetMCEvents()->size(); i++ ) {
-        // ================= Compute SciFiHit Data=========================
+        // ================= Compute VirtualHit Data=========================
         double pt_mc_t1 = 0.0;
         double pz_mc_t1 = 0.0;
         double pt_mc_t2 = 0.0;
@@ -124,32 +119,28 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         int num_hits_t1 = 0;
         int num_hits_t2 = 0;
 
-        SciFiHitArray* hits = spill.GetMCEvents()->at(i)->GetSciFiHits();
-        // Loop over scifi hits
+        VirtualHitArray* hits = spill.GetMCEvents()->at(i)->GetVirtualHits();
+        // Loop over virtual hits
         for ( unsigned int j = 0; j < hits->size(); j++ ) {
-          SciFiHit hit = hits->at(j);
+          VirtualHit hit = hits->at(j);
           ThreeVector pos = hit.GetPosition();
           ThreeVector mom = hit.GetMomentum();
-          if ( mom.z() > 50. ) {
-            _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
-            _of2 << hit.GetParticleId() << "\t" << hit.GetChannelId()->GetTrackerNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetStationNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetPlaneNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
-            _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
-            _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
-            // Write MC momentum data in tracker 1
-            if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
-              pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
-              pz_mc_t1 += mom.z();
-              ++num_hits_t1;
-            } else { // Write MC momentum data in tracker 2
-              pt_mc_t2 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
-              pz_mc_t2 += mom.z();
-              ++num_hits_t2;
-            }
+          _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
+          _of2 << hit.GetParticleId() << "\t" << hit.GetStationId() << "\t";
+          _of2 << hit.GetBField().z() << "\t";
+          _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
+          _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
+          // Write MC momentum data in tracker 1
+          if ( hit.GetStationId() < 6 ) {
+            pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+            pz_mc_t1 += mom.z();
+            ++num_hits_t1;
+          } else { // Write MC momentum data in tracker 2
+            pt_mc_t2 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
+            pz_mc_t2 += mom.z();
+            ++num_hits_t2;
           }
-        } // Ends loop over scifihits
+        } // Ends loop over vhits
 
         // Calculate the average MC truth momentum per tracker
         pt_mc_t1 /= num_hits_t1;
@@ -231,18 +222,16 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
                 _of1 << sp.get_time() << "\n";
                 for ( unsigned int j = 0; j < hits->size(); j++ ) {
-                  SciFiHit hit = hits->at(j);
+                  VirtualHit hit = hits->at(j);
                   // Is the vhit in the same tracker and station as the spacepoint
-                  if ( sp.get_tracker() == 0 &&
-                       hit.GetChannelId()->GetTrackerNumber() == 0 &&
-                       sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
+                  if ( ( sp.get_tracker() == 0 &&
+                         sp.get_station() == stat_id_to_stat_num(hit.GetStationId()) ) ) {
                     if ( ( fabs(- pos.x() - hit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - hit.GetPosition().y()) < _cut1) ) {
                       ++n_matched_sp_t1;
                     }
                   } else if ( sp.get_tracker() == 1 &&
-                              hit.GetChannelId()->GetTrackerNumber() == 1 &&
-                              sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
+                              sp.get_station() == stat_id_to_stat_num(hit.GetStationId()) ) {
                     if ( ( fabs(pos.x() - hit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - hit.GetPosition().y()) < _cut1 ) ) {
                       ++n_matched_sp_t2;
@@ -283,16 +272,16 @@ std::string MapCppTrackerReconTest::process(std::string document) {
   return writer.write(root);
 }
 
-void MapCppTrackerReconTest::vhits_per_tracker(SciFiHitArray* hits, int &t1, int &t2) {
+void MapCppTrackerReconTest::vhits_per_tracker(VirtualHitArray* hits, int &t1, int &t2) {
   t1 = 0;
   t2 = 0;
 
   if ( hits ) {
     for ( unsigned int i = 0; i < hits->size(); ++i ) {
-      SciFiHit hit = hits->at(i);
-      if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
+      VirtualHit hit = hits->at(i);
+      if ( hit.GetStationId() < 6 ) {
         ++t1;
-      } else if ( hit.GetChannelId()->GetTrackerNumber() == 1 ) {
+      } else if ( hit.GetStationId() > 5 ) {
         ++t2;
       }
     }
