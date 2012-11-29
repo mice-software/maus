@@ -19,7 +19,6 @@ Tests for MongoDBDocumentStore module.
 # pylint: disable=C0103
 
 import pymongo
-from pymongo.errors import AutoReconnect
 import unittest
 
 from docstore.MongoDBDocumentStore import MongoDBDocumentStore
