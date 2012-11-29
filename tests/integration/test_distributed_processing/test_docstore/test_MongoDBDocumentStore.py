@@ -41,7 +41,8 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         self._port = 27017
         try:
             test_conx = pymongo.Connection(self._host, self._port)
-        except AutoReconnect: # pylint: disable=W0702
+        # Need ConnectionFailure here for pymongo > 2.4
+        except pymongo.errors.ConnectionFailure: # pylint: disable=W0702
             unittest.TestCase.skipTest(self, 
                                        "MongoDB server is not accessible")
         test_conx.disconnect()
