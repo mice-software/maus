@@ -63,8 +63,9 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of4 << "pt_rec_t1\tpz_rec_t1\tpt_rec_t2\tpz_rec_t2\tn_matched_t1\tn_avail_t1\t";
   _of4 << "n_matched_t2\tn_avail_t2\tn_hits_t1\tn_hits_t2\n";
 
-  _of5.open("virtualhit_data.dat");
-  _of5 << "spill\ttrack_ID\tPDG_ID\ttracker\tstation\tx\ty\tz\tt\tpx\tpy\tpz\n";
+  _of5.open("MCSpace_data.dat");
+  _of5 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
+  _of5 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
@@ -125,6 +126,9 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         int num_hits_t2 = 0;
 
         SciFiHitArray* hits = spill.GetMCEvents()->at(i)->GetSciFiHits();
+        std::vector<SciFiHit> virt_scifi_hit;
+        std::vector<double> num_virt;
+
         // Loop over scifi hits
         for ( unsigned int j = 0; j < hits->size(); j++ ) {
           SciFiHit hit = hits->at(j);
@@ -138,6 +142,41 @@ std::string MapCppTrackerReconTest::process(std::string document) {
             _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
             _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
             _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
+            int g = 0;
+            if ( virt_scifi_hit.size() == 0 ) {
+            virt_scifi_hit.push_back(hit);
+            num_virt.push_back(1.);
+            } else {
+              for ( unsigned int h = 0; h < virt_scifi_hit.size(); h++ ) {
+                if ( virt_scifi_hit[h].GetChannelId()->GetTrackerNumber()   ==
+                     hit.GetChannelId()->GetTrackerNumber()    &&
+                     virt_scifi_hit[h].GetChannelId()->GetStationNumber()   ==
+                     hit.GetChannelId()->GetStationNumber()    &&
+                     virt_scifi_hit[h].GetParticleId() == hit.GetParticleId() &&
+                     virt_scifi_hit[h].GetTrackId() == hit.GetTrackId() &&
+                     fabs(virt_scifi_hit[h].GetTime() - hit.GetTime()) < 2. &&
+                     fabs(virt_scifi_hit[h].GetPosition().x() - hit.GetPosition().x()) < 0.5 &&
+                     fabs(virt_scifi_hit[h].GetPosition().y() - hit.GetPosition().y()) < 0.5 &&
+                     fabs(virt_scifi_hit[h].GetPosition().z() - hit.GetPosition().z()) < 10. ) {
+                  virt_scifi_hit[h].SetTime((virt_scifi_hit[h].GetTime() +
+                                            (hit.GetTime()/num_virt[h])) /
+                                            ((num_virt[h]+1.)/num_virt[h]));
+                  virt_scifi_hit[h].SetPosition((virt_scifi_hit[h].GetPosition() +
+                                                (hit.GetPosition()/num_virt[h])) /
+                                                ((num_virt[h]+1.)/num_virt[h]));
+                  virt_scifi_hit[h].SetMomentum((virt_scifi_hit[h].GetMomentum() +
+                                                (hit.GetMomentum()/num_virt[h])) /
+                                                ((num_virt[h]+1.)/num_virt[h]));
+                  num_virt[h]++;
+                  g = 1;
+                  continue;
+                }
+              }
+              if ( g == 0 ) {
+                virt_scifi_hit.push_back(hit);
+                num_virt.push_back(1.);
+              }
+            }
             // Write MC momentum data in tracker 1
             if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
               pt_mc_t1 += sqrt(mom.x()*mom.x() + mom.y()*mom.y());
@@ -150,7 +189,6 @@ std::string MapCppTrackerReconTest::process(std::string document) {
             }
           }
         } // Ends loop over scifihits
-
         // Calculate the average MC truth momentum per tracker
         pt_mc_t1 /= num_hits_t1;
         pz_mc_t1 /= num_hits_t1;
@@ -160,6 +198,21 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         // Write the MC truth momentum to the current event file
         _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
         _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
+
+        for ( unsigned int l = 0; l < virt_scifi_hit.size(); l++ ) {
+            ThreeVector v_pos = virt_scifi_hit[l].GetPosition();
+            ThreeVector v_mom = virt_scifi_hit[l].GetMomentum();
+            _of5 << spill.GetSpillNumber() << "\t" << l << "\t";
+            _of5 << virt_scifi_hit[l].GetTrackId() << "\t";
+            _of5 << virt_scifi_hit[l].GetParticleId() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetTrackerNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetStationNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetPlaneNumber() << "\t";
+            _of5 << virt_scifi_hit[l].GetChannelId()->GetFibreNumber() << "\t";
+            _of5 << v_pos.x() << "\t" << v_pos.y() << "\t" << v_pos.z() << "\t";
+            _of5 << virt_scifi_hit[l].GetTime() << "\t";
+            _of5 << v_mom.x() << "\t" << v_mom.y() << "\t" << v_mom.z() << "\n";
+        }
 
         // ================= Normal Tracker Reconstruction =========================
         double pt_rec_t1 = 0.0;
