@@ -85,13 +85,13 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
              const CovarianceMatrix & uncertainties, const double z = 0.0);
 
   /* @brief	Detector-generated track point constructor. The Detector reference
-   * is used to copy it's ID and uncertainty matrix.
+   * is used to copy it's ID, uncertainty matrix, and z-plane.
    * 
    */
   TrackPoint(const double time, const double energy,
              const double x, const double px,
              const double y, const double py,
-             const Detector & detector, const double z = 0.0);
+             const Detector & detector);
 
   /* @brief	This constructor is used when to create well-defined particle tracks
    * for simulating through MICE.

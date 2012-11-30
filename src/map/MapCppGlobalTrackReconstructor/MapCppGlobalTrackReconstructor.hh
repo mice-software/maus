@@ -111,11 +111,21 @@ class MapCppGlobalTrackReconstructor {
 
   void LoadSimulationData(const std::string mc_branch_name);
 
+  void LoadTOFTracks(
+      std::map<MAUS::recon::global::Detector::ID,
+               MAUS::recon::global::Detector>& detectors,
+      Json::Value& recon_event,
+      std::vector<MAUS::recon::global::Track>& tof_tracks);
+  void LoadSciFiTracks(
+      std::map<MAUS::recon::global::Detector::ID,
+               MAUS::recon::global::Detector>& detectors,
+      Json::Value& recon_event,
+      std::vector<MAUS::recon::global::Track>& sci_fi_tracks);
   void LoadDetectorConfiguration(
     std::map<MAUS::recon::global::Detector::ID,
     MAUS::recon::global::Detector> & detectors);
   void LoadMonteCarloData(
-    const std::string                                             branch_name,
+    const std::string branch_name,
     const std::map<MAUS::recon::global::Detector::ID,
                    MAUS::recon::global::Detector> & detectors);
 

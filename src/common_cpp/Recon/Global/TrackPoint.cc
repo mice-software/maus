@@ -75,12 +75,11 @@ TrackPoint::TrackPoint(const double time, const double energy,
 TrackPoint::TrackPoint(const double time, const double energy,
                        const double x, const double px,
                        const double y, const double py,
-                       const Detector & detector,
-                       const double z)
+                       const Detector & detector)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(detector.id()),
       uncertainties_(detector.uncertainties()),
-      particle_id_(Particle::kNone), z_(z) { }
+      particle_id_(Particle::kNone), z_(detector.plane()) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
                        const double x, const double px,

@@ -119,7 +119,7 @@ TEST_F(TrackPointTest, CopyConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(Detector::kTOF1);
   ASSERT_EQ(static_cast<size_t>(6), kUncertainties.size());
   test_point.set_uncertainties(kUncertainties);
 
@@ -171,13 +171,13 @@ TEST_F(TrackPointTest, DetectorConstructor) {
   test_point.set_Px(3.3);
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
-  test_point.set_z(6.6);
+  test_point.set_z(kDetectorPlane);
   test_point.set_detector_id(Detector::kTracker2_3);
   test_point.set_uncertainties(kUncertainties);
 
   const Detector detector(Detector::kTracker2_3, kDetectorPlane,
                           kUncertainties);
-  const TrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, detector, 6.6);
+  const TrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, detector);
 
   ASSERT_EQ(test_point, point);
 }
@@ -229,11 +229,14 @@ TEST_F(TrackPointTest, Equality) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(Detector::kTOF1);
   test_point.set_particle_id(Particle::kMuMinus);
   test_point.set_uncertainties(kUncertainties);
 
   ASSERT_EQ(test_point, test_point);
+
+  TrackPoint test_point_copy(test_point);
+  ASSERT_EQ(test_point_copy, test_point);
 
   TrackPoint point;
 
@@ -248,7 +251,7 @@ TEST_F(TrackPointTest, Equality) {
   point.set_y(4.4);
   point.set_Py(5.5);
   point.set_z(6.6);
-  point.set_detector_id(Detector::kTOF1_1);
+  point.set_detector_id(Detector::kTOF1);
   point.set_particle_id(Particle::kMuMinus);
   point.set_uncertainties(kUncertainties);
 
@@ -271,7 +274,7 @@ TEST_F(TrackPointTest, Equality) {
 TEST_F(TrackPointTest, Inequality) {
   const double coordinates[6] = {0.0, 1000., 2.2, 3.3, 4.4, 5.5};
   TrackPoint test_point(coordinates, 6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(Detector::kTOF1);
   test_point.set_particle_id(Particle::kMuMinus);
   test_point.set_uncertainties(kUncertainties);
 
@@ -299,7 +302,7 @@ TEST_F(TrackPointTest, Inequality) {
   // Test detector ID inequality
   test_point.set_detector_id(Detector::kCherenkov2);
   EXPECT_NE(test_point, point);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(Detector::kTOF1);
 
   // Test uncertainties inequality
   MAUS::CovarianceMatrix uncertainties;

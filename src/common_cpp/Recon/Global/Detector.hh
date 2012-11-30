@@ -30,7 +30,7 @@ namespace global {
 
 class Detector {
  public:
-  enum ID {kNone, kTOF0 kCherenkov1, kTOF1 kTracker1_1,
+  enum ID {kNone, kTOF0, kCherenkov1, kTOF1, kTracker1_1,
            kTracker1_2, kTracker1_3, kTracker1_4, kTracker1_5, kTracker2_1,
            kTracker2_2, kTracker2_3, kTracker2_4, kTracker2_5, kTOF2,
            kCherenkov2, kCalorimeter, kEMR};
