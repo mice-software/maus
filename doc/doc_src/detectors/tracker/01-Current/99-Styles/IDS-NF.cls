@@ -1,7 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{IDS-NF}[2012/04/27]
 \let\ids@startsection\@startsection
-\LoadClass[a4paper,fleqn,preprintnumbers,nofootinbib,PRD,11pt]{99-Styles/revtex4-1/revtex4-1-tds/tex/latex/revtex/revtex4-1}
+\LoadClass[a4paper,fleqn,preprintnumbers,nofootinbib,PRD,11pt]{revtex4-1}
 %-- YU: [prl,12pt,tightenlines]
 \renewcommand\thesection{\arabic{section}}
 \renewcommand\p@section{}

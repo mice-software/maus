@@ -67,6 +67,8 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of5 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
   _of5 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
+  _of6.open("DataGrid.dat");
+
   // Get the tracker modules.
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
   std::string filename;
@@ -99,6 +101,7 @@ bool MapCppTrackerReconTest::death() {
   _of3.close();
   _of4.close();
   _of5.close();
+  _of6.close();
   return true;
 }
 
@@ -272,7 +275,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 t2_set = true;
               }
 
-              // ================= Match Seed Spacepoints with VirtualHits =====================
+              // ================= Match Seed Spacepoints with SciFi Hits =====================
               int n_matched_sp_t1 = 0;
               int n_matched_sp_t2 = 0;
               // Loop over spacepoints in the track
@@ -283,21 +286,21 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 _of1 << sp.get_tracker() << "\t" << sp.get_station() << "\t";
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
                 _of1 << sp.get_time() << "\n";
-                for ( unsigned int j = 0; j < hits->size(); j++ ) {
-                  SciFiHit hit = hits->at(j);
+                for ( unsigned int j = 0; j < virt_scifi_hit.size(); j++ ) {
+                  SciFiHit vhit = virt_scifi_hit[j];
                   // Is the vhit in the same tracker and station as the spacepoint
                   if ( sp.get_tracker() == 0 &&
-                       hit.GetChannelId()->GetTrackerNumber() == 0 &&
-                       sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
-                    if ( ( fabs(- pos.x() - hit.GetPosition().x()) < _cut1 ) &&
-                         ( fabs(pos.y() - hit.GetPosition().y()) < _cut1) ) {
+                       vhit.GetChannelId()->GetTrackerNumber() == 0 &&
+                       sp.get_station() == vhit.GetChannelId()->GetStationNumber() ) {
+                    if ( ( fabs(- pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
+                         ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1) ) {
                       ++n_matched_sp_t1;
                     }
                   } else if ( sp.get_tracker() == 1 &&
-                              hit.GetChannelId()->GetTrackerNumber() == 1 &&
-                              sp.get_station() == hit.GetChannelId()->GetStationNumber() ) {
-                    if ( ( fabs(pos.x() - hit.GetPosition().x()) < _cut1 ) &&
-                         ( fabs(pos.y() - hit.GetPosition().y()) < _cut1 ) ) {
+                              vhit.GetChannelId()->GetTrackerNumber() == 1 &&
+                              sp.get_station() == vhit.GetChannelId()->GetStationNumber() ) {
+                    if ( ( fabs(pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
+                         ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1 ) ) {
                       ++n_matched_sp_t2;
                     }
                   }
@@ -313,13 +316,18 @@ std::string MapCppTrackerReconTest::process(std::string document) {
 
         int t1_hits = 0;
         int t2_hits = 0;
-        vhits_per_tracker(hits, t1_hits, t2_hits);
+        vhits_per_tracker(virt_scifi_hit, t1_hits, t2_hits);
 
         // ================= Write Data For The Current Event =========================
         _of4 << pt_rec_t1 << "\t" << pz_rec_t1 << "\t" << pt_rec_t2 << "\t" << pz_rec_t2 << "\t";
         _of4 << n_matched_sp_evt_t1 << "\t" << n_sp_avail_t1 << "\t";
         _of4 << n_matched_sp_evt_t2 << "\t" << n_sp_avail_t2 << "\t";
         _of4 << t1_hits << "\t" << t2_hits << "\n";
+
+        if ( spill.GetReconEvents()->at(i) ) {
+          SciFiEvent *recon = spill.GetReconEvents()->at(i)->GetSciFiEvent();
+          mc_v_recon(*recon, *hits);
+        }
       }  // ~Loop over MC events
     } else {
       std::cout << "No mc or recon events found\n";
@@ -336,16 +344,18 @@ std::string MapCppTrackerReconTest::process(std::string document) {
   return writer.write(root);
 }
 
-void MapCppTrackerReconTest::vhits_per_tracker(SciFiHitArray* hits, int &t1, int &t2) {
+void MapCppTrackerReconTest::vhits_per_tracker(std::vector<SciFiHit> &virt_scifi_hit,
+                                               int &t1,
+                                               int &t2) {
   t1 = 0;
   t2 = 0;
 
-  if ( hits ) {
-    for ( unsigned int i = 0; i < hits->size(); ++i ) {
-      SciFiHit hit = hits->at(i);
-      if ( hit.GetChannelId()->GetTrackerNumber() == 0 ) {
+  if ( virt_scifi_hit.size() ) {
+    for ( unsigned int i = 0; i < virt_scifi_hit.size(); ++i ) {
+      SciFiHit vhit = virt_scifi_hit[i];
+      if ( vhit.GetChannelId()->GetTrackerNumber() == 0 ) {
         ++t1;
-      } else if ( hit.GetChannelId()->GetTrackerNumber() == 1 ) {
+      } else if ( vhit.GetChannelId()->GetTrackerNumber() == 1 ) {
         ++t2;
       }
     }
@@ -436,6 +446,88 @@ void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
             << event.straightprtracks().size() << " "
             << event.helicalprtracks().size() << " " << std::endl;
 }
+
+void MapCppTrackerReconTest::mc_v_recon(SciFiEvent &event, SciFiHitArray &hits) {
+  for ( unsigned int a = 0; a < event.spacepoints().size(); a++ ) {
+    SciFiSpacePoint *sp1 = event.spacepoints().at(a);
+    SciFiSpacePoint sp2;
+    _of6 << "\n" << sp1->get_position() << "\t";
+    bool match = false;
+    for ( unsigned int b = 0; b < event.helicalprtracks().size(); b++ ) {
+      SciFiHelicalPRTrack *trk = event.helicalprtracks().at(b);
+      if ( match == true ) {
+        continue;
+      }
+      for ( unsigned int c = 0; c < trk->get_spacepoints().size(); c++ ) {
+        sp2 = trk->get_spacepoints().at(c);
+        if ( sp1->get_position().x() == sp2.get_position().x() &&
+             sp1->get_position().y() == sp2.get_position().y() &&
+             sp1->get_position().z() == sp2.get_position().z() ) {
+          match = true;
+          continue;
+        }
+      }
+    }
+    _of6 << match << "\t";
+
+    SciFiClusterPArray clusters = sp1->get_channels();
+    for ( unsigned int d = 0; d < clusters.size(); d++ ) {
+      double channel1 = clusters[d]->get_channel();
+      int plane1   = clusters[d]->get_plane();
+      int station1 = clusters[d]->get_station();
+      int tracker1 = clusters[d]->get_tracker();
+      for ( unsigned int e = 0; e < hits.size(); e++ ) {
+        SciFiHit hit = hits[e];
+        double channel2 = compute_chan_no(&hit);
+        int plane2   = hit.GetChannelId()->GetPlaneNumber();
+        int station2 = hit.GetChannelId()->GetStationNumber();
+        int tracker2 = hit.GetChannelId()->GetTrackerNumber();
+        if ( fabs(channel1 - channel2) < 1 &&
+             plane1   == plane2   &&
+             station1 == station2 &&
+             tracker1 == tracker2 ) {
+          _of6 << hit.GetPosition() << "\t\n\t\t";
+        }
+      }
+    }
+  }
+}
+
+double MapCppTrackerReconTest::compute_chan_no(MAUS::SciFiHit *ahit) {
+  int tracker = ahit->GetChannelId()->GetTrackerNumber();
+  int station = ahit->GetChannelId()->GetStationNumber();
+  int plane   = ahit->GetChannelId()->GetPlaneNumber();
+
+  // std::cout << "Time: " << ahit->GetTime() << std::endl;
+  // std::cout << tracker << " " << station << " " << plane << std::endl;
+  const MiceModule* this_plane = NULL;
+  for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
+    if ( modules[j]->propertyExists("Tracker", "int") &&
+         modules[j]->propertyInt("Tracker") == tracker &&
+         modules[j]->propertyExists("Station", "int") &&
+         modules[j]->propertyInt("Station") == station &&
+         modules[j]->propertyExists("Plane", "int") &&
+         modules[j]->propertyInt("Plane") == plane )
+      // save the module corresponding to this plane
+      this_plane = modules[j];
+  }
+  // std:: << tracker << " " << station << " " << plane << std::endl;
+  assert(this_plane != NULL);
+
+  int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
+  int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
+  double chanNo;
+
+  if ( tracker == 0 ) {
+    // start counting from the other end
+    chanNo = static_cast<int> (floor((numberFibres-fiberNumber)/7.0));
+  } else {
+    chanNo = static_cast<int> (floor(fiberNumber/7.0));
+  }
+
+  return chanNo;
+}
+
 
 } // ~namespace MAUS
 
