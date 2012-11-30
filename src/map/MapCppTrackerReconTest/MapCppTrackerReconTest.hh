@@ -135,7 +135,11 @@ class MapCppTrackerReconTest {
 
   void n_spoints(std::vector<MAUS::SciFiSpacePoint*> spoints, int &n_sp_t1, int &n_sp_t2);
 
-  void vhits_per_tracker(MAUS::SciFiHitArray* hits, int &t1, int &t2);
+  void vhits_per_tracker(std::vector<MAUS::SciFiHit> &virt_scifi_hit, int &t1, int &t2);
+
+  void mc_v_recon(MAUS::SciFiEvent &event, MAUS::SciFiHitArray &hits);
+
+  double compute_chan_no(MAUS::SciFiHit *ahit);
 
  private:
   /// This should be the classname
@@ -156,7 +160,7 @@ class MapCppTrackerReconTest {
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
   /// File streams for writing data
-  ofstream _of1, _of2, _of3, _of4, _of5;
+  ofstream _of1, _of2, _of3, _of4, _of5, _of6;
   /// The cut used to determine if a spacepoint partners a virtual hit (mm)
   static const double _cut1 = 2.0;
 
