@@ -21,6 +21,7 @@
 
 // C headers
 #include <assert.h>
+#include <iostream>
 
 // C++ headers
 #include <string>

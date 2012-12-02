@@ -46,7 +46,7 @@ class KalmanTrack {
 
   void calc_filtered_state(KalmanSite *a_site);
 
-  void update_misaligments(KalmanSite *a_site);
+  void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
 
   void update_V(KalmanSite *a_site);
 

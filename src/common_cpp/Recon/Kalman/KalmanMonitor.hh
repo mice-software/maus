@@ -63,8 +63,16 @@ class KalmanMonitor {
 
   TH1F *chi2_tracker0;
   TH1F *chi2_tracker1;
-  TGraph *gr8;
-  TGraph *gr21;
+  TGraph *station1;
+  TGraph *station2;
+  TGraph *station3;
+  TGraph *station4;
+  TGraph *station5;
+  TGraph *station6;
+  TGraph *station7;
+  TGraph *station8;
+  TGraph *station9;
+  TGraph *station10;
 
   TH2F *pull_hist;
   TH2F *residual_hist;

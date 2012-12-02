@@ -20,7 +20,9 @@
 namespace MAUS {
 
 KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
-                                gr8(0), gr21(0), pull_hist(0), residual_hist(0), smooth_residual_hist(0),
+                                station1(0), station2(0), station3(0), station4(0), station5(0),
+                                station6(0), station7(0), station8(0), station9(0), station10(0),
+                                pull_hist(0), residual_hist(0), smooth_residual_hist(0),
                                 x_proj_h(0), y_proj_h(0),
                                 px_proj_h(0),py_proj_h(0), pz_proj_h(0) {
   _counter = 0;
@@ -39,8 +41,16 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
     pz_proj_h  = (TH2F*)file->Get("pz_proj_h");
     chi2_tracker0 = (TH1F*)file->Get("chi2_tracker0");
     chi2_tracker1 = (TH1F*)file->Get("chi2_tracker1");
-    gr8            = (TGraph*)file->Get("xd_plane8");
-    gr21           = (TGraph*)file->Get("xd_plane21");
+    station1            = (TGraph*)file->Get("xd_station1");
+    station2            = (TGraph*)file->Get("xd_station2");
+    station3            = (TGraph*)file->Get("xd_station3");
+    station4            = (TGraph*)file->Get("xd_station4");
+    station5            = (TGraph*)file->Get("xd_station5");
+    station6            = (TGraph*)file->Get("xd_station6");
+    station7            = (TGraph*)file->Get("xd_station7");
+    station8            = (TGraph*)file->Get("xd_station8");
+    station9            = (TGraph*)file->Get("xd_station9");
+    station10            = (TGraph*)file->Get("xd_station10");
     std::cerr << "loaded histograms" << std::endl;
   } else {
     std::cerr << "creating new histograms." << std::endl;
@@ -54,10 +64,26 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
     pz_proj_h = new TH2F("pz_proj_h","projection residual; x, mm;;",31,0,30,70,-50, 50);
     chi2_tracker0 = new TH1F("chi2_tracker0","chi2_tracker0",50,0,10);
     chi2_tracker1 = new TH1F("chi2_tracker1","chi2_tracker1",50,0,10);
-    gr8 = new TGraph();
-    gr8->SetName("xd_plane8");
-    gr21 = new TGraph();
-    gr21->SetName("xd_plane21");
+    station1 = new TGraph();
+    station1->SetName("xd_station1");
+    station2 = new TGraph();
+    station2->SetName("xd_station2");
+    station3 = new TGraph();
+    station3->SetName("xd_station3");
+    station4 = new TGraph();
+    station4->SetName("xd_station4");
+    station5 = new TGraph();
+    station5->SetName("xd_station5");
+    station6 = new TGraph();
+    station6->SetName("xd_station6");
+    station7 = new TGraph();
+    station7->SetName("xd_station7");
+    station8 = new TGraph();
+    station8->SetName("xd_station8");
+    station9 = new TGraph();
+    station9->SetName("xd_station9");
+    station10 = new TGraph();
+    station10->SetName("xd_station10");
   }
 /*
   x_filt_h  = new TH2F("h6","X coord of Hits",31,0,30,70,-150, 150);
@@ -259,16 +285,56 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   //  mg->Add(gr1,"lp");
    //  mg->Add(gr2,"cp");
    //  mg->Draw("a");
-
-    if ( id == 8 ) {
+    int station = ceil((id+1.)/3.);
+    if ( station == 1  ) {
       double y = site.get_shifts()(0, 0);
-      double x = gr8->GetN();
-      gr8->SetPoint(x, x, y);
+      double x = station1->GetN();
+      station1->SetPoint(x, x, y);
     }
-    if ( id == 21 ) {
+    if ( station == 2  ) {
       double y = site.get_shifts()(0, 0);
-      double x = gr21->GetN();
-      gr21->SetPoint(x, x, y);
+      double x = station2->GetN();
+      station2->SetPoint(x, x, y);
+    }
+    if ( station == 3  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station3->GetN();
+      station3->SetPoint(x, x, y);
+    }
+    if ( station == 4  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station4->GetN();
+      station4->SetPoint(x, x, y);
+    }
+    if ( station == 5  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station5->GetN();
+      station5->SetPoint(x, x, y);
+    }
+    if ( station == 6  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station6->GetN();
+      station6->SetPoint(x, x, y);
+    }
+    if ( station == 7  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station7->GetN();
+      station7->SetPoint(x, x, y);
+    }
+    if ( station == 8  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station8->GetN();
+      station8->SetPoint(x, x, y);
+    }
+    if ( station == 9  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station9->GetN();
+      station9->SetPoint(x, x, y);
+    }
+    if ( station == 10  ) {
+      double y = site.get_shifts()(0, 0);
+      double x = station10->GetN();
+      station10->SetPoint(x, x, y);
     }
   }
 
@@ -298,8 +364,16 @@ void KalmanMonitor::save() {
   py_proj_h->Write("",TObject::kOverwrite);
   pz_proj_h->Write("",TObject::kOverwrite);
 
-  gr8->Write("",TObject::kOverwrite);
-  gr21->Write("",TObject::kOverwrite);
+  station1->Write("",TObject::kOverwrite);
+  station2->Write("",TObject::kOverwrite);
+  station3->Write("",TObject::kOverwrite);
+  station4->Write("",TObject::kOverwrite);
+  station5->Write("",TObject::kOverwrite);
+  station6->Write("",TObject::kOverwrite);
+  station7->Write("",TObject::kOverwrite);
+  station8->Write("",TObject::kOverwrite);
+  station9->Write("",TObject::kOverwrite);
+  station10->Write("",TObject::kOverwrite);
 /*
   x_filt_h->Write();
   y_filt_h->Write();

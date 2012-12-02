@@ -260,8 +260,6 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
     _S(0, 1) = -(sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
     //_R.Zero();
     //_R(0, 1) = -((x_0-x_d)/pitch)*(-cos_theta_sin_thetay+sin_theta_cos_thetay)+
-    //            ((y_0-y_d)/pitch)*(-sin_theta_sin_thetay-cos_theta_cos_thetay);
-  } else {
     _H.Zero();
     _S.Zero();
     _R.Zero();
@@ -290,6 +288,7 @@ void KalmanTrack::update_W(KalmanSite *a_site) {
   _W.Zero();
   _W = TMatrixD(TMatrixD(_V, TMatrixD::kPlus, A), TMatrixD::kPlus, B);
   _W.Invert();
+    std::cerr << "Updated W.\n";
 }
 
 void KalmanTrack::update_covariance(KalmanSite *a_site) {
@@ -318,20 +317,24 @@ TMatrixD KalmanTrack::solve_measurement_equation(TMatrixD a, TMatrixD s) {
   return result;
 }
 
-void KalmanTrack::update_misaligments(KalmanSite *a_site) {
+void KalmanTrack::update_misaligments(KalmanSite *a_site, KalmanSite *alignment_projection_site) {
   // ***************************
   // Calculate the pull,
   TMatrixD residual = a_site->get_smoothed_residual();
   // ***************************
   //update_W(a_site);
+  TMatrixD shifts(3, 1);
+  TMatrixD Cov_s(3, 3);
 
-  TMatrixD Cov_s = a_site->get_S_covariance();
+    std::cerr << "getting shifs\n";
+  shifts = alignment_projection_site->get_shifts();
+  Cov_s  = alignment_projection_site->get_S_covariance();
+    std::cerr << "got shifs\n";
+
   TMatrixD Ks = TMatrixD(TMatrixD(Cov_s, TMatrixD::kMultTranspose, _S),
                          TMatrixD::kMult,
                          _W);
 
-  TMatrixD shifts(3, 1);
-  shifts = a_site->get_shifts();
   TMatrixD new_shifts(3, 1);
   new_shifts = TMatrixD(shifts, TMatrixD::kPlus, TMatrixD(Ks, TMatrixD::kMult, residual));
   a_site->set_shifts(new_shifts);

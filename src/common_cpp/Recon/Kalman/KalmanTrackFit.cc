@@ -350,6 +350,14 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
                             KalmanTrack *track, int current_site) {
   // Get Site...
   KalmanSite *a_site = &sites[current_site];
+  KalmanSite *alignment_projection_site = 0;
+  // Get previous site too.
+  if ( !(current_site%3) ) {
+    std::cerr << "first plane; copying shifts read in. \n";
+    alignment_projection_site = a_site;
+  } else {
+    alignment_projection_site = &sites[current_site-1];
+  }
 
   // Update measurement error:
   // (non-const std for the perp direction)
@@ -357,7 +365,7 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   track->update_H(a_site);
   track->update_W(a_site);
 
-  track->update_misaligments(a_site);
+  track->update_misaligments(a_site, alignment_projection_site);
   // a_k = a_k^k-1 + K_k x pull
   // track->calc_filtered_state(a_site);
   // Cp = (C-KHC)

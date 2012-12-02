@@ -76,37 +76,39 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _id(0), _chi2(0.),
   _Cov_s = site.get_S_covariance();
 }
 
-KalmanSite& KalmanSite::operator=(const KalmanSite &site) {
-  if ( this == &site ) {
+KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
+  if ( this == &rhs ) {
     return *this;
   }
 
-  _z = site.get_z();
-  _id= site.get_id();
-  _chi2 = site.get_chi2();
-  _type = site.get_type();
-  _pitch = site.get_pitch();
-  _direction = site.get_direction();
-  _mc_pos = site.get_true_position();
-  _mc_mom = site.get_true_momentum();
+  std::cerr << "operator = is called.\n";
 
-  _a = site.get_a();
-  _projected_a = site.get_projected_a();
-  _smoothed_a  = site.get_smoothed_a();
+  _z  = rhs.get_z();
+  _id = rhs.get_id();
+  _chi2  = rhs.get_chi2();
+  _type  = rhs.get_type();
+  _pitch = rhs.get_pitch();
+  _direction = rhs.get_direction();
+  _mc_pos = rhs.get_true_position();
+  _mc_mom = rhs.get_true_momentum();
 
-  _projected_C = site.get_projected_covariance_matrix();
-  _C = site.get_covariance_matrix();
-  _smoothed_C  = site.get_smoothed_covariance_matrix();
+  _a = rhs.get_a();
+  _projected_a = rhs.get_projected_a();
+  _smoothed_a  = rhs.get_smoothed_a();
 
-  _v = site.get_measurement();
+  _projected_C = rhs.get_projected_covariance_matrix();
+  _C = rhs.get_covariance_matrix();
+  _smoothed_C  = rhs.get_smoothed_covariance_matrix();
 
-  _pull = site.get_pull();
-  _residual = site.get_residual();
-  _smoothed_residual = site.get_smoothed_residual();
-  _covariance_residuals = site.get_covariance_residuals();
+  _v = rhs.get_measurement();
 
-  _s = site.get_shifts();
-  _Cov_s = site.get_S_covariance();
+  _pull     = rhs.get_pull();
+  _residual = rhs.get_residual();
+  _smoothed_residual    = rhs.get_smoothed_residual();
+  _covariance_residuals = rhs.get_covariance_residuals();
+
+  _s     = rhs.get_shifts();
+  _Cov_s = rhs.get_S_covariance();
 
   return *this;
 }
