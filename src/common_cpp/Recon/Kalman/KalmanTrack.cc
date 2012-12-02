@@ -199,7 +199,7 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   // my my
   _Q(3, 3) = c_my_my;
 
-  _Q.Zero();
+  // _Q.Zero();
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -288,7 +288,6 @@ void KalmanTrack::update_W(KalmanSite *a_site) {
   _W.Zero();
   _W = TMatrixD(TMatrixD(_V, TMatrixD::kPlus, A), TMatrixD::kPlus, B);
   _W.Invert();
-    std::cerr << "Updated W.\n";
 }
 
 void KalmanTrack::update_covariance(KalmanSite *a_site) {

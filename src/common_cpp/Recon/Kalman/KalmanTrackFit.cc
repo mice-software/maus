@@ -87,7 +87,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
     track->compute_chi2(sites);
 
     monitor.fill(sites);
-    //monitor.print_info(sites);
+    monitor.print_info(sites);
 
     if ( track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
@@ -104,14 +104,7 @@ void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
                                                  KalmanSciFiAlignment &kalman_align) {
   unsigned int numb_measurements = sites.size();
 
-  // Filter first site.
-  // std::cerr << "Updating site " << 0 << std::endl;
-  // filter_updating_misalignments(sites, track, 0);
-
   for ( int i = 0; i < numb_measurements; ++i ) {
-    // Predict the state vector at site i...
-    // std::cerr << "Extrapolating to site " << i << std::endl;
-    //extrapolate(sites, track, i);
     // ... Filter...
     std::cerr << "Updating site " << i << std::endl;
     filter_updating_misalignments(sites, track, i);
@@ -389,7 +382,7 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   //track->subtract_energy_loss(old_site, new_site);
 
   // Calculate the system noise...
-  // track->calc_system_noise(old_site, new_site);
+  track->calc_system_noise(old_site, new_site);
 
   // ... so that we can compute the prediction for the
   // covariance matrix.
