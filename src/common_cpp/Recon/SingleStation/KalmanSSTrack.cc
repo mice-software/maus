@@ -153,7 +153,113 @@ void KalmanSSTrack::straight_line(double deltaZ) {
   _F(2, 3) = deltaZ;
 }
 
+void KalmanSSTrack::get_site_properties(KalmanSite *site, double &thickness, double &density) {
+  switch ( site->get_type() ) {
+    case 0 :
+      thickness = 25.;
+      density = 1.023; // density of EJ-204
+      break;
+    case 1 :
+      thickness = 25.;
+      density   = 1.023;
+      break;
+    case 2 :
+      thickness = 0.670;
+      density   = 1.0;
+      break;
+    case 3 : // Cherenkov
+      thickness = 0.1*5000.; // 5 mil sheets of 0.1 mm
+      density   = 0.934; // g/cm3
+      break;
+    default :
+      thickness = 0.0;
+      density  = 0.0;
+  }
+}
+
+void KalmanSSTrack::update_V(KalmanSite *a_site) {
+  double sigma_beta;
+  // switch ( a_site->get_type() ) {
+  //  case 0 : // TOF0
+  //    sigma_beta = 10./sqrt(12.);
+  //    break;
+  //  case 1 : // TOF1
+  //    sigma_beta = 7./sqrt(12.);
+  //    break;
+  //  case 2 : // SciFi
+      double alpha = (a_site->get_measurement())(0, 0);
+      double pitch = a_site->get_pitch();
+      double l = pow(_active_radius*_active_radius -
+                 (alpha*pitch)*(alpha*pitch), 0.5);
+      if ( l != l ) l = 150.;
+      sigma_beta = (l/pitch)/sqrt(12.);
+  //}
+
+  double sigma_alpha = 1.0/sqrt(12.);
+
+  _V.Zero();
+  _V(0, 0) = sigma_alpha*sigma_alpha;
+  _V(1, 1) = sigma_beta*sigma_beta;
+}
+
+void KalmanSSTrack::update_H(KalmanSite *a_site) {
+  double pitch = a_site->get_pitch();
+
+  CLHEP::Hep3Vector dir = a_site->get_direction();
+  double sin_theta = dir.x();
+  double cos_theta = dir.y();
+
+  TMatrixD a(5, 1);
+  a = a_site->get_a();
+  double x_0 = a(0, 0);
+  double y_0 = a(2, 0);
+
+  TMatrixD shift_misalign(3,1);
+  shift_misalign = a_site->get_shifts();
+  // TMatrixD rotation_misalign(3,1);
+  // rotation_misalign = a_site->get_rotations();
+
+  double x_d = shift_misalign(0, 0);
+  double y_d = shift_misalign(1, 0);
+  // double theta_y = rotation_misalign(1, 0);
+  if ( pitch ) {
+    _H.Zero();
+    _H(0, 0) = -cos_theta/pitch;
+    _H(0, 2) =  sin_theta/pitch;
+    _S.Zero();
+    _S(0, 0) =  cos_theta/pitch;
+    _S(0, 1) = -sin_theta/pitch;
+  } else {
+    _H.Zero();
+    _S.Zero();
+  }
+/*
+  // Define useful factors
+  double cos_theta_cos_thetay = cos_theta*cos(theta_y);
+  double sin_theta_sin_thetay = sin_theta*sin(theta_y);
+  double sin_theta_cos_thetay = sin_theta*cos(theta_y);
+  double cos_theta_sin_thetay = cos_theta*sin(theta_y);
+
+  if ( pitch ) {
+    _H.Zero();
+    _H(0, 0) = - (cos_theta_cos_thetay+sin_theta_sin_thetay)/pitch;
+    _H(0, 2) =   (sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
+    _S.Zero();
+    _S(0, 0) = (cos_theta_cos_thetay-sin_theta_sin_thetay)/pitch;
+    _S(0, 1) = -(sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
+    //_R.Zero();
+    //_R(0, 1) = -((x_0-x_d)/pitch)*(-cos_theta_sin_thetay+sin_theta_cos_thetay)+
+    //            ((y_0-y_d)/pitch)*(-sin_theta_sin_thetay-cos_theta_cos_thetay);
+  } else {
+    _H.Zero();
+    _S.Zero();
+    _R.Zero();
+  }
+*/
+}
+
 void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
+/*
   int number_of_sites = sites.size();
   int number_parameters = 5;
   int number_of_measurement_sites = 7;
@@ -198,6 +304,7 @@ void KalmanSSTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   std::ofstream output2("emittance_chi2.txt", std::ios::out | std::ios::app);
   output2 << r << " " << tranvs << " " << _chi2 << " " << _ndf  << "\n";
   output2.close();
+*/
 }
 
 } // namespace MAUS

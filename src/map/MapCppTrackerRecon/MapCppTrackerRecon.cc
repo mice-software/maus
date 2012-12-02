@@ -104,7 +104,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
-         std::cout << "Number of spacepoints: " << event->spacepoints().size() << "\n";
          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
           track_fit(*event);
          }

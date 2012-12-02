@@ -64,8 +64,8 @@ class ReduceCppPatternRecognitionTestCase(unittest.TestCase):
         self.reducer.death()
         #pylint: disable = E1101
         foutput = ROOT.TFile('reduce_pattern_recognition.root')
-        circles = foutput.Get('circles')
-        self.assertEqual(circles.GetEntries(), 8)
+        htracks = foutput.Get('htracks')
+        self.assertEqual(htracks.GetEntries(), 8)
         strks = foutput.Get('stracks')
         self.assertEqual(strks.GetEntries(), 2)
 

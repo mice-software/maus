@@ -44,121 +44,115 @@ class KalmanSite {
 
   KalmanSite& operator=(const KalmanSite& site);
 
-  /// Assigns PROJECTED state vector at the site.
+  void initialise();
+
+  /// SETTERS
+  ///
+  /// The state vector at the site.
   void set_projected_a(TMatrixD projected_a) { _projected_a = projected_a; }
   void set_a(TMatrixD a)                     { _a = a; }
   void set_smoothed_a(TMatrixD smoothed_a)   { _smoothed_a = smoothed_a; }
-
+  /// The covariance of the state vector.
   void set_projected_covariance_matrix(TMatrixD Cp) { _projected_C = Cp; }
   void set_covariance_matrix(TMatrixD C)            { _C = C; }
   void set_smoothed_covariance_matrix(TMatrixD C)   { _smoothed_C = C; }
-
+  /// Sets the measurement vector.
   void set_measurement(double alpha)                { _v(0, 0) = alpha;
-                                                      _v(1, 0) = 0.0;
-                                                      _alpha   = alpha; }
-  void set_smoothed_alpha(double alpha_smoothed)   { _alpha_smoothed = alpha_smoothed; }
-  void set_projected_alpha(double alpha)           { _alpha_projected = alpha; }
-
+                                                      _v(1, 0) = 0.0; }
+  /// The properties of the site.
   void set_direction(CLHEP::Hep3Vector dir)        { _direction = dir; }
   void set_z(double z)                             { _z = z; }
   void set_id(int id)                              { _id = id; }
   void set_pitch(double factor)                    { _pitch = factor; }
   void set_type(int type);
-
+  /// Residuals.
   void set_pull(TMatrixD pull)                     { _pull = pull; }
-  void set_residual_x(double residual_x)           { _residual_x = residual_x; }
-  void set_residual_y(double residual_y)           { _residual_y = residual_y; }
+  void set_residual(TMatrixD res)                  { _residual = res; }
+  void set_smoothed_residual(TMatrixD res)         { _smoothed_residual = res; }
+  /// The covariance of the innovation.
+  void set_covariance_residuals(TMatrixD cov_res)  { _covariance_residuals = cov_res; }
   void set_chi2(double chi2)                       { _chi2 = chi2; }
-
+  /// Misalignments matrices and vectors.
   void set_shifts(TMatrixD shift)                  { _s = shift; }
-  void set_rotations(TMatrixD rot)                 { _r = rot; }
-  void set_R_covariance(TMatrixD cov_r)            { _Cov_r = cov_r; }
   void set_S_covariance(TMatrixD cov_s)            { _Cov_s = cov_s; }
+
   void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
   void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
-  void set_residual(TMatrixD res)                     { _residual = res; }
 
-  /// Returns PROJECTED state vector at the site.
+  /// GETTERS
+  /// The state vector and its covariance.
   TMatrixD get_projected_a()                 const { return _projected_a; }
   TMatrixD get_a()                           const { return _a; }
   TMatrixD get_smoothed_a()                  const { return _smoothed_a; }
   TMatrixD get_covariance_matrix()           const { return _C; }
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
   TMatrixD get_smoothed_covariance_matrix()  const { return _smoothed_C; }
+  /// The measurement.
   TMatrixD get_measurement()                 const { return _v; }
-  TMatrixD get_pull()                        const { return _pull; }
-
-  double get_alpha()                         const { return _alpha; }
-  double get_smoothed_alpha()                const { return _alpha_smoothed; }
+  /// The site properties.
   double get_z()                             const { return _z; }
   int get_id()                               const { return _id; }
   int get_type()                             const { return _type; }
-  double get_projected_alpha()               const { return _alpha_projected; }
-  double get_residual_x()                    const { return _residual_x; }
-  double get_residual_y()                    const { return _residual_y; }
   double get_chi2()                          const { return _chi2; }
   double get_pitch()                         const { return _pitch; }
-  TMatrixD get_residual()                      const { return _residual; }
-
   CLHEP::Hep3Vector get_direction()          const { return _direction; }
-  CLHEP::Hep3Vector get_true_momentum()      const { return _mc_mom; }
-  CLHEP::Hep3Vector get_true_position()      const { return _mc_pos; }
-  // Misalignments
+  /// The residuals and its covariance.
+  TMatrixD get_pull()                        const { return _pull; }
+  TMatrixD get_residual()                    const { return _residual; }
+  TMatrixD get_smoothed_residual()           const { return _smoothed_residual; }
+  TMatrixD get_covariance_residuals()        const { return _covariance_residuals; }
+  /// Misalignments and their covariance.
   TMatrixD get_shifts()       const { return _s; }
-  TMatrixD get_rotations()    const { return _r; }
-  TMatrixD get_R_covariance() const { return _Cov_r; }
   TMatrixD get_S_covariance() const { return _Cov_s; }
 
- private:
-  CLHEP::Hep3Vector _mc_pos;
+  CLHEP::Hep3Vector get_true_momentum()      const { return _mc_mom; }
+  CLHEP::Hep3Vector get_true_position()      const { return _mc_pos; }
 
+ private:
+  /// Z placement of the site (mm).
+  double _z;
+
+  /// Site id.
+  int _id;
+
+  /// The Chi2 at this site.
+  double _chi2;
+
+  /// Type of detector (SciFi, TOF, Cherenkov).
+  int _type;
+
+  /// Pitch of the detector.
+  double _pitch;
+
+  /// Orientation of the measuring plane.
+  CLHEP::Hep3Vector _direction;
+
+  CLHEP::Hep3Vector _mc_pos;
   CLHEP::Hep3Vector _mc_mom;
 
   /// The state vector.
-  TMatrixD _a;
-
-  /// The projected state.
   TMatrixD _projected_a;
-
-  /// The smoothed state.
+  TMatrixD _a;
   TMatrixD _smoothed_a;
 
   /// The covariance matrix.
-  TMatrixD _C;
-
-  /// The projected cov matrix.
   TMatrixD _projected_C;
-
-  /// The projected cov matrix.
+  TMatrixD _C;
   TMatrixD _smoothed_C;
 
   /// The measurement.
   TMatrixD _v;
 
+  /// The residuals.
   TMatrixD _pull;
   TMatrixD _residual;
-  /// shifts
+  TMatrixD _smoothed_residual;
+
+  TMatrixD _covariance_residuals;
+
+  /// The misalignments.
   TMatrixD _s;
   TMatrixD _Cov_s;
-
-  /// rotations
-  TMatrixD _r;
-  TMatrixD _Cov_r;
-
-  double _z, _alpha, _alpha_projected, _alpha_smoothed;
-
-  double _chi2;
-
-  int _id;
-
-  int _type;
-
-  CLHEP::Hep3Vector _direction;
-
-  /// The residual at this site. (filtered-meas)
-  double _residual_x, _residual_y;
-
-  double _pitch;
 };
 
 } // ~namespace MAUS

@@ -59,7 +59,7 @@ class KalmanMonitor {
 
   int _counter;
 
-  std::vector<double> _alpha_meas, _site, _alpha_projected;
+  std::vector<double> _site;
 
   TH1F *chi2_tracker0;
   TH1F *chi2_tracker1;
@@ -67,7 +67,8 @@ class KalmanMonitor {
   TGraph *gr21;
 
   TH2F *pull_hist;
-  TH2F *pull2_hist;
+  TH2F *residual_hist;
+  TH2F *smooth_residual_hist;
 
   TH2F *x_proj_h;
   TH2F *y_proj_h;

@@ -57,8 +57,9 @@ class KalmanTrack {
   void update_W(KalmanSite *a_site);
 
   void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
+  void set_residual(KalmanSite *a_site);
 
-  TMatrixD solve_measurement_equation(KalmanSite *site);
+  TMatrixD solve_measurement_equation(TMatrixD a, TMatrixD s);
 
   void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
   void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
@@ -90,8 +91,6 @@ class KalmanTrack {
   TMatrixD _H;
 
   TMatrixD _S;
-
-  TMatrixD _R;
 
   TMatrixD _V;
 

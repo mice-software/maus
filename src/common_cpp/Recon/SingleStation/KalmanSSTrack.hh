@@ -50,6 +50,12 @@ class KalmanSSTrack : public KalmanTrack {
 
   void straight_line(double deltaZ);
 
+  void update_V(KalmanSite *a_site);
+
+  void update_H(KalmanSite *a_site);
+
+  void get_site_properties(KalmanSite *site, double &thickness, double &density);
+
   // Acessors
   void compute_chi2(const std::vector<KalmanSite> &sites);
 };

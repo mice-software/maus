@@ -20,7 +20,7 @@
 namespace MAUS {
 
 KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
-                                gr8(0), gr21(0), pull_hist(0), pull2_hist(0),
+                                gr8(0), gr21(0), pull_hist(0), residual_hist(0), smooth_residual_hist(0),
                                 x_proj_h(0), y_proj_h(0),
                                 px_proj_h(0),py_proj_h(0), pz_proj_h(0) {
   _counter = 0;
@@ -30,7 +30,8 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
 
   pull_hist  = (TH2F*)file->Get("pull_hist");
   if ( pull_hist ) {
-    pull2_hist = (TH2F*)file->Get("pull2_hist");
+    residual_hist = (TH2F*)file->Get("residual_hist");
+    smooth_residual_hist= (TH2F*)file->Get("smooth_residual_hist");
     x_proj_h   = (TH2F*)file->Get("x_proj_h");
     y_proj_h   = (TH2F*)file->Get("y_proj_h");
     px_proj_h  = (TH2F*)file->Get("px_proj_h");
@@ -44,8 +45,8 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
   } else {
     std::cerr << "creating new histograms." << std::endl;
     pull_hist = new TH2F("pull_hist","Kalman Monitor",30,0,29,70,-30,30);
-    pull2_hist = new TH2F("pull2_hist","Kalman Monitor2",30,0,29,30,-50,50);
-
+    residual_hist = new TH2F("residual_hist","Kalman Monitor2",30,0,29,70,-30,30);
+    smooth_residual_hist = new TH2F("smooth_residual_hist","Kalman Monitor3",30,0,29,70,-30,30);
     x_proj_h = new TH2F("x_proj_h","projection residual; x, mm;;",31,0,30,70,-150, 150);
     y_proj_h = new TH2F("y_proj_h","projection residual; x, mm;;",31,0,30,70,-150, 150);
     px_proj_h = new TH2F("px_proj_h","projection residual; x, mm;;",31,0,30,70,-50, 50);
@@ -97,9 +98,9 @@ KalmanMonitor::~KalmanMonitor() {
 
 void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
-  _alpha_meas.resize(numb_sites);
+  //_alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
-  _alpha_projected.resize(numb_sites);
+  //_alpha_projected.resize(numb_sites);
 
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
@@ -109,11 +110,11 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
                                        site.get_direction().y() << ", " <<
                                        site.get_direction().z() << ")" << std::endl;
 
-    std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
-              << site.get_residual_y() << std::endl;
-    std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
-    std::cerr << "SITE smoothed alpha: " << site.get_smoothed_alpha() << std::endl;
-    std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
+    //std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
+     //         << site.get_residual_y() << std::endl;
+    //std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
+    //std::cerr << "SITE smoothed alpha: " << site.get_smoothed_alpha() << std::endl;
+    //std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
     std::cerr << "================Projection================" << std::endl;
     site.get_projected_a().Print();
     // site.get_projected_covariance_matrix().Print();
@@ -139,13 +140,13 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   int ndf = number_of_sites - number_parameters;
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    _alpha_projected.at(i) = site.get_projected_alpha();
+    //_alpha_projected.at(i) = site.get_projected_alpha();
     _site.at(i) = site.get_id();
-    _alpha_meas.at(i) = site.get_alpha();
+    //_alpha_meas.at(i) = site.get_alpha();
 
-    double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    double alpha_smooth = site.get_smoothed_alpha();
-    double pull2 = _alpha_meas.at(i) - alpha_smooth;
+    //double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
+    //double alpha_smooth = site.get_smoothed_alpha();
+    //double pull2 = _alpha_meas.at(i) - alpha_smooth;
 
     TMatrixD a(5, 1);
     a = site.get_a();
@@ -205,9 +206,12 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double py_smooth = a_smooth(3, 0);
     double kappa_smooth=a_smooth(4, 0);
 
-    pull_hist->Fill(id, pull);
-    pull2_hist->Fill(id, pull2);
-
+    TMatrixD pull = site.get_pull();
+    pull_hist->Fill(id, pull(0, 0));
+    TMatrixD residual = site.get_residual();
+    residual_hist->Fill(id, residual(0, 0));
+    TMatrixD smooth_residual = site.get_smoothed_residual();
+    smooth_residual_hist->Fill(id, smooth_residual(0, 0));
     // Projections - TH1
 /*
     x_proj_h1->Fill(x_proj-mc_x);
@@ -285,7 +289,8 @@ void KalmanMonitor::save() {
   chi2_tracker0->Write("",TObject::kOverwrite);
   chi2_tracker1->Write("",TObject::kOverwrite);
   pull_hist->Write("",TObject::kOverwrite);
-  pull2_hist->Write("",TObject::kOverwrite);
+  residual_hist->Write("",TObject::kOverwrite);
+  smooth_residual_hist->Write("",TObject::kOverwrite);
 
   x_proj_h->Write("",TObject::kOverwrite);
   y_proj_h->Write("",TObject::kOverwrite);
