@@ -41,6 +41,7 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
+// #include "src/common_cpp/Recon/SciFi/SciFiChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -125,6 +126,21 @@ class MapCppTrackerReconTest {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
+  /** Converts the station id associated with a virtual plane to a tracker station number
+   *
+   *
+   *  \param vhit_stat_id The virtual hit station id (should be value from 1 to 10)
+   */
+  int stat_id_to_stat_num(const int vhit_stat_id);
+
+  void n_spoints(std::vector<MAUS::SciFiSpacePoint*> spoints, int &n_sp_t1, int &n_sp_t2);
+
+  void vhits_per_tracker(std::vector<MAUS::SciFiHit> &virt_scifi_hit, int &t1, int &t2);
+
+  void mc_v_recon(MAUS::SciFiEvent &event, MAUS::SciFiHitArray &hits);
+
+  double compute_chan_no(MAUS::SciFiHit *ahit);
+
  private:
   /// This should be the classname
   std::string _classname;
@@ -144,7 +160,9 @@ class MapCppTrackerReconTest {
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
   /// File streams for writing data
-  ofstream _of1, _of2, _of3, _of4;
+  ofstream _of1, _of2, _of3, _of4, _of5, _of6;
+  /// The cut used to determine if a spacepoint partners a virtual hit (mm)
+  static const double _cut1 = 2.0;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

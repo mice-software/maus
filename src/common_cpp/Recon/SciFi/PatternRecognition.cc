@@ -606,7 +606,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                   for (unsigned int sp_no = 0; sp_no < spnts_by_station[st_num].size(); ++sp_no) {
                     // If the spacepoint has not already been used in a track fit
                     if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
-                         good_spnts.push_back(spnts_by_station[st_num][sp_no]);
+                         good_spnts.push_back(spnts_by_station[st_num][sp_no]); // CHECK!!!!!!
                     }
                   } // ~loop over intermediate station sp
                 } // ~if (st_num != ignore_station)
