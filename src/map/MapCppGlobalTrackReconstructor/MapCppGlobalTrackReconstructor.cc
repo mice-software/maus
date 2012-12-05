@@ -742,8 +742,10 @@ void MapCppGlobalTrackReconstructor::LoadLiveData() {
       // Load TOF and SciFi tracks from the appropriate recon event trees
       std::vector<Track> tof_tracks;
       LoadTOFTracks(detectors, recon_event, tof_tracks);
+      /*
       std::vector<Track> sci_fi_tracks;
       LoadSciFiTracks(detectors, recon_event, sci_fi_tracks);
+      */
 
     // Assuming there are an equal number of TOF and SciFi tracks,
     // merge each pair of tracks based on z position of the detectors
