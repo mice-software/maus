@@ -65,7 +65,7 @@ std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
 void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   &seeds) {
   int seeds_size = seeds.size();
   for ( int i = 0; i < seeds_size; i++ ) {
-    if ( !seeds[i]->is_used() ) {
+    if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
@@ -204,7 +204,7 @@ ThreeVector SciFiClusterRec::get_reference_frame_pos(int tracker) {
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
   bool neigh = false;
 
-  if ( !seed_j->is_used() && // seed is unused
+  if ( !(seed_j->is_used()) && // seed is unused
        seed_j->get_spill() == seed_i->get_spill() && // same spill
        seed_j->get_event() == seed_i->get_event() && // same event
        seed_j->get_tracker() == seed_i->get_tracker() && // same tracker

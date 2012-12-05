@@ -87,7 +87,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
     track->compute_chi2(sites);
 
     monitor.fill(sites);
-    monitor.print_info(sites);
+    // monitor.print_info(sites);
 
     if ( track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
@@ -276,9 +276,13 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack *seed, std::vector<KalmanSi
 
   TMatrixD C(5, 5);
   C.Zero();
-  for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = _seed_cov; // dummy values
-  }
+  //for ( int i = 0; i < 5; ++i ) {
+     C(0, 0) = _seed_cov/200.; // dummy values
+     C(1, 1) = _seed_cov/50.; // dummy values
+     C(2, 2) = _seed_cov/200.; // dummy values
+     C(3, 3) = _seed_cov/50.; // dummy values
+     C(4, 4) = _seed_cov/50.; // dummy values
+  //}
 
   KalmanSite first_plane;
   first_plane.set_projected_a(a);
@@ -359,10 +363,6 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   track->update_W(a_site);
 
   track->update_misaligments(a_site, alignment_projection_site);
-  // a_k = a_k^k-1 + K_k x pull
-  // track->calc_filtered_state(a_site);
-  // Cp = (C-KHC)
-  // track->update_covariance(a_site);
 }
 
 void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {
