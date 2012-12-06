@@ -79,7 +79,7 @@ class KalmanTrack {
   double get_mass() const { return _mass; }
   double get_momentum() const { return _momentum; }
 
-  //void get_site_properties(KalmanSite *site, double &thickess, double &density);
+  // void get_site_properties(KalmanSite *site, double &thickess, double &density);
 
   void set_mass(double mass) { _mass = mass; }
 

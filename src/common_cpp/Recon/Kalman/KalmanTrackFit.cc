@@ -17,17 +17,17 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include <math.h>
-
+#include "Interface/Squeal.hh"
 // #define PI 3.14159265359
 
 namespace MAUS {
 
 KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
-  std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
+  // std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
 KalmanTrackFit::~KalmanTrackFit() {
-  std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
+  // std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
 }
 
 bool sort_by_id(const SciFiCluster *a, const SciFiCluster *b) {
@@ -55,14 +55,14 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
     KalmanTrack *track = new StraightTrack();
     initialise(seed, sites, kalman_align);
 
-    std::cerr << "Number of sites: " << sites.size() << "\n";
+    // std::cerr << "Number of sites: " << sites.size() << "\n";
     // muon assumption for now.
     double muon_mass    = 105.7; // MeV/c
     track->set_mass(muon_mass);
     double momentum     = 200.; // MeV/c
     track->set_momentum(momentum);
     // Filter the first state.
-    //std::cerr << "Filtering site 0" << std::endl;
+    // std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
 
     unsigned int numb_measurements = sites.size();
@@ -71,17 +71,17 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
 
     for ( unsigned int i = 1; i < numb_measurements; ++i ) {
       // Predict the state vector at site i...
-      //std::cerr << "Extrapolating to site " << i << std::endl;
+      // std::cerr << "Extrapolating to site " << i << std::endl;
       extrapolate(sites, track, i);
       // ... Filter...
-      //std::cerr << "Filtering site " << i << std::endl;
+      // std::cerr << "Filtering site " << i << std::endl;
       filter(sites, track, i);
     }
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
     for ( int i = numb_measurements-2; i >= 0; --i ) {
-      //std::cerr << "Smoothing site " << i << std::endl;
+      // std::cerr << "Smoothing site " << i << std::endl;
       smooth(sites, track, i);
     }
     track->compute_chi2(sites);
@@ -90,7 +90,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
     // monitor.print_info(sites);
 
     if ( track->get_chi2() < 15. && numb_measurements == 15 ) {
-      std::cerr << "Good chi2; lauching KalmanAlignment...\n";
+      // std::cerr << "Good chi2; lauching KalmanAlignment...\n";
       update_alignment_parameters(sites, track, kalman_align);
       // Update Stored misalignments using values stored in each site.
       kalman_align.update(sites);
@@ -106,7 +106,7 @@ void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
 
   for ( int i = 0; i < numb_measurements; ++i ) {
     // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
+    // std::cerr << "Updating site " << i << std::endl;
     filter_updating_misalignments(sites, track, i);
   }
 }
@@ -183,8 +183,8 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack* seed, std::vector<KalmanSit
   process_clusters(spacepoints, clusters, seed_pz);
   // The clusters are sorted by plane number.
 
-  std::cerr << "Helical Pz: " << pz << " " << seed_pz << " "
-            << clusters[0]->get_true_momentum().z() << "\n";
+  // std::cerr << "Helical Pz: " << pz << " " << seed_pz << " "
+  //           << clusters[0]->get_true_momentum().z() << "\n";
 
   int numb_sites = clusters.size();
 
@@ -258,7 +258,7 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack *seed, std::vector<KalmanSi
   double seed_pz = 200.; // MeV/c
   process_clusters(spacepoints, clusters, seed_pz);
 
-  std::cerr << "Number of clusters: " << clusters.size() << "\n";
+  // std::cerr << "Number of clusters: " << clusters.size() << "\n";
   // Initialise Kalman.
   double x = spacepoints[0].get_position().x();
   double y = spacepoints[0].get_position().y();
@@ -276,13 +276,13 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack *seed, std::vector<KalmanSi
 
   TMatrixD C(5, 5);
   C.Zero();
-  //for ( int i = 0; i < 5; ++i ) {
-     C(0, 0) = _seed_cov/200.; // dummy values
-     C(1, 1) = _seed_cov/50.; // dummy values
-     C(2, 2) = _seed_cov/200.; // dummy values
-     C(3, 3) = _seed_cov/50.; // dummy values
-     C(4, 4) = _seed_cov/50.; // dummy values
-  //}
+  // for ( int i = 0; i < 5; ++i ) {
+  C(0, 0) = _seed_cov/200.; // dummy values
+  C(1, 1) = _seed_cov/50.; // dummy values
+  C(2, 2) = _seed_cov/200.; // dummy values
+  C(3, 3) = _seed_cov/50.; // dummy values
+  C(4, 4) = _seed_cov/50.; // dummy values
+  // }
 
   KalmanSite first_plane;
   first_plane.set_projected_a(a);
@@ -308,9 +308,9 @@ void KalmanTrackFit::initialise(SciFiStraightPRTrack *seed, std::vector<KalmanSi
     a_site.set_id(id);
     a_site.set_type(2);
     a_site.set_shifts(kalman_align.get_shifts(id));
-    //a_site.set_rotations(kalman_align.get_rotations(id));
+    // a_site.set_rotations(kalman_align.get_rotations(id));
     a_site.set_S_covariance(kalman_align.get_cov_shifts(id));
-    //a_site.set_R_covariance(kalman_align.get_cov_rotat(id));
+    // a_site.set_R_covariance(kalman_align.get_cov_rotat(id));
     sites.push_back(a_site);
   }
 
@@ -350,7 +350,7 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   KalmanSite *alignment_projection_site = 0;
   // Get previous site too.
   if ( !(current_site%3) ) {
-    std::cerr << "first plane; copying shifts read in. \n";
+    // std::cerr << "first plane; copying shifts read in. \n";
     alignment_projection_site = a_site;
   } else {
     alignment_projection_site = &sites[current_site-1];
@@ -379,7 +379,7 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   track->calc_predicted_state(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
-  //track->subtract_energy_loss(old_site, new_site);
+  // track->subtract_energy_loss(old_site, new_site);
 
   // Calculate the system noise...
   track->calc_system_noise(old_site, new_site);

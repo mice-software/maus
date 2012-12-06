@@ -38,13 +38,16 @@
 #include "DetModel/SciFi/SciFiSD.hh"
 #include "DetModel/SciFi/DoubletFiberParam.hh"
 
-
 // NOTE: not sure how Geant4 deals with the deletion
 // of Logical and Solid Volumes;
 // possible bug in the destructor.
 
 // SciFiPlane - Specific parameterisation of the SciFi station
-// to be called by the generic MICE detector construction code
+// to be called by the generic MICE detector construction code.
+//
+// Geometry layout to be documented!
+//
+
 SciFiPlane::SciFiPlane(MiceModule* mod,
                        G4Material* mater,
                        G4VPhysicalVolume *mlv) {

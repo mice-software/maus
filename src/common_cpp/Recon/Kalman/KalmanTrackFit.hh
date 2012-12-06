@@ -55,22 +55,36 @@ class KalmanTrackFit {
   // This will: initialise the state vector;
   // Set covariance matrix;
   // Add plane measurents to all sites;
-  void initialise(SciFiStraightPRTrack *evt, std::vector<KalmanSite> &sites, KalmanSciFiAlignment &kalman_align);
+  void initialise(SciFiStraightPRTrack *evt,
+                  std::vector<KalmanSite> &sites,
+                  KalmanSciFiAlignment &kalman_align);
 
-  void initialise(SciFiHelicalPRTrack *evt, std::vector<KalmanSite> &sites, double &momentum);
+  void initialise(SciFiHelicalPRTrack *evt,
+                  std::vector<KalmanSite> &sites,
+                  double &momentum);
 
   void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                        std::vector<SciFiCluster*> &clusters, double &seed_pz);
+                        std::vector<SciFiCluster*> &clusters,
+                        double &seed_pz);
 
-  void extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+  void extrapolate(std::vector<KalmanSite> &sites,
+                   KalmanTrack *track,
+                   int current_site);
 
-  void filter(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+  void filter(std::vector<KalmanSite> &sites,
+              KalmanTrack *track,
+              int current_site);
 
-  void filter_updating_misalignments(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+  void filter_updating_misalignments(std::vector<KalmanSite> &sites,
+                                     KalmanTrack *track,
+                                     int current_site);
 
-  void smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int current_site);
+  void smooth(std::vector<KalmanSite> &sites,
+              KalmanTrack *track,
+              int current_site);
 
-  void update_alignment_parameters(std::vector<KalmanSite> &sites, KalmanTrack *track,
+  void update_alignment_parameters(std::vector<KalmanSite> &sites,
+                                   KalmanTrack *track,
                                    KalmanSciFiAlignment &kalman_align);
 
  protected:

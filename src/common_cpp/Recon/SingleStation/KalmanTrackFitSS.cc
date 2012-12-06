@@ -88,7 +88,8 @@ void KalmanTrackFitSS::process(Json::Value event) {
 
 void KalmanTrackFitSS::initialise_global_track(Json::Value event,
                                                std::vector<KalmanSite> &sites,
-                                               double &momentum, double &mass, double displacement) {
+                                               double &momentum, double &mass,
+                                               double displacement) {
   double x_pr, y_pr, mx_pr, my_pr;
   perform_elementar_pattern_recon(event,
                                   x_pr, y_pr,
@@ -260,7 +261,8 @@ void KalmanTrackFitSS::filter_virtual(std::vector<KalmanSite> &sites,
 void KalmanTrackFitSS::perform_elementar_pattern_recon(Json::Value event,
                                                        double &x_pr, double &y_pr,
                                                        double &mx_pr, double &my_pr,
-                                                       double &p_z, double &mass, double ss_displacement) {
+                                                       double &p_z, double &mass,
+                                                       double ss_displacement) {
   double protron_mass = 938.272; // MeV/c
   double pion_mass    = 139.6; // MeV/c
   double muon_mass    = 105.7; // MeV/c

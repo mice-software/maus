@@ -113,13 +113,6 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   clust->set_alpha(alpha);
   int id = 15*tracker + 3*(station-1) + (plane);
   clust->set_id(id);
-  /*
-   std::cerr << "----------Clustering--------- \n"
-            << "Site ID: " << id << "\n"
-            << "Tracker " << tracker << ", station " << station << ", plane " << plane << "\n"
-            << "Fibre direction: " << dir << "\n"
-            << "Position: " << tracker_ref_frame_pos << "\n";
-  */
 }
 
 void SciFiClusterRec::construct(SciFiCluster *clust,

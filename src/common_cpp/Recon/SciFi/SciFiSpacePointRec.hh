@@ -50,7 +50,7 @@ namespace MAUS {
 
 class SciFiSpacePointRec {
  public:
-  SciFiSpacePointRec(); // Default constructor
+  SciFiSpacePointRec();
 
   ~SciFiSpacePointRec();
 

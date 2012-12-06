@@ -17,6 +17,9 @@
 
 #include <algorithm>
 
+#include "Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
@@ -47,7 +50,6 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   assert(_configJSON.isMember("reconstruction_geometry_filename"));
   std::string filename;
   filename = _configJSON["reconstruction_geometry_filename"].asString();
-  std::cerr << "Using geomtry: " << filename << std::endl;
   MiceModule* _module;
   _module = new MiceModule(filename);
   modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
@@ -105,16 +107,18 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Kalman Track Fit.
          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          track_fit(*event);
+          // track_fit(*event);
          }
-
-
         print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
+  } catch(Squeal& squee) {
+    squee.Print();
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;

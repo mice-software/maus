@@ -24,46 +24,44 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
                                 station6(0), station7(0), station8(0), station9(0), station10(0),
                                 pull_hist(0), residual_hist(0), smooth_residual_hist(0),
                                 x_proj_h(0), y_proj_h(0),
-                                px_proj_h(0),py_proj_h(0), pz_proj_h(0) {
+                                px_proj_h(0), py_proj_h(0), pz_proj_h(0) {
   _counter = 0;
   file = new TFile("kalman_histograms.root", "UPDATE");
-  //file->ls();
+
   std::cerr << file->IsOpen() << std::endl;
 
-  pull_hist  = (TH2F*)file->Get("pull_hist");
+  pull_hist  = reinterpret_cast<TH2F*> (file->Get("pull_hist"));
   if ( pull_hist ) {
-    residual_hist = (TH2F*)file->Get("residual_hist");
-    smooth_residual_hist= (TH2F*)file->Get("smooth_residual_hist");
-    x_proj_h   = (TH2F*)file->Get("x_proj_h");
-    y_proj_h   = (TH2F*)file->Get("y_proj_h");
-    px_proj_h  = (TH2F*)file->Get("px_proj_h");
-    py_proj_h  = (TH2F*)file->Get("py_proj_h");
-    pz_proj_h  = (TH2F*)file->Get("pz_proj_h");
-    chi2_tracker0 = (TH1F*)file->Get("chi2_tracker0");
-    chi2_tracker1 = (TH1F*)file->Get("chi2_tracker1");
-    station1            = (TGraph*)file->Get("xd_station1");
-    station2            = (TGraph*)file->Get("xd_station2");
-    station3            = (TGraph*)file->Get("xd_station3");
-    station4            = (TGraph*)file->Get("xd_station4");
-    station5            = (TGraph*)file->Get("xd_station5");
-    station6            = (TGraph*)file->Get("xd_station6");
-    station7            = (TGraph*)file->Get("xd_station7");
-    station8            = (TGraph*)file->Get("xd_station8");
-    station9            = (TGraph*)file->Get("xd_station9");
-    station10            = (TGraph*)file->Get("xd_station10");
-    std::cerr << "loaded histograms" << std::endl;
+    residual_hist = reinterpret_cast<TH2F*> (file->Get("residual_hist"));
+    smooth_residual_hist= reinterpret_cast<TH2F*> (file->Get("smooth_residual_hist"));
+    x_proj_h   = reinterpret_cast<TH2F*> (file->Get("x_proj_h"));
+    y_proj_h   = reinterpret_cast<TH2F*> (file->Get("y_proj_h"));
+    px_proj_h  = reinterpret_cast<TH2F*> (file->Get("px_proj_h"));
+    py_proj_h  = reinterpret_cast<TH2F*> (file->Get("py_proj_h"));
+    pz_proj_h  = reinterpret_cast<TH2F*> (file->Get("pz_proj_h"));
+    chi2_tracker0 = reinterpret_cast<TH1F*> (file->Get("chi2_tracker0"));
+    chi2_tracker1 = reinterpret_cast<TH1F*> (file->Get("chi2_tracker1"));
+    station1            = reinterpret_cast<TGraph*> (file->Get("xd_station1"));
+    station2            = reinterpret_cast<TGraph*> (file->Get("xd_station2"));
+    station3            = reinterpret_cast<TGraph*> (file->Get("xd_station3"));
+    station4            = reinterpret_cast<TGraph*> (file->Get("xd_station4"));
+    station5            = reinterpret_cast<TGraph*> (file->Get("xd_station5"));
+    station6            = reinterpret_cast<TGraph*> (file->Get("xd_station6"));
+    station7            = reinterpret_cast<TGraph*> (file->Get("xd_station7"));
+    station8            = reinterpret_cast<TGraph*> (file->Get("xd_station8"));
+    station9            = reinterpret_cast<TGraph*> (file->Get("xd_station9"));
+    station10           = reinterpret_cast<TGraph*> (file->Get("xd_station10"));
   } else {
-    std::cerr << "creating new histograms." << std::endl;
-    pull_hist = new TH2F("pull_hist","Kalman Monitor",30,0,29,70,-30,30);
-    residual_hist = new TH2F("residual_hist","Kalman Monitor2",30,0,29,70,-30,30);
-    smooth_residual_hist = new TH2F("smooth_residual_hist","Kalman Monitor3",30,0,29,70,-30,30);
-    x_proj_h = new TH2F("x_proj_h","projection residual; x, mm;;",31,0,30,70,-150, 150);
-    y_proj_h = new TH2F("y_proj_h","projection residual; x, mm;;",31,0,30,70,-150, 150);
-    px_proj_h = new TH2F("px_proj_h","projection residual; x, mm;;",31,0,30,70,-50, 50);
-    py_proj_h = new TH2F("py_proj_h","projection residual; x, mm;;",31,0,30,70,-50, 50);
-    pz_proj_h = new TH2F("pz_proj_h","projection residual; x, mm;;",31,0,30,70,-50, 50);
-    chi2_tracker0 = new TH1F("chi2_tracker0","chi2_tracker0",50,0,10);
-    chi2_tracker1 = new TH1F("chi2_tracker1","chi2_tracker1",50,0,10);
+    pull_hist = new TH2F("pull", "Kalman", 30, 0, 29, 70, -30, 30);
+    residual_hist = new TH2F("residual", "Kalman", 30, 0, 29, 70, -30, 30);
+    smooth_residual_hist = new TH2F("smooth_residual", "Kalman", 30, 0, 29, 70, -30, 30);
+    x_proj_h = new TH2F("x_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -150, 150);
+    y_proj_h = new TH2F("y_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -150, 150);
+    px_proj_h = new TH2F("px_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
+    py_proj_h = new TH2F("py_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
+    pz_proj_h = new TH2F("pz_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
+    chi2_tracker0 = new TH1F("chi2_tracker0", "chi2_tracker0", 50, 0, 10);
+    chi2_tracker1 = new TH1F("chi2_tracker1", "chi2_tracker1", 50, 0, 10);
     station1 = new TGraph();
     station1->SetName("xd_station1");
     station2 = new TGraph();
@@ -124,9 +122,9 @@ KalmanMonitor::~KalmanMonitor() {
 
 void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   int numb_sites = sites.size();
-  //_alpha_meas.resize(numb_sites);
+  // _alpha_meas.resize(numb_sites);
   _site.resize(numb_sites);
-  //_alpha_projected.resize(numb_sites);
+  // _alpha_projected.resize(numb_sites);
 
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
@@ -135,14 +133,8 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
                                        site.get_direction().y() << ", " <<
                                        site.get_direction().z() << ")" << std::endl;
-
-    //std::cerr << "SITE residual (mm): " << site.get_residual_x() << ", "
-     //         << site.get_residual_y() << std::endl;
-    //std::cerr << "SITE measured alpha: " << site.get_alpha() << std::endl;
-    //std::cerr << "SITE smoothed alpha: " << site.get_smoothed_alpha() << std::endl;
-    //std::cerr << "SITE projected alpha: " << site.get_projected_alpha() << std::endl;
-    std::cerr << "================Projection================" << std::endl;
-    site.get_projected_a().Print();
+    // std::cerr << "================Projection================" << std::endl;
+    // site.get_projected_a().Print();
     // site.get_projected_covariance_matrix().Print();
     // std::cerr << "=================Filtered=================" << std::endl;
     // site.get_a().Print();
@@ -166,13 +158,13 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   int ndf = number_of_sites - number_parameters;
   for ( int i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    //_alpha_projected.at(i) = site.get_projected_alpha();
+    // _alpha_projected.at(i) = site.get_projected_alpha();
     _site.at(i) = site.get_id();
-    //_alpha_meas.at(i) = site.get_alpha();
+    // _alpha_meas.at(i) = site.get_alpha();
 
-    //double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    //double alpha_smooth = site.get_smoothed_alpha();
-    //double pull2 = _alpha_meas.at(i) - alpha_smooth;
+    // double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
+    // double alpha_smooth = site.get_smoothed_alpha();
+    // double pull2 = _alpha_meas.at(i) - alpha_smooth;
 
     TMatrixD a(5, 1);
     a = site.get_a();
@@ -230,7 +222,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double y_smooth  = a_smooth(2, 0);
     double px_smooth = a_smooth(1, 0);
     double py_smooth = a_smooth(3, 0);
-    double kappa_smooth=a_smooth(4, 0);
+    double kappa_smooth = a_smooth(4, 0);
 
     TMatrixD pull = site.get_pull();
     pull_hist->Fill(id, pull(0, 0));
@@ -278,60 +270,60 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     py_smooth_h->Fill(id, py_smooth-mc_py/mc_pz);
     pz_smooth_h->Fill(id, (1./kappa_smooth)-mc_pz);
 */
-//  gr = new TGraph();
-//  gr->SetTitle("difference");
-  //   TGraphErrors *gr2 = new TGraphErrors(...
-  //   TMultiGraph *mg = new TMultiGraph();
-  //  mg->Add(gr1,"lp");
-   //  mg->Add(gr2,"cp");
-   //  mg->Draw("a");
+    // gr = new TGraph();
+    // gr->SetTitle("difference");
+    // TGraphErrors *gr2 = new TGraphErrors(...
+    // TMultiGraph *mg = new TMultiGraph();
+    // mg->Add(gr1,"lp");
+    // mg->Add(gr2,"cp");
+    // mg->Draw("a");
     int station = ceil((id+1.)/3.);
-    if ( station == 1  ) {
+    if ( station == 1 ) {
       double y = site.get_shifts()(0, 0);
       double x = station1->GetN();
       station1->SetPoint(x, x, y);
     }
-    if ( station == 2  ) {
+    if ( station == 2 ) {
       double y = site.get_shifts()(0, 0);
       double x = station2->GetN();
       station2->SetPoint(x, x, y);
     }
-    if ( station == 3  ) {
+    if ( station == 3 ) {
       double y = site.get_shifts()(0, 0);
       double x = station3->GetN();
       station3->SetPoint(x, x, y);
     }
-    if ( station == 4  ) {
+    if ( station == 4 ) {
       double y = site.get_shifts()(0, 0);
       double x = station4->GetN();
       station4->SetPoint(x, x, y);
     }
-    if ( station == 5  ) {
+    if ( station == 5 ) {
       double y = site.get_shifts()(0, 0);
       double x = station5->GetN();
       station5->SetPoint(x, x, y);
     }
-    if ( station == 6  ) {
+    if ( station == 6 ) {
       double y = site.get_shifts()(0, 0);
       double x = station6->GetN();
       station6->SetPoint(x, x, y);
     }
-    if ( station == 7  ) {
+    if ( station == 7 ) {
       double y = site.get_shifts()(0, 0);
       double x = station7->GetN();
       station7->SetPoint(x, x, y);
     }
-    if ( station == 8  ) {
+    if ( station == 8 ) {
       double y = site.get_shifts()(0, 0);
       double x = station8->GetN();
       station8->SetPoint(x, x, y);
     }
-    if ( station == 9  ) {
+    if ( station == 9 ) {
       double y = site.get_shifts()(0, 0);
       double x = station9->GetN();
       station9->SetPoint(x, x, y);
     }
-    if ( station == 10  ) {
+    if ( station == 10 ) {
       double y = site.get_shifts()(0, 0);
       double x = station10->GetN();
       station10->SetPoint(x, x, y);
@@ -351,29 +343,29 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
 }
 
 void KalmanMonitor::save() {
-//hpx->Write("",TObject::kOverwrite)
-  chi2_tracker0->Write("",TObject::kOverwrite);
-  chi2_tracker1->Write("",TObject::kOverwrite);
-  pull_hist->Write("",TObject::kOverwrite);
-  residual_hist->Write("",TObject::kOverwrite);
-  smooth_residual_hist->Write("",TObject::kOverwrite);
+  // hpx->Write("",TObject::kOverwrite)
+  chi2_tracker0->Write("", TObject::kOverwrite);
+  chi2_tracker1->Write("", TObject::kOverwrite);
+  pull_hist->Write("", TObject::kOverwrite);
+  residual_hist->Write("", TObject::kOverwrite);
+  smooth_residual_hist->Write("", TObject::kOverwrite);
 
-  x_proj_h->Write("",TObject::kOverwrite);
-  y_proj_h->Write("",TObject::kOverwrite);
-  px_proj_h->Write("",TObject::kOverwrite);
-  py_proj_h->Write("",TObject::kOverwrite);
-  pz_proj_h->Write("",TObject::kOverwrite);
+  x_proj_h->Write("", TObject::kOverwrite);
+  y_proj_h->Write("", TObject::kOverwrite);
+  px_proj_h->Write("", TObject::kOverwrite);
+  py_proj_h->Write("", TObject::kOverwrite);
+  pz_proj_h->Write("", TObject::kOverwrite);
 
-  station1->Write("",TObject::kOverwrite);
-  station2->Write("",TObject::kOverwrite);
-  station3->Write("",TObject::kOverwrite);
-  station4->Write("",TObject::kOverwrite);
-  station5->Write("",TObject::kOverwrite);
-  station6->Write("",TObject::kOverwrite);
-  station7->Write("",TObject::kOverwrite);
-  station8->Write("",TObject::kOverwrite);
-  station9->Write("",TObject::kOverwrite);
-  station10->Write("",TObject::kOverwrite);
+  station1->Write("", TObject::kOverwrite);
+  station2->Write("", TObject::kOverwrite);
+  station3->Write("", TObject::kOverwrite);
+  station4->Write("", TObject::kOverwrite);
+  station5->Write("", TObject::kOverwrite);
+  station6->Write("", TObject::kOverwrite);
+  station7->Write("", TObject::kOverwrite);
+  station8->Write("", TObject::kOverwrite);
+  station9->Write("", TObject::kOverwrite);
+  station10->Write("", TObject::kOverwrite);
 /*
   x_filt_h->Write();
   y_filt_h->Write();

@@ -193,7 +193,7 @@ void KalmanSSTrack::update_V(KalmanSite *a_site) {
                  (alpha*pitch)*(alpha*pitch), 0.5);
       if ( l != l ) l = 150.;
       sigma_beta = (l/pitch)/sqrt(12.);
-  //}
+  // }
 
   double sigma_alpha = 1.0/sqrt(12.);
 
@@ -214,7 +214,7 @@ void KalmanSSTrack::update_H(KalmanSite *a_site) {
   double x_0 = a(0, 0);
   double y_0 = a(2, 0);
 
-  TMatrixD shift_misalign(3,1);
+  TMatrixD shift_misalign(3, 1);
   shift_misalign = a_site->get_shifts();
   // TMatrixD rotation_misalign(3,1);
   // rotation_misalign = a_site->get_rotations();

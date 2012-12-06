@@ -19,6 +19,9 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
+#include "Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+
 namespace MAUS {
 
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
@@ -53,15 +56,13 @@ bool MapCppTrackerDigits::death() {
 }
 
 std::string MapCppTrackerDigits::process(std::string document) {
-  std::cout << "Digitising tracker data\n";
-
   Json::FastWriter writer;
   Spill spill;
 
   try {
     // Load input.
     root = JsonWrapper::StringToJson(document);
-    if ( root.isMember("daq_data") && !root["daq_data"].isNull() ) {
+    if ( root.isMember("daq_data") && !(root["daq_data"].isNull()) ) {
       // Get daq data.
       Json::Value daq = root.get("daq_data", 0);
       // Process the input.
@@ -70,6 +71,10 @@ std::string MapCppTrackerDigits::process(std::string document) {
       // Save to JSON output.
       save_to_json(spill);
     }
+  } catch(Squeal& squee) {
+    squee.Print();
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;

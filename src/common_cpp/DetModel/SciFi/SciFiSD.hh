@@ -40,9 +40,6 @@ class SciFiSD : public MAUS::MAUSSD {
      *   Does nothing.
      */
     void EndOfEvent(G4HCofThisEvent* HCE);
-
-  private:
-    int nChans;
 };
 
 #endif

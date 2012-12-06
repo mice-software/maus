@@ -100,8 +100,6 @@ class MapCppTrackerRecon {
   void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                            MAUS::SciFiEvent &evt);
 
-  // void make_seed_and_fit(MAUS::SciFiEvent &event);
-
   /** Performs the final track fit
    *
    *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters

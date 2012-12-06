@@ -41,7 +41,6 @@
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
 }
 
-
 G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   G4double edep = aStep->GetTotalEnergyDeposit();

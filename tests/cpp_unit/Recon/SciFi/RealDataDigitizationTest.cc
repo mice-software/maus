@@ -20,6 +20,7 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 namespace MAUS {
 
@@ -33,8 +34,7 @@ class RealDataDigitizationTest : public ::testing::Test {
 
 TEST_F(RealDataDigitizationTest, test_calibration_load) {
   RealDataDigitization test_case_1;
-  bool bad_calib = test_case_1.load_calibration("nonsense.txt");
-  EXPECT_FALSE(bad_calib);
+  EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), Squeal);
   RealDataDigitization test_case_2;
   bool good_calib = test_case_2.load_calibration("scifi_calibration_30_09_2011.txt");
   EXPECT_TRUE(good_calib);
@@ -56,8 +56,7 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
 
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
   RealDataDigitization test_case;
-  bool bad_map = test_case.load_mapping("nonsense.txt");
-  EXPECT_FALSE(bad_map);
+  EXPECT_THROW(test_case.load_mapping("nonsense.txt"), Squeal);
   bool good_map = test_case.load_mapping("mapping_7.txt");
   EXPECT_TRUE(good_map);
   int missing_channel_counter = 0;
