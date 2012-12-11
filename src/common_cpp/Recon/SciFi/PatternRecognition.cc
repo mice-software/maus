@@ -167,12 +167,12 @@ void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
   if ( _debug > 0 ) std::cout << "Making 5 point tracks" << std::endl;
-  int num_points = 5;
+  int n_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are to be used
   if ( track_type == 0 )
-    make_straight_tracks(num_points, trker_no, ignore_stations, spnts_by_station, strks);
+    make_straight_tracks(n_points, trker_no, ignore_stations, spnts_by_station, strks);
   if ( track_type == 1 )
-    make_helix(num_points, trker_no, ignore_stations, spnts_by_station, htrks);
+    make_helix(n_points, trker_no, ignore_stations, spnts_by_station, htrks);
   if ( _debug > 0 ) std::cout << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt(...)
 
@@ -182,7 +182,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
   if ( _debug > 0 ) std::cout << "Making 4 point tracks" << std::endl;
 
-  int num_points = 4;
+  int n_points = 4;
 
   // Count how many stations have at least one *unused* spacepoint
   int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
@@ -196,12 +196,12 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
       // Recount how many stations have at least one unused spacepoint
       num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
       // If there are enough occupied stations left to make a 4 point track, keep making tracks
-      if ( num_stations_hit  >= num_points ) {
+      if ( num_stations_hit  >= n_points ) {
         std::vector<int> ignore_stations(1, i);
         if ( track_type == 0 )
-          make_straight_tracks(num_points, trker_no, ignore_stations, spnts_by_station, strks);
+          make_straight_tracks(n_points, trker_no, ignore_stations, spnts_by_station, strks);
         if ( track_type == 1 )
-          make_helix(num_points, trker_no, ignore_stations, spnts_by_station, htrks);
+          make_helix(n_points, trker_no, ignore_stations, spnts_by_station, htrks);
       } else {
         break;
       }
@@ -217,9 +217,9 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
       if ( track_type == 0 )
-        make_straight_tracks(num_points, trker_no, stations_not_hit, spnts_by_station, strks);
+        make_straight_tracks(n_points, trker_no, stations_not_hit, spnts_by_station, strks);
       if ( track_type == 1 )
-        make_helix(num_points, trker_no, stations_not_hit, spnts_by_station, htrks);
+        make_helix(n_points, trker_no, stations_not_hit, spnts_by_station, htrks);
     } else {
       if ( _debug > 0 )
         std::cerr << "Wrong number of stations without spacepoints aborting 4 pt track.\n";
@@ -240,7 +240,7 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
   if ( _debug > 0 ) std::cout << "Making 3 point track" << std::endl;
 
-  int num_points = 3;
+  int n_points = 3;
 
   // Count how many stations have at least one *unused* spacepoint
   int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
@@ -259,15 +259,15 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
             // Recount how many stations have at least one unused spacepoint
             num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
             // If there are enough occupied stations left to make a 3pt track, keep making tracks
-            if ( num_stations_hit  >= num_points ) {
+            if ( num_stations_hit  >= n_points ) {
               std::vector<int> ignore_stations;
               ignore_stations.push_back(i);
               ignore_stations.push_back(j);
               if ( track_type == 0 )
-                make_straight_tracks(num_points, trker_no, ignore_stations,
+                make_straight_tracks(n_points, trker_no, ignore_stations,
                                      spnts_by_station, strks);
               if ( track_type == 1 )
-                make_helix(num_points, trker_no, ignore_stations, spnts_by_station, htrks);
+                make_helix(n_points, trker_no, ignore_stations, spnts_by_station, htrks);
             } else {
                 sufficient_hit_stations = false;
             }
@@ -290,15 +290,15 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
         // Recount how many stations have at least one unused spacepoint
         num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
         // If there are enough occupied stations left to make a 4 point track, keep making tracks
-        if ( num_stations_hit  >= num_points ) {
+        if ( num_stations_hit  >= n_points ) {
           ignore_stations.clear();
           if ( stations_not_hit[0] != i ) { // Don't send the same 2 ignore stations
             ignore_stations.push_back(stations_not_hit[0]);
             ignore_stations.push_back(i);
             if ( track_type == 0 )
-              make_straight_tracks(num_points, trker_no, ignore_stations, spnts_by_station, strks);
+              make_straight_tracks(n_points, trker_no, ignore_stations, spnts_by_station, strks);
             if ( track_type == 1 )
-              make_helix(num_points, trker_no, ignore_stations, spnts_by_station, htrks);
+              make_helix(n_points, trker_no, ignore_stations, spnts_by_station, htrks);
           }
         } else {
           break;
@@ -316,9 +316,9 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 2 ) {
       if ( track_type == 0 )
-        make_straight_tracks(num_points, trker_no, stations_not_hit, spnts_by_station, strks);
+        make_straight_tracks(n_points, trker_no, stations_not_hit, spnts_by_station, strks);
       if ( track_type == 1 )
-        make_helix(num_points, trker_no, stations_not_hit, spnts_by_station, htrks);
+        make_helix(n_points, trker_no, stations_not_hit, spnts_by_station, htrks);
     } else {
       if ( _debug > 0 ) {
         std::cerr << "Wrong number of stations without spacepoints, ";
@@ -335,7 +335,7 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
   if ( _debug > 0 ) std::cout << "Finished making 3 pt tracks" << std::endl;
 } // ~make_straight_3tracks(...)
 
-void PatternRecognition::make_straight_tracks(const int num_points, const int trker_no,
+void PatternRecognition::make_straight_tracks(const int n_points, const int trker_no,
                                      const std::vector<int> ignore_stations,
                                      SpacePoint2dPArray &spnts_by_station,
                                      std::vector<SciFiStraightPRTrack*> &strks) {
@@ -353,7 +353,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
 
       // Check the outer spacepoint is unused and enough stations are left with unused sp
       if ( !spnts_by_station[outer_st_num][outer_sp]->get_used() &&
-           num_stations_with_unused_spnts(spnts_by_station) >= num_points) {
+           num_stations_with_unused_spnts(spnts_by_station) >= n_points) {
 
         // Loop over spacepoints in inner station
         for ( unsigned int inner_sp = 0;
@@ -361,11 +361,11 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
 
           // Check the inner spacepoint is unused and enough stations are left with unused sp
           if ( !spnts_by_station[inner_st_num][inner_sp]->get_used() &&
-              num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
+              num_stations_with_unused_spnts(spnts_by_station) >= n_points ) {
 
             // Vector to hold the good spacepoints in each station
             std::vector<SciFiSpacePoint*> good_spnts;
-            // good_spnts.resize(num_points);
+            // good_spnts.resize(n_points);
 
             // Set variables to hold which stations are to be ignored
             int ignore_st_1 = -1, ignore_st_2 = -1;
@@ -393,14 +393,14 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
                     double dx = 0, dy = 0;
                     calc_residual(sp, line_x, line_y, dx, dy);
                     if ( _debug > 1 ) {
-                      *_f_res << trker_no << "\t" << st_num << "\t" << num_points << "\t";
+                      *_f_res << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                       *_f_res << dx << "\t" << dy << "\n";
                     }
 
                     // Apply roadcuts & find the spoints with the smallest residuals for the line
                     if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                       if ( _debug > 1 ) {
-                        *_f_res_good << trker_no << "\t" << st_num << "\t" << num_points << "\t";
+                        *_f_res_good << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                         *_f_res_good << dx << "\t" << dy << "\n";
                       }
                       if ( delta_sq > (dx*dx + dy*dy) )
@@ -417,7 +417,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
                   double dx = 0, dy = 0;
                   calc_residual(sp, line_x, line_y, dx, dy);
                   if ( _debug > 1 ) {
-                    *_f_res_chosen << trker_no << "\t" << st_num << "\t" << num_points << "\t";
+                    *_f_res_chosen << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                     *_f_res_chosen << dx << "\t" << dy << "\n";
                   }
                 }// ~if (counter > 0)
@@ -429,7 +429,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
             line_y.clear();
 
             // Check we have at least 1 good spacepoint in each of the intermediate stations
-            if ( static_cast<int>(good_spnts.size()) > (num_points - 3) ) {
+            if ( static_cast<int>(good_spnts.size()) > (n_points - 3) ) {
 
               good_spnts.insert(good_spnts.begin(), spnts_by_station[inner_st_num][inner_sp]);
               good_spnts.push_back(spnts_by_station[outer_st_num][outer_sp]);
@@ -456,49 +456,32 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
               linear_fit(z, y, y_err, line_y);
 
               // Check track passes chisq test, then create SciFiStraightPRTrack
-              if ( ( line_x.get_chisq() / ( num_points - 2 ) < _chisq_cut ) &&
-                  ( line_y.get_chisq() / ( num_points - 2 ) < _chisq_cut ) ) {
+              if ( ( line_x.get_chisq() / ( n_points - 2 ) < _chisq_cut ) &&
+                  ( line_y.get_chisq() / ( n_points - 2 ) < _chisq_cut ) ) {
 
                 if ( _debug > 0 )
-                  std::cout << "** chisq test passed, adding " << num_points << "pt track **\n";
+                  std::cout << "** chisq test passed, adding " << n_points << "pt track **\n";
                 SciFiStraightPRTrack* track =
-                    new SciFiStraightPRTrack(-1, num_points, line_x, line_y);
+                    new SciFiStraightPRTrack(-1, n_points, line_x, line_y);
                 if ( _debug > 0 ) {
-                  std::cout << "x0 = " << track->get_x0()
-                            << "mx = " << track->get_mx();
-                  std::cout << "y0 = " << track->get_y0()
-                            << "my = " << track->get_my()
-                            << std::endl;
+                  std::cout << "x0 = " << track->get_x0() << " mx = " << track->get_mx();
+                  std::cout << " y0 = " << track->get_y0() << " my = " << track->get_my() << "\n";
                 }
-                // *_f_trks << num_points << "\t" << track->get_x0() << "\t" << track->get_mx();
-                // *_f_trks << "\t" << track->get_x_chisq() << "\t" << track->get_y0() << "\t";
-                // *_f_trks << track->get_my() << "\t" << track->get_y_chisq() << "\t" << 1 << "\n";
 
-                // Set all the good sp to used and convert pointers to variables
-                std::vector<SciFiSpacePoint> good_spnts_variables;
-                good_spnts_variables.resize(good_spnts.size());
-
+                // Set all the good sp to used
                 for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
                   good_spnts[i]->set_used(true);
-                  good_spnts_variables[i] = *good_spnts[i];
                 }
 
                 // Populate the sp of the track and then push the track back into the strks vector
-                track->set_spacepoints(good_spnts_variables);
+                track->set_spacepoints(good_spnts);
                 strks.push_back(track);
               } else {
                 if ( _debug > 0 ) {
                   std::cout << "x_chisq = " << line_x.get_chisq();
                   std::cout << "\ty_chisq = " << line_y.get_chisq() << std::endl;
-                  std::cout << "chisq test failed, " << num_points << "pt track rejected\n";
+                  std::cout << "chisq test failed, " << n_points << "pt track rejected\n";
                 }
-
-                // SciFiStraightPRTrack* bad_track =
-                //    new SciFiStraightPRTrack(-1, num_points, line_x, line_y);
-                // *_f_trks << num_points << "\t" << bad_track->get_x0() << "\t";
-                // *_f_trks << bad_track->get_mx() << "\t" << bad_track->get_x_chisq() << "\t";
-                // *_f_trks << bad_track->get_y0() << "\t" << bad_track->get_my() << "\t";
-                // *_f_trks << bad_track->get_y_chisq() << "\t" << 0 << "\n";
               } // ~Check track passes chisq test
             } // ~ if ( good_spnts.size() > 1 )
           } else {
@@ -517,11 +500,11 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
 void PatternRecognition::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
                                     const std::vector<double> &_y_err, SimpleLine &line) {
 
-  int num_points = static_cast<int>(_x.size());
+  int n_points = static_cast<int>(_x.size());
 
-  CLHEP::HepMatrix A(num_points, 2); // rows, columns
-  CLHEP::HepMatrix V(num_points, num_points); // error matrix
-  CLHEP::HepMatrix Y(num_points, 1); // measurements
+  CLHEP::HepMatrix A(n_points, 2); // rows, columns
+  CLHEP::HepMatrix V(n_points, n_points); // error matrix
+  CLHEP::HepMatrix Y(n_points, 1); // measurements
 
   for ( int i = 0; i < static_cast<int>(_x.size()); ++i ) {
     // std::cout <<"( " << _x[i] << "," << _y[i] << " )" << std::endl;
@@ -551,10 +534,10 @@ void PatternRecognition::linear_fit(const std::vector<double> &_x, const std::ve
   C = Y - (A * yparams);
   result = C.T() * V * C;
   line.set_chisq(result[0][0]);
-  line.set_chisq_dof(result[0][0] / num_points);
+  line.set_chisq_dof(result[0][0] / n_points);
 } // ~linear_fit(...)
 
-void PatternRecognition::make_helix(const int num_points, const int trker_no,
+void PatternRecognition::make_helix(const int n_points, const int trker_no,
                                     const std::vector<int> ignore_stations,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) {
@@ -572,7 +555,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
 
     // Check the outer spacepoint is unused and enough stations are left with unused sp
     if ( !spnts_by_station[outer_st_num][outer_sp]->get_used() &&
-         num_stations_with_unused_spnts(spnts_by_station) >= num_points) {
+         num_stations_with_unused_spnts(spnts_by_station) >= n_points) {
 
       // Loop over spacepoints in inner station
       for ( unsigned int inner_sp = 0; inner_sp < spnts_by_station[inner_st_num].size();
@@ -581,7 +564,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
         // Check the inner spacepoint is unused and enough stations are left with unused sp
         if ( !spnts_by_station[inner_st_num][inner_sp]->get_used() &&
              !spnts_by_station[outer_st_num][outer_sp]->get_used() &&
-             num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
+             num_stations_with_unused_spnts(spnts_by_station) >= n_points ) {
 
           // Loop over spacepoints in middle station
           for ( unsigned int mid_sp = 0; mid_sp < spnts_by_station[mid_st_num].size(); ++mid_sp ) {
@@ -590,7 +573,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
             if ( !spnts_by_station[mid_st_num][mid_sp]->get_used() &&
                  !spnts_by_station[inner_st_num][inner_sp]->get_used() &&
                  !spnts_by_station[outer_st_num][outer_sp]->get_used() &&
-                 num_stations_with_unused_spnts(spnts_by_station) >= num_points ) {
+                 num_stations_with_unused_spnts(spnts_by_station) >= n_points ) {
 
               // Vector to hold the good spacepoints in each station
               std::vector<SciFiSpacePoint*> good_spnts;
@@ -621,7 +604,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                 good_spnts.push_back(spnts_by_station[mid_st_num][mid_sp]);
 
               // Check we have at least 1 good spacepoint in each of the intermediate stations
-              if ( static_cast<int>(good_spnts.size()) >= (num_points - 3) ) {
+              if ( static_cast<int>(good_spnts.size()) >= (n_points - 3) ) {
 
                 good_spnts.insert(good_spnts.begin(), spnts_by_station[inner_st_num][inner_sp]);
                 good_spnts.push_back(spnts_by_station[outer_st_num][outer_sp]);
@@ -634,7 +617,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                 if ( !good_radius ) continue;
 
                 // Check circle chisq test passes, then perform s-z fit
-                if ( circle.get_chisq() / ( num_points - 2 ) < _chisq_cut ) {
+                if ( circle.get_chisq() / ( n_points - 2 ) < _chisq_cut ) {
 
                   // std::cerr << "Found a good circle using spacepoints:\n";
                   for (unsigned int i = 0; i < good_spnts.size(); ++i) {
@@ -659,7 +642,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                   */
 
                   // Check linear fit passes chisq test, then perform make a helical track
-                  if ( line_sz.get_chisq() / ( num_points - 2 ) < _sz_chisq_cut ) {
+                  if ( line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) {
 
                     // double pt = circle.get_R() * 1.2;
                     // double pz = pt / line_sz.get_m();
@@ -671,25 +654,15 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
                     std::cout << "x0 = " << x0 << " y0 = " << y0 << " phi0 = " << phi_0 << "\n";
                     CLHEP::Hep3Vector pos_0(x0, y0, -1);
                     SciFiHelicalPRTrack* track =
-                        new SciFiHelicalPRTrack(-1, num_points, pos_0,
-                                                phi_0, psi_0, circle, line_sz);
+                        new SciFiHelicalPRTrack(-1, n_points, pos_0, phi_0, psi_0, circle, line_sz);
                     track->set_phi_i(dphi);
-                    /*
-                    for ( unsigned int i = 0; i < dphi.size(); ++i ) {
-                      std::cerr << "1phi_i[" << i << "] = " << dphi[i] << std::endl;
-                      std::cerr << "2phi_i[" << i << "] = " << track->get_phi_i()[i] << std::endl;
-                    }*/
 
-                    // Set all the good sp to used and convert pointers to variables
-                    std::vector<SciFiSpacePoint> good_spnts_variables;
-                    good_spnts_variables.resize(good_spnts.size());
-
+                    // Set all the good sp to used
                     for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
                       good_spnts[i]->set_used(true);
-                      good_spnts_variables[i] = *good_spnts[i];
                     }
                     // Populate the sp of the track and then push the track back into trks vector
-                    track->set_spacepoints(good_spnts_variables);
+                    track->set_spacepoints(good_spnts);
                     htrks.push_back(track);
                   } // ~Check s-z line passes chisq test
                 } // ~Check circle passes chisq test
@@ -705,10 +678,10 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
 bool PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
                                     SimpleCircle &circle) {
 
-  int num_points = static_cast<int>(spnts.size());
-  CLHEP::HepMatrix A(num_points, 3); // rows, columns
-  CLHEP::HepMatrix V(num_points, num_points); // error matrix
-  CLHEP::HepMatrix K(num_points, 1);
+  int n_points = static_cast<int>(spnts.size());
+  CLHEP::HepMatrix A(n_points, 3); // rows, columns
+  CLHEP::HepMatrix V(n_points, n_points); // error matrix
+  CLHEP::HepMatrix K(n_points, 1);
 
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     // This part will change once I figure out proper errors

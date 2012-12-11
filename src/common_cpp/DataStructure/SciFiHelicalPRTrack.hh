@@ -61,10 +61,10 @@ class SciFiHelicalPRTrack {
     SciFiHelicalPRTrack& operator=(const SciFiHelicalPRTrack &_htrk);
 
     /** Get the vector holding pointers to the spacepoints used by the track */
-    SciFiSpacePointArray get_spacepoints() const { return _spoints; }
+    SciFiSpacePointPArray get_spacepoints() const { return _spoints; }
 
     /** Set the vector holding pointers to the spacepoints used by the track */
-    void set_spacepoints(SciFiSpacePointArray spoints) { _spoints = spoints; }
+    void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
 
     /** Get the tracker number */
     int get_tracker() const { return _tracker; }
@@ -186,7 +186,7 @@ class SciFiHelicalPRTrack {
     int _num_points;
     static const int _type = 1; // 0 for straight, 1 for helical
 
-    SciFiSpacePointArray _spoints;
+    SciFiSpacePointPArray _spoints;
 
     ClassDef(SciFiHelicalPRTrack, 1)
 };

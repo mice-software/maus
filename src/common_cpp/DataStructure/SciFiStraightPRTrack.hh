@@ -54,10 +54,10 @@ class SciFiStraightPRTrack {
     SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
     /** Get the vector holding pointers to the spacepoints used by the track */
-    SciFiSpacePointArray get_spacepoints() const { return _spoints; }
+    SciFiSpacePointPArray get_spacepoints() const { return _spoints; }
 
     /** Set the vector holding pointers to the spacepoints used by the track */
-    void set_spacepoints(SciFiSpacePointArray spoints) { _spoints = spoints; }
+    void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
 
     /** Get the x position of the track at z=0 */
     double get_x0() const { return _x0; }
@@ -111,7 +111,7 @@ class SciFiStraightPRTrack {
     int get_type() const { return _type; }
 
   private:
-    SciFiSpacePointArray _spoints;
+    SciFiSpacePointPArray _spoints;
 
     double _x0;
     double _mx;

@@ -107,7 +107,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Kalman Track Fit.
          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          // track_fit(*event);
+           track_fit(*event);
          }
         print_event_info(*event);
       }
@@ -174,8 +174,10 @@ void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const boo
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
   if ( evt.helicalprtracks().size() )
+    std::cout << "Performing kalman for helical tracks\n";
     fit.process(evt.helicalprtracks());
   if ( evt.straightprtracks().size() )
+    std::cout << "Performing kalman for straight tracks\n";
     fit.process(evt.straightprtracks());
 }
 
