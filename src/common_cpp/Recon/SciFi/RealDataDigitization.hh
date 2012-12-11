@@ -101,6 +101,7 @@ class RealDataDigitization {
   static const int _number_banks          = 4;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
+  static const double _pedestal_min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
   double _calibration_pedestal[_number_boards][_number_banks][_number_channels];

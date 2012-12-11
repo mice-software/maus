@@ -88,7 +88,7 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
 
       // Calculate the number of photoelectrons.
       double pe;
-      if ( pedestal > 0. && gain > 0 ) {
+      if ( pedestal > _pedestal_min && gain > 0 ) {
         pe = (adc-pedestal)/gain;
       } else {
         pe = -10.0;
