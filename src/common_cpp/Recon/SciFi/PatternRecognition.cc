@@ -41,7 +41,7 @@
 namespace MAUS {
 
 PatternRecognition::PatternRecognition() {
-  if (debug == 2) {
+  if (_debug == 2) {
     _f_res = new ofstream();
     _f_res->open("residuals.dat", std::ios::app);
 
@@ -57,7 +57,7 @@ PatternRecognition::PatternRecognition() {
 };
 
 PatternRecognition::~PatternRecognition() {
-  if (debug == 2) {
+  if (_debug == 2) {
     if ( _f_res ) {
       _f_res->close();
       delete _f_res;
@@ -166,21 +166,21 @@ void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
                                       SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if ( debug > 0 ) std::cout << "Making 5 point tracks" << std::endl;
+  if ( _debug > 0 ) std::cout << "Making 5 point tracks" << std::endl;
   int num_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are to be used
   if ( track_type == 0 )
     make_straight_tracks(num_points, trker_no, ignore_stations, spnts_by_station, strks);
   if ( track_type == 1 )
     make_helix(num_points, trker_no, ignore_stations, spnts_by_station, htrks);
-  if ( debug > 0 ) std::cout << "Finished making 5 pt tracks" << std::endl;
+  if ( _debug > 0 ) std::cout << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt(...)
 
 void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
                                       SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if ( debug > 0 ) std::cout << "Making 4 point tracks" << std::endl;
+  if ( _debug > 0 ) std::cout << "Making 4 point tracks" << std::endl;
 
   int num_points = 4;
 
@@ -190,7 +190,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( debug > 0 ) std::cout << "4pt track: 5 stations with unused spacepoints" << std::endl;
+    if ( _debug > 0 ) std::cout << "4pt track: 5 stations with unused spacepoints" << std::endl;
 
     for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
       // Recount how many stations have at least one unused spacepoint
@@ -208,7 +208,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
     } // ~Loop of stations, ignoring each one in turn
   } else if ( num_stations_hit == 4 ) {
 
-    if ( debug > 0 ) std::cout << "4pt track: 4 stations with unused spacepoints" << std::endl;
+    if ( _debug > 0 ) std::cout << "4pt track: 4 stations with unused spacepoints" << std::endl;
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -221,24 +221,24 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
       if ( track_type == 1 )
         make_helix(num_points, trker_no, stations_not_hit, spnts_by_station, htrks);
     } else {
-      if ( debug > 0 )
+      if ( _debug > 0 )
         std::cerr << "Wrong number of stations without spacepoints aborting 4 pt track.\n";
     }
   } else if ( num_stations_hit < 4 ) {
-    if ( debug > 0 )
+    if ( _debug > 0 )
       std::cout << "Not enough unused spacepoints, quiting 4 point track." << std::endl;
   } else if ( num_stations_hit > 6 ) {
-    if ( debug > 0 )
+    if ( _debug > 0 )
       std::cerr << "Wrong number of stations with spacepoints, aborting 4 pt track.\n";
   }
-  if ( debug > 0 ) std::cout << "Finished making 4 pt tracks" << std::endl;
+  if ( _debug > 0 ) std::cout << "Finished making 4 pt tracks" << std::endl;
 } // ~make_straight_4tracks(...)
 
 void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
                                       SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if ( debug > 0 ) std::cout << "Making 3 point track" << std::endl;
+  if ( _debug > 0 ) std::cout << "Making 3 point track" << std::endl;
 
   int num_points = 3;
 
@@ -250,7 +250,7 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( debug > 0 ) std::cout << "3pt track: 5 stations with unused spacepoints" << std::endl;
+    if ( _debug > 0 ) std::cout << "3pt track: 5 stations with unused spacepoints" << std::endl;
 
     for (int i = 0; i < 4; ++i) { // Loop of first station to ignore
       if ( sufficient_hit_stations ) {
@@ -277,7 +277,7 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
     } // ~Loop of first station to ignore
   } else if ( num_stations_hit == 4 ) {
 
-    if ( debug > 0 ) std::cout << "3pt track: 4 stations with unused spacepoints" << std::endl;
+    if ( _debug > 0 ) std::cout << "3pt track: 4 stations with unused spacepoints" << std::endl;
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -307,7 +307,7 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
     }
   } else if ( num_stations_hit == 3 ) {
 
-    if ( debug > 0 ) std::cout << "3pt track: 3 stations with unused spacepoints" << std::endl;
+    if ( _debug > 0 ) std::cout << "3pt track: 3 stations with unused spacepoints" << std::endl;
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -320,19 +320,19 @@ void PatternRecognition::make_3tracks(const bool track_type, const int trker_no,
       if ( track_type == 1 )
         make_helix(num_points, trker_no, stations_not_hit, spnts_by_station, htrks);
     } else {
-      if ( debug > 0 ) {
+      if ( _debug > 0 ) {
         std::cerr << "Wrong number of stations without spacepoints, ";
         std::cerr << "aborting 3 pt track." << std::endl;
       }
     }
   } else if ( num_stations_hit < 3 ) {
-    if ( debug > 0 )
+    if ( _debug > 0 )
       std::cout << "Not enough unused spacepoints, quiting 3 point track." << std::endl;
   } else if ( num_stations_hit > 6 ) {
-    if ( debug > 0 )
+    if ( _debug > 0 )
       std::cerr << "Wrong number of stations with spacepoints, aborting 3 pt track." << std::endl;
   }
-  if ( debug > 0 ) std::cout << "Finished making 3 pt tracks" << std::endl;
+  if ( _debug > 0 ) std::cout << "Finished making 3 pt tracks" << std::endl;
 } // ~make_straight_3tracks(...)
 
 void PatternRecognition::make_straight_tracks(const int num_points, const int trker_no,
@@ -392,14 +392,14 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
                     SciFiSpacePoint *sp = spnts_by_station[st_num][sp_no];
                     double dx = 0, dy = 0;
                     calc_residual(sp, line_x, line_y, dx, dy);
-                    if ( debug > 1 ) {
+                    if ( _debug > 1 ) {
                       *_f_res << trker_no << "\t" << st_num << "\t" << num_points << "\t";
                       *_f_res << dx << "\t" << dy << "\n";
                     }
 
                     // Apply roadcuts & find the spoints with the smallest residuals for the line
                     if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
-                      if ( debug > 1 ) {
+                      if ( _debug > 1 ) {
                         *_f_res_good << trker_no << "\t" << st_num << "\t" << num_points << "\t";
                         *_f_res_good << dx << "\t" << dy << "\n";
                       }
@@ -416,7 +416,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
                   good_spnts.push_back(sp);
                   double dx = 0, dy = 0;
                   calc_residual(sp, line_x, line_y, dx, dy);
-                  if ( debug > 1 ) {
+                  if ( _debug > 1 ) {
                     *_f_res_chosen << trker_no << "\t" << st_num << "\t" << num_points << "\t";
                     *_f_res_chosen << dx << "\t" << dy << "\n";
                   }
@@ -459,11 +459,11 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
               if ( ( line_x.get_chisq() / ( num_points - 2 ) < _chisq_cut ) &&
                   ( line_y.get_chisq() / ( num_points - 2 ) < _chisq_cut ) ) {
 
-                if ( debug > 0 )
+                if ( _debug > 0 )
                   std::cout << "** chisq test passed, adding " << num_points << "pt track **\n";
                 SciFiStraightPRTrack* track =
                     new SciFiStraightPRTrack(-1, num_points, line_x, line_y);
-                if ( debug > 0 ) {
+                if ( _debug > 0 ) {
                   std::cout << "x0 = " << track->get_x0()
                             << "mx = " << track->get_mx();
                   std::cout << "y0 = " << track->get_y0()
@@ -487,14 +487,14 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
                 track->set_spacepoints(good_spnts_variables);
                 strks.push_back(track);
               } else {
-                if ( debug > 0 ) {
+                if ( _debug > 0 ) {
                   std::cout << "x_chisq = " << line_x.get_chisq();
                   std::cout << "\ty_chisq = " << line_y.get_chisq() << std::endl;
                   std::cout << "chisq test failed, " << num_points << "pt track rejected\n";
                 }
 
-                SciFiStraightPRTrack* bad_track =
-                    new SciFiStraightPRTrack(-1, num_points, line_x, line_y);
+                // SciFiStraightPRTrack* bad_track =
+                //    new SciFiStraightPRTrack(-1, num_points, line_x, line_y);
                 // *_f_trks << num_points << "\t" << bad_track->get_x0() << "\t";
                 // *_f_trks << bad_track->get_mx() << "\t" << bad_track->get_x_chisq() << "\t";
                 // *_f_trks << bad_track->get_y0() << "\t" << bad_track->get_my() << "\t";
@@ -510,7 +510,7 @@ void PatternRecognition::make_straight_tracks(const int num_points, const int tr
       }// ~Check the outer spacepoint is unused
     } // ~Loop over sp in station 5
   } else {
-    if ( debug > 0 ) std::cerr << "Bad spnts_by_station passed, aborting make_straight_tracks.\n";
+    if ( _debug > 0 ) std::cerr << "Bad spnts_by_station passed, aborting make_straight_tracks.\n";
   }
 } // ~make_straight_tracks(...)
 
@@ -663,7 +663,7 @@ void PatternRecognition::make_helix(const int num_points, const int trker_no,
 
                     // double pt = circle.get_R() * 1.2;
                     // double pz = pt / line_sz.get_m();
-                    if ( debug > 0 ) std::cout << "dsdz = " << line_sz.get_m() << std:: endl;
+                    if ( _debug > 0 ) std::cout << "dsdz = " << line_sz.get_m() << std:: endl;
 
                     double psi_0 = phi_0 + (CLHEP::pi / 2);
                     double x0 = circle.get_x0() + circle.get_R()*cos(phi_0);
@@ -752,7 +752,7 @@ bool PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   else
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
-  if ( debug > 0 ) {
+  if ( _debug > 0 ) {
     std::cout << "alpha = " << alpha << std::endl;
     std::cout << "beta = " << beta << std::endl;
     std::cout << "gamma = " << gamma << std::endl;
@@ -846,7 +846,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   if ( dphi_ok ) {
     std::vector<double> ds;
     dphi_to_ds(circle.get_R(), dphi, ds);
-    /* if ( debug > 0 ) {
+    /* if ( _debug > 0 ) {
       for ( unsigned int i = 0; i < ds.size(); i++ ) {
         std::cerr << "ds = " << ds[i] << ", dz = " << dz[i] << std::endl;
       }
@@ -864,7 +864,7 @@ double PatternRecognition::calc_turning_angle(double xpos, double ypos,
   double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
 
   if ( angle < 0. ) angle += 2. * CLHEP::pi;
-  if ( debug > 0 ) std::cout << "Turning angle from circle fit = " << angle << std::endl;
+  if ( _debug > 0 ) std::cout << "Turning angle from circle fit = " << angle << std::endl;
   return angle;
 } // ~calculate_phi(...)
 
@@ -967,7 +967,7 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
         if ( ignore_stations[0] == i ) ok = true;
       }
       if ( !ok ) {
-        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        if ( _debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
         return false;
       }
       // Set outer station number
@@ -990,7 +990,7 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
       }
       if ( ignore_stations[0] == ignore_stations[1] ) ok0 = false;
       if ( !ok0 || !ok1 ) {
-        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        if ( _debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
         return false;
       }
       // Set outer station number
@@ -1008,7 +1008,7 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
       else
         inner_st_num = 2;
   } else {
-    if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+    if ( _debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
     return false;
   }
   return true;
@@ -1028,7 +1028,7 @@ bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
         if ( ignore_stations[0] == i ) ok = true;
       }
       if ( !ok ) {
-        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        if ( _debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
         return false;
       }
       // Set outer station number
@@ -1056,7 +1056,7 @@ bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
       }
       if ( ignore_stations[0] == ignore_stations[1] ) ok0 = false;
       if ( !ok0 || !ok1 ) {
-        if ( debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
+        if ( _debug > 0 ) std::cerr << "Error: Invalid ignore station argument." << std::endl;
         return false;
       }
 
@@ -1110,7 +1110,7 @@ bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
         }
       }
     } else {
-    if (debug > 0) std::cout << "Error: Invalid ignore station argument." << std::endl;
+    if (_debug > 0) std::cout << "Error: Invalid ignore station argument." << std::endl;
     return false;
   }
   return true;

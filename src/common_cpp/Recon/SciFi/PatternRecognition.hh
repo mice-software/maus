@@ -365,33 +365,48 @@ class PatternRecognition {
     void draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
                    SimpleLine &line_x, SimpleLine &line_y);
 
+    /** @brief Calculate the residuals of a straight line to a spacepoint
+     *
+     *  @param sp - The spacepoint
+     *  @param line_x - The x projection of the line
+     *  @param line_y - The y projection of the line
+     *  @param dx - x residual
+     *  @param dy - y residual
+     */
     void calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
                        const SimpleLine &line_y, double &dx, double &dy);
 
+    /** @brief Return helical PR on flag */
     bool get_helical_pr_on() { return _helical_pr_on; }
+
+    /** @brief Return straight PR on flag */
     bool get_straight_pr_on() { return _straight_pr_on; }
+
+    /** @brief Set helical PR on flag */
     void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+
+    /** @brief Set straight PR on flag */
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
   private:
-    static const int debug = 1; // Set output level, 0 = little, 1 = more couts, 2 = files as well
-    static const int _n_trackers = 2;
-    static const int _n_stations = 5;
-    static const int _n_bins = 100;         // Number of bins in each residuals histogram
-    static const double _sd_1to4 = 0.3844;  // Position error associated with stations 1 through 4
-    static const double _sd_5 = 0.4298;     // Position error associated with station 5
-    static const double _sd_phi_5 = 1.0;
-    static const double _sd_phi_1to4 = 1.0;
-    static const double _res_cut = 50;      // Road cut for linear fit in mm
-    static const double _R_res_cut = 2.0;    // Road cut for circle radius in mm
-    static const double _chisq_cut = 15;    // Cut on the chi^2 of the least squares fit in mm
+    static const int _debug = 1;               // Verbosity: 0=little, 1=more couts, 2=files too
+    static const int _n_trackers = 2;         // Number of trackers
+    static const int _n_stations = 5;         // Number of stations per tracker
+    static const int _n_bins = 100;           // Number of bins in each residuals histogram
+    static const double _sd_1to4 = 0.3844;    // Position error associated with stations 1 t0 4
+    static const double _sd_5 = 0.4298;       // Position error associated with station 5
+    static const double _sd_phi_1to4 = 1.0;   // Rotation error associated with stations 1 t0 4
+    static const double _sd_phi_5 = 1.0;      // Rotation error associated with station 5
+    static const double _res_cut = 50;        // Road cut for linear fit in mm
+    static const double _R_res_cut = 2.0;     // Road cut for circle radius in mm
+    static const double _chisq_cut = 15;      // Cut on the chi^2 of the least squares fit in mm
     static const double _sz_chisq_cut = 30.0; // Cut on the sz chi^2 from least squares fit in mm
-    static const double _helix_chisq_cut = 100;
+    static const double _helix_chisq_cut = 100;  // Cut on the helix chi^2 in mm (not used)
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .7;       // Need to decide on appropriate cut here!!!
+    static const double _AB_cut = .7;              // Need to decide on appropriate cut here!!!
     static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    bool _helical_pr_on;   // Flag to turn on helical pr (0 off, 1 on)
-    bool _straight_pr_on;  // Flag to turn on straight pr (0 off, 1 on)
+    bool _helical_pr_on;                           // Flag to turn on helical pr (0 off, 1 on)
+    bool _straight_pr_on;                          // Flag to turn on straight pr (0 off, 1 on)
 
     static const double _Pt_max = 180.; // MeV/c max Pt for helical tracks (given by R_max = 150mm)
     static const double _Pz_min = 50.; // MeV/c min Pz for helical tracks (this is a guess)

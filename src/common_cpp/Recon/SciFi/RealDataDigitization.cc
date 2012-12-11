@@ -192,9 +192,8 @@ bool RealDataDigitization::load_mapping(std::string file) {
   return true;
 }
 
-bool RealDataDigitization::
-     get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                          int& tracker, int& station, int& plane, int& channel) const {
+bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
+                           int& tracker, int& station, int& plane, int& channel) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
