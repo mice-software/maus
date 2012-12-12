@@ -72,7 +72,7 @@ bool KalmanSciFiAlignment::load_misaligments() {
     assert(line_i == station && "SciFiMisalignments (Shifts) set up as expected.");
     // site_id_array[site_i]= site;
     int site_id = 3*(station-1);
-    //std::cerr << "Setting misalignment in site " << site_id << std::endl;
+    // std::cerr << "Setting misalignment in site " << site_id << std::endl;
     TMatrixD shifts(3, 1);
     shifts(0, 0) = xd;
     shifts(1, 0) = yd;

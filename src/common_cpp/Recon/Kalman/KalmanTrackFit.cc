@@ -87,7 +87,7 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
     track->compute_chi2(sites);
 
     monitor.fill(sites);
-    //monitor.print_info(sites);
+    // monitor.print_info(sites);
 
     if ( track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
@@ -343,9 +343,9 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   KalmanSite *a_site = &sites[current_site];
   KalmanSite *alignment_projection_site = 0;
   // Get previous site too.
-  //if ( !(current_site%3) ) {
+  // if ( !(current_site%3) ) {
   int id = a_site->get_id();
-   if ( id == 3 ) {
+  if ( id == 3 ) {
     std::cout << "Site 3; shift is: " << std::endl;
     alignment_projection_site = a_site;
     alignment_projection_site->get_shifts().Print();

@@ -76,15 +76,18 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
 
     pull_site_3   = new TH1F("pull_site_3", "pull_site_3", 50, -10, 10);
     residual_site_3   = new TH1F("residual_site_3", "residual_site_3", 50, -10, 10);
-    smoothed_residual_site_3   = new TH1F("smoothed_residual_site_3", "smoothed_residual_site_3", 50, -10, 10);
+    smoothed_residual_site_3   = new TH1F("smoothed_residual_site_3",
+                                          "smoothed_residual_site_3", 50, -10, 10);
 
     pull_site_4   = new TH1F("pull_site_4", "pull_site_4", 50, -10, 10);
     residual_site_4   = new TH1F("residual_site_4", "residual_site_4", 50, -10, 10);
-    smoothed_residual_site_4   = new TH1F("smoothed_residual_site_4", "smoothed_residual_site_4", 50, -10, 10);
+    smoothed_residual_site_4   = new TH1F("smoothed_residual_site_4",
+                                          "smoothed_residual_site_4", 50, -10, 10);
 
     pull_site_5   = new TH1F("pull_site_5", "pull_site_5", 50, -10, 10);
     residual_site_5   = new TH1F("residual_site_5", "residual_site_5", 50, -10, 10);
-    smoothed_residual_site_5   = new TH1F("smoothed_residual_site_5", "smoothed_residual_site_5", 50, -10, 10);
+    smoothed_residual_site_5   = new TH1F("smoothed_residual_site_5",
+                                          "smoothed_residual_site_5", 50, -10, 10);
 
     station1 = new TGraph();
     station1->SetName("xd_station1");
@@ -247,33 +250,33 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double kappa_proj= a_proj(4, 0);
 
   if ( id == 3 ) {
-    Double_t pull = site.get_pull()(0,0);
+    Double_t pull = site.get_pull()(0, 0);
     pull_site_3->Fill(pull);
 
-    Double_t residual = site.get_residual()(0,0);
+    Double_t residual = site.get_residual()(0, 0);
     residual_site_3->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0,0);
+    Double_t s_residual = site.get_smoothed_residual()(0, 0);
     smoothed_residual_site_3->Fill(s_residual);
   }
   if ( id == 4 ) {
-    Double_t pull = site.get_pull()(0,0);
+    Double_t pull = site.get_pull()(0, 0);
     pull_site_4->Fill(pull);
 
-    Double_t residual = site.get_residual()(0,0);
+    Double_t residual = site.get_residual()(0, 0);
     residual_site_4->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0,0);
+    Double_t s_residual = site.get_smoothed_residual()(0, 0);
     smoothed_residual_site_4->Fill(s_residual);
   }
   if ( id == 5 ) {
-    Double_t pull = site.get_pull()(0,0);
+    Double_t pull = site.get_pull()(0, 0);
     pull_site_5->Fill(pull);
 
-    Double_t residual = site.get_residual()(0,0);
+    Double_t residual = site.get_residual()(0, 0);
     residual_site_5->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0,0);
+    Double_t s_residual = site.get_smoothed_residual()(0, 0);
     smoothed_residual_site_5->Fill(s_residual);
   }
 /*
