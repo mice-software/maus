@@ -280,25 +280,25 @@ std::string MapCppTrackerReconTest::process(std::string document) {
               int n_matched_sp_t2 = 0;
               // Loop over spacepoints in the track
               for ( unsigned int k = 0; k < trk->get_spacepoints().size(); ++k ) {
-                SciFiSpacePoint sp = trk->get_spacepoints()[k];
-                ThreeVector pos = sp.get_position();
+                SciFiSpacePoint *sp = trk->get_spacepoints()[k];
+                ThreeVector pos = sp->get_position();
                 _of1 << spill.GetSpillNumber() << "\t" << i << "\t" << j << "\t";
-                _of1 << sp.get_tracker() << "\t" << sp.get_station() << "\t";
+                _of1 << sp->get_tracker() << "\t" << sp->get_station() << "\t";
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
-                _of1 << sp.get_time() << "\n";
+                _of1 << sp->get_time() << "\n";
                 for ( unsigned int j = 0; j < virt_scifi_hit.size(); j++ ) {
                   SciFiHit vhit = virt_scifi_hit[j];
                   // Is the vhit in the same tracker and station as the spacepoint
-                  if ( sp.get_tracker() == 0 &&
+                  if ( sp->get_tracker() == 0 &&
                        vhit.GetChannelId()->GetTrackerNumber() == 0 &&
-                       sp.get_station() == vhit.GetChannelId()->GetStationNumber() ) {
+                       sp->get_station() == vhit.GetChannelId()->GetStationNumber() ) {
                     if ( ( fabs(- pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1) ) {
                       ++n_matched_sp_t1;
                     }
-                  } else if ( sp.get_tracker() == 1 &&
+                  } else if ( sp->get_tracker() == 1 &&
                               vhit.GetChannelId()->GetTrackerNumber() == 1 &&
-                              sp.get_station() == vhit.GetChannelId()->GetStationNumber() ) {
+                              sp->get_station() == vhit.GetChannelId()->GetStationNumber() ) {
                     if ( ( fabs(pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
                          ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1 ) ) {
                       ++n_matched_sp_t2;
@@ -450,7 +450,7 @@ void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
 void MapCppTrackerReconTest::mc_v_recon(SciFiEvent &event, SciFiHitArray &hits) {
   for ( unsigned int a = 0; a < event.spacepoints().size(); a++ ) {
     SciFiSpacePoint *sp1 = event.spacepoints().at(a);
-    SciFiSpacePoint sp2;
+    SciFiSpacePoint *sp2;
     _of6 << "\n" << sp1->get_position() << "\t";
     bool match = false;
     for ( unsigned int b = 0; b < event.helicalprtracks().size(); b++ ) {
@@ -460,9 +460,9 @@ void MapCppTrackerReconTest::mc_v_recon(SciFiEvent &event, SciFiHitArray &hits) 
       }
       for ( unsigned int c = 0; c < trk->get_spacepoints().size(); c++ ) {
         sp2 = trk->get_spacepoints().at(c);
-        if ( sp1->get_position().x() == sp2.get_position().x() &&
-             sp1->get_position().y() == sp2.get_position().y() &&
-             sp1->get_position().z() == sp2.get_position().z() ) {
+        if ( sp1->get_position().x() == sp2->get_position().x() &&
+             sp1->get_position().y() == sp2->get_position().y() &&
+             sp1->get_position().z() == sp2->get_position().z() ) {
           match = true;
           continue;
         }

@@ -23,7 +23,7 @@ namespace MAUS {
 // Constructors
 SciFiStraightPRTrack::SciFiStraightPRTrack() : _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                                _y0(-1.0), _my(-1.0), _y_chisq(-1.0),
-                                               _tracker(-1), _num_points(-1) {
+                                               _tracker(-1), _num_points(-1), _spoints(0) {
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
@@ -31,7 +31,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            double y0, double my, double y_chisq)
                                           : _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0),
-                                            _tracker(-1), _num_points(-1) {
+                                            _tracker(-1), _num_points(-1), _spoints(0) {
   _x0 = x0;
   _mx = mx;
   _x_chisq = x_chisq;
@@ -46,7 +46,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            SimpleLine line_x, SimpleLine line_y)
                                           : _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0),
-                                            _tracker(-1), _num_points(-1) {
+                                            _tracker(-1), _num_points(-1), _spoints(0) {
 
   _x0 = line_x.get_c();
   _mx = line_x.get_m();
@@ -63,7 +63,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk)
                                           : _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0),
-                                            _tracker(-1), _num_points(-1) {
+                                            _tracker(-1), _num_points(-1), _spoints(0) {
   *this = _strk;
 }
 

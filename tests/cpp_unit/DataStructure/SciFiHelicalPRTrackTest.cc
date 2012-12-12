@@ -115,9 +115,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   trk1.set_circle_y0(circle_y0);
   trk1.set_circle_chisq(circle_chisq);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
 
@@ -146,7 +146,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   ASSERT_EQ(trk2.get_phi_i().size(), 2);
   EXPECT_EQ(trk2.get_phi_i()[0], 1.0);
   EXPECT_EQ(trk2.get_phi_i()[1], -2.0);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
@@ -217,9 +217,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   trk1.set_circle_y0(circle_y0);
   trk1.set_circle_chisq(circle_chisq);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
 
@@ -251,7 +251,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   ASSERT_EQ(trk2.get_phi_i().size(), size);
   EXPECT_EQ(trk2.get_phi_i()[0], 1.0);
   EXPECT_EQ(trk2.get_phi_i()[1], -2.0);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
@@ -271,9 +271,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   double circle_y0 = 7.0;
   double circle_chisq = 8.0;
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
 
   SciFiHelicalPRTrack prtrack;
@@ -313,7 +313,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
 
-  EXPECT_EQ(prtrack.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(prtrack.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
-} // namespace
+} // ~namespace MAUS

@@ -49,49 +49,70 @@ class SciFiDigit {
     /** Destructor - any member pointers are deleted */
     virtual ~SciFiDigit();
 
-    // Getters and Setters
+    /** Set the spill number */
     void set_spill(int spill) { _spill = spill; }
 
+    /** Get the spill number */
     int get_spill()   const { return _spill; }
 
+    /** Set the event number */
     void set_event(int event) { _event = event; }
 
+    /** Get the event number */
     int get_event() const { return _event; }
 
+    /** Set the tracker number */
     void set_tracker(int trackerNo) { _tracker = trackerNo; }
 
+    /** Get the tracker number */
     int get_tracker() const { return _tracker; }
 
+    /** Set the station number */
     void set_station(int stationNo) { _station = stationNo; }
 
+    /** Get the tracker number */
     int get_station() const { return _station; }
 
+    /** Set the plane number */
     void set_plane(int planeNo) { _plane = planeNo; }
 
+    /** Get the plane number */
     int get_plane()   const { return _plane; }
 
+    /** Set the channel number */
     void set_channel(int channelNo) { _channel = channelNo; }
 
+    /** Get the channel number */
     int get_channel() const { return _channel; }
 
+    /** Set the number of photo electrons */
     void set_npe(double npe) { _npe = npe; }
 
+    /** Get the number of photo electrons */
     double get_npe()     const { return _npe;     }
 
+    /** Set the time (ns) */
     void set_time(double time) { _time = time; }
 
+    /** Get the time (ns) */
     double get_time()    const { return _time;    }
 
+    /** Set the used flag */
     void set_used(bool used)   { _used = used; }
 
+    /** Get the used flag */
     bool is_used()     const { return _used; }
 
+    /** Set the MC truth momentum (temporary) */
     void set_true_momentum(ThreeVector p) { _p = p; }
 
+    /** Get the MC truth momentum (temporary) */
     ThreeVector get_true_momentum() const { return _p; }
 
+    /** Set the MC truth position (temporary) */
     void set_true_position(ThreeVector position) { _position = position; }
 
+    /** Get the MC truth position (temporary) */
     ThreeVector get_true_position() const { return _position; }
 
   private:
