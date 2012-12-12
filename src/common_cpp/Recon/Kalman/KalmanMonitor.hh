@@ -63,6 +63,17 @@ class KalmanMonitor {
 
   TH1F *chi2_tracker0;
   TH1F *chi2_tracker1;
+
+  TH1F *pull_site_3;
+  TH1F *residual_site_3;
+  TH1F *smoothed_residual_site_3;
+  TH1F *pull_site_4;
+  TH1F *residual_site_4;
+  TH1F *smoothed_residual_site_4;
+  TH1F *pull_site_5;
+  TH1F *residual_site_5;
+  TH1F *smoothed_residual_site_5;
+
   TGraph *station1;
   TGraph *station2;
   TGraph *station3;

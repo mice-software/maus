@@ -72,6 +72,7 @@ bool KalmanSciFiAlignment::load_misaligments() {
     assert(line_i == station && "SciFiMisalignments (Shifts) set up as expected.");
     // site_id_array[site_i]= site;
     int site_id = 3*(station-1);
+    //std::cerr << "Setting misalignment in site " << site_id << std::endl;
     TMatrixD shifts(3, 1);
     shifts(0, 0) = xd;
     shifts(1, 0) = yd;
@@ -130,7 +131,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
   // sites 2 to 29; increment 3
   for ( int station = 2; station < 5; station++ ) {
-      int site_i = 3*(station-1)+2;
+      int site_i = 3*(station-1); // 3, 6, 9
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"
@@ -162,7 +163,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   for ( int station = 7; station < 10; station++ ) {
-      int site_i = 3*(station-1)+2;
+      int site_i = 3*(station-1); // 18, 21, 24
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"

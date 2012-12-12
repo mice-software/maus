@@ -69,28 +69,28 @@ void KalmanTrackFit::process(std::vector<SciFiStraightPRTrack*> straight_tracks)
 
     assert(numb_measurements < 16);
 
-    for ( unsigned int i = 1; i < numb_measurements; ++i ) {
+    for ( unsigned int j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
       // std::cerr << "Extrapolating to site " << i << std::endl;
-      extrapolate(sites, track, i);
+      extrapolate(sites, track, j);
       // ... Filter...
       // std::cerr << "Filtering site " << i << std::endl;
-      filter(sites, track, i);
+      filter(sites, track, j);
     }
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
-    for ( int i = numb_measurements-2; i >= 0; --i ) {
+    for ( unsigned int j = numb_measurements-2; j > -1; --j ) {
       // std::cerr << "Smoothing site " << i << std::endl;
-      smooth(sites, track, i);
+      smooth(sites, track, j);
     }
     track->compute_chi2(sites);
 
     monitor.fill(sites);
-    // monitor.print_info(sites);
+    //monitor.print_info(sites);
 
     if ( track->get_chi2() < 15. && numb_measurements == 15 ) {
-      // std::cerr << "Good chi2; lauching KalmanAlignment...\n";
+      std::cerr << "Good chi2; lauching KalmanAlignment...\n";
       update_alignment_parameters(sites, track, kalman_align);
       // Update Stored misalignments using values stored in each site.
       kalman_align.update(sites);
@@ -115,7 +115,7 @@ void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
 // Helical track fit.
 //
 void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack*> helical_tracks) {
-  int num_tracks  = helical_tracks.size();
+  unsigned int num_tracks  = helical_tracks.size();
   KalmanMonitor monitor;
 
   for ( int i = 0; i < num_tracks; ++i ) {
@@ -137,20 +137,20 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack*> helical_tracks) {
 
     assert(numb_measurements < 16);
 
-    for ( unsigned int i = 1; i < numb_measurements; ++i ) {
+    for ( unsigned int j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
       // std::cerr << "Extrapolating to site " << i << std::endl;
-      extrapolate(sites, track, i);
+      extrapolate(sites, track, j);
       // ... Filter...
-      // std::cerr << "Filtering site " << i << std::endl;
-      filter(sites, track, i);
+      // std::cerr << "Filtering site " << j << std::endl;
+      filter(sites, track, j);
     }
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
-    for ( unsigned int i = numb_measurements-2; i >= 0; --i ) {
-      // std::cerr << "Smoothing site " << i << std::endl;
-      smooth(sites, track, i);
+    for ( unsigned int j = numb_measurements-2; j > -1; --j ) {
+      // std::cerr << "Smoothing site " << j << std::endl;
+      smooth(sites, track, j);
     }
 
     track->compute_chi2(sites);
@@ -190,23 +190,14 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack* seed, std::vector<KalmanSit
 
   int tracker = clusters[0]->get_tracker();
 
-  double x, y;
-
   double pi = acos(-1.);
   double phi_0 = seed->get_phi0();
   double phi = phi_0 + pi/2.;
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
-  for ( unsigned int i = 0; i < spacepoints.size(); i++ ) {
-    if ( tracker == 0 && spacepoints[i].get_station() == 1 ) {
-      x = spacepoints[i].get_position().x();
-      y = spacepoints[i].get_position().y();
-    } else if ( tracker == 1 && spacepoints[i].get_station() == 1 ) {
-      x = spacepoints[i].get_position().x();
-      y = spacepoints[i].get_position().y();
-    }
-  }
+  double x = spacepoints[0].get_position().x();
+  double y = spacepoints[0].get_position().y();
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
@@ -217,9 +208,12 @@ void KalmanTrackFit::initialise(SciFiHelicalPRTrack* seed, std::vector<KalmanSit
 
   TMatrixD C(5, 5);
   C.Zero();
-  for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = _seed_cov; // dummy values
-  }
+  // for ( int i = 0; i < 5; ++i ) {
+  C(0, 0) = _seed_cov/100.; // dummy values
+  C(1, 1) = _seed_cov; // dummy values
+  C(2, 2) = _seed_cov/100.; // dummy values
+  C(3, 3) = _seed_cov; // dummy values
+  C(4, 4) = _seed_cov; // dummy values
 
   KalmanSite first_plane;
   first_plane.set_projected_a(a);
@@ -349,13 +343,22 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   KalmanSite *a_site = &sites[current_site];
   KalmanSite *alignment_projection_site = 0;
   // Get previous site too.
-  if ( !(current_site%3) ) {
-    // std::cerr << "first plane; copying shifts read in. \n";
+  //if ( !(current_site%3) ) {
+  int id = a_site->get_id();
+   if ( id == 3 ) {
+    std::cout << "Site 3; shift is: " << std::endl;
     alignment_projection_site = a_site;
-  } else {
+    alignment_projection_site->get_shifts().Print();
+  } else if ( id == 4 || id == 5 ) {
+    std::cout << "Site " << id << std::endl;
     alignment_projection_site = &sites[current_site-1];
+    alignment_projection_site->get_shifts().Print();
   }
-
+    track->update_V(a_site);
+    track->update_H(a_site);
+    track->update_W(a_site);
+    track->update_misaligments(a_site, alignment_projection_site);
+/*
   // Update measurement error:
   // (non-const std for the perp direction)
   track->update_V(a_site);
@@ -363,6 +366,7 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
   track->update_W(a_site);
 
   track->update_misaligments(a_site, alignment_projection_site);
+*/
 }
 
 void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {

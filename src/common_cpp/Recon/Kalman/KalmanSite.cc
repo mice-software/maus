@@ -81,8 +81,6 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
     return *this;
   }
 
-  std::cerr << "operator = is called.\n";
-
   _z  = rhs.get_z();
   _id = rhs.get_id();
   _chi2  = rhs.get_chi2();
