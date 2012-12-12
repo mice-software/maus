@@ -51,7 +51,6 @@ REDUCER_LIST = [
   'reconstruct_daq_scalars_reducer.py',
   'reconstruct_daq_tof_reducer.py',
   'reconstruct_daq_ckov_reducer.py',
-  'reconstruct_daq_single_station_reducer.py',
 ]
 
 def poll_processes(proc_list):
