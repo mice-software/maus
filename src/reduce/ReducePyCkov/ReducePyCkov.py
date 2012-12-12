@@ -224,6 +224,7 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
         Reinitialise histograms at death
         """
         self.__init_histos()
+        self.get_histogram_images()
     
     def __init_histos(self): #pylint: disable=R0201,R0914,R0915
         """Draw Canvases and Histograms """

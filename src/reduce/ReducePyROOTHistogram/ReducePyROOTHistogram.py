@@ -186,6 +186,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         containing image data in the form described above. 
         @throws Exception if various sub-class specific errors arise.
         """
+        raise NotImplementedError("Should be overloaded to update histos")
 
     def death(self): #pylint: disable=R0201
         """
