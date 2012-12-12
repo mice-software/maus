@@ -206,7 +206,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         @param self Object reference.
         @returns True
         """
-        return True
+        raise NotImplementedError("Should be overloaded to clean out histos")
 
     def get_image_doc(self, keywords, description, tag, canvas):
         """

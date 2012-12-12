@@ -736,3 +736,9 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             image_list.append(doc)
 
         return image_list
+
+    def _cleanup_at_death(self):
+        """
+        Reinitialise histograms at death
+        """
+        self.__init_histos()

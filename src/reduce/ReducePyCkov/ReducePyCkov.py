@@ -218,6 +218,12 @@ class ReducePyCkov(ReducePyROOTHistogram): # pylint: disable=R0902
                     self._htime[i].Fill(time)
                     
         return True
+
+    def _cleanup_at_death(self):
+        """
+        Reinitialise histograms at death
+        """
+        self.__init_histos()
     
     def __init_histos(self): #pylint: disable=R0201,R0914,R0915
         """Draw Canvases and Histograms """
