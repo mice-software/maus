@@ -329,8 +329,7 @@ class PatternRecognition {
      *  @param spnts_by_station - Output 2D vector of spacepoints sorted by station
      *
      */
-    void sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
-                         SpacePoint2dPArray &spnts_by_station);
+    void sort_by_station(const SciFiSpacePointPArray &spnts, SpacePoint2dPArray &spnts_by_station);
 
     /** @brief Count the number of stations that have unused spacepoint
      *
