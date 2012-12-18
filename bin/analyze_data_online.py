@@ -39,11 +39,11 @@ kill all child processes.
 import sys
 import os
 import signal
-# import xboa.Common
 import subprocess
-# import multiprocessing
 import time
+import pymongo
 
+MONGODB = 'maus-new' # no '.' character
 LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
 PROCESSES = []
 POLL_TIME = 10
@@ -51,6 +51,7 @@ REDUCER_LIST = [
   'reconstruct_daq_scalars_reducer.py',
   'reconstruct_daq_tof_reducer.py',
   'reconstruct_daq_ckov_reducer.py',
+  'reconstruct_monitor_reducer.py',
 ]
 
 def poll_processes(proc_list):
@@ -105,7 +106,7 @@ def maus_input_transform_process(maus_input_log):
              os.path.join(os.environ['MAUS_ROOT_DIR'],
                           'bin/online/analyze_data_online_input_transform.py')
     proc = subprocess.Popen(
-                       ['python', maus_inp, '-mongodb_database_name=maus-new',
+                       ['python', maus_inp, '-mongodb_database_name='+MONGODB,
                         '-type_of_dataflow=multi_process_input_transform',
 				        '-verbose_level=0',
 						'-DAQ_hostname=miceraid5'],
@@ -113,7 +114,7 @@ def maus_input_transform_process(maus_input_log):
     print 'with pid', proc.pid
     return proc
     
-def maus_merge_output_process(maus_output_log, reducer_name):
+def maus_merge_output_process(maus_output_log, reducer_name, output_name):
     """
     Open the merge output process - runs against reconstructed data and collects
     into a bunch of histograms.
@@ -123,11 +124,46 @@ def maus_merge_output_process(maus_output_log, reducer_name):
     maus_red = os.path.join(os.environ['MAUS_ROOT_DIR'], 'bin/online',
                                                                    reducer_name)
     proc = subprocess.Popen(
-                       ['python', maus_red, '-mongodb_database_name=maus-new',
-                        '-type_of_dataflow=multi_process_merge_output'],
+                       ['python', maus_red, '-mongodb_database_name='+MONGODB,
+                        '-type_of_dataflow=multi_process_merge_output',
+                        '-output_json_file_name='+output_name],
                        stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid
     return proc
+
+def monitor_mongodb(url, database_name, file_handle):
+    """
+    Summarise the database.
+    @param url URL.
+    @param database_name Database name or "ALL" for all.
+    """
+    mongo = pymongo.Connection(url)
+    database_names = mongo.database_names()
+    if (database_name != "ALL"):
+        if (database_name not in database_names):
+            print >> file_handle, "Database %s not found" % database_name
+            return
+        else:
+            database_names = [database_name]
+    for database_name in database_names:
+        print >> file_handle, "Database: %s" % database_name,
+        mongodb = mongo[database_name]
+        collection_names = mongodb.collection_names()
+        if ("system.indexes" in collection_names):
+            collection_names.remove("system.indexes")
+        if (len(collection_names) == 0):
+            print >> file_handle, "  No collections"
+            continue
+        for collection_name in collection_names:
+            collection = mongodb[collection_name]
+            space = mongodb.validate_collection(collection_name)["datasize"]
+            space_kb = space / 1024
+            space_mb = space_kb / 1024
+            print >> file_handle, \
+                "  Collection: %s : %d documents (%d bytes %d Kb %d Mb)" \
+                % (collection_name, collection.count(), space, \
+                space_kb, space_mb)
+    file_handle.flush()
 
 def force_kill_maus_web_app():
     """
@@ -222,18 +258,21 @@ def main():
         celery_log = os.path.join(log_dir, 'celeryd.log')
         maus_web_log = os.path.join(log_dir, 'maus-web.log')
         input_log = os.path.join(log_dir, 'maus-input-transform.log')
+        debug_json = os.path.join(log_dir, 'reconstruct_monitor_reducer.json')
 
         PROCESSES.append(celeryd_process(celery_log))
         PROCESSES.append(maus_web_app_process(maus_web_log))
         PROCESSES.append(maus_input_transform_process(input_log))
-        for reducer in  	REDUCER_LIST:
+        for reducer in REDUCER_LIST:
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
-                                                       reducer))
+                                                      reducer, debug_json))
 
         make_lockfile(PROCESSES)
         print '\nCTRL-C to quit\n'
+        mongo_log = open(os.path.join(log_dir, 'mongodb.log'), 'w')
         while poll_processes(PROCESSES):
+            monitor_mongodb("localhost:27017", MONGODB, mongo_log)
             time.sleep(POLL_TIME)
     except KeyboardInterrupt:
         print "Closing"

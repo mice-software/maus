@@ -36,18 +36,11 @@ def run():
     data_cards_list.append("histogram_auto_number=%s\n" % False)
     # Default image type is eps. For online use, use PNG.
     data_cards_list.append("histogram_image_type=\"png\"\n")
-    # Directory for images. Default: $MAUS_WEB_MEDIA_RAW if set
-    # else the current directory is used.
-    # Uncomment and change the following if you want to hard
-    # code a different default path.
-#    data_cards_list.append("image_directory='%s'\n" % os.getcwd())
 
     # Convert data_cards to string.    
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
     # Set up the input that reads from DAQ
-#    my_input = MAUS.InputCppDAQData()
-#    my_input = MAUS.InputCppDAQOnlineData()
     my_input = MAUS.InputCppDAQOnlineData()
 
     # Create an empty array of mappers, then populate it
@@ -61,11 +54,9 @@ def run():
     my_map.append(MAUS.MapPyCkov())
     #my_map.append(MAUS.MapCppSingleStationRecon())
     # Histogram reducer.
-    reducer = MAUS.ReducePyCkov()
-    #reducer = MAUS.ReducePyDoNothing()
-    # Save images as EPS and meta-data as JSON.
-    #output_worker = MAUS.OutputPyImage()
-    output_worker = MAUS.OutputCppRoot()
+    reducer = MAUS.ReducePyDoNothing()
+    # write out json
+    output_worker = MAUS.OutputPyJSON()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 

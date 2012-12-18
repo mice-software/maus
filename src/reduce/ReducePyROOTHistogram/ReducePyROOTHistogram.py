@@ -27,7 +27,7 @@ import os
 import ErrorHandler
 import ROOT
 
-class ReducePyROOTHistogram: # pylint: disable=R0902
+class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
     @class ReducePyROOTHistogram.ReducePyROOTHistogram is a base class
     for classes that create histograms using ROOT. 

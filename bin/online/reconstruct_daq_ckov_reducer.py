@@ -58,7 +58,7 @@ def run():
     my_map.append(MAUS.MapCppTOFSpacePoints())
     my_map.append(MAUS.MapPyCkov())
     # Histogram reducer.
-    reducer = MAUS.ReducePyCkov()
+    reducer = MAUS.ReducePyCkovPlot()
     #reducer = MAUS.ReducePyDoNothing()
     # Save images as EPS and meta-data as JSON.
     output_worker = MAUS.OutputPyImage()
