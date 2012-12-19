@@ -30,6 +30,9 @@
 #include <vector>
 #include <string>
 
+// ROOT headers
+#include "TMatrixD.h"
+
 // MAUS headers
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SimpleCircle.hh"
@@ -372,8 +375,39 @@ class PatternRecognition {
      *  @param dx - x residual
      *  @param dy - y residual
      */
-    void calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
-                       const SimpleLine &line_y, double &dx, double &dy);
+    void calc_straight_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
+                                const SimpleLine &line_y, double &dx, double &dy);
+
+    /** @brief Calculate the residual of a circle to a spacepoint
+     *
+     *  @param sp - The spacepoint
+     *  @param c - The circle (x0, y0 and rho must be set) 
+     */
+    double calc_circle_residual(const SciFiSpacePoint *sp, const SimpleCircle &c);
+
+    /** @brief Create a circle from 3 spacepoints
+     *
+     *  Create a circle from 3 spacepoints. A circle is unambiguously defined by 3 points.
+     *  For 3 spacepoints we can make a simple circle without requiring least squares fitting.
+     *  See the tracker documentation for a description of algorithms.
+     *
+     *  @param sp1 - The first spacepoint
+     *  @param sp2 - The second spacepoint
+     *  @param sp3 - The third spacepoint
+     */
+    SimpleCircle make_3pt_circle(const SciFiSpacePoint *sp1,
+                                 const SciFiSpacePoint *sp2,
+                                 const SciFiSpacePoint *sp3);
+
+    /** @brief Calculate the determinant for a 3*3 ROOT matrix
+     *
+     *  Calculate the determinant for a 3*3 ROOT matrix (the in-built ROOT method falls over
+     *  in the case of a singular matrix)
+     *
+     * @param m - The 3*3 ROOT TMatrixD (a matrix of doubles)
+     *
+     */
+    double det3by3(const TMatrixD &m);
 
     /** @brief Return helical PR on flag */
     bool get_helical_pr_on() { return _helical_pr_on; }
@@ -388,27 +422,28 @@ class PatternRecognition {
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
   private:
-    static const int _debug = 1;               // Verbosity: 0=little, 1=more couts, 2=files too
-    static const int _n_trackers = 2;         // Number of trackers
-    static const int _n_stations = 5;         // Number of stations per tracker
-    static const int _n_bins = 100;           // Number of bins in each residuals histogram
-    static const double _sd_1to4 = 0.3844;    // Position error associated with stations 1 t0 4
-    static const double _sd_5 = 0.4298;       // Position error associated with station 5
-    static const double _sd_phi_1to4 = 1.0;   // Rotation error associated with stations 1 t0 4
-    static const double _sd_phi_5 = 1.0;      // Rotation error associated with station 5
-    static const double _res_cut = 50;        // Road cut for linear fit in mm
-    static const double _R_res_cut = 2.0;     // Road cut for circle radius in mm
-    static const double _chisq_cut = 15;      // Cut on the chi^2 of the least squares fit in mm
-    static const double _sz_chisq_cut = 30.0; // Cut on the sz chi^2 from least squares fit in mm
-    static const double _helix_chisq_cut = 100;  // Cut on the helix chi^2 in mm (not used)
+    static const int _debug = 1;             /** Verbosity: 0=little, 1=more couts, 2=files too */
+    static const int _n_trackers = 2;        /** Number of trackers */
+    static const int _n_stations = 5;        /** Number of stations per tracker */
+    static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
+    static const double _sd_1to4 = 0.3844;   /** Position error associated with stations 1 t0 4 */
+    static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
+    static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */
+    static const double _sd_phi_5 = 1.0;     /** Rotation error associated with station 5 */
+    static const double _res_cut = 50;       /** Road cut for linear fit in mm */
+    static const double _c_res_cut = 50;     /** Road cut for circle fit in mm */
+    static const double _R_res_cut = 2.0;    /** Road cut for circle radius in mm */
+    static const double _chisq_cut = 15;     /** Cut on the chi^2 of the least sqs fit in mm */
+    static const double _sz_chisq_cut = 30.0; /** Cut on the sz chi^2 from least sqs fit in mm */
+    static const double _helix_chisq_cut = 100; /** Cut on the helix chi^2 in mm (not used) */
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .7;              // Need to decide on appropriate cut here!!!
-    static const double _active_diameter = 300.0;  // Active volume diameter a tracker in mm
-    bool _helical_pr_on;                           // Flag to turn on helical pr (0 off, 1 on)
-    bool _straight_pr_on;                          // Flag to turn on straight pr (0 off, 1 on)
+    static const double _AB_cut = .7;             /** Need to decide on appropriate cut here!!! */
+    static const double _active_diameter = 300.0; /** Active volume diameter a tracker in mm */
+    bool _helical_pr_on;                          /** Flag to turn on helical pr (0 off, 1 on) */
+    bool _straight_pr_on;                         /** Flag to turn on straight pr (0 off, 1 on) */
 
-    static const double _Pt_max = 180.; // MeV/c max Pt for helical tracks (given by R_max = 150mm)
-    static const double _Pz_min = 50.; // MeV/c min Pz for helical tracks (this is a guess)
+    static const double _Pt_max = 180.; /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
+    static const double _Pz_min = 50.; /** MeV/c min Pz for helical tracks (this is a guess) */
 
     // Some output files - only to be kept when in development stages
     std::ofstream * _f_res;

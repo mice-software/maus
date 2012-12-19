@@ -388,7 +388,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                   if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
                     SciFiSpacePoint *sp = spnts_by_station[st_num][sp_no];
                     double dx = 0, dy = 0;
-                    calc_residual(sp, line_x, line_y, dx, dy);
+                    calc_straight_residual(sp, line_x, line_y, dx, dy);
                     if ( _debug > 1 ) {
                       *_f_res << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                       *_f_res << dx << "\t" << dy << "\n";
@@ -412,7 +412,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                   SciFiSpacePoint * sp = spnts_by_station[st_num][best_sp];
                   good_spnts.push_back(sp);
                   double dx = 0, dy = 0;
-                  calc_residual(sp, line_x, line_y, dx, dy);
+                  calc_straight_residual(sp, line_x, line_y, dx, dy);
                   if ( _debug > 1 ) {
                     *_f_res_chosen << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                     *_f_res_chosen << dx << "\t" << dy << "\n";
@@ -1155,12 +1155,84 @@ void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpaceP
   line_y.set_c(pos_outer.y() - ( pos_outer.z() *  line_y.get_m() ));
 } // ~draw_line(...)
 
-void PatternRecognition::calc_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
+void PatternRecognition::calc_straight_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
                                        const SimpleLine &line_y, double &dx, double &dy) {
 
     ThreeVector pos = sp->get_position();
     dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
     dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
-} // ~calc_residual(...)
+} // ~calc_straight_residual(...)
+
+double PatternRecognition::calc_circle_residual(const SciFiSpacePoint *sp, const SimpleCircle &c) {
+    ThreeVector pos = sp->get_position();
+    double delta = sqrt(((pos.x()-c.get_x0()) * (pos.x()-c.get_x0())) +
+                        ((pos.y()-c.get_y0()) * (pos.y()-c.get_y0()))) - c.get_R();
+    return delta;
+} // ~calc_circle_residual(...)
+
+SimpleCircle PatternRecognition::make_3pt_circle(const SciFiSpacePoint *sp1,
+                                                 const SciFiSpacePoint *sp2,
+                                                 const SciFiSpacePoint *sp3) {
+  SimpleCircle c;
+  ThreeVector pos1 = sp1->get_position();
+  ThreeVector pos2 = sp2->get_position();
+  ThreeVector pos3 = sp3->get_position();
+
+  // Calculate alpha
+  Double_t arr_a[] = {pos1.x(), pos1.y(), 1.0,
+                      pos2.x(), pos2.y(), 1.0,
+                      pos3.x(), pos3.y(), 1.0};
+  TMatrixD mat_a(3, 3, arr_a);
+  double alpha = det3by3(mat_a);
+  c.set_alpha(alpha);
+
+  // Calculate beta
+  Double_t arr_b[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.y(), 1.0,
+                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.y(), 1.0,
+                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.y(), 1.0};
+  TMatrixD mat_b(3, 3, arr_b);
+  double beta = - det3by3(mat_b);
+  c.set_beta(beta);
+
+  // Calculate gamma
+  Double_t arr_g[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.x(), 1.0,
+                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.x(), 1.0,
+                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.x(), 1.0};
+  TMatrixD mat_g(3, 3, arr_g);
+  double gamma = det3by3(mat_g);
+  c.set_gamma(gamma);
+
+  // Calculate kappa
+  Double_t arr_k[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.x(), pos1.y(),
+                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.x(), pos2.y(),
+                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.x(), pos3.y()};
+  TMatrixD mat_k(3, 3, arr_k);
+  double kappa = - det3by3(mat_k);
+  c.set_kappa(kappa);
+
+  // Calculate the dependent parameters
+  double x0 = - beta / (2 * alpha);
+  c.set_x0(x0);
+
+  double y0 = - gamma / (2 * alpha);
+  c.set_y0(y0);
+
+  double R = sqrt(((beta*beta+gamma*gamma)/(4*alpha*alpha))-(kappa/alpha));
+  c.set_R(R);
+
+  return c;
+} // ~make_3pt_circle
+
+double PatternRecognition::det3by3(const TMatrixD &m) {
+  if ( m.GetNrows() == 3 && m.GetNcols() == 3 ) {
+    double det = m(0, 0)*(m(1, 1)*m(2, 2)-m(1, 2)*m(2, 1)) +
+                 m(0, 1)*(m(1, 2)*m(2, 0)-m(1, 0)*m(2, 2)) +
+                 m(0, 2)*(m(1, 0)*m(2, 1)-m(1, 1)*m(2, 0));
+    return det;
+  } else {
+    std::cerr << "Error: PatternRecognition::det3by3 says: Bad matrix given" << std::endl;
+    return 0;
+  }
+}
 
 } // ~namespace MAUS

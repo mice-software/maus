@@ -1044,6 +1044,57 @@ TEST_F(PatternRecognitionTest, test_AB_ratio) {
   EXPECT_EQ(z_j, 450.0);
 }
 
+TEST_F(PatternRecognitionTest, test_make_3pt_circle) {
+
+  PatternRecognition pr;
+
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+
+  // Set up spacepoints corresponding to circle of radius 2 mm, centred at (1,2)
+  ThreeVector pos(1.0, 4.0, 0.0);
+  sp1->set_position(pos);
+  pos.set(3.0, 2.0, 0.0);
+  sp2->set_position(pos);
+  pos.set(1.0, 0.0, 0.0);
+  sp3->set_position(pos);
+
+  SimpleCircle c = pr.make_3pt_circle(sp1, sp2, sp3);
+
+  double x0 = 1.0;
+  double y0 = 2.0;
+  double R = 2.0;
+  double epsilon = 0.01;
+
+  EXPECT_NEAR(c.get_x0(), x0, epsilon);
+  EXPECT_NEAR(c.get_y0(), y0, epsilon);
+  EXPECT_NEAR(c.get_R(), R, epsilon);
+
+  // Now check for a circle of radius 2mm, centred at (0,0) (involves singular matrices)
+  pos.set(0.0, 2.0, 0.0);
+  sp1->set_position(pos);
+  pos.set(2.0, 0.0, 0.0);
+  sp2->set_position(pos);
+  pos.set(0.0, -2.0, 0.0);
+  sp3->set_position(pos);
+
+  c = pr.make_3pt_circle(sp1, sp2, sp3);
+
+  x0 = 0.0;
+  y0 = 0.0;
+  R = 2.0;
+  epsilon = 0.01;
+
+  EXPECT_NEAR(c.get_x0(), x0, epsilon);
+  EXPECT_NEAR(c.get_y0(), y0, epsilon);
+  EXPECT_NEAR(c.get_R(), R, epsilon);
+
+  delete sp1;
+  delete sp2;
+  delete sp3;
+}
+
 /*
 TEST_F(PatternRecognitionTest, test_process_bad) {
 
