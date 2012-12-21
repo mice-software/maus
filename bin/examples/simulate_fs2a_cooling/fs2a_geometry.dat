@@ -1,0 +1,228 @@
+Configuration fs2a_geometry
+{
+    PropertyHep3Vector Dimensions 1.0 1.0 600 m
+    PropertyString Material   Galactic
+    PropertyDouble G4StepMax  100 mm
+
+    Substitution $cell_length        750. //mm
+    Substitution $number_of_cells    1
+    Substitution $number_of_virtuals 3
+    Substitution $rf_phase         35
+    Substitution $rf_voltage       15
+
+    // ***************** INPUT, OUTPUT, etc ***************
+
+    Module VirtualDetectors // detectors for output
+    {
+      PropertyString     Volume             None
+      PropertyHep3Vector Position           0.0 0.0 $cell_length*$number_of_cells/$number_of_virtuals*@RepeatNumber mm
+      PropertyString     SensitiveDetector  Virtual
+      PropertyBool       RepeatModule2      1
+      PropertyInt        NumberOfRepeats    $number_of_virtuals
+    }
+
+    // MAGNETIC FIELDS
+    Module Focus // dummy module to write the field map - field is scaled to 0.
+    {
+      PropertyString     Volume            None
+      PropertyHep3Vector Position          0.0 0.0 -50000.0 mm
+      PropertyDouble     ScaleFactor       0.
+      PropertyString     FieldType         Solenoid
+      PropertyString     FileName          ${MAUS_ROOT_DIR}/tmp/fs2a.fld
+      PropertyString     FieldMapMode      Write
+      PropertyDouble     CurrentDensity    1.
+      PropertyDouble     Length            150. mm
+      PropertyDouble     Thickness         150. mm
+      PropertyDouble     InnerRadius       350. mm
+    }
+    // actual fields; note we have some at z < 0. to make sure the field is periodic
+    Module Focus
+    {
+      PropertyString     Volume            None
+      PropertyHep3Vector Position          0.0 0.0 $cell_length*(@RepeatNumber-4.5) m
+      PropertyDouble     ScaleFactor       106.667*(-1)**@RepeatNumber
+      PropertyString     FieldType         Solenoid
+      PropertyString     FileName          ${MAUS_ROOT_DIR}/tmp/fs2a.fld
+      PropertyString     FieldMapMode      Read
+      PropertyBool       RepeatModule2     1
+      PropertyInt        NumberOfRepeats   $number_of_cells
+    }
+
+    // RF CAVITY
+    Module RF
+    {
+        PropertyString     Volume       Cylinder 
+        PropertyDouble     Dimensions   650.0 520.4 mm //radius, length in z
+        PropertyHep3Vector Position     0.0 0.0  $cell_length*(@RepeatNumber+0.5) mm
+        PropertyString     Material     Galactic
+
+        PropertyDouble     RedColour    1.0
+        PropertyDouble     GreenColour  0.0
+        PropertyDouble     BlueColour   0.0
+
+        PropertyString     FieldType              PillBox
+        PropertyString     CavityMode             Unphased
+        PropertyString     FieldDuringPhasing     TimeVarying
+        PropertyDouble     Length                 500.0         mm 
+        PropertyDouble     PeakEField             $rf_voltage   MV/m
+        PropertyDouble     ReferenceParticlePhase $rf_phase     degree
+        PropertyDouble     Frequency              0.200         GHz
+
+        PropertyBool       RepeatModule2     1
+        PropertyInt        NumberOfRepeats   $number_of_cells
+        // CAVITY WALLS
+        Module CavityOuter
+        {
+            PropertyString     Volume            Tube
+            PropertyHep3Vector Dimensions        640. 650. 520. mm
+            PropertyHep3Vector Position          0.0 0.0 0.0  mm
+            PropertyString     Material          Galactic
+            PropertyDouble     RedColour         0.2
+            PropertyDouble     GreenColour       0.2
+            PropertyDouble     BlueColour        0.0
+            PropertyBool       Invisible         true
+        }
+        Module CavityUS
+        {
+            PropertyString     Volume            Tube
+            PropertyHep3Vector Dimensions        350. 640. 10. mm
+            PropertyHep3Vector Position          0.0 0.0 -255.0  mm
+            PropertyString     Material          Galactic
+            PropertyDouble     RedColour         0.2
+            PropertyDouble     GreenColour       0.2
+            PropertyDouble     BlueColour        0.0
+            PropertyBool       Invisible         true
+        }
+        Module CavityDS
+        {
+            PropertyString     Volume            Tube
+            PropertyHep3Vector Dimensions        350. 640. 10. mm
+            PropertyHep3Vector Position          0.0 0.0 -255.0  mm
+            PropertyString     Material          Galactic
+            PropertyDouble     RedColour         0.2
+            PropertyDouble     GreenColour       0.2
+            PropertyDouble     BlueColour        0.0
+            PropertyBool       Invisible         true
+        }
+        // UPSTREAM ABSORBER
+        Module AbsorberUS
+        {
+            PropertyString     Volume            Cylinder
+            PropertyHep3Vector Dimensions        350. 10.20 mm
+            PropertyHep3Vector Position          0.0 0.0 -255.1  mm
+            PropertyString     Material          Galactic
+            PropertyDouble     RedColour         0.0
+            PropertyDouble     GreenColour       1.0
+            PropertyDouble     BlueColour        0.0
+            Module USWindow // next to vacuum
+            {
+                PropertyString Volume Cylinder
+                Dimensions 350. 25e-3 mm
+                Position   0.0 0.0 -5.0125 mm
+                PropertyString     Material          Be
+
+                PropertyDouble RedColour   0.0
+                PropertyDouble GreenColour 0.0
+                PropertyDouble BlueColour  1.0
+            }
+            Module LiH
+            {
+                Volume Cylinder
+                Dimensions 350. 10. mm
+                Position   0.0 0.0 0.0 mm
+                PropertyString Material   LITHIUM_HYDRIDE
+
+                PropertyDouble RedColour   0.0
+                PropertyDouble GreenColour 1.0
+                PropertyDouble BlueColour  0.0
+            }  
+            Module DSWindow // next to RF cavity
+            {
+                Volume Cylinder
+                Dimensions 350. 100e-3 mm
+                Position   0.0 0.0 5.05 mm
+                PropertyString     Material          Be
+
+                PropertyDouble RedColour   0.0
+                PropertyDouble GreenColour 0.0
+                PropertyDouble BlueColour  1.0
+            }
+        }
+        Module AbsorberDS
+        {
+            PropertyString     Volume            Cylinder
+            PropertyHep3Vector Dimensions        350. 10.20 mm
+            PropertyHep3Vector Position          0.0 0.0 255.1  mm
+            PropertyString     Material          Galactic
+            PropertyDouble     RedColour         0.0
+            PropertyDouble     GreenColour       1.0
+            PropertyDouble     BlueColour        0.0
+            Module USWindow // next to RF cavity
+            {
+                Volume Cylinder
+                Dimensions 350. 100e-3 mm
+                Position   0.0 0.0 -5.05 mm
+                PropertyString     Material          Be
+
+                PropertyDouble RedColour   0.0
+                PropertyDouble GreenColour 0.0
+                PropertyDouble BlueColour  1.0
+            }  
+            Module LiH
+            {
+                Volume Cylinder
+                Dimensions 350. 10. mm
+                Position   0.0 0.0 0.0 mm
+                PropertyString Material   LITHIUM_HYDRIDE
+
+                PropertyDouble RedColour   0.0
+                PropertyDouble GreenColour 1.0
+                PropertyDouble BlueColour  0.0
+            }  
+            Module DSWindow // next to Vacuum
+            {
+                PropertyString     Volume     Cylinder
+                PropertyHep3Vector Dimensions 350. 25e-3 mm
+                PropertyHep3Vector Position   0.0 0.0 +5.0125 mm
+                PropertyString     Material   Be
+
+                PropertyDouble RedColour      0.0
+                PropertyDouble GreenColour    0.0
+                PropertyDouble BlueColour     1.0
+            }
+        }
+
+    }
+
+    // DOWNSTREAM ABSORBER
+
+    // BEAMPIPES, APERTURES, ETC
+    Module BeamPipeUS
+    {
+        PropertyString     Volume            Cylinder
+        PropertyHep3Vector Dimensions        350. 360. 125. mm
+        PropertyHep3Vector Position          0.0 0.0 $cell_length*(@RepeatNumber)+125./2.  mm
+        PropertyString     Material          Galactic
+        PropertyBool       RepeatModule2     1
+        PropertyInt        NumberOfRepeats   $number_of_cells
+        PropertyDouble     RedColour         0.2
+        PropertyDouble     GreenColour       0.2
+        PropertyDouble     BlueColour        0.2
+        PropertyBool       Invisible         true
+    }
+    Module BeamPipeDS
+    {
+        PropertyString     Volume            Cylinder
+        PropertyHep3Vector Dimensions        350. 360. 125. mm
+        PropertyHep3Vector Position          0.0 0.0 $cell_length*(@RepeatNumber+1)-125./2.  mm
+        PropertyString     Material          Galactic
+        PropertyBool       RepeatModule2     1
+        PropertyInt        NumberOfRepeats   $number_of_cells
+        PropertyDouble     RedColour         0.2
+        PropertyDouble     GreenColour       0.2
+        PropertyDouble     BlueColour        0.2
+        PropertyBool       Invisible         true
+    }
+
+  //******************* RF CAVITIES *****************
+}
