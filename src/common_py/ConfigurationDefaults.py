@@ -218,6 +218,11 @@ SciFiCrossTalkSigma = 50.0
 SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
+SciFiKalmanMCS = 0 # flag to add MCS to the Kalman Fit
+SciFiKalmanEloss = 0 # flag to add Eloss to the Kalman Fit
+SciFiUpdateMisalignments = 0 # Do Misalignment Search & Update
+SciFiKalmanUseFieldMap = 0
+SciFiKalmanStepSize = 1. # mm
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/

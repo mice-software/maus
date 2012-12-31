@@ -20,21 +20,38 @@
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4RotationMatrix.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
-SciFiClusterRec::SciFiClusterRec() {}
+SciFiClusterRec::SciFiClusterRec():_size_exception(0.),
+                                   _min_npe(0.) {}
 
+// To be removed soon.
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe,
-                                 std::vector<const MiceModule*> modules)
-                                 :_size_exception(cluster_exception),
-                                  _min_npe(min_npe),
-                                  _modules(modules) {}
+                std::vector<const MiceModule*> modules):
+                                   _size_exception(0.),
+                                   _min_npe(0.),
+                                   _modules(modules) {}
 
 SciFiClusterRec::~SciFiClusterRec() {}
 
 bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
   return ( a->get_npe() > b->get_npe() );
+}
+
+void SciFiClusterRec::initialise() {
+  Json::Value *json = Globals::GetConfigurationCards();
+
+  std::string filename;
+  filename = (*json)["reconstruction_geometry_filename"].asString();
+  MiceModule* module;
+  module = new MiceModule(filename);
+
+  _size_exception = (*json)["SciFiClustExcept"].asInt();
+  _min_npe = (*json)["SciFiNPECut"].asDouble();
+  _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {
@@ -56,6 +73,7 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
   for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }
