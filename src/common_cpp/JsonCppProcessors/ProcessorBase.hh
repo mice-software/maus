@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_PROCESSORBASE_HH_
 
+#include <string>
+
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
@@ -50,7 +52,7 @@ class IProcessor {
      *  memory.
      */
     virtual Json::Value* CppToJson
-                              (const CppRepresentation& cpp_representation) = 0;
+            (const CppRepresentation& cpp_representation, std::string path) = 0;
 };
 
 /** @class ProcessorBase
@@ -59,19 +61,21 @@ class IProcessor {
  *  data. Json data is represented by Json::Value while cpp data is represented
  *  by CppRepresentation type.
  *
- *  This class is provided because at some point I want to provide some more
- *  sophisticated error handling.
- *
  */
 template <class CppRepresentation>
 class ProcessorBase : IProcessor<CppRepresentation> {
   public:
     virtual CppRepresentation* JsonToCpp
                                    (const Json::Value& json_representation) = 0;
-    virtual Json::Value* CppToJson
-                              (const CppRepresentation& cpp_representation) = 0;
 
-  protected:
+    /** Convert from C++ to Json passing additional path information
+     *
+     *  When converting from json to C++ it is necessary to pass path
+     *  information in order to set up json references. Overload this method in
+     *  order to handle path (=> references) in this and child instances.
+     */
+    virtual Json::Value* CppToJson
+            (const CppRepresentation& cpp_representation, std::string path) = 0;
 };
 }
 

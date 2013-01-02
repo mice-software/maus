@@ -48,7 +48,7 @@ class DoubletFiberParamTest : public ::testing::Test {
     note135_core_diameter = 0.308;  // mm
     note135_fiber_diameter = 0.350; // mm
     note135_fiber_pitch = 0.427;    // mm
-    calculated_fiber_half_length = 152.732; // mm
+    calculated_fiber_half_length = 152.7126; // mm
     expected_delta_phi = 6.28319;
     calculated_X = 47.7375;
     calculated_Y = 0;

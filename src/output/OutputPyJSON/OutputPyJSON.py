@@ -96,7 +96,8 @@ class OutputPyJSON:
         Closes the file that the class has open 
         """
         try:
-            self.file.close() # can this make an exception? Catch anyway...
+            if self.file != None:
+                self.file.close() # can this make an exception? Catch anyway...
             return True
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)

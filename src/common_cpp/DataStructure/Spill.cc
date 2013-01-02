@@ -22,12 +22,14 @@ namespace MAUS {
 
 Spill::Spill()
         : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
-          _spill_number(0), _run_number(0), _daq_event_type(), _errors() {
+          _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
+          _test(NULL) {
 }
 
 Spill::Spill(const Spill& md)
         : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
-          _spill_number(0), _run_number(0), _daq_event_type(), _errors() {
+          _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
+          _test(NULL) {
   *this = md;
 }
 
@@ -90,6 +92,11 @@ Spill& Spill::operator=(const Spill& md) {
     _spill_number = md._spill_number;
     _run_number = md._run_number;
     _errors = md._errors;
+    if (md._test == NULL) {
+        _test = NULL;
+    } else {
+        _test = new TestBranch(*md._test);
+    }
     return *this;
 }
 
@@ -114,6 +121,9 @@ Spill::~Spill() {
             delete (*_recon)[i];
         }
         delete _recon;
+    }
+    if (_test != NULL) {
+        delete _test;
     }
 }
 
@@ -188,6 +198,16 @@ void Spill::SetErrors(ErrorsMap errors) {
 
 ErrorsMap Spill::GetErrors() const {
   return _errors;
+}
+
+TestBranch* Spill::GetTestBranch() const {
+  return _test;
+}
+
+void Spill::SetTestBranch(TestBranch* test) {
+  if (_test != NULL)
+    delete _test;
+  _test = test;
 }
 }
 

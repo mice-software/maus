@@ -19,28 +19,52 @@ get_beamline_info.py
 
 from geometry.ConfigReader import Configreader
 import cdb
+from datetime import datetime 
 
 def main():
     """
     This is the executbale which gets information relating to beamline stored
     on the configuration Database. It will print either to screen or to file
-    the details of the beamline or whether it is on the database or not. It takes 
-    arguments in the form of which method you wish to call the cdb. It currently only 
-    has a query of run number and a time frame. These
+    the details of the beamline or whether it is on the database or not. 
+    It takes arguments in the form of which method you wish to call the cdb. 
+    It currently only has a query of run number and a time frame. These
     arguments can be specified in the ConfigurationDefaults file.
     """
     configuration = Configreader()
     server = cdb.Beamline()
     print "Server status is " + server.get_status()
-    if configuration.get_beamline_by == 'run_number':
+    if configuration.get_beamline_by == 'all_entries':    
+        start_time = "2009-01-01 09:00:00"
+        stop_time = datetime.today()
+        id_dict = server.get_beamlines_for_dates(start_time, stop_time)
+        keys = id_dict.viewkeys()
+        ids_list = []
+        ids_list = list(keys)
+        length = len(ids_list)
+        print 'The CDB has information on the following runs;'
+        for i in range(0, length):
+            print ids_list[i]
+        print 'If the run you are looking for is not here ' + \
+                  'then it is most likely not on the CDB.\n Reasons for '+\
+                  'this are;\n Run was not uploaded from the control room;\n '+\
+                  'The CDB was still under construction or in testing '+\
+                  'at the time.'
+
+    elif configuration.get_beamline_by == 'run_number':
         run = configuration.get_beamline_run_number
         id_dict = server.get_beamline_for_run(run)
         if str(id_dict.keys()) == '[]':
             print '!WARNING! No beamline information on the CDB for ' \
                                  + str(configuration.get_beamline_run_number)
+            print 'If the run you are looking for is not here ' + \
+                  'then it is most likely not on the CDB.\n Reasons for '+\
+                  'this are;\n Run was not uploaded from the control room;\n '+\
+                  'The CDB was still under construction or in testing '+\
+                  'at the time.'
         else:
             print 'There is information for run number ' \
                 + str(configuration.get_beamline_run_number) + ' on the CDB'
+
     elif configuration.get_beamline_by == 'dates':
         if configuration.get_beamline_start_time == "":
             raise IOError('Start time not entered!' + \
@@ -59,7 +83,15 @@ def main():
         for i in range(0, length):
             print ids_list[i]
         print 'If the run you are looking for is not here ' + \
-                          'the it is most likely not on the CDB'
+                  'then it is most likely not on the CDB.\n Reasons for '+\
+                  'this are;\n Run was not uploaded from the control room;\n '+\
+                  'The CDB was still under construction or in testing '+\
+                  'at the time.'
+
+    else:
+        raise KeyError("Didn't recognise 'get_beamline_by' option '"+\
+               configuration.geometry_download_by+"'. Should be on of\n"+\
+               "all_entries\nrun_number\ndates\n")
 
 if __name__ == "__main__":
     main()

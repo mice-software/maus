@@ -96,17 +96,26 @@ class Squeak {
   /// true, redirects it to std::cout
   static void activateCout(bool isActive);
 
+  /// Return false if std::cout points to voidout; else true
+  static bool coutIsActive();
+
   /// Activate std::cerr
 
-  /// If isActive is false, redirects std::clog to /dev/null; if isActive is
-  /// true, redirects it to std::clog
+  /// If isActive is false, redirects std::cerr to /dev/null; if isActive is
+  /// true, redirects it to std::cerr
   static void activateCerr(bool isActive);
+
+  /// Return false if std::cerr points to voidout; else true
+  static bool cerrIsActive();
 
   /// Activate std::clog
 
   /// If isActive is false, redirects std::clog to /dev/null; if isActive is
   /// true, redirects it to std::clog
   static void activateClog(bool isActive);
+
+  /// Return false if std::clog points to voidout; else true
+  static bool clogIsActive();
 
   /// Return ostream pointing to /dev/null (irrespective of verbose level)
   static std::ostream& nullOut();

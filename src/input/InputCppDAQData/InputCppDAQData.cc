@@ -206,6 +206,7 @@ std::string InputCppDAQData::getCurEvent() {
   unsigned int event_type = _dataProcessManager.GetEventType();
   xDocRoot["daq_event_type"] = event_type_to_str(event_type);
   xDocRoot["run_number"] = _dataProcessManager.GetRunNumber();
+  xDocRoot["maus_event_type"] = Json::Value("Spill");
   // cout << xDocRoot << endl;
 
   _eventsCount++;

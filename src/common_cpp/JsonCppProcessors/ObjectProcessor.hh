@@ -24,18 +24,9 @@
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/BaseItem.hh"
 
 namespace MAUS {
-
-template <class ObjectType>
-class BaseItem; // defined in ObjectProcessor-inl
-
-template <class ObjectType, class ChildType>
-class PointerItem; // defined in ObjectProcessor-inl
-
-template <class ObjectType, class ChildType>
-class ValueItem; // defined in ObjectProcessor-inl
-
 /** @class ObjectProcessor processes json object types into C++ classes
  *
  *  The object processor converts from a C++ class to a json value and vice
@@ -48,8 +39,13 @@ class ValueItem; // defined in ObjectProcessor-inl
  *  This works by storing the registered branches in a std::vector of BaseItems.
  *  The BaseItem defines an interface for allocating and accessing member data
  *  for the branch based on the registered processor, accessor and mutator.
- *  BaseItem has been overloaded with two specific ways to register a branch,
- *  as a pointer data type and as a value data type.
+ *  BaseItem has been overloaded with four specific ways to register a branch,
+ *  \li RegisterPointerBranch for pointer data type where the ObjectType object
+ *      owns the memory
+ *  \li RegisterPointerReference for pointer data type where another C++ object
+ *      in the tree owns the memory (borrowed reference)
+ *  \li RegisterValueBranch for value data
+ *  \li RegisterConstantBranch for static const data
  *
  *  @tparam ObjectType C++ type that will be converted
  */
@@ -84,14 +80,16 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *
      *  If a branch is required but has NULL value, throw a Squeal.
      *
-     *  @param C++ object to be converted to json
+     *  @param cpp_instance C++ object to be converted to json
+     *  @param path Path to the newly created json object
      *
      *  @returns json representation of the object. Caller is responsible for
      *  memory
      */
-    Json::Value* CppToJson(const ObjectType& cpp_instance);
+    Json::Value* CppToJson(const ObjectType& cpp_instance, std::string path);
 
-    /** Register a branch for processing
+    /** Register a branch for processing, where the data is stored in a pointer
+     *  and the ParentType owns the memory pointed to. 
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
@@ -100,9 +98,9 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param child_processor processor that will be used to convert the
      *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
-     *  where memory is still owned by the ObjectProcessor
+     *  where memory is still owned by the ParentType
      *  @param SetMethod callback that will set a pointer to the child data,
-     *  where memory is given to the ObjectProcessor
+     *  where memory ownership is given to the ParentType
      *  @param is_required if the branch doesnt exist in json or is NULL in C++,
      *  throw Squeal if is_required is set to true
      *
@@ -115,7 +113,41 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);
 
-    /** Register a branch for processing
+    /** Register a branch reference for processing, where the data is stored in
+     *  a pointer and another class in the tree owns the memory pointed to. 
+     *
+     *  For a PointerReference we only convert the address and assume that the
+     *  value is passed elsewhere in the tree as a PointerBranch.
+     *  
+     *  Pointers are resolved after all other processing is complete. Memory is
+     *  assumed to be owned by the ParentType of the RegisterPointerBranch, NOT
+     *  the ParentType of this RegisterPointerReference.
+     *
+     *  @tparam ChildType of the child object referenced by the branch. Should
+     *  use the actual type even if the target is a pointer (i.e. 
+     *  MyProcessor<Child>, NOT MyProcess<Child*>
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param child_processor processor that will be used to convert the
+     *  representation of the child types
+     *  @param GetMethod callback that will return a pointer to the child data,
+     *  where memory is still owned by the ParentType
+     *  @param SetMethod callback that will set a pointer to the child data,
+     *  where memory is owned by the PointerBranch parent
+     *  @param is_required if the branch doesnt exist in json, is None in json,
+     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  the branch to NULL/None as appropriate
+     *item
+     *  Note: don't forget Get method has to be const
+     */
+    template <class ChildType>
+    void RegisterPointerReference(std::string branch_name,
+                    ProcessorBase<ChildType>* child_processor,
+                    ChildType* (ObjectType::*GetMethod)() const,
+                    void (ObjectType::*SetMethod)(ChildType* value),
+                    bool is_required);
+
+    /** Register a branch for processing where the data is stored by value.
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
@@ -138,6 +170,20 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     ChildType (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
+
+    /** Register a branch for processing, where json value is always the same
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param child_value the branch will always be filled with this value
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     *
+     *  This method will never fill anything in the parent C++ class
+     */
+    void RegisterConstantBranch(std::string branch_name,
+                    Json::Value child_value,
+                    bool is_required);
+
 
     /** Return true if json value properties not the same as branches
      *
@@ -171,11 +217,18 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      */
     bool _throws_if_unknown_branches;
 
+    /** Set the path of the json object
+     *
+     *  Use the branch name to set the path of the json object
+     */
+    void SetPath();
+
   private:
-    typedef typename std::map< std::string, BaseItem<ObjectType>* >::iterator my_iter;
-    std::map< std::string, BaseItem<ObjectType>* > _items;
+    typedef typename std::map< std::string,
+                   ObjectProcessorNS::BaseItem<ObjectType>* >::iterator my_iter;
+    std::map< std::string, ObjectProcessorNS::BaseItem<ObjectType>* > _items;
 };
-}
+} // namespace MAUS
 
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor-inl.hh"
 

@@ -151,3 +151,23 @@ TEST(IRStreamTest, TestReadEvent ) {
   /////////////////////////////////
   delete a;
 }
+
+TEST(IRStreamTest, TestSetCurrentEvent ) {
+  TFile f("TestFile.root", "RECREATE");
+  TTree t("TestTree", "treetitle");
+  Int_t* a = new Int_t(0);
+  t.Branch("testA", a, "testA/I");
+  t.Fill();
+  *a = 1;
+  t.Fill();
+  *a = 4;
+  t.Write();
+  f.Close();
+
+  irstream is("TestFile.root", "TestTree");
+  is.set_current_event(2);
+  is >> branchName("testA") >> a;
+  EXPECT_EQ(*a, 4);
+  delete a;
+}
+

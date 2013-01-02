@@ -31,6 +31,7 @@
 #include "gsl/gsl_vector_complex_double.h"
 
 #include "Maths/Complex.hh"
+#include "Interface/Squeal.hh"
 
 namespace MAUS {
 
@@ -453,6 +454,44 @@ VectorBase<complex, gsl_vector_complex>::operator/=(
 }
 
 template<>
+VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator+=(
+    const double& rhs) {
+  if (vector_ != NULL) {
+    gsl_vector_add_constant(vector_, rhs);
+  }
+  return *this;
+}
+
+template<>
+VectorBase<complex, gsl_vector_complex>&
+VectorBase<complex, gsl_vector_complex>::operator+=(
+    const complex& rhs) {
+  if (vector_ != NULL) {
+    gsl_vector_complex_add_constant(vector_, rhs);
+  }
+  return *this;
+}
+
+template<>
+VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator-=(
+    const double& rhs) {
+  if (vector_ != NULL) {
+    gsl_vector_add_constant(vector_, -rhs);
+  }
+  return *this;
+}
+
+template<>
+VectorBase<complex, gsl_vector_complex>&
+VectorBase<complex, gsl_vector_complex>::operator-=(
+    const complex& rhs) {
+  if (vector_ != NULL) {
+    gsl_vector_complex_add_constant(vector_, -rhs);
+  }
+  return *this;
+}
+
+template<>
 VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator*=(
     const double& rhs) {
   if (vector_ != NULL) {
@@ -478,6 +517,7 @@ VectorBase<double, gsl_vector>::operator/=(const double& rhs) {
   }
   return *this;
 }
+
 template<> VectorBase<complex, gsl_vector_complex>&
 VectorBase<complex, gsl_vector_complex>::operator/=(const complex& rhs) {
   if (vector_ != NULL) {
@@ -539,6 +579,32 @@ VectorBase<double, gsl_vector>::operator/(
 template const VectorBase<complex, gsl_vector_complex>
 VectorBase<complex, gsl_vector_complex>::operator/(
     const VectorBase<complex, gsl_vector_complex>&  rhs) const;
+
+template <typename StdType, typename GslType>
+const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator+(
+    const StdType& rhs) const {
+  return VectorBase<StdType, GslType>(*this) += rhs;
+}
+template
+const VectorBase<double, gsl_vector> VectorBase<double, gsl_vector>::operator+(
+    const double& rhs) const;
+template
+const VectorBase<complex, gsl_vector_complex>
+VectorBase<complex, gsl_vector_complex>::operator+(
+    const complex& rhs) const;
+
+template <typename StdType, typename GslType>
+const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator-(
+    const StdType& rhs) const {
+  return VectorBase<StdType, GslType>(*this) -= rhs;
+}
+template
+const VectorBase<double, gsl_vector> VectorBase<double, gsl_vector>::operator-(
+    const double& rhs) const;
+template
+const VectorBase<complex, gsl_vector_complex>
+VectorBase<complex, gsl_vector_complex>::operator-(
+    const complex& rhs) const;
 
 template <typename StdType, typename GslType>
 const VectorBase<StdType, GslType> VectorBase<StdType, GslType>::operator*(
@@ -675,6 +741,13 @@ template void VectorBase<double, gsl_vector>::build_vector(
 template void VectorBase<complex, gsl_vector_complex>::build_vector(
     const size_t size, const complex* data);
 
+template <typename StdType, typename GslType>
+GslType * VectorBase<StdType, GslType>::vector() {
+  return vector_;
+}
+template gsl_vector * VectorBase<double, gsl_vector>::vector();
+template gsl_vector_complex * VectorBase<complex, gsl_vector_complex>::vector();
+
 // ############################
 //  Vector (public)
 // ############################
@@ -697,6 +770,14 @@ const Vector<double> Vector<double>::operator*(const Vector<double>& rhs)
 const Vector<double> Vector<double>::operator/(const Vector<double>& rhs)
     const {
   return VectorBase<double, gsl_vector>::operator/(rhs);
+}
+
+const Vector<double> Vector<double>::operator+(const double& rhs) const {
+  return VectorBase<double, gsl_vector>::operator+(rhs);
+}
+
+const Vector<double> Vector<double>::operator-(const double& rhs) const {
+  return VectorBase<double, gsl_vector>::operator-(rhs);
 }
 
 const Vector<double> Vector<double>::operator*(const double& rhs) const {
@@ -725,6 +806,14 @@ const Vector<complex> Vector<complex>::operator*(const Vector<complex>& rhs)
 const Vector<complex> Vector<complex>::operator/(const Vector<complex>& rhs)
     const {
   return VectorBase<complex, gsl_vector_complex>::operator/(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator+(const complex& rhs) const {
+  return VectorBase<complex, gsl_vector_complex>::operator+(rhs);
+}
+
+const Vector<complex> Vector<complex>::operator-(const complex& rhs) const {
+  return VectorBase<complex, gsl_vector_complex>::operator-(rhs);
 }
 
 const Vector<complex> Vector<complex>::operator*(const complex& rhs) const {

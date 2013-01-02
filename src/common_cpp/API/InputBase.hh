@@ -59,10 +59,18 @@ namespace MAUS {
     /*!\brief Generate data
      *
      * Implementation of the interface. Wraps the _emitter function
-     * providing additional control/checking.
+     * providing additional control/checking. Intended to be further wrapped
+     * by SWIG to generate a python emitter using yield statement.
+     *
      * \return The data generated
      */
-    T* emitter();
+    T emitter_cpp();
+
+    /** Python emitter - should be overloaded by SWIG script
+     */
+    T emitter() {
+      throw(std::exception());
+    }
 
   private:
     /*!\brief Generate data
@@ -71,7 +79,7 @@ namespace MAUS {
      * derived inputter author to correctly generate the input data.
      * \return The data generated
      */
-    virtual T* _emitter() = 0;
+    virtual T _emitter_cpp() = 0;
   };
 
 }// end of namespace

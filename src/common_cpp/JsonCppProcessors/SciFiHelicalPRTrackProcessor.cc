@@ -19,8 +19,8 @@
 namespace MAUS {
 
 SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
-                         : _sf_spoint_array_proc(new SciFiSpacePointProcessor),
-                           _double_array_proc(new DoubleProcessor) {
+                         : _double_array_proc(new DoubleProcessor),
+                           _sf_spoint_array_proc(new SciFiSpacePointProcessor) {
 
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiHelicalPRTrack::get_tracker,

@@ -31,12 +31,10 @@ TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
                         "test_utilities", "test_geometry")
 CONFIG_PATH_FILE = os.path.join(TEST_DIR, "test_get_ids_config.txt")
 CONFIG_PATH_NO_FILE = os.path.join(TEST_DIR, "test_get_ids_config_nofile.txt")
-INTERNET_CONNECTION = True
 
 def run_get_geometries():
     """
-    Run get_ids to generate some data. We only want to do this once, so I
-    pull it out into a separate part of the test.
+    Run get_geometry_ids to generate some data. 
     """
     file_name = os.environ['MAUS_ROOT_DIR']+'/tmp/get_geometry_ids_output'
     test_out = open(file_name, 'w')
@@ -51,10 +49,12 @@ def run_get_geometries():
 
 class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
     """
-    This class has two tests. One checks that particles are accumulated into one
-    vrml output file when the tag is selected in configuration defaults. The 
-    second checks that the DrawByParticleID model has been registered so 
-    particles will have specified colours in the vrml.
+    This test calls the get_geometry_ids specifying the executable to
+    both print to screen and create a file of geometry ids. It captures
+    the screen print to file and checks the correct information can
+    be found within it. It also checks the created file for the same
+    information. It will not carry out the test if there is no 
+    internet connection as it needs to call the cdb
     """
     def setUp(self): # pylint: disable=C0103, C0202
         """

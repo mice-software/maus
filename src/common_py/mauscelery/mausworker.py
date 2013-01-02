@@ -39,7 +39,6 @@ sending to the sub-processes.
 
 import json
 import logging
-
 from types import UnicodeType
 
 from celery.worker.control import Panel
@@ -104,17 +103,21 @@ def sub_process_broadcast(panel, func, arguments, errors):
     pids_arguments = (pids_done,) + arguments
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
+    data = []
     while pids ^ pids_done: 
         result = pool.apply_async(func, pids_arguments)
         status = result.get()
         pids_done.add(status[0])
         status_detail = status[1]
+        if status[2] != '':
+            data.append(status[2])
         # Avoid duplicated information.
         if (status_detail != None) and (status_detail not in errors):
             errors.append(status_detail)
+    return data
 
 @Panel.register
-def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=W0613, C0301
+def birth(panel, config_id, transform, run_number, configuration = "{}"): # pylint: disable=W0613, C0301
     """
     Create and birth a new transform in each sub-process. This is
     invoked by "broadcast" calls from clients and, in turn, invokes
@@ -137,6 +140,7 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
     doc = {}
     # List of any errors from sub-processes.
     errors = []
+    run_header = ""
     try:
         # If configuration is unicode convert to a normal 
         # string to avoid problems e.g. with SWIG/C++ calls.
@@ -153,8 +157,8 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
             raise ValueError("maus_version: expected %s, got %s" % 
                 (MausConfiguration.version, config_doc["maus_version"]))
         # Invoke process_birth on all sub-processes
-        sub_process_broadcast(panel, process_birth, 
-            (config_id, transform, config,), errors)
+        run_header = sub_process_broadcast(panel, process_birth, 
+            (config_id, transform, config, run_number), errors)
     except Exception as exc: # pylint:disable = W0703
         status = {}
         status["error"] = str(exc.__class__)
@@ -169,12 +173,13 @@ def birth(panel, config_id, transform, configuration = "{}"): # pylint: disable=
         MausConfiguration.config_id = config_id
         MausConfiguration.configuration = config
         MausConfiguration.transform = transform
+    doc["run_headers"] = run_header
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
     return doc
 
 @Panel.register
-def death(panel):
+def death(panel, run_number):
     """
     Execute death on the current transform in each sub-process. This
     is invoked by broadcast calls from clients  and, in turn, invokes
@@ -190,11 +195,13 @@ def death(panel):
     doc = {}
     # List of any errors from sub-processes.
     errors = []
+    run_footer = ""
     # Submit asynchronous jobs to the sub-processes until they've all
     # processed the message.
     try:
         # Invoke process_death on all sub-processes
-        sub_process_broadcast(panel, process_death, (), errors)
+        run_footer = sub_process_broadcast(panel, process_death, (run_number,),
+                                           errors)
     except Exception as exc: # pylint:disable = W0703
         status = {}
         status["error"] = str(exc.__class__)
@@ -205,6 +212,7 @@ def death(panel):
         doc["error"] = errors
     else:
         doc["status"] = "ok"
+    doc["run_footers"] = run_footer
     if logger.isEnabledFor(logging.INFO):
         logger.info("Status: %s" % doc)
     return doc

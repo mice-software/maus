@@ -61,6 +61,7 @@ Json::Value CppErrorHandler::ExceptionToPython
   // * Convert string to json value
   if (!getInstance()->GetPyErrorHandler()) {
     // Importing ErrorHandler calls libMausCpp which calls SetPyErrorHandler
+    std::cerr << "Not GetInstance" << std::endl;
     PyImport_ImportModule("ErrorHandler");
     PyErr_Clear();
     if (CppErrorHandler::getInstance()->GetPyErrorHandler() == 0) {
@@ -77,10 +78,10 @@ Json::Value CppErrorHandler::ExceptionToPython
                 (getInstance()->GetPyErrorHandler(), &sss[0],
                  json_in_cpp.c_str(), class_name.c_str(), what.c_str());
   const char* json_str;
-  if (!json_out_py) {  // error on python side
-    Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
-    PyErr_Print();
-    return Json::Value();
+  if (!json_out_py) {  // python ErrorHandler was set to raise the error
+    // Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
+    // PyErr_Print();
+    throw std::exception();
   }
   int ok = PyArg_Parse(json_out_py, "s", &json_str);  // convert to string
   if (!ok) {  // we didn't get a string back

@@ -129,9 +129,9 @@ class TestAsyncResult: # pylint: disable=R0903
         self.func = func
         self.arguments = arguments
         if (function_success):
-            self.result = (pid, None)
+            self.result = (pid, None, None)
         else:
-            self.result = (pid, {"error":"ERROR", "message":"MESSAGE"})
+            self.result = (pid, {"error":"ERROR", "message":"MESSAGE"}, None)
 
     def get(self):
         """ 
@@ -214,6 +214,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param status Expected status.
         """
         self.assertTrue(report.has_key("status"), "Missing status entry")
+        print report
         self.assertEquals(status, report["status"], 
             "Unexpected status value")
         if (status == "error"): 
@@ -253,7 +254,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         transform = "MapPyPrint"
         configuration = """{"TOFconversionFactor":%s, "maus_version":"%s"}""" \
             % (config_id, self.__version)
-        result = birth(self.__panel, config_id, transform, configuration)
+        result = birth(self.__panel, config_id, transform, 1, configuration)
         # Check the status and that the configuration has been 
         # updated.  
         self.validate_status(result)
@@ -262,7 +263,8 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEquals(process_birth, 
             self.__panel.consumer.pool.result.func,
             "An unexpected function was passed to be invoked")
-        (check_set, check_config_id, check_transform, check_config) = \
+        (check_set, check_config_id, 
+         check_transform, check_config, check_run_number) = \
             self.__panel.consumer.pool.result.arguments
         self.assertTrue(isinstance(check_set, set),
              "Expected a set to be passed")
@@ -272,9 +274,10 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             "Unexpected transform was passed to be invoked")
         self.assertEquals(check_config, configuration,
             "Unexpected configuration was passed to be invoked")
+        self.assertEquals(check_run_number, 1)
         # Check that another birth with the same ID is a no-op. Use
         # different transform name and configuration to be sure.
-        result = birth(self.__panel, config_id, transform, configuration)
+        result = birth(self.__panel, config_id, transform, 1, configuration)
         # Check the status and configuration.
         self.validate_status(result, "ok")
         self.validate_configuration(configuration, transform, config_id)
@@ -286,7 +289,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         config_id = datetime.now().microsecond
         configuration = """{"TOFconversionFactor":BADJSON"""
-        result = birth(self.__panel, config_id, "MapPyPrint", configuration)
+        result = birth(self.__panel, config_id, "MapPyPrint", 1, configuration)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 
@@ -297,7 +300,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         config_id = datetime.now().microsecond
         configuration = """{"maus_version":"BAD"}"""
-        result = birth(self.__panel, config_id, "MapPyPrint", configuration)
+        result = birth(self.__panel, config_id, "MapPyPrint", 1, configuration)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 
@@ -310,7 +313,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.__panel.consumer.pool.set_function_success(False)
         config_id = datetime.now().microsecond
         configuration = """{"maus_version":"%s"}""" % self.__version
-        result = birth(self.__panel, config_id, "MapPyPrint", configuration)
+        result = birth(self.__panel, config_id, "MapPyPrint", 1, configuration)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 
@@ -323,7 +326,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.__panel.consumer.pool.set_async_success(False)
         config_id = datetime.now().microsecond
         configuration = """{"maus_version":"%s"}""" % self.__version
-        result = birth(self.__panel, config_id, "MapPyPrint", configuration)
+        result = birth(self.__panel, config_id, "MapPyPrint", 1, configuration)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 
@@ -332,16 +335,17 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test death.
         @param self Object reference.
         """
-        result = death(self.__panel)
+        result = death(self.__panel, 1)
         # Check the status.
         self.validate_status(result)
         # Check expected function and arguments were passed:
         self.assertEquals(process_death, 
             self.__panel.consumer.pool.result.func,
             "An unexpected function was passed to be invoked")
-        (check_set,) = self.__panel.consumer.pool.result.arguments
+        (check_set, check_run_num) = self.__panel.consumer.pool.result.arguments
         self.assertTrue(isinstance(check_set, set),
              "Expected a set to be passed")
+        self.assertEqual(check_run_num, 1)
 
     def test_death_function_exception(self):
         """
@@ -350,7 +354,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         # Configure so that death throws an exception.
         self.__panel.consumer.pool.set_function_success(False)
-        result = death(self.__panel)
+        result = death(self.__panel, 1)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 
@@ -361,7 +365,7 @@ class MausBroadcastTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         # Configure so that the pool throws an exception.
         self.__panel.consumer.pool.set_async_success(False)
-        result = death(self.__panel)
+        result = death(self.__panel, 1)
         # Check the status specifies an error.
         self.validate_status(result, "error")
 

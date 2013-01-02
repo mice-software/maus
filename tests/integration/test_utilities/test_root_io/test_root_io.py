@@ -40,8 +40,8 @@ def run_analyze_offline(root_file_name):
     except OSError:
         pass
     subproc = subprocess.Popen([ANALYSIS,
-                                "-output_root_file_name", root_file_name,
-                                "-TOF_findTriggerPixelCut", "2.0"])
+                                "--output_root_file_name", root_file_name,
+                                "--TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 
 def run_mc_simulation(root_file_name):
@@ -55,8 +55,8 @@ def run_mc_simulation(root_file_name):
     config_file_name = os.path.join(MRD,
            "tests/integration/test_utilities/test_root_io/root_io_mc_config.py")
     subproc = subprocess.Popen([SIMULATION,
-                                "-configuration_file", config_file_name,
-                                "-output_root_file_name", root_file_name,
+                                "--configuration_file", config_file_name,
+                                "--output_root_file_name", root_file_name,
                                 ])
     subproc.wait()
 
@@ -69,9 +69,10 @@ def run_json_to_root(json_file_name, root_file_name):
     except OSError:
         pass
     subproc = subprocess.Popen([JSON_TO_ROOT,
-                                "-input_json_file_name", json_file_name,
-                                "-output_root_file_name", root_file_name,
-                                "-verbose_level", "01"])
+                                "--input_json_file_name", json_file_name,
+                                "--output_root_file_name", root_file_name,
+                                "--verbose_level", "1",
+                                "--header_and_footer_mode", "dont_append",])
 
     subproc.wait()
 
@@ -84,9 +85,10 @@ def run_root_to_json(root_file_name, json_file_name):
     except OSError:
         pass
     subproc = subprocess.Popen([ROOT_TO_JSON,
-                                "-input_root_file_name", root_file_name,
-                                "-output_json_file_name", json_file_name,
-                                "-verbose_level", "1"])
+                                "--input_root_file_name", root_file_name,
+                                "--output_json_file_name", json_file_name,
+                                "--verbose_level", "1",
+                                "--header_and_footer_mode", "dont_append",])
     subproc.wait()
 
 class RootIOTest(unittest.TestCase): #pylint: disable=R0904

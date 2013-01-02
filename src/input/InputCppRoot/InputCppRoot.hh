@@ -19,17 +19,18 @@
 #define _MAUS_SRC_INPUT_INPUTCPPROOT_INPUTCPPROOT_HH__
 
 #include <string>
+#include <map>
+
+#include "Rtypes.h"  // ROOT
 
 #include "json/json.h"
 
 #include "src/legacy/Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/API/InputBase.hh"
 
 class irstream;
 
 namespace MAUS {
-
-class CppJsonConverter;
 
 /** @class InputCppRoot
  *
@@ -38,7 +39,7 @@ class CppJsonConverter;
  *  JsonCppStreamer to read ROOT files and JsonCppConverter to convert from
  *  ROOT to json.
  */
-class InputCppRoot {
+class InputCppRoot : public InputBase<std::string> {
   public:
     /** Constructor for InputCppRoot, initialises all members to NULL
      *
@@ -46,38 +47,105 @@ class InputCppRoot {
      *         pulling a filename from the datacards at birth
      */
     explicit InputCppRoot(std::string filename = "");
+
     /** Destructor for InputCppRoot - calls death()
      */
     ~InputCppRoot();
 
+    void birth(const std::string& json_datacards) {
+        InputBase<std::string>::birth(json_datacards);
+    }
+
+    void death() {
+        InputBase<std::string>::death();
+    }
+
+
+  private:
     /** Initialise the inputter
      *
      *  @param json_datacards json formatted string containing the json datacards
      *  - takes root file from "root_input_filename" parameter
      */
-    bool birth(std::string json_datacards);
+    void _birth(const std::string& json_datacards);
 
     /** Deletes inputter member data
      */
-    bool death();
+    void _death();
 
     /** Gets the next event from the root file. If there are no more events,
      *  returns an empty string ("")
+     *
+     *  This will cycle through different event types as follows:
+     *  First attempts to find all JobHeaders, then RunHeaders until run_number
+     *  changes, then spill until the run_number changes; then RunFooter until
+     *  run_number changes. Then starts back on RunHeader.
+     *
+     *  If there are no events of a particular type left, then that event type
+     *  is skipped and we move on to the next event type until all events have
+     *  been fired and we have no more data.
+     *
+     *  Bug: I don't check for consistent run numbers between data types, just
+     *  look for run number changing, so can get weirdness if there is a run
+     *  with no spill data
      */
-    std::string getNextEvent();
+    std::string _emitter_cpp();
 
-    /** The emitter - should be overloaded by SWIG script
-     */
+    /** Should be overloaded in SWIG call */
     std::string emitter() {
-      return "";
+        throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));
     }
 
-  private:
+    /** Gets an event from the root file.
+     *
+     *  If there are no more events of the given type, or the event could not be
+     *  resolved (data inconsistencies?) return ""
+     *
+     *  Note that if we are accessing a different branch from last time, we have
+     *  to reopen _infile with the new branch name (that's how irstream works). 
+     */
+    template <class ConverterT, class DataT>
+    std::string load_event(std::string branch_name);
+
+    /** Move to the next event type and return the event */
+    std::string advance_event_type();
+
+    /** Push an event to the cache.
+     *
+     *  If an event of this type is already cached, throw a Squeal
+     */
+    void cache_event(event_type type, std::string event);
+
+    /** Pop an event from the cache of the required type.
+     *
+     *  Returns "" if no event is cached
+     */
+    std::string uncache_event(event_type type);
+
+    /** Return true if there is an item of type in the cache
+     */
+    bool is_cached(event_type type);
+
+    /** Return true if we want to use this event; otherwise can cache
+     *
+     *  If the event number for this event has changed, and this is not a
+     *  run_footer, or the event is an empty string (no more events of this 
+     *  type), then we don't want to use this event so return false. If the
+     *  event is otherwise good, cache it.
+     */
+    bool use_event(std::string event);
+
+    /** _irstream holds root TFile.
+     */
     irstream* _infile;
-    CppJsonConverter* _cppJsonConverter;
-    Data* _data;
+    std::string _infile_tree;
     std::string _filename;
     std::string _classname;
+
+    event_type _event_type;
+    std::map<event_type, std::string> _cache;
+    std::map<event_type, int> _current_run_number;
+    std::map<std::string, Long64_t> _current_event_number;
 };
 }
 

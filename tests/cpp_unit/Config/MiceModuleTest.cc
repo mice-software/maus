@@ -53,6 +53,7 @@ std::string MiceModuleTest::test_module_name = "";
 
 TEST_F(MiceModuleTest, ReadModuleTest) {//name test...
   EXPECT_EQ(moduleTest->fullName(), test_module_name);
+  EXPECT_THROW(MiceModule(""), Squeal);
 }
 
 TEST_F(MiceModuleTest, GetBoolTest) {//bool test
