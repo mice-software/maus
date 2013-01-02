@@ -432,11 +432,11 @@ void MapCppTrackerReconTest::pattern_recognition(const bool helical_pr_on,
 }
 
 void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
-  KalmanTrackFit fit;
-  if ( evt.helicalprtracks().size() )
-    fit.process(evt.helicalprtracks());
-  if ( evt.straightprtracks().size() )
-    fit.process(evt.straightprtracks());
+  // KalmanTrackFit fit;
+  // if ( evt.helicalprtracks().size() )
+  //  fit.process(evt.helicalprtracks());
+  // if ( evt.straightprtracks().size() )
+  //  fit.process(evt.straightprtracks());
 }
 
 void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {

@@ -46,9 +46,9 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
 
     // std::cerr << "Number of sites: " << sites.size() << "\n";
     KalmanTrack *track = 0;
-    if ( seed.is_straight() ) {
+    if ( seed->is_straight() ) {
       track = new StraightTrack();
-    } else if ( seed.is_helical() ) {
+    } else if ( seed->is_helical() ) {
       track = new HelicalTrack();
     }
     // muon assumption for now.
@@ -206,14 +206,11 @@ void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack*> helical_tracks) {
 }
 */
 
-//void KalmanTrackFit::initialise(SciFiHelicalPRTrack* seed, std::vector<KalmanSite> &sites,
-//                                double &momentum) {
-void KalmanTrackFit::initialise(KalmanSeed &seed,
-                                std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::initialise(KalmanSeed *seed,
+                                std::vector<KalmanSite> &sites,
+                                KalmanSciFiAlignment &kalman_align) {
   TMatrixD a0(5, 1);
-  a0 = seed.get_initial_state_vector();
-
-
+  a0 = seed->get_initial_state_vector();
 
   TMatrixD C(5, 5);
   C.Zero();
@@ -224,73 +221,7 @@ void KalmanTrackFit::initialise(KalmanSeed &seed,
   C(3, 3) = _seed_cov; // dummy values
   C(4, 4) = _seed_cov; // dummy values
 
-  KalmanSite first_plane;
-  first_plane.set_projected_a(a0);
-  first_plane.set_projected_covariance_matrix(C);
-  first_plane.set_measurement(clusters[0]->get_alpha());
-  first_plane.set_direction(clusters[0]->get_direction());
-  first_plane.set_z(clusters[0]->get_position().z());
-  first_plane.set_id(clusters[0]->get_id());
-  first_plane.set_type(2);
-  // first_plane
-  sites.push_back(first_plane);
-
-  for ( int j = 1; j < numb_sites; ++j ) {
-    KalmanSite a_site;
-    a_site.set_measurement(clusters[j]->get_alpha());
-    a_site.set_direction(clusters[j]->get_direction());
-    a_site.set_z(clusters[j]->get_position().z());
-    a_site.set_id(clusters[j]->get_id());
-    a_site.set_type(2);
-    sites.push_back(a_site);
-  }
-
-  for ( int j = 0; j < numb_sites; ++j ) {
-    CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
-    CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
-    sites[j].set_true_position(true_position);
-    sites[j].set_true_momentum(true_momentum);
-  }
-}
-
-void KalmanTrackFit::initialise(SciFiStraightPRTrack *seed, std::vector<KalmanSite> &sites,
-                                KalmanSciFiAlignment &kalman_align) {
-  TMatrixD a0(5, 1);
-  a0 = seed.get_initial_state_vector();
-/*
-  // Process PR seed.
-  std::vector<SciFiSpacePoint> spacepoints;
-  for ( size_t i = 0; i < seed->get_spacepoints().size(); ++i ) {
-    SciFiSpacePoint sp = *seed->get_spacepoints()[i];
-    spacepoints.push_back(sp);
-  }
-  std::vector<SciFiCluster*> clusters;
-  double seed_pz = 200.; // MeV/c
-  process_clusters(spacepoints, clusters, seed_pz);
-
-  // std::cerr << "Number of clusters: " << clusters.size() << "\n";
-  // Initialise Kalman.
-  double x = spacepoints[0].get_position().x();
-  double y = spacepoints[0].get_position().y();
-  double mx = seed->get_mx();
-  double my = seed->get_my();
-
-  TMatrixD a(5, 1);
-  a(0, 0) = x;
-  a(1, 0) = mx;
-  a(2, 0) = y;
-  a(3, 0) = my;
-  a(4, 0) = 1./seed_pz;
-*/
-  TMatrixD C(5, 5);
-  C.Zero();
-  // for ( int i = 0; i < 5; ++i ) {
-  C(0, 0) = _seed_cov/200.; // dummy values
-  C(1, 1) = _seed_cov/50.; // dummy values
-  C(2, 2) = _seed_cov/200.; // dummy values
-  C(3, 3) = _seed_cov/50.; // dummy values
-  C(4, 4) = _seed_cov/50.; // dummy values
-  // }
+  std::vector<SciFiCluster*> clusters = seed->get_clusters();
 
   KalmanSite first_plane;
   first_plane.set_projected_a(a0);

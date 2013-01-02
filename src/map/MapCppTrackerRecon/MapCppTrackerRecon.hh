@@ -51,6 +51,7 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 

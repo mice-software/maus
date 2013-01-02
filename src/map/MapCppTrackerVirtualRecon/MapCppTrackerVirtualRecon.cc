@@ -104,9 +104,9 @@ std::string MapCppTrackerVirtualRecon::process(std::string document) {
         std::cout << "Pattern Recognition complete." << std::endl;
       }
       // Kalman Track Fit.
-      if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
-        track_fit(event);
-      }
+      // if ( event.straightprtracks().size() || event.helicalprtracks().size() ) {
+      //  track_fit(event);
+      // }
 
       print_event_info_recon(event);
       save_to_json_recon(event, k);
@@ -302,11 +302,11 @@ void MapCppTrackerVirtualRecon::pattern_recognition(const bool helical_pr_on,
 }
 
 void MapCppTrackerVirtualRecon::track_fit(SciFiEvent &evt) {
-  KalmanTrackFit fit;
-  if ( evt.helicalprtracks().size() )
-    fit.process(evt.helicalprtracks());
-  if ( evt.straightprtracks().size() )
-    fit.process(evt.straightprtracks());
+  // KalmanTrackFit fit;
+  // if ( evt.helicalprtracks().size() )
+  //  fit.process(evt.helicalprtracks());
+  // if ( evt.straightprtracks().size() )
+  //  fit.process(evt.straightprtracks());
 }
 
 void MapCppTrackerVirtualRecon::save_to_json_recon(SciFiEvent &evt, int event_i) {
