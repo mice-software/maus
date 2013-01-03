@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(100.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(500.) {
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 

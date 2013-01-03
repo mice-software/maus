@@ -63,6 +63,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         fin = open(test1,'r')
         # Check the first spill (straights)
         data = fin.readline()
+	print data
         result = self.mapper.process(data)
         spill_out = json.loads(result)
         self.assertTrue('recon_events' in spill_out)
