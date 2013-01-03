@@ -20,6 +20,8 @@
 //
 
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
@@ -39,6 +41,15 @@ KalmanSciFiAlignment::KalmanSciFiAlignment() {
     covariance_shifts[i].ResizeTo(3, 3);
     covariance_shifts[i].Zero();
   }
+
+/*
+  Json::Value *json = Globals::GetConfigurationCards();
+  std::string filename;
+  filename = (*json)["reconstruction_geometry_filename"].asString();
+  MiceModule* module;
+  module = new MiceModule(filename);
+  _modules = module->findModulesByPropertyExistsNC("SensitiveDetector", "SciFi");
+*/
 }
 
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
@@ -187,6 +198,38 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   file_out.close();
+
+/*
+  MiceModule* this_plane = NULL;
+  this_plane = find_plane(0, 3, 0);
+  assert(this_plane != NULL);
+
+  CLHEP::Hep3Vector new_position(1., 1., 1.);
+  std::cerr << this_plane->position() << std::endl;
+  this_plane->setProperty("Position", new_position);
+  std::cerr << this_plane->position() << std::endl;
+*/
+}
+
+MiceModule* KalmanSciFiAlignment::find_plane(int tracker, int station, int plane) {
+/*  MiceModule* scifi_plane = NULL;
+  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); j++ ) {
+    // Find the right module
+    if ( _modules[j]->propertyExists("Tracker", "int") &&
+         _modules[j]->propertyExists("Station", "int") &&
+         _modules[j]->propertyExists("Plane", "int")  &&
+         _modules[j]->propertyInt("Tracker") ==
+         tracker &&
+         _modules[j]->propertyInt("Station") ==
+         station &&
+         _modules[j]->propertyInt("Plane") ==
+         plane ) {
+         // Save the module
+      scifi_plane = _modules[j];
+    }
+  }
+  return scifi_plane;
+*/
 }
 
 } // ~namespace MAUS

@@ -72,7 +72,7 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
-  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+  for ( size_t dig = 0; dig < evt.digits().size(); dig++ ) {
 
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
@@ -81,15 +81,15 @@ std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
 }
 
 void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   &seeds) {
-  int seeds_size = seeds.size();
-  for ( int i = 0; i < seeds_size; i++ ) {
+  size_t seeds_size = seeds.size();
+  for ( size_t i = 0; i < seeds_size; i++ ) {
     if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
       double pe = seed->get_npe();
       // Look for a neighbour.
-      for ( int j = i+1; j < seeds_size; j++ ) {
+      for ( size_t j = i+1; j < seeds_size; j++ ) {
         if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
@@ -148,13 +148,15 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   G4RotationMatrix trot(this_plane->globalRotation());
   // Rotations of the planes in the Tracker Reference Frame.
   if ( clust->get_tracker() == 0 ) {
-    trot= trot*zflip;
-    dir  *= trot;
-    perp *= trot;
-  } else if ( clust->get_tracker() == 1 ) {
-    dir  *= trot;
-    perp *= trot;
+    trot = trot*zflip;
+  // dir  *= trot;
+  // perp *= trot;
+  // } else if ( clust->get_tracker() == 1 ) {
+  //  dir  *= trot;
+  //  perp *= trot;
   }
+  dir  *= trot;
+  perp *= trot;
 
   double Pitch = this_plane->propertyDouble("Pitch");
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
@@ -164,8 +166,8 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
 
   tracker_ref_frame_pos = position - reference;
-  tracker_ref_frame_pos.setX(0.);
-  tracker_ref_frame_pos.setY(0.);
+  // tracker_ref_frame_pos.setX(0.);
+  // tracker_ref_frame_pos.setY(0.);
   // ThreeVector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
     tracker_ref_frame_pos = - (position - reference);

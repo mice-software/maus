@@ -18,6 +18,9 @@
 #ifndef KALMANSEED_HH
 #define KALMANSEED_HH
 
+#include <algorithm>
+#include <vector>
+
 #include "TMatrixD.h"
 
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
@@ -32,13 +35,17 @@ class KalmanSeed {
 
   ~KalmanSeed();
 
-  template <class PRTrack> void build(PRTrack* helical_track);
+  void build(const SciFiStraightPRTrack* pr_track);
 
-  template <class PRTrack> void process_measurements(PRTrack* pr_track);
+  void build(const SciFiHelicalPRTrack* pr_track);
 
-  TMatrixD compute_initial_state_vector(SciFiHelicalPRTrack* seed);
+  void process_measurements(const SciFiStraightPRTrack* pr_track);
 
-  TMatrixD compute_initial_state_vector(SciFiStraightPRTrack* seed);
+  void process_measurements(const SciFiHelicalPRTrack* pr_track);
+
+  TMatrixD compute_initial_state_vector(const SciFiHelicalPRTrack* seed);
+
+  TMatrixD compute_initial_state_vector(const SciFiStraightPRTrack* seed);
 
   void retrieve_clusters(std::vector<SciFiSpacePoint> &spacepoints, double &seed_pz);
 

@@ -21,6 +21,7 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
@@ -32,9 +33,6 @@
 #include "TDecompChol.h"
 #include "TDecompSVD.h"
 #include "TF1.h"
-
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
@@ -79,12 +77,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
-          std::cout << "Building clusters\n";
           cluster_recon(*event);
         }
         // Build SpacePoints.
         if ( event->clusters().size() ) {
-          std::cout << "Building spacepoints\n";
           spacepoint_recon(*event);
         }
         // Pattern Recognition.
@@ -172,9 +168,9 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   }
 
   for ( int track_i = 0; track_i < number_straight_tracks; track_i++ ) {
-    //KalmanSeed *seed = new KalmanSeed();
-    //seed->build(evt.straightprtracks()[track_i]);
-    //seeds.push_back(seed);
+    KalmanSeed *seed = new KalmanSeed();
+    seed->build(evt.straightprtracks()[track_i]);
+    seeds.push_back(seed);
   }
 
   if ( seeds.size() ) {
@@ -192,4 +188,3 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
 }
 
 } // ~namespace MAUS
-

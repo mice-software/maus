@@ -203,7 +203,7 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   // my my
   _Q(3, 3) = c_my_my;
 
-  _Q.Zero();
+  // _Q.Zero();
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -331,8 +331,8 @@ void KalmanTrack::update_misaligments(KalmanSite *a_site, KalmanSite *alignment_
   Cov_s  = alignment_projection_site->get_S_covariance();
 
   std::cout<< "Updating misalignments! Matrices to be updated are: " << std::endl;
-shifts.Print();
-Cov_s.Print();
+  shifts.Print();
+  Cov_s.Print();
 
   TMatrixD S_transposed(3, 2);
   S_transposed.Transpose(_S);

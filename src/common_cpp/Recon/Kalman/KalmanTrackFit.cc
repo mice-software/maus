@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(1000.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(100.) {
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -38,6 +38,8 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
   KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
+
+  // std::cerr << "Number of seeds: " << num_tracks << std::endl;
 
   for ( unsigned int i = 0; i < num_tracks; ++i ) {
     KalmanSeed* seed = seeds[i];
@@ -63,20 +65,20 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
     unsigned int numb_measurements = sites.size();
 
     assert(numb_measurements < 16);
-
+    if ( numb_measurements != 15 ) continue;
     for ( unsigned int j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
-      // std::cerr << "Extrapolating to site " << i << std::endl;
+      // std::cerr << "Extrapolating to site " << j << std::endl;
       extrapolate(sites, track, j);
       // ... Filter...
-      // std::cerr << "Filtering site " << i << std::endl;
+      // std::cerr << "Filtering site " << j << std::endl;
       filter(sites, track, j);
     }
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
     for ( unsigned int j = numb_measurements-2; j > -1; --j ) {
-      // std::cerr << "Smoothing site " << i << std::endl;
+      // std::cerr << "Smoothing site " << j << std::endl;
       smooth(sites, track, j);
     }
     track->compute_chi2(sites);
@@ -87,6 +89,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
     if ( 0 && track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
       update_alignment_parameters(sites, track, kalman_align);
+      std::cerr << "Updating..." << std::endl;
       // Update Stored misalignments using values stored in each site.
       kalman_align.update(sites);
     }
@@ -101,110 +104,10 @@ void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
 
   for ( int i = 0; i < numb_measurements; ++i ) {
     // ... Filter...
-    // std::cerr << "Updating site " << i << std::endl;
+    std::cerr << "Updating site " << i << std::endl;
     filter_updating_misalignments(sites, track, i);
   }
 }
-
-//
-// Helical track fit.
-//
-/*
-void KalmanTrackFit::process(std::vector<SciFiHelicalPRTrack*> helical_tracks) {
-  unsigned int num_tracks  = helical_tracks.size();
-  KalmanMonitor monitor;
-
-  for ( int i = 0; i < num_tracks; ++i ) {
-    std::vector<KalmanSite> sites;
-
-    SciFiHelicalPRTrack* seed = helical_tracks[i];
-    std::vector<SciFiCluster*> clusters;
-    std::vector<SciFiSpacePoint> spacepoints;
-    for ( size_t i = 0; i < seed->get_spacepoints().size(); ++i ) {
-      SciFiSpacePoint sp = *seed->get_spacepoints()[i];
-      spacepoints.push_back(sp);
-    }
-    double pz_from_timing;
-    process_clusters(spacepoints, clusters, pz_from_timing);
-
-    double momentum;
-    initialise(seed, sites, momentum);
-
-  // Get seed values.
-  double r  = seed->get_R();
-  double B = -4.;
-  double pt = -0.3*B*r;
-
-  double dsdz  = seed->get_dsdz();
-  double tan_lambda = 1./dsdz;
-  // PR doesnt see Eloss, so overstimates pz.
-  // Total Eloss = 2 MeV/c.
-  double pz = pt*tan_lambda - 2./sqrt(12.);
-  double seed_pz;
-
-  momentum = pow(pt*pt+pz*pz, 0.5);
-  double kappa = fabs(1./pz);
-
-  int numb_sites = clusters.size();
-
-  int tracker = clusters[0]->get_tracker();
-
-  double pi = acos(-1.);
-  double phi_0 = seed->get_phi0();
-  double phi = phi_0 + pi/2.;
-  double px  = pt*cos(phi);
-  double py  = pt*sin(phi);
-
-  double x = spacepoints[0].get_position().x();
-  double y = spacepoints[0].get_position().y();
-
-  TMatrixD a(5, 1);
-  a(0, 0) = x;
-  a(1, 0) = px;
-  a(2, 0) = y;
-  a(3, 0) = py;
-  a(4, 0) = kappa;
-///////////////////////////////////
-
-    KalmanTrack *track = new HelicalTrack();
-
-
-    // muon assumption for now.
-    double muon_mass    = 105.7; // MeV/c
-    track->set_mass(muon_mass);
-    track->set_momentum(momentum);
-    // Filter the first state.
-    // std::cerr << "Filtering site 0" << std::endl;
-    filter(sites, track, 0);
-
-    unsigned int numb_measurements = sites.size();
-
-    assert(numb_measurements < 16);
-
-    for ( unsigned int j = 1; j < numb_measurements; ++j ) {
-      // Predict the state vector at site i...
-      // std::cerr << "Extrapolating to site " << i << std::endl;
-      extrapolate(sites, track, j);
-      // ... Filter...
-      // std::cerr << "Filtering site " << j << std::endl;
-      filter(sites, track, j);
-    }
-
-    track->prepare_for_smoothing(sites);
-    // ...and Smooth back all sites.
-    for ( unsigned int j = numb_measurements-2; j > -1; --j ) {
-      // std::cerr << "Smoothing site " << j << std::endl;
-      smooth(sites, track, j);
-    }
-
-    track->compute_chi2(sites);
-
-    // monitor.fill(sites);
-    // monitor.print_info(sites);
-    delete track;
-  }
-}
-*/
 
 void KalmanTrackFit::initialise(KalmanSeed *seed,
                                 std::vector<KalmanSite> &sites,
@@ -215,9 +118,9 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   TMatrixD C(5, 5);
   C.Zero();
   // for ( int i = 0; i < 5; ++i ) {
-  C(0, 0) = _seed_cov/100.; // dummy values
+  C(0, 0) = _seed_cov/5.; // dummy values
   C(1, 1) = _seed_cov; // dummy values
-  C(2, 2) = _seed_cov/100.; // dummy values
+  C(2, 2) = _seed_cov/5.; // dummy values
   C(3, 3) = _seed_cov; // dummy values
   C(4, 4) = _seed_cov; // dummy values
 
@@ -234,7 +137,6 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   first_plane.set_type(2);
   first_plane.set_shifts(kalman_align.get_shifts(id_0));
   first_plane.set_S_covariance(kalman_align.get_cov_shifts(id_0));
-
   sites.push_back(first_plane);
 
   int numb_sites = clusters.size();
@@ -247,9 +149,7 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
     a_site.set_id(id);
     a_site.set_type(2);
     a_site.set_shifts(kalman_align.get_shifts(id));
-    // a_site.set_rotations(kalman_align.get_rotations(id));
     a_site.set_S_covariance(kalman_align.get_cov_shifts(id));
-    // a_site.set_R_covariance(kalman_align.get_cov_rotat(id));
     sites.push_back(a_site);
   }
 
@@ -286,32 +186,23 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
                             KalmanTrack *track, int current_site) {
   // Get Site...
   KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = 0;
+  KalmanSite *alignment_projection_site = NULL;
   // Get previous site too.
   // if ( !(current_site%3) ) {
   int id = a_site->get_id();
-  if ( id == 3 ) {
-    std::cout << "Site 3; shift is: " << std::endl;
+  std::cout << id << std::endl;
+  if ( !(current_site%3) ) {
     alignment_projection_site = a_site;
     alignment_projection_site->get_shifts().Print();
-  } else if ( id == 4 || id == 5 ) {
-    std::cout << "Site " << id << std::endl;
+  } else {
     alignment_projection_site = &sites[current_site-1];
     alignment_projection_site->get_shifts().Print();
   }
-    track->update_V(a_site);
-    track->update_H(a_site);
-    track->update_W(a_site);
-    track->update_misaligments(a_site, alignment_projection_site);
-/*
-  // Update measurement error:
-  // (non-const std for the perp direction)
+
   track->update_V(a_site);
   track->update_H(a_site);
   track->update_W(a_site);
-
   track->update_misaligments(a_site, alignment_projection_site);
-*/
 }
 
 void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {
@@ -356,4 +247,3 @@ void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, 
 }
 
 } // ~namespace MAUS
-

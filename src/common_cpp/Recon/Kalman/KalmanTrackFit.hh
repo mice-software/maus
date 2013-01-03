@@ -57,11 +57,7 @@ class KalmanTrackFit {
   void initialise(KalmanSeed *seed,
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
-/*
-  void process_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                        std::vector<SciFiCluster*> &clusters,
-                        double &seed_pz);
-*/
+
   void extrapolate(std::vector<KalmanSite> &sites,
                    KalmanTrack *track,
                    int current_site);

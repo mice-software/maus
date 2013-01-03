@@ -18,6 +18,8 @@
 
 namespace MAUS {
 
+const double PI = acos(-1.);
+
 bool sort_by_id(const SciFiCluster *a, const SciFiCluster *b) {
   // Ascending site number.
   return ( a->get_id() < b->get_id() );
@@ -28,18 +30,14 @@ bool sort_by_station(const SciFiSpacePoint a, const SciFiSpacePoint b) {
   return ( a.get_station() < b.get_station() );
 }
 
-KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {}
+KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {
+  _a0.ResizeTo(5, 1);
+}
 
 KalmanSeed::~KalmanSeed() {}
 
-template <class PRTrack>
-void KalmanSeed::build(PRTrack* pr_track) {
-
-  if ( pr_track->get_type() == 0 ) {
-    _straight = true;
-  } else if ( pr_track->get_type() == 1 ) {
-    _helical = true;
-  }
+void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
+  _straight = true;
 
   // This builds the _clusters vector.
   process_measurements(pr_track);
@@ -47,20 +45,36 @@ void KalmanSeed::build(PRTrack* pr_track) {
   _a0 = compute_initial_state_vector(pr_track);
 }
 
-template <class PRTrack>
-void KalmanSeed::process_measurements(PRTrack* pr_track) {
+void KalmanSeed::build(const SciFiHelicalPRTrack* pr_track) {
+  _helical = true;
 
-    for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
-      SciFiSpacePoint sp = *pr_track->get_spacepoints()[i];
-      _spacepoints.push_back(sp);
-    }
-    double pz_from_timing;
-    //std::vector<SciFiCluster*> clusters;
-    retrieve_clusters(_spacepoints, pz_from_timing);
+  // This builds the _clusters vector.
+  process_measurements(pr_track);
 
+  _a0 = compute_initial_state_vector(pr_track);
 }
 
-TMatrixD KalmanSeed::compute_initial_state_vector(SciFiHelicalPRTrack* seed) {
+void KalmanSeed::process_measurements(const SciFiStraightPRTrack* pr_track) {
+  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
+    SciFiSpacePoint sp = *pr_track->get_spacepoints()[i];
+    _spacepoints.push_back(sp);
+  }
+  double pz_from_timing;
+
+  retrieve_clusters(_spacepoints, pz_from_timing);
+}
+
+void KalmanSeed::process_measurements(const SciFiHelicalPRTrack* pr_track) {
+  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
+    SciFiSpacePoint sp = *pr_track->get_spacepoints()[i];
+    _spacepoints.push_back(sp);
+  }
+  double pz_from_timing;
+
+  retrieve_clusters(_spacepoints, pz_from_timing);
+}
+
+TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* seed) {
   // Get seed values.
   double r  = seed->get_R();
   double B = -4.;
@@ -80,9 +94,8 @@ TMatrixD KalmanSeed::compute_initial_state_vector(SciFiHelicalPRTrack* seed) {
 
   int tracker = _clusters[0]->get_tracker();
 
-  double pi = acos(-1.);
   double phi_0 = seed->get_phi0();
-  double phi = phi_0 + pi/2.;
+  double phi = phi_0 + PI/2.;
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
@@ -99,9 +112,10 @@ TMatrixD KalmanSeed::compute_initial_state_vector(SciFiHelicalPRTrack* seed) {
   return a;
 }
 
-TMatrixD KalmanSeed::compute_initial_state_vector(SciFiStraightPRTrack* seed) {
+TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* seed) {
   double x = _spacepoints[0].get_position().x();
   double y = _spacepoints[0].get_position().y();
+
   double mx = seed->get_mx();
   double my = seed->get_my();
   double seed_pz = 200.;
@@ -122,16 +136,17 @@ void KalmanSeed::retrieve_clusters(std::vector<SciFiSpacePoint> &spacepoints,
   // This admits there is only one track...
   // SciFiStraightPRTrack seed = event.straightprtracks()[0];
   // std::vector<SciFiSpacePoint> spacepoints = seed->get_spacepoints(); // Get CLUSTERS!
-  int numb_spacepoints = spacepoints.size();
+  size_t numb_spacepoints = spacepoints.size();
 
-  for ( int i = 0; i < numb_spacepoints; ++i ) {
+  for ( size_t i = 0; i < numb_spacepoints; ++i ) {
     SciFiSpacePoint spacepoint = spacepoints[i];
-    int num_clusters = spacepoint.get_channels().size();
-    for ( int j = 0; j < num_clusters; ++j ) {
+    size_t num_clusters = spacepoint.get_channels().size();
+    for ( size_t j = 0; j < num_clusters; ++j ) {
       SciFiCluster *cluster = spacepoint.get_channels()[j];
       _clusters.push_back(cluster);
     }
   }
+
   std::sort(_clusters.begin(), _clusters.end(), sort_by_id);
   std::sort(_spacepoints.begin(), _spacepoints.end(), sort_by_station);
   /*
