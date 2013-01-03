@@ -1,0 +1,135 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_INL_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_REFERENCERESOLVERCPPTOJSON_INL_HH_
+
+#include <map>
+#include <set>
+#include <string>
+
+#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "src/legacy/Interface/STLUtils.hh"
+
+namespace MAUS {
+namespace ReferenceResolver {
+namespace CppToJson {
+template <class ChildType>
+TypedResolver<ChildType>::TypedResolver
+(ChildType* ref_cpp_address, std::string ref_json_address)
+  : _cpp_pointer(ref_cpp_address), _json_pointer(ref_json_address) {
+}
+
+template <class ChildType>
+void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
+    Json::Value& child =
+                   JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
+    child = Json::Value();
+    // will throw if pointer is not in the RefManager
+    std::string json_address =
+                      RefManager::GetInstance().GetPointerAsValue(_cpp_pointer);
+    child["$ref"] = Json::Value(json_address);
+}
+
+
+///////////////////////////////////////////////////////
+
+class RefManager::PointerValueTable {
+  public:
+    virtual ~PointerValueTable() {}
+    virtual void ClearData() = 0;
+  private:
+};
+
+template <class PointerType>
+class RefManager::TypedPointerValueTable : public RefManager::PointerValueTable {
+  public:
+    virtual ~TypedPointerValueTable() {}
+    void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}
+    std::map<PointerType*, std::string> _data_hash;
+};
+
+template <class PointerType>
+void RefManager::SetPointerAsValue
+                              (PointerType* pointer, std::string json_address) {
+    if (pointer == NULL)
+        return;
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(pointer) != table->_data_hash.end())
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to add pointer for C++ address "+
+                     STLUtils::ToString(pointer)+
+                     " to hash table when it was already added",
+                     "CppToJson::RefManager::SetPointerAsValue(...)"));
+    table->_data_hash[pointer] = json_address;
+}
+
+template <class PointerType>
+std::string RefManager::GetPointerAsValue(PointerType* pointer) {
+    TypedPointerValueTable<PointerType>* table =
+                                       GetTypedPointerValueTable<PointerType>();
+    if (table->_data_hash.find(pointer) == table->_data_hash.end())
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to get pointer for json address "+
+                     STLUtils::ToString(pointer)+
+                     " when it was never added",
+                     "CppToJson::RefManager::GetPointerAsValue(...)"));
+    return table->_data_hash[pointer];
+}
+
+template <class PointerType>
+RefManager::TypedPointerValueTable<PointerType>*
+                                       RefManager::GetTypedPointerValueTable() {
+    static TypedPointerValueTable<PointerType> table;
+    _value_tables.insert(&table);
+    return &table;
+}
+
+////////////////////////////////////////////////////////
+
+RefManager::~RefManager() {
+    for (size_t i = 0; i < _references.size(); ++i) {
+        delete _references[i];
+    }
+    for (std::set<PointerValueTable*>::iterator it = _value_tables.begin();
+         it != _value_tables.end();
+         ++it) {
+        (*it)->ClearData();
+    }
+    if (this == _instance) {
+        _instance = NULL;
+    }
+}
+
+void RefManager::ResolveReferences(Json::Value& json_root) {
+    for (size_t i = 0; i < _references.size(); ++i) {
+        _references[i]->ResolveReferences(json_root);
+    }
+}
+
+void RefManager::AddReference(Resolver* reference) {
+    if (reference == NULL) return;
+    _references.push_back(reference);
+}
+}  // namespace CppToJson
+}  // namespace ReferenceResolver
+}  // namespace MAUS
+
+#endif
+

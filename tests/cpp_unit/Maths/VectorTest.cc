@@ -27,6 +27,7 @@
 
 #include "Maths/Complex.hh"
 #include "Maths/Vector.hh"
+#include "Interface/Squeal.hh"
 
 using MAUS::Vector;
 using MAUS::operator ==;

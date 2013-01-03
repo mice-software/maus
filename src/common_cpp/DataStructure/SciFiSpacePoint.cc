@@ -105,10 +105,8 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
   // _time_res   = 0;
 }
 
-// Destructor
 SciFiSpacePoint::~SciFiSpacePoint() {}
 
-// Assignment operator
 SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &_scifispacepoint) {
   if (this == &_scifispacepoint) {
     return *this;

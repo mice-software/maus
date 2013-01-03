@@ -18,13 +18,18 @@
 #ifndef _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
 #define _SRC_OUTPUT_OUTPUTCPPROOT_OUTPUTCPPROOT_HH_
 
+#include <fstream>
 #include <string>
 
-// TODO (Rogers): looks okay - but throws a segmentation fault if we forget to
-//                call death(); needs proper error handler calling
+#include "src/common_cpp/DataStructure/MAUSEvent.hh"
+#include "src/common_cpp/API/OutputBase.hh"
 
-class Data;
-class JsonCppConverter;
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/DataStructure/JobFooterData.hh"
+#include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/DataStructure/RunFooterData.hh"
+
 class orstream;
 
 namespace MAUS {
@@ -34,7 +39,7 @@ namespace MAUS {
  *  OutputCppRoot writes the data structure out as a ROOT tree
  */
 
-class OutputCppRoot {
+class OutputCppRoot : public OutputBase<std::string> {
  public:
   /** OutputCppRoot constructor - initialise to NULL
    */
@@ -45,30 +50,61 @@ class OutputCppRoot {
   ~OutputCppRoot() {death();}
 
   /** Initialise member data using datacards
+   *
    *  @param json_datacards Json document containing datacards. Only card used
    *         is root_output_file [string], the root file name
    *
-   *  @returns True on success, False on failure
+   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
+   *  base class method
    */
-  bool birth(std::string json_datacards);
-
-  /** Store a spill in the ROOT tree
-   *
-   *  @returns True on success, False on failure
-   */
-  bool save(std::string json_spill_document);
+  inline void birth(const std::string& json_datacards) {
+      ModuleBase::birth(json_datacards);
+  }
 
   /** Delete member data
    *
-   *  @returns True on success, False on failure
+   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
+   *  base class method
    */
-  bool death();
+  inline void death() {
+      ModuleBase::death();
+  }
 
  private:
+  void _birth(const std::string& json_datacards);
+
+  void _death();
+
+  /** Write a generic event based on type specifications
+
+   *  The lowest level of
+   *  the branch has to be a MAUSEvent<DataT> and ConverterT has to be of type
+   *  Converter<std::string, DataT>.
+   *
+   *  Reopens the _outfile if the DataT type has changed since the last read (we
+   *  put one Event type per TTree in MAUS, open() required to change the name
+   *  of _outfile).
+   */
+  template <class ConverterT, class DataT>
+  bool write_event(MAUSEvent<DataT>* data_cpp,
+                   const Json::Value& data_json,
+                   std::string branch_name);
+
+  event_type get_event_type(const Json::Value& data_json);
+
+
+  bool _save(std::string json_document);
+
   orstream* _outfile;
-  Data* _data;
-  JsonCppConverter* _jsonCppConverter;
-  std::string _classname;
+
+  std::string _fname;
+  std::string _outfile_branch;
+  JobHeaderData _job_header_cpp;
+  RunHeaderData _run_header_cpp;
+  Data _spill_cpp;
+  RunFooterData _run_footer_cpp;
+  JobFooterData _job_footer_cpp;
+  std::ofstream log;
 };
 }
 

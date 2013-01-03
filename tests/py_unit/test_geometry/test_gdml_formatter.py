@@ -70,8 +70,8 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
                       (self.gdml.material_file, materialfile)
         configfile = 'fastradModel.gdml'
         self.assertEqual(self.gdml.configuration_file, configfile)
-        field_file = 'Field.gdml'
-        self.assertEqual(self.gdml.field_file, field_file)
+        maus_information_file = 'Maus_Information.gdml'
+        self.assertEqual(self.gdml.maus_information_file, maus_information_file)
         beamline_file = 'Beamline.gdml'
         self.assertEqual(self.gdml.beamline_file, beamline_file)
         
@@ -173,7 +173,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
             fin = open(filename, 'r')
             if gdml_file == self.gdml.configuration_file:
                 for line in fin.readlines():
-                    if self.gdml.field_file != None:
+                    if self.gdml.maus_information_file != None:
                         if line.find('</run>') >= 0:
                             run_found += 1
                     if self.gdml.beamline_file != None:
@@ -188,7 +188,6 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
                     maus = 'location="' + self.gdml.path_out + '"'
                     if line.find(maus) >= 0:
                         path_out_found += 1
-                        print str(path_out_found) + "maus number"
                 self.assertEqual(run_found, 1,
                             msg="Run tag not found "+filename)
                 self.assertEqual(mice_found, 1,

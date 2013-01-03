@@ -23,6 +23,8 @@ import unittest
 from celery import current_app
 from celery.utils import LOG_LEVELS
 
+import Configuration
+import maus_cpp.globals
 from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
@@ -40,6 +42,9 @@ class ExecuteTransformTaskTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @param self Object reference.
         """
         MausTransform.transform = None
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(
+                                  Configuration.Configuration().getConfigJSON())
         MausTransform.is_dead = True
         MausConfiguration.transform = "MapPyTestMap"
         # Set Celery logging to ensure conditional log statements

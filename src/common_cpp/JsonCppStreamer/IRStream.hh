@@ -30,6 +30,7 @@
 #define IRSTREAM_H
 
 #include "gtest/gtest_prod.h"
+#include "Rtypes.h"  // ROOT
 
 #include "JsonCppStreamer/RStream.hh"
 #include "JsonCppStreamer/OneArgManip.hh"
@@ -65,6 +66,12 @@ class irstream : public rstream {
   void open(const char*,
 	    const char* = "Data",
 	    const char* = "READ");
+
+  /*!
+   * \brief set the next event to be read
+   * \param event the event number of the next event to be read
+   */
+  void set_current_event(Long64_t event);
 
   // ! \brief close the file and cleanup
   void close();

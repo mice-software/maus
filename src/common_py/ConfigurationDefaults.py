@@ -25,6 +25,8 @@ bin/simulate_mice.py --configuration_file my_configuration.py
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# NOTE: please use lower_case_and_underscores for new configuration cards
+
 import os
 
 type_of_dataflow = 'pipeline_single_thread'
@@ -46,10 +48,23 @@ output_root_file_name = "maus_output.root"
 # 4 = fatal
 # >4 = silent
 # Doesnt effect python
-verbose_level = 0
+verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+
+# set how headers and footers are handled - "append" will set to
+# append headers and footers to the output; dont_append will set to not append
+# headers and footers to the output. Affects JobHeader, JobFooter, RunHeader and
+# RunFooter
+#
+# For example, if the user wants to copy data from one format to another, he
+# should set to dont_append to avoid header and footer information being taken
+# to the output
+header_and_footer_mode = "append" #append or dont_append
+
+# Used by MapPyRemoveTracks.
+keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
 keep_tracks = False # set to true to keep start and end point of every track
@@ -218,6 +233,11 @@ SciFiCrossTalkSigma = 50.0
 SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
+SciFiKalmanMCS = 0 # flag to add MCS to the Kalman Fit
+SciFiKalmanEloss = 0 # flag to add Eloss to the Kalman Fit
+SciFiUpdateMisalignments = 0 # Do Misalignment Search & Update
+SciFiKalmanUseFieldMap = 0
+SciFiKalmanStepSize = 1. # mm
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -240,6 +260,7 @@ geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used 
 geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
 geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
 geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
+technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 geometry_upload_cleanup = True # set to True to clean up after upload
 technical_drawing_name = "" #name and version of the technical drawing from which the CAD model came from.
 
@@ -249,7 +270,14 @@ get_ids_stop_time = "2012-05-22 15:47:34.856000"
 get_ids_create_file = True
 
 #get beamline information
-get_beamline_by = "run_number" #This sets the method which you would like to query the beamline database. Options are 'run_number' and 'dates'
+# This executable will give the run numbers of the runs which the CDB has information on.
+# The information is the magnet currents, reasons for run and other information which
+# is specific to that run. When downloading a geometry by run number the beamline 
+# information is merged with the geometrical infomation. Options for querying
+# beamline information are; 'all_entries' returns a list of all run numbers with beamline info.
+#                           'run_number'  prints whether info is held for this run number or not.
+#                           'dates'       returns a list of run numbers with info during specified time period.
+get_beamline_by = "all_entries" 
 get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""

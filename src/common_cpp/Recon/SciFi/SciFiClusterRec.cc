@@ -20,21 +20,38 @@
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4RotationMatrix.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
-SciFiClusterRec::SciFiClusterRec() {}
+SciFiClusterRec::SciFiClusterRec():_size_exception(0.),
+                                   _min_npe(0.) {}
 
+// To be removed soon.
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe,
-                                 std::vector<const MiceModule*> modules)
-                                 :_size_exception(cluster_exception),
-                                  _min_npe(min_npe),
-                                  _modules(modules) {}
+                std::vector<const MiceModule*> modules):
+                                   _size_exception(0.),
+                                   _min_npe(0.),
+                                   _modules(modules) {}
 
 SciFiClusterRec::~SciFiClusterRec() {}
 
 bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
   return ( a->get_npe() > b->get_npe() );
+}
+
+void SciFiClusterRec::initialise() {
+  Json::Value *json = Globals::GetConfigurationCards();
+
+  std::string filename;
+  filename = (*json)["reconstruction_geometry_filename"].asString();
+  MiceModule* module;
+  module = new MiceModule(filename);
+
+  _size_exception = (*json)["SciFiClustExcept"].asInt();
+  _min_npe = (*json)["SciFiNPECut"].asDouble();
+  _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {
@@ -55,7 +72,8 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
-  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+  for ( size_t dig = 0; dig < evt.digits().size(); dig++ ) {
+
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }
@@ -63,15 +81,15 @@ std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
 }
 
 void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   &seeds) {
-  int seeds_size = seeds.size();
-  for ( int i = 0; i < seeds_size; i++ ) {
+  size_t seeds_size = seeds.size();
+  for ( size_t i = 0; i < seeds_size; i++ ) {
     if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
       double pe = seed->get_npe();
       // Look for a neighbour.
-      for ( int j = i+1; j < seeds_size; j++ ) {
+      for ( size_t j = i+1; j < seeds_size; j++ ) {
         if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
@@ -130,13 +148,15 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   G4RotationMatrix trot(this_plane->globalRotation());
   // Rotations of the planes in the Tracker Reference Frame.
   if ( clust->get_tracker() == 0 ) {
-    trot= trot*zflip;
-    dir  *= trot;
-    perp *= trot;
-  } else if ( clust->get_tracker() == 1 ) {
-    dir  *= trot;
-    perp *= trot;
+    trot = trot*zflip;
+  // dir  *= trot;
+  // perp *= trot;
+  // } else if ( clust->get_tracker() == 1 ) {
+  //  dir  *= trot;
+  //  perp *= trot;
   }
+  dir  *= trot;
+  perp *= trot;
 
   double Pitch = this_plane->propertyDouble("Pitch");
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
@@ -146,8 +166,8 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
 
   tracker_ref_frame_pos = position - reference;
-  tracker_ref_frame_pos.setX(0.);
-  tracker_ref_frame_pos.setY(0.);
+  // tracker_ref_frame_pos.setX(0.);
+  // tracker_ref_frame_pos.setY(0.);
   // ThreeVector tracker_ref_frame_pos;
   if ( clust->get_tracker() == 0 ) {
     tracker_ref_frame_pos = - (position - reference);

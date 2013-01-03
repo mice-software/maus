@@ -78,6 +78,29 @@ class ObjectMapValueProcessor
      */
     Json::Value* CppToJson(const std::map<std::string, MapSecond>& cpp_map);
 
+    /** Convert the std::map to a json_object passing path information
+     *
+     *  @param cpp_map the json object to be converted; calls
+     *  second_processor->JsonToCpp on each of the properties and allocates the
+     *  resultant C++ object to the std::map.
+     *  @param path string containing path information
+     * 
+     *  @return Returns the json representation of cpp_map. Caller owns the
+     *  memory pointed to by the return value.
+     */
+    Json::Value* CppToJson(const std::map<std::string, MapSecond>& cpp_map,
+                           std::string path);
+
+    /** Get a path object for child branches of the std::map
+     *
+     *  @param path Path through the Json tree to the parent object
+     *         (json representation of the C++ map)
+     *  @param branch name of the branch
+     *
+     *  @returns path to the branch i.e. path+"/"+branch
+     */
+    std::string GetPath(std::string path, std::string branch);
+
   private:
     ProcessorBase<MapSecond>* _proc;
 };

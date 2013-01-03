@@ -5,6 +5,24 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.4.1
+  The following functionality was added:
+    - JSON output format now supports references (internal links within JSON
+      documents)
+    - An API has been added for global (cross-detector) reconstruction routines.
+
+MAUS-v0.4.0
+  The following functionality was added:
+    - The API was updated to facilitate adding new modules to MAUS. New modules
+      should inherit from base classes in the src/common_cpp/API directory
+    - Additional metadata was added to the data structure detailing job and run
+      information
+    - A new utility to access information on beamline data available on the
+      Configuration Database was added
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
+    - third_party/bash/45beamline_fieldmaps.bash
+
 MAUS-v0.3.3
   The following functionality was added:
     - xboa accelerator physics library was updated to use the ROOT datastructure

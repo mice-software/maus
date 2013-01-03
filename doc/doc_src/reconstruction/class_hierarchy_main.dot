@@ -15,41 +15,45 @@ digraph G {
     fontname = "Bitstream Vera Sans"
     fontsize = 8
   ]
+  
+  Detector [
+    label = "{\N|id: Integer\lplane: Double\luncertainties: CovarianceMatrix\l}"
+  ]
+  
+  ReconstructionInput [
+    label = "{\N|beamPolarityNegative: Boolean\ldetectors: Detector[]\ltracks: TrackPoint[]\l}"
+  ]
 
   MapCppTrackReconstructor [
-    label = "{\N|opticsModel: OpticsModel\levents: DetectorEvent[]\ltrackFitter: TrackFitter\ltrajectories: ParticleTrajectory[]\l|Process()\l}"
+    label = "{\N|input: ReconstructionInput\lopticsModel: OpticsModel\lTrackFitter: TrackFitter\ltrajectories: Track[]\l|Process()\l}"
   ]
 
-  DetectorEvent [
-    label = "{\N|detectorID: Integer}"
-  ]
-
-  ParticleTrajectory [
-    label = "{\N|tracks: ParticleTrack[]\lparticleID: Integer\l}"
+  Track [
+    label = "{\N|particleID: Integer\ltracks: TrackPoint[]\l}"
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
   ]
 
   TrackFitter [
-    label = "{\<\<interface\>\>\n\N}"
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(TrackPoint[], Track *)}"
   ]
 
   subgraph Main {
-    rank = same; MapCppTrackReconstructor; DetectorEvent; ParticleTrajectory; OpticsModel; TrackFitter;
+    rank = same; MapCppTrackReconstructor; Track; OpticsModel; TrackFitter;
   }
 
   PhaseSpaceVector [
     label = "{\N|t: Double\lE: Double\lx: Double\lPx: Double\ly: Double\lPy: Double\l}"
   ]
 
-  ParticleTrack [
-    label = "{\N|z: Double\lPz: Double\luncertainties: CovarianceMatrix|FillInCoordinates()\l}"
+  TrackPoint [
+    label = "{\N|z: Double\lPz: Double\ldetectorID: Integer\luncertainties: CovarianceMatrix\l|FillInCoordinates()\l}"
   ]
 
   TransferMap [
-    label = "{\<\<interface\>\>\n\N|Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector): PhaseSpaceVector\lTransport(CovarianceMatrix): CovarianceMatrix\l}"
     pos = "10,50"
   ]
 
@@ -57,8 +61,7 @@ digraph G {
     style = "solid"
   ]
 
-  ParticleTrack -> PhaseSpaceVector
-  DetectorEvent -> ParticleTrack
+  TrackPoint -> PhaseSpaceVector
 
 
   edge [
@@ -68,9 +71,11 @@ digraph G {
     headlabel = "1..*"
   ]
 
-  MapCppTrackReconstructor -> DetectorEvent
-  MapCppTrackReconstructor -> ParticleTrajectory
-  ParticleTrajectory -> ParticleTrack
+  ReconstructionInput -> Detector
+  TrackFitter -> Detector
+  ReconstructionInput -> TrackPoint
+  MapCppTrackReconstructor -> Track
+  Track -> TrackPoint
 
   edge [
     style = "solid"
@@ -79,7 +84,8 @@ digraph G {
     headlabel = "1"
   ]
 
+  MapCppTrackReconstructor -> ReconstructionInput
   MapCppTrackReconstructor -> TrackFitter
   MapCppTrackReconstructor -> OpticsModel
-  OpticsModel -> TransferMap
+  TrackFitter -> OpticsModel
 }

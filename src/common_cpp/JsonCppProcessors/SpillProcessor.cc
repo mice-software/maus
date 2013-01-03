@@ -27,6 +27,9 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                                   _recon_array_proc(new ReconEventProcessor()),
                                  _error_proc(new StringProcessor()) {
     RegisterPointerBranch
+         ("test_branch", &_test_branch_proc, &Spill::GetTestBranch,
+          &Spill::SetTestBranch, false);
+    RegisterPointerBranch
          ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, false);
     RegisterPointerBranch
          ("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, false);
@@ -44,6 +47,7 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
                                                   &Spill::SetDaqEventType, true);
     RegisterValueBranch("errors", &_error_proc, &Spill::GetErrors,
                                                   &Spill::SetErrors, false);
+    RegisterConstantBranch("maus_event_type", Json::Value("Spill"), true);
 }
 }
 

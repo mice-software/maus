@@ -6,6 +6,9 @@
 # this is the maximum amount of characters (including whitespace) per line)
 ######################################################################
 
+root_version=root_v5.30.03
+# Find where MAUS is installed
+maus_root_dir=`pwd`
 
 arch=`uname -s`
 
@@ -39,9 +42,6 @@ echo
 (type -P gcc &>/dev/null && type -P g++ &>/dev/null) || {
     echo "FATAL: gcc/g++ is required to compile code." >&2;
     exit 1; }
-
-# Find where MAUS is installed
-maus_root_dir=`pwd`
 
 if echo $maus_root_dir | grep -E '[ "]' >/dev/null;
 then
@@ -97,81 +97,6 @@ else
         eval ${DYLIB_VAR}="${maus_root_dir}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
     fi
 fi
-
-# Check for Python
-type -P python &>/dev/null || {
-    echo "FATAL: Python is required.">&2;
-    echo "FATAL:">&2;
-    echo "FATAL: To install within MAUS, set the MAUS_ROOT_DIR" >&2;
-    echo "FATAL: environmental variable.  For Bourne-compatible" >&2;
-    echo "FATAL: shells like 'bash', run:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      export MAUS_ROOT_DIR=\"${maus_root_dir}\"" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL: then run the following to install Python 2.7:" >&2;
-    echo "FATAL:" >&2;
-    echo "FATAL:      ./third_party/bash/01python.bash" >&2;
-    exit 1; }
-
-python_version=`env $DYLIB_VAR=./third_party/install/lib python -V 2>&1`
-## Check for supported python version
-if [ "${python_version}" != "Python 2.7" ]
-then               ##################################################
-    if [ ! -f "env.sh" ]
-    then
-        echo "WARNING: Unsupported python version (You are using ${python_version}),";
-        echo "WARNING: so using Python 2.7 is recommended.  MAUS will install extra";
-        echo "WARNING: packages in this location like numpy and xboa and currently";
-        echo "WARNING: the way we go about this is having our own Python install.";
-        echo "WARNING: ";
-        echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-        echo "WARNING: environmental variable.  For Bourne-compatible";
-        echo "WARNING: shells like 'bash', run:";
-        echo "WARNING: ";
-        echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-        echo "WARNING: ";
-        echo "WARNING: then run the following to install Python 2.7:"
-        echo "WARNING: ";
-        echo "WARNING:       ./third_party/bash/01python.bash";
-        echo
-    fi
-fi
-
-# check for SCons
-type -P scons &>/dev/null || {
-    if [ ! -f "env.sh" ]
-    then
-        echo "WARNING: Scons is required to proceed after this step"
-        echo "WARNING:"
-        echo "WARNING: To install within MAUS, set the MAUS_ROOT_DIR";
-        echo "WARNING: environmental variable.  For Bourne-compatible";
-        echo "WARNING: shells like 'bash', run:";
-        echo "WARNING: ";
-        echo "WARNING:       export MAUS_ROOT_DIR=\"${maus_root_dir}\"";
-        echo "WARNING: ";
-        echo "WARNING: then run the following to install Scons:" >&2;
-        echo "WARNING:" >&2;
-        echo "WARNING:      ./third_party/bash/40python_extras.bash";
-        echo "WARNING:";
-        echo
-    fi
-    }
-
-
-root_version=root_v5.30.03
-
-if [ ! -f "env.sh" ]
-then
-    echo "RECOMMENDATION:  This appears to be your first time running MAUS."
-    echo "RECOMMENDATION:  If you want to install all the external dependencies"
-    echo "RECOMMENDATION:  automatically (takes an hour or so since geant is big)"
-    echo "RECOMMENDATION:  then run the following command:"
-    echo "RECOMMENDATION:"
-    echo "RECOMMENDATION:       ./tests/integration/install_then_build_then_test.bash"
-    echo "RECOMMENDATION:"
-    echo
-fi
-
 
 ### Create environment files
 
@@ -249,13 +174,23 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 
-     export maus_no_optimize=0 # force gcc not to optimise
-     export maus_lcov=0 # enable cpp coverage - requires lcov
-     export maus_debug=0 # enable debugging
-     export maus_gprof=0 # enable cpp profiling of cpp unit tests 
-                         # requires gprof
-     export maus_assert_active=0 # enable assert() command - disabled by default
-                                 # as better to use exceptions
+     if [ -z "\${maus_no_optimize}" ]; then  # see if the variable exists
+        export maus_no_optimize=0 # force gcc not to optimise
+     fi
+     if [ -z "\${maus_lcov}" ]; then  # see if the variable exists
+        export maus_lcov=0 # enable cpp coverage - requires lcov
+     fi
+     if [ -z "\${maus_debug}" ]; then  # see if the variable exists
+        export maus_debug=0 # enable debugging
+     fi
+     if [ -z "\${maus_gprof}" ]; then  # see if the variable exists
+        export maus_gprof=0 # enable cpp profiling of cpp unit tests 
+                            # requires gprof
+     fi
+     if [ -z "\${maus_assert_active}" ]; then  # see if the variable exists
+        export maus_assert_active=0 # enable assert() command - disabled by default
+                                    # as better to use exceptions
+     fi
 
      echo "SUCCESS: MAUS setup"
 else

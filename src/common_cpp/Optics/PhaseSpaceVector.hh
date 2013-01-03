@@ -28,7 +28,10 @@ namespace MAUS {
 
 class PhaseSpaceVector : public Vector<double> {
  public:
-  /* @brief	Construct with all elements initialized to zero.
+  class PhaseSpaceType;
+
+  /* @brief	Construct with all elements initialized to zero and phase space type
+   * temporal.
    */
   PhaseSpaceVector();
 
@@ -41,41 +44,45 @@ class PhaseSpaceVector : public Vector<double> {
    */
   PhaseSpaceVector(const PhaseSpaceVector& original_instance);
 
-  /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py.
+  /* @brief Create with coordinates from an array. Order is t, E, x, Px, y, Py
+   * if type = aseSpaceVector::kTemporalPhaseSpace or x, Px, y, Py, z, Pz if
+   * type = haseSpaceVector::kPositionalPhaseSpace.
    */
   explicit PhaseSpaceVector(double const * const array);
 
   /* @brief	Create with the given initial coordinates.
    */
   PhaseSpaceVector(const double t, const double E,
-                   const double x, const double Px,
-                   const double y, const double Py);
+                   const double x, const double px,
+                   const double y, const double py);
 
   ~PhaseSpaceVector();
 
+  PhaseSpaceVector & operator=(const PhaseSpaceVector & rhs);
+
   // accessors
-  inline double time()       const {return (*this)[0];}
-  inline double t()          const {return (*this)[0];}
-  inline double energy()     const {return (*this)[1];}
-  inline double E()          const {return (*this)[1];}
-  inline double x()          const {return (*this)[2];}
-  inline double x_momentum() const {return (*this)[3];}
-  inline double Px()         const {return (*this)[3];}
-  inline double y()          const {return (*this)[4];}
-  inline double y_momentum() const {return (*this)[5];}
-  inline double Py()         const {return (*this)[5];}
+  double time()       const {return (*this)[0];}
+  double t()          const {return time();}
+  double energy()     const {return (*this)[1];}
+  double E()          const {return energy();}
+  double x()          const {return (*this)[2];}
+  double x_momentum() const {return (*this)[3];}
+  double Px()         const {return x_momentum();}
+  double y()          const {return (*this)[4];}
+  double y_momentum() const {return (*this)[5];}
+  double Py()         const {return y_momentum();}
 
   // mutators
-  inline void set_time(double time)              {(*this)[0] = time;}
-  inline void set_t(double time)                {(*this)[0] = time;}
-  inline void set_energy(double energy)          {(*this)[1] = energy;}
-  inline void set_E(double energy)              {(*this)[1] = energy;}
-  inline void set_x(double x)                    {(*this)[2] = x;}
-  inline void set_x_momentum(double x_momentum)  {(*this)[3] = x_momentum;}
-  inline void set_Px(double x_momentum)          {(*this)[3] = x_momentum;}
-  inline void set_y(double y)                    {(*this)[4] = y;}
-  inline void set_y_momentum(double y_momentum)  {(*this)[5] = y_momentum;}
-  inline void set_Py(double y_momentum)          {(*this)[5] = y_momentum;}
+  void set_time(double time)              {(*this)[0] = time;}
+  void set_t(double time)                 {set_time(time);}
+  void set_energy(double energy)          {(*this)[1] = energy;}
+  void set_E(double energy)               {set_energy(energy);}
+  void set_x(double x)                    {(*this)[2] = x;}
+  void set_x_momentum(double x_momentum)  {(*this)[3] = x_momentum;}
+  void set_Px(double x_momentum)          {set_x_momentum(x_momentum);}
+  void set_y(double y)                    {(*this)[4] = y;}
+  void set_y_momentum(double y_momentum)  {(*this)[5] = y_momentum;}
+  void set_Py(double y_momentum)          {set_y_momentum(y_momentum);}
 };
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector);

@@ -33,26 +33,14 @@
 #include "src/common_cpp/JsonCppProcessors/ReconEventProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
+#include "tests/cpp_unit/JsonCppProcessors/CommonProcessorTest.hh"
+
 // Rogers: critique is that we never check that all data was filled; so, for
 //         example, if we never touch "energy" or something, it never gets used.
 //         But checking this is a lot of work...
 
 namespace MAUS {
 namespace SpillProcessorTest {
-
-template <class TYPE>
-void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
-    Json::Value json_in;
-    ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(test_string))
-                                                                 << test_string;
-    TYPE* cpp_type = NULL;
-    ASSERT_NO_THROW(cpp_type = proc->JsonToCpp(json_in)) << json_in;
-    Json::Value* json_out = NULL;
-    ASSERT_NO_THROW(json_out = proc->CppToJson(*cpp_type));
-    EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
-    delete cpp_type;
-    delete json_out;
-}
 
 std::string THREE_VEC = "{\"x\":1.,\"y\":2.,\"z\":3.}";
 
@@ -103,6 +91,13 @@ std::string TOF_HIT = HIT_SEED+TOF_CHANNEL_ID+"}";
 
 std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
 
+std::string TEST_BRANCH(std::string path) {
+    std::string ref = "{\"$ref\":\"#"+path+"test_child_by_value\"}";
+    return std::string("{\"test_child_by_value\":{}, ")+
+           std::string("\"test_child_by_ref\":")+ref+", "+
+           std::string("\"test_child_array\":[")+ref+", "+ref+", null]}";
+}
+
 std::string VIRTUAL_HIT =
     std::string("{\"particle_id\":1,\"track_id\":2,\"station_id\":3,")+
     std::string("\"time\":5.,\"mass\":6.,\"charge\":7.,")+
@@ -126,85 +121,92 @@ std::string RECON_EVENT =
 std::string SPILL_SEED =
     std::string("{\"spill_number\":1, \"run_number\":-1, ")+
     std::string("\"daq_event_type\":\"physics_event\", ")+
-    std::string("\"errors\":{\"an_error\":\"message\"}");
+    std::string("\"errors\":{\"an_error\":\"message\"}, ")+
+    std::string("\"maus_event_type\":\"Spill\"");
 
 std::string SPILL_ALL = SPILL_SEED+","+
     std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
-    std::string("\"mc_events\":[], \"recon_events\":[]}");
+    std::string("\"mc_events\":[], \"recon_events\":[], \"test_branch\":"+
+                TEST_BRANCH("test_branch/")+"}");
 
 std::string SPILL_MINIMAL = SPILL_SEED+"}";
 
 
 TEST(SpillProcessorTest, ThreeVectorProcessorTest) {
     ThreeVectorProcessor proc;
-    test_value(&proc, THREE_VEC);
+    ProcessorTest::test_value(&proc, THREE_VEC);
 }
 
 TEST(SpillProcessorTest, StepProcessorTest) {
     StepProcessor proc;
-    test_value(&proc, STEP);
+    ProcessorTest::test_value(&proc, STEP);
 }
 
 TEST(SpillProcessorTest, TrackProcessorTest) {
     TrackProcessor proc;
-    test_value(&proc, TRACK_NO_STEP);
-    test_value(&proc, TRACK_STEP);
+    ProcessorTest::test_value(&proc, TRACK_NO_STEP);
+    ProcessorTest::test_value(&proc, TRACK_STEP);
 }
 
 TEST(SpillProcessorTest, TOFChannelIdProcessorTest) {
     TOFChannelIdProcessor proc;
-    test_value(&proc, TOF_CHANNEL_ID);
+    ProcessorTest::test_value(&proc, TOF_CHANNEL_ID);
 }
 
 TEST(SpillProcessorTest, SciFiChannelIdProcessorTest) {
     SciFiChannelIdProcessor proc;
-    test_value(&proc, SF_CHANNEL_ID);
+    ProcessorTest::test_value(&proc, SF_CHANNEL_ID);
 }
 
 TEST(SpillProcessorTest, SpecialVirtualChannelIdProcessorTest) {
     SpecialVirtualChannelIdProcessor proc;
-    test_value(&proc, SV_CHANNEL_ID);
+    ProcessorTest::test_value(&proc, SV_CHANNEL_ID);
 }
 
 TEST(SpillProcessorTest, SciFiHitProcessorTest) {
     SciFiHitProcessor proc;
-    test_value(&proc, SF_HIT);
+    ProcessorTest::test_value(&proc, SF_HIT);
 }
 
 TEST(SpillProcessorTest, TOFHitProcessorTest) {
     TOFHitProcessor proc;
-    test_value(&proc, TOF_HIT);
+    ProcessorTest::test_value(&proc, TOF_HIT);
 }
 
 TEST(SpillProcessorTest, SpecialVirtualHitProcessorTest) {
     SpecialVirtualHitProcessor proc;
-    test_value(&proc, SV_HIT);
+    ProcessorTest::test_value(&proc, SV_HIT);
 }
 
 TEST(SpillProcessorTest, VirtualHitProcessorTest) {
     VirtualHitProcessor proc;
-    test_value(&proc, VIRTUAL_HIT);
+    ProcessorTest::test_value(&proc, VIRTUAL_HIT);
 }
 
 TEST(SpillProcessorTest, PrimaryProcessorTest) {
     PrimaryProcessor proc;
-    test_value(&proc, PRIMARY);
+    ProcessorTest::test_value(&proc, PRIMARY);
 }
 
 TEST(SpillProcessorTest, MCEventProcessorTest) {
     MCEventProcessor proc;
-    test_value(&proc, MC_EVENT);
+    ProcessorTest::test_value(&proc, MC_EVENT);
 }
 
 TEST(SpillProcessorTest, ReconEventProcessorTest) {
     ReconEventProcessor proc;  // just a minimal recon event here
-    test_value(&proc, RECON_EVENT);
+    ProcessorTest::test_value(&proc, RECON_EVENT);
+}
+
+TEST(SpillProcessorTest, TestBranchProcessorTest) {
+    TestBranchProcessor proc;  // see how we do evaluating references
+    ProcessorTest::test_value(&proc, TEST_BRANCH(""));
 }
 
 TEST(SpillProcessorTest, SpillProcessorTest) {
     SpillProcessor proc;
-    test_value(&proc, SPILL_MINIMAL);
-    test_value(&proc, SPILL_ALL);
+    ProcessorTest::test_value(&proc, SPILL_MINIMAL);
+    ProcessorTest::test_value(&proc, SPILL_ALL);
 }
 }
 }

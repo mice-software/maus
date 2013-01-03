@@ -22,10 +22,30 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
+
+// #include "src/common_cpp/Utils/Globals.hh"
+// #include "src/common_cpp/Globals/GlobalsManager.hh"
+
 namespace MAUS {
 
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
+/*
+  // Check if the JSON document can be parsed, else return error only
+  try {
+    if (!Globals::HasInstance()) {
+        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
+    return true;  // Sucessful completion
+  // Normal session, no visualization
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
+
 
   // JsonCpp string -> JSON::Value converter
   Json::Reader reader;
@@ -49,6 +69,7 @@ bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   minPE = _configJSON["SciFiNPECut"].asDouble();
 
   return true;
+*/
 }
 
 bool MapCppTrackerDigits::death() {
@@ -88,7 +109,7 @@ std::string MapCppTrackerDigits::process(std::string document) {
 
 void MapCppTrackerDigits::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill);
+  root = *spill_proc.CppToJson(spill, "");
 }
 
 } // ~namespace MAUS

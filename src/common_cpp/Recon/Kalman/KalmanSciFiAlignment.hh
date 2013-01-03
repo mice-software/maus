@@ -37,6 +37,7 @@
 #include "TMatrixD.h"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "Interface/Squeal.hh"
+#include "Config/MiceModule.hh"
 
 namespace MAUS {
 
@@ -49,6 +50,8 @@ class KalmanSciFiAlignment {
   bool load_misaligments();
 
   void update(std::vector<KalmanSite> sites);
+
+  MiceModule* find_plane(int tracker, int station, int plane);
 
   TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
   TMatrixD get_rotations(int site_id)  const { return rotations_array[site_id]; }
@@ -67,6 +70,7 @@ class KalmanSciFiAlignment {
   TMatrixD rotations_array[30];
   TMatrixD covariance_rotations[30];
   TMatrixD covariance_shifts[30];
+  // std::vector<MiceModule*> _modules;
 };
 
 } // ~namespace MAUS
