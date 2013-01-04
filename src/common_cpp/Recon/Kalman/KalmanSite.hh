@@ -15,7 +15,6 @@
  *
  */
 
-
 #ifndef KALMANSITE_HH
 #define KALMANSITE_HH
 

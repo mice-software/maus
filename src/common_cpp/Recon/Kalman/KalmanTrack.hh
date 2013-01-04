@@ -61,7 +61,7 @@ class KalmanTrack {
 
   TMatrixD solve_measurement_equation(TMatrixD a, TMatrixD s);
 
-  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
+  virtual void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
   void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 
@@ -80,7 +80,7 @@ class KalmanTrack {
   double get_momentum() const { return _momentum; }
 
   TMatrixD get_Q() const { return _Q; }
-
+  void set_Q(TMatrixD Q) { _Q = Q; }
   // void get_site_properties(KalmanSite *site, double &thickess, double &density);
 
   void set_mass(double mass) { _mass = mass; }

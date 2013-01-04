@@ -130,12 +130,8 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
   return a;
 }
 
-
 void KalmanSeed::retrieve_clusters(std::vector<SciFiSpacePoint> &spacepoints,
                                       double &seed_pz) {
-  // This admits there is only one track...
-  // SciFiStraightPRTrack seed = event.straightprtracks()[0];
-  // std::vector<SciFiSpacePoint> spacepoints = seed->get_spacepoints(); // Get CLUSTERS!
   size_t numb_spacepoints = spacepoints.size();
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {
