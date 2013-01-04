@@ -47,7 +47,6 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    std::cerr << "Recon geometry filename:" << (*json)["reconstruction_geometry_filename"].asString() << std::endl;
     return true;  // Sucessful completion
   // Normal session, no visualization
   } catch(Squeal& squee) {
