@@ -63,6 +63,8 @@ class KalmanSciFiAlignment {
   void set_cov_shifts(TMatrixD cov_s, int site_id)     { covariance_shifts[site_id]   = cov_s; }
   void set_cov_rotat(TMatrixD cov_r, int site_id)      { covariance_rotations[site_id]= cov_r; }
 
+  void update_site(KalmanSite *site);
+
  private:
   std::string file, fname;
 

@@ -51,6 +51,7 @@ class KalmanSite {
   void set_projected_a(TMatrixD projected_a) { _projected_a = projected_a; }
   void set_a(TMatrixD a)                     { _a = a; }
   void set_smoothed_a(TMatrixD smoothed_a)   { _smoothed_a = smoothed_a; }
+  void set_excluded_state(TMatrixD a_excl)   { _a_excl = a_excl; }
   /// The covariance of the state vector.
   void set_projected_covariance_matrix(TMatrixD Cp) { _projected_C = Cp; }
   void set_covariance_matrix(TMatrixD C)            { _C = C; }
@@ -83,6 +84,7 @@ class KalmanSite {
   TMatrixD get_projected_a()                 const { return _projected_a; }
   TMatrixD get_a()                           const { return _a; }
   TMatrixD get_smoothed_a()                  const { return _smoothed_a; }
+  TMatrixD get_a_excl()                      const { return _a_excl; }
   TMatrixD get_covariance_matrix()           const { return _C; }
   TMatrixD get_projected_covariance_matrix() const { return _projected_C; }
   TMatrixD get_smoothed_covariance_matrix()  const { return _smoothed_C; }
@@ -133,6 +135,7 @@ class KalmanSite {
   TMatrixD _projected_a;
   TMatrixD _a;
   TMatrixD _smoothed_a;
+  TMatrixD _a_excl;
 
   /// The covariance matrix.
   TMatrixD _projected_C;

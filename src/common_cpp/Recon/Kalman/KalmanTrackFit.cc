@@ -30,8 +30,7 @@ KalmanTrackFit::~KalmanTrackFit() {
   std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
 }
 
-void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
-  KalmanMonitor monitor;
+void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -81,6 +80,14 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
     monitor.fill(sites);
     // monitor.print_info(sites);
 
+    if ( track->get_chi2() < 15. ) {
+      for ( size_t j = 0; j < numb_measurements; ++j ) {
+        KalmanSite *site = &sites[j];
+        track->exclude_site(site);
+        kalman_align.update_site(site);
+      }
+    }
+/*
     if ( 0 && track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
       update_alignment_parameters(sites, track, kalman_align);
@@ -88,6 +95,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
       // Update Stored misalignments using values stored in each site.
       kalman_align.update(sites);
     }
+*/
     delete track;
   }
 }
@@ -224,12 +232,12 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   track->calc_covariance(old_site, new_site);
 }
 
-void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int k) {
+void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int id) {
   // Get site to be smoothed...
-  KalmanSite *smoothing_site = &sites[k];
+  KalmanSite *smoothing_site = &sites[id];
 
   // ... and the already perfected site.
-  KalmanSite *optimum_site = &sites[k+1];
+  KalmanSite *optimum_site = &sites[id+1];
 
   // Set the propagator right.
   track->update_propagator(optimum_site, smoothing_site);

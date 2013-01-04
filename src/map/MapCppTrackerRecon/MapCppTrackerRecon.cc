@@ -42,13 +42,14 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   try {
     if (!Globals::HasInstance()) {
-        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    return true;  // Sucessful completion
-  // Normal session, no visualization
+    std::cerr << _helical_pr_on  << std::endl;
+    std::cerr << _straight_pr_on << std::endl;
+    return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
   } catch(std::exception& exc) {

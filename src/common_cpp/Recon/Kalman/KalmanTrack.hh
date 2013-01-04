@@ -68,6 +68,7 @@ class KalmanTrack {
   void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
   void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
   void prepare_for_smoothing(std::vector<KalmanSite> &sites);
+  void exclude_site(KalmanSite *site);
 
   TMatrixD get_propagator() { return _F; }
   TMatrixD get_pull(KalmanSite *a_site);
@@ -87,7 +88,7 @@ class KalmanTrack {
 
   void set_momentum(double momentum) { _momentum = momentum; }
 
-  virtual void compute_chi2(const std::vector<KalmanSite> &sites);
+  void compute_chi2(const std::vector<KalmanSite> &sites);
 
  protected:
   TMatrixD _H;

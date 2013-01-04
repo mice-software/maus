@@ -60,6 +60,7 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _id(0), _chi2(0.),
   _a = site.get_a();
   _projected_a = site.get_projected_a();
   _smoothed_a  = site.get_smoothed_a();
+  _a_excl      = site.get_a_excl();
 
   _projected_C = site.get_projected_covariance_matrix();
   _C = site.get_covariance_matrix();
@@ -93,6 +94,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   _a = rhs.get_a();
   _projected_a = rhs.get_projected_a();
   _smoothed_a  = rhs.get_smoothed_a();
+  _a_excl      = rhs.get_a_excl();
 
   _projected_C = rhs.get_projected_covariance_matrix();
   _C = rhs.get_covariance_matrix();
@@ -116,6 +118,7 @@ void KalmanSite::initialise() {
   _projected_a.ResizeTo(5, 1);
   _a.          ResizeTo(5, 1);
   _smoothed_a. ResizeTo(5, 1);
+  _a_excl.     ResizeTo(5, 1);
 
   // The covariance matrix.
   _projected_C.ResizeTo(5, 5);
