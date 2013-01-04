@@ -54,16 +54,6 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         """ Test to make sure death occurs """
         self.assertTrue(self.mapper.death())
 
-    def testEmpty(self):
-        """Check can handle empty configuration and empty data"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
-        result = self.mapper.process("")
-        spill_out = json.loads(result)
-        self.assertTrue('errors' in spill_out)
-        self.assertTrue("bad_json_document" in spill_out['errors'])
-        self.assertFalse("recon_events" in spill_out)
-
     def testBadData(self):
         """Check can handle nonsense json input data"""
         result = self.mapper.process("blah")
