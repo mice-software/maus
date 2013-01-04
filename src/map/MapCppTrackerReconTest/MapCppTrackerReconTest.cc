@@ -332,7 +332,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
     } else {
       std::cout << "No mc or recon events found\n";
     }
-    save_to_json(spill);
+    // save_to_json(spill);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -410,8 +410,8 @@ bool MapCppTrackerReconTest::read_in_json(std::string json_data, Spill &spill) {
 }
 
 void MapCppTrackerReconTest::save_to_json(Spill &spill) {
-  SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill);
+  // SpillProcessor spill_proc;
+  // root = *spill_proc.CppToJson(spill);
 }
 
 void MapCppTrackerReconTest::cluster_recon(SciFiEvent &evt) {
@@ -432,11 +432,11 @@ void MapCppTrackerReconTest::pattern_recognition(const bool helical_pr_on,
 }
 
 void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
-  KalmanTrackFit fit;
-  if ( evt.helicalprtracks().size() )
-    fit.process(evt.helicalprtracks());
-  if ( evt.straightprtracks().size() )
-    fit.process(evt.straightprtracks());
+  // KalmanTrackFit fit;
+  // if ( evt.helicalprtracks().size() )
+  //  fit.process(evt.helicalprtracks());
+  // if ( evt.straightprtracks().size() )
+  //  fit.process(evt.straightprtracks());
 }
 
 void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
@@ -528,6 +528,4 @@ double MapCppTrackerReconTest::compute_chan_no(MAUS::SciFiHit *ahit) {
   return chanNo;
 }
 
-
 } // ~namespace MAUS
-

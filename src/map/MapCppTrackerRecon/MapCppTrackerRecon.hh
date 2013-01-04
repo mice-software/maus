@@ -121,6 +121,12 @@ class MapCppTrackerRecon {
 
   void save_to_json(MAUS::Spill &spill);
 
+  /** @brief Set helical PR on flag, overiding the datacard */
+  void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+
+  /** @brief Set straight PR on flag, overiding the datacard */
+  void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
+
   void print_event_info(MAUS::SciFiEvent &event);
 
  private:
