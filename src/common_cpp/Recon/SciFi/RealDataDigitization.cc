@@ -15,40 +15,16 @@
  *
  */
 
+// NOTE: Equipment list to be changed
+// when tracker moved to MICE Hall.
+// A few assertions to be removed.
+// ES
+
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
 namespace MAUS {
 
-const int RealDataDigitization::_number_channels = 128;
-const int RealDataDigitization::_number_banks    = 4;
-const int RealDataDigitization::_number_boards   = 16;
-const int RealDataDigitization::_total_number_channels = 6403;
-
-RealDataDigitization::RealDataDigitization() {
-/*
-  _board.resize(_total_number_channels);
-  _bank.resize(_total_number_channels);
-  _chan_ro.resize(_total_number_channels);
-  _tracker.resize(_total_number_channels);
-  _station.resize(_total_number_channels);
-  _view.resize(_total_number_channels);
-  _fibre.resize(_total_number_channels);
-  _extWG.resize(_total_number_channels);
-  _inWG.resize(_total_number_channels);
-  _WGfib.resize(_total_number_channels);
-
-  _calibration.resize(_number_boards);
-  _good_chan.resize(_number_boards);
-  for (int i = 0; i < _number_boards; i++) {
-    _calibration[i].resize(_number_banks);
-    _good_chan[i].resize(_number_banks);
-    for (int j = 0; j < _number_channels; j++) {
-      _calibration[i][j].resize(_number_channels);
-      _good_chan[i][j].resize(_number_channels);
-    }
-  }
-*/
-}
+RealDataDigitization::RealDataDigitization() {}
 
 RealDataDigitization::~RealDataDigitization() {}
 
@@ -60,13 +36,14 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-    bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
-    assert(calib);
-    bool map = load_mapping("mapping_7.txt");
-    assert(map);
-    bool bad_channels = load_bad_channels();
-    assert(bad_channels);
-
+  bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
+  bool map = load_mapping("mapping_7.txt");
+  bool bad_channels = load_bad_channels();
+  if ( !calib || !map || !bad_channels ) {
+    throw(Squeal(Squeal::recoverable,
+          "Could not load Tracker calibration, mapping or bad channel list.",
+          "RealDataDigitization::process"));
+  }
   // -------------------------------------------------
 
   // Pick up JSON daq event.
@@ -106,14 +83,12 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       }
 
       // Get pedestal and gain from calibration.
-      // assert(_calibration[board][bank][channel_ro].isMember("pedestal"));
-      // assert(_calibration[board][bank][channel_ro].isMember("gain"));
       double pedestal =  _calibration_pedestal[board][bank][channel_ro];
       double gain     =  _calibration_gain[board][bank][channel_ro];
 
       // Calculate the number of photoelectrons.
       double pe;
-      if ( pedestal > 0. && gain > 0 ) {
+      if ( pedestal > _pedestal_min && gain > 0 ) {
         pe = (adc-pedestal)/gain;
       } else {
         pe = -10.0;
@@ -144,8 +119,9 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    std::cout << "Unable to open file " << fname << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+          "Could not load Tracker Calibration.",
+          "RealDataDigitization::load_calibration"));
   }
 
   std::string line;
@@ -163,11 +139,11 @@ bool RealDataDigitization::load_calibration(std::string file) {
 void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
   std::string line;
   // Run over all boards.
-  for ( int i = 0; i < 16; ++i ) {
+  for ( int i = 0; i < _number_boards; ++i ) {
     // Run over banks.
-    for ( int j = 0; j < 4; ++j ) {
+    for ( int j = 0; j < _number_banks; ++j ) {
       // Run over channels.
-      for ( int k = 0; k < 128; ++k ) {
+      for ( int k = 0; k < _number_channels; ++k ) {
         int unique_chan_no, board, bank, chan;
         double ped, gain;
 
@@ -188,8 +164,9 @@ bool RealDataDigitization::load_mapping(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    std::cout << "Unable to open file " << fname << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+          "Could not load Tracker Mapping.",
+          "RealDataDigitization::load_mapping"));
   }
 
   std::string line;
@@ -215,9 +192,8 @@ bool RealDataDigitization::load_mapping(std::string file) {
   return true;
 }
 
-bool RealDataDigitization::
-     get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                          int& tracker, int& station, int& plane, int& channel) const {
+bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
+                           int& tracker, int& station, int& plane, int& channel) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
@@ -248,8 +224,9 @@ bool RealDataDigitization::load_bad_channels() {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    std::cout << "Unable to open file " << fname << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+          "Could not load Tracker bad channel list.",
+          "RealDataDigitization::load_bad_channels"));
   }
 
   for ( int board = 0; board < _number_boards; ++board ) {

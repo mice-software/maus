@@ -77,7 +77,7 @@ class ReduceCppPatternRecognition {
   std::string process(std::string document);
 
   int const get_num_stracks() { return _stracks.GetEntries(); }
-  int const get_num_circles() { return _circles.GetEntries(); }
+  int const get_num_htracks() { return _htracks.GetEntries(); }
   int const get_num_spoints() { return _spoints.GetEntries(); }
   MAUS::Spill get_spill() { return _spill; }
 
@@ -93,8 +93,10 @@ class ReduceCppPatternRecognition {
   void draw_histos(TTree * t1, TCanvas * c1);
   void draw_graphs(TTree * t1, TCanvas * c1);
   void draw_stracks(TCanvas * c1);
-  void draw_circles(TCanvas * c1);
+  void draw_htracks(TCanvas * c1);
   TF1 make_strack(double c, double m);
+  TF1 make_htrack_x(double x0, double R, double dsdz, double phi0 );
+  TF1 make_htrack_y(double y0, double R, double dsdz, double phi0 );
   TArc make_circle(double x0, double y0, double R);
   void clear_tracks();
 
@@ -134,17 +136,23 @@ class ReduceCppPatternRecognition {
   double _x0;
   double _y0;
 
-  TTree _circles;
-  int _num_points_circ;
+  TTree _htracks;
+  int _num_points_hlx;
   double _circle_x0;
   double _circle_y0;
   double _circle_R;
+  double _dsdz;
+  double _phi0;
 
   // Vectors to hold the tracks in each projection in each tracker
-  std::vector<TF1> _trks_zx_trkr0;
-  std::vector<TF1> _trks_zy_trkr0;
-  std::vector<TF1> _trks_zx_trkr1;
-  std::vector<TF1> _trks_zy_trkr1;
+  std::vector<TF1> _strks_zx_trkr0;
+  std::vector<TF1> _strks_zy_trkr0;
+  std::vector<TF1> _strks_zx_trkr1;
+  std::vector<TF1> _strks_zy_trkr1;
+  std::vector<TF1> _htrks_zx_trkr0;
+  std::vector<TF1> _htrks_zy_trkr0;
+  std::vector<TF1> _htrks_zx_trkr1;
+  std::vector<TF1> _htrks_zy_trkr1;
   std::vector<TArc> _circles_xy_trkr0;
   std::vector<TArc> _circles_xy_trkr1;
 

@@ -19,10 +19,33 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
+#include "Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+
+
+// #include "src/common_cpp/Utils/Globals.hh"
+// #include "src/common_cpp/Globals/GlobalsManager.hh"
+
 namespace MAUS {
 
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
+/*
+  // Check if the JSON document can be parsed, else return error only
+  try {
+    if (!Globals::HasInstance()) {
+        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
+    return true;  // Sucessful completion
+  // Normal session, no visualization
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
+
 
   // JsonCpp string -> JSON::Value converter
   Json::Reader reader;
@@ -46,6 +69,7 @@ bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   minPE = _configJSON["SciFiNPECut"].asDouble();
 
   return true;
+*/
 }
 
 bool MapCppTrackerDigits::death() {
@@ -53,15 +77,13 @@ bool MapCppTrackerDigits::death() {
 }
 
 std::string MapCppTrackerDigits::process(std::string document) {
-  std::cout << "Digitising tracker data\n";
-
   Json::FastWriter writer;
   Spill spill;
 
   try {
     // Load input.
     root = JsonWrapper::StringToJson(document);
-    if ( root.isMember("daq_data") && !root["daq_data"].isNull() ) {
+    if ( root.isMember("daq_data") && !(root["daq_data"].isNull()) ) {
       // Get daq data.
       Json::Value daq = root.get("daq_data", 0);
       // Process the input.
@@ -70,6 +92,10 @@ std::string MapCppTrackerDigits::process(std::string document) {
       // Save to JSON output.
       save_to_json(spill);
     }
+  } catch(Squeal& squee) {
+    squee.Print();
+    root = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(root, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;

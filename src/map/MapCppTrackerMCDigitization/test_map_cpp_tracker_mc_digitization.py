@@ -70,7 +70,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         self.assertTrue(self.mapper.death())
 
     def test_process(self):
-        """ Test of the process function of MapCppTrackerMCDigitization """
+        """ Test of the process function """
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)

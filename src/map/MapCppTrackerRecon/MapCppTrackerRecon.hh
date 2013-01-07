@@ -50,6 +50,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 
@@ -98,6 +100,15 @@ class MapCppTrackerRecon {
    */
   void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                            MAUS::SciFiEvent &evt);
+
+  /** Performs the final track fit
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param evt the current SciFiEvent
+   */
+  void track_fit(MAUS::SciFiEvent &evt);
 
   /** Takes json data and returns a Sc
    *

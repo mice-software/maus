@@ -76,9 +76,9 @@ TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
 TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(1);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(1);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
 
@@ -92,15 +92,15 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), 1);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), 1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(1);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(1);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
 
@@ -116,7 +116,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), 1);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), 1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
@@ -129,9 +129,9 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   int tracker = 1;
   int num_points = 5;
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
 
   SciFiStraightPRTrack prtrack;
@@ -156,7 +156,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
 
-  EXPECT_EQ(prtrack.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(prtrack.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
 } // ~namespace MAUS

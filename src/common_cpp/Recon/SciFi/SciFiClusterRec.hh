@@ -49,11 +49,13 @@ namespace MAUS {
 
 class SciFiClusterRec {
  public:
-  SciFiClusterRec(); // Default constructor
+  SciFiClusterRec();
 
   SciFiClusterRec(int cluster_exception, double min_npe, std::vector<const MiceModule*> modules);
 
   ~SciFiClusterRec();
+
+  void initialise();
 
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters
@@ -76,14 +78,14 @@ class SciFiClusterRec {
 
   const MiceModule* find_plane(int tracker, int station, int plane);
 
-  // Set relative position & channel number for the Kalman Filter.
-  // This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
-  // with the displacement of the station centre subtracted.
+  /** @brief Set relative position & channel number for the Kalman Filter.
+   * This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
+   * with the displacement of the station centre subtracted.
+  */
   void construct(SciFiCluster *clust, const MiceModule* this_plane,
                  ThreeVector &dir, ThreeVector &tracker_ref_frame_pos, double &alpha);
 
  private:
-
   int _size_exception;
 
   double _min_npe;

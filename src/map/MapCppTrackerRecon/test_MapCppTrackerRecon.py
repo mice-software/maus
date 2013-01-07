@@ -22,12 +22,13 @@ import json
 import unittest
 import Configuration
 import MAUS
+import maus_cpp.globals
 
 class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTrackerRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
-    cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
+    cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
     cfg['SciFiPRHelicalOn'] = 0
     cfg['SciFiStraightOn'] = 0
 
@@ -35,15 +36,6 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MAUS.MapCppTrackerRecon()
-
-    def testEmpty(self):
-        """Check can handle empty configuration and data"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
-        result = self.mapper.process("")
-        spill_out = json.loads(result)
-        self.assertTrue('errors' in spill_out)
-        self.assertTrue("bad_json_document" in spill_out['errors'])
 
     def testInit(self):
         """Check birth"""
@@ -53,6 +45,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     def testGoodStraightProcess(self):
         """Check that tracker recon  process produces expected
            output with good straight track data"""
+        maus_cpp.globals.death()
+        self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiStraightOn'] = 1
         success = self.mapper.birth(json.dumps(self.cfg))
@@ -62,6 +56,11 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (straights)
+        fin.readline()
+        fin.readline()
+        fin.readline()
+        fin.readline()
+        fin.readline()
         data = fin.readline()
         result = self.mapper.process(data)
         spill_out = json.loads(result)
@@ -71,19 +70,21 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(15, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
-        self.assertEqual(15, len(revt['sci_fi_event']['clusters']))
+        self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])
-        self.assertEqual(5, len(revt['sci_fi_event']['spacepoints']))
+        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
         self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(1, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertEqual(2, len(revt['sci_fi_event']['straight_pr_tracks']))
         self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
 
     def testGoodHelicalProcess(self):
         """Check that tracker recon  process produces expected
         output with good helical track data"""
+        maus_cpp.globals.death()
+        self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
         success = self.mapper.birth(json.dumps(self.cfg))
@@ -93,11 +94,13 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (helices)
+        fin.readline()
+        fin.readline()
         data = fin.readline()
         result = self.mapper.process(data)
         spill_out = json.loads(result)
         self.assertTrue('recon_events' in spill_out)
-        self.assertEqual(2, len(spill_out['recon_events']))
+        self.assertEqual(5, len(spill_out['recon_events']))
         # Check the first event
         revt = spill_out['recon_events'][0]
         self.assertTrue('digits' in revt['sci_fi_event'])

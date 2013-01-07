@@ -40,15 +40,6 @@ class SciFiSD : public MAUS::MAUSSD {
      *   Does nothing.
      */
     void EndOfEvent(G4HCofThisEvent* HCE);
-
-    /** @brief Legacy code, kept for as a debugging tool
-     *  determine the fibre number based on the position in the tracker and the
-     *  MiceModule information about the fibre orientation and numbering scheme
-     */
-    int legacy_chanNo(G4Step* aStep);
-
-  private:
-    int nChans;
 };
 
 #endif

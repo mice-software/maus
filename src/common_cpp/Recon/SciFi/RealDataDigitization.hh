@@ -56,10 +56,6 @@ namespace MAUS {
 
 class RealDataDigitization {
  public:
-  // typedef std::vector< std::vector< std::vector< Json::Value > > > JsonBoardBankChannelArray;
-
-  // typedef std::vector< std::vector< std::vector< bool > > > BoolBoardBankChannelArray;
-
   typedef std::vector<int> IntChannelArray;
 
   RealDataDigitization();
@@ -101,23 +97,20 @@ class RealDataDigitization {
                                        return _calibration_unique_chan_number[board][bank][chan]; }
 
  private:
-  static const int _number_channels;
-  static const int _number_banks;
-  static const int _number_boards;
-  static const int _total_number_channels;
+  static const int _number_channels       = 128;
+  static const int _number_banks          = 4;
+  static const int _number_boards         = 16;
+  static const int _total_number_channels = 6403;
+  static const double _pedestal_min       = 0.000000001;
 
-  /// A vector containing calibration values for every 4 banks of the 16 boards.
-  double _calibration_pedestal[16][4][128];
-
-  double _calibration_gain[16][4][128];
-
-  int _calibration_unique_chan_number[16][4][128];
-
+  /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
+  double _calibration_pedestal[_number_boards][_number_banks][_number_channels];
+  double _calibration_gain[_number_boards][_number_banks][_number_channels];
+  int    _calibration_unique_chan_number[_number_boards][_number_banks][_number_channels];
   /// This is an array storing the goodness of each channel.
-  bool _good_chan[16][4][128];
+  bool _good_chan[_number_boards][_number_banks][_number_channels];
 
-  // std::vector<int> _cryo;
-  // std::vector<int> _cass;
+  /// This is for the mapping storage.
   IntChannelArray _board;
   IntChannelArray _bank;
   IntChannelArray _chan_ro;
