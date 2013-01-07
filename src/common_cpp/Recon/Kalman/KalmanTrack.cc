@@ -93,23 +93,24 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
   double gamma = E/muon_mass;
   double gamma2= TMath::Power(gamma, 2.);
 
-  double K = 0.307075; // MeV g-1 cm2 (for A=1gmol-1 
+  double K = 0.307075; // MeV g-1 cm2 (for A=1gmol-1
   double A = 104.15; // g.mol-1 per styrene monomer
   double I = 68.7; // eV (mean excitation energy)
   double I2= TMath::Power(I, 2.);
   double Z = 5.61291; // Z=6 for 0.922582% and Z=1 for 0.077418%
 
   double outer_term = K*Z/(A*beta2);
-  
-  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass)+TMath::Power(electron_mass/muon_mass, 2.));
-  
+
+  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
+                TMath::Power(electron_mass/muon_mass, 2.));
+
   double log_term = TMath::Log(2*electron_mass*beta2*gamma2*Tmax/(I2));
   double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*muon_mass, 2);
   double density = 1.06000;// g.cm-3
   double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
   double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
   double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
-  //std::cerr << outer_term << " " << log_term << " " << beta2 << " " << Tmax << std::endl;
+  // std::cerr << outer_term << " " << log_term << " " << beta2 << " " << Tmax << std::endl;
   return beta*dEdx;
 /*
    double Z       = MuELMaterial::Z(mt);
@@ -161,7 +162,7 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
 
 void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
   Delta_Z = 0.6523;
-  
+
   TMatrixD a_old_site(5, 1);
   a_old_site = old_site->get_a();
   double px = a_old_site(1, 0);
@@ -174,14 +175,14 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
 
   // double Delta_z = fabs(old_site->get_z()-new_site->get_z());
   int n_steps = 100;
-  
+
   double Delta_p = 0.;
   for ( int i = 0; i < n_steps; ++i ) {
     momentum += Delta_p;
     Delta_p += BetheBlochStoppingPower(momentum)*Delta_z/n_steps;
   }
   std::cerr << "Total deltaP = " << Delta_p << " " << Delta_z <<  std::endl;
-  
+
   /*
   double tau = momentum/_mass;
   double tau_squared = tau*tau;
