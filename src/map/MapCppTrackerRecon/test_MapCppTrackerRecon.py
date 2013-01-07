@@ -36,6 +36,9 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MAUS.MapCppTrackerRecon()
+        cls.test_config = ""
+        if maus_cpp.globals.has_instance():
+            cls.test_config = maus_cpp.globals.get_configuration_cards()
 
     def testInit(self):
         """Check birth"""
@@ -43,10 +46,10 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         #self.assertTrue(success)
 
     def testGoodStraightProcess(self):
-        """Check that tracker recon  process produces expected
+        """Check that tracker recon process produces expected
            output with good straight track data"""
         if maus_cpp.globals.has_instance():
-          maus_cpp.globals.death()
+            maus_cpp.globals.death()
         self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
@@ -88,7 +91,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         """Check that tracker recon  process produces expected
         output with good helical track data"""
         if maus_cpp.globals.has_instance():
-          maus_cpp.globals.death()
+            maus_cpp.globals.death()
         self.cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
@@ -121,7 +124,14 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
-        """Check that we can death() MapCppTrackerRecon"""
+        """Sets a mapper and configuration,
+        and checks that we can death() MapCppTrackerRecon"""
+        cls.mapper = MAUS.MapCppTrackerRecon()
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        if cls.test_config != "":
+            maus_cpp.globals.birth(cls.test_config)
+        # Check we death() the mapper
         success = cls.mapper.death()
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
