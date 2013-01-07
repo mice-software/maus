@@ -43,22 +43,28 @@ bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
 
 void SciFiClusterRec::initialise() {
   if (!Globals::HasInstance()) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Squeal(Squeal::nonRecoverable,
           "Instance of Globals not found.",
           "SciFiClusterRec::initialise"));
   }
-  static MiceModule* module = Globals::GetReconstructionMiceModules();
-  if ( !module || module->daughters() ) {
-    throw(Squeal(Squeal::recoverable,
+
+  Json::Value *json = Globals::GetConfigurationCards();
+  _size_exception = (*json)["SciFiClustExcept"].asInt();
+  _min_npe = (*json)["SciFiNPECut"].asDouble();
+
+  MiceModule* module = Globals::GetReconstructionMiceModules();
+  if ( !module || !(module->daughters()) ) {
+    throw(Squeal(Squeal::nonRecoverable,
           "Failed to load MiceModules",
           "SciFiClusterRec::initialise"));
   }
 
   _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-  Json::Value *json = Globals::GetConfigurationCards();
-  _size_exception = (*json)["SciFiClustExcept"].asInt();
-  _min_npe = (*json)["SciFiNPECut"].asDouble();
+  if ( !(_modules.size()) ) {
+    throw(Squeal(Squeal::nonRecoverable,
+          "Failed to load MiceModules",
+          "SciFiClusterRec::initialise"));
+  }
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {

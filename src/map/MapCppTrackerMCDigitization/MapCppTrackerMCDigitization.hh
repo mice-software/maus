@@ -108,7 +108,7 @@ class MapCppTrackerMCDigitization {
 
  private:
   /// This is the Mice Module
-  MiceModule*      _module;
+  // MiceModule*      _module;
   /// This should be the classname
   std::string _classname;
   /// This will contain the configuration

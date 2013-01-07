@@ -36,7 +36,7 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
   RealDataDigitization test_case_1;
   EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), Squeal);
   RealDataDigitization test_case_2;
-  bool good_calib = test_case_2.load_calibration("scifi_calibration_30_09_2011.txt");
+  bool good_calib = test_case_2.load_calibration("scifi_calibration_jan2013.txt");
   EXPECT_TRUE(good_calib);
 
   for ( int board = 0; board < 16; ++board ) {
