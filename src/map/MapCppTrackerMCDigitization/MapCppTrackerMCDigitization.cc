@@ -19,41 +19,45 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
-  Json::Reader reader;
 
-  // Check if the JSON document can be parsed, else return error only
-  if (!reader.parse(argJsonConfigDocument, _configJSON))
-    return false;
-
-  // Get the tracker modules; they will be necessary for the channel number calculation
-  assert(_configJSON.isMember("simulation_geometry_filename"));
-  std::string filename = _configJSON["simulation_geometry_filename"].asString();
-  _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-  assert(_configJSON.isMember("SciFiDigitNPECut"));
-  SciFiNPECut = _configJSON["SciFiDigitNPECut"].asDouble();
-
-  // Checks for individual channel calibrations, if so, then loads them
-  assert(_configJSON.isMember("SciFiPerChanFlag"));
-  if (_configJSON["SciFiPerChanFlag"].asInt()) {
-    std::ifstream calib_file;
-    calib_file.open("SciFiChanCal.txt");
-    while ( calib_file.good() ) {
-      std::string temp;
-      getline(calib_file, temp);
-      argCal += temp;
+  try {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    static MiceModule* mice_modules = Globals::GetMonteCarloMiceModules();
+    modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    Json::Value *json = Globals::GetConfigurationCards();
+    SciFiNPECut = (*json)["SciFiDigitNPECut"].asDouble();
+    // ______________________________________________
+    _configJSON = *json;
+    assert(_configJSON.isMember("SciFiPerChanFlag"));
+    if (_configJSON["SciFiPerChanFlag"].asInt()) {
+      std::ifstream calib_file;
+      calib_file.open("SciFiChanCal.txt");
+      while ( calib_file.good() ) {
+        std::string temp;
+        getline(calib_file, temp);
+        argCal += temp;
     }
     calib_reader.parse(argCal, _calib_list);
     // std::cerr << _calib_list["entries"][1]["good"] <<"\n";
+    }
+    // ______________________________________________
+    return true;
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
-
-  return true;
+  return false;
 }
 
 bool MapCppTrackerMCDigitization::death() {
@@ -254,6 +258,7 @@ void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
         digits[entry]->set_npe(numPE);
         continue;
       }
+      std::cerr << SciFiNPECut << " " << numPE << std::endl;
       if (numPE > SciFiNPECut) {
         SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
                                              tracker, station, plane,

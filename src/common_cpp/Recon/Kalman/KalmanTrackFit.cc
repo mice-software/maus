@@ -58,7 +58,6 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor mo
 
     size_t numb_measurements = sites.size();
 
-    assert(numb_measurements < 16);
     if ( numb_measurements != 15 ) continue;
     for ( size_t j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
@@ -80,6 +79,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor mo
     monitor.fill(sites);
     // monitor.print_info(sites);
 
+/*
     if ( track->get_chi2() < 15. ) {
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
@@ -87,7 +87,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor mo
         kalman_align.update_site(site);
       }
     }
-/*
+
     if ( 0 && track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
       update_alignment_parameters(sites, track, kalman_align);

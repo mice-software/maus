@@ -47,18 +47,12 @@ void SciFiClusterRec::initialise() {
           "Instance of Globals not found.",
           "SciFiClusterRec::initialise"));
   }
+  static MiceModule* module = Globals::GetReconstructionMiceModules();
+  _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
   Json::Value *json = Globals::GetConfigurationCards();
-
-  std::string filename;
-  filename = (*json)["reconstruction_geometry_filename"].asString();
-  MiceModule* module;
-  module = new MiceModule(filename);
-
   _size_exception = (*json)["SciFiClustExcept"].asInt();
   _min_npe = (*json)["SciFiNPECut"].asDouble();
-  _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-  
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {
@@ -80,7 +74,6 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
   for ( size_t dig = 0; dig < evt.digits().size(); dig++ ) {
-
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }

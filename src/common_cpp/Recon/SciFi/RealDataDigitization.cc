@@ -36,7 +36,7 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  bool calib = load_calibration("scifi_calibration_30_09_2011.txt");
+  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool map = load_mapping("mapping_7.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
@@ -78,31 +78,38 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       int adc = channel_in["adc"].asInt();
       int tdc = channel_in["tdc"].asInt();
 
-      if ( !is_good_channel(board, bank, channel_ro) ) {
+      if ( !is_good_channel(bank, channel_ro) ) {
         continue;
       }
 
       // Get pedestal and gain from calibration.
-      double pedestal =  _calibration_pedestal[board][bank][channel_ro];
-      double gain     =  _calibration_gain[board][bank][channel_ro];
-
+      int new_bank = bank+4*board;
+      double adc_pedestal = calibration_[new_bank][channel_ro]["adc_pedestal"].asDouble();
+      double adc_gain     = calibration_[new_bank][channel_ro]["adc_gain"].asDouble();
+      double tdc_pedestal = calibration_[new_bank][channel_ro]["tdc_pedestal"].asDouble();
+      double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
       // Calculate the number of photoelectrons.
       double pe;
-      if ( pedestal > _pedestal_min && gain > 0 ) {
-        pe = (adc-pedestal)/gain;
+      if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+        pe = (adc-adc_pedestal)/adc_gain;
       } else {
         pe = -10.0;
       }
-      // int unique_chan  = _calibration[board][bank][channel_ro]["unique_chan"].asDouble();
-
+      double time = -10.0;
+      /* No TDC calibration yet.
+      if ( tdc_pedestal > tdc_pedestal_min && tdc_gain > 0 ) {
+        time = (tdc-tdc_pedestal)/tdc_gain;
+      } else {
+        time = -10.0;
+      }
+      */
       // Find tracker, station, plane, channel.
       int tracker, station, plane, channel;
       bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
-
       // Exclude missing modules.
       if ( found ) { // pe > 1.0 &&
         SciFiDigit *digit = new SciFiDigit(spill, eventNo,
-                                           tracker, station, plane, channel, pe, tdc);
+                                           tracker, station, plane, channel, pe, time);
         event->add_digit(digit);
       }
     }  // ends loop over channels (j)
@@ -114,7 +121,7 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
 
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
 
   std::ifstream inf(fname.c_str());
 
@@ -124,20 +131,35 @@ bool RealDataDigitization::load_calibration(std::string file) {
           "RealDataDigitization::load_calibration"));
   }
 
-  std::string line;
+  std::string calib((std::istreambuf_iterator<char>(inf)), std::istreambuf_iterator<char>());
 
-  int numBoards;
-  getline(inf, line);
-  std::istringstream ist1(line.c_str());
-  ist1 >> numBoards;
+  Json::Reader reader;
+  Json::Value calibration_data;
+  if (!reader.parse(calib, calibration_data))
+    return false;
 
-  read_in_all_Boards(inf);
+  size_t n_channels = calibration_data.size();
+
+  for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
+    int bank            = calibration_data[i]["bank"].asInt();
+    int channel_n       = calibration_data[i]["channel"].asInt();
+    double adc_pedestal = calibration_data[i]["adc_pedestal"].asDouble();
+    double adc_gain     = calibration_data[i]["adc_gain"].asDouble();
+    double tdc_pedestal = calibration_data[i]["tdc_pedestal"].asDouble();
+    double tdc_gain     = calibration_data[i]["tdc_gain"].asDouble();
+    Json::Value channel;
+    channel["adc_pedestal"] = adc_pedestal;
+    channel["adc_gain"]     = adc_gain;
+    channel["tdc_pedestal"] = tdc_pedestal;
+    channel["tdc_gain"]     = tdc_gain;
+    calibration_[bank][channel_n] = channel;
+  }
 
   return true;
 }
 
 void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
-  std::string line;
+/*  std::string line;
   // Run over all boards.
   for ( int i = 0; i < _number_boards; ++i ) {
     // Run over banks.
@@ -156,6 +178,7 @@ void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
       }
     }
   }
+*/
 }
 
 bool RealDataDigitization::load_mapping(std::string file) {
@@ -197,7 +220,7 @@ bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan
   bool found = false;
   tracker = station = plane = channel = -1;
 
-  for ( unsigned int i = 0; !found && i < _board.size(); ++i ) {
+  for ( size_t i = 0; !found && i < _board.size(); ++i ) {
     if ( (board == _board[i]) && (bank == _bank[i]) && (chan_ro == _chan_ro[i]) ) {
       station = _station[i];
       plane = _view[i];
@@ -209,10 +232,10 @@ bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan
   return found;
 }
 
-bool RealDataDigitization::is_good_channel(const int board, const int bank,
+bool RealDataDigitization::is_good_channel(const int bank,
                                            const int chan_ro) const {
-  if ( board < _number_boards && bank < _number_banks && chan_ro < _number_channels ) {
-    return _good_chan[board][bank][chan_ro];
+  if ( bank < _number_banks && chan_ro < _number_channels ) {
+    return _good_chan[bank][chan_ro];
   } else {
     return false;
   }
@@ -229,20 +252,20 @@ bool RealDataDigitization::load_bad_channels() {
           "RealDataDigitization::load_bad_channels"));
   }
 
-  for ( int board = 0; board < _number_boards; ++board ) {
-    for ( int bank = 0; bank < _number_banks; ++bank ) {
-      for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
-        _good_chan[board][bank][chan_ro] = true;
-      }
+  for ( int bank = 0; bank < _number_banks; ++bank ) {
+    for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
+      _good_chan[bank][chan_ro] = true;
     }
   }
 
-  int bad_board, bad_bank, bad_chan_ro;
+
+  int bad_bank, bad_chan_ro;
 
   while ( !inf.eof() ) {
-    inf >> bad_board >> bad_bank >> bad_chan_ro;
-    _good_chan[bad_board][bad_bank][bad_chan_ro] = false;
+    inf >> bad_bank >> bad_chan_ro;
+    _good_chan[bad_bank][bad_chan_ro] = false;
   }
+
   return true;
 }
 

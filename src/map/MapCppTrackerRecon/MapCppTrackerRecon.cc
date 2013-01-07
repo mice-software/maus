@@ -39,7 +39,6 @@ namespace MAUS {
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
-  // Check if the JSON document can be parsed, else return error only
   try {
     if (!Globals::HasInstance()) {
       GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
