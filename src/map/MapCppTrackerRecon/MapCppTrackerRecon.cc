@@ -47,8 +47,6 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    std::cerr << _helical_pr_on  << std::endl;
-    std::cerr << _straight_pr_on << std::endl;
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);

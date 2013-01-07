@@ -45,9 +45,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     def testGoodStraightProcess(self):
         """Check that tracker recon  process produces expected
            output with good straight track data"""
-        #maus_cpp.globals.death()
-        print "Globals init? "
-        print maus_cpp.globals.has_instance()
+        maus_cpp.globals.death()
+        self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
         print "Flags passed: "
@@ -55,8 +54,6 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         print self.cfg['SciFiPRStraightOn']
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
-        self.mapper.set_helical_pr_on(0)
-        self.mapper.set_straight_pr_on(1)
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -89,12 +86,12 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     def testGoodHelicalProcess(self):
         """Check that tracker recon  process produces expected
         output with good helical track data"""
+        maus_cpp.globals.death()
+        self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
-        self.mapper.set_helical_pr_on(1)
-        self.mapper.set_straight_pr_on(0)
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))

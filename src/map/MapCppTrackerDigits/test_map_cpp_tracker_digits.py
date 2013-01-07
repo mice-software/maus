@@ -34,35 +34,25 @@ from MapCppTrackerDigits import MapCppTrackerDigits
 # pylint: disable-msg=C0202
 
 class MapCppTrackerDigitsTestCase(unittest.TestCase):
-    """ The MapCppTrackerDigits test.
-    """
+    """ The MapCppTrackerDigits test."""
+
+    cfg = json.loads(Configuration().getConfigJSON())
+    cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
+
     @classmethod
     def setUpClass(self):
         """ Class Initializer.
-            The set up is called before each test function
-            is called.
+            The set up is called before each test function is called.
         """
         self.mapper = MapCppTrackerDigits()
-        conf = json.loads(Configuration().getConfigJSON())
-        conf["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
-        success = self.mapper.birth(json.dumps(conf))
+        success = self.mapper.birth(json.dumps(self.cfg))
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
 
     def testDeath(self):
         """ Test to make sure death occurs """
         self.assertTrue(self.mapper.death())
-
-    def testEmpty(self):
-        """Check can handle empty configuration and empty data"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
-        result = self.mapper.process("")
-        spill_out = json.loads(result)
-        self.assertTrue('errors' in spill_out)
-        self.assertTrue("bad_json_document" in spill_out['errors'])
-        self.assertFalse("recon_events" in spill_out)
 
     def testBadData(self):
         """Check can handle nonsense json input data"""
