@@ -39,8 +39,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def testInit(self):
         """Check birth"""
-        #success = self.mapper.birth(json.dumps(self.cfg))
-        #self.assertTrue(success)
+        success = self.mapper.birth(json.dumps(self.cfg))
+        self.assertTrue(success)
 
     def testGoodStraightProcess(self):
         """Check that tracker recon  process produces expected
