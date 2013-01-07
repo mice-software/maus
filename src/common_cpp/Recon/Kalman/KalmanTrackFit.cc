@@ -30,7 +30,8 @@ KalmanTrackFit::~KalmanTrackFit() {
   std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
 }
 
-void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor monitor;
+void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
+  // KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -76,7 +77,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {  KalmanMonitor mo
     }
     track->compute_chi2(sites);
 
-    monitor.fill(sites);
+    // monitor.fill(sites);
     // monitor.print_info(sites);
 
 /*

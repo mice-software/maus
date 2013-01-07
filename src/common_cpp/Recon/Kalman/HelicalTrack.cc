@@ -109,7 +109,7 @@ void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site)
 
   TMatrixD Q(5, 5);
   Q = get_Q();
-  Q.Print();
+  // Q.Print();
   Q *= conv_factor;
   // Q.Print();
   // Q.Zero();

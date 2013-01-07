@@ -48,6 +48,12 @@ void SciFiClusterRec::initialise() {
           "SciFiClusterRec::initialise"));
   }
   static MiceModule* module = Globals::GetReconstructionMiceModules();
+  if ( !module || module->daughters() ) {
+    throw(Squeal(Squeal::recoverable,
+          "Failed to load MiceModules",
+          "SciFiClusterRec::initialise"));
+  }
+
   _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
 
   Json::Value *json = Globals::GetConfigurationCards();
