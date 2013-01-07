@@ -119,8 +119,8 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   TMatrixD a_smoothed(5, 1);
   a_smoothed = site->get_smoothed_a();
 
-  a_excl.Print();
-  a_smoothed.Print();
+  //a_excl.Print();
+  //a_smoothed.Print();
 
   double diff = a_excl(0, 0) - a_smoothed(0, 0);
 

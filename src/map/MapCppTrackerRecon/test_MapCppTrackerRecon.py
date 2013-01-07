@@ -28,23 +28,14 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTrackerRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
-    #cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
-    #cfg['SciFiPRHelicalOn'] = 0
-    #cfg['SciFiStraightOn'] = 0
+    cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
+    cfg['SciFiPRHelicalOn'] = 0
+    cfg['SciFiStraightOn'] = 0
 
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MAUS.MapCppTrackerRecon()
-
-    def testEmpty(self):
-        """Check can handle empty configuration and data"""
-        #result = self.mapper.birth("")
-        #self.assertFalse(result)
-        #result = self.mapper.process("")
-        #spill_out = json.loads(result)
-        #self.assertTrue('errors' in spill_out)
-        #self.assertTrue("bad_json_document" in spill_out['errors'])
 
     def testInit(self):
         """Check birth"""
@@ -64,11 +55,18 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         print self.cfg['SciFiPRStraightOn']
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
+        self.mapper.set_helical_pr_on(0)
+        self.mapper.set_straight_pr_on(1)
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (straights)
+        fin.readline()
+        fin.readline()
+        fin.readline()
+        fin.readline()
+        fin.readline()
         data = fin.readline()
         result = self.mapper.process(data)
         spill_out = json.loads(result)
@@ -78,17 +76,49 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(15, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
-        self.assertEqual(15, len(revt['sci_fi_event']['clusters']))
+        self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])
-        self.assertEqual(5, len(revt['sci_fi_event']['spacepoints']))
+        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
         self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(1, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertEqual(2, len(revt['sci_fi_event']['straight_pr_tracks']))
         self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
 
-
+    def testGoodHelicalProcess(self):
+        """Check that tracker recon  process produces expected
+        output with good helical track data"""
+        self.cfg['SciFiPRHelicalOn'] = 1
+        self.cfg['SciFiStraightOn'] = 0
+        success = self.mapper.birth(json.dumps(self.cfg))
+        self.assertTrue(success)
+        self.mapper.set_helical_pr_on(1)
+        self.mapper.set_straight_pr_on(0)
+        # Read in a spill of mc data containing 5 straight tracks
+        test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test1,'r')
+        # Check the first spill (helices)
+        fin.readline()
+        fin.readline()
+        data = fin.readline()
+        result = self.mapper.process(data)
+        spill_out = json.loads(result)
+        self.assertTrue('recon_events' in spill_out)
+        self.assertEqual(5, len(spill_out['recon_events']))
+        # Check the first event
+        revt = spill_out['recon_events'][0]
+        self.assertTrue('digits' in revt['sci_fi_event'])
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        self.assertTrue('clusters' in revt['sci_fi_event'])
+        self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
+        self.assertTrue('spacepoints' in revt['sci_fi_event'])
+        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
+        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(0, len(revt['sci_fi_event']['straight_pr_tracks']))
+        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
+        self.assertEqual(2, len(revt['sci_fi_event']['helical_pr_tracks']))
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103

@@ -346,6 +346,75 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   EXPECT_NEAR(4.5, strks[0]->get_y_chisq(), 0.1);
 }
 
+TEST_F(PatternRecognitionTest, test_make_3pt_helical_tracks) {
+
+  // Make a 3 point helical track from 3 spacepoints
+  // -----------------------------------------------
+  PatternRecognition pr;
+  int n_stations = 5;
+
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+
+  // Set up spacepoints corresponding to circle of radius 2 mm, centred at (1,2)
+  ThreeVector pos(1.0, 4.0, 0.0);
+  sp1->set_position(pos);
+  pos.set(3.0, 2.0, 0.0);
+  sp2->set_position(pos);
+  pos.set(1.0, 0.0, 0.0);
+  sp3->set_position(pos);
+
+  sp1->set_tracker(1);
+  sp1->set_station(1);
+  sp1->set_type("triplet");
+  sp1->set_used(false);
+
+  sp2->set_tracker(1);
+  sp2->set_station(2);
+  sp2->set_type("triplet");
+  sp2->set_used(false);
+
+  sp3->set_tracker(1);
+  sp3->set_station(3);
+  sp3->set_type("triplet");
+  sp3->set_used(false);
+
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp1);
+  spnts.push_back(sp2);
+  spnts.push_back(sp3);
+
+  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
+  pr.sort_by_station(spnts, spnts_by_station);
+
+  std::vector<SciFiHelicalPRTrack*> htrks;
+  std::vector<SciFiStraightPRTrack*> strks;
+
+  bool track_type = 1; // Helical tracks
+  int tracker_num = 0;
+
+  // Make the track
+  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
+
+  // Check the parameters are correct
+  double x0 = 1.0;
+  double y0 = 2.0;
+  double R = 2.0;
+  double epsilon = 0.01;
+
+  ASSERT_EQ(0u, strks.size());
+  ASSERT_EQ(0u, htrks.size());  // Should fail sz chisq test
+
+  // EXPECT_NEAR(htrks[0]->get_circle_x0(), x0, epsilon);
+  // EXPECT_NEAR(htrks[0]->get_circle_x0(), y0, epsilon);
+  // EXPECT_NEAR(htrks[0]->get_R(), R, epsilon);
+
+  delete sp1;
+  delete sp2;
+  delete sp3;
+}
+
 TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 
   // Set up the spacepoints vector

@@ -528,6 +528,4 @@ double MapCppTrackerReconTest::compute_chan_no(MAUS::SciFiHit *ahit) {
   return chanNo;
 }
 
-
 } // ~namespace MAUS
-
