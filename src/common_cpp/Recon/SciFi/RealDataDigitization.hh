@@ -62,19 +62,22 @@ class RealDataDigitization {
 
   ~RealDataDigitization();
 
+  void initialise();
+
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
    *  @params input_event The DAQ JSON Tracker Event
    */
   void process(Spill &spill, Json::Value const &input_event);
 
+  void process_VLSB_c(Json::Value input_event,
+                      SciFiEvent* event,
+                      Tracker0DaqArray &tracker0,
+                      Tracker1DaqArray &tracker1);
+
   /** @brief Reads in the calibration.
    */
   bool load_calibration(std::string filename);
-
-  /** @brief Saves calibration to vectors.
-   */
-  void read_in_all_Boards(std::ifstream &inf);
 
   /** @brief Loads the mapping.
    */
@@ -91,24 +94,22 @@ class RealDataDigitization {
 
   /** @brief Returns value depends on the goodness of the channel.
    */
-  bool is_good_channel(int board, int bank, int chan_ro) const;
+  bool is_good_channel(int bank, int chan_ro) const;
 
-  int get_calibration_unique_chan_numb(int board, int bank, int chan) const {
-                                       return _calibration_unique_chan_number[board][bank][chan]; }
+  // int get_calibration_unique_chan_numb(int bank, int chan) const {
+  //                                 return _calibration_unique_chan_number[board][bank][chan]; }
 
  private:
   static const int _number_channels       = 128;
-  static const int _number_banks          = 4;
+  static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
   static const double _pedestal_min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
-  double _calibration_pedestal[_number_boards][_number_banks][_number_channels];
-  double _calibration_gain[_number_boards][_number_banks][_number_channels];
-  int    _calibration_unique_chan_number[_number_boards][_number_banks][_number_channels];
+  Json::Value calibration_[_number_banks][_number_channels];
   /// This is an array storing the goodness of each channel.
-  bool _good_chan[_number_boards][_number_banks][_number_channels];
+  bool _good_chan[_number_banks][_number_channels];
 
   /// This is for the mapping storage.
   IntChannelArray _board;

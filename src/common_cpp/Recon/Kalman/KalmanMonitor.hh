@@ -73,6 +73,9 @@ class KalmanMonitor {
   TH1F *pull_site_5;
   TH1F *residual_site_5;
   TH1F *smoothed_residual_site_5;
+  TH1F *pull_site_9;
+  TH1F *residual_site_9;
+  TH1F *smoothed_residual_site_9;
 
   TGraph *station1;
   TGraph *station2;

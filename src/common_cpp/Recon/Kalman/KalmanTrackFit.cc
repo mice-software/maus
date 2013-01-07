@@ -22,7 +22,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(500.) {
+KalmanTrackFit::KalmanTrackFit():_seed_cov(200.) {
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -30,18 +30,13 @@ KalmanTrackFit::~KalmanTrackFit() {
   std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
 }
 
-//
-// Straight track fit.
-//
 void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
-  unsigned int num_tracks = seeds.size();
-  KalmanMonitor monitor;
+  // KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
-  // std::cerr << "Number of seeds: " << num_tracks << std::endl;
-
-  for ( unsigned int i = 0; i < num_tracks; ++i ) {
+  size_t num_tracks = seeds.size();
+  for ( size_t i = 0; i < num_tracks; ++i ) {
     KalmanSeed* seed = seeds[i];
     std::vector<KalmanSite> sites;
     initialise(seed, sites, kalman_align);
@@ -62,11 +57,10 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
     // std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
 
-    unsigned int numb_measurements = sites.size();
+    size_t numb_measurements = sites.size();
 
-    assert(numb_measurements < 16);
     if ( numb_measurements != 15 ) continue;
-    for ( unsigned int j = 1; j < numb_measurements; ++j ) {
+    for ( size_t j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
       // std::cerr << "Extrapolating to site " << j << std::endl;
       extrapolate(sites, track, j);
@@ -77,14 +71,23 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
-    for ( unsigned int j = numb_measurements-2; j > -1; --j ) {
+    for ( size_t j = numb_measurements-2; j > -1; --j ) {
       // std::cerr << "Smoothing site " << j << std::endl;
       smooth(sites, track, j);
     }
     track->compute_chi2(sites);
 
-    monitor.fill(sites);
+    // monitor.fill(sites);
     // monitor.print_info(sites);
+
+/*
+    if ( track->get_chi2() < 15. ) {
+      for ( size_t j = 0; j < numb_measurements; ++j ) {
+        KalmanSite *site = &sites[j];
+        track->exclude_site(site);
+        kalman_align.update_site(site);
+      }
+    }
 
     if ( 0 && track->get_chi2() < 15. && numb_measurements == 15 ) {
       std::cerr << "Good chi2; lauching KalmanAlignment...\n";
@@ -93,6 +96,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
       // Update Stored misalignments using values stored in each site.
       kalman_align.update(sites);
     }
+*/
     delete track;
   }
 }
@@ -100,9 +104,9 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
 void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
                                                  KalmanTrack *track,
                                                  KalmanSciFiAlignment &kalman_align) {
-  unsigned int numb_measurements = sites.size();
+  size_t numb_measurements = sites.size();
 
-  for ( int i = 0; i < numb_measurements; ++i ) {
+  for ( size_t i = 0; i < numb_measurements; ++i ) {
     // ... Filter...
     std::cerr << "Updating site " << i << std::endl;
     filter_updating_misalignments(sites, track, i);
@@ -139,8 +143,8 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   first_plane.set_S_covariance(kalman_align.get_cov_shifts(id_0));
   sites.push_back(first_plane);
 
-  int numb_sites = clusters.size();
-  for ( int j = 1; j < numb_sites; ++j ) {
+  size_t numb_sites = clusters.size();
+  for ( size_t j = 1; j < numb_sites; ++j ) {
     KalmanSite a_site;
     a_site.set_measurement(clusters[j]->get_alpha());
     a_site.set_direction(clusters[j]->get_direction());
@@ -153,7 +157,7 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
     sites.push_back(a_site);
   }
 
-  for ( int j = 0; j < numb_sites; ++j ) {
+  for ( size_t j = 0; j < numb_sites; ++j ) {
     CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
     CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
     sites[j].set_true_position(true_position);
@@ -229,12 +233,12 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   track->calc_covariance(old_site, new_site);
 }
 
-void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int k) {
+void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int id) {
   // Get site to be smoothed...
-  KalmanSite *smoothing_site = &sites[k];
+  KalmanSite *smoothing_site = &sites[id];
 
   // ... and the already perfected site.
-  KalmanSite *optimum_site = &sites[k+1];
+  KalmanSite *optimum_site = &sites[id+1];
 
   // Set the propagator right.
   track->update_propagator(optimum_site, smoothing_site);

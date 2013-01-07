@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,39 +12,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-
-#ifndef HELICALTRACK_HH
-#define HELICALTRACK_HH
-
-// C headers
-#include <assert.h>
-#include <math.h>
-
-// C++ headers
-#include <string>
-#include <vector>
-
-#include "TMath.h"
-#include "TMatrixD.h"
-
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/JsonCppProcessors/TrackerDaqProcessor.hh"
 
 namespace MAUS {
 
-class HelicalTrack : public KalmanTrack {
- public:
-
-  virtual ~HelicalTrack();
-
-  void update_propagator(KalmanSite *old_site, KalmanSite *new_site);
-
-  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
-};
-
-} // ~namespace MAUS
-
-#endif
+TrackerDaqProcessor::TrackerDaqProcessor()
+    : _VLSB_proc(new VLSBProcessor) {
+    RegisterValueBranch
+          ("VLSB", &_VLSB_proc, &TrackerDaq::GetVLSBArray,
+          &TrackerDaq::SetVLSBArray, true);
+}
+}  // namespace MAUS

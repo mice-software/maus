@@ -29,6 +29,7 @@
 #include "src/common_cpp/DataStructure/Unknown.hh"
 #include "src/common_cpp/DataStructure/TriggerRequest.hh"
 #include "src/common_cpp/DataStructure/Tag.hh"
+#include "src/common_cpp/DataStructure/TrackerDaq.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -41,6 +42,8 @@ typedef std::vector<TOFDaq*> TOF2DaqArray;
 typedef std::vector<TriggerRequest*> TriggerRequestArray;
 typedef std::vector<Unknown*> UnknownArray;
 typedef std::vector<Tag*> TagArray;
+typedef std::vector<TrackerDaq*> Tracker0DaqArray;
+typedef std::vector<TrackerDaq*> Tracker1DaqArray;
 
 /** @class DAQData comment
  *
@@ -125,6 +128,22 @@ class DAQData {
     /** Sets TOF2DaqArray */
     void SetTOF2DaqArray(TOF2DaqArray tof2);
 
+    Tracker0DaqArray GetTracker0DaqArray() const;
+
+    TrackerDaq* GetTracker0DaqArrayElement(size_t index) const;
+
+    size_t GetTracker0DaqArraySize() const;
+
+    void SetTracker0DaqArray(Tracker0DaqArray tracker0);
+
+    Tracker1DaqArray GetTracker1DaqArray() const;
+
+    TrackerDaq* GetTracker1DaqArrayElement(size_t index) const;
+
+    size_t GetTracker1DaqArraySize() const;
+
+    void SetTracker1DaqArray(Tracker1DaqArray tracker1);
+
     /** Returns UnknownArray */
     UnknownArray GetUnknownArray() const;
 
@@ -196,6 +215,8 @@ class DAQData {
     TagArray _tag;
     TOF0DaqArray _tof0;
     TriggerArray _trigger;
+    Tracker0DaqArray _tracker0;
+    Tracker1DaqArray _tracker1;
 
     ClassDef(DAQData, 1)
 };

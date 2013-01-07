@@ -36,8 +36,8 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   prev_site = old_site->get_a();
 
   double old_kappa = prev_site(4, 0);
-  double old_px = prev_site(1, 0);
-  double old_py = prev_site(3, 0);
+  // double old_px = prev_site(1, 0);
+  // double old_py = prev_site(3, 0);
 
   double Q = 1.;
   double B = -4.;
@@ -97,6 +97,23 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 3) = 0.;
   // @kappa/@kappa
   _F(4, 4) = 1.;
+}
+
+void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
+  TMatrixD a(5, 1);
+  a = old_site->get_a();
+  Double_t kappa = a(4, 0);
+  Double_t conv_factor = kappa*kappa;
+
+  KalmanTrack::calc_system_noise(old_site, new_site);
+
+  TMatrixD Q(5, 5);
+  Q = get_Q();
+  // Q.Print();
+  Q *= conv_factor;
+  // Q.Print();
+  // Q.Zero();
+  set_Q(Q);
 }
 
 } // ~namespace MAUS

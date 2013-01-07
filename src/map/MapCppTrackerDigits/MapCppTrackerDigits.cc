@@ -22,54 +22,10 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
-
-// #include "src/common_cpp/Utils/Globals.hh"
-// #include "src/common_cpp/Globals/GlobalsManager.hh"
-
 namespace MAUS {
 
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
-/*
-  // Check if the JSON document can be parsed, else return error only
-  try {
-    if (!Globals::HasInstance()) {
-        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
-    _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
-    return true;  // Sucessful completion
-  // Normal session, no visualization
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-  }
-  return false;
-
-
-  // JsonCpp string -> JSON::Value converter
-  Json::Reader reader;
-
-  // Check if the JSON document can be parsed, else return error only.
-  bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
-  if (!parsingSuccessful) {
-    return false;
-  }
-
-  // Get the tracker modules.
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
-  std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
-  MiceModule* _module;
-  _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-  // Get minPE cut value.
-  assert(_configJSON.isMember("SciFiNPECut"));
-  minPE = _configJSON["SciFiNPECut"].asDouble();
-
-  return true;
-*/
 }
 
 bool MapCppTrackerDigits::death() {
@@ -88,6 +44,7 @@ std::string MapCppTrackerDigits::process(std::string document) {
       Json::Value daq = root.get("daq_data", 0);
       // Process the input.
       RealDataDigitization real;
+      real.initialise();
       real.process(spill, daq);
       // Save to JSON output.
       save_to_json(spill);

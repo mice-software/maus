@@ -62,6 +62,8 @@
 #pragma link C++ class std::vector<TriggerRequest*>;
 #pragma link C++ class std::vector<Unknown*>;
 #pragma link C++ class std::vector<Tag*>;
+#pragma link C++ class std::vector<TrackerDaq*>;
+#pragma link C++ class std::vector<TrackerDaq*>;
 
 #pragma link C++ class MAUS::TestBranch+;
 #pragma link C++ class MAUS::TestChild+;
@@ -95,6 +97,10 @@
 #pragma link C++ class MAUS::SpecialVirtualHit+;
 #pragma link C++ class MAUS::SpecialVirtualChannelId+;
 
+#pragma link C++ class MAUS::VLSB+;
+#pragma link C++ class std::vector<VLSB>;
+#pragma link C++ class MAUS::VLSB_C+;
+#pragma link C++ class std::vector<VLSB_C>;
 #pragma link C++ class MAUS::V1290+;
 #pragma link C++ class std::vector<V1290>;
 #pragma link C++ class MAUS::EMREvent+;
@@ -133,6 +139,7 @@
 #pragma link C++ class MAUS::CkovA+;
 #pragma link C++ class MAUS::CkovB+;
 #pragma link C++ class MAUS::Tag+;
+#pragma link C++ class MAUS::TrackerDaq+;
 #pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::SciFiDigit+;
 #pragma link C++ class MAUS::SciFiCluster+;

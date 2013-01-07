@@ -39,22 +39,19 @@ namespace MAUS {
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
-  // Check if the JSON document can be parsed, else return error only
   try {
     if (!Globals::HasInstance()) {
-        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    return true;  // Sucessful completion
-  // Normal session, no visualization
+    return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
-  std::cerr << "Failed to initialised globals" << std::endl;
   return false;
 }
 
@@ -63,16 +60,14 @@ bool MapCppTrackerRecon::death() {
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
-  std::cerr << "Reconstructing tracker data\n";
+  std::cout << "Reconstructing tracker data\n";
   Json::FastWriter writer;
 
   // Read in json data
   Spill spill;
   bool success = read_in_json(document, spill);
-  if (!success) {
-    std::cerr << _classname << " says: Failed to read in JSON\n";
+  if (!success)
     return writer.write(root);
-  }
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -99,7 +94,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         print_event_info(*event);
       }
     } else {
-      std::cerr << "No recon events found\n";
+      std::cout << "No recon events found\n";
     }
     save_to_json(spill);
   } catch(Squeal& squee) {
@@ -118,13 +113,20 @@ std::string MapCppTrackerRecon::process(std::string document) {
 }
 
 bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
+  Json::Reader reader;
   Json::FastWriter writer;
+
   try {
     root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     spill = *spill_proc.JsonToCpp(root);
     return true;
   } catch(...) {
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << reader.getFormatedErrorMessages();
+    errors["bad_json_document"] = ss.str();
+    root["errors"] = errors;
     writer.write(root);
     return false;
   }

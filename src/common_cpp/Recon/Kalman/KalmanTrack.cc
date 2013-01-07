@@ -606,7 +606,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   ap = optimum_site->get_projected_a();
 
   TMatrixD a_smooth(5, 1);
-  a_smooth = a + _A* (ap - a_opt );
+  a_smooth = a + _A* (a_opt - ap);
   smoothing_site->set_smoothed_a(a_smooth);
   // _________________________________________
   TMatrixD measurement(2, 1);
@@ -636,6 +636,45 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
   TMatrixD C_smooth(5, 5);
   C_smooth =  TMatrixD(C, TMatrixD::kPlus, temp5);
   smoothing_site->set_smoothed_covariance_matrix(C_smooth);
+}
+
+void KalmanTrack::exclude_site(KalmanSite *site) {
+  update_H(site);
+  update_V(site);
+  // a' = a + K pull
+  // The pull.
+  TMatrixD a_smoothed(5, 1);
+  a_smoothed = site->get_smoothed_a();
+
+  TMatrixD shifts = site->get_shifts();
+  TMatrixD HA = solve_measurement_equation(a_smoothed, shifts);
+
+  TMatrixD measurement = site->get_measurement();
+  TMatrixD pull = measurement-HA;
+  std::cout << "Pull exclusion..." << std::endl;
+  pull.Print();
+
+  // The "gain"
+  TMatrixD C_smoothed(5, 5);
+  C_smoothed = site->get_smoothed_covariance_matrix();
+
+  TMatrixD H_transposed(5, 2);
+  H_transposed.Transpose(_H);
+
+
+  TMatrixD TEMP = _V*(-1.)+_H*C_smoothed*H_transposed;
+  TEMP.Invert();
+
+  TMatrixD Kn(5, 2);
+  Kn = C_smoothed*H_transposed*TEMP;
+
+  // new site estimation
+  TMatrixD an(5, 1);
+  an = a_smoothed + Kn*pull;
+an.Print();
+a_smoothed.Print();
+
+  site->set_excluded_state(an);
 }
 
 void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {

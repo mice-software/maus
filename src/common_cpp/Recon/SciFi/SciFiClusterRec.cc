@@ -42,16 +42,29 @@ bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
 }
 
 void SciFiClusterRec::initialise() {
+  if (!Globals::HasInstance()) {
+    throw(Squeal(Squeal::nonRecoverable,
+          "Instance of Globals not found.",
+          "SciFiClusterRec::initialise"));
+  }
+
   Json::Value *json = Globals::GetConfigurationCards();
-
-  std::string filename;
-  filename = (*json)["reconstruction_geometry_filename"].asString();
-  MiceModule* module;
-  module = new MiceModule(filename);
-
   _size_exception = (*json)["SciFiClustExcept"].asInt();
   _min_npe = (*json)["SciFiNPECut"].asDouble();
+
+  MiceModule* module = Globals::GetReconstructionMiceModules();
+  if ( !module || !(module->daughters()) ) {
+    throw(Squeal(Squeal::nonRecoverable,
+          "Failed to load MiceModules",
+          "SciFiClusterRec::initialise"));
+  }
+
   _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  if ( !(_modules.size()) ) {
+    throw(Squeal(Squeal::nonRecoverable,
+          "Failed to load MiceModules",
+          "SciFiClusterRec::initialise"));
+  }
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {
@@ -73,7 +86,6 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
   for ( size_t dig = 0; dig < evt.digits().size(); dig++ ) {
-
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }
