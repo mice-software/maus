@@ -80,8 +80,8 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         _outfile->open
               (_fname.c_str(), data_type.c_str(), "MAUS output data", "UPDATE");
         _outfile_branch = data_type;
-        (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
     }
+    (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
     data_cpp->SetEvent(ConverterT()(&data_json));
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
