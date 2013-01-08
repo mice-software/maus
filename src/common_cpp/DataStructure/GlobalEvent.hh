@@ -19,6 +19,11 @@
 
 #include "Rtypes.h"  // ROOT
 
+#include "src/common_cpp/DataStructure/GlobalPrimaryChain.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
+#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
+
 namespace MAUS {
 
 /** @class GlobalEvent comment
@@ -26,25 +31,149 @@ namespace MAUS {
  */
 
 class GlobalEvent {
-  public:
-    /** Default constructor - initialises to 0/NULL */
-    GlobalEvent();
+ public:
+  /** Default constructor - initialises to 0/NULL */
+  GlobalEvent();
+  
+  /** Copy constructor - any pointers are deep copied */
+  GlobalEvent(const GlobalEvent& globalevent);
+  
+  /** Equality operator - any pointers are deep copied */
+  GlobalEvent& operator=(const GlobalEvent& globalevent);
 
-    /** Copy constructor - any pointers are deep copied */
-    GlobalEvent(const GlobalEvent& _globalevent);
+  /** Destructor - any member pointers are deleted */
+  virtual ~GlobalEvent();
 
-    /** Equality operator - any pointers are deep copied */
-    GlobalEvent& operator=(const GlobalEvent& _globalevent);
+  /** Add a MAUS::GlobalPrimaryChain object, daughter objects
+   * are ignored. */
+  void add_primarychain(MAUS::GlobalPrimaryChain* pchain) {
+    _primarychains->push_back(pchain);
+  };
 
-    /** Destructor - any member pointers are deleted */
-    virtual ~GlobalEvent();
+  /** If a MAUS::GlobalPrimaryChain object is not already a
+   *  member of the GlobalEvent, add it in.  Otherwise, return false,
+   *  to signify already added.*/
+  bool add_primarychain_check(MAUS::GlobalPrimaryChain* pchain);
 
+  /** Recursively add a MAUS::GlobalPrimaryChain object and
+   *  the associated daughter objects */
+  void add_primarychain_recursive(MAUS::GlobalPrimaryChain* pchain);
 
-  private:
+  /** Return the std::vector of MAUS::GlobalPrimaryChain*,
+   *  #_primarychains. */
+  std::vector<MAUS::recon::global::PrimaryChain*>* get_primarychains() const {
+    return _primarychains;
+  };
 
-    ClassDef(GlobalEvent, 1)
-};
-}
+  /** Set the std::vector<MAUS::recon::global::PrimaryChain*>. */
+  void set_primarychains(
+      std::vector<MAUS::recon::global::PrimaryChain*> *primarychains) {
+    _primarychains = primarychains;
+  };
+
+  /** Add a MAUS::GlobalTrack object, daughter objects are ignored. */
+  void add_track(MAUS::GlobalTrack* track) {
+    _tracks->push_back(track);
+  };
+
+  /** If a MAUS::GlobalTrack object is not already a member of the
+   *  GlobalEvent, add it in.  Otherwise, return false, to signify
+   *  already added.*/
+  bool add_track_check(MAUS::GlobalTrack* track);
+
+  /** Recursively add a MAUS::GlobalTrack object and the associated
+   *  daughter objects */
+  void add_track_recursive(MAUS::GlobalTrack* track);
+
+  /** Return the std::vector of MAUS::GlobalTrack*,
+   *  #_tracks. */
+  std::vector<MAUS::recon::global::Track*>* get_tracks() const {
+    return _tracks;
+  };
+
+  /** Set the std::vector<MAUS::recon::global::Track*>. */
+  void set_tracks(
+      std::vector<MAUS::recon::global::Track*> *tracks) {
+    _tracks = tracks;
+  };
+
+  /** Add a MAUS::GlobalTrackPoint object, daughter objects are ignored. */
+  void add_trackpoint(MAUS::GlobalTrackPoint* trackpoint) {
+    _trackpoints->push_back(trackpoint);
+  };
+
+  /** If a MAUS::GlobalTrackPoint object is not already a member of the
+   *  GlobalEvent, add it in.  Otherwise, return false, to signify
+   *  already added.*/
+  bool add_trackpoint_check(MAUS::GlobalTrackPoint* trackpoint);
+
+  /** Recursively add a MAUS::GlobalTrackPoint object and the associated
+   *  daughter objects */
+  void add_trackpoint_recursive(MAUS::GlobalTrackPoint* trackpoint);
+
+  /** Return the std::vector of MAUS::GlobalTrackPoint*,
+   *  #_trackpoints. */
+  std::vector<MAUS::recon::global::TrackPoint*>* get_trackpoints() const {
+    return _trackpoints;
+  };
+
+  /** Set the std::vector<MAUS::recon::global::TrackPoint*>. */
+  void set_trackpoints(
+      std::vector<MAUS::recon::global::TrackPoint*> *trackpoints) {
+    _trackpoints = trackpoints;
+  };
+
+  /** Add a MAUS::GlobalSpacePoint object. */
+  void add_spacepoint(MAUS::GlobalSpacePoint* spacepoint) {
+    _spacepoints->push_back(spacepoint);
+  };
+
+  /** If a MAUS::GlobalSpacePoint object is not already a
+   *  member of the GlobalEvent, add it in.  Otherwise, return false,
+   *  to signify already added.*/
+  bool add_spacepoint_check(MAUS::GlobalSpacePoint* spacepoint);
+
+  /** Return the std::vector of MAUS::GlobalSpacePoint*,
+   *  #_spacepoints. */
+  std::vector<MAUS::recon::global::SpacePoint*>* get_spacepoints() const {
+    return _spacepoints;
+  };
+
+  /** Set the std::vector<MAUS::recon::global::SpacePoint*>, #_spacepoints. */
+  void set_spacepoints(
+      std::vector<MAUS::recon::global::SpacePoint*> *spacepoints) {
+    _spacepoints = spacepoints;
+  };
+
+ private:
+
+  /** A vector of MAUS::GlobalPrimaryChain pointers
+   *  associated with this event. Different reconstruction steps can
+   *  be distinguished by mapper_name. */
+  std::vector<MAUS::recon::global::PrimaryChain*> *_primarychains;
+  
+  /** A vector of MAUS::GlobalTrack pointers associated with
+   *  this event. These should be accessed through the
+   *  MAUS::GlobalPrimaryChain pointers stored in
+   *  #_primarychains. */
+  std::vector<MAUS::recon::global::Track*> *_tracks;
+  
+  /** A vector of MAUS::GlobalTrackPoint pointers associated with
+   *  this event. These should be accessed through the
+   *  MAUS::GlobalPrimaryChain pointers stored in
+   *  #_primarychains. */
+  std::vector<MAUS::recon::global::TrackPoint*> *_trackpoints;
+  
+  /** A vector of MAUS::GlobalSpacePoint pointers associated with
+   *  this event. These should be accessed through the
+   *  MAUS::GlobalPrimaryChain pointers stored in
+   *  #_primarychains. */
+  std::vector<MAUS::recon::global::SpacePoint*> *_spacepoints;
+
+  ClassDef(GlobalEvent, 2)
+}; // ~GlobalEvent
+
+} // ~MAUS
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
 

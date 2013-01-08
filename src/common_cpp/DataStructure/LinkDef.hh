@@ -67,8 +67,6 @@
 #pragma link C++ class MAUS::TestChild+;
 #pragma link C++ class std::vector<MAUS::TestChild*>;
 
-#pragma link C++ class MAUS::ReconEvent+;
-
 #pragma link C++ class MAUS::TOFEvent+;
 #pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::EMREvent+;
@@ -140,6 +138,14 @@
 #pragma link C++ class std::vector<SciFiSpacePoint*>+;
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
+#pragma link C++ class MAUS::recon::global::SpacePoint+;
+#pragma link C++ class MAUS::recon::global::TrackPoint+;
+#pragma link C++ class MAUS::recon::global::Track+;
+#pragma link C++ class MAUS::recon::global::PrimaryChain+;
+#pragma link C++ class std::vector<MAUS::recon::global::SpacePoint*>+;
+#pragma link C++ class std::vector<MAUS::recon::global::TrackPoint*>+;
+#pragma link C++ class std::vector<MAUS::recon::global::Track*>+;
+#pragma link C++ class std::vector<MAUS::recon::global::PrimaryChain*>+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;
