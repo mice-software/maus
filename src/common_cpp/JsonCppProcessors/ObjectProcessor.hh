@@ -128,8 +128,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  MyProcessor<Child>, NOT MyProcess<Child*>
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param child_processor processor that will be used to convert the
-     *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
      *  where memory is still owned by the ParentType
      *  @param SetMethod callback that will set a pointer to the child data,
@@ -142,7 +140,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      */
     template <class ChildType>
     void RegisterPointerReference(std::string branch_name,
-                    ProcessorBase<ChildType>* child_processor,
                     ChildType* (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);

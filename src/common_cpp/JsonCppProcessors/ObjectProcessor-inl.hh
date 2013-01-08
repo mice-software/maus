@@ -52,14 +52,13 @@ template <class ObjectType>
 template <class ChildType>
 void ObjectProcessor<ObjectType>::RegisterPointerReference(
                 std::string branch_name,
-                ProcessorBase<ChildType>* child_processor,
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
     using ObjectProcessorNS::BaseItem;
     using ObjectProcessorNS::PointerRefItem;
     BaseItem<ObjectType>* item = new PointerRefItem<ObjectType, ChildType>
-              (branch_name, child_processor, GetMethod, SetMethod, is_required);
+              (branch_name, GetMethod, SetMethod, is_required);
     _items[branch_name] = item;
 }
 
