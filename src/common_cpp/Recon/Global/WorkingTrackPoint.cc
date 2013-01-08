@@ -17,7 +17,7 @@
 /* Author: Peter Lane
  */
 
-#include "Recon/Global/TrackPoint.hh"
+#include "Recon/Global/WorkingTrackPoint.hh"
 
 #include <cmath>
 #include "CLHEP/Units/PhysicalConstants.h"
@@ -33,14 +33,14 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-TrackPoint::TrackPoint()
+WorkingTrackPoint::WorkingTrackPoint()
     : PhaseSpaceVector(),
       detector_id_(Detector::kNone),
       particle_id_(Particle::kNone),
       z_(0.0)
 { }
 
-TrackPoint::TrackPoint(const TrackPoint& original_instance)
+WorkingTrackPoint::WorkingTrackPoint(const WorkingTrackPoint& original_instance)
     : PhaseSpaceVector(original_instance),
       detector_id_(original_instance.detector_id_),
       uncertainties_(original_instance.uncertainties_),
@@ -48,60 +48,60 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance)
       z_(original_instance.z_)
 { }
 
-TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
-                       const double z, const Particle::ID pid)
+WorkingTrackPoint::WorkingTrackPoint(const PhaseSpaceVector & original_instance,
+                                     const double z, const Particle::ID pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone),
       particle_id_(pid), z_(z)
 { }
 
-TrackPoint::TrackPoint(const Vector<double> & original_instance,
-                       const double z, const Particle::ID pid)
+WorkingTrackPoint::WorkingTrackPoint(const Vector<double> & original_instance,
+                                     const double z, const Particle::ID pid)
     : PhaseSpaceVector(original_instance),
       detector_id_(Detector::kNone),
       particle_id_(pid), z_(z)
 { }
 
-TrackPoint::TrackPoint(const double time, const double energy,
-                       const double x, const double px,
-                       const double y, const double py,
-                       const CovarianceMatrix & uncertainties,
-                       const double z)
+WorkingTrackPoint::WorkingTrackPoint(const double time, const double energy,
+                                     const double x, const double px,
+                                     const double y, const double py,
+                                     const CovarianceMatrix & uncertainties,
+                                     const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(Detector::kNone),
       uncertainties_(uncertainties),
       particle_id_(Particle::kNone), z_(z) { }
 
-TrackPoint::TrackPoint(const double time, const double energy,
-                       const double x, const double px,
-                       const double y, const double py,
-                       const Detector & detector,
-                       const double z)
+WorkingTrackPoint::WorkingTrackPoint(const double time, const double energy,
+                                     const double x, const double px,
+                                     const double y, const double py,
+                                     const Detector & detector,
+                                     const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(detector.id()),
       uncertainties_(detector.uncertainties()),
       particle_id_(Particle::kNone), z_(z) { }
 
-TrackPoint::TrackPoint(const double time, const double energy,
-                       const double x, const double px,
-                       const double y, const double py,
-                       const Particle::ID particle_id,
-                       const double z)
+WorkingTrackPoint::WorkingTrackPoint(const double time, const double energy,
+                                     const double x, const double px,
+                                     const double y, const double py,
+                                     const Particle::ID particle_id,
+                                     const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(Detector::kNone),
       particle_id_(particle_id), z_(z) { }
 
-TrackPoint::TrackPoint(double const * const array,
-                       const double z)
+WorkingTrackPoint::WorkingTrackPoint(double const * const array,
+                                     const double z)
     : PhaseSpaceVector(array),
       detector_id_(Detector::kNone),
       particle_id_(Particle::kNone), z_(z) {
 }
 
-TrackPoint::~TrackPoint() {
+WorkingTrackPoint::~WorkingTrackPoint() {
 }
 
-TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
+WorkingTrackPoint & WorkingTrackPoint::operator=(const WorkingTrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
   particle_id_ = rhs.particle_id_;
   uncertainties_ = rhs.uncertainties_;
@@ -111,7 +111,7 @@ TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   return *this;
 }
 
-const bool TrackPoint::operator==(const TrackPoint& rhs) const {
+const bool WorkingTrackPoint::operator==(const WorkingTrackPoint& rhs) const {
   if (static_cast<PhaseSpaceVector const * const>(this)->operator!=(rhs)) {
     return false;
   } else if (rhs.detector_id_ != detector_id_) {
@@ -127,47 +127,47 @@ const bool TrackPoint::operator==(const TrackPoint& rhs) const {
   return true;
 }
 
-const bool TrackPoint::operator!=(const TrackPoint& rhs) const {
+const bool WorkingTrackPoint::operator!=(const WorkingTrackPoint& rhs) const {
   return !operator==(rhs);
 }
 
-const bool TrackPoint::operator<(const TrackPoint& rhs) const {
+const bool WorkingTrackPoint::operator<(const WorkingTrackPoint& rhs) const {
   return z() < rhs.z();
 }
 
-const bool TrackPoint::operator>(const TrackPoint& rhs) const {
+const bool WorkingTrackPoint::operator>(const WorkingTrackPoint& rhs) const {
   return z() > rhs.z();
 }
 
-void TrackPoint::set_particle_id(const Particle::ID id) {
+void WorkingTrackPoint::set_particle_id(const Particle::ID id) {
   particle_id_ = id;
 }
 
-Particle::ID TrackPoint::particle_id() const {
+Particle::ID WorkingTrackPoint::particle_id() const {
   return particle_id_;
 }
 
-void TrackPoint::set_detector_id(const Detector::ID id) {
+void WorkingTrackPoint::set_detector_id(const Detector::ID id) {
   detector_id_ = id;
 }
 
-Detector::ID TrackPoint::detector_id() const {
+Detector::ID WorkingTrackPoint::detector_id() const {
   return detector_id_;
 }
 
-void TrackPoint::set_uncertainties(const CovarianceMatrix & uncertainties) {
+void WorkingTrackPoint::set_uncertainties(const CovarianceMatrix & uncertainties) {
   uncertainties_ = uncertainties;
 }
 
-const CovarianceMatrix & TrackPoint::uncertainties() const {
+const CovarianceMatrix & WorkingTrackPoint::uncertainties() const {
   return uncertainties_;
 }
 
-double TrackPoint::z_momentum() const {
+double WorkingTrackPoint::z_momentum() const {
   if (particle_id_ == Particle::kNone) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to calculate the momentum of a non-particle",
-                 "MAUS::recon::global::TrackPoint::z_momentum()"));
+                 "MAUS::recon::global::WorkingTrackPoint::z_momentum()"));
   }
   const double mass = Particle::GetInstance()->GetMass(particle_id_);
   const double energy = (*this)[1];
@@ -178,14 +178,14 @@ double TrackPoint::z_momentum() const {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to calculate the momentum of a "
                  "particle that is off mass shell.",
-                 "MAUS::recon::global::TrackPoint::z_momentum()"));
+                 "MAUS::recon::global::WorkingTrackPoint::z_momentum()"));
   }
 
   return ::sqrt(energy*energy - mass*mass - px*px - py*py);
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle
-PrimaryGeneratorParticle(const TrackPoint & point) {
+PrimaryGeneratorParticle(const WorkingTrackPoint & point) {
   MAUSPrimaryGeneratorAction::PGParticle particle;
   particle.time = point.t();
   particle.energy = point.E();
@@ -201,7 +201,7 @@ PrimaryGeneratorParticle(const TrackPoint & point) {
   return particle;
 }
 
-std::ostream& operator<<(std::ostream& out, const TrackPoint& point) {
+std::ostream& operator<<(std::ostream& out, const WorkingTrackPoint& point) {
   out << "t: " << point.time() << "  E: "  << point.energy()
       << "  x: " << point.x()    << "  Px: " << point.Px()
       << "  y: " << point.y()    << "  Py: " << point.Py()

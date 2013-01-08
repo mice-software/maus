@@ -17,7 +17,7 @@
 /* Author: Peter Lane
  */
 
-#include "Recon/Global/Track.hh"
+#include "Recon/Global/WorkingTrack.hh"
 
 #include "Interface/Squeak.hh"
 
@@ -25,35 +25,35 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-Track::Track() : std::vector<TrackPoint>(), particle_id_(0)
+WorkingTrack::WorkingTrack() : std::vector<WorkingTrackPoint>(), particle_id_(0)
 { }
 
-Track::Track(const int particle_id)
-    : std::vector<TrackPoint>(), particle_id_(particle_id)
+WorkingTrack::WorkingTrack(const int particle_id)
+    : std::vector<WorkingTrackPoint>(), particle_id_(particle_id)
 { }
 
-Track::Track(const std::vector<TrackPoint>& tracks,
-             const int particle_id)
-    : std::vector<TrackPoint>(tracks), particle_id_(particle_id)
+WorkingTrack::WorkingTrack(const std::vector<WorkingTrackPoint>& tracks,
+                           const int particle_id)
+    : std::vector<WorkingTrackPoint>(tracks), particle_id_(particle_id)
 { }
 
-Track::Track(const Track & original_instance)
-    : std::vector<TrackPoint>(original_instance),
+WorkingTrack::WorkingTrack(const WorkingTrack & original_instance)
+    : std::vector<WorkingTrackPoint>(original_instance),
       particle_id_(original_instance.particle_id_)
 { }
 
-Track::~Track()
+WorkingTrack::~WorkingTrack()
 { }
 
-int Track::particle_id() const {
+int WorkingTrack::particle_id() const {
   return particle_id_;
 }
 
-void Track::set_particle_id(const int particle_id) {
+void WorkingTrack::set_particle_id(const int particle_id) {
   particle_id_ = particle_id;
 }
 
-std::ostream& operator<<(std::ostream& out, const Track& track) {
+std::ostream& operator<<(std::ostream& out, const WorkingTrack& track) {
   out << track.size();
   for (size_t index = 0; index < track.size(); ++index) {
     out << std::endl << track[index];

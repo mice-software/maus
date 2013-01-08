@@ -17,37 +17,37 @@
 /* Author: Peter Lane
  */
 
-#ifndef COMMON_CPP_RECONSTRUCTION_TRACK_HH
-#define COMMON_CPP_RECONSTRUCTION_TRACK_HH
+#ifndef COMMON_CPP_RECONSTRUCTION_WORKING_TRACK_HH
+#define COMMON_CPP_RECONSTRUCTION_WORKING_TRACK_HH
 
 #include <vector>
 
-#include "Recon/Global/TrackPoint.hh"
+#include "Recon/Global/WorkingTrackPoint.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
 
-class Track : public std::vector<TrackPoint> {
+class WorkingTrack : public std::vector<WorkingTrackPoint> {
  public:
   /* @brief	Construct with all elements initialized to zero.
    */
-  Track();
+  WorkingTrack();
 
   /* @brief Create with particle ID only.
    */
-  explicit Track(const int particle_id);
+  explicit WorkingTrack(const int particle_id);
 
   /* @brief Copy constructor;
    */  
-  Track(const Track & original_instance);
+  WorkingTrack(const WorkingTrack & original_instance);
 
   /* @brief Create with tracks and particle ID.
    */
-  Track(const std::vector<TrackPoint>& tracks,
-        const int particle_id);
+  WorkingTrack(const std::vector<WorkingTrackPoint>& tracks,
+               const int particle_id);
 
-  ~Track();
+  ~WorkingTrack();
 
   int particle_id() const;
   void set_particle_id(const int particle_id);
@@ -55,7 +55,7 @@ class Track : public std::vector<TrackPoint> {
   int particle_id_;
 };
 
-std::ostream& operator<<(std::ostream & out, const Track & vector);
+std::ostream& operator<<(std::ostream & out, const WorkingTrack & vector);
 
 }  // namespace global
 }  // namespace recon
