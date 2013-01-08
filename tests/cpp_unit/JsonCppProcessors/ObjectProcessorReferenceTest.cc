@@ -89,7 +89,7 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
   // setup processors
   DoubleProcessor double_proc;
   ObjectProcessor<TestObject_4> test_4_proc;
-  test_4_proc.RegisterPointerReference("reference", &double_proc,
+  test_4_proc.RegisterPointerReference("reference",
                 &TestObject_4::GetReference, &TestObject_4::SetReference, true);
   ObjectProcessor<TestObject_3> test_3_proc;
   test_3_proc.RegisterPointerBranch("child_1", &test_4_proc,
@@ -124,12 +124,11 @@ TEST(ObjectProcessorReferenceTest, SimpleTreeTest) {
 }
 
 TEST(ObjectProcessorReferenceTest, RequiredTest) {
-  DoubleProcessor double_proc;
   ObjectProcessor<TestObject_4> test_4_req_proc;
-  test_4_req_proc.RegisterPointerReference("reference", &double_proc,
+  test_4_req_proc.RegisterPointerReference("reference",
                &TestObject_4::GetReference, &TestObject_4::SetReference, true);
   ObjectProcessor<TestObject_4> test_4_not_proc;
-  test_4_not_proc.RegisterPointerReference("reference", &double_proc,
+  test_4_not_proc.RegisterPointerReference("reference",
                &TestObject_4::GetReference, &TestObject_4::SetReference, false);
 
   TestObject_4 test_4_cpp;
