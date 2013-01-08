@@ -285,7 +285,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["ldc_id"]        = xLdc = this->GetLdcId();
 
   if (xLdc == 0)
-    xDetector = "single_station";
+    xDetector = "tracker1";
   if (xLdc == 2)
     xDetector = "tracker2";
   if (xLdc == 3)

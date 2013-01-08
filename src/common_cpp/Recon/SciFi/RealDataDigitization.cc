@@ -22,17 +22,15 @@
 
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 
+#include "src/common_cpp/DataStructure/DAQData.hh"
+
 namespace MAUS {
 
 RealDataDigitization::RealDataDigitization() {}
 
 RealDataDigitization::~RealDataDigitization() {}
 
-void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
-  // Check to see if the spill ReconEventArray pointer has been initialised
-  if (spill.GetReconEvents() == NULL)
-    spill.SetReconEvents(new ReconEventArray());
-
+void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
@@ -44,79 +42,156 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
           "Could not load Tracker calibration, mapping or bad channel list.",
           "RealDataDigitization::process"));
   }
-  // -------------------------------------------------
+}
 
-  // Pick up JSON daq event.
+void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
+  if ( spill.GetDAQData() == NULL ) {
+    spill.SetDAQData(new DAQData());
+  }
+  // This size is the number of tracker events in the spill.
+  std::cerr << "Tracker 0 Daq size: " << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
+  std::cerr << "Tracker 1 Daq size: " << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
+
+
+
+/*
+  TrackerDaq *tracker0daq_event = new TrackerDaq(); // new event
+  VLSBArray VLSB_array;
+  VSLB vlsb;
+  VLSB_array.push_back(vlsb); // as many as digits in the event
+  tracker0daq_event->SetVLSBArray(VLSB_array) // fill event with all vlsb digits
+  tracker0.push_back(tracker0daq_event); // end of event. push back.
+
+  spill.GetDAQData()->GetTracker0DaqArray().push_back(tracker0)
+
+*/
+
+  // Check to see if the spill ReconEventArray pointer has been initialised
+  if (spill.GetReconEvents() == NULL)
+    spill.SetReconEvents(new ReconEventArray());
+
+  // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
 
-  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) {
+  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) { // loop over events
     SciFiEvent* event = new SciFiEvent();
+    Tracker0DaqArray tracker0;
+    Tracker1DaqArray tracker1;
 
-    Json::Value input_event = tracker_event[i]["VLSB_C"];
-    // Merge tracker events.
-    for ( unsigned int idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
-      input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+    if ( tracker_event[i].isMember("VLSB_C") ) {
+      Json::Value input_event = tracker_event[i]["VLSB_C"];
+      // Merge tracker events.
+      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
+        input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+      }
+      process_VLSB_c(input_event, event, tracker0, tracker1);
+    } else if ( tracker_event[i].isMember("VLSB") ) {
+      /*
+      Json::Value input_event = tracker_event[i]["VLSB_C"];
+      // Merge tracker events.
+      for ( usize_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
+        input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+      }
+      process_VLSB(input_event, event);
+      */
+    } else {
+      continue;
     }
 
-    // Loop over the digits of this event.
-    for ( unsigned int j = 0; j < input_event.size(); ++j ) {
-      Json::Value channel_in = input_event[j];
-      assert(channel_in.isMember("phys_event_number"));
-      assert(channel_in.isMember("part_event_number"));
-      assert(channel_in.isMember("geo"));
-      assert(channel_in.isMember("bank"));
-      assert(channel_in.isMember("channel"));
-      assert(channel_in.isMember("adc"));
-      assert(channel_in.isMember("tdc"));
-      // assert(channel_in.isMember("discr"));
+    spill.GetDAQData()->SetTracker0DaqArray(tracker0);
+    spill.GetDAQData()->SetTracker1DaqArray(tracker1);
 
-      int spill = channel_in["phys_event_number"].asInt();
-      int eventNo = channel_in["part_event_number"].asInt();
-      int board = channel_in["geo"].asInt()-1;
-      int bank = channel_in["bank"].asInt();
-      int channel_ro = channel_in["channel"].asInt();
-      int adc = channel_in["adc"].asInt();
-      int tdc = channel_in["tdc"].asInt();
-
-      if ( !is_good_channel(bank, channel_ro) ) {
-        continue;
-      }
-
-      // Get pedestal and gain from calibration.
-      int new_bank = bank+4*board;
-      double adc_pedestal = calibration_[new_bank][channel_ro]["adc_pedestal"].asDouble();
-      double adc_gain     = calibration_[new_bank][channel_ro]["adc_gain"].asDouble();
-      double tdc_pedestal = calibration_[new_bank][channel_ro]["tdc_pedestal"].asDouble();
-      double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
-      // Calculate the number of photoelectrons.
-      double pe;
-      if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
-        pe = (adc-adc_pedestal)/adc_gain;
-      } else {
-        pe = -10.0;
-      }
-      double time = -10.0;
-      /* No TDC calibration yet.
-      if ( tdc_pedestal > tdc_pedestal_min && tdc_gain > 0 ) {
-        time = (tdc-tdc_pedestal)/tdc_gain;
-      } else {
-        time = -10.0;
-      }
-      */
-      // Find tracker, station, plane, channel.
-      int tracker, station, plane, channel;
-      bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
-      // Exclude missing modules.
-      if ( found ) { // pe > 1.0 &&
-        SciFiDigit *digit = new SciFiDigit(spill, eventNo,
-                                           tracker, station, plane, channel, pe, time);
-        event->add_digit(digit);
-      }
-    }  // ends loop over channels (j)
     ReconEvent * revt = new ReconEvent();
     revt->SetSciFiEvent(new SciFiEvent(*event));
     spill.GetReconEvents()->push_back(revt);
   }  // ends loop over events (i)
+}
+
+void RealDataDigitization::process_VLSB_c(Json::Value input_event,
+                                          SciFiEvent* event,
+                                          Tracker0DaqArray &tracker0,
+                                          Tracker1DaqArray &tracker1) {
+  // Loop over the digits of this event.
+  TrackerDaq *tracker0daq_event = new TrackerDaq(); // new event
+  TrackerDaq *tracker1daq_event = new TrackerDaq(); // new event
+
+  VLSB_CArray vlsb_c_tracker0_array;
+  VLSB_CArray vlsb_c_tracker1_array;
+  for ( unsigned int j = 0; j < input_event.size(); ++j ) {
+    Json::Value channel_in = input_event[j];
+    int ldc = channel_in["ldc_id"].asInt();
+    std::string detector = channel_in["detector"].asString();
+    int discriminator = channel_in["discriminator"].asInt();
+    int equip_type = channel_in["equip_type"].asInt();
+    int time_stamp = channel_in["time_stamp"].asInt();
+    int spill = channel_in["phys_event_number"].asInt();
+    int eventNo = channel_in["part_event_number"].asInt();
+    int board = channel_in["geo"].asInt()-1;
+    int bank = channel_in["bank"].asInt();
+    int channel_ro = channel_in["channel"].asInt();
+    int adc = channel_in["adc"].asInt();
+    int tdc = channel_in["tdc"].asInt();
+
+    VLSB_C vlsb_c;
+    vlsb_c.SetEquipType(equip_type);
+    vlsb_c.SetPhysEventNumber(spill);
+    vlsb_c.SetTimeStamp(time_stamp);
+    vlsb_c.SetDetector(detector);
+    vlsb_c.SetPartEventNumber(eventNo);
+    vlsb_c.SetChannel(channel_ro);
+    vlsb_c.SetBankID(bank);
+    vlsb_c.SetADC(adc);
+    vlsb_c.SetTDC(tdc);
+    vlsb_c.SetDiscriminator(discriminator);
+    vlsb_c.SetLdcId(ldc);
+    vlsb_c.SetGeo(board);
+
+    if ( board < 4 ) {
+      vlsb_c_tracker0_array.push_back(vlsb_c);
+    } else {
+      vlsb_c_tracker1_array.push_back(vlsb_c);
+    }
+
+    if ( !is_good_channel(bank, channel_ro) ) {
+      continue;
+    }
+
+    // Get pedestal and gain from calibration.
+    int new_bank = bank+4*board;
+    double adc_pedestal = calibration_[new_bank][channel_ro]["adc_pedestal"].asDouble();
+    double adc_gain     = calibration_[new_bank][channel_ro]["adc_gain"].asDouble();
+    double tdc_pedestal = calibration_[new_bank][channel_ro]["tdc_pedestal"].asDouble();
+    double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
+    // Calculate the number of photoelectrons.
+    double pe;
+    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+      pe = (adc-adc_pedestal)/adc_gain;
+    } else {
+      pe = -10.0;
+    }
+    double time = -10.0;
+    /* No TDC calibration yet.
+    if ( tdc_pedestal > tdc_pedestal_min && tdc_gain > 0 ) {
+      time = (tdc-tdc_pedestal)/tdc_gain;
+    } else {
+      time = -10.0;
+    }
+    */
+    // Find tracker, station, plane, channel.
+    int tracker, station, plane, channel;
+    bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
+     // Exclude missing modules.
+    if ( found ) { // pe > 1.0 &&
+      SciFiDigit *digit = new SciFiDigit(spill, eventNo,
+                                         tracker, station, plane, channel, pe, time);
+      event->add_digit(digit);
+    }
+  }  // ends loop over channels (j)
+  tracker0daq_event->SetVLSB_CArray(vlsb_c_tracker0_array); // fill event with all vlsb digits
+  tracker1daq_event->SetVLSB_CArray(vlsb_c_tracker1_array); // fill event with all vlsb digits
+
+  tracker0.push_back(tracker0daq_event); // end of event. push back.
+  tracker1.push_back(tracker1daq_event); // end of event. push back.
 }
 
 bool RealDataDigitization::load_calibration(std::string file) {
@@ -156,29 +231,6 @@ bool RealDataDigitization::load_calibration(std::string file) {
   }
 
   return true;
-}
-
-void RealDataDigitization::read_in_all_Boards(std::ifstream &inf) {
-/*  std::string line;
-  // Run over all boards.
-  for ( int i = 0; i < _number_boards; ++i ) {
-    // Run over banks.
-    for ( int j = 0; j < _number_banks; ++j ) {
-      // Run over channels.
-      for ( int k = 0; k < _number_channels; ++k ) {
-        int unique_chan_no, board, bank, chan;
-        double ped, gain;
-
-        getline(inf, line);
-        std::istringstream ist1(line.c_str());
-        ist1 >> unique_chan_no >> board >> bank >> chan >> ped >> gain;
-        _calibration_pedestal[board][bank][chan] = ped;
-        _calibration_gain[board][bank][chan]     = gain;
-        _calibration_unique_chan_number[board][bank][chan] = unique_chan_no;
-      }
-    }
-  }
-*/
 }
 
 bool RealDataDigitization::load_mapping(std::string file) {

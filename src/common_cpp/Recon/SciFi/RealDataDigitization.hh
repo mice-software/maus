@@ -62,19 +62,22 @@ class RealDataDigitization {
 
   ~RealDataDigitization();
 
+  void initialise();
+
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
    *  @params input_event The DAQ JSON Tracker Event
    */
   void process(Spill &spill, Json::Value const &input_event);
 
+  void process_VLSB_c(Json::Value input_event,
+                      SciFiEvent* event,
+                      Tracker0DaqArray &tracker0,
+                      Tracker1DaqArray &tracker1);
+
   /** @brief Reads in the calibration.
    */
   bool load_calibration(std::string filename);
-
-  /** @brief Saves calibration to vectors.
-   */
-  void read_in_all_Boards(std::ifstream &inf);
 
   /** @brief Loads the mapping.
    */
