@@ -26,7 +26,6 @@ TestBranchProcessor::TestBranchProcessor() {
             &TestBranch::SetDoubleByValue, true);
     RegisterPointerReference
                ("test_child_by_ref",
-                &_double_proc,
                 &TestBranch::GetDoubleByRef,
                 &TestBranch::SetDoubleByRef,
                 true);
