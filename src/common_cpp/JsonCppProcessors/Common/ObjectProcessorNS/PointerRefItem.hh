@@ -46,8 +46,6 @@ class PointerRefItem : public BaseItem<ParentType> {
     /** Constructor
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param child_processor processor that will be used to convert the
-     *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
      *  where memory is still owned by the ObjectProcessor
      *  @param SetMethod callback that will set a pointer to the child data,
@@ -57,7 +55,6 @@ class PointerRefItem : public BaseItem<ParentType> {
      *  Set...Child methods are called
      */
     PointerRefItem(std::string branch_name,
-                   ProcessorBase<ChildType>* child_processor,
                    GetMethod getter,
                    SetMethod setter,
                    bool is_required);
@@ -94,7 +91,6 @@ class PointerRefItem : public BaseItem<ParentType> {
 
   private:
     std::string _branch;
-    ProcessorBase<ChildType>* _processor;
     SetMethod _setter;
     GetMethod _getter;
     bool      _required;
