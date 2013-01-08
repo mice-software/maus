@@ -33,25 +33,25 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/Track.hh"
-#include "Recon/Global/TrackPoint.hh"
+#include "Recon/Global/WorkingTrack.hh"
+#include "Recon/Global/WorkingTrackPoint.hh"
 
 using MAUS::CovarianceMatrix;
 using MAUS::Vector;
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::Particle;
-using MAUS::recon::global::Track;
-using MAUS::recon::global::TrackPoint;
+using MAUS::recon::global::WorkingTrack;
+using MAUS::recon::global::WorkingTrackPoint;
 
-class TrackTest : public ::testing::Test {
+class WorkingTrackTest : public ::testing::Test {
  public:
-  TrackTest() {
+  WorkingTrackTest() {
   }
  protected:
   static const double kDetectorPlane;
   static const double kUncertaintyData[36];
   static const CovarianceMatrix kUncertainties;
-  static const TrackPoint kPoint;
+  static const WorkingTrackPoint kPoint;
 
   virtual void SetUp() { }
 
@@ -59,12 +59,12 @@ class TrackTest : public ::testing::Test {
 };
 
 // ************************************************//
-// TrackTest static const initializations//
+// WorkingTrackTest static const initializations//
 // ************************************************//
 
-const double TrackTest::kDetectorPlane = 78.6;
+const double WorkingTrackTest::kDetectorPlane = 78.6;
 
-const double TrackTest::kUncertaintyData[36] = {
+const double WorkingTrackTest::kUncertaintyData[36] = {
   +0.,      1.,       2.,       3.,      -5.,      -6.,
   +1.,    -13.,     -21.,      34.5,     55.7,     13.2,
   +2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
@@ -73,45 +73,45 @@ const double TrackTest::kUncertaintyData[36] = {
   -6.,     13.2,    -23.4,     59.9,     67.4,      5.12
 };
 
-const CovarianceMatrix TrackTest::kUncertainties
-  = CovarianceMatrix(TrackTest::kUncertainties);
+const CovarianceMatrix WorkingTrackTest::kUncertainties
+  = CovarianceMatrix(WorkingTrackTest::kUncertainties);
 
-const TrackPoint TrackTest::kPoint
-  = TrackPoint(1.1, 2.2, 3.3, 4.4, 5.5, 6.6,
-               TrackTest::kUncertainties, 7.7);
+const WorkingTrackPoint WorkingTrackTest::kPoint
+  = WorkingTrackPoint(1.1, 2.2, 3.3, 4.4, 5.5, 6.6,
+               WorkingTrackTest::kUncertainties, 7.7);
 
 // ***********
 // test cases
 // ***********
 
-TEST_F(TrackTest, DefaultConstructor) {
-  Track empty_track;
+TEST_F(WorkingTrackTest, DefaultConstructor) {
+  WorkingTrack empty_track;
 
   ASSERT_EQ((size_t) 0, empty_track.size());
   ASSERT_EQ(Particle::kNone, empty_track.particle_id());
 }
 
-TEST_F(TrackTest, Accessors) {
-  Track track;
+TEST_F(WorkingTrackTest, Accessors) {
+  WorkingTrack track;
   track.set_particle_id(Particle::kMuPlus);
   EXPECT_EQ(Particle::kMuPlus, track.particle_id());
 }
 
-TEST_F(TrackTest, IdentifiedConstructor) {
-  Track track(Particle::kMuMinus);
+TEST_F(WorkingTrackTest, IdentifiedConstructor) {
+  WorkingTrack track(Particle::kMuMinus);
 
   ASSERT_EQ((size_t) 0, track.size());
   ASSERT_EQ(Particle::kMuMinus, track.particle_id());
 }
 
-TEST_F(TrackTest, ContentConstructor) {
-  const TrackPoint track_point_array[2] = {
-    TrackPoint(1., 2., 3., 4., 5., 6., TrackTest::kUncertainties, 7.),
-    TrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
+TEST_F(WorkingTrackTest, ContentConstructor) {
+  const WorkingTrackPoint track_point_array[2] = {
+    WorkingTrackPoint(1., 2., 3., 4., 5., 6., WorkingTrackTest::kUncertainties, 7.),
+    WorkingTrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
   };
-  std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
+  std::vector<WorkingTrackPoint> track_points(track_point_array, track_point_array+2);
 
-  Track track(track_points, Particle::kMuMinus);
+  WorkingTrack track(track_points, Particle::kMuMinus);
 
   ASSERT_EQ((size_t) 2, track.size());
   for (int index = 0; index < 2; ++index) {
@@ -120,18 +120,18 @@ TEST_F(TrackTest, ContentConstructor) {
   ASSERT_EQ(Particle::kMuMinus, track.particle_id());
 }
 
-TEST_F(TrackTest, CopyConstructor) {
-  const TrackPoint track_point_array[2] = {
-    TrackPoint(1., 2., 3., 4., 5., 6., TrackTest::kUncertainties, 7.),
-    TrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
+TEST_F(WorkingTrackTest, CopyConstructor) {
+  const WorkingTrackPoint track_point_array[2] = {
+    WorkingTrackPoint(1., 2., 3., 4., 5., 6., WorkingTrackTest::kUncertainties, 7.),
+    WorkingTrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
   };
-  std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
-  Track track(track_points, Particle::kMuMinus);
-  Track track_copy(track);
+  std::vector<WorkingTrackPoint> track_points(track_point_array, track_point_array+2);
+  WorkingTrack track(track_points, Particle::kMuMinus);
+  WorkingTrack track_copy(track);
 
   for (int index = 0; index < 2; ++index) {
-    TrackPoint track_point = track[index];
-    TrackPoint track_point_copy = track[index];
+    WorkingTrackPoint track_point = track[index];
+    WorkingTrackPoint track_point_copy = track[index];
     EXPECT_EQ(track_point, track_point_copy);
   }
   EXPECT_EQ(track.particle_id(), track_copy.particle_id());

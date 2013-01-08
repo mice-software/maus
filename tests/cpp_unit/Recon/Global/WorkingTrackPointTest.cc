@@ -32,15 +32,15 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/TrackPoint.hh"
+#include "Recon/Global/WorkingTrackPoint.hh"
 
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::Particle;
-using MAUS::recon::global::TrackPoint;
+using MAUS::recon::global::WorkingTrackPoint;
 
-class TrackPointTest : public ::testing::Test {
+class WorkingTrackPointTest : public ::testing::Test {
  public:
-  TrackPointTest() {
+  WorkingTrackPointTest() {
   }
  protected:
   static const double kDetectorPlane;
@@ -53,12 +53,12 @@ class TrackPointTest : public ::testing::Test {
 };
 
 // ************************************************//
-// TrackPointTest static const initializations//
+// WorkingTrackPointTest static const initializations//
 // ************************************************//
 
-const double TrackPointTest::kDetectorPlane = 78.6;
+const double WorkingTrackPointTest::kDetectorPlane = 78.6;
 
-const double TrackPointTest::kUncertaintyData[36] = {
+const double WorkingTrackPointTest::kUncertaintyData[36] = {
   +0.,      1.,       2.,       3.,      -5.,      -6.,
   +1.,    -13.,     -21.,      34.5,     55.7,     13.2,
   +2.,    -21.,     -32.5,    -57.5,    -91.2,    -23.4,
@@ -67,15 +67,15 @@ const double TrackPointTest::kUncertaintyData[36] = {
   -6.,     13.2,    -23.4,     59.9,     67.4,      5.12
 };
 
-const MAUS::CovarianceMatrix TrackPointTest::kUncertainties
-  = MAUS::CovarianceMatrix(TrackPointTest::kUncertaintyData);
+const MAUS::CovarianceMatrix WorkingTrackPointTest::kUncertainties
+  = MAUS::CovarianceMatrix(WorkingTrackPointTest::kUncertaintyData);
 
 // ***********
 // test cases
 // ***********
 
-TEST_F(TrackPointTest, DefaultConstructor) {
-  TrackPoint explicit_default_point;
+TEST_F(WorkingTrackPointTest, DefaultConstructor) {
+  WorkingTrackPoint explicit_default_point;
   explicit_default_point.set_t(0.0);
   explicit_default_point.set_E(0.0);
   explicit_default_point.set_x(0.0);
@@ -87,7 +87,7 @@ TEST_F(TrackPointTest, DefaultConstructor) {
   const MAUS::CovarianceMatrix null_uncertainties;
   explicit_default_point.set_uncertainties(null_uncertainties);
 
-  const TrackPoint default_point;
+  const WorkingTrackPoint default_point;
 
   // verify with getters
   ASSERT_EQ(0.0, default_point.t());
@@ -110,8 +110,8 @@ TEST_F(TrackPointTest, DefaultConstructor) {
   ASSERT_TRUE(non_particle);
 }
 
-TEST_F(TrackPointTest, CopyConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, CopyConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -123,13 +123,13 @@ TEST_F(TrackPointTest, CopyConstructor) {
   ASSERT_EQ(static_cast<size_t>(6), kUncertainties.size());
   test_point.set_uncertainties(kUncertainties);
 
-  const TrackPoint point(test_point);
+  const WorkingTrackPoint point(test_point);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, ArrayConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, ArrayConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -142,13 +142,13 @@ TEST_F(TrackPointTest, ArrayConstructor) {
   test_point.set_uncertainties(null_uncertainties);
 
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
-  const TrackPoint point(coordinates, 6.6);
+  const WorkingTrackPoint point(coordinates, 6.6);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, ReconstructedConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, ReconstructedConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -158,13 +158,13 @@ TEST_F(TrackPointTest, ReconstructedConstructor) {
   test_point.set_z(6.6);
   test_point.set_uncertainties(kUncertainties);
 
-  const TrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, kUncertainties, 6.6);
+  const WorkingTrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, kUncertainties, 6.6);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, DetectorConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, DetectorConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -177,13 +177,13 @@ TEST_F(TrackPointTest, DetectorConstructor) {
 
   const Detector detector(Detector::kTracker2_3, kDetectorPlane,
                           kUncertainties);
-  const TrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, detector, 6.6);
+  const WorkingTrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, detector, 6.6);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, VectorConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, VectorConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -197,13 +197,13 @@ TEST_F(TrackPointTest, VectorConstructor) {
 
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
   const MAUS::Vector<double> coordinate_vector(coordinates, 6);
-  const TrackPoint point(coordinate_vector, 6.6);
+  const WorkingTrackPoint point(coordinate_vector, 6.6);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, PhaseSpaceVectorConstructor) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, PhaseSpaceVectorConstructor) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1.1);
   test_point.set_x(2.2);
@@ -215,13 +215,13 @@ TEST_F(TrackPointTest, PhaseSpaceVectorConstructor) {
 
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
   const MAUS::PhaseSpaceVector coordinate_vector(coordinates);
-  const TrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
+  const WorkingTrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
 
   ASSERT_EQ(test_point, point);
 }
 
-TEST_F(TrackPointTest, Equality) {
-  TrackPoint test_point;
+TEST_F(WorkingTrackPointTest, Equality) {
+  WorkingTrackPoint test_point;
   test_point.set_t(0.0);
   test_point.set_E(1000.);  // avoid being off mass shell
   test_point.set_x(2.2);
@@ -235,10 +235,10 @@ TEST_F(TrackPointTest, Equality) {
 
   ASSERT_EQ(test_point, test_point);
 
-  TrackPoint point;
+  WorkingTrackPoint point;
 
   // Test equality with a null point
-  const TrackPoint null_point;
+  const WorkingTrackPoint null_point;
   EXPECT_EQ(null_point, point);
 
   point.set_t(0.0);
@@ -268,19 +268,19 @@ TEST_F(TrackPointTest, Equality) {
   ASSERT_EQ(test_stream.str(), stream.str());
 }
 
-TEST_F(TrackPointTest, Inequality) {
+TEST_F(WorkingTrackPointTest, Inequality) {
   const double coordinates[6] = {0.0, 1000., 2.2, 3.3, 4.4, 5.5};
-  TrackPoint test_point(coordinates, 6.6);
+  WorkingTrackPoint test_point(coordinates, 6.6);
   test_point.set_detector_id(Detector::kTOF1_1);
   test_point.set_particle_id(Particle::kMuMinus);
   test_point.set_uncertainties(kUncertainties);
 
   // Test inequality with a null point
-  const TrackPoint null_point;
+  const WorkingTrackPoint null_point;
   EXPECT_NE(test_point, null_point);
 
   // Test coordinate inequality
-  TrackPoint point(test_point);
+  WorkingTrackPoint point(test_point);
   test_point.set_t(1.0);
   EXPECT_NE(test_point, point);
   test_point.set_t(0.0);
@@ -307,10 +307,10 @@ TEST_F(TrackPointTest, Inequality) {
   EXPECT_NE(test_point, point);
 }
 
-TEST_F(TrackPointTest, OffMassShellException) {
+TEST_F(WorkingTrackPointTest, OffMassShellException) {
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
   const MAUS::PhaseSpaceVector coordinate_vector(coordinates);
-  const TrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
+  const WorkingTrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
 
   bool off_mass_shell = false;
   try {
