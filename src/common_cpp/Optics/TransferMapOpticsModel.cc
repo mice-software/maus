@@ -24,7 +24,7 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/TrackPoint.hh"
+#include "Recon/Global/WorkingTrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
@@ -34,7 +34,7 @@
 
 namespace MAUS {
 
-using recon::global::TrackPoint;
+using recon::global::WorkingTrackPoint;
 using recon::global::Particle;
 
 // ##############################
@@ -53,7 +53,7 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   reference_pgparticle_ = simulator->GetReferenceParticle();
   first_plane_ = reference_pgparticle_.z;
 
-  reference_particle_ = TrackPoint(
+  reference_particle_ = WorkingTrackPoint(
     reference_pgparticle_.time, reference_pgparticle_.energy,
     reference_pgparticle_.x, reference_pgparticle_.px,
     reference_pgparticle_.y, reference_pgparticle_.py,
@@ -88,7 +88,7 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired First plane
-  const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
+  const std::vector<WorkingTrackPoint> first_plane_hits = BuildFirstPlaneHits();
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
@@ -96,8 +96,8 @@ void TransferMapOpticsModel::Build() {
   // Force setting of stochastics
   simulator->GetPhysicsList()->BeginOfRunAction();
 
-  std::map<int, std::vector<TrackPoint> > station_hits_map;
-  std::vector<TrackPoint>::const_iterator first_plane_hit;
+  std::map<int, std::vector<WorkingTrackPoint> > station_hits_map;
+  std::vector<WorkingTrackPoint>::const_iterator first_plane_hit;
   for (first_plane_hit = first_plane_hits.begin();
        first_plane_hit < first_plane_hits.end();
        ++first_plane_hit) {
@@ -111,12 +111,12 @@ void TransferMapOpticsModel::Build() {
   }
 
   // Iterate through each station
-  std::map<int, std::vector<TrackPoint> >::iterator station_hits;
+  std::map<int, std::vector<WorkingTrackPoint> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
     // find the average z coordinate for the station
-    std::vector<TrackPoint>::iterator station_hit;
+    std::vector<WorkingTrackPoint>::iterator station_hit;
 
     double station_plane = station_hits->second.begin()->z();
 
@@ -181,13 +181,13 @@ const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
   return FindTransferMap(plane);
 }
 
-const std::vector<TrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
-  std::vector<TrackPoint> first_plane_hits;
+const std::vector<WorkingTrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
+  std::vector<WorkingTrackPoint> first_plane_hits;
   first_plane_hits.push_back(reference_particle_);
 
   for (int coordinate_index = 0; coordinate_index < 6; ++coordinate_index) {
     // Make a copy of the reference trajectory vector
-    TrackPoint first_plane_hit = reference_particle_;
+    WorkingTrackPoint first_plane_hit = reference_particle_;
 
     // Add to the current coordinate of the reference trajectory vector
     // the appropriate delta value and save the modified vector
@@ -207,7 +207,7 @@ const std::vector<TrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
 }
 
 void TransferMapOpticsModel::MapStationsToHits(
-    std::map<int, std::vector<TrackPoint> > & station_hits) {
+    std::map<int, std::vector<WorkingTrackPoint> > & station_hits) {
   // Iterate through each event of the simulation
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   const Json::Value events = simulator->GetEventAction()->GetEvents();
@@ -230,7 +230,7 @@ void TransferMapOpticsModel::MapStationsToHits(
       const double momentum = ::sqrt(px*px + py*py + pz*pz);
       const double energy = ::sqrt(mass*mass + momentum*momentum);
 
-      TrackPoint hit_vector(
+      WorkingTrackPoint hit_vector(
         hit["time"].asDouble(), energy,
         hit["position"]["x"].asDouble(), px,
         hit["position"]["y"].asDouble(), py,
