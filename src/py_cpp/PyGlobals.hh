@@ -53,6 +53,12 @@ PyObject* Death(PyObject *dummy, PyObject *args);
  * PyObject integer 1 if library is initialised, 0 if it is not
  */
 PyObject* HasInstance(PyObject *dummy, PyObject *args);
+
+/* @brief Get Json configuration datacards
+ *
+ * Returns NULL if Globals were not initialised
+ */
+PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args);
 }  // namespace PyGlobals
 }  // namespace MAUS
 
