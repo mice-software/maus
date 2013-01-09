@@ -46,7 +46,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         """Check that tracker recon  process produces expected
            output with good straight track data"""
         if maus_cpp.globals.has_instance():
-          maus_cpp.globals.death()
+            maus_cpp.globals.death()
         self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
@@ -88,7 +88,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         """Check that tracker recon  process produces expected
         output with good helical track data"""
         if maus_cpp.globals.has_instance():
-          maus_cpp.globals.death()
+            maus_cpp.globals.death()
         self.cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
