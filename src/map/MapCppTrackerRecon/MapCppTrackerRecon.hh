@@ -123,6 +123,12 @@ class MapCppTrackerRecon {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
+  /** @brief Set helical PR on flag */
+  void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+
+  /** @brief Set straight PR on flag */
+  void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
+
  private:
   /// This should be the classname
   std::string _classname;

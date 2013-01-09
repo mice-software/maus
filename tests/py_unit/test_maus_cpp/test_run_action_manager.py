@@ -33,6 +33,9 @@ class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def setUp(self): # pylint: disable=C0103
         """Set up test"""
+        self.test_config = ""
+        if maus_cpp.globals.has_instance():
+            self.test_config = maus_cpp.globals.get_configuration_cards()
         config_options = StringIO.StringIO(unicode("""
 simulation_geometry_filename = "Test.dat"
 reconstruction_geometry_filename = "Test.dat"
@@ -40,8 +43,17 @@ reconstruction_geometry_filename = "Test.dat"
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
 
+    def tearDown(self): # pylint: disable = C0103
+        """Reset the globals"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        if self.test_config != "":
+            maus_cpp.globals.birth(self.test_config)
+
     def test_start_end_of_run(self):
         """Test maus_cpp.run_action_manager.start_of_run(...)"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
         maus_cpp.globals.birth(self.config)
         run_header = json.loads(maus_cpp.run_action_manager.start_of_run(1))
         self.assertEqual(run_header["maus_event_type"], "RunHeader")

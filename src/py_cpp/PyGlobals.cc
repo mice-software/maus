@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
@@ -40,6 +41,10 @@ std::string HasInstance_DocString =
   std::string("Check if MAUS globals have been initialised. Ignores all ")+
   std::string("arguments. Returns 1 if globals have been initialised, else 0");
 
+std::string GetConfigurationCards_DocString =
+  std::string("Return the configuration cards as a string. Throws an exception if globals have")+
+  std::string(" not been initialised.");
+
 static PyMethodDef methods[] = {
 {"birth", (PyCFunction)Birth,
     METH_VARARGS, Birth_DocString.c_str()},
@@ -47,14 +52,16 @@ static PyMethodDef methods[] = {
     METH_VARARGS, Death_DocString.c_str()},
 {"has_instance", (PyCFunction)HasInstance,
     METH_VARARGS, HasInstance_DocString.c_str()},
-{NULL, NULL, 0, NULL}
+{"get_configuration_cards", (PyCFunction)GetConfigurationCards,
+    METH_VARARGS, GetConfigurationCards_DocString.c_str()},
+    {NULL, NULL, 0, NULL}
 };
 
 PyObject* Birth(PyObject *dummy, PyObject *args) {
   const char* temp = NULL;
   if (!PyArg_ParseTuple(args, "s", &temp)) {
     PyErr_SetString(PyExc_TypeError,
-         "Failed to recognise arguments to Globals.birth as a string");
+         "Failed to recognise arghas_instanceuments to Globals.birth as a string");
     return NULL;
   }
   std::string cards(temp);
@@ -90,6 +97,28 @@ PyObject* HasInstance(PyObject *dummy, PyObject *args) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
+}
+
+PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args) {
+    if (!Globals::HasInstance()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                                    "Attempt to get configuration cards but globals not birthed");
+        return NULL;
+    }
+    Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+    if (cards == NULL) {
+        PyErr_SetString(PyExc_RuntimeError,
+                     "Attempt to get configuration cards failed but cards were not initialised");
+        return NULL;
+    }
+    std::string json_str = JsonWrapper::JsonToString(*cards);
+    const char* json = json_str.c_str();
+    PyObject* py_cards = Py_BuildValue("s", json);
+    if (py_cards == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Attempt to get configuration cards failed");
+        return NULL;
+    }
+    return py_cards;
 }
 
 PyMODINIT_FUNC initglobals(void) {

@@ -44,6 +44,7 @@ std::string MapCppTrackerDigits::process(std::string document) {
       Json::Value daq = root.get("daq_data", 0);
       // Process the input.
       RealDataDigitization real;
+      real.initialise();
       real.process(spill, daq);
       // Save to JSON output.
       save_to_json(spill);
