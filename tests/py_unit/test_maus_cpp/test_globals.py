@@ -74,9 +74,11 @@ reconstruction_geometry_filename = "Test.dat"
         self.assertEqual(maus_cpp.globals.has_instance(), 0)
 
     def test_get_configuration_cards(self):
+        """Test maus_cpp.globals.get_configuration_cards()"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        self.assertRaises(RuntimeError, maus_cpp.globals.get_configuration_cards, ())
+        self.assertRaises(
+             RuntimeError, maus_cpp.globals.get_configuration_cards, ())
         maus_cpp.globals.birth(self.config)
         json_string = maus_cpp.globals.get_configuration_cards()
         self.assertEqual(json.loads(json_string), json.loads(self.config))
