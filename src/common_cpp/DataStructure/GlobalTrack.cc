@@ -40,10 +40,8 @@ Track::Track()
       _charge(0),
       _detectorpoints(0),
       _goodness_of_fit(0.) {
-  _trackpoints =
-      new std::vector<MAUS::GlobalTrackPoint*>();
-  _constituent_tracks =
-      new std::vector<MAUS::GlobalTrack*>();
+  _trackpoints.Clear();
+  _constituent_tracks.Clear();
 }
 
 // Copy contructor
@@ -51,10 +49,10 @@ Track::Track(const Track &track)
     : _mapper_name(track.get_mapper_name()),
       _pid(track.get_pid()),
       _charge(track.get_charge()),
-      _trackpoints(track.get_trackpoints()),
+      _trackpoints(track.get_trackpoints_trefarray()),
       _detectorpoints(track.get_detectorpoints()),
       _geometry_paths(track.get_geometry_paths()),
-      _constituent_tracks(track.get_constituent_tracks()),
+      _constituent_tracks(track.get_constituent_tracks_trefarray()),
       _goodness_of_fit(track.get_goodness_of_fit()) {}
 
 // Destructor
@@ -68,10 +66,10 @@ Track& Track::operator=(const Track &track) {
   _mapper_name        = track.get_mapper_name();
   _pid                = track.get_pid();
   _charge             = track.get_charge();
-  _trackpoints        = track.get_trackpoints();
+  _trackpoints        = track.get_trackpoints_trefarray();
   _detectorpoints     = track.get_detectorpoints();
   _geometry_paths     = track.get_geometry_paths();
-  _constituent_tracks = track.get_constituent_tracks();
+  _constituent_tracks = track.get_constituent_tracks_trefarray();
   _goodness_of_fit    = track.get_goodness_of_fit();
   
   return *this;
@@ -88,22 +86,18 @@ Track* Track::Clone() const {
   trackNew->set_charge(get_charge());
 
   // Track points may be edited, so we clone the original points
-  std::vector<MAUS::GlobalTrackPoint*>::const_iterator tp;
-  for(tp = _trackpoints->begin();
-      tp != _trackpoints->end(); ++tp) {
-    if(*tp){
-      trackNew->PushBackTrackPoint((*tp)->Clone());
-    } else {
-      Squeak::mout(Squeak::error) << "Invalid input TP" << std::endl;
-      trackNew->PushBackTrackPoint(NULL);
-    }
+  MAUS::GlobalTrackPoint* tp = NULL;
+  TIterator *iter = _trackpoints.MakeIterator();
+  while((tp = (MAUS::GlobalTrackPoint*) iter->Next())) {
+    trackNew->PushBackTrackPoint(tp->Clone());
   }
-  
+
   trackNew->set_detectorpoints(this->get_detectorpoints());
   trackNew->set_geometry_paths(this->get_geometry_paths());
 
   // This is just book-keeping, so we copy the vector whole.
-  trackNew->set_constituent_tracks(this->get_constituent_tracks());
+  trackNew->set_constituent_tracks_trefarray(
+      this->get_constituent_tracks_trefarray());
   
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
   
@@ -126,7 +120,7 @@ void Track::AddTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
   
 void Track::PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
   if(trackpoint)
-    _trackpoints->push_back(trackpoint);
+    _trackpoints.Add(trackpoint);
   else
     Squeak::mout(Squeak::error)
         << "recon::global::track - Attempting to add a NULL trackpoint pointer"
@@ -145,18 +139,29 @@ void Track::RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
   }
 
   // Remove trackpoint from vector
-  MAUS::GlobalTrackPointPArray::iterator result =
-      find(_trackpoints->begin(), _trackpoints->end(), trackpoint);
-  EraseTrackPoint(result);
+  TObject* result = _trackpoints.FindObject(trackpoint);
+  if(!result)
+    Squeak::mout(Squeak::debug)
+        << "recon::global::track - "
+        << "Trying to remove a trackpoint not stored in track"
+        << std::endl;
+  else {
+    _trackpoints.Remove(result);
+    _trackpoints.Compress();
+  }
 
   // Check if trackpoint detector point should still be set.
   MAUS::recon::global::DetectorPoint targetDP = trackpoint->get_detector();
-  MAUS::GlobalTrackPointPArray::iterator eachTP;
-  for(eachTP = _trackpoints->begin(); eachTP != _trackpoints->end(); ++eachTP) {
-    if((*eachTP)->get_detector() == targetDP) break;
+  MAUS::recon::global::TrackPoint *eachTP;
+  TIterator *iter = _trackpoints.MakeIterator();
+  bool stillNeeded = false;
+  while((eachTP = (MAUS::recon::global::TrackPoint*) iter->Next())) {
+    if(eachTP->get_detector() == targetDP) {
+      stillNeeded = true;
+      break;
+    }
   }
-  if(eachTP == _trackpoints->end()){
-    // Must have passed all remaining points, unset the bit
+  if(!stillNeeded){
     RemoveDetector(targetDP);
   }
 
@@ -166,21 +171,12 @@ void Track::RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
   }
 }
 
-void Track::EraseTrackPoint(
-    MAUS::GlobalTrackPointPArray::iterator trackpointIter) {
-  if(trackpointIter < _trackpoints->begin() ||
-     trackpointIter >= _trackpoints->end()) {
-    Squeak::mout(Squeak::debug)
-        << "recon::global::track - "
-        << "Trying to remove a trackpoint not stored in track"
-        << std::endl;
-  } else {
-    _trackpoints->erase(trackpointIter);
-  }
-}
-
 void Track::SortTrackPointsByZ() {
-  std::sort(_trackpoints->begin(), _trackpoints->end(), SortByZ);
+  MAUS::GlobalTrackPointPArray* _temp_trackpoints = get_trackpoints();
+  
+  std::sort(_temp_trackpoints->begin(), _temp_trackpoints->end(), SortByZ);
+
+  set_trackpoints(_temp_trackpoints);
 }
 
 // Detector Point Methods
@@ -250,32 +246,25 @@ void Track::ClearGeometryPaths() {
 
 // Constituent Tracks methods
 void Track::AddTrack(MAUS::GlobalTrack* track) {
-  _constituent_tracks->push_back(track);
+  _constituent_tracks.Add(track);
 }
 
 void Track::RemoveTrack(MAUS::GlobalTrack* track) {
-  MAUS::GlobalTrackPArray::iterator result =
-      find(_constituent_tracks->begin(), _constituent_tracks->end(), track);
-
-  if(result == _constituent_tracks->end()) {
+  TObject *result = _constituent_tracks.FindObject(track);
+  if(!result) {
     Squeak::mout(Squeak::debug)
         << "recon::global::track - "
         << "Trying to remove a constituent track not stored in track"
         << std::endl;
   } else {
-    _constituent_tracks->erase(result);
+    _constituent_tracks.Remove(track);
   }
 }
 
 bool Track::HasTrack(MAUS::GlobalTrack* track) {
-  MAUS::GlobalTrackPArray::iterator result =
-      find(_constituent_tracks->begin(), _constituent_tracks->end(), track);
+  TObject *result = _constituent_tracks.FindObject(track);
 
-  return (result != _constituent_tracks->end());
-}
-
-void Track::ClearTracks() {
-  _constituent_tracks->clear();
+  return (result != NULL);
 }
 
 } // ~namespace global

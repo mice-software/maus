@@ -35,6 +35,8 @@
 #include <vector>
 
 // ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
 #include "Rtypes.h"
 
 // MAUS headers
@@ -45,7 +47,7 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-class Track {
+class Track : public TObject {
  public:
 
   /// Default constructor - initialises to 0/NULL
@@ -108,14 +110,35 @@ class Track {
   /// will matter.
   void SortTrackPointsByZ();
 
- /// Set the PID hypothesis, #_pid
+  /// Set the PID hypothesis, #_pid, from a vector of
+  /// MAUS::recon::global::TrackPoint pointers
   void set_trackpoints(GlobalTrackPointPArray* trackpoints) {
+    _trackpoints.Clear();
+    for(size_t i = 0; i < trackpoints->size(); ++i)
+      _trackpoints.Add(trackpoints->at(i));
+  }
+
+  /// Set the PID hypothesis, #_pid, from a TRefArray
+  void set_trackpoints_trefarray(TRefArray trackpoints) {
     _trackpoints = trackpoints;
   }
 
   /// Directly access the MAUS::recon::global::TrackPoint pointers
   /// stored in the track, #_trackpoints.
   GlobalTrackPointPArray* get_trackpoints() const {
+    GlobalTrackPointPArray *result =
+        new GlobalTrackPointPArray;
+    MAUS::recon::global::TrackPoint* tp;
+    TIterator *iter = _trackpoints.MakeIterator();
+    while((tp = (MAUS::recon::global::TrackPoint*) iter->Next())) {
+      result->push_back(tp);
+    }
+    return result;
+  }
+
+  /// Directly access the MAUS::recon::global::TrackPoint pointers
+  /// stored in the track, #_trackpoints.
+  TRefArray get_trackpoints_trefarray() const {
     return _trackpoints;
   }
 
@@ -177,20 +200,42 @@ class Track {
   /// #_constituent_tracks vector.
   void RemoveTrack(Track* track);
 
-  /// Check for a historical track in the #_constituent_tracks vector.
+  /// Check for a historical track in the #_constituent_tracks TRefArray.
   bool HasTrack(Track* track);
 
-  /// Empty the book-keeping track vectror, #_constituent_tracks.
-  void ClearTracks();
+  /// Empty the book-keeping track TRefArray, #_constituent_tracks.
+  void ClearTracks() {
+    _constituent_tracks.Clear();
+  }
 
-  /// Directly set the #_constituent_tracks vector.
+  /// Directly fill the #_constituent_tracks TRefArray, from a vector
+  /// of Tracks..
   void set_constituent_tracks(
       std::vector<MAUS::recon::global::Track*> *constituent_tracks){
+    _constituent_tracks.Clear();
+    for(size_t i = 0; i < constituent_tracks->size(); ++i)
+      _constituent_tracks.Add(constituent_tracks->at(i));
+  }
+
+  /// Directly set the #_constituent_tracks TRefArray.
+  void set_constituent_tracks_trefarray(TRefArray constituent_tracks){
     _constituent_tracks = constituent_tracks;
   }
+
   /// Direct access to the #_constituent_tracks vector.
-  std::vector<MAUS::recon::global::Track*>* get_constituent_tracks()
+  std::vector<MAUS::recon::global::Track*> *get_constituent_tracks()
       const {
+    std::vector<MAUS::recon::global::Track*> *result =
+        new std::vector<MAUS::recon::global::Track*>;
+    MAUS::recon::global::Track* t;
+    TIterator *iter = _constituent_tracks.MakeIterator();
+    while((t = (MAUS::recon::global::Track*) iter->Next())) {
+      result->push_back(t);
+    }
+    return result;
+  }
+
+  TRefArray get_constituent_tracks_trefarray() const {
     return _constituent_tracks;
   }
 
@@ -211,12 +256,6 @@ class Track {
   /// AddTrackPoint(MAUS::recon::global::TrackPoint*) method.
   void PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
 
-  /// Remove a MAUS::recon::global::TrackPoint* from the #_trackpoints
-  /// vector.  This method is private, as
-  /// MAUS::recon::global::TrackPoint's should be removed through the
-  /// RemoveTrackPoint(MAUS::recon::global::TrackPoint*) method.
-  void EraseTrackPoint(MAUS::GlobalTrackPointPArray::iterator trackpointIter);
-
   /// The name of the mapper which produced this Track. This can be
   /// used to separate different stages of the global reconstruction
   /// if required.
@@ -230,7 +269,7 @@ class Track {
 
   /// The associated MAUS::recon::global::TrackPoint's, which define
   /// the path of the reconstructed track.
-  MAUS::GlobalTrackPointPArray* _trackpoints;
+  TRefArray _trackpoints;
 
   /// A bitmask for the set detector points, and a vector of strings
   /// for the vairable geometry paths.
@@ -242,8 +281,9 @@ class Track {
   std::vector<std::string> _geometry_paths;
 
   /// These tracks aren't owned by this track, they are just for
-  /// book-keeping.  Therefore, we make the pointers const.
-  std::vector<MAUS::recon::global::Track*>* _constituent_tracks;
+  /// book-keeping.  Therefore, we use a TRefArray.
+  TRefArray _constituent_tracks;
+  // std::vector<MAUS::recon::global::Track*>* _constituent_tracks;
 
   /// A currently undefined 'Goodness of Fit' variable. This will be
   /// used to help analysers in interpreting the results, and will
