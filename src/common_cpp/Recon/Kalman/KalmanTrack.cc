@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "Interface/Squeal.hh"
+
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include <iostream>
 #include <fstream>
@@ -29,7 +31,7 @@ KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
   // Propagator.
   _F.ResizeTo(5, 5);
   _F.Zero();
-  // Back transport.
+  // Back transportation matrix.
   _A.ResizeTo(5, 5);
   _A.Zero();
   // Measurement error.
@@ -138,13 +140,6 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
   new_site->set_projected_a(a_subtracted);
 }
 
-/*
-void KalmanTrack::get_site_properties(KalmanSite *site, double &thickness, double &density) {
-  thickness = 0.670;
-  density   = 1.0;
-}
-*/
-
 void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
   // Find dz.
   double new_z = new_site->get_z();
@@ -203,7 +198,7 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   // my my
   _Q(3, 3) = c_my_my;
 
-  // _Q.Zero();
+  _Q.Zero();
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -214,7 +209,11 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
   double pitch = a_site->get_pitch();
   double lenght = pow(_active_radius*_active_radius -
                  (alpha*pitch)*(alpha*pitch), 0.5);
-  if ( lenght != lenght ) lenght = 150.;
+  if ( lenght != lenght || lenght > _active_radius ) {
+    throw(Squeal(Squeal::recoverable,
+          "Found a bad measurement.",
+          "KalmanTrack::update_V"));
+  }
 
   double sigma_beta = (lenght/pitch)/sqrt(12.);
   double sigma_alpha = 1.0/sqrt(12.);
@@ -274,11 +273,11 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
 // W = [ V +    A       +      B         ]-1
 void KalmanTrack::update_W(KalmanSite *a_site) {
   TMatrixD C_a(5, 5);
-  if ( a_site->get_chi2() ) {
-    C_a = a_site->get_smoothed_covariance_matrix();
-  } else {
-    C_a = a_site->get_projected_covariance_matrix();
-  }
+  // if ( a_site->get_chi2() ) {
+  //  C_a = a_site->get_smoothed_covariance_matrix();
+  // } else {
+  C_a = a_site->get_projected_covariance_matrix();
+  // }
   TMatrixD C_s = a_site->get_S_covariance();
 
   TMatrixD A = TMatrixD(TMatrixD(_H, TMatrixD::kMult, C_a),
@@ -287,6 +286,8 @@ void KalmanTrack::update_W(KalmanSite *a_site) {
   TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
                         TMatrixD::kMultTranspose,
                         _S);
+  // ED
+  B.Zero();
 
   _W.Zero();
   _W = _V + A + B;
@@ -312,6 +313,8 @@ TMatrixD KalmanTrack::solve_measurement_equation(TMatrixD a, TMatrixD s) {
 
   TMatrixD Ss(2, 1);
   Ss = _S * s;
+  // ED
+  // Ss.Zero();
 
   TMatrixD result(2, 1);
   result = ha + Ss;
@@ -515,6 +518,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 
   TMatrixD a_smooth(5, 1);
   a_smooth = a + _A* (a_opt - ap);
+
   smoothing_site->set_smoothed_a(a_smooth);
   // _________________________________________
   TMatrixD measurement(2, 1);
@@ -559,8 +563,6 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
 
   TMatrixD measurement = site->get_measurement();
   TMatrixD pull = measurement-HA;
-  std::cout << "Pull exclusion..." << std::endl;
-  pull.Print();
 
   // The "gain"
   TMatrixD C_smoothed(5, 5);
@@ -568,7 +570,6 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
 
   TMatrixD H_transposed(5, 2);
   H_transposed.Transpose(_H);
-
 
   TMatrixD TEMP = _V*(-1.)+_H*C_smoothed*H_transposed;
   TEMP.Invert();
@@ -579,8 +580,6 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
   // new site estimation
   TMatrixD an(5, 1);
   an = a_smoothed + Kn*pull;
-an.Print();
-a_smoothed.Print();
 
   site->set_excluded_state(an);
 }

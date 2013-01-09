@@ -70,6 +70,11 @@ class RealDataDigitization {
    */
   void process(Spill &spill, Json::Value const &input_event);
 
+  void process_VLSB(Json::Value input_event,
+                      SciFiEvent* event,
+                      Tracker0DaqArray &tracker0,
+                      Tracker1DaqArray &tracker1);
+
   void process_VLSB_c(Json::Value input_event,
                       SciFiEvent* event,
                       Tracker0DaqArray &tracker0,

@@ -31,7 +31,7 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
-  // KalmanMonitor monitor;
+  KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -71,32 +71,28 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
-    for ( size_t j = numb_measurements-2; j > -1; --j ) {
-      // std::cerr << "Smoothing site " << j << std::endl;
-      smooth(sites, track, j);
+    for ( int k = (int) numb_measurements-2; k > -1; --k ) {
+      // std::cerr << "Smoothing site " << k << std::endl;
+      smooth(sites, track, k);
     }
     track->compute_chi2(sites);
 
-    // monitor.fill(sites);
+    monitor.fill(sites);
     // monitor.print_info(sites);
 
-/*
-    if ( track->get_chi2() < 15. ) {
+    // Misalignment work.
+    if ( track->get_chi2() < 3. ) {
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
         track->exclude_site(site);
         kalman_align.update_site(site);
       }
-    }
 
-    if ( 0 && track->get_chi2() < 15. && numb_measurements == 15 ) {
-      std::cerr << "Good chi2; lauching KalmanAlignment...\n";
-      update_alignment_parameters(sites, track, kalman_align);
-      std::cerr << "Updating..." << std::endl;
+      // update_alignment_parameters(sites, track, kalman_align);
+      // std::cerr << "Updating..." << std::endl;
       // Update Stored misalignments using values stored in each site.
-      kalman_align.update(sites);
+      // kalman_align.update(sites);
     }
-*/
     delete track;
   }
 }

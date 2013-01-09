@@ -71,7 +71,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
+    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
+        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
@@ -159,13 +161,13 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   size_t number_helical_tracks  = evt.helicalprtracks().size();
   size_t number_straight_tracks = evt.straightprtracks().size();
 
-  for ( int track_i = 0; track_i < number_helical_tracks; track_i++ ) {
+  for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
     seed->build(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
-  for ( int track_i = 0; track_i < number_straight_tracks; track_i++ ) {
+  for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
     seed->build(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
