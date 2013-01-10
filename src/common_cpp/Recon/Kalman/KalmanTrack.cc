@@ -587,17 +587,22 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
 void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   int number_parameters = 5;
   int number_of_sites = sites.size();
+
+  _ndf = number_of_sites - number_parameters;
+
   int id = sites[0].get_id();
 
   if ( id <= 14 ) _tracker = 0;
-  if ( id > 14 ) _tracker = 1;
+  if ( id > 14 )  _tracker = 1;
 
   // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
     _chi2 += site.get_chi2();
-    // std::cerr << _chi2 << " ";
+    std::cerr << _chi2 << " ";
   }
+
+  _P_value = TMath::Prob(_chi2, _ndf);
   // std::cerr << "\n";
 }
 

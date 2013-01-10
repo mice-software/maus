@@ -76,6 +76,7 @@ class KalmanTrack {
   TMatrixD get_kalman_gain(KalmanSite *a_site);
   double get_chi2() const { return _chi2; }
   double get_ndf() const { return _ndf; }
+  double get_P_value() const { return _P_value; }
   double get_tracker() const { return _tracker; }
   double get_mass() const { return _mass; }
   double get_momentum() const { return _momentum; }
@@ -91,6 +92,8 @@ class KalmanTrack {
   void compute_chi2(const std::vector<KalmanSite> &sites);
 
  protected:
+  // int _inversion_sanity;
+
   TMatrixD _H;
 
   TMatrixD _S;
@@ -108,6 +111,8 @@ class KalmanTrack {
   TMatrixD _W;
 
   double _chi2, _ndf;
+
+  double _P_value;
 
   int _tracker;
 

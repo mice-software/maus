@@ -72,13 +72,13 @@ class RealDataDigitization {
 
   void process_VLSB(Json::Value input_event,
                       SciFiEvent* event,
-                      Tracker0DaqArray &tracker0,
-                      Tracker1DaqArray &tracker1);
+                      TrackerDaq *tracker0daq_event,
+                      TrackerDaq *tracker1daq_event);
 
   void process_VLSB_c(Json::Value input_event,
                       SciFiEvent* event,
-                      Tracker0DaqArray &tracker0,
-                      Tracker1DaqArray &tracker1);
+                      TrackerDaq *tracker0daq_event,
+                      TrackerDaq *tracker1daq_event);
 
   /** @brief Reads in the calibration.
    */

@@ -19,9 +19,12 @@
 namespace MAUS {
 
 TrackerDaqProcessor::TrackerDaqProcessor()
-    : _VLSB_proc(new VLSBProcessor) {
+    : _VLSB_proc(new VLSBProcessor), _VLSB_C_proc(new VLSB_CProcessor) {
     RegisterValueBranch
           ("VLSB", &_VLSB_proc, &TrackerDaq::GetVLSBArray,
           &TrackerDaq::SetVLSBArray, true);
+    RegisterValueBranch
+          ("VLSB_C", &_VLSB_C_proc, &TrackerDaq::GetVLSB_CArray,
+          &TrackerDaq::SetVLSB_CArray, true);
 }
 }  // namespace MAUS

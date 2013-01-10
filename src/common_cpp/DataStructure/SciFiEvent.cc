@@ -26,6 +26,7 @@ SciFiEvent::SciFiEvent() {
   _scifiseeds.resize(0);
   _scifistraightprtracks.resize(0);
   _scifihelicalprtracks.resize(0);
+  _scifitracks.resize(0);
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
@@ -62,6 +63,11 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
           new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
     }
 
+    _scifitracks.resize(_scifievent._scifitracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
+      _scifitracks[i] = _scifievent._scifitracks[i];
+    }
+
     // *this = _scifievent;
 }
 
@@ -95,6 +101,11 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
     for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
       _scifihelicalprtracks[i] =
           new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
+    }
+
+    _scifitracks.resize(_scifievent._scifitracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
+      _scifitracks[i] = _scifievent._scifitracks[i];
     }
 
     return *this;

@@ -30,7 +30,7 @@ KalmanTrackFit::~KalmanTrackFit() {
   std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
 }
 
-void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
+void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) {
   KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
@@ -81,7 +81,8 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
     // monitor.print_info(sites);
 
     // Misalignment work.
-    if ( track->get_chi2() < 3. ) {
+    if ( track->get_chi2() < 25. ) {
+      std::cerr << "Good chi2!" << std::endl;
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
         track->exclude_site(site);
@@ -93,6 +94,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds) {
       // Update Stored misalignments using values stored in each site.
       // kalman_align.update(sites);
     }
+    save(track, sites, event);
     delete track;
   }
 }
@@ -244,6 +246,14 @@ void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, 
 
   // Compute smoothed a_k and C_k.
   track->smooth_back(optimum_site, smoothing_site);
+}
+
+void KalmanTrackFit::save(const KalmanTrack *kalman_track,
+                          std::vector<KalmanSite> sites,
+                          SciFiEvent &event) {
+  SciFiTrack *track = new SciFiTrack(kalman_track);
+  // track->add_track_points(sites);
+  event.add_scifitrack(track);
 }
 
 } // ~namespace MAUS

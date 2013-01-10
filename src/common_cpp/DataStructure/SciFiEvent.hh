@@ -29,6 +29,7 @@
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
 namespace MAUS {
 
@@ -83,6 +84,10 @@ class SciFiEvent {
     void set_helicalprtrack(SciFiHelicalPRTrackPArray tracks) { _scifihelicalprtracks = tracks; }
     SciFiHelicalPRTrackPArray helicalprtracks() const { return _scifihelicalprtracks; }
 
+    /** Kalman tracks */
+    void add_scifitrack(SciFiTrack *a_track) { _scifitracks.push_back(a_track); }
+    void set_scifitracks(SciFiTrackPArray tracks) { _scifitracks = tracks; }
+    SciFiTrackPArray scifitracks() const { return _scifitracks; }
 
   private:
 
@@ -103,6 +108,9 @@ class SciFiEvent {
 
     /** Helical tracks */
     SciFiHelicalPRTrackPArray           _scifihelicalprtracks;
+
+    /** Kalman tracks */
+    SciFiTrackPArray                     _scifitracks;
 
     ClassDef(SciFiEvent, 1)
 };

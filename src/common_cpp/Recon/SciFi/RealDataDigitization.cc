@@ -55,10 +55,12 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
 
+  Tracker0DaqArray tracker0;
+  Tracker1DaqArray tracker1;
   for ( unsigned int i = 0; i < tracker_event.size(); ++i ) { // loop over events
     SciFiEvent* event = new SciFiEvent();
-    Tracker0DaqArray tracker0;
-    Tracker1DaqArray tracker1;
+    TrackerDaq *tracker0daq_event = new TrackerDaq();
+    TrackerDaq *tracker1daq_event = new TrackerDaq();
 
     if ( tracker_event[i].isMember("VLSB_C") ) {
       Json::Value input_event = tracker_event[i]["VLSB_C"];
@@ -66,38 +68,43 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
         input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
       }
-      process_VLSB_c(input_event, event, tracker0, tracker1);
+      process_VLSB_c(input_event, event, tracker0daq_event, tracker1daq_event);
     } else if ( tracker_event[i].isMember("VLSB") ) {
       Json::Value input_event = tracker_event[i]["VLSB"];
       // Merge tracker events.
       for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB"].size(); ++idig ) {
         input_event[input_event.size()] = daq["tracker2"][i]["VLSB"][idig];
       }
-      process_VLSB(input_event, event, tracker0, tracker1);
+      process_VLSB(input_event, event, tracker0daq_event, tracker1daq_event);
     } else {
       continue;
     }
 
-    spill.GetDAQData()->SetTracker0DaqArray(tracker0);
-    spill.GetDAQData()->SetTracker1DaqArray(tracker1);
+    //spill.GetDAQData()->SetTracker0DaqArray(tracker0);
+    //spill.GetDAQData()->SetTracker1DaqArray(tracker1);
 
-    std::cerr << "DAQ sizes: " << std::endl;
-    std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-    std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
+    //std::cerr << "DAQ sizes: " << std::endl;
+    //std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
+    //std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
+    tracker0.push_back(tracker0daq_event); // end of event. push back.
+    tracker1.push_back(tracker1daq_event); // end of event. push back.
+
 
     ReconEvent * revt = new ReconEvent();
     revt->SetSciFiEvent(new SciFiEvent(*event));
     spill.GetReconEvents()->push_back(revt);
   }  // ends loop over events (i)
+  spill.GetDAQData()->SetTracker0DaqArray(tracker0);
+  spill.GetDAQData()->SetTracker1DaqArray(tracker1);
+  std::cerr << "DAQ sizes: " << std::endl;
+  std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
+  std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB(Json::Value input_event,
                                           SciFiEvent* event,
-                                          Tracker0DaqArray &tracker0,
-                                          Tracker1DaqArray &tracker1) {
-  TrackerDaq *tracker0daq_event = new TrackerDaq();
-  TrackerDaq *tracker1daq_event = new TrackerDaq();
-
+                                          TrackerDaq *tracker0daq_event,
+                                          TrackerDaq *tracker1daq_event) {
   VLSBArray vlsb_tracker0_array;
   VLSBArray vlsb_tracker1_array;
 
@@ -175,24 +182,18 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
   tracker0daq_event->SetVLSBArray(vlsb_tracker0_array); // fill event with all vlsb digits
   tracker1daq_event->SetVLSBArray(vlsb_tracker1_array); // fill event with all vlsb digits
 
-  std::cerr << "VLSB array sizes: " << std::endl;
-  std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
-  std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
-
-  tracker0.push_back(tracker0daq_event); // end of event. push back.
-  tracker1.push_back(tracker1daq_event); // end of event. push back.
+  //std::cerr << "VLSB array sizes: " << std::endl;
+  //std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
+  //std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB_c(Json::Value input_event,
                                           SciFiEvent* event,
-                                          Tracker0DaqArray &tracker0,
-                                          Tracker1DaqArray &tracker1) {
-  TrackerDaq *tracker0daq_event = new TrackerDaq();
-  TrackerDaq *tracker1daq_event = new TrackerDaq();
+                                          TrackerDaq *tracker0daq_event,
+                                          TrackerDaq *tracker1daq_event) {
 
   VLSB_CArray vlsb_c_tracker0_array;
   VLSB_CArray vlsb_c_tracker1_array;
-
   // Loop over the VLSB channels of this event.
   for ( unsigned int j = 0; j < input_event.size(); ++j ) {
     Json::Value channel_in = input_event[j];
@@ -271,8 +272,8 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
   std::cerr << tracker0daq_event->GetVLSB_CArraySize() << std::endl;
   std::cerr << tracker1daq_event->GetVLSB_CArraySize() << std::endl;
 
-  tracker0.push_back(tracker0daq_event); // end of event. push back.
-  tracker1.push_back(tracker1daq_event); // end of event. push back.
+  //tracker0.push_back(tracker0daq_event); // end of event. push back.
+  //tracker1.push_back(tracker1daq_event); // end of event. push back.
 }
 
 bool RealDataDigitization::load_calibration(std::string file) {

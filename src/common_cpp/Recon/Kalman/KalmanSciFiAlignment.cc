@@ -124,6 +124,7 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   // std::cerr << site->get_id() << " " << diff << std::endl;
   int id = site->get_id();
 
+  std::cerr << diff_x << std::endl;
 
   std::ofstream out2("kalman_diff.txt", std::ios::out | std::ios::app);
   out2 << id << " "<< diff_x << " " << diff_y << "\n";
