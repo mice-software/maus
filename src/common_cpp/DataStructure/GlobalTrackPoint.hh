@@ -174,7 +174,6 @@ class TrackPoint : public TObject{
   /// Set the component MAUS::recon::global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   void set_spacepoint(MAUS::recon::global::SpacePoint* spacepoint) {
-    std::cout << "SSP:\t" << spacepoint << std::endl;
     _spacepoint = spacepoint;
     _spacepoint.ls();
   }
@@ -183,7 +182,6 @@ class TrackPoint : public TObject{
   MAUS::recon::global::SpacePoint* get_spacepoint() const {
     MAUS::recon::global::SpacePoint* spacepoint =
         static_cast<MAUS::recon::global::SpacePoint*>(_spacepoint.GetObject());
-    std::cout << "GSP:\t" << spacepoint << std::endl;
     return spacepoint;
   }
 
