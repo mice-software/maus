@@ -26,12 +26,13 @@
 // C++ headers
 #include <vector>
 
+#include <TMatrixD.h>
+
 // MAUS headers
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/SimpleHelix.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+// #include "src/common_cpp/Recon/Global/Detector.hh"
+// #include "src/common_cpp/Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 
@@ -47,6 +48,8 @@ class SciFiTrack {
     explicit SciFiTrack(const KalmanTrack *kalman_track);
 
     SciFiTrack& operator=(const SciFiTrack &a_track);
+
+    // void add_track_points(const std::vector<KalmanSite> &sites);
 
     int  get_tracker() const      { return _tracker; }
     void set_tracker(int tracker) { _tracker = tracker; }

@@ -110,9 +110,9 @@ class KalmanTrack {
 
   TMatrixD _W;
 
-  double _chi2, _ndf;
+  double _chi2, _ndf, _P_value;
 
-  double _P_value;
+  int _n_parameters;
 
   int _tracker;
 

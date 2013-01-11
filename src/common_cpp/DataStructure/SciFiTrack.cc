@@ -52,8 +52,28 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     return *this;
 }
 
-SciFiTrack::~SciFiTrack() {
+SciFiTrack::~SciFiTrack() {}
 
+/*
+void SciFiTrack::add_track_points(const std::vector<KalmanSite> &sites) {
+  size_t n_sites = sites.size();
+  for ( size_t i = 0; i < n_sites; ++i ) {
+    const KalmanSite site = sites[i];
+    double time = 0.0;
+    TMatrixD state_vector(5, 1);
+    state_vector = site->get_smoothed_state();
+    double energy = 1.0;
+    double x = state_vector(0, 0);
+    double px= state_vector(1, 0);
+    double y = state_vector(2, 0);
+    double py= state_vector(3, 0);
+    Detector & detector
+    double z = site.get_z();
+    recon::global::TrackPoint track_point = 
+  }
+
+  Detector(const ID id, const double plane, const CovarianceMatrix & uncertainties);
 }
+*/
 
 } // ~namespace MAUS

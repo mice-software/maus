@@ -429,6 +429,65 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   if ( !(_counter%20) ) {
     save();
   }
+
+  // Energy loss and scattering angles
+  for ( int i = 1; i < numb_sites; ++i ) {
+    KalmanSite site_i_1 = sites[i-1];
+    KalmanSite site_i = sites[i];
+
+    double muon_mass = 105.65836668;
+    double muon_mass2=TMath::Power(muon_mass, 2.);
+
+    double old_mc_x  = site_i_1.get_true_position().x();
+    double old_mc_y  = site_i_1.get_true_position().y();
+    double old_mc_px = site_i_1.get_true_momentum().x();
+    double old_mc_py = site_i_1.get_true_momentum().y();
+    double old_mc_pz = site_i_1.get_true_momentum().z();
+    double old_p2 = TMath::Power(old_mc_px, 2.)+TMath::Power(old_mc_py, 2.)+TMath::Power(old_mc_pz, 2.);
+    double old_p  = TMath::Sqrt(old_p2);
+    double old_energy  = TMath::Sqrt(muon_mass2+old_p2);
+    double old_thethax = atan2(old_mc_px, old_mc_pz);
+    double old_thethay = atan2(old_mc_py, old_mc_pz);
+
+
+    double new_mc_x  = site_i.get_true_position().x();
+    double new_mc_y  = site_i.get_true_position().y();
+    double new_mc_px = site_i.get_true_momentum().x();
+    double new_mc_py = site_i.get_true_momentum().y();
+    double new_mc_pz = site_i.get_true_momentum().z();
+    double new_p2 = TMath::Power(new_mc_px, 2.)+TMath::Power(new_mc_py, 2.)+TMath::Power(new_mc_pz, 2.);
+    double new_energy  = TMath::Sqrt(muon_mass2+new_p2);
+    double new_thethax = atan2(new_mc_px, new_mc_pz);
+    double new_thethay = atan2(new_mc_py, new_mc_pz);
+
+    if ( site_i.get_id() == 1 ||
+         site_i.get_id() == 2 ||
+         site_i.get_id() == 4 ||
+         site_i.get_id() == 5 ||
+         site_i.get_id() == 7 ||
+         site_i.get_id() == 8 ||
+         site_i.get_id() == 10 ||
+         site_i.get_id() == 11 ||
+         site_i.get_id() == 13 ||
+         site_i.get_id() == 14 ) {
+      double fibre_eloss = old_energy - new_energy;
+      double fibre_mcs_x = old_thethax - new_thethax;
+      double fibre_mcs_y = old_thethay - new_thethay;
+      std::ofstream out2("eloss_fibre.txt", std::ios::out | std::ios::app);
+      out2 << old_p << " " << fibre_eloss << " " << fibre_mcs_x << " " << fibre_mcs_y << "\n";
+      out2.close();
+    } else if ( site_i.get_id() == 3 ||
+         site_i.get_id() == 6 ||
+         site_i.get_id() == 9 ||
+         site_i.get_id() == 12 ) {
+      double _eloss = old_energy - new_energy;
+      double _mcs_x = old_thethax - new_thethax;
+      double _mcs_y = old_thethay - new_thethay;
+      std::ofstream out2("eloss_fibre_gas.txt", std::ios::out | std::ios::app);
+      out2 << old_p << " " << _eloss << " " << _mcs_x << " " << _mcs_y << "\n";
+      out2.close();
+    }
+  }
 }
 
 void KalmanMonitor::save() {

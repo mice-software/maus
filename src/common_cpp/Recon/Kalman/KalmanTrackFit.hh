@@ -24,6 +24,9 @@
 #include <assert.h>
 #include <algorithm>
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+
 // C++ headers
 #include <string>
 #include <vector>
@@ -85,6 +88,8 @@ class KalmanTrackFit {
 
  protected:
   double _seed_cov;
+
+  bool _use_MCS, _use_Eloss, _update_misalignments;
 };
 
 } // ~namespace MAUS

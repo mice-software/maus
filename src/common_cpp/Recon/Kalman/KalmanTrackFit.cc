@@ -22,7 +22,13 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit():_seed_cov(200.) {
+KalmanTrackFit::KalmanTrackFit() {
+  Json::Value *json = Globals::GetConfigurationCards();
+  _seed_cov  = (*json)["SciFiSeedCovariance"].asDouble();
+  _use_MCS   = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_Eloss = (*json)["SciFiKalman_use_Eloss"].asBool();
+  _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
+
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -81,14 +87,12 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     // monitor.print_info(sites);
 
     // Misalignment work.
-    if ( track->get_chi2() < 25. ) {
-      std::cerr << "Good chi2!" << std::endl;
+    if ( track->get_chi2() < 25. && numb_measurements == 15 ) {
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
         track->exclude_site(site);
         kalman_align.update_site(site);
       }
-
       // update_alignment_parameters(sites, track, kalman_align);
       // std::cerr << "Updating..." << std::endl;
       // Update Stored misalignments using values stored in each site.
@@ -120,9 +124,9 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   TMatrixD C(5, 5);
   C.Zero();
   // for ( int i = 0; i < 5; ++i ) {
-  C(0, 0) = _seed_cov/5.; // dummy values
+  C(0, 0) = _seed_cov/50.; // dummy values
   C(1, 1) = _seed_cov; // dummy values
-  C(2, 2) = _seed_cov/5.; // dummy values
+  C(2, 2) = _seed_cov/50.; // dummy values
   C(3, 3) = _seed_cov; // dummy values
   C(4, 4) = _seed_cov; // dummy values
 
@@ -156,8 +160,8 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   }
 
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    CLHEP::Hep3Vector true_position = clusters[j]->get_true_position();
-    CLHEP::Hep3Vector true_momentum = clusters[j]->get_true_momentum();
+    Hep3Vector true_position = clusters[j]->get_true_position();
+    Hep3Vector true_momentum = clusters[j]->get_true_momentum();
     sites[j].set_true_position(true_position);
     sites[j].set_true_momentum(true_momentum);
   }
@@ -221,10 +225,12 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
   track->calc_predicted_state(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
+  if ( _use_Eloss )
   // track->subtract_energy_loss(old_site, new_site);
 
   // Calculate the system noise...
-  track->calc_system_noise(old_site, new_site);
+  if ( _use_MCS )
+    track->calc_system_noise(old_site, new_site);
 
   // ... so that we can compute the prediction for the
   // covariance matrix.

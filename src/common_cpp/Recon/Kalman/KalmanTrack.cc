@@ -159,10 +159,11 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   double pz = 1./kappa; // MeV/c
   double px = mx/kappa;
   double py = my/kappa;
-  double p = pow(px*px+py*py+pz*pz, 0.5);
+  double p = TMath::Power(px*px+py*py+pz*pz, 0.5);
 
   double v = p/_mass;
   double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
+
   double C2 = C*C;
   double grad_to_mom = 1.; // pow(1./kappa, 1.); // convertion factor: gradients to momentum
 
@@ -313,8 +314,6 @@ TMatrixD KalmanTrack::solve_measurement_equation(TMatrixD a, TMatrixD s) {
 
   TMatrixD Ss(2, 1);
   Ss = _S * s;
-  // ED
-  // Ss.Zero();
 
   TMatrixD result(2, 1);
   result = ha + Ss;
@@ -584,11 +583,10 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
   site->set_excluded_state(an);
 }
 
-void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
-  int number_parameters = 5;
+void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {  int number_parameters = 5;
   int number_of_sites = sites.size();
 
-  _ndf = number_of_sites - number_parameters;
+  _ndf = number_of_sites - _n_parameters;
 
   int id = sites[0].get_id();
 
@@ -599,7 +597,7 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
     _chi2 += site.get_chi2();
-    std::cerr << _chi2 << " ";
+    // std::cerr << _chi2 << " ";
   }
 
   _P_value = TMath::Prob(_chi2, _ndf);

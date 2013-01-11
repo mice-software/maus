@@ -37,6 +37,7 @@ namespace MAUS {
 
 class HelicalTrack : public KalmanTrack {
  public:
+  HelicalTrack();
 
   virtual ~HelicalTrack();
 
