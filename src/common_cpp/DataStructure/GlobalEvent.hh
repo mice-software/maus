@@ -61,13 +61,12 @@ class GlobalEvent {
 
   /** Return the std::vector of MAUS::GlobalPrimaryChain*,
    *  #_primarychains. */
-  std::vector<MAUS::recon::global::PrimaryChain*>* get_primarychains() const {
+  GlobalPrimaryChainPArray* get_primarychains() const {
     return _primarychains;
   };
 
   /** Set the std::vector<MAUS::recon::global::PrimaryChain*>. */
-  void set_primarychains(
-      std::vector<MAUS::recon::global::PrimaryChain*> *primarychains) {
+  void set_primarychains(GlobalPrimaryChainPArray *primarychains) {
     _primarychains = primarychains;
   };
 
@@ -87,13 +86,12 @@ class GlobalEvent {
 
   /** Return the std::vector of MAUS::GlobalTrack*,
    *  #_tracks. */
-  std::vector<MAUS::recon::global::Track*>* get_tracks() const {
+  GlobalTrackPArray* get_tracks() const {
     return _tracks;
   };
 
   /** Set the std::vector<MAUS::recon::global::Track*>. */
-  void set_tracks(
-      std::vector<MAUS::recon::global::Track*> *tracks) {
+  void set_tracks(GlobalTrackPArray *tracks) {
     _tracks = tracks;
   };
 
@@ -113,13 +111,12 @@ class GlobalEvent {
 
   /** Return the std::vector of MAUS::GlobalTrackPoint*,
    *  #_trackpoints. */
-  std::vector<MAUS::recon::global::TrackPoint*>* get_trackpoints() const {
+  GlobalTrackPointPArray* get_trackpoints() const {
     return _trackpoints;
   };
 
   /** Set the std::vector<MAUS::recon::global::TrackPoint*>. */
-  void set_trackpoints(
-      std::vector<MAUS::recon::global::TrackPoint*> *trackpoints) {
+  void set_trackpoints(GlobalTrackPointPArray *trackpoints) {
     _trackpoints = trackpoints;
   };
 
@@ -135,13 +132,12 @@ class GlobalEvent {
 
   /** Return the std::vector of MAUS::GlobalSpacePoint*,
    *  #_spacepoints. */
-  std::vector<MAUS::recon::global::SpacePoint*>* get_spacepoints() const {
+  GlobalSpacePointPArray* get_spacepoints() const {
     return _spacepoints;
   };
 
   /** Set the std::vector<MAUS::recon::global::SpacePoint*>, #_spacepoints. */
-  void set_spacepoints(
-      std::vector<MAUS::recon::global::SpacePoint*> *spacepoints) {
+  void set_spacepoints(GlobalSpacePointPArray *spacepoints) {
     _spacepoints = spacepoints;
   };
 
@@ -150,25 +146,25 @@ class GlobalEvent {
   /** A vector of MAUS::GlobalPrimaryChain pointers
    *  associated with this event. Different reconstruction steps can
    *  be distinguished by mapper_name. */
-  std::vector<MAUS::recon::global::PrimaryChain*> *_primarychains;
+  GlobalPrimaryChainPArray *_primarychains;
   
   /** A vector of MAUS::GlobalTrack pointers associated with
    *  this event. These should be accessed through the
    *  MAUS::GlobalPrimaryChain pointers stored in
    *  #_primarychains. */
-  std::vector<MAUS::recon::global::Track*> *_tracks;
+  GlobalTrackPArray *_tracks;
   
   /** A vector of MAUS::GlobalTrackPoint pointers associated with
    *  this event. These should be accessed through the
    *  MAUS::GlobalPrimaryChain pointers stored in
    *  #_primarychains. */
-  std::vector<MAUS::recon::global::TrackPoint*> *_trackpoints;
+  GlobalTrackPointPArray *_trackpoints;
   
   /** A vector of MAUS::GlobalSpacePoint pointers associated with
    *  this event. These should be accessed through the
    *  MAUS::GlobalPrimaryChain pointers stored in
    *  #_primarychains. */
-  std::vector<MAUS::recon::global::SpacePoint*> *_spacepoints;
+  GlobalSpacePointPArray *_spacepoints;
 
   ClassDef(GlobalEvent, 2)
 }; // ~GlobalEvent
