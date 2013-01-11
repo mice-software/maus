@@ -18,27 +18,27 @@
 
 namespace MAUS {
 
-GlobalPrimaryChainProcessor::GlobalPrimaryChainProcessor()
-    : _global_track_array_proc(new GlobalTrackProcessor),
-      _parents_proc(new IntProcessor) {
+GlobalPrimaryChainProcessor::GlobalPrimaryChainProcessor() {
 
     RegisterValueBranch("mapper_name", &_string_proc,
                         &MAUS::recon::global::PrimaryChain::get_mapper_name,
                         &MAUS::recon::global::PrimaryChain::set_mapper_name,
                         true);
 
-    RegisterPointerBranch("tracks", &_global_track_array_proc,
-                        &MAUS::recon::global::PrimaryChain::get_tracks,
-                        &MAUS::recon::global::PrimaryChain::set_tracks, true); 
+    RegisterPointerReference(
+        "tracks",
+        &MAUS::recon::global::PrimaryChain::get_tracks,
+        &MAUS::recon::global::PrimaryChain::set_tracks, true); 
 
-    RegisterValueBranch("parents", &_parents_proc,
-                        &MAUS::recon::global::PrimaryChain::get_parents,
-                        &MAUS::recon::global::PrimaryChain::set_parents, true); 
+    RegisterPointerReference(
+        "parents",
+        &MAUS::recon::global::PrimaryChain::get_parents,
+        &MAUS::recon::global::PrimaryChain::set_parents, true); 
 
-    RegisterValueBranch("goodness_of_fit", &_double_proc,
-                        &MAUS::recon::global::PrimaryChain::get_goodness_of_fit,
-                        &MAUS::recon::global::PrimaryChain::set_goodness_of_fit, true);
-
+    RegisterValueBranch(
+        "goodness_of_fit", &_double_proc,
+        &MAUS::recon::global::PrimaryChain::get_goodness_of_fit,
+        &MAUS::recon::global::PrimaryChain::set_goodness_of_fit, true);
 
 }
 

@@ -18,6 +18,7 @@
 #include "DataStructure/GlobalPrimaryChain.hh"
 
 #include <algorithm>
+#include <utility>
 
 #include "Interface/Squeak.hh"
 // #include "DataStructure/GlobalTrackPoint.hh"
@@ -29,22 +30,21 @@ namespace global {
 // Default constructor
 PrimaryChain::PrimaryChain()
     : _mapper_name(""),
+      _tracks(),
       _goodness_of_fit(0.) {
-  _tracks = new std::vector<MAUS::GlobalTrack*>();
 }
 
 // Copy contructor
 PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
     : _mapper_name(""),
-      _tracks(primary_chain.get_tracks()),
-      _parents(primary_chain.get_parents()),
+      _tracks(primary_chain.get_tracks_tref()),
       _goodness_of_fit(primary_chain.get_goodness_of_fit()) {}
 
 // Constructor setting #_mapper_name
 PrimaryChain::PrimaryChain(std::string mapper_name)
     : _mapper_name(mapper_name),
+      _tracks(),
       _goodness_of_fit(0.) {
-  _tracks = new std::vector<MAUS::GlobalTrack*>();
 }
 
 // Destructor
@@ -56,8 +56,7 @@ PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
     return *this;
   }
   _mapper_name        = primary_chain.get_mapper_name();
-  _tracks             = primary_chain.get_tracks();
-  _parents            = primary_chain.get_parents();
+  _tracks             = primary_chain.get_tracks_tref();
   _goodness_of_fit    = primary_chain.get_goodness_of_fit();
   
   return *this;
@@ -69,8 +68,30 @@ PrimaryChain* PrimaryChain::Clone() const {
   MAUS::GlobalPrimaryChain* primaryChainNew =
       new MAUS::GlobalPrimaryChain(_mapper_name);
 
-  for(unsigned int i = 0; i < _tracks->size(); ++i) {
-    primaryChainNew->AddTrack(_tracks->at(i)->Clone(), _parents[i]);
+  MAUS::recon::global::Track* track;
+  MAUS::recon::global::Track* parent;
+
+  // First, we loop through all of the tracks, cloning each, and
+  // placing the clones in a temporary map...
+  std::map<MAUS::recon::global::Track*,
+           MAUS::recon::global::Track*> tempMap;
+  for(size_t i = 0; i < _tracks.size(); i++) {
+    track = (MAUS::recon::global::Track*) _tracks.at(i).first.GetObject();
+    tempMap[track] = track->Clone();
+  }
+
+  // Second, we loop through again.  Clones are added to the new
+  // PrimaryChain, either as Primaries or with the appropriate
+  // Clone...
+  for(size_t i = 0; i < _tracks.size(); i++) {
+    track = (MAUS::recon::global::Track*) _tracks.at(i).first.GetObject();
+    if(!_tracks.at(i).second.IsValid())
+      primaryChainNew->AddPrimaryTrack(tempMap[track]);
+    else {
+      parent = (MAUS::recon::global::Track*) _tracks.at(i).second.GetObject();
+      primaryChainNew->AddTrack(tempMap[track],
+                                tempMap[parent]);
+    }
   }
 
   primaryChainNew->set_goodness_of_fit(_goodness_of_fit);
@@ -78,42 +99,65 @@ PrimaryChain* PrimaryChain::Clone() const {
   return primaryChainNew;
 }
 
-// Constituent Tracks methods
-int PrimaryChain::AddTrack(MAUS::GlobalTrack* track, int parent) {
+bool PrimaryChain::AddTrack(MAUS::GlobalTrack* track,
+                            MAUS::GlobalTrack* parent) {
   // Check track is valid
   if(!track) {
     Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
                                 << std::endl;
-    return -2;
+    return false;
   }
 
-  // Check parent signifies either a primary track being added (-1) or
-  // a track already stored in the chain.
-  if(parent != -1) {
-    size_t index = parent;
-    if(index < 0 || index >= _tracks->size()) {
-      Squeak::mout(Squeak::error)
-          << "Proposed Parent not in Primary Chain, rejecting Track"
-          << std::endl;
-      return -2;
+  // Check parent is valid.  If not, then add the track as a primary
+  if(!parent)
+    return AddPrimaryTrack(track);
+  
+  // Check parent is already in the _track vector.
+  bool found = false;
+  for(size_t i = 0; i < _tracks.size(); i++) {
+    if(_tracks.at(i).first.GetObject() == parent) {
+      found = true;
+      break;
     }
   }
 
-  // Add track and parent simultaneously
-  _tracks->push_back(track);
-  _parents.push_back(parent);
+  if(!found) {
+    Squeak::mout(Squeak::error)
+        << "Proposed Parent not in Primary Chain, rejecting Track"
+        << std::endl;
+    return false;
+  }
 
-  // Return index of new entry
-  return (_tracks->size() - 1);
+  // Add the track with parent
+  _tracks.push_back(std::make_pair(track, parent));
+  return true;
+}
+
+bool PrimaryChain::AddPrimaryTrack(MAUS::GlobalTrack* track) {
+  // Check track is valid
+  if(!track) {
+    Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
+                                << std::endl;
+    return false;
+  }
+  
+  // Add the track with a NULL parent
+  _tracks.push_back(std::make_pair(track, TRef(NULL)));
+  return true;
 }
 
 bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
-  // Find track in vector
-  std::vector<MAUS::GlobalTrack*>::iterator target;
-  target = std::find(_tracks->begin(), _tracks->end(), track);
-
-  // If target not found, warning and return.
-  if(target == _tracks->end()) {
+  // Check track is in the container
+  bool in_tracks = false;
+  for(size_t i = 0; i < _tracks.size(); i++) {
+    if(_tracks.at(i).first.GetObject() == track) {
+      in_tracks = true;
+      break;
+    }
+  }
+  
+  // If not in _tracks, warning and return.
+  if(!in_tracks) {
     Squeak::mout(Squeak::warning)
         << "Track not in PrimaryChain, can't remove"
         << std::endl;
@@ -121,186 +165,95 @@ bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
   }
 
   // If target is parent of other track, prevent removal
-  size_t index = target - _tracks->begin();
-  std::vector<int>::iterator storedparent;
-  storedparent = std::find(_parents.begin(), _parents.end(), index);
-  if (storedparent != _parents.end()) {
+  bool is_parent = false;
+  for(size_t i = 0; i < _tracks.size(); i++) {
+    if(_tracks.at(i).second.GetObject() == track) {
+      is_parent = true;
+      break;
+    }
+  }
+  
+  // If track is a parent, warn and return
+  if (is_parent) {
     Squeak::mout(Squeak::warning)
         << "Attempting to remove track with daughter in PrimaryChain, forbidden"
         << std::endl;
     return false;
   }
 
-  // Can't actually remove the entry, as indices will shift!
-  _tracks->at(index) = NULL;
-  _parents.at(index) = -2;
-
+  // Remove the pair
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->first.GetObject() == track) {
+      _tracks.erase(index);
+      break;
+    }
+  }
+  
   return true;
 }
 
 bool PrimaryChain::HasTrack(MAUS::GlobalTrack* track) {
-  // Check incoming track pointer is valid, otherwise might match a
-  // NULL entry in vector.
-  if(track == NULL) {
-    Squeak::mout(Squeak::warning)
-        << "PrimaryChain::HasTrack was passed a NULL Track pointer..."
-        << std::endl;
-    return false;
+  // Find track in vector
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->first.GetObject() == track) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PrimaryChain::HasTrackAsParent(MAUS::GlobalTrack* parent) {
+  // Find track as parent vector
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->second.GetObject() == parent) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PrimaryChain::IsPrimaryTrack(MAUS::GlobalTrack* track) {
+  // Find track in vector
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->first.GetObject() == track) {
+      return !(index->second.IsValid());
+    }
+  }
+  return false;
+}
+
+MAUS::GlobalTrack* PrimaryChain::GetTrackParent(MAUS::GlobalTrack* track) {
+  // Find track, and return parent
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->first.GetObject() == track) {
+      return (MAUS::GlobalTrack*) index->second.GetObject();
+    }
+  }
+  return NULL;
+}
+
+std::vector<MAUS::GlobalTrack*>
+PrimaryChain::GetTrackDaughters(MAUS::GlobalTrack* track) {
+  std::vector<MAUS::GlobalTrack*> result;
+
+  // Find all tracks with this track as a parent
+  std::vector<std::pair<TRef, TRef> >::iterator index;
+  for(index = _tracks.begin(); index < _tracks.end(); index++) {
+    if(index->second.GetObject() == track) {
+      result.push_back((MAUS::GlobalTrack*) index->first.GetObject());
+    }
   }
 
-  // Find track in vector
-  std::vector<MAUS::GlobalTrack*>::iterator target;
-  target = std::find(_tracks->begin(), _tracks->end(), track);
-
-  if(target == _tracks->end()) return false;
-  else return true;
-}
-
-bool PrimaryChain::HasTrackFromInt(int trackid) {
-  if(trackid == -1) {
-    Squeak::mout(Squeak::warning)
-        << "Search for Parent ID == -1.  This signifies\n"
-        << "initial track was a primary particle, with no parent."
-        << std::endl;
-    return false;
-  }
-
-  size_t index = trackid;
-  if(index < 0 || index >= _tracks->size()) return false;
-
-  // Check the track hasn't been removed via the RemoveTrack method.
-  if(_tracks->at(trackid) == NULL) return false;
-  
-  return true;
-}
-
-int PrimaryChain::GetTrackId(MAUS::GlobalTrack* track) {
-  // Check incoming track pointer is valid, otherwise might match a
-  // NULL entry in vector.
-  if(track == NULL) {
-    Squeak::mout(Squeak::warning)
-        << "PrimaryChain::GetTrackId was passed a NULL Track pointer..."
-        << std::endl;
-    return -2;
-  }
-
-  // Find track in vector
-  std::vector<MAUS::GlobalTrack*>::iterator target;
-  target = std::find(_tracks->begin(), _tracks->end(), track);
-
-  if(target == _tracks->end()) return -2;
-  else return (target - _tracks->begin());
-}
-
-int PrimaryChain::GetTrackParentId(MAUS::GlobalTrack* track) {
-  // Find track in vector
-  std::vector<MAUS::GlobalTrack*>::iterator target;
-  target = std::find(_tracks->begin(), _tracks->end(), track);
-
-  // Track not member of PrimaryChain, return -2
-  if(target == _tracks->end()) return -2;
-
-  size_t index = target - _tracks->begin();
-  return _parents[index];
-}
-
-int PrimaryChain::GetTrackParentIdFromInt(int index) {
-  if(index < 0) return -2;
-  size_t index_s = index;
-  if(index_s >= _parents.size()) return -2;
-  else return _parents[index_s];
-}
-
-std::vector<int> PrimaryChain::GetTrackDaughterIds(MAUS::GlobalTrack* track) {
-  // Find track in vector
-  std::vector<MAUS::GlobalTrack*>::iterator target;
-  target = std::find(_tracks->begin(), _tracks->end(), track);
-
-  // Track not member of PrimaryChain, return empty vector
-  if(target == _tracks->end()) return std::vector<int>();
-
-  // Store indices for tracks with parent == index
-  int index = target - _tracks->begin();
-  return GetTrackDaughterIdsFromInt(index);
-}
-
-std::vector<int> PrimaryChain::GetTrackDaughterIdsFromInt(int index) {
-  std::vector<int> result;
-  unsigned int i;
-  for(i = 0; i < _parents.size(); ++i) {
-    if(_parents[i] == index) result.push_back(i);
-  }
   return result;
 }
-
-const MAUS::GlobalTrack* PrimaryChain::GetTrackFromInt(int index) {
-  if(index < 0) return NULL;
-  size_t index_s = index;
-  if(index_s >= _tracks->size()) return NULL;
-  else return _tracks->at(index);
   
-}
-
-bool PrimaryChain::CleanUpTracks() {
-  // Identify NULL Track pointers and matching indices
-  std::vector<unsigned int> dead_indices;
-  unsigned int i;
-  for(i = 0; i < _tracks->size(); ++i) {
-    if(_tracks->at(i) == NULL) dead_indices.push_back(i);
-  }
-
-  // Check no existing tracks point to a NULL parent
-  std::vector<int>::iterator result;
-  for(i = 0; i < dead_indices.size(); ++i) {
-    result = std::find(_parents.begin(), _parents.end(), dead_indices[i]);
-    if(result != _parents.end()) {
-      Squeak::mout(Squeak::error)
-          << "Parent ID matches a NULL track.  CleanUpTracks failed."
-          << std::endl;
-      return false;
-    }
-  }
-
-  // Determine change in indices
-  std::vector<int> index_map;
-  int index_count = 0;
-  for(i = 0; i < _parents.size(); ++i) {
-    bool remove = (std::find(dead_indices.begin(), dead_indices.end(), i) !=
-                   dead_indices.end());
-    if(remove) {
-      index_map.push_back(-2);
-    } else {
-      index_map.push_back(index_count++);
-    }
-  }
-  
-  // Remove NULL Tracks and change parents vector
-  std::vector<MAUS::GlobalTrack*> * replacement_tracks =
-      new std::vector<MAUS::GlobalTrack*>();
-  std::vector<int> replacement_parents;
-  for(i = 0; i < _tracks->size(); ++i) {
-    // bool remove = (std::find(dead_indices.begin(), dead_indices.end(), i) !=
-    //                dead_indices.end());
-    bool remove = (index_map[i] == -2);
-    if(!remove) {
-      replacement_tracks->push_back(_tracks->at(i));
-      // Maintain primary status
-      if(_parents[i] == -1) {
-        replacement_parents.push_back(-1);
-      } else {
-        replacement_parents.push_back(index_map[_parents[i]]);
-      }
-    }
-  }
-  set_tracks(replacement_tracks);
-  set_parents(replacement_parents);
-  
-  return true;
-}
-
 void PrimaryChain::ClearTracks() {
-  _tracks->clear();
-  _parents.clear();
+  _tracks.clear();
 }
 
 } // ~namespace global

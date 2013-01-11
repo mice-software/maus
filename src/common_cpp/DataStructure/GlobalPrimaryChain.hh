@@ -29,13 +29,14 @@
 
 // C++ headers
 #include <string>
-#include <vector>
+#include <map>
 
 // ROOT headers
 #include "Rtypes.h"
 
 // MAUS headers
-#include "GlobalTrack.hh"
+#include "Interface/Squeal.hh"
+#include "DataStructure/GlobalTrack.hh"
 
 namespace MAUS {
 namespace recon {
@@ -70,9 +71,15 @@ class PrimaryChain {
   /// Add a MAUS::recon::global::Track, tracking the location of the
   /// parent track.
   /// @param[in] track  The track being added to the primary chain
-  /// @param[in] parent The index of track's parent
-  ///                   MAUS::recon::global::Track. -1 for a primary track.
-  int AddTrack(MAUS::recon::global::Track* track, int parent);
+  /// @param[in] parent The track's parent.  We require parent to
+  ///                   already be a member of the primarychain.
+  bool AddTrack(MAUS::recon::global::Track* track,
+                MAUS::recon::global::Track* parent);
+
+  /// Add a primary MAUS::recon::global::Track, with the parent
+  /// reference set to NULL.
+  /// @param[in] track  The track being added to the primary chain
+  bool AddPrimaryTrack(MAUS::recon::global::Track* track);
 
   /// Remove all reference of the provided track.  Returns false if a)
   /// track is not a member of the chain, or b) track has daughter
@@ -82,34 +89,18 @@ class PrimaryChain {
   /// Checks whether track is stored in the chain.
   bool HasTrack(MAUS::recon::global::Track* track);
 
-  /// Checks whether trackid is a valid index for a valid track.
-  bool HasTrackFromInt(int trackid);
+  /// Checks whether track is a parent in the chain.
+  bool HasTrackAsParent(MAUS::recon::global::Track* parent);
 
-  /// Determines the index for a given track pointer, returns -2 if
-  /// track not found.
-  int GetTrackId(MAUS::recon::global::Track* track);
+  /// Checks if a track is a primary track
+  bool IsPrimaryTrack(MAUS::recon::global::Track* track);
 
-  /// Determines a track's parent, according to this primary chain
-  int GetTrackParentId(MAUS::recon::global::Track* track);
-
-  /// Determines a track's parent, according to this primary chain  
-  int GetTrackParentIdFromInt(int index);
+  /// Returns a track's parent, according to this primary chain
+  MAUS::recon::global::Track* GetTrackParent(MAUS::recon::global::Track* track);
 
   /// Prepare a list of a track's daughter tracks.
-  std::vector<int> GetTrackDaughterIds(MAUS::recon::global::Track* track);
-
-  /// Prepare a list of a track's daughter tracks.
-  std::vector<int> GetTrackDaughterIdsFromInt(int index);
-
-  /// Returns the track matching a specified index.
-  const MAUS::recon::global::Track* GetTrackFromInt(int index);
-
-  /// Rearranges the tracks in the chain, in case tracks have been
-  /// removed.  Correctly handles indices internally, but provides no
-  /// functionality for replacing external indices.  Really, it would
-  /// be a lot better if we just never deleted Tracks from a
-  /// PrimaryChain.
-  bool CleanUpTracks();
+  std::vector<MAUS::recon::global::Track*>
+  GetTrackDaughters(MAUS::recon::global::Track* track);
 
   /// Empties the #_tracks object
   void ClearTracks();
@@ -124,22 +115,64 @@ class PrimaryChain {
     return _mapper_name;
   }
 
+  /// Fills the tracks half of the map #_tracks from a vector of tracks.
+  void set_tracks(GlobalTrackPArray* tracks){
+    _tracks.clear();
+    for(size_t i = 0; i < tracks->size(); ++i){
+      // Create a vector entry, but leave the parent TRef to be
+      // constructed by the default constructor
+      std::pair<TRef, TRef> track_pair;
+      track_pair.first = tracks->at(i);
+      _tracks.push_back(track_pair);
+    }
+  }
+
+  /// Fills the parents half of the map #_tracks from a vector of
+  /// tracks, requiring the map size to be equal to the vector size.
+  void set_parents(GlobalTrackPArray* parents){
+    if(_tracks.size() != parents->size()){
+      throw(Squeal(Squeal::recoverable,
+                   "Trying to set parents using a diff. size vector to tracks",
+                   "PrimaryChain::set_parents"));
+    }
+    for(size_t i = 0; i < parents->size(); ++i){
+      _tracks.at(i).second = parents->at(i);
+    }
+  }
+
+  /// Builds a vector of tracks from the internal #_tracks TRefArray
+  GlobalTrackPArray* get_tracks() const {
+    GlobalTrackPArray *result =
+        new GlobalTrackPArray;
+    for(size_t i = 0; i < _tracks.size(); ++i){
+      MAUS::recon::global::Track* temp =
+          (MAUS::recon::global::Track*) _tracks.at(i).first.GetObject();
+      result->push_back(temp);
+    }
+    
+    return result;
+  }
+
+  /// Builds a vector of tracks from the internal #_tracks TRefArray
+  GlobalTrackPArray* get_parents() const {
+    GlobalTrackPArray *result =
+        new GlobalTrackPArray;
+    for(size_t i = 0; i < _tracks.size(); ++i){
+      MAUS::recon::global::Track* temp =
+          (MAUS::recon::global::Track*) _tracks.at(i).second.GetObject();
+      result->push_back(temp);
+    }
+    
+    return result;
+  }
+
   /// Directly sets the internal #_tracks vector
-  void set_tracks(std::vector<MAUS::GlobalTrack*> * tracks){
+  void set_tracks_tref(std::vector<std::pair<TRef, TRef> > tracks){
     _tracks = tracks;
   }
   /// Direct access to the internal #_tracks vector
-  std::vector<MAUS::GlobalTrack*> * get_tracks() const {
+  std::vector<std::pair<TRef, TRef> > get_tracks_tref() const {
     return _tracks;
-  }
-
-  /// Directly sets the internal #_parents vector
-  void set_parents(std::vector<int> parents){
-    _parents = parents;
-  }
-  /// Direct access to the #_parents vector
-  std::vector<int> get_parents() const {
-    return _parents;
   }
 
   /// Set the #_goodness_of_fit paramter
@@ -158,13 +191,10 @@ class PrimaryChain {
   /// if required.
   std::string _mapper_name;
   
-  /// List of tracks associated with this primary chain, to be used
-  /// with #_parents, which contains the location of the parent
-  /// track.
-  MAUS::GlobalTrackPArray * _tracks;
-
-  /// The indices of each track's parent track.
-  std::vector<int> _parents;
+  /// Map of tracks associated with this primary chain, and a
+  /// reference to their parent tracks if applicable (NULL if track is
+  /// believed to be a primary particle).
+  std::vector<std::pair<TRef, TRef> > _tracks;
 
   /// The goodness of fit parameter.
   double _goodness_of_fit;

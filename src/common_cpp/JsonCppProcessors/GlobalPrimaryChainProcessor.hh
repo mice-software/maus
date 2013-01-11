@@ -41,8 +41,6 @@ class GlobalPrimaryChainProcessor :
  private:
   DoubleProcessor _double_proc;
   StringProcessor _string_proc;
-  PointerArrayProcessor<MAUS::recon::global::Track> _global_track_array_proc;
-  ValueArrayProcessor<int> _parents_proc;
 };
 } // ~namespace MAUS
 
