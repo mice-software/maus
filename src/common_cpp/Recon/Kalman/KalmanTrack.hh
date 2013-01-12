@@ -61,7 +61,8 @@ class KalmanTrack {
 
   TMatrixD solve_measurement_equation(TMatrixD a, TMatrixD s);
 
-  virtual void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
+  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
+  double BetheBlochStoppingPower(double p);
   void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
   void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
 

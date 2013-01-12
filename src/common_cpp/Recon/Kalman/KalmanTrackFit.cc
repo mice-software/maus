@@ -226,7 +226,8 @@ void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *tr
 
   // Calculate the energy loss for the projected state.
   if ( _use_Eloss )
-  // track->subtract_energy_loss(old_site, new_site);
+    track->subtract_energy_loss(old_site, new_site);
+
 
   // Calculate the system noise...
   if ( _use_MCS )

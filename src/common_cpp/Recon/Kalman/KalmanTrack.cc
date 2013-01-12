@@ -75,25 +75,117 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   C_new = _F*C_old*_F_transposed + _Q;
 
   new_site->set_projected_covariance_matrix(C_new);
+  /*
+  std::cerr << "Bethe-Bloch for 10 MeV/c: " << BetheBlochStoppingPower(10.) << "\n" 
+            << "Bethe-Bloch for 300 MeV/c: " << BetheBlochStoppingPower(300.) << "\n"
+            << "Bethe-Bloch for 1 GeV/c: " << BetheBlochStoppingPower(1000.) << std::endl;
+*/
+}
+
+// Returns (beta) * (-dE/dx). Formula and constanst from PDG.
+double KalmanTrack::BetheBlochStoppingPower(double p) {
+  double muon_mass = 105.7; // MeV/c2
+  double muon_mass2 = TMath::Power(muon_mass, 2.);
+  double electron_mass = 0.511;
+
+  double E = TMath::Sqrt(muon_mass2+p*p);
+  double E2 = TMath::Power(E, 2.);
+  double beta = p/E;
+  double beta2= TMath::Power(beta, 2.);
+  double gamma = E/muon_mass;
+  double gamma2= TMath::Power(gamma, 2.);
+
+  double K = 0.307075; // MeV g-1 cm2 (for A=1gmol-1
+  double A = 104.15; // g.mol-1 per styrene monomer
+  double I = 68.7; // eV (mean excitation energy)
+  double I2= TMath::Power(I, 2.);
+  double Z = 5.61291; // Z=6 for 0.922582% and Z=1 for 0.077418%
+
+  double outer_term = K*Z/(A*beta2);
+
+  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
+                TMath::Power(electron_mass/muon_mass, 2.));
+
+  double log_term = TMath::Log(2*electron_mass*beta2*gamma2*Tmax/(I2));
+  double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*muon_mass, 2);
+  double density = 1.06000;// g.cm-3
+  double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
+  double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
+  double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
+  // std::cerr << outer_term << " " << log_term << " " << beta2 << " " << Tmax << std::endl;
+  return beta*dEdx;
+/*
+   double Z       = MuELMaterial::Z(mt);
+   double A       = MuELMaterial::A(mt);
+   double Z_A     = Z/A;              // in mol/gr
+   double a2      = kAem2;            // (em coupling const)^2
+   double Na      = kNA;              // Avogadro's number
+   double lamda2 =  kLe2/units::cm2;  // (e compton wavelength)^2 in cm^2
+   double me      = kElectronMass;    // in GeV
+   double me2     = kElectronMass2; 
+   double mmu     = kMuonMass;        // in GeV
+   double mmu2    = kMuonMass2;
+   double E2      = TMath::Power(E,2);
+   double beta    = TMath::Sqrt(E2-mmu2)/E;
+   double beta2   = TMath::Power(beta,2);
+   double gamma   = E/mmu;
+   double gamma2  = TMath::Power(gamma,2);
+   double I       = BetheBlochMaterialParams::IonizationPotential(mt) * units::eV; 
+   double I2      = TMath::Power(I,2); // in GeV^2
+
+   // Calculate the maximum energy transfer to the electron (in GeV)
+
+   double p2      = E2-mmu2;
+   double Emaxt   = 2*me*p2 / (me2 + mmu2 + 2*me*E);
+   double Emaxt2  = TMath::Power(Emaxt,2);
+
+   // Calculate the density correction factor delta
+
+   double X0 =  BetheBlochMaterialParams::DensityCorrection_X0(mt);
+   double X1 =  BetheBlochMaterialParams::DensityCorrection_X1(mt);
+   double a  =  BetheBlochMaterialParams::DensityCorrection_a(mt);
+   double m  =  BetheBlochMaterialParams::DensityCorrection_m(mt);
+   double C  =  BetheBlochMaterialParams::DensityCorrection_C(mt);
+   double X  =  TMath::Log10(beta*gamma);
+
+   double delta = 0;
+   if(X0<X && X<X1) delta = 4.6052*X + a*TMath::Power(X1-X,m) + C;
+   if(X>X1)         delta = 4.6052*X + C;
+   
+   // Calculate the -dE/dx
+   double de_dx =  a2 * (2*kPi*Na*lamda2) * Z_A * (me/beta2) *
+                    (TMath::Log( 2*me*beta2*gamma2*Emaxt/I2 ) - 
+                                      2*beta2 + 0.25*(Emaxt2/E2) - delta);
+
+   de_dx *= (units::GeV/(units::g/units::cm2));
+   return de_dx; // in GeV^-2
+*/
 }
 
 void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
-  double minimum_ionization_energy = 1.; // MeV cm2 / g
+  double Delta_Z = 0.6523;
 
   TMatrixD a_old_site(5, 1);
   a_old_site = old_site->get_a();
-
   double px = a_old_site(1, 0);
   double py = a_old_site(3, 0);
   double kappa = a_old_site(4, 0);
   double pz = 1./kappa;
 
-  // assert(pz > 80. && "Previous site Pz is bad.");
-
-  double momentum = pow(px*px+py*py+pz*pz, 0.5);
-  // assert(momentum < 10000.);
+  double momentum = TMath::Sqrt(px*px+py*py+pz*pz);
   assert(_mass == _mass && "mass is not defined");
 
+  // double Delta_z = fabs(old_site->get_z()-new_site->get_z());
+  int n_steps = 100;
+
+  double Delta_p = 0.;
+  for ( int i = 0; i < n_steps; ++i ) {
+    momentum += Delta_p;
+    Delta_p += BetheBlochStoppingPower(momentum)*Delta_Z/n_steps;
+  }
+  std::cerr << "Total deltaP = " << Delta_p << " " << Delta_Z <<  std::endl;
+
+  /*
   double tau = momentum/_mass;
   double tau_squared = tau*tau;
 
@@ -138,6 +230,7 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
   a_subtracted(4, 0) = new_kappa;
 
   new_site->set_projected_a(a_subtracted);
+*/
 }
 
 void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
