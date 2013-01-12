@@ -77,7 +77,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     track->prepare_for_smoothing(sites);
     // ...and Smooth back all sites.
-    for ( int k = (int) numb_measurements-2; k > -1; --k ) {
+    for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
       // std::cerr << "Smoothing site " << k << std::endl;
       smooth(sites, track, k);
     }

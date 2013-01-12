@@ -430,7 +430,7 @@ class PatternRecognition {
     static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
     static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */
     static const double _sd_phi_5 = 1.0;     /** Rotation error associated with station 5 */
-    static const double _res_cut = 10; //2;       /** Road cut for linear fit in mm */
+    static const double _res_cut = 2;       /** Road cut for linear fit in mm */
     static const double _circ_res_cut = 5;  /** Road cut for circle fit in mm */
     static const double _R_res_cut = 150.0;    /** Road cut for circle radius in mm */
     static const double _chisq_cut = 15;     /** Cut on the chi^2 of the least sqs fit in mm */

@@ -80,12 +80,12 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       continue;
     }
 
-    //spill.GetDAQData()->SetTracker0DaqArray(tracker0);
-    //spill.GetDAQData()->SetTracker1DaqArray(tracker1);
+    // spill.GetDAQData()->SetTracker0DaqArray(tracker0);
+    // spill.GetDAQData()->SetTracker1DaqArray(tracker1);
 
-    //std::cerr << "DAQ sizes: " << std::endl;
-    //std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-    //std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
+    // std::cerr << "DAQ sizes: " << std::endl;
+    // std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
+    // std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
     tracker0.push_back(tracker0daq_event); // end of event. push back.
     tracker1.push_back(tracker1daq_event); // end of event. push back.
 
@@ -147,7 +147,7 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
     }
 
     // Get pedestal and gain from calibration.
-    //int new_bank = bank + 4*board;
+    // int new_bank = bank + 4*board;
     double adc_pedestal = calibration_[bank][channel_ro]["adc_pedestal"].asDouble();
     double adc_gain     = calibration_[bank][channel_ro]["adc_gain"].asDouble();
     double tdc_pedestal = calibration_[bank][channel_ro]["tdc_pedestal"].asDouble();
@@ -171,7 +171,8 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
     int board = floor(bank/4);
     int old_bank = bank%4;
     int tracker, station, plane, channel;
-     bool found = false; // get_StatPlaneChannel(board, old_bank, channel_ro, tracker, station, plane, channel);
+    bool found = false; // get_StatPlaneChannel(board, old_bank, channel_ro,
+                        //                      tracker, station, plane, channel);
      // Exclude missing modules.
     if ( found ) { // pe > 1.0 &&
       SciFiDigit *digit = new SciFiDigit(spill, eventNo,
@@ -182,9 +183,9 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
   tracker0daq_event->SetVLSBArray(vlsb_tracker0_array); // fill event with all vlsb digits
   tracker1daq_event->SetVLSBArray(vlsb_tracker1_array); // fill event with all vlsb digits
 
-  //std::cerr << "VLSB array sizes: " << std::endl;
-  //std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
-  //std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
+  // std::cerr << "VLSB array sizes: " << std::endl;
+  // std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
+  // std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB_c(Json::Value input_event,
@@ -265,15 +266,9 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
       event->add_digit(digit);
     }
   }  // ends loop over channels (j)
-  tracker0daq_event->SetVLSB_CArray(vlsb_c_tracker0_array); // fill event with all vlsb digits
-  tracker1daq_event->SetVLSB_CArray(vlsb_c_tracker1_array); // fill event with all vlsb digits
-
-  std::cerr << "VLSB_C array sizes: " << std::endl;
-  std::cerr << tracker0daq_event->GetVLSB_CArraySize() << std::endl;
-  std::cerr << tracker1daq_event->GetVLSB_CArraySize() << std::endl;
-
-  //tracker0.push_back(tracker0daq_event); // end of event. push back.
-  //tracker1.push_back(tracker1daq_event); // end of event. push back.
+  // Fill event with all vlsb digits.
+  tracker0daq_event->SetVLSB_CArray(vlsb_c_tracker0_array);
+  tracker1daq_event->SetVLSB_CArray(vlsb_c_tracker1_array);
 }
 
 bool RealDataDigitization::load_calibration(std::string file) {

@@ -23,10 +23,10 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 
+#include <TMatrixD.h>
+
 // C++ headers
 #include <vector>
-
-#include <TMatrixD.h>
 
 // MAUS headers
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"

@@ -17,8 +17,6 @@
 #include "Interface/Squeal.hh"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include <iostream>
-#include <fstream>
 
 namespace MAUS {
 
@@ -151,7 +149,7 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
    double delta = 0;
    if(X0<X && X<X1) delta = 4.6052*X + a*TMath::Power(X1-X,m) + C;
    if(X>X1)         delta = 4.6052*X + C;
-   
+
    // Calculate the -dE/dx
    double de_dx =  a2 * (2*kPi*Na*lamda2) * Z_A * (me/beta2) *
                     (TMath::Log( 2*me*beta2*gamma2*Emaxt/I2 ) - 

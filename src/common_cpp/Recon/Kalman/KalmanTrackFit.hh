@@ -24,15 +24,14 @@
 #include <assert.h>
 #include <algorithm>
 
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-
 // C++ headers
 #include <string>
 #include <vector>
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"

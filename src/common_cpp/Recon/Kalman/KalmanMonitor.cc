@@ -435,15 +435,18 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     KalmanSite site_i_1 = sites[i-1];
     KalmanSite site_i = sites[i];
 
-    double muon_mass = 105.65836668;
-    double muon_mass2=TMath::Power(muon_mass, 2.);
+    double muon_mass  = 105.65836668;
+    double muon_mass2 = TMath::Power(muon_mass, 2.);
 
     double old_mc_x  = site_i_1.get_true_position().x();
     double old_mc_y  = site_i_1.get_true_position().y();
     double old_mc_px = site_i_1.get_true_momentum().x();
     double old_mc_py = site_i_1.get_true_momentum().y();
     double old_mc_pz = site_i_1.get_true_momentum().z();
-    double old_p2 = TMath::Power(old_mc_px, 2.)+TMath::Power(old_mc_py, 2.)+TMath::Power(old_mc_pz, 2.);
+    double old_p2 = TMath::Power(old_mc_px, 2.) +
+                    TMath::Power(old_mc_py, 2.) +
+                    TMath::Power(old_mc_pz, 2.);
+
     double old_p  = TMath::Sqrt(old_p2);
     double old_energy  = TMath::Sqrt(muon_mass2+old_p2);
     double old_thethax = atan2(old_mc_px, old_mc_pz);
@@ -455,7 +458,10 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double new_mc_px = site_i.get_true_momentum().x();
     double new_mc_py = site_i.get_true_momentum().y();
     double new_mc_pz = site_i.get_true_momentum().z();
-    double new_p2 = TMath::Power(new_mc_px, 2.)+TMath::Power(new_mc_py, 2.)+TMath::Power(new_mc_pz, 2.);
+    double new_p2 = TMath::Power(new_mc_px, 2.) +
+                    TMath::Power(new_mc_py, 2.) +
+                    TMath::Power(new_mc_pz, 2.);
+
     double new_energy  = TMath::Sqrt(muon_mass2+new_p2);
     double new_thethax = atan2(new_mc_px, new_mc_pz);
     double new_thethay = atan2(new_mc_py, new_mc_pz);

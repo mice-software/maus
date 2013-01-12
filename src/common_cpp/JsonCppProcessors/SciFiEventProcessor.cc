@@ -24,9 +24,7 @@ SciFiEventProcessor::SciFiEventProcessor()
                       _sf_spoint_array_proc(new SciFiSpacePointProcessor),
                       _sf_sprtrk_array_proc(new SciFiStraightPRTrackProcessor),
                       _sf_hprtrk_array_proc(new SciFiHelicalPRTrackProcessor),
-                      _sf_trk_array_proc(new SciFiTrackProcessor)
-  {
-
+                      _sf_trk_array_proc(new SciFiTrackProcessor) {
   RegisterValueBranch("digits", &_sf_digit_array_proc,
                       &SciFiEvent::digits, &SciFiEvent::set_digits, false);
   RegisterValueBranch("clusters", &_sf_cluster_array_proc,
