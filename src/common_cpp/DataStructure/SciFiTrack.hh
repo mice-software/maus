@@ -41,7 +41,7 @@ class SciFiTrack {
 
     SciFiTrack();
 
-    ~SciFiTrack();
+    virtual ~SciFiTrack();
 
     SciFiTrack(const SciFiTrack &a_track);
 

@@ -38,6 +38,27 @@ namespace MAUS {
 
 class KalmanSite;
 
+typedef struct SciFiParams {
+  /// Polystyrene's atomic number.
+  static const double Z()               { return 5.61291; }
+  /// Width of the fibre plane.
+  static const double Plane_Width()     { return 0.6523; }
+  static const double Radiation_Legth() { return 43.72; }
+  /// Fractional Radiation Length in cm3/g
+  static const double R0()              { return Plane_Width()/Radiation_Legth(); }
+  /// Density in g.cm-3
+  static const double Density()         { return 1.06000; }
+  /// Mean excitation energy in eV.
+  static const double Mean_Excitation_Energy() { return 68.7; }
+  /// Atomic number in g.mol-1 per styrene monomer
+  static const double A()               { return 104.15; }
+} FibreParameters;
+
+typedef struct BetheBloch {
+  /// Bethe Bloch constant in MeV g-1 cm2 (for A=1gmol-1)
+  static const double K() { return 0.307075; }
+} BetheBlochParameters;
+
 class KalmanTrack {
  public:
   KalmanTrack();

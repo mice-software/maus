@@ -234,8 +234,8 @@ SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
 SciFiSeedCovariance = 200 # Error estimate for Seed values of the Kalman Fit
-SciFiKalman_use_MCS = False # flag to add MCS to the Kalman Fit
-SciFiKalman_use_Eloss = False # flag to add Eloss to the Kalman Fit
+SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
+SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiUpdateMisalignments = False # Do Misalignment Search & Update
 
 
