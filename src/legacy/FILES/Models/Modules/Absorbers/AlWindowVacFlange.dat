@@ -1,0 +1,15 @@
+// FILES/Models/Modules/Absorbers/AlWindowVacFlange.dat
+//
+//
+// 
+// 
+
+Module AlWindowVacFlange
+{
+  Volume Tube
+  Dimensions 150 235 36 mm
+  PropertyString Material Al 
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+}
