@@ -667,6 +667,7 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
     KalmanSite site = sites[i];
     _chi2 += site.get_chi2();
   }
+  std::cerr << "Chi2/ndf: " << _chi2/_ndf << std::endl;
 
   _P_value = TMath::Prob(_chi2, _ndf);
 }
