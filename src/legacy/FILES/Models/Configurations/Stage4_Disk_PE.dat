@@ -1,5 +1,3 @@
-// Stage 4 Floor Plan, everything is relative to z=0 at middle H absorber in Stage 6
-
 Configuration Stage4
 {
   Dimensions 6. 6. 31. m
