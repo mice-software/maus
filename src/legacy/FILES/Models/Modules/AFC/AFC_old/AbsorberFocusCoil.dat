@@ -1,12 +1,3 @@
-// src/legacy/FILES/Models/Modules/AFC/AbsorberFocusCoil.dat
-//
-// Absorber Focus Coil with no windows or absorber in it
-//
-// Modified by P. Snopok on August 21, 2012
-//
-// See comments from Chris Rogers below
-
-
 // WARNING *** I HAVE BEEN CAREFUL TO GET THIS RIGHT
 //         *** JUST DONT BREAK IT!
 //
@@ -35,12 +26,15 @@
 
 Module AbsorberFocusCoil
 {
-//  Volume Cylinder
-//  Dimensions 76.0 84.4 cm
-  Volume Tube
-  Dimensions 235.5 757 844 mm
+  Volume Cylinder
+  Dimensions 76.0 84.4 cm
   PropertyBool Invisible 1
   PropertyString Material Galactic
+  Module AFC/AlVessel.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
   Module AFC/AFCCryostat.dat
   {
     Position 0.0 0.0 0.0 mm
@@ -58,4 +52,60 @@ Module AbsorberFocusCoil
       ScaleFactor -113.95
     }  
   }
+  Module AFC/AlWindowAbsFlange.dat
+  {
+    Position 0.0 0.0 136 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/AlWindowAbsFlange.dat
+  {
+    Position 0.0 0.0 -136 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/AlWindowAbsPolycone.dat
+  {
+    Position 0.0 0.0 175.15 mm
+    Rotation 0.0 180.0 0.0 degree
+  }
+  Module AFC/AlWindowAbsPolycone.dat
+  {
+    Position 0.0 0.0 -175.15 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/LH2End.dat
+  {
+    Position 0.0 0.0 175.15 mm
+    Rotation 0.0 180.0 0.0 degree
+  }
+  Module AFC/LH2Center.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/LH2End.dat
+  {
+    Position 0.0 0.0 -175.15 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/AlWindowVacFlange.dat
+  {
+    Position 0.0 0.0 308+5-50 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/AlWindowVacFlange.dat
+  {
+    Position 0.0 0.0 -308-5+50 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module AFC/AlWindowVacPolycone.dat
+  {
+    Position 0.0 0.0 308.0 mm
+    Rotation 0.0 180.0 0.0 degree
+  }
+  Module AFC/AlWindowVacPolycone.dat
+  {
+    Position 0.0 0.0 -308.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
 }
+

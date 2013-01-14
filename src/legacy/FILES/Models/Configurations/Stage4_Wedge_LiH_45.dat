@@ -18,6 +18,11 @@ Configuration Stage4
     Position 0. 0. 14205.74 mm
     Rotation 0. 0. 0. degree
   }
+  Module Absorbers/Wedge_LiH_45.dat
+  {
+    Position 0. 0. 14205.74 mm
+    Rotation 0. 0. 0. degree
+  }
   Module Tracker/TrackerSolenoid1.dat
   {
     Position 0. 0. 16155.74 mm
