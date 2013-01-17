@@ -161,11 +161,6 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   // Rotations of the planes in the Tracker Reference Frame.
   if ( clust->get_tracker() == 0 ) {
     trot = trot*zflip;
-  // dir  *= trot;
-  // perp *= trot;
-  // } else if ( clust->get_tracker() == 1 ) {
-  //  dir  *= trot;
-  //  perp *= trot;
   }
   dir  *= trot;
   perp *= trot;

@@ -129,7 +129,6 @@ bool InputCppDAQData::readNextEvent() {
 }
 
 std::string InputCppDAQData::getCurEvent() {
-  std::cerr << "ED: InputCppDAQData: Getting current event. "<< std::endl;
   // Create new Json documents.
   Json::Value xDocRoot;  // Root of the event
   Json::FastWriter xJSONWr;

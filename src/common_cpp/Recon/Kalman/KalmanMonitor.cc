@@ -163,7 +163,6 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   size_t numb_sites = sites.size();
   int ndf = numb_sites - number_parameters;
 
-  std::cerr << "Processing " << numb_sites << std::endl;
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
 
@@ -184,16 +183,14 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     a_proj = site.get_projected_a();
 
     int id = site.get_id();
-    std::cerr << id << std::endl;
     if ( id < 15 ) {
       tracker = 0;
       mc_x  = -mc_x;
       mc_px = -mc_px;
-      mc_pz = -mc_pz;
+      // mc_pz = -mc_pz;
     }
 
     chi2 += site.get_chi2();
-    std::cerr << chi2 << std::endl;
     // assert(a_smooth(0, 0) ==  a_smooth(0, 0) && "Sanity check - smoothing");
     // assert(a_proj(0, 0)   == a_proj(0, 0)    && "Sanity check - projection.");
 /*
@@ -373,17 +370,16 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
       station10->SetPoint(static_cast<Int_t> (x), x, y);
     }
   }
-
   if ( tracker == 0 ) {
     chi2_tracker0->Fill(chi2/ndf);
   } else {
     chi2_tracker1->Fill(chi2/ndf);
   }
 
-  // _counter +=1;
-  // if ( !(_counter%20) ) {
+  _counter +=1;
+  if ( !(_counter%10) ) {
     save();
-  // }
+  }
 
 /*
   // Energy loss and scattering angles
@@ -472,12 +468,12 @@ void KalmanMonitor::save() {
   station3->Write("", TObject::kOverwrite);
   station4->Write("", TObject::kOverwrite);
   station5->Write("", TObject::kOverwrite);
+
   station6->Write("", TObject::kOverwrite);
   station7->Write("", TObject::kOverwrite);
   station8->Write("", TObject::kOverwrite);
   station9->Write("", TObject::kOverwrite);
   station10->Write("", TObject::kOverwrite);
-
 
   pull_site_3->Write("", TObject::kOverwrite);
   residual_site_3->Write("", TObject::kOverwrite);

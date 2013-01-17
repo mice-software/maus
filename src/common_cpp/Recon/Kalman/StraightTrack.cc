@@ -24,7 +24,7 @@ StraightTrack::StraightTrack() {
 
 StraightTrack::~StraightTrack() {}
 
-void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
+void StraightTrack::update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) {
   // Reset.
   _F.Zero();
 

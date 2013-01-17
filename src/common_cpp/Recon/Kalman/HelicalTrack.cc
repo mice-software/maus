@@ -25,7 +25,7 @@ HelicalTrack::HelicalTrack() {
 
 HelicalTrack::~HelicalTrack() {}
 
-void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {
+void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
@@ -40,23 +40,28 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   prev_site = old_site->get_a();
 
   double old_kappa = prev_site(4, 0);
-  // double old_px = prev_site(1, 0);
-  // double old_py = prev_site(3, 0);
+  double old_mx = prev_site(1, 0);
+  double old_my = prev_site(3, 0);
 
   double Q = 1.;
   double B = -4.;
   double a = -0.2998*Q*B; // MeV/mm
 
+  double sine = sin(a*deltaZ*old_kappa);
+  double cosine = cos(a*deltaZ*old_kappa);
+
   // @x/@x
   _F(0, 0) = 1.;
   // @x/@px
-  _F(0, 1) = sin(a*deltaZ*old_kappa)/a;
+  _F(0, 1) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
   // @x/@y
   _F(0, 2) = 0.;
   // @x/@py
-  _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/a;
+  _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
   // @x/@kappa
-  _F(0, 4) = 0.;
+  _F(0, 4) = 0.0;
+  // (-1./(old_kappa*old_kappa))*(old_mx*sine/a-old_my/a+old_my*cosine/a) +
+  //           (1./old_kappa)*(old_mx*deltaZ*cosine-old_my*deltaZ*sine);
 
   // @px/@x
   _F(1, 0) = 0.;
@@ -72,13 +77,15 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   // @y/@x
   _F(2, 0) = 0.;
   // @y/@px
-  _F(2, 1) = (1.-cos(a*deltaZ*old_kappa))/a;
+  _F(2, 1) = (1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
   // @y/@y
   _F(2, 2) = 1.;
   // @y/@py
-  _F(2, 3) = sin(a*deltaZ*old_kappa)/a;
+  _F(2, 3) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
   // @y/@kappa
-  _F(2, 4) = 0.;
+  _F(2, 4) = 0.0;
+  // (-1./(old_kappa*old_kappa))*(old_my*sine/a+old_mx/a-old_mx*cosine/a) +
+  //           (1./old_kappa)*(old_my*deltaZ*cosine+old_mx*deltaZ*sine);
 
   // @py/@x
   _F(3, 0) = 0.;
@@ -103,6 +110,7 @@ void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site)
   _F(4, 4) = 1.;
 }
 
+/*
 void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
   TMatrixD a(5, 1);
   a = old_site->get_a();
@@ -119,5 +127,6 @@ void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site)
   // Q.Zero();
   set_Q(Q);
 }
+*/
 
 } // ~namespace MAUS

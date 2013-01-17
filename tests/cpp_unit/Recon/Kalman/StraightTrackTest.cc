@@ -17,6 +17,8 @@
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 #include "gtest/gtest.h"
 
+// TODO: Test propagation of covariance.
+
 namespace {
 class StraightTrackTest : public ::testing::Test {
  protected:
@@ -50,7 +52,7 @@ void StraightTrackTest::set_up_sites() {
   TMatrixD C(5, 5);
   C.Zero();
   for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = 1.; // dummy values
+     C(i, i) = 100.; // dummy values
   }
   old_site.set_projected_covariance_matrix(C);
 }
@@ -69,6 +71,10 @@ TEST_F(StraightTrackTest, propagator_test) {
   double expected_y = my*deltaZ;
   EXPECT_EQ(expected_x, a_projected(0, 0));
   EXPECT_EQ(expected_y, a_projected(2, 0));
+
+  track->calc_covariance(&old_site, &new_site);
+  // DO SOMETHING WITH COVARIANCE
+
 }
 /*
 TEST_F(StraightTrackTest, noise_test) {

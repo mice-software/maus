@@ -18,7 +18,6 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include <math.h>
 #include "Interface/Squeal.hh"
-// #define PI 3.14159265359
 
 namespace MAUS {
 
@@ -86,7 +85,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     // monitor.print_info(sites);
     track->compute_chi2(sites);
     // Misalignment work.
-    if ( track->get_chi2() < 25. && numb_measurements == 15 ) {
+    if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
         track->exclude_site(site);
@@ -102,18 +101,6 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
   }
 }
 
-void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                                 KalmanTrack *track,
-                                                 KalmanSciFiAlignment &kalman_align) {
-  size_t numb_measurements = sites.size();
-
-  for ( size_t i = 0; i < numb_measurements; ++i ) {
-    // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
-    filter_updating_misalignments(sites, track, i);
-  }
-}
-
 void KalmanTrackFit::initialise(KalmanSeed *seed,
                                 std::vector<KalmanSite> &sites,
                                 KalmanSciFiAlignment &kalman_align) {
@@ -122,10 +109,9 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
 
   TMatrixD C(5, 5);
   C.Zero();
-  // for ( int i = 0; i < 5; ++i ) {
-  C(0, 0) = _seed_cov/50.; // dummy values
+  C(0, 0) = 3.; // dummy values
   C(1, 1) = _seed_cov; // dummy values
-  C(2, 2) = _seed_cov/50.; // dummy values
+  C(2, 2) = 3.; // dummy values
   C(3, 3) = _seed_cov; // dummy values
   C(4, 4) = _seed_cov; // dummy values
 
@@ -175,7 +161,6 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
   KalmanSite *a_site = &sites[current_site];
 
   // Update measurement error:
-  // (non-const std for the perp direction)
   track->update_V(a_site);
 
   // Update H (depends on plane direction.)
@@ -183,31 +168,9 @@ void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
 
   // a_k = a_k^k-1 + K_k x pull
   track->calc_filtered_state(a_site);
+
   // Cp = (C-KHC)
   track->update_covariance(a_site);
-}
-
-void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = NULL;
-  // Get previous site too.
-  // if ( !(current_site%3) ) {
-  int id = a_site->get_id();
-  std::cout << id << std::endl;
-  if ( !(current_site%3) ) {
-    alignment_projection_site = a_site;
-    alignment_projection_site->get_shifts().Print();
-  } else {
-    alignment_projection_site = &sites[current_site-1];
-    alignment_projection_site->get_shifts().Print();
-  }
-
-  track->update_V(a_site);
-  track->update_H(a_site);
-  track->update_W(a_site);
-  track->update_misaligments(a_site, alignment_projection_site);
 }
 
 void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {
@@ -260,6 +223,42 @@ void KalmanTrackFit::save(const KalmanTrack *kalman_track,
   SciFiTrack *track = new SciFiTrack(kalman_track);
   // track->add_track_points(sites);
   event.add_scifitrack(track);
+}
+
+
+void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
+                                                 KalmanTrack *track,
+                                                 KalmanSciFiAlignment &kalman_align) {
+  size_t numb_measurements = sites.size();
+
+  for ( size_t i = 0; i < numb_measurements; ++i ) {
+    // ... Filter...
+    std::cerr << "Updating site " << i << std::endl;
+    filter_updating_misalignments(sites, track, i);
+  }
+}
+
+void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
+                            KalmanTrack *track, int current_site) {
+  // Get Site...
+  KalmanSite *a_site = &sites[current_site];
+  KalmanSite *alignment_projection_site = NULL;
+  // Get previous site too.
+  // if ( !(current_site%3) ) {
+  int id = a_site->get_id();
+  std::cout << id << std::endl;
+  if ( !(current_site%3) ) {
+    alignment_projection_site = a_site;
+    alignment_projection_site->get_shifts().Print();
+  } else {
+    alignment_projection_site = &sites[current_site-1];
+    alignment_projection_site->get_shifts().Print();
+  }
+
+  track->update_V(a_site);
+  track->update_H(a_site);
+  track->update_W(a_site);
+  track->update_misaligments(a_site, alignment_projection_site);
 }
 
 } // ~namespace MAUS

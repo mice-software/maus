@@ -41,10 +41,11 @@ class KalmanSite;
 typedef struct SciFiParams {
   /// Polystyrene's atomic number.
   static const double Z()               { return 5.61291; }
-  /// Width of the fibre plane.
+  /// Width of the fibre plane in mm.
   static const double Plane_Width()     { return 0.6523; }
-  static const double Radiation_Legth() { return 43.72; }
-  /// Fractional Radiation Length in cm3/g
+  /// Fibre radiation lenght in mm
+  static const double Radiation_Legth() { return 424.0; }
+  /// Fractional Radiation Length
   static const double R0()              { return Plane_Width()/Radiation_Legth(); }
   /// Density in g.cm-3
   static const double Density()         { return 1.06000; }
@@ -65,55 +66,57 @@ class KalmanTrack {
 
   virtual ~KalmanTrack() {}
 
-  virtual void update_propagator(KalmanSite *old_site, KalmanSite *new_site) = 0;
+  virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
+  /// Projection: calculation of predicted state.
+  void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site);
+  /// Projection: calculation of covariance matrix.
+  void calc_covariance(const KalmanSite *old_site, KalmanSite *new_site);
+  /// Bethe-Bloch calculation.
+  double BetheBlochStoppingPower(double p);
+  /// Subtract energy loss.
+  void subtract_energy_loss(const KalmanSite *old_site, KalmanSite *new_site);
+  /// Error added by Multiple Coulomb Scattering.
+  void calc_system_noise(const KalmanSite *old_site, const KalmanSite *new_site);
+
+  /// Filtering: update of relevant matrices.
+  void update_V(const KalmanSite *a_site);
+  void update_H(const KalmanSite *a_site);
+  void update_W(const KalmanSite *a_site);
+  /// Filtering: calculation of filtered state.
   void calc_filtered_state(KalmanSite *a_site);
-
+  TMatrixD get_pull(KalmanSite *a_site);
+  /// Filtering: update of covariance matrix.
+  void update_covariance(KalmanSite *a_site);
+  void set_residual(KalmanSite *a_site);
+  TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
   void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
 
-  void update_V(KalmanSite *a_site);
-
-  void update_covariance(KalmanSite *a_site);
-
-  void update_H(KalmanSite *a_site);
-
-  void update_W(KalmanSite *a_site);
-
-  void calc_predicted_state(KalmanSite *old_site, KalmanSite *new_site);
-  void set_residual(KalmanSite *a_site);
-
-  TMatrixD solve_measurement_equation(TMatrixD a, TMatrixD s);
-
-  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
-  double BetheBlochStoppingPower(double p);
-  void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
-  void calc_covariance(KalmanSite *old_site, KalmanSite *new_site);
-
-  void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
+  /// Smoothing: updates back transportation matrix.
+  void update_back_transportation_matrix(const KalmanSite *optimum_site, const KalmanSite *smoothing_site);
+  void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
   void prepare_for_smoothing(std::vector<KalmanSite> &sites);
   void exclude_site(KalmanSite *site);
+  TMatrixD get_kalman_gain(const KalmanSite *a_site);
 
-  TMatrixD get_propagator() { return _F; }
-  TMatrixD get_pull(KalmanSite *a_site);
-  TMatrixD get_system_noise() { return _Q; }
-  TMatrixD get_kalman_gain(KalmanSite *a_site);
-  double get_chi2() const { return _chi2; }
-  double get_ndf() const { return _ndf; }
-  double get_P_value() const { return _P_value; }
-  double get_tracker() const { return _tracker; }
-  double get_mass() const { return _mass; }
-  double get_momentum() const { return _momentum; }
-
-  TMatrixD get_Q() const { return _Q; }
-  void set_Q(TMatrixD Q) { _Q = Q; }
   // void get_site_properties(KalmanSite *site, double &thickess, double &density);
-
-  void set_mass(double mass) { _mass = mass; }
-
-  void set_momentum(double momentum) { _momentum = momentum; }
-
   void compute_chi2(const std::vector<KalmanSite> &sites);
+
+
+  /// Getters.
+  TMatrixD get_propagator()   const { return _F;        }
+  TMatrixD get_system_noise() const { return _Q;        }
+  TMatrixD get_Q()            const { return _Q;        }
+  double get_chi2()           const { return _chi2;     }
+  double get_ndf()            const { return _ndf;      }
+  double get_P_value()        const { return _P_value;  }
+  double get_tracker()        const { return _tracker;  }
+  double get_mass()           const { return _mass;     }
+  double get_momentum()       const { return _momentum; }
+
+  void set_Q(TMatrixD Q)             { _Q = Q;               }
+  void set_mass(double mass)         { _mass = mass;         }
+  void set_momentum(double momentum) { _momentum = momentum; }
 
  protected:
   // int _inversion_sanity;
@@ -142,7 +145,7 @@ class KalmanTrack {
 
   double _mass, _momentum;
 
-  double _active_radius; // = 150.;
+  double _active_radius;
 };
 
 } // ~namespace MAUS

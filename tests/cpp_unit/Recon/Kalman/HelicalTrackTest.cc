@@ -30,26 +30,26 @@ class HelicalTrackTest : public ::testing::Test {
   MAUS::KalmanSite old_site;
   MAUS::KalmanSite new_site;
   double z0, z1;
-  double x0, y0, px0, py0, kappa;
-  double x1, y1, px1, py1;
+  double x0, y0, mx0, my0, kappa;
+  double x1, y1, mx1, my1;
   void set_up_sites();
   TMatrixD a;
   static const double err = 1.e-2;
 };
 
 void HelicalTrackTest::set_up_sites() {
+  kappa = 1./200.;
   x0 = 0.;
   y0 = 5.;
   z0 = 0.;
-  px0 = 15.;
-  py0 = 15.;
-  kappa = 1./200.;
+  mx0 = 15.*kappa;
+  my0 = 15.*kappa;
 
   x1 = -8.0019;
   y1 = 34.614;
   z1 = 350.;
-  px1 = -20.513;
-  py1 = 5.4042;
+  mx1 = -20.513*kappa;
+  my1 = 5.4042*kappa;
 
   old_site.set_z(z0);
   new_site.set_z(z1);
@@ -57,9 +57,9 @@ void HelicalTrackTest::set_up_sites() {
 
   a.ResizeTo(5, 1);
   a(0, 0) = x0;
-  a(1, 0) = px0;
+  a(1, 0) = mx0;
   a(2, 0) = y0;
-  a(3, 0) = py0;
+  a(3, 0) = my0;
   a(4, 0) = kappa;
   old_site.set_a(a);
 
@@ -82,11 +82,11 @@ TEST_F(HelicalTrackTest, test_propagation) {
   TMatrixD a_projected(5, 1);
   a_projected = new_site.get_projected_a();
 
-  EXPECT_NEAR(x1, a_projected(0, 0), 1e-3);
-  EXPECT_NEAR(px1, a_projected(1, 0), 1e-3);
-  EXPECT_NEAR(y1, a_projected(2, 0), 1e-3);
-  EXPECT_NEAR(py1, a_projected(3, 0), 1e-3);
-  EXPECT_NEAR(kappa, a_projected(4, 0), 1e-3);
+  EXPECT_NEAR(x1,    a_projected(0, 0), err);
+  EXPECT_NEAR(mx1,   a_projected(1, 0), err);
+  EXPECT_NEAR(y1,    a_projected(2, 0), err);
+  EXPECT_NEAR(my1,   a_projected(3, 0), err);
+  EXPECT_NEAR(kappa, a_projected(4, 0), err);
 }
 
 

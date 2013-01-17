@@ -124,8 +124,7 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   // std::cerr << site->get_id() << " " << diff << std::endl;
   int id = site->get_id();
 
-  std::cerr << diff_x << std::endl;
-
+  // std::cerr << diff_x << std::endl;
   std::ofstream out2("kalman_diff.txt", std::ios::out | std::ios::app);
   out2 << id << " "<< diff_x << " " << diff_y << "\n";
   out2.close();
@@ -134,7 +133,8 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   s.Zero();
   s(0, 0) = diff_x;
   s(1, 0) = diff_y;
-  // set_shifts(s, id);
+  set_shifts(s, id);
+//  site->set_shifts(s);
 }
 
 void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
