@@ -36,7 +36,6 @@ class SciFiHelicalPRTrackProcessor : public ObjectProcessor<SciFiHelicalPRTrack>
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
-    ValueArrayProcessor<double> _double_array_proc;
     PointerArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;
 };
 } // ~namespace MAUS

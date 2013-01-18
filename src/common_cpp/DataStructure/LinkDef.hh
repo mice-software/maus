@@ -142,11 +142,15 @@
 #pragma link C++ class MAUS::TrackerDaq+;
 #pragma link C++ class MAUS::SciFiEvent+;
 #pragma link C++ class MAUS::SciFiDigit+;
+#pragma link C++ class std::vector<SciFiDigit*>+;
 #pragma link C++ class MAUS::SciFiCluster+;
+#pragma link C++ class std::vector<SciFiCluster*>+;
 #pragma link C++ class MAUS::SciFiSpacePoint+;
 #pragma link C++ class std::vector<SciFiSpacePoint*>+;
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
+#pragma link C++ class std::vector<SciFiStraightPRTrack*>+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
+#pragma link C++ class std::vector<SciFiHelicalPRTrack*>+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

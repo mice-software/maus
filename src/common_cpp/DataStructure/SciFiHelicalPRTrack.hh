@@ -156,12 +156,6 @@ class SciFiHelicalPRTrack {
     /** Set the chi^2 per degree of freedom of the final helix fit, if used */
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
 
-    /** Get the vector holding the rotation in x-y of each spacepoint in the track */
-    std::vector<double> get_phi_i() const { return _phi_i; }
-
-    /** Set the vector holding the rotation in x-y of each spacepoint in the track */
-    void set_phi_i(std::vector<double> phi_i) { _phi_i = phi_i; }
-
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
@@ -180,13 +174,12 @@ class SciFiHelicalPRTrack {
     double _circle_chisq;
     double _chisq;
     double _chisq_dof;
-    std::vector<double> _phi_i;
 
     int _tracker;
     int _num_points;
     static const int _type = 1; // 0 for straight, 1 for helical
 
-    SciFiSpacePointPArray _spoints;
+    SciFiSpacePointPArray  _spoints;
 
     ClassDef(SciFiHelicalPRTrack, 1)
 };
