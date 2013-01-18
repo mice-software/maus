@@ -119,37 +119,6 @@ KalmanMonitor::KalmanMonitor(): file(0), chi2_tracker0(0), chi2_tracker1(0),
     station10 = new TGraph();
     station10->SetName("xd_station10");
   }
-/*
-  x_filt_h  = new TH2F("h6","X coord of Hits",31,0,30,70,-150, 150);
-  y_filt_h  = new TH2F("h7","Y coord of Hits",31,0,30,70,-150, 150);
-  px_filt_h = new TH2F("h8","Y coord of Hits",31,0,30,70,-50, 50);
-  py_filt_h = new TH2F("h9","Y coord of Hits",31,0,30,70,-50, 50);
-  pz_filt_h = new TH2F("h10","Y coord of Hits",31,0,30,70,-50, 50);
-
-  x_smooth_h  = new TH2F("h11","X coord of Hits",31,0,30,70,-150,150);
-  y_smooth_h  = new TH2F("h12","Y coord of Hits",31,0,30,70,-150,150);
-  px_smooth_h = new TH2F("h13","Y coord of Hits",31,0,30,70,-50, 50);
-  py_smooth_h = new TH2F("h14","Y coord of Hits",31,0,30,70,-50, 50);
-  pz_smooth_h = new TH2F("h15","Y coord of Hits",31,0,30,70,-50, 50);
-  ///////////////
-  x_proj_h1  = new TH1F("h16","X coord of Hits",70,-150,150);
-  y_proj_h1  = new TH1F("h17","Y coord of Hits",70,-150,150);
-  px_proj_h1 = new TH1F("h18","Y coord of Hits",70,-50, 50);
-  py_proj_h1 = new TH1F("h19","Y coord of Hits",70,-50, 50);
-  pz_proj_h1 = new TH1F("h20","Y coord of Hits",70,-50, 50);
-
-  x_filt_h1  = new TH1F("h21","X coord of Hits",70,-150,150);
-  y_filt_h1  = new TH1F("h22","Y coord of Hits",70,-150,150);
-  px_filt_h1 = new TH1F("h23","Y coord of Hits",70,-50, 50);
-  py_filt_h1 = new TH1F("h24","Y coord of Hits",70,-50, 50);
-  pz_filt_h1 = new TH1F("h25","Y coord of Hits",70,-50, 50);
-
-  x_smooth_h1  = new TH1F("h26","X coord of Hits",70,-150,150);
-  y_smooth_h1  = new TH1F("h27","Y coord of Hits",70,-150,150);
-  px_smooth_h1 = new TH1F("h28","Y coord of Hits",70,-50, 50);
-  py_smooth_h1 = new TH1F("h29","Y coord of Hits",70,-50, 50);
-  pz_smooth_h1 = new TH1F("h30","Y coord of Hits",70,-50, 50);
-*/
 }
 
 KalmanMonitor::~KalmanMonitor() {
@@ -157,30 +126,27 @@ KalmanMonitor::~KalmanMonitor() {
 }
 
 void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
-  int numb_sites = sites.size();
-  // _alpha_meas.resize(numb_sites);
-  _site.resize(numb_sites);
-  // _alpha_projected.resize(numb_sites);
+  size_t numb_sites = sites.size();
 
-  for ( int i = 0; i < numb_sites; ++i ) {
+  for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
     std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    std::cerr << "SITE Z: " << site.get_z() << std::endl;
-    std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
-                                       site.get_direction().y() << ", " <<
-                                       site.get_direction().z() << ")" << std::endl;
+    // std::cerr << "SITE Z: " << site.get_z() << std::endl;
+    // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
+    //                                   site.get_direction().y() << ", " <<
+    //                                   site.get_direction().z() << ")" << std::endl;
     std::cerr << "Measurement: " << (site.get_measurement())(0, 0) << std::endl;
-    std::cerr << "Shift: " <<  "(" << (site.get_shifts())(0, 0) << ", " <<
-                                      (site.get_shifts())(1, 0) << ", " <<
-                                      (site.get_shifts())(2, 0) << ")" << std::endl;
+    // std::cerr << "Shift: " <<  "(" << (site.get_shifts())(0, 0) << ", " <<
+    //                                  (site.get_shifts())(1, 0) << ", " <<
+    //                                  (site.get_shifts())(2, 0) << ")" << std::endl;
     std::cerr << "================Residuals================" << std::endl;
     std::cerr << (site.get_pull())(0, 0) << std::endl;
     std::cerr << (site.get_residual())(0, 0) << std::endl;
     std::cerr << (site.get_smoothed_residual())(0, 0) << std::endl;
-    std::cerr << "================Projection================" << std::endl;
-    site.get_projected_a().Print();
-    site.get_a().Print();
-    site.get_smoothed_a().Print();
+    // std::cerr << "================Projection================" << std::endl;
+    // site.get_projected_a().Print();
+    // site.get_a().Print();
+    // site.get_smoothed_a().Print();
     // site.get_projected_covariance_matrix().Print();
     // std::cerr << "=================Filtered=================" << std::endl;
     // site.get_a().Print();
@@ -190,27 +156,16 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
 }
 
 void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
-  std::vector<double> _alpha_meas, _site, _alpha_projected;
-  int numb_sites = sites.size();
-  _alpha_meas.resize(numb_sites);
-  _site.resize(numb_sites);
-  _alpha_projected.resize(numb_sites);
-
   double chi2 = 0;
   int tracker = 1;
 
   int number_parameters = 5;
-  int number_of_sites = sites.size();
-  int ndf = number_of_sites - number_parameters;
-  for ( int i = 0; i < numb_sites; ++i ) {
-    KalmanSite site = sites[i];
-    // _alpha_projected.at(i) = site.get_projected_alpha();
-    _site.at(i) = site.get_id();
-    // _alpha_meas.at(i) = site.get_alpha();
+  size_t numb_sites = sites.size();
+  int ndf = numb_sites - number_parameters;
 
-    // double pull = _alpha_meas.at(i) - _alpha_projected.at(i);
-    // double alpha_smooth = site.get_smoothed_alpha();
-    // double pull2 = _alpha_meas.at(i) - alpha_smooth;
+  std::cerr << "Processing " << numb_sites << std::endl;
+  for ( size_t i = 0; i < numb_sites; ++i ) {
+    KalmanSite site = sites[i];
 
     TMatrixD a(5, 1);
     a = site.get_a();
@@ -229,7 +184,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     a_proj = site.get_projected_a();
 
     int id = site.get_id();
-
+    std::cerr << id << std::endl;
     if ( id < 15 ) {
       tracker = 0;
       mc_x  = -mc_x;
@@ -238,7 +193,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     }
 
     chi2 += site.get_chi2();
-
+    std::cerr << chi2 << std::endl;
     // assert(a_smooth(0, 0) ==  a_smooth(0, 0) && "Sanity check - smoothing");
     // assert(a_proj(0, 0)   == a_proj(0, 0)    && "Sanity check - projection.");
 /*
@@ -425,10 +380,77 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     chi2_tracker1->Fill(chi2/ndf);
   }
 
-  _counter +=1;
-  if ( !(_counter%20) ) {
+  // _counter +=1;
+  // if ( !(_counter%20) ) {
     save();
+  // }
+
+/*
+  // Energy loss and scattering angles
+  for ( int i = 1; i < numb_sites; ++i ) {
+    KalmanSite site_i_1 = sites[i-1];
+    KalmanSite site_i = sites[i];
+
+    double muon_mass  = 105.65836668;
+    double muon_mass2 = TMath::Power(muon_mass, 2.);
+
+    double old_mc_x  = site_i_1.get_true_position().x();
+    double old_mc_y  = site_i_1.get_true_position().y();
+    double old_mc_px = site_i_1.get_true_momentum().x();
+    double old_mc_py = site_i_1.get_true_momentum().y();
+    double old_mc_pz = site_i_1.get_true_momentum().z();
+    double old_p2 = TMath::Power(old_mc_px, 2.) +
+                    TMath::Power(old_mc_py, 2.) +
+                    TMath::Power(old_mc_pz, 2.);
+
+    double old_p  = TMath::Sqrt(old_p2);
+    double old_energy  = TMath::Sqrt(muon_mass2+old_p2);
+    double old_thethax = atan2(old_mc_px, old_mc_pz);
+    double old_thethay = atan2(old_mc_py, old_mc_pz);
+
+
+    double new_mc_x  = site_i.get_true_position().x();
+    double new_mc_y  = site_i.get_true_position().y();
+    double new_mc_px = site_i.get_true_momentum().x();
+    double new_mc_py = site_i.get_true_momentum().y();
+    double new_mc_pz = site_i.get_true_momentum().z();
+    double new_p2 = TMath::Power(new_mc_px, 2.) +
+                    TMath::Power(new_mc_py, 2.) +
+                    TMath::Power(new_mc_pz, 2.);
+
+    double new_energy  = TMath::Sqrt(muon_mass2+new_p2);
+    double new_thethax = atan2(new_mc_px, new_mc_pz);
+    double new_thethay = atan2(new_mc_py, new_mc_pz);
+
+    if ( site_i.get_id() == 1 ||
+         site_i.get_id() == 2 ||
+         site_i.get_id() == 4 ||
+         site_i.get_id() == 5 ||
+         site_i.get_id() == 7 ||
+         site_i.get_id() == 8 ||
+         site_i.get_id() == 10 ||
+         site_i.get_id() == 11 ||
+         site_i.get_id() == 13 ||
+         site_i.get_id() == 14 ) {
+      double fibre_eloss = old_energy - new_energy;
+      double fibre_mcs_x = old_thethax - new_thethax;
+      double fibre_mcs_y = old_thethay - new_thethay;
+      std::ofstream out2("eloss_fibre.txt", std::ios::out | std::ios::app);
+      out2 << old_p << " " << fibre_eloss << " " << fibre_mcs_x << " " << fibre_mcs_y << "\n";
+      out2.close();
+    } else if ( site_i.get_id() == 3 ||
+         site_i.get_id() == 6 ||
+         site_i.get_id() == 9 ||
+         site_i.get_id() == 12 ) {
+      double _eloss = old_energy - new_energy;
+      double _mcs_x = old_thethax - new_thethax;
+      double _mcs_y = old_thethay - new_thethay;
+      std::ofstream out2("eloss_fibre_gas.txt", std::ios::out | std::ios::app);
+      out2 << old_p << " " << _eloss << " " << _mcs_x << " " << _mcs_y << "\n";
+      out2.close();
+    }
   }
+*/
 }
 
 void KalmanMonitor::save() {

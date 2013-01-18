@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "TMatrixD.h"
+#include "TMath.h"
 
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
@@ -59,12 +60,16 @@ class KalmanSeed {
 
   size_t is_usable() const { return _clusters.size(); }
 
+  double get_momentum() const { return _momentum; }
+
  private:
   std::vector<SciFiCluster*> _clusters;
 
   std::vector<SciFiSpacePoint> _spacepoints;
 
   TMatrixD _a0;
+
+  double _momentum;
 
   bool _straight;
 

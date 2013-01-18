@@ -109,6 +109,10 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   a(3, 0) = py;
   a(4, 0) = kappa;
 
+  _momentum = TMath::Power(px*px+py*py+pz*pz, 2.);
+
+  std::cerr << "Seed: " << x << " " << px << " " << y << " " << py << " " << 1./kappa << std::endl;
+
   return a;
 }
 
@@ -126,6 +130,8 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
   a(2, 0) = y;
   a(3, 0) = my;
   a(4, 0) = 1./seed_pz;
+
+  _momentum = seed_pz;
 
   return a;
 }

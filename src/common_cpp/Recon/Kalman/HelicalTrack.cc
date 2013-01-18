@@ -19,6 +19,10 @@
 
 namespace MAUS {
 
+HelicalTrack::HelicalTrack() {
+  _n_parameters = 5;
+}
+
 HelicalTrack::~HelicalTrack() {}
 
 void HelicalTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {

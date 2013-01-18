@@ -14,9 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "Interface/Squeal.hh"
+
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include <iostream>
-#include <fstream>
 
 namespace MAUS {
 
@@ -29,7 +29,7 @@ KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
   // Propagator.
   _F.ResizeTo(5, 5);
   _F.Zero();
-  // Back transport.
+  // Back transportation matrix.
   _A.ResizeTo(5, 5);
   _A.Zero();
   // Measurement error.
@@ -75,36 +75,108 @@ void KalmanTrack::calc_covariance(KalmanSite *old_site, KalmanSite *new_site) {
   new_site->set_projected_covariance_matrix(C_new);
 }
 
+// Returns (beta) * (-dE/dx). Formula and constants from PDG.
+double KalmanTrack::BetheBlochStoppingPower(double p) {
+  double muon_mass = 105.7; // MeV/c2
+  double muon_mass2 = TMath::Power(muon_mass, 2.);
+  double electron_mass = 0.511;
+
+  double E = TMath::Sqrt(muon_mass2+p*p);
+  double E2 = TMath::Power(E, 2.);
+  double beta = p/E;
+  double beta2= TMath::Power(beta, 2.);
+  double gamma = E/muon_mass;
+  double gamma2= TMath::Power(gamma, 2.);
+
+  double K = BetheBlochParameters::K();
+  double A = FibreParameters::A();
+  double I = FibreParameters::Mean_Excitation_Energy();
+  double I2= TMath::Power(I, 2.);
+  double Z = FibreParameters::Z();
+
+  double outer_term = K*Z/(A*beta2);
+
+  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
+                TMath::Power(electron_mass/muon_mass, 2.));
+
+  double log_term = TMath::Log(2*electron_mass*beta2*gamma2*Tmax/(I2));
+  double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*muon_mass, 2);
+  double density = FibreParameters::Density();
+  double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
+  double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
+  double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
+  // std::cerr << outer_term << " " << log_term << " " << beta2 << " " << Tmax << std::endl;
+  return beta*dEdx;
+/*
+   double Z       = MuELMaterial::Z(mt);
+   double A       = MuELMaterial::A(mt);
+   double Z_A     = Z/A;              // in mol/gr
+   double a2      = kAem2;            // (em coupling const)^2
+   double Na      = kNA;              // Avogadro's number
+   double lamda2 =  kLe2/units::cm2;  // (e compton wavelength)^2 in cm^2
+   double me      = kElectronMass;    // in GeV
+   double me2     = kElectronMass2; 
+   double mmu     = kMuonMass;        // in GeV
+   double mmu2    = kMuonMass2;
+   double E2      = TMath::Power(E,2);
+   double beta    = TMath::Sqrt(E2-mmu2)/E;
+   double beta2   = TMath::Power(beta,2);
+   double gamma   = E/mmu;
+   double gamma2  = TMath::Power(gamma,2);
+   double I       = BetheBlochMaterialParams::IonizationPotential(mt) * units::eV; 
+   double I2      = TMath::Power(I,2); // in GeV^2
+
+   // Calculate the maximum energy transfer to the electron (in GeV)
+
+   double p2      = E2-mmu2;
+   double Emaxt   = 2*me*p2 / (me2 + mmu2 + 2*me*E);
+   double Emaxt2  = TMath::Power(Emaxt,2);
+
+   // Calculate the density correction factor delta
+
+   double X0 =  BetheBlochMaterialParams::DensityCorrection_X0(mt);
+   double X1 =  BetheBlochMaterialParams::DensityCorrection_X1(mt);
+   double a  =  BetheBlochMaterialParams::DensityCorrection_a(mt);
+   double m  =  BetheBlochMaterialParams::DensityCorrection_m(mt);
+   double C  =  BetheBlochMaterialParams::DensityCorrection_C(mt);
+   double X  =  TMath::Log10(beta*gamma);
+
+   double delta = 0;
+   if(X0<X && X<X1) delta = 4.6052*X + a*TMath::Power(X1-X,m) + C;
+   if(X>X1)         delta = 4.6052*X + C;
+
+   // Calculate the -dE/dx
+   double de_dx =  a2 * (2*kPi*Na*lamda2) * Z_A * (me/beta2) *
+                    (TMath::Log( 2*me*beta2*gamma2*Emaxt/I2 ) - 
+                                      2*beta2 + 0.25*(Emaxt2/E2) - delta);
+
+   de_dx *= (units::GeV/(units::g/units::cm2));
+   return de_dx; // in GeV^-2
+*/
+}
+
 void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site) {
-  double minimum_ionization_energy = 1.; // MeV cm2 / g
+  double plane_width = SciFiParams::Plane_Width();
 
   TMatrixD a_old_site(5, 1);
   a_old_site = old_site->get_a();
-
   double px = a_old_site(1, 0);
   double py = a_old_site(3, 0);
   double kappa = a_old_site(4, 0);
   double pz = 1./kappa;
 
-  // assert(pz > 80. && "Previous site Pz is bad.");
-
-  double momentum = pow(px*px+py*py+pz*pz, 0.5);
-  // assert(momentum < 10000.);
+  double momentum = TMath::Sqrt(px*px+py*py+pz*pz);
   assert(_mass == _mass && "mass is not defined");
 
-  double tau = momentum/_mass;
-  double tau_squared = tau*tau;
+  // double Delta_z = fabs(old_site->get_z()-new_site->get_z());
+  int n_steps = 100;
 
-  double thickness, density;
-  // get_site_properties(old_site, thickness, density);
-  thickness = 0.670;
-  density   = 1.0;
-
-  double F_tau = pow(1.+tau_squared, 1.5)/(11.528*tau*tau*tau)*
-                 (9.0872+2.*log(tau)-tau_squared/(1.+tau_squared));
-
-  double delta_p =minimum_ionization_energy*density*thickness*F_tau/6.;
-
+  double Delta_p = 0.;
+  for ( int i = 0; i < n_steps; ++i ) {
+    momentum += Delta_p;
+    Delta_p += BetheBlochStoppingPower(momentum)*plane_width/n_steps;
+  }
+  /*
   double lambda = atan(pow(px*px+py*py, 0.5)/pz);
   // assert(tan(lambda)<1 && "Lambda: pt < pz");
 
@@ -136,22 +208,13 @@ void KalmanTrack::subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_sit
   a_subtracted(4, 0) = new_kappa;
 
   new_site->set_projected_a(a_subtracted);
-}
-
-/*
-void KalmanTrack::get_site_properties(KalmanSite *site, double &thickness, double &density) {
-  thickness = 0.670;
-  density   = 1.0;
-}
 */
+}
 
 void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
-  // Find dz.
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
+  double plane_width = SciFiParams::Plane_Width();
 
-  double deltaZ = (new_z-old_z); // deltaZ in mm
-  double deltaZ_squared = deltaZ*deltaZ;
+  double deltaZ_squared = plane_width*plane_width;
 
   TMatrixD a(5, 1);
   a = old_site->get_a();
@@ -159,15 +222,23 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   double my    = a(3, 0);
   double kappa = a(4, 0);
 
-  double Z = 9.;
-  double r0 = 0.00167; // cm3/g
+  double Z = SciFiParams::Z();
+  double L0 = SciFiParams::R0(); // 0.00167; // cm3/g
+
   double pz = 1./kappa; // MeV/c
   double px = mx/kappa;
   double py = my/kappa;
-  double p = pow(px*px+py*py+pz*pz, 0.5);
+  double p = TMath::Sqrt(px*px+py*py+pz*pz);
 
-  double v = p/_mass;
-  double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
+  double muon_mass = 105.7; // MeV/c2
+  double muon_mass2 = TMath::Power(muon_mass, 2.);
+  double E = TMath::Sqrt(muon_mass2+p*p);
+  double gamma = E/muon_mass;
+  double beta = p/E;
+
+  double v = p/(gamma*_mass);
+  double C = 13.6*Z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+
   double C2 = C*C;
   double grad_to_mom = 1.; // pow(1./kappa, 1.); // convertion factor: gradients to momentum
 
@@ -179,31 +250,29 @@ void KalmanTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) 
   // x x
   _Q(0, 0) = deltaZ_squared*c_mx_mx;
   // x mx
-  _Q(0, 1) = deltaZ*c_mx_mx;
-  _Q(1, 0) = deltaZ*c_mx_mx;
+  _Q(0, 1) = plane_width*c_mx_mx;
+  _Q(1, 0) = plane_width*c_mx_mx;
   // x y
   _Q(0, 2) = deltaZ_squared*c_mx_my;
   _Q(2, 0) = deltaZ_squared*c_mx_my;
   // x my
-  _Q(0, 3) = deltaZ*c_mx_my;
-  _Q(3, 0) = deltaZ*c_mx_my;
+  _Q(0, 3) = plane_width*c_mx_my;
+  _Q(3, 0) = plane_width*c_mx_my;
   // mx mx
   _Q(1, 1) = c_mx_mx;
   // mx y
-  _Q(1, 2) = deltaZ*c_mx_my;
-  _Q(2, 1) = deltaZ*c_mx_my;
+  _Q(1, 2) = plane_width*c_mx_my;
+  _Q(2, 1) = plane_width*c_mx_my;
   // mx my
   _Q(1, 3) = c_mx_my;
   _Q(3, 1) = c_mx_my;
   // y y
   _Q(2, 2) = deltaZ_squared*c_my_my;
   // y my
-  _Q(2, 3) = deltaZ*c_my_my;
-  _Q(3, 2) = deltaZ*c_my_my;
+  _Q(2, 3) = plane_width*c_my_my;
+  _Q(3, 2) = plane_width*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
-
-  // _Q.Zero();
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -214,7 +283,11 @@ void KalmanTrack::update_V(KalmanSite *a_site) {
   double pitch = a_site->get_pitch();
   double lenght = pow(_active_radius*_active_radius -
                  (alpha*pitch)*(alpha*pitch), 0.5);
-  if ( lenght != lenght ) lenght = 150.;
+  if ( lenght != lenght || lenght > _active_radius ) {
+    throw(Squeal(Squeal::recoverable,
+          "Found a bad measurement.",
+          "KalmanTrack::update_V"));
+  }
 
   double sigma_beta = (lenght/pitch)/sqrt(12.);
   double sigma_alpha = 1.0/sqrt(12.);
@@ -274,11 +347,8 @@ void KalmanTrack::update_H(KalmanSite *a_site) {
 // W = [ V +    A       +      B         ]-1
 void KalmanTrack::update_W(KalmanSite *a_site) {
   TMatrixD C_a(5, 5);
-  if ( a_site->get_chi2() ) {
-    C_a = a_site->get_smoothed_covariance_matrix();
-  } else {
-    C_a = a_site->get_projected_covariance_matrix();
-  }
+  C_a = a_site->get_projected_covariance_matrix();
+
   TMatrixD C_s = a_site->get_S_covariance();
 
   TMatrixD A = TMatrixD(TMatrixD(_H, TMatrixD::kMult, C_a),
@@ -287,6 +357,8 @@ void KalmanTrack::update_W(KalmanSite *a_site) {
   TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
                         TMatrixD::kMultTranspose,
                         _S);
+  // ED
+  B.Zero();
 
   _W.Zero();
   _W = _V + A + B;
@@ -356,10 +428,10 @@ void KalmanTrack::update_misaligments(KalmanSite *a_site, KalmanSite *alignment_
   a_site->set_S_covariance(new_Cov_s);
 
   std::cout<< "Updated values are: " << std::endl;
-new_shifts.Print();
-new_Cov_s.Print();
+  new_shifts.Print();
+  new_Cov_s.Print();
   std::cout << "Pull was: " << std::endl;
-residual.Print();
+  residual.Print();
 }
 
 TMatrixD KalmanTrack::get_pull(KalmanSite *a_site) {
@@ -515,6 +587,7 @@ void KalmanTrack::smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_si
 
   TMatrixD a_smooth(5, 1);
   a_smooth = a + _A* (a_opt - ap);
+
   smoothing_site->set_smoothed_a(a_smooth);
   // _________________________________________
   TMatrixD measurement(2, 1);
@@ -559,8 +632,6 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
 
   TMatrixD measurement = site->get_measurement();
   TMatrixD pull = measurement-HA;
-  std::cout << "Pull exclusion..." << std::endl;
-  pull.Print();
 
   // The "gain"
   TMatrixD C_smoothed(5, 5);
@@ -568,7 +639,6 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
 
   TMatrixD H_transposed(5, 2);
   H_transposed.Transpose(_H);
-
 
   TMatrixD TEMP = _V*(-1.)+_H*C_smoothed*H_transposed;
   TEMP.Invert();
@@ -579,27 +649,27 @@ void KalmanTrack::exclude_site(KalmanSite *site) {
   // new site estimation
   TMatrixD an(5, 1);
   an = a_smoothed + Kn*pull;
-an.Print();
-a_smoothed.Print();
 
   site->set_excluded_state(an);
 }
 
 void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
-  int number_parameters = 5;
   int number_of_sites = sites.size();
+
+  _ndf = number_of_sites - _n_parameters;
+
   int id = sites[0].get_id();
 
   if ( id <= 14 ) _tracker = 0;
-  if ( id > 14 ) _tracker = 1;
+  if ( id > 14 )  _tracker = 1;
 
-  // double alpha, model_alpha;
   for ( int i = 0; i < number_of_sites; ++i ) {
     KalmanSite site = sites[i];
     _chi2 += site.get_chi2();
-    // std::cerr << _chi2 << " ";
   }
-  // std::cerr << "\n";
+  std::cerr << "Chi2/ndf: " << _chi2/_ndf << std::endl;
+
+  _P_value = TMath::Prob(_chi2, _ndf);
 }
 
 } // ~namespace MAUS

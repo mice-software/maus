@@ -21,13 +21,14 @@
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/VLSBProcessor.hh"
-
+#include "src/common_cpp/JsonCppProcessors/VLSB_CProcessor.hh"
 
 namespace MAUS {
 
 /** @class TrackerDaqProcessor Conversions for TOFDaq between C++ and Json 
  *
  *  @var _VLSB_proc_proc Processor for _VLSB
+ *  @var _VLSB_C_proc_proc Processor for _VLSB_C
  */
 
 class TrackerDaqProcessor : public ObjectProcessor<TrackerDaq> {
@@ -40,6 +41,7 @@ class TrackerDaqProcessor : public ObjectProcessor<TrackerDaq> {
 
   private:
     ValueArrayProcessor<VLSB> _VLSB_proc;
+    ValueArrayProcessor<VLSB_C> _VLSB_C_proc;
 };
 }  // namespace MAUS
 

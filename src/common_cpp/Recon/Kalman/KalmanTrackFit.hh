@@ -30,9 +30,12 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
@@ -49,7 +52,7 @@ class KalmanTrackFit {
 
   virtual ~KalmanTrackFit();
 
-  void process(std::vector<KalmanSeed*> seeds);
+  void process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
   // This will: initialise the state vector;
   // Set covariance matrix;
@@ -78,8 +81,14 @@ class KalmanTrackFit {
                                    KalmanTrack *track,
                                    KalmanSciFiAlignment &kalman_align);
 
+  void save(const KalmanTrack *kalman_track,
+            std::vector<KalmanSite> sites,
+            SciFiEvent &event);
+
  protected:
   double _seed_cov;
+
+  bool _use_MCS, _use_Eloss, _update_misalignments;
 };
 
 } // ~namespace MAUS

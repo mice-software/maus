@@ -18,6 +18,10 @@
 
 namespace MAUS {
 
+StraightTrack::StraightTrack() {
+  _n_parameters = 4;
+}
+
 StraightTrack::~StraightTrack() {}
 
 void StraightTrack::update_propagator(KalmanSite *old_site, KalmanSite *new_site) {

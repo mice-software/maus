@@ -1028,8 +1028,10 @@ TEST_F(PatternRecognitionTest, test_linear_fit) {
   SimpleLine line;
   pr.linear_fit(x, y, y_err, line);
 
-  EXPECT_EQ(2.0, line.get_c());
-  EXPECT_EQ(1.0, line.get_m());
+  double epsilon = 0.00001;
+
+  EXPECT_NEAR(2.0, line.get_c(), epsilon);
+  EXPECT_NEAR(1.0, line.get_m(), epsilon);
 }
 
 TEST_F(PatternRecognitionTest, test_calculate_dipangle) {

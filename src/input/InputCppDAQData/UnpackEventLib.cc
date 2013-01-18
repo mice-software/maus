@@ -272,7 +272,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
                                   typeid(MDfragmentVLSB).name() << std::endl;
     return CastError;
   }
-
+  std::cerr << "ED: VLSBDataProcessor::Process called" << std::endl;
   MDfragmentVLSB* xVLSBFragment = static_cast<MDfragmentVLSB*>(aFragPtr);
 
   Json::Value pBoardDoc, xVLSB_CHit;

@@ -24,7 +24,7 @@ def run(number_of_spills):
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
+    my_map.append(MAUS.MapCppTOFMCDigitizer())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerMCDigitization())  #   SCiFi electronics
 
     datacards = io.StringIO(u"keep_steps = True")

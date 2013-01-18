@@ -113,23 +113,34 @@ bool KalmanSciFiAlignment::load_misaligments() {
 }
 
 void KalmanSciFiAlignment::update_site(KalmanSite *site) {
-  TMatrixD a_excl(5, 1);
-  a_excl = site->get_a_excl();
+  TMatrixD a_excluded(5, 1);
+  a_excluded = site->get_a_excl();
 
   TMatrixD a_smoothed(5, 1);
   a_smoothed = site->get_smoothed_a();
 
-  // a_excl.Print();
-  // a_smoothed.Print();
+  double diff_x = a_excluded(0, 0) - a_smoothed(0, 0);
+  double diff_y = a_excluded(2, 0) - a_smoothed(2, 0);
+  // std::cerr << site->get_id() << " " << diff << std::endl;
+  int id = site->get_id();
 
-  double diff = a_excl(0, 0) - a_smoothed(0, 0);
+  std::cerr << diff_x << std::endl;
 
-  std::cerr << site->get_id() << " " << diff << std::endl;
+  std::ofstream out2("kalman_diff.txt", std::ios::out | std::ios::app);
+  out2 << id << " "<< diff_x << " " << diff_y << "\n";
+  out2.close();
+
+  TMatrixD s(3, 1);
+  s.Zero();
+  s(0, 0) = diff_x;
+  s(1, 0) = diff_y;
+  // set_shifts(s, id);
 }
 
 void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
   int numb_sites = sites.size();
   // Overwrite matrices with site's values.
+/*
   for ( int site_i = 0; site_i < numb_sites; ++site_i ) {
     KalmanSite site = sites[site_i];
     int id = site.get_id();
@@ -138,7 +149,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
     set_cov_shifts(site.get_S_covariance(), id);
     // set_cov_rotat(site.get_R_covariance(), id);
   }
-
+*/
   std::ofstream file_out(fname.c_str());
   // Write shifts.
   file_out << "# station" << "\t" << "xd" << "\t"

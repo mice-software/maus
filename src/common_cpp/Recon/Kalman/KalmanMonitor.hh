@@ -59,7 +59,7 @@ class KalmanMonitor {
 
   int _counter;
 
-  std::vector<double> _site;
+  // std::vector<double> _site;
 
   TH1F *chi2_tracker0;
   TH1F *chi2_tracker1;

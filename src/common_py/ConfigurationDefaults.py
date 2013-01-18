@@ -75,7 +75,7 @@ check_volume_overlaps = False
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
-    "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+    "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
@@ -161,7 +161,7 @@ beam = {
     ##### PIONS #####
     { # as above...
        "reference":{
-           "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+           "position":{"x":0.0, "y":-0.0, "z":-6400.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
            "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
        },
@@ -179,7 +179,7 @@ beam = {
     ##### ELECTRONS #####
     { # as above...
         "reference":{
-            "position":{"x":0.0, "y":-0.0, "z":-5800.0},
+            "position":{"x":0.0, "y":-0.0, "z":-6400.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
         },
@@ -233,11 +233,11 @@ SciFiCrossTalkSigma = 50.0
 SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
-SciFiKalmanMCS = 0 # flag to add MCS to the Kalman Fit
-SciFiKalmanEloss = 0 # flag to add Eloss to the Kalman Fit
-SciFiUpdateMisalignments = 0 # Do Misalignment Search & Update
-SciFiKalmanUseFieldMap = 0
-SciFiKalmanStepSize = 1. # mm
+SciFiSeedCovariance = 200 # Error estimate for Seed values of the Kalman Fit
+SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
+SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
+SciFiUpdateMisalignments = False # Do Misalignment Search & Update
+
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -300,7 +300,7 @@ V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
 Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 45
+VLSB_C_Zero_Suppression_Threshold = 60
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -321,14 +321,18 @@ TOFscintLightSpeed =  170.0 # mm/ns
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 #TOF_trigger_station = "tof0"
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
-TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
-TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
-TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePiontCut = 0.5 # nanosecond
+# the date for which we want the cabling and calibration
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+TOF_calib_date_from = 'current'
+TOF_cabling_date_from = 'current'
 Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
