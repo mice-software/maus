@@ -33,8 +33,8 @@ def run():
     reducer = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputPyJSON()
-    # my_output = MAUS.OutputCppRoot()
+    # my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
