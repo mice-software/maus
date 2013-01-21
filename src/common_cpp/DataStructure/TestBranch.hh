@@ -35,42 +35,49 @@ class TestBranch {
    */
   TestBranch();
 
-  /** Deep copy double_by_value - shallow copy other data
+  /** Deep copy child_by_value - shallow copy other data
    */
   TestBranch(const TestBranch& md);
 
-  /** Deep copy double_by_value - shallow copy other data
+  /** Deep copy child_by_value - shallow copy other data
    */
   TestBranch& operator=(const TestBranch& md);
 
-  /** Destructor only cleans double_by_value */
+  /** Destructor only cleans child_by_value */
   virtual ~TestBranch();
 
-  /** Return double_by_value - memory still owned by TestBranch */
-  TestChild* GetDoubleByValue() const;
+  /** Return child_by_value - memory still owned by TestBranch */
+  TestChild* GetChildByValue() const;
 
-  /** Set double_by_value - memory now owned by TestBranch */
-  void SetDoubleByValue(TestChild* test);
+  /** Set child_by_value - memory now owned by TestBranch */
+  void SetChildByValue(TestChild* test);
 
-  /** Return double_by_reference - memory owned externally */
-  TestChild* GetDoubleByRef() const;
+  /** Return child_by_reference - memory owned externally */
+  TestChild* GetRequiredChildByRef() const;
 
-  /** Set double_by_reference - memory owned by caller still */
-  void SetDoubleByRef(TestChild* test);
+  /** Set child_by_reference - memory owned by caller still */
+  void SetRequiredChildByRef(TestChild* test);
+
+  /** Return child_by_reference - memory owned externally */
+  TestChild* GetNotRequiredChildByRef() const;
+
+  /** Set child_by_reference - memory owned by caller still */
+  void SetNotRequiredChildByRef(TestChild* test);
 
   /** Return test_pointer_array - memory of the vector owned by TestBranch;
    *  memory of the vector data owned by caller
    */
-  std::vector<TestChild*>* GetDoubleArray() const;
+  std::vector<TestChild*>* GetChildArray() const;
 
   /** Set test_pointer_array - memory of the vector owned by TestBranch;
    *  memory of the vector data owned by caller
    */
-  void SetDoubleArray(std::vector<TestChild*>* test);
+  void SetChildArray(std::vector<TestChild*>* test);
 
  private:
-  TestChild* _double_by_reference;
-  TestChild* _double_by_value;
+  TestChild* _not_required_child_by_reference;
+  TestChild* _required_child_by_reference;
+  TestChild* _child_by_value;
   std::vector<TestChild*>* _test_pointer_array;
 
   ClassDef(TestBranch, 1)
