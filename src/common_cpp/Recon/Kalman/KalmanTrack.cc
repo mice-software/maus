@@ -20,7 +20,8 @@
 
 namespace MAUS {
 
-KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _tracker(-1),
+KalmanTrack::KalmanTrack() : _chi2(0.), _ndf(0.), _P_value(0.),
+                             _n_parameters(0), _tracker(-1),
                              _mass(0.), _momentum(0.),
                              _active_radius(150.) {
   // Measurement equation.
@@ -235,9 +236,9 @@ void KalmanTrack::calc_system_noise(const KalmanSite *old_site, const KalmanSite
   double E = TMath::Sqrt(muon_mass2+p*p);
   double gamma = E/muon_mass;
   double beta = p/E;
-  double v = p/muon_mass;
+  // double v = p/muon_mass;
 
-  double C = 13.6*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(v*p);
+  double C = 13.6*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
 
   double C2 = TMath::Power(C, 2.);
 
@@ -251,36 +252,36 @@ void KalmanTrack::calc_system_noise(const KalmanSite *old_site, const KalmanSite
   // x x
   _Q(0, 0) = deltaZ_squared*c_mx_mx;
   // x mx
-  _Q(0, 1) = plane_width*c_mx_mx; ///
+  _Q(0, 1) = -plane_width*c_mx_mx;
   // x y
   _Q(0, 2) = deltaZ_squared*c_mx_my;
   // x my
-  _Q(0, 3) = plane_width*c_mx_my; ///
+  _Q(0, 3) = -plane_width*c_mx_my;
 
   // mx x
-  _Q(1, 0) = plane_width*c_mx_mx; ///
+  _Q(1, 0) = -plane_width*c_mx_mx;
   // mx mx
   _Q(1, 1) = c_mx_mx;
   // mx y
-  _Q(1, 2) = plane_width*c_mx_my; ///
+  _Q(1, 2) = -plane_width*c_mx_my;
   // mx my
   _Q(1, 3) = c_mx_my;
 
   // y x
   _Q(2, 0) = deltaZ_squared*c_mx_my;
   // y mx
-  _Q(2, 1) = plane_width*c_mx_my; ///
+  _Q(2, 1) = -plane_width*c_mx_my;
   // y y
   _Q(2, 2) = deltaZ_squared*c_my_my;
   // y my
-  _Q(2, 3) = plane_width*c_my_my; ///
+  _Q(2, 3) = -plane_width*c_my_my;
 
   // my x
-  _Q(3, 0) = plane_width*c_mx_my; ///
+  _Q(3, 0) = -plane_width*c_mx_my;
   // my mx
   _Q(3, 1) = c_mx_my;
   // my y
-  _Q(3, 2) = plane_width*c_my_my; ///
+  _Q(3, 2) = -plane_width*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
 }

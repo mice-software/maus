@@ -41,8 +41,6 @@ class StraightTrack : public KalmanTrack {
   virtual ~StraightTrack();
 
   void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site);
-
-  // void calc_system_noise(KalmanSite *site);
 };
 
 } // ~namespace MAUS
