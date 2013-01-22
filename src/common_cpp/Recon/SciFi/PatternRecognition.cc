@@ -638,7 +638,6 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         CLHEP::Hep3Vector pos_0(x0, y0, -1);
         SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, pos_0, phi_0,
                                                              psi_0, c_trial, line_sz);
-        track->set_phi_i(dphi);
 
         // Set all the good sp to used
         for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i )

@@ -23,8 +23,8 @@ on_error = 'none' # none, halt or raise
 keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
-keep_tracks = False # set to true to keep start and end point of every track
-keep_steps = False # set to true to keep start and end point of every track and
+keep_tracks = True # set to true to keep start and end point of every track
+keep_steps = True # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000

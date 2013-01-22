@@ -19,7 +19,6 @@ Tests for MongoDBDocumentStore module.
 # pylint: disable=C0103
 
 import pymongo
-from pymongo.errors import AutoReconnect
 import unittest
 
 from docstore.MongoDBDocumentStore import MongoDBDocumentStore
@@ -41,7 +40,8 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         self._port = 27017
         try:
             test_conx = pymongo.Connection(self._host, self._port)
-        except AutoReconnect: # pylint: disable=W0702
+        # Need ConnectionFailure here for pymongo > 2.4
+        except pymongo.errors.ConnectionFailure: # pylint: disable=W0702
             unittest.TestCase.skipTest(self, 
                                        "MongoDB server is not accessible")
         test_conx.disconnect()
@@ -88,7 +88,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         parameters = {"mongodb_host":"nonExistant", "mongodb_port":999999}
         try:
             self._data_store.connect(parameters)
-        except AutoReconnect:
+        except pymongo.errors.ConnectionFailure:
             pass
 
     def test_connect_bad_port(self):
@@ -100,7 +100,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         parameters = {"mongodb_host":self._host, "mongodb_port":999999}
         try:
             self._data_store.connect(parameters)
-        except AutoReconnect:
+        except pymongo.errors.ConnectionFailure:
             pass
 
     def test_connect_no_database_name(self):
