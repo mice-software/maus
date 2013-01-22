@@ -137,6 +137,84 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
 //  site->set_shifts(s);
 }
 
+/*
+void KalmanSciFiAlignment::algorithm_A() {
+    for ( size_t j = 0; j < numb_measurements; ++j ) {
+      KalmanSite *site = &sites[j];
+      track->exclude_site(site);
+      kalman_align.update_site(site);
+    }
+    // update_alignment_parameters(sites, track, kalman_align);
+    // std::cerr << "Updating..." << std::endl;
+    // Update Stored misalignments using values stored in each site.
+    // kalman_align.update(sites);
+  }
+}
+
+void KalmanSciFiAlignment::algorithm_B() {
+
+
+}
+
+void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
+                                                 KalmanTrack *track,
+                                                 KalmanSciFiAlignment &kalman_align) {
+  size_t numb_measurements = sites.size();
+
+  for ( size_t i = 0; i < numb_measurements; ++i ) {
+    // ... Filter...
+    std::cerr << "Updating site " << i << std::endl;
+    filter_updating_misalignments(sites, track, i);
+  }
+}
+
+void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
+                            KalmanTrack *track, int current_site) {
+  // Get Site...
+  KalmanSite *a_site = &sites[current_site];
+  KalmanSite *alignment_projection_site = NULL;
+  // Get previous site too.
+  // if ( !(current_site%3) ) {
+  int id = a_site->get_id();
+  std::cout << id << std::endl;
+  if ( !(current_site%3) ) {
+    alignment_projection_site = a_site;
+    alignment_projection_site->get_shifts().Print();
+  } else {
+    alignment_projection_site = &sites[current_site-1];
+    alignment_projection_site->get_shifts().Print();
+  }
+
+  track->update_V(a_site);
+  track->update_H(a_site);
+  track->update_W(a_site);
+  track->update_misaligments(a_site, alignment_projection_site);
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
   int numb_sites = sites.size();
   // Overwrite matrices with site's values.

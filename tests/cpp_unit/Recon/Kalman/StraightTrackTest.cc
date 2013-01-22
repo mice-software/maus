@@ -74,7 +74,6 @@ TEST_F(StraightTrackTest, propagator_test) {
 
   track->calc_covariance(&old_site, &new_site);
   // DO SOMETHING WITH COVARIANCE
-
 }
 /*
 TEST_F(StraightTrackTest, noise_test) {

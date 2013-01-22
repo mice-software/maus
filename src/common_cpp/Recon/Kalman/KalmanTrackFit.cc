@@ -92,20 +92,11 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     monitor.fill(sites);
     monitor.print_info(sites);
     track->compute_chi2(sites);
-    // Misalignment work.
-    /*
-    if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
-      for ( size_t j = 0; j < numb_measurements; ++j ) {
-        KalmanSite *site = &sites[j];
-        track->exclude_site(site);
-        kalman_align.update_site(site);
-      }
-      // update_alignment_parameters(sites, track, kalman_align);
-      // std::cerr << "Updating..." << std::endl;
-      // Update Stored misalignments using values stored in each site.
-      // kalman_align.update(sites);
-    }
-    */
+    // Misalignment search.
+    // if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
+    // kalman_align->algorithm_1();
+    // kalman_align->algorithm_2();
+    // }
     save(track, sites, event);
     delete track;
   }
@@ -240,42 +231,5 @@ void KalmanTrackFit::save(const KalmanTrack *kalman_track,
   // track->add_track_points(sites);
   event.add_scifitrack(track);
 }
-
-/*
-void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                                 KalmanTrack *track,
-                                                 KalmanSciFiAlignment &kalman_align) {
-  size_t numb_measurements = sites.size();
-
-  for ( size_t i = 0; i < numb_measurements; ++i ) {
-    // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
-    filter_updating_misalignments(sites, track, i);
-  }
-}
-
-void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = NULL;
-  // Get previous site too.
-  // if ( !(current_site%3) ) {
-  int id = a_site->get_id();
-  std::cout << id << std::endl;
-  if ( !(current_site%3) ) {
-    alignment_projection_site = a_site;
-    alignment_projection_site->get_shifts().Print();
-  } else {
-    alignment_projection_site = &sites[current_site-1];
-    alignment_projection_site->get_shifts().Print();
-  }
-
-  track->update_V(a_site);
-  track->update_H(a_site);
-  track->update_W(a_site);
-  track->update_misaligments(a_site, alignment_projection_site);
-}
-*/
 
 } // ~namespace MAUS

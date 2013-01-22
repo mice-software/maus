@@ -95,7 +95,8 @@ class KalmanTrack {
   // void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
 
   /// Smoothing: updates back transportation matrix.
-  void update_back_transportation_matrix(const KalmanSite *optimum_site, const KalmanSite *smoothing_site);
+  void update_back_transportation_matrix(const KalmanSite *optimum_site,
+                                         const KalmanSite *smoothing_site);
   void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
   void prepare_for_smoothing(KalmanSite *last_site);
   void exclude_site(KalmanSite *site);

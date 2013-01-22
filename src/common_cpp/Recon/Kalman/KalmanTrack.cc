@@ -254,11 +254,13 @@ void KalmanTrack::calc_system_noise(const KalmanSite *old_site, const KalmanSite
 
   double C2 = TMath::Power(C, 2.);
 
-  double c_mx_mx = C2 * (1. + TMath::Power(mx, 2.)) * (1.+TMath::Power(mx, 2.)+TMath::Power(my, 2.));
+  double c_mx_mx = C2 * (1. + TMath::Power(mx, 2.)) *
+                        (1.+TMath::Power(mx, 2.)+TMath::Power(my, 2.));
 
-  double c_my_my = C2 * (1. + TMath::Power(my, 2.)) * (1.+TMath::Power(mx, 2.)+TMath::Power(my, 2.));
+  double c_my_my = C2 * (1. + TMath::Power(my, 2.)) *
+                        (1.+TMath::Power(mx, 2.)+TMath::Power(my, 2.));
 
-  double c_mx_my = C2 * mx*my * (1.+TMath::Power(mx, 2.)+TMath::Power(my, 2.));
+  double c_mx_my = C2 * mx*my * (1.+TMath::Power(mx, 2.) + TMath::Power(my, 2.));
 
   _Q.Zero();
   // x x
@@ -477,10 +479,10 @@ void KalmanTrack::set_residual(KalmanSite *a_site) {
   TMatrixD chi2(1, 1);
   cov_residual.Invert();
   chi2 = residual_transposed * cov_residual *residual;
-  //std::cerr << "residuals" << std::endl;
-  //residual_transposed.Print();
-  //cov_residual.Print();
-  //residual.Print();
+  // std::cerr << "residuals" << std::endl;
+  // residual_transposed.Print();
+  // cov_residual.Print();
+  // residual.Print();
 
   a_site->set_chi2(chi2(0, 0));
 }

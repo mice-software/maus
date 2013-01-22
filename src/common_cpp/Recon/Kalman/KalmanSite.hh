@@ -71,12 +71,12 @@ class KalmanSite {
   void set_z(double z)                             { _z = z; }
   void set_id(int id)                              { _id = id; }
   void set_pitch(double factor)                    { _pitch = factor; }
-//////////////////////////////////////
+
   /// Residuals.
   void set_pull(TMatrixD pull)                     { _pull = pull; }
   void set_residual(TMatrixD res)                  { _residual = res; }
   void set_smoothed_residual(TMatrixD res)         { _smoothed_residual = res; }
-/////////////////////////////////////////
+
   /// The covariance of the innovation.
   void set_covariance_residuals(TMatrixD cov_res)  { _covariance_residuals = cov_res; }
   void set_chi2(double chi2)                       { _chi2 = chi2; }
@@ -98,9 +98,6 @@ class KalmanSite {
   double get_pitch()                         const { return _pitch; }
   CLHEP::Hep3Vector get_direction()          const { return _direction; }
   /// The residuals and its covariance.
-  //TMatrixD get_pull()                        const { return _pull; }
-  //TMatrixD get_residual()                    const { return _residual; }
-  //TMatrixD get_smoothed_residual()           const { return _smoothed_residual; }
   TMatrixD get_covariance_residuals()        const { return _covariance_residuals; }
   /// Misalignments and their covariance.
   TMatrixD get_shifts()       const { return _s; }
@@ -111,7 +108,7 @@ class KalmanSite {
 
   State get_current_state() const { return _current_state; }
 
-  void set_current_state(State kalman_state) { _current_state = kalman_state; };
+  void set_current_state(State kalman_state) { _current_state = kalman_state; }
 
  private:
   State _current_state;

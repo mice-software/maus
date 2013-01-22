@@ -121,8 +121,6 @@ TEST_F(KalmanTrackTest, test_error_methods) {
 
   // double momentum = 200.0;
   // track->BetheBlochStoppingPower(momentum);
-
-
 }
 
 //

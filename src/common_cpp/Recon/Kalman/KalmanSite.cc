@@ -132,99 +132,99 @@ void KalmanSite::initialise() {
 }
 
 void KalmanSite::set_a(TMatrixD a, State kalman_state) {
-  switch(kalman_state) {
-    case ( Projected ) :
+  switch ( kalman_state ) {
+    case(Projected) :
       _projected_a = a;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       _a = a;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       _smoothed_a = a;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       _a_excl = a;
   }
 }
 
 TMatrixD KalmanSite::get_a(State desired_state) const {
-  switch(desired_state) {
-    case ( Projected ) :
+  switch ( desired_state ) {
+    case(Projected) :
       return _projected_a;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       return _a;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       return _smoothed_a;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       return _a_excl;
   }
 }
 
 void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
-  switch(kalman_state) {
-    case ( Projected ) :
+  switch ( kalman_state ) {
+    case(Projected) :
       _projected_C = C;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       _C = C;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       _smoothed_C = C;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       _smoothed_C = C;
       // add this.
   }
 }
 
 TMatrixD KalmanSite::get_covariance_matrix(State desired_state) const {
-  switch(desired_state) {
-    case ( Projected ) :
+  switch ( desired_state ) {
+    case(Projected) :
       return _projected_C;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       return _C;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       return _smoothed_C;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       return _smoothed_C;
       // add this.
   }
 }
 
 void KalmanSite::set_residual(TMatrixD residual, State kalman_state) {
-  switch(kalman_state) {
-    case ( Projected ) :
+  switch ( kalman_state ) {
+    case(Projected) :
       _pull = residual;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       _residual = residual;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       _smoothed_residual = residual;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       _measured_shift = residual;
   }
 }
 
 TMatrixD KalmanSite::get_residual(State desired_state) const {
-  switch(desired_state) {
-    case ( Projected ) :
+  switch ( desired_state ) {
+    case(Projected) :
       return _pull;
       break;
-    case ( Filtered ) :
+    case(Filtered) :
       return _residual;
       break;
-    case ( Smoothed ) :
+    case(Smoothed) :
       return _smoothed_residual;
       break;
-    case ( Excluded ) :
+    case(Excluded) :
       return _measured_shift;
   }
 }
