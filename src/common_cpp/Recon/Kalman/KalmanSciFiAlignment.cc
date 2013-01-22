@@ -114,10 +114,10 @@ bool KalmanSciFiAlignment::load_misaligments() {
 
 void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   TMatrixD a_excluded(5, 1);
-  a_excluded = site->get_a_excl();
+  a_excluded = site->get_a(KalmanSite::Excluded);
 
   TMatrixD a_smoothed(5, 1);
-  a_smoothed = site->get_smoothed_a();
+  a_smoothed = site->get_a(KalmanSite::Smoothed);
 
   double diff_x = a_excluded(0, 0) - a_smoothed(0, 0);
   double diff_y = a_excluded(2, 0) - a_smoothed(2, 0);

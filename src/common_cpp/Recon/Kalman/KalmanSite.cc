@@ -19,8 +19,9 @@
 
 namespace MAUS {
 
-KalmanSite::KalmanSite(): _z(0.), _id(0), _chi2(0.),
-                          _type(-1), _pitch(0.),
+KalmanSite::KalmanSite(): _current_state(Initialized),
+                          _z(0.), _id(0), _chi2(0.),
+                          _pitch(1.4945),
                           _direction((0., 0., 0.)),
                           _mc_pos((0., 0., 0.)),
                           _mc_mom((0., 0., 0.)) {
@@ -29,20 +30,9 @@ KalmanSite::KalmanSite(): _z(0.), _id(0), _chi2(0.),
 
 KalmanSite::~KalmanSite() {}
 
-void KalmanSite::set_type(int type) {
-  _type = type;
-  // set the detector pitch (mm)
-  if        ( type == 0 ) { // TOF0
-    _pitch = 40.;
-  } else if ( type == 1 ) { // TOF1
-    _pitch = 60.;
-  } else if ( type == 2 ) { // SciFi
-    _pitch = (7.*0.427)/2.;
-  }
-}
-
-KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _id(0), _chi2(0.),
-                                                _type(-1), _pitch(0.),
+KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
+                                                _z(0.), _id(0), _chi2(0.),
+                                                _pitch(1.4945),
                                                 _direction((0., 0., 0.)),
                                                 _mc_pos((0., 0., 0.)),
                                                 _mc_mom((0., 0., 0.)) {
@@ -51,30 +41,31 @@ KalmanSite::KalmanSite(const KalmanSite &site): _z(0.), _id(0), _chi2(0.),
   _z = site.get_z();
   _id= site.get_id();
   _chi2 = site.get_chi2();
-  _type = site.get_type();
   _pitch = site.get_pitch();
   _direction = site.get_direction();
   _mc_pos = site.get_true_position();
   _mc_mom = site.get_true_momentum();
 
-  _a = site.get_a();
-  _projected_a = site.get_projected_a();
-  _smoothed_a  = site.get_smoothed_a();
-  _a_excl      = site.get_a_excl();
+  _projected_a = site.get_a(KalmanSite::Projected);
+  _a           = site.get_a(KalmanSite::Filtered);
+  _smoothed_a  = site.get_a(KalmanSite::Smoothed);
+  _a_excl      = site.get_a(KalmanSite::Excluded);
 
-  _projected_C = site.get_projected_covariance_matrix();
-  _C = site.get_covariance_matrix();
-  _smoothed_C  = site.get_smoothed_covariance_matrix();
+  _projected_C = site.get_covariance_matrix(KalmanSite::Projected);
+  _C           = site.get_covariance_matrix(KalmanSite::Filtered);
+  _smoothed_C  = site.get_covariance_matrix(KalmanSite::Smoothed);
 
   _v = site.get_measurement();
 
-  _pull = site.get_pull();
-  _residual = site.get_residual();
-  _smoothed_residual = site.get_smoothed_residual();
+  _pull                 = site.get_residual(KalmanSite::Projected);
+  _residual             = site.get_residual(KalmanSite::Filtered);
+  _smoothed_residual    = site.get_residual(KalmanSite::Smoothed);
   _covariance_residuals = site.get_covariance_residuals();
 
   _s = site.get_shifts();
   _Cov_s = site.get_S_covariance();
+
+  _current_state = site.get_current_state();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
@@ -85,30 +76,31 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   _z  = rhs.get_z();
   _id = rhs.get_id();
   _chi2  = rhs.get_chi2();
-  _type  = rhs.get_type();
   _pitch = rhs.get_pitch();
   _direction = rhs.get_direction();
   _mc_pos = rhs.get_true_position();
   _mc_mom = rhs.get_true_momentum();
 
-  _a = rhs.get_a();
-  _projected_a = rhs.get_projected_a();
-  _smoothed_a  = rhs.get_smoothed_a();
-  _a_excl      = rhs.get_a_excl();
+  _projected_a = rhs.get_a(KalmanSite::Projected);
+  _a           = rhs.get_a(KalmanSite::Filtered);
+  _smoothed_a  = rhs.get_a(KalmanSite::Smoothed);
+  _a_excl      = rhs.get_a(KalmanSite::Excluded);
 
-  _projected_C = rhs.get_projected_covariance_matrix();
-  _C = rhs.get_covariance_matrix();
-  _smoothed_C  = rhs.get_smoothed_covariance_matrix();
+  _projected_C = rhs.get_covariance_matrix(KalmanSite::Projected);
+  _C           = rhs.get_covariance_matrix(KalmanSite::Filtered);
+  _smoothed_C  = rhs.get_covariance_matrix(KalmanSite::Smoothed);
 
   _v = rhs.get_measurement();
 
-  _pull     = rhs.get_pull();
-  _residual = rhs.get_residual();
-  _smoothed_residual    = rhs.get_smoothed_residual();
+  _pull                 = rhs.get_residual(KalmanSite::Projected);
+  _residual             = rhs.get_residual(KalmanSite::Filtered);
+  _smoothed_residual    = rhs.get_residual(KalmanSite::Smoothed);
   _covariance_residuals = rhs.get_covariance_residuals();
 
   _s     = rhs.get_shifts();
   _Cov_s = rhs.get_S_covariance();
+
+  _current_state = rhs.get_current_state();
 
   return *this;
 }
@@ -137,6 +129,104 @@ void KalmanSite::initialise() {
   // The misalignments.
   _s.    ResizeTo(3, 1);
   _Cov_s.ResizeTo(3, 3);
+}
+
+void KalmanSite::set_a(TMatrixD a, State kalman_state) {
+  switch(kalman_state) {
+    case ( Projected ) :
+      _projected_a = a;
+      break;
+    case ( Filtered ) :
+      _a = a;
+      break;
+    case ( Smoothed ) :
+      _smoothed_a = a;
+      break;
+    case ( Excluded ) :
+      _a_excl = a;
+  }
+}
+
+TMatrixD KalmanSite::get_a(State desired_state) const {
+  switch(desired_state) {
+    case ( Projected ) :
+      return _projected_a;
+      break;
+    case ( Filtered ) :
+      return _a;
+      break;
+    case ( Smoothed ) :
+      return _smoothed_a;
+      break;
+    case ( Excluded ) :
+      return _a_excl;
+  }
+}
+
+void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
+  switch(kalman_state) {
+    case ( Projected ) :
+      _projected_C = C;
+      break;
+    case ( Filtered ) :
+      _C = C;
+      break;
+    case ( Smoothed ) :
+      _smoothed_C = C;
+      break;
+    case ( Excluded ) :
+      _smoothed_C = C;
+      // add this.
+  }
+}
+
+TMatrixD KalmanSite::get_covariance_matrix(State desired_state) const {
+  switch(desired_state) {
+    case ( Projected ) :
+      return _projected_C;
+      break;
+    case ( Filtered ) :
+      return _C;
+      break;
+    case ( Smoothed ) :
+      return _smoothed_C;
+      break;
+    case ( Excluded ) :
+      return _smoothed_C;
+      // add this.
+  }
+}
+
+void KalmanSite::set_residual(TMatrixD residual, State kalman_state) {
+  switch(kalman_state) {
+    case ( Projected ) :
+      _pull = residual;
+      break;
+    case ( Filtered ) :
+      _residual = residual;
+      break;
+    case ( Smoothed ) :
+      _smoothed_residual = residual;
+      break;
+    case ( Excluded ) :
+      _measured_shift = residual;
+  }
+}
+
+TMatrixD KalmanSite::get_residual(State desired_state) const {
+  switch(desired_state) {
+    case ( Projected ) :
+      return _pull;
+      break;
+    case ( Filtered ) :
+      return _residual;
+      break;
+    case ( Smoothed ) :
+      return _smoothed_residual;
+      break;
+    case ( Excluded ) :
+      return _measured_shift;
+  }
 }
 
 } // ~namespace MAUS

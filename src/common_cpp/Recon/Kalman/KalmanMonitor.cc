@@ -140,9 +140,9 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     //                                  (site.get_shifts())(1, 0) << ", " <<
     //                                  (site.get_shifts())(2, 0) << ")" << std::endl;
     std::cerr << "================Residuals================" << std::endl;
-    std::cerr << (site.get_pull())(0, 0) << std::endl;
-    std::cerr << (site.get_residual())(0, 0) << std::endl;
-    std::cerr << (site.get_smoothed_residual())(0, 0) << std::endl;
+    std::cerr << (site.get_residual(KalmanSite::Projected))(0, 0) << std::endl;
+    std::cerr << (site.get_residual(KalmanSite::Filtered))(0, 0) << std::endl;
+    std::cerr << (site.get_residual(KalmanSite::Smoothed))(0, 0) << std::endl;
     // std::cerr << "================Projection================" << std::endl;
     // site.get_projected_a().Print();
     // site.get_a().Print();
@@ -167,10 +167,10 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     KalmanSite site = sites[i];
 
     TMatrixD a(5, 1);
-    a = site.get_a();
+    a = site.get_a(KalmanSite::Filtered);
 
     TMatrixD a_smooth(5, 1);
-    a_smooth = site.get_smoothed_a();
+    a_smooth = site.get_a(KalmanSite::Smoothed);
 
     // MC position and momentum.
     double mc_x  = site.get_true_position().x();
@@ -180,7 +180,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double mc_pz = site.get_true_momentum().z();
 
     TMatrixD a_proj(5, 1);
-    a_proj = site.get_projected_a();
+    a_proj = site.get_a(KalmanSite::Projected);
 
     int id = site.get_id();
     if ( id < 15 ) {
@@ -211,44 +211,44 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double kappa_proj= a_proj(4, 0);
 
   if ( id == 3 ) {
-    Double_t pull = site.get_pull()(0, 0);
+    Double_t pull = site.get_residual(KalmanSite::Projected)(0, 0);
     pull_site_3->Fill(pull);
 
-    Double_t residual = site.get_residual()(0, 0);
+    Double_t residual = site.get_residual(KalmanSite::Filtered)(0, 0);
     residual_site_3->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0, 0);
+    Double_t s_residual = site.get_residual(KalmanSite::Smoothed)(0, 0);
     smoothed_residual_site_3->Fill(s_residual);
   }
   if ( id == 4 ) {
-    Double_t pull = site.get_pull()(0, 0);
+    Double_t pull = site.get_residual(KalmanSite::Projected)(0, 0);
     pull_site_4->Fill(pull);
 
-    Double_t residual = site.get_residual()(0, 0);
+    Double_t residual = site.get_residual(KalmanSite::Filtered)(0, 0);
     residual_site_4->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0, 0);
+    Double_t s_residual = site.get_residual(KalmanSite::Smoothed)(0, 0);
     smoothed_residual_site_4->Fill(s_residual);
   }
   if ( id == 5 ) {
-    Double_t pull = site.get_pull()(0, 0);
+    Double_t pull = site.get_residual(KalmanSite::Projected)(0, 0);
     pull_site_5->Fill(pull);
 
-    Double_t residual = site.get_residual()(0, 0);
+    Double_t residual = site.get_residual(KalmanSite::Filtered)(0, 0);
     residual_site_5->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0, 0);
+    Double_t s_residual = site.get_residual(KalmanSite::Smoothed)(0, 0);
     smoothed_residual_site_5->Fill(s_residual);
   }
 
   if ( id == 9 ) {
-    Double_t pull = site.get_pull()(0, 0);
+    Double_t pull = site.get_residual(KalmanSite::Projected)(0, 0);
     pull_site_9->Fill(pull);
 
-    Double_t residual = site.get_residual()(0, 0);
+    Double_t residual = site.get_residual(KalmanSite::Filtered)(0, 0);
     residual_site_9->Fill(residual);
 
-    Double_t s_residual = site.get_smoothed_residual()(0, 0);
+    Double_t s_residual = site.get_residual(KalmanSite::Smoothed)(0, 0);
     smoothed_residual_site_9->Fill(s_residual);
   }
 /*
@@ -264,11 +264,11 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     double py_smooth = a_smooth(3, 0);
     double kappa_smooth = a_smooth(4, 0);
 */
-    TMatrixD pull = site.get_pull();
+    TMatrixD pull = site.get_residual(KalmanSite::Projected);
     pull_hist->Fill(id, pull(0, 0));
-    TMatrixD residual = site.get_residual();
+    TMatrixD residual = site.get_residual(KalmanSite::Filtered);
     residual_hist->Fill(id, residual(0, 0));
-    TMatrixD smooth_residual = site.get_smoothed_residual();
+    TMatrixD smooth_residual = site.get_residual(KalmanSite::Smoothed);
     smooth_residual_hist->Fill(id, smooth_residual(0, 0));
     // Projections - TH1
 /*
@@ -330,7 +330,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
       station2->SetPoint(static_cast<Int_t> (x), x, y);
     }
     if ( id == 6 ) {
-      double y = site.get_shifts()(0, 0);
+        double y = site.get_shifts()(0, 0);
       double x = station3->GetN();
       station3->SetPoint(static_cast<Int_t> (x), x, y);
     }

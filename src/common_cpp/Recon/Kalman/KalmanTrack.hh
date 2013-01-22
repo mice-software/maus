@@ -83,25 +83,26 @@ class KalmanTrack {
   void update_V(const KalmanSite *a_site);
   void update_H(const KalmanSite *a_site);
   void update_W(const KalmanSite *a_site);
+  void update_K(const KalmanSite *a_site);
+  void compute_pull(KalmanSite *a_site);
   /// Filtering: calculation of filtered state.
   void calc_filtered_state(KalmanSite *a_site);
-  TMatrixD get_pull(KalmanSite *a_site);
+
   /// Filtering: update of covariance matrix.
   void update_covariance(KalmanSite *a_site);
   void set_residual(KalmanSite *a_site);
   TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
-  void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
+  // void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
 
   /// Smoothing: updates back transportation matrix.
   void update_back_transportation_matrix(const KalmanSite *optimum_site, const KalmanSite *smoothing_site);
   void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void prepare_for_smoothing(std::vector<KalmanSite> &sites);
+  void prepare_for_smoothing(KalmanSite *last_site);
   void exclude_site(KalmanSite *site);
-  TMatrixD get_kalman_gain(const KalmanSite *a_site);
+  // TMatrixD get_kalman_gain(const KalmanSite *a_site);
 
   // void get_site_properties(KalmanSite *site, double &thickess, double &density);
   void compute_chi2(const std::vector<KalmanSite> &sites);
-
 
   /// Getters.
   TMatrixD get_propagator()   const { return _F;        }
@@ -137,9 +138,15 @@ class KalmanTrack {
 
   TMatrixD _W;
 
-  double _chi2, _ndf, _P_value;
+  double _chi2;
+
+  int _ndf;
+
+  double _P_value;
 
   int _n_parameters;
+
+  size_t _n_sites;
 
   int _tracker;
 

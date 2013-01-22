@@ -61,14 +61,14 @@ void HelicalTrackTest::set_up_sites() {
   a(2, 0) = y0;
   a(3, 0) = my0;
   a(4, 0) = kappa;
-  old_site.set_a(a);
+  old_site.set_a(a, MAUS::KalmanSite::Filtered);
 
   TMatrixD C(5, 5);
   C.Zero();
   for ( int i = 0; i < 5; ++i ) {
      C(i, i) = 1.; // dummy values
   }
-  old_site.set_projected_covariance_matrix(C);
+  old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
 }
 
 TEST_F(HelicalTrackTest, test_propagation) {
@@ -80,7 +80,7 @@ TEST_F(HelicalTrackTest, test_propagation) {
   track->calc_predicted_state(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);
-  a_projected = new_site.get_projected_a();
+  a_projected = new_site.get_a(MAUS::KalmanSite::Projected);
 
   EXPECT_NEAR(x1,    a_projected(0, 0), err);
   EXPECT_NEAR(mx1,   a_projected(1, 0), err);

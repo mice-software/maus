@@ -35,7 +35,7 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   projected_a(0, 0) = 3.0;
   projected_a(0, 0) = 4.0;
   projected_a(0, 0) = 5.0;
-  a_site.set_projected_a(projected_a);
+  a_site.set_a(projected_a, MAUS::KalmanSite::Projected);
 
   TMatrixD a(5, 1);
   a(0, 0) = 1.0;
@@ -43,7 +43,7 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   a(0, 0) = 3.0;
   a(0, 0) = 4.0;
   a(0, 0) = 5.0;
-  a_site.set_a(a);
+  a_site.set_a(a, MAUS::KalmanSite::Filtered);
 
   TMatrixD smoothed_a(5, 1);
   smoothed_a(0, 0) = 1.0;
@@ -51,7 +51,7 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   smoothed_a(0, 0) = 3.0;
   smoothed_a(0, 0) = 4.0;
   smoothed_a(0, 0) = 5.0;
-  a_site.set_smoothed_a(smoothed_a);
+  a_site.set_a(smoothed_a, MAUS::KalmanSite::Smoothed);
 
 /*
   set_projected_covariance_matrix(TMatrixD Cp);

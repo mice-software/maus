@@ -37,7 +37,7 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
 
   // Get old state vector...
   TMatrixD prev_site(5, 1);
-  prev_site = old_site->get_a();
+  prev_site = old_site->get_a(KalmanSite::Filtered);
 
   double old_kappa = prev_site(4, 0);
   double old_mx = prev_site(1, 0);

@@ -47,14 +47,14 @@ void StraightTrackTest::set_up_sites() {
   a(2, 0) = 0.0;
   a(3, 0) = my;
   a(4, 0) = 1./200.;
-  old_site.set_a(a);
+  old_site.set_a(a, MAUS::KalmanSite::Filtered);
 
   TMatrixD C(5, 5);
   C.Zero();
   for ( int i = 0; i < 5; ++i ) {
      C(i, i) = 100.; // dummy values
   }
-  old_site.set_projected_covariance_matrix(C);
+  old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
 }
 
 TEST_F(StraightTrackTest, propagator_test) {
@@ -65,7 +65,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   track->calc_predicted_state(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);
-  a_projected = new_site.get_projected_a();
+  a_projected = new_site.get_a(MAUS::KalmanSite::Projected);
 
   double expected_x = mx*deltaZ;
   double expected_y = my*deltaZ;

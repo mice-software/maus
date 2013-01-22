@@ -54,9 +54,9 @@ class KalmanTrackFit {
 
   void process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
-  // This will: initialise the state vector;
-  // Set covariance matrix;
-  // Add plane measurents to all sites;
+  /// This will: initialise the state vector;
+  /// Set covariance matrix;
+  /// Add plane measurents to all sites;
   void initialise(KalmanSeed *seed,
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
@@ -69,17 +69,19 @@ class KalmanTrackFit {
               KalmanTrack *track,
               int current_site);
 
-  void filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                                     KalmanTrack *track,
-                                     int current_site);
-
   void smooth(std::vector<KalmanSite> &sites,
               KalmanTrack *track,
               int current_site);
 
+/*
+  void filter_updating_misalignments(std::vector<KalmanSite> &sites,
+                                     KalmanTrack *track,
+                                     int current_site);
+
   void update_alignment_parameters(std::vector<KalmanSite> &sites,
                                    KalmanTrack *track,
                                    KalmanSciFiAlignment &kalman_align);
+*/
 
   void save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,
