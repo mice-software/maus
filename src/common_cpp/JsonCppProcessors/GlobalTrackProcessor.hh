@@ -17,10 +17,8 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalSpacePointProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackPointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EnumeratorProcessors.hh"
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/DataStructure/GlobalTrack.hh"
 
@@ -44,7 +42,9 @@ class GlobalTrackProcessor :
   IntProcessor _int_proc;
   UIntProcessor _uint_proc;
   ValueArrayProcessor<std::string> _geometry_paths_proc;
-
+  TRefArrayProcessor<MAUS::GlobalTrack> _track_trefarray_proc;
+  TRefArrayProcessor<MAUS::GlobalTrackPoint> _trackpoint_trefarray_proc;
+ 
 };
 } // ~namespace MAUS
 

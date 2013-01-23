@@ -35,9 +35,10 @@ GlobalTrackProcessor::GlobalTrackProcessor() :
                         &MAUS::recon::global::Track::get_charge,
                         &MAUS::recon::global::Track::set_charge, true);
 
-    RegisterPointerReference("trackpoints",
-                        &MAUS::recon::global::Track::get_trackpoints,
-                        &MAUS::recon::global::Track::set_trackpoints, true); 
+    RegisterTRefArray("trackpoints",
+                      &_trackpoint_trefarray_proc,
+                      &MAUS::recon::global::Track::get_trackpoints,
+                      &MAUS::recon::global::Track::set_trackpoints, true); 
 
     RegisterValueBranch("detector_points", &_uint_proc,
                         &MAUS::recon::global::Track::get_detectorpoints,
@@ -48,10 +49,11 @@ GlobalTrackProcessor::GlobalTrackProcessor() :
                         &MAUS::recon::global::Track::set_geometry_paths,
                         true);
     
-    RegisterPointerReference(
-        "constituent_tracks",
-        &MAUS::recon::global::Track::get_constituent_tracks,
-        &MAUS::recon::global::Track::set_constituent_tracks, true); 
+    RegisterTRefArray("constituent_tracks",
+                      &_track_trefarray_proc,
+                      &MAUS::recon::global::Track::get_constituent_tracks,
+                      &MAUS::recon::global::Track::set_constituent_tracks,
+                      true); 
 
     RegisterValueBranch("goodness_of_fit", &_double_proc,
                         &MAUS::recon::global::Track::get_goodness_of_fit,

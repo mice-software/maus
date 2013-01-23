@@ -54,10 +54,11 @@ GlobalTrackPointProcessor::GlobalTrackPointProcessor() {
                         &MAUS::recon::global::TrackPoint::set_geometry_path,
                         true);
 
-    RegisterPointerReference("spacepoint",
-                             &MAUS::recon::global::TrackPoint::get_spacepoint,
-                             &MAUS::recon::global::TrackPoint::set_spacepoint,
-                             true);
+    RegisterTRef<MAUS::recon::global::SpacePoint>(
+        "spacepoint",
+        &MAUS::recon::global::TrackPoint::get_spacepoint_tref,
+        &MAUS::recon::global::TrackPoint::set_spacepoint_tref,
+        true);
 }
 
 } // ~namespace MAUS

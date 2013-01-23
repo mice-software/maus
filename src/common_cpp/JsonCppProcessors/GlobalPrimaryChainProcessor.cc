@@ -18,28 +18,25 @@
 
 namespace MAUS {
 
-GlobalPrimaryChainProcessor::GlobalPrimaryChainProcessor() {
+GlobalPrimaryChainProcessor::GlobalPrimaryChainProcessor() :
+    _treftrackpair_array_proc(new TRefTrackPairProcessor())
+{
 
-    RegisterValueBranch("mapper_name", &_string_proc,
-                        &MAUS::recon::global::PrimaryChain::get_mapper_name,
-                        &MAUS::recon::global::PrimaryChain::set_mapper_name,
+  RegisterValueBranch("mapper_name", &_string_proc,
+                      &MAUS::recon::global::PrimaryChain::get_mapper_name,
+                      &MAUS::recon::global::PrimaryChain::set_mapper_name,
+                      true);
+  
+  RegisterPointerBranch("track_parent_pairs", &_treftrackpair_array_proc,
+                        &MAUS::GlobalPrimaryChain::get_track_parent_pairs,
+                        &MAUS::GlobalPrimaryChain::set_track_parent_pairs,
                         true);
-
-    RegisterPointerReference(
-        "tracks",
-        &MAUS::recon::global::PrimaryChain::get_tracks,
-        &MAUS::recon::global::PrimaryChain::set_tracks, true); 
-
-    RegisterPointerReference(
-        "parents",
-        &MAUS::recon::global::PrimaryChain::get_parents,
-        &MAUS::recon::global::PrimaryChain::set_parents, true); 
-
-    RegisterValueBranch(
-        "goodness_of_fit", &_double_proc,
-        &MAUS::recon::global::PrimaryChain::get_goodness_of_fit,
-        &MAUS::recon::global::PrimaryChain::set_goodness_of_fit, true);
-
+  
+  RegisterValueBranch(
+      "goodness_of_fit", &_double_proc,
+      &MAUS::recon::global::PrimaryChain::get_goodness_of_fit,
+      &MAUS::recon::global::PrimaryChain::set_goodness_of_fit, true);
+  
 }
 
 } // ~namespace MAUS

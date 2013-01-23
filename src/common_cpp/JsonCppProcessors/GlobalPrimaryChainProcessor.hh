@@ -18,12 +18,9 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
-
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
 #include "src/common_cpp/DataStructure/GlobalPrimaryChain.hh"
+
+#include "src/common_cpp/JsonCppProcessors/TRefTrackPairProcessor.hh"
 
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALPRIMARYCHAINPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALPRIMARYCHAINPROCESSOR_HH_
@@ -41,6 +38,9 @@ class GlobalPrimaryChainProcessor :
  private:
   DoubleProcessor _double_proc;
   StringProcessor _string_proc;
+  PointerArrayProcessor<MAUS::recon::global::TRefTrackPair>
+  _treftrackpair_array_proc;
+  
 };
 } // ~namespace MAUS
 
