@@ -25,166 +25,139 @@
 namespace MAUS {
 
 class GlobalPrimaryChainTestDS : public ::testing::Test {
-  protected:
-    GlobalPrimaryChainTestDS()  {}
-    virtual ~GlobalPrimaryChainTestDS() {}
-    virtual void SetUp()    {}
-    virtual void TearDown() {}
+ protected:
+  GlobalPrimaryChainTestDS()  {}
+  virtual ~GlobalPrimaryChainTestDS() {}
+  virtual void SetUp()    {
+    _primarychain1 = new GlobalPrimaryChain();
+
+    _t0 = new MAUS::GlobalTrack();
+    _t0->set_mapper_name("t0");
+    _t1 = new MAUS::GlobalTrack();
+    _t1->set_mapper_name("t1");
+    _t2 = new MAUS::GlobalTrack();
+    _t2->set_mapper_name("t2");
+
+    track_parent_pairs = 
+        new std::vector<MAUS::recon::global::TRefTrackPair*>();
+    track_parent_pairs->push_back(
+        new MAUS::recon::global::TRefTrackPair(_t0, NULL));
+    track_parent_pairs->push_back(
+        new MAUS::recon::global::TRefTrackPair(_t1, _t0));
+    track_parent_pairs->push_back(
+        new MAUS::recon::global::TRefTrackPair(_t2, _t0));
+
+    _primarychain1->set_track_parent_pairs(track_parent_pairs);
+
+    _goodness_of_fit = 5.;
+    _primarychain1->set_goodness_of_fit(_goodness_of_fit);      
+  }
+  virtual void TearDown() {}
+ protected:
+  GlobalPrimaryChain* _primarychain1;
+  MAUS::GlobalTrack* _t0;
+  MAUS::GlobalTrack* _t1;
+  MAUS::GlobalTrack* _t2;
+  double _goodness_of_fit;
+  std::vector<MAUS::recon::global::TRefTrackPair*> *track_parent_pairs;
 };
 
 TEST_F(GlobalPrimaryChainTestDS, test_default_constructor) {
   GlobalPrimaryChain primarychain;
 
-  EXPECT_TRUE(primarychain.get_tracks()->empty());
-  EXPECT_TRUE(primarychain.get_parents()->empty());
+  EXPECT_TRUE(primarychain.get_track_parent_pairs()->empty());
   EXPECT_EQ(0., primarychain.get_goodness_of_fit());
 }
 
 TEST_F(GlobalPrimaryChainTestDS, test_getters_setters) {
-  GlobalPrimaryChain* primarychain1 =
-      new GlobalPrimaryChain();
-
-  MAUS::GlobalTrack* t0 = new MAUS::GlobalTrack();
-  t0->set_mapper_name("t0");
-  MAUS::GlobalTrack* t1 = new MAUS::GlobalTrack();
-  t1->set_mapper_name("t1");
-  MAUS::GlobalTrack* t2 = new MAUS::GlobalTrack();
-  t2->set_mapper_name("t2");
-  
-  std::vector<MAUS::GlobalTrack*> trackvector;
-  std::vector<MAUS::GlobalTrack*> parentvector;
-  trackvector.push_back(t0);
-  parentvector.push_back(NULL);
-  trackvector.push_back(t1);
-  parentvector.push_back(t0);
-  trackvector.push_back(t2);
-  parentvector.push_back(t0);
-
-  primarychain1->set_tracks(&trackvector);
-  primarychain1->set_parents(&parentvector);
-
-  double goodness_of_fit = 5.;
-  primarychain1->set_goodness_of_fit(goodness_of_fit);
-
-  ASSERT_EQ(3U, primarychain1->get_tracks()->size());
-  ASSERT_EQ(3U, primarychain1->get_parents()->size());
-  EXPECT_EQ(t0, primarychain1->get_tracks()->at(0));
-  EXPECT_EQ(t1, primarychain1->get_tracks()->at(1));
-  EXPECT_EQ(t2, primarychain1->get_tracks()->at(2));
-  EXPECT_EQ("t0", primarychain1->get_tracks()->at(0)->get_mapper_name());
-  EXPECT_EQ("t1", primarychain1->get_tracks()->at(1)->get_mapper_name());
-  EXPECT_EQ("t2", primarychain1->get_tracks()->at(2)->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain1->get_parents()->at(0));
-  EXPECT_EQ(t0, primarychain1->get_parents()->at(1));
-  EXPECT_EQ(t0, primarychain1->get_parents()->at(2));
-  EXPECT_EQ(goodness_of_fit, primarychain1->get_goodness_of_fit());
+  ASSERT_EQ(3U, _primarychain1->get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, _primarychain1->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, _primarychain1->get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, _primarychain1->get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", _primarychain1->get_track_parent_pairs()
+            ->at(0)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t1", _primarychain1->get_track_parent_pairs()
+            ->at(1)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t2", _primarychain1->get_track_parent_pairs()
+            ->at(2)->GetTrack()->get_mapper_name());
+  EXPECT_TRUE(NULL == _primarychain1->get_track_parent_pairs()
+              ->at(0)->GetParent());
+  EXPECT_EQ(_t0, _primarychain1->get_track_parent_pairs()
+            ->at(1)->GetParent());
+  EXPECT_EQ(_t0, _primarychain1->get_track_parent_pairs()
+            ->at(2)->GetParent());
+  EXPECT_EQ(_goodness_of_fit, _primarychain1->get_goodness_of_fit());
 }
 
 TEST_F(GlobalPrimaryChainTestDS, test_copy_constructor) {
-  GlobalPrimaryChain primarychain1;
+  GlobalPrimaryChain primarychain2(*_primarychain1);
 
-  MAUS::GlobalTrack* t0 = new MAUS::GlobalTrack();
-  t0->set_mapper_name("t0");
-  MAUS::GlobalTrack* t1 = new MAUS::GlobalTrack();
-  t1->set_mapper_name("t1");
-  
-  std::vector<MAUS::GlobalTrack*> trackvector;
-  std::vector<MAUS::GlobalTrack*> parentvector;
-  trackvector.push_back(t0);
-  parentvector.push_back(NULL);
-  trackvector.push_back(t1);
-  parentvector.push_back(t0);
-
-  primarychain1.set_tracks(&trackvector);
-  primarychain1.set_parents(&parentvector);
-
-  double goodness_of_fit = 5.;
-  primarychain1.set_goodness_of_fit(goodness_of_fit);
-
-  GlobalPrimaryChain primarychain2(primarychain1);
-
-  ASSERT_NE(&primarychain2, &primarychain1);
-  ASSERT_EQ(2U, primarychain2.get_tracks()->size());
-  ASSERT_EQ(2U, primarychain2.get_parents()->size());
-  EXPECT_EQ(t0, primarychain2.get_tracks()->at(0));
-  EXPECT_EQ(t1, primarychain2.get_tracks()->at(1));
-  EXPECT_EQ("t0", primarychain2.get_tracks()->at(0)->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2.get_tracks()->at(1)->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2.get_parents()->at(0));
-  EXPECT_EQ(t0, primarychain2.get_parents()->at(1));
-  EXPECT_EQ(goodness_of_fit, primarychain2.get_goodness_of_fit());
+  ASSERT_NE(&primarychain2, _primarychain1);
+  ASSERT_EQ(3U, primarychain2.get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, primarychain2.get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, primarychain2.get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primarychain2.get_track_parent_pairs()
+            ->at(0)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t1", primarychain2.get_track_parent_pairs()
+            ->at(1)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t2", primarychain2.get_track_parent_pairs()
+            ->at(2)->GetTrack()->get_mapper_name());
+  EXPECT_TRUE(NULL == primarychain2.get_track_parent_pairs()
+              ->at(0)->GetParent());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+            ->at(1)->GetParent());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+            ->at(2)->GetParent());
+  EXPECT_EQ(_goodness_of_fit, primarychain2.get_goodness_of_fit());
 }
 
 TEST_F(GlobalPrimaryChainTestDS, test_assignment_operator) {
-  GlobalPrimaryChain primarychain1;
+  GlobalPrimaryChain primarychain2 = *_primarychain1;
 
-  MAUS::GlobalTrack* t0 = new MAUS::GlobalTrack();
-  t0->set_mapper_name("t0");
-  MAUS::GlobalTrack* t1 = new MAUS::GlobalTrack();
-  t1->set_mapper_name("t1");
-  
-  std::vector<MAUS::GlobalTrack*> trackvector;
-  std::vector<MAUS::GlobalTrack*> parentvector;
-  trackvector.push_back(t0);
-  parentvector.push_back(NULL);
-  trackvector.push_back(t1);
-  parentvector.push_back(t0);
-
-  primarychain1.set_tracks(&trackvector);
-  primarychain1.set_parents(&parentvector);
-
-  double goodness_of_fit = 5.;
-  primarychain1.set_goodness_of_fit(goodness_of_fit);
-
-  GlobalPrimaryChain primarychain2 = primarychain1;
-
-  ASSERT_NE(&primarychain2, &primarychain1);
-  ASSERT_EQ(2U, primarychain2.get_tracks()->size());
-  ASSERT_EQ(2U, primarychain2.get_parents()->size());
-  EXPECT_EQ(t0, primarychain2.get_tracks()->at(0));
-  EXPECT_EQ(t1, primarychain2.get_tracks()->at(1));
-  EXPECT_EQ("t0", primarychain2.get_tracks()->at(0)->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2.get_tracks()->at(1)->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2.get_parents()->at(0));
-  EXPECT_EQ(t0, primarychain2.get_parents()->at(1));
-  EXPECT_EQ(goodness_of_fit, primarychain2.get_goodness_of_fit());
+  ASSERT_NE(&primarychain2, _primarychain1);
+  ASSERT_EQ(3U, primarychain2.get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, primarychain2.get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, primarychain2.get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primarychain2.get_track_parent_pairs()
+            ->at(0)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t1", primarychain2.get_track_parent_pairs()
+            ->at(1)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t2", primarychain2.get_track_parent_pairs()
+            ->at(2)->GetTrack()->get_mapper_name());
+  EXPECT_TRUE(NULL == primarychain2.get_track_parent_pairs()
+              ->at(0)->GetParent());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+            ->at(1)->GetParent());
+  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+            ->at(2)->GetParent());
+  EXPECT_EQ(_goodness_of_fit, primarychain2.get_goodness_of_fit());
 }
 
 TEST_F(GlobalPrimaryChainTestDS, test_Clone) {
-  GlobalPrimaryChain primarychain1;
+  GlobalPrimaryChain* primarychain2 = _primarychain1->Clone();
 
-  MAUS::GlobalTrack* t0 = new MAUS::GlobalTrack();
-  t0->set_mapper_name("t0");
-  MAUS::GlobalTrack* t1 = new MAUS::GlobalTrack();
-  t1->set_mapper_name("t1");
-  
-  std::vector<MAUS::GlobalTrack*> trackvector;
-  std::vector<MAUS::GlobalTrack*> parentvector;
-  trackvector.push_back(t0);
-  parentvector.push_back(NULL);
-  trackvector.push_back(t1);
-  parentvector.push_back(t0);
-
-  primarychain1.set_tracks(&trackvector);
-  primarychain1.set_parents(&parentvector);
-
-  double goodness_of_fit = 5.;
-  primarychain1.set_goodness_of_fit(goodness_of_fit);
-
-  GlobalPrimaryChain* primarychain2 = primarychain1.Clone();
-
-  ASSERT_NE(primarychain2, &primarychain1);
-  ASSERT_EQ(2U, primarychain2->get_tracks()->size());
-  ASSERT_EQ(2U, primarychain2->get_parents()->size());
-  EXPECT_NE(t0, primarychain2->get_tracks()->at(0));
-  EXPECT_NE(t1, primarychain2->get_tracks()->at(1));
-  EXPECT_EQ("t0", primarychain2->get_tracks()->at(0)->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2->get_tracks()->at(1)->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2->get_parents()->at(0));
-  EXPECT_NE(t0, primarychain2->get_parents()->at(1));
-  EXPECT_EQ(primarychain2->get_tracks()->at(0),
-            primarychain2->get_parents()->at(1));
-  EXPECT_EQ(goodness_of_fit, primarychain2->get_goodness_of_fit());
+  ASSERT_NE(primarychain2, _primarychain1);
+  ASSERT_EQ(3U, primarychain2->get_track_parent_pairs()->size());
+  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_NE(_t1, primarychain2->get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_NE(_t2, primarychain2->get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primarychain2->get_track_parent_pairs()
+            ->at(0)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t1", primarychain2->get_track_parent_pairs()
+            ->at(1)->GetTrack()->get_mapper_name());
+  EXPECT_EQ("t2", primarychain2->get_track_parent_pairs()
+            ->at(2)->GetTrack()->get_mapper_name());
+  EXPECT_TRUE(NULL == primarychain2->get_track_parent_pairs()
+              ->at(0)->GetParent());
+  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(1)->GetParent());
+  EXPECT_EQ(primarychain2->get_track_parent_pairs()->at(1)->GetParent(),
+            primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(2)->GetParent());
+  EXPECT_EQ(primarychain2->get_track_parent_pairs()->at(2)->GetParent(),
+            primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_goodness_of_fit, primarychain2->get_goodness_of_fit());
 }
 
 TEST_F(GlobalPrimaryChainTestDS, test_TrackMethods) {
@@ -212,14 +185,15 @@ TEST_F(GlobalPrimaryChainTestDS, test_TrackMethods) {
   primarychain1->AddTrack(t4, t1);
   primarychain1->AddTrack(t5, t1);
 
-  EXPECT_EQ(6U, primarychain1->get_tracks()->size());
-  EXPECT_EQ(6U, primarychain1->get_parents()->size());
-  EXPECT_TRUE(NULL == primarychain1->get_parents()->at(0));
-  EXPECT_TRUE(NULL == primarychain1->get_parents()->at(1));
-  EXPECT_EQ(t0, primarychain1->get_parents()->at(2));
-  EXPECT_EQ(t0, primarychain1->get_parents()->at(3));
-  EXPECT_EQ(t1, primarychain1->get_parents()->at(4));
-  EXPECT_EQ(t1, primarychain1->get_parents()->at(5));
+  ASSERT_EQ(6U, primarychain1->get_track_parent_pairs()->size());
+  EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
+              ->at(0)->GetParent());
+  EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
+              ->at(1)->GetParent());
+  EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(2)->GetParent());
+  EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(3)->GetParent());
+  EXPECT_EQ(t1, primarychain1->get_track_parent_pairs()->at(4)->GetParent());
+  EXPECT_EQ(t1, primarychain1->get_track_parent_pairs()->at(5)->GetParent());
 
   // RemoveTrack
   // Try to remove a track that isn't in primary chain, t6
@@ -267,8 +241,7 @@ TEST_F(GlobalPrimaryChainTestDS, test_TrackMethods) {
 
   // ClearTracks
   primarychain1->ClearTracks();
-  EXPECT_TRUE(primarychain1->get_tracks()->empty());
-  EXPECT_TRUE(primarychain1->get_parents()->empty());
+  EXPECT_TRUE(primarychain1->get_track_parent_pairs()->empty());
 }
   
 } // ~namespace MAUS

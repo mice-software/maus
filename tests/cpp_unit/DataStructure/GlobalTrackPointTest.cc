@@ -64,6 +64,7 @@ TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
   std::string geom_path = "11";
 
   recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  TObject* sp_test = sp;
 
   recon::global::TrackPoint tp;
   tp.set_mapper_name(mapper_name);
@@ -96,7 +97,7 @@ TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
   EXPECT_EQ(ept, tp.get_momentum_error().T());
   EXPECT_EQ(det, tp.get_detector());
   EXPECT_EQ(geom_path, tp.get_geometry_path());
-  EXPECT_EQ(sp, tp.get_spacepoint());
+  EXPECT_EQ(sp_test, tp.get_spacepoint());
 }
 
 
@@ -138,6 +139,7 @@ TEST_F(GlobalTrackPointTestDS, test_copy_constructor) {
   TLorentzVector pos(x, y, z, t);
 
   recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  TObject* sp_test = sp;
 
   recon::global::TrackPoint tp1;
   tp1.set_mapper_name(mapper_name);
@@ -153,7 +155,7 @@ TEST_F(GlobalTrackPointTestDS, test_copy_constructor) {
   EXPECT_EQ(y, tp2.get_position().Y());
   EXPECT_EQ(z, tp2.get_position().Z());
   EXPECT_EQ(t, tp2.get_position().T());
-  EXPECT_EQ(sp, tp2.get_spacepoint());
+  EXPECT_EQ(sp_test, tp2.get_spacepoint());
 }
 
 TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
@@ -168,6 +170,7 @@ TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
   TLorentzVector pos(x, y, z, t);
 
   recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  TObject* sp_test = sp;
 
   recon::global::TrackPoint tp1;
   tp1.set_mapper_name(mapper_name);
@@ -183,7 +186,7 @@ TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
   EXPECT_EQ(y, tp2.get_position().Y());
   EXPECT_EQ(z, tp2.get_position().Z());
   EXPECT_EQ(t, tp2.get_position().T());
-  EXPECT_EQ(sp, tp2.get_spacepoint());
+  EXPECT_EQ(sp_test, tp2.get_spacepoint());
 }
 
 TEST_F(GlobalTrackPointTestDS, test_clone) {
@@ -198,6 +201,7 @@ TEST_F(GlobalTrackPointTestDS, test_clone) {
   TLorentzVector pos(x, y, z, t);
 
   recon::global::SpacePoint sp;
+  TObject* sp_test = &sp;
 
   recon::global::TrackPoint *tp1 =
       new recon::global::TrackPoint();
@@ -220,7 +224,10 @@ TEST_F(GlobalTrackPointTestDS, test_clone) {
   // spacepoint, rather than a direct copy.  Therefore, this test
   // confirms that they have different pointer values.  This may
   // change in the future.
-  EXPECT_NE(&sp, tp2->get_spacepoint());
+
+  // Changed 14/01/2013.
+  EXPECT_EQ(sp_test,
+            tp2->get_spacepoint());
 }
 
 } // ~namespace MAUS

@@ -54,15 +54,15 @@ TEST_F(GlobalTrackTestDS, test_getters_setters) {
   geometry_paths.push_back("Nowhere");
   geometry_paths.push_back("Somewhere");
 
-  GlobalTrackPointPArray trackpoints;
-  trackpoints.push_back(new GlobalTrackPoint());
-  trackpoints.push_back(new GlobalTrackPoint());
-  trackpoints.push_back(new GlobalTrackPoint());
+  TRefArray* trackpoints = new TRefArray();
+  int trackpoints_size = 3;
+  for(int i = 0; i < trackpoints_size; ++i)
+    trackpoints->Add(new GlobalTrackPoint());
   
-  GlobalTrackPArray constituent_tracks;
-  constituent_tracks.push_back(new GlobalTrack());
-  constituent_tracks.push_back(new GlobalTrack());
-  constituent_tracks.push_back(new GlobalTrack());
+  TRefArray* constituent_tracks = new TRefArray();
+  int constituent_tracks_size = 3;
+  for(int i = 0; i < constituent_tracks_size; ++i)
+    constituent_tracks->Add(new GlobalTrack());
   
   double goodness_of_fit = 7.0;
 
@@ -71,8 +71,8 @@ TEST_F(GlobalTrackTestDS, test_getters_setters) {
   track.set_charge(charge);
   track.set_detectorpoints(detectorpoints);
   track.set_geometry_paths(geometry_paths);
-  track.set_trackpoints(&trackpoints);
-  track.set_constituent_tracks(&constituent_tracks);
+  track.set_trackpoints(trackpoints);
+  track.set_constituent_tracks(constituent_tracks);
   track.set_goodness_of_fit(goodness_of_fit);
 
   EXPECT_EQ(mapper_name, track.get_mapper_name());
@@ -83,20 +83,21 @@ TEST_F(GlobalTrackTestDS, test_getters_setters) {
 
   // Check size and contents of geometry_paths
   ASSERT_EQ(geometry_paths.size(), track.get_geometry_paths().size());
-  for(unsigned int j = 0; j < geometry_paths.size(); ++j){
-    EXPECT_EQ(geometry_paths[j], track.get_geometry_paths()[j]);
+  for(size_t j = 0; j < geometry_paths.size(); ++j){
+    EXPECT_EQ(geometry_paths.at(j), track.get_geometry_paths().at(j));
   }
 
   // Check size and contents of trackpoints
-  ASSERT_EQ(trackpoints.size(), track.get_trackpoints()->size());
-  for(unsigned int j = 0; j < trackpoints.size(); ++j){
-    EXPECT_EQ(trackpoints[j], track.get_trackpoints()->at(j));
+  ASSERT_EQ(trackpoints_size, track.get_trackpoints()->GetEntries());
+  for(int j = 0; j < trackpoints_size; ++j){
+    EXPECT_EQ(trackpoints->At(j), track.get_trackpoints()->At(j));
   }
 
   // Check size and contents of constituent_tracks
-  ASSERT_EQ(constituent_tracks.size(), track.get_constituent_tracks()->size());
-  for(unsigned int j = 0; j < constituent_tracks.size(); ++j){
-    EXPECT_EQ(constituent_tracks[j], track.get_constituent_tracks()->at(j));
+  ASSERT_EQ(constituent_tracks_size,
+            track.get_constituent_tracks()->GetEntries());
+  for(int j = 0; j < constituent_tracks_size; ++j){
+    EXPECT_EQ(constituent_tracks->At(j), track.get_constituent_tracks()->At(j));
   }
 
 }
@@ -105,7 +106,7 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   GlobalTrack track;
 
   // Prepare some detector points and virtual paths
-  static const unsigned int kArraySize = 6;
+  static const size_t kArraySize = 6;
   double zArray[kArraySize] = { 0., 1., 2., 3., 4., 5. };
   
   recon::global::DetectorPoint dpArray[kArraySize] =
@@ -129,7 +130,7 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   // Make some track points
   GlobalTrackPoint* skipTP1 = NULL;
   GlobalTrackPoint* skipTP2 = NULL;
-  for(unsigned int i = 0; i < kArraySize; ++i){
+  for(size_t i = 0; i < kArraySize; ++i){
     GlobalTrackPoint* tp = new GlobalTrackPoint();
 
     // The other data members are fully tested by the TrackPoint
@@ -153,11 +154,16 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   track.RemoveTrackPoint(skipTP2);
   
   // Check the track points are correctly sorted
-  unsigned int kNewArraySize = kArraySize - 2;
-  ASSERT_EQ(kNewArraySize, track.get_trackpoints()->size());
-  for(unsigned int i = 0; i < kNewArraySize - 1; ++i){
-    EXPECT_LT(track.get_trackpoints()->at(i)->get_position().Z(),
-              track.get_trackpoints()->at(i+1)->get_position().Z());
+  int kNewArraySize = kArraySize - 2;
+  ASSERT_EQ(kNewArraySize, track.get_trackpoints()->GetEntries());
+  TIterator *tp_iter =
+      track.get_trackpoints()->MakeIterator();
+  MAUS::GlobalTrackPoint* tp1 = (MAUS::GlobalTrackPoint*) tp_iter->Next();
+  MAUS::GlobalTrackPoint* tp2 = NULL;
+  while((tp2 = tp1) && (tp1 = (MAUS::GlobalTrackPoint*) tp_iter->Next())) {
+    ASSERT_TRUE(tp1);
+    ASSERT_TRUE(tp2);
+    EXPECT_GT(tp1->get_position().Z(), tp2->get_position().Z());
   }
   
   // Check the detectorpoints are correctly set
@@ -216,15 +222,15 @@ TEST_F(GlobalTrackTestDS, test_ConstituentTrack_Access) {
 TEST_F(GlobalTrackTestDS, test_default_constructor) {
   GlobalTrack track;
 
-  unsigned int detectorpoints = 0;
+  size_t detectorpoints = 0;
   
   EXPECT_EQ("", track.get_mapper_name());
   EXPECT_EQ(MAUS::recon::global::kNoPID, track.get_pid());
   EXPECT_EQ(0, track.get_charge());
-  EXPECT_TRUE(track.get_trackpoints()->empty());
+  EXPECT_TRUE(track.get_trackpoints()->GetEntries() == 0);
   EXPECT_EQ(detectorpoints, track.get_detectorpoints());
   EXPECT_TRUE(track.get_geometry_paths().empty());
-  EXPECT_TRUE(track.get_constituent_tracks()->empty());
+  EXPECT_TRUE(track.get_constituent_tracks()->GetEntries() == 0);
   EXPECT_EQ(0., track.get_goodness_of_fit());
 }
 
@@ -242,7 +248,7 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
   tp1->set_mapper_name("tp1");
 
-  unsigned int detectorpoints = 2;
+  size_t detectorpoints = 2;
 
   std::vector<std::string> geometry_paths;
   std::string path0 = "Nowhere";
@@ -250,13 +256,9 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrackPArray constituent_tracks;
   GlobalTrack *conTrack0 = new GlobalTrack();
   GlobalTrack *conTrack1 = new GlobalTrack();
   GlobalTrack *conTrack2 = new GlobalTrack();
-  constituent_tracks.push_back(conTrack0);
-  constituent_tracks.push_back(conTrack1);
-  constituent_tracks.push_back(conTrack2);
 
   double goodness_of_fit = 7.0;
 
@@ -267,7 +269,9 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   track1->AddTrackPoint(tp1);
   track1->set_detectorpoints(detectorpoints);
   track1->set_geometry_paths(geometry_paths);
-  track1->set_constituent_tracks(&constituent_tracks);
+  track1->AddTrack(conTrack0);
+  track1->AddTrack(conTrack1);
+  track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
   GlobalTrack *track2 =
@@ -276,14 +280,14 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(mapper_name, track2->get_mapper_name());
   EXPECT_EQ(pid, track2->get_pid());
   EXPECT_EQ(charge, track2->get_charge());
-  EXPECT_EQ(tp0, track2->get_trackpoints()->at(0));
-  EXPECT_EQ(tp1, track2->get_trackpoints()->at(1));
+  EXPECT_EQ(tp0, track2->get_trackpoints()->At(0));
+  EXPECT_EQ(tp1, track2->get_trackpoints()->At(1));
   EXPECT_EQ(detectorpoints, track2->get_detectorpoints());
   EXPECT_EQ(path0, track2->get_geometry_paths()[0]);
   EXPECT_EQ(path1, track2->get_geometry_paths()[1]);
-  EXPECT_EQ(conTrack0, track2->get_constituent_tracks()->at(0));
-  EXPECT_EQ(conTrack1, track2->get_constituent_tracks()->at(1));
-  EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->at(2));
+  EXPECT_EQ(conTrack0, track2->get_constituent_tracks()->At(0));
+  EXPECT_EQ(conTrack1, track2->get_constituent_tracks()->At(1));
+  EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->At(2));
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
 }
 
@@ -297,9 +301,11 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   int charge = -1;
 
   MAUS::GlobalTrackPoint* tp0 = new MAUS::GlobalTrackPoint();
+  tp0->set_mapper_name("tp0");
   MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
+  tp1->set_mapper_name("tp1");
 
-  unsigned int detectorpoints = 2;
+  size_t detectorpoints = 2;
 
   std::vector<std::string> geometry_paths;
   std::string path0 = "Nowhere";
@@ -307,13 +313,9 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrackPArray constituent_tracks;
   GlobalTrack *conTrack0 = new GlobalTrack();
   GlobalTrack *conTrack1 = new GlobalTrack();
   GlobalTrack *conTrack2 = new GlobalTrack();
-  constituent_tracks.push_back(conTrack0);
-  constituent_tracks.push_back(conTrack1);
-  constituent_tracks.push_back(conTrack2);
 
   double goodness_of_fit = 7.0;
 
@@ -324,7 +326,9 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   track1->AddTrackPoint(tp1);
   track1->set_detectorpoints(detectorpoints);
   track1->set_geometry_paths(geometry_paths);
-  track1->set_constituent_tracks(&constituent_tracks);
+  track1->AddTrack(conTrack0);
+  track1->AddTrack(conTrack1);
+  track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
   GlobalTrack track2 = (*track1);
@@ -332,14 +336,14 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(mapper_name, track2.get_mapper_name());
   EXPECT_EQ(pid, track2.get_pid());
   EXPECT_EQ(charge, track2.get_charge());
-  EXPECT_EQ(tp0, track2.get_trackpoints()->at(0));
-  EXPECT_EQ(tp1, track2.get_trackpoints()->at(1));
+  EXPECT_EQ(tp0, track2.get_trackpoints()->At(0));
+  EXPECT_EQ(tp1, track2.get_trackpoints()->At(1));
   EXPECT_EQ(detectorpoints, track2.get_detectorpoints());
   EXPECT_EQ(path0, track2.get_geometry_paths()[0]);
   EXPECT_EQ(path1, track2.get_geometry_paths()[1]);
-  EXPECT_EQ(conTrack0, track2.get_constituent_tracks()->at(0));
-  EXPECT_EQ(conTrack1, track2.get_constituent_tracks()->at(1));
-  EXPECT_EQ(conTrack2, track2.get_constituent_tracks()->at(2));
+  EXPECT_EQ(conTrack0, track2.get_constituent_tracks()->At(0));
+  EXPECT_EQ(conTrack1, track2.get_constituent_tracks()->At(1));
+  EXPECT_EQ(conTrack2, track2.get_constituent_tracks()->At(2));
   EXPECT_EQ(goodness_of_fit, track2.get_goodness_of_fit());
 }
 
@@ -357,7 +361,7 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
   tp1->set_mapper_name("tp1");
 
-  unsigned int detectorpoints = 2;
+  size_t detectorpoints = 2;
 
   std::vector<std::string> geometry_paths;
   std::string path0 = "Nowhere";
@@ -365,13 +369,9 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrackPArray constituent_tracks;
   GlobalTrack *conTrack0 = new GlobalTrack();
   GlobalTrack *conTrack1 = new GlobalTrack();
   GlobalTrack *conTrack2 = new GlobalTrack();
-  constituent_tracks.push_back(conTrack0);
-  constituent_tracks.push_back(conTrack1);
-  constituent_tracks.push_back(conTrack2);
 
   double goodness_of_fit = 7.0;
 
@@ -382,7 +382,9 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   track1->AddTrackPoint(tp1);
   track1->set_detectorpoints(detectorpoints);
   track1->set_geometry_paths(geometry_paths);
-  track1->set_constituent_tracks(&constituent_tracks);
+  track1->AddTrack(conTrack0);
+  track1->AddTrack(conTrack1);
+  track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
   GlobalTrack *track2 = track1->Clone();
@@ -393,22 +395,27 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   EXPECT_EQ(mapper_name, track2->get_mapper_name());
   EXPECT_EQ(pid, track2->get_pid());
   EXPECT_EQ(charge, track2->get_charge());
-  ASSERT_EQ(2U, track2->get_trackpoints()->size());
+  ASSERT_EQ(2, track2->get_trackpoints()->GetEntries());
 
   // New cloned objects, but contents should be the same.
-  EXPECT_NE(tp0, track2->get_trackpoints()->at(0)); 
-  EXPECT_EQ("tp0", track2->get_trackpoints()->at(0)->get_mapper_name());
-  EXPECT_NE(tp1, track2->get_trackpoints()->at(1));
-  EXPECT_EQ("tp1", track2->get_trackpoints()->at(1)->get_mapper_name());
+  EXPECT_NE(tp0, track2->get_trackpoints()->At(0));
+  MAUS::GlobalTrackPoint* not_tp0 = (MAUS::GlobalTrackPoint*) track2->get_trackpoints()->At(0);
+  EXPECT_EQ("tp0", not_tp0->get_mapper_name());
+  EXPECT_NE(tp1, track2->get_trackpoints()->At(1));
+  MAUS::GlobalTrackPoint* not_tp1 = (MAUS::GlobalTrackPoint*) track2->get_trackpoints()->At(1);
+  EXPECT_EQ("tp1", not_tp1->get_mapper_name());
   
   EXPECT_EQ(detectorpoints, track2->get_detectorpoints());
+
   ASSERT_EQ(2U, track2->get_geometry_paths().size());
   EXPECT_EQ(path0, track2->get_geometry_paths()[0]);
   EXPECT_EQ(path1, track2->get_geometry_paths()[1]);
-  ASSERT_EQ(3U, track2->get_constituent_tracks()->size());
-  EXPECT_EQ(conTrack0, track2->get_constituent_tracks()->at(0));
-  EXPECT_EQ(conTrack1, track2->get_constituent_tracks()->at(1));
-  EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->at(2));
+
+  ASSERT_EQ(3, track2->get_constituent_tracks()->GetEntries());
+  EXPECT_EQ(conTrack0, track2->get_constituent_tracks()->At(0));
+  EXPECT_EQ(conTrack1, track2->get_constituent_tracks()->At(1));
+  EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->At(2));
+
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
 }
 

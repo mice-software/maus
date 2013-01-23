@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
@@ -27,23 +28,62 @@ class GlobalEventTestDS : public ::testing::Test {
   
   GlobalEventTestDS() {}
   virtual ~GlobalEventTestDS() {}
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    // Fill Cpp GlobalEvent
+    for(int i = 0; i < 4; ++i) {
+      _trackpoint.push_back(new MAUS::recon::global::TrackPoint());
+      _spacepoint.push_back(new MAUS::recon::global::SpacePoint());
+      _spacepoint[i]->set_charge(1. * i);
+      _trackpoint[i]->set_spacepoint(_spacepoint[i]);
+    }
+    
+    for(int i = 0; i < 2; ++i) {
+      _track.push_back(new MAUS::recon::global::Track());
+      _track[i]->AddTrackPoint(_trackpoint[2*i] );
+      _track[i]->AddTrackPoint(_trackpoint[2*i + 1]);
+    }
+    
+    _chain = new MAUS::recon::global::PrimaryChain();
+    _chain->AddPrimaryTrack(_track[0]);
+    _chain->AddTrack(_track[1], _track[0]);
+    
+    _event = new MAUS::GlobalEvent();
+    _event->add_primarychain_recursive(_chain);
+
+    local_chain = NULL;
+    local_track.resize(2);
+    local_trackpoint.resize(4);
+    local_spacepoint.resize(4);    
+  }
   virtual void TearDown() {}
+
+  MAUS::GlobalEvent *_event;
+  MAUS::recon::global::PrimaryChain* _chain;
+  std::vector<MAUS::recon::global::Track*> _track;
+  std::vector<MAUS::recon::global::TrackPoint*> _trackpoint;
+  std::vector<MAUS::recon::global::SpacePoint*> _spacepoint;
+  
+  MAUS::recon::global::PrimaryChain *local_chain;
+  std::vector<MAUS::recon::global::Track*> local_track;
+  std::vector<MAUS::recon::global::TrackPoint*> local_trackpoint;
+  std::vector<MAUS::recon::global::SpacePoint*> local_spacepoint;
+  
 };
 
-// all one function - urk
 TEST_F(GlobalEventTestDS, test_all_constructors) {
-  GlobalEvent*        global_event = new GlobalEvent();
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
-    
-  EXPECT_TRUE(global_event != NULL);
-  EXPECT_TRUE(global_chain != NULL);
-  EXPECT_TRUE(global_track != NULL);
-  EXPECT_TRUE(global_trackpoint != NULL);
-  EXPECT_TRUE(global_spacepoint != NULL);
+  EXPECT_TRUE(_event);
+  EXPECT_TRUE(_chain);
+
+  for(int i = 0; i < 2; ++i){
+    EXPECT_TRUE(_track[i]);
+  }
+  
+  for(int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(_trackpoint[i]);
+    EXPECT_TRUE(_spacepoint[i]);
+    double charge = _spacepoint[i]->get_charge();
+    EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
+  }
 }
 
 TEST_F(GlobalEventTestDS, test_all_allocators) {
@@ -229,6 +269,37 @@ TEST_F(GlobalEventTestDS, test_null_copy) {
 
   ASSERT_TRUE(event_equal.get_spacepoints());
   EXPECT_EQ(event_equal.get_spacepoints()->size(), 0U);
+}
+
+TEST_F(GlobalEventTestDS, test_recursive_add) {
+  GlobalEvent event;
+
+  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
+  GlobalTrack*        global_track = new GlobalTrack();
+  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
+  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+
+  global_trackpoint->set_spacepoint(global_spacepoint);
+  global_track->AddTrackPoint(global_trackpoint);
+  global_chain->AddPrimaryTrack(global_track);
+
+  event.add_primarychain_recursive(global_chain);
+  
+  ASSERT_TRUE(event.get_primarychains());
+  EXPECT_EQ(event.get_primarychains()->size(), 1U);
+  EXPECT_EQ(event.get_primarychains()->at(0), global_chain);
+
+  ASSERT_TRUE(event.get_tracks());
+  EXPECT_EQ(event.get_tracks()->size(), 1U);
+  EXPECT_EQ(event.get_tracks()->at(0), global_track);
+
+  ASSERT_TRUE(event.get_trackpoints());
+  EXPECT_EQ(event.get_trackpoints()->size(), 1U);
+  EXPECT_EQ(event.get_trackpoints()->at(0), global_trackpoint);
+
+  ASSERT_TRUE(event.get_spacepoints());
+  EXPECT_EQ(event.get_spacepoints()->size(), 1U);
+  EXPECT_EQ(event.get_spacepoints()->at(0), global_spacepoint);
 }
 
 }
