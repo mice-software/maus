@@ -22,6 +22,9 @@
 #include <string>
 #include <vector>
 
+#include <TRef.h>
+#include <TRefArray.h>
+
 #include "json/value.h"
 
 namespace MAUS {
@@ -88,6 +91,53 @@ class FullyTypedResolver : public Resolver {
     ParentType* _ref_cpp_parent;
 };
 
+/** @class TRefResolver
+ *
+ *  Converts a Json pointer to a C++ pointer
+ *
+ *  @tparam ParentType type of object that holds the pointer
+ *  @tparam ChildType type of object pointed to 
+ */
+template <class ParentType, class ChildType>
+class TRefResolver : public Resolver {
+  public:
+    /** SetMethod function pointer for setting the C++ pointer during
+     *  dereference operation
+     */
+    typedef void (ParentType::*SetMethod)(TRef value);
+
+    /** Constructor
+     *
+     *  @param ref_json_address path to the json pointer-by-value (i.e. actual
+     *  data in the json tree. This is stored in the "$ref" field of the json
+     *  pointer-by-reference
+     *  @param ref_cpp_set_func SetMethod that is used to set the C++ pointer
+     *  @param ref_cpp_parent C++ object that will store the C++ pointer.
+     */
+    TRefResolver(std::string ref_json_address,
+                 SetMethod ref_cpp_set_func,
+                 ParentType* ref_cpp_parent);
+
+    /** Destructor does nothing */
+    ~TRefResolver() {}
+
+    /** Resolve this reference
+     *
+     *  Lookup the json address on the RefManager; call SetMethod to allocate
+     *  the resultant C++ pointer to the parent object.
+     *
+     *  Note that as we store the addresses of C++ objects, deep copy of the C++
+     *  data is not allowed during processing of the data tree until after we
+     *  have called ResolveReferences (otherwise reference resolution will fail)
+     */
+    void ResolveReferences();
+
+  private:
+    SetMethod _cpp_setter;
+    std::string _ref_json_address;
+    ParentType* _ref_cpp_parent;
+};
+
 /** @class VectorResolver
  *
  *  Converts a Json pointer to a C++ pointer in an array (std::vector)
@@ -126,6 +176,45 @@ class VectorResolver : public Resolver {
     std::string _ref_json_address;
     std::vector<ChildType*>* _vector;
     size_t _index;
+};
+
+/** @class TRefArrayResolver
+ *
+ *  Converts a Json pointer to a C++ pointer stored in a TRefArray
+ *
+ *  @tparam ChildType type of object pointed to;
+ */
+template <class ChildType>
+class TRefArrayResolver : public Resolver {
+ public:
+  /** Constructor
+   *
+   *  @param ref_json_address Address of json object
+   *  @param tref_array The TRefArray holding child data
+   *  @param vector_index Location in the vector holding child data
+   */
+  TRefArrayResolver(std::string ref_json_address,
+                    TRefArray* tref_array,
+                    size_t vector_index);
+
+  /** Destructor - does nothing */
+  ~TRefArrayResolver() {}
+
+  /** Resolve this reference
+   *
+   *  Lookup the json address on the RefManager; call vector subscript
+   *  operator to allocate the resultant C++ pointer to the parent object.
+   *
+   *  Note that as we store the addresses of C++ objects, deep copy of the C++
+   *  data is not allowed during processing of the data tree until after we
+   *  have called ResolveReferences (otherwise reference resolution will fail)
+   */
+  void ResolveReferences();
+
+ private:
+  std::string _ref_json_address;
+  TRefArray* _tref_array;
+  size_t _index;
 };
 
 class RefManager {

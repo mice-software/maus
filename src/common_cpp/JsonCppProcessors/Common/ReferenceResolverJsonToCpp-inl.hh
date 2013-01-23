@@ -52,6 +52,27 @@ void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
               "ReferenceResolver::FullyTypedResolver::ResolveReferences"));
 }
 
+template <class ParentType, class ChildType>
+TRefResolver<ParentType, ChildType>::TRefResolver(
+      std::string ref_json_address,
+      TRefResolver<ParentType, ChildType>::SetMethod cpp_setter,
+      ParentType* ref_cpp_parent)
+  : _cpp_setter(cpp_setter), _ref_json_address(ref_json_address),
+    _ref_cpp_parent(ref_cpp_parent) {
+}
+
+template <class ParentType, class ChildType>
+void TRefResolver<ParentType, ChildType>::ResolveReferences() {
+    ChildType* data_address = RefManager::GetInstance().
+                                GetPointerAsValue<ChildType>(_ref_json_address);
+    (*_ref_cpp_parent.*_cpp_setter)(TRef(data_address));
+    if (data_address == NULL)
+        throw(Squeal(Squeal::recoverable,
+              "Failed to resolve reference at "+_ref_json_address+
+              " on C++ object "+STLUtils::ToString(_ref_cpp_parent),
+              "ReferenceResolver::TRefResolver::ResolveReferences"));
+}
+
 ////////////////////////////////////////////////////////////////
 
 template <class ChildType>
@@ -81,6 +102,39 @@ void VectorResolver<ChildType>::ResolveReferences() {
               STLUtils::ToString(_index),
               "ReferenceResolver::VectorResolver::ResolveReferences"));
   }
+
+////////////////////////////////////////////////////////////////
+
+template <class ChildType>
+TRefArrayResolver<ChildType>::TRefArrayResolver(
+    std::string ref_json_address,
+    TRefArray* tref_array,
+    size_t vector_index)
+    : _ref_json_address(ref_json_address),
+      _tref_array(tref_array),
+      _index(vector_index) {
+}
+
+template <class ChildType>
+void TRefArrayResolver<ChildType>::ResolveReferences() {
+  if (_tref_array == NULL)
+    return;
+  if ((int)_index > _tref_array->GetSize())
+    throw(Squeal(Squeal::recoverable,
+                 "Index out of range while resolving pointer to array "+
+                 _ref_json_address,
+                 "ReferenceResolver::TRefArrayResolver::ResolveReferences"));
+  ChildType* data_address = RefManager::GetInstance().
+      GetPointerAsValue<ChildType>(_ref_json_address);
+  if (data_address == NULL)
+    throw(Squeal(Squeal::recoverable,
+                 "Failed to resolve reference at "+_ref_json_address+
+                 " on TRefArray element "+
+                 STLUtils::ToString(_index),
+                 "ReferenceResolver::TRefArrayResolver::ResolveReferences"));
+  _tref_array->AddAt(data_address, _index);
+  data_address->ls();
+}
 
 //////////////////////////////////////////////////////////////////
 
