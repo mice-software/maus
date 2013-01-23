@@ -86,8 +86,9 @@ TrackPoint* TrackPoint::Clone() {
   // or copy it?  I am cloning for now, but I don't think we are
   // expecting to change the spacepoint (it is just for book-keeping),
   // so a copy is probably better.
-  if(this->get_spacepoint())
-    tpNew->set_spacepoint(this->get_spacepoint()->Clone());
+
+  // Changed my mind, not cloning...  Need to think about this A LOT MORE!
+  tpNew->set_spacepoint(this->get_spacepoint());
 
   return tpNew;
 }

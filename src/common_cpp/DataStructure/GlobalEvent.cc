@@ -107,26 +107,30 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
 
 GlobalEvent::~GlobalEvent() {
   if (_primarychains != NULL) {
-    for(size_t i = 0; i < _primarychains->size(); ++i)
+    for(size_t i = 0; i < _primarychains->size(); ++i){
       delete _primarychains->at(i);
+    }
     delete _primarychains;
   }
 
   if (_tracks != NULL) {
-    for(size_t i = 0; i < _tracks->size(); ++i)
+    for(size_t i = 0; i < _tracks->size(); ++i){
       delete _tracks->at(i);
+    }
     delete _tracks;
   }
 
   if (_trackpoints != NULL) {
-    for(size_t i = 0; i < _trackpoints->size(); ++i)
+    for(size_t i = 0; i < _trackpoints->size(); ++i){
       delete _trackpoints->at(i);
+    }
     delete _trackpoints;
   }
 
   if (_spacepoints != NULL) {
-    for(size_t i = 0; i < _spacepoints->size(); ++i)
+    for(size_t i = 0; i < _spacepoints->size(); ++i){
       delete _spacepoints->at(i);
+    }
     delete _spacepoints;
   }
   
@@ -140,7 +144,7 @@ bool GlobalEvent::add_primarychain_check(MAUS::GlobalPrimaryChain* pchain) {
   
   bool exists = (pc_iter != _primarychains->end());
   if(!exists)
-    _primarychains->push_back(pchain);
+    add_primarychain(pchain);
 
   return exists;
 }
@@ -152,11 +156,14 @@ void GlobalEvent::add_primarychain_recursive(MAUS::GlobalPrimaryChain* pchain) {
   // If the chain had been added, then we will loop over the tracks
   // and add them too.
   if(!already_added) {
-    MAUS::GlobalTrackPArray::iterator iter_track;
-    MAUS::GlobalTrackPArray *ctracks = pchain->get_tracks();
-    for(iter_track = ctracks->begin();
-        iter_track != ctracks->end(); ++iter_track){
-      add_track_recursive(*iter_track);
+    std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter_track;
+    std::vector<MAUS::recon::global::TRefTrackPair*> *track_pair
+        = pchain->get_track_parent_pairs();
+    MAUS::GlobalTrack* track = NULL;
+    for(iter_track = track_pair->begin();
+        iter_track != track_pair->end(); ++iter_track){
+      track = (*iter_track)->GetTrack();
+      add_track_recursive(track);
     }
   }
 }
@@ -169,7 +176,7 @@ bool GlobalEvent::add_track_check(MAUS::GlobalTrack* track) {
   
   bool exists = (track_iter != _tracks->end());
   if(!exists)
-    _tracks->push_back(track);
+    add_track(track);
 
   return exists;
 }
@@ -182,19 +189,19 @@ void GlobalEvent::add_track_recursive(MAUS::GlobalTrack* track) {
   // constituent tracks and trackpoints, adding them too.
   if(!already_added) {
     // Constituent Tracks
-    MAUS::GlobalTrackPArray::iterator iter_track;
-    MAUS::GlobalTrackPArray *ctracks = track->get_constituent_tracks();
-    for(iter_track = ctracks->begin();
-        iter_track != ctracks->end(); ++iter_track){
-      add_track_recursive(*iter_track);
+    MAUS::GlobalTrack* ct = NULL;
+    for(int i = 0; i < track->get_constituent_tracks()->GetLast() + 1; ++i) {
+      ct = (MAUS::GlobalTrack*) track->get_constituent_tracks()->At(i);
+      if(!ct) continue;
+      add_track_recursive(ct);
     }
 
     // TrackPoints
-    MAUS::GlobalTrackPointPArray::const_iterator iter_tp;
-    MAUS::GlobalTrackPointPArray *trackpoints = track->get_trackpoints();
-    for(iter_tp = trackpoints->begin();
-        iter_tp != trackpoints->end(); ++iter_tp){
-      add_trackpoint_recursive(*iter_tp);
+    MAUS::GlobalTrackPoint* tp = NULL;
+    for(int i = 0; i < track->get_trackpoints()->GetLast() + 1; ++i) {
+      tp = (MAUS::GlobalTrackPoint*) track->get_trackpoints()->At(i);
+      if(!tp) continue;
+      add_trackpoint_recursive(tp);
     }
   }
 }
@@ -207,7 +214,7 @@ bool GlobalEvent::add_trackpoint_check(MAUS::GlobalTrackPoint* trackpoint) {
   
   bool exists = (trackpoint_iter != _trackpoints->end());
   if(!exists)
-    _trackpoints->push_back(trackpoint);
+    add_trackpoint(trackpoint);
 
   return exists;
 }
@@ -238,7 +245,7 @@ bool GlobalEvent::add_spacepoint_check(MAUS::GlobalSpacePoint* spacepoint) {
   }
   
   if(!exists)
-    _spacepoints->push_back(spacepoint);
+    add_spacepoint(spacepoint);
 
   return exists;
 }

@@ -30,34 +30,48 @@ namespace global {
 // Default constructor
 PrimaryChain::PrimaryChain()
     : _mapper_name(""),
-      _tracks(),
+      _tracks(new std::vector<MAUS::recon::global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
 }
 
 // Copy contructor
 PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
     : _mapper_name(""),
-      _tracks(primary_chain.get_tracks_tref()),
-      _goodness_of_fit(primary_chain.get_goodness_of_fit()) {}
+      _goodness_of_fit(primary_chain._goodness_of_fit) {
+  _tracks = new std::vector<MAUS::recon::global::TRefTrackPair*>();
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = primary_chain._tracks->begin();
+      iter < primary_chain._tracks->end(); iter++){
+    _tracks->push_back(new MAUS::recon::global::TRefTrackPair(**iter));
+  }
+}
 
 // Constructor setting #_mapper_name
 PrimaryChain::PrimaryChain(std::string mapper_name)
     : _mapper_name(mapper_name),
-      _tracks(),
+      _tracks(new std::vector<MAUS::recon::global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
 }
 
 // Destructor
-PrimaryChain::~PrimaryChain() {}
+PrimaryChain::~PrimaryChain() {
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++)
+    delete *iter;
+}
 
 // Assignment operator
 PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
   if (this == &primary_chain) {
     return *this;
   }
-  _mapper_name        = primary_chain.get_mapper_name();
-  _tracks             = primary_chain.get_tracks_tref();
-  _goodness_of_fit    = primary_chain.get_goodness_of_fit();
+  _mapper_name        = primary_chain._mapper_name;
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = primary_chain._tracks->begin();
+      iter < primary_chain._tracks->end(); iter++){
+    _tracks->push_back(new MAUS::recon::global::TRefTrackPair(**iter));
+  }
+  _goodness_of_fit    = primary_chain._goodness_of_fit;
   
   return *this;
 }
@@ -68,27 +82,29 @@ PrimaryChain* PrimaryChain::Clone() const {
   MAUS::GlobalPrimaryChain* primaryChainNew =
       new MAUS::GlobalPrimaryChain(_mapper_name);
 
-  MAUS::recon::global::Track* track;
-  MAUS::recon::global::Track* parent;
+  MAUS::recon::global::Track *track;
+  MAUS::recon::global::Track *parent;
+  // MAUS::recon::global::Track const *track;
+  // MAUS::recon::global::Track const *parent;
 
   // First, we loop through all of the tracks, cloning each, and
   // placing the clones in a temporary map...
-  std::map<MAUS::recon::global::Track*,
+  std::map<const MAUS::recon::global::Track*,
            MAUS::recon::global::Track*> tempMap;
-  for(size_t i = 0; i < _tracks.size(); i++) {
-    track = (MAUS::recon::global::Track*) _tracks.at(i).first.GetObject();
+  for(size_t i = 0; i < _tracks->size(); i++) {
+    track = _tracks->at(i)->GetTrack();
     tempMap[track] = track->Clone();
   }
 
   // Second, we loop through again.  Clones are added to the new
   // PrimaryChain, either as Primaries or with the appropriate
   // Clone...
-  for(size_t i = 0; i < _tracks.size(); i++) {
-    track = (MAUS::recon::global::Track*) _tracks.at(i).first.GetObject();
-    if(!_tracks.at(i).second.IsValid())
+  for(size_t i = 0; i < _tracks->size(); i++) {
+    track = _tracks->at(i)->GetTrack();
+    if(!_tracks->at(i)->second.IsValid())
       primaryChainNew->AddPrimaryTrack(tempMap[track]);
     else {
-      parent = (MAUS::recon::global::Track*) _tracks.at(i).second.GetObject();
+      parent = _tracks->at(i)->GetParent();
       primaryChainNew->AddTrack(tempMap[track],
                                 tempMap[parent]);
     }
@@ -114,8 +130,8 @@ bool PrimaryChain::AddTrack(MAUS::GlobalTrack* track,
   
   // Check parent is already in the _track vector.
   bool found = false;
-  for(size_t i = 0; i < _tracks.size(); i++) {
-    if(_tracks.at(i).first.GetObject() == parent) {
+  for(size_t i = 0; i < _tracks->size(); i++) {
+    if(_tracks->at(i)->GetTrack() == parent) {
       found = true;
       break;
     }
@@ -129,7 +145,9 @@ bool PrimaryChain::AddTrack(MAUS::GlobalTrack* track,
   }
 
   // Add the track with parent
-  _tracks.push_back(std::make_pair(track, parent));
+  MAUS::recon::global::TRefTrackPair* newPair =
+      new MAUS::recon::global::TRefTrackPair(track, parent);
+  _tracks->push_back(newPair);
   return true;
 }
 
@@ -142,15 +160,17 @@ bool PrimaryChain::AddPrimaryTrack(MAUS::GlobalTrack* track) {
   }
   
   // Add the track with a NULL parent
-  _tracks.push_back(std::make_pair(track, TRef(NULL)));
+  MAUS::recon::global::TRefTrackPair* newPair =
+      new MAUS::recon::global::TRefTrackPair(track, NULL);
+  _tracks->push_back(newPair);
   return true;
 }
 
 bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
   // Check track is in the container
   bool in_tracks = false;
-  for(size_t i = 0; i < _tracks.size(); i++) {
-    if(_tracks.at(i).first.GetObject() == track) {
+  for(size_t i = 0; i < _tracks->size(); i++) {
+    if(_tracks->at(i)->GetTrack() == track) {
       in_tracks = true;
       break;
     }
@@ -166,8 +186,8 @@ bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
 
   // If target is parent of other track, prevent removal
   bool is_parent = false;
-  for(size_t i = 0; i < _tracks.size(); i++) {
-    if(_tracks.at(i).second.GetObject() == track) {
+  for(size_t i = 0; i < _tracks->size(); i++) {
+    if(_tracks->at(i)->GetParent() == track) {
       is_parent = true;
       break;
     }
@@ -182,10 +202,10 @@ bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
   }
 
   // Remove the pair
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->first.GetObject() == track) {
-      _tracks.erase(index);
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetTrack() == track) {
+      _tracks->erase(iter);
       break;
     }
   }
@@ -195,9 +215,9 @@ bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
 
 bool PrimaryChain::HasTrack(MAUS::GlobalTrack* track) {
   // Find track in vector
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->first.GetObject() == track) {
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetTrack() == track) {
       return true;
     }
   }
@@ -206,9 +226,9 @@ bool PrimaryChain::HasTrack(MAUS::GlobalTrack* track) {
 
 bool PrimaryChain::HasTrackAsParent(MAUS::GlobalTrack* parent) {
   // Find track as parent vector
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->second.GetObject() == parent) {
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetParent() == parent) {
       return true;
     }
   }
@@ -217,10 +237,10 @@ bool PrimaryChain::HasTrackAsParent(MAUS::GlobalTrack* parent) {
 
 bool PrimaryChain::IsPrimaryTrack(MAUS::GlobalTrack* track) {
   // Find track in vector
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->first.GetObject() == track) {
-      return !(index->second.IsValid());
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetTrack() == track) {
+      return !((*iter)->second.IsValid());
     }
   }
   return false;
@@ -228,10 +248,10 @@ bool PrimaryChain::IsPrimaryTrack(MAUS::GlobalTrack* track) {
 
 MAUS::GlobalTrack* PrimaryChain::GetTrackParent(MAUS::GlobalTrack* track) {
   // Find track, and return parent
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->first.GetObject() == track) {
-      return (MAUS::GlobalTrack*) index->second.GetObject();
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetTrack() == track) {
+      return (*iter)->GetParent();
     }
   }
   return NULL;
@@ -242,10 +262,10 @@ PrimaryChain::GetTrackDaughters(MAUS::GlobalTrack* track) {
   std::vector<MAUS::GlobalTrack*> result;
 
   // Find all tracks with this track as a parent
-  std::vector<std::pair<TRef, TRef> >::iterator index;
-  for(index = _tracks.begin(); index < _tracks.end(); index++) {
-    if(index->second.GetObject() == track) {
-      result.push_back((MAUS::GlobalTrack*) index->first.GetObject());
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->GetParent() == track) {
+      result.push_back((*iter)->GetTrack());
     }
   }
 
@@ -253,7 +273,10 @@ PrimaryChain::GetTrackDaughters(MAUS::GlobalTrack* track) {
 }
   
 void PrimaryChain::ClearTracks() {
-  _tracks.clear();
+  std::vector<MAUS::recon::global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++)
+    delete *iter;
+  _tracks->clear();
 }
 
 } // ~namespace global

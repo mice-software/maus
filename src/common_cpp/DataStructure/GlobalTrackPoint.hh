@@ -173,15 +173,26 @@ class TrackPoint : public TObject{
 
   /// Set the component MAUS::recon::global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
+  void set_spacepoint_tref(TRef spacepoint) {
+    _spacepoint = spacepoint;
+  }
+  /// Get the component MAUS::recon::global::SpacePoint, the detector
+  /// measurement matching this reconstructed position.
+  TRef get_spacepoint_tref() const {
+    return _spacepoint;
+  }
+
+  /// Set the component MAUS::recon::global::SpacePoint, the detector
+  /// measurement matching this reconstructed position.
   void set_spacepoint(MAUS::recon::global::SpacePoint* spacepoint) {
     _spacepoint = spacepoint;
-    _spacepoint.ls();
   }
+
   /// Get the component MAUS::recon::global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   MAUS::recon::global::SpacePoint* get_spacepoint() const {
     MAUS::recon::global::SpacePoint* spacepoint =
-        static_cast<MAUS::recon::global::SpacePoint*>(_spacepoint.GetObject());
+        (MAUS::recon::global::SpacePoint*) _spacepoint.GetObject();
     return spacepoint;
   }
 
