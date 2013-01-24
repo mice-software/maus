@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTrackerRecon 
+/** @class MapCppTrackerReconTest
  *  Digitize events by running Tracker electronics simulation.
  *
  */
@@ -41,18 +41,17 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
-// #include "src/common_cpp/Recon/SciFi/SciFiChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 
@@ -75,7 +74,7 @@ class MapCppTrackerReconTest {
    *
    *  Receive a document with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
-   * 
+   *
    * \param document a line/spill from the JSON input
    */
   std::string process(std::string document);
@@ -95,14 +94,12 @@ class MapCppTrackerReconTest {
   /** Performs the pattern recogniton
    *
    *  Pattern Recogntion identifies which spacepoints are associate with particle tracks,
-   *  then fits functions to the tracks using simple least squared fitting 
+   *  then fits functions to the tracks using simple least squared fitting
    *
    *  \param evt the current SciFiEvent
    */
   void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                            MAUS::SciFiEvent &evt);
-
-  // void make_seed_and_fit(MAUS::SciFiEvent &event);
 
   /** Performs the final track fit
    *
@@ -159,6 +156,7 @@ class MapCppTrackerReconTest {
   bool _straight_pr_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
+
   /// File streams for writing data
   ofstream _of1, _of2, _of3, _of4, _of5, _of6;
   /// The cut used to determine if a spacepoint partners a virtual hit (mm)
