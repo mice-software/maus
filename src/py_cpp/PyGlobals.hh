@@ -59,6 +59,10 @@ PyObject* HasInstance(PyObject *dummy, PyObject *args);
  * Returns NULL if Globals were not initialised
  */
 PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args);
+
+/* @brief Get the MAUS version number as a Python string like x.y.z
+ */
+PyObject* GetVersionNumber(PyObject *dummy, PyObject *args);
 }  // namespace PyGlobals
 }  // namespace MAUS
 
