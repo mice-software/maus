@@ -20,10 +20,8 @@
 // C++ headers
 #include <vector>
 
-// ROOT headers
-#include "Rtypes.h"
-
 // MAUS Headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -105,7 +103,7 @@ class SciFiDigit {
 
     bool _used;
 
-    ClassDef(SciFiDigit, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiDigit)
 };
 
 typedef std::vector<SciFiDigit*> SciFiDigitPArray;

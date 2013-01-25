@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/V1290.hh"
 
@@ -62,7 +62,7 @@ class Unknown {
   private:
     V1290Array _V1290;
 
-    ClassDef(Unknown, 1)
+    MAUS_VERSIONED_CLASS_DEF(Unknown)
 };
 }
 
