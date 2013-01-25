@@ -420,7 +420,8 @@ class FileManager: # pylint: disable = R0902
                 os.remove(self.tar_file_name)
             tar_file = tarfile.open(self.tar_file_name, 'w:gz')
             for item in self.tar_queue:
-                if os.path.isfile(self.tar_file_name):         
+                if os.path.isfile(self.tar_file_name):
+                    print "Adding", item, "to tar file"         
                     tar_file.add(item)
             tar_file.close()
             for item in self.tar_queue:

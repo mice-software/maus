@@ -26,10 +26,8 @@
 // C++ headers
 #include <vector>
 
-// ROOT headers
-#include "Rtypes.h"
-
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -129,7 +127,7 @@ class SciFiCluster {
 
   ThreeVector _direction, _position;
 
-  ClassDef(SciFiCluster, 1)
+  MAUS_VERSIONED_CLASS_DEF(SciFiCluster)
 }; // Don't forget this trailing colon!!!!
 
 typedef std::vector<SciFiCluster*> SciFiClusterPArray;

@@ -19,8 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/DateTime.hh"
 
 namespace Json {
@@ -114,7 +113,7 @@ class JobHeader {
     std::string _maus_version_number;
     std::string _json_configuration;
 
-    ClassDef(JobHeader, 1)
+    MAUS_VERSIONED_CLASS_DEF(JobHeader)
 };
 }
 

@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 
-#include "Rtypes.h"
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 /** Stub class for EMR data on the spill level
@@ -33,8 +33,7 @@ class EMRSpillData {
   virtual ~EMRSpillData();
 
  private:
-
-  ClassDef(EMRSpillData, 1)
+  MAUS_VERSIONED_CLASS_DEF(EMRSpillData)
 };
 }
 

@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CKOVB_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CKOVB_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -170,7 +170,7 @@ class CkovB {
     int _position_min_5;
     int _position_min_4;
 
-    ClassDef(CkovB, 1)
+    MAUS_VERSIONED_CLASS_DEF(CkovB)
 };
 }
 

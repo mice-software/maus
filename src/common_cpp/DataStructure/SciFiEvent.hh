@@ -20,10 +20,8 @@
 // C++ headers
 #include <vector>
 
-// ROOT headers
-#include "Rtypes.h"
-
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -104,7 +102,7 @@ class SciFiEvent {
     /** Helical tracks */
     SciFiHelicalPRTrackArray            _scifihelicalprtracks;
 
-    ClassDef(SciFiEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiEvent)
 };
 
 typedef std::vector<SciFiEvent*> SciFiEventPArray;

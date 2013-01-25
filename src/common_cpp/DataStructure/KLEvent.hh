@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -42,7 +42,7 @@ class KLEvent {
 
   private:
 
-    ClassDef(KLEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(KLEvent)
 };
 }
 

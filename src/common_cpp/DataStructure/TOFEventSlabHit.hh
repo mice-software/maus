@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/TOFSlabHit.hh"
 
@@ -92,7 +92,7 @@ class TOFEventSlabHit {
     TOF0SlabHitArray _tof0;
     TOF2SlabHitArray _tof2;
 
-    ClassDef(TOFEventSlabHit, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFEventSlabHit)
 };
 }
 

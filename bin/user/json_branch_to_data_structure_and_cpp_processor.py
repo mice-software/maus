@@ -174,7 +174,7 @@ class DataStructureDeclaration:
                 if array_el.is_class:
                     class_file = os.path.join(DATA_DIR, array_el.type+'.hh')
                     includes['#include "'+class_file+'"'] = 1
-        includes['#include "Rtypes.h"  // ROOT'] = 1
+        includes['#include "src/common_cpp/VersionNumber.hh"'] = 1
         return '\n'.join(includes)
 
     def typedefs(self):
@@ -205,7 +205,7 @@ class DataStructureDeclaration:
         return top_matter
 
     def bottom_matter(self):
-        bottom_matter = "\n    ClassDef("+self.class_name+", 1)\n"
+        bottom_matter = "\n    MAUS_VERSIONED_CLASS_DEF("+self.class_name+")\n"
         bottom_matter += "};\n}\n\n#endif  // "+self.ifdef+"\n"
         return bottom_matter
 

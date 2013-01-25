@@ -19,8 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/V1731.hh"
 
 namespace MAUS {
@@ -62,7 +61,7 @@ class CkovDaq {
   private:
     V1731Array _V1731;
 
-    ClassDef(CkovDaq, 1)
+    MAUS_VERSIONED_CLASS_DEF(CkovDaq)
 };
 }
 

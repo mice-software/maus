@@ -19,8 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/TestChild.hh"
 
 namespace MAUS {
@@ -80,7 +79,7 @@ class TestBranch {
   TestChild* _child_by_value;
   std::vector<TestChild*>* _test_pointer_array;
 
-  ClassDef(TestBranch, 1)
+  MAUS_VERSIONED_CLASS_DEF(TestBranch)
 };
 }
 

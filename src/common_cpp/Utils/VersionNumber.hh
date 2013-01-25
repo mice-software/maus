@@ -15,6 +15,8 @@
  *
  */
 
+#include "Rtypes.h"
+
 // Don't use macros / #define! I have to use it here to tie it into the ROOT
 // ClassDef macro (issue #1188).
 // version number is x.y.z, encoded as a single int as xxxyyyzzz where each of
@@ -23,6 +25,13 @@
 #define MAUS_VERSION_NUMBER_X 000
 #define MAUS_VERSION_NUMBER_Y 004
 #define MAUS_VERSION_NUMBER_Z 002
-#define MAUS_VERSION_NUMBER MAUS_VERSION_NUMBER_XMAUS_VERSION_NUMBER_YMAUS_VERSION_NUMBER_Z
+#define MAUS_VERSION_NUMBER() \
+        (MAUS_VERSION_NUMBER_X*1000000+\
+        MAUS_VERSION_NUMBER_Y*1000+\
+        MAUS_VERSION_NUMBER_Z)
+
+// Macro wrapper for ClassDef
+#define MAUS_VERSIONED_CLASS_DEF(Class) ClassDef(Class, MAUS_VERSION_NUMBER());
+
 #endif
 
