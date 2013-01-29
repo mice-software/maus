@@ -32,6 +32,7 @@
 
 // MAUS
 #include "Recon/Global/Detector.hh"
+#include "Recon/Global/Particle.hh"
 #include "Recon/Global/Track.hh"
 #include "Recon/Global/TrackPoint.hh"
 
@@ -85,6 +86,7 @@ class MapCppGlobalRawTracks {
 
  private:
   Json::Value configuration_;
+  int beam_polarity_;
 
   Json::Value run_data_;
   std::vector<MAUS::recon::global::Track> tracks_;
@@ -116,6 +118,8 @@ class MapCppGlobalRawTracks {
     const std::string branch_name,
     const std::map<MAUS::recon::global::Detector::ID,
                    MAUS::recon::global::Detector> & detectors);
+  recon::global::Particle::ID IdentifyParticle(const double beta);
+  double Beta(recon::global::Particle::ID pid, const double momentum);
 
   static CovarianceMatrix const GetJsonCovarianceMatrix(
       Json::Value const & value);

@@ -48,6 +48,9 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor()
     RegisterValueBranch("chi2", &_double_proc,
                         &SciFiSpacePoint::get_chi2,
                         &SciFiSpacePoint::set_chi2, true);
+    RegisterValueBranch("time", &_double_proc,
+                        &SciFiSpacePoint::get_time,
+                        &SciFiSpacePoint::set_time, true);
 
     RegisterValueBranch("position", &_three_vec_proc,
                         &SciFiSpacePoint::get_position,

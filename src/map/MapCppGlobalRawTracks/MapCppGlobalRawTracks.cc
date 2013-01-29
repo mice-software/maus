@@ -21,12 +21,14 @@
 
 // C++
 #include <algorithm>
+#include <cmath>
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 // External
 #include "TMinuit.h"
+#include "CLHEP/Random/RandGauss.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "json/json.h"
 
@@ -35,13 +37,15 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/JsonCppProcessors/SciFiHelicalPRTrackProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TOFEventSpacePointProcessor.hh"
-#include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiSpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TOFEventSpacePointProcessor.hh"
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Recon/Global/Detector.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Recon/Global/Track.hh"
@@ -78,6 +82,27 @@ bool MapCppGlobalRawTracks::birth(std::string configuration) {
     return false;
   }
 
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  switch (reference_pgparticle.pid) {
+    case Particle::kEPlus:
+    case Particle::kMuPlus:
+    case Particle::kPiPlus:
+      beam_polarity_ = 1;
+      break;
+    case Particle::kEMinus:
+    case Particle::kMuMinus:
+    case Particle::kPiMinus:
+      beam_polarity_ = -1;
+      break;
+    default:
+      throw(Squeal(Squeal::nonRecoverable,
+                   "Reference particle is not a pion+/-, muon+/-, or e+/-.",
+                   "MapCppGlobalRawTracks::process()"));
+
+  }
+
   return true;  // Sucessful parsing
 }
 
@@ -86,15 +111,15 @@ std::string MapCppGlobalRawTracks::process(std::string run_data) {
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
 
-    // Populate ReconstructionInput instance from JSON data
-    Json::Value data_acquisition_mode_names = JsonWrapper::GetProperty(
-        configuration_,
-        "data_acquisition_modes",
-        JsonWrapper::arrayValue);
-    Json::Value data_acquisition_mode = JsonWrapper::GetProperty(
-        configuration_,
-        "data_acquisition_mode",
-        JsonWrapper::stringValue);
+    Json::Value data_acquisition_mode;
+    try {
+      data_acquisition_mode= JsonWrapper::GetProperty(
+          configuration_,
+          "data_acquisition_mode",
+          JsonWrapper::stringValue);
+    } catch (Squeal squeal) {
+      data_acquisition_mode = Json::Value("Live");
+    }
     if (data_acquisition_mode == "Random") {
       LoadRandomData();
     } else if (data_acquisition_mode == "Simulation") {
@@ -131,13 +156,14 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
 
   Json::Value global_raw_tracks;
 
-  for (std::vector<MAUS::recon::global::Track>::const_iterator
+  for (std::vector<MAUS::recon::global::Track>::iterator
           raw_track = tracks_.begin();
        raw_track < tracks_.end();
        ++raw_track) {
+    std::sort(raw_track->begin(), raw_track->end());  // sort in z-plane order
 
   std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
-            << "Appending a track of size " << global_raw_tracks.size()
+            << "Appending a track of size " << raw_track->size()
             << " to global_raw_tracks" << std::endl;
     global_raw_tracks.append(TrackToJson(*raw_track));
   }
@@ -398,8 +424,8 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadMonteCarloData: "
       double delta_x = tof1_track_point.x() - tof0_track_point.x();
       double delta_y = tof1_track_point.y() - tof0_track_point.y();
       double delta_z = tof1_track_point.z() - tof0_track_point.z();
-      double distance = ::sqrt(delta_x*delta_x + delta_y*delta_y
-                                + delta_z*delta_z);
+      double distance = std::sqrt(delta_x*delta_x + delta_y*delta_y
+                                  + delta_z*delta_z);
       double delta_t = tof1_track_point.time() - tof0_track_point.time();
       double velocity = distance / delta_t;
       double beta = velocity / ::CLHEP::c_light;
@@ -429,110 +455,6 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadMonteCarloData: "
   }
 }
 
-/*
-void ExtractTOFSpacePoints(
-    const Json::Value& tof_space_points,
-    std::vector<MAUS::TOFSpacePoint>& tof0_space_points,
-    std::vector<MAUS::TOFSpacePoint>& tof1_space_points,
-    std::vector<MAUS::TOFSpacePoint>& tof2_space_points) {
-  stations.push_back(JsonWrapper::GetProperty(tof_space_points,
-                                              "tof0",
-                                              JsonWrapper::arrayValue));
-  stations.push_back(JsonWrapper::GetProperty(tof_space_points,
-                                              "tof1",
-                                              JsonWrapper::arrayValue));
-
-  for (unsigned int station = 0; station <=2; ++station) {
-    std::stringstream station_name
-    station_name << "tof" << station;
-    Json::Value space_points = JsonWrapper::GetProperty(
-        tof_space_points,
-        station_name.str(),
-        JsonWrapper::arrayValue);
-    std::vector<MAUS::TOFSpacePoint>& tofn_space_points;
-    switch {
-      case 0: tofn_space_points = tof0_space_points; break;
-      case 1: tofn_space_points = tof1_space_points; break;
-      case 2: tofn_space_points = tof2_space_points; break;
-    }
-
-    for (size_t point_index = 0;
-          point_index < space_points.size();
-          ++point_index) {
-      Json::Value space_point_json = JsonWrapper::GetItem(
-          space_points,
-          point_index,
-          JsonWrapper::objectValue);
-      TOFSpacePoint space_point;
-
-      Json::Value time_json = JsonWrapper::GetProperty(
-          _json,
-          "time",
-          JsonWrapper::realValue);
-      const double time = time_json.asDouble();
-
-      Json::Value station = JsonWrapper::GetProperty(
-          _json,
-          "station",
-          JsonWrapper::uintValue);
-      unsigned int tof_station = station.asUInt();
-
-      Json::Value x_slab = JsonWrapper::GetProperty(
-          _json,
-          "slabX",
-          JsonWrapper::uintValue);
-      space_point.SetSlabx(y_slab.asInt());
-      double max_x_value = 0.;
-      double x_slab_half_width = 0.;
-      switch (tof_station) {
-        // 10 4cm-wide slabs between -18cm and +18cm
-        case 0:
-          max_x_value = -180.;
-          x_slab_half_width = 2.;
-          break;
-        // 7 6cm-wide slabs between -18cm and +18cm
-        case 1:
-          max_x_value = -180.;
-          x_slab_half_width = 3.;
-          break;
-        // 10 6cm-wide slabs between -27cm and +27cm
-        case 2:
-          max_x_value = -270.;
-          x_slab_half_width = 3.;
-          break;
-      }
-      const double x = max_x_value + x_slab_half_width * x_slab.asUInt();
-
-      Json::Value y_slab = JsonWrapper::GetProperty(
-          _json,
-          "slabY",
-          JsonWrapper::uintValue);
-      double max_y_value = 0.;
-      double y_slab_half_width = 0.;
-      switch (tof_station) {
-        // 10 4cm-wide slabs between -18cm and +18cm
-        case 0:
-          max_y_value = -180.;
-          y_slab_half_width = 2.;
-          break;
-        // 7 6cm-wide slabs between -18cm and +18cm
-        case 1:
-          max_y_value = -180.;
-          y_slab_half_width = 3.;
-          break;
-        // 10 6cm-wide slabs between -27cm and +27cm
-        case 2:
-          max_y_value = -270.;
-          y_slab_half_width = 3.;
-          break;
-      }
-      const double y = max_y_value + y_slab_half_width * y_slab.asUInt();
-
-      tofn_space_points.
-    }
-  }
-}
-*/
 
 /** LoadLiveData - load data provided by the DAQ system or via digitized MC
  *
@@ -543,46 +465,50 @@ void ExtractTOFSpacePoints(
  *    4) Serialize raw tracks
  */
 void MapCppGlobalRawTracks::LoadLiveData() {
-  Json::Value event_type = JsonWrapper::GetProperty(run_data_,
-                                                    "daq_event_type",
-                                                    JsonWrapper::stringValue);
   std::map<Detector::ID, Detector> detectors;
   LoadDetectorConfiguration(detectors);
 
-  if (event_type == "physics_event") {
-    // Dig out the recon_event element in the run data JSON document
-    Json::Value recon_events = JsonWrapper::GetProperty(
-        run_data_,
-        "recon_events",
-        JsonWrapper::arrayValue);
-    for (size_t event_index = 0;
-         event_index < recon_events.size();
-         ++event_index) {
-      Json::Value recon_event = JsonWrapper::GetItem(
-          recon_events,
-          event_index,
-          JsonWrapper::objectValue);
+  Json::Value recon_events = JsonWrapper::GetProperty(
+      run_data_,
+      "recon_events",
+      JsonWrapper::arrayValue);
+  for (size_t event_index = 0;
+        event_index < recon_events.size();
+        ++event_index) {
+    Json::Value recon_event = JsonWrapper::GetItem(
+        recon_events,
+        event_index,
+        JsonWrapper::objectValue);
 
-      // Load TOF and SciFi tracks from the appropriate recon event trees
-      std::vector<Track> tof_tracks;
-      LoadTOFTracks(detectors, recon_event, tof_tracks);
-      std::vector<Track> sci_fi_tracks;
-      LoadSciFiTracks(detectors, recon_event, sci_fi_tracks);
+    // Load TOF and SciFi tracks from the appropriate recon event trees
+    std::vector<Track> tof_tracks;
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Loading TOF tracks..." << std::endl;
+    LoadTOFTracks(detectors, recon_event, tof_tracks);
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Loaded " << tof_tracks.size() << " TOF tracks." << std::endl;
+    std::vector<Track> sci_fi_tracks;
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Loading SciFi tracks..." << std::endl;
+    LoadSciFiTracks(detectors, recon_event, sci_fi_tracks);
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Loaded " << sci_fi_tracks.size() << " SciFi tracks." << std::endl;
 
-      // Assuming there are an equal number of TOF and SciFi tracks,
-      // merge each pair of tracks based on z position of the detectors
-      std::vector<Track>::const_iterator tof_track = tof_tracks.begin();
-      std::vector<Track>::const_iterator sci_fi_track = sci_fi_tracks.begin();
-      while (tof_track < tof_tracks.end()) {
-        std::vector<TrackPoint>::const_iterator tof_track_point
+    // Assuming there are an equal number of TOF and SciFi tracks,
+    // merge each pair of tracks based on z position of the detectors
+    std::vector<Track>::iterator tof_track = tof_tracks.begin();
+    std::vector<Track>::iterator sci_fi_track = sci_fi_tracks.begin();
+    while (tof_track < tof_tracks.end()) {
+      while (sci_fi_track < sci_fi_tracks.end()) {
+        std::vector<TrackPoint>::iterator tof_track_point
             = tof_track->begin();
-        std::vector<TrackPoint>::const_iterator sci_fi_track_point
+        std::vector<TrackPoint>::iterator sci_fi_track_point
             = sci_fi_track->begin();
         Track combined_track;
-        while (tof_track_point < tof_track->end() &&
-               sci_fi_track_point < sci_fi_track->end()) {
-          if (sci_fi_track_point == sci_fi_track->end() ||
-              tof_track_point->z() < sci_fi_track_point->z()) {
+        while (tof_track_point < tof_track->end() ||
+                sci_fi_track_point < sci_fi_track->end()) {
+          if (sci_fi_track_point >= sci_fi_track->end() ||
+              tof_track_point->z() <= sci_fi_track_point->z()) {
             combined_track.push_back(*tof_track_point);
             ++tof_track_point;
           } else {
@@ -591,9 +517,13 @@ void MapCppGlobalRawTracks::LoadLiveData() {
           }
         }
         tracks_.push_back(combined_track);
-        ++tof_track;
         ++sci_fi_track;
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Combined track size: " << combined_track.size() << std::endl;
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+          << "Global tracks acquired: " << tracks_.size() << std::endl;
       }
+      ++tof_track;
     }
   }
 }
@@ -614,53 +544,50 @@ void MapCppGlobalRawTracks::LoadTOFTracks(
   const TOFEventSpacePoint * tof_space_points = deserializer.JsonToCpp(
       tof_space_points_json);
 
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
   const size_t num_space_points
       = tof_space_points->GetTOF0SpacePointArraySize();
-  // TODO(Lane) match up tof0, tof1, and tof2 space points based on DAQ window
-  // For now assume an equal number of space points for each TOF detector
+
+  // TODO(Lane) handle multiple TOF space points per detector
   for (size_t index = 0; index < num_space_points; ++index) {
+    Track tof_track;
+
     // Use TOF0 and TOF1 to calculate the velocity of the particle
     const TOFSpacePoint tof0_space_point
         = tof_space_points->GetTOF0SpacePointArrayElement(index);
     const TOFSpacePoint tof1_space_point
         = tof_space_points->GetTOF1SpacePointArrayElement(index);
-    const double delta_t
-        = tof1_space_point.GetTime() - tof0_space_point.GetTime();
     const Detector& tof0 = detectors.find(Detector::kTOF0)->second;
     const Detector& tof1 = detectors.find(Detector::kTOF1)->second;
-    const double delta_z = tof1.plane() - tof0.plane();
-    const double beta = delta_z / delta_t / ::CLHEP::c_light;
-    const double gamma = 1. / ::sqrt(1 - beta*beta);
 
-    // Assume particle is a muon and calculate energy and momentum.
-    const double mass = Particle::GetInstance()->GetMass(Particle::kMuMinus);
-    const double energy = gamma * mass;
-    const double momentum = beta * energy;
+    // FIXME(Lane) Replace hard coded slab to coordinate conversion once
+    // Mark Reiner's code has been incorporated into TOF space point code.
+    const double tof0_t = tof0_space_point.GetTime();
+    const double tof1_t = tof1_space_point.GetTime();
+    const double tof0_x = -18. + 2. * tof0_space_point.GetSlabx();
+    const double tof1_x = -18. + 3. * tof1_space_point.GetSlabx();
+    const double tof0_y = -18. + 2. * tof0_space_point.GetSlaby();
+    const double tof1_y = -18. + 3. * tof1_space_point.GetSlaby();
+    const double tof0_z = tof0.plane();
+    const double tof1_z = tof1.plane();
 
-    // Ignore if the energy or momentum inconsistant with a muon.
-    const double reference_energy = reference_pgparticle.energy;
-    const double reference_momentum = reference_pgparticle.pz;  // good enough
-    // m_mu / m_pi = 0.7572 and m_mu / m_e = 206.8
-    const double energy_ratio = reference_energy / energy;
-    const double momentum_ratio = reference_momentum / momentum;
-    if ((energy_ratio < 0.8) || (energy_ratio > 10.) ||
-        (momentum_ratio < 0.8) || (momentum_ratio > 10.)) {
-      return;
-    }
-
-    // Otherwise, populate TrackPoints for each space point
-    Track tof_track;
-    double tof0_x = -18. + 2. * tof0_space_point.GetSlabx();
-    double tof1_x = -18. + 3. * tof1_space_point.GetSlabx();
+    double delta_t = tof1_t - tof0_t;
     double delta_x = tof1_x - tof0_x;
-    double px = mass * delta_x / delta_t;
-    double tof0_y = -18. + 2. * tof0_space_point.GetSlaby();
-    double tof1_y = -18. + 3. * tof1_space_point.GetSlaby();
     double delta_y = tof1_y - tof0_y;
+    double delta_z = tof1_z - tof0_z;
+    double delta_l = std::sqrt(delta_x*delta_x + delta_y*delta_y
+                               + delta_z*delta_z);
+    double beta = delta_l / delta_t / ::CLHEP::c_light;
+    double gamma = 1. / std::sqrt(1 - beta*beta);
+    Particle::ID particle_id = IdentifyParticle(beta);
+
+    double mass = Particle::GetInstance()->GetMass(particle_id);
+    double px = mass * delta_x / delta_t;
     double py = mass * delta_y / delta_t;
+    double energy = gamma * mass;
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTracks(): "
+              << "Particle: " << Particle::GetInstance()->GetName(particle_id)
+              << "\tbeta: " << beta << "\t energy: " << energy << std::endl;
+
     TrackPoint tof0_track_point(tof0_space_point.GetTime(),
                                 energy,
                                 tof0_x,
@@ -668,7 +595,9 @@ void MapCppGlobalRawTracks::LoadTOFTracks(
                                 tof0_y,
                                 py,
                                 tof0);
+    tof0_track_point.set_particle_id(particle_id);
     tof_track.push_back(tof0_track_point);
+
     TrackPoint tof1_track_point(tof1_space_point.GetTime(),
                                 energy,
                                 tof1_x,
@@ -676,20 +605,49 @@ void MapCppGlobalRawTracks::LoadTOFTracks(
                                 tof1_y,
                                 py,
                                 tof1);
+    tof1_track_point.set_particle_id(particle_id);
     tof_track.push_back(tof1_track_point);
-    const TOFSpacePoint tof2_space_point
-        = tof_space_points->GetTOF2SpacePointArrayElement(index);
-    double tof2_x = -27. + 3. * tof2_space_point.GetSlabx();
-    double tof2_y = -27. + 3. * tof2_space_point.GetSlaby();
-    const Detector& tof2 = detectors.find(Detector::kTOF2)->second;
-    TrackPoint tof2_track_point(tof2_space_point.GetTime(),
-                                energy,
-                                tof2_x,
-                                px,
-                                tof2_y,
-                                py,
-                                tof2);
-    tof_track.push_back(tof2_track_point);
+
+    if (tof_space_points->GetTOF2SpacePointArraySize() >= (index+1)) {
+      const TOFSpacePoint tof2_space_point
+          = tof_space_points->GetTOF2SpacePointArrayElement(index);
+      const Detector& tof2 = detectors.find(Detector::kTOF2)->second;
+
+      const double tof2_t = tof2_space_point.GetTime();
+      const double tof2_x = -27. + 3. * tof2_space_point.GetSlabx();
+      const double tof2_y = -27. + 3. * tof2_space_point.GetSlaby();
+      const double tof2_z = tof2.plane();
+
+      delta_t = tof2_t - tof1_t;
+      delta_x = tof2_x - tof1_x;
+      delta_y = tof2_y - tof1_y;
+      delta_z = tof2_z - tof1_z;
+      delta_l = std::sqrt(delta_x*delta_x + delta_y*delta_y
+                          + delta_z*delta_z);
+      beta = delta_l / delta_t / ::CLHEP::c_light;
+      gamma = 1. / std::sqrt(1 - beta*beta);
+      particle_id = IdentifyParticle(beta);
+
+      mass = Particle::GetInstance()->GetMass(particle_id);
+      energy = gamma * mass;
+      px = mass * delta_x / delta_t;
+      py = mass * delta_y / delta_t;
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTracks(): TOF2 info..." << std::endl
+          << "dx: " << delta_x << "\tdy: " << delta_y << "\tdz: " << delta_z
+          << "\tbeta: " << beta << std::endl
+          << "\tenergy: " << energy << "\tpx: " << px << "\tpy: " << py << std::endl;
+
+      TrackPoint tof2_track_point(tof2_space_point.GetTime(),
+                                  energy,
+                                  tof2_x,
+                                  px,
+                                  tof2_y,
+                                  py,
+                                  tof2);
+      tof2_track_point.set_particle_id(particle_id);
+      tof_track.push_back(tof2_track_point);
+    }
+
     std::sort(tof_track.begin(), tof_track.end());  // sort in z-plane order
     tof_tracks.push_back(tof_track);
   }
@@ -701,139 +659,140 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
     std::map<Detector::ID, Detector>& detectors,
     Json::Value& recon_event,
     std::vector<Track>& sci_fi_tracks) {
-  BTField * b_field_map = Globals::GetInstance()
-                        ->GetReconFieldConstructor()->GetMagneticField();
+  const double z_offset
+    = detectors.find(Detector::kTracker1_5)->second.plane();
+  std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): "
+            << "z offset: " << z_offset << std::endl;
+
   Json::Value sci_fi_event = JsonWrapper::GetProperty(
       recon_event,
       "sci_fi_event",
       JsonWrapper::objectValue);
-  Json::Value helical_tracks = JsonWrapper::GetProperty(
+  Json::Value space_points = JsonWrapper::GetProperty(
       sci_fi_event,
-      "helical_pr_tracks",
-      JsonWrapper::objectValue);
-  SciFiHelicalPRTrackProcessor deserializer;
-  for (size_t track_index = 0;
-       track_index < helical_tracks.size();
-       ++track_index) {
-    Json::Value helical_track_json = JsonWrapper::GetItem(
-        helical_tracks,
-        track_index,
-        JsonWrapper::objectValue);
-    const SciFiHelicalPRTrack * helical_track = deserializer.JsonToCpp(
-        helical_track_json);
-    const double radius = helical_track->get_R();
-    const double dsdz = helical_track->get_dsdz();
-    const int tracker = helical_track->get_tracker();
+      "spacepoints",
+      JsonWrapper::arrayValue);
+  SciFiSpacePointProcessor deserializer;
 
-    const SciFiSpacePointArray space_points = helical_track->get_spacepoints();
-    const int num_points = helical_track->get_num_points();
-    const double delta_z = space_points[num_points-1].get_position().z()
-                         - space_points[0].get_position().z();
-    const double delta_t = space_points[num_points-1].get_time()
-                         - space_points[0].get_time();
-    const double beta = delta_z / delta_t / ::CLHEP::c_light;
-    const double gamma = 1. / ::sqrt(1. - beta*beta);
-
-    Track track;
-
-    for (size_t point_index = 0;
-        point_index < space_points.size();
-        ++point_index) {
-      const SciFiSpacePoint space_point = space_points[point_index];
-
-      const int station = space_point.get_station();
-      const Detector::ID detector_id = Detector::ID(
-          Detector::kTracker1_1 + 5 * tracker + station - 1);
-      const Detector& detector = detectors.find(detector_id)->second;
-
-      const double time = space_point.get_time();
-      ThreeVector position = space_point.get_position();
-      const double x = position.x();
-      const double y = position.y();
-      const double z = position.z();
-
-      std::vector<double> b_field = b_field_map->GetFieldValue(x, y, z, time);
-      const double bz = b_field[2];
-      const double pt = bz * radius;
-      double phi_i = 0.0;
-      if (point_index > 0) {
-        phi_i = helical_track->get_phi_i()[point_index-1];
-      }
-      const double psi = helical_track->get_psi0() + phi_i;
-      const double px = pt * ::cos(psi);
-      const double py = pt * ::sin(psi);
-      const double pz = pt / dsdz;
-      const double mass_c = pz / (gamma * beta);
-      const double energy = gamma * mass_c * ::CLHEP::c_light;
-      TrackPoint track_point(time, energy, position.x(), px,
-                                    position.y(), py, detector);
-      track.push_back(track_point);
-    }
-
-    sci_fi_tracks.push_back(track);
-    delete helical_track;
-  }
-}
-
-/* We assume that muons traverse the MICE lattice one at a time, so we can
- * sort out tracks based on the requirement that hits will occur in the same
- * order as the detector positions.
- */
-/*
-void MapCppGlobalRawTracks::CorrelateTrackPoints(
-    std::vector<Track> & tracks) {
-  const std::vector<TrackPoint> & track_points
-      = recon_input_->events();
-
-  if (track_points.size() == 0) {
-    return;
-  }
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "correlating " << track_points.size() << " track points ..."
-          << std::endl;
-
-  const double muon_mass
-    = Particle::GetInstance()->GetMass(Particle::kMuMinus);
-
-  // TODO(plane1@hawk.iit.edu) Handle multiple particles per spill, still
-  // assuming the particles navigate the MICE lattice one at a time
   Track track;
-  double last_z = track_points[0].z();
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "correlating the following track point:" << std::endl
-          << *event << std::endl;
-    if (event->energy() < muon_mass) {
-      // reject particles with energy < muon mass (electrons)
-      continue;
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "rejected particle with energy < muon mass" << std::endl;
-    } else if (event->z() < last_z) {
-      // A new track begins when a hit is upstream from the last hit
-      tracks.push_back(track);
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "completed a track with " << track.size() << "track points."
-          << std::endl;
-      track.clear();
-      track.push_back(*event);
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "pushed the following track point:" << std::endl
-          << *event << std::endl;
-    } else {
-      track.push_back(*event);
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "pushed the following track point:" << std::endl
-          << *event << std::endl;
+  const size_t num_points = space_points.size();
+  for (size_t point_index = 0; point_index < num_points; ++point_index) {
+    Json::Value space_point_json = JsonWrapper::GetItem(
+        space_points,
+        point_index,
+        JsonWrapper::objectValue);
+    const SciFiSpacePoint * space_point = deserializer.JsonToCpp(
+        space_point_json);
+
+    const int tracker = space_point->get_tracker();
+    const int station = space_point->get_station();
+    const Detector::ID detector_id = Detector::ID(
+        Detector::kTracker1_1 + 5 * tracker + station - 1);
+    const Detector& detector = detectors.find(detector_id)->second;
+
+    const double time = space_point->get_time();
+    ThreeVector position = space_point->get_position();
+
+    // FIXME(Lane) Replace MC momentum with official track momentum when that
+    // information becomes available.
+    ThreeVector momentum;
+    const SciFiClusterPArray clusters = space_point->get_channels();
+    for (SciFiClusterPArray::const_iterator cluster = clusters.begin();
+        cluster < clusters.end();
+        ++cluster) {
+      ThreeVector true_momentum = (*cluster)->get_true_momentum();
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): " << std::endl
+          << "\tTrue Momentum: " << true_momentum << std::endl;
+      momentum += true_momentum;
     }
-    last_z = event->z();
+    if (clusters.size() > 0) {
+      momentum /= clusters.size();
+    }
+    // smear the MC momentum1.293e+04
+    momentum.setX(momentum.x() + ::CLHEP::RandGauss::shoot(0., 3.));
+    momentum.setY(momentum.y() + ::CLHEP::RandGauss::shoot(0., 3.));
+    momentum.setZ(momentum.z() + ::CLHEP::RandGauss::shoot(0., 20.));
+std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): " << std::endl
+          << "\tSmeared Momentum: " << momentum << std::endl;
+
+    // FIXME(Lane) For now assume we've selected only muon tracks and no decays
+    const Particle::ID particle_id
+      = Particle::ID(Particle::kMuPlus * beam_polarity_);
+    const double beta = Beta(particle_id, momentum.mag());
+    const double energy = momentum.mag() / beta;
+
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): " << std::endl
+              << "\tSciFi Space Point " << point_index << ":"
+              << "\tDetector: " << detector_id
+              << "\tStation: " << station << std::endl
+              << std::setprecision(10)
+              << "\tTime: " << time << "\tEnergy: " << energy << std::endl
+              << "\tPosition: " << position << std::endl
+              << "\tMomentum: " << momentum << std::endl;
+
+    TrackPoint track_point(time, energy, position.x(), momentum.x(),
+                           position.y(), momentum.y(), detector);
+    track_point.set_particle_id(particle_id);
+
+    track.push_back(track_point);
   }
-  if (track.size() > 0) {
-    tracks.push_back(track);
-std::cout << "DEBUG MapCppGlobalRawTracks::CorrelateTrackPoints: "
-          << "completed a track with " << track.size() << "track points."
-          << std::endl;
-  }
+
+  sci_fi_tracks.push_back(track);
 }
-*/
+
+/* Take an educated guess at the particle ID based on the axial velocity
+ * of the particle (beta)
+ */
+Particle::ID MapCppGlobalRawTracks::IdentifyParticle(const double beta) {
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const double reference_momentum = reference_pgparticle.pz;  // good enough
+  const double beta_pi = Beta(Particle::kPiPlus, reference_momentum);
+  const double beta_mu = Beta(Particle::kMuPlus, reference_momentum);
+  const double beta_e = Beta(Particle::kEPlus, reference_momentum);
+  std::cout << "DEBUG MapCppGlobalRawTracks::IdentifyParticle(): " << std::endl
+            << "\tbeta = " << beta << "\tbeta_pi = " << beta_pi << std::endl
+            << "\tbeta_mu = " << beta_mu << "\tbeta_e = " << beta_e << std::endl;
+
+  const double beta_fit[3] = {
+    std::abs(1. - beta / beta_pi),
+    std::abs(1. - beta / beta_mu),
+    std::abs(1. - beta / beta_e)
+  };
+  std::cout << "DEBUG MapCppGlobalRawTracks::IdentifyParticle(): "
+            << "beta fits {" << std::endl << std::setprecision(4)
+            << "\t" << 1. - beta / beta_pi
+            << "\t" << beta_fit[1]
+            << "\t" << beta_fit[2]
+            << std::endl << "}" << std::endl;
+  size_t min_index = 0;
+  for (size_t index = 1; index < 3; ++index) {
+    if (beta_fit[index] < beta_fit[min_index]) {
+      min_index = index;
+    }
+  }
+
+  Particle::ID particle_id = Particle::kNone;
+  switch(min_index) {
+    case 0: particle_id = Particle::ID(Particle::kPiPlus * beam_polarity_);
+            break;
+    case 1: particle_id = Particle::ID(Particle::kMuPlus * beam_polarity_);
+            break;
+    case 2: particle_id = Particle::ID(Particle::kEPlus * beam_polarity_);
+            break;
+  }
+
+  return particle_id;
+}
+
+double MapCppGlobalRawTracks::Beta(Particle::ID pid, const double momentum) {
+  const double mass = Particle::GetInstance()->GetMass(pid);
+  const double one_over_beta_squared
+    = 1+ (mass*mass) / (momentum*momentum);
+  return 1. / std::sqrt(one_over_beta_squared);
+}
+
 bool MapCppGlobalRawTracks::death() {
   return true;  // successful
 }
@@ -866,6 +825,39 @@ CovarianceMatrix const MapCppGlobalRawTracks::GetJsonCovarianceMatrix(
 }
 
 Json::Value MapCppGlobalRawTracks::TrackToJson(const Track & track) {
+  GlobalTrackPointArray global_track_points;
+
+  for (Track::const_iterator track_point = track.begin();
+       track_point < track.end();
+       ++track_point) {
+    GlobalTrackPoint global_track_point;
+    global_track_point.set_time(track_point->time());
+    global_track_point.set_energy(track_point->energy());
+    ThreeVector position(track_point->x(), track_point->y(), track_point->z());
+    global_track_point.set_position(position);
+    ThreeVector momentum(track_point->Px(),
+                         track_point->Py(),
+                         track_point->Pz());
+    global_track_point.set_momentum(momentum);
+    global_track_point.set_detector_id(track_point->detector_id());
+    global_track_point.set_particle_id(track_point->particle_id());
+
+    global_track_points.push_back(global_track_point);
+  }
+
+  GlobalRawTrack global_track;
+  global_track.set_track_points(global_track_points);
+
+  GlobalRawTrackProcessor serializer;
+  Json::Value * json_pointer = serializer.CppToJson(global_track,
+                                                    "global_raw_tracks");
+  Json::Value json = *json_pointer;
+  delete json_pointer;
+  return json;
+}
+
+/*
+Json::Value MapCppGlobalRawTracks::TrackToJson(const Track & track) {
   Json::Value track_node;
 
   // track points
@@ -875,15 +867,16 @@ Json::Value MapCppGlobalRawTracks::TrackToJson(const Track & track) {
   }
   track_node["track_points"] = track_points;
 
-  // particle ID
-  track_node["PID"] = Json::Value(track.particle_id());
-
   return track_node;
 }
+*/
 
 Json::Value MapCppGlobalRawTracks::TrackPointToJson(
     const TrackPoint & track_point) {
   Json::Value track_point_node;
+
+  // particle ID
+  track_point_node["PID"] = Json::Value(track_point.particle_id());
 
   // coordinates
   Json::Value position;
@@ -905,6 +898,7 @@ Json::Value MapCppGlobalRawTracks::TrackPointToJson(
   track_point_node["detector_id"] = Json::Value(track_point.detector_id());
 
   // uncertainty matrix
+  /*
   Json::Value uncertainties;
   size_t size = track_point.uncertainties().size();
   for (size_t row = 1; row <= size; ++row) {
@@ -915,6 +909,7 @@ Json::Value MapCppGlobalRawTracks::TrackPointToJson(
     uncertainties.append(row_node);
   }
   track_point_node["uncertainties"] = uncertainties;
+  */
 
   return track_point_node;
 }

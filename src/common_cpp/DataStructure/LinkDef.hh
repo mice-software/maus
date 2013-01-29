@@ -141,6 +141,10 @@
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
 
+#pragma link C++ class MAUS::GlobalTrackPoint+;
+#pragma link C++ class std::vector<GlobalTrackPoint>+;
+#pragma link C++ class MAUS::GlobalRawTrack+;
+
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;
 

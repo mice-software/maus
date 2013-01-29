@@ -173,14 +173,15 @@ double TrackPoint::z_momentum() const {
   const double px = (*this)[3];
   const double py = (*this)[5];
 
-  if (energy < mass) {
+  const double pz_squared = energy*energy - mass*mass - px*px - py*py;
+  if (pz_squared < 0) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempting to calculate the momentum of a "
+                 "Attempting to calculate the longitudinal momentum of a "
                  "particle that is off mass shell.",
                  "MAUS::recon::global::TrackPoint::z_momentum()"));
   }
 
-  return ::sqrt(energy*energy - mass*mass - px*px - py*py);
+  return ::sqrt(pz_squared);
 }
 
 MAUS::MAUSPrimaryGeneratorAction::PGParticle

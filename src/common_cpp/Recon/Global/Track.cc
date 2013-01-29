@@ -25,15 +25,15 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-Track::Track() : std::vector<TrackPoint>(), particle_id_(0)
+Track::Track() : std::vector<TrackPoint>(), particle_id_(Particle::kNone)
 { }
 
-Track::Track(const int particle_id)
+Track::Track(const Particle::ID particle_id)
     : std::vector<TrackPoint>(), particle_id_(particle_id)
 { }
 
 Track::Track(const std::vector<TrackPoint>& tracks,
-             const int particle_id)
+             const Particle::ID particle_id)
     : std::vector<TrackPoint>(tracks), particle_id_(particle_id)
 { }
 
@@ -45,11 +45,11 @@ Track::Track(const Track & original_instance)
 Track::~Track()
 { }
 
-int Track::particle_id() const {
+Particle::ID Track::particle_id() const {
   return particle_id_;
 }
 
-void Track::set_particle_id(const int particle_id) {
+void Track::set_particle_id(const Particle::ID particle_id) {
   particle_id_ = particle_id;
 }
 

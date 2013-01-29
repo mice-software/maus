@@ -36,7 +36,7 @@ class Track : public std::vector<TrackPoint> {
 
   /* @brief Create with particle ID only.
    */
-  explicit Track(const int particle_id);
+  explicit Track(const Particle::ID particle_id);
 
   /* @brief Copy constructor;
    */  
@@ -45,14 +45,14 @@ class Track : public std::vector<TrackPoint> {
   /* @brief Create with tracks and particle ID.
    */
   Track(const std::vector<TrackPoint>& tracks,
-        const int particle_id);
+        const Particle::ID particle_id);
 
   ~Track();
 
-  int particle_id() const;
-  void set_particle_id(const int particle_id);
+  Particle::ID particle_id() const;
+  void set_particle_id(const Particle::ID particle_id);
  protected:
-  int particle_id_;
+  Particle::ID particle_id_;
 };
 
 std::ostream& operator<<(std::ostream & out, const Track & vector);

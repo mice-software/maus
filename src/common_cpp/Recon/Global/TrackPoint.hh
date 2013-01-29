@@ -93,7 +93,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
              const double y, const double py,
              const Detector & detector);
 
-  /* @brief	This constructor is used when to create well-defined particle tracks
+  /* @brief	This constructor is used to create well-defined particle tracks
    * for simulating through MICE.
    */
   TrackPoint(const double time, const double energy,

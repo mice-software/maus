@@ -45,7 +45,6 @@ namespace recon {
 namespace global {
 
 class TrackFitter;
-class ReconstructionInput;
 
 }  // namespace global
 }  // namespace recon
@@ -94,8 +93,9 @@ class MapCppGlobalTrackReconstructor {
   MAUS::recon::global::TrackFitter * track_fitter_;
 
   Json::Value run_data_;
-  // MAUS::recon::global::ReconstructionInput * recon_input_;
-  std::vector<MAUS::recon::global::Track> tracks_;
+  std::vector<MAUS::recon::global::Track> raw_tracks_;
+  std::map<MAUS::recon::global::Detector::ID, MAUS::recon::global::Detector>
+    detectors_;
 
   static const std::string kClassname;
   BTField * electromagnetic_field_;
@@ -103,42 +103,15 @@ class MapCppGlobalTrackReconstructor {
   void SetupOpticsModel();
   void SetupTrackFitter();
 
-  void LoadRandomData();
-  void LoadTestingData();
-  void LoadSimulationData();
-  void LoadSmearedData();
-  void LoadLiveData();
+  void LoadDetectorConfiguration();
+  void LoadRawTracks();
 
-  void LoadSimulationData(const std::string mc_branch_name);
-
-  void LoadTOFTracks(
-      std::map<MAUS::recon::global::Detector::ID,
-               MAUS::recon::global::Detector>& detectors,
-      Json::Value& recon_event,
-      std::vector<MAUS::recon::global::Track>& tof_tracks);
-  void LoadSciFiTracks(
-      std::map<MAUS::recon::global::Detector::ID,
-               MAUS::recon::global::Detector>& detectors,
-      Json::Value& recon_event,
-      std::vector<MAUS::recon::global::Track>& sci_fi_tracks);
-  void LoadDetectorConfiguration(
-    std::map<MAUS::recon::global::Detector::ID,
-    MAUS::recon::global::Detector> & detectors);
-  void LoadMonteCarloData(
-    const std::string branch_name,
-    const std::map<MAUS::recon::global::Detector::ID,
-                   MAUS::recon::global::Detector> & detectors);
+  static Json::Value TrackToJson(const MAUS::recon::global::Track & track);
+  static Json::Value TrackPointToJson(
+      const MAUS::recon::global::TrackPoint & track_point);
 
   static CovarianceMatrix const GetJsonCovarianceMatrix(
       Json::Value const & value);
-
-  void CorrelateTrackPoints(
-      std::vector<MAUS::recon::global::Track> & tracks);
-
-  static Json::Value TrackToJson(
-      const MAUS::recon::global::Track & track);
-  static Json::Value TrackPointToJson(
-      const MAUS::recon::global::TrackPoint & track_point);
 };
 
 }  // namespace MAUS
