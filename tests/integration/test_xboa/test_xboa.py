@@ -14,10 +14,11 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Run xboa tests as part of MAUS integration tests
+Run xboa tests as part of MAUS integration tests? disabled
 """
 
 import unittest
+import ROOT
 import xboa.test.XBOATest
 
 class TestXBOA(unittest.TestCase): # pylint: disable=R0904
@@ -25,7 +26,7 @@ class TestXBOA(unittest.TestCase): # pylint: disable=R0904
     Run the tests and check they return 0
     """
 
-    def test_xboa(self):
+    def _test_xboa(self):
         """
         Run the xboa test
         """
