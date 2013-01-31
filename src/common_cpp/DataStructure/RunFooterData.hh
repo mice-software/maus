@@ -19,6 +19,7 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_RUNFOOTERDATA_HH_
 
 #include <string>
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
@@ -85,7 +86,7 @@ class RunFooterData : public MAUSEvent<RunFooter> {
 
   private:
     RunFooter* _run_footer;
-    ClassDef(RunFooterData, 1)
+    MAUS_VERSIONED_CLASS_DEF(RunFooterData)
 };
 }
 

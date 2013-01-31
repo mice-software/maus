@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -132,7 +132,7 @@ class TOFSpacePoint {
     int _part_event_number;
     double _dt;
 
-    ClassDef(TOFSpacePoint, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFSpacePoint)
 };
 }
 

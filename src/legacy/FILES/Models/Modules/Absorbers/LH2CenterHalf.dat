@@ -1,0 +1,18 @@
+// FILES/Models/Modules/Absorbers/LH2Center.dat
+//
+// The cylindrical region for the liquid Hydrogen in the 
+// H absorber in the muon cooling device
+//
+// 
+// 
+
+Module LH2CenterHalf
+{
+  Volume Cylinder
+  Dimensions 150 122.426 mm
+  PropertyString Material lH2
+  PropertyDouble BlueColour 0.75
+  PropertyDouble OpticsMaterialLength 0.
+  PropertyString     SensitiveDetector  SpecialVirtual
+}
+

@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCALARSDATA_HH_
 
-#include "Rtypes.h"
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -34,7 +34,7 @@ class Scalars {
   virtual ~Scalars();
 
  private:
-  ClassDef(Scalars, 1)
+  MAUS_VERSIONED_CLASS_DEF(Scalars)
 };
 }
 

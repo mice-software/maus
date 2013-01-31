@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -156,7 +156,7 @@ class V1724 {
     int _position_max;
     int _channel;
 
-    ClassDef(V1724, 1)
+    MAUS_VERSIONED_CLASS_DEF(V1724)
 };
 }
 

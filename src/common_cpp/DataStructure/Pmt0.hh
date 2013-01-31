@@ -19,8 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 namespace MAUS {
 
 /** @class Pmt0 comment
@@ -92,7 +91,7 @@ class Pmt0 {
     std::string _tof_key;
     int _trigger_request_leading_time;
 
-    ClassDef(Pmt0, 1)
+    MAUS_VERSIONED_CLASS_DEF(Pmt0)
 };
 }
 

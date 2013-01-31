@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_V830_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_V830_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Channels.hh"
 
 namespace MAUS {
@@ -91,7 +91,7 @@ class V830 {
     int _time_stamp;
     int _geo;
 
-    ClassDef(V830, 1)
+    MAUS_VERSIONED_CLASS_DEF(V830)
 };
 }
 

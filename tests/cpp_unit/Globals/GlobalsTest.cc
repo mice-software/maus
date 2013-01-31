@@ -162,5 +162,7 @@ TEST_F(GlobalsTest, TestAccessors) {
 */
     GlobalsManager::DeleteGlobals();
 }
+
+// Version number is tested in PyGlobals
 }
 

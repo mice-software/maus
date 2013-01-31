@@ -1,0 +1,19 @@
+// FILES/Models/Modules/Absorbers/LH2End.dat
+//
+// The polycone end for the liquid Hydrogen container
+//
+// 
+// 
+
+Module LH2End
+{
+  Volume Polycone
+  Dimensions 150 350 mm
+  PropertyString Material lH2
+  PropertyDouble BlueColour 0.75
+  PropertyString FileName ${MICEFILES}/Models/Modules/Absorbers/H2-WindowAbs.txt
+  PropertyString PolyconeType Fill   
+  PropertyDouble OpticsMaterialLength 0 mm
+  PropertyString     SensitiveDetector  SpecialVirtual
+}
+

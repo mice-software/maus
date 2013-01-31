@@ -17,6 +17,7 @@
 """Tests for src/common_py/get_tof_calib.py"""
 import json
 import unittest
+# pylint: disable = E0611, F0401, E1101
 import calibration.get_tof_calib
 from Configuration import Configuration
 

@@ -31,6 +31,9 @@ class FieldTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def setUp(self): # pylint: disable=C0103
         """Set up test"""
+        self.test_config = ""
+        if maus_cpp.globals.has_instance():
+            self.test_config = maus_cpp.globals.get_configuration_cards()
         config_options = StringIO.StringIO(unicode("""
 simulation_geometry_filename = "Test.dat"
 reconstruction_geometry_filename = "Test.dat"
@@ -38,8 +41,17 @@ reconstruction_geometry_filename = "Test.dat"
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
 
+    def tearDown(self): # pylint: disable = C0103
+        """Reset the globals"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        if self.test_config != "":
+            maus_cpp.globals.birth(self.test_config)
+
     def test_get_field_value(self):
         """Test maus_cpp.Field.get_field_value(...)"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
         maus_cpp.globals.birth(self.config)
         for x_pos in range(10):
             field_value = maus_cpp.field.get_field_value\

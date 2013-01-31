@@ -84,6 +84,15 @@ Interpolator3dGridTo3d* ThreeDFieldMap::LoadBeamlineMap(std::istream& fin, Inter
 
 	Interpolator3dGridTo3d* interpol = new Interpolator3dGridTo3d(new ThreeDGrid(xV,yV,zV), Bx, By, Bz, algo);
 
+	Squeak::mout(Squeak::debug) << "Loaded field map with\n  min (x, y, z): "
+                              << interpol->GetMesh()->MinX() << " "
+                              << interpol->GetMesh()->MinY() << " "
+                              << interpol->GetMesh()->MinZ() << " "
+                              << "\n  max (x, y, z): "
+                              << interpol->GetMesh()->MaxX() << " "
+                              << interpol->GetMesh()->MaxY() << " "
+                              << interpol->GetMesh()->MaxZ() << std::endl;
+
 	DeleteArray(x,  nx, ny, nz);
 	DeleteArray(y,  nx, ny, nz);
 	DeleteArray(z,  nx, ny, nz);

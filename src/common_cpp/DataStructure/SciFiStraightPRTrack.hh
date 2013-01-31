@@ -23,10 +23,8 @@
 // C++ headers
 #include <vector>
 
-// ROOT headers
-#include "Rtypes.h"
-
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 
@@ -97,7 +95,7 @@ class SciFiStraightPRTrack {
     int _num_points;
     static const int _type = 0; // 0 for straight, 1 for helical
 
-    ClassDef(SciFiStraightPRTrack, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiStraightPRTrack)
 };
 
 typedef std::vector<SciFiStraightPRTrack*> SciFiStraightPRTrackPArray;
