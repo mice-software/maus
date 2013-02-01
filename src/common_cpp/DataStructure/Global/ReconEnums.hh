@@ -27,8 +27,8 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALRECONENUMS_HH_
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 /** @defgroup globalrecon Global Reconstruction
  *  The global reconstruction software, including both the associated
@@ -100,8 +100,8 @@ enum PID {
 };
 /** @} */ // end of globalrecon
 
-} // ~namespace global
-} // ~namespace recon
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS
 
 #endif

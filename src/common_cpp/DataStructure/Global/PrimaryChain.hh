@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MAUS::recon::global::PrimaryChain
+/** @class MAUS::DataStructure::Global::PrimaryChain
  *  @ingroup globalrecon
  *  @brief The reconstructed chain for a single primary particle.
  *
@@ -40,8 +40,8 @@
 #include "DataStructure/TRefTrackPair.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 class PrimaryChain {
  public:
@@ -69,7 +69,7 @@ class PrimaryChain {
 
   // Methods for adding and removing tracks, while tracking the parents
 
-  /// Add a MAUS::recon::global::Track, tracking the location of the
+  /// Add a MAUS::DataStructure::Global::Track, tracking the location of the
   /// parent track.
   /// @param[in] track  The track being added to the primary chain
   /// @param[in] parent The track's parent.  We require parent to
@@ -77,7 +77,7 @@ class PrimaryChain {
   bool AddTrack(MAUS::GlobalTrack* track,
                 MAUS::GlobalTrack* parent);
 
-  /// Add a primary MAUS::recon::global::Track, with the parent
+  /// Add a primary MAUS::DataStructure::Global::Track, with the parent
   /// reference set to NULL.
   /// @param[in] track  The track being added to the primary chain
   bool AddPrimaryTrack(MAUS::GlobalTrack* track);
@@ -117,11 +117,11 @@ class PrimaryChain {
   }
 
   void set_track_parent_pairs(
-      std::vector<MAUS::recon::global::TRefTrackPair*>* tracks) {
+      std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
     _tracks = tracks;
   }
 
-  std::vector<MAUS::recon::global::TRefTrackPair*>*
+  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
   get_track_parent_pairs() const {
     return _tracks;
   }
@@ -145,7 +145,7 @@ class PrimaryChain {
   /// Map of tracks associated with this primary chain, and a
   /// reference to their parent tracks if applicable (NULL if track is
   /// believed to be a primary particle).
-  std::vector<MAUS::recon::global::TRefTrackPair*> *_tracks;
+  std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *_tracks;
 
   /// The goodness of fit parameter.
   double _goodness_of_fit;
@@ -153,16 +153,8 @@ class PrimaryChain {
   ClassDef(PrimaryChain, 1)
 }; // ~class PrimaryChain
 
-} // ~namespace global
-} // ~namespace recon
-
-typedef MAUS::recon::global::PrimaryChain GlobalPrimaryChain;
-
-typedef std::vector<MAUS::GlobalPrimaryChain*> GlobalPrimaryChainPArray; 
-
-typedef std::vector<const MAUS::GlobalPrimaryChain*>
-ConstGlobalPrimaryChainPArray; 
-
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS
 
 #endif

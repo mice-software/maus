@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MAUS::recon::global::SpacePoint
+/** @class MAUS::DataStructure::Global::SpacePoint
  *  @ingroup globalrecon
  *  @brief A reconstructed point in 4D space, matching a detector measurement.
  *
@@ -40,8 +40,8 @@
 #include "src/common_cpp/DataStructure/GlobalReconEnums.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 class SpacePoint : public TObject {
  public:
@@ -134,17 +134,8 @@ class SpacePoint : public TObject {
   ClassDef(SpacePoint, 1)
 }; // ~class SpacePoint
   
-} // ~namespace global
-} // ~namespace recon
-
-typedef MAUS::recon::global::SpacePoint GlobalSpacePoint;
-
-typedef std::vector<MAUS::GlobalSpacePoint*>
-GlobalSpacePointPArray; 
-
-typedef std::vector<const MAUS::GlobalSpacePoint*>
-ConstGlobalSpacePointPArray; 
-
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS
 
 #endif

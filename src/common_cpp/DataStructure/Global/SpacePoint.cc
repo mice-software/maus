@@ -18,15 +18,15 @@
 #include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 // Default constructor
 SpacePoint::SpacePoint()
   : _charge(0.),
     _position(0., 0., 0., 0.),
     _position_error(0., 0., 0., 0.),
-    _detector(MAUS::recon::global::kUndefined),
+    _detector(MAUS::DataStructure::Global::kUndefined),
     _geometry_path("") {}
 
 // Copy contructor
@@ -61,8 +61,8 @@ SpacePoint* SpacePoint::Clone() const {
   // of this in the constructor, and save CPU time.  But, I prefer to
   // keep the methods similar between SpacePoint, TrackPoint and
   // Track.
-  MAUS::recon::global::SpacePoint* spNew =
-      new MAUS::recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint* spNew =
+      new MAUS::DataStructure::Global::SpacePoint();
 
   spNew->set_charge(this->get_charge());
   spNew->set_position(this->get_position());
@@ -73,6 +73,6 @@ SpacePoint* SpacePoint::Clone() const {
   return spNew;
 }
 
-} // ~namespace global
-} // ~namespace recon
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS

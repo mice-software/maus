@@ -15,13 +15,13 @@
  *
  */
 
-/** @class MAUS::recon::global::Track
+/** @class MAUS::DataStructure::Global::Track
  *  @ingroup globalrecon
  *  @brief Track object for the global reconstruction.
  *
  *  A reconstructed track, produced by the global reconstruction.
  *  Primarily consists of a series of
- *  MAUS::recon::global::TrackPoint's, as well as the PID/charge
+ *  MAUS::DataStructure::Global::TrackPoint's, as well as the PID/charge
  *  assumption underwhich the track was reconstructed.  Constituent
  *  tracks can be stored, for book-keeping purposes.
  *
@@ -44,8 +44,8 @@
 #include "DataStructure/GlobalTrackPoint.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 class Track : public TObject {
  public:
@@ -96,11 +96,11 @@ class Track : public TObject {
     return _charge;
   }
 
-  /// Add a MAUS::recon::global::TrackPoint, filling #_geometry_paths
+  /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
   void AddTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
 
-  /// Remove a MAUS::recon::global::TrackPoint, unsetting
+  /// Remove a MAUS::DataStructure::Global::TrackPoint, unsetting
   /// #_detectorpoints bist and removing #_geometry_paths entries if
   /// required.
   void RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
@@ -115,28 +115,28 @@ class Track : public TObject {
     _trackpoints = trackpoints;
   }
 
-  /// Directly access the MAUS::recon::global::TrackPoint pointers
+  /// Directly access the MAUS::DataStructure::Global::TrackPoint pointers
   /// stored in the track, #_trackpoints.
   TRefArray* get_trackpoints() const {
     return _trackpoints;
   }
 
   /// Set the corresponding bit in #_detectorpoints.
-  void SetDetector(MAUS::recon::global::DetectorPoint detector);
+  void SetDetector(MAUS::DataStructure::Global::DetectorPoint detector);
 
   /// Unsetting the bit in #_detectorpoints.
-  void RemoveDetector(MAUS::recon::global::DetectorPoint detector);
+  void RemoveDetector(MAUS::DataStructure::Global::DetectorPoint detector);
 
   /// Check whether the input bit is set in #_detectorpoints (via
   /// bitmask and enumerator value).
-  bool HasDetector(MAUS::recon::global::DetectorPoint detector);
+  bool HasDetector(MAUS::DataStructure::Global::DetectorPoint detector);
 
   /// Set #_detectorpoints = 0, clearing all detector bits.
   void ClearDetectors();
 
   /// Provides a list of detector points associated with the track
   /// object.
-  std::vector<MAUS::recon::global::DetectorPoint> GetDetectorPoints();
+  std::vector<MAUS::DataStructure::Global::DetectorPoint> GetDetectorPoints();
 
   /// Directly set the #_detectorpoints value.
   void set_detectorpoints(unsigned int detectorpoints) {
@@ -149,11 +149,11 @@ class Track : public TObject {
   }
 
   /// Add a geometry path to #_geometry_paths, mostly used by
-  /// AddTrackPoint(MAUS::recon::global::TrackPoint*).
+  /// AddTrackPoint(MAUS::DataStructure::Global::TrackPoint*).
   void AddGeometryPath(std::string geometry_path);
 
   /// Remove a geometry path from #_geometry_paths, mostly used by
-  /// RemoveTrackPoint(MAUS::recon::global::TrackPoint*).
+  /// RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint*).
   void RemoveGeometryPath(std::string geometry_path);
 
   /// Search for a geometry path in #_geometry_paths.
@@ -208,10 +208,10 @@ class Track : public TObject {
 
  private:
 
-  /// Push a MAUS::recon::global::TrackPoint* into the #_trackpoints
+  /// Push a MAUS::DataStructure::Global::TrackPoint* into the #_trackpoints
   /// TRefArray.  This method is private, as
-  /// MAUS::recon::global::TrackPoint's should be added through the
-  /// AddTrackPoint(MAUS::recon::global::TrackPoint*) method.
+  /// MAUS::DataStructure::Global::TrackPoint's should be added through the
+  /// AddTrackPoint(MAUS::DataStructure::Global::TrackPoint*) method.
   void PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
 
   /// The name of the mapper which produced this Track. This can be
@@ -225,7 +225,7 @@ class Track : public TObject {
   /// Charge (+1/-1) of particle hypothesis.  0 for undecided.
   int _charge;
 
-  /// The associated MAUS::recon::global::TrackPoint's, which define
+  /// The associated MAUS::DataStructure::Global::TrackPoint's, which define
   /// the path of the reconstructed track.
   TRefArray* _trackpoints;
 
@@ -234,7 +234,7 @@ class Track : public TObject {
   unsigned int _detectorpoints;
 
   /// A vector of paths for the virtual
-  /// MAUS::recon::global::TrackPoint objects, which don't match a
+  /// MAUS::DataStructure::Global::TrackPoint objects, which don't match a
   /// DetectorPoint.
   std::vector<std::string> _geometry_paths;
 
@@ -251,13 +251,8 @@ class Track : public TObject {
   ClassDef(Track, 1)
 }; // ~class Track
   
-} // ~namespace global
-} // ~namespace recon
-
-typedef MAUS::recon::global::Track GlobalTrack;
-typedef std::vector<MAUS::GlobalTrack*> GlobalTrackPArray; 
-typedef std::vector<const MAUS::GlobalTrack*> ConstGlobalTrackPArray;
-
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS
 
 #endif

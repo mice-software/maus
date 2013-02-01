@@ -20,8 +20,8 @@
 #include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 // Default constructor
 TrackPoint::TrackPoint()
@@ -31,7 +31,7 @@ TrackPoint::TrackPoint()
       _position_error(0., 0., 0., 0.),
       _momentum(0., 0., 0., 0.),
       _momentum_error(0., 0., 0., 0.),
-      _detector(MAUS::recon::global::kUndefined),
+      _detector(MAUS::DataStructure::Global::kUndefined),
       _geometry_path(""),
       _spacepoint(NULL) {}
 
@@ -70,8 +70,8 @@ TrackPoint& TrackPoint::operator=(const TrackPoint &trackpoint) {
 
 // Create a new TrackPoint, identical to the original, but separate.
 TrackPoint* TrackPoint::Clone() {
-  MAUS::recon::global::TrackPoint* tpNew =
-      new MAUS::recon::global::TrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tpNew =
+      new MAUS::DataStructure::Global::TrackPoint();
   
   tpNew->set_mapper_name(this->get_mapper_name());
   tpNew->set_charge(this->get_charge());
@@ -93,6 +93,6 @@ TrackPoint* TrackPoint::Clone() {
   return tpNew;
 }
 
-} // ~namespace global
-} // ~namespace recon
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS

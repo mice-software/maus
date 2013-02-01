@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MAUS::recon::global::PrimaryChain
+/** @class MAUS::DataStructure::Global::PrimaryChain
  *  @ingroup globalrecon
  *  @brief The reconstructed chain for a single primary particle.
  *
@@ -36,8 +36,8 @@
 #include "src/common_cpp/DataStructure/GlobalTrack.hh"
 
 namespace MAUS {
-namespace recon {
-namespace global {
+namespace DataStructure {
+namespace Global {
 
 class TRefTrackPair : public std::pair<TRef, TRef> {
  public:
@@ -52,8 +52,8 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
     this->second = s; 
   };
 
-  TRefTrackPair(MAUS::recon::global::Track* track,
-                MAUS::recon::global::Track* parent) {
+  TRefTrackPair(MAUS::DataStructure::Global::Track* track,
+                MAUS::DataStructure::Global::Track* parent) {
     this->first = track; 
     this->second = parent; 
   };
@@ -62,23 +62,23 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
   ~TRefTrackPair() {};
 
   // Set the Track
-  void SetTrack(MAUS::recon::global::Track* track) {
+  void SetTrack(MAUS::DataStructure::Global::Track* track) {
     this->first = track; 
   }    
 
   // Get a const pointer to the track
-  MAUS::recon::global::Track* GetTrack() const {
-    return (MAUS::recon::global::Track*) this->first.GetObject();
+  MAUS::DataStructure::Global::Track* GetTrack() const {
+    return (MAUS::DataStructure::Global::Track*) this->first.GetObject();
   }    
 
   // Set the Parent
-  void SetParent(MAUS::recon::global::Track* parent) {
+  void SetParent(MAUS::DataStructure::Global::Track* parent) {
     this->second = parent; 
   }    
 
   // Get a const pointer to the parent
-  MAUS::recon::global::Track* GetParent() const {
-    return (MAUS::recon::global::Track*) this->second.GetObject();
+  MAUS::DataStructure::Global::Track* GetParent() const {
+    return (MAUS::DataStructure::Global::Track*) this->second.GetObject();
   }    
 
   // Setter for first element, for TRefTrackPairProcessor
@@ -101,8 +101,8 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
     return this->second;
   }
 };
-} // ~namespace global
-} // ~namespace recon
+} // ~namespace Global
+} // ~namespace DataStructure
 } // ~namespace MAUS
 
 #endif
