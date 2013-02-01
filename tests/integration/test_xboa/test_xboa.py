@@ -26,7 +26,7 @@ class TestXBOA(unittest.TestCase): # pylint: disable=R0904
     Run the tests and check they return 0
     """
 
-    def test_xboa(self):
+    def _test_xboa(self):
         """
         Run the xboa test
         """
