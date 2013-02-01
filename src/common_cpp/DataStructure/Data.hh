@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
@@ -88,7 +89,7 @@ class Data : public MAUSEvent<Spill> {
   private:
     Spill* _spill;
     std::string _event_type;
-    ClassDef(Data, 1)
+    MAUS_VERSIONED_CLASS_DEF(Data)
 };
 }
 

@@ -94,7 +94,8 @@ std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
 std::string TEST_BRANCH(std::string path) {
     std::string ref = "{\"$ref\":\"#"+path+"test_child_by_value\"}";
     return std::string("{\"test_child_by_value\":{}, ")+
-           std::string("\"test_child_by_ref\":")+ref+", "+
+           std::string("\"test_required_child_by_ref\":")+ref+", "+
+           std::string("\"test_not_req_child_by_ref\":")+ref+", "+
            std::string("\"test_child_array\":[")+ref+", "+ref+", null]}";
 }
 

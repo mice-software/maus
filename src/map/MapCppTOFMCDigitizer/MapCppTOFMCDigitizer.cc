@@ -82,6 +82,7 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
   Json::Value tof_evt;
 
   // loop over events
+  std::cout << "mc numevts = " << mc.size() << std::endl;
   if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
   for ( unsigned int i = 0; i < mc.size(); i++ ) {
     Json::Value particle = mc[i];
@@ -130,7 +131,8 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
 
   for ( unsigned int j = 0; j < hits.size(); j++ ) {  //  j-th hit
       Json::Value hit = hits[j];
-      if (fDebug) std::cout << "hit# " << j << hit << std::endl;
+      // if (fDebug) std::cout << "hit# " << j << hit << std::endl;
+      if (fDebug) std::cout << "=================== hit# " << j << std::endl;
 
       // make sure we can get the station/slab info
       if (!hit.isMember("channel_id"))
@@ -156,7 +158,7 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       if (fDebug) {
          std::cout << "tofhit: " << hit["channel_id"] << " "
                    << hit["position"] << " " << hit["momentum"]
-                   << " " << hit["time"] << std::endl;
+                   << " " << hit["time"] << " " << hit["energy_deposited"] << std::endl;
       }
 
       int stn = hit["channel_id"]["station_number"].asInt();
@@ -221,8 +223,11 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
       // convert edep to photoelectrons for this slab/pmt
       // can't convert to adc yet since we need to add up ph.el's
       //   from other hits if any
+      if (fDebug) std::cout << "edep= " << edep << std::endl;
       double npe1 = get_npe(dist1, edep);
       double npe2 = get_npe(dist2, edep);
+      if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
+      if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
 
       // get the hit time
       double csp = _configJSON["TOFscintLightSpeed"].asDouble();
@@ -334,9 +339,10 @@ bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
 }
 
 //////////////////////////////////////////////////////////////////////
-double MapCppTOFMCDigitizer::get_npe(double edep, double dist) {
-      double peRes = 1e-4;
+double MapCppTOFMCDigitizer::get_npe(double dist, double edep) {
       double nphot = 0;
+      double nptmp = 0.;
+      if (fDebug) std::cout << "get_npe::edep= " << edep << std::endl;
 
       if (!_configJSON.isMember("TOFattenuationLength"))
           throw(Squeal(Squeal::recoverable,
@@ -350,14 +356,26 @@ double MapCppTOFMCDigitizer::get_npe(double edep, double dist) {
           throw(Squeal(Squeal::recoverable,
                        "Could not find TOFconversionFactor in config",
                        "MapCppTOFMCDigitizer::birth"));
+      if (fDebug)
+          printf("nphot0: %3.12f %3.12f\n", edep, _configJSON["TOFconversionFactor"].asDouble());
+      // convert energy deposited to number of photoelectrons
       nphot = edep / (_configJSON["TOFconversionFactor"].asDouble());
 
+      TRandom* rnd = new TRandom();
+      rnd = new TRandom();
+      nptmp = rnd->Poisson(nphot);
+      nphot = nptmp;
+      // attenuate the yield
       nphot *= exp(-dist / (_configJSON["TOFattenuationLength"].asDouble()));
+      rnd = new TRandom();
+      nptmp = rnd->Poisson(nphot);
+      nphot = nptmp;
+      // correct for phototube quantum efficiency
       nphot *= (_configJSON["TOFpmtQuantumEfficiency"].asDouble());
-      nphot = CLHEP::RandGauss::shoot(nphot, peRes);
-      // cannot convert to adc yet -- need to add up yields from multi hits in bar
-      // take care of adc conversion after weeding out duplicate/multi hits
-      // int adc = (int)( nPE / (_configJSON.["TOFadcConversionFactor"].asDouble()) );
+      rnd = new TRandom();
+      nptmp = rnd->Poisson(nphot);
+      nphot = nptmp;
+
       return nphot;
 }
 
@@ -421,6 +439,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
+      if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
       // ROGERS = changed from "charge" to "charge_pm" for data integrity
       digit["charge_pm"] = adc;
       // NOTE: needs tweaking/verifying -- DR 3/15

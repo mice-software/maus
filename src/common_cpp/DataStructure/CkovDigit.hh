@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CKOVDIGIT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CKOVDIGIT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/CkovA.hh"
 #include "src/common_cpp/DataStructure/CkovB.hh"
 
@@ -60,7 +60,7 @@ class CkovDigit {
     CkovA _A;
     CkovB _B;
 
-    ClassDef(CkovDigit, 1)
+    MAUS_VERSIONED_CLASS_DEF(CkovDigit)
 };
 }
 

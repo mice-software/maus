@@ -5,6 +5,13 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.4.3
+  The following functionality was added:
+    - TOF Monte Carlo digitisation now produces more realistic TOF digits
+  If upgrading from the previous version, the following third party library
+  scripts need to be rerun:
+    - third_party/bash/51xboa.bash
+
 MAUS-v0.4.2
   The following functionality was added:
     - TOF calibration and cabling information is now indexed in the

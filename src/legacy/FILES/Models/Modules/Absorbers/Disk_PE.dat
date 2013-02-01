@@ -1,0 +1,16 @@
+// FILES/Models/Modules/Absorbers/Disk_PE.dat
+//
+// Flat Polyethylene absorber
+// L=52 mm, R=225 mm
+// 
+// created by P. Snopok on August 20, 2012
+
+Module Disk_PE
+{
+  Volume Cylinder
+  Dimensions 225. 52. mm
+  PropertyString Material    POLYETHYLENE
+  PropertyDouble BlueColour  0.5
+  PropertyString SensitiveDetector SpecialVirtual
+}
+

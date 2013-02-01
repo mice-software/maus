@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/Pmt1.hh"
 #include "src/common_cpp/DataStructure/Pmt0.hh"
@@ -143,7 +143,7 @@ class TOFSlabHit {
     Pmt1 _pmt1;
     Pmt0 _pmt0;
 
-    ClassDef(TOFSlabHit, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFSlabHit)
 };
 }
 

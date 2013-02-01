@@ -1,0 +1,17 @@
+// FILES/Models/Modules/Absorbers/AlWindowVacPolycone.dat
+//
+// The Aluminum container for the liquid hydrogen absorber
+//
+// 
+// 
+
+Module AlWindowVacPolycone
+{
+  Volume Polycone
+  PropertyString Material Al 
+  PropertyDouble BlueColour 0.87
+  PropertyDouble GreenColour 0.77
+  PropertyDouble RedColour 0.69
+  PropertyString FileName ${MICEFILES}/Models/Modules/Absorbers/H2-WindowVac.txt
+  PropertyString PolyconeType Shell 
+}

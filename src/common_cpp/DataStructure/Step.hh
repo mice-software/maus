@@ -19,8 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h" // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
@@ -96,7 +95,7 @@ class Step {
     double _energy;
     double _energy_deposited;
 
-    ClassDef(Step, 1)
+    MAUS_VERSIONED_CLASS_DEF(Step)
 };
 }
 

@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/TOFSpacePoint.hh"
 
@@ -91,7 +91,7 @@ class TOFEventSpacePoint {
     TOF1SpacePointArray _tof1;
     TOF2SpacePointArray _tof2;
 
-    ClassDef(TOFEventSpacePoint, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFEventSpacePoint)
 };
 }
 
