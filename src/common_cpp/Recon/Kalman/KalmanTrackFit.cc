@@ -48,9 +48,12 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
   for ( size_t i = 0; i < num_tracks; ++i ) {
     KalmanSeed* seed = seeds[i];
     std::vector<KalmanSite> sites;
+
     initialise(seed, sites, kalman_align);
 
-    // std::cerr << "Number of sites: " << sites.size() << "\n";
+    size_t numb_measurements = sites.size();
+    if ( numb_measurements != 15 ) continue;
+
     KalmanTrack *track = 0;
     if ( seed->is_straight() ) {
       track = new StraightTrack();
@@ -70,9 +73,6 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     // std::cerr << "Filtering site 0" << std::endl;
     filter(sites, track, 0);
 
-    size_t numb_measurements = sites.size();
-
-    if ( numb_measurements != 15 ) continue;
     for ( size_t j = 1; j < numb_measurements; ++j ) {
       // Predict the state vector at site i...
       // std::cerr << "Extrapolating to site " << j << std::endl;
@@ -90,9 +90,19 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     }
 
     monitor.fill(sites);
-    monitor.print_info(sites);
+    // monitor.print_info(sites);
     track->compute_chi2(sites);
     // Misalignment search.
+    for ( size_t j = 0; j < numb_measurements; ++j ) {
+      KalmanSite *site = &sites[j];
+      track->exclude_site(site);
+      if ( track->get_f_chi2()<25. && (j==6 || j==9 || j==12) ) {
+        track->update_misaligments(site);
+        // kalman_align.update_site(site);
+      }
+    }
+    kalman_align.update(sites);
+
     // if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
     // kalman_align->algorithm_1();
     // kalman_align->algorithm_2();
@@ -126,8 +136,8 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   first_plane.set_z(clusters[0]->get_position().z());
   int id_0 = clusters[0]->get_id();
   first_plane.set_id(id_0);
-  first_plane.set_shifts(kalman_align.get_shifts(id_0));
-  first_plane.set_S_covariance(kalman_align.get_cov_shifts(id_0));
+  first_plane.set_input_shift(kalman_align.get_shifts(id_0));
+  first_plane.set_input_shift_covariance(kalman_align.get_cov_shifts(id_0));
   sites.push_back(first_plane);
 
   size_t numb_sites = clusters.size();
@@ -138,8 +148,8 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
     a_site.set_z(clusters[j]->get_position().z());
     int id = clusters[j]->get_id();
     a_site.set_id(id);
-    a_site.set_shifts(kalman_align.get_shifts(id));
-    a_site.set_S_covariance(kalman_align.get_cov_shifts(id));
+    a_site.set_input_shift(kalman_align.get_shifts(id));
+    a_site.set_input_shift_covariance(kalman_align.get_cov_shifts(id));
     sites.push_back(a_site);
   }
 

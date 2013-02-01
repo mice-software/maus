@@ -123,7 +123,7 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
 
   double mx = seed->get_mx();
   double my = seed->get_my();
-  double seed_pz = 200.;
+  double seed_pz = 230.;
 
   TMatrixD a(5, 1);
   a(0, 0) = x;

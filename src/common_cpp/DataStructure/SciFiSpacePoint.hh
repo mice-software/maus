@@ -84,6 +84,14 @@ class SciFiSpacePoint {
 
   double get_time()    const { return _time; }
 
+  void set_time_error(double time_error) { _time_error = time_error; }
+
+  double get_time_error()    const { return _time_error; }
+
+  void set_time_res(double time_res) { _time_res = time_res; }
+
+  double get_time_res()    const { return _time_res; }
+
   void set_type(std::string type) { _type = type; }
 
   std::string get_type()  const { return _type; }

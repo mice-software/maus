@@ -40,8 +40,9 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   prev_site = old_site->get_a(KalmanSite::Filtered);
 
   double old_kappa = prev_site(4, 0);
-  double old_mx = prev_site(1, 0);
-  double old_my = prev_site(3, 0);
+  double old_kappa2 = TMath::Power(old_kappa, 2.);
+  // double old_mx = prev_site(1, 0);
+  // double old_my = prev_site(3, 0);
 
   double Q = 1.;
   double B = -4.;
@@ -53,35 +54,35 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // @x/@x
   _F(0, 0) = 1.;
   // @x/@px
-  _F(0, 1) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
+  _F(0, 1) = sine/(old_kappa*a);
   // @x/@y
   _F(0, 2) = 0.;
   // @x/@py
-  _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
+  _F(0, 3) = (cosine-1.)/(old_kappa*a);
   // @x/@kappa
   _F(0, 4) = 0.0;
-  // (-1./(old_kappa*old_kappa))*(old_mx*sine/a-old_my/a+old_my*cosine/a) +
-  //           (1./old_kappa)*(old_mx*deltaZ*cosine-old_my*deltaZ*sine);
+  //F(0, 4) = (-1./old_kappa2)*(old_mx*sine/a - old_my/a + old_my*cosine/a) +
+  //          (1./old_kappa)*(old_mx*deltaZ*cosine - old_my*deltaZ*sine);
 
   // @px/@x
   _F(1, 0) = 0.;
   // @px/@px
-  _F(1, 1) = cos(a*deltaZ*old_kappa);
+  _F(1, 1) = cosine;
   // @px/@y
   _F(1, 2) = 0.;
   // @px/@py
-  _F(1, 3) = -sin(a*deltaZ*old_kappa);
+  _F(1, 3) = -sine;
   // @px/@kappa
   _F(1, 4) = 0.;
 
   // @y/@x
   _F(2, 0) = 0.;
   // @y/@px
-  _F(2, 1) = (1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
+  _F(2, 1) = (1.-cosine)/(old_kappa*a);
   // @y/@y
   _F(2, 2) = 1.;
   // @y/@py
-  _F(2, 3) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
+  _F(2, 3) = sine/(old_kappa*a);
   // @y/@kappa
   _F(2, 4) = 0.0;
   // (-1./(old_kappa*old_kappa))*(old_my*sine/a+old_mx/a-old_mx*cosine/a) +
@@ -90,11 +91,11 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // @py/@x
   _F(3, 0) = 0.;
   // @py/@px
-  _F(3, 1) = sin(a*deltaZ*old_kappa);
+  _F(3, 1) = sine;
   // @py/@y
   _F(3, 2) = 0.;
   // @py/@py
-  _F(3, 3) = cos(a*deltaZ*old_kappa);
+  _F(3, 3) = cosine;
   // @py/@kappa
   _F(3, 4) = 0.;
 

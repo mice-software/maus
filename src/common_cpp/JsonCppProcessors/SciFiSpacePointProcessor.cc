@@ -44,6 +44,12 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor()
     RegisterValueBranch("time", &_double_proc,
                         &SciFiSpacePoint::get_time,
                         &SciFiSpacePoint::set_time, true);
+    RegisterValueBranch("time_error", &_double_proc,
+                        &SciFiSpacePoint::get_time_error,
+                        &SciFiSpacePoint::set_time_error, true);
+    RegisterValueBranch("time_res", &_double_proc,
+                        &SciFiSpacePoint::get_time_res,
+                        &SciFiSpacePoint::set_time_res, true);
     RegisterValueBranch("npe", &_double_proc,
                         &SciFiSpacePoint::get_npe,
                         &SciFiSpacePoint::set_npe, true);

@@ -23,8 +23,8 @@ SciFiTrackProcessor::SciFiTrackProcessor() {
                         &SciFiTrack::get_tracker,
                         &SciFiTrack::set_tracker, true);
     RegisterValueBranch("chi2", &_double_proc,
-                        &SciFiTrack::get_chi2,
-                        &SciFiTrack::set_chi2, true);
+                        &SciFiTrack::get_f_chi2,
+                        &SciFiTrack::set_f_chi2, true);
     RegisterValueBranch("ndf", &_int_proc,
                         &SciFiTrack::get_ndf,
                         &SciFiTrack::set_ndf, true);

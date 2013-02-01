@@ -87,6 +87,7 @@ class KalmanMonitor {
   TGraph *station8;
   TGraph *station9;
   TGraph *station10;
+  TH1F *excl_plane11;
 
   TH2F *pull_hist;
   TH2F *residual_hist;

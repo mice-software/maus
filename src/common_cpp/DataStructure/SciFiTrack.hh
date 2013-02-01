@@ -54,8 +54,11 @@ class SciFiTrack {
     int  get_tracker() const      { return _tracker; }
     void set_tracker(int tracker) { _tracker = tracker; }
 
-    double get_chi2()    const   { return _chi2; }
-    void   set_chi2(double chi2) { _chi2 = chi2; }
+    double get_f_chi2()    const   { return _f_chi2; }
+    void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
+
+    double get_s_chi2()    const   { return _s_chi2; }
+    void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
 
     int  get_ndf()     const   { return _ndf; }
     void set_ndf(int ndf)      { _ndf = ndf; }
@@ -66,7 +69,8 @@ class SciFiTrack {
   private:
     int _tracker;
 
-    double _chi2;
+    double _f_chi2;
+    double _s_chi2;
 
     int _ndf;
 

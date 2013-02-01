@@ -19,24 +19,28 @@
 
 namespace MAUS {
 
-SciFiTrack::SciFiTrack(): _tracker(-1), _chi2(-1), _ndf(-1), _P_value(-1) {}
+SciFiTrack::SciFiTrack(): _tracker(-1), _f_chi2(-1), _s_chi2(-1), _ndf(-1), _P_value(-1) {}
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
-                                                   _chi2(-1),
+                                                   _f_chi2(-1),
+                                                   _s_chi2(-1),
                                                    _ndf(-1),
                                                    _P_value(-1) {
   _tracker = a_track.get_tracker();
-  _chi2    = a_track.get_chi2();
+  _f_chi2    = a_track.get_f_chi2();
+  _s_chi2    = a_track.get_s_chi2();
   _ndf     = a_track.get_ndf();
   _P_value = a_track.get_P_value();
 }
 
 SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
-                                                  _chi2(-1),
+                                                  _f_chi2(-1),
+                                                  _s_chi2(-1),
                                                   _ndf(-1),
                                                   _P_value(-1) {
   _tracker = kalman_track->get_tracker();
-  _chi2    = kalman_track->get_chi2();
+  _f_chi2    = kalman_track->get_f_chi2();
+  _s_chi2    = kalman_track->get_s_chi2();
   _ndf     = kalman_track->get_ndf();
   _P_value = kalman_track->get_P_value();
 }
@@ -46,7 +50,8 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
         return *this;
     }
     _tracker = a_track.get_tracker();
-    _chi2    = a_track.get_chi2();
+    _f_chi2    = a_track.get_f_chi2();
+    _s_chi2    = a_track.get_s_chi2();
     _ndf     = a_track.get_ndf();
     _P_value = a_track.get_P_value();
     return *this;

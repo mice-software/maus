@@ -29,6 +29,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "Interface/Squeal.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 
 namespace MAUS {
@@ -49,19 +50,42 @@ class KalmanSite {
                Smoothed,
                Excluded };
 
+  /// Initialises member matrices.
   void initialise();
 
   /// SETTERS
   ///
   /// The state vector at the site.
   void set_a(TMatrixD a, State current_state);
-  TMatrixD get_a(State desired_state) const;
-
   void set_covariance_matrix(TMatrixD C, State current_state);
-  TMatrixD get_covariance_matrix(State desired_state) const;
-
   void set_residual(TMatrixD residual, State current_state);
+
+
+  TMatrixD get_a(State desired_state) const;
+  TMatrixD get_covariance_matrix(State desired_state) const;
   TMatrixD get_residual(State desired_state) const;
+
+  void set_covariance_residual(TMatrixD C, State kalman_state);
+  TMatrixD get_covariance_residual(State desired_state) const;
+  /// The residuals and its covariance.
+  // need to extend this to other residuals
+  // TMatrixD get_covariance_residuals()        const { return _covariance_residuals; }
+
+  /// Shifts.
+  void set_input_shift(TMatrixD input_shift) { _input_shift = input_shift; }
+  TMatrixD get_input_shift() const { return _input_shift; }
+  void set_input_shift_covariance(TMatrixD input_covariance) { _input_shift_covariance = input_covariance; }
+  TMatrixD get_input_shift_covariance() const { return _input_shift_covariance; }
+
+  void set_shift_A(TMatrixD shift_A) { _shift_A = shift_A; }
+  TMatrixD get_shift_A() const { return _shift_A; }
+  TMatrixD get_shift_A_covariance() const { return _shift_A_covariance; }
+  void set_shift_A_covariance(TMatrixD shift_A_covariance) { _shift_A_covariance = shift_A_covariance; }
+
+  void set_shift_B(TMatrixD shift_B) { _shift_B = shift_B; }
+  TMatrixD get_shift_B()            const { return _shift_B; }
+  TMatrixD get_shift_B_covariance() const { return _shift_B_covariance; }
+  void set_shift_B_covariance(TMatrixD shift_B_covariance) { _shift_B_covariance = shift_B_covariance; }
 
   /// Sets the measurement vector.
   void set_measurement(double alpha)                { _v(0, 0) = alpha;
@@ -70,77 +94,57 @@ class KalmanSite {
   void set_direction(CLHEP::Hep3Vector dir)        { _direction = dir; }
   void set_z(double z)                             { _z = z; }
   void set_id(int id)                              { _id = id; }
-  void set_pitch(double factor)                    { _pitch = factor; }
-
-  /// Residuals.
-  void set_pull(TMatrixD pull)                     { _pull = pull; }
-  void set_residual(TMatrixD res)                  { _residual = res; }
-  void set_smoothed_residual(TMatrixD res)         { _smoothed_residual = res; }
+  // void set_pitch(double factor)                    { _pitch = factor; }
 
   /// The covariance of the innovation.
-  void set_covariance_residuals(TMatrixD cov_res)  { _covariance_residuals = cov_res; }
-  void set_chi2(double chi2)                       { _chi2 = chi2; }
-  /// Misalignments matrices and vectors.
-  void set_shifts(TMatrixD shift)                  { _s = shift;     }
-  void set_S_covariance(TMatrixD cov_s)            { _Cov_s = cov_s; }
-
-  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
-  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
-
-  /// GETTERS
+  //void set_covariance_residuals(TMatrixD cov_res)  { _covariance_residuals = cov_res; }
+  void set_chi2(double chi2, State kalman_state);
+  double get_chi2(State desired_state) const;
 
   /// The measurement.
   TMatrixD get_measurement()                 const { return _v; }
   /// The site properties.
   double get_z()                             const { return _z; }
   int get_id()                               const { return _id; }
-  double get_chi2()                          const { return _chi2; }
-  double get_pitch()                         const { return _pitch; }
+
+
+  // double get_pitch()                         const { return _pitch; }
   CLHEP::Hep3Vector get_direction()          const { return _direction; }
-  /// The residuals and its covariance.
-  TMatrixD get_covariance_residuals()        const { return _covariance_residuals; }
-  /// Misalignments and their covariance.
-  TMatrixD get_shifts()       const { return _s; }
-  TMatrixD get_S_covariance() const { return _Cov_s; }
+
+  State get_current_state() const { return _current_state; }
+  void set_current_state(State kalman_state) { _current_state = kalman_state; }
 
   CLHEP::Hep3Vector get_true_momentum()      const { return _mc_mom; }
   CLHEP::Hep3Vector get_true_position()      const { return _mc_pos; }
-
-  State get_current_state() const { return _current_state; }
-
-  void set_current_state(State kalman_state) { _current_state = kalman_state; }
+  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
+  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
 
  private:
+  /// State of the site.
   State _current_state;
-
   /// Z placement of the site (mm).
   double _z;
-
   /// Site id.
   int _id;
-
   /// The Chi2 at this site.
-  double _chi2;
-
+  double _f_chi2;
+  double _s_chi2;
   /// Pitch of the detector.
-  double _pitch;
-
+  // double _pitch;
   /// Orientation of the measuring plane.
   CLHEP::Hep3Vector _direction;
-
-  CLHEP::Hep3Vector _mc_pos;
-  CLHEP::Hep3Vector _mc_mom;
 
   /// The state vector.
   TMatrixD _projected_a;
   TMatrixD _a;
   TMatrixD _smoothed_a;
-  TMatrixD _a_excl;
+  TMatrixD _a_excluded;
 
   /// The covariance matrix.
   TMatrixD _projected_C;
   TMatrixD _C;
   TMatrixD _smoothed_C;
+  TMatrixD _C_excluded;
 
   /// The measurement.
   TMatrixD _v;
@@ -149,13 +153,22 @@ class KalmanSite {
   TMatrixD _pull;
   TMatrixD _residual;
   TMatrixD _smoothed_residual;
-  TMatrixD _measured_shift;
+  TMatrixD _excluded_residual;
 
-  TMatrixD _covariance_residuals;
+  TMatrixD _covariance_residual;
+  TMatrixD _covariance_smoothed_residual;
+  TMatrixD _covariance_excluded_residual;
 
-  /// The misalignments.
-  TMatrixD _s;
-  TMatrixD _Cov_s;
+  /// Alignment.
+  TMatrixD _input_shift;
+  TMatrixD _shift_A;
+  TMatrixD _shift_B;
+  TMatrixD _input_shift_covariance;
+  TMatrixD _shift_A_covariance;
+  TMatrixD _shift_B_covariance;
+
+  CLHEP::Hep3Vector _mc_pos;
+  CLHEP::Hep3Vector _mc_mom;
 };
 
 } // ~namespace MAUS

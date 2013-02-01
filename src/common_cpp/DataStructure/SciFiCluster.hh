@@ -110,6 +110,10 @@ class SciFiCluster {
 
   int get_id() const { return _id; }
 
+  SciFiDigitPArray get_digits() const { return _digits; }
+
+  void set_digits(SciFiDigitPArray digits) { _digits = digits; }
+
   void set_true_momentum(ThreeVector p) { _true_p = p; }
 
   ThreeVector get_true_momentum() const { return _true_p; }
@@ -129,11 +133,12 @@ class SciFiCluster {
 
   ThreeVector _direction, _position;
 
+  SciFiDigitPArray _digits;
+
   ClassDef(SciFiCluster, 1)
 }; // Don't forget this trailing colon!!!!
 
 typedef std::vector<SciFiCluster*> SciFiClusterPArray;
-
 } // ~namespace MAUS
 
 #endif

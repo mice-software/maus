@@ -108,7 +108,7 @@ void KalmanTrackTest::set_up_sites() {
 TEST_F(KalmanTrackTest, test_constructor) {
   // a_site->set_measurement(0);
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  EXPECT_EQ(track->get_chi2(), 0.0);
+  // EXPECT_EQ(track->get_chi2(), 0.0);
   EXPECT_EQ(track->get_ndf(), 0.0);
   EXPECT_EQ(track->get_tracker(), -1);
 }
@@ -128,17 +128,68 @@ TEST_F(KalmanTrackTest, test_error_methods) {
 //
 TEST_F(KalmanTrackTest, test_filtering_methods) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  CLHEP::Hep3Vector direction_plane0_tracker0 = (0., 1., 0.);
-  CLHEP::Hep3Vector direction_plane1_tracker0 = (-0.866, -0.5, 0.0);
-  CLHEP::Hep3Vector direction_plane2_tracker0 = (0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
+  CLHEP::Hep3Vector direction_plane1_tracker0(-0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker0(0.866, -0.5, 0.0);
 
-  CLHEP::Hep3Vector direction_plane0_tracker1 = (0., 1., 0.);
-  CLHEP::Hep3Vector direction_plane1_tracker1 = (0.866, -0.5, 0.0);
-  CLHEP::Hep3Vector direction_plane2_tracker1 = (-0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane0_tracker1(0., 1., 0.);
+  CLHEP::Hep3Vector direction_plane1_tracker1(0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker1(-0.866, -0.5, 0.0);
 
-  // KalmanSite *a_site;
-  // a_site->set_direction(direction_plane0_tracker0);
-  // a_site->set_measurement(0.0);
+  MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
+  // Plane 0. 1st case.
+  a_site->set_direction(direction_plane1_tracker0);
+  TMatrixD a;
+  a.ResizeTo(5, 1);
+  a(0, 0) = 50.;
+  a(1, 0) = 1.;
+  a(2, 0) = 5.;
+  a(3, 0) = 1.;
+  a(4, 0) = 1./200.;
+  a.Print();
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  TMatrixD s(3, 1);
+  s.Zero();
+  track->update_H(a_site);
+  TMatrixD HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) > 0);
+  // 2nd case.
+  a(0, 0) = 2.;
+  a(2, 0) = 60.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) < 0);
+  // 3rd case
+  a(0, 0) = -30.;
+  a(2, 0) = 30.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) < 0);
+  // 4th case
+  a(0, 0) = -50.;
+  a(2, 0) = -5.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) < 0);
+  // 5th case
+  a(0, 0) = -2.;
+  a(2, 0) = -60.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) > 0);
+  // 6th case
+  a(0, 0) = 30.;
+  a(2, 0) = -30.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+  HA = track->solve_measurement_equation(a, s);
+  HA.Print();
+  EXPECT_TRUE(HA(0, 0) > 0);
+
 /*
   double x, px, y, py, kappa;
   x =

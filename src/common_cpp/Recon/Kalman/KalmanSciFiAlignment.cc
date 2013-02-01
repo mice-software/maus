@@ -151,10 +151,49 @@ void KalmanSciFiAlignment::algorithm_A() {
   }
 }
 
+/////////////////////////////////B
 void KalmanSciFiAlignment::algorithm_B() {
-
+      std::cerr << "Good chi2; lauching KalmanAlignment...\n";
+      update_alignment_parameters(sites, track, kalman_align);
+      // Update Stored misalignments using values stored in each site.
+      kalman_align.update(sites);
 
 }
+
+void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
+                                                 KalmanTrack *track,
+                                                 KalmanSciFiAlignment &kalman_align) {
+  unsigned int numb_measurements = sites.size();
+
+  for ( int i = 0; i < numb_measurements; ++i ) {
+    // ... Filter...
+    std::cerr << "Updating site " << i << std::endl;
+    filter_updating_misalignments(sites, track, i);
+  }
+}
+void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
+                            KalmanTrack *track, int current_site) {
+  // Get Site...
+  KalmanSite *a_site = &sites[current_site];
+  KalmanSite *alignment_projection_site = 0;
+  // Get previous site too.
+  if ( !(current_site%3) ) {
+    std::cerr << "first plane; copying shifts read in. \n";
+    alignment_projection_site = a_site;
+  } else {
+    alignment_projection_site = &sites[current_site-1];
+  }
+
+  // Update measurement error:
+  // (non-const std for the perp direction)
+  track->update_V(a_site);
+  track->update_H(a_site);
+  track->update_W(a_site);
+
+  track->update_misaligments(a_site, alignment_projection_site);
+}
+/////////////////////////////////B
+
 
 void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
                                                  KalmanTrack *track,
@@ -193,41 +232,18 @@ void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &site
 */
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
   int numb_sites = sites.size();
   // Overwrite matrices with site's values.
-/*
   for ( int site_i = 0; site_i < numb_sites; ++site_i ) {
     KalmanSite site = sites[site_i];
     int id = site.get_id();
-    set_shifts(site.get_shifts(), id);
+    set_shifts(site.get_shift_A(), id);
     // set_rotations(site.get_rotations(), id);
-    set_cov_shifts(site.get_S_covariance(), id);
+    set_cov_shifts(site.get_shift_A_covariance(), id);
     // set_cov_rotat(site.get_R_covariance(), id);
   }
-*/
+
   std::ofstream file_out(fname.c_str());
   // Write shifts.
   file_out << "# station" << "\t" << "xd" << "\t"
@@ -244,9 +260,20 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
       << 0. << "\t"
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
+
+      file_out << 2 << "\t"
+      << 0. << "\t"
+      << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
+      << 0. << "\t"
+      << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
+      << 0. << "\t"
+      << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
+
   // sites 2 to 29; increment 3
-  for ( int station = 2; station < 5; station++ ) {
-      int site_i = 3*(station-1); // 3, 6, 9
+  for ( int station = 3; station < 6; station++ ) {
+      // int site_i = 3*(station-1); // 3, 6, 9
+      //int site_i = 3*station-1; // j==5 || j==8 || j==11
+      int site_i = 3*(station-1); // j==5 || j==8 || j==11
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"
@@ -261,6 +288,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << covariance_shifts[site_i](2, 1) << "\t"
       << covariance_shifts[site_i](2, 2) << "\n";
   }
+/*
       file_out << 5 << "\t"
       << 0. << "\t"
       << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
@@ -268,7 +296,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
       << 0. << "\t"
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
-
+*/
       file_out << 6 << "\t"
       << 0. << "\t"
       << 0.1 << "\t" << 0. << "\t" << 0. << "\t"

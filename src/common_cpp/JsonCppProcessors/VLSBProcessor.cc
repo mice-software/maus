@@ -18,46 +18,54 @@
 
 namespace MAUS {
 
-VLSBProcessor::VLSBProcessor()
-    : _detector_proc(), _equip_type_proc(), _time_stamp_proc(),
-      _phys_event_number_proc(), _bank_id_proc(), _adc_proc(),
-      _part_event_number_proc(), _channel_proc(), _tdc_proc(),
-      _discriminator_proc(), _ldc_id_proc() {
+VLSBProcessor::VLSBProcessor() {
     RegisterValueBranch
-          ("detector", &_detector_proc, &VLSB::GetDetector,
+          ("detector", &_string_proc,
+          &VLSB::GetDetector,
           &VLSB::SetDetector, true);
     RegisterValueBranch
-          ("equip_type", &_equip_type_proc, &VLSB::GetEquipType,
+          ("equip_type", &_int_proc,
+          &VLSB::GetEquipType,
           &VLSB::SetEquipType, true);
     RegisterValueBranch
-          ("time_stamp", &_time_stamp_proc, &VLSB::GetTimeStamp,
+          ("time_stamp", &_int_proc,
+          &VLSB::GetTimeStamp,
           &VLSB::SetTimeStamp, true);
     RegisterValueBranch
-          ("phys_event_number", &_phys_event_number_proc, &VLSB::GetPhysEventNumber,
+          ("phys_event_number", &_int_proc,
+          &VLSB::GetPhysEventNumber,
           &VLSB::SetPhysEventNumber, true);
     RegisterValueBranch
-          ("bank_id", &_bank_id_proc, &VLSB::GetBankID,
+          ("bank_id", &_int_proc,
+          &VLSB::GetBankID,
           &VLSB::SetBankID, true);
     RegisterValueBranch
-          ("adc", &_adc_proc, &VLSB::GetADC,
+          ("adc", &_int_proc,
+          &VLSB::GetADC,
           &VLSB::SetADC, true);
     RegisterValueBranch
-          ("adc", &_adc_proc, &VLSB::GetADC,
+          ("adc", &_int_proc,
+          &VLSB::GetADC,
           &VLSB::SetADC, true);
     RegisterValueBranch
-          ("part_event_number", &_part_event_number_proc, &VLSB::GetPartEventNumber,
+          ("part_event_number", &_int_proc,
+          &VLSB::GetPartEventNumber,
           &VLSB::SetPartEventNumber, true);
     RegisterValueBranch
-          ("channel", &_channel_proc, &VLSB::GetChannel,
+          ("channel", &_int_proc,
+          &VLSB::GetChannel,
           &VLSB::SetChannel, true);
     RegisterValueBranch
-          ("tdc", &_tdc_proc, &VLSB::GetTDC,
+          ("tdc", &_int_proc,
+          &VLSB::GetTDC,
           &VLSB::SetTDC, true);
     RegisterValueBranch
-          ("discriminator", &_discriminator_proc, &VLSB::GetDiscriminator,
+          ("discriminator", &_int_proc,
+          &VLSB::GetDiscriminator,
           &VLSB::SetDiscriminator, true);
     RegisterValueBranch
-          ("ldc_id", &_ldc_id_proc, &VLSB::GetLdcId,
+          ("ldc_id", &_int_proc,
+          &VLSB::GetLdcId,
           &VLSB::SetLdcId, true);
 }
 }  // namespace MAUS
