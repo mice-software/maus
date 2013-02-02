@@ -272,7 +272,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
   // sites 2 to 29; increment 3
   for ( int station = 3; station < 6; station++ ) {
       // int site_i = 3*(station-1); // 3, 6, 9
-      //int site_i = 3*station-1; // j==5 || j==8 || j==11
+      // int site_i = 3*station-1; // j==5 || j==8 || j==11
       int site_i = 3*(station-1); // j==5 || j==8 || j==11
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"

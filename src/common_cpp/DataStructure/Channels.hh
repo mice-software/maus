@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CHANNELS_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CHANNELS_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -298,7 +298,7 @@ class Channels {
     int _ch8;
     int _ch9;
 
-    ClassDef(Channels, 1)
+    MAUS_VERSIONED_CLASS_DEF(Channels)
 };
 }
 

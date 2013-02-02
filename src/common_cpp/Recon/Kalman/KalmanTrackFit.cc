@@ -93,16 +93,17 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     // monitor.print_info(sites);
     track->compute_chi2(sites);
     // Misalignment search.
-    for ( size_t j = 0; j < numb_measurements; ++j ) {
-      KalmanSite *site = &sites[j];
-      track->exclude_site(site);
-      if ( track->get_f_chi2()<25. && (j==6 || j==9 || j==12) ) {
-        track->update_misaligments(site);
-        // kalman_align.update_site(site);
+    if ( _update_misalignments ) {
+      for ( size_t j = 0; j < numb_measurements; ++j ) {
+        KalmanSite *site = &sites[j];
+        track->exclude_site(site);
+        if ( track->get_f_chi2()<25. && (j == 6 || j == 9 || j == 12) ) {
+          track->update_misaligments(site);
+          // kalman_align.update_site(site);
+        }
       }
+      kalman_align.update(sites);
     }
-    kalman_align.update(sites);
-
     // if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
     // kalman_align->algorithm_1();
     // kalman_align->algorithm_2();

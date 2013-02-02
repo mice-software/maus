@@ -19,6 +19,7 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_JOBFOOTERDATA_HH_
 
 #include <string>
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
@@ -85,7 +86,7 @@ class JobFooterData : public MAUSEvent<JobFooter> {
 
   private:
     JobFooter* _job_footer;
-    ClassDef(JobFooterData, 1)
+    MAUS_VERSIONED_CLASS_DEF(JobFooterData)
 };
 }
 

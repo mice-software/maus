@@ -148,7 +148,7 @@ void KalmanSite::initialise() {
   _covariance_residual.ResizeTo(2, 2);
   _covariance_smoothed_residual.ResizeTo(2, 2);
   _covariance_excluded_residual.ResizeTo(2, 2);
-  //_covariance_residuals.ResizeTo(2, 2);
+  // _covariance_residuals.ResizeTo(2, 2);
 
   // The misalignments.
   _input_shift.ResizeTo(3, 1);

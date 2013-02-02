@@ -1,0 +1,16 @@
+// FILES/Models/Modules/Absorbers/Disk_Al.dat
+//
+// Flat Alumin(i)um absorber
+// L=23 mm, R=225 mm
+// 
+// created by P. Snopok on August 20, 2012
+
+Module Disk_Al 
+{
+  Volume Cylinder
+  Dimensions 225. 23. mm
+  PropertyString Material    Al
+  PropertyDouble BlueColour  0.5
+  PropertyString SensitiveDetector SpecialVirtual
+}
+

@@ -61,7 +61,7 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   _F(0, 3) = (cosine-1.)/(old_kappa*a);
   // @x/@kappa
   _F(0, 4) = 0.0;
-  //F(0, 4) = (-1./old_kappa2)*(old_mx*sine/a - old_my/a + old_my*cosine/a) +
+  // F(0, 4) = (-1./old_kappa2)*(old_mx*sine/a - old_my/a + old_my*cosine/a) +
   //          (1./old_kappa)*(old_mx*deltaZ*cosine - old_my*deltaZ*sine);
 
   // @px/@x

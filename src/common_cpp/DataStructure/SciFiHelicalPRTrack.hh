@@ -27,6 +27,7 @@
 #include <vector>
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
@@ -181,7 +182,7 @@ class SciFiHelicalPRTrack {
 
     SciFiSpacePointPArray  _spoints;
 
-    ClassDef(SciFiHelicalPRTrack, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };
 
 typedef std::vector<SciFiHelicalPRTrack*> SciFiHelicalPRTrackPArray;

@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -197,7 +197,7 @@ class V1731 {
     int _pedestal;
     int _channel;
 
-    ClassDef(V1731, 1)
+    MAUS_VERSIONED_CLASS_DEF(V1731)
 };
 }
 

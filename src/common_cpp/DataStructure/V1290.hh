@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -148,7 +148,7 @@ class V1290 {
     int _geo;
     int _channel;
 
-    ClassDef(V1290, 1)
+    MAUS_VERSIONED_CLASS_DEF(V1290)
 };
 }
 

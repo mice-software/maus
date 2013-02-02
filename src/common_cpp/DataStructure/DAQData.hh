@@ -19,8 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/KLDaq.hh"
 #include "src/common_cpp/DataStructure/Trigger.hh"
 #include "src/common_cpp/DataStructure/TOFDaq.hh"
@@ -218,7 +217,7 @@ class DAQData {
     Tracker0DaqArray _tracker0;
     Tracker1DaqArray _tracker1;
 
-    ClassDef(DAQData, 1)
+    MAUS_VERSIONED_CLASS_DEF(DAQData)
 };
 }
 

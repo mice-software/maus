@@ -68,24 +68,26 @@ class KalmanSite {
   void set_covariance_residual(TMatrixD C, State kalman_state);
   TMatrixD get_covariance_residual(State desired_state) const;
   /// The residuals and its covariance.
-  // need to extend this to other residuals
-  // TMatrixD get_covariance_residuals()        const { return _covariance_residuals; }
 
   /// Shifts.
   void set_input_shift(TMatrixD input_shift) { _input_shift = input_shift; }
   TMatrixD get_input_shift() const { return _input_shift; }
-  void set_input_shift_covariance(TMatrixD input_covariance) { _input_shift_covariance = input_covariance; }
+  void set_input_shift_covariance(TMatrixD input_covariance) {
+                _input_shift_covariance = input_covariance; }
+
   TMatrixD get_input_shift_covariance() const { return _input_shift_covariance; }
 
   void set_shift_A(TMatrixD shift_A) { _shift_A = shift_A; }
   TMatrixD get_shift_A() const { return _shift_A; }
   TMatrixD get_shift_A_covariance() const { return _shift_A_covariance; }
-  void set_shift_A_covariance(TMatrixD shift_A_covariance) { _shift_A_covariance = shift_A_covariance; }
+  void set_shift_A_covariance(TMatrixD shift_A_covariance) {
+                _shift_A_covariance = shift_A_covariance; }
 
   void set_shift_B(TMatrixD shift_B) { _shift_B = shift_B; }
   TMatrixD get_shift_B()            const { return _shift_B; }
   TMatrixD get_shift_B_covariance() const { return _shift_B_covariance; }
-  void set_shift_B_covariance(TMatrixD shift_B_covariance) { _shift_B_covariance = shift_B_covariance; }
+  void set_shift_B_covariance(TMatrixD shift_B_covariance) {
+                _shift_B_covariance = shift_B_covariance; }
 
   /// Sets the measurement vector.
   void set_measurement(double alpha)                { _v(0, 0) = alpha;
@@ -97,7 +99,6 @@ class KalmanSite {
   // void set_pitch(double factor)                    { _pitch = factor; }
 
   /// The covariance of the innovation.
-  //void set_covariance_residuals(TMatrixD cov_res)  { _covariance_residuals = cov_res; }
   void set_chi2(double chi2, State kalman_state);
   double get_chi2(State desired_state) const;
 

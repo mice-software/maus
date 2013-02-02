@@ -19,10 +19,9 @@
 
 #include <vector>
 
-#include "Rtypes.h" // ROOT
-
 #include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
                                                // forward declaration of this
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -141,7 +140,7 @@ class MCEvent {
   SpecialVirtualHitArray* _special_virtual_hits;
   TrackArray* _tracks;
 
-  ClassDef(MCEvent, 1)
+  MAUS_VERSIONED_CLASS_DEF(MCEvent)
 };
 }
 

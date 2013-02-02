@@ -76,7 +76,7 @@ class SciFiTrack {
 
     double _P_value;
 
-    ClassDef(SciFiTrack, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };
 
 typedef std::vector<SciFiTrack*> SciFiTrackPArray;

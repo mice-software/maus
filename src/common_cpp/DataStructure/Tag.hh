@@ -19,8 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/V1724.hh"
 
 namespace MAUS {
@@ -62,7 +61,7 @@ class Tag {
   private:
     V1724Array _V1724;
 
-    ClassDef(Tag, 1)
+    MAUS_VERSIONED_CLASS_DEF(Tag)
 };
 }
 

@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/TOFDigit.hh"
 
@@ -92,7 +92,7 @@ class TOFEventDigit {
     TOF0DigitArray _tof0;
     TOF2DigitArray _tof2;
 
-    ClassDef(TOFEventDigit, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFEventDigit)
 };
 }
 
