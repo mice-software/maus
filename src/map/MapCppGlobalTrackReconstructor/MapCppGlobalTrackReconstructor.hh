@@ -103,15 +103,7 @@ class MapCppGlobalTrackReconstructor {
   void SetupOpticsModel();
   void SetupTrackFitter();
 
-  void LoadDetectorConfiguration();
   void LoadRawTracks();
-
-  static Json::Value TrackToJson(const MAUS::recon::global::Track & track);
-  static Json::Value TrackPointToJson(
-      const MAUS::recon::global::TrackPoint & track_point);
-
-  static CovarianceMatrix const GetJsonCovarianceMatrix(
-      Json::Value const & value);
 };
 
 }  // namespace MAUS

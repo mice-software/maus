@@ -76,7 +76,7 @@ MinuitTrackFitter::MinuitTrackFitter(
   Json::Value const * configuration = optics_model.configuration();
 
   const double max_iterations = JsonWrapper::GetProperty(
-      *configuration, "recon_minuit_max_iterations",
+      *configuration, "global_recon_minuit_max_iterations",
       JsonWrapper::intValue).asInt();
   minimiser->SetMaxIterations(max_iterations);
 
@@ -89,7 +89,7 @@ MinuitTrackFitter::MinuitTrackFitter(
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
   const Json::Value parameters = JsonWrapper::GetProperty(
-      *configuration, "recon_minuit_parameters",
+      *configuration, "global_recon_minuit_parameters",
       JsonWrapper::arrayValue);
   const Json::Value::UInt parameter_count = parameters.size();
   for (Json::Value::UInt index = 0; index < parameter_count; ++index) {

@@ -121,16 +121,8 @@ class MapCppGlobalRawTracks {
   recon::global::Particle::ID IdentifyParticle(const double beta);
   double Beta(recon::global::Particle::ID pid, const double momentum);
 
-  static CovarianceMatrix const GetJsonCovarianceMatrix(
-      Json::Value const & value);
-
   void CorrelateTrackPoints(
       std::vector<MAUS::recon::global::Track> & tracks);
-
-  static Json::Value TrackToJson(
-      const MAUS::recon::global::Track & track);
-  static Json::Value TrackPointToJson(
-      const MAUS::recon::global::TrackPoint & track_point);
 };
 
 }  // namespace MAUS

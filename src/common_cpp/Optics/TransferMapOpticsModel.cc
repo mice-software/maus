@@ -173,7 +173,7 @@ int iteration = 0;
           (station_plane > end_plane)) {
         std::ostringstream message_buffer;
         message_buffer << "Mapping detectors are all positioned downstream "
-                       << "from one or more hits (End Plane: " << end_plane
+                       << "from one or more hits (Hit z: " << end_plane
                        << ", First Station Plane: " << station_plane << ").";
         throw(Squeal(Squeal::nonRecoverable, message_buffer.str(),
                      "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
