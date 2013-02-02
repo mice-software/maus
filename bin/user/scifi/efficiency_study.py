@@ -5,7 +5,7 @@ Example to load a ROOT file with SciFi data and do some analysis
 """
 
 import sys
-import math
+from math import fabs
 
 # basic PyROOT definitions
 import ROOT 
@@ -64,13 +64,17 @@ def main(file_name):
 
             # Loop over MC track ids (a substitute for MC tracks)
             for trk_num, hits_in_trk in hits_by_track.iteritems():
-                print "  Looking at track number: " + str(trk_num)
                 if not trk_num == 1:
                     break
 
+                # Make a nested dictionary of tracker and station num
+                # to track point (1 per station)
+                sorted_tp = make_mc_track_pts(mc_evt)
+
                 # Loop over trackers
                 for trker_num in range(2):
-                    print "   Looking at tracker " + str(trker_num) +", with ",
+                    print "  Track number: " + str(trk_num),
+                    print " Tracker number: " + str(trker_num) +", containing ",
                     print str(len(sorted_rec_trks[trker_num])) + " rec tracks"
 
                     # Loop over recon tracks (one per tracker for now)
@@ -79,16 +83,13 @@ def main(file_name):
 
                         # Should check this matches the MC track here somehow
 
-                        # Make a nested dictionary of tracker and station num
-                        # to track point (1 per station), and similarly for
-                        # space points (many per station)
-                        sorted_tp = make_mc_track_pts(mc_evt)
                         seeds_in_track = rec_trk.get_spacepoints()
                         sorted_seeds = sort_spoints(seeds_in_track)
 
                         # Should check here that there is only 0 or 1
                         # seeds per tracker/station, otherwise break
-
+                        print '  Found ' +str(len(sorted_tp[trker_num])),
+                        print ' track points'
                         # Loop over track points
                         for t_num, tracker in sorted_tp.iteritems():
                             for s_num, tp in tracker.iteritems():
@@ -121,13 +122,13 @@ def check_match(tp, sp):
     sp_pos = sp.get_position()
     match = True
 
-    if (math.fabs( tp_pos.x() - sp_pos.x() ) > delta_x):
+    if ( fabs(fabs(tp_pos.x()) - fabs(sp_pos.x())) > delta_x ):
         match = False
-    if (math.fabs( tp_pos.y() - sp_pos.y() ) > delta_y):
+    if ( fabs(fabs(tp_pos.y()) - fabs(sp_pos.y())) > delta_y ):
         match = False
 
-    s1 = "dx is " + str(math.fabs( tp_pos.x() - sp_pos.x() ))
-    s2 = "dy is " + str(math.fabs( tp_pos.y() - sp_pos.y() ))
+    s1 = "   dx is " + str( fabs( fabs(tp_pos.x()) - fabs(sp_pos.x())))
+    s2 = "   dy is " + str( fabs( fabs(tp_pos.y()) - fabs(sp_pos.y())))
     print s1 + ", " + s2
     return match
 
@@ -168,6 +169,9 @@ def make_mc_track_pts(mc_evt):
 
         # Loop over stations
         for s_num, station in tracker.iteritems():
+            print "  Forming track point in tracker" + str(t_num),
+            print " station " + str(s_num) + " containing ",
+            print str(len(station)) + " hits"
             if len(station) < 1:
                 continue
             # Use the SpacePoint class for track points, as is near enough
@@ -175,7 +179,7 @@ def make_mc_track_pts(mc_evt):
             # Look for a hit corresponding to the primary track and
             # then make the track point from it 
             for hit in station:
-                if hit.GetTrackId == 1:
+                if hit.GetTrackId() == 1:
                     tp.set_position(hit.GetPosition())
                     tp.set_station(hit.GetChannelId().GetStationNumber())
                     tp.set_tracker(hit.GetChannelId().GetTrackerNumber())
@@ -205,7 +209,7 @@ def sort_hits(sf_hits):
         for hit in tracker:
             hits_by_station[hit.GetChannelId().GetStationNumber()].append(hit)
         sorted_hits[num] = hits_by_station
-
+    
     return sorted_hits
 
 def sort_rec_tracks(trks):
@@ -244,7 +248,7 @@ def sort_hits_by_track(sf_hits):
             hits_by_trk[hit.GetTrackId()] = [hit]
 
     for trk_num, trk in hits_by_trk.iteritems():
-        print "    Track " + str(trk_num) + " has " + str(len(trk)) + " hits"
+        print "  Track " + str(trk_num) + " has " + str(len(trk)) + " sf hits"
     return hits_by_trk
 
 if __name__ == "__main__":
