@@ -57,7 +57,7 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
   _of4 << "n_matched_t2\tn_avail_t2\tn_hits_t1\tn_hits_t2\n";
 
   _of5.open("MCSpace_data.dat");
-  _of5 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\tstation";
+  _of5 << "spill\tmc_event\ttrack_ID\tPDG_ID\ttracker\ttrack_point_num\tstation";
   _of5 << "\tplane\tfiber\tx\ty\tz\tt\tpx\tpy\tpz\n";
 
   _of6.open("DataGrid.dat");
@@ -192,10 +192,11 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         for ( unsigned int l = 0; l < virt_scifi_hit.size(); l++ ) {
             ThreeVector v_pos = virt_scifi_hit[l].GetPosition();
             ThreeVector v_mom = virt_scifi_hit[l].GetMomentum();
-            _of5 << spill.GetSpillNumber() << "\t" << l << "\t";
+            _of5 << spill.GetSpillNumber() << "\t" << i << "\t";
             _of5 << virt_scifi_hit[l].GetTrackId() << "\t";
             _of5 << virt_scifi_hit[l].GetParticleId() << "\t";
             _of5 << virt_scifi_hit[l].GetChannelId()->GetTrackerNumber() << "\t";
+            _of5 << l << "\t";
             _of5 << virt_scifi_hit[l].GetChannelId()->GetStationNumber() << "\t";
             _of5 << virt_scifi_hit[l].GetChannelId()->GetPlaneNumber() << "\t";
             _of5 << virt_scifi_hit[l].GetChannelId()->GetFibreNumber() << "\t";
