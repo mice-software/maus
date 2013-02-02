@@ -646,10 +646,10 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   _P_value = TMath::Prob(_f_chi2, _ndf);
 }
 
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++
 // Alignment Routines
 //
-void KalmanTrack::update_misaligments(KalmanSite *a_site) { //, KalmanSite *alignment_projection_site) {
+void KalmanTrack::update_misaligments(KalmanSite *a_site) {
   // ***************************
   // Get the pull.
   // TMatrixD residual = a_site->get_residual(KalmanSite::Excluded);

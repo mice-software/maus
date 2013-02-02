@@ -97,7 +97,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
       for ( size_t j = 0; j < numb_measurements; ++j ) {
         KalmanSite *site = &sites[j];
         track->exclude_site(site);
-        if ( track->get_f_chi2()<25. && (j == 6 || j == 9 || j == 12) ) {
+        if ( track->get_f_chi2() < 25. && (j == 6 || j == 9 || j == 12) ) {
           track->update_misaligments(site);
           // kalman_align.update_site(site);
         }

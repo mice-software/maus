@@ -35,19 +35,19 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
 }
 
 // Copy contructor
-SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &scifispacepoint):
-    _used(false),
-    _spill(0),
-    _event(0),
-    _tracker(0),
-    _station(0),
-    _time(0.),
-    _time_error(0.),
-    _time_res(0.),
-    _npe(0.),
-    _chi2(0.),
-    _type(""),
-    _position(ThreeVector(0, 0, 0)) {
+SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &scifispacepoint)
+    : _used(false),
+      _spill(0),
+      _event(0),
+      _tracker(0),
+      _station(0),
+      _time(0.),
+      _time_error(0.),
+      _time_res(0.),
+      _npe(0.),
+      _chi2(0.),
+      _type(""),
+      _position(ThreeVector(0, 0, 0)) {
   _used      = scifispacepoint.is_used();
   _spill     = scifispacepoint.get_spill();
   _event     = scifispacepoint.get_event();
