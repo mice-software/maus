@@ -31,7 +31,7 @@ KalmanTrackFit::KalmanTrackFit(): _seed_cov(1000.),
   _use_MCS   = (*json)["SciFiKalman_use_MCS"].asBool();
   _use_Eloss = (*json)["SciFiKalman_use_Eloss"].asBool();
   _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
-
+  // type_of_dataflow = 'pipeline_single_thread'
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -116,19 +116,17 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 void KalmanTrackFit::initialise(KalmanSeed *seed,
                                 std::vector<KalmanSite> &sites,
                                 KalmanSciFiAlignment &kalman_align) {
-  TMatrixD a0(5, 1);
-  a0 = seed->get_initial_state_vector();
+  TMatrixD a0 = seed->get_initial_state_vector();
 
   TMatrixD C(5, 5);
   C.Zero();
-  C(0, 0) = 2.;
-  C(1, 1) = _seed_cov; // dummy values
-  C(2, 2) = 2.;
-  C(3, 3) = _seed_cov; // dummy values
-  C(4, 4) = _seed_cov; // dummy values
+  C(0, 0) = 2.;        // x covariance
+  C(1, 1) = _seed_cov; // dummy covariance
+  C(2, 2) = 2.;        // y covariance
+  C(3, 3) = _seed_cov; // dummy covariance
+  C(4, 4) = _seed_cov; // dummy covariance
 
   std::vector<SciFiCluster*> clusters = seed->get_clusters();
-
   KalmanSite first_plane;
   first_plane.set_a(a0, KalmanSite::Projected);
   first_plane.set_covariance_matrix(C, KalmanSite::Projected);
