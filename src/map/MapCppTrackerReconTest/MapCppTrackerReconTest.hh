@@ -138,6 +138,10 @@ class MapCppTrackerReconTest {
 
   double compute_chan_no(MAUS::SciFiHit *ahit);
 
+  bool compare_hits(MAUS::SciFiHit hit1, MAUS::SciFiHit hit2);
+
+  void update_average(const int nhits, const MAUS::SciFiHit &new_hit, MAUS::SciFiHit &old_hit);
+
  private:
   /// This should be the classname
   std::string _classname;
@@ -159,8 +163,14 @@ class MapCppTrackerReconTest {
 
   /// File streams for writing data
   ofstream _of1, _of2, _of3, _of4, _of5, _of6;
-  /// The cut used to determine if a spacepoint partners a virtual hit (mm)
+
+  /// The cuts used to determine if a spacepoint partners a virtual hit (mm)
   static const double _cut1 = 2.0;
+  static const double _t_cut = 2.0;
+  static const double _x_cut = 0.5;
+  static const double _y_cut = 0.5;
+  static const double _z_cut = 10.0;
+  static const double _pz_cut = 50.0;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

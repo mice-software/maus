@@ -113,18 +113,16 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         int num_hits_t1 = 0;
         int num_hits_t2 = 0;
 
-
-
         SciFiHitArray* hits = spill.GetMCEvents()->at(i)->GetSciFiHits();
-        std::vector<SciFiHit> virt_scifi_hit;
-        std::vector<double> num_virt;
+        std::vector<SciFiHit> track_points;
+        std::vector<int> nhits_in_tp;
 
         // Loop over scifi hits
         for ( unsigned int j = 0; j < hits->size(); j++ ) {
           SciFiHit hit = hits->at(j);
           ThreeVector pos = hit.GetPosition();
           ThreeVector mom = hit.GetMomentum();
-          if ( mom.z() > 50. ) {
+          if ( mom.z() > _pz_cut ) {
             _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
             _of2 << hit.GetParticleId() << "\t" << hit.GetChannelId()->GetTrackerNumber() << "\t";
             _of2 << hit.GetChannelId()->GetStationNumber() << "\t";
@@ -132,39 +130,30 @@ std::string MapCppTrackerReconTest::process(std::string document) {
             _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
             _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
             _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
-            int g = 0;
-            if ( virt_scifi_hit.size() == 0 ) {
-            virt_scifi_hit.push_back(hit);
-            num_virt.push_back(1.);
+
+            bool hit_matched = false;
+
+            // If we have track points yet, use the hit to make a first track point
+            if ( track_points.size() == 0 ) {
+              track_points.push_back(hit);
+              nhits_in_tp.push_back(1);
             } else {
-              for ( unsigned int h = 0; h < virt_scifi_hit.size(); h++ ) {
-                if ( virt_scifi_hit[h].GetChannelId()->GetTrackerNumber()   ==
-                     hit.GetChannelId()->GetTrackerNumber()    &&
-                     virt_scifi_hit[h].GetChannelId()->GetStationNumber()   ==
-                     hit.GetChannelId()->GetStationNumber()    &&
-                     virt_scifi_hit[h].GetParticleId() == hit.GetParticleId() &&
-                     virt_scifi_hit[h].GetTrackId() == hit.GetTrackId() &&
-                     fabs(virt_scifi_hit[h].GetTime() - hit.GetTime()) < 2. &&
-                     fabs(virt_scifi_hit[h].GetPosition().x() - hit.GetPosition().x()) < 0.5 &&
-                     fabs(virt_scifi_hit[h].GetPosition().y() - hit.GetPosition().y()) < 0.5 &&
-                     fabs(virt_scifi_hit[h].GetPosition().z() - hit.GetPosition().z()) < 10. ) {
-                  virt_scifi_hit[h].SetTime((virt_scifi_hit[h].GetTime() +
-                                            (hit.GetTime()/num_virt[h])) /
-                                            ((num_virt[h]+1.)/num_virt[h]));
-                  virt_scifi_hit[h].SetPosition((virt_scifi_hit[h].GetPosition() +
-                                                (hit.GetPosition()/num_virt[h])) /
-                                                ((num_virt[h]+1.)/num_virt[h]));
-                  virt_scifi_hit[h].SetMomentum((virt_scifi_hit[h].GetMomentum() +
-                                                (hit.GetMomentum()/num_virt[h])) /
-                                                ((num_virt[h]+1.)/num_virt[h]));
-                  num_virt[h]++;
-                  g = 1;
+              // Loop over track points
+              for ( unsigned int h = 0; h < track_points.size(); h++ ) {
+                // If the hit comes from the same track point
+                if ( compare_hits(track_points[h], hit) ) {
+                  std::cout << "Updating track point average in station ";
+                  std::cout << hit.GetChannelId()->GetStationNumber() << std::endl;
+                  update_average(nhits_in_tp[h], hit, track_points[h]);
+                  nhits_in_tp[h]++;
+                  hit_matched = true;
                   continue;
                 }
               }
-              if ( g == 0 ) {
-                virt_scifi_hit.push_back(hit);
-                num_virt.push_back(1.);
+              // If we did not match the hit to any of the existing tpoints, make a new tpoint
+              if ( !hit_matched ) {
+                track_points.push_back(hit);
+                nhits_in_tp.push_back(1);
               }
             }
             // Write MC momentum data in tracker 1
@@ -189,19 +178,19 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
         _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
 
-        for ( unsigned int l = 0; l < virt_scifi_hit.size(); l++ ) {
-            ThreeVector v_pos = virt_scifi_hit[l].GetPosition();
-            ThreeVector v_mom = virt_scifi_hit[l].GetMomentum();
+        for ( unsigned int l = 0; l < track_points.size(); l++ ) {
+            ThreeVector v_pos = track_points[l].GetPosition();
+            ThreeVector v_mom = track_points[l].GetMomentum();
             _of5 << spill.GetSpillNumber() << "\t" << i << "\t";
-            _of5 << virt_scifi_hit[l].GetTrackId() << "\t";
-            _of5 << virt_scifi_hit[l].GetParticleId() << "\t";
-            _of5 << virt_scifi_hit[l].GetChannelId()->GetTrackerNumber() << "\t";
+            _of5 << track_points[l].GetTrackId() << "\t";
+            _of5 << track_points[l].GetParticleId() << "\t";
+            _of5 << track_points[l].GetChannelId()->GetTrackerNumber() << "\t";
             _of5 << l << "\t";
-            _of5 << virt_scifi_hit[l].GetChannelId()->GetStationNumber() << "\t";
-            _of5 << virt_scifi_hit[l].GetChannelId()->GetPlaneNumber() << "\t";
-            _of5 << virt_scifi_hit[l].GetChannelId()->GetFibreNumber() << "\t";
+            _of5 << track_points[l].GetChannelId()->GetStationNumber() << "\t";
+            _of5 << track_points[l].GetChannelId()->GetPlaneNumber() << "\t";
+            _of5 << track_points[l].GetChannelId()->GetFibreNumber() << "\t";
             _of5 << v_pos.x() << "\t" << v_pos.y() << "\t" << v_pos.z() << "\t";
-            _of5 << virt_scifi_hit[l].GetTime() << "\t";
+            _of5 << track_points[l].GetTime() << "\t";
             _of5 << v_mom.x() << "\t" << v_mom.y() << "\t" << v_mom.z() << "\n";
         }
 
@@ -279,8 +268,8 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 _of1 << sp->get_tracker() << "\t" << sp->get_station() << "\t";
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
                 _of1 << sp->get_time() << "\n";
-                for ( unsigned int j = 0; j < virt_scifi_hit.size(); j++ ) {
-                  SciFiHit vhit = virt_scifi_hit[j];
+                for ( unsigned int j = 0; j < track_points.size(); j++ ) {
+                  SciFiHit vhit = track_points[j];
                   // Is the vhit in the same tracker and station as the spacepoint
                   if ( sp->get_tracker() == 0 &&
                        vhit.GetChannelId()->GetTrackerNumber() == 0 &&
@@ -309,20 +298,13 @@ std::string MapCppTrackerReconTest::process(std::string document) {
 
         int t1_hits = 0;
         int t2_hits = 0;
-        vhits_per_tracker(virt_scifi_hit, t1_hits, t2_hits);
+        vhits_per_tracker(track_points, t1_hits, t2_hits);
 
         // ================= Write Data For The Current Event =========================
         _of4 << pt_rec_t1 << "\t" << pz_rec_t1 << "\t" << pt_rec_t2 << "\t" << pz_rec_t2 << "\t";
         _of4 << n_matched_sp_evt_t1 << "\t" << n_sp_avail_t1 << "\t";
         _of4 << n_matched_sp_evt_t2 << "\t" << n_sp_avail_t2 << "\t";
         _of4 << t1_hits << "\t" << t2_hits << "\n";
-
-        /*
-        if ( spill.GetReconEvents()->at(i) ) {
-          SciFiEvent *recon = spill.GetReconEvents()->at(i)->GetSciFiEvent();
-          mc_v_recon(*recon, *hits);
-        }
-        */
       } // ~ Loop over MC events
     } else {
       std::cout << "Do not have either MC or Recon events\n";
@@ -341,6 +323,22 @@ std::string MapCppTrackerReconTest::process(std::string document) {
   }
   return writer.write(root);
 }
+
+bool MapCppTrackerReconTest::compare_hits(SciFiHit hit1, SciFiHit hit2) {
+  if ( hit1.GetChannelId()->GetTrackerNumber() == hit2.GetChannelId()->GetTrackerNumber() &&
+       hit1.GetChannelId()->GetStationNumber() == hit2.GetChannelId()->GetStationNumber() &&
+       hit1.GetParticleId() == hit2.GetParticleId() &&
+       hit1.GetTrackId() == hit2.GetTrackId() &&
+       fabs(hit1.GetTime() - hit2.GetTime()) < _t_cut &&
+       fabs(hit1.GetPosition().x() - hit2.GetPosition().x()) < _x_cut &&
+       fabs(hit1.GetPosition().y() - hit2.GetPosition().y()) < _y_cut &&
+       fabs(hit1.GetPosition().z() - hit2.GetPosition().z()) < _z_cut
+     ) {
+  return true;
+  } else {
+    return false;
+  }
+};
 
 bool MapCppTrackerReconTest::read_in_json(std::string json_data, Spill &spill) {
   Json::Reader reader;
@@ -415,15 +413,15 @@ void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
             << event.helicalprtracks().size() << " " << std::endl;
 }
 
-void MapCppTrackerReconTest::vhits_per_tracker(std::vector<SciFiHit> &virt_scifi_hit,
+void MapCppTrackerReconTest::vhits_per_tracker(std::vector<SciFiHit> &track_points,
                                                int &t1,
                                                int &t2) {
   t1 = 0;
   t2 = 0;
 
-  if ( virt_scifi_hit.size() ) {
-    for ( unsigned int i = 0; i < virt_scifi_hit.size(); ++i ) {
-      SciFiHit vhit = virt_scifi_hit[i];
+  if ( track_points.size() ) {
+    for ( unsigned int i = 0; i < track_points.size(); ++i ) {
+      SciFiHit vhit = track_points[i];
       if ( vhit.GetChannelId()->GetTrackerNumber() == 0 ) {
         ++t1;
       } else if ( vhit.GetChannelId()->GetTrackerNumber() == 1 ) {
@@ -538,6 +536,21 @@ double MapCppTrackerReconTest::compute_chan_no(MAUS::SciFiHit *ahit) {
   }
 
   return chanNo;
+}
+
+void MapCppTrackerReconTest::update_average(const int nhits, const SciFiHit &new_hit,
+                                            SciFiHit &old_hit) {
+  // Create average track point values using equivalent hits
+  double t = ((old_hit.GetTime() * nhits) + new_hit.GetTime()) / (nhits+1);
+  old_hit.SetTime(t);
+
+  ThreeVector pos = ((old_hit.GetPosition() * nhits) + new_hit.GetPosition() )
+                    / (nhits+1);
+  old_hit.SetPosition(pos);
+
+  ThreeVector mom = ((old_hit.GetMomentum() * nhits) + new_hit.GetMomentum() )
+                    / (nhits+1);
+  old_hit.SetMomentum(mom);
 }
 
 } // ~namespace MAUS
