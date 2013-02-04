@@ -32,6 +32,8 @@
 #include <map>
 
 // ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
 #include "Rtypes.h"
 
 // MAUS headers
@@ -43,7 +45,8 @@ namespace MAUS {
 namespace DataStructure {
 namespace Global {
 
-class PrimaryChain {
+// Only elements in the DataStructure should inherit from TObject.
+class PrimaryChain : public TObject {
  public:
 
   /// Default constructor - initialises to 0/NULL
@@ -97,7 +100,8 @@ class PrimaryChain {
   bool IsPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Returns a track's parent, according to this primary chain
-  MAUS::DataStructure::Global::Track* GetTrackParent(MAUS::DataStructure::Global::Track* track);
+  MAUS::DataStructure::Global::Track* GetTrackParent(
+      MAUS::DataStructure::Global::Track* track);
 
   /// Prepare a list of a track's daughter tracks.
   std::vector<MAUS::DataStructure::Global::Track*>
@@ -116,11 +120,13 @@ class PrimaryChain {
     return _mapper_name;
   }
 
+  /// Set the vector of track/parent references, #_track_parent_pairs
   void set_track_parent_pairs(
       std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
     _tracks = tracks;
   }
 
+  /// Get the vector of track/parent references, #_track_parent_pairs
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
   get_track_parent_pairs() const {
     return _tracks;
@@ -133,6 +139,18 @@ class PrimaryChain {
   /// Get the #_goodness_of_fit paramter
   double get_goodness_of_fit() const {
     return _goodness_of_fit;
+  }
+
+  /// Set the #_parent_primary_chains pointer array
+  void set_parent_primary_chains(TRefArray* parent_primary_chains) {
+    if(_parent_primary_chains != NULL) {
+      delete _parent_primary_chains;
+    }
+    _parent_primary_chains = parent_primary_chains;
+  }
+  /// Get the #_parent_primary_chains pointer array
+  TRefArray* get_parent_primary_chains() const {
+    return _parent_primary_chains;
   }
 
  private:
@@ -149,6 +167,11 @@ class PrimaryChain {
 
   /// The goodness of fit parameter.
   double _goodness_of_fit;
+
+  /// An array of pointers to preceeding PrimaryChain, to fully
+  /// document the global reconstruction steps which produced this
+  /// result.
+  TRefArray* _parent_primary_chains;
 
   ClassDef(PrimaryChain, 1)
 }; // ~class PrimaryChain

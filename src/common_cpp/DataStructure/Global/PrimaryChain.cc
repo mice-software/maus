@@ -32,6 +32,7 @@ PrimaryChain::PrimaryChain()
     : _mapper_name(""),
       _tracks(new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
+  _parent_primary_chains = new TRefArray();
 }
 
 // Copy contructor
@@ -44,6 +45,8 @@ PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
       iter < primary_chain._tracks->end(); iter++){
     _tracks->push_back(new MAUS::DataStructure::Global::TRefTrackPair(**iter));
   }
+  _parent_primary_chains =
+      new TRefArray(*primary_chain.get_parent_primary_chains());
 }
 
 // Constructor setting #_mapper_name
@@ -51,6 +54,7 @@ PrimaryChain::PrimaryChain(std::string mapper_name)
     : _mapper_name(mapper_name),
       _tracks(new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
+  _parent_primary_chains = new TRefArray();
 }
 
 // Destructor
@@ -58,6 +62,7 @@ PrimaryChain::~PrimaryChain() {
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++)
     delete *iter;
+  delete _parent_primary_chains;
 }
 
 // Assignment operator
@@ -72,12 +77,13 @@ PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
     _tracks->push_back(new MAUS::DataStructure::Global::TRefTrackPair(**iter));
   }
   _goodness_of_fit    = primary_chain._goodness_of_fit;
-  
+  _parent_primary_chains =
+      new TRefArray(*primary_chain._parent_primary_chains);
   return *this;
 }
 
 // Create a new PrimaryChain, identical to the original, but separate.  All
-// PrimaryChainPoints are also cloned.
+// constituent tracks are also cloned.
 PrimaryChain* PrimaryChain::Clone() const {
   MAUS::DataStructure::Global::PrimaryChain* primaryChainNew =
       new MAUS::DataStructure::Global::PrimaryChain(_mapper_name);
@@ -112,6 +118,8 @@ PrimaryChain* PrimaryChain::Clone() const {
 
   primaryChainNew->set_goodness_of_fit(_goodness_of_fit);
 
+  primaryChainNew->set_parent_primary_chains(
+      new TRefArray(*_parent_primary_chains));
   return primaryChainNew;
 }
 
@@ -224,7 +232,8 @@ bool PrimaryChain::HasTrack(MAUS::DataStructure::Global::Track* track) {
   return false;
 }
 
-bool PrimaryChain::HasTrackAsParent(MAUS::DataStructure::Global::Track* parent) {
+bool PrimaryChain::HasTrackAsParent(
+    MAUS::DataStructure::Global::Track* parent) {
   // Find track as parent vector
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
@@ -246,7 +255,8 @@ bool PrimaryChain::IsPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   return false;
 }
 
-MAUS::DataStructure::Global::Track* PrimaryChain::GetTrackParent(MAUS::DataStructure::Global::Track* track) {
+MAUS::DataStructure::Global::Track* PrimaryChain::GetTrackParent(
+    MAUS::DataStructure::Global::Track* track) {
   // Find track, and return parent
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {

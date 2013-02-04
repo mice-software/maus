@@ -47,6 +47,7 @@ namespace MAUS {
 namespace DataStructure {
 namespace Global {
 
+// Only elements in the DataStructure should inherit from TObject.
 class Track : public TObject {
  public:
 

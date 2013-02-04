@@ -129,7 +129,8 @@ void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   PushBackTrackPoint(trackpoint);
 }
   
-void Track::PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
+void Track::PushBackTrackPoint(
+    MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(trackpoint)
     _trackpoints->Add(trackpoint);
   else
@@ -140,7 +141,8 @@ void Track::PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoi
 
 // Correctly remove the trackpoint, unsetting the detector bit and/or
 // removing the geometry path if appropriate.
-void Track::RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
+void Track::RemoveTrackPoint(
+    MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(!trackpoint) {
     Squeak::mout(Squeak::error)
         << "recon::global::track - "
@@ -162,7 +164,8 @@ void Track::RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint
   }
 
   // Check if trackpoint detector point should still be set.
-  MAUS::DataStructure::Global::DetectorPoint targetDP = trackpoint->get_detector();
+  MAUS::DataStructure::Global::DetectorPoint targetDP =
+      trackpoint->get_detector();
   MAUS::DataStructure::Global::TrackPoint *eachTP;
   bool stillNeeded = false;
   for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
@@ -208,7 +211,8 @@ void Track::SetDetector(MAUS::DataStructure::Global::DetectorPoint detector) {
   _detectorpoints |= (1u << detector);
 }
 
-void Track::RemoveDetector(MAUS::DataStructure::Global::DetectorPoint detector) {
+void Track::RemoveDetector(
+    MAUS::DataStructure::Global::DetectorPoint detector) {
   // Clear the Nth bit of the integer, where N is the value of the
   // DetectorPoint enumerator.
   _detectorpoints &= ~(1u << detector);
@@ -225,7 +229,8 @@ void Track::ClearDetectors() {
   _detectorpoints = 0;
 }
 
-std::vector<MAUS::DataStructure::Global::DetectorPoint> Track::GetDetectorPoints() {
+std::vector<MAUS::DataStructure::Global::DetectorPoint>
+Track::GetDetectorPoints() {
   std::vector<MAUS::DataStructure::Global::DetectorPoint> result;
   MAUS::DataStructure::Global::DetectorPoint test;
   for (int i = 0; i < MAUS::DataStructure::Global::kDetectorPointSize; ++i) {
