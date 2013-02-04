@@ -43,8 +43,6 @@ bool MapCppGlobalRecon::death() {
 }
 
 std::string MapCppGlobalRecon::process(std::string document) const {
-  return document;
-  
   // Prepare converters, spill and json objects
   JsonCppSpillConverter json2cppconverter;
   CppJsonSpillConverter cpp2jsonconverter;
@@ -122,23 +120,23 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
   // Create our new GlobalEvent
   MAUS::GlobalEvent* global_event = new MAUS::GlobalEvent();
 
-  MAUS::recon::global::SpacePoint* spacepoint =
-      new MAUS::recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint* spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
   spacepoint->set_charge(1234.0);
-  spacepoint->set_detector(MAUS::recon::global::kTracker1);
+  spacepoint->set_detector(MAUS::DataStructure::Global::kTracker1);
   spacepoint->set_geometry_path("FakeGeomPath");
   
   global_event->add_spacepoint_check(spacepoint);
   
-  spacepoint = new MAUS::recon::global::SpacePoint();
+  spacepoint = new MAUS::DataStructure::Global::SpacePoint();
 
   spacepoint->set_charge(2345.0);
-  spacepoint->set_detector(MAUS::recon::global::kTracker2);
+  spacepoint->set_detector(MAUS::DataStructure::Global::kTracker2);
   spacepoint->set_geometry_path("RealGeomPath");
   
-  MAUS::recon::global::TrackPoint* trackpoint =
-      new MAUS::recon::global::TrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
 
   trackpoint->set_charge(3456.0);
   trackpoint->set_spacepoint(spacepoint);

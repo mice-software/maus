@@ -64,8 +64,8 @@ void ImportSciFiRecon::ImportStraightTracks(
 
   // Create a new MAUS::recon::global::PrimaryChain for the output.
   std::string local_mapper_name = mapper_name + "/ImportStraight";  
-  MAUS::recon::global::PrimaryChain* pchain =
-      new MAUS::recon::global::PrimaryChain(local_mapper_name);
+  MAUS::DataStructure::Global::PrimaryChain* pchain =
+      new MAUS::DataStructure::Global::PrimaryChain(local_mapper_name);
 
 
 
@@ -90,8 +90,8 @@ void ImportSciFiRecon::ImportHelicalTracks(
 
   // Create a new MAUS::recon::global::PrimaryChain for the output.
   std::string local_mapper_name = mapper_name + "/ImportHelical";  
-  MAUS::recon::global::PrimaryChain* pchain =
-      new MAUS::recon::global::PrimaryChain(local_mapper_name);
+  MAUS::DataStructure::Global::PrimaryChain* pchain =
+      new MAUS::DataStructure::Global::PrimaryChain(local_mapper_name);
 
   // Loop over the input array, accessing each track
   MAUS::SciFiHelicalPRTrackArray::const_iterator track_iter;
