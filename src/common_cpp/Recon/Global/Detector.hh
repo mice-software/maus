@@ -21,6 +21,7 @@
 #define COMMON_CPP_RECONSTRUCTION_DETECTOR_HH
 
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
@@ -57,6 +58,9 @@ class Detector {
   double plane_;
   CovarianceMatrix uncertainties_;
 };
+
+typedef std::map<MAUS::recon::global::Detector::ID,
+                 MAUS::recon::global::Detector> DetectorMap;
 
 }  // namespace global
 }  // namespace recon

@@ -102,8 +102,6 @@ class MapCppGlobalTrackReconstructor {
 
   void SetupOpticsModel();
   void SetupTrackFitter();
-
-  void LoadRawTracks();
 };
 
 }  // namespace MAUS

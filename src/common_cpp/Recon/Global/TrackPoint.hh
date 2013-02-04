@@ -103,10 +103,44 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 
   ~TrackPoint();
 
-  TrackPoint & operator=(const TrackPoint& rhs);
+  // *************************
+  //  Assignment Operators
+  // *************************
+  TrackPoint& operator =(
+    const TrackPoint&                  rhs);
+  TrackPoint& operator+=(
+    const TrackPoint&                  rhs);
+  TrackPoint& operator-=(
+    const TrackPoint&                  rhs);
+  TrackPoint& operator*=(
+    const TrackPoint&                  rhs);
+  TrackPoint& operator/=(
+    const TrackPoint&                  rhs);
+  TrackPoint& operator+=(const double& rhs);
+  TrackPoint& operator-=(const double& rhs);
+  TrackPoint& operator*=(const double& rhs);
+  TrackPoint& operator/=(const double& rhs);
 
+  // *************************
+  //  Algebraic Operators
+  // *************************
+  const TrackPoint operator+(
+    const TrackPoint&                      rhs) const;
+  const TrackPoint operator-(
+    const TrackPoint&                      rhs) const;
+  const TrackPoint operator*(
+    const TrackPoint&                      rhs) const;
+  const TrackPoint operator/(
+    const TrackPoint&                      rhs) const;
+  const TrackPoint operator+(const double& rhs) const;
+  const TrackPoint operator-(const double& rhs) const;
+  const TrackPoint operator*(const double& rhs) const;
+  const TrackPoint operator/(const double& rhs) const;
+
+  // *************************
+  //  Comparison Operators
+  // *************************
   const bool operator==(const TrackPoint& rhs) const;
-
   const bool operator!=(const TrackPoint& rhs) const;
 
   /* @brief Determines if the track point occurs earlier in time than another.

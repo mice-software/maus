@@ -92,6 +92,8 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
                   "of the test particles with walls.",
                   "MAUS::MapCppGlobalTrackReconstructor::birth()"));
     }
+    DataStructureHelper::GetInstance().GetDetectorAttributes(
+        configuration_, detectors_);
     SetupOpticsModel();
     SetupTrackFitter();
   } catch(Squeal& squee) {
@@ -112,7 +114,9 @@ std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
 
-    LoadRawTracks();
+    DataStructureHelper::GetInstance().GetGlobalRawTracks(run_data_,
+                                                          detectors_,
+                                                          raw_tracks_);
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
   } catch(std::exception& exc) {
@@ -156,8 +160,6 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
   }
 
 
-std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-          << "global_tracks: " << std::endl << global_tracks << std::endl;
   // TODO(plane1@hawk.iit.edu) Update the run data with recon results.
   run_data_["global_tracks"] = global_tracks;
 
@@ -306,45 +308,6 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
     }
-  }
-}
-
-void MapCppGlobalTrackReconstructor::LoadRawTracks() {
-  // LoadDetectorConfiguration();
-  DataStructureHelper::GetInstance().GetDetectorAttributes(
-      configuration_, detectors_);
-
-  Json::Value global_raw_tracks = JsonWrapper::GetProperty(
-      run_data_, "global_raw_tracks", JsonWrapper::arrayValue);
-  size_t num_tracks = global_raw_tracks.size();
-  for (size_t track_index = 0; track_index < num_tracks; ++track_index) {
-    GlobalRawTrackProcessor deserializer;
-    GlobalRawTrack * const global_raw_track = deserializer.JsonToCpp(
-      global_raw_tracks[track_index]);
-    GlobalTrackPointArray global_track_points
-      = global_raw_track->track_points();
-    delete global_raw_track;
-
-    Track raw_track;
-    for (GlobalTrackPointArray::const_iterator global_track_point
-            = global_track_points.begin();
-         global_track_point < global_track_points.end();
-         ++global_track_point) {
-      ThreeVector position = global_track_point->position();
-      ThreeVector momentum = global_track_point->momentum();
-      const Detector& detector = detectors_.find(
-        Detector::ID(global_track_point->detector_id()))->second;
-
-      TrackPoint track_point(global_track_point->time(),
-                             global_track_point->energy(),
-                             position.x(), momentum.x(),
-                             position.y(), momentum.y(),
-                             detector);
-      track_point.set_particle_id(
-        Particle::ID(global_track_point->particle_id()));
-      raw_track.push_back(track_point);
-    }
-    raw_tracks_.push_back(raw_track);
   }
 }
 

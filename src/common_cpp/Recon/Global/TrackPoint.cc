@@ -100,6 +100,10 @@ TrackPoint::TrackPoint(double const * const array,
 TrackPoint::~TrackPoint() {
 }
 
+// *************************
+//  Assignment Operators
+// *************************
+
 TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
   PhaseSpaceVector::operator=(rhs);
   particle_id_ = rhs.particle_id_;
@@ -109,6 +113,110 @@ TrackPoint & TrackPoint::operator=(const TrackPoint& rhs) {
 
   return *this;
 }
+
+TrackPoint & TrackPoint::operator+=(const TrackPoint& rhs) {
+  PhaseSpaceVector::operator+=(rhs);
+  particle_id_ = rhs.particle_id_;
+  uncertainties_ = rhs.uncertainties_;
+  detector_id_ = rhs.detector_id_;
+  z_ = rhs.z_;
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator-=(const TrackPoint& rhs) {
+  PhaseSpaceVector::operator-=(rhs);
+  particle_id_ = rhs.particle_id_;
+  uncertainties_ = rhs.uncertainties_;
+  detector_id_ = rhs.detector_id_;
+  z_ = rhs.z_;
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator*=(const TrackPoint& rhs) {
+  PhaseSpaceVector::operator*=(rhs);
+  particle_id_ = rhs.particle_id_;
+  uncertainties_ = rhs.uncertainties_;
+  detector_id_ = rhs.detector_id_;
+  z_ = rhs.z_;
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator/=(const TrackPoint& rhs) {
+  PhaseSpaceVector::operator/=(rhs);
+  particle_id_ = rhs.particle_id_;
+  uncertainties_ = rhs.uncertainties_;
+  detector_id_ = rhs.detector_id_;
+  z_ = rhs.z_;
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator+=(const double& rhs) {
+  PhaseSpaceVector::operator+=(rhs);
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator-=(const double& rhs) {
+  PhaseSpaceVector::operator-=(rhs);
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator*=(const double& rhs) {
+  PhaseSpaceVector::operator*=(rhs);
+
+  return *this;
+}
+
+TrackPoint & TrackPoint::operator/=(const double& rhs) {
+  PhaseSpaceVector::operator/=(rhs);
+
+  return *this;
+}
+
+// *************************
+//  Algebraic Operators
+// *************************
+
+const TrackPoint TrackPoint::operator+(const TrackPoint& rhs) const {
+  return TrackPoint(*this) += rhs;
+}
+
+const TrackPoint TrackPoint::operator-(const TrackPoint& rhs) const {
+  return TrackPoint(*this) -= rhs;
+}
+
+const TrackPoint TrackPoint::operator*(const TrackPoint& rhs) const {
+  return TrackPoint(*this) *= rhs;
+}
+
+const TrackPoint TrackPoint::operator/(const TrackPoint& rhs) const {
+  return TrackPoint(*this) /= rhs;
+}
+
+const TrackPoint TrackPoint::operator+(const double& rhs) const {
+  return TrackPoint(*this) += rhs;
+}
+
+const TrackPoint TrackPoint::operator-(const double& rhs) const {
+  return TrackPoint(*this) -= rhs;
+}
+
+const TrackPoint TrackPoint::operator*(const double& rhs) const {
+  return TrackPoint(*this) *= rhs;
+}
+
+const TrackPoint TrackPoint::operator/(const double& rhs) const {
+  return TrackPoint(*this) /= rhs;
+}
+
+// *************************
+//  Comparison Operators
+// *************************
 
 const bool TrackPoint::operator==(const TrackPoint& rhs) const {
   if (static_cast<PhaseSpaceVector const * const>(this)->operator!=(rhs)) {
