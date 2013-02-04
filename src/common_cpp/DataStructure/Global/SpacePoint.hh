@@ -37,7 +37,7 @@
 #include "TLorentzVector.h"
 
 // MAUS headers
-#include "src/common_cpp/DataStructure/GlobalReconEnums.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 
 namespace MAUS {
 namespace DataStructure {

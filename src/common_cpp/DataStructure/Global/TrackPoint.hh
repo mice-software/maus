@@ -47,8 +47,8 @@
 #include "TRef.h"
 
 // MAUS headers
-#include "src/common_cpp/DataStructure/GlobalReconEnums.hh"
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
 namespace MAUS {
 namespace DataStructure {

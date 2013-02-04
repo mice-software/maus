@@ -15,13 +15,13 @@
  *
  */
 
-#include "DataStructure/GlobalPrimaryChain.hh"
+#include "DataStructure/Global/PrimaryChain.hh"
 
 #include <algorithm>
 #include <utility>
 
 #include "Interface/Squeak.hh"
-// #include "DataStructure/GlobalTrackPoint.hh"
+// #include "DataStructure/Global/TrackPoint.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -79,8 +79,8 @@ PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
 // Create a new PrimaryChain, identical to the original, but separate.  All
 // PrimaryChainPoints are also cloned.
 PrimaryChain* PrimaryChain::Clone() const {
-  MAUS::GlobalPrimaryChain* primaryChainNew =
-      new MAUS::GlobalPrimaryChain(_mapper_name);
+  MAUS::DataStructure::Global::PrimaryChain* primaryChainNew =
+      new MAUS::DataStructure::Global::PrimaryChain(_mapper_name);
 
   MAUS::DataStructure::Global::Track *track;
   MAUS::DataStructure::Global::Track *parent;
@@ -115,8 +115,8 @@ PrimaryChain* PrimaryChain::Clone() const {
   return primaryChainNew;
 }
 
-bool PrimaryChain::AddTrack(MAUS::GlobalTrack* track,
-                            MAUS::GlobalTrack* parent) {
+bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
+                            MAUS::DataStructure::Global::Track* parent) {
   // Check track is valid
   if(!track) {
     Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
@@ -151,7 +151,7 @@ bool PrimaryChain::AddTrack(MAUS::GlobalTrack* track,
   return true;
 }
 
-bool PrimaryChain::AddPrimaryTrack(MAUS::GlobalTrack* track) {
+bool PrimaryChain::AddPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   // Check track is valid
   if(!track) {
     Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
@@ -166,7 +166,7 @@ bool PrimaryChain::AddPrimaryTrack(MAUS::GlobalTrack* track) {
   return true;
 }
 
-bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
+bool PrimaryChain::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   // Check track is in the container
   bool in_tracks = false;
   for(size_t i = 0; i < _tracks->size(); i++) {
@@ -213,7 +213,7 @@ bool PrimaryChain::RemoveTrack(MAUS::GlobalTrack* track) {
   return true;
 }
 
-bool PrimaryChain::HasTrack(MAUS::GlobalTrack* track) {
+bool PrimaryChain::HasTrack(MAUS::DataStructure::Global::Track* track) {
   // Find track in vector
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
@@ -224,7 +224,7 @@ bool PrimaryChain::HasTrack(MAUS::GlobalTrack* track) {
   return false;
 }
 
-bool PrimaryChain::HasTrackAsParent(MAUS::GlobalTrack* parent) {
+bool PrimaryChain::HasTrackAsParent(MAUS::DataStructure::Global::Track* parent) {
   // Find track as parent vector
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
@@ -235,7 +235,7 @@ bool PrimaryChain::HasTrackAsParent(MAUS::GlobalTrack* parent) {
   return false;
 }
 
-bool PrimaryChain::IsPrimaryTrack(MAUS::GlobalTrack* track) {
+bool PrimaryChain::IsPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   // Find track in vector
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
@@ -246,7 +246,7 @@ bool PrimaryChain::IsPrimaryTrack(MAUS::GlobalTrack* track) {
   return false;
 }
 
-MAUS::GlobalTrack* PrimaryChain::GetTrackParent(MAUS::GlobalTrack* track) {
+MAUS::DataStructure::Global::Track* PrimaryChain::GetTrackParent(MAUS::DataStructure::Global::Track* track) {
   // Find track, and return parent
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
@@ -257,9 +257,9 @@ MAUS::GlobalTrack* PrimaryChain::GetTrackParent(MAUS::GlobalTrack* track) {
   return NULL;
 }
 
-std::vector<MAUS::GlobalTrack*>
-PrimaryChain::GetTrackDaughters(MAUS::GlobalTrack* track) {
-  std::vector<MAUS::GlobalTrack*> result;
+std::vector<MAUS::DataStructure::Global::Track*>
+PrimaryChain::GetTrackDaughters(MAUS::DataStructure::Global::Track* track) {
+  std::vector<MAUS::DataStructure::Global::Track*> result;
 
   // Find all tracks with this track as a parent
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;

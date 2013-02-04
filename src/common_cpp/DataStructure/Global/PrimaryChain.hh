@@ -36,8 +36,8 @@
 
 // MAUS headers
 #include "Interface/Squeal.hh"
-#include "DataStructure/GlobalTrack.hh"
-#include "DataStructure/TRefTrackPair.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TRefTrackPair.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -74,34 +74,34 @@ class PrimaryChain {
   /// @param[in] track  The track being added to the primary chain
   /// @param[in] parent The track's parent.  We require parent to
   ///                   already be a member of the primarychain.
-  bool AddTrack(MAUS::GlobalTrack* track,
-                MAUS::GlobalTrack* parent);
+  bool AddTrack(MAUS::DataStructure::Global::Track* track,
+                MAUS::DataStructure::Global::Track* parent);
 
   /// Add a primary MAUS::DataStructure::Global::Track, with the parent
   /// reference set to NULL.
   /// @param[in] track  The track being added to the primary chain
-  bool AddPrimaryTrack(MAUS::GlobalTrack* track);
+  bool AddPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Remove all reference of the provided track.  Returns false if a)
   /// track is not a member of the chain, or b) track has daughter
   /// particles stored in the chain.
-  bool RemoveTrack(MAUS::GlobalTrack* track);
+  bool RemoveTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Checks whether track is stored in the chain.
-  bool HasTrack(MAUS::GlobalTrack* track);
+  bool HasTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Checks whether track is a parent in the chain.
-  bool HasTrackAsParent(MAUS::GlobalTrack* parent);
+  bool HasTrackAsParent(MAUS::DataStructure::Global::Track* parent);
 
   /// Checks if a track is a primary track
-  bool IsPrimaryTrack(MAUS::GlobalTrack* track);
+  bool IsPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Returns a track's parent, according to this primary chain
-  MAUS::GlobalTrack* GetTrackParent(MAUS::GlobalTrack* track);
+  MAUS::DataStructure::Global::Track* GetTrackParent(MAUS::DataStructure::Global::Track* track);
 
   /// Prepare a list of a track's daughter tracks.
-  std::vector<MAUS::GlobalTrack*>
-  GetTrackDaughters(MAUS::GlobalTrack* track);
+  std::vector<MAUS::DataStructure::Global::Track*>
+  GetTrackDaughters(MAUS::DataStructure::Global::Track* track);
 
   /// Empties the #_tracks object
   void ClearTracks();

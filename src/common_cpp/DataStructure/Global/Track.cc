@@ -15,12 +15,12 @@
  *
  */
 
-#include "DataStructure/GlobalTrack.hh"
+#include "DataStructure/Global/Track.hh"
 
 #include <algorithm>
 
 #include "Interface/Squeak.hh"
-#include "DataStructure/GlobalTrackPoint.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -28,8 +28,8 @@ namespace Global {
 
 /// Global function to sort MAUS::DataStructure::Global::TrackPoint's based on
 /// their Z coordinate.
-bool SortByZ(const MAUS::GlobalTrackPoint* tp1,
-             const MAUS::GlobalTrackPoint* tp2) {
+bool SortByZ(const MAUS::DataStructure::Global::TrackPoint* tp1,
+             const MAUS::DataStructure::Global::TrackPoint* tp2) {
   return (tp1->get_position().Z() < tp2->get_position().Z());
 }
 
@@ -84,17 +84,17 @@ Track& Track::operator=(const Track &track) {
 // Create a new Track, identical to the original, but separate.  All
 // TrackPoints are also cloned.
 Track* Track::Clone() const {
-  MAUS::GlobalTrack* trackNew =
-      new MAUS::GlobalTrack();
+  MAUS::DataStructure::Global::Track* trackNew =
+      new MAUS::DataStructure::Global::Track();
 
   trackNew->set_mapper_name(get_mapper_name());
   trackNew->set_pid(get_pid());
   trackNew->set_charge(get_charge());
 
   // Track points may be edited, so we clone the original points
-  MAUS::GlobalTrackPoint* tp = NULL;
+  MAUS::DataStructure::Global::TrackPoint* tp = NULL;
   for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    tp = (MAUS::GlobalTrackPoint*) _trackpoints->At(i);
+    tp = (MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
     if(!tp) continue;
     trackNew->PushBackTrackPoint(tp->Clone());
   }
@@ -103,9 +103,9 @@ Track* Track::Clone() const {
   trackNew->set_geometry_paths(this->get_geometry_paths());
 
   // This is just book-keeping, so we copy the TRefArray whole.
-  MAUS::GlobalTrack* t = NULL;
+  MAUS::DataStructure::Global::Track* t = NULL;
   for(int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
-    t = (MAUS::GlobalTrack*) _constituent_tracks->At(i);
+    t = (MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
     if(!t) continue;
     trackNew->AddTrack(t);
   }
@@ -117,7 +117,7 @@ Track* Track::Clone() const {
 
 // Trackpoint methods
 
-void Track::AddTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
+void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(!trackpoint){
     Squeak::mout(Squeak::error) << "Adding NULL Track Point" << std::endl;
     return;
@@ -129,7 +129,7 @@ void Track::AddTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
   PushBackTrackPoint(trackpoint);
 }
   
-void Track::PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
+void Track::PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(trackpoint)
     _trackpoints->Add(trackpoint);
   else
@@ -140,7 +140,7 @@ void Track::PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
 
 // Correctly remove the trackpoint, unsetting the detector bit and/or
 // removing the geometry path if appropriate.
-void Track::RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
+void Track::RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(!trackpoint) {
     Squeak::mout(Squeak::error)
         << "recon::global::track - "
@@ -184,10 +184,10 @@ void Track::RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint) {
 }
 
 void Track::SortTrackPointsByZ() {
-  MAUS::GlobalTrackPointPArray temp_trackpoints;
-  MAUS::GlobalTrackPoint* tp = NULL;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> temp_trackpoints;
+  MAUS::DataStructure::Global::TrackPoint* tp = NULL;
   for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    tp = (MAUS::GlobalTrackPoint*) _trackpoints->At(i);
+    tp = (MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
     if(!tp) continue;
     temp_trackpoints.push_back(tp);
   }
@@ -267,11 +267,11 @@ void Track::ClearGeometryPaths() {
 }
 
 // Constituent Tracks methods
-void Track::AddTrack(MAUS::GlobalTrack* track) {
+void Track::AddTrack(MAUS::DataStructure::Global::Track* track) {
   _constituent_tracks->Add(track);
 }
 
-void Track::RemoveTrack(MAUS::GlobalTrack* track) {
+void Track::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
   if(!result) {
     Squeak::mout(Squeak::debug)
@@ -283,7 +283,7 @@ void Track::RemoveTrack(MAUS::GlobalTrack* track) {
   }
 }
 
-bool Track::HasTrack(MAUS::GlobalTrack* track) {
+bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
 
   return (result != NULL);

@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
 namespace MAUS {
 namespace DataStructure {

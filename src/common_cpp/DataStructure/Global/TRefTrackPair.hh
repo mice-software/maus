@@ -33,7 +33,7 @@
 // ROOT headers
 #include <TRef.h>
 
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
 
 namespace MAUS {
 namespace DataStructure {

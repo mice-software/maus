@@ -40,8 +40,8 @@
 #include "Rtypes.h"
 
 // MAUS headers
-#include "DataStructure/GlobalReconEnums.hh"
-#include "DataStructure/GlobalTrackPoint.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -98,12 +98,12 @@ class Track : public TObject {
 
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
-  void AddTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
+  void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
 
   /// Remove a MAUS::DataStructure::Global::TrackPoint, unsetting
   /// #_detectorpoints bist and removing #_geometry_paths entries if
   /// required.
-  void RemoveTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
+  void RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
 
   /// Sort the track points based purely on the Z coordinate. The
   /// order of #_geometry_paths is unchanged, as I don't believe it
@@ -212,7 +212,7 @@ class Track : public TObject {
   /// TRefArray.  This method is private, as
   /// MAUS::DataStructure::Global::TrackPoint's should be added through the
   /// AddTrackPoint(MAUS::DataStructure::Global::TrackPoint*) method.
-  void PushBackTrackPoint(MAUS::GlobalTrackPoint* trackpoint);
+  void PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
 
   /// The name of the mapper which produced this Track. This can be
   /// used to separate different stages of the global reconstruction
