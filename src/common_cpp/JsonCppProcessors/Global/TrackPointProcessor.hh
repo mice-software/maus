@@ -16,36 +16,36 @@
 
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/EnumeratorProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/TLorentzVectorProcessor.hh"
 
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_HH_
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPOINTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPOINTPROCESSOR_HH_
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-/** @class GlobalTrackProcessor processor for
- *  MAUS::recon::global::Track */
-class GlobalTrackProcessor :
-      public ObjectProcessor<MAUS::recon::global::Track> {
+/** @class TrackPointProcessor processor for
+ *  MAUS::DataStructure::Global::TrackPoint */
+class TrackPointProcessor :
+      public ObjectProcessor<MAUS::DataStructure::Global::TrackPoint> {
  public:
   /** Constructor - registers the branch structure */
-  GlobalTrackProcessor();
+  TrackPointProcessor();
 
  private:
+  EnumDetectorPointProcessor _detector_enum_proc;
   DoubleProcessor _double_proc;
+  TLorentzVectorProcessor _tlorentz_vec_proc;
   StringProcessor _string_proc;
-  EnumPIDProcessor _pid_proc;
-  IntProcessor _int_proc;
-  UIntProcessor _uint_proc;
-  ValueArrayProcessor<std::string> _geometry_paths_proc;
-  TRefArrayProcessor<MAUS::GlobalTrack> _track_trefarray_proc;
-  TRefArrayProcessor<MAUS::GlobalTrackPoint> _trackpoint_trefarray_proc;
- 
 };
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS
 
 #endif

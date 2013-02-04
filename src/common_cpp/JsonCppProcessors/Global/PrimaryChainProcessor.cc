@@ -14,29 +14,33 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/GlobalPrimaryChainProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/PrimaryChainProcessor.hh"
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-GlobalPrimaryChainProcessor::GlobalPrimaryChainProcessor() :
+PrimaryChainProcessor::PrimaryChainProcessor() :
     _treftrackpair_array_proc(new TRefTrackPairProcessor())
 {
 
   RegisterValueBranch("mapper_name", &_string_proc,
-                      &MAUS::recon::global::PrimaryChain::get_mapper_name,
-                      &MAUS::recon::global::PrimaryChain::set_mapper_name,
+                      &MAUS::DataStructure::Global::PrimaryChain::get_mapper_name,
+                      &MAUS::DataStructure::Global::PrimaryChain::set_mapper_name,
                       true);
   
   RegisterPointerBranch("track_parent_pairs", &_treftrackpair_array_proc,
-                        &MAUS::GlobalPrimaryChain::get_track_parent_pairs,
-                        &MAUS::GlobalPrimaryChain::set_track_parent_pairs,
+                        &MAUS::DataStructure::Global::PrimaryChain::get_track_parent_pairs,
+                        &MAUS::DataStructure::Global::PrimaryChain::set_track_parent_pairs,
                         true);
   
   RegisterValueBranch(
       "goodness_of_fit", &_double_proc,
-      &MAUS::recon::global::PrimaryChain::get_goodness_of_fit,
-      &MAUS::recon::global::PrimaryChain::set_goodness_of_fit, true);
+      &MAUS::DataStructure::Global::PrimaryChain::get_goodness_of_fit,
+      &MAUS::DataStructure::Global::PrimaryChain::set_goodness_of_fit, true);
   
 }
 
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS

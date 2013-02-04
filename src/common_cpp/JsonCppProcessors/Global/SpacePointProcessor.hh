@@ -16,32 +16,34 @@
 
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/TLorentzVectorProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 
-#include "src/common_cpp/DataStructure/GlobalPrimaryChain.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
-#include "src/common_cpp/JsonCppProcessors/TRefTrackPairProcessor.hh"
-
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALPRIMARYCHAINPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALPRIMARYCHAINPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-/** @class GlobalPrimaryChainProcessor processor for
- *  MAUS::recon::global::PrimaryChain */
-class GlobalPrimaryChainProcessor :
-      public ObjectProcessor<MAUS::recon::global::PrimaryChain> {
+/** @class SpacePointProcessor processor for
+ *  MAUS::DataStructure::Global::SpacePoint */
+class SpacePointProcessor :
+      public ObjectProcessor<MAUS::DataStructure::Global::SpacePoint> {
  public:
   /** Constructor - registers the branch structure */
-  GlobalPrimaryChainProcessor();
+  SpacePointProcessor();
 
  private:
+  EnumDetectorPointProcessor _detector_enum_proc;
   DoubleProcessor _double_proc;
+  TLorentzVectorProcessor _tlorentz_vec_proc;
   StringProcessor _string_proc;
-  PointerArrayProcessor<MAUS::recon::global::TRefTrackPair>
-  _treftrackpair_array_proc;
-  
 };
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS
 
 #endif

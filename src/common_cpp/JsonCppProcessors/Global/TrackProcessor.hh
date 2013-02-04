@@ -16,30 +16,40 @@
 
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TLorentzVectorProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/EnumeratorProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_HH_
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-/** @class GlobalSpacePointProcessor processor for
- *  MAUS::recon::global::SpacePoint */
-class GlobalSpacePointProcessor :
-      public ObjectProcessor<MAUS::recon::global::SpacePoint> {
+/** @class TrackProcessor processor for
+ *  MAUS::DataStructure::Global::Track */
+class TrackProcessor :
+      public ObjectProcessor<MAUS::DataStructure::Global::Track> {
  public:
   /** Constructor - registers the branch structure */
-  GlobalSpacePointProcessor();
+  TrackProcessor();
 
  private:
-  EnumDetectorPointProcessor _detector_enum_proc;
   DoubleProcessor _double_proc;
-  TLorentzVectorProcessor _tlorentz_vec_proc;
   StringProcessor _string_proc;
+  EnumPIDProcessor _pid_proc;
+  IntProcessor _int_proc;
+  UIntProcessor _uint_proc;
+  ValueArrayProcessor<std::string> _geometry_paths_proc;
+  TRefArrayProcessor<MAUS::DataStructure::Global::Track> _track_trefarray_proc;
+  TRefArrayProcessor<MAUS::DataStructure::Global::TrackPoint> _trackpoint_trefarray_proc;
+ 
 };
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS
 
 #endif

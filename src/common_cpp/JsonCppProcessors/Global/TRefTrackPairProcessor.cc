@@ -14,25 +14,30 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_TREFTRACKPAIRPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_TREFTRACKPAIRPROCESSOR_HH_
-
-#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
-
-#include "DataStructure/TRefTrackPair.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TRefTrackPairProcessor.hh"
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-/** @class TRefTrackPairProcessor for converting json <-> cpp data */
-class TRefTrackPairProcessor :
-      public ObjectProcessor<MAUS::recon::global::TRefTrackPair> {
- public:
-    /** Constructor - registers the branch structure */
-    TRefTrackPairProcessor();
-};
+TRefTrackPairProcessor::TRefTrackPairProcessor() {
+
+  RegisterTRef<MAUS::DataStructure::Global::Track>(
+      "first",
+      &MAUS::DataStructure::Global::TRefTrackPair::get_first,
+      &MAUS::DataStructure::Global::TRefTrackPair::set_first,
+      true);
+  
+  RegisterTRef<MAUS::DataStructure::Global::Track>(
+      "second",
+      &MAUS::DataStructure::Global::TRefTrackPair::get_second,
+      &MAUS::DataStructure::Global::TRefTrackPair::set_second,
+      false);
+  
+}
+
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS
 
-#endif
 

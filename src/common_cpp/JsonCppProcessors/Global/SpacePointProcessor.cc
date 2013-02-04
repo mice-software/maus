@@ -14,32 +14,36 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/GlobalSpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-GlobalSpacePointProcessor::GlobalSpacePointProcessor() {
+SpacePointProcessor::SpacePointProcessor() {
     RegisterValueBranch("charge", &_double_proc,
-                        &MAUS::recon::global::SpacePoint::get_charge,
-                        &MAUS::recon::global::SpacePoint::set_charge, true);
+                        &MAUS::DataStructure::Global::SpacePoint::get_charge,
+                        &MAUS::DataStructure::Global::SpacePoint::set_charge, true);
 
     RegisterValueBranch("position", &_tlorentz_vec_proc,
-                        &MAUS::recon::global::SpacePoint::get_position,
-                        &MAUS::recon::global::SpacePoint::set_position, true);
+                        &MAUS::DataStructure::Global::SpacePoint::get_position,
+                        &MAUS::DataStructure::Global::SpacePoint::set_position, true);
 
     RegisterValueBranch("position_error", &_tlorentz_vec_proc,
-                        &MAUS::recon::global::SpacePoint::get_position_error,
-                        &MAUS::recon::global::SpacePoint::set_position_error,
+                        &MAUS::DataStructure::Global::SpacePoint::get_position_error,
+                        &MAUS::DataStructure::Global::SpacePoint::set_position_error,
                         true);
 
     RegisterValueBranch("detector", &_detector_enum_proc,
-                        &MAUS::recon::global::SpacePoint::get_detector,
-                        &MAUS::recon::global::SpacePoint::set_detector, true);
+                        &MAUS::DataStructure::Global::SpacePoint::get_detector,
+                        &MAUS::DataStructure::Global::SpacePoint::set_detector, true);
 
     RegisterValueBranch("geometry_path", &_string_proc,
-                        &MAUS::recon::global::SpacePoint::get_geometry_path,
-                        &MAUS::recon::global::SpacePoint::set_geometry_path,
+                        &MAUS::DataStructure::Global::SpacePoint::get_geometry_path,
+                        &MAUS::DataStructure::Global::SpacePoint::set_geometry_path,
                         true);
 }
 
+} // ~namespace Global
+} // ~namespace Processor
 } // ~namespace MAUS

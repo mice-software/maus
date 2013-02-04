@@ -15,16 +15,18 @@
  */
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/JsonCppProcessors/EnumeratorProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 
 namespace MAUS {
+namespace Processor {
+namespace Global {
 
-MAUS::recon::global::DetectorPoint* EnumDetectorPointProcessor::JsonToCpp(
+MAUS::DataStructure::Global::DetectorPoint* EnumDetectorPointProcessor::JsonToCpp(
     const Json::Value& json_int) {
   if (json_int.isNumeric()) {
-    MAUS::recon::global::DetectorPoint* dp =
-        new MAUS::recon::global::DetectorPoint();
-    (*dp) = static_cast<MAUS::recon::global::DetectorPoint>(json_int.asInt());
+    MAUS::DataStructure::Global::DetectorPoint* dp =
+        new MAUS::DataStructure::Global::DetectorPoint();
+    (*dp) = static_cast<MAUS::DataStructure::Global::DetectorPoint>(json_int.asInt());
     return dp;
   } else {
     throw(Squeal(
@@ -37,23 +39,23 @@ MAUS::recon::global::DetectorPoint* EnumDetectorPointProcessor::JsonToCpp(
 }
 
 Json::Value* EnumDetectorPointProcessor::CppToJson(
-    const MAUS::recon::global::DetectorPoint& cpp_enum) {
+    const MAUS::DataStructure::Global::DetectorPoint& cpp_enum) {
   return new Json::Value(static_cast<int>(cpp_enum));
 }
 
 Json::Value* EnumDetectorPointProcessor::CppToJson(
-    const MAUS::recon::global::DetectorPoint& cpp_enum, std::string path) {
+    const MAUS::DataStructure::Global::DetectorPoint& cpp_enum, std::string path) {
   Json::Value* json_int = new Json::Value(static_cast<int>(cpp_enum));
   JsonWrapper::Path::SetPath(*json_int, path);
   return json_int;
 }
 
-MAUS::recon::global::PID* EnumPIDProcessor::JsonToCpp(
+MAUS::DataStructure::Global::PID* EnumPIDProcessor::JsonToCpp(
     const Json::Value& json_int) {
   if (json_int.isNumeric()) {
-    MAUS::recon::global::PID* pd =
-        new MAUS::recon::global::PID();
-    (*pd) = static_cast<MAUS::recon::global::PID>(json_int.asInt());
+    MAUS::DataStructure::Global::PID* pd =
+        new MAUS::DataStructure::Global::PID();
+    (*pd) = static_cast<MAUS::DataStructure::Global::PID>(json_int.asInt());
     return pd;
   } else {
     throw(Squeal(
@@ -66,16 +68,19 @@ MAUS::recon::global::PID* EnumPIDProcessor::JsonToCpp(
 }
 
 Json::Value* EnumPIDProcessor::CppToJson(
-    const MAUS::recon::global::PID& cpp_enum) {
+    const MAUS::DataStructure::Global::PID& cpp_enum) {
   return new Json::Value(static_cast<int>(cpp_enum));
 }
 
 Json::Value* EnumPIDProcessor::CppToJson(
-    const MAUS::recon::global::PID& cpp_enum, std::string path) {
+    const MAUS::DataStructure::Global::PID& cpp_enum, std::string path) {
   Json::Value* json_int = new Json::Value(static_cast<int>(cpp_enum));
   JsonWrapper::Path::SetPath(*json_int, path);
   return json_int;
 }
 
-}
+} // ~namespace Global
+} // ~namespace Processor
+} // ~namespace MAUS
+
 
