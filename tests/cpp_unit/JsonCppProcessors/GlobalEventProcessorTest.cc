@@ -30,19 +30,19 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
   virtual void SetUp() {
     // Fill Cpp GlobalEvent
     for(int i = 0; i < 4; ++i) {
-      _trackpoint.push_back(new MAUS::recon::global::TrackPoint());
-      _spacepoint.push_back(new MAUS::recon::global::SpacePoint());
+      _trackpoint.push_back(new MAUS::DataStructure::Global::TrackPoint());
+      _spacepoint.push_back(new MAUS::DataStructure::Global::SpacePoint());
       _spacepoint[i]->set_charge(1. * i);
       _trackpoint[i]->set_spacepoint(_spacepoint[i]);
     }
     
     for(int i = 0; i < 2; ++i) {
-      _track.push_back(new MAUS::recon::global::Track());
+      _track.push_back(new MAUS::DataStructure::Global::Track());
       _track[i]->AddTrackPoint(_trackpoint[2*i] );
       _track[i]->AddTrackPoint(_trackpoint[2*i + 1]);
     }
     
-    _chain = new MAUS::recon::global::PrimaryChain();
+    _chain = new MAUS::DataStructure::Global::PrimaryChain();
     _chain->AddPrimaryTrack(_track[0]);
     _chain->AddTrack(_track[1], _track[0]);
     
@@ -56,15 +56,15 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
   }
     
   MAUS::GlobalEvent *_event;
-  MAUS::recon::global::PrimaryChain* _chain;
-  std::vector<MAUS::recon::global::Track*> _track;
-  std::vector<MAUS::recon::global::TrackPoint*> _trackpoint;
-  std::vector<MAUS::recon::global::SpacePoint*> _spacepoint;
+  MAUS::DataStructure::Global::PrimaryChain* _chain;
+  std::vector<MAUS::DataStructure::Global::Track*> _track;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> _trackpoint;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> _spacepoint;
   
-  MAUS::recon::global::PrimaryChain *local_chain;
-  std::vector<MAUS::recon::global::Track*> local_track;
-  std::vector<MAUS::recon::global::TrackPoint*> local_trackpoint;
-  std::vector<MAUS::recon::global::SpacePoint*> local_spacepoint;
+  MAUS::DataStructure::Global::PrimaryChain *local_chain;
+  std::vector<MAUS::DataStructure::Global::Track*> local_track;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> local_trackpoint;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> local_spacepoint;
   
 };
 
@@ -105,9 +105,9 @@ TEST_F(GlobalEventProcessorTestClass, CheckConsistentChain) {
     local_track[i] = _chain->get_track_parent_pairs()->at(i)->GetTrack();
     EXPECT_EQ(local_track[i], _track[i]);
 
-    local_trackpoint[2*i] = (MAUS::recon::global::TrackPoint*)
+    local_trackpoint[2*i] = (MAUS::DataStructure::Global::TrackPoint*)
         _track[i]->get_trackpoints()->At(0);
-    local_trackpoint[2*i+1] = (MAUS::recon::global::TrackPoint*)
+    local_trackpoint[2*i+1] = (MAUS::DataStructure::Global::TrackPoint*)
         _track[i]->get_trackpoints()->At(1);
   }
   

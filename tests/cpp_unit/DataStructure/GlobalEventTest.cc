@@ -31,19 +31,19 @@ class GlobalEventTestDS : public ::testing::Test {
   virtual void SetUp() {
     // Fill Cpp GlobalEvent
     for(int i = 0; i < 4; ++i) {
-      _trackpoint.push_back(new MAUS::recon::global::TrackPoint());
-      _spacepoint.push_back(new MAUS::recon::global::SpacePoint());
+      _trackpoint.push_back(new MAUS::DataStructure::Global::TrackPoint());
+      _spacepoint.push_back(new MAUS::DataStructure::Global::SpacePoint());
       _spacepoint[i]->set_charge(1. * i);
       _trackpoint[i]->set_spacepoint(_spacepoint[i]);
     }
     
     for(int i = 0; i < 2; ++i) {
-      _track.push_back(new MAUS::recon::global::Track());
+      _track.push_back(new MAUS::DataStructure::Global::Track());
       _track[i]->AddTrackPoint(_trackpoint[2*i] );
       _track[i]->AddTrackPoint(_trackpoint[2*i + 1]);
     }
     
-    _chain = new MAUS::recon::global::PrimaryChain();
+    _chain = new MAUS::DataStructure::Global::PrimaryChain();
     _chain->AddPrimaryTrack(_track[0]);
     _chain->AddTrack(_track[1], _track[0]);
     
@@ -58,15 +58,15 @@ class GlobalEventTestDS : public ::testing::Test {
   virtual void TearDown() {}
 
   MAUS::GlobalEvent *_event;
-  MAUS::recon::global::PrimaryChain* _chain;
-  std::vector<MAUS::recon::global::Track*> _track;
-  std::vector<MAUS::recon::global::TrackPoint*> _trackpoint;
-  std::vector<MAUS::recon::global::SpacePoint*> _spacepoint;
+  MAUS::DataStructure::Global::PrimaryChain* _chain;
+  std::vector<MAUS::DataStructure::Global::Track*> _track;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> _trackpoint;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> _spacepoint;
   
-  MAUS::recon::global::PrimaryChain *local_chain;
-  std::vector<MAUS::recon::global::Track*> local_track;
-  std::vector<MAUS::recon::global::TrackPoint*> local_trackpoint;
-  std::vector<MAUS::recon::global::SpacePoint*> local_spacepoint;
+  MAUS::DataStructure::Global::PrimaryChain *local_chain;
+  std::vector<MAUS::DataStructure::Global::Track*> local_track;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> local_trackpoint;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> local_spacepoint;
   
 };
 
@@ -89,26 +89,32 @@ TEST_F(GlobalEventTestDS, test_all_constructors) {
 TEST_F(GlobalEventTestDS, test_all_allocators) {
   GlobalEvent event;
 
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+  MAUS::DataStructure::Global::PrimaryChain* global_chain =
+      new MAUS::DataStructure::Global::PrimaryChain();
+  MAUS::DataStructure::Global::Track*        global_track =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::TrackPoint*   global_trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::SpacePoint*   global_spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
-  GlobalPrimaryChainPArray* chains = new GlobalPrimaryChainPArray();
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
+      new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
   event.set_primarychains(chains);
 
-  GlobalTrackPArray* tracks = new GlobalTrackPArray();
+  std::vector<MAUS::DataStructure::Global::Track*>* tracks =
+      new std::vector<MAUS::DataStructure::Global::Track*>();
   tracks->push_back(global_track);
   event.set_tracks(tracks);
 
-  GlobalTrackPointPArray* trackpoints
-      = new GlobalTrackPointPArray();
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>* trackpoints
+      = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
   trackpoints->push_back(global_trackpoint);
   event.set_trackpoints(trackpoints);
 
-  GlobalSpacePointPArray* spacepoints
-      = new GlobalSpacePointPArray();
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spacepoints
+      = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
   spacepoints->push_back(global_spacepoint);
   event.set_spacepoints(spacepoints);
 
@@ -128,26 +134,32 @@ TEST_F(GlobalEventTestDS, test_all_allocators) {
 TEST_F(GlobalEventTestDS, test_copy_constructor) {
   GlobalEvent event;
 
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+  MAUS::DataStructure::Global::PrimaryChain* global_chain =
+      new MAUS::DataStructure::Global::PrimaryChain();
+  MAUS::DataStructure::Global::Track*        global_track =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::TrackPoint*   global_trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::SpacePoint*   global_spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
-  GlobalPrimaryChainPArray* chains = new GlobalPrimaryChainPArray();
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
+      new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
   event.set_primarychains(chains);
 
-  GlobalTrackPArray* tracks = new GlobalTrackPArray();
+  std::vector<MAUS::DataStructure::Global::Track*>* tracks =
+      new std::vector<MAUS::DataStructure::Global::Track*>();
   tracks->push_back(global_track);
   event.set_tracks(tracks);
 
-  GlobalTrackPointPArray* trackpoints
-      = new GlobalTrackPointPArray();
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>* trackpoints
+      = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
   trackpoints->push_back(global_trackpoint);
   event.set_trackpoints(trackpoints);
 
-  GlobalSpacePointPArray* spacepoints
-      = new GlobalSpacePointPArray();
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spacepoints
+      = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
   spacepoints->push_back(global_spacepoint);
   event.set_spacepoints(spacepoints);
 
@@ -177,26 +189,32 @@ TEST_F(GlobalEventTestDS, test_copy_constructor) {
 TEST_F(GlobalEventTestDS, test_equality_operator) {
   GlobalEvent event;
 
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+  MAUS::DataStructure::Global::PrimaryChain* global_chain =
+      new MAUS::DataStructure::Global::PrimaryChain();
+  MAUS::DataStructure::Global::Track*        global_track =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::TrackPoint*   global_trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::SpacePoint*   global_spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
-  GlobalPrimaryChainPArray* chains = new GlobalPrimaryChainPArray();
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
+      new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
   event.set_primarychains(chains);
 
-  GlobalTrackPArray* tracks = new GlobalTrackPArray();
+  std::vector<MAUS::DataStructure::Global::Track*>* tracks =
+      new std::vector<MAUS::DataStructure::Global::Track*>();
   tracks->push_back(global_track);
   event.set_tracks(tracks);
 
-  GlobalTrackPointPArray* trackpoints
-      = new GlobalTrackPointPArray();
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>* trackpoints
+      = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
   trackpoints->push_back(global_trackpoint);
   event.set_trackpoints(trackpoints);
 
-  GlobalSpacePointPArray* spacepoints
-      = new GlobalSpacePointPArray();
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spacepoints
+      = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
   spacepoints->push_back(global_spacepoint);
   event.set_spacepoints(spacepoints);
 
@@ -226,26 +244,32 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
 TEST_F(GlobalEventTestDS, test_null_copy) {
   GlobalEvent event;
 
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+  MAUS::DataStructure::Global::PrimaryChain* global_chain =
+      new MAUS::DataStructure::Global::PrimaryChain();
+  MAUS::DataStructure::Global::Track*        global_track =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::TrackPoint*   global_trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::SpacePoint*   global_spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
-  GlobalPrimaryChainPArray* chains = new GlobalPrimaryChainPArray();
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
+      new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
   event.set_primarychains(chains);
 
-  GlobalTrackPArray* tracks = new GlobalTrackPArray();
+  std::vector<MAUS::DataStructure::Global::Track*>* tracks =
+      new std::vector<MAUS::DataStructure::Global::Track*>();
   tracks->push_back(global_track);
   event.set_tracks(tracks);
 
-  GlobalTrackPointPArray* trackpoints
-      = new GlobalTrackPointPArray();
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>* trackpoints
+      = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
   trackpoints->push_back(global_trackpoint);
   event.set_trackpoints(trackpoints);
 
-  GlobalSpacePointPArray* spacepoints
-      = new GlobalSpacePointPArray();
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spacepoints
+      = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
   spacepoints->push_back(global_spacepoint);
   event.set_spacepoints(spacepoints);
 
@@ -274,10 +298,14 @@ TEST_F(GlobalEventTestDS, test_null_copy) {
 TEST_F(GlobalEventTestDS, test_recursive_add) {
   GlobalEvent event;
 
-  GlobalPrimaryChain* global_chain = new GlobalPrimaryChain();
-  GlobalTrack*        global_track = new GlobalTrack();
-  GlobalTrackPoint*   global_trackpoint = new GlobalTrackPoint();
-  GlobalSpacePoint*   global_spacepoint = new GlobalSpacePoint();
+  MAUS::DataStructure::Global::PrimaryChain* global_chain =
+      new MAUS::DataStructure::Global::PrimaryChain();
+  MAUS::DataStructure::Global::Track*        global_track =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::TrackPoint*   global_trackpoint =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::SpacePoint*   global_spacepoint =
+      new MAUS::DataStructure::Global::SpacePoint();
 
   global_trackpoint->set_spacepoint(global_spacepoint);
   global_track->AddTrackPoint(global_trackpoint);

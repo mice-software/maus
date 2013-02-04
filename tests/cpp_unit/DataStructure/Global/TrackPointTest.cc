@@ -15,19 +15,19 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 
 #include "gtest/gtest.h"
 
 namespace MAUS {
 
 class GlobalTrackPointTestDS : public ::testing::Test {
-  protected:
-    GlobalTrackPointTestDS()  {}
-    virtual ~GlobalTrackPointTestDS() {}
-    virtual void SetUp()    {}
-    virtual void TearDown() {}
+ protected:
+  GlobalTrackPointTestDS()  {}
+  virtual ~GlobalTrackPointTestDS() {}
+  virtual void SetUp()    {}
+  virtual void TearDown() {}
 };
 
 TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
@@ -59,14 +59,16 @@ TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
   double ept = 9.0;
   TLorentzVector emom(epx, epy, epz, ept);
 
-  recon::global::DetectorPoint det = recon::global::kTracker1S1; // 10
+  MAUS::DataStructure::Global::DetectorPoint det =
+      MAUS::DataStructure::Global::kTracker1S1; // 10
 
   std::string geom_path = "11";
 
-  recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint* sp =
+      new MAUS::DataStructure::Global::SpacePoint();
   TObject* sp_test = sp;
 
-  recon::global::TrackPoint tp;
+  MAUS::DataStructure::Global::TrackPoint tp;
   tp.set_mapper_name(mapper_name);
   tp.set_charge(charge);
   tp.set_position(pos);
@@ -103,7 +105,7 @@ TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
 
 
 TEST_F(GlobalTrackPointTestDS, test_default_constructor) {
-  recon::global::TrackPoint tp;
+  MAUS::DataStructure::Global::TrackPoint tp;
   EXPECT_EQ("", tp.get_mapper_name());
   EXPECT_EQ(0., tp.get_charge());
   EXPECT_EQ(0., tp.get_position().X());
@@ -122,7 +124,7 @@ TEST_F(GlobalTrackPointTestDS, test_default_constructor) {
   EXPECT_EQ(0., tp.get_momentum_error().Y());
   EXPECT_EQ(0., tp.get_momentum_error().Z());
   EXPECT_EQ(0., tp.get_momentum_error().T());
-  EXPECT_EQ(recon::global::kUndefined, tp.get_detector());
+  EXPECT_EQ(MAUS::DataStructure::Global::kUndefined, tp.get_detector());
   EXPECT_EQ("", tp.get_geometry_path());
   EXPECT_TRUE(tp.get_spacepoint() == NULL);
 }
@@ -138,16 +140,17 @@ TEST_F(GlobalTrackPointTestDS, test_copy_constructor) {
   double t = -5.0;
   TLorentzVector pos(x, y, z, t);
 
-  recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint* sp =
+      new MAUS::DataStructure::Global::SpacePoint();
   TObject* sp_test = sp;
 
-  recon::global::TrackPoint tp1;
+  MAUS::DataStructure::Global::TrackPoint tp1;
   tp1.set_mapper_name(mapper_name);
   tp1.set_charge(charge);
   tp1.set_position(pos);
   tp1.set_spacepoint(sp);
 
-  recon::global::TrackPoint tp2(tp1);
+  MAUS::DataStructure::Global::TrackPoint tp2(tp1);
 
   EXPECT_EQ(mapper_name, tp2.get_mapper_name());
   EXPECT_EQ(charge, tp2.get_charge());
@@ -169,16 +172,17 @@ TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
   double t = -5.0;
   TLorentzVector pos(x, y, z, t);
 
-  recon::global::SpacePoint* sp = new recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint* sp =
+      new MAUS::DataStructure::Global::SpacePoint();
   TObject* sp_test = sp;
 
-  recon::global::TrackPoint tp1;
+  MAUS::DataStructure::Global::TrackPoint tp1;
   tp1.set_mapper_name(mapper_name);
   tp1.set_charge(charge);
   tp1.set_position(pos);
   tp1.set_spacepoint(sp);
 
-  recon::global::TrackPoint tp2 = tp1;
+  MAUS::DataStructure::Global::TrackPoint tp2 = tp1;
 
   EXPECT_EQ(mapper_name, tp2.get_mapper_name());
   EXPECT_EQ(charge, tp2.get_charge());
@@ -200,17 +204,17 @@ TEST_F(GlobalTrackPointTestDS, test_clone) {
   double t = -5.0;
   TLorentzVector pos(x, y, z, t);
 
-  recon::global::SpacePoint sp;
+  MAUS::DataStructure::Global::SpacePoint sp;
   TObject* sp_test = &sp;
 
-  recon::global::TrackPoint *tp1 =
-      new recon::global::TrackPoint();
+  MAUS::DataStructure::Global::TrackPoint *tp1 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp1->set_mapper_name(mapper_name);
   tp1->set_charge(charge);
   tp1->set_position(pos);
   tp1->set_spacepoint(&sp);
 
-  recon::global::TrackPoint *tp2 = tp1->Clone();
+  MAUS::DataStructure::Global::TrackPoint *tp2 = tp1->Clone();
   delete tp1;
 
   EXPECT_EQ(mapper_name, tp2->get_mapper_name());
@@ -226,8 +230,7 @@ TEST_F(GlobalTrackPointTestDS, test_clone) {
   // change in the future.
 
   // Changed 14/01/2013.
-  EXPECT_EQ(sp_test,
-            tp2->get_spacepoint());
+  EXPECT_EQ(sp_test, tp2->get_spacepoint());
 }
 
 } // ~namespace MAUS

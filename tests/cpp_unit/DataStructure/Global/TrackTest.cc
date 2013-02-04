@@ -15,40 +15,42 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
 
 #include "gtest/gtest.h"
 
 namespace MAUS {
 
-class GlobalTrackTestDS : public ::testing::Test {
+class TrackTestDS : public ::testing::Test {
   protected:
-    GlobalTrackTestDS()  {}
-    virtual ~GlobalTrackTestDS() {}
+    TrackTestDS()  {}
+    virtual ~TrackTestDS() {}
     virtual void SetUp()    {}
     virtual void TearDown() {}
 };
 
-TEST_F(GlobalTrackTestDS, test_getters_setters) {
-  GlobalTrack track;
+TEST_F(TrackTestDS, test_getters_setters) {
+  MAUS::DataStructure::Global::Track track;
 
   std::string mapper_name = "0";
 
-  MAUS::recon::global::PID pid = MAUS::recon::global::kElectron; // 11
+  MAUS::DataStructure::Global::PID pid =
+      MAUS::DataStructure::Global::kElectron; // 11
   
   int charge = 1;
 
   // Fill detectorpoints will current largest enum value, plus a
   // random selection.
-  ASSERT_EQ(MAUS::recon::global::kDetectorPointSize - 1,
-            (int) MAUS::recon::global::kBPM);
-  unsigned int detectorpoints = (1u << MAUS::recon::global::kTracker2S5);
-  detectorpoints += (1u << MAUS::recon::global::kTOF0);
-  detectorpoints += (1u << MAUS::recon::global::kEMR);
-  detectorpoints += (1u << MAUS::recon::global::kVirtual);
-  detectorpoints += (1u << MAUS::recon::global::kTracker1S3);
+  ASSERT_EQ(MAUS::DataStructure::Global::kDetectorPointSize - 1,
+            (int) MAUS::DataStructure::Global::kBPM);
+  unsigned int detectorpoints =
+      (1u << MAUS::DataStructure::Global::kTracker2S5);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kTOF0);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kEMR);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kVirtual);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kTracker1S3);
 
   std::vector<std::string> geometry_paths;
   geometry_paths.push_back("Nowhere");
@@ -57,12 +59,12 @@ TEST_F(GlobalTrackTestDS, test_getters_setters) {
   TRefArray* trackpoints = new TRefArray();
   int trackpoints_size = 3;
   for(int i = 0; i < trackpoints_size; ++i)
-    trackpoints->Add(new GlobalTrackPoint());
+    trackpoints->Add(new MAUS::DataStructure::Global::TrackPoint());
   
   TRefArray* constituent_tracks = new TRefArray();
   int constituent_tracks_size = 3;
   for(int i = 0; i < constituent_tracks_size; ++i)
-    constituent_tracks->Add(new GlobalTrack());
+    constituent_tracks->Add(new MAUS::DataStructure::Global::Track());
   
   double goodness_of_fit = 7.0;
 
@@ -102,20 +104,20 @@ TEST_F(GlobalTrackTestDS, test_getters_setters) {
 
 }
 
-TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
-  GlobalTrack track;
+TEST_F(TrackTestDS, test_TrackPoint_Access) {
+  MAUS::DataStructure::Global::Track track;
 
   // Prepare some detector points and virtual paths
   static const size_t kArraySize = 6;
   double zArray[kArraySize] = { 0., 1., 2., 3., 4., 5. };
   
-  recon::global::DetectorPoint dpArray[kArraySize] =
-      { MAUS::recon::global::kVirtual,
-        MAUS::recon::global::kTracker1S1,
-        MAUS::recon::global::kTracker1S2,
-        MAUS::recon::global::kTracker1S3,
-        MAUS::recon::global::kTracker1S4,
-        MAUS::recon::global::kVirtual };
+  DataStructure::Global::DetectorPoint dpArray[kArraySize] =
+      { MAUS::DataStructure::Global::kVirtual,
+        MAUS::DataStructure::Global::kTracker1S1,
+        MAUS::DataStructure::Global::kTracker1S2,
+        MAUS::DataStructure::Global::kTracker1S3,
+        MAUS::DataStructure::Global::kTracker1S4,
+        MAUS::DataStructure::Global::kVirtual };
 
   std::string pathArray[kArraySize] =
       { "/Top/Of/The/Hill",
@@ -128,10 +130,11 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   int unsortedArrayIndices[kArraySize] = {1, 0, 3, 4, 2, 5 };
     
   // Make some track points
-  GlobalTrackPoint* skipTP1 = NULL;
-  GlobalTrackPoint* skipTP2 = NULL;
+  MAUS::DataStructure::Global::TrackPoint* skipTP1 = NULL;
+  MAUS::DataStructure::Global::TrackPoint* skipTP2 = NULL;
   for(size_t i = 0; i < kArraySize; ++i){
-    GlobalTrackPoint* tp = new GlobalTrackPoint();
+    MAUS::DataStructure::Global::TrackPoint* tp =
+        new MAUS::DataStructure::Global::TrackPoint();
 
     // The other data members are fully tested by the TrackPoint
     // tests, just want to confirm the track sorting and detector
@@ -158,9 +161,11 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   ASSERT_EQ(kNewArraySize, track.get_trackpoints()->GetEntries());
   TIterator *tp_iter =
       track.get_trackpoints()->MakeIterator();
-  MAUS::GlobalTrackPoint* tp1 = (MAUS::GlobalTrackPoint*) tp_iter->Next();
-  MAUS::GlobalTrackPoint* tp2 = NULL;
-  while((tp2 = tp1) && (tp1 = (MAUS::GlobalTrackPoint*) tp_iter->Next())) {
+  MAUS::DataStructure::Global::TrackPoint* tp1 =
+      (MAUS::DataStructure::Global::TrackPoint*) tp_iter->Next();
+  MAUS::DataStructure::Global::TrackPoint* tp2 = NULL;
+  while((tp2 = tp1) &&
+        (tp1 = (MAUS::DataStructure::Global::TrackPoint*) tp_iter->Next())) {
     ASSERT_TRUE(tp1);
     ASSERT_TRUE(tp2);
     EXPECT_GT(tp1->get_position().Z(), tp2->get_position().Z());
@@ -185,13 +190,17 @@ TEST_F(GlobalTrackTestDS, test_TrackPoint_Access) {
   
 }
   
-TEST_F(GlobalTrackTestDS, test_ConstituentTrack_Access) {
-  GlobalTrack track;
+TEST_F(TrackTestDS, test_ConstituentTrack_Access) {
+  MAUS::DataStructure::Global::Track track;
 
-  GlobalTrack* constituentTrack1 = new GlobalTrack();
-  GlobalTrack* constituentTrack2 = new GlobalTrack();
-  GlobalTrack* constituentTrack3 = new GlobalTrack();
-  GlobalTrack* constituentTrack4 = new GlobalTrack();
+  MAUS::DataStructure::Global::Track* constituentTrack1 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track* constituentTrack2 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track* constituentTrack3 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track* constituentTrack4 =
+      new MAUS::DataStructure::Global::Track();
 
   track.AddTrack(constituentTrack1);
   track.AddTrack(constituentTrack2);
@@ -219,13 +228,13 @@ TEST_F(GlobalTrackTestDS, test_ConstituentTrack_Access) {
   EXPECT_FALSE(track.HasTrack(constituentTrack4));
 }
 
-TEST_F(GlobalTrackTestDS, test_default_constructor) {
-  GlobalTrack track;
+TEST_F(TrackTestDS, test_default_constructor) {
+  MAUS::DataStructure::Global::Track track;
 
   size_t detectorpoints = 0;
   
   EXPECT_EQ("", track.get_mapper_name());
-  EXPECT_EQ(MAUS::recon::global::kNoPID, track.get_pid());
+  EXPECT_EQ(MAUS::DataStructure::Global::kNoPID, track.get_pid());
   EXPECT_EQ(0, track.get_charge());
   EXPECT_TRUE(track.get_trackpoints()->GetEntries() == 0);
   EXPECT_EQ(detectorpoints, track.get_detectorpoints());
@@ -234,18 +243,22 @@ TEST_F(GlobalTrackTestDS, test_default_constructor) {
   EXPECT_EQ(0., track.get_goodness_of_fit());
 }
 
-TEST_F(GlobalTrackTestDS, test_copy_constructor) {
-  GlobalTrack* track1 = new GlobalTrack();
+TEST_F(TrackTestDS, test_copy_constructor) {
+  MAUS::DataStructure::Global::Track* track1 =
+      new MAUS::DataStructure::Global::Track();
 
   std::string mapper_name = "0";
 
-  MAUS::recon::global::PID pid = MAUS::recon::global::kElectron; // 11
+  MAUS::DataStructure::Global::PID pid =
+      MAUS::DataStructure::Global::kElectron; // 11
   
   int charge = -1;
 
-  MAUS::GlobalTrackPoint* tp0 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp0 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp0->set_mapper_name("tp0");
-  MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp1 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp1->set_mapper_name("tp1");
 
   size_t detectorpoints = 2;
@@ -256,9 +269,12 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrack *conTrack0 = new GlobalTrack();
-  GlobalTrack *conTrack1 = new GlobalTrack();
-  GlobalTrack *conTrack2 = new GlobalTrack();
+  MAUS::DataStructure::Global::Track *conTrack0 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack1 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack2 =
+      new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
 
@@ -274,8 +290,8 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
-  GlobalTrack *track2 =
-      new GlobalTrack(*track1);
+  MAUS::DataStructure::Global::Track *track2 =
+      new MAUS::DataStructure::Global::Track(*track1);
   
   EXPECT_EQ(mapper_name, track2->get_mapper_name());
   EXPECT_EQ(pid, track2->get_pid());
@@ -291,18 +307,22 @@ TEST_F(GlobalTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
 }
 
-TEST_F(GlobalTrackTestDS, test_assignment_operator) {
-  GlobalTrack* track1 = new GlobalTrack();
+TEST_F(TrackTestDS, test_assignment_operator) {
+  MAUS::DataStructure::Global::Track* track1 =
+      new MAUS::DataStructure::Global::Track();
 
   std::string mapper_name = "0";
 
-  MAUS::recon::global::PID pid = MAUS::recon::global::kElectron; // 11
+  MAUS::DataStructure::Global::PID pid =
+      MAUS::DataStructure::Global::kElectron; // 11
   
   int charge = -1;
 
-  MAUS::GlobalTrackPoint* tp0 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp0 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp0->set_mapper_name("tp0");
-  MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp1 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp1->set_mapper_name("tp1");
 
   size_t detectorpoints = 2;
@@ -313,9 +333,12 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrack *conTrack0 = new GlobalTrack();
-  GlobalTrack *conTrack1 = new GlobalTrack();
-  GlobalTrack *conTrack2 = new GlobalTrack();
+  MAUS::DataStructure::Global::Track *conTrack0 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack1 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack2 =
+      new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
 
@@ -331,7 +354,7 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
-  GlobalTrack track2 = (*track1);
+  MAUS::DataStructure::Global::Track track2 = (*track1);
   
   EXPECT_EQ(mapper_name, track2.get_mapper_name());
   EXPECT_EQ(pid, track2.get_pid());
@@ -347,18 +370,22 @@ TEST_F(GlobalTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(goodness_of_fit, track2.get_goodness_of_fit());
 }
 
-TEST_F(GlobalTrackTestDS, test_clone_method) {
-  GlobalTrack* track1 = new GlobalTrack();
+TEST_F(TrackTestDS, test_clone_method) {
+  MAUS::DataStructure::Global::Track* track1 =
+      new MAUS::DataStructure::Global::Track();
 
   std::string mapper_name = "0";
 
-  MAUS::recon::global::PID pid = MAUS::recon::global::kElectron; // 11
+  MAUS::DataStructure::Global::PID pid =
+      MAUS::DataStructure::Global::kElectron; // 11
   
   int charge = -1;
 
-  MAUS::GlobalTrackPoint* tp0 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp0 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp0->set_mapper_name("tp0");
-  MAUS::GlobalTrackPoint* tp1 = new MAUS::GlobalTrackPoint();
+  MAUS::DataStructure::Global::TrackPoint* tp1 =
+      new MAUS::DataStructure::Global::TrackPoint();
   tp1->set_mapper_name("tp1");
 
   size_t detectorpoints = 2;
@@ -369,9 +396,12 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   geometry_paths.push_back(path0);
   geometry_paths.push_back(path1);
 
-  GlobalTrack *conTrack0 = new GlobalTrack();
-  GlobalTrack *conTrack1 = new GlobalTrack();
-  GlobalTrack *conTrack2 = new GlobalTrack();
+  MAUS::DataStructure::Global::Track *conTrack0 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack1 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *conTrack2 =
+      new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
 
@@ -387,7 +417,7 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
-  GlobalTrack *track2 = track1->Clone();
+  MAUS::DataStructure::Global::Track *track2 = track1->Clone();
   
   ASSERT_TRUE(track2);
   EXPECT_NE(track1, track2);
@@ -399,10 +429,14 @@ TEST_F(GlobalTrackTestDS, test_clone_method) {
 
   // New cloned objects, but contents should be the same.
   EXPECT_NE(tp0, track2->get_trackpoints()->At(0));
-  MAUS::GlobalTrackPoint* not_tp0 = (MAUS::GlobalTrackPoint*) track2->get_trackpoints()->At(0);
+  MAUS::DataStructure::Global::TrackPoint* not_tp0 =
+      (MAUS::DataStructure::Global::TrackPoint*)
+      track2->get_trackpoints()->At(0);
   EXPECT_EQ("tp0", not_tp0->get_mapper_name());
   EXPECT_NE(tp1, track2->get_trackpoints()->At(1));
-  MAUS::GlobalTrackPoint* not_tp1 = (MAUS::GlobalTrackPoint*) track2->get_trackpoints()->At(1);
+  MAUS::DataStructure::Global::TrackPoint* not_tp1 =
+      (MAUS::DataStructure::Global::TrackPoint*)
+      track2->get_trackpoints()->At(1);
   EXPECT_EQ("tp1", not_tp1->get_mapper_name());
   
   EXPECT_EQ(detectorpoints, track2->get_detectorpoints());

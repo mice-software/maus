@@ -15,21 +15,21 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/GlobalSpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
 #include "gtest/gtest.h"
 
 namespace MAUS {
 
-class GlobalSpacePointTestDS : public ::testing::Test {
+class SpacePointTestDS : public ::testing::Test {
   protected:
-    GlobalSpacePointTestDS()  {}
-    virtual ~GlobalSpacePointTestDS() {}
+    SpacePointTestDS()  {}
+    virtual ~SpacePointTestDS() {}
     virtual void SetUp()    {}
     virtual void TearDown() {}
 };
 
-TEST_F(GlobalSpacePointTestDS, test_getters_setters) {
+TEST_F(SpacePointTestDS, test_getters_setters) {
   double charge = 1.0;
 
   double x = 2.0;
@@ -44,11 +44,12 @@ TEST_F(GlobalSpacePointTestDS, test_getters_setters) {
   double et = 9.0;
   TLorentzVector epos(ex, ey, ez, et);
 
-  recon::global::DetectorPoint det = recon::global::kTracker1S1; // 10
+  MAUS::DataStructure::Global::DetectorPoint det =
+      MAUS::DataStructure::Global::kTracker1S1; // 10
 
   std::string geom_path = "11";
 
-  recon::global::SpacePoint sp;
+  MAUS::DataStructure::Global::SpacePoint sp;
   sp.set_charge(charge);
   sp.set_position(pos);
   sp.set_position_error(epos);
@@ -68,8 +69,8 @@ TEST_F(GlobalSpacePointTestDS, test_getters_setters) {
   EXPECT_EQ(geom_path, sp.get_geometry_path());
 }
 
-TEST_F(GlobalSpacePointTestDS, test_default_constructor) {
-  recon::global::SpacePoint sp;
+TEST_F(SpacePointTestDS, test_default_constructor) {
+  MAUS::DataStructure::Global::SpacePoint sp;
   EXPECT_EQ(0., sp.get_charge());
   EXPECT_EQ(0., sp.get_position().X());
   EXPECT_EQ(0., sp.get_position().Y());
@@ -79,39 +80,39 @@ TEST_F(GlobalSpacePointTestDS, test_default_constructor) {
   EXPECT_EQ(0., sp.get_position_error().Y());
   EXPECT_EQ(0., sp.get_position_error().Z());
   EXPECT_EQ(0., sp.get_position_error().T());
-  EXPECT_EQ(recon::global::kUndefined, sp.get_detector());
+  EXPECT_EQ(MAUS::DataStructure::Global::kUndefined, sp.get_detector());
   EXPECT_EQ("", sp.get_geometry_path());
 }
 
-TEST_F(GlobalSpacePointTestDS, test_copy_constructor) {
+TEST_F(SpacePointTestDS, test_copy_constructor) {
   double charge = 1.0;
 
-  recon::global::SpacePoint sp1;
+  MAUS::DataStructure::Global::SpacePoint sp1;
   sp1.set_charge(charge);
 
-  recon::global::SpacePoint sp2(sp1);
+  MAUS::DataStructure::Global::SpacePoint sp2(sp1);
 
   EXPECT_EQ(charge, sp2.get_charge());
 }
 
-TEST_F(GlobalSpacePointTestDS, test_assignment_operator) {
+TEST_F(SpacePointTestDS, test_assignment_operator) {
   double charge = 1.0;
 
-  recon::global::SpacePoint sp1;
+  MAUS::DataStructure::Global::SpacePoint sp1;
   sp1.set_charge(charge);
 
-  recon::global::SpacePoint sp2 = sp1;
+  MAUS::DataStructure::Global::SpacePoint sp2 = sp1;
 
   EXPECT_EQ(charge, sp2.get_charge());
 }
 
-TEST_F(GlobalSpacePointTestDS, test_clone) {
+TEST_F(SpacePointTestDS, test_clone) {
   double charge = 1.0;
-  recon::global::SpacePoint *sp1 =
-      new recon::global::SpacePoint();
+  MAUS::DataStructure::Global::SpacePoint *sp1 =
+      new MAUS::DataStructure::Global::SpacePoint();
   sp1->set_charge(charge);
 
-  recon::global::SpacePoint *sp2 = sp1->Clone();
+  MAUS::DataStructure::Global::SpacePoint *sp2 = sp1->Clone();
 
   EXPECT_EQ(charge, sp2->get_charge());
   EXPECT_NE(sp1, sp2);
