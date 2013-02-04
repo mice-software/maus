@@ -138,14 +138,16 @@
 #pragma link C++ class std::vector<SciFiSpacePoint*>+;
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
-#pragma link C++ class MAUS::recon::global::SpacePoint+;
-#pragma link C++ class MAUS::recon::global::TrackPoint+;
-#pragma link C++ class MAUS::recon::global::Track+;
-#pragma link C++ class MAUS::recon::global::PrimaryChain+;
-#pragma link C++ class std::vector<MAUS::recon::global::SpacePoint*>+;
-#pragma link C++ class std::vector<MAUS::recon::global::TrackPoint*>+;
-#pragma link C++ class std::vector<MAUS::recon::global::Track*>+;
-#pragma link C++ class std::vector<MAUS::recon::global::PrimaryChain*>+;
+#pragma link C++ class MAUS::DataStructure::Global::SpacePoint+;
+#pragma link C++ class MAUS::DataStructure::Global::TrackPoint+;
+#pragma link C++ class MAUS::DataStructure::Global::Track+;
+#pragma link C++ class MAUS::DataStructure::Global::PrimaryChain+;
+#pragma link C++ class MAUS::DataStructure::Global::TRefTrackPair+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::SpacePoint*>+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::TrackPoint*>+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::Track*>+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::PrimaryChain*>+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::TRefTrackPair*>+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;
