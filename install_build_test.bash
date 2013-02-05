@@ -55,7 +55,7 @@ fi
 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure $MAUS_THIRD_PARTY >& $FILE_STD
+	./configure -t $MAUS_THIRD_PARTY >& $FILE_STD
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 else
