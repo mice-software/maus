@@ -113,6 +113,7 @@ bool KalmanSciFiAlignment::load_misaligments() {
 }
 
 void KalmanSciFiAlignment::update_site(KalmanSite *site) {
+/*
   TMatrixD a_excluded(5, 1);
   a_excluded = site->get_a(KalmanSite::Excluded);
 
@@ -135,6 +136,7 @@ void KalmanSciFiAlignment::update_site(KalmanSite *site) {
   s(1, 0) = diff_y;
   set_shifts(s, id);
 //  site->set_shifts(s);
+*/
 }
 
 /*
@@ -271,9 +273,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
 
   // sites 2 to 29; increment 3
   for ( int station = 3; station < 6; station++ ) {
-      // int site_i = 3*(station-1); // 3, 6, 9
-      // int site_i = 3*station-1; // j==5 || j==8 || j==11
-      int site_i = 3*(station-1); // j==5 || j==8 || j==11
+      int site_i = 3*(station)-1; // j==8 || j==11 || j==14
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"
@@ -288,15 +288,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << covariance_shifts[site_i](2, 1) << "\t"
       << covariance_shifts[site_i](2, 2) << "\n";
   }
-/*
-      file_out << 5 << "\t"
-      << 0. << "\t"
-      << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
-      << 0. << "\t"
-      << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
-      << 0. << "\t"
-      << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
-*/
+
       file_out << 6 << "\t"
       << 0. << "\t"
       << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
@@ -305,8 +297,16 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t"
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
-  for ( int station = 7; station < 10; station++ ) {
-      int site_i = 3*(station-1); // 18, 21, 24
+      file_out << 7 << "\t"
+      << 0. << "\t"
+      << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
+      << 0. << "\t"
+      << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
+      << 0. << "\t"
+      << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
+
+  for ( int station = 8; station < 11; station++ ) {
+      int site_i = 3*(station)-1; // 18, 21, 24
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"
@@ -321,13 +321,6 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << covariance_shifts[site_i](2, 1) << "\t"
       << covariance_shifts[site_i](2, 2) << "\n";
   }
-      file_out << 10 << "\t"
-      << 0. << "\t"
-      << 0.1 << "\t" << 0. << "\t" << 0. << "\t"
-      << 0. << "\t"
-      << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
-      << 0. << "\t"
-      << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   file_out.close();
 

@@ -62,6 +62,8 @@ class KalmanSeed {
 
   double get_momentum() const { return _momentum; }
 
+  std::vector<SciFiSpacePoint> get_spacepoints() { return _spacepoints; }
+
  private:
   std::vector<SciFiCluster*> _clusters;
 

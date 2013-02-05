@@ -15,6 +15,8 @@
  *
  */
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+#include <iostream>
+#include <fstream>
 
 namespace MAUS {
 
@@ -72,6 +74,22 @@ void KalmanSeed::process_measurements(const SciFiHelicalPRTrack* pr_track) {
   double pz_from_timing;
 
   retrieve_clusters(_spacepoints, pz_from_timing);
+/*
+  std::ofstream myfile;
+  file.open ("spacepoints_cosmics_position.txt", std::ios::out | std::ios::app);
+
+  if ( _spacepoints.size() == 5 ) {
+    for ( size_t i = 0; i < 5; ++i ) {
+      int tracker = _spacepoints[i]->get_tracker();
+      int station = _spacepoints[i]->get_station();
+      ThreeVector position=_spacepoints[i]->get_position;
+      file << tracker << "\t" << station << "\t"
+           << position.x() << "\t" << position.y() << "\t" << position.z() << "\t"
+           <<
+    }
+  }
+  file.close();
+*/
 }
 
 TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* seed) {

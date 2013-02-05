@@ -162,7 +162,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   double chi2 = 0;
   int tracker = 1;
 
-  int number_parameters = 5;
+  int number_parameters = 4;
   size_t numb_sites = sites.size();
   int ndf = numb_sites - number_parameters;
 
@@ -327,52 +327,52 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     // mg->Add(gr2,"cp");
     // mg->Draw("a");
     // int station = ceil((id+1.)/3.);
-    if ( id == 0 ) {
+    if ( id == 2 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station1->GetN();
       station1->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 3 ) {
+    if ( id == 5 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station2->GetN();
       station2->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 6 ) {
+    if ( id == 8 ) {
         double y = site.get_shift_A()(0, 0);
       double x = station3->GetN();
       station3->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 9 ) {
+    if ( id == 11 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station4->GetN();
       station4->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 12 ) {
+    if ( id == 14 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station5->GetN();
       station5->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 15 ) {
+    if ( id == 17 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station6->GetN();
       station6->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 18 ) {
+    if ( id == 20 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station7->GetN();
       station7->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 21 ) {
+    if ( id == 23 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station8->GetN();
       station8->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 24 ) {
+    if ( id == 26 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station9->GetN();
       station9->SetPoint(static_cast<Int_t> (x), x, y);
     }
-    if ( id == 27 ) {
+    if ( id == 29 ) {
       double y = site.get_shift_A()(0, 0);
       double x = station10->GetN();
       station10->SetPoint(static_cast<Int_t> (x), x, y);

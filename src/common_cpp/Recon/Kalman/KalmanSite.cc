@@ -20,7 +20,7 @@
 namespace MAUS {
 
 KalmanSite::KalmanSite(): _current_state(Initialized),
-                          _z(0.), _id(0),
+                          _z(0.), _id(-1),
                           _f_chi2(0.), _s_chi2(0.),
                           _direction(CLHEP::Hep3Vector(0., 0., 0.)),
                           _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
@@ -31,7 +31,7 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
 KalmanSite::~KalmanSite() {}
 
 KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
-                                                _z(0.), _id(0),
+                                                _z(0.), _id(-1),
                                                 _f_chi2(0.), _s_chi2(0.),
                                                 _direction(CLHEP::Hep3Vector(0., 0., 0.)),
                                                 _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
@@ -70,9 +70,9 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
   _input_shift_covariance = site.get_input_shift_covariance();
 
   _shift_A = site.get_shift_A();
-  _shift_B = site.get_shift_B();
+  // _shift_B = site.get_shift_B();
   _shift_A_covariance = site.get_shift_A_covariance();
-  _shift_B_covariance = site.get_shift_B_covariance();
+  // _shift_B_covariance = site.get_shift_B_covariance();
 
   _current_state = site.get_current_state();
 }
@@ -114,9 +114,9 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   _input_shift_covariance = rhs.get_input_shift_covariance();
 
   _shift_A = rhs.get_shift_A();
-  _shift_B = rhs.get_shift_B();
+  // _shift_B = rhs.get_shift_B();
   _shift_A_covariance = rhs.get_shift_A_covariance();
-  _shift_B_covariance = rhs.get_shift_B_covariance();
+  // _shift_B_covariance = rhs.get_shift_B_covariance();
 
   _current_state = rhs.get_current_state();
 
@@ -155,10 +155,10 @@ void KalmanSite::initialise() {
   _input_shift_covariance.ResizeTo(3, 3);
 
   _shift_A.ResizeTo(3, 1);
-  _shift_B.ResizeTo(3, 1);
+  // _shift_B.ResizeTo(3, 1);
 
   _shift_A_covariance.ResizeTo(3, 3);
-  _shift_B_covariance.ResizeTo(3, 3);
+  // _shift_B_covariance.ResizeTo(3, 3);
 }
 
 void KalmanSite::set_a(TMatrixD a, State kalman_state) {
@@ -288,10 +288,6 @@ TMatrixD KalmanSite::get_residual(State desired_state) const {
             "KalmanSite::get_residual"));
   }
 }
-
-  TMatrixD _covariance_residual;
-  TMatrixD _covariance_smoothed_residual;
-  TMatrixD _covariance_excluded_residual;
 
 void KalmanSite::set_covariance_residual(TMatrixD C, State kalman_state) {
   switch ( kalman_state ) {

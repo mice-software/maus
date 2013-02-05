@@ -32,7 +32,10 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+// #include "src/common_cpp/Utils/Globals.hh"
+// #include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
@@ -54,9 +57,9 @@ typedef struct SciFiParams {
   /// Atomic number in g.mol-1 per styrene monomer
   static const double A()               { return 104.15; }
   /// Channel width in mm
-  static const double Pitch()               { return 1.4945; }
+  static const double Pitch()           { return 1.4945; }
   /// Active Radius in mm
-  static const double Active_Radius()               { return 150.; }
+  static const double Active_Radius()   { return 150.; }
 } FibreParameters;
 
 typedef struct BetheBloch {
@@ -69,6 +72,12 @@ class KalmanTrack {
   KalmanTrack();
 
   virtual ~KalmanTrack() {}
+
+  void extrapolate(std::vector<KalmanSite> &sites, int current_site);
+
+  void filter(std::vector<KalmanSite> &sites, int current_site);
+
+  void smooth(std::vector<KalmanSite> &sites, int current_site);
 
   virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
@@ -108,18 +117,19 @@ class KalmanTrack {
 
   // void get_site_properties(KalmanSite *site, double &thickess, double &density);
   void compute_chi2(const std::vector<KalmanSite> &sites);
+  void compute_emittance(KalmanSite site);
 
-  void update_misaligments(KalmanSite *a_site);
+  void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
 
   /// Getters.
   TMatrixD get_propagator()   const { return _F;        }
   TMatrixD get_system_noise() const { return _Q;        }
   TMatrixD get_Q()            const { return _Q;        }
-  double get_f_chi2()           const { return _f_chi2;     }
-  double get_s_chi2()           const { return 1.;     }
-  int get_ndf()            const { return _ndf;      }
+  double get_f_chi2()         const { return _f_chi2;   }
+  double get_s_chi2()         const { return 1.;        }
+  int get_ndf()               const { return _ndf;      }
   double get_P_value()        const { return _P_value;  }
-  int get_tracker()        const { return _tracker;  }
+  int get_tracker()           const { return _tracker;  }
   double get_mass()           const { return _mass;     }
   double get_momentum()       const { return _momentum; }
 
@@ -128,6 +138,7 @@ class KalmanTrack {
   void set_momentum(double momentum) { _momentum = momentum; }
 
  protected:
+  bool _use_MCS, _use_Eloss;
   // int _inversion_sanity;
 
   TMatrixD _H;
@@ -159,6 +170,15 @@ class KalmanTrack {
   int _tracker;
 
   double _mass, _momentum;
+
+  struct Emittance {
+    double epsilon;
+    double alpha;
+    double beta;
+    double gamma;
+  };
+
+  Emittance emittance;
 };
 
 } // ~namespace MAUS

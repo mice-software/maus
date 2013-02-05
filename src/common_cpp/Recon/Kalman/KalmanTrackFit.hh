@@ -22,7 +22,6 @@
 // C headers
 #include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
-#include <algorithm>
 
 // C++ headers
 #include <string>
@@ -30,6 +29,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
@@ -61,27 +61,13 @@ class KalmanTrackFit {
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
 
-  void extrapolate(std::vector<KalmanSite> &sites,
-                   KalmanTrack *track,
-                   int current_site);
+  // std::vector<KalmanSite> exclude_station(int station,
+  //                                        std::vector<KalmanSite> sites);
+  void run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites);
 
-  void filter(std::vector<KalmanSite> &sites,
-              KalmanTrack *track,
-              int current_site);
+  void run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i);
 
-  void smooth(std::vector<KalmanSite> &sites,
-              KalmanTrack *track,
-              int current_site);
-
-/*
-  void filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                                     KalmanTrack *track,
-                                     int current_site);
-
-  void update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                   KalmanTrack *track,
-                                   KalmanSciFiAlignment &kalman_align);
-*/
+  void filter_virtual(KalmanSite &a_site);
 
   void save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,
@@ -90,7 +76,7 @@ class KalmanTrackFit {
  protected:
   double _seed_cov;
 
-  bool _use_MCS, _use_Eloss, _update_misalignments;
+  bool _update_misalignments;
 };
 
 } // ~namespace MAUS

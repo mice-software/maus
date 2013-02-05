@@ -5,7 +5,7 @@ Example to load a ROOT file with SciFi data and do some analysis
 """
 
 import sys
-import math
+from math import fabs
 
 # basic PyROOT definitions
 import ROOT 
@@ -20,7 +20,6 @@ import libMausCpp #pylint: disable = W0611
 
 delta_x = 2
 delta_y = 2
-
 
 def main(file_name):
     """ Main function which performs the analysis """
@@ -51,22 +50,32 @@ def main(file_name):
         # Loop over MC events
         for evt_num in range(spill.GetMCEvents().size()):
             mc_evt = spill.GetMCEvents()[evt_num]
+            print ' Looking at MC event ' + str(evt_num)
             # mc_trks = mc_evt.GetTracks() # Make dict from track_id to trk
             sf_hits = mc_evt.GetSciFiHits()
             hits_by_track = sort_hits_by_track(sf_hits)
 
             sf_evt = spill.GetReconEvents()[evt_num].GetSciFiEvent()
             if not check_tracks(sf_evt):
+                print ' Bad recon tracks, skipping'
                 continue
 
             sorted_rec_trks = sort_rec_tracks(sf_evt.helicalprtracks())
 
             # Loop over MC track ids (a substitute for MC tracks)
             for trk_num, hits_in_trk in hits_by_track.iteritems():
-                print "Looking at track number: " + str(trk_num)
+                if not trk_num == 1:
+                    break
+
+                # Make a nested dictionary of tracker and station num
+                # to track point (1 per station)
+                sorted_tp = make_mc_track_pts(mc_evt)
 
                 # Loop over trackers
                 for trker_num in range(2):
+                    print "  Track number: " + str(trk_num),
+                    print " Tracker number: " + str(trker_num) +", containing ",
+                    print str(len(sorted_rec_trks[trker_num])) + " rec tracks"
 
                     # Loop over recon tracks (one per tracker for now)
                     sp_matched = 0
@@ -74,16 +83,13 @@ def main(file_name):
 
                         # Should check this matches the MC track here somehow
 
-                        # Make a nested dictionary of tracker and station num
-                        # to track point (1 per station), and similarly for
-                        # space points (many per station)
-                        sorted_tp = make_mc_track_pts(mc_evt)
                         seeds_in_track = rec_trk.get_spacepoints()
                         sorted_seeds = sort_spoints(seeds_in_track)
 
                         # Should check here that there is only 0 or 1
                         # seeds per tracker/station, otherwise break
-
+                        print '  Found ' +str(len(sorted_tp[trker_num])),
+                        print ' track points'
                         # Loop over track points
                         for t_num, tracker in sorted_tp.iteritems():
                             for s_num, tp in tracker.iteritems():
@@ -96,15 +102,15 @@ def main(file_name):
                                         sp_matched = sp_matched + 1
                                         break
 
-                    f1.write( str(spill.GetSpillNumber()) + '\t' )
-                    f1.write( str(evt_num) + '\t' )
-                    tid = hits_in_trk[0].GetTrackId()
-                    f1.write( str(tid) + '\t' )
+                        f1.write( str(spill.GetSpillNumber()) + '\t' )
+                        f1.write( str(evt_num) + '\t' )
+                        tid = hits_in_trk[0].GetTrackId()
+                        f1.write( str(tid) + '\t' )
 
-                    f1.write( str(trker_num) + '\t' )
-                    f1.write( str(sp_matched) + '\t' )
-                    f1.write( str(5 - sp_matched) + '\t' )
-                    f1.write( str(len(seeds) - sp_matched) + '\n' )
+                        f1.write( str(trker_num) + '\t' )
+                        f1.write( str(sp_matched) + '\t' )
+                        f1.write( str(5 - sp_matched) + '\t' )
+                        f1.write( str(len(seeds_in_track) - sp_matched) + '\n' )
 
     print "Closing files"
     root_file.Close()
@@ -114,14 +120,16 @@ def check_match(tp, sp):
     """ Check whether a track point matches a spoint"""
     tp_pos = tp.get_position()
     sp_pos = sp.get_position()
-
     match = True
 
-    if (math.fabs( tp_pos.x() - sp_pos.x() ) > delta_x):
+    if ( fabs(fabs(tp_pos.x()) - fabs(sp_pos.x())) > delta_x ):
         match = False
-    if (math.fabs( tp_pos.y() - sp_pos.y() ) > delta_y):
+    if ( fabs(fabs(tp_pos.y()) - fabs(sp_pos.y())) > delta_y ):
         match = False
 
+    s1 = "   dx is " + str( fabs( fabs(tp_pos.x()) - fabs(sp_pos.x())))
+    s2 = "   dy is " + str( fabs( fabs(tp_pos.y()) - fabs(sp_pos.y())))
+    print s1 + ", " + s2
     return match
 
 def check_spill(spill):
@@ -134,7 +142,6 @@ def check_spill(spill):
 
 def check_tracks(sf_evt):
     """ Check the sf evt contains tracks we can use for the analysis """
-
     # For now, enforce 1 and only 1 track per tracker
     ok = True
     if len(sf_evt.helicalprtracks()) != 2:
@@ -150,7 +157,6 @@ def check_tracks(sf_evt):
 
 def make_mc_track_pts(mc_evt):
     """ Make MC track points for the tracker stations using sf hits """
-
     # Sort hits by tracker then station number into two nested dicts
     sorted_hits = sort_hits(mc_evt.GetSciFiHits())
 
@@ -163,30 +169,34 @@ def make_mc_track_pts(mc_evt):
 
         # Loop over stations
         for s_num, station in tracker.iteritems():
+            print "  Forming track point in tracker" + str(t_num),
+            print " station " + str(s_num) + " containing ",
+            print str(len(station)) + " hits"
             if len(station) < 1:
                 continue
             # Use the SpacePoint class for track points, as is near enough
             tp = ROOT.MAUS.SciFiSpacePoint()
-            # Use the first hit's data to define the track point
-            # (not ideal but will do for now)
-            tp.set_position(station[0].GetPosition())
-            tp.set_station(station[0].GetChannelId().GetStationNumber())
-            tp.set_tracker(station[0].GetChannelId().GetTrackerNumber())
-            tp_by_station[s_num] = tp
+            # Look for a hit corresponding to the primary track and
+            # then make the track point from it 
+            for hit in station:
+                if hit.GetTrackId() == 1:
+                    tp.set_position(hit.GetPosition())
+                    tp.set_station(hit.GetChannelId().GetStationNumber())
+                    tp.set_tracker(hit.GetChannelId().GetTrackerNumber())
+                    tp_by_station[s_num] = tp
+                    break
 
         tp_by_tracker[t_num] = tp_by_station
     return tp_by_tracker
 
 def print_spill_info(spill):
     """ Print some basic information about the spill """
-
     print "Found spill number", spill.GetSpillNumber(),
     print "in run number", spill.GetRunNumber(),
     print "DAQ event type", spill.GetDaqEventType()
 
 def sort_hits(sf_hits):
     """ Sort hits by tracker then station number into two nested dicts """
-
     # Sort hits by tracker into a dictionary
     hits_by_tracker = {0: [], 1:[]}
     for hit in sf_hits:
@@ -199,7 +209,7 @@ def sort_hits(sf_hits):
         for hit in tracker:
             hits_by_station[hit.GetChannelId().GetStationNumber()].append(hit)
         sorted_hits[num] = hits_by_station
-
+    
     return sorted_hits
 
 def sort_rec_tracks(trks):
@@ -211,7 +221,6 @@ def sort_rec_tracks(trks):
 
 def sort_spoints(spoints):
     """ Sort spoints by tracker then station number into two nested dicts """
-
     # Sort spoints by tracker into a dictionary
     spoints_by_tracker = {0: [], 1:[]}
     for sp in spoints:
@@ -229,16 +238,18 @@ def sort_spoints(spoints):
 
 def sort_hits_by_track(sf_hits):
     """ Sort hits into a dictionary by MC track number """
-
     hits_by_trk = {}
+    # print 'Sorting ' + str(sf_hits.size()) + ' sf hits'
     for i in range(sf_hits.size()):
         hit = sf_hits[i]
         if hit.GetTrackId() in hits_by_trk:
             hits_by_trk[hit.GetTrackId()].append(hit)
         else:
             hits_by_trk[hit.GetTrackId()] = [hit]
-    return hits_by_trk
 
+    for trk_num, trk in hits_by_trk.iteritems():
+        print "  Track " + str(trk_num) + " has " + str(len(trk)) + " sf hits"
+    return hits_by_trk
 
 if __name__ == "__main__":
     main(sys.argv[1])

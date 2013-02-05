@@ -83,11 +83,11 @@ class KalmanSite {
   void set_shift_A_covariance(TMatrixD shift_A_covariance) {
                 _shift_A_covariance = shift_A_covariance; }
 
-  void set_shift_B(TMatrixD shift_B) { _shift_B = shift_B; }
-  TMatrixD get_shift_B()            const { return _shift_B; }
-  TMatrixD get_shift_B_covariance() const { return _shift_B_covariance; }
-  void set_shift_B_covariance(TMatrixD shift_B_covariance) {
-                _shift_B_covariance = shift_B_covariance; }
+  // void set_shift_B(TMatrixD shift_B) { _shift_B = shift_B; }
+  // TMatrixD get_shift_B()            const { return _shift_B; }
+  // TMatrixD get_shift_B_covariance() const { return _shift_B_covariance; }
+  // void set_shift_B_covariance(TMatrixD shift_B_covariance) {
+  //              _shift_B_covariance = shift_B_covariance; }
 
   /// Sets the measurement vector.
   void set_measurement(double alpha)                { _v(0, 0) = alpha;
@@ -163,10 +163,10 @@ class KalmanSite {
   /// Alignment.
   TMatrixD _input_shift;
   TMatrixD _shift_A;
-  TMatrixD _shift_B;
+  // TMatrixD _shift_B;
   TMatrixD _input_shift_covariance;
   TMatrixD _shift_A_covariance;
-  TMatrixD _shift_B_covariance;
+  // TMatrixD _shift_B_covariance;
 
   CLHEP::Hep3Vector _mc_pos;
   CLHEP::Hep3Vector _mc_mom;

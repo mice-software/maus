@@ -16,20 +16,14 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include <math.h>
-#include "Interface/Squeal.hh"
 
 namespace MAUS {
 
 KalmanTrackFit::KalmanTrackFit(): _seed_cov(1000.),
-                                  _use_MCS(false),
-                                  _use_Eloss(false),
                                   _update_misalignments(false) {
   // Get Configuration values.
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov  = (*json)["SciFiSeedCovariance"].asDouble();
-  _use_MCS   = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_Eloss = (*json)["SciFiKalman_use_Eloss"].asBool();
   _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
   // type_of_dataflow = 'pipeline_single_thread'
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
@@ -71,43 +65,49 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     track->set_momentum(momentum);
     // Filter the first state.
     // std::cerr << "Filtering site 0" << std::endl;
-    filter(sites, track, 0);
+    track->filter(sites, 0);
 
-    for ( size_t j = 1; j < numb_measurements; ++j ) {
-      // Predict the state vector at site i...
-      // std::cerr << "Extrapolating to site " << j << std::endl;
-      extrapolate(sites, track, j);
-      // ... Filter...
-      // std::cerr << "Filtering site " << j << std::endl;
-      filter(sites, track, j);
-    }
-
-    track->prepare_for_smoothing(&sites.back());
-    // ...and Smooth back all sites.
-    for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
-      // std::cerr << "Smoothing site " << k << std::endl;
-      smooth(sites, track, k);
-    }
+    run_filter(track, sites);
 
     monitor.fill(sites);
     // monitor.print_info(sites);
     track->compute_chi2(sites);
+    // track->compute_emittance(sites.front());
+
     // Misalignment search.
-    if ( _update_misalignments ) {
-      for ( size_t j = 0; j < numb_measurements; ++j ) {
-        KalmanSite *site = &sites[j];
-        track->exclude_site(site);
-        if ( track->get_f_chi2() < 25. && (j == 6 || j == 9 || j == 12) ) {
-          track->update_misaligments(site);
-          // kalman_align.update_site(site);
+    if ( _update_misalignments && track->get_f_chi2() < 25. && numb_measurements == 15 ) {
+      for ( int station_i = 2; station_i < 5; ++station_i ) {
+        std::cerr << "Ignoring station " << station_i << std::endl;
+        // Fit without station i.
+        run_filter(track, sites, station_i);
+        // get difference between spacepoint (x, y, phi) and fitted (x, y, phi)
+        int plane_i = 3*(station_i)-2;
+        KalmanSite *excluded = &sites[plane_i];
+        TMatrixD a = excluded->get_a(KalmanSite::Smoothed);
+        a.Print();
+        std::vector<SciFiSpacePoint> spacepoints = seed->get_spacepoints();
+        bool found = false;
+        SciFiSpacePoint spacepoint;
+        ThreeVector sp_position;
+        for ( int sp_i = 0; sp_i < spacepoints.size(); sp_i++ ) {
+          if ( spacepoints[sp_i].get_station() == station_i ) {
+            sp_position = spacepoints[sp_i].get_position();
+          }
         }
+        std::cout << sp_position << std::endl;
+
+        //update misaligment estimation and covariance
+        //double st2_x, st2y;
+      }
+    }
+/*
+    if ( _update_misalignments && track->get_f_chi2() < 25. && numb_measurements == 15 ) {
+      for ( size_t j = 6; j < numb_measurements; ++j ) {
+        track->update_misaligments(sites, j);
       }
       kalman_align.update(sites);
     }
-    // if ( _update_misalignments && track->get_chi2() < 25. && numb_measurements == 15 ) {
-    // kalman_align->algorithm_1();
-    // kalman_align->algorithm_2();
-    // }
+*/
     save(track, sites, event);
     delete track;
   }
@@ -160,78 +160,73 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   }
 }
 
-//
-// General purpose routines.
-//
-void KalmanTrackFit::filter(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-
-  // Update measurement error:
-  track->update_V(a_site);
-
-  // Update H (depends on plane direction.)
-  track->update_H(a_site);
-  track->update_W(a_site);
-  track->update_K(a_site);
-  track->compute_pull(a_site);
-  // a_k = a_k^k-1 + K_k x pull
-  track->calc_filtered_state(a_site);
-
-  // Cp = (C-KHC)
-  track->update_covariance(a_site);
-
-  a_site->set_current_state(KalmanSite::Filtered);
+void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites) {
+  size_t numb_measurements = sites.size();
+  for ( size_t j = 1; j < numb_measurements; ++j ) {
+    // Predict the state vector at site i...
+    // std::cerr << "Extrapolating to site " << j << std::endl;
+    track->extrapolate(sites, j);
+    // ... Filter...
+    // std::cerr << "Filtering site " << j << std::endl;
+    track->filter(sites, j);
+  }
+  track->prepare_for_smoothing(&sites.back());
+  // ...and Smooth back all sites.
+  for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+    // std::cerr << "Smoothing site " << k << std::endl;
+    track->smooth(sites, k);
+  }
 }
 
-void KalmanTrackFit::extrapolate(std::vector<KalmanSite> &sites, KalmanTrack *track, int i) {
-  // Get current site...
-  KalmanSite *new_site = &sites[i];
+void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i) {
+  size_t numb_measurements = sites.size();
 
-  // ... and the site we will extrapolate from.
-  const KalmanSite *old_site = &sites[i-1];
-
-  // The propagator matrix...
-  track->update_propagator(old_site, new_site);
-
-  // Now, calculate prediction.
-  track->calc_predicted_state(old_site, new_site);
-
-  // Calculate the energy loss for the projected state.
-  if ( _use_Eloss )
-    track->subtract_energy_loss(old_site, new_site);
-
-
-  // Calculate the system noise...
-  if ( _use_MCS )
-    track->calc_system_noise(old_site, new_site);
-
-  // ... so that we can compute the prediction for the
-  // covariance matrix.
-  track->calc_covariance(old_site, new_site);
-
-  new_site->set_current_state(KalmanSite::Projected);
+  size_t site_removed_1 = 3*(ignore_i-1);
+  size_t site_removed_2 = site_removed_1 + 1;
+  size_t site_removed_3 = site_removed_1 + 2;
+  for ( size_t j = 1; j < numb_measurements; ++j ) {
+    // Predict the state vector at site i...
+    // std::cerr << "Extrapolating to site " << j << std::endl;
+    track->extrapolate(sites, j);
+    // ... Filter...
+    if ( j!=site_removed_1 && j!=site_removed_2 && j!=site_removed_3 ) {
+      // std::cerr << "Filtering site " << j << std::endl;
+      track->filter(sites, j);
+    } else {
+      // std::cerr << "Filtering VIRTUAL site " << j << std::endl;
+      filter_virtual(sites[j]);
+    }
+  }
+  track->prepare_for_smoothing(&sites.back());
+  // ...and Smooth back all sites.
+  for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+    // std::cerr << "Smoothing site " << k << std::endl;
+    track->smooth(sites, k);
+  }
 }
 
-void KalmanTrackFit::smooth(std::vector<KalmanSite> &sites, KalmanTrack *track, int id) {
-  // Get site to be smoothed...
-  KalmanSite *smoothing_site = &sites[id];
+void KalmanTrackFit::filter_virtual(KalmanSite &a_site) {
+  // Filtered States = Projected States
+  TMatrixD C(5, 5);
+  C = a_site.get_covariance_matrix(KalmanSite::Projected);
+  a_site.set_covariance_matrix(C, KalmanSite::Filtered);
 
-  // ... and the already perfected site.
-  const KalmanSite *optimum_site = &sites[id+1];
-
-  // Set the propagator right.
-  track->update_propagator(optimum_site, smoothing_site);
-
-  // Compute A_k.
-  track->update_back_transportation_matrix(optimum_site, smoothing_site);
-
-  // Compute smoothed a_k and C_k.
-  track->smooth_back(optimum_site, smoothing_site);
-
-  smoothing_site->set_current_state(KalmanSite::Smoothed);
+  TMatrixD a(5, 1);
+  a = a_site.get_a(KalmanSite::Projected);
+  a_site.set_a(a, KalmanSite::Filtered);
+  a_site.set_current_state(KalmanSite::Filtered);
 }
+
+/*
+std::vector<KalmanSite> KalmanTrackFit::exclude_station(int station, std::vector<KalmanSite> sites) {
+  std::vector<KalmanSite> new_sites = sites;
+  int starting_index = 3*(station-1);
+  int last_index = starting_index + 3;
+  // erase the first 3 elements:
+  new_sites.erase (new_sites.begin()+starting_index,new_sites.begin()+last_index)
+  return new_sites;
+}
+*/
 
 void KalmanTrackFit::save(const KalmanTrack *kalman_track,
                           std::vector<KalmanSite> sites,
