@@ -13,8 +13,8 @@ while getopts ":r:t:" opt; do
     r)
       if [ -d "$OPTARG" ]; then
           maus_root_dir=`cd $OPTARG; pwd -P`;
-          if [ ${maus_third_party} == ""]; then
-              maus_third_party=${maus_root_dir}
+          if [ "${maus_third_party}" == "" ]; then
+              maus_third_party="${maus_root_dir}"
           fi
       else
           echo "FATAL: \$MAUS_ROOT_DIR $OPTARG not a directory"
@@ -39,6 +39,10 @@ while getopts ":r:t:" opt; do
       ;;
   esac
 done
+if [ "${maus_third_party}" == "" ]; then
+    maus_third_party="${maus_root_dir}"
+fi
+
 
 arch=`uname -s`
 
