@@ -18,9 +18,9 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_PRIMARY_HH_
 
 #include <vector>
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
@@ -104,7 +104,7 @@ class Primary {
   ThreeVector _position;
   ThreeVector _momentum;
 
-  ClassDef(Primary, 1)
+  MAUS_VERSIONED_CLASS_DEF(Primary)
 };
 }
 

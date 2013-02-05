@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_RUNHEADER_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_RUNHEADER_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -49,7 +49,7 @@ class RunHeader {
   private:
     int _run_number;
 
-    ClassDef(RunHeader, 1)
+    MAUS_VERSIONED_CLASS_DEF(RunHeader)
 };
 }
 

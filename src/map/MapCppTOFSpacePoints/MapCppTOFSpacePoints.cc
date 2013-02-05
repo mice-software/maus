@@ -130,7 +130,7 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
           //      but for now it at least lets MC get reconstructed without clobbering real data
           // For now I have chosen option a) with option b) commented out below
           // need to be sure to change configdefaults for switching between data<->mc
-          if (root.isMember("mc")) _findTriggerPixelCut = 50.0;
+          if (root.isMember("mc_events")) _findTriggerPixelCut = 50.0;
 
           // Loop over each station starting from the trigger station.
           for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {

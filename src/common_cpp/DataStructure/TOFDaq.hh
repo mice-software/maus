@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/V1290.hh"
 #include "src/common_cpp/DataStructure/V1724.hh"
@@ -78,7 +78,7 @@ class TOFDaq {
     V1724Array _V1724;
     V1290Array _V1290;
 
-    ClassDef(TOFDaq, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFDaq)
 };
 }
 

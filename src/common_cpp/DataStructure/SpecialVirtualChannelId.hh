@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SPECIALVIRTUALCHANNELID_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SPECIALVIRTUALCHANNELID_HH_
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -46,7 +46,7 @@ class SpecialVirtualChannelId {
   private:
     int _station;
 
-    ClassDef(SpecialVirtualChannelId, 1)
+    MAUS_VERSIONED_CLASS_DEF(SpecialVirtualChannelId)
 };
 }
 

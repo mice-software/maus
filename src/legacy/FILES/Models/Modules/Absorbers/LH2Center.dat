@@ -1,0 +1,32 @@
+// FILES/Models/Modules/Absorbers/LH2Center.dat
+//
+// The cylindrical region for the liquid Hydrogen in the 
+// H absorber in the muon cooling device
+//
+// 
+// MJW 8-1-07 changed Dimensions from 150 245.852 -> 150 491.704
+
+Module LH2Center
+{
+  Volume Cylinder
+  Dimensions 150 122.44*2. mm
+
+  PropertyString Material Galactic
+
+  Module Absorbers/LH2CenterHalf.dat
+  {
+    Position 0.0 0.0 -122.436/2. mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Absorbers/LH2CenterSpecVirt.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Absorbers/LH2CenterHalf.dat
+  {
+    Position 0.0 0.0 +122.436/2. mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

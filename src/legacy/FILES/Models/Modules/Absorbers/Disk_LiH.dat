@@ -1,0 +1,16 @@
+// FILES/Models/Modules/Absorbers/Disk_LiH.dat
+//
+// Flat Lithium Hydride absorber
+// L=65 mm, R=225 mm
+// 
+// created by P. Snopok on August 20, 2012
+
+Module Disk_LiH 
+{
+  Volume Cylinder
+  Dimensions 225. 65. mm
+  PropertyString Material    LITHIUM_HYDRIDE
+  PropertyDouble BlueColour  0.5
+  PropertyString SensitiveDetector SpecialVirtual
+}
+

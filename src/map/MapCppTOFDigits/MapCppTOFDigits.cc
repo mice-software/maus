@@ -50,12 +50,15 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     //  this will contain the configuration
 
+/*
     map_file_name = JsonWrapper::GetProperty(configJSON,
                                              "TOF_cabling_file",
                                              JsonWrapper::stringValue);
 
     std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
     bool loaded = _map.InitFromFile(xMapFile);
+*/
+    bool loaded = _map.InitializeCards(configJSON);
     if (!loaded)
       return false;
 

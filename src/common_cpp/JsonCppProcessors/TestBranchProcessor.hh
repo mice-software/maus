@@ -35,8 +35,8 @@ class TestBranchProcessor : public ObjectProcessor<TestBranch> {
     TestBranchProcessor();
 
  private:
-    ReferenceArrayProcessor<TestChild> _double_array_proc;
-    TestChildProcessor _double_proc;
+    ReferenceArrayProcessor<TestChild> _child_array_proc;
+    TestChildProcessor _child_proc;
 };
 }
 #endif

@@ -17,6 +17,10 @@
 
 #include "Utils/TOFCalibrationMap.hh"
 
+TOFCalibrationMap::TOFCalibrationMap() {
+  this->Reset();
+}
+
 TOFCalibrationMap::~TOFCalibrationMap() {
   _Pkey.clear();
   _Tkey.clear();
@@ -30,6 +34,9 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   this->MakeTOFChannelKeys();
 
   // Get the calibration text files from the Json document.
+  // This is no longer done. Calibration is got from CDB now
+  // - DR, 12/11/12
+  /*
   Json::Value t0_file = JsonWrapper::GetProperty(configJSON,
                                                  "TOF_T0_calibration_file",
                                                  JsonWrapper::stringValue);
@@ -41,7 +48,7 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   Json::Value trigger_file = JsonWrapper::GetProperty(configJSON,
                                                       "TOF_Trigger_calibration_file",
                                                       JsonWrapper::stringValue);
-
+  */
   // Check what needs to be done.
   _do_timeWalk_correction = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_timeWalk_correction",
@@ -53,6 +60,21 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
                                                "Enable_t0_correction",
                                                JsonWrapper::booleanValue).asBool();
 
+  _tof_station = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_trigger_station",
+                                               JsonWrapper::stringValue).asString();
+
+  // convert trigger station name to upper case
+  // the DB holds detector names in upper case
+  std::transform(_tof_station.begin(), _tof_station.end(),
+                                       _tof_station.begin(),
+                                       std::ptr_fun<int, int>(std::toupper));
+
+  _tof_calibdate = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_calib_date_from",
+                                               JsonWrapper::stringValue).asString();
+  // std::cout << "calib date: " << _tof_calibdate << std::endl;
+
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   if (!pMAUS_ROOT_DIR) {
     Squeak::mout(Squeak::error)
@@ -61,12 +83,15 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
     return false;
   }
 
+  /*
   std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
   std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
   std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
-
   // Load the calibration constants.
-  bool loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
+  // bool loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
+  */
+  // get calib from DB instead of file, the above line is replaced by the one below
+  bool loaded = this->InitializeFromCDB();
   if (!loaded)
     return false;
 
@@ -79,6 +104,17 @@ bool TOFCalibrationMap::Initialize(std::string t0File,
   bool status = LoadT0File(t0File) &&
                 LoadTWFile(twFile) &&
                 LoadTriggerFile(triggerFile);
+
+  return status;
+}
+
+bool TOFCalibrationMap::InitializeFromCDB() {
+  // bool status = LoadT0Calib() &&
+  //              LoadTWCalib() &&
+  //              LoadTriggerCalib();
+  // The above lines have been replaces by the line below
+  // The new functions get the calibs from the DB
+  bool status = LoadT0Calib() && LoadTWCalib() && LoadTriggerCalib();
 
   return status;
 }
@@ -387,6 +423,145 @@ string TOFPixelKey::str() {
   return xConv.str();
 }
 
+void TOFCalibrationMap::Reset() {
+  // import the get_tof_calib module
+  // this python module access and gets calibrations from the DB
+  _calib_mod = PyImport_ImportModule("calibration.get_tof_calib");
+  if (_calib_mod == NULL) {
+    std::cerr << "Failed to import get_tof_calib module" << std::endl;
+    return;
+  }
 
+  PyObject* calib_mod_dict = PyModule_GetDict(_calib_mod);
+  if (calib_mod_dict != NULL) {
+    PyObject* calib_init = PyDict_GetItemString
+                                              (calib_mod_dict, "GetCalib");
+    if (PyCallable_Check(calib_init)) {
+        _tcalib = PyObject_Call(calib_init, NULL, NULL);
+    }
+  }
+  if (_tcalib == NULL) {
+    std::cerr << "Failed to instantiate get_tof_calib" << std::endl;
+    return;
+  }
 
+    // get the get_calib_func() function
+  _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
+  if (_get_calib_func == NULL) {
+    std::cerr << "Failed to find get_calib function" << std::endl;
+    return;
+  }
+}
 
+void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {
+  PyObject *py_arg = NULL, *py_value = NULL;
+  // setup the arguments to get_calib_func
+  // the arguments are 3 strings
+  // arg1 = device name (TOF0/TOF1/TOF2) uppercase
+  // arg2 = calibration type (tw/t0/trigger) lowercase
+  // arg3 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
+  // default date argument is "current"
+  // this is set via TOF_calib_date_from card in ConfigurationDefaults
+  py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
+  if (py_arg == NULL) {
+    PyErr_Clear();
+    throw(Squeal(Squeal::recoverable,
+              "Failed to resolve arguments to get_calib",
+              "MAUSEvaluator::evaluate"));
+    }
+    if (_get_calib_func != NULL && PyCallable_Check(_get_calib_func)) {
+        py_value = PyObject_CallObject(_get_calib_func, py_arg);
+        // setup the streams to hold the different calibs
+        if (py_value != NULL && strcmp(caltype.c_str(), "t0") == 0)
+            t0str << PyString_AsString(py_value);
+        if (strcmp(caltype.c_str(), "tw") == 0)
+            twstr << PyString_AsString(py_value);
+        if (strcmp(caltype.c_str(), "trigger") == 0)
+            trigstr << PyString_AsString(py_value);
+    }
+    if (py_value == NULL) {
+        PyErr_Clear();
+        Py_XDECREF(py_arg);
+        throw(Squeal(Squeal::recoverable,
+                     "Failed to parse argument "+devname,
+                     "GetCalib::get_calib"));
+    }
+    // clean up
+    Py_XDECREF(py_value);
+    Py_XDECREF(py_arg);
+}
+
+bool TOFCalibrationMap::LoadT0Calib() {
+  this->GetCalib(_tof_station, "t0", _tof_calibdate);
+  int reff;
+  double p0;
+  TOFChannelKey key;
+  try {
+    while (!t0str.eof()) {
+      t0str >> key >> p0 >> reff;
+
+      int n = FindTOFChannelKey(key);
+      _t0[n] = p0;
+      _reff[n] = reff;
+      // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
+    }
+  } catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool TOFCalibrationMap::LoadTWCalib() {
+  this->GetCalib(_tof_station, "tw", _tof_calibdate);
+  double p0, p1, p2, p3;
+  TOFChannelKey key;
+  try {
+    while (!twstr.eof()) {
+      twstr >> key >> p0 >> p1 >> p2 >> p3;
+      // std::cout << "tw: " << key.str() << " " << key << std::endl;
+
+      int n = FindTOFChannelKey(key);
+      _twPar[n].resize(4);
+      _twPar[n][0] = p0;
+      _twPar[n][1] = p1;
+      _twPar[n][2] = p2;
+      _twPar[n][3] = p3;
+       // std::cout<< key << " pos:" << n << "  p0:" << p0 << "  p1:" << p1 << std::endl;
+    }
+  } catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool TOFCalibrationMap::LoadTriggerCalib() {
+  this->GetCalib(_tof_station, "trigger", _tof_calibdate);
+  TOFPixelKey Pkey;
+  double dt;
+  try {
+    while (!trigstr.eof()) {
+      trigstr >> Pkey >> dt;
+
+      _Tkey.push_back(Pkey);
+      _Trt0.push_back(dt);
+       // std::cout<< Pkey << "  dt:" << dt << std::endl;
+    }
+  } catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in TOFCalibrationMap::LoadTriggerFile. Error during loading. " << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
+  // Use the last readed pixel key to set the number of the trigger station.
+  _triggerStation = Pkey.station();
+
+  return true;
+}

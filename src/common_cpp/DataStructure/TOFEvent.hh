@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFEVENT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/TOFEventDigit.hh"
 #include "src/common_cpp/DataStructure/TOFEventSlabHit.hh"
 #include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
@@ -69,7 +69,7 @@ class TOFEvent {
     TOFEventSpacePoint _tof_space_points;
     TOFEventDigit _tof_digits;
 
-    ClassDef(TOFEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFEvent)
 };
 }
 

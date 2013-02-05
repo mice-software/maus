@@ -17,7 +17,8 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_RUNFOOTER_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_RUNFOOTER_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
+
 
 namespace MAUS {
 
@@ -49,7 +50,7 @@ class RunFooter {
   private:
     int _run_number;
 
-    ClassDef(RunFooter, 1)
+    MAUS_VERSIONED_CLASS_DEF(RunFooter)
 };
 }
 

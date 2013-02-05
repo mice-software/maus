@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -149,7 +149,7 @@ class VirtualHit {
     ThreeVector _b_field;
     ThreeVector _e_field;
 
-    ClassDef(VirtualHit, 1)
+    MAUS_VERSIONED_CLASS_DEF(VirtualHit)
 };
 }
 
