@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 version=`grep "version" $MAUS_ROOT_DIR/README | sed s/\ /_/g`
-filename=third_party_libraries.tar.gz
+filename=_third_party_libraries.tar.gz
 url=http://micewww.pp.rl.ac.uk/maus/${version}/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then

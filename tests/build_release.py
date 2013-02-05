@@ -94,8 +94,15 @@ def build_user_guide():
 def build_third_party_tarball():
     """Build tarball of third party libraries"""
     print """Building third party tarball"""
-    os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
-    glob_list = ["source/*.tar.gz", "source/*.egg", "source/*.tgz"]
+    os.chdir(os.path.join(os.environ['MAUS_THIRD_PARTY'], "third_party"))
+    egg_list = glob.glob("install/lib/python2.7/site-packages/*.egg")
+    for egg_source in egg_list:
+        target = "source/easy_install/"+os.path.split(egg_source)[1]
+        if os.path.isdir(egg_source):
+            shutil.copytree(egg_source, target)
+        else:
+            shutil.copy2(egg_source, target)
+    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
     tarball_targets = []
     tarball_name = "third_party_libraries.tar.gz"
     for targets in glob_list:
@@ -142,7 +149,7 @@ def main():
     print "Doing server build"
     build_user_guide()
     build_doxygen()
-    #build_test_output()
+    build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:
