@@ -93,20 +93,18 @@ fi
 #      maus_central says where the precompiled third party libraries are (if any)
 #      PATH says where the binaries are
 #      DYLIB_VAR says where your shared libraries are
-if [ "${maus_third_party}" ]; then
-    echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
-    echo
-    if [ -z "${PATH}" ]; then  # see if the variable exists yet
-        PATH="${maus_third_party}/third_party/install/bin"       # if not, initialize it
-    else
-        PATH="${maus_third_party}/third_party/install/bin:$PATH" # else add to it
-    fi
+echo "INFO: Attempting to use third party libraries from " ${maus_third_party}
+echo
+if [ -z "${PATH}" ]; then  # see if the variable exists yet
+    PATH="${maus_third_party}/third_party/install/bin"       # if not, initialize it
+else
+    PATH="${maus_third_party}/third_party/install/bin:$PATH" # else add to it
+fi
 
-    if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
-        eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib"                  # if not, initialize it
-    else
-        eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
-    fi
+if [ -z "${!DYLIB_VAR}" ]; then  # see if the variable exists yet
+    eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib"                  # if not, initialize it
+else
+    eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
 fi
 
 ### Create environment files
