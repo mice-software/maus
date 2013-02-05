@@ -101,7 +101,7 @@ bool MapCppGlobalRawTracks::birth(std::string configuration) {
     default:
       throw(Squeal(Squeal::nonRecoverable,
                    "Reference particle is not a pion+/-, muon+/-, or e+/-.",
-                   "MapCppGlobalRawTracks::process()"));
+                   "MapCppGlobalRawTracks::birth()"));
 
   }
 
@@ -156,7 +156,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-  Json::Value global_raw_tracks;
+  Json::Value raw_tracks;
 
   for (std::vector<MAUS::recon::global::Track>::iterator
           raw_track = tracks_.begin();
@@ -167,11 +167,11 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
   std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
             << "Appending a track of size " << raw_track->size()
             << " to global_raw_tracks" << std::endl;
-    global_raw_tracks.append(
+    raw_tracks.append(
       DataStructureHelper::GetInstance().TrackToJson(*raw_track));
   }
 
-  run_data_["global_raw_tracks"] = global_raw_tracks;
+  run_data_["recon_events"]["global_event"]["raw_tracks"] = raw_tracks;
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;

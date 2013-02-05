@@ -28,6 +28,7 @@
 #include "Interface/Squeak.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
+#include "Recon/Global/ParticleOpticalVector.hh"
 
 namespace MAUS {
 namespace recon {
@@ -61,6 +62,25 @@ TrackPoint::TrackPoint(const Vector<double> & original_instance,
       detector_id_(Detector::kNone),
       particle_id_(pid), z_(z)
 { }
+
+TrackPoint::TrackPoint(const ParticleOpticalVector & vector,
+                       const double t0, const double E0, const double P0)
+    : PhaseSpaceVector()
+{
+  const double beta0 = P0 / E0;
+  const double gamma0 = 1. / ::sqrt(1 - beta0*beta0);
+  const double k = beta0 * ::CLHEP::c_light * gamma0 / (1 + gamma0);
+
+  set_t(vector.l() / k + t0);
+  set_E(vector.delta() * E0 + E0);
+  set_x(vector.x());
+  set_Px(vector.a() * P0);
+  set_y(vector.y());
+  set_Py(vector.b() * P0);
+}
+
+TrackPoint::TrackPoint(const ParticleOpticalVector & original_instance)
+    : PhaseSpaceVector(original_instance) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
                        const double x, const double px,

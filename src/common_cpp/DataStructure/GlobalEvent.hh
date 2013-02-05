@@ -19,6 +19,8 @@
 
 #include "Rtypes.h"  // ROOT
 
+#include "DataStructure/GlobalRawTrack.hh"
+
 namespace MAUS {
 
 /** @class GlobalEvent comment
@@ -39,8 +41,15 @@ class GlobalEvent {
     /** Destructor - any member pointers are deleted */
     virtual ~GlobalEvent();
 
+    GlobalRawTrackArray raw_tracks() const {
+      return raw_tracks_;
+    }
+    void set_raw_tracks(const GlobalRawTrackArray raw_tracks) {
+      raw_tracks_ = raw_tracks;
+    }
 
   private:
+    GlobalRawTrackArray raw_tracks_;
 
     ClassDef(GlobalEvent, 1)
 };

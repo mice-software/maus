@@ -30,6 +30,9 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& _globalevent) {
     if (this == &_globalevent) {
         return *this;
     }
+
+    raw_tracks_ = _globalevent.raw_tracks_;
+
     return *this;
 }
 

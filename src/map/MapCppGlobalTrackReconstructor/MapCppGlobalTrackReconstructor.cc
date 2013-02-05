@@ -154,6 +154,7 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
 std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
           << "Appending a best fit track of size " << best_fit_track.size()
           << " to global_tracks" << std::endl;
+// std::cout << best_fit_track << std::endl;
     global_tracks.append(
       DataStructureHelper::GetInstance().TrackToJson(best_fit_track));
     track_count += best_fit_track.size() - 1;

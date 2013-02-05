@@ -31,12 +31,14 @@
 #include "Interface/Squeal.hh"
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
+#include "Recon/Global/ParticleOpticalVector.hh"
 #include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
+using recon::global::ParticleOpticalVector;
 using recon::global::TrackPoint;
 
 PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
@@ -206,6 +208,12 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     const std::vector<recon::global::TrackPoint> & start_plane_hits,
     const std::vector<recon::global::TrackPoint> & station_hits)
     const {
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const double t0 = reference_pgparticle.time;
+  const double E0 = reference_pgparticle.energy;
+  const double P0 = reference_pgparticle.pz;
 
   if (start_plane_hits.size() != station_hits.size()) {
     throw(Squeal(Squeal::nonRecoverable,
@@ -216,18 +224,29 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   std::vector< std::vector<double> > points;
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
+    ParticleOpticalVector start_plane_point(start_plane_hits[pt_index],
+                                            t0, E0, P0);
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      point.push_back(start_plane_hits[pt_index][coord_index]);
+      #if 0
+        point.push_back(start_plane_point[coord_index]);
+      #else
+        point.push_back(start_plane_hits[pt_index][coord_index]);
+      #endif
     }
     points.push_back(point);
   }
 
   std::vector< std::vector<double> > values;
   for (size_t val_index = 0; val_index < station_hits.size(); ++val_index) {
+    ParticleOpticalVector station_value(station_hits[val_index], t0, E0, P0);
     std::vector<double> value;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      value.push_back(station_hits[val_index][coord_index]);
+      #if 0
+        value.push_back(station_value[coord_index]);
+      #else
+        value.push_back(station_hits[val_index][coord_index]);
+      #endif
     }
     values.push_back(value);
   }

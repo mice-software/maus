@@ -33,7 +33,10 @@
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "Recon/Global/Particle.hh"
+#include "Recon/Global/ParticleOpticalVector.hh"
 #include "Recon/Global/Track.hh"
 #include "Recon/Global/TrackPoint.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -165,6 +168,12 @@ std::cout.flush();
 
 Double_t MinuitTrackFitter::ScoreTrack(
     Double_t * const start_plane_track_coordinates) {
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const double t0 = reference_pgparticle.time;
+  const double E0 = reference_pgparticle.energy;
+  const double P0 = reference_pgparticle.pz;
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
@@ -200,7 +209,15 @@ std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     // calculate the next guess
     const double end_plane = events->z();
     TrackPoint point = TrackPoint(
-      optics_model_->Transport(guess, end_plane), end_plane);
+    #if 0
+      ParticleOpticalVector(
+        optics_model_->Transport(ParticleOpticalVector(guess, t0, E0, P0),
+                                 end_plane)),
+        t0, E0, P0);
+    #else
+      optics_model_->Transport(guess, end_plane));
+    #endif
+    point.set_z(end_plane);
     // assume the particle didn't decay
     point.set_particle_id(events->particle_id());
 std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;

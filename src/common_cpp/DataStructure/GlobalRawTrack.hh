@@ -48,6 +48,8 @@ class GlobalRawTrack {
 
     ClassDef(GlobalRawTrack, 1)
 };
+
+typedef std::vector<GlobalRawTrack> GlobalRawTrackArray;
 }
 
 #endif

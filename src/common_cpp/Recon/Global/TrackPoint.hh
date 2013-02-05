@@ -36,6 +36,8 @@ class Vector<double>;
 namespace recon {
 namespace global {
 
+class ParticleOpticalVector;
+
 /* @class TrackPoint a phase space vector with redundant t/E and z/Pz
  * coordinates as well as an ID that links the track to the detector that
  * measured it.
@@ -69,6 +71,11 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
   explicit TrackPoint(const Vector<double> & original_instance,
                       const double z = 0.0,
                       const Particle::ID pid = Particle::kNone);
+
+  TrackPoint(const ParticleOpticalVector & vector,
+             const double t0, const double E0, const double P0);
+
+  explicit TrackPoint(const ParticleOpticalVector & original_instance);
 
   /* @brief Create with coordinates from an array.
      Order is t, E, x, Px, y, Py.

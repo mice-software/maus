@@ -24,8 +24,12 @@
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "Recon/Global/ParticleOpticalVector.hh"
 
 namespace MAUS {
+  
+using MAUS::recon::global::ParticleOpticalVector;
+
 // ##############################
 //  PolynomialTransferMap public
 // ##############################
