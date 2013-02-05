@@ -1,14 +1,15 @@
 Configuration fs2a_geometry
 {
-    PropertyHep3Vector Dimensions 1.0 1.0 600 m
+    // world volume size; if this is too big it can slow the simulation down
+    PropertyHep3Vector Dimensions 1.0 1.0 100 m
     PropertyString Material   Galactic
-    PropertyDouble G4StepMax  100 mm
+    PropertyDouble G4StepMax  10 mm
 
     Substitution $cell_length        750. //mm
-    Substitution $number_of_cells    1
-    Substitution $number_of_virtuals 3
+    Substitution $number_of_cells    20
+    Substitution $number_of_virtuals 200
     Substitution $rf_phase         35
-    Substitution $rf_voltage       15
+    Substitution $rf_voltage       19
 
     // ***************** INPUT, OUTPUT, etc ***************
 
@@ -39,20 +40,20 @@ Configuration fs2a_geometry
     Module Focus
     {
       PropertyString     Volume            None
-      PropertyHep3Vector Position          0.0 0.0 $cell_length*(@RepeatNumber-4.5) m
+      PropertyHep3Vector Position          0.0 0.0 $cell_length*(@RepeatNumber-10) mm
       PropertyDouble     ScaleFactor       106.667*(-1)**@RepeatNumber
       PropertyString     FieldType         Solenoid
       PropertyString     FileName          ${MAUS_ROOT_DIR}/tmp/fs2a.fld
       PropertyString     FieldMapMode      Read
       PropertyBool       RepeatModule2     1
-      PropertyInt        NumberOfRepeats   $number_of_cells
+      PropertyInt        NumberOfRepeats   $number_of_cells+10
     }
 
     // RF CAVITY
     Module RF
     {
         PropertyString     Volume       Cylinder 
-        PropertyDouble     Dimensions   650.0 520.4 mm //radius, length in z
+        PropertyHep3Vector Dimensions   650.0 520.4 mm //radius, length in z
         PropertyHep3Vector Position     0.0 0.0  $cell_length*(@RepeatNumber+0.5) mm
         PropertyString     Material     Galactic
 
@@ -148,6 +149,7 @@ Configuration fs2a_geometry
                 PropertyDouble BlueColour  1.0
             }
         }
+        // DOWNSTREAM ABSORBER
         Module AbsorberDS
         {
             PropertyString     Volume            Cylinder
@@ -193,8 +195,6 @@ Configuration fs2a_geometry
         }
 
     }
-
-    // DOWNSTREAM ABSORBER
 
     // BEAMPIPES, APERTURES, ETC
     Module BeamPipeUS
