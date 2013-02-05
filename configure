@@ -30,11 +30,11 @@ while getopts ":r:t:" opt; do
       fi
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+      echo "FATAL: Invalid option: -$OPTARG" >&2
       exit 1
       ;;
     :)
-      echo "Option -$OPTARG requires an argument."
+      echo "FATAL: Option -$OPTARG requires an argument."
       exit 1
       ;;
   esac
