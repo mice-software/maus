@@ -110,6 +110,10 @@ class PrimaryChain : public TObject {
   /// Empties the #_tracks object
   void ClearTracks();
 
+  /// Add a preceeding primary chain.  This allows us to record the
+  /// full algorithm flow.
+  void AddParentChain(MAUS::DataStructure::Global::PrimaryChain* chain);
+
   // Getters and Setters for the member variables
   /// Set the name for the mapper which produced the result, #_mapper_name.
   void set_mapper_name(std::string mapper_name) {

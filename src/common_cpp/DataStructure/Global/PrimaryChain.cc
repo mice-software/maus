@@ -289,6 +289,17 @@ void PrimaryChain::ClearTracks() {
   _tracks->clear();
 }
 
+void PrimaryChain::AddParentChain(
+    MAUS::DataStructure::Global::PrimaryChain* chain) {
+  // Check primary chain is valid
+  if(!chain) {
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to add a NULL PriamryChain",
+                 "DataStructure::Global::PrimaryChain::AddParentChain()"));
+  }
+
+  _parent_primary_chains->Add(chain);
+}
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS
