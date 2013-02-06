@@ -28,6 +28,13 @@ namespace GlobalEventProcessorTest {
 class GlobalEventProcessorTestClass : public ::testing::Test {
  protected:
   virtual void SetUp() {
+    // Clear the reference resolvers, in case they were left in a strange
+    // state by another test failing...
+    if(ReferenceResolver::CppToJson::RefManager::HasInstance())
+      ReferenceResolver::CppToJson::RefManager::Death();
+    if(ReferenceResolver::JsonToCpp::RefManager::HasInstance())
+      ReferenceResolver::JsonToCpp::RefManager::Death();
+    
     // Fill Cpp GlobalEvent
     for(int i = 0; i < 4; ++i) {
       _trackpoint.push_back(new MAUS::DataStructure::Global::TrackPoint());

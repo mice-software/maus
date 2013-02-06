@@ -24,6 +24,11 @@ namespace MAUS {
 namespace ProcessorTest {
 template <class TYPE>
 void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
+  if(ReferenceResolver::JsonToCpp::RefManager::HasInstance())
+    ReferenceResolver::JsonToCpp::RefManager::Death();
+  if(ReferenceResolver::CppToJson::RefManager::HasInstance())
+    ReferenceResolver::CppToJson::RefManager::Death();
+
     ReferenceResolver::JsonToCpp::RefManager::Birth();
     ReferenceResolver::CppToJson::RefManager::Birth();
     Json::Value json_in;
