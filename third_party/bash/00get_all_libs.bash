@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 version=`grep "version" $MAUS_ROOT_DIR/README | sed s/\ /_/g`
-filename=_third_party_libraries.tar.gz
+filename=third_party_libraries_incl_python.tar.gz
 url=http://micewww.pp.rl.ac.uk/maus/${version}/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
@@ -20,7 +20,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/"
     else
-        echo "ERROR: Failed to get source archive"
+        echo "WARN: Failed to get source archive - build scripts will attempt to"
+        echo "WARN: get them from the internet instead..."
         exit 1
     fi
 else
