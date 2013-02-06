@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install/*.egg
+site_packages=${MAUS_ROOT_DIR}/third_party/install/lib/python2.7/site-packages/
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     #  Just use one version....
     rm -Rf scons-2.1.0.alpha.20110323.tar.gz
@@ -11,20 +14,13 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     easy_install ${MAUS_ROOT_DIR}/third_party/build/scons-2.1.0.alpha.20110323
 
     package_list="suds validictory nose nose-exclude coverage readline ipython \
-                 doxypy pylint==0.25.1 numpy==1.5 bitarray matplotlib celery \
-                 pymongo" 
+ doxypy pylint==0.25.1 numpy==1.5 bitarray matplotlib celery \
+ pymongo" 
     echo "Installing $package_list"
-    easy_install -i ${MAUS_ROOT_DIR}/third_party/source/easy_install/ \
-                 -f http://pypi.python.org/simple/ \
-                 $package_list
-#    easy_install "pylint==0.25.1"
-#    easy_install "numpy==1.5"
+    cp -r $egg_source $site_packages
 
-#    easy_install "validictory==0.7.0"
-#    easy_install bitarray
-#    easy_install matplotlib
-#    easy_install "celery==2.5.5"
-#    easy_install pymongo
+
+    easy_install $package_list
 
     echo "INFO: The package should be locally build now in your"
     echo "INFO: third_party directory, which the rest of MAUS will"
