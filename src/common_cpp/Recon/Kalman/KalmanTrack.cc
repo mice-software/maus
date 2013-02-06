@@ -729,6 +729,13 @@ void KalmanTrack::update_misaligments2(KalmanSite *excluded, KalmanSeed *seed, i
   TMatrixD new_E(3, 3);
   new_E = ( I - Ks*_S ) * old_E;
   excluded->set_shift_A_covariance(new_E);
+
+  std::cerr << "Site : " << excluded->get_id() << std::endl;
+  std::cerr << "Pull (in channel unit) is: " << std::endl;
+  pull.print();
+  std::cerr << "old and new shift estimation: "<< std::endl;
+  old_s.print();
+  new_s.print();
 }
 
 void KalmanTrack::update_misaligments(std::vector<KalmanSite> &sites, size_t i) {
