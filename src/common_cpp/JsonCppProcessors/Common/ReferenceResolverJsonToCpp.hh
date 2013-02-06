@@ -96,9 +96,8 @@ class FullyTypedResolver : public Resolver {
  *  Converts a Json pointer to a C++ pointer
  *
  *  @tparam ParentType type of object that holds the pointer
- *  @tparam ChildType type of object pointed to 
  */
-template <class ParentType, class ChildType>
+template <class ParentType>
 class TRefResolver : public Resolver {
   public:
     /** SetMethod function pointer for setting the C++ pointer during
@@ -184,7 +183,6 @@ class VectorResolver : public Resolver {
  *
  *  @tparam ChildType type of object pointed to;
  */
-template <class ChildType>
 class TRefArrayResolver : public Resolver {
  public:
   /** Constructor

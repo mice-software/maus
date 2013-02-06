@@ -65,7 +65,6 @@ void ObjectProcessor<ObjectType>::RegisterPointerReference(
 }
 
 template <class ObjectType>
-template <class ChildType>
 void ObjectProcessor<ObjectType>::RegisterTRef(
     std::string branch_name,
     TRef (ObjectType::*GetMethod)() const,
@@ -73,22 +72,21 @@ void ObjectProcessor<ObjectType>::RegisterTRef(
     bool is_required) {
   using ObjectProcessorNS::BaseItem;
   using ObjectProcessorNS::PointerTRefItem;
-  BaseItem<ObjectType>* item = new PointerTRefItem<ObjectType, ChildType>
+  BaseItem<ObjectType>* item = new PointerTRefItem<ObjectType>
       (branch_name, GetMethod, SetMethod, is_required);
   _items[branch_name] = item;
 }
 
 template <class ObjectType>
-template <class ChildType>
 void ObjectProcessor<ObjectType>::RegisterTRefArray(
     std::string branch_name,
-    TRefArrayProcessor<ChildType>* child_processor,
+    TRefArrayProcessor* child_processor,
     TRefArray* (ObjectType::*GetMethod)() const,
     void (ObjectType::*SetMethod)(TRefArray* value),
     bool is_required) {
   using ObjectProcessorNS::BaseItem;
   using ObjectProcessorNS::PointerTRefArrayItem;
-  BaseItem<ObjectType>* item = new PointerTRefArrayItem<ObjectType, ChildType>
+  BaseItem<ObjectType>* item = new PointerTRefArrayItem<ObjectType>
       (branch_name, child_processor, GetMethod, SetMethod, is_required);
   _items[branch_name] = item;
 }

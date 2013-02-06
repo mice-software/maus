@@ -25,10 +25,10 @@
 
 namespace MAUS {
 namespace ObjectProcessorNS {
-template <class ParentType, class ChildType>
-PointerTRefArrayItem<ParentType, ChildType>::PointerTRefArrayItem(
+template <class ParentType>
+PointerTRefArrayItem<ParentType>::PointerTRefArrayItem(
     std::string branch_name,
-    TRefArrayProcessor<ChildType>* child_processor,
+    TRefArrayProcessor* child_processor,
     GetMethod getter,
     SetMethod setter,
     bool is_required)
@@ -38,8 +38,8 @@ PointerTRefArrayItem<ParentType, ChildType>::PointerTRefArrayItem(
       _getter(getter), _required(is_required) {
 }
 
-template <class ParentType, class ChildType>
-void PointerTRefArrayItem<ParentType, ChildType>::_SetCppChild
+template <class ParentType>
+void PointerTRefArrayItem<ParentType>::_SetCppChild
 (const Json::Value& parent_json, ParentType& parent_cpp) {
   if (!parent_json.isMember(_branch)) {
     if (_required) {
@@ -68,8 +68,8 @@ void PointerTRefArrayItem<ParentType, ChildType>::_SetCppChild
   (parent_cpp.*_setter)(child_cpp);
 }
 
-template <class ParentType, class ChildType>
-void PointerTRefArrayItem<ParentType, ChildType>::_SetJsonChild
+template <class ParentType>
+void PointerTRefArrayItem<ParentType>::_SetJsonChild
 (const ParentType& parent_cpp, Json::Value& parent_json) {
   TRefArray *child_cpp = (parent_cpp.*_getter)();
   std::string path = BaseItem<ParentType>::GetPath(parent_json);

@@ -146,16 +146,15 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     bool is_required);
 
     /** Register a ROOT TRef for processing, which contains a pointer
-     * to memory owned by another class in the tree.
+     *  to memory owned by another class in the tree.
      *
      *  We only convert the address and assume that the value is
      *  passed elsewhere in the tree as a PointerBranch.
      *  
-     *  Pointers are resolved after all other processing is complete. Memory is
-     *  assumed to be owned by the ParentType of the RegisterPointerBranch, NOT
-     *  the ParentType of this RegisterPointerReference.
-     *
-     *  @tparam ChildType of the child object referenced by the branch.
+     *  Pointers are resolved after all other processing is
+     *  complete. To be stored in a TRef, a data member must inherit
+     *  from TObject.  This remvoes the need to template this method,
+     *  as all pointers can be resolved as TObjects.
      *
      *  @param branch_name name used by json to reference the branch
      *  @param GetMethod callback that will return a pointer to the child data,
@@ -168,7 +167,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *item
      *  Note: don't forget Get method has to be const
      */
-    template <class ChildType>
     void RegisterTRef(std::string branch_name,
                       TRef (ObjectType::*GetMethod)() const,
                       void (ObjectType::*SetMethod)(TRef value),
@@ -184,8 +182,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  assumed to be owned by the ParentType of the RegisterPointerBranch, NOT
      *  the ParentType of this RegisterPointerReference.
      *
-     *  @tparam ChildType of the child object referenced by the branch.
-     *
      *  @param branch_name name used by json to reference the branch
      *  @param GetMethod callback that will return a pointer to the child data,
      *  where memory is still owned by the ParentType
@@ -197,9 +193,8 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *item
      *  Note: don't forget Get method has to be const
      */
-    template <class ChildType>
     void RegisterTRefArray(std::string branch_name,
-                           TRefArrayProcessor<ChildType>* child_processor,
+                           TRefArrayProcessor* child_processor,
                            TRefArray* (ObjectType::*GetMethod)() const,
                            void (ObjectType::*SetMethod)(TRefArray* value),
                            bool is_required);

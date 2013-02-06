@@ -39,7 +39,7 @@ namespace ObjectProcessorNS {
  *
  *  References the location of a PointerValueItem type branch.
  */
-template <class ParentType, class ChildType>
+template <class ParentType>
 class PointerTRefItem : public BaseItem<ParentType> {
  public:
   typedef void (ParentType::*SetMethod)(TRef);

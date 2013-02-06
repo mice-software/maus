@@ -24,8 +24,7 @@
 namespace MAUS {
 
 ////////////////////////////
-template <class ArrayContents>
-TRefArray* TRefArrayProcessor<ArrayContents>::JsonToCpp(
+inline TRefArray* TRefArrayProcessor::JsonToCpp(
     const Json::Value& json_array) {
   using ReferenceResolver::JsonToCpp::RefManager;
   using ReferenceResolver::JsonToCpp::TRefArrayResolver;
@@ -47,8 +46,8 @@ TRefArray* TRefArrayProcessor<ArrayContents>::JsonToCpp(
             (json_array[i], "$ref", JsonWrapper::stringValue).asString();
         // allocate the TRefArray element
         if (RefManager::HasInstance()) {
-          TRefArrayResolver<ArrayContents>* res =
-              new TRefArrayResolver<ArrayContents>(data_path, tref_array, i);
+          TRefArrayResolver* res =
+              new TRefArrayResolver(data_path, tref_array, i);
           RefManager::GetInstance().AddReference(res);
         }
       }
@@ -60,8 +59,7 @@ TRefArray* TRefArrayProcessor<ArrayContents>::JsonToCpp(
   return tref_array;
 }
 
-template <class ArrayContents>
-Json::Value* TRefArrayProcessor<ArrayContents>::CppToJson(
+inline Json::Value* TRefArrayProcessor::CppToJson(
     const TRefArray* tref_array,
     std::string path) {
   using ReferenceResolver::CppToJson::RefManager;
@@ -69,27 +67,20 @@ Json::Value* TRefArrayProcessor<ArrayContents>::CppToJson(
   Json::Value* array = new Json::Value(Json::arrayValue);
   JsonWrapper::Path::SetPath(*array, path);
   array->resize(tref_array->GetEntries());
-  ArrayContents *array_element;
+  TObject *array_element;
   for(int i = 0; i < tref_array->GetLast()+1; ++i) {
-    array_element = (ArrayContents*) tref_array->At(i);
+    array_element = tref_array->At(i);
     if(!array_element) continue;
     (*array)[i] = Json::Value();
     JsonWrapper::Path::SetPath((*array)[i], path);
     JsonWrapper::Path::AppendPath((*array)[i], i);
     if (RefManager::HasInstance()) {
       std::string arr_path = JsonWrapper::Path::GetPath((*array)[i]);
-      TypedResolver<ArrayContents>* res = new TypedResolver
-          <ArrayContents>(array_element, arr_path);
+      TypedResolver<TObject>* res =
+          new TypedResolver<TObject>(array_element, arr_path);
       RefManager::GetInstance().AddReference(res);
     }
   }
   return array;
 }
-
-// template <class ArrayContents>
-// std::string TRefArrayProcessor<ArrayContents>::GetPath(
-//     std::string path, size_t index) {
-//   return path+"/"+STLUtils::ToString(index);
-// }
-
 }

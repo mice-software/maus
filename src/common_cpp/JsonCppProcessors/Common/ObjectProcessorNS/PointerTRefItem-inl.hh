@@ -25,19 +25,19 @@
 
 namespace MAUS {
 namespace ObjectProcessorNS {
-template <class ParentType, class ChildType>
-PointerTRefItem<ParentType, ChildType>::PointerTRefItem(
+template <class ParentType>
+PointerTRefItem<ParentType>::PointerTRefItem(
     std::string branch_name,
     GetMethod getter,
     SetMethod setter,
     bool is_required)
     : BaseItem<ParentType>(), _branch(branch_name),
-      _setter(setter),
-      _getter(getter), _required(is_required) {
+    _setter(setter),
+    _getter(getter), _required(is_required) {
 }
-
-template <class ParentType, class ChildType>
-void PointerTRefItem<ParentType, ChildType>::_SetCppChild
+  
+template <class ParentType>
+void PointerTRefItem<ParentType>::_SetCppChild
 (const Json::Value& parent_json, ParentType& parent_cpp) {
   if (!parent_json.isMember(_branch)) {
     if (_required) {
@@ -76,8 +76,8 @@ void PointerTRefItem<ParentType, ChildType>::_SetCppChild
   using ReferenceResolver::JsonToCpp::TRefResolver;
   using ReferenceResolver::JsonToCpp::RefManager;
   if (RefManager::HasInstance()) {
-    TRefResolver<ParentType, ChildType>* res =
-        new TRefResolver<ParentType, ChildType>
+    TRefResolver<ParentType>* res =
+        new TRefResolver<ParentType>
         (data_path, _setter, &parent_cpp);
     RefManager::GetInstance().AddReference(res);
   }
@@ -85,11 +85,11 @@ void PointerTRefItem<ParentType, ChildType>::_SetCppChild
   (parent_cpp.*_setter)(TRef(NULL));
 }
 
-template <class ParentType, class ChildType>
-void PointerTRefItem<ParentType, ChildType>::_SetJsonChild
+template <class ParentType>
+void PointerTRefItem<ParentType>::_SetJsonChild
 (const ParentType& parent_cpp, Json::Value& parent_json) {
   TRef reference = (parent_cpp.*_getter)();
-  ChildType* child_cpp = (ChildType*) reference.GetObject();
+  TObject* child_cpp = reference.GetObject();
   if (child_cpp == NULL) {
     if (_required) {
       throw Squeal(Squeal::recoverable,
@@ -105,7 +105,7 @@ void PointerTRefItem<ParentType, ChildType>::_SetJsonChild
   using ReferenceResolver::CppToJson::TypedResolver;
   using ReferenceResolver::CppToJson::RefManager;
   if (RefManager::HasInstance()) {
-    TypedResolver<ChildType>* res = new TypedResolver<ChildType>
+    TypedResolver<TObject>* res = new TypedResolver<TObject>
         (child_cpp, JsonWrapper::Path::GetPath(parent_json[_branch]));
     RefManager::GetInstance().AddReference(res);
   }

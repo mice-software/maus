@@ -21,6 +21,8 @@
 #include <set>
 #include <string>
 
+#include "TObject.h"
+
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/legacy/Interface/Squeal.hh"
@@ -78,12 +80,35 @@ void RefManager::SetPointerAsValue
                      " to hash table when it was already added",
                      "CppToJson::RefManager::SetPointerAsValue(...)"));
     table->_data_hash[pointer] = json_address;
+
+    // If the object inherits from a TObject, add a second entry in a
+    // second table, so that we can find the pointer from a TRef.
+    TObject* tobject_pointer = (TObject*) pointer;
+    if(tobject_pointer) {
+      TypedPointerValueTable<TObject>* tableTObject =
+          GetTypedPointerValueTable<TObject>();
+      if (tableTObject->_data_hash.find(tobject_pointer) !=
+          tableTObject->_data_hash.end())
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to add pointer for C++ address "+
+                     STLUtils::ToString(pointer)+
+                     " to TObject hash table when it was already added",
+                     "CppToJson::RefManager::SetPointerAsValue(...)"));
+      tableTObject->_data_hash[tobject_pointer] = json_address;
+    }
 }
 
 template <class PointerType>
 std::string RefManager::GetPointerAsValue(PointerType* pointer) {
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
+    if(!table) {
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to get pointer for json address "+
+                     STLUtils::ToString(pointer)+
+                     " when it was never added",
+                     "CppToJson::RefManager::GetPointerAsValue(...)"));
+    }
     if (table->_data_hash.find(pointer) == table->_data_hash.end())
         throw(Squeal(Squeal::recoverable,
                      "Attempt to get pointer for json address "+

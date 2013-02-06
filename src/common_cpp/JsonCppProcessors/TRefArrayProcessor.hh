@@ -43,7 +43,6 @@ namespace MAUS {
  *  defines the structure of JsonToCpp and CppToJson...
  */
 
-template <class ArrayContents>
 class TRefArrayProcessor {
  public:
   /** @Constructor
@@ -52,7 +51,6 @@ class TRefArrayProcessor {
    *  (as we are just handing pointers around).  Do need to identify
    *  the object inside the TRef, beyond the template parameter.
    *
-   *  @tparam ArrayContents The C++ type held within the TRefArray
    */
   TRefArrayProcessor() {}
 
@@ -64,8 +62,8 @@ class TRefArrayProcessor {
    *
    *  @param json_array Json arrayValue
    *
-   *  @returns TRefArray, containing pointers to C++ objects of type
-   *  ArrayContents, owned elsewhere.
+   *  @returns TRefArray, containing pointers to C++ objects, which
+   *  must inherit from TObject, owned elsewhere.
    */
   TRefArray* JsonToCpp(const Json::Value& json_array);
 

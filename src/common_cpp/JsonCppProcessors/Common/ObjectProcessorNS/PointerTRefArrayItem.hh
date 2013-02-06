@@ -35,12 +35,10 @@ namespace ObjectProcessorNS {
  *  directly on ObjectProcessor
  *
  *  @tparam ParentType type of the parent object
- *  @tparam ChildType type of the child object referenced by the branch. Should
- *  use the actual type even if the target is a pointer
  *
  *  References the location of a PointerValueItem type branch.
  */
-template <class ParentType, class ChildType>
+template <class ParentType>
 class PointerTRefArrayItem : public BaseItem<ParentType> {
  public:
   typedef void (ParentType::*SetMethod)(TRefArray*);
@@ -58,7 +56,7 @@ class PointerTRefArrayItem : public BaseItem<ParentType> {
    *  Set...Child methods are called
    */
   PointerTRefArrayItem(std::string branch_name,
-                       TRefArrayProcessor<ChildType>* child_processor,
+                       TRefArrayProcessor* child_processor,
                        GetMethod getter,
                        SetMethod setter,
                        bool is_required);
@@ -95,7 +93,7 @@ class PointerTRefArrayItem : public BaseItem<ParentType> {
 
  private:
   std::string _branch;
-  TRefArrayProcessor<ChildType>* _processor;
+  TRefArrayProcessor* _processor;
   SetMethod _setter;
   GetMethod _getter;
   bool      _required;

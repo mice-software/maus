@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include "TObject.h"
+
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/legacy/Interface/Squeal.hh"
@@ -52,19 +54,19 @@ void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
               "ReferenceResolver::FullyTypedResolver::ResolveReferences"));
 }
 
-template <class ParentType, class ChildType>
-TRefResolver<ParentType, ChildType>::TRefResolver(
+template <class ParentType>
+TRefResolver<ParentType>::TRefResolver(
       std::string ref_json_address,
-      TRefResolver<ParentType, ChildType>::SetMethod cpp_setter,
+      TRefResolver<ParentType>::SetMethod cpp_setter,
       ParentType* ref_cpp_parent)
   : _cpp_setter(cpp_setter), _ref_json_address(ref_json_address),
     _ref_cpp_parent(ref_cpp_parent) {
 }
 
-template <class ParentType, class ChildType>
-void TRefResolver<ParentType, ChildType>::ResolveReferences() {
-    ChildType* data_address = RefManager::GetInstance().
-                                GetPointerAsValue<ChildType>(_ref_json_address);
+template <class ParentType>
+void TRefResolver<ParentType>::ResolveReferences() {
+    TObject* data_address = RefManager::GetInstance().
+                                GetPointerAsValue<TObject>(_ref_json_address);
     (*_ref_cpp_parent.*_cpp_setter)(TRef(data_address));
     if (data_address == NULL)
         throw(Squeal(Squeal::recoverable,
@@ -105,8 +107,7 @@ void VectorResolver<ChildType>::ResolveReferences() {
 
 ////////////////////////////////////////////////////////////////
 
-template <class ChildType>
-TRefArrayResolver<ChildType>::TRefArrayResolver(
+inline TRefArrayResolver::TRefArrayResolver(
     std::string ref_json_address,
     TRefArray* tref_array,
     size_t vector_index)
@@ -115,8 +116,7 @@ TRefArrayResolver<ChildType>::TRefArrayResolver(
       _index(vector_index) {
 }
 
-template <class ChildType>
-void TRefArrayResolver<ChildType>::ResolveReferences() {
+inline void TRefArrayResolver::ResolveReferences() {
   if (_tref_array == NULL)
     return;
   if ((int)_index > _tref_array->GetSize())
@@ -124,8 +124,8 @@ void TRefArrayResolver<ChildType>::ResolveReferences() {
                  "Index out of range while resolving pointer to array "+
                  _ref_json_address,
                  "ReferenceResolver::TRefArrayResolver::ResolveReferences"));
-  ChildType* data_address = RefManager::GetInstance().
-      GetPointerAsValue<ChildType>(_ref_json_address);
+  TObject* data_address = RefManager::GetInstance().
+      GetPointerAsValue<TObject>(_ref_json_address);
   if (data_address == NULL)
     throw(Squeal(Squeal::recoverable,
                  "Failed to resolve reference at "+_ref_json_address+
@@ -170,6 +170,21 @@ void RefManager::SetPointerAsValue
                      " to hash table when it was already added",
                      "JsonToCpp::RefManager::SetPointerAsValue(...)"));
     table->_data_hash[json_address] = pointer;
+
+    // If the object inherits from a TObject, add a second entry in a
+    // second table, so that we can find the pointer from a TRef.
+    TObject* tobject_pointer = (TObject*) pointer;
+    if(tobject_pointer) {
+      TypedPointerValueTable<TObject>* tableTObject =
+          GetTypedPointerValueTable<TObject>();
+      if (tableTObject->_data_hash.find(json_address) !=
+          tableTObject->_data_hash.end())
+        throw(Squeal(Squeal::recoverable,
+                     "Attempt to add json pointer "+json_address+
+                     " to TObject hash table when it was already added",
+                     "JsonToCpp::RefManager::SetPointerAsValue(...)"));
+      tableTObject->_data_hash[json_address] = tobject_pointer;
+    }
 }
 
 template <class PointerType>
