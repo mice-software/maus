@@ -104,7 +104,7 @@ def build_third_party_tarball():
             shutil.copy2(egg_source, target)
     glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
     tarball_targets = []
-    tarball_name = "third_party_libraries.tar.gz"
+    tarball_name = "third_party_libraries_incl_python.tar.gz"
     for targets in glob_list:
         tarball_targets += glob.glob(targets)
     proc = subprocess.Popen(["tar", "-czf",
