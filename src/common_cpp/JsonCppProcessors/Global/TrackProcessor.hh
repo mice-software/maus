@@ -44,8 +44,8 @@ class TrackProcessor :
   IntProcessor _int_proc;
   UIntProcessor _uint_proc;
   ValueArrayProcessor<std::string> _geometry_paths_proc;
-  TRefArrayProcessor<MAUS::DataStructure::Global::Track> _track_trefarray_proc;
-  TRefArrayProcessor<MAUS::DataStructure::Global::TrackPoint> _trackpoint_trefarray_proc;
+  TRefArrayProcessor _track_trefarray_proc;
+  TRefArrayProcessor _trackpoint_trefarray_proc;
  
 };
 } // ~namespace Global
