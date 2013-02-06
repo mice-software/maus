@@ -119,7 +119,8 @@ void ObjectProcessor<ObjectType>::RegisterConstantBranch(
 }
 
 template <class ObjectType>
-ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
+    const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue) {
         std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
         throw(Squeal(Squeal::recoverable,

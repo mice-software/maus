@@ -22,13 +22,13 @@ namespace Global {
 
 TRefTrackPairProcessor::TRefTrackPairProcessor() {
 
-  RegisterTRef<MAUS::DataStructure::Global::Track>(
+  RegisterTRef/*<MAUS::DataStructure::Global::Track>*/(
       "first",
       &MAUS::DataStructure::Global::TRefTrackPair::get_first,
       &MAUS::DataStructure::Global::TRefTrackPair::set_first,
       true);
   
-  RegisterTRef<MAUS::DataStructure::Global::Track>(
+  RegisterTRef/*<MAUS::DataStructure::Global::Track>*/(
       "second",
       &MAUS::DataStructure::Global::TRefTrackPair::get_second,
       &MAUS::DataStructure::Global::TRefTrackPair::set_second,

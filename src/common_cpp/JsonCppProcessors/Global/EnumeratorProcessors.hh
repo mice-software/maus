@@ -46,34 +46,42 @@ class EnumDetectorPointProcessor :
     /** Convert from MAUS::DataStructure::Global::DetectorPoint to
      * Json::numericValue
      */
-    virtual Json::Value* CppToJson(const MAUS::DataStructure::Global::DetectorPoint& cpp_enum);
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::DetectorPoint& cpp_enum);
 
     /** Convert from MAUS::DataStructure::Global::DetectorPoint to
      * Json::numericValue passing path
      */
-    virtual Json::Value* CppToJson(const MAUS::DataStructure::Global::DetectorPoint& cpp_enum,
-                                   std::string path);
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::DetectorPoint& cpp_enum,
+        std::string path);
 };
 
-/** Processor to convert between MAUS::DataStructure::Global::PID and Json::numericValue
+/** Processor to convert between MAUS::DataStructure::Global::PID and
+ *  Json::numericValue
  */
-class EnumPIDProcessor : public ProcessorBase<MAUS::DataStructure::Global::PID> {
+class EnumPIDProcessor :
+      public ProcessorBase<MAUS::DataStructure::Global::PID> {
   public:
     /** Convert from Json::numericValue to MAUS::DataStructure::Global::PID
      *
      *  If json_double cannot be converted to a
      *  MAUS::DataStructure::Global::PID, throw a Squeal
      */
-    virtual MAUS::DataStructure::Global::PID* JsonToCpp(const Json::Value& json_double);
+    virtual MAUS::DataStructure::Global::PID* JsonToCpp(
+        const Json::Value& json_double);
 
     /** Convert from MAUS::DataStructure::Global::PID to Json::numericValue
      */
-    virtual Json::Value* CppToJson(const MAUS::DataStructure::Global::PID& cpp_enum);
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::PID& cpp_enum);
 
-    /** Convert from MAUS::DataStructure::Global::PID to Json::numericValue passing path
+    /** Convert from MAUS::DataStructure::Global::PID to
+     *  Json::numericValue passing path
      */
-    virtual Json::Value* CppToJson(const MAUS::DataStructure::Global::PID& cpp_enum,
-                                   std::string path);
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::PID& cpp_enum,
+        std::string path);
 };
 
 } // ~namespace Global

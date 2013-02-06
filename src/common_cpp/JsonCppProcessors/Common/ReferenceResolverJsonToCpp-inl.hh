@@ -146,7 +146,8 @@ class RefManager::PointerValueTable {
 };
 
 template <class PointerType>
-class RefManager::TypedPointerValueTable : public RefManager::PointerValueTable {
+class RefManager::TypedPointerValueTable
+    : public RefManager::PointerValueTable {
   public:
     virtual ~TypedPointerValueTable() {}
     void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}

@@ -21,12 +21,15 @@ namespace MAUS {
 namespace Processor {
 namespace Global {
 
-MAUS::DataStructure::Global::DetectorPoint* EnumDetectorPointProcessor::JsonToCpp(
+MAUS::DataStructure::Global::DetectorPoint*
+EnumDetectorPointProcessor::JsonToCpp(
     const Json::Value& json_int) {
   if (json_int.isNumeric()) {
     MAUS::DataStructure::Global::DetectorPoint* dp =
         new MAUS::DataStructure::Global::DetectorPoint();
-    (*dp) = static_cast<MAUS::DataStructure::Global::DetectorPoint>(json_int.asInt());
+    (*dp) =
+        static_cast<MAUS::DataStructure::Global::DetectorPoint>(
+            json_int.asInt());
     return dp;
   } else {
     throw(Squeal(
@@ -44,7 +47,8 @@ Json::Value* EnumDetectorPointProcessor::CppToJson(
 }
 
 Json::Value* EnumDetectorPointProcessor::CppToJson(
-    const MAUS::DataStructure::Global::DetectorPoint& cpp_enum, std::string path) {
+    const MAUS::DataStructure::Global::DetectorPoint& cpp_enum,
+    std::string path) {
   Json::Value* json_int = new Json::Value(static_cast<int>(cpp_enum));
   JsonWrapper::Path::SetPath(*json_int, path);
   return json_int;

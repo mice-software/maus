@@ -21,27 +21,32 @@ namespace Processor {
 namespace Global {
 
 SpacePointProcessor::SpacePointProcessor() {
-    RegisterValueBranch("charge", &_double_proc,
-                        &MAUS::DataStructure::Global::SpacePoint::get_charge,
-                        &MAUS::DataStructure::Global::SpacePoint::set_charge, true);
+  RegisterValueBranch(
+      "charge", &_double_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_charge,
+      &MAUS::DataStructure::Global::SpacePoint::set_charge, true);
 
-    RegisterValueBranch("position", &_tlorentz_vec_proc,
-                        &MAUS::DataStructure::Global::SpacePoint::get_position,
-                        &MAUS::DataStructure::Global::SpacePoint::set_position, true);
+  RegisterValueBranch(
+      "position", &_tlorentz_vec_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_position,
+      &MAUS::DataStructure::Global::SpacePoint::set_position, true);
 
-    RegisterValueBranch("position_error", &_tlorentz_vec_proc,
-                        &MAUS::DataStructure::Global::SpacePoint::get_position_error,
-                        &MAUS::DataStructure::Global::SpacePoint::set_position_error,
-                        true);
+  RegisterValueBranch(
+      "position_error", &_tlorentz_vec_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_position_error,
+      &MAUS::DataStructure::Global::SpacePoint::set_position_error,
+      true);
 
-    RegisterValueBranch("detector", &_detector_enum_proc,
-                        &MAUS::DataStructure::Global::SpacePoint::get_detector,
-                        &MAUS::DataStructure::Global::SpacePoint::set_detector, true);
+  RegisterValueBranch(
+      "detector", &_detector_enum_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_detector,
+      &MAUS::DataStructure::Global::SpacePoint::set_detector, true);
 
-    RegisterValueBranch("geometry_path", &_string_proc,
-                        &MAUS::DataStructure::Global::SpacePoint::get_geometry_path,
-                        &MAUS::DataStructure::Global::SpacePoint::set_geometry_path,
-                        true);
+  RegisterValueBranch(
+      "geometry_path", &_string_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_geometry_path,
+      &MAUS::DataStructure::Global::SpacePoint::set_geometry_path,
+      true);
 }
 
 } // ~namespace Global
