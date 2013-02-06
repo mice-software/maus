@@ -82,23 +82,11 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
         run_filter(track, sites, station_i);
         // get difference between spacepoint (x, y, phi) and fitted (x, y, phi)
         int plane_i = 3*(station_i)-2;
-        KalmanSite *excluded = &sites[plane_i];
-        TMatrixD a = excluded->get_a(KalmanSite::Smoothed);
-        a.Print();
-        std::vector<SciFiSpacePoint> spacepoints = seed->get_spacepoints();
-        bool found = false;
-        SciFiSpacePoint spacepoint;
-        ThreeVector sp_position;
-        for ( int sp_i = 0; sp_i < spacepoints.size(); sp_i++ ) {
-          if ( spacepoints[sp_i].get_station() == station_i ) {
-            sp_position = spacepoints[sp_i].get_position();
-          }
-        }
-        std::cout << sp_position << std::endl;
-
+        track->update_misaligments2(&sites[plane_i], seed, station_i);
         //update misaligment estimation and covariance
         //double st2_x, st2y;
       }
+      kalman_align.update(sites);
     }
 /*
     if ( _update_misalignments && track->get_f_chi2() < 25. && numb_measurements == 15 ) {

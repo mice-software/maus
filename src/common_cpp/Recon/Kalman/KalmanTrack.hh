@@ -34,6 +34,8 @@
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+// #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 // #include "src/common_cpp/Utils/Globals.hh"
 // #include "src/common_cpp/Globals/GlobalsManager.hh"
 
@@ -120,6 +122,7 @@ class KalmanTrack {
   void compute_emittance(KalmanSite site);
 
   void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
+  void update_misaligments2(KalmanSite *excluded, KalmanSeed *seed, int station_i);
 
   /// Getters.
   TMatrixD get_propagator()   const { return _F;        }

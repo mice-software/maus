@@ -688,6 +688,49 @@ void KalmanTrack::compute_emittance(KalmanSite site) {
 // +++++++++++++++++++++++++++++
 // Alignment Routines
 //
+
+void KalmanTrack::update_misaligments2(KalmanSite *excluded, KalmanSeed *seed, int station_i) {
+  TMatrixD a = excluded->get_a(KalmanSite::Smoothed);
+  a.Print();
+  std::vector<SciFiSpacePoint> spacepoints = seed->get_spacepoints();
+
+  bool found = false;
+  SciFiSpacePoint spacepoint;
+  ThreeVector sp_position;
+  for ( int sp_i = 0; sp_i < spacepoints.size() && !found; sp_i++ ) {
+    if ( spacepoints[sp_i].get_station() == station_i ) {
+      sp_position = spacepoints[sp_i].get_position();
+      found = true;
+    }
+  }
+  sp_position *= 1./FibreParameters::Pitch();
+  std::cout << sp_position << std::endl;
+  TMatrixD pull(2, 1);
+  pull(0, 0) = (sp_position.x() - a(0, 0));
+  pull(1, 0) = (sp_position.y() - a(2, 0));
+  // pull(2, 0) = 0.0;
+
+  TMatrixD old_s = excluded->get_input_shift();
+  TMatrixD old_E = excluded->get_input_shift_covariance();
+
+  update_H(excluded);
+  TMatrixD S_transposed(3, 2);
+  S_transposed.Transpose(_S);
+  update_W(excluded);
+  TMatrixD Ks = old_E * S_transposed * _W;
+
+  TMatrixD new_s = old_s+Ks*pull;
+  excluded->set_shift_A(new_s);
+
+  TMatrixD I(3, 3);
+  I.UnitMatrix();
+
+  // New covariance.
+  TMatrixD new_E(3, 3);
+  new_E = ( I - Ks*_S ) * old_E;
+  excluded->set_shift_A_covariance(new_E);
+}
+
 void KalmanTrack::update_misaligments(std::vector<KalmanSite> &sites, size_t i) {
   KalmanSite *a_site = &sites[i];
 
