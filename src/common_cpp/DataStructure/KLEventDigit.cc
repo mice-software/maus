@@ -14,47 +14,45 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/KLEvent.hh"
+#include "src/common_cpp/DataStructure/KLEventDigit.hh"
 
 
 namespace MAUS {
 
-KLEvent::KLEvent()
-    : _kl_digits(), _kl_cell_hits() {
+KLEventDigit::KLEventDigit()
+    : _kl() {
 }
 
-KLEvent::KLEvent(const KLEvent& _klevent)
-    : _kl_digits(), _kl_cell_hits() {
-    *this = _klevent;
+KLEventDigit::KLEventDigit(const KLEventDigit& _kleventdigit)
+    : _kl() {
+    *this = _kleventdigit;
 }
 
-KLEvent& KLEvent::operator=(const KLEvent& _klevent) {
-    if (this == &_klevent) {
+KLEventDigit& KLEventDigit::operator=(const KLEventDigit& _kleventdigit) {
+    if (this == &_kleventdigit) {
         return *this;
     }
-    SetKLEventDigit(_klevent._kl_digits);
-    SetKLEventCellHit(_klevent._kl_cell_hits);
+    SetKLDigitArray(_kleventdigit._kl);
     return *this;
 }
 
-KLEvent::~KLEvent() {
+KLEventDigit::~KLEventDigit() {
 }
 
-KLEventDigit KLEvent::GetKLEventDigit() const {
-    return _kl_digits;
+KLDigitArray KLEventDigit::GetKLDigitArray() const {
+    return _kl;
 }
 
-void KLEvent::SetKLEventDigit(KLEventDigit kl_digits) {
-    _kl_digits = kl_digits;
+KLDigit KLEventDigit::GetKLDigitArrayElement(size_t index) const {
+    return _kl[index];
 }
 
-
-KLEventCellHit KLEvent::GetKLEventCellHit() const {
-    return _kl_cell_hits;
+size_t KLEventDigit::GetKLDigitArraySize() const {
+    return _kl.size();
 }
 
-void KLEvent::SetKLEventCellHit(KLEventCellHit kl_cell_hits) {
-    _kl_cell_hits = kl_cell_hits;
+void KLEventDigit::SetKLDigitArray(KLDigitArray kl) {
+    _kl = kl;
 }
 }
 

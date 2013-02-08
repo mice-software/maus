@@ -14,35 +14,33 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTPROCESSOR_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTPROCESSOR_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTDIGITPROCESSOR_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTDIGITPROCESSOR_
 
-#include "src/common_cpp/DataStructure/KLEvent.hh"
+#include "src/common_cpp/DataStructure/KLEventDigit.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/KLEventDigitProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/KLEventCellHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLDigitProcessor.hh"
 
 namespace MAUS {
 
-/** @class KLEventProcessor Conversions for KLEvent between C++ and Json 
+/** @class KLEventDigitProcessor Conversions for KLEventDigit between C++ and Json 
  *
- *  @var _kl_digits_proc_proc Processor for _kl_digits
- *  @var _kl_cell_hits_proc_proc Processor for _kl_cell_hits
+ *  @var _kl_proc_proc Processor for _kl
  */
 
-class KLEventProcessor : public ObjectProcessor<KLEvent> {
+class KLEventDigitProcessor : public ObjectProcessor<KLEventDigit> {
   public:
     /** Set up processors and register branches
      *
      *  Everything else is handled by the base class
      */
-    KLEventProcessor();
+    KLEventDigitProcessor();
 
   private:
-    KLEventDigitProcessor _kl_digits_proc;
-    KLEventCellHitProcessor _kl_cell_hits_proc;
+    ValueArrayProcessor<KLDigit> _kl_proc;
 };
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTPROCESSOR_
+#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_KLEVENTDIGITPROCESSOR_
 

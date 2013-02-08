@@ -14,20 +14,15 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/KLEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLEventDigitProcessor.hh"
 
 namespace MAUS {
 
-KLEventProcessor::KLEventProcessor()
-    : _kl_digits_proc(), _kl_cell_hits_proc() {
-
+KLEventDigitProcessor::KLEventDigitProcessor()
+    : _kl_proc(new KLDigitProcessor) {
     RegisterValueBranch
-          ("kl_digits", &_kl_digits_proc, &KLEvent::GetKLEventDigit,
-          &KLEvent::SetKLEventDigit, false);
-
-    RegisterValueBranch
-          ("kl_cell_hits", &_kl_cell_hits_proc, &KLEvent::GetKLEventCellHit,
-          &KLEvent::SetKLEventCellHit, false);
+          ("kl", &_kl_proc, &KLEventDigit::GetKLDigitArray,
+          &KLEventDigit::SetKLDigitArray, true);
 }
 }  // namespace MAUS
 

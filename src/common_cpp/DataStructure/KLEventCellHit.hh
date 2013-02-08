@@ -14,55 +14,57 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTCELLHIT_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTCELLHIT_
+
+#include <vector>
 
 #include "Rtypes.h"  // ROOT
-#include "src/common_cpp/DataStructure/KLEventDigit.hh"
-#include "src/common_cpp/DataStructure/KLEventCellHit.hh"
+
+#include "src/common_cpp/DataStructure/KLCellHit.hh"
 
 namespace MAUS {
+// Needed for ROOT
+typedef std::vector<KLCellHit> KLCellHitArray;
 
-/** @class KLEvent comment
+/** @class KLEventCellHit comment
  *
- *  @var kl_digits  <--description-->
- *  @var kl_cell_hits  <--description-->
+ *  @var kl  <--description-->
  */
 
-class KLEvent {
+class KLEventCellHit {
   public:
     /** Default constructor - initialises to 0/NULL */
-    KLEvent();
+    KLEventCellHit();
 
     /** Copy constructor - any pointers are deep copied */
-    KLEvent(const KLEvent& _klevent);
+    KLEventCellHit(const KLEventCellHit& _kleventcellhit);
 
     /** Equality operator - any pointers are deep copied */
-    KLEvent& operator=(const KLEvent& _klevent);
+    KLEventCellHit& operator=(const KLEventCellHit& _kleventcellhit);
 
     /** Destructor - any member pointers are deleted */
-    virtual ~KLEvent();
+    virtual ~KLEventCellHit();
 
 
-     /** Returns KLEventDigit */
-    KLEventDigit GetKLEventDigit() const;
+    /** Returns KLCellHitArray */
+    KLCellHitArray GetKLCellHitArray() const;
 
-    /** Sets KLEventDigit */
-    void SetKLEventDigit(KLEventDigit kl_digits);
+    /** Get an element from KLCellHitArray (needed for PyROOT) */
+    KLCellHit GetKLCellHitArrayElement(size_t index) const;
 
-    /** Returns KLEventCellHit */
-    KLEventCellHit GetKLEventCellHit() const;
+    /** Get size of KLCellHitArray (needed for PyROOT) */
+    size_t GetKLCellHitArraySize() const;
 
-    /** Sets KLEventCellHit */
-    void SetKLEventCellHit(KLEventCellHit kl_cell_hits);
+    /** Sets KLCellHitArray */
+    void SetKLCellHitArray(KLCellHitArray kl);
 
   private:
-    KLEventDigit _kl_digits;
-    KLEventCellHit _kl_cell_hits;
+    KLCellHitArray _kl;
 
-    ClassDef(KLEvent, 1)
+    ClassDef(KLEventCellHit, 1)
 };
 }
 
-#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
+#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTSLABHIT_
 
