@@ -36,8 +36,16 @@ def main(file_name):
 
     # Set up an output ascii file
     f1 = open('efficiency_study_output.dat', 'w')
-    header = 'spill\tevent\tmctrack\tpid\ttracker\tmatched\tmissed\twrong\n'
+    header = 'spill\tevent\tmctrack\tpid\ttracker\t'
+    header = header + 'tp_tot\tsd_matched\tsd_missed\tsd_wrong\n'
     f1.write( header )
+
+    # sd refers to specifically seed spacepoints, sp to spacepoints in general
+    sd_matched_tot = 0
+    sd_missed_tot = 0
+    sd_wrong_tot = 0
+    # num_sp_tot = 0
+    num_tp_tot = 0
 
     # Loop over spills
     for i in range(tree.GetEntries()):
@@ -61,6 +69,7 @@ def main(file_name):
                 continue
 
             sorted_rec_trks = sort_rec_tracks(sf_evt.helicalprtracks())
+            # sorted_sp = sort_spoints(sf_evt.spacepoints())
 
             # Loop over MC track ids (a substitute for MC tracks)
             for trk_num, hits_in_trk in hits_by_track.iteritems():
@@ -78,7 +87,7 @@ def main(file_name):
                     print str(len(sorted_rec_trks[trker_num])) + " rec tracks"
 
                     # Loop over recon tracks (one per tracker for now)
-                    sp_matched = 0
+                    sd_matched = 0
                     for rec_trk in sorted_rec_trks[trker_num]:
 
                         # Should check this matches the MC track here somehow
@@ -88,8 +97,8 @@ def main(file_name):
 
                         # Should check here that there is only 0 or 1
                         # seeds per tracker/station, otherwise break
-                        print '  Found ' +str(len(sorted_tp[trker_num])),
-                        print ' track points'
+                        num_tp = len(sorted_tp[trker_num])
+                        print '  Found ' +str(num_tp) + 'track points'
                         # Loop over track points
                         for t_num, tracker in sorted_tp.iteritems():
                             for s_num, tp in tracker.iteritems():
@@ -99,25 +108,44 @@ def main(file_name):
                                 for seed in seeds:
                                     matched = check_match(tp, seed)
                                     if matched:
-                                        sp_matched = sp_matched + 1
+                                        sd_matched = sd_matched + 1
                                         break
+
+                        # Calculate efficiency stats for this track and write
+                        tid = hits_in_trk[0].GetTrackId()
+                        sd_missed = len(sorted_tp[trker_num]) - sd_matched
+                        sd_wrong = len(seeds_in_track) - sd_matched
+
+                        sd_matched_tot = sd_matched_tot + sd_matched
+                        sd_missed_tot = sd_missed_tot + sd_missed
+                        sd_wrong_tot = sd_wrong_tot + sd_wrong
+                        num_tp_tot = num_tp_tot + num_tp
 
                         f1.write( str(spill.GetSpillNumber()) + '\t' )
                         f1.write( str(evt_num) + '\t' )
-                        tid = hits_in_trk[0].GetTrackId()
                         f1.write( str(tid) + '\t' )
-
                         f1.write( str(trker_num) + '\t' )
-                        f1.write( str(sp_matched) + '\t' )
-                        f1.write( str(5 - sp_matched) + '\t' )
-                        f1.write( str(len(seeds_in_track) - sp_matched) + '\n' )
+                        f1.write( str(num_tp) + '\t' )
+                        f1.write( str(sd_matched) + '\t' )
+                        f1.write( str(sd_missed) + '\t' )
+                        f1.write( str(sd_wrong) + '\n' )
 
-    print "Closing files"
+
+    eff = (float(sd_matched_tot)/float(num_tp_tot))*100.0
+    print "\n---------------------------------------------"
+    print "Total track points: " + str(num_tp_tot)
+    print "Correctly matched seeds: " + str(sd_matched_tot),
+    print "(%.2f percent)" % eff
+    print "Missed seeds: " + str(sd_missed_tot)
+    print "Mis-matched seeds: " + str(sd_wrong_tot)
+    print "---------------------------------------------"
+
+    print "\nClosing files"
     root_file.Close()
     f1.close()
 
 def check_match(tp, sp):
-    """ Check whether a track point matches a spoint"""
+    """ Check whether a track point matches a spacepoint"""
     tp_pos = tp.get_position()
     sp_pos = sp.get_position()
     match = True
@@ -130,6 +158,7 @@ def check_match(tp, sp):
     s1 = "   dx is " + str( fabs( fabs(tp_pos.x()) - fabs(sp_pos.x())))
     s2 = "   dy is " + str( fabs( fabs(tp_pos.y()) - fabs(sp_pos.y())))
     print s1 + ", " + s2
+
     return match
 
 def check_spill(spill):
@@ -189,6 +218,18 @@ def make_mc_track_pts(mc_evt):
         tp_by_tracker[t_num] = tp_by_station
     return tp_by_tracker
 
+def match_tp2sp(tp_by_station, sp_by_station):
+    """ Compare a set of track points and spacepoints sorted by station """
+    num_matched = 0
+    for tp in tp_by_station:
+        for sp in sp_by_station:
+            match = check_match(tp, sp)
+            if match:
+                num_matched = num_matched + 1
+                tp.set_used(True)
+                break
+    return num_matched
+
 def print_spill_info(spill):
     """ Print some basic information about the spill """
     print "Found spill number", spill.GetSpillNumber(),
@@ -209,7 +250,7 @@ def sort_hits(sf_hits):
         for hit in tracker:
             hits_by_station[hit.GetChannelId().GetStationNumber()].append(hit)
         sorted_hits[num] = hits_by_station
-    
+
     return sorted_hits
 
 def sort_rec_tracks(trks):
