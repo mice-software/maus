@@ -28,6 +28,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "TMath.h"
 #include "TMatrixD.h"
@@ -121,8 +122,8 @@ class KalmanTrack {
   void compute_chi2(const std::vector<KalmanSite> &sites);
   void compute_emittance(KalmanSite site);
 
-  void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
-  void update_misaligments2(KalmanSite *excluded, KalmanSeed *seed, int station_i);
+  // void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
+  void update_misaligments2(KalmanSite *excluded, TMatrixD a_old); //, TMatrixD old_smoothed);
 
   /// Getters.
   TMatrixD get_propagator()   const { return _F;        }

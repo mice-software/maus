@@ -61,11 +61,12 @@ class KalmanTrackFit {
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
 
-  // std::vector<KalmanSite> exclude_station(int station,
-  //                                        std::vector<KalmanSite> sites);
-  void run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites);
+  void run_filter(KalmanTrack *track,
+                  std::vector<KalmanSite> &sites);
 
-  void run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i);
+  void run_filter(KalmanTrack *track,
+                  std::vector<KalmanSite> &sites,
+                  int ignore_i);
 
   void filter_virtual(KalmanSite &a_site);
 

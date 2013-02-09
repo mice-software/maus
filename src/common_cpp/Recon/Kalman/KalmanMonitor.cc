@@ -147,7 +147,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << (site.get_residual(KalmanSite::Filtered))(0, 0) << std::endl;
     std::cerr << (site.get_residual(KalmanSite::Smoothed))(0, 0) << std::endl;
     std::cerr << "================Projection================" << std::endl;
-    site.get_a(KalmanSite::Projected).Print();
+    // site.get_a(KalmanSite::Projected).Print();
     // site.get_a().Print();
     // site.get_smoothed_a().Print();
     // site.get_projected_covariance_matrix().Print();
@@ -190,7 +190,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
       tracker = 0;
       mc_x  = -mc_x;
       mc_px = -mc_px;
-      // mc_pz = -mc_pz;
+      mc_pz = -mc_pz;
     }
 
     chi2 += site.get_chi2(KalmanSite::Filtered);

@@ -60,6 +60,7 @@ void KalmanSeed::process_measurements(const SciFiStraightPRTrack* pr_track) {
   for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
     SciFiSpacePoint sp = *pr_track->get_spacepoints()[i];
     _spacepoints.push_back(sp);
+    // std::cerr << sp.get_position() << " " << sp.get_channels()[0]->get_true_position() << std::endl;
   }
   double pz_from_timing;
 

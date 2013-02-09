@@ -70,21 +70,20 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     run_filter(track, sites);
 
     monitor.fill(sites);
-    // monitor.print_info(sites);
+    monitor.print_info(sites);
     track->compute_chi2(sites);
     // track->compute_emittance(sites.front());
 
     // Misalignment search.
-    if ( _update_misalignments && track->get_f_chi2() < 25. && numb_measurements == 15 ) {
+    if ( _update_misalignments && track->get_f_chi2() < 20. && numb_measurements == 15 ) {
       for ( int station_i = 2; station_i < 5; ++station_i ) {
         std::cerr << "Ignoring station " << station_i << std::endl;
+        int plane_i = 3*(station_i)-2;
+        TMatrixD a(5, 1);
+        a = sites[plane_i].get_a(KalmanSite::Smoothed);
         // Fit without station i.
         run_filter(track, sites, station_i);
-        // get difference between spacepoint (x, y, phi) and fitted (x, y, phi)
-        int plane_i = 3*(station_i)-2;
-        track->update_misaligments2(&sites[plane_i], seed, station_i);
-        //update misaligment estimation and covariance
-        //double st2_x, st2y;
+        track->update_misaligments2(&sites[plane_i], a);
       }
       kalman_align.update(sites);
     }
@@ -181,8 +180,21 @@ void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sit
       // std::cerr << "Filtering site " << j << std::endl;
       track->filter(sites, j);
     } else {
-      // std::cerr << "Filtering VIRTUAL site " << j << std::endl;
+      std::cerr << "Filtering VIRTUAL site " << j << std::endl;
+/*
+      TMatrixD a(5, 1);
+      a = sites[j].get_a(KalmanSite::Filtered);
+      a.Print();
+      a = sites[j].get_a(KalmanSite::Smoothed);
+      a.Print();
+*/
       filter_virtual(sites[j]);
+/*
+      a = sites[j].get_a(KalmanSite::Filtered);
+      a.Print();
+      a = sites[j].get_a(KalmanSite::Smoothed);
+      a.Print();
+*/
     }
   }
   track->prepare_for_smoothing(&sites.back());
@@ -203,6 +215,15 @@ void KalmanTrackFit::filter_virtual(KalmanSite &a_site) {
   a = a_site.get_a(KalmanSite::Projected);
   a_site.set_a(a, KalmanSite::Filtered);
   a_site.set_current_state(KalmanSite::Filtered);
+
+/*
+  // remove
+  TMatrixD a_f = a_site.get_a(KalmanSite::Filtered);
+  TMatrixD a_s = a_site.get_a(KalmanSite::Smoothed);
+  a.Print();
+  a_f.Print();
+  a_s.Print();
+*/
 }
 
 /*

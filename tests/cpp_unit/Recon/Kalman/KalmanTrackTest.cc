@@ -126,19 +126,75 @@ TEST_F(KalmanTrackTest, test_error_methods) {
 //
 // ------- Filtering ------------
 //
+TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
+  CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
+  CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);
+
+  MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
+  a_site->set_direction(direction_plane0_tracker0);
+
+
+  // Say we have a measurement...
+  TMatrixD measurement(2, 1);
+  measurement(0., 0.) = 10.;
+  measurement(1., 0.) = 0.;
+
+  // and there's a x,y position corresponding to that measurement...
+  TMatrixD a;
+  a.ResizeTo(5, 1);
+  a(0, 0) = -measurement(0., 0.)*1.4945;
+  a(1, 0) = 1.;
+  a(2, 0) = 5.; // random number, y doesnt matter.
+  a(3, 0) = 1.;
+  a(4, 0) = 1.;
+  a_site->set_a(a, MAUS::KalmanSite::Projected);
+
+  TMatrixD s(3, 1);
+  s.Zero();
+
+  track->update_H(a_site);
+
+  TMatrixD HA = track->solve_measurement_equation(a, s);
+measurement.Print();
+HA.Print();
+  EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
+
+  // now, we introduce a shift in x.
+  // The state vector is the same, the measurement is slightly different
+  double shift_x = 2.; // mm
+  s(0, 0) = shift_x; // mm
+  // the new measurement includes the misalignment shift
+  double new_alpha = measurement(0., 0.) + shift_x/1.4945;
+
+  TMatrixD HA_new = track->solve_measurement_equation(a, s);
+  HA_new.Print();
+  std::cerr << new_alpha << std::endl;
+  EXPECT_NEAR(new_alpha, HA_new(0, 0), 1e-1);
+  // Now, we introduce a shift in both x & y.
+  double shift_y = 2.; // mm
+  s(1, 0) = shift_y; // mm
+  // So we need a plane that's not 0 (because this one is vertical, only measures x)
+  a_site->set_direction(direction_plane1_tracker0);
+  CLHEP::Hep3Vector perp = direction_plane1_tracker0.orthogonal();
+
+
+}
+
 TEST_F(KalmanTrackTest, test_filtering_methods) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
   CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
-  CLHEP::Hep3Vector direction_plane1_tracker0(-0.866, -0.5, 0.0);
-  CLHEP::Hep3Vector direction_plane2_tracker0(0.866, -0.5, 0.0);
-
+  CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
+  CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);
+/*
   CLHEP::Hep3Vector direction_plane0_tracker1(0., 1., 0.);
   CLHEP::Hep3Vector direction_plane1_tracker1(0.866, -0.5, 0.0);
   CLHEP::Hep3Vector direction_plane2_tracker1(-0.866, -0.5, 0.0);
-
+*/
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
   // Plane 0. 1st case.
-  a_site->set_direction(direction_plane1_tracker0);
+  a_site->set_direction(direction_plane2_tracker0);
   TMatrixD a;
   a.ResizeTo(5, 1);
   a(0, 0) = 50.;
@@ -213,6 +269,8 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   track->calc_filtered_state
 */
 }
+
+
 
 
 } // ~namespace MAUS

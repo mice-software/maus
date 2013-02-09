@@ -20,8 +20,10 @@
 namespace MAUS {
 
 KalmanSite::KalmanSite(): _current_state(Initialized),
-                          _z(0.), _id(-1),
-                          _f_chi2(0.), _s_chi2(0.),
+                          _z(0.),
+                          _id(-1),
+                          _f_chi2(0.),
+                          _s_chi2(0.),
                           _direction(CLHEP::Hep3Vector(0., 0., 0.)),
                           _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
                           _mc_mom(CLHEP::Hep3Vector(0., 0., 0.)) {
@@ -31,8 +33,10 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
 KalmanSite::~KalmanSite() {}
 
 KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
-                                                _z(0.), _id(-1),
-                                                _f_chi2(0.), _s_chi2(0.),
+                                                _z(0.),
+                                                _id(-1),
+                                                _f_chi2(0.),
+                                                _s_chi2(0.),
                                                 _direction(CLHEP::Hep3Vector(0., 0., 0.)),
                                                 _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
                                                 _mc_mom(CLHEP::Hep3Vector(0., 0., 0.)) {

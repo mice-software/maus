@@ -23,6 +23,9 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
+#include <iostream>
+#include <fstream>
+
 namespace MAUS {
 
 KalmanSciFiAlignment::KalmanSciFiAlignment() {
@@ -31,25 +34,11 @@ KalmanSciFiAlignment::KalmanSciFiAlignment() {
   fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
 
   for ( int i = 0; i < 30; ++i ) {
-    shifts_array[i].ResizeTo(3, 1);
-    shifts_array[i].Zero();
-    rotations_array[i].ResizeTo(3, 1);
-    rotations_array[i].Zero();
-
-    covariance_rotations[i].ResizeTo(3, 3);
-    covariance_rotations[i].Zero();
+    shifts_array[i].     ResizeTo(3, 1);
     covariance_shifts[i].ResizeTo(3, 3);
+    shifts_array[i].     Zero();
     covariance_shifts[i].Zero();
   }
-
-/*
-  Json::Value *json = Globals::GetConfigurationCards();
-  std::string filename;
-  filename = (*json)["reconstruction_geometry_filename"].asString();
-  MiceModule* module;
-  module = new MiceModule(filename);
-  _modules = module->findModulesByPropertyExistsNC("SensitiveDetector", "SciFi");
-*/
 }
 
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
@@ -60,8 +49,6 @@ bool KalmanSciFiAlignment::load_misaligments() {
     throw(Squeal(Squeal::recoverable,
           "Could not load misalignments.",
           "KalmanSciFiAlignment::load_misaligments"));
-  // std::cout << "Unable to open file " << fname << std::endl;
-  // return false;
   }
 
   std::string line;
@@ -70,21 +57,21 @@ bool KalmanSciFiAlignment::load_misaligments() {
   double s_xx, s_xy, s_xz;
   double s_yx, s_yy, s_yz;
   double s_zx, s_zy, s_zz;
-  double thetax, thetay, thetaz;
-  int size = 10;
-  getline(inf, line);
-  // Get shift vectors and matrices.
+  int size = 11;
 
-  for ( int line_i = 1; line_i < 11; line_i++ ) {
+  getline(inf, line);
+  for ( int line_i = 1; line_i < size; line_i++ ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
-    ist1 >> station >> xd >> s_xx >> s_xy >> s_xz
-         >> yd >> s_yx >> s_yy >> s_yz >> zd >> s_zx >> s_zy >> s_zz;
+    ist1 >> station
+         >> xd >> s_xx >> s_xy >> s_xz
+         >> yd >> s_yx >> s_yy >> s_yz
+         >> zd >> s_zx >> s_zy >> s_zz;
+
     assert(line_i == station && "SciFiMisalignments (Shifts) set up as expected.");
-    // site_id_array[site_i]= site;
-    int site_id = 3*(station-1);
-    // std::cerr << "Setting misalignment in site " << site_id << std::endl;
-    // double pitch = 1.4945;
+    int site_id = 3*(station-1); // 0, 3, 6, 9, 12
+
+    // Shifts.
     TMatrixD shifts(3, 1);
     shifts(0, 0) = xd;
     shifts(1, 0) = yd;
@@ -92,15 +79,14 @@ bool KalmanSciFiAlignment::load_misaligments() {
     shifts_array[site_id]   = shifts;
     shifts_array[site_id+1] = shifts;
     shifts_array[site_id+2] = shifts;
+    // Their covariance.
     TMatrixD cov_s(3, 3);
     cov_s(0, 0) = s_xx;
     cov_s(0, 1) = s_xy;
     cov_s(0, 2) = s_xz;
-
     cov_s(1, 0) = s_yx;
     cov_s(1, 1) = s_yy;
     cov_s(1, 2) = s_yz;
-
     cov_s(2, 0) = s_zx;
     cov_s(2, 1) = s_zy;
     cov_s(2, 2) = s_zz;
@@ -112,128 +98,6 @@ bool KalmanSciFiAlignment::load_misaligments() {
   inf.close();
   return true;
 }
-
-void KalmanSciFiAlignment::update_site(KalmanSite *site) {
-/*
-  TMatrixD a_excluded(5, 1);
-  a_excluded = site->get_a(KalmanSite::Excluded);
-
-  TMatrixD a_smoothed(5, 1);
-  a_smoothed = site->get_a(KalmanSite::Smoothed);
-
-  double diff_x = a_excluded(0, 0) - a_smoothed(0, 0);
-  double diff_y = a_excluded(2, 0) - a_smoothed(2, 0);
-  // std::cerr << site->get_id() << " " << diff << std::endl;
-  int id = site->get_id();
-
-  // std::cerr << diff_x << std::endl;
-  std::ofstream out2("kalman_diff.txt", std::ios::out | std::ios::app);
-  out2 << id << " "<< diff_x << " " << diff_y << "\n";
-  out2.close();
-
-  TMatrixD s(3, 1);
-  s.Zero();
-  s(0, 0) = diff_x;
-  s(1, 0) = diff_y;
-  set_shifts(s, id);
-//  site->set_shifts(s);
-*/
-}
-
-/*
-void KalmanSciFiAlignment::algorithm_A() {
-    for ( size_t j = 0; j < numb_measurements; ++j ) {
-      KalmanSite *site = &sites[j];
-      track->exclude_site(site);
-      kalman_align.update_site(site);
-    }
-    // update_alignment_parameters(sites, track, kalman_align);
-    // std::cerr << "Updating..." << std::endl;
-    // Update Stored misalignments using values stored in each site.
-    // kalman_align.update(sites);
-  }
-}
-
-/////////////////////////////////B
-void KalmanSciFiAlignment::algorithm_B() {
-      std::cerr << "Good chi2; lauching KalmanAlignment...\n";
-      update_alignment_parameters(sites, track, kalman_align);
-      // Update Stored misalignments using values stored in each site.
-      kalman_align.update(sites);
-
-}
-
-void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                                 KalmanTrack *track,
-                                                 KalmanSciFiAlignment &kalman_align) {
-  unsigned int numb_measurements = sites.size();
-
-  for ( int i = 0; i < numb_measurements; ++i ) {
-    // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
-    filter_updating_misalignments(sites, track, i);
-  }
-}
-void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = 0;
-  // Get previous site too.
-  if ( !(current_site%3) ) {
-    std::cerr << "first plane; copying shifts read in. \n";
-    alignment_projection_site = a_site;
-  } else {
-    alignment_projection_site = &sites[current_site-1];
-  }
-
-  // Update measurement error:
-  // (non-const std for the perp direction)
-  track->update_V(a_site);
-  track->update_H(a_site);
-  track->update_W(a_site);
-
-  track->update_misaligments(a_site, alignment_projection_site);
-}
-/////////////////////////////////B
-
-
-void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                                 KalmanTrack *track,
-                                                 KalmanSciFiAlignment &kalman_align) {
-  size_t numb_measurements = sites.size();
-
-  for ( size_t i = 0; i < numb_measurements; ++i ) {
-    // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
-    filter_updating_misalignments(sites, track, i);
-  }
-}
-
-void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = NULL;
-  // Get previous site too.
-  // if ( !(current_site%3) ) {
-  int id = a_site->get_id();
-  std::cout << id << std::endl;
-  if ( !(current_site%3) ) {
-    alignment_projection_site = a_site;
-    alignment_projection_site->get_shifts().Print();
-  } else {
-    alignment_projection_site = &sites[current_site-1];
-    alignment_projection_site->get_shifts().Print();
-  }
-
-  track->update_V(a_site);
-  track->update_H(a_site);
-  track->update_W(a_site);
-  track->update_misaligments(a_site, alignment_projection_site);
-}
-*/
-
 
 void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
   int numb_sites = sites.size();
@@ -299,7 +163,7 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   for ( int station = 7; station < 10; station++ ) {
-      int site_i = 3*(station)-2; // 18, 21, 24
+      int site_i = 3*(station)-2; // 19, 22, 25
       file_out << station << "\t"
       << shifts_array[site_i](0, 0) << "\t"
       << covariance_shifts[site_i](0, 0) << "\t"
@@ -323,38 +187,6 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   file_out.close();
-
-/*
-  MiceModule* this_plane = NULL;
-  this_plane = find_plane(0, 3, 0);
-  assert(this_plane != NULL);
-
-  CLHEP::Hep3Vector new_position(1., 1., 1.);
-  std::cerr << this_plane->position() << std::endl;
-  this_plane->setProperty("Position", new_position);
-  std::cerr << this_plane->position() << std::endl;
-*/
-}
-
-MiceModule* KalmanSciFiAlignment::find_plane(int tracker, int station, int plane) {
-/*  MiceModule* scifi_plane = NULL;
-  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); j++ ) {
-    // Find the right module
-    if ( _modules[j]->propertyExists("Tracker", "int") &&
-         _modules[j]->propertyExists("Station", "int") &&
-         _modules[j]->propertyExists("Plane", "int")  &&
-         _modules[j]->propertyInt("Tracker") ==
-         tracker &&
-         _modules[j]->propertyInt("Station") ==
-         station &&
-         _modules[j]->propertyInt("Plane") ==
-         plane ) {
-         // Save the module
-      scifi_plane = _modules[j];
-    }
-  }
-  return scifi_plane;
-*/
 }
 
 } // ~namespace MAUS

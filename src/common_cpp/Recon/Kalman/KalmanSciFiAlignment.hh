@@ -52,7 +52,7 @@ class KalmanSciFiAlignment {
 
   void update(std::vector<KalmanSite> sites);
 
-  MiceModule* find_plane(int tracker, int station, int plane);
+  // MiceModule* find_plane(int tracker, int station, int plane);
 
   TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
   TMatrixD get_rotations(int site_id)  const { return rotations_array[site_id]; }
@@ -64,7 +64,7 @@ class KalmanSciFiAlignment {
   void set_cov_shifts(TMatrixD cov_s, int site_id)     { covariance_shifts[site_id]   = cov_s; }
   void set_cov_rotat(TMatrixD cov_r, int site_id)      { covariance_rotations[site_id]= cov_r; }
 
-  void update_site(KalmanSite *site);
+  // void update_site(KalmanSite *site);
 
  private:
   std::string file, fname;

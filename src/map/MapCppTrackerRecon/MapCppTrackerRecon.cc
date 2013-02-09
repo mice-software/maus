@@ -60,7 +60,6 @@ bool MapCppTrackerRecon::death() {
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
-  std::cout << "Reconstructing tracker data\n";
   Json::FastWriter writer;
 
   // Read in json data
@@ -71,9 +70,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
-    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
-        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
