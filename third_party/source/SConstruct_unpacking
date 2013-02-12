@@ -1,0 +1,21 @@
+import glob
+import os
+
+maus_root_dir = os.environ.get('MAUS_ROOT_DIR')
+if not maus_root_dir:
+    print('!! Could not find the $MAUS_ROOT_DIR environmental variable')
+    print('!! Did you try running: "source env.sh"?')
+    Exit(1)
+
+env = Environment(CPPPATH='include')
+env.Append(CCFLAGS=["""-Dlong32='int'""", """-Dlong64='long long'"""])
+
+my_lib = env.SharedLibrary('MDunpack', glob.glob("src/*cpp"))
+
+install_dir = "%s/third_party/install" % maus_root_dir
+print 'Installing in:', install_dir
+
+env.Install(dir ='%s/lib'% install_dir, source = my_lib)
+env.Install(dir='%s/include/unpacking' % install_dir, source = glob.glob("include/*.h"))
+
+env.Alias('install', [install_dir])
