@@ -461,12 +461,15 @@ int fADCDataProcessor::get_area() {
 void fADCDataProcessor::set_pedestal() {
   double area = 0;
   unsigned int pedBins = 10;
+  if (_data.size() < pedBins)
+    _pedestal = 0;
+
   if (_data.size() > pedBins) {
     for (unsigned int i = 0; i < pedBins; i++) {
        area += _data[i];
     }
   }
-  _pedestal = area/pedBins;
+  _pedestal = static_cast<int>(area/pedBins);
 }
 
 int fADCDataProcessor::chargeMinMax() {
@@ -487,19 +490,22 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator min;
   int area = 0;
+  if (_data.size()) {
+    min = min_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), min);
 
-  min = min_element(_data.begin(), _data.end());
-  pos = distance(_data.begin(), min);
-
-  if (pos > 15) { // was: pos > 10
-    it = min -  10;
-    while (it < min + 30 && it < _data.end()) {
-      // area += abs(*it - _pedestal);
-      area += _pedestal- *it;
-      it++;
+    if (pos > 15) { // was: pos > 10
+      it = min -  10;
+      while (it < min + 30 && it < _data.end()) {
+        // area += abs(*it - _pedestal);
+        area += _pedestal- *it;
+        it++;
+      }
     }
+    return area;
   }
-  return area;
+
+  return 0;
 }
 
 
@@ -507,18 +513,21 @@ int fADCDataProcessor::get_signal_area(int& pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator max;
   int area = 0;
+  if (_data.size()) {
+    max = max_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), max);
 
-  max = max_element(_data.begin(), _data.end());
-  pos = distance(_data.begin(), max);
+    if (pos > 10) it = max - 10;
 
-  if (pos > 10) it = max - 10;
+    while (it < max+20) {
+      area += abs(*it - _pedestal);
+      it++;
+    }
 
-  while (it < max+20) {
-    area += abs(*it - _pedestal);
-    it++;
+    return area;
   }
 
-  return area;
+  return 0;
 }
 
 int fADCDataProcessor::get_arrival_time() {
@@ -537,55 +546,74 @@ int fADCDataProcessor::get_pedestal_area(int& pos) {
   vector<int>::iterator max;
   int pedareaminus = 0;
   int pedareaplus = 0;
+  if (_data.size()) {
+    max = max_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), max);
 
-  max = max_element(_data.begin(), _data.end());
-  pos = distance(_data.begin(), max);
+    if (pos > 30 && pos < 97) {
+      it = max - 30;
+      while (it < max-10) {
+        pedareaminus += *it - _pedestal;
+        it++;
+      }
 
-  if (pos > 30 && pos < 97) {
-    it = max - 30;
-    while (it < max-10) {
-      pedareaminus += *it - _pedestal;
-      it++;
+      it = max + 20;
+      while (it < max+30) {
+        pedareaplus += *it - _pedestal;
+        it++;
+      }
     }
 
-    it = max + 20;
-    while (it < max+30) {
-      pedareaplus += *it - _pedestal;
-      it++;
-    }
+    return pedareaminus + pedareaplus;
   }
 
-  return pedareaminus + pedareaplus;
+  return 0;
 }
 
 int fADCDataProcessor::get_max_position() {
   int pos = 0;
   vector<int>::iterator max;
-  max = max_element(_data.begin(), _data.end());
-  pos = distance(_data.begin(), max);
+  if (_data.size()) {
+    max = max_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), max);
 
-  return pos;
+    return pos;
+  }
+
+  return 0;
 }
 
 int fADCDataProcessor::get_min_position() {
   int pos = 0;
   vector<int>::iterator min;
-  min = min_element(_data.begin(), _data.end());
-  pos = distance(_data.begin(), min);
+  if (_data.size()) {
+    min = min_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), min);
 
-  return pos;
+    return pos;
+  }
+
+  return 0;
 }
 
 int fADCDataProcessor::chargePedMax() {
   int max = 0;
-  max = *max_element(_data.begin(), _data.end());
-  return max - _pedestal;
+  if (_data.size()) {
+    max = *max_element(_data.begin(), _data.end());
+    return max - _pedestal;
+  }
+
+  return 0;
 }
 
 int fADCDataProcessor::chargePedMin() {
   int min = 0;
-  min = *min_element(_data.begin(), _data.end());
-  return _pedestal - min;
+  if (_data.size()) {
+    min = *min_element(_data.begin(), _data.end());
+    return _pedestal - min;
+  }
+
+  return 0;
 }
 
 int fADCDataProcessor::get_charge(int Algorithm) {
