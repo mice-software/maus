@@ -19,7 +19,7 @@
 
 #include "Rtypes.h"  // ROOT
 
-#include "DataStructure/GlobalRawTrack.hh"
+#include "DataStructure/GlobalTrack.hh"
 
 namespace MAUS {
 
@@ -33,23 +33,33 @@ class GlobalEvent {
     GlobalEvent();
 
     /** Copy constructor - any pointers are deep copied */
-    GlobalEvent(const GlobalEvent& _globalevent);
+    GlobalEvent(const GlobalEvent& global_event);
 
     /** Equality operator - any pointers are deep copied */
-    GlobalEvent& operator=(const GlobalEvent& _globalevent);
+    GlobalEvent& operator=(const GlobalEvent& global_event);
 
     /** Destructor - any member pointers are deleted */
     virtual ~GlobalEvent();
 
-    GlobalRawTrackArray raw_tracks() const {
+    GlobalTrackArray raw_tracks() const {
       return raw_tracks_;
     }
-    void set_raw_tracks(const GlobalRawTrackArray raw_tracks) {
+
+    void set_raw_tracks(GlobalTrackArray raw_tracks) {
       raw_tracks_ = raw_tracks;
     }
 
+    GlobalTrackArray tracks() const {
+      return raw_tracks_;
+    }
+
+    void set_tracks(GlobalTrackArray tracks) {
+      tracks_ = tracks;
+    }
+
   private:
-    GlobalRawTrackArray raw_tracks_;
+    GlobalTrackArray raw_tracks_;
+    GlobalTrackArray tracks_;
 
     ClassDef(GlobalEvent, 1)
 };

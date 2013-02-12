@@ -14,32 +14,32 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALRAWTRACKPROCESSOR_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALRAWTRACKPROCESSOR_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_
 
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 namespace MAUS {
 
-/** @class GlobalRawTrackProcessor Conversions for GlobalRawTrack between C++ and Json 
+/** @class GlobalTrackProcessor Conversions for GlobalTrack between C++ and Json 
  *
  */
 
-class GlobalRawTrackProcessor : public ObjectProcessor<GlobalRawTrack> {
+class GlobalTrackProcessor : public ObjectProcessor<GlobalTrack> {
   public:
     /** Set up processors and register branches
      *
      *  Everything else is handled by the base class
      */
-    GlobalRawTrackProcessor();
+    GlobalTrackProcessor();
 
   private:
     ValueArrayProcessor<GlobalTrackPoint> track_point_array_processor_;
 };
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALRAWTRACKPROCESSOR_
+#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALTRACKPROCESSOR_
 

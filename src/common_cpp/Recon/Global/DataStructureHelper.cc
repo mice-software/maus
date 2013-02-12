@@ -22,9 +22,9 @@
 #include <map>
 #include <vector>
 
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
 #include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
 #include "src/common_cpp/Recon/Global/Detector.hh"
 #include "src/common_cpp/Recon/Global/Track.hh"
@@ -73,31 +73,33 @@ void DataStructureHelper::GetDetectorAttributes(
 }
 
 void DataStructureHelper::GetGlobalRawTracks(
-    const Json::Value& json_document,
+    const Json::Value& recon_event,
     const std::map<Detector::ID, Detector>& detectors,
     std::vector<Track>& raw_tracks) {
-  GetGlobalTracks(json_document, "global_raw_tracks", detectors, raw_tracks);
+  GetGlobalTracks(recon_event, "raw_tracks", detectors, raw_tracks);
 }
 
 void DataStructureHelper::GetGlobalTracks(
-    const Json::Value& json_document,
+    const Json::Value& recon_event,
     const std::map<Detector::ID, Detector>& detectors,
     std::vector<Track>& tracks) {
-  GetGlobalTracks(json_document, "global_tracks", detectors, tracks);
+  GetGlobalTracks(recon_event, "tracks", detectors, tracks);
 }
 
 void DataStructureHelper::GetGlobalTracks(
-    const Json::Value& json_document,
+    const Json::Value& recon_event,
     const std::string& json_node_name,
     const std::map<Detector::ID, Detector>& detectors,
     std::vector<Track>& raw_tracks) {
+  Json::Value global_event = JsonWrapper::GetProperty(
+      recon_event, "global_event", JsonWrapper::objectValue);
   Json::Value global_raw_tracks = JsonWrapper::GetProperty(
-      json_document, json_node_name, JsonWrapper::arrayValue);
+      global_event, json_node_name, JsonWrapper::arrayValue);
   size_t num_tracks = global_raw_tracks.size();
   for (size_t track_index = 0; track_index < num_tracks; ++track_index) {
-    GlobalRawTrackProcessor deserializer;
+    GlobalTrackProcessor deserializer;
 std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 1" << std::endl;
-    GlobalRawTrack * const global_raw_track = deserializer.JsonToCpp(
+    GlobalTrack * const global_raw_track = deserializer.JsonToCpp(
       global_raw_tracks[track_index]);
 std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 2" << std::endl;
     GlobalTrackPointArray global_track_points
@@ -142,10 +144,10 @@ Json::Value DataStructureHelper::TrackToJson(const Track & track) {
     global_track_points.push_back(global_track_point);
   }
 
-  GlobalRawTrack global_track;
+  GlobalTrack global_track;
   global_track.set_track_points(global_track_points);
 
-  GlobalRawTrackProcessor serializer;
+  GlobalTrackProcessor serializer;
   Json::Value * json_pointer = serializer.CppToJson(global_track, "");
   Json::Value json = *json_pointer;
   delete json_pointer;

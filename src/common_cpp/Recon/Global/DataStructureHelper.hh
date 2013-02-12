@@ -39,13 +39,13 @@ class DataStructureHelper {
   void GetDetectorAttributes(const Json::Value& json_document,
                              DetectorMap& detectors)
                                       const;
-  void GetGlobalRawTracks(const Json::Value& json_document,
+  void GetGlobalRawTracks(const Json::Value& recon_event,
                           const DetectorMap& detectors,
                           std::vector<MAUS::recon::global::Track>& raw_tracks);
-  void GetGlobalTracks(const Json::Value& json_document,
+  void GetGlobalTracks(const Json::Value& recon_event,
                        const DetectorMap& detectors,
                        std::vector<MAUS::recon::global::Track>& raw_tracks);
-  void GetGlobalTracks(const Json::Value& json_document,
+  void GetGlobalTracks(const Json::Value& recon_event,
                        const std::string& json_node_name,
                        const DetectorMap& detectors,
                        std::vector<MAUS::recon::global::Track>& raw_tracks);

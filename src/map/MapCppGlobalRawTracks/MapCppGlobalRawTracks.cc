@@ -37,12 +37,12 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiSpacePointProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TOFEventSpacePointProcessor.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
@@ -156,8 +156,8 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-  Json::Value raw_tracks;
-
+  /*
+  size_t event_index = 0;
   for (std::vector<MAUS::recon::global::Track>::iterator
           raw_track = tracks_.begin();
        raw_track < tracks_.end();
@@ -166,12 +166,16 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
 
   std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
             << "Appending a track of size " << raw_track->size()
-            << " to global_raw_tracks" << std::endl;
+            << " to raw_tracks" << std::endl;
+    Json::Value raw_tracks;
+    // Only one raw track per event for now...
     raw_tracks.append(
       DataStructureHelper::GetInstance().TrackToJson(*raw_track));
+    run_data_["recon_events"][event_index]["global_event"]["raw_tracks"]
+      = raw_tracks;
+    ++event_index;
   }
-
-  run_data_["recon_events"]["global_event"]["raw_tracks"] = raw_tracks;
+  */
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;

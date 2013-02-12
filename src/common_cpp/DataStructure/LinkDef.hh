@@ -143,7 +143,8 @@
 
 #pragma link C++ class MAUS::GlobalTrackPoint+;
 #pragma link C++ class std::vector<GlobalTrackPoint>+;
-#pragma link C++ class MAUS::GlobalRawTrack+;
+#pragma link C++ class MAUS::GlobalTrack+;
+#pragma link C++ class std::vector<GlobalTrack>+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

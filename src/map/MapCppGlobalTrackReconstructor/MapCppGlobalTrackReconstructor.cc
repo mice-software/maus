@@ -35,10 +35,10 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
@@ -111,58 +111,79 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
 
 std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
   // parse the JSON document.
+  Json::Value recon_events;
   try {
     run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
-
-    DataStructureHelper::GetInstance().GetGlobalRawTracks(run_data_,
-                                                          detectors_,
-                                                          raw_tracks_);
+    recon_events = JsonWrapper::GetProperty(run_data_, "recon_events",
+                                            JsonWrapper::arrayValue);
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
+  size_t event_index = 0;
+  for (Json::Value::iterator recon_event = recon_events.begin();
+       recon_event != recon_events.end();
+       ++recon_event) {
+std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
+          << "Processing recon event #" << event_index << std::endl;
+    try {
+      raw_tracks_.clear();
+      DataStructureHelper::GetInstance().GetGlobalRawTracks(*recon_event,
+                                                            detectors_,
+                                                            raw_tracks_);
+    } catch(Squeal& squee) {
+      MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
+    } catch(std::exception& exc) {
+      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
+    }
 std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
           << "Loaded " << raw_tracks_.size() << " tracks." << std::endl;
-  if (raw_tracks_.size() == 0) {
-/*
-    Json::FastWriter writer;
-    std::string output = writer.write(run_data_);
-    return output;
-*/
-    throw(Squeal(Squeal::recoverable,
-                 "Null recon input.",
-                 "MapCppGlobalTrackReconstructor::process()"));
-  }
+    if (raw_tracks_.size() == 0) {
+      throw(Squeal(Squeal::recoverable,
+                  "Null recon input.",
+                  "MapCppGlobalTrackReconstructor::process()"));
+    }
 
-  Json::Value global_tracks;
+    Json::Value global_tracks;
 
-  // Find the best fit track for each particle traversing the lattice
-  size_t track_count = 0;
-  for (std::vector<Track>::const_iterator raw_track = raw_tracks_.begin();
-       raw_track < raw_tracks_.end();
-       ++raw_track) {
-    // FIXME(Lane) Assuming the track doesn't decay for now.
-    Particle::ID particle_id = (*raw_track)[0].particle_id();
-
-    MAUS::recon::global::Track best_fit_track(particle_id);
-    track_fitter_->Fit(*raw_track, best_fit_track);
-    // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
-    //  specified in the configuration.
-
+    // Find the best fit track for each particle traversing the lattice
+    size_t track_count = 0;
+    for (std::vector<Track>::const_iterator raw_track = raw_tracks_.begin();
+        raw_track != raw_tracks_.end();
+        ++raw_track) {
 std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-          << "Appending a best fit track of size " << best_fit_track.size()
-          << " to global_tracks" << std::endl;
-// std::cout << best_fit_track << std::endl;
-    global_tracks.append(
-      DataStructureHelper::GetInstance().TrackToJson(best_fit_track));
-    track_count += best_fit_track.size() - 1;
+          << "Processing track #" << track_count
+          << " from recon event #" << event_index << std::endl;
+      // FIXME(Lane) Assuming the track doesn't decay for now.
+      Particle::ID particle_id = (*raw_track)[0].particle_id();
+
+      MAUS::recon::global::Track best_fit_track(particle_id);
+      track_fitter_->Fit(*raw_track, best_fit_track);
+      // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
+      //  specified in the configuration.
+
+  std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
+            << "Appending a best fit track of size " << best_fit_track.size()
+            << " to global_tracks" << std::endl;
+  // std::cout << best_fit_track << std::endl;
+      global_tracks.append(
+        DataStructureHelper::GetInstance().TrackToJson(best_fit_track));
+      ++track_count;
+    }
+
+
+    // TODO(plane1@hawk.iit.edu) Update the run data with recon results.
+    if (global_tracks.size() > 0) {
+      run_data_["recon_events"][event_index]["global_event"]["tracks"]
+        = global_tracks;
+    } else {
+  std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
+            << "Skipping track of zero length." << std::endl;
+    }
+    ++event_index;
   }
-
-
-  // TODO(plane1@hawk.iit.edu) Update the run data with recon results.
-  run_data_["global_tracks"] = global_tracks;
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;

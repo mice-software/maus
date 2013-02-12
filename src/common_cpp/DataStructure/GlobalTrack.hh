@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALRAWTRACK_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALRAWTRACK_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALTRACK_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALTRACK_HH_
 
 #include "Rtypes.h" // ROOT
 
@@ -23,33 +23,36 @@
 
 namespace MAUS {
 
-class GlobalRawTrack {
+class GlobalTrack {
   public:
     /** Initialise to 0/NULL */
-    GlobalRawTrack();
+    GlobalTrack();
 
     /** Copy constructor - deep copies steps */
-    GlobalRawTrack(const GlobalRawTrack& track);
+    GlobalTrack(const GlobalTrack& track);
 
     /** Equality operator - deep copies steps */
-    GlobalRawTrack& operator=(const GlobalRawTrack& track);
+    GlobalTrack& operator=(const GlobalTrack& track);
 
     /** Destructor - frees memory allocated to steps */
-    virtual ~GlobalRawTrack();
+    virtual ~GlobalTrack();
 
     /** Get the array of the track points */
     GlobalTrackPointArray track_points() const { return track_points_; };
 
     /** Set the array of the track points */
-    void set_track_points(GlobalTrackPointArray points) { track_points_ = points; };
+    void set_track_points(GlobalTrackPointArray points)
+    {
+      track_points_ = points;
+    };
 
   private:
     GlobalTrackPointArray track_points_;
 
-    ClassDef(GlobalRawTrack, 1)
+    ClassDef(GlobalTrack, 2)
 };
 
-typedef std::vector<GlobalRawTrack> GlobalRawTrackArray;
+typedef std::vector<GlobalTrack> GlobalTrackArray;
 }
 
 #endif

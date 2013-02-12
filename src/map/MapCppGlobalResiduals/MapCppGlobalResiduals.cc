@@ -37,7 +37,7 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"

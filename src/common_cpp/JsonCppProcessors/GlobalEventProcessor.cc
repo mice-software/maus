@@ -15,15 +15,18 @@
  */
 
 #include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
 
 namespace MAUS {
 
 GlobalEventProcessor::GlobalEventProcessor()
-    : raw_track_array_processor_(new GlobalRawTrackProcessor()) {
+    : raw_track_array_processor_(new GlobalTrackProcessor()) {
   RegisterValueBranch("raw_tracks", &raw_track_array_processor_,
                       &GlobalEvent::raw_tracks,
                       &GlobalEvent::set_raw_tracks, true);
+  RegisterValueBranch("tracks", &raw_track_array_processor_,
+                      &GlobalEvent::tracks,
+                      &GlobalEvent::set_tracks, true);
 }
 }  // namespace MAUS
 

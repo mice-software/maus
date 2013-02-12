@@ -18,7 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALEVENTPROCESSOR_
 
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
-#include "src/common_cpp/DataStructure/GlobalRawTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
@@ -37,7 +37,7 @@ class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {
     GlobalEventProcessor();
 
   private:
-    ValueArrayProcessor<GlobalRawTrack> raw_track_array_processor_;
+    ValueArrayProcessor<GlobalTrack> raw_track_array_processor_;
 };
 }  // namespace MAUS
 

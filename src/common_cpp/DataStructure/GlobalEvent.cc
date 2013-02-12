@@ -16,27 +16,26 @@
 
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
-
 namespace MAUS {
 
 GlobalEvent::GlobalEvent() {
 }
 
-GlobalEvent::GlobalEvent(const GlobalEvent& _globalevent) {
-    *this = _globalevent;
+GlobalEvent::GlobalEvent(const GlobalEvent& global_event) {
+  *this = global_event;
 }
 
-GlobalEvent& GlobalEvent::operator=(const GlobalEvent& _globalevent) {
-    if (this == &_globalevent) {
-        return *this;
-    }
+GlobalEvent& GlobalEvent::operator=(const GlobalEvent& global_event) {
+  if (this == &global_event) {
+      return *this;
+  }
 
-    raw_tracks_ = _globalevent.raw_tracks_;
+  raw_tracks_ = global_event.raw_tracks_;
+  tracks_ = global_event.tracks_;
 
-    return *this;
+  return *this;
 }
 
-GlobalEvent::~GlobalEvent() {
-}
+GlobalEvent::~GlobalEvent() { }
 }
 

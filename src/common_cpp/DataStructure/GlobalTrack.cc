@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,19 +12,34 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-#include "src/common_cpp/JsonCppProcessors/GlobalRawTrackProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackPointProcessor.hh"
+// MAUS headers
+#include "src/common_cpp/DataStructure/GlobalTrack.hh"
+#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
 
 namespace MAUS {
 
-GlobalRawTrackProcessor::GlobalRawTrackProcessor()
-    : track_point_array_processor_(new GlobalTrackPointProcessor()) {
-  RegisterValueBranch("track_points", &track_point_array_processor_,
-                      &GlobalRawTrack::track_points,
-                      &GlobalRawTrack::set_track_points, true);
+// Constructors
+GlobalTrack::GlobalTrack() : track_points_() { }
+
+// Destructor
+GlobalTrack::~GlobalTrack() { }
+
+GlobalTrack::GlobalTrack(const GlobalTrack &track)
+  : track_points_(track.track_points_) {
 }
-}  // namespace MAUS
 
+// Assignment operator
+GlobalTrack& GlobalTrack::operator=(const GlobalTrack &track) {
+  if (this == &track) {
+      return *this;
+  }
 
+  track_points_ = track.track_points_;
+
+  return *this;
+}
+
+} // ~namespace MAUS
