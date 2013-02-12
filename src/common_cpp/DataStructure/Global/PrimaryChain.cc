@@ -20,8 +20,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "Interface/Squeak.hh"
-// #include "DataStructure/Global/TrackPoint.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -127,9 +126,9 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
                             MAUS::DataStructure::Global::Track* parent) {
   // Check track is valid
   if(!track) {
-    Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
-                                << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to add a NULL Track",
+                 "DataStructure::Global::PrimaryChain::AddTrack()"));
   }
 
   // Check parent is valid.  If not, then add the track as a primary
@@ -146,10 +145,9 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
   }
 
   if(!found) {
-    Squeak::mout(Squeak::error)
-        << "Proposed Parent not in Primary Chain, rejecting Track"
-        << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+                 "Proposed Parent not in Primary Chain",
+                 "DataStructure::Global::PrimaryChain::AddTrack()"));
   }
 
   // Add the track with parent
@@ -162,62 +160,15 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
 bool PrimaryChain::AddPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   // Check track is valid
   if(!track) {
-    Squeak::mout(Squeak::error) << "Attempting to add NULL Track"
-                                << std::endl;
-    return false;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to add a NULL Track",
+                 "DataStructure::Global::PrimaryChain::AddPrimaryTrack()"));
   }
   
   // Add the track with a NULL parent
   MAUS::DataStructure::Global::TRefTrackPair* newPair =
       new MAUS::DataStructure::Global::TRefTrackPair(track, NULL);
   _tracks->push_back(newPair);
-  return true;
-}
-
-bool PrimaryChain::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
-  // Check track is in the container
-  bool in_tracks = false;
-  for(size_t i = 0; i < _tracks->size(); i++) {
-    if(_tracks->at(i)->GetTrack() == track) {
-      in_tracks = true;
-      break;
-    }
-  }
-  
-  // If not in _tracks, warning and return.
-  if(!in_tracks) {
-    Squeak::mout(Squeak::warning)
-        << "Track not in PrimaryChain, can't remove"
-        << std::endl;
-    return false;
-  }
-
-  // If target is parent of other track, prevent removal
-  bool is_parent = false;
-  for(size_t i = 0; i < _tracks->size(); i++) {
-    if(_tracks->at(i)->GetParent() == track) {
-      is_parent = true;
-      break;
-    }
-  }
-  
-  // If track is a parent, warn and return
-  if (is_parent) {
-    Squeak::mout(Squeak::warning)
-        << "Attempting to remove track with daughter in PrimaryChain, forbidden"
-        << std::endl;
-    return false;
-  }
-
-  // Remove the pair
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if((*iter)->GetTrack() == track) {
-      _tracks->erase(iter);
-      break;
-    }
-  }
-  
   return true;
 }
 
@@ -294,7 +245,7 @@ void PrimaryChain::AddParentChain(
   // Check primary chain is valid
   if(!chain) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempting to add a NULL PriamryChain",
+                 "Attempting to add a NULL PrimaryChain",
                  "DataStructure::Global::PrimaryChain::AddParentChain()"));
   }
 

@@ -178,8 +178,6 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
       new MAUS::DataStructure::Global::Track();
   MAUS::DataStructure::Global::Track* t5 =
       new MAUS::DataStructure::Global::Track();
-  MAUS::DataStructure::Global::Track* t6 =
-      new MAUS::DataStructure::Global::Track();
 
   // Add Primaries, t0, t1
   primarychain1->AddPrimaryTrack(t0);
@@ -191,9 +189,8 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
   
   // Add t1 daughters
   primarychain1->AddTrack(t4, t1);
-  primarychain1->AddTrack(t5, t1);
 
-  ASSERT_EQ(6U, primarychain1->get_track_parent_pairs()->size());
+  ASSERT_EQ(5U, primarychain1->get_track_parent_pairs()->size());
   EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
               ->at(0)->GetParent());
   EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
@@ -201,30 +198,18 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
   EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(2)->GetParent());
   EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(3)->GetParent());
   EXPECT_EQ(t1, primarychain1->get_track_parent_pairs()->at(4)->GetParent());
-  EXPECT_EQ(t1, primarychain1->get_track_parent_pairs()->at(5)->GetParent());
 
   // RemoveTrack
-  // Try to remove a track that isn't in primary chain, t6
-  EXPECT_FALSE(primarychain1->RemoveTrack(t6));
-
-  // Try to remove a track with daughters, t1
-  EXPECT_FALSE(primarychain1->RemoveTrack(t1));
-  
-  // Remove t4, t5 and t1
-  EXPECT_TRUE(primarychain1->RemoveTrack(t4));
-  EXPECT_TRUE(primarychain1->RemoveTrack(t5));
-  EXPECT_TRUE(primarychain1->RemoveTrack(t1));
-  
   // HasTrack & HasTrackAsParent
   EXPECT_TRUE(primarychain1->HasTrack(t0));
-  EXPECT_FALSE(primarychain1->HasTrack(t1));
+  EXPECT_TRUE(primarychain1->HasTrack(t1));
   EXPECT_TRUE(primarychain1->HasTrack(t2));
   EXPECT_TRUE(primarychain1->HasTrack(t3));
-  EXPECT_FALSE(primarychain1->HasTrack(t4));
+  EXPECT_TRUE(primarychain1->HasTrack(t4));
   EXPECT_FALSE(primarychain1->HasTrack(t5));
 
   EXPECT_TRUE(primarychain1->HasTrackAsParent(t0));
-  EXPECT_FALSE(primarychain1->HasTrackAsParent(t1));
+  EXPECT_TRUE(primarychain1->HasTrackAsParent(t1));
   EXPECT_FALSE(primarychain1->HasTrackAsParent(t2));
   EXPECT_FALSE(primarychain1->HasTrackAsParent(t3));
   EXPECT_FALSE(primarychain1->HasTrackAsParent(t4));
@@ -232,20 +217,27 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
 
   // IsPrimaryTrack
   EXPECT_TRUE(primarychain1->IsPrimaryTrack(t0));
+  EXPECT_TRUE(primarychain1->IsPrimaryTrack(t1));
   EXPECT_FALSE(primarychain1->IsPrimaryTrack(t2));
   EXPECT_FALSE(primarychain1->IsPrimaryTrack(t3));
+  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t4));
+  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t5));
 
   // GetTrackParent
   EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t0));
+  EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t1));
   EXPECT_EQ(t0, primarychain1->GetTrackParent(t2));
   EXPECT_EQ(t0, primarychain1->GetTrackParent(t3));
+  EXPECT_EQ(t1, primarychain1->GetTrackParent(t4));
+  EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t5));
 
   // GetTrackDaughters
   ASSERT_EQ(2U, primarychain1->GetTrackDaughters(t0).size());
   EXPECT_EQ(t2, primarychain1->GetTrackDaughters(t0)[0]);
   EXPECT_EQ(t3, primarychain1->GetTrackDaughters(t0)[1]);
-  EXPECT_EQ(0U, primarychain1->GetTrackDaughters(t2).size());
-  EXPECT_EQ(0U, primarychain1->GetTrackDaughters(t3).size());
+  ASSERT_EQ(1U, primarychain1->GetTrackDaughters(t1).size());
+  EXPECT_EQ(t4, primarychain1->GetTrackDaughters(t1)[0]);
+  EXPECT_EQ(0U, primarychain1->GetTrackDaughters(t4).size());
 
   // ClearTracks
   primarychain1->ClearTracks();

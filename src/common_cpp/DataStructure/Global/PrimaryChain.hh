@@ -85,11 +85,6 @@ class PrimaryChain : public TObject {
   /// @param[in] track  The track being added to the primary chain
   bool AddPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
-  /// Remove all reference of the provided track.  Returns false if a)
-  /// track is not a member of the chain, or b) track has daughter
-  /// particles stored in the chain.
-  bool RemoveTrack(MAUS::DataStructure::Global::Track* track);
-
   /// Checks whether track is stored in the chain.
   bool HasTrack(MAUS::DataStructure::Global::Track* track);
 

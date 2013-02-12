@@ -15,12 +15,10 @@
  *
  */
 
-#include "DataStructure/Global/Track.hh"
-
 #include <algorithm>
 
-#include "Interface/Squeak.hh"
-#include "DataStructure/Global/TrackPoint.hh"
+#include "src/legacy/Interface/Squeal.hh"
+#include "DataStructure/Global/Track.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -119,8 +117,9 @@ Track* Track::Clone() const {
 
 void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(!trackpoint){
-    Squeak::mout(Squeak::error) << "Adding NULL Track Point" << std::endl;
-    return;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to add a NULL TrackPoint",
+                 "DataStructure::Global::Track::AddTrackPoint()"));
   }
   if(trackpoint->get_detector() == MAUS::DataStructure::Global::kVirtual) {
     AddGeometryPath(trackpoint->get_geometry_path());
@@ -134,9 +133,9 @@ void Track::PushBackTrackPoint(
   if(trackpoint)
     _trackpoints->Add(trackpoint);
   else
-    Squeak::mout(Squeak::error)
-        << "recon::global::track - Attempting to add a NULL trackpoint pointer"
-        << std::endl;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to add a NULL TrackPoint",
+                 "DataStructure::Global::Track::PushBackTrackPoint()"));
 }
 
 // Correctly remove the trackpoint, unsetting the detector bit and/or
@@ -144,20 +143,17 @@ void Track::PushBackTrackPoint(
 void Track::RemoveTrackPoint(
     MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   if(!trackpoint) {
-    Squeak::mout(Squeak::error)
-        << "recon::global::track - "
-        << "Attempting to remove a NULL trackpoint pointer"
-        << std::endl;
-    return;
+    throw(Squeal(Squeal::recoverable,
+                 "No matching TrackPoint: pointer is NULL",
+                 "DataStructure::Global::Track::RemoveTrackPoint()"));
   }
 
   // Remove trackpoint from TRefArray
   TObject* result = _trackpoints->FindObject(trackpoint);
   if(!result)
-    Squeak::mout(Squeak::debug)
-        << "recon::global::track - "
-        << "Trying to remove a trackpoint not stored in track"
-        << std::endl;
+    throw(Squeal(Squeal::recoverable,
+                 "No matching TrackPoint ",
+                 "DataStructure::Global::Track::RemoveTrackPoint()"));
   else {
     _trackpoints->Remove(result);
     _trackpoints->Compress();
@@ -251,10 +247,9 @@ void Track::RemoveGeometryPath(std::string geometry_path) {
       find(_geometry_paths.begin(), _geometry_paths.end(), geometry_path);
 
   if(result == _geometry_paths.end()) {
-    Squeak::mout(Squeak::debug)
-        << "recon::global::track - "
-        << "Trying to remove a geometry_path not stored in track"
-        << std::endl;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to remove a geometry path not stored in Track",
+                 "DataStructure::Global::Track::AddGeometryPath()"));
   } else {
     _geometry_paths.erase(result);
   }
@@ -279,10 +274,9 @@ void Track::AddTrack(MAUS::DataStructure::Global::Track* track) {
 void Track::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
   if(!result) {
-    Squeak::mout(Squeak::debug)
-        << "recon::global::track - "
-        << "Trying to remove a constituent track not stored in track"
-        << std::endl;
+    throw(Squeal(Squeal::recoverable,
+                 "Attempting to remove a constituent track not stored in Track",
+                 "DataStructure::Global::Track::AddGeometryPath()"));
   } else {
     _constituent_tracks->Remove(track);
   }
