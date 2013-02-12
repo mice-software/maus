@@ -206,6 +206,32 @@ bool PrimaryChain::IsPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   return false;
 }
 
+std::vector<MAUS::DataStructure::Global::Track*> PrimaryChain::GetTracks() {
+  std::vector<MAUS::DataStructure::Global::Track*> result;
+
+  // Get a pointer for each of the tracks stored.
+  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    result.push_back((*iter)->GetTrack());
+  }
+
+  return result;
+}
+  
+std::vector<MAUS::DataStructure::Global::Track*>
+PrimaryChain::GetPrimaryTracks() {
+  std::vector<MAUS::DataStructure::Global::Track*> result;
+
+  // Get a pointer for each of the tracks that is primary
+  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
+  for(iter = _tracks->begin(); iter < _tracks->end(); iter++) {
+    if((*iter)->second.IsValid() == false)
+      result.push_back((*iter)->GetTrack());
+  }
+
+  return result;
+}
+  
 MAUS::DataStructure::Global::Track* PrimaryChain::GetTrackParent(
     MAUS::DataStructure::Global::Track* track) {
   // Find track, and return parent
@@ -250,6 +276,18 @@ void PrimaryChain::AddParentChain(
   }
 
   _parent_primary_chains->Add(chain);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+PrimaryChain::GetParentChains() {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> result;
+  // Not a fast function, ROOT recommends avoiding unnecessary repeats
+  int n = _parent_primary_chains->GetEntries(); 
+  for(int i = 0; i < n; ++i) {
+    // Cast the TObject* into a PrimaryChain*, and add to result
+    result.push_back((MAUS::DataStructure::Global::PrimaryChain*)
+                     _parent_primary_chains->At(i));
+  }
 }
 } // ~namespace Global
 } // ~namespace DataStructure

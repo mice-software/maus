@@ -70,19 +70,27 @@ class PrimaryChain : public TObject {
   /// standard copy method within a mapper.
   PrimaryChain* Clone() const;
 
-  // Methods for adding and removing tracks, while tracking the parents
+  // Methods for adding tracks, while tracking the parents
 
-  /// Add a MAUS::DataStructure::Global::Track, tracking the location of the
-  /// parent track.
-  /// @param[in] track  The track being added to the primary chain
+  /// Add a MAUS::DataStructure::Global::Track, tracking the location
+  /// of the parent track.
+  /// @param[in] track  The track being added to the primary chain. The
+  ///                   track pointed to by the pointer must be stored
+  ///                   elsewhere in the event.  We are only taking a
+  ///                   reference.
   /// @param[in] parent The track's parent.  We require parent to
-  ///                   already be a member of the primarychain.
+  ///                   already be a member of the
+  ///                   primarychain. Again, this is only storing a
+  ///                   reference, the data must be saved elsewhere.
   bool AddTrack(MAUS::DataStructure::Global::Track* track,
                 MAUS::DataStructure::Global::Track* parent);
 
   /// Add a primary MAUS::DataStructure::Global::Track, with the parent
   /// reference set to NULL.
-  /// @param[in] track  The track being added to the primary chain
+  /// @param[in] track  The track being added to the primary chain. The
+  ///                   track pointed to by the pointer must be stored
+  ///                   elsewhere in the event.  We are only taking a
+  ///                   reference.
   bool AddPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
   /// Checks whether track is stored in the chain.
@@ -94,6 +102,14 @@ class PrimaryChain : public TObject {
   /// Checks if a track is a primary track
   bool IsPrimaryTrack(MAUS::DataStructure::Global::Track* track);
 
+  /// Returns a vector of all of the tracks in this chain, for users
+  /// to examine.
+  std::vector<MAUS::DataStructure::Global::Track*> GetTracks();
+  
+  /// Returns a vector of all of the primary tracks in this chain, for
+  /// users to examine.
+  std::vector<MAUS::DataStructure::Global::Track*> GetPrimaryTracks();
+  
   /// Returns a track's parent, according to this primary chain
   MAUS::DataStructure::Global::Track* GetTrackParent(
       MAUS::DataStructure::Global::Track* track);
@@ -109,6 +125,9 @@ class PrimaryChain : public TObject {
   /// full algorithm flow.
   void AddParentChain(MAUS::DataStructure::Global::PrimaryChain* chain);
 
+  /// Get a vector of preceeding primary chains.
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetParentChains();
+
   // Getters and Setters for the member variables
   /// Set the name for the mapper which produced the result, #_mapper_name.
   void set_mapper_name(std::string mapper_name) {
@@ -119,13 +138,28 @@ class PrimaryChain : public TObject {
     return _mapper_name;
   }
 
-  /// Set the vector of track/parent references, #_track_parent_pairs
+  /// Set the vector of track/parent references, #_track_parent_pairs.
+  /// The PrimaryChain takes ownership of this vector and the
+  /// associated TRefTrackPairs.  This is mostly for the Json/Cpp
+  /// Processor, in general it would be better for users to use the
+  /// AddTrack and AddPrimaryTrack methods.
   void set_track_parent_pairs(
       std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
+    if(_tracks != NULL) {
+      // These TRefTrackPair's are unique to this PrimaryChain, and
+      // owned by it.  Delete them before we replace the vector.
+      for(size_t i = 0; i < _tracks->size(); ++i)
+        delete _tracks->at(i);
+      delete _tracks;
+    }
     _tracks = tracks;
   }
 
-  /// Get the vector of track/parent references, #_track_parent_pairs
+  /// Get the vector of track/parent references, #_track_parent_pairs.
+  /// Predominantly to be used by the Json/Cpp Processor.  Users are
+  /// encouraged to use the helpful GetTracks and GetPrimaryTracks
+  /// methods, then to use the GetTrackParent or GetTrackDaughters
+  /// methods.
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
   get_track_parent_pairs() const {
     return _tracks;
@@ -140,7 +174,9 @@ class PrimaryChain : public TObject {
     return _goodness_of_fit;
   }
 
-  /// Set the #_parent_primary_chains pointer array
+  /// Set the #_parent_primary_chains pointer array.  The PrimaryChain
+  /// takes ownership of this pointer.  This is mostly for the
+  /// Json/Cpp Processor, most users shoudl use AddParentChain.
   void set_parent_primary_chains(TRefArray* parent_primary_chains) {
     if(_parent_primary_chains != NULL) {
       delete _parent_primary_chains;
