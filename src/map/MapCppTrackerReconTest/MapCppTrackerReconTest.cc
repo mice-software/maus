@@ -219,6 +219,13 @@ std::string MapCppTrackerReconTest::process(std::string document) {
               // ================= Match Seed Spacepoints with SciFi Hits =====================
               int n_matched_sp_t1 = 0;
               int n_matched_sp_t2 = 0;
+	      int num_matched_spt_in_track0;
+	      int num_matched_spt_in_track1;
+	      // My added code to make sure we only record one spacepoint //
+	      // as matched for each spacepoint in //
+	      // Loop even if it is matched to multiple track points //
+	      num_matched_spt_in_track0 = 0;
+	      num_matched_spt_in_track1 = 0;
               // Loop over spacepoints in the track
               for ( unsigned int k = 0; k < trk->get_spacepoints().size(); ++k ) {
                 SciFiSpacePoint *sp = trk->get_spacepoints()[k];
@@ -245,11 +252,16 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                       ++n_matched_sp_t2;
                     }
                   }
-                }
+		}
+		if (n_matched_sp_t1>0) {
+		  num_matched_spt_in_track0++;}
+		if (n_matched_sp_t2>0) {
+		  num_matched_spt_in_track1++;}
               }  // ~Loop over spacepoints in the track
-              _of3 << n_matched_sp_t1 << "\t" << n_matched_sp_t2 << "\n";
-              n_matched_sp_evt_t1 += n_matched_sp_t1;
-              n_matched_sp_evt_t2 += n_matched_sp_t2;
+	      std::cout << "num matched 1: " << num_matched_spt_in_track1 << std::endl;
+              _of3 << num_matched_spt_in_track0 << "\t" << num_matched_spt_in_track1 << "\n";
+              n_matched_sp_evt_t1 += num_matched_spt_in_track0;
+              n_matched_sp_evt_t2 += num_matched_spt_in_track1;
             } // ~Loop over the helical tracks in the recon event
           } // ~if ( event->helicalprtracks().size() )
           print_event_info(*event);
