@@ -21,13 +21,13 @@
 #include <map>
 #include <string>
 
-#include "Rtypes.h"
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
 #include "src/common_cpp/DataStructure/Scalars.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/TestBranch.hh"
 
 namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;
@@ -127,6 +127,12 @@ class Spill {
   /** Get the errors on this spill */
   ErrorsMap GetErrors() const;
 
+  /** Test branch for testing porpoises only */
+  void SetTestBranch(TestBranch* test);
+
+  /** Test branch for testing porpoises only */
+  TestBranch* GetTestBranch() const;
+
  private:
   DAQData* _daq;
   Scalars* _scalars;
@@ -136,10 +142,10 @@ class Spill {
   int _spill_number;
   int _run_number;
   std::string _daq_event_type;
-
   std::map<std::string, std::string> _errors;
+  TestBranch* _test;
 
-  ClassDef(Spill, 1)
+  MAUS_VERSIONED_CLASS_DEF(Spill)
 };
 }
 

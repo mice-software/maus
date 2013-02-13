@@ -19,8 +19,10 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
+#include "src/common_cpp/Utils/VersionNumber.hh"
+
 namespace MAUS {
-typedef CLHEP::Hep3Vector ThreeVector;
+typedef ::CLHEP::Hep3Vector ThreeVector;
 }
 
 #endif

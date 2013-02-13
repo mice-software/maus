@@ -285,7 +285,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["ldc_id"]        = xLdc = this->GetLdcId();
 
   if (xLdc == 0)
-    xDetector = "single_station"; // 11/05/2012 - CTR hack to get things working in MLCR
+    xDetector = "single_station";
   if (xLdc == 2)
     xDetector = "tracker2";
   if (xLdc == 3)
@@ -308,7 +308,7 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
     xVLSB_CHit["adc"] = xAdc = xVLSBFragment->GetAdc(xWordCount);
     if (!_zero_suppression ||
         (_zero_suppression && xAdc > _zs_threshold) ) {
-      xVLSB_CHit["part_event_number"] = xPartEv = xVLSBFragment->GetEventNum(xWordCount);
+      xVLSB_CHit["part_event_number"] = xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
       xVLSB_CHit["channel"] = xVLSBFragment->GetChannel(xWordCount);
       xVLSB_CHit["tdc"] = xVLSBFragment->GetTdc(xWordCount);
       xVLSB_CHit["discriminator"] = xVLSBFragment->GetDiscriBit(xWordCount);
@@ -348,7 +348,7 @@ int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
   pBoardDoc["detector"]          = xDetector;
   pBoardDoc["equip_type"]        = this->GetEquipmentType();
   pBoardDoc["time_stamp"]        = this->GetTimeStamp();
-  pBoardDoc["phys_event_number"] = this->GetPhysEventNumber();
+  pBoardDoc["phys_event_number"] = this->GetPhysEventNumber()-1;
   pBoardDoc["geo"]               = xVLSB_CFragment->GetGeo();
 
   MDdataWordVLSB xDataWord;
@@ -360,7 +360,7 @@ int VLSB_CDataProcessor::Process(MDdataContainer* aFragPtr) {
       xVLSB_CHit["adc"] = xAdc = xDataWord.GetAdc();
       if ( !_zero_suppression ||
           (_zero_suppression && xAdc > _zs_threshold) ) {
-        xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum();
+        xVLSB_CHit["part_event_number"] = xPartEv = xDataWord.GetEventNum()-1;
         xVLSB_CHit["bank"] = iban;
         xVLSB_CHit["channel"] = xDataWord.GetChannel();
         xVLSB_CHit["tdc"] = xDataWord.GetTdc();
@@ -461,9 +461,12 @@ int fADCDataProcessor::get_area() {
 void fADCDataProcessor::set_pedestal() {
   double area = 0;
   unsigned int pedBins = 10;
+<<<<<<< TREE
   if (_data.size() < pedBins)
     _pedestal = 0;
 
+=======
+>>>>>>> MERGE-SOURCE
   if (_data.size() > pedBins) {
     for (unsigned int i = 0; i < pedBins; i++) {
        area += _data[i];
@@ -490,6 +493,7 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator min;
   int area = 0;
+<<<<<<< TREE
   if (_data.size()) {
     min = min_element(_data.begin(), _data.end());
     pos = distance(_data.begin(), min);
@@ -521,6 +525,17 @@ int fADCDataProcessor::get_signal_area(int& pos) {
 
     while (it < max+20) {
       area += abs(*it - _pedestal);
+=======
+
+  min = min_element(_data.begin(), _data.end());
+  pos = distance(_data.begin(), min);
+
+  if (pos > 15) { // was: pos > 10
+    it = min -  10;
+    while (it < min + 30 && it < _data.end()) {
+      // area += abs(*it - _pedestal);
+      area += _pedestal- *it;
+>>>>>>> MERGE-SOURCE
       it++;
     }
 

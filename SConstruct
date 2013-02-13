@@ -69,15 +69,16 @@ def setup_environment():
         maus_build_tools.environment_tools.set_lib(conf, env, lib)
     return _maus_root_dir, env
 
-def build_libraries(maus_root_dir, env):
+def build_libraries(maus_root_dir, env, skip_ds):
     """
     Build the maus libraries
 
     Build core libraries, cpp tests, python tests, python utilities, modules
     """
-    # build the data structure (separate library so we can port it to external
-    # deps)
-    maus_build_tools.core_builder.build_data_structure(env)
+    if not skip_ds:
+        # build the data structure (separate library so we can port it to
+        # external deps)
+        maus_build_tools.core_builder.build_data_structure(env)
     # build the maus cpp core library (libMausCpp.so)
     maus_build_tools.core_builder.build_lib_maus_cpp(env)
     # install the python tests (pure python, no build to do)
@@ -102,7 +103,8 @@ def main():
     if env_.GetOption('clean'):
         maus_build_tools.module_builder.cleanup_extras()
 
-    build_libraries(maus_root_dir_, env_)
+    skip_ds = ARGUMENTS.get('skip_ds', False) # pylint: disable=E0602
+    build_libraries(maus_root_dir_, env_, skip_ds)
 
 main()
 

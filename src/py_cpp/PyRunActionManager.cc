@@ -64,7 +64,7 @@ PyObject* StartOfRun(PyObject *dummy, PyObject *args) {
     RunHeader* run_header = new RunHeader();
     run_header->SetRunNumber(run_number);
     maus_run_action_manager->StartOfRun(run_header);
-    Json::Value* head_json = RunHeaderProcessor().CppToJson(*run_header);
+    Json::Value* head_json = RunHeaderProcessor().CppToJson(*run_header, "");
     Py_BuildValue("s", head_str.c_str());
     head_str = JsonWrapper::JsonToString(*head_json);
     delete head_json;
@@ -95,7 +95,7 @@ PyObject* EndOfRun(PyObject *dummy, PyObject *args) {
     RunFooter* run_footer = new RunFooter();
     run_footer->SetRunNumber(run_number);
     maus_run_action_manager->EndOfRun(run_footer);
-    Json::Value* foot_json = RunFooterProcessor().CppToJson(*run_footer);
+    Json::Value* foot_json = RunFooterProcessor().CppToJson(*run_footer, "");
     Py_BuildValue("s", foot_str.c_str());
     foot_str = JsonWrapper::JsonToString(*foot_json);
     delete foot_json;

@@ -51,6 +51,8 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
+        # test branch makes segmentation fault... from ROOT side
+        # spill.SetTestBranch(ROOT.MAUS.TestBranch()) # pylint: disable = E1101
         spill.SetSpillNumber(1)
         spill.SetRunNumber(10)
         data.SetSpill(spill)

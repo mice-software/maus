@@ -1,0 +1,15 @@
+// FILES/Models/Modules/Absorber/Cylinder_90.dat
+//
+// LiH cylinder acting as a base volume for the 90 degree wedge absorber
+//
+// created by P. Snopok on August 20, 2012
+// 
+// NB: cylinder length can be anything longer than the wedge length of 2 x 197.7 mm
+
+Module Cylinder_90
+{
+  Volume Cylinder
+  Dimensions 160. 400. mm
+  PropertyString Material    LITHIUM_HYDRIDE
+  PropertyDouble BlueColour  0.5
+}

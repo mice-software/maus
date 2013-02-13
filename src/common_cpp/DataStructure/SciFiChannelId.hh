@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICHANNELID_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICHANNELID_HH_
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -38,10 +38,10 @@ class SciFiChannelId {
     virtual ~SciFiChannelId();
 
     /** Get index of the fibre that was hit */
-    int GetFiberNumber() const;
+    int GetFibreNumber() const;
 
     /** Set index of the fibre that was hit */
-    void SetFiberNumber(int fiber);
+    void SetFibreNumber(int fibre);
 
     /** Get the station number (3-plane view) */
     int GetStationNumber() const;
@@ -61,13 +61,21 @@ class SciFiChannelId {
     /** Set the plane number */
     void SetPlaneNumber(int plane);
 
+    /** Get the used flag */
+    bool GetUsed() const;
+
+    /** Set the plane number */
+    void SetUsed(bool used);
+
   private:
-    int _fiber;
+    int _fibre;
     int _station;
     int _tracker;
     int _plane;
 
-    ClassDef(SciFiChannelId, 1)
+    bool _used;
+
+    MAUS_VERSIONED_CLASS_DEF(SciFiChannelId)
 };
 }
 

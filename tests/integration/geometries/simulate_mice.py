@@ -32,10 +32,8 @@ def run(number_of_spills):#pylint: disable =W0621
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    #TOF detector digitization
-    my_map.append(MAUS.MapCppTOFDigitization())#pylint: disable=E1101
-    #  tracker detector digitization
-    my_map.append(MAUS.MapCppTrackerMCDigitization())
+    my_map.append(MAUS.MapCppTOFMCDigitizer())  #  TOF detector digitization
+    my_map.append(MAUS.MapCppTrackerMCDigitization())  #  tracker detector digitization
     
     datacards = io.StringIO(u"keep_tracks = False\n"\
                             "simulation_geometry_filename = \"Stage5.dat\"")

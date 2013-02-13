@@ -53,9 +53,10 @@ else
     echo
 fi
 
+uname -a 2>>$FILE_STD 1>>$FILE_STD 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure $MAUS_THIRD_PARTY >& $FILE_STD
+	./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD 
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
 else
@@ -75,10 +76,25 @@ scons -c 2>>$FILE_STD 1>>$FILE_STD
 echo "Building MAUS"
 (scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
-  echo "FAIL Failed to make MAUS using scons - exiting (check the log file)"
-  exit 1
+    cat ${MAUS_ROOT_DIR}/install_log_std
+    echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"
+    exit 1
 fi
 
 echo "Run the tests"
-(./tests/run_tests.bash || (echo "FAIL!  See logs." && exit 1)) 2>>$FILE_STD 1>>$FILE_STD
+bash ${MAUS_ROOT_DIR}/tests/unit_tests.bash  2>>$FILE_STD 1>>$FILE_STD
+if [ $? != 0 ]
+then
+    cat ${MAUS_ROOT_DIR}/install_log_std
+    echo "FAIL Failed unit tests. Fatal error - aborting"
+    exit 1
+fi
+
+bash ${MAUS_ROOT_DIR}/tests/style_tests.bash
+if [ $? != 0 ]
+then
+    cat ${MAUS_ROOT_DIR}/install_log_std
+    echo "FAIL Failed style tests"
+    exit 1
+fi
 

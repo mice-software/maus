@@ -25,7 +25,7 @@ namespace MAUS {
 Json::Value* CppJsonRunFooterConverter::_convert(const RunFooterData* data) const {
   if (data == NULL || data->GetRunFooter() == NULL)
       return new Json::Value();
-  Json::Value* my_json = RunFooterProcessor().CppToJson(*data->GetRunFooter());
+  Json::Value* my_json = RunFooterProcessor().CppToJson(*data->GetRunFooter(), "");
   return my_json;
 }
 }

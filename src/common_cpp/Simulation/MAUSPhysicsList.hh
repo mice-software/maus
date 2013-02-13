@@ -82,10 +82,12 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
      */
     void BeginOfRunAction();
 
-    /** Construct the process table and add any MAUS specific processes 
+    /** Construct the process table (wraps _list); add MAUS specific processes 
      */
     void ConstructProcess();
 
+    /** Construct the particle table (wraps _list) 
+     */
     void ConstructParticle();
 
     /** Does nothing - included to overload pure virtual base class function

@@ -24,6 +24,7 @@
 
 #include "gtest/gtest.h"
 
+#include "Interface/Squeal.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "Maths/Vector.hh"
 

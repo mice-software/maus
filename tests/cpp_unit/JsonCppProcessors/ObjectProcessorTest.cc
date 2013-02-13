@@ -206,7 +206,7 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
 
 TEST_F(ObjectProcessorTest, CppToJsonRequiredTest) {
   // Check allocates values okay
-  Json::Value* json_value = req_proc.CppToJson(test);
+  Json::Value* json_value = req_proc.CppToJson(test, "");
   EXPECT_EQ((*json_value)["branch_a"], test.GetA());
   EXPECT_EQ((*json_value)["branch_b"], *(test.GetB()));
   EXPECT_EQ((*json_value)["branch_c"], Json::Value("const"));
@@ -214,12 +214,12 @@ TEST_F(ObjectProcessorTest, CppToJsonRequiredTest) {
 
   // Check throw on NULL
   test.SetB(NULL);
-  EXPECT_THROW(req_proc.CppToJson(test), Squeal);
+  EXPECT_THROW(req_proc.CppToJson(test, ""), Squeal);
 }
 
 TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
   // Check allocates values okay
-  Json::Value* json_value = not_req_proc.CppToJson(test);
+  Json::Value* json_value = not_req_proc.CppToJson(test, "");
   EXPECT_EQ((*json_value)["branch_a"].asDouble(), test.GetA());
   EXPECT_EQ((*json_value)["branch_b"].asDouble(), *(test.GetB()));
   EXPECT_EQ((*json_value)["branch_c"], Json::Value("const"));
@@ -227,9 +227,20 @@ TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {
 
   // Check that branch_b is not allocated
   test.SetB(NULL);
-  json_value = not_req_proc.CppToJson(test);
+  json_value = not_req_proc.CppToJson(test, "");
   EXPECT_FALSE(json_value->isMember("branch_b"));
   delete json_value;
+}
+
+TEST_F(ObjectProcessorTest, PathTest) {
+  Json::Value* json_value = req_proc.CppToJson(test, "#path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)), "#path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_a"]),
+            "#path/branch_a");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_b"]),
+            "#path/branch_b");
+  EXPECT_EQ(JsonWrapper::Path::GetPath((*json_value)["branch_c"]),
+            "#path/branch_c");
 }
 }
 

@@ -17,11 +17,21 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 
-#include "Rtypes.h"  // ROOT
+// C++ headers
+#include <vector>
+
+// MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
 namespace MAUS {
 
-/** @class SciFiEvent comment
+
+/** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
  */
 
@@ -33,18 +43,72 @@ class SciFiEvent {
     /** Copy constructor - any pointers are deep copied */
     SciFiEvent(const SciFiEvent& _scifievent);
 
-    /** Equality operator - any pointers are deep copied */
+    /** Assignment operator - any pointers are deep copied */
     SciFiEvent& operator=(const SciFiEvent& _scifievent);
 
     /** Destructor - any member pointers are deleted */
     virtual ~SciFiEvent();
 
+    /** Digits */
+    void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
+    void set_digits(SciFiDigitPArray scifidigits) { _scifidigits = scifidigits; }
+    SciFiDigitPArray digits() const { return _scifidigits; }
+
+    /** Clusters */
+    void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
+    void set_clusters(SciFiClusterPArray scificlusters) { _scificlusters = scificlusters; }
+    SciFiClusterPArray clusters() const { return _scificlusters; }
+
+    /** Spacepoints */
+    void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
+    void set_spacepoints(SciFiSpacePointPArray scifispacepoints) {
+                        _scifispacepoints = scifispacepoints; }
+    SciFiSpacePointPArray spacepoints() const { return _scifispacepoints; }
+    void set_spacepoints_used_flag(bool flag);
+
+    /** Seeds */
+    void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
+    SciFiSpacePointPArray seeds() const { return _scifiseeds; }
+
+    /** Straight Pattern Recognition tracks */
+    void add_straightprtrack(SciFiStraightPRTrack track) {
+                             _scifistraightprtracks.push_back(track); }
+    void set_straightprtrack(SciFiStraightPRTrackArray tracks) { _scifistraightprtracks = tracks; }
+    SciFiStraightPRTrackArray straightprtracks() const { return _scifistraightprtracks; }
+
+    /** Helical Pattern Recognition tracks */
+    void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
+    void set_helicalprtrack(SciFiHelicalPRTrackArray tracks) { _scifihelicalprtracks = tracks; }
+    SciFiHelicalPRTrackArray helicalprtracks() const { return _scifihelicalprtracks; }
+
 
   private:
 
-    ClassDef(SciFiEvent, 1)
+    /** Digits in an event */
+    SciFiDigitPArray                    _scifidigits;
+
+    /** Clusters in an event */
+    SciFiClusterPArray                  _scificlusters;
+
+    /** SpacePoints in an event */
+    SciFiSpacePointPArray               _scifispacepoints;
+
+    /** Seeds for track fitting */
+    SciFiSpacePointPArray               _scifiseeds;
+
+    /** Straight tracks */
+    SciFiStraightPRTrackArray           _scifistraightprtracks;
+
+    /** Helical tracks */
+    SciFiHelicalPRTrackArray            _scifihelicalprtracks;
+
+    MAUS_VERSIONED_CLASS_DEF(SciFiEvent)
 };
-}
+
+typedef std::vector<SciFiEvent*> SciFiEventPArray;
+typedef std::vector<SciFiEvent> SciFiEventArray;
+
+} // ~namespace MAUS
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIEVENT_
 

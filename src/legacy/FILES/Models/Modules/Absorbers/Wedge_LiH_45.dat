@@ -1,0 +1,32 @@
+// FILES/Models/Modules/Absorbers/Wedge_LiH_45.dat
+//
+// The Lithium Hydride half-wedge formed by intersecting
+// the cylindrical base volume with the triangular Prism 
+// and another Cylinder that is offset in z
+//
+// created by P. Snopok on August 20, 2012
+// 
+// NB: keep "SensitiveDetector" on to ensure the geometry is right.
+
+
+Module Wedge_LiH_45
+{
+  Volume         Boolean
+  Dimensions     0 0 mm
+
+  PropertyDouble     BlueColour         0.5
+  PropertyString     Material           LITHIUM_HYDRIDE
+  PropertyString     BaseModule         Absorbers/Cylinder.dat
+ 
+  PropertyString     BooleanModule1     Absorbers/Prism.dat
+  PropertyString     BooleanModule1Type Intersection
+  PropertyHep3Vector BooleanModule1Pos  0.0 -84.6 0.0 mm
+  PropertyHep3Vector BooleanModule1Rot  90. 0. 0. degree
+
+  PropertyString     BooleanModule2     Absorbers/Cylinder.dat
+  PropertyString     BooleanModule2Type Intersection
+  PropertyHep3Vector BooleanModule2Pos  0.0 0.0 -200.0 mm
+  PropertyHep3Vector BooleanModule2Rot  0. 0. 0. degree
+ 
+  PropertyString     SensitiveDetector  SpecialVirtual
+}

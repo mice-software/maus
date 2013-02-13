@@ -16,6 +16,7 @@
 """
 Tools to build core library (libMausCpp) and core library unit tests
 """
+# pylint: disable=W0141
 
 import os
 import glob
@@ -33,10 +34,9 @@ def install_python_tests(maus_root_dir, env):
     into build/, preserving directory structure below tests/py_unit. Also 
     installs files tests/style/*.py into build/ 
     """
-    style = "%s/tests/style/" % maus_root_dir
     target = "%s/tests/py_unit/" % maus_root_dir
     build  = "%s/build/" % maus_root_dir
-    files = glob.glob(target+'test_*.py')+glob.glob(style+'*.py')
+    files = glob.glob(target+'test_*.py')
     env.Install(build, files)
 
     test_subdirs = glob.glob(target+"*")
@@ -132,7 +132,8 @@ def build_cpp_tests(env, module_list):
         env.Append(LINKFLAGS=['-undefined', 'suppress','-flat_namespace'])
 
     test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
-        glob.glob("tests/cpp_unit/*cc")
+                     glob.glob("tests/cpp_unit/*cc")+\
+                     glob.glob("tests/cpp_unit/*/*/*cc")
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
@@ -162,8 +163,7 @@ def build_data_structure(env):
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
-    data_items = filter(lambda x: x[-7:] != '-inl.hh',#pylint:disable=W0141
-                        data_items)
+    data_items = filter(lambda x: x[-7:] != '-inl.hh', data_items)
     dict_target = (data_struct+'/MausDataStructure.cc')
     proc_target = ['rootcint']+['-f', dict_target, '-c']
     for include in env['CPPPATH']:

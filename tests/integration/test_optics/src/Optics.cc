@@ -19,6 +19,7 @@
 #include "src/legacy/Interface/SpecialHit.hh"
 #include "src/legacy/Interface/MiceEventManager.hh"
 #include "src/legacy/Optics/TransferMap.hh"
+#include "src/legacy/Config/MiceModule.hh"
 #include "Maths/Complex.hh"
 
 using MAUS::Matrix;
@@ -97,11 +98,11 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["field_tracker_absolute_error"] = 1.e-4;
   json_config["field_tracker_relative_error"] = 1.e-4;
 
-
   std::string str_config = JsonWrapper::JsonToString(json_config);
   MAUS::GlobalsManager::InitialiseGlobals(str_config);
   g4Manager = MAUS::Globals::GetInstance()->GetGeant4Manager();
   MAUS::GlobalsManager::SetLegacyCards(&MyDataCards);
+  Squeak::setStandardOutputs(json_config["verbose_level"].asInt());
   return MAUS::Globals::GetMonteCarloMiceModules();
 }
 
@@ -159,8 +160,8 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   if(env_type == "Simple" || env_type == "TrackingDerivative")
   {
     Squeak::mout(Squeak::info) << "Finding TrackingDerivative envelope functions" << std::endl;
-    std::vector< ::PhaseSpaceVector> hits = BuildHitsIn(g_mean, delta);
-    tm_out = TrackingDerivativeTransferMaps(hits, false, true);
+    std::vector< ::PhaseSpaceVector> hitsIn = BuildHitsIn(g_mean, delta);
+    tm_out = TrackingDerivativeTransferMaps(hitsIn, false, true);
     Squeak::mout(Squeak::debug) << "TM_OUT SIZE " << tm_out.size() << std::endl;
   }
   else if(env_type == "PolyFit")
@@ -281,11 +282,14 @@ std::vector< ::TransferMap*>      TrackingDerivativeTransferMaps(std::vector< ::
 {
   if (rephaseCavities) Simulation::PhaseCavities(hitsIn[0]);
   g_hitsIn = hitsIn;
-  g_hits   = std::map<Optics::StationId, std::vector< ::PhaseSpaceVector> >();
+  g_hits.clear();
 
   std::vector< ::PhaseSpaceVector> psvByEvent;
 
   std::map< StationId,   std::vector< ::PhaseSpaceVector> > hits;
+
+  // Iterate over all particles at the start plane, simulate them through MICE,
+  // and map each hit the simulation generates to the station that recorded it.
   for(unsigned int j=0; j<hitsIn.size() && (!referenceOnly || j==0); j++)
   {
     MICEEvent* event = Simulation::RunSimulation(hitsIn[j]);
@@ -294,43 +298,73 @@ std::vector< ::TransferMap*>      TrackingDerivativeTransferMaps(std::vector< ::
     event->virtualHits    = std::vector<VirtualHit*>();
     event->zustandVektors = std::vector<ZustandVektor*>();
   }
-  int order = 2;
+  int order = 1;
   if(referenceOnly) order = 0;
+
+  // Create transfer maps between 
   return MakePolyfitMaps(hitsIn, g_hits, order);
 }
 
 std::vector< ::TransferMap*>      PolynomialFitTransferMaps(::PhaseSpaceVector reference, const MiceModule* root)
 {
-  //Algorithm
-  //First do any set up like phasing cavities etc
-  //Then look for the fit station
-  //Make StationId for that station, set it to TrackingFunctionStationId
-  //Make TrackingFunction as a Function type
-  //Run SweepingLeastSquaresFit to define map at z (where PolynomialVector calls TrackingFunction.F())
+  // Do any set up like phasing cavities etc.
+  Simulation::PhaseCavities(reference);
+
+  // Look for the fit station and make a StationId for that station.
+  // Set it as the tracking function station ID.
+  SetPolyFitModule(root);
+
+  //Setup the tracking function.
+  Function trackingFunction(PolyFitFunction, 6, 6);
+
+  //Run SweepingLeastSquaresFit to define map at z (where PolynomialVector calls trackingFunction.F())
+  DoPolyfit(trackingFunction, *(root->findModulesByPropertyExists("string", "EnvelopeType")[0]));
+
   //Run LeastSquaresFit to define maps at all other z points
   //Return maps
-  Simulation::PhaseCavities(reference);
-  SetPolyFitModule(root);
-  Function trackingFunction(PolyFitFunction, 6, 6);
-  DoPolyfit(trackingFunction, *(root->findModulesByPropertyExists("string", "EnvelopeType")[0]));
-  return MakePolyfitMaps(g_hitsIn, g_hits,  root->findModulesByPropertyExists("string", "EnvelopeType")[0]->propertyInt("PolynomialOrder")+1 );
+  return MakePolyfitMaps(g_hitsIn, g_hits,  root->findModulesByPropertyExists("string", "EnvelopeType")[0]->propertyInt("PolynomialOrder") );
 }
 
-std::vector< ::TransferMap*> MakePolyfitMaps(std::vector< ::PhaseSpaceVector> hitsIn, std::map<StationId, std::vector< ::PhaseSpaceVector> > hits, int order)
-{
-  typedef std::map< StationId, std::vector< ::PhaseSpaceVector> >::iterator vec_it;
+std::vector< ::TransferMap*> MakePolyfitMaps(
+    std::vector< ::PhaseSpaceVector>                        hitsIn,
+    std::map<StationId, std::vector< ::PhaseSpaceVector> >  hits,
+    int                                                     order) {
+  typedef std::map<StationId,std::vector< ::PhaseSpaceVector> >::iterator vec_it;
   std::vector< ::TransferMap*> maps;
-  for(vec_it it = hits.begin(); it!=hits.end(); it++) {
-    if( it->second.size() != hitsIn.size() && order > 0)
-      Squeak::mout(Squeak::warning) << "Warning - derivatives may be screwy. I only got " << it->second.size() << " hits in station " << it->first << std::endl;
-    else {
+
+  // Iterate over each station.
+  for(vec_it it = hits.begin(); it!=hits.end(); ++it) {
+    // Each station should have the same number of hits as there were particles
+    // at the start plane.
+    if( it->second.size() != hitsIn.size() && order > 0) {
+      Squeak::mout(Squeak::warning) << "Warning - derivatives may be screwy. "
+                                    << "I only got " << it->second.size()
+                                    << " hits in station "
+                                    << it->first << std::endl;
+    } else {
       try { 
-        if(order == 0) maps.push_back( new ::TransferMap( ::CLHEP::HepMatrix(6,6,1), hitsIn[0], it->second[0], NULL) );
-        else           maps.push_back( new ::TransferMap( TransferMapCalculator::GetPolynomialTransferMap(hitsIn, it->second, order ) ) );
+        // Calculate a transfer map between the start plane hits (hitsIn) and
+        // the hits at the station (hits). 
+        if(order == 0) {
+          maps.push_back(new ::TransferMap(::CLHEP::HepMatrix(6,6,1),
+                                           hitsIn[0],
+                                           it->second[0], NULL) );
+        } else {
+          maps.push_back(new ::TransferMap(
+            TransferMapCalculator::GetPolynomialTransferMap(hitsIn,
+                                                            it->second,
+                                                            order)));
+        }
+
+        // Add a mapping between the station and the transfer map that links the
+        // start plane and that station.
         AddStationToMapping(it->first, maps.back());
-      }
-      catch(Squeal squee) {
-        Squeak::mout(Squeak::warning) << "Failed to find " << order << " order transfer map for plane " << it->first << " from " << it->second.size() << " hits" << std::endl;
+      } catch(Squeal squee) {
+        Squeak::mout(Squeak::warning) << "Failed to find " << order
+                                      << " order transfer map for plane "
+                                      << it->first << " from "
+                                      << it->second.size() << " hits"
+                                      << std::endl;
       }
     }
   }
@@ -343,7 +377,7 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
 {
   ::CLHEP::HepVector delta    = GetDelta(&mod);
   ::CLHEP::HepVector deltaMax = GetDeltaMax(&mod);
-  int    order            = mod.propertyIntThis   ("PolynomialOrder")+1;
+  int    order            = mod.propertyIntThis   ("PolynomialOrder");
   int    maxNumberOfSteps = 100;
   double chi2Max          = mod.propertyDoubleThis("Tolerance");
   double deltaFactor      = 2.;
@@ -378,6 +412,8 @@ void PolyFitFunction(const double* psv_in, double* psv_out)
   for(int i=0; i<vecOut.num_row(); i++) psv_out[i] = vecOut[i] - g_mean.getSixVector()[i];
 }
 
+/* @brief 
+ */
 void SetPolyFitModule(const MiceModule* root)
 {
   bool                           foundModule = false;
@@ -407,11 +443,17 @@ StationId::StationId(VirtualHit hit) :   _type(virt), _station_number(hit.GetSta
 StationId::StationId(SpecialHit hit) :   _type(special), _station_number(hit.GetStationNo())
 {}
 
-StationId::StationId(const MiceModule& mod) throw(Squeal)       :   _type(virt), _station_number(MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()->GetStationNumberFromModule(&mod ))
+StationId::StationId(const MiceModule& mod) throw(Squeal)
+    : _type(virt),
+      _station_number(MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()
+                      ->GetStationNumberFromModule(&mod ))
 {
   std::string sd = mod.propertyStringThis("SensitiveDetector");
   if(sd!="Envelope") 
-    throw(Squeal(Squeal::recoverable, "Attempt to make a StationId when SensitiveDetector was "+sd+" - should be Envelope", "Optics::StationId()"));
+    throw(Squeal(Squeal::recoverable,
+                 "Attempt to make a StationId when SensitiveDetector was "
+                 + sd + " - should be Envelope",
+                 "Optics::StationId()"));
 }
 
 bool          operator < (const StationId& id1, const StationId& id2)
@@ -847,7 +889,7 @@ namespace Optimiser
   {
     f = 0;
     for(int i=0; i<npar; i++) g_parameters[i]->value = x[i];
-    PushParameters(g_root_mod, g_parameters);
+    PushParameters(g_parameters);
     if(g_rebuild_simulation)
     {
       Squeak::mout(Squeak::debug) << "Rebuilding fields" << std::endl;
@@ -878,15 +920,13 @@ namespace Optimiser
   }
 
   //Recursively push parameters onto the MiceModules
-  void PushParameters(MiceModule* mod, std::vector<Parameter*> parameters)
+  void PushParameters(std::vector<Parameter*> parameters)
   {
-    std::vector<MiceModule*> daughters = mod->allDaughters();
-    for(int i=0; i<int(daughters.size()); i++)
-    {
-      for(int j=0; j<int(parameters.size()); j++) 
-        daughters[i]->addParameter(parameters[j]->name, parameters[j]->value);
-      PushParameters(daughters[i], parameters);
+    std::map<std::string, double> parameter_map;
+    for(int j=0; j<int(parameters.size()); j++) {
+        parameter_map[parameters[j]->name] = parameters[j]->value;
     }
+    ModuleTextFileIO::setEvaluator(parameter_map);
   }
 
   //Calculate scores based on optics output
@@ -968,25 +1008,24 @@ int main(int argc, char **argv)
   Squeak::mout() << "||   Optics   ||" << std::endl;
   Squeak::mout() << "\\\\============//" << std::endl;
   Squeak::mout() << "Parsing control files" << std::endl;
-  MiceModule* root   = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
+  MiceModule* root = new MiceModule(MyDataCards.fetchValueString("MiceModel"));
   std::vector<MiceModule*> optim = root->findModulesByPropertyExistsNC("string", "Optimiser");
   if(optim.size()>0)
-  {
     Optimiser::g_parameters = Optimiser::BuildParameters(optim[0]);
-    Optimiser::PushParameters(root, Optimiser::g_parameters);
-  }
+  Optimiser::PushParameters(Optimiser::g_parameters);
+  delete root;
   Squeak::mout(Squeak::info) << "Building geometry" << std::endl;
-
+  MiceModule* mc = Simulation::SetupSimulation(std::vector< ::CovarianceMatrix>());
   //Try to run the optimiser
   Squeak::mout(Squeak::info) << "Looking for optimisation requests" << std::endl;
-  Optimiser::RunOptimiser(root);
+  Optimiser::RunOptimiser(mc);
   //Run an envelope through
   Squeak::mout(Squeak::info) << "Running beam envelope through" << std::endl;
   std::vector< ::CovarianceMatrix>  envelope;
   std::vector< ::TransferMap*>      tms;
-  Optics::Envelope(root, envelope, tms);
+  Optics::Envelope(mc, envelope, tms);
   //Write output
-  Output::MakeOutput(envelope, tms, root->findModulesByPropertyExists("string", "EnvelopeType")[0]);
+  Output::MakeOutput(envelope, tms, mc->findModulesByPropertyExists("string", "EnvelopeType")[0]);
   
 
   for(int i=0; i<int(tms.size()); i++) delete tms[i];

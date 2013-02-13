@@ -119,11 +119,13 @@ G4VPhysicalVolume* MICEDetectorConstruction::Construct()
 
   setBTMagneticField( _model );
   // turn on cout if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(0);
+  bool cout_alive = Squeak::coutIsActive();
+  if(_checkVolumes && !cout_alive)
+      Squeak::activateCout(true);
   for( int i = 0; i < _model->daughters(); ++i )
     addDaughter( _model->daughter( i ), MICEExpHall );
   // turn cout back to default mode if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(-1);
+  Squeak::activateCout(cout_alive);
   return MICEExpHall;
 }
 
@@ -177,7 +179,10 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
   {
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
     logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
-    place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
+    // who owns memory allocated to rot? This is making a bug... not defined in
+    // G4 docs
+    G4RotationMatrix * rot = new G4RotationMatrix(mod->rotation());
+    place = new G4PVPlacement(rot, mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
     Squeak::errorLevel my_err = Squeak::debug;
     if(mod->mother()->isRoot()) my_err = Squeak::info;
     Squeak::mout(my_err) << "Placing " << mod->name() << " of type " 
@@ -330,6 +335,9 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
     fieldMgr->SetDetectorField(_miceElectroMagneticField);
     fEquationE = new G4EqMagElectricField(_miceElectroMagneticField);
   }
+  std::string mag_only = "stepping_algorithm '"+stepperType+
+      "' for magnets only - called when RF was present";
+
 
   //Scan through the list of steppers
   if(stepperType == "Classic" || stepperType=="ClassicalRK4")
@@ -362,43 +370,13 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
     if(!_btField->HasRF()) pStepper = new G4CashKarpRKF45(fEquationM);
     else                   pStepper = new G4CashKarpRKF45(fEquationE, 8);
   }
-  else if(stepperType == "HelixImplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixImplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixHeum")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixHeum(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixSimpleRunge")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixSimpleRunge(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixExplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixExplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
+  else throw(Squeal(Squeal::recoverable,
+                    "stepping_algorithm '"+stepperType+"' not found",
+                    "MICEDetectorConstruction::setSteppingAlgorithm()"));
 
-  if(pStepper == NULL)
-  {
-    std::cerr << "Stepper not found - using ClassicalRK4" << std::endl;
-    if(!_btField->HasRF()) pStepper = new G4ClassicalRK4(fEquationM);
-    else                   pStepper = new G4ClassicalRK4(fEquationE, 8);
-  }
-
-  if(!_btField->HasRF())
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-  else
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-
+  pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1*mm, pStepper);
   fieldMgr->SetChordFinder(pChordFinder);
-
 }
-
 
 //Set G4 Stepping Accuracy parameters
 void MICEDetectorConstruction::setSteppingAccuracy()

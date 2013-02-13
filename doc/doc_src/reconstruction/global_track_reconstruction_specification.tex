@@ -6,7 +6,7 @@
 \usepackage{wrapfig}
 \usepackage{graphicx}
 \usepackage{verbatim}
-\usepackage[version=3]{mhchem}
+%\usepackage[version=3]{mhchem}
 \usepackage{ifthen}
 
 \setlength{\headheight}{52pt}
@@ -52,7 +52,7 @@
 
 \newcommand{\spinup}
 {
-	\begin{pmatrix} 
+	\begin{pmatrix} pdftex
 		1 \\
 		0
 	\end{pmatrix}
@@ -389,9 +389,17 @@ The fundamental algorithm that is proposed for track reconstruction is to take i
 \renewcommand{\labelitemi}{$\bullet$}
    \item An algorithm that propagates the tracks and associated error matrix between detectors
    \item A minimisation routine that minimises the errors given the tracks
- \end{itemize}
+\end{itemize}
 
 Several different algorithms can be foreseen; one task of the Global Reconstruction is to determine a framework in which different algorithms can be implemented without major infrastructure changes.\\
+
+\subsection{Detector Outputs}
+
+\subsubsection{TOF}
+\subsubsection{Cerenkov}
+\subsubsection{Scintillating Fiber Tracker}
+\subsubsection{Calorimeter (KL)}
+\subsubsection{Electron/Muon Ranger (EMR)}
 
 \subsection{Track and Error Propagation}
 
@@ -445,15 +453,17 @@ Minuit is the algorithm, packaged with ROOT, that allows for solving of fairly g
 
 The Kalman filter technique may be a more optimal solution. This algorithm has been proposed for use by the tracker group.\\
 
-The Kalman filter would work in the context of track reconstruction by predicting subsequent particle event coordinates and calculating a weighted average between the prediction and the actual measurement from the detector. The transfer matrix is given, and the last weighted average is propagated back through the lattice to produce a final trajectory.\emph{Is this last part right?}
+The Kalman filter would work in the context of track reconstruction by predicting subsequent particle event coordinates and calculating a weighted average between the prediction and the actual measurement from the detector. The transfer matrix is given, and the last weighted average is propagated back through the lattice to produce a final track.\emph{Is this last part right?}
 
 \subsubsection{TOF Iteration (\emph{Better Name?})}
 
 The TOF iteration takes advantage of the fact that the TOFs reconstruct longitudinal phase space quite accurately, and that longitudinal phase space is approximately independent of longitudinal phase space (cf Mark Rayner thesis). The TOF iteration
-1. reconstructs momentum from measured time of flight
-2. generates a transfer matrix for this momentum
-3. uses the generated transfer matrix to calculate transverse phase space parameters
-4. recalculates momentum using transverse phase space parameters
+\begin{enumerate}
+  \item reconstructs momentum from measured time of flight
+  \item generates a transfer matrix for this momentum
+  \item uses the generated transfer matrix to calculate transverse phase space parameters
+  \item recalculates momentum using transverse phase space parameters
+\end{enumerate}
 
 \subsubsection{Other Minimisation Techniques}
 
@@ -482,12 +492,15 @@ It may also be possible to use mass as a free parameter in the track finding. Th
 
 \section{Class Hierarchy}
 
-Figure 1.1 shows the proposed, main class hierarchy for track reconstruction. The two interfaces TransferMap and TrackFitter provide the required implementation flexibility which is detailed in figure 1.2. The particular track fitting algorithm can be specified in the configuration file and the appropriate class instance will be instantiated.
+Figure 1.1 shows the proposed, main class hierarchy for track reconstruction.
+The interfaces OpticsModel, TransferMap, and TrackFitter provide the
+required implementation flexibility which is detailed in figure 1.2. The
+particular optics model and track fitting algorithm can be specified in the configuration file. The appropriate class instances will then be instantiated.
 
 \begin{figure}
 \centering
 \hspace*{\fill}
-\includegraphics[width=180mm]{class_hierarchy_main.png}
+\includegraphics[width=180mm]{class_hierarchy_main}
 \hspace*{\fill}
 \caption{Main track reconstruction class hierarchy} \label{fig:mult1}
 \end{figure}
@@ -495,16 +508,72 @@ Figure 1.1 shows the proposed, main class hierarchy for track reconstruction. Th
 \begin{figure}
 \centering
 \hspace*{\fill}
-\includegraphics[width=180mm]{class_hierarchy_interfaces.png}
+\includegraphics[width=180mm]{class_hierarchy_interfaces}
 \hspace*{\fill}
 \caption{Track reconstruction interface details} \label{fig:mult1}
 \end{figure}
+
+\subsection{Input Data Structure}
+
+The inputs to reconstruction are embodied in the ReconstructionInput class. This
+will likely be constructed by the reconstruction map component from seperate
+data structures supplied by the various detectors. The following abstract
+description of this class is a guide for the detector groups in order that they
+may include all of the required information in their output data structures.\\
+\\
+An instance of the reconstruction input data structure requires three pieces of
+information:
+\begin{enumerate}
+  \item a flag indicating the polarity of the particle beam,
+  \item a list of detector information data structures, and
+  \item a list of track point data structures.
+\end{enumerate}
+
+Each instance of the detector information data structure is comprised of
+\begin{enumerate}
+  \item a unique detector ID in the form of an \emph{unsigned integer greater than zero},
+  \item a distance along the beam axis where the center of the detector lies, and
+  \item a matrix of covariances indicating the uncertainties of the detector.
+\end{enumerate}
+
+The items of the track point data structure that are used for inputs into
+reconstruction are
+\begin{enumerate}
+  \item the 6D phase space coordinates of the track point $(t, E, x, Px, y, Py)$, and
+  \item the ID of the detector which produced the track point.
+\end{enumerate}
+This data structure also contains the z and Pz coordinates as well an
+uncertainty matrix. The z and Pz coordinates are filled in automatically and are
+provided as an output of reconstruction. For measured track points the
+uncertainty matrix is filled in using the one given for the detector where
+the track point was produced.
+
+\subsection{Output Data Structure}
+
+The outputs of reconstruction are a list of track data structures.
+Each track contains
+\begin{enumerate}
+  \item the PDG particle ID for the type of particle associated with the track, and
+  \item a list of track pont data structures that comprise the discrete track.
+\end{enumerate}
+
+Each track point data structure contains the following items:
+\begin{enumerate}
+  \item the 6D phase space coordinates of the track point $(t, E, x, Px, y, Py)$,
+  \item the calculated z and Pz coordinates,
+  \item the uncertainties on the phase space coordinates in the form of a
+        covariance matrix.
+  \item the ID of the detector which produced the track point, or zero if this track point was 
+        calculated during reconstruction.
+\end{enumerate}
 
 \section{Task Breakdown}
 
 \subsection{Data Structures}
 
-Define input and output data structures. It is crucial to get this flushed out early on so that the detector groups know what is needed. Referring to the class diagram, this would involve implementing PhaseSpaceVector (exists already), ParticleTrack, DetectorEvent, and ParticleTrajectory.
+Define input and output data structures. It is crucial to get this flushed out early on so that the detector groups know what is needed. Referring to the class diagram, this would involve implementing PhaseSpaceVector (exists already), TrackPoint, Detector,
+and ReconstructionInput for the inputs. Track must be implemented
+for the outputs.
 
 \subsection{Interfaces}
 

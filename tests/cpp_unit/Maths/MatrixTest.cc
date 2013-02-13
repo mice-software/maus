@@ -1266,16 +1266,17 @@ TEST_F(MatrixTest, VectorMultiplication) {
 }
 
 TEST_F(MatrixTest, Streaming) {
-  std::stringstream test;
+  std::stringstream double_stream;
   Matrix<double> matrix_da(kRows, kColumns, kDoubleData);
   Matrix<double> matrix_db;
-  test << matrix_da;
-  test >> matrix_db;
+  double_stream << matrix_da;
+  double_stream >> matrix_db;
   EXPECT_TRUE(equal(matrix_da, matrix_db));
 
+  std::stringstream complex_stream;
   Matrix<complex> matrix_ca(kRows, kColumns, kComplexData);
   Matrix<complex> matrix_cb;
-  test << matrix_ca;
-  test >> matrix_cb;
+  complex_stream << matrix_ca;
+  complex_stream >> matrix_cb;
   EXPECT_TRUE(equal(matrix_ca, matrix_cb));
 }

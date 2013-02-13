@@ -213,12 +213,17 @@ class Beam(): # pylint: disable=R0902
             trans_matrix = self.__birth_twiss_ellipse(beam_def)
         elif self.transverse_mode == "constant_solenoid":
             # k_s is solenoid focussing strength: cite Penn MUCOOL note 71
-            k_s = (ref['charge']*xboa.Common.constants['c_light']/\
+            k_s = abs(ref['charge']*xboa.Common.constants['c_light']/\
                                                      2.*beam_def['bz']/ref['p'])
-            if k_s < 1e-9:
-                raise ZeroDivisionError(\
-                      "Cannot define constant_solenoid beam for "+\
-                      "solenoid with 0. focussing strength")
+            if abs(beam_def['bz']) < 1e-9:
+                raise ZeroDivisionError("Cannot define constant_solenoid "+\
+                                        "beam for solenoid with 0. field")
+            if abs(ref['charge']) < 1e-9:
+                raise ZeroDivisionError("Cannot define constant_solenoid "+\
+                                        "beam for reference with 0. charge")
+            if abs(ref['p']) < 1e-9:
+                raise ZeroDivisionError("Cannot define constant_solenoid "+\
+                                        "beam for reference with 0. momentum")
             beta_4d = (1.+beam_def['normalised_angular_momentum'])**0.5/k_s
             alpha_4d = 0.
             trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(

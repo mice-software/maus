@@ -1,0 +1,30 @@
+// Dummy configuration with minimal field map for stepping tests
+
+Configuration Test
+{
+  Dimensions 1. 1. 20. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+  Module VirtualPlane
+  {
+    Volume None
+    PropertyHep3Vector Position 0. 0. 2000. mm
+    PropertyString SensitiveDetector Virtual
+  }
+  Module Quad
+  {
+      Volume None
+      PropertyHep3Vector Position 0. 0. 1000. mm     
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       1.0 T/m //normalise to one T/m
+      PropertyDouble Height              1.0 m
+      PropertyDouble Width               1.0 m     
+      PropertyDouble Length              2.0 m
+      PropertyString EndFieldType        Tanh
+      PropertyDouble EndLength           0.2 m
+      PropertyDouble CentreLength        0.5 m
+  }
+}
+

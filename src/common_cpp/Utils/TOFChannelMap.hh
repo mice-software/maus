@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <Python.h>
 #include <limits.h>
 #include <string>
 #include <vector>
@@ -28,11 +29,13 @@
 #include <sstream>
 #include <algorithm>
 #include <fstream>
+#include <functional>
 
-
+#include "json/json.h"
 #include "src/common_cpp/Utils/DAQChannelMap.hh"
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 using std::string;
 using std::ostream;
@@ -124,14 +127,14 @@ class TOFChannelKey {
 class TOFChannelMap {
  public:
 
-  TOFChannelMap() {}
+  TOFChannelMap();
   virtual ~TOFChannelMap();
 
   /// Initialize the map from text file.
   bool InitFromFile(string filename);
 
-  /// Not implemented.
-  void InitFromCDB();
+  /// Get cabling from CDB
+  bool InitFromCDB();
 
  /** Return pointer to the TOF key.
  * This function returns pointer to the TOF channel key for the required DAQ channel.
@@ -161,11 +164,24 @@ class TOFChannelMap {
  */   
   DAQChannelKey* findTdcKey(string adcKeyStr);
 
+  /* Get data cards from configuration file */
+  bool InitializeCards(Json::Value configJSON);
+  /* interface to the python get_tof_cabling module */
+  void GetCabling(std::string devname, std::string fromdate);
+  void Reset();
+
  private:
 
   std::vector<TOFChannelKey*> _tofKey;
   std::vector<DAQChannelKey*> _tdcKey;
   std::vector<DAQChannelKey*> _fadcKey;
+
+  std::string _name;
+  std::stringstream cblstr;
+  std::string _tof_station, _tof_cablingdate;
+  PyObject* _cabling_mod;
+  PyObject* _tcabling;
+  PyObject* _get_cabling_func;
 };
 
 #endif

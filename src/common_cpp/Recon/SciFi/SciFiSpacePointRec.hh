@@ -30,6 +30,7 @@
 #include <CLHEP/Random/RandGauss.h>
 #include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Matrix/Matrix.h>
 
 // C++ headers
 #include <cmath>
@@ -40,11 +41,12 @@
 
 #include "Config/MiceModule.hh"
 
-#include "src/common_cpp/Recon/SciFi/SciFiCluster.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-// namespace MAUS {
+namespace MAUS {
 
 class SciFiSpacePointRec {
  public:
@@ -54,11 +56,17 @@ class SciFiSpacePointRec {
 
   void process(SciFiEvent &evt);
 
+  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+
+  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+
+  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+
   void build_duplet(SciFiSpacePoint* duplet);
 
   void build_triplet(SciFiSpacePoint* triplet);
 
-  Hep3Vector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
 
   bool kuno_accepts(SciFiCluster* cluster1,
                     SciFiCluster* cluster2,
@@ -81,6 +89,7 @@ class SciFiSpacePointRec {
   static const int _kuno_else  = 318;
   static const int _kuno_toler = 2;
 };  // Don't forget this trailing colon!!!!
-// } // ~namespace MAUS
+
+} // ~namespace MAUS
 
 #endif
