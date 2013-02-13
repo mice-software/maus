@@ -514,7 +514,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         
         # Slab Hits x
-        self.canvas_hits_x = ROOT.TCanvas("hits_x", "hits_x", 800, 800)
+        canvas_name = "hits_x"
+        self.canvas_hits_x = ROOT.TCanvas(canvas_name, canvas_name, 800, 800)
         self.canvas_hits_x.cd()
         self.hslabhits[1][0].Draw()
         for i in range (0, 3):
@@ -598,6 +599,12 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         leg.AddEntry(self.hslabhits[0][0], "TOF0", "l")
         leg.AddEntry(self.hslabhits[1][0], "TOF1", "l")
         leg.AddEntry(self.hslabhits[2][0], "TOF2", "l")
+        all_max_y = []
+        for hists in self.hslabhits[0:-1]:
+            a_hist = hists[0]
+            all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
+        for hists in self.hslabhits[0:-1]:
+            hists[0].SetMaximum(max(all_max_y)*1.1+1)
         leg.SetBorderSize(0)
         leg.SetFillColor(0)
         leg.Draw()
@@ -606,6 +613,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_hits_y.cd()
         leg = self.canvas_hits_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
         leg.Clear()
+        all_max_y = []
+        for hists in self.hslabhits[0:-1]:
+            a_hist = hists[1]
+            all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
+        for hists in self.hslabhits[0:-1]:
+            hists[1].SetMaximum(max(all_max_y)+1)
+
         leg.AddEntry(self.hslabhits[0][1], "TOF0", "l")
         leg.AddEntry(self.hslabhits[1][1], "TOF1", "l")
         leg.AddEntry(self.hslabhits[2][1], "TOF2", "l")
@@ -621,6 +635,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 leg.Clear()
                 
                 pnum = "Plane%d,PMT%d" % (plane, pmt)
+                all_max_y = []
+                for hists in self.hpmthits[0:-1]:
+                    a_hist = hists[plane][pmt]
+                    all_max_y.append(\
+                                   a_hist.GetBinContent(a_hist.GetMaximumBin()))
+                for hists in self.hpmthits[0:-1]:
+                    hists[plane][pmt].SetMaximum(max(all_max_y)+1)
                 leg.AddEntry(self.hpmthits[0][plane][pmt], "TOF0,"+pnum, "l")
                 leg.AddEntry(self.hpmthits[1][plane][pmt], "TOF1,"+pnum, "l")
                 leg.AddEntry(self.hpmthits[2][plane][pmt], "TOF2,"+pnum, "l")
