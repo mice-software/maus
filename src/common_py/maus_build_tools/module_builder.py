@@ -205,6 +205,7 @@ def build_maus_lib(filename, stuff_to_import):
     file_to_import.close()
 
 def build_okay(directory):
+    """ ?  """
     fail_path = os.path.split(directory)[-1]
     fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
     fail_path = os.path.expandvars(fail_path)
