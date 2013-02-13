@@ -40,6 +40,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
+    #${MAUS_ROOT_DIR}/third_party/bash/61monitoring.bash
 
 else
 echo
