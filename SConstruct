@@ -62,6 +62,7 @@ def setup_environment():
     # add 'CheckCommand' to check that we can run exe - could just call directly
     tests = {'CheckCommand' : maus_build_tools.environment_tools.check_command}
     conf = Configure(env, tests) # pylint: disable=E0602
+    Export('conf') # pylint: disable=E0602
     # check libraries exist; add them into the environment
     for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',
                 'gtest', 'unpacker']:

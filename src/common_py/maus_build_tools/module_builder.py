@@ -145,7 +145,10 @@ class ModuleBuilder:
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
                     self.subproject(directory)
-                    cpp_libs.append(parts[2])
+                    if build_okay(directory):
+                        cpp_libs.append(parts[2])
+                    else:
+                        print "build failed", directory
         return cpp_libs, py_libs
 
 
@@ -200,4 +203,10 @@ def build_maus_lib(filename, stuff_to_import):
         file_to_import.write("\n")
 
     file_to_import.close()
+
+def build_okay(directory):
+    fail_path = os.path.split(directory)[-1]
+    fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
+    fail_path = os.path.expandvars(fail_path)
+    return not os.path.exists(fail_path)
 
