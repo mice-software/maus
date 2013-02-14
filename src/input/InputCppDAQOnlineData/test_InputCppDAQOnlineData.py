@@ -22,7 +22,7 @@ import json
 import md5
 import unittest
 from Configuration import Configuration
-from InputCppDAQOnlineData import InputCppDAQOnlineData
+from InputCppDAQOnlineData import InputCppDAQOnlineData #pylint: disable=F0401
 
 class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
     """Tests for InputCppDAQOnlineData"""

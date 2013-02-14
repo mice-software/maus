@@ -78,7 +78,7 @@ def celeryd_process(celeryd_log_file_name):
     log = open(celeryd_log_file_name, 'w')
     proc = subprocess.Popen(['celeryd', '-c8', '-lINFO', '--purge'], \
                                            stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid
+    print 'with pid', proc.pid # pylint: disable = E1101
     return proc
 
 def maus_web_app_process(maus_web_log_file_name):
@@ -92,7 +92,7 @@ def maus_web_app_process(maus_web_log_file_name):
     proc = subprocess.Popen(
                        ['python', maus_web, 'runserver', 'localhost:9000'],
                        stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid
+    print 'with pid', proc.pid # pylint: disable = E1101
     return proc
 
 def maus_input_transform_process(maus_input_log):
@@ -111,7 +111,7 @@ def maus_input_transform_process(maus_input_log):
 				        '-verbose_level=0',
 						'-DAQ_hostname=miceraid5'],
                        stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid
+    print 'with pid', proc.pid # pylint: disable = E1101
     return proc
     
 def maus_merge_output_process(maus_output_log, reducer_name, output_name):
@@ -128,7 +128,7 @@ def maus_merge_output_process(maus_output_log, reducer_name, output_name):
                         '-type_of_dataflow=multi_process_merge_output',
                         '-output_json_file_name='+output_name],
                        stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid
+    print 'with pid', proc.pid # pylint: disable = E1101
     return proc
 
 def monitor_mongodb(url, database_name, file_handle):
@@ -174,7 +174,7 @@ def force_kill_maus_web_app():
     fout = open(hack_stdout, 'w')
     ps_proc = subprocess.Popen(['ps', '-e', '-F'], stdout=fout, \
                                                        stderr=subprocess.STDOUT)
-    ps_proc.wait()
+    ps_proc.wait() # pylint: disable = E1101
     fout.close()
     fin = open(hack_stdout)
     pid = None
