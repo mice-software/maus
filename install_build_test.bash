@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_STD=install_log_std
+FILE_STD=install.log
 
 if [ ! -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: Trying to build with \$MAUS_ROOT_DIR set. Please start a new"
@@ -90,7 +90,7 @@ then
     exit 1
 fi
 
-bash ${MAUS_ROOT_DIR}/tests/style_tests.bash
+bash ${MAUS_ROOT_DIR}/tests/style_tests.bash  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]
 then
     cat ${MAUS_ROOT_DIR}/install_log_std
