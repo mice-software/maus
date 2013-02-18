@@ -200,6 +200,18 @@ void Track::SortTrackPointsByZ() {
   }
 }
 
+std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+Track::GetTrackPoints() {
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_trackpoints;
+  const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
+  for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
+    tp = (const MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
+    if(!tp) continue;
+    temp_trackpoints.push_back(tp);
+  }
+  return temp_trackpoints;
+}
+
 // Detector Point Methods
 void Track::SetDetector(MAUS::DataStructure::Global::DetectorPoint detector) {
   // Set the Nth bit of the integer, where N is the value of the
@@ -286,6 +298,18 @@ bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
 
   return (result != NULL);
+}
+
+std::vector<const MAUS::DataStructure::Global::Track*>
+Track::GetConstituentTracks() {
+  std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
+  const MAUS::DataStructure::Global::Track* t = NULL;
+  for(int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
+    t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
+    if(!t) continue;
+    temp_tracks.push_back(t);
+  }
+  return temp_tracks;
 }
 
 } // ~namespace Global

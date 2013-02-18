@@ -111,13 +111,26 @@ class Track : public TObject {
   /// will matter.
   void SortTrackPointsByZ();
 
-  /// Set the list of associated TrackPoints, #_trackpoints, from a TRefArray
+  /// Get the associated track points, as a vector of const pointers,
+  /// ensuring they are unchanged.
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints();
+
+  /// Set the list of associated TrackPoints, #_trackpoints, from a
+  /// TRefArray.  The Track takes ownership of this pointer, deleting
+  /// the current TRefArray if necessary.  This is mostly for the
+  /// Json/Cpp Processor, users are encouraged to use the Add/Remove
+  /// TrackPoint methods.
   void set_trackpoints(TRefArray* trackpoints) {
+    if(_trackpoints != NULL) {
+      delete _trackpoints;
+    }
     _trackpoints = trackpoints;
   }
 
-  /// Directly access the MAUS::DataStructure::Global::TrackPoint pointers
-  /// stored in the track, #_trackpoints.
+  /// Directly access the MAUS::DataStructure::Global::TrackPoint
+  /// pointers stored in the track, #_trackpoints.  This is mostly for
+  /// the Json/Cpp Processor, users are encouraged to use the
+  /// GetTrackPoints method.
   TRefArray* get_trackpoints() const {
     return _trackpoints;
   }
@@ -188,12 +201,22 @@ class Track : public TObject {
     _constituent_tracks->Clear();
   }
 
-  /// Directly set the #_constituent_tracks TRefArray.
+  /// User method for accessing the constituent tracks.  These are
+  /// returned as const, so that they can't be changed.
+  std::vector<const MAUS::DataStructure::Global::Track*> GetConstituentTracks();
+
+  /// Directly set the #_constituent_tracks TRefArray.  This passes
+  /// ownership of the pointer to the Track, and is mostly for use by
+  /// the Json/Cpp Processor.  Users should use Add/Remove Track
+  /// methods.
   void set_constituent_tracks(TRefArray* constituent_tracks){
     _constituent_tracks = constituent_tracks;
   }
 
-  /// Direct access to the #_constituent_tracks vector.
+  /// Direct access to the #_constituent_tracks vector, for the
+  /// Json/Cpp Processor.  Users should probably access the
+  /// constituent tracks through: GetConstituentTracks(), which
+  /// returns a vector of Track pointers.
   TRefArray* get_constituent_tracks() const {
     return _constituent_tracks;
   }
