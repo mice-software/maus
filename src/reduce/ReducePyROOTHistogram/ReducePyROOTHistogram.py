@@ -27,7 +27,7 @@ import os
 import ErrorHandler
 import ROOT
 
-class ReducePyROOTHistogram: # pylint: disable=R0902
+class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
     @class ReducePyROOTHistogram.ReducePyROOTHistogram is a base class
     for classes that create histograms using ROOT. 
@@ -186,6 +186,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         containing image data in the form described above. 
         @throws Exception if various sub-class specific errors arise.
         """
+        raise NotImplementedError("Should be overloaded to update histos")
 
     def death(self): #pylint: disable=R0201
         """
@@ -206,7 +207,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902
         @param self Object reference.
         @returns True
         """
-        return True
+        raise NotImplementedError("Should be overloaded to clean out histos")
 
     def get_image_doc(self, keywords, description, tag, canvas):
         """

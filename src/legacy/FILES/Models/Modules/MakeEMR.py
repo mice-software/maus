@@ -7,7 +7,7 @@ ExportFolder = "EMR/"
 WithBars = 1
 
 class G4MiceGeoBase:
-    def __init__( self, Name ):
+    def __init__( self, Name ):#pylint:disable=C0103
         self.Name = Name
         self.Height = 0.0
         self.Length = 0.0
@@ -87,9 +87,20 @@ class EMRBar( G4MiceGeoBase ):
             Rotation 0.0 0.0 0.0 degree
           }
         }
-        """ % ( ExportFolder, self.Name, self.Name, self.Length / 2, self.Length / 2, 0., self.Width / 2, self.Height / 2, self.LayerId, self.BarId, self.Name )
+        """ % ( ExportFolder,
+                self.Name,
+                self.Name,
+                self.Length / 2,
+                self.Length / 2,
+                0.,
+                self.Width / 2,
+                self.Height / 2,
+                self.LayerId,
+                self.BarId,
+                self.Name )
 
-        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength, Y1HalfLength, Y2HalfLength, ZHalfLength, self.LayerId, self.BarId, self.Name )
+        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength, Y1HalfLength,
+        #Y2HalfLength, ZHalfLength, self.LayerId, self.BarId, self.Name )
 
         BarFile = open( ExportFolder + self.Name + ".dat", 'w' )
         BarFile.write( Content )
@@ -109,8 +120,18 @@ class EMRBar( G4MiceGeoBase ):
           PropertyDouble GreenColour 1.0
           PropertyDouble RedColour 1.0
         }
-        """ % ( ExportFolder, self.Name, self.Name, self.Length / 2, self.Length / 2, 0., self.Width / 2, self.Height / 2, self.LayerId, self.BarId )
-        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength, Y1HalfLength, Y2HalfLength, ZHalfLength, self.LayerId, self.BarId )
+        """ % ( ExportFolder,
+                self.Name,
+                self.Name,
+                self.Length / 2,
+                self.Length / 2,
+                0.,
+                self.Width / 2,
+                self.Height / 2,
+                self.LayerId,
+                self.BarId )
+        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength,
+        #Y1HalfLength, Y2HalfLength, ZHalfLength, self.LayerId, self.BarId )
         SciFile = open( ExportFolder + self.Name + "Sci.dat", 'w' )
         SciFile.write( Content )
         SciFile.close()
@@ -182,9 +203,19 @@ class EMRLayer( G4MiceGeoBase ):
             //  PropertyInt numSlabs %d
             PropertyInt numBars %d
             PropertyBool Invisible 1
-          """% ( ExportFolder, self.Name, self.Name, self.Length / 2, self.Length / 2, ( self.BarWidth * ( self.BarCount / 2 ) ) / 2,
-              ( self.BarWidth * ( ( self.BarCount / 2 ) + ( self.BarCount % 2 ) ) ) / 2, self.Height / 2, self.LayerId, self.BarCount, self.BarCount )
-            #% ( ExportFolder, self.Name, self.Name, X1HL, X2HL, Y1HL, Y2HL, ZHL,     self.LayerId, self.BarCount, self.BarCount )
+          """% ( ExportFolder,
+                 self.Name,
+                 self.Name,
+                 self.Length / 2,
+                 self.Length / 2,
+                 ( self.BarWidth * ( self.BarCount / 2 ) ) / 2,
+                 ( self.BarWidth * ( ( self.BarCount / 2 ) + ( self.BarCount % 2 ) ) ) / 2,
+                 self.Height / 2,
+                 self.LayerId,
+                 self.BarCount,
+                 self.BarCount )
+            #% ( ExportFolder, self.Name, self.Name, X1HL, X2HL, Y1HL, Y2HL, ZHL,
+            #self.LayerId, self.BarCount, self.BarCount )
         if WithBars == 1:
             for bar in self.Bars:
                 Content += """Module %s%s.dat
@@ -248,7 +279,14 @@ class EMRGeometry( G4MiceGeoBase ):
           // PropertyInt numPlanes %d
           PropertyInt numLayers %d
           PropertyDouble G4StepMax 1.0 mm
-        """ % ( ExportFolder, self.Name, self.Name, self.Length, self.Width, self.Height, self.LayersCount, self.LayersCount )
+        """ % ( ExportFolder,
+                self.Name,
+                self.Name,
+                self.Length,
+                self.Width,
+                self.Height,
+                self.LayersCount,
+                self.LayersCount )
         for layer in self.Layers:
             Content += """
               Module %s%s.dat
@@ -256,7 +294,14 @@ class EMRGeometry( G4MiceGeoBase ):
                 Position %.2f %.2f %.2f  cm
                 Rotation %.2f %.2f %.2f degree
               }
-            """ % ( ExportFolder, layer.Name, layer.X, layer.Y, layer.Z, layer.Phi, layer.Theta, layer.Psi )
+            """ % ( ExportFolder,
+                    layer.Name,
+                    layer.X,
+                    layer.Y,
+                    layer.Z,
+                    layer.Phi,
+                    layer.Theta,
+                    layer.Psi )
             layer.Export()
         Content += "}"
         EMRFile = open( ExportFolder + self.Name + ".dat", 'w' )

@@ -19,10 +19,12 @@ as part of the regular test script - only should be run by online machine (and
 online-capable machines)
 """
 
+import os 
 import unittest
 import celery.task.control
 import pymongo
 import pymongo.errors
+import subprocess
 
 class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -52,6 +54,19 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         except pymongo.errors.AutoReconnect: # pylint: disable=W0702
             self.assertTrue(False, "MongoDB server is not accessible")
         test_connx.disconnect()
+
+    def test_maus_app(self):
+        """
+        _test_online_okay: Check that maus web-app is in the environment
+        """
+        # should throw an exception if undefined
+        os.environ['MAUS_WEB_DIR'] # pylint: disable=W0104
+        os.environ['MAUS_WEB_MEDIA_RAW'] # pylint: disable=W0104
+        maus_web = os.path.join(os.environ['MAUS_WEB_DIR'],
+                                                    'src/mausweb/manage.py')
+        proc = subprocess.Popen(['python', '-m', maus_web])        
+        proc.wait()
+        self.assertEquals(proc.returncode, 0)
 
 if __name__ == "__main__":
     unittest.main()

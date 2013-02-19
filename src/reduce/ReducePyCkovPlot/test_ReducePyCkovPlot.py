@@ -44,7 +44,8 @@ class ReducePyCkovPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         success = self.__reducer.birth("{}")
         if not success:
-            raise Exception('Test setUp failed', 'reducer.birth() failed')
+            raise Exception('Test setUp failed '+str(success),
+                            'reducer.birth() failed')
 
     def test_birth_default(self):
         """
@@ -145,8 +146,8 @@ class ReducePyCkovPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         @param self Object reference.
         """
         success = self.__reducer.death()
-        if not success:
-            raise Exception('Test setUp failed', 'reducer.death() failed')
+        if success != None:
+            raise Exception('Test tearDown failed', 'reducer.death() failed')
         
 if __name__ == '__main__':
     unittest.main()

@@ -260,7 +260,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
         self._headings[2] = \
             "Average of last %d values" % self._recent_window
 
-    def _process_spill(self, spill):
+    def _process_spill(self, spill): #pylint: disable=R0912
         """
         Check that the spill has the data necessary to update the
         averages then creates JSON documents in the format described 
@@ -279,6 +279,20 @@ class ReducePyScalersTable: # pylint: disable=R0902
                 return self._create_output()
             else:
                 return {}
+
+        if "maus_event_type" not in spill:
+            out = self._create_output()
+            if "errors" not in out:
+                out["errors"] = {}
+            out["errors"]["ReducePyScalersTable"] = \
+                              ["Bad input spill - no maus_event_type"]
+            return out
+        elif spill["maus_event_type"] != "Spill": 
+            return self._create_output()
+
+        if "daq_event_type" not in spill or \
+           spill["daq_event_type"] != "physics_event":
+            return self._create_output()
 
         if "daq_data" not in spill:
             raise KeyError("daq_data is not in spill")

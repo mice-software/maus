@@ -38,10 +38,11 @@ class ModuleBuilder:
     sconscript files call these functions
     """
 
-    def __init__(self, scons_environment):
+    def __init__(self, scons_environment, scons_configuration):
         """
         Initialise the ModuleBuilder
         """
+        self.conf = scons_configuration
         self.env = scons_environment
         self.project_list = []
         self.dependency_dict = {}
@@ -49,11 +50,12 @@ class ModuleBuilder:
         self.local_environments = {}
 
     # sets up the sconscript file for a given sub-project
-    def subproject(self, project): #pylint: disable=C0103, R0201
+    def subproject(self, project, env, conf):#pylint: disable=C0103, R0201,W0613
         """
         Build the Subproject with name project
         """
-        SConscript(sconscript_path(project), exports=['project']) # pylint: disable=E0602, C0301
+        SConscript(sconscript_path(project),
+                   exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
 
     #sets up the build for a given project
@@ -144,8 +146,13 @@ class ModuleBuilder:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
-                    self.subproject(directory)
-                    cpp_libs.append(parts[2])
+                    self.subproject(directory, self.env, self.conf)
+                    project_failed_file = \
+                                  MAUS_ROOT_DIR+'/tmp/'+parts[2]+'_failed_build'
+                    if glob.glob(project_failed_file) == []:
+                        cpp_libs.append(parts[2])
+                    else:
+                        os.remove(glob.glob(project_failed_file)[0])
         return cpp_libs, py_libs
 
 

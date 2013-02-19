@@ -53,15 +53,16 @@ def setup_environment():
                  maus_build_tools.environment_tools.get_environment_variables()
     # Setup the scons environment.
     env = maus_build_tools.environment_tools.get_environment()
-    # Setup the module builder
-    SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env)
     # make sure the sconscripts can get to the variables - don't need to export
     # anything but 'env'. This needs to be done at global scope I think.
     Export('env') # pylint: disable=E0602
-
     # add 'CheckCommand' to check that we can run exe - could just call directly
     tests = {'CheckCommand' : maus_build_tools.environment_tools.check_command}
     conf = Configure(env, tests) # pylint: disable=E0602
+    # Setup the module builder
+    SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env,
+                                                                          conf)
+
     # check libraries exist; add them into the environment
     for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',
                 'gtest', 'unpacker']:
