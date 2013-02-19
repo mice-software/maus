@@ -46,8 +46,8 @@ std::string MapCppGlobalRecon::process(std::string document) const {
   // Prepare converters, spill and json objects
   JsonCppSpillConverter json2cppconverter;
   CppJsonSpillConverter cpp2jsonconverter;
-  Json::Value *data_json;
-  MAUS::Spill *spill;
+  Json::Value *data_json = NULL;
+  MAUS::Data *data_cpp = NULL;
 
   // Read string and convert to a Json object
   Json::Value imported_json = JsonWrapper::StringToJson(document);
@@ -66,12 +66,14 @@ std::string MapCppGlobalRecon::process(std::string document) const {
   // Convert Json into MAUS::Spill object.  In future, this will all
   // be done for me, and process will take/return whichever object we
   // prefer.
-  spill = json2cppconverter(data_json);
+  data_cpp = json2cppconverter(data_json);
 
-  if(!spill){
+  if(!data_cpp){
     return std::string("{\"errors\":{\"failed_json_cpp_conversion\":")+
            std::string("\"Failed to convert Json to Cpp Spill object\"}}");
   }
+
+  const MAUS::Spill* spill = data_cpp->GetSpill();
 
   MAUS::ReconEventArray* recon_events = spill->GetReconEvents();
 
@@ -91,8 +93,9 @@ std::string MapCppGlobalRecon::process(std::string document) const {
     recon_event->SetGlobalEvent(global_event);
   }
 
-  MAUS::Data *data_cpp = new MAUS::Data();
-  data_cpp->SetSpill(spill);
+  // MAUS::Data *data_cpp = new MAUS::Data();
+  // data_cpp->SetSpill(spill);
+  // data_cpp->SetEventType
   data_json = cpp2jsonconverter(data_cpp);
 
   if(!data_json){
