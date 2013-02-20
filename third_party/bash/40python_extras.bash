@@ -7,8 +7,9 @@ package_list="suds validictory nose==1.1 nose-exclude coverage  \
  pymongo scons"
 # this comes from the internet - seems to be some dependency issues that were
 # not easily fixed using the eggs (e.g. I tried adding egg of dependency and
-# python still didn't see appropriate .so files)
-web_package_list="readline numpy"
+# python still didn't see appropriate .so files; seems to be a linking issue
+# when using egg packages locally)
+web_package_list="readline numpy==1.5" # 1.7 fails due to "sandbox error"; 1.6 fails due to "distutils error"
 module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
  pymongo"
