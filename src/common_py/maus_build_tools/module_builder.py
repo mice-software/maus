@@ -146,7 +146,7 @@ class ModuleBuilder:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
-                    self.subproject(directory)
+                    self.subproject(directory, self.env, self.conf)
                     if build_okay(directory):
                         cpp_libs.append(parts[2])
                     else:
