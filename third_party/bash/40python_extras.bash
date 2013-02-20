@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
-package_list="suds validictory nose==1.1 nose-exclude coverage readline \
+# these are packages in MAUS third party tarball
+package_list="suds validictory nose==1.1 nose-exclude coverage  \
  ipython doxypy pylint==0.25.1 numpy bitarray matplotlib celery \
- pymongo scons tinfo"
-module_test_list="suds validictory nose coverage readline \
+ pymongo scons"
+# this comes from the internet - seems to be some dependency issues that were
+# not easily fixed using the egg
+web_package_list="readline"
+module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
- pymongo tinfo"
+ pymongo"
 binary_test_list="scons"
 
 
@@ -18,6 +22,7 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # first try a local install
     ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
+    ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install $web_package_list
     for module in $module_test_list
     do
         # fails because of version number on some packages
