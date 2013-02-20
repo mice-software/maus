@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# we use -doesnt_install- easy_install for python packages. Due to instability
+# with the easy_install servers mostly these come prepacked. A few have narly
+# dependency issues so they need to be called from the easy_install server
+# (which has a wider range of dependencies pre-packed)
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 package_list="suds validictory nose==1.1 nose-exclude coverage  \
@@ -24,7 +28,7 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # first try a local install
     ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
     # few packages that don't build locally (maybe dependency issues)
-    # note that if this command comes first the install fails (urk)
+    # I don't know why numpy is such a pain...
     easy_install $web_package_list
     easy_install numpy==1.5
     # now check that packages were installed
