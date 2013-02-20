@@ -5,7 +5,7 @@ egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 package_list="suds validictory nose==1.1 nose-exclude coverage  \
  ipython doxypy pylint==0.25.1 bitarray matplotlib celery \
  pymongo scons"
-# this comes from the internet - seems to be some dependency issues that were
+# these packages come from the internet - some dependency issues that were
 # not easily fixed using the eggs (e.g. I tried adding egg of dependency and
 # python still didn't see appropriate .so files; seems to be a linking issue
 # when using egg packages locally)
@@ -21,14 +21,12 @@ if [ "$1" ]; then
     easy_install -H None -zmaxd $egg_source $package_list
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "Installing $package_list"
-
-    # few packages that don't build locally (maybe dependency issues)
-    easy_install $web_package_list
-    # now check that numpy was installed (readline doesnt work like this)
-    python -c "import numpy" || { echo "FATAL: Failed to install python module numpy"; exit 1; }
     # first try a local install
     ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
-    # now check that it was installed
+    # few packages that don't build locally (maybe dependency issues)
+    # note that if this command comes first the install fails (urk)
+    easy_install $web_package_list
+    # now check that packages were installed
     for module in $module_test_list
     do
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
