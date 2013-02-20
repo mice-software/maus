@@ -93,15 +93,15 @@ def build_user_guide():
 
 def build_third_party_tarball():
     """Build tarball of third party libraries"""
-    print """Building third party tarball"""
-    os.chdir(os.path.join(os.environ['MAUS_THIRD_PARTY'], "third_party"))
-    egg_list = glob.glob("install/lib/python2.7/site-packages/*.egg")
-    for egg_source in egg_list:
-        target = "source/easy_install/"+os.path.split(egg_source)[1]
-        if os.path.isdir(egg_source):
-            shutil.copytree(egg_source, target)
-        else:
-            shutil.copy2(egg_source, target)
+    print """Building third party tarball - source is MAUS_THIRD_PARTY, """+\
+          """target is MAUS_ROOT_DIR"""
+    proc = subprocess.Popen([
+                       "bash",
+                       os.environ['MAUS_THIRD_PARTY']+\
+                                      "/third_party/bash/40python_extras.bash",
+                       "1"])
+  
+    os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
     glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
     tarball_targets = []
     tarball_name = "third_party_libraries_incl_python.tar.gz"
@@ -111,7 +111,11 @@ def build_third_party_tarball():
                              tarball_name]
                              +tarball_targets)
     proc.wait()
+    proc = subprocess.Popen(["md5sum", tarball_name],
+                            stdout=open(tarball_name+".md5", "w"))
+    proc.wait()
     COPY_TARGETS.append(os.path.join(os.getcwd(), tarball_name))
+    COPY_TARGETS.append(os.path.join(os.getcwd(), tarball_name+".md5"))
 
 def copy_targets():
     """Copy targets to a temporary store in tmp"""
@@ -147,9 +151,9 @@ def scp(scp_in, scp_out):
 def main():
     """main function"""
     print "Doing server build"
-    build_user_guide()
-    build_doxygen()
-    build_test_output()
+    #build_user_guide()
+    #build_doxygen()
+    #build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:

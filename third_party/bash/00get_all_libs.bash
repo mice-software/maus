@@ -5,25 +5,21 @@ url=http://micewww.pp.rl.ac.uk/maus/${version}/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/${filename}" ]
     then
         echo "INFO: Found source archive in 'source' directory"
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
-        wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
+        wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/" ${url}
+        wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/" ${url}.md5
     fi
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
-    then
-        echo "INFO: Source archive exists."
-        echo "INFO: Unpacking:"
-        echo
-        tar xvfz "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/"
-    else
-        echo "WARN: Failed to get source archive - build scripts will attempt to"
-        echo "WARN: get them from the internet instead..."
-        exit 1
-    fi
+    echo "INFO: Source archive exists."
+    echo "INFO: Unpacking:"
+    echo
+    cd ${MAUS_ROOT_DIR}/third_party/
+    md5sum -c "${filename}.md5" || { echo "FATAL: Failed to download $url - aborting"; exit 1; }
+    tar xvfz ${filename}
 else
     echo "ERROR: MAUS_ROOT_DIR was not set"
     echo "ERROR: Need to do (from maus download directory)"
