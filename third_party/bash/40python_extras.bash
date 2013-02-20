@@ -14,15 +14,6 @@ if [ "$1" ]; then
     echo "INFO: Attempting to pack eggs for distribution"
     easy_install -H None -zmaxd $egg_source $package_list
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
-#    #  Just use one version....
-#    rm -Rf scons-2.1.0.alpha.20110323.tar.gz
-#    rm -Rf scons-2.1.0.alpha.20110323
-#    wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source  http://downloads.sourceforge.net/project/scons/scons/2.1.0.alpha.20110323/scons-2.1.0.alpha.20110323.tar.gz
-#    cd "${MAUS_ROOT_DIR}/third_party/source"
-#    md5sum -c scons-2.1.0.alpha.20110323.tar.gz.md5 || { echo "FATAL: Failed to download scons"; echo "FATAL: MD5 checksum failed."; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f scons-2.1.0.alpha.20110323.tar.gz; exit 1; }
-#    tar xvfz ${MAUS_ROOT_DIR}/third_party/source/scons-2.1.0.alpha.20110323.tar.gz --directory ${MAUS_ROOT_DIR}/third_party/build/
-#    easy_install ${MAUS_ROOT_DIR}/third_party/build/scons-2.1.0.alpha.20110323
-
     echo "Installing $package_list"
 
     # first try a local install
