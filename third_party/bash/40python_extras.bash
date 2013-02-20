@@ -4,12 +4,12 @@ egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 package_list="suds validictory nose==1.1 nose-exclude coverage  \
  ipython doxypy pylint==0.25.1 bitarray matplotlib celery \
- pymongo scons numpy==1.5"
+ pymongo scons"
 # this comes from the internet - seems to be some dependency issues that were
 # not easily fixed using the eggs (e.g. I tried adding egg of dependency and
 # python still didn't see appropriate .so files; seems to be a linking issue
 # when using egg packages locally)
-web_package_list="readline numpy==1.5" # 1.7 fails due to "sandbox error"; 1.6 fails due to "distutils error"
+web_package_list="readline numpy" # 1.7 fails due to "sandbox error"; 1.6 fails due to "distutils error"
 module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
  pymongo"
@@ -24,11 +24,13 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # few packages that don't build locally (maybe dependency issues)
     easy_install $web_package_list
+    # now check that numpy was installed (readline doesnt work like this)
+    python -c "import numpy" || { echo "FATAL: Failed to install python module numpy"; exit 1; }
     # first try a local install
     ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
+    # now check that it was installed
     for module in $module_test_list
     do
-        # fails because of version number on some packages
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
     done
     for bin in $binary_test_list
