@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
-
-# require python extras for scons
-
-directory=unpacking-mice
-filename=${directory}.tarz
+directory=monitor
+filename=lib${directory}.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -34,23 +30,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
         sleep 1
         echo
-        echo "INFO: Unpacking:"
+        echo "INFO: Monitoring:"
         echo
-        rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        sleep 1
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-        cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
-        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        echo
-        echo "INFO: Making and installing"
-        echo
-        sleep 1
-        scons install
 
-        echo
-        echo "INFO: The package should be locally build now in your"
-        echo "INFO: third_party directory, which the rest of MAUS will"
-        echo "INFO: find."
+        mkdir montmp
+        tar xvfz ${filename} -C montmp
+
+        if [ ! -d "${MAUS_ROOT_DIR}/third_party/install/include/${directory}" ]; then
+          mkdir ${MAUS_ROOT_DIR}/third_party/install/include/${directory}
+        fi
+
+        cp montmp/*.h* ${MAUS_ROOT_DIR}/third_party/install/include/${directory}/
+        cp montmp/*.a  ${MAUS_ROOT_DIR}/third_party/install/lib/
+        rm -rf montmp
     else
         echo "FATAL: Unable to download the source archive files. Please file a bug report at:" >&2
         echo "FATAL: " >&2

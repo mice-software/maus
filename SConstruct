@@ -62,7 +62,7 @@ def setup_environment():
     # Setup the module builder
     SConsEnvironment.jDev = maus_build_tools.module_builder.ModuleBuilder(env,
                                                                           conf)
-
+    Export('conf') # pylint: disable=E0602
     # check libraries exist; add them into the environment
     for lib in ['compiler', 'python', 'gsl', 'root', 'clhep', 'geant4',
                 'gtest', 'unpacker']:
