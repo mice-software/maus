@@ -150,7 +150,6 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
   }
 }
 
-
 void PatternRecognition::add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
                                     std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt ) {
   for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
@@ -752,10 +751,10 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   // Loop over spacepoints
   for ( int i = 1; i < static_cast<int>(spnts_by_zed.size()); ++i ) {
     if (spnts[0]->get_tracker() == 0) {
-      dz.push_back(spnts_by_zed[0]->get_position().z() -
-                   spnts_by_zed[i]->get_position().z());
-    } else {dz.push_back(spnts_by_zed[i]->get_position().z() -
-                         spnts_by_zed[0]->get_position().z());}
+      dz.push_back(spnts_by_zed[0]->get_position().z() - spnts_by_zed[i]->get_position().z());
+    } else {
+      dz.push_back(spnts_by_zed[i]->get_position().z() - spnts_by_zed[0]->get_position().z());
+    }
 
     // theta_i is defined as phi_i + phi_0 i.e. the turning angle wrt the x (not x') axis
     double theta_i = calc_turning_angle(spnts_by_zed[i]->get_position().x(),
@@ -805,9 +804,10 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
   // Make sure that you have enough points to make a line (2)
   if ( dz.size() < 2 || dphi.size() < 2 )
     return false;
-  for ( int n = 0; n < 2; ++n ) {
+  for ( int k = 0; k < _k_limit; ++k ) {  // Weird??
     for ( int i = 0; i < static_cast<int>(dphi.size()) - 1; ++i ) {
       int j = i + 1;
+      // Is this ok in the case of having both positive and negative particles?
       if ( dphi[i] < 0 )
         dphi[i] += 2. * CLHEP::pi;
 
@@ -832,8 +832,8 @@ bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
 } // ~turns_between_stations(...)
 
 bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji, double dz_kj) {
-  for ( int n = 0; n < 10; ++n ) {
-    for ( int m = 0; m < 10; ++m ) {
+  for ( int n = 0; n < _n_limit; ++n ) {
+    for ( int m = 0; m < _m_limit; ++m ) {
       // std::cerr << "n is " << n << " and m is " << m << std::endl;
       double A, B;
       A = ( dphi_kj + ( 2 * n * CLHEP::pi ) ) / ( dphi_ji + ( 2 * m * CLHEP::pi ) ); // phi_ratio

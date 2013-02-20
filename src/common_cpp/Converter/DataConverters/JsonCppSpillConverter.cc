@@ -28,6 +28,7 @@ Spill* JsonCppSpillConverter::_convert(const Json::Value* data) const {
     Json::Value my_data = *data;  // need non-const copy to set path data
     JsonWrapper::Path::SetPathRecursive(my_data, "");
     Spill* spill = SpillProcessor().JsonToCpp(my_data);
+    ReferenceResolver::JsonToCpp::RefManager::GetInstance().ResolveReferences();
     ReferenceResolver::JsonToCpp::RefManager::Death();
     return spill;
   }
