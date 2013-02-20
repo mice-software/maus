@@ -32,6 +32,8 @@ third_party/install/share/*
 third_party/install/share/man/man3
 third_party/install/share/man/man1/*
 third_party/source/*
+third_party/third_party_libraries_incl_python.tar.gz
+third_party/third_party_libraries_incl_python.tar.gz.md5
 tests/integration/optics/log.*
 tests/integration/optics/envelope*
 tests/integration/optics/optics
@@ -58,3 +60,5 @@ third_party/install/man/man3
 install_log_std
 env_geant4.9.5.p01.sh
 files/geometry/ConfigUpload.py
+third_party/source/easy_install/*
+
