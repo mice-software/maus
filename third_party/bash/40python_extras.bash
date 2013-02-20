@@ -26,6 +26,7 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # few packages that don't build locally (maybe dependency issues)
     # note that if this command comes first the install fails (urk)
     easy_install $web_package_list
+    easy_install numpy==1.5
     # now check that packages were installed
     for module in $module_test_list
     do
