@@ -3,11 +3,12 @@
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 package_list="suds validictory nose==1.1 nose-exclude coverage  \
- ipython doxypy pylint==0.25.1 numpy bitarray matplotlib celery \
+ ipython doxypy pylint==0.25.1 bitarray matplotlib celery \
  pymongo scons"
 # this comes from the internet - seems to be some dependency issues that were
-# not easily fixed using the egg
-web_package_list="readline"
+# not easily fixed using the eggs (e.g. I tried adding egg of dependency and
+# python still didn't see appropriate .so files)
+web_package_list="readline numpy"
 module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
  pymongo"
