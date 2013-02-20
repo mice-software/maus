@@ -22,9 +22,10 @@ if [ "$1" ]; then
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "Installing $package_list"
 
+    # few packages that don't build locally (maybe dependency issues)
+    easy_install $web_package_list
     # first try a local install
     ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
-    easy_install $web_package_list
     for module in $module_test_list
     do
         # fails because of version number on some packages
