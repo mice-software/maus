@@ -76,7 +76,7 @@ scons -c 2>>$FILE_STD 1>>$FILE_STD
 echo "Building MAUS"
 (scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
-    cat ${MAUS_ROOT_DIR}/install_log_std
+    cat $FILE_STD
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"
     exit 1
 fi
@@ -85,7 +85,7 @@ echo "Run the tests"
 bash ${MAUS_ROOT_DIR}/tests/unit_tests.bash  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]
 then
-    cat ${MAUS_ROOT_DIR}/install_log_std
+    cat $FILE_STD
     echo "FAIL Failed unit tests. Fatal error - aborting"
     exit 1
 fi
@@ -93,7 +93,7 @@ fi
 bash ${MAUS_ROOT_DIR}/tests/style_tests.bash  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]
 then
-    cat ${MAUS_ROOT_DIR}/install_log_std
+    cat $FILE_STD
     echo "FAIL Failed style tests"
     exit 1
 fi
