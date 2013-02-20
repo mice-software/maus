@@ -3,10 +3,10 @@
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 package_list="suds validictory nose==1.1 nose-exclude coverage readline \
  ipython doxypy pylint==0.25.1 numpy bitarray matplotlib celery \
- pymongo scons"
+ pymongo scons tinfo"
 module_test_list="suds validictory nose coverage readline \
  pylint numpy bitarray matplotlib celery \
- pymongo"
+ pymongo tinfo"
 binary_test_list="scons"
 
 
