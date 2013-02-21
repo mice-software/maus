@@ -1,8 +1,28 @@
+# This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+#
+# MAUS is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# MAUS is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+In this simulation example, we pass a grid of particles in (x, y) through a
+solenoid lens and examine the grid on the far side of the lens. Note the grid is
+rotated, due to the x-y coupling, and grid lines have become wavy due to
+spherical aberrations in the lens.
+"""
 
 import subprocess
 import os
 
-import xboa.Bunch
 from xboa.Bunch import Bunch
 
 def run_simulation():
@@ -27,6 +47,7 @@ def plot_output():
         canvas, hist, graph = bunch.root_scatter_graph('x', 'y', 'mm', 'mm',
                                       xmin=-600, xmax=600, ymin=-600, ymax=600,
                                      	hist_title_string='z='+str(bunch[0]['z']))
+    return (canvas, hist, graph)
 
 def main():
     """
