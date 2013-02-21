@@ -36,10 +36,10 @@ if [ "$1" ]; then
         rm -rf $item
     done
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    echo "Installing $package_list"
     # first try a local install
     for pacakage in $package_list
     do
+        echo "INFO: Installing $package"
         easy_install -H None -f $egg_source $package
     done
     # now check that packages were installed
@@ -47,10 +47,13 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     do
         echo "INFO: Checking import of package $module"
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
+        echo "INFO: ok"
     done
     for bin in $binary_test_list
     do
+        echo "INFO: Checking python script $bin"
         which $bin || { echo "FATAL: Failed to install python script $bin"; exit 1; }
+        echo "INFO: ok"
     done
 
     echo "INFO: The package should be locally build now in your"
