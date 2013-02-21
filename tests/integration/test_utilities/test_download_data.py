@@ -61,11 +61,13 @@ class TestDataDownload(unittest.TestCase): #pylint: disable=R0904
         for a_file in glob.glob('./04000.*')+glob.glob('./robots.txt'):
             os.remove(a_file)
 
-    def wget_file(self, file_name_in, url_in=None,
+    def wget_file(self, file_name_in, url_in=None, #pylint: disable=R0913
                   directory_out=None, file_name_out=None,
-                  will_overwrite=None, no_untar=None, dummy=None):
+                  will_overwrite=None, no_untar=None,
+                  dummy=None):
         """wget file; leave input as None to ignore"""
-        args = [os.path.join(self.mrd, 'bin', 'utilities', 'download_data.py'),
+        args = [os.path.join(self.mrd, 'tests', 'integration', 'test_utilities',
+                                      'test_download_data', 'download_data.py'),
                '--file_name_in', file_name_in]
         if url_in != None:
             args += ['--url_in', url_in]

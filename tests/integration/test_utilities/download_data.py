@@ -15,6 +15,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Utility script to download data files. For more information, use -h on the
+command line.
+"""
+
 DESCRIPTION = \
 """
 Download an input data file (i.e. output from MICE experiment) from the web
@@ -70,9 +75,9 @@ def make_arg_parser():
                          action='store_false')
     return parser
 
-def wget_file(url_in, file_name_in,
+def wget_file(url_in, file_name_in, # pylint: disable=R0913
               directory_out, file_name_out,
-              will_overwrite, will_untar):
+              will_overwrite):
     """
     Get data from a file at a given URL and place it in the specified directory
     @param url_in (string) input url at which the file can be found
@@ -116,7 +121,9 @@ def url_hook(transferred, size, total):
         OLD_TIME = TIME
 
 def untar_file(file_name):
-    pass
+    """Does nothing - not implemented"""
+    if file_name:
+        pass
 
 def main(argv):
     """
