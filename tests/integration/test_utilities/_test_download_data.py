@@ -67,7 +67,7 @@ class TestDataDownload(unittest.TestCase): #pylint: disable=R0904
                   dummy=None):
         """wget file; leave input as None to ignore"""
         args = [os.path.join(self.mrd, 'tests', 'integration', 'test_utilities',
-                                      'test_download_data', 'download_data.py'),
+                                      'download_data.py'),
                '--file_name_in', file_name_in]
         if url_in != None:
             args += ['--url_in', url_in]
