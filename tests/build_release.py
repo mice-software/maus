@@ -18,8 +18,6 @@ import os
 import shutil
 import sys
 
-import Configuration
-
 # want to add version number to docs
 # want to add tarball manufacture
 # want to add coverage information
@@ -95,11 +93,11 @@ def build_third_party_tarball():
     """Build tarball of third party libraries"""
     print """Building third party tarball - source is MAUS_THIRD_PARTY, """+\
           """target is MAUS_ROOT_DIR"""
-    proc = subprocess.Popen([
-                       "bash",
-                       os.environ['MAUS_THIRD_PARTY']+\
-                                      "/third_party/bash/40python_extras.bash",
-                       "1"])
+#    proc = subprocess.Popen([
+#                       "bash",
+#                       os.environ['MAUS_THIRD_PARTY']+\
+#                                      "/third_party/bash/40python_extras.bash",
+#                       "1"])
   
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
     glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
@@ -119,6 +117,7 @@ def build_third_party_tarball():
 
 def copy_targets():
     """Copy targets to a temporary store in tmp"""
+    import Configuration
     print "Copying to tmp"
     if os.path.exists(TEMP_DST):
         shutil.rmtree(TEMP_DST)
