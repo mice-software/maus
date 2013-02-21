@@ -38,12 +38,14 @@ if [ "$1" ]; then
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "Installing $package_list"
     # first try a local install
-    easy_install -H None -f $egg_source $package_list
-    # dont ask me
-    easy_install -H None -f $egg_source numpy
+    for pacakage in $package_list
+    do
+        easy_install -H None -f $egg_source $package
+    done
     # now check that packages were installed
     for module in $module_test_list
     do
+        echo "INFO: Checking import of package $module"
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
     done
     for bin in $binary_test_list
