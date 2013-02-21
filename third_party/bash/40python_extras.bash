@@ -37,7 +37,7 @@ if [ "$1" ]; then
     done
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # first try a local install
-    for pacakage in $package_list
+    for package in $package_list
     do
         echo "INFO: Installing $package"
         easy_install -H None -f $egg_source $package
