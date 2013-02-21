@@ -19,6 +19,10 @@ module_test_list="suds validictory nose coverage \
  pymongo"
 binary_test_list="scons"
 
+# To download the original tarballs and pack them into easy_install dir, try
+# running this loop (put a flag on the end of the execution command e.g. run
+#     bash 40python_extras.bash
+#
 if [ "$1" ]; then
     echo "INFO: Attempting to pack eggs for distribution"
     cd $egg_source

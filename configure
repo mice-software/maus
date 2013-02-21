@@ -114,6 +114,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MAUS_THIRD_PARTY="${maus_third_party}"
      echo "INFO: Using third party libraries from ${maus_third_party}"
+     # hack to get scons working (doesnt do well with --prefix_dir on build)
+     export SCONS_LIB_DIR="\${MAUS_THIRD_PARTY}/third_party/install/lib/python2.7/site-packages/scons-2.2.0-py2.7.egg/scons-2.2.0/"
 
      maus_bin_dirs="\${MAUS_THIRD_PARTY}/third_party/install/bin"
      if [ "$arch" == "Darwin" ]; then
