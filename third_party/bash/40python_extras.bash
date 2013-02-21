@@ -6,39 +6,58 @@
 # (which has a wider range of dependencies pre-packed)
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
-package_list="suds validictory nose==1.1 nose-exclude coverage  \
- ipython doxypy pylint==0.25.1 bitarray celery \
- pymongo scons"
-# these packages come from the internet - some dependency issues that were
-# not easily fixed using the eggs (e.g. I tried adding egg of dependency and
-# python still didn't see appropriate .so files; seems to be a linking issue
-# when using egg packages locally)
-web_package_list="readline numpy==1.5 matplotlib" # 1.7 fails due to "sandbox error"; 1.6 fails due to "distutils error"
+download_package_list="anyjson kombu suds validictory nose==1.1 nose-exclude  \
+ coverage ipython doxypy pylint==0.25.1 bitarray celery \
+ pymongo scons readline numpy==1.5 matplotlib logilab-common \
+ amqp>=1.0.8,<1.1.0 python-dateutil>=1.5,<2.0"
+package_list="anyjson python-dateutil billiard amqp kombu logilab-common \
+ logilab-astng suds validictory nose nose-exclude coverage  \
+ ipython doxypy pylint bitarray celery \
+ pymongo scons readline numpy matplotlib"
 module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
  pymongo"
 binary_test_list="scons"
 
-
+# To download the original tarballs and pack them into easy_install dir, try
+# running this loop (put a flag on the end of the execution command e.g. run
+#     bash 40python_extras.bash
+#
 if [ "$1" ]; then
     echo "INFO: Attempting to pack eggs for distribution"
-    easy_install -H None -zmaxd $egg_source $package_list
+    cd $egg_source
+    rm *
+    for package in $download_package_list
+    do
+        easy_install -zmaxeb . $package
+    done
+    downloaded_list=`ls`
+    echo "INFO: Downloaded following packages\n$downloaded_list"
+    echo "INFO: Packing them now - they can be found tarred in $egg_source"
+    for item in $downloaded_list
+    do
+        tar -czf $item.tar.gz $item
+        rm -rf $item
+    done
 elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    echo "Installing $package_list"
     # first try a local install
-    ${MAUS_THIRD_PARTY}/third_party/install/bin/easy_install -H None -f $egg_source $package_list
-    # few packages that don't build locally (maybe dependency issues)
-    # I don't know why numpy is such a pain...
-    easy_install $web_package_list
-    easy_install numpy==1.5
+    for package in $package_list
+    do
+        echo "INFO: Installing $package"
+        easy_install -H None -f $egg_source $package
+    done
     # now check that packages were installed
     for module in $module_test_list
     do
+        echo "INFO: Checking import of package $module"
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
+        echo "INFO: ok"
     done
     for bin in $binary_test_list
     do
+        echo "INFO: Checking python script $bin"
         which $bin || { echo "FATAL: Failed to install python script $bin"; exit 1; }
+        echo "INFO: ok"
     done
 
     echo "INFO: The package should be locally build now in your"
