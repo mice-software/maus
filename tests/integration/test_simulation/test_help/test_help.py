@@ -1,9 +1,12 @@
+"""test_help.py"""
+
 import unittest
 #import tempfile
 import os
 import subprocess
 
-class HelpTest(unittest.TestCase):
+class HelpTest(unittest.TestCase):#pylint: disable =R0904
+    """HelpTest"""
     def test_maus_help(self):
         """Checks that no other program is grabbing the MAUS help function"""
         file_name = os.environ['MAUS_ROOT_DIR']+'/tmp/help_message'

@@ -1,3 +1,4 @@
+#pylint: disable = C0103
 """ 
 basic test of TOFDigitizer to see if digits come out on real spills
 and if errors come out on empty

@@ -58,8 +58,8 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             for i in range(len(keys)):
                 if keys[i] in config_doc:
-                    self._tof_cut_e = config_doc[str(keys[0])]
-                    self._tof_cut_mu = config_doc[str(keys[1])]
+                    self._tof_cut_e = -1e4
+                    self._tof_cut_mu = -1e4
                     self._refresh_rate = int(config_doc[str(keys[2])])
         #if "refresh_rate" in config_doc:
         #    self._refresh_rate = int(config_doc["refresh_rate"])
@@ -218,15 +218,15 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         
         self.canvas_tof_A = ROOT.TCanvas("tof_A", "tof_A", 600, 600)
         self._htof_A = ROOT.TH2F("tof_A", "tof_A", 100, 0, 50, 200, 15, 35)
-        self._htof_A.GetXaxis().SetTitle("PE")
-        self._htof_A.GetYaxis().SetTitle("TOF(CKOVA) (ns)")
+        self._htof_A.GetXaxis().SetTitle("CkovA PE")
+        self._htof_A.GetYaxis().SetTitle("t(TOF0 to TOF1) (ns)")
         self.canvas_tof_A.cd()
         self._htof_A.Draw()
 
         self.canvas_tof_B = ROOT.TCanvas("tof_B", "tof_B", 600, 600)
         self._htof_B = ROOT.TH2F("tof_B", "tof_B", 100, 0, 50, 200, 15, 35)
-        self._htof_B.GetXaxis().SetTitle("PE")
-        self._htof_B.GetYaxis().SetTitle("TOF(CKOVB) (ns)")
+        self._htof_B.GetXaxis().SetTitle("CkovB PE")
+        self._htof_B.GetYaxis().SetTitle("t(TOF0 to TOF1) (ns)")
         self.canvas_tof_B.cd()
         self._htof_B.Draw()
 
@@ -245,8 +245,8 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         for j in range(0, 8):
             #ROOT.gPad.SetLogy()
 
-            hname = "hPMT%d" % (j)
-            htitle = "PMT%d" % (j)
+            hname = "hPMT%d" % (j+1)
+            htitle = "PMT%d" % (j+1)
             nbins = 200
             x_lo = -50
             x_hi = 200
@@ -267,14 +267,14 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         for j in range(0, 8):
             #ROOT.gPad.SetLogy()
             
-            hname = "harr_time%d" % (j)
-            htitle = "Arrival Times%d" % (j)
+            hname = "harr_time%d" % (j+1)
+            htitle = "Arrival Times%d" % (j+1)
             nbins = 200
             x_lo = 0
             x_hi = 200
             
             self._htime.append(ROOT.TH1F(hname, htitle, nbins, x_lo, x_hi))
-            self._htime[j].GetXaxis().SetTitle("Time (ns)")
+            self._htime[j].GetXaxis().SetTitle("Uncalibrated Time (ns)")
             self.canvas_time.cd(j+1)
             self._htime[j].Draw()
         
@@ -297,43 +297,51 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # PMT Charge
         # file label = PTM1-8.eps
         keywords = ['ckov', 'charge', 'pmt']
-        tag = "CkovChargePMT1-8"
-        content = "CkovChargePMT1-8"
+        tag = "CkovCharge_PMT1-8"
+        content = "CkovCharge_PMT1-8"
         doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_charge)
         image_list.append(doc)
 
         #ArrivalTimes
         #file label = ArrivalTime.eps
         keywords = ['ckov', 'time', 'pmt']
-        tag = "CkovArrivalTimes"
-        content = "CkovArrivalTimes"
+        tag = "CkovArrivalTimes_PMT1-8"
+        content = "CkovArrivalTimes_PMT1-8"
         doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_time)
         image_list.append(doc)
 
+        #Rogers - disabled; duplicates tof reducer output
         #TOF
         #file label = "TOF"
-        keywords = ['ckov', 'tof', 'tof1-tof0']
-        tag = "TOF1-TOF0"
-        content = "TOF1-TOF0"
-        doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_tof)
-        image_list.append(doc)                                
+        #keywords = ['ckov', 'tof', 'tof1-tof0']
+        #tag = "TOF1-TOF0"
+        #content = "TOF1-TOF0"
+        #doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_tof)
+        #image_list.append(doc)                                
 
         
         #TOFA and Charge
         #file label = "TOF_A"
         keywords = ['ckov', 'tof', 'ckova']
-        tag = "CkovCharge_VS_TOF_A"
-        content = "CkovCharge_VS_TOF_A"
+        tag = "CkovPE_A_vs_TOF_0_to_1"
+        content = "CkovPE_A_vs_TOF_0_to_1"
         doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_tof_A)
         image_list.append(doc)
 
         #TOFB and Charge
         #file label = "TOF_B"
         keywords = ['ckov', 'tof', 'ckovb']
-        tag = "CkovCharge_VS_TOF_B"
-        content = "CkovCharge_VS_TOF_B"
+        tag = "CkovPE_B_vs_TOF_0_to_1"
+        content = "CkovPE_B_vs_TOF_0_to_1"
         doc = ReducePyROOTHistogram.get_image_doc(self, keywords, content, tag, self.canvas_tof_B)
         image_list.append(doc)
 
         return image_list
                                                                             
+
+    def _cleanup_at_death(self):
+        """
+        Reinitialise histograms at death and print out new (empty) images
+        """
+        self.__init_histos()
+        self.get_histogram_images()

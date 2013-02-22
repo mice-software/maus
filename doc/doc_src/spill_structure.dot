@@ -1,4 +1,4 @@
-// generate using "dot file_structure.dot -Tpng -o file_structure.png"
+// generate using "dot spill_structure.dot -Tpng -o spill_structure.png"
 
 digraph G {
   node [shape=record];
@@ -181,6 +181,12 @@ digraph G {
     recon_events_array_item_emr_event [shape=record, label="{EMREvent|emr_event}"]
     recon_events_array_item_global_event [shape=record, label="{GlobalEvent|global_event}"]
     recon_events_array_item_kl_event [shape=record, label="{KLEvent|kl_event}"]
+     recon_events_array_item_kl_event_kl_digits [shape=record, label="{KLEventDigit|kl_digits}"]
+      recon_events_array_item_kl_event_kl_digits_kl [shape=record, label="{KLDigitArray|kl}"]
+       recon_events_array_item_kl_event_kl_digits_kl_array_item [shape=record, label="{KLDigit|[]}"]
+     recon_events_array_item_kl_event_kl_cell_hits [shape=record, label="{KLEventCellHit|kl_cell_hits}"]
+      recon_events_array_item_kl_event_kl_cell_hits_kl [shape=record, label="{KLCellHitArray|kl}"]
+       recon_events_array_item_kl_event_kl_cell_hits_kl_array_item [shape=record, label="{KLCellHit|[]}"]
     recon_events_array_item_sci_fi_event [shape=record, label="{SciFiEvent|sci_fi_event}"]
     recon_events_array_item_tof_event [shape=record, label="{TOFEvent|tof_event}"]
      recon_events_array_item_tof_event_tof_digits [shape=record, label="{TOFEventDigit|tof_digits}"]
@@ -216,6 +222,12 @@ digraph G {
    recon_events_array_item -> recon_events_array_item_emr_event
    recon_events_array_item -> recon_events_array_item_global_event
    recon_events_array_item -> recon_events_array_item_kl_event
+    recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_digits
+     recon_events_array_item_kl_event_kl_digits -> recon_events_array_item_kl_event_kl_digits_kl
+      recon_events_array_item_kl_event_kl_digits_kl -> recon_events_array_item_kl_event_kl_digits_kl_array_item
+    recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_cell_hits
+     recon_events_array_item_kl_event_kl_cell_hits -> recon_events_array_item_kl_event_kl_cell_hits_kl
+      recon_events_array_item_kl_event_kl_cell_hits_kl -> recon_events_array_item_kl_event_kl_cell_hits_kl_array_item
    recon_events_array_item -> recon_events_array_item_sci_fi_event
    recon_events_array_item -> recon_events_array_item_tof_event
    recon_events_array_item -> recon_events_array_item_trigger_event

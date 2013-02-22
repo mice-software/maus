@@ -12,6 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+"""InputPyEmptyDocument.py"""
 
 class InputPyEmptyDocument:
     """Lets MAUS start with empty spills
@@ -35,7 +36,7 @@ class InputPyEmptyDocument:
         self._number_of_events = arg_number_of_events
         self._current_spill = 0
 
-    def birth(self, json_config = "{}"): 
+    def birth(self, json_config = "{}"): #pylint:disable=W0613
         """
         birth() does nothing
         """
@@ -55,7 +56,7 @@ class InputPyEmptyDocument:
                 yield """{ "spill_number" : %d }""" % i
                 self._current_spill = i
 
-    def death(self):
+    def death(self):#pylint:disable=R0201
         """
         death() does nothing
         """

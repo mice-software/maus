@@ -26,6 +26,8 @@ import os
 import json
 import HTMLParser
 
+CPP_COV = os.path.expandvars('$MAUS_ROOT_DIR/doc/cpp_coverage')
+
 class Coverage(): # pylint: disable=R0903
     """
     Data structure reflecting lcov coverage information
@@ -180,6 +182,8 @@ def maus_filter(coverage_item):
         return False
     if coverage_item.file[-5:] == 'build':
         return False
+    if coverage_item.file.find('MausDataStructure.') > -1:
+        return False
     return True    
 
 def datastructure_filter(coverage_item):
@@ -189,6 +193,16 @@ def datastructure_filter(coverage_item):
     if coverage_item.file.find('src/common_cpp/DataStructure') == 0:
         return True
     return False
+
+def datastructure_getter():
+    """
+    Datastructure needs special handling to ignore ROOT generated
+    MausDataStructure code.
+    """
+    ds_list = CoverageParser().parse_file(
+      CPP_COV+'/src/common_cpp/DataStructure/index.html')
+    ds_list = [ds for ds in ds_list if ds.file.find('MausDataStructure.') == -1]
+    return total_coverage(ds_list)
 
 def non_legacy_filter(coverage_item):
     """
@@ -208,18 +222,16 @@ def main():
         os.path.expandvars('$MAUS_ROOT_DIR/doc/cpp_coverage/index.html')
     )   
     maus_coverage_list = [x for x in coverage_list if maus_filter(x)]
+    maus_coverage_list = [x for x in maus_coverage_list \
+                                                 if not datastructure_filter(x)]
+    maus_coverage_list.append(datastructure_getter())
     for item in maus_coverage_list:
-        print item.file
+        print item.file, item.json_repr()['line']['percentage']
     print 'ALL MAUS\n', total_coverage(maus_coverage_list)
     non_legacy_list = [x for x in maus_coverage_list if non_legacy_filter(x)]
     print 'NON-LEGACY MAUS\n', total_coverage(non_legacy_list)
     legacy_list = [x for x in maus_coverage_list if not non_legacy_filter(x)]
     print 'LEGACY MAUS\n', total_coverage(legacy_list)
-    not_ds_list = [x for x in maus_coverage_list if not datastructure_filter(x)]
-    print 'MAUS EXCLUDING DATASTRUCTURE\n', total_coverage(not_ds_list)
-    not_legacy_not_ds_list = [x for x in not_ds_list if non_legacy_filter(x)]
-    print 'MAUS EXCLUDING DATASTRUCTURE AND LEGACY\n', \
-          total_coverage(not_legacy_not_ds_list)
 
 if __name__ == "__main__":
     main()
