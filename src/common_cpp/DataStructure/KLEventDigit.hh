@@ -14,55 +14,57 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTDIGIT_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTDIGIT_
+
+#include <vector>
 
 #include "Rtypes.h"  // ROOT
-#include "src/common_cpp/DataStructure/KLEventDigit.hh"
-#include "src/common_cpp/DataStructure/KLEventCellHit.hh"
+
+#include "src/common_cpp/DataStructure/KLDigit.hh"
 
 namespace MAUS {
+// Needed for ROOT
+typedef std::vector<KLDigit> KLDigitArray;
 
-/** @class KLEvent comment
+/** @class KLEventDigit comment
  *
- *  @var kl_digits  <--description-->
- *  @var kl_cell_hits  <--description-->
+ *  @var kl  <--description-->
  */
 
-class KLEvent {
+class KLEventDigit {
   public:
     /** Default constructor - initialises to 0/NULL */
-    KLEvent();
+    KLEventDigit();
 
     /** Copy constructor - any pointers are deep copied */
-    KLEvent(const KLEvent& _klevent);
+    KLEventDigit(const KLEventDigit& _kleventdigit);
 
     /** Equality operator - any pointers are deep copied */
-    KLEvent& operator=(const KLEvent& _klevent);
+    KLEventDigit& operator=(const KLEventDigit& _kleventdigit);
 
     /** Destructor - any member pointers are deleted */
-    virtual ~KLEvent();
+    virtual ~KLEventDigit();
 
 
-     /** Returns KLEventDigit */
-    KLEventDigit GetKLEventDigit() const;
+    /** Returns KLDigitArray */
+    KLDigitArray GetKLDigitArray() const;
 
-    /** Sets KLEventDigit */
-    void SetKLEventDigit(KLEventDigit kl_digits);
+    /** Get an element from KLDigitArray (needed for PyROOT) */
+    KLDigit GetKLDigitArrayElement(size_t index) const;
 
-    /** Returns KLEventCellHit */
-    KLEventCellHit GetKLEventCellHit() const;
+    /** Get size of KLDigitArray (needed for PyROOT) */
+    size_t GetKLDigitArraySize() const;
 
-    /** Sets KLEventCellHit */
-    void SetKLEventCellHit(KLEventCellHit kl_cell_hits);
+    /** Sets KLDigitArray */
+    void SetKLDigitArray(KLDigitArray kl);
 
   private:
-    KLEventDigit _kl_digits;
-    KLEventCellHit _kl_cell_hits;
+    KLDigitArray _kl;
 
-    ClassDef(KLEvent, 1)
+    ClassDef(KLEventDigit, 1)
 };
 }
 
-#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
+#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENTDIGIT_
 
