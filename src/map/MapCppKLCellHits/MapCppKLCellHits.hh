@@ -31,7 +31,7 @@
 #include "json/json.h"
 #include "src/common_cpp/Utils/KLChannelMap.hh"
 
-
+namespace MAUS {
 class MapCppKLCellHits {
 
  public:
@@ -71,4 +71,5 @@ class MapCppKLCellHits {
    */
   Json::Value makeCellHits(Json::Value xDocPartEvent);
 };
+}
 #endif

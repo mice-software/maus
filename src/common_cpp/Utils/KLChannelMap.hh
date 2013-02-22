@@ -40,6 +40,7 @@ using std::istream;
 using std::ifstream;
 using std::stringstream;
 
+namespace MAUS {
 //////////////////////////////////////////////////////////////////////////////////////////////
 /** Identifier for a single KL channel.
  * This class is used to hold and manage all the information needed
@@ -137,7 +138,7 @@ class KLChannelMap {
   std::vector<KLChannelKey*> _klKey;
   std::vector<DAQChannelKey*> _fadcKey;
 };
-
+}
 #endif
 
 

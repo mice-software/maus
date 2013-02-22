@@ -17,6 +17,7 @@
 
 #include "Utils/KLChannelMap.hh"
 
+namespace MAUS {
 KLChannelMap::~KLChannelMap() {
   for (unsigned int i = 0;i < _klKey.size();i++) {
     delete _klKey[i];
@@ -178,5 +179,5 @@ string KLChannelKey::str() {
   xConv << (*this);
   return xConv.str();
 }
-
+}
 

@@ -37,10 +37,9 @@
 #include <vector>
 
 // G4MICE from commonCpp
-#include "Config/MiceModule.hh"  //  from old file?
 #include "Utils/KLChannelMap.hh"
 
-
+namespace MAUS {
 class MapCppKLDigits {
 
  public:
@@ -85,5 +84,6 @@ class MapCppKLDigits {
    */
   Json::Value getAdc(Json::Value xDocPartEvent);
 };
+}
 #endif
 

@@ -26,6 +26,7 @@
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
 
+namespace MAUS {
 bool MapCppKLCellHits::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   _classname = "MapCppKLCellHits";
@@ -216,4 +217,4 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
 
   return xDocCellHit;
 }
-
+}

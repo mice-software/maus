@@ -24,6 +24,7 @@
 
 #include "src/map/MapCppKLDigits/MapCppKLDigits.hh"
 
+namespace MAUS {
 bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
 
   _classname = "MapCppKLDigits";
@@ -227,4 +228,5 @@ Json::Value MapCppKLDigits::getAdc(Json::Value xDocAdcHit) {
   }
 
   return xDocInfo;
+}
 }
