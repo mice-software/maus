@@ -126,13 +126,15 @@ class MapCppTrackerReconTest {
   /** Converts the station id associated with a virtual plane to a tracker station number
    *
    *
-   *  \param vhit_stat_id The virtual hit station id (should be value from 1 to 10)
+   *  \param tpoint_stat_id The virtual hit station id (should be value from 1 to 10)
    */
-  int stat_id_to_stat_num(const int vhit_stat_id);
+  int stat_id_to_stat_num(const int tpoint_stat_id);
+
+  void normal_recon(MAUS::SciFiEvent *event);
 
   void n_spoints(std::vector<MAUS::SciFiSpacePoint*> spoints, int &n_sp_t1, int &n_sp_t2);
 
-  void vhits_per_tracker(std::vector<MAUS::SciFiHit> &virt_scifi_hit, int &t1, int &t2);
+  void track_points_per_tracker(std::vector<MAUS::SciFiHit> &track_points, int &t1, int &t2);
 
   void mc_v_recon(MAUS::SciFiEvent &event, MAUS::SciFiHitArray &hits);
 
@@ -141,6 +143,11 @@ class MapCppTrackerReconTest {
   bool compare_hits(MAUS::SciFiHit hit1, MAUS::SciFiHit hit2);
 
   void update_average(const int nhits, const MAUS::SciFiHit &new_hit, MAUS::SciFiHit &old_hit);
+
+  void write_hit_data(const int spill_num, const int mc_evt_num, const MAUS::SciFiHit &hit);
+
+  void write_track_point_data(const int spill_num, const int mc_evt_num, const int track_point_num,
+                              const MAUS:: SciFiHit &track_point);
 
  private:
   /// This should be the classname

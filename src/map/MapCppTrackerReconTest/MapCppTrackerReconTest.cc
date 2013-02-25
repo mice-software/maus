@@ -123,14 +123,7 @@ std::string MapCppTrackerReconTest::process(std::string document) {
           ThreeVector pos = hit.GetPosition();
           ThreeVector mom = hit.GetMomentum();
           if ( mom.z() > _pz_cut ) {
-            _of2 << spill.GetSpillNumber() << "\t" << i << "\t" << hit.GetTrackId() << "\t";
-            _of2 << hit.GetParticleId() << "\t" << hit.GetChannelId()->GetTrackerNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetStationNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetPlaneNumber() << "\t";
-            _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
-            _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
-            _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
-
+            write_hit_data(spill.GetSpillNumber(), static_cast<int>(i), hit);
             bool hit_matched = false;
 
             // If we have track points yet, use the hit to make a first track point
@@ -142,8 +135,6 @@ std::string MapCppTrackerReconTest::process(std::string document) {
               for ( unsigned int h = 0; h < track_points.size(); h++ ) {
                 // If the hit comes from the same track point
                 if ( compare_hits(track_points[h], hit) ) {
-                  std::cout << "Updating track point average in station ";
-                  std::cout << hit.GetChannelId()->GetStationNumber() << std::endl;
                   update_average(nhits_in_tp[h], hit, track_points[h]);
                   nhits_in_tp[h]++;
                   hit_matched = true;
@@ -168,30 +159,17 @@ std::string MapCppTrackerReconTest::process(std::string document) {
             }
           }
         } // Ends loop over scifihits
+
         // Calculate the average MC truth momentum per tracker
         pt_mc_t1 /= num_hits_t1;
         pz_mc_t1 /= num_hits_t1;
         pt_mc_t2 /= num_hits_t2;
         pz_mc_t2 /= num_hits_t2;
 
-        // Write the MC truth momentum to the current event file
-        _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
-        _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
-
+        // Loop over track points and write out data
         for ( unsigned int l = 0; l < track_points.size(); l++ ) {
-            ThreeVector v_pos = track_points[l].GetPosition();
-            ThreeVector v_mom = track_points[l].GetMomentum();
-            _of5 << spill.GetSpillNumber() << "\t" << i << "\t";
-            _of5 << track_points[l].GetTrackId() << "\t";
-            _of5 << track_points[l].GetParticleId() << "\t";
-            _of5 << track_points[l].GetChannelId()->GetTrackerNumber() << "\t";
-            _of5 << l << "\t";
-            _of5 << track_points[l].GetChannelId()->GetStationNumber() << "\t";
-            _of5 << track_points[l].GetChannelId()->GetPlaneNumber() << "\t";
-            _of5 << track_points[l].GetChannelId()->GetFibreNumber() << "\t";
-            _of5 << v_pos.x() << "\t" << v_pos.y() << "\t" << v_pos.z() << "\t";
-            _of5 << track_points[l].GetTime() << "\t";
-            _of5 << v_mom.x() << "\t" << v_mom.y() << "\t" << v_mom.z() << "\n";
+          write_track_point_data(spill.GetSpillNumber(), static_cast<int>(i), static_cast<int>(l),
+                                 track_points[l]);
         }
 
         double pt_rec_t1 = 0.0;
@@ -210,29 +188,10 @@ std::string MapCppTrackerReconTest::process(std::string document) {
         if ( spill.GetReconEvents()->at(i) ) {
           std::cerr << "Performing normal recon for event " << i << std::endl;
           SciFiEvent *event = spill.GetReconEvents()->at(i)->GetSciFiEvent();
-          // Build Clusters.
-          if ( event->digits().size() ) {
-            cluster_recon(*event);
-          }
-          // Build SpacePoints.
-          if ( event->clusters().size() ) {
-            spacepoint_recon(*event);
-          }
-          // Pattern Recognition.
-          if ( event->spacepoints().size() ) {
-            std::cout << "Calling Pattern Recognition..." << std::endl;
-            pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
-            std::cout << "Pattern Recognition complete." << std::endl;
-          }
-          // Kalman Track Fit.
-          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-            // track_fit(*event);
-          }
-          print_event_info(*event);
+          normal_recon(event);
 
           // ================= Compute Reconstruction Momentum Data =========================
           n_spoints(event->spacepoints(), n_sp_avail_t1, n_sp_avail_t2);
-
           bool t1_set = false;
           bool t2_set = false;
 
@@ -260,6 +219,13 @@ std::string MapCppTrackerReconTest::process(std::string document) {
               // ================= Match Seed Spacepoints with SciFi Hits =====================
               int n_matched_sp_t1 = 0;
               int n_matched_sp_t2 = 0;
+	      int num_matched_spt_in_track0;
+	      int num_matched_spt_in_track1;
+	      // My added code to make sure we only record one spacepoint //
+	      // as matched for each spacepoint in //
+	      // Loop even if it is matched to multiple track points //
+	      num_matched_spt_in_track0 = 0;
+	      num_matched_spt_in_track1 = 0;
               // Loop over spacepoints in the track
               for ( unsigned int k = 0; k < trk->get_spacepoints().size(); ++k ) {
                 SciFiSpacePoint *sp = trk->get_spacepoints()[k];
@@ -269,28 +235,33 @@ std::string MapCppTrackerReconTest::process(std::string document) {
                 _of1 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t";
                 _of1 << sp->get_time() << "\n";
                 for ( unsigned int j = 0; j < track_points.size(); j++ ) {
-                  SciFiHit vhit = track_points[j];
-                  // Is the vhit in the same tracker and station as the spacepoint
+                  SciFiHit tpoint = track_points[j];
+                  // Is the tpoint in the same tracker and station as the spacepoint
                   if ( sp->get_tracker() == 0 &&
-                       vhit.GetChannelId()->GetTrackerNumber() == 0 &&
-                       sp->get_station() == vhit.GetChannelId()->GetStationNumber() ) {
-                    if ( ( fabs(- pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
-                         ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1) ) {
+                       tpoint.GetChannelId()->GetTrackerNumber() == 0 &&
+                       sp->get_station() == tpoint.GetChannelId()->GetStationNumber() ) {
+                    if ( ( fabs(- pos.x() - tpoint.GetPosition().x()) < _cut1 ) &&
+                         ( fabs(pos.y() - tpoint.GetPosition().y()) < _cut1) ) {
                       ++n_matched_sp_t1;
                     }
                   } else if ( sp->get_tracker() == 1 &&
-                              vhit.GetChannelId()->GetTrackerNumber() == 1 &&
-                              sp->get_station() == vhit.GetChannelId()->GetStationNumber() ) {
-                    if ( ( fabs(pos.x() - vhit.GetPosition().x()) < _cut1 ) &&
-                         ( fabs(pos.y() - vhit.GetPosition().y()) < _cut1 ) ) {
+                              tpoint.GetChannelId()->GetTrackerNumber() == 1 &&
+                              sp->get_station() == tpoint.GetChannelId()->GetStationNumber() ) {
+                    if ( ( fabs(pos.x() - tpoint.GetPosition().x()) < _cut1 ) &&
+                         ( fabs(pos.y() - tpoint.GetPosition().y()) < _cut1 ) ) {
                       ++n_matched_sp_t2;
                     }
                   }
-                }
+		}
+		if (n_matched_sp_t1>0) {
+		  num_matched_spt_in_track0++;}
+		if (n_matched_sp_t2>0) {
+		  num_matched_spt_in_track1++;}
               }  // ~Loop over spacepoints in the track
-              _of3 << n_matched_sp_t1 << "\t" << n_matched_sp_t2 << "\n";
-              n_matched_sp_evt_t1 += n_matched_sp_t1;
-              n_matched_sp_evt_t2 += n_matched_sp_t2;
+	      std::cout << "num matched 1: " << num_matched_spt_in_track1 << std::endl;
+              _of3 << num_matched_spt_in_track0 << "\t" << num_matched_spt_in_track1 << "\n";
+              n_matched_sp_evt_t1 += num_matched_spt_in_track0;
+              n_matched_sp_evt_t2 += num_matched_spt_in_track1;
             } // ~Loop over the helical tracks in the recon event
           } // ~if ( event->helicalprtracks().size() )
           print_event_info(*event);
@@ -298,9 +269,11 @@ std::string MapCppTrackerReconTest::process(std::string document) {
 
         int t1_hits = 0;
         int t2_hits = 0;
-        vhits_per_tracker(track_points, t1_hits, t2_hits);
+        track_points_per_tracker(track_points, t1_hits, t2_hits);
 
         // ================= Write Data For The Current Event =========================
+        _of4 << spill.GetSpillNumber() << "\t" << i << "\t";
+        _of4 << pt_mc_t1 << "\t" << pz_mc_t1 << "\t" << pt_mc_t2 << "\t" << pz_mc_t2 << "\t";
         _of4 << pt_rec_t1 << "\t" << pz_rec_t1 << "\t" << pt_rec_t2 << "\t" << pz_rec_t2 << "\t";
         _of4 << n_matched_sp_evt_t1 << "\t" << n_sp_avail_t1 << "\t";
         _of4 << n_matched_sp_evt_t2 << "\t" << n_sp_avail_t2 << "\t";
@@ -339,6 +312,28 @@ bool MapCppTrackerReconTest::compare_hits(SciFiHit hit1, SciFiHit hit2) {
     return false;
   }
 };
+
+void MapCppTrackerReconTest::normal_recon(SciFiEvent *event) {
+  // Build Clusters.
+  if ( event->digits().size() ) {
+    cluster_recon(*event);
+  }
+  // Build SpacePoints.
+  if ( event->clusters().size() ) {
+    spacepoint_recon(*event);
+  }
+  // Pattern Recognition.
+  if ( event->spacepoints().size() ) {
+    std::cout << "Calling Pattern Recognition..." << std::endl;
+    pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
+    std::cout << "Pattern Recognition complete." << std::endl;
+  }
+  // Kalman Track Fit.
+  if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+    // track_fit(*event);
+  }
+  print_event_info(*event);
+}
 
 bool MapCppTrackerReconTest::read_in_json(std::string json_data, Spill &spill) {
   Json::Reader reader;
@@ -413,34 +408,28 @@ void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {
             << event.helicalprtracks().size() << " " << std::endl;
 }
 
-void MapCppTrackerReconTest::vhits_per_tracker(std::vector<SciFiHit> &track_points,
-                                               int &t1,
-                                               int &t2) {
+void MapCppTrackerReconTest::track_points_per_tracker(std::vector<SciFiHit> &track_points,
+                                                      int &t1, int &t2) {
   t1 = 0;
   t2 = 0;
-
   if ( track_points.size() ) {
     for ( unsigned int i = 0; i < track_points.size(); ++i ) {
-      SciFiHit vhit = track_points[i];
-      if ( vhit.GetChannelId()->GetTrackerNumber() == 0 ) {
-        ++t1;
-      } else if ( vhit.GetChannelId()->GetTrackerNumber() == 1 ) {
-        ++t2;
-      }
+      if ( track_points[i].GetChannelId()->GetTrackerNumber() == 0 ) ++t1;
+      if ( track_points[i].GetChannelId()->GetTrackerNumber() == 1 ) ++t2;
     }
   } else {
     std::cerr << "Invalid pointer supplied\n";
   }
 }
 
-int MapCppTrackerReconTest::stat_id_to_stat_num(const int vhit_stat_id) {
+int MapCppTrackerReconTest::stat_id_to_stat_num(const int tpoint_stat_id) {
   int stat_num = 0;
 
   // Tracker 1
-  if ( vhit_stat_id < 6 ) {
-    stat_num = 6 - vhit_stat_id;
-  } else if ( vhit_stat_id > 5 ) {
-    stat_num = vhit_stat_id - 5;
+  if ( tpoint_stat_id < 6 ) {
+    stat_num = 6 - tpoint_stat_id;
+  } else if ( tpoint_stat_id > 5 ) {
+    stat_num = tpoint_stat_id - 5;
   }
   return stat_num;
 }
@@ -551,6 +540,37 @@ void MapCppTrackerReconTest::update_average(const int nhits, const SciFiHit &new
   ThreeVector mom = ((old_hit.GetMomentum() * nhits) + new_hit.GetMomentum() )
                     / (nhits+1);
   old_hit.SetMomentum(mom);
+}
+
+void MapCppTrackerReconTest::write_hit_data(const int spill_num, const int mc_evt_num,
+                                            const SciFiHit &hit) {
+  ThreeVector pos = hit.GetPosition();
+  ThreeVector mom = hit.GetMomentum();
+  _of2 << spill_num << "\t" << mc_evt_num << "\t" << hit.GetTrackId() << "\t";
+  _of2 << hit.GetParticleId() << "\t" << hit.GetChannelId()->GetTrackerNumber() << "\t";
+  _of2 << hit.GetChannelId()->GetStationNumber() << "\t";
+  _of2 << hit.GetChannelId()->GetPlaneNumber() << "\t";
+  _of2 << hit.GetChannelId()->GetFibreNumber() << "\t";
+  _of2 << pos.x() << "\t" << pos.y() << "\t" << pos.z() << "\t" << hit.GetTime() << "\t";
+  _of2 << mom.x() << "\t" << mom.y() << "\t" << mom.z() << "\n";
+}
+
+void MapCppTrackerReconTest::write_track_point_data(const int spill_num, const int mc_evt_num,
+                                                    const int track_point_num,
+                                                    const SciFiHit &track_point) {
+  ThreeVector v_pos = track_point.GetPosition();
+  ThreeVector v_mom = track_point.GetMomentum();
+  _of5 << spill_num << "\t" << mc_evt_num << "\t";
+  _of5 << track_point.GetTrackId() << "\t";
+  _of5 << track_point.GetParticleId() << "\t";
+  _of5 << track_point.GetChannelId()->GetTrackerNumber() << "\t";
+  _of5 << track_point_num << "\t";
+  _of5 << track_point.GetChannelId()->GetStationNumber() << "\t";
+  _of5 << track_point.GetChannelId()->GetPlaneNumber() << "\t";
+  _of5 << track_point.GetChannelId()->GetFibreNumber() << "\t";
+  _of5 << v_pos.x() << "\t" << v_pos.y() << "\t" << v_pos.z() << "\t";
+  _of5 << track_point.GetTime() << "\t";
+  _of5 << v_mom.x() << "\t" << v_mom.y() << "\t" << v_mom.z() << "\n";
 }
 
 } // ~namespace MAUS
