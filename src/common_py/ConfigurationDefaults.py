@@ -237,7 +237,7 @@ SciFiSeedCovariance = 200 # Error estimate for Seed values of the Kalman Fit
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiUpdateMisalignments = False # Do Misalignment Search & Update
-
+SciFiParticleHypotesis = ["Proton", "MuMinus", "MuPlusElectron", "Positron", "PiMinus ", "PiPlus"]
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -300,7 +300,7 @@ V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
 Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 60
+VLSB_C_Zero_Suppression_Threshold = 35
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True

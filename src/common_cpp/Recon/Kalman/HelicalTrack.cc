@@ -33,21 +33,19 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   double new_z = new_site->get_z();
   double old_z = old_site->get_z();
 
-  double deltaZ = (new_z-old_z); // deltaZ in mm
+  // Delta Z in mm
+  double deltaZ = (new_z-old_z);
 
   // Get old state vector...
-  TMatrixD prev_site(5, 1);
-  prev_site = old_site->get_a(KalmanSite::Filtered);
+  TMatrixD prev_site = old_site->get_a(KalmanSite::Filtered);
 
   double old_kappa = prev_site(4, 0);
   double old_kappa2 = TMath::Power(old_kappa, 2.);
-  // double old_mx = prev_site(1, 0);
-  // double old_my = prev_site(3, 0);
 
-  double Q = 1.;
-  double B = -4.;
-  double a = -0.2998*Q*B; // MeV/mm
+  // constant in units MeV/mm
+  double a = -0.2998*_particle_charge*_B_field;
 
+  // Define factors to be used in the matrix.
   double sine = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
@@ -61,8 +59,6 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   _F(0, 3) = (cosine-1.)/(old_kappa*a);
   // @x/@kappa
   _F(0, 4) = 0.0;
-  // F(0, 4) = (-1./old_kappa2)*(old_mx*sine/a - old_my/a + old_my*cosine/a) +
-  //          (1./old_kappa)*(old_mx*deltaZ*cosine - old_my*deltaZ*sine);
 
   // @px/@x
   _F(1, 0) = 0.;
@@ -85,8 +81,6 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   _F(2, 3) = sine/(old_kappa*a);
   // @y/@kappa
   _F(2, 4) = 0.0;
-  // (-1./(old_kappa*old_kappa))*(old_my*sine/a+old_mx/a-old_mx*cosine/a) +
-  //           (1./old_kappa)*(old_my*deltaZ*cosine+old_mx*deltaZ*sine);
 
   // @py/@x
   _F(3, 0) = 0.;
@@ -110,24 +104,5 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // @kappa/@kappa
   _F(4, 4) = 1.;
 }
-
-/*
-void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
-  TMatrixD a(5, 1);
-  a = old_site->get_a();
-  Double_t kappa = a(4, 0);
-  Double_t conv_factor = kappa*kappa;
-
-  KalmanTrack::calc_system_noise(old_site, new_site);
-
-  TMatrixD Q(5, 5);
-  Q = get_Q();
-  // Q.Print();
-  Q *= conv_factor;
-  // Q.Print();
-  // Q.Zero();
-  set_Q(Q);
-}
-*/
 
 } // ~namespace MAUS

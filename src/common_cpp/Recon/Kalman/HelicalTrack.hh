@@ -42,6 +42,9 @@ class HelicalTrack : public KalmanTrack {
   virtual ~HelicalTrack();
 
   void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site);
+
+ private:
+  static const double _B_field = -4.;
 };
 
 } // ~namespace MAUS

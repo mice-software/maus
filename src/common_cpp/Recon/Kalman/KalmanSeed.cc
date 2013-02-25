@@ -20,15 +20,13 @@
 
 namespace MAUS {
 
-const double PI = acos(-1.);
-
+// Ascending site number.
 bool sort_by_id(const SciFiCluster *a, const SciFiCluster *b) {
-  // Ascending site number.
   return ( a->get_id() < b->get_id() );
 }
 
+// Ascending station number.
 bool sort_by_station(const SciFiSpacePoint a, const SciFiSpacePoint b) {
-  // Ascending station number.
   return ( a.get_station() < b.get_station() );
 }
 
@@ -41,7 +39,6 @@ KalmanSeed::~KalmanSeed() {}
 void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
   _straight = true;
 
-  // This builds the _clusters vector.
   process_measurements(pr_track);
 
   _a0 = compute_initial_state_vector(pr_track);
@@ -50,7 +47,6 @@ void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
 void KalmanSeed::build(const SciFiHelicalPRTrack* pr_track) {
   _helical = true;
 
-  // This builds the _clusters vector.
   process_measurements(pr_track);
 
   _a0 = compute_initial_state_vector(pr_track);
@@ -60,7 +56,6 @@ void KalmanSeed::process_measurements(const SciFiStraightPRTrack* pr_track) {
   for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
     SciFiSpacePoint sp = *pr_track->get_spacepoints()[i];
     _spacepoints.push_back(sp);
-    // std::cerr << sp.get_position() << " " << sp.get_channels()[0]->get_true_position() << std::endl;
   }
   double pz_from_timing;
 
@@ -75,22 +70,6 @@ void KalmanSeed::process_measurements(const SciFiHelicalPRTrack* pr_track) {
   double pz_from_timing;
 
   retrieve_clusters(_spacepoints, pz_from_timing);
-/*
-  std::ofstream myfile;
-  file.open ("spacepoints_cosmics_position.txt", std::ios::out | std::ios::app);
-
-  if ( _spacepoints.size() == 5 ) {
-    for ( size_t i = 0; i < 5; ++i ) {
-      int tracker = _spacepoints[i]->get_tracker();
-      int station = _spacepoints[i]->get_station();
-      ThreeVector position=_spacepoints[i]->get_position;
-      file << tracker << "\t" << station << "\t"
-           << position.x() << "\t" << position.y() << "\t" << position.z() << "\t"
-           <<
-    }
-  }
-  file.close();
-*/
 }
 
 TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* seed) {
@@ -103,16 +82,17 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   double tan_lambda = 1./dsdz;
   // PR doesnt see Eloss, so overstimates pz.
   // Total Eloss = 2 MeV/c.
-  double pz = pt*tan_lambda - 2./sqrt(12.);
+  double pz = pt*tan_lambda;
   double seed_pz;
 
   double momentum = pow(pt*pt+pz*pz, 0.5);
   double kappa = fabs(1./pz);
 
-  int numb_sites = _clusters.size();
+  // int numb_sites = _clusters.size();
 
   int tracker = _clusters[0]->get_tracker();
 
+  double PI = acos(-1.);
   double phi_0 = seed->get_phi0();
   double phi = phi_0 + PI/2.;
   double px  = pt*cos(phi);
@@ -121,6 +101,19 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   double x = _spacepoints[0].get_position().x();
   double y = _spacepoints[0].get_position().y();
 
+  // ThreeVector true_p = _clusters[0]->get_true_momentum();
+  // std::cerr << pz << " " << true_p.z() << " " << true_p << std::endl;
+/*
+  ThreeVector true_p = _clusters[0]->get_true_momentum();
+  double true_pt  = sqrt(true_p.x()*true_p.x()+true_p.y()*true_p.y());
+  double true_phi = acos(-true_p.x()/true_pt);
+  std::cerr << pt*cos(phi-PI/2.) << " " << pt*sin(phi-PI/2.) << std::endl;
+  std::cerr << px << " " << py << " " << true_p << std::endl;
+  std::cerr << "Pt: " << sqrt(px*px+py*py) << std::endl;
+  std::cerr << "True Pt: " << true_pt << std::endl;
+  std::cerr << "phi's: " << phi << " " << true_phi << "difference: " << true_phi-phi_0<< std::endl;
+*/
+
   TMatrixD a(5, 1);
   a(0, 0) = x;
   a(1, 0) = px*kappa;
@@ -128,10 +121,7 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   a(3, 0) = py*kappa;
   a(4, 0) = kappa;
 
-  _momentum = TMath::Power(px*px+py*py+pz*pz, 2.);
-
-  // std::cerr << "Seed: " << x << " " << px << " "
-  //             << y << " " << py << " " << 1./kappa << std::endl;
+  _momentum = TMath::Sqrt(px*px+py*py+pz*pz);
 
   return a;
 }
@@ -143,6 +133,9 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
   double mx = seed->get_mx();
   double my = seed->get_my();
   double seed_pz = 230.;
+
+  // std::cerr << mx << " " << my << " " << _clusters[0]->get_true_momentum()<< std::endl;
+
 
   TMatrixD a(5, 1);
   a(0, 0) = x;
@@ -157,7 +150,7 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
 }
 
 void KalmanSeed::retrieve_clusters(std::vector<SciFiSpacePoint> &spacepoints,
-                                      double &seed_pz) {
+                                   double &seed_pz) {
   size_t numb_spacepoints = spacepoints.size();
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {

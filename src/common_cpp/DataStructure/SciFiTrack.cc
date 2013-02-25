@@ -26,11 +26,11 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _s_chi2(-1),
                                                    _ndf(-1),
                                                    _P_value(-1) {
-  _tracker = a_track.get_tracker();
-  _f_chi2    = a_track.get_f_chi2();
-  _s_chi2    = a_track.get_s_chi2();
-  _ndf     = a_track.get_ndf();
-  _P_value = a_track.get_P_value();
+  _tracker = a_track.tracker();
+  _f_chi2    = a_track.f_chi2();
+  _s_chi2    = a_track.s_chi2();
+  _ndf     = a_track.ndf();
+  _P_value = a_track.P_value();
 }
 
 SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
@@ -38,22 +38,22 @@ SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
                                                   _s_chi2(-1),
                                                   _ndf(-1),
                                                   _P_value(-1) {
-  _tracker = kalman_track->get_tracker();
-  _f_chi2    = kalman_track->get_f_chi2();
-  _s_chi2    = kalman_track->get_s_chi2();
-  _ndf     = kalman_track->get_ndf();
-  _P_value = kalman_track->get_P_value();
+  _tracker = kalman_track->tracker();
+  _f_chi2    = kalman_track->f_chi2();
+  _s_chi2    = kalman_track->s_chi2();
+  _ndf     = kalman_track->ndf();
+  _P_value = kalman_track->P_value();
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     if (this == &a_track) {
         return *this;
     }
-    _tracker = a_track.get_tracker();
-    _f_chi2    = a_track.get_f_chi2();
-    _s_chi2    = a_track.get_s_chi2();
-    _ndf     = a_track.get_ndf();
-    _P_value = a_track.get_P_value();
+    _tracker = a_track.tracker();
+    _f_chi2    = a_track.f_chi2();
+    _s_chi2    = a_track.s_chi2();
+    _ndf     = a_track.ndf();
+    _P_value = a_track.P_value();
     return *this;
 }
 
@@ -63,21 +63,21 @@ SciFiTrack::~SciFiTrack() {}
 void SciFiTrack::add_track_points(const std::vector<KalmanSite> &sites) {
   size_t n_sites = sites.size();
   for ( size_t i = 0; i < n_sites; ++i ) {
-    const KalmanSite site = sites[i];
+    const KalmanSite *site = &sites[i];
     double time = 0.0;
     TMatrixD state_vector(5, 1);
-    state_vector = site->get_smoothed_state();
+    state_vector = site->get_a(KalmanSite::Smoothed);
     double energy = 1.0;
     double x = state_vector(0, 0);
     double px= state_vector(1, 0);
     double y = state_vector(2, 0);
     double py= state_vector(3, 0);
-    Detector & detector
-    double z = site.get_z();
-    recon::global::TrackPoint track_point = 
+    //Detector & detector
+    //double z = site.get_z();
+    //recon::global::TrackPoint track_point = 
   }
 
-  Detector(const ID id, const double plane, const CovarianceMatrix & uncertainties);
+  //Detector(const ID id, const double plane, const CovarianceMatrix & uncertainties);
 }
 */
 

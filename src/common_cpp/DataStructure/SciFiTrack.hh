@@ -31,8 +31,9 @@
 // MAUS headers
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 // #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-// #include "src/common_cpp/Recon/Global/Detector.hh"
-// #include "src/common_cpp/Recon/Global/TrackPoint.hh"
+//#include "src/common_cpp/Recon/Global/Detector.hh"
+//#include "src/common_cpp/Recon/Global/TrackPoint.hh"
+// class KalmanSite;
 
 namespace MAUS {
 
@@ -51,19 +52,19 @@ class SciFiTrack {
 
     // void add_track_points(const std::vector<KalmanSite> &sites);
 
-    int  get_tracker() const      { return _tracker; }
+    int  tracker() const      { return _tracker; }
     void set_tracker(int tracker) { _tracker = tracker; }
 
-    double get_f_chi2()    const   { return _f_chi2; }
+    double f_chi2()    const   { return _f_chi2; }
     void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
 
-    double get_s_chi2()    const   { return _s_chi2; }
+    double s_chi2()    const   { return _s_chi2; }
     void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
 
-    int  get_ndf()     const   { return _ndf; }
+    int  ndf()     const   { return _ndf; }
     void set_ndf(int ndf)      { _ndf = ndf; }
 
-    double get_P_value()    const   { return _P_value; }
+    double P_value()    const   { return _P_value; }
     void   set_P_value(double p_value) { _P_value = p_value; }
 
   private:

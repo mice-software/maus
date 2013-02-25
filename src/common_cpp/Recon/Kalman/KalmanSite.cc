@@ -73,10 +73,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
   _input_shift = site.get_input_shift();
   _input_shift_covariance = site.get_input_shift_covariance();
 
-  _shift_A = site.get_shift_A();
-  // _shift_B = site.get_shift_B();
-  _shift_A_covariance = site.get_shift_A_covariance();
-  // _shift_B_covariance = site.get_shift_B_covariance();
+  _shift = site.get_shift();
+  _shift_covariance = site.get_shift_covariance();
 
   _current_state = site.get_current_state();
 }
@@ -117,9 +115,9 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   _input_shift = rhs.get_input_shift();
   _input_shift_covariance = rhs.get_input_shift_covariance();
 
-  _shift_A = rhs.get_shift_A();
+  _shift = rhs.get_shift();
   // _shift_B = rhs.get_shift_B();
-  _shift_A_covariance = rhs.get_shift_A_covariance();
+  _shift_covariance = rhs.get_shift_covariance();
   // _shift_B_covariance = rhs.get_shift_B_covariance();
 
   _current_state = rhs.get_current_state();
@@ -152,17 +150,13 @@ void KalmanSite::initialise() {
   _covariance_residual.ResizeTo(2, 2);
   _covariance_smoothed_residual.ResizeTo(2, 2);
   _covariance_excluded_residual.ResizeTo(2, 2);
-  // _covariance_residuals.ResizeTo(2, 2);
 
   // The misalignments.
   _input_shift.ResizeTo(3, 1);
   _input_shift_covariance.ResizeTo(3, 3);
 
-  _shift_A.ResizeTo(3, 1);
-  // _shift_B.ResizeTo(3, 1);
-
-  _shift_A_covariance.ResizeTo(3, 3);
-  // _shift_B_covariance.ResizeTo(3, 3);
+  _shift.ResizeTo(3, 1);
+  _shift_covariance.ResizeTo(3, 3);
 }
 
 void KalmanSite::set_a(TMatrixD a, State kalman_state) {

@@ -44,6 +44,8 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
+#include "src/common_cpp/Recon/Kalman/Particle.hh"
+
 namespace MAUS {
 
 class KalmanTrackFit {
@@ -69,6 +71,10 @@ class KalmanTrackFit {
                   int ignore_i);
 
   void filter_virtual(KalmanSite &a_site);
+
+  void launch_misaligment_search(KalmanTrack *track,
+                                 std::vector<KalmanSite> &sites,
+                                 KalmanSciFiAlignment &kalman_align);
 
   void save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,

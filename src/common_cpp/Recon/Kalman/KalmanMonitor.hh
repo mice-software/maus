@@ -54,6 +54,8 @@ class KalmanMonitor {
 
   void save();
 
+  void save_graph();
+
  private:
   TFile *file;
 
@@ -63,6 +65,8 @@ class KalmanMonitor {
 
   TH1F *chi2_tracker0;
   TH1F *chi2_tracker1;
+  TH1F *pvalue_tracker0;
+  TH1F *pvalue_tracker1;
 
   TH1F *pull_site_3;
   TH1F *residual_site_3;
@@ -77,16 +81,26 @@ class KalmanMonitor {
   TH1F *residual_site_9;
   TH1F *smoothed_residual_site_9;
 
-  TGraph *station1;
-  TGraph *station2;
-  TGraph *station3;
-  TGraph *station4;
-  TGraph *station5;
-  TGraph *station6;
-  TGraph *station7;
-  TGraph *station8;
-  TGraph *station9;
-  TGraph *station10;
+  TGraph *station1_x;
+  TGraph *station2_x;
+  TGraph *station3_x;
+  TGraph *station4_x;
+  TGraph *station5_x;
+  TGraph *station6_x;
+  TGraph *station7_x;
+  TGraph *station8_x;
+  TGraph *station9_x;
+  TGraph *station10_x;
+  TGraph *station1_y;
+  TGraph *station2_y;
+  TGraph *station3_y;
+  TGraph *station4_y;
+  TGraph *station5_y;
+  TGraph *station6_y;
+  TGraph *station7_y;
+  TGraph *station8_y;
+  TGraph *station9_y;
+  TGraph *station10_y;
   TH1F *excl_plane11;
 
   TH2F *pull_hist;

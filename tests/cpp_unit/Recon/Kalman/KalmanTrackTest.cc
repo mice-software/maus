@@ -109,8 +109,8 @@ TEST_F(KalmanTrackTest, test_constructor) {
   // a_site->set_measurement(0);
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
   // EXPECT_EQ(track->get_chi2(), 0.0);
-  EXPECT_EQ(track->get_ndf(), 0.0);
-  EXPECT_EQ(track->get_tracker(), -1);
+  EXPECT_EQ(track->ndf(), 0.0);
+  EXPECT_EQ(track->tracker(), -1);
 }
 
 //

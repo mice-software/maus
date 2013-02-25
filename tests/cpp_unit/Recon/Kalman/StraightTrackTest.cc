@@ -72,7 +72,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   EXPECT_EQ(expected_x, a_projected(0, 0));
   EXPECT_EQ(expected_y, a_projected(2, 0));
 
-  track->calc_covariance(&old_site, &new_site);
+  // track->calc_covariance(&old_site, &new_site);
   // DO SOMETHING WITH COVARIANCE
 }
 /*

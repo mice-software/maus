@@ -15,7 +15,6 @@
  *
  */
 
-
 #ifndef KALMANSCIFIALIGNMENT_HH
 #define KALMANSCIFIALIGNMENT_HH
 
@@ -50,8 +49,10 @@ class KalmanSciFiAlignment {
 
   bool load_misaligments();
 
-  void update(std::vector<KalmanSite> sites);
 
+  void update(KalmanSite site);
+
+  void save();
   // MiceModule* find_plane(int tracker, int station, int plane);
 
   TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
@@ -63,8 +64,6 @@ class KalmanSciFiAlignment {
   void set_rotations(TMatrixD rotations, int site_id)  { rotations_array[site_id]     = rotations; }
   void set_cov_shifts(TMatrixD cov_s, int site_id)     { covariance_shifts[site_id]   = cov_s; }
   void set_cov_rotat(TMatrixD cov_r, int site_id)      { covariance_rotations[site_id]= cov_r; }
-
-  // void update_site(KalmanSite *site);
 
  private:
   std::string file, fname;

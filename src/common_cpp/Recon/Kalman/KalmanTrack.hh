@@ -39,7 +39,7 @@
 // #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 // #include "src/common_cpp/Utils/Globals.hh"
 // #include "src/common_cpp/Globals/GlobalsManager.hh"
-
+#include "src/common_cpp/Recon/Kalman/Particle.hh"
 namespace MAUS {
 
 class KalmanSite;
@@ -63,6 +63,8 @@ typedef struct SciFiParams {
   static const double Pitch()           { return 1.4945; }
   /// Active Radius in mm
   static const double Active_Radius()   { return 150.; }
+  /// RMS per channel measurement (um).
+  static const double RMS()             { return 370.; }
 } FibreParameters;
 
 typedef struct BetheBloch {
@@ -123,19 +125,21 @@ class KalmanTrack {
   void compute_emittance(KalmanSite site);
 
   // void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
-  void update_misaligments2(KalmanSite *excluded, TMatrixD a_old); //, TMatrixD old_smoothed);
+  void update_misaligments(std::vector<KalmanSite> &sites,
+                           std::vector<KalmanSite> &sites_copy,
+                           int station_i);
 
   /// Getters.
-  TMatrixD get_propagator()   const { return _F;        }
-  TMatrixD get_system_noise() const { return _Q;        }
-  TMatrixD get_Q()            const { return _Q;        }
-  double get_f_chi2()         const { return _f_chi2;   }
-  double get_s_chi2()         const { return 1.;        }
-  int get_ndf()               const { return _ndf;      }
-  double get_P_value()        const { return _P_value;  }
-  int get_tracker()           const { return _tracker;  }
-  double get_mass()           const { return _mass;     }
-  double get_momentum()       const { return _momentum; }
+  TMatrixD propagator()   const { return _F;        }
+  TMatrixD system_noise() const { return _Q;        }
+  TMatrixD Q()            const { return _Q;        }
+  double f_chi2()         const { return _f_chi2;   }
+  double s_chi2()         const { return _s_chi2;        }
+  int ndf()               const { return _ndf;      }
+  double P_value()        const { return _P_value;  }
+  int tracker()           const { return _tracker;  }
+  double mass()           const { return _mass;     }
+  double momentum()       const { return _momentum; }
 
   void set_Q(TMatrixD Q)             { _Q = Q;               }
   void set_mass(double mass)         { _mass = mass;         }
@@ -174,6 +178,10 @@ class KalmanTrack {
   int _tracker;
 
   double _mass, _momentum;
+
+  Particle _particle;
+
+  int _particle_charge;
 
   struct Emittance {
     double epsilon;

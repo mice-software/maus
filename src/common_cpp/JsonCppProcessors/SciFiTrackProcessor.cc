@@ -20,16 +20,16 @@ namespace MAUS {
 
 SciFiTrackProcessor::SciFiTrackProcessor() {
     RegisterValueBranch("tracker", &_int_proc,
-                        &SciFiTrack::get_tracker,
+                        &SciFiTrack::tracker,
                         &SciFiTrack::set_tracker, true);
     RegisterValueBranch("chi2", &_double_proc,
-                        &SciFiTrack::get_f_chi2,
+                        &SciFiTrack::f_chi2,
                         &SciFiTrack::set_f_chi2, true);
     RegisterValueBranch("ndf", &_int_proc,
-                        &SciFiTrack::get_ndf,
+                        &SciFiTrack::ndf,
                         &SciFiTrack::set_ndf, true);
     RegisterValueBranch("P_value", &_double_proc,
-                        &SciFiTrack::get_P_value,
+                        &SciFiTrack::P_value,
                         &SciFiTrack::set_P_value, true);
 }
 } // ~namespace MAUS
