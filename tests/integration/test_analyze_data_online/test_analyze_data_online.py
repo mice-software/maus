@@ -36,8 +36,8 @@ def online_okay():
     log = open("/dev/null", "w")
     proc = subprocess.Popen(["python", ONLINE_TEST], stdout=log,
                                                      stderr=subprocess.STDOUT)
-    proc.wait()
-    return proc.returncode == 0
+    proc.wait() # pylint: disable=E1101
+    return proc.returncode == 0 # pylint: disable=E1101
 
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online - crash out if it doesnt work"""
@@ -54,12 +54,12 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         proc = subprocess.Popen(['python', ANALYZE_EXE], env=env_cp,
                                            stdout=log, stderr=subprocess.STDOUT)
         time.sleep(10)
-        print "killing analyze online", proc.returncode
-        self.assertEquals(proc.returncode, None)
-        proc.send_signal(signal.SIGINT)
-        proc.wait()
+        print "killing analyze online", proc.returncode # pylint: disable=E1101
+        self.assertEquals(proc.returncode, None) # pylint: disable=E1101
+        proc.send_signal(signal.SIGINT) # pylint: disable=E1101
+        proc.wait() # pylint: disable=E1101
         print "killed analyze online"
-        self.assertEquals(proc.returncode, 0)
+        self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
     unittest.main()

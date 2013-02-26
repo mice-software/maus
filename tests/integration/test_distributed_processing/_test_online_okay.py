@@ -21,7 +21,7 @@ online-capable machines)
 
 import os 
 import unittest
-import celery.task.control
+import celery.task.control # pylint: disable=E0611, F0401
 import pymongo
 import pymongo.errors
 import subprocess
@@ -38,7 +38,8 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         down) or no active nodes
         """
         try:
-            active_nodes = celery.task.control.inspect().active()
+            active_nodes = \
+                  celery.task.control.inspect().active() # pylint: disable=E1101
         except: #pylint: disable=W0702
             self.assertTrue(False, "Failed to inspect celery workers")
         self.assertNotEqual(active_nodes, None)
@@ -65,8 +66,8 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         maus_web = os.path.join(os.environ['MAUS_WEB_DIR'],
                                                     'src/mausweb/manage.py')
         proc = subprocess.Popen(['python', '-m', maus_web])        
-        proc.wait()
-        self.assertEquals(proc.returncode, 0)
+        proc.wait() # pylint: disable=E1101
+        self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
     unittest.main()

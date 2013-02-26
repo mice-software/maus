@@ -42,8 +42,8 @@ def build_test_output():
                                                               "run_tests.bash")
     testproc = subprocess.Popen(['bash', run_tests_bash], stdout=test_log,
                                                        stderr=subprocess.STDOUT)
-    testproc.wait()
-    if testproc.returncode != 0:
+    testproc.wait() # pylint: disable=E1101
+    if testproc.returncode != 0: # pylint: disable=E1101
         print "ERROR - tests failed"
     else:
         COPY_TARGETS.append(TEST_PLOTS)
@@ -61,8 +61,8 @@ def build_doxygen():
         path = os.path.join(doc_tools, doxyfile)
         doxyproc = subprocess.Popen(['doxygen', path], stdout=doxy_log,
                                                        stderr=subprocess.STDOUT)
-        doxyproc.wait()
-        if doxyproc.returncode != 0:
+        doxyproc.wait() # pylint: disable=E1101
+        if doxyproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - doxygen failed for doxyfile: "+path
     COPY_TARGETS += glob.glob(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
                                                                    'doxygen_*'))
@@ -76,14 +76,14 @@ def build_user_guide():
     for index in range(2): #pylint: disable = W0612
         latexproc = subprocess.Popen(['pdflatex', 'maus_user_guide.tex'],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
-        latexproc.wait()
-        if latexproc.returncode != 0:
+        latexproc.wait() # pylint: disable=E1101
+        if latexproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - latex failed"
         latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex',
                                          "-split", "3", "-html_version", "3.2"],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
-        latexproc.wait()
-        if latexproc.returncode != 0:
+        latexproc.wait() # pylint: disable=E1101
+        if latexproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - latex failed"
     COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide.pdf'))
     COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide'))
@@ -108,10 +108,10 @@ def build_third_party_tarball():
     proc = subprocess.Popen(["tar", "-czf",
                              tarball_name]
                              +tarball_targets)
-    proc.wait()
+    proc.wait() # pylint: disable=E1101
     proc = subprocess.Popen(["md5sum", tarball_name],
                             stdout=open(tarball_name+".md5", "w"))
-    proc.wait()
+    proc.wait() # pylint: disable=E1101
     COPY_TARGETS.append(os.path.join(os.getcwd(), tarball_name))
     COPY_TARGETS.append(os.path.join(os.getcwd(), tarball_name+".md5"))
 
@@ -143,16 +143,16 @@ def scp(scp_in, scp_out):
     scp_log = open(SCP_LOG, 'w')
     scp_proc = subprocess.Popen(['scp', '-r', scp_in, scp_out], stdout=scp_log,
                                                        stderr=subprocess.STDOUT)
-    scp_proc.wait()
-    if scp_proc.returncode != 0:
+    scp_proc.wait() # pylint: disable=E1101
+    if scp_proc.returncode != 0: # pylint: disable=E1101
         print "ERROR - scp failed"
 
 def main():
     """main function"""
     print "Doing server build"
-    #build_user_guide()
-    #build_doxygen()
-    #build_test_output()
+    build_user_guide()
+    build_doxygen()
+    build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:
