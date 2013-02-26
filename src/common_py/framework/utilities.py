@@ -20,9 +20,9 @@ MAUS framework utilities module.
 import socket
 import sys
 
-from celery.task.control import discard_all
-from celery.task.control import inspect
-from celery.task.control import broadcast
+from celery.task.control import discard_all # pylint: disable=E0611, F0401
+from celery.task.control import inspect # pylint: disable=E0611, F0401
+from celery.task.control import broadcast # pylint: disable=E0611, F0401
 from docstore.DocumentStore import DocumentStore
 from docstore.DocumentStore import DocumentStoreException
 
