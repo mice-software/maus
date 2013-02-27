@@ -12,8 +12,8 @@
 # 
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
-import sys
+"""test_reconstruction.py"""
+# import sys
 import unittest
 import os
 import subprocess
@@ -45,7 +45,8 @@ def run_simulation(output_json):
     proc.wait()
     return output_json
 
-class TestReconstruction(unittest.TestCase):
+class TestReconstruction(unittest.TestCase):#pylint: disable =R0904
+    """TestReconstruction"""
     def test_tof_reconstruction(self):
         """
         Check that we can reconstruct at each of the relevant detectors
@@ -56,9 +57,9 @@ class TestReconstruction(unittest.TestCase):
         json_in = open(output_json).readlines()
         det_list = ["tof0", "tof1", "tof2"]
         n_events = 0
-        dt = {}
+        det = {}
         for detector in det_list:
-            dt[detector] = []
+            det[detector] = []
         for spill in json_in:
             spill = json.loads(spill)
             if "mc" in spill:
@@ -66,19 +67,19 @@ class TestReconstruction(unittest.TestCase):
                 for detector in det_list:
                     for sp_list in spill["space_points"][detector]:
                         if type(sp_list) != type(None):
-                            dt[detector] += [sp["time"] for sp in sp_list]
+                            det[detector] += [sp["time"] for sp in sp_list]
             else:
                 print spill
         for detector in det_list:
             name = detector+"_mc_time-of-flight"
             canvas = Common.make_root_canvas(name)
-            hist = Common.make_root_histogram(name, dt[detector], 'ns', 100)
+            hist = Common.make_root_histogram(name, det[detector], 'ns', 100)
             hist.SetStats(True)
             hist.Draw()
             plot_out = os.path.join \
                              (mrd, "tests", "integration", "plots", name+".png")
             canvas.Print(plot_out)
-            self.assertGreater(len(dt[detector])/float(n_events), 0.90)
+            self.assertGreater(len(det[detector])/float(n_events), 0.90)
 
 if __name__ == '__main__':
     unittest.main()

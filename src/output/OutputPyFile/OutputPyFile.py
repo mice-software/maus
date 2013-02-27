@@ -108,12 +108,15 @@ class OutputPyFile:
         else:
             file_name = "%s.%s" % (self.file_name, self.file_extension)
         file_path = os.path.join(self.directory, file_name)
+        print "save to ", file_path
         try:
             json_file = open(file_path, 'w')
             json_file.write(document.rstrip() + '\n')
             json_file.close()
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)
+            return False
+        return True
 
     def death(self): #pylint: disable=R0201
         """

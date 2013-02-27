@@ -19,10 +19,12 @@
 
 namespace MAUS {
 
-KLEvent::KLEvent() {
+KLEvent::KLEvent()
+    : _kl_digits(), _kl_cell_hits() {
 }
 
-KLEvent::KLEvent(const KLEvent& _klevent) {
+KLEvent::KLEvent(const KLEvent& _klevent)
+    : _kl_digits(), _kl_cell_hits() {
     *this = _klevent;
 }
 
@@ -30,10 +32,29 @@ KLEvent& KLEvent::operator=(const KLEvent& _klevent) {
     if (this == &_klevent) {
         return *this;
     }
+    SetKLEventDigit(_klevent._kl_digits);
+    SetKLEventCellHit(_klevent._kl_cell_hits);
     return *this;
 }
 
 KLEvent::~KLEvent() {
+}
+
+KLEventDigit KLEvent::GetKLEventDigit() const {
+    return _kl_digits;
+}
+
+void KLEvent::SetKLEventDigit(KLEventDigit kl_digits) {
+    _kl_digits = kl_digits;
+}
+
+
+KLEventCellHit KLEvent::GetKLEventCellHit() const {
+    return _kl_cell_hits;
+}
+
+void KLEvent::SetKLEventCellHit(KLEventCellHit kl_cell_hits) {
+    _kl_cell_hits = kl_cell_hits;
 }
 }
 

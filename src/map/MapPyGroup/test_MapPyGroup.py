@@ -316,7 +316,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         workers[2].birth("""{"death_result":%s}""" % MapPyTestMap.FAIL)
         result = group.death()
         self.assertFalse(result, "death unexpectedly returned True")
-        
+
     def test_death_exception(self):
         """
         Test calling death where one worker's death function 

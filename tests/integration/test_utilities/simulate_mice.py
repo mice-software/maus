@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""simulate_mice.py"""
 import os
 import io   #  generic python library for I/O
 import gzip #  For compressed output # pylint: disable=W0611
@@ -36,7 +37,8 @@ def run(number_of_spills):
 
     #  Choose from either a compressed or uncompressed output file
     #
-    output_file = open(os.environ["MAUS_ROOT_DIR"]+"/tmp/simulation.out", 'w')  #  Uncompressed
+    output_file = open(os.environ["MAUS_ROOT_DIR"] + "/tmp/simulation.out",
+                       'w')  #  Uncompressed
     #output_file = gzip.GzipFile("mausput.gz", 'wb')  #  Compressed
 
     #

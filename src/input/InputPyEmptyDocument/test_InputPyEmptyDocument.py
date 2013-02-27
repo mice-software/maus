@@ -1,9 +1,11 @@
+#pylint:disable=C0103
+"""test_InputPyEmptyDocument.py"""
 import json
 import unittest
 
 from InputPyEmptyDocument import InputPyEmptyDocument
 
-class InputPyEmptyDocumentTestCase(unittest.TestCase):
+class InputPyEmptyDocumentTestCase(unittest.TestCase): #pylint:disable=R0904
     """
     Test class for InputPyEmptyDocument
     """
