@@ -310,13 +310,13 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
   int chanNo;
 
-  //if ( tracker == 0 ) {
+  // if ( tracker == 0 ) {
     // start counting from the other end
   //  chanNo = static_cast<int> (floor((numberFibres-fiberNumber)/7.0));
-  //} else {
+  // } else {
   // The fibre numbers run from right to left;
     chanNo = static_cast<int> (floor(fiberNumber/7.0));
-  //}
+  // }
 
   return chanNo;
 }

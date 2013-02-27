@@ -12,7 +12,7 @@
 # 
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
+"""test_virtual_planes.py"""
 import unittest
 import os
 import subprocess
@@ -50,7 +50,8 @@ def run_simulation(geometry, configuration):
     proc.wait()
     return output_json
 
-class VirtualPlaneTestCase(unittest.TestCase):
+class VirtualPlaneTestCase(unittest.TestCase):#pylint: disable =R0904
+    """VirtualPlaneTestCase"""
     def test_virtual_defaults(self):
         """
         Check that we readout virtual hits at the correct z position (and not

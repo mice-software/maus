@@ -178,7 +178,7 @@ void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sit
     // Predict the state vector at site i...
     track->extrapolate(sites, j);
     // ... Filter...
-    if ( j!=site_removed_1 && j!=site_removed_2 && j!=site_removed_3 ) {
+    if ( j != site_removed_1 && j != site_removed_2 && j != site_removed_3 ) {
       track->filter(sites, j);
     } else {
       filter_virtual(sites[j]);
@@ -205,7 +205,7 @@ void KalmanTrackFit::save(const KalmanTrack *kalman_track,
                           std::vector<KalmanSite> sites,
                           SciFiEvent &event) {
   KalmanSite *plane_0 = &sites[0];
-  assert(plane_0->get_id()==0 ||plane_0->get_id()==15);
+  assert(plane_0->get_id() == 0 || plane_0->get_id() == 15);
 
   TMatrixD a = plane_0->get_a(KalmanSite::Smoothed);
   TMatrixD C = plane_0->get_covariance_matrix(KalmanSite::Smoothed);
@@ -220,16 +220,18 @@ void KalmanTrackFit::save(const KalmanTrack *kalman_track,
 
   Json::Value *json = Globals::GetConfigurationCards();
   double energy  = (*json)["simulation_reference_particle"]["energy"].asDouble();
-  double emittance_in= (*json)["beam"]["definitions"][static_cast<Json::UInt> (0)]["transverse"]["emittance_4d"].asDouble();
+  double emittance_in= (*json)["beam"]["definitions"]
+                       [static_cast<Json::UInt> (0)]["transverse"]
+                       ["emittance_4d"].asDouble();
 
   std::ofstream file;
-  file.open ("emittance.txt", std::ios::out | std::ios::app);
+  file.open("emittance.txt", std::ios::out | std::ios::app);
   file << energy << "\t" << emittance_in << "\t" << tracker << "\t"
-       << a(0,0) << "\t" << C(0,0) << "\t" << mc_pos.getX() << "\t"
-       << a(1,0) << "\t" << C(1,1) << "\t" << mc_mom.getX() << "\t"
-       << a(2,0) << "\t" << C(2,2) << "\t" << mc_pos.getY() << "\t"
-       << a(3,0) << "\t" << C(3,3) << "\t" << mc_mom.getY() << "\t"
-       << a(4,0) << "\t" << C(4,4) << "\t" << mc_mom.getZ() << "\n";
+       << a(0, 0) << "\t" << C(0, 0) << "\t" << mc_pos.getX() << "\t"
+       << a(1, 0) << "\t" << C(1, 1) << "\t" << mc_mom.getX() << "\t"
+       << a(2, 0) << "\t" << C(2, 2) << "\t" << mc_pos.getY() << "\t"
+       << a(3, 0) << "\t" << C(3, 3) << "\t" << mc_mom.getY() << "\t"
+       << a(4, 0) << "\t" << C(4, 4) << "\t" << mc_mom.getZ() << "\n";
   file.close();
 
   SciFiTrack *track = new SciFiTrack(kalman_track);

@@ -26,8 +26,10 @@ namespace MAUS {
 KalmanMonitor::KalmanMonitor(): file(0),
                                 chi2_tracker0(0), chi2_tracker1(0),
                                 pvalue_tracker0(0), pvalue_tracker1(0),
-                                station1_x(0), station2_x(0), station3_x(0), station4_x(0), station5_x(0),
-                                station6_x(0), station7_x(0), station8_x(0), station9_x(0), station10_x(0),
+                                station1_x(0), station2_x(0), station3_x(0),
+                                station4_x(0), station5_x(0),
+                                station6_x(0), station7_x(0), station8_x(0),
+                                station9_x(0), station10_x(0),
                                 pull_hist(0), residual_hist(0), smooth_residual_hist(0),
                                 x_proj_h(0), y_proj_h(0),
                                 px_proj_h(0), py_proj_h(0), pz_proj_h(0),
@@ -404,7 +406,6 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
   _counter +=1;
   if ( !(_counter%10) ) {
     save();
-    // save_graph();
   }
 
 /*
@@ -527,25 +528,25 @@ void KalmanMonitor::save() {
   excl_plane11->Write("", TObject::kOverwrite);
 
 
-  //TCanvas *c = new TCanvas("c","c",600,500);
-  TMultiGraph *mg = new TMultiGraph("multigraph","multigraph");
+  // TCanvas *c = new TCanvas("c","c",600,500);
+  TMultiGraph *mg = new TMultiGraph("multigraph", "multigraph");
   mg->SetMaximum(1.);
   mg->SetMinimum(-3.);
-   station2_x->SetLineColor(kBlack);
-   station2_x->SetLineWidth(2);
-   station3_x->SetLineColor(kBlue);
-   station3_x->SetLineWidth(2);
-   station4_x->SetLineColor(kRed);
-   station4_x->SetLineWidth(2);
-   station2_y->SetLineColor(kBlack);
-   station2_y->SetLineWidth(2);
-   station2_y->SetLineStyle(9);
-   station3_y->SetLineColor(kBlue);
-   station3_y->SetLineWidth(2);
-   station3_y->SetLineStyle(9);
-   station4_y->SetLineColor(kRed);
-   station4_y->SetLineWidth(2);
-   station4_y->SetLineStyle(9);
+  station2_x->SetLineColor(kBlack);
+  station2_x->SetLineWidth(2);
+  station3_x->SetLineColor(kBlue);
+  station3_x->SetLineWidth(2);
+  station4_x->SetLineColor(kRed);
+  station4_x->SetLineWidth(2);
+  station2_y->SetLineColor(kBlack);
+  station2_y->SetLineWidth(2);
+  station2_y->SetLineStyle(9);
+  station3_y->SetLineColor(kBlue);
+  station3_y->SetLineWidth(2);
+  station3_y->SetLineStyle(9);
+  station4_y->SetLineColor(kRed);
+  station4_y->SetLineWidth(2);
+  station4_y->SetLineStyle(9);
   mg->Add(station2_x);
   mg->Add(station3_x);
   mg->Add(station4_x);
@@ -553,9 +554,9 @@ void KalmanMonitor::save() {
   mg->Add(station3_y);
   mg->Add(station4_y);
 
-  //station4_x->Draw("ALP");
-  //mg->Draw("LP");
-  //c->BuildLegend();
+  // station4_x->Draw("ALP");
+  // mg->Draw("LP");
+  // c->BuildLegend();
 /*
   TLegend *leg = new TLegend(0.1,0.7,0.4,0.9);
   leg->SetHeader("The Legend Title");
@@ -579,11 +580,4 @@ void KalmanMonitor::save() {
 */
   file->Close();
 }
-
-void KalmanMonitor::save_graph() {
-
-
-}
-
 } // ~namespace MAUS
-

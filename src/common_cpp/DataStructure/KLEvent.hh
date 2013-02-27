@@ -17,12 +17,16 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/DataStructure/KLEventDigit.hh"
+#include "src/common_cpp/DataStructure/KLEventCellHit.hh"
 
 namespace MAUS {
 
 /** @class KLEvent comment
  *
+ *  @var kl_digits  <--description-->
+ *  @var kl_cell_hits  <--description-->
  */
 
 class KLEvent {
@@ -40,9 +44,23 @@ class KLEvent {
     virtual ~KLEvent();
 
 
-  private:
+     /** Returns KLEventDigit */
+    KLEventDigit GetKLEventDigit() const;
 
-    MAUS_VERSIONED_CLASS_DEF(KLEvent)
+    /** Sets KLEventDigit */
+    void SetKLEventDigit(KLEventDigit kl_digits);
+
+    /** Returns KLEventCellHit */
+    KLEventCellHit GetKLEventCellHit() const;
+
+    /** Sets KLEventCellHit */
+    void SetKLEventCellHit(KLEventCellHit kl_cell_hits);
+
+  private:
+    KLEventDigit _kl_digits;
+    KLEventCellHit _kl_cell_hits;
+
+    ClassDef(KLEvent, 1)
 };
 }
 

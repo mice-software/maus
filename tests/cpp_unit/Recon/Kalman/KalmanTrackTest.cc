@@ -178,8 +178,6 @@ HA.Print();
   // So we need a plane that's not 0 (because this one is vertical, only measures x)
   a_site->set_direction(direction_plane1_tracker0);
   CLHEP::Hep3Vector perp = direction_plane1_tracker0.orthogonal();
-
-
 }
 
 TEST_F(KalmanTrackTest, test_filtering_methods) {

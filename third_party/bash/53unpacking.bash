@@ -2,19 +2,35 @@
 
 # require python extras for scons
 
-directory=unpacking-maus
-filename=${directory}.tar.gz
+directory=unpacking-mice
+filename=${directory}.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    cd ${MAUS_ROOT_DIR}/third_party/source
+
+    if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ]
     then
-	echo "INFO: Source archive exists."
+      rm ${MAUS_ROOT_DIR}/third_party/source/${filename}
+    fi
+
+    if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]
+    then
+      rm ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5
+    fi
+
+    wget http://dpnc.unige.ch/~yordan/${filename}
+    wget http://dpnc.unige.ch/~yordan/${filename}.md5
+
+    if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ] &&
+       [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]
+    then
+        echo "INFO: Source archive file is download."
         echo
         echo "INFO: Checking MD5 checksum (otherwise the file didn't"
         echo "INFO: download properly):"
         echo
-        cd ${MAUS_ROOT_DIR}/third_party/source
+
         md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
         sleep 1
         echo
@@ -23,26 +39,25 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
+        cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+        echo
+        echo "INFO: Making and installing"
+        echo
+        sleep 1
+        scons install
 
-	echo 
-	echo "INFO: Making and installing"
-	echo
-	sleep 1
-	scons install
-
-	echo
+        echo
         echo "INFO: The package should be locally build now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"
         echo "INFO: find."
     else
-        echo "FATAL: Source archive still doesn't exist.  Please file a bug report with your operating system,">&2
-        echo "FATAL: distribution, and any other useful information at:" >&2
+        echo "FATAL: Unable to download the source archive files. Please file a bug report at:" >&2
         echo "FATAL: " >&2
         echo "FATAL: http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/" >&2
         echo "FATAL:" >&2
         echo "FATAL: Giving up, sorry..." >&2
-	exit 1
+        exit 1
     fi
 
 else

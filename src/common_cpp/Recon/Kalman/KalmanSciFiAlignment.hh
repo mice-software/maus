@@ -34,6 +34,9 @@
 
 #include "TMath.h"
 #include "TMatrixD.h"
+
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "Interface/Squeal.hh"

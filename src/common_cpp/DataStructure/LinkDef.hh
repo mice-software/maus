@@ -150,9 +150,14 @@
 #pragma link C++ class MAUS::SciFiStraightPRTrack+;
 #pragma link C++ class std::vector<SciFiStraightPRTrack*>+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
-#pragma link C++ class std::vector<SciFiHelicalPRTrack*>+;
 #pragma link C++ class MAUS::SciFiTrack+;
 #pragma link C++ class std::vector<SciFiTrack*>+;
+#pragma link C++ class MAUS::KLDigit+;
+#pragma link C++ class MAUS::KLCellHit+;
+#pragma link C++ class MAUS::KLEventCellHit+;
+#pragma link C++ class MAUS::KLEventDigit+;
+#pragma link C++ class std::vector<MAUS::KLDigit>;
+#pragma link C++ class std::vector<MAUS::KLCellHit>;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

@@ -20,11 +20,6 @@
 //
 
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-
-#include <iostream>
-#include <fstream>
 
 namespace MAUS {
 
@@ -182,5 +177,4 @@ void KalmanSciFiAlignment::save() {
 
   file_out.close();
 }
-
 } // ~namespace MAUS

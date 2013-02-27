@@ -1,0 +1,88 @@
+{
+  "daq_event_type": "physics_event", 
+  "recon_events": [
+    {
+      "kl_event": {
+        "kl_digits": {
+          "kl": [
+            {
+              "pmt": 0, 
+              "part_event_number": 0, 
+              "charge_mm": 1043, 
+              "charge_pm": 1040, 
+              "cell": 1, 
+              "phys_event_number": 0, 
+              "position_max": 44, 
+              "kl_key": "KLChannelKey 1 0 kl"
+            }, 
+            {
+              "pmt": 1, 
+              "part_event_number": 0, 
+              "charge_mm": 1318, 
+              "charge_pm": 1309, 
+              "cell": 1, 
+              "phys_event_number": 0, 
+              "position_max": 45, 
+              "kl_key": "KLChannelKey 1 1 kl"
+            }, 
+            {
+              "pmt": 0, 
+              "part_event_number": 0, 
+              "charge_mm": 1195, 
+              "charge_pm": 1190, 
+              "cell": 12, 
+              "phys_event_number": 0, 
+              "position_max": 38, 
+              "kl_key": "KLChannelKey 12 0 kl"
+            }, 
+            {
+              "pmt": 1, 
+              "part_event_number": 0, 
+              "charge_mm": 1153, 
+              "charge_pm": 1149, 
+              "cell": 12, 
+              "phys_event_number": 0, 
+              "position_max": 38, 
+              "kl_key": "KLChannelKey 12 1 kl"
+            }
+          ]
+        }
+      } 
+    }, 
+    {
+      "kl_event": {
+        "kl_digits": {
+          "kl": [
+            {
+              "pmt": 0, 
+              "part_event_number": 2, 
+              "charge_mm": 1078, 
+              "charge_pm": 1076, 
+              "cell": 11, 
+              "phys_event_number": 0, 
+              "position_max": 41, 
+              "kl_key": "KLChannelKey 11 0 kl"
+            }, 
+            {
+              "pmt": 1, 
+              "part_event_number": 2, 
+              "charge_mm": 1274, 
+              "charge_pm": 1272, 
+              "cell": 11, 
+              "phys_event_number": 0, 
+              "position_max": 42, 
+              "kl_key": "KLChannelKey 11 1 kl"
+            }
+          ]
+        }
+      } 
+    }, 
+    {
+      "kl_event": {
+        "kl_digits": {
+          "kl": []
+        }
+      } 
+    }
+  ]
+}

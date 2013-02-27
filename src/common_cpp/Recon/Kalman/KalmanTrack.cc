@@ -730,7 +730,7 @@ void KalmanTrack::update_misaligments(std::vector<KalmanSite> &sites,
     TMatrixD pull = measurement - HA;
 
     // Compute new shift.
-    //TMatrixD old_E = excluded->get_input_shift_covariance();
+    // TMatrixD old_E = excluded->get_input_shift_covariance();
     TMatrixD S_transposed(3, 2);
     S_transposed.Transpose(_S);
     TMatrixD Ks    = old_E * S_transposed * _W;

@@ -54,8 +54,6 @@ class KalmanMonitor {
 
   void save();
 
-  void save_graph();
-
  private:
   TFile *file;
 

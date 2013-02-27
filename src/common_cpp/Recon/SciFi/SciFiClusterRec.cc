@@ -178,7 +178,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
 
   if ( clust->get_tracker() == 0 ) {
     // flips z and x
-   // tracker_ref_frame_pos.rotateY(acos(-1));
+    // tracker_ref_frame_pos.rotateY(acos(-1));
   }
   // tracker_ref_frame_pos.setX(0.);
   // tracker_ref_frame_pos.setY(0.);
@@ -191,9 +191,9 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   }
 */
   alpha = clust->get_channel() - CentralFibre;
-  //if ( clust->get_tracker() == 0 ) {
+  // if ( clust->get_tracker() == 0 ) {
     alpha = -alpha;
-  //}
+  // }
 }
 
 const MiceModule* SciFiClusterRec::find_plane(int tracker, int station, int plane) {
