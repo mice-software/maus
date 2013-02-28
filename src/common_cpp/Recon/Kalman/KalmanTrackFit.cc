@@ -38,7 +38,7 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) {
-  KalmanMonitor monitor;
+  // KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -72,7 +72,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     run_filter(track, sites);
 
-    monitor.fill(sites);
+    // monitor.fill(sites);
     // monitor.print_info(sites);
     track->compute_chi2(sites);
     // track->compute_emittance(sites.front());
