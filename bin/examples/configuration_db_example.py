@@ -17,6 +17,9 @@ def run():
     This script will show you how to fetch information from the configuration
     database.  It will run you through many of the steps so you can use this
     within your own macro.
+
+    You will need to be able to see the configuration database, usually 
+    requiring an internet connection, to run this script.
     """
 
     # This is used to nicely print python dictionaries

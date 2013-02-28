@@ -17,6 +17,9 @@ import libMausCpp #pylint: disable = W0611
 def generate_some_data(outfile):
     """
     Run the offline reconstruction to make a data file
+
+    Note the "offline" reconstruction needs an internet connection to access
+    configuration and calibration data.
     """
     analysis = os.path.join\
                  (os.environ["MAUS_ROOT_DIR"], "bin", "analyze_data_offline.py")

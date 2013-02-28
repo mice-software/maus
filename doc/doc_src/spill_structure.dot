@@ -2,7 +2,7 @@
 
 digraph G {
   node [shape=record];
-  subgraph DAQ {
+  subgraph cluster_DAQ {
   daq_data [shape=record, label="{DAQData|daq_data}"]
    daq_data_V830 [shape=record, label="{V830|V830}"]
     daq_data_V830_channels [shape=record, label="{Channels|channels}"]
@@ -96,7 +96,7 @@ digraph G {
      daq_data_unknown_array_item_V1290 -> daq_data_unknown_array_item_V1290_array_item
   }
 
-  subgraph MC {
+  subgraph cluster_MC {
   mc_events [shape=record, label="{MCEventArray|mc_events}"]
    mc_events_array_item [shape=record, label="{MCEvent|[]}"]
     mc_events_array_item_primary [shape=record, label="{Primary|primary}"]
@@ -170,7 +170,7 @@ digraph G {
        mc_events_array_item_tracks_array_item_steps_array_item -> mc_events_array_item_tracks_array_item_steps_array_item_momentum
   }
 
-  subgraph RECON {
+  subgraph cluster_RECON {
   recon_events [shape=record, label="{ReconEventArray|recon_events}"]
    recon_events_array_item [shape=record, label="{ReconEvent|[]}"]
     recon_events_array_item_ckov_event [shape=record, label="{CkovEvent|ckov_event}"]
