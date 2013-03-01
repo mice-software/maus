@@ -22,15 +22,15 @@
 
 namespace MAUS {
 
-class GlobalTrackPointTestDS : public ::testing::Test {
+class TrackPointTestDS : public ::testing::Test {
  protected:
-  GlobalTrackPointTestDS()  {}
-  virtual ~GlobalTrackPointTestDS() {}
+  TrackPointTestDS()  {}
+  virtual ~TrackPointTestDS() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
 };
 
-TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
+TEST_F(TrackPointTestDS, test_getters_setters) {
   std::string mapper_name = "0";
   
   double charge = 1.0;
@@ -104,7 +104,7 @@ TEST_F(GlobalTrackPointTestDS, test_getters_setters) {
 
 
 
-TEST_F(GlobalTrackPointTestDS, test_default_constructor) {
+TEST_F(TrackPointTestDS, test_default_constructor) {
   MAUS::DataStructure::Global::TrackPoint tp;
   EXPECT_EQ("", tp.get_mapper_name());
   EXPECT_EQ(0., tp.get_charge());
@@ -129,7 +129,7 @@ TEST_F(GlobalTrackPointTestDS, test_default_constructor) {
   EXPECT_TRUE(tp.get_spacepoint() == NULL);
 }
 
-TEST_F(GlobalTrackPointTestDS, test_copy_constructor) {
+TEST_F(TrackPointTestDS, test_copy_constructor) {
   std::string mapper_name = "0";
   
   double charge = 1.0;
@@ -161,7 +161,7 @@ TEST_F(GlobalTrackPointTestDS, test_copy_constructor) {
   EXPECT_EQ(sp_test, tp2.get_spacepoint());
 }
 
-TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
+TEST_F(TrackPointTestDS, test_assignment_operator) {
   std::string mapper_name = "0";
   
   double charge = 1.0;
@@ -182,7 +182,8 @@ TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
   tp1.set_position(pos);
   tp1.set_spacepoint(sp);
 
-  MAUS::DataStructure::Global::TrackPoint tp2 = tp1;
+  MAUS::DataStructure::Global::TrackPoint tp2;
+  tp2 = tp1;
 
   EXPECT_EQ(mapper_name, tp2.get_mapper_name());
   EXPECT_EQ(charge, tp2.get_charge());
@@ -193,7 +194,7 @@ TEST_F(GlobalTrackPointTestDS, test_assignment_operator) {
   EXPECT_EQ(sp_test, tp2.get_spacepoint());
 }
 
-TEST_F(GlobalTrackPointTestDS, test_clone) {
+TEST_F(TrackPointTestDS, test_clone) {
   std::string mapper_name = "0";
   
   double charge = 1.0;

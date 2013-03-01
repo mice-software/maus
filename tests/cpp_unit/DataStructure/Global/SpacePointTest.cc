@@ -101,7 +101,8 @@ TEST_F(SpacePointTestDS, test_assignment_operator) {
   MAUS::DataStructure::Global::SpacePoint sp1;
   sp1.set_charge(charge);
 
-  MAUS::DataStructure::Global::SpacePoint sp2 = sp1;
+  MAUS::DataStructure::Global::SpacePoint sp2;
+  sp2 = sp1;
 
   EXPECT_EQ(charge, sp2.get_charge());
 }

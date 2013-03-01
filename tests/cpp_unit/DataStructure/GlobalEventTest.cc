@@ -186,6 +186,35 @@ TEST_F(GlobalEventTestDS, test_copy_constructor) {
   EXPECT_NE(event_copy.get_spacepoints()->at(0), spacepoints->at(0));
 }
 
+TEST_F(GlobalEventTestDS, test_null_copy_constructor) {
+  GlobalEvent event;
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains = NULL;
+  event.set_primarychains(chains);
+
+  std::vector<MAUS::DataStructure::Global::Track*>* tracks = NULL;
+  event.set_tracks(tracks);
+
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>* trackpoints = NULL;
+  event.set_trackpoints(trackpoints);
+
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spacepoints = NULL;
+  event.set_spacepoints(spacepoints);
+
+  GlobalEvent event_copy1(event);
+  GlobalEvent event_copy2 = event;
+
+  ASSERT_FALSE(event_copy1.get_primarychains());
+  ASSERT_FALSE(event_copy1.get_tracks());
+  ASSERT_FALSE(event_copy1.get_trackpoints());
+  ASSERT_FALSE(event_copy1.get_spacepoints());
+
+  ASSERT_FALSE(event_copy2.get_primarychains());
+  ASSERT_FALSE(event_copy2.get_tracks());
+  ASSERT_FALSE(event_copy2.get_trackpoints());
+  ASSERT_FALSE(event_copy2.get_spacepoints());
+}
+
 TEST_F(GlobalEventTestDS, test_equality_operator) {
   GlobalEvent event;
 

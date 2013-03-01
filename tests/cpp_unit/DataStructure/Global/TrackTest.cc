@@ -18,6 +18,7 @@
 #include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
+#include "src/legacy/Interface/Squeal.hh"
 
 #include "gtest/gtest.h"
 
@@ -170,6 +171,12 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
     ASSERT_TRUE(tp2);
     EXPECT_GT(tp1->get_position().Z(), tp2->get_position().Z());
   }
+
+  // Check the GetTrackPoints method
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> tps =
+      track.GetTrackPoints();
+
+  ASSERT_EQ((size_t)kNewArraySize, tps.size());
   
   // Check the detectorpoints are correctly set
   EXPECT_TRUE(track.HasDetector(dpArray[0]));
@@ -180,6 +187,26 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   EXPECT_TRUE(track.HasDetector(dpArray[5])); // Point removed, but other
                                               // kVirtual remains
 
+  // Check the GetDetectorPoints method
+  std::vector<MAUS::DataStructure::Global::DetectorPoint> dps =
+      track.GetDetectorPoints();
+  // MAUS::DataStructure::Global::kVirtual    // 1
+  // MAUS::DataStructure::Global::kTracker1S1 // 2
+  // MAUS::DataStructure::Global::kTracker1S2 // 3
+  // MAUS::DataStructure::Global::kTracker1S3 // Removed
+  // MAUS::DataStructure::Global::kTracker1S4 // 4
+  // MAUS::DataStructure::Global::kVirtual    // Doesn't count twice
+  ASSERT_EQ(4U, dps.size());
+
+  // Check the ClearDetectors method
+  track.ClearDetectors();
+  EXPECT_FALSE(track.HasDetector(dpArray[0]));
+  EXPECT_FALSE(track.HasDetector(dpArray[1]));
+  EXPECT_FALSE(track.HasDetector(dpArray[2]));
+  EXPECT_FALSE(track.HasDetector(dpArray[3]));
+  EXPECT_FALSE(track.HasDetector(dpArray[4]));
+  EXPECT_FALSE(track.HasDetector(dpArray[5]));
+  
   // Check the geometry path has one entry
   EXPECT_TRUE(track.HasGeometryPath(pathArray[0]));
   EXPECT_FALSE(track.HasGeometryPath(pathArray[1])); // Blank, not added
@@ -187,6 +214,10 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   EXPECT_FALSE(track.HasGeometryPath(pathArray[3])); // Blank, not added
   EXPECT_FALSE(track.HasGeometryPath(pathArray[4])); // Blank, not added
   EXPECT_FALSE(track.HasGeometryPath(pathArray[5])); // Removed
+  
+  // Check the ClearGeometryPaths method
+  track.ClearGeometryPaths();
+  EXPECT_FALSE(track.HasGeometryPath(pathArray[0]));
   
 }
   
@@ -220,6 +251,12 @@ TEST_F(TrackTestDS, test_ConstituentTrack_Access) {
   EXPECT_TRUE(track.HasTrack(constituentTrack3));
   EXPECT_FALSE(track.HasTrack(constituentTrack4));
 
+  std::vector<const MAUS::DataStructure::Global::Track*> ts =
+      track.GetConstituentTracks();
+  ASSERT_EQ(2U, ts.size());
+  EXPECT_TRUE(constituentTrack1 == ts.at(0));
+  EXPECT_TRUE(constituentTrack3 == ts.at(1));
+ 
   track.ClearTracks();
               
   EXPECT_FALSE(track.HasTrack(constituentTrack1));
@@ -354,7 +391,8 @@ TEST_F(TrackTestDS, test_assignment_operator) {
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
 
-  MAUS::DataStructure::Global::Track track2 = (*track1);
+  MAUS::DataStructure::Global::Track track2;
+  track2 = (*track1);
   
   EXPECT_EQ(mapper_name, track2.get_mapper_name());
   EXPECT_EQ(pid, track2.get_pid());
@@ -453,4 +491,29 @@ TEST_F(TrackTestDS, test_clone_method) {
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
 }
 
+TEST_F(TrackTestDS, test_Throws) {
+  MAUS::DataStructure::Global::Track track0;
+  MAUS::DataStructure::Global::Track *track1 =
+      new MAUS::DataStructure::Global::Track();
+  MAUS::DataStructure::Global::Track *track2 = NULL;
+
+  MAUS::DataStructure::Global::TrackPoint *tp0 = NULL;
+  MAUS::DataStructure::Global::TrackPoint *tp1 =
+      new MAUS::DataStructure::Global::TrackPoint();
+  MAUS::DataStructure::Global::TrackPoint *tp2 =
+      new MAUS::DataStructure::Global::TrackPoint();
+
+  ASSERT_THROW(track0.AddTrackPoint(tp0), Squeal);
+
+  track0.AddTrackPoint(tp1);
+  
+  ASSERT_THROW(track0.RemoveTrackPoint(tp0), Squeal);
+  ASSERT_NO_THROW(track0.RemoveTrackPoint(tp1));
+  ASSERT_THROW(track0.RemoveTrackPoint(tp2), Squeal);
+
+  ASSERT_THROW(track0.RemoveTrack(track1), Squeal);
+  ASSERT_THROW(track0.RemoveTrack(track2), Squeal);
+
+  ASSERT_THROW(track0.RemoveGeometryPath("Narnia"), Squeal);
+}
 } // ~namespace MAUS
