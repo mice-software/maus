@@ -28,8 +28,9 @@ namespace MAUS {
 
 /** @class TRefArrayProcessor
  *
- *  Note that TRefArrayProcessor can only be used on an array that is
- *  stored in C++ as a pointer-by-value, so memory ownership is clear.
+ *  Note that TRefArrayProcessor can only be used on TRefArray, an
+ *  array that is stored in C++ as a pointer-by-value, so memory
+ *  ownership is clear.
  *
  *  TRefArrayProcessor provides bindings for converting between a C++
  *  TRefArray, containing a set of C++ pointers (to objects inherited
@@ -41,6 +42,20 @@ namespace MAUS {
  *
  *  N.B. Doesn't inherit from ProcessorBase, as it rather rigidly
  *  defines the structure of JsonToCpp and CppToJson...
+ *
+ *  Notes on using TRefArrays: These are useful objects, providing
+ *  specific functionality for storing references with no claims of
+ *  ownership.  The main usage would be to reference an object stored
+ *  elsewhere in the datastructure, without writing multiple copies to
+ *  disk.
+ *
+ *   However, there are some annoyances.  The access methods are not
+ *   as convenient as a STL vector.  Iterators are best avoided.  The
+ *   best way to work through all members is to count from 0 to
+ *   GetLast(), and use the At(i) access method.
+ *
+ *   Full documentation is, as always, available direct from ROOT:
+ *   http://root.cern.ch/root/html/TRefArray.html
  */
 
 class TRefArrayProcessor {
