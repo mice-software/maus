@@ -26,7 +26,7 @@
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Recon/Global/WorkingTrackPoint.hh"
+#include "src/common_cpp/Recon/Global/TrackPoint.hh"
 #include "Maths/Vector.hh"
 
 #include "Interface/Squeal.hh"
@@ -34,8 +34,8 @@
 namespace MAUS {
 
 const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
-    const std::vector<recon::global::WorkingTrackPoint> & start_plane_hits,
-    const std::vector<recon::global::WorkingTrackPoint> & station_hits)
+    const std::vector<recon::global::TrackPoint> & start_plane_hits,
+    const std::vector<recon::global::TrackPoint> & station_hits)
     const {
   const recon::global::Particle::ID particle_id
     = recon::global::Particle::ID(start_plane_hits[0].particle_id());
@@ -43,7 +43,7 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
   double start_plane = start_plane_hits[0].z();
 
   double hit_total = 0.0;
-  std::vector<recon::global::WorkingTrackPoint>::const_iterator hit;
+  std::vector<recon::global::TrackPoint>::const_iterator hit;
   for (hit = station_hits.begin(); hit != station_hits.end(); ++hit) {
     hit_total += hit->z();
   }

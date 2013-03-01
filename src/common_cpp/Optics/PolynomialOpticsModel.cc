@@ -31,13 +31,13 @@
 #include "Interface/Squeal.hh"
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
-#include "Recon/Global/WorkingTrackPoint.hh"
+#include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
-using recon::global::WorkingTrackPoint;
+using recon::global::TrackPoint;
 
 PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
       : TransferMapOpticsModel(configuration), algorithm_(kNone) {
@@ -55,13 +55,13 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 
 void PolynomialOpticsModel::Build() {
   // Create some test hits at the desired First plane
-  const std::vector<WorkingTrackPoint> first_plane_hits = BuildFirstPlaneHits();
+  const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
 
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
   simulator->GetPhysicsList()->BeginOfRunAction();
-  std::map<int, std::vector<WorkingTrackPoint> > station_hits_map;
-  std::vector<WorkingTrackPoint>::const_iterator first_plane_hit;
+  std::map<int, std::vector<TrackPoint> > station_hits_map;
+  std::vector<TrackPoint>::const_iterator first_plane_hit;
   for (first_plane_hit = first_plane_hits.begin();
        first_plane_hit < first_plane_hits.end();
        ++first_plane_hit) {
@@ -75,12 +75,12 @@ void PolynomialOpticsModel::Build() {
   }
 
   // Iterate through each station
-  std::map<int, std::vector<WorkingTrackPoint> >::iterator station_hits;
+  std::map<int, std::vector<TrackPoint> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
     // find the average z coordinate for the station
-    std::vector<WorkingTrackPoint>::iterator station_hit;
+    std::vector<TrackPoint>::iterator station_hit;
 
     double station_plane = station_hits->second.begin()->z();
 
@@ -133,14 +133,14 @@ void PolynomialOpticsModel::SetupAlgorithm() {
  * necessary in order to solve the least squares problem which involves
  * the calculation of a Moore-Penrose psuedo inverse.
  */
-const std::vector<WorkingTrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
+const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
   size_t num_poly_coefficients
     = PolynomialMap::NumberOfPolynomialCoefficients(6, polynomial_order_);
 
-    std::vector<WorkingTrackPoint> first_plane_hits;
+    std::vector<TrackPoint> first_plane_hits;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
-      WorkingTrackPoint first_plane_hit;
+      TrackPoint first_plane_hit;
 
       for (size_t k = 0; k < i; ++k) {
         first_plane_hit[k] = 1.;
@@ -148,7 +148,7 @@ const std::vector<WorkingTrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits(
       double delta = deltas_[j];
       first_plane_hit[j] = delta;
 
-      first_plane_hits.push_back(WorkingTrackPoint(first_plane_hit + reference_particle_,
+      first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
                                  reference_particle_.z(),
                                  reference_particle_.particle_id()));
     }
@@ -164,10 +164,10 @@ const std::vector<WorkingTrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits(
   int summand;
   for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
     summand = row / base_block_length;
-    WorkingTrackPoint first_plane_hit
-      = WorkingTrackPoint(first_plane_hits[row % base_block_length] + summand);
+    TrackPoint first_plane_hit
+      = TrackPoint(first_plane_hits[row % base_block_length] + summand);
 
-    first_plane_hits.push_back(WorkingTrackPoint(first_plane_hit + reference_particle_,
+    first_plane_hits.push_back(TrackPoint(first_plane_hit + reference_particle_,
                                 reference_particle_.z(),
                                 reference_particle_.particle_id()));
   }
@@ -177,8 +177,8 @@ const std::vector<WorkingTrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits(
 /* Calculate a transfer matrix from an equal number of inputs and output.
  */
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
-    const std::vector<recon::global::WorkingTrackPoint> & start_plane_hits,
-    const std::vector<recon::global::WorkingTrackPoint> & station_hits)
+    const std::vector<recon::global::TrackPoint> & start_plane_hits,
+    const std::vector<recon::global::TrackPoint> & station_hits)
     const {
 
   if (start_plane_hits.size() != station_hits.size()) {
