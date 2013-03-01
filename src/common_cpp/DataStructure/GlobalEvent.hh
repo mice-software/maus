@@ -46,27 +46,27 @@ class GlobalEvent {
 
   /** Add a MAUS::DataStructure::Global::PrimaryChain object, daughter objects
    * are ignored. */
-  void add_primarychain(MAUS::DataStructure::Global::PrimaryChain* pchain);
+  void add_primary_chain(MAUS::DataStructure::Global::PrimaryChain* pchain);
 
   /** If a MAUS::DataStructure::Global::PrimaryChain object is not already a
    *  member of the GlobalEvent, add it in.  Otherwise, return false,
    *  to signify already added.*/
-  bool add_primarychain_check(
+  bool add_primary_chain_check(
       MAUS::DataStructure::Global::PrimaryChain* pchain);
 
   /** Recursively add a MAUS::DataStructure::Global::PrimaryChain object and
    *  the associated daughter objects */
-  void add_primarychain_recursive(
+  void add_primary_chain_recursive(
       MAUS::DataStructure::Global::PrimaryChain* pchain);
 
   /** Return the std::vector of MAUS::DataStructure::Global::PrimaryChain*,
-   *  #_primarychains. */
+   *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
-  get_primarychains() const;
+  get_primary_chains() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::PrimaryChain*>. */
-  void set_primarychains(
-      std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primarychains);
+  void set_primary_chains(
+      std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primary_chains);
 
   /** Add a MAUS::DataStructure::Global::Track object, daughter
    *  objects are ignored. */
@@ -136,24 +136,24 @@ class GlobalEvent {
   /** A vector of MAUS::DataStructure::Global::PrimaryChain pointers
    *  associated with this event. Different reconstruction steps can
    *  be distinguished by mapper_name. */
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> *_primarychains;
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> *_primary_chains;
   
   /** A vector of MAUS::DataStructure::Global::Track pointers associated with
    *  this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
-   *  #_primarychains. */
+   *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::Track*> *_tracks;
   
   /** A vector of MAUS::DataStructure::Global::TrackPoint pointers
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
-   *  #_primarychains. */
+   *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::TrackPoint*> *_track_points;
   
   /** A vector of MAUS::DataStructure::Global::SpacePoint pointers
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
-   *  #_primarychains. */
+   *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::SpacePoint*> *_space_points;
 
   ClassDef(GlobalEvent, 2)

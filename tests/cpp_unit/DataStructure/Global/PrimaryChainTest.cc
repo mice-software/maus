@@ -29,7 +29,7 @@ class PrimaryChainTestDS : public ::testing::Test {
   PrimaryChainTestDS()  {}
   virtual ~PrimaryChainTestDS() {}
   virtual void SetUp()    {
-    _primarychain0 = new MAUS::DataStructure::Global::PrimaryChain();
+    _primary_chain0 = new MAUS::DataStructure::Global::PrimaryChain();
 
     _t0 = new MAUS::DataStructure::Global::Track();
     _t0->set_mapper_name("t0");
@@ -46,14 +46,14 @@ class PrimaryChainTestDS : public ::testing::Test {
         new MAUS::DataStructure::Global::TRefTrackPair(_t1, _t0));
     track_parent_pairs->push_back(
         new MAUS::DataStructure::Global::TRefTrackPair(_t2, _t0));
-    _primarychain0->set_track_parent_pairs(track_parent_pairs);
+    _primary_chain0->set_track_parent_pairs(track_parent_pairs);
         
     _goodness_of_fit = 5.;
-    _primarychain0->set_goodness_of_fit(_goodness_of_fit);      
+    _primary_chain0->set_goodness_of_fit(_goodness_of_fit);      
   }
   virtual void TearDown() {}
  protected:
-  MAUS::DataStructure::Global::PrimaryChain* _primarychain0;
+  MAUS::DataStructure::Global::PrimaryChain* _primary_chain0;
   MAUS::DataStructure::Global::Track* _t0;
   MAUS::DataStructure::Global::Track* _t1;
   MAUS::DataStructure::Global::Track* _t2;
@@ -62,115 +62,115 @@ class PrimaryChainTestDS : public ::testing::Test {
 };
 
 TEST_F(PrimaryChainTestDS, test_default_constructor) {
-  MAUS::DataStructure::Global::PrimaryChain primarychain;
+  MAUS::DataStructure::Global::PrimaryChain primary_chain;
 
-  EXPECT_TRUE(primarychain.get_track_parent_pairs()->empty());
-  EXPECT_EQ(0., primarychain.get_goodness_of_fit());
+  EXPECT_TRUE(primary_chain.get_track_parent_pairs()->empty());
+  EXPECT_EQ(0., primary_chain.get_goodness_of_fit());
 }
 
 TEST_F(PrimaryChainTestDS, test_named_constructor) {
-  MAUS::DataStructure::Global::PrimaryChain primarychain("MapName");
+  MAUS::DataStructure::Global::PrimaryChain primary_chain("MapName");
 
-  EXPECT_TRUE(primarychain.get_track_parent_pairs()->empty());
-  EXPECT_EQ(0., primarychain.get_goodness_of_fit());
-  EXPECT_EQ("MapName",primarychain.get_mapper_name());
+  EXPECT_TRUE(primary_chain.get_track_parent_pairs()->empty());
+  EXPECT_EQ(0., primary_chain.get_goodness_of_fit());
+  EXPECT_EQ("MapName",primary_chain.get_mapper_name());
 }
 
 TEST_F(PrimaryChainTestDS, test_getters_setters) {
-  ASSERT_EQ(3U, _primarychain0->get_track_parent_pairs()->size());
-  EXPECT_EQ(_t0, _primarychain0->get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_EQ(_t1, _primarychain0->get_track_parent_pairs()->at(1)->GetTrack());
-  EXPECT_EQ(_t2, _primarychain0->get_track_parent_pairs()->at(2)->GetTrack());
-  EXPECT_EQ("t0", _primarychain0->get_track_parent_pairs()
+  ASSERT_EQ(3U, _primary_chain0->get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, _primary_chain0->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, _primary_chain0->get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, _primary_chain0->get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", _primary_chain0->get_track_parent_pairs()
             ->at(0)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t1", _primarychain0->get_track_parent_pairs()
+  EXPECT_EQ("t1", _primary_chain0->get_track_parent_pairs()
             ->at(1)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t2", _primarychain0->get_track_parent_pairs()
+  EXPECT_EQ("t2", _primary_chain0->get_track_parent_pairs()
             ->at(2)->GetTrack()->get_mapper_name());
-  EXPECT_TRUE(NULL == _primarychain0->get_track_parent_pairs()
+  EXPECT_TRUE(NULL == _primary_chain0->get_track_parent_pairs()
               ->at(0)->GetParent());
-  EXPECT_EQ(_t0, _primarychain0->get_track_parent_pairs()
+  EXPECT_EQ(_t0, _primary_chain0->get_track_parent_pairs()
             ->at(1)->GetParent());
-  EXPECT_EQ(_t0, _primarychain0->get_track_parent_pairs()
+  EXPECT_EQ(_t0, _primary_chain0->get_track_parent_pairs()
             ->at(2)->GetParent());
-  EXPECT_EQ(_goodness_of_fit, _primarychain0->get_goodness_of_fit());
+  EXPECT_EQ(_goodness_of_fit, _primary_chain0->get_goodness_of_fit());
 }
 
 TEST_F(PrimaryChainTestDS, test_copy_constructor) {
-  MAUS::DataStructure::Global::PrimaryChain primarychain2(*_primarychain0);
+  MAUS::DataStructure::Global::PrimaryChain primary_chain2(*_primary_chain0);
 
-  ASSERT_NE(&primarychain2, _primarychain0);
-  ASSERT_EQ(3U, primarychain2.get_track_parent_pairs()->size());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_EQ(_t1, primarychain2.get_track_parent_pairs()->at(1)->GetTrack());
-  EXPECT_EQ(_t2, primarychain2.get_track_parent_pairs()->at(2)->GetTrack());
-  EXPECT_EQ("t0", primarychain2.get_track_parent_pairs()
+  ASSERT_NE(&primary_chain2, _primary_chain0);
+  ASSERT_EQ(3U, primary_chain2.get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, primary_chain2.get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, primary_chain2.get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primary_chain2.get_track_parent_pairs()
             ->at(0)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2.get_track_parent_pairs()
+  EXPECT_EQ("t1", primary_chain2.get_track_parent_pairs()
             ->at(1)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t2", primarychain2.get_track_parent_pairs()
+  EXPECT_EQ("t2", primary_chain2.get_track_parent_pairs()
             ->at(2)->GetTrack()->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2.get_track_parent_pairs()
+  EXPECT_TRUE(NULL == primary_chain2.get_track_parent_pairs()
               ->at(0)->GetParent());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(1)->GetParent());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(2)->GetParent());
-  EXPECT_EQ(_goodness_of_fit, primarychain2.get_goodness_of_fit());
+  EXPECT_EQ(_goodness_of_fit, primary_chain2.get_goodness_of_fit());
 }
 
 TEST_F(PrimaryChainTestDS, test_assignment_operator) {
-  MAUS::DataStructure::Global::PrimaryChain primarychain2;
-  primarychain2 = *_primarychain0;
+  MAUS::DataStructure::Global::PrimaryChain primary_chain2;
+  primary_chain2 = *_primary_chain0;
 
-  ASSERT_NE(&primarychain2, _primarychain0);
-  ASSERT_EQ(3U, primarychain2.get_track_parent_pairs()->size());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_EQ(_t1, primarychain2.get_track_parent_pairs()->at(1)->GetTrack());
-  EXPECT_EQ(_t2, primarychain2.get_track_parent_pairs()->at(2)->GetTrack());
-  EXPECT_EQ("t0", primarychain2.get_track_parent_pairs()
+  ASSERT_NE(&primary_chain2, _primary_chain0);
+  ASSERT_EQ(3U, primary_chain2.get_track_parent_pairs()->size());
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_t1, primary_chain2.get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_EQ(_t2, primary_chain2.get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primary_chain2.get_track_parent_pairs()
             ->at(0)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2.get_track_parent_pairs()
+  EXPECT_EQ("t1", primary_chain2.get_track_parent_pairs()
             ->at(1)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t2", primarychain2.get_track_parent_pairs()
+  EXPECT_EQ("t2", primary_chain2.get_track_parent_pairs()
             ->at(2)->GetTrack()->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2.get_track_parent_pairs()
+  EXPECT_TRUE(NULL == primary_chain2.get_track_parent_pairs()
               ->at(0)->GetParent());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(1)->GetParent());
-  EXPECT_EQ(_t0, primarychain2.get_track_parent_pairs()
+  EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(2)->GetParent());
-  EXPECT_EQ(_goodness_of_fit, primarychain2.get_goodness_of_fit());
+  EXPECT_EQ(_goodness_of_fit, primary_chain2.get_goodness_of_fit());
 }
 
 TEST_F(PrimaryChainTestDS, test_Clone) {
-  MAUS::DataStructure::Global::PrimaryChain* primarychain2 =
-      _primarychain0->Clone();
+  MAUS::DataStructure::Global::PrimaryChain* primary_chain2 =
+      _primary_chain0->Clone();
 
-  ASSERT_NE(primarychain2, _primarychain0);
-  ASSERT_EQ(3U, primarychain2->get_track_parent_pairs()->size());
-  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_NE(_t1, primarychain2->get_track_parent_pairs()->at(1)->GetTrack());
-  EXPECT_NE(_t2, primarychain2->get_track_parent_pairs()->at(2)->GetTrack());
-  EXPECT_EQ("t0", primarychain2->get_track_parent_pairs()
+  ASSERT_NE(primary_chain2, _primary_chain0);
+  ASSERT_EQ(3U, primary_chain2->get_track_parent_pairs()->size());
+  EXPECT_NE(_t0, primary_chain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_NE(_t1, primary_chain2->get_track_parent_pairs()->at(1)->GetTrack());
+  EXPECT_NE(_t2, primary_chain2->get_track_parent_pairs()->at(2)->GetTrack());
+  EXPECT_EQ("t0", primary_chain2->get_track_parent_pairs()
             ->at(0)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t1", primarychain2->get_track_parent_pairs()
+  EXPECT_EQ("t1", primary_chain2->get_track_parent_pairs()
             ->at(1)->GetTrack()->get_mapper_name());
-  EXPECT_EQ("t2", primarychain2->get_track_parent_pairs()
+  EXPECT_EQ("t2", primary_chain2->get_track_parent_pairs()
             ->at(2)->GetTrack()->get_mapper_name());
-  EXPECT_TRUE(NULL == primarychain2->get_track_parent_pairs()
+  EXPECT_TRUE(NULL == primary_chain2->get_track_parent_pairs()
               ->at(0)->GetParent());
-  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(1)->GetParent());
-  EXPECT_EQ(primarychain2->get_track_parent_pairs()->at(1)->GetParent(),
-            primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_NE(_t0, primarychain2->get_track_parent_pairs()->at(2)->GetParent());
-  EXPECT_EQ(primarychain2->get_track_parent_pairs()->at(2)->GetParent(),
-            primarychain2->get_track_parent_pairs()->at(0)->GetTrack());
-  EXPECT_EQ(_goodness_of_fit, primarychain2->get_goodness_of_fit());
+  EXPECT_NE(_t0, primary_chain2->get_track_parent_pairs()->at(1)->GetParent());
+  EXPECT_EQ(primary_chain2->get_track_parent_pairs()->at(1)->GetParent(),
+            primary_chain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_NE(_t0, primary_chain2->get_track_parent_pairs()->at(2)->GetParent());
+  EXPECT_EQ(primary_chain2->get_track_parent_pairs()->at(2)->GetParent(),
+            primary_chain2->get_track_parent_pairs()->at(0)->GetTrack());
+  EXPECT_EQ(_goodness_of_fit, primary_chain2->get_goodness_of_fit());
 }
 
 TEST_F(PrimaryChainTestDS, test_TrackMethods) {
-  MAUS::DataStructure::Global::PrimaryChain* primarychain1 =
+  MAUS::DataStructure::Global::PrimaryChain* primary_chain1 =
       new MAUS::DataStructure::Global::PrimaryChain();
 
   // AddTrack
@@ -188,99 +188,99 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
       new MAUS::DataStructure::Global::Track();
 
   // Add Primaries, t0, t1
-  primarychain1->AddPrimaryTrack(t0);
-  primarychain1->AddPrimaryTrack(t1);
+  primary_chain1->AddPrimaryTrack(t0);
+  primary_chain1->AddPrimaryTrack(t1);
 
   // Add t0 daughters
-  primarychain1->AddTrack(t2, t0);
-  primarychain1->AddTrack(t3, t0);
+  primary_chain1->AddTrack(t2, t0);
+  primary_chain1->AddTrack(t3, t0);
   
   // Add t1 daughters
-  primarychain1->AddTrack(t4, t1);
+  primary_chain1->AddTrack(t4, t1);
 
-  ASSERT_EQ(5U, primarychain1->get_track_parent_pairs()->size());
-  EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
+  ASSERT_EQ(5U, primary_chain1->get_track_parent_pairs()->size());
+  EXPECT_TRUE(NULL == primary_chain1->get_track_parent_pairs()
               ->at(0)->GetParent());
-  EXPECT_TRUE(NULL == primarychain1->get_track_parent_pairs()
+  EXPECT_TRUE(NULL == primary_chain1->get_track_parent_pairs()
               ->at(1)->GetParent());
-  EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(2)->GetParent());
-  EXPECT_EQ(t0, primarychain1->get_track_parent_pairs()->at(3)->GetParent());
-  EXPECT_EQ(t1, primarychain1->get_track_parent_pairs()->at(4)->GetParent());
+  EXPECT_EQ(t0, primary_chain1->get_track_parent_pairs()->at(2)->GetParent());
+  EXPECT_EQ(t0, primary_chain1->get_track_parent_pairs()->at(3)->GetParent());
+  EXPECT_EQ(t1, primary_chain1->get_track_parent_pairs()->at(4)->GetParent());
 
   // RemoveTrack
   // HasTrack & HasTrackAsParent
-  EXPECT_TRUE(primarychain1->HasTrack(t0));
-  EXPECT_TRUE(primarychain1->HasTrack(t1));
-  EXPECT_TRUE(primarychain1->HasTrack(t2));
-  EXPECT_TRUE(primarychain1->HasTrack(t3));
-  EXPECT_TRUE(primarychain1->HasTrack(t4));
-  EXPECT_FALSE(primarychain1->HasTrack(t5));
+  EXPECT_TRUE(primary_chain1->HasTrack(t0));
+  EXPECT_TRUE(primary_chain1->HasTrack(t1));
+  EXPECT_TRUE(primary_chain1->HasTrack(t2));
+  EXPECT_TRUE(primary_chain1->HasTrack(t3));
+  EXPECT_TRUE(primary_chain1->HasTrack(t4));
+  EXPECT_FALSE(primary_chain1->HasTrack(t5));
 
-  EXPECT_TRUE(primarychain1->HasTrackAsParent(t0));
-  EXPECT_TRUE(primarychain1->HasTrackAsParent(t1));
-  EXPECT_FALSE(primarychain1->HasTrackAsParent(t2));
-  EXPECT_FALSE(primarychain1->HasTrackAsParent(t3));
-  EXPECT_FALSE(primarychain1->HasTrackAsParent(t4));
-  EXPECT_FALSE(primarychain1->HasTrackAsParent(t5));
+  EXPECT_TRUE(primary_chain1->HasTrackAsParent(t0));
+  EXPECT_TRUE(primary_chain1->HasTrackAsParent(t1));
+  EXPECT_FALSE(primary_chain1->HasTrackAsParent(t2));
+  EXPECT_FALSE(primary_chain1->HasTrackAsParent(t3));
+  EXPECT_FALSE(primary_chain1->HasTrackAsParent(t4));
+  EXPECT_FALSE(primary_chain1->HasTrackAsParent(t5));
 
   // IsPrimaryTrack
-  EXPECT_TRUE(primarychain1->IsPrimaryTrack(t0));
-  EXPECT_TRUE(primarychain1->IsPrimaryTrack(t1));
-  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t2));
-  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t3));
-  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t4));
-  EXPECT_FALSE(primarychain1->IsPrimaryTrack(t5));
+  EXPECT_TRUE(primary_chain1->IsPrimaryTrack(t0));
+  EXPECT_TRUE(primary_chain1->IsPrimaryTrack(t1));
+  EXPECT_FALSE(primary_chain1->IsPrimaryTrack(t2));
+  EXPECT_FALSE(primary_chain1->IsPrimaryTrack(t3));
+  EXPECT_FALSE(primary_chain1->IsPrimaryTrack(t4));
+  EXPECT_FALSE(primary_chain1->IsPrimaryTrack(t5));
 
   // GetTrackParent
-  EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t0));
-  EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t1));
-  EXPECT_EQ(t0, primarychain1->GetTrackParent(t2));
-  EXPECT_EQ(t0, primarychain1->GetTrackParent(t3));
-  EXPECT_EQ(t1, primarychain1->GetTrackParent(t4));
-  EXPECT_TRUE(NULL == primarychain1->GetTrackParent(t5));
+  EXPECT_TRUE(NULL == primary_chain1->GetTrackParent(t0));
+  EXPECT_TRUE(NULL == primary_chain1->GetTrackParent(t1));
+  EXPECT_EQ(t0, primary_chain1->GetTrackParent(t2));
+  EXPECT_EQ(t0, primary_chain1->GetTrackParent(t3));
+  EXPECT_EQ(t1, primary_chain1->GetTrackParent(t4));
+  EXPECT_TRUE(NULL == primary_chain1->GetTrackParent(t5));
 
   // GetTrackDaughters
-  ASSERT_EQ(2U, primarychain1->GetTrackDaughters(t0).size());
-  EXPECT_EQ(t2, primarychain1->GetTrackDaughters(t0)[0]);
-  EXPECT_EQ(t3, primarychain1->GetTrackDaughters(t0)[1]);
-  ASSERT_EQ(1U, primarychain1->GetTrackDaughters(t1).size());
-  EXPECT_EQ(t4, primarychain1->GetTrackDaughters(t1)[0]);
-  EXPECT_EQ(0U, primarychain1->GetTrackDaughters(t4).size());
+  ASSERT_EQ(2U, primary_chain1->GetTrackDaughters(t0).size());
+  EXPECT_EQ(t2, primary_chain1->GetTrackDaughters(t0)[0]);
+  EXPECT_EQ(t3, primary_chain1->GetTrackDaughters(t0)[1]);
+  ASSERT_EQ(1U, primary_chain1->GetTrackDaughters(t1).size());
+  EXPECT_EQ(t4, primary_chain1->GetTrackDaughters(t1)[0]);
+  EXPECT_EQ(0U, primary_chain1->GetTrackDaughters(t4).size());
 
   // GetTracks
-  ASSERT_EQ(5U, primarychain1->GetTracks().size());
-  EXPECT_EQ(t0, primarychain1->GetTracks().at(0));
-  EXPECT_EQ(t1, primarychain1->GetTracks().at(1));
-  EXPECT_EQ(t2, primarychain1->GetTracks().at(2));
-  EXPECT_EQ(t3, primarychain1->GetTracks().at(3));
-  EXPECT_EQ(t4, primarychain1->GetTracks().at(4));
+  ASSERT_EQ(5U, primary_chain1->GetTracks().size());
+  EXPECT_EQ(t0, primary_chain1->GetTracks().at(0));
+  EXPECT_EQ(t1, primary_chain1->GetTracks().at(1));
+  EXPECT_EQ(t2, primary_chain1->GetTracks().at(2));
+  EXPECT_EQ(t3, primary_chain1->GetTracks().at(3));
+  EXPECT_EQ(t4, primary_chain1->GetTracks().at(4));
 
   // GetPrimaryTracks
-  ASSERT_EQ(2U, primarychain1->GetPrimaryTracks().size());
-  EXPECT_EQ(t0, primarychain1->GetPrimaryTracks().at(0));
-  EXPECT_EQ(t1, primarychain1->GetPrimaryTracks().at(1));
+  ASSERT_EQ(2U, primary_chain1->GetPrimaryTracks().size());
+  EXPECT_EQ(t0, primary_chain1->GetPrimaryTracks().at(0));
+  EXPECT_EQ(t1, primary_chain1->GetPrimaryTracks().at(1));
 
   // ClearTracks
-  primarychain1->ClearTracks();
-  EXPECT_TRUE(primarychain1->get_track_parent_pairs()->empty());
+  primary_chain1->ClearTracks();
+  EXPECT_TRUE(primary_chain1->get_track_parent_pairs()->empty());
 }
   
 TEST_F(PrimaryChainTestDS, test_ParentMethods) {
   // SetParentChains
-  MAUS::DataStructure::Global::PrimaryChain* primarychain1 =
+  MAUS::DataStructure::Global::PrimaryChain* primary_chain1 =
       new MAUS::DataStructure::Global::PrimaryChain();
-  MAUS::DataStructure::Global::PrimaryChain* primarychain2 =
+  MAUS::DataStructure::Global::PrimaryChain* primary_chain2 =
       new MAUS::DataStructure::Global::PrimaryChain();
-  _primarychain0->set_track_parent_pairs(track_parent_pairs);
-  _primarychain0->AddParentChain(primarychain1);
-  _primarychain0->AddParentChain(primarychain2);
+  _primary_chain0->set_track_parent_pairs(track_parent_pairs);
+  _primary_chain0->AddParentChain(primary_chain1);
+  _primary_chain0->AddParentChain(primary_chain2);
   
   // GetParentChains
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> chains =
-      _primarychain0->GetParentChains();
+      _primary_chain0->GetParentChains();
   ASSERT_EQ(2U, chains.size());
-  EXPECT_EQ(primarychain1, chains.at(0));
-  EXPECT_EQ(primarychain2, chains.at(1));
+  EXPECT_EQ(primary_chain1, chains.at(0));
+  EXPECT_EQ(primary_chain2, chains.at(1));
 }
 
 TEST_F(PrimaryChainTestDS, test_Throws) {
@@ -292,11 +292,11 @@ TEST_F(PrimaryChainTestDS, test_Throws) {
   MAUS::DataStructure::Global::Track* t9 =
       new MAUS::DataStructure::Global::Track();
   
-  ASSERT_THROW(_primarychain0->AddTrack(t6, t7), Squeal);
-  ASSERT_THROW(_primarychain0->AddPrimaryTrack(t6), Squeal);
+  ASSERT_THROW(_primary_chain0->AddTrack(t6, t7), Squeal);
+  ASSERT_THROW(_primary_chain0->AddPrimaryTrack(t6), Squeal);
 
-  ASSERT_NO_THROW(_primarychain0->AddTrack(t7, t6));
+  ASSERT_NO_THROW(_primary_chain0->AddTrack(t7, t6));
 
-  ASSERT_THROW(_primarychain0->AddTrack(t9, t8), Squeal);
+  ASSERT_THROW(_primary_chain0->AddTrack(t9, t8), Squeal);
 }
 } // ~namespace MAUS

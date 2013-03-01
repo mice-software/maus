@@ -22,9 +22,9 @@ namespace MAUS {
 
 
 GlobalEvent::GlobalEvent() :
-    _primarychains(NULL), _tracks(NULL),
+    _primary_chains(NULL), _tracks(NULL),
     _track_points(NULL), _space_points(NULL) {
-  _primarychains =
+  _primary_chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   _tracks        = new std::vector<MAUS::DataStructure::Global::Track*>();
   _track_points   = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
@@ -32,7 +32,7 @@ GlobalEvent::GlobalEvent() :
 }
 
 GlobalEvent::GlobalEvent(const GlobalEvent& globalevent) :
-    _primarychains(NULL), _tracks(NULL),
+    _primary_chains(NULL), _tracks(NULL),
     _track_points(NULL), _space_points(NULL) {
   *this = globalevent;
 }
@@ -42,21 +42,21 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     return *this;
   }
 
-  if (_primarychains != NULL) {
-    if(!_primarychains->empty())
-      for(size_t i = 0; i < _primarychains->size(); ++i)
-        delete _primarychains->at(i);
-    delete _primarychains;
+  if (_primary_chains != NULL) {
+    if(!_primary_chains->empty())
+      for(size_t i = 0; i < _primary_chains->size(); ++i)
+        delete _primary_chains->at(i);
+    delete _primary_chains;
   }
-  if (globalevent._primarychains == NULL) {
-    _primarychains = NULL;
+  if (globalevent._primary_chains == NULL) {
+    _primary_chains = NULL;
   } else {
-    _primarychains =
+    _primary_chains =
         new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
-    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primarychain =
-        globalevent._primarychains;
-    for(size_t i = 0; i < old_primarychain->size(); ++i)
-      _primarychains->push_back(old_primarychain->at(i)->Clone());
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
+        globalevent._primary_chains;
+    for(size_t i = 0; i < old_primary_chain->size(); ++i)
+      _primary_chains->push_back(old_primary_chain->at(i)->Clone());
   }
 
   if (_tracks != NULL) {
@@ -108,11 +108,11 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
 }
 
 GlobalEvent::~GlobalEvent() {
-  if (_primarychains != NULL) {
-    for(size_t i = 0; i < _primarychains->size(); ++i){
-      delete _primarychains->at(i);
+  if (_primary_chains != NULL) {
+    for(size_t i = 0; i < _primary_chains->size(); ++i){
+      delete _primary_chains->at(i);
     }
-    delete _primarychains;
+    delete _primary_chains;
   }
 
   if (_tracks != NULL) {
@@ -138,29 +138,29 @@ GlobalEvent::~GlobalEvent() {
   
 }
 
-void GlobalEvent::add_primarychain(
+void GlobalEvent::add_primary_chain(
     MAUS::DataStructure::Global::PrimaryChain* pchain) {
-  _primarychains->push_back(pchain);
+  _primary_chains->push_back(pchain);
 };
 
-bool GlobalEvent::add_primarychain_check(
+bool GlobalEvent::add_primary_chain_check(
     MAUS::DataStructure::Global::PrimaryChain* pchain) {
   // Check if the provided pchain matches an existing entry (this is
   // to save repeated entries and wasted disk space).
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>::iterator pc_iter =
-      std::find(_primarychains->begin(), _primarychains->end(), pchain);
+      std::find(_primary_chains->begin(), _primary_chains->end(), pchain);
   
-  bool exists = (pc_iter != _primarychains->end());
+  bool exists = (pc_iter != _primary_chains->end());
   if(!exists)
-    add_primarychain(pchain);
+    add_primary_chain(pchain);
 
   return exists;
 }
 
-void GlobalEvent::add_primarychain_recursive(
+void GlobalEvent::add_primary_chain_recursive(
     MAUS::DataStructure::Global::PrimaryChain* pchain) {
   // Add the primary chain, checking if it already exists in chain.
-  bool already_added = add_primarychain_check(pchain);
+  bool already_added = add_primary_chain_check(pchain);
 
   // If the chain had been added, then we will loop over the tracks
   // and add them too.
@@ -179,13 +179,13 @@ void GlobalEvent::add_primarychain_recursive(
 }
     
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
-GlobalEvent::get_primarychains() const {
-  return _primarychains;
+GlobalEvent::get_primary_chains() const {
+  return _primary_chains;
 };
 
-void GlobalEvent::set_primarychains(
-    std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primarychains) {
-  _primarychains = primarychains;
+void GlobalEvent::set_primary_chains(
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primary_chains) {
+  _primary_chains = primary_chains;
 };
 
 void GlobalEvent::add_track(MAUS::DataStructure::Global::Track* track) {

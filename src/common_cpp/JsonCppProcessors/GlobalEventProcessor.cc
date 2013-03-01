@@ -25,7 +25,7 @@ GlobalEventProcessor::GlobalEventProcessor() :
         new MAUS::Processor::Global::TrackPointProcessor()),
     _global_track_array_proc(
         new MAUS::Processor::Global::TrackProcessor()),
-    _global_primarychain_array_proc(
+    _global_primary_chain_array_proc(
         new MAUS::Processor::Global::PrimaryChainProcessor())
 {
 
@@ -41,9 +41,9 @@ GlobalEventProcessor::GlobalEventProcessor() :
                         &GlobalEvent::get_tracks,
                         &GlobalEvent::set_tracks, false); 
                         
-  RegisterPointerBranch("primarychains", &_global_primarychain_array_proc,
-                        &GlobalEvent::get_primarychains,
-                        &GlobalEvent::set_primarychains, false); 
+  RegisterPointerBranch("primary_chains", &_global_primary_chain_array_proc,
+                        &GlobalEvent::get_primary_chains,
+                        &GlobalEvent::set_primary_chains, false); 
                         
 }
 }  // namespace MAUS

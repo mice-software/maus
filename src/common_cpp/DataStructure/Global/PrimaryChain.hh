@@ -53,7 +53,7 @@ class PrimaryChain : public TObject {
   PrimaryChain();
 
   /// Copy constructor - any pointers are deep copied
-  PrimaryChain(const PrimaryChain &primarychain);
+  PrimaryChain(const PrimaryChain &primary_chain);
 
   /// Constructor setting mapper name - everything else initialises to
   /// 0/NULL
@@ -63,7 +63,7 @@ class PrimaryChain : public TObject {
   virtual ~PrimaryChain();
 
   /// Assignment operator - any pointers are deep copied
-  PrimaryChain& operator=(const PrimaryChain &primarychain);
+  PrimaryChain& operator=(const PrimaryChain &primary_chain);
 
   /// Clone method.  This allows us to create a new object and change
   /// that object, without changing the original.  This should be the
@@ -80,7 +80,7 @@ class PrimaryChain : public TObject {
   ///                   reference.
   /// @param[in] parent The track's parent.  We require parent to
   ///                   already be a member of the
-  ///                   primarychain. Again, this is only storing a
+  ///                   primary_chain. Again, this is only storing a
   ///                   reference, the data must be saved elsewhere.
   bool AddTrack(MAUS::DataStructure::Global::Track* track,
                 MAUS::DataStructure::Global::Track* parent);

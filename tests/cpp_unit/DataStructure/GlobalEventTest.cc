@@ -48,7 +48,7 @@ class GlobalEventTestDS : public ::testing::Test {
     _chain->AddTrack(_track[1], _track[0]);
     
     _event = new MAUS::GlobalEvent();
-    _event->add_primarychain_recursive(_chain);
+    _event->add_primary_chain_recursive(_chain);
 
     local_chain = NULL;
     local_track.resize(2);
@@ -101,7 +101,7 @@ TEST_F(GlobalEventTestDS, test_all_allocators) {
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
-  event.set_primarychains(chains);
+  event.set_primary_chains(chains);
 
   std::vector<MAUS::DataStructure::Global::Track*>* tracks =
       new std::vector<MAUS::DataStructure::Global::Track*>();
@@ -118,8 +118,8 @@ TEST_F(GlobalEventTestDS, test_all_allocators) {
   space_points->push_back(global_space_point);
   event.set_space_points(space_points);
 
-  EXPECT_EQ(event.get_primarychains()->size(), chains->size());
-  EXPECT_EQ(event.get_primarychains()->at(0), chains->at(0));
+  EXPECT_EQ(event.get_primary_chains()->size(), chains->size());
+  EXPECT_EQ(event.get_primary_chains()->at(0), chains->at(0));
 
   EXPECT_EQ(event.get_tracks()->size(), tracks->size());
   EXPECT_EQ(event.get_tracks()->at(0), tracks->at(0));
@@ -146,7 +146,7 @@ TEST_F(GlobalEventTestDS, test_copy_constructor) {
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
-  event.set_primarychains(chains);
+  event.set_primary_chains(chains);
 
   std::vector<MAUS::DataStructure::Global::Track*>* tracks =
       new std::vector<MAUS::DataStructure::Global::Track*>();
@@ -165,10 +165,10 @@ TEST_F(GlobalEventTestDS, test_copy_constructor) {
 
   GlobalEvent event_copy(event);
 
-  ASSERT_TRUE(event_copy.get_primarychains());
-  EXPECT_NE(event_copy.get_primarychains(), event.get_primarychains());
-  EXPECT_EQ(event_copy.get_primarychains()->size(), chains->size());
-  EXPECT_NE(event_copy.get_primarychains()->at(0), chains->at(0));
+  ASSERT_TRUE(event_copy.get_primary_chains());
+  EXPECT_NE(event_copy.get_primary_chains(), event.get_primary_chains());
+  EXPECT_EQ(event_copy.get_primary_chains()->size(), chains->size());
+  EXPECT_NE(event_copy.get_primary_chains()->at(0), chains->at(0));
 
   ASSERT_TRUE(event_copy.get_tracks());
   EXPECT_NE(event_copy.get_tracks(), event.get_tracks());
@@ -190,7 +190,7 @@ TEST_F(GlobalEventTestDS, test_null_copy_constructor) {
   GlobalEvent event;
 
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains = NULL;
-  event.set_primarychains(chains);
+  event.set_primary_chains(chains);
 
   std::vector<MAUS::DataStructure::Global::Track*>* tracks = NULL;
   event.set_tracks(tracks);
@@ -204,12 +204,12 @@ TEST_F(GlobalEventTestDS, test_null_copy_constructor) {
   GlobalEvent event_copy1(event);
   GlobalEvent event_copy2 = event;
 
-  ASSERT_FALSE(event_copy1.get_primarychains());
+  ASSERT_FALSE(event_copy1.get_primary_chains());
   ASSERT_FALSE(event_copy1.get_tracks());
   ASSERT_FALSE(event_copy1.get_track_points());
   ASSERT_FALSE(event_copy1.get_space_points());
 
-  ASSERT_FALSE(event_copy2.get_primarychains());
+  ASSERT_FALSE(event_copy2.get_primary_chains());
   ASSERT_FALSE(event_copy2.get_tracks());
   ASSERT_FALSE(event_copy2.get_track_points());
   ASSERT_FALSE(event_copy2.get_space_points());
@@ -230,7 +230,7 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
-  event.set_primarychains(chains);
+  event.set_primary_chains(chains);
 
   std::vector<MAUS::DataStructure::Global::Track*>* tracks =
       new std::vector<MAUS::DataStructure::Global::Track*>();
@@ -249,10 +249,10 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
 
   GlobalEvent event_equal = event;
 
-  ASSERT_TRUE(event_equal.get_primarychains());
-  EXPECT_NE(event_equal.get_primarychains(), event.get_primarychains());
-  EXPECT_EQ(event_equal.get_primarychains()->size(), chains->size());
-  EXPECT_NE(event_equal.get_primarychains()->at(0), chains->at(0));
+  ASSERT_TRUE(event_equal.get_primary_chains());
+  EXPECT_NE(event_equal.get_primary_chains(), event.get_primary_chains());
+  EXPECT_EQ(event_equal.get_primary_chains()->size(), chains->size());
+  EXPECT_NE(event_equal.get_primary_chains()->at(0), chains->at(0));
 
   ASSERT_TRUE(event_equal.get_tracks());
   EXPECT_NE(event_equal.get_tracks(), event.get_tracks());
@@ -285,7 +285,7 @@ TEST_F(GlobalEventTestDS, test_null_copy) {
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>* chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   chains->push_back(global_chain);
-  event.set_primarychains(chains);
+  event.set_primary_chains(chains);
 
   std::vector<MAUS::DataStructure::Global::Track*>* tracks =
       new std::vector<MAUS::DataStructure::Global::Track*>();
@@ -311,8 +311,8 @@ TEST_F(GlobalEventTestDS, test_null_copy) {
   // Check that we handle copy of NULL data okay
   GlobalEvent default_event;
   event_equal = default_event;
-  ASSERT_TRUE(event_equal.get_primarychains());
-  EXPECT_EQ(event_equal.get_primarychains()->size(), 0U);
+  ASSERT_TRUE(event_equal.get_primary_chains());
+  EXPECT_EQ(event_equal.get_primary_chains()->size(), 0U);
 
   ASSERT_TRUE(event_equal.get_tracks());
   EXPECT_EQ(event_equal.get_tracks()->size(), 0U);
@@ -340,11 +340,11 @@ TEST_F(GlobalEventTestDS, test_recursive_add) {
   global_track->AddTrackPoint(global_track_point);
   global_chain->AddPrimaryTrack(global_track);
 
-  event.add_primarychain_recursive(global_chain);
+  event.add_primary_chain_recursive(global_chain);
   
-  ASSERT_TRUE(event.get_primarychains());
-  EXPECT_EQ(event.get_primarychains()->size(), 1U);
-  EXPECT_EQ(event.get_primarychains()->at(0), global_chain);
+  ASSERT_TRUE(event.get_primary_chains());
+  EXPECT_EQ(event.get_primary_chains()->size(), 1U);
+  EXPECT_EQ(event.get_primary_chains()->at(0), global_chain);
 
   ASSERT_TRUE(event.get_tracks());
   EXPECT_EQ(event.get_tracks()->size(), 1U);

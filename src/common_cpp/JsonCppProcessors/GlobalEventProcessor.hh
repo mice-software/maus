@@ -55,7 +55,7 @@ class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {
   _global_track_array_proc;
   
   PointerArrayProcessor<MAUS::DataStructure::Global::PrimaryChain>
-  _global_primarychain_array_proc;
+  _global_primary_chain_array_proc;
 };
 }  // namespace MAUS
 

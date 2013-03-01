@@ -54,7 +54,7 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
     _chain->AddTrack(_track[1], _track[0]);
     
     _event = new MAUS::GlobalEvent();
-    _event->add_primarychain_recursive(_chain);
+    _event->add_primary_chain_recursive(_chain);
 
     local_chain = NULL;
     local_track.resize(2);
@@ -81,12 +81,12 @@ TEST_F(GlobalEventProcessorTestClass, TestSetup) {
 
 TEST_F(GlobalEventProcessorTestClass, CheckInitialSetup) {
   ASSERT_TRUE(_event);
-  ASSERT_EQ(1U, _event->get_primarychains()->size());
+  ASSERT_EQ(1U, _event->get_primary_chains()->size());
   ASSERT_EQ(2U, _event->get_tracks()->size());
   ASSERT_EQ(4U, _event->get_track_points()->size());
   ASSERT_EQ(4U, _event->get_space_points()->size());
 
-  local_chain = _event->get_primarychains()->at(0);
+  local_chain = _event->get_primary_chains()->at(0);
   EXPECT_EQ(local_chain, _chain);
 
   for(int i = 0; i < 2; ++i){
@@ -105,7 +105,7 @@ TEST_F(GlobalEventProcessorTestClass, CheckInitialSetup) {
 }
 
 TEST_F(GlobalEventProcessorTestClass, CheckConsistentChain) {
-  local_chain = _event->get_primarychains()->at(0);
+  local_chain = _event->get_primary_chains()->at(0);
   EXPECT_EQ(local_chain, _chain);
 
   for(int i = 0; i < 2; ++i){
@@ -161,12 +161,12 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCpp) {
                   ResolveReferences());
   ASSERT_NO_THROW(ReferenceResolver::JsonToCpp::RefManager::Death());
 
-  ASSERT_EQ(1U, event_out->get_primarychains()->size());
+  ASSERT_EQ(1U, event_out->get_primary_chains()->size());
   ASSERT_EQ(2U, event_out->get_tracks()->size());
   ASSERT_EQ(4U, event_out->get_track_points()->size());
   ASSERT_EQ(4U, event_out->get_space_points()->size());
 
-  local_chain = event_out->get_primarychains()->at(0);
+  local_chain = event_out->get_primary_chains()->at(0);
   EXPECT_NE(local_chain, _chain);
 
   for(int i = 0; i < 2; ++i){
@@ -206,12 +206,12 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCppWithDelete) {
                   ResolveReferences());
   ASSERT_NO_THROW(ReferenceResolver::JsonToCpp::RefManager::Death());
 
-  ASSERT_EQ(1U, event_out->get_primarychains()->size());
+  ASSERT_EQ(1U, event_out->get_primary_chains()->size());
   ASSERT_EQ(2U, event_out->get_tracks()->size());
   ASSERT_EQ(4U, event_out->get_track_points()->size());
   ASSERT_EQ(4U, event_out->get_space_points()->size());
 
-  local_chain = event_out->get_primarychains()->at(0);
+  local_chain = event_out->get_primary_chains()->at(0);
   EXPECT_TRUE(local_chain);
 
   for(int i = 0; i < 2; ++i){

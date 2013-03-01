@@ -43,7 +43,7 @@ PrimaryChainProcessor::PrimaryChainProcessor() :
   
   RegisterTRefArray(
       "preceeding_pchains",
-      &_primarychain_trefarray_proc,
+      &_primary_chain_trefarray_proc,
       &MAUS::DataStructure::Global::PrimaryChain::get_parent_primary_chains,
       &MAUS::DataStructure::Global::PrimaryChain::set_parent_primary_chains,
       true);

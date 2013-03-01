@@ -71,7 +71,7 @@ void ImportSciFiRecon::ImportStraightTracks(
 
   // Add the MAUS::recon::global::PrimaryChain result to the
   // MAUS::GlobalEvent
-  global_event->add_primarychain_recursive(pchain);
+  global_event->add_primary_chain_recursive(pchain);
 }
 
 void ImportSciFiRecon::ImportHelicalTracks(
@@ -107,7 +107,7 @@ void ImportSciFiRecon::ImportHelicalTracks(
   
   // Add the MAUS::recon::global::PrimaryChain result to the
   // MAUS::GlobalEvent
-  global_event->add_primarychain_recursive(pchain);
+  global_event->add_primary_chain_recursive(pchain);
 }
 
 

@@ -42,7 +42,7 @@ class PrimaryChainProcessor :
   StringProcessor _string_proc;
   PointerArrayProcessor<MAUS::DataStructure::Global::TRefTrackPair>
   _treftrackpair_array_proc;
-  TRefArrayProcessor _primarychain_trefarray_proc;
+  TRefArrayProcessor _primary_chain_trefarray_proc;
   
 };
 } // ~namespace Global
