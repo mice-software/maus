@@ -19,7 +19,7 @@
 /// \file GlobalReconEnums.hh
 ///
 /// This file provides enumerators for: a) keeping track of the
-/// locations of space- and trackpoints within the global
+/// locations of space- and track_points within the global
 /// reconstruction and b) the particle ID hypotheses of reconstructed
 /// objects.
 
@@ -42,8 +42,8 @@ namespace Global {
  *  point.
 
  * An enum to define the detector or geometry element for the
- * spacepoint.  The kVirtual entry allows for the definition of
- * arbitrary space- or trackpoints, by filling a separate member
+ * SpacePoint.  The kVirtual entry allows for the definition of
+ * arbitrary space- or track_points, by filling a separate member
  * variable with a geometry path string.  For the code to work, we
  * need to keep the values consecutive and constant.  I hope no new
  * values will be needed, but if so they should be added at the end,

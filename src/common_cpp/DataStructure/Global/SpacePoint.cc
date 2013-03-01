@@ -30,26 +30,26 @@ SpacePoint::SpacePoint()
       _geometry_path("") {}
 
 // Copy contructor
-SpacePoint::SpacePoint(const SpacePoint &spacepoint)
-    : _charge(spacepoint.get_charge()),
-      _position(spacepoint.get_position()),
-      _position_error(spacepoint.get_position_error()),
-      _detector(spacepoint.get_detector()),
-      _geometry_path(spacepoint.get_geometry_path()) {}
+SpacePoint::SpacePoint(const SpacePoint &space_point)
+    : _charge(space_point.get_charge()),
+      _position(space_point.get_position()),
+      _position_error(space_point.get_position_error()),
+      _detector(space_point.get_detector()),
+      _geometry_path(space_point.get_geometry_path()) {}
 
 // Destructor
 SpacePoint::~SpacePoint() {}
 
 // Assignment operator
-SpacePoint& SpacePoint::operator=(const SpacePoint &spacepoint) {
-  if (this == &spacepoint) {
+SpacePoint& SpacePoint::operator=(const SpacePoint &space_point) {
+  if (this == &space_point) {
     return *this;
   }
-  _charge          = spacepoint.get_charge();
-  _position        = spacepoint.get_position();
-  _position_error  = spacepoint.get_position_error();
-  _detector        = spacepoint.get_detector();
-  _geometry_path   = spacepoint.get_geometry_path();
+  _charge          = space_point.get_charge();
+  _position        = space_point.get_position();
+  _position_error  = space_point.get_position_error();
+  _detector        = space_point.get_detector();
+  _geometry_path   = space_point.get_geometry_path();
 
   return *this;
 }

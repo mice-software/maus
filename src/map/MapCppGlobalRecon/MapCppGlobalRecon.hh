@@ -83,7 +83,7 @@ class MapCppGlobalRecon {
    * MAUS::GlobalEvent and populating an early
    * MAUS::recon::global::PrimaryChain object, with one track per
    * input object (even if a sub-detector has only provided a single
-   * spacepoint).
+   * space_point).
    */
   MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
 

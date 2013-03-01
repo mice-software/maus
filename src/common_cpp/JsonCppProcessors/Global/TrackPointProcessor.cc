@@ -66,9 +66,9 @@ TrackPointProcessor::TrackPointProcessor() {
       true);
 
   RegisterTRef/*<MAUS::DataStructure::Global::SpacePoint>*/(
-      "spacepoint",
-      &MAUS::DataStructure::Global::TrackPoint::get_spacepoint_tref,
-      &MAUS::DataStructure::Global::TrackPoint::set_spacepoint_tref,
+      "space_point",
+      &MAUS::DataStructure::Global::TrackPoint::get_space_point_tref,
+      &MAUS::DataStructure::Global::TrackPoint::set_space_point_tref,
       true);
 }
 

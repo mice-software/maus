@@ -46,10 +46,10 @@ class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {
  private:
   
   PointerArrayProcessor<MAUS::DataStructure::Global::SpacePoint>
-  _global_spacepoint_array_proc;
+  _global_space_point_array_proc;
   
   PointerArrayProcessor<MAUS::DataStructure::Global::TrackPoint>
-  _global_trackpoint_array_proc;
+  _global_track_point_array_proc;
   
   PointerArrayProcessor<MAUS::DataStructure::Global::Track>
   _global_track_array_proc;

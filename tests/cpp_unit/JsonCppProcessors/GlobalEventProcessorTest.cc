@@ -37,16 +37,16 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
     
     // Fill Cpp GlobalEvent
     for(int i = 0; i < 4; ++i) {
-      _trackpoint.push_back(new MAUS::DataStructure::Global::TrackPoint());
-      _spacepoint.push_back(new MAUS::DataStructure::Global::SpacePoint());
-      _spacepoint[i]->set_charge(1. * i);
-      _trackpoint[i]->set_spacepoint(_spacepoint[i]);
+      _track_point.push_back(new MAUS::DataStructure::Global::TrackPoint());
+      _space_point.push_back(new MAUS::DataStructure::Global::SpacePoint());
+      _space_point[i]->set_charge(1. * i);
+      _track_point[i]->set_space_point(_space_point[i]);
     }
     
     for(int i = 0; i < 2; ++i) {
       _track.push_back(new MAUS::DataStructure::Global::Track());
-      _track[i]->AddTrackPoint(_trackpoint[2*i] );
-      _track[i]->AddTrackPoint(_trackpoint[2*i + 1]);
+      _track[i]->AddTrackPoint(_track_point[2*i] );
+      _track[i]->AddTrackPoint(_track_point[2*i + 1]);
     }
     
     _chain = new MAUS::DataStructure::Global::PrimaryChain();
@@ -58,20 +58,20 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
 
     local_chain = NULL;
     local_track.resize(2);
-    local_trackpoint.resize(4);
-    local_spacepoint.resize(4);
+    local_track_point.resize(4);
+    local_space_point.resize(4);
   }
     
   MAUS::GlobalEvent *_event;
   MAUS::DataStructure::Global::PrimaryChain* _chain;
   std::vector<MAUS::DataStructure::Global::Track*> _track;
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> _trackpoint;
-  std::vector<MAUS::DataStructure::Global::SpacePoint*> _spacepoint;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> _track_point;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> _space_point;
   
   MAUS::DataStructure::Global::PrimaryChain *local_chain;
   std::vector<MAUS::DataStructure::Global::Track*> local_track;
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> local_trackpoint;
-  std::vector<MAUS::DataStructure::Global::SpacePoint*> local_spacepoint;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> local_track_point;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> local_space_point;
   
 };
 
@@ -83,8 +83,8 @@ TEST_F(GlobalEventProcessorTestClass, CheckInitialSetup) {
   ASSERT_TRUE(_event);
   ASSERT_EQ(1U, _event->get_primarychains()->size());
   ASSERT_EQ(2U, _event->get_tracks()->size());
-  ASSERT_EQ(4U, _event->get_trackpoints()->size());
-  ASSERT_EQ(4U, _event->get_spacepoints()->size());
+  ASSERT_EQ(4U, _event->get_track_points()->size());
+  ASSERT_EQ(4U, _event->get_space_points()->size());
 
   local_chain = _event->get_primarychains()->at(0);
   EXPECT_EQ(local_chain, _chain);
@@ -95,11 +95,11 @@ TEST_F(GlobalEventProcessorTestClass, CheckInitialSetup) {
   }
   
   for(int i = 0; i < 4; ++i) {
-    local_trackpoint[i] = _event->get_trackpoints()->at(i);
-    local_spacepoint[i] = _event->get_spacepoints()->at(i);
-    EXPECT_EQ(local_trackpoint[i], _trackpoint[i]);
-    EXPECT_EQ(local_spacepoint[i], _spacepoint[i]);
-    double charge = local_spacepoint[i]->get_charge();
+    local_track_point[i] = _event->get_track_points()->at(i);
+    local_space_point[i] = _event->get_space_points()->at(i);
+    EXPECT_EQ(local_track_point[i], _track_point[i]);
+    EXPECT_EQ(local_space_point[i], _space_point[i]);
+    double charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
   }
 }
@@ -112,19 +112,19 @@ TEST_F(GlobalEventProcessorTestClass, CheckConsistentChain) {
     local_track[i] = _chain->get_track_parent_pairs()->at(i)->GetTrack();
     EXPECT_EQ(local_track[i], _track[i]);
 
-    local_trackpoint[2*i] = (MAUS::DataStructure::Global::TrackPoint*)
-        _track[i]->get_trackpoints()->At(0);
-    local_trackpoint[2*i+1] = (MAUS::DataStructure::Global::TrackPoint*)
-        _track[i]->get_trackpoints()->At(1);
+    local_track_point[2*i] = (MAUS::DataStructure::Global::TrackPoint*)
+        _track[i]->get_track_points()->At(0);
+    local_track_point[2*i+1] = (MAUS::DataStructure::Global::TrackPoint*)
+        _track[i]->get_track_points()->At(1);
   }
   
   for(int i = 0; i < 4; ++i){
-    EXPECT_EQ(local_trackpoint[i], _trackpoint[i]);
+    EXPECT_EQ(local_track_point[i], _track_point[i]);
 
-    local_spacepoint[i] = _trackpoint[i]->get_spacepoint();
-    EXPECT_EQ(local_spacepoint[i], _spacepoint[i]);
+    local_space_point[i] = _track_point[i]->get_space_point();
+    EXPECT_EQ(local_space_point[i], _space_point[i]);
 
-    double charge = local_spacepoint[i]->get_charge();
+    double charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
   }
 }
@@ -163,8 +163,8 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCpp) {
 
   ASSERT_EQ(1U, event_out->get_primarychains()->size());
   ASSERT_EQ(2U, event_out->get_tracks()->size());
-  ASSERT_EQ(4U, event_out->get_trackpoints()->size());
-  ASSERT_EQ(4U, event_out->get_spacepoints()->size());
+  ASSERT_EQ(4U, event_out->get_track_points()->size());
+  ASSERT_EQ(4U, event_out->get_space_points()->size());
 
   local_chain = event_out->get_primarychains()->at(0);
   EXPECT_NE(local_chain, _chain);
@@ -175,11 +175,11 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCpp) {
   }
   
   for(int i = 0; i < 4; ++i) {
-    local_trackpoint[i] = event_out->get_trackpoints()->at(i);
-    local_spacepoint[i] = event_out->get_spacepoints()->at(i);
-    EXPECT_NE(local_trackpoint[i], _trackpoint[i]);
-    EXPECT_NE(local_spacepoint[i], _spacepoint[i]);
-    double charge = local_spacepoint[i]->get_charge();
+    local_track_point[i] = event_out->get_track_points()->at(i);
+    local_space_point[i] = event_out->get_space_points()->at(i);
+    EXPECT_NE(local_track_point[i], _track_point[i]);
+    EXPECT_NE(local_space_point[i], _space_point[i]);
+    double charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
   }
 }
@@ -208,8 +208,8 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCppWithDelete) {
 
   ASSERT_EQ(1U, event_out->get_primarychains()->size());
   ASSERT_EQ(2U, event_out->get_tracks()->size());
-  ASSERT_EQ(4U, event_out->get_trackpoints()->size());
-  ASSERT_EQ(4U, event_out->get_spacepoints()->size());
+  ASSERT_EQ(4U, event_out->get_track_points()->size());
+  ASSERT_EQ(4U, event_out->get_space_points()->size());
 
   local_chain = event_out->get_primarychains()->at(0);
   EXPECT_TRUE(local_chain);
@@ -220,11 +220,11 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCppWithDelete) {
   }
   
   for(int i = 0; i < 4; ++i) {
-    local_trackpoint[i] = event_out->get_trackpoints()->at(i);
-    local_spacepoint[i] = event_out->get_spacepoints()->at(i);
-    EXPECT_TRUE(local_trackpoint[i]);
-    EXPECT_TRUE(local_spacepoint[i]);
-    double charge = local_spacepoint[i]->get_charge();
+    local_track_point[i] = event_out->get_track_points()->at(i);
+    local_space_point[i] = event_out->get_space_points()->at(i);
+    EXPECT_TRUE(local_track_point[i]);
+    EXPECT_TRUE(local_space_point[i]);
+    double charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
   }
 }

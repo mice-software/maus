@@ -33,37 +33,37 @@ TrackPoint::TrackPoint()
       _momentum_error(0., 0., 0., 0.),
       _detector(MAUS::DataStructure::Global::kUndefined),
       _geometry_path(""),
-      _spacepoint(NULL) {}
+      _space_point(NULL) {}
 
 // Copy contructor
-TrackPoint::TrackPoint(const TrackPoint &trackpoint)
-    : _mapper_name(trackpoint.get_mapper_name()),
-      _charge(trackpoint.get_charge()),
-      _position(trackpoint.get_position()),
-      _position_error(trackpoint.get_position_error()),
-      _momentum(trackpoint.get_momentum()),
-      _momentum_error(trackpoint.get_momentum_error()),
-      _detector(trackpoint.get_detector()),
-      _geometry_path(trackpoint.get_geometry_path()),
-      _spacepoint(trackpoint.get_spacepoint()) {}
+TrackPoint::TrackPoint(const TrackPoint &track_point)
+    : _mapper_name(track_point.get_mapper_name()),
+      _charge(track_point.get_charge()),
+      _position(track_point.get_position()),
+      _position_error(track_point.get_position_error()),
+      _momentum(track_point.get_momentum()),
+      _momentum_error(track_point.get_momentum_error()),
+      _detector(track_point.get_detector()),
+      _geometry_path(track_point.get_geometry_path()),
+      _space_point(track_point.get_space_point()) {}
 
 // Destructor
 TrackPoint::~TrackPoint() {}
 
 // Assignment operator
-TrackPoint& TrackPoint::operator=(const TrackPoint &trackpoint) {
-  if (this == &trackpoint) {
+TrackPoint& TrackPoint::operator=(const TrackPoint &track_point) {
+  if (this == &track_point) {
     return *this;
   }
-  _mapper_name     = trackpoint.get_mapper_name();
-  _charge          = trackpoint.get_charge();
-  _position        = trackpoint.get_position();
-  _position_error  = trackpoint.get_position_error();
-  _momentum        = trackpoint.get_momentum();
-  _momentum_error  = trackpoint.get_momentum_error();
-  _detector        = trackpoint.get_detector();
-  _geometry_path   = trackpoint.get_geometry_path();
-  _spacepoint      = trackpoint.get_spacepoint();
+  _mapper_name     = track_point.get_mapper_name();
+  _charge          = track_point.get_charge();
+  _position        = track_point.get_position();
+  _position_error  = track_point.get_position_error();
+  _momentum        = track_point.get_momentum();
+  _momentum_error  = track_point.get_momentum_error();
+  _detector        = track_point.get_detector();
+  _geometry_path   = track_point.get_geometry_path();
+  _space_point      = track_point.get_space_point();
 
   return *this;
 }
@@ -84,11 +84,11 @@ TrackPoint* TrackPoint::Clone() {
 
   // ToDo (Ian Taylor - 29/10/12): Do we want to Clone the Spacepoint,
   // or copy it?  I am cloning for now, but I don't think we are
-  // expecting to change the spacepoint (it is just for book-keeping),
+  // expecting to change the space_point (it is just for book-keeping),
   // so a copy is probably better.
 
   // Changed my mind, not cloning...  Need to think about this A LOT MORE!
-  tpNew->set_spacepoint(this->get_spacepoint());
+  tpNew->set_space_point(this->get_space_point());
 
   return tpNew;
 }
@@ -157,22 +157,22 @@ std::string TrackPoint::get_geometry_path() const {
   return _geometry_path;
 }
 
-void TrackPoint::set_spacepoint_tref(TRef spacepoint) {
-  _spacepoint = spacepoint;
+void TrackPoint::set_space_point_tref(TRef space_point) {
+  _space_point = space_point;
 }
 
-TRef TrackPoint::get_spacepoint_tref() const {
-  return _spacepoint;
+TRef TrackPoint::get_space_point_tref() const {
+  return _space_point;
 }
 
-void TrackPoint::set_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint) {
-  _spacepoint = spacepoint;
+void TrackPoint::set_space_point(MAUS::DataStructure::Global::SpacePoint* space_point) {
+  _space_point = space_point;
 }
 
-MAUS::DataStructure::Global::SpacePoint* TrackPoint::get_spacepoint() const {
-  MAUS::DataStructure::Global::SpacePoint* spacepoint =
-      (MAUS::DataStructure::Global::SpacePoint*) _spacepoint.GetObject();
-  return spacepoint;
+MAUS::DataStructure::Global::SpacePoint* TrackPoint::get_space_point() const {
+  MAUS::DataStructure::Global::SpacePoint* space_point =
+      (MAUS::DataStructure::Global::SpacePoint*) _space_point.GetObject();
+  return space_point;
 }
 } // ~namespace Global
 } // ~namespace DataStructure

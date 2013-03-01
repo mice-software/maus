@@ -90,46 +90,46 @@ class GlobalEvent {
 
   /** Add a MAUS::DataStructure::Global::TrackPoint object, daughter
    *  objects are ignored. */
-  void add_trackpoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  void add_track_point(MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /** If a MAUS::DataStructure::Global::TrackPoint object is not
    *  already a member of the GlobalEvent, add it in.  Otherwise,
    *  return false, to signify already added.*/
-  bool add_trackpoint_check(
-      MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  bool add_track_point_check(
+      MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /** Recursively add a MAUS::DataStructure::Global::TrackPoint object
    *  and the associated daughter objects */
-  void add_trackpoint_recursive(
-      MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  void add_track_point_recursive(
+      MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /** Return the std::vector of MAUS::DataStructure::Global::TrackPoint*,
-   *  #_trackpoints. */
+   *  #_track_points. */
   std::vector<MAUS::DataStructure::Global::TrackPoint*>*
-  get_trackpoints() const;
+  get_track_points() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::TrackPoint*>. */
-  void set_trackpoints(
-      std::vector<MAUS::DataStructure::Global::TrackPoint*> *trackpoints);
+  void set_track_points(
+      std::vector<MAUS::DataStructure::Global::TrackPoint*> *track_points);
 
   /** Add a MAUS::DataStructure::Global::SpacePoint object. */
-  void add_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint);
+  void add_space_point(MAUS::DataStructure::Global::SpacePoint* space_point);
 
   /** If a MAUS::DataStructure::Global::SpacePoint object is not already a
    *  member of the GlobalEvent, add it in.  Otherwise, return false,
    *  to signify already added.*/
-  bool add_spacepoint_check(
-      MAUS::DataStructure::Global::SpacePoint* spacepoint);
+  bool add_space_point_check(
+      MAUS::DataStructure::Global::SpacePoint* space_point);
 
   /** Return the std::vector of MAUS::DataStructure::Global::SpacePoint*,
-   *  #_spacepoints. */
+   *  #_space_points. */
   std::vector<MAUS::DataStructure::Global::SpacePoint*>*
-  get_spacepoints() const;
+  get_space_points() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::SpacePoint*>,
-   *  #_spacepoints. */
-  void set_spacepoints(
-      std::vector<MAUS::DataStructure::Global::SpacePoint*> *spacepoints);
+   *  #_space_points. */
+  void set_space_points(
+      std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points);
 
  private:
 
@@ -148,13 +148,13 @@ class GlobalEvent {
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
    *  #_primarychains. */
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> *_trackpoints;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> *_track_points;
   
   /** A vector of MAUS::DataStructure::Global::SpacePoint pointers
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
    *  #_primarychains. */
-  std::vector<MAUS::DataStructure::Global::SpacePoint*> *_spacepoints;
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> *_space_points;
 
   ClassDef(GlobalEvent, 2)
 }; // ~GlobalEvent

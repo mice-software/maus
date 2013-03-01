@@ -62,13 +62,13 @@ class TrackPoint : public TObject{
   TrackPoint();
 
   /// Copy constructor - any pointers are deep copied
-  TrackPoint(const TrackPoint &trackpoint);
+  TrackPoint(const TrackPoint &track_point);
 
   /// Destructor
   virtual ~TrackPoint();
 
   /// Assignment operator - any pointers are deep copied
-  TrackPoint& operator=(const TrackPoint &trackpoint);
+  TrackPoint& operator=(const TrackPoint &track_point);
 
   /// Clone method.  This allows us to create a new object and change
   /// that object, without changing the original.  This should be the
@@ -150,19 +150,19 @@ class TrackPoint : public TObject{
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  void set_spacepoint_tref(TRef spacepoint);
+  void set_space_point_tref(TRef space_point);
   
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  TRef get_spacepoint_tref() const;
+  TRef get_space_point_tref() const;
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  void set_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint);
+  void set_space_point(MAUS::DataStructure::Global::SpacePoint* space_point);
   
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  MAUS::DataStructure::Global::SpacePoint* get_spacepoint() const;
+  MAUS::DataStructure::Global::SpacePoint* get_space_point() const;
 
  private:
 
@@ -197,7 +197,7 @@ class TrackPoint : public TObject{
 
   /// The reconstruction object defining the matching detector
   /// measurement.
-  TRef _spacepoint;
+  TRef _space_point;
 
   ClassDef(TrackPoint, 1)
 }; // ~class TrackPoint

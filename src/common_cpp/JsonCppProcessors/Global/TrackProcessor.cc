@@ -41,10 +41,10 @@ TrackProcessor::TrackProcessor() :
         &MAUS::DataStructure::Global::Track::set_charge, true);
 
     RegisterTRefArray(
-        "trackpoints",
-        &_trackpoint_trefarray_proc,
-        &MAUS::DataStructure::Global::Track::get_trackpoints,
-        &MAUS::DataStructure::Global::Track::set_trackpoints, true); 
+        "track_points",
+        &_track_point_trefarray_proc,
+        &MAUS::DataStructure::Global::Track::get_track_points,
+        &MAUS::DataStructure::Global::Track::set_track_points, true); 
 
     RegisterValueBranch(
         "detector_points", &_uint_proc,

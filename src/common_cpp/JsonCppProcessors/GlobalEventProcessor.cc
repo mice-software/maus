@@ -19,9 +19,9 @@
 namespace MAUS {
 
 GlobalEventProcessor::GlobalEventProcessor() :
-    _global_spacepoint_array_proc(
+    _global_space_point_array_proc(
         new MAUS::Processor::Global::SpacePointProcessor()),
-    _global_trackpoint_array_proc(
+    _global_track_point_array_proc(
         new MAUS::Processor::Global::TrackPointProcessor()),
     _global_track_array_proc(
         new MAUS::Processor::Global::TrackProcessor()),
@@ -29,13 +29,13 @@ GlobalEventProcessor::GlobalEventProcessor() :
         new MAUS::Processor::Global::PrimaryChainProcessor())
 {
 
-  RegisterPointerBranch("spacepoints", &_global_spacepoint_array_proc,
-                        &GlobalEvent::get_spacepoints,
-                        &GlobalEvent::set_spacepoints, false); 
+  RegisterPointerBranch("space_points", &_global_space_point_array_proc,
+                        &GlobalEvent::get_space_points,
+                        &GlobalEvent::set_space_points, false); 
                         
-  RegisterPointerBranch("trackpoints", &_global_trackpoint_array_proc,
-                        &GlobalEvent::get_trackpoints,
-                        &GlobalEvent::set_trackpoints, false); 
+  RegisterPointerBranch("track_points", &_global_track_point_array_proc,
+                        &GlobalEvent::get_track_points,
+                        &GlobalEvent::set_track_points, false); 
                         
   RegisterPointerBranch("tracks", &_global_track_array_proc,
                         &GlobalEvent::get_tracks,

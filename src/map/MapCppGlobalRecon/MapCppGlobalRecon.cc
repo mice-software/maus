@@ -123,28 +123,28 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
   // Create our new GlobalEvent
   MAUS::GlobalEvent* global_event = new MAUS::GlobalEvent();
 
-  MAUS::DataStructure::Global::SpacePoint* spacepoint =
+  MAUS::DataStructure::Global::SpacePoint* space_point =
       new MAUS::DataStructure::Global::SpacePoint();
 
-  spacepoint->set_charge(1234.0);
-  spacepoint->set_detector(MAUS::DataStructure::Global::kTracker1);
-  spacepoint->set_geometry_path("FakeGeomPath");
+  space_point->set_charge(1234.0);
+  space_point->set_detector(MAUS::DataStructure::Global::kTracker1);
+  space_point->set_geometry_path("FakeGeomPath");
   
-  global_event->add_spacepoint_check(spacepoint);
+  global_event->add_space_point_check(space_point);
   
-  spacepoint = new MAUS::DataStructure::Global::SpacePoint();
+  space_point = new MAUS::DataStructure::Global::SpacePoint();
 
-  spacepoint->set_charge(2345.0);
-  spacepoint->set_detector(MAUS::DataStructure::Global::kTracker2);
-  spacepoint->set_geometry_path("RealGeomPath");
+  space_point->set_charge(2345.0);
+  space_point->set_detector(MAUS::DataStructure::Global::kTracker2);
+  space_point->set_geometry_path("RealGeomPath");
   
-  MAUS::DataStructure::Global::TrackPoint* trackpoint =
+  MAUS::DataStructure::Global::TrackPoint* track_point =
       new MAUS::DataStructure::Global::TrackPoint();
 
-  trackpoint->set_charge(3456.0);
-  trackpoint->set_spacepoint(spacepoint);
+  track_point->set_charge(3456.0);
+  track_point->set_space_point(space_point);
 
-  global_event->add_trackpoint_recursive(trackpoint);
+  global_event->add_track_point_recursive(track_point);
 
   // // Import the various reconstruction elements
   // MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
@@ -161,7 +161,7 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
 // void MapCppGlobalRecon::print_event_info(GlobalEvent &event) {
 //   // std::cout << event.digits().size() << " "
 //   //           << event.clusters().size() << " "
-//   //           << event.spacepoints().size() << " "
+//   //           << event.space_points().size() << " "
 //   //             << event.straightprtracks().size() << " " << std::endl;
 // }
 

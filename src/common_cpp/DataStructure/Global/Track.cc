@@ -38,7 +38,7 @@ Track::Track()
       _charge(0),
       _detectorpoints(0),
       _goodness_of_fit(0.) {
-  _trackpoints = new TRefArray();
+  _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
 }
 
@@ -47,18 +47,18 @@ Track::Track(const Track &track)
     : _mapper_name(track.get_mapper_name()),
       _pid(track.get_pid()),
       _charge(track.get_charge()),
-      _trackpoints(track.get_trackpoints()),
+      _track_points(track.get_track_points()),
       _detectorpoints(track.get_detectorpoints()),
       _geometry_paths(track.get_geometry_paths()),
       _constituent_tracks(track.get_constituent_tracks()),
       _goodness_of_fit(track.get_goodness_of_fit()) {
-  _trackpoints = new TRefArray(*track.get_trackpoints());
+  _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
 }
 
 // Destructor
 Track::~Track() {
-  delete _trackpoints;
+  delete _track_points;
   delete _constituent_tracks;
 }
 
@@ -70,7 +70,7 @@ Track& Track::operator=(const Track &track) {
   _mapper_name        = track.get_mapper_name();
   _pid                = track.get_pid();
   _charge             = track.get_charge();
-  _trackpoints = new TRefArray(*track.get_trackpoints());
+  _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
   _detectorpoints     = track.get_detectorpoints();
   _geometry_paths     = track.get_geometry_paths();
@@ -91,8 +91,8 @@ Track* Track::Clone() const {
 
   // Track points may be edited, so we clone the original points
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    tp = (MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
+  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+    tp = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
     if(!tp) continue;
     trackNew->PushBackTrackPoint(tp->Clone());
   }
@@ -139,52 +139,52 @@ int Track::get_charge() const {
 
 // Trackpoint methods
 
-void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
-  if(!trackpoint){
+void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point) {
+  if(!track_point){
     throw(Squeal(Squeal::recoverable,
                  "Attempting to add a NULL TrackPoint",
                  "DataStructure::Global::Track::AddTrackPoint()"));
   }
-  if(trackpoint->get_detector() == MAUS::DataStructure::Global::kVirtual) {
-    AddGeometryPath(trackpoint->get_geometry_path());
+  if(track_point->get_detector() == MAUS::DataStructure::Global::kVirtual) {
+    AddGeometryPath(track_point->get_geometry_path());
   }
-  SetDetector(trackpoint->get_detector());
-  PushBackTrackPoint(trackpoint);
+  SetDetector(track_point->get_detector());
+  PushBackTrackPoint(track_point);
 }
   
 void Track::PushBackTrackPoint(
-    MAUS::DataStructure::Global::TrackPoint* trackpoint) {
-  _trackpoints->Add(trackpoint);
+    MAUS::DataStructure::Global::TrackPoint* track_point) {
+  _track_points->Add(track_point);
 }
 
-// Correctly remove the trackpoint, unsetting the detector bit and/or
+// Correctly remove the track_point, unsetting the detector bit and/or
 // removing the geometry path if appropriate.
 void Track::RemoveTrackPoint(
-    MAUS::DataStructure::Global::TrackPoint* trackpoint) {
-  if(!trackpoint) {
+    MAUS::DataStructure::Global::TrackPoint* track_point) {
+  if(!track_point) {
     throw(Squeal(Squeal::recoverable,
                  "No matching TrackPoint: pointer is NULL",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
   }
 
-  // Remove trackpoint from TRefArray
-  TObject* result = _trackpoints->FindObject(trackpoint);
+  // Remove track_point from TRefArray
+  TObject* result = _track_points->FindObject(track_point);
   if(!result)
     throw(Squeal(Squeal::recoverable,
                  "No matching TrackPoint ",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
   else {
-    _trackpoints->Remove(result);
-    _trackpoints->Compress();
+    _track_points->Remove(result);
+    _track_points->Compress();
   }
 
-  // Check if trackpoint detector point should still be set.
+  // Check if track_point detector point should still be set.
   MAUS::DataStructure::Global::DetectorPoint targetDP =
-      trackpoint->get_detector();
+      track_point->get_detector();
   MAUS::DataStructure::Global::TrackPoint *eachTP;
   bool stillNeeded = false;
-  for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    eachTP = (MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
+  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+    eachTP = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
     if(!eachTP) continue;
     if(eachTP->get_detector() == targetDP) {
       stillNeeded = true;
@@ -197,49 +197,49 @@ void Track::RemoveTrackPoint(
 
   // If we have an associated geometry path, remove that as well
   if(targetDP == MAUS::DataStructure::Global::kVirtual) {
-    RemoveGeometryPath(trackpoint->get_geometry_path());
+    RemoveGeometryPath(track_point->get_geometry_path());
   }
 }
 
 void Track::SortTrackPointsByZ() {
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> temp_trackpoints;
+  std::vector<MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    tp = (MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
+  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+    tp = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
     if(!tp) continue;
-    temp_trackpoints.push_back(tp);
+    temp_track_points.push_back(tp);
   }
   
-  std::sort(temp_trackpoints.begin(), temp_trackpoints.end(), SortByZ);
+  std::sort(temp_track_points.begin(), temp_track_points.end(), SortByZ);
 
-  _trackpoints->Clear();
-  _trackpoints->Expand(temp_trackpoints.size()); // Can be used to shrink too
-  for(size_t i = 0; i < temp_trackpoints.size(); ++i) {
-    _trackpoints->AddAt(temp_trackpoints.at(i), i);
+  _track_points->Clear();
+  _track_points->Expand(temp_track_points.size()); // Can be used to shrink too
+  for(size_t i = 0; i < temp_track_points.size(); ++i) {
+    _track_points->AddAt(temp_track_points.at(i), i);
   }
 }
 
 std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 Track::GetTrackPoints() {
-  std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_trackpoints;
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
   const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _trackpoints->GetLast()+1; ++i) {
-    tp = (const MAUS::DataStructure::Global::TrackPoint*) _trackpoints->At(i);
+  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+    tp = (const MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
     if(!tp) continue;
-    temp_trackpoints.push_back(tp);
+    temp_track_points.push_back(tp);
   }
-  return temp_trackpoints;
+  return temp_track_points;
 }
 
-void Track::set_trackpoints(TRefArray* trackpoints) {
-  if(_trackpoints != NULL) {
-    delete _trackpoints;
+void Track::set_track_points(TRefArray* track_points) {
+  if(_track_points != NULL) {
+    delete _track_points;
   }
-  _trackpoints = trackpoints;
+  _track_points = track_points;
 }
 
-TRefArray* Track::get_trackpoints() const {
-  return _trackpoints;
+TRefArray* Track::get_track_points() const {
+  return _track_points;
 }
 
 // Detector Point Methods

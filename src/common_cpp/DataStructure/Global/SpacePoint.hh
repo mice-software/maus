@@ -51,13 +51,13 @@ class SpacePoint : public TObject {
   SpacePoint();
 
   /// Copy constructor - any pointers are deep copied
-  SpacePoint(const SpacePoint &spacepoint);
+  SpacePoint(const SpacePoint &space_point);
 
   /// Destructor
   virtual ~SpacePoint();
 
   /// Assignment operator - any pointers are deep copied
-  SpacePoint& operator=(const SpacePoint &spacepoint);
+  SpacePoint& operator=(const SpacePoint &space_point);
 
   /// Clone method.  This allows us to create a new object and change
   /// that object, without changing the original.  This should be the

@@ -90,12 +90,12 @@ class Track : public TObject {
 
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
-  void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /// Remove a MAUS::DataStructure::Global::TrackPoint, unsetting
   /// #_detectorpoints bist and removing #_geometry_paths entries if
   /// required.
-  void RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  void RemoveTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /// Sort the track points based purely on the Z coordinate. The
   /// order of #_geometry_paths is unchanged, as I don't believe it
@@ -106,18 +106,18 @@ class Track : public TObject {
   /// ensuring they are unchanged.
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints();
 
-  /// Set the list of associated TrackPoints, #_trackpoints, from a
+  /// Set the list of associated TrackPoints, #_track_points, from a
   /// TRefArray.  The Track takes ownership of this pointer, deleting
   /// the current TRefArray if necessary.  This is mostly for the
   /// Json/Cpp Processor, users are encouraged to use the Add/Remove
   /// TrackPoint methods.
-  void set_trackpoints(TRefArray* trackpoints);
+  void set_track_points(TRefArray* track_points);
 
   /// Directly access the MAUS::DataStructure::Global::TrackPoint
-  /// pointers stored in the track, #_trackpoints.  This is mostly for
+  /// pointers stored in the track, #_track_points.  This is mostly for
   /// the Json/Cpp Processor, users are encouraged to use the
   /// GetTrackPoints method.
-  TRefArray* get_trackpoints() const;
+  TRefArray* get_track_points() const;
 
   /// Set the corresponding bit in #_detectorpoints.
   void SetDetector(MAUS::DataStructure::Global::DetectorPoint detector);
@@ -200,11 +200,11 @@ class Track : public TObject {
 
  private:
 
-  /// Push a MAUS::DataStructure::Global::TrackPoint* into the #_trackpoints
+  /// Push a MAUS::DataStructure::Global::TrackPoint* into the #_track_points
   /// TRefArray.  This method is private, as
   /// MAUS::DataStructure::Global::TrackPoint's should be added through the
   /// AddTrackPoint(MAUS::DataStructure::Global::TrackPoint*) method.
-  void PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
+  void PushBackTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
 
   /// The name of the mapper which produced this Track. This can be
   /// used to separate different stages of the global reconstruction
@@ -219,7 +219,7 @@ class Track : public TObject {
 
   /// The associated MAUS::DataStructure::Global::TrackPoint's, which define
   /// the path of the reconstructed track.
-  TRefArray* _trackpoints;
+  TRefArray* _track_points;
 
   /// A bitmask for the set detector points, and a vector of strings
   /// for the vairable geometry paths.

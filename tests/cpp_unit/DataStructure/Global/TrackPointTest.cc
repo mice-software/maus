@@ -77,7 +77,7 @@ TEST_F(TrackPointTestDS, test_getters_setters) {
   tp.set_momentum_error(emom);
   tp.set_detector(det);
   tp.set_geometry_path(geom_path);
-  tp.set_spacepoint(sp);
+  tp.set_space_point(sp);
 
   EXPECT_EQ(mapper_name, tp.get_mapper_name());
   EXPECT_EQ(charge, tp.get_charge());
@@ -99,7 +99,7 @@ TEST_F(TrackPointTestDS, test_getters_setters) {
   EXPECT_EQ(ept, tp.get_momentum_error().T());
   EXPECT_EQ(det, tp.get_detector());
   EXPECT_EQ(geom_path, tp.get_geometry_path());
-  EXPECT_EQ(sp_test, tp.get_spacepoint());
+  EXPECT_EQ(sp_test, tp.get_space_point());
 }
 
 
@@ -126,7 +126,7 @@ TEST_F(TrackPointTestDS, test_default_constructor) {
   EXPECT_EQ(0., tp.get_momentum_error().T());
   EXPECT_EQ(MAUS::DataStructure::Global::kUndefined, tp.get_detector());
   EXPECT_EQ("", tp.get_geometry_path());
-  EXPECT_TRUE(tp.get_spacepoint() == NULL);
+  EXPECT_TRUE(tp.get_space_point() == NULL);
 }
 
 TEST_F(TrackPointTestDS, test_copy_constructor) {
@@ -148,7 +148,7 @@ TEST_F(TrackPointTestDS, test_copy_constructor) {
   tp1.set_mapper_name(mapper_name);
   tp1.set_charge(charge);
   tp1.set_position(pos);
-  tp1.set_spacepoint(sp);
+  tp1.set_space_point(sp);
 
   MAUS::DataStructure::Global::TrackPoint tp2(tp1);
 
@@ -158,7 +158,7 @@ TEST_F(TrackPointTestDS, test_copy_constructor) {
   EXPECT_EQ(y, tp2.get_position().Y());
   EXPECT_EQ(z, tp2.get_position().Z());
   EXPECT_EQ(t, tp2.get_position().T());
-  EXPECT_EQ(sp_test, tp2.get_spacepoint());
+  EXPECT_EQ(sp_test, tp2.get_space_point());
 }
 
 TEST_F(TrackPointTestDS, test_assignment_operator) {
@@ -180,7 +180,7 @@ TEST_F(TrackPointTestDS, test_assignment_operator) {
   tp1.set_mapper_name(mapper_name);
   tp1.set_charge(charge);
   tp1.set_position(pos);
-  tp1.set_spacepoint(sp);
+  tp1.set_space_point(sp);
 
   MAUS::DataStructure::Global::TrackPoint tp2;
   tp2 = tp1;
@@ -191,7 +191,7 @@ TEST_F(TrackPointTestDS, test_assignment_operator) {
   EXPECT_EQ(y, tp2.get_position().Y());
   EXPECT_EQ(z, tp2.get_position().Z());
   EXPECT_EQ(t, tp2.get_position().T());
-  EXPECT_EQ(sp_test, tp2.get_spacepoint());
+  EXPECT_EQ(sp_test, tp2.get_space_point());
 }
 
 TEST_F(TrackPointTestDS, test_clone) {
@@ -213,7 +213,7 @@ TEST_F(TrackPointTestDS, test_clone) {
   tp1->set_mapper_name(mapper_name);
   tp1->set_charge(charge);
   tp1->set_position(pos);
-  tp1->set_spacepoint(&sp);
+  tp1->set_space_point(&sp);
 
   MAUS::DataStructure::Global::TrackPoint *tp2 = tp1->Clone();
   delete tp1;
@@ -226,12 +226,12 @@ TEST_F(TrackPointTestDS, test_clone) {
   EXPECT_EQ(t, tp2->get_position().T());
 
   // As of 29/10/2012. Clone creates and stores a Clone of the
-  // spacepoint, rather than a direct copy.  Therefore, this test
+  // space_point, rather than a direct copy.  Therefore, this test
   // confirms that they have different pointer values.  This may
   // change in the future.
 
   // Changed 14/01/2013.
-  EXPECT_EQ(sp_test, tp2->get_spacepoint());
+  EXPECT_EQ(sp_test, tp2->get_space_point());
 }
 
 } // ~namespace MAUS
