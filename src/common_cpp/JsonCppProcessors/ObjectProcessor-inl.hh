@@ -25,6 +25,8 @@
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ConstantItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ValueItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerRefItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefArrayItem.hh"
 
 namespace MAUS {
 
@@ -52,15 +54,41 @@ template <class ObjectType>
 template <class ChildType>
 void ObjectProcessor<ObjectType>::RegisterPointerReference(
                 std::string branch_name,
-                ProcessorBase<ChildType>* child_processor,
                 ChildType* (ObjectType::*GetMethod)() const,
                 void (ObjectType::*SetMethod)(ChildType* value),
                 bool is_required) {
     using ObjectProcessorNS::BaseItem;
     using ObjectProcessorNS::PointerRefItem;
     BaseItem<ObjectType>* item = new PointerRefItem<ObjectType, ChildType>
-              (branch_name, child_processor, GetMethod, SetMethod, is_required);
+              (branch_name, GetMethod, SetMethod, is_required);
     _items[branch_name] = item;
+}
+
+template <class ObjectType>
+void ObjectProcessor<ObjectType>::RegisterTRef(
+    std::string branch_name,
+    TRef (ObjectType::*GetMethod)() const,
+    void (ObjectType::*SetMethod)(TRef value),
+    bool is_required) {
+  using ObjectProcessorNS::BaseItem;
+  using ObjectProcessorNS::PointerTRefItem;
+  BaseItem<ObjectType>* item = new PointerTRefItem<ObjectType>
+      (branch_name, GetMethod, SetMethod, is_required);
+  _items[branch_name] = item;
+}
+
+template <class ObjectType>
+void ObjectProcessor<ObjectType>::RegisterTRefArray(
+    std::string branch_name,
+    TRefArrayProcessor* child_processor,
+    TRefArray* (ObjectType::*GetMethod)() const,
+    void (ObjectType::*SetMethod)(TRefArray* value),
+    bool is_required) {
+  using ObjectProcessorNS::BaseItem;
+  using ObjectProcessorNS::PointerTRefArrayItem;
+  BaseItem<ObjectType>* item = new PointerTRefArrayItem<ObjectType>
+      (branch_name, child_processor, GetMethod, SetMethod, is_required);
+  _items[branch_name] = item;
 }
 
 template <class ObjectType>
@@ -91,7 +119,8 @@ void ObjectProcessor<ObjectType>::RegisterConstantBranch(
 }
 
 template <class ObjectType>
-ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(const Json::Value& json_object) {
+ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
+    const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue) {
         std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
         throw(Squeal(Squeal::recoverable,

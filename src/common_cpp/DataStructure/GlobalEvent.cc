@@ -14,26 +14,312 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <vector>
+
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
 
 namespace MAUS {
 
-GlobalEvent::GlobalEvent() {
+GlobalEvent::GlobalEvent()
+    : _primary_chains(NULL), _tracks(NULL),
+      _track_points(NULL), _space_points(NULL) {
+  _primary_chains =
+      new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
+  _tracks        = new std::vector<MAUS::DataStructure::Global::Track*>();
+  _track_points   = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
+  _space_points   = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
 }
 
-GlobalEvent::GlobalEvent(const GlobalEvent& _globalevent) {
-    *this = _globalevent;
+GlobalEvent::GlobalEvent(const GlobalEvent& globalevent)
+    : _primary_chains(NULL), _tracks(NULL),
+      _track_points(NULL), _space_points(NULL) {
+  *this = globalevent;
 }
 
-GlobalEvent& GlobalEvent::operator=(const GlobalEvent& _globalevent) {
-    if (this == &_globalevent) {
-        return *this;
-    }
+GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
+  if (this == &globalevent) {
     return *this;
+  }
+
+  if (_primary_chains != NULL) {
+    if (!_primary_chains->empty())
+      for (size_t i = 0; i < _primary_chains->size(); ++i)
+        delete _primary_chains->at(i);
+    delete _primary_chains;
+  }
+  if (globalevent._primary_chains == NULL) {
+    _primary_chains = NULL;
+  } else {
+    _primary_chains =
+        new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
+        globalevent._primary_chains;
+    for (size_t i = 0; i < old_primary_chain->size(); ++i)
+      _primary_chains->push_back(old_primary_chain->at(i)->Clone());
+  }
+
+  if (_tracks != NULL) {
+    for (size_t i = 0; i < _tracks->size(); ++i)
+      delete _tracks->at(i);
+    delete _tracks;
+  }
+  if (globalevent._tracks == NULL) {
+    _tracks = NULL;
+  } else {
+    _tracks = new std::vector<MAUS::DataStructure::Global::Track*>();
+    std::vector<MAUS::DataStructure::Global::Track*>* old_tracks =
+        globalevent._tracks;
+    for (size_t i = 0; i < old_tracks->size(); ++i)
+      _tracks->push_back(old_tracks->at(i)->Clone());
+  }
+
+  if (_track_points != NULL) {
+    for (size_t i = 0; i < _track_points->size(); ++i)
+      delete _track_points->at(i);
+    delete _track_points;
+  }
+  if (globalevent._track_points == NULL) {
+    _track_points = NULL;
+  } else {
+    _track_points = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
+    std::vector<MAUS::DataStructure::Global::TrackPoint*>* old_track_points =
+        globalevent._track_points;
+    for (size_t i = 0; i < old_track_points->size(); ++i)
+      _track_points->push_back(old_track_points->at(i)->Clone());
+  }
+
+  if (_space_points != NULL) {
+    for (size_t i = 0; i < _space_points->size(); ++i)
+      delete _space_points->at(i);
+    delete _space_points;
+  }
+  if (globalevent._space_points == NULL) {
+    _space_points = NULL;
+  } else {
+    _space_points = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
+    std::vector<MAUS::DataStructure::Global::SpacePoint*>* old_space_points =
+        globalevent._space_points;
+    for (size_t i = 0; i < old_space_points->size(); ++i)
+      _space_points->push_back(old_space_points->at(i)->Clone());
+  }
+
+  return *this;
 }
 
 GlobalEvent::~GlobalEvent() {
+  if (_primary_chains != NULL) {
+    for (size_t i = 0; i < _primary_chains->size(); ++i) {
+      delete _primary_chains->at(i);
+    }
+    delete _primary_chains;
+  }
+
+  if (_tracks != NULL) {
+    for (size_t i = 0; i < _tracks->size(); ++i) {
+      delete _tracks->at(i);
+    }
+    delete _tracks;
+  }
+
+  if (_track_points != NULL) {
+    for (size_t i = 0; i < _track_points->size(); ++i) {
+      delete _track_points->at(i);
+    }
+    delete _track_points;
+  }
+
+  if (_space_points != NULL) {
+    for (size_t i = 0; i < _space_points->size(); ++i) {
+      delete _space_points->at(i);
+    }
+    delete _space_points;
+  }
 }
+
+void GlobalEvent::add_primary_chain(
+    MAUS::DataStructure::Global::PrimaryChain* pchain) {
+  _primary_chains->push_back(pchain);
+};
+
+bool GlobalEvent::add_primary_chain_check(
+    MAUS::DataStructure::Global::PrimaryChain* pchain) {
+  // Check if the provided pchain matches an existing entry (this is
+  // to save repeated entries and wasted disk space).
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>::iterator pc_iter =
+      std::find(_primary_chains->begin(), _primary_chains->end(), pchain);
+
+  bool exists = (pc_iter != _primary_chains->end());
+  if (!exists)
+    add_primary_chain(pchain);
+
+  return exists;
+}
+
+void GlobalEvent::add_primary_chain_recursive(
+    MAUS::DataStructure::Global::PrimaryChain* pchain) {
+  // Add the primary chain, checking if it already exists in chain.
+  bool already_added = add_primary_chain_check(pchain);
+
+  // If the chain had been added, then we will loop over the tracks
+  // and add them too.
+  if (!already_added) {
+    std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator
+        iter_track;
+    std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *track_pair
+        = pchain->get_track_parent_pairs();
+    MAUS::DataStructure::Global::Track* track = NULL;
+    for (iter_track = track_pair->begin();
+        iter_track != track_pair->end(); ++iter_track) {
+      track = (*iter_track)->GetTrack();
+      add_track_recursive(track);
+    }
+  }
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
+GlobalEvent::get_primary_chains() const {
+  return _primary_chains;
+};
+
+void GlobalEvent::set_primary_chains(
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primary_chains) {
+  _primary_chains = primary_chains;
+};
+
+void GlobalEvent::add_track(MAUS::DataStructure::Global::Track* track) {
+  _tracks->push_back(track);
+};
+
+bool GlobalEvent::add_track_check(MAUS::DataStructure::Global::Track* track) {
+  // Check if the provided track matches an existing entry (this is
+  // to save repeated entries and wasted disk space).
+  std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter =
+      std::find(_tracks->begin(), _tracks->end(), track);
+
+  bool exists = (track_iter != _tracks->end());
+  if (!exists)
+    add_track(track);
+
+  return exists;
+}
+
+void GlobalEvent::add_track_recursive(
+    MAUS::DataStructure::Global::Track* track) {
+  // Add the Track, checking if it already exists in the GlobalEvent.
+  bool already_added = add_track_check(track);
+
+  // If the chain had been added, then we will loop over the
+  // constituent tracks and track_points, adding them too.
+  if (!already_added) {
+    // Constituent Tracks
+    MAUS::DataStructure::Global::Track* ct = NULL;
+    for (int i = 0; i < track->get_constituent_tracks()->GetLast() + 1; ++i) {
+      ct = (MAUS::DataStructure::Global::Track*)
+          track->get_constituent_tracks()->At(i);
+      if (!ct) continue;
+      add_track_recursive(ct);
+    }
+
+    // TrackPoints
+    MAUS::DataStructure::Global::TrackPoint* tp = NULL;
+    for (int i = 0; i < track->get_track_points()->GetLast() + 1; ++i) {
+      tp = (MAUS::DataStructure::Global::TrackPoint*)
+          track->get_track_points()->At(i);
+      if (!tp) continue;
+      add_track_point_recursive(tp);
+    }
+  }
+}
+
+std::vector<MAUS::DataStructure::Global::Track*>*
+GlobalEvent::get_tracks() const {
+  return _tracks;
+};
+
+void GlobalEvent::set_tracks(
+    std::vector<MAUS::DataStructure::Global::Track*> *tracks) {
+  _tracks = tracks;
+};
+
+void GlobalEvent::add_track_point(
+    MAUS::DataStructure::Global::TrackPoint* track_point) {
+  _track_points->push_back(track_point);
+};
+
+bool GlobalEvent::add_track_point_check(
+    MAUS::DataStructure::Global::TrackPoint* track_point) {
+  // Check if the provided track_point matches an existing entry (this is
+  // to save repeated entries and wasted disk space).
+  std::vector<MAUS::DataStructure::Global::TrackPoint*>::iterator
+      track_point_iter = std::find(_track_points->begin(),
+                                  _track_points->end(),
+                                  track_point);
+
+  bool exists = (track_point_iter != _track_points->end());
+  if (!exists)
+    add_track_point(track_point);
+
+  return exists;
+}
+
+void GlobalEvent::add_track_point_recursive(
+    MAUS::DataStructure::Global::TrackPoint* track_point) {
+  // Add the TrackPoint, checking if it already exists in the GlobalEvent.
+  bool already_added = add_track_point_check(track_point);
+
+  // If the chain had been added, then we will add the constituent
+  // space_point.
+  if (!already_added) {
+    // SpacePoints
+    add_space_point_check(track_point->get_space_point());
+  }
+}
+
+std::vector<MAUS::DataStructure::Global::TrackPoint*>*
+GlobalEvent::get_track_points() const {
+  return _track_points;
+};
+
+void GlobalEvent::set_track_points(
+    std::vector<MAUS::DataStructure::Global::TrackPoint*> *track_points) {
+  _track_points = track_points;
+};
+
+void GlobalEvent::add_space_point(
+    MAUS::DataStructure::Global::SpacePoint* space_point) {
+  _space_points->push_back(space_point);
+};
+
+bool GlobalEvent::add_space_point_check(
+    MAUS::DataStructure::Global::SpacePoint* space_point) {
+  // Check if the provided space_point matches an existing entry (this is
+  // to save repeated entries and wasted disk space).
+  bool exists = false;
+
+  for (unsigned int i = 0; i < _space_points->size(); ++i) {
+    MAUS::DataStructure::Global::SpacePoint* test = _space_points->at(i);
+    if (test == space_point) {
+      exists = true;
+      break;
+    }
+  }
+
+  if (!exists)
+    add_space_point(space_point);
+
+  return exists;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*>*
+GlobalEvent::get_space_points() const {
+  return _space_points;
+};
+
+void GlobalEvent::set_space_points(
+    std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points) {
+  _space_points = space_points;
+};
 }
 

@@ -180,6 +180,34 @@ digraph G {
        recon_events_array_item_ckov_event_ckov_digits_array_item_B [shape=record, label="{CkovB|B}"]
     recon_events_array_item_emr_event [shape=record, label="{EMREvent|emr_event}"]
     recon_events_array_item_global_event [shape=record, label="{GlobalEvent|global_event}"]
+     recon_events_array_item_global_event_spacepoints [shape=record, label="{SpacePointArray|spacepoints}"]
+      recon_events_array_item_global_event_spacepoints_array_item [shape=record, label="{Global::SpacePoint|[]}"]
+       recon_events_array_item_global_event_spacepoints_array_item_pos [shape=record, label="{TLorentzVector|position}"]
+       recon_events_array_item_global_event_spacepoints_array_item_poserr [shape=record, label="{TLorentzVector|position_error}"]
+     recon_events_array_item_global_event_trackpoints [shape=record, label="{TrackPointArray|trackpoints}"]
+      recon_events_array_item_global_event_trackpoints_array_item [shape=record, label="{Global::TrackPoint|[]}"]
+       recon_events_array_item_global_event_trackpoints_array_item_spacepoint [shape=record, label="{TRef|spacepoint}"]
+       recon_events_array_item_global_event_trackpoints_array_item_pos [shape=record, label="{TLorentzVector|position}"]
+       recon_events_array_item_global_event_trackpoints_array_item_poserr [shape=record, label="{TLorentzVector|position_error}"]
+       recon_events_array_item_global_event_trackpoints_array_item_mom [shape=record, label="{TLorentzVector|momentum}"]
+       recon_events_array_item_global_event_trackpoints_array_item_momerr [shape=record, label="{TLorentzVector|momentum_error}"]
+     recon_events_array_item_global_event_tracks [shape=record, label="{TrackArray|tracks}"]
+      recon_events_array_item_global_event_tracks_array_item [shape=record, label="{Global::Track|[]}"]
+       recon_events_array_item_global_event_tracks_array_item_trackpoints [shape=record, label="{TRefArray|trackpoints}"]
+       recon_events_array_item_global_event_tracks_array_item_tracks [shape=record, label="{TRefArray|constituent_tracks}"]
+     recon_events_array_item_global_event_primarychains [shape=record, label="{PrimaryChainArray|primarychains}"]
+      recon_events_array_item_global_event_primarychains_array_item [shape=record, label="{Global::PrimaryChain|[]}"]
+       recon_events_array_item_global_event_primarychains_array_item_trackparentpairs [shape=record, label="{TRefTrackPairArray|track_parent_pairs}"]
+        recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item [shape=record, label="{TRefTrackPair|[]}"]
+         recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_first [shape=record, label="{TRef|first}"]
+         recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_second [shape=record, label="{TRef|second}"]
+       recon_events_array_item_global_event_primarychains_array_item_primarychains [shape=record, label="{TRefArray|preceeding_pchains}"]
+       { rank = same;
+         recon_events_array_item_global_event_spacepoints;
+         recon_events_array_item_global_event_trackpoints;
+         recon_events_array_item_global_event_tracks;
+         recon_events_array_item_global_event_primarychains;
+       }
     recon_events_array_item_kl_event [shape=record, label="{KLEvent|kl_event}"]
      recon_events_array_item_kl_event_kl_digits [shape=record, label="{KLEventDigit|kl_digits}"]
       recon_events_array_item_kl_event_kl_digits_kl [shape=record, label="{KLDigitArray|kl}"]
@@ -221,6 +249,34 @@ digraph G {
    recon_events_array_item -> recon_events_array_item_ckov_event
    recon_events_array_item -> recon_events_array_item_emr_event
    recon_events_array_item -> recon_events_array_item_global_event
+    recon_events_array_item_global_event -> recon_events_array_item_global_event_spacepoints
+     recon_events_array_item_global_event_spacepoints -> recon_events_array_item_global_event_spacepoints_array_item
+      recon_events_array_item_global_event_spacepoints_array_item -> recon_events_array_item_global_event_spacepoints_array_item_pos
+      recon_events_array_item_global_event_spacepoints_array_item -> recon_events_array_item_global_event_spacepoints_array_item_poserr
+    recon_events_array_item_global_event -> recon_events_array_item_global_event_trackpoints
+     recon_events_array_item_global_event_trackpoints -> recon_events_array_item_global_event_trackpoints_array_item
+      recon_events_array_item_global_event_trackpoints_array_item -> recon_events_array_item_global_event_trackpoints_array_item_spacepoint
+       recon_events_array_item_global_event_trackpoints_array_item_spacepoint -> recon_events_array_item_global_event_spacepoints [style=dotted]
+      recon_events_array_item_global_event_trackpoints_array_item -> recon_events_array_item_global_event_trackpoints_array_item_pos
+      recon_events_array_item_global_event_trackpoints_array_item -> recon_events_array_item_global_event_trackpoints_array_item_poserr
+      recon_events_array_item_global_event_trackpoints_array_item -> recon_events_array_item_global_event_trackpoints_array_item_mom
+      recon_events_array_item_global_event_trackpoints_array_item -> recon_events_array_item_global_event_trackpoints_array_item_momerr
+    recon_events_array_item_global_event -> recon_events_array_item_global_event_tracks
+     recon_events_array_item_global_event_tracks -> recon_events_array_item_global_event_tracks_array_item
+      recon_events_array_item_global_event_tracks_array_item -> recon_events_array_item_global_event_tracks_array_item_trackpoints
+       recon_events_array_item_global_event_tracks_array_item_trackpoints -> recon_events_array_item_global_event_trackpoints [style=dotted]
+      recon_events_array_item_global_event_tracks_array_item -> recon_events_array_item_global_event_tracks_array_item_tracks
+       recon_events_array_item_global_event_tracks_array_item_tracks -> recon_events_array_item_global_event_tracks [style=dotted]
+    recon_events_array_item_global_event -> recon_events_array_item_global_event_primarychains
+     recon_events_array_item_global_event_primarychains -> recon_events_array_item_global_event_primarychains_array_item
+      recon_events_array_item_global_event_primarychains_array_item -> recon_events_array_item_global_event_primarychains_array_item_trackparentpairs
+       recon_events_array_item_global_event_primarychains_array_item_trackparentpairs -> recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item
+        recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item -> recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_first
+         recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_first -> recon_events_array_item_global_event_tracks [style=dotted]
+        recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item -> recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_second
+         recon_events_array_item_global_event_primarychains_array_item_trackparentpairs_array_item_second -> recon_events_array_item_global_event_tracks [style=dotted]
+      recon_events_array_item_global_event_primarychains_array_item -> recon_events_array_item_global_event_primarychains_array_item_primarychains
+       recon_events_array_item_global_event_primarychains_array_item_primarychains -> recon_events_array_item_global_event_primarychains [style=dotted]
    recon_events_array_item -> recon_events_array_item_kl_event
     recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_digits
      recon_events_array_item_kl_event_kl_digits -> recon_events_array_item_kl_event_kl_digits_kl

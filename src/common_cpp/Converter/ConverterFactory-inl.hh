@@ -81,7 +81,7 @@ namespace MAUS {
     throw ConverterNotFoundException("ConverterFactory");
   }
   template <>
-  IConverter<Json::Value, Spill>* ConverterFactory::getConverter<Json::Value, Spill>() const
+  IConverter<Json::Value, Data>* ConverterFactory::getConverter<Json::Value, Data>() const
     throw(ConverterNotFoundException) {
 
     return new JsonCppSpillConverter();
