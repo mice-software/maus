@@ -23,11 +23,11 @@ namespace Global {
 
 // Default constructor
 SpacePoint::SpacePoint()
-  : _charge(0.),
-    _position(0., 0., 0., 0.),
-    _position_error(0., 0., 0., 0.),
-    _detector(MAUS::DataStructure::Global::kUndefined),
-    _geometry_path("") {}
+    : _charge(0.),
+      _position(0., 0., 0., 0.),
+      _position_error(0., 0., 0., 0.),
+      _detector(MAUS::DataStructure::Global::kUndefined),
+      _geometry_path("") {}
 
 // Copy contructor
 SpacePoint::SpacePoint(const SpacePoint &spacepoint)
@@ -71,6 +71,46 @@ SpacePoint* SpacePoint::Clone() const {
   spNew->set_geometry_path(this->get_geometry_path());
 
   return spNew;
+}
+
+void SpacePoint::set_charge(double charge) {
+  _charge = charge;
+}
+
+double SpacePoint::get_charge() const {
+  return _charge;
+}
+
+void SpacePoint::set_position(TLorentzVector position) {
+  _position = position;
+}
+
+TLorentzVector SpacePoint::get_position() const {
+  return _position;
+}
+
+void SpacePoint::set_position_error(TLorentzVector position_error) {
+  _position_error = position_error;
+}
+
+TLorentzVector SpacePoint::get_position_error() const {
+  return _position_error;
+}
+
+void SpacePoint::set_detector(DetectorPoint detector) {
+  _detector = detector;
+}
+
+DetectorPoint SpacePoint::get_detector() const {
+  return _detector;
+}
+
+void SpacePoint::set_geometry_path(std::string geometry_path) {
+  _geometry_path = geometry_path;
+}
+
+std::string SpacePoint::get_geometry_path() const {
+  return _geometry_path;
 }
 
 } // ~namespace Global

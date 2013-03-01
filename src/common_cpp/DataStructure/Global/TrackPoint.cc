@@ -93,6 +93,87 @@ TrackPoint* TrackPoint::Clone() {
   return tpNew;
 }
 
+void TrackPoint::set_mapper_name(std::string mapper_name) {
+  _mapper_name = mapper_name;
+}
+
+std::string TrackPoint::get_mapper_name() const {
+  return _mapper_name;
+}
+
+void TrackPoint::set_charge(double charge) {
+  _charge = charge;
+}
+
+double TrackPoint::get_charge() const {
+  return _charge;
+}
+
+void TrackPoint::set_position(TLorentzVector position) {
+  _position = position;
+}
+
+TLorentzVector TrackPoint::get_position() const {
+  return _position;
+}
+
+void TrackPoint::set_position_error(TLorentzVector position_error) {
+  _position_error = position_error;
+}
+
+TLorentzVector TrackPoint::get_position_error() const {
+  return _position_error;
+}
+
+void TrackPoint::set_momentum(TLorentzVector momentum) {
+  _momentum = momentum;
+}
+
+TLorentzVector TrackPoint::get_momentum() const {
+  return _momentum;
+}
+
+void TrackPoint::set_momentum_error(TLorentzVector momentum_error) {
+  _momentum_error = momentum_error;
+}
+
+TLorentzVector TrackPoint::get_momentum_error() const {
+  return _momentum_error;
+}
+
+void TrackPoint::set_detector(DetectorPoint detector) {
+  _detector = detector;
+}
+
+DetectorPoint TrackPoint::get_detector() const {
+  return _detector;
+}
+
+void TrackPoint::set_geometry_path(std::string geometry_path) {
+  _geometry_path = geometry_path;
+}
+
+std::string TrackPoint::get_geometry_path() const {
+  return _geometry_path;
+}
+
+void TrackPoint::set_spacepoint_tref(TRef spacepoint) {
+  _spacepoint = spacepoint;
+}
+
+TRef TrackPoint::get_spacepoint_tref() const {
+  return _spacepoint;
+}
+
+void TrackPoint::set_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint) {
+  _spacepoint = spacepoint;
+}
+
+MAUS::DataStructure::Global::SpacePoint* TrackPoint::get_spacepoint() const {
+  MAUS::DataStructure::Global::SpacePoint* spacepoint =
+      (MAUS::DataStructure::Global::SpacePoint*) _spacepoint.GetObject();
+  return spacepoint;
+}
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

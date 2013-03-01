@@ -144,16 +144,7 @@ class PrimaryChain : public TObject {
   /// Processor, in general it would be better for users to use the
   /// AddTrack and AddPrimaryTrack methods.
   void set_track_parent_pairs(
-      std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
-    if(_tracks != NULL) {
-      // These TRefTrackPair's are unique to this PrimaryChain, and
-      // owned by it.  Delete them before we replace the vector.
-      for(size_t i = 0; i < _tracks->size(); ++i)
-        delete _tracks->at(i);
-      delete _tracks;
-    }
-    _tracks = tracks;
-  }
+      std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks);
 
   /// Get the vector of track/parent references, #_track_parent_pairs.
   /// Predominantly to be used by the Json/Cpp Processor.  Users are
@@ -161,32 +152,21 @@ class PrimaryChain : public TObject {
   /// methods, then to use the GetTrackParent or GetTrackDaughters
   /// methods.
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
-  get_track_parent_pairs() const {
-    return _tracks;
-  }
+  get_track_parent_pairs() const;
 
   /// Set the #_goodness_of_fit paramter
-  void set_goodness_of_fit(double goodness_of_fit) {
-    _goodness_of_fit = goodness_of_fit;
-  }
+  void set_goodness_of_fit(double goodness_of_fit);
+  
   /// Get the #_goodness_of_fit paramter
-  double get_goodness_of_fit() const {
-    return _goodness_of_fit;
-  }
+  double get_goodness_of_fit() const;
 
   /// Set the #_parent_primary_chains pointer array.  The PrimaryChain
   /// takes ownership of this pointer.  This is mostly for the
   /// Json/Cpp Processor, most users shoudl use AddParentChain.
-  void set_parent_primary_chains(TRefArray* parent_primary_chains) {
-    if(_parent_primary_chains != NULL) {
-      delete _parent_primary_chains;
-    }
-    _parent_primary_chains = parent_primary_chains;
-  }
+  void set_parent_primary_chains(TRefArray* parent_primary_chains);
+  
   /// Get the #_parent_primary_chains pointer array
-  TRefArray* get_parent_primary_chains() const {
-    return _parent_primary_chains;
-  }
+  TRefArray* get_parent_primary_chains() const;
 
  private:
 

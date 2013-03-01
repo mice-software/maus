@@ -46,9 +46,7 @@ class GlobalEvent {
 
   /** Add a MAUS::DataStructure::Global::PrimaryChain object, daughter objects
    * are ignored. */
-  void add_primarychain(MAUS::DataStructure::Global::PrimaryChain* pchain) {
-    _primarychains->push_back(pchain);
-  };
+  void add_primarychain(MAUS::DataStructure::Global::PrimaryChain* pchain);
 
   /** If a MAUS::DataStructure::Global::PrimaryChain object is not already a
    *  member of the GlobalEvent, add it in.  Otherwise, return false,
@@ -64,21 +62,15 @@ class GlobalEvent {
   /** Return the std::vector of MAUS::DataStructure::Global::PrimaryChain*,
    *  #_primarychains. */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
-  get_primarychains() const {
-    return _primarychains;
-  };
+  get_primarychains() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::PrimaryChain*>. */
   void set_primarychains(
-      std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primarychains) {
-    _primarychains = primarychains;
-  };
+      std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primarychains);
 
   /** Add a MAUS::DataStructure::Global::Track object, daughter
    *  objects are ignored. */
-  void add_track(MAUS::DataStructure::Global::Track* track) {
-    _tracks->push_back(track);
-  };
+  void add_track(MAUS::DataStructure::Global::Track* track);
 
   /** If a MAUS::DataStructure::Global::Track object is not already a
    *  member of the GlobalEvent, add it in.  Otherwise, return false,
@@ -91,20 +83,14 @@ class GlobalEvent {
 
   /** Return the std::vector of MAUS::DataStructure::Global::Track*,
    *  #_tracks. */
-  std::vector<MAUS::DataStructure::Global::Track*>* get_tracks() const {
-    return _tracks;
-  };
+  std::vector<MAUS::DataStructure::Global::Track*>* get_tracks() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::Track*>. */
-  void set_tracks(std::vector<MAUS::DataStructure::Global::Track*> *tracks) {
-    _tracks = tracks;
-  };
+  void set_tracks(std::vector<MAUS::DataStructure::Global::Track*> *tracks);
 
   /** Add a MAUS::DataStructure::Global::TrackPoint object, daughter
    *  objects are ignored. */
-  void add_trackpoint(MAUS::DataStructure::Global::TrackPoint* trackpoint) {
-    _trackpoints->push_back(trackpoint);
-  };
+  void add_trackpoint(MAUS::DataStructure::Global::TrackPoint* trackpoint);
 
   /** If a MAUS::DataStructure::Global::TrackPoint object is not
    *  already a member of the GlobalEvent, add it in.  Otherwise,
@@ -120,20 +106,14 @@ class GlobalEvent {
   /** Return the std::vector of MAUS::DataStructure::Global::TrackPoint*,
    *  #_trackpoints. */
   std::vector<MAUS::DataStructure::Global::TrackPoint*>*
-  get_trackpoints() const {
-    return _trackpoints;
-  };
+  get_trackpoints() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::TrackPoint*>. */
   void set_trackpoints(
-      std::vector<MAUS::DataStructure::Global::TrackPoint*> *trackpoints) {
-    _trackpoints = trackpoints;
-  };
+      std::vector<MAUS::DataStructure::Global::TrackPoint*> *trackpoints);
 
   /** Add a MAUS::DataStructure::Global::SpacePoint object. */
-  void add_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint) {
-    _spacepoints->push_back(spacepoint);
-  };
+  void add_spacepoint(MAUS::DataStructure::Global::SpacePoint* spacepoint);
 
   /** If a MAUS::DataStructure::Global::SpacePoint object is not already a
    *  member of the GlobalEvent, add it in.  Otherwise, return false,
@@ -144,16 +124,12 @@ class GlobalEvent {
   /** Return the std::vector of MAUS::DataStructure::Global::SpacePoint*,
    *  #_spacepoints. */
   std::vector<MAUS::DataStructure::Global::SpacePoint*>*
-  get_spacepoints() const {
-    return _spacepoints;
-  };
+  get_spacepoints() const;
 
   /** Set the std::vector<MAUS::DataStructure::Global::SpacePoint*>,
    *  #_spacepoints. */
   void set_spacepoints(
-      std::vector<MAUS::DataStructure::Global::SpacePoint*> *spacepoints) {
-    _spacepoints = spacepoints;
-  };
+      std::vector<MAUS::DataStructure::Global::SpacePoint*> *spacepoints);
 
  private:
 

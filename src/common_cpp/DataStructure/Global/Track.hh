@@ -71,31 +71,22 @@ class Track : public TObject {
   // Getters and Setters for the member variables
   
   /// Set the name for the mapper which produced the track, #_mapper_name.
-  void set_mapper_name(std::string mapper_name) {
-    _mapper_name = mapper_name;
-  }
+  void set_mapper_name(std::string mapper_name);
+  
   /// Get the name for the mapper which produced the track, #_mapper_name.
-  std::string get_mapper_name() const {
-    return _mapper_name;
-  }
+  std::string get_mapper_name() const;
 
   /// Set the PID hypothesis, #_pid
-  void set_pid(PID pid) {
-    _pid = pid;
-  }
+  void set_pid(PID pid);
+  
   /// Get the PID hypothesis, #_pid
-  PID get_pid() const {
-    return _pid;
-  }
+  PID get_pid() const;
 
   /// Set the particle charge hypothesis, #_charge.
-  void set_charge(int charge) {
-    _charge = charge;
-  }
+  void set_charge(int charge);
+  
   /// Get the particle charge hypothesis, #_charge.
-  int get_charge() const {
-    return _charge;
-  }
+  int get_charge() const;
 
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
@@ -120,20 +111,13 @@ class Track : public TObject {
   /// the current TRefArray if necessary.  This is mostly for the
   /// Json/Cpp Processor, users are encouraged to use the Add/Remove
   /// TrackPoint methods.
-  void set_trackpoints(TRefArray* trackpoints) {
-    if(_trackpoints != NULL) {
-      delete _trackpoints;
-    }
-    _trackpoints = trackpoints;
-  }
+  void set_trackpoints(TRefArray* trackpoints);
 
   /// Directly access the MAUS::DataStructure::Global::TrackPoint
   /// pointers stored in the track, #_trackpoints.  This is mostly for
   /// the Json/Cpp Processor, users are encouraged to use the
   /// GetTrackPoints method.
-  TRefArray* get_trackpoints() const {
-    return _trackpoints;
-  }
+  TRefArray* get_trackpoints() const;
 
   /// Set the corresponding bit in #_detectorpoints.
   void SetDetector(MAUS::DataStructure::Global::DetectorPoint detector);
@@ -153,14 +137,10 @@ class Track : public TObject {
   std::vector<MAUS::DataStructure::Global::DetectorPoint> GetDetectorPoints();
 
   /// Directly set the #_detectorpoints value.
-  void set_detectorpoints(unsigned int detectorpoints) {
-    _detectorpoints = detectorpoints;
-  }
+  void set_detectorpoints(unsigned int detectorpoints);
 
   /// Direct access to the #_detectorpoints value.
-  unsigned int get_detectorpoints() const {
-    return _detectorpoints;
-  }
+  unsigned int get_detectorpoints() const;
 
   /// Add a geometry path to #_geometry_paths, mostly used by
   /// AddTrackPoint(MAUS::DataStructure::Global::TrackPoint*).
@@ -177,13 +157,10 @@ class Track : public TObject {
   void ClearGeometryPaths();
 
   /// Directly set the #_geometry_paths vector.
-  void set_geometry_paths(std::vector<std::string> geometry_paths) {
-    _geometry_paths = geometry_paths;
-  }
+  void set_geometry_paths(std::vector<std::string> geometry_paths);
+  
   /// Direct access to the #_geometry_paths vector.
-  std::vector<std::string> get_geometry_paths() const {
-    return _geometry_paths;
-  }
+  std::vector<std::string> get_geometry_paths() const;
 
   /// Add a constituent track (for book-keeping purposes), stored in
   /// the #_constituent_tracks vector.
@@ -197,9 +174,7 @@ class Track : public TObject {
   bool HasTrack(Track* track);
 
   /// Empty the book-keeping track TRefArray, #_constituent_tracks.
-  void ClearTracks() {
-    _constituent_tracks->Clear();
-  }
+  void ClearTracks();
 
   /// User method for accessing the constituent tracks.  These are
   /// returned as const, so that they can't be changed.
@@ -209,26 +184,19 @@ class Track : public TObject {
   /// ownership of the pointer to the Track, and is mostly for use by
   /// the Json/Cpp Processor.  Users should use Add/Remove Track
   /// methods.
-  void set_constituent_tracks(TRefArray* constituent_tracks){
-    _constituent_tracks = constituent_tracks;
-  }
+  void set_constituent_tracks(TRefArray* constituent_tracks);
 
   /// Direct access to the #_constituent_tracks vector, for the
   /// Json/Cpp Processor.  Users should probably access the
   /// constituent tracks through: GetConstituentTracks(), which
   /// returns a vector of Track pointers.
-  TRefArray* get_constituent_tracks() const {
-    return _constituent_tracks;
-  }
+  TRefArray* get_constituent_tracks() const;
 
   /// Set the goodness of fit varialbe, #_goodness_of_fit.
-  void set_goodness_of_fit(double goodness_of_fit) {
-    _goodness_of_fit = goodness_of_fit;
-  }
-  /// Get the goodness of fit varialbe, #_goodness_of_fit.
-  double get_goodness_of_fit() const {
-    return _goodness_of_fit;
-  }
+  void set_goodness_of_fit(double goodness_of_fit);
+  
+  /// Get the goodness of fit variable, #_goodness_of_fit.
+  double get_goodness_of_fit() const;
 
  private:
 

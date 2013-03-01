@@ -29,8 +29,8 @@ namespace Global {
 // Default constructor
 PrimaryChain::PrimaryChain()
     : _mapper_name(""),
-      _tracks(new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
+  _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
   _parent_primary_chains = new TRefArray();
 }
 
@@ -51,8 +51,8 @@ PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
 // Constructor setting #_mapper_name
 PrimaryChain::PrimaryChain(std::string mapper_name)
     : _mapper_name(mapper_name),
-      _tracks(new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>()),
       _goodness_of_fit(0.) {
+  _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
   _parent_primary_chains = new TRefArray();
 }
 
@@ -282,13 +282,52 @@ std::vector<MAUS::DataStructure::Global::PrimaryChain*>
 PrimaryChain::GetParentChains() {
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> result;
   // Not a fast function, ROOT recommends avoiding unnecessary repeats
-  int n = _parent_primary_chains->GetEntries(); 
+  int n = _parent_primary_chains->GetEntries();
   for(int i = 0; i < n; ++i) {
     // Cast the TObject* into a PrimaryChain*, and add to result
     result.push_back((MAUS::DataStructure::Global::PrimaryChain*)
                      _parent_primary_chains->At(i));
   }
+  return result;
 }
+
+void PrimaryChain::set_track_parent_pairs(
+    std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
+  if(_tracks != NULL) {
+    // These TRefTrackPair's are unique to this PrimaryChain, and
+    // owned by it.  Delete them before we replace the vector.
+    for(size_t i = 0; i < _tracks->size(); ++i)
+      delete _tracks->at(i);
+    delete _tracks;
+  }
+  _tracks = tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
+PrimaryChain::get_track_parent_pairs() const {
+  return _tracks;
+}
+
+void PrimaryChain::set_goodness_of_fit(double goodness_of_fit) {
+  _goodness_of_fit = goodness_of_fit;
+}
+
+double PrimaryChain::get_goodness_of_fit() const {
+  return _goodness_of_fit;
+}
+
+
+void PrimaryChain::set_parent_primary_chains(TRefArray* parent_primary_chains) {
+  if(_parent_primary_chains != NULL) {
+    delete _parent_primary_chains;
+  }
+  _parent_primary_chains = parent_primary_chains;
+}
+
+TRefArray* PrimaryChain::get_parent_primary_chains() const {
+  return _parent_primary_chains;
+}
+
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

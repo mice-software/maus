@@ -67,53 +67,38 @@ class SpacePoint : public TObject {
   // Getters and Setters for the member variables
   /// Set the calibrated 'charge' or energy deposit of the matching
   /// detector measurement.
-  void set_charge(double charge) {
-    _charge = charge;
-  }
+  void set_charge(double charge);
+  
   /// Get the calibrated 'charge' or energy deposit of the matching
   /// detector measurement.
-  double get_charge() const {
-    return _charge;
-  }
+  double get_charge() const;
 
   /// Set the 4D position of the detector measurement.
-  void set_position(TLorentzVector position) {
-    _position = position;
-  }
+  void set_position(TLorentzVector position);
+      
   /// Get the 4D position of the detector measurement.
-  TLorentzVector get_position() const {
-    return _position;
-  }
+  TLorentzVector get_position() const;
 
   /// Set the error on the 4D position of the detector measurement.
-  void set_position_error(TLorentzVector position_error) {
-    _position_error = position_error;
-  }
+  void set_position_error(TLorentzVector position_error);
+  
   /// Get the error on the 4D position of the detector measurement.
-  TLorentzVector get_position_error() const {
-    return _position_error;
-  }
+  TLorentzVector get_position_error() const;
 
   /// Set the MAUS::global::recon::DetectorPoint flag for the
   /// SpacePoint, defining which detector produced the point.
-  void set_detector(DetectorPoint detector) {
-    _detector = detector;
-  }
+  void set_detector(DetectorPoint detector);
+  
   /// Get the MAUS::global::recon::DetectorPoint flag, #_detector, for the
   /// SpacePoint, which defines the detector that produced this point.
-  DetectorPoint get_detector() const {
-    return _detector;
-  }
+  DetectorPoint get_detector() const;
 
   /// Set the fully qualified geometry path for this point in space.  This
   /// string may not be required in the end...
-  void set_geometry_path(std::string geometry_path) {
-    _geometry_path = geometry_path;
-  }
+  void set_geometry_path(std::string geometry_path);
+  
   /// Get the fully qualified geometry path for this point in space.
-  std::string get_geometry_path() const {
-    return _geometry_path;
-  }
+  std::string get_geometry_path() const;
   
  private:
 

@@ -41,65 +41,42 @@ namespace Global {
 
 class TRefTrackPair : public std::pair<TRef, TRef> {
  public:
-  // Standard Constructor
-  TRefTrackPair() {
-    this->first = TRef(NULL); 
-    this->second = TRef(NULL); 
-  };
+  /// Standard Constructor
+  TRefTrackPair();
 
-  TRefTrackPair(TRef f, TRef s) {
-    this->first = f; 
-    this->second = s; 
-  };
+  /// Constructor from TRefs
+  TRefTrackPair(TRef f, TRef s);
 
+  /// Constructor from pointers
   TRefTrackPair(MAUS::DataStructure::Global::Track* track,
-                MAUS::DataStructure::Global::Track* parent) {
-    this->first = track; 
-    this->second = parent; 
-  };
+                MAUS::DataStructure::Global::Track* parent);
 
-  // Destructor
-  ~TRefTrackPair() {};
+  /// Destructor
+  ~TRefTrackPair();
 
-  // Set the Track
-  void SetTrack(MAUS::DataStructure::Global::Track* track) {
-    this->first = track; 
-  }    
+  /// Set the Track
+  void SetTrack(MAUS::DataStructure::Global::Track* track);
 
-  // Get a const pointer to the track
-  MAUS::DataStructure::Global::Track* GetTrack() const {
-    return (MAUS::DataStructure::Global::Track*) this->first.GetObject();
-  }    
+  /// Get a const pointer to the track
+  MAUS::DataStructure::Global::Track* GetTrack() const;
 
-  // Set the Parent
-  void SetParent(MAUS::DataStructure::Global::Track* parent) {
-    this->second = parent; 
-  }    
+  /// Set the Parent
+  void SetParent(MAUS::DataStructure::Global::Track* parent);
 
-  // Get a const pointer to the parent
-  MAUS::DataStructure::Global::Track* GetParent() const {
-    return (MAUS::DataStructure::Global::Track*) this->second.GetObject();
-  }    
+  /// Get a const pointer to the parent
+  MAUS::DataStructure::Global::Track* GetParent() const;
 
-  // Setter for first element, for TRefTrackPairProcessor
-  void set_first(TRef first) {
-    this->first = first;
-  }
+  /// Setter for first element, for TRefTrackPairProcessor
+  void set_first(TRef first);
 
-  // Getter for first element, for TRefTrackPairProcessor
-  TRef get_first() const {
-    return this->first;
-  }
+  /// Getter for first element, for TRefTrackPairProcessor
+  TRef get_first() const;
 
-  // Setter for second element, for TRefTrackPairProcessor
-  void set_second(TRef second) {
-    this->second = second;
-  }
+  /// Setter for second element, for TRefTrackPairProcessor
+  void set_second(TRef second);
 
-  // Getter for second element, for TRefTrackPairProcessor
-  TRef get_second() const {
-    return this->second;
-  }
+  /// Getter for second element, for TRefTrackPairProcessor
+  TRef get_second() const;
 };
 } // ~namespace Global
 } // ~namespace DataStructure

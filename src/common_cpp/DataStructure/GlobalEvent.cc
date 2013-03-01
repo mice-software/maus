@@ -138,6 +138,11 @@ GlobalEvent::~GlobalEvent() {
   
 }
 
+void GlobalEvent::add_primarychain(
+    MAUS::DataStructure::Global::PrimaryChain* pchain) {
+  _primarychains->push_back(pchain);
+};
+
 bool GlobalEvent::add_primarychain_check(
     MAUS::DataStructure::Global::PrimaryChain* pchain) {
   // Check if the provided pchain matches an existing entry (this is
@@ -172,6 +177,20 @@ void GlobalEvent::add_primarychain_recursive(
     }
   }
 }
+    
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
+GlobalEvent::get_primarychains() const {
+  return _primarychains;
+};
+
+void GlobalEvent::set_primarychains(
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*> *primarychains) {
+  _primarychains = primarychains;
+};
+
+void GlobalEvent::add_track(MAUS::DataStructure::Global::Track* track) {
+  _tracks->push_back(track);
+};
 
 bool GlobalEvent::add_track_check(MAUS::DataStructure::Global::Track* track) {
   // Check if the provided track matches an existing entry (this is
@@ -214,6 +233,21 @@ void GlobalEvent::add_track_recursive(
   }
 }
 
+std::vector<MAUS::DataStructure::Global::Track*>*
+GlobalEvent::get_tracks() const {
+  return _tracks;
+};
+
+void GlobalEvent::set_tracks(
+    std::vector<MAUS::DataStructure::Global::Track*> *tracks) {
+  _tracks = tracks;
+};
+
+void GlobalEvent::add_trackpoint(
+    MAUS::DataStructure::Global::TrackPoint* trackpoint) {
+  _trackpoints->push_back(trackpoint);
+};
+
 bool GlobalEvent::add_trackpoint_check(
     MAUS::DataStructure::Global::TrackPoint* trackpoint) {
   // Check if the provided trackpoint matches an existing entry (this is
@@ -243,6 +277,21 @@ void GlobalEvent::add_trackpoint_recursive(
   }
 }
 
+std::vector<MAUS::DataStructure::Global::TrackPoint*>*
+GlobalEvent::get_trackpoints() const {
+  return _trackpoints;
+};
+
+void GlobalEvent::set_trackpoints(
+    std::vector<MAUS::DataStructure::Global::TrackPoint*> *trackpoints) {
+  _trackpoints = trackpoints;
+};
+
+void GlobalEvent::add_spacepoint(
+    MAUS::DataStructure::Global::SpacePoint* spacepoint) {
+  _spacepoints->push_back(spacepoint);
+};
+
 bool GlobalEvent::add_spacepoint_check(
     MAUS::DataStructure::Global::SpacePoint* spacepoint) {
   // Check if the provided spacepoint matches an existing entry (this is
@@ -262,6 +311,16 @@ bool GlobalEvent::add_spacepoint_check(
 
   return exists;
 }
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*>*
+GlobalEvent::get_spacepoints() const {
+  return _spacepoints;
+};
+
+void GlobalEvent::set_spacepoints(
+    std::vector<MAUS::DataStructure::Global::SpacePoint*> *spacepoints) {
+  _spacepoints = spacepoints;
+};
 
 }
 
