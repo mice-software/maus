@@ -1,0 +1,18 @@
+// FILES/Models/Modules/Absorbers/Prism_90.dat
+//
+// LiH wedge boolean volume overlay: triangular prism
+// of size larger than the underlying LiH cylinder
+// 
+// created by P. Snopok on Aug 20, 2012
+//
+// NB: the documented dimensions (MAUS) of the wedges are incorrect, 
+// $y$ should be the half width, not the full with
+
+
+Module LiHWedgeHalf
+{
+  Volume Wedge
+  Dimensions 320.0 320.0 320.0 mm 
+  PropertyDouble BlueColour  0.5
+  PropertyString Material LITHIUM_HYDRIDE
+}

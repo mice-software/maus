@@ -84,6 +84,19 @@ reconstruction_geometry_filename = "Test.dat"
         self.assertEqual(json.loads(json_string), json.loads(self.config))
         maus_cpp.globals.death()
 
+    def test_version_number(self):
+        """Test maus_cpp.globals.get_version_number()"""
+        # doesnt need globals initialised
+        version = maus_cpp.globals.get_version_number().split('.')
+        self.assertEqual(len(version), 3)
+        for i in range(3):
+            int(version[i])
+        maus_cpp.globals.birth(self.config)
+        dc_version = json.loads(self.config)["maus_version"]
+        dc_version = dc_version.split(' ')[-1]
+        self.assertEqual(maus_cpp.globals.get_version_number(), dc_version)
+        maus_cpp.globals.death()
+        
 if __name__ == "__main__":
     unittest.main()
 

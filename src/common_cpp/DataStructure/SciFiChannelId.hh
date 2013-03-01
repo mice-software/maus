@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICHANNELID_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICHANNELID_HH_
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -75,7 +75,7 @@ class SciFiChannelId {
 
     bool _used;
 
-    ClassDef(SciFiChannelId, 1)
+    MAUS_VERSIONED_CLASS_DEF(SciFiChannelId)
 };
 }
 

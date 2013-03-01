@@ -1,3 +1,4 @@
+"""ErrorHandler.py"""
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -44,7 +45,7 @@ class ErrorHandler:
         self.error_to_json = True
         self.on_error = 'none'
 
-    def HandleException(self, doc=None, caller=None):
+    def HandleException(self, doc=None, caller=None):# pylint:disable = C0103
         """
         Handle a raised exception - put the error message in the right IO
         streams etc.
@@ -70,11 +71,11 @@ class ErrorHandler:
                                                             +str(self.on_error))
         return doc
 
-    def ErrorsToUser(self):
+    def ErrorsToUser(self):# pylint:disable = C0103,R0201
         """Prints the excetption to stderr (using sys.excepthook)"""
         sys.excepthook(*sys.exc_info())
 
-    def ErrorsToJson(self, doc=None, caller=None):
+    def ErrorsToJson(self, doc=None, caller=None):# pylint:disable = C0103,R0201
         """
         Puts the exception into the json stream
         @param doc the json document
@@ -84,7 +85,8 @@ class ErrorHandler:
         object, where <classname> is found dynamically at runtime. The error
         branch is appended with <exception type>: <exception message>.
         """
-        if doc == None: doc = {}
+        if doc == None:
+            doc = {}
         class_name = "<unknown caller>"
         if caller == None:
             pass
@@ -100,7 +102,7 @@ class ErrorHandler:
                                                         +str(sys.exc_info()[1]))
         return doc
 
-    def ConfigurationToErrorHandler(self, config):
+    def ConfigurationToErrorHandler(self, config):# pylint:disable = C0103
         """
         Hand configuration information to the default handler
           @param config json configuration information default handler.
@@ -122,20 +124,21 @@ class CppError(Exception):
     argument, which is printed when the error is raised.
     """
     def __init__(self, message):
+        super(CppError, self).__init__()
         self.args = (str(message), )
 
     def __repr__(self):
         return self.args[0]
 
-__default_handler = ErrorHandler()
+__default_handler = ErrorHandler()# pylint:disable = C0103
 
-def DefaultHandler():
+def DefaultHandler():# pylint:disable = C0103
     """
     Returns the default handler object
     """
     return __default_handler
 
-def HandleException(doc, caller):
+def HandleException(doc, caller):# pylint:disable = C0103
     """
     Handle an exception with the default exception handler
     @param doc the json data stream
@@ -146,7 +149,7 @@ def HandleException(doc, caller):
     out = __default_handler.HandleException(doc, caller)
     return out
 
-def HandleCppException(doc, caller, error_message):
+def HandleCppException(doc, caller, error_message):# pylint:disable = C0103
     """
     Handle an exception with the default exception handler
     @param doc string representation of the json data stream
@@ -156,8 +159,8 @@ def HandleCppException(doc, caller, error_message):
     """
     json_doc = json.loads(doc)
     try:
-        raise(CppError(error_message))
-    except:
+        raise CppError(error_message)
+    except CppError:
         out = json.dumps(__default_handler.HandleException(json_doc, caller))
     return out
 

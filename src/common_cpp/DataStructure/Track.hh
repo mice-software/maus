@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/Step.hh"
@@ -120,7 +120,7 @@ class Track {
     int _parent_track_id;
     std::string _kill_reason;
 
-    ClassDef(Track, 1)
+    MAUS_VERSIONED_CLASS_DEF(Track)
 };
 }
 

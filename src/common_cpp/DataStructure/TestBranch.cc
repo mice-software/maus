@@ -19,63 +19,77 @@
 #include "src/common_cpp/DataStructure/TestBranch.hh"
 
 namespace MAUS {
-TestBranch::TestBranch() : _double_by_reference(NULL), _double_by_value(NULL),
+TestBranch::TestBranch() : _not_required_child_by_reference(NULL),
+                           _required_child_by_reference(NULL),
+                           _child_by_value(NULL),
                            _test_pointer_array(NULL) {
-    _double_by_value = new TestChild();
-    _double_by_reference = _double_by_value;
+    _child_by_value = new TestChild();
+    _required_child_by_reference = _child_by_value;
+    _not_required_child_by_reference = _child_by_value;
     _test_pointer_array = new std::vector<TestChild*>();
     _test_pointer_array->push_back(NULL);
-    _test_pointer_array->push_back(_double_by_value);
+    _test_pointer_array->push_back(_child_by_value);
     _test_pointer_array->push_back(NULL);
-    _test_pointer_array->push_back(_double_by_value);
-    _test_pointer_array->push_back(_double_by_value);
+    _test_pointer_array->push_back(_child_by_value);
+    _test_pointer_array->push_back(_child_by_value);
 }
 
-TestBranch::TestBranch(const TestBranch& md) : _double_by_reference(NULL),
-                           _double_by_value(NULL), _test_pointer_array(NULL) {
+TestBranch::TestBranch(const TestBranch& md)
+             :  _not_required_child_by_reference(NULL),
+                _required_child_by_reference(NULL),
+                _child_by_value(NULL), _test_pointer_array(NULL) {
     *this = md;
 }
 
 TestBranch& TestBranch::operator=(const TestBranch& md) {
     if (&md == this)
         return *this;
-    SetDoubleByValue(new TestChild(*md._double_by_value));
-    SetDoubleArray(new std::vector<TestChild*>(*md._test_pointer_array));
-    SetDoubleByRef(md._double_by_reference);  // we don't own this memory
+    SetChildByValue(new TestChild(*md._child_by_value));
+    SetChildArray(new std::vector<TestChild*>(*md._test_pointer_array));
+    SetRequiredChildByRef(md._required_child_by_reference);
+    SetNotRequiredChildByRef(md._not_required_child_by_reference);
     return *this;
 }
 
 TestBranch::~TestBranch() {
-    // only delete _double_by_value - we don't own any other memory
-    if (_double_by_value != NULL)
-        delete _double_by_value;
+    // only delete _child_by_value - we don't own any other memory
+    if (_child_by_value != NULL)
+        delete _child_by_value;
     if (_test_pointer_array != NULL)
         delete _test_pointer_array;
 }
 
-TestChild* TestBranch::GetDoubleByRef() const {
-    return _double_by_reference;
+TestChild* TestBranch::GetRequiredChildByRef() const {
+    return _required_child_by_reference;
 }
 
-void TestBranch::SetDoubleByRef(TestChild* test) {
-    _double_by_reference = test;
+void TestBranch::SetRequiredChildByRef(TestChild* test) {
+    _required_child_by_reference = test;
 }
 
-TestChild* TestBranch::GetDoubleByValue() const {
-    return _double_by_value;
+TestChild* TestBranch::GetNotRequiredChildByRef() const {
+    return _not_required_child_by_reference;
 }
 
-void TestBranch::SetDoubleByValue(TestChild* test) {
-    if (_double_by_value != NULL)
-        delete _double_by_value;
-    _double_by_value = test;
+void TestBranch::SetNotRequiredChildByRef(TestChild* test) {
+    _not_required_child_by_reference = test;
 }
 
-std::vector<TestChild*>* TestBranch::GetDoubleArray() const {
+TestChild* TestBranch::GetChildByValue() const {
+    return _child_by_value;
+}
+
+void TestBranch::SetChildByValue(TestChild* test) {
+    if (_child_by_value != NULL)
+        delete _child_by_value;
+    _child_by_value = test;
+}
+
+std::vector<TestChild*>* TestBranch::GetChildArray() const {
     return _test_pointer_array;
 }
 
-void TestBranch::SetDoubleArray(std::vector<TestChild*>* test) {
+void TestBranch::SetChildArray(std::vector<TestChild*>* test) {
     if (_test_pointer_array != NULL)
         delete _test_pointer_array;
     _test_pointer_array = test;

@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -180,7 +180,7 @@ class TOFDigit {
     int _part_event_number;
     int _slab;
 
-    ClassDef(TOFDigit, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFDigit)
 };
 }
 

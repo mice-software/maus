@@ -19,6 +19,7 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_RUNHEADERDATA_HH_
 
 #include <string>
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
@@ -83,7 +84,7 @@ class RunHeaderData : public MAUSEvent<RunHeader> {
 
   private:
     RunHeader* _run_header;
-    ClassDef(RunHeaderData, 1)
+    MAUS_VERSIONED_CLASS_DEF(RunHeaderData)
 };
 }
 

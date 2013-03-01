@@ -16,18 +16,26 @@
 
 ## @class ReducePyDoNothing.ReducePyDoNothing
 #  ReducePyDoNothing returns the input
-
-import json
-import types
+"""ReducePyDoNothing.py"""
+# import json
+# import types
 
 class ReducePyDoNothing:
-    def birth(self, configurationJson):
+    """ReducePyDoNothing"""
+    def __init__(self):
+        """__init__"""
+        pass
+    
+    def birth(self, configuration_json):#pylint: disable =R0201,W0613
+        """birth"""
         return True
 
-    def process(self, x):
-        return x
+    def process(self, spill):#pylint: disable =R0201
+        """process"""
+        return spill
 
-    def death(self):
+    def death(self):#pylint: disable =R0201
+        """death"""
         return True
 
 

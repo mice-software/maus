@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/TOFEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
@@ -112,7 +112,7 @@ class ReconEvent {
 
     int _part_event_number;
 
-    ClassDef(ReconEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(ReconEvent)
 };
 
 typedef std::vector<ReconEvent*> ReconEventArray;

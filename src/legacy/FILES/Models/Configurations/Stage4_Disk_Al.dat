@@ -1,0 +1,37 @@
+Configuration Stage4
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+  Module BeamLine/BeamLine.dat
+  {
+    Position 0. 0. 6672.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tracker/TrackerSolenoid0.dat
+  {
+    Position 0. 0. 12172.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module AFC/AbsorberFocusCoil.dat
+  {
+    Position 0. 0. 14205.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Absorbers/Disk_Al.dat
+  {
+    Position 0. 0. 14205.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tracker/TrackerSolenoid1.dat
+  {
+    Position 0. 0. 16155.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module TOF/TOF2.dat
+  {
+    Position 0. 0. 17905.74 mm
+    Rotation 0. 0. 0. degree
+  }
+}
+

@@ -45,6 +45,12 @@ std::string GetConfigurationCards_DocString =
   std::string("Return the configuration cards as a string. Throws an exception if globals have")+
   std::string(" not been initialised.");
 
+std::string GetVersionNumber_DocString =
+  std::string("Return the MAUS version number as a string like x.y.z.\n\n")+
+  std::string("Return the MAUS version number as a string like x.y.z where.")+
+  std::string("x is the major version number, y is the minor version number,")+
+  std::string("and z is the patch number. Ignores all arguments.");
+
 static PyMethodDef methods[] = {
 {"birth", (PyCFunction)Birth,
     METH_VARARGS, Birth_DocString.c_str()},
@@ -54,6 +60,8 @@ static PyMethodDef methods[] = {
     METH_VARARGS, HasInstance_DocString.c_str()},
 {"get_configuration_cards", (PyCFunction)GetConfigurationCards,
     METH_VARARGS, GetConfigurationCards_DocString.c_str()},
+{"get_version_number", (PyCFunction)GetVersionNumber,
+    METH_VARARGS, GetVersionNumber_DocString.c_str()},
     {NULL, NULL, 0, NULL}
 };
 
@@ -102,23 +110,36 @@ PyObject* HasInstance(PyObject *dummy, PyObject *args) {
 PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args) {
     if (!Globals::HasInstance()) {
         PyErr_SetString(PyExc_RuntimeError,
-                                    "Attempt to get configuration cards but globals not birthed");
+            "Attempt to get configuration cards but globals not birthed");
         return NULL;
     }
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
     if (cards == NULL) {
         PyErr_SetString(PyExc_RuntimeError,
-                     "Attempt to get configuration cards failed but cards were not initialised");
+         "Attempt to get configuration cards failed but cards were not initialised");            
         return NULL;
     }
     std::string json_str = JsonWrapper::JsonToString(*cards);
     const char* json = json_str.c_str();
     PyObject* py_cards = Py_BuildValue("s", json);
     if (py_cards == NULL) {
-        PyErr_SetString(PyExc_RuntimeError, "Attempt to get configuration cards failed");
+        PyErr_SetString(PyExc_RuntimeError,
+            "Attempt to get configuration cards failed unexpectedly");
         return NULL;
     }
     return py_cards;
+}
+
+PyObject* GetVersionNumber(PyObject *dummy, PyObject *args) {
+    std::string version_str = Globals::GetVersionNumberString();
+    const char* version_cstr = version_str.c_str();
+    PyObject* version_py = Py_BuildValue("s", version_cstr);
+    if (version_py == NULL) {
+        PyErr_SetString(PyExc_RuntimeError,
+            "Attempt to get version number failed unexpectedly");
+        return NULL;
+    }
+    return version_py;
 }
 
 PyMODINIT_FUNC initglobals(void) {

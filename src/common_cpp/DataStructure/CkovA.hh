@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_CKOVA_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_CKOVA_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -170,7 +170,7 @@ class CkovA {
     int _part_event_number;
     double _number_of_pes;
 
-    ClassDef(CkovA, 1)
+    MAUS_VERSIONED_CLASS_DEF(CkovA)
 };
 }
 
