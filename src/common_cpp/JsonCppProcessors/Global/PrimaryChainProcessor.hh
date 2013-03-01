@@ -30,7 +30,11 @@ namespace Processor {
 namespace Global {
 
 /** @class PrimaryChainProcessor processor for
- *  MAUS::DataStructure::Global::PrimaryChain */
+ *  MAUS::DataStructure::Global::PrimaryChain 
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
+ * 
+ */
 class PrimaryChainProcessor :
       public ObjectProcessor<MAUS::DataStructure::Global::PrimaryChain> {
  public:

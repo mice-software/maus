@@ -32,7 +32,9 @@
 namespace MAUS {
 
 /** @class GlobalEventProcessor Conversions for GlobalEvent between
- * C++ and Json
+ *  C++ and Json
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01 - Expanded from initial 'blank slate'.
  */
 
 class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {

@@ -27,7 +27,9 @@
 namespace MAUS {
 
 /** @class GlobalEvent comment
- *
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01 - Expanded from original 'blank slate'
+ *	
  */
 
 class GlobalEvent {

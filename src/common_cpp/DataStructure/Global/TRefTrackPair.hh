@@ -15,13 +15,16 @@
  *
  */
 
-/** @class MAUS::DataStructure::Global::PrimaryChain
+/** @class MAUS::DataStructure::Global::TRefTrackPair
  *  @ingroup globalrecon
- *  @brief The reconstructed chain for a single primary particle.
+ *  @brief A container class, for a pair of TRefs to Tracks.
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
  *
- *  A hypothesised reconstructed chain for a single primary particle.
- *  This consists of a series of tracks, with one primary and the
- *  possibility of multiple daughters.
+ *  A container class, for a pair of TRef references to two
+ *  MAUS::DataStructure::Global::TRefTrackPair objects. The main use
+ *  case is for a track / parent pair, within the PrimaryChain object.
+ *  The first reference must be valid, but the second can be NULL.
  */
 
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TREFTRACKPAIR_HH_

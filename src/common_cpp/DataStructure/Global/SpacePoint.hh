@@ -18,6 +18,8 @@
 /** @class MAUS::DataStructure::Global::SpacePoint
  *  @ingroup globalrecon
  *  @brief A reconstructed point in 4D space, matching a detector measurement.
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
  *
  *  The measurement of a single detector element, represented as a 4D
  *  point in space, with an associated set of errors.

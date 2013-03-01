@@ -18,6 +18,8 @@
 /** @class MAUS::DataStructure::Global::TrackPoint
  *  @ingroup globalrecon
  *  @brief TrackPoint object for the global reconstruction.
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
  *
  *  A reconstructed track point, produced by the global
  *  reconstruction.  It represents a single point in space through

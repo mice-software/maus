@@ -24,12 +24,23 @@
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 
+/*!
+ * \file EnumeratorProcessors.hh
+ *
+ * \author Ian Taylore, University of Warwick
+ * \date 2013/03/01 - First added to trunk
+ *
+ * Contains Processors for all Enumrators used by the global
+ * reconstruction.
+ */
+
 namespace MAUS {
 namespace Processor {
 namespace Global {
 
 /** Processor to convert between MAUS::DataStructure::Global::DetectorPoint
  *  and Json::numericValue
+ *  @date
  */
 class EnumDetectorPointProcessor :
       public ProcessorBase<MAUS::DataStructure::Global::DetectorPoint> {

@@ -18,6 +18,8 @@
 /** @class MAUS::DataStructure::Global::PrimaryChain
  *  @ingroup globalrecon
  *  @brief The reconstructed chain for a single primary particle.
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
  *
  *  A hypothesised reconstructed chain for a single primary particle.
  *  This consists of a series of tracks, with one primary and the

@@ -29,7 +29,10 @@ namespace Processor {
 namespace Global {
 
 /** @class SpacePointProcessor processor for
- *  MAUS::DataStructure::Global::SpacePoint */
+ *  MAUS::DataStructure::Global::SpacePoint
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
+ */
 class SpacePointProcessor :
       public ObjectProcessor<MAUS::DataStructure::Global::SpacePoint> {
  public:

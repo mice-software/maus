@@ -30,7 +30,10 @@ namespace Processor {
 namespace Global {
 
 /** @class TrackProcessor processor for
- *  MAUS::DataStructure::Global::Track */
+ *  MAUS::DataStructure::Global::Track
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
+ */
 class TrackProcessor :
       public ObjectProcessor<MAUS::DataStructure::Global::Track> {
  public:

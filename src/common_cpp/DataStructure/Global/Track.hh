@@ -18,6 +18,8 @@
 /** @class MAUS::DataStructure::Global::Track
  *  @ingroup globalrecon
  *  @brief Track object for the global reconstruction.
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
  *
  *  A reconstructed track, produced by the global reconstruction.
  *  Primarily consists of a series of

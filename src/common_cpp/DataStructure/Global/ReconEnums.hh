@@ -17,6 +17,8 @@
 
 //////////////////////////////////////////////////////////////////////
 /// \file GlobalReconEnums.hh
+/// \author Ian Taylor, University of Warwick
+///	\date 2013/03/01
 ///
 /// This file provides enumerators for: a) keeping track of the
 /// locations of space- and track_points within the global

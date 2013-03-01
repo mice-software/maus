@@ -27,7 +27,10 @@ namespace MAUS {
 namespace Processor {
 namespace Global {
 
-/** @class TRefTrackPairProcessor for converting json <-> cpp data */
+/** @class TRefTrackPairProcessor for converting json <-> cpp data 
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
+ */
 class TRefTrackPairProcessor :
       public ObjectProcessor<MAUS::DataStructure::Global::TRefTrackPair> {
  public:
