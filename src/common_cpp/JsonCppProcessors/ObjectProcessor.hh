@@ -153,7 +153,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  
      *  Pointers are resolved after all other processing is
      *  complete. To be stored in a TRef, a data member must inherit
-     *  from TObject.  This remvoes the need to template this method,
+     *  from TObject.  This removes the need to template this method,
      *  as all pointers can be resolved as TObjects.
      *
      *  @param branch_name name used by json to reference the branch
@@ -172,20 +172,24 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                       void (ObjectType::*SetMethod)(TRef value),
                       bool is_required);
 
-    /** Register a ROOT TRef for processing, which contains a pointer
-     * to memory owned by another class in the tree.
+    /** Register a ROOT TRefArray for processing, which contains a
+     *  pointer to memory owned by another class in the tree.
      *
-     *  We only convert the address and assume that the value is
+     *  We only convert the address and assume that the values are
      *  passed elsewhere in the tree as a PointerBranch.
      *  
-     *  Pointers are resolved after all other processing is complete. Memory is
-     *  assumed to be owned by the ParentType of the RegisterPointerBranch, NOT
-     *  the ParentType of this RegisterPointerReference.
+     *  References are resolved after all other processing is
+     *  complete. Memory is assumed to be owned by the ParentType of
+     *  the RegisterPointerBranch, NOT the ParentType of this
+     *  RegisterTRefArray.  All objects referenced this way must
+     *  inherit from TObject.  This is required by the associated ROOT
+     *  code, but also helpful, as it removes the need for templating
+     *  the ChildType.
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param GetMethod callback that will return a pointer to the child data,
-     *  where memory is still owned by the ParentType
-     *  @param SetMethod callback that will set a pointer to the child data,
+     *  @param GetMethod callback that will return a pointer to the TRefArray,
+     *  which contains references to memory still owned by the ParentType
+     *  @param SetMethod callback that will set a pointer to the TRefArray,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
      *  or is NULL in C++, throw Squeal if is_required is set to true; else set
