@@ -116,8 +116,8 @@ PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args) {
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
     if (cards == NULL) {
         PyErr_SetString(PyExc_RuntimeError,
-         "Attempt to get configuration cards failed but cards were not initialised");            
-        return NULL;
+         "Attempt to get configuration cards failed but cards were not initialised");
+         return NULL;
     }
     std::string json_str = JsonWrapper::JsonToString(*cards);
     const char* json = json_str.c_str();
