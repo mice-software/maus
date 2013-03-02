@@ -86,6 +86,8 @@ reconstruction_geometry_filename = "Test.dat"
 
     def test_version_number(self):
         """Test maus_cpp.globals.get_version_number()"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
         # doesnt need globals initialised
         version = maus_cpp.globals.get_version_number().split('.')
         self.assertEqual(len(version), 3)
