@@ -187,7 +187,7 @@ class PrimaryChain : public TObject {
 
   /// Get the #_comments map.
   std::map<std::string, std::string> get_comments() const;
-  
+
  private:
 
   /// The name of the mapper which produced this result. This can be

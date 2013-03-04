@@ -124,7 +124,7 @@ PrimaryChain* PrimaryChain::Clone() const {
       new TRefArray(*_parent_primary_chains));
 
   primaryChainNew->set_comments(_comments);
-  
+
   return primaryChainNew;
 }
 
