@@ -50,6 +50,11 @@ class PrimaryChainTestDS : public ::testing::Test {
 
     _goodness_of_fit = 5.;
     _primary_chain0->set_goodness_of_fit(_goodness_of_fit);
+
+    _test_comment_key   = "TestError1";
+    _test_comment_value = "Test errors are FUN!";
+    _test_comments[_test_comment_key] = _test_comment_value;
+    _primary_chain0->set_comments(_test_comments);
   }
   virtual void TearDown() {}
  protected:
@@ -59,6 +64,9 @@ class PrimaryChainTestDS : public ::testing::Test {
   MAUS::DataStructure::Global::Track* _t2;
   double _goodness_of_fit;
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *track_parent_pairs;
+  std::string _test_comment_key;
+  std::string _test_comment_value;
+  std::map<std::string, std::string> _test_comments;
 };
 
 TEST_F(PrimaryChainTestDS, test_default_constructor) {
@@ -66,6 +74,7 @@ TEST_F(PrimaryChainTestDS, test_default_constructor) {
 
   EXPECT_TRUE(primary_chain.get_track_parent_pairs()->empty());
   EXPECT_EQ(0., primary_chain.get_goodness_of_fit());
+  EXPECT_EQ(0U, primary_chain.get_comments().size());
 }
 
 TEST_F(PrimaryChainTestDS, test_named_constructor) {
@@ -74,6 +83,7 @@ TEST_F(PrimaryChainTestDS, test_named_constructor) {
   EXPECT_TRUE(primary_chain.get_track_parent_pairs()->empty());
   EXPECT_EQ(0., primary_chain.get_goodness_of_fit());
   EXPECT_EQ("MapName", primary_chain.get_mapper_name());
+  EXPECT_EQ(0U, primary_chain.get_comments().size());
 }
 
 TEST_F(PrimaryChainTestDS, test_getters_setters) {
@@ -94,6 +104,9 @@ TEST_F(PrimaryChainTestDS, test_getters_setters) {
   EXPECT_EQ(_t0, _primary_chain0->get_track_parent_pairs()
             ->at(2)->GetParent());
   EXPECT_EQ(_goodness_of_fit, _primary_chain0->get_goodness_of_fit());
+  ASSERT_EQ(1U, _primary_chain0->get_comments().size());
+  EXPECT_EQ(_test_comment_value,
+            _primary_chain0->get_comments().at(_test_comment_key));
 }
 
 TEST_F(PrimaryChainTestDS, test_copy_constructor) {
@@ -117,6 +130,9 @@ TEST_F(PrimaryChainTestDS, test_copy_constructor) {
   EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(2)->GetParent());
   EXPECT_EQ(_goodness_of_fit, primary_chain2.get_goodness_of_fit());
+  ASSERT_EQ(1U, primary_chain2.get_comments().size());
+  EXPECT_EQ(_test_comment_value,
+            primary_chain2.get_comments().at(_test_comment_key));
 }
 
 TEST_F(PrimaryChainTestDS, test_assignment_operator) {
@@ -141,6 +157,9 @@ TEST_F(PrimaryChainTestDS, test_assignment_operator) {
   EXPECT_EQ(_t0, primary_chain2.get_track_parent_pairs()
             ->at(2)->GetParent());
   EXPECT_EQ(_goodness_of_fit, primary_chain2.get_goodness_of_fit());
+  ASSERT_EQ(1U, primary_chain2.get_comments().size());
+  EXPECT_EQ(_test_comment_value,
+            primary_chain2.get_comments().at(_test_comment_key));
 }
 
 TEST_F(PrimaryChainTestDS, test_Clone) {
@@ -167,6 +186,9 @@ TEST_F(PrimaryChainTestDS, test_Clone) {
   EXPECT_EQ(primary_chain2->get_track_parent_pairs()->at(2)->GetParent(),
             primary_chain2->get_track_parent_pairs()->at(0)->GetTrack());
   EXPECT_EQ(_goodness_of_fit, primary_chain2->get_goodness_of_fit());
+  ASSERT_EQ(1U, primary_chain2->get_comments().size());
+  EXPECT_EQ(_test_comment_value,
+            primary_chain2->get_comments().at(_test_comment_key));
 }
 
 TEST_F(PrimaryChainTestDS, test_TrackMethods) {

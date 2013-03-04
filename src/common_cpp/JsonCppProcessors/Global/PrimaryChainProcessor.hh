@@ -17,6 +17,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ObjectMapProcessors.hh"
 
 #include "src/common_cpp/JsonCppProcessors/Global/TRefTrackPairProcessor.hh"
 
@@ -47,6 +48,7 @@ class PrimaryChainProcessor
   PointerArrayProcessor<MAUS::DataStructure::Global::TRefTrackPair>
   _treftrackpair_array_proc;
   TRefArrayProcessor _primary_chain_trefarray_proc;
+  ObjectMapValueProcessor<std::string> _comments_proc;
 };
 } // ~namespace Global
 } // ~namespace Processor

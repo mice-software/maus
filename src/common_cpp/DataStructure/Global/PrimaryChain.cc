@@ -38,7 +38,8 @@ PrimaryChain::PrimaryChain()
 // Copy contructor
 PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
     : _mapper_name(""),
-      _goodness_of_fit(primary_chain._goodness_of_fit) {
+      _goodness_of_fit(primary_chain._goodness_of_fit),
+      _comments(primary_chain._comments) {
   _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
   std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
   for (iter = primary_chain._tracks->begin();
@@ -79,6 +80,7 @@ PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
   _goodness_of_fit    = primary_chain._goodness_of_fit;
   _parent_primary_chains =
       new TRefArray(*primary_chain._parent_primary_chains);
+  _comments = primary_chain._comments;
   return *this;
 }
 
@@ -120,6 +122,9 @@ PrimaryChain* PrimaryChain::Clone() const {
 
   primaryChainNew->set_parent_primary_chains(
       new TRefArray(*_parent_primary_chains));
+
+  primaryChainNew->set_comments(_comments);
+  
   return primaryChainNew;
 }
 
@@ -329,6 +334,26 @@ TRefArray* PrimaryChain::get_parent_primary_chains() const {
   return _parent_primary_chains;
 }
 
+void PrimaryChain::AddComment(std::string key, std::string comment) {
+  _comments[key] = comment;
+}
+
+void PrimaryChain::ClearComments() {
+  _comments.clear();
+}
+
+void PrimaryChain::RemoveComment(std::string key) {
+  _comments.erase(key);
+}
+
+void PrimaryChain::set_comments(
+    std::map<std::string, std::string> comments) {
+  _comments = comments;
+}
+
+std::map<std::string, std::string> PrimaryChain::get_comments() const {
+  return _comments;
+}
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

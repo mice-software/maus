@@ -21,7 +21,8 @@ namespace Processor {
 namespace Global {
 
 PrimaryChainProcessor::PrimaryChainProcessor()
-    : _treftrackpair_array_proc(new TRefTrackPairProcessor()) {
+    : _treftrackpair_array_proc(new TRefTrackPairProcessor()),
+      _comments_proc(new StringProcessor()) {
 
   RegisterValueBranch(
       "mapper_name", &_string_proc,
@@ -46,6 +47,12 @@ PrimaryChainProcessor::PrimaryChainProcessor()
       &MAUS::DataStructure::Global::PrimaryChain::get_parent_primary_chains,
       &MAUS::DataStructure::Global::PrimaryChain::set_parent_primary_chains,
       true);
+
+  RegisterValueBranch("comments",
+                      &_comments_proc,
+                      &MAUS::DataStructure::Global::PrimaryChain::get_comments,
+                      &MAUS::DataStructure::Global::PrimaryChain::set_comments,
+                      true);
 }
 } // ~namespace Global
 } // ~namespace Processor
