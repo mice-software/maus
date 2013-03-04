@@ -82,7 +82,6 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
   Json::Value tof_evt;
 
   // loop over events
-  std::cout << "mc numevts = " << mc.size() << std::endl;
   if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
   for ( unsigned int i = 0; i < mc.size(); i++ ) {
     Json::Value particle = mc[i];
