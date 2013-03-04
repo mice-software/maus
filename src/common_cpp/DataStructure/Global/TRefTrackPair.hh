@@ -53,7 +53,7 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
                 MAUS::DataStructure::Global::Track* parent);
 
   /// Destructor
-  ~TRefTrackPair();
+  virtual ~TRefTrackPair();
 
   /// Set the Track
   void SetTrack(MAUS::DataStructure::Global::Track* track);
