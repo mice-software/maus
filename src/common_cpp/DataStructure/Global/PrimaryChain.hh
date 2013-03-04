@@ -172,6 +172,22 @@ class PrimaryChain : public TObject {
   /// Get the #_parent_primary_chains pointer array
   TRefArray* get_parent_primary_chains() const;
 
+  /// Add a comment to the primary chain, e.g.
+  /// AddComment("Error0", "Track took a 10 cm step to the right").
+  void AddComment(std::string key, std::string comment);
+
+  /// Clear all comments from the primary chain.
+  void ClearComments();
+
+  /// Remove a specific comment from the chain.
+  void RemoveComment(std::string key);
+
+  /// Set the #_comments map.
+  void set_comments(std::map<std::string, std::string> comments);
+
+  /// Get the #_comments map.
+  std::map<std::string, std::string> get_comments() const;
+
  private:
 
   /// The name of the mapper which produced this result. This can be
@@ -191,6 +207,11 @@ class PrimaryChain : public TObject {
   /// document the global reconstruction steps which produced this
   /// result.
   TRefArray* _parent_primary_chains;
+
+  /// A map, holding indexed comments.  This is intended to be an
+  /// automated interface with the analysis group, providing
+  /// potentially important comments on the reconstructed result.
+  std::map<std::string, std::string> _comments;
 
   MAUS_VERSIONED_CLASS_DEF(PrimaryChain);
 }; // ~class PrimaryChain
