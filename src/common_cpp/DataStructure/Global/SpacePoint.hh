@@ -39,6 +39,7 @@
 #include "TLorentzVector.h"
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 
 namespace MAUS {
@@ -119,7 +120,7 @@ class SpacePoint : public TObject {
   /// be removed if deemed unnecessary.
   std::string    _geometry_path;
 
-  ClassDef(SpacePoint, 1)
+  MAUS_VERSIONED_CLASS_DEF(SpacePoint);
 }; // ~class SpacePoint
 
 } // ~namespace Global
