@@ -89,6 +89,8 @@ TEST_PENN = {"transverse_mode":"penn", "emittance_4d":6., "beta_4d":333.,
 
 TEST_CONSTANT_SOL = {"transverse_mode":"constant_solenoid", "emittance_4d":6.,
              "normalised_angular_momentum":2., "bz":4.e-3}
+TEST_CONSTANT_SOL_NEG = {"transverse_mode":"constant_solenoid",
+             "emittance_4d":6., "normalised_angular_momentum":2., "bz":-4.e-3}
 
 TEST_PENN_F1 = {"transverse_mode":"penn", "emittance_4d":-6., "beta_4d":333.,
              "alpha_4d":1., "normalised_angular_momentum":1.,
@@ -259,15 +261,22 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual( self._beam.transverse_mode, "penn" )
         self.__cmp_matrix(test_array, self._beam.beam_matrix[0:4, 0:4])
 
+    # TEST_CONSTANT_SOL_NEG is a test for issue #1211
     def test_birth_transverse_const_sol(self):
         """Beam transverse constant solenoid mode"""
         self._beam._Beam__birth_transverse_ellipse(TEST_CONSTANT_SOL)
         matrix_const_sol = self._beam.beam_matrix[0:4, 0:4]
+        self._beam._Beam__birth_transverse_ellipse(TEST_CONSTANT_SOL_NEG)
+        matrix_const_sol_neg = self._beam.beam_matrix[0:4, 0:4]
+        for i in range(4):
+            matrix_const_sol_neg[i, i-4] = -matrix_const_sol_neg[i, i-4]
         penn_mod = copy.deepcopy(TEST_PENN)
         penn_mod["alpha_4d"] = 0.
         self._beam._Beam__birth_transverse_ellipse(penn_mod)
         matrix_penn = self._beam.beam_matrix[0:4, 0:4]
         self.__cmp_matrix(matrix_penn, matrix_const_sol)
+        self.__cmp_matrix(matrix_penn, matrix_const_sol_neg)
+        
 
     def test_birth_transverse_twiss(self):
         """Beam transverse twiss mode"""
@@ -344,7 +353,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "uniform_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_UNIFORM_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_UNIFORM_T["t_end"])
-        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
+        self.assertAlmostEqual(self._beam.beam_matrix[5, 5], 1.e4)
         self.assertRaises(ValueError, 
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_UNIFORM_T_F1)
@@ -353,7 +362,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam.longitudinal_mode, "sawtooth_time")
         self.assertAlmostEqual(self._beam.t_start, TEST_SAWTOOTH_T["t_start"])
         self.assertAlmostEqual(self._beam.t_end, TEST_SAWTOOTH_T["t_end"])
-        self.assertAlmostEqual(self._beam.beam_matrix[5,5], 1.e4)
+        self.assertAlmostEqual(self._beam.beam_matrix[5, 5], 1.e4)
 
     def test_birth_trans_long_coupling(self):
         """Beam transverse - longitudinal coupling"""

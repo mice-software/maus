@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""simulate_mice.py"""
 import os
 import io   #  generic python library for I/O
 import gzip #  For compressed output # pylint: disable=W0611
@@ -24,7 +25,7 @@ def run(number_of_spills):
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
-    my_map.append(MAUS.MapCppTOFDigitization())  #  TOF electronics model
+    my_map.append(MAUS.MapCppTOFMCDigitizer())  #  TOF electronics model
     my_map.append(MAUS.MapCppTrackerMCDigitization())  #   SCiFi electronics
 
     datacards = io.StringIO(u"keep_steps = True")
@@ -36,7 +37,8 @@ def run(number_of_spills):
 
     #  Choose from either a compressed or uncompressed output file
     #
-    output_file = open(os.environ["MAUS_ROOT_DIR"]+"/tmp/simulation.out", 'w')  #  Uncompressed
+    output_file = open(os.environ["MAUS_ROOT_DIR"] + "/tmp/simulation.out",
+                       'w')  #  Uncompressed
     #output_file = gzip.GzipFile("mausput.gz", 'wb')  #  Compressed
 
     #

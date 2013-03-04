@@ -31,6 +31,7 @@
 
 // C++ headers
 #include <string>
+#include <vector>
 #include <map>
 
 // ROOT headers
@@ -59,7 +60,7 @@ class PrimaryChain : public TObject {
 
   /// Constructor setting mapper name - everything else initialises to
   /// 0/NULL
-  PrimaryChain(std::string mapper_name);
+  explicit PrimaryChain(std::string mapper_name);
 
   /// Destructor
   virtual ~PrimaryChain();
@@ -107,11 +108,11 @@ class PrimaryChain : public TObject {
   /// Returns a vector of all of the tracks in this chain, for users
   /// to examine.
   std::vector<MAUS::DataStructure::Global::Track*> GetTracks();
-  
+
   /// Returns a vector of all of the primary tracks in this chain, for
   /// users to examine.
   std::vector<MAUS::DataStructure::Global::Track*> GetPrimaryTracks();
-  
+
   /// Returns a track's parent, according to this primary chain
   MAUS::DataStructure::Global::Track* GetTrackParent(
       MAUS::DataStructure::Global::Track* track);
@@ -158,7 +159,7 @@ class PrimaryChain : public TObject {
 
   /// Set the #_goodness_of_fit paramter
   void set_goodness_of_fit(double goodness_of_fit);
-  
+
   /// Get the #_goodness_of_fit paramter
   double get_goodness_of_fit() const;
 
@@ -166,7 +167,7 @@ class PrimaryChain : public TObject {
   /// takes ownership of this pointer.  This is mostly for the
   /// Json/Cpp Processor, most users shoudl use AddParentChain.
   void set_parent_primary_chains(TRefArray* parent_primary_chains);
-  
+
   /// Get the #_parent_primary_chains pointer array
   TRefArray* get_parent_primary_chains() const;
 
@@ -176,7 +177,7 @@ class PrimaryChain : public TObject {
   /// used to separate different stages of the global reconstruction
   /// if required.
   std::string _mapper_name;
-  
+
   /// Map of tracks associated with this primary chain, and a
   /// reference to their parent tracks if applicable (NULL if track is
   /// believed to be a primary particle).

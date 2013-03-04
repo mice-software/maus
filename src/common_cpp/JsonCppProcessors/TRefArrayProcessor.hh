@@ -20,8 +20,7 @@
 #include <vector>
 #include <string>
 
-#include <TRefArray.h>
-
+#include "TRefArray.h"
 #include "json/json.h"
 
 namespace MAUS {
@@ -94,7 +93,7 @@ class TRefArrayProcessor {
   Json::Value* CppToJson(const TRefArray* cpp_trefarray,
                          std::string path);
 
-  // /** Return string for ith array item given array path 
+  // /** Return string for ith array item given array path
   //  *
   //  *  @param path json path to the array
   //  *  @param index position of the element in the array

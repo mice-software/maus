@@ -1,8 +1,8 @@
-// generate using "dot file_structure.dot -Tpng -o file_structure.png"
+// generate using "dot spill_structure.dot -Tpng -o spill_structure.png"
 
 digraph G {
   node [shape=record];
-  subgraph DAQ {
+  subgraph cluster_DAQ {
   daq_data [shape=record, label="{DAQData|daq_data}"]
    daq_data_V830 [shape=record, label="{V830|V830}"]
     daq_data_V830_channels [shape=record, label="{Channels|channels}"]
@@ -96,7 +96,7 @@ digraph G {
      daq_data_unknown_array_item_V1290 -> daq_data_unknown_array_item_V1290_array_item
   }
 
-  subgraph MC {
+  subgraph cluster_MC {
   mc_events [shape=record, label="{MCEventArray|mc_events}"]
    mc_events_array_item [shape=record, label="{MCEvent|[]}"]
     mc_events_array_item_primary [shape=record, label="{Primary|primary}"]
@@ -170,7 +170,7 @@ digraph G {
        mc_events_array_item_tracks_array_item_steps_array_item -> mc_events_array_item_tracks_array_item_steps_array_item_momentum
   }
 
-  subgraph RECON {
+  subgraph cluster_RECON {
   recon_events [shape=record, label="{ReconEventArray|recon_events}"]
    recon_events_array_item [shape=record, label="{ReconEvent|[]}"]
     recon_events_array_item_ckov_event [shape=record, label="{CkovEvent|ckov_event}"]
@@ -209,6 +209,12 @@ digraph G {
          recon_events_array_item_global_event_primarychains;
        }
     recon_events_array_item_kl_event [shape=record, label="{KLEvent|kl_event}"]
+     recon_events_array_item_kl_event_kl_digits [shape=record, label="{KLEventDigit|kl_digits}"]
+      recon_events_array_item_kl_event_kl_digits_kl [shape=record, label="{KLDigitArray|kl}"]
+       recon_events_array_item_kl_event_kl_digits_kl_array_item [shape=record, label="{KLDigit|[]}"]
+     recon_events_array_item_kl_event_kl_cell_hits [shape=record, label="{KLEventCellHit|kl_cell_hits}"]
+      recon_events_array_item_kl_event_kl_cell_hits_kl [shape=record, label="{KLCellHitArray|kl}"]
+       recon_events_array_item_kl_event_kl_cell_hits_kl_array_item [shape=record, label="{KLCellHit|[]}"]
     recon_events_array_item_sci_fi_event [shape=record, label="{SciFiEvent|sci_fi_event}"]
     recon_events_array_item_tof_event [shape=record, label="{TOFEvent|tof_event}"]
      recon_events_array_item_tof_event_tof_digits [shape=record, label="{TOFEventDigit|tof_digits}"]
@@ -272,6 +278,12 @@ digraph G {
       recon_events_array_item_global_event_primarychains_array_item -> recon_events_array_item_global_event_primarychains_array_item_primarychains
        recon_events_array_item_global_event_primarychains_array_item_primarychains -> recon_events_array_item_global_event_primarychains [style=dotted]
    recon_events_array_item -> recon_events_array_item_kl_event
+    recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_digits
+     recon_events_array_item_kl_event_kl_digits -> recon_events_array_item_kl_event_kl_digits_kl
+      recon_events_array_item_kl_event_kl_digits_kl -> recon_events_array_item_kl_event_kl_digits_kl_array_item
+    recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_cell_hits
+     recon_events_array_item_kl_event_kl_cell_hits -> recon_events_array_item_kl_event_kl_cell_hits_kl
+      recon_events_array_item_kl_event_kl_cell_hits_kl -> recon_events_array_item_kl_event_kl_cell_hits_kl_array_item
    recon_events_array_item -> recon_events_array_item_sci_fi_event
    recon_events_array_item -> recon_events_array_item_tof_event
    recon_events_array_item -> recon_events_array_item_trigger_event

@@ -183,7 +183,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
         self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.KeyError'>: 'daq_data is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("Bad input spill - no maus_event_type", errors[0], "Unexpected error trace "+str(errors[0])) # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -194,7 +194,9 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         with value None.
         @param self Object reference.
         """
-        result = self.__process({"daq_data":None})
+        result = self.__process({"daq_event_type":"physics_event",
+                                 "daq_data":None,
+                                 "maus_event_type":"Spill",})
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         self.assertTrue("ReducePyScalersTable" in errors,
@@ -211,7 +213,9 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         Test "process" with a JSON document with no "V830".
         @param self Object reference.
         """
-        result = self.__process({"daq_data":{}})
+        result = self.__process({"daq_event_type":"physics_event",
+                                 "daq_data":{},
+                                 "maus_event_type":"Spill",})
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         self.assertTrue("ReducePyScalersTable" in errors,
@@ -228,7 +232,9 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         Test "process" with a JSON document with no "channels".
         @param self Object reference.
         """
-        result = self.__process({"daq_data":{"V830":{}}})
+        result = self.__process({"daq_event_type":"physics_event",
+                                 "daq_data":{"V830":{}},
+                                 "maus_event_type":"Spill",})
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         self.assertTrue("ReducePyScalersTable" in errors,
@@ -245,7 +251,9 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         Test "process" with a JSON document with no "ch0".
         @param self Object reference.
         """
-        result = self.__process({"daq_data":{"V830":{"channels":{}}}})
+        result = self.__process({"daq_data":{"V830":{"channels":{}}},
+                                 "daq_event_type":"physics_event",
+                                 "maus_event_type":"Spill",})
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         self.assertTrue("ReducePyScalersTable" in errors,
@@ -279,6 +287,8 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         @return spill
         """
         spill = {}
+        spill["daq_event_type"] = "physics_event"
+        spill["maus_event_type"] = "Spill"
         spill["daq_data"] = {}
         spill["daq_data"]["V830"] = {}
         scalers = spill["daq_data"]["V830"]
@@ -366,7 +376,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
             time_str = ""
         description = "Scaler counts from channel data for event: %s at time: %s" % (event, time_str) # pylint: disable=C0301
         self.assertEquals(description, result["description"],
-            "Unexpected description")
+          "Unexpected description\n  "+description+"\n  "+result["description"])
         self.assertTrue("table_data" in result, "No data")
         data = result["table_data"]
         self.assertEquals(6, len(data), "Unexpected number of rows")

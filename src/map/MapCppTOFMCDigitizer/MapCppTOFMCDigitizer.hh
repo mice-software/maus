@@ -37,6 +37,7 @@
 #include <vector>
 #include <map>
 
+#include "TRandom.h"
 #include "Config/MiceModule.hh"
 #include "Utils/TOFCalibrationMap.hh"
 

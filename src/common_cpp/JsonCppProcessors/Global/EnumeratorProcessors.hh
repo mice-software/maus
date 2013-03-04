@@ -42,8 +42,8 @@ namespace Global {
  *  and Json::numericValue
  *  @date
  */
-class EnumDetectorPointProcessor :
-      public ProcessorBase<MAUS::DataStructure::Global::DetectorPoint> {
+class EnumDetectorPointProcessor
+    : public ProcessorBase<MAUS::DataStructure::Global::DetectorPoint> {
   public:
     /** Convert from Json::numericValue to
      *  MAUS::DataStructure::Global::DetectorPoint
@@ -53,7 +53,7 @@ class EnumDetectorPointProcessor :
      */
     virtual MAUS::DataStructure::Global::DetectorPoint*
     JsonToCpp(const Json::Value& json_int);
-  
+
     /** Convert from MAUS::DataStructure::Global::DetectorPoint to
      * Json::numericValue
      */
@@ -71,8 +71,8 @@ class EnumDetectorPointProcessor :
 /** Processor to convert between MAUS::DataStructure::Global::PID and
  *  Json::numericValue
  */
-class EnumPIDProcessor :
-      public ProcessorBase<MAUS::DataStructure::Global::PID> {
+class EnumPIDProcessor
+    : public ProcessorBase<MAUS::DataStructure::Global::PID> {
   public:
     /** Convert from Json::numericValue to MAUS::DataStructure::Global::PID
      *

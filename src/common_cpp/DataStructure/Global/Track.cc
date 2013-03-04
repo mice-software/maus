@@ -75,7 +75,7 @@ Track& Track::operator=(const Track &track) {
   _detectorpoints     = track.get_detectorpoints();
   _geometry_paths     = track.get_geometry_paths();
   _goodness_of_fit    = track.get_goodness_of_fit();
-  
+
   return *this;
 }
 
@@ -91,9 +91,9 @@ Track* Track::Clone() const {
 
   // Track points may be edited, so we clone the original points
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+  for (int i = 0; i < _track_points->GetLast()+1; ++i) {
     tp = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
-    if(!tp) continue;
+    if (!tp) continue;
     trackNew->PushBackTrackPoint(tp->Clone());
   }
 
@@ -102,14 +102,14 @@ Track* Track::Clone() const {
 
   // This is just book-keeping, so we copy the TRefArray whole.
   MAUS::DataStructure::Global::Track* t = NULL;
-  for(int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
+  for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
     t = (MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
-    if(!t) continue;
+    if (!t) continue;
     trackNew->AddTrack(t);
   }
-  
+
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
-  
+
   return trackNew;
 }
 
@@ -140,18 +140,18 @@ int Track::get_charge() const {
 // Trackpoint methods
 
 void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point) {
-  if(!track_point){
+  if (!track_point) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to add a NULL TrackPoint",
                  "DataStructure::Global::Track::AddTrackPoint()"));
   }
-  if(track_point->get_detector() == MAUS::DataStructure::Global::kVirtual) {
+  if (track_point->get_detector() == MAUS::DataStructure::Global::kVirtual) {
     AddGeometryPath(track_point->get_geometry_path());
   }
   SetDetector(track_point->get_detector());
   PushBackTrackPoint(track_point);
 }
-  
+
 void Track::PushBackTrackPoint(
     MAUS::DataStructure::Global::TrackPoint* track_point) {
   _track_points->Add(track_point);
@@ -161,7 +161,7 @@ void Track::PushBackTrackPoint(
 // removing the geometry path if appropriate.
 void Track::RemoveTrackPoint(
     MAUS::DataStructure::Global::TrackPoint* track_point) {
-  if(!track_point) {
+  if (!track_point) {
     throw(Squeal(Squeal::recoverable,
                  "No matching TrackPoint: pointer is NULL",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
@@ -169,11 +169,11 @@ void Track::RemoveTrackPoint(
 
   // Remove track_point from TRefArray
   TObject* result = _track_points->FindObject(track_point);
-  if(!result)
+  if (!result) {
     throw(Squeal(Squeal::recoverable,
                  "No matching TrackPoint ",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
-  else {
+  } else {
     _track_points->Remove(result);
     _track_points->Compress();
   }
@@ -183,20 +183,20 @@ void Track::RemoveTrackPoint(
       track_point->get_detector();
   MAUS::DataStructure::Global::TrackPoint *eachTP;
   bool stillNeeded = false;
-  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+  for (int i = 0; i < _track_points->GetLast()+1; ++i) {
     eachTP = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
-    if(!eachTP) continue;
-    if(eachTP->get_detector() == targetDP) {
+    if (!eachTP) continue;
+    if (eachTP->get_detector() == targetDP) {
       stillNeeded = true;
       break;
     }
   }
-  if(!stillNeeded){
+  if (!stillNeeded) {
     RemoveDetector(targetDP);
   }
 
   // If we have an associated geometry path, remove that as well
-  if(targetDP == MAUS::DataStructure::Global::kVirtual) {
+  if (targetDP == MAUS::DataStructure::Global::kVirtual) {
     RemoveGeometryPath(track_point->get_geometry_path());
   }
 }
@@ -204,17 +204,17 @@ void Track::RemoveTrackPoint(
 void Track::SortTrackPointsByZ() {
   std::vector<MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+  for (int i = 0; i < _track_points->GetLast()+1; ++i) {
     tp = (MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
-    if(!tp) continue;
+    if (!tp) continue;
     temp_track_points.push_back(tp);
   }
-  
+
   std::sort(temp_track_points.begin(), temp_track_points.end(), SortByZ);
 
   _track_points->Clear();
   _track_points->Expand(temp_track_points.size()); // Can be used to shrink too
-  for(size_t i = 0; i < temp_track_points.size(); ++i) {
+  for (size_t i = 0; i < temp_track_points.size(); ++i) {
     _track_points->AddAt(temp_track_points.at(i), i);
   }
 }
@@ -223,16 +223,16 @@ std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 Track::GetTrackPoints() {
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
   const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-  for(int i = 0; i < _track_points->GetLast()+1; ++i) {
+  for (int i = 0; i < _track_points->GetLast()+1; ++i) {
     tp = (const MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
-    if(!tp) continue;
+    if (!tp) continue;
     temp_track_points.push_back(tp);
   }
   return temp_track_points;
 }
 
 void Track::set_track_points(TRefArray* track_points) {
-  if(_track_points != NULL) {
+  if (_track_points != NULL) {
     delete _track_points;
   }
   _track_points = track_points;
@@ -296,7 +296,7 @@ void Track::RemoveGeometryPath(std::string geometry_path) {
   std::vector<std::string>::iterator result =
       find(_geometry_paths.begin(), _geometry_paths.end(), geometry_path);
 
-  if(result == _geometry_paths.end()) {
+  if (result == _geometry_paths.end()) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to remove a geometry path not stored in Track",
                  "DataStructure::Global::Track::RemoveGeometryPath()"));
@@ -331,7 +331,7 @@ void Track::AddTrack(MAUS::DataStructure::Global::Track* track) {
 
 void Track::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
-  if(!result) {
+  if (!result) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to remove a constituent track not stored in Track",
                  "DataStructure::Global::Track::RemoveTrack()"));
@@ -350,9 +350,9 @@ std::vector<const MAUS::DataStructure::Global::Track*>
 Track::GetConstituentTracks() {
   std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
   const MAUS::DataStructure::Global::Track* t = NULL;
-  for(int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
+  for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
     t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
-    if(!t) continue;
+    if (!t) continue;
     temp_tracks.push_back(t);
   }
   return temp_tracks;
@@ -362,7 +362,7 @@ void Track::ClearTracks() {
   _constituent_tracks->Clear();
 }
 
-void Track::set_constituent_tracks(TRefArray* constituent_tracks){
+void Track::set_constituent_tracks(TRefArray* constituent_tracks) {
   _constituent_tracks = constituent_tracks;
 }
 

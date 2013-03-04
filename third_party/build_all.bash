@@ -25,12 +25,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     fi
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
     ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
     ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
     ${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
     ${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
     ${MAUS_ROOT_DIR}/third_party/bash/41cpplint.bash
     ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash
     ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
@@ -40,6 +40,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
+    # This will fail if we don't have appropriate DATE install
+    # Comment for now
+    #${MAUS_ROOT_DIR}/third_party/bash/61monitoring.bash
 
 else
 echo

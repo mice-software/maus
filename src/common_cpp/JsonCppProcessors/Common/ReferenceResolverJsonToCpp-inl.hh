@@ -119,7 +119,7 @@ inline TRefArrayResolver::TRefArrayResolver(
 inline void TRefArrayResolver::ResolveReferences() {
   if (_tref_array == NULL)
     return;
-  if ((int)_index > _tref_array->GetSize())
+  if (_index > static_cast<size_t>(_tref_array->GetSize()))
     throw(Squeal(Squeal::recoverable,
                  "Index out of range while resolving pointer to array "+
                  _ref_json_address,
@@ -175,7 +175,7 @@ void RefManager::SetPointerAsValue
     // If the object inherits from a TObject, add a second entry in a
     // second table, so that we can find the pointer from a TRef.
     TObject* tobject_pointer = (TObject*) pointer;
-    if(tobject_pointer) {
+    if (tobject_pointer) {
       TypedPointerValueTable<TObject>* tableTObject =
           GetTypedPointerValueTable<TObject>();
       if (tableTObject->_data_hash.find(json_address) !=

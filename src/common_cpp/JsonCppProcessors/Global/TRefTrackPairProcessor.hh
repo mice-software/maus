@@ -31,8 +31,8 @@ namespace Global {
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01
  */
-class TRefTrackPairProcessor :
-      public ObjectProcessor<MAUS::DataStructure::Global::TRefTrackPair> {
+class TRefTrackPairProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::TRefTrackPair> {
  public:
     /** Constructor - registers the branch structure */
     TRefTrackPairProcessor();

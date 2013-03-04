@@ -15,15 +15,16 @@
  */
 
 #include <algorithm>
+#include <vector>
+
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
 
 namespace MAUS {
 
-
-GlobalEvent::GlobalEvent() :
-    _primary_chains(NULL), _tracks(NULL),
-    _track_points(NULL), _space_points(NULL) {
+GlobalEvent::GlobalEvent()
+    : _primary_chains(NULL), _tracks(NULL),
+      _track_points(NULL), _space_points(NULL) {
   _primary_chains =
       new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
   _tracks        = new std::vector<MAUS::DataStructure::Global::Track*>();
@@ -31,9 +32,9 @@ GlobalEvent::GlobalEvent() :
   _space_points   = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
 }
 
-GlobalEvent::GlobalEvent(const GlobalEvent& globalevent) :
-    _primary_chains(NULL), _tracks(NULL),
-    _track_points(NULL), _space_points(NULL) {
+GlobalEvent::GlobalEvent(const GlobalEvent& globalevent)
+    : _primary_chains(NULL), _tracks(NULL),
+      _track_points(NULL), _space_points(NULL) {
   *this = globalevent;
 }
 
@@ -43,8 +44,8 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
   }
 
   if (_primary_chains != NULL) {
-    if(!_primary_chains->empty())
-      for(size_t i = 0; i < _primary_chains->size(); ++i)
+    if (!_primary_chains->empty())
+      for (size_t i = 0; i < _primary_chains->size(); ++i)
         delete _primary_chains->at(i);
     delete _primary_chains;
   }
@@ -55,12 +56,12 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
         new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
     std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
         globalevent._primary_chains;
-    for(size_t i = 0; i < old_primary_chain->size(); ++i)
+    for (size_t i = 0; i < old_primary_chain->size(); ++i)
       _primary_chains->push_back(old_primary_chain->at(i)->Clone());
   }
 
   if (_tracks != NULL) {
-    for(size_t i = 0; i < _tracks->size(); ++i)
+    for (size_t i = 0; i < _tracks->size(); ++i)
       delete _tracks->at(i);
     delete _tracks;
   }
@@ -70,12 +71,12 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     _tracks = new std::vector<MAUS::DataStructure::Global::Track*>();
     std::vector<MAUS::DataStructure::Global::Track*>* old_tracks =
         globalevent._tracks;
-    for(size_t i = 0; i < old_tracks->size(); ++i)
+    for (size_t i = 0; i < old_tracks->size(); ++i)
       _tracks->push_back(old_tracks->at(i)->Clone());
   }
 
   if (_track_points != NULL) {
-    for(size_t i = 0; i < _track_points->size(); ++i)
+    for (size_t i = 0; i < _track_points->size(); ++i)
       delete _track_points->at(i);
     delete _track_points;
   }
@@ -85,12 +86,12 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     _track_points = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
     std::vector<MAUS::DataStructure::Global::TrackPoint*>* old_track_points =
         globalevent._track_points;
-    for(size_t i = 0; i < old_track_points->size(); ++i)
+    for (size_t i = 0; i < old_track_points->size(); ++i)
       _track_points->push_back(old_track_points->at(i)->Clone());
   }
 
   if (_space_points != NULL) {
-    for(size_t i = 0; i < _space_points->size(); ++i)
+    for (size_t i = 0; i < _space_points->size(); ++i)
       delete _space_points->at(i);
     delete _space_points;
   }
@@ -100,7 +101,7 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     _space_points = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
     std::vector<MAUS::DataStructure::Global::SpacePoint*>* old_space_points =
         globalevent._space_points;
-    for(size_t i = 0; i < old_space_points->size(); ++i)
+    for (size_t i = 0; i < old_space_points->size(); ++i)
       _space_points->push_back(old_space_points->at(i)->Clone());
   }
 
@@ -109,33 +110,32 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
 
 GlobalEvent::~GlobalEvent() {
   if (_primary_chains != NULL) {
-    for(size_t i = 0; i < _primary_chains->size(); ++i){
+    for (size_t i = 0; i < _primary_chains->size(); ++i) {
       delete _primary_chains->at(i);
     }
     delete _primary_chains;
   }
 
   if (_tracks != NULL) {
-    for(size_t i = 0; i < _tracks->size(); ++i){
+    for (size_t i = 0; i < _tracks->size(); ++i) {
       delete _tracks->at(i);
     }
     delete _tracks;
   }
 
   if (_track_points != NULL) {
-    for(size_t i = 0; i < _track_points->size(); ++i){
+    for (size_t i = 0; i < _track_points->size(); ++i) {
       delete _track_points->at(i);
     }
     delete _track_points;
   }
 
   if (_space_points != NULL) {
-    for(size_t i = 0; i < _space_points->size(); ++i){
+    for (size_t i = 0; i < _space_points->size(); ++i) {
       delete _space_points->at(i);
     }
     delete _space_points;
   }
-  
 }
 
 void GlobalEvent::add_primary_chain(
@@ -149,9 +149,9 @@ bool GlobalEvent::add_primary_chain_check(
   // to save repeated entries and wasted disk space).
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>::iterator pc_iter =
       std::find(_primary_chains->begin(), _primary_chains->end(), pchain);
-  
+
   bool exists = (pc_iter != _primary_chains->end());
-  if(!exists)
+  if (!exists)
     add_primary_chain(pchain);
 
   return exists;
@@ -164,20 +164,20 @@ void GlobalEvent::add_primary_chain_recursive(
 
   // If the chain had been added, then we will loop over the tracks
   // and add them too.
-  if(!already_added) {
+  if (!already_added) {
     std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator
         iter_track;
     std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *track_pair
         = pchain->get_track_parent_pairs();
     MAUS::DataStructure::Global::Track* track = NULL;
-    for(iter_track = track_pair->begin();
-        iter_track != track_pair->end(); ++iter_track){
+    for (iter_track = track_pair->begin();
+        iter_track != track_pair->end(); ++iter_track) {
       track = (*iter_track)->GetTrack();
       add_track_recursive(track);
     }
   }
 }
-    
+
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
 GlobalEvent::get_primary_chains() const {
   return _primary_chains;
@@ -197,9 +197,9 @@ bool GlobalEvent::add_track_check(MAUS::DataStructure::Global::Track* track) {
   // to save repeated entries and wasted disk space).
   std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter =
       std::find(_tracks->begin(), _tracks->end(), track);
-  
+
   bool exists = (track_iter != _tracks->end());
-  if(!exists)
+  if (!exists)
     add_track(track);
 
   return exists;
@@ -212,22 +212,22 @@ void GlobalEvent::add_track_recursive(
 
   // If the chain had been added, then we will loop over the
   // constituent tracks and track_points, adding them too.
-  if(!already_added) {
+  if (!already_added) {
     // Constituent Tracks
     MAUS::DataStructure::Global::Track* ct = NULL;
-    for(int i = 0; i < track->get_constituent_tracks()->GetLast() + 1; ++i) {
+    for (int i = 0; i < track->get_constituent_tracks()->GetLast() + 1; ++i) {
       ct = (MAUS::DataStructure::Global::Track*)
           track->get_constituent_tracks()->At(i);
-      if(!ct) continue;
+      if (!ct) continue;
       add_track_recursive(ct);
     }
 
     // TrackPoints
     MAUS::DataStructure::Global::TrackPoint* tp = NULL;
-    for(int i = 0; i < track->get_track_points()->GetLast() + 1; ++i) {
+    for (int i = 0; i < track->get_track_points()->GetLast() + 1; ++i) {
       tp = (MAUS::DataStructure::Global::TrackPoint*)
           track->get_track_points()->At(i);
-      if(!tp) continue;
+      if (!tp) continue;
       add_track_point_recursive(tp);
     }
   }
@@ -256,9 +256,9 @@ bool GlobalEvent::add_track_point_check(
       track_point_iter = std::find(_track_points->begin(),
                                   _track_points->end(),
                                   track_point);
-  
+
   bool exists = (track_point_iter != _track_points->end());
-  if(!exists)
+  if (!exists)
     add_track_point(track_point);
 
   return exists;
@@ -271,7 +271,7 @@ void GlobalEvent::add_track_point_recursive(
 
   // If the chain had been added, then we will add the constituent
   // space_point.
-  if(!already_added) {
+  if (!already_added) {
     // SpacePoints
     add_space_point_check(track_point->get_space_point());
   }
@@ -298,15 +298,15 @@ bool GlobalEvent::add_space_point_check(
   // to save repeated entries and wasted disk space).
   bool exists = false;
 
-  for(unsigned int i = 0; i < _space_points->size(); ++i) {
+  for (unsigned int i = 0; i < _space_points->size(); ++i) {
     MAUS::DataStructure::Global::SpacePoint* test = _space_points->at(i);
-    if(test == space_point){
+    if (test == space_point) {
       exists = true;
       break;
     }
   }
-  
-  if(!exists)
+
+  if (!exists)
     add_space_point(space_point);
 
   return exists;
@@ -321,6 +321,5 @@ void GlobalEvent::set_space_points(
     std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points) {
   _space_points = space_points;
 };
-
 }
 

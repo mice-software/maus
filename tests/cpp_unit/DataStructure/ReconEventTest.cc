@@ -24,7 +24,7 @@ namespace MAUS {
  */
 class ReconEventTestDS : public ::testing::Test {
  protected:
-  
+
   ReconEventTestDS() {}
   virtual ~ReconEventTestDS() {}
   virtual void SetUp() {}
@@ -74,7 +74,6 @@ TEST_F(ReconEventTestDS, test_all_constructors) {
     EXPECT_TRUE(emr_null == NULL);
     EXPECT_TRUE(trigger_null == NULL);
     EXPECT_TRUE(global_null == NULL);
-
 }
 
 TEST_F(ReconEventTestDS, test_all_allocators) {
@@ -103,7 +102,6 @@ TEST_F(ReconEventTestDS, test_all_allocators) {
     EXPECT_EQ(my_event.GetEMREvent(), emr_1);
     EXPECT_EQ(my_event.GetTriggerEvent(), trigger_1);
     EXPECT_EQ(my_event.GetGlobalEvent(), global_1);
-
 }
 
 TEST_F(ReconEventTestDS, test_all_reallocators) {
@@ -151,7 +149,6 @@ TEST_F(ReconEventTestDS, test_all_reallocators) {
     EXPECT_EQ(my_event.GetEMREvent(), emr_2);
     EXPECT_EQ(my_event.GetTriggerEvent(), trigger_2);
     EXPECT_EQ(my_event.GetGlobalEvent(), global_2);
-
 }
 
 TEST_F(ReconEventTestDS, test_copy_constructor) {
@@ -268,6 +265,5 @@ TEST_F(ReconEventTestDS, test_null_copy) {
     EXPECT_TRUE(my_event_equal.GetTriggerEvent() == NULL);
     EXPECT_TRUE(my_event_equal.GetGlobalEvent() == NULL);
 }
-
 }
 

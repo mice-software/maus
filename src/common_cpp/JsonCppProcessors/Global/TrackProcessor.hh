@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
+
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
@@ -34,8 +36,8 @@ namespace Global {
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01
  */
-class TrackProcessor :
-      public ObjectProcessor<MAUS::DataStructure::Global::Track> {
+class TrackProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::Track> {
  public:
   /** Constructor - registers the branch structure */
   TrackProcessor();
@@ -49,7 +51,6 @@ class TrackProcessor :
   ValueArrayProcessor<std::string> _geometry_paths_proc;
   TRefArrayProcessor _track_trefarray_proc;
   TRefArrayProcessor _track_point_trefarray_proc;
- 
 };
 } // ~namespace Global
 } // ~namespace Processor

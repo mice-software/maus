@@ -44,18 +44,18 @@ class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {
    *  Everything else is handled by the base class
    */
   GlobalEventProcessor();
-  
+
  private:
-  
+
   PointerArrayProcessor<MAUS::DataStructure::Global::SpacePoint>
   _global_space_point_array_proc;
-  
+
   PointerArrayProcessor<MAUS::DataStructure::Global::TrackPoint>
   _global_track_point_array_proc;
-  
+
   PointerArrayProcessor<MAUS::DataStructure::Global::Track>
   _global_track_array_proc;
-  
+
   PointerArrayProcessor<MAUS::DataStructure::Global::PrimaryChain>
   _global_primary_chain_array_proc;
 };

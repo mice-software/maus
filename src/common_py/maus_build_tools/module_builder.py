@@ -38,10 +38,11 @@ class ModuleBuilder:
     sconscript files call these functions
     """
 
-    def __init__(self, scons_environment):
+    def __init__(self, scons_environment, scons_configuration):
         """
         Initialise the ModuleBuilder
         """
+        self.conf = scons_configuration
         self.env = scons_environment
         self.project_list = []
         self.dependency_dict = {}
@@ -49,11 +50,12 @@ class ModuleBuilder:
         self.local_environments = {}
 
     # sets up the sconscript file for a given sub-project
-    def subproject(self, project): #pylint: disable=C0103, R0201
+    def subproject(self, project, env, conf):#pylint: disable=C0103, R0201,W0613
         """
         Build the Subproject with name project
         """
-        SConscript(sconscript_path(project), exports=['project']) # pylint: disable=E0602, C0301
+        SConscript(sconscript_path(project),
+                   exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
 
     #sets up the build for a given project
@@ -144,8 +146,11 @@ class ModuleBuilder:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
-                    self.subproject(directory)
-                    cpp_libs.append(parts[2])
+                    self.subproject(directory, self.env, self.conf)
+                    if build_okay(directory):
+                        cpp_libs.append(parts[2])
+                    else:
+                        print "  Build failed", directory
         return cpp_libs, py_libs
 
 
@@ -200,4 +205,17 @@ def build_maus_lib(filename, stuff_to_import):
         file_to_import.write("\n")
 
     file_to_import.close()
+
+def build_okay(directory):
+    """
+    Return true if the project at <directory> built okay. Else return false.
+
+    I believe there is no way to return a value from a sconscript file.
+    So to indicate a failed build we make a temporary file called
+    <project>_failed_build in sconscript and then look for it here.
+    """
+    fail_path = os.path.split(directory)[-1]
+    fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
+    fail_path = os.path.expandvars(fail_path)
+    return not os.path.exists(fail_path)
 

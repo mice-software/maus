@@ -30,13 +30,13 @@ namespace Processor {
 namespace Global {
 
 /** @class PrimaryChainProcessor processor for
- *  MAUS::DataStructure::Global::PrimaryChain 
+ *  MAUS::DataStructure::Global::PrimaryChain
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01
- * 
+ *
  */
-class PrimaryChainProcessor :
-      public ObjectProcessor<MAUS::DataStructure::Global::PrimaryChain> {
+class PrimaryChainProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::PrimaryChain> {
  public:
   /** Constructor - registers the branch structure */
   PrimaryChainProcessor();
@@ -47,7 +47,6 @@ class PrimaryChainProcessor :
   PointerArrayProcessor<MAUS::DataStructure::Global::TRefTrackPair>
   _treftrackpair_array_proc;
   TRefArrayProcessor _primary_chain_trefarray_proc;
-  
 };
 } // ~namespace Global
 } // ~namespace Processor

@@ -35,8 +35,8 @@ namespace Global {
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01
  */
-class TrackPointProcessor :
-      public ObjectProcessor<MAUS::DataStructure::Global::TrackPoint> {
+class TrackPointProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::TrackPoint> {
  public:
   /** Constructor - registers the branch structure */
   TrackPointProcessor();

@@ -68,9 +68,9 @@ inline Json::Value* TRefArrayProcessor::CppToJson(
   JsonWrapper::Path::SetPath(*array, path);
   array->resize(tref_array->GetEntries());
   TObject *array_element;
-  for(int i = 0; i < tref_array->GetLast()+1; ++i) {
+  for (int i = 0; i < tref_array->GetLast()+1; ++i) {
     array_element = tref_array->At(i);
-    if(!array_element) continue;
+    if (!array_element) continue;
     (*array)[i] = Json::Value();
     JsonWrapper::Path::SetPath((*array)[i], path);
     JsonWrapper::Path::AppendPath((*array)[i], i);

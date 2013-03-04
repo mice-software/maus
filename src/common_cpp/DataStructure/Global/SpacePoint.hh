@@ -70,27 +70,27 @@ class SpacePoint : public TObject {
   /// Set the calibrated 'charge' or energy deposit of the matching
   /// detector measurement.
   void set_charge(double charge);
-  
+
   /// Get the calibrated 'charge' or energy deposit of the matching
   /// detector measurement.
   double get_charge() const;
 
   /// Set the 4D position of the detector measurement.
   void set_position(TLorentzVector position);
-      
+
   /// Get the 4D position of the detector measurement.
   TLorentzVector get_position() const;
 
   /// Set the error on the 4D position of the detector measurement.
   void set_position_error(TLorentzVector position_error);
-  
+
   /// Get the error on the 4D position of the detector measurement.
   TLorentzVector get_position_error() const;
 
   /// Set the MAUS::global::recon::DetectorPoint flag for the
   /// SpacePoint, defining which detector produced the point.
   void set_detector(DetectorPoint detector);
-  
+
   /// Get the MAUS::global::recon::DetectorPoint flag, #_detector, for the
   /// SpacePoint, which defines the detector that produced this point.
   DetectorPoint get_detector() const;
@@ -98,10 +98,10 @@ class SpacePoint : public TObject {
   /// Set the fully qualified geometry path for this point in space.  This
   /// string may not be required in the end...
   void set_geometry_path(std::string geometry_path);
-  
+
   /// Get the fully qualified geometry path for this point in space.
   std::string get_geometry_path() const;
-  
+
  private:
 
   /// The calibrated 'charge' or energy deposit of the detector
@@ -121,7 +121,7 @@ class SpacePoint : public TObject {
 
   ClassDef(SpacePoint, 1)
 }; // ~class SpacePoint
-  
+
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

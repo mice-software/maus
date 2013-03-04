@@ -25,35 +25,35 @@ namespace MAUS {
  */
 class GlobalEventTestDS : public ::testing::Test {
  protected:
-  
+
   GlobalEventTestDS() {}
   virtual ~GlobalEventTestDS() {}
   virtual void SetUp() {
     // Fill Cpp GlobalEvent
-    for(int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {
       _track_point.push_back(new MAUS::DataStructure::Global::TrackPoint());
       _space_point.push_back(new MAUS::DataStructure::Global::SpacePoint());
       _space_point[i]->set_charge(1. * i);
       _track_point[i]->set_space_point(_space_point[i]);
     }
-    
-    for(int i = 0; i < 2; ++i) {
+
+    for (int i = 0; i < 2; ++i) {
       _track.push_back(new MAUS::DataStructure::Global::Track());
       _track[i]->AddTrackPoint(_track_point[2*i] );
       _track[i]->AddTrackPoint(_track_point[2*i + 1]);
     }
-    
+
     _chain = new MAUS::DataStructure::Global::PrimaryChain();
     _chain->AddPrimaryTrack(_track[0]);
     _chain->AddTrack(_track[1], _track[0]);
-    
+
     _event = new MAUS::GlobalEvent();
     _event->add_primary_chain_recursive(_chain);
 
     local_chain = NULL;
     local_track.resize(2);
     local_track_point.resize(4);
-    local_space_point.resize(4);    
+    local_space_point.resize(4);
   }
   virtual void TearDown() {}
 
@@ -62,23 +62,22 @@ class GlobalEventTestDS : public ::testing::Test {
   std::vector<MAUS::DataStructure::Global::Track*> _track;
   std::vector<MAUS::DataStructure::Global::TrackPoint*> _track_point;
   std::vector<MAUS::DataStructure::Global::SpacePoint*> _space_point;
-  
+
   MAUS::DataStructure::Global::PrimaryChain *local_chain;
   std::vector<MAUS::DataStructure::Global::Track*> local_track;
   std::vector<MAUS::DataStructure::Global::TrackPoint*> local_track_point;
   std::vector<MAUS::DataStructure::Global::SpacePoint*> local_space_point;
-  
 };
 
 TEST_F(GlobalEventTestDS, test_all_constructors) {
   EXPECT_TRUE(_event);
   EXPECT_TRUE(_chain);
 
-  for(int i = 0; i < 2; ++i){
+  for (int i = 0; i < 2; ++i) {
     EXPECT_TRUE(_track[i]);
   }
-  
-  for(int i = 0; i < 4; ++i) {
+
+  for (int i = 0; i < 4; ++i) {
     EXPECT_TRUE(_track_point[i]);
     EXPECT_TRUE(_space_point[i]);
     double charge = _space_point[i]->get_charge();
@@ -267,7 +266,7 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
   ASSERT_TRUE(event_equal.get_space_points());
   EXPECT_NE(event_equal.get_space_points(), event.get_space_points());
   EXPECT_EQ(event_equal.get_space_points()->size(), space_points->size());
-  EXPECT_NE(event_equal.get_space_points()->at(0), space_points->at(0));  
+  EXPECT_NE(event_equal.get_space_points()->at(0), space_points->at(0));
 }
 
 TEST_F(GlobalEventTestDS, test_null_copy) {
@@ -341,7 +340,7 @@ TEST_F(GlobalEventTestDS, test_recursive_add) {
   global_chain->AddPrimaryTrack(global_track);
 
   event.add_primary_chain_recursive(global_chain);
-  
+
   ASSERT_TRUE(event.get_primary_chains());
   EXPECT_EQ(event.get_primary_chains()->size(), 1U);
   EXPECT_EQ(event.get_primary_chains()->at(0), global_chain);
@@ -358,6 +357,5 @@ TEST_F(GlobalEventTestDS, test_recursive_add) {
   EXPECT_EQ(event.get_space_points()->size(), 1U);
   EXPECT_EQ(event.get_space_points()->at(0), global_space_point);
 }
-
 }
 

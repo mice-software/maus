@@ -30,12 +30,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TREFTRACKPAIR_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TREFTRACKPAIR_HH_
 
-// C++ headers
 #include <utility>
 
-// ROOT headers
-#include <TRef.h>
-
+#include "TRef.h"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
 
 namespace MAUS {

@@ -45,10 +45,10 @@ class ImportSciFiRecon {
  public:
 
   /// Default constructor
-  ImportSciFiRecon() {};
+  ImportSciFiRecon() {}
 
   /// Destructor
-  ~ImportSciFiRecon() {};
+  ~ImportSciFiRecon() {}
 
   /**  Main process, accepting the MAUS::SciFiEvent and importing
        track details into an existing MAUS::GlobalEvent
@@ -74,7 +74,7 @@ class ImportSciFiRecon {
       const MAUS::SciFiStraightPRTrackArray straightarray,
       MAUS::GlobalEvent* global_event,
       std::string mapper_name);
-  
+
   /// Import Straight tracks, populating a
   /// MAUS::recon::global::PrimaryChain object with
   /// MAUS::recon::global::Track's, MAUS::recon::global::TrackPoint's
@@ -83,9 +83,7 @@ class ImportSciFiRecon {
       const MAUS::SciFiHelicalPRTrackArray helicalarray,
       MAUS::GlobalEvent* global_event,
       std::string mapper_name);
-  
 }; // ~class ImportSciFiRecon
-
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS

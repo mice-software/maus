@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include <TRef.h>
-#include <TRefArray.h>
+#include "TRef.h"
+#include "TRefArray.h"
 
 #include "json/value.h"
 

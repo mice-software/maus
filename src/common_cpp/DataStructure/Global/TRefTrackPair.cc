@@ -31,43 +31,43 @@ namespace DataStructure {
 namespace Global {
 
 TRefTrackPair::TRefTrackPair() {
-  this->first = TRef(NULL); 
-  this->second = TRef(NULL); 
+  this->first = TRef(NULL);
+  this->second = TRef(NULL);
 };
 
 TRefTrackPair::TRefTrackPair(TRef f, TRef s) {
-  this->first = f; 
-  this->second = s; 
+  this->first = f;
+  this->second = s;
 };
 
 TRefTrackPair::TRefTrackPair(MAUS::DataStructure::Global::Track* track,
                              MAUS::DataStructure::Global::Track* parent) {
-  this->first = track; 
-  this->second = parent; 
+  this->first = track;
+  this->second = parent;
 };
 
 // Destructor
-TRefTrackPair::~TRefTrackPair() {};
+TRefTrackPair::~TRefTrackPair() {}
 
 // Set the Track
 void TRefTrackPair::SetTrack(MAUS::DataStructure::Global::Track* track) {
-  this->first = track; 
-}    
+  this->first = track;
+}
 
 // Get a const pointer to the track
 MAUS::DataStructure::Global::Track* TRefTrackPair::GetTrack() const {
   return (MAUS::DataStructure::Global::Track*) this->first.GetObject();
-}    
+}
 
 // Set the Parent
 void TRefTrackPair::SetParent(MAUS::DataStructure::Global::Track* parent) {
-  this->second = parent; 
-}    
+  this->second = parent;
+}
 
 // Get a const pointer to the parent
 MAUS::DataStructure::Global::Track* TRefTrackPair::GetParent() const {
   return (MAUS::DataStructure::Global::Track*) this->second.GetObject();
-}    
+}
 
 // Setter for first element, for TRefTrackPairProcessor
 void TRefTrackPair::set_first(TRef first) {

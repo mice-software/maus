@@ -17,7 +17,9 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
 
-#include "Rtypes.h"  // ROOT
+#include <vector>
+
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
@@ -29,17 +31,17 @@ namespace MAUS {
 /** @class GlobalEvent comment
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01 - Expanded from original 'blank slate'
- *	
+ *
  */
 
 class GlobalEvent {
  public:
   /** Default constructor - initialises to 0/NULL */
   GlobalEvent();
-  
+
   /** Copy constructor - any pointers are deep copied */
   GlobalEvent(const GlobalEvent& globalevent);
-  
+
   /** Equality operator - any pointers are deep copied */
   GlobalEvent& operator=(const GlobalEvent& globalevent);
 
@@ -139,28 +141,27 @@ class GlobalEvent {
    *  associated with this event. Different reconstruction steps can
    *  be distinguished by mapper_name. */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> *_primary_chains;
-  
+
   /** A vector of MAUS::DataStructure::Global::Track pointers associated with
    *  this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
    *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::Track*> *_tracks;
-  
+
   /** A vector of MAUS::DataStructure::Global::TrackPoint pointers
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
    *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::TrackPoint*> *_track_points;
-  
+
   /** A vector of MAUS::DataStructure::Global::SpacePoint pointers
    *  associated with this event. These should be accessed through the
    *  MAUS::DataStructure::Global::PrimaryChain pointers stored in
    *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::SpacePoint*> *_space_points;
 
-  ClassDef(GlobalEvent, 2)
+  MAUS_VERSIONED_CLASS_DEF(GlobalEvent);
 }; // ~GlobalEvent
-
 } // ~MAUS
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_

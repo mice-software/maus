@@ -15,15 +15,16 @@
  *
  */
 
-//////////////////////////////////////////////////////////////////////
-/// \file GlobalReconEnums.hh
-/// \author Ian Taylor, University of Warwick
-///	\date 2013/03/01
-///
-/// This file provides enumerators for: a) keeping track of the
-/// locations of space- and track_points within the global
-/// reconstruction and b) the particle ID hypotheses of reconstructed
-/// objects.
+
+/** @file GlobalReconEnums.hh
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01
+ * 
+ *  This file provides enumerators for: a) keeping track of the
+ *  locations of space- and track_points within the global
+ *  reconstruction and b) the particle ID hypotheses of reconstructed
+ *  objects.
+ */
 
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALRECONENUMS_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALRECONENUMS_HH_
@@ -92,7 +93,7 @@ const int kDetectorPointSize = 23;
 ///  consistent expansion as necessary.  The full possible list is
 ///  available at:
 ///  http://pdg.lbl.gov/2012/reviews/rpp2012-rev-monte-carlo-numbering.pdf
-///  Particles and antiparticles are considered identically here. 
+///  Particles and antiparticles are considered identically here.
 enum PID {
   kNoPID    = 0,
   kElectron = 11,

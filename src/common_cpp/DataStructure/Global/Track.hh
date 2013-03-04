@@ -71,22 +71,22 @@ class Track : public TObject {
   Track* Clone() const;
 
   // Getters and Setters for the member variables
-  
+
   /// Set the name for the mapper which produced the track, #_mapper_name.
   void set_mapper_name(std::string mapper_name);
-  
+
   /// Get the name for the mapper which produced the track, #_mapper_name.
   std::string get_mapper_name() const;
 
   /// Set the PID hypothesis, #_pid
   void set_pid(PID pid);
-  
+
   /// Get the PID hypothesis, #_pid
   PID get_pid() const;
 
   /// Set the particle charge hypothesis, #_charge.
   void set_charge(int charge);
-  
+
   /// Get the particle charge hypothesis, #_charge.
   int get_charge() const;
 
@@ -160,7 +160,7 @@ class Track : public TObject {
 
   /// Directly set the #_geometry_paths vector.
   void set_geometry_paths(std::vector<std::string> geometry_paths);
-  
+
   /// Direct access to the #_geometry_paths vector.
   std::vector<std::string> get_geometry_paths() const;
 
@@ -196,7 +196,7 @@ class Track : public TObject {
 
   /// Set the goodness of fit varialbe, #_goodness_of_fit.
   void set_goodness_of_fit(double goodness_of_fit);
-  
+
   /// Get the goodness of fit variable, #_goodness_of_fit.
   double get_goodness_of_fit() const;
 
@@ -244,7 +244,7 @@ class Track : public TObject {
 
   ClassDef(Track, 1)
 }; // ~class Track
-  
+
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

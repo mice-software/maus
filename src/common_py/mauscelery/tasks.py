@@ -45,7 +45,7 @@ def execute_transform(spill, client_id = "Unknown"):
     try:
         spill_json = json.loads(spill)
         if "maus_event_type" in spill_json.keys() and \
-           spill_json["maus_event_type"] != "spill":
+           spill_json["maus_event_type"] != "Spill":
             return spill
         else:
             return MausTransform.process(spill)

@@ -39,13 +39,13 @@ TEST_F(TrackTestDS, test_getters_setters) {
 
   MAUS::DataStructure::Global::PID pid =
       MAUS::DataStructure::Global::kElectron; // 11
-  
+
   int charge = 1;
 
   // Fill detectorpoints will current largest enum value, plus a
   // random selection.
   ASSERT_EQ(MAUS::DataStructure::Global::kDetectorPointSize - 1,
-            (int) MAUS::DataStructure::Global::kBPM);
+            static_cast<int>(MAUS::DataStructure::Global::kBPM));
   unsigned int detectorpoints =
       (1u << MAUS::DataStructure::Global::kTracker2S5);
   detectorpoints += (1u << MAUS::DataStructure::Global::kTOF0);
@@ -59,14 +59,14 @@ TEST_F(TrackTestDS, test_getters_setters) {
 
   TRefArray* track_points = new TRefArray();
   int track_points_size = 3;
-  for(int i = 0; i < track_points_size; ++i)
+  for (int i = 0; i < track_points_size; ++i)
     track_points->Add(new MAUS::DataStructure::Global::TrackPoint());
-  
+
   TRefArray* constituent_tracks = new TRefArray();
   int constituent_tracks_size = 3;
-  for(int i = 0; i < constituent_tracks_size; ++i)
+  for (int i = 0; i < constituent_tracks_size; ++i)
     constituent_tracks->Add(new MAUS::DataStructure::Global::Track());
-  
+
   double goodness_of_fit = 7.0;
 
   track.set_mapper_name(mapper_name);
@@ -86,23 +86,22 @@ TEST_F(TrackTestDS, test_getters_setters) {
 
   // Check size and contents of geometry_paths
   ASSERT_EQ(geometry_paths.size(), track.get_geometry_paths().size());
-  for(size_t j = 0; j < geometry_paths.size(); ++j){
+  for (size_t j = 0; j < geometry_paths.size(); ++j) {
     EXPECT_EQ(geometry_paths.at(j), track.get_geometry_paths().at(j));
   }
 
   // Check size and contents of track_points
   ASSERT_EQ(track_points_size, track.get_track_points()->GetEntries());
-  for(int j = 0; j < track_points_size; ++j){
+  for (int j = 0; j < track_points_size; ++j) {
     EXPECT_EQ(track_points->At(j), track.get_track_points()->At(j));
   }
 
   // Check size and contents of constituent_tracks
   ASSERT_EQ(constituent_tracks_size,
             track.get_constituent_tracks()->GetEntries());
-  for(int j = 0; j < constituent_tracks_size; ++j){
+  for (int j = 0; j < constituent_tracks_size; ++j) {
     EXPECT_EQ(constituent_tracks->At(j), track.get_constituent_tracks()->At(j));
   }
-
 }
 
 TEST_F(TrackTestDS, test_TrackPoint_Access) {
@@ -111,7 +110,7 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   // Prepare some detector points and virtual paths
   static const size_t kArraySize = 6;
   double zArray[kArraySize] = { 0., 1., 2., 3., 4., 5. };
-  
+
   DataStructure::Global::DetectorPoint dpArray[kArraySize] =
       { MAUS::DataStructure::Global::kVirtual,
         MAUS::DataStructure::Global::kTracker1S1,
@@ -129,11 +128,11 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
         "/Down/Again" };
 
   int unsortedArrayIndices[kArraySize] = {1, 0, 3, 4, 2, 5 };
-    
+
   // Make some track points
   MAUS::DataStructure::Global::TrackPoint* skipTP1 = NULL;
   MAUS::DataStructure::Global::TrackPoint* skipTP2 = NULL;
-  for(size_t i = 0; i < kArraySize; ++i){
+  for (size_t i = 0; i < kArraySize; ++i) {
     MAUS::DataStructure::Global::TrackPoint* tp =
         new MAUS::DataStructure::Global::TrackPoint();
 
@@ -148,15 +147,15 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
     track.AddTrackPoint(tp);
 
     // Save two TrackPoints, to remove later
-    if(unsortedArrayIndices[i] == 3) skipTP1 = tp;
-    if(unsortedArrayIndices[i] == 5) skipTP2 = tp;
+    if (unsortedArrayIndices[i] == 3) skipTP1 = tp;
+    if (unsortedArrayIndices[i] == 5) skipTP2 = tp;
   }
 
   track.SortTrackPointsByZ();
 
   track.RemoveTrackPoint(skipTP1);
   track.RemoveTrackPoint(skipTP2);
-  
+
   // Check the track points are correctly sorted
   int kNewArraySize = kArraySize - 2;
   ASSERT_EQ(kNewArraySize, track.get_track_points()->GetEntries());
@@ -165,8 +164,8 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   MAUS::DataStructure::Global::TrackPoint* tp1 =
       (MAUS::DataStructure::Global::TrackPoint*) tp_iter->Next();
   MAUS::DataStructure::Global::TrackPoint* tp2 = NULL;
-  while((tp2 = tp1) &&
-        (tp1 = (MAUS::DataStructure::Global::TrackPoint*) tp_iter->Next())) {
+  while ((tp2 = tp1) &&
+         (tp1 = (MAUS::DataStructure::Global::TrackPoint*) tp_iter->Next())) {
     ASSERT_TRUE(tp1);
     ASSERT_TRUE(tp2);
     EXPECT_GT(tp1->get_position().Z(), tp2->get_position().Z());
@@ -177,7 +176,7 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
       track.GetTrackPoints();
 
   ASSERT_EQ((size_t)kNewArraySize, tps.size());
-  
+
   // Check the detectorpoints are correctly set
   EXPECT_TRUE(track.HasDetector(dpArray[0]));
   EXPECT_TRUE(track.HasDetector(dpArray[1]));
@@ -206,7 +205,7 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   EXPECT_FALSE(track.HasDetector(dpArray[3]));
   EXPECT_FALSE(track.HasDetector(dpArray[4]));
   EXPECT_FALSE(track.HasDetector(dpArray[5]));
-  
+
   // Check the geometry path has one entry
   EXPECT_TRUE(track.HasGeometryPath(pathArray[0]));
   EXPECT_FALSE(track.HasGeometryPath(pathArray[1])); // Blank, not added
@@ -214,13 +213,12 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   EXPECT_FALSE(track.HasGeometryPath(pathArray[3])); // Blank, not added
   EXPECT_FALSE(track.HasGeometryPath(pathArray[4])); // Blank, not added
   EXPECT_FALSE(track.HasGeometryPath(pathArray[5])); // Removed
-  
+
   // Check the ClearGeometryPaths method
   track.ClearGeometryPaths();
   EXPECT_FALSE(track.HasGeometryPath(pathArray[0]));
-  
 }
-  
+
 TEST_F(TrackTestDS, test_ConstituentTrack_Access) {
   MAUS::DataStructure::Global::Track track;
 
@@ -245,7 +243,7 @@ TEST_F(TrackTestDS, test_ConstituentTrack_Access) {
 
   track.RemoveTrack(constituentTrack2);
   track.RemoveTrack(constituentTrack4);
-              
+
   EXPECT_TRUE(track.HasTrack(constituentTrack1));
   EXPECT_FALSE(track.HasTrack(constituentTrack2));
   EXPECT_TRUE(track.HasTrack(constituentTrack3));
@@ -256,9 +254,9 @@ TEST_F(TrackTestDS, test_ConstituentTrack_Access) {
   ASSERT_EQ(2U, ts.size());
   EXPECT_TRUE(constituentTrack1 == ts.at(0));
   EXPECT_TRUE(constituentTrack3 == ts.at(1));
- 
+
   track.ClearTracks();
-              
+
   EXPECT_FALSE(track.HasTrack(constituentTrack1));
   EXPECT_FALSE(track.HasTrack(constituentTrack2));
   EXPECT_FALSE(track.HasTrack(constituentTrack3));
@@ -269,7 +267,7 @@ TEST_F(TrackTestDS, test_default_constructor) {
   MAUS::DataStructure::Global::Track track;
 
   size_t detectorpoints = 0;
-  
+
   EXPECT_EQ("", track.get_mapper_name());
   EXPECT_EQ(MAUS::DataStructure::Global::kNoPID, track.get_pid());
   EXPECT_EQ(0, track.get_charge());
@@ -288,7 +286,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
 
   MAUS::DataStructure::Global::PID pid =
       MAUS::DataStructure::Global::kElectron; // 11
-  
+
   int charge = -1;
 
   MAUS::DataStructure::Global::TrackPoint* tp0 =
@@ -329,7 +327,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
 
   MAUS::DataStructure::Global::Track *track2 =
       new MAUS::DataStructure::Global::Track(*track1);
-  
+
   EXPECT_EQ(mapper_name, track2->get_mapper_name());
   EXPECT_EQ(pid, track2->get_pid());
   EXPECT_EQ(charge, track2->get_charge());
@@ -352,7 +350,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
 
   MAUS::DataStructure::Global::PID pid =
       MAUS::DataStructure::Global::kElectron; // 11
-  
+
   int charge = -1;
 
   MAUS::DataStructure::Global::TrackPoint* tp0 =
@@ -393,7 +391,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
 
   MAUS::DataStructure::Global::Track track2;
   track2 = (*track1);
-  
+
   EXPECT_EQ(mapper_name, track2.get_mapper_name());
   EXPECT_EQ(pid, track2.get_pid());
   EXPECT_EQ(charge, track2.get_charge());
@@ -416,7 +414,7 @@ TEST_F(TrackTestDS, test_clone_method) {
 
   MAUS::DataStructure::Global::PID pid =
       MAUS::DataStructure::Global::kElectron; // 11
-  
+
   int charge = -1;
 
   MAUS::DataStructure::Global::TrackPoint* tp0 =
@@ -456,10 +454,10 @@ TEST_F(TrackTestDS, test_clone_method) {
   track1->set_goodness_of_fit(goodness_of_fit);
 
   MAUS::DataStructure::Global::Track *track2 = track1->Clone();
-  
+
   ASSERT_TRUE(track2);
   EXPECT_NE(track1, track2);
-  
+
   EXPECT_EQ(mapper_name, track2->get_mapper_name());
   EXPECT_EQ(pid, track2->get_pid());
   EXPECT_EQ(charge, track2->get_charge());
@@ -476,7 +474,7 @@ TEST_F(TrackTestDS, test_clone_method) {
       (MAUS::DataStructure::Global::TrackPoint*)
       track2->get_track_points()->At(1);
   EXPECT_EQ("tp1", not_tp1->get_mapper_name());
-  
+
   EXPECT_EQ(detectorpoints, track2->get_detectorpoints());
 
   ASSERT_EQ(2U, track2->get_geometry_paths().size());
@@ -506,7 +504,7 @@ TEST_F(TrackTestDS, test_Throws) {
   ASSERT_THROW(track0.AddTrackPoint(tp0), Squeal);
 
   track0.AddTrackPoint(tp1);
-  
+
   ASSERT_THROW(track0.RemoveTrackPoint(tp0), Squeal);
   ASSERT_NO_THROW(track0.RemoveTrackPoint(tp1));
   ASSERT_THROW(track0.RemoveTrackPoint(tp2), Squeal);

@@ -15,8 +15,12 @@
  *
  */
 
+#include <sstream>
+
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "src/legacy/Interface/STLUtils.hh"
 
 namespace MAUS {
 
@@ -83,6 +87,13 @@ MiceModule* Globals::GetMonteCarloMiceModules() {
 
 MiceModule* Globals::GetReconstructionMiceModules() {
     return GetInstance()->_recon_mods;
+}
+
+std::string Globals::GetVersionNumberString() {
+    std::string version = STLUtils::ToString(MAUS_VERSION_NUMBER_X)+"."+
+                          STLUtils::ToString(MAUS_VERSION_NUMBER_Y)+"."+
+                          STLUtils::ToString(MAUS_VERSION_NUMBER_Z);
+    return version;
 }
 
 }  // namespace MAUS

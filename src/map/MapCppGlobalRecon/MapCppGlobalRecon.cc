@@ -53,12 +53,12 @@ std::string MapCppGlobalRecon::process(std::string document) const {
   Json::Value imported_json = JsonWrapper::StringToJson(document);
   data_json = &imported_json;
 
-  if(!data_json || data_json->isNull()){
+  if (!data_json || data_json->isNull()) {
     return std::string("{\"errors\":{\"bad_json_document\":")+
            std::string("\"Failed to parse input document\"}}");
   }
 
-  if(data_json->empty()){
+  if (data_json->empty()) {
     return std::string("{\"errors\":{\"bad_json_document\":")+
            std::string("\"Failed to parse input document\"}}");
   }
@@ -68,7 +68,7 @@ std::string MapCppGlobalRecon::process(std::string document) const {
   // prefer.
   data_cpp = json2cppconverter(data_json);
 
-  if(!data_cpp){
+  if (!data_cpp) {
     return std::string("{\"errors\":{\"failed_json_cpp_conversion\":")+
            std::string("\"Failed to convert Json to Cpp Spill object\"}}");
   }
@@ -77,14 +77,14 @@ std::string MapCppGlobalRecon::process(std::string document) const {
 
   MAUS::ReconEventArray* recon_events = spill->GetReconEvents();
 
-  if(!recon_events) {
+  if (!recon_events) {
     return document;
   }
 
   std::cout << "Recon Event Size:\t" << recon_events->size() << std::endl;
 
   MAUS::ReconEventArray::iterator recon_event_iter;
-  for(recon_event_iter = recon_events->begin();
+  for (recon_event_iter = recon_events->begin();
       recon_event_iter != recon_events->end();
       ++recon_event_iter) {
     // Load the ReconEvent, and import it into the GlobalEvent
@@ -98,7 +98,7 @@ std::string MapCppGlobalRecon::process(std::string document) const {
   // data_cpp->SetEventType
   data_json = cpp2jsonconverter(data_cpp);
 
-  if(!data_json){
+  if (!data_json) {
     return std::string("{\"errors\":{\"failed_cpp_json_conversion\":")+
            std::string("\"Failed to convert Cpp to Json Spill object\"}}");
   }
@@ -108,18 +108,18 @@ std::string MapCppGlobalRecon::process(std::string document) const {
 
 MAUS::GlobalEvent*
 MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
-  if(!recon_event) {
+  if (!recon_event) {
     throw(Squeal(Squeal::recoverable,
                  "Trying to import an empty recon event.",
                  "MapCppGlobalRecon::Import"));
   }
 
-  if(recon_event->GetGlobalEvent()) {
+  if (recon_event->GetGlobalEvent()) {
     throw(Squeal(Squeal::recoverable,
                  "Trying to replace GlobalEvent in ReconEvent",
                  "MapCppGlobalRecon::Import"));
   }
-  
+
   // Create our new GlobalEvent
   MAUS::GlobalEvent* global_event = new MAUS::GlobalEvent();
 
@@ -129,15 +129,15 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
   space_point->set_charge(1234.0);
   space_point->set_detector(MAUS::DataStructure::Global::kTracker1);
   space_point->set_geometry_path("FakeGeomPath");
-  
+
   global_event->add_space_point_check(space_point);
-  
+
   space_point = new MAUS::DataStructure::Global::SpacePoint();
 
   space_point->set_charge(2345.0);
   space_point->set_detector(MAUS::DataStructure::Global::kTracker2);
   space_point->set_geometry_path("RealGeomPath");
-  
+
   MAUS::DataStructure::Global::TrackPoint* track_point =
       new MAUS::DataStructure::Global::TrackPoint();
 
@@ -148,7 +148,7 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
 
   // // Import the various reconstruction elements
   // MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
-  // if(scifi_event) {
+  // if (scifi_event) {
   //   MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
   //   scifirecon_importer.process((*scifi_event), global_event, _classname);
   // }
@@ -156,13 +156,4 @@ MapCppGlobalRecon::Import(MAUS::ReconEvent* recon_event) const {
   // Return the new GlobalEvent, to be added to the ReconEvent
   return global_event;
 }
-
-
-// void MapCppGlobalRecon::print_event_info(GlobalEvent &event) {
-//   // std::cout << event.digits().size() << " "
-//   //           << event.clusters().size() << " "
-//   //           << event.space_points().size() << " "
-//   //             << event.straightprtracks().size() << " " << std::endl;
-// }
-
 } // ~MAUS

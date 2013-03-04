@@ -19,8 +19,7 @@
 
 #include <string>
 
-#include <TRef.h>
-
+#include "TRef.h"
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"

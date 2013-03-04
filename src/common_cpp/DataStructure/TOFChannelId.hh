@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_TOFCHANNELID_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_TOFCHANNELID_HH_
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -60,7 +60,7 @@ class TOFChannelId {
     int _plane;
     int _station;
 
-    ClassDef(TOFChannelId, 1)
+    MAUS_VERSIONED_CLASS_DEF(TOFChannelId)
 };
 }
 

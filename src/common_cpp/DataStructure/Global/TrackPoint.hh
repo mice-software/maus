@@ -57,7 +57,7 @@ namespace DataStructure {
 namespace Global {
 
 // Only elements in the DataStructure should inherit from TObject.
-class TrackPoint : public TObject{
+class TrackPoint : public TObject {
  public:
 
   /// Default constructor - initialises to 0/NULL
@@ -78,10 +78,10 @@ class TrackPoint : public TObject{
   TrackPoint* Clone();
 
   // Getters and Setters for the member variables
-  
+
   /// Set the name for the mapper which produced the track, #_mapper_name.
   void set_mapper_name(std::string mapper_name);
-  
+
   /// Get the name for the mapper which produced the track, #_mapper_name.
   std::string get_mapper_name() const;
 
@@ -89,7 +89,7 @@ class TrackPoint : public TObject{
   /// this point, based on detector measurements.  This will be
   /// undefined for MAUS::DataStructure::Global::kVirtual points.
   void set_charge(double charge);
-  
+
   /// Get the calibrated 'charge' or energy deposit at this point,
   /// #_charge.
   double get_charge() const;
@@ -97,7 +97,7 @@ class TrackPoint : public TObject{
   /// Set the 4D position of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   void set_position(TLorentzVector position);
-  
+
   /// Get the 4D position of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   TLorentzVector get_position() const;
@@ -105,7 +105,7 @@ class TrackPoint : public TObject{
   /// Set the error on the 4D position of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   void set_position_error(TLorentzVector position_error);
-  
+
   /// Get the error on the 4D position of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   TLorentzVector get_position_error() const;
@@ -113,7 +113,7 @@ class TrackPoint : public TObject{
   /// Set the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   void set_momentum(TLorentzVector momentum);
-  
+
   /// Get the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   TLorentzVector get_momentum() const;
@@ -121,7 +121,7 @@ class TrackPoint : public TObject{
   /// Set the error on the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   void set_momentum_error(TLorentzVector momentum_error);
-  
+
   /// Get the error on the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   TLorentzVector get_momentum_error() const;
@@ -131,7 +131,7 @@ class TrackPoint : public TObject{
   /// flag is kVirtual, then the TrackPoint does not correspond to a
   /// detector measurment.
   void set_detector(DetectorPoint detector);
-  
+
   /// Get the MAUS::global::recon::DetectorPoint flag for the
   /// SpacePoint, defining which detector produced the point. If the
   /// flag is kVirtual, then the TrackPoint does not correspond to a
@@ -143,7 +143,7 @@ class TrackPoint : public TObject{
   /// no matching detector measurement, but have been filled to define
   /// 'physics' points, e.g. immediately upstream of absorber region.
   void set_geometry_path(std::string geometry_path);
-  
+
   /// Get the fully qualified geometry path of this point in space.
   /// This will be primarily used for kVirtual TrackPoints, which have
   /// no matching detector measurement, but have been filled to define
@@ -153,7 +153,7 @@ class TrackPoint : public TObject{
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   void set_space_point_tref(TRef space_point);
-  
+
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   TRef get_space_point_tref() const;
@@ -161,7 +161,7 @@ class TrackPoint : public TObject{
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   void set_space_point(MAUS::DataStructure::Global::SpacePoint* space_point);
-  
+
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
   MAUS::DataStructure::Global::SpacePoint* get_space_point() const;
@@ -203,7 +203,7 @@ class TrackPoint : public TObject{
 
   ClassDef(TrackPoint, 1)
 }; // ~class TrackPoint
-  
+
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

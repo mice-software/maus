@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -79,7 +79,7 @@ class DateTime {
     static bool Check(std::string number, int minimum, int maximum_plus_one);
     static bool CheckDay(std::string day, std::string month);
     static bool CheckSeparators(std::string datetime);
-    ClassDef(DateTime, 1)
+    MAUS_VERSIONED_CLASS_DEF(DateTime)
 };
 }
 

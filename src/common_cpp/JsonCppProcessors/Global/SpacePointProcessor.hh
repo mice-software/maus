@@ -33,8 +33,8 @@ namespace Global {
  *  @author Ian Taylor, University of Warwick
  *  @date 2013/03/01
  */
-class SpacePointProcessor :
-      public ObjectProcessor<MAUS::DataStructure::Global::SpacePoint> {
+class SpacePointProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::SpacePoint> {
  public:
   /** Constructor - registers the branch structure */
   SpacePointProcessor();

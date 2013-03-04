@@ -18,7 +18,16 @@
 
 namespace MAUS {
 
-KLEventProcessor::KLEventProcessor() {
+KLEventProcessor::KLEventProcessor()
+    : _kl_digits_proc(), _kl_cell_hits_proc() {
+
+    RegisterValueBranch
+          ("kl_digits", &_kl_digits_proc, &KLEvent::GetKLEventDigit,
+          &KLEvent::SetKLEventDigit, false);
+
+    RegisterValueBranch
+          ("kl_cell_hits", &_kl_cell_hits_proc, &KLEvent::GetKLEventCellHit,
+          &KLEvent::SetKLEventCellHit, false);
 }
 }  // namespace MAUS
 

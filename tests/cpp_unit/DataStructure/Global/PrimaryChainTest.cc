@@ -38,7 +38,7 @@ class PrimaryChainTestDS : public ::testing::Test {
     _t2 = new MAUS::DataStructure::Global::Track();
     _t2->set_mapper_name("t2");
 
-    track_parent_pairs = 
+    track_parent_pairs =
         new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
     track_parent_pairs->push_back(
         new MAUS::DataStructure::Global::TRefTrackPair(_t0, NULL));
@@ -47,9 +47,9 @@ class PrimaryChainTestDS : public ::testing::Test {
     track_parent_pairs->push_back(
         new MAUS::DataStructure::Global::TRefTrackPair(_t2, _t0));
     _primary_chain0->set_track_parent_pairs(track_parent_pairs);
-        
+
     _goodness_of_fit = 5.;
-    _primary_chain0->set_goodness_of_fit(_goodness_of_fit);      
+    _primary_chain0->set_goodness_of_fit(_goodness_of_fit);
   }
   virtual void TearDown() {}
  protected:
@@ -73,7 +73,7 @@ TEST_F(PrimaryChainTestDS, test_named_constructor) {
 
   EXPECT_TRUE(primary_chain.get_track_parent_pairs()->empty());
   EXPECT_EQ(0., primary_chain.get_goodness_of_fit());
-  EXPECT_EQ("MapName",primary_chain.get_mapper_name());
+  EXPECT_EQ("MapName", primary_chain.get_mapper_name());
 }
 
 TEST_F(PrimaryChainTestDS, test_getters_setters) {
@@ -194,7 +194,7 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
   // Add t0 daughters
   primary_chain1->AddTrack(t2, t0);
   primary_chain1->AddTrack(t3, t0);
-  
+
   // Add t1 daughters
   primary_chain1->AddTrack(t4, t1);
 
@@ -264,7 +264,7 @@ TEST_F(PrimaryChainTestDS, test_TrackMethods) {
   primary_chain1->ClearTracks();
   EXPECT_TRUE(primary_chain1->get_track_parent_pairs()->empty());
 }
-  
+
 TEST_F(PrimaryChainTestDS, test_ParentMethods) {
   // SetParentChains
   MAUS::DataStructure::Global::PrimaryChain* primary_chain1 =
@@ -274,7 +274,7 @@ TEST_F(PrimaryChainTestDS, test_ParentMethods) {
   _primary_chain0->set_track_parent_pairs(track_parent_pairs);
   _primary_chain0->AddParentChain(primary_chain1);
   _primary_chain0->AddParentChain(primary_chain2);
-  
+
   // GetParentChains
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> chains =
       _primary_chain0->GetParentChains();
@@ -287,11 +287,11 @@ TEST_F(PrimaryChainTestDS, test_Throws) {
   MAUS::DataStructure::Global::Track* t6 = NULL;
   MAUS::DataStructure::Global::Track* t7 =
       new MAUS::DataStructure::Global::Track();
-  MAUS::DataStructure::Global::Track* t8 = 
+  MAUS::DataStructure::Global::Track* t8 =
       new MAUS::DataStructure::Global::Track();
   MAUS::DataStructure::Global::Track* t9 =
       new MAUS::DataStructure::Global::Track();
-  
+
   ASSERT_THROW(_primary_chain0->AddTrack(t6, t7), Squeal);
   ASSERT_THROW(_primary_chain0->AddPrimaryTrack(t6), Squeal);
 

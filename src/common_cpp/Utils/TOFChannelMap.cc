@@ -15,6 +15,7 @@
  *
  */
 
+
 #include "Utils/TOFChannelMap.hh"
 
 TOFChannelMap::~TOFChannelMap() {
@@ -26,6 +27,34 @@ TOFChannelMap::~TOFChannelMap() {
   _tdcKey.resize(0);
   _fadcKey.resize(0);
   _tofKey.resize(0);
+}
+
+
+TOFChannelMap::TOFChannelMap() {
+  this->Reset();
+}
+
+bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
+  _tof_station = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_trigger_station",
+                                               JsonWrapper::stringValue).asString();
+
+  // convert trigger station name to upper case
+  // the DB holds detector names in upper case
+  std::transform(_tof_station.begin(), _tof_station.end(),
+                                       _tof_station.begin(),
+                                       std::ptr_fun<int, int>(std::toupper));
+
+  _tof_cablingdate = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_cabling_date_from",
+                                               JsonWrapper::stringValue).asString();
+  // std::cout << "cabling date: " << _tof_cablingdate << std::endl;
+
+  bool loaded = this->InitFromCDB();
+  if (!loaded)
+    return false;
+
+  return true;
 }
 
 bool TOFChannelMap::InitFromFile(string filename) {
@@ -65,7 +94,36 @@ bool TOFChannelMap::InitFromFile(string filename) {
   return true;
 }
 
-void TOFChannelMap::InitFromCDB() {}
+bool TOFChannelMap::InitFromCDB() {
+  this->GetCabling(_tof_station, _tof_cablingdate);
+  std::cout << "got cabling" << std::endl;
+  TOFChannelKey* tofkey;
+  DAQChannelKey* tdckey;
+  DAQChannelKey* fadckey;
+  try {
+    while (!cblstr.eof()) {
+      tofkey = new TOFChannelKey();
+      tdckey = new DAQChannelKey();
+      fadckey = new DAQChannelKey();
+      cblstr >> *tofkey >> *fadckey >> *tdckey;
+      _tofKey.push_back(tofkey);
+      _tdcKey.push_back(tdckey);
+      _fadcKey.push_back(fadckey);
+    }
+  } catch(Squeal e) {
+    Squeak::mout(Squeak::error)
+    << "Error in TOFChannelMap::InitFromCDB : Error during loading." << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
+
+  if (_tofKey.size() == 0) {
+    Squeak::mout(Squeak::error)
+    << "Error in TOFChannelMap::InitFromCDB : Nothing is loaded. "  << std::endl;
+    return false;
+  }
+  return true;
+}
 
 TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqKey) {
   if (daqKey->eqType() == 102)
@@ -247,4 +305,70 @@ string TOFChannelKey::str() {
   return xConv.str();
 }
 
+
+void TOFChannelMap::Reset() {
+  // import the get_tof_cabling module
+  // this python module access and gets cabling from the DB
+  _cabling_mod = PyImport_ImportModule("calibration.get_tof_cabling");
+  if (_cabling_mod == NULL) {
+    std::cerr << "Failed to import get_tof_cabling module" << std::endl;
+    return;
+  }
+
+  PyObject* cabling_mod_dict = PyModule_GetDict(_cabling_mod);
+  if (cabling_mod_dict != NULL) {
+    PyObject* cabling_init = PyDict_GetItemString
+                                              (cabling_mod_dict, "GetCabling");
+    if (PyCallable_Check(cabling_init)) {
+        _tcabling = PyObject_Call(cabling_init, NULL, NULL);
+    }
+  }
+  if (_tcabling == NULL) {
+    std::cerr << "Failed to instantiate get_tof_cabling" << std::endl;
+    return;
+  }
+
+    // get the get_cabling_func() function
+  _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling");
+  if (_get_cabling_func == NULL) {
+    std::cerr << "Failed to find get_cabling function" << std::endl;
+    return;
+  }
+}
+
+void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
+  PyObject *py_arg = NULL, *py_value = NULL;
+  // setup the arguments to get_calib_func
+  // the arguments are 2 strings
+  // arg1 = device name (TOF0/TOF1/TOF2) uppercase
+  // this is actually not very meaningful since the cabling is for TOF not TOF0/1/2
+  // however the cabling schema does not have a generic "TOF" device
+  // hence using the trigger station as the default device
+  // arg2 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
+  // default date argument is "current"
+  // this is set via TOF_cabling_date_from card in ConfigurationDefaults
+  py_arg = Py_BuildValue("(ss)", devname.c_str(), fromdate.c_str());
+  if (py_arg == NULL) {
+    PyErr_Clear();
+    throw(Squeal(Squeal::recoverable,
+              "Failed to resolve arguments to get_cabling",
+              "MAUSEvaluator::evaluate"));
+    }
+    if (_get_cabling_func != NULL && PyCallable_Check(_get_cabling_func)) {
+        py_value = PyObject_CallObject(_get_cabling_func, py_arg);
+        // setup the stream to hold the cabling
+        if (py_value != NULL)
+            cblstr << PyString_AsString(py_value);
+    }
+    if (py_value == NULL) {
+        PyErr_Clear();
+        Py_XDECREF(py_arg);
+        throw(Squeal(Squeal::recoverable,
+                     "Failed to parse argument "+devname,
+                     "GetCabling::get_cabling"));
+    }
+    // clean up
+    Py_XDECREF(py_value);
+    Py_XDECREF(py_arg);
+}
 

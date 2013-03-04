@@ -32,7 +32,7 @@ class TrackPointTestDS : public ::testing::Test {
 
 TEST_F(TrackPointTestDS, test_getters_setters) {
   std::string mapper_name = "0";
-  
+
   double charge = 1.0;
 
   double x = -2.0;
@@ -131,7 +131,7 @@ TEST_F(TrackPointTestDS, test_default_constructor) {
 
 TEST_F(TrackPointTestDS, test_copy_constructor) {
   std::string mapper_name = "0";
-  
+
   double charge = 1.0;
 
   double x = -2.0;
@@ -163,7 +163,7 @@ TEST_F(TrackPointTestDS, test_copy_constructor) {
 
 TEST_F(TrackPointTestDS, test_assignment_operator) {
   std::string mapper_name = "0";
-  
+
   double charge = 1.0;
 
   double x = -2.0;
@@ -196,7 +196,7 @@ TEST_F(TrackPointTestDS, test_assignment_operator) {
 
 TEST_F(TrackPointTestDS, test_clone) {
   std::string mapper_name = "0";
-  
+
   double charge = 1.0;
 
   double x = -2.0;

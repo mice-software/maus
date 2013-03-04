@@ -33,37 +33,36 @@ void ImportSciFiRecon::process(const MAUS::SciFiEvent &scifi_event,
   // Import the straight tracks
   const MAUS::SciFiStraightPRTrackArray straightarray
       = scifi_event.straightprtracks();
-  
-  if(!straightarray.empty()){
+
+  if (!straightarray.empty()) {
     ImportStraightTracks(straightarray, global_event, mapper_name);
   }
-    
+
   // Import the helical tracks
   const MAUS::SciFiHelicalPRTrackArray helicalarray
       = scifi_event.helicalprtracks();
-  
-  if(!helicalarray.empty()){
+
+  if (!helicalarray.empty()) {
     ImportHelicalTracks(helicalarray, global_event, mapper_name);
   }
-    
 }
 
 void ImportSciFiRecon::ImportStraightTracks(
     const MAUS::SciFiStraightPRTrackArray straightarray,
     MAUS::GlobalEvent* global_event,
-    std::string mapper_name){
-  if(straightarray.empty()) {
+    std::string mapper_name) {
+  if (straightarray.empty()) {
     Squeak::mout(Squeak::debug) << "\tStraight Array size:\tEmpty"
                                 << std::endl;
     return;
   }
-  
+
   Squeak::mout(Squeak::debug)
       << "\tStraight Array size:\t"
       << straightarray.size() << std::endl;
 
   // Create a new MAUS::recon::global::PrimaryChain for the output.
-  std::string local_mapper_name = mapper_name + "/ImportStraight";  
+  std::string local_mapper_name = mapper_name + "/ImportStraight";
   MAUS::DataStructure::Global::PrimaryChain* pchain =
       new MAUS::DataStructure::Global::PrimaryChain(local_mapper_name);
 
@@ -77,34 +76,34 @@ void ImportSciFiRecon::ImportStraightTracks(
 void ImportSciFiRecon::ImportHelicalTracks(
     const MAUS::SciFiHelicalPRTrackArray helicalarray,
     MAUS::GlobalEvent* global_event,
-    std::string mapper_name){
-  if(helicalarray.empty()) {
+    std::string mapper_name) {
+  if (helicalarray.empty()) {
     Squeak::mout(Squeak::debug) << "\tHelical Array size:\tEmpty"
                                 << std::endl;
     return;
   }
-  
+
   Squeak::mout(Squeak::debug)
       << "\tHelical Array size:\t"
       << helicalarray.size() << std::endl;
 
   // Create a new MAUS::recon::global::PrimaryChain for the output.
-  std::string local_mapper_name = mapper_name + "/ImportHelical";  
+  std::string local_mapper_name = mapper_name + "/ImportHelical";
   MAUS::DataStructure::Global::PrimaryChain* pchain =
       new MAUS::DataStructure::Global::PrimaryChain(local_mapper_name);
 
   // Loop over the input array, accessing each track
   MAUS::SciFiHelicalPRTrackArray::const_iterator track_iter;
-  for(track_iter = helicalarray.begin();
+  for (track_iter = helicalarray.begin();
       track_iter != helicalarray.end();
-      ++track_iter){
+      ++track_iter) {
     const SciFiHelicalPRTrack* helical_track = &(*track_iter);
-    
+
     Squeak::mout(Squeak::debug)
         << "\t\tHelical Track:\t"
         << std::endl;
   }
-  
+
   // Add the MAUS::recon::global::PrimaryChain result to the
   // MAUS::GlobalEvent
   global_event->add_primary_chain_recursive(pchain);

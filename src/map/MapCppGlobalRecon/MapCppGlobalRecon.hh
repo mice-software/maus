@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppGlobalRecon 
+/** @class MapCppGlobalRecon
  *  Digitize events by running Global electronics simulation.
  *
  */
@@ -28,7 +28,6 @@
 // C headers
 #include <assert.h>
 #include <json/json.h>
-//#include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
 #include <cmath>
@@ -57,7 +56,7 @@ class MapCppGlobalRecon {
  public:
   /** Constructor, setting the internal variable #_classname */
   MapCppGlobalRecon();
-      
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -100,6 +99,6 @@ class MapCppGlobalRecon {
   // Mapper name, useful for tracking results...
   std::string _classname;
 }; // Don't forget this trailing colon!!!!
-} //~MAUS
+} // ~MAUS
 
 #endif

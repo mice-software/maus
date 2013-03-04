@@ -72,7 +72,7 @@ TrackPoint& TrackPoint::operator=(const TrackPoint &track_point) {
 TrackPoint* TrackPoint::Clone() {
   MAUS::DataStructure::Global::TrackPoint* tpNew =
       new MAUS::DataStructure::Global::TrackPoint();
-  
+
   tpNew->set_mapper_name(this->get_mapper_name());
   tpNew->set_charge(this->get_charge());
   tpNew->set_position(this->get_position());

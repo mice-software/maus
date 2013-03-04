@@ -19,8 +19,7 @@
 
 #include <string>
 
-#include <TRefArray.h>
-
+#include "TRefArray.h"
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefArrayItem.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -41,7 +40,7 @@ namespace ObjectProcessorNS {
 template <class ParentType>
 class PointerTRefArrayItem : public BaseItem<ParentType> {
  public:
-  typedef void (ParentType::*SetMethod)(TRefArray*);
+  typedef void (ParentType::*SetMethod)(TRefArray* ref_array);
   typedef TRefArray* (ParentType::*GetMethod)() const;
 
   /** Constructor

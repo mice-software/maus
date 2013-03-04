@@ -85,7 +85,7 @@ void RefManager::SetPointerAsValue
     // If the object inherits from a TObject, add a second entry in a
     // second table, so that we can find the pointer from a TRef.
     TObject* tobject_pointer = (TObject*) pointer;
-    if(tobject_pointer) {
+    if (tobject_pointer) {
       TypedPointerValueTable<TObject>* tableTObject =
           GetTypedPointerValueTable<TObject>();
       if (tableTObject->_data_hash.find(tobject_pointer) !=
@@ -103,7 +103,7 @@ template <class PointerType>
 std::string RefManager::GetPointerAsValue(PointerType* pointer) {
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
-    if(!table) {
+    if (!table) {
         throw(Squeal(Squeal::recoverable,
                      "Attempt to get pointer for json address "+
                      STLUtils::ToString(pointer)+

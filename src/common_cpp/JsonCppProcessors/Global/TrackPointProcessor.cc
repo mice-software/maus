@@ -26,7 +26,7 @@ TrackPointProcessor::TrackPointProcessor() {
       &MAUS::DataStructure::Global::TrackPoint::get_mapper_name,
       &MAUS::DataStructure::Global::TrackPoint::set_mapper_name,
       true);
-    
+
   RegisterValueBranch(
       "charge", &_double_proc,
       &MAUS::DataStructure::Global::TrackPoint::get_charge,

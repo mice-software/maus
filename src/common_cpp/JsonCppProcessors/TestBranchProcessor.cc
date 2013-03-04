@@ -22,17 +22,22 @@ namespace MAUS {
 
 TestBranchProcessor::TestBranchProcessor() {
     RegisterPointerBranch
-           ("test_child_by_value", &_double_proc, &TestBranch::GetDoubleByValue,
-            &TestBranch::SetDoubleByValue, true);
+           ("test_child_by_value", &_child_proc, &TestBranch::GetChildByValue,
+            &TestBranch::SetChildByValue, true);
     RegisterPointerReference
-               ("test_child_by_ref",
-                &TestBranch::GetDoubleByRef,
-                &TestBranch::SetDoubleByRef,
+               ("test_required_child_by_ref",
+                &TestBranch::GetRequiredChildByRef,
+                &TestBranch::SetRequiredChildByRef,
                 true);
+    RegisterPointerReference
+               ("test_not_req_child_by_ref",
+                &TestBranch::GetNotRequiredChildByRef,
+                &TestBranch::SetNotRequiredChildByRef,
+                false);
     RegisterPointerBranch("test_child_array",
-                &_double_array_proc,
-                &TestBranch::GetDoubleArray,
-                &TestBranch::SetDoubleArray,
+                &_child_array_proc,
+                &TestBranch::GetChildArray,
+                &TestBranch::SetChildArray,
                 true);
 }
 }

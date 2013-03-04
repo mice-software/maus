@@ -35,7 +35,7 @@ PointerTRefItem<ParentType>::PointerTRefItem(
     _setter(setter),
     _getter(getter), _required(is_required) {
 }
-  
+
 template <class ParentType>
 void PointerTRefItem<ParentType>::_SetCppChild
 (const Json::Value& parent_json, ParentType& parent_cpp) {

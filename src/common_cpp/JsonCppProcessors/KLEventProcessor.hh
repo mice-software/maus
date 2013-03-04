@@ -19,11 +19,15 @@
 
 #include "src/common_cpp/DataStructure/KLEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLEventDigitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLEventCellHitProcessor.hh"
 
 namespace MAUS {
 
 /** @class KLEventProcessor Conversions for KLEvent between C++ and Json 
  *
+ *  @var _kl_digits_proc_proc Processor for _kl_digits
+ *  @var _kl_cell_hits_proc_proc Processor for _kl_cell_hits
  */
 
 class KLEventProcessor : public ObjectProcessor<KLEvent> {
@@ -35,6 +39,8 @@ class KLEventProcessor : public ObjectProcessor<KLEvent> {
     KLEventProcessor();
 
   private:
+    KLEventDigitProcessor _kl_digits_proc;
+    KLEventCellHitProcessor _kl_cell_hits_proc;
 };
 }  // namespace MAUS
 

@@ -25,8 +25,8 @@ import unittest
 
 from datetime import datetime
  
-from celery.task.control import broadcast
-from celery.task.control import inspect
+from celery.task.control import broadcast #pylint: disable=E0611, F0401
+from celery.task.control import inspect #pylint: disable=E0611, F0401
 
 from Configuration import Configuration
 from MapPyTestMap import MapPyTestMap

@@ -20,30 +20,41 @@
 #  This class is meant to mimick MapCppPrint and output in
 #  a human readable format each spill.  It's also useful to
 #  look at to figure out how MAUS mappers work.
-
+"""MapPyPrint.py"""
 import json
 
 class MapPyPrint:
-    def birth(self, argJsonConfigDocument):
-        self._sortKeys = True
-        self._indent = 4
+    """MapPyPrint"""
+    def __init__(self):
+        """__init__"""
+        pass
+    
+    def birth(self, argJsonConfigDocument):#pylint: disable =C0103,W0613
+        """birth"""
+        self._sort_keys = True#pylint: disable =W0201
+        self._indent = 4#pylint: disable =W0201
         return True
 
     def process(self, spill):
+        """process"""
         try:
             spill_dict = json.loads(spill)
             print "MapPyPrint output:"
-            print json.dumps(spill_dict, sort_keys=self._sortKeys, indent=self._indent)  #  print spill
-        except:
-            y = {}
+            print json.dumps(spill_dict,
+                             sort_keys=self._sort_keys,
+                             indent=self._indent)  #  print spill
+        except: #pylint: disable =W0702
+            y = {}#pylint: disable =C0103
             y["errors"] = {}
-            y["errors"]["bad_json_document"] = "MapPyPrint couldn't parse the input"
+            y["errors"]["bad_json_document"] = "MapPyPrint couldn't "\
+                                               "parse the input"
             print y
             return json.dumps(y)
         return spill
 
 
-    def death(self):
+    def death(self):#pylint: disable =R0201
+        """death"""
         return True
 
 
