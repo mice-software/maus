@@ -49,6 +49,7 @@
 #include "TRef.h"
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
@@ -201,7 +202,7 @@ class TrackPoint : public TObject {
   /// measurement.
   TRef _space_point;
 
-  ClassDef(TrackPoint, 1)
+  MAUS_VERSIONED_CLASS_DEF(TrackPoint);
 }; // ~class TrackPoint
 
 } // ~namespace Global

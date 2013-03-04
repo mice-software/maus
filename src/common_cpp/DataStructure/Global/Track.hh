@@ -42,6 +42,7 @@
 #include "Rtypes.h"
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "DataStructure/Global/ReconEnums.hh"
 #include "DataStructure/Global/TrackPoint.hh"
 
@@ -242,7 +243,7 @@ class Track : public TObject {
   /// and trajectory.
   double _goodness_of_fit;
 
-  ClassDef(Track, 1)
+  MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track
 
 } // ~namespace Global

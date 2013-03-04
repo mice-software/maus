@@ -40,6 +40,7 @@
 #include "Rtypes.h"
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "Interface/Squeal.hh"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TRefTrackPair.hh"
@@ -191,7 +192,7 @@ class PrimaryChain : public TObject {
   /// result.
   TRefArray* _parent_primary_chains;
 
-  ClassDef(PrimaryChain, 1)
+  MAUS_VERSIONED_CLASS_DEF(PrimaryChain);
 }; // ~class PrimaryChain
 
 } // ~namespace Global

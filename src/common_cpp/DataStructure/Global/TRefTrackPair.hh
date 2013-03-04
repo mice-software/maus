@@ -33,6 +33,7 @@
 #include <utility>
 
 #include "TRef.h"
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
 
 namespace MAUS {
@@ -77,6 +78,8 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
 
   /// Getter for second element, for TRefTrackPairProcessor
   TRef get_second() const;
+
+  MAUS_VERSIONED_CLASS_DEF(TRefTrackPair);
 };
 } // ~namespace Global
 } // ~namespace DataStructure
