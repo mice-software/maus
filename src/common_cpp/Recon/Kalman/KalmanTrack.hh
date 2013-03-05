@@ -36,9 +36,6 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
-// #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-// #include "src/common_cpp/Utils/Globals.hh"
-// #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Recon/Kalman/Particle.hh"
 namespace MAUS {
 
@@ -118,13 +115,10 @@ class KalmanTrack {
   void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
   void prepare_for_smoothing(KalmanSite *last_site);
   void exclude_site(KalmanSite *site);
-  // TMatrixD get_kalman_gain(const KalmanSite *a_site);
 
-  // void get_site_properties(KalmanSite *site, double &thickess, double &density);
   void compute_chi2(const std::vector<KalmanSite> &sites);
   void compute_emittance(KalmanSite site);
 
-  // void update_misaligments(std::vector<KalmanSite> &sites, size_t i);
   void update_misaligments(std::vector<KalmanSite> &sites,
                            std::vector<KalmanSite> &sites_copy,
                            int station_i);
@@ -147,7 +141,6 @@ class KalmanTrack {
 
  protected:
   bool _use_MCS, _use_Eloss;
-  // int _inversion_sanity;
 
   TMatrixD _H;
 

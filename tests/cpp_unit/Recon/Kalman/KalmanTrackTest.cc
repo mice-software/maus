@@ -267,8 +267,4 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   track->calc_filtered_state
 */
 }
-
-
-
-
 } // ~namespace MAUS

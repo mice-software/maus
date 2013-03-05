@@ -28,7 +28,7 @@ KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.),
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov  = (*json)["SciFiSeedCovariance"].asDouble();
   _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
-  // type_of_dataflow = 'pipeline_single_thread'
+  _type_of_dataflow = (*json)["type_of_dataflow"].asString();
 
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
@@ -38,7 +38,6 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) {
-  // KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -72,8 +71,12 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     run_filter(track, sites);
 
-    // monitor.fill(sites);
-    // monitor.print_info(sites);
+    if ( _type_of_dataflow == "pipeline_single_thread" ) {
+      KalmanMonitor monitor;
+      monitor.fill(sites);
+      // monitor.print_info(sites);
+    }
+
     track->compute_chi2(sites);
     // track->compute_emittance(sites.front());
 

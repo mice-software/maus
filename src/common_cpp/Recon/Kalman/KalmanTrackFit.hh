@@ -80,10 +80,12 @@ class KalmanTrackFit {
             std::vector<KalmanSite> sites,
             SciFiEvent &event);
 
- protected:
+ private:
   double _seed_cov;
 
   bool _update_misalignments;
+
+  std::string _type_of_dataflow;
 };
 
 } // ~namespace MAUS

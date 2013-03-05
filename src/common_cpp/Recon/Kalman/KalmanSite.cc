@@ -24,9 +24,9 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
                           _id(-1),
                           _f_chi2(0.),
                           _s_chi2(0.),
-                          _direction(CLHEP::Hep3Vector(0., 0., 0.)),
-                          _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
-                          _mc_mom(CLHEP::Hep3Vector(0., 0., 0.)) {
+                          _direction(CLHEP::Hep3Vector()),
+                          _mc_pos(CLHEP::Hep3Vector()),
+                          _mc_mom(CLHEP::Hep3Vector()) {
   initialise();
 }
 
@@ -37,9 +37,9 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
                                                 _id(-1),
                                                 _f_chi2(0.),
                                                 _s_chi2(0.),
-                                                _direction(CLHEP::Hep3Vector(0., 0., 0.)),
-                                                _mc_pos(CLHEP::Hep3Vector(0., 0., 0.)),
-                                                _mc_mom(CLHEP::Hep3Vector(0., 0., 0.)) {
+                                                _direction(CLHEP::Hep3Vector()),
+                                                _mc_pos(CLHEP::Hep3Vector()),
+                                                _mc_mom(CLHEP::Hep3Vector()) {
   initialise();
 
   _z = site.get_z();

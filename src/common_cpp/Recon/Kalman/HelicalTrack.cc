@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-HelicalTrack::HelicalTrack() {
+HelicalTrack::HelicalTrack() : KalmanTrack() {
   _n_parameters = 5;
 }
 

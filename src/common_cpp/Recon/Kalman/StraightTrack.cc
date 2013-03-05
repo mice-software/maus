@@ -18,7 +18,7 @@
 
 namespace MAUS {
 
-StraightTrack::StraightTrack() {
+StraightTrack::StraightTrack() : KalmanTrack() {
   _n_parameters = 4;
 }
 
