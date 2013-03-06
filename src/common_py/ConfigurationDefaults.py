@@ -300,11 +300,7 @@ V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
 Do_VLSB_C_Zero_Suppression = True
-<<<<<<< TREE
-VLSB_C_Zero_Suppression_Threshold = 35
-=======
 VLSB_C_Zero_Suppression_Threshold = 60
->>>>>>> MERGE-SOURCE
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True

@@ -72,8 +72,8 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     run_filter(track, sites);
 
     if ( _type_of_dataflow == "pipeline_single_thread" ) {
-      KalmanMonitor monitor;
-      monitor.fill(sites);
+      // KalmanMonitor monitor;
+      // monitor.fill(sites);
       // monitor.print_info(sites);
     }
 
