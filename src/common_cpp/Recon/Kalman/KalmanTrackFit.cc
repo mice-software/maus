@@ -28,8 +28,9 @@ KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.),
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov  = (*json)["SciFiSeedCovariance"].asDouble();
   _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
-  _type_of_dataflow = (*json)["type_of_dataflow"].asString();
-
+  _type_of_dataflow     = (*json)["type_of_dataflow"].asString();
+  _use_MCS              = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_Eloss            = (*json)["SciFiKalman_use_Eloss"].asBool();
   std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
 }
 
@@ -38,6 +39,7 @@ KalmanTrackFit::~KalmanTrackFit() {
 }
 
 void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) {
+  KalmanMonitor monitor;
   KalmanSciFiAlignment kalman_align;
   kalman_align.load_misaligments();
 
@@ -53,17 +55,14 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     KalmanTrack *track = 0;
     if ( seed->is_straight() ) {
-      track = new StraightTrack();
+      track = new StraightTrack(_use_MCS, _use_Eloss);
     } else if ( seed->is_helical() ) {
-      track = new HelicalTrack();
+      track = new HelicalTrack(_use_MCS, _use_Eloss);
     } else {
       throw(Squeal(Squeal::recoverable,
             "Can't initialise KalmanTrack; seed undefined.",
             "KalmanTrackFit::process"));
     }
-    // muon assumption for now.
-    double muon_mass    = 105.7; // MeV/c
-    track->set_mass(muon_mass);
     double momentum = seed->get_momentum(); // MeV/c
     track->set_momentum(momentum);
     // Filter the first state.
@@ -72,19 +71,17 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     run_filter(track, sites);
 
     if ( _type_of_dataflow == "pipeline_single_thread" ) {
-      // KalmanMonitor monitor;
-      // monitor.fill(sites);
-      // monitor.print_info(sites);
+      monitor.fill(sites);
+      monitor.print_info(sites);
     }
 
     track->compute_chi2(sites);
-    // track->compute_emittance(sites.front());
+    save(track, sites, event);
 
     // Misalignment search.
     if ( _update_misalignments && track->f_chi2() < 20. && numb_measurements == 15 ) {
       launch_misaligment_search(track, sites, kalman_align);
     }
-    save(track, sites, event);
     delete track;
   }
 }

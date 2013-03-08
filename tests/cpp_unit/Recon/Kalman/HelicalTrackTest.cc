@@ -74,7 +74,7 @@ void HelicalTrackTest::set_up_sites() {
 TEST_F(HelicalTrackTest, test_propagation) {
   set_up_sites();
 
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   // old_site.get_a().Print();
   track->update_propagator(&old_site, &new_site);
   track->calc_predicted_state(&old_site, &new_site);

@@ -92,15 +92,15 @@ KalmanMonitor::KalmanMonitor(): file(0),
     pull_hist = new TH2F("pull", "Kalman", 30, 0, 29, 70, -30, 30);
     residual_hist = new TH2F("residual", "Kalman", 30, 0, 29, 70, -30, 30);
     smooth_residual_hist = new TH2F("smooth_residual", "Kalman", 30, 0, 29, 70, -30, 30);
-    x_proj_h = new TH2F("x_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -150, 150);
-    y_proj_h = new TH2F("y_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -150, 150);
-    px_proj_h = new TH2F("px_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
-    py_proj_h = new TH2F("py_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
-    pz_proj_h = new TH2F("pz_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
-    chi2_tracker0 = new TH1F("chi2_tracker0", "chi2_tracker0", 50, 0, 10);
-    chi2_tracker1 = new TH1F("chi2_tracker1", "chi2_tracker1", 50, 0, 10);
-    pvalue_tracker0 = new TH1F("pvalue_tracker0", "pvalue_tracker0", 100, 0, 1);
-    pvalue_tracker1 = new TH1F("pvalue_tracker1", "pvalue_tracker1", 100, 0, 1);
+    x_proj_h = new TH2F("x_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
+    y_proj_h = new TH2F("y_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -50, 50);
+    px_proj_h = new TH2F("px_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -30, 30);
+    py_proj_h = new TH2F("py_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -30, 30);
+    pz_proj_h = new TH2F("pz_proj_h", "projection residual; x, mm;", 31, 0, 30, 70, -30, 30);
+    chi2_tracker0 = new TH1F("chi2_tracker0", "chi2_tracker0", 70, 0, 10);
+    chi2_tracker1 = new TH1F("chi2_tracker1", "chi2_tracker1", 70, 0, 10);
+    pvalue_tracker0 = new TH1F("pvalue_tracker0", "pvalue_tracker0", 70, 0, 1);
+    pvalue_tracker1 = new TH1F("pvalue_tracker1", "pvalue_tracker1", 70, 0, 1);
     pull_site_3   = new TH1F("pull_site_3", "pull_site_3", 50, -10, 10);
     residual_site_3   = new TH1F("residual_site_3", "residual_site_3", 50, -10, 10);
     smoothed_residual_site_3   = new TH1F("smoothed_residual_site_3",
@@ -175,6 +175,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
     std::cerr << "SITE ID: " << site.get_id() << std::endl;
+    std::cerr << "Momentum: " << site.get_true_momentum() << std::endl;
     // std::cerr << "SITE Z: " << site.get_z() << std::endl;
     // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
     //                                   site.get_direction().y() << ", " <<

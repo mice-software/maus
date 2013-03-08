@@ -60,7 +60,7 @@ void StraightTrackTest::set_up_sites() {
 TEST_F(StraightTrackTest, propagator_test) {
   set_up_sites();
 
-  MAUS::KalmanTrack *track = new MAUS::StraightTrack();
+  MAUS::KalmanTrack *track = new MAUS::StraightTrack(false, false);
   track->update_propagator(&old_site, &new_site);
   track->calc_predicted_state(&old_site, &new_site);
 

@@ -19,8 +19,9 @@
 
 namespace MAUS {
 
-KalmanTrack::KalmanTrack() : _use_MCS(true),
-                             _use_Eloss(false),
+KalmanTrack::KalmanTrack(bool MCS, bool Eloss) :
+                             _use_MCS(MCS),
+                             _use_Eloss(Eloss),
                              _f_chi2(0.),
                              _s_chi2(0.),
                              _ndf(0),
@@ -28,7 +29,7 @@ KalmanTrack::KalmanTrack() : _use_MCS(true),
                              _n_parameters(0),
                              _n_sites(0),
                              _tracker(-1),
-                             _mass(0.),
+                             _mass(105.65837),
                              _momentum(0.),
                              _particle_charge(1) {
   // Measurement equation.
@@ -55,10 +56,6 @@ KalmanTrack::KalmanTrack() : _use_MCS(true),
   // Weight matrix.
   _W.ResizeTo(2, 2);
   _W.Zero();
-
-  // Json::Value *json = Globals::GetConfigurationCards();
-  // _use_MCS   = (*json)["SciFiKalman_use_MCS"].asBool();
-  // _use_Eloss = (*json)["SciFiKalman_use_Eloss"].asBool();
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -683,16 +680,6 @@ void KalmanTrack::compute_chi2(const std::vector<KalmanSite> &sites) {
   }
   _P_value = TMath::Prob(_f_chi2, _ndf);
   std::cerr <<_f_chi2<< " " << _P_value << std::endl;
-}
-
-void KalmanTrack::compute_emittance(KalmanSite site) {
-  TMatrixD covariance = site.get_covariance_matrix(KalmanSite::Smoothed);
-  covariance.ResizeTo(4, 4);
-  double determinant = covariance.Determinant();
-  emittance.epsilon = TMath::Power(determinant, 1./4.);
-  emittance.alpha   = 0.;
-  emittance.beta    = 0.;
-  emittance.gamma   = 0.;
 }
 
 // +++++++++++++++++++++++++++++

@@ -36,7 +36,7 @@ namespace MAUS {
 
 class StraightTrack : public KalmanTrack {
  public:
-  StraightTrack();
+  StraightTrack(bool MCS, bool Eloss);
 
   virtual ~StraightTrack();
 

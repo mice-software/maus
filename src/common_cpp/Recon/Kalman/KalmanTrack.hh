@@ -36,7 +36,11 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
-#include "src/common_cpp/Recon/Kalman/Particle.hh"
+// #include "src/common_cpp/Recon/Kalman/Particle.hh"
+
+//#include "src/common_cpp/Utils/Globals.hh"
+//#include "src/common_cpp/Globals/GlobalsManager.hh"
+
 namespace MAUS {
 
 class KalmanSite;
@@ -71,7 +75,7 @@ typedef struct BetheBloch {
 
 class KalmanTrack {
  public:
-  KalmanTrack();
+  KalmanTrack(bool MCS, bool Eloss);
 
   virtual ~KalmanTrack() {}
 
@@ -83,64 +87,55 @@ class KalmanTrack {
 
   virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
-  /// Projection: calculation of predicted state.
+  /// Projection methods
   void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Projection: calculation of covariance matrix.
   void calc_covariance(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Bethe-Bloch calculation.
   double BetheBlochStoppingPower(double p);
-  /// Subtract energy loss.
   void subtract_energy_loss(const KalmanSite *old_site, KalmanSite *new_site);
   /// Error added by Multiple Coulomb Scattering.
   void calc_system_noise(const KalmanSite *old_site, const KalmanSite *new_site);
 
-  /// Filtering: update of relevant matrices.
+
+  /// Filtering methods
+  void calc_filtered_state(KalmanSite *a_site);
+  void update_covariance(KalmanSite *a_site);
+  void set_residual(KalmanSite *a_site, KalmanSite::State kalman_state);
+  TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
+  /// Update of relevant matrices.
   void update_V(const KalmanSite *a_site);
   void update_H(const KalmanSite *a_site);
   void update_W(const KalmanSite *a_site);
   void update_K(const KalmanSite *a_site);
   void compute_pull(KalmanSite *a_site);
-  /// Filtering: calculation of filtered state.
-  void calc_filtered_state(KalmanSite *a_site);
 
-  /// Filtering: update of covariance matrix.
-  void update_covariance(KalmanSite *a_site);
-  void set_residual(KalmanSite *a_site, KalmanSite::State kalman_state);
-  TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
-  // void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
-
-  /// Smoothing: updates back transportation matrix.
+  /// Smoothing methods
+  void prepare_for_smoothing(KalmanSite *last_site);
   void update_back_transportation_matrix(const KalmanSite *optimum_site,
                                          const KalmanSite *smoothing_site);
   void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void prepare_for_smoothing(KalmanSite *last_site);
+
+
+  /// Other methods
   void exclude_site(KalmanSite *site);
-
   void compute_chi2(const std::vector<KalmanSite> &sites);
-  void compute_emittance(KalmanSite site);
-
   void update_misaligments(std::vector<KalmanSite> &sites,
                            std::vector<KalmanSite> &sites_copy,
                            int station_i);
 
   /// Getters.
-  TMatrixD propagator()   const { return _F;        }
-  TMatrixD system_noise() const { return _Q;        }
-  TMatrixD Q()            const { return _Q;        }
   double f_chi2()         const { return _f_chi2;   }
   double s_chi2()         const { return _s_chi2;        }
   int ndf()               const { return _ndf;      }
   double P_value()        const { return _P_value;  }
   int tracker()           const { return _tracker;  }
-  double mass()           const { return _mass;     }
   double momentum()       const { return _momentum; }
 
-  void set_Q(TMatrixD Q)             { _Q = Q;               }
-  void set_mass(double mass)         { _mass = mass;         }
   void set_momentum(double momentum) { _momentum = momentum; }
 
  protected:
-  bool _use_MCS, _use_Eloss;
+  bool _use_MCS;
+
+  bool _use_Eloss;
 
   TMatrixD _H;
 
@@ -159,7 +154,9 @@ class KalmanTrack {
   TMatrixD _W;
 
   double _f_chi2;
+
   double _s_chi2;
+
   int _ndf;
 
   double _P_value;
@@ -170,20 +167,11 @@ class KalmanTrack {
 
   int _tracker;
 
-  double _mass, _momentum;
+  double _mass;
 
-  Particle _particle;
+  double _momentum;
 
   int _particle_charge;
-
-  struct Emittance {
-    double epsilon;
-    double alpha;
-    double beta;
-    double gamma;
-  };
-
-  Emittance emittance;
 };
 
 } // ~namespace MAUS

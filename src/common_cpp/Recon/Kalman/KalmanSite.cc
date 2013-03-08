@@ -116,9 +116,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   _input_shift_covariance = rhs.get_input_shift_covariance();
 
   _shift = rhs.get_shift();
-  // _shift_B = rhs.get_shift_B();
   _shift_covariance = rhs.get_shift_covariance();
-  // _shift_B_covariance = rhs.get_shift_B_covariance();
 
   _current_state = rhs.get_current_state();
 
@@ -214,7 +212,6 @@ void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
       break;
     case(Excluded) :
       _C_excluded = C;
-      // add this.
       break;
     default :
       throw(Squeal(Squeal::recoverable,

@@ -83,6 +83,10 @@ class KalmanTrackFit {
  private:
   double _seed_cov;
 
+  bool _use_MCS;
+
+  bool _use_Eloss;
+
   bool _update_misalignments;
 
   std::string _type_of_dataflow;

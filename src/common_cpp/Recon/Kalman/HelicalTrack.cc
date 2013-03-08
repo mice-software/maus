@@ -19,8 +19,8 @@
 
 namespace MAUS {
 
-HelicalTrack::HelicalTrack() : KalmanTrack() {
-  _n_parameters = 5;
+HelicalTrack::HelicalTrack(bool MCS, bool Eloss) : KalmanTrack(MCS, Eloss) {
+  _n_parameters = 6;
 }
 
 HelicalTrack::~HelicalTrack() {}
@@ -39,14 +39,14 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // Get old state vector...
   TMatrixD prev_site = old_site->get_a(KalmanSite::Filtered);
 
-  double old_kappa = prev_site(4, 0);
+  double old_kappa  = prev_site(4, 0);
   double old_kappa2 = TMath::Power(old_kappa, 2.);
 
   // constant in units MeV/mm
   double a = -0.2998*_particle_charge*_B_field;
 
   // Define factors to be used in the matrix.
-  double sine = sin(a*deltaZ*old_kappa);
+  double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
   // @x/@x
