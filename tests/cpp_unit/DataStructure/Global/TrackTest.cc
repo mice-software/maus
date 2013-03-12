@@ -38,20 +38,20 @@ TEST_F(TrackTestDS, test_getters_setters) {
   std::string mapper_name = "0";
 
   MAUS::DataStructure::Global::PID pid =
-      MAUS::DataStructure::Global::kElectron; // 11
+      MAUS::DataStructure::Global::kEMinus; // 11
 
   int charge = 1;
 
   // Fill detectorpoints will current largest enum value, plus a
   // random selection.
   ASSERT_EQ(MAUS::DataStructure::Global::kDetectorPointSize - 1,
-            static_cast<int>(MAUS::DataStructure::Global::kBPM));
+            static_cast<int>(MAUS::DataStructure::Global::kEMR));
   unsigned int detectorpoints =
-      (1u << MAUS::DataStructure::Global::kTracker2S5);
-  detectorpoints += (1u << MAUS::DataStructure::Global::kTOF0);
-  detectorpoints += (1u << MAUS::DataStructure::Global::kEMR);
+      (1u << MAUS::DataStructure::Global::kTracker2_5);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kTOF0_1);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kCalorimeter);
   detectorpoints += (1u << MAUS::DataStructure::Global::kVirtual);
-  detectorpoints += (1u << MAUS::DataStructure::Global::kTracker1S3);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kTracker1_3);
 
   std::vector<std::string> geometry_paths;
   geometry_paths.push_back("Nowhere");
@@ -113,10 +113,10 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
 
   DataStructure::Global::DetectorPoint dpArray[kArraySize] =
       { MAUS::DataStructure::Global::kVirtual,
-        MAUS::DataStructure::Global::kTracker1S1,
-        MAUS::DataStructure::Global::kTracker1S2,
-        MAUS::DataStructure::Global::kTracker1S3,
-        MAUS::DataStructure::Global::kTracker1S4,
+        MAUS::DataStructure::Global::kTracker1_1,
+        MAUS::DataStructure::Global::kTracker1_2,
+        MAUS::DataStructure::Global::kTracker1_3,
+        MAUS::DataStructure::Global::kTracker1_4,
         MAUS::DataStructure::Global::kVirtual };
 
   std::string pathArray[kArraySize] =
@@ -190,10 +190,10 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   std::vector<MAUS::DataStructure::Global::DetectorPoint> dps =
       track.GetDetectorPoints();
   // MAUS::DataStructure::Global::kVirtual    // 1
-  // MAUS::DataStructure::Global::kTracker1S1 // 2
-  // MAUS::DataStructure::Global::kTracker1S2 // 3
-  // MAUS::DataStructure::Global::kTracker1S3 // Removed
-  // MAUS::DataStructure::Global::kTracker1S4 // 4
+  // MAUS::DataStructure::Global::kTracker1_1 // 2
+  // MAUS::DataStructure::Global::kTracker1_2 // 3
+  // MAUS::DataStructure::Global::kTracker1_3 // Removed
+  // MAUS::DataStructure::Global::kTracker1_4 // 4
   // MAUS::DataStructure::Global::kVirtual    // Doesn't count twice
   ASSERT_EQ(4U, dps.size());
 
@@ -285,7 +285,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
   std::string mapper_name = "0";
 
   MAUS::DataStructure::Global::PID pid =
-      MAUS::DataStructure::Global::kElectron; // 11
+      MAUS::DataStructure::Global::kEMinus; // 11
 
   int charge = -1;
 
@@ -349,7 +349,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
   std::string mapper_name = "0";
 
   MAUS::DataStructure::Global::PID pid =
-      MAUS::DataStructure::Global::kElectron; // 11
+      MAUS::DataStructure::Global::kEMinus; // 11
 
   int charge = -1;
 
@@ -413,7 +413,7 @@ TEST_F(TrackTestDS, test_clone_method) {
   std::string mapper_name = "0";
 
   MAUS::DataStructure::Global::PID pid =
-      MAUS::DataStructure::Global::kElectron; // 11
+      MAUS::DataStructure::Global::kEMinus; // 11
 
   int charge = -1;
 

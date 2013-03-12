@@ -45,7 +45,7 @@ TEST_F(SpacePointTestDS, test_getters_setters) {
   TLorentzVector epos(ex, ey, ez, et);
 
   MAUS::DataStructure::Global::DetectorPoint det =
-      MAUS::DataStructure::Global::kTracker1S1; // 10
+      MAUS::DataStructure::Global::kTracker1_1; // 10
 
   std::string geom_path = "11";
 
