@@ -143,7 +143,7 @@ class TrackPoint : public MAUS::PhaseSpaceVector {
 
  protected:
   // = 0 if this was not measured in a detector
-  MAUS::DataStructure::Global::DetectorPoint detector_id_;  
+  MAUS::DataStructure::Global::DetectorPoint detector_id_;
   CovarianceMatrix uncertainties_;
   MAUS::DataStructure::Global::PID particle_id_;
   double z_;

@@ -36,7 +36,7 @@ Particle::Particle() {
                         "none",
                         0.,
                         0);
-  
+
   AddParticleDefinition(MAUS::DataStructure::Global::kEMinus,
                         "e-",
                         0.510998910,
