@@ -60,6 +60,7 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   _hits["tof_hits"][hit_i]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
   _hits["tof_hits"][hit_i]["energy"] = track->GetTotalEnergy();
   _hits["tof_hits"][hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
+  _hits["tof_hits"][hit_i]["energy_deposited"] = aStep->GetTotalEnergyDeposit();
 
   return true;
 }

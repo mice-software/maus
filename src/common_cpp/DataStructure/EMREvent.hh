@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -42,7 +42,7 @@ class EMREvent {
 
   private:
 
-    ClassDef(EMREvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(EMREvent)
 };
 }
 

@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "DataStructure/GlobalTrack.hh"
 
@@ -61,7 +61,7 @@ class GlobalEvent {
     GlobalTrackArray raw_tracks_;
     GlobalTrackArray tracks_;
 
-    ClassDef(GlobalEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(GlobalEvent);
 };
 }
 

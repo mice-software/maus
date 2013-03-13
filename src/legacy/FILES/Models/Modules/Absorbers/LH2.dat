@@ -1,7 +1,13 @@
+// src/legacy/FILES/Models/Modules/Absorber/LH2Absorber.dat
+// modified by P. Snopok on August 25, 2012
+// Separated LH2 absorber and Absorbers coil
+//
+// See also comments below by Chris Rogers
+//
 // WARNING *** I HAVE BEEN CAREFUL TO GET THIS RIGHT
 //         *** JUST DONT BREAK IT!
 //
-// I think I fixed the AFC module, which was a complete mess.
+// I think I fixed the Absorbers module, which was a complete mess.
 //
 // The curvature shape came from communication with Wing about 3 years ago. I hope it's still correct. 
 //
@@ -24,70 +30,68 @@
 // CTR - 2010-03-02
 
 
-Module AbsorberFocusCoil
+Module LH2
 {
   Volume Cylinder
   Dimensions 76.0 84.4 cm
   PropertyBool Invisible 1
   PropertyString Material Galactic
-  Module AFC/AlVessel.dat
+  Module Absorbers/AlVessel.dat
   {
     Position 0.0 0.0 0.0 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AFCCryostat.dat
-  {
-    Position 0.0 0.0 0.0 mm
-    Rotation 0.0 0.0 0.0 degree
-    Module AFC/FCoil.dat
-    {
-      Position 0.0 0.0 -205.0 mm
-      Rotation 0.0 0.0 0.0 degree
-      ScaleFactor 113.95
-    }
-    Module AFC/FCoil.dat
-    {
-      Position 0.0 0.0 205.0 mm
-      Rotation 0.0 0.0 0.0 degree
-      ScaleFactor -113.95
-    }  
-  }
-  Module AFC/AlWindowAbsFlange.dat
+  Module Absorbers/AlWindowAbsFlange.dat
   {
     Position 0.0 0.0 136 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AlWindowAbsFlange.dat
+  Module Absorbers/AlWindowAbsFlange.dat
   {
     Position 0.0 0.0 -136 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AlWindowAbsPolycone.dat
+  Module Absorbers/AlWindowAbsPolycone.dat
   {
     Position 0.0 0.0 175.15 mm
     Rotation 0.0 180.0 0.0 degree
   }
-  Module AFC/AlWindowAbsPolycone.dat
+  Module Absorbers/AlWindowAbsPolycone.dat
   {
     Position 0.0 0.0 -175.15 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AlWindowVacFlange.dat
+  Module Absorbers/LH2End.dat
+  {
+    Position 0.0 0.0 175.15 mm
+    Rotation 0.0 180.0 0.0 degree
+  }
+  Module Absorbers/LH2Center.dat
+  {
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Absorbers/LH2End.dat
+  {
+    Position 0.0 0.0 -175.15 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Absorbers/AlWindowVacFlange.dat
   {
     Position 0.0 0.0 308+5-50 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AlWindowVacFlange.dat
+  Module Absorbers/AlWindowVacFlange.dat
   {
     Position 0.0 0.0 -308-5+50 mm
     Rotation 0.0 0.0 0.0 degree
   }
-  Module AFC/AlWindowVacPolycone.dat
+  Module Absorbers/AlWindowVacPolycone.dat
   {
     Position 0.0 0.0 308.0 mm
     Rotation 0.0 180.0 0.0 degree
   }
-  Module AFC/AlWindowVacPolycone.dat
+  Module Absorbers/AlWindowVacPolycone.dat
   {
     Position 0.0 0.0 -308.0 mm
     Rotation 0.0 0.0 0.0 degree

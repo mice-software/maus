@@ -21,11 +21,15 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <Python.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <functional>
 
 #include "json/json.h"
 #include "Utils/TOFChannelMap.hh"
@@ -105,7 +109,7 @@ class TOFPixelKey {
 class TOFCalibrationMap {
  public:
 
-  TOFCalibrationMap() {}
+  TOFCalibrationMap();
   virtual ~TOFCalibrationMap();
 
  /** Initialize the calibration map by using the text files provided in 
@@ -115,8 +119,8 @@ class TOFCalibrationMap {
   */
   bool InitializeFromCards(Json::Value configJSON);
 
-  /// Not implemented.
-  bool InitFromCDB();
+  /// Get calibrations from CDB
+  bool InitializeFromCDB();
 
  /** Initialize the map by using the provided text files.
   * \param[in] t0File name of the text file containing the t0 calibration constants.
@@ -172,7 +176,8 @@ class TOFCalibrationMap {
   * To be used only for debugging.
   */
   void Print();
-
+  void Reset();
+  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
    /** This value is returned when the correction can not be calculated.
@@ -246,15 +251,24 @@ class TOFCalibrationMap {
   */
   int _triggerStation;
 
- /** Name of the calibration as in the CBD.
+ /** Name of the calibration as in the CDB.
   */
   std::string _name;
+  std::stringstream t0str, twstr, trigstr;
+  std::string _tof_station, _tof_calibdate;
 
  /** Flags for switching On and Off of the different types of calibration corrections.
   */
   bool _do_timeWalk_correction;
   bool _do_triggerDelay_correction;
   bool _do_t0_correction;
+
+  PyObject* _calib_mod;
+  PyObject* _tcalib;
+  PyObject* _get_calib_func;
+  bool LoadT0Calib();
+  bool LoadTWCalib();
+  bool LoadTriggerCalib();
 };
 
 #endif

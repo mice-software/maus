@@ -20,8 +20,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "Rtypes.h"  // ROOT
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 
 namespace MAUS {
@@ -84,7 +83,7 @@ class MAUSEvent {
   private:
     std::string _event_type;
 
-    ClassDef(MAUSEvent<EventT>, 1)
+    MAUS_VERSIONED_CLASS_DEF(MAUSEvent<EventT>)
 };
 }
 

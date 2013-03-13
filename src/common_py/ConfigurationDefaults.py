@@ -309,14 +309,18 @@ TOFscintLightSpeed =  170.0 # mm/ns
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 #TOF_trigger_station = "tof0"
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
-TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
-TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
-TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePiontCut = 0.5 # nanosecond
+# the date for which we want the cabling and calibration
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+TOF_calib_date_from = 'current'
+TOF_cabling_date_from = 'current'
 Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True

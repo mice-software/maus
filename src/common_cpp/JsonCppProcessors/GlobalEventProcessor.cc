@@ -23,10 +23,10 @@ GlobalEventProcessor::GlobalEventProcessor()
     : raw_track_array_processor_(new GlobalTrackProcessor()) {
   RegisterValueBranch("raw_tracks", &raw_track_array_processor_,
                       &GlobalEvent::raw_tracks,
-                      &GlobalEvent::set_raw_tracks, true);
+                      &GlobalEvent::set_raw_tracks, false);
   RegisterValueBranch("tracks", &raw_track_array_processor_,
                       &GlobalEvent::tracks,
-                      &GlobalEvent::set_tracks, true);
+                      &GlobalEvent::set_tracks, false);
 }
 }  // namespace MAUS
 

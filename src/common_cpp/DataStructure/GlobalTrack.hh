@@ -49,7 +49,7 @@ class GlobalTrack {
   private:
     GlobalTrackPointArray track_points_;
 
-    ClassDef(GlobalTrack, 2)
+    MAUS_VERSIONED_CLASS_DEF(GlobalTrack);
 };
 
 typedef std::vector<GlobalTrack> GlobalTrackArray;

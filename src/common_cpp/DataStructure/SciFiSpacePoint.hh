@@ -28,10 +28,8 @@
 #include <string>
 #include <vector>
 
-// ROOT headers
-#include "Rtypes.h"
-
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -123,7 +121,7 @@ class SciFiSpacePoint {
 
   SciFiClusterPArray  _channels;
 
-  ClassDef(SciFiSpacePoint, 1)
+  MAUS_VERSIONED_CLASS_DEF(SciFiSpacePoint)
 };  // Don't forget this trailing colon!!!!
 
 typedef std::vector<SciFiSpacePoint*> SciFiSpacePointPArray;

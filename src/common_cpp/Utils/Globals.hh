@@ -140,6 +140,12 @@ class Globals {
      */
     static MiceModule* GetReconstructionMiceModules();
 
+    /** Get the version number like x.y.z
+     *
+     *  Return the version number x.y.z
+     */
+    static std::string GetVersionNumberString();
+
   private:
     // construction, destruction etc disallowed
     Globals();

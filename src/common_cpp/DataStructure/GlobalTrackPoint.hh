@@ -87,7 +87,7 @@ class GlobalTrackPoint {
     int detector_id_;
     int particle_id_;
 
-    ClassDef(GlobalTrackPoint, 1)
+    MAUS_VERSIONED_CLASS_DEF(GlobalTrackPoint);
 };
 
 typedef std::vector<GlobalTrackPoint> GlobalTrackPointArray;

@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_JOBFOOTER_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_JOBFOOTER_HH_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/DateTime.hh"
 
@@ -51,7 +51,7 @@ class JobFooter {
   private:
     DateTime _end_of_job;
 
-    ClassDef(JobFooter, 1)
+    MAUS_VERSIONED_CLASS_DEF(JobFooter);
 };
 }
 

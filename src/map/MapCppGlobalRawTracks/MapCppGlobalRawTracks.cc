@@ -156,7 +156,9 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
   }
 
-  /*
+  std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
+            << "Processing " << tracks_.size()
+            << " raw tracks" << std::endl;
   size_t event_index = 0;
   for (std::vector<MAUS::recon::global::Track>::iterator
           raw_track = tracks_.begin();
@@ -175,11 +177,13 @@ std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
       = raw_tracks;
     ++event_index;
   }
-  */
 
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;
   std::string output = writer.write(run_data_);
+  std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
+            << "Output: " << std::endl
+            << output << std::endl;
 
   return output;
 }

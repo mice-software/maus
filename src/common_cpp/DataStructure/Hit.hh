@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h" // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
@@ -147,7 +147,7 @@ class Hit {
 
     ChannelId* _channel_id;
 
-    ClassDef(Hit, 1)
+    MAUS_VERSIONED_CLASS_DEF(Hit);
 };
 
 typedef Hit<SciFiChannelId> SciFiHit;

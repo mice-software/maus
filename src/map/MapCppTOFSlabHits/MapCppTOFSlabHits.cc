@@ -258,7 +258,11 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
     xDocPMT0["charge"] = xChargeDigit0;
     xDocPMT1["charge"] = xChargeDigit1;
     xDocSlabHit["charge"] = xChargeDigit0 + xChargeDigit1;
-    xDocSlabHit["charge_product"] = xChargeDigit0 * xChargeDigit1 / (xChargeDigit0 + xChargeDigit1);
+    if ((xChargeDigit0 + xChargeDigit1) == 0)
+        xDocSlabHit["charge_product"] = 0;
+    else
+        xDocSlabHit["charge_product"] =
+                 xChargeDigit0 * xChargeDigit1 / (xChargeDigit0 + xChargeDigit1);
   }
 
   // Calculate the measured value of the time in nanoseconds.

@@ -21,8 +21,7 @@
 #include <map>
 #include <string>
 
-#include "Rtypes.h"
-
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/DAQData.hh"
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
 #include "src/common_cpp/DataStructure/Scalars.hh"
@@ -146,7 +145,7 @@ class Spill {
   std::map<std::string, std::string> _errors;
   TestBranch* _test;
 
-  ClassDef(Spill, 2)
+  MAUS_VERSIONED_CLASS_DEF(Spill)
 };
 }
 
