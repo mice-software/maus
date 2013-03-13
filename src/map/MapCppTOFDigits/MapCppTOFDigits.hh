@@ -105,6 +105,7 @@ class MapCppTOFDigits {
    *  a document with digits
    */
   bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
+  bool map_init;
 };
 #endif
 
