@@ -37,8 +37,8 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     const std::vector<recon::global::TrackPoint> & start_plane_hits,
     const std::vector<recon::global::TrackPoint> & station_hits)
     const {
-  const recon::global::Particle::ID particle_id
-    = recon::global::Particle::ID(start_plane_hits[0].particle_id());
+  const MAUS::DataStructure::Global::PID particle_id
+    = MAUS::DataStructure::Global::PID(start_plane_hits[0].particle_id());
 
   double start_plane = start_plane_hits[0].z();
 

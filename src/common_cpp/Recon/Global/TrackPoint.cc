@@ -35,8 +35,8 @@ namespace global {
 
 TrackPoint::TrackPoint()
     : PhaseSpaceVector(),
-      detector_id_(Detector::kNone),
-      particle_id_(Particle::kNone),
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
+      particle_id_(MAUS::DataStructure::Global::kNoPID),
       z_(0.0)
 { }
 
@@ -49,16 +49,18 @@ TrackPoint::TrackPoint(const TrackPoint& original_instance)
 { }
 
 TrackPoint::TrackPoint(const PhaseSpaceVector & original_instance,
-                       const double z, const Particle::ID pid)
+                       const double z,
+                       const MAUS::DataStructure::Global::PID pid)
     : PhaseSpaceVector(original_instance),
-      detector_id_(Detector::kNone),
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
       particle_id_(pid), z_(z)
 { }
 
 TrackPoint::TrackPoint(const Vector<double> & original_instance,
-                       const double z, const Particle::ID pid)
+                       const double z,
+                       const MAUS::DataStructure::Global::PID pid)
     : PhaseSpaceVector(original_instance),
-      detector_id_(Detector::kNone),
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
       particle_id_(pid), z_(z)
 { }
 
@@ -68,9 +70,9 @@ TrackPoint::TrackPoint(const double time, const double energy,
                        const CovarianceMatrix & uncertainties,
                        const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
-      detector_id_(Detector::kNone),
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
       uncertainties_(uncertainties),
-      particle_id_(Particle::kNone), z_(z) { }
+      particle_id_(MAUS::DataStructure::Global::kNoPID), z_(z) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
                        const double x, const double px,
@@ -80,22 +82,22 @@ TrackPoint::TrackPoint(const double time, const double energy,
     : PhaseSpaceVector(time, energy, x, px, y, py),
       detector_id_(detector.id()),
       uncertainties_(detector.uncertainties()),
-      particle_id_(Particle::kNone), z_(z) { }
+      particle_id_(MAUS::DataStructure::Global::kNoPID), z_(z) { }
 
 TrackPoint::TrackPoint(const double time, const double energy,
                        const double x, const double px,
                        const double y, const double py,
-                       const Particle::ID particle_id,
+                       const MAUS::DataStructure::Global::PID particle_id,
                        const double z)
     : PhaseSpaceVector(time, energy, x, px, y, py),
-      detector_id_(Detector::kNone),
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
       particle_id_(particle_id), z_(z) { }
 
 TrackPoint::TrackPoint(double const * const array,
                        const double z)
     : PhaseSpaceVector(array),
-      detector_id_(Detector::kNone),
-      particle_id_(Particle::kNone), z_(z) {
+      detector_id_(MAUS::DataStructure::Global::kUndefined),
+      particle_id_(MAUS::DataStructure::Global::kNoPID), z_(z) {
 }
 
 TrackPoint::~TrackPoint() {
@@ -139,19 +141,20 @@ const bool TrackPoint::operator>(const TrackPoint& rhs) const {
   return z() > rhs.z();
 }
 
-void TrackPoint::set_particle_id(const Particle::ID id) {
+void TrackPoint::set_particle_id(const MAUS::DataStructure::Global::PID id) {
   particle_id_ = id;
 }
 
-Particle::ID TrackPoint::particle_id() const {
+MAUS::DataStructure::Global::PID TrackPoint::particle_id() const {
   return particle_id_;
 }
 
-void TrackPoint::set_detector_id(const Detector::ID id) {
+void TrackPoint::set_detector_id(
+    const MAUS::DataStructure::Global::DetectorPoint id) {
   detector_id_ = id;
 }
 
-Detector::ID TrackPoint::detector_id() const {
+MAUS::DataStructure::Global::DetectorPoint TrackPoint::detector_id() const {
   return detector_id_;
 }
 
@@ -164,7 +167,7 @@ const CovarianceMatrix & TrackPoint::uncertainties() const {
 }
 
 double TrackPoint::z_momentum() const {
-  if (particle_id_ == Particle::kNone) {
+  if (particle_id_ == MAUS::DataStructure::Global::kNoPID) {
     throw(Squeal(Squeal::recoverable,
                  "Attempting to calculate the momentum of a non-particle",
                  "MAUS::recon::global::TrackPoint::z_momentum()"));
