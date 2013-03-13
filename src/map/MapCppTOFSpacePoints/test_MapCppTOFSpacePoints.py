@@ -39,7 +39,8 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         result = self.mapper.process("")
         doc = json.loads(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
+        self.assertTrue("bad_json_document" in doc["errors"] or
+                        "no_tofcalib" in doc["errors"])
 
     def test_init(self):
         """Check can handle empty spill"""

@@ -76,7 +76,8 @@ class MapCppTOFSlabHitsTestCase(unittest.TestCase):# pylint: disable = R0904
              len(spill['recon_events'][0]['tof_event']['tof_slab_hits']['tof0'])
         self.assertEqual(n_slab_hits_part_ev0_tof0, 1)
         # test the calculation of the raw time
-        raw_time_part_ev0_sl_hit0 = (416572-420998+1727593-1731992)/2.*0.0244140625
+        raw_time_part_ev0_sl_hit0 = (416572-420998+1727593-1731992)/ \
+                                                     2.*0.0244140625
         raw_time_part_ev0_sl_hit0_rec = spill['recon_events'][0]['tof_event']\
                                         ['tof_slab_hits']['tof0'][0]['raw_time']
         self.assertEqual(raw_time_part_ev0_sl_hit0_rec,
