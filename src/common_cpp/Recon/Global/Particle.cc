@@ -28,119 +28,149 @@ namespace global {
 using MAUS::recon::global::Particle;
 
 Particle::Particle() {
-  names_.insert(std::pair<ID, std::string>(kNone, std::string("none")));
-  masses_.insert(std::pair<ID, double>(kNone, 0.));
-  charges_.insert(std::pair<ID, int>(kNone, 0));
+  typedef std::pair<MAUS::DataStructure::Global::PID, std::string> name_pair;
+  typedef std::pair<MAUS::DataStructure::Global::PID, double>      mass_pair;
+  typedef std::pair<MAUS::DataStructure::Global::PID, int>         charge_pair;
 
-  names_.insert(std::pair<ID, std::string>(kEMinus, std::string("e-")));
-  masses_.insert(std::pair<ID, double>(kEMinus, 0.510998910));
-  charges_.insert(std::pair<ID, int>(kEMinus, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kNoPID,
+                        "none",
+                        0.,
+                        0);
+  
+  AddParticleDefinition(MAUS::DataStructure::Global::kEMinus,
+                        "e-",
+                        0.510998910,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kElectronNeutrino, std::string("electron neutrino")));
-  masses_.insert(std::pair<ID, double>(kElectronNeutrino, 1.9e-6));
-  charges_.insert(std::pair<ID, int>(kElectronNeutrino, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kElectronNeutrino,
+                        "electron neutrino",
+                        1.9e-6,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kMuMinus, std::string("mu-")));
-  masses_.insert(std::pair<ID, double>(kMuMinus, 105.6583668));
-  charges_.insert(std::pair<ID, int>(kMuMinus, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kMuMinus,
+                        "mu-",
+                        105.6583668,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kMuonNeutrino, std::string("muon neutrino")));
-  masses_.insert(std::pair<ID, double>(kMuonNeutrino, 1.9e-6));
-  charges_.insert(std::pair<ID, int>(kMuonNeutrino, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kMuonNeutrino,
+                        "muon neutrino",
+                        1.9e-6,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kPhoton, std::string("photon")));
-  masses_.insert(std::pair<ID, double>(kPhoton, 0.));
-  charges_.insert(std::pair<ID, int>(kPhoton, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kPhoton,
+                        "photon",
+                        0.,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kPi0, std::string("pi0")));
-  masses_.insert(std::pair<ID, double>(kPi0, 134.9766));
-  charges_.insert(std::pair<ID, int>(kPi0, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kPi0,
+                        "pi0",
+                        134.9766,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kPiPlus, std::string("pi+")));
-  masses_.insert(std::pair<ID, double>(kPiPlus, 139.57018));
-  charges_.insert(std::pair<ID, int>(kPiPlus, +1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kPiPlus,
+                        "pi+",
+                        139.57018,
+                        +1);
 
-  names_.insert(std::pair<ID, std::string>(kKPlus, std::string("K+")));
-  masses_.insert(std::pair<ID, double>(kKPlus, 493.667));
-  charges_.insert(std::pair<ID, int>(kKPlus, +1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kKPlus,
+                        "K+",
+                        493.667,
+                        +1);
 
-  names_.insert(std::pair<ID, std::string>(kNeutron, std::string("neutron")));
-  masses_.insert(std::pair<ID, double>(kNeutron, 939.56536));
-  charges_.insert(std::pair<ID, int>(kNeutron, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kNeutron,
+                        "neutron",
+                        939.56536,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kProton, std::string("proton")));
-  masses_.insert(std::pair<ID, double>(kProton, 938.271996));
-  charges_.insert(std::pair<ID, int>(kProton, +1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kProton,
+                        "proton",
+                        938.271996,
+                        +1);
 
-  names_.insert(std::pair<ID, std::string>(kDeuterium, std::string("deuterium")));
-  masses_.insert(std::pair<ID, double>(kDeuterium, 1876.1239));
-  charges_.insert(std::pair<ID, int>(kDeuterium, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kDeuterium,
+                        "deuterium",
+                        1876.1239,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kTritium, std::string("tritium")));
-  masses_.insert(std::pair<ID, double>(kTritium, 2809.432));
-  charges_.insert(std::pair<ID, int>(kTritium, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kTritium,
+                        "tritium",
+                        2809.432,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kHelium3, std::string("3He")));
-  masses_.insert(std::pair<ID, double>(kHelium3, 2809.41346));
-  charges_.insert(std::pair<ID, int>(kHelium3, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kHelium3,
+                        "3He",
+                        2809.41346,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kHelium4, std::string("4He")));
-  masses_.insert(std::pair<ID, double>(kHelium4, 3728.4001));
-  charges_.insert(std::pair<ID, int>(kHelium4, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kHelium4,
+                        "4He",
+                        3728.4001,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kKLong, std::string("K0L")));
-  masses_.insert(std::pair<ID, double>(kKLong, 497.614));
-  charges_.insert(std::pair<ID, int>(kKLong, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kKLong,
+                        "K0L",
+                        497.614,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kKShort, std::string("K0S")));
-  masses_.insert(std::pair<ID, double>(kKShort, 497.614));
-  charges_.insert(std::pair<ID, int>(kKShort, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kKShort,
+                        "K0S",
+                        497.614,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kK0, std::string("K0")));
-  masses_.insert(std::pair<ID, double>(kK0, 497.614));
-  charges_.insert(std::pair<ID, int>(kK0, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kK0,
+                        "K0",
+                        497.614,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kLambda, std::string("lambda")));
-  masses_.insert(std::pair<ID, double>(kLambda, 1115.683));
-  charges_.insert(std::pair<ID, int>(kLambda, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kLambda,
+                        "lambda",
+                        1115.683,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kEPlus, std::string("e+")));
-  masses_.insert(std::pair<ID, double>(kEPlus, 0.510998910));
-  charges_.insert(std::pair<ID, int>(kEPlus, +1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kEPlus,
+                        "e+",
+                        0.510998910,
+                        +1);
 
-  names_.insert(std::pair<ID, std::string>(kElectronAntineutrino, std::string(
-    "electron antineutrino")));
-  masses_.insert(std::pair<ID, double>(kElectronAntineutrino, 0.));
-  charges_.insert(std::pair<ID, int>(kElectronAntineutrino, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kElectronAntineutrino,
+                        "electron antineutrino",
+                        0.,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kMuPlus, std::string("mu+")));
-  masses_.insert(std::pair<ID, double>(kMuPlus, 105.6583668));
-  charges_.insert(std::pair<ID, int>(kMuPlus, +1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kMuPlus,
+                        "mu+",
+                        105.6583668,
+                        +1);
 
-  names_.insert(std::pair<ID, std::string>(kMuonAntineutrino, std::string(
-    "muon antineutrino")));
-  masses_.insert(std::pair<ID, double>(kMuonAntineutrino, 0.));
-  charges_.insert(std::pair<ID, int>(kMuonAntineutrino, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kMuonAntineutrino,
+                        "muon antineutrino",
+                        0.,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kPiMinus, std::string("pi-")));
-  masses_.insert(std::pair<ID, double>(kPiMinus, 139.57018));
-  charges_.insert(std::pair<ID, int>(kPiMinus, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kPiMinus,
+                        "pi-",
+                        139.57018,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kKMinus, std::string("K-")));
-  masses_.insert(std::pair<ID, double>(kKMinus, 493.667));
-  charges_.insert(std::pair<ID, int>(kKMinus, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kKMinus,
+                        "K-",
+                        493.667,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kAntineutron, std::string("antineutron")));
-  masses_.insert(std::pair<ID, double>(kAntineutron, 939.56536));
-  charges_.insert(std::pair<ID, int>(kAntineutron, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kAntineutron,
+                        "antineutron",
+                        939.56536,
+                        0);
 
-  names_.insert(std::pair<ID, std::string>(kAntiproton, std::string("antiproton")));
-  masses_.insert(std::pair<ID, double>(kAntiproton, 938.271996));
-  charges_.insert(std::pair<ID, int>(kAntiproton, -1));
+  AddParticleDefinition(MAUS::DataStructure::Global::kAntiproton,
+                        "antiproton",
+                        938.271996,
+                        -1);
 
-  names_.insert(std::pair<ID, std::string>(kAntilambda, std::string("antilambda")));
-  masses_.insert(std::pair<ID, double>(kAntilambda, 1115.683));
-  charges_.insert(std::pair<ID, int>(kAntilambda, 0));
+  AddParticleDefinition(MAUS::DataStructure::Global::kAntilambda,
+                        "antilambda",
+                        1115.683,
+                        0);
 }
 
 Particle::~Particle() { }
@@ -149,19 +179,32 @@ Particle const * Particle::GetInstance() {
   return &Particle::kSingleton;
 }
 
-std::string Particle::GetName(ID id) const {
+std::string Particle::GetName(MAUS::DataStructure::Global::PID id) const {
   return names_.find(id)->second;
 }
 
-double Particle::GetMass(ID id) const {
+double Particle::GetMass(MAUS::DataStructure::Global::PID id) const {
   return masses_.find(id)->second;
 }
 
-int Particle::GetCharge(ID id) const {
+int Particle::GetCharge(MAUS::DataStructure::Global::PID id) const {
   return charges_.find(id)->second;
 }
 
 const Particle Particle::kSingleton = Particle();
+
+void Particle::AddParticleDefinition(MAUS::DataStructure::Global::PID pid,
+                                     std::string name,
+                                     double mass,
+                                     int charge) {
+  names_.insert(
+      std::pair<MAUS::DataStructure::Global::PID, std::string>(pid, name));
+  masses_.insert(
+      std::pair<MAUS::DataStructure::Global::PID, double>(pid, mass));
+  charges_.insert(
+      std::pair<MAUS::DataStructure::Global::PID, int>(pid, charge));
+}
+
 
 }  // namespace global
 }  // namespace recon
