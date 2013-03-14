@@ -10,17 +10,17 @@ download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 billiard amqp>=1.0.8,<1.1.0 kombu \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery \
- pymongo scons readline numpy==1.5 matplotlib \
+ pymongo scons readline numpy==1.5 pylab matplotlib \
 "
 # these are the packages to install - note the version dependencies
 package_list="\
  anyjson python-dateutil billiard amqp kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
- pymongo scons readline numpy matplotlib \
+ pymongo scons readline numpy pylab matplotlib \
 "
 module_test_list="suds validictory nose coverage \
- pylint numpy bitarray matplotlib celery \
+ pylint numpy bitarray pylab matplotlib celery \
  pymongo"
 binary_test_list="scons"
 
