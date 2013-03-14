@@ -40,7 +40,7 @@ SpacePoint& SpacePoint::operator=(const SpacePoint &space_point) {
     return *this;
   }
   BasePoint::operator=(space_point);
-  
+
   _charge          = space_point.get_charge();
 
   return *this;
@@ -53,7 +53,7 @@ SpacePoint* SpacePoint::Clone() const {
   // of this in the constructor, and save CPU time.  But, I prefer to
   // keep the methods similar between SpacePoint, TrackPoint and
   // Track.
-  
+
   MAUS::DataStructure::Global::SpacePoint* spNew =
       new MAUS::DataStructure::Global::SpacePoint();
 

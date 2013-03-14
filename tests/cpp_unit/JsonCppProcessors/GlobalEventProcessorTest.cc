@@ -40,7 +40,7 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
     detector_array[1] = MAUS::DataStructure::Global::kVirtual;
     detector_array[2] = MAUS::DataStructure::Global::kTracker1_1;
     detector_array[3] = MAUS::DataStructure::Global::kTracker2_2;
-    
+
     for (int i = 0; i < 4; ++i) {
       _track_point.push_back(new MAUS::DataStructure::Global::TrackPoint());
       _space_point.push_back(new MAUS::DataStructure::Global::SpacePoint());
@@ -109,12 +109,12 @@ TEST_F(GlobalEventProcessorTestClass, CheckInitialSetup) {
     local_space_point[i] = _event->get_space_points()->at(i);
     EXPECT_EQ(local_track_point[i], _track_point[i]);
     EXPECT_EQ(local_space_point[i], _space_point[i]);
-    
+
     charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_space_point[i]->get_detector();
     EXPECT_EQ(dp, detector_array[i]);
-    
+
     charge = local_track_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_track_point[i]->get_detector();
@@ -148,7 +148,7 @@ TEST_F(GlobalEventProcessorTestClass, CheckConsistentChain) {
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_space_point[i]->get_detector();
     EXPECT_EQ(dp, detector_array[i]);
-    
+
     charge = local_track_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_track_point[i]->get_detector();
@@ -209,12 +209,12 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCpp) {
     local_space_point[i] = event_out->get_space_points()->at(i);
     EXPECT_NE(local_track_point[i], _track_point[i]);
     EXPECT_NE(local_space_point[i], _space_point[i]);
-    
+
     charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_space_point[i]->get_detector();
     EXPECT_EQ(dp, detector_array[i]);
-    
+
     charge = local_track_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_track_point[i]->get_detector();
@@ -264,12 +264,12 @@ TEST_F(GlobalEventProcessorTestClass, JsonToCppWithDelete) {
     local_space_point[i] = event_out->get_space_points()->at(i);
     EXPECT_TRUE(local_track_point[i]);
     EXPECT_TRUE(local_space_point[i]);
-    
+
     charge = local_space_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_space_point[i]->get_detector();
     EXPECT_EQ(dp, detector_array[i]);
-    
+
     charge = local_track_point[i]->get_charge();
     EXPECT_TRUE(std::fabs(charge - (1.0*i)) < 0.00001);
     dp = local_track_point[i]->get_detector();
