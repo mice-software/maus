@@ -30,7 +30,7 @@ import pymongo
 import unittest 
 import json
 
-import celery.task.control
+import celery.task.control #pylint: disable=E0611, F0401
 
 import libMausCpp # pylint: disable=W0611
 
@@ -53,7 +53,7 @@ def run_simulate_mice(dataflow, output_file_pre, wait=True,
                             ],
                             stdout = log, stderr=subprocess.STDOUT)
     if wait:
-        proc.wait()
+        proc.wait() #pylint: disable=E1101
     return proc
 
 
@@ -66,7 +66,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         Check that celery is running or skip
         """
         try:
-            active_nodes = celery.task.control.inspect().active()
+            active_nodes = celery.task.control.inspect().active() #pylint: disable=E1101, C0301
         except Exception: # pylint: disable=W0703
             unittest.TestCase.skipTest(self, "Skip - RabbitMQ seems to be down")
         if (active_nodes == None):
@@ -113,7 +113,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         # merge_output hopefully finished in the split multi - equivalent
         # process has run twice in the other two subprocesses + transforms
         print 'killing', split_name_out, 'job'
-        out_proc.send_signal(signal.SIGINT)
+        out_proc.send_signal(signal.SIGINT) #pylint: disable=E1101
         time.sleep(1) # give a chance for signal and file close to come through
         return file_names
 

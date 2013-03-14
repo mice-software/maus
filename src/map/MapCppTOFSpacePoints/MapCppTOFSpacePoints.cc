@@ -37,10 +37,11 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
     // this will contain the configuration
 
     // Load the calibration.
+    map_init = true;
     bool loaded = _map.InitializeFromCards(configJSON);
     if (!loaded)
-      return false;
-
+      map_init = false;
+    std::cout << "map_init = " << map_init << std::endl;
     _makeSpacePiontCut =
     JsonWrapper::GetProperty(configJSON,
                              "TOF_makeSpacePiontCut",
@@ -89,6 +90,14 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
+  if (!map_init) {
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says: Failed to initialize calibration map";
+    errors["no_tofcalib"] = ss.str();
+    root["errors"] = errors;
+    return writer.write(root);
+  }
   // Check if the JSON document can be parsed, else return error only
   try {root = JsonWrapper::StringToJson(document);}
   catch(...) {

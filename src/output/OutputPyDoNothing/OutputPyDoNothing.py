@@ -12,7 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
+"""OutputPyDoNothing.py"""
 
 class OutputPyDoNothing:
     """OutputPyDoNothing doesn't save output
@@ -22,8 +22,11 @@ class OutputPyDoNothing:
     room and also for load tests.
 
     """
+    def __init__(self):
+        """__init__"""
+        pass
 
-    def birth(self, config_doc):
+    def birth(self, config_doc):#pylint: disable =R0201,W0613
         """Birth returns true
         """
         return True
@@ -39,7 +42,7 @@ class OutputPyDoNothing:
         """
         pass # do nothing
 
-    def death(self):
+    def death(self):#pylint: disable =R0201
         """Closes down OutputPyDoNothing
 
         Does nothing but return true

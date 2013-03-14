@@ -1,0 +1,231 @@
+{
+  "daq_event_type": "physics_event", 
+  "daq_data": {
+    "kl": [
+      {
+        "V1724": [
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1043, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1040, 
+            "channel_key": "DAQChannelKey 0 12 2 120 kl", 
+            "position_max": 44, 
+            "trigger_time_tag": 254714079, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 0, 
+            "geo": 12, 
+            "pedestal": 8551, 
+            "channel": 2
+          }, 
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1318, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1309, 
+            "channel_key": "DAQChannelKey 0 12 3 120 kl", 
+            "position_max": 45, 
+            "trigger_time_tag": 254714079, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 0, 
+            "geo": 12, 
+            "pedestal": 8648, 
+            "channel": 3
+          }, 
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1195, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1190, 
+            "channel_key": "DAQChannelKey 0 15 0 120 kl", 
+            "position_max": 38, 
+            "trigger_time_tag": 251443949, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 0, 
+            "geo": 15, 
+            "pedestal": 8356, 
+            "channel": 0
+          }, 
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1153, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1149, 
+            "channel_key": "DAQChannelKey 0 15 1 120 kl", 
+            "position_max": 38, 
+            "trigger_time_tag": 251443949, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 0, 
+            "geo": 15, 
+            "pedestal": 8503, 
+            "channel": 1
+          }
+        ]
+      }, 
+      {
+        "V1724": [
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1078, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1076, 
+            "channel_key": "DAQChannelKey 0 14 6 120 kl", 
+            "position_max": 41, 
+            "trigger_time_tag": 252557053, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 2, 
+            "geo": 14, 
+            "pedestal": 8346, 
+            "channel": 6
+          }, 
+          {
+            "ldc_id": 0, 
+            "charge_mm": 1274, 
+            "equip_type": 120, 
+            "phys_event_number": 0, 
+            "charge_pm": 1272, 
+            "channel_key": "DAQChannelKey 0 14 7 120 kl", 
+            "position_max": 42, 
+            "trigger_time_tag": 252557053, 
+            "time_stamp": 1323695416, 
+            "detector": "kl", 
+            "part_event_number": 2, 
+            "geo": 14, 
+            "pedestal": 8542, 
+            "channel": 7
+          }
+        ]
+      }, 
+      null 
+    ],
+    "trigger": [
+      {
+        "V1290": [
+          {
+            "bunch_id": 1259, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 0 0 102 trigger", 
+            "leading_time": 1316898, 
+            "trigger_time_tag": 10537, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 0, 
+            "geo": 0, 
+            "channel": 0
+          }, 
+          {
+            "bunch_id": 1256, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 1 0 102 trigger", 
+            "leading_time": 1314593, 
+            "trigger_time_tag": 10537, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 0, 
+            "geo": 1, 
+            "channel": 0
+          }, 
+          {
+            "bunch_id": 1254, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 2 0 102 trigger", 
+            "leading_time": 1312581, 
+            "trigger_time_tag": 10537, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 0, 
+            "geo": 2, 
+            "channel": 0
+          }, 
+          {
+            "bunch_id": 1256, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 3 0 102 trigger", 
+            "leading_time": 1314738, 
+            "trigger_time_tag": 10537, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 0, 
+            "geo": 3, 
+            "channel": 0
+          } 
+        ]
+      }, 
+      {
+        "V1290": [
+          {
+            "bunch_id": 3397, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 0 0 102 trigger", 
+            "leading_time": 1409001, 
+            "trigger_time_tag": 10860, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 1, 
+            "geo": 0, 
+            "channel": 0
+          }, 
+          {
+            "bunch_id": 3394, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 1 0 102 trigger", 
+            "leading_time": 1406615, 
+            "trigger_time_tag": 10860, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 1, 
+            "geo": 1, 
+            "channel": 0
+          } 
+        ]
+      }, 
+      {
+        "V1290": [
+          {
+            "bunch_id": 3816, 
+            "ldc_id": 1, 
+            "equip_type": 102, 
+            "phys_event_number": 0, 
+            "trailing_time": -99, 
+            "channel_key": "DAQChannelKey 1 0 0 102 trigger", 
+            "leading_time": 1838185, 
+            "trigger_time_tag": 10873, 
+            "time_stamp": 1323695416, 
+            "detector": "trigger", 
+            "part_event_number": 2, 
+            "geo": 0, 
+            "channel": 0
+          }
+        ]
+      }
+     ] 
+   }
+}

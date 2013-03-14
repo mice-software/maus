@@ -82,7 +82,6 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
   Json::Value tof_evt;
 
   // loop over events
-  std::cout << "mc numevts = " << mc.size() << std::endl;
   if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
   for ( unsigned int i = 0; i < mc.size(); i++ ) {
     Json::Value particle = mc[i];
@@ -428,7 +427,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 
       npe = all_tof_digits[i]["npe"].asDouble();
       // loop over all the other digits to find multihit slabs
-      for ( unsigned int j = i; j < all_tof_digits.size(); j++ ) {
+      for ( unsigned int j = i+1; j < all_tof_digits.size(); j++ ) {
         if ( check_param(&(all_tof_digits[i]), &(all_tof_digits[j])) ) {
             // add up light yields if same bar was hit
             npe += all_tof_digits[j]["npe"].asDouble();
@@ -436,9 +435,15 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
             all_tof_digits[j]["isUsed"]=1;
         } // end check for used
       } // end loop over secondary digits
-
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
+      /*
+      double adcs = npe / (_configJSON["TOFadcConversionFactor"].asDouble());
+      double adcw = 0.5;
+      TRandom* rnd = new TRandom();
+      double adcsm = rnd->Landau(adcs,adcw);
+      int adc = static_cast<int>(adcsm);
+      */
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
       // ROGERS = changed from "charge" to "charge_pm" for data integrity
       digit["charge_pm"] = adc;

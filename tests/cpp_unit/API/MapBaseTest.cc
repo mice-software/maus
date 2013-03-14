@@ -22,6 +22,7 @@
 #include "gtest/gtest_prod.h"
 #include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
@@ -76,17 +77,17 @@ namespace MAUS {
     virtual int* _process(double* t) const {throw 17;}
   };
 
-  class MyMapper_converter : public MapBase<Spill, int> {
+  class MyMapper_converter : public MapBase<Data, int> {
   public:
-    MyMapper_converter() : MapBase<Spill, int>("TestClass") {}
-    MyMapper_converter(const MyMapper_converter& mm) : MapBase<Spill, int>(mm) {}
+    MyMapper_converter() : MapBase<Data, int>("TestClass") {}
+    MyMapper_converter(const MyMapper_converter& mm) : MapBase<Data, int>(mm) {}
     virtual ~MyMapper_converter() {}
 
   private:
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _process(Spill* t) const {
+    virtual int* _process(Data* t) const {
       return new int(999);
     }
   };

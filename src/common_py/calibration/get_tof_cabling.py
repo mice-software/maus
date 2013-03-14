@@ -21,6 +21,8 @@ Get TOF cabling from DB
 import cdb
 import json
 from Configuration import Configuration
+from cdb._exceptions import CdbPermanentError
+from cdb._exceptions import CdbTemporaryError
 
 class GetCabling:
     """
@@ -40,11 +42,16 @@ class GetCabling:
         cfgdoc = cfg.getConfigJSON()
         cfgdoc_json = json.loads(cfgdoc)
         cdb_url = cfgdoc_json['cdb_download_url'] + 'cabling?wsdl'
-        #cdb_url = "http://rgma19.pp.rl.ac.uk:8080/cdb/cabling?wsdl"
         self.cdb_server = cdb.Cabling()
+        try:
+            cdb.Cabling().get_status()
+        except CdbPermanentError:
+            raise CdbPermanentError("CDB error") #pylint: disable = E0702
+        except CdbTemporaryError:
+            raise CdbTemporaryError("CDB error") #pylint: disable = E0702
         self.cdb_server.set_url(cdb_url)
-        #print 'Server: ', self.cdb_server.get_name(), \
-        #                  self.cdb_server.get_version()
+        print '>Server: ', self.cdb_server.get_name(), \
+                         self.cdb_server.get_version()
 
     def get_cabling(self, devname, fromdate):
         """
@@ -59,13 +66,23 @@ class GetCabling:
             # check whether we are asked for the current cabling 
             # or cabling for an older date
             if fromdate == "" or fromdate == "current":
-                #print 'getting current cabling', devname
-                self._current_cabling = \
-                     self.cdb_server.get_current_cabling(devname)
+                #print '>getting current cabling', devname
+                try:
+                    self._current_cabling = \
+                         self.cdb_server.get_current_cabling(devname)
+                except CdbPermanentError:
+                    self._current_cabling = "cdb_permanent_error"
+                except CdbTemporaryError:
+                    self._current_cabling = "cdb_temporary_error"
             else:
                 #print 'getting cabling for date', fromdate
-                self._current_cabling = \
-                     self.cdb_server.get_cabling_for_date(devname,fromdate)
+                try:
+                    self._current_cabling = \
+                         self.cdb_server.get_cabling_for_date(devname,fromdate)
+                except CdbPermanentError:
+                    self._current_cabling = "cdb_permanent_error"
+                except CdbTemporaryError:
+                    self._current_cabling = "cdb_temporary_error"
             #print self._current_cabling
         else:
             raise Exception('get_tof_cabling failed.No device.')
