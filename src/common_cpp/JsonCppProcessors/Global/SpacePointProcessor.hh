@@ -41,7 +41,6 @@ class SpacePointProcessor
   SpacePointProcessor();
 
  private:
-  EnumDetectorPointProcessor _detector_enum_proc;
   BasePointProcessor _base_proc;
   DoubleProcessor _double_proc;
 };
