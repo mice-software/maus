@@ -144,11 +144,13 @@
 #pragma link C++ class MAUS::KLEventDigit+;
 #pragma link C++ class std::vector<MAUS::KLDigit>;
 #pragma link C++ class std::vector<MAUS::KLCellHit>;
+#pragma link C++ class MAUS::DataStructure::Global::BasePoint+;
 #pragma link C++ class MAUS::DataStructure::Global::SpacePoint+;
 #pragma link C++ class MAUS::DataStructure::Global::TrackPoint+;
 #pragma link C++ class MAUS::DataStructure::Global::Track+;
 #pragma link C++ class MAUS::DataStructure::Global::PrimaryChain+;
 #pragma link C++ class MAUS::DataStructure::Global::TRefTrackPair+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::BasePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::SpacePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TrackPoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::Track*>+;
