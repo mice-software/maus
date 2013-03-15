@@ -227,6 +227,27 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
 
+    /** Register a branch for processing where the data is the base class component of a derived class.
+     *
+     *  @tparam ChildType The base class, which must have it's own processor.
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param child_processor processor that will be used to convert the
+     *  representation of the child types
+     *  @param SetMethod callback that will set the value of the child data
+     *  associated with this branch
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     *
+     *  Note: A Get method is not required, as the inherited class
+     *        will be passed through to the relevant processor.
+     */
+    template <class ChildType>
+    void RegisterBaseClass(std::string branch_name,
+                           ProcessorBase<ChildType>* child_processor,
+                           void (ChildType::*SetMethod)(ChildType value),
+                           bool is_required);
+
     /** Register a branch for processing, where json value is always the same
      *
      *  @param branch_name name used by json to reference the branch

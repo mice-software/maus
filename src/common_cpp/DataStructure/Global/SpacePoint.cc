@@ -23,19 +23,13 @@ namespace Global {
 
 // Default constructor
 SpacePoint::SpacePoint()
-    : _charge(0.),
-      _position(0., 0., 0., 0.),
-      _position_error(0., 0., 0., 0.),
-      _detector(MAUS::DataStructure::Global::kUndefined),
-      _geometry_path("") {}
+    : BasePoint(),
+      _charge(0.) {}
 
 // Copy contructor
 SpacePoint::SpacePoint(const SpacePoint &space_point)
-    : _charge(space_point.get_charge()),
-      _position(space_point.get_position()),
-      _position_error(space_point.get_position_error()),
-      _detector(space_point.get_detector()),
-      _geometry_path(space_point.get_geometry_path()) {}
+    : BasePoint(space_point),
+      _charge(space_point.get_charge()) {}
 
 // Destructor
 SpacePoint::~SpacePoint() {}
@@ -45,11 +39,9 @@ SpacePoint& SpacePoint::operator=(const SpacePoint &space_point) {
   if (this == &space_point) {
     return *this;
   }
+  BasePoint::operator=(space_point);
+
   _charge          = space_point.get_charge();
-  _position        = space_point.get_position();
-  _position_error  = space_point.get_position_error();
-  _detector        = space_point.get_detector();
-  _geometry_path   = space_point.get_geometry_path();
 
   return *this;
 }
@@ -61,14 +53,14 @@ SpacePoint* SpacePoint::Clone() const {
   // of this in the constructor, and save CPU time.  But, I prefer to
   // keep the methods similar between SpacePoint, TrackPoint and
   // Track.
+
   MAUS::DataStructure::Global::SpacePoint* spNew =
       new MAUS::DataStructure::Global::SpacePoint();
 
+  // Clone the BasePoint elements
+  this->BasePoint::Clone(spNew);
+
   spNew->set_charge(this->get_charge());
-  spNew->set_position(this->get_position());
-  spNew->set_position_error(this->get_position_error());
-  spNew->set_detector(this->get_detector());
-  spNew->set_geometry_path(this->get_geometry_path());
 
   return spNew;
 }
@@ -79,38 +71,6 @@ void SpacePoint::set_charge(double charge) {
 
 double SpacePoint::get_charge() const {
   return _charge;
-}
-
-void SpacePoint::set_position(TLorentzVector position) {
-  _position = position;
-}
-
-TLorentzVector SpacePoint::get_position() const {
-  return _position;
-}
-
-void SpacePoint::set_position_error(TLorentzVector position_error) {
-  _position_error = position_error;
-}
-
-TLorentzVector SpacePoint::get_position_error() const {
-  return _position_error;
-}
-
-void SpacePoint::set_detector(DetectorPoint detector) {
-  _detector = detector;
-}
-
-DetectorPoint SpacePoint::get_detector() const {
-  return _detector;
-}
-
-void SpacePoint::set_geometry_path(std::string geometry_path) {
-  _geometry_path = geometry_path;
-}
-
-std::string SpacePoint::get_geometry_path() const {
-  return _geometry_path;
 }
 
 } // ~namespace Global

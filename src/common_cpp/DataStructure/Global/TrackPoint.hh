@@ -51,6 +51,7 @@
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
 #include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 
 namespace MAUS {
@@ -58,7 +59,7 @@ namespace DataStructure {
 namespace Global {
 
 // Only elements in the DataStructure should inherit from TObject.
-class TrackPoint : public TObject {
+class TrackPoint : public BasePoint {
  public:
 
   /// Default constructor - initialises to 0/NULL
@@ -95,22 +96,6 @@ class TrackPoint : public TObject {
   /// #_charge.
   double get_charge() const;
 
-  /// Set the 4D position of the reconstructed
-  /// MAUS::DataStructure::Global::Track at this point.
-  void set_position(TLorentzVector position);
-
-  /// Get the 4D position of the reconstructed
-  /// MAUS::DataStructure::Global::Track at this point.
-  TLorentzVector get_position() const;
-
-  /// Set the error on the 4D position of the reconstructed
-  /// MAUS::DataStructure::Global::Track at this point.
-  void set_position_error(TLorentzVector position_error);
-
-  /// Get the error on the 4D position of the reconstructed
-  /// MAUS::DataStructure::Global::Track at this point.
-  TLorentzVector get_position_error() const;
-
   /// Set the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   void set_momentum(TLorentzVector momentum);
@@ -126,30 +111,6 @@ class TrackPoint : public TObject {
   /// Get the error on the 4-momentum of the reconstructed
   /// MAUS::DataStructure::Global::Track at this point.
   TLorentzVector get_momentum_error() const;
-
-  /// Set the MAUS::global::recon::DetectorPoint flag for the
-  /// SpacePoint, defining which detector produced the point. If the
-  /// flag is kVirtual, then the TrackPoint does not correspond to a
-  /// detector measurment.
-  void set_detector(DetectorPoint detector);
-
-  /// Get the MAUS::global::recon::DetectorPoint flag for the
-  /// SpacePoint, defining which detector produced the point. If the
-  /// flag is kVirtual, then the TrackPoint does not correspond to a
-  /// detector measurment.
-  DetectorPoint get_detector() const;
-
-  /// Set the fully qualified geometry path of this point in space.
-  /// This will be primarily used for kVirtual TrackPoints, which have
-  /// no matching detector measurement, but have been filled to define
-  /// 'physics' points, e.g. immediately upstream of absorber region.
-  void set_geometry_path(std::string geometry_path);
-
-  /// Get the fully qualified geometry path of this point in space.
-  /// This will be primarily used for kVirtual TrackPoints, which have
-  /// no matching detector measurement, but have been filled to define
-  /// 'physics' points, e.g. immediately upstream of absorber region.
-  std::string get_geometry_path() const;
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
@@ -179,24 +140,11 @@ class TrackPoint : public TObject {
   /// Set/Get functions changed to access the underlieing SpacePoint.
   double         _charge;
 
-  /// The 4D position of the reconstructed Track at this point.
-  TLorentzVector  _position;
-  /// The error on the 4D position of the reconstructed Track at this
-  /// point.
-  TLorentzVector  _position_error;
-
   /// The 4-momentum of the reconstructed Track at this point.
   TLorentzVector  _momentum;
   /// The error on the 4-momentum of the reconstructed Track at this
   /// point.
   TLorentzVector  _momentum_error;
-
-  /// The detector element for this TrackPoint, either the detector
-  /// which produced the matching SpacePoint or kVirtual for 'physics'
-  /// TrackPoint's at user-defined locations.
-  DetectorPoint  _detector;
-  /// The fully qualified geometry path for this point in space.
-  std::string    _geometry_path;
 
   /// The reconstruction object defining the matching detector
   /// measurement.

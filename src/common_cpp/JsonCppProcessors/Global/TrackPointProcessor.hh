@@ -20,6 +20,7 @@
 
 #include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/BasePointProcessor.hh"
 
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 
@@ -33,7 +34,7 @@ namespace Global {
 /** @class TrackPointProcessor processor for
  *  MAUS::DataStructure::Global::TrackPoint
  *  @author Ian Taylor, University of Warwick
- *  @date 2013/03/01
+ *  @date 2013/03/14
  */
 class TrackPointProcessor
     : public ObjectProcessor<MAUS::DataStructure::Global::TrackPoint> {
@@ -42,7 +43,7 @@ class TrackPointProcessor
   TrackPointProcessor();
 
  private:
-  EnumDetectorPointProcessor _detector_enum_proc;
+  BasePointProcessor _base_proc;
   DoubleProcessor _double_proc;
   TLorentzVectorProcessor _tlorentz_vec_proc;
   StringProcessor _string_proc;

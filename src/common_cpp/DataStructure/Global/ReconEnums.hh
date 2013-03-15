@@ -54,35 +54,36 @@ namespace Global {
  * updated.
  */
 enum DetectorPoint {
-  kUndefined  =  0, /**< enum Undefined, used for initialization only */
-  kVirtual    =  1, /**< enum For a Virtual point with a geometry path */
-  kTOF0       =  2,
-  kTOF1       =  3,
-  kTOF2       =  4,
-  kCkovA      =  5,
-  kCkovB      =  6,
-  kKL         =  7,
-  kEMR        =  8,
-  kTracker1   =  9,
-  kTracker1S1 = 10,
-  kTracker1S2 = 11,
-  kTracker1S3 = 12,
-  kTracker1S4 = 13,
-  kTracker1S5 = 14,
-  kTracker2   = 15,
-  kTracker2S1 = 16,
-  kTracker2S2 = 17,
-  kTracker2S3 = 18,
-  kTracker2S4 = 19,
-  kTracker2S5 = 20,
-  kGVA        = 21,
-  kBPM        = 22
+  kUndefined   =  0, /**< enum Undefined, used for initialization only */
+  kVirtual     =  1, /**< enum For a Virtual point with a geometry path */
+  kTOF0_1      =  2,
+  kTOF0_2      =  3,
+  kCherenkov1  =  4,
+  kTOF1_1      =  5,
+  kTOF1_2      =  6,
+  kTracker1    =  7,
+  kTracker1_1  =  8,
+  kTracker1_2  =  9,
+  kTracker1_3  = 10,
+  kTracker1_4  = 11,
+  kTracker1_5  = 12,
+  kTracker2    = 13,
+  kTracker2_1  = 14,
+  kTracker2_2  = 15,
+  kTracker2_3  = 16,
+  kTracker2_4  = 17,
+  kTracker2_5  = 18,
+  kTOF2_1      = 19,
+  kTOF2_2      = 20,
+  kCherenkov2  = 21,
+  kCalorimeter = 22,
+  kEMR         = 23
   // If you add an entry, remember to update kDetectorPointSize below.
 };
 
 /// A constant defining the upper limit of the DetectorPoint enum
 /// (i.e. one more than the highest value above).
-const int kDetectorPointSize = 23;
+const int kDetectorPointSize = 24;
 
 //////////////////////////////////////////////////////////////////////
 ///  @brief Defines the PID hypothesis for reconstruction objects,
@@ -95,11 +96,34 @@ const int kDetectorPointSize = 23;
 ///  http://pdg.lbl.gov/2012/reviews/rpp2012-rev-monte-carlo-numbering.pdf
 ///  Particles and antiparticles are considered identically here.
 enum PID {
-  kNoPID    = 0,
-  kElectron = 11,
-  kMuon     = 13,
-  kPion     = 211,
-  kProton   = 2212
+  kNoPID                =  0,
+  kEMinus               =  11,
+  kEPlus                = -11,
+  kElectronNeutrino     =  12,
+  kElectronAntineutrino = -12,
+  kMuMinus              =  13,
+  kMuPlus               = -13,
+  kMuonNeutrino         =  14,
+  kMuonAntineutrino     = -14,
+  kPhoton               =  22,
+  kPiMinus              = -211,
+  kPi0                  =  111,
+  kPiPlus               =  211,
+  kKMinus               = -321,
+  kK0                   =  311,
+  kKLong                =  130,
+  kKShort               =  310,
+  kKPlus                =  321,
+  kNeutron              =  2112,
+  kAntineutron          = -2112,
+  kProton               =  2212,
+  kAntiproton           = -2212,
+  kLambda               =  3122,
+  kAntilambda           = -3122,
+  kDeuterium            =  1000010020,
+  kTritium              =  1000010030,
+  kHelium3              =  1000020030,
+  kHelium4              =  1000020040
 };
 /** @} */ // end of globalrecon
 
