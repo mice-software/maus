@@ -190,6 +190,8 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
     std::cerr << (site.get_residual(KalmanSite::Smoothed))(0, 0) << std::endl;
     std::cerr << "================Projection================" << std::endl;
     // site.get_a(KalmanSite::Projected).Print();
+    // site.get_a(KalmanSite::Filtered).Print();
+    // site.get_a(KalmanSite::Smoothed).Print();
     // site.get_a().Print();
     // site.get_smoothed_a().Print();
     // site.get_projected_covariance_matrix().Print();

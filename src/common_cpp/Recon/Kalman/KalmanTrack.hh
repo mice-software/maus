@@ -75,26 +75,41 @@ typedef struct BetheBloch {
 
 class KalmanTrack {
  public:
+  /* @brief	Constructs taking MCS and Eloss flags.
+   */
   KalmanTrack(bool MCS, bool Eloss);
 
+  /* @brief	Destructor. Cleans up heap.
+   */
   virtual ~KalmanTrack() {}
 
+  /* @brief	Initializes member matrices.
+   */
+  void init();
+
+  /* @brief	Manages all extrapolation steps.
+   */
   void extrapolate(std::vector<KalmanSite> &sites, int current_site);
 
+  /* @brief	Manages all filtering steps.
+   */
   void filter(std::vector<KalmanSite> &sites, int current_site);
 
+  /* @brief	Manages all smoothins steps.
+   */
   void smooth(std::vector<KalmanSite> &sites, int current_site);
 
+  /* @brief	Calculates the Propagator Matrix (F) for the current extrapolation.
+   */
   virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
   /// Projection methods
-  void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site);
+  virtual void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) = 0;
   void calc_covariance(const KalmanSite *old_site, KalmanSite *new_site);
   double BetheBlochStoppingPower(double p);
   void subtract_energy_loss(const KalmanSite *old_site, KalmanSite *new_site);
   /// Error added by Multiple Coulomb Scattering.
   void calc_system_noise(const KalmanSite *old_site, const KalmanSite *new_site);
-
 
   /// Filtering methods
   void calc_filtered_state(KalmanSite *a_site);
@@ -133,6 +148,7 @@ class KalmanTrack {
   void set_momentum(double momentum) { _momentum = momentum; }
 
  protected:
+  
   bool _use_MCS;
 
   bool _use_Eloss;

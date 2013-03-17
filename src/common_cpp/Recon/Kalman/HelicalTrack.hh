@@ -37,11 +37,15 @@ namespace MAUS {
 
 class HelicalTrack : public KalmanTrack {
  public:
+  /* @brief	Helical constructor.
+   */
   HelicalTrack(bool MCS, bool Eloss);
 
   virtual ~HelicalTrack();
 
   void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site);
+
+  void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site);
 
  private:
   static const double _B_field = -4.;

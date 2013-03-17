@@ -38,6 +38,7 @@ KalmanSeed::~KalmanSeed() {}
 
 void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
   _straight = true;
+  _n_parameters = 4;
 
   process_measurements(pr_track);
 
@@ -46,6 +47,7 @@ void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
 
 void KalmanSeed::build(const SciFiHelicalPRTrack* pr_track) {
   _helical = true;
+  _n_parameters = 5;
 
   process_measurements(pr_track);
 
@@ -121,6 +123,7 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   a(3, 0) = py*kappa;
   a(4, 0) = kappa;
 
+  std::cout << "SEED (Pz, kappa) = " << pz << " " << kappa << std::endl;
   _momentum = TMath::Sqrt(px*px+py*py+pz*pz);
 
   return a;

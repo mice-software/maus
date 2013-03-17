@@ -19,7 +19,7 @@
 namespace MAUS {
 
 StraightTrack::StraightTrack(bool MCS, bool Eloss) : KalmanTrack(MCS, Eloss) {
-  _n_parameters = 5;
+  _n_parameters = 4;
 }
 
 StraightTrack::~StraightTrack() {}
@@ -39,6 +39,16 @@ void StraightTrack::update_propagator(const KalmanSite *old_site, const KalmanSi
   }
   _F(0, 1) = deltaZ;
   _F(2, 3) = deltaZ;
+}
+
+void StraightTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) {
+  update_propagator(old_site, new_site);
+
+  TMatrixD a = old_site->get_a(KalmanSite::Filtered);
+
+  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+
+  new_site->set_a(a_projected, KalmanSite::Projected);
 }
 
 } // ~namespace MAUS

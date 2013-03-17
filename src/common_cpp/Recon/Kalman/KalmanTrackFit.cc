@@ -45,14 +45,10 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
   size_t num_tracks = seeds.size();
   for ( size_t i = 0; i < num_tracks; ++i ) {
+    // Get the seed.
     KalmanSeed* seed = seeds[i];
-    std::vector<KalmanSite> sites;
 
-    initialise(seed, sites, kalman_align);
-
-    size_t numb_measurements = sites.size();
-    if ( numb_measurements != 15 ) continue;
-
+    // Create the Track object.
     KalmanTrack *track = 0;
     if ( seed->is_straight() ) {
       track = new StraightTrack(_use_MCS, _use_Eloss);
@@ -63,6 +59,17 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
             "Can't initialise KalmanTrack; seed undefined.",
             "KalmanTrackFit::process"));
     }
+
+    // Initialize member matrices.
+    track->init();
+
+    // Set up KalmanSites to be used.
+    std::vector<KalmanSite> sites;
+    initialise(seed, sites, kalman_align);
+
+    size_t numb_measurements = sites.size();
+    if ( numb_measurements != 15 ) continue;
+
     double momentum = seed->get_momentum(); // MeV/c
     track->set_momentum(momentum);
     // Filter the first state.
@@ -72,7 +79,7 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     if ( _type_of_dataflow == "pipeline_single_thread" ) {
       monitor.fill(sites);
-      monitor.print_info(sites);
+      // monitor.print_info(sites);
     }
 
     track->compute_chi2(sites);
@@ -86,36 +93,18 @@ void KalmanTrackFit::process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
   }
 }
 
-void KalmanTrackFit::launch_misaligment_search(KalmanTrack *track,
-                                               std::vector<KalmanSite> &sites,
-                                               KalmanSciFiAlignment &kalman_align) {
-  double old_track_chi2 = track->s_chi2();
-  for ( int station_i = 2; station_i < 5; ++station_i ) {
-    std::vector<KalmanSite> sites_copy(sites);
-    // Fit without station i.
-    run_filter(track, sites_copy, station_i);
-    track->compute_chi2(sites_copy);
-    double new_track_chi2 = track->s_chi2();
-    if ( new_track_chi2 < old_track_chi2 ) {
-      // Compute inovation in local misalignments when station is removed.
-      track->update_misaligments(sites, sites_copy, station_i);
-      int site_i = 3*(station_i)-1;
-      kalman_align.update(sites_copy[site_i]);
-    }
-  }
-  kalman_align.save();
-}
-
 void KalmanTrackFit::initialise(KalmanSeed *seed,
                                 std::vector<KalmanSite> &sites,
                                 KalmanSciFiAlignment &kalman_align) {
   TMatrixD a0 = seed->get_initial_state_vector();
 
+  int n_param = seed->get_n_parameters();
+
   TMatrixD C(5, 5);
   C.Zero();
-  C(0, 0) = 2.;        // x covariance
+  C(0, 0) = _seed_cov;        // x covariance
   C(1, 1) = _seed_cov; // dummy covariance
-  C(2, 2) = 2.;        // y covariance
+  C(2, 2) = _seed_cov;        // y covariance
   C(3, 3) = _seed_cov; // dummy covariance
   C(4, 4) = _seed_cov; // dummy covariance
 
@@ -189,6 +178,26 @@ void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sit
   for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
     track->smooth(sites, k);
   }
+}
+
+void KalmanTrackFit::launch_misaligment_search(KalmanTrack *track,
+                                               std::vector<KalmanSite> &sites,
+                                               KalmanSciFiAlignment &kalman_align) {
+  double old_track_chi2 = track->s_chi2();
+  for ( int station_i = 2; station_i < 5; ++station_i ) {
+    std::vector<KalmanSite> sites_copy(sites);
+    // Fit without station i.
+    run_filter(track, sites_copy, station_i);
+    track->compute_chi2(sites_copy);
+    double new_track_chi2 = track->s_chi2();
+    if ( new_track_chi2 < old_track_chi2 ) {
+      // Compute inovation in local misalignments when station is removed.
+      track->update_misaligments(sites, sites_copy, station_i);
+      int site_i = 3*(station_i)-1;
+      kalman_align.update(sites_copy[site_i]);
+    }
+  }
+  kalman_align.save();
 }
 
 void KalmanTrackFit::filter_virtual(KalmanSite &a_site) {

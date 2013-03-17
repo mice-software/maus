@@ -19,13 +19,50 @@
 
 namespace MAUS {
 
-HelicalTrack::HelicalTrack(bool MCS, bool Eloss) : KalmanTrack(MCS, Eloss) {
-  _n_parameters = 6;
+HelicalTrack::HelicalTrack(bool MCS,
+                           bool Eloss) : KalmanTrack(MCS, Eloss) {
+  _n_parameters = 5;
 }
 
 HelicalTrack::~HelicalTrack() {}
 
-void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) {
+void HelicalTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) {
+  // Find dz (mm).
+  double new_z = new_site->get_z();
+  double old_z = old_site->get_z();
+  double deltaZ = (new_z-old_z);
+
+  // Get old state vector...
+  TMatrixD old_a = old_site->get_a(KalmanSite::Filtered);
+  double old_x      = old_a(0, 0);
+  double old_mx     = old_a(1, 0);
+  double old_y      = old_a(2, 0);
+  double old_my     = old_a(3, 0);
+  double old_kappa  = old_a(4, 0);
+
+  double a = -0.2998*_particle_charge*_B_field;
+  double sine   = sin(a*deltaZ*old_kappa);
+  double cosine = cos(a*deltaZ*old_kappa);
+
+  double new_x  = old_x + 1./old_kappa*( old_mx*sine/a - old_my*(1.-cosine)/a);
+  double new_mx = old_mx*cosine - old_my*sine;
+  double new_y  = old_y + 1./old_kappa*( old_my*sine/a + old_mx*(1.-cosine)/a);
+  double new_my = old_my*cosine + old_mx*sine;
+
+  TMatrixD a_projected(_n_parameters, 1);
+  a_projected(0, 0) = new_x;
+  a_projected(1, 0) = new_mx;
+  a_projected(2, 0) = new_y;
+  a_projected(3, 0) = new_my;
+  a_projected(4, 0) = old_kappa;
+
+  new_site->set_a(a_projected, KalmanSite::Projected);
+
+  update_propagator(old_site, new_site);
+}
+
+void HelicalTrack::update_propagator(const KalmanSite *old_site,
+                                     const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
@@ -36,62 +73,65 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // Delta Z in mm
   double deltaZ = (new_z-old_z);
 
-  // Get old state vector...
-  TMatrixD prev_site = old_site->get_a(KalmanSite::Filtered);
-
-  double old_kappa  = prev_site(4, 0);
-  double old_kappa2 = TMath::Power(old_kappa, 2.);
+  // Get current state vector...
+  TMatrixD site = new_site->get_a(KalmanSite::Projected);
+  double mx     = site(1, 0);
+  double my     = site(3, 0);
+  double kappa  = site(4, 0);
+  double kappa2 = TMath::Power(kappa, 2.);
 
   // constant in units MeV/mm
   double a = -0.2998*_particle_charge*_B_field;
 
   // Define factors to be used in the matrix.
-  double sine   = sin(a*deltaZ*old_kappa);
-  double cosine = cos(a*deltaZ*old_kappa);
+  double sine   = sin(a*deltaZ*kappa);
+  double cosine = cos(a*deltaZ*kappa);
 
   // @x/@x
   _F(0, 0) = 1.;
-  // @x/@px
-  _F(0, 1) = sine/(old_kappa*a);
+  // @x/@mx
+  _F(0, 1) = sine/(kappa*a);
   // @x/@y
   _F(0, 2) = 0.;
-  // @x/@py
-  _F(0, 3) = (cosine-1.)/(old_kappa*a);
+  // @x/@my
+  _F(0, 3) = (cosine-1.)/(kappa*a);
   // @x/@kappa
-  _F(0, 4) = 0.0;
+  _F(0, 4) = - (1./kappa2)*(mx*sine/a - my*(1.-cosine)/a)
+             + (1./kappa) *(mx*deltaZ*cosine - my*deltaZ*sine);
 
-  // @px/@x
+  // @mx/@x
   _F(1, 0) = 0.;
-  // @px/@px
+  // @mx/@mx
   _F(1, 1) = cosine;
-  // @px/@y
+  // @mx/@y
   _F(1, 2) = 0.;
-  // @px/@py
+  // @mx/@my
   _F(1, 3) = -sine;
-  // @px/@kappa
-  _F(1, 4) = 0.;
+  // @mx/@kappa
+  _F(1, 4) = -mx*a*deltaZ*sine - my*a*deltaZ*cosine;
 
   // @y/@x
   _F(2, 0) = 0.;
-  // @y/@px
-  _F(2, 1) = (1.-cosine)/(old_kappa*a);
+  // @y/@mx
+  _F(2, 1) = (1.-cosine)/(kappa*a);
   // @y/@y
   _F(2, 2) = 1.;
-  // @y/@py
-  _F(2, 3) = sine/(old_kappa*a);
+  // @y/@my
+  _F(2, 3) = sine/(kappa*a);
   // @y/@kappa
-  _F(2, 4) = 0.0;
+  _F(2, 4) =  - (1./kappa2)*(my*sine/a - mx*(1.-cosine)/a)
+              + (1./kappa) *(my*deltaZ*cosine - mx*deltaZ*sine);
 
-  // @py/@x
+  // @my/@x
   _F(3, 0) = 0.;
-  // @py/@px
+  // @py/@mx
   _F(3, 1) = sine;
-  // @py/@y
+  // @my/@y
   _F(3, 2) = 0.;
-  // @py/@py
+  // @my/@my
   _F(3, 3) = cosine;
-  // @py/@kappa
-  _F(3, 4) = 0.;
+  // @my/@kappa
+  _F(3, 4) = -my*a*deltaZ*sine + mx*a*deltaZ*cosine;
 
   // @kappa/@x
   _F(4, 0) = 0.;

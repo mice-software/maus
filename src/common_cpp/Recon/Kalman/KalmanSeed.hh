@@ -64,6 +64,7 @@ class KalmanSeed {
 
   std::vector<SciFiSpacePoint> get_spacepoints() { return _spacepoints; }
 
+  int get_n_parameters() const { return _n_parameters; }
  private:
   std::vector<SciFiCluster*> _clusters;
 
@@ -76,6 +77,8 @@ class KalmanSeed {
   bool _straight;
 
   bool _helical;
+
+  int _n_parameters;
 };
 
 } // ~namespace MAUS

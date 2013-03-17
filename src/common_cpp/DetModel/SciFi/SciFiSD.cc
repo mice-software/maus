@@ -15,27 +15,6 @@
  *
  */
 
-#include <iostream>
-#include <fstream>
-#include <cmath>
-
-
-#include "Geant4/G4TransportationManager.hh"
-#include "Geant4/G4FieldManager.hh"
-#include "Geant4/G4Field.hh"
-#include "Geant4/G4HCofThisEvent.hh"
-#include "Geant4/G4Step.hh"
-#include "Geant4/G4ThreeVector.hh"
-#include "Geant4/G4SDManager.hh"
-#include "Geant4/G4ios.hh"
-
-#include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TTree.h"
-
-#include "Interface/MICEEvent.hh"
-#include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/DetModel/SciFi/SciFiSD.hh"
 
 SciFiSD::SciFiSD(MiceModule* mod) : MAUSSD(mod) {
