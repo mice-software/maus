@@ -170,7 +170,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         if (self.end_of_run_spill == None):
             print "  Missing an end_of_run spill..."
             print "  ...creating one to flush the mergers!"
-            self.end_of_run_spill = {"daq_event_type":"physics_event",
+            self.end_of_run_spill = {"daq_event_type":"end_of_run",
                                      "maus_event_type":"Spill",
                                      "run_number":self.run_number,
                                      "spill_number":-1}

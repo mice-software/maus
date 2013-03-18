@@ -88,20 +88,20 @@ TEST_F(TrackTest, DefaultConstructor) {
   Track empty_track;
 
   ASSERT_EQ((size_t) 0, empty_track.size());
-  ASSERT_EQ(Particle::kNone, empty_track.particle_id());
+  ASSERT_EQ(MAUS::DataStructure::Global::kNoPID, empty_track.particle_id());
 }
 
 TEST_F(TrackTest, Accessors) {
   Track track;
-  track.set_particle_id(Particle::kMuPlus);
-  EXPECT_EQ(Particle::kMuPlus, track.particle_id());
+  track.set_particle_id(MAUS::DataStructure::Global::kMuPlus);
+  EXPECT_EQ(MAUS::DataStructure::Global::kMuPlus, track.particle_id());
 }
 
 TEST_F(TrackTest, IdentifiedConstructor) {
-  Track track(Particle::kMuMinus);
+  Track track(MAUS::DataStructure::Global::kMuMinus);
 
   ASSERT_EQ((size_t) 0, track.size());
-  ASSERT_EQ(Particle::kMuMinus, track.particle_id());
+  ASSERT_EQ(MAUS::DataStructure::Global::kMuMinus, track.particle_id());
 }
 
 TEST_F(TrackTest, ContentConstructor) {
@@ -111,13 +111,13 @@ TEST_F(TrackTest, ContentConstructor) {
   };
   std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
 
-  Track track(track_points, Particle::kMuMinus);
+  Track track(track_points, MAUS::DataStructure::Global::kMuMinus);
 
   ASSERT_EQ((size_t) 2, track.size());
   for (int index = 0; index < 2; ++index) {
     ASSERT_EQ(track_point_array[index], track[index]);
   }
-  ASSERT_EQ(Particle::kMuMinus, track.particle_id());
+  ASSERT_EQ(MAUS::DataStructure::Global::kMuMinus, track.particle_id());
 }
 
 TEST_F(TrackTest, CopyConstructor) {
@@ -126,7 +126,7 @@ TEST_F(TrackTest, CopyConstructor) {
     TrackPoint(8., 7., 6., 5., 4., 3., CovarianceMatrix(), 2.)
   };
   std::vector<TrackPoint> track_points(track_point_array, track_point_array+2);
-  Track track(track_points, Particle::kMuMinus);
+  Track track(track_points, MAUS::DataStructure::Global::kMuMinus);
   Track track_copy(track);
 
   for (int index = 0; index < 2; ++index) {

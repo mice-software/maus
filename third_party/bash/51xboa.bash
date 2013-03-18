@@ -40,7 +40,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         python setup.py build
         echo "INFO: Installing within MAUS's third party directory:"
         sleep 1
-        python setup.py install --prefix=${my_prefix} --root=${my_destdir}
+        # Remove --prefix, --root as they appear to have broken the "share" area
+        # i.e. there was no install/share/xboa directory created; but if omitted
+        # doesn't appear to cause any problems 
+        # --prefix=${my_prefix} --root=${my_destdir} 
+        python setup.py install
 	echo
         echo "INFO: The package should be locally build now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"

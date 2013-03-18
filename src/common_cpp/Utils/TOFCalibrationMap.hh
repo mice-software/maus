@@ -176,7 +176,7 @@ class TOFCalibrationMap {
   * To be used only for debugging.
   */
   void Print();
-  void Reset();
+  bool InitializePyMod();
   void GetCalib(std::string devname, std::string caltype, std::string fromdate);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
@@ -269,6 +269,7 @@ class TOFCalibrationMap {
   bool LoadT0Calib();
   bool LoadTWCalib();
   bool LoadTriggerCalib();
+  bool pymod_ok;
 };
 
 #endif

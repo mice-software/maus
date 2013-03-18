@@ -16,7 +16,10 @@ import ROOT
 
 def generate_some_data(outfile):
     """
-    Run the offline reconstruction to make a data file
+    Run the offline reconstruction to make a data file.
+
+    Note the "offline" reconstruction needs an internet connection to access
+    configuration and calibration data.
     """
     # generate a root file from MAUS output
     root_tmp = os.path.expandvars("$MAUS_ROOT_DIR/tmp/load_json_file_temp.root")
