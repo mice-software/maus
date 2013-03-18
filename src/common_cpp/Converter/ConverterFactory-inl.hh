@@ -32,9 +32,10 @@ namespace MAUS {
 
 
   // Template implementation
-  // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+  // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
   template <typename INPUT, typename OUTPUT>
-  OUTPUT* ConverterFactory::convert(INPUT* i) const throw(NullInputException, UnhandledException) {
+  OUTPUT* ConverterFactory::convert(INPUT* i) const
+      throw(NullInputException, UnhandledException) {
     // not necessary if each converter does this check
     // but only if inheriting from converter base, not necessary as long as
     // implement the IConverter interface so check here anyway
@@ -81,20 +82,23 @@ namespace MAUS {
     throw ConverterNotFoundException("ConverterFactory");
   }
   template <>
-  IConverter<Json::Value, Data>* ConverterFactory::getConverter<Json::Value, Data>() const
+  inline IConverter<Json::Value, Data>*
+  ConverterFactory::getConverter<Json::Value, Data>() const
     throw(ConverterNotFoundException) {
 
     return new JsonCppSpillConverter();
   }
 
-  // DAMN cant do this as JsonCppSpillConverter only inherits from one type of Converter base
-  // Must split it up
+  // DAMN cant do this as JsonCppSpillConverter only inherits from one
+  // type of Converter base. Must split it up
   template <>
-  IConverter<Data, Json::Value>* ConverterFactory::getConverter<Data, Json::Value>() const
+  inline IConverter<Data, Json::Value>*
+  ConverterFactory::getConverter<Data, Json::Value>() const
     throw(ConverterNotFoundException) {
 
     return new CppJsonSpillConverter();
   }
+
 //   template <>
 //   IConverter<int,double>* ConverterFactory::getConverter<double, int>() const
 //     throw (ConverterNotFoundException){
