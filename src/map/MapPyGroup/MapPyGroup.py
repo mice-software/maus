@@ -125,7 +125,12 @@ class MapPyGroup:
         birth_ok = True
         for worker in self._workers:
             try:
-                birth_ok = birth_ok and worker.birth(json_config_doc)
+                # Because None is also considered a pass, we can't
+                # simply use 'and' here.
+                worker_birth_ok = worker.birth(json_config_doc)
+                if (worker_birth_ok is None):
+                    worker_birth_ok = True
+                birth_ok = birth_ok and worker_birth_ok
             except: # pylint:disable = W0702
                 # Record the exception.
                 exceptions.append(worker.__class__.__name__ + ":" + 
@@ -179,7 +184,12 @@ class MapPyGroup:
         exceptions = [] # List of exceptions from each member.
         for worker in self._workers:
             try:
-                death_ok = death_ok and worker.death()
+                # Because None is also considered a pass, we can't
+                # simply use 'and' here.
+                worker_death_ok = worker.death()
+                if (worker_death_ok is None):
+                    worker_death_ok = True
+                death_ok = death_ok and worker_death_ok
             except: # pylint:disable = W0702
                 # Record the exception and continue.
                 exceptions.append(worker.__class__.__name__ + ": " + 
