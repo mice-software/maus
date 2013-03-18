@@ -38,6 +38,8 @@ class HelicalTrackTest : public ::testing::Test {
 };
 
 void HelicalTrackTest::set_up_sites() {
+  old_site.initialise(5);
+  new_site.initialise(5);
   kappa = 1./200.;
   x0 = 0.;
   y0 = 5.;
@@ -76,7 +78,7 @@ TEST_F(HelicalTrackTest, test_propagation) {
 
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   // old_site.get_a().Print();
-  track->update_propagator(&old_site, &new_site);
+  // track->update_propagator(&old_site, &new_site);
   track->calc_predicted_state(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);

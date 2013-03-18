@@ -31,7 +31,6 @@ bool sort_by_station(const SciFiSpacePoint a, const SciFiSpacePoint b) {
 }
 
 KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {
-  _a0.ResizeTo(5, 1);
 }
 
 KalmanSeed::~KalmanSeed() {}
@@ -39,6 +38,7 @@ KalmanSeed::~KalmanSeed() {}
 void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
   _straight = true;
   _n_parameters = 4;
+  _a0.ResizeTo(_n_parameters, 1);
 
   process_measurements(pr_track);
 
@@ -48,6 +48,7 @@ void KalmanSeed::build(const SciFiStraightPRTrack* pr_track) {
 void KalmanSeed::build(const SciFiHelicalPRTrack* pr_track) {
   _helical = true;
   _n_parameters = 5;
+  _a0.ResizeTo(_n_parameters, 1);
 
   process_measurements(pr_track);
 
@@ -103,27 +104,13 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiHelicalPRTrack* see
   double x = _spacepoints[0].get_position().x();
   double y = _spacepoints[0].get_position().y();
 
-  // ThreeVector true_p = _clusters[0]->get_true_momentum();
-  // std::cerr << pz << " " << true_p.z() << " " << true_p << std::endl;
-/*
-  ThreeVector true_p = _clusters[0]->get_true_momentum();
-  double true_pt  = sqrt(true_p.x()*true_p.x()+true_p.y()*true_p.y());
-  double true_phi = acos(-true_p.x()/true_pt);
-  std::cerr << pt*cos(phi-PI/2.) << " " << pt*sin(phi-PI/2.) << std::endl;
-  std::cerr << px << " " << py << " " << true_p << std::endl;
-  std::cerr << "Pt: " << sqrt(px*px+py*py) << std::endl;
-  std::cerr << "True Pt: " << true_pt << std::endl;
-  std::cerr << "phi's: " << phi << " " << true_phi << "difference: " << true_phi-phi_0<< std::endl;
-*/
-
-  TMatrixD a(5, 1);
+  TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
   a(1, 0) = px*kappa;
   a(2, 0) = y;
   a(3, 0) = py*kappa;
   a(4, 0) = kappa;
 
-  std::cout << "SEED (Pz, kappa) = " << pz << " " << kappa << std::endl;
   _momentum = TMath::Sqrt(px*px+py*py+pz*pz);
 
   return a;
@@ -135,17 +122,13 @@ TMatrixD KalmanSeed::compute_initial_state_vector(const SciFiStraightPRTrack* se
 
   double mx = seed->get_mx();
   double my = seed->get_my();
-  double seed_pz = 230.;
+  double seed_pz = 226.;
 
-  // std::cerr << mx << " " << my << " " << _clusters[0]->get_true_momentum()<< std::endl;
-
-
-  TMatrixD a(5, 1);
+  TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
-  a(4, 0) = 1./seed_pz;
 
   _momentum = seed_pz;
 

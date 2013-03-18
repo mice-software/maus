@@ -148,7 +148,6 @@ class KalmanTrack {
   void set_momentum(double momentum) { _momentum = momentum; }
 
  protected:
-  
   bool _use_MCS;
 
   bool _use_Eloss;

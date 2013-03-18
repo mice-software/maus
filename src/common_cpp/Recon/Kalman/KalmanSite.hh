@@ -36,7 +36,7 @@ namespace MAUS {
 
 class KalmanSite {
  public:
-  KalmanSite();
+  explicit KalmanSite();
 
   ~KalmanSite();
 
@@ -51,7 +51,7 @@ class KalmanSite {
                Excluded };
 
   /// Initialises member matrices.
-  void initialise();
+  void initialise(int dim);
 
   /// SETTERS
   ///

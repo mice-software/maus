@@ -65,6 +65,7 @@ class KalmanSeed {
   std::vector<SciFiSpacePoint> get_spacepoints() { return _spacepoints; }
 
   int get_n_parameters() const { return _n_parameters; }
+
  private:
   std::vector<SciFiCluster*> _clusters;
 

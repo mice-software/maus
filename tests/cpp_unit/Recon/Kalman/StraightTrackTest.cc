@@ -34,6 +34,8 @@ class StraightTrackTest : public ::testing::Test {
 };
 
 void StraightTrackTest::set_up_sites() {
+  old_site.initialise(4);
+  new_site.initialise(4);
   deltaZ = 1100.0;
   new_site.set_id(0);
   new_site.set_z(deltaZ);

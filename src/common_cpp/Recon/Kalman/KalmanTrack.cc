@@ -77,7 +77,7 @@ void KalmanTrack::extrapolate(std::vector<KalmanSite> &sites, int i) {
   calc_predicted_state(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
-  if ( _use_Eloss )
+  if ( _n_parameters > 4 && _use_Eloss )
     subtract_energy_loss(old_site, new_site);
 
   // Calculate the system noise...
@@ -462,10 +462,7 @@ void KalmanTrack::calc_filtered_state(KalmanSite *a_site) {
   a_filt = a + _K*pull;
 
   a_site->set_a(a_filt, KalmanSite::Filtered);
-  std::cout <<"Filtered"<<std::endl;
-  a_filt.Print();
-_K.Print();
-pull.Print();
+
   // Residual.
   set_residual(a_site, KalmanSite::Filtered);
 }

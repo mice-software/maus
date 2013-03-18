@@ -26,9 +26,7 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
                           _s_chi2(0.),
                           _direction(CLHEP::Hep3Vector()),
                           _mc_pos(CLHEP::Hep3Vector()),
-                          _mc_mom(CLHEP::Hep3Vector()) {
-  initialise();
-}
+                          _mc_mom(CLHEP::Hep3Vector()) {}
 
 KalmanSite::~KalmanSite() {}
 
@@ -40,7 +38,8 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
                                                 _direction(CLHEP::Hep3Vector()),
                                                 _mc_pos(CLHEP::Hep3Vector()),
                                                 _mc_mom(CLHEP::Hep3Vector()) {
-  initialise();
+  int dim = site.get_a(KalmanSite::Projected).GetNrows();
+  initialise(dim);
 
   _z = site.get_z();
   _id= site.get_id();
@@ -123,18 +122,18 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   return *this;
 }
 
-void KalmanSite::initialise() {
+void KalmanSite::initialise(int dim) {
   // The state vector.
-  _projected_a.ResizeTo(5, 1);
-  _a.          ResizeTo(5, 1);
-  _smoothed_a. ResizeTo(5, 1);
-  _a_excluded. ResizeTo(5, 1);
+  _projected_a.ResizeTo(dim, 1);
+  _a.          ResizeTo(dim, 1);
+  _smoothed_a. ResizeTo(dim, 1);
+  _a_excluded. ResizeTo(dim, 1);
 
   // The covariance matrix.
-  _projected_C.ResizeTo(5, 5);
-  _C.          ResizeTo(5, 5);
-  _smoothed_C. ResizeTo(5, 5);
-  _C_excluded. ResizeTo(5, 5);
+  _projected_C.ResizeTo(dim, dim);
+  _C.          ResizeTo(dim, dim);
+  _smoothed_C. ResizeTo(dim, dim);
+  _C_excluded. ResizeTo(dim, dim);
 
   // The measurement.
   _v.          ResizeTo(2, 1);

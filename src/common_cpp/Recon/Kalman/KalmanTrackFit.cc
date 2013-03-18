@@ -100,16 +100,14 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
 
   int n_param = seed->get_n_parameters();
 
-  TMatrixD C(5, 5);
+  TMatrixD C(n_param, n_param);
   C.Zero();
-  C(0, 0) = _seed_cov;        // x covariance
-  C(1, 1) = _seed_cov; // dummy covariance
-  C(2, 2) = _seed_cov;        // y covariance
-  C(3, 3) = _seed_cov; // dummy covariance
-  C(4, 4) = _seed_cov; // dummy covariance
+  for ( int i = 0; i < n_param; i++ )
+    C(i, i) = _seed_cov;
 
   std::vector<SciFiCluster*> clusters = seed->get_clusters();
   KalmanSite first_plane;
+  first_plane.initialise(n_param);
   first_plane.set_a(a0, KalmanSite::Projected);
   first_plane.set_covariance_matrix(C, KalmanSite::Projected);
   first_plane.set_measurement(clusters[0]->get_alpha());
@@ -124,6 +122,7 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
   size_t numb_sites = clusters.size();
   for ( size_t j = 1; j < numb_sites; ++j ) {
     KalmanSite a_site;
+    a_site.initialise(n_param);
     a_site.set_measurement(clusters[j]->get_alpha());
     a_site.set_direction(clusters[j]->get_direction());
     a_site.set_z(clusters[j]->get_position().z());
@@ -144,15 +143,19 @@ void KalmanTrackFit::initialise(KalmanSeed *seed,
 
 void KalmanTrackFit::run_filter(KalmanTrack *track, std::vector<KalmanSite> &sites) {
   size_t numb_measurements = sites.size();
+
   for ( size_t j = 1; j < numb_measurements; ++j ) {
     // Predict the state vector at site i...
+    std::cout << "Extrapolating " << j << std::endl;
     track->extrapolate(sites, j);
     // ... Filter...
+    std::cout << "Filtering " << j << std::endl;
     track->filter(sites, j);
   }
   track->prepare_for_smoothing(&sites.back());
   // ...and Smooth back all sites.
   for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+    std::cout << "Smoothing " << k << std::endl;
     track->smooth(sites, k);
   }
 }
@@ -213,6 +216,7 @@ void KalmanTrackFit::filter_virtual(KalmanSite &a_site) {
 void KalmanTrackFit::save(const KalmanTrack *kalman_track,
                           std::vector<KalmanSite> sites,
                           SciFiEvent &event) {
+/*
   KalmanSite *plane_0 = &sites[0];
   assert(plane_0->get_id() == 0 || plane_0->get_id() == 15);
 
@@ -242,7 +246,7 @@ void KalmanTrackFit::save(const KalmanTrack *kalman_track,
        << a(3, 0) << "\t" << C(3, 3) << "\t" << mc_mom.getY() << "\t"
        << a(4, 0) << "\t" << C(4, 4) << "\t" << mc_mom.getZ() << "\n";
   file.close();
-
+*/
   SciFiTrack *track = new SciFiTrack(kalman_track);
   // track->add_track_points(sites);
   event.add_scifitrack(track);
