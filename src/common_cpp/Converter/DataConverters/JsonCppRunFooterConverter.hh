@@ -20,7 +20,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/RunFooter.hh"
+#include "src/common_cpp/DataStructure/RunFooterData.hh"
 
 namespace MAUS {
 
@@ -34,10 +34,12 @@ namespace MAUS {
  * format. Since Json documents often come in the form of a string, these
  * too are accepted and parsed on the fly.
  */
-  class JsonCppRunFooterConverter : public ConverterBase<Json::Value, RunFooter> {
+  class JsonCppRunFooterConverter : public ConverterBase<Json::Value,
+                                                         RunFooterData> {
   public:
     JsonCppRunFooterConverter()
-      : ConverterBase<Json::Value, RunFooter>("JsonCppRunFooterConverter") {}
+      : ConverterBase<Json::Value,
+                      RunFooterData>("JsonCppRunFooterConverter") {}
 
   private:
     /*!
@@ -47,9 +49,9 @@ namespace MAUS {
      *
      * \param Json::Value& The root \a Json::Value object from the Json data
      *        file
-     * \return a pointer to the RunFooter object
+     * \return a pointer to the RunFooterData object
      */
-    RunFooter* _convert(const Json::Value*) const;
+    RunFooterData* _convert(const Json::Value*) const;
 
   private:
 };

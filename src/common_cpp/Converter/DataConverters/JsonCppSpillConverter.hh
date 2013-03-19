@@ -21,6 +21,7 @@
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 
 namespace MAUS {
 
@@ -37,10 +38,10 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/01/2012
  */
-  class JsonCppSpillConverter : public ConverterBase<Json::Value, Spill> {
+  class JsonCppSpillConverter : public ConverterBase<Json::Value, Data> {
   public:
     JsonCppSpillConverter()
-      : ConverterBase<Json::Value, Spill>("JsonCppConverter") {}
+      : ConverterBase<Json::Value, Data>("JsonCppConverter") {}
 
   private:
     /*!
@@ -52,7 +53,7 @@ namespace MAUS {
      *        file
      * \return a pointer to the MausData object
      */
-    Spill* _convert(const Json::Value*) const;
+    Data* _convert(const Json::Value*) const;
   private:
 };
 }

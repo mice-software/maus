@@ -26,13 +26,11 @@ TestBranchProcessor::TestBranchProcessor() {
             &TestBranch::SetChildByValue, true);
     RegisterPointerReference
                ("test_required_child_by_ref",
-                &_child_proc,
                 &TestBranch::GetRequiredChildByRef,
                 &TestBranch::SetRequiredChildByRef,
                 true);
     RegisterPointerReference
                ("test_not_req_child_by_ref",
-                &_child_proc,
                 &TestBranch::GetNotRequiredChildByRef,
                 &TestBranch::SetNotRequiredChildByRef,
                 false);

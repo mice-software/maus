@@ -21,8 +21,12 @@
 #include "src/common_cpp/JsonCppProcessors/RunHeaderProcessor.hh"
 
 namespace MAUS {
-RunHeader* JsonCppRunHeaderConverter::_convert(const Json::Value* data) const {
-  return RunHeaderProcessor().JsonToCpp(*data);
+RunHeaderData* JsonCppRunHeaderConverter::_convert(
+    const Json::Value* data) const {
+  RunHeader* run_header = RunHeaderProcessor().JsonToCpp(*data);
+  RunHeaderData* data_cpp = new RunHeaderData();
+  data_cpp->SetEvent(run_header);
+  return data_cpp;
 }
 }
 

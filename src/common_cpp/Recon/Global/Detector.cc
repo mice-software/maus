@@ -26,7 +26,7 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-Detector::Detector(const ID id,
+Detector::Detector(const MAUS::DataStructure::Global::DetectorPoint id,
                    const double plane,
                    const CovarianceMatrix & uncertainties)
     : id_(id), plane_(plane), uncertainties_(uncertainties) {
@@ -35,7 +35,7 @@ Detector::Detector(const ID id,
 Detector::~Detector() {
 }
 
-const Detector::ID Detector::id() const {
+const MAUS::DataStructure::Global::DetectorPoint Detector::id() const {
   return id_;
 }
 
