@@ -74,7 +74,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     RunFilter(track, sites);
 
     track->ComputeChi2(sites);
-    DumpInfo(sites);
+    // DumpInfo(sites);
     Save(track, sites, event);
 
     // Misalignment search.

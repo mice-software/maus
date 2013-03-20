@@ -106,15 +106,14 @@ void KalmanTrack::CalculateCovariance(const KalmanSite *old_site, KalmanSite *ne
 
 // Returns (beta) * (-dE/dx). Formula and constants from PDG.
 double KalmanTrack::BetheBlochStoppingPower(double p) {
-  double muon_mass = 105.7; // MeV/c2
-  double muon_mass2 = TMath::Power(muon_mass, 2.);
-  double electron_mass = 0.511;
+  double muon_mass2 = TMath::Power(_mass, 2.);
+  double electron_mass = BetheBlochParameters::Electron_Mass();
 
   double E = TMath::Sqrt(muon_mass2+p*p);
 
   double beta = p/E;
   double beta2= TMath::Power(beta, 2.);
-  double gamma = E/muon_mass;
+  double gamma = E/_mass;
   double gamma2= TMath::Power(gamma, 2.);
 
   double K = BetheBlochParameters::K();
@@ -125,11 +124,11 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
 
   double outer_term = K*Z/(A*beta2);
 
-  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
-                TMath::Power(electron_mass/muon_mass, 2.));
+  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/_mass) +
+                TMath::Power(electron_mass/_mass, 2.));
 
   double log_term = TMath::Log(2*electron_mass*beta2*gamma2*Tmax/(I2));
-  double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*muon_mass, 2);
+  double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*_mass, 2);
   double density = FibreParameters::Density();
   double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
   double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
@@ -236,8 +235,8 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
   double py = my/kappa;
   double p = TMath::Sqrt(px*px+py*py+pz*pz); // MeV/c
 
-  double muon_mass = 105.7; // MeV/c2
-  double muon_mass2 = TMath::Power(muon_mass, 2.);
+  // double muon_mass = 105.7; // MeV/c2
+  double muon_mass2 = TMath::Power(_mass, 2.);
   double E = TMath::Sqrt(muon_mass2+p*p);
   double beta = p/E;
 

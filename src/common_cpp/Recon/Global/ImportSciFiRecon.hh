@@ -71,7 +71,7 @@ class ImportSciFiRecon {
   /// MAUS::recon::global::Track's, MAUS::recon::global::TrackPoint's
   /// and MAUS::recon::global::SpacePoint's,
   void ImportStraightTracks(
-      const MAUS::SciFiStraightPRTrackArray straightarray,
+      const MAUS::SciFiStraightPRTrackPArray straightarray,
       MAUS::GlobalEvent* global_event,
       std::string mapper_name);
 
@@ -80,7 +80,7 @@ class ImportSciFiRecon {
   /// MAUS::recon::global::Track's, MAUS::recon::global::TrackPoint's
   /// and MAUS::recon::global::SpacePoint's,
   void ImportHelicalTracks(
-      const MAUS::SciFiHelicalPRTrackArray helicalarray,
+      const MAUS::SciFiHelicalPRTrackPArray helicalarray,
       MAUS::GlobalEvent* global_event,
       std::string mapper_name);
 }; // ~class ImportSciFiRecon
