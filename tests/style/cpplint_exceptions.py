@@ -198,3 +198,23 @@ exceptions[os.path.join(TST, 'Recon/Global',
 ('  } catch (Squeal squeal) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
+
+exceptions[os.path.join(CPP_CM, 
+                        'JsonCppProcessors',
+                        'Common',
+                        'ReferenceResolverCppToJson-inl.hh')] = [
+('    TObject* tobject_pointer = (TObject*) pointer;',
+ 'A C style cast is the only option here, without requiring' +
+ ' all processed objects inherit from TObject',
+ 'taylor'),
+]
+
+exceptions[os.path.join(CPP_CM,
+                        'JsonCppProcessors',
+                        'Common',
+                        'ReferenceResolverJsonToCpp-inl.hh')] = [
+('    TObject* tobject_pointer = (TObject*) pointer;',
+ 'A C style cast is the only option here, without requiring' +
+ ' all processed objects inherit from TObject',
+ 'taylor'),
+]

@@ -20,7 +20,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/Converter/ConverterBase.hh"
-#include "src/common_cpp/DataStructure/JobFooter.hh"
+#include "src/common_cpp/DataStructure/JobFooterData.hh"
 
 namespace MAUS {
 
@@ -35,10 +35,12 @@ namespace MAUS {
  * too are accepted and parsed on the fly.
  */
   class JsonCppJobFooterConverter
-                                : public ConverterBase<Json::Value, JobFooter> {
+                                : public ConverterBase<Json::Value,
+                                                       JobFooterData> {
   public:
     JsonCppJobFooterConverter()
-      : ConverterBase<Json::Value, JobFooter>("JsonCppFooterConverter") {}
+      : ConverterBase<Json::Value,
+                      JobFooterData>("JsonCppFooterConverter") {}
 
   private:
     /*!
@@ -48,9 +50,9 @@ namespace MAUS {
      *
      * \param Json::Value& The root \a Json::Value object from the Json data
      *        file
-     * \return a pointer to the JobFooter object
+     * \return a pointer to the JobFooterData object
      */
-    JobFooter* _convert(const Json::Value*) const;
+    JobFooterData* _convert(const Json::Value*) const;
 };
 }
 

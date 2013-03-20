@@ -18,7 +18,8 @@
 #include "Utils/TOFCalibrationMap.hh"
 
 TOFCalibrationMap::TOFCalibrationMap() {
-  this->Reset();
+  pymod_ok = true;
+  if (!this->InitializePyMod()) pymod_ok = false;
 }
 
 TOFCalibrationMap::~TOFCalibrationMap() {
@@ -91,6 +92,7 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   // bool loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
   */
   // get calib from DB instead of file, the above line is replaced by the one below
+  if (!pymod_ok) return false;
   bool loaded = this->InitializeFromCDB();
   if (!loaded)
     return false;
@@ -423,13 +425,13 @@ string TOFPixelKey::str() {
   return xConv.str();
 }
 
-void TOFCalibrationMap::Reset() {
+bool TOFCalibrationMap::InitializePyMod() {
   // import the get_tof_calib module
   // this python module access and gets calibrations from the DB
   _calib_mod = PyImport_ImportModule("calibration.get_tof_calib");
   if (_calib_mod == NULL) {
     std::cerr << "Failed to import get_tof_calib module" << std::endl;
-    return;
+    return false;
   }
 
   PyObject* calib_mod_dict = PyModule_GetDict(_calib_mod);
@@ -442,15 +444,16 @@ void TOFCalibrationMap::Reset() {
   }
   if (_tcalib == NULL) {
     std::cerr << "Failed to instantiate get_tof_calib" << std::endl;
-    return;
+    return false;
   }
 
     // get the get_calib_func() function
   _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
   if (_get_calib_func == NULL) {
     std::cerr << "Failed to find get_calib function" << std::endl;
-    return;
+    return false;
   }
+  return true;
 }
 
 void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {

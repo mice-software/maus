@@ -31,7 +31,8 @@ TOFChannelMap::~TOFChannelMap() {
 
 
 TOFChannelMap::TOFChannelMap() {
-  this->Reset();
+  pymod_ok = true;
+  if (!this->InitializePyMod()) pymod_ok = false;
 }
 
 bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
@@ -50,6 +51,7 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
                                                JsonWrapper::stringValue).asString();
   // std::cout << "cabling date: " << _tof_cablingdate << std::endl;
 
+  if (!pymod_ok) return false;
   bool loaded = this->InitFromCDB();
   if (!loaded)
     return false;
@@ -306,13 +308,13 @@ string TOFChannelKey::str() {
 }
 
 
-void TOFChannelMap::Reset() {
+bool TOFChannelMap::InitializePyMod() {
   // import the get_tof_cabling module
   // this python module access and gets cabling from the DB
   _cabling_mod = PyImport_ImportModule("calibration.get_tof_cabling");
   if (_cabling_mod == NULL) {
     std::cerr << "Failed to import get_tof_cabling module" << std::endl;
-    return;
+    return false;
   }
 
   PyObject* cabling_mod_dict = PyModule_GetDict(_cabling_mod);
@@ -325,15 +327,16 @@ void TOFChannelMap::Reset() {
   }
   if (_tcabling == NULL) {
     std::cerr << "Failed to instantiate get_tof_cabling" << std::endl;
-    return;
+    return false;
   }
 
     // get the get_cabling_func() function
   _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling");
   if (_get_cabling_func == NULL) {
     std::cerr << "Failed to find get_cabling function" << std::endl;
-    return;
+    return false;
   }
+  return true;
 }
 
 void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
@@ -348,6 +351,7 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
   // default date argument is "current"
   // this is set via TOF_cabling_date_from card in ConfigurationDefaults
   py_arg = Py_BuildValue("(ss)", devname.c_str(), fromdate.c_str());
+  std::cout << "Building" << std::endl;
   if (py_arg == NULL) {
     PyErr_Clear();
     throw(Squeal(Squeal::recoverable,

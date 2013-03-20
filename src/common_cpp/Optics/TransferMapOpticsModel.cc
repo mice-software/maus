@@ -57,7 +57,8 @@ TransferMapOpticsModel::TransferMapOpticsModel(
     reference_pgparticle_.time, reference_pgparticle_.energy,
     reference_pgparticle_.x, reference_pgparticle_.px,
     reference_pgparticle_.y, reference_pgparticle_.py,
-    Particle::ID(reference_pgparticle_.pid), reference_pgparticle_.z);
+    MAUS::DataStructure::Global::PID(reference_pgparticle_.pid),
+    reference_pgparticle_.z);
 
   // Calculate time offset from t=0 at z=0
   const double first_plane_time = reference_pgparticle_.time;
@@ -221,8 +222,8 @@ void TransferMapOpticsModel::MapStationsToHits(
     const Json::Value hits = events[event_index]["virtual_hits"];
     for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
       const Json::Value hit = hits[hit_index];
-      const Particle::ID particle_id
-        = Particle::ID(hit["particle_id"].asInt());
+      const MAUS::DataStructure::Global::PID particle_id
+        = MAUS::DataStructure::Global::PID(hit["particle_id"].asInt());
       const double mass = Particle::GetInstance()->GetMass(particle_id);
       const double px = hit["momentum"]["x"].asDouble();
       const double py = hit["momentum"]["y"].asDouble();

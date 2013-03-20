@@ -18,23 +18,46 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALEVENTPROCESSOR_
 
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
+#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackPointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/PrimaryChainProcessor.hh"
 
 namespace MAUS {
 
-/** @class GlobalEventProcessor Conversions for GlobalEvent between C++ and Json 
- *
+/** @class GlobalEventProcessor Conversions for GlobalEvent between
+ *  C++ and Json
+ *  @author Ian Taylor, University of Warwick
+ *  @date 2013/03/01 - Expanded from initial 'blank slate'.
  */
 
 class GlobalEventProcessor : public ObjectProcessor<GlobalEvent> {
-  public:
-    /** Set up processors and register branches
-     *
-     *  Everything else is handled by the base class
-     */
-    GlobalEventProcessor();
+ public:
+  /** Set up processors and register branches
+   *
+   *  Everything else is handled by the base class
+   */
+  GlobalEventProcessor();
 
-  private:
+ private:
+
+  PointerArrayProcessor<MAUS::DataStructure::Global::SpacePoint>
+  _global_space_point_array_proc;
+
+  PointerArrayProcessor<MAUS::DataStructure::Global::TrackPoint>
+  _global_track_point_array_proc;
+
+  PointerArrayProcessor<MAUS::DataStructure::Global::Track>
+  _global_track_array_proc;
+
+  PointerArrayProcessor<MAUS::DataStructure::Global::PrimaryChain>
+  _global_primary_chain_array_proc;
 };
 }  // namespace MAUS
 

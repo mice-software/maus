@@ -63,9 +63,9 @@ The data structure can be extended in MAUS by adding extra classes to the existi
 \begin{itemize}
 \item Add a new class in \verb|src/common_cpp/DataStructure|.
 \item Ensure that default constructor, copy constructor, equality operator and destructor is present. The destructor must be virtual.
-\item Make a typedef for each type of STL object you wish to use. ROOT does not handle STL objects terribly well otherwise. Even then there are limitations, for example accessing STL vector objects can cause a segmentation fault in PyROOT. Specific accessors are required to access data from STL objects for PyROOT interface.
 \item Add \verb|#include "src/common_cpp/Utils/VersionNumber.hh"| and a call to the \verb|MAUS_VERSIONED_CLASS_DEF()| macro at the end of the class definition before the closing braces. \verb|MAUS_VERSIONED_CLASS_DEF| calls the ROOT ClassDef() macro which generates metaclasses based on information in the class. This is put into the (dynamically generated) \verb|MausDataStructure.h,cc| files.
-\item Add the class to the list of classes in \verb|src/common_cpp/DataStructure/LinkDef.hh|. This is required for the class to be linked properly to the main library, and a linker error will result if this step is not taken. Also add any template definitions which you used, including STL classes (e.g. std::vector<MyClass> or whatever).
+\item Add the class to the list of classes in \verb|src/common_cpp/DataStructure/LinkDef.hh|. This is required for the class to be linked properly to the main library, and a linker error will result if this step is not taken.
+\item Add any template definitions which you used, including STL classes (e.g. std::vector<MyClass> or whatever) to linkdef. Otherwise ROOT will generate a segmentation fault whenever the user tries to call functions of the templated class (but the code will link successfully in this case).
 \end{itemize}
 In order to make these classes accessible to JSON, it is necessary to add a new processor in \verb|src/common_cpp/JsonCppProcessors|. There are a few default processors available.
 \begin{itemize}
@@ -79,11 +79,38 @@ In order to make these classes accessible to JSON, it is necessary to add a new 
 A script, \verb|bin/user/json_branch_to_data_structure_and_cpp_processor.py| is available that analyses a JSON object or JSON tree of nested objects and converts to C++ classes. The script is provided "as-is" and it is expected that developers will check the output, adding comments and tests where appropriate.
 
 \subsection{Pointer Handling}
-MAUS can handle pointers for arrays and classes using ROOT native support or the standard JSON reference syntax. JSON references are indexed by a path relative to the root value of a JSON document. JSON references are formatted like URIs, for example the JSON object \verb|{"$ref":"#spill/recon_events/1"}| would index the second \verb|recon_event| in the spill object (indexing from 0). MAUS can only handle paths relative to the top level of the JSON document for the same MAUS event. Absolute URIs, URIs relative to another position in the JSON document or URIs to another MAUS event are not supported. 
+MAUS can handle pointers for arrays and classes using ROOT native support
+(via the \verb|TRef| and \verb|TRefArray| classes)
+or the standard JSON reference syntax. 
+JSON references are indexed by a path relative to the root value of a JSON document. 
+JSON references are formatted like URIs, 
+for example the JSON object \verb|{"$ref":"#spill/recon_events/1"}| 
+would index the second \verb|recon_event| in the spill object (indexing from 0). 
+MAUS can only handle paths relative to the top level of the JSON document for the same MAUS event. 
+Absolute URIs, URIs relative to another position in the JSON document or URIs to another MAUS event are not supported. 
 
-In MAUS, it is necessary to make a distinction between data that is stored as a value in C++ and JSON (value-as-data), data that is stored as a pointer in C++ and a value in JSON (pointer-as-data) and data that is stored as a pointer in C++ and JSON to some other data in the same tree (pointer-as-reference). In the latter case, the C++ parent object does not own the memory; rather it is owned by some other object in the same tree and \emph{borrowed} by the C++ object holding the pointer-as-reference.
+In MAUS, it is necessary to make a distinction between data that is stored as a value in C++ and JSON (value-as-data), 
+data that is stored as a pointer in C++ and a value in JSON (pointer-as-data) 
+and data that is stored as a pointer in C++ and JSON to some other data in the same tree (pointer-as-reference). 
+In the latter case, the C++ parent object does not own the memory; 
+rather it is owned by some other object in the same tree and 
+\emph{borrowed} by the C++ object holding the pointer-as-reference.
+The \verb|TRef| and \verb|TRefArray| classes provide this functionality by default;
+never owning the memory but only storing a relevant pointer.
+All objects referenced by a \verb|TRef| or \verb|TRefArray|
+must inherit from \verb|TObject|.
+ROOT handles all memory management while writing to and reading from ROOT files,
+and the order of reading is unimportant,
+as long as both reference and value have been read before the reference is used.
 
-Pointers-as-reference and pointers-as-data are converted from JSON arrays to C++ vectors and vice versa using the \verb|ReferenceArrayProcessor<ArrayContents>| and \verb|PointerArrayProcessor<ArrayContents>| classes respectively. Pointers-as-reference and pointers-as-data are converted from JSON objects to C++ classes and vice versa using \verb|ObjectProcessor<ParentType>::RegisterPointerReference<ChildType>| and \verb|ObjectProcessor<ParentType>::RegisterPointerValue<ChildType>| methods respectively.
+Pointers-as-data are converted between JSON arrays and C++ objects
+using the \verb|ObjectProcessor<ParentType>::RegisterPointerBranch<ChildType>| method.
+This takes a Processor for the ChildType as an argument.
+For C++ arrays / vectors, the Processor argument is instead a 
+\verb|PointerArrayProcessor<ArrayContents>|.
+Pointers-as-reference (TRef and TRefArray) are converted using the
+\verb|ObjectProcessor<ParentType>::RegisterTRef| and 
+\verb|ObjectProcessor<ParentType>::RegisterTRefArray| methods respectively.
 
 Other equivalent data formats, for example YAML, use a unique identifier to reference a pointer-as-reference and store the pointer-as-data in a reserved part of the data tree. There are some consequences of storing pointers-as-reference using the path to a pointer-as-data as implemented in MAUS.
 \begin{itemize}
@@ -94,7 +121,7 @@ Other equivalent data formats, for example YAML, use a unique identifier to refe
 \end{itemize}
 
 \subsubsection{Pointer Resolution}
-Conversion from C++ pointers to JSON pointers is handled in a type-safe way. Values-as-data are stored in the data tree converted at run time from JSON to C++ and vice versa. Pointers-as-data are handled in the same way as Values-as-data. Pointers-as-references are stored in the C++ data tree as a pointer in the normal way, and in JSON as an address to the position in the tree to a pointer-as-data. It is an error to store a pointer-as-reference without storing an associated pointer-as-data as the pointer-as-reference cannot be converted, unless the pointer-as-reference is set to NULL (in which case it may be an error depending on caller settings). It is an error to store multiple C++ pointers-as-data to the same memory address as the conversion from C++ to JSON and back again would yield logically different data and the resolution of associated pointers-as-reference is dependent on the resolution order of the data tree, which is ill-defined.
+Conversion from C++ pointers to JSON pointers is handled in a type-safe way. Values-as-data are stored in the data tree converted at run time from JSON to C++ and vice versa. Pointers-as-data are handled in the same way as Values-as-data. Pointers-as-references are stored in the C++ data tree as a TRef (or TRefArray element) in the normal way, and in JSON as an address to the position in the tree to a pointer-as-data. It is an error to store a pointer-as-reference without storing an associated pointer-as-data as the pointer-as-reference cannot be converted, unless the pointer-as-reference is set to NULL (in which case it may be an error depending on caller settings). It is an error to store multiple C++ pointers-as-data to the same memory address as the conversion from C++ to JSON and back again would yield logically different data and the resolution of associated pointers-as-reference is dependent on the resolution order of the data tree, which is ill-defined.
 
 In order to implement the data conversion, the pointers have to be resolved in a two-stage process. In the first stage, it is necessary to collect all of the pointers-as-data and pointers-as-reference by traversing the data tree. This is performed during the standard data conversion, but pointers-as-reference are left pointing to NULL. A mapping from the pointer-as-data in the original data format to the pointer-as-data in the converted data format is stored, together with a list of pointers-as-reference in the original data format and the necessary mutators in the converted data format. In the second stage MAUS iterates over the pointers-as-reference, finds the appropriate pointer-as-data and writes the location of the pointer-as-data to the pointer-as-reference in the converted data format. The code is templated to maintain full type-safety during this process.
  

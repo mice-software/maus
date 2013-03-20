@@ -83,7 +83,8 @@ TEST_F(TrackPointTest, DefaultConstructor) {
   explicit_default_point.set_y(0.0);
   explicit_default_point.set_Py(0.0);
   explicit_default_point.set_z(0.0);
-  explicit_default_point.set_detector_id(Detector::kNone);
+  explicit_default_point.set_detector_id(
+      MAUS::DataStructure::Global::kUndefined);
   const MAUS::CovarianceMatrix null_uncertainties;
   explicit_default_point.set_uncertainties(null_uncertainties);
 
@@ -97,7 +98,8 @@ TEST_F(TrackPointTest, DefaultConstructor) {
   ASSERT_EQ(0.0, default_point.y());
   ASSERT_EQ(0.0, default_point.Py());
   ASSERT_EQ(0.0, default_point.z());
-  ASSERT_EQ(Detector::kNone, default_point.detector_id());
+  ASSERT_EQ(MAUS::DataStructure::Global::kUndefined,
+            default_point.detector_id());
   const MAUS::CovarianceMatrix uncertainties = default_point.uncertainties();
   ASSERT_EQ(null_uncertainties, uncertainties);
 
@@ -119,7 +121,7 @@ TEST_F(TrackPointTest, CopyConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kTOF1_1);
   ASSERT_EQ(static_cast<size_t>(6), kUncertainties.size());
   test_point.set_uncertainties(kUncertainties);
 
@@ -137,7 +139,7 @@ TEST_F(TrackPointTest, ArrayConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kNone);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kUndefined);
   MAUS::CovarianceMatrix null_uncertainties;
   test_point.set_uncertainties(null_uncertainties);
 
@@ -172,10 +174,11 @@ TEST_F(TrackPointTest, DetectorConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kTracker2_3);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kTracker2_3);
   test_point.set_uncertainties(kUncertainties);
 
-  const Detector detector(Detector::kTracker2_3, kDetectorPlane,
+  const Detector detector(MAUS::DataStructure::Global::kTracker2_3,
+                          kDetectorPlane,
                           kUncertainties);
   const TrackPoint point(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, detector, 6.6);
 
@@ -191,7 +194,7 @@ TEST_F(TrackPointTest, VectorConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kNone);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kUndefined);
   MAUS::CovarianceMatrix null_uncertainties;
   test_point.set_uncertainties(null_uncertainties);
 
@@ -211,11 +214,12 @@ TEST_F(TrackPointTest, PhaseSpaceVectorConstructor) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_particle_id(Particle::kMuMinus);
+  test_point.set_particle_id(MAUS::DataStructure::Global::kMuMinus);
 
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
   const MAUS::PhaseSpaceVector coordinate_vector(coordinates);
-  const TrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
+  const TrackPoint point(coordinate_vector, 6.6,
+                         MAUS::DataStructure::Global::kMuMinus);
 
   ASSERT_EQ(test_point, point);
 }
@@ -229,8 +233,8 @@ TEST_F(TrackPointTest, Equality) {
   test_point.set_y(4.4);
   test_point.set_Py(5.5);
   test_point.set_z(6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
-  test_point.set_particle_id(Particle::kMuMinus);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kTOF1_1);
+  test_point.set_particle_id(MAUS::DataStructure::Global::kMuMinus);
   test_point.set_uncertainties(kUncertainties);
 
   ASSERT_EQ(test_point, test_point);
@@ -248,8 +252,8 @@ TEST_F(TrackPointTest, Equality) {
   point.set_y(4.4);
   point.set_Py(5.5);
   point.set_z(6.6);
-  point.set_detector_id(Detector::kTOF1_1);
-  point.set_particle_id(Particle::kMuMinus);
+  point.set_detector_id(MAUS::DataStructure::Global::kTOF1_1);
+  point.set_particle_id(MAUS::DataStructure::Global::kMuMinus);
   point.set_uncertainties(kUncertainties);
 
   // Test both operator==() and setters
@@ -271,8 +275,8 @@ TEST_F(TrackPointTest, Equality) {
 TEST_F(TrackPointTest, Inequality) {
   const double coordinates[6] = {0.0, 1000., 2.2, 3.3, 4.4, 5.5};
   TrackPoint test_point(coordinates, 6.6);
-  test_point.set_detector_id(Detector::kTOF1_1);
-  test_point.set_particle_id(Particle::kMuMinus);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kTOF1_1);
+  test_point.set_particle_id(MAUS::DataStructure::Global::kMuMinus);
   test_point.set_uncertainties(kUncertainties);
 
   // Test inequality with a null point
@@ -292,14 +296,14 @@ TEST_F(TrackPointTest, Inequality) {
   test_point.set_z(6.6);
 
   // Test particle ID inequality
-  test_point.set_particle_id(Particle::kPi0);
+  test_point.set_particle_id(MAUS::DataStructure::Global::kPi0);
   EXPECT_NE(test_point, point);
-  test_point.set_particle_id(Particle::kMuMinus);
+  test_point.set_particle_id(MAUS::DataStructure::Global::kMuMinus);
 
   // Test detector ID inequality
-  test_point.set_detector_id(Detector::kCherenkov2);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kCherenkov2);
   EXPECT_NE(test_point, point);
-  test_point.set_detector_id(Detector::kTOF1_1);
+  test_point.set_detector_id(MAUS::DataStructure::Global::kTOF1_1);
 
   // Test uncertainties inequality
   MAUS::CovarianceMatrix uncertainties;
@@ -310,7 +314,8 @@ TEST_F(TrackPointTest, Inequality) {
 TEST_F(TrackPointTest, OffMassShellException) {
   const double coordinates[6] = { 0.0, 1.1, 2.2, 3.3, 4.4, 5.5 };
   const MAUS::PhaseSpaceVector coordinate_vector(coordinates);
-  const TrackPoint point(coordinate_vector, 6.6, Particle::kMuMinus);
+  const TrackPoint point(coordinate_vector, 6.6,
+                         MAUS::DataStructure::Global::kMuMinus);
 
   bool off_mass_shell = false;
   try {

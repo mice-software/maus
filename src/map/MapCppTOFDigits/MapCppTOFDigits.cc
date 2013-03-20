@@ -58,9 +58,10 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
     std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
     bool loaded = _map.InitFromFile(xMapFile);
 */
+    map_init = true;
     bool loaded = _map.InitializeCards(configJSON);
     if (!loaded)
-      return false;
+      map_init = false;
 
     xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
                                                        "Enable_V1290_Unpacking",
@@ -96,11 +97,21 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
 bool MapCppTOFDigits::death()  {return true;}
 
 std::string MapCppTOFDigits::process(std::string document) {
-
   //  JsonCpp setup
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
+  // don't try to process if we have not initialized the channel map
+  // this could be because of an invalid map
+  // or because the CDB is down
+  if (!map_init) {
+      Json::Value errors;
+      std::stringstream ss;
+      ss << _classname << " says: Failed to intialize channel map";
+      errors["no_channel_map"] = ss.str();
+      root["errors"] = errors;
+      return writer.write(root);
+  }
   // Check if the JSON document can be parsed, else return error only
   try {root = JsonWrapper::StringToJson(document);}
   catch(...) {
