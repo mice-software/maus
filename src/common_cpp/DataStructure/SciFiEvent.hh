@@ -28,6 +28,7 @@
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
+//#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
@@ -87,6 +88,11 @@ class SciFiEvent {
     void set_scifitracks(SciFiTrackPArray tracks) { _scifitracks = tracks; }
     SciFiTrackPArray scifitracks() const { return _scifitracks; }
 
+
+    //SciFiTrackPointPArray scifitrackpoints()          const      { return _scifitrackpoints; }
+   // void set_scifitrackpoints(SciFiTrackPointPArray trackpoints) { _scifitrackpoints = trackpoints; }
+    //void add_scifitrackpoint(SciFiTrackPoint *trackpoint)        { _scifitrackpoints.push_back(trackpoint); }
+
   private:
 
     /** Digits in an event */
@@ -109,6 +115,9 @@ class SciFiEvent {
 
     /** Kalman tracks */
     SciFiTrackPArray                     _scifitracks;
+
+    /** Kalman track points */
+    //SciFiTrackPointPArray _scifitrackpoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiEvent)
 };

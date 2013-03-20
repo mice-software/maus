@@ -31,6 +31,7 @@
 #include "src/common_cpp/JsonCppProcessors/SciFiStraightPRTrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiHelicalPRTrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiTrackProcessor.hh"
+//#include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
 
 namespace MAUS {
 
@@ -53,6 +54,7 @@ class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {
     PointerArrayProcessor<SciFiStraightPRTrack> _sf_sprtrk_array_proc;
     PointerArrayProcessor<SciFiHelicalPRTrack> _sf_hprtrk_array_proc;
     PointerArrayProcessor<SciFiTrack> _sf_trk_array_proc;
+    //PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
 };
 }  // namespace MAUS
 

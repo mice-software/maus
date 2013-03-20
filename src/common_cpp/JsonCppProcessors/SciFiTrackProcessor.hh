@@ -22,8 +22,8 @@
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
-#include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
+// #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+// #include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
 
 namespace MAUS {
 
@@ -35,7 +35,7 @@ class SciFiTrackProcessor : public ObjectProcessor<SciFiTrack> {
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
-    PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
+    // PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
 };
 } // ~namespace MAUS
 

@@ -27,6 +27,7 @@ SciFiEvent::SciFiEvent() {
   _scifistraightprtracks.resize(0);
   _scifihelicalprtracks.resize(0);
   _scifitracks.resize(0);
+  // _scifitrackpoints.resize(0);
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
@@ -68,6 +69,12 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
       _scifitracks[i] = _scifievent._scifitracks[i];
     }
 
+/*
+    _scifitrackpoints.resize(_scifievent._scifitrackpoints.size());
+    for (unsigned int i = 0; i < _scifievent._scifitrackpoints.size(); ++i) {
+      _scifitrackpoints[i] = _scifievent._scifitrackpoints[i];
+    }
+*/
     // *this = _scifievent;
 }
 
@@ -107,7 +114,12 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
     for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
       _scifitracks[i] = _scifievent._scifitracks[i];
     }
-
+/*
+    _scifitrackpoints.resize(_scifievent._scifitrackpoints.size());
+    for (unsigned int i = 0; i < _scifievent._scifitrackpoints.size(); ++i) {
+      _scifitrackpoints[i] = _scifievent._scifitrackpoints[i];
+    }
+*/
     return *this;
 }
 
@@ -144,6 +156,20 @@ SciFiEvent::~SciFiEvent() {
        htrack!= _scifihelicalprtracks.end(); ++htrack) {
     delete (*htrack);
   }
+
+  std::vector<SciFiTrack*>::iterator track;
+  for (track = _scifitracks.begin();
+       track!= _scifitracks.end(); ++track) {
+    delete (*track);
+  }
+
+/*
+  std::vector<SciFiTrackPoint*>::iterator point;
+  for (point = _scifitrackpoints.begin();
+       point!= _scifitrackpoints.end(); ++point) {
+    delete (*point);
+  }
+*/
 }
 
 void SciFiEvent::set_spacepoints_used_flag(bool flag) {

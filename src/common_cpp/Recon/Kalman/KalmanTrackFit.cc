@@ -42,8 +42,10 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
   KalmanSciFiAlignment kalman_align;
   kalman_align.LoadMisaligments();
 
+  std::cout << "number of seeds: " << seeds.size() << "\n";
   size_t num_tracks = seeds.size();
   for ( size_t i = 0; i < num_tracks; ++i ) {
+    std::cout << "processing track number " << i << "\n";
     // Get the seed.
     KalmanSeed* seed = seeds[i];
 
@@ -53,10 +55,6 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
       track = new StraightTrack(_use_MCS, _use_Eloss);
     } else if ( seed->is_helical() ) {
       track = new HelicalTrack(_use_MCS, _use_Eloss);
-    } else {
-      throw(Squeal(Squeal::recoverable,
-            "Can't initialise KalmanTrack; seed undefined.",
-            "KalmanTrackFit::process"));
     }
 
     // Initialize member matrices.
@@ -67,12 +65,11 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     Initialise(seed, sites, kalman_align);
 
     size_t numb_measurements = sites.size();
+    std::cout << numb_measurements << std::endl;
     if ( numb_measurements != 15 ) continue;
 
     double momentum = seed->get_momentum(); // MeV/c
     track->set_momentum(momentum);
-    // Filter the first state.
-    track->Filter(sites, 0);
 
     RunFilter(track, sites);
 
@@ -138,17 +135,22 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
 }
 
 void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites) {
-  size_t numb_measurements = sites.size();
+  // Filter the first state.
+  track->Filter(sites, 0);
 
+  size_t numb_measurements = sites.size();
   for ( size_t j = 1; j < numb_measurements; ++j ) {
     // Predict the state vector at site i...
+    std::cout << "Extrapolating " << j << std::endl;
     track->Extrapolate(sites, j);
     // ... Filter...
+    std::cout << "Filtering " << j << std::endl;
     track->Filter(sites, j);
   }
   track->PrepareForSmoothing(&sites.back());
   // ...and Smooth back all sites.
   for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+    std::cout << "Smoothing " << k << std::endl;
     track->Smooth(sites, k);
   }
 }
@@ -179,6 +181,7 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
 void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
                                                std::vector<KalmanSite> &sites,
                                                KalmanSciFiAlignment &kalman_align) {
+  // kalman_align.SetRootOutput();
   double old_track_chi2 = track->s_chi2();
   for ( int station_i = 2; station_i < 5; ++station_i ) {
     std::vector<KalmanSite> sites_copy(sites);
@@ -193,6 +196,7 @@ void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
       kalman_align.Update(sites_copy[site_i]);
     }
   }
+  // kalman_align.CloseRootFile();
   kalman_align.Save();
 }
 
@@ -241,7 +245,13 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   file.close();
 */
   SciFiTrack *track = new SciFiTrack(kalman_track);
-  // track->add_track_points(sites);
+
+
+  // size_t n_sites = sites.size();
+  // for ( size_t i = 0; i < n_sites; ++i ) {
+    // SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
+    // track->add_scifitrackpoint(track_point);
+  // }
   event.add_scifitrack(track);
 }
 

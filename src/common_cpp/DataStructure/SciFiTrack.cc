@@ -16,14 +16,15 @@
 
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
-
 namespace MAUS {
 
 SciFiTrack::SciFiTrack(): _tracker(-1),
                           _f_chi2(-1),
                           _s_chi2(-1),
                           _ndf(-1),
-                          _P_value(-1) {}
+                          _P_value(-1) {
+  // _scifitrackpoints.resize(0);
+}
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _f_chi2(-1),
@@ -35,6 +36,13 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   _s_chi2    = a_track.s_chi2();
   _ndf     = a_track.ndf();
   _P_value = a_track.P_value();
+
+/*
+  _scifitrackpoints.resize(a_track._scifitrackpoints.size());
+  for (unsigned int i = 0; i < a_track._scifitrackpoints.size(); ++i) {
+    _scifitrackpoints[i] = a_track._scifitrackpoints[i];
+  }
+*/
 }
 
 SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
@@ -54,28 +62,27 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
         return *this;
     }
     _tracker = a_track.tracker();
-    _f_chi2    = a_track.f_chi2();
-    _s_chi2    = a_track.s_chi2();
+    _f_chi2  = a_track.f_chi2();
+    _s_chi2  = a_track.s_chi2();
     _ndf     = a_track.ndf();
     _P_value = a_track.P_value();
+/*
+  _scifitrackpoints.resize(a_track._scifitrackpoints.size());
+    for (unsigned int i = 0; i < a_track._scifitrackpoints.size(); ++i) {
+      _scifitrackpoints[i] = a_track._scifitrackpoints[i];
+    }
+*/
     return *this;
 }
 
-SciFiTrack::~SciFiTrack() {}
+SciFiTrack::~SciFiTrack() {
 /*
-void SciFiTrack::add_track_points(const std::vector<KalmanSite> &sites) {
-  size_t n_sites = sites.size();
-  for ( size_t i = 0; i < n_sites; ++i ) {
-    const KalmanSite *site = &sites[i];
-    double time = 0.0;
-    TMatrixD state_vector(5, 1);
-    state_vector = site->a(KalmanSite::Smoothed);
-    double energy = 1.0;
-    double x = state_vector(0, 0);
-    double px= state_vector(1, 0);
-    double y = state_vector(2, 0);
-    double py= state_vector(3, 0);
+  std::vector<SciFiTrackPoint*>::iterator point;
+  for (point = _scifitrackpoints.begin();
+       point!= _scifitrackpoints.end(); ++point) {
+    delete (*point);
   }
-}
 */
+}
+
 } // ~namespace MAUS

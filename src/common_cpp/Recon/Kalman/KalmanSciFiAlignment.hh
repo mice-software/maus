@@ -65,7 +65,7 @@ class KalmanSciFiAlignment {
 
   void SaveToHistogram();
   void SetRootOutput();
-
+  void CloseRootFile();
   // MiceModule* find_plane(int tracker, int station, int plane);
 
   TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
@@ -86,6 +86,7 @@ class KalmanSciFiAlignment {
   TMatrixD covariance_rotations[30];
   TMatrixD covariance_shifts[30];
   // std::vector<MiceModule*> _modules;
+/*
   TFile  *rootfile;
   TGraph *station1_x;
   TGraph *station2_x;
@@ -107,6 +108,7 @@ class KalmanSciFiAlignment {
   TGraph *station8_y;
   TGraph *station9_y;
   TGraph *station10_y;
+*/
 };
 
 } // ~namespace MAUS
