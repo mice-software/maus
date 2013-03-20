@@ -17,8 +17,8 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    # my_input = MAUS.InputPySpillGenerator()
-    my_input = MAUS.InputCppRoot()
+    my_input = MAUS.InputPySpillGenerator()
+    # my_input = MAUS.InputCppRoot()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -32,8 +32,8 @@ def run():
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
 
-    # reducer = MAUS.ReduceCppPatternRecognition()
-    reducer = MAUS.ReducePyDoNothing()
+    reducer = MAUS.ReduceCppPatternRecognition()
+    # reducer = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards
     # my_output = MAUS.OutputPyJSON()
