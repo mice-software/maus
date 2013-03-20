@@ -75,65 +75,91 @@ typedef struct BetheBloch {
 
 class KalmanTrack {
  public:
-  /* @brief	Constructs taking MCS and Eloss flags.
+  /* @brief  Constructs taking MCS and Eloss flags.
    */
   KalmanTrack(bool MCS, bool Eloss);
 
-  /* @brief	Destructor. Cleans up heap.
+  /* @brief  Destructor. Cleans up heap.
    */
   virtual ~KalmanTrack() {}
 
-  /* @brief	Initializes member matrices.
+  /* @brief  Initializes member matrices.
    */
-  void init();
+  void Initialise();
 
-  /* @brief	Manages all extrapolation steps.
+  /* @brief  Manages all extrapolation steps.
    */
-  void extrapolate(std::vector<KalmanSite> &sites, int current_site);
+  void Extrapolate(std::vector<KalmanSite> &sites, int current_site);
 
-  /* @brief	Manages all filtering steps.
+  /* @brief  Manages all filtering steps.
    */
-  void filter(std::vector<KalmanSite> &sites, int current_site);
+  void Filter(std::vector<KalmanSite> &sites, int current_site);
 
-  /* @brief	Manages all smoothins steps.
+  /* @brief  Manages all smoothins steps.
    */
-  void smooth(std::vector<KalmanSite> &sites, int current_site);
+  void Smooth(std::vector<KalmanSite> &sites, int current_site);
 
-  /* @brief	Calculates the Propagator Matrix (F) for the current extrapolation.
+  /* @brief  Calculates the Propagator Matrix (F) for the current extrapolation.
    */
-  virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
+  virtual void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
-  /// Projection methods
-  virtual void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) = 0;
-  void calc_covariance(const KalmanSite *old_site, KalmanSite *new_site);
+  /* @brief  Calculates the state vector prediction at the next site.
+   */
+  virtual void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) = 0;
+
+  /* @brief  Projects the Covariance matrix.
+   */
+  void CalculateCovariance(const KalmanSite *old_site, KalmanSite *new_site);
+
+  /* @brief  Calculates the Energy loss according to Bethe Bloch formula.
+   */
   double BetheBlochStoppingPower(double p);
-  void subtract_energy_loss(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Error added by Multiple Coulomb Scattering.
-  void calc_system_noise(const KalmanSite *old_site, const KalmanSite *new_site);
 
-  /// Filtering methods
-  void calc_filtered_state(KalmanSite *a_site);
-  void update_covariance(KalmanSite *a_site);
-  void set_residual(KalmanSite *a_site, KalmanSite::State kalman_state);
-  TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
-  /// Update of relevant matrices.
-  void update_V(const KalmanSite *a_site);
-  void update_H(const KalmanSite *a_site);
-  void update_W(const KalmanSite *a_site);
-  void update_K(const KalmanSite *a_site);
-  void compute_pull(KalmanSite *a_site);
+  /* @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
+   */
+  void SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new_site);
 
-  /// Smoothing methods
-  void prepare_for_smoothing(KalmanSite *last_site);
-  void update_back_transportation_matrix(const KalmanSite *optimum_site,
+  /* @brief  Computes the contribution of MCS to the covariance matrix.
+   */
+  void CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site);
+
+  /* @brief  Computes the filtered state.
+   */
+  void CalculateFilteredState(KalmanSite *a_site);
+
+  /* @brief  Computes the filtered covariance matrix.
+   */
+  void UpdateCovariance(KalmanSite *a_site);
+
+
+  void SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state);
+
+  /* @brief  Solves the measurement equation.
+   */
+  TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
+
+  void UpdateV(const KalmanSite *a_site);
+
+  void UpdateH(const KalmanSite *a_site);
+
+  void UpdateW(const KalmanSite *a_site);
+
+  void UpdateK(const KalmanSite *a_site);
+
+  void ComputePull(KalmanSite *a_site);
+
+  /* @brief  Solves the measurement equation.
+   */
+  void PrepareForSmoothing(KalmanSite *last_site);
+  void UpdateBackTransportationMatrix(const KalmanSite *optimum_site,
                                          const KalmanSite *smoothing_site);
-  void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
+  void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
 
   /// Other methods
-  void exclude_site(KalmanSite *site);
-  void compute_chi2(const std::vector<KalmanSite> &sites);
-  void update_misaligments(std::vector<KalmanSite> &sites,
+  void ExcludeSite(KalmanSite *site);
+  void ComputeChi2(const std::vector<KalmanSite> &sites);
+  void UpdateMisaligments(std::vector<KalmanSite> &sites,
                            std::vector<KalmanSite> &sites_copy,
                            int station_i);
 

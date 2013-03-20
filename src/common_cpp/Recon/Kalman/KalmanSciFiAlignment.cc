@@ -23,7 +23,17 @@
 
 namespace MAUS {
 
-KalmanSciFiAlignment::KalmanSciFiAlignment() {
+KalmanSciFiAlignment::KalmanSciFiAlignment() : file(0),
+                                               station1_x(0),
+                                               station2_x(0),
+                                               station3_x(0),
+                                               station4_x(0),
+                                               station5_x(0),
+                                               station6_x(0),
+                                               station7_x(0),
+                                               station8_x(0),
+                                               station9_x(0),
+                                               station10_x(0) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   file = "SciFiMisalignments";
   fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
@@ -34,11 +44,63 @@ KalmanSciFiAlignment::KalmanSciFiAlignment() {
     shifts_array[i].     Zero();
     covariance_shifts[i].Zero();
   }
+  SetRootOutput();
 }
 
-KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
+KalmanSciFiAlignment::~KalmanSciFiAlignment() {
+  station1_x->Write("", TObject::kOverwrite);
+  station2_x->Write("", TObject::kOverwrite);
+  station3_x->Write("", TObject::kOverwrite);
+  station4_x->Write("", TObject::kOverwrite);
+  station5_x->Write("", TObject::kOverwrite);
+  station6_x->Write("", TObject::kOverwrite);
+  station7_x->Write("", TObject::kOverwrite);
+  station8_x->Write("", TObject::kOverwrite);
+  station9_x->Write("", TObject::kOverwrite);
+  station10_x->Write("", TObject::kOverwrite);
+  station1_y->Write("", TObject::kOverwrite);
+  station2_y->Write("", TObject::kOverwrite);
+  station3_y->Write("", TObject::kOverwrite);
+  station4_y->Write("", TObject::kOverwrite);
+  station5_y->Write("", TObject::kOverwrite);
+  station6_y->Write("", TObject::kOverwrite);
+  station7_y->Write("", TObject::kOverwrite);
+  station8_y->Write("", TObject::kOverwrite);
+  station9_y->Write("", TObject::kOverwrite);
+  station10_y->Write("", TObject::kOverwrite);
+/*
+  TMultiGraph *mg = new TMultiGraph("multigraph", "multigraph");
+  mg->SetMaximum(1.);
+  mg->SetMinimum(-3.);
+  station2_x->SetLineColor(kBlack);
+  station2_x->SetLineWidth(2);
+  station3_x->SetLineColor(kBlue);
+  station3_x->SetLineWidth(2);
+  station4_x->SetLineColor(kRed);
+  station4_x->SetLineWidth(2);
+  station2_y->SetLineColor(kBlack);
+  station2_y->SetLineWidth(2);
+  station2_y->SetLineStyle(9);
+  station3_y->SetLineColor(kBlue);
+  station3_y->SetLineWidth(2);
+  station3_y->SetLineStyle(9);
+  station4_y->SetLineColor(kRed);
+  station4_y->SetLineWidth(2);
+  station4_y->SetLineStyle(9);
+  mg->Add(station2_x);
+  mg->Add(station3_x);
+  mg->Add(station4_x);
+  mg->Add(station2_y);
+  mg->Add(station3_y);
+  mg->Add(station4_y);
+  mg->SetMaximum(1.);
+  mg->SetMinimum(-3.);
+  mg->Write("", TObject::kOverwrite);
+*/
+  rootfile->Close();
+}
 
-bool KalmanSciFiAlignment::load_misaligments() {
+bool KalmanSciFiAlignment::LoadMisaligments() {
   std::ifstream inf(fname.c_str());
   if (!inf) {
     throw(Squeal(Squeal::recoverable,
@@ -94,13 +156,13 @@ bool KalmanSciFiAlignment::load_misaligments() {
   return true;
 }
 
-void KalmanSciFiAlignment::update(KalmanSite site) {
-  int id = site.get_id();
-  set_shifts(site.get_shift(), id);
-  set_cov_shifts(site.get_shift_covariance(), id);
+void KalmanSciFiAlignment::Update(KalmanSite site) {
+  int id = site.id();
+  set_shifts(site.shift(), id);
+  set_cov_shifts(site.shift_covariance(), id);
 }
 
-void KalmanSciFiAlignment::save() {
+void KalmanSciFiAlignment::Save() {
   std::ofstream file_out(fname.c_str());
   // Write shifts.
   file_out << "# station" << "\t" << "xd" << "\t"
@@ -176,5 +238,150 @@ void KalmanSciFiAlignment::save() {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   file_out.close();
+
+  SaveToHistogram();
 }
+
+void KalmanSciFiAlignment::SaveToHistogram() {
+  for ( int id = 0; id < 30; id+=3 ) {
+    if ( id == 0 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd = shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station1_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station1_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 3 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station2_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station2_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 6 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station3_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station3_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 9 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station4_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station4_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 12 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station5_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station5_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 15 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station6_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station6_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 18 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station7_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station7_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 21 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station8_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station8_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 24 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station9_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station9_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 27 ) {
+      double xd = shifts_array[id](0, 0);
+      double yd =shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station10_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station10_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+  }
+}
+
+void KalmanSciFiAlignment::SetRootOutput() {
+  rootfile = new TFile("misalignments.root", "UPDATE");
+  station1_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station1"));
+  if ( station1_x ) {
+    station2_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station2"));
+    station3_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station3"));
+    station4_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station4"));
+    station5_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station5"));
+    station6_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station6"));
+    station7_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station7"));
+    station8_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station8"));
+    station9_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station9"));
+    station10_x           = reinterpret_cast<TGraph*> (rootfile->Get("xd_station10"));
+    station1_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station1"));
+    station2_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station2"));
+    station3_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station3"));
+    station4_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station4"));
+    station5_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station5"));
+    station6_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station6"));
+    station7_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station7"));
+    station8_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station8"));
+    station9_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station9"));
+    station10_y           = reinterpret_cast<TGraph*> (rootfile->Get("yd_station10"));
+  } else {
+    station1_x = new TGraph();
+    station1_x->SetName("xd_station1");
+    station2_x = new TGraph();
+    station2_x->SetName("xd_station2");
+    station3_x = new TGraph();
+    station3_x->SetName("xd_station3");
+    station4_x = new TGraph();
+    station4_x->SetName("xd_station4");
+    station5_x = new TGraph();
+    station5_x->SetName("xd_station5");
+    station6_x = new TGraph();
+    station6_x->SetName("xd_station6");
+    station7_x = new TGraph();
+    station7_x->SetName("xd_station7");
+    station8_x = new TGraph();
+    station8_x->SetName("xd_station8");
+    station9_x = new TGraph();
+    station9_x->SetName("xd_station9");
+    station10_x = new TGraph();
+    station10_x->SetName("xd_station10");
+    station1_y = new TGraph();
+    station1_y->SetName("yd_station1");
+    station2_y = new TGraph();
+    station2_y->SetName("yd_station2");
+    station3_y = new TGraph();
+    station3_y->SetName("yd_station3");
+    station4_y = new TGraph();
+    station4_y->SetName("yd_station4");
+    station5_y = new TGraph();
+    station5_y->SetName("yd_station5");
+    station6_y = new TGraph();
+    station6_y->SetName("yd_station6");
+    station7_y = new TGraph();
+    station7_y->SetName("yd_station7");
+    station8_y = new TGraph();
+    station8_y->SetName("yd_station8");
+    station9_y = new TGraph();
+    station9_y->SetName("yd_station9");
+    station10_y = new TGraph();
+    station10_y->SetName("yd_station10");
+  }
+}
+
 } // ~namespace MAUS

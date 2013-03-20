@@ -24,27 +24,27 @@ StraightTrack::StraightTrack(bool MCS, bool Eloss) : KalmanTrack(MCS, Eloss) {
 
 StraightTrack::~StraightTrack() {}
 
-void StraightTrack::update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) {
+void StraightTrack::UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) {
   // Reset.
   _F.Zero();
 
   // Find dz between sites.
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
+  double new_z = new_site->z();
+  double old_z = old_site->z();
   double deltaZ = new_z-old_z;
 
   // Build _F.
-  for ( int i = 0; i < 5; i++ ) {
+  for ( int i = 0; i < _n_parameters; i++ ) {
     _F(i, i) = 1.;
   }
   _F(0, 1) = deltaZ;
   _F(2, 3) = deltaZ;
 }
 
-void StraightTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) {
-  update_propagator(old_site, new_site);
+void StraightTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) {
+  UpdatePropagator(old_site, new_site);
 
-  TMatrixD a = old_site->get_a(KalmanSite::Filtered);
+  TMatrixD a = old_site->a(KalmanSite::Filtered);
 
   TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
 

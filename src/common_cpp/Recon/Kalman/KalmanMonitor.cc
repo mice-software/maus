@@ -174,20 +174,20 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    std::cerr << "SITE ID: " << site.get_id() << std::endl;
-    std::cerr << "Momentum: " << site.get_true_momentum() << std::endl;
+    std::cerr << "SITE ID: " << site.id() << std::endl;
+    std::cerr << "Momentum: " << site.true_momentum() << std::endl;
     // std::cerr << "SITE Z: " << site.get_z() << std::endl;
     // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
     //                                   site.get_direction().y() << ", " <<
     //                                   site.get_direction().z() << ")" << std::endl;
-    std::cerr << "Measurement: " << (site.get_measurement())(0, 0) << std::endl;
+    std::cerr << "Measurement: " << (site.measurement())(0, 0) << std::endl;
     // std::cerr << "Shift: " <<  "(" << (site.get_input_shift_A())(0, 0) << ", " <<
     //                                  (site.get_input_shift_A())(1, 0) << ", " <<
     //                                  (site.get_input_shift_A())(2, 0) << ")" << std::endl;
     std::cerr << "================Residuals================" << std::endl;
-    std::cerr << (site.get_residual(KalmanSite::Projected))(0, 0) << std::endl;
-    std::cerr << (site.get_residual(KalmanSite::Filtered))(0, 0) << std::endl;
-    std::cerr << (site.get_residual(KalmanSite::Smoothed))(0, 0) << std::endl;
+    std::cerr << (site.residual(KalmanSite::Projected))(0, 0) << std::endl;
+    std::cerr << (site.residual(KalmanSite::Filtered))(0, 0) << std::endl;
+    std::cerr << (site.residual(KalmanSite::Smoothed))(0, 0) << std::endl;
     std::cerr << "================Projection================" << std::endl;
     // site.get_a(KalmanSite::Projected).Print();
     // site.get_a(KalmanSite::Filtered).Print();
@@ -203,6 +203,7 @@ void KalmanMonitor::print_info(std::vector<KalmanSite> const &sites) {
 }
 
 void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
+/*
   double chi2 = 0;
   int tracker = 1;
 
@@ -240,17 +241,7 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
     chi2 += site.get_chi2(KalmanSite::Filtered);
     // assert(a_smooth(0, 0) ==  a_smooth(0, 0) && "Sanity check - smoothing");
     // assert(a_proj(0, 0)   == a_proj(0, 0)    && "Sanity check - projection.");
-/*
-    std::ofstream out2("kalman_mc.txt", std::ios::out | std::ios::app);
-    out2 << a_proj(0, 0) << " " << a_proj(1, 0) << " " << a_proj(2, 0)
-         << " " << a_proj(3, 0) << " " << a_proj(4, 0) << " "
-         << a(0, 0) << " " << a(1, 0) << " " << a(2, 0) << " " << a(3, 0)
-         << " " << a(4, 0) << " " << a_smooth(0, 0) << " " << a_smooth(1, 0) << " "
-         << a_smooth(2, 0) << " " << a_smooth(3, 0) << " " << a_smooth(4, 0) << " "
-         << mc_x << " " << mc_y << " " << mc_px << " " << mc_py << " " << mc_pz << " "
-         << pull << " " << pull2 << " " << id     << "\n";
-    out2.close();
-*/
+
     double x_proj    = a_proj(0, 0);
     double px_proj   = a_proj(1, 0);
     double y_proj    = a_proj(2, 0);
@@ -397,19 +388,12 @@ void KalmanMonitor::fill(std::vector<KalmanSite> const &sites) {
       station10_y->SetPoint(static_cast<Int_t> (x), x, yd);
     }
   }
-  double P_value = TMath::Prob(chi2, ndf);
-  if ( tracker == 0 ) {
-    chi2_tracker0->Fill(chi2/ndf);
-    pvalue_tracker0->Fill(P_value);
-  } else {
-    chi2_tracker1->Fill(chi2/ndf);
-    pvalue_tracker1->Fill(P_value);
-  }
 
   _counter +=1;
   if ( !(_counter%10) ) {
     save();
   }
+*/
 
 /*
   // Energy loss and scattering angles

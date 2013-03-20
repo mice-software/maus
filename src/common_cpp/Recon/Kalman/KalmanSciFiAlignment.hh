@@ -34,6 +34,13 @@
 
 #include "TMath.h"
 #include "TMatrixD.h"
+#include "TFile.h"
+#include "TGraph.h"
+#include "TMultiGraph.h"
+#include "TH1.h"
+#include "TF1.h"
+#include "TH2F.h"
+#include "TH1F.h"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -50,12 +57,15 @@ class KalmanSciFiAlignment {
 
   ~KalmanSciFiAlignment();
 
-  bool load_misaligments();
+  bool LoadMisaligments();
 
+  void Update(KalmanSite site);
 
-  void update(KalmanSite site);
+  void Save();
 
-  void save();
+  void SaveToHistogram();
+  void SetRootOutput();
+
   // MiceModule* find_plane(int tracker, int station, int plane);
 
   TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
@@ -76,6 +86,27 @@ class KalmanSciFiAlignment {
   TMatrixD covariance_rotations[30];
   TMatrixD covariance_shifts[30];
   // std::vector<MiceModule*> _modules;
+  TFile  *rootfile;
+  TGraph *station1_x;
+  TGraph *station2_x;
+  TGraph *station3_x;
+  TGraph *station4_x;
+  TGraph *station5_x;
+  TGraph *station6_x;
+  TGraph *station7_x;
+  TGraph *station8_x;
+  TGraph *station9_x;
+  TGraph *station10_x;
+  TGraph *station1_y;
+  TGraph *station2_y;
+  TGraph *station3_y;
+  TGraph *station4_y;
+  TGraph *station5_y;
+  TGraph *station6_y;
+  TGraph *station7_y;
+  TGraph *station8_y;
+  TGraph *station9_y;
+  TGraph *station10_y;
 };
 
 } // ~namespace MAUS

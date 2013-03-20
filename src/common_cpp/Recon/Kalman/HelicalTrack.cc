@@ -26,14 +26,14 @@ HelicalTrack::HelicalTrack(bool MCS,
 
 HelicalTrack::~HelicalTrack() {}
 
-void HelicalTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site) {
+void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) {
   // Find dz (mm).
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
+  double new_z = new_site->z();
+  double old_z = old_site->z();
   double deltaZ = (new_z-old_z);
 
   // Get old state vector...
-  TMatrixD old_a = old_site->get_a(KalmanSite::Filtered);
+  TMatrixD old_a = old_site->a(KalmanSite::Filtered);
   double old_x      = old_a(0, 0);
   double old_mx     = old_a(1, 0);
   double old_y      = old_a(2, 0);
@@ -44,9 +44,9 @@ void HelicalTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *
   double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
-  double new_x  = old_x + 1./old_kappa*( old_mx*sine/a - old_my*(1.-cosine)/a);
+  double new_x  = old_x + (1./old_kappa)*( old_mx*sine/a - old_my*(1.-cosine)/a);
   double new_mx = old_mx*cosine - old_my*sine;
-  double new_y  = old_y + 1./old_kappa*( old_my*sine/a + old_mx*(1.-cosine)/a);
+  double new_y  = old_y + (1./old_kappa)*( old_my*sine/a + old_mx*(1.-cosine)/a);
   double new_my = old_my*cosine + old_mx*sine;
 
   TMatrixD a_projected(_n_parameters, 1);
@@ -58,23 +58,23 @@ void HelicalTrack::calc_predicted_state(const KalmanSite *old_site, KalmanSite *
 
   new_site->set_a(a_projected, KalmanSite::Projected);
 
-  update_propagator(old_site, new_site);
+  UpdatePropagator(old_site, new_site);
 }
 
-void HelicalTrack::update_propagator(const KalmanSite *old_site,
+void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
                                      const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
   // Find dz.
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
+  double new_z = new_site->z();
+  double old_z = old_site->z();
 
   // Delta Z in mm
   double deltaZ = (new_z-old_z);
 
   // Get current state vector...
-  TMatrixD site = new_site->get_a(KalmanSite::Projected);
+  TMatrixD site = new_site->a(KalmanSite::Projected);
   double mx     = site(1, 0);
   double my     = site(3, 0);
   double kappa  = site(4, 0);

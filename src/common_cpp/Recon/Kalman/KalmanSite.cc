@@ -38,44 +38,44 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
                                                 _direction(CLHEP::Hep3Vector()),
                                                 _mc_pos(CLHEP::Hep3Vector()),
                                                 _mc_mom(CLHEP::Hep3Vector()) {
-  int dim = site.get_a(KalmanSite::Projected).GetNrows();
-  initialise(dim);
+  int dim = site.a(KalmanSite::Projected).GetNrows();
+  Initialise(dim);
 
-  _z = site.get_z();
-  _id= site.get_id();
-  _f_chi2 = site.get_chi2(KalmanSite::Filtered);
-  _s_chi2 = site.get_chi2(KalmanSite::Smoothed);
-  _direction = site.get_direction();
-  _mc_pos = site.get_true_position();
-  _mc_mom = site.get_true_momentum();
+  _z = site.z();
+  _id= site.id();
+  _f_chi2 = site.chi2(KalmanSite::Filtered);
+  _s_chi2 = site.chi2(KalmanSite::Smoothed);
+  _direction = site.direction();
+  _mc_pos = site.true_position();
+  _mc_mom = site.true_momentum();
 
-  _projected_a = site.get_a(KalmanSite::Projected);
-  _a           = site.get_a(KalmanSite::Filtered);
-  _smoothed_a  = site.get_a(KalmanSite::Smoothed);
-  _a_excluded  = site.get_a(KalmanSite::Excluded);
+  _projected_a = site.a(KalmanSite::Projected);
+  _a           = site.a(KalmanSite::Filtered);
+  _smoothed_a  = site.a(KalmanSite::Smoothed);
+  _a_excluded  = site.a(KalmanSite::Excluded);
 
-  _projected_C = site.get_covariance_matrix(KalmanSite::Projected);
-  _C           = site.get_covariance_matrix(KalmanSite::Filtered);
-  _smoothed_C  = site.get_covariance_matrix(KalmanSite::Smoothed);
-  _C_excluded  = site.get_covariance_matrix(KalmanSite::Excluded);
+  _projected_C = site.covariance_matrix(KalmanSite::Projected);
+  _C           = site.covariance_matrix(KalmanSite::Filtered);
+  _smoothed_C  = site.covariance_matrix(KalmanSite::Smoothed);
+  _C_excluded  = site.covariance_matrix(KalmanSite::Excluded);
 
-  _v = site.get_measurement();
+  _v = site.measurement();
 
-  _pull                 = site.get_residual(KalmanSite::Projected);
-  _residual             = site.get_residual(KalmanSite::Filtered);
-  _smoothed_residual    = site.get_residual(KalmanSite::Smoothed);
-  _excluded_residual    = site.get_residual(KalmanSite::Excluded);
-  _covariance_residual          = site.get_covariance_residual(KalmanSite::Filtered);
-  _covariance_smoothed_residual = site.get_covariance_residual(KalmanSite::Smoothed);
-  _covariance_excluded_residual = site.get_covariance_residual(KalmanSite::Excluded);
+  _pull                 = site.residual(KalmanSite::Projected);
+  _residual             = site.residual(KalmanSite::Filtered);
+  _smoothed_residual    = site.residual(KalmanSite::Smoothed);
+  _excluded_residual    = site.residual(KalmanSite::Excluded);
+  _covariance_residual          = site.covariance_residual(KalmanSite::Filtered);
+  _covariance_smoothed_residual = site.covariance_residual(KalmanSite::Smoothed);
+  _covariance_excluded_residual = site.covariance_residual(KalmanSite::Excluded);
 
-  _input_shift = site.get_input_shift();
-  _input_shift_covariance = site.get_input_shift_covariance();
+  _input_shift = site.input_shift();
+  _input_shift_covariance = site.input_shift_covariance();
 
-  _shift = site.get_shift();
-  _shift_covariance = site.get_shift_covariance();
+  _shift = site.shift();
+  _shift_covariance = site.shift_covariance();
 
-  _current_state = site.get_current_state();
+  _current_state = site.current_state();
 }
 
 KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
@@ -83,46 +83,46 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
     return *this;
   }
 
-  _z  = rhs.get_z();
-  _id = rhs.get_id();
-  _f_chi2 = rhs.get_chi2(KalmanSite::Filtered);
-  _s_chi2 = rhs.get_chi2(KalmanSite::Smoothed);
-  _direction = rhs.get_direction();
-  _mc_pos = rhs.get_true_position();
-  _mc_mom = rhs.get_true_momentum();
+  _z  = rhs.z();
+  _id = rhs.id();
+  _f_chi2 = rhs.chi2(KalmanSite::Filtered);
+  _s_chi2 = rhs.chi2(KalmanSite::Smoothed);
+  _direction = rhs.direction();
+  _mc_pos = rhs.true_position();
+  _mc_mom = rhs.true_momentum();
 
-  _projected_a = rhs.get_a(KalmanSite::Projected);
-  _a           = rhs.get_a(KalmanSite::Filtered);
-  _smoothed_a  = rhs.get_a(KalmanSite::Smoothed);
-  _a_excluded  = rhs.get_a(KalmanSite::Excluded);
+  _projected_a = rhs.a(KalmanSite::Projected);
+  _a           = rhs.a(KalmanSite::Filtered);
+  _smoothed_a  = rhs.a(KalmanSite::Smoothed);
+  _a_excluded  = rhs.a(KalmanSite::Excluded);
 
-  _projected_C = rhs.get_covariance_matrix(KalmanSite::Projected);
-  _C           = rhs.get_covariance_matrix(KalmanSite::Filtered);
-  _smoothed_C  = rhs.get_covariance_matrix(KalmanSite::Smoothed);
-  _C_excluded  = rhs.get_covariance_matrix(KalmanSite::Excluded);
+  _projected_C = rhs.covariance_matrix(KalmanSite::Projected);
+  _C           = rhs.covariance_matrix(KalmanSite::Filtered);
+  _smoothed_C  = rhs.covariance_matrix(KalmanSite::Smoothed);
+  _C_excluded  = rhs.covariance_matrix(KalmanSite::Excluded);
 
-  _v = rhs.get_measurement();
+  _v = rhs.measurement();
 
-  _pull                 = rhs.get_residual(KalmanSite::Projected);
-  _residual             = rhs.get_residual(KalmanSite::Filtered);
-  _smoothed_residual    = rhs.get_residual(KalmanSite::Smoothed);
-  _excluded_residual    = rhs.get_residual(KalmanSite::Excluded);
-  _covariance_residual          = rhs.get_covariance_residual(KalmanSite::Filtered);
-  _covariance_smoothed_residual = rhs.get_covariance_residual(KalmanSite::Smoothed);
-  _covariance_excluded_residual = rhs.get_covariance_residual(KalmanSite::Excluded);
+  _pull                 = rhs.residual(KalmanSite::Projected);
+  _residual             = rhs.residual(KalmanSite::Filtered);
+  _smoothed_residual    = rhs.residual(KalmanSite::Smoothed);
+  _excluded_residual    = rhs.residual(KalmanSite::Excluded);
+  _covariance_residual          = rhs.covariance_residual(KalmanSite::Filtered);
+  _covariance_smoothed_residual = rhs.covariance_residual(KalmanSite::Smoothed);
+  _covariance_excluded_residual = rhs.covariance_residual(KalmanSite::Excluded);
 
-  _input_shift = rhs.get_input_shift();
-  _input_shift_covariance = rhs.get_input_shift_covariance();
+  _input_shift = rhs.input_shift();
+  _input_shift_covariance = rhs.input_shift_covariance();
 
-  _shift = rhs.get_shift();
-  _shift_covariance = rhs.get_shift_covariance();
+  _shift = rhs.shift();
+  _shift_covariance = rhs.shift_covariance();
 
-  _current_state = rhs.get_current_state();
+  _current_state = rhs.current_state();
 
   return *this;
 }
 
-void KalmanSite::initialise(int dim) {
+void KalmanSite::Initialise(int dim) {
   // The state vector.
   _projected_a.ResizeTo(dim, 1);
   _a.          ResizeTo(dim, 1);
@@ -177,7 +177,7 @@ void KalmanSite::set_a(TMatrixD a, State kalman_state) {
   }
 }
 
-TMatrixD KalmanSite::get_a(State desired_state) const {
+TMatrixD KalmanSite::a(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _projected_a;
@@ -219,7 +219,7 @@ void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
   }
 }
 
-TMatrixD KalmanSite::get_covariance_matrix(State desired_state) const {
+TMatrixD KalmanSite::covariance_matrix(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _projected_C;
@@ -262,7 +262,7 @@ void KalmanSite::set_residual(TMatrixD residual, State kalman_state) {
   }
 }
 
-TMatrixD KalmanSite::get_residual(State desired_state) const {
+TMatrixD KalmanSite::residual(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _pull;
@@ -301,7 +301,7 @@ void KalmanSite::set_covariance_residual(TMatrixD C, State kalman_state) {
   }
 }
 
-TMatrixD KalmanSite::get_covariance_residual(State desired_state) const {
+TMatrixD KalmanSite::covariance_residual(State desired_state) const {
   switch ( desired_state ) {
     case(Filtered) :
       return _covariance_residual;
@@ -336,7 +336,7 @@ void KalmanSite::set_chi2(double chi2, State kalman_state) {
   }
 }
 
-double KalmanSite::get_chi2(State desired_state) const {
+double KalmanSite::chi2(State desired_state) const {
   switch ( desired_state ) {
     case(Filtered) :
       return _f_chi2;

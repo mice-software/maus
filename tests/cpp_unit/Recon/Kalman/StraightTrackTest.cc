@@ -34,8 +34,8 @@ class StraightTrackTest : public ::testing::Test {
 };
 
 void StraightTrackTest::set_up_sites() {
-  old_site.initialise(4);
-  new_site.initialise(4);
+  old_site.Initialise(4);
+  new_site.Initialise(4);
   deltaZ = 1100.0;
   new_site.set_id(0);
   new_site.set_z(deltaZ);
@@ -63,11 +63,11 @@ TEST_F(StraightTrackTest, propagator_test) {
   set_up_sites();
 
   MAUS::KalmanTrack *track = new MAUS::StraightTrack(false, false);
-  track->update_propagator(&old_site, &new_site);
-  track->calc_predicted_state(&old_site, &new_site);
+  track->UpdatePropagator(&old_site, &new_site);
+  track->CalculatePredictedState(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);
-  a_projected = new_site.get_a(MAUS::KalmanSite::Projected);
+  a_projected = new_site.a(MAUS::KalmanSite::Projected);
 
   double expected_x = mx*deltaZ;
   double expected_y = my*deltaZ;

@@ -81,7 +81,11 @@ class KalmanTrackTest : public ::testing::Test {
   MAUS::KalmanSite new_site;
 };
 
+// This is an utility function. It sets up two Kalman Sites
+// for use by all KalmanTrack routines.
 void KalmanTrackTest::set_up_sites() {
+  old_site.Initialise(5);
+  new_site.Initialise(5);
   double deltaZ = 1100.0;
   new_site.set_id(0);
   new_site.set_z(deltaZ);
@@ -154,9 +158,9 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   TMatrixD s(3, 1);
   s.Zero();
 
-  track->update_H(a_site);
+  track->UpdateH(a_site);
 
-  TMatrixD HA = track->solve_measurement_equation(a, s);
+  TMatrixD HA = track->SolveMeasurementEquation(a, s);
 measurement.Print();
 HA.Print();
   EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
@@ -168,7 +172,7 @@ HA.Print();
   // the new measurement includes the misalignment shift
   double new_alpha = measurement(0., 0.) + shift_x/1.4945;
 
-  TMatrixD HA_new = track->solve_measurement_equation(a, s);
+  TMatrixD HA_new = track->SolveMeasurementEquation(a, s);
   HA_new.Print();
   std::cerr << new_alpha << std::endl;
   EXPECT_NEAR(new_alpha, HA_new(0, 0), 1e-1);
@@ -181,6 +185,7 @@ HA.Print();
 }
 
 TEST_F(KalmanTrackTest, test_filtering_methods) {
+
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
   CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
@@ -204,43 +209,43 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a_site->set_a(a, MAUS::KalmanSite::Projected);
   TMatrixD s(3, 1);
   s.Zero();
-  track->update_H(a_site);
-  TMatrixD HA = track->solve_measurement_equation(a, s);
+  track->UpdateH(a_site);
+  TMatrixD HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) > 0);
   // 2nd case.
   a(0, 0) = 2.;
   a(2, 0) = 60.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->solve_measurement_equation(a, s);
+  HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) < 0);
   // 3rd case
   a(0, 0) = -30.;
   a(2, 0) = 30.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->solve_measurement_equation(a, s);
+  HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) < 0);
   // 4th case
   a(0, 0) = -50.;
   a(2, 0) = -5.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->solve_measurement_equation(a, s);
+  HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) < 0);
   // 5th case
   a(0, 0) = -2.;
   a(2, 0) = -60.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->solve_measurement_equation(a, s);
+  HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) > 0);
   // 6th case
   a(0, 0) = 30.;
   a(2, 0) = -30.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->solve_measurement_equation(a, s);
+  HA = track->SolveMeasurementEquation(a, s);
   HA.Print();
   EXPECT_TRUE(HA(0, 0) > 0);
 
@@ -268,3 +273,8 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
 */
 }
 } // ~namespace MAUS
+
+
+
+
+

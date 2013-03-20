@@ -15,11 +15,6 @@
  *
  */
 
-/** @class SciFiHelicalPRTrack
- *
- *
- */
-
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 
@@ -30,10 +25,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-// #include "src/common_cpp/Recon/Global/Detector.hh"
-// #include "src/common_cpp/Recon/Global/TrackPoint.hh"
-// class KalmanSite;
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
@@ -67,6 +59,10 @@ class SciFiTrack {
     double P_value()    const   { return _P_value; }
     void   set_P_value(double p_value) { _P_value = p_value; }
 
+    SciFiTrackPointPArray scifitrackpoints()          const      { return _scifitrackpoints; }
+    void set_scifitrackpoints(SciFiTrackPointPArray trackpoints) { _scifitrackpoints = trackpoints; }
+    void add_scifitrackpoint(SciFiTrackPoint *trackpoint)        { _scifitrackpoints.push_back(trackpoint); }
+
   private:
     int _tracker;
 
@@ -76,6 +72,9 @@ class SciFiTrack {
     int _ndf;
 
     double _P_value;
+
+    /** Kalman track points */
+    SciFiTrackPointPArray                     _scifitrackpoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

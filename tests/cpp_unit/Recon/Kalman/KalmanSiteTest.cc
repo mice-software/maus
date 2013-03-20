@@ -28,7 +28,7 @@ class KalmanSiteTest : public ::testing::Test {
 
 TEST_F(KalmanSiteTest, getters_and_setters_test) {
   MAUS::KalmanSite a_site = MAUS::KalmanSite();
-
+  a_site.Initialise(5);
   TMatrixD projected_a(5, 1);
   projected_a(0, 0) = 1.0;
   projected_a(0, 0) = 2.0;
@@ -53,6 +53,10 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   smoothed_a(0, 0) = 5.0;
   a_site.set_a(smoothed_a, MAUS::KalmanSite::Smoothed);
 
+  int id = 13;
+  a_site.set_id(id);
+
+  EXPECT_EQ(a_site.id(), id);
 /*
   set_projected_covariance_matrix(TMatrixD Cp);
   set_smoothed_covariance_matrix(TMatrixD C);
@@ -69,11 +73,13 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
 */
   // Test copy constructor.
   MAUS::KalmanSite copy = MAUS::KalmanSite(a_site);
+  EXPECT_EQ(copy.id(), id);
   // EXPECT_EQ(copy.get_spill(), spill);
   // EXPECT_EQ(copy.get_event(), event);
   // Test = operator.
   MAUS::KalmanSite second_copy;
   second_copy = copy;
+  EXPECT_EQ(second_copy.id(), id);
   // EXPECT_EQ(second_copy.get_spill(), spill);
   // EXPECT_EQ(second_copy.get_event(), event);
 }

@@ -14,26 +14,28 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPROCESSOR_HH_
+
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
-
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPROCESSOR_HH_
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
 
 namespace MAUS {
 
-/** @class SciFiHelicalPRTrackProcessor processor for SciFiHelicalPRTrack */
+/** @class SciFiTrackProcessor processor for SciFiTrack */
 class SciFiTrackProcessor : public ObjectProcessor<SciFiTrack> {
  public:
-    /** Constructor - registers the branch structure */
     SciFiTrackProcessor();
 
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
+    PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
 };
 } // ~namespace MAUS
 

@@ -151,6 +151,8 @@
 #pragma link C++ class std::vector<SciFiStraightPRTrack*>+;
 #pragma link C++ class MAUS::SciFiHelicalPRTrack+;
 #pragma link C++ class std::vector<SciFiHelicalPRTrack*>+;
+#pragma link C++ class MAUS::SciFiTrackPoint+;
+#pragma link C++ class std::vector<SciFiTrackPoint*>+;
 #pragma link C++ class MAUS::SciFiTrack+;
 #pragma link C++ class std::vector<SciFiTrack*>+;
 #pragma link C++ class MAUS::KLDigit+;

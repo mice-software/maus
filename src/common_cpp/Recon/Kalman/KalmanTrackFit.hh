@@ -54,31 +54,33 @@ class KalmanTrackFit {
 
   virtual ~KalmanTrackFit();
 
-  void process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
+  void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
   /// This will: initialise the state vector;
   /// Set covariance matrix;
   /// Add plane measurents to all sites;
-  void initialise(KalmanSeed *seed,
+  void Initialise(KalmanSeed *seed,
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
 
-  void run_filter(KalmanTrack *track,
+  void RunFilter(KalmanTrack *track,
                   std::vector<KalmanSite> &sites);
 
-  void run_filter(KalmanTrack *track,
+  void RunFilter(KalmanTrack *track,
                   std::vector<KalmanSite> &sites,
                   int ignore_i);
 
-  void filter_virtual(KalmanSite &a_site);
+  void FilterVirtual(KalmanSite &a_site);
 
-  void launch_misaligment_search(KalmanTrack *track,
+  void LaunchMisaligmentSearch(KalmanTrack *track,
                                  std::vector<KalmanSite> &sites,
                                  KalmanSciFiAlignment &kalman_align);
 
-  void save(const KalmanTrack *kalman_track,
+  void Save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,
             SciFiEvent &event);
+
+  void DumpInfo(std::vector<KalmanSite> const &sites);
 
  private:
   double _seed_cov;
