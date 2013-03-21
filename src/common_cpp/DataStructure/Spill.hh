@@ -84,6 +84,7 @@ class Spill {
 
   /** Get the MC event size (needed for PyROOT)*/
   size_t GetMCEventSize() const {
+    if(!_mc) return 0;
     return _mc->size();
   }
 
@@ -100,6 +101,7 @@ class Spill {
 
   /** Get the Recon event size (needed for PyROOT)*/
   size_t GetReconEventSize() const {
+    if(!_recon) return 0;
     return _recon->size();
   }
 
