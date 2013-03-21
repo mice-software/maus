@@ -16,11 +16,12 @@ A group of workers which iterates through each worker in turn.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from types import ListType
+from types import ListType, StringType
 import inspect
 import sys
 
 import ErrorHandler
+from maus_cpp import data_to_string 
 
 class MapPyGroup:
     """
@@ -168,7 +169,19 @@ class MapPyGroup:
         """
         nu_spill = spill
         for worker in self._workers:
+            worker_name = worker.__class__.__name__
+            # If the current worker is a MapPyXXX worker, and the
+            # current nu_spill isn't a std::string, do the conversion
+            # first.
+            if (not hasattr(worker, 'CanConvert') and
+                type(nu_spill) is not StringType):
+                nu_spill = data_to_string.convert(nu_spill)
             nu_spill = worker.process(nu_spill)
+
+        # Always return a string type
+        if (type(nu_spill) is not StringType):
+            nu_spill = data_to_string.convert(nu_spill)
+
         return nu_spill
 
     def death(self):
