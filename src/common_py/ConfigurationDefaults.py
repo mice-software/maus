@@ -298,11 +298,11 @@ DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
 
 # tof digitization
-TOFconversionFactor = 0.01 # MeV
+TOFconversionFactor = 0.005 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
 TOFattenuationLength = 140 * 10 # mm
 TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.025 # nanosecond
+TOFtdcConversionFactor = 0.0244140625 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
