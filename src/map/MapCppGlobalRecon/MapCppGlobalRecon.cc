@@ -17,71 +17,47 @@
 
 #include "src/map/MapCppGlobalRecon/MapCppGlobalRecon.hh"
 
-#include "src/common_cpp/DataStructure/Data.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "src/common_cpp/API/APIExceptions.hh"
 
 #include "Recon/Global/ImportSciFiRecon.hh"
 
 namespace MAUS {
-MapCppGlobalRecon::MapCppGlobalRecon() {
-  _classname = "MapCppGlobalRecon";
-}
+MapCppGlobalRecon::MapCppGlobalRecon()
+    : MapBase<MAUS::Data, MAUS::Data>("MapCppGlobalRecon") {};
 
-bool MapCppGlobalRecon::birth(std::string argJsonConfigDocument) {
+void MapCppGlobalRecon::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only.
   bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    return false;
+    throw(Squeal(Squeal::nonRecoverable,
+                 "Unable to Parse Json Config",
+                 "MapCppGlobalRecon::_birth"));
   }
-
-  return true;
 }
 
-bool MapCppGlobalRecon::death() {
-  return true;
-}
+void MapCppGlobalRecon::_death() {}
 
-std::string MapCppGlobalRecon::process(std::string document) const {
-  // Prepare converters, spill and json objects
-  JsonCppSpillConverter json2cppconverter;
-  CppJsonSpillConverter cpp2jsonconverter;
-  Json::Value *data_json = NULL;
-  MAUS::Data *data_cpp = NULL;
-
-  // Read string and convert to a Json object
-  Json::Value imported_json = JsonWrapper::StringToJson(document);
-  data_json = &imported_json;
-
-  if (!data_json || data_json->isNull()) {
-    return std::string("{\"errors\":{\"bad_json_document\":")+
-           std::string("\"Failed to parse input document\"}}");
+MAUS::Data* MapCppGlobalRecon::_process(MAUS::Data* data) const {
+  if (!data) {
+    throw(Squeal(Squeal::nonRecoverable,
+                 "NULL MAUS::Data* passed to process.",
+                 "MapCppGlobalRecon::_process"));
   }
 
-  if (data_json->empty()) {
-    return std::string("{\"errors\":{\"bad_json_document\":")+
-           std::string("\"Failed to parse input document\"}}");
+  const MAUS::Spill* spill = data->GetSpill();
+  if (!spill) {
+    throw(Squeal(Squeal::recoverable,
+                 "No MAUS::Spill in MAUS::Data, required!",
+                 "MapCppGlobalRecon::_process"));
   }
-
-  // Convert Json into MAUS::Spill object.  In future, this will all
-  // be done for me, and process will take/return whichever object we
-  // prefer.
-  data_cpp = json2cppconverter(data_json);
-
-  if (!data_cpp) {
-    return std::string("{\"errors\":{\"failed_json_cpp_conversion\":")+
-           std::string("\"Failed to convert Json to Cpp Spill object\"}}");
-  }
-
-  const MAUS::Spill* spill = data_cpp->GetSpill();
 
   MAUS::ReconEventArray* recon_events = spill->GetReconEvents();
 
   if (!recon_events) {
-    return document;
+    throw(Squeal(Squeal::recoverable,
+                 "No MAUS::ReconEventArray in MAUS::Spill!",
+                 "MapCppGlobalRecon::_process"));
   }
-
-  std::cout << "Recon Event Size:\t" << recon_events->size() << std::endl;
 
   MAUS::ReconEventArray::iterator recon_event_iter;
   for (recon_event_iter = recon_events->begin();
@@ -93,17 +69,7 @@ std::string MapCppGlobalRecon::process(std::string document) const {
     recon_event->SetGlobalEvent(global_event);
   }
 
-  // MAUS::Data *data_cpp = new MAUS::Data();
-  // data_cpp->SetSpill(spill);
-  // data_cpp->SetEventType
-  data_json = cpp2jsonconverter(data_cpp);
-
-  if (!data_json) {
-    return std::string("{\"errors\":{\"failed_cpp_json_conversion\":")+
-           std::string("\"Failed to convert Cpp to Json Spill object\"}}");
-  }
-
-  return JsonWrapper::JsonToString(*data_json);
+  return data;
 }
 
 MAUS::GlobalEvent*

@@ -38,37 +38,34 @@
 
 // Other headers
 #include "Interface/Squeak.hh"
-#include "Config/MiceModule.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 
+#include "src/common_cpp/API/MapBase.hh"
+
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-
-// #include "src/common_cpp/API/MapBase.hh"
-
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
 namespace MAUS {
 
-class MapCppGlobalRecon {
+class MapCppGlobalRecon : public MapBase<MAUS::Data, MAUS::Data> {
  public:
   /** Constructor, setting the internal variable #_classname */
   MapCppGlobalRecon();
 
+ private:
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool death();
+  void _death();
 
   /** process JSON document
    *
@@ -76,7 +73,7 @@ class MapCppGlobalRecon {
    *  a document with digits
    * \param document a line/spill from the JSON input
    */
-  std::string process(std::string) const;
+  MAUS::Data* _process(MAUS::Data* data) const;
 
   /** Import the existing MAUS::ReconEvent, creating a new
    * MAUS::GlobalEvent and populating an early
@@ -86,8 +83,6 @@ class MapCppGlobalRecon {
    */
   MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
 
-  // void print_event_info(GlobalEvent &event);
-
  private:
   /// This will contain the configuration
   Json::Value _configJSON;
@@ -95,9 +90,6 @@ class MapCppGlobalRecon {
   // Json::Value root;
   ///  JsonCpp setup
   Json::Reader _reader;
-
-  // Mapper name, useful for tracking results...
-  std::string _classname;
 }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 
