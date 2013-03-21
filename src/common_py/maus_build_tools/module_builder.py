@@ -57,9 +57,18 @@ class ModuleBuilder:
         SConscript(sconscript_path(project),
                    exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
+    # Determine if the project uses SWIG to build, and pass to either
+    # build_project_SWIG or build_project_CAPI
+    def build_project(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+        name = project.split('/')[-1]
+        potential_swig_file = os.path.join(MAUS_ROOT_DIR, project, name + '.i')
+        if os.path.isfile(potential_swig_file):
+            self.build_project_Swig(localenv, project, dependencies)
+        else:
+            self.build_project_CAPI(localenv, project, dependencies)
 
     #sets up the build for a given project
-    def build_project(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+    def build_project_Swig(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
         """
         Add a particular subproject to the build list
 
@@ -115,6 +124,85 @@ class ModuleBuilder:
         self.env.Install(full_build_dir, "build/%s.py" % name)
         self.env.Install(full_build_dir, swig_lib)
         self.env.Install(full_build_dir, normal_lib)
+        self.env.Install(full_build_dir, tests)
+        return True
+
+    #sets up the build for a given project
+    def build_project_CAPI(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+        """
+        Add a particular subproject to the build list
+
+        Buildit is called by SConscript files to request that we build a module.
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param dependencies list of projects on which this project depends
+        @return True on success
+        """
+        if dependencies == None:
+            dependencies = [] # can cause evil if we use [] as default value
+
+        # Determine the name of the project
+        name = project.split('/')[-1]
+        
+        # Find the sources
+        ccpath = [x for x in glob.glob('*.cc')]
+
+        #append the user's additional compile flags
+        #assume debugcflags and releasecflags are defined
+        localenv.Append(LIBS=['MausCpp'])
+        localenv.Append(LIBPATH = "%s/src/common_cpp" % MAUS_ROOT_DIR)
+        if type(dependencies) != type([]):
+            print 'Warning - dependencies should be a list - found '+\
+                  str(dependencies)+' in project '+project
+            dependencies = []
+        for dep in dependencies:
+            lib_name = dep.split('/')[-1]
+            localenv.Append(LIBS=lib_name)
+
+        #specify the build directory
+        builddir = 'build'
+        localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
+        localenv.Append(CPPPATH='.')
+        full_build_dir = os.path.join(MAUS_ROOT_DIR, builddir)
+
+        # Build the library, and set the dependencies
+        lib1_path = os.path.join(builddir, 'lib%s' % name)
+        lib2_path = os.path.join(builddir, '_%s.so' % name)
+        normal_lib1 = localenv.SharedLibrary(lib1_path, source=ccpath)
+        normal_lib2 = localenv.SharedLibrary(lib2_path, source=ccpath)
+        for dep in dependencies:
+            localenv.Depends(dep, normal_lib1)
+            localenv.Depends(dep, normal_lib2)
+
+        # Build an extra copy with the .dylib extension for linking on OS X
+        if (os.uname()[0] == 'Darwin'):
+            lib_so = self.env.Dylib2SO(lib1_path)
+            Depends(lib_so, pgm) #pylint: disable=E0602
+            self.env.Install(full_build_dir, lib_so)
+
+        # Ensure the build directory exists
+        if not os.path.exists(builddir):
+            os.makedirs(builddir)
+
+        # Prepare the python wrapper
+        pywraptemplate = os.path.join(MAUS_ROOT_DIR,
+                                      'src/map/Templates/MapCppTemplate.py')
+        pywrap = os.path.join(builddir, '%s.py' % name)
+        f1 = open(pywraptemplate, 'r')
+        f2 = open(pywrap, 'w')
+        for line in f1:
+            f2.write(line.replace('MapCppTemplate',name))
+        f1.close()
+        f2.close()
+
+        # Locate the test file
+        tests = glob.glob('test_*.py')
+
+        # Install the files in the build directory, under MAUS_ROOT_DIR.
+        print 'Installing', project
+        self.env.Install(full_build_dir, pywrap)
+        self.env.Install(full_build_dir, normal_lib1)
+        self.env.Install(full_build_dir, normal_lib2)
         self.env.Install(full_build_dir, tests)
         return True
 
