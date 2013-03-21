@@ -112,6 +112,7 @@ void KalmanTrackTest::set_up_sites() {
 TEST_F(KalmanTrackTest, test_constructor) {
   // a_site->set_measurement(0);
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
   // EXPECT_EQ(track->get_chi2(), 0.0);
   EXPECT_EQ(track->ndf(), 0.0);
   EXPECT_EQ(track->tracker(), -1);
@@ -121,10 +122,13 @@ TEST_F(KalmanTrackTest, test_constructor) {
 // ------- Projection ------------
 //
 TEST_F(KalmanTrackTest, test_error_methods) {
-  // MAUS::KalmanTrack *track = new MAUS::StraightTrack();
+  MAUS::KalmanTrack *track = new MAUS::StraightTrack();
+  track->Initialise();
 
-  // double momentum = 200.0;
-  // track->BetheBlochStoppingPower(momentum);
+  double momentum = 230.0;
+
+  track->BetheBlochStoppingPower(momentum);
+
 }
 
 //
@@ -132,6 +136,7 @@ TEST_F(KalmanTrackTest, test_error_methods) {
 //
 TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
   CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
   CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
   CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);
@@ -187,6 +192,7 @@ HA.Print();
 TEST_F(KalmanTrackTest, test_filtering_methods) {
 
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
   CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
   CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
   CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);

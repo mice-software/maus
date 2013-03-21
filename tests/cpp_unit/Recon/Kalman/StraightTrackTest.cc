@@ -63,6 +63,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   set_up_sites();
 
   MAUS::KalmanTrack *track = new MAUS::StraightTrack(false, false);
+  track->Initialise();
   track->UpdatePropagator(&old_site, &new_site);
   track->CalculatePredictedState(&old_site, &new_site);
 
@@ -73,7 +74,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   double expected_y = my*deltaZ;
   EXPECT_EQ(expected_x, a_projected(0, 0));
   EXPECT_EQ(expected_y, a_projected(2, 0));
-
+  delete track;
   // track->calc_covariance(&old_site, &new_site);
   // DO SOMETHING WITH COVARIANCE
 }

@@ -34,7 +34,7 @@ class HelicalTrackTest : public ::testing::Test {
   double x1, y1, mx1, my1;
   void set_up_sites();
   TMatrixD a;
-  static const double err = 1.e-2;
+  static const double err = 1.e-6;
 };
 
 void HelicalTrackTest::set_up_sites() {
@@ -77,8 +77,7 @@ TEST_F(HelicalTrackTest, test_propagation) {
   set_up_sites();
 
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
-  // old_site.get_a().Print();
-  // track->update_propagator(&old_site, &new_site);
+  track->Initialise();
   track->CalculatePredictedState(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);
@@ -89,7 +88,17 @@ TEST_F(HelicalTrackTest, test_propagation) {
   EXPECT_NEAR(y1,    a_projected(2, 0), err);
   EXPECT_NEAR(my1,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
+  delete track;
 }
 
+TEST_F(HelicalTrackTest, test_update_propagator) {
+  set_up_sites();
+
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
+  delete track;
+ // what to do?  
+
+}
 
 } // namespace
