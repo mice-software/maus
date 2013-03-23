@@ -47,33 +47,65 @@
 
 namespace MAUS {
 
+/** @class KalmanTrackFit
+ *
+ *  @brief KalmanTrackFit manages the workflow of the fitting.
+ *
+ */
 class KalmanTrackFit {
  public:
   KalmanTrackFit();
 
   virtual ~KalmanTrackFit();
 
+  /** @brief The main worker. All Kalman Filtering lives within.
+   */
   void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
-  /// This will: initialise the state vector;
-  /// Set covariance matrix;
-  /// Add plane measurents to all sites;
+  /** @brief Sets up the KalmanSites.
+   *
+   *  This will: initialise the state vector;
+   *  Set the covariance matrix;
+   *  Add plane measurents to all sites;
+   *
+   */
   void Initialise(KalmanSeed *seed,
                   std::vector<KalmanSite> &sites,
                   KalmanSciFiAlignment &kalman_align);
 
+  /** @brief Runs Filter routines.
+   *
+   *  Runs the Prediction->Filtering->Smoothing stages.
+   *
+   */
   void RunFilter(KalmanTrack *track,
-                  std::vector<KalmanSite> &sites);
+                 std::vector<KalmanSite> &sites);
 
+  /** @brief Runs Filter routines ignoring a station.
+   *
+   *  This removes one station from the fit and runs the normal filter.
+   *  Useful for misalignment studies, for ex.
+   *
+   */
   void RunFilter(KalmanTrack *track,
-                  std::vector<KalmanSite> &sites,
-                  int ignore_i);
+                 std::vector<KalmanSite> &sites,
+                 int ignore_i);
 
+  /** @brief "Filter" a station ignoring the measurement.
+   *
+   *  In other words, it makes the filtered states equal to the projected ones.
+   *
+   */
   void FilterVirtual(KalmanSite &a_site);
 
+  /** @brief 
+   *
+   *  In other words, it makes the filtered states equal to the projected ones.
+   *
+   */
   void LaunchMisaligmentSearch(KalmanTrack *track,
-                                 std::vector<KalmanSite> &sites,
-                                 KalmanSciFiAlignment &kalman_align);
+                               std::vector<KalmanSite> &sites,
+                               KalmanSciFiAlignment &kalman_align);
 
   void Save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,

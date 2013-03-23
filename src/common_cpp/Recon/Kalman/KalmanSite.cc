@@ -82,6 +82,8 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
+  int dim = rhs.a(KalmanSite::Projected).GetNrows();
+  this->Initialise(dim);
 
   _z  = rhs.z();
   _id = rhs.id();
@@ -301,8 +303,8 @@ void KalmanSite::set_covariance_residual(TMatrixD C, State kalman_state) {
   }
 }
 
-TMatrixD KalmanSite::covariance_residual(State desired_state) const {
-  switch ( desired_state ) {
+TMatrixD KalmanSite::covariance_residual(State st) const {
+  switch ( st ) {
     case(Filtered) :
       return _covariance_residual;
       break;

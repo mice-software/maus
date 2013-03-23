@@ -64,7 +64,7 @@ TEST_F(StraightTrackTest, propagator_test) {
 
   MAUS::KalmanTrack *track = new MAUS::StraightTrack(false, false);
   track->Initialise();
-  track->UpdatePropagator(&old_site, &new_site);
+  // track->UpdatePropagator(&old_site, &new_site);
   track->CalculatePredictedState(&old_site, &new_site);
 
   TMatrixD a_projected(5, 1);

@@ -34,7 +34,7 @@ class HelicalTrackTest : public ::testing::Test {
   double x1, y1, mx1, my1;
   void set_up_sites();
   TMatrixD a;
-  static const double err = 1.e-6;
+  static const double err = 1.e-4;
 };
 
 void HelicalTrackTest::set_up_sites() {

@@ -18,6 +18,7 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include <stdlib.h>
 
 #include "gtest/gtest.h"
 
@@ -122,12 +123,12 @@ TEST_F(KalmanTrackTest, test_constructor) {
 // ------- Projection ------------
 //
 TEST_F(KalmanTrackTest, test_error_methods) {
-  MAUS::KalmanTrack *track = new MAUS::StraightTrack();
-  track->Initialise();
+  //MAUS::KalmanTrack *track = new MAUS::StraightTrack();
+  //track->Initialise();
 
-  double momentum = 230.0;
+  //double momentum = 230.0;
 
-  track->BetheBlochStoppingPower(momentum);
+  //track->BetheBlochStoppingPower(momentum);
 
 }
 
@@ -153,7 +154,7 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   // and there's a x,y position corresponding to that measurement...
   TMatrixD a;
   a.ResizeTo(5, 1);
-  a(0, 0) = -measurement(0., 0.)*1.4945;
+  a(0, 0) = -measurement(0, 0)*1.4945;
   a(1, 0) = 1.;
   a(2, 0) = 5.; // random number, y doesnt matter.
   a(3, 0) = 1.;
@@ -166,8 +167,8 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   track->UpdateH(a_site);
 
   TMatrixD HA = track->SolveMeasurementEquation(a, s);
-measurement.Print();
-HA.Print();
+  measurement.Print();
+  HA.Print();
   EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
 
   // now, we introduce a shift in x.
@@ -175,7 +176,7 @@ HA.Print();
   double shift_x = 2.; // mm
   s(0, 0) = shift_x; // mm
   // the new measurement includes the misalignment shift
-  double new_alpha = measurement(0., 0.) + shift_x/1.4945;
+  double new_alpha = measurement(0, 0) + shift_x/1.4945;
 
   TMatrixD HA_new = track->SolveMeasurementEquation(a, s);
   HA_new.Print();
@@ -190,7 +191,6 @@ HA.Print();
 }
 
 TEST_F(KalmanTrackTest, test_filtering_methods) {
-
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
   CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
@@ -202,6 +202,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   CLHEP::Hep3Vector direction_plane2_tracker1(-0.866, -0.5, 0.0);
 */
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
+  a_site->Initialise(5);
   // Plane 0. 1st case.
   a_site->set_direction(direction_plane2_tracker0);
   TMatrixD a;
@@ -255,6 +256,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   HA.Print();
   EXPECT_TRUE(HA(0, 0) > 0);
 
+  a_site->set_measurement(HA(0, 0));
 /*
   double x, px, y, py, kappa;
   x =
@@ -277,10 +279,44 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   track->update_H(&a_site);
   track->calc_filtered_state
 */
+
+  // So we have H ready. Let's test the built of W.
+  // For that, we will need V.
+  track->UpdateV(a_site);
+  TMatrixD C(5, 5);
+  TMatrixD C_S(3, 3);
+  a_site->set_covariance_matrix(C, KalmanSite::Projected);
+  a_site->set_input_shift_covariance(C_S);
+
+  EXPECT_THROW(track->UpdateW(a_site), Squeal);
 }
+
+TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
+  // Set up the sites and the track.
+  set_up_sites();
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
+  track->CalculatePredictedState(&old_site, &new_site);
+
+  // Build a covariance matrix. Elements are random in [0, 100].
+  TMatrixD covariance = TMatrixD(5, 5);
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+      covariance(j, k) = 100.*rand()/RAND_MAX;
+    }
+  }
+
+  old_site.set_covariance_matrix(covariance, MAUS::KalmanSite::Filtered);
+  track->CalculateCovariance(&old_site, &new_site);
+
+  // Verify that the covariance GROWS when we extrapolate.
+  // Not much we can do with this.
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+    EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
+              old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
+    }
+  }
+}
+
 } // ~namespace MAUS
-
-
-
-
-

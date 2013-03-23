@@ -110,6 +110,8 @@ class SciFiSpacePoint {
 
   bool get_used() const { return _used; }
 
+  void add_channel(SciFiCluster *channel) { _channels.push_back(channel); }
+
   void set_channels(SciFiClusterPArray channels) { _channels = channels; }
 
   SciFiClusterPArray get_channels()  const { return _channels; }

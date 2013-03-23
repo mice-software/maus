@@ -68,7 +68,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     std::cout << numb_measurements << std::endl;
     if ( numb_measurements != 15 ) continue;
 
-    double momentum = seed->get_momentum(); // MeV/c
+    double momentum = seed->momentum(); // MeV/c
     track->set_momentum(momentum);
 
     RunFilter(track, sites);
@@ -89,16 +89,16 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 void KalmanTrackFit::Initialise(KalmanSeed *seed,
                                 std::vector<KalmanSite> &sites,
                                 KalmanSciFiAlignment &kalman_align) {
-  TMatrixD a0 = seed->get_initial_state_vector();
+  TMatrixD a0 = seed->initial_state_vector();
 
-  int n_param = seed->get_n_parameters();
+  int n_param = seed->n_parameters();
 
   TMatrixD C(n_param, n_param);
   C.Zero();
   for ( int i = 0; i < n_param; i++ )
     C(i, i) = _seed_cov;
 
-  std::vector<SciFiCluster*> clusters = seed->get_clusters();
+  std::vector<SciFiCluster*> clusters = seed->clusters();
   KalmanSite first_plane;
   first_plane.Initialise(n_param);
   first_plane.set_a(a0, KalmanSite::Projected);
@@ -157,6 +157,12 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
 
 void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i) {
   size_t numb_measurements = sites.size();
+
+  if ( ignore_i < 2 || ignore_i > 4 ) {
+    throw(Squeal(Squeal::recoverable,
+          "Bad request.",
+          "KalmanTrackFit::RunFilter"));
+  }
 
   size_t site_removed_1 = 3*(ignore_i-1);
   size_t site_removed_2 = site_removed_1 + 1;

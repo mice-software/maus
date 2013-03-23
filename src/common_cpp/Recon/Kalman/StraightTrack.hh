@@ -34,14 +34,32 @@
 
 namespace MAUS {
 
+/** @class StraightTrack
+ *
+ *  @brief Models the propagation of particles in the absence of fields.
+ *
+ *  Inherits from KalmanTrack, where most of the functionality is defined.
+ *  The methods overwritten here are the ones related with particle propagation.
+ *
+ */
 class StraightTrack : public KalmanTrack {
  public:
+  /** @brief Straight Track constructor.
+   *
+   *  @param flags for use of Multiple Scattering and Eloss models.
+   */
   StraightTrack(bool MCS, bool Eloss);
 
+  /** @brief Destructor.
+   */
   virtual ~StraightTrack();
 
+  /** @brief Calculates the propagator (F), using Taylor expansion at current site.
+   */
   void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site);
 
+  /** @brief Calculates the projected state.
+   */
   void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site);
 };
 

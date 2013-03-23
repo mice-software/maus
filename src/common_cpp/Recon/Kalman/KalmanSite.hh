@@ -32,6 +32,14 @@
 
 namespace MAUS {
 
+/** @class KalmanSite
+ *
+ *  @brief A KalmanSite is a tracker plane. Each tracker contains 15 (if all planes are hit).
+ *
+ *  Each KalmanSite is a container for matrices which describe the state of the fit
+ *  and the errors associated.
+ *
+ */
 class KalmanSite {
  public:
   KalmanSite();
@@ -48,69 +56,87 @@ class KalmanSite {
                Smoothed,
                Excluded };
 
-  /// Initialises member matrices.
+  /** @brief Initialises member matrices.
+   *
+   *  @param dim The number of parameters to be calculated.
+   */
   void Initialise(int dim);
 
-  /// SETTERS
-  ///
-  /// The state vector at the site.
+  /** @brief Sets the state vector at the site.
+   */
   void set_a(TMatrixD a, State current_state);
+
   void set_covariance_matrix(TMatrixD C, State current_state);
+
+  /** @brief Sets the residual
+   *
+   *  This is the difference between the projected, filtered or smoothed estimation and
+   *  the measurement.
+   *
+   */
   void set_residual(TMatrixD residual, State current_state);
 
-
-  TMatrixD a(State desired_state) const;
-  TMatrixD covariance_matrix(State desired_state) const;
-  TMatrixD residual(State desired_state) const;
-
   void set_covariance_residual(TMatrixD C, State kalman_state);
-  TMatrixD covariance_residual(State desired_state) const;
-  /// The residuals and its covariance.
 
-  /// Shifts.
-  void set_input_shift(TMatrixD input_shift) { _input_shift = input_shift; }
-  TMatrixD input_shift() const { return _input_shift; }
+  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
+
+  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
+
+  void set_input_shift(TMatrixD input_shift)       { _input_shift = input_shift; }
+
   void set_input_shift_covariance(TMatrixD input_covariance) {
                 _input_shift_covariance = input_covariance; }
 
-  TMatrixD input_shift_covariance() const { return _input_shift_covariance; }
+  void set_shift(TMatrixD shift)                   { _shift = shift; }
 
-  void set_shift(TMatrixD shift) { _shift = shift; }
-  TMatrixD shift() const { return _shift; }
-  TMatrixD shift_covariance() const { return _shift_covariance; }
   void set_shift_covariance(TMatrixD shift_covariance) {
                 _shift_covariance = shift_covariance; }
 
-  /// Sets the measurement vector.
-  void set_measurement(double alpha)                { _v(0, 0) = alpha;
-                                                      _v(1, 0) = 0.0; }
-  /// The properties of the site.
+  void set_measurement(double alpha)               { _v(0, 0) = alpha;
+                                                     _v(1, 0) = 0.0; }
+
   void set_direction(CLHEP::Hep3Vector dir)        { _direction = dir; }
+
   void set_z(double z)                             { _z = z; }
+
   void set_id(int id)                              { _id = id; }
-  // void set_pitch(double factor)                    { _pitch = factor; }
 
-  /// The covariance of the innovation.
   void set_chi2(double chi2, State kalman_state);
-  double chi2(State desired_state) const;
 
-  /// The measurement.
+  void set_current_state(State kalman_state)       { _current_state = kalman_state; }
+
+
+  State current_state()                  const { return _current_state; }
+
+  TMatrixD a(State desired_state)        const;
+
+  TMatrixD covariance_matrix(State ds)   const;
+
+  TMatrixD residual(State desired_state) const;
+
+  TMatrixD covariance_residual(State st) const;
+
+  double chi2(State desired_state)       const;
+
+  TMatrixD input_shift()                 const { return _input_shift; }
+
+  TMatrixD input_shift_covariance()      const { return _input_shift_covariance; }
+
+  TMatrixD shift()                       const { return _shift; }
+
+  TMatrixD shift_covariance()            const { return _shift_covariance; }
+
   TMatrixD measurement()                 const { return _v; }
-  /// The site properties.
+
   double z()                             const { return _z; }
+
   int id()                               const { return _id; }
 
-
-  // double get_pitch()                         const { return _pitch; }
   CLHEP::Hep3Vector direction()          const { return _direction; }
 
-  State current_state() const { return _current_state; }
-  void set_current_state(State kalman_state) { _current_state = kalman_state; }
-
   CLHEP::Hep3Vector true_momentum()      const { return _mc_mom; }
+
   CLHEP::Hep3Vector true_position()      const { return _mc_pos; }
-  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
-  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
 
  private:
   /// State of the site.
@@ -122,8 +148,7 @@ class KalmanSite {
   /// The Chi2 at this site.
   double _f_chi2;
   double _s_chi2;
-  /// Pitch of the detector.
-  // double _pitch;
+
   /// Orientation of the measuring plane.
   CLHEP::Hep3Vector _direction;
 
