@@ -121,9 +121,9 @@ def get_environment():
     env = SCons.Environment.Environment(SHLIBPREFIX="",
                  BUILDERS = {'Dylib2SO' : DYLIB2SO}) # pylint: disable-msg=E0602
     if os.getenv('CC') != None:
-        env['CC'] = os.getenv["CC"]
+        env['CC'] = os.getenv("CC")
     if os.getenv('CXX') != None:
-        env['CXX'] = os.getenv["CXX"]
+        env['CXX'] = os.getenv("CXX")
 
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
@@ -137,6 +137,10 @@ def get_environment():
 
     libs = str(os.environ.get('LD_LIBRARY_PATH'))+':'+\
                                         str(os.environ.get('DYLD_LIBRARY_PATH'))
+
+    # Additions for those who wish to use colorgcc
+    env['ENV']['HOME'] =  os.environ.get('HOME')
+    env['ENV']['TERM'] =  os.environ.get('TERM')
 
     # to find third party libs, includes
     env.Append(LIBPATH =  libs.split(':') + \

@@ -29,7 +29,7 @@ keep_steps = False # set to true to keep start and end point of every track and
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":-5760.0},
+    "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
@@ -69,7 +69,7 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":5, # number of coin tosses
+    "binomial_n":10, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated

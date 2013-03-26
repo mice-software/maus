@@ -27,6 +27,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 // External libs headers
 #include "TROOT.h"
@@ -755,7 +756,7 @@ bool PatternRecognition::find_dsdz(std::vector<SciFiSpacePoint*> &spnts,
     phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
     // Calculate each dz_ji and dphi_ji value (separation in z and phi between spacepoints)
     if ( it != (spnts.end()-1) ) {
-      dz.push_back( fabs((*it)->get_position().z() - (*(it+1))->get_position().z() ) );
+      dz.push_back(fabs((*it)->get_position().z() - (*(it+1))->get_position().z()));
       dphi.push_back(fabs(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle) -
            calc_phi((*(it+1))->get_position().x(), (*(it+1))->get_position().y(), circle)));
     }
@@ -780,9 +781,10 @@ bool PatternRecognition::find_dsdz(std::vector<SciFiSpacePoint*> &spnts,
   linear_fit(z_i, s_i, phi_err, line_sz);
 }
 
-bool PatternRecognition::find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
-                                     const std::vector<double> &phi_i,
-                                     std::vector<double> &true_phi_i) {
+bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
+                                      const std::vector<double> &dphi,
+                                      const std::vector<double> &phi_i,
+                                      std::vector<double> &true_phi_i) {
 
   true_phi_i.push_back(phi_i[0]); // The first phi_i is by definition always correct
   for (size_t i = 0; i < (dz.size() - 1); ++i) { // Loop over the separation between stations
