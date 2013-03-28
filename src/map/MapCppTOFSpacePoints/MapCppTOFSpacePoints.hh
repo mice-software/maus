@@ -89,5 +89,6 @@ class MapCppTOFSpacePoints {
    * one particle event in one individual detector.
    */
   Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
+  bool map_init;
 };
 #endif

@@ -21,11 +21,17 @@
 #include <sstream>
 #include <ctime>
 
+#include "TLorentzVector.h"
+
+#include "src/common_cpp/DataStructure/Primary.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
+#include "Recon/Global/DataStructureHelper.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
@@ -35,8 +41,10 @@
 
 namespace MAUS {
 
-using recon::global::TrackPoint;
+using DataStructure::Global::TrackPoint;
+using DataStructure::Global::PID;
 using recon::global::Particle;
+using recon::global::DataStructureHelper;
 
 // ##############################
 //  TransferMapOpticsModel public
@@ -51,18 +59,12 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   configuration_ = &configuration;
   // Reference Particle
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  reference_pgparticle_ = simulator->GetReferenceParticle();
-  first_plane_ = reference_pgparticle_.z;
+  MAUS::MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  reference_primary_ = DataStructureHelper::GetInstance().
+    PGParticle2Primary(reference_pgparticle);
 
-  reference_particle_ = TrackPoint(
-    reference_pgparticle_.time, reference_pgparticle_.energy,
-    reference_pgparticle_.x, reference_pgparticle_.px,
-    reference_pgparticle_.y, reference_pgparticle_.py,
-    Particle::ID(reference_pgparticle_.pid), reference_pgparticle_.z);
-
-  // Calculate time offset from t=0 at z=0
-  const double first_plane_time = reference_pgparticle_.time;
-  time_offset_ = first_plane_time - reference_particle_.time();
+  primary_plane_ = reference_pgparticle.z;
 
   // First plane particle coordinate deltas
   Json::Value delta_values = JsonWrapper::GetProperty(
@@ -89,70 +91,59 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired First plane
-  const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
-  std::stringstream primaries_string;
-  primaries_string.setf(ios::fixed, ios::floatfield);
-  primaries_string.precision(1);
-  primaries_string << "[";
-  for (size_t index = 0; index < first_plane_hits.size(); ++index) {
-    const TrackPoint & primary = first_plane_hits[index];
-    primaries_string << "{\"primary\":{"
-                     << "\"position\":{"
-                     << "\"x\":" << primary.x() << ", "
-                     << "\"y\":" << primary.y() << ", "
-                     << "\"z\":" << primary.z() << "}, "
-                     << "\"momentum\":{"
-                     << "\"x\":" << primary.Px() << ", "
-                     << "\"y\":" << primary.Py() << ", "
-                     << "\"z\":" << primary.Pz() << "}, "
-                     << "\"particle_id\":" << primary.particle_id() << ", "
-                     << "\"time\":" << primary.t() << ", ";
-    primaries_string.precision(7);
-    primaries_string << "\"energy\":" << primary.E() << ", "
-                     << "\"random_seed\":10}}";
-    if (index < (first_plane_hits.size()-1)) {
-      primaries_string << ",";
-    }
-  }
-  primaries_string << "]";
-  Json::Value primaries = JsonWrapper::StringToJson(primaries_string.str());
+  const std::vector<Primary> primaries = Primaries();
+  const std::vector<PhaseSpaceVector> primary_vectors;
+  Json::Value primaries_json;
+  for (std::vector<Primary>::const_iterator primary = primaries.begin();
+       primary < primaries.end();
+       ++primary) {
+    // serialize primary to JSON
+    PrimaryProcessor serializer;
+    Json::Value * primary_json = serializer.CppToJson(*primary, "");
+    Json::Value object_value;
+    object_value["primary"] = *primary_json;
+    primaries_json.append(object_value);
 
-  // Iterate through each First plane hit
+    // generate a phase space vector for the primary
+    ThreeVector position = primary->GetPosition();
+    ThreeVector momentum = primary->GetMomentum();
+    PhaseSpaceVector primary_vector(primary->GetTime(), primary->GetEnergy(),
+                                    position.x(), momentum.x(),
+                                    position.y(), momentum.y());
+    const_cast<std::vector<PhaseSpaceVector>*>(&primary_vectors)
+      ->push_back(primary_vector);
+  }
+
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
 
   // Force setting of stochastics
   simulator->GetPhysicsList()->BeginOfRunAction();
 
-  std::map<int, std::vector<TrackPoint> > station_hits_map;
-  std::vector<TrackPoint>::const_iterator first_plane_hit;
-  const Json::Value events
-      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries);
-  if (events.size() == 0) {
+  // Simulate on the primaries, generating virtual detector tracks for each
+  const Json::Value virtual_tracks
+      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
+  if (virtual_tracks.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::Build()"));
   }
 
-  for (Json::Value::const_iterator event = events.begin();
-       event != events.end();
-       ++event) {
-    MapStationsToHits(station_hits_map, *event);
+  // Map stations to hits in each virtual track
+  std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
+  for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
+       virtual_track != virtual_tracks.end();
+       ++virtual_track) {
+    MapStationsToHits(station_hits_map, *virtual_track);
   }
 
-  // Iterate through each station
-  std::map<int, std::vector<TrackPoint> >::iterator station_hits;
+  // Calculate transfer maps from the primary plane to each station plane
+  std::map<double, std::vector<PhaseSpaceVector> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
-    // find the average z coordinate for the station
-    std::vector<TrackPoint>::iterator station_hit;
-
-    double station_plane = station_hits->second.begin()->z();
-
-    // Generate a transfer map between the First plane and the current station
-    // and map the station ID to the transfer map
-    transfer_maps_[station_plane]
-      = CalculateTransferMap(first_plane_hits, station_hits->second);
+    // calculate transfer map and index it by the station z-plane
+    transfer_maps_[station_hits->first]
+      = CalculateTransferMap(primary_vectors, station_hits->second);
   }
 }
 
@@ -162,7 +153,6 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
   // to the station that is nearest to the desired end_plane
   std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
   bool found_entry = false;
-int iteration = 0;
   for (transfer_map_entry = transfer_maps_.begin();
        !found_entry && (transfer_map_entry != transfer_maps_.end());
        ++transfer_map_entry) {
@@ -189,7 +179,6 @@ int iteration = 0;
 
       found_entry = true;
     }
-++iteration;
   }
 
   if (transfer_map_entry != transfer_maps_.begin()) {
@@ -210,55 +199,84 @@ const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
   return FindTransferMap(plane);
 }
 
-const std::vector<TrackPoint> TransferMapOpticsModel::BuildFirstPlaneHits() {
-  std::vector<TrackPoint> first_plane_hits;
-  first_plane_hits.push_back(reference_particle_);
+const std::vector<Primary> TransferMapOpticsModel::Primaries() {
+  std::vector<Primary> primaries;
+  primaries.push_back(reference_primary_);
 
   for (int coordinate_index = 0; coordinate_index < 6; ++coordinate_index) {
-    // Make a copy of the reference trajectory vector
-    TrackPoint first_plane_hit = reference_particle_;
+    Primary primary1 = reference_primary_;
+    Primary primary2 = reference_primary_;
 
-    // Add to the current coordinate of the reference trajectory vector
-    // the appropriate delta value and save the modified vector
-    first_plane_hit[coordinate_index] += deltas_[coordinate_index];
-    first_plane_hits.push_back(first_plane_hit);
+    switch (coordinate_index) {
+      case 0: {
+        primary1.SetTime(primary1.GetTime() + deltas_[coordinate_index]);
+        primary2.SetTime(primary2.GetTime() - deltas_[coordinate_index]);
+        break;
+      }
+      case 1: {
+        primary1.SetEnergy(primary1.GetEnergy() + deltas_[coordinate_index]);
+        primary2.SetEnergy(primary2.GetEnergy() - deltas_[coordinate_index]);
+        break;
+      }
+      case 2:
+      case 3: {
+        ThreeVector position = primary1.GetPosition();
+        position[coordinate_index-2] += deltas_[coordinate_index];
+        primary1.SetPosition(position);
 
-    // Subtract from the current coordinate of the reference trajectory vector
-    // the appropriate delta value and save the modified vector
-    first_plane_hit[coordinate_index] -= 2. * deltas_[coordinate_index];
-    if ((coordinate_index == 1) && (first_plane_hit[coordinate_index] < 0)) {
-      first_plane_hit[coordinate_index] *= -1.;
+        position = primary2.GetPosition();
+        position[coordinate_index-2] -= deltas_[coordinate_index];
+        primary2.SetPosition(position);
+        break;
+      }
+      case 4:
+      case 5: {
+        ThreeVector momentum = primary1.GetMomentum();
+        momentum[coordinate_index-4] += deltas_[coordinate_index];
+        primary1.SetMomentum(momentum);
+
+        momentum = primary2.GetMomentum();
+        momentum[coordinate_index-4] -= deltas_[coordinate_index];
+        primary2.SetMomentum(momentum);
+        break;
+      }
     }
-    first_plane_hits.push_back(first_plane_hit);
+
+    primaries.push_back(primary1);
+    primaries.push_back(primary2);
   }
 
-  return first_plane_hits;
+  return primaries;
 }
 
 void TransferMapOpticsModel::MapStationsToHits(
-    std::map<int, std::vector<TrackPoint> > & station_hits,
+    std::map<double, std::vector<PhaseSpaceVector> > & station_hits,
     const Json::Value & event) {
   // Iterate through each event of the simulation
   const Json::Value hits = event["virtual_hits"];
   for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
     const Json::Value hit = hits[hit_index];
-    const Particle::ID particle_id
-      = Particle::ID(hit["particle_id"].asInt());
-    const double mass = Particle::GetInstance()->GetMass(particle_id);
+    const PID particle_id = PID(hit["particle_id"].asInt());
+    const double mass = Particle::GetInstance().GetMass(particle_id);
     const double px = hit["momentum"]["x"].asDouble();
     const double py = hit["momentum"]["y"].asDouble();
     const double pz = hit["momentum"]["z"].asDouble();
     const double momentum = ::sqrt(px*px + py*py + pz*pz);
     const double energy = ::sqrt(mass*mass + momentum*momentum);
 
-    TrackPoint hit_vector(
-      hit["time"].asDouble(), energy,
-      hit["position"]["x"].asDouble(), px,
-      hit["position"]["y"].asDouble(), py,
-      particle_id,
-      hit["position"]["z"].asDouble());
-    const int station_id = hit["station_id"].asInt();
-    station_hits[station_id].push_back(hit_vector);
+    PhaseSpaceVector hit_vector(
+      hit["time"].asDouble(),           energy,
+      hit["position"]["x"].asDouble(),  px,
+      hit["position"]["y"].asDouble(),  py);
+    station_hits[hit["position"]["z"].asDouble()].push_back(hit_vector);
+
+    // Assuming the first hit is at the start plane, save the time offset
+    // between what the reference primary specifies and what the simulation's
+    // virtual detectors produce
+    if (hit_index == 0) {
+      const double start_plane_time = hit["time"].asDouble();
+      time_offset_ = start_plane_time - reference_primary_.GetPosition().z();
+    }
   }
 }
 

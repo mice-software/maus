@@ -22,11 +22,15 @@
 #include <iostream>
 #include <vector>
 
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+
 namespace MAUS {
 namespace recon {
 namespace global {
 
-Detector::Detector(const ID id,
+using MAUS::DataStructure::Global::DetectorPoint;
+
+Detector::Detector(const DetectorPoint id,
                    const double plane,
                    const CovarianceMatrix & uncertainties)
     : id_(id), plane_(plane), uncertainties_(uncertainties) {
@@ -35,7 +39,7 @@ Detector::Detector(const ID id,
 Detector::~Detector() {
 }
 
-const Detector::ID Detector::id() const {
+const DetectorPoint Detector::id() const {
   return id_;
 }
 

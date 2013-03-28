@@ -168,7 +168,7 @@ class TOFChannelMap {
   bool InitializeCards(Json::Value configJSON);
   /* interface to the python get_tof_cabling module */
   void GetCabling(std::string devname, std::string fromdate);
-  void Reset();
+  bool InitializePyMod();
 
  private:
 
@@ -182,6 +182,7 @@ class TOFChannelMap {
   PyObject* _cabling_mod;
   PyObject* _tcabling;
   PyObject* _get_cabling_func;
+  bool pymod_ok;
 };
 
 #endif

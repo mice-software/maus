@@ -24,6 +24,7 @@
 #include <map>
 #include <string>
 
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
 namespace MAUS {
@@ -32,6 +33,7 @@ namespace global {
 
 class Particle {
  public:
+  /*
   enum ID {kNone, kEMinus = 11, kElectronNeutrino, kMuMinus, kMuonNeutrino,
            kPhoton = 22, kPi0 = 111, kPiPlus = 211, kKPlus = 321,
            kNeutron = 2112, kProton = 2212, kDeuterium = 1000010020,
@@ -40,27 +42,28 @@ class Particle {
            kMuonAntineutrino = -14, kMuPlus, kElectronAntineutrino, kEPlus,
            kPiMinus = -211, kKMinus = -321, kAntineutron = -2112,
            kAntiproton = -2212, kAntilambda = -3122};
+  */
 
-  static Particle const * GetInstance();
+  static const Particle & GetInstance();
   ~Particle();
 
   /* @brief returns the unique name of the particle referenced by id.
    */
-  std::string GetName(const ID id) const;
+  std::string GetName(const MAUS::DataStructure::Global::PID id) const;
 
   /* @brief returns the mass (MeV/c^2) of the particle referenced by id.
    */
-  double GetMass(const ID id) const;
+  double GetMass(const MAUS::DataStructure::Global::PID id) const;
 
   /* @brief returns the charge (e) of the particle reference by id.
    */
-  int GetCharge(const ID id) const;
+  int GetCharge(const MAUS::DataStructure::Global::PID id) const;
  protected:
   Particle();
   static const Particle kSingleton;
-  std::map<ID, std::string> names_;
-  std::map<ID, double> masses_;
-  std::map<ID, int> charges_;
+  std::map<MAUS::DataStructure::Global::PID, std::string> names_;
+  std::map<MAUS::DataStructure::Global::PID, double> masses_;
+  std::map<MAUS::DataStructure::Global::PID, int> charges_;
 };
 
 std::ostream& operator<<(std::ostream& out, const Particle& vector);

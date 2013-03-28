@@ -1,15 +1,17 @@
-import hashlib
-import json
+#pylint: disable =C0103,R0904
+"""test_MapPyFakeTestSimulation.py"""
+# import hashlib
+# import json
 import unittest
-import io
-from Configuration import Configuration
+# import io
+# from Configuration import Configuration
 
 from MapPyFakeTestSimulation import MapPyFakeTestSimulation
 
 class MapPyFakeTestSimulationTestCase(unittest.TestCase):
     """ Testing MapPyFakeTestSimulation """
     @classmethod
-    def setUpClass(self):
+    def setUpClass(self):#pylint: disable =C0103,C0202
         """ Set Up """
         self.expectedShaSumTracks =   '9ffe5bf5173024f6f02fbce036b6313a36970b53'
 

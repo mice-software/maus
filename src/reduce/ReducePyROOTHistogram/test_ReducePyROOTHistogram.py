@@ -74,7 +74,6 @@ class ReducePyROOTTester(ReducePyROOTHistogram):
         @param self Object reference.
         @returns True
         """
-        ReducePyROOTHistogram._cleanup_at_death(self)
         return True
 
 class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904, C0301

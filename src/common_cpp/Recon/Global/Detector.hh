@@ -24,21 +24,19 @@
 #include <map>
 #include <vector>
 
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
+
 namespace MAUS {
 namespace recon {
 namespace global {
 
 class Detector {
  public:
-  enum ID {kNone, kTOF0, kCherenkov1, kTOF1, kTracker1_1,
-           kTracker1_2, kTracker1_3, kTracker1_4, kTracker1_5, kTracker2_1,
-           kTracker2_2, kTracker2_3, kTracker2_4, kTracker2_5, kTOF2,
-           kCherenkov2, kCalorimeter, kEMR};
 
   /* @brief Create with the given input values.
    */
-  Detector(const ID id,
+  Detector(const MAUS::DataStructure::Global::DetectorPoint id,
            const double plane,
            const CovarianceMatrix & uncertainties);
 
@@ -48,18 +46,18 @@ class Detector {
 
   ~Detector();
 
-  const ID id() const;
+  const MAUS::DataStructure::Global::DetectorPoint id() const;
   const double plane() const;
   const CovarianceMatrix & uncertainties() const;
  protected:
   Detector();
 
-  ID id_;
+  MAUS::DataStructure::Global::DetectorPoint id_;
   double plane_;
   CovarianceMatrix uncertainties_;
 };
 
-typedef std::map<MAUS::recon::global::Detector::ID,
+typedef std::map<MAUS::DataStructure::Global::DetectorPoint,
                  MAUS::recon::global::Detector> DetectorMap;
 
 }  // namespace global

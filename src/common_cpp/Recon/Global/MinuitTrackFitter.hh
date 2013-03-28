@@ -25,6 +25,7 @@
 #include "TMinuit.h"
 #include "TObject.h"
 
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "Recon/Global/TrackFitter.hh"
 #include "Recon/Global/Particle.hh"
@@ -33,10 +34,15 @@ namespace MAUS {
 
 class OpticsModel;
 
+namespace DataStructure {
+namespace Global {
+  class Track;
+  class TrackPoint;
+}
+}
+
 namespace recon {
 namespace global {
-
-class Track;
 
 // Minuit requires a gobal, static function to minimize. This requires a
 // global instance of TMinuit to use TMinuit::GetObjectFit().
@@ -51,10 +57,12 @@ void common_cpp_optics_recon_minuit_track_fitter_score_function(
 
 class MinuitTrackFitter : public TrackFitter, public TObject {
  public:
-  MinuitTrackFitter(const MAUS::OpticsModel & optics_model, const double start_plane);
+  MinuitTrackFitter(const MAUS::OpticsModel & optics_model,
+                    const double start_plane);
 
   // pure virtual function from TrackFitter base class
-  void Fit(const Track & detector_events, Track & track);
+  void Fit(const MAUS::DataStructure::Global::Track & raw_track,
+           MAUS::DataStructure::Global::Track & track);
 
   ~MinuitTrackFitter();
 
@@ -62,11 +70,12 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
  protected:
   static const size_t kPhaseSpaceDimension;
 
-  Track const * detector_events_;
-  Track * track_;
-  Particle::ID particle_id_;
+  const std::vector<const MAUS::DataStructure::Global::TrackPoint *>
+  detector_events_;
+  std::vector<MAUS::DataStructure::Global::TrackPoint> reconstructed_points_;
+  MAUS::DataStructure::Global::PID particle_id_;
 
-  bool ValidGuess(const TrackPoint & guess) const;
+  bool ValidGuess(const MAUS::DataStructure::Global::TrackPoint & guess) const;
   MinuitTrackFitter();
 };
 

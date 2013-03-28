@@ -15,18 +15,38 @@
  */
 
 #include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/PrimaryChainProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackPointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackProcessor.hh"
 
 namespace MAUS {
 
 GlobalEventProcessor::GlobalEventProcessor()
-    : raw_track_array_processor_(new GlobalTrackProcessor()) {
-  RegisterValueBranch("raw_tracks", &raw_track_array_processor_,
-                      &GlobalEvent::raw_tracks,
-                      &GlobalEvent::set_raw_tracks, false);
-  RegisterValueBranch("tracks", &raw_track_array_processor_,
-                      &GlobalEvent::tracks,
-                      &GlobalEvent::set_tracks, false);
+    : _global_space_point_array_proc(
+        new MAUS::Processor::Global::SpacePointProcessor()),
+      _global_track_point_array_proc(
+          new MAUS::Processor::Global::TrackPointProcessor()),
+      _global_track_array_proc(
+          new MAUS::Processor::Global::TrackProcessor()),
+      _global_primary_chain_array_proc(
+          new MAUS::Processor::Global::PrimaryChainProcessor()) {
+
+  RegisterPointerBranch("space_points", &_global_space_point_array_proc,
+                        &GlobalEvent::get_space_points,
+                        &GlobalEvent::set_space_points, false);
+
+  RegisterPointerBranch("track_points", &_global_track_point_array_proc,
+                        &GlobalEvent::get_track_points,
+                        &GlobalEvent::set_track_points, false);
+
+  RegisterPointerBranch("tracks", &_global_track_array_proc,
+                        &GlobalEvent::get_tracks,
+                        &GlobalEvent::set_tracks, false);
+
+  RegisterPointerBranch("primary_chains", &_global_primary_chain_array_proc,
+                        &GlobalEvent::get_primary_chains,
+                        &GlobalEvent::set_primary_chains, false);
 }
 }  // namespace MAUS
 

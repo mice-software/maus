@@ -22,28 +22,42 @@
 #include <map>
 #include <vector>
 
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
+#include "TLorentzVector.h"
+
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
 #include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
 #include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/Track.hh"
+#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
 
+using MAUS::PhaseSpaceVector;
+using MAUS::DataStructure::Global::DetectorPoint;
+using MAUS::DataStructure::Global::PID;
+using MAUS::DataStructure::Global::PrimaryChain;
+using MAUS::DataStructure::Global::Track;
+using MAUS::DataStructure::Global::TrackPoint;
 using MAUS::recon::global::Detector;
-using MAUS::recon::global::Track;
+using MAUS::recon::global::Particle;
 
-DataStructureHelper& DataStructureHelper::GetInstance() {
+const DataStructureHelper& DataStructureHelper::GetInstance() {
   static DataStructureHelper instance;
   return instance;
 }
 
 void DataStructureHelper::GetDetectorAttributes(
     const Json::Value& json_document,
-    std::map<Detector::ID, Detector>& detectors) const {
+    std::map<DetectorPoint, Detector>& detectors) const {
   // FIXME(plane1@hawk.iit.edu) Once the detector groups provide this
   // information this will need to be changed
   Json::Value detector_attributes_json = JsonWrapper::GetProperty(
@@ -56,7 +70,7 @@ void DataStructureHelper::GetDetectorAttributes(
     const Json::Value detector_json = detector_attributes_json[index];
     const Json::Value id_json = JsonWrapper::GetProperty(
         detector_json, "id", JsonWrapper::intValue);
-    const Detector::ID id = Detector::ID(id_json.asInt());
+    const DetectorPoint id = DetectorPoint(id_json.asInt());
 
     const Json::Value plane_json = JsonWrapper::GetProperty(
         detector_json, "plane", JsonWrapper::realValue);
@@ -68,26 +82,86 @@ void DataStructureHelper::GetDetectorAttributes(
         = GetJsonCovarianceMatrix(uncertainties_json);
 
     const Detector detector(id, plane, uncertainties);
-    detectors.insert(std::pair<Detector::ID, Detector>(id, detector));
+    detectors.insert(std::pair<DetectorPoint, Detector>(id, detector));
   }
 }
 
+PhaseSpaceVector DataStructureHelper::TrackPoint2PhaseSpaceVector(
+    const TrackPoint& track_point) const {
+  TLorentzVector position = track_point.get_position();
+  TLorentzVector momentum = track_point.get_momentum();
+  return MAUS::PhaseSpaceVector(
+    position.T(), momentum.E(),
+    position.X(), momentum.Px(),
+    position.Y(), momentum.Py());
+}
+
+TrackPoint DataStructureHelper::PhaseSpaceVector2TrackPoint(
+      const PhaseSpaceVector& vector,
+      const double z,
+      const PID particle_id) const {
+    TrackPoint track_point;
+    const TLorentzVector position(vector.x(), vector.y(), z, vector.t());
+    track_point.set_position(position);
+
+    const double energy = vector.E();
+    const double px = vector.Px();
+    const double py = vector.Py();
+    const double mass = Particle::GetInstance().GetMass(particle_id);
+    const double pz = ::sqrt(energy*energy - mass*mass - px*px - py*py);
+    const TLorentzVector momentum(px, py, pz, energy);
+    track_point.set_momentum(momentum);
+
+    track_point.set_detector(MAUS::DataStructure::Global::kVirtual);
+    return track_point;
+}
+
+std::vector<PrimaryChain*>* DataStructureHelper::GetPrimaryChains(
+    const Json::Value& recon_event) const {
+  Json::Value global_event_json = JsonWrapper::GetProperty(
+      recon_event, "global_event", JsonWrapper::objectValue);
+  MAUS::GlobalEventProcessor deserializer;
+  GlobalEvent * global_event = deserializer.JsonToCpp(global_event_json);
+
+  return global_event->get_primary_chains();
+}
+
+MAUS::Primary DataStructureHelper::PGParticle2Primary(
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle& pgparticle) const {
+  ThreeVector position(pgparticle.x,
+                       pgparticle.y,
+                       pgparticle.z);
+  ThreeVector momentum(pgparticle.px,
+                       pgparticle.py,
+                       pgparticle.pz);
+  Primary primary;
+  primary.SetPosition(position);
+  primary.SetMomentum(momentum);
+  primary.SetTime(pgparticle.time);
+  primary.SetEnergy(pgparticle.energy);
+  primary.SetParticleId(pgparticle.seed);
+  primary.SetRandomSeed(pgparticle.pid);
+
+  return primary;
+}
+
+/*
 void DataStructureHelper::GetGlobalRawTracks(
     const Json::Value& recon_event,
-    const std::map<Detector::ID, Detector>& detectors,
+    const std::map<DetectorPoint, Detector>& detectors,
     std::vector<Track>& raw_tracks) {
   GetGlobalTracks(recon_event, "raw_tracks", detectors, raw_tracks);
 }
 
 void DataStructureHelper::GetGlobalTracks(
     const Json::Value& recon_event,
-    const std::map<Detector::ID, Detector>& detectors,
+    const std::map<DetectorPoint, Detector>& detectors,
     std::vector<Track>& tracks) {
   GetGlobalTracks(recon_event, "tracks", detectors, tracks);
 }
 
 void DataStructureHelper::GetGlobalTracks(
-    const Json::Value& recon_event,
+    const Primary& recon_event,
     const std::string& json_node_name,
     const std::map<Detector::ID, Detector>& detectors,
     std::vector<Track>& raw_tracks) {
@@ -114,15 +188,15 @@ std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 3" << std
          ++global_track_point) {
       ThreeVector position = global_track_point->position();
       ThreeVector momentum = global_track_point->momentum();
-      Particle::ID particle_id
-        = Particle::ID(global_track_point->particle_id());
+      MAUS::DataStructure::Global::PID particle_id
+        = MAUS::DataStructure::Global::PID(global_track_point->particle_id());
       TrackPoint track_point(global_track_point->time(),
                              global_track_point->energy(),
                              position.x(), momentum.x(),
                              position.y(), momentum.y(),
                              particle_id, position.z());
       const DetectorMap::const_iterator detector_map_entry = detectors.find(
-        Detector::ID(global_track_point->detector_id()));
+        DetectorPoint(global_track_point->detector_id()));
       if (detector_map_entry != detectors.end()) {
         track_point.set_detector_id(detector_map_entry->second.id());
       }
@@ -179,6 +253,7 @@ GlobalTrackPoint DataStructureHelper::TrackPointToGlobalTrackPoint(
   global_track_point.set_particle_id(track_point.particle_id());
   return global_track_point;
 }
+*/
 
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {

@@ -21,6 +21,7 @@ Get TOF calibrations from DB
 import cdb
 import json
 from Configuration import Configuration
+from cdb._exceptions import CdbPermanentError
 
 class GetCalib:
     """
@@ -44,6 +45,10 @@ class GetCalib:
         self.cdb_server.set_url(cdb_url)
         #print 'Server: ', self.cdb_server.get_name(), \
         #                  self.cdb_server.get_version()
+        try:
+            cdb.Calibration().get_status()
+        except CdbPermanentError:
+            raise CdbPermanentError("CDB error")
 
     def get_calib(self, devname, ctype, fromdate):
         """
@@ -60,13 +65,20 @@ class GetCalib:
             # or calibration for an older date
             if fromdate == "" or fromdate == "current":
                 #print 'getting current calib', devname, ctype
-                self._current_cali = \
-                     self.cdb_server.get_current_calibration(devname, ctype)
+                try:
+                    self._current_cali = \
+                         self.cdb_server.get_current_calibration(devname, ctype)
+                except CdbPermanentError:
+                    self._current_cali = "cdb_permanent_error"
             else:
                 #print 'getting calib for date', fromdate
-                self._current_cali = \
-                     self.cdb_server.get_calibration_for_date(devname,fromdate,
-                                                                         ctype)
+                try:
+                    self._current_cali = \
+                         self.cdb_server.get_calibration_for_date(devname,
+                                                                  fromdate, 
+                                                                  ctype)
+                except CdbPermanentError:
+                    self._current_cali = "cdb_permanent_error"
             #print self._current_cali
         else:
             raise Exception('get_tof_calib failed.No device/calibration type.')

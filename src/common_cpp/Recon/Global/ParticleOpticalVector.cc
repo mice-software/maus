@@ -27,7 +27,6 @@
 #include "Interface/Squeak.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 namespace recon {

@@ -30,16 +30,20 @@
 
 #include "Interface/Squeal.hh"
 #include "Maths/PolynomialMap.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
+#include "Recon/Global/DataStructureHelper.hh"
 #include "Recon/Global/ParticleOpticalVector.hh"
-#include "Recon/Global/TrackPoint.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
+using MAUS::PhaseSpaceVector;
 using recon::global::ParticleOpticalVector;
-using recon::global::TrackPoint;
 
 PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
       : TransferMapOpticsModel(configuration), algorithm_(kNone) {
@@ -57,69 +61,61 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 
 void PolynomialOpticsModel::Build() {
   // Create some test hits at the desired First plane
-  const std::vector<TrackPoint> first_plane_hits = BuildFirstPlaneHits();
-  std::stringstream primaries_string;
-  primaries_string.setf(ios::fixed, ios::floatfield);
-  primaries_string.precision(7);
-  primaries_string << "[";
-  for (size_t index = 0; index < first_plane_hits.size(); ++index) {
-    const TrackPoint & primary = first_plane_hits[index];
-    primaries_string << "{\"primary\":{"
-                     << "\"position\":{"
-                     << "\"x\":" << primary.x() << ", "
-                     << "\"y\":" << primary.y() << ", "
-                     << "\"z\":" << primary.z() << "}, "
-                     << "\"momentum\":{"
-                     << "\"x\":" << primary.Px() << ", "
-                     << "\"y\":" << primary.Py() << ", "
-                     << "\"z\":" << primary.Pz() << "}, "
-                     << "\"particle_id\":" << primary.particle_id() << ", "
-                     << "\"time\":" << primary.t() << ", "
-                     << "\"energy\":" << primary.E() << ", "
-                     << "\"random_seed\":10}}";
-    if (index < (first_plane_hits.size()-1)) {
-      primaries_string << ",";
-    }
-  }
-  primaries_string << "]";
-  Json::Value primaries = JsonWrapper::StringToJson(primaries_string.str());
+  const std::vector<PhaseSpaceVector> primary_vectors = PrimaryVectors();
+  Json::Value primaries_json;
+  for (std::vector<PhaseSpaceVector>::const_iterator primary_vector
+        = primary_vectors.begin();
+       primary_vector < primary_vectors.end();
+       ++primary_vector) {
+    // generate a Primary object
+    Primary primary(reference_primary_);
+    ThreeVector position(primary_vector->x(), primary_vector->y(),
+                         reference_primary_.GetPosition().z());
+    ThreeVector momentum(primary_vector->Px(), primary_vector->Py(),
+                         reference_primary_.GetMomentum().z());
+    primary.SetPosition(position);
+    primary.SetMomentum(momentum);
+    primary.SetTime(primary_vector->t());
+    primary.SetEnergy(primary_vector->E());
 
-  // Iterate through each First plane hit
+    // serialize primary to JSON
+    PrimaryProcessor serializer;
+    Json::Value * primary_json = serializer.CppToJson(primary, "");
+    Json::Value object_value;
+    object_value["primary"] = *primary_json;
+    primaries_json.append(object_value);
+  }
+
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
 
   // Force setting of stochastics
   simulator->GetPhysicsList()->BeginOfRunAction();
 
-  std::map<int, std::vector<TrackPoint> > station_hits_map;
-  std::vector<TrackPoint>::const_iterator first_plane_hit;
-  const Json::Value events
-      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries);
-  if (events.size() == 0) {
+  // Simulate on the primaries, generating virtual detector tracks for each
+  const Json::Value virtual_tracks
+      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
+  if (virtual_tracks.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::Build()"));
   }
 
-  for (Json::Value::const_iterator event = events.begin();
-       event != events.end();
-       ++event) {
-    MapStationsToHits(station_hits_map, *event);
+  // Map stations to hits in each virtual track
+  std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
+  for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
+       virtual_track != virtual_tracks.end();
+       ++virtual_track) {
+    MapStationsToHits(station_hits_map, *virtual_track);
   }
 
-  // Iterate through each station
-  std::map<int, std::vector<TrackPoint> >::iterator station_hits;
+  // Calculate transfer maps from the primary plane to each station plane
+  std::map<double, std::vector<PhaseSpaceVector> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
-    // find the average z coordinate for the station
-    std::vector<TrackPoint>::iterator station_hit;
-
-    double station_plane = station_hits->second.begin()->z();
-
-    // Generate a transfer map between the First plane and the current station
-    // and map the station ID to the transfer map
-    transfer_maps_[station_plane]
-      = CalculateTransferMap(first_plane_hits, station_hits->second);
+    // calculate transfer map and index it by the station z-plane
+    transfer_maps_[station_hits->first]
+      = CalculateTransferMap(primary_vectors, station_hits->second);
   }
 }
 
@@ -165,48 +161,54 @@ void PolynomialOpticsModel::SetupAlgorithm() {
  * necessary in order to solve the least squares problem which involves
  * the calculation of a Moore-Penrose psuedo inverse.
  */
-const std::vector<TrackPoint> PolynomialOpticsModel::BuildFirstPlaneHits() {
+const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
   size_t num_poly_coefficients
     = PolynomialMap::NumberOfPolynomialCoefficients(6, polynomial_order_);
+  ThreeVector position = reference_primary_.GetPosition();
+  ThreeVector momentum = reference_primary_.GetMomentum();
+  PhaseSpaceVector reference_vector(reference_primary_.GetTime(),
+                                    reference_primary_.GetEnergy(),
+                                    position.x(), momentum.x(),
+                                    position.y(), momentum.y());
 
-    std::vector<TrackPoint> first_plane_hits;
+  std::vector<PhaseSpaceVector> primaries;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
-      TrackPoint first_plane_hit;
+      PhaseSpaceVector primary;
 
       for (size_t k = 0; k < i; ++k) {
-        first_plane_hit[k] = 1.;
+        primary[k] = 1.;
       }
       double delta = deltas_[j];
-      first_plane_hit[j] = delta;
+      primary[j] = delta;
 
-      first_plane_hits.push_back(first_plane_hit + reference_particle_);
+      primaries.push_back(primary + reference_vector);
     }
   }
-  size_t base_block_length = first_plane_hits.size();
+  size_t base_block_length = primaries.size();
 
   // adjust for the case where the base block size is greater than N(n, v)
   while (base_block_length > num_poly_coefficients) {
-    first_plane_hits.pop_back();
-    base_block_length = first_plane_hits.size();
+    primaries.pop_back();
+    base_block_length = primaries.size();
   }
 
   int summand;
   for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
     summand = row / base_block_length;
-    TrackPoint first_plane_hit
-      = first_plane_hits[row % base_block_length] + summand;
+    PhaseSpaceVector primary
+      = primaries[row % base_block_length] + summand;
 
-    first_plane_hits.push_back(first_plane_hit + reference_particle_);
+    primaries.push_back(primary + reference_vector);
   }
-  return first_plane_hits;
+  return primaries;
 }
 
 /* Calculate a transfer matrix from an equal number of inputs and output.
  */
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
-    const std::vector<recon::global::TrackPoint> & start_plane_hits,
-    const std::vector<recon::global::TrackPoint> & station_hits)
+    const std::vector<PhaseSpaceVector> & start_plane_hits,
+    const std::vector<PhaseSpaceVector> & station_hits)
     const {
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
@@ -304,8 +306,16 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
                     "PolynomialOpticsModel::CalculateTransferMap()"));
   }
 
+  ThreeVector reference_position = reference_primary_.GetPosition();
+  ThreeVector reference_momentum = reference_primary_.GetMomentum();
+  PhaseSpaceVector reference_particle(reference_primary_.GetTime(),
+                                      reference_primary_.GetEnergy(),
+                                      reference_position.x(),
+                                      reference_momentum.x(),
+                                      reference_position.y(),
+                                      reference_momentum.y());
   TransferMap * transfer_map = new PolynomialTransferMap(
-    *polynomial_map, reference_particle_);
+    *polynomial_map, reference_particle);
   delete polynomial_map;
 
   return transfer_map;

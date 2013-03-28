@@ -26,9 +26,9 @@
 
 #include "Interface/Squeal.hh"
 #include "Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
-#include "Recon/Global/TrackPoint.hh"
 
 class dataCards;
 class MiceMaterials;
@@ -92,8 +92,7 @@ class TransferMapOpticsModel : public OpticsModel {
   const Json::Value * maus_configuration_;
 
   std::map<double, const TransferMap *> transfer_maps_;
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle_;
-  recon::global::TrackPoint reference_particle_;
+  Primary reference_primary_;
   double time_offset_;
   PhaseSpaceVector deltas_;
 
@@ -104,13 +103,14 @@ class TransferMapOpticsModel : public OpticsModel {
    * phase space coordinates. The set is used as test particles to extrapolate
    * transfer matrices to other detector station planes.
    */
-  const std::vector<recon::global::TrackPoint> BuildFirstPlaneHits();
+  const std::vector<Primary> Primaries();
 
   /* @brief Identify simulated hits by station and add them to the mappings
    * from station ID to hits recorded by that station.
    */
   void MapStationsToHits(
-      std::map<int, std::vector<recon::global::TrackPoint> > & station_hits,
+      std::map<double, std::vector<PhaseSpaceVector> > &
+      station_hits,
       const Json::Value & event);
 
   const TransferMap * FindTransferMap(const double end_plane) const;
@@ -120,8 +120,8 @@ class TransferMapOpticsModel : public OpticsModel {
    * TranferMap. The caller assumes all responsibility for the allocated memory.
    */
   virtual const TransferMap * CalculateTransferMap(
-      const std::vector<recon::global::TrackPoint> & start_plane_hits,
-      const std::vector<recon::global::TrackPoint> & station_hits)
+      const std::vector<PhaseSpaceVector> & start_plane_hits,
+      const std::vector<PhaseSpaceVector> & end_plane_hits)
       const = 0;
 };
 

@@ -66,10 +66,102 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
 
 PhaseSpaceVector::~PhaseSpaceVector() { }
 
+// *************************
+//  Assignment Operators
+// *************************
+
 PhaseSpaceVector & PhaseSpaceVector::operator=(const PhaseSpaceVector & rhs) {
   (*this).Vector<double>::operator=(rhs);
 
   return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const double& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const double& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const double& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const double& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+// *************************
+//  Algebraic Operators
+// *************************
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) /= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const double& rhs) const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const double& rhs) const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const double& rhs) const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const double& rhs) const {
+  return PhaseSpaceVector(*this) /= rhs;
 }
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {

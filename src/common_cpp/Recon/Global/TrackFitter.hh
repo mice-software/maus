@@ -22,12 +22,17 @@
 
 #include <vector>
 
-#include "Recon/Global/TrackPoint.hh"
-#include "Recon/Global/Track.hh"
+//#include "DataStructure/Global/Track.hh"
 
 namespace MAUS {
 
 class OpticsModel;
+
+namespace DataStructure {
+namespace Global {
+  class Track;
+}
+}
 
 namespace recon {
 namespace global {
@@ -37,7 +42,8 @@ class TrackFitter {
   TrackFitter(const MAUS::OpticsModel & optics_model, const double start_plane)
       : optics_model_(&optics_model), start_plane_(start_plane) { }
   virtual ~TrackFitter() { }
-  virtual void Fit(const Track & detector_events, Track & track) = 0;
+  virtual void Fit(const MAUS::DataStructure::Global::Track & raw_track,
+                   MAUS::DataStructure::Global::Track & track) = 0;
  protected:
   MAUS::OpticsModel const * optics_model_;
   const double start_plane_;

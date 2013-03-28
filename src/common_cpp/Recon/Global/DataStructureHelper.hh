@@ -24,9 +24,15 @@
 #include <string>
 #include <vector>
 
+#include "TLorentzVector.h"
+
 #include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/Track.hh"
-// #include "src/common_cpp/Recon/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
+#include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
 namespace MAUS {
 namespace recon {
@@ -35,10 +41,22 @@ namespace global {
 class DataStructureHelper {
  public:
   ~DataStructureHelper() { }
-  static DataStructureHelper& GetInstance();
+  static const DataStructureHelper& GetInstance();
   void GetDetectorAttributes(const Json::Value& json_document,
                              DetectorMap& detectors)
                                       const;
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
+  GetPrimaryChains(const Json::Value& recon_event) const;
+  MAUS::PhaseSpaceVector TrackPoint2PhaseSpaceVector(
+      const MAUS::DataStructure::Global::TrackPoint& track_point) const;
+  MAUS::DataStructure::Global::TrackPoint PhaseSpaceVector2TrackPoint(
+      const MAUS::PhaseSpaceVector& vector,
+      const double z,
+      const MAUS::DataStructure::Global::PID particle_id) const;
+  MAUS::Primary PGParticle2Primary(
+      MAUS::MAUSPrimaryGeneratorAction::PGParticle& pgparticle) const;
+  
+  /*
   void GetGlobalRawTracks(const Json::Value& recon_event,
                           const DetectorMap& detectors,
                           std::vector<MAUS::recon::global::Track>& raw_tracks);
@@ -56,6 +74,7 @@ class DataStructureHelper {
   GlobalTrackPoint TrackPointToGlobalTrackPoint(
       const MAUS::recon::global::TrackPoint& track_point,
       const bool on_mass_shell);
+  */
  protected:
   DataStructureHelper() { };
   CovarianceMatrix GetJsonCovarianceMatrix(

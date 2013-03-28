@@ -26,13 +26,10 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "Recon/Global/Particle.hh"
 #include "Recon/Global/Detector.hh"
-// #include "Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
-
-class TrackPoint;
 
 /* @class ParticleOpticalVector a phase space vector with redundant t/E and z/Pz
  * coordinates as well as an ID that links the track to the detector that

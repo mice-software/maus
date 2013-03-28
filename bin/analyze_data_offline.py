@@ -30,6 +30,9 @@ def run():
 
     my_map.append(MAUS.MapPyCkov())
 
+    my_map.append(MAUS.MapCppKLDigits())
+    my_map.append(MAUS.MapCppKLCellHits())
+
     # Tracker (commented out as no tracker installed in MICE hall)
     #my_map.append(MAUS.MapCppTrackerRecon())
 

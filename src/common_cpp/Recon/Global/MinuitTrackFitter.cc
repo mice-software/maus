@@ -28,6 +28,8 @@
 #include "TMinuit.h"
 #include "json/json.h"
 
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
@@ -35,15 +37,17 @@
 #include "src/common_cpp/Optics/TransferMap.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "Recon/Global/DataStructureHelper.hh"
 #include "Recon/Global/Particle.hh"
 #include "Recon/Global/ParticleOpticalVector.hh"
-#include "Recon/Global/Track.hh"
-#include "Recon/Global/TrackPoint.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
+
+using MAUS::DataStructure::Global::Track;
+using MAUS::DataStructure::Global::TrackPoint;
 
 void common_cpp_optics_recon_minuit_track_fitter_score_function(
     Int_t &    number_of_parameters,
@@ -131,19 +135,15 @@ MinuitTrackFitter::~MinuitTrackFitter() {
   delete common_cpp_optics_recon_minuit_track_fitter_minuit;
 }
 
-void MinuitTrackFitter::Fit(Track const & detector_events, Track & track) {
+void MinuitTrackFitter::Fit(Track const & raw_track, Track & track) {
   std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
   std::cout.flush();
-  detector_events_ = &detector_events;
+  detector_events_ = raw_track.GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
   std::cout << "DEBUG ScoreTrack(): Fitting track with "
-            << detector_events_->size() << "track points." << std::endl;
+            << detector_events_.size() << "track points." << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl;
-  track_ = &track;
-
-  // TODO(plane1@hawk.iit.edu) Fit to multiple masses or use mass as a fit
-  // parameter to find the likely particle identity
-  particle_id_ = Particle::kMuMinus;
+  particle_id_ = raw_track.get_pid();
 
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl;
   if (detector_events_->size() < 2) {
@@ -160,8 +160,16 @@ void MinuitTrackFitter::Fit(Track const & detector_events, Track & track) {
     = common_cpp_optics_recon_minuit_track_fitter_minuit;
   // Int_t status = minimiser->Migrad();
   minimiser->Migrad();
-
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
+
+  for (std::vector<TrackPoint>::const_iterator reconstructed_point
+          = reconstructed_points_.begin();
+       reconstructed_point < reconstructed_points_.end();
+       ++reconstructed_point) {
+    track.AddTrackPoint(new TrackPoint(reconstructed_point));
+  }
+  track.set_pid(raw_track.get_pid());
+
 std::cout << "CHECKPOINT Fit(): END" << std::endl;
 std::cout.flush();
 }
@@ -177,38 +185,39 @@ Double_t MinuitTrackFitter::ScoreTrack(
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
-  track_->clear();
-std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
-          << std::endl;
+  reconstructed_points_.clear();
+
+  DataStructureHelper helper = DataStructureHelper::GetInstance();
 
   // Setup the start plane track point based on the Minuit initial conditions
   CovarianceMatrix null_uncertainties;
-  const TrackPoint guess(start_plane_track_coordinates[0],
-                         start_plane_track_coordinates[1],
-                         start_plane_track_coordinates[2],
-                         start_plane_track_coordinates[3],
-                         start_plane_track_coordinates[4],
-                         start_plane_track_coordinates[5],
-                         particle_id_, optics_model_->first_plane());
+  const PhaseSpaceVector guess(start_plane_track_coordinates[0],
+                               start_plane_track_coordinates[1],
+                               start_plane_track_coordinates[2],
+                               start_plane_track_coordinates[3],
+                               start_plane_track_coordinates[4],
+                               start_plane_track_coordinates[5]);
   // If the guess is not physical then return a horrible score
   if (!ValidGuess(guess)) {
 //    return std::numeric_limits<double>::max();
     return 1.0e+15;
   }
-  track_->push_back(guess);
+  TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
+      guess, optics_model_->primary_plane(), particle_id_);
+  reconstructed_points_->push_back(primary);
 
   CovarianceMatrix const * uncertainties = NULL;
-  std::vector<TrackPoint>::const_iterator events
+  std::vector<TrackPoint*>::const_iterator event
     = detector_events_->begin();
 
   // calculate chi^2
   Double_t chi_squared = 0.0;
-  for (size_t index = 0; events < detector_events_->end(); ++index) {
+  for (size_t index = 0; event < detector_events_->end(); ++index) {
 std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
-std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
+std::cout << "DEBUG ScoreTrack(): Measured: " << *event << std::endl;
     // calculate the next guess
-    const double end_plane = events->z();
-    TrackPoint point = TrackPoint(
+    const double end_plane = (*events)->GetPosition().Z();
+    PhaseSpaceVector point =
     #if 0
       ParticleOpticalVector(
         optics_model_->Transport(ParticleOpticalVector(guess, t0, E0, P0),
@@ -217,18 +226,15 @@ std::cout << "DEBUG ScoreTrack(): Measured: " << *events << std::endl;
     #else
       optics_model_->Transport(guess, end_plane));
     #endif
-    point.set_z(end_plane);
-    // assume the particle didn't decay
-    point.set_particle_id(events->particle_id());
 std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
 
     uncertainties = &events->uncertainties();
-    point.set_uncertainties(*uncertainties);
 std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::endl;
 
     // save the calculated track point in case this is the
     // last (best fitting) track
-    track_->push_back(point);
+    reconstructed_points_->push_back(
+      helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
 std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
           << std::endl;
 
@@ -245,15 +251,16 @@ std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
     // Sum the squares of the differences between the calculated phase space
     // coordinates (point) and the measured coordinates (event).
     // TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
-    TrackPoint residual = TrackPoint(weight_matrix * (*events - point)
-                                     / *events);
+    PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(*event);
+    PhaseSpaceVector residual = PhaseSpaceVector(
+      weight_matrix * (event_point - point) / event_point);
 std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
-std::cout << "DEBUG ScoreTrack(): Event: " << *events << std::endl;
+std::cout << "DEBUG ScoreTrack(): Event: " << event_point << std::endl;
 std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
     chi_squared += (transpose(residual) * (*uncertainties) * residual)[0];
 std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
-    ++events;
+    ++event;
   }
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
           << "Energy = " << guess[1] << "\tScore = " << chi_squared << std::endl;
