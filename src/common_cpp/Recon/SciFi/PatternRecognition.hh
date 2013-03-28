@@ -199,6 +199,35 @@ class PatternRecognition {
      */
     bool circle_fit(const std::vector<SciFiSpacePoint*> &spnts, SimpleCircle &circle);
 
+    double evaluate_nm(const int n_ji, const int n_kj, const double dz_ji, const double dz_kj,
+                       const double dphi_ji, const double dphi_kj);
+
+    /** @brief Find the ds/dz of a helical track
+     *
+     * Find the ds/dz of a helical track. Output is the turning angles of the spacepoints
+     * and a line of s vs z, the slope of which is dsdz = 1/tan(lambda).
+     *
+     * @param spnts - A vector of all the input spacepoints
+     * @param circle - The circle fit of spacepoints from x-y projection
+     * @param line_sz - The output fitted line in s-z projection.
+     */
+    bool find_dsdz(std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+                   std::vector<double> &phi_i, SimpleLine &line_sz);
+
+    /** @brief Find the number of 2pi rotations that occured between each station
+     *
+     * Find the number of 2pi rotations that occured between each stations. This is
+     * necessary in order to later evaluate s, the track path length in x-y, used to find ds/dz.
+     *
+     * @param dz - the separation in z between successive spacepoints in the order seen by the beam
+     * @param dphi - the separation in phi (the turning angle) between successive spacepoints
+     *               in the order seen by the beam
+     * @param true_phip - the output corrected phi prime coordinate
+     *                    (prime indicates relative to the first spacepoint) 
+     */
+    bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
+                      const std::vector<double> &phi_i, std::vector<double> &true_phi_i);
+
     /** @brief Determine the dip angle of the helix
      *
      * Calculate the dip angle of the helix.  Output is a line, the slope of which
@@ -214,18 +243,18 @@ class PatternRecognition {
                             const SimpleCircle &circle, std::vector<double> &dphi,
                             SimpleLine &line_sz, double &phi_0);
 
-    /** @brief Calculates the turning angle of a spacepoint w.r.t. the x axis
+    /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
      *
-     * Calculates the turning angle from the x axis, returning (phi_i + phi_0). In the case that
+     * Calculates the turning angle from the x' axis, returning (phi_i + phi_0). In the case that
      * x0 and y0 are used, it returns phi_0. Do not confuse the returned angle with phi_i itself,
-     * the turning angle wrt the x' axis.
+     * the turning angle wrt the x' axis not the x axis.
      * 
      * @param xpos - x position of spacepoint
      * @param ypos - y position of  spacepoint
      * @param circle - Contains the helix center
      *
      */
-    double calc_turning_angle(double xpos, double ypos, const SimpleCircle &circle);
+    double calc_phi(double xpos, double ypos, const SimpleCircle &circle);
 
     /** @brief Account for possible 2*pi rotations between stations
      *
