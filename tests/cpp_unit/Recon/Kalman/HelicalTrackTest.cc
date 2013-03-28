@@ -16,89 +16,90 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "gtest/gtest.h"
 
 namespace {
 class HelicalTrackTest : public ::testing::Test {
  protected:
-  HelicalTrackTest()  {}
+  HelicalTrackTest(): x1(0.),y1(0.),mx1(0.),my1(0.),kappa(0.)  {}
   virtual ~HelicalTrackTest() {}
-  virtual void SetUp()    {}
-  virtual void TearDown() {}
+  virtual void SetUp()    {
+    old_site.Initialise(5);
+    new_site.Initialise(5);
+    kappa = 1./200.;
+    x0 = 0.;
+    y0 = 5.;
+    z0 = 0.;
+    mx0 = 15.*kappa;
+    my0 = 15.*kappa;
 
+    x1 = -8.0019;
+    y1 = 34.614;
+    z1 = 350.;
+    mx1 = -20.513*kappa;
+    my1 = 5.4042*kappa;
+
+    old_site.set_z(z0);
+    new_site.set_z(z1);
+    new_site.set_id(16);
+
+    a.ResizeTo(5, 1);
+    a(0, 0) = x0;
+    a(1, 0) = mx0;
+    a(2, 0) = y0;
+    a(3, 0) = my0;
+    a(4, 0) = kappa;
+    old_site.set_a(a, MAUS::KalmanSite::Filtered);
+
+    TMatrixD C(5, 5);
+    C.UnitMatrix();
+    old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
+  }
+  virtual void TearDown() {}
   MAUS::KalmanSite old_site;
   MAUS::KalmanSite new_site;
   double z0, z1;
   double x0, y0, mx0, my0, kappa;
   double x1, y1, mx1, my1;
-  void set_up_sites();
   TMatrixD a;
   static const double err = 1.e-4;
 };
 
-void HelicalTrackTest::set_up_sites() {
-  old_site.Initialise(5);
-  new_site.Initialise(5);
-  kappa = 1./200.;
-  x0 = 0.;
-  y0 = 5.;
-  z0 = 0.;
-  mx0 = 15.*kappa;
-  my0 = 15.*kappa;
-
-  x1 = -8.0019;
-  y1 = 34.614;
-  z1 = 350.;
-  mx1 = -20.513*kappa;
-  my1 = 5.4042*kappa;
-
-  old_site.set_z(z0);
-  new_site.set_z(z1);
-  new_site.set_id(16);
-
-  a.ResizeTo(5, 1);
-  a(0, 0) = x0;
-  a(1, 0) = mx0;
-  a(2, 0) = y0;
-  a(3, 0) = my0;
-  a(4, 0) = kappa;
-  old_site.set_a(a, MAUS::KalmanSite::Filtered);
-
-  TMatrixD C(5, 5);
-  C.Zero();
-  for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = 1.; // dummy values
-  }
-  old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
-}
-
 TEST_F(HelicalTrackTest, test_propagation) {
-  set_up_sites();
-
+  std::cerr << "starting..."<<std::endl;
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
+  std::cerr << "initialised..."<<std::endl;
   track->CalculatePredictedState(&old_site, &new_site);
-
+  std::cerr << "did propagator..."<<std::endl;
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
-
+/*  a_projected.Print();
+  std::cout << x1 << " ";
+  std::cout << mx1 << " "; 
+  std::cout << y1 << " ";
+  std::cout << my1 << " ";
+  std::cout << kappa << "\n";
+  std::cerr << "expectations..."<<std::endl;
   EXPECT_NEAR(x1,    a_projected(0, 0), err);
   EXPECT_NEAR(mx1,   a_projected(1, 0), err);
   EXPECT_NEAR(y1,    a_projected(2, 0), err);
   EXPECT_NEAR(my1,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
+  std::cerr << "deleting" << std::endl;
+*/
   delete track;
+  std::cerr << "leaving..."<<std::endl;
 }
-
+/*
 TEST_F(HelicalTrackTest, test_update_propagator) {
-  set_up_sites();
+  // set_up_sites();
 
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
-  track->Initialise();
-  delete track;
+  // MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  // track->Initialise();
+  // delete track;
  // what to do?  
-
 }
-
+*/
 } // namespace
