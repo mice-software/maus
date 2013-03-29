@@ -280,7 +280,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
 }
 
 std::vector<Track *> MapCppGlobalRawTracks::LoadTOFTracks(
-    std::map<Detector::ID, Detector>& detectors,
+    DetectorMap & detectors,
     MAUS::ReconEvent * recon_event,
     std::vector<Track> * tof_tracks) {
   const TOFEvent * tof_event = recon_event->GetTOFEvent();
@@ -429,10 +429,10 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
 
 // NOTE(Lane) CONTINUE HERE
 
-void MapCppGlobalRawTracks::LoadSciFiTracks(
-    std::map<Detector::ID, Detector>& detectors,
-    Json::Value& recon_event,
-    std::vector<Track>& sci_fi_tracks) {
+std::vector<Track *> MapCppGlobalRawTracks::LoadSciFiTracks(
+    DetectorMap & detectors,
+    MAUS::ReconEvent * recon_event,
+    std::vector<Track> * sci_fi_tracks) {
   const double z_offset
     = detectors.find(Detector::kTracker1_5)->second.plane();
   std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): "
