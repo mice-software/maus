@@ -249,6 +249,8 @@ class Track : public TObject {
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track
 
+typedef std::vector<MAUS::DataStructure::Global::Track *> TrackArray;
+typedef std::vector<MAUS::DataStructure::Global::Track *> TrackPtrArray;
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

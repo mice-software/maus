@@ -59,7 +59,6 @@ class Detector {
 
 typedef std::map<MAUS::DataStructure::Global::DetectorPoint,
                  MAUS::recon::global::Detector> DetectorMap;
-
 }  // namespace global
 }  // namespace recon
 }  // namespace MAUS

@@ -61,14 +61,7 @@ Track::Track(const Track &track)
 
 // Destructor
 Track::~Track() {
-  TRefArrayIter track_point_iter(_track_points);
-  for (TRef * track_point = dynamic_cast<TRef*>(track_point_iter.Next());
-       track_point > 0;
-       track_point = dynamic_cast<TRef*>(track_point_iter.Next())) {
-    delete track_point;
-  }
   delete _track_points;
-
   delete _constituent_tracks;
 }
 

@@ -31,10 +31,10 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
-#include "Recon/Global/Track.hh"
-#include "Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 
@@ -54,7 +54,7 @@ class MapCppGlobalRawTracks {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
-  MapCppGlobalRawTracks();
+  MapCppGlobalRawTracks() : run_data_(NULL);
 
   /** @brief Destroys the *global* scope Minuit object
    *
@@ -88,41 +88,47 @@ class MapCppGlobalRawTracks {
   Json::Value configuration_;
   int beam_polarity_;
 
-  Json::Value run_data_;
-  std::vector<MAUS::recon::global::Track> tracks_;
-
   static const std::string kClassname;
 
-  void LoadRandomData();
-  void LoadTestingData();
-  void LoadSimulationData();
-  void LoadSmearedData();
-  void LoadLiveData();
+  // ************************
+  //  Data Loading Functions
+  // ************************
 
-  void LoadSimulationData(const std::string mc_branch_name);
+  void AssembleRawTracks(MAUS::ReconEvent * recon_event,
+                         MAUS::GlobalEvent * global_event);
 
-  void LoadTOFTracks(
-      std::map<MAUS::recon::global::Detector::ID,
-               MAUS::recon::global::Detector>& detectors,
-      Json::Value& recon_event,
-      std::vector<MAUS::recon::global::Track>& tof_tracks);
-  void LoadSciFiTracks(
-      std::map<MAUS::recon::global::Detector::ID,
-               MAUS::recon::global::Detector>& detectors,
-      Json::Value& recon_event,
-      std::vector<MAUS::recon::global::Track>& sci_fi_tracks);
-  void LoadDetectorConfiguration(
-    std::map<MAUS::recon::global::Detector::ID,
-    MAUS::recon::global::Detector> & detectors);
-  void LoadMonteCarloData(
-    const std::string branch_name,
-    const std::map<MAUS::recon::global::Detector::ID,
-                   MAUS::recon::global::Detector> & detectors);
-  recon::global::Particle::ID IdentifyParticle(const double beta);
-  double Beta(recon::global::Particle::ID pid, const double momentum);
+  MAUS::recon::global::DetectorMap LoadDetectorConfiguration();
 
-  void CorrelateTrackPoints(
-      std::vector<MAUS::recon::global::Track> & tracks);
+  std::vector<MAUS::DataStructure::Global::Track *> LoadTOFTracks(
+      MAUS::recon::global::DetectorMap & detectors,
+      MAUS::ReconEvent * recon_event);
+
+  void PopulateTOFTrackPoint(
+      const Detector & detector,
+      const std::vector<TOFSpacePoint>::const_iterator & tof_space_point,
+      const double slab_width,
+      const size_t number_of_slabs,
+      TrackPoint * track_point);
+
+  std::vector<MAUS::DataStructure::Global::Track *> LoadSciFiTracks(
+      MAUS::recon::global::DetectorMap & detectors,
+      MAUS::ReconEvent * recon_event);
+
+  void PopulateSciFiTrackPoint(
+      const Detector & detector,
+      const std::vector<SciFiSpacePoint>::const_iterator & scifi_space_point,
+      const double x,
+      const double y,
+      TrackPoint * track_point);
+
+
+  // ***********************************
+  //  Particle Identification Functions
+  // ***********************************
+
+  MAUS::DataStructure::Global::PID IdentifyParticle(const double beta);
+
+  double Beta(MAUS::DataStructure::Global::PID pid, const double momentum);
 };
 
 }  // namespace MAUS

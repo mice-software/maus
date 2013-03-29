@@ -185,6 +185,15 @@ std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
     ++event_index;
   }
 
+  /*
+  TRefArrayIter track_point_iter(_track_points);
+  for (TRef * track_point = dynamic_cast<TRef*>(track_point_iter.Next());
+       track_point > 0;
+       track_point = dynamic_cast<TRef*>(track_point_iter.Next())) {
+    delete track_point;
+  }
+  */
+
   // pass on the updated run data to the next map in the workflow
   Json::FastWriter writer;
   std::string output = writer.write(run_data_);
