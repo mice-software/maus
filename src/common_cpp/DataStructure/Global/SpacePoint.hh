@@ -35,19 +35,18 @@
 
 // ROOT headers
 #include "Rtypes.h"
-#include "TObject.h"
-#include "TLorentzVector.h"
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
 
 namespace MAUS {
 namespace DataStructure {
 namespace Global {
 
 // Only elements in the DataStructure should inherit from TObject.
-class SpacePoint : public TObject {
+class SpacePoint : public BasePoint {
  public:
 
   /// Default constructor - initialises to 0/NULL
@@ -76,49 +75,11 @@ class SpacePoint : public TObject {
   /// detector measurement.
   double get_charge() const;
 
-  /// Set the 4D position of the detector measurement.
-  void set_position(TLorentzVector position);
-
-  /// Get the 4D position of the detector measurement.
-  TLorentzVector get_position() const;
-
-  /// Set the error on the 4D position of the detector measurement.
-  void set_position_error(TLorentzVector position_error);
-
-  /// Get the error on the 4D position of the detector measurement.
-  TLorentzVector get_position_error() const;
-
-  /// Set the MAUS::global::recon::DetectorPoint flag for the
-  /// SpacePoint, defining which detector produced the point.
-  void set_detector(DetectorPoint detector);
-
-  /// Get the MAUS::global::recon::DetectorPoint flag, #_detector, for the
-  /// SpacePoint, which defines the detector that produced this point.
-  DetectorPoint get_detector() const;
-
-  /// Set the fully qualified geometry path for this point in space.  This
-  /// string may not be required in the end...
-  void set_geometry_path(std::string geometry_path);
-
-  /// Get the fully qualified geometry path for this point in space.
-  std::string get_geometry_path() const;
-
  private:
 
   /// The calibrated 'charge' or energy deposit of the detector
   /// measurement.
   double         _charge;
-
-  /// The central 4D space position for the detector measurement.
-  TLorentzVector  _position;
-  /// The 4D uncertainty on the space position #_position.
-  TLorentzVector  _position_error;
-
-  /// The detector element which produced this SpacePoint.
-  DetectorPoint  _detector;
-  /// The fully qualified geometry path for this point in space.  May
-  /// be removed if deemed unnecessary.
-  std::string    _geometry_path;
 
   MAUS_VERSIONED_CLASS_DEF(SpacePoint);
 }; // ~class SpacePoint

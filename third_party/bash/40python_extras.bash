@@ -31,7 +31,7 @@ binary_test_list="scons"
 if [ "$1" ]; then
     echo "INFO: Attempting to pack eggs for distribution"
     cd $egg_source
-    rm *
+    rm -r *
     for package in $download_package_list
     do
         easy_install -zmaxeb . $package

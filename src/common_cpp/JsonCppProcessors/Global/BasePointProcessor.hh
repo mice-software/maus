@@ -18,31 +18,31 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TLorentzVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/Global/BasePointProcessor.hh"
 
-#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
+#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALSPACEPOINTPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALBASEPOINTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_GLOBALBASEPOINTPROCESSOR_HH_
 
 namespace MAUS {
 namespace Processor {
 namespace Global {
 
-/** @class SpacePointProcessor processor for
- *  MAUS::DataStructure::Global::SpacePoint
+/** @class BasePointProcessor processor for
+ *  MAUS::DataStructure::Global::BasePoint
  *  @author Ian Taylor, University of Warwick
- *  @date 2013/03/14
+ *  @date 2013/03/01
  */
-class SpacePointProcessor
-    : public ObjectProcessor<MAUS::DataStructure::Global::SpacePoint> {
+class BasePointProcessor
+    : public ObjectProcessor<MAUS::DataStructure::Global::BasePoint> {
  public:
   /** Constructor - registers the branch structure */
-  SpacePointProcessor();
+  BasePointProcessor();
 
- private:
-  BasePointProcessor _base_proc;
-  DoubleProcessor _double_proc;
+ protected:
+  EnumDetectorPointProcessor _detector_enum_proc;
+  TLorentzVectorProcessor _tlorentz_vec_proc;
+  StringProcessor _string_proc;
 };
 } // ~namespace Global
 } // ~namespace Processor

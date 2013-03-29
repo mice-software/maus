@@ -33,17 +33,6 @@ namespace global {
 
 class Particle {
  public:
-  /*
-  enum ID {kNone, kEMinus = 11, kElectronNeutrino, kMuMinus, kMuonNeutrino,
-           kPhoton = 22, kPi0 = 111, kPiPlus = 211, kKPlus = 321,
-           kNeutron = 2112, kProton = 2212, kDeuterium = 1000010020,
-           kTritium = 1000010030, kHelium3 = 1000020030, kHelium4 = 1000020040,
-           kKLong = 130, kKShort = 310, kK0 = 311, kLambda = 3122,
-           kMuonAntineutrino = -14, kMuPlus, kElectronAntineutrino, kEPlus,
-           kPiMinus = -211, kKMinus = -321, kAntineutron = -2112,
-           kAntiproton = -2212, kAntilambda = -3122};
-  */
-
   static const Particle & GetInstance();
   ~Particle();
 
@@ -64,6 +53,11 @@ class Particle {
   std::map<MAUS::DataStructure::Global::PID, std::string> names_;
   std::map<MAUS::DataStructure::Global::PID, double> masses_;
   std::map<MAUS::DataStructure::Global::PID, int> charges_;
+ private:
+  void AddParticleDefinition(MAUS::DataStructure::Global::PID pid,
+                             std::string name,
+                             double mass,
+                             int charge);
 };
 
 std::ostream& operator<<(std::ostream& out, const Particle& vector);

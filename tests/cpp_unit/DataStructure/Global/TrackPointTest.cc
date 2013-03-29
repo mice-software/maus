@@ -60,7 +60,7 @@ TEST_F(TrackPointTestDS, test_getters_setters) {
   TLorentzVector emom(epx, epy, epz, ept);
 
   MAUS::DataStructure::Global::DetectorPoint det =
-      MAUS::DataStructure::Global::kTracker1S1; // 10
+      MAUS::DataStructure::Global::kTracker1_1; // 8
 
   std::string geom_path = "11";
 

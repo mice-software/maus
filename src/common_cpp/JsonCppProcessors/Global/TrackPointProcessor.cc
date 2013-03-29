@@ -33,17 +33,6 @@ TrackPointProcessor::TrackPointProcessor() {
       &MAUS::DataStructure::Global::TrackPoint::set_charge, true);
 
   RegisterValueBranch(
-      "position", &_tlorentz_vec_proc,
-      &MAUS::DataStructure::Global::TrackPoint::get_position,
-      &MAUS::DataStructure::Global::TrackPoint::set_position, true);
-
-  RegisterValueBranch(
-      "position_error", &_tlorentz_vec_proc,
-      &MAUS::DataStructure::Global::TrackPoint::get_position_error,
-      &MAUS::DataStructure::Global::TrackPoint::set_position_error,
-      true);
-
-  RegisterValueBranch(
       "momentum", &_tlorentz_vec_proc,
       &MAUS::DataStructure::Global::TrackPoint::get_momentum,
       &MAUS::DataStructure::Global::TrackPoint::set_momentum, true);
@@ -54,22 +43,15 @@ TrackPointProcessor::TrackPointProcessor() {
       &MAUS::DataStructure::Global::TrackPoint::set_momentum_error,
       true);
 
-  RegisterValueBranch(
-      "detector", &_detector_enum_proc,
-      &MAUS::DataStructure::Global::TrackPoint::get_detector,
-      &MAUS::DataStructure::Global::TrackPoint::set_detector, true);
-
-  RegisterValueBranch(
-      "geometry_path", &_string_proc,
-      &MAUS::DataStructure::Global::TrackPoint::get_geometry_path,
-      &MAUS::DataStructure::Global::TrackPoint::set_geometry_path,
-      true);
-
-  RegisterTRef/*<MAUS::DataStructure::Global::SpacePoint>*/(
+  RegisterTRef(
       "space_point",
       &MAUS::DataStructure::Global::TrackPoint::get_space_point_tref,
       &MAUS::DataStructure::Global::TrackPoint::set_space_point_tref,
       true);
+
+  RegisterBaseClass(
+      "basepoint", &_base_proc,
+      &MAUS::DataStructure::Global::BasePoint::set_base, true);
 }
 
 } // ~namespace Global

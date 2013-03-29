@@ -24,6 +24,7 @@
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ConstantItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/ValueItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/BaseClassItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerRefItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefArrayItem.hh"
@@ -103,6 +104,20 @@ void ObjectProcessor<ObjectType>::RegisterValueBranch(
     using ObjectProcessorNS::ValueItem;
     BaseItem<ObjectType>* item = new ValueItem<ObjectType, ChildType>
               (branch_name, child_processor, GetMethod, SetMethod, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
+template <class ChildType>
+void ObjectProcessor<ObjectType>::RegisterBaseClass(
+                std::string branch_name,
+                ProcessorBase<ChildType>* child_processor,
+                void (ChildType::*SetMethod)(ChildType value),
+                bool is_required = true) {
+    using ObjectProcessorNS::BaseItem;
+    using ObjectProcessorNS::BaseClassItem;
+    BaseItem<ObjectType>* item = new BaseClassItem<ObjectType, ChildType>
+        (branch_name, child_processor, SetMethod, is_required);
     _items[branch_name] = item;
 }
 
