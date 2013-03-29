@@ -135,10 +135,11 @@ MinuitTrackFitter::~MinuitTrackFitter() {
   delete common_cpp_optics_recon_minuit_track_fitter_minuit;
 }
 
-void MinuitTrackFitter::Fit(Track const & raw_track, Track & track) {
+void MinuitTrackFitter::Fit(const Track & raw_track, Track & track) {
   std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
   std::cout.flush();
-  detector_events_ = raw_track.GetTrackPoints();
+  *const_cast<std::vector<const TrackPoint*>*>(&detector_events_)
+    = raw_track.GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
   std::cout << "DEBUG ScoreTrack(): Fitting track with "
             << detector_events_.size() << "track points." << std::endl;
@@ -146,7 +147,7 @@ void MinuitTrackFitter::Fit(Track const & raw_track, Track & track) {
   particle_id_ = raw_track.get_pid();
 
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl;
-  if (detector_events_->size() < 2) {
+  if (detector_events_.size() < 2) {
     throw(Squeal(Squeal::recoverable,
                  "Not enough track points to fit track (need at least two).",
                  "MAUS::MinuitTrackFitter::Fit()"));
@@ -166,7 +167,7 @@ void MinuitTrackFitter::Fit(Track const & raw_track, Track & track) {
           = reconstructed_points_.begin();
        reconstructed_point < reconstructed_points_.end();
        ++reconstructed_point) {
-    track.AddTrackPoint(new TrackPoint(reconstructed_point));
+    track.AddTrackPoint(new TrackPoint(*reconstructed_point));
   }
   track.set_pid(raw_track.get_pid());
 
@@ -204,19 +205,18 @@ std::cout.flush();
   }
   TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
       guess, optics_model_->primary_plane(), particle_id_);
-  reconstructed_points_->push_back(primary);
+  reconstructed_points_.push_back(primary);
 
-  CovarianceMatrix const * uncertainties = NULL;
-  std::vector<TrackPoint*>::const_iterator event
-    = detector_events_->begin();
+  std::vector<const TrackPoint*>::const_iterator event
+    = detector_events_.begin();
 
   // calculate chi^2
   Double_t chi_squared = 0.0;
-  for (size_t index = 0; event < detector_events_->end(); ++index) {
+  for (size_t index = 0; event < detector_events_.end(); ++index) {
 std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
 std::cout << "DEBUG ScoreTrack(): Measured: " << *event << std::endl;
     // calculate the next guess
-    const double end_plane = (*events)->GetPosition().Z();
+    const double end_plane = (*event)->get_position().Z();
     PhaseSpaceVector point =
     #if 0
       ParticleOpticalVector(
@@ -224,19 +224,30 @@ std::cout << "DEBUG ScoreTrack(): Measured: " << *event << std::endl;
                                  end_plane)),
         t0, E0, P0);
     #else
-      optics_model_->Transport(guess, end_plane));
+      optics_model_->Transport(guess, end_plane);
     #endif
 std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
 
-    uncertainties = &events->uncertainties();
-std::cout << "DEBUG ScoreTrack(): Uncertainties: " << *uncertainties << std::endl;
+    TLorentzVector position_error = (*event)->get_position_error();
+    TLorentzVector momentum_error = (*event)->get_momentum_error();
+    const double errors[36] = {
+      position_error.T(), 0., 0., 0., 0., 0.,
+      0., momentum_error.E(), 0., 0., 0., 0.,
+      0., 0., position_error.X(), 0., 0., 0.,
+      0., 0., 0., momentum_error.Px(), 0., 0.,
+      0., 0., 0., 0., position_error.Y(), 0.,
+      0., 0., 0., 0., 0., momentum_error.Py(),
+    };
+    const Matrix<double> error_matrix(6, 6, errors);
+    const CovarianceMatrix uncertainties(error_matrix*error_matrix);
+std::cout << "DEBUG ScoreTrack(): Uncertainties: " << uncertainties << std::endl;
 
     // save the calculated track point in case this is the
     // last (best fitting) track
-    reconstructed_points_->push_back(
+    reconstructed_points_.push_back(
       helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
-std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
-          << std::endl;
+std::cout << "DEBUG ScoreTrack(): Pushed track point #"
+          << reconstructed_points_.size() << std::endl;
 
     const double weights[36] = {
       1., 0., 0., 0., 0., 0.,
@@ -251,13 +262,13 @@ std::cout << "DEBUG ScoreTrack(): Pushed track point #" << track_->size()
     // Sum the squares of the differences between the calculated phase space
     // coordinates (point) and the measured coordinates (event).
     // TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
-    PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(*event);
+    PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(**event);
     PhaseSpaceVector residual = PhaseSpaceVector(
       weight_matrix * (event_point - point) / event_point);
 std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
 std::cout << "DEBUG ScoreTrack(): Event: " << event_point << std::endl;
 std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
-    chi_squared += (transpose(residual) * (*uncertainties) * residual)[0];
+    chi_squared += (transpose(residual) * uncertainties * residual)[0];
 std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
 
     ++event;
@@ -268,7 +279,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
   return chi_squared;
 }
 
-bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
+bool MinuitTrackFitter::ValidGuess(const PhaseSpaceVector & guess) const {
   bool valid = true;
 
   if (guess != guess) {

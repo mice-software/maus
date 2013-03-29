@@ -75,7 +75,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
   std::vector<MAUS::DataStructure::Global::TrackPoint> reconstructed_points_;
   MAUS::DataStructure::Global::PID particle_id_;
 
-  bool ValidGuess(const MAUS::DataStructure::Global::TrackPoint & guess) const;
+  bool ValidGuess(const MAUS::PhaseSpaceVector & guess) const;
   MinuitTrackFitter();
 };
 

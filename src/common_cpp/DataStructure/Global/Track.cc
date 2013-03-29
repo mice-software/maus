@@ -61,10 +61,10 @@ Track::Track(const Track &track)
 
 // Destructor
 Track::~Track() {
-  TRefArray::Iterator_t track_point_iter = _track_points->MakeIterator();
-  for (TRef * track_point = track_point_iter.Next();
+  TRefArrayIter track_point_iter(_track_points);
+  for (TRef * track_point = dynamic_cast<TRef*>(track_point_iter.Next());
        track_point > 0;
-       track_point = track_point_iter.Next()) {
+       track_point = dynamic_cast<TRef*>(track_point_iter.Next())) {
     delete track_point;
   }
   delete _track_points;
@@ -230,7 +230,7 @@ void Track::SortTrackPointsByZ() {
 }
 
 std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-Track::GetTrackPoints() {
+Track::GetTrackPoints() const {
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
   const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
   for (int i = 0; i < _track_points->GetLast()+1; ++i) {
@@ -266,7 +266,8 @@ void Track::RemoveDetector(
   _detectorpoints &= ~(1u << detector);
 }
 
-bool Track::HasDetector(MAUS::DataStructure::Global::DetectorPoint detector) {
+bool Track::HasDetector(MAUS::DataStructure::Global::DetectorPoint detector)
+    const {
   // Return the Nth bit of the integer, where N is the value of the
   // DetectorPoint enumerator.
   return (_detectorpoints & (1u << detector));
@@ -278,7 +279,7 @@ void Track::ClearDetectors() {
 }
 
 std::vector<MAUS::DataStructure::Global::DetectorPoint>
-Track::GetDetectorPoints() {
+Track::GetDetectorPoints() const {
   std::vector<MAUS::DataStructure::Global::DetectorPoint> result;
   MAUS::DataStructure::Global::DetectorPoint test;
   for (int i = 0; i < MAUS::DataStructure::Global::kDetectorPointSize; ++i) {
@@ -315,8 +316,8 @@ void Track::RemoveGeometryPath(std::string geometry_path) {
   }
 }
 
-bool Track::HasGeometryPath(std::string geometry_path) {
-  std::vector<std::string>::iterator result =
+bool Track::HasGeometryPath(std::string geometry_path) const {
+  std::vector<std::string>::const_iterator result =
       find(_geometry_paths.begin(), _geometry_paths.end(), geometry_path);
 
   return (result != _geometry_paths.end());
@@ -350,14 +351,14 @@ void Track::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   }
 }
 
-bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) {
+bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) const {
   TObject *result = _constituent_tracks->FindObject(track);
 
   return (result != NULL);
 }
 
 std::vector<const MAUS::DataStructure::Global::Track*>
-Track::GetConstituentTracks() {
+Track::GetConstituentTracks() const {
   std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
   const MAUS::DataStructure::Global::Track* t = NULL;
   for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
