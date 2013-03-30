@@ -24,8 +24,7 @@ SciFiEventProcessor::SciFiEventProcessor()
                       _sf_spoint_array_proc(new SciFiSpacePointProcessor),
                       _sf_sprtrk_array_proc(new SciFiStraightPRTrackProcessor),
                       _sf_hprtrk_array_proc(new SciFiHelicalPRTrackProcessor),
-                      _sf_trk_array_proc(new SciFiTrackProcessor) {//,
-                      //_scifi_trackpoint_array_proc(new SciFiTrackPointProcessor) {
+                      _sf_trk_array_proc(new SciFiTrackProcessor) {
   RegisterValueBranch("digits", &_sf_digit_array_proc,
                       &SciFiEvent::digits, &SciFiEvent::set_digits, false);
   RegisterValueBranch("clusters", &_sf_cluster_array_proc,
@@ -38,10 +37,5 @@ SciFiEventProcessor::SciFiEventProcessor()
                       &SciFiEvent::helicalprtracks, &SciFiEvent::set_helicalprtrack, false);
   RegisterValueBranch("tracks", &_sf_trk_array_proc,
                       &SciFiEvent::scifitracks, &SciFiEvent::set_scifitracks, false);
-  //RegisterValueBranch("trackpoints", &_scifi_trackpoint_array_proc,
-   //                   &SciFiEvent::scifitrackpoints,
-   //                   &SciFiEvent::set_scifitrackpoints, false);
 }
-
 } // ~namespace MAUS
-

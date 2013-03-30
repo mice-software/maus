@@ -74,62 +74,62 @@ class KalmanTrackTest : public ::testing::Test {
  protected:
   KalmanTrackTest()  {}
   virtual ~KalmanTrackTest() {}
-  virtual void SetUp()    {}
+  virtual void SetUp()    {
+    old_site.Initialise(5);
+    new_site.Initialise(5);
+    double deltaZ = 0.66;
+    new_site.set_id(0);
+    new_site.set_z(deltaZ);
+    old_site.set_z(0.0);
+
+    double mx = 2.0;
+    double my = 3.0;
+    TMatrixD a(5, 1);
+    a(0, 0) = 0.0;
+    a(1, 0) = mx;
+    a(2, 0) = 0.0;
+    a(3, 0) = my;
+    a(4, 0) = 1./200.;
+    old_site.set_a(a, MAUS::KalmanSite::Filtered);
+
+    TMatrixD C(5, 5);
+    C.Zero();
+    for ( int i = 0; i < 5; ++i ) {
+      C(i, i) = 1.; // dummy values
+    }
+    old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
+
+    kalman_sites.push_back(old_site);
+    kalman_sites.push_back(new_site);
+  }
   virtual void TearDown() {}
-  void set_up_sites();
-  // MAUS::KalmanSite *a_site;
   MAUS::KalmanSite old_site;
   MAUS::KalmanSite new_site;
+  std::vector<MAUS::KalmanSite> kalman_sites;
 };
 
-// This is an utility function. It sets up two Kalman Sites
-// for use by all KalmanTrack routines.
-void KalmanTrackTest::set_up_sites() {
-  old_site.Initialise(5);
-  new_site.Initialise(5);
-  double deltaZ = 1100.0;
-  new_site.set_id(0);
-  new_site.set_z(deltaZ);
-  old_site.set_z(0.0);
-
-  double mx = 2.0;
-  double my = 3.0;
-  TMatrixD a(5, 1);
-  a(0, 0) = 0.0;
-  a(1, 0) = mx;
-  a(2, 0) = 0.0;
-  a(3, 0) = my;
-  a(4, 0) = 1./200.;
-  old_site.set_a(a, MAUS::KalmanSite::Filtered);
-
-  TMatrixD C(5, 5);
-  C.Zero();
-  for ( int i = 0; i < 5; ++i ) {
-     C(i, i) = 1.; // dummy values
-  }
-  old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
-}
-
 TEST_F(KalmanTrackTest, test_constructor) {
-  // a_site->set_measurement(0);
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
-  // EXPECT_EQ(track->get_chi2(), 0.0);
   EXPECT_EQ(track->ndf(), 0.0);
   EXPECT_EQ(track->tracker(), -1);
+  delete track;
 }
 
 //
 // ------- Projection ------------
 //
-TEST_F(KalmanTrackTest, test_error_methods) {
-  //MAUS::KalmanTrack *track = new MAUS::StraightTrack();
-  //track->Initialise();
+TEST_F(KalmanTrackTest, test_energy_loss) {
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
+  track->CalculatePredictedState(&old_site, &new_site);
+  TMatrixD a_old = old_site.a(KalmanSite::Projected);
+  a_old.Print();
 
-  //double momentum = 230.0;
-
-  //track->BetheBlochStoppingPower(momentum);
-
+  track->SubtractEnergyLoss(&old_site, &new_site);
+  TMatrixD a     = new_site.a(KalmanSite::Projected);
+  a.Print();
+  EXPECT_LT(a(4,0), a_old(4,0));
 }
 
 //
@@ -180,8 +180,7 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   double new_alpha = measurement(0, 0) + shift_x/1.4945;
 
   TMatrixD HA_new = track->SolveMeasurementEquation(a, s);
-  HA_new.Print();
-  std::cerr << new_alpha << std::endl;
+
   EXPECT_NEAR(new_alpha, HA_new(0, 0), 1e-1);
   // Now, we introduce a shift in both x & y.
   double shift_y = 2.; // mm
@@ -189,6 +188,9 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   // So we need a plane that's not 0 (because this one is vertical, only measures x)
   a_site->set_direction(direction_plane1_tracker0);
   CLHEP::Hep3Vector perp = direction_plane1_tracker0.orthogonal();
+
+  delete a_site;
+  delete track;
 }
 
 TEST_F(KalmanTrackTest, test_filtering_methods) {
@@ -252,7 +254,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a(2, 0) = -30.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
   HA = track->SolveMeasurementEquation(a, s);
-  HA.Print();
+
   EXPECT_TRUE(HA(0, 0) > 0);
 
   a_site->set_measurement(HA(0, 0));
@@ -273,8 +275,6 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a_site->get_a(a_filt);
   a_site->get_projected_alpha(alpha_model);
 
-
-
   track->update_H(&a_site);
   track->calc_filtered_state
 */
@@ -289,11 +289,11 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
 
   // this breaks
   // EXPECT_THROW(track->UpdateW(a_site), Squeal);
+  delete a_site;
+  delete track;
 }
 
 TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
-  // Set up the sites and the track.
-  set_up_sites();
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
   track->CalculatePredictedState(&old_site, &new_site);
@@ -313,10 +313,32 @@ TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
   // Not much we can do with this.
   for ( int j = 0; j < 5; j++ ) {
     for ( int k = 0; k < 5; k++ ) {
-    //EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
-    //          old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
+      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
+                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
     }
   }
+  //
+  // MCS increases matrix elements.
+  //
+  track->CalculateSystemNoise(&old_site, &new_site);
+  track->CalculateCovariance(&old_site, &new_site);
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
+                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
+    }
+  }
+  delete track;
 }
 
+TEST_F(KalmanTrackTest, test_exclusion_of_site) {
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  track->Initialise();
+  track->Extrapolate(kalman_sites, 1);
+  track->Filter(kalman_sites, 1);
+  track->PrepareForSmoothing(&new_site);
+  track->SmoothBack(&new_site, &old_site);
+  track->ExcludeSite(&old_site);
+  // The projected state becomes the filtered one.
+}
 } // ~namespace MAUS

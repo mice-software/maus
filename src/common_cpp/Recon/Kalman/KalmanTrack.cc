@@ -641,9 +641,6 @@ void KalmanTrack::ExcludeSite(KalmanSite *site) {
   an = a_smoothed + Kn*pull;
   site->set_a(an, KalmanSite::Excluded);
 
-  a_smoothed.Print();
-  an.Print();
-
   // The covariance associated.
   TMatrixD covariance(_n_parameters, _n_parameters);
   TMatrixD I(_n_parameters, _n_parameters);

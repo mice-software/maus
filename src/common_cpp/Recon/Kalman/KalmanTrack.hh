@@ -36,10 +36,6 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
-// #include "src/common_cpp/Recon/Kalman/Particle.hh"
-
-//#include "src/common_cpp/Utils/Globals.hh"
-//#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 

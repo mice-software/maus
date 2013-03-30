@@ -68,6 +68,12 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   smoothed_residual(1, 0) = 3.;
   double s_chi2 = 1.;
 
+  TMatrixD covariance_residual(2, 2);
+  covariance_residual(0, 0) = 1.;
+  covariance_residual(0, 1) = 2.;
+  covariance_residual(1, 0) = 3.;
+  covariance_residual(1, 1) = 4.;
+
   // Set them all.
   a_site.set_a(projected_a, MAUS::KalmanSite::Projected);
   a_site.set_residual(pull, MAUS::KalmanSite::Projected);
@@ -79,6 +85,7 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   a_site.set_a(smoothed_a, MAUS::KalmanSite::Smoothed);
   a_site.set_residual(smoothed_residual, MAUS::KalmanSite::Smoothed);
   a_site.set_chi2(s_chi2, MAUS::KalmanSite::Smoothed);
+  a_site.set_covariance_residual(covariance_residual, MAUS::KalmanSite::Smoothed);
 
   // Now, we can quickly check that these states were set as expected.
   // Expectations can't handle TMatrices, so we'll be comparing first element of each.
@@ -120,6 +127,8 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
             f_chi2);
   EXPECT_EQ(copy.chi2(MAUS::KalmanSite::Smoothed),
             s_chi2);
+  EXPECT_EQ(copy.covariance_residual(MAUS::KalmanSite::Smoothed)(0, 0),
+            covariance_residual(0, 0));
 
   // Now, the assignment.
   MAUS::KalmanSite second_copy;
@@ -141,6 +150,18 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
             f_chi2);
   EXPECT_EQ(second_copy.chi2(MAUS::KalmanSite::Smoothed),
             s_chi2);
+  EXPECT_EQ(second_copy.covariance_residual(MAUS::KalmanSite::Smoothed)(1, 1),
+            covariance_residual(1, 1));
+
+  // Bad requests
+  EXPECT_THROW(a_site.set_chi2(0., MAUS::KalmanSite::Initialized),
+               Squeal);
+  EXPECT_THROW(a_site.set_covariance_residual(covariance_residual, MAUS::KalmanSite::Initialized),
+               Squeal);
+  EXPECT_THROW(a_site.set_residual(smoothed_residual, MAUS::KalmanSite::Initialized),
+               Squeal);
+  EXPECT_THROW(a_site.set_covariance_matrix(covariance_residual, MAUS::KalmanSite::Initialized),
+               Squeal);
 }
 
 }

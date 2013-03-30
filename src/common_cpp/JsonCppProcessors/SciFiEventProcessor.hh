@@ -31,7 +31,6 @@
 #include "src/common_cpp/JsonCppProcessors/SciFiStraightPRTrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiHelicalPRTrackProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiTrackProcessor.hh"
-//#include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
 
 namespace MAUS {
 
@@ -48,13 +47,12 @@ class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {
     SciFiEventProcessor();
 
   private:
-    PointerArrayProcessor<SciFiDigit> _sf_digit_array_proc;
-    PointerArrayProcessor<SciFiCluster> _sf_cluster_array_proc;
-    PointerArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;
+    PointerArrayProcessor<SciFiDigit>           _sf_digit_array_proc;
+    PointerArrayProcessor<SciFiCluster>         _sf_cluster_array_proc;
+    PointerArrayProcessor<SciFiSpacePoint>      _sf_spoint_array_proc;
     PointerArrayProcessor<SciFiStraightPRTrack> _sf_sprtrk_array_proc;
-    PointerArrayProcessor<SciFiHelicalPRTrack> _sf_hprtrk_array_proc;
-    PointerArrayProcessor<SciFiTrack> _sf_trk_array_proc;
-    //PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
+    PointerArrayProcessor<SciFiHelicalPRTrack>  _sf_hprtrk_array_proc;
+    PointerArrayProcessor<SciFiTrack>           _sf_trk_array_proc;
 };
 }  // namespace MAUS
 

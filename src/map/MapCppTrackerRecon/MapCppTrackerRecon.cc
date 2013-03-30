@@ -88,7 +88,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Kalman Track Fit.
         if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          // track_fit(*event);
+          track_fit(*event);
         }
         print_event_info(*event);
       }

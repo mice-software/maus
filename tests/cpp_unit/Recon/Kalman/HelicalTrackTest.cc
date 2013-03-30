@@ -16,7 +16,6 @@
  */
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
-// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "gtest/gtest.h"
 
 namespace {
@@ -75,7 +74,8 @@ TEST_F(HelicalTrackTest, test_propagation) {
   std::cerr << "did propagator..."<<std::endl;
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
-/*  a_projected.Print();
+/*
+  a_projected.Print();
   std::cout << x1 << " ";
   std::cout << mx1 << " "; 
   std::cout << y1 << " ";
@@ -99,7 +99,7 @@ TEST_F(HelicalTrackTest, test_update_propagator) {
   // MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   // track->Initialise();
   // delete track;
- // what to do?  
+  // what to do?  
 }
 */
 } // namespace
