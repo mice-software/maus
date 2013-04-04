@@ -66,23 +66,10 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     _s_chi2  = a_track.s_chi2();
     _ndf     = a_track.ndf();
     _P_value = a_track.P_value();
-/*
-  _scifitrackpoints.resize(a_track._scifitrackpoints.size());
-    for (unsigned int i = 0; i < a_track._scifitrackpoints.size(); ++i) {
-      _scifitrackpoints[i] = a_track._scifitrackpoints[i];
-    }
-*/
+
     return *this;
 }
 
-SciFiTrack::~SciFiTrack() {
-/*
-  std::vector<SciFiTrackPoint*>::iterator point;
-  for (point = _scifitrackpoints.begin();
-       point!= _scifitrackpoints.end(); ++point) {
-    delete (*point);
-  }
-*/
-}
+SciFiTrack::~SciFiTrack() {}
 
 } // ~namespace MAUS

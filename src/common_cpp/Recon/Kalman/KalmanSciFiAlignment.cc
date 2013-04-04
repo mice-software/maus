@@ -23,7 +23,8 @@
 
 namespace MAUS {
 
-KalmanSciFiAlignment::KalmanSciFiAlignment()/* : file(0),
+KalmanSciFiAlignment::KalmanSciFiAlignment() {
+/* : file(0),
                                                rootfile(0),
                                                station1_x(0),
                                                station2_x(0),
@@ -34,7 +35,8 @@ KalmanSciFiAlignment::KalmanSciFiAlignment()/* : file(0),
                                                station7_x(0),
                                                station8_x(0),
                                                station9_x(0),
-                                               station10_x(0)*/ {
+                                               station10_x(0)
+*/
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   file = "SciFiMisalignments";
   fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;

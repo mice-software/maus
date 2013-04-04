@@ -79,7 +79,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
 
     // Misalignment search.
     if ( _update_misalignments && track->f_chi2() < 20. && numb_measurements == 15 ) {
-      // if ( _type_of_dataflow != "pipeline_single_thread" ) throw 
+      // if ( _type_of_dataflow != "pipeline_single_thread" ) throw
       LaunchMisaligmentSearch(track, sites, kalman_align);
     }
     delete track;

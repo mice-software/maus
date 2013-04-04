@@ -29,7 +29,6 @@ SciFiEvent::SciFiEvent() {
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
       _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
@@ -109,7 +108,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
 }
 
 SciFiEvent::~SciFiEvent() {
-
   std::vector<SciFiDigit*>::iterator digit;
   for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
     delete (*digit);

@@ -14,59 +14,13 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <stdlib.h>
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-#include <stdlib.h>
 
 #include "gtest/gtest.h"
-
-/* NOTE:
-  The KalmanTrack class does most of the Kalman work. Here are the member functions:
-
-  // Projection
-  void calc_system_noise(KalmanSite *old_site, KalmanSite *new_site);
-  double BetheBlochStoppingPower(double p);
-  void subtract_energy_loss(KalmanSite *old_site, KalmanSite *new_site);
-
-  // FILTERING
-  void calc_filtered_state(KalmanSite *a_site);
-  void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
-  void update_V(KalmanSite *a_site);
-  void update_covariance(KalmanSite *a_site);
-  void update_H(KalmanSite *a_site);
-  void update_W(KalmanSite *a_site);
-
-  TMatrixD solve_measurement_equation(TMatrixD a, TMatrixD s);
-  void set_residual(KalmanSite *a_site);
-
-
-  // SMOOTHING
-  void update_back_transportation_matrix(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void smooth_back(KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void prepare_for_smoothing(std::vector<KalmanSite> &sites);
-  void exclude_site(KalmanSite *site);
-
-
-  TMatrixD get_propagator() { return _F; }
-  TMatrixD get_pull(KalmanSite *a_site);
-  TMatrixD get_system_noise() { return _Q; }
-  TMatrixD get_kalman_gain(KalmanSite *a_site);
-  double get_chi2() const { return _chi2; }
-  double get_ndf() const { return _ndf; }
-  double get_P_value() const { return _P_value; }
-  double get_tracker() const { return _tracker; }
-  double get_mass() const { return _mass; }
-  double get_momentum() const { return _momentum; }
-
-  TMatrixD get_Q() const { return _Q; }
-  void set_Q(TMatrixD Q) { _Q = Q; }
-  void set_mass(double mass) { _mass = mass; }
-  void set_momentum(double momentum) { _momentum = momentum; }
-
-  void compute_chi2(const std::vector<KalmanSite> &sites);
-*/
 
 namespace MAUS {
 
@@ -111,7 +65,7 @@ class KalmanTrackTest : public ::testing::Test {
 TEST_F(KalmanTrackTest, test_constructor) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
-  EXPECT_EQ(track->ndf(), 0.0);
+  EXPECT_EQ(track->ndf(), 0.);
   EXPECT_EQ(track->tracker(), -1);
   delete track;
 }
@@ -129,7 +83,7 @@ TEST_F(KalmanTrackTest, test_energy_loss) {
   track->SubtractEnergyLoss(&old_site, &new_site);
   TMatrixD a     = new_site.a(KalmanSite::Projected);
   a.Print();
-  EXPECT_LT(a(4,0), a_old(4,0));
+  EXPECT_LT(a(4, 0), a_old(4, 0));
 }
 
 //
@@ -145,7 +99,6 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
   a_site->Initialise(5);
   a_site->set_direction(direction_plane0_tracker0);
-
 
   // Say we have a measurement...
   TMatrixD measurement(2, 1);

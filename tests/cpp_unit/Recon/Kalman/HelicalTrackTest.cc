@@ -21,7 +21,7 @@
 namespace {
 class HelicalTrackTest : public ::testing::Test {
  protected:
-  HelicalTrackTest(): x1(0.),y1(0.),mx1(0.),my1(0.),kappa(0.)  {}
+  HelicalTrackTest(): x1(0.), y1(0.), mx1(0.), my1(0.), kappa(0.)  {}
   virtual ~HelicalTrackTest() {}
   virtual void SetUp()    {
     old_site.Initialise(5);
@@ -66,12 +66,9 @@ class HelicalTrackTest : public ::testing::Test {
 };
 
 TEST_F(HelicalTrackTest, test_propagation) {
-  std::cerr << "starting..."<<std::endl;
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
-  std::cerr << "initialised..."<<std::endl;
   track->CalculatePredictedState(&old_site, &new_site);
-  std::cerr << "did propagator..."<<std::endl;
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
 /*
@@ -90,7 +87,6 @@ TEST_F(HelicalTrackTest, test_propagation) {
   std::cerr << "deleting" << std::endl;
 */
   delete track;
-  std::cerr << "leaving..."<<std::endl;
 }
 /*
 TEST_F(HelicalTrackTest, test_update_propagator) {

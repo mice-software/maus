@@ -19,8 +19,8 @@
 
 namespace MAUS {
 
-KalmanTrack::KalmanTrack(bool MCS, bool Eloss) :
-                             _use_MCS(MCS),
+KalmanTrack::KalmanTrack(bool MCS, bool Eloss)
+                            :_use_MCS(MCS),
                              _use_Eloss(Eloss),
                              _f_chi2(0.),
                              _s_chi2(0.),
@@ -221,7 +221,7 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
   double mx    = a(1, 0);
   double my    = a(3, 0);
 
-  //double kappa = a(4, 0);
+  // double kappa = a(4, 0);
   double momentum = _momentum;
   double kappa = 1./momentum;
 
