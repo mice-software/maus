@@ -33,7 +33,7 @@
 #include "src/common_cpp/DataStructure/TOFEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
-char in_file[60], out_file[60];
+char in_file[256], out_file[256];
 
 void ana_mc(char* ifname, char* ofname) {
 
