@@ -146,6 +146,14 @@ def build_cpp_tests(env, module_list):
                                LIBS= env['LIBS'] + ['MausCpp'] + module_list)
     env.Install('build', test_optics)
 
+    test_tof_files = glob.glob\
+                ("tests/integration/test_simulation/test_tof/src/*cc")
+    tof_mc_plotter = env.Program(target = \
+                'tests/integration/test_simulation/test_tof/tof_mc_plotter', \
+                source = test_tof_files, \
+                LIBS= env['LIBS'] + ['MausCpp'] + module_list)
+    env.Install('build', tof_mc_plotter)
+
 def build_data_structure(env):
     """
     Build the data structure library
