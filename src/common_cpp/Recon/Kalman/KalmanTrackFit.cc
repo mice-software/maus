@@ -88,7 +88,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // Calculate the chi2 of this track.
     track->ComputeChi2(sites);
     // Optional printing.
-    if ( _verbose ) 
+    if ( _verbose )
       DumpInfo(sites);
     //
     // Save to data structure.

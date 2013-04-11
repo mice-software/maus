@@ -15,24 +15,7 @@
  *
  */
 
-#include <algorithm>
-
-#include "Interface/Squeal.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
-
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
-
-#include "Riostream.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "TGraphErrors.h"
-#include "TDecompChol.h"
-#include "TDecompSVD.h"
-#include "TF1.h"
 
 namespace MAUS {
 
