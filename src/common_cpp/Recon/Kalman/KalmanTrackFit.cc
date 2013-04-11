@@ -24,62 +24,83 @@ namespace MAUS {
 
 KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.),
                                   _update_misalignments(false) {
+  //
   // Get Configuration values.
+  //
   Json::Value *json = Globals::GetConfigurationCards();
-  _seed_cov  = (*json)["SciFiSeedCovariance"].asDouble();
+  _seed_cov             = (*json)["SciFiSeedCovariance"].asDouble();
   _update_misalignments = (*json)["SciFiUpdateMisalignments"].asBool();
   _type_of_dataflow     = (*json)["type_of_dataflow"].asString();
   _use_MCS              = (*json)["SciFiKalman_use_MCS"].asBool();
   _use_Eloss            = (*json)["SciFiKalman_use_Eloss"].asBool();
-  std::cerr << "---------------------Birth of Kalman Filter--------------------" << std::endl;
+  _verbose              = (*json)["SciFiKalmanVerbose"].asBool();
 }
 
-KalmanTrackFit::~KalmanTrackFit() {
-  std::cerr << "---------------------Death of Kalman Filter--------------------" << std::endl;
-}
+KalmanTrackFit::~KalmanTrackFit() {}
 
-void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) {
+void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
+                             SciFiEvent &event) {
+  //
+  // Initialise Alignment object
+  // This loads misalignments and may
+  // be used to conduct a misalignment search,
+  // if the flag is set to do so.
+  //
   KalmanSciFiAlignment kalman_align;
   kalman_align.LoadMisaligments();
-
-  std::cout << "number of seeds: " << seeds.size() << "\n";
-  size_t num_tracks = seeds.size();
-  for ( size_t i = 0; i < num_tracks; ++i ) {
-    std::cout << "processing track number " << i << "\n";
-    // Get the seed.
+  //
+  // Prepare to loop over seeds. 1 seed = 1 track hypotesis
+  //
+  size_t num_seeds = seeds.size();
+  for ( size_t i = 0; i < num_seeds; ++i ) {
+    // Current seed.
     KalmanSeed* seed = seeds[i];
 
-    // Create the Track object.
+    // Create pointer to abstract class KalmanTrack.
     KalmanTrack *track = 0;
     if ( seed->is_straight() ) {
       track = new StraightTrack(_use_MCS, _use_Eloss);
     } else if ( seed->is_helical() ) {
       track = new HelicalTrack(_use_MCS, _use_Eloss);
     }
-
-    // Initialize member matrices.
+    //
+    // Initialize Track's member matrices.
     track->Initialise();
-
-    // Set up KalmanSites to be used.
+    //
+    // Set up KalmanSites to be used. KalmanSite = Measurement Plane
     std::vector<KalmanSite> sites;
     Initialise(seed, sites, kalman_align);
 
     size_t numb_measurements = sites.size();
-    std::cout << numb_measurements << std::endl;
+    //
+    // For now, we are only interested in events where all 15 planes are hit.
+    // The high efficiency of the fibers makes this a reasonable assumption.
     if ( numb_measurements != 15 ) continue;
-
-    double momentum = seed->momentum(); // MeV/c
+    //
+    // Set the momentum of the track hypostesis (in MeV/c)
+    double momentum = seed->momentum();
     track->set_momentum(momentum);
-
+    //
+    // Run the KALMAN FILTER
+    //
     RunFilter(track, sites);
-
+    //
+    // Calculate the chi2 of this track.
     track->ComputeChi2(sites);
-    DumpInfo(sites);
+    // Optional printing.
+    if ( _verbose ) 
+      DumpInfo(sites);
+    //
+    // Save to data structure.
+    // The KalmanTrack is converted into a
+    // SciFiTrack for general use.
+    //
     Save(track, sites, event);
 
-    // Misalignment search.
-    if ( _update_misalignments && track->f_chi2() < 20. && numb_measurements == 15 ) {
-      // if ( _type_of_dataflow != "pipeline_single_thread" ) throw
+    // Misalignment search. Optional.
+    // This must be run in single thread mode.
+    if ( _update_misalignments && track->f_chi2() < 20. &&
+         numb_measurements == 15 && _type_of_dataflow == "pipeline_single_thread") {
       LaunchMisaligmentSearch(track, sites, kalman_align);
     }
     delete track;
@@ -141,16 +162,13 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
   size_t numb_measurements = sites.size();
   for ( size_t j = 1; j < numb_measurements; ++j ) {
     // Predict the state vector at site i...
-    std::cout << "Extrapolating " << j << std::endl;
     track->Extrapolate(sites, j);
     // ... Filter...
-    std::cout << "Filtering " << j << std::endl;
     track->Filter(sites, j);
   }
   track->PrepareForSmoothing(&sites.back());
   // ...and Smooth back all sites.
   for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
-    std::cout << "Smoothing " << k << std::endl;
     track->Smooth(sites, k);
   }
 }
@@ -219,46 +237,18 @@ void KalmanTrackFit::FilterVirtual(KalmanSite &a_site) {
 void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
                           std::vector<KalmanSite> sites,
                           SciFiEvent &event) {
-/*
-  KalmanSite *plane_0 = &sites[0];
-  assert(plane_0->get_id() == 0 || plane_0->get_id() == 15);
-
-  TMatrixD a = plane_0->get_a(KalmanSite::Smoothed);
-  TMatrixD C = plane_0->get_covariance_matrix(KalmanSite::Smoothed);
-  CLHEP::Hep3Vector mc_pos = plane_0->get_true_position();
-  CLHEP::Hep3Vector mc_mom = plane_0->get_true_momentum();
-
-  int tracker = kalman_track->tracker();
-  if ( tracker == 0 ) {
-    mc_pos.setX(-1.*mc_pos.getX());
-    mc_mom.setX(-1.*mc_mom.getX());
-  }
-
-  Json::Value *json = Globals::GetConfigurationCards();
-  double energy  = (*json)["simulation_reference_particle"]["energy"].asDouble();
-  double emittance_in= (*json)["beam"]["definitions"]
-                       [static_cast<Json::UInt> (0)]["transverse"]
-                       ["emittance_4d"].asDouble();
-
-  std::ofstream file;
-  file.open("emittance.txt", std::ios::out | std::ios::app);
-  file << energy << "\t" << emittance_in << "\t" << tracker << "\t"
-       << a(0, 0) << "\t" << C(0, 0) << "\t" << mc_pos.getX() << "\t"
-       << a(1, 0) << "\t" << C(1, 1) << "\t" << mc_mom.getX() << "\t"
-       << a(2, 0) << "\t" << C(2, 2) << "\t" << mc_pos.getY() << "\t"
-       << a(3, 0) << "\t" << C(3, 3) << "\t" << mc_mom.getY() << "\t"
-       << a(4, 0) << "\t" << C(4, 4) << "\t" << mc_mom.getZ() << "\n";
-  file.close();
-*/
+  //
+  // Convert KalmanTrack to SciFiTrack
+  //
   SciFiTrack *track = new SciFiTrack(kalman_track);
-
-
+  //
+  // Store information at each measurement plane.
   size_t n_sites = sites.size();
   for ( size_t i = 0; i < n_sites; ++i ) {
     SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
     track->add_scifitrackpoint(track_point);
   }
-
+  // Add to data structure.
   event.add_scifitrack(track);
 }
 
@@ -270,30 +260,11 @@ void KalmanTrackFit::DumpInfo(std::vector<KalmanSite> const &sites) {
     std::cerr << "==========================================" << std::endl;
     std::cerr << "SITE ID: " << site.id() << std::endl;
     std::cerr << "SITE Z: " << site.z() << std::endl;
-    std::cerr << "Momentum: " << site.true_momentum() << std::endl;
-    site.a(KalmanSite::Projected).Print();
-    // std::cerr << "SITE Z: " << site.get_z() << std::endl;
-    // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
-    //                                   site.get_direction().y() << ", " <<
-    //                                   site.get_direction().z() << ")" << std::endl;
     std::cerr << "Measurement: " << (site.measurement())(0, 0) << std::endl;
-    // std::cerr << "Shift: " <<  "(" << (site.get_input_shift_A())(0, 0) << ", " <<
-    //                                  (site.get_input_shift_A())(1, 0) << ", " <<
-    //                                  (site.get_input_shift_A())(2, 0) << ")" << std::endl;
     std::cerr << "================Residuals================" << std::endl;
     std::cerr << (site.residual(KalmanSite::Projected))(0, 0) << std::endl;
     std::cerr << (site.residual(KalmanSite::Filtered))(0, 0) << std::endl;
     std::cerr << (site.residual(KalmanSite::Smoothed))(0, 0) << std::endl;
-    // std::cerr << "================Projection================" << std::endl;
-    // site.get_a(KalmanSite::Projected).Print();
-    // site.get_a(KalmanSite::Filtered).Print();
-    // site.get_a(KalmanSite::Smoothed).Print();
-    // site.get_a().Print();
-    // site.get_smoothed_a().Print();
-    // site.get_projected_covariance_matrix().Print();
-    // std::cerr << "=================Filtered=================" << std::endl;
-    // site.get_a().Print();
-    // site.get_covariance_matrix().Print();
     std::cerr << "==========================================" << std::endl;
   }
 }

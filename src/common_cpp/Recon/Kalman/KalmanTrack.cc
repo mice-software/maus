@@ -249,36 +249,36 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
   // x x
   _Q(0, 0) = deltaZ_squared*c_mx_mx;
   // x mx
-  _Q(0, 1) = deltaZ*c_mx_mx; ///
+  _Q(0, 1) = deltaZ*c_mx_mx;
   // x y
   _Q(0, 2) = deltaZ_squared*c_mx_my;
   // x my
-  _Q(0, 3) = deltaZ*c_mx_my; ///
+  _Q(0, 3) = deltaZ*c_mx_my;
 
   // mx x
-  _Q(1, 0) = deltaZ*c_mx_mx; ///
+  _Q(1, 0) = deltaZ*c_mx_mx;
   // mx mx
   _Q(1, 1) = c_mx_mx;
   // mx y
-  _Q(1, 2) = deltaZ*c_mx_my; ///
+  _Q(1, 2) = deltaZ*c_mx_my;
   // mx my
   _Q(1, 3) = c_mx_my;
 
   // y x
   _Q(2, 0) = deltaZ_squared*c_mx_my;
   // y mx
-  _Q(2, 1) = deltaZ*c_mx_my; ///
+  _Q(2, 1) = deltaZ*c_mx_my;
   // y y
   _Q(2, 2) = deltaZ_squared*c_my_my;
   // y my
-  _Q(2, 3) = deltaZ*c_my_my; ///
+  _Q(2, 3) = deltaZ*c_my_my;
 
   // my x
-  _Q(3, 0) = deltaZ*c_mx_my; ///
+  _Q(3, 0) = deltaZ*c_mx_my;
   // my mx
   _Q(3, 1) = c_mx_my;
   // my y
-  _Q(3, 2) = deltaZ*c_my_my; ///
+  _Q(3, 2) = deltaZ*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
 }
@@ -492,18 +492,6 @@ void KalmanTrack::SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state
   chi2 = residual_transposed * cov_residual *residual;
 
   a_site->set_chi2(fabs(chi2(0, 0)), kalman_state);
-/*
-  std::cerr << "Witch hunt." <<std::endl;
-  measurement.Print();
-  a.Print();
-s.Print();
-  std::cerr << "expected measurement." <<std::endl;
-HA.Print();
-residual.Print();
-std::cerr <<"covariance"<<std::endl;
-cov_residual.Print();
-chi2.Print();
-*/
 }
 
 void KalmanTrack::UpdateCovariance(KalmanSite *a_site) {

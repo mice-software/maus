@@ -119,6 +119,8 @@ class KalmanTrackFit {
 
   bool _use_Eloss;
 
+  bool _verbose;
+
   bool _update_misalignments;
 
   std::string _type_of_dataflow;
