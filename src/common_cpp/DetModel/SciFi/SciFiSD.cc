@@ -26,13 +26,14 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
+  /*
   if ( pid == -13 ) {
     edep = 10.;
   } else {
     return false;
   }
-
-  // if ( edep == 0. ) return false;
+  */
+  if ( edep == 0. ) return false;
 
   if (!_hits.isMember("sci_fi_hits")) {
     _hits["sci_fi_hits"] = Json::Value(Json::arrayValue);
