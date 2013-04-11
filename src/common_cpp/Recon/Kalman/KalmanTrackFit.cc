@@ -74,7 +74,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event) 
     RunFilter(track, sites);
 
     track->ComputeChi2(sites);
-    // DumpInfo(sites);
+    DumpInfo(sites);
     Save(track, sites, event);
 
     // Misalignment search.
@@ -267,8 +267,11 @@ void KalmanTrackFit::DumpInfo(std::vector<KalmanSite> const &sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
+    std::cerr << "==========================================" << std::endl;
     std::cerr << "SITE ID: " << site.id() << std::endl;
+    std::cerr << "SITE Z: " << site.z() << std::endl;
     std::cerr << "Momentum: " << site.true_momentum() << std::endl;
+    site.a(KalmanSite::Projected).Print();
     // std::cerr << "SITE Z: " << site.get_z() << std::endl;
     // std::cerr << "SITE Direction: " << "(" << site.get_direction().x() << ", " <<
     //                                   site.get_direction().y() << ", " <<
@@ -281,7 +284,7 @@ void KalmanTrackFit::DumpInfo(std::vector<KalmanSite> const &sites) {
     std::cerr << (site.residual(KalmanSite::Projected))(0, 0) << std::endl;
     std::cerr << (site.residual(KalmanSite::Filtered))(0, 0) << std::endl;
     std::cerr << (site.residual(KalmanSite::Smoothed))(0, 0) << std::endl;
-    std::cerr << "================Projection================" << std::endl;
+    // std::cerr << "================Projection================" << std::endl;
     // site.get_a(KalmanSite::Projected).Print();
     // site.get_a(KalmanSite::Filtered).Print();
     // site.get_a(KalmanSite::Smoothed).Print();

@@ -57,8 +57,8 @@ class SciFiTrack {
     double P_value()    const   { return _P_value; }
     void   set_P_value(double p_value) { _P_value = p_value; }
 
-    SciFiTrackPointPArray scifitrackpoints()      const      { return _trackpoints; }
-    void add_scifitrackpoint(SciFiTrackPoint* trackpoint)         { _trackpoints.push_back(trackpoint); }
+    SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
+    void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
     void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
 
   private:

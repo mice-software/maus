@@ -31,19 +31,24 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void SetUp()    {
     old_site.Initialise(5);
     new_site.Initialise(5);
-    double deltaZ = 100.66;
-    new_site.set_id(0);
-    new_site.set_z(deltaZ);
-    old_site.set_z(0.0);
+    // Old site.
+    old_site.set_id(8);
+    old_site.set_z(-451.132);
+    old_site.set_measurement(-15.5);
+    // New site.
+    new_site.set_id(9);
+    new_site.set_z(-749.828);
+    new_site.set_measurement(-28.5);
 
-    double mx = 2.0;
-    double my = 3.0;
+    double px = -6.65702;
+    double py = 20.6712;
+    double pz = 209.21;
     TMatrixD a(5, 1);
-    a(0, 0) = 0.0;
-    a(1, 0) = mx;
-    a(2, 0) = 0.0;
-    a(3, 0) = my;
-    a(4, 0) = 1./200.;
+    a(0, 0) = 52.9;
+    a(1, 0) = px/pz;
+    a(2, 0) = 57.55;
+    a(3, 0) = py/pz;
+    a(4, 0) = 1./pz;
     old_site.set_a(a, MAUS::KalmanSite::Filtered);
     old_site.set_a(a, MAUS::KalmanSite::Projected);
 
@@ -230,17 +235,9 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
 TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
+  track->set_momentum(200.);
   track->CalculatePredictedState(&old_site, &new_site);
 
-  // Build a covariance matrix. Elements are random in [0, 100].
-  TMatrixD covariance = TMatrixD(5, 5);
-  for ( int j = 0; j < 5; j++ ) {
-    for ( int k = 0; k < 5; k++ ) {
-      covariance(j, k) = 100.*rand()/RAND_MAX;
-    }
-  }
-
-  old_site.set_covariance_matrix(covariance, MAUS::KalmanSite::Filtered);
   track->CalculateCovariance(&old_site, &new_site);
 
   // Verify that the covariance GROWS when we extrapolate.
@@ -255,11 +252,6 @@ TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
   // MCS increases matrix elements.
   //
   track->CalculateSystemNoise(&old_site, &new_site);
-  for ( int j = 0; j < 5; j++ ) {
-    for ( int k = 0; k < 5; k++ ) {
-      EXPECT_GE(track->Q()(j, k), 0.);
-    }
-  }
   track->CalculateCovariance(&old_site, &new_site);
   for ( int j = 0; j < 5; j++ ) {
     for ( int k = 0; k < 5; k++ ) {
@@ -278,7 +270,10 @@ TEST_F(KalmanTrackTest, test_exclusion_of_site) {
   track->Filter(kalman_sites, 1);
   track->PrepareForSmoothing(&new_site);
   track->SmoothBack(&new_site, &old_site);
-  track->ExcludeSite(&old_site);
+  track->ExcludeSite(&new_site);
+  TMatrixD smoothed_residual = new_site.residual(MAUS::KalmanSite::Smoothed);
+  TMatrixD excluded_residual = new_site.residual(MAUS::KalmanSite::Excluded);
+  EXPECT_GT(abs(excluded_residual(0, 0)), abs(smoothed_residual(0, 0)));
   // The projected state becomes the filtered one.
 }
 } // ~namespace MAUS

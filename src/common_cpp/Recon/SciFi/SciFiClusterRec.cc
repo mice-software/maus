@@ -169,6 +169,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
   ThreeVector plane_position = this_plane->globalPosition();
+  // The displacements ARE NOT set by the MiceModules.
   plane_position.setX(0.);
   plane_position.setY(0.);
   ThreeVector position = dist_mm * perp + plane_position;

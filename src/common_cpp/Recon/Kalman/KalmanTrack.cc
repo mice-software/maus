@@ -217,13 +217,13 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
   double deltaZ = ( new_site->z() ) - ( old_site->z() );
   double deltaZ_squared = TMath::Power(deltaZ, 2.);
 
-  TMatrixD a = new_site->a(KalmanSite::Projected);
+  TMatrixD a   = new_site->a(KalmanSite::Projected);
   double mx    = a(1, 0);
   double my    = a(3, 0);
 
   // double kappa = a(4, 0);
   double momentum = _momentum;
-  double kappa = 1./momentum;
+  double kappa    = 1./momentum;
 
   // Charge of incoming particle.
   double z = _particle_charge;

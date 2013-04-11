@@ -31,6 +31,7 @@
 #include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Matrix/Matrix.h>
+#include <TMath.h>
 
 // C++ headers
 #include <cmath>
@@ -38,8 +39,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
-#include <TMath.h>
 
 #include "Config/MiceModule.hh"
 
