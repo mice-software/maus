@@ -39,6 +39,8 @@
 #include <sstream>
 #include <vector>
 
+#include <TMath.h>
+
 #include "Config/MiceModule.hh"
 
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"

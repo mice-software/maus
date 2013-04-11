@@ -19,7 +19,7 @@
 namespace MAUS {
 
 SciFiClusterProcessor::SciFiClusterProcessor() {
-                     //: _scifidigit_array_proc(new SciFiDigitProcessor) {
+                       // : _scifidigit_array_proc(new SciFiDigitProcessor) {
     RegisterValueBranch("spill", &_int_proc,
                         &SciFiCluster::get_spill,
                         &SciFiCluster::set_spill, true);
@@ -69,7 +69,7 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::get_position,
                         &SciFiCluster::set_position, true);
 
-    //RegisterValueBranch("digits", &_scifidigit_array_proc,
+    // RegisterValueBranch("digits", &_scifidigit_array_proc,
     //                    &SciFiCluster::get_digits,
     //                    &SciFiCluster::set_digits, true);
 }

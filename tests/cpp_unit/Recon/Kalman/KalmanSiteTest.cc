@@ -163,5 +163,4 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   EXPECT_THROW(a_site.set_covariance_matrix(covariance_residual, MAUS::KalmanSite::Initialized),
                Squeal);
 }
-
 }

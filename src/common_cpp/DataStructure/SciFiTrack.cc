@@ -22,7 +22,8 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _f_chi2(-1),
                           _s_chi2(-1),
                           _ndf(-1),
-                          _P_value(-1) {
+                          _P_value(-1),
+                          _trackpoints(0) {
   // _scifitrackpoints.resize(0);
 }
 
@@ -30,13 +31,14 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _f_chi2(-1),
                                                    _s_chi2(-1),
                                                    _ndf(-1),
-                                                   _P_value(-1) {
-  _tracker = a_track.tracker();
+                                                   _P_value(-1),
+                                                   _trackpoints(0) {
+  _tracker   = a_track.tracker();
   _f_chi2    = a_track.f_chi2();
   _s_chi2    = a_track.s_chi2();
-  _ndf     = a_track.ndf();
-  _P_value = a_track.P_value();
-
+  _ndf       = a_track.ndf();
+  _P_value   = a_track.P_value();
+  _trackpoints = a_track.scifitrackpoints();
 /*
   _scifitrackpoints.resize(a_track._scifitrackpoints.size());
   for (unsigned int i = 0; i < a_track._scifitrackpoints.size(); ++i) {
@@ -66,7 +68,7 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     _s_chi2  = a_track.s_chi2();
     _ndf     = a_track.ndf();
     _P_value = a_track.P_value();
-
+    _trackpoints = a_track.scifitrackpoints();
     return *this;
 }
 

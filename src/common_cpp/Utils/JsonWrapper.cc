@@ -30,7 +30,7 @@ Json::Value JsonWrapper::StringToJson(const std::string& json_in)
   Json::Value  json_out;
   bool parsingSuccessful = reader.parse(json_in, json_out);
   if (!parsingSuccessful) {
-    throw(Squeal(Squeal::recoverable,json_in+
+    throw(Squeal(Squeal::recoverable,
           "Failed to parse Json configuration. Json reports\n"
                                       +reader.getFormatedErrorMessages(),
           "JsonWrapper::StringToJson()"));

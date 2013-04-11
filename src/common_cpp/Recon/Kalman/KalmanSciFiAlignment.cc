@@ -322,7 +322,7 @@ void KalmanSciFiAlignment::CloseRootFile() {
   mg->SetMinimum(-3.);
   mg->Write("", TObject::kOverwrite);
 */
-  //rootfile->Close();
+  // rootfile->Close();
 }
 
 void KalmanSciFiAlignment::SetRootOutput() {

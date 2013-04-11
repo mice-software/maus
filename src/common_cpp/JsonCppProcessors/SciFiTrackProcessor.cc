@@ -18,7 +18,8 @@
 
 namespace MAUS {
 
-SciFiTrackProcessor::SciFiTrackProcessor() {
+SciFiTrackProcessor::SciFiTrackProcessor()
+                         : _scifi_trackpoint_array_proc(new SciFiTrackPointProcessor) {
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiTrack::tracker,
                         &SciFiTrack::set_tracker, false);
@@ -31,5 +32,8 @@ SciFiTrackProcessor::SciFiTrackProcessor() {
     RegisterValueBranch("P_value", &_double_proc,
                         &SciFiTrack::P_value,
                         &SciFiTrack::set_P_value, false);
+    RegisterValueBranch("trackpoints", &_scifi_trackpoint_array_proc,
+                        &SciFiTrack::scifitrackpoints,
+                        &SciFiTrack::set_scifitrackpoints, false);
 }
 } // ~namespace MAUS

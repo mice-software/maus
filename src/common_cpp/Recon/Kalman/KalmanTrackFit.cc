@@ -253,11 +253,12 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   SciFiTrack *track = new SciFiTrack(kalman_track);
 
 
-  // size_t n_sites = sites.size();
-  // for ( size_t i = 0; i < n_sites; ++i ) {
-    // SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
-    // track->add_scifitrackpoint(track_point);
-  // }
+  size_t n_sites = sites.size();
+  for ( size_t i = 0; i < n_sites; ++i ) {
+    SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
+    track->add_scifitrackpoint(track_point);
+  }
+
   event.add_scifitrack(track);
 }
 

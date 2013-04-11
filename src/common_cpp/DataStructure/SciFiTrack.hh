@@ -25,6 +25,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
@@ -56,6 +57,10 @@ class SciFiTrack {
     double P_value()    const   { return _P_value; }
     void   set_P_value(double p_value) { _P_value = p_value; }
 
+    SciFiTrackPointPArray scifitrackpoints()      const      { return _trackpoints; }
+    void add_scifitrackpoint(SciFiTrackPoint* trackpoint)         { _trackpoints.push_back(trackpoint); }
+    void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
+
   private:
     int _tracker;
 
@@ -67,11 +72,12 @@ class SciFiTrack {
 
     double _P_value;
 
+    SciFiTrackPointPArray _trackpoints;
+
     MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };
 
 typedef std::vector<SciFiTrack*> SciFiTrackPArray;
-
 } // ~namespace MAUS
 
 #endif

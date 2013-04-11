@@ -153,6 +153,7 @@ class KalmanTrack {
                                          const KalmanSite *smoothing_site);
   void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
+  void set_momentum(double momentum) { _momentum = momentum; }
 
   /// Other methods
   void ExcludeSite(KalmanSite *site);
@@ -163,13 +164,12 @@ class KalmanTrack {
 
   /// Getters.
   double f_chi2()         const { return _f_chi2;   }
-  double s_chi2()         const { return _s_chi2;        }
+  double s_chi2()         const { return _s_chi2;   }
   int ndf()               const { return _ndf;      }
   double P_value()        const { return _P_value;  }
   int tracker()           const { return _tracker;  }
   double momentum()       const { return _momentum; }
-
-  void set_momentum(double momentum) { _momentum = momentum; }
+  TMatrixD Q()            const { return _Q;        }
 
  protected:
   bool _use_MCS;

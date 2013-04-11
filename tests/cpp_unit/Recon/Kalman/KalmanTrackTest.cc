@@ -31,7 +31,7 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void SetUp()    {
     old_site.Initialise(5);
     new_site.Initialise(5);
-    double deltaZ = 0.66;
+    double deltaZ = 100.66;
     new_site.set_id(0);
     new_site.set_z(deltaZ);
     old_site.set_z(0.0);
@@ -45,6 +45,7 @@ class KalmanTrackTest : public ::testing::Test {
     a(3, 0) = my;
     a(4, 0) = 1./200.;
     old_site.set_a(a, MAUS::KalmanSite::Filtered);
+    old_site.set_a(a, MAUS::KalmanSite::Projected);
 
     TMatrixD C(5, 5);
     C.Zero();
@@ -211,26 +212,6 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   EXPECT_TRUE(HA(0, 0) > 0);
 
   a_site->set_measurement(HA(0, 0));
-/*
-  double x, px, y, py, kappa;
-  x =
-  TMatrixD projected_a(5, 1);
-  projected_a(0, 0) = x;
-  projected_a(0, 0) = px;
-  projected_a(0, 0) = y;
-  projected_a(0, 0) = py;
-  projected_a(0, 0) = kappa;
-
-  a_site->set_projected_a();
-  a_site->set_projected_covariance_matrix();
-
-
-  a_site->get_a(a_filt);
-  a_site->get_projected_alpha(alpha_model);
-
-  track->update_H(&a_site);
-  track->calc_filtered_state
-*/
 
   // So we have H ready. Let's test the built of W.
   // For that, we will need V.
@@ -274,9 +255,15 @@ TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
   // MCS increases matrix elements.
   //
   track->CalculateSystemNoise(&old_site, &new_site);
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+      EXPECT_GE(track->Q()(j, k), 0.);
+    }
+  }
   track->CalculateCovariance(&old_site, &new_site);
   for ( int j = 0; j < 5; j++ ) {
     for ( int k = 0; k < 5; k++ ) {
+      if ( new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k)>0 )
       EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
                 old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
     }
