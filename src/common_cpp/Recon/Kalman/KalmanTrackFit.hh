@@ -44,8 +44,6 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
-#include "src/common_cpp/Recon/Kalman/Particle.hh"
-
 namespace MAUS {
 
 /** @class KalmanTrackFit
