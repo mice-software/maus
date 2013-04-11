@@ -2,13 +2,18 @@
 # Configure script
 
 # Setup env.sh environment for MAUS installation
+# Accepts two command line flags
+# -r specify MAUS_ROOT_DIR (defaults to ./)
+# -t specify MAUS_THIRD_PARTY (defaults to ./)
+# -e specify MAUS_TEMP_DIR (defaults to ./tmp/)
 
 root_version=root_v5.30.03
 
 maus_root_dir=`pwd -P`
 maus_third_party=""
+maus_temp_dir=""
 
-while getopts ":r:t:" opt; do
+while getopts ":r:t:e:" opt; do
   case $opt in
     r)
       if [ -d "$OPTARG" ]; then
@@ -26,6 +31,19 @@ while getopts ":r:t:" opt; do
           maus_third_party=`cd $OPTARG; pwd -P`;
       else
           echo "FATAL: \$MAUS_THIRD_PARTY $OPTARG not a directory"
+          exit 1
+      fi
+      ;;
+    e)
+      if [ -d "$OPTARG" ]; then
+          maus_temp_dir=`cd $OPTARG; pwd -P`;
+      else
+          echo "FATAL: \$MAUS_TEMP_DIR $OPTARG must be an existing directory"
+          exit 1
+      fi
+      if [[ "${maus_temp_dir}" == "${maus_root_dir}/tmp"* ]]; then
+          echo "FATAL: \$MAUS_TEMP_DIR $maus_temp_dir must not be a subdirectory of"
+          echo "FATAL: $maus_root_dir/tmp"
           exit 1
       fi
       ;;
@@ -106,6 +124,21 @@ if [ "${maus_third_party}" ]; then
         eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib"                  # if not, initialize it
     else
         eval ${DYLIB_VAR}="${maus_third_party}/third_party/install/lib:${!DYLIB_VAR}" # else add to to it
+    fi
+fi
+
+if [ "${maus_temp_dir}" ]; then
+    echo "INFO: Linking to temp dir " ${maus_temp_dir}
+    echo
+    rm -r ${maus_root_dir}/tmp
+    ln -s ${maus_temp_dir} ${maus_root_dir}/tmp
+else
+    if [ -d ${maus_root_dir}/tmp ]; then
+        echo "INFO: ${MAUS_ROOT_DIR}/tmp already exists and no new location set"
+        echo "INFO: no changes made"
+    else
+        echo "INFO: Making tmpdir ${MAUS_ROOT_DIR}/tmp"
+        mkdir ${maus_root_dir}/tmp
     fi
 fi
 
