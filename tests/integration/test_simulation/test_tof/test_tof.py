@@ -63,7 +63,7 @@ def compare_plots(plotname):
     h1 = fileref.Get(refplotname) # pylint: disable=C0103
     filein = TFile(TEST_PLOT_FILE,"r")
     h2 = filein.Get(plotname) # pylint: disable=C0103
-    kval = h1.KolmogorovTest(h2,"UOND")
+    kval = h1.KolmogorovTest(h2,"D")
     return kval
 
 class TestTof(unittest.TestCase): # pylint: disable=R0904
