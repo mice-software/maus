@@ -648,10 +648,8 @@ void KalmanTrack::ComputeChi2(const std::vector<KalmanSite> &sites) {
     KalmanSite site = sites[i];
     _f_chi2 += site.chi2(KalmanSite::Filtered);
     _s_chi2 += site.chi2(KalmanSite::Smoothed);
-    std::cerr << site.chi2(KalmanSite::Filtered) << std::endl;
   }
   _P_value = TMath::Prob(_f_chi2, _ndf);
-  std::cerr <<_f_chi2<< " " << _P_value << std::endl;
 }
 
 // +++++++++++++++++++++++++++++

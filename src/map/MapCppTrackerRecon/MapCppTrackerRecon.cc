@@ -88,7 +88,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Kalman Track Fit.
         if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          // track_fit(*event);
+          track_fit(*event);
         }
         print_event_info(*event);
       }
@@ -177,11 +177,16 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cout << event.digits().size() << " "
+  std::cerr << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << "; "
             << event.straightprtracks().size() << " "
-            << event.helicalprtracks().size() << " " << std::endl;
+            << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+              << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  std::cerr << std::endl;
 }
 
 } // ~namespace MAUS
