@@ -25,7 +25,7 @@
 
 namespace MAUS {
 
-SciFiClusterRec::SciFiClusterRec():_size_exception(0.),
+SciFiClusterRec::SciFiClusterRec():_size_exception(0),
                                    _min_npe(0.) {}
 
 // To be removed soon.

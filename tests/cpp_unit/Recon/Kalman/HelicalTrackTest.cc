@@ -21,7 +21,7 @@
 namespace {
 class HelicalTrackTest : public ::testing::Test {
  protected:
-  HelicalTrackTest(): x1(0.), y1(0.), mx1(0.), my1(0.), kappa(0.)  {}
+  HelicalTrackTest() {}
   virtual ~HelicalTrackTest() {}
   virtual void SetUp()    {
     old_site.Initialise(5);
@@ -62,7 +62,7 @@ class HelicalTrackTest : public ::testing::Test {
   double x0, y0, mx0, my0, kappa;
   double x1, y1, mx1, my1;
   TMatrixD a;
-  static const double err = 1.e-4;
+  static const double err = 2.e-4;
 };
 
 TEST_F(HelicalTrackTest, test_propagation) {
@@ -71,31 +71,13 @@ TEST_F(HelicalTrackTest, test_propagation) {
   track->CalculatePredictedState(&old_site, &new_site);
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
-/*
-  a_projected.Print();
-  std::cout << x1 << " ";
-  std::cout << mx1 << " "; 
-  std::cout << y1 << " ";
-  std::cout << my1 << " ";
-  std::cout << kappa << "\n";
-  std::cerr << "expectations..."<<std::endl;
+
   EXPECT_NEAR(x1,    a_projected(0, 0), err);
   EXPECT_NEAR(mx1,   a_projected(1, 0), err);
   EXPECT_NEAR(y1,    a_projected(2, 0), err);
   EXPECT_NEAR(my1,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
-  std::cerr << "deleting" << std::endl;
-*/
+
   delete track;
 }
-/*
-TEST_F(HelicalTrackTest, test_update_propagator) {
-  // set_up_sites();
-
-  // MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
-  // track->Initialise();
-  // delete track;
-  // what to do?  
-}
-*/
 } // namespace

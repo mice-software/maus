@@ -61,7 +61,8 @@ bool KalmanSciFiAlignment::LoadMisaligments() {
 
   std::string line;
   // Titles line.
-  double station, xd, yd, zd;
+  int station;
+  double xd, yd, zd;
   double s_xx, s_xy, s_xz;
   double s_yx, s_yy, s_yz;
   double s_zx, s_zy, s_zz;

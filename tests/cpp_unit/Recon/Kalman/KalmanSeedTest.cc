@@ -173,7 +173,6 @@ TEST_F(KalmanSeedTest, test_ordering) {
 
 TEST_F(KalmanSeedTest, test_process_measurements_straight_track) {
   MAUS::KalmanSeed seed;
-  double seed_pz = 200.;
 
   MAUS::SciFiStraightPRTrack straight_track;
   straight_track.set_spacepoints(_spacepoints);
@@ -184,7 +183,6 @@ TEST_F(KalmanSeedTest, test_process_measurements_straight_track) {
 
 TEST_F(KalmanSeedTest, test_process_measurements_helical_track) {
   MAUS::KalmanSeed seed;
-  double seed_pz = 200.;
 
   MAUS::SciFiHelicalPRTrack helical_track;
   helical_track.set_spacepoints(_spacepoints);
@@ -241,7 +239,6 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double phi_0 = 0.;
   double pt = 0.3*4.*r;
   double pz = pt*tan_lambda;
-  double momentum = pow(pt*pt+pz*pz, 0.5);
   double kappa = fabs(1./pz);
   helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);
@@ -253,7 +250,6 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Build an initial state vector.
   //
   TMatrixD a = seed.initial_state_vector();
-  a.Print();
   //
   // Check the result is the expected.
   //

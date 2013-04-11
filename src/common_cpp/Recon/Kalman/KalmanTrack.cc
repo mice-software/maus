@@ -152,16 +152,8 @@ void KalmanTrack::SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new
   double momentum = TMath::Sqrt(px*px+py*py+pz*pz);
   assert(_mass == _mass && "mass is not defined");
 
-  int n_steps = 1;
-
-  /* I think the planes are too thin for this integral. BB barely changes.
-  double Delta_p = 0.;
-  for ( int i = 0; i < n_steps; ++i ) {
-    momentum += Delta_p;
-    Delta_p += BetheBlochStoppingPower(momentum)*plane_width/n_steps;
-  }
-  */
-
+  // This could be an integral. But I think the planes are too thin
+  // and BB barely changes during integration.
   double Delta_p = BetheBlochStoppingPower(momentum)*plane_width;
   double new_pz;
   if ( _tracker == 0 ) {

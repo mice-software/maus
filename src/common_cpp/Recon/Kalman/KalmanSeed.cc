@@ -86,14 +86,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) 
   // PR doesnt see Eloss, so overstimates pz.
   // Total Eloss = 2 MeV/c.
   double pz = pt*tan_lambda;
-  double seed_pz;
 
-  double momentum = pow(pt*pt+pz*pz, 0.5);
   double kappa = fabs(1./pz);
-
-  // int numb_sites = _clusters.size();
-
-  int tracker = _clusters[0]->get_tracker();
 
   double PI = acos(-1.);
   double phi_0 = seed->get_phi0();

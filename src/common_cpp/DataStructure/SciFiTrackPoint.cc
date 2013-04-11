@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-SciFiTrackPoint::SciFiTrackPoint() : _id(0.),
+SciFiTrackPoint::SciFiTrackPoint() : _id(-1),
                                      _f_chi2(0.),
                                      _s_chi2(0.),
                                      _x(0.),

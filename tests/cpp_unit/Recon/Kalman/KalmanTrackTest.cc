@@ -83,12 +83,10 @@ TEST_F(KalmanTrackTest, test_energy_loss) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
   track->CalculatePredictedState(&old_site, &new_site);
-  TMatrixD a_old = old_site.a(KalmanSite::Projected);
-  a_old.Print();
 
+  TMatrixD a_old = old_site.a(KalmanSite::Projected);
   track->SubtractEnergyLoss(&old_site, &new_site);
   TMatrixD a     = new_site.a(KalmanSite::Projected);
-  a.Print();
   EXPECT_LT(a(4, 0), a_old(4, 0));
 }
 
@@ -127,8 +125,6 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   track->UpdateH(a_site);
 
   TMatrixD HA = track->SolveMeasurementEquation(a, s);
-  measurement.Print();
-  HA.Print();
   EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
 
   // now, we introduce a shift in x.
@@ -206,7 +202,6 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a(2, 0) = -60.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
   HA = track->SolveMeasurementEquation(a, s);
-  HA.Print();
   EXPECT_TRUE(HA(0, 0) > 0);
   // 6th case
   a(0, 0) = 30.;
@@ -226,7 +221,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a_site->set_covariance_matrix(C, KalmanSite::Projected);
   a_site->set_input_shift_covariance(C_S);
 
-  // this breaks
+  // this breaks.
   // EXPECT_THROW(track->UpdateW(a_site), Squeal);
   delete a_site;
   delete track;
@@ -273,7 +268,6 @@ TEST_F(KalmanTrackTest, test_exclusion_of_site) {
   track->ExcludeSite(&new_site);
   TMatrixD smoothed_residual = new_site.residual(MAUS::KalmanSite::Smoothed);
   TMatrixD excluded_residual = new_site.residual(MAUS::KalmanSite::Excluded);
-  EXPECT_GT(abs(excluded_residual(0, 0)), abs(smoothed_residual(0, 0)));
-  // The projected state becomes the filtered one.
+  EXPECT_GT(fabs(excluded_residual(0, 0)), fabs(smoothed_residual(0, 0)));
 }
 } // ~namespace MAUS
