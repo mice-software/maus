@@ -199,7 +199,7 @@ class PatternRecognition {
      */
     bool circle_fit(const std::vector<SciFiSpacePoint*> &spnts, SimpleCircle &circle);
 
-    double evaluate_nm(const int n_ji, const int n_kj, const double dz_ji, const double dz_kj,
+    double evaluate_nm(const int n, const int m, const double dz_ji, const double dz_kj,
                        const double dphi_ji, const double dphi_kj);
 
     /** @brief Find the ds/dz of a helical track
@@ -207,11 +207,12 @@ class PatternRecognition {
      * Find the ds/dz of a helical track. Output is the turning angles of the spacepoints
      * and a line of s vs z, the slope of which is dsdz = 1/tan(lambda).
      *
+     * @param n_points - Number of points in the current track (used for the chi_sq cut)
      * @param spnts - A vector of all the input spacepoints
      * @param circle - The circle fit of spacepoints from x-y projection
      * @param line_sz - The output fitted line in s-z projection.
      */
-    bool find_dsdz(std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
+    bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
                    std::vector<double> &phi_i, SimpleLine &line_sz);
 
     /** @brief Find the number of 2pi rotations that occured between each station
@@ -226,7 +227,7 @@ class PatternRecognition {
      *                    (prime indicates relative to the first spacepoint) 
      */
     bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
-                      const std::vector<double> &phi_i, std::vector<double> &true_phi_i);
+                      std::vector<double> &true_dphi);
 
     /** @brief Determine the dip angle of the helix
      *
@@ -324,12 +325,11 @@ class PatternRecognition {
      *  Returns true if successful, false if fails (due to a bad argument being passed)
      *
      *  @param ignore_stations - Vector of ints, holding which stations should be ignored
-     *  @param outer_station_num - The outermost station number used for a given track fit
-     *  @param inner_station_num - The innermost station number used for a given track fit
+     *  @param o_stat_num - The outermost station number used for a given track fit
+     *  @param i_stat_num - The innermost station number used for a given track fit
      *
      */
-    bool set_end_stations(const std::vector<int> ignore_stations,
-                          int &outer_station_num, int &inner_station_num);
+    bool set_end_stations(const std::vector<int> ignore_stations, int &o_stat_num, int &i_stat_num);
 
     /** @brief Determine which three stations the initial circle should be fit to
      *
@@ -344,13 +344,13 @@ class PatternRecognition {
      *  NB Stations are number 0 - 4 in the code, not 1 - 5 as in the outside world
      *
      *  @param ignore_stations - Vector of ints, holding which stations should be ignored
-     *  @param outer_station_num - The outermost station number used for a given track fit
-     *  @param inner_station_num - The innermost station number used for a given track fit
-     *  @param middle_station_num - the middle station number used for a given track fit
+     *  @param o_stat_num - The outermost station number used for a given track fit
+     *  @param i_stat_num - The innermost station number used for a given track fit
+     *  @param mid_stat_num - the middle station number used for a given track fit
      *
      */
-    bool set_seed_stations(const std::vector<int> ignore_stations, int &outer_station_num,
-                           int &inner_station_num, int &middle_station_num);
+    bool set_seed_stations(const std::vector<int> ignore_stations, int &o_stat_num,
+                           int &i_stat_num, int &mid_stat_num);
 
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
@@ -462,14 +462,14 @@ class PatternRecognition {
     static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
     static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */
     static const double _sd_phi_5 = 1.0;     /** Rotation error associated with station 5 */
-    static const double _res_cut = 2;       /** Road cut for linear fit in mm */
-    static const double _circ_res_cut = 5;  /** Road cut for circle fit in mm */
-    static const double _R_res_cut = 150.0;    /** Road cut for circle radius in mm */
-    static const double _chisq_cut = 15;     /** Cut on the chi^2 of the least sqs fit in mm */
-    static const double _sz_chisq_cut = 30.0; /** Cut on the sz chi^2 from least sqs fit in mm */
+    static const double _res_cut = 2;           /** Road cut for linear fit in mm */
+    static const double _circ_res_cut = 5;      /** Road cut for circle fit in mm */
+    static const double _R_res_cut = 150.0;     /** Road cut for circle radius in mm */
+    static const double _chisq_cut = 15;        /** Cut on the chi^2 of the least sqs fit in mm */
+    static const double _sz_chisq_cut = 30.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
     static const double _helix_chisq_cut = 100; /** Cut on the helix chi^2 in mm (not used) */
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .7;             /** Need to decide on appropriate cut here!!! */
+    static const double _AB_cut = .1;             /** Need to decide on appropriate cut here!!! */
     static const double _active_diameter = 300.0; /** Active volume diameter a tracker in mm */
     bool _helical_pr_on;                          /** Flag to turn on helical pr (0 off, 1 on) */
     bool _straight_pr_on;                         /** Flag to turn on straight pr (0 off, 1 on) */

@@ -46,6 +46,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _kalman_on = (*json)["SciFiKalmanOn"].asBool();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -90,8 +91,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
-        if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          track_fit(*event);
+        if ( _kalman_on ) {
+          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+            track_fit(*event);
+          }
         }
         print_event_info(*event);
       }

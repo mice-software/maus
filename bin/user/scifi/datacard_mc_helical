@@ -23,7 +23,7 @@ on_error = 'none' # none, halt or raise
 keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
-keep_tracks = False # set to true to keep start and end point of every track
+keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
@@ -43,7 +43,7 @@ muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
-geant4_visualisation = False
+geant4_visualisation = True
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.
@@ -69,7 +69,7 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":5, # number of coin tosses
+    "binomial_n":2, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
@@ -125,6 +125,7 @@ SciFiNPECut = 2
 SciFiClustExcept = 100
 SciFiHelicalPROn = 1
 SciFiStraightPROn = 0
+SciFiKalmanOn = False
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads

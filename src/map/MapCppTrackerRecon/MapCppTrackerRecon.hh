@@ -139,6 +139,7 @@ class MapCppTrackerRecon {
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
+  bool _kalman_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 
