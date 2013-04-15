@@ -22,6 +22,8 @@
 // C headers
 #include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
+#include <iostream>
+#include <fstream>
 
 // C++ headers
 #include <string>
@@ -97,19 +99,29 @@ class KalmanTrackFit {
    */
   void FilterVirtual(KalmanSite &a_site);
 
-  /** @brief 
+  /** @brief
    *
-   *  In other words, it makes the filtered states equal to the projected ones.
+   *  Performs a misalignment search.
    *
    */
   void LaunchMisaligmentSearch(KalmanTrack *track,
                                std::vector<KalmanSite> &sites,
                                KalmanSciFiAlignment &kalman_align);
 
+  /** @brief
+   *
+   *  Saves the KalmanTrack to an output SciFiTrack.
+   *
+   */
   void Save(const KalmanTrack *kalman_track,
             std::vector<KalmanSite> sites,
             SciFiEvent &event);
 
+  /** @brief
+   *
+   *  Prints some info about the filtering status.
+   *
+   */
   void DumpInfo(std::vector<KalmanSite> const &sites);
 
  private:

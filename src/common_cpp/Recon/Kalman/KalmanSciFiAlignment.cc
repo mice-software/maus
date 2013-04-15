@@ -15,44 +15,48 @@
  *
  */
 
-// TODO: Find a proper way to save
-//       misalignments and respective errors.
+// TODO: Find a better way to save
+//       misalignments and respective errors?
+//       The current implementation creates a set of TGraphs,
+//       where each TGraph stores the misalignment evaluation (x & y) at each
+//       iteration. Obviously there are other ways of recording this.
+//       The one chosen makes it easy to save and browse, but requires a lot
+//       of repetitive coding, hence the legth of this file.
 //
 
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
 
 namespace MAUS {
 
-KalmanSciFiAlignment::KalmanSciFiAlignment() {
-/* : file(0),
-                                               rootfile(0),
-                                               station1_x(0),
-                                               station2_x(0),
-                                               station3_x(0),
-                                               station4_x(0),
-                                               station5_x(0),
-                                               station6_x(0),
-                                               station7_x(0),
-                                               station8_x(0),
-                                               station9_x(0),
-                                               station10_x(0)
-*/
+KalmanSciFiAlignment::KalmanSciFiAlignment()
+  : _file("SciFiMisalignments"),
+    _rootfile(0),
+    station1_x(0), station1_y(0),
+    station2_x(0), station2_y(0),
+    station3_x(0), station3_y(0),
+    station4_x(0), station4_y(0),
+    station5_x(0), station5_y(0),
+    station6_x(0), station6_y(0),
+    station7_x(0), station7_y(0),
+    station8_x(0), station8_y(0),
+    station9_x(0), station9_y(0),
+    station10_x(0), station10_y(0) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  file = "SciFiMisalignments";
-  fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  _fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+_file;
 
   for ( int i = 0; i < 30; ++i ) {
-    shifts_array[i].     ResizeTo(3, 1);
-    covariance_shifts[i].ResizeTo(3, 3);
-    shifts_array[i].     Zero();
-    covariance_shifts[i].Zero();
+    _shifts_array[i].     ResizeTo(3, 1);
+    _covariance_shifts[i].ResizeTo(3, 3);
+    _shifts_array[i].     Zero();
+    _covariance_shifts[i].Zero();
   }
+  std::cerr << "default construct" << std::endl;
 }
 
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
 
 bool KalmanSciFiAlignment::LoadMisaligments() {
-  std::ifstream inf(fname.c_str());
+  std::ifstream inf(_fname.c_str());
   if (!inf) {
     throw(Squeal(Squeal::recoverable,
           "Could not load misalignments.",
@@ -85,9 +89,9 @@ bool KalmanSciFiAlignment::LoadMisaligments() {
     shifts(0, 0) = xd;
     shifts(1, 0) = yd;
     shifts(2, 0) = zd;
-    shifts_array[site_id]   = shifts;
-    shifts_array[site_id+1] = shifts;
-    shifts_array[site_id+2] = shifts;
+    _shifts_array[site_id]   = shifts;
+    _shifts_array[site_id+1] = shifts;
+    _shifts_array[site_id+2] = shifts;
     // Their covariance.
     TMatrixD cov_s(3, 3);
     cov_s(0, 0) = s_xx;
@@ -99,9 +103,9 @@ bool KalmanSciFiAlignment::LoadMisaligments() {
     cov_s(2, 0) = s_zx;
     cov_s(2, 1) = s_zy;
     cov_s(2, 2) = s_zz;
-    covariance_shifts[site_id]   = cov_s;
-    covariance_shifts[site_id+1] = cov_s;
-    covariance_shifts[site_id+2] = cov_s;
+    _covariance_shifts[site_id]   = cov_s;
+    _covariance_shifts[site_id+1] = cov_s;
+    _covariance_shifts[site_id+2] = cov_s;
   }
 
   inf.close();
@@ -115,7 +119,7 @@ void KalmanSciFiAlignment::Update(KalmanSite site) {
 }
 
 void KalmanSciFiAlignment::Save() {
-  std::ofstream file_out(fname.c_str());
+  std::ofstream file_out(_fname.c_str());
   // Write shifts.
   file_out << "# station" << "\t" << "xd" << "\t"
            << "s_xd_xd" << "\t" << "s_xd_yd" << "\t"
@@ -136,18 +140,18 @@ void KalmanSciFiAlignment::Save() {
   for ( int station = 2; station < 5; station++ ) {
       int site_i = 3*(station)-1; // j==5 || j==8 || j==11
       file_out << station << "\t"
-      << shifts_array[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 1) << "\t"
-      << covariance_shifts[site_i](0, 2) << "\t"
-      << shifts_array[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 1) << "\t"
-      << covariance_shifts[site_i](1, 2) << "\t"
-      << shifts_array[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 1) << "\t"
-      << covariance_shifts[site_i](2, 2) << "\n";
+      << _shifts_array[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 1) << "\t"
+      << _covariance_shifts[site_i](0, 2) << "\t"
+      << _shifts_array[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 1) << "\t"
+      << _covariance_shifts[site_i](1, 2) << "\t"
+      << _shifts_array[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 1) << "\t"
+      << _covariance_shifts[site_i](2, 2) << "\n";
   }
       file_out << 5 << "\t"
       << 0. << "\t"
@@ -168,18 +172,18 @@ void KalmanSciFiAlignment::Save() {
   for ( int station = 7; station < 10; station++ ) {
       int site_i = 3*(station)-1;
       file_out << station << "\t"
-      << shifts_array[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 1) << "\t"
-      << covariance_shifts[site_i](0, 2) << "\t"
-      << shifts_array[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 1) << "\t"
-      << covariance_shifts[site_i](1, 2) << "\t"
-      << shifts_array[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 1) << "\t"
-      << covariance_shifts[site_i](2, 2) << "\n";
+      << _shifts_array[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 1) << "\t"
+      << _covariance_shifts[site_i](0, 2) << "\t"
+      << _shifts_array[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 1) << "\t"
+      << _covariance_shifts[site_i](1, 2) << "\t"
+      << _shifts_array[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 1) << "\t"
+      << _covariance_shifts[site_i](2, 2) << "\n";
   }
       file_out << 10 << "\t"
       << 0. << "\t"
@@ -191,88 +195,85 @@ void KalmanSciFiAlignment::Save() {
 
   file_out.close();
 
-  SaveToHistogram();
+  SaveToRootFile();
 }
 
-void KalmanSciFiAlignment::SaveToHistogram() {
-/*
+void KalmanSciFiAlignment::SaveToRootFile() {
   for ( int id = 0; id < 30; id+=3 ) {
     if ( id == 0 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd = shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station1_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station1_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 3 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station2_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station2_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 6 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station3_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station3_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 9 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station4_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station4_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 12 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station5_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station5_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 15 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station6_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station6_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 18 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station7_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station7_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 21 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station8_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station8_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 24 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station9_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station9_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
     if ( id == 27 ) {
-      double xd = shifts_array[id](0, 0);
-      double yd =shifts_array[id](1, 0);
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station10_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station10_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
   }
-*/
 }
 
 void KalmanSciFiAlignment::CloseRootFile() {
-/*
   station1_x->Write("", TObject::kOverwrite);
   station2_x->Write("", TObject::kOverwrite);
   station3_x->Write("", TObject::kOverwrite);
@@ -293,63 +294,38 @@ void KalmanSciFiAlignment::CloseRootFile() {
   station8_y->Write("", TObject::kOverwrite);
   station9_y->Write("", TObject::kOverwrite);
   station10_y->Write("", TObject::kOverwrite);
-*/
-/*
-  TMultiGraph *mg = new TMultiGraph("multigraph", "multigraph");
-  mg->SetMaximum(1.);
-  mg->SetMinimum(-3.);
-  station2_x->SetLineColor(kBlack);
-  station2_x->SetLineWidth(2);
-  station3_x->SetLineColor(kBlue);
-  station3_x->SetLineWidth(2);
-  station4_x->SetLineColor(kRed);
-  station4_x->SetLineWidth(2);
-  station2_y->SetLineColor(kBlack);
-  station2_y->SetLineWidth(2);
-  station2_y->SetLineStyle(9);
-  station3_y->SetLineColor(kBlue);
-  station3_y->SetLineWidth(2);
-  station3_y->SetLineStyle(9);
-  station4_y->SetLineColor(kRed);
-  station4_y->SetLineWidth(2);
-  station4_y->SetLineStyle(9);
-  mg->Add(station2_x);
-  mg->Add(station3_x);
-  mg->Add(station4_x);
-  mg->Add(station2_y);
-  mg->Add(station3_y);
-  mg->Add(station4_y);
-  mg->SetMaximum(1.);
-  mg->SetMinimum(-3.);
-  mg->Write("", TObject::kOverwrite);
-*/
-  // rootfile->Close();
+
+  _rootfile->Close();
 }
 
-void KalmanSciFiAlignment::SetRootOutput() {
-/*
-  rootfile = new TFile("misalignments.root", "UPDATE");
-  station1_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station1"));
+void KalmanSciFiAlignment::SetUpRootOutput() {
+  //
+  // Sets up a root file containing a TGraphs which monitor
+  // the misalignment search. If an outfile already exists,
+  // we will append to it.
+  //
+  _rootfile = new TFile("misalignments.root", "UPDATE");
+  station1_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station1"));
   if ( station1_x ) {
-    station2_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station2"));
-    station3_x      = reinterpret_cast<TGraph*> (rootfile->Get("xd_station3"));
-    station4_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station4"));
-    station5_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station5"));
-    station6_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station6"));
-    station7_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station7"));
-    station8_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station8"));
-    station9_x            = reinterpret_cast<TGraph*> (rootfile->Get("xd_station9"));
-    station10_x           = reinterpret_cast<TGraph*> (rootfile->Get("xd_station10"));
-    station1_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station1"));
-    station2_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station2"));
-    station3_y      = reinterpret_cast<TGraph*> (rootfile->Get("yd_station3"));
-    station4_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station4"));
-    station5_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station5"));
-    station6_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station6"));
-    station7_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station7"));
-    station8_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station8"));
-    station9_y            = reinterpret_cast<TGraph*> (rootfile->Get("yd_station9"));
-    station10_y           = reinterpret_cast<TGraph*> (rootfile->Get("yd_station10"));
+    station2_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station2"));
+    station3_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station3"));
+    station4_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station4"));
+    station5_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station5"));
+    station6_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station6"));
+    station7_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station7"));
+    station8_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station8"));
+    station9_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station9"));
+    station10_x     = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station10"));
+    station1_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station1"));
+    station2_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station2"));
+    station3_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station3"));
+    station4_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station4"));
+    station5_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station5"));
+    station6_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station6"));
+    station7_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station7"));
+    station8_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station8"));
+    station9_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station9"));
+    station10_y     = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station10"));
   } else {
     station1_x = new TGraph();
     station1_x->SetName("xd_station1");
@@ -392,7 +368,6 @@ void KalmanSciFiAlignment::SetRootOutput() {
     station10_y = new TGraph();
     station10_y->SetName("yd_station10");
   }
-*/
 }
 
 } // ~namespace MAUS

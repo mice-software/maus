@@ -39,12 +39,6 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
   _trackpoints = a_track.scifitrackpoints();
-/*
-  _scifitrackpoints.resize(a_track._scifitrackpoints.size());
-  for (unsigned int i = 0; i < a_track._scifitrackpoints.size(); ++i) {
-    _scifitrackpoints[i] = a_track._scifitrackpoints[i];
-  }
-*/
 }
 
 SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
@@ -72,6 +66,13 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     return *this;
 }
 
-SciFiTrack::~SciFiTrack() {}
+SciFiTrack::~SciFiTrack() {
+  // Delete track points in this track.
+  std::vector<SciFiTrackPoint*>::iterator track_point;
+  for (track_point = _trackpoints.begin();
+       track_point!= _trackpoints.end(); ++track_point) {
+    delete (*track_point);
+  }
+}
 
 } // ~namespace MAUS

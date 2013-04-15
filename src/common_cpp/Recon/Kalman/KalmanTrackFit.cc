@@ -17,13 +17,9 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 
-#include <iostream>
-#include <fstream>
-
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.),
-                                  _update_misalignments(false) {
+KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.) {
   //
   // Get Configuration values.
   //
@@ -205,13 +201,25 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
 void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
                                                std::vector<KalmanSite> &sites,
                                                KalmanSciFiAlignment &kalman_align) {
-  // kalman_align.SetRootOutput();
+  //
+  // Set up the ROOT output file where we save progress
+  // in TGraphs.
+  //
+  kalman_align.SetUpRootOutput();
+  //
+  // Get the current track smoothed Chi2.
+  //
   double old_track_chi2 = track->s_chi2();
+  //
+  // Fit excluding a station.
+  //
   for ( int station_i = 2; station_i < 5; ++station_i ) {
     std::vector<KalmanSite> sites_copy(sites);
     // Fit without station i.
     RunFilter(track, sites_copy, station_i);
     track->ComputeChi2(sites_copy);
+    // Store new misalignment IF Chi2 of the track improves when
+    // we run the filter without the station.
     double new_track_chi2 = track->s_chi2();
     if ( new_track_chi2 < old_track_chi2 ) {
       // Compute inovation in local misalignments when station is removed.
@@ -220,8 +228,8 @@ void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
       kalman_align.Update(sites_copy[site_i]);
     }
   }
-  // kalman_align.CloseRootFile();
   kalman_align.Save();
+  kalman_align.CloseRootFile();
 }
 
 void KalmanTrackFit::FilterVirtual(KalmanSite &a_site) {
