@@ -50,7 +50,6 @@ KalmanSciFiAlignment::KalmanSciFiAlignment()
     _shifts_array[i].     Zero();
     _covariance_shifts[i].Zero();
   }
-  std::cerr << "default construct" << std::endl;
 }
 
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}

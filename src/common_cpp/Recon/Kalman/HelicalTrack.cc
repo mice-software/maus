@@ -96,8 +96,8 @@ void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
   // @x/@my
   _F(0, 3) = (cosine-1.)/(kappa*a);
   // @x/@kappa
-  _F(0, 4) = - (1./kappa2)*(mx*sine/a - my*(1.-cosine)/a)
-             + (1./kappa) *(mx*deltaZ*cosine - my*deltaZ*sine);
+  // _F(0, 4) = - (1./kappa2)*(mx*sine/a - my*(1.-cosine)/a)
+  //            + (1./kappa) *(mx*deltaZ*cosine - my*deltaZ*sine);
 
   // @mx/@x
   _F(1, 0) = 0.;
@@ -108,7 +108,7 @@ void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
   // @mx/@my
   _F(1, 3) = -sine;
   // @mx/@kappa
-  _F(1, 4) = -mx*a*deltaZ*sine - my*a*deltaZ*cosine;
+  // _F(1, 4) = -mx*a*deltaZ*sine - my*a*deltaZ*cosine;
 
   // @y/@x
   _F(2, 0) = 0.;
@@ -119,8 +119,8 @@ void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
   // @y/@my
   _F(2, 3) = sine/(kappa*a);
   // @y/@kappa
-  _F(2, 4) =  - (1./kappa2)*(my*sine/a - mx*(1.-cosine)/a)
-              + (1./kappa) *(my*deltaZ*cosine - mx*deltaZ*sine);
+  // _F(2, 4) =  - (1./kappa2)*(my*sine/a - mx*(1.-cosine)/a)
+  //            + (1./kappa) *(my*deltaZ*cosine - mx*deltaZ*sine);
 
   // @my/@x
   _F(3, 0) = 0.;
@@ -131,7 +131,7 @@ void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
   // @my/@my
   _F(3, 3) = cosine;
   // @my/@kappa
-  _F(3, 4) = -my*a*deltaZ*sine + mx*a*deltaZ*cosine;
+  // _F(3, 4) = -my*a*deltaZ*sine + mx*a*deltaZ*cosine;
 
   // @kappa/@x
   _F(4, 0) = 0.;
