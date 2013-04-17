@@ -69,7 +69,7 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":2, # number of coin tosses
+    "binomial_n":1, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated

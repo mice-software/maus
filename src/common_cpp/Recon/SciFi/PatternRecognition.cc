@@ -596,7 +596,10 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         } // ~Loop over intermediate stations
 
         // Check we have enough stations with sp that have passed the road cuts to make the track
-        if ( static_cast<int>(best_sp.size()) != n_points - 3) continue;
+        if ( static_cast<int>(best_sp.size()) != n_points - 3) {
+          if ( _debug > 0 ) std::cerr << "Not enough spoints passed road cuts" << std::endl;
+          continue;
+        }
 
         // Add the other spacepoints currently being considerd to the good_spnts vector
         if ( good_spnts.size() < 1 )
