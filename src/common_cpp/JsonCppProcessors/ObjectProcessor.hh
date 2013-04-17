@@ -24,6 +24,7 @@
 #include "json/json.h"
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
+#include "src/common_cpp/JsonCppProcessors/TRefArrayProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/BaseItem.hh"
 
 namespace MAUS {
@@ -128,8 +129,6 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  MyProcessor<Child>, NOT MyProcess<Child*>
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param child_processor processor that will be used to convert the
-     *  representation of the child types
      *  @param GetMethod callback that will return a pointer to the child data,
      *  where memory is still owned by the ParentType
      *  @param SetMethod callback that will set a pointer to the child data,
@@ -142,12 +141,69 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      */
     template <class ChildType>
     void RegisterPointerReference(std::string branch_name,
-                    ProcessorBase<ChildType>* child_processor,
                     ChildType* (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType* value),
                     bool is_required);
 
-    /** Register a branch for processing where the data is stored by value.
+    /** Register a ROOT TRef for processing, which contains a pointer
+     *  to memory owned by another class in the tree.
+     *
+     *  We only convert the address and assume that the value is
+     *  passed elsewhere in the tree as a PointerBranch.
+     *  
+     *  Pointers are resolved after all other processing is
+     *  complete. To be stored in a TRef, a data member must inherit
+     *  from TObject.  This removes the need to template this method,
+     *  as all pointers can be resolved as TObjects.
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param GetMethod callback that will return a pointer to the child data,
+     *  where memory is still owned by the ParentType
+     *  @param SetMethod callback that will set a pointer to the child data,
+     *  where memory is owned by the PointerBranch parent
+     *  @param is_required if the branch doesnt exist in json, is None in json,
+     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  the branch to NULL/None as appropriate
+     *item
+     *  Note: don't forget Get method has to be const
+     */
+    void RegisterTRef(std::string branch_name,
+                      TRef (ObjectType::*GetMethod)() const,
+                      void (ObjectType::*SetMethod)(TRef value),
+                      bool is_required);
+
+    /** Register a ROOT TRefArray for processing, which contains a
+     *  pointer to memory owned by another class in the tree.
+     *
+     *  We only convert the address and assume that the values are
+     *  passed elsewhere in the tree as a PointerBranch.
+     *  
+     *  References are resolved after all other processing is
+     *  complete. Memory is assumed to be owned by the ParentType of
+     *  the RegisterPointerBranch, NOT the ParentType of this
+     *  RegisterTRefArray.  All objects referenced this way must
+     *  inherit from TObject.  This is required by the associated ROOT
+     *  code, but also helpful, as it removes the need for templating
+     *  the ChildType.
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param GetMethod callback that will return a pointer to the TRefArray,
+     *  which contains references to memory still owned by the ParentType
+     *  @param SetMethod callback that will set a pointer to the TRefArray,
+     *  where memory is owned by the PointerBranch parent
+     *  @param is_required if the branch doesnt exist in json, is None in json,
+     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  the branch to NULL/None as appropriate
+     *item
+     *  Note: don't forget Get method has to be const
+     */
+    void RegisterTRefArray(std::string branch_name,
+                           TRefArrayProcessor* child_processor,
+                           TRefArray* (ObjectType::*GetMethod)() const,
+                           void (ObjectType::*SetMethod)(TRefArray* value),
+                           bool is_required);
+
+  /** Register a branch for processing where the data is stored by value.
      *
      *  @tparam ChildType of the child object referenced by the branch. Should
      *  use the actual type even if the target is a pointer
@@ -170,6 +226,27 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     ChildType (ObjectType::*GetMethod)() const,
                     void (ObjectType::*SetMethod)(ChildType value),
                     bool is_required);
+
+    /** Register a branch for processing where the data is the base class component of a derived class.
+     *
+     *  @tparam ChildType The base class, which must have it's own processor.
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param child_processor processor that will be used to convert the
+     *  representation of the child types
+     *  @param SetMethod callback that will set the value of the child data
+     *  associated with this branch
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     *
+     *  Note: A Get method is not required, as the inherited class
+     *        will be passed through to the relevant processor.
+     */
+    template <class ChildType>
+    void RegisterBaseClass(std::string branch_name,
+                           ProcessorBase<ChildType>* child_processor,
+                           void (ChildType::*SetMethod)(ChildType value),
+                           bool is_required);
 
     /** Register a branch for processing, where json value is always the same
      *

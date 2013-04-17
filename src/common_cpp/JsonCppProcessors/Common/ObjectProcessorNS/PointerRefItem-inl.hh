@@ -28,12 +28,11 @@ namespace ObjectProcessorNS {
 template <class ParentType, class ChildType>
 PointerRefItem<ParentType, ChildType>::PointerRefItem(
                    std::string branch_name,
-                   ProcessorBase<ChildType>* child_processor,
                    GetMethod getter,
                    SetMethod setter,
                    bool is_required)
     : BaseItem<ParentType>(), _branch(branch_name),
-      _processor(child_processor), _setter(setter),
+      _setter(setter),
       _getter(getter), _required(is_required) {
 }
 

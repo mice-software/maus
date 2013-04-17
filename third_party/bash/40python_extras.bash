@@ -6,14 +6,19 @@
 # (which has a wider range of dependencies pre-packed)
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
-download_package_list="anyjson kombu suds validictory nose==1.1 nose-exclude  \
+download_package_list="\
+ anyjson python-dateutil>=1.5,<2.0 billiard amqp>=1.0.8,<1.1.0 kombu \
+ logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery \
- pymongo scons readline numpy==1.5 matplotlib logilab-common \
- amqp>=1.0.8,<1.1.0 python-dateutil>=1.5,<2.0"
-package_list="anyjson python-dateutil billiard amqp kombu logilab-common \
- logilab-astng suds validictory nose nose-exclude coverage  \
- ipython doxypy pylint bitarray celery \
- pymongo scons readline numpy matplotlib"
+ pymongo scons readline numpy==1.5 matplotlib \
+"
+# these are the packages to install - note the version dependencies
+package_list="\
+ anyjson python-dateutil billiard amqp kombu \
+ logilab-common logilab-astng  suds validictory nose nose-exclude \
+ coverage ipython doxypy pylint bitarray celery \
+ pymongo scons readline numpy matplotlib \
+"
 module_test_list="suds validictory nose coverage \
  pylint numpy bitarray matplotlib celery \
  pymongo"
@@ -26,7 +31,7 @@ binary_test_list="scons"
 if [ "$1" ]; then
     echo "INFO: Attempting to pack eggs for distribution"
     cd $egg_source
-    rm *
+    rm -r *
     for package in $download_package_list
     do
         easy_install -zmaxeb . $package

@@ -21,8 +21,12 @@
 #include "src/common_cpp/JsonCppProcessors/RunFooterProcessor.hh"
 
 namespace MAUS {
-RunFooter* JsonCppRunFooterConverter::_convert(const Json::Value* data) const {
-  return RunFooterProcessor().JsonToCpp(*data);
+RunFooterData* JsonCppRunFooterConverter::_convert(
+    const Json::Value* data) const {
+  RunFooter* run_header = RunFooterProcessor().JsonToCpp(*data);
+  RunFooterData* data_cpp = new RunFooterData();
+  data_cpp->SetEvent(run_header);
+  return data_cpp;
 }
 }
 
