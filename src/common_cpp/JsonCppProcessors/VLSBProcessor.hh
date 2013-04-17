@@ -47,17 +47,8 @@ class VLSBProcessor : public ObjectProcessor<VLSB> {
     VLSBProcessor();
 
   private:
-    StringProcessor _detector_proc;
-    IntProcessor _equip_type_proc;
-    IntProcessor _time_stamp_proc;
-    IntProcessor _phys_event_number_proc;
-    IntProcessor _bank_id_proc;
-    IntProcessor _adc_proc;
-    IntProcessor _part_event_number_proc;
-    IntProcessor _channel_proc;
-    IntProcessor _tdc_proc;
-    IntProcessor _discriminator_proc;
-    IntProcessor _ldc_id_proc;
+    StringProcessor _string_proc;
+    IntProcessor _int_proc;
 };
 }  // namespace MAUS
 

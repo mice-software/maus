@@ -19,84 +19,119 @@
 
 namespace MAUS {
 
-HelicalTrack::HelicalTrack() {
+HelicalTrack::HelicalTrack(bool MCS,
+                           bool Eloss) : KalmanTrack(MCS, Eloss) {
   _n_parameters = 5;
 }
 
 HelicalTrack::~HelicalTrack() {}
 
-void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) {
+void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) {
+  // Find dz (mm).
+  double new_z = new_site->z();
+  double old_z = old_site->z();
+  double deltaZ = (new_z-old_z);
+
+  // Get old state vector...
+  TMatrixD old_a = old_site->a(KalmanSite::Filtered);
+  double old_x      = old_a(0, 0);
+  double old_mx     = old_a(1, 0);
+  double old_y      = old_a(2, 0);
+  double old_my     = old_a(3, 0);
+  double old_kappa  = old_a(4, 0);
+
+  double a = -0.2998*_particle_charge*_B_field;
+  double sine   = sin(a*deltaZ*old_kappa);
+  double cosine = cos(a*deltaZ*old_kappa);
+
+  double new_x  = old_x + (1./old_kappa)*( old_mx*sine/a - old_my*(1.-cosine)/a);
+  double new_mx = old_mx*cosine - old_my*sine;
+  double new_y  = old_y + (1./old_kappa)*( old_my*sine/a + old_mx*(1.-cosine)/a);
+  double new_my = old_my*cosine + old_mx*sine;
+
+  TMatrixD a_projected(_n_parameters, 1);
+  a_projected(0, 0) = new_x;
+  a_projected(1, 0) = new_mx;
+  a_projected(2, 0) = new_y;
+  a_projected(3, 0) = new_my;
+  a_projected(4, 0) = old_kappa;
+
+  new_site->set_a(a_projected, KalmanSite::Projected);
+
+  UpdatePropagator(old_site, new_site);
+}
+
+void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
+                                     const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
   // Find dz.
-  double new_z = new_site->get_z();
-  double old_z = old_site->get_z();
+  double new_z = new_site->z();
+  double old_z = old_site->z();
 
-  double deltaZ = (new_z-old_z); // deltaZ in mm
+  // Delta Z in mm
+  double deltaZ = (new_z-old_z);
 
-  // Get old state vector...
-  TMatrixD prev_site(5, 1);
-  prev_site = old_site->get_a(KalmanSite::Filtered);
+  // Get current state vector...
+  TMatrixD site = new_site->a(KalmanSite::Projected);
+  double mx     = site(1, 0);
+  double my     = site(3, 0);
+  double kappa  = site(4, 0);
+  double kappa2 = TMath::Power(kappa, 2.);
 
-  double old_kappa = prev_site(4, 0);
-  double old_mx = prev_site(1, 0);
-  double old_my = prev_site(3, 0);
+  // constant in units MeV/mm
+  double a = -0.2998*_particle_charge*_B_field;
 
-  double Q = 1.;
-  double B = -4.;
-  double a = -0.2998*Q*B; // MeV/mm
-
-  double sine = sin(a*deltaZ*old_kappa);
-  double cosine = cos(a*deltaZ*old_kappa);
+  // Define factors to be used in the matrix.
+  double sine   = sin(a*deltaZ*kappa);
+  double cosine = cos(a*deltaZ*kappa);
 
   // @x/@x
   _F(0, 0) = 1.;
-  // @x/@px
-  _F(0, 1) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
+  // @x/@mx
+  _F(0, 1) = sine/(kappa*a);
   // @x/@y
   _F(0, 2) = 0.;
-  // @x/@py
-  _F(0, 3) = -(1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
+  // @x/@my
+  _F(0, 3) = (cosine-1.)/(kappa*a);
   // @x/@kappa
-  _F(0, 4) = 0.0;
-  // (-1./(old_kappa*old_kappa))*(old_mx*sine/a-old_my/a+old_my*cosine/a) +
-  //           (1./old_kappa)*(old_mx*deltaZ*cosine-old_my*deltaZ*sine);
+  // _F(0, 4) = - (1./kappa2)*(mx*sine/a - my*(1.-cosine)/a)
+  //            + (1./kappa) *(mx*deltaZ*cosine - my*deltaZ*sine);
 
-  // @px/@x
+  // @mx/@x
   _F(1, 0) = 0.;
-  // @px/@px
-  _F(1, 1) = cos(a*deltaZ*old_kappa);
-  // @px/@y
+  // @mx/@mx
+  _F(1, 1) = cosine;
+  // @mx/@y
   _F(1, 2) = 0.;
-  // @px/@py
-  _F(1, 3) = -sin(a*deltaZ*old_kappa);
-  // @px/@kappa
-  _F(1, 4) = 0.;
+  // @mx/@my
+  _F(1, 3) = -sine;
+  // @mx/@kappa
+  // _F(1, 4) = -mx*a*deltaZ*sine - my*a*deltaZ*cosine;
 
   // @y/@x
   _F(2, 0) = 0.;
-  // @y/@px
-  _F(2, 1) = (1.-cos(a*deltaZ*old_kappa))/(old_kappa*a);
+  // @y/@mx
+  _F(2, 1) = (1.-cosine)/(kappa*a);
   // @y/@y
   _F(2, 2) = 1.;
-  // @y/@py
-  _F(2, 3) = sin(a*deltaZ*old_kappa)/(old_kappa*a);
+  // @y/@my
+  _F(2, 3) = sine/(kappa*a);
   // @y/@kappa
-  _F(2, 4) = 0.0;
-  // (-1./(old_kappa*old_kappa))*(old_my*sine/a+old_mx/a-old_mx*cosine/a) +
-  //           (1./old_kappa)*(old_my*deltaZ*cosine+old_mx*deltaZ*sine);
+  // _F(2, 4) =  - (1./kappa2)*(my*sine/a - mx*(1.-cosine)/a)
+  //            + (1./kappa) *(my*deltaZ*cosine - mx*deltaZ*sine);
 
-  // @py/@x
+  // @my/@x
   _F(3, 0) = 0.;
-  // @py/@px
-  _F(3, 1) = sin(a*deltaZ*old_kappa);
-  // @py/@y
+  // @py/@mx
+  _F(3, 1) = sine;
+  // @my/@y
   _F(3, 2) = 0.;
-  // @py/@py
-  _F(3, 3) = cos(a*deltaZ*old_kappa);
-  // @py/@kappa
-  _F(3, 4) = 0.;
+  // @my/@my
+  _F(3, 3) = cosine;
+  // @my/@kappa
+  // _F(3, 4) = -my*a*deltaZ*sine + mx*a*deltaZ*cosine;
 
   // @kappa/@x
   _F(4, 0) = 0.;
@@ -109,24 +144,5 @@ void HelicalTrack::update_propagator(const KalmanSite *old_site, const KalmanSit
   // @kappa/@kappa
   _F(4, 4) = 1.;
 }
-
-/*
-void HelicalTrack::calc_system_noise(KalmanSite *old_site, KalmanSite *new_site) {
-  TMatrixD a(5, 1);
-  a = old_site->get_a();
-  Double_t kappa = a(4, 0);
-  Double_t conv_factor = kappa*kappa;
-
-  KalmanTrack::calc_system_noise(old_site, new_site);
-
-  TMatrixD Q(5, 5);
-  Q = get_Q();
-  // Q.Print();
-  Q *= conv_factor;
-  // Q.Print();
-  // Q.Zero();
-  set_Q(Q);
-}
-*/
 
 } // ~namespace MAUS

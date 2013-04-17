@@ -238,7 +238,7 @@ SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiUpdateMisalignments = False # Do Misalignment Search & Update
-
+SciFiKalmanVerbose  = False # Dump information per fitted track
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/

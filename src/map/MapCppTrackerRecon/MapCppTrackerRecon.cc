@@ -15,24 +15,16 @@
  *
  */
 
+
 #include <algorithm>
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
-
-#include "Riostream.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "TGraphErrors.h"
-#include "TDecompChol.h"
-#include "TDecompSVD.h"
-#include "TF1.h"
 
 namespace MAUS {
 
@@ -61,7 +53,6 @@ bool MapCppTrackerRecon::death() {
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
-  std::cout << "Reconstructing tracker data\n";
   Json::FastWriter writer;
 
   // Read in json data
@@ -166,28 +157,33 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->build(evt.helicalprtracks()[track_i]);
+    seed->Build(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->build(evt.straightprtracks()[track_i]);
+    seed->Build(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   if ( seeds.size() ) {
     KalmanTrackFit fit;
-    fit.process(seeds, evt);
+    fit.Process(seeds, evt);
   }
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cout << event.digits().size() << " "
+  std::cerr << event.digits().size() << " "
             << event.clusters().size() << " "
             << event.spacepoints().size() << "; "
             << event.straightprtracks().size() << " "
-            << event.helicalprtracks().size() << " " << std::endl;
+            << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+              << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  std::cerr << std::endl;
 }
 
 } // ~namespace MAUS

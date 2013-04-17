@@ -384,19 +384,19 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->build(evt.helicalprtracks()[track_i]);
+    seed->Build(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->build(evt.straightprtracks()[track_i]);
+    seed->Build(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   if ( seeds.size() ) {
     KalmanTrackFit fit;
-    fit.process(seeds, evt);
+    fit.Process(seeds, evt);
   }
 }
 

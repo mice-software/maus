@@ -36,36 +36,40 @@ class KalmanSeed {
 
   ~KalmanSeed();
 
-  void build(const SciFiStraightPRTrack* pr_track);
+  void Build(const SciFiStraightPRTrack* pr_track);
 
-  void build(const SciFiHelicalPRTrack* pr_track);
+  void Build(const SciFiHelicalPRTrack* pr_track);
 
-  void process_measurements(const SciFiStraightPRTrack* pr_track);
+  void ProcessMeasurements(const SciFiStraightPRTrack* pr_track);
 
-  void process_measurements(const SciFiHelicalPRTrack* pr_track);
+  void ProcessMeasurements(const SciFiHelicalPRTrack* pr_track);
 
-  TMatrixD compute_initial_state_vector(const SciFiHelicalPRTrack* seed);
+  TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed);
 
-  TMatrixD compute_initial_state_vector(const SciFiStraightPRTrack* seed);
+  TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed);
 
-  void retrieve_clusters(std::vector<SciFiSpacePoint> &spacepoints, double &seed_pz);
+  void RetrieveClusters(std::vector<SciFiSpacePoint*> &spacepoints, double &seed_pz);
 
   bool is_helical()  const { return _helical; }
 
   bool is_straight() const { return _straight; }
 
-  std::vector<SciFiCluster*> get_clusters() const { return _clusters; }
+  std::vector<SciFiCluster*> clusters() const { return _clusters; }
 
-  TMatrixD get_initial_state_vector() const { return _a0; }
+  TMatrixD initial_state_vector() const { return _a0; }
 
   size_t is_usable() const { return _clusters.size(); }
 
-  double get_momentum() const { return _momentum; }
+  double momentum() const { return _momentum; }
+
+  std::vector<SciFiSpacePoint*> spacepoints() { return _spacepoints; }
+
+  int n_parameters() const { return _n_parameters; }
 
  private:
   std::vector<SciFiCluster*> _clusters;
 
-  std::vector<SciFiSpacePoint> _spacepoints;
+  std::vector<SciFiSpacePoint*> _spacepoints;
 
   TMatrixD _a0;
 
@@ -74,6 +78,8 @@ class KalmanSeed {
   bool _straight;
 
   bool _helical;
+
+  int _n_parameters;
 };
 
 } // ~namespace MAUS

@@ -15,7 +15,6 @@
  *
  */
 
-
 #ifndef KALMANSCIFIALIGNMENT_HH
 #define KALMANSCIFIALIGNMENT_HH
 
@@ -35,7 +34,18 @@
 
 #include "TMath.h"
 #include "TMatrixD.h"
+#include "TFile.h"
+#include "TGraph.h"
+#include "TMultiGraph.h"
+#include "TH1.h"
+#include "TF1.h"
+#include "TH2F.h"
+#include "TH1F.h"
+
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "Interface/Squeal.hh"
 #include "Config/MiceModule.hh"
 
@@ -47,32 +57,86 @@ class KalmanSciFiAlignment {
 
   ~KalmanSciFiAlignment();
 
-  bool load_misaligments();
+  /** @brief
+   *
+   *  Loads misalignment info (x, y and their covariances)
+   *  which are stored in a txt file. They are loaded into
+   *  member TMatrixD's _shifts_array and _covariance_shifts.
+   *
+   */
+  bool LoadMisaligments();
 
-  void update(std::vector<KalmanSite> sites);
+  /** @brief
+   *
+   *  Updates info stored for a given site.
+   *
+   */
+  void Update(KalmanSite site);
 
-  MiceModule* find_plane(int tracker, int station, int plane);
+  /** @brief
+   *
+   *  Saves to txt and calls SaveToRootFile.
+   *
+   */
+  void Save();
 
-  TMatrixD get_shifts(int site_id)     const { return shifts_array[site_id]; }
-  TMatrixD get_rotations(int site_id)  const { return rotations_array[site_id]; }
-  TMatrixD get_cov_shifts(int site_id) const { return covariance_shifts[site_id]; }
-  TMatrixD get_cov_rotat(int site_id)  const { return covariance_rotations[site_id]; }
+  /** @brief
+   *
+   *  Saves updates to TGraphs in the root output.
+   *
+   */
+  void SaveToRootFile();
 
-  void set_shifts(TMatrixD shifts, int site_id)        { shifts_array[site_id]        = shifts; }
-  void set_rotations(TMatrixD rotations, int site_id)  { rotations_array[site_id]     = rotations; }
-  void set_cov_shifts(TMatrixD cov_s, int site_id)     { covariance_shifts[site_id]   = cov_s; }
-  void set_cov_rotat(TMatrixD cov_r, int site_id)      { covariance_rotations[site_id]= cov_r; }
+  /** @brief
+   *
+   *  Initialises the root output file. If a root output file
+   *  already exists, it loads it and appends to it.
+   *
+   */
+  void SetUpRootOutput();
 
-  void update_site(KalmanSite *site);
+  /** @brief
+   *
+   *  Saves and cloes the root output.
+   *
+   */
+  void CloseRootFile();
+
+  TMatrixD get_shifts(int site_id)     const { return _shifts_array[site_id]; }
+
+  TMatrixD get_cov_shifts(int site_id) const { return _covariance_shifts[site_id]; }
+
+  void set_shifts(TMatrixD shifts, int site_id)        { _shifts_array[site_id]        = shifts; }
+
+  void set_cov_shifts(TMatrixD cov_s, int site_id)     { _covariance_shifts[site_id]   = cov_s; }
 
  private:
-  std::string file, fname;
+  std::string _file, _fname;
 
-  TMatrixD shifts_array[30];
-  TMatrixD rotations_array[30];
-  TMatrixD covariance_rotations[30];
-  TMatrixD covariance_shifts[30];
-  // std::vector<MiceModule*> _modules;
+  TMatrixD _shifts_array[30];
+  TMatrixD _covariance_shifts[30];
+
+  TFile  *_rootfile;
+  TGraph *station1_x;
+  TGraph *station1_y;
+  TGraph *station2_x;
+  TGraph *station2_y;
+  TGraph *station3_x;
+  TGraph *station3_y;
+  TGraph *station4_x;
+  TGraph *station4_y;
+  TGraph *station5_x;
+  TGraph *station5_y;
+  TGraph *station6_x;
+  TGraph *station6_y;
+  TGraph *station7_x;
+  TGraph *station7_y;
+  TGraph *station8_x;
+  TGraph *station8_y;
+  TGraph *station9_x;
+  TGraph *station9_y;
+  TGraph *station10_x;
+  TGraph *station10_y;
 };
 
 } // ~namespace MAUS

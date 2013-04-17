@@ -65,14 +65,11 @@ bool MapCppTrackerMCDigitization::death() {
 }
 
 std::string MapCppTrackerMCDigitization::process(std::string document) {
-
-  std::cout << "Begining tracker MC digitisation\n";
   Json::FastWriter writer;
 
   // Set up a spill object, then continue only if MC event array is initialised
   Spill spill = read_in_json(document);
   if ( spill.GetMCEvents() ) {
-    std::cout << "Found " << spill.GetMCEventSize() << " MC events\n";
   } else {
     std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
     Json::Value errors;
@@ -313,12 +310,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
   int chanNo;
 
-  if ( tracker == 0 ) {
-    // start counting from the other end
-    chanNo = static_cast<int> (floor((numberFibres-fiberNumber)/7.0));
-  } else {
-    chanNo = static_cast<int> (floor(fiberNumber/7.0));
-  }
+  chanNo = static_cast<int> (floor(fiberNumber/7.0));
 
   return chanNo;
 }

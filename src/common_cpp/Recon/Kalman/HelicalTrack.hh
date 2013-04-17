@@ -35,13 +35,38 @@
 
 namespace MAUS {
 
+/** @class HelicalTrack
+ *
+ *  @brief Models the propagation of particles in the tracker solenoidal field.
+ *
+ *  Inherits from KalmanTrack, where most of the functionality is defined.
+ *  The methods overwritten here are the ones related with particle propagation.
+ *
+ */
 class HelicalTrack : public KalmanTrack {
  public:
-  HelicalTrack();
+  /** @brief Helical Track constructor.
+   *
+   *  @param flags for use of Multiple Scattering and Eloss models.
+   */
+  HelicalTrack(bool MCS, bool Eloss);
 
+  /** @brief Destructor.
+   */
   virtual ~HelicalTrack();
 
-  void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site);
+  /** @brief Calculates the propagator (F), using Taylor expansion at current site.
+   */
+  void UpdatePropagator(const KalmanSite *old_site,
+                        const KalmanSite *new_site);
+
+  /** @brief Calculates the projected state.
+   */
+  void CalculatePredictedState(const KalmanSite *old_site,
+                               KalmanSite *new_site);
+
+ private:
+  static const double _B_field = -4.;
 };
 
 } // ~namespace MAUS

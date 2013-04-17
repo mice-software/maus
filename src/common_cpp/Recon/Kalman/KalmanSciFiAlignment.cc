@@ -15,220 +15,110 @@
  *
  */
 
-// TODO: Find a proper way to save
-//       misalignments and respective errors.
+// TODO: Find a better way to save
+//       misalignments and respective errors?
+//       The current implementation creates a set of TGraphs,
+//       where each TGraph stores the misalignment evaluation (x & y) at each
+//       iteration. Obviously there are other ways of recording this.
+//       The one chosen makes it easy to save and browse, but requires a lot
+//       of repetitive coding, hence the legth of this file.
 //
 
 #include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
 
-KalmanSciFiAlignment::KalmanSciFiAlignment() {
+KalmanSciFiAlignment::KalmanSciFiAlignment()
+  : _file("SciFiMisalignments"),
+    _rootfile(0),
+    station1_x(0), station1_y(0),
+    station2_x(0), station2_y(0),
+    station3_x(0), station3_y(0),
+    station4_x(0), station4_y(0),
+    station5_x(0), station5_y(0),
+    station6_x(0), station6_y(0),
+    station7_x(0), station7_y(0),
+    station8_x(0), station8_y(0),
+    station9_x(0), station9_y(0),
+    station10_x(0), station10_y(0) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  file = "SciFiMisalignments";
-  fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+file;
+  _fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+_file;
 
   for ( int i = 0; i < 30; ++i ) {
-    shifts_array[i].ResizeTo(3, 1);
-    shifts_array[i].Zero();
-    rotations_array[i].ResizeTo(3, 1);
-    rotations_array[i].Zero();
-
-    covariance_rotations[i].ResizeTo(3, 3);
-    covariance_rotations[i].Zero();
-    covariance_shifts[i].ResizeTo(3, 3);
-    covariance_shifts[i].Zero();
+    _shifts_array[i].     ResizeTo(3, 1);
+    _covariance_shifts[i].ResizeTo(3, 3);
+    _shifts_array[i].     Zero();
+    _covariance_shifts[i].Zero();
   }
-
-/*
-  Json::Value *json = Globals::GetConfigurationCards();
-  std::string filename;
-  filename = (*json)["reconstruction_geometry_filename"].asString();
-  MiceModule* module;
-  module = new MiceModule(filename);
-  _modules = module->findModulesByPropertyExistsNC("SensitiveDetector", "SciFi");
-*/
 }
 
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
 
-bool KalmanSciFiAlignment::load_misaligments() {
-  std::ifstream inf(fname.c_str());
+bool KalmanSciFiAlignment::LoadMisaligments() {
+  std::ifstream inf(_fname.c_str());
   if (!inf) {
     throw(Squeal(Squeal::recoverable,
           "Could not load misalignments.",
           "KalmanSciFiAlignment::load_misaligments"));
-  // std::cout << "Unable to open file " << fname << std::endl;
-  // return false;
   }
 
   std::string line;
   // Titles line.
-  double station, xd, yd, zd;
+  int station;
+  double xd, yd, zd;
   double s_xx, s_xy, s_xz;
   double s_yx, s_yy, s_yz;
   double s_zx, s_zy, s_zz;
-  double thetax, thetay, thetaz;
-  int size = 10;
-  getline(inf, line);
-  // Get shift vectors and matrices.
+  int size = 11;
 
-  for ( int line_i = 1; line_i < 11; line_i++ ) {
+  getline(inf, line);
+  for ( int line_i = 1; line_i < size; line_i++ ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
-    ist1 >> station >> xd >> s_xx >> s_xy >> s_xz
-         >> yd >> s_yx >> s_yy >> s_yz >> zd >> s_zx >> s_zy >> s_zz;
+    ist1 >> station
+         >> xd >> s_xx >> s_xy >> s_xz
+         >> yd >> s_yx >> s_yy >> s_yz
+         >> zd >> s_zx >> s_zy >> s_zz;
+
     assert(line_i == station && "SciFiMisalignments (Shifts) set up as expected.");
-    // site_id_array[site_i]= site;
-    int site_id = 3*(station-1);
-    // std::cerr << "Setting misalignment in site " << site_id << std::endl;
+    int site_id = 3*(station-1); // 0, 3, 6, 9, 12
+
+    // Shifts.
     TMatrixD shifts(3, 1);
     shifts(0, 0) = xd;
     shifts(1, 0) = yd;
     shifts(2, 0) = zd;
-    shifts_array[site_id]   = shifts;
-    shifts_array[site_id+1] = shifts;
-    shifts_array[site_id+2] = shifts;
+    _shifts_array[site_id]   = shifts;
+    _shifts_array[site_id+1] = shifts;
+    _shifts_array[site_id+2] = shifts;
+    // Their covariance.
     TMatrixD cov_s(3, 3);
     cov_s(0, 0) = s_xx;
     cov_s(0, 1) = s_xy;
     cov_s(0, 2) = s_xz;
-
     cov_s(1, 0) = s_yx;
     cov_s(1, 1) = s_yy;
     cov_s(1, 2) = s_yz;
-
     cov_s(2, 0) = s_zx;
     cov_s(2, 1) = s_zy;
     cov_s(2, 2) = s_zz;
-    covariance_shifts[site_id]   = cov_s;
-    covariance_shifts[site_id+1] = cov_s;
-    covariance_shifts[site_id+2] = cov_s;
+    _covariance_shifts[site_id]   = cov_s;
+    _covariance_shifts[site_id+1] = cov_s;
+    _covariance_shifts[site_id+2] = cov_s;
   }
 
   inf.close();
   return true;
 }
 
-void KalmanSciFiAlignment::update_site(KalmanSite *site) {
-  TMatrixD a_excluded(5, 1);
-  a_excluded = site->get_a(KalmanSite::Excluded);
-
-  TMatrixD a_smoothed(5, 1);
-  a_smoothed = site->get_a(KalmanSite::Smoothed);
-
-  double diff_x = a_excluded(0, 0) - a_smoothed(0, 0);
-  double diff_y = a_excluded(2, 0) - a_smoothed(2, 0);
-  // std::cerr << site->get_id() << " " << diff << std::endl;
-  int id = site->get_id();
-
-  // std::cerr << diff_x << std::endl;
-  std::ofstream out2("kalman_diff.txt", std::ios::out | std::ios::app);
-  out2 << id << " "<< diff_x << " " << diff_y << "\n";
-  out2.close();
-
-  TMatrixD s(3, 1);
-  s.Zero();
-  s(0, 0) = diff_x;
-  s(1, 0) = diff_y;
-  set_shifts(s, id);
-//  site->set_shifts(s);
+void KalmanSciFiAlignment::Update(KalmanSite site) {
+  int id = site.id();
+  set_shifts(site.shift(), id);
+  set_cov_shifts(site.shift_covariance(), id);
 }
 
-/*
-void KalmanSciFiAlignment::algorithm_A() {
-    for ( size_t j = 0; j < numb_measurements; ++j ) {
-      KalmanSite *site = &sites[j];
-      track->exclude_site(site);
-      kalman_align.update_site(site);
-    }
-    // update_alignment_parameters(sites, track, kalman_align);
-    // std::cerr << "Updating..." << std::endl;
-    // Update Stored misalignments using values stored in each site.
-    // kalman_align.update(sites);
-  }
-}
-
-void KalmanSciFiAlignment::algorithm_B() {
-
-
-}
-
-void KalmanTrackFit::update_alignment_parameters(std::vector<KalmanSite> &sites,
-                                                 KalmanTrack *track,
-                                                 KalmanSciFiAlignment &kalman_align) {
-  size_t numb_measurements = sites.size();
-
-  for ( size_t i = 0; i < numb_measurements; ++i ) {
-    // ... Filter...
-    std::cerr << "Updating site " << i << std::endl;
-    filter_updating_misalignments(sites, track, i);
-  }
-}
-
-void KalmanTrackFit::filter_updating_misalignments(std::vector<KalmanSite> &sites,
-                            KalmanTrack *track, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
-  KalmanSite *alignment_projection_site = NULL;
-  // Get previous site too.
-  // if ( !(current_site%3) ) {
-  int id = a_site->get_id();
-  std::cout << id << std::endl;
-  if ( !(current_site%3) ) {
-    alignment_projection_site = a_site;
-    alignment_projection_site->get_shifts().Print();
-  } else {
-    alignment_projection_site = &sites[current_site-1];
-    alignment_projection_site->get_shifts().Print();
-  }
-
-  track->update_V(a_site);
-  track->update_H(a_site);
-  track->update_W(a_site);
-  track->update_misaligments(a_site, alignment_projection_site);
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
-  int numb_sites = sites.size();
-  // Overwrite matrices with site's values.
-/*
-  for ( int site_i = 0; site_i < numb_sites; ++site_i ) {
-    KalmanSite site = sites[site_i];
-    int id = site.get_id();
-    set_shifts(site.get_shifts(), id);
-    // set_rotations(site.get_rotations(), id);
-    set_cov_shifts(site.get_S_covariance(), id);
-    // set_cov_rotat(site.get_R_covariance(), id);
-  }
-*/
-  std::ofstream file_out(fname.c_str());
+void KalmanSciFiAlignment::Save() {
+  std::ofstream file_out(_fname.c_str());
   // Write shifts.
   file_out << "# station" << "\t" << "xd" << "\t"
            << "s_xd_xd" << "\t" << "s_xd_yd" << "\t"
@@ -244,22 +134,23 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0.1 << "\t" << 0. << "\t"
       << 0. << "\t"
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
+
   // sites 2 to 29; increment 3
   for ( int station = 2; station < 5; station++ ) {
-      int site_i = 3*(station-1); // 3, 6, 9
+      int site_i = 3*(station)-1; // j==5 || j==8 || j==11
       file_out << station << "\t"
-      << shifts_array[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 1) << "\t"
-      << covariance_shifts[site_i](0, 2) << "\t"
-      << shifts_array[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 1) << "\t"
-      << covariance_shifts[site_i](1, 2) << "\t"
-      << shifts_array[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 1) << "\t"
-      << covariance_shifts[site_i](2, 2) << "\n";
+      << _shifts_array[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 1) << "\t"
+      << _covariance_shifts[site_i](0, 2) << "\t"
+      << _shifts_array[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 1) << "\t"
+      << _covariance_shifts[site_i](1, 2) << "\t"
+      << _shifts_array[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 1) << "\t"
+      << _covariance_shifts[site_i](2, 2) << "\n";
   }
       file_out << 5 << "\t"
       << 0. << "\t"
@@ -278,20 +169,20 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   for ( int station = 7; station < 10; station++ ) {
-      int site_i = 3*(station-1); // 18, 21, 24
+      int site_i = 3*(station)-1;
       file_out << station << "\t"
-      << shifts_array[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 0) << "\t"
-      << covariance_shifts[site_i](0, 1) << "\t"
-      << covariance_shifts[site_i](0, 2) << "\t"
-      << shifts_array[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 0) << "\t"
-      << covariance_shifts[site_i](1, 1) << "\t"
-      << covariance_shifts[site_i](1, 2) << "\t"
-      << shifts_array[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 0) << "\t"
-      << covariance_shifts[site_i](2, 1) << "\t"
-      << covariance_shifts[site_i](2, 2) << "\n";
+      << _shifts_array[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 0) << "\t"
+      << _covariance_shifts[site_i](0, 1) << "\t"
+      << _covariance_shifts[site_i](0, 2) << "\t"
+      << _shifts_array[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 0) << "\t"
+      << _covariance_shifts[site_i](1, 1) << "\t"
+      << _covariance_shifts[site_i](1, 2) << "\t"
+      << _shifts_array[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 0) << "\t"
+      << _covariance_shifts[site_i](2, 1) << "\t"
+      << _covariance_shifts[site_i](2, 2) << "\n";
   }
       file_out << 10 << "\t"
       << 0. << "\t"
@@ -303,37 +194,179 @@ void KalmanSciFiAlignment::update(std::vector<KalmanSite> sites) {
 
   file_out.close();
 
-/*
-  MiceModule* this_plane = NULL;
-  this_plane = find_plane(0, 3, 0);
-  assert(this_plane != NULL);
-
-  CLHEP::Hep3Vector new_position(1., 1., 1.);
-  std::cerr << this_plane->position() << std::endl;
-  this_plane->setProperty("Position", new_position);
-  std::cerr << this_plane->position() << std::endl;
-*/
+  SaveToRootFile();
 }
 
-MiceModule* KalmanSciFiAlignment::find_plane(int tracker, int station, int plane) {
-/*  MiceModule* scifi_plane = NULL;
-  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); j++ ) {
-    // Find the right module
-    if ( _modules[j]->propertyExists("Tracker", "int") &&
-         _modules[j]->propertyExists("Station", "int") &&
-         _modules[j]->propertyExists("Plane", "int")  &&
-         _modules[j]->propertyInt("Tracker") ==
-         tracker &&
-         _modules[j]->propertyInt("Station") ==
-         station &&
-         _modules[j]->propertyInt("Plane") ==
-         plane ) {
-         // Save the module
-      scifi_plane = _modules[j];
+void KalmanSciFiAlignment::SaveToRootFile() {
+  for ( int id = 0; id < 30; id+=3 ) {
+    if ( id == 0 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station1_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station1_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 3 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station2_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station2_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 6 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station3_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station3_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 9 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station4_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station4_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 12 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station5_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station5_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 15 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station6_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station6_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 18 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station7_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station7_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 21 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station8_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station8_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 24 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station9_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station9_y->SetPoint(static_cast<Int_t> (n), n, yd);
+    }
+    if ( id == 27 ) {
+      double xd = _shifts_array[id](0, 0);
+      double yd = _shifts_array[id](1, 0);
+      double n = station1_x->GetN();
+      station10_x->SetPoint(static_cast<Int_t> (n), n, xd);
+      station10_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
   }
-  return scifi_plane;
-*/
+}
+
+void KalmanSciFiAlignment::CloseRootFile() {
+  station1_x->Write("", TObject::kOverwrite);
+  station2_x->Write("", TObject::kOverwrite);
+  station3_x->Write("", TObject::kOverwrite);
+  station4_x->Write("", TObject::kOverwrite);
+  station5_x->Write("", TObject::kOverwrite);
+  station6_x->Write("", TObject::kOverwrite);
+  station7_x->Write("", TObject::kOverwrite);
+  station8_x->Write("", TObject::kOverwrite);
+  station9_x->Write("", TObject::kOverwrite);
+  station10_x->Write("", TObject::kOverwrite);
+  station1_y->Write("", TObject::kOverwrite);
+  station2_y->Write("", TObject::kOverwrite);
+  station3_y->Write("", TObject::kOverwrite);
+  station4_y->Write("", TObject::kOverwrite);
+  station5_y->Write("", TObject::kOverwrite);
+  station6_y->Write("", TObject::kOverwrite);
+  station7_y->Write("", TObject::kOverwrite);
+  station8_y->Write("", TObject::kOverwrite);
+  station9_y->Write("", TObject::kOverwrite);
+  station10_y->Write("", TObject::kOverwrite);
+
+  _rootfile->Close();
+}
+
+void KalmanSciFiAlignment::SetUpRootOutput() {
+  //
+  // Sets up a root file containing a TGraphs which monitor
+  // the misalignment search. If an outfile already exists,
+  // we will append to it.
+  //
+  _rootfile = new TFile("misalignments.root", "UPDATE");
+  station1_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station1"));
+  if ( station1_x ) {
+    station2_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station2"));
+    station3_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station3"));
+    station4_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station4"));
+    station5_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station5"));
+    station6_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station6"));
+    station7_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station7"));
+    station8_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station8"));
+    station9_x      = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station9"));
+    station10_x     = reinterpret_cast<TGraph*> (_rootfile->Get("xd_station10"));
+    station1_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station1"));
+    station2_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station2"));
+    station3_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station3"));
+    station4_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station4"));
+    station5_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station5"));
+    station6_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station6"));
+    station7_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station7"));
+    station8_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station8"));
+    station9_y      = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station9"));
+    station10_y     = reinterpret_cast<TGraph*> (_rootfile->Get("yd_station10"));
+  } else {
+    station1_x = new TGraph();
+    station1_x->SetName("xd_station1");
+    station2_x = new TGraph();
+    station2_x->SetName("xd_station2");
+    station3_x = new TGraph();
+    station3_x->SetName("xd_station3");
+    station4_x = new TGraph();
+    station4_x->SetName("xd_station4");
+    station5_x = new TGraph();
+    station5_x->SetName("xd_station5");
+    station6_x = new TGraph();
+    station6_x->SetName("xd_station6");
+    station7_x = new TGraph();
+    station7_x->SetName("xd_station7");
+    station8_x = new TGraph();
+    station8_x->SetName("xd_station8");
+    station9_x = new TGraph();
+    station9_x->SetName("xd_station9");
+    station10_x = new TGraph();
+    station10_x->SetName("xd_station10");
+    station1_y = new TGraph();
+    station1_y->SetName("yd_station1");
+    station2_y = new TGraph();
+    station2_y->SetName("yd_station2");
+    station3_y = new TGraph();
+    station3_y->SetName("yd_station3");
+    station4_y = new TGraph();
+    station4_y->SetName("yd_station4");
+    station5_y = new TGraph();
+    station5_y->SetName("yd_station5");
+    station6_y = new TGraph();
+    station6_y->SetName("yd_station6");
+    station7_y = new TGraph();
+    station7_y->SetName("yd_station7");
+    station8_y = new TGraph();
+    station8_y->SetName("yd_station8");
+    station9_y = new TGraph();
+    station9_y->SetName("yd_station9");
+    station10_y = new TGraph();
+    station10_y->SetName("yd_station10");
+  }
 }
 
 } // ~namespace MAUS

@@ -15,11 +15,6 @@
  *
  */
 
-/** @class SciFiHelicalPRTrack
- *
- *
- */
-
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFITRACK_HH_
 
@@ -30,9 +25,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-// #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-// #include "src/common_cpp/Recon/Global/Detector.hh"
-// #include "src/common_cpp/Recon/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
@@ -49,34 +42,42 @@ class SciFiTrack {
 
     SciFiTrack& operator=(const SciFiTrack &a_track);
 
-    // void add_track_points(const std::vector<KalmanSite> &sites);
-
-    int  get_tracker() const      { return _tracker; }
+    int  tracker() const      { return _tracker; }
     void set_tracker(int tracker) { _tracker = tracker; }
 
-    double get_chi2()    const   { return _chi2; }
-    void   set_chi2(double chi2) { _chi2 = chi2; }
+    double f_chi2()    const   { return _f_chi2; }
+    void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
 
-    int  get_ndf()     const   { return _ndf; }
+    double s_chi2()    const   { return _s_chi2; }
+    void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
+
+    int  ndf()     const   { return _ndf; }
     void set_ndf(int ndf)      { _ndf = ndf; }
 
-    double get_P_value()    const   { return _P_value; }
+    double P_value()    const   { return _P_value; }
     void   set_P_value(double p_value) { _P_value = p_value; }
+
+    SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
+    void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
+    void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
 
   private:
     int _tracker;
 
-    double _chi2;
+    double _f_chi2;
+
+    double _s_chi2;
 
     int _ndf;
 
     double _P_value;
 
-    ClassDef(SciFiTrack, 1)
+    SciFiTrackPointPArray _trackpoints;
+
+    MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };
 
 typedef std::vector<SciFiTrack*> SciFiTrackPArray;
-
 } // ~namespace MAUS
 
 #endif

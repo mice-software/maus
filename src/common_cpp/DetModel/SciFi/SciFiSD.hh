@@ -18,7 +18,22 @@
 #ifndef SciFiSD_h
 #define SciFiSD_h 1
 
+// C headers
+#include <cmath>
+
+// other headers
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4FieldManager.hh"
+#include "Geant4/G4Field.hh"
+#include "Geant4/G4HCofThisEvent.hh"
+#include "Geant4/G4Step.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4SDManager.hh"
+#include "Geant4/G4ios.hh"
+
 #include "json/json.h"
+#include "Interface/MICEEvent.hh"
+#include "src/legacy/Config/MiceModule.hh"
 #include "DetModel/MAUSSD.hh"
 
 /** @brief The Scintilating Fibre Sensitive Detector

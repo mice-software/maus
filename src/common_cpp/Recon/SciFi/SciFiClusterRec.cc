@@ -25,7 +25,7 @@
 
 namespace MAUS {
 
-SciFiClusterRec::SciFiClusterRec():_size_exception(0.),
+SciFiClusterRec::SciFiClusterRec():_size_exception(0),
                                    _min_npe(0.) {}
 
 // To be removed soon.
@@ -169,23 +169,16 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
   ThreeVector plane_position = this_plane->globalPosition();
+  // The displacements ARE NOT set by the MiceModules.
+  plane_position.setX(0.);
+  plane_position.setY(0.);
   ThreeVector position = dist_mm * perp + plane_position;
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
 
   tracker_ref_frame_pos = position - reference;
-  // tracker_ref_frame_pos.setX(0.);
-  // tracker_ref_frame_pos.setY(0.);
-  // ThreeVector tracker_ref_frame_pos;
-  if ( clust->get_tracker() == 0 ) {
-    tracker_ref_frame_pos = - (position - reference);
-  } else if ( clust->get_tracker() == 1 ) {
-    tracker_ref_frame_pos = position - reference;
-  }
 
   alpha = clust->get_channel() - CentralFibre;
-  if ( clust->get_tracker() == 1 ) {
-    alpha = -alpha;
-  }
+  alpha = -alpha;
 }
 
 const MiceModule* SciFiClusterRec::find_plane(int tracker, int station, int plane) {

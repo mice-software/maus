@@ -16,64 +16,63 @@
 
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
-
 namespace MAUS {
 
-SciFiTrack::SciFiTrack(): _tracker(-1), _chi2(-1), _ndf(-1), _P_value(-1) {}
+SciFiTrack::SciFiTrack(): _tracker(-1),
+                          _f_chi2(-1),
+                          _s_chi2(-1),
+                          _ndf(-1),
+                          _P_value(-1),
+                          _trackpoints(0) {
+  // _scifitrackpoints.resize(0);
+}
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
-                                                   _chi2(-1),
+                                                   _f_chi2(-1),
+                                                   _s_chi2(-1),
                                                    _ndf(-1),
-                                                   _P_value(-1) {
-  _tracker = a_track.get_tracker();
-  _chi2    = a_track.get_chi2();
-  _ndf     = a_track.get_ndf();
-  _P_value = a_track.get_P_value();
+                                                   _P_value(-1),
+                                                   _trackpoints(0) {
+  _tracker   = a_track.tracker();
+  _f_chi2    = a_track.f_chi2();
+  _s_chi2    = a_track.s_chi2();
+  _ndf       = a_track.ndf();
+  _P_value   = a_track.P_value();
+  _trackpoints = a_track.scifitrackpoints();
 }
 
 SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
-                                                  _chi2(-1),
+                                                  _f_chi2(-1),
+                                                  _s_chi2(-1),
                                                   _ndf(-1),
                                                   _P_value(-1) {
-  _tracker = kalman_track->get_tracker();
-  _chi2    = kalman_track->get_chi2();
-  _ndf     = kalman_track->get_ndf();
-  _P_value = kalman_track->get_P_value();
+  _tracker = kalman_track->tracker();
+  _f_chi2    = kalman_track->f_chi2();
+  _s_chi2    = kalman_track->s_chi2();
+  _ndf     = kalman_track->ndf();
+  _P_value = kalman_track->P_value();
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     if (this == &a_track) {
         return *this;
     }
-    _tracker = a_track.get_tracker();
-    _chi2    = a_track.get_chi2();
-    _ndf     = a_track.get_ndf();
-    _P_value = a_track.get_P_value();
+    _tracker = a_track.tracker();
+    _f_chi2  = a_track.f_chi2();
+    _s_chi2  = a_track.s_chi2();
+    _ndf     = a_track.ndf();
+    _P_value = a_track.P_value();
+    _trackpoints = a_track.scifitrackpoints();
     return *this;
 }
 
-SciFiTrack::~SciFiTrack() {}
-
-/*
-void SciFiTrack::add_track_points(const std::vector<KalmanSite> &sites) {
-  size_t n_sites = sites.size();
-  for ( size_t i = 0; i < n_sites; ++i ) {
-    const KalmanSite site = sites[i];
-    double time = 0.0;
-    TMatrixD state_vector(5, 1);
-    state_vector = site->get_smoothed_state();
-    double energy = 1.0;
-    double x = state_vector(0, 0);
-    double px= state_vector(1, 0);
-    double y = state_vector(2, 0);
-    double py= state_vector(3, 0);
-    Detector & detector
-    double z = site.get_z();
-    recon::global::TrackPoint track_point = 
+SciFiTrack::~SciFiTrack() {
+  // Delete track points in this track.
+  std::vector<SciFiTrackPoint*>::iterator track_point;
+  for (track_point = _trackpoints.begin();
+       track_point!= _trackpoints.end(); ++track_point) {
+    delete (*track_point);
   }
-
-  Detector(const ID id, const double plane, const CovarianceMatrix & uncertainties);
 }
-*/
 
 } // ~namespace MAUS

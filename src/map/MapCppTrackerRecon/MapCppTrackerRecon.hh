@@ -29,17 +29,23 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-#include <cmath>
-#include <iostream>
+// #include <cmath>
+// #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
+// #include <algorithm>
 
 // Other headers
 #include "Interface/Squeak.hh"
+#include "Interface/Squeal.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"

@@ -16,7 +16,6 @@
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 
-
 namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
@@ -30,7 +29,6 @@ SciFiEvent::SciFiEvent() {
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
       _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
@@ -67,8 +65,6 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
     for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
       _scifitracks[i] = _scifievent._scifitracks[i];
     }
-
-    // *this = _scifievent;
 }
 
 SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
@@ -112,7 +108,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
 }
 
 SciFiEvent::~SciFiEvent() {
-
   std::vector<SciFiDigit*>::iterator digit;
   for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
     delete (*digit);
@@ -143,6 +138,12 @@ SciFiEvent::~SciFiEvent() {
   for (htrack = _scifihelicalprtracks.begin();
        htrack!= _scifihelicalprtracks.end(); ++htrack) {
     delete (*htrack);
+  }
+
+  std::vector<SciFiTrack*>::iterator track;
+  for (track = _scifitracks.begin();
+       track!= _scifitracks.end(); ++track) {
+    delete (*track);
   }
 }
 

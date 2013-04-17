@@ -28,11 +28,14 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "TMath.h"
 #include "TMatrixD.h"
 
+#include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 
@@ -46,82 +49,132 @@ typedef struct SciFiParams {
   /// Fibre radiation lenght in mm
   static const double Radiation_Legth() { return 424.0; }
   /// Fractional Radiation Length
-  static const double R0()              { return Plane_Width()/Radiation_Legth(); }
+  static const double R0(double lenght) { return lenght/Radiation_Legth(); }
   /// Density in g.cm-3
   static const double Density()         { return 1.06000; }
   /// Mean excitation energy in eV.
   static const double Mean_Excitation_Energy() { return 68.7; }
   /// Atomic number in g.mol-1 per styrene monomer
   static const double A()               { return 104.15; }
+  /// Channel width in mm
+  static const double Pitch()           { return 1.4945; }
+  /// Active Radius in mm
+  static const double Active_Radius()   { return 150.; }
+  /// RMS per channel measurement (um).
+  static const double RMS()             { return 370.; }
 } FibreParameters;
 
 typedef struct BetheBloch {
   /// Bethe Bloch constant in MeV g-1 cm2 (for A=1gmol-1)
   static const double K() { return 0.307075; }
+  /// The electron mass is a parameter of Bethe-Bloch's formula.
+  static const double Electron_Mass() { return 0.511; }
 } BetheBlochParameters;
 
 class KalmanTrack {
  public:
-  KalmanTrack();
+  /* @brief  Constructs taking MCS and Eloss flags.
+   */
+  KalmanTrack(bool MCS, bool Eloss);
 
+  /* @brief  Destructor. Cleans up heap.
+   */
   virtual ~KalmanTrack() {}
 
-  virtual void update_propagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
+  /* @brief  Initializes member matrices.
+   */
+  void Initialise();
 
-  /// Projection: calculation of predicted state.
-  void calc_predicted_state(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Projection: calculation of covariance matrix.
-  void calc_covariance(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Bethe-Bloch calculation.
+  /* @brief  Manages all extrapolation steps.
+   */
+  void Extrapolate(std::vector<KalmanSite> &sites, int current_site);
+
+  /* @brief  Manages all filtering steps.
+   */
+  void Filter(std::vector<KalmanSite> &sites, int current_site);
+
+  /* @brief  Manages all smoothins steps.
+   */
+  void Smooth(std::vector<KalmanSite> &sites, int current_site);
+
+  /* @brief  Calculates the Propagator Matrix (F) for the current extrapolation.
+   */
+  virtual void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
+
+  /* @brief  Calculates the state vector prediction at the next site.
+   */
+  virtual void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) = 0;
+
+  /* @brief  Projects the Covariance matrix.
+   */
+  void CalculateCovariance(const KalmanSite *old_site, KalmanSite *new_site);
+
+  /* @brief  Calculates the Energy loss according to Bethe Bloch formula.
+   */
   double BetheBlochStoppingPower(double p);
-  /// Subtract energy loss.
-  void subtract_energy_loss(const KalmanSite *old_site, KalmanSite *new_site);
-  /// Error added by Multiple Coulomb Scattering.
-  void calc_system_noise(const KalmanSite *old_site, const KalmanSite *new_site);
 
-  /// Filtering: update of relevant matrices.
-  void update_V(const KalmanSite *a_site);
-  void update_H(const KalmanSite *a_site);
-  void update_W(const KalmanSite *a_site);
-  void update_K(const KalmanSite *a_site);
-  void compute_pull(KalmanSite *a_site);
-  /// Filtering: calculation of filtered state.
-  void calc_filtered_state(KalmanSite *a_site);
+  /* @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
+   */
+  void SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new_site);
 
-  /// Filtering: update of covariance matrix.
-  void update_covariance(KalmanSite *a_site);
-  void set_residual(KalmanSite *a_site);
-  TMatrixD solve_measurement_equation(const TMatrixD &a, const TMatrixD &s);
-  // void update_misaligments(KalmanSite *a_site, KalmanSite *old_site);
+  /* @brief  Computes the contribution of MCS to the covariance matrix.
+   */
+  void CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site);
 
-  /// Smoothing: updates back transportation matrix.
-  void update_back_transportation_matrix(const KalmanSite *optimum_site,
+  /* @brief  Computes the filtered state.
+   */
+  void CalculateFilteredState(KalmanSite *a_site);
+
+  /* @brief  Computes the filtered covariance matrix.
+   */
+  void UpdateCovariance(KalmanSite *a_site);
+
+
+  void SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state);
+
+  /* @brief  Solves the measurement equation.
+   */
+  TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
+
+  void UpdateV(const KalmanSite *a_site);
+
+  void UpdateH(const KalmanSite *a_site);
+
+  void UpdateW(const KalmanSite *a_site);
+
+  void UpdateK(const KalmanSite *a_site);
+
+  void ComputePull(KalmanSite *a_site);
+
+  /* @brief  Solves the measurement equation.
+   */
+  void PrepareForSmoothing(KalmanSite *last_site);
+  void UpdateBackTransportationMatrix(const KalmanSite *optimum_site,
                                          const KalmanSite *smoothing_site);
-  void smooth_back(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
-  void prepare_for_smoothing(KalmanSite *last_site);
-  void exclude_site(KalmanSite *site);
-  // TMatrixD get_kalman_gain(const KalmanSite *a_site);
+  void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
-  // void get_site_properties(KalmanSite *site, double &thickess, double &density);
-  void compute_chi2(const std::vector<KalmanSite> &sites);
-
-  /// Getters.
-  TMatrixD get_propagator()   const { return _F;        }
-  TMatrixD get_system_noise() const { return _Q;        }
-  TMatrixD get_Q()            const { return _Q;        }
-  double get_chi2()           const { return _chi2;     }
-  double get_ndf()            const { return _ndf;      }
-  double get_P_value()        const { return _P_value;  }
-  double get_tracker()        const { return _tracker;  }
-  double get_mass()           const { return _mass;     }
-  double get_momentum()       const { return _momentum; }
-
-  void set_Q(TMatrixD Q)             { _Q = Q;               }
-  void set_mass(double mass)         { _mass = mass;         }
   void set_momentum(double momentum) { _momentum = momentum; }
 
+  /// Other methods
+  void ExcludeSite(KalmanSite *site);
+  void ComputeChi2(const std::vector<KalmanSite> &sites);
+  void UpdateMisaligments(std::vector<KalmanSite> &sites,
+                           std::vector<KalmanSite> &sites_copy,
+                           int station_i);
+
+  /// Getters.
+  double f_chi2()         const { return _f_chi2;   }
+  double s_chi2()         const { return _s_chi2;   }
+  int ndf()               const { return _ndf;      }
+  double P_value()        const { return _P_value;  }
+  int tracker()           const { return _tracker;  }
+  double momentum()       const { return _momentum; }
+  TMatrixD Q()            const { return _Q;        }
+
  protected:
-  // int _inversion_sanity;
+  bool _use_MCS;
+
+  bool _use_Eloss;
 
   TMatrixD _H;
 
@@ -139,7 +192,9 @@ class KalmanTrack {
 
   TMatrixD _W;
 
-  double _chi2;
+  double _f_chi2;
+
+  double _s_chi2;
 
   int _ndf;
 
@@ -151,9 +206,11 @@ class KalmanTrack {
 
   int _tracker;
 
-  double _mass, _momentum;
+  double _mass;
 
-  double _active_radius;
+  double _momentum;
+
+  int _particle_charge;
 };
 
 } // ~namespace MAUS

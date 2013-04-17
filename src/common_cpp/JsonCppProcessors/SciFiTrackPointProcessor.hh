@@ -16,30 +16,24 @@
 
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-// #include "src/common_cpp/JsonCppProcessors/SciFiDigitProcessor.hh"
 
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICLUSTERPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICLUSTERPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPOINTPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFITRACKPOINTPROCESSOR_HH_
 
 namespace MAUS {
 
-/** @class SciFiClusterProcessor processor for SciFiCluster */
-class SciFiClusterProcessor : public ObjectProcessor<SciFiCluster> {
+/** @class SciFiTrackPointProcessor processor for SciFiTrackPoint */
+class SciFiTrackPointProcessor : public ObjectProcessor<SciFiTrackPoint> {
  public:
-    /** Constructor - registers the branch structure */
-    SciFiClusterProcessor();
+    SciFiTrackPointProcessor();
 
  private:
     IntProcessor _int_proc;
-    BoolProcessor _bool_proc;
     DoubleProcessor _double_proc;
-    ThreeVectorProcessor _three_vec_proc;
-    // PointerArrayProcessor<SciFiDigit> _scifidigit_array_proc;
 };
-}
+} // ~namespace MAUS
 
 #endif

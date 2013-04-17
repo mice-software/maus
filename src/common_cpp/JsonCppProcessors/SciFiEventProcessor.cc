@@ -38,6 +38,4 @@ SciFiEventProcessor::SciFiEventProcessor()
   RegisterValueBranch("tracks", &_sf_trk_array_proc,
                       &SciFiEvent::scifitracks, &SciFiEvent::set_scifitracks, false);
 }
-
 } // ~namespace MAUS
-
