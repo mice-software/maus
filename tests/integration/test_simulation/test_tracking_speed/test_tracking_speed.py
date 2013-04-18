@@ -54,7 +54,7 @@ class TestTrackingSpeed(unittest.TestCase): # pylint: disable=R0904
             subproc.wait() # pylint: disable=E1101
             print "Took", time.time() - time_start, "seconds to track", \
                   n_spills, "spills each with 10 muons"
-            results += {"dt":time.time()-time_start, "n_spills":n_spills}
+            results.append({"dt":time.time()-time_start, "n_spills":n_spills})
         out.write(json.dumps(results))
 
 
