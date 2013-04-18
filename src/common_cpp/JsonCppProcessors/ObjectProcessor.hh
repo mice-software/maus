@@ -261,6 +261,18 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
                     Json::Value child_value,
                     bool is_required);
 
+    /** Register a branch for ignoring
+     *
+     *  @param branch_name name used by json to reference the branch
+     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  is_required is set to true
+     *
+     *  This method will never fill anything in the parent C++ class or the Json
+     *  value; it merely registers that there is a branch which should be 
+     *  ignored.
+     */
+    void RegisterIgnoredBranch(std::string branch_name,
+                    bool is_required);
 
     /** Return true if json value properties not the same as branches
      *

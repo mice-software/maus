@@ -54,6 +54,7 @@ DAQDataProcessor::DAQDataProcessor()
     RegisterValueBranch
           ("trigger", &_trigger_proc, &DAQData::GetTriggerArray,
           &DAQData::SetTriggerArray, false);
+    RegisterIgnoredBranch("single_station", false);
 }
 }  // namespace MAUS
 

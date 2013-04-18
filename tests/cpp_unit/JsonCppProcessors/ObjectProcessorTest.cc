@@ -56,12 +56,14 @@ class ObjectProcessorTest : public ::testing::Test {
     req_proc.RegisterPointerBranch("branch_b", &double_proc, &TestObject::GetB,
                                                       &TestObject::SetB, true);
     req_proc.RegisterConstantBranch("branch_c", Json::Value("const"), true);
+    req_proc.RegisterIgnoredBranch("branch_d", true);
 
     not_req_proc.RegisterValueBranch("branch_a", &double_proc,
                                    &TestObject::GetA, &TestObject::SetA, false);
     not_req_proc.RegisterPointerBranch("branch_b", &double_proc,
                                    &TestObject::GetB, &TestObject::SetB, false);
     not_req_proc.RegisterConstantBranch("branch_c", Json::Value("const"), false);
+    not_req_proc.RegisterIgnoredBranch("branch_d", false);
     test.SetA(1.);
     test.SetB(new double(2.));
   }
@@ -109,6 +111,7 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   json_object["branch_a"] = Json::Value(1.);
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_c"] = Json::Value("const");
+  json_object["branch_d"] = Json::Value(1.); // could be int, string or anything
 
   // should handle processing correctly
   TestObject* cpp_object = req_proc.JsonToCpp(json_object);
@@ -120,23 +123,33 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   json_object["branch_a"] = Json::Value(1.);
   json_object["branch_b"] = Json::Value();
   json_object["branch_c"] = Json::Value("const");
+  json_object["branch_d"] = Json::Value("const");
   EXPECT_THROW(req_proc.JsonToCpp(json_object), Squeal);
 
   // should throw if object is missing
   Json::Value json_object_missing_a(Json::objectValue);
   json_object_missing_a["branch_b"] = Json::Value(2.);
   json_object_missing_a["branch_c"] = Json::Value("const");
+  json_object_missing_a["branch_d"] = Json::Value("const");
   EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_a), Squeal);
 
   Json::Value json_object_missing_b(Json::objectValue);
   json_object_missing_b["branch_a"] = Json::Value(2.);
   json_object_missing_b["branch_c"] = Json::Value("const");
+  json_object_missing_b["branch_d"] = Json::Value("const");
   EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_b), Squeal);
 
   Json::Value json_object_missing_c(Json::objectValue);
   json_object_missing_c["branch_a"] = Json::Value(2.);
   json_object_missing_c["branch_b"] = Json::Value(1.);
+  json_object_missing_c["branch_d"] = Json::Value("const");
   EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_c), Squeal);
+
+  Json::Value json_object_missing_d(Json::objectValue);
+  json_object_missing_d["branch_a"] = Json::Value(1.);
+  json_object_missing_d["branch_b"] = Json::Value();
+  json_object_missing_d["branch_c"] = Json::Value("const");
+  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_d), Squeal);
 
   // should throw if object is present but can't be processed
   json_object["branch_b"] = Json::Value("string");
@@ -156,6 +169,7 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
   json_object["branch_a"] = Json::Value(1.);
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_c"] = Json::Value("const");
+  json_object["branch_d"] = Json::Value("const");
 
   // should handle processing correctly
   TestObject* cpp_object = not_req_proc.JsonToCpp(json_object);
@@ -164,22 +178,8 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
   delete cpp_object;
 
   // should not throw if object is missing
-  Json::Value json_object_missing_a(Json::objectValue);
-  json_object_missing_a["branch_b"] = Json::Value(2.);
-  json_object_missing_a["branch_c"] = Json::Value("const");
-  cpp_object = not_req_proc.JsonToCpp(json_object_missing_a);
-  delete cpp_object;
-
-  Json::Value json_object_missing_b(Json::objectValue);
-  json_object_missing_b["branch_a"] = Json::Value(2.);
-  json_object_missing_a["branch_c"] = Json::Value("const");
-  cpp_object = not_req_proc.JsonToCpp(json_object_missing_b);
-  delete cpp_object;
-
-  Json::Value json_object_missing_c(Json::objectValue);
-  json_object_missing_b["branch_a"] = Json::Value(2.);
-  json_object_missing_a["branch_b"] = Json::Value(1.);
-  cpp_object = not_req_proc.JsonToCpp(json_object_missing_c);
+  Json::Value json_object_missing_all(Json::objectValue);
+  cpp_object = not_req_proc.JsonToCpp(json_object_missing_all);
   delete cpp_object;
 
   // should throw if object is present but can't be processed
