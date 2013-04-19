@@ -78,7 +78,7 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
     Run the examples and check they return 0
     """
 
-    def test_all(self):
+    def _test_all(self):
         """
         Get everything in bin/examples and check it runs with returncode 0
         """
@@ -88,6 +88,21 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         for item in examples:
             proc, log = run_example(item)
             self.assertEqual(proc.returncode, 0, msg="Check logfile "+log)
+
+    def test_load_root_file_cpp(self):
+        """
+        Test bin/examples/load_root_file_cpp
+        """
+        examples_dir = os.path.join\
+          (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "load_root_file_cpp")
+        os.chdir(examples_dir)
+        proc = subprocess.Popen(["make", "clean"])
+        proc.wait()
+        proc = subprocess.Popen(["make"])
+        proc.wait()
+        proc = subprocess.Popen(["./load_root_file"])
+        proc.wait()
+        self.assertEqual(proc.returncode, 0)
 
 if __name__ == "__main__":
     unittest.main()
