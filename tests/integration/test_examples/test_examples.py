@@ -78,7 +78,7 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
     Run the examples and check they return 0
     """
 
-    def _test_all(self):
+    def test_all(self):
         """
         Get everything in bin/examples and check it runs with returncode 0
         """
