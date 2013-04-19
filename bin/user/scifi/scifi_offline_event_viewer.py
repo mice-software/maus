@@ -279,10 +279,14 @@ def main(file_name):
                     t1.spoints_z, t2.spoints_x, t2.spoints_y, t2.spoints_z)
             draw_htracks(t1.seeds_circle, t2.seeds_circle, c_sp_xy)
             c_sp_xy.Update()
-            mg = draw_sz(t1.seeds_z, t1.seeds_s, t2.seeds_z, t2.seeds_s, c_trk_sz)
+            mg = draw_sz(t1.seeds_z, t1.seeds_s,
+                         t2.seeds_z, t2.seeds_s, c_trk_sz)
+            c_trk_sz.Update()
             raw_input("Press any key to move to the next spill...")
             mg[0].Clear()
             mg[1].Clear()
+            del mg
+
 
     print "Closing root file"
     root_file.Close()
@@ -388,7 +392,6 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, can):
         t2_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t2_s[i])
         t2_sz_graph.SetMarkerStyle(20)
         t2_sz_graph.SetMarkerColor(ROOT.kBlack)
-        t2_sz_graph.Draw("AP")
         mg2.Add(t2_sz_graph)
     mg2.Draw("ap")
     mg2.SetTitle("Seed s-z plot for tracker 2")
