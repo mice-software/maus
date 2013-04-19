@@ -20,9 +20,9 @@ namespace MAUS {
 
 TOFDaqProcessor::TOFDaqProcessor()
     : _V1724_proc(new V1724Processor), _V1290_proc(new V1290Processor) {
-    RegisterValueBranch
+    RegisterValueBranch // zero suppression removes V1724 arrays
           ("V1724", &_V1724_proc, &TOFDaq::GetV1724Array,
-          &TOFDaq::SetV1724Array, true);
+          &TOFDaq::SetV1724Array, false);
     RegisterValueBranch
           ("V1290", &_V1290_proc, &TOFDaq::GetV1290Array,
           &TOFDaq::SetV1290Array, false);
