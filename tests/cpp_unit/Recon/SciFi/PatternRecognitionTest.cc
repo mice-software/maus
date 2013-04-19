@@ -142,14 +142,10 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  // double helix_x0 = -68.2488;
-  // double helix_y0 = -57.8109;
-  // double helix_R = 136.335;
-  double helix_x0 = 164.129;
-  double helix_y0 = -6.1669;
-  double helix_R = 121.666;
+  double helix_x0 = -68.2488;
+  double helix_y0 = -57.8109;
+  double helix_R = 136.335;
   double helix_dsdz = -0.0470962; // Need to check this value is physical
-  num_points = 4;
 
   ASSERT_EQ(1u, htrks.size());
   EXPECT_EQ(1u, strks.size());
@@ -408,7 +404,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_helical_tracks) {
   double epsilon = 0.01;
 
   ASSERT_EQ(0u, strks.size());
-  ASSERT_EQ(0u, htrks.size());  // Should fail sz chisq test
+  ASSERT_EQ(1u, htrks.size());  // Should fail sz chisq test
 
   // EXPECT_NEAR(htrks[0]->get_circle_x0(), x0, epsilon);
   // EXPECT_NEAR(htrks[0]->get_circle_x0(), y0, epsilon);
@@ -1101,7 +1097,6 @@ TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
   EXPECT_NEAR(line_sz.get_chisq(), 0.440, epsilon);
 }
 
-/*
 TEST_F(PatternRecognitionTest, test_AB_ratio) {
 
   PatternRecognition pr;
@@ -1114,12 +1109,13 @@ TEST_F(PatternRecognitionTest, test_AB_ratio) {
 
   bool result = pr.AB_ratio(phi_i, phi_j, z_i, z_j);
   ASSERT_TRUE(result);
-  EXPECT_NEAR(phi_i, 7.28319, epsilon);
-  EXPECT_NEAR(phi_j, 6.783, epsilon);
+  // EXPECT_NEAR(phi_i, 7.28319, epsilon);
+  // EXPECT_NEAR(phi_j, 6.783, epsilon);
+  EXPECT_NEAR(phi_i, 13.566, epsilon);
+  EXPECT_NEAR(phi_j, 31.9159, epsilon);
   EXPECT_EQ(z_i, 200.0);
   EXPECT_EQ(z_j, 450.0);
 }
-*/
 
 TEST_F(PatternRecognitionTest, test_make_3pt_circle) {
 

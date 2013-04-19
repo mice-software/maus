@@ -257,6 +257,8 @@ class PatternRecognition {
      */
     double calc_phi(double xpos, double ypos, const SimpleCircle &circle);
 
+    double old_calc_phi(double xpos, double ypos, const SimpleCircle &circle);
+
     /** @brief Account for possible 2*pi rotations between stations
      *
      *  As the seperation along z increases between stations, the difference in phi should

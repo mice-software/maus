@@ -27,6 +27,7 @@ keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
+# simulation_geometry_filename = "TrackerStraightFitTest.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
@@ -43,7 +44,7 @@ muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
-geant4_visualisation = True
+geant4_visualisation = False
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.

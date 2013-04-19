@@ -152,7 +152,8 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     add_tracks(trker_no, strks, htrks, evt);
   }
   num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
-  if (num_stations_hit > 2) {
+  // if (num_stations_hit > 2  && track_type != 1 ) { // No 3pt tracks for helical
+  if ( num_stations_hit > 2 ) {
     std::vector<SciFiStraightPRTrack*> strks;
     std::vector<SciFiHelicalPRTrack*> htrks;
     make_3tracks(track_type, trker_no, spnts_by_station, strks, htrks);
@@ -596,9 +597,12 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         } // ~Loop over intermediate stations
 
         // Check we have enough stations with sp that have passed the road cuts to make the track
-        if ( static_cast<int>(best_sp.size()) != n_points - 3 ) {
+        if ( static_cast<int>(best_sp.size()) != (n_points - 3) ) {
           if ( _debug > 0 ) std::cerr << "Not enough spoints passed road cuts" << std::endl;
           continue;
+        } else {
+          if ( _debug > 0 ) std::cerr << "Found " << best_sp.size() << " sp which passed rc,";
+          if ( _debug > 0 ) std::cerr << " n_points is " << n_points << std::endl;
         }
 
         // Add the other spacepoints currently being considerd to the good_spnts vector
@@ -629,12 +633,18 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         double phi_0; // initial turning angle
 
         // Perform s-z fit
-        // calculate_dipangle(good_spnts, c_trial, dphi, line_sz, phi_0);
+        calculate_dipangle(good_spnts, c_trial, phi_i, line_sz, phi_0);
+        phi_i.insert(phi_i.begin(), phi_0);
+        for ( int i = 1; i < phi_i.size(); ++i ) {
+          phi_i[i] = phi_i[i] + phi_0;
+        }
+        /*
         bool good_dsdz = find_dsdz(n_points, good_spnts, c_trial, phi_i, line_sz);
         if (!good_dsdz) {
           std::cerr << "dsdz fit failed, looping..." << std::endl;
           continue;
         }
+        */
 
         // Form the helical track
         double psi_0 = phi_0 + (CLHEP::pi / 2);
@@ -762,6 +772,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     z_i.push_back((*it)->get_position().z());
     phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
 
+    /*
     std::cerr << "r is " << circle.get_R() << ", X0 is " << circle.get_x0() << ", Y0 is ";
     std::cerr << circle.get_y0() << "\n";
     for ( size_t i = 0; i < z_i.size(); ++i ) {
@@ -769,6 +780,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
       std::cerr << " z[" << i << "] is " << z_i[i] << ", phi_i[" << i << "] is " << phi_i[i];
       std::cerr << std::endl;
     }
+    */
 
     // Calculate each dz_ji and dphi_ji value (separation in z and phi between spacepoints)
     if ( it != spnts.begin() ) {
@@ -892,7 +904,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   // TODO approximates 1st sp to x0, y0 which is not quite true at best,
   // and completely false if there is no spacepoint in the first station
   ThreeVector pos0 = spnts_by_zed[0]->get_position();
-  phi_0 = calc_phi(pos0.x(), pos0.y(), circle);
+  phi_0 = old_calc_phi(pos0.x(), pos0.y(), circle);
 
   // Loop over spacepoints
   for ( int i = 1; i < static_cast<int>(spnts_by_zed.size()); ++i ) {
@@ -905,7 +917,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
     }
 
     // theta_i is defined as phi_i + phi_0 i.e. the turning angle wrt the x (not x') axis
-    double theta_i = calc_phi(spnts_by_zed[i]->get_position().x(),
+    double theta_i = old_calc_phi(spnts_by_zed[i]->get_position().x(),
                               spnts_by_zed[i]->get_position().y(), circle);
 
     // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
@@ -952,6 +964,13 @@ double PatternRecognition::calc_phi(double xpos, double ypos, const SimpleCircle
   }
   std::cerr << ", phi is " << angle << "\n";
   return angle;
+} // ~calculate_phi(...)
+
+double PatternRecognition::old_calc_phi(double xpos, double ypos, const SimpleCircle &circle) {
+    // Note this function returns phi_i + phi_0, unless using x0, y0 in which case it returns phi_0
+    double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
+    if ( angle < 0. ) angle += 2. * CLHEP::pi; // TODO is this ok if have different sign particles?
+    return angle;
 } // ~calculate_phi(...)
 
 bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
