@@ -14,4 +14,5 @@ load_root_file :
 	                       -Wl,--no-as-needed
 
 clean:
-	rm load_root_file
+	rm load_root_file;
+	rm *.png;

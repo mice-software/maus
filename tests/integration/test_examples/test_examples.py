@@ -13,9 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Run the examples and check they return 0
 """
+
+# Popen false errors
+# pylint: disable=E1101
 
 import sys
 import os
@@ -88,10 +92,14 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         for item in examples:
             proc, log = run_example(item)
             self.assertEqual(proc.returncode, 0, msg="Check logfile "+log)
+        self._test_load_root_file_cpp()
 
-    def test_load_root_file_cpp(self):
+    def _test_load_root_file_cpp(self):
         """
-        Test bin/examples/load_root_file_cpp
+        Test bin/examples/load_root_file_cpp; make clean; make; run test
+
+        This has to be called after bin/examples/load_root_file.py (as it is
+        dependent on file generation so we call it as a subfunction of test_all.
         """
         examples_dir = os.path.join\
           (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "load_root_file_cpp")
