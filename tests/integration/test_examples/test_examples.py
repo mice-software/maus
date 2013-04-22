@@ -87,7 +87,7 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         Get everything in bin/examples and check it runs with returncode 0
         """
         examples_dir = os.path.join\
-                           (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*")
+                       (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*.py")
         examples = glob.glob(examples_dir)
         for item in examples:
             proc, log = run_example(item)
