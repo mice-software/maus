@@ -35,6 +35,7 @@ class Tracker:
     seeds_phi = []
     seeds_s = []
     seeds_circles = []
+    sz_fits = []
 
     def __init__(self):
         """ Constructor, set everything to empty or zero """
@@ -47,10 +48,13 @@ class Tracker:
         self.spoints_x = array.array('d', [0])
         self.spoints_y = array.array('d', [0])
         self.spoints_z = array.array('d', [0])
+        self.seeds_x = []
+        self.seeds_y = []
         self.seeds_z = []
         self.seeds_phi = []
         self.seeds_s = []
         self.seeds_circle = []
+        self.sz_fits = []
 
     def accumulate_data(self, evt, trker_num):
         """ Add data from a scifi event """
@@ -98,8 +102,6 @@ class Tracker:
                 y0 = trk.get_circle_y0()
                 rad = trk.get_R()
                 self.seeds_circle.append(make_circle(x0, y0, rad))
-                self.num_htracks = self.num_htracks + 1
-
                 # Pull out the turning angles of each seed spacepoint
                 phi_per_trk = array.array('d', [0])
                 s_per_trk = array.array('d', [0])
@@ -108,27 +110,44 @@ class Tracker:
                     if num_phi == 0:
                         phi_per_trk[0] = phi
                         s_per_trk[0] = phi * rad
-                        num_phi = num_phi + 1
                         print 'phi' + str(num_phi+1) + ' is ' + str(phi)
+                        num_phi = num_phi + 1
                     else:
                         phi_per_trk.append(phi)
                         s_per_trk.append(phi*rad)
-                        num_phi = num_phi + 1
                         print 'phi' + str(num_phi+1) + ' is ' + str(phi)
-                    self.seeds_phi.append(phi_per_trk)
-                    self.seeds_s.append(s_per_trk)
+                        num_phi = num_phi + 1
+                self.seeds_phi.append(phi_per_trk)
+                self.seeds_s.append(s_per_trk)
 
-                # Pull out the z of each seed spacepoint
+                # Pull out the coords of each seed spacepoint
+                x_per_trk = array.array('d', [0])
+                y_per_trk = array.array('d', [0])
                 z_per_trk = array.array('d', [0])
                 num_seeds = 0
                 for seed in trk.get_spacepoints():
                     if num_seeds == 0:
+                        x_per_trk[0] = seed.get_position().x()
+                        y_per_trk[0] = seed.get_position().y()
                         z_per_trk[0] = seed.get_position().z()
                         num_seeds = num_seeds + 1
                     else:
+                        x_per_trk.append(seed.get_position().x())
+                        y_per_trk.append(seed.get_position().y())
                         z_per_trk.append(seed.get_position().z())
                         num_seeds = num_seeds + 1
-                    self.seeds_z.append(z_per_trk)
+                self.seeds_x.append(x_per_trk)
+                self.seeds_y.append(y_per_trk)
+                self.seeds_z.append(z_per_trk)
+
+                dsdz = trk.get_dsdz()
+                sz_c = trk.get_line_sz_c() + self.seeds_s[-1][0] \
+                       - (dsdz * self.seeds_z[-1][0])
+                if trker_num == 0:
+                    self.sz_fits.append(make_line(dsdz, sz_c, -1200, 0))
+                elif trker_num == 1:
+                    self.sz_fits.append(make_line(dsdz, sz_c, 0, 1200))
+                self.num_htracks = self.num_htracks + 1
 
     def clear(self):
         """ Clear all accumulated data """
@@ -145,6 +164,7 @@ class Tracker:
         self.seeds_phi = []
         self.seeds_s = []
         self.seeds_circle = []
+        self.sz_fits = []
 
 class info_box():
     """ Class which wraps a ROOT TPaveText to display info for one tracker """
@@ -155,7 +175,7 @@ class info_box():
     p_label = ROOT.TPaveText(.0, .0, 0.55, 1.0)
     p_t1 = ROOT.TPaveText(.68, .0, 0.75, 1.0)
     p_t2 = ROOT.TPaveText(.88, .0, 0.95, 1.0)
-    can = ROOT.TCanvas("c_info", "Info Box", 350, 50, 380, 800)
+    can = ROOT.TCanvas("c_info", "Info Box", 1500, 000, 300, 650)
     line1 = ROOT.TLine(0.585, 0.0, 0.585, 1.0)
     line2 = ROOT.TLine(0.0, 0.915, 1.0, 0.915)
 
@@ -245,9 +265,9 @@ def main(file_name):
     tree.SetBranchAddress("data", data)
 
     # Set up the ROOT canvases
-    c_sp_xy = ROOT.TCanvas("sp_xy", "Spacepoint x-y", 200, 10, 700, 500)
+    c_sp_xy = ROOT.TCanvas("sp_xy", "Spacepoint x-y", 0, 0, 700, 500)
     c_sp_xy.Divide(3, 2)
-    c_trk_sz = ROOT.TCanvas("trk_sz", "Track s-z", 350, 10, 700, 500)
+    c_trk_sz = ROOT.TCanvas("trk_sz", "Track s-z", 770, 0, 600, 500)
     c_trk_sz.Divide(1, 2)
     ib1 = info_box()
 
@@ -279,8 +299,8 @@ def main(file_name):
                     t1.spoints_z, t2.spoints_x, t2.spoints_y, t2.spoints_z)
             draw_htracks(t1.seeds_circle, t2.seeds_circle, c_sp_xy)
             c_sp_xy.Update()
-            mg = draw_sz(t1.seeds_z, t1.seeds_s,
-                         t2.seeds_z, t2.seeds_s, c_trk_sz)
+            mg = draw_sz(t1.seeds_z, t1.seeds_s, t2.seeds_z, t2.seeds_s, \
+                         t1.sz_fits, t2.sz_fits, c_trk_sz)
             c_trk_sz.Update()
             raw_input("Press any key to move to the next spill...")
             mg[0].Clear()
@@ -290,6 +310,14 @@ def main(file_name):
 
     print "Closing root file"
     root_file.Close()
+
+def make_line(m, c, xmin, xmax):
+    """ Create a straight line using the ROOT TF1 class """
+    line = ROOT.TF1("line", "[0]*x+[1]", xmin, xmax)
+    line.SetParameter(0, m)
+    line.SetParameter(1, c)
+    line.SetLineColor(ROOT.kBlue)
+    return line
 
 def make_circle(x0, y0, rad):
     """ Make a circle from its centre coords & radius using the TArc class"""
@@ -372,7 +400,7 @@ def draw_htracks(t1_circles_xy, t2_circles_xy, can):
         circ.Draw("same")
         can.Update()
 
-def draw_sz(t1_z, t1_s, t2_z, t2_s, can):
+def draw_sz(t1_z, t1_s, t2_z, t2_s, t1_fits, t2_fits, can):
     """ Draw s - z for each track """
     can.cd(1)
     mg1 = ROOT.TMultiGraph()
@@ -385,6 +413,8 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, can):
     mg1.SetTitle("Seed s-z plot for tracker 1")
     mg1.GetXaxis().SetTitle("z(mm)")
     mg1.GetYaxis().SetTitle("s(mm)")
+    for line in t1_fits:
+        line.Draw("same")
 
     can.cd(2)
     mg2 = ROOT.TMultiGraph()
@@ -397,6 +427,8 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, can):
     mg2.SetTitle("Seed s-z plot for tracker 2")
     mg2.GetXaxis().SetTitle("z(mm)")
     mg2.GetYaxis().SetTitle("s(mm)")
+    for line in t2_fits:
+        line.Draw("same")
 
     can.Update()
     return [mg1, mg2]

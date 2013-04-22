@@ -129,6 +129,12 @@ class SciFiHelicalPRTrack {
     /** Set R the radius of the helix in the x-y plane */
     void set_R(double R) { _R = R; }
 
+    /** Get the intercept of the straight line fit in s-z */
+    double get_line_sz_c() const { return _line_sz_c; }
+
+    /** Set the intercept of the straight line fit in s-z */
+    void set_line_sz_c(double line_sz_c) { _line_sz_c = line_sz_c; }
+
     /** Get the chi^2 of the straight line fit in s-z */
     double get_line_sz_chisq() const { return _line_sz_chisq; }
 
@@ -177,6 +183,7 @@ class SciFiHelicalPRTrack {
     double _phi0;
     double _psi0;
     double _dsdz;
+    double _line_sz_c;
     double _line_sz_chisq;
     double _circle_x0;
     double _circle_y0;

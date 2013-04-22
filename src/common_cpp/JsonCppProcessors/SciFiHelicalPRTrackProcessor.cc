@@ -50,6 +50,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("R", &_double_proc,
                         &SciFiHelicalPRTrack::get_R,
                         &SciFiHelicalPRTrack::set_R, true);
+    RegisterValueBranch("line_sz_c", &_double_proc,
+                        &SciFiHelicalPRTrack::get_line_sz_c,
+                        &SciFiHelicalPRTrack::set_line_sz_c, true);
     RegisterValueBranch("line_sz_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_line_sz_chisq,
                         &SciFiHelicalPRTrack::set_line_sz_chisq, true);
