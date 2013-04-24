@@ -56,11 +56,11 @@ namespace Global {
 enum DetectorPoint {
   kUndefined    =  0, /**< enum Undefined, used for initialization only */
   kVirtual      =  1, /**< enum For a Virtual point with a geometry path */
-  kTOF0         =  2
+  kTOF0         =  2,
   kTOF0_1       =  3,
   kTOF0_2       =  4,
   kCherenkov1   =  5,
-  kTOF1         =  6
+  kTOF1         =  6,
   kTOF1_1       =  7,
   kTOF1_2       =  8,
   kTracker1     =  9,

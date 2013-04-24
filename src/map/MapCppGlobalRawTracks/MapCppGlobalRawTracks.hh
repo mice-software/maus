@@ -32,17 +32,25 @@
 
 // MAUS
 #include "DataStructure/Global/Track.hh"
-#include "DataStructure/Global/TrackPoint.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
 
 namespace MAUS {
 
 class CovarianceMatrix;
+class GlobalEvent;
+class ReconEvent;
+class TOFSpacePoint;
+class SciFiSpacePoint;
+
+namespace DataStructure {
+namespace Global {
+  class TrackPoint;
+}
+}
 
 namespace recon {
 namespace global {
-
 }  // namespace global
 }  // namespace recon
 
@@ -54,7 +62,7 @@ class MapCppGlobalRawTracks {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
-  MapCppGlobalRawTracks() : run_data_(NULL);
+  MapCppGlobalRawTracks();
 
   /** @brief Destroys the *global* scope Minuit object
    *
@@ -99,27 +107,27 @@ class MapCppGlobalRawTracks {
 
   MAUS::recon::global::DetectorMap LoadDetectorConfiguration();
 
-  std::vector<MAUS::DataStructure::Global::Track *> LoadTOFTracks(
-      MAUS::recon::global::DetectorMap & detectors,
-      MAUS::ReconEvent * recon_event);
+  void LoadTOFTrack(
+      const MAUS::recon::global::DetectorMap & detectors,
+      MAUS::ReconEvent const * const recon_event,
+      MAUS::DataStructure::Global::TrackPArray & tof_tracks);
 
   void PopulateTOFTrackPoint(
-      const Detector & detector,
+      const MAUS::recon::global::Detector & detector,
       const std::vector<TOFSpacePoint>::const_iterator & tof_space_point,
       const double slab_width,
       const size_t number_of_slabs,
-      TrackPoint * track_point);
+      MAUS::DataStructure::Global::TrackPoint * track_point);
 
-  std::vector<MAUS::DataStructure::Global::Track *> LoadSciFiTracks(
-      MAUS::recon::global::DetectorMap & detectors,
-      MAUS::ReconEvent * recon_event);
+  void LoadSciFiTrack(
+      const MAUS::recon::global::DetectorMap & detectors,
+      MAUS::ReconEvent const * const recon_event,
+      MAUS::DataStructure::Global::TrackPArray & sci_fi_tracks);
 
   void PopulateSciFiTrackPoint(
-      const Detector & detector,
-      const std::vector<SciFiSpacePoint>::const_iterator & scifi_space_point,
-      const double x,
-      const double y,
-      TrackPoint * track_point);
+      const MAUS::recon::global::Detector & detector,
+      const std::vector<SciFiSpacePoint *>::const_iterator & scifi_space_point,
+      MAUS::DataStructure::Global::TrackPoint * track_point);
 
 
   // ***********************************

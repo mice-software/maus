@@ -32,14 +32,10 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
-#include "Recon/Global/Detector.hh"
-#include "Recon/Global/Particle.hh"
-#include "Recon/Global/Track.hh"
-#include "Recon/Global/TrackPoint.hh"
+#include "DataStructure/GlobalEvent.hh"
+#include "DataStructure/Global/Track.hh"
 
 namespace MAUS {
-
-class CovarianceMatrix;
 
 namespace recon {
 namespace global {
@@ -48,10 +44,9 @@ namespace global {
 }  // namespace recon
 
 /** @class MapCppGlobalResiduals
- *  Reconstruct tracks at the desired longitudinal spacing using the desired
- *  track fitting method.
+ *  Calculate residuals between MC data and "digitized" track points
  */
-class MapCppGlobalResiduals {
+class MapCppGlobalResiduals : public MapBase<Spill, Spill> {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
@@ -63,6 +58,7 @@ class MapCppGlobalResiduals {
    */
   ~MapCppGlobalResiduals();
 
+ private:
   /** @brief Begin the startup procedure for TrackReconstructor
    *
    *
@@ -84,23 +80,17 @@ class MapCppGlobalResiduals {
    */
   std::string process(std::string json_run_data);
 
- private:
   Json::Value configuration_;
-  Json::Value run_data_;
-  std::map<MAUS::recon::global::Detector::ID, MAUS::recon::global::Detector>
-    detectors_;
-  std::vector<MAUS::recon::global::Track> raw_tracks_;
-  std::vector<MAUS::recon::global::Track> tracks_;
-  std::vector<MAUS::recon::global::TrackPoint> residuals_;
 
   static const std::string kClassname;
-  void GenerateGlobalResiduals();
-  int FindMatchingTrack(
-    const MAUS::recon::global::TrackPoint& raw_track_point,
-    const MAUS::recon::global::Track& track);
-/*
-  void GenerateStatistics();
-*/
+
+  void LoadReconstructedTracks(
+      MAUS::DataStructure::Global::GlobalEvent const * const global_event,
+      MAUS::DataStructure::Global::TrackPArray & tracks) const;
+
+  void GenerateResidualTrackPoints(
+      MAUS::DataStructure::Global::GlobalEvent * const global_event,
+      const MAUS::DataStructure::Global::TrackPArray & tracks) const;
 };
 
 }  // namespace MAUS

@@ -53,9 +53,9 @@ RealDataDigitization::RealDataDigitization() {
 RealDataDigitization::~RealDataDigitization() {}
 
 void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
-  // Check to see if the spill ReconEventArray pointer has been initialised
+  // Check to see if the spill ReconEventPArray pointer has been initialised
   if (spill.GetReconEvents() == NULL)
-    spill.SetReconEvents(new ReconEventArray());
+    spill.SetReconEvents(new ReconEventPArray());
 
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.

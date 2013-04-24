@@ -37,32 +37,31 @@
 #include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackPointProcessor.hh"
+#include "API/MapBase.hh"
+#include "DataStructure/SciFiSpacePoint.hh"
+#include "DataStructure/Spill.hh"
+#include "DataStructure/TOFEventSpacePoint.hh"
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
-#include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Recon/Global/Track.hh"
-#include "src/common_cpp/Recon/Global/TrackPoint.hh"
+#include "Recon/Global/DataStructureHelper.hh"
+#include "Recon/Global/Detector.hh"
+#include "Recon/Global/Particle.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "Utils/Globals.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
 using MAUS::recon::global::DataStructureHelper;
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::Particle;
-using MAUS::recon::global::Track;
-using MAUS::recon::global::TrackPoint;
+namespace GlobalDS = MAUS::DataStructure::Global;
 
-MapCppGlobalResiduals::MapCppGlobalResiduals() {
+MapCppGlobalResiduals::MapCppGlobalResiduals()
 }
 
 MapCppGlobalResiduals::~MapCppGlobalResiduals() {
@@ -89,28 +88,52 @@ std::cout << "DEBUG MapCppGlobalResiduals::birth(): CHECKPOINT 2" << std::endl;
   return true;  // Sucessful parsing
 }
 
-std::string MapCppGlobalResiduals::process(std::string run_data) {
+std::string MapCppGlobalResiduals::process(std::string run_data_string) {
   // parse the JSON document.
-  try {
-    run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
-
-    DataStructureHelper::GetInstance().GetGlobalRawTracks(run_data_,
-                                                          detectors_,
-                                                          raw_tracks_);
-    DataStructureHelper::GetInstance().GetGlobalTracks(run_data_,
-                                                       detectors_,
-                                                       tracks_);
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
-  } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
+  Json::Value run_data_json
+    = Json::Value(JsonWrapper::StringToJson(run_data_string));
+  if (run_data_json.isNull() || run_data_json.empty()) {
+    return std::string("{\"errors\":{\"bad_json_document\":"
+                        "\"Failed to parse input document\"}}");
   }
 
-  GenerateGlobalResiduals();
+  JsonCppSpillConverter deserialize;
+  MAUS::Data * run_data = deserialize(&run_data_json);
+  if (!run_data) {
+    return std::string("{\"errors\":{\"failed_json_cpp_conversion\":"
+                        "\"Failed to convert Json to C++ Data object\"}}");
+  }
 
-  // pass on the updated run data to the next map in the workflow
+  const MAUS::Spill * spill = run_data->GetSpill();
+
+  ReconEventPArray * recon_events = spill->GetReconEvents();
+  if (!recon_events) {
+    return run_data_string;
+  }
+
+  ReconEventPArray::const_iterator recon_event;
+  for (recon_event = recon_events->begin();
+       recon_event < recon_events->end();
+       ++recon_event) {
+    GlobalEvent * const global_event;
+
+    GlobalDS::TrackPtrArray tracks;
+    LoadReconstructedTrackPoints(global_event, tracks);
+
+    GenerateResidualTracks(global_event, tracks);
+  }
+
+  // Serialize the Spill for passing on to the next map in the workflow
+  CppJsonSpillConverter serialize;
   Json::FastWriter writer;
-  std::string output = writer.write(run_data_);
+  std::string output = writer.write(*serialize(run_data));
+  std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
+            << "Output: " << std::endl
+            << output << std::endl;
+
+  // Delete the GlobalEvent instance as well as any Track and TrackPoint
+  // instances added to it using add_track_recursive().
+  delete global_event;
 
   return output;
 }
@@ -119,72 +142,30 @@ bool MapCppGlobalResiduals::death() {
   return true;  // successful
 }
 
-void MapCppGlobalResiduals::GenerateGlobalResiduals() {
-  GlobalTrackPointProcessor serializer;
-  Json::Value json_residuals;
-std::cout << "DEBUG MapCppGlobalResiduals::GenerateGlobalResiduals(): " << std::endl
-          << "Processing " << raw_tracks_.size() << " tracks..." << std::endl;
-  // FIXME(Lane) When the global recon data structure is available we should be
-  // matching raw tracks with reconstructed tracks by track ID
-  for (std::vector<Track>::const_iterator raw_track = raw_tracks_.begin(),
-       track = tracks_.begin();
-       raw_track != raw_tracks_.end();
-       ++raw_track, ++track) {
-    for (Track::const_iterator raw_track_point = raw_track->begin();
-         raw_track_point != raw_track->end();
-         ++raw_track_point) {
-      const int track_point_index
-        = FindMatchingTrack(*raw_track_point, *track);
-      if (track_point_index < 0) {
-        throw(Squeal(Squeal::nonRecoverable,
-                    "Unable to match raw tracks with reconstructed tracks.",
-                    "MapCppGlobalResiduals::CalculateResiduals()"));
-      }
-      const TrackPoint& track_point = (*track)[track_point_index];
-      residuals_.push_back(track_point - *raw_track_point);
-      const GlobalTrackPoint residual
-        = DataStructureHelper::GetInstance().TrackPointToGlobalTrackPoint(
-          residuals_.back(), false);
-      Json::Value * json_residual = serializer.CppToJson(residual, "");
-      json_residuals.append(*json_residual);
-      delete json_residual;
+void MapCppGlobalResiduals::LoadReconstructedTracks(
+    GlobalDS::GlobalEvent const * const global_event,
+    GlobalDS::TrackPArray & tracks) const {
+  GlobalDS::TrackPArray * global_tracks = global_event->get_tracks();
+  GlobalDS::TrackPArray::iterator global_track;
+  const std::string recon_mapper_name("MapCppGlobalTrackReconstructor");
+  for (global_track = global_tracks->begin();
+       global_track < global_tracks->end();
+       ++global_track) {
+    if ((*global_track)->get_mapper_name() == recon_mapper_name) {
+      tracks.push_back(*global_track);
     }
   }
-
-  run_data_["global_residuals"] = json_residuals;
 }
 
-int MapCppGlobalResiduals::FindMatchingTrack(const TrackPoint& raw_track_point,
-                                             const Track& track) {
-  const double raw_z = raw_track_point.z();
-std::cout << "DEBUG MapCppGlobalResiduals::FindMatchingTrack(): " << std::endl
-          << "raw z: " << raw_z << "\ttrack: " << track << std::endl;
-  double z;
-  // Do a binary search for the track element with the
-  // same z coordinate as the raw track point
-  size_t lower_index = 0;
-  size_t upper_index = track.size() - 1;
-  while (upper_index != lower_index) {
-    const size_t index = (lower_index + upper_index) / 2. + 0.5;
-    z = track[index].z();
-std::cout << "DEBUG MapCppGlobalResiduals::FindMatchingTrack(): " << std::endl
-          << "lower index: " << lower_index << "\tupper index: " << upper_index
-          << std::endl << "index: " << index << "\tz: " << z << std::endl;
-    if (z < raw_z) {
-      lower_index = index;
-    } else if (z > raw_z) {
-      upper_index = index;
-    } else {
-      lower_index = index;
-      upper_index = index;
-    }
-  }
-  if (z != raw_z) {
-std::cout << "DEBUG MapCppGlobalResiduals::FindMatchingTrack(): "
-          << "raw z: " << raw_z << "\tz: " << z << std::endl;
-    return -1;
-  }
-  return lower_index;
+void MapCppGlobalResiduals::GenerateResidualTrackPoints(
+    GlobalDS::GlobalEvent * const global_event,
+    const GlobalDS::TrackPArray & tracks) const {
+  // for each track
+  //    1) load constituent tracks with mapper name "MapCppGlobalRawTracks"
+  //    2) create TrackPoint residual for each pair of matching TrackPoints
+  //       in reconstructed and raw tracks
+  //    3) add residual TrackPoint to global_event with mapper name
+  //       "MapCppGlobalResiduals"
 }
 
 const std::string MapCppGlobalResiduals::kClassname

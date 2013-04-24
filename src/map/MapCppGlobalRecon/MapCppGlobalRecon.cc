@@ -21,8 +21,6 @@
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 
-#include "Recon/Global/ImportSciFiRecon.hh"
-
 namespace MAUS {
 MapCppGlobalRecon::MapCppGlobalRecon() {
   _classname = "MapCppGlobalRecon";
@@ -75,7 +73,7 @@ std::string MapCppGlobalRecon::process(std::string document) const {
 
   const MAUS::Spill* spill = data_cpp->GetSpill();
 
-  MAUS::ReconEventArray* recon_events = spill->GetReconEvents();
+  MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
 
   if (!recon_events) {
     return document;
@@ -83,7 +81,7 @@ std::string MapCppGlobalRecon::process(std::string document) const {
 
   std::cout << "Recon Event Size:\t" << recon_events->size() << std::endl;
 
-  MAUS::ReconEventArray::iterator recon_event_iter;
+  MAUS::ReconEventPArray::iterator recon_event_iter;
   for (recon_event_iter = recon_events->begin();
       recon_event_iter != recon_events->end();
       ++recon_event_iter) {

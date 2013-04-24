@@ -73,7 +73,7 @@ Spill& Spill::operator=(const Spill& md) {
     if (md._mc == NULL) {
         _mc = NULL;
     } else {
-        _mc = new MCEventArray(*md._mc);
+        _mc = new MCEventPArray(*md._mc);
     }
 
     if (_recon != NULL) {
@@ -85,7 +85,7 @@ Spill& Spill::operator=(const Spill& md) {
     if (md._recon == NULL) {
         _recon = NULL;
     } else {
-        _recon = new ReconEventArray(*md._recon);
+        _recon = new ReconEventPArray(*md._recon);
     }
 
     _daq_event_type = md._daq_event_type;
@@ -143,19 +143,19 @@ EMRSpillData* Spill::GetEMRSpillData() const {
   return _emr;
 }
 
-void Spill::SetMCEvents(MCEventArray* mc) {
+void Spill::SetMCEvents(MCEventPArray* mc) {
   _mc = mc;
 }
 
-MCEventArray* Spill::GetMCEvents() const {
+MCEventPArray* Spill::GetMCEvents() const {
   return _mc;
 }
 
-void Spill::SetReconEvents(ReconEventArray* recon) {
+void Spill::SetReconEvents(ReconEventPArray* recon) {
   _recon = recon;
 }
 
-ReconEventArray* Spill::GetReconEvents() const {
+ReconEventPArray* Spill::GetReconEvents() const {
   return _recon;
 }
 
