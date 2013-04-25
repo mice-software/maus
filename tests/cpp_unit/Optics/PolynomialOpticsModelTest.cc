@@ -184,12 +184,12 @@ TEST_F(PolynomialOpticsModelTest, Constructor) {
 TEST_F(PolynomialOpticsModelTest, Accessors) {
   PolynomialOpticsModel optics_model(
       *MAUS::Globals::GetConfigurationCards());
-  double first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(1000., first_plane);
+  double primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(1000., primary_plane);
 
-  optics_model.set_first_plane(2000.);
-  first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(2000., first_plane);
+  optics_model.set_primary_plane(2000.);
+  primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(2000., primary_plane);
 }
 
 TEST_F(PolynomialOpticsModelTest, Transport) {

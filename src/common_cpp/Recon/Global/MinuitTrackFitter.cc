@@ -135,16 +135,16 @@ MinuitTrackFitter::~MinuitTrackFitter() {
   delete common_cpp_optics_recon_minuit_track_fitter_minuit;
 }
 
-void MinuitTrackFitter::Fit(const Track & raw_track, Track & track) {
+void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track) {
   std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
   std::cout.flush();
   *const_cast<std::vector<const TrackPoint*>*>(&detector_events_)
-    = raw_track.GetTrackPoints();
+    = raw_track->GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
   std::cout << "DEBUG ScoreTrack(): Fitting track with "
             << detector_events_.size() << "track points." << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl;
-  particle_id_ = raw_track.get_pid();
+  particle_id_ = raw_track->get_pid();
 
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl;
   if (detector_events_.size() < 2) {
@@ -167,9 +167,9 @@ void MinuitTrackFitter::Fit(const Track & raw_track, Track & track) {
           = reconstructed_points_.begin();
        reconstructed_point < reconstructed_points_.end();
        ++reconstructed_point) {
-    track.AddTrackPoint(new TrackPoint(*reconstructed_point));
+    track->AddTrackPoint(new TrackPoint(*reconstructed_point));
   }
-  track.set_pid(raw_track.get_pid());
+  track->set_pid(raw_track->get_pid());
 
 std::cout << "CHECKPOINT Fit(): END" << std::endl;
 std::cout.flush();

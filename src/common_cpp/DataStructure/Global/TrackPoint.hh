@@ -154,8 +154,10 @@ class TrackPoint : public BasePoint {
 }; // ~class TrackPoint
 
 typedef std::vector<MAUS::DataStructure::Global::TrackPoint> TrackPointArray;
-typedef
-std::vector<MAUS::DataStructure::Global::TrackPoint *> TrackPointPArray;
+typedef std::vector<MAUS::DataStructure::Global::TrackPoint *>
+  TrackPointPArray;
+typedef std::vector<const MAUS::DataStructure::Global::TrackPoint *>
+  ConstTrackPointPArray;
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

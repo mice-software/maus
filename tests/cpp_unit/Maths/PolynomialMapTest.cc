@@ -378,11 +378,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
         points, values, 1, weightFunction);
 
   // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), 1);
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
 
   // with polynomial order 1, the number of poly. coeff. is just the number of
   // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 4);
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
   CLHEP::HepMatrix recCoeff
     = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
@@ -406,11 +406,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
                                                      1, weights);
 
   // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), 1);
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
 
   // with polynomial order 1, the number of poly. coeff. is just the number of
   // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 4);
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
   recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
   Squeak::mout(Squeak::debug) << "Weighted Input" << mat << "Weighted Output"
@@ -431,11 +431,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
                                                      1, weightFunction);
 
   // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), 1);
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
 
   // with polynomial order 1, the number of poly. coeff. is just the number of
   // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 4);
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
   recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
   for (int i = 0; i < recCoeff.num_row(); i++)
@@ -459,11 +459,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     points, values, 1, constraintPVec->GetCoefficientsAsVector(), weights);
 
   // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), 1);
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
 
   // with polynomial order 1, the number of poly. coeff. is just the number of
   // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 4);
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
   recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
   Squeak::mout(Squeak::debug) << "Constrained Input\n" << *constraintPVec
@@ -552,11 +552,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
                                 << std::endl;
   } else {
     // polynomial order should be 1
-    EXPECT_EQ(pVec->PolynomialOrder(), 1);
+    EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
 
     // with polynomial order 1, the number of poly. coeff. is just the number of
     // variables plus one for the constant term
-    EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 4);
+    EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
     Matrix<double> o1 = pVec ->GetCoefficientsAsMatrix();
     Matrix<double> o2 = testF->GetCoefficientsAsMatrix();
@@ -610,11 +610,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     1e-20, delta, 10., 100, deltaMax);
 
   // polynomial order should be 2
-  EXPECT_EQ(pVec->PolynomialOrder(), 2);
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(2));
 
   // with point size 3 and polynomial order 2,
   // the number of poly. coeff. is (3+2)!/(3!2!) = 10
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), 10);
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(10));
 
   Squeak::mout(Squeak::debug) << "delta variable walls: ";
   for (size_t i = 0; i < delta.size(); i++) {
@@ -640,11 +640,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     testpass = false;
   } else {
     // polynomial order should be 2
-    EXPECT_EQ(pVec2->PolynomialOrder(), 2);
+    EXPECT_EQ(pVec2->PolynomialOrder(), static_cast<size_t>(2));
 
     // with point size 3 and polynomial order 2,
     // the number of poly. coeff. is (3+2)!/(3!2!) = 10
-    EXPECT_EQ(pVec2->NumberOfPolynomialCoefficients(), 10);
+    EXPECT_EQ(pVec2->NumberOfPolynomialCoefficients(), static_cast<size_t>(10));
 
     Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n"
                                 << *testF2

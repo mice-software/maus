@@ -26,33 +26,34 @@
 #include <string>
 
 // External
+#include "TLorentzVector.h"
 #include "TMinuit.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "json/json.h"
 
 // Legacy/G4MICE
 #include "Interface/Squeal.hh"
-#include "Interface/dataCards.hh"
 
 // MAUS
-#include "src/common_cpp/DataStructure/GlobalTrack.hh"
-#include "src/common_cpp/DataStructure/GlobalTrackPoint.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalTrackProcessor.hh"
+#include "Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "DataStructure/GlobalEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/Spill.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
+#include "DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
-#include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
-#include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/MinuitTrackFitter.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Recon/Global/ReconstructionInput.hh"
-#include "src/common_cpp/Recon/Global/Track.hh"
-#include "src/common_cpp/Recon/Global/TrackFitter.hh"
-#include "src/common_cpp/Recon/Global/TrackPoint.hh"
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "Recon/Global/DataStructureHelper.hh"
+#include "Recon/Global/Detector.hh"
+#include "Recon/Global/MinuitTrackFitter.hh"
+#include "Recon/Global/Particle.hh"
+#include "Recon/Global/TrackFitter.hh"
+#include "Simulation/MAUSGeant4Manager.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
@@ -60,10 +61,8 @@ using MAUS::recon::global::DataStructureHelper;
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::MinuitTrackFitter;
 using MAUS::recon::global::Particle;
-using MAUS::recon::global::ReconstructionInput;
-using MAUS::recon::global::Track;
 using MAUS::recon::global::TrackFitter;
-using MAUS::recon::global::TrackPoint;
+namespace GlobalDS = MAUS::DataStructure::Global;
 
 MapCppGlobalTrackReconstructor::MapCppGlobalTrackReconstructor()
     : optics_model_(NULL), track_fitter_(NULL) {
@@ -79,11 +78,11 @@ MapCppGlobalTrackReconstructor::~MapCppGlobalTrackReconstructor() {
   }
 }
 
-bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
+bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
   // parse the JSON document.
   try {
-    configuration_ = JsonWrapper::StringToJson(configuration);
-    Json::Value physics_processes = configuration_["physics_processes"];
+    Json::Value configuration = JsonWrapper::StringToJson(configuration_string);
+    Json::Value physics_processes = configuration["physics_processes"];
     if ((physics_processes != Json::Value("mean_energy_loss"))
         && (physics_processes != Json::Value("none"))) {
       throw(Squeal(Squeal::nonRecoverable,
@@ -93,9 +92,9 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
                   "MAUS::MapCppGlobalTrackReconstructor::birth()"));
     }
     DataStructureHelper::GetInstance().GetDetectorAttributes(
-        configuration_, detectors_);
-    SetupOpticsModel();
-    SetupTrackFitter();
+        configuration, detectors_);
+    SetupOpticsModel(configuration);
+    SetupTrackFitter(configuration);
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
       squee, MapCppGlobalTrackReconstructor::kClassname);
@@ -109,94 +108,61 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration) {
   return true;  // Sucessful parsing
 }
 
-std::string MapCppGlobalTrackReconstructor::process(std::string run_data) {
+std::string MapCppGlobalTrackReconstructor::process(
+    std::string run_data_string) {
   // parse the JSON document.
-  Json::Value recon_events;
-  try {
-    run_data_ = Json::Value(JsonWrapper::StringToJson(run_data));
-    recon_events = JsonWrapper::GetProperty(run_data_, "recon_events",
-                                            JsonWrapper::arrayValue);
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
-  } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
+  Json::Value run_data_json
+    = Json::Value(JsonWrapper::StringToJson(run_data_string));
+  if (run_data_json.isNull() || run_data_json.empty()) {
+    return std::string("{\"errors\":{\"bad_json_document\":"
+                        "\"Failed to parse input document\"}}");
   }
 
-  size_t event_index = 0;
-  for (Json::Value::iterator recon_event = recon_events.begin();
-       recon_event != recon_events.end();
-       ++recon_event) {
-std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-          << "Processing recon event #" << event_index << std::endl;
-    try {
-      raw_tracks_.clear();
-      DataStructureHelper::GetInstance().GetGlobalRawTracks(*recon_event,
-                                                            detectors_,
-                                                            raw_tracks_);
-    } catch(Squeal& squee) {
-      MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, kClassname);
-    } catch(std::exception& exc) {
-      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, kClassname);
-    }
-std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-          << "Loaded " << raw_tracks_.size() << " tracks." << std::endl;
-    if (raw_tracks_.size() == 0) {
-      throw(Squeal(Squeal::recoverable,
-                  "Null recon input.",
-                  "MapCppGlobalTrackReconstructor::process()"));
-    }
+  JsonCppSpillConverter deserialize;
+  MAUS::Data * run_data = deserialize(&run_data_json);
+  if (!run_data) {
+    return std::string("{\"errors\":{\"failed_json_cpp_conversion\":"
+                        "\"Failed to convert Json to C++ Data object\"}}");
+  }
 
-    Json::Value global_tracks;
+  const MAUS::Spill * spill = run_data->GetSpill();
+  MAUS::ReconEventPArray * recon_events = spill->GetReconEvents();
+  if (!recon_events) {
+    return run_data_string;
+  }
 
-    // Find the best fit track for each particle traversing the lattice
-    size_t track_count = 0;
-    for (std::vector<Track>::const_iterator raw_track = raw_tracks_.begin();
-        raw_track != raw_tracks_.end();
-        ++raw_track) {
-std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-          << "Processing track #" << track_count
-          << " from recon event #" << event_index << std::endl;
-      // FIXME(Lane) Assuming the track doesn't decay for now.
-      Particle::ID particle_id = (*raw_track)[0].particle_id();
+  MAUS::ReconEventPArray::const_iterator recon_event;
+  for (recon_event = recon_events->begin();
+      recon_event < recon_events->end();
+      ++recon_event) {
+    MAUS::GlobalEvent * const global_event = (*recon_event)->GetGlobalEvent();
 
-      MAUS::recon::global::Track best_fit_track(particle_id);
+    GlobalDS::TrackPArray raw_tracks;
+    LoadRawTracks(global_event, raw_tracks);
+
+    // Fit each raw track and store best fit track in global_event
+    GlobalDS::TrackPArray::const_iterator raw_track;
+    for (raw_track = raw_tracks.begin();
+         raw_track < raw_tracks.end();
+         ++raw_track) {
+      GlobalDS::Track * best_fit_track = new GlobalDS::Track();
+      best_fit_track->set_mapper_name(kClassname);
+
       track_fitter_->Fit(*raw_track, best_fit_track);
-      // TODO(plane1@hawk.iit.edu) Reconstruct track at the desired locations
-      //  specified in the configuration.
 
-  std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-            << "Appending a best fit track of size " << best_fit_track.size()
-            << " to global_tracks" << std::endl;
-  // std::cout << best_fit_track << std::endl;
-      global_tracks.append(
-        DataStructureHelper::GetInstance().TrackToJson(best_fit_track));
-      ++track_count;
+      global_event->add_track_recursive(best_fit_track);
     }
-
-
-    // TODO(plane1@hawk.iit.edu) Update the run data with recon results.
-    if (global_tracks.size() > 0) {
-      run_data_["recon_events"][event_index]["global_event"]["tracks"]
-        = global_tracks;
-    } else {
-  std::cout << "DEBUG MapCppGlobalTrackReconstructor::process(): "
-            << "Skipping track of zero length." << std::endl;
-    }
-    ++event_index;
   }
 
-  /*
-  TRefArrayIter track_point_iter(_track_points);
-  for (TRef * track_point = dynamic_cast<TRef*>(track_point_iter.Next());
-       track_point > 0;
-       track_point = dynamic_cast<TRef*>(track_point_iter.Next())) {
-    delete track_point;
-  }
-  */
-
-  // pass on the updated run data to the next map in the workflow
+  // Serialize the Spill for passing on to the next map in the workflow
+  CppJsonSpillConverter serialize;
   Json::FastWriter writer;
-  std::string output = writer.write(run_data_);
+  std::string output = writer.write(*serialize(run_data));
+  std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
+            << "Output: " << std::endl
+            << output << std::endl;
+
+  delete run_data;
 
   return output;
 }
@@ -205,15 +171,16 @@ bool MapCppGlobalTrackReconstructor::death() {
   return true;  // successful
 }
 
-void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
+void MapCppGlobalTrackReconstructor::SetupOpticsModel(
+    const Json::Value & configuration) {
 fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n");
 fflush(stdout);
   Json::Value optics_model_names = JsonWrapper::GetProperty(
-      configuration_,
+      configuration,
       "global_recon_optics_models",
       JsonWrapper::arrayValue);
   Json::Value optics_model_name = JsonWrapper::GetProperty(
-      configuration_,
+      configuration,
       "global_recon_optics_model",
       JsonWrapper::stringValue);
   size_t model;
@@ -249,7 +216,7 @@ fflush(stdout);
     case 2: {
 fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n");
 fflush(stdout);
-     optics_model_ = new PolynomialOpticsModel(configuration_);
+     optics_model_ = new PolynomialOpticsModel(configuration);
       break;
     }
     case 3: {
@@ -266,7 +233,7 @@ fflush(stdout);
       // "Linear Approximation"
 fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n");
 fflush(stdout);
-     optics_model_ = new LinearApproximationOpticsModel(configuration_);
+     optics_model_ = new LinearApproximationOpticsModel(configuration);
       break;
     }
     default: {
@@ -282,19 +249,18 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 2\n");
 fflush(stdout);
   optics_model_->Build();
 
-  // make sure we don't override mc_events in the output data structure
-  configuration_.removeMember("mc_events");
 fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 3\n");
 fflush(stdout);
 }
 
-void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
+void MapCppGlobalTrackReconstructor::SetupTrackFitter(
+    const Json::Value & configuration) {
   Json::Value fitter_names = JsonWrapper::GetProperty(
-      configuration_,
+      configuration,
       "global_recon_track_fitters",
       JsonWrapper::arrayValue);
   Json::Value fitter_name = JsonWrapper::GetProperty(
-      configuration_,
+      configuration,
       "global_recon_track_fitter",
       JsonWrapper::stringValue);
   size_t fitter;
@@ -307,7 +273,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
   switch (fitter) {
     case 0: {
       // Minuit
-      double start_plane = optics_model_->first_plane();
+      double start_plane = optics_model_->primary_plane();
       track_fitter_ = new MinuitTrackFitter(*optics_model_, start_plane);
       break;
     }
@@ -338,6 +304,21 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
       throw(Squeal(Squeal::nonRecoverable,
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
+    }
+  }
+}
+
+void MapCppGlobalTrackReconstructor::LoadRawTracks(
+    GlobalEvent const * const global_event,
+    GlobalDS::TrackPArray & tracks) const {
+  GlobalDS::TrackPArray * global_tracks = global_event->get_tracks();
+  GlobalDS::TrackPArray::iterator global_track;
+  const std::string recon_mapper_name("MapCppGlobalRawTracks");
+  for (global_track = global_tracks->begin();
+       global_track < global_tracks->end();
+       ++global_track) {
+    if ((*global_track)->get_mapper_name() == recon_mapper_name) {
+      tracks.push_back(*global_track);
     }
   }
 }

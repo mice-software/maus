@@ -61,8 +61,8 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
                     const double start_plane);
 
   // pure virtual function from TrackFitter base class
-  void Fit(const MAUS::DataStructure::Global::Track & raw_track,
-           MAUS::DataStructure::Global::Track & track);
+  void Fit(MAUS::DataStructure::Global::Track const * const raw_track,
+           MAUS::DataStructure::Global::Track * const track);
 
   ~MinuitTrackFitter();
 

@@ -15,6 +15,7 @@
  *
  */
 #include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
@@ -69,7 +70,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
   // Check the Recon event array is initialised, and if not make it so
   if ( !spill.GetReconEvents() ) {
-    ReconEventArray* revts = new ReconEventArray();
+    ReconEventPArray* revts = new ReconEventPArray();
     spill.SetReconEvents(revts);
   }
 

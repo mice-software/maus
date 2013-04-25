@@ -166,12 +166,12 @@ TEST_F(LinearApproximationOpticsModelTest, Constructor) {
 TEST_F(LinearApproximationOpticsModelTest, Accessors) {
   LinearApproximationOpticsModel optics_model(
       *MAUS::Globals::GetConfigurationCards());
-  double first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(-1000., first_plane);
+  double primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(-1000., primary_plane);
 
-  optics_model.set_first_plane(0.);
-  first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(0., first_plane);
+  optics_model.set_primary_plane(0.);
+  primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(0., primary_plane);
 }
 
 TEST_F(LinearApproximationOpticsModelTest, Transport) {

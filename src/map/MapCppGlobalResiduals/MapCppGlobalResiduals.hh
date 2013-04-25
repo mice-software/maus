@@ -46,7 +46,7 @@ namespace global {
 /** @class MapCppGlobalResiduals
  *  Calculate residuals between MC data and "digitized" track points
  */
-class MapCppGlobalResiduals : public MapBase<Spill, Spill> {
+class MapCppGlobalResiduals {
  public:
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
@@ -58,7 +58,6 @@ class MapCppGlobalResiduals : public MapBase<Spill, Spill> {
    */
   ~MapCppGlobalResiduals();
 
- private:
   /** @brief Begin the startup procedure for TrackReconstructor
    *
    *
@@ -80,16 +79,17 @@ class MapCppGlobalResiduals : public MapBase<Spill, Spill> {
    */
   std::string process(std::string json_run_data);
 
+ private:
   Json::Value configuration_;
 
   static const std::string kClassname;
 
   void LoadReconstructedTracks(
-      MAUS::DataStructure::Global::GlobalEvent const * const global_event,
+      GlobalEvent const * const global_event,
       MAUS::DataStructure::Global::TrackPArray & tracks) const;
 
   void GenerateResidualTrackPoints(
-      MAUS::DataStructure::Global::GlobalEvent * const global_event,
+      GlobalEvent * const global_event,
       const MAUS::DataStructure::Global::TrackPArray & tracks) const;
 };
 

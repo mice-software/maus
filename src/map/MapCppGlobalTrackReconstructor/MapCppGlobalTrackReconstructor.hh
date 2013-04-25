@@ -32,9 +32,10 @@
 #include "Interface/Squeak.hh"
 
 // MAUS
+#include "DataStructure/GlobalEvent.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "DataStructure/Global/Track.hh"
 #include "Recon/Global/Detector.hh"
-#include "Recon/Global/Track.hh"
-#include "Recon/Global/TrackPoint.hh"
 
 namespace MAUS {
 
@@ -88,20 +89,19 @@ class MapCppGlobalTrackReconstructor {
   std::string process(std::string document);
 
  private:
-  Json::Value configuration_;
   OpticsModel * optics_model_;
   MAUS::recon::global::TrackFitter * track_fitter_;
 
-  Json::Value run_data_;
-  std::vector<MAUS::recon::global::Track> raw_tracks_;
-  std::map<MAUS::recon::global::Detector::ID, MAUS::recon::global::Detector>
-    detectors_;
+  MAUS::recon::global::DetectorMap detectors_;
 
   static const std::string kClassname;
   BTField * electromagnetic_field_;
 
-  void SetupOpticsModel();
-  void SetupTrackFitter();
+  void SetupOpticsModel(const Json::Value & configuration);
+  void SetupTrackFitter(const Json::Value & configuration);
+  void LoadRawTracks(
+      GlobalEvent const * const global_event,
+      MAUS::DataStructure::Global::TrackPArray & tracks) const;
 };
 
 }  // namespace MAUS

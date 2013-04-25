@@ -93,7 +93,7 @@ class MapCppGlobalRawTracks {
   std::string process(std::string document);
 
  private:
-  Json::Value configuration_;
+  MAUS::recon::global::DetectorMap detectors_;
   int beam_polarity_;
 
   static const std::string kClassname;
@@ -108,7 +108,6 @@ class MapCppGlobalRawTracks {
   MAUS::recon::global::DetectorMap LoadDetectorConfiguration();
 
   void LoadTOFTrack(
-      const MAUS::recon::global::DetectorMap & detectors,
       MAUS::ReconEvent const * const recon_event,
       MAUS::DataStructure::Global::TrackPArray & tof_tracks);
 
@@ -120,7 +119,6 @@ class MapCppGlobalRawTracks {
       MAUS::DataStructure::Global::TrackPoint * track_point);
 
   void LoadSciFiTrack(
-      const MAUS::recon::global::DetectorMap & detectors,
       MAUS::ReconEvent const * const recon_event,
       MAUS::DataStructure::Global::TrackPArray & sci_fi_tracks);
 

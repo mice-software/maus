@@ -17,6 +17,8 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
@@ -61,13 +63,13 @@ TEST(SpillTest, SpillTest) {
     EMRSpillData* emr_2 = new EMRSpillData();
     EMRSpillData* emr_null = NULL;
 
-    MCEventArray* mc_1 = new MCEventArray();
-    MCEventArray* mc_2 = new MCEventArray();
-    MCEventArray* mc_null = NULL;
+    MCEventPArray* mc_1 = new MCEventPArray();
+    MCEventPArray* mc_2 = new MCEventPArray();
+    MCEventPArray* mc_null = NULL;
 
-    ReconEventArray* rec_1 = new ReconEventArray();
-    ReconEventArray* rec_2 = new ReconEventArray();
-    ReconEventArray* rec_null = NULL;
+    ReconEventPArray* rec_1 = new ReconEventPArray();
+    ReconEventPArray* rec_2 = new ReconEventPArray();
+    ReconEventPArray* rec_null = NULL;
 
     ErrorsMap errors_1 = std::map<std::string, std::string>();
     errors_1["test"] = "test_out";

@@ -61,30 +61,13 @@ using MAUS::recon::global::Detector;
 using MAUS::recon::global::Particle;
 namespace GlobalDS = MAUS::DataStructure::Global;
 
-MapCppGlobalResiduals::MapCppGlobalResiduals()
+MapCppGlobalResiduals::MapCppGlobalResiduals() {
 }
 
 MapCppGlobalResiduals::~MapCppGlobalResiduals() {
 }
 
 bool MapCppGlobalResiduals::birth(std::string configuration) {
-  // parse the JSON document.
-  try {
-    configuration_ = JsonWrapper::StringToJson(configuration);
-std::cout << "DEBUG MapCppGlobalResiduals::birth(): CHECKPOINT 1" << std::endl;
-    DataStructureHelper::GetInstance().GetDetectorAttributes(
-        configuration_, detectors_);
-std::cout << "DEBUG MapCppGlobalResiduals::birth(): CHECKPOINT 2" << std::endl;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
-      squee, MapCppGlobalResiduals::kClassname);
-    return false;
-  } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
-      exc, MapCppGlobalResiduals::kClassname);
-    return false;
-  }
-
   return true;  // Sucessful parsing
 }
 
@@ -115,12 +98,12 @@ std::string MapCppGlobalResiduals::process(std::string run_data_string) {
   for (recon_event = recon_events->begin();
        recon_event < recon_events->end();
        ++recon_event) {
-    GlobalEvent * const global_event;
+    GlobalEvent * const global_event = (*recon_event)->GetGlobalEvent();
 
-    GlobalDS::TrackPtrArray tracks;
-    LoadReconstructedTrackPoints(global_event, tracks);
+    GlobalDS::TrackPArray tracks;
+    LoadReconstructedTracks(global_event, tracks);
 
-    GenerateResidualTracks(global_event, tracks);
+    GenerateResidualTrackPoints(global_event, tracks);
   }
 
   // Serialize the Spill for passing on to the next map in the workflow
@@ -131,9 +114,7 @@ std::string MapCppGlobalResiduals::process(std::string run_data_string) {
             << "Output: " << std::endl
             << output << std::endl;
 
-  // Delete the GlobalEvent instance as well as any Track and TrackPoint
-  // instances added to it using add_track_recursive().
-  delete global_event;
+  delete run_data;
 
   return output;
 }
@@ -143,7 +124,7 @@ bool MapCppGlobalResiduals::death() {
 }
 
 void MapCppGlobalResiduals::LoadReconstructedTracks(
-    GlobalDS::GlobalEvent const * const global_event,
+    GlobalEvent const * const global_event,
     GlobalDS::TrackPArray & tracks) const {
   GlobalDS::TrackPArray * global_tracks = global_event->get_tracks();
   GlobalDS::TrackPArray::iterator global_track;
@@ -158,7 +139,7 @@ void MapCppGlobalResiduals::LoadReconstructedTracks(
 }
 
 void MapCppGlobalResiduals::GenerateResidualTrackPoints(
-    GlobalDS::GlobalEvent * const global_event,
+    GlobalEvent * const global_event,
     const GlobalDS::TrackPArray & tracks) const {
   // for each track
   //    1) load constituent tracks with mapper name "MapCppGlobalRawTracks"
@@ -166,6 +147,50 @@ void MapCppGlobalResiduals::GenerateResidualTrackPoints(
   //       in reconstructed and raw tracks
   //    3) add residual TrackPoint to global_event with mapper name
   //       "MapCppGlobalResiduals"
+  GlobalDS::TrackPArray::const_iterator track;
+  const std::string raw_mapper_name("MapCppGlobalRawTracks");
+  for (track = tracks.begin();
+       track < tracks.end();
+       ++track) {
+    // Find the raw track this reconstructed track is based on
+    GlobalDS::ConstTrackPArray raw_tracks = (*track)->GetConstituentTracks();
+    GlobalDS::ConstTrackPArray::const_iterator raw_track;
+    for (raw_track = raw_tracks.begin();
+          raw_track < raw_tracks.end();
+          ++raw_track) {
+      if ((*raw_track)->get_mapper_name() == raw_mapper_name) {
+        break;
+      }
+    }
+
+    GlobalDS::ConstTrackPointPArray recon_track_points
+      = (*track)->GetTrackPoints();
+    GlobalDS::ConstTrackPointPArray::const_iterator recon_track_point
+      = recon_track_points.begin();
+    GlobalDS::ConstTrackPointPArray raw_track_points
+      = (*raw_track)->GetTrackPoints();
+    GlobalDS::ConstTrackPointPArray::const_iterator raw_track_point
+      = raw_track_points.begin();
+    // FIXME(Lane) eventually will have to take into account track points
+    // without parent track points created between detectors
+    while (recon_track_point < recon_track_points.end()) {
+      GlobalDS::TrackPoint * residual
+        = new GlobalDS::TrackPoint(**recon_track_point);
+      residual->set_mapper_name(kClassname);
+
+      TLorentzVector recon_position = (*recon_track_point)->get_position();
+      TLorentzVector raw_position = (*raw_track_point)->get_position();
+      residual->set_position(recon_position - raw_position);
+
+      TLorentzVector recon_momentum = (*recon_track_point)->get_momentum();
+      TLorentzVector raw_momentum = (*raw_track_point)->get_momentum();
+      residual->set_momentum(recon_momentum - raw_momentum);
+
+      global_event->add_track_point(residual);
+
+      ++recon_track_point;
+    }
+  }
 }
 
 const std::string MapCppGlobalResiduals::kClassname
