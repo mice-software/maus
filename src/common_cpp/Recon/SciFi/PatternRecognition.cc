@@ -51,7 +51,7 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
-PatternRecognition::PatternRecognition() {
+PatternRecognition::PatternRecognition(): _lsq(_sd_1to4, _sd_5, _R_res_cut) {
   if (_debug == 2) {
     _f_res = new ofstream();
     _f_res->open("residuals.dat", std::ios::app);
@@ -462,8 +462,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
         // Fit track
         SimpleLine line_x, line_y;
-        linear_fit(z, x, x_err, line_x);
-        linear_fit(z, y, y_err, line_y);
+        _lsq.linear_fit(z, x, x_err, line_x);
+        _lsq.linear_fit(z, y, y_err, line_y);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _chisq_cut ) &&
@@ -497,46 +497,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
     } // ~Loop over sp in station 1
   } // ~Loop over sp in station 5
 } // ~make_straight_tracks(...)
-
-void PatternRecognition::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
-                                    const std::vector<double> &_y_err, SimpleLine &line) {
-
-  int n_points = static_cast<int>(_x.size());
-
-  CLHEP::HepMatrix A(n_points, 2); // rows, columns
-  CLHEP::HepMatrix V(n_points, n_points); // error matrix
-  CLHEP::HepMatrix Y(n_points, 1); // measurements
-
-  for ( int i = 0; i < static_cast<int>(_x.size()); ++i ) {
-    // std::cout <<"( " << _x[i] << "," << _y[i] << " )" << std::endl;
-    A[i][0] = 1;
-    A[i][1] = _x[i];
-    V[i][i] = ( _y_err[i] * _y_err[i] );
-    Y[i][0] = _y[i];
-  }
-
-  CLHEP::HepMatrix At, tmpy, yparams;
-
-  int ierr;
-  V.invert(ierr);
-  At = A.T();
-
-  tmpy = At * V * A;
-  tmpy.invert(ierr);
-  yparams = tmpy * At * V * Y;
-
-  line.set_c(yparams[0][0]);
-  line.set_m(yparams[1][0]);
-  line.set_c_err(sqrt(tmpy[0][0]));
-  line.set_m_err(sqrt(tmpy[1][1]));
-
-  CLHEP::HepMatrix C, result;
-
-  C = Y - (A * yparams);
-  result = C.T() * V * C;
-  line.set_chisq(result[0][0]);
-  line.set_chisq_dof(result[0][0] / n_points);
-} // ~linear_fit(...)
 
 void PatternRecognition::make_helix(const int n_points, const int trker_no,
                                     const std::vector<int> ignore_stations,
@@ -620,7 +580,7 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
 
         // Perform a circle fit now that we have found a set of spacepoints
         SimpleCircle c_trial;
-        bool good_radius = circle_fit(good_spnts, c_trial);
+        bool good_radius = _lsq.circle_fit(good_spnts, c_trial);
 
         // If the radius calculated is too large or chisq fails, force loop to iterate from here
         if ( !good_radius || !( c_trial.get_chisq() / ( n_points - 2 ) < _chisq_cut ) ) {
@@ -669,78 +629,6 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
     } // ~Loop over inner station spacepoints
   } // ~Loop over outer station spacepoints
 } // ~make_helix(...)
-
-bool PatternRecognition::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
-                                    SimpleCircle &circle) {
-
-  int n_points = static_cast<int>(spnts.size());
-  CLHEP::HepMatrix A(n_points, 3); // rows, columns
-  CLHEP::HepMatrix V(n_points, n_points); // error matrix
-  CLHEP::HepMatrix K(n_points, 1);
-
-  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-    // This part will change once I figure out proper errors
-    double sd = -1.0;
-    if ( spnts[i]->get_station() == 5 )
-      sd = _sd_5;
-    else
-      sd = _sd_1to4;
-
-    double x_i = spnts[i]->get_position().x();
-    double y_i = spnts[i]->get_position().y();
-
-    A[i][0] = ( x_i * x_i ) + ( y_i * y_i );
-    A[i][1] = x_i;
-    A[i][2] = y_i;
-
-    V[i][i] = ( sd * sd );
-    K[i][0] = 1.;
-  }
-
-  CLHEP::HepMatrix At, tmpx, tmp_params;
-  int ierr;
-  V.invert(ierr);
-  At = A.T();
-  tmpx = At * V * A;
-  tmpx.invert(ierr);
-  tmp_params = tmpx * At * V * K;
-
-  // These values will be used for delta_R calculation
-  double alpha, beta, gamma;
-  alpha = tmp_params[0][0];
-  beta = tmp_params[1][0];
-  gamma = tmp_params[2][0];
-
-  // Convert the linear parameters into the circle center and radius
-  double x0, y0, R;
-  x0 = (-1*beta) / (2 * alpha);
-  y0 = (-1*gamma) / (2 * alpha);
-  if ( ((4 * alpha) + (beta * beta) + (gamma * gamma)) < 0 )
-    R = 0;
-  else
-    R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
-
-  if ( R < 0. )
-    std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
-  R = fabs(R);
-
-  if (R > _R_res_cut) return false; // Cannot be larger than 150mm or the track is not contained
-
-  circle.set_x0(x0);
-  circle.set_y0(y0);
-  circle.set_R(R);
-  circle.set_alpha(alpha);
-  circle.set_beta(beta);
-  circle.set_gamma(gamma);
-
-  CLHEP::HepMatrix C, result;
-
-  C = K - (A * tmp_params);
-  result = C.T() * V * C;
-  double chi2 = result[0][0];
-  circle.set_chisq(chi2); // should I leave this un-reduced?
-  return true;
-} // ~circle_fit(...)
 
 bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts,
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
@@ -821,7 +709,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   dphi_to_ds(circle.get_R(), true_dphi, ds);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  linear_fit(dz, true_dphi, phi_err, line_sz);
+  _lsq.linear_fit(dz, true_dphi, phi_err, line_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
@@ -941,7 +829,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
     std::vector<double> ds;
     dphi_to_ds(circle.get_R(), dphi, ds);
     // Peform a linear fit in s - z
-    linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
+    _lsq.linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
   }
 } // ~calculate_dipangle(...)
 

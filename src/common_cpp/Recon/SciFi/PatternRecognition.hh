@@ -34,6 +34,7 @@
 #include "TMatrixD.h"
 
 // MAUS headers
+#include "src/common_cpp/Recon/SciFi/LSQFit.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SimpleCircle.hh"
 #include "src/common_cpp/DataStructure/SimpleHelix.hh"
@@ -49,11 +50,11 @@ typedef std::vector< std::vector<SciFiSpacePoint*> > SpacePoint2dPArray;
 class PatternRecognition {
   public:
 
-    /** @brief Default constructor, does nothing
+    /** @brief Default constructor
      */
     PatternRecognition();
 
-    /** @brief Default destructor, does nothing
+    /** @brief Default destructor
      */
     ~PatternRecognition();
 
@@ -155,19 +156,6 @@ class PatternRecognition {
                               SpacePoint2dPArray &spnts_by_station,
                               std::vector<SciFiStraightPRTrack*> &strks);
 
-    /** @brief Least-squares straight line fit
-     *
-     *  Fit straight lines, using linear least squares fitting,
-     *  for input spacepoints. Output is a line.
-     *
-     *  @param spnts - A vector of all the input spacepoints
-     *  @param line_x - Output line in x - z plane
-     *  @param line_y - Output line in y - z plane
-     *
-     */
-    void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
-                    const std::vector<double> &_y_err, SimpleLine &line);
-
     /** @brief Form a helical track from spacepoints
      *
      *  Two part process. (1) Fit circle in x-y projection. (2) Fit a
@@ -187,17 +175,6 @@ class PatternRecognition {
                     const std::vector<int> ignore_stations,
                     SpacePoint2dPArray &spnts_by_station,
                     std::vector<SciFiHelicalPRTrack*> &htrks);
-
-    /** @brief Fit a circle to spacepoints in x-y projection
-     *
-     *  Fit a circle of the form A*(x^2 + y^2) + b*x + c*y = 1 with least squares fit 
-     *  for input spacepoints. Output is a circle in the x-y projection.
-     *
-     *  @param spnts - A vector containing the input spacepoints
-     *  @param circle - The output circle fit
-     *
-     */
-    bool circle_fit(const std::vector<SciFiSpacePoint*> &spnts, SimpleCircle &circle);
 
     double evaluate_nm(const int n, const int m, const double dz_ji, const double dz_kj,
                        const double dphi_ji, const double dphi_kj);
@@ -478,6 +455,8 @@ class PatternRecognition {
 
     static const double _Pt_max = 180.; /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     static const double _Pz_min = 50.; /** MeV/c min Pz for helical tracks (this is a guess) */
+
+    LSQFit _lsq;
 
     // Some output files - only to be kept when in development stages
     std::ofstream * _f_res;

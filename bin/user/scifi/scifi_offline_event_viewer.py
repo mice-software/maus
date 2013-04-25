@@ -96,7 +96,8 @@ class Tracker:
         for trk in evt.helicalprtracks():
             if trk.get_tracker() == trker_num:
                 print 'Tracker ' + str(self.trker_num),
-                print ', Track ' + str(self.num_htracks) + ':'
+                print ', Track ' + str(self.num_htracks),
+                print ', rad = ' + str(trk.get_R()) + 'mm:'
                 # Pull out the circle fit data
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
