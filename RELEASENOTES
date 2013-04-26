@@ -5,7 +5,18 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
-MAUS -0.5.1
+MAUS-v0.5.2
+  The following functionality was added:
+    - An example was added for accessing the data structure from a standalone
+      C++ application
+    - TOF integration test was added
+    - A bug preventing reconstruction of single station data was resolved
+  If upgrading from a previous version, the following third party library
+  scripts need to be rerun
+    - third_party/bash/44cdb.bash
+    - third_party/bash/51xboa.bash
+
+MAUS-v0.5.1
   The following functionality was added:
     - Global recon data structure was added
   If upgrading from a previous version, the following third party library

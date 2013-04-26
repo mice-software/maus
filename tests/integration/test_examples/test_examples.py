@@ -13,9 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Run the examples and check they return 0
 """
+
+# Popen false errors
+# pylint: disable=E1101
 
 import sys
 import os
@@ -83,11 +87,30 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         Get everything in bin/examples and check it runs with returncode 0
         """
         examples_dir = os.path.join\
-                           (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*")
+                       (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*.py")
         examples = glob.glob(examples_dir)
         for item in examples:
             proc, log = run_example(item)
             self.assertEqual(proc.returncode, 0, msg="Check logfile "+log)
+        self._test_load_root_file_cpp()
+
+    def _test_load_root_file_cpp(self):
+        """
+        Test bin/examples/load_root_file_cpp; make clean; make; run test
+
+        This has to be called after bin/examples/load_root_file.py (as it is
+        dependent on file generation so we call it as a subfunction of test_all.
+        """
+        examples_dir = os.path.join\
+          (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "load_root_file_cpp")
+        os.chdir(examples_dir)
+        proc = subprocess.Popen(["make", "clean"])
+        proc.wait()
+        proc = subprocess.Popen(["make"])
+        proc.wait()
+        proc = subprocess.Popen(["./load_root_file"])
+        proc.wait()
+        self.assertEqual(proc.returncode, 0)
 
 if __name__ == "__main__":
     unittest.main()

@@ -302,7 +302,7 @@ TOFconversionFactor = 0.005 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
 TOFattenuationLength = 140 * 10 # mm
 TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.0244140625 # nanosecond
+TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
