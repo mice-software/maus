@@ -110,13 +110,20 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle()
 
 void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   Json::Value pos = JsonWrapper::GetProperty
-                             (particle, "position", JsonWrapper::objectValue);
+                            (particle, "position", JsonWrapper::objectValue);
   Json::Value mom = JsonWrapper::GetProperty
-                             (particle, "momentum", JsonWrapper::objectValue);
+                            (particle, "momentum", JsonWrapper::objectValue);
   pid = JsonWrapper::GetProperty
-                       (particle, "particle_id", JsonWrapper::intValue).asInt();
-  seed = JsonWrapper::GetProperty
-                     (particle, "random_seed", JsonWrapper::intValue).asUInt();
+                      (particle, "particle_id", JsonWrapper::intValue).asInt();
+  try {
+    seed = JsonWrapper::GetProperty
+                      (particle, "random_seed", JsonWrapper::intValue).asUInt();
+  } catch (std::exception stde) {
+    throw(Squeal(Squeal::recoverable,
+                 "Failed to convert Json::Value integer \"random_seed\" to "
+                 "unsigned int.",
+                 "MAUSPrimaryGeneratorAction::PGParticle::ReadJson"));
+  }
   x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
   y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
   z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();

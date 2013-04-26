@@ -51,8 +51,8 @@ const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
     const double energy = hit->energy();
     const double momentum = ::sqrt(energy*energy - mass*mass);
     const double beta = momentum / energy;
-    const double delta_t = hit->time()
-                         - reference_primary_.GetTime() + time_offset_;
+    const double delta_t = hit->time() - time_offset_
+                         - reference_primary_.GetTime();
     const double delta_z = beta * ::CLHEP::c_light * delta_t;
     hit_total += (reference_primary_.GetPosition().z() + delta_z);
   }

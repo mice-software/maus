@@ -62,6 +62,8 @@ PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
 void PolynomialOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<PhaseSpaceVector> primary_vectors = PrimaryVectors();
+std::cout << "DEBUG PolynomialOpticsModel::Build: "
+          << "# primaries: " << primary_vectors.size() << std::endl;
   Json::Value primaries_json;
   for (std::vector<PhaseSpaceVector>::const_iterator primary_vector
         = primary_vectors.begin();
@@ -94,6 +96,8 @@ void PolynomialOpticsModel::Build() {
   // Simulate on the primaries, generating virtual detector tracks for each
   const Json::Value virtual_tracks
       = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
+std::cout << "DEBUG PolynomialOpticsModel::Build: "
+          << "# virtual tracks: " << virtual_tracks.size() << std::endl;
   if (virtual_tracks.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No events were generated during simulation.",
@@ -102,11 +106,16 @@ void PolynomialOpticsModel::Build() {
 
   // Map stations to hits in each virtual track
   std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
+size_t count = 0;
   for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
        ++virtual_track) {
     MapStationsToHits(station_hits_map, *virtual_track);
+    ++count;
   }
+std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
+          << "\t# virtual tracks mapped: " << count << std::endl
+          << "\t# station Zs: " << station_hits_map.size() << std::endl;
 
   // Calculate transfer maps from the primary plane to each station plane
   std::map<double, std::vector<PhaseSpaceVector> >::iterator station_hits;
@@ -114,6 +123,9 @@ void PolynomialOpticsModel::Build() {
        station_hits != station_hits_map.end();
        ++station_hits) {
     // calculate transfer map and index it by the station z-plane
+std::cout << "DEBUG PolynomialOpticsModel::Build: "
+          << "# virtual track hits for z = " << station_hits->first
+          << ": " << station_hits->second.size() << std::endl;
     transfer_maps_[station_hits->first]
       = CalculateTransferMap(primary_vectors, station_hits->second);
   }
@@ -218,9 +230,12 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
   const double P0 = reference_pgparticle.pz;
 
   if (start_plane_hits.size() != station_hits.size()) {
+    std::stringstream message;
+    message << "The number of start plane hits (" << start_plane_hits.size()
+            << ") is not the same as the number of hits per station ("
+            << station_hits.size() << ").";
     throw(Squeal(Squeal::nonRecoverable,
-                  "The number of start plane hits is not the same as the number "
-                  "of hits per station.",
+                  message.str(),
                   "PolynomialOpticsModel::CalculateTransferMap()"));
   }
 

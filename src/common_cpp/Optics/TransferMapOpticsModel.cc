@@ -120,8 +120,17 @@ void TransferMapOpticsModel::Build() {
   simulator->GetPhysicsList()->BeginOfRunAction();
 
   // Simulate on the primaries, generating virtual detector tracks for each
-  const Json::Value virtual_tracks
+  Json::Value virtual_tracks;
+  try {
+    virtual_tracks
       = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
+  } catch (std::exception ex) {
+    std::stringstream message;
+    message << "Simulation failed." << std::endl << ex.what() << std::endl;
+    throw(Squeal(Squeal::nonRecoverable,
+                 message.str(),
+                 "MAUS::TransferMapOpticsModel::Build()"));
+  }
   if (virtual_tracks.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No events were generated during simulation.",
@@ -130,7 +139,7 @@ void TransferMapOpticsModel::Build() {
 
   // Map stations to hits in each virtual track
   std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
-  for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
+  for (Json::Value::iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
        ++virtual_track) {
     MapStationsToHits(station_hits_map, *virtual_track);
@@ -142,6 +151,9 @@ void TransferMapOpticsModel::Build() {
        station_hits != station_hits_map.end();
        ++station_hits) {
     // calculate transfer map and index it by the station z-plane
+std::cout << "DEBUG TransferMapOpticsModel::Build: "
+          << "Calculating transfer map for plane at z = " << station_hits->first
+          << std::endl;
     transfer_maps_[station_hits->first]
       = CalculateTransferMap(primary_vectors, station_hits->second);
   }
@@ -254,6 +266,8 @@ void TransferMapOpticsModel::MapStationsToHits(
     const Json::Value & event) {
   // Iterate through each event of the simulation
   const Json::Value hits = event["virtual_hits"];
+std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
+          << "# virtual track hits: " << hits.size() << std::endl;
   for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
     const Json::Value hit = hits[hit_index];
     const PID particle_id = PID(hit["particle_id"].asInt());
@@ -268,14 +282,20 @@ void TransferMapOpticsModel::MapStationsToHits(
       hit["time"].asDouble(),           energy,
       hit["position"]["x"].asDouble(),  px,
       hit["position"]["y"].asDouble(),  py);
-    station_hits[hit["position"]["z"].asDouble()].push_back(hit_vector);
+    double z = hit["position"]["z"].asDouble();
+    // Round to 6 decimal places (should be sufficient since z is in mm)
+    z = static_cast<double>(static_cast<int>(z * 1e6 + .5 * z/::abs(z))/1.e6);
+    station_hits[z].push_back(hit_vector);
+std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
+          << "# virtual track hits for z = " << z
+          << ": " << station_hits[z].size() << std::endl;
 
     // Assuming the first hit is at the start plane, save the time offset
     // between what the reference primary specifies and what the simulation's
     // virtual detectors produce
     if (hit_index == 0) {
       const double start_plane_time = hit["time"].asDouble();
-      time_offset_ = start_plane_time - reference_primary_.GetPosition().z();
+      time_offset_ = start_plane_time - reference_primary_.GetTime();
     }
   }
 }

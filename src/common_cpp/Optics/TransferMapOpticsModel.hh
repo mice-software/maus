@@ -26,7 +26,7 @@
 
 #include "Interface/Squeal.hh"
 #include "Simulation/MAUSPrimaryGeneratorAction.hh"
-#include "src/common_cpp/DataStructure/Primary.hh"
+#include "DataStructure/Primary.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 

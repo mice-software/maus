@@ -86,7 +86,7 @@ enum DetectorPoint {
 
 /// A constant defining the upper limit of the DetectorPoint enum
 /// (i.e. one more than the highest value above).
-const int kDetectorPointSize = 24;
+const int kDetectorPointSize = 27;
 
 //////////////////////////////////////////////////////////////////////
 ///  @brief Defines the PID hypothesis for reconstruction objects,

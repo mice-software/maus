@@ -139,8 +139,8 @@ MAUS::Primary DataStructureHelper::PGParticle2Primary(
   primary.SetMomentum(momentum);
   primary.SetTime(pgparticle.time);
   primary.SetEnergy(pgparticle.energy);
-  primary.SetParticleId(pgparticle.seed);
-  primary.SetRandomSeed(pgparticle.pid);
+  primary.SetParticleId(pgparticle.pid);
+  primary.SetRandomSeed(pgparticle.seed);
 
   return primary;
 }
