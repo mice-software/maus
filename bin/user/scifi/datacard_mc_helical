@@ -126,7 +126,7 @@ SciFiNPECut = 2
 SciFiClustExcept = 100
 SciFiHelicalPROn = 1
 SciFiStraightPROn = 0
-SciFiKalmanOn = False
+SciFiKalmanOn = True
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads

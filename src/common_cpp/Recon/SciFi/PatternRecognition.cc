@@ -105,6 +105,16 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
+    for ( size_t i = 0; i < evt.spacepoints().size(); ++i ) {
+      double x = evt.spacepoints()[i]->get_position().x();
+      double y = evt.spacepoints()[i]->get_position().y();
+      double z = evt.spacepoints()[i]->get_position().z();
+      z = fabs(z);
+      std::cout << "setting z to " << z << std::endl;
+      ThreeVector pos(x, y, z);
+      evt.spacepoints()[i]->set_position(pos);
+      std::cerr << "z is " << evt.spacepoints()[i]->get_position().z() << "\n";
+    }
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = sort_by_tracker(evt.spacepoints());
 
@@ -592,6 +602,12 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         std::vector<double> phi_i; // to hold change between turning angles wrt first spacepoint
         double phi_0; // initial turning angle
 
+        // Sort spacepoints in order seen by the beam (descending z for T1, ascending z for T2)
+        if (good_spnts[0]->get_tracker() == 0)
+          std::sort(good_spnts.begin(), good_spnts.end(), compare_spoints_descending_z);
+        else if (good_spnts[0]->get_tracker() == 1)
+          std::sort(good_spnts.begin(), good_spnts.end(), compare_spoints_ascending_z);
+
         // Perform s-z fit
         calculate_dipangle(good_spnts, c_trial, phi_i, line_sz, phi_0);
         phi_i.insert(phi_i.begin(), phi_0);
@@ -772,9 +788,9 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
   std::vector<double> dz;
   std::vector<double> dphi_err;
-  std::vector<SciFiSpacePoint*> spnts_by_zed;
 
   // TODO replace this with a proper stl sort function
+  /*
   int spnts_size = spnts.size();
   if (spnts[0]->get_tracker() == 0) {
     for (int i = 0; i < spnts_size; i++) {
@@ -782,6 +798,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
       spnts_by_zed.push_back(spnts[swith]);
     }
   } else { spnts_by_zed = spnts; }
+  */
 
   for ( size_t i = 0; i < spnts.size(); ++i ) {
     std::cerr << "SP" << i << ": Tracker = " << spnts[i]->get_tracker() << " z = ";
@@ -791,22 +808,23 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   // Calculate phi_0, the rotation when moving from x to x'
   // TODO approximates 1st sp to x0, y0 which is not quite true at best,
   // and completely false if there is no spacepoint in the first station
-  ThreeVector pos0 = spnts_by_zed[0]->get_position();
+  ThreeVector pos0 = spnts[0]->get_position();
   phi_0 = old_calc_phi(pos0.x(), pos0.y(), circle);
 
   // Loop over spacepoints
-  for ( int i = 1; i < static_cast<int>(spnts_by_zed.size()); ++i ) {
+  for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
 
     // TODO Why are we removing the offset from sp0?
     if (spnts[0]->get_tracker() == 0) {
-      dz.push_back(spnts_by_zed[0]->get_position().z() - spnts_by_zed[i]->get_position().z());
+      dz.push_back(spnts[0]->get_position().z() - spnts[i]->get_position().z());
     } else {
-      dz.push_back(spnts_by_zed[i]->get_position().z() - spnts_by_zed[0]->get_position().z());
+      dz.push_back(spnts[i]->get_position().z() - spnts[0]->get_position().z());
     }
 
     // theta_i is defined as phi_i + phi_0 i.e. the turning angle wrt the x (not x') axis
-    double theta_i = old_calc_phi(spnts_by_zed[i]->get_position().x(),
-                              spnts_by_zed[i]->get_position().y(), circle);
+    double theta_i = old_calc_phi(spnts[i]->get_position().x(),
+                              spnts[i]->get_position().y(), circle);
+
 
     // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
     dphi.push_back(theta_i - phi_0);
@@ -814,7 +832,7 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
     // Set the error on phi
     double sd_phi = -1.0;
-    if ( spnts_by_zed[i]->get_station() == 5 )
+    if ( spnts[i]->get_station() == 5 )
       sd_phi = _sd_phi_5;
     else
       sd_phi = _sd_phi_1to4;

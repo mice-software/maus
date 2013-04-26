@@ -95,9 +95,12 @@ class Tracker:
         # Loop over helical tracks and pull out data
         for trk in evt.helicalprtracks():
             if trk.get_tracker() == trker_num:
-                print 'Tracker ' + str(self.trker_num),
+                print '\nTracker ' + str(self.trker_num),
                 print ', Track ' + str(self.num_htracks),
-                print ', rad = ' + str(trk.get_R()) + 'mm:'
+                print ', rad = ' + str(trk.get_R()) + 'mm, ',
+                print 'X0 = ' + str(trk.get_circle_x0()) + 'mm, ',
+                print 'Y0 = ' + str(trk.get_circle_y0()) + 'mm,',
+                print 'dsdz = ' + str(trk.get_dsdz())
                 # Pull out the circle fit data
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
@@ -107,16 +110,30 @@ class Tracker:
                 phi_per_trk = array.array('d', [0])
                 s_per_trk = array.array('d', [0])
                 num_phi = 0
-                for phi in trk.get_phi():
+                for i, phi in enumerate(trk.get_phi()):
                     if num_phi == 0:
                         phi_per_trk[0] = phi
                         s_per_trk[0] = phi * rad
-                        print 'phi' + str(num_phi+1) + ' is ' + str(phi)
+                        pos = trk.get_spacepoints()[i].get_position()
+                        clus = trk.get_spacepoints()[i].get_channels()[0]
+                        mom = clus.get_true_momentum()
+                        t = trk.get_spacepoints()[i].get_time()
+                        print str(pos.x()) + '\t' + str(pos.y()) + '\t',
+                        print str(pos.z()) + '\t' + str(t) + '\t' + str(phi),
+                        print '\t' + str(mom.x()) + '\t' + str(mom.y()),
+                        print '\t' + str(mom.z())
                         num_phi = num_phi + 1
                     else:
                         phi_per_trk.append(phi)
                         s_per_trk.append(phi*rad)
-                        print 'phi' + str(num_phi+1) + ' is ' + str(phi)
+                        pos = trk.get_spacepoints()[i].get_position()
+                        clus = trk.get_spacepoints()[i].get_channels()[0]
+                        mom = clus.get_true_momentum()
+                        t = trk.get_spacepoints()[i].get_time()
+                        print str(pos.x()) + '\t' + str(pos.y()) + '\t',
+                        print str(pos.z()) + '\t' + str(t) + '\t' + str(phi),
+                        print '\t' + str(mom.x()) + '\t' + str(mom.y()),
+                        print '\t' + str(mom.z())
                         num_phi = num_phi + 1
                 self.seeds_phi.append(phi_per_trk)
                 self.seeds_s.append(s_per_trk)
@@ -141,13 +158,13 @@ class Tracker:
                 self.seeds_y.append(y_per_trk)
                 self.seeds_z.append(z_per_trk)
 
-                dsdz = trk.get_dsdz()
+                if trker_num == 0:
+                    dsdz = - trk.get_dsdz()
+                elif trker_num == 1:
+                    dsdz = trk.get_dsdz()
                 sz_c = trk.get_line_sz_c() + self.seeds_s[-1][0] \
                        - (dsdz * self.seeds_z[-1][0])
-                if trker_num == 0:
-                    self.sz_fits.append(make_line(dsdz, sz_c, -1200, 0))
-                elif trker_num == 1:
-                    self.sz_fits.append(make_line(dsdz, sz_c, 0, 1200))
+                self.sz_fits.append(make_line(dsdz, sz_c, 0, 1200))
                 self.num_htracks = self.num_htracks + 1
 
     def clear(self):
