@@ -105,7 +105,7 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
   }
 
   // Map stations to hits in each virtual track
-  std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
+  std::map<long, std::vector<PhaseSpaceVector> > station_hits_map;
 size_t count = 0;
   for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
@@ -118,7 +118,7 @@ std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
           << "\t# station Zs: " << station_hits_map.size() << std::endl;
 
   // Calculate transfer maps from the primary plane to each station plane
-  std::map<double, std::vector<PhaseSpaceVector> >::iterator station_hits;
+  std::map<long, std::vector<PhaseSpaceVector> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {

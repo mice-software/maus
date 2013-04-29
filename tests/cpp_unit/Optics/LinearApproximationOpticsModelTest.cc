@@ -150,7 +150,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
 // *************************************************
 // LinearApproximationOpticsModelTest static const initializations
 // *************************************************
-const double LinearApproximationOpticsModelTest::kPrimaryPlane = 10;
+const double LinearApproximationOpticsModelTest::kPrimaryPlane = -1000;
 const double LinearApproximationOpticsModelTest::kCovariances[36] = {
   0., 1., 2., 3., 4., 5.,
   1., 2., 3., 4., 5., 6.,

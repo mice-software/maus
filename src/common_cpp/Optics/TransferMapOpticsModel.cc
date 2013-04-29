@@ -23,10 +23,10 @@
 
 #include "TLorentzVector.h"
 
-#include "src/common_cpp/DataStructure/Primary.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
-#include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
+#include "DataStructure/Primary.hh"
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "JsonCppProcessors/PrimaryProcessor.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
@@ -34,6 +34,7 @@
 #include "Recon/Global/Particle.hh"
 #include "Simulation/MAUSGeant4Manager.hh"
 #include "Simulation/MAUSPhysicsList.hh"
+#include "Simulation/VirtualPlanes.hh"
 
 #include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/legacy/Interface/MICERun.hh"
@@ -81,7 +82,7 @@ TransferMapOpticsModel::TransferMapOpticsModel(
 }
 
 TransferMapOpticsModel::~TransferMapOpticsModel() {
-  std::map<double, const TransferMap *>::iterator transfer_map;
+  std::map<long, const TransferMap *>::iterator transfer_map;
   for (transfer_map = transfer_maps_.begin();
        transfer_map != transfer_maps_.end();
        ++transfer_map) {
@@ -122,6 +123,16 @@ void TransferMapOpticsModel::Build() {
   // Simulate on the primaries, generating virtual detector tracks for each
   Json::Value virtual_tracks;
   try {
+/*DEBUG*/
+std::cerr << "DEBUG TransferMapOpticsModel::Build: "
+          << "Executing RunManyParticles with the following VirtualPlanes:"
+          << std::endl;
+MAUS::VirtualPlaneManager * const virtual_plane_mgr
+  = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
+for (size_t i = 0; i < virtual_plane_mgr->GetPlanes().size(); ++i) {
+    std::cerr << virtual_plane_mgr->GetPlanes()[i]->GetPosition() << std::endl;
+}
+/*DEBUG*/
     virtual_tracks
       = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
   } catch (std::exception ex) {
@@ -138,20 +149,36 @@ void TransferMapOpticsModel::Build() {
   }
 
   // Map stations to hits in each virtual track
-  std::map<double, std::vector<PhaseSpaceVector> > station_hits_map;
+  std::map<long, std::vector<PhaseSpaceVector> > station_hits_map;
+/*DEBUG*/
+std::cerr << "DEBUG TransferMapOpticsModel::Build: "
+          << "RunManyParticles yielded the following tracks:" << std::endl;
+/*DEBUG*/
   for (Json::Value::iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
        ++virtual_track) {
+/*DEBUG*/
+const Json::Value hits = (*virtual_track)["virtual_hits"];
+for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
+  std::cerr << setprecision(12)
+            << "(" << hits[hit_index]["position"]["x"].asDouble() << ", "
+            << hits[hit_index]["position"]["y"].asDouble() << ", "
+            << hits[hit_index]["position"]["z"].asDouble() << ") ";
+}
+std::cerr << std::endl;
+/*DEBUG*/
     MapStationsToHits(station_hits_map, *virtual_track);
+std::cerr << "DEBUG TransferMapOpticsModel::Build: "
+          << "station_hits_map size: " << station_hits_map.size() << std::endl;
   }
 
   // Calculate transfer maps from the primary plane to each station plane
-  std::map<double, std::vector<PhaseSpaceVector> >::iterator station_hits;
+  std::map<long, std::vector<PhaseSpaceVector> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
     // calculate transfer map and index it by the station z-plane
-std::cout << "DEBUG TransferMapOpticsModel::Build: "
+std::cerr << "DEBUG TransferMapOpticsModel::Build: "
           << "Calculating transfer map for plane at z = " << station_hits->first
           << std::endl;
     transfer_maps_[station_hits->first]
@@ -163,13 +190,13 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
     const double end_plane) const {
   // find the transfer map that transports a particle from the first plane
   // to the station that is nearest to the desired end_plane
-  std::map<double, const TransferMap *>::const_iterator transfer_map_entry;
+  std::map<long, const TransferMap *>::const_iterator transfer_map_entry;
   bool found_entry = false;
   for (transfer_map_entry = transfer_maps_.begin();
        !found_entry && (transfer_map_entry != transfer_maps_.end());
        ++transfer_map_entry) {
     // determine whether the station before or after end_plane is closest
-    double station_plane = transfer_map_entry->first;
+    double station_plane = static_cast<double>(transfer_map_entry->first);
     if (station_plane >= end_plane) {
       if ((transfer_map_entry == transfer_maps_.begin()) &&
           (station_plane > end_plane)) {
@@ -183,7 +210,8 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
       double after_delta = station_plane - end_plane;
       if (transfer_map_entry != transfer_maps_.begin()) {
         --transfer_map_entry;
-        double before_delta = end_plane - transfer_map_entry->first;
+        double before_delta
+          = end_plane - static_cast<double>(transfer_map_entry->first);
         if (after_delta < before_delta) {
           ++transfer_map_entry;
         }
@@ -262,7 +290,7 @@ const std::vector<Primary> TransferMapOpticsModel::Primaries() {
 }
 
 void TransferMapOpticsModel::MapStationsToHits(
-    std::map<double, std::vector<PhaseSpaceVector> > & station_hits,
+    std::map<long, std::vector<PhaseSpaceVector> > & station_hits,
     const Json::Value & event) {
   // Iterate through each event of the simulation
   const Json::Value hits = event["virtual_hits"];
@@ -283,12 +311,12 @@ std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
       hit["position"]["x"].asDouble(),  px,
       hit["position"]["y"].asDouble(),  py);
     double z = hit["position"]["z"].asDouble();
-    // Round to 6 decimal places (should be sufficient since z is in mm)
-    z = static_cast<double>(static_cast<int>(z * 1e6 + .5 * z/::abs(z))/1.e6);
-    station_hits[z].push_back(hit_vector);
-std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
-          << "# virtual track hits for z = " << z
-          << ": " << station_hits[z].size() << std::endl;
+    // Round to the nearest mm
+    long z_key = (z>=0?static_cast<long>(z+.5):static_cast<long>(z-.5));
+std::cerr << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
+          << setprecision(8)
+          << "z = " << z << "\tz_key = " << z_key << std::endl;;
+    station_hits[z_key].push_back(hit_vector);
 
     // Assuming the first hit is at the start plane, save the time offset
     // between what the reference primary specifies and what the simulation's
