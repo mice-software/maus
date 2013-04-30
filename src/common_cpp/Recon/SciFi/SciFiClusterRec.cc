@@ -17,6 +17,8 @@
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include <algorithm>
 
+#include "src/common_cpp/Utils/ThreeVectorUtils.hh"
+
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4RotationMatrix.hh"
 
@@ -148,7 +150,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   double Pitch = this_plane->propertyDouble("Pitch");
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
-  ThreeVector plane_position = this_plane->globalPosition();
+  ThreeVector plane_position = clhep_to_root(this_plane->globalPosition());
   ThreeVector position = dist_mm * perp + plane_position;
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
 
@@ -195,7 +197,7 @@ ThreeVector SciFiClusterRec::get_reference_frame_pos(int tracker) {
   reference_plane = find_plane(tracker, station, plane);
 
   assert(reference_plane != NULL);
-  ThreeVector reference_pos =  reference_plane->globalPosition();
+  ThreeVector reference_pos = clhep_to_root(reference_plane->globalPosition());
 
   return reference_pos;
 }

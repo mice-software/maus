@@ -17,7 +17,6 @@ Module BeamLine
 { 
 	Volume Box
 	PropertyString Material Galactic
-	PropertyDouble G4StepMax 1. mm
 	Dimensions 5.1 5.1 8.06 m
 	PropertyBool Invisible 1
 	Module TOF/TOF0.dat
