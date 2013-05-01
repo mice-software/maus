@@ -4,6 +4,7 @@
 
 import sys
 import array
+import math
 import ROOT 
 import libMausCpp #pylint: disable = W0611
 
@@ -95,12 +96,19 @@ class Tracker:
         # Loop over helical tracks and pull out data
         for trk in evt.helicalprtracks():
             if trk.get_tracker() == trker_num:
-                print '\nTracker ' + str(self.trker_num),
-                print ', Track ' + str(self.num_htracks),
-                print ', rad = ' + str(trk.get_R()) + 'mm, ',
-                print 'X0 = ' + str(trk.get_circle_x0()) + 'mm, ',
-                print 'Y0 = ' + str(trk.get_circle_y0()) + 'mm,',
-                print 'dsdz = ' + str(trk.get_dsdz())
+                pt = trk.get_R()*1.2
+                pz = pt / trk.get_dsdz()
+                print '\nTracker ' + str(self.trker_num) + ',',
+                print 'Track ' + str(self.num_htracks) + ',',
+                print 'rad = ' + '%.2f' % trk.get_R() + 'mm,',
+                print 'X0 = ' + '%.2f' % trk.get_circle_x0() + 'mm,',
+                print 'Y0 = ' + '%.2f' % trk.get_circle_y0() + 'mm,',
+                print 'dsdz = ' + '%.4f' % trk.get_dsdz() + ', ',
+                print 'pt = ' + '%.2f' % pt + 'MeV/c' + ',',
+                print 'pz = ' + '%.2f' % pz + 'MeV/c',
+                print 'xy_chi2 = ' + '%.4f' % trk.get_circle_chisq(),
+                print 'sz_chi2 = ' + '%.4f' % trk.get_line_sz_chisq()
+                print 'x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc'
                 # Pull out the circle fit data
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
@@ -114,27 +122,25 @@ class Tracker:
                     if num_phi == 0:
                         phi_per_trk[0] = phi
                         s_per_trk[0] = phi * rad
-                        pos = trk.get_spacepoints()[i].get_position()
-                        clus = trk.get_spacepoints()[i].get_channels()[0]
-                        mom = clus.get_true_momentum()
-                        t = trk.get_spacepoints()[i].get_time()
-                        print str(pos.x()) + '\t' + str(pos.y()) + '\t',
-                        print str(pos.z()) + '\t' + str(t) + '\t' + str(phi),
-                        print '\t' + str(mom.x()) + '\t' + str(mom.y()),
-                        print '\t' + str(mom.z())
                         num_phi = num_phi + 1
                     else:
                         phi_per_trk.append(phi)
                         s_per_trk.append(phi*rad)
-                        pos = trk.get_spacepoints()[i].get_position()
-                        clus = trk.get_spacepoints()[i].get_channels()[0]
-                        mom = clus.get_true_momentum()
-                        t = trk.get_spacepoints()[i].get_time()
-                        print str(pos.x()) + '\t' + str(pos.y()) + '\t',
-                        print str(pos.z()) + '\t' + str(t) + '\t' + str(phi),
-                        print '\t' + str(mom.x()) + '\t' + str(mom.y()),
-                        print '\t' + str(mom.z())
                         num_phi = num_phi + 1
+                    pos = trk.get_spacepoints()[i].get_position()
+                    clus = trk.get_spacepoints()[i].get_channels()[0]
+                    mom = clus.get_true_momentum()
+                    t = trk.get_spacepoints()[i].get_time()
+                    print '%.2f' % pos.x() + '\t',
+                    print '%.2f' % pos.y() + '\t',
+                    print '%.2f' % pos.z() + '\t',
+                    print '%.2f' % t + '\t',
+                    print '%.2f' % phi + '\t',
+                    print '%.2f' % mom.x() + '\t',
+                    print '%.2f' % mom.y() + '\t',
+                    pt_mc = math.sqrt(mom.x()*mom.x()+mom.y()*mom.y())
+                    print '%.2f' % pt_mc + '\t',
+                    print '%.2f' % mom.z()
                 self.seeds_phi.append(phi_per_trk)
                 self.seeds_s.append(s_per_trk)
 
@@ -289,8 +295,11 @@ def main(file_name):
     c_trk_sz.Divide(1, 2)
     ib1 = info_box()
 
+    start_num = 1
+    start_num = raw_input('Enter the first spill number to start from: ')
+
     # Loop over spills
-    for i in range(tree.GetEntries()):
+    for i in range(int(start_num)-1, tree.GetEntries()):
         tree.GetEntry(i)
         spill = data.GetSpill()
         t1 = Tracker()
@@ -422,31 +431,33 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, t1_fits, t2_fits, can):
     """ Draw s - z for each track """
     can.cd(1)
     mg1 = ROOT.TMultiGraph()
-    for i, z_per_track in enumerate(t1_z):
-        t1_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t1_s[i])
-        t1_sz_graph.SetMarkerStyle(20)
-        t1_sz_graph.SetMarkerColor(ROOT.kBlack)
-        mg1.Add(t1_sz_graph)
-    mg1.Draw("ap")
-    mg1.SetTitle("Seed s-z plot for tracker 1")
-    mg1.GetXaxis().SetTitle("z(mm)")
-    mg1.GetYaxis().SetTitle("s(mm)")
-    for line in t1_fits:
-        line.Draw("same")
+    if ( len(t1_z) > 0 ):
+        for i, z_per_track in enumerate(t1_z):
+            t1_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t1_s[i])
+            t1_sz_graph.SetMarkerStyle(20)
+            t1_sz_graph.SetMarkerColor(ROOT.kBlack)
+            mg1.Add(t1_sz_graph)
+        mg1.Draw("ap")
+        mg1.SetTitle("Seed s-z plot for tracker 1")
+        mg1.GetXaxis().SetTitle("z(mm)")
+        mg1.GetYaxis().SetTitle("s(mm)")
+        for line in t1_fits:
+            line.Draw("same")
 
     can.cd(2)
     mg2 = ROOT.TMultiGraph()
-    for i, z_per_track in enumerate(t2_z):
-        t2_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t2_s[i])
-        t2_sz_graph.SetMarkerStyle(20)
-        t2_sz_graph.SetMarkerColor(ROOT.kBlack)
-        mg2.Add(t2_sz_graph)
-    mg2.Draw("ap")
-    mg2.SetTitle("Seed s-z plot for tracker 2")
-    mg2.GetXaxis().SetTitle("z(mm)")
-    mg2.GetYaxis().SetTitle("s(mm)")
-    for line in t2_fits:
-        line.Draw("same")
+    if ( len(t2_z) > 0 ):
+        for i, z_per_track in enumerate(t2_z):
+            t2_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t2_s[i])
+            t2_sz_graph.SetMarkerStyle(20)
+            t2_sz_graph.SetMarkerColor(ROOT.kBlack)
+            mg2.Add(t2_sz_graph)
+        mg2.Draw("ap")
+        mg2.SetTitle("Seed s-z plot for tracker 2")
+        mg2.GetXaxis().SetTitle("z(mm)")
+        mg2.GetYaxis().SetTitle("s(mm)")
+        for line in t2_fits:
+            line.Draw("same")
 
     can.Update()
     return [mg1, mg2]

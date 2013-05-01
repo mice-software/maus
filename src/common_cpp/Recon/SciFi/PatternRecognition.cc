@@ -162,8 +162,8 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     add_tracks(trker_no, strks, htrks, evt);
   }
   num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
-  // if (num_stations_hit > 2  && track_type != 1 ) { // No 3pt tracks for helical
-  if ( num_stations_hit > 2 ) {
+  if (num_stations_hit > 2  && track_type != 1) { // No 3pt tracks for helical
+  // if ( num_stations_hit > 2 ) {
     std::vector<SciFiStraightPRTrack*> strks;
     std::vector<SciFiHelicalPRTrack*> htrks;
     make_3tracks(track_type, trker_no, spnts_by_station, strks, htrks);
@@ -594,7 +594,9 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
 
         // If the radius calculated is too large or chisq fails, force loop to iterate from here
         if ( !good_radius || !( c_trial.get_chisq() / ( n_points - 2 ) < _chisq_cut ) ) {
-          if ( _debug > 0 ) std::cerr << "Failed circle cut" << std::endl;
+          if ( _debug > 0 ) {
+              std::cerr << "Failed circle cut, chisq = " << c_trial.get_chisq() << "\n";
+          }
           continue;
         }
 
@@ -609,18 +611,19 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
           std::sort(good_spnts.begin(), good_spnts.end(), compare_spoints_ascending_z);
 
         // Perform s-z fit
+        /*
         calculate_dipangle(good_spnts, c_trial, phi_i, line_sz, phi_0);
         phi_i.insert(phi_i.begin(), phi_0);
         for ( int i = 1; i < phi_i.size(); ++i ) {
           phi_i[i] = phi_i[i] + phi_0;
         }
-        /*
+        */
         bool good_dsdz = find_dsdz(n_points, good_spnts, c_trial, phi_i, line_sz);
         if (!good_dsdz) {
           std::cerr << "dsdz fit failed, looping..." << std::endl;
           continue;
         }
-        */
+
 
         // Form the helical track
         double psi_0 = phi_0 + (CLHEP::pi / 2);
@@ -661,13 +664,12 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   std::vector<double> y_i;        // Vector of the y coord of each successive spacepoint
   std::vector<double> z_i;        // Vector of the z coord of each successive spacepoint
   std::vector<double> dz;         // The distance in z from the first spacepoint
+  std::vector<double> dphi;       // The distance in phi from the first spacepoint
   std::vector<double> true_dphi;  // dphi corrected for any extra 2*n*pi rotations
   std::vector<double> phi_err;    // The errors on the phi_i
-  std::vector<double> dphi;       // The distance in phi from the first spacepoint
 
   // Find the phi value of the first spacepoint
-  double phi_1 = calc_phi((*(spnts.begin()))->get_position().x(),
-                          (*(spnts.begin()))->get_position().y(), circle);
+  double phi_1 = calc_phi(spnts[0]->get_position().x(), spnts[0]->get_position().y(), circle);
 
   // Loop over the spacepoints
   for (std::vector<SciFiSpacePoint*>::const_iterator it = spnts.begin(); it != spnts.end(); ++it) {
@@ -725,11 +727,11 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   dphi_to_ds(circle.get_R(), true_dphi, ds);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  _lsq.linear_fit(dz, true_dphi, phi_err, line_sz);
+  _lsq.linear_fit(dz, ds, phi_err, line_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
-    if ( _debug > 0 ) std::cerr << "Failed s-z chisq cut" << std::endl;
+    if ( _debug > 0 ) std::cerr << "Failed s-z cut, chisq = " << line_sz.get_chisq() << std::endl;
     return false;
   } else {
     if ( _debug > 0 ) std::cerr << "Passed s-z cut, ds/dz is " << line_sz.get_m() << "\n";
@@ -750,11 +752,13 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
       if ( found ) break;
       for (int m = 0; m < _m_limit; ++m) {
         // Remainder should be ~0 if correct n_ji and m are found
-        double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) /
-                                  (true_dphi[i] + 2*n*CLHEP::pi)) -
-                                  (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
+        double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) / (true_dphi[i] + 2*n*CLHEP::pi))
+                                   - (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
         // double remainder = evaluate_nm(n, m, dz[i], dz[i+1], dphi[i], dphi[i+1]);
+        // std::cerr << "For i = " << i << " trying n = " << n << ", m = " << m << ", rem = ";
+        // std::cerr<< remainder << std::endl;
         if ( remainder < _AB_cut ) {
+          // std::cerr << "Passed AB_cut for phi[" << i << "]" << std::endl;
           found = true;
           true_n = n;
           true_m = m;
@@ -800,11 +804,6 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
   } else { spnts_by_zed = spnts; }
   */
 
-  for ( size_t i = 0; i < spnts.size(); ++i ) {
-    std::cerr << "SP" << i << ": Tracker = " << spnts[i]->get_tracker() << " z = ";
-    std::cerr << spnts[i]->get_position().z() << " t  = " << spnts[i]->get_time() << std::endl;
-  }
-
   // Calculate phi_0, the rotation when moving from x to x'
   // TODO approximates 1st sp to x0, y0 which is not quite true at best,
   // and completely false if there is no spacepoint in the first station
@@ -813,8 +812,6 @@ void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> 
 
   // Loop over spacepoints
   for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
-
-    // TODO Why are we removing the offset from sp0?
     if (spnts[0]->get_tracker() == 0) {
       dz.push_back(spnts[0]->get_position().z() - spnts[i]->get_position().z());
     } else {
