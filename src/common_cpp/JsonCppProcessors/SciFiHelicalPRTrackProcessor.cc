@@ -19,7 +19,8 @@
 namespace MAUS {
 
 SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
-                   : _sf_spoint_array_proc(new SciFiSpacePointProcessor) {
+                   : _sf_spoint_array_proc(new SciFiSpacePointProcessor),
+                     _double_array_proc(new DoubleProcessor) {
 
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiHelicalPRTrack::get_tracker,
@@ -49,6 +50,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("R", &_double_proc,
                         &SciFiHelicalPRTrack::get_R,
                         &SciFiHelicalPRTrack::set_R, true);
+    RegisterValueBranch("line_sz_c", &_double_proc,
+                        &SciFiHelicalPRTrack::get_line_sz_c,
+                        &SciFiHelicalPRTrack::set_line_sz_c, true);
     RegisterValueBranch("line_sz_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_line_sz_chisq,
                         &SciFiHelicalPRTrack::set_line_sz_chisq, true);
@@ -71,5 +75,8 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);
+    RegisterValueBranch("phi", &_double_array_proc,
+                        &SciFiHelicalPRTrack::get_phi,
+                        &SciFiHelicalPRTrack::set_phi, false);
 }
 } // ~namespace MAUS

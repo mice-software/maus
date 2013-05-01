@@ -84,6 +84,15 @@ def main(file_name):
                         else:
                             t2_sp_x_arr.append(x)
                             t2_sp_y_arr.append(y)
+                # Print turning angles for each helical track
+                trks = evt.helicalprtracks()
+                print 'Found ' + str(trks.size()) + ' helical tracks'
+                for j in range(trks.size()):
+                    print 'Track ' + str(j) + ':'
+                    phi = trks[j].get_phi()
+                    print phi.size()
+                    for k, phi_i in enumerate(phi):
+                        print 'phi' + str(k+1) + ' is ' + str(phi_i)
 
     # draw the histograms and graphs and write to disk
     print "Writing histogram files"

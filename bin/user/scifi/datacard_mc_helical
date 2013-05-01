@@ -23,10 +23,11 @@ on_error = 'none' # none, halt or raise
 keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
-keep_tracks = False # set to true to keep start and end point of every track
+keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
+# simulation_geometry_filename = "TrackerStraightFitTest.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
@@ -69,7 +70,7 @@ spill_generator_number_of_spills = 10
 # an optimised beam might look like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":5, # number of coin tosses
+    "binomial_n":1, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
@@ -125,6 +126,7 @@ SciFiNPECut = 2
 SciFiClustExcept = 100
 SciFiHelicalPROn = 1
 SciFiStraightPROn = 0
+SciFiKalmanOn = True
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads

@@ -35,6 +35,8 @@
 
 namespace MAUS {
 
+typedef std::vector<double> DoubleArray;
+
 class SciFiHelicalPRTrack {
   public:
 
@@ -66,6 +68,12 @@ class SciFiHelicalPRTrack {
 
     /** Set the vector holding pointers to the spacepoints used by the track */
     void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
+
+    /** Get the vector the turning angles of the spacepoints used by the track  */
+    DoubleArray get_phi() const { return _phi; }
+
+    /** Set the vector the turning angles of the spacepoints used by the track */
+    void set_phi(DoubleArray phi) { _phi = phi; }
 
     /** Get the tracker number */
     int get_tracker() const { return _tracker; }
@@ -121,6 +129,12 @@ class SciFiHelicalPRTrack {
     /** Set R the radius of the helix in the x-y plane */
     void set_R(double R) { _R = R; }
 
+    /** Get the intercept of the straight line fit in s-z */
+    double get_line_sz_c() const { return _line_sz_c; }
+
+    /** Set the intercept of the straight line fit in s-z */
+    void set_line_sz_c(double line_sz_c) { _line_sz_c = line_sz_c; }
+
     /** Get the chi^2 of the straight line fit in s-z */
     double get_line_sz_chisq() const { return _line_sz_chisq; }
 
@@ -169,6 +183,7 @@ class SciFiHelicalPRTrack {
     double _phi0;
     double _psi0;
     double _dsdz;
+    double _line_sz_c;
     double _line_sz_chisq;
     double _circle_x0;
     double _circle_y0;
@@ -181,6 +196,7 @@ class SciFiHelicalPRTrack {
     static const int _type = 1; // 0 for straight, 1 for helical
 
     SciFiSpacePointPArray  _spoints;
+    DoubleArray _phi;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

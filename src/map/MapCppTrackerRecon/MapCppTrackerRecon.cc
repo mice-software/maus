@@ -15,6 +15,15 @@
  *
  */
 
+
+#include <algorithm>
+
+#include "Interface/Squeal.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
 namespace MAUS {
@@ -29,6 +38,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     Json::Value *json = Globals::GetConfigurationCards();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _kalman_on = (*json)["SciFiKalmanOn"].asBool();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -53,7 +63,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
+    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
+        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
@@ -70,8 +82,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
           std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
-        if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-          track_fit(*event);
+        if ( _kalman_on ) {
+          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+            track_fit(*event);
+          }
         }
         print_event_info(*event);
       }
