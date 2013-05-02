@@ -481,8 +481,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           if ( _debug > 0 )
             std::cout << "** chisq test passed, adding " << n_points << "pt track **\n";
-          SciFiStraightPRTrack* track =
-              new SciFiStraightPRTrack(-1, n_points, line_x, line_y);
+          SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, n_points, line_x, line_y);
           if ( _debug > 0 ) {
             std::cout << "x0 = " << track->get_x0() << " mx = " << track->get_mx();
             std::cout << " y0 = " << track->get_y0() << " my = " << track->get_my() << "\n";

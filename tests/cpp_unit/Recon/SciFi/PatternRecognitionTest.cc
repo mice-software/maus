@@ -35,54 +35,57 @@ class PatternRecognitionTest : public ::testing::Test {
   virtual void SetUp()    {}
   virtual void TearDown() {}
 
-  void set_up_spacepoints() {
-    _sp1 = new SciFiSpacePoint();
-    _sp2 = new SciFiSpacePoint();
-    _sp3 = new SciFiSpacePoint();
-    _sp4 = new SciFiSpacePoint();
-    _sp5 = new SciFiSpacePoint();
+  std::vector<SciFiSpacePoint*> set_up_spacepoints() {
+    SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+    SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+    SciFiSpacePoint *sp3 = new SciFiSpacePoint();
+    SciFiSpacePoint *sp4 = new SciFiSpacePoint();
+    SciFiSpacePoint *sp5 = new SciFiSpacePoint();
 
     ThreeVector pos(-68.24883333333334, -57.810948479361, -0.652299999999741);
-    _sp1->set_position(pos);
-    _sp1->set_tracker(1);
-    _sp1->set_station(1);
-    _sp1->set_type("triplet");
-    _sp1->set_used(false);
+    sp1->set_position(pos);
+    sp1->set_tracker(1);
+    sp1->set_station(1);
+    sp1->set_type("triplet");
+    sp1->set_used(false);
 
     pos.set(-62.84173333333334, -67.17694825239995, -200.6168999999991);
-    _sp2->set_position(pos);
-    _sp2->set_tracker(1);
-    _sp2->set_station(2);
-    _sp2->set_type("triplet");
-    _sp2->set_used(false);
+    sp2->set_position(pos);
+    sp2->set_tracker(1);
+    sp2->set_station(2);
+    sp2->set_type("triplet");
+    sp2->set_used(false);
 
     pos.set(-56.99676666666667, -76.0964980027428, -450.4798999999994);
-    _sp3->set_position(pos);
-    _sp3->set_tracker(1);
-    _sp3->set_station(3);
-    _sp3->set_type("triplet");
-    _sp3->set_used(false);
+    sp3->set_position(pos);
+    sp3->set_tracker(1);
+    sp3->set_station(3);
+    sp3->set_type("triplet");
+    sp3->set_used(false);
 
     pos.set(-47.89523333333333, -87.75184770769343, -750.4801999999991);
-    _sp4->set_position(pos);
-    _sp4->set_tracker(1);
-    _sp4->set_station(4);
-    _sp4->set_type("triplet");
-    _sp4->set_used(false);
+    sp4->set_position(pos);
+    sp4->set_tracker(1);
+    sp4->set_station(4);
+    sp4->set_type("triplet");
+    sp4->set_used(false);
 
     pos.set(-35.86799999999999, -99.22774738994798, -1100.410099999999);
-    _sp5->set_position(pos);
-    _sp5->set_tracker(1);
-    _sp5->set_station(5);
-    _sp5->set_type("triplet");
-    _sp5->set_used(false);
-  }
+    sp5->set_position(pos);
+    sp5->set_tracker(1);
+    sp5->set_station(5);
+    sp5->set_type("triplet");
+    sp5->set_used(false);
 
-  SciFiSpacePoint *_sp1;
-  SciFiSpacePoint *_sp2;
-  SciFiSpacePoint *_sp3;
-  SciFiSpacePoint *_sp4;
-  SciFiSpacePoint *_sp5;
+    std::vector<SciFiSpacePoint*> spnts;
+    spnts.push_back(sp1);
+    spnts.push_back(sp2);
+    spnts.push_back(sp3);
+    spnts.push_back(sp4);
+    spnts.push_back(sp5);
+
+    return spnts;
+  }
 };
 
 TEST_F(PatternRecognitionTest, test_process_good) {
@@ -90,13 +93,7 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   PatternRecognition pr;
 
   // Set up the spacepoints vector
-  set_up_spacepoints();
-  std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(_sp5);
-  spnts.push_back(_sp2);
-  spnts.push_back(_sp3);
-  spnts.push_back(_sp1);
-  spnts.push_back(_sp4);
+  std::vector<SciFiSpacePoint*> spnts = set_up_spacepoints();
 
   // For a straight fit
   // ------------------
@@ -132,11 +129,10 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 
   // For a helical fit
   //------------------
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp4->set_used(false);
-  _sp5->set_used(false);
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   pr.process(true, false, evt1); // Helical on, Straight off
 
@@ -155,16 +151,18 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   EXPECT_NEAR(helix_R, htrks[0]->get_R(), epsilon);
   EXPECT_NEAR(helix_dsdz, htrks[0]->get_dsdz(), epsilon);
   EXPECT_EQ(num_points, htrks[0]->get_num_points());
+
+  // evt descoping will delete the spacepoints
 }
 
 TEST_F(PatternRecognitionTest, test_make_tracks) {
 
   // Set up the spacepoints vector
-  set_up_spacepoints();
+  std::vector<SciFiSpacePoint*> spnts_all = set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(_sp5);
-  spnts.push_back(_sp2);
-  spnts.push_back(_sp1);
+  spnts.push_back(spnts_all[4]);
+  spnts.push_back(spnts_all[1]);
+  spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
   int n_stations = 5;
@@ -202,13 +200,22 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
   EXPECT_NEAR(13.3, strks[0]->get_y_chisq(), 0.1);
 
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  std::vector<SciFiHelicalPRTrack*>::iterator htrack;
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
+
   // Make a 4 point track
   // ---------------------
-  spnts.push_back(_sp3);
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp5->set_used(false);
+  spnts.push_back(spnts_all[2]);
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -231,14 +238,19 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
   EXPECT_NEAR(16.0, strks[0]->get_y_chisq(), 0.1);
 
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
+
   // Make a 5 point track
   // ---------------------
-  spnts.push_back(_sp4);
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp4->set_used(false);
-  _sp5->set_used(false);
+  spnts.push_back(spnts_all[3]);
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -260,17 +272,22 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   EXPECT_NEAR(y0, strks[0]->get_y0(), 1);
   EXPECT_NEAR(my, strks[0]->get_my(), 0.001);
   EXPECT_NEAR(y_chisq, strks[0]->get_y_chisq(), 0.1);
+
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    delete (*it);
+  }
+  // evt descoping will delete tracks created
 }
 
 TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
 
   // Set up the spacepoints vector
-  set_up_spacepoints();
+  std::vector<SciFiSpacePoint*> spnts_all = set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(_sp5);
-  spnts.push_back(_sp3);
-  spnts.push_back(_sp2);
-  spnts.push_back(_sp1);
+  spnts.push_back(spnts_all[4]);
+  spnts.push_back(spnts_all[2]);
+  spnts.push_back(spnts_all[1]);
+  spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
   int n_stations = 5;
@@ -279,7 +296,6 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
 
-  SciFiEvent evt;
   bool track_type = 0; // Straight tracks
 
   // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
@@ -294,10 +310,10 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
 
   // Make a 4 point track with 4 spacepoints
   // ---------------------------------------
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp5->set_used(false);
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -318,19 +334,22 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
   EXPECT_NEAR(15.9, strks[0]->get_y_chisq(), 0.1);
 
-    // Make a 4 point track with 5 spacepoints
+  // Make a 4 point track with 5 spacepoints
   // ---------------------------------------
-  spnts.push_back(_sp4);
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp4->set_used(false);
-  _sp5->set_used(false);
+  spnts.push_back(spnts_all[3]);
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
   spnts_by_station.resize(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
+
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
   strks.resize(0);
 
   pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
@@ -345,88 +364,28 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
   EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
   EXPECT_NEAR(4.5, strks[0]->get_y_chisq(), 0.1);
+
+  // Tidy up
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    delete (*it);
+  }
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  std::vector<SciFiHelicalPRTrack*>::iterator htrack;
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
 }
 
-TEST_F(PatternRecognitionTest, test_make_3pt_helical_tracks) {
-
-  // Make a 3 point helical track from 3 spacepoints
-  // -----------------------------------------------
-  PatternRecognition pr;
-  int n_stations = 5;
-
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
-
-  // Set up spacepoints corresponding to circle of radius 2 mm, centred at (1,2)
-  ThreeVector pos(1.0, 4.0, 0.0);
-  sp1->set_position(pos);
-  pos.set(3.0, 2.0, 0.0);
-  sp2->set_position(pos);
-  pos.set(1.0, 0.0, 0.0);
-  sp3->set_position(pos);
-
-  sp1->set_tracker(1);
-  sp1->set_station(1);
-  sp1->set_type("triplet");
-  sp1->set_used(false);
-
-  sp2->set_tracker(1);
-  sp2->set_station(2);
-  sp2->set_type("triplet");
-  sp2->set_used(false);
-
-  sp3->set_tracker(1);
-  sp3->set_station(3);
-  sp3->set_type("triplet");
-  sp3->set_used(false);
-
-  std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp1);
-  spnts.push_back(sp2);
-  spnts.push_back(sp3);
-
-  std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
-  pr.sort_by_station(spnts, spnts_by_station);
-
-  std::vector<SciFiHelicalPRTrack*> htrks;
-  std::vector<SciFiStraightPRTrack*> strks;
-
-  bool track_type = 1; // Helical tracks
-  int tracker_num = 0;
-
-  // Make the track
-  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
-
-  // Check the parameters are correct
-  ASSERT_EQ(0u, strks.size());
-  ASSERT_EQ(1u, htrks.size());  // Should fail sz chisq test
-
-  /*
-  double x0 = 1.0;
-  double y0 = 2.0;
-  double R = 2.0;
-  double epsilon = 0.01;
-
-  EXPECT_NEAR(htrks[0]->get_circle_x0(), x0, epsilon);
-  EXPECT_NEAR(htrks[0]->get_circle_x0(), y0, epsilon);
-  EXPECT_NEAR(htrks[0]->get_R(), R, epsilon);
-  */
-
-  delete sp1;
-  delete sp2;
-  delete sp3;
-}
-
-/*
 TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 
   // Set up the spacepoints vector
-  set_up_spacepoints();
+  std::vector<SciFiSpacePoint*> spnts_all = set_up_spacepoints();
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(_sp5);
-  spnts.push_back(_sp2);
-  spnts.push_back(_sp1);
+  spnts.push_back(spnts_all[4]);
+  spnts.push_back(spnts_all[1]);
+  spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
   int n_stations = 5;
@@ -435,7 +394,6 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
 
-  SciFiEvent evt;
   bool track_type = 0; // Straight tracks
 
   // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
@@ -463,13 +421,22 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
   EXPECT_NEAR(13.3, strks[0]->get_y_chisq(), 0.1);
 
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  std::vector<SciFiHelicalPRTrack*>::iterator htrack;
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
+
   // Make a 3 point track with 4 spacepoints
   // ---------------------------------------
-  spnts.push_back(_sp3);
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp5->set_used(false);
+  spnts.push_back(spnts_all[2]);
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -490,14 +457,19 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
   EXPECT_NEAR(0.0015, strks[0]->get_y_chisq(), 0.001);
 
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
+
   // Make a 3 point track with 5 spacepoints
   // ---------------------------------------
-  spnts.push_back(_sp4);
-  _sp1->set_used(false);
-  _sp2->set_used(false);
-  _sp3->set_used(false);
-  _sp4->set_used(false);
-  _sp5->set_used(false);
+  spnts.push_back(spnts_all[3]);
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    (*it)->set_used(false);
+  }
 
   spnts_by_station.clear();
   spnts_by_station.resize(0);
@@ -517,8 +489,18 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   EXPECT_NEAR(y0, strks[0]->get_y0(), 3);
   EXPECT_NEAR(my, strks[0]->get_my(), 0.005);
   EXPECT_NEAR(4.2, strks[0]->get_y_chisq(), 0.1);
+
+  // Tidy up
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    delete (*it);
+  }
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
+  for (htrack = htrks.begin(); htrack != htrks.end(); ++htrack) {
+    delete (*htrack);
+  }
 }
-*/
 
 TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
 
@@ -527,24 +509,18 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   PatternRecognition pr;
 
   // Set up the spacepoints vector
-  set_up_spacepoints();
-  std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(_sp5);
-  spnts.push_back(_sp2);
-  spnts.push_back(_sp3);
-  spnts.push_back(_sp1);
-  spnts.push_back(_sp4);
+  std::vector<SciFiSpacePoint*> spnts = set_up_spacepoints();
 
   // Set up the spacepoints by station 2D vector
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
 
   // Check the spacepoints have setup correctly
-  EXPECT_EQ(_sp1, spnts_by_station[0][0]);
-  EXPECT_EQ(_sp2, spnts_by_station[1][0]);
-  EXPECT_EQ(_sp3, spnts_by_station[2][0]);
-  EXPECT_EQ(_sp4, spnts_by_station[3][0]);
-  EXPECT_EQ(_sp5, spnts_by_station[4][0]);
+  EXPECT_EQ(spnts[0], spnts_by_station[0][0]);
+  EXPECT_EQ(spnts[1], spnts_by_station[1][0]);
+  EXPECT_EQ(spnts[2], spnts_by_station[2][0]);
+  EXPECT_EQ(spnts[3], spnts_by_station[3][0]);
+  EXPECT_EQ(spnts[4], spnts_by_station[4][0]);
   EXPECT_EQ(-68.24883333333334, spnts_by_station[0][0]->get_position().x());
 
   std::vector<int> ignore_stations;
@@ -571,6 +547,16 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   EXPECT_NEAR(y0, strks[0]->get_y0(), epsilon);
   EXPECT_NEAR(my, strks[0]->get_my(), epsilon);
   EXPECT_NEAR(y_chisq, strks[0]->get_y_chisq(), epsilon);
+
+  // Tidy up
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = spnts.begin(); it != spnts.end(); ++it) {
+    delete (*it);
+  }
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = strks.begin(); strack != strks.end(); ++strack) {
+    delete (*strack);
+  }
 }
 
 TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
@@ -908,6 +894,12 @@ TEST_F(PatternRecognitionTest, test_sort_by_station) {
   EXPECT_EQ(sp3, spnts_by_station[2][0]);
   EXPECT_EQ(sp4, spnts_by_station[3][0]);
   EXPECT_EQ(sp5, spnts_by_station[4][0]);
+
+  delete sp1;
+  delete sp2;
+  delete sp3;
+  delete sp4;
+  delete sp5;
 }
 
 TEST_F(PatternRecognitionTest, test_stations_with_unused_sp) {
@@ -965,6 +957,12 @@ TEST_F(PatternRecognitionTest, test_stations_with_unused_sp) {
 
   int stats_with_unused = pr.num_stations_with_unused_spnts(spnts_by_station);
   EXPECT_EQ(2, stats_with_unused);
+
+  delete sp1;
+  delete sp2;
+  delete sp4;
+  delete sp4_1;
+  delete sp5;
 }
 
 TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
@@ -1029,6 +1027,12 @@ TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
   EXPECT_NEAR(line_sz.get_c(), -1.09, epsilon);
   EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
   EXPECT_NEAR(line_sz.get_chisq(), 0.440, epsilon);
+
+  delete sp1;
+  delete sp2;
+  delete sp3;
+  delete sp4;
+  delete sp5;
 }
 
 TEST_F(PatternRecognitionTest, test_AB_ratio) {
@@ -1101,85 +1105,5 @@ TEST_F(PatternRecognitionTest, test_make_3pt_circle) {
   delete sp2;
   delete sp3;
 }
-
-/*
-TEST_F(PatternRecognitionTest, test_process_bad) {
-
-  PatternRecognition pr;
-
-  // Now give it random spacepoints and check it produces no tracks
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp3 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp4 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp5 = new SciFiSpacePoint();
-
-  ThreeVector pos(-50.0, -50.0, -0.652299999999741);
-  sp1->set_position(pos);
-  sp1->set_tracker(0);
-  sp1->set_station(1);
-  sp1->set_type("triplet");
-
-  pos.set(-20, -70, -200.6168999999991);
-  sp2->set_position(pos);
-  sp2->set_tracker(0);
-  sp2->set_station(2);
-  sp2->set_type("triplet");
-
-  pos.set(40.0, -80, -450.4798999999994);
-  sp3->set_position(pos);
-  sp3->set_tracker(0);
-  sp3->set_station(3);
-  sp3->set_type("triplet");
-
-  pos.set(-10.0, 90, -750.4801999999991);
-  sp4->set_position(pos);
-  sp4->set_tracker(0);
-  sp4->set_station(4);
-  sp4->set_type("triplet");
-
-  pos.set(1.0, 20.0, -1100.410099999999);
-  sp5->set_position(pos);
-  sp5->set_tracker(0);
-  sp5->set_station(5);
-  sp5->set_type("triplet");
-
-  // Set up the spacepoints vector
-  std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp5);
-  spnts.push_back(sp2);
-  spnts.push_back(sp3);
-  spnts.push_back(sp1);
-  spnts.push_back(sp4);
-
-  SciFiEvent evt;
-  evt.set_spacepoints(spnts);
-
-  pr.process(evt);
-
-  std::vector<SciFiStraightPRTrack> strks = evt.straightprtracks();
-  std::vector<SciFiHelicalPRTrack> htrks = evt.helicalprtracks();
-
-  SciFiHelicalPRTrack htrk = htrks[0];
-  std::cerr << " x0 is " << htrk.get_x0() << std::endl;
-  std::cerr << " y0 is " << htrk.get_y0() << std::endl;
-  std::cerr << " z0 is " << htrk.get_z0() << std::endl;
-  std::cerr << " phi0 is " << htrk.get_phi0() << std::endl;
-  std::cerr << " psi0 is " << htrk.get_psi0() << std::endl;
-  std::cerr << " ds/dz is " << htrk.get_dsdz() << std::endl;
-  std::cerr << " R is " << htrk.get_R() << std::endl;
-  std::cerr << " line_sz_chi2 is " << htrk.get_line_sz_chisq() << std::endl;
-  std::cerr << " circle_x0 is " << htrk.get_circle_x0() << std::endl;
-  std::cerr << " circle_y0 is " << htrk.get_circle_y0() << std::endl;
-  std::cerr << " circle_chi2 is " << htrk.get_circle_chisq() << std::endl;
-  std::cerr << " chi2 is " << htrk.get_chisq() << std::endl;
-  std::cerr << " chi2_dof is " << htrk.get_chisq_dof() << std::endl;
-  std::cerr << " num_points is " << htrk.get_num_points() << std::endl;
-
-  EXPECT_EQ(0, strks.size());
-  EXPECT_EQ(0, htrks.size());
-}
-*/
-
 
 } // ~namespace MAUS
