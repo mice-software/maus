@@ -3,7 +3,7 @@
 
 # Setup env.sh environment for MAUS installation
 
-root_version=root_v5.30.03
+root_version=root_v5.34.07
 
 maus_root_dir=`pwd -P`
 maus_third_party=""
