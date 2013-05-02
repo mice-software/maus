@@ -25,12 +25,12 @@
 // C++ headers
 #include <string>
 #include <vector>
-#include "CLHEP/Vector/ThreeVector.h"
 #include "TMath.h"
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 

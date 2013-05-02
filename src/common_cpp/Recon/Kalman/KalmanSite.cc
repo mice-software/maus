@@ -24,9 +24,9 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
                           _id(-1),
                           _f_chi2(0.),
                           _s_chi2(0.),
-                          _direction(CLHEP::Hep3Vector()),
-                          _mc_pos(CLHEP::Hep3Vector()),
-                          _mc_mom(CLHEP::Hep3Vector()) {}
+                          _direction(ThreeVector()),
+                          _mc_pos(ThreeVector()),
+                          _mc_mom(ThreeVector()) {}
 
 KalmanSite::~KalmanSite() {}
 
@@ -35,9 +35,9 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
                                                 _id(-1),
                                                 _f_chi2(0.),
                                                 _s_chi2(0.),
-                                                _direction(CLHEP::Hep3Vector()),
-                                                _mc_pos(CLHEP::Hep3Vector()),
-                                                _mc_mom(CLHEP::Hep3Vector()) {
+                                                _direction(ThreeVector()),
+                                                _mc_pos(ThreeVector()),
+                                                _mc_mom(ThreeVector()) {
   int dim = site.a(KalmanSite::Projected).GetNrows();
   Initialise(dim);
 

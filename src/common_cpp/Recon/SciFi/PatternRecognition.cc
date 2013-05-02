@@ -628,7 +628,7 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         double psi_0 = phi_0 + (CLHEP::pi / 2);
         double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
         double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
-        CLHEP::Hep3Vector pos_0(x0, y0, -1);
+        ThreeVector pos_0(x0, y0, -1);
         SciFiHelicalPRTrack *track;
         track = new SciFiHelicalPRTrack(-1, n_points, pos_0, phi_0, psi_0, c_trial, line_sz);
         track->set_phi(phi_i);

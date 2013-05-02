@@ -326,12 +326,12 @@ void KalmanTrack::UpdateV(const KalmanSite *a_site) {
 }
 
 void KalmanTrack::UpdateH(const KalmanSite *a_site) {
-  CLHEP::Hep3Vector dir = a_site->direction();
+  ThreeVector dir = a_site->direction();
 
   double dx = dir.x();
   double dy = dir.y();
 
-  CLHEP::Hep3Vector perp = dir.orthogonal();
+  ThreeVector perp = dir.orthogonal();
 
   double perp_x = perp.x();
   double perp_y = perp.y();

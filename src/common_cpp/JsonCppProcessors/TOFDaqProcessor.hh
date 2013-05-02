@@ -27,8 +27,8 @@ namespace MAUS {
 
 /** @class TOFDaqProcessor Conversions for TOFDaq between C++ and Json 
  *
- *  @var _V1724_proc_proc Processor for _V1724
- *  @var _V1290_proc_proc Processor for _V1290
+ *  @var _V1724_proc_proc Processor for _V1724 (fADC)
+ *  @var _V1290_proc_proc Processor for _V1290 (TDC)
  */
 
 class TOFDaqProcessor : public ObjectProcessor<TOFDaq> {

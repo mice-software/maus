@@ -20,7 +20,6 @@
 #define KALMANTRACKFIT_HH
 
 // C headers
-#include <CLHEP/Vector/ThreeVector.h>
 #include <assert.h>
 #include <iostream>
 #include <fstream>
@@ -34,6 +33,7 @@
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"

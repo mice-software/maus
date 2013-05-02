@@ -21,7 +21,7 @@
 namespace MAUS {
 
 // Constructors
-SciFiHelicalPRTrack::SciFiHelicalPRTrack() : _spoints(0), _phi(0) {
+SciFiHelicalPRTrack::SciFiHelicalPRTrack() : _phi(0), _spoints(0) {
   _x0 = -1.0;
   _y0 = -1.0;
   _z0 = -1.0;
@@ -56,7 +56,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, double x0,
   _chisq = chisq;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0,
                                          double phi0, double psi0, SimpleCircle circle,
                                          SimpleLine line_sz) {
   _tracker = tracker;
@@ -75,8 +75,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep
   _psi0 = psi0;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
-                                         SimpleHelix helix) : _spoints(0), _phi(0) {
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0,
+                                         SimpleHelix helix) : _phi(0), _spoints(0)  {
   _tracker = tracker;
   _num_points = num_points;
   _x0        = pos0.x();
@@ -125,10 +125,9 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)
-  :  _x0(-1.0), _y0(-1.0), _z0(-1.0), _R(-1.0), _phi0(-1.0), _psi0(-1.0), _dsdz(-1.0),
-  _tracker(-1), _num_points(-1), _line_sz_c(-1.0), _line_sz_chisq(-1.0),
-  _circle_x0(-1.0), _circle_y0(-1.0), _circle_chisq(-1.0), _chisq(-1.0),
-  _spoints(0), _phi(0) {
+  : _tracker(-1), _num_points(-1), _x0(-1.0), _y0(-1.0), _z0(-1.0), _R(-1.0), _phi0(-1.0),
+  _psi0(-1.0), _dsdz(-1.0), _line_sz_c(-1.0), _line_sz_chisq(-1.0),
+  _circle_x0(-1.0), _circle_y0(-1.0), _circle_chisq(-1.0), _chisq(-1.0), _phi(0), _spoints(0) {
   *this = _htrk;
 }
 
