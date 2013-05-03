@@ -331,7 +331,7 @@ void KalmanTrack::UpdateH(const KalmanSite *a_site) {
   double dx = dir.x();
   double dy = dir.y();
 
-  ThreeVector perp = dir.orthogonal();
+  ThreeVector perp = dir.Orthogonal();
 
   double perp_x = perp.x();
   double perp_y = perp.y();

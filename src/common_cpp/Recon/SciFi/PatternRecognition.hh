@@ -176,9 +176,6 @@ class PatternRecognition {
                     SpacePoint2dPArray &spnts_by_station,
                     std::vector<SciFiHelicalPRTrack*> &htrks);
 
-    double evaluate_nm(const int n, const int m, const double dz_ji, const double dz_kj,
-                       const double dphi_ji, const double dphi_kj);
-
     /** @brief Find the ds/dz of a helical track
      *
      * Find the ds/dz of a helical track. Output is the turning angles of the spacepoints
@@ -206,20 +203,6 @@ class PatternRecognition {
     bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
                       std::vector<double> &true_dphi);
 
-    /** @brief Determine the dip angle of the helix
-     *
-     * Calculate the dip angle of the helix.  Output is a line, the slope of which
-     * is dsdz = 1/tanlambda. Note: the function is sensitive to the order the
-     * spacepoints appear in the input vector (should be sp1 in index 0, sp2 in index 1, ...)
-     *
-     * @param spnts - A vector of all the input spacepoints
-     * @param circle - The circle fit of spacepoints from x-y projection
-     * @param line_sz - The output fitted line in s-z projection.
-     *
-     */
-    void calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
-                            const SimpleCircle &circle, std::vector<double> &dphi,
-                            SimpleLine &line_sz, double &phi_0);
 
     /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
      *
@@ -234,33 +217,19 @@ class PatternRecognition {
      */
     double calc_phi(double xpos, double ypos, const SimpleCircle &circle);
 
+    /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
+     *
+     * Alternative algorithm for calculating the turning angle from the x' axis, 
+     * returning (phi_i + phi_0). In the case that x0 and y0 are used, it returns phi_0. 
+     * Do not confuse the returned angle with phi_i itself,
+     * the turning angle wrt the x' axis not the x axis.
+     * 
+     * @param xpos - x position of spacepoint
+     * @param ypos - y position of  spacepoint
+     * @param circle - Contains the helix center
+     *
+     */
     double old_calc_phi(double xpos, double ypos, const SimpleCircle &circle);
-
-    /** @brief Account for possible 2*pi rotations between stations
-     *
-     *  As the seperation along z increases between stations, the difference in phi should
-     *  also increase. Inputs are vectors containing the seperation in z, from stations 1-5,
-     *  and a vector containing the phi differences.  Returns true if the rotations are
-     *  consistent with z spacing, and the vector dphi should contain new dphis corrected for
-     *  2*pi rotations.
-     *
-     * @param dz - a vector containing z seperations, z_j - z_i
-     * @param dphi - a vector containing the differences in phi b/w stations, phi_j - phi_i
-     *
-     */
-    bool turns_between_stations(const std::vector<double> &dz, std::vector<double> &dphi);
-
-    /** @brief Check that the ratio between the change in z and change in phi is appropriate
-     *
-     *  Returns true is the ABcut is satisfied.  Should be very nearly 0.
-     *
-     *  @param dphi_kj - dphi_k - dphi_j where k > j
-     *  @param dphi_ji - dphi_j - dphi_i where j > i
-     *  @param dz_kj - dz_k - dz_j where k > j
-     *  @param dz_ji - dz_j - dz_i where j > i
-     *
-     */
-    bool AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji, double dz_kj);
 
     /** @brief Changes dphi vector to ds vector
      *
@@ -434,7 +403,6 @@ class PatternRecognition {
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
-    static const int _k_limit = 2;           /** */
     static const int _m_limit = 10;          /** Max number of turns between stations allowed */
     static const int _n_limit = 10;          /** Max number of turns between stations allowed */
     static const double _sd_1to4 = 0.3844;   /** Position error associated with stations 1 t0 4 */

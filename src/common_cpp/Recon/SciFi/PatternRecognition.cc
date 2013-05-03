@@ -609,20 +609,12 @@ void PatternRecognition::make_helix(const int n_points, const int trker_no,
         else if (good_spnts[0]->get_tracker() == 1)
           std::sort(good_spnts.begin(), good_spnts.end(), compare_spoints_ascending_z);
 
-        // Perform s-z fit
-        /*
-        calculate_dipangle(good_spnts, c_trial, phi_i, line_sz, phi_0);
-        phi_i.insert(phi_i.begin(), phi_0);
-        for ( int i = 1; i < phi_i.size(); ++i ) {
-          phi_i[i] = phi_i[i] + phi_0;
-        }
-        */
+        // Perform the s - z fit
         bool good_dsdz = find_dsdz(n_points, good_spnts, c_trial, phi_i, line_sz);
         if (!good_dsdz) {
           std::cerr << "dsdz fit failed, looping..." << std::endl;
           continue;
         }
-
 
         // Form the helical track
         double psi_0 = phi_0 + (CLHEP::pi / 2);
@@ -677,25 +669,14 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     z_i.push_back((*it)->get_position().z());
     phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
 
-    /*
-    std::cerr << "r is " << circle.get_R() << ", X0 is " << circle.get_x0() << ", Y0 is ";
-    std::cerr << circle.get_y0() << "\n";
-    for ( size_t i = 0; i < z_i.size(); ++i ) {
-      std::cerr << "x[" << i << "] is " << x_i[i] << ", y_i[" << i << "] is " << y_i[i];
-      std::cerr << " z[" << i << "] is " << z_i[i] << ", phi_i[" << i << "] is " << phi_i[i];
-      std::cerr << std::endl;
-    }
-    */
-
     // Calculate each dz_ji and dphi_ji value (separation in z and phi between spacepoints)
     if ( it != spnts.begin() ) {
       dz.push_back(fabs((*it)->get_position().z() - (*(spnts.begin()))->get_position().z()));
       // dphi is negative means later spacepoint has gone over 2pi so we add to 2pi to compensate
-      if ( (*(phi_i.end()-1) - phi_1) > 0 ) {
+      if ( (*(phi_i.end()-1) - phi_1) > 0 )
         dphi.push_back(*(phi_i.end()-1) - phi_1);
-      } else {
+      else 
         dphi.push_back((*(phi_i.end()-1)) + 2*CLHEP::pi - phi_1);
-      }
     }
 
     // Set the phi_i errors
@@ -753,11 +734,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
         // Remainder should be ~0 if correct n_ji and m are found
         double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) / (true_dphi[i] + 2*n*CLHEP::pi))
                                    - (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
-        // double remainder = evaluate_nm(n, m, dz[i], dz[i+1], dphi[i], dphi[i+1]);
-        // std::cerr << "For i = " << i << " trying n = " << n << ", m = " << m << ", rem = ";
-        // std::cerr<< remainder << std::endl;
         if ( remainder < _AB_cut ) {
-          // std::cerr << "Passed AB_cut for phi[" << i << "]" << std::endl;
           found = true;
           true_n = n;
           true_m = m;
@@ -774,78 +751,6 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
   }
   return true;
 }
-
-double PatternRecognition::evaluate_nm(const int n, const int m,
-                                      const double dz_ji, const double dz_kj,
-                                      const double dphi_ji, const double dphi_kj) {
-  double gamma = ((2*CLHEP::pi)/dz_kj) * (m - (dz_kj/dz_ji)*n);
-  double lambda = (dphi_ji/dz_ji) - (dphi_kj/dz_kj);
-  return fabs(lambda - gamma);
-}
-
-void PatternRecognition::calculate_dipangle(const std::vector<SciFiSpacePoint*> &spnts,
-                                            const SimpleCircle &circle, std::vector<double> &dphi,
-                                            SimpleLine &line_sz, double &phi_0) {
-  // For the linear fit in s-z, we care about the change in z vs change in s
-  // So here we calculate the values dz_i and phi_i (because ds_i = R * phi_i)
-
-  std::vector<double> dz;
-  std::vector<double> dphi_err;
-
-  // TODO replace this with a proper stl sort function
-  /*
-  int spnts_size = spnts.size();
-  if (spnts[0]->get_tracker() == 0) {
-    for (int i = 0; i < spnts_size; i++) {
-      int swith = spnts_size - i - 1;
-      spnts_by_zed.push_back(spnts[swith]);
-    }
-  } else { spnts_by_zed = spnts; }
-  */
-
-  // Calculate phi_0, the rotation when moving from x to x'
-  // TODO approximates 1st sp to x0, y0 which is not quite true at best,
-  // and completely false if there is no spacepoint in the first station
-  ThreeVector pos0 = spnts[0]->get_position();
-  phi_0 = old_calc_phi(pos0.x(), pos0.y(), circle);
-
-  // Loop over spacepoints
-  for ( int i = 1; i < static_cast<int>(spnts.size()); ++i ) {
-    if (spnts[0]->get_tracker() == 0) {
-      dz.push_back(spnts[0]->get_position().z() - spnts[i]->get_position().z());
-    } else {
-      dz.push_back(spnts[i]->get_position().z() - spnts[0]->get_position().z());
-    }
-
-    // theta_i is defined as phi_i + phi_0 i.e. the turning angle wrt the x (not x') axis
-    double theta_i = old_calc_phi(spnts[i]->get_position().x(),
-                              spnts[i]->get_position().y(), circle);
-
-
-    // phi_i is defined as the turning angle wrt the x' axis, given by theta_i - phi_0
-    dphi.push_back(theta_i - phi_0);
-    // std::cerr << "Pushed " << theta_i - phi_0 << " into dphi, size is " << dphi.size() << "\n";
-
-    // Set the error on phi
-    double sd_phi = -1.0;
-    if ( spnts[i]->get_station() == 5 )
-      sd_phi = _sd_phi_5;
-    else
-      sd_phi = _sd_phi_1to4;
-    dphi_err.push_back(sd_phi);
-  } // ~Loop over spacepoints
-
-  // Correct dphi for 2pi rotations
-  bool dphi_ok = turns_between_stations(dz, dphi);
-
-  // Use the dphi to calculate the ds by multiplying each element of dphi by R
-  if ( dphi_ok ) {
-    std::vector<double> ds;
-    dphi_to_ds(circle.get_R(), dphi, ds);
-    // Peform a linear fit in s - z
-    _lsq.linear_fit(dz, ds, dphi_err, line_sz); // Take ds_err to be dphi_err (is this true??)
-  }
-} // ~calculate_dipangle(...)
 
 double PatternRecognition::calc_phi(double xpos, double ypos, const SimpleCircle &circle) {
   // Note this function returns phi_i + phi_0, unless using x0, y0 in which case it returns phi_0
@@ -874,54 +779,6 @@ double PatternRecognition::old_calc_phi(double xpos, double ypos, const SimpleCi
     if ( angle < 0. ) angle += 2. * CLHEP::pi; // TODO is this ok if have different sign particles?
     return angle;
 } // ~calculate_phi(...)
-
-bool PatternRecognition::turns_between_stations(const std::vector<double> &dz,
-                                                std::vector<double> &dphi) {
-  // Make sure that you have enough points to make a line (2)
-  if ( dz.size() < 2 || dphi.size() < 2 )
-    return false;
-  for ( int k = 0; k < _k_limit; ++k ) {  // TODO what is this obscure outer loop doing?
-    for ( int i = 0; i < static_cast<int>(dphi.size()) - 1; ++i ) {
-      int j = i + 1;
-      // TODO Is this ok in the case of having both positive and negative particles?
-      if ( dphi[i] < 0 )
-        dphi[i] += 2. * CLHEP::pi;
-
-      if ( dphi[j] < 0 )
-        dphi[j] += 2. * CLHEP::pi;
-
-      if ( dphi[j] < dphi[i] )
-        dphi[j] += 2. * CLHEP::pi;
-
-      double z_ratio = dz[j] / dz[i];
-      double phi_ratio = dphi[j] / dphi[i];
-
-      if ( fabs(phi_ratio - z_ratio) /  z_ratio > _AB_cut ) {
-        // try
-        bool passed_cut = AB_ratio(dphi[i], dphi[j], dz[i], dz[j]);
-        if ( !passed_cut )
-          return false;
-      }
-    }
-  }
-  return true;
-} // ~turns_between_stations(...)
-
-bool PatternRecognition::AB_ratio(double &dphi_ji, double &dphi_kj, double dz_ji, double dz_kj) {
-  for ( int n = 0; n < _n_limit; ++n ) {
-    for ( int m = 0; m < _m_limit; ++m ) {
-      double A, B;
-      A = ( dphi_kj + ( 2 * n * CLHEP::pi ) ) / ( dphi_ji + ( 2 * m * CLHEP::pi ) ); // phi_ratio
-      B = dz_kj / dz_ji; // z_ratio
-      if ( fabs(A - B) / B < _AB_cut ) {
-        dphi_kj += 2 * n * CLHEP::pi;
-        dphi_ji += 2 * m * CLHEP::pi;
-        return true;
-      }
-    } // end m loop
-  } // end n loop
-  return false; // Return false if _ABcut is never satisfied
-} // ~AB_ratio(...)
 
 void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
                                     std::vector<double> &ds) {

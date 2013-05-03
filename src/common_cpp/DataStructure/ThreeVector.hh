@@ -98,20 +98,6 @@ class ThreeVector : public TVector3 {
     /** Return the magnitude sqrt(this.this) */
     inline double mag() const {return TVector3::Mag();}
 
-    /** Return a vector orthogonal to this */
-    inline ThreeVector orthogonal() const {
-      double x = TVector3::x() < 0.0 ? -TVector3::x() : TVector3::x();
-      double y = TVector3::y() < 0.0 ? -TVector3::y() : TVector3::y();
-      double z = TVector3::z() < 0.0 ? -TVector3::z() : TVector3::z();
-      if (x < y) {
-        return x < z ? ThreeVector(0, TVector3::z(), -TVector3::y()) :
-                       ThreeVector(TVector3::y(), -TVector3::x(), 0);
-      } else {
-        return y < z ? ThreeVector(-TVector3::z(), 0, TVector3::x()) :
-                       ThreeVector(TVector3::y(), -TVector3::x(), 0);
-      }
-    }
-
     /** Set x, y and z values of the vector */
     void set(double x, double y, double z) {SetXYZ(x, y, z);}
 

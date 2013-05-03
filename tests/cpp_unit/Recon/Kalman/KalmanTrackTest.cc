@@ -142,7 +142,7 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   s(1, 0) = shift_y; // mm
   // So we need a plane that's not 0 (because this one is vertical, only measures x)
   a_site->set_direction(direction_plane1_tracker0);
-  ThreeVector perp = direction_plane1_tracker0.orthogonal();
+  ThreeVector perp = direction_plane1_tracker0.Orthogonal();
 
   delete a_site;
   delete track;

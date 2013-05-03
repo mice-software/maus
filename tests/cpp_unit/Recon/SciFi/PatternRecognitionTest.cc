@@ -965,7 +965,7 @@ TEST_F(PatternRecognitionTest, test_stations_with_unused_sp) {
   delete sp5;
 }
 
-TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
+TEST_F(PatternRecognitionTest, test_find_dsdz) {
 
   PatternRecognition pr;
 
@@ -1020,9 +1020,9 @@ TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
 
   SimpleLine line_sz;
   std::vector<double> dphi;
-  double phi_0;
+  int n_points = 5;
 
-  pr.calculate_dipangle(spnts, circle, dphi, line_sz, phi_0);
+  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz);
 
   EXPECT_NEAR(line_sz.get_c(), -1.09, epsilon);
   EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
@@ -1033,26 +1033,6 @@ TEST_F(PatternRecognitionTest, test_calculate_dipangle) {
   delete sp3;
   delete sp4;
   delete sp5;
-}
-
-TEST_F(PatternRecognitionTest, test_AB_ratio) {
-
-  PatternRecognition pr;
-  double phi_i = 1.0;
-  double phi_j = 0.5;
-  double z_i = 200.0;
-  double z_j = 450.0;
-
-  double epsilon = 0.01;
-
-  bool result = pr.AB_ratio(phi_i, phi_j, z_i, z_j);
-  ASSERT_TRUE(result);
-  // EXPECT_NEAR(phi_i, 7.28319, epsilon);
-  // EXPECT_NEAR(phi_j, 6.783, epsilon);
-  EXPECT_NEAR(phi_i, 7.283, epsilon);
-  EXPECT_NEAR(phi_j, 13.066, epsilon);
-  EXPECT_EQ(z_i, 200.0);
-  EXPECT_EQ(z_j, 450.0);
 }
 
 TEST_F(PatternRecognitionTest, test_make_3pt_circle) {
