@@ -103,13 +103,33 @@ TEST(PrimitivesProcessorsTest, IntCppToJson) {
 
 TEST(PrimitivesProcessorsTest, UIntJsonToCpp) {
   UIntProcessor proc;
-  unsigned int* value = proc.JsonToCpp(Json::Value(1)); // int
+  unsigned int* value;
+
+  value = proc.JsonToCpp(Json::Value(1)); // int
   EXPECT_EQ(*value, static_cast<unsigned int>(1));
   delete value;
+  
+  value = proc.JsonToCpp(Json::Value(0)); // int
+  EXPECT_EQ(*value, static_cast<unsigned int>(0));
+  delete value;
+
+  EXPECT_THROW(proc.JsonToCpp(Json::Value(-1)), Squeal); // negative int
+  
   unsigned int uint_in = 1;
   value = proc.JsonToCpp(Json::Value(uint_in)); // uint
   EXPECT_EQ(*value, static_cast<unsigned int>(1));
   delete value;
+  
+  uint_in = 0;
+  value = proc.JsonToCpp(Json::Value(uint_in)); // uint
+  EXPECT_EQ(*value, static_cast<unsigned int>(0));
+  delete value;
+  
+  uint_in = 2147483648;
+  value = proc.JsonToCpp(Json::Value(uint_in)); // uint
+  EXPECT_EQ(*value, static_cast<unsigned int>(2147483648));
+  delete value;
+  
   EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Squeal);
 }
 
