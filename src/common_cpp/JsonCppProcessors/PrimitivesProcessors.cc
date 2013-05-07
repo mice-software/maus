@@ -14,8 +14,11 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+
+#include <sstream>
+
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
@@ -92,12 +95,15 @@ Json::Value* IntProcessor::CppToJson
 unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
   if (json_uint.isUInt()) {
       return new unsigned int (json_uint.asUInt());
-  } else if (json_uint.isInt() && json_uint.asInt() > 0) {
+  } else if (json_uint.isInt() && json_uint.asInt() >= 0) {
       return new unsigned int (json_uint.asUInt());
   } else {
+      std::stringstream message;
+      message << "Failed to convert json value \"" << json_uint << "\""
+              << " to unsigned int";
       throw(Squeal(
           Squeal::recoverable,
-          "Failed to convert json value to unsigned int",
+          message.str(),
           "UIntProcessor::JsonToCpp"
       ));
   }

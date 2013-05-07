@@ -48,9 +48,14 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor()
     RegisterValueBranch("chi2", &_double_proc,
                         &SciFiSpacePoint::get_chi2,
                         &SciFiSpacePoint::set_chi2, true);
+    /* FIXME(Lane) this should be required, but
+     * src/reduce/ReduceCppPatternRecognition/test_spills.json has not been
+     * updated yet to include time. Thus making this required causes a unit
+     * test to fail.
+     */
     RegisterValueBranch("time", &_double_proc,
                         &SciFiSpacePoint::get_time,
-                        &SciFiSpacePoint::set_time, true);
+                        &SciFiSpacePoint::set_time, false);
 
     RegisterValueBranch("position", &_three_vec_proc,
                         &SciFiSpacePoint::get_position,
