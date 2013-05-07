@@ -173,8 +173,14 @@ class PatternRecognition {
      */
     void make_helix(const int num_points, const int trker_no,
                     const std::vector<int> ignore_stations,
-                    SpacePoint2dPArray &spnts_by_station,
-                    std::vector<SciFiHelicalPRTrack*> &htrks);
+                    SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks);
+
+    void make_helix2(const int n_points, const int stat_num, const std::vector<int> ignore_stations,
+                     std::vector<SciFiSpacePoint*> &current_spnts,
+                     SpacePoint2dPArray &spnts_by_station,
+                     std::vector<SciFiHelicalPRTrack*> &htrks);
+
+    SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts );
 
     /** @brief Find the ds/dz of a helical track
      *
@@ -413,7 +419,7 @@ class PatternRecognition {
     static const double _circ_res_cut = 5;      /** Road cut for circle fit in mm */
     static const double _R_res_cut = 150.0;     /** Road cut for circle radius in mm */
     static const double _chisq_cut = 15;        /** Cut on the chi^2 of the least sqs fit in mm */
-    static const double _sz_chisq_cut = 30.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
+    static const double _sz_chisq_cut = 20.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
     static const double _helix_chisq_cut = 100; /** Cut on the helix chi^2 in mm (not used) */
     static const double _chisq_diff = 3.;
     static const double _AB_cut = .5;             /** Need to decide on appropriate cut here!!! */
