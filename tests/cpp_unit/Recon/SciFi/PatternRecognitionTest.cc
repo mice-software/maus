@@ -483,8 +483,6 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   std::vector< std::vector<SciFiSpacePoint*> > spnts_by_station(n_stations);
   pr.sort_by_station(spnts, spnts_by_station);
 
-  bool track_type = 0; // Straight tracks
-
   // The track parameters that should be reconstructed from the spacepoints in 5 pt track case
   int num_points = 3;
   int tracker_num = 0;
@@ -497,7 +495,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
 
   // Make a 3 point track with 3 spacepoints
   // ---------------------------------------
-  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
+  pr.make_3tracks(tracker_num, spnts_by_station, strks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1u, strks.size());
@@ -533,7 +531,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
+  pr.make_3tracks(tracker_num, spnts_by_station, strks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1u, strks.size());
@@ -566,7 +564,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.sort_by_station(spnts, spnts_by_station);
   strks.resize(0);
 
-  pr.make_3tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
+  pr.make_3tracks(tracker_num, spnts_by_station, strks);
 
   // Check it matches to within a tolerance
   EXPECT_EQ(1u, strks.size());
