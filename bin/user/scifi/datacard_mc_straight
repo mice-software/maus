@@ -156,8 +156,8 @@ SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
-SciFiPRHelicalOn = 0
-SciFiPRStraightOn = 1
+SciFiPRHelicalOn = False
+SciFiPRStraightOn = True
 
 
 # configuration database

@@ -585,6 +585,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
 
   // Form the helical track
+  phi_0 = phi_i[0];
   double psi_0 = phi_0 + (CLHEP::pi / 2);
   double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
   double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);

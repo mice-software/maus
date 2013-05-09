@@ -329,10 +329,16 @@ def main(file_name):
             mg = draw_sz(t1.seeds_z, t1.seeds_s, t2.seeds_z, t2.seeds_s, \
                          t1.sz_fits, t2.sz_fits, c_trk_sz)
             c_trk_sz.Update()
-            raw_input("Press any key to move to the next spill...")
+            if ( t1.num_htracks < 1):
+              raw_input("Found one!")
+            # raw_input("Press any key to move to the next spill...")
+            print 'Helical tracks found: ' + str(t1.num_htracks + t2.num_htracks)
             mg[0].Clear()
             mg[1].Clear()
             del mg
+        del t1
+        del t2
+        del spill
 
 
     print "Closing root file"

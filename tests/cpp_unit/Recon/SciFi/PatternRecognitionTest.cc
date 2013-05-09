@@ -139,8 +139,10 @@ TEST_F(PatternRecognitionTest, test_process_good) {
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  double helix_x0 = 189.91;
-  double helix_y0 = 3.55;
+  // double helix_x0 = 189.91;
+  // double helix_y0 = 3.55;
+  double helix_x0 = -68.25;
+  double helix_y0 = -57.81;
   double helix_R = 136.335;
   double helix_dsdz = -0.0470962; // Need to check this value is physical
 

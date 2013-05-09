@@ -125,9 +125,9 @@ SciFinStations = 5
 SciFinTrackers = 2
 SciFiNPECut = 2
 SciFiClustExcept = 100
-SciFiHelicalPROn = 1
-SciFiStraightPROn = 0
-SciFiKalmanOn = False
+SciFiPRHelicalOn = True
+SciFiPRStraightOn = False
+SciFiKalmanOn = True
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
