@@ -139,7 +139,7 @@ std::string MapCppGlobalTrackReconstructor::process(
 
     GlobalDS::TrackPArray raw_tracks;
     LoadRawTracks(global_event, raw_tracks);
-
+    std::cerr << "Loaded " << raw_tracks.size() << " raw tracks." << std::endl;
     // Fit each raw track and store best fit track in global_event
     GlobalDS::TrackPArray::const_iterator raw_track;
     for (raw_track = raw_tracks.begin();
@@ -147,11 +147,17 @@ std::string MapCppGlobalTrackReconstructor::process(
          ++raw_track) {
       GlobalDS::Track * best_fit_track = new GlobalDS::Track();
       best_fit_track->set_mapper_name(kClassname);
+      best_fit_track->AddTrack(*raw_track);
 
       track_fitter_->Fit(*raw_track, best_fit_track);
 
       global_event->add_track_recursive(best_fit_track);
     }
+
+    std::vector<MAUS::DataStructure::Global::Track*>* tracks
+      = global_event->get_tracks();
+    std::cout << "Added " << (tracks->size()-1)<< " reconstructed tracks."
+              << std::endl;
   }
 
   // Serialize the Spill for passing on to the next map in the workflow

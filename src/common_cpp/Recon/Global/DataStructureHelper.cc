@@ -83,10 +83,6 @@ void DataStructureHelper::GetDetectorAttributes(
 
     const Detector detector(id, plane, uncertainties);
     detectors.insert(std::pair<DetectorPoint, Detector>(id, detector));
-std::cerr << "DEBUG DataStructureHelper::GetDetectorAttributes: " << std::endl
-          << "\tID: " << detector.id() << std::endl
-          << "\tPlane: " << detector.plane() << std::endl
-          << "\tUncertainties: " << detector.uncertainties() << std::endl;
   }
 }
 
@@ -261,9 +257,6 @@ GlobalTrackPoint DataStructureHelper::TrackPointToGlobalTrackPoint(
 
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {
-std::cerr << "DEBUG DataStructureHelper::GetJsonCovarianceMatrix: "
-          << "converting the following JSON to a CovarianceMatrix:" << std::endl
-          << value << std::endl;
   if (value.size() < static_cast<Json::Value::UInt>(6)) {
     throw(Squeal(Squeal::recoverable,
                  "Not enough row elements to convert JSON to CovarianceMatrix",
@@ -283,10 +276,6 @@ std::cerr << "DEBUG DataStructureHelper::GetJsonCovarianceMatrix: "
     for (size_t column = 0; column < 6; ++column) {
       const Json::Value element_json = row_json[column];
       matrix_data[row*size+column] = element_json.asDouble();
-std::cerr << "DEBUG DataStructureHelper::GetJsonCovarianceMatrix: "
-          << "setting CovarianceMatrix element at row " << row
-          << " and column " << column << " equal to "
-          << element_json.asDouble() << std::endl;
     }
   }
 

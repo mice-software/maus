@@ -213,6 +213,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
     }
 
     GlobalDS::Track * combined_track = new GlobalDS::Track();
+    combined_track->set_mapper_name(kClassname);
     if (tof_track != tof_tracks.end()) {
       //combined_track->AddTrack(*tof_track);
       while (tof_track_point != tof_track_points.end()) {
@@ -260,7 +261,6 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     = space_point_events.GetTOF2SpacePointArray();
 
   GlobalDS::Track * track = new GlobalDS::Track();
-  track->set_mapper_name(kClassname);
 
   TLorentzVector last_position[3];
   TLorentzVector deltas[2];
