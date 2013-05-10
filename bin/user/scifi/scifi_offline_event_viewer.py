@@ -36,6 +36,8 @@ class Tracker:
     seeds_phi = []
     seeds_s = []
     seeds_circles = []
+    seeds_xz = []
+    seeds_yz = []
     sz_fits = []
 
     def __init__(self):
@@ -54,7 +56,9 @@ class Tracker:
         self.seeds_z = []
         self.seeds_phi = []
         self.seeds_s = []
-        self.seeds_circle = []
+        self.seeds_circles = []
+        self.seeds_xz = []
+        self.seeds_yz = []
         self.sz_fits = []
 
     def accumulate_data(self, evt, trker_num):
@@ -107,13 +111,15 @@ class Tracker:
                 print 'pt = ' + '%.2f' % pt + 'MeV/c' + ',',
                 print 'pz = ' + '%.2f' % pz + 'MeV/c',
                 print 'xy_chi2 = ' + '%.4f' % trk.get_circle_chisq(),
+                print 'sz_c = ' + '%.4f' % trk.get_line_sz_c(),
                 print 'sz_chi2 = ' + '%.4f' % trk.get_line_sz_chisq()
                 print 'x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc'
                 # Pull out the circle fit data
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
+                dsdz = trk.get_dsdz()
                 rad = trk.get_R()
-                self.seeds_circle.append(make_circle(x0, y0, rad))
+                self.seeds_circles.append(make_circle(x0, y0, rad))
                 # Pull out the turning angles of each seed spacepoint
                 phi_per_trk = array.array('d', [0])
                 s_per_trk = array.array('d', [0])
@@ -168,8 +174,14 @@ class Tracker:
                     dsdz = - trk.get_dsdz()
                 elif trker_num == 1:
                     dsdz = trk.get_dsdz()
+                # As the line_sz was drawn in ds - dz space (origin set by
+                # the 1st spoint) dsdz is the same but the axis intercept
+                # needs to be altered to plot in s - z space correctly.
                 sz_c = trk.get_line_sz_c() + self.seeds_s[-1][0] \
                        - (dsdz * self.seeds_z[-1][0])
+                # sz_c = trk.get_line_sz_c()
+                self.seeds_xz.append(make_xz(x0, rad, dsdz, sz_c, 0, 1200))
+                self.seeds_yz.append(make_yz(y0, rad, dsdz, sz_c, 0, 1200))
                 self.sz_fits.append(make_line(dsdz, sz_c, 0, 1200))
                 self.num_htracks = self.num_htracks + 1
 
@@ -187,7 +199,9 @@ class Tracker:
         self.seeds_z = []
         self.seeds_phi = []
         self.seeds_s = []
-        self.seeds_circle = []
+        self.seeds_circles = []
+        self.seeds_xz = []
+        self.seeds_yz = []
         self.sz_fits = []
 
 class info_box():
@@ -289,8 +303,8 @@ def main(file_name):
     tree.SetBranchAddress("data", data)
 
     # Set up the ROOT canvases
-    c_sp_xy = ROOT.TCanvas("sp_xy", "Spacepoint x-y", 0, 0, 700, 500)
-    c_sp_xy.Divide(3, 2)
+    c_sp_xyz = ROOT.TCanvas("sp_xyz", "Spacepoint x-y", 0, 0, 700, 500)
+    c_sp_xyz.Divide(3, 2)
     c_trk_sz = ROOT.TCanvas("trk_sz", "Track s-z", 770, 0, 600, 500)
     c_trk_sz.Divide(1, 2)
     ib1 = info_box()
@@ -322,17 +336,18 @@ def main(file_name):
             ib1.update(spill.GetSpillNumber(), t1, t2)
 
             # Make plots
-            sp_graphs = draw_spoints(c_sp_xy, t1.spoints_x, t1.spoints_y,
+            sp_graphs = draw_spoints(c_sp_xyz, t1.spoints_x, t1.spoints_y,
                     t1.spoints_z, t2.spoints_x, t2.spoints_y, t2.spoints_z)
-            draw_htracks(t1.seeds_circle, t2.seeds_circle, c_sp_xy)
-            c_sp_xy.Update()
+            draw_htracks(t1, t2, c_sp_xyz)
+            c_sp_xyz.Update()
             mg = draw_sz(t1.seeds_z, t1.seeds_s, t2.seeds_z, t2.seeds_s, \
                          t1.sz_fits, t2.sz_fits, c_trk_sz)
             c_trk_sz.Update()
-            if ( t1.num_htracks < 1):
-              raw_input("Found one!")
-            # raw_input("Press any key to move to the next spill...")
-            print 'Helical tracks found: ' + str(t1.num_htracks + t2.num_htracks)
+            # if ( t1.num_htracks < 1):
+              # raw_input("Found one!")
+            raw_input("Press any key to move to the next spill...")
+            print 'Helical tracks found: ' + \
+                  str(t1.num_htracks + t2.num_htracks)
             mg[0].Clear()
             mg[1].Clear()
             del mg
@@ -351,6 +366,28 @@ def make_line(m, c, xmin, xmax):
     line.SetParameter(1, c)
     line.SetLineColor(ROOT.kBlue)
     return line
+
+def make_xz(circle_x0, rad, dsdz, sz_c, zmin, zmax):
+    """ Make a function for the x-z projection of the helix """
+    # The x in the cos term is actually representing z (the indep variable)
+    func = ROOT.TF1("xz_func", "[0]+([1]*cos((1/[1])*([2]*x+[3])))", zmin, zmax)
+    func.SetParameter(0, circle_x0)
+    func.SetParameter(1, rad)
+    func.SetParameter(2, dsdz)
+    func.SetParameter(3, sz_c)
+    func.SetLineColor(ROOT.kBlue)
+    return func
+
+def make_yz(circle_y0, rad, dsdz, sz_c, zmin, zmax):
+    """ Make a function for the y-z projection of the helix """
+    # The x in the cos term is actually representing z (the indep variable)
+    func = ROOT.TF1("yz_func", "[0]+([1]*sin((1/[1])*([2]*x+[3])))", zmin, zmax)
+    func.SetParameter(0, circle_y0)
+    func.SetParameter(1, rad)
+    func.SetParameter(2, dsdz)
+    func.SetParameter(3, sz_c)
+    func.SetLineColor(ROOT.kBlue)
+    return func
 
 def make_circle(x0, y0, rad):
     """ Make a circle from its centre coords & radius using the TArc class"""
@@ -421,16 +458,31 @@ def draw_spoints(can, t1_spoints_x, t1_spoints_y, t1_spoints_z,
     return [t1_sp_xy_graph, t1_sp_xz_graph, t1_sp_yz_graph,
             t2_sp_xz_graph, t2_sp_yz_graph,t2_sp_xy_graph]
 
-def draw_htracks(t1_circles_xy, t2_circles_xy, can):
-    """ Draw the circle fits over the spacepoints """
-
-    for circ in t1_circles_xy:
+def draw_htracks(t1, t2, can):
+    """ Draw the helix fits over the spacepoints """
+    for circ in t1.seeds_circles:
         can.cd(1)
         circ.Draw("same")
         can.Update()
-    for circ in t2_circles_xy:
+    for func in t1.seeds_xz:
+        can.cd(2)
+        func.Draw("same")
+        can.Update()
+    for func in t1.seeds_yz:
+        can.cd(3)
+        func.Draw("same")
+        can.Update()
+    for circ in t2.seeds_circles:
         can.cd(4)
         circ.Draw("same")
+        can.Update()
+    for func in t2.seeds_xz:
+        can.cd(5)
+        func.Draw("same")
+        can.Update()
+    for func in t2.seeds_yz:
+        can.cd(6)
+        func.Draw("same")
         can.Update()
 
 def draw_sz(t1_z, t1_s, t2_z, t2_s, t1_fits, t2_fits, can):

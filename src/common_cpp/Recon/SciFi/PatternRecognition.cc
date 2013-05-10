@@ -670,6 +670,19 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
   _lsq.linear_fit(dz, ds, phi_err, line_sz);
 
+  // Alter the intercept so it is true for s - z space (rather than ds - dz space, where the origin
+  // is given by the first spacepoint)
+  /*
+  double dsdz = 0.0;
+  if (spnts[0]->get_tracker() == 0)
+    dsdz = - line_sz.get_m();
+  else
+    dsdz = line_sz.get_m();
+  line_sz.set_c(line_sz.get_c() + (circle.get_R()*phi_i[0]) - (dsdz*z_i[0]));
+  std::cerr << "phi_i[0] = " << phi_i[0] << ", z_i[0] = " << z_i[0] << std::endl;
+  std::cerr << "sz_c = " << line_sz.get_c() + (circle.get_R()*phi_1) - (dsdz*z_i[0]) << "\n";
+  */
+
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
     if ( _debug > 0 ) std::cerr << "Failed s-z cut, chisq = " << line_sz.get_chisq() << std::endl;
