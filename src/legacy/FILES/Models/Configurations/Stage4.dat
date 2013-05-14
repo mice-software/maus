@@ -2,7 +2,7 @@ Configuration Stage4
 {
   Dimensions 6. 6. 31. m
   PropertyString Material AIR
-  PropertyDouble G4StepMax 1.0 mm
+  PropertyDouble G4StepMax 100.0 mm
   Module BeamLine/BeamLine.dat
   {
     Position 0. 0. 6672.74 mm

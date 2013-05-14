@@ -67,7 +67,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_parameter_constructor) {
 TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   double phi0 = 3.0;
   double psi0 = -1.0;
-  CLHEP::Hep3Vector pos0(1.0, 2.0, 1100.0);
+  ThreeVector pos0(1.0, 2.0, 1100.0);
   SimpleLine line_sz;
   SimpleCircle circle;
   line_sz.set_c(1.0);

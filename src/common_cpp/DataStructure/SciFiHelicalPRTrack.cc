@@ -56,7 +56,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, double x0,
   _chisq = chisq;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0,
                                          double phi0, double psi0, SimpleCircle circle,
                                          SimpleLine line_sz) {
   _tracker = tracker;
@@ -75,8 +75,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep
   _psi0 = psi0;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0,
-                                         SimpleHelix helix) : _spoints(0), _phi(0) {
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0,
+                                         SimpleHelix helix) : _phi_i(0), _spoints(0)  {
   _tracker = tracker;
   _num_points = num_points;
   _x0        = pos0.x();

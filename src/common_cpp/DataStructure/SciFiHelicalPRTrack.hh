@@ -48,11 +48,11 @@ class SciFiHelicalPRTrack {
                         double psi0, double dsdz, double R, double chisq);
 
     /** Constructor from SimpleCircle and SimpleLine */
-    SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0, double phi0,
+    SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0, double phi0,
                         double psi0, SimpleCircle circle, SimpleLine line_sz);
 
     /** Constructor from SimpleHelix */
-    SciFiHelicalPRTrack(int tracker, int num_points, CLHEP::Hep3Vector pos0, SimpleHelix helix);
+    SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0, SimpleHelix helix);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
