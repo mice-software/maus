@@ -144,8 +144,8 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   }
 
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    Hep3Vector true_position = clusters[j]->get_true_position();
-    Hep3Vector true_momentum = clusters[j]->get_true_momentum();
+    ThreeVector true_position = clusters[j]->get_true_position();
+    ThreeVector true_momentum = clusters[j]->get_true_momentum();
     sites[j].set_true_position(true_position);
     sites[j].set_true_momentum(true_momentum);
   }

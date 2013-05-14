@@ -58,7 +58,7 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "TrackerStraightFitTest.dat" # geometry used by simulation
+# simulation_geometry_filename = "TrackerStraightFitTest.dat" # geometry used by simulation
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
@@ -156,8 +156,8 @@ SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
-SciFiPRHelicalOn = 0
-SciFiPRStraightOn = 1
+SciFiPRHelicalOn = False
+SciFiPRStraightOn = True
 
 
 # configuration database

@@ -170,6 +170,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
   double Pitch = this_plane->propertyDouble("Pitch");
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
+
   ThreeVector plane_position = clhep_to_root(this_plane->globalPosition());
   ThreeVector position = dist_mm * perp + plane_position;
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());

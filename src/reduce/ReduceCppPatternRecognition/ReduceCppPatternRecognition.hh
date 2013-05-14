@@ -112,8 +112,8 @@ class ReduceCppPatternRecognition {
 
   int _nSpills;
   // int _number_spacepoints;
-  static const int _trk_lower_bound = 1300;
-  static const int _trk_upper_bound = 0;
+  static const int _trk_lower_bound = 0;
+  static const int _trk_upper_bound = 1300;
   double tracker2;
 
   TTree _digits;
@@ -142,6 +142,7 @@ class ReduceCppPatternRecognition {
   double _circle_y0;
   double _circle_R;
   double _dsdz;
+  double _sz_c;
   double _phi0;
 
   // Vectors to hold the tracks in each projection in each tracker

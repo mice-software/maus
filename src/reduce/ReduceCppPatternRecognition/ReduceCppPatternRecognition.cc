@@ -182,19 +182,19 @@ std::string ReduceCppPatternRecognition::process(std::string document) {
             _circle_y0 = htrk->get_circle_y0();
             _circle_R = htrk->get_R();
             _dsdz = htrk->get_dsdz();
+            _sz_c = htrk->get_line_sz_c();
             _phi0 = htrk->get_phi0();
             _num_points_hlx = htrk->get_num_points();
             _tracker = htrk->get_tracker();
-            std::cout << "Red: x0 = " << _x0 << " y0 = " << _y0 << " phi0 = " << _phi0 << "\n";
             _htracks.Fill();
             if ( _tracker == 0 ) {
               _circles_xy_trkr0.push_back(make_circle(_circle_x0, _circle_y0, _circle_R));
-              _htrks_zx_trkr0.push_back(make_htrack_x(_x0, _circle_R, _dsdz, _phi0));
-              _htrks_zy_trkr0.push_back(make_htrack_y(_y0, _circle_R, _dsdz, _phi0));
+              _htrks_zx_trkr0.push_back(make_htrack_x(_circle_x0, _circle_R, _dsdz, _sz_c));
+              _htrks_zy_trkr0.push_back(make_htrack_y(_circle_y0, _circle_R, _dsdz, _sz_c));
             } else if ( _tracker == 1 ) {
               _circles_xy_trkr1.push_back(make_circle(_circle_x0, _circle_y0, _circle_R));
-              _htrks_zx_trkr1.push_back(make_htrack_x(_x0, _circle_R, _dsdz, _phi0));
-              _htrks_zy_trkr1.push_back(make_htrack_y(_y0, _circle_R, _dsdz, _phi0));
+              _htrks_zx_trkr1.push_back(make_htrack_x(_circle_x0, _circle_R, _dsdz, _sz_c));
+              _htrks_zy_trkr1.push_back(make_htrack_y(_circle_y0, _circle_R, _dsdz, _sz_c));
             }
             /*
             for ( unsigned int i = 0; i < htrk->get_phi_i().size(); ++i )
@@ -296,22 +296,20 @@ TF1 ReduceCppPatternRecognition::make_strack(double c, double m) {
   return trk;
 }
 
-TF1 ReduceCppPatternRecognition::make_htrack_x(double x0, double R, double dsdz, double phi0 ) {
+TF1 ReduceCppPatternRecognition::make_htrack_x(double x0, double R, double dsdz, double sz_c ) {
   // Note: in the function expression, x is just the independent variable, which
   // in this case is the z coordinate in the tracker coordinate system
-  TF1 trk = TF1("trk", "-[0]+[1]*(cos((x*[2])/[1])-1)*cos([3])-[1]*sin((x*[2])/[1])*sin([3])",
-                _trk_lower_bound, _trk_upper_bound);
-  trk.SetParameters(x0, R, dsdz, phi0);
+  TF1 trk = TF1("trk", "[0]+([1]*cos((1/[1])*([2]*x+[3])))", _trk_lower_bound, _trk_upper_bound);
+  trk.SetParameters(x0, R, dsdz, sz_c);
   trk.SetLineColor(kBlue);
   return trk;
 }
 
-TF1 ReduceCppPatternRecognition::make_htrack_y(double y0, double R, double dsdz, double phi0 ) {
+TF1 ReduceCppPatternRecognition::make_htrack_y(double y0, double R, double dsdz, double sz_c) {
   // Note: in the function expression, x is just the independent variable, which
   // in this case is the z coordinate in the tracker coordinate system
-  TF1 trk = TF1("trk", "-[0]+[1]*(cos((x*[2])/[1])-1)*sin([3])-[1]*sin((x*[2])/[1])*cos([3])",
-                _trk_lower_bound, _trk_upper_bound);
-  trk.SetParameters(y0, R, dsdz, phi0);
+  TF1 trk = TF1("trk", "[0]+([1]*sin((1/[1])*([2]*x+[3])))", _trk_lower_bound, _trk_upper_bound);
+  trk.SetParameters(y0, R, dsdz, sz_c);
   trk.SetLineColor(kBlue);
   return trk;
 }

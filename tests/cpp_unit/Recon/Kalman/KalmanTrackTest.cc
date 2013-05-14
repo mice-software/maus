@@ -96,9 +96,9 @@ TEST_F(KalmanTrackTest, test_energy_loss) {
 TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
-  CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
-  CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
-  CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);
+  ThreeVector direction_plane0_tracker0(0., 1., 0.);
+  ThreeVector direction_plane1_tracker0(0.866, -0.5, 0.0);
+  ThreeVector direction_plane2_tracker0(-0.866, -0.5, 0.0);
 
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
   a_site->Initialise(5);
@@ -142,7 +142,7 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   s(1, 0) = shift_y; // mm
   // So we need a plane that's not 0 (because this one is vertical, only measures x)
   a_site->set_direction(direction_plane1_tracker0);
-  CLHEP::Hep3Vector perp = direction_plane1_tracker0.orthogonal();
+  ThreeVector perp = direction_plane1_tracker0.Orthogonal();
 
   delete a_site;
   delete track;
@@ -152,9 +152,9 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
   track->Initialise();
 
-  CLHEP::Hep3Vector direction_plane0_tracker0(0., 1., 0.);
-  CLHEP::Hep3Vector direction_plane1_tracker0(0.866, -0.5, 0.0);
-  CLHEP::Hep3Vector direction_plane2_tracker0(-0.866, -0.5, 0.0);
+  ThreeVector direction_plane0_tracker0(0., 1., 0.);
+  ThreeVector direction_plane1_tracker0(0.866, -0.5, 0.0);
+  ThreeVector direction_plane2_tracker0(-0.866, -0.5, 0.0);
 
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
   a_site->Initialise(5);

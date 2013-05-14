@@ -84,6 +84,7 @@ int main() {
     TCanvas canvas_0("tof1_digits_0", "tof1_digits_0");
     tof1_digits_0_hist.Draw();
     canvas_0.Draw();
+	std::cout << "Blah\n";
     canvas_0.Print("tof1_digits_0_load_root_file_cpp.png");
     TCanvas canvas_1("tof1_digits_1", "tof1_digits_1");
     tof1_digits_1_hist.Draw();

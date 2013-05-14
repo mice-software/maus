@@ -23,12 +23,12 @@
 
 // C++ headers
 #include <vector>
-#include "CLHEP/Vector/ThreeVector.h"
 #include "TMath.h"
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
@@ -78,9 +78,9 @@ class KalmanSite {
 
   void set_covariance_residual(TMatrixD C, State kalman_state);
 
-  void set_true_momentum(CLHEP::Hep3Vector mc_mom) { _mc_mom = mc_mom; }
+  void set_true_momentum(ThreeVector mc_mom) { _mc_mom = mc_mom; }
 
-  void set_true_position(CLHEP::Hep3Vector mc_pos) { _mc_pos = mc_pos; }
+  void set_true_position(ThreeVector mc_pos) { _mc_pos = mc_pos; }
 
   void set_input_shift(TMatrixD input_shift)       { _input_shift = input_shift; }
 
@@ -95,7 +95,7 @@ class KalmanSite {
   void set_measurement(double alpha)               { _v(0, 0) = alpha;
                                                      _v(1, 0) = 0.0; }
 
-  void set_direction(CLHEP::Hep3Vector dir)        { _direction = dir; }
+  void set_direction(ThreeVector dir)        { _direction = dir; }
 
   void set_z(double z)                             { _z = z; }
 
@@ -132,11 +132,11 @@ class KalmanSite {
 
   int id()                               const { return _id; }
 
-  CLHEP::Hep3Vector direction()          const { return _direction; }
+  ThreeVector direction()          const { return _direction; }
 
-  CLHEP::Hep3Vector true_momentum()      const { return _mc_mom; }
+  ThreeVector true_momentum()      const { return _mc_mom; }
 
-  CLHEP::Hep3Vector true_position()      const { return _mc_pos; }
+  ThreeVector true_position()      const { return _mc_pos; }
 
  private:
   /// State of the site.
@@ -150,7 +150,7 @@ class KalmanSite {
   double _s_chi2;
 
   /// Orientation of the measuring plane.
-  CLHEP::Hep3Vector _direction;
+  ThreeVector _direction;
 
   /// The state vector.
   TMatrixD _projected_a;
@@ -184,8 +184,8 @@ class KalmanSite {
   TMatrixD _input_shift_covariance;
   TMatrixD _shift_covariance;
 
-  CLHEP::Hep3Vector _mc_pos;
-  CLHEP::Hep3Vector _mc_mom;
+  ThreeVector _mc_pos;
+  ThreeVector _mc_mom;
 };
 
 } // ~namespace MAUS

@@ -57,8 +57,8 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanSite *kalman_site) {
     _py = state_vector(3, 0)/state_vector(4, 0);
   }
 
-  CLHEP::Hep3Vector mc_mom = kalman_site->true_momentum();
-  CLHEP::Hep3Vector mc_pos = kalman_site->true_position();
+  ThreeVector mc_mom = kalman_site->true_momentum();
+  ThreeVector mc_pos = kalman_site->true_position();
   _mc_x  = mc_pos.x();
   _mc_px = mc_mom.x();
   _mc_y  = mc_pos.y();

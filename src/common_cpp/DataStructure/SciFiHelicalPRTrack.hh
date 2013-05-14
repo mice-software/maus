@@ -32,6 +32,7 @@
 #include "src/common_cpp/DataStructure/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SimpleCircle.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
@@ -175,6 +176,9 @@ class SciFiHelicalPRTrack {
     int get_type() const { return _type; }
 
   private:
+    int _tracker;
+    int _num_points;
+    static const int _type = 1; // 0 for straight, 1 for helical
 
     double _x0;
     double _y0;
@@ -191,12 +195,8 @@ class SciFiHelicalPRTrack {
     double _chisq;
     double _chisq_dof;
 
-    int _tracker;
-    int _num_points;
-    static const int _type = 1; // 0 for straight, 1 for helical
-
-    SciFiSpacePointPArray  _spoints;
     DoubleArray _phi;
+    SciFiSpacePointPArray  _spoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

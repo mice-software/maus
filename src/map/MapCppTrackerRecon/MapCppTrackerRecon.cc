@@ -77,7 +77,8 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          std::cout << "Calling Pattern Recognition..." << std::endl;
+          std::cout << "Calling Pattern Recognition, helical " << _helical_pr_on;
+          std::cout << ", straight " << _straight_pr_on << std::endl;
           pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
           std::cout << "Pattern Recognition complete." << std::endl;
         }
