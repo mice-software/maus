@@ -100,7 +100,8 @@ def build_third_party_tarball():
 #                       "1"])
   
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
-    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
+    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz",
+                 "source/*.egg"]
     tarball_targets = []
     tarball_name = "third_party_libraries_incl_python.tar.gz"
     for targets in glob_list:
@@ -152,7 +153,6 @@ def main():
     print "Doing server build"
     build_user_guide()
     build_doxygen()
-    build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:

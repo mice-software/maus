@@ -24,7 +24,7 @@ def generate_some_data(outfile):
     analysis = os.path.join\
                  (os.environ["MAUS_ROOT_DIR"], "bin", "analyze_data_offline.py")
     proc = subprocess.Popen([analysis, "-output_root_file_name", outfile])
-    proc.wait()
+    proc.wait() #pylint: disable = E1101
 
 def main():
     """
@@ -69,11 +69,11 @@ def main():
         if spill.GetDaqEventType() == "physics_event":
             # note PyROOT gives a segmentation fault if we try to call the STL
             # vector directly
-            for i in range(spill.GetReconEvents().size()):
-                tof_event = spill.GetReconEvents()[i].GetTOFEvent()
+            for j in range(spill.GetReconEvents().size()):
+                tof_event = spill.GetReconEvents()[j].GetTOFEvent()
                 digits = tof_event.GetTOFEventDigit()
-                for i in range(digits.GetTOF1DigitArray().size()):
-                    tof1_digit = digits.GetTOF1DigitArray()[i]
+                for k in range(digits.GetTOF1DigitArray().size()):
+                    tof1_digit = digits.GetTOF1DigitArray()[k]
                     if tof1_digit.GetPlane() == 0:
                         tof1_digits_0_hist.Fill(tof1_digit.GetSlab())
                     else:
