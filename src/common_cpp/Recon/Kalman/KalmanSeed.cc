@@ -78,7 +78,7 @@ void KalmanSeed::ProcessMeasurements(const SciFiHelicalPRTrack* pr_track) {
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) {
   // Get seed values.
   double r  = seed->get_R();
-  double B = -4.;
+  double B  = -4.;
   double pt = -0.3*B*r;
 
   double dsdz  = seed->get_dsdz();

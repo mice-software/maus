@@ -175,16 +175,16 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cerr << event.digits().size() << " "
-            << event.clusters().size() << " "
-            << event.spacepoints().size() << "; "
-            << event.straightprtracks().size() << " "
-            << event.helicalprtracks().size() << "; ";
+  Squeak::mout(Squeak::error) << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-              << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+    Squeak::mout(Squeak::error) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
   }
-  std::cerr << std::endl;
+  Squeak::mout(Squeak::error) << std::endl;
 }
 
 } // ~namespace MAUS

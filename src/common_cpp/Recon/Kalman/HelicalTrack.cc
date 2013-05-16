@@ -62,7 +62,7 @@ void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSit
 }
 
 void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
-                                     const KalmanSite *new_site) {
+                                    const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
