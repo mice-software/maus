@@ -185,7 +185,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
           MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
-          nPE += compute_npe(edep_j, chanNo, a_hit);
+          nPE += edep_j*_eV_to_phe;
           same_digit->GetChannelId()->SetUsed(true);
         } // if-statement
       } // ends l-loop over all the array
@@ -437,4 +437,3 @@ void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
 }
 
 } // ~namespace MAUS
-
