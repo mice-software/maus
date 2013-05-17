@@ -36,6 +36,7 @@
 #include <cmath>
 #include <vector>
 #include <string>
+// #include <time.h>
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
@@ -43,6 +44,11 @@
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
@@ -121,7 +127,19 @@ class MapCppTrackerMCDigitization {
   std::string argCal;
   Json::Value _calib_list;
 
-  double SciFiNPECut;
+  double _SciFiNPECut;
+  double _SciFivlpcEnergyRes;
+  double _SciFiadcFactor;
+  double _SciFitdcBits;
+  double _SciFivlpcTimeRes;
+  double _SciFitdcFactor;
+  double _SciFiFiberConvFactor;
+  double _SciFiFiberTrappingEff;
+  double _SciFiFiberMirrorEff;
+  double _SciFivlpcQE;
+  double _SciFiFiberTransmissionEff;
+  double _SciFiMUXTransmissionEff;
+  double _eV_to_phe;
 
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;

@@ -112,8 +112,9 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
 
   TMatrixD C(n_param, n_param);
   C.Zero();
-  for ( int i = 0; i < n_param; i++ )
+  for ( int i = 0; i < n_param; i++ ) {
     C(i, i) = _seed_cov;
+  }
 
   std::vector<SciFiCluster*> clusters = seed->clusters();
   KalmanSite first_plane;

@@ -397,7 +397,7 @@ void KalmanTrack::UpdateW(const KalmanSite *a_site) {
                         _S);
 
   _W.Zero();
-  _W = _V + A + B;
+  _W = _V + A;// + B;
   _W.Invert();
 }
 
