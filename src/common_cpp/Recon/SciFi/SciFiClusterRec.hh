@@ -55,8 +55,6 @@ class SciFiClusterRec {
 
   ~SciFiClusterRec();
 
-  void initialise();
-
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters
    * @arg modules the SciFi MICE modules

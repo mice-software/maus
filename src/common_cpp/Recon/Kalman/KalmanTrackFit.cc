@@ -64,7 +64,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     track->Initialise();
     //
     // Set up KalmanSites to be used. KalmanSite = Measurement Plane
-    std::vector<KalmanSite> sites;
+    KalmanSitesVector sites;
     Initialise(seed, sites, kalman_align);
 
     size_t numb_measurements = sites.size();
@@ -104,7 +104,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
 }
 
 void KalmanTrackFit::Initialise(KalmanSeed *seed,
-                                std::vector<KalmanSite> &sites,
+                                KalmanSitesVector &sites,
                                 KalmanSciFiAlignment &kalman_align) {
   TMatrixD a0 = seed->initial_state_vector();
 
@@ -152,7 +152,7 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   }
 }
 
-void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::RunFilter(KalmanTrack *track, KalmanSitesVector &sites) {
   // Filter the first state.
   track->Filter(sites, 0);
 
@@ -170,7 +170,7 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
   }
 }
 
-void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i) {
+void KalmanTrackFit::RunFilter(KalmanTrack *track, KalmanSitesVector &sites, int ignore_i) {
   size_t numb_measurements = sites.size();
 
   if ( ignore_i < 2 || ignore_i > 4 ) {
@@ -200,7 +200,7 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
 }
 
 void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
-                                               std::vector<KalmanSite> &sites,
+                                               KalmanSitesVector &sites,
                                                KalmanSciFiAlignment &kalman_align) {
   //
   // Set up the ROOT output file where we save progress
@@ -215,7 +215,7 @@ void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
   // Fit excluding a station.
   //
   for ( int station_i = 2; station_i < 5; ++station_i ) {
-    std::vector<KalmanSite> sites_copy(sites);
+    KalmanSitesVector sites_copy(sites);
     // Fit without station i.
     RunFilter(track, sites_copy, station_i);
     track->ComputeChi2(sites_copy);
@@ -244,7 +244,7 @@ void KalmanTrackFit::FilterVirtual(KalmanSite &a_site) {
 }
 
 void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
-                          std::vector<KalmanSite> sites,
+                          KalmanSitesVector sites,
                           SciFiEvent &event) {
   //
   // Convert KalmanTrack to SciFiTrack
@@ -253,6 +253,8 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   //
   // Store information at each measurement plane.
   size_t n_sites = sites.size();
+  //for ( auto kalmansite : sites ) {
+  //  SciFiTrackPoint *track_point = new SciFiTrackPoint(&kalmansite);
   for ( size_t i = 0; i < n_sites; ++i ) {
     SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
     track->add_scifitrackpoint(track_point);
@@ -261,7 +263,7 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   event.add_scifitrack(track);
 }
 
-void KalmanTrackFit::DumpInfo(std::vector<KalmanSite> const &sites) {
+void KalmanTrackFit::DumpInfo(KalmanSitesVector const &sites) {
   size_t numb_sites = sites.size();
 
   for ( size_t i = 0; i < numb_sites; ++i ) {

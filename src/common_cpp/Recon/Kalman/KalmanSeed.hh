@@ -43,10 +43,6 @@ class KalmanSeed {
   template <class PRTrack>
   void ProcessMeasurements(const PRTrack *track);
 
-  // void ProcessMeasurements(const SciFiStraightPRTrack* pr_track);
-
-  // void ProcessMeasurements(const SciFiHelicalPRTrack* pr_track);
-
   TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed);
 
   TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed);

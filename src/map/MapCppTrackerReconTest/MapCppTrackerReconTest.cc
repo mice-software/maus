@@ -362,7 +362,7 @@ void MapCppTrackerReconTest::save_to_json(Spill &spill) {
 
 void MapCppTrackerReconTest::cluster_recon(SciFiEvent &evt) {
   SciFiClusterRec clustering;
-  clustering.initialise();
+  // clustering.initialise();
   clustering.process(evt);
 }
 

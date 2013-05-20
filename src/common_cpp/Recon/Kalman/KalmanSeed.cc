@@ -32,23 +32,6 @@ bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
   return ( a->get_station() < b->get_station() );
 }
 
-/*
-//(Int_t &, Double_t *, Double_t &f, Double_t *, Int_t)
-void circle_function(Double_t *x, Double_t *y, Double_t &f, Double_t *par, Int_t) {
-   //minimisation function computing the sum of squares of residuals
-   Int_t np = 5;
-   f = 0;
-   Double_t *x = gr->GetX();
-   Double_t *y = gr->GetY();
-   for (Int_t i=0;i<np;i++) {
-      Double_t u = x[i] - par[0];
-      Double_t v = y[i] - par[1];
-      Double_t dr = par[2] - TMath::Sqrt(u*u+v*v);
-      f += dr*dr;
-   }
-}
-*/
-
 KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {
 }
 
@@ -70,19 +53,79 @@ void KalmanSeed::Build(const SciFiEvent &evt, bool field_on) {
   std::sort(_clusters.begin(), _clusters.end(), SortByID);
   std::sort(_spacepoints.begin(), _spacepoints.end(), SortByStation);
 
-  double x   = _spacepoints[0]->get_position().x();
-  double y   = _spacepoints[0]->get_position().y();
-  double phi = _spacepoints[0]->get_position().Phi();
+  for ( size_t i = 0; i < 5; ++i ) {
+    _x[i]   = _spacepoints[i]->get_position().x();
+    _y[i]   = _spacepoints[i]->get_position().y();
+    _z[i]   = _spacepoints[i]->get_position().y();
+    _s[i]   = TMath::Sqrt(_x[i]*_x[i] + _y[i]*_y[i] + _z[i]*_z[i]);
+    _phi[i] = _spacepoints[0]->get_position().Phi();
+  }
 
-  if
+  if ( field_on ) {
+    double radius, x0, y0;
+    get_circle_param(radius, x0, y0);
 
-  _a0 = ComputeInitialStateVector(pr_track);
+    double tanlambda;
+    get_tan_lambda(tanlambda);
 
-void fitCircle(Int_t n=10000) {
+    _a0 = ComputeInitialStateVector(pr_track);
+  } else {
+    double mx, my;
+    get_gradients(mx, my);
+
+    _a0 = ComputeInitialStateVector(pr_track);
+  }
+}
+
+void get_gradients(double &mx, double &my) {
+  TVirtualFitter::SetDefaultFitter("Minuit");
+  TVirtualFitter *fitter = TVirtualFitter::Fitter(0, 3);
+  fitter->SetFCN(mx_fit);
+  fitter->SetParameter(0, "x0",   0, 0.1, 0,0);
+  fitter->SetParameter(1, "mx",   0, 0.1, 0,0);
+  Double_t arglist[1] = {0};
+  fitter->ExecuteCommand("MIGRAD", arglist, 0);
+  mx = fitter->GetParameter(1);
+
+  TVirtualFitter::SetDefaultFitter("Minuit");
+  TVirtualFitter *fitter2 = TVirtualFitter::Fitter(0, 3);
+  fitter2->SetFCN(mx_fit);
+  fitter2->SetParameter(0, "y0",   0, 0.1, 0,0);
+  fitter2->SetParameter(1, "my",   0, 0.1, 0,0);
+  Double_t arglist2[1] = {0};
+  fitter2->ExecuteCommand("MIGRAD", arglist2, 0);
+  my = fitter->GetParameter(1);
+}
+
+void get_tan_lambda(double &tanlambda) {
+  TVirtualFitter::SetDefaultFitter("Minuit");
+  TVirtualFitter *fitter = TVirtualFitter::Fitter(0, 3);
+  fitter->SetFCN(tan_lambda_fit);
+  fitter->SetParameter(0, "tan_lambda",   0, 0.1, 0,0);
+
+  Double_t arglist[1] = {0};
+  fitter->ExecuteCommand("MIGRAD", arglist, 0);
+
+  tanlambda = fitter->GetParameter(0);
+}
+
+void tan_lambda_fit(Int_t &, Double_t *, Double_t &f, Double_t *, Int_t) {
+  // minimisation function computing the sum of squares of residuals
+  Int_t np = 5;
+  f = 0;
+  for (Int_t i=0;i<np;i++) {
+    Double_t u = _x[i] - par[0];
+    Double_t v = _y[i] - par[1];
+    Double_t dr = par[2] - TMath::Sqrt(u*u+v*v);
+    f += dr*dr;
+  }
+}
+
+
+void get_circle_param(double &radius, double &x0, double &y0) {
   TVirtualFitter::SetDefaultFitter("Minuit");
   TVirtualFitter *fitter = TVirtualFitter::Fitter(0, 3);
   fitter->SetFCN(circle_fit);
-
   fitter->SetParameter(0, "x0",   0, 0.1, 0,0);
   fitter->SetParameter(1, "y0",   0, 0.1, 0,0);
   fitter->SetParameter(2, "R",    1, 0.1, 0,0);
@@ -90,13 +133,25 @@ void fitCircle(Int_t n=10000) {
   Double_t arglist[1] = {0};
   fitter->ExecuteCommand("MIGRAD", arglist, 0);
 
-  //Draw the circle on top of the points
-  std::cerr << fitter->GetParameter(0) << " "
-            << fitter->GetParameter(1) << " "
-            << fitter->GetParameter(2) << std::endl;
+  radius = fitter->GetParameter(0);
+  x0     = fitter->GetParameter(1);
+  y0     = fitter->GetParameter(2);
 }
 
+void circle_fit(Int_t &, Double_t *, Double_t &f, Double_t *, Int_t) {
+  // minimisation function computing the sum of squares of residuals
+  Int_t np = 5;
+  f = 0;
+  //Double_t *x = gr->GetX();
+  //Double_t *y = gr->GetY();
+  for (Int_t i=0;i<np;i++) {
+    Double_t u = _x[i] - par[0];
+    Double_t v = _y[i] - par[1];
+    Double_t dr = par[2] - TMath::Sqrt(u*u+v*v);
+    f += dr*dr;
+  }
 }
+
 */
 
 void KalmanSeed::Build(const SciFiStraightPRTrack* pr_track) {
@@ -129,28 +184,6 @@ void KalmanSeed::ProcessMeasurements(const PRTrack *pr_track) {
 
   RetrieveClusters(_spacepoints, pz_from_timing);
 }
-
-/*
-void KalmanSeed::ProcessMeasurements(const SciFiStraightPRTrack* pr_track) {
-  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
-    SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
-    _spacepoints.push_back(sp);
-  }
-  double pz_from_timing;
-
-  RetrieveClusters(_spacepoints, pz_from_timing);
-}
-
-void KalmanSeed::ProcessMeasurements(const SciFiHelicalPRTrack* pr_track) {
-  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
-    SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
-    _spacepoints.push_back(sp);
-  }
-  double pz_from_timing;
-
-  RetrieveClusters(_spacepoints, pz_from_timing);
-}
-*/
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) {
   // Get seed values.

@@ -36,9 +36,19 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
       GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
-    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    _kalman_on = (*json)["SciFiKalmanOn"].asBool();
+    _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
+    _size_exception = (*json)["SciFiClustExcept"].asInt();
+    _min_npe        = (*json)["SciFiNPECut"].asDouble();
+
+    MiceModule* module = Globals::GetReconstructionMiceModules();
+    _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    if ( !(_modules.size()) ) {
+      throw(Squeal(Squeal::nonRecoverable,
+            "Failed to load MiceModules",
+            "MapCppTrackerRecon::birth"));
+    }
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -135,8 +145,7 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering;
-  clustering.initialise();
+  SciFiClusterRec clustering(_size_exception, _min_npe, _modules);
   clustering.process(evt);
 }
 
@@ -175,16 +184,16 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  Squeak::mout(Squeak::error) << event.digits().size() << " "
+  Squeak::mout(Squeak::info) << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
                               << event.straightprtracks().size() << " "
                               << event.helicalprtracks().size() << "; ";
   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-    Squeak::mout(Squeak::error) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+    Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
   }
-  Squeak::mout(Squeak::error) << std::endl;
+  Squeak::mout(Squeak::info) << std::endl;
 }
 
 } // ~namespace MAUS

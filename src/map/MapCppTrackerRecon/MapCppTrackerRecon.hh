@@ -139,15 +139,17 @@ class MapCppTrackerRecon {
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.
-  double minPE;
+  //double minPE;
   /// Value above which reconstruction is aborted.
   int ClustException;
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
   bool _kalman_on;
+  int _size_exception;
+  double  _min_npe;
   ///  Vector with the MICE SciFi Modules.
-  std::vector<const MiceModule*> modules;
+  std::vector<const MiceModule*> _modules;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

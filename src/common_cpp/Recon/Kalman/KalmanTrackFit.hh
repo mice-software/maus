@@ -136,6 +136,8 @@ class KalmanTrackFit {
   bool _update_misalignments;
 
   std::string _type_of_dataflow;
+
+  typedef std::vector<KalmanSite> KalmanSitesVector;
 };
 
 } // ~namespace MAUS

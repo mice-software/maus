@@ -30,43 +30,16 @@ namespace MAUS {
 SciFiClusterRec::SciFiClusterRec():_size_exception(0),
                                    _min_npe(0.) {}
 
-// To be removed soon.
 SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe,
-                std::vector<const MiceModule*> modules):
-                                   _size_exception(0.),
-                                   _min_npe(0.),
+                 std::vector<const MiceModule*> modules):
+                                   _size_exception(cluster_exception),
+                                   _min_npe(min_npe),
                                    _modules(modules) {}
 
 SciFiClusterRec::~SciFiClusterRec() {}
 
 bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
   return ( a->get_npe() > b->get_npe() );
-}
-
-void SciFiClusterRec::initialise() {
-  if (!Globals::HasInstance()) {
-    throw(Squeal(Squeal::nonRecoverable,
-          "Instance of Globals not found.",
-          "SciFiClusterRec::initialise"));
-  }
-
-  Json::Value *json = Globals::GetConfigurationCards();
-  _size_exception = (*json)["SciFiClustExcept"].asInt();
-  _min_npe = (*json)["SciFiNPECut"].asDouble();
-
-  MiceModule* module = Globals::GetReconstructionMiceModules();
-  if ( !module || !(module->daughters()) ) {
-    throw(Squeal(Squeal::nonRecoverable,
-          "Failed to load MiceModules",
-          "SciFiClusterRec::initialise"));
-  }
-
-  _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-  if ( !(_modules.size()) ) {
-    throw(Squeal(Squeal::nonRecoverable,
-          "Failed to load MiceModules",
-          "SciFiClusterRec::initialise"));
-  }
 }
 
 void SciFiClusterRec::process(SciFiEvent &evt) {
@@ -131,6 +104,7 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   int station = clust->get_station();
   int plane   = clust->get_plane();
   const MiceModule* this_plane = NULL;
+
   this_plane = find_plane(tracker, station, plane);
   assert(this_plane != NULL);
   // compute it's direction & position in TRF...
@@ -152,29 +126,26 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
                                 ThreeVector &dir,
                                 ThreeVector &tracker_ref_frame_pos,
                                 double &alpha) {
-  ThreeVector perp(-1., 0., 0.);
+  // Find the rotation of the fibre wrt the solenoid.
+  G4RotationMatrix rel_rot(this_plane->relativeRotation(this_plane->mother()    // plane
+                                                                  ->mother()    // tracker
+                                                                  ->mother())); // solenoid
 
-  CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0., 0.);
-  const Hep3Vector rowy(0., 1., 0.);
-  const Hep3Vector rowz(0., 0., -1.);
-  zflip.setRows(rowx, rowy, rowz);
-  G4RotationMatrix trot(this_plane->globalRotation());
-  // Rotations of the planes in the Tracker Reference Frame.
-  if ( clust->get_tracker() == 0 ) {
-    trot = trot*zflip;
-  }
-  dir  *= trot;
-  perp *= trot;
+  // Build the direction and perp vectors.
+  dir  *= rel_rot;
+  ThreeVector perp(-1., 0., 0.);
+  perp *= rel_rot;
 
   double Pitch = this_plane->propertyDouble("Pitch");
   double CentralFibre = this_plane->propertyDouble("CentralFibre");
   double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
 
+  // tracker_ref_frame_pos = clhep_to_root(this_plane->relativePosition(this_plane->mother()->mother()));
+  // tracker_ref_frame_pos = dist_mm * perp + tracker_ref_frame_pos;
+
   ThreeVector plane_position = clhep_to_root(this_plane->globalPosition());
   ThreeVector position = dist_mm * perp + plane_position;
   ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
-
   tracker_ref_frame_pos = position - reference;
 
   alpha = clust->get_channel() - CentralFibre;
@@ -183,7 +154,7 @@ void SciFiClusterRec::construct(SciFiCluster *clust,
 
 const MiceModule* SciFiClusterRec::find_plane(int tracker, int station, int plane) {
   const MiceModule* scifi_plane = NULL;
-  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); j++ ) {
+  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); ++j ) {
     // Find the right module
     if ( _modules[j]->propertyExists("Tracker", "int") &&
          _modules[j]->propertyExists("Station", "int") &&
