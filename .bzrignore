@@ -61,4 +61,4 @@ install_log_std
 env_geant4.9.5.p01.sh
 files/geometry/ConfigUpload.py
 third_party/source/easy_install/*
-
+tests/integration/test_simulation/test_tof/tof_mc_plotter
