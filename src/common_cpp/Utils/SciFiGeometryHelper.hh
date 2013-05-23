@@ -36,7 +36,7 @@ struct SciFiPlaneGeometry {
 
 class SciFiGeometryHelper {
  public:
-  SciFiGeometryHelper(std::vector<const MiceModule*> modules);
+  explicit SciFiGeometryHelper(std::vector<const MiceModule*> modules);
 
   ~SciFiGeometryHelper();
 
