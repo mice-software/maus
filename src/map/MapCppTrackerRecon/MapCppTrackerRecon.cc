@@ -19,6 +19,19 @@
 
 namespace MAUS {
 
+MapCppTrackerRecon::MapCppTrackerRecon()
+    : _spill_json(NULL), _spill_cpp(NULL) {
+}
+
+MapCppTrackerRecon::~MapCppTrackerRecon() {
+    if (_spill_json != NULL) {
+        delete _spill_json;
+    }
+    if (_spill_cpp != NULL) {
+        delete _spill_cpp;
+    }
+}
+
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
@@ -54,10 +67,11 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
 
   // Read in json data
-  Spill spill;
-  bool success = read_in_json(document, spill);
+  bool success = read_in_json(document);
   if (!success)
-    return writer.write(root);
+    return writer.write(_spill_json);
+
+  Spill& spill = *_spill_cpp;
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -99,42 +113,51 @@ std::string MapCppTrackerRecon::process(std::string document) {
     save_to_json(spill);
   } catch(Squeal& squee) {
     squee.Print();
-    root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
+    // _spill_json = MAUS::CppErrorHandler::getInstance()
+    //                                   ->HandleSqueal(_spill_json, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["recon_failed"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
+    (*_spill_json)["errors"] = errors;
+    return writer.write(_spill_json);
   }
-  return writer.write(root);
+  return writer.write(_spill_json);
 }
 
-bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
+bool MapCppTrackerRecon::read_in_json(std::string json_data) {
   Json::Reader reader;
+  Json::Value json_root;
   Json::FastWriter writer;
 
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+    _spill_cpp = NULL;
+  }
+
   try {
-    root = JsonWrapper::StringToJson(json_data);
+    json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
-    spill = *spill_proc.JsonToCpp(root);
-    return true;
+    _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
-    Json::Value errors;
+    std::cerr << "Bad json document" << std::endl;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    writer.write(root);
-    return false;
+    _spill_cpp->GetErrors();
   }
 }
 
 void MapCppTrackerRecon::save_to_json(Spill &spill) {
-  SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill, "");
+    SpillProcessor spill_proc;
+    if (_spill_json != NULL) {
+        delete _spill_json;
+        _spill_json = NULL;
+    }
+    _spill_json = spill_proc.CppToJson(spill, "");
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {

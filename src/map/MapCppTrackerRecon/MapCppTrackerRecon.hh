@@ -61,6 +61,12 @@ struct SciFiPlaneGeometry;
 class MapCppTrackerRecon {
 
  public:
+  /** Constructor - initialises pointers to NULL */
+  MapCppTrackerRecon();
+
+  /** Constructor - deletes any allocated memory */
+  ~MapCppTrackerRecon();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -121,7 +127,7 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  bool read_in_json(std::string json_data, MAUS::Spill &spill);
+  bool read_in_json(std::string json_data);
 
   void save_to_json(MAUS::Spill &spill);
 
@@ -135,7 +141,8 @@ class MapCppTrackerRecon {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.
