@@ -20,14 +20,14 @@ namespace MAUS {
 
 // Constructors
 SciFiCluster::SciFiCluster(): _used(false),
-                              _spill(0),
-                              _event(0),
-                              _tracker(0),
-                              _station(0),
-                              _plane(0),
-                              _channel_w(0),
-                              _npe(0.0),
-                              _time(0.0),
+                              _spill(-1),
+                              _event(-1),
+                              _tracker(-1),
+                              _station(-1),
+                              _plane(-1),
+                              _channel_w(-1),
+                              _npe(-1),
+                              _time(-1),
                               _digits(0) {
 }
 

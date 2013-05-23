@@ -36,12 +36,7 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     MiceModule* module = Globals::GetReconstructionMiceModules();
     std::vector<const MiceModule*> modules =
       module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    // _geometry_map = SciFiGeometryHelper(modules)->build_geometry_map();
-    // if ( !(modules.size()) ) {
-    //  throw(Squeal(Squeal::nonRecoverable,
-    //        "Failed to load MiceModules",
-    //        "MapCppTrackerRecon::birth"));
-    // }
+    _geometry_map = SciFiGeometryHelper(modules).build_geometry_map();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -143,8 +138,8 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  // SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_map);
-  // clustering.process(evt);
+  SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_map);
+  clustering.process(evt);
 }
 
 void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {

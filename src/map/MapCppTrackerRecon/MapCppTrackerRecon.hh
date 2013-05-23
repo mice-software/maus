@@ -32,11 +32,11 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 // Other headers
 #include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -45,9 +45,6 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
-#include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
@@ -57,9 +54,9 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
-// #include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
-
 namespace MAUS {
+
+struct SciFiPlaneGeometry;
 
 class MapCppTrackerRecon {
 
@@ -151,7 +148,7 @@ class MapCppTrackerRecon {
   bool _kalman_on;
 
   ///  Map of the planes geometry specifications.
-  // std::map<int, SciFiPlaneGeometry> _geometry_map;
+  std::map<int, SciFiPlaneGeometry> _geometry_map;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

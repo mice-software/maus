@@ -31,11 +31,12 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 // other headers
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
-// #include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
+#include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
 
 namespace MAUS {
 
@@ -48,11 +49,10 @@ class SciFiClusterRec {
   /** @brief
    * @arg
    */
-/*
   SciFiClusterRec(int cluster_exception,
                   double min_npe,
                   std::map<int, SciFiPlaneGeometry> geometry_map);
-*/
+
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters
    * @arg modules the SciFi MICE modules
@@ -84,7 +84,7 @@ class SciFiClusterRec {
 
   double _min_npe;
 
-  // std::map<int, SciFiPlaneGeometry> _geometry_map;
+  std::map<int, SciFiPlaneGeometry> _geometry_map;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

@@ -255,8 +255,6 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   //
   // Store information at each measurement plane.
   size_t n_sites = sites.size();
-  //for ( auto kalmansite : sites ) {
-  //  SciFiTrackPoint *track_point = new SciFiTrackPoint(&kalmansite);
   for ( size_t i = 0; i < n_sites; ++i ) {
     SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
     track->add_scifitrackpoint(track_point);
@@ -275,6 +273,10 @@ void KalmanTrackFit::DumpInfo(KalmanSitesVector const &sites) {
     << "SITE ID: " << site.id() << "\n"
     << "SITE Z: " << site.z()   << "\n"
     << "Measurement: " << (site.measurement())(0, 0) << "\n"
+    << "Projection: " << (site.a(KalmanSite::Projected))(0, 0) << " "
+                      << (site.a(KalmanSite::Projected))(1, 0) << " "
+                      << (site.a(KalmanSite::Projected))(2, 0) << " "
+                      << (site.a(KalmanSite::Projected))(3, 0) << "\n"
     << "================Residuals================"   << "\n"
     << (site.residual(KalmanSite::Projected))(0, 0)  << "\n"
     << (site.residual(KalmanSite::Filtered))(0, 0)   << "\n"

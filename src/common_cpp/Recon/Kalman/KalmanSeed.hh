@@ -25,7 +25,7 @@
 #include "TMath.h"
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
-
+#include "Interface/Squeak.hh"
 
 namespace MAUS {
 
@@ -96,7 +96,7 @@ class KalmanSeed {
 
   int _n_parameters;
 
-  int _first_station_hit;
+  int _tracker;
 };
 
 template <class PRTrack>
@@ -109,12 +109,7 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
     _n_parameters = 4;
   }
 
-  int tracker = pr_track->get_tracker();
-  if ( tracker==0 ) {
-    _first_station_hit = 5;
-  } else {
-    _first_station_hit = 1;
-  }
+  _tracker = pr_track->get_tracker();
 
   _a0.ResizeTo(_n_parameters, 1);
 

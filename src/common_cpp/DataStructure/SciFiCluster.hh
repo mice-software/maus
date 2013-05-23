@@ -29,7 +29,7 @@
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/Utils/ThreeVectorUtils.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 

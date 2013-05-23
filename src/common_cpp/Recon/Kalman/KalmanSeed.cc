@@ -49,8 +49,6 @@ double KalmanSeed::tan_lambda_fit(const double *par) {
 double KalmanSeed::circle_fit(const double *par) {
   // minimisation function computing the sum of squares of residuals
   double f = 0;
-  //Double_t *x = gr->GetX();
-  //Double_t *y = gr->GetY();
   for (Int_t i = 0; i < 5; i++) {
     Double_t u = _x[i] - par[0];
     Double_t v = _y[i] - par[1];
@@ -82,8 +80,7 @@ double KalmanSeed::my_fit(const double *par) {
   return f;
 }
 
-KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {
-}
+KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {}
 
 KalmanSeed::~KalmanSeed() {}
 
@@ -178,12 +175,12 @@ void KalmanSeed::get_circle_param(double &radius, double &x0, double &y0) {
   min->Minimize();
 
   const double *par = min->X();
-  std::cout << "Minimum: f(" << par[0] << "," << par[1] << " " << par[2] << "): " 
+  std::cout << "Minimum: f(" << par[0] << "," << par[1] << " " << par[2] << "): "
             << min->MinValue()  << std::endl;
 
   // expected minimum is 0
   std::cerr << min->MinValue() << " " << circle_fit(par) << std::endl;
-  if ( min->MinValue()  < 1.E-1  && circle_fit(par) < 1.E-1) {
+  if ( min->MinValue()  < 1.E-1  && circle_fit(par) < 1.E-1 ) {
      std::cerr << "Seed fit converged." << std::endl;
   } else {
      std::cerr << "Seed fit failed to converge." << std::endl;
@@ -223,12 +220,12 @@ void KalmanSeed::get_tan_lambda(double &tanlambda) {
   min->Minimize();
 
   const double *par = min->X();
-  std::cout << "Minimum: f(" << par[0] << "," << par[1] << " " << par[2] << "): " 
+  std::cout << "Minimum: f(" << par[0] << "," << par[1] << " " << par[2] << "): "
             << min->MinValue()  << std::endl;
 
   // expected minimum is 0
   std::cerr << min->MinValue() << " " << circle_fit(par) << std::endl;
-  if ( min->MinValue()  < 1.E-1  && circle_fit(par) < 1.E-1) {
+  if ( min->MinValue()  < 1.E-1  && circle_fit(par) < 1.E-1 ) {
      std::cerr << "Seed fit converged." << std::endl;
   } else {
      std::cerr << "Seed fit failed to converge." << std::endl;
@@ -257,8 +254,14 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) 
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
-  double x = _spacepoints[_first_station_hit-1]->get_position().x();
-  double y = _spacepoints[_first_station_hit-1]->get_position().y();
+  double x, y;
+  if ( _tracker == 0 ) {
+    x = _spacepoints.back()->get_position().x();
+    y = _spacepoints.back()->get_position().y();
+  } else if ( _tracker == 1 ) {
+    x = _spacepoints.front()->get_position().x();
+    y = _spacepoints.front()->get_position().y();
+  }
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
@@ -273,8 +276,14 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) 
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed) {
-  double x = _spacepoints[_first_station_hit-1]->get_position().x();
-  double y = _spacepoints[_first_station_hit-1]->get_position().y();
+  double x, y;
+  if ( _tracker == 0 ) {
+    x = _spacepoints.back()->get_position().x();
+    y = _spacepoints.back()->get_position().y();
+  } else if ( _tracker == 1 ) {
+    x = _spacepoints.front()->get_position().x();
+    y = _spacepoints.front()->get_position().y();
+  }
 
   double mx = seed->get_mx();
   double my = seed->get_my();

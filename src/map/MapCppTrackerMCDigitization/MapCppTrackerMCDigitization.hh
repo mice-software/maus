@@ -36,7 +36,6 @@
 #include <cmath>
 #include <vector>
 #include <string>
-// #include <time.h>
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
@@ -47,7 +46,6 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
@@ -56,7 +54,7 @@ class MapCppTrackerMCDigitization {
  public:
   /** Constructor - initialises pointers to NULL */
   MapCppTrackerMCDigitization();
-  
+
   /** Constructor - deletes any allocated memory */
   ~MapCppTrackerMCDigitization();
 

@@ -20,14 +20,14 @@ namespace MAUS {
 
 SciFiClusterRec::SciFiClusterRec():_size_exception(0),
                                    _min_npe(0.) {}
-/*
+
 SciFiClusterRec::SciFiClusterRec(int cluster_exception,
                                  double min_npe,
                                  std::map<int, SciFiPlaneGeometry> geometry_map):
                                    _size_exception(cluster_exception),
                                    _min_npe(min_npe),
                                    _geometry_map(geometry_map) {}
-*/
+
 SciFiClusterRec::~SciFiClusterRec() {}
 
 bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
@@ -91,7 +91,6 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   
 }
 
 void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
-/*
   // Get the MiceModule of the plane...
   int tracker = clust->get_tracker();
   int station = clust->get_station();
@@ -103,7 +102,12 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
 
   std::map<int, SciFiPlaneGeometry>::iterator iterator;
   iterator = _geometry_map.find(id);
-  assert(iterator!=_geometry_map.end());
+  // Throw if the plane isn't found.
+  if ( iterator == _geometry_map.end() ) {
+    throw(Squeal(Squeal::nonRecoverable,
+    "Failed to find SciFi plane in _geometry_map.",
+    "SciFiClusterRec::process_cluster"));
+  }
   SciFiPlaneGeometry this_plane = (*iterator).second;
   ThreeVector plane_direction = this_plane.Direction;
   ThreeVector plane_position  = this_plane.Position;
@@ -121,7 +125,6 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   clust->set_position(position);
 
   clust->set_alpha(alpha);
-*/
 }
 
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
