@@ -24,12 +24,12 @@ MapCppTrackerRecon::MapCppTrackerRecon()
 }
 
 MapCppTrackerRecon::~MapCppTrackerRecon() {
-    if (_spill_json != NULL) {
-        delete _spill_json;
-    }
-    if (_spill_cpp != NULL) {
-        delete _spill_cpp;
-    }
+  if (_spill_json != NULL) {
+      delete _spill_json;
+  }
+  if (_spill_cpp != NULL) {
+      delete _spill_cpp;
+  }
 }
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
@@ -67,11 +67,12 @@ std::string MapCppTrackerRecon::process(std::string document) {
   Json::FastWriter writer;
 
   // Read in json data
-  bool success = read_in_json(document);
-  if (!success)
-    return writer.write(_spill_json);
-
+  read_in_json(document);
   Spill& spill = *_spill_cpp;
+
+  // Json::Value root = JsonWrapper::StringToJson(document);
+  // SpillProcessor spill_proc;
+  // Spill spill = *spill_proc.JsonToCpp(root);
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -80,6 +81,8 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
+        // Squeak::mout(Squeak::info) << "Digits found " <<
+        //          event->digits().size() << std::endl;
         if ( event->digits().size() ) {
           cluster_recon(*event);
         }
@@ -123,10 +126,10 @@ std::string MapCppTrackerRecon::process(std::string document) {
     (*_spill_json)["errors"] = errors;
     return writer.write(_spill_json);
   }
-  return writer.write(_spill_json);
+  return writer.write(*_spill_json);
 }
 
-bool MapCppTrackerRecon::read_in_json(std::string json_data) {
+void MapCppTrackerRecon::read_in_json(std::string json_data) {
   Json::Reader reader;
   Json::Value json_root;
   Json::FastWriter writer;

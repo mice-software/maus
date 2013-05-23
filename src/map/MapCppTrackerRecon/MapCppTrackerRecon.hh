@@ -127,7 +127,7 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  bool read_in_json(std::string json_data);
+  void read_in_json(std::string json_data);
 
   void save_to_json(MAUS::Spill &spill);
 
