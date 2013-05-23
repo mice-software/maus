@@ -22,6 +22,19 @@ NOTE: Commented out code that needs to pass a code review.
 */
 
 namespace MAUS {
+MapCppTrackerMCDigitization::MapCppTrackerMCDigitization()
+    : _spill_json(NULL), _spill_cpp(NULL) {
+}
+
+MapCppTrackerMCDigitization::~MapCppTrackerMCDigitization() {
+    if (_spill_json != NULL) {
+        delete _spill_json;
+    }
+    if (_spill_cpp != NULL) {
+        delete _spill_cpp;
+    }
+}
+
 
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
@@ -85,16 +98,18 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   Json::FastWriter writer;
 
   // Set up a spill object, then continue only if MC event array is initialised
-  Spill spill = read_in_json(document);
+  read_in_json(document);
+  Spill& spill = *_spill_cpp;
+
   if ( spill.GetMCEvents() ) {
   } else {
     std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
-    Json::Value errors;
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << "MC event array not initialised, aborting digitisation";
     errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
+    save_to_json(spill);
+    return writer.write(*_spill_json);
   }
 
   // ================= Reconstruction =========================
@@ -135,30 +150,31 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     }
   }
   // ==========================================================
-
   save_to_json(spill);
-  return writer.write(root);
+  return writer.write(*_spill_json);
 }
 
-Spill MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
-
+void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
   Json::FastWriter writer;
-  Spill spill;
+  Json::Value json_root;
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+    _spill_cpp = NULL;
+  }
 
   try {
-    root = JsonWrapper::StringToJson(json_data);
+    json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
-    spill = *spill_proc.JsonToCpp(root);
+    _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
     std::cerr << "Bad json document" << std::endl;
-    Json::Value errors;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    writer.write(root);
+    _spill_cpp->GetErrors();
   }
-  return spill;
 }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
@@ -432,8 +448,12 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
 }
 
 void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
-  SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill, "");
+    SpillProcessor spill_proc;
+    if (_spill_json != NULL) {
+        delete _spill_json;
+        _spill_json = NULL;
+    }
+    _spill_json = spill_proc.CppToJson(spill, "");
 }
 
 } // ~namespace MAUS

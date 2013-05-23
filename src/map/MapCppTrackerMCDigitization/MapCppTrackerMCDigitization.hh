@@ -54,6 +54,12 @@ namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
+  /** Constructor - initialises pointers to NULL */
+  MapCppTrackerMCDigitization();
+  
+  /** Constructor - deletes any allocated memory */
+  ~MapCppTrackerMCDigitization();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -77,7 +83,7 @@ class MapCppTrackerMCDigitization {
   /** @brief reads in json data to a Spill object
    *
    */
-  MAUS::Spill read_in_json(std::string json_data);
+  void read_in_json(std::string json_data);
 
   /** @brief builds digits
    */
@@ -118,7 +124,8 @@ class MapCppTrackerMCDigitization {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   Json::Reader calib_reader;
