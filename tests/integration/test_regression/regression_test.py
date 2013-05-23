@@ -14,9 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 """ Run the regression tests """
+
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
 import argparse
 from regression import RegressionTest, Chi2Test, KolmogorovTest
-
 
 if __name__ == '__main__':
     PARSER = argparse.ArgumentParser(
