@@ -86,7 +86,6 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
   if ( spill.GetMCEvents() ) {
   } else {
-    
     std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
@@ -153,12 +152,12 @@ void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
     std::cerr << "Bad json document" << std::endl;
-    Json::Value errors;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["bad_json_document"] = ss.str();
-    json_root["errors"] = errors;
-    writer.write(json_root);
+    _spill_cpp->GetErrors();
   }
 }
 
