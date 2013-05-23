@@ -62,10 +62,10 @@ class MapCppTOFSpacePoints {
 
   TOFCalibrationMap _map;
 
-  std::vector<int> xPlane0Hits;
-  std::vector<int> xPlane1Hits;
+  std::vector<int> _xPlane0Hits;
+  std::vector<int> _xPlane1Hits;
 
-  double _makeSpacePiontCut; // nanoseconds
+  double _makeSpacePointCut; // nanoseconds
   double _findTriggerPixelCut; // nanoseconds
   std::string _triggerStation;
 
@@ -89,6 +89,6 @@ class MapCppTOFSpacePoints {
    * one particle event in one individual detector.
    */
   Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
-  bool map_init;
+  bool _map_init;
 };
 #endif

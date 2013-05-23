@@ -81,6 +81,12 @@ class TrackPoint : public BasePoint {
 
   // Getters and Setters for the member variables
 
+  /// Set the index of the particle event that created this track point.
+  void set_particle_event(const int mapper_name);
+
+  /// Get the name for the mapper which produced the track, #_mapper_name.
+  int get_particle_event() const;
+
   /// Set the name for the mapper which produced the track, #_mapper_name.
   void set_mapper_name(std::string mapper_name);
 
@@ -129,6 +135,11 @@ class TrackPoint : public BasePoint {
   MAUS::DataStructure::Global::SpacePoint* get_space_point() const;
 
  private:
+
+  /// The index of the particle event that produced this track point. If
+  /// creation of the TrackPoint was not due to a particle event the value
+  /// should remain at the default value of -1.
+  int _particle_event;
 
   /// The name of the mapper which produced this track.
   std::string    _mapper_name;

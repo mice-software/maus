@@ -50,7 +50,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         test_conf_json['Enable_triggerDelay_correction'] = False
         test_conf_json['Enable_timeWalk_correction'] = False
         test_conf_json['TOF_findTriggerPixelCut'] = 1.001
-        test_conf_json['TOF_makeSpacePiontCut'] = 1.001
+        test_conf_json['TOF_makeSpacePointCut'] = 1.001
         #print testConfJSON
         test_configuration = json.dumps(test_conf_json)
         success = self.mapper.birth(test_configuration)

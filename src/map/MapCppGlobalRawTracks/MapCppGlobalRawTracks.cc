@@ -198,8 +198,10 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
   GlobalDS::TrackPArray::iterator sci_fi_track = sci_fi_tracks.begin();
   while (tof_track != tof_tracks.end() ||
           sci_fi_track != sci_fi_tracks.end()) {
-    std::vector<GlobalDS::TrackPoint const *> tof_track_points
-      = (*tof_track)->GetTrackPoints();
+    std::vector<GlobalDS::TrackPoint const *> tof_track_points;
+    if (tof_track != tof_tracks.end()) {
+      tof_track_points = (*tof_track)->GetTrackPoints();
+    }
     std::vector<GlobalDS::TrackPoint const *>::iterator tof_track_point;
     if (tof_track != tof_tracks.end()) {
       tof_track_point = tof_track_points.begin();
@@ -230,11 +232,15 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
         ++sci_fi_track_point;
       }
     }
-    combined_track->SortTrackPointsByZ();
-    global_event->add_track_recursive(combined_track);
+
+    if (combined_track->GetTrackPoints().size() > 0) {
+      combined_track->SortTrackPointsByZ();
+      global_event->add_track_recursive(combined_track);
 std::cerr << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
           << "Combined track size: " << combined_track->GetTrackPoints().size()
           << std::endl;
+    }
+
     if (tof_track != tof_tracks.end()) {
       ++tof_track;
     }
@@ -260,10 +266,14 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const std::vector<TOFSpacePoint> tof2_space_points
     = space_point_events.GetTOF2SpacePointArray();
 
+  if (tof0_space_points.size() != tof1_space_points.size()) {
+    return;
+  }
+
   GlobalDS::Track * track = new GlobalDS::Track();
 
   TLorentzVector last_position[3];
-  TLorentzVector deltas[2];
+  TLorentzVector deltas[3];
 
   GlobalDS::TrackPointPArray track_points;
 
@@ -282,10 +292,15 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof0_space_point < tof0_space_points.end();
        ++tof0_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
-    PopulateTOFTrackPoint(tof0, tof0_space_point, 4., 10, track_point);
+    PopulateTOFTrackPoint(tof0, tof0_space_point, 40., 10, track_point);
     track_points.push_back(track_point);
 
     last_position[0] = track_point->get_position();
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
+              << "\t TOF0 4-position: (" << last_position[0].T()
+              << ", " << last_position[0].X()
+              << ", " << last_position[0].Y() << ", " << last_position[0].Z()
+              << ")" << std::endl;
   }
 
   MAUS::recon::global::DetectorMap::const_iterator tof1_mapping
@@ -301,12 +316,18 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof1_space_point < tof1_space_points.end();
        ++tof1_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
-    PopulateTOFTrackPoint(tof1, tof1_space_point, 6., 7, track_point);
+    PopulateTOFTrackPoint(tof1, tof1_space_point, 60., 7, track_point);
     track_points.push_back(track_point);
 
     last_position[1] = track_point->get_position();
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
+              << "\t TOF1 4-position: (" << last_position[1].T()
+              << ", " << last_position[1].X()
+              << ", " << last_position[1].Y() << ", " << last_position[1].Z()
+              << ")" << std::endl;
   }
   deltas[0] = last_position[1] - last_position[0];
+  deltas[1] = deltas[0];
 
   MAUS::recon::global::DetectorMap::const_iterator tof2_mapping
     = detectors_.find(GlobalDS::kTOF2);
@@ -321,17 +342,24 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof2_space_point < tof2_space_points.end();
        ++tof2_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
-    PopulateTOFTrackPoint(tof2, tof2_space_point, 6., 10, track_point);
+    PopulateTOFTrackPoint(tof2, tof2_space_point, 60., 10, track_point);
     track_points.push_back(track_point);
 
     last_position[2] = track_point->get_position();
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
+              << "\t TOF2 4-position: (" << last_position[2].T()
+              << ", " << last_position[2].X()
+              << ", " << last_position[2].Y() << ", " << last_position[2].Z()
+              << ")" << std::endl;
   }
-  deltas[1] = last_position[2] - last_position[1];
+  deltas[2] = last_position[2] - last_position[1];
 
   // Approximate momenta by using tof0/tof1 and tof1/tof2 position deltas
-  TLorentzVector momenta[2];
+  TLorentzVector momenta[3];
   for (size_t index = 0; index < 2; ++index) {
     double delta_x = deltas[index].X();
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
+              << "delta_x: " << delta_x << std::endl;
     double delta_y = deltas[index].Y();
     double delta_z = deltas[index].Z();
     double delta_t = deltas[index].T();
@@ -357,9 +385,12 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "mass: " << mass << std::endl;
 
-    momenta[index] = TLorentzVector(mass * delta_x / delta_t,
-                                    mass * delta_y / delta_t,
-                                    gamma * mass * beta,  // pz ~= p
+    momenta[index] = TLorentzVector(gamma * mass * delta_x / delta_t
+                                          / ::CLHEP::c_light,
+                                    gamma * mass * delta_y / delta_t
+                                          / ::CLHEP::c_light,
+                                    gamma * mass * delta_z / delta_t
+                                          / ::CLHEP::c_light,
                                     gamma * mass);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "Particle: " << Particle::GetInstance().GetName(particle_id)
@@ -371,15 +402,11 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
 
   // Set each track point's 4-momentum and add to the track
   std::vector<GlobalDS::TrackPoint *>::iterator track_point;
+  size_t point_index = 0;
   for (track_point = track_points.begin();
        track_point < track_points.end();
        ++track_point) {
-    const double z = (*track_point)->get_position().Z();
-    if (z <= tof1.plane()) {
-      (*track_point)->set_momentum(momenta[0]);
-    } else {
-      (*track_point)->set_momentum(momenta[1]);
-    }
+    (*track_point)->set_momentum(momenta[point_index++]);
 
     track->AddTrackPoint(*track_point);
   }
@@ -400,11 +427,22 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
     const double slab_width,
     const size_t number_of_slabs,
     GlobalDS::TrackPoint * track_point) {
-std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
-          << "\tID: " << detector.id() << std::endl
-          << "\tPlane: " << detector.plane() << std::endl
-          << "\tUncertainties: " << detector.uncertainties() << std::endl;
-  const double max_xy = slab_width * (number_of_slabs - 0.5);
+  std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: "
+            << std::endl
+            << "\tPhys. Event #: " << tof_space_point->GetPhysEventNumber()
+            << std::endl;
+  std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
+            << "\tID: " << detector.id() << std::endl
+            << "\tPlane: " << detector.plane() << std::endl
+            << "\tUncertainties: " << detector.uncertainties() << std::endl;
+  double max_xy = slab_width * ::floor(number_of_slabs / 2.0);
+  if (number_of_slabs % 2 == 0) {
+    max_xy -= slab_width / 2.0;
+  }
+  std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
+            << "\t# Slabs: " << number_of_slabs << std::endl
+            << "\tSlab Width: " << slab_width << std::endl
+            << "\tMax X/Y Value: " << max_xy << std::endl;
 
   GlobalDS::SpacePoint * space_point = new GlobalDS::SpacePoint();
 
@@ -412,8 +450,10 @@ std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
 
   // FIXME(Lane) not sure what to put here
   space_point->set_geometry_path("");
-
-  const double x = slab_width * tof_space_point->GetSlabx() - max_xy;
+  
+  // FIXME(Lane) x and y are intentionally backwards with respect to there
+  // GetSlab?() function. Change when MapCppTOFSpacePoints is fixed.
+  const double x = slab_width * tof_space_point->GetSlaby() - max_xy;
   const double y = slab_width * tof_space_point->GetSlabx() - max_xy;
   const double z = detector.plane();
   const double t = tof_space_point->GetTime();
@@ -427,7 +467,7 @@ std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
 
   dynamic_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
-
+  track_point->set_particle_event(tof_space_point->GetPhysEventNumber());
   track_point->set_mapper_name(kClassname);
 
   track_point->set_position(position);
