@@ -293,7 +293,19 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @returns list of 3 JSON documents containing the images.
         """
         image_list = []
-        
+        histos = [self._htof,
+                  self._htof_A,
+                  self._htof_B]
+        histos.extend(self._hcharge)
+        histos.extend(self._htime)
+        # ROOT
+        # file label = PTM1-8.eps
+        tag = "OutputHistos"
+        content = "OutputHistos"
+        doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
+        image_list.append(doc)
+
+
         # PMT Charge
         # file label = PTM1-8.eps
         keywords = ['ckov', 'charge', 'pmt']
