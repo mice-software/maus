@@ -21,8 +21,10 @@ from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
-ROTATEDXSL = os.environ["MAUS_ROOT_DIR"] + \
-        "/src/common_py/geometry/xsltScripts/RotatedGeometryFileTranslation.xsl"
+# ROTATEDXSL = os.environ["MAUS_ROOT_DIR"] + \
+#                      "/src/common_py/geometry/xsltScripts/RotatedGeometryFileTranslation.xsl"
+TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
+        "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
 
@@ -51,6 +53,7 @@ class GDMLtomaus(): #pylint: disable = R0903
         self.config_file = None
         self.material_file = None
         self.material_file_path = None
+        self.tracker_file = None
         file_list = []
         self.step_files = file_list
         if os.path.exists(path) == False:
@@ -60,23 +63,30 @@ class GDMLtomaus(): #pylint: disable = R0903
         gdmls = os.listdir(self.path)
         for fname in gdmls:
             if fname.find('materials') >= 0:
-                found_file = self.path + '/' + fname
+                found_file = os.path.join(self.path, fname)
                 self.material_file = found_file
                 self.material_file_path = os.path.abspath(self.material_file)
-            if fname == 'fastradModel.gdml' or fname == 'FastradModel.gdml':
-                found_file = self.path + '/' + fname
+            if fname == 'fastradModel.gdml' or fname == 'FastradModel.gdml' or fname == 'Step_IV.gdml':
+                found_file = os.path.join(self.path, fname)
                 self.config_file = found_file
             if fname.find('Maus_Information') >= 0:
-                found_file = self.path + '/' + fname
+                found_file = os.path.join(self.path, fname)
                 self.maus_information_file = found_file
+            if fname == 'Tracker.gdml':
+                found_file = os.path.join(self.path, fname)
+                self.tracker_file = found_file
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Fastrad') < 0 \
                and fname.find('Maus_Information') < 0 \
                and fname.find('Beamline') < 0 \
-               and fname[-5:] == '.gdml':
-                stepfile = self.path + '/' + fname
+               and fname[-5:] == '.gdml' \
+               and fname.find('Step_IV') < 0\
+               and fname.find('Tracker') < 0:
+            
+                stepfile = os.path.join(self.path, fname)
                 self.step_files.append(stepfile)
+                
 
     def convert_to_maus(self, output):
         """
@@ -94,13 +104,17 @@ class GDMLtomaus(): #pylint: disable = R0903
             raise IOError('Output path doesnt exist '+str(output))
         else:
             outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
-            outputfile2 = os.path.join(output, "RotatedGeometryFile.dat")
+            outputfile2 = os.path.join(output, "TrackerGeometryFile.dat")
+            # outputfile3 = os.path.join(output, "RotatedGeometryFile.dat")
             config_file = CADImport(xmlin1 = str(self.config_file), \
                            xsl = str(CONFIGXSL), output = str(outputfile1))
             config_file.parse_xslt()
-            rotated_file = CADImport(xmlin1 = str(self.config_file), \
-                           xsl = str(ROTATEDXSL), output = str(outputfile2))
-            rotated_file.parse_xslt()
+            tracker_file = CADImport(xmlin1 = str(self.config_file), \
+                           xsl = str(TRACKERXSL), output = str(outputfile2))
+            tracker_file.parse_xslt()
+            # rotated_file = CADImport(xmlin1 = str(self.config_file), \
+            #                          xsl = str(ROTATEDXSL), output = str(outputfile3))
+            # rotated_file.parse_xslt()                       
             print "Configuration File Converted"
             length = len(self.step_files)
             for num in range(0, length):

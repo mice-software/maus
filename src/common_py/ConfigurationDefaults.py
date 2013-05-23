@@ -270,6 +270,13 @@ get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""
 
+# File Numbers
+# This following section gives the files numbers of each detector. The numbers speficy the technical drawing
+# number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
+# and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
+tof_0_file_number = "3116"
+tof_1_file_number = "1234"
+
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False

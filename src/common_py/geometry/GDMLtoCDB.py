@@ -52,7 +52,7 @@ class Uploader: #pylint: disable = R0902
     individual file is saved to a zip file by another class
     and then encoded and uploaded to the CDB.
     """
-    def __init__(self, filepath, notes, textfile = None):
+    def __init__(self, filepath, notes, textfile = None, usetestserver = 1):
         """
         @Method Class constructor This method sets up the necessaries to upload
                                   to the database
@@ -69,7 +69,10 @@ class Uploader: #pylint: disable = R0902
         """
         self.config = Configreader()
         self.wsdlurl = None
-        self.geometry_cdb = cdb.GeometrySuperMouse()
+        if(usetestserver): # If statement needed to switch between test and production.
+            self.geometry_cdb = cdb.GeometrySuperMouse('http://rgma19.pp.rl.ac.uk:8080') 
+        else: #set to cdb.GeometrySuperMouse() for production server. 
+            self.geometry_cdb = cdb.GeometrySuperMouse()
         self.textfile = textfile
         self.text = ""
         if type(notes) != str:
@@ -82,7 +85,8 @@ class Uploader: #pylint: disable = R0902
             raise IOError("File path "+str(filepath)+" does not exist")
         else:
             self.filepath = filepath
-        self.set_up_server()
+#       self.set_up_server()
+
         if self.textfile == None:
             self.create_file_list()
         self.check_file_list()
@@ -153,7 +157,6 @@ class Uploader: #pylint: disable = R0902
             _dt = self.config.geometry_upload_valid_from
             fin = open(zipped_file, 'r')
             _gdml = fin.read()
-            self.geometry_cdb = cdb.GeometrySuperMouse()
             self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             
 class Downloader: #pylint: disable = R0902

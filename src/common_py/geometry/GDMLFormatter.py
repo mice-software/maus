@@ -42,12 +42,15 @@ class Formatter: #pylint: disable = R0902
                     outputted GDML files
         """
         self.g4_step_max = Configreader().g4_step_max
+        self.tof_0_file_number = Configreader().tof_0_file_number
+	self.tof_1_file_number = Configreader().tof_1_file_number
         self.path_in = path_in
         self.path_out = path_out + '/'
         self.beamline_file = None
         self.maus_information_file = None
         self.configuration_file = None
         self.material_file = None
+        self.tracker_file = None
         self.stepfiles = []
         self.formatted = False
         self.txt_file = ""
@@ -62,7 +65,7 @@ class Formatter: #pylint: disable = R0902
                 self.material_file = fname
                 shutil.copy(os.path.join(self.path_in, fname), 
                         os.path.join(self.path_out, fname)   )
-            elif fname.find('fastrad') >= 0 or fname.find('Fastrad') >= 0:
+            elif fname.find('fastrad') >= 0 or fname.find('Fastrad') >= 0 or fname.find('Step_IV')>=0:
                 self.configuration_file = fname
             elif fname.find('Maus_Information') >= 0 or \
                                             fname.find('maus_information') >= 0\
@@ -70,6 +73,8 @@ class Formatter: #pylint: disable = R0902
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
+            elif fname.find('Tracker') >= 0:
+                self.tracker_file = fname
             else:
                 self.stepfiles.append(fname)
         if self.maus_information_file == None:
@@ -124,6 +129,12 @@ class Formatter: #pylint: disable = R0902
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))
         top_node.appendChild(g4_step)
+	file_numbers = doc.createElement("FileNumbers")
+	top_node.appendChild(file_numbers)
+	tof_0_file_number = doc.createElement("Tof0FileNumber")
+	tof_0_file_number.setAttribute("number", str(self.tof_0_file_number))
+	file_numbers.appendChild(tof_0_file_number)
+
         if file_numbers != None:
             top_node.appendChild(file_numbers)
         maus_information = minidom.parse(os.path.join(self.path_out, \
@@ -276,6 +287,7 @@ class Formatter: #pylint: disable = R0902
                        os.path.join(self.path_out, self.maus_information_file))
 
         if self.formatted == False:
+            print self.configuration_file
             self.format_schema_location(self.configuration_file)
             self.merge_maus_info(self.configuration_file)
             self.format_materials(self.configuration_file)
