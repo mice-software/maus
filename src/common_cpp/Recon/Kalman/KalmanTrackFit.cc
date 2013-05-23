@@ -100,6 +100,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
       LaunchMisaligmentSearch(track, sites, kalman_align);
     }
     delete track;
+    delete seed;
   }
 }
 
@@ -115,6 +116,8 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   for ( int i = 0; i < n_param; i++ ) {
     C(i, i) = _seed_cov;
   }
+  C(0, 0) = 1.;
+  C(2, 2) = 1.;
 
   std::vector<SciFiCluster*> clusters = seed->clusters();
   KalmanSite first_plane;
@@ -129,7 +132,6 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   first_plane.set_input_shift(kalman_align.get_shifts(id_0));
   first_plane.set_input_shift_covariance(kalman_align.get_cov_shifts(id_0));
   sites.push_back(first_plane);
-
   size_t numb_sites = clusters.size();
   for ( size_t j = 1; j < numb_sites; ++j ) {
     KalmanSite a_site;
@@ -268,15 +270,17 @@ void KalmanTrackFit::DumpInfo(KalmanSitesVector const &sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    std::cerr << "==========================================" << std::endl;
-    std::cerr << "SITE ID: " << site.id() << std::endl;
-    std::cerr << "SITE Z: " << site.z() << std::endl;
-    std::cerr << "Measurement: " << (site.measurement())(0, 0) << std::endl;
-    std::cerr << "================Residuals================" << std::endl;
-    std::cerr << (site.residual(KalmanSite::Projected))(0, 0) << std::endl;
-    std::cerr << (site.residual(KalmanSite::Filtered))(0, 0) << std::endl;
-    std::cerr << (site.residual(KalmanSite::Smoothed))(0, 0) << std::endl;
-    std::cerr << "==========================================" << std::endl;
+    Squeak::mout(Squeak::info)
+    << "=========================================="  << "\n"
+    << "SITE ID: " << site.id() << "\n"
+    << "SITE Z: " << site.z()   << "\n"
+    << "Measurement: " << (site.measurement())(0, 0) << "\n"
+    << "================Residuals================"   << "\n"
+    << (site.residual(KalmanSite::Projected))(0, 0)  << "\n"
+    << (site.residual(KalmanSite::Filtered))(0, 0)   << "\n"
+    << (site.residual(KalmanSite::Smoothed))(0, 0)   << "\n"
+    << "=========================================="
+    << std::endl;
   }
 }
 

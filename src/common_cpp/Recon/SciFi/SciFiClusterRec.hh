@@ -25,10 +25,7 @@
 
 // C headers
 #include <assert.h>
-#include <json/json.h>
-#include <CLHEP/Random/RandPoisson.h>
-#include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
+#include <map>
 
 // C++ headers
 #include <cmath>
@@ -36,14 +33,9 @@
 #include <vector>
 
 // other headers
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Matrix/Matrix.h"
-#include "CLHEP/Vector/Rotation.h"
-
-#include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
+// #include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
 
 namespace MAUS {
 
@@ -51,10 +43,16 @@ class SciFiClusterRec {
  public:
   SciFiClusterRec();
 
-  SciFiClusterRec(int cluster_exception, double min_npe, std::vector<const MiceModule*> modules);
-
   ~SciFiClusterRec();
 
+  /** @brief
+   * @arg
+   */
+/*
+  SciFiClusterRec(int cluster_exception,
+                  double min_npe,
+                  std::map<int, SciFiPlaneGeometry> geometry_map);
+*/
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters
    * @arg modules the SciFi MICE modules
@@ -66,29 +64,27 @@ class SciFiClusterRec {
    */
   void process_cluster(SciFiCluster *clust);
 
-  ThreeVector get_reference_frame_pos(int tracker);
-
+  /** @brief Evaluates if two digits belong to neighbouring channels.
+   * @arg Digits for comparison.
+   */
   bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
 
+  /** @brief Loops over digits and accepts those above npe cut as seeds.
+   * @arg The particle event.
+   */
   std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt);
 
+  /** @brief
+   * @arg
+   */
   void make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds);
-
-  const MiceModule* find_plane(int tracker, int station, int plane);
-
-  /** @brief Set relative position & channel number for the Kalman Filter.
-   * This is the position of the cluster relatively to station 1 of the tracker (0 or 1)
-   * with the displacement of the station centre subtracted.
-  */
-  void construct(SciFiCluster *clust, const MiceModule* this_plane,
-                 ThreeVector &dir, ThreeVector &tracker_ref_frame_pos, double &alpha);
 
  private:
   int _size_exception;
 
   double _min_npe;
 
-  std::vector<const MiceModule*> _modules;
+  // std::map<int, SciFiPlaneGeometry> _geometry_map;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

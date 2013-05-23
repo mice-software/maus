@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTrackerRecon 
+/** @class MapCppTrackerRecon
  *  Digitize events by running Tracker electronics simulation.
  *
  */
@@ -29,14 +29,12 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-// #include <cmath>
-// #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
-// #include <algorithm>
 
 // Other headers
+#include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
 #include "Config/MiceModule.hh"
@@ -59,9 +57,12 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
+// #include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
+
 namespace MAUS {
 
 class MapCppTrackerRecon {
+
  public:
   /** Sets up the worker
    *
@@ -129,6 +130,8 @@ class MapCppTrackerRecon {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
+  void kalman_fit(MAUS::SciFiEvent &evt);
+
  private:
   /// This should be the classname
   std::string _classname;
@@ -139,17 +142,16 @@ class MapCppTrackerRecon {
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.
-  //double minPE;
+  double  _min_npe;
   /// Value above which reconstruction is aborted.
-  int ClustException;
+  int _size_exception;
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
   bool _kalman_on;
-  int _size_exception;
-  double  _min_npe;
-  ///  Vector with the MICE SciFi Modules.
-  std::vector<const MiceModule*> _modules;
+
+  ///  Map of the planes geometry specifications.
+  // std::map<int, SciFiPlaneGeometry> _geometry_map;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

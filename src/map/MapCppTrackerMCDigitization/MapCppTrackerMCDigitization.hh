@@ -113,8 +113,6 @@ class MapCppTrackerMCDigitization {
   void save_to_json(MAUS::Spill &spill);
 
  private:
-  /// This is the Mice Module
-  // MiceModule*      _module;
   /// This should be the classname
   std::string _classname;
   /// This will contain the configuration

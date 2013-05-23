@@ -34,7 +34,7 @@
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+//#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {

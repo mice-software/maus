@@ -67,8 +67,16 @@ bool MapCppTrackerReconTest::birth(std::string argJsonConfigDocument) {
       GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
-    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
+    // _size_exception = (*json)["SciFiClustExcept"].asInt();
+    // _min_npe        = (*json)["SciFiNPECut"].asDouble();
+
+    MiceModule* module = Globals::GetReconstructionMiceModules();
+    std::vector<const MiceModule*> modules =
+      module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    // _geometry_map = SciFiGeometryHelper(modules)->build_geometry_map();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -329,8 +337,10 @@ void MapCppTrackerReconTest::normal_recon(SciFiEvent *event) {
     std::cout << "Pattern Recognition complete." << std::endl;
   }
   // Kalman Track Fit.
-  if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-    // track_fit(*event);
+  if ( _kalman_on ) {
+    if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+      track_fit(*event);
+    }
   }
   print_event_info(*event);
 }
@@ -361,9 +371,8 @@ void MapCppTrackerReconTest::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerReconTest::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering;
-  // clustering.initialise();
-  clustering.process(evt);
+  // SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_map);
+  // clustering.process(evt);
 }
 
 void MapCppTrackerReconTest::spacepoint_recon(SciFiEvent &evt) {
@@ -384,13 +393,13 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->Build(evt.helicalprtracks()[track_i]);
+    seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->Build(evt.straightprtracks()[track_i]);
+    seed->Build<SciFiStraightPRTrack>(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
   }
 

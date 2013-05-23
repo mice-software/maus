@@ -15,15 +15,6 @@
  *
  */
 
-
-#include <algorithm>
-
-#include "Interface/Squeal.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
 namespace MAUS {
@@ -43,12 +34,14 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     _min_npe        = (*json)["SciFiNPECut"].asDouble();
 
     MiceModule* module = Globals::GetReconstructionMiceModules();
-    _modules = module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    if ( !(_modules.size()) ) {
-      throw(Squeal(Squeal::nonRecoverable,
-            "Failed to load MiceModules",
-            "MapCppTrackerRecon::birth"));
-    }
+    std::vector<const MiceModule*> modules =
+      module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    // _geometry_map = SciFiGeometryHelper(modules)->build_geometry_map();
+    // if ( !(modules.size()) ) {
+    //  throw(Squeal(Squeal::nonRecoverable,
+    //        "Failed to load MiceModules",
+    //        "MapCppTrackerRecon::birth"));
+    // }
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -98,6 +91,11 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
+/*
+        if ( _kalman_on && event->spacepoints().size()==5 && event->clusters().size()==15) {
+          kalman_fit(*event);
+        }
+*/
         print_event_info(*event);
       }
     } else {
@@ -145,8 +143,8 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(_size_exception, _min_npe, _modules);
-  clustering.process(evt);
+  // SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_map);
+  // clustering.process(evt);
 }
 
 void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
@@ -167,13 +165,13 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->Build(evt.helicalprtracks()[track_i]);
+    seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
     KalmanSeed *seed = new KalmanSeed();
-    seed->Build(evt.straightprtracks()[track_i]);
+    seed->Build<SciFiStraightPRTrack>(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
@@ -181,6 +179,18 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
     KalmanTrackFit fit;
     fit.Process(seeds, evt);
   }
+}
+
+void MapCppTrackerRecon::kalman_fit(SciFiEvent &evt) {
+  std::vector<KalmanSeed*> seeds;
+
+  KalmanSeed *the_seed = new KalmanSeed();
+  the_seed->Build(evt, _helical_pr_on);
+
+  seeds.push_back(the_seed);
+
+  KalmanTrackFit fit;
+  fit.Process(seeds, evt);
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
