@@ -659,8 +659,8 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   // Set phi_i to the corrected values
   for ( size_t i = 0; i < true_dphi.size(); ++i ) {
     phi_i[i+1] = true_dphi[i] + phi_1;  // As first phi_i is just phi_1
-    // std::cerr << "dz[" << i << "] is " << dz[i] << ", dphi[" << i << "] is " << dphi[i];
-    // std::cerr << ", true_dphi[" << i << "] is " << true_dphi[i] << std::endl;
+    std::cerr << "dz[" << i << "] is " << dz[i] << ", dphi[" << i << "] is " << dphi[i];
+    std::cerr << ", true_dphi[" << i << "] is " << true_dphi[i] << std::endl;
   }
 
   // Using the circle radius and the true_dphi, calc the s_i (distance in x-y between sp)
@@ -708,16 +708,24 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
         // Remainder should be ~0 if correct n_ji and m are found
         double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) / (true_dphi[i] + 2*n*CLHEP::pi))
                                    - (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
+        std::cerr << "find_n_turns: dz_i = " << dz[i] << ", dphi_i = " << dphi[i];
+        std::cerr << ", true_dphi_i = " << true_dphi[i]; 
+        std::cerr << ", dz_j = " << dz[i+1] << ", dphi_j = " << dphi[i+1];
+        std::cerr << ", true_dphi_j = " << true_dphi[i+1]; 
+        std::cerr << ", m = " << m << ", n = " << n << ", remainder = " << remainder;
         if ( remainder < _AB_cut ) {
+          std::cerr << ", passed\n";
           found = true;
           true_n = n;
           true_m = m;
           break;
+        } else {
+          std::cerr << ", failed\n";
         }
       }
     }
     if ( found ) { // If we suceeding in finding corrections which pass the cut
-      true_dphi[i] = dphi[i] + 2*true_n*CLHEP::pi;
+      if ( i == 0 ) true_dphi[i] = dphi[i] + 2*true_n*CLHEP::pi; // Only correct old on first pass
       true_dphi[i+1] = dphi[i+1] + 2*true_m*CLHEP::pi;
     } else { // Abort finding dsdz if we fail to find any single n turns correction
       return false;
