@@ -238,10 +238,10 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
   EXPECT_EQ(5, htrks[1]->get_num_points());
   EXPECT_EQ(5, htrks[2]->get_num_points());
   EXPECT_EQ(5, htrks[3]->get_num_points());
-  EXPECT_NEAR(0.0348, htrks[0]->get_dsdz(), 0.001);
-  EXPECT_NEAR(0.1181, htrks[1]->get_dsdz(), 0.01);
-  EXPECT_NEAR(0.1180, htrks[2]->get_dsdz(), 0.01);
-  EXPECT_NEAR(0.0712, htrks[3]->get_dsdz(), 0.001);
+  EXPECT_NEAR(0.03771, htrks[0]->get_dsdz(), 0.001);
+  EXPECT_NEAR(0.1160, htrks[1]->get_dsdz(), 0.01);
+  EXPECT_NEAR(0.1172, htrks[2]->get_dsdz(), 0.01);
+  EXPECT_NEAR(0.07349, htrks[3]->get_dsdz(), 0.001);
 
   // evt descoping will delete the spacepoints
 }
@@ -1113,9 +1113,9 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
 
   pr.find_dsdz(n_points, spnts, circle, dphi, line_sz);
 
-  EXPECT_NEAR(line_sz.get_c(), -1.09, epsilon);
+  EXPECT_NEAR(line_sz.get_c(), 15.47, epsilon);
   EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
-  EXPECT_NEAR(line_sz.get_chisq(), 0.440, epsilon);
+  EXPECT_NEAR(line_sz.get_chisq(), 1.005 , epsilon);
 
   delete sp1;
   delete sp2;

@@ -592,6 +592,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   ThreeVector pos_0(x0, y0, -1);
   track = new SciFiHelicalPRTrack(-1, n_points, pos_0, phi_0, psi_0, c_trial, line_sz);
   track->set_phi(phi_i);
+  if (spnts[0]->get_tracker() == 0) track->set_dsdz(-track->get_dsdz());  // sign flip for t1
 
   // Set all the good sp to used
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i )
@@ -659,29 +660,16 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   // Set phi_i to the corrected values
   for ( size_t i = 0; i < true_dphi.size(); ++i ) {
     phi_i[i+1] = true_dphi[i] + phi_1;  // As first phi_i is just phi_1
-    std::cerr << "dz[" << i << "] is " << dz[i] << ", dphi[" << i << "] is " << dphi[i];
-    std::cerr << ", true_dphi[" << i << "] is " << true_dphi[i] << std::endl;
+    // std::cerr << "dz[" << i << "] is " << dz[i] << ", dphi[" << i << "] is " << dphi[i];
+    // std::cerr << ", true_dphi[" << i << "] is " << true_dphi[i] << std::endl;
   }
 
   // Using the circle radius and the true_dphi, calc the s_i (distance in x-y between sp)
-  std::vector<double> ds;
-  dphi_to_ds(circle.get_R(), true_dphi, ds);
+  std::vector<double> s_i;
+  dphi_to_ds(circle.get_R(), phi_i, s_i);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  _lsq.linear_fit(dz, ds, phi_err, line_sz);
-
-  // Alter the intercept so it is true for s - z space (rather than ds - dz space, where the origin
-  // is given by the first spacepoint)
-  /*
-  double dsdz = 0.0;
-  if (spnts[0]->get_tracker() == 0)
-    dsdz = - line_sz.get_m();
-  else
-    dsdz = line_sz.get_m();
-  line_sz.set_c(line_sz.get_c() + (circle.get_R()*phi_i[0]) - (dsdz*z_i[0]));
-  std::cerr << "phi_i[0] = " << phi_i[0] << ", z_i[0] = " << z_i[0] << std::endl;
-  std::cerr << "sz_c = " << line_sz.get_c() + (circle.get_R()*phi_1) - (dsdz*z_i[0]) << "\n";
-  */
+  _lsq.linear_fit(z_i, s_i, phi_err, line_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
@@ -714,13 +702,13 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
         // std::cerr << ", true_dphi_j = " << true_dphi[i+1];
         // std::cerr << ", m = " << m << ", n = " << n << ", remainder = " << remainder;
         if ( remainder < _AB_cut ) {
-          std::cerr << ", passed\n";
+          // std::cerr << ", passed\n";
           found = true;
           true_n = n;
           true_m = m;
           break;
         } else {
-          std::cerr << ", failed\n";
+          // std::cerr << ", failed\n";
         }
       }
     }
