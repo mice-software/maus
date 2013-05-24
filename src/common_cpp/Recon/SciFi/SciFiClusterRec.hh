@@ -36,7 +36,7 @@
 // other headers
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 namespace MAUS {
 

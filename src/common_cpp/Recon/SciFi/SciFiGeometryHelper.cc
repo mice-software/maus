@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/Utils/SciFiGeometryHelper.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 namespace MAUS {
 
