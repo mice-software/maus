@@ -21,7 +21,7 @@
                 <title>Configuration <xsl:value-of select="structure/volume/@name"/> 
                        { 
                            Dimensions <xsl:if test="solids/sphere/@name = 'WorldSphereRef'">15000.0 10000.0 50000.0 mm</xsl:if>
-                           PropertyString Material <xsl:if test="structure/volume/materialref/@ref = 'Vacuum'">AIR</xsl:if>  
+                           PropertyString Material AIR <!--<xsl:if test="structure/volume/materialref/@ref = 'Vacuum'">AIR</xsl:if>-->  
                            PropertyDouble G4StepMax <xsl:value-of select="MICE_Information/Other_Information/G4StepMax/@Value"/> mm 
                 </title>
             </head>
@@ -73,13 +73,42 @@
                             </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
                             
-                            Module <xsl:value-of select="MICE_Information/Other_Information/GDML_Files/@location"/>RotatedGeometryFile.dat
-                            { 
-                                Position 0.0 0.0 0.0 mm 
-                                Rotation 0.0 90.0 0.0 deg 
-                            }
+                            //Module <xsl:value-of select="MICE_Information/Other_Information/GDML_Files/@location"/>RotatedGeometryFile.dat
+                            //{
+                            //    Position 0.0 0.0 0.0 mm
+                            //    Rotation 0.0 90.0 0.0 deg
+                            //}
+
+                           
+                            <xsl:variable name="tof_1_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof1FileNumber/@number"/>
                             
-                            //Other Modules
+                             <xsl:for-each select="structure/volume/physvol"> 
+                                   Module <xsl:choose><xsl:when test="contains(file/@name, 'Iges_0')">TOF/TOF0.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_1')">TOF/TOF1.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_3')">TOF/TOF2.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_4')">KL/KL.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_6')">Ckov/Cherenkov.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_7')">Ckov/Acc1.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_8')">Ckov/Acc2.dat</xsl:when><xsl:when test="contains(file/@name, 'SingleStation')">Tracker/Tracker1Station1.dat</xsl:when><xsl:otherwise><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat</xsl:otherwise></xsl:choose>
+                                    { 
+                                        Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
+                                        Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
+                                    }
+                            </xsl:for-each> 
+                	    
+                            //Module Tracker/TrackerSolenoid0.dat
+                            //{
+                            //    Position 0. 0. 15016.24 mm
+                            //    Rotation 0. 0. 0. degree
+                            //}
+                
+                            //Module AFC/AbsorberFocusCoil.dat
+                            //{
+                            //    Position 0. 0. 16955.74 mm
+                            //    Rotation 0. 0. 0. degree
+                            //}
+                
+                            //Module RFCC/RFCouplingCoilUp.dat
+                            //{
+                            //    Position 0. 0. 18895.24 mm
+                            //    Rotation 0. 0. 0. degree
+                            //    ScaleFactor -1
+                            //}
+                                            //Other Modules
                             <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
                             //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
                             //Go and select the diffuser model
