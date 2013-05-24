@@ -25,6 +25,7 @@ import os
 from Configuration import Configuration
 
 from MapCppTrackerDigits import MapCppTrackerDigits
+import maus_cpp.globals
 
 # Disable: Too many public methods
 # pylint: disable-msg=R0904
@@ -46,6 +47,8 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         """
         self.mapper = MapCppTrackerDigits()
         # Test whether the configuration files were loaded correctly at birth
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
         success = self.mapper.birth(json.dumps(self.cfg))
         if not success:
             raise Exception('InitializeFail', 'Could not start worker')
