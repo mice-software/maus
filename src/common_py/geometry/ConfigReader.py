@@ -65,6 +65,12 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.get_beamline_stop_time = config_dict['get_beamline_stop_time']
 	self.tof_0_file_number = config_dict['tof_0_file_number']
 	self.tof_1_file_number = config_dict['tof_1_file_number']
+	self.tof_2_file_number = config_dict['tof_2_file_number']
+	self.ckov_file_number = config_dict['ckov_file_number']
+	self.acc1_file_number = config_dict['acc1_file_number']
+	self.acc2_file_number = config_dict['acc2_file_number']
+	self.kl_file_number = config_dict['kl_file_number']
+	self.emr_file_number = config_dict['emr_file_number']
 
 
 
