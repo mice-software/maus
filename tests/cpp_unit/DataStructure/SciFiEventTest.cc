@@ -94,7 +94,7 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   EXPECT_FALSE(evt2.digits()[0]->is_used());
 
   ASSERT_EQ(evt2.clusters().size(), 1u);
-  EXPECT_EQ(evt2.clusters()[0]->get_tracker(), 0);
+  EXPECT_EQ(evt2.clusters()[0]->get_tracker(), -1);
 
   ASSERT_EQ(evt2.spacepoints().size(), 1u);
   EXPECT_EQ(evt2.spacepoints()[0]->get_tracker(), 0);

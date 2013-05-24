@@ -34,9 +34,7 @@ void StraightTrack::UpdatePropagator(const KalmanSite *old_site, const KalmanSit
   double deltaZ = new_z-old_z;
 
   // Build _F.
-  for ( int i = 0; i < _n_parameters; i++ ) {
-    _F(i, i) = 1.;
-  }
+  _F.UnitMatrix();
   _F(0, 1) = deltaZ;
   _F(2, 3) = deltaZ;
 }

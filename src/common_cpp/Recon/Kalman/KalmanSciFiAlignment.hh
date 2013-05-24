@@ -49,6 +49,10 @@
 #include "Interface/Squeal.hh"
 #include "Config/MiceModule.hh"
 
+/*
+TODO: adapt to new plane numbering.
+*/
+
 namespace MAUS {
 
 class KalmanSciFiAlignment {
@@ -102,19 +106,19 @@ class KalmanSciFiAlignment {
    */
   void CloseRootFile();
 
-  TMatrixD get_shifts(int site_id)     const { return _shifts_array[site_id]; }
+  TMatrixD get_shifts(int site_id)     const { return _shifts_array[0]; }
 
-  TMatrixD get_cov_shifts(int site_id) const { return _covariance_shifts[site_id]; }
+  TMatrixD get_cov_shifts(int site_id) const { return _covariance_shifts[0]; }
 
-  void set_shifts(TMatrixD shifts, int site_id)        { _shifts_array[site_id]        = shifts; }
+  void set_shifts(TMatrixD shifts, int site_id)        { _shifts_array[0]        = shifts; }
 
-  void set_cov_shifts(TMatrixD cov_s, int site_id)     { _covariance_shifts[site_id]   = cov_s; }
+  void set_cov_shifts(TMatrixD cov_s, int site_id)     { _covariance_shifts[0]   = cov_s; }
 
  private:
   std::string _file, _fname;
 
-  TMatrixD _shifts_array[30];
-  TMatrixD _covariance_shifts[30];
+  TMatrixD _shifts_array[31];
+  TMatrixD _covariance_shifts[31];
 
   TFile  *_rootfile;
   TGraph *station1_x;

@@ -29,6 +29,7 @@ SciFiEvent::SciFiEvent() {
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
+  std::cerr << "IN copy constructor " << std::endl;
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
       _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
@@ -68,6 +69,7 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
 }
 
 SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
+  std::cerr << "IN = operator " << std::endl;
     if (this == &_scifievent) {
         return *this;
     }

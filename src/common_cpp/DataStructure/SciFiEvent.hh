@@ -31,7 +31,6 @@
 
 namespace MAUS {
 
-
 /** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
  */

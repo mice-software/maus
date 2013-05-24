@@ -24,9 +24,8 @@
 #include "TMatrixD.h"
 #include "TMath.h"
 
-#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "Interface/Squeak.hh"
 
 namespace MAUS {
 
@@ -36,13 +35,13 @@ class KalmanSeed {
 
   ~KalmanSeed();
 
-  void Build(const SciFiStraightPRTrack* pr_track);
+  template <class PRTrack>
+  void Build(const PRTrack* pr_track);
 
-  void Build(const SciFiHelicalPRTrack* pr_track);
+  void Build(const SciFiEvent &evt, bool field_on);
 
-  void ProcessMeasurements(const SciFiStraightPRTrack* pr_track);
-
-  void ProcessMeasurements(const SciFiHelicalPRTrack* pr_track);
+  template <class PRTrack>
+  void ProcessMeasurements(const PRTrack *track);
 
   TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed);
 
@@ -66,7 +65,23 @@ class KalmanSeed {
 
   int n_parameters() const { return _n_parameters; }
 
+  void get_gradients(double &mx, double &my);
+
+  void get_tan_lambda(double &tanlambda);
+
+  void get_circle_param(double &radius, double &x0, double &y0);
+
+  double tan_lambda_fit(const double *par);
+
+  double circle_fit(const double *par);
+
+  double mx_fit(const double *par);
+
+  double my_fit(const double *par);
+
  private:
+  double _x[5], _y[5], _z[5], _phi[5], _s[5];
+
   std::vector<SciFiCluster*> _clusters;
 
   std::vector<SciFiSpacePoint*> _spacepoints;
@@ -80,7 +95,39 @@ class KalmanSeed {
   bool _helical;
 
   int _n_parameters;
+
+  int _tracker;
 };
+
+template <class PRTrack>
+void KalmanSeed::Build(const PRTrack* pr_track) {
+  if ( pr_track->get_type() ) {
+    _helical = true;
+    _n_parameters = 5;
+  } else {
+    _straight = true;
+    _n_parameters = 4;
+  }
+
+  _tracker = pr_track->get_tracker();
+
+  _a0.ResizeTo(_n_parameters, 1);
+
+  ProcessMeasurements<PRTrack>(pr_track);
+
+  _a0 = ComputeInitialStateVector(pr_track);
+}
+
+template <class PRTrack>
+void KalmanSeed::ProcessMeasurements(const PRTrack *pr_track) {
+  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
+    SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
+    _spacepoints.push_back(sp);
+  }
+  double pz_from_timing;
+
+  RetrieveClusters(_spacepoints, pz_from_timing);
+}
 
 } // ~namespace MAUS
 

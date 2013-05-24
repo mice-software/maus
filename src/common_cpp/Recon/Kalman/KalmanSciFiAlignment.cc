@@ -44,7 +44,7 @@ KalmanSciFiAlignment::KalmanSciFiAlignment()
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   _fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+_file;
 
-  for ( int i = 0; i < 30; ++i ) {
+  for ( int i = 0; i < 31; ++i ) {
     _shifts_array[i].     ResizeTo(3, 1);
     _covariance_shifts[i].ResizeTo(3, 3);
     _shifts_array[i].     Zero();
@@ -72,7 +72,7 @@ bool KalmanSciFiAlignment::LoadMisaligments() {
   int size = 11;
 
   getline(inf, line);
-  for ( int line_i = 1; line_i < size; line_i++ ) {
+  for ( int line_i = 1; line_i < size; ++line_i ) {
     getline(inf, line);
     std::istringstream ist1(line.c_str());
     ist1 >> station
@@ -81,7 +81,7 @@ bool KalmanSciFiAlignment::LoadMisaligments() {
          >> zd >> s_zx >> s_zy >> s_zz;
 
     assert(line_i == station && "SciFiMisalignments (Shifts) set up as expected.");
-    int site_id = 3*(station-1); // 0, 3, 6, 9, 12
+    int site_id = 3*(station)-2; // 1, 4, 7, 10, 13, ...
 
     // Shifts.
     TMatrixD shifts(3, 1);
@@ -137,7 +137,7 @@ void KalmanSciFiAlignment::Save() {
 
   // sites 2 to 29; increment 3
   for ( int station = 2; station < 5; station++ ) {
-      int site_i = 3*(station)-1; // j==5 || j==8 || j==11
+      int site_i = 3*(station); // j==6 || j==9 || j==12
       file_out << station << "\t"
       << _shifts_array[site_i](0, 0) << "\t"
       << _covariance_shifts[site_i](0, 0) << "\t"
@@ -169,7 +169,7 @@ void KalmanSciFiAlignment::Save() {
       << 0. << "\t" << 0. << "\t" << 0.1 << "\n";
 
   for ( int station = 7; station < 10; station++ ) {
-      int site_i = 3*(station)-1;
+      int site_i = 3*(station);
       file_out << station << "\t"
       << _shifts_array[site_i](0, 0) << "\t"
       << _covariance_shifts[site_i](0, 0) << "\t"
@@ -198,71 +198,71 @@ void KalmanSciFiAlignment::Save() {
 }
 
 void KalmanSciFiAlignment::SaveToRootFile() {
-  for ( int id = 0; id < 30; id+=3 ) {
-    if ( id == 0 ) {
+  for ( int id = 1; id < 31; id+=3 ) {
+    if ( id == 3 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station1_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station1_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 3 ) {
+    if ( id == 6 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station2_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station2_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 6 ) {
+    if ( id == 9 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station3_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station3_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 9 ) {
+    if ( id == 12 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station4_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station4_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 12 ) {
+    if ( id == 15 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station5_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station5_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 15 ) {
+    if ( id == 18 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station6_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station6_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 18 ) {
+    if ( id == 21 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station7_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station7_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 21 ) {
+    if ( id == 24 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station8_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station8_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 24 ) {
+    if ( id == 27 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();
       station9_x->SetPoint(static_cast<Int_t> (n), n, xd);
       station9_y->SetPoint(static_cast<Int_t> (n), n, yd);
     }
-    if ( id == 27 ) {
+    if ( id == 30 ) {
       double xd = _shifts_array[id](0, 0);
       double yd = _shifts_array[id](1, 0);
       double n = station1_x->GetN();

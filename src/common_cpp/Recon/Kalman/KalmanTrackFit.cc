@@ -64,7 +64,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     track->Initialise();
     //
     // Set up KalmanSites to be used. KalmanSite = Measurement Plane
-    std::vector<KalmanSite> sites;
+    KalmanSitesVector sites;
     Initialise(seed, sites, kalman_align);
 
     size_t numb_measurements = sites.size();
@@ -100,11 +100,12 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
       LaunchMisaligmentSearch(track, sites, kalman_align);
     }
     delete track;
+    delete seed;
   }
 }
 
 void KalmanTrackFit::Initialise(KalmanSeed *seed,
-                                std::vector<KalmanSite> &sites,
+                                KalmanSitesVector &sites,
                                 KalmanSciFiAlignment &kalman_align) {
   TMatrixD a0 = seed->initial_state_vector();
 
@@ -112,8 +113,11 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
 
   TMatrixD C(n_param, n_param);
   C.Zero();
-  for ( int i = 0; i < n_param; i++ )
+  for ( int i = 0; i < n_param; i++ ) {
     C(i, i) = _seed_cov;
+  }
+  C(0, 0) = 1.;
+  C(2, 2) = 1.;
 
   std::vector<SciFiCluster*> clusters = seed->clusters();
   KalmanSite first_plane;
@@ -128,7 +132,6 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   first_plane.set_input_shift(kalman_align.get_shifts(id_0));
   first_plane.set_input_shift_covariance(kalman_align.get_cov_shifts(id_0));
   sites.push_back(first_plane);
-
   size_t numb_sites = clusters.size();
   for ( size_t j = 1; j < numb_sites; ++j ) {
     KalmanSite a_site;
@@ -151,7 +154,7 @@ void KalmanTrackFit::Initialise(KalmanSeed *seed,
   }
 }
 
-void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites) {
+void KalmanTrackFit::RunFilter(KalmanTrack *track, KalmanSitesVector &sites) {
   // Filter the first state.
   track->Filter(sites, 0);
 
@@ -169,7 +172,7 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
   }
 }
 
-void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &sites, int ignore_i) {
+void KalmanTrackFit::RunFilter(KalmanTrack *track, KalmanSitesVector &sites, int ignore_i) {
   size_t numb_measurements = sites.size();
 
   if ( ignore_i < 2 || ignore_i > 4 ) {
@@ -199,7 +202,7 @@ void KalmanTrackFit::RunFilter(KalmanTrack *track, std::vector<KalmanSite> &site
 }
 
 void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
-                                               std::vector<KalmanSite> &sites,
+                                               KalmanSitesVector &sites,
                                                KalmanSciFiAlignment &kalman_align) {
   //
   // Set up the ROOT output file where we save progress
@@ -214,7 +217,7 @@ void KalmanTrackFit::LaunchMisaligmentSearch(KalmanTrack *track,
   // Fit excluding a station.
   //
   for ( int station_i = 2; station_i < 5; ++station_i ) {
-    std::vector<KalmanSite> sites_copy(sites);
+    KalmanSitesVector sites_copy(sites);
     // Fit without station i.
     RunFilter(track, sites_copy, station_i);
     track->ComputeChi2(sites_copy);
@@ -243,7 +246,7 @@ void KalmanTrackFit::FilterVirtual(KalmanSite &a_site) {
 }
 
 void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
-                          std::vector<KalmanSite> sites,
+                          KalmanSitesVector sites,
                           SciFiEvent &event) {
   //
   // Convert KalmanTrack to SciFiTrack
@@ -260,20 +263,26 @@ void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
   event.add_scifitrack(track);
 }
 
-void KalmanTrackFit::DumpInfo(std::vector<KalmanSite> const &sites) {
+void KalmanTrackFit::DumpInfo(KalmanSitesVector const &sites) {
   size_t numb_sites = sites.size();
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanSite site = sites[i];
-    std::cerr << "==========================================" << std::endl;
-    std::cerr << "SITE ID: " << site.id() << std::endl;
-    std::cerr << "SITE Z: " << site.z() << std::endl;
-    std::cerr << "Measurement: " << (site.measurement())(0, 0) << std::endl;
-    std::cerr << "================Residuals================" << std::endl;
-    std::cerr << (site.residual(KalmanSite::Projected))(0, 0) << std::endl;
-    std::cerr << (site.residual(KalmanSite::Filtered))(0, 0) << std::endl;
-    std::cerr << (site.residual(KalmanSite::Smoothed))(0, 0) << std::endl;
-    std::cerr << "==========================================" << std::endl;
+    Squeak::mout(Squeak::info)
+    << "=========================================="  << "\n"
+    << "SITE ID: " << site.id() << "\n"
+    << "SITE Z: " << site.z()   << "\n"
+    << "Measurement: " << (site.measurement())(0, 0) << "\n"
+    << "Projection: " << (site.a(KalmanSite::Projected))(0, 0) << " "
+                      << (site.a(KalmanSite::Projected))(1, 0) << " "
+                      << (site.a(KalmanSite::Projected))(2, 0) << " "
+                      << (site.a(KalmanSite::Projected))(3, 0) << "\n"
+    << "================Residuals================"   << "\n"
+    << (site.residual(KalmanSite::Projected))(0, 0)  << "\n"
+    << (site.residual(KalmanSite::Filtered))(0, 0)   << "\n"
+    << (site.residual(KalmanSite::Smoothed))(0, 0)   << "\n"
+    << "=========================================="
+    << std::endl;
   }
 }
 

@@ -53,6 +53,8 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
+// #include "src/map/MapCppTrackerRecon/SciFiGeometryHelper.hh"
+
 namespace MAUS {
 
 class MapCppTrackerReconTest {
@@ -165,9 +167,11 @@ class MapCppTrackerReconTest {
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
+  bool _kalman_on;
   ///  Vector with the MICE SciFi Modules.
   std::vector<const MiceModule*> modules;
 
+  // std::map<int, SciFiPlaneGeometry> _geometry_map;
   /// File streams for writing data
   ofstream _of1, _of2, _of3, _of4, _of5, _of6;
 

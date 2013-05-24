@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTrackerRecon 
+/** @class MapCppTrackerRecon
  *  Digitize events by running Tracker electronics simulation.
  *
  */
@@ -29,16 +29,14 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-// #include <cmath>
-// #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
-// #include <algorithm>
+#include <map>
 
 // Other headers
-#include "Interface/Squeak.hh"
 #include "Interface/Squeal.hh"
+#include "Interface/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -47,9 +45,6 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 
-#include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
@@ -61,8 +56,17 @@
 
 namespace MAUS {
 
+struct SciFiPlaneGeometry;
+
 class MapCppTrackerRecon {
+
  public:
+  /** Constructor - initialises pointers to NULL */
+  MapCppTrackerRecon();
+
+  /** Constructor - deletes any allocated memory */
+  ~MapCppTrackerRecon();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -123,11 +127,13 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  bool read_in_json(std::string json_data, MAUS::Spill &spill);
+  void read_in_json(std::string json_data);
 
   void save_to_json(MAUS::Spill &spill);
 
   void print_event_info(MAUS::SciFiEvent &event);
+
+  void kalman_fit(MAUS::SciFiEvent &evt);
 
  private:
   /// This should be the classname
@@ -135,19 +141,21 @@ class MapCppTrackerRecon {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.
-  double minPE;
+  double  _min_npe;
   /// Value above which reconstruction is aborted.
-  int ClustException;
+  int _size_exception;
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
   bool _kalman_on;
-  ///  Vector with the MICE SciFi Modules.
-  std::vector<const MiceModule*> modules;
+
+  ///  Map of the planes geometry specifications.
+  std::map<int, SciFiPlaneGeometry> _geometry_map;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

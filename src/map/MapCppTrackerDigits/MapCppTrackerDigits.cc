@@ -26,6 +26,7 @@ namespace MAUS {
 
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
+  return true;
 }
 
 bool MapCppTrackerDigits::death() {

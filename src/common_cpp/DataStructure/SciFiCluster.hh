@@ -31,7 +31,6 @@
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-
 namespace MAUS {
 
 class SciFiCluster {
