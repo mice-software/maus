@@ -119,7 +119,7 @@ class Tracker:
                 y0 = trk.get_circle_y0()
                 dsdz = trk.get_dsdz()
                 if ( trker_num == 0 ):
-                  dsdz = -dsdz  # Needed due to the way we plot
+                    dsdz = -dsdz  # Needed due to the way we plot
                 rad = trk.get_R()
                 self.seeds_circles.append(make_circle(x0, y0, rad))
                 # Pull out the turning angles of each seed spacepoint
