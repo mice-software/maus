@@ -708,11 +708,11 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
         // Remainder should be ~0 if correct n_ji and m are found
         double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) / (true_dphi[i] + 2*n*CLHEP::pi))
                                    - (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
-        std::cerr << "find_n_turns: dz_i = " << dz[i] << ", dphi_i = " << dphi[i];
-        std::cerr << ", true_dphi_i = " << true_dphi[i]; 
-        std::cerr << ", dz_j = " << dz[i+1] << ", dphi_j = " << dphi[i+1];
-        std::cerr << ", true_dphi_j = " << true_dphi[i+1]; 
-        std::cerr << ", m = " << m << ", n = " << n << ", remainder = " << remainder;
+        // std::cerr << "find_n_turns: dz_i = " << dz[i] << ", dphi_i = " << dphi[i];
+        // std::cerr << ", true_dphi_i = " << true_dphi[i];
+        // std::cerr << ", dz_j = " << dz[i+1] << ", dphi_j = " << dphi[i+1];
+        // std::cerr << ", true_dphi_j = " << true_dphi[i+1];
+        // std::cerr << ", m = " << m << ", n = " << n << ", remainder = " << remainder;
         if ( remainder < _AB_cut ) {
           std::cerr << ", passed\n";
           found = true;

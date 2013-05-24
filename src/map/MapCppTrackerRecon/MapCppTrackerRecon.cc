@@ -70,7 +70,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
   read_in_json(document);
   Spill& spill = *_spill_cpp;
 
-
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
     std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
