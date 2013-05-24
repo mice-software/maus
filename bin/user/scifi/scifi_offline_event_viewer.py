@@ -345,7 +345,7 @@ def main(file_name):
             c_trk_sz.Update()
             # if ( t1.num_htracks < 1):
               # raw_input("Found one!")
-            raw_input("Press any key to move to the next spill...")
+            # raw_input("Press any key to move to the next spill...")
             print 'Helical tracks found: ' + \
                   str(t1.num_htracks + t2.num_htracks)
             mg[0].Clear()
