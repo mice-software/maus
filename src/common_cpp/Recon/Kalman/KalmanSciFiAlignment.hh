@@ -117,8 +117,8 @@ class KalmanSciFiAlignment {
  private:
   std::string _file, _fname;
 
-  TMatrixD _shifts_array[30];
-  TMatrixD _covariance_shifts[30];
+  TMatrixD _shifts_array[31];
+  TMatrixD _covariance_shifts[31];
 
   TFile  *_rootfile;
   TGraph *station1_x;

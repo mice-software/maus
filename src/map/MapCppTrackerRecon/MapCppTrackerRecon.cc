@@ -70,9 +70,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
   read_in_json(document);
   Spill& spill = *_spill_cpp;
 
-  // Json::Value root = JsonWrapper::StringToJson(document);
-  // SpillProcessor spill_proc;
-  // Spill spill = *spill_proc.JsonToCpp(root);
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -81,8 +78,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
         std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
-        // Squeak::mout(Squeak::info) << "Digits found " <<
-        //          event->digits().size() << std::endl;
         if ( event->digits().size() ) {
           cluster_recon(*event);
         }

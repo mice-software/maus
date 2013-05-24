@@ -44,7 +44,7 @@ KalmanSciFiAlignment::KalmanSciFiAlignment()
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   _fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+_file;
 
-  for ( int i = 0; i < 30; ++i ) {
+  for ( int i = 0; i < 31; ++i ) {
     _shifts_array[i].     ResizeTo(3, 1);
     _covariance_shifts[i].ResizeTo(3, 3);
     _shifts_array[i].     Zero();
