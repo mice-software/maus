@@ -32,6 +32,9 @@ controlled by a lock file. Additionally the lock file contains a list of child
 process ids. If this script fails to clean up at the end of the run, for example
 if it is killed by an external signal, then next time it is run we can
 kill all child processes.
+
+Any command line arguments are passed to the MAUS input-transform and all MAUS
+merge-output processes
 """
 
 # would be great to have some tests for this
@@ -95,7 +98,7 @@ def maus_web_app_process(maus_web_log_file_name):
     print 'with pid', proc.pid # pylint: disable = E1101
     return proc
 
-def maus_input_transform_process(maus_input_log):
+def maus_input_transform_process(maus_input_log, _extra_args):
     """
     Open the input transform process - runs against data and performs
     reconstruction, leaving reconstructed data in a database somewhere.
@@ -109,12 +112,13 @@ def maus_input_transform_process(maus_input_log):
                        ['python', maus_inp, '-mongodb_database_name='+MONGODB,
                         '-type_of_dataflow=multi_process_input_transform',
 				        '-verbose_level=0',
-						'-DAQ_hostname=miceraid5'],
+						'-DAQ_hostname=miceraid5']+_extra_args,
                        stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid # pylint: disable = E1101
     return proc
     
-def maus_merge_output_process(maus_output_log, reducer_name, output_name):
+def maus_merge_output_process(maus_output_log, reducer_name, output_name,
+                              _extra_args):
     """
     Open the merge output process - runs against reconstructed data and collects
     into a bunch of histograms.
@@ -126,7 +130,7 @@ def maus_merge_output_process(maus_output_log, reducer_name, output_name):
     proc = subprocess.Popen(
                        ['python', maus_red, '-mongodb_database_name='+MONGODB,
                         '-type_of_dataflow=multi_process_merge_output',
-                        '-output_json_file_name='+output_name],
+                        '-output_json_file_name='+output_name]+_extra_args,
                        stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid # pylint: disable = E1101
     return proc
@@ -156,13 +160,15 @@ def monitor_mongodb(url, database_name, file_handle):
             continue
         for collection_name in collection_names:
             collection = mongodb[collection_name]
-            space = mongodb.validate_collection(collection_name)["datasize"]
-            space_kb = space / 1024
-            space_mb = space_kb / 1024
-            print >> file_handle, \
-                "  Collection: %s : %d documents (%d bytes %d Kb %d Mb)" \
-                % (collection_name, collection.count(), space, \
-                space_kb, space_mb)
+            validate = mongodb.validate_collection(collection_name)
+            if "datasize" in validate.keys():
+                space = validate["datasize"]
+                space_kb = space / 1024
+                space_mb = space_kb / 1024
+                print >> file_handle, \
+                    "  Collection: %s : %d documents (%d bytes %d Kb %d Mb)" \
+                    % (collection_name, collection.count(), space, \
+                    space_kb, space_mb)
     file_handle.flush()
 
 def force_kill_maus_web_app():
@@ -249,7 +255,10 @@ def main():
     hits ctrl-c
 
     If the subprocesses fail, have a go at setting up rabbitmcq and mongo
+
+    Pass any command line arguments to all MAUS processes
     """
+    extra_args = sys.argv[1:]
     try:
         force_kill_maus_web_app()
         clear_lockfile()
@@ -261,12 +270,12 @@ def main():
         debug_json = os.path.join(log_dir, 'reconstruct_monitor_reducer.json')
 
         PROCESSES.append(celeryd_process(celery_log))
-        PROCESSES.append(maus_web_app_process(maus_web_log))
-        PROCESSES.append(maus_input_transform_process(input_log))
+        #PROCESSES.append(maus_web_app_process(maus_web_log))
+        PROCESSES.append(maus_input_transform_process(input_log, extra_args))
         for reducer in REDUCER_LIST:
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
-                                                      reducer, debug_json))
+                                              reducer, debug_json, extra_args))
 
         make_lockfile(PROCESSES)
         print '\nCTRL-C to quit\n'
