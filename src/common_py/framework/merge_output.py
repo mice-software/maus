@@ -17,6 +17,7 @@ Multi-process dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 from datetime import datetime
 import json
 import sys
@@ -265,31 +266,30 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 try:
                     docs = self.doc_store.get_since(self.collection,
                                                     self.last_time)
-                except Exception as exc:
-                    sys.excepthook(*sys.exc_info())
-                    raise DocumentStoreException(exc)
-                # Iterate using while, not for, since docs is an
-                # iterator which streams data from database and we
-                # want to detect database errors.
-                while True:
-                    try:
-                        doc = docs.next()
-                    except StopIteration:
-                        # No more data so exit inner loop.
-                        break
-                    except Exception as exc:
-                        raise DocumentStoreException(exc)
-                    doc_id = doc["_id"]
-                    doc_time = doc["date"]
-                    spill = doc["doc"]
-                    print "Read event %s (dated %s)" % (doc_id, doc_time)
-                    if (doc_time > self.last_time):
-                        self.last_time = doc_time
-                    self.process_event(spill)
+                    # Iterate using while, not for, since docs is an
+                    # iterator which streams data from database and we
+                    # want to detect database errors.
+                    while True:
+                        try:
+                            doc = self.docs_next(docs)
+                        except StopIteration:
+                            # No more data so exit inner loop.
+                            break
+                        doc_id = doc["_id"]
+                        doc_time = doc["date"]
+                        spill = doc["doc"]
+                        print "Read event %s (dated %s)" % (doc_id, doc_time)
+                        if (doc_time > self.last_time):
+                            self.last_time = doc_time
+                        self.process_event(spill)
+                except Exception as exc: # catch MongoDB errors...
+                    sys.excepthook(*sys.exc_info())                   
+                    #raise DocumentStoreException(exc)
         except KeyboardInterrupt:
             print "Received SIGINT - closing"
             sys.exit(0)
         except:
+            sys.excepthook(*sys.exc_info())
             raise
         finally:
             # Finish the final run.
@@ -310,3 +310,25 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
+
+    def docs_next(self, _docs):
+        """
+        Try to access mongodb a few times before giving up
+        """
+        max_number_of_retries = 10
+        retry_time = 2
+        retry_counter = 0
+        while True:
+            try:
+                return _docs.next()
+            except StopIteration:
+                raise
+            except Exception as exc:
+                if retry_counter >= max_number_of_retries:
+                    print 'Failed to access docstore - giving up'
+                    raise
+                time.sleep(retry_time)
+                retry_counter += 1
+                print 'Failed to access docstore', retry_counter
+
+

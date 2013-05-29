@@ -7,14 +7,14 @@
 egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 download_package_list="\
- anyjson python-dateutil>=1.5,<2.0 billiard amqp>=1.0.8,<1.1.0 kombu \
+ anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
- coverage ipython doxypy pylint==0.25.1 bitarray celery \
- pymongo scons readline numpy==1.5 matplotlib \
+ coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
+ pymongo=2.3 scons readline numpy==1.5 matplotlib \
 "
 # these are the packages to install - note the version dependencies
 package_list="\
- anyjson python-dateutil billiard amqp kombu \
+ anyjson python-dateutil \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline numpy matplotlib \

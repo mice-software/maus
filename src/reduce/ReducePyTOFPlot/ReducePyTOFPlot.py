@@ -678,6 +678,24 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         image_list = []
 
+        # construct a list of histos to put in the root canvas
+        histos = [self._ht01, self._ht02, self._ht12, self.hspslabx_0,
+                  self.hspslabx_1, self.hspslabx_2, self.hspslaby_0, 
+                  self.hspslaby_1, self.hspslaby_2, self.hnsp_0, self.hnsp_1,
+                  self.hnsp_2]
+        for tof_station_hists in self.hpmthits: # histo for each pmt
+            for tof_plane_hists in tof_station_hists:
+                histos += tof_plane_hists
+        for tof_station_hists in self.hslabhits: # histo for each plane
+            histos += tof_station_hists
+        histos += self.hspxy # hist for each station
+        # now add them to the root/json document
+        tag = __name__
+        content = __name__
+        doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
+        image_list.append(doc)
+
+
         # Slab Hits X
         # file label = tof_hit_x.eps
         tag = "tof_SlabHits_X"

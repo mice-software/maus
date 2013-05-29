@@ -131,7 +131,8 @@ class MongoDBDocumentStore(DocumentStore):
         @param docid Document ID.
         @return document or None.
         """
-        doc = self.__data_store[collection].find_one({"_id":docid})
+        doc = self.__data_store[collection].find_one({"_id":docid},
+                                                     timeout=False)
         if doc != None:
             return doc['doc']
         else:
@@ -154,7 +155,7 @@ class MongoDBDocumentStore(DocumentStore):
             result = self.__data_store[collection].find().sort("date")
         else:
             result = self.__data_store[collection].find(\
-                {"date":{"$gt":earliest}}).sort("date")
+                               {"date":{"$gt":earliest}}).sort("date")
         return result
 
     def delete_document(self, collection, docid):
