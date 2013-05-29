@@ -85,15 +85,16 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         separate processes for input-map and reduce-output)
         """
         single_name = os.path.expandvars \
-                              ('$MAUS_ROOT_DIR/tmp/test_mauscelery_single')
+                              ('$MAUS_ROOT_DIR/tmp/test_multi_single')
         multi_name = os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_multi')
+                               ('$MAUS_ROOT_DIR/tmp/test_multi_multi')
         split_name_in =  os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_in')
+                               ('$MAUS_ROOT_DIR/tmp/test_multi_split_in')
         split_name_out = os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_out')
+                               ('$MAUS_ROOT_DIR/tmp/test_multi_split_out')
         # warning - can only use MongoDBDocumentStore with one concurrent run -
         # no test for job that spawned the document!    
+        start_time = time.time()
         print split_name_in
         run_simulate_mice('multi_process_input_transform',
                           split_name_in, False,
@@ -104,6 +105,17 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
                   docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')
         print single_name
         run_simulate_mice('pipeline_single_thread', single_name)
+        print "Finished single - waiting for multi_split_out to finish"
+        end_time_first = time.time()
+        while time.time()-end_time_first < 2*(end_time_first-start_time) and \
+              out_proc.poll() == None:
+            print 'Sleeping for', time.time()-end_time_first, 'out of', \
+                  2*(end_time_first-start_time), 'seconds'
+            time.sleep(10)
+        if out_proc.returncode == None:
+            print 'test_multi_split_out job is still running - killing it'
+            out_proc.send_signal(signal.SIGINT) #pylint: disable=E1101
+        time.sleep(1)
         print multi_name
         run_simulate_mice('multi_process', multi_name)
         self.assertFalse(os.path.exists(split_name_in+'.json'))
@@ -112,9 +124,6 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
                       split_name_out+'.json']
         # merge_output hopefully finished in the split multi - equivalent
         # process has run twice in the other two subprocesses + transforms
-        print 'killing', split_name_out, 'job'
-        out_proc.send_signal(signal.SIGINT) #pylint: disable=E1101
-        time.sleep(1) # give a chance for signal and file close to come through
         return file_names
 
     def sort_by_maus_event_type(self, lines): # pylint: disable = R0201
@@ -169,8 +178,10 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
                 self.assertEqual(number, run_nums.values()[0][0])
         dates = self._get_data(files, 'JobFooter', 'end_of_job')
         spill_numbers = self._get_data(files, 'Spill', 'spill_number')
-        for spill_number in spill_numbers.values()[1:]:
-            self.assertEqual(sorted(spill_numbers.values()[0]),
+        ref_file_name = spill_numbers.keys()[0]
+        for file_name, spill_number in spill_numbers.iteritems():
+            print 'Comparing', ref_file_name, 'with', file_name
+            self.assertEqual(sorted(spill_numbers[ref_file_name]),
                              sorted(spill_number))
         for end_of_job in dates.values():
             self.assertEqual(len(end_of_job), 1)
