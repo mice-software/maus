@@ -10,11 +10,11 @@ download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo=2.3 scons readline numpy==1.5 matplotlib \
+ pymongo==2.3 readline numpy==1.5 matplotlib==1.1.0 \
 "
 # these are the packages to install - note the version dependencies
 package_list="\
- anyjson python-dateutil \
+ anyjson python-dateutil kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline numpy matplotlib \
@@ -37,7 +37,8 @@ if [ "$1" ]; then
         easy_install -zmaxeb . $package
     done
     downloaded_list=`ls`
-    echo "INFO: Downloaded following packages\n$downloaded_list"
+    echo "INFO: Downloaded the following packages"
+    echo "$downloaded_list"
     echo "INFO: Packing them now - they can be found tarred in $egg_source"
     for item in $downloaded_list
     do

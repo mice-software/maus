@@ -25,6 +25,9 @@ import celery.task.control # pylint: disable=E0611, F0401
 import pymongo
 import pymongo.errors
 import subprocess
+import time
+import sys 
+import signal 
 
 class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -38,10 +41,14 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         down) or no active nodes
         """
         try:
+            proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+            time.sleep(5)
             active_nodes = \
                   celery.task.control.inspect().active() # pylint: disable=E1101
-        except: #pylint: disable=W0702
-            self.assertTrue(False, "Failed to inspect celery workers")
+            proc.send_signal(signal.SIGKILL)
+        except Exception: #pylint: disable=W0702
+            sys.excepthook(*sys.exc_info())
+            self.assertTrue(False)
         self.assertNotEqual(active_nodes, None)
 
     def test_mongodb_is_alive(self):
@@ -67,6 +74,7 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
                                                     'src/mausweb/manage.py')
         proc = subprocess.Popen(['python', '-m', maus_web])        
         proc.wait() # pylint: disable=E1101
+        proc,send_signal(signal.SIGINT)
         self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":

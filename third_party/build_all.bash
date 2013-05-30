@@ -18,6 +18,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # Exit the script if ANY command fails
     set -e
+    # Overwrite python modules with copies pulled down from web - will get 
+    # latest versions (remove before putting this code into production) 
+    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash 1
+    # Now build libraries
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     if [ $? != 0 ]; then

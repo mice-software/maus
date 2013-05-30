@@ -258,12 +258,12 @@ def cleanup(_procs):
     """
     returncode = 0
     print 'Exiting... killing all MAUS processes'
+    for process in _procs:
+        if process.poll() == None:
+            print 'Attempting to kill process', str(process.pid),
+            process.send_signal(signal.SIGINT)
     while len(_procs) > 0:
         _proc_alive = []
-        for process in _procs:
-            if process.poll() == None:
-                print 'Attempting to kill process', str(process.pid),
-                process.send_signal(signal.SIGINT)
             if process.poll() == None:
                 print '... Process did not die - it is still working '+\
                       '(check the log file)'
