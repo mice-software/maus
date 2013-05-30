@@ -29,7 +29,6 @@ import time
 import pymongo
 import unittest 
 import json
-import sys
 
 import celery.task.control #pylint: disable=E0611, F0401
 
@@ -67,12 +66,12 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls): #pylint: disable=C0103
         cls.proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
         time.sleep(5)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls): #pylint: disable=C0103
         if cls.proc != None:
             print "Killing celeryd process", cls.proc.pid
             cls.proc.send_signal(signal.SIGKILL)
@@ -102,8 +101,8 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         single_name = os.path.expandvars \
                               ('$MAUS_ROOT_DIR/tmp/test_multi_single')
-        multi_name = os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_multi_multi')
+#        multi_name = os.path.expandvars \
+#                               ('$MAUS_ROOT_DIR/tmp/test_multi_multi')
         split_name_in =  os.path.expandvars \
                                ('$MAUS_ROOT_DIR/tmp/test_multi_split_in')
         split_name_out = os.path.expandvars \
@@ -115,7 +114,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         proc_list += [run_simulate_mice('pipeline_single_thread', single_name)]
 #        print multi_name
 #        proc_list += [run_simulate_mice('multi_process', multi_name,
-#                 docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')]
+#                docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')]
         print split_name_in
         proc_list += [run_simulate_mice('multi_process_input_transform',
                       split_name_in, False, 'test_multi_split',

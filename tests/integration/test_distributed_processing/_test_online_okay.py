@@ -46,7 +46,7 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
             active_nodes = \
                   celery.task.control.inspect().active() # pylint: disable=E1101
             proc.send_signal(signal.SIGKILL)
-        except Exception: #pylint: disable=W0702
+        except Exception: #pylint: disable=W0703
             sys.excepthook(*sys.exc_info())
             self.assertTrue(False)
         self.assertNotEqual(active_nodes, None)
@@ -74,7 +74,7 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
                                                     'src/mausweb/manage.py')
         proc = subprocess.Popen(['python', '-m', maus_web])        
         proc.wait() # pylint: disable=E1101
-        proc,send_signal(signal.SIGINT)
+        proc.send_signal(signal.SIGINT)
         self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":

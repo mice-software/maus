@@ -264,6 +264,7 @@ def cleanup(_procs):
             process.send_signal(signal.SIGINT)
     while len(_procs) > 0:
         _proc_alive = []
+        for process in _procs:
             if process.poll() == None:
                 print '... Process did not die - it is still working '+\
                       '(check the log file)'
