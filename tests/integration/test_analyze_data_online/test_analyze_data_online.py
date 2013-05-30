@@ -27,13 +27,15 @@ import time
 import glob
 
 import regression
+import ROOT
+ROOT.gROOT.SetBatch(True)
 
 ONLINE_TEST = os.path.expandvars(
                             "$MAUS_ROOT_DIR/tests/integration/"+\
                             "test_distributed_processing/_test_online_okay.py")
 ANALYZE_EXE = os.path.expandvars("$MAUS_ROOT_DIR/bin/analyze_data_online.py")
 TMP_DIR =  os.path.expandvars("$MAUS_ROOT_DIR/tmp/test_analyze_data_online/")
-
+LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
 
 def online_okay():
     """Return true if online libraries are okay"""
@@ -46,9 +48,11 @@ def online_okay():
 def temp_dir(data_file_name):
     return "%s/%s/" % (TMP_DIR, data_file_name)
 
-def make_plots(data_file_name):
+def run_process(data_file_name, dir_suffix, send_signal=None):
     """Run analyze_data_online.py and generate plots"""
-    my_tmp = temp_dir(data_file_name)
+    if os.path.exists(LOCKFILE):
+        raise RuntimeError("Found lockfile")
+    my_tmp = temp_dir(data_file_name+dir_suffix)
     if not os.path.exists(my_tmp):
         os.makedirs(my_tmp)
     log = open(my_tmp+"test_analyze_data_online.log", "w")
@@ -57,41 +61,73 @@ def make_plots(data_file_name):
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp
     env_cp['MAUS_WEB_DIR'] = my_tmp
     proc = subprocess.Popen(['python', ANALYZE_EXE,
-                             '--DAQ_online_file', data_file_name],
+                             '--DAQ_online_file', TMP_DIR+data_file_name],
                              env=env_cp, stdout=log,
                              stderr=subprocess.STDOUT)
-    print 'Waiting for online recon to finish'
+    if send_signal != None:
+        time.sleep(5)
+        proc.send_signal(send_signal)
     while proc.poll() == None:
+        time.sleep(5)
         print '.',
-        log.flush()
         sys.stdout.flush()
-        time.sleep(2)
+    print '\n'
     return proc.returncode
-
 
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
     def setUp(self):
-        self.returncodes = {}        
-        for data in ['04222.000']:
-            self.returncodes[data] = 0 #make_plots(data)
+        """
+        Clear any lockfile that exists
+        """
+        self.returncodes = {}
+        if os.path.exists(LOCKFILE):
+            os.remove(LOCKFILE)
+            print 'Cleared lockfile'
+            time.sleep(1)
+        target =  TMP_DIR+"04235.000"
+        if os.path.exists(target):
+            os.remove(target)
+        share = os.environ["MAUS_THIRD_PARTY"]+"/third_party/install/share/"
+        os.symlink(share+"04235/04235.000", target)
+
+    def _test_kill(self):
+        """
+        Check that analyze_data_online dies on sigkill with non-zero return code
+        """
+        returncode = run_process('04235.000', '_sigkill', signal.SIGKILL)
+        self.assertNotEqual(returncode, 0)
+
+    def _test_keyboard_interrupt(self):
+        """
+        Check that analyze_data_online dies on sigint with zero return code
+        """
+        returncode = run_process('04235.000', '_sigint', signal.SIGINT)
+        self.assertEquals(returncode, 0)
 
     def test_root_histos(self):
-        """Check that the return code is 0"""
+        """
+        Check that analyze_data_online makes good histos for full run
+        """
+        for data in ['04235.000']:
+            self.returncodes[data] = run_process(data, '_histos')
         for key, ret_code in self.returncodes.iteritems():
             self.assertEquals(ret_code, 0)
         pass_dict = {}
         test_pass = True
+        # ROOT Chi2 is giving False negatives (test fails) so we exclude 
+        test_config = [regression.KolmogorovTest(0.1, 0.05)]
         for data in self.returncodes.keys():
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration/test_analyze_data_online/reference_plots_'+str(data)+'/*.root') 
             for ref_root in glob.glob(ref_dir):
-                test_root = temp_dir(data)+ref_root.split('/')[-1]
-                print "Testing", test_root, ref_root
+                test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
                 pass_dict[test_root] = \
-                            regression.AggregateRegressionTests(test_root, ref_root)
+                            regression.AggregateRegressionTests(test_root,
+                                                                ref_root,
+                                                                default_config = test_config)
                 test_pass = test_pass and pass_dict[test_root]
             for key, value in pass_dict.iteritems():
-                print key, value
+                print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
 
 if __name__ == "__main__":

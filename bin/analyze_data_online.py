@@ -171,6 +171,22 @@ def monitor_mongodb(url, database_name, file_handle):
                     space_kb, space_mb)
     file_handle.flush()
 
+def force_kill_celeryd():
+    """
+    celeryd likes to leave lurking subprocesses. This function searches the
+    process table for celeryd child process and kills it.
+    """
+    ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+    pids = []
+    for line in ps_out.split('\n')[1:]:
+        if line.find('celeryd') > -1:
+            words = line.split()
+            pids.append(int(words[1]))
+            print "Found lurking celeryd process", pids[-1]
+    for a_pid in pids:
+        os.kill(a_pid, signal.SIGKILL)
+        print "Killed", a_pid
+
 def force_kill_maus_web_app():
     """
     maus web app spawns a child process that is pretty hard to kill. This
@@ -205,6 +221,7 @@ def clear_lockfile():
         print """
 Found lockfile - this may mean you have an existing session running elsewhere.
 Kill existing session? (y/N)""" 
+        sys.stdout.flush()
         user_input = raw_input()
         if len(user_input) == 0 or user_input[0].lower() != 'y':
             # note this doesnt go through cleanup function - just exits
@@ -220,6 +237,8 @@ Kill existing session? (y/N)"""
             print 'Killed', pid
         # maus web app spawns a child that needs special handling
         force_kill_maus_web_app()
+        # celeryd must die
+        force_kill_celeryd()
         time.sleep(3)
 
 def make_lockfile(PROCESSES):# pylint:disable = C0103, W0621
@@ -237,16 +256,32 @@ def cleanup():
     """
     Kill any subprocesses of this process
     """
+    global PROCESSES
+    returncode = 0
     print 'Exiting... killing all MAUS processes'
-    for process in PROCESSES:
-        if process.poll() == None:
-            process.send_signal(signal.SIGKILL)
-            print 'Killed process '+str(process.pid)
+    while len(PROCESSES) > 0:
+        _proc_alive = []
+        for process in PROCESSES:
+            if process.poll() == None:
+                print 'Attempting to kill process', str(process.pid),
+                process.send_signal(signal.SIGINT)
+            if process.poll() == None:
+                print '... Process did not die - it is still working '+\
+                      '(check the log file)'
+                _proc_alive.append(process)
+            else:
+                print '... Process', str(process.pid), \
+                      'is dead with return code', str(process.returncode)
+                returncode = process.returncode
+        sys.stdout.flush()
+        PROCESSES = _proc_alive
+        time.sleep(10)
     if os.path.exists(LOCKFILE):
         os.remove(LOCKFILE)
         print 'Cleared lockfile'
     else:
         print 'Strange, I lost the lockfile...'
+    return returncode
 
 
 def main():
@@ -259,8 +294,10 @@ def main():
     Pass any command line arguments to all MAUS processes
     """
     extra_args = sys.argv[1:]
+    returncode = 0
     try:
         force_kill_maus_web_app()
+        force_kill_celeryd()
         clear_lockfile()
         log_dir = os.environ['MAUS_WEB_MEDIA_RAW']
 
@@ -282,14 +319,17 @@ def main():
         mongo_log = open(os.path.join(log_dir, 'mongodb.log'), 'w')
         while poll_processes(PROCESSES):
             monitor_mongodb("localhost:27017", MONGODB, mongo_log)
+            sys.stdout.flush()
+            sys.stderr.flush()
             time.sleep(POLL_TIME)
     except KeyboardInterrupt:
         print "Closing"
     except Exception:
         sys.excepthook(*sys.exc_info())
-        sys.exit(1) # still goes into finally loop
+        returncode = 1
     finally:
-        cleanup()
+        returncode = cleanup()+returncode
+        sys.exit(returncode)
 
 if __name__ == "__main__":
     main()

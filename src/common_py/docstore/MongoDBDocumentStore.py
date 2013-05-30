@@ -20,8 +20,10 @@ MongoDB-based document store.
 from datetime import datetime
 import time
 import pymongo
+from pymongo.errors import OperationFailure
 
 from docstore.DocumentStore import DocumentStore
+from docstore.DocumentStore import DocumentStoreException
 
 class MongoDBDocumentStore(DocumentStore):
     """
@@ -51,14 +53,17 @@ class MongoDBDocumentStore(DocumentStore):
         @param parameters Connection information.
         @throws KeyError. If mongodb_host, mongodb_port or
         mongodb_database_name are not provided. 
-        @throws pymongo.errors.AutoReconnect. If the database cannot
+        @throws DocumentStoreException. If the database cannot
         be contacted using the given host and port.
         """
-        self.__mongodb = pymongo.Connection(
-            parameters["mongodb_host"],
-            parameters["mongodb_port"])
-        self.__data_store = \
-            self.__mongodb[parameters["mongodb_database_name"]]
+        try:
+            self.__mongodb = pymongo.Connection(
+                parameters["mongodb_host"],
+                parameters["mongodb_port"])
+            self.__data_store = \
+                self.__mongodb[parameters["mongodb_database_name"]]
+        except pymongo.errors.AutoReconnect as exc:
+            raise DocumentStoreException(exc)
 
     def collection_names(self):
         """ 
@@ -130,13 +135,18 @@ class MongoDBDocumentStore(DocumentStore):
         @param collection Collection name.
         @param docid Document ID.
         @return document or None.
+        @throws DocumentStoreException if the operation fails - currently not
+                sure under what circumstances operation failure may occur
         """
-        doc = self.__data_store[collection].find_one({"_id":docid},
-                                                     timeout=False)
-        if doc != None:
-            return doc['doc']
-        else:
-            return None
+        try:
+            doc = self.__data_store[collection].find_one({"_id":docid},
+                                                         timeout=False)
+            if doc != None:
+                return doc['doc']
+            else:
+                return None
+        except pymongo.errors.OperationFailure as exc:
+            raise DocumentStoreException(exc)
 
     def get_since(self, collection, earliest = None):
         """ 
@@ -150,13 +160,18 @@ class MongoDBDocumentStore(DocumentStore):
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
         Documents are sorted earliest to latest.
+        @throws DocumentStoreException if the operation fails - currently not
+                sure under what circumstances operation failure may occur
         """
-        if (earliest == None):
-            result = self.__data_store[collection].find().sort("date")
-        else:
-            result = self.__data_store[collection].find(\
-                               {"date":{"$gt":earliest}}).sort("date")
-        return result
+        try:
+            if (earliest == None):
+                result = self.__data_store[collection].find().sort("date")
+            else:
+                result = self.__data_store[collection].find(\
+                                   {"date":{"$gt":earliest}}).sort("date")
+            return result
+        except pymongo.errors.OperationFailure as exc:
+            raise DocumentStoreException(exc)
 
     def delete_document(self, collection, docid):
         """ 

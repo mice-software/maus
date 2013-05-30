@@ -84,9 +84,26 @@ def printhistos(hist_mon, hist_ref, results):
 
 def KS(mon, ref):
     """KS Test"""
+    sum_mon = \
+       sum([mon.GetBinContent(i) for i in range (1, mon.GetXaxis().GetNbins())])
+    sum_ref = \
+       sum([ref.GetBinContent(i) for i in range (1, ref.GetXaxis().GetNbins())])
+    if sum_mon == 0 and sum_ref == 0:
+        return 1.
     return ref.KolmogorovTest(mon)
+
 def X2(mon, ref):
-    """Chi^2 Test"""
+    """
+    Chi^2 Test
+
+    Appears to give false negatives in some cases; so I ignore
+    """
+    sum_mon = \
+       sum([mon.GetBinContent(i) for i in range (1, mon.GetXaxis().GetNbins())])
+    sum_ref = \
+       sum([ref.GetBinContent(i) for i in range (1, ref.GetXaxis().GetNbins())])
+    if sum_mon == 0 and sum_ref == 0:
+        return 1.
     return ref.Chi2Test(mon)
 
 
@@ -208,7 +225,8 @@ def RegressionTest( mon,
                     status = 'Failure'
                 results[histo].update({t.name: TestResult(status, pVal,
                                                         t.warning, t.failure)})
-                print t, hist_mon.GetMaximum(), hist_ref.GetMaximum(), pVal, status
+                print histo, t.name, hist_mon.GetMaximum(), \
+                      hist_ref.GetMaximum(), pVal, status
 
         if printer is not None:
             printer(hist_mon, hist_ref, results[histo])

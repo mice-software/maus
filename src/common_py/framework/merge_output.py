@@ -21,7 +21,9 @@ import time
 from datetime import datetime
 import json
 import sys
+import os
 
+import pymongo.errors
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
 from framework.utilities import DocumentStoreUtilities
@@ -248,7 +250,13 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputting a spill, birthing or deathing the merger or
         outputer or merging an end_of_run spill.
         """
-        # Darkness and sinister evil - somewhere in the combination of ROOT,
+        # Darkness and sinister evil 1 - the loop structure and exception
+        # handling in this code is quite elaborate. Requirements:
+        # * If we receive a sigint we should exit after clearing mongo buffer
+        # * If mongo access throws an error we should ignore it
+        # * See #1190
+
+        # Darkness and sinister evil 2 - somewhere in the combination of ROOT,
         # SWIG, Python; I get a segmentation fault from OutputCppRoot fillevent
         # (*_outfile) << fillEvent; command depending
         # on which function I call outputer.save(...) from when outputer is
@@ -261,6 +269,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             self.job_footer = job_footer
             self.start_of_job(job_header)
             run_again = True # always run once
+            keyboard_interrupt = False
             while run_again:
                 run_again = will_run_until_ctrl_c
                 try:
@@ -272,29 +281,48 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     while True:
                         try:
                             doc = self.docs_next(docs)
+                            doc_id = doc["_id"]
+                            doc_time = doc["date"]
+                            spill = doc["doc"]
+                            print "Read event %s (dated %s)" % (doc_id, doc_time)
+                            if (doc_time > self.last_time):
+                                self.last_time = doc_time
+                            self.process_event(spill)
                         except StopIteration:
                             # No more data so exit inner loop.
-                            break
-                        doc_id = doc["_id"]
-                        doc_time = doc["date"]
-                        spill = doc["doc"]
-                        print "Read event %s (dated %s)" % (doc_id, doc_time)
-                        if (doc_time > self.last_time):
-                            self.last_time = doc_time
-                        self.process_event(spill)
-                except Exception as exc: # catch MongoDB errors...
-                    sys.excepthook(*sys.exc_info())                   
-                    #raise DocumentStoreException(exc)
+                            raise
+                        except KeyboardInterrupt:
+                            # If there is a keyboard interrupt we should clear
+                            # the buffer before quitting
+                            print "Received SIGINT in", os.getpid(), \
+                                  "- processing open spills before quitting"
+                            keyboard_interrupt = True
+                except StopIteration:
+                    # No more data so exit inner loop. If we have received a
+                    # SIGINT anywhere, end the loop; otherwise wait for data
+                    if keyboard_interrupt:
+                        print "Finished processing spills and exiting on SIGINT"
+                        break
+                except KeyboardInterrupt:
+                    # If there is a keyboard interrupt we should clear
+                    # the buffer before quitting
+                    print "Received SIGINT in", os.getpid(), \
+                          "- processing open spills before quitting"
+                    keyboard_interrupt = True
+                except DocumentStoreException:
+                    # Some instability in MongoDB - ignore and carry on
+                    sys.excepthook(*sys.exc_info())
         except KeyboardInterrupt:
-            print "Received SIGINT - closing"
+            print "Received SIGINT and dying"
             sys.exit(0)
-        except:
+        except Exception:
             sys.excepthook(*sys.exc_info())
             raise
         finally:
-            # Finish the final run.
-            print "No more data and set to stop - ending run"
-            self.end_of_run()
+            # Finish the final run, if it was started; then finish the job
+            if (self.run_number != None):
+                print "No more data and set to stop - ending run"
+                self.end_of_run()
             print "Ending job"
             self.end_of_job(self.job_footer)
 
@@ -311,22 +339,25 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
 
-    def docs_next(self, _docs):
+    def docs_next(self, _docs, max_number_of_retries=0, retry_time=1):
         """
-        Try to access mongodb a few times before giving up
+        Try to access document from the iterator a few times before giving up
+        @param _docs iterable that points at a set of documents on the docstore
+        @param max_number_of_retries Integer number of times to retry accessing
+               document before giving up
+        @param retry_time time to wait between retries 
         """
-        max_number_of_retries = 10
-        retry_time = 2
+        # Note retry counter 
         retry_counter = 0
         while True:
             try:
                 return _docs.next()
             except StopIteration:
                 raise
-            except Exception as exc:
+            except pymongo.errors.OperationFailure as err:
                 if retry_counter >= max_number_of_retries:
                     print 'Failed to access docstore - giving up'
-                    raise
+                    raise DocumentStoreException(err)
                 time.sleep(retry_time)
                 retry_counter += 1
                 print 'Failed to access docstore', retry_counter
