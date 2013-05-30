@@ -22,6 +22,10 @@ executing transforms on spills.
 
 import json
 import unittest
+import subprocess
+import signal
+import time
+import copy
 
 from datetime import datetime
  
@@ -36,6 +40,20 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
     """
     Test class for Celery workers configured for MAUS.
     """
+
+    proc = None
+    default_config = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+        time.sleep(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.proc != None:
+            print "Killing celeryd process", cls.proc.pid
+            cls.proc.send_signal(signal.SIGKILL)
 
     def setUp(self):
         """ 
@@ -54,8 +72,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                                        "Skip - No active Celery workers")
         # Get the current MAUS version.
         configuration  = Configuration()
-        config_doc = configuration.getConfigJSON()
-        config_dictionary = json.loads(config_doc)
+        self.config_doc = configuration.getConfigJSON()
+        config_dictionary = json.loads(self.config_doc)
         self.__version = config_dictionary["maus_version"]
         # Reset the worker. Invoke twice in case the first attempt
         # fails due to mess left by previous test.
@@ -71,12 +89,11 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         broadcast("birth", 
-            arguments={"configuration":"""{"maus_version":"%s"}""" \
-                       % self.__version,
+            arguments={"configuration":self.config_doc,
                        "transform":"MapPyDoNothing", 
                        "config_id":config_id}, reply=True)
 
-    def birth(self, config_id, configuration = "{}", transform = "MapPyDoNothing"): # pylint:disable = R0201, C0301
+    def birth(self, config_id, configuration = None, transform = "MapPyDoNothing"): # pylint:disable = R0201, C0301
         """
         Configure the Celery workers, via a broadcast.
         @param self Object reference.
@@ -85,10 +102,13 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         @param transform Transform specification.
         @return status of update.
         """
+        if configuration == None:
+            configuration = self.config_doc
         return broadcast("birth", 
             arguments={"configuration":configuration, \
                        "transform":transform, 
-                       "config_id":config_id}, reply=True)
+                       "config_id":config_id,
+                       "run_number":1}, reply=True)
 
     def validate_configuration(self, configuration, transform,
         config_id = None):
@@ -123,7 +143,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                 "Configuration has no configuration entry")
             self.assertEquals(configuration,
                 worker_config["configuration"],
-                "Unexpected configuration value")
+                "Unexpected configuration value\n\n%s\n\n%s" % (configuration,
+                worker_config["configuration"]))
             self.assertTrue(worker_config.has_key("transform"),
                 "Configuration has no transform entry")
             self.assertEquals(transform, worker_config["transform"],
@@ -172,24 +193,19 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                 self.assertTrue(len(errors) > 0, 
                     "Expected a list of error information")
 
-    def test_get_maus_config(self):
-        """
-        Test get_maus_configuration broadcast command.
-        @param self Object reference.
-        """
-        # Check using default values.
-        configuration = """{"maus_version":"%s"}""" % self.__version
-        self.validate_configuration(configuration, "MapPyDoNothing")
-
     def test_birth(self):
         """
-        Test birth broadcast command.
+        Test birth broadcast command. 
+
+        Note we also test mausworker.get_maus_configuration here.
+
         @param self Object reference.
         """
         config_id = datetime.now().microsecond
         transform = "MapPyPrint"
-        configuration = """{"TOFconversionFactor":%s, "maus_version":"%s"}""" \
-            % (config_id, self.__version)
+        configuration = json.loads(self.config_doc)
+        configuration["TOFconversionFactor"] = 1
+        configuration = json.dumps(configuration)
         result = self.birth(config_id, configuration, transform)
         print "birth(OK): %s " % result
         # Check the status and that the configuration has been 
@@ -293,12 +309,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         Test death broadcast command.
         @param self Object reference.
         """
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         result.sort()
         print "death: %s " % result
         self.validate_status(result)
         # Expect subsequent attempt to succeed.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
 
     def test_death_exception(self):
@@ -316,11 +332,11 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Check the status is OK.
         self.validate_status(result)
         # Now death the transform.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         print "death(transform.death exception): %s " % result
         self.validate_status(result, "error")
         # Expect subsequent attempt to succeed.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
 
     def test_process(self):
@@ -352,7 +368,7 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         self.validate_status(result)
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
         # Call process.
         result = execute_transform.delay("{}", 1) 
