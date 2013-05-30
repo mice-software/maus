@@ -25,7 +25,6 @@ import unittest
 import subprocess
 import signal
 import time
-import copy
 
 from datetime import datetime
  

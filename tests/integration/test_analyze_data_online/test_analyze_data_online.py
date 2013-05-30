@@ -28,7 +28,7 @@ import glob
 
 import regression
 import ROOT
-ROOT.gROOT.SetBatch(True)
+ROOT.gROOT.SetBatch(True) # pylint: disable = E1101
 
 ONLINE_TEST = os.path.expandvars(
                             "$MAUS_ROOT_DIR/tests/integration/"+\
@@ -37,15 +37,10 @@ ANALYZE_EXE = os.path.expandvars("$MAUS_ROOT_DIR/bin/analyze_data_online.py")
 TMP_DIR =  os.path.expandvars("$MAUS_ROOT_DIR/tmp/test_analyze_data_online/")
 LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
 
-def online_okay():
-    """Return true if online libraries are okay"""
-    log = open("/dev/null", "w")
-    proc = subprocess.Popen(["python", ONLINE_TEST])#, stdout=log,
-                                                    # stderr=subprocess.STDOUT)
-    proc.wait() # pylint: disable=E1101
-    return proc.returncode == 0 # pylint: disable=E1101
-
 def temp_dir(data_file_name):
+    """
+    Return the directory name for temp data associated with given file
+    """
     return "%s/%s/" % (TMP_DIR, data_file_name)
 
 def run_process(data_file_name, dir_suffix, send_signal=None):
@@ -76,7 +71,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
 
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         """
         Clear any lockfile that exists
         """
@@ -118,13 +113,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
         for data in self.returncodes.keys():
-            ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration/test_analyze_data_online/reference_plots_'+str(data)+'/*.root') 
+            ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration"+\
+               "/test_analyze_data_online/reference_plots_'+str(data)+'/*.root')
             for ref_root in glob.glob(ref_dir):
                 test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
-                pass_dict[test_root] = \
-                            regression.AggregateRegressionTests(test_root,
-                                                                ref_root,
-                                                                default_config = test_config)
+                pass_dict[test_root] = regression.AggregateRegressionTests(
+                                                   test_root,
+                                                   ref_root,
+                                                   default_config = test_config)
                 test_pass = test_pass and pass_dict[test_root]
             for key, value in pass_dict.iteritems():
                 print 'test file:', key, 'passes:', value

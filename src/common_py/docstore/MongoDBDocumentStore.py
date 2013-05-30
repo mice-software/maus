@@ -20,7 +20,6 @@ MongoDB-based document store.
 from datetime import datetime
 import time
 import pymongo
-from pymongo.errors import OperationFailure
 
 from docstore.DocumentStore import DocumentStore
 from docstore.DocumentStore import DocumentStoreException

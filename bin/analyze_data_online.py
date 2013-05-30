@@ -241,27 +241,26 @@ Kill existing session? (y/N)"""
         force_kill_celeryd()
         time.sleep(3)
 
-def make_lockfile(PROCESSES):# pylint:disable = C0103, W0621
+def make_lockfile(_procs):
     """
     Make a lock file listing pid of this process and all children
     """
     print 'Making lockfile '+LOCKFILE
     fout = open(LOCKFILE, 'w')
     print >> fout, os.getpid()
-    for proc in PROCESSES:
+    for proc in _procs  :
         print >> fout, proc.pid
     fout.close()
 
-def cleanup():
+def cleanup(_procs):
     """
     Kill any subprocesses of this process
     """
-    global PROCESSES
     returncode = 0
     print 'Exiting... killing all MAUS processes'
-    while len(PROCESSES) > 0:
+    while len(_procs) > 0:
         _proc_alive = []
-        for process in PROCESSES:
+        for process in _procs:
             if process.poll() == None:
                 print 'Attempting to kill process', str(process.pid),
                 process.send_signal(signal.SIGINT)
@@ -274,7 +273,7 @@ def cleanup():
                       'is dead with return code', str(process.returncode)
                 returncode = process.returncode
         sys.stdout.flush()
-        PROCESSES = _proc_alive
+        _procs = _proc_alive
         time.sleep(10)
     if os.path.exists(LOCKFILE):
         os.remove(LOCKFILE)
@@ -282,7 +281,6 @@ def cleanup():
     else:
         print 'Strange, I lost the lockfile...'
     return returncode
-
 
 def main():
     """
@@ -307,7 +305,7 @@ def main():
         debug_json = os.path.join(log_dir, 'reconstruct_monitor_reducer.json')
 
         PROCESSES.append(celeryd_process(celery_log))
-        #PROCESSES.append(maus_web_app_process(maus_web_log))
+        PROCESSES.append(maus_web_app_process(maus_web_log))
         PROCESSES.append(maus_input_transform_process(input_log, extra_args))
         for reducer in REDUCER_LIST:
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
@@ -328,8 +326,9 @@ def main():
         sys.excepthook(*sys.exc_info())
         returncode = 1
     finally:
-        returncode = cleanup()+returncode
+        returncode = cleanup(PROCESSES)+returncode
         sys.exit(returncode)
 
 if __name__ == "__main__":
     main()
+

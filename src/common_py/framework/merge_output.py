@@ -269,49 +269,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             self.job_footer = job_footer
             self.start_of_job(job_header)
             run_again = True # always run once
-            keyboard_interrupt = False
             while run_again:
-                run_again = will_run_until_ctrl_c
-                try:
-                    docs = self.doc_store.get_since(self.collection,
-                                                    self.last_time)
-                    # Iterate using while, not for, since docs is an
-                    # iterator which streams data from database and we
-                    # want to detect database errors.
-                    while True:
-                        try:
-                            doc = self.docs_next(docs)
-                            doc_id = doc["_id"]
-                            doc_time = doc["date"]
-                            spill = doc["doc"]
-                            print "Read event %s (dated %s)" % (doc_id, doc_time)
-                            if (doc_time > self.last_time):
-                                self.last_time = doc_time
-                            self.process_event(spill)
-                        except StopIteration:
-                            # No more data so exit inner loop.
-                            raise
-                        except KeyboardInterrupt:
-                            # If there is a keyboard interrupt we should clear
-                            # the buffer before quitting
-                            print "Received SIGINT in", os.getpid(), \
-                                  "- processing open spills before quitting"
-                            keyboard_interrupt = True
-                except StopIteration:
-                    # No more data so exit inner loop. If we have received a
-                    # SIGINT anywhere, end the loop; otherwise wait for data
-                    if keyboard_interrupt:
-                        print "Finished processing spills and exiting on SIGINT"
-                        break
-                except KeyboardInterrupt:
-                    # If there is a keyboard interrupt we should clear
-                    # the buffer before quitting
-                    print "Received SIGINT in", os.getpid(), \
-                          "- processing open spills before quitting"
-                    keyboard_interrupt = True
-                except DocumentStoreException:
-                    # Some instability in MongoDB - ignore and carry on
-                    sys.excepthook(*sys.exc_info())
+                run_again = will_run_until_ctrl_c and self._execute_inner_loop()
         except KeyboardInterrupt:
             print "Received SIGINT and dying"
             sys.exit(0)
@@ -326,6 +285,57 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             print "Ending job"
             self.end_of_job(self.job_footer)
 
+    def _execute_inner_loop(self):
+        """
+        Get documents off the doc store and process them.
+
+        @returns False if a keyboard interrupt is received, indicating that the
+                 iteration should not wait for new data
+        """
+        keyboard_interrupt = False
+        try:
+            docs = self.doc_store.get_since(self.collection,
+                                            self.last_time)
+            # Iterate using while, not for, since docs is an
+            # iterator which streams data from database and we
+            # want to detect database errors.
+            while True:
+                try:
+                    doc = self.docs_next(docs)
+                    doc_id = doc["_id"]
+                    doc_time = doc["date"]
+                    spill = doc["doc"]
+                    print "Read event %s (dated %s)" % (doc_id,
+                                                        doc_time)
+                    if (doc_time > self.last_time):
+                        self.last_time = doc_time
+                    self.process_event(spill)
+                except StopIteration:
+                    # No more data so exit inner loop.
+                    raise
+                except KeyboardInterrupt:
+                    # If there is a keyboard interrupt we should clear
+                    # the buffer before quitting
+                    print "Received SIGINT in", os.getpid(), \
+                          "- processing open spills before quitting"
+                    keyboard_interrupt = True
+        except StopIteration:
+            # No more data so exit inner loop. If we have received a
+            # SIGINT anywhere, end the loop; otherwise wait for data
+            if keyboard_interrupt:
+                print "Finished processing spills and exiting on SIGINT"
+                return False
+        except KeyboardInterrupt:
+            # If there is a keyboard interrupt we should clear
+            # the buffer before quitting
+            print "Received SIGINT in", os.getpid(), \
+                  "- processing open spills before quitting"
+            keyboard_interrupt = True
+        except DocumentStoreException:
+            # Some instability in MongoDB - ignore and carry on
+            sys.excepthook(*sys.exc_info())
+        return True
+
     @staticmethod
     def get_dataflow_description():
         """
@@ -339,7 +349,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
 
-    def docs_next(self, _docs, max_number_of_retries=0, retry_time=1):
+    @staticmethod
+    def docs_next(_docs, max_number_of_retries=0, retry_time=1):
         """
         Try to access document from the iterator a few times before giving up
         @param _docs iterable that points at a set of documents on the docstore

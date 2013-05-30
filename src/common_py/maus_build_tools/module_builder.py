@@ -212,10 +212,11 @@ def fail_path(directory):
     """
     Return the name of the temporary file that flags a failed subproject build
     """
-    fail_path = os.path.split(directory)[-1]
-    fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
-    fail_path = os.path.expandvars(fail_path)
-    return fail_path
+    _fail_path = os.path.split(directory)[-1]
+    _fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp',
+                                                     _fail_path+'_failed_build')
+    _fail_path = os.path.expandvars(_fail_path)
+    return _fail_path
 
 def build_okay(directory):
     """
