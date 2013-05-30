@@ -52,7 +52,7 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
-  for ( size_t dig = 0; dig < evt.digits().size(); dig++ ) {
+  for ( size_t dig = 0; dig < evt.digits().size(); ++dig ) {
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }
@@ -68,7 +68,7 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   
 
       double pe = seed->get_npe();
       // Look for a neighbour.
-      for ( size_t j = i+1; j < seeds_size; j++ ) {
+      for ( size_t j = i+1; j < seeds_size; ++j ) {
         if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
@@ -114,7 +114,7 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   double Pitch                = this_plane.Pitch;
   double CentralFibre         = this_plane.CentralFibre;
   // alpha is the distance to the central fibre.
-  double alpha = clust->get_channel() - CentralFibre;
+  double alpha   = clust->get_channel() - CentralFibre;
   double dist_mm = Pitch * 7.0 / 2.0 * alpha;
 
   ThreeVector perp(-plane_direction.y(), plane_direction.x(), plane_direction.z());
@@ -123,6 +123,11 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   clust->set_direction(plane_direction);
   clust->set_position(position);
   clust->set_alpha(alpha);
+
+  double mc_x = clust->get_true_position().x();
+  double mc_y = clust->get_true_position().y();
+  double mc_z = clust->get_true_position().z();
+  // if ( position.x() - mc_x >
 }
 
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {

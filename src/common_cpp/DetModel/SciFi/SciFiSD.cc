@@ -26,7 +26,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
 
-  /* 
+  /*
   if ( pid == -13 ) {
     edep = 10.;
   } else {
@@ -68,6 +68,20 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   _hits["sci_fi_hits"][hit_i]["position"]["y"] = Pos.y();
   _hits["sci_fi_hits"][hit_i]["position"]["z"] = Pos.z();
 
+  // this is the rotation of the fibre array
+  /*
+  // From tracker 0 to tracker 1, the modules global rotation IS different.
+  // What DOESN'T change is the plane relative rotation wrt the tracker frame.
+  std::cerr << "Module name: " << _module->fullName() << "\n"
+            << "Module GLOBAL rotation: " << _module->globalRotation() << "\n"
+            << "Plane direction: " << dir << "\n"
+            //<< "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
+            << "Rotation relatively to: \n" 
+            << "Station: " << _module->relativeRotation(_module->mother()) << "\n"
+            << "Tracker: " << _module->relativeRotation(_module->mother()->mother()) << "\n"
+            << "Solenoid: " << _module->relativeRotation(_module->mother()->mother()->mother()) << "\n"
+  << "--------------------------------------------------------------------\n";
+  */
   return true;
 }
 

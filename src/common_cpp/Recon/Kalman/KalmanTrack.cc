@@ -641,8 +641,8 @@ void KalmanTrack::ComputeChi2(const std::vector<KalmanSite> &sites) {
 
   int id = sites[0].id();
 
-  if ( id <= 14 ) _tracker = 0;
-  if ( id > 14 )  _tracker = 1;
+  if ( id < 0 ) _tracker = 0;
+  if ( id > 0 ) _tracker = 1;
 
   for ( size_t i = 0; i < _n_sites; ++i ) {
     KalmanSite site = sites[i];

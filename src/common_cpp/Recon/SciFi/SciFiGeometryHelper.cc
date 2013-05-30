@@ -43,13 +43,19 @@ std::map<int, SciFiPlaneGeometry> SciFiGeometryHelper::build_geometry_map() {
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
       G4RotationMatrix rel_rot(module->relativeRotation(module->mother()    // plane
-                                                              ->mother()    // tracker
-                                                              ->mother())); // solenoid
+                                                              ->mother()));    // tracker
+                                                              //->mother())); // solenoid
       direction *= rel_rot;
 
       ThreeVector position  = clhep_to_root(module->globalPosition());
       ThreeVector reference = get_reference_frame_pos(tracker_n);
-      ThreeVector tracker_ref_frame_pos = position - reference;
+      ThreeVector tracker_ref_frame_pos;
+      // The if statements are used so that the stations Z is always > 0.
+      if ( tracker_n == 0 ) {
+        tracker_ref_frame_pos = reference - position;
+      } else {
+        tracker_ref_frame_pos = position - reference;
+      }
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction    = direction;

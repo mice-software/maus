@@ -133,7 +133,7 @@ class MapCppTrackerRecon {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
-  void kalman_fit(MAUS::SciFiEvent &evt);
+  // void kalman_fit(MAUS::SciFiEvent &evt);
 
  private:
   /// This should be the classname

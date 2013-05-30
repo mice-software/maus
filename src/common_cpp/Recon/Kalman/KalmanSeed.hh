@@ -23,6 +23,10 @@
 
 #include "TMatrixD.h"
 #include "TMath.h"
+#include "TVirtualFitter.h"
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "Interface/Squeak.hh"
@@ -38,16 +42,18 @@ class KalmanSeed {
   template <class PRTrack>
   void Build(const PRTrack* pr_track);
 
-  void Build(const SciFiEvent &evt, bool field_on);
+  // void Build(const SciFiEvent &evt, bool field_on);
 
-  template <class PRTrack>
-  void ProcessMeasurements(const PRTrack *track);
+  // template <class PRTrack>
+  // void ProcessMeasurements(const PRTrack *track);
 
-  TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed);
+  TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
+                                     const SciFiSpacePointPArray &spacepoints);
 
-  TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed);
+  TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
+                                     const SciFiSpacePointPArray &spacepoints);
 
-  void RetrieveClusters(std::vector<SciFiSpacePoint*> &spacepoints, double &seed_pz);
+  void RetrieveClusters(std::vector<SciFiSpacePoint*> &spacepoints);
 
   bool is_helical()  const { return _helical; }
 
@@ -61,10 +67,10 @@ class KalmanSeed {
 
   double momentum() const { return _momentum; }
 
-  std::vector<SciFiSpacePoint*> spacepoints() { return _spacepoints; }
+  // SciFiSpacePointPArray spacepoints() { return _spacepoints; }
 
   int n_parameters() const { return _n_parameters; }
-
+/*
   void get_gradients(double &mx, double &my);
 
   void get_tan_lambda(double &tanlambda);
@@ -78,13 +84,13 @@ class KalmanSeed {
   double mx_fit(const double *par);
 
   double my_fit(const double *par);
-
+*/
  private:
-  double _x[5], _y[5], _z[5], _phi[5], _s[5];
+  // double _x[5], _y[5], _z[5], _phi[5], _s[5];
 
-  std::vector<SciFiCluster*> _clusters;
+  SciFiClusterPArray _clusters;
 
-  std::vector<SciFiSpacePoint*> _spacepoints;
+  // std::vector<SciFiSpacePoint*> _spacepoints;
 
   TMatrixD _a0;
 
@@ -113,22 +119,26 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
 
   _a0.ResizeTo(_n_parameters, 1);
 
-  ProcessMeasurements<PRTrack>(pr_track);
+  //ProcessMeasurements<PRTrack>(pr_track);
+  SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints();
+  RetrieveClusters(spacepoints);
 
-  _a0 = ComputeInitialStateVector(pr_track);
+  _a0 = ComputeInitialStateVector(pr_track, spacepoints);
 }
 
+/*
 template <class PRTrack>
 void KalmanSeed::ProcessMeasurements(const PRTrack *pr_track) {
-  for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
-    SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
-    _spacepoints.push_back(sp);
-  }
+  _spacepoints = pr_track->get_spacepoints();
+  // for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
+  //  SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
+  //  _spacepoints.push_back(sp);
+  // }
   double pz_from_timing;
 
   RetrieveClusters(_spacepoints, pz_from_timing);
 }
-
+*/
 } // ~namespace MAUS
 
 #endif

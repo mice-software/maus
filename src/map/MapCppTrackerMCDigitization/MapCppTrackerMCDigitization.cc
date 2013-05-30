@@ -35,7 +35,6 @@ MapCppTrackerMCDigitization::~MapCppTrackerMCDigitization() {
     }
 }
 
-
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerMCDigitization";
 
@@ -129,9 +128,9 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     }
 
     // Adds Effects of Noise from Electrons to MC
-    if (_configJSON["SciFiNoiseFlag"].asInt()) {
-      add_elec_noise(digits, spill.GetSpillNumber(), static_cast<int>(event_i));
-    }
+    // if (_configJSON["SciFiNoiseFlag"].asInt()) {
+    //  add_elec_noise(digits, spill.GetSpillNumber(), static_cast<int>(event_i));
+    // }
 
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
@@ -166,7 +165,7 @@ void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
-    std::cerr << "Bad json document" << std::endl;
+    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
@@ -195,18 +194,18 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       double time1   = a_hit->GetTime();
       // int tdcCounts = compute_tdc_counts(time1);
 
-      // loop over all the other hits
+      // Loop over all the other hits.
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
           MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
           nPE += edep_j*_eV_to_phe;
           same_digit->GetChannelId()->SetUsed(true);
-        } // if-statement
-      } // ends l-loop over all the array
+        }
+      } // ends loop over all the array
       int tracker = a_hit->GetChannelId()->GetTrackerNumber();
       int station = a_hit->GetChannelId()->GetStationNumber();
-      int plane = a_hit->GetChannelId()->GetPlaneNumber();
+      int plane   = a_hit->GetChannelId()->GetPlaneNumber();
 
       SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
                                            tracker, station, plane, chanNo, nPE, time1);

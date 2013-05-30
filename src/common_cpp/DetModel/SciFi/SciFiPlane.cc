@@ -80,12 +80,12 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   const Hep3Vector rowz(0., 0., -1.);
   zflip.setRows(rowx, rowy, rowz);
 
-  G4RotationMatrix* trot = new G4RotationMatrix(mod->globalRotation());
+  G4RotationMatrix* trot = new G4RotationMatrix(mod->relativeRotation(mod->mother()));
 
-  size_t found;
-  found = doubletName.find("Tracker1");
-  if (found != G4String::npos)
-    (*trot) = (*trot)*zflip;
+  // size_t found;
+  // found = doubletName.find("Tracker1");
+  // if (found != G4String::npos)
+  //  (*trot) = (*trot)*zflip;
 
   // this is the rotation of the fibre array
   /*

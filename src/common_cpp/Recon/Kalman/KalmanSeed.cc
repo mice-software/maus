@@ -14,14 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
-#include <iostream>
-#include <fstream>
 
-#include "TVirtualFitter.h"
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 
@@ -34,7 +28,7 @@ bool SortByID(const SciFiCluster *a, const SciFiCluster *b) {
 bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
   return ( a->get_station() < b->get_station() );
 }
-
+/*
 double KalmanSeed::tan_lambda_fit(const double *par) {
   double f = 0;
   for (Int_t i = 0; i < 4; i++) {
@@ -79,12 +73,12 @@ double KalmanSeed::my_fit(const double *par) {
   }
   return f;
 }
-
+*/
 KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {}
 
 KalmanSeed::~KalmanSeed() {}
 
-
+/*
 void KalmanSeed::Build(const SciFiEvent &evt, bool field_on) {
   if ( field_on ) {
     _helical  = true;
@@ -113,17 +107,16 @@ void KalmanSeed::Build(const SciFiEvent &evt, bool field_on) {
     get_circle_param(radius, x0, y0);
     std::cerr << "Circle parameters: " << std::endl;
     std::cerr << radius << " " << x0 << " " << y0 << std::endl;
-/*
-    _s[0] = 0;
-    for ( size_t i = 0; i < 5; ++i ) {
-      _phi[i] = atan2(_y[i]-y0, _x[i] - x0);
-    }
-    for ( size_t i = 0; i < 4; ++i ) {
-      double delta_phi = 
-    }
-    double tanlambda;
-    get_tan_lambda(tanlambda);
-*/
+  //  _s[0] = 0;
+  //  for ( size_t i = 0; i < 5; ++i ) {
+  //    _phi[i] = atan2(_y[i]-y0, _x[i] - x0);
+  //  }
+  //  for ( size_t i = 0; i < 4; ++i ) {
+  //    double delta_phi = 
+  //  }
+  //  double tanlambda;
+  //  get_tan_lambda(tanlambda);
+
     // _a0 = ComputeInitialStateVector(pr_track);
   } else {
     // double mx, my;
@@ -134,7 +127,6 @@ void KalmanSeed::Build(const SciFiEvent &evt, bool field_on) {
 }
 
 void KalmanSeed::get_gradients(double &mx, double &my) {
-/*
   TVirtualFitter::SetDefaultFitter("Minuit");
   TVirtualFitter *fitter = TVirtualFitter::Fitter(0, 3);
   fitter->SetFCN(mx_fit);
@@ -152,7 +144,6 @@ void KalmanSeed::get_gradients(double &mx, double &my) {
   Double_t arglist2[1] = {0};
   fitter2->ExecuteCommand("MIGRAD", arglist2, 0);
   my = fitter->GetParameter(1);
-*/
 }
 
 void KalmanSeed::get_circle_param(double &radius, double &x0, double &y0) {
@@ -188,21 +179,6 @@ void KalmanSeed::get_circle_param(double &radius, double &x0, double &y0) {
   x0     = par[0];
   y0     = par[1];
   radius = par[2];
-  /*
-  TVirtualFitter::SetDefaultFitter("Minuit");
-  TVirtualFitter *fitter = TVirtualFitter::Fitter(0, 3);
-  fitter->SetFCN(circle_fit);
-  fitter->SetParameter(0, "x0",   0, 0.1, 0,0);
-  fitter->SetParameter(1, "y0",   0, 0.1, 0,0);
-  fitter->SetParameter(2, "R",    1, 0.1, 0,0);
-
-  Double_t arglist[1] = {0};
-  fitter->ExecuteCommand("MIGRAD", arglist, 0);
-
-  radius = fitter->GetParameter(0);
-  x0     = fitter->GetParameter(1);
-  y0     = fitter->GetParameter(2);
-  */
 }
 
 void KalmanSeed::get_tan_lambda(double &tanlambda) {
@@ -233,8 +209,10 @@ void KalmanSeed::get_tan_lambda(double &tanlambda) {
 
   tanlambda = par[0];
 }
+*/
 
-TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) {
+TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
+                                               const SciFiSpacePointPArray &spacepoints) {
   // Get seed values.
   double r  = seed->get_R();
   double B  = -4.;
@@ -256,11 +234,11 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) 
 
   double x, y;
   if ( _tracker == 0 ) {
-    x = _spacepoints.back()->get_position().x();
-    y = _spacepoints.back()->get_position().y();
+    x = spacepoints.back()->get_position().x();
+    y = spacepoints.back()->get_position().y();
   } else if ( _tracker == 1 ) {
-    x = _spacepoints.front()->get_position().x();
-    y = _spacepoints.front()->get_position().y();
+    x = spacepoints.front()->get_position().x();
+    y = spacepoints.front()->get_position().y();
   }
 
   TMatrixD a(_n_parameters, 1);
@@ -275,14 +253,20 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed) 
   return a;
 }
 
-TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed) {
+TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
+                                               const SciFiSpacePointPArray &spacepoints) {
   double x, y;
   if ( _tracker == 0 ) {
-    x = _spacepoints.back()->get_position().x();
-    y = _spacepoints.back()->get_position().y();
+    x = spacepoints.back()->get_position().x();
+    y = spacepoints.back()->get_position().y();
   } else if ( _tracker == 1 ) {
-    x = _spacepoints.front()->get_position().x();
-    y = _spacepoints.front()->get_position().y();
+    x = spacepoints.front()->get_position().x();
+    y = spacepoints.front()->get_position().y();
+  } else {
+    x = y = -666; // removes a compiler warning.
+    throw(Squeal(Squeal::recoverable,
+      "Pattern Recon has bad tracker number.",
+      "KalmanSeed::ComputeInitialStateVector"));
   }
 
   double mx = seed->get_mx();
@@ -300,21 +284,21 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed)
   return a;
 }
 
-void KalmanSeed::RetrieveClusters(std::vector<SciFiSpacePoint*> &spacepoints,
-                                  double &seed_pz) {
+void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
   size_t numb_spacepoints = spacepoints.size();
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {
     SciFiSpacePoint *spacepoint = spacepoints[i];
-    size_t num_clusters = spacepoint->get_channels().size();
-    for ( size_t j = 0; j < num_clusters; ++j ) {
+    size_t numb_clusters = spacepoint->get_channels().size();
+    for ( size_t j = 0; j < numb_clusters; ++j ) {
       SciFiCluster *cluster = spacepoint->get_channels()[j];
       _clusters.push_back(cluster);
     }
   }
 
   std::sort(_clusters.begin(), _clusters.end(), SortByID);
-  std::sort(_spacepoints.begin(), _spacepoints.end(), SortByStation);
+  std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
+
   /*
   // Compute pz from tracker timing.
   int last_cluster = clusters.size();

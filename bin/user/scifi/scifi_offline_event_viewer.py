@@ -118,6 +118,8 @@ class Tracker:
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
                 dsdz = trk.get_dsdz()
+                if ( trker_num == 0 ):
+                    dsdz = -dsdz  # Needed due to the way we plot
                 rad = trk.get_R()
                 self.seeds_circles.append(make_circle(x0, y0, rad))
                 # Pull out the turning angles of each seed spacepoint
@@ -170,16 +172,7 @@ class Tracker:
                 self.seeds_y.append(y_per_trk)
                 self.seeds_z.append(z_per_trk)
 
-                if trker_num == 0:
-                    dsdz = - trk.get_dsdz()
-                elif trker_num == 1:
-                    dsdz = trk.get_dsdz()
-                # As the line_sz was drawn in ds - dz space (origin set by
-                # the 1st spoint) dsdz is the same but the axis intercept
-                # needs to be altered to plot in s - z space correctly.
-                sz_c = trk.get_line_sz_c() + self.seeds_s[-1][0] \
-                       - (dsdz * self.seeds_z[-1][0])
-                # sz_c = trk.get_line_sz_c()
+                sz_c = trk.get_line_sz_c()
                 self.seeds_xz.append(make_xz(x0, rad, dsdz, sz_c, 0, 1200))
                 self.seeds_yz.append(make_yz(y0, rad, dsdz, sz_c, 0, 1200))
                 self.sz_fits.append(make_line(dsdz, sz_c, 0, 1200))

@@ -413,8 +413,8 @@ class PatternRecognition {
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
-    static const int _m_limit = 10;          /** Max number of turns between stations allowed */
-    static const int _n_limit = 10;          /** Max number of turns between stations allowed */
+    static const int _m_limit = 3;          /** Max number of turns between stations allowed */
+    static const int _n_limit = 3;          /** Max number of turns between stations allowed */
     static const double _sd_1to4 = 0.3844;   /** Position error associated with stations 1 t0 4 */
     static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
     static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */

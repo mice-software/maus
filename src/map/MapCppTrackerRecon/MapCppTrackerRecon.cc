@@ -196,6 +196,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   }
 }
 
+/*
 void MapCppTrackerRecon::kalman_fit(SciFiEvent &evt) {
   std::vector<KalmanSeed*> seeds;
 
@@ -207,6 +208,7 @@ void MapCppTrackerRecon::kalman_fit(SciFiEvent &evt) {
   KalmanTrackFit fit;
   fit.Process(seeds, evt);
 }
+*/
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   Squeak::mout(Squeak::info) << event.digits().size() << " "
