@@ -142,65 +142,40 @@ void KalmanTrack::SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new
 
   TMatrixD a_old(_n_parameters, 1);
   a_old = new_site->a(KalmanSite::Projected);
-  double px = a_old(1, 0);
-  double py = a_old(3, 0);
+  double px    = a_old(1, 0);
+  double py    = a_old(3, 0);
   double kappa = a_old(4, 0);
   double pz = 1./kappa;
   double pt = TMath::Sqrt(px*px+py*py);
-  double lambda = atan2(pz, pt);
+
+  // The angles.
+  double phi    = atan2(px, py);
+  double lambda = atan2(pt, pz);
 
   double momentum = TMath::Sqrt(px*px+py*py+pz*pz);
-  assert(_mass == _mass && "mass is not defined");
 
   // This could be an integral. But I think the planes are too thin
   // and BB barely changes during integration.
   double Delta_p = BetheBlochStoppingPower(momentum)*plane_width;
-  double new_pz;
-  if ( _tracker == 0 ) {
-    new_pz = (momentum+Delta_p)*sin(lambda);
-  } else {
-    new_pz = (momentum-Delta_p)*sin(lambda);
-  }
 
+  double delta_pz = Delta_p * cos(lambda);
+  double delta_pt = Delta_p * sin(lambda);
+
+  double delta_px = delta_pt * cos(phi);
+  double delta_py = delta_pt * sin(phi);
+
+  double new_px = px - delta_px;
+  double new_py = py - delta_py;
+  double new_pz = pz - delta_pz;
   double new_kappa = 1./new_pz;
+
   TMatrixD a_subtracted(_n_parameters, 1);
   a_subtracted = new_site->a(KalmanSite::Projected);
-  a_subtracted(4, 0) = new_kappa;
-
-  new_site->set_a(a_subtracted, KalmanSite::Projected);
-  /*
-  double lambda = atan(pow(px*px+py*py, 0.5)/pz);
-  // assert(tan(lambda)<1 && "Lambda: pt < pz");
-
-  double delta_pt = delta_p * tan(lambda);
-  double delta_pz = delta_p * cos(lambda);
-
-  double pt = tan(lambda)*pz;
-  double phi = acos(px/pt);
-  double delta_px = delta_pt*cos(phi);
-  double delta_py = delta_pt*sin(phi);
-
-  TMatrixD a_projected(5, 1);
-  a_projected = new_site->get_projected_a();
-  double x  = a_projected(0, 0);
-  double px_projected = a_projected(1, 0);
-  double y  = a_projected(2, 0);
-  double py_projected = a_projected(3, 0) - delta_py;
-  double kappa_projected = a_projected(4, 0);
-
-  double new_px = px_projected - delta_px;
-  double new_py = py_projected - delta_py;
-  double new_kappa = 1./(1./kappa_projected - delta_pz);
-
-  TMatrixD a_subtracted(5, 1);
-  a_subtracted(0, 0) = x;
   a_subtracted(1, 0) = new_px;
-  a_subtracted(2, 0) = y;
   a_subtracted(3, 0) = new_py;
   a_subtracted(4, 0) = new_kappa;
 
-  new_site->set_projected_a(a_subtracted);
-*/
+  new_site->set_a(a_subtracted, KalmanSite::Projected);
 }
 
 void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site) {
@@ -336,15 +311,6 @@ void KalmanTrack::UpdateH(const KalmanSite *a_site) {
   double perp_x = perp.x();
   double perp_y = perp.y();
 
-  // TMatrixD a = a_site->get_a(KalmanSite::Projected);
-  // double x_0 = a(0, 0);
-  // double y_0 = a(2, 0);
-
-  // TMatrixD shifts = a_site->get_input_shift();
-  // double x_d     = shifts(0, 0);
-  // double y_d     = shifts(1, 0);
-  // double theta_y = shifts(2, 0);
-
   double pitch = FibreParameters::Pitch();
 
   _H.Zero();
@@ -359,27 +325,6 @@ void KalmanTrack::UpdateH(const KalmanSite *a_site) {
   _S(1, 0) =  perp_y/pitch;
   _S(1, 1) = -perp_x/pitch;
 }
-/*
-  // Define useful factors
-  double cos_theta_cos_thetay = cos_theta*cos(theta_y);
-  double sin_theta_sin_thetay = sin_theta*sin(theta_y);
-  double sin_theta_cos_thetay = sin_theta*cos(theta_y);
-  double cos_theta_sin_thetay = cos_theta*sin(theta_y);
-
-  if ( pitch ) {
-    _H.Zero();
-    _H(0, 0) = - (cos_theta_cos_thetay+sin_theta_sin_thetay)/pitch;
-    _H(0, 2) =   (sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
-    _S.Zero();
-    _S(0, 0) = (cos_theta_cos_thetay-sin_theta_sin_thetay)/pitch;
-    _S(0, 1) = -(sin_theta_cos_thetay-cos_theta_sin_thetay)/pitch;
-    //_R.Zero();
-    //_R(0, 1) = -((x_0-x_d)/pitch)*(-cos_theta_sin_thetay+sin_theta_cos_thetay)+
-    _H.Zero();
-    _S.Zero();
-    _R.Zero();
-  }
-*/
 
 // W = [ V + H C_k-1 Ht + S cov_S_k-1 St ]-1
 // W = [ V +    A       +      B         ]-1
