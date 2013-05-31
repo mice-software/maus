@@ -22,7 +22,7 @@ download_package_list="\
 "
 # these are the packages to install - note the version dependencies
 package_list="\
- anyjson python-dateutil kombu amqplib \
+ anyjson python-dateutil amqplib kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline numpy matplotlib \
