@@ -50,7 +50,6 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     std::vector<const MiceModule*> modules =
       module->findModulesByPropertyString("SensitiveDetector", "SciFi");
     _geometry_map = SciFiGeometryHelper(modules).BuildGeometryMap();
-    SciFiGeometryHelper(modules).DumpPlanesInfo();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -77,7 +76,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
         std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
-/*
         // Build Clusters.
         if ( event->digits().size() ) {
           cluster_recon(*event);
@@ -99,7 +97,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
-*/
         print_event_info(*event);
       }
     } else {
