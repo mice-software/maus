@@ -118,6 +118,13 @@ class MapCppGlobalRawTracks {
       const size_t number_of_slabs,
       MAUS::DataStructure::Global::TrackPoint * track_point);
 
+  double FindEnergy(const double mass,
+                    const double delta_z,
+                    const double delta_t) const;
+
+  double TOFSlabEnergyLoss(const double beta, const double mass) const;
+  double TOFMeanStoppingPower(const double beta, const double mass) const;
+
   void LoadSciFiTrack(
       MAUS::ReconEvent const * const recon_event,
       MAUS::DataStructure::Global::TrackPArray & sci_fi_tracks);
