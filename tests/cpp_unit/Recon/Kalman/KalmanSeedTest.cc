@@ -208,6 +208,7 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
   double my = 2.;
   straight_track.set_my(my);
   straight_track.set_mx(mx);
+  straight_track.set_tracker(0);
   straight_track.set_spacepoints(_spacepoints);
   // Set up stuff for posterior use.
   seed.Build(&straight_track);

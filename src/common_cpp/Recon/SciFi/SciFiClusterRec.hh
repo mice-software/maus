@@ -51,7 +51,7 @@ class SciFiClusterRec {
    */
   SciFiClusterRec(int cluster_exception,
                   double min_npe,
-                  std::map<int, SciFiPlaneGeometry> geometry_map);
+                  const std::map<int, SciFiPlaneGeometry> &geometry_map);
 
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters

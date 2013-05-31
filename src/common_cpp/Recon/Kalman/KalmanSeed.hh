@@ -39,13 +39,12 @@ class KalmanSeed {
 
   ~KalmanSeed();
 
+  KalmanSeed(const KalmanSeed &seed);
+
+  KalmanSeed& operator=(const KalmanSeed& seed);
+
   template <class PRTrack>
   void Build(const PRTrack* pr_track);
-
-  // void Build(const SciFiEvent &evt, bool field_on);
-
-  // template <class PRTrack>
-  // void ProcessMeasurements(const PRTrack *track);
 
   TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
@@ -59,7 +58,7 @@ class KalmanSeed {
 
   bool is_straight() const { return _straight; }
 
-  std::vector<SciFiCluster*> clusters() const { return _clusters; }
+  SciFiClusterPArray clusters() const { return _clusters; }
 
   TMatrixD initial_state_vector() const { return _a0; }
 
@@ -67,30 +66,10 @@ class KalmanSeed {
 
   double momentum() const { return _momentum; }
 
-  // SciFiSpacePointPArray spacepoints() { return _spacepoints; }
-
   int n_parameters() const { return _n_parameters; }
-/*
-  void get_gradients(double &mx, double &my);
 
-  void get_tan_lambda(double &tanlambda);
-
-  void get_circle_param(double &radius, double &x0, double &y0);
-
-  double tan_lambda_fit(const double *par);
-
-  double circle_fit(const double *par);
-
-  double mx_fit(const double *par);
-
-  double my_fit(const double *par);
-*/
  private:
-  // double _x[5], _y[5], _z[5], _phi[5], _s[5];
-
   SciFiClusterPArray _clusters;
-
-  // std::vector<SciFiSpacePoint*> _spacepoints;
 
   TMatrixD _a0;
 
@@ -119,26 +98,12 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
 
   _a0.ResizeTo(_n_parameters, 1);
 
-  //ProcessMeasurements<PRTrack>(pr_track);
   SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints();
   RetrieveClusters(spacepoints);
 
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
 }
 
-/*
-template <class PRTrack>
-void KalmanSeed::ProcessMeasurements(const PRTrack *pr_track) {
-  _spacepoints = pr_track->get_spacepoints();
-  // for ( size_t i = 0; i < pr_track->get_spacepoints().size(); ++i ) {
-  //  SciFiSpacePoint *sp = pr_track->get_spacepoints()[i];
-  //  _spacepoints.push_back(sp);
-  // }
-  double pz_from_timing;
-
-  RetrieveClusters(_spacepoints, pz_from_timing);
-}
-*/
 } // ~namespace MAUS
 
 #endif

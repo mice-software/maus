@@ -25,7 +25,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   int pid = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
-
   /*
   if ( pid == -13 ) {
     edep = 10.;

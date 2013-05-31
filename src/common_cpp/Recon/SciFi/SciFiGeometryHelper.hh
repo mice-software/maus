@@ -36,18 +36,22 @@ struct SciFiPlaneGeometry {
 
 class SciFiGeometryHelper {
  public:
-  explicit SciFiGeometryHelper(std::vector<const MiceModule*> modules);
+  explicit SciFiGeometryHelper(const std::vector<const MiceModule*> &modules);
 
   ~SciFiGeometryHelper();
 
-  std::map<int, SciFiPlaneGeometry> build_geometry_map();
+  std::map<int, SciFiPlaneGeometry> BuildGeometryMap();
 
-  const MiceModule* find_plane(int tracker, int station, int plane);
+  const MiceModule* FindPlane(int tracker, int station, int plane);
 
-  ThreeVector get_reference_frame_pos(int tracker);
+  ThreeVector GetReferenceFramePosition(int tracker);
+
+  void DumpPlanesInfo();
 
  private:
   std::vector<const MiceModule*> _modules;
+
+  std::map<int, SciFiPlaneGeometry> _geometry_map;
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
 

@@ -30,51 +30,50 @@
 namespace MAUS {
 
 class SciFiTrack {
-  public:
+ public:
+  SciFiTrack();
 
-    SciFiTrack();
+  virtual ~SciFiTrack();
 
-    virtual ~SciFiTrack();
+  SciFiTrack(const SciFiTrack &a_track);
 
-    SciFiTrack(const SciFiTrack &a_track);
+  explicit SciFiTrack(const KalmanTrack *kalman_track);
 
-    explicit SciFiTrack(const KalmanTrack *kalman_track);
+  SciFiTrack& operator=(const SciFiTrack &a_track);
 
-    SciFiTrack& operator=(const SciFiTrack &a_track);
+  int  tracker() const      { return _tracker; }
+  void set_tracker(int tracker) { _tracker = tracker; }
 
-    int  tracker() const      { return _tracker; }
-    void set_tracker(int tracker) { _tracker = tracker; }
+  double f_chi2()    const   { return _f_chi2; }
+  void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
 
-    double f_chi2()    const   { return _f_chi2; }
-    void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
+  double s_chi2()    const   { return _s_chi2; }
+  void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
 
-    double s_chi2()    const   { return _s_chi2; }
-    void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
+  int  ndf()     const   { return _ndf; }
+  void set_ndf(int ndf)      { _ndf = ndf; }
 
-    int  ndf()     const   { return _ndf; }
-    void set_ndf(int ndf)      { _ndf = ndf; }
+  double P_value()    const   { return _P_value; }
+  void   set_P_value(double p_value) { _P_value = p_value; }
 
-    double P_value()    const   { return _P_value; }
-    void   set_P_value(double p_value) { _P_value = p_value; }
+  SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
+  void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
+  void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
 
-    SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
-    void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
-    void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
+ private:
+  int _tracker;
 
-  private:
-    int _tracker;
+  double _f_chi2;
 
-    double _f_chi2;
+  double _s_chi2;
 
-    double _s_chi2;
+  int _ndf;
 
-    int _ndf;
+  double _P_value;
 
-    double _P_value;
+  SciFiTrackPointPArray _trackpoints;
 
-    SciFiTrackPointPArray _trackpoints;
-
-    MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
+  MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };
 
 typedef std::vector<SciFiTrack*> SciFiTrackPArray;

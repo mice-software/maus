@@ -19,15 +19,12 @@
 
 namespace MAUS {
 
-SciFiGeometryHelper::SciFiGeometryHelper(std::vector<const MiceModule*> modules)
+SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &modules)
                                         : _modules(modules) {}
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
 
-std::map<int, SciFiPlaneGeometry> SciFiGeometryHelper::build_geometry_map() {
-  // This is the map to be returned.
-  std::map<int, SciFiPlaneGeometry> geometry_map;
-
+std::map<int, SciFiPlaneGeometry> SciFiGeometryHelper::BuildGeometryMap() {
   // Iterate over existing modules, adding planes to the map.
   std::vector<const MiceModule*>::iterator iter;
   for ( iter = _modules.begin(); iter != _modules.end(); iter++ ) {
@@ -44,11 +41,11 @@ std::map<int, SciFiPlaneGeometry> SciFiGeometryHelper::build_geometry_map() {
       ThreeVector direction(0., 1., 0.);
       G4RotationMatrix rel_rot(module->relativeRotation(module->mother()    // plane
                                                               ->mother()));    // tracker
-                                                              //->mother())); // solenoid
+
       direction *= rel_rot;
 
       ThreeVector position  = clhep_to_root(module->globalPosition());
-      ThreeVector reference = get_reference_frame_pos(tracker_n);
+      ThreeVector reference = GetReferenceFramePosition(tracker_n);
       ThreeVector tracker_ref_frame_pos;
       // The if statements are used so that the stations Z is always > 0.
       if ( tracker_n == 0 ) {
@@ -65,13 +62,13 @@ std::map<int, SciFiPlaneGeometry> SciFiGeometryHelper::build_geometry_map() {
 
       int plane_id =  3*(station_n-1) + (plane_n+1);
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
-      geometry_map.insert(std::make_pair(plane_id, this_plane));
+      _geometry_map.insert(std::make_pair(plane_id, this_plane));
     }
   }
-  return geometry_map;
+  return _geometry_map;
 }
 
-const MiceModule* SciFiGeometryHelper::find_plane(int tracker, int station, int plane) {
+const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int plane) {
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < _modules.size(); ++j ) {
     // Find the right module
@@ -96,17 +93,28 @@ const MiceModule* SciFiGeometryHelper::find_plane(int tracker, int station, int 
   return this_plane;
 }
 
-ThreeVector SciFiGeometryHelper::get_reference_frame_pos(int tracker) {
+ThreeVector SciFiGeometryHelper::GetReferenceFramePosition(int tracker) {
   // Reference plane is plane 0, station 1 of current tracker.
   int station = 1;
   int plane   = 0;
   const MiceModule* reference_plane = NULL;
-  reference_plane = find_plane(tracker, station, plane);
+  reference_plane = FindPlane(tracker, station, plane);
 
   assert(reference_plane != NULL);
   ThreeVector reference_pos = clhep_to_root(reference_plane->globalPosition());
 
   return reference_pos;
+}
+
+void SciFiGeometryHelper::DumpPlanesInfo() {
+  std::map<int, SciFiPlaneGeometry>::iterator plane;
+  for ( plane = _geometry_map.begin(); plane != _geometry_map.end(); ++plane ) {
+    Squeak::mout(Squeak::info) << "Plane ID: " << plane->first << "\n"
+                               << "Direction: "<< plane->second.Direction << "\n"
+                               << "Position: " << plane->second.Position << "\n"
+                               << "CentralFibre: "<< plane->second.CentralFibre << "\n"
+                               << "Pitch: "       << plane->second.Pitch << "\n";
+  }
 }
 
 } // ~namespace MAUS

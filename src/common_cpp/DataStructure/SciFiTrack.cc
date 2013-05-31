@@ -51,6 +51,9 @@ SciFiTrack::SciFiTrack(const KalmanTrack *kalman_track): _tracker(-1),
   _s_chi2  = kalman_track->s_chi2();
   _ndf     = kalman_track->ndf();
   _P_value = kalman_track->P_value();
+  if ( _f_chi2  != _f_chi2 )  _f_chi2  = 0;
+  if ( _s_chi2  != _s_chi2 )  _s_chi2  = 0;
+  if ( _P_value != _P_value ) _P_value = 0;
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {

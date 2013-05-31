@@ -38,10 +38,6 @@
 #include "DetModel/SciFi/SciFiSD.hh"
 #include "DetModel/SciFi/DoubletFiberParam.hh"
 
-// NOTE: not sure how Geant4 deals with the deletion
-// of Logical and Solid Volumes;
-// possible bug in the destructor.
-
 // SciFiPlane - Specific parameterisation of the SciFi station
 // to be called by the generic MICE detector construction code.
 //
@@ -60,44 +56,10 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4double doubletThickness = mod->dimensions().y();
 
   G4String doubletName = mod->fullName() + "Doublet";
-  G4String coreName = mod->fullName() + "DoubletCores";
-  G4String clad1Name = mod->fullName() + "DoubletClad1";
-  G4String clad2Name = mod->fullName() + "DoubletClad2";
-
-  // Getting the rotations right.
-  // A "z-flip" is a rotation of 180 degrees over the y axis.
-  // Remember that the rotation matrix for
-  // a rotation over the y axis is given by:
-  //
-  //             [cos(theta)  0    sin(theta)]
-  // R_y(theta) =[0           1        0     ]
-  //             [-sin(theta) 0    cos(theta)]
-  //
-
-  CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0., 0.);
-  const Hep3Vector rowy(0., 1., 0.);
-  const Hep3Vector rowz(0., 0., -1.);
-  zflip.setRows(rowx, rowy, rowz);
+  G4String coreName    = mod->fullName() + "DoubletCores";
 
   G4RotationMatrix* trot = new G4RotationMatrix(mod->relativeRotation(mod->mother()));
 
-  // size_t found;
-  // found = doubletName.find("Tracker1");
-  // if (found != G4String::npos)
-  //  (*trot) = (*trot)*zflip;
-
-  // this is the rotation of the fibre array
-  /*
-  G4ThreeVector dir(0, 1, 0);
-  dir = dir*(*trot);
-
-  std::cerr << "Module name: " << doubletName << "\n"
-            << "Module rotation: " << *(trot) << "\n"
-            // << "Plane direction: " << dir << "\n"
-            << "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
-            << "Mothers rotation is: "      << *(mlv->GetRotation()) << "\n";
-  */
   // this is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,
@@ -111,7 +73,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
                                                false, 0);
 
   // lenght of the tube of fibre
-  G4double tlen = 190.0 * mm;
+  G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
   _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
@@ -130,6 +92,11 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
 
 SciFiPlane::~SciFiPlane() {
   delete physiDoublet;
-
   delete physiCore;
+
+  delete solidDoublet;
+  delete solidCore;
+
+  delete logicDoublet;
+  delete logicCore;
 }

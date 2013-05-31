@@ -21,37 +21,36 @@
 // C headers
 #include <assert.h>
 #include <math.h>
+#include <sstream>
 
 // C++ headers
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sstream>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <map>
 
 #include "TMath.h"
 #include "TMatrixD.h"
 #include "TFile.h"
+#include "TTree.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TH1.h"
 #include "TF1.h"
 #include "TH2F.h"
 #include "TH1F.h"
+#include "TCollection.h"
+#include "TList.h"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "Interface/Squeal.hh"
-#include "Config/MiceModule.hh"
-
-/*
-TODO: adapt to new plane numbering.
-*/
 
 namespace MAUS {
 
@@ -75,7 +74,7 @@ class KalmanSciFiAlignment {
    *  Updates info stored for a given site.
    *
    */
-  void Update(KalmanSite site);
+  void Update(const KalmanSite &site);
 
   /** @brief
    *
@@ -106,41 +105,25 @@ class KalmanSciFiAlignment {
    */
   void CloseRootFile();
 
-  TMatrixD get_shifts(int site_id)     const { return _shifts_array[0]; }
+  TMatrixD get_shifts(int site_id);
 
-  TMatrixD get_cov_shifts(int site_id) const { return _covariance_shifts[0]; }
+  TMatrixD get_cov_shifts(int site_id);
 
-  void set_shifts(TMatrixD shifts, int site_id)        { _shifts_array[0]        = shifts; }
+  void set_shifts(TMatrixD shifts, int site_id)        { _shifts_map[site_id]     = shifts; }
 
-  void set_cov_shifts(TMatrixD cov_s, int site_id)     { _covariance_shifts[0]   = cov_s; }
+  void set_cov_shifts(TMatrixD cov_s, int site_id)     { _covariance_map[site_id] = cov_s; }
 
  private:
   std::string _file, _fname;
 
-  TMatrixD _shifts_array[31];
-  TMatrixD _covariance_shifts[31];
+  std::map<int, TMatrixD> _shifts_map;
+  std::map<int, TMatrixD> _covariance_map;
+
+  TMultiGraph *_graphs_tracker0;
+  TMultiGraph *_graphs_tracker1;
 
   TFile  *_rootfile;
-  TGraph *station1_x;
-  TGraph *station1_y;
-  TGraph *station2_x;
-  TGraph *station2_y;
-  TGraph *station3_x;
-  TGraph *station3_y;
-  TGraph *station4_x;
-  TGraph *station4_y;
-  TGraph *station5_x;
-  TGraph *station5_y;
-  TGraph *station6_x;
-  TGraph *station6_y;
-  TGraph *station7_x;
-  TGraph *station7_y;
-  TGraph *station8_x;
-  TGraph *station8_y;
-  TGraph *station9_x;
-  TGraph *station9_y;
-  TGraph *station10_x;
-  TGraph *station10_y;
+  TTree *_tree;
 };
 
 } // ~namespace MAUS

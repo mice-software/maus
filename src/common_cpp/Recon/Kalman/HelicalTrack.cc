@@ -44,9 +44,9 @@ void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSit
   double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
-  double new_x  = old_x + (1./old_kappa)*( old_mx*sine/a - old_my*(1.-cosine)/a);
+  double new_x  = old_x + (1./old_kappa)*(old_mx*sine/a - old_my*(1.-cosine)/a);
   double new_mx = old_mx*cosine - old_my*sine;
-  double new_y  = old_y + (1./old_kappa)*( old_my*sine/a + old_mx*(1.-cosine)/a);
+  double new_y  = old_y + (1./old_kappa)*(old_my*sine/a + old_mx*(1.-cosine)/a);
   double new_my = old_my*cosine + old_mx*sine;
 
   TMatrixD a_projected(_n_parameters, 1);

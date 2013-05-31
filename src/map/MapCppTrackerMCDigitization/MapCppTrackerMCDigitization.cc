@@ -312,28 +312,6 @@ int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
 }
 
 int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
-  /*
-  int tracker = ahit->GetChannelId()->GetTrackerNumber();
-  int station = ahit->GetChannelId()->GetStationNumber();
-  int plane   = ahit->GetChannelId()->GetPlaneNumber();
-
-  const MiceModule* this_plane = NULL;
-  for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
-    if ( modules[j]->propertyExists("Tracker", "int") &&
-         modules[j]->propertyInt("Tracker") == tracker &&
-         modules[j]->propertyExists("Station", "int") &&
-         modules[j]->propertyInt("Station") == station &&
-         modules[j]->propertyExists("Plane", "int") &&
-         modules[j]->propertyInt("Plane") == plane )
-      // save the module corresponding to this plane
-      this_plane = modules[j];
-  }
-
-  assert(this_plane != NULL);
-
-  // This is the total number of fibres.
-  // int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
-  */
   // This is the channel number computed from the fibre number.
   int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
   int chanNo      = static_cast<int> (floor(fiberNumber/7.0));

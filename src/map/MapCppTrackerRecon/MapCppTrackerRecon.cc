@@ -49,7 +49,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     MiceModule* module = Globals::GetReconstructionMiceModules();
     std::vector<const MiceModule*> modules =
       module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    _geometry_map = SciFiGeometryHelper(modules).build_geometry_map();
+    _geometry_map = SciFiGeometryHelper(modules).BuildGeometryMap();
+    SciFiGeometryHelper(modules).DumpPlanesInfo();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -76,6 +77,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
         std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
+/*
         // Build Clusters.
         if ( event->digits().size() ) {
           cluster_recon(*event);
@@ -96,10 +98,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
           if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
             track_fit(*event);
           }
-        }
-/*
-        if ( _kalman_on && event->spacepoints().size()==5 && event->clusters().size()==15) {
-          kalman_fit(*event);
         }
 */
         print_event_info(*event);
@@ -195,20 +193,6 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
     fit.Process(seeds, evt);
   }
 }
-
-/*
-void MapCppTrackerRecon::kalman_fit(SciFiEvent &evt) {
-  std::vector<KalmanSeed*> seeds;
-
-  KalmanSeed *the_seed = new KalmanSeed();
-  the_seed->Build(evt, _helical_pr_on);
-
-  seeds.push_back(the_seed);
-
-  KalmanTrackFit fit;
-  fit.Process(seeds, evt);
-}
-*/
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
   Squeak::mout(Squeak::info) << event.digits().size() << " "

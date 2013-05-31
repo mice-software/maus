@@ -23,7 +23,7 @@ SciFiClusterRec::SciFiClusterRec():_size_exception(0),
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception,
                                  double min_npe,
-                                 std::map<int, SciFiPlaneGeometry> geometry_map):
+                                 const std::map<int, SciFiPlaneGeometry> &geometry_map):
                                    _size_exception(cluster_exception),
                                    _min_npe(min_npe),
                                    _geometry_map(geometry_map) {}
@@ -91,11 +91,10 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   
 }
 
 void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
-  // Get the MiceModule of the plane...
   int tracker = clust->get_tracker();
   int station = clust->get_station();
   int plane   = clust->get_plane();
-  // const MiceModule* this_plane = NULL;
+
   int id =  3*(station-1) + (plane+1);
   id = ( tracker == 0 ? -id : id );
   clust->set_id(id);
@@ -123,11 +122,6 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   clust->set_direction(plane_direction);
   clust->set_position(position);
   clust->set_alpha(alpha);
-
-  double mc_x = clust->get_true_position().x();
-  double mc_y = clust->get_true_position().y();
-  double mc_z = clust->get_true_position().z();
-  // if ( position.x() - mc_x >
 }
 
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {

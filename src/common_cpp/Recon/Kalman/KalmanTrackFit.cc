@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit(): _seed_cov(200.) {
+KalmanTrackFit::KalmanTrackFit() {
   //
   // Get Configuration values.
   //
@@ -45,10 +45,9 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
   KalmanSciFiAlignment kalman_align;
   kalman_align.LoadMisaligments();
   //
-  // Prepare to loop over seeds. 1 seed = 1 track hypotesis
+  // Prepare to loop over seeds. 1 seed = 1 track hypothesis
   //
-  size_t num_seeds = seeds.size();
-  for ( size_t i = 0; i < num_seeds; ++i ) {
+  for ( size_t i = 0; i < seeds.size(); ++i ) {
     // Current seed.
     KalmanSeed* seed = seeds[i];
 
@@ -95,7 +94,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
 
     // Misalignment search. Optional.
     // This must be run in single thread mode.
-    if ( _update_misalignments && track->f_chi2() < 20. &&
+    if ( _update_misalignments && track->f_chi2() < 25. &&
          numb_measurements == 15 && _type_of_dataflow == "pipeline_single_thread") {
       LaunchMisaligmentSearch(track, sites, kalman_align);
     }

@@ -133,8 +133,6 @@ class MapCppTrackerRecon {
 
   void print_event_info(MAUS::SciFiEvent &event);
 
-  // void kalman_fit(MAUS::SciFiEvent &evt);
-
  private:
   /// This should be the classname
   std::string _classname;
@@ -154,7 +152,7 @@ class MapCppTrackerRecon {
   bool _straight_pr_on;
   bool _kalman_on;
 
-  ///  Map of the planes geometry specifications.
+  ///  Map of the planes geometry.
   std::map<int, SciFiPlaneGeometry> _geometry_map;
 
   int SciFiRunRecon;
