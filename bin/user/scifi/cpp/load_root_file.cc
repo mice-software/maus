@@ -60,6 +60,9 @@ class TrackerData {
       _num_digits = 0;
       _num_clusters = 0;
       _num_spoints = 0;
+      _num_noise_spoints = 0;
+      _num_seeds = 0;
+      _num_noise_seeds = 0;
       _num_stracks = 0;
       _num_htracks_5pt = 0;
       _num_htracks_4pt = 0;
@@ -95,6 +98,9 @@ class TrackerData {
           _spoints_x.push_back(x);
           _spoints_y.push_back(y);
           _spoints_z.push_back(z);
+          MAUS::SciFiCluster *clus = sp->get_channels()[0];
+          MAUS::ThreeVector mom = clus->get_true_momentum();
+          if ( mom.z() < 10.0 ) ++_num_noise_spoints;
           ++_num_spoints;
         }
       }
@@ -156,6 +162,8 @@ class TrackerData {
             std::cout <<  std::setprecision(4) << mom.y() << "\t";
             std::cout <<  std::setprecision(4) << pt_mc << "\t";
             std::cout <<  std::setprecision(4) << mom.z() << "\n";
+            ++_num_seeds;
+            if ( mom.z() < 10.0 ) ++_num_noise_seeds;
           }
         }
       }
@@ -167,6 +175,9 @@ class TrackerData {
       _num_digits = 0;
       _num_clusters = 0;
       _num_spoints = 0;
+      _num_noise_spoints = 0;
+      _num_seeds = 0;
+      _num_noise_seeds = 0;
       _num_stracks = 0;
       _num_htracks_5pt = 0;
       _num_htracks_4pt = 0;
@@ -198,6 +209,9 @@ class TrackerData {
     int _num_digits;
     int _num_clusters;
     int _num_spoints;
+    int _num_noise_spoints;
+    int _num_seeds;
+    int _num_noise_seeds;
     int _num_stracks;
     int _num_htracks_5pt;
     int _num_htracks_4pt;
@@ -237,6 +251,12 @@ int main(int argc, char *argv[]) {
   int t2_4pt_trks = 0;
   int tot_t1_sp = 0;
   int tot_t2_sp = 0;
+  int tot_t1_noise_sp = 0;
+  int tot_t2_noise_sp = 0;
+  int tot_t1_seeds = 0;
+  int tot_t2_seeds = 0;
+  int tot_t1_noise_seeds = 0;
+  int tot_t2_noise_seeds = 0;
 
   irstream infile(filename.c_str(), "Spill");
 
@@ -262,6 +282,14 @@ int main(int argc, char *argv[]) {
 
       tot_t1_sp += t1._num_spoints;
       tot_t2_sp += t2._num_spoints;
+      tot_t1_noise_sp += t1._num_noise_spoints;
+      tot_t2_noise_sp += t2._num_noise_spoints;
+
+      tot_t1_seeds += t1._num_seeds;
+      tot_t2_seeds += t2._num_seeds;
+      tot_t1_noise_seeds += t1._num_noise_seeds;
+      tot_t2_noise_seeds += t2._num_noise_seeds;
+
       t1_5pt_trks += t1._num_htracks_5pt;
       t2_5pt_trks += t2._num_htracks_5pt;
       t1_4pt_trks += t1._num_htracks_4pt;
@@ -277,7 +305,13 @@ int main(int argc, char *argv[]) {
   }
   infile.close();
   of1 << "T1 spacepoints: " <<  tot_t1_sp << std::endl;
+  of1 << "T1 noise spacepoints: " <<  tot_t1_noise_sp << std::endl;
   of1 << "T2 spacepoints: " <<  tot_t2_sp << std::endl;
+  of1 << "T2 noise spacepoints: " <<  tot_t2_noise_sp << std::endl;
+  of1 << "T1 seeds: " <<  tot_t1_seeds << std::endl;
+  of1 << "T1 noise seeds: " <<  tot_t1_noise_seeds << std::endl;
+  of1 << "T2 seeds: " <<  tot_t2_seeds << std::endl;
+  of1 << "T2 noise seeds: " <<  tot_t2_noise_seeds << std::endl;
   of1 << "T1 5 point tracks: " <<  t1_5pt_trks << std::endl;
   of1 << "T1 4 point tracks: " <<  t1_4pt_trks << std::endl;
   of1 << "T2 5 point tracks: " <<  t2_5pt_trks << std::endl;
