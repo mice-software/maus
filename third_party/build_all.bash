@@ -18,9 +18,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # Exit the script if ANY command fails
     set -e
-    # Overwrite python modules with copies pulled down from web - will get 
-    # latest versions (remove before putting this code into production) 
-    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash 1
     # Now build libraries
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
@@ -29,7 +26,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     fi
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
     ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash
+    # Install python modules with copies pulled down from web - will get 
+    # latest versions (change to option -i before putting into production) 
+    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -cgi
     ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash

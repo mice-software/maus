@@ -4,7 +4,16 @@
 # with the easy_install servers mostly these come prepacked. A few have narly
 # dependency issues so they need to be called from the easy_install server
 # (which has a wider range of dependencies pre-packed)
-egg_source=${MAUS_ROOT_DIR}/third_party/source/easy_install
+# 
+# options:
+#
+# -c remove any files or directories from $egg_source before doing anything
+# -g get packages (will happen after cleaning egg source if -c is set)
+# -i install packages (will happen after getting packages if -g is set)
+#
+# if no options are set, this does nothing(!)
+
+egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 \
@@ -24,14 +33,42 @@ module_test_list="suds validictory nose coverage \
  pymongo"
 binary_test_list="scons"
 
-# To download the original tarballs and pack them into easy_install dir, try
-# running this loop (put a flag on the end of the execution command e.g. run
-#     bash 40python_extras.bash
-#
-if [ "$1" ]; then
-    echo "INFO: Attempting to pack eggs for distribution"
+cleanup="0"
+get_packages="0"
+install_packages="0"
+
+while getopts ":cgi" opt; do
+  case $opt in
+    c)
+      cleanup="1"
+      ;;
+    g)
+      get_packages="1"
+      ;;
+    i)
+      install_packages="1"
+      ;;
+    \?)
+      echo "FATAL: Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z ${MAUS_THIRD_PARTY} ]; then
+    echo "FATAL: MAUS_THIRD_PARTY was not set - aborting"
+    exit 1
+fi
+
+if [ "$cleanup" == "1" ]; then
+    echo "INFO: Cleaning $egg_source directory" 
     cd $egg_source
     rm -r *
+fi
+
+if [ "$get_packages" == "1" ]; then
+    echo "INFO: Attempting to download eggs and pack for distribution"
+    cd $egg_source
     for package in $download_package_list
     do
         easy_install -zmaxeb . $package
@@ -45,7 +82,9 @@ if [ "$1" ]; then
         tar -czf $item.tar.gz $item
         rm -rf $item
     done
-elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
+fi
+
+if [ "$install_packages" == "1" ]; then
     # first try a local install
     for package in $package_list
     do
@@ -66,23 +105,7 @@ elif [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: ok"
     done
 
-    echo "INFO: The package should be locally build now in your"
-    echo "INFO: third_party directory, which the rest of MAUS will"
-    echo "INFO: find."
-else
-    echo
-    echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2
-    echo "FATAL: know where to install this package.  You have two" >&2
-    echo "FATAL: options:" >&2
-    echo "FATAL:" >&2
-    echo "FATAL: 1. Set the MAUS_ROOT_DIR from the command line by" >&2
-    echo "FATAL: (if XXX is the directory where MAUS is installed):" >&2
-    echo "FATAL:" >&2
-    echo "FATAL:        MAUS_ROOT_DIR=XXX ${0}" >&2
-    echo "FATAL:" >&2
-    echo "FATAL: 2. Run the './configure' script in the MAUS ROOT" >&2
-    echo "FATAL: directory, run 'source env.sh' then rerun this" >&2
-    echo "FATAL: command ">&2
-    exit 1
+    echo "INFO: easy_install libraries were installed in your third party"
+    echo "INFO: directory $MAUS_THIRD_PARTY"
 fi
 
