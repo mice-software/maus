@@ -12,14 +12,14 @@
 # -i install packages (will happen after getting packages if -g is set)
 #
 # if no options are set, this does nothing(!)
-
+scons_target="http://sourceforge.net/projects/scons/files/scons/2.1.0.alpha.20110323/scons-2.1.0.alpha.20110323.tar.gz/download"
 egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo==2.3 readline numpy==1.5 matplotlib==1.1.0 \
+ pymongo==2.3 readline numpy==1.5 matplotlib==1.1.0 scons==2.2.0\
 "
 # these are the packages to install - note the version dependencies
 package_list="\
@@ -73,6 +73,8 @@ if [ "$get_packages" == "1" ]; then
     do
         easy_install -zmaxeb . $package
     done
+    echo "INFO: Getting scons"
+    wget $scons_target
     downloaded_list=`ls`
     echo "INFO: Downloaded the following packages"
     echo "$downloaded_list"
