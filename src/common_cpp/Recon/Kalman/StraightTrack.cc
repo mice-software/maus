@@ -18,8 +18,9 @@
 
 namespace MAUS {
 
-StraightTrack::StraightTrack(bool MCS, bool Eloss) : KalmanTrack(MCS, Eloss) {
-  _n_parameters = 4;
+StraightTrack::StraightTrack() : KalmanTrack() {
+  _n_parameters   = 4;
+  _algorithm_used = kalman_straight;
 }
 
 StraightTrack::~StraightTrack() {}

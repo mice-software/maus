@@ -66,7 +66,7 @@ class HelicalTrackTest : public ::testing::Test {
 };
 
 TEST_F(HelicalTrackTest, test_propagation) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
+  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
   track->Initialise();
   track->CalculatePredictedState(&old_site, &new_site);
   TMatrixD a_projected(5, 1);

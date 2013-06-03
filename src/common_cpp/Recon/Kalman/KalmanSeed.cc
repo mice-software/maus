@@ -42,8 +42,10 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
   _momentum = rhs._momentum;
   _straight = rhs._straight;
   _helical  = rhs._helical;
-  _n_parameters = rhs._n_parameters;
   _tracker  = rhs._tracker;
+  _n_parameters = rhs._n_parameters;
+
+  return *this;
 }
 
 KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
@@ -52,8 +54,8 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
   _momentum = seed._momentum;
   _straight = seed._straight;
   _helical  = seed._helical;
-  _n_parameters = seed._n_parameters;
   _tracker  = seed._tracker;
+  _n_parameters = seed._n_parameters;
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
@@ -62,18 +64,17 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double r  = seed->get_R();
   double B  = -4.;
   double pt = -0.3*B*r;
+  // double pt = _particle_charge*(CLHEP::c_light*1.e-9)*B*r;
 
   double dsdz  = seed->get_dsdz();
   double tan_lambda = 1./dsdz;
-  // PR doesnt see Eloss, so overstimates pz.
-  // Total Eloss = 2 MeV/c.
+
   double pz = pt*tan_lambda;
 
   double kappa = fabs(1./pz);
 
-  double PI = acos(-1.);
   double phi_0 = seed->get_phi0();
-  double phi = phi_0 + PI/2.;
+  double phi = phi_0 + TMath::PiOver2();
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
@@ -84,6 +85,11 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   } else if ( _tracker == 1 ) {
     x = spacepoints.front()->get_position().x();
     y = spacepoints.front()->get_position().y();
+  } else {
+    x = y = -666; // removes a compiler warning.
+    throw(Squeal(Squeal::recoverable,
+                 "Pattern Recon has bad tracker number.",
+                 "KalmanSeed::ComputeInitialStateVector"));
   }
 
   TMatrixD a(_n_parameters, 1);
@@ -116,6 +122,9 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
 
   double mx = seed->get_mx();
   double my = seed->get_my();
+
+  // Straight tracks don't have Pz. Assume a reasonable number
+  // just so that we can allow for some more trajectory kink correction.
   double seed_pz = 226.;
 
   TMatrixD a(_n_parameters, 1);

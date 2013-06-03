@@ -49,7 +49,7 @@ class HelicalTrack : public KalmanTrack {
    *
    *  @param flags for use of Multiple Scattering and Eloss models.
    */
-  HelicalTrack(bool MCS, bool Eloss);
+  HelicalTrack();
 
   /** @brief Destructor.
    */

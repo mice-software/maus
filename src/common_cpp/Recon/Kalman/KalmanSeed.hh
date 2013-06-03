@@ -31,36 +31,56 @@
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "Interface/Squeak.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 namespace MAUS {
 
 class KalmanSeed {
  public:
+  /** Default constructor.
+   */
   KalmanSeed();
 
+  /** Destructor.
+   */
   ~KalmanSeed();
 
+  /** Copy constructor.
+   */
   KalmanSeed(const KalmanSeed &seed);
 
+  /** Equality operator.
+   */
   KalmanSeed& operator=(const KalmanSeed& seed);
 
+  /** Builds a KalmanSeed from a pattern recon object.
+   */
   template <class PRTrack>
   void Build(const PRTrack* pr_track);
 
+  /** Computes the initial state vector for a helical track.
+   */
   TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
+  /** Computes the initial state vector for a straight track.
+   */
   TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
-  void RetrieveClusters(std::vector<SciFiSpacePoint*> &spacepoints);
+  /** Fills the _clusters member.
+   */
+  void RetrieveClusters(SciFiSpacePointPArray &spacepoints);
+
+  /** Getter for the initial state vector.
+   */
+  TMatrixD initial_state_vector() const { return _a0; }
 
   bool is_helical()  const { return _helical; }
 
   bool is_straight() const { return _straight; }
 
   SciFiClusterPArray clusters() const { return _clusters; }
-
-  TMatrixD initial_state_vector() const { return _a0; }
 
   size_t is_usable() const { return _clusters.size(); }
 

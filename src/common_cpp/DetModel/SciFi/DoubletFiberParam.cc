@@ -58,9 +58,6 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
 void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
                                           G4int copyNo,
                                     const G4VPhysicalVolume* physVol) const {
-  // This is the number of fibers
-  G4double nFiber = 2*floor(activeRadius/(fiberDiameter*fiberPitch/2));
-
   G4double xPos = copyNo * (fiberDiameter*fiberPitch/2)
                   -(activeRadius-fiberDiameter/2);
 

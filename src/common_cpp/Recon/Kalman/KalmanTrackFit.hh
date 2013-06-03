@@ -34,16 +34,14 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSciFiAlignment.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
@@ -55,7 +53,7 @@ namespace MAUS {
  */
 class KalmanTrackFit {
  public:
-  KalmanTrackFit();
+  explicit KalmanTrackFit(SciFiGeometryMap map);
 
   virtual ~KalmanTrackFit();
 
@@ -70,43 +68,29 @@ class KalmanTrackFit {
    *  Add plane measurents to all sites;
    *
    */
-  void Initialise(KalmanSeed *seed,
-                  std::vector<KalmanSite> &sites,
-                  KalmanSciFiAlignment &kalman_align);
+  void Initialise(const KalmanSeed *seed, KalmanSitesVector &sites);
 
   /** @brief Runs Filter routines.
    *
    *  Runs the Prediction->Filtering->Smoothing stages.
    *
    */
-  void RunFilter(KalmanTrack *track,
-                 std::vector<KalmanSite> &sites);
+  void RunKalmanFilter(KalmanTrack *track,
+                       KalmanSitesVector &sites);
 
-  /** @brief Runs Filter routines ignoring a station.
-   *
-   *  This removes one station from the fit and runs the normal filter.
-   *  Useful for misalignment studies, for ex.
-   *
+  /** @brief  Manages all extrapolation steps.
    */
-  void RunFilter(KalmanTrack *track,
-                 std::vector<KalmanSite> &sites,
-                 int ignore_i);
+  void Extrapolate(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
 
-  /** @brief "Filter" a station ignoring the measurement.
-   *
-   *  In other words, it makes the filtered states equal to the projected ones.
-   *
+  /** @brief  Manages all filtering steps.
    */
-  void FilterVirtual(KalmanSite &a_site);
+  void Filter(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
 
-  /** @brief
-   *
-   *  Performs a misalignment search.
-   *
+  void PrepareForSmoothing(KalmanSite *last_site);
+
+  /** @brief  Manages all smoothing steps.
    */
-  void LaunchMisaligmentSearch(KalmanTrack *track,
-                               std::vector<KalmanSite> &sites,
-                               KalmanSciFiAlignment &kalman_align);
+  void Smooth(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
 
   /** @brief
    *
@@ -114,7 +98,7 @@ class KalmanTrackFit {
    *
    */
   void Save(const KalmanTrack *kalman_track,
-            std::vector<KalmanSite> sites,
+            KalmanSitesVector sites,
             SciFiEvent &event);
 
   /** @brief
@@ -122,9 +106,11 @@ class KalmanTrackFit {
    *  Prints some info about the filtering status.
    *
    */
-  void DumpInfo(std::vector<KalmanSite> const &sites);
+  void DumpInfo(KalmanSitesVector const &sites);
 
  private:
+  SciFiGeometryMap _geometry_map;
+
   double _seed_cov;
 
   bool _use_MCS;
@@ -132,12 +118,6 @@ class KalmanTrackFit {
   bool _use_Eloss;
 
   bool _verbose;
-
-  bool _update_misalignments;
-
-  std::string _type_of_dataflow;
-
-  typedef std::vector<KalmanSite> KalmanSitesVector;
 };
 
 } // ~namespace MAUS

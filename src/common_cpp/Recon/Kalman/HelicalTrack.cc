@@ -19,9 +19,9 @@
 
 namespace MAUS {
 
-HelicalTrack::HelicalTrack(bool MCS,
-                           bool Eloss) : KalmanTrack(MCS, Eloss) {
-  _n_parameters = 5;
+HelicalTrack::HelicalTrack() : KalmanTrack() {
+  _n_parameters   = 5;
+  _algorithm_used = kalman_helical;
 }
 
 HelicalTrack::~HelicalTrack() {}

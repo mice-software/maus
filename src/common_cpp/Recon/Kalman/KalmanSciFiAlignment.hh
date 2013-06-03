@@ -67,28 +67,28 @@ class KalmanSciFiAlignment {
    *  member TMatrixD's _shifts_array and _covariance_shifts.
    *
    */
-  bool LoadMisaligments();
+  // bool LoadMisaligments();
 
   /** @brief
    *
    *  Updates info stored for a given site.
    *
    */
-  void Update(const KalmanSite &site);
+  // void Update(const KalmanSite &site);
 
   /** @brief
    *
    *  Saves to txt and calls SaveToRootFile.
    *
    */
-  void Save();
+  // void Save();
 
   /** @brief
    *
    *  Saves updates to TGraphs in the root output.
    *
    */
-  void SaveToRootFile();
+  // void SaveToRootFile();
 
   /** @brief
    *
@@ -96,15 +96,15 @@ class KalmanSciFiAlignment {
    *  already exists, it loads it and appends to it.
    *
    */
-  void SetUpRootOutput();
+  // void SetUpRootOutput();
 
   /** @brief
    *
    *  Saves and cloes the root output.
    *
    */
-  void CloseRootFile();
-
+  // void CloseRootFile();
+/*
   TMatrixD get_shifts(int site_id);
 
   TMatrixD get_cov_shifts(int site_id);
@@ -124,6 +124,7 @@ class KalmanSciFiAlignment {
 
   TFile  *_rootfile;
   TTree *_tree;
+*/
 };
 
 } // ~namespace MAUS

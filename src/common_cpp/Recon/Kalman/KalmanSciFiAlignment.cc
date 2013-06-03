@@ -26,7 +26,8 @@
 
 namespace MAUS {
 
-KalmanSciFiAlignment::KalmanSciFiAlignment()
+KalmanSciFiAlignment::KalmanSciFiAlignment() {}
+/*
       : _file("SciFiMisalignments"),
         _rootfile(0),
         _graphs_tracker0(0),
@@ -34,9 +35,9 @@ KalmanSciFiAlignment::KalmanSciFiAlignment()
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   _fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerRecon/"+_file;
 }
-
+*/
 KalmanSciFiAlignment::~KalmanSciFiAlignment() {}
-
+/*
 TMatrixD KalmanSciFiAlignment::get_shifts(int site_id) {
   std::map<int, TMatrixD>::iterator it;
   it = _shifts_map.find(site_id);
@@ -257,5 +258,5 @@ void KalmanSciFiAlignment::SetUpRootOutput() {
     }
   }
 }
-
+*/
 } // ~namespace MAUS

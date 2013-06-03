@@ -186,7 +186,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   }
 
   if ( seeds.size() ) {
-    KalmanTrackFit fit;
+    KalmanTrackFit fit(_geometry_map);
     fit.Process(seeds, evt);
   }
 }

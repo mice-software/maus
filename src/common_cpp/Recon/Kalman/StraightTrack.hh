@@ -48,7 +48,7 @@ class StraightTrack : public KalmanTrack {
    *
    *  @param flags for use of Multiple Scattering and Eloss models.
    */
-  StraightTrack(bool MCS, bool Eloss);
+  StraightTrack();
 
   /** @brief Destructor.
    */

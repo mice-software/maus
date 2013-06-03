@@ -188,6 +188,8 @@ class KalmanSite {
   ThreeVector _mc_mom;
 };
 
+typedef std::vector<KalmanSite> KalmanSitesVector;
+
 } // ~namespace MAUS
 
 #endif

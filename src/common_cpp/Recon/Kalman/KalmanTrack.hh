@@ -72,66 +72,53 @@ typedef struct BetheBloch {
 
 class KalmanTrack {
  public:
-  /* @brief  Constructs taking MCS and Eloss flags.
+  /** @brief  Constructor.
    */
-  KalmanTrack(bool MCS, bool Eloss);
+  KalmanTrack();
 
-  /* @brief  Destructor. Cleans up heap.
+  /** @brief  Destructor. Cleans up heap.
    */
   virtual ~KalmanTrack() {}
 
-  /* @brief  Initializes member matrices.
-   */
-  void Initialise();
-
-  /* @brief  Manages all extrapolation steps.
-   */
-  void Extrapolate(std::vector<KalmanSite> &sites, int current_site);
-
-  /* @brief  Manages all filtering steps.
-   */
-  void Filter(std::vector<KalmanSite> &sites, int current_site);
-
-  /* @brief  Manages all smoothins steps.
-   */
-  void Smooth(std::vector<KalmanSite> &sites, int current_site);
-
-  /* @brief  Calculates the Propagator Matrix (F) for the current extrapolation.
+  /** @brief  Calculates the Propagator Matrix (F) for the current extrapolation.
    */
   virtual void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
 
-  /* @brief  Calculates the state vector prediction at the next site.
+  /** @brief  Calculates the state vector prediction at the next site.
    */
   virtual void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) = 0;
 
-  /* @brief  Projects the Covariance matrix.
+  /** @brief  Initializes member matrices.
+   */
+  void Initialise();
+
+  /** @brief  Projects the Covariance matrix.
    */
   void CalculateCovariance(const KalmanSite *old_site, KalmanSite *new_site);
 
-  /* @brief  Calculates the Energy loss according to Bethe Bloch formula.
+  /** @brief  Calculates the Energy loss according to Bethe Bloch formula.
    */
   double BetheBlochStoppingPower(double p);
 
-  /* @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
+  /** @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
    */
   void SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new_site);
 
-  /* @brief  Computes the contribution of MCS to the covariance matrix.
+  /** @brief  Computes the contribution of MCS to the covariance matrix.
    */
   void CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site);
 
-  /* @brief  Computes the filtered state.
+  /** @brief  Computes the filtered state.
    */
   void CalculateFilteredState(KalmanSite *a_site);
 
-  /* @brief  Computes the filtered covariance matrix.
+  /** @brief  Computes the filtered covariance matrix.
    */
   void UpdateCovariance(KalmanSite *a_site);
 
-
   void SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state);
 
-  /* @brief  Solves the measurement equation.
+  /** @brief  Solves the measurement equation.
    */
   TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
 
@@ -145,11 +132,9 @@ class KalmanTrack {
 
   void ComputePull(KalmanSite *a_site);
 
-  /* @brief  Solves the measurement equation.
-   */
-  void PrepareForSmoothing(KalmanSite *last_site);
   void UpdateBackTransportationMatrix(const KalmanSite *optimum_site,
-                                         const KalmanSite *smoothing_site);
+                                      const KalmanSite *smoothing_site);
+
   void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
 
   void set_momentum(double momentum) { _momentum = momentum; }
@@ -157,27 +142,26 @@ class KalmanTrack {
   /// Other methods
   void ExcludeSite(KalmanSite *site);
   void ComputeChi2(const std::vector<KalmanSite> &sites);
-  void UpdateMisaligments(std::vector<KalmanSite> &sites,
-                           std::vector<KalmanSite> &sites_copy,
-                           int station_i);
 
   /// Getters.
   double f_chi2()         const { return _f_chi2;   }
   double s_chi2()         const { return _s_chi2;   }
-  int ndf()               const { return _ndf;      }
   double P_value()        const { return _P_value;  }
-  int tracker()           const { return _tracker;  }
   double momentum()       const { return _momentum; }
+  int ndf()               const { return _ndf;      }
+  int tracker()           const { return _tracker;  }
   TMatrixD Q()            const { return _Q;        }
 
- protected:
-  bool _use_MCS;
+  enum AlgorithmUsed { kalman_straight, kalman_helical };
 
-  bool _use_Eloss;
+  AlgorithmUsed GetAlgorithmUsed() { return _algorithm_used; }
+
+ protected:
+  AlgorithmUsed _algorithm_used;
 
   TMatrixD _H;
 
-  TMatrixD _S;
+  // TMatrixD _S;
 
   TMatrixD _V;
 

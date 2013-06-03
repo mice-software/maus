@@ -404,8 +404,8 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
   }
 
   if ( seeds.size() ) {
-    KalmanTrackFit fit;
-    fit.Process(seeds, evt);
+    // KalmanTrackFit fit;
+    // fit.Process(seeds, evt);
   }
 }
 

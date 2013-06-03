@@ -34,13 +34,15 @@ struct SciFiPlaneGeometry {
   double Pitch;
 };
 
+typedef std::map<int, SciFiPlaneGeometry> SciFiGeometryMap;
+
 class SciFiGeometryHelper {
  public:
   explicit SciFiGeometryHelper(const std::vector<const MiceModule*> &modules);
 
   ~SciFiGeometryHelper();
 
-  std::map<int, SciFiPlaneGeometry> BuildGeometryMap();
+  SciFiGeometryMap BuildGeometryMap();
 
   const MiceModule* FindPlane(int tracker, int station, int plane);
 
@@ -51,7 +53,7 @@ class SciFiGeometryHelper {
  private:
   std::vector<const MiceModule*> _modules;
 
-  std::map<int, SciFiPlaneGeometry> _geometry_map;
+  SciFiGeometryMap _geometry_map;
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
 
