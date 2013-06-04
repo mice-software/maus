@@ -54,7 +54,6 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     print "Running analyze online"
     env_cp = os.environ.copy()
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp
-    env_cp['MAUS_WEB_DIR'] = my_tmp
     proc = subprocess.Popen(['python', ANALYZE_EXE,
                              '--DAQ_online_file', TMP_DIR+data_file_name],
                              env=env_cp, stdout=log,

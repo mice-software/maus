@@ -45,10 +45,12 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
             time.sleep(5)
             active_nodes = \
                   celery.task.control.inspect().active() # pylint: disable=E1101
-            proc.send_signal(signal.SIGKILL)
         except Exception: #pylint: disable=W0703
             sys.excepthook(*sys.exc_info())
             self.assertTrue(False)
+        finally:
+            if proc.poll() == None:
+                proc.send_signal(signal.SIGKILL)
         self.assertNotEqual(active_nodes, None)
 
     def test_mongodb_is_alive(self):
@@ -70,11 +72,12 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         # should throw an exception if undefined
         os.environ['MAUS_WEB_DIR'] # pylint: disable=W0104
         os.environ['MAUS_WEB_MEDIA_RAW'] # pylint: disable=W0104
-        maus_web = os.path.join(os.environ['MAUS_WEB_DIR'],
-                                                    'src/mausweb/manage.py')
-        proc = subprocess.Popen(['python', '-m', maus_web])        
-        proc.wait() # pylint: disable=E1101
-        proc.send_signal(signal.SIGINT)
+        maus_web = os.path.join(
+                      os.path.expandvars('$MAUS_WEB_DIR/src/mausweb/manage.py'))
+        proc = subprocess.Popen(['python', maus_web, 'runserver', 'localhost:9000'])        
+        time.sleep(5)
+        if proc.poll() == None:
+            proc.send_signal(signal.SIGINT)
         self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
