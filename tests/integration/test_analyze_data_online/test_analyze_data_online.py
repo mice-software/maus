@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
+
 """
 test_analyze_online.py - Note that I never ran this test successfully! Always
 skips until someone sorts out the environment on the test server.
@@ -28,7 +30,7 @@ import glob
 
 import regression
 import ROOT
-ROOT.gROOT.SetBatch(True) # pylint: disable = E1101
+ROOT.gROOT.SetBatch(True)
 
 ONLINE_TEST = os.path.expandvars(
                             "$MAUS_ROOT_DIR/tests/integration/"+\

@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
+
 """
 Check that celery is alive on the test server. Note that this should not be run
 as part of the regular test script - only should be run by online machine (and
@@ -74,7 +76,8 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         os.environ['MAUS_WEB_MEDIA_RAW'] # pylint: disable=W0104
         maus_web = os.path.join(
                       os.path.expandvars('$MAUS_WEB_DIR/src/mausweb/manage.py'))
-        proc = subprocess.Popen(['python', maus_web, 'runserver', 'localhost:9000'])        
+        proc = subprocess.Popen(
+                            ['python', maus_web, 'runserver', 'localhost:9000'])
         time.sleep(5)
         if proc.poll() == None:
             print 'test_maus_app Sending SIGINT'

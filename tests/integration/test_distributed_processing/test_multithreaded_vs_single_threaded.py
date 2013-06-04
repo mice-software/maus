@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
+
 """
 Tests for Celery workers configured for MAUS. This checks that single threaded
 mode, multithreaded and split multithreaded mode return the same output.

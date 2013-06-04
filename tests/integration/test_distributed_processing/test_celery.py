@@ -18,6 +18,7 @@ executing transforms on spills.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
 # pylint: disable=C0103
 
 import json
