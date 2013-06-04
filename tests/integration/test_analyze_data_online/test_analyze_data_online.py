@@ -85,6 +85,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         target =  TMP_DIR+"04235.000"
         if os.path.exists(target):
             os.remove(target)
+            time.sleep(1)
         share = os.environ["MAUS_THIRD_PARTY"]+"/third_party/install/share/"
         share = share+"04235/04235.000"
         print "Linking", share, "to", target 
