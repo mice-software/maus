@@ -77,9 +77,11 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         proc = subprocess.Popen(['python', maus_web, 'runserver', 'localhost:9000'])        
         time.sleep(5)
         if proc.poll() == None:
+            print 'test_maus_app Sending SIGINT'
             proc.send_signal(signal.SIGINT)
             time.sleep(5)
             if proc.poll() == None:
+                print 'test_maus_app Sending SIGKILL'
                 proc.send_signal(signal.SIGKILL)
                 time.sleep(5)
         self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
