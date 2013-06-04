@@ -8,7 +8,8 @@
 # options:
 #
 # -c remove any files or directories from $egg_source before doing anything
-# -g get packages (will happen after cleaning egg source if -c is set)
+# -g get packages (will happen after cleaning egg source if -c is set); do not
+#    overwrite any existing packages
 # -i install packages (will happen after getting packages if -g is set)
 #
 # if no options are set, this does nothing(!)
@@ -19,6 +20,7 @@ download_package_list="\
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
  pymongo==2.3 readline numpy==1.5 matplotlib==1.1.0 scons==2.2.0\
+ pil django magickwand
 "
 # these are the packages to install - note the version dependencies
 package_list="\
@@ -26,10 +28,11 @@ package_list="\
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline numpy matplotlib \
+ pil django magickwand
 "
 module_test_list="suds validictory nose coverage \
- pylint numpy bitarray matplotlib celery \
- pymongo"
+ pylint numpy bitarray matplotlib celery pymongo \
+ Image django magickwand" #Image is pil bottom level
 binary_test_list="scons"
 
 cleanup="0"
@@ -76,10 +79,16 @@ if [ "$get_packages" == "1" ]; then
     echo "INFO: Downloaded the following packages"
     echo "$downloaded_list"
     echo "INFO: Packing them now - they can be found tarred in $egg_source"
+    echo "INFO: I will skip any packages which are already packed"
     for item in $downloaded_list
     do
-        tar -czf $item.tar.gz $item
-        rm -rf $item
+        if [ ! -e $item.tar.gz ]; then # ignore existing tarballs
+            echo "INFO:       $item"
+            tar -czf $item.tar.gz $item
+        else
+            echo "INFO:       $item skipped"
+        fi
+        rm -rf $item # cleanup anything not tarred
     done
 fi
 
