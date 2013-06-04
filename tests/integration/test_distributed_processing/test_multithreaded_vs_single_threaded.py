@@ -183,12 +183,8 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         print 'Checking data'
         files = {}
         for fname in file_names:
-            try:
-                files[fname] = [json.loads(line) \
-                                            for line in open(fname).readlines()]
-            except:
-                print open(fname).readlines()
-                sys.excepthook(*sys.exc_info())
+            files[fname] = [json.loads(line) \
+                                        for line in open(fname).readlines()]
             files[fname] = self.sort_by_maus_event_type(files[fname])
         for name, _file in files.iteritems():
             print name, len(_file['Spill'])

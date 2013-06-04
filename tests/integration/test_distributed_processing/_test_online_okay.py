@@ -63,7 +63,8 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
             self.assertTrue(False, "MongoDB server is not accessible")
         test_connx.disconnect()
 
-    def test_maus_app(self):
+    ############# DISABLED ##################
+    def _test_maus_app(self):
         """
         _test_online_okay: Check that maus web-app is in the environment
         """
