@@ -292,6 +292,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @returns False if a keyboard interrupt is received, indicating that the
                  iteration should not wait for new data
         """
+        sys.stdout.flush()
+        sys.stderr.flush()
         keyboard_interrupt = False
         try:
             docs = self.doc_store.get_since(self.collection,
@@ -310,6 +312,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     if (doc_time > self.last_time):
                         self.last_time = doc_time
                     self.process_event(spill)
+                    sys.stdout.flush()
+                    sys.stderr.flush()
                 except StopIteration:
                     # No more data so exit inner loop.
                     raise
@@ -330,11 +334,12 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             # the buffer before quitting
             print "Received SIGINT in", os.getpid(), \
                   "- processing open spills before quitting"
-            keyboard_interrupt = True
+            return False
         except DocumentStoreException:
             # Some instability in MongoDB - ignore and carry on
             sys.excepthook(*sys.exc_info())
-        return True
+            print "Caught document store error - ignore and carry on"
+        return not keyboard_interrupt
 
     @staticmethod
     def get_dataflow_description():

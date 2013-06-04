@@ -39,14 +39,14 @@ class MongoDBDocumentStore(DocumentStore):
         
     def connect(self, parameters = None):
         """ 
-        Connect to the data store. The connection is configured
-        via the following parameters:
+        Connect to the data store and purge existing data. 
 
-        -mongodb_host - MongoDB host name. This is a mandatory parameter.
-        -mongodb_port - MongoDB port. This is a mandatory parameter.
-        -mongodb_database_name - MongoDB database name. This is a
-         mandatory parameter. If the database does not exist then it
-         is created.
+        The connection is configured via the following parameters:
+        - mongodb_host - MongoDB host name. This is a mandatory parameter.
+        - mongodb_port - MongoDB port. This is a mandatory parameter.
+        - mongodb_database_name - MongoDB database name. This is a
+          mandatory parameter. If the database does not exist then it
+          is created.
 
         @param self Object reference.
         @param parameters Connection information.
@@ -61,6 +61,7 @@ class MongoDBDocumentStore(DocumentStore):
                 parameters["mongodb_port"])
             self.__data_store = \
                 self.__mongodb[parameters["mongodb_database_name"]]
+            self.__mongodb.drop_database(parameters["mongodb_database_name"])
         except pymongo.errors.AutoReconnect as exc:
             raise DocumentStoreException(exc)
 
@@ -83,6 +84,7 @@ class MongoDBDocumentStore(DocumentStore):
             self.__data_store.create_collection(collection)
             collection = self.__data_store[collection]
             collection.create_index("date")
+        #print self.__data_store[collection].count()
         
     def has_collection(self, collection):
         """ 
@@ -189,6 +191,14 @@ class MongoDBDocumentStore(DocumentStore):
         @param collection Collection name.
         """
         self.__data_store.drop_collection(collection)
+
+    def delete_database(self, database):
+        """ 
+        Delete database.
+        @param self Object reference.
+        @param database Database name.
+        """
+        self.__mongodb.drop_database(database)
 
     def disconnect(self):
         """

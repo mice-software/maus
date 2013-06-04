@@ -128,7 +128,7 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         # merge_output hopefully finished in the split multi - equivalent
         # process has run twice in the other two subprocesses + transforms
         end_time = time.time()
-        sleep_time = 2*(end_time-start_time)
+        sleep_time = 3*(end_time-start_time)
         print 'Sleeping for', sleep_time 
         time.sleep(sleep_time)
         done = False
@@ -183,8 +183,12 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         print 'Checking data'
         files = {}
         for fname in file_names:
-            files[fname] = [json.loads(line) \
+            try:
+                files[fname] = [json.loads(line) \
                                             for line in open(fname).readlines()]
+            except:
+                print open(fname).readlines()
+                sys.excepthook(*sys.exc_info())
             files[fname] = self.sort_by_maus_event_type(files[fname])
         for name, _file in files.iteritems():
             print name, len(_file['Spill'])
