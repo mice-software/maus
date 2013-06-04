@@ -79,6 +79,9 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             os.remove(LOCKFILE)
             print 'Cleared lockfile'
             time.sleep(1)
+        if not os.path.exists(TMP_DIR):
+            os.makedirs(TMP_DIR)
+
         target =  TMP_DIR+"04235.000"
         if os.path.exists(target):
             os.remove(target)
