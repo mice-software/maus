@@ -79,6 +79,9 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         if proc.poll() == None:
             proc.send_signal(signal.SIGINT)
             time.sleep(5)
+            if proc.poll() == None:
+                proc.send_signal(signal.SIGKILL)
+                time.sleep(5)
         self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
