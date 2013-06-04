@@ -88,7 +88,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         share = os.environ["MAUS_THIRD_PARTY"]+"/third_party/install/share/"
         share = share+"04235/04235.000"
         print "Linking", share, "to", target 
-        os.symlink(share+"04235/04235.000", target)
+        os.symlink(share, target)
 
     def _test_kill(self):
         """
