@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 
 // C++ headers
 #include <string>

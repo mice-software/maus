@@ -120,7 +120,7 @@ class KalmanTrack {
 
   /** @brief  Solves the measurement equation.
    */
-  TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
+  // TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
 
   void UpdateV(const KalmanSite *a_site);
 
@@ -151,6 +151,7 @@ class KalmanTrack {
   int ndf()               const { return _ndf;      }
   int tracker()           const { return _tracker;  }
   TMatrixD Q()            const { return _Q;        }
+  TMatrixD H()            const { return _H;        }
 
   enum AlgorithmUsed { kalman_straight, kalman_helical };
 

@@ -21,45 +21,45 @@ namespace MAUS {
 SciFiTrackPointProcessor::SciFiTrackPointProcessor() {
     RegisterValueBranch("id", &_int_proc,
                         &SciFiTrackPoint::id,
-                        &SciFiTrackPoint::set_id, true);
+                        &SciFiTrackPoint::set_id, false);
     RegisterValueBranch("f_chi2", &_double_proc,
                         &SciFiTrackPoint::f_chi2,
-                        &SciFiTrackPoint::set_f_chi2, true);
+                        &SciFiTrackPoint::set_f_chi2, false);
     RegisterValueBranch("s_chi2", &_double_proc,
                         &SciFiTrackPoint::s_chi2,
-                        &SciFiTrackPoint::set_s_chi2, true);
+                        &SciFiTrackPoint::set_s_chi2, false);
     RegisterValueBranch("x", &_double_proc,
                         &SciFiTrackPoint::x,
-                        &SciFiTrackPoint::set_x, true);
+                        &SciFiTrackPoint::set_x, false);
     RegisterValueBranch("px", &_double_proc,
                         &SciFiTrackPoint::px,
-                        &SciFiTrackPoint::set_px, true);
+                        &SciFiTrackPoint::set_px, false);
     RegisterValueBranch("y", &_double_proc,
                         &SciFiTrackPoint::y,
-                        &SciFiTrackPoint::set_y, true);
+                        &SciFiTrackPoint::set_y, false);
     RegisterValueBranch("py", &_double_proc,
                         &SciFiTrackPoint::py,
-                        &SciFiTrackPoint::set_py, true);
+                        &SciFiTrackPoint::set_py, false);
     RegisterValueBranch("mc_x", &_double_proc,
                         &SciFiTrackPoint::mc_x,
-                        &SciFiTrackPoint::set_mc_x, true);
+                        &SciFiTrackPoint::set_mc_x, false);
     RegisterValueBranch("mc_px", &_double_proc,
                         &SciFiTrackPoint::mc_px,
-                        &SciFiTrackPoint::set_mc_px, true);
+                        &SciFiTrackPoint::set_mc_px, false);
     RegisterValueBranch("mc_y", &_double_proc,
                         &SciFiTrackPoint::mc_y,
-                        &SciFiTrackPoint::set_mc_y, true);
+                        &SciFiTrackPoint::set_mc_y, false);
     RegisterValueBranch("mc_py", &_double_proc,
                         &SciFiTrackPoint::mc_py,
-                        &SciFiTrackPoint::set_mc_py, true);
+                        &SciFiTrackPoint::set_mc_py, false);
     RegisterValueBranch("pull", &_double_proc,
                         &SciFiTrackPoint::pull,
-                        &SciFiTrackPoint::set_pull, true);
+                        &SciFiTrackPoint::set_pull, false);
     RegisterValueBranch("residual", &_double_proc,
                         &SciFiTrackPoint::residual,
-                        &SciFiTrackPoint::set_residual, true);
+                        &SciFiTrackPoint::set_residual, false);
     RegisterValueBranch("s_residual", &_double_proc,
                         &SciFiTrackPoint::smoothed_residual,
-                        &SciFiTrackPoint::set_smoothed_residual, true);
+                        &SciFiTrackPoint::set_smoothed_residual, false);
 }
 } // ~namespace MAUS

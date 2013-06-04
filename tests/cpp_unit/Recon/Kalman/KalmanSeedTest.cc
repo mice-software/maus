@@ -245,6 +245,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double pt = 0.3*4.*r;
   double pz = pt*tan_lambda;
   double kappa = fabs(1./pz);
+  helical_track.set_tracker(0);
   helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);
   helical_track.set_phi0(phi_0);

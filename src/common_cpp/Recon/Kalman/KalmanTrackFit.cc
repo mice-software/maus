@@ -71,10 +71,16 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // The KalmanTrack is converted into a
     // SciFiTrack for general use.
     //
-    Save(track, sites, event);
-
-    delete track;
-    delete seed;
+    double chi2 = track->f_chi2();
+    if ( chi2 != chi2 ) {
+      delete track;
+      delete seed;
+      return;
+    } else {
+      Save(track, sites, event);
+      delete track;
+      delete seed;
+    }
   }
 }
 

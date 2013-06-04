@@ -297,29 +297,22 @@ void KalmanTrack::ComputePull(KalmanSite *a_site) {
   TMatrixD a           = a_site->a(KalmanSite::Projected);
   TMatrixD shifts      = a_site->input_shift();
 
-  TMatrixD HA = SolveMeasurementEquation(a, shifts);
+  TMatrixD HA = _H*a;
 
   TMatrixD pull(2, 1);
   pull = measurement - HA;
 
   a_site->set_residual(pull, KalmanSite::Projected);
 }
-
+/*
 TMatrixD KalmanTrack::SolveMeasurementEquation(const TMatrixD &a,
                                                const TMatrixD &s) {
   TMatrixD ha(2, 1);
   ha = _H * a;
 
   return ha;
-  // TMatrixD Ss(2, 1);
-  // Ss = _S * s;
-
-  // TMatrixD result(2, 1);
-  // result = ha + Ss;
-
-  // return result;
 }
-
+*/
 void KalmanTrack::CalculateFilteredState(KalmanSite *a_site) {
   // Calculate the pull,
   TMatrixD pull = a_site->residual(KalmanSite::Projected);
@@ -346,7 +339,7 @@ void KalmanTrack::SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state
   // Solve the measurement equation again,
   // this time passing the FILTERED state to find the
   // residual.
-  TMatrixD HA = SolveMeasurementEquation(a, s);
+  TMatrixD HA = _H * a;
 
   TMatrixD residual(2, 1);
   residual = measurement - HA;
