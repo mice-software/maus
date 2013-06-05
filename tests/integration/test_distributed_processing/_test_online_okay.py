@@ -79,15 +79,28 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         proc = subprocess.Popen(
                             ['python', maus_web, 'runserver', 'localhost:9000'])
         time.sleep(5)
-        if proc.poll() == None:
-            print 'test_maus_app Sending SIGINT'
-            proc.send_signal(signal.SIGINT)
-            time.sleep(5)
-            if proc.poll() == None:
-                print 'test_maus_app Sending SIGKILL'
-                proc.send_signal(signal.SIGKILL)
-                time.sleep(5)
-        self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
+        ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+        pids = []
+        for line in ps_out.split('\n')[1:]:
+            if line.find('manage.py') > -1 and line.find('runserver') > -1:
+                words = line.split()
+                pids.append(int(words[1]))
+                print "Found lurking maus-apps process", pids[-1]
+        for a_pid in pids:
+            print "SIGINT", a_pid
+            try:
+                os.kill(a_pid, signal.SIGINT)
+            except OSError:
+                sys.excepthook(*sys.exc_info())
+        time.sleep(1)
+        for a_pid in pids:
+            print "SIGKILL", a_pid
+            try:
+                os.kill(a_pid, signal.SIGKILL)
+            except OSError:
+                sys.excepthook(*sys.exc_info())
+        time.sleep(1)
+        self.assertEquals(proc.poll(), 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
     unittest.main()
