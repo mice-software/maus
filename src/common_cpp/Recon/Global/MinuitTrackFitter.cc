@@ -56,7 +56,7 @@ void common_cpp_optics_recon_minuit_track_fitter_score_function(
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag) {
 for (size_t index = 0; index < 6; ++index) {
-  std::cout << "DEBUG ..._score_function: coordinate[" << index << "] = "
+  std::cout << "DEBUG common_..._score_function: coordinate[" << index << "] = "
             << phase_space_coordinate_values[index] << std::endl;
 }
   // common_cpp_optics_recon_minuit_track_fitter_minuit is defined
@@ -141,7 +141,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track) 
   *const_cast<std::vector<const TrackPoint*>*>(&detector_events_)
     = raw_track->GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
-  std::cout << "DEBUG ScoreTrack(): Fitting track with "
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): Fitting track with "
             << detector_events_.size() << "track points." << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl;
   particle_id_ = raw_track->get_pid();
@@ -213,8 +213,10 @@ std::cout.flush();
   // calculate chi^2
   Double_t chi_squared = 0.0;
   for (size_t index = 0; event < detector_events_.end(); ++index) {
-std::cout << "DEBUG ScoreTrack(): Guess: " << guess << std::endl;
-std::cout << "DEBUG ScoreTrack(): Measured: " << *event << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Guess: "
+          << guess << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Measured: "
+          << *event << std::endl;
     // calculate the next guess
     const double end_plane = (*event)->get_position().Z();
     PhaseSpaceVector point =
@@ -226,7 +228,8 @@ std::cout << "DEBUG ScoreTrack(): Measured: " << *event << std::endl;
     #else
       optics_model_->Transport(guess, end_plane);
     #endif
-std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
+          << point << std::endl;
 
     TLorentzVector position_error = (*event)->get_position_error();
     TLorentzVector momentum_error = (*event)->get_momentum_error();
@@ -240,13 +243,14 @@ std::cout << "DEBUG ScoreTrack(): Calculated: " << point << std::endl;
     };
     const Matrix<double> error_matrix(6, 6, errors);
     const CovarianceMatrix uncertainties(error_matrix*error_matrix);
-std::cout << "DEBUG ScoreTrack(): Uncertainties: " << uncertainties << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Uncertainties: "
+          << uncertainties << std::endl;
 
     // save the calculated track point in case this is the
     // last (best fitting) track
     reconstructed_points_.push_back(
       helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
-std::cout << "DEBUG ScoreTrack(): Pushed track point #"
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
           << reconstructed_points_.size() << std::endl;
 
     const double weights[36] = {
@@ -264,12 +268,22 @@ std::cout << "DEBUG ScoreTrack(): Pushed track point #"
     // TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
     PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(**event);
     PhaseSpaceVector residual = PhaseSpaceVector(
-      weight_matrix * (event_point - point) / event_point);
-std::cout << "DEBUG ScoreTrack(): Point: " << point << std::endl;
-std::cout << "DEBUG ScoreTrack(): Event: " << event_point << std::endl;
-std::cout << "DEBUG ScoreTrack(): Residual: " << residual << std::endl;
-    chi_squared += (transpose(residual) * uncertainties * residual)[0];
-std::cout << "DEBUG ScoreTrack(): Chi Squared: " << chi_squared << std::endl;
+      weight_matrix * (event_point - point));
+    ParticleOpticalVector normalized_residual(event_point, t0, E0, P0);
+    normalized_residual -= ParticleOpticalVector(point, t0, E0, P0);
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Point: "
+          << point << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Event: "
+          << event_point << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual: "
+          << residual << std::endl;
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
+          << normalized_residual << std::endl;
+    chi_squared += (transpose(normalized_residual)
+                    * uncertainties
+                    * normalized_residual)[0];
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Chi Squared: "
+          << chi_squared << std::endl;
 
     ++event;
   }

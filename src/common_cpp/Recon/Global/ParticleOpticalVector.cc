@@ -46,7 +46,8 @@ std::cout << "DEBUG ParticleOpticalVector::ParticleOpticalVector(): PS Vector"
           << std::endl << vector << std::endl;
   const double beta0 = P0 / E0;
   const double gamma0 = 1. / ::sqrt(1 - beta0*beta0);
-  const double k = beta0 * ::CLHEP::c_light * gamma0 / (1 + gamma0);
+  // const double k = beta0 * ::CLHEP::c_light * gamma0 / (1 + gamma0);
+  const double k = beta0 * gamma0 / (1 + gamma0);
 
   set_l(k * (vector.t() - t0));
   set_delta((vector.E() - E0) / E0);

@@ -321,7 +321,7 @@ void MapCppGlobalTrackReconstructor::LoadRawTracks(
   GlobalDS::TrackPArray::iterator global_track;
   const std::string recon_mapper_name("MapCppGlobalRawTracks");
   for (global_track = global_tracks->begin();
-       global_track < global_tracks->end();
+       global_track != global_tracks->end();
        ++global_track) {
     if ((*global_track)->get_mapper_name() == recon_mapper_name) {
       tracks.push_back(*global_track);

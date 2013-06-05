@@ -268,6 +268,8 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     = space_point_events.GetTOF2SpacePointArray();
 
   if (tof0_space_points.size() != tof1_space_points.size()) {
+    std::cout << "DEBUG LoadTOFTrack: track has different number of "
+              << "space points in TOF0 and TOF1...skipping." << std::endl;
     return;
   }
 
@@ -406,9 +408,17 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
                                           / ::CLHEP::c_light,
                                     gamma * mass * delta_y / delta_t
                                           / ::CLHEP::c_light,
+                                    beta * energy,
+                                    energy);
+    /*
+    momenta[index] = TLorentzVector(gamma * mass * delta_x / delta_t
+                                          / ::CLHEP::c_light,
+                                    gamma * mass * delta_y / delta_t
+                                          / ::CLHEP::c_light,
                                     gamma * mass * delta_z / delta_t
                                           / ::CLHEP::c_light,
                                     energy);
+    */
                                     // gamma * mass);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "Particle: " << Particle::GetInstance().GetName(particle_id)
