@@ -83,6 +83,9 @@ def arg_parser():
     parser.add_argument('--no-test', dest='test_mode', \
                         help="Don't run the batch job using test cdb output",
                         action='store_false', default=False)
+    parser.add_argument('--batch-iteration', dest='batch_iteration', type=int,
+                        help='Batch iteration number for configuration DB',
+                        default='')
     return parser
 
 class DownloadError(Exception):
@@ -284,7 +287,7 @@ class RunSettings: #pylint: disable = R0902
         """
         self.input_file_name = args_in.input_file
         self.test_mode = args_in.test_mode    
-
+        self.batch_iteration = args_in.batch_iteration
         self.run_number = self.get_run_number_from_file_name \
                                                           (self.input_file_name)
         self.run_number_as_string = str(self.run_number).rjust(5, '0')

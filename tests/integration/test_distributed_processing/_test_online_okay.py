@@ -31,6 +31,32 @@ import time
 import sys 
 import signal 
 
+def kill_maus_apps():
+    """
+    Kill any lurking maus_apps
+    """
+    ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+    pids = []
+    for line in ps_out.split('\n')[1:]:
+        if line.find('manage.py') > -1 and line.find('runserver') > -1:
+            words = line.split()
+            pids.append(int(words[1]))
+            print "Found lurking maus-apps process", pids[-1]
+    for a_pid in pids:
+        print "SIGINT", a_pid
+        try:
+            os.kill(a_pid, signal.SIGINT)
+        except OSError:
+            sys.excepthook(*sys.exc_info())
+    time.sleep(1)
+    for a_pid in pids:
+        print "SIGKILL", a_pid
+        try:
+            os.kill(a_pid, signal.SIGKILL)
+        except OSError:
+            sys.excepthook(*sys.exc_info())
+    time.sleep(1)
+
 class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     Check that celery nodes are available and RabbitMQ is alive or fail
@@ -71,6 +97,7 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         _test_online_okay: Check that maus web-app is in the environment
         """
+        kill_maus_apps()
         # should throw an exception if undefined
         os.environ['MAUS_WEB_DIR'] # pylint: disable=W0104
         os.environ['MAUS_WEB_MEDIA_RAW'] # pylint: disable=W0104
@@ -79,27 +106,8 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         proc = subprocess.Popen(
                             ['python', maus_web, 'runserver', 'localhost:9000'])
         time.sleep(5)
-        ps_out =  subprocess.check_output(['ps', '-e', '-F'])
-        pids = []
-        for line in ps_out.split('\n')[1:]:
-            if line.find('manage.py') > -1 and line.find('runserver') > -1:
-                words = line.split()
-                pids.append(int(words[1]))
-                print "Found lurking maus-apps process", pids[-1]
-        for a_pid in pids:
-            print "SIGINT", a_pid
-            try:
-                os.kill(a_pid, signal.SIGINT)
-            except OSError:
-                sys.excepthook(*sys.exc_info())
-        time.sleep(1)
-        for a_pid in pids:
-            print "SIGKILL", a_pid
-            try:
-                os.kill(a_pid, signal.SIGKILL)
-            except OSError:
-                sys.excepthook(*sys.exc_info())
-        time.sleep(1)
+        kill_maus_apps()
+        time.sleep(5)
         self.assertEquals(proc.poll(), 0) # pylint: disable=E1101
 
 if __name__ == "__main__":

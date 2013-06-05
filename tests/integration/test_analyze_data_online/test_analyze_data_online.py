@@ -76,14 +76,6 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Clear any lockfile that exists
         """
-        online_okay = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
-                            'test_distributed_processing/_test_online_okay.py')
-        proc = subprocess.Popen(['python', online_okay],
-                                stdout=open('/dev/null', 'w'),
-                                stderr=subprocess.STDOUT)
-        proc.wait()
-        if proc.poll() != 0:
-            unittest.TestCase.skipTest(self, "Skip - online is not available")
         self.returncodes = {}
         if os.path.exists(LOCKFILE):
             os.remove(LOCKFILE)
@@ -100,6 +92,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         share = share+"04235/04235.000"
         print "Linking", share, "to", target 
         os.symlink(share, target)
+        online_okay = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
+                            'test_distributed_processing/_test_online_okay.py')
+        proc = subprocess.Popen(['python', online_okay],
+                                stdout=open(TMP_DIR+'online_okay.log', 'w'),
+                                stderr=subprocess.STDOUT)
+        proc.wait()
+        if proc.poll() != 0:
+            unittest.TestCase.skipTest(self, "Skip - online is not available")
 
     def _test_kill(self):
         """
