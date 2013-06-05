@@ -120,8 +120,8 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
         for data in self.returncodes.keys():
-            ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration"+\
-               "/test_analyze_data_online/reference_plots_'+str(data)+'/*.root')
+            ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
+               '/test_analyze_data_online/reference_plots_'+str(data)+'/*.root')
             for ref_root in glob.glob(ref_dir):
                 test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(

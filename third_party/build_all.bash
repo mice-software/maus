@@ -31,7 +31,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash
     ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
     ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
-
+    exit 1
     # python and python site-packages are now built; still missing ROOT from the
     # python environment, that will come later. Now HEP libraries
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
