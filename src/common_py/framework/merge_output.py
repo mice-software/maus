@@ -17,10 +17,13 @@ Multi-process dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 from datetime import datetime
 import json
 import sys
+import os
 
+import pymongo.errors
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
 from framework.utilities import DocumentStoreUtilities
@@ -247,7 +250,13 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputting a spill, birthing or deathing the merger or
         outputer or merging an end_of_run spill.
         """
-        # Darkness and sinister evil - somewhere in the combination of ROOT,
+        # Darkness and sinister evil 1 - the loop structure and exception
+        # handling in this code is quite elaborate. Requirements:
+        # * If we receive a sigint we should exit after clearing mongo buffer
+        # * If mongo access throws an error we should ignore it
+        # * See #1190
+
+        # Darkness and sinister evil 2 - somewhere in the combination of ROOT,
         # SWIG, Python; I get a segmentation fault from OutputCppRoot fillevent
         # (*_outfile) << fillEvent; command depending
         # on which function I call outputer.save(...) from when outputer is
@@ -261,42 +270,76 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             self.start_of_job(job_header)
             run_again = True # always run once
             while run_again:
-                run_again = will_run_until_ctrl_c
+                run_again = will_run_until_ctrl_c and self._execute_inner_loop()
+        except KeyboardInterrupt:
+            print "Received SIGINT and dying"
+            sys.exit(0)
+        except Exception:
+            sys.excepthook(*sys.exc_info())
+            raise
+        finally:
+            # Finish the final run, if it was started; then finish the job
+            if (self.run_number != None):
+                print "No more data and set to stop - ending run"
+                self.end_of_run()
+            print "Ending job"
+            self.end_of_job(self.job_footer)
+
+    def _execute_inner_loop(self):
+        """
+        Get documents off the doc store and process them.
+
+        @returns False if a keyboard interrupt is received, indicating that the
+                 iteration should not wait for new data
+        """
+        sys.stdout.flush()
+        sys.stderr.flush()
+        keyboard_interrupt = False
+        try:
+            docs = self.doc_store.get_since(self.collection,
+                                            self.last_time)
+            # Iterate using while, not for, since docs is an
+            # iterator which streams data from database and we
+            # want to detect database errors.
+            while True:
                 try:
-                    docs = self.doc_store.get_since(self.collection,
-                                                    self.last_time)
-                except Exception as exc:
-                    sys.excepthook(*sys.exc_info())
-                    raise DocumentStoreException(exc)
-                # Iterate using while, not for, since docs is an
-                # iterator which streams data from database and we
-                # want to detect database errors.
-                while True:
-                    try:
-                        doc = docs.next()
-                    except StopIteration:
-                        # No more data so exit inner loop.
-                        break
-                    except Exception as exc:
-                        raise DocumentStoreException(exc)
+                    doc = self.docs_next(docs)
                     doc_id = doc["_id"]
                     doc_time = doc["date"]
                     spill = doc["doc"]
-                    print "Read event %s (dated %s)" % (doc_id, doc_time)
+                    print "Read event %s (dated %s)" % (doc_id,
+                                                        doc_time)
                     if (doc_time > self.last_time):
                         self.last_time = doc_time
                     self.process_event(spill)
+                    sys.stdout.flush()
+                    sys.stderr.flush()
+                except StopIteration:
+                    # No more data so exit inner loop.
+                    raise
+                except KeyboardInterrupt:
+                    # If there is a keyboard interrupt we should clear
+                    # the buffer before quitting
+                    print "Received SIGINT in", os.getpid(), \
+                          "- processing open spills before quitting"
+                    keyboard_interrupt = True
+        except StopIteration:
+            # No more data so exit inner loop. If we have received a
+            # SIGINT anywhere, end the loop; otherwise wait for data
+            if keyboard_interrupt:
+                print "Finished processing spills and exiting on SIGINT"
+                return False
         except KeyboardInterrupt:
-            print "Received SIGINT - closing"
-            sys.exit(0)
-        except:
-            raise
-        finally:
-            # Finish the final run.
-            print "No more data and set to stop - ending run"
-            self.end_of_run()
-            print "Ending job"
-            self.end_of_job(self.job_footer)
+            # If there is a keyboard interrupt we should clear
+            # the buffer before quitting
+            print "Received SIGINT in", os.getpid(), \
+                  "- processing open spills before quitting"
+            return False
+        except DocumentStoreException:
+            # Some instability in MongoDB - ignore and carry on
+            sys.excepthook(*sys.exc_info())
+            print "Caught document store error - ignore and carry on"
+        return not keyboard_interrupt
 
     @staticmethod
     def get_dataflow_description():
@@ -310,3 +353,29 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
+
+    @staticmethod
+    def docs_next(_docs, max_number_of_retries=0, retry_time=1):
+        """
+        Try to access document from the iterator a few times before giving up
+        @param _docs iterable that points at a set of documents on the docstore
+        @param max_number_of_retries Integer number of times to retry accessing
+               document before giving up
+        @param retry_time time to wait between retries 
+        """
+        # Note retry counter 
+        retry_counter = 0
+        while True:
+            try:
+                return _docs.next()
+            except StopIteration:
+                raise
+            except pymongo.errors.OperationFailure as err:
+                if retry_counter >= max_number_of_retries:
+                    print 'Failed to access docstore - giving up'
+                    raise DocumentStoreException(err)
+                time.sleep(retry_time)
+                retry_counter += 1
+                print 'Failed to access docstore', retry_counter
+
+

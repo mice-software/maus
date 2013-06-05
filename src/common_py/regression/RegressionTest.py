@@ -35,13 +35,16 @@ def printhistos(hist_mon, hist_ref, results):
     hist_mon.Draw("sames")
     ROOT.gPad.Update()
 
-    stats_ref = hist_ref.FindObject("stats")
-    stats_ref.SetTextColor(ROOT.kRed)
-    stats_mon = hist_mon.FindObject("stats")
-    stats_mon.SetTextColor(ROOT.kBlue)
-    height = stats_mon.GetY2NDC() - stats_mon.GetY1NDC()
-    stats_mon.SetY2NDC(stats_ref.GetY1NDC() - 0.03)
-    stats_mon.SetY1NDC(stats_ref.GetY1NDC() - 0.03 - height)
+    try:
+        stats_ref = hist_ref.FindObject("stats")
+        stats_ref.SetTextColor(ROOT.kRed)
+        stats_mon = hist_mon.FindObject("stats")
+        stats_mon.SetTextColor(ROOT.kBlue)
+        height = stats_mon.GetY2NDC() - stats_mon.GetY1NDC()
+        stats_mon.SetY2NDC(stats_ref.GetY1NDC() - 0.03)
+        stats_mon.SetY1NDC(stats_ref.GetY1NDC() - 0.03 - height)
+    except AttributeError:
+        pass
 
     l = ROOT.TLatex()
     l.SetTextSize(0.036)
@@ -81,9 +84,26 @@ def printhistos(hist_mon, hist_ref, results):
 
 def KS(mon, ref):
     """KS Test"""
+    sum_mon = \
+       sum([mon.GetBinContent(i) for i in range (1, mon.GetXaxis().GetNbins())])
+    sum_ref = \
+       sum([ref.GetBinContent(i) for i in range (1, ref.GetXaxis().GetNbins())])
+    if sum_mon == 0 and sum_ref == 0:
+        return 1.
     return ref.KolmogorovTest(mon)
+
 def X2(mon, ref):
-    """Chi^2 Test"""
+    """
+    Chi^2 Test
+
+    Appears to give false negatives in some cases; so I ignore
+    """
+    sum_mon = \
+       sum([mon.GetBinContent(i) for i in range (1, mon.GetXaxis().GetNbins())])
+    sum_ref = \
+       sum([ref.GetBinContent(i) for i in range (1, ref.GetXaxis().GetNbins())])
+    if sum_mon == 0 and sum_ref == 0:
+        return 1.
     return ref.Chi2Test(mon)
 
 
@@ -166,6 +186,7 @@ def RegressionTest( mon,
     if printer is not None:
         if printed_filename is None:
             printed_filename = mon.replace('.root', '_compared.root')
+            print "Printing output to ", printed_filename
         output_file = ROOT.TFile(printed_filename, "RECREATE")
 
     histo_list = [item.GetName() for item in ref_file.GetListOfKeys() \
@@ -196,13 +217,16 @@ def RegressionTest( mon,
         results[histo] = {}
         for t in tests[0]:
             status = 'Pass'
-            pVal = t.test(hist_mon, hist_ref)
-            if pVal < t.warning:
-                status = 'Warning'
-            if pVal < t.failure:
-                status = 'Failure'
-            results[histo].update({t.name: TestResult(status, pVal,
-                                                      t.warning, t.failure)})
+            if hist_mon.GetMaximum() > 1e-3 or hist_ref.GetMaximum() > 1e-3:
+                pVal = t.test(hist_mon, hist_ref)
+                if pVal < t.warning:
+                    status = 'Warning'
+                if pVal < t.failure:
+                    status = 'Failure'
+                results[histo].update({t.name: TestResult(status, pVal,
+                                                        t.warning, t.failure)})
+                print histo, t.name, hist_mon.GetMaximum(), \
+                      hist_ref.GetMaximum(), pVal, status
 
         if printer is not None:
             printer(hist_mon, hist_ref, results[histo])
