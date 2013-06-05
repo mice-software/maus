@@ -83,7 +83,7 @@ def arg_parser():
     parser.add_argument('--no-test', dest='test_mode', \
                         help="Don't run the batch job using test cdb output",
                         action='store_false', default=False)
-    parser.add_argument('--batch-iteration', dest='batch_iteration', type=int,
+    parser.add_argument('--batch-iteration', dest='batch_iteration', type=str,
                         help='Batch iteration number for configuration DB',
                         default='')
     return parser
