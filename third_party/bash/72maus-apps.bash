@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-dirname=maus-apps
+version=0.2
+dirname=maus-apps-${version}
 filename=${dirname}.tar.gz
-url=http://micewww.pp.rl.ac.uk/maus/${filename}
+url=http://micewww.pp.rl.ac.uk/maus/maus-apps/${filename}
 sourcedir=${MAUS_THIRD_PARTY}/third_party/source/
 sourcefile=${sourcedir}/${filename}
 libdir=${MAUS_THIRD_PARTY}/third_party/install/lib/
@@ -48,7 +49,8 @@ mkdir -p $destdir
 cd "${libdir}"
 tar -xzf ${sourcefile} || { echo "FATAL: Failed untar"; exit 1; }
 sleep 1
-cd $dirname
+ln -s ${dirname} maus-apps
+cd ${dirname}
 echo "INFO: Configuring"
 ./configure --with-maus || { echo "FATAL: Failed configure"; exit 1; }
 echo "INFO: $dirname installed successfully at $destdir"
