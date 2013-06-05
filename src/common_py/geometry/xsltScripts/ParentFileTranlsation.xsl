@@ -79,11 +79,19 @@
                             //    Rotation 0.0 90.0 0.0 deg
                             //}
 
-                           
+                           // 
+
+                            <xsl:variable name="tof_0_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof0FileNumber/@number"/>
                             <xsl:variable name="tof_1_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof1FileNumber/@number"/>
+                            <xsl:variable name="tof_2_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof2FileNumber/@number"/>
+                            <xsl:variable name="kl_file_number" select="MICE_Information/Other_Information/FileNumbers/KLFileNumber/@number"/>
+                            <xsl:variable name="ckov_file_number" select="MICE_Information/Other_Information/FileNumbers/CkovFileNumber/@number"/>
+                            <xsl:variable name="acc1_file_number" select="MICE_Information/Other_Information/FileNumbers/Acc1FileNumber/@number"/>
+                            <xsl:variable name="acc2_file_number" select="MICE_Information/Other_Information/FileNumbers/Acc2FileNumber/@number"/>
+                            <xsl:variable name="emr_file_number" select="MICE_Information/Other_Information/FileNumbers/EMRFileNumber/@number"/>
                             
-                             <xsl:for-each select="structure/volume/physvol"> 
-                                   Module <xsl:choose><xsl:when test="contains(file/@name, 'Iges_0')">TOF/TOF0.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_1')">TOF/TOF1.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_3')">TOF/TOF2.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_4')">KL/KL.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_6')">Ckov/Cherenkov.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_5')">EMR/Calorimeter.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_7')">Ckov/Acc1.dat</xsl:when><xsl:when test="contains(file/@name, 'Iges_8')">Ckov/Acc2.dat</xsl:when><xsl:when test="contains(file/@name, 'SingleStation')">Tracker/Tracker1Station1.dat</xsl:when><xsl:otherwise><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat</xsl:otherwise></xsl:choose>
+                            <xsl:for-each select="structure/volume/physvol"> 
+                                   Module <xsl:choose><xsl:when test="contains(file/@name, $tof_0_file_number)">TOF/TOF0.dat</xsl:when><xsl:when test="contains(file/@name, $tof_1_file_number)">TOF/TOF1.dat</xsl:when><xsl:when test="contains(file/@name, $tof_2_file_number)">TOF/TOF2.dat</xsl:when><xsl:when test="contains(file/@name, $kl_file_number)">KL/KL.dat</xsl:when><xsl:when test="contains(file/@name, $ckov_file_number)">Ckov/Cherenkov.dat</xsl:when><xsl:when test="contains(file/@name, $emr_file_number)">EMR/Calorimeter.dat</xsl:when><xsl:when test="contains(file/@name, $acc1_file_number)">Ckov/Acc1.dat</xsl:when><xsl:when test="contains(file/@name, $acc2_file_number)">Ckov/Acc2.dat</xsl:when><xsl:when test="contains(file/@name, 'SingleStation')">Tracker/Tracker1Station1.dat</xsl:when><xsl:otherwise><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat</xsl:otherwise></xsl:choose>
                                     { 
                                         Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
                                         Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
