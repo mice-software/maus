@@ -156,7 +156,7 @@ std::string MapCppGlobalTrackReconstructor::process(
 
     std::vector<MAUS::DataStructure::Global::Track*>* tracks
       = global_event->get_tracks();
-    std::cout << "Added " << (tracks->size()-1)<< " reconstructed tracks."
+    std::cout << "Added " << (tracks->size()-1)<< " reconstructed tracks:"
               << std::endl;
   }
 

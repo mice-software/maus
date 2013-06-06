@@ -163,10 +163,14 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track) 
   minimiser->Migrad();
   // TODO(plane1@hawk.iit.edu) Handle status from minimiser
 
-  for (std::vector<TrackPoint>::const_iterator reconstructed_point
+  size_t particle_event
+    = raw_track->GetTrackPoints()[0]->get_particle_event();
+
+  for (std::vector<TrackPoint>::iterator reconstructed_point
           = reconstructed_points_.begin();
        reconstructed_point < reconstructed_points_.end();
        ++reconstructed_point) {
+    reconstructed_point->set_particle_event(particle_event);
     track->AddTrackPoint(new TrackPoint(*reconstructed_point));
   }
   track->set_pid(raw_track->get_pid());
