@@ -52,10 +52,18 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     my_tmp = temp_dir(data_file_name+dir_suffix)
     if not os.path.exists(my_tmp):
         os.makedirs(my_tmp)
+    raw_dir = my_tmp+'/raw'
+    print raw_dir, os.path.exists(raw_dir), my_tmp, os.path.exists(my_tmp)
+    if os.path.exists(raw_dir):
+        os.remove(raw_dir)
+        time.sleep(1)
+    os.symlink(my_tmp, raw_dir)
     log = open(my_tmp+"test_analyze_data_online.log", "w")
     print "Running analyze online"
+    print "Point your browser at http://localhost:9000/maus/"
     env_cp = os.environ.copy()
-    env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp
+    env_cp['MAUS_WEB_MEDIA'] = my_tmp+'/'
+    env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp+'/raw/'
     proc = subprocess.Popen(['python', ANALYZE_EXE,
                              '--DAQ_online_file', TMP_DIR+data_file_name],
                              env=env_cp, stdout=log,
@@ -98,6 +106,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
                                 stdout=open(TMP_DIR+'online_okay.log', 'w'),
                                 stderr=subprocess.STDOUT)
         proc.wait()
+
         if proc.poll() != 0:
             unittest.TestCase.skipTest(self, "Skip - online is not available")
 
