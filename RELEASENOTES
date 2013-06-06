@@ -5,6 +5,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.5.4
+  The following functionality was added:
+    - Stability and testing of online code was improved
+  If upgrading from a previous version, please redo the entire installation
+
 MAUS-v0.5.3
   The following functionality was added:
     - The ROOT version was updated to the latest version 5.34.07
