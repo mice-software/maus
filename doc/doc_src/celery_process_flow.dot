@@ -1,0 +1,29 @@
+digraph G {
+  node [shape=record];
+  process_event [shape=record, color=blue, label="{InputTransformExecutor.process_event}"]
+  subgraph cluster_birth {
+    start_of_run [shape=record, color=blue, label="{InputTransformExecutor.start_of_run}"]
+    birth_celery [shape=record, color=blue, label="{CeleryUtilities.birth_celery}"]
+    worker_birth [shape=record, color=red, label="{mausworker.birth}"]
+    process_birth [shape=record, color=red, label="{mausprocess.process_birth}"]
+    transform_initialize [shape=record, color=red, label="{state.MausTransform.initialize}"]
+    transform_birth [shape=record, color=red, label="{state.MausTransform.birth}"]
+    create_transform [ shape=record, color=red, label="{workers.WorkerUtilities.create_transform}"]
+    mapper_init [ shape=record, color=red, label="{\<mapper module\>.\<mapper class\>.__init__()}"]
+    mapper_birth [ shape=record, color=red, label="{\<mapper module\>.\<mapper class\>.birth()}"]
+  }
+  subgraph cluster_process {
+    submit_spill_to_celery [shape=record, color=blue, label="{InputTransformExecutor.submit_spill_to_celery}"]
+  }
+  subgraph cluster_death {
+    end_of_run [shape=record, color=blue, label="{InputTransformExecutor.end_of_run}"]
+  }
+
+  process_event -> start_of_run [style=dotted, label="run number changed?"]
+                   start_of_run -> birth_celery -> worker_birth
+                                                   worker_birth -> process_birth -> transform_initialize -> create_transform -> mapper_init
+                                                                   process_birth -> transform_birth -> mapper_birth
+  process_event -> submit_spill_to_celery
+  process_event -> end_of_run [style=dotted, label="run number changed and not first?"]
+}
+

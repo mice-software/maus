@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
+
 """
 Tests for Celery workers configured for MAUS. This checks that single threaded
 mode, multithreaded and split multithreaded mode return the same output.
@@ -35,6 +37,7 @@ import celery.task.control #pylint: disable=E0611, F0401
 import libMausCpp # pylint: disable=W0611
 
 def run_simulate_mice(dataflow, output_file_pre, wait=True,
+               mongodb_name='test_multi',
                docstore='docstore.InMemoryDocumentStore.InMemoryDocumentStore'):
     """
     Run simulate_mice.py
@@ -50,6 +53,8 @@ def run_simulate_mice(dataflow, output_file_pre, wait=True,
                             '--type_of_dataflow', dataflow,
                             '--output_json_file_name', output_file_pre+'.json',
                             '--doc_store_class', docstore,
+                            '--spill_generator_number_of_spills', '10',
+                            '--mongodb_database_name', mongodb_name
                             ],
                             stdout = log, stderr=subprocess.STDOUT)
     if wait:
@@ -61,6 +66,18 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     Run simulation in each mode; check that each datatype has the correct output
     """
+
+    @classmethod
+    def setUpClass(cls): #pylint: disable=C0103
+        cls.proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+        time.sleep(5)
+
+    @classmethod
+    def tearDownClass(cls): #pylint: disable=C0103
+        if cls.proc != None:
+            print "Killing celeryd process", cls.proc.pid
+            cls.proc.send_signal(signal.SIGKILL)
+
     def setUp(self): #pylint: disable=C0103
         """
         Check that celery is running or skip
@@ -85,36 +102,54 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         separate processes for input-map and reduce-output)
         """
         single_name = os.path.expandvars \
-                              ('$MAUS_ROOT_DIR/tmp/test_mauscelery_single')
-        multi_name = os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_multi')
+                              ('$MAUS_ROOT_DIR/tmp/test_multi_single')
+#        multi_name = os.path.expandvars \
+#                               ('$MAUS_ROOT_DIR/tmp/test_multi_multi')
         split_name_in =  os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_in')
+                               ('$MAUS_ROOT_DIR/tmp/test_multi_split_in')
         split_name_out = os.path.expandvars \
-                               ('$MAUS_ROOT_DIR/tmp/test_mauscelery_split_out')
+                               ('$MAUS_ROOT_DIR/tmp/test_multi_split_out')
         # warning - can only use MongoDBDocumentStore with one concurrent run -
         # no test for job that spawned the document!    
+        proc_list = []
+        start_time = time.time()
+        proc_list += [run_simulate_mice('pipeline_single_thread', single_name)]
+#        print multi_name
+#        proc_list += [run_simulate_mice('multi_process', multi_name,
+#                docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')]
         print split_name_in
-        run_simulate_mice('multi_process_input_transform',
-                          split_name_in, False,
-                  docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')
-        print split_name_out
-        out_proc = run_simulate_mice('multi_process_merge_output',
-                                     split_name_out, False,
-                  docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')
-        print single_name
-        run_simulate_mice('pipeline_single_thread', single_name)
-        print multi_name
-        run_simulate_mice('multi_process', multi_name)
+        proc_list += [run_simulate_mice('multi_process_input_transform',
+                      split_name_in, False, 'test_multi_split',
+                 docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')]
         self.assertFalse(os.path.exists(split_name_in+'.json'))
-        file_names = [multi_name+'.json',
-                      single_name+'.json',
-                      split_name_out+'.json']
+        print split_name_out
+        proc_list += [run_simulate_mice('multi_process_merge_output',
+                                     split_name_out, False, 'test_multi_split',
+                 docstore='docstore.MongoDBDocumentStore.MongoDBDocumentStore')]
+        print single_name
         # merge_output hopefully finished in the split multi - equivalent
         # process has run twice in the other two subprocesses + transforms
-        print 'killing', split_name_out, 'job'
-        out_proc.send_signal(signal.SIGINT) #pylint: disable=E1101
-        time.sleep(1) # give a chance for signal and file close to come through
+        end_time = time.time()
+        sleep_time = 3*(end_time-start_time)
+        print 'Sleeping for', sleep_time 
+        time.sleep(sleep_time)
+        done = False
+        for proc in proc_list:
+            if proc.poll() == None:
+                print 'ctrl-c', proc.pid
+                proc.send_signal(signal.SIGINT)
+        print 'Watching for running processes'
+        done = False
+        while not done:
+            done = True
+            for proc in proc_list:
+                done = done and proc.poll() != None
+                print proc.poll() == None,
+            print 'done', done
+            time.sleep(10)
+        file_names = [#multi_name+'.json',
+                      single_name+'.json',
+                      split_name_out+'.json']
         return file_names
 
     def sort_by_maus_event_type(self, lines): # pylint: disable = R0201
@@ -151,10 +186,10 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
         files = {}
         for fname in file_names:
             files[fname] = [json.loads(line) \
-                                            for line in open(fname).readlines()]
+                                        for line in open(fname).readlines()]
             files[fname] = self.sort_by_maus_event_type(files[fname])
         for name, _file in files.iteritems():
-            print name, len(_file)
+            print name, len(_file['Spill'])
         bzr_revs = self._get_data(files, 'JobHeader', 'bzr_revision')
         for rev in bzr_revs.values()[1:]:
             self.assertEqual(bzr_revs.values()[0], rev)
@@ -164,13 +199,15 @@ class MultiThreadedTest(unittest.TestCase): # pylint: disable=R0904, C0301
             for number in run_number_list:
                 self.assertEqual(number, run_nums.values()[0][0])
         run_nums = self._get_data(files, 'RunFooter', 'run_number')
-        for run_number_list in run_nums.values():
+        for run_number_list in []:
             for number in run_number_list:
                 self.assertEqual(number, run_nums.values()[0][0])
         dates = self._get_data(files, 'JobFooter', 'end_of_job')
         spill_numbers = self._get_data(files, 'Spill', 'spill_number')
-        for spill_number in spill_numbers.values()[1:]:
-            self.assertEqual(sorted(spill_numbers.values()[0]),
+        ref_file_name = spill_numbers.keys()[0]
+        for file_name, spill_number in spill_numbers.iteritems():
+            print 'Comparing', ref_file_name, 'with', file_name
+            self.assertEqual(sorted(spill_numbers[ref_file_name]),
                              sorted(spill_number))
         for end_of_job in dates.values():
             self.assertEqual(len(end_of_job), 1)

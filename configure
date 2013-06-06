@@ -205,6 +205,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
                                     # as better to use exceptions
      fi
 
+     source "\${MAUS_THIRD_PARTY}/third_party/install/lib/maus-apps/env.sh"
+
      echo "SUCCESS: MAUS setup"
 else
      echo "WARNING: MAUS already setup"

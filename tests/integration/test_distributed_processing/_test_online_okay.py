@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
+
 """
 Check that celery is alive on the test server. Note that this should not be run
 as part of the regular test script - only should be run by online machine (and
@@ -25,6 +27,35 @@ import celery.task.control # pylint: disable=E0611, F0401
 import pymongo
 import pymongo.errors
 import subprocess
+import time
+import sys 
+import signal 
+
+def kill_maus_apps():
+    """
+    Kill any lurking maus_apps
+    """
+    ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+    pids = []
+    for line in ps_out.split('\n')[1:]:
+        if line.find('manage.py') > -1 and line.find('runserver') > -1:
+            words = line.split()
+            pids.append(int(words[1]))
+            print "Found lurking maus-apps process", pids[-1]
+    for a_pid in pids:
+        print "SIGINT", a_pid
+        try:
+            os.kill(a_pid, signal.SIGINT)
+        except OSError:
+            sys.excepthook(*sys.exc_info())
+    time.sleep(1)
+    for a_pid in pids:
+        print "SIGKILL", a_pid
+        try:
+            os.kill(a_pid, signal.SIGKILL)
+        except OSError:
+            sys.excepthook(*sys.exc_info())
+    time.sleep(1)
 
 class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -38,10 +69,16 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         down) or no active nodes
         """
         try:
+            proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+            time.sleep(5)
             active_nodes = \
                   celery.task.control.inspect().active() # pylint: disable=E1101
-        except: #pylint: disable=W0702
-            self.assertTrue(False, "Failed to inspect celery workers")
+        except Exception: #pylint: disable=W0703
+            sys.excepthook(*sys.exc_info())
+            self.assertTrue(False)
+        finally:
+            if proc.poll() == None:
+                proc.send_signal(signal.SIGKILL)
         self.assertNotEqual(active_nodes, None)
 
     def test_mongodb_is_alive(self):
@@ -60,14 +97,18 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         _test_online_okay: Check that maus web-app is in the environment
         """
+        kill_maus_apps()
         # should throw an exception if undefined
         os.environ['MAUS_WEB_DIR'] # pylint: disable=W0104
         os.environ['MAUS_WEB_MEDIA_RAW'] # pylint: disable=W0104
-        maus_web = os.path.join(os.environ['MAUS_WEB_DIR'],
-                                                    'src/mausweb/manage.py')
-        proc = subprocess.Popen(['python', '-m', maus_web])        
-        proc.wait() # pylint: disable=E1101
-        self.assertEquals(proc.returncode, 0) # pylint: disable=E1101
+        maus_web = os.path.join(
+                      os.path.expandvars('$MAUS_WEB_DIR/src/mausweb/manage.py'))
+        proc = subprocess.Popen(
+                            ['python', maus_web, 'runserver', 'localhost:9000'])
+        time.sleep(5)
+        kill_maus_apps()
+        time.sleep(5)
+        self.assertEquals(proc.poll(), 0) # pylint: disable=E1101
 
 if __name__ == "__main__":
     unittest.main()
