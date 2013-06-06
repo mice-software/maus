@@ -47,7 +47,7 @@ def walker(_maus_root_dir, _exclude_dirs, _exclude_files, _filename):
     @returns number of errors found by cpplint
     """
     file_handle = open(_filename, 'w')
-    cpplint._cpplint_state.SetOutputHandler(file_handle)
+    cpplint._cpplint_state.SetOutputHandler(file_handle) # pylint: disable=W0212
     errors = 0
     for root_dir, ls_dirs, ls_files in os.walk(_maus_root_dir):
         maus_dir = root_dir[len(_maus_root_dir)+1:] #root_dir relative to maus
@@ -88,13 +88,13 @@ def run_cpplint(root_dir, file_list):
     Note that this only runs against files with suffixes in the list:
               ['.hh', '.h', '.cpp', '.cc']
     """
-    cpplint._cpplint_state.ResetErrorCounts()
+    cpplint._cpplint_state.ResetErrorCounts() # pylint: disable=W0212
     for a_file in file_list:
         target = os.path.join(root_dir, a_file)
         for suffix in CPPLINT_SUFFIXES:
             if target.endswith(suffix):
                 cpplint.ProcessFile(target, 3)
-    return cpplint._cpplint_state.error_count
+    return cpplint._cpplint_state.error_count # pylint: disable=W0212
 
 class CpplintPostProcessor:
     """
