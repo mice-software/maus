@@ -79,8 +79,8 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertEquals(os.getcwd(), worker.directory)
         self.assertEquals(worker.directory+'/end_of_run/',
                           worker.end_of_run_directory)
-        success = worker.birth(json.dumps({"image_directory":None,
-                                           "end_of_run_image_directory":None}))
+        success = worker.birth(json.dumps({"image_directory":'',
+                                           "end_of_run_image_directory":''}))
         self.assertTrue(success, "worker.birth() failed")
         self.assertEquals(os.getcwd(), worker.directory)
         self.assertEquals(worker.directory+'/end_of_run/',

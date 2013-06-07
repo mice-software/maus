@@ -78,13 +78,13 @@ class OutputPyImage:
             self.file_prefix = config_doc[key]
 
         key = "image_directory"
-        if key in config_doc and config_doc[key] != None:
+        if key in config_doc and config_doc[key] != '':
             self.directory = config_doc[key]
         else:
             self.directory = os.getcwd()
 
         key = "end_of_run_image_directory"
-        if key in config_doc and config_doc[key] != None:
+        if key in config_doc and config_doc[key] != '':
             self.end_of_run_directory = config_doc[key]
         else:
             self.end_of_run_directory = self.directory+'/end_of_run/'
