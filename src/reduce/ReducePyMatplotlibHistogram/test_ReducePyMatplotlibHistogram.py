@@ -285,6 +285,8 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         """
         self.assertEquals(spill_id + 1, self.__reducer.spill_count,
             "Unexpected reducer.spill_count")
+        self.assertTrue("maus_event_type" in result)
+        self.assertEquals(result["maus_event_type"], "Image")
         self.assertTrue("image" in result, "No image field")
         image = result["image"]
         self.assertEquals(self.__reducer.image_type, image["image_type"],
@@ -312,7 +314,7 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
 
     @classmethod
     def tearDownClass(self): # pylint: disable=C0202
-        """ 
+        """
         Set the worker to None.
         @param self Object reference.
         """

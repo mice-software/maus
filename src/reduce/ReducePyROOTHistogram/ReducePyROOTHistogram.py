@@ -241,6 +241,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
         json_doc["image"]["data"] = encoded_data
+        json_doc["maus_event_type"] = "Image"
         return json_doc
  
     def get_root_doc(self, keywords, description, tag, histos):

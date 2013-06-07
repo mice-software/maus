@@ -239,6 +239,7 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
         @returns JSON document.
         """
         json_doc = {}
+        json_doc["maus_event_type"] = "Image"
         json_doc["image"] = {}
         if (self.auto_number):
             image_tag = "%s%06d" % (tag, self.spill_count)

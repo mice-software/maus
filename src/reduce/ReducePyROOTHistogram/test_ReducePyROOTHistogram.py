@@ -308,6 +308,8 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         """
         self.assertEquals(spill_id + 1, self.__reducer.spill_count,
             "Unexpected reducer.spill_count")
+        self.assertTrue("maus_event_type" in result)
+        self.assertEquals(result["maus_event_type"], "Image")
         self.assertTrue("image" in result, "No image field")
         image = result["image"]
         self.assertEquals(self.__reducer.image_type, image["image_type"],
