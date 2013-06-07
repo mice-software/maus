@@ -310,21 +310,21 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
             "Unexpected reducer.spill_count")
         self.assertTrue("maus_event_type" in result)
         self.assertEquals(result["maus_event_type"], "Image")
-        self.assertTrue("image" in result, "No image field")
-        image = result["image"]
-        self.assertEquals(self.__reducer.image_type, image["image_type"],
-            "Unexpected image_type")
-        if (self.__reducer.auto_number):
-            tag = "test%06d" % (spill_id + 1)
-        else:
-            tag = "test"
-        self.assertEquals(tag, image["tag"], "Unexpected tag")
-        self.assertTrue("keywords" in image, "No keywords field")
-        self.assertTrue("description" in image, "No description field")
-        self.assertTrue("data" in image, "No data field")
-        decoded_data = base64.b64decode(image["data"])
-        self.assertTrue(decoded_data.find("EPS") != -1,
-            "Unexpected image data")
+        self.assertTrue("image_list" in result, "No image field")
+        for image in result["image_list"]:
+            self.assertEquals(self.__reducer.image_type, image["image_type"],
+                "Unexpected image_type")
+            if (self.__reducer.auto_number):
+                tag = "test%06d" % (spill_id + 1)
+            else:
+                tag = "test"
+            self.assertEquals(tag, image["tag"], "Unexpected tag")
+            self.assertTrue("keywords" in image, "No keywords field")
+            self.assertTrue("description" in image, "No description field")
+            self.assertTrue("data" in image, "No data field")
+            decoded_data = base64.b64decode(image["data"])
+            self.assertTrue(decoded_data.find("EPS") != -1,
+                "Unexpected image data")
 
     def tearDown(self):
         """

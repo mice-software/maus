@@ -163,13 +163,9 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         except Exception: # pylint:disable=W0703
             ErrorHandler.HandleException(json_doc, self)
             return unicode(json.dumps(json_doc))
-
+        image_list = [image['image'] for image in result]
         # Convert results to strings.
-        doc_list = []
-        for doc in result:
-            doc_list.append(json.dumps(doc))
-            doc_list.append("\n")
-        return unicode("".join(doc_list))
+        return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 
     def _update_histograms(self, spill):
         """
@@ -241,7 +237,6 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
         json_doc["image"]["data"] = encoded_data
-        json_doc["maus_event_type"] = "Image"
         return json_doc
  
     def get_root_doc(self, keywords, description, tag, histos):

@@ -41,7 +41,14 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
         """
         self.__worker = OutputPyImage()
+        self.here = os.getcwd()
         self.__file_extension = "outputpyimage"
+        self.working_dir = os.path.expandvars(
+                                        "$MAUS_ROOT_DIR/tmp/test_OutputPyImage")
+        if exists(self.working_dir):
+            shutil.rmtree(self.working_dir)
+        os.makedirs(self.working_dir)
+        os.chdir(self.working_dir)
 
     def setUp(self):
         """ 
@@ -69,10 +76,15 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
         """
         worker = OutputPyImage()
-        success = worker.birth("""{"image_directory":null}""")
+        self.assertEquals(os.getcwd(), worker.directory)
+        self.assertEquals(worker.directory+'/end_of_run/',
+                          worker.end_of_run_directory)
+        success = worker.birth(json.dumps({"image_directory":None,
+                                           "end_of_run_image_directory":None}))
         self.assertTrue(success, "worker.birth() failed")
-        self.assertEquals(os.getcwd(), worker.directory, 
-            "Unexpected worker.directory")
+        self.assertEquals(os.getcwd(), worker.directory)
+        self.assertEquals(worker.directory+'/end_of_run/',
+                          worker.end_of_run_directory)
 
     def test_birth_bad_dir(self):
         """ 
@@ -80,7 +92,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
       . """
         worker = OutputPyImage()
-        self.__tmpdir = tempfile.mkdtemp()
+        self.__tmpdir = tempfile.mkdtemp(prefix=os.getcwd())
         temp_path = os.path.join(self.__tmpdir, "somefile.txt")
         temp_file = open(temp_path, 'w')
         temp_file.write('')
@@ -88,6 +100,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         with self.assertRaisesRegexp(ValueError,
             ".*image_directory is a file.*"):
             worker.birth("""{"image_directory":"%s"}""" % temp_path)
+            worker.save(json.dumps({"maus_event_type":"Image", "image_list": [{
+                "description":"Description", 
+                "tag": "_tdcadc", 
+                "image_type": self.__file_extension, 
+                "data": "Data"}]}))
 
     def test_birth_abs_dir(self):
         """ 
@@ -99,12 +116,22 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         self.__tmpdir = tempfile.mkdtemp()
         relative_path = join('a', 'b', 'c', 'd')
         abs_path = join(self.__tmpdir, relative_path)
+        abs_path_end = join(abs_path, 'e', 'f')
         self.assertTrue(not exists(abs_path), "Directory already exists")
-        success = worker.birth("""{"image_directory":"%s"}""" % abs_path)
+        success = worker.birth(json.dumps({"image_directory":abs_path,
+                                    "end_of_run_image_directory":abs_path_end}))
         self.assertTrue(success, "worker.birth() failed")
-        self.assertTrue(exists(abs_path), "Directory does not exist")
-        self.assertEquals(abs_path, worker.directory, 
-            "Unexpected worker.image_directory")
+        worker.save(json.dumps({"maus_event_type":"Image", "image_list": [{
+            "description":"Description", 
+            "tag": "_tdcadc", 
+            "image_type": self.__file_extension, 
+            "data": "Data"}]}))
+        self.assertTrue(exists(abs_path))
+        self.assertEquals(abs_path, worker.directory)
+        worker.save(json.dumps({"maus_event_type":"RunFooter",
+                               "run_number":1111}))
+        self.assertTrue(exists(abs_path_end))
+        self.assertEquals(abs_path_end, worker.end_of_run_directory)
 
     def test_birth_relative_dir(self):
         """ 
@@ -118,6 +145,11 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertTrue(not exists(self.__tmpdir), "Directory already exists")
         success = worker.birth("""{"image_directory":"%s"}""" % relative_path)
         self.assertTrue(success, "worker.birth() failed")
+        worker.save(json.dumps({"maus_event_type":"Image", "image_list":[{
+            "description":"Description", 
+            "tag": "_tdcadc", 
+            "image_type": self.__file_extension, 
+            "data": "Data"}]}))
         self.assertTrue(exists(self.__tmpdir), "Directory does not exist")
         self.assertEquals(relative_path, worker.directory, 
             "Unexpected worker.image_directory")
@@ -127,7 +159,19 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         Test "save" with a JSON document with no "image".
         @param self Object reference.
         """
-        self.__save({})
+        self.__save({'maus_event_type':'Image', "image_list":[]})
+
+
+    def test_save_no_event_type(self):
+        """ 
+        Test "save" with a JSON document with no "maus_event_type".
+        @param self Object reference.
+        """
+        try:
+            self.__save({})
+            self.assertTrue(False)
+        except KeyError:
+            pass
 
     def test_save_image_no_tag(self):
         """ 
@@ -136,10 +180,10 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing tag.*"):
-            self.__save({"image": {
+            self.__save({"maus_event_type":"Image", "image_list": [{
                 "description":"Description", 
                 "image_type": self.__file_extension, 
-                "data": "Data"}})
+                "data": "Data"}]})
 
     def test_save_image_no_type(self):
         """ 
@@ -148,10 +192,10 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing image_type.*"):
-            self.__save({"image": {
+            self.__save({"maus_event_type":"Image", "image_list": [{
                 "description":"Description", 
                 "tag": "tdcadc", 
-                "data": "Data"}})
+                "data": "Data"}]})
 
     def test_save_image_no_data(self):
         """ 
@@ -160,27 +204,41 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         """
         with self.assertRaisesRegexp(ValueError,
             ".*Missing data.*"):
-            self.__save({"image": {
+            self.__save({"maus_event_type":"Image", "image_list": [{
                 "description":"Description", 
                 "tag": "tdcadc", 
-                "image_type": self.__file_extension}})
+                "image_type": self.__file_extension}]})
 
     def test_save_images(self):
         """ 
         Test "save" with 3 JSON documents each an "image".
         @param self Object reference.
         """
-        json_str = ""
-        for i in range(0, 3):
-            json_doc = {"image": {
-                "description":"Description", 
-                "tag": "tdcadc%d" % i, 
-                "image_type": self.__file_extension, 
-                "data": "Data"}}
-            json_str = "%s\n%s" % (json.dumps(json_doc), json_str)
-        self.__worker.save(json_str)
+        json_doc = {"maus_event_type":"Image", "image_list": [{
+            "description":"Description", 
+            "tag": "tdcadc%d" % i, 
+            "image_type": self.__file_extension, 
+            "data": "Data"} for i in range(3)]}
+        self.__worker.save(json.dumps(json_doc))
         # Check output files...
-        self.__check_result(3)
+        self.__check_result(3, join(os.getcwd(), self.__worker.directory))
+
+    def test_save_end_of_run(self):
+        """ 
+        Test "save" with 3 JSON documents each an "image".
+        @param self Object reference.
+        """
+        json_doc = {"maus_event_type":"Image", "image_list": [{
+            "description":"Description", 
+            "tag": "tdcadc%d" % i, 
+            "image_type": self.__file_extension, 
+            "data": "Data"} for i in range(3)]}
+        self.__worker.save(json.dumps(json_doc))
+        run_footer = json.dumps({"maus_event_type":"RunFooter",
+                                 "run_number":1111})
+        self.__worker.save(run_footer)
+        self.__check_result(3, join(os.getcwd(),
+                            self.__worker.end_of_run_directory, '1111'))
 
     def __save(self, json_doc):
         """
@@ -192,7 +250,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         json_str = json.dumps(json_doc)
         self.__worker.save(json_str)
 
-    def __check_result(self, number_of_files):
+    def __check_result(self, number_of_files, directory):
         """ 
         Validate results from "save". Check that the image directory
         has the expected number of files, each with the expected
@@ -200,7 +258,6 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
         @param number_of_files Number of files to check for.
         """
-        directory = join(os.getcwd(), self.__worker.directory)
         image_files = []
         json_files = []
         for afile in os.listdir(directory):
@@ -211,7 +268,8 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         image_files = sorted(image_files)
         json_files = sorted(json_files)
         self.assertEquals(number_of_files, len(image_files), 
-            "Unexpected number of image files")
+            "Unexpected number of image files %i/%i"% (len(image_files),
+                                                               number_of_files))
         self.assertEquals(number_of_files, len(json_files), 
             "Unexpected number of JSON files")
         for i in range(0, number_of_files):
@@ -236,14 +294,6 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         success = self.__worker.death()
         if not success:
             raise Exception('Test setUp failed', 'worker.death() failed')
-        # Clean up any temporary directories and files.
-        if (self.__tmpdir != ""):
-            shutil.rmtree(self.__tmpdir)
-        for afile in os.listdir(os.getcwd()):
-            if fnmatch.fnmatch(afile, '*.%s' % self.__file_extension):
-                os.remove(afile)
-            if fnmatch.fnmatch(afile, '*.json'):
-                os.remove(afile)
 
     @classmethod
     def tearDownClass(self): # pylint: disable=C0202
@@ -252,6 +302,7 @@ class OutputPyImageTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
         """
         self.__worker = None
+        os.chdir(self.here)
 
 if __name__ == '__main__':
     unittest.main()

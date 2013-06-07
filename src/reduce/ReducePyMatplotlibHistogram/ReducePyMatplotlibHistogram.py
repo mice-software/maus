@@ -155,12 +155,9 @@ class ReducePyMatplotlibHistogram: # pylint: disable=R0903
             ErrorHandler.HandleException(json_doc, self)
             return unicode(json.dumps(json_doc))
 
+        image_list = [image['image'] for image in result]
         # Convert results to strings.
-        doc_list = []
-        for doc in result:
-            doc_list.append(json.dumps(doc))
-            doc_list.append("\n")
-        return unicode("".join(doc_list))
+        return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 
     def _update_histograms(self, spill):
         """
