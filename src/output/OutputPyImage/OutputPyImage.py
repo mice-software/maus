@@ -17,7 +17,6 @@ OutputPyImage saves image files held in a set of JSON documents.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import base64
-import io
 import json
 import os
 
@@ -25,15 +24,15 @@ class OutputPyImage:
     """
     OutputPyImage saves image files held in a set of JSON documents.
 
-    The input is a sequence of JSON documents separated by line
-    breaks e.g.:
+    The input is a JSON document formatted like:
 
     @verbatim
-    {"image": {"keywords":["TDC", "ADC", "counts"],
+    { "maus_event_type":"Image",
+      "image_list": [{"keywords":["TDC", "ADC", "counts"],
                "description":"Total TDC and ADC counts to spill 2",
                "tag": "tdcadc",
                "image_type": "eps", 
-               "data": "...base 64 encoded image..."}}
+               "data": "...base 64 encoded image..."}]}
     @endverbatim
 
     If there are no such entries in a document then it skips to the
@@ -59,6 +58,9 @@ class OutputPyImage:
     def __init__(self):
         self.file_prefix = "image"
         self.directory = os.getcwd()
+        self.end_of_run_directory = os.getcwd()+'/end_of_run/'
+        self.last_event = {}
+        self.run_number = -9999
 
     def birth(self, config_json):
         """
@@ -76,18 +78,16 @@ class OutputPyImage:
             self.file_prefix = config_doc[key]
 
         key = "image_directory"
-        if key in config_doc:
-            directory = config_doc[key]
-            if (directory == None):
-                directory = os.getcwd()
-            elif not os.path.exists(directory):
-                os.makedirs(directory) 
-            elif (not os.path.isdir(directory)):
-                raise ValueError("image_directory is a file: %s" % 
-                    directory)
-            self.directory = directory
+        if key in config_doc and config_doc[key] != '':
+            self.directory = config_doc[key]
         else:
             self.directory = os.getcwd()
+
+        key = "end_of_run_image_directory"
+        if key in config_doc and config_doc[key] != '':
+            self.end_of_run_directory = config_doc[key]
+        else:
+            self.end_of_run_directory = self.directory+'/end_of_run/'
 
         return True
 
@@ -98,32 +98,18 @@ class OutputPyImage:
         that has missing "data", "tag" or "image_type" entries.
         @param document List of JSON documents separated by newline.
         """
-        document_file = io.StringIO(unicode(document))
-        next_value = document_file.readline()
-        while next_value != "":
-            next_value = next_value.rstrip()
-            if next_value != "":
-                json_doc = json.loads(next_value)
-                if "image" in json_doc:
-                    image = json_doc["image"]
-                    if ((not "tag" in image) or (image["tag"] == "")):
-                        raise ValueError("Missing tag in %s")
-                    if ((not "image_type" in image) or 
-                        (image["image_type"] == "")):
-                        raise ValueError("Missing image_type in %s")
-                    if (not "data" in image):
-                        raise ValueError("Missing data in %s")
-                    image_path = self.__get_file_path(image["tag"], 
-                                                      image["image_type"])
-                    data_file = open(image_path, "w")
-                    decoded_data = base64.b64decode(image.pop("data"))
-                    data_file.write(decoded_data)
-                    data_file.close()
-                    json_path = self.__get_file_path(image["tag"], "json")
-                    json_file = open(json_path, "w")
-                    json_file.write(json.dumps(image) + "\n")
-                    json_file.close()
-            next_value = document_file.readline()
+        json_doc = json.loads(document)
+        if "maus_event_type" not in json_doc.keys():
+            print json_doc
+            raise KeyError("Expected maus_event_type in json_doc")
+        if json_doc["maus_event_type"] == "Image":
+            self.last_event = json_doc
+            for image in json_doc["image_list"]:
+                self.__handle_image(image, False)
+        elif json_doc["maus_event_type"] == "RunFooter":
+            self.run_number = json_doc["run_number"]
+            for image in self.last_event["image_list"]:
+                self.__handle_image(image, True)
 
     def death(self): #pylint: disable=R0201
         """
@@ -132,18 +118,55 @@ class OutputPyImage:
         """
         return True
 
-    def __get_file_path(self, tag, image_type):
+    def __handle_image(self, image, _is_end_of_run):
+        """
+        Helper function that does the image file save to disk
+        @param json_doc the json document
+        @param is_end_of_run boolean that controls destination directory; if
+               we are at the end of a run, file goes to a better place
+        """
+        if ((not "tag" in image) or (image["tag"] == "")):
+            raise ValueError("Missing tag in %s" % str(image))
+        if ((not "image_type" in image) or 
+            (image["image_type"] == "")):
+            raise ValueError("Missing image_type in %s" % str(image))
+        if (not "data" in image):
+            raise ValueError("Missing data in %s" % str(image))
+        image_path = self.__get_file_path(image["tag"], 
+                                          image["image_type"],
+                                          _is_end_of_run)
+        data_file = open(image_path, "w")
+        decoded_data = base64.b64decode(image["data"])
+        data_file.write(decoded_data)
+        data_file.close()
+        json_path = self.__get_file_path(image["tag"], "json",
+                                         _is_end_of_run)
+        json_file = open(json_path, "w")
+        json_file.write(json.dumps(image) + "\n")
+        json_file.close()
+
+    def __get_file_path(self, tag, image_type, is_end_of_run):
         """
         Get file path, derived from the directory, file name prefix,
         tag and using image_type as the file extension.
         @param self Object reference.
         @param tag File name tag.
         @param image_type Image type.
+        @param is_end_of_run set to True to save in end_of_run location for
+               datamover to pick up.
         @returns file path.
         """
         file_name = "%s%s.%s" % (
             self.file_prefix, 
             tag,
             image_type)
-        file_path = os.path.join(self.directory, file_name)
+        directory = self.directory
+        if is_end_of_run:
+            directory = self.end_of_run_directory+"/"+str(self.run_number)
+        if not os.path.exists(directory):
+            os.makedirs(directory) 
+        if (not os.path.isdir(directory)):
+            raise ValueError("image_directory is a file: %s" % directory)
+        file_path = os.path.join(directory, file_name)
         return file_path
+
