@@ -28,6 +28,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "Interface/Squeak.hh"
 
@@ -35,46 +36,57 @@
 
 namespace MAUS {
 
+/** @class KalmanSeed
+ *
+ *  @brief A class to interface the Kalman Fitting with Pattern Recon.
+ *
+ */
 class KalmanSeed {
  public:
-  /** Default constructor.
+  /** @brief Default constructor.
    */
   KalmanSeed();
 
-  /** Destructor.
+  /** @brief Constructor accepting a Geometry map.
+   */
+  explicit KalmanSeed(SciFiGeometryMap map);
+
+  /** @brief Destructor.
    */
   ~KalmanSeed();
 
-  /** Copy constructor.
+  /** @brief Copy constructor.
    */
   KalmanSeed(const KalmanSeed &seed);
 
-  /** Equality operator.
+  /** @brief Equality operator.
    */
   KalmanSeed& operator=(const KalmanSeed& seed);
 
-  /** Builds a KalmanSeed from a pattern recon object.
+  /** @brief Builds a KalmanSeed from a pattern recon object.
    */
   template <class PRTrack>
   void Build(const PRTrack* pr_track);
 
-  /** Computes the initial state vector for a helical track.
+  /** @brief Computes the initial state vector for a helical track.
    */
   TMatrixD ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
-  /** Computes the initial state vector for a straight track.
+  /** @brief Computes the initial state vector for a straight track.
    */
   TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
-  /** Fills the _clusters member.
+  /** @brief Fills the _clusters member.
    */
   void RetrieveClusters(SciFiSpacePointPArray &spacepoints);
 
-  /** Getter for the initial state vector.
+  /** @brief Getter for the initial state vector.
    */
   TMatrixD initial_state_vector() const { return _a0; }
+
+  void SetField(SciFiGeometryMap _plane_map);
 
   bool is_helical()  const { return _helical; }
 
@@ -84,16 +96,28 @@ class KalmanSeed {
 
   size_t is_usable() const { return _clusters.size(); }
 
-  double momentum() const { return _momentum; }
+  double momentum()  const { return _momentum; }
 
   int n_parameters() const { return _n_parameters; }
 
+  KalmanSitesVector KalmanSites() const { return _kalman_sites; }
+
+  void BuildKalmanSites();
+
+  void SetField(double bz) { _Bz = bz; }
+
  private:
+  SciFiGeometryMap _geometry_map;
+
   SciFiClusterPArray _clusters;
+
+  KalmanSitesVector _kalman_sites;
 
   TMatrixD _a0;
 
   double _momentum;
+
+  double _Bz;
 
   bool _straight;
 
@@ -102,6 +126,12 @@ class KalmanSeed {
   int _n_parameters;
 
   int _tracker;
+
+  double _mT_to_T;
+
+  double _seed_cov;
+
+  double _plane_width;
 };
 
 template <class PRTrack>
@@ -122,8 +152,9 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
   RetrieveClusters(spacepoints);
 
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
-}
 
+  BuildKalmanSites();
+}
 } // ~namespace MAUS
 
 #endif

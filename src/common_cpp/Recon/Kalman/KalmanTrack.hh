@@ -40,28 +40,28 @@ namespace MAUS {
 
 class KalmanSite;
 
-typedef struct SciFiParams {
+struct SciFiParams {
   /// Polystyrene's atomic number.
-  static const double Z()               { return 5.61291; }
+  double Z;
   /// Width of the fibre plane in mm.
-  static const double Plane_Width()     { return 0.6523; }
+  double Plane_Width;
   /// Fibre radiation lenght in mm
-  static const double Radiation_Legth() { return 424.0; }
+  double Radiation_Legth;
   /// Fractional Radiation Length
-  static const double R0(double lenght) { return lenght/Radiation_Legth(); }
+  double R0(double lenght) { return lenght/Radiation_Legth; }
   /// Density in g.cm-3
-  static const double Density()         { return 1.06000; }
+  double Density;
   /// Mean excitation energy in eV.
-  static const double Mean_Excitation_Energy() { return 68.7; }
+  double Mean_Excitation_Energy;
   /// Atomic number in g.mol-1 per styrene monomer
-  static const double A()               { return 104.15; }
+  double A;
   /// Channel width in mm
-  static const double Pitch()           { return 1.4945; }
+  double Pitch;
   /// Active Radius in mm
-  static const double Active_Radius()   { return 150.; }
+  double Active_Radius;
   /// RMS per channel measurement (um).
-  static const double RMS()             { return 370.; }
-} FibreParameters;
+  double RMS;
+};
 
 typedef struct BetheBloch {
   /// Bethe Bloch constant in MeV g-1 cm2 (for A=1gmol-1)
@@ -158,6 +158,8 @@ class KalmanTrack {
   AlgorithmUsed GetAlgorithmUsed() { return _algorithm_used; }
 
  protected:
+  SciFiParams FibreParameters;
+
   AlgorithmUsed _algorithm_used;
 
   TMatrixD _H;

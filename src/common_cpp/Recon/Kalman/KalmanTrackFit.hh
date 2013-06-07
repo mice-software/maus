@@ -21,9 +21,6 @@
 
 // C headers
 #include <assert.h>
-#include <iostream>
-#include <fstream>
-#include <map>
 
 // C++ headers
 #include <string>
@@ -35,7 +32,6 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
@@ -54,22 +50,13 @@ namespace MAUS {
  */
 class KalmanTrackFit {
  public:
-  explicit KalmanTrackFit(SciFiGeometryMap map);
+  KalmanTrackFit();
 
   virtual ~KalmanTrackFit();
 
   /** @brief The main worker. All Kalman Filtering lives within.
    */
   void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
-
-  /** @brief Sets up the KalmanSites.
-   *
-   *  This will: initialise the state vector;
-   *  Set the covariance matrix;
-   *  Add plane measurents to all sites;
-   *
-   */
-  void Initialise(const KalmanSeed *seed, KalmanSitesVector &sites);
 
   /** @brief Runs Filter routines.
    *
@@ -110,10 +97,6 @@ class KalmanTrackFit {
   void DumpInfo(KalmanSitesVector const &sites);
 
  private:
-  SciFiGeometryMap _geometry_map;
-
-  double _seed_cov;
-
   bool _use_MCS;
 
   bool _use_Eloss;

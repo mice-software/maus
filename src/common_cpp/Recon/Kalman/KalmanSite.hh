@@ -62,6 +62,8 @@ class KalmanSite {
    */
   void Initialise(int dim);
 
+  void Build(SciFiCluster *cluster);
+
   /** @brief Sets the state vector at the site.
    */
   void set_a(TMatrixD a, State current_state);

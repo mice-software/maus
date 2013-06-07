@@ -387,6 +387,7 @@ void MapCppTrackerReconTest::pattern_recognition(const bool helical_pr_on,
 }
 
 void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
+/*
   std::vector<KalmanSeed*> seeds;
   size_t number_helical_tracks  = evt.helicalprtracks().size();
   size_t number_straight_tracks = evt.straightprtracks().size();
@@ -407,6 +408,7 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) {
     // KalmanTrackFit fit;
     // fit.Process(seeds, evt);
   }
+*/
 }
 
 void MapCppTrackerReconTest::print_event_info(SciFiEvent &event) {

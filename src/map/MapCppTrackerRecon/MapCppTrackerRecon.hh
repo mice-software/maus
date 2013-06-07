@@ -153,7 +153,7 @@ class MapCppTrackerRecon {
   bool _kalman_on;
 
   ///  Map of the planes geometry.
-  std::map<int, SciFiPlaneGeometry> _geometry_map;
+  SciFiGeometryHelper _geometry_helper;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

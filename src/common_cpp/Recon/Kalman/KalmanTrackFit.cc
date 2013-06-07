@@ -19,12 +19,11 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit(SciFiGeometryMap map) : _geometry_map(map) {
+KalmanTrackFit::KalmanTrackFit() {
   //
   // Get Configuration values.
   //
   Json::Value *json = Globals::GetConfigurationCards();
-  _seed_cov             = (*json)["SciFiSeedCovariance"].asDouble();
   _use_MCS              = (*json)["SciFiKalman_use_MCS"].asBool();
   _use_Eloss            = (*json)["SciFiKalman_use_Eloss"].asBool();
   _verbose              = (*json)["SciFiKalmanVerbose"].asBool();
@@ -50,8 +49,8 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     track->Initialise();
     //
     // Set up KalmanSites to be used. KalmanSite = Measurement Plane
-    KalmanSitesVector sites;
-    Initialise(seed, sites);
+    KalmanSitesVector sites = seed->KalmanSites();
+    // Initialise(seed, sites);
     //
     // Set the momentum of the track hypostesis (in MeV/c)
     double momentum = seed->momentum();
@@ -81,75 +80,6 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
       delete track;
       delete seed;
     }
-  }
-}
-
-void KalmanTrackFit::Initialise(const KalmanSeed *seed, KalmanSitesVector &sites) {
-  TMatrixD a0 = seed->initial_state_vector();
-
-  int n_param = seed->n_parameters();
-
-  TMatrixD C(n_param, n_param);
-  C.Zero();
-  for ( int i = 0; i < n_param; i++ ) {
-    C(i, i) = _seed_cov;
-  }
-  C(0, 0) = 1.;
-  C(2, 2) = 1.;
-
-  std::vector<SciFiCluster*> clusters = seed->clusters();
-  KalmanSite first_plane;
-  first_plane.Initialise(n_param);
-  first_plane.set_a(a0, KalmanSite::Projected);
-  first_plane.set_covariance_matrix(C, KalmanSite::Projected);
-  first_plane.set_measurement(clusters[0]->get_alpha());
-  first_plane.set_direction(clusters[0]->get_direction());
-  first_plane.set_z(clusters[0]->get_position().z());
-
-  int id_0 = clusters[0]->get_id();
-  first_plane.set_id(id_0);
-
-  std::map<int, SciFiPlaneGeometry>::iterator iterator;
-  iterator = _geometry_map.find(id_0);
-  SciFiPlaneGeometry this_plane = (*iterator).second;
-  ThreeVector plane_position  = this_plane.Position;
-
-  TMatrixD shift(3, 1);
-  shift(0, 0) = plane_position.x();
-  shift(1, 0) = plane_position.y();
-  shift(2, 0) = 0.0;
-  first_plane.set_input_shift(shift);
-  // first_plane.set_input_shift_covariance(kalman_align.get_cov_shifts(id_0));
-  sites.push_back(first_plane);
-  size_t numb_sites = clusters.size();
-  for ( size_t j = 1; j < numb_sites; ++j ) {
-    KalmanSite a_site;
-    a_site.Initialise(n_param);
-    a_site.set_measurement(clusters[j]->get_alpha());
-    a_site.set_direction(clusters[j]->get_direction());
-    a_site.set_z(clusters[j]->get_position().z());
-    int id = clusters[j]->get_id();
-    a_site.set_id(id);
-
-    std::map<int, SciFiPlaneGeometry>::iterator it;
-    it = _geometry_map.find(id);
-    SciFiPlaneGeometry a_plane = (*it).second;
-    ThreeVector a_position  = a_plane.Position;
-
-    TMatrixD a_shift(3, 1);
-    a_shift(0, 0) = a_position.x();
-    a_shift(1, 0) = a_position.y();
-    a_shift(2, 0) = 0.0;
-    a_site.set_input_shift(a_shift);
-    // a_site.set_input_shift_covariance(kalman_align.get_cov_shifts(id));
-    sites.push_back(a_site);
-  }
-
-  for ( size_t j = 0; j < numb_sites; ++j ) {
-    ThreeVector true_position = clusters[j]->get_true_position();
-    ThreeVector true_momentum = clusters[j]->get_true_momentum();
-    sites[j].set_true_position(true_position);
-    sites[j].set_true_momentum(true_momentum);
   }
 }
 

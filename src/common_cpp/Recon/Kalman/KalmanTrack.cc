@@ -16,6 +16,7 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 namespace MAUS {
 
@@ -28,7 +29,18 @@ KalmanTrack::KalmanTrack() : _f_chi2(0.),
                              _tracker(-1),
                              _mass(105.65837),
                              _momentum(0.),
-                             _particle_charge(1) {}
+                             _particle_charge(1) {
+  Json::Value *json = Globals::GetConfigurationCards();
+  FibreParameters.Z              = (*json)["SciFiParams_Z"].asDouble();
+  FibreParameters.Plane_Width    = (*json)["SciFiParams_Plane_Width"].asDouble();
+  FibreParameters.Radiation_Legth= (*json)["SciFiParams_Radiation_Legth"].asDouble();
+  FibreParameters.Density        = (*json)["SciFiParams_Density"].asDouble();
+  FibreParameters.Mean_Excitation_Energy = (*json)["SciFiParams_Mean_Excitation_Energy"].asDouble();
+  FibreParameters.A              = (*json)["SciFiParams_A"].asDouble();
+  FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
+  FibreParameters.Active_Radius  = (*json)["SciFiParams_Active_Radius"].asDouble();
+  FibreParameters.RMS            = (*json)["SciFiParams_RMS"].asDouble();
+}
 
 void KalmanTrack::Initialise() {
   // Measurement equation.
@@ -75,7 +87,7 @@ void KalmanTrack::CalculateCovariance(const KalmanSite *old_site, KalmanSite *ne
 
 // Returns (beta) * (-dE/dx). Formula and constants from PDG.
 double KalmanTrack::BetheBlochStoppingPower(double p) {
-  double muon_mass2 = TMath::Power(_mass, 2.);
+  double muon_mass2 = _mass*_mass;
   double electron_mass = BetheBlochParameters::Electron_Mass();
 
   double E = TMath::Sqrt(muon_mass2+p*p);
@@ -86,10 +98,10 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
   double gamma2= TMath::Power(gamma, 2.);
 
   double K = BetheBlochParameters::K();
-  double A = FibreParameters::A();
-  double I = FibreParameters::Mean_Excitation_Energy();
+  double A = FibreParameters.A;
+  double I = FibreParameters.Mean_Excitation_Energy;
   double I2= TMath::Power(I, 2.);
-  double Z = FibreParameters::Z();
+  double Z = FibreParameters.Z;
 
   double outer_term = K*Z/(A*beta2);
 
@@ -98,7 +110,7 @@ double KalmanTrack::BetheBlochStoppingPower(double p) {
 
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
   double last_term = TMath::Power(Tmax, 2.)/TMath::Power(gamma*_mass, 2);
-  double density = FibreParameters::Density();
+  double density = FibreParameters.Density;
   double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
   double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
   double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
@@ -118,7 +130,7 @@ void KalmanTrack::SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new
   ThreeVector old_momentum(px, py, pz);
   //
   // Compute the correction using Bethe Bloch's formula.
-  double plane_width = SciFiParams::Plane_Width();
+  double plane_width = FibreParameters.Plane_Width;
   double Delta_p = BetheBlochStoppingPower(old_momentum.mag())*plane_width;
   //
   // Reduce momentum vector accordingly.
@@ -135,7 +147,7 @@ void KalmanTrack::SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new
 }
 
 void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site) {
-  double plane_width = SciFiParams::Plane_Width();
+  double plane_width = FibreParameters.Plane_Width;
 
   double deltaZ = new_site->z() - old_site->z();
   double deltaZ_squared = deltaZ*deltaZ;
@@ -151,7 +163,7 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
   // Charge of incoming particle.
   double z = _particle_charge;
   // Plane lenght in units of radiation lenght (~0.0015).
-  double L0 = SciFiParams::R0(plane_width);
+  double L0 = FibreParameters.R0(plane_width);
 
   double pz = 1./kappa;
   double px = mx/kappa;
@@ -219,9 +231,9 @@ void KalmanTrack::CalculateSystemNoise(const KalmanSite *old_site, const KalmanS
 //
 void KalmanTrack::UpdateV(const KalmanSite *a_site) {
   // Fibre constants.
-  double pitch         = FibreParameters::Pitch();
+  double pitch         = FibreParameters.Pitch;
   // Active radius in units of channel width.
-  double active_radius = FibreParameters::Active_Radius()/pitch;
+  double active_radius = FibreParameters.Active_Radius/pitch;
 
   double alpha = (a_site->measurement())(0, 0);
   double lenght = 2.*TMath::Sqrt(active_radius*active_radius -
@@ -246,7 +258,7 @@ void KalmanTrack::UpdateH(const KalmanSite *a_site) {
   double perp_x = perp.x();
   double perp_y = perp.y();
 
-  double pitch = FibreParameters::Pitch();
+  double pitch = FibreParameters.Pitch;
 
   _H.Zero();
   _H(0, 0) = -dy/pitch;

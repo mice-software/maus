@@ -29,7 +29,20 @@ bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
   return ( a->get_station() < b->get_station() );
 }
 
-KalmanSeed::KalmanSeed(): _straight(false), _helical(false) {}
+KalmanSeed::KalmanSeed() : _straight(false),
+                           _helical(false),
+                           _Bz(0.),
+                           _mT_to_T(1000.) {}
+
+KalmanSeed::KalmanSeed(SciFiGeometryMap map): _geometry_map(map),
+                                              _straight(false),
+                                              _helical(false),
+                                              _Bz(0.),
+                                              _mT_to_T(1000.) {
+  Json::Value *json = Globals::GetConfigurationCards();
+  _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
+  _plane_width = (*json)["SciFiParams_Plane_Width"].asDouble();
+}
 
 KalmanSeed::~KalmanSeed() {}
 
@@ -58,12 +71,72 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
   _n_parameters = seed._n_parameters;
 }
 
+void KalmanSeed::BuildKalmanSites() {
+  size_t numb_sites = _clusters.size();
+  for ( size_t j = 0; j < numb_sites; ++j ) {
+    SciFiCluster& cluster = (*_clusters[j]);
+    KalmanSite a_site;
+    a_site.Initialise(_n_parameters);
+
+    int id = cluster.get_id();
+    a_site.set_id(id);
+    a_site.set_measurement(cluster.get_alpha());
+    a_site.set_direction(cluster.get_direction());
+    a_site.set_z(cluster.get_position().z());
+
+    std::map<int, SciFiPlaneGeometry>::iterator iterator;
+    iterator = _geometry_map.find(id);
+    SciFiPlaneGeometry this_plane = (*iterator).second;
+    ThreeVector plane_position  = this_plane.Position;
+
+    TMatrixD shift(3, 1);
+    shift(0, 0) = plane_position.x();
+    shift(1, 0) = plane_position.y();
+    shift(2, 0) = 0.0;
+    a_site.set_input_shift(shift);
+
+    _kalman_sites.push_back(a_site);
+  }
+  //
+  // Set up first state and its covariance.
+  TMatrixD C(_n_parameters, _n_parameters);
+  C.Zero();
+  for ( int i = 0; i < _n_parameters; ++i ) {
+    C(i, i) = _seed_cov;
+  }
+  C(0, 0) = _plane_width*_plane_width/12.;
+  C(2, 2) = _plane_width*_plane_width/12.;
+  _kalman_sites[0].set_a(_a0, KalmanSite::Projected);
+  _kalman_sites[0].set_covariance_matrix(C, KalmanSite::Projected);
+
+  for ( size_t j = 0; j < numb_sites; ++j ) {
+    ThreeVector true_position = _clusters[j]->get_true_position();
+    ThreeVector true_momentum = _clusters[j]->get_true_momentum();
+    _kalman_sites[j].set_true_position(true_position);
+    _kalman_sites[j].set_true_momentum(true_momentum);
+  }
+}
+
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
+  double x, y, z;
+  if ( _tracker == 0 ) {
+    x = spacepoints.back()->get_position().x();
+    y = spacepoints.back()->get_position().y();
+    z = spacepoints.back()->get_position().z();
+  } else if ( _tracker == 1 ) {
+    x = spacepoints.front()->get_position().x();
+    y = spacepoints.front()->get_position().y();
+    z = spacepoints.front()->get_position().z();
+  } else {
+    x = y = z = -666; // removes a compiler warning.
+    throw(Squeal(Squeal::recoverable,
+                 "Pattern Recon has bad tracker number.",
+                 "KalmanSeed::ComputeInitialStateVector"));
+  }
   // Get seed values.
   double r  = seed->get_R();
-  double B  = -4.;
-  double pt = -0.3*B*r;
+  double pt = -0.3*_Bz*r;
   // double pt = _particle_charge*(CLHEP::c_light*1.e-9)*B*r;
 
   double dsdz  = seed->get_dsdz();
@@ -77,20 +150,6 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double phi = phi_0 + TMath::PiOver2();
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
-
-  double x, y;
-  if ( _tracker == 0 ) {
-    x = spacepoints.back()->get_position().x();
-    y = spacepoints.back()->get_position().y();
-  } else if ( _tracker == 1 ) {
-    x = spacepoints.front()->get_position().x();
-    y = spacepoints.front()->get_position().y();
-  } else {
-    x = y = -666; // removes a compiler warning.
-    throw(Squeal(Squeal::recoverable,
-                 "Pattern Recon has bad tracker number.",
-                 "KalmanSeed::ComputeInitialStateVector"));
-  }
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;

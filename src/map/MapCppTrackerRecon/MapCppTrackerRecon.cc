@@ -49,7 +49,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     MiceModule* module = Globals::GetReconstructionMiceModules();
     std::vector<const MiceModule*> modules =
       module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    _geometry_map = SciFiGeometryHelper(modules).BuildGeometryMap();
+    _geometry_helper = SciFiGeometryHelper(modules);
+    _geometry_helper.Build();
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -153,7 +154,7 @@ void MapCppTrackerRecon::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_map);
+  SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_helper.GeometryMap());
   clustering.process(evt);
 }
 
@@ -174,19 +175,23 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
   size_t number_straight_tracks = evt.straightprtracks().size();
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
-    KalmanSeed *seed = new KalmanSeed();
+    int tracker = evt.helicalprtracks()[track_i]->get_tracker();
+    double Bz = _geometry_helper.GetFieldValue(tracker);
+    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
+    seed->SetField(Bz);
+    std::cerr << "Tracker " << tracker << " has field " << Bz << std::endl;
     seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
-    KalmanSeed *seed = new KalmanSeed();
+    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
     seed->Build<SciFiStraightPRTrack>(evt.straightprtracks()[track_i]);
     seeds.push_back(seed);
   }
 
   if ( seeds.size() ) {
-    KalmanTrackFit fit(_geometry_map);
+    KalmanTrackFit fit;
     fit.Process(seeds, evt);
   }
 }
