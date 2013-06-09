@@ -19,14 +19,15 @@
 
 namespace MAUS {
 
-KalmanTrackFit::KalmanTrackFit() {
+KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
+                                   _filter(NULL) {
   //
   // Get Configuration values.
   //
   Json::Value *json = Globals::GetConfigurationCards();
-  _use_MCS              = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_Eloss            = (*json)["SciFiKalman_use_Eloss"].asBool();
-  _verbose              = (*json)["SciFiKalmanVerbose"].asBool();
+  _use_MCS          = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_Eloss        = (*json)["SciFiKalman_use_Eloss"].asBool();
+  _verbose          = (*json)["SciFiKalmanVerbose"].asBool();
 }
 
 KalmanTrackFit::~KalmanTrackFit() {}
@@ -39,190 +40,103 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // Current seed.
     KalmanSeed* seed = seeds[i];
 
-    // Create pointer to abstract class KalmanTrack.
-    KalmanTrack *track = 0;
+    SciFiTrack *track = new SciFiTrack();
+    track->SetKalmanSites(seed->GetKalmanSites());
     if ( seed->is_straight() ) {
-      track = new StraightTrack();
+      _propagator = new KalmanStraightPropagator();
+      _filter     = new KalmanFilter(4);
     } else if ( seed->is_helical() ) {
-      track = new HelicalTrack();
+      double Bz   = seed->GetField();
+      _propagator = new KalmanHelicalPropagator(Bz);
+      _filter     = new KalmanFilter(5);
     }
-    track->Initialise();
-    //
-    // Set up KalmanSites to be used. KalmanSite = Measurement Plane
-    KalmanSitesVector sites = seed->KalmanSites();
-    // Initialise(seed, sites);
-    //
-    // Set the momentum of the track hypostesis (in MeV/c)
-    double momentum = seed->momentum();
-    track->set_momentum(momentum);
-    //
-    // Run the KALMAN FILTER
-    //
-    RunKalmanFilter(track, sites);
-    //
+    // Filter the first state.
+    _filter->Process(track, 0);
+
+    // Run the extrapolation & filter chain.
+    size_t numb_measurements = track->GetNumberKalmanSites();
+    for ( size_t j = 1; j < numb_measurements; ++j ) {
+      // Predict the state vector at site i...
+      _propagator->Extrapolate(track, j);
+      // ... Filter...
+      _filter->Process(track, j);
+    }
+    _propagator->PrepareForSmoothing(track);
+    // ...and Smooth back all sites.
+    for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+      _propagator->Smooth(track, k);
+      _filter->UpdateH(track->GetKalmanSite(k));
+      _filter->SetResidual(track->GetKalmanSite(k), KalmanSite::Smoothed);
+    }
     // Calculate the chi2 of this track.
-    track->ComputeChi2(sites);
+    ComputeChi2(track);
     // Optional printing.
     if ( _verbose )
-      DumpInfo(sites);
-    //
-    // Save to data structure.
-    // The KalmanTrack is converted into a
-    // SciFiTrack for general use.
-    //
-    double chi2 = track->f_chi2();
-    if ( chi2 != chi2 ) {
-      delete track;
-      delete seed;
-      return;
-    } else {
-      Save(track, sites, event);
-      delete track;
-      delete seed;
-    }
+      DumpInfo(track);
+
+    // Save(event, track);
+    // Free memory allocated and reset pointers to NULL.
+    delete _propagator;
+    delete _filter;
+    _propagator = NULL;
+    _filter     = NULL;
   }
 }
 
-void KalmanTrackFit::RunKalmanFilter(KalmanTrack *track, KalmanSitesVector &sites) {
-  // Filter the first state.
-  Filter(track, sites, 0);
+void KalmanTrackFit::ComputeChi2(SciFiTrack *track) {
+  double f_chi2 = 0.;
+  double s_chi2 = 0.;
+  int n_sites = track->GetNumberKalmanSites();
 
-  size_t numb_measurements = sites.size();
-  for ( size_t j = 1; j < numb_measurements; ++j ) {
-    // Predict the state vector at site i...
-    Extrapolate(track, sites, j);
-    // ... Filter...
-    Filter(track, sites, j);
+  int n_parameters;
+  if ( track->GetAlgorithmUsed() == SciFiTrack::kalman_straight ) {
+    n_parameters = 4;
+  } else {
+    n_parameters = 5;
   }
-  PrepareForSmoothing(&sites.back());
-  // ...and Smooth back all sites.
-  for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
-    Smooth(track, sites, k);
-  }
-}
 
-void KalmanTrackFit::Filter(KalmanTrack *track, KalmanSitesVector &sites, int current_site) {
-  // Get Site...
-  KalmanSite *a_site = &sites[current_site];
+  int ndf = n_sites - n_parameters;
 
-  // Update measurement error:
-  track->UpdateV(a_site);
-
-  // Update H (depends on plane direction.)
-  track->UpdateH(a_site);
-  track->UpdateW(a_site);
-  track->UpdateK(a_site);
-  track->ComputePull(a_site);
-  // a_k = a_k^k-1 + K_k x pull
-  track->CalculateFilteredState(a_site);
-
-  // Cp = (C-KHC)
-  track->UpdateCovariance(a_site);
-
-  a_site->set_current_state(KalmanSite::Filtered);
-}
-
-void KalmanTrackFit::Extrapolate(KalmanTrack *track, KalmanSitesVector &sites, int i) {
-  // Get current site...
-  KalmanSite *new_site = &sites[i];
-
-  // ... and the site we will extrapolate from.
-  const KalmanSite *old_site = &sites[i-1];
-
-  // Calculate prediction for the state vector.
-  track->CalculatePredictedState(old_site, new_site);
-
-  // Calculate the energy loss for the projected state.
-  if ( track->GetAlgorithmUsed() == KalmanTrack::kalman_helical && _use_Eloss )
-    track->SubtractEnergyLoss(old_site, new_site);
-
-  // Calculate the system noise...
-  if ( _use_MCS )
-    track->CalculateSystemNoise(old_site, new_site);
-
-  // ... so that we can add it to the prediction for the
-  // covariance matrix.
-  track->CalculateCovariance(old_site, new_site);
-
-  new_site->set_current_state(KalmanSite::Projected);
-}
-
-void KalmanTrackFit::PrepareForSmoothing(KalmanSite *last_site) {
-  TMatrixD a_smooth = last_site->a(KalmanSite::Filtered);
-  last_site->set_a(a_smooth, KalmanSite::Smoothed);
-
-  TMatrixD C_smooth = last_site->covariance_matrix(KalmanSite::Filtered);
-  last_site->set_covariance_matrix(C_smooth, KalmanSite::Smoothed);
-
-  TMatrixD residual(2, 1);
-  residual = last_site->residual(KalmanSite::Filtered);
-  last_site->set_residual(residual, KalmanSite::Smoothed);
-  last_site->set_current_state(KalmanSite::Smoothed);
-
-  // Set smoothed chi2.
-  double f_chi2 = last_site->chi2(KalmanSite::Filtered);
-  last_site->set_chi2(f_chi2, KalmanSite::Smoothed);
-}
-
-void KalmanTrackFit::Smooth(KalmanTrack *track, KalmanSitesVector &sites, int id) {
-  // Get site to be smoothed...
-  KalmanSite *smoothing_site = &sites[id];
-
-  // ... and the already perfected site.
-  const KalmanSite *optimum_site = &sites[id+1];
-
-  // Set the propagator right.
-  track->UpdatePropagator(optimum_site, smoothing_site);
-
-  // H and V are necessary for the residual calculation.
-  track->UpdateH(smoothing_site);
-  track->UpdateV(smoothing_site);
-
-  // Compute A_k.
-  track->UpdateBackTransportationMatrix(optimum_site, smoothing_site);
-
-  // Compute smoothed a_k and C_k.
-  track->SmoothBack(optimum_site, smoothing_site);
-
-  smoothing_site->set_current_state(KalmanSite::Smoothed);
-}
-
-void KalmanTrackFit::Save(const KalmanTrack *kalman_track,
-                          KalmanSitesVector sites,
-                          SciFiEvent &event) {
-  //
-  // Convert KalmanTrack to SciFiTrack
-  //
-  SciFiTrack *track = new SciFiTrack(kalman_track);
-  //
-  // Store information at each measurement plane.
-  size_t n_sites = sites.size();
   for ( size_t i = 0; i < n_sites; ++i ) {
-    SciFiTrackPoint *track_point = new SciFiTrackPoint(&sites[i]);
+    KalmanSite *site = track->GetKalmanSite(i);
+    f_chi2 += site->chi2(KalmanSite::Filtered);
+    s_chi2 += site->chi2(KalmanSite::Smoothed);
+  }
+  double P_value = TMath::Prob(f_chi2, ndf);
+  track->set_f_chi2(f_chi2);
+  track->set_s_chi2(s_chi2);
+  track->set_ndf(ndf);
+  track->set_P_value(P_value);
+}
+
+void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track) {
+  double pvalue = track->P_value();
+  if ( pvalue != pvalue ) return;
+  for ( size_t i = 0; i < track->GetNumberKalmanSites(); ++i ) {
+    SciFiTrackPoint *track_point = new SciFiTrackPoint(track->GetKalmanSite(i));
     track->add_scifitrackpoint(track_point);
   }
-  // Add to data structure.
   event.add_scifitrack(track);
 }
 
-void KalmanTrackFit::DumpInfo(KalmanSitesVector const &sites) {
-  size_t numb_sites = sites.size();
+void KalmanTrackFit::DumpInfo(SciFiTrack *track) {
+  size_t numb_sites = track->GetNumberKalmanSites();
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
-    KalmanSite site = sites[i];
+    KalmanSite* site = track->GetKalmanSite(i);
     Squeak::mout(Squeak::info)
     << "=========================================="  << "\n"
-    << "SITE ID: " << site.id() << "\n"
-    << "SITE Z: " << site.z()   << "\n"
-    << "Measurement: " << (site.measurement())(0, 0) << "\n"
-    << "Projection: " << (site.a(KalmanSite::Projected))(0, 0) << " "
-                      << (site.a(KalmanSite::Projected))(1, 0) << " "
-                      << (site.a(KalmanSite::Projected))(2, 0) << " "
-                      << (site.a(KalmanSite::Projected))(3, 0) << "\n"
+    << "SITE ID: " << site->id() << "\n"
+    << "SITE Z: " << site->z()   << "\n"
+    << "Measurement: " << (site->measurement())(0, 0) << "\n"
+    << "Projection: " << (site->a(KalmanSite::Projected))(0, 0) << " "
+                      << (site->a(KalmanSite::Projected))(1, 0) << " "
+                      << (site->a(KalmanSite::Projected))(2, 0) << " "
+                      << (site->a(KalmanSite::Projected))(3, 0) << "\n"
     << "================Residuals================"   << "\n"
-    << (site.residual(KalmanSite::Projected))(0, 0)  << "\n"
-    << (site.residual(KalmanSite::Filtered))(0, 0)   << "\n"
-    << (site.residual(KalmanSite::Smoothed))(0, 0)   << "\n"
+    << (site->residual(KalmanSite::Projected))(0, 0)  << "\n"
+    << (site->residual(KalmanSite::Filtered))(0, 0)   << "\n"
+    << (site->residual(KalmanSite::Smoothed))(0, 0)   << "\n"
     << "=========================================="
     << std::endl;
   }

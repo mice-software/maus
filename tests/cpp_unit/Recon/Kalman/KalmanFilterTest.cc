@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*
 #include <stdlib.h>
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
@@ -127,6 +129,7 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   // TMatrixD HA = track->SolveMeasurementEquation(a, s);
   TMatrixD HA = track->H()*a;
   EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
+*/
 
 /*
   // now, we introduce a shift in x.
@@ -146,6 +149,8 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   a_site->set_direction(direction_plane1_tracker0);
   ThreeVector perp = direction_plane1_tracker0.Orthogonal();
 */
+
+/*
   delete a_site;
   delete track;
 }
@@ -259,6 +264,7 @@ TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
   }
   delete track;
 }
+*/
 
 /*
 TEST_F(KalmanTrackTest, test_exclusion_of_site) {
@@ -274,4 +280,5 @@ TEST_F(KalmanTrackTest, test_exclusion_of_site) {
   EXPECT_GT(fabs(excluded_residual(0, 0)), fabs(smoothed_residual(0, 0)));
 }
 */
-} // ~namespace MAUS
+// } // ~namespace MAUS
+

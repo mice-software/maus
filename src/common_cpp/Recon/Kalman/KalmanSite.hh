@@ -32,6 +32,29 @@
 
 namespace MAUS {
 
+struct SciFiParams {
+  /// Polystyrene's atomic number.
+  double Z;
+  /// Width of the fibre plane in mm.
+  double Plane_Width;
+  /// Fibre radiation lenght in mm
+  double Radiation_Legth;
+  /// Fractional Radiation Length
+  double R0(double lenght) { return lenght/Radiation_Legth; }
+  /// Density in g.cm-3
+  double Density;
+  /// Mean excitation energy in eV.
+  double Mean_Excitation_Energy;
+  /// Atomic number in g.mol-1 per styrene monomer
+  double A;
+  /// Channel width in mm
+  double Pitch;
+  /// Active Radius in mm
+  double Active_Radius;
+  /// RMS per channel measurement (um).
+  double RMS;
+};
+
 /** @class KalmanSite
  *
  *  @brief A KalmanSite is a tracker plane. Each tracker contains 15 (if all planes are hit).
@@ -190,7 +213,7 @@ class KalmanSite {
   ThreeVector _mc_mom;
 };
 
-typedef std::vector<KalmanSite> KalmanSitesVector;
+typedef std::vector<KalmanSite*> KalmanSitesPArray;
 
 } // ~namespace MAUS
 

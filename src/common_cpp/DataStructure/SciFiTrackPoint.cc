@@ -52,9 +52,9 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanSite *kalman_site) {
     _py = state_vector(3, 0);
   } else if ( dimension == 5 ) {
     _x  = state_vector(0, 0);
-    _px = state_vector(1, 0)/state_vector(4, 0);
+    _px = state_vector(1, 0)/fabs(state_vector(4, 0));
     _y  = state_vector(2, 0);
-    _py = state_vector(3, 0)/state_vector(4, 0);
+    _py = state_vector(3, 0)/fabs(state_vector(4, 0));
   }
 
   ThreeVector mc_mom = kalman_site->true_momentum();

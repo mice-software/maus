@@ -33,16 +33,16 @@ class KalmanSeedTest : public ::testing::Test {
   virtual void SetUp()    {
     // Clusters need id,
     // spacepoints need station number.
-    int id_0     = 0;
-    int id_1     = 1;
+    int id_0     = 1;
+    int id_1     = 2;
     int id_3     = 3;
     int id_4     = 4;
-    int id_6     = 6;
-    int id_7     = 7;
-    int id_9     = 9;
-    int id_10    = 10;
-    int id_12    = 12;
-    int id_13    = 13;
+    int id_6     = 5;
+    int id_7     = 6;
+    int id_9     = 7;
+    int id_10    = 8;
+    int id_12    = 9;
+    int id_13    = 10;
 
     int station_1 = 1;
     int station_2 = 2;
@@ -151,14 +151,11 @@ class KalmanSeedTest : public ::testing::Test {
 
 TEST_F(KalmanSeedTest, test_ordering) {
   MAUS::KalmanSeed seed;
-  double seed_pz = 200.;
-
+  // This will load the clusters stored in the _spacepoints
   seed.RetrieveClusters(_spacepoints);
+  std::vector<SciFiCluster*> seed_clusters = seed.GetClusters();
 
-  // std::vector<SciFiSpacePoint*> seed_spacepoints = seed.spacepoints();
-  std::vector<SciFiCluster*> seed_clusters       = seed.clusters();
-
-  // Check order of clusters.
+  // Now, let's check that they are ordered.
   int temp = -1;
   for ( size_t i = 0; i < seed_clusters.size(); ++i ) {
     int id = seed_clusters[i]->get_id();
@@ -173,26 +170,8 @@ TEST_F(KalmanSeedTest, test_ordering) {
     EXPECT_TRUE(temp < station_number);
     temp = station_number;
   }
-}
-
-TEST_F(KalmanSeedTest, test_process_measurements_straight_track) {
-  MAUS::KalmanSeed seed;
-
-  MAUS::SciFiStraightPRTrack straight_track;
-  straight_track.set_spacepoints(_spacepoints);
-
-  // seed.ProcessMeasurements(&straight_track);
-  // EXPECT_EQ(_spacepoints.size(), seed.spacepoints().size());
-}
-
-TEST_F(KalmanSeedTest, test_process_measurements_helical_track) {
-  MAUS::KalmanSeed seed;
-
-  MAUS::SciFiHelicalPRTrack helical_track;
-  helical_track.set_spacepoints(_spacepoints);
-
-  // seed.ProcessMeasurements(&helical_track);
-  // EXPECT_EQ(_spacepoints.size(), seed.spacepoints().size());
+  // Check if any clusters were lost.
+  EXPECT_EQ(_clusters.size(), seed_clusters.size());
 }
 
 TEST_F(KalmanSeedTest, test_straight_state_vector) {
@@ -219,11 +198,10 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
   //
   // Check the result is the expected.
   //
-  // EXPECT_EQ(seed->momentum(), seed_pz);
   EXPECT_EQ(a.GetNrows(), 4);
-  // EXPECT_NEAR(a(0, 0), x,  1e-6);
+  EXPECT_NEAR(a(0, 0), x,  1e-6);
   EXPECT_NEAR(a(1, 0), mx, 1e-6);
-  // EXPECT_NEAR(a(2, 0), y,  1e-6);
+  EXPECT_NEAR(a(2, 0), y,  1e-6);
   EXPECT_NEAR(a(3, 0), my, 1e-6);
 }
 
@@ -239,7 +217,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double r     = 10.; // mm
   double tan_lambda = 1./200.;
   double dsdz  = 1./tan_lambda;
-  // Is thos Pi really necessary?
+  // Is this Pi really necessary?
   double PI = acos(-1.);
   double phi_0 = 0.;
   double pt = 0.3*4.*r;
@@ -261,9 +239,9 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   //
   // EXPECT_EQ(seed->momentum(), seed_pz);
   EXPECT_EQ(a.GetNrows(), 5);
-  // EXPECT_EQ(a(0, 0), x);
+  EXPECT_EQ(a(0, 0), x);
   EXPECT_EQ(a(1, 0), pt*cos(phi_0+PI/2.)*kappa);
-  // EXPECT_EQ(a(2, 0), y);
+  EXPECT_EQ(a(2, 0), y);
   EXPECT_EQ(a(3, 0), pt*sin(phi_0+PI/2.)*kappa);
 }
 

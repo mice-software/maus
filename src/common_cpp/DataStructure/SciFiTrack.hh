@@ -24,20 +24,23 @@
 #include <vector>
 
 // MAUS headers
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
 class SciFiTrack {
  public:
+  /** @brief Constructor.
+   *
+   */
   SciFiTrack();
 
   virtual ~SciFiTrack();
 
   SciFiTrack(const SciFiTrack &a_track);
 
-  explicit SciFiTrack(const KalmanTrack *kalman_track);
+  // explicit SciFiTrack(const KalmanTrack *kalman_track);
 
   SciFiTrack& operator=(const SciFiTrack &a_track);
 
@@ -60,6 +63,15 @@ class SciFiTrack {
   void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
   void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
 
+  KalmanSitesPArray GetKalmanSites()  { return _kalman_sites;        }
+  KalmanSite* GetKalmanSite(int i)    { return _kalman_sites[i];     }
+  size_t GetNumberKalmanSites() const { return _kalman_sites.size(); }
+  void SetKalmanSites(KalmanSitesPArray sites) { _kalman_sites = sites; }
+
+  enum AlgorithmUsed { kalman_straight, kalman_helical };
+
+  AlgorithmUsed GetAlgorithmUsed() { return _algorithm_used; }
+
  private:
   int _tracker;
 
@@ -71,7 +83,15 @@ class SciFiTrack {
 
   double _P_value;
 
+  double _mass;
+
+  double _charge;
+
+  AlgorithmUsed _algorithm_used;
+
   SciFiTrackPointPArray _trackpoints;
+
+  KalmanSitesPArray _kalman_sites;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

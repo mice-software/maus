@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "gtest/gtest.h"
 
@@ -24,25 +25,10 @@ class KalmanTrackFitTest : public ::testing::Test {
   virtual ~KalmanTrackFitTest() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
-
-  MAUS::KalmanSite old_site;
-  MAUS::KalmanSite new_site;
-  double z0, z1;
-  double x0, y0, mx0, my0, kappa;
-  double x1, y1, mx1, my1;
-  void set_up_sites();
-  TMatrixD a;
   static const double err = 1.e-4;
 };
 
-TEST_F(KalmanTrackFitTest, test_filter_without_station) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  std::vector<MAUS::KalmanSite> sites;
-
-  int ignore_station = 6;
-
-  // MAUS::KalmanTrackFit track_fit;
-  // EXPECT_THROW(track_fit.RunKalmanFilter(track, sites, ignore_station), Squeal);
-  // delete track;
+TEST_F(KalmanTrackFitTest, none) {
+  MAUS::KalmanTrackFit *manager;
 }
 } // namespace

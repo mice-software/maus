@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/*
 #include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
 #include "gtest/gtest.h"
 
@@ -77,23 +79,7 @@ TEST_F(StraightTrackTest, propagator_test) {
   // track->calc_covariance(&old_site, &new_site);
   // DO SOMETHING WITH COVARIANCE
 }
-/*
-TEST_F(StraightTrackTest, noise_test) {
-  set_up_sites();
-  MAUS::StraightTrack *track = new MAUS::StraightTrack();
-  track->calc_system_noise(&new_site);
-  TMatrixD Q(5, 5);
-  Q = track->get_system_noise();
-  Q.Print();
 
-  double kappa = 1./200.;
-  double Z = 1.;
-  double r0 = 0.00167; // cm3/g
-  double p = 1./kappa; // MeV/c
-  double v = p/105.7;
-  double C = 13.6*Z*pow(r0, 0.5)*(1.+0.038*log(r0))/(v*p);
-  double expected_value = (1.+pow(mx, 2.))*(1.+pow(mx, 2.)+pow(my, 2.))*C;
-  EXPECT_EQ(expected_value,Q(2, 2));
 }
+
 */
-}

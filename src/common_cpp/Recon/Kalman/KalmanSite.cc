@@ -127,6 +127,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
 void KalmanSite::Initialise(int dim) {
   // The state vector.
   _projected_a.ResizeTo(dim, 1);
+
   _a.          ResizeTo(dim, 1);
   _smoothed_a. ResizeTo(dim, 1);
   _a_excluded. ResizeTo(dim, 1);
@@ -149,7 +150,6 @@ void KalmanSite::Initialise(int dim) {
   _covariance_residual.ResizeTo(2, 2);
   _covariance_smoothed_residual.ResizeTo(2, 2);
   _covariance_excluded_residual.ResizeTo(2, 2);
-
   // The misalignments.
   _input_shift.ResizeTo(3, 1);
   _input_shift_covariance.ResizeTo(3, 3);

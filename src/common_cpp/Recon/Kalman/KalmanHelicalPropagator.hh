@@ -16,8 +16,8 @@
  */
 
 
-#ifndef STRAIGHTTRACK_HH
-#define STRAIGHTTRACK_HH
+#ifndef HELICALTRACK_HH
+#define HELICALTRACK_HH
 
 // C headers
 #include <assert.h>
@@ -30,29 +30,32 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanPropagator.hh"
 
 namespace MAUS {
 
-/** @class StraightTrack
+/** @class KalmanHelicalPropagator
  *
- *  @brief Models the propagation of particles in the absence of fields.
+ *  @brief Models the propagation of particles in the tracker solenoidal field.
  *
  *  Inherits from KalmanTrack, where most of the functionality is defined.
  *  The methods overwritten here are the ones related with particle propagation.
  *
  */
-class StraightTrack : public KalmanTrack {
+class KalmanHelicalPropagator : public KalmanPropagator {
  public:
-  /** @brief Straight Track constructor.
+  /** @brief Helical Track constructor.
    *
    *  @param flags for use of Multiple Scattering and Eloss models.
    */
-  StraightTrack();
+  KalmanHelicalPropagator();
+
+  explicit KalmanHelicalPropagator(double Bz);
 
   /** @brief Destructor.
    */
-  virtual ~StraightTrack();
+  virtual ~KalmanHelicalPropagator();
 
   /** @brief Calculates the propagator (F), using Taylor expansion at current site.
    */
@@ -61,6 +64,9 @@ class StraightTrack : public KalmanTrack {
   /** @brief Calculates the projected state.
    */
   void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site);
+
+ private:
+  double _Bz;
 };
 
 } // ~namespace MAUS

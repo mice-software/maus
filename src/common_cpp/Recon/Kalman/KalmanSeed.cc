@@ -52,37 +52,54 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
   }
   _clusters = rhs._clusters;
   _a0       = rhs._a0;
-  _momentum = rhs._momentum;
   _straight = rhs._straight;
   _helical  = rhs._helical;
   _tracker  = rhs._tracker;
   _n_parameters = rhs._n_parameters;
 
+  _clusters.resize(rhs._clusters.size());
+  for (size_t i = 0; i < rhs._clusters.size(); ++i) {
+    _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+  }
+
+  _kalman_sites.resize(rhs._kalman_sites.size());
+  for (size_t i = 0; i < rhs._kalman_sites.size(); ++i) {
+    _kalman_sites[i] = new KalmanSite(*rhs._kalman_sites[i]);
+  }
   return *this;
 }
 
 KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
   _clusters = seed._clusters;
   _a0       = seed._a0;
-  _momentum = seed._momentum;
   _straight = seed._straight;
   _helical  = seed._helical;
   _tracker  = seed._tracker;
   _n_parameters = seed._n_parameters;
+
+  _clusters.resize(seed._clusters.size());
+  for (size_t i = 0; i < seed._clusters.size(); ++i) {
+    _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+  }
+
+  _kalman_sites.resize(seed._kalman_sites.size());
+  for (size_t i = 0; i < seed._kalman_sites.size(); ++i) {
+    _kalman_sites[i] = new KalmanSite(*seed._kalman_sites[i]);
+  }
 }
 
 void KalmanSeed::BuildKalmanSites() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
     SciFiCluster& cluster = (*_clusters[j]);
-    KalmanSite a_site;
-    a_site.Initialise(_n_parameters);
+    KalmanSite* a_site = new KalmanSite();
+    a_site->Initialise(_n_parameters);
 
     int id = cluster.get_id();
-    a_site.set_id(id);
-    a_site.set_measurement(cluster.get_alpha());
-    a_site.set_direction(cluster.get_direction());
-    a_site.set_z(cluster.get_position().z());
+    a_site->set_id(id);
+    a_site->set_measurement(cluster.get_alpha());
+    a_site->set_direction(cluster.get_direction());
+    a_site->set_z(cluster.get_position().z());
 
     std::map<int, SciFiPlaneGeometry>::iterator iterator;
     iterator = _geometry_map.find(id);
@@ -93,7 +110,7 @@ void KalmanSeed::BuildKalmanSites() {
     shift(0, 0) = plane_position.x();
     shift(1, 0) = plane_position.y();
     shift(2, 0) = 0.0;
-    a_site.set_input_shift(shift);
+    a_site->set_input_shift(shift);
 
     _kalman_sites.push_back(a_site);
   }
@@ -104,16 +121,16 @@ void KalmanSeed::BuildKalmanSites() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  C(0, 0) = _plane_width*_plane_width/12.;
-  C(2, 2) = _plane_width*_plane_width/12.;
-  _kalman_sites[0].set_a(_a0, KalmanSite::Projected);
-  _kalman_sites[0].set_covariance_matrix(C, KalmanSite::Projected);
+  C(0, 0) = 1.;//_plane_width*_plane_width/12.;
+  C(2, 2) = 1.;//_plane_width*_plane_width/12.;
+  _kalman_sites[0]->set_a(_a0, KalmanSite::Projected);
+  _kalman_sites[0]->set_covariance_matrix(C, KalmanSite::Projected);
 
   for ( size_t j = 0; j < numb_sites; ++j ) {
     ThreeVector true_position = _clusters[j]->get_true_position();
     ThreeVector true_momentum = _clusters[j]->get_true_momentum();
-    _kalman_sites[j].set_true_position(true_position);
-    _kalman_sites[j].set_true_momentum(true_momentum);
+    _kalman_sites[j]->set_true_position(true_position);
+    _kalman_sites[j]->set_true_momentum(true_momentum);
   }
 }
 
@@ -158,8 +175,6 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   a(3, 0) = py*kappa;
   a(4, 0) = kappa;
 
-  _momentum = TMath::Sqrt(px*px+py*py+pz*pz);
-
   return a;
 }
 
@@ -184,15 +199,13 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
 
   // Straight tracks don't have Pz. Assume a reasonable number
   // just so that we can allow for some more trajectory kink correction.
-  double seed_pz = 226.;
+  // double seed_pz = 226.;
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
-
-  _momentum = seed_pz;
 
   return a;
 }

@@ -14,18 +14,27 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanStraightPropagator.hh"
 
 namespace MAUS {
 
-StraightTrack::StraightTrack() : KalmanTrack() {
-  _n_parameters   = 4;
-  _algorithm_used = kalman_straight;
+KalmanStraightPropagator::KalmanStraightPropagator() : KalmanPropagator() {
+  _n_parameters = 4;
+  // Propagator matrix.
+  _F.ResizeTo(_n_parameters, _n_parameters);
+  _F.Zero();
+  // MCS error.
+  _Q.ResizeTo(_n_parameters, _n_parameters);
+  _Q.Zero();
+  // Backpropagation matrix.
+  _A.ResizeTo(_n_parameters, _n_parameters);
+  _A.Zero();
 }
 
-StraightTrack::~StraightTrack() {}
+KalmanStraightPropagator::~KalmanStraightPropagator() {}
 
-void StraightTrack::UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) {
+void KalmanStraightPropagator::UpdatePropagator(const KalmanSite *old_site,
+                                                const KalmanSite *new_site) {
   // Reset.
   _F.Zero();
 
@@ -40,7 +49,8 @@ void StraightTrack::UpdatePropagator(const KalmanSite *old_site, const KalmanSit
   _F(2, 3) = deltaZ;
 }
 
-void StraightTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) {
+void KalmanStraightPropagator::CalculatePredictedState(const KalmanSite *old_site,
+                                                       KalmanSite *new_site) {
   UpdatePropagator(old_site, new_site);
 
   TMatrixD a = old_site->a(KalmanSite::Filtered);

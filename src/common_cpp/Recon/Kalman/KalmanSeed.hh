@@ -86,38 +86,54 @@ class KalmanSeed {
    */
   TMatrixD initial_state_vector() const { return _a0; }
 
-  void SetField(SciFiGeometryMap _plane_map);
+  /** @brief Loops over the clusters in the event and makes a KalmanSite for each.
+   */
+  void BuildKalmanSites();
+
+  // void SetField(SciFiGeometryMap _plane_map);
 
   bool is_helical()  const { return _helical; }
 
   bool is_straight() const { return _straight; }
 
-  SciFiClusterPArray clusters() const { return _clusters; }
+  SciFiClusterPArray GetClusters() const { return _clusters; }
 
-  size_t is_usable() const { return _clusters.size(); }
-
-  double momentum()  const { return _momentum; }
+  void SetClusters(SciFiClusterPArray clusters) { _clusters = clusters; }
 
   int n_parameters() const { return _n_parameters; }
 
-  KalmanSitesVector KalmanSites() const { return _kalman_sites; }
+  KalmanSitesPArray GetKalmanSites() const { return _kalman_sites; }
 
-  void BuildKalmanSites();
+  void SetKalmanSites(KalmanSitesPArray sites) { _kalman_sites = sites; }
 
   void SetField(double bz) { _Bz = bz; }
 
+  double GetField() const { return _Bz; }
+
  private:
+  /** @brief Initial 'guess' of the state vector [x, mx, y, my, (kappa)].
+   */
+  TMatrixD _a0;
+
+  /** @brief The field in the tracker the seed belongs to.
+   */
+  double _Bz;
+
+  /** @brief Convertion factor for G4's magnetic field.
+   */
+  double _mT_to_T;
+
+  /** @brief Uncertainty on a0's elements - tunable parameter in the datacards.
+   */
+  double _seed_cov;
+
+  double _plane_width;
+
   SciFiGeometryMap _geometry_map;
 
   SciFiClusterPArray _clusters;
 
-  KalmanSitesVector _kalman_sites;
-
-  TMatrixD _a0;
-
-  double _momentum;
-
-  double _Bz;
+  KalmanSitesPArray _kalman_sites;
 
   bool _straight;
 
@@ -126,12 +142,6 @@ class KalmanSeed {
   int _n_parameters;
 
   int _tracker;
-
-  double _mT_to_T;
-
-  double _seed_cov;
-
-  double _plane_width;
 };
 
 template <class PRTrack>

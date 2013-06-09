@@ -35,10 +35,9 @@
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanFilter.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanStraightPropagator.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
@@ -58,43 +57,16 @@ class KalmanTrackFit {
    */
   void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
-  /** @brief Runs Filter routines.
-   *
-   *  Runs the Prediction->Filtering->Smoothing stages.
-   *
-   */
-  void RunKalmanFilter(KalmanTrack *track,
-                       KalmanSitesVector &sites);
+  void ComputeChi2(SciFiTrack *track);
 
-  /** @brief  Manages all extrapolation steps.
-   */
-  void Extrapolate(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
-
-  /** @brief  Manages all filtering steps.
-   */
-  void Filter(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
-
-  void PrepareForSmoothing(KalmanSite *last_site);
-
-  /** @brief  Manages all smoothing steps.
-   */
-  void Smooth(KalmanTrack *track, KalmanSitesVector &sites, int current_site);
-
-  /** @brief
-   *
-   *  Saves the KalmanTrack to an output SciFiTrack.
-   *
-   */
-  void Save(const KalmanTrack *kalman_track,
-            KalmanSitesVector sites,
-            SciFiEvent &event);
+  void Save(SciFiEvent &event, SciFiTrack *track);
 
   /** @brief
    *
    *  Prints some info about the filtering status.
    *
    */
-  void DumpInfo(KalmanSitesVector const &sites);
+  void DumpInfo(SciFiTrack *track);
 
  private:
   bool _use_MCS;
@@ -102,6 +74,10 @@ class KalmanTrackFit {
   bool _use_Eloss;
 
   bool _verbose;
+
+  KalmanPropagator *_propagator;
+
+  KalmanFilter     *_filter;
 };
 
 } // ~namespace MAUS

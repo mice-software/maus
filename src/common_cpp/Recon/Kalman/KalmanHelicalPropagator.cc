@@ -15,18 +15,29 @@
  *
  */
 
-#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
 
 namespace MAUS {
+KalmanHelicalPropagator::KalmanHelicalPropagator() : KalmanPropagator() {}
 
-HelicalTrack::HelicalTrack() : KalmanTrack() {
-  _n_parameters   = 5;
-  _algorithm_used = kalman_helical;
+KalmanHelicalPropagator::KalmanHelicalPropagator(double Bz) : KalmanPropagator() {
+  _Bz = Bz;
+  _n_parameters = 5;
+  // Propagator matrix.
+  _F.ResizeTo(_n_parameters, _n_parameters);
+  _F.Zero();
+  // MCS error.
+  _Q.ResizeTo(_n_parameters, _n_parameters);
+  _Q.Zero();
+  // Backpropagation matrix.
+  _A.ResizeTo(_n_parameters, _n_parameters);
+  _A.Zero();
 }
 
-HelicalTrack::~HelicalTrack() {}
+KalmanHelicalPropagator::~KalmanHelicalPropagator() {}
 
-void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) {
+void KalmanHelicalPropagator::CalculatePredictedState(const KalmanSite *old_site,
+                                                      KalmanSite *new_site) {
   // Find dz (mm).
   double new_z  = new_site->z();
   double old_z  = old_site->z();
@@ -40,7 +51,8 @@ void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSit
   double old_my     = old_a(3, 0);
   double old_kappa  = old_a(4, 0);
 
-  double a      = -0.2998*_particle_charge*_B_field;
+  double particle_charge = old_kappa/fabs(old_kappa);
+  double a      = -0.2998*particle_charge*_Bz;
   double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
@@ -61,8 +73,8 @@ void HelicalTrack::CalculatePredictedState(const KalmanSite *old_site, KalmanSit
   UpdatePropagator(old_site, new_site);
 }
 
-void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
-                                    const KalmanSite *new_site) {
+void KalmanHelicalPropagator::UpdatePropagator(const KalmanSite *old_site,
+                                               const KalmanSite *new_site) {
   // Reset propagator.
   _F.Zero();
 
@@ -80,8 +92,9 @@ void HelicalTrack::UpdatePropagator(const KalmanSite *old_site,
   double kappa  = site(4, 0);
   double kappa2 = TMath::Power(kappa, 2.);
 
+  double particle_charge = kappa/fabs(kappa);
   // constant in units MeV/mm
-  double a = -0.2998*_particle_charge*_B_field;
+  double a = -0.2998*particle_charge*_Bz;
 
   // Define factors to be used in the matrix.
   double sine   = sin(a*deltaZ*kappa);
