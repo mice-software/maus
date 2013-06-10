@@ -52,7 +52,8 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanSite *old_site
   double old_kappa  = old_a(4, 0);
 
   double particle_charge = old_kappa/fabs(old_kappa);
-  double a      = -0.2998*particle_charge*_Bz;
+  double c      = CLHEP::c_light*1.e-3;
+  double a      = c*particle_charge*_Bz;
   double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
 
@@ -83,18 +84,19 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanSite *old_site,
   double old_z = old_site->z();
 
   // Delta Z in mm
-  double deltaZ = 0; // (new_z-old_z);
+  double deltaZ = (new_z-old_z);
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanSite::Projected);
   double mx     = site(1, 0);
   double my     = site(3, 0);
   double kappa  = site(4, 0);
-  double kappa2 = TMath::Power(kappa, 2.);
+  double kappa2 = kappa*kappa;
 
   double particle_charge = kappa/fabs(kappa);
   // constant in units MeV/mm
-  double a = -0.2998*particle_charge*_Bz;
+  double c = CLHEP::c_light*1.e-3;
+  double a = c*particle_charge*_Bz;
 
   // Define factors to be used in the matrix.
   double sine   = sin(a*deltaZ*kappa);

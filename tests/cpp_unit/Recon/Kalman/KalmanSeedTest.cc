@@ -210,6 +210,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Set up Seed object with spacepoints.
   //
   MAUS::KalmanSeed seed;
+  seed.SetField(4);
   //
   // Now set up a Straight Pattern Recognition Track
   //
@@ -220,9 +221,11 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Is this Pi really necessary?
   double PI = acos(-1.);
   double phi_0 = 0.;
-  double pt = 0.3*4.*r;
+  int charge = -1;
+  double field = -4;
+  double pt = charge*0.3*field*r;
   double pz = pt*tan_lambda;
-  double kappa = fabs(1./pz);
+  double kappa = charge*fabs(1./pz);
   helical_track.set_tracker(0);
   helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);
@@ -237,7 +240,6 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   //
   // Check the result is the expected.
   //
-  // EXPECT_EQ(seed->momentum(), seed_pz);
   EXPECT_EQ(a.GetNrows(), 5);
   EXPECT_EQ(a(0, 0), x);
   EXPECT_EQ(a(1, 0), pt*cos(phi_0+PI/2.)*kappa);

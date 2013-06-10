@@ -33,6 +33,8 @@
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanPropagator.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 namespace MAUS {
 
 /** @class KalmanHelicalPropagator

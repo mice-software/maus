@@ -116,12 +116,10 @@ class KalmanSeed {
   TMatrixD _a0;
 
   /** @brief The field in the tracker the seed belongs to.
+   *
+   * This is the field value wrt the global reference frame.
    */
   double _Bz;
-
-  /** @brief Convertion factor for G4's magnetic field.
-   */
-  double _mT_to_T;
 
   /** @brief Uncertainty on a0's elements - tunable parameter in the datacards.
    */
@@ -142,6 +140,8 @@ class KalmanSeed {
   int _n_parameters;
 
   int _tracker;
+  
+  int _particle_charge;
 };
 
 template <class PRTrack>

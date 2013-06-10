@@ -57,14 +57,15 @@ class KalmanTrackFit {
    */
   void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
 
+  /** @brief Loops over the track points in the finished track calculating the chi2.
+   */
   void ComputeChi2(SciFiTrack *track);
 
+  /** @brief Saves the track into the SciFiEvent for data structure output.
+   */
   void Save(SciFiEvent &event, SciFiTrack *track);
 
-  /** @brief
-   *
-   *  Prints some info about the filtering status.
-   *
+  /** @brief Prints some info about the fitting evolution.
    */
   void DumpInfo(SciFiTrack *track);
 

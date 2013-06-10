@@ -15,6 +15,8 @@
  *
  */
 
+// TODO: use Pattern Recognition to set up _particle_charge
+
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
@@ -32,13 +34,13 @@ bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
 KalmanSeed::KalmanSeed() : _straight(false),
                            _helical(false),
                            _Bz(0.),
-                           _mT_to_T(1000.) {}
+                           _particle_charge(-1) {}
 
 KalmanSeed::KalmanSeed(SciFiGeometryMap map): _geometry_map(map),
                                               _straight(false),
                                               _helical(false),
                                               _Bz(0.),
-                                              _mT_to_T(1000.) {
+                                              _particle_charge(-1) {
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
   _plane_width = (*json)["SciFiParams_Plane_Width"].asDouble();
@@ -136,15 +138,18 @@ void KalmanSeed::BuildKalmanSites() {
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
+  double Bfield;
   double x, y, z;
   if ( _tracker == 0 ) {
     x = spacepoints.back()->get_position().x();
     y = spacepoints.back()->get_position().y();
     z = spacepoints.back()->get_position().z();
+    Bfield = -_Bz;
   } else if ( _tracker == 1 ) {
     x = spacepoints.front()->get_position().x();
     y = spacepoints.front()->get_position().y();
     z = spacepoints.front()->get_position().z();
+    Bfield = _Bz;
   } else {
     x = y = z = -666; // removes a compiler warning.
     throw(Squeal(Squeal::recoverable,
@@ -153,15 +158,15 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   }
   // Get seed values.
   double r  = seed->get_R();
-  double pt = -0.3*_Bz*r;
-  // double pt = _particle_charge*(CLHEP::c_light*1.e-9)*B*r;
+  double c = CLHEP::c_light*1.e-3;
+  double pt = _particle_charge*c*Bfield*r;
 
   double dsdz  = seed->get_dsdz();
   double tan_lambda = 1./dsdz;
 
   double pz = pt*tan_lambda;
 
-  double kappa = fabs(1./pz);
+  double kappa = _particle_charge*fabs(1./pz);
 
   double phi_0 = seed->get_phi0();
   double phi = phi_0 + TMath::PiOver2();
@@ -196,10 +201,6 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
 
   double mx = seed->get_mx();
   double my = seed->get_my();
-
-  // Straight tracks don't have Pz. Assume a reasonable number
-  // just so that we can allow for some more trajectory kink correction.
-  // double seed_pz = 226.;
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
