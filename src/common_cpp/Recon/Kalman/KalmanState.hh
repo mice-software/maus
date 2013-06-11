@@ -57,23 +57,23 @@ struct SciFiParams {
   double RMS;
 };
 
-/** @class KalmanSite
+/** @class KalmanState
  *
- *  @brief A KalmanSite is a tracker plane. Each tracker contains 15 (if all planes are hit).
+ *  @brief A KalmanState is a tracker plane. Each tracker contains 15 (if all planes are hit).
  *
- *  Each KalmanSite is a container for matrices which describe the state of the fit
+ *  Each KalmanState is a container for matrices which describe the state of the fit
  *  and the errors associated.
  *
  */
-class KalmanSite {
+class KalmanState {
  public:
-  KalmanSite();
+  KalmanState();
 
-  ~KalmanSite();
+  ~KalmanState();
 
-  KalmanSite(const KalmanSite &site);
+  KalmanState(const KalmanState &site);
 
-  KalmanSite& operator=(const KalmanSite& site);
+  KalmanState& operator=(const KalmanState& site);
 
   enum State { Initialized = -1,
                Projected,
@@ -215,7 +215,7 @@ class KalmanSite {
   ThreeVector _mc_mom;
 };
 
-typedef std::vector<KalmanSite*> KalmanSitesPArray;
+typedef std::vector<KalmanState*> KalmanStatesPArray;
 
 } // ~namespace MAUS
 

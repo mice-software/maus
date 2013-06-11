@@ -41,18 +41,18 @@ class KalmanStraightPropagatorTest : public ::testing::Test {
     a(1, 0) = mx;
     a(2, 0) = 0.0;
     a(3, 0) = my;
-    old_site.set_a(a, MAUS::KalmanSite::Filtered);
+    old_site.set_a(a, MAUS::KalmanState::Filtered);
 
     TMatrixD C(4, 4);
     C.Zero();
     for ( int i = 0; i < 4; ++i ) {
       C(i, i) = 100.; // dummy values
     }
-    old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
+    old_site.set_covariance_matrix(C, MAUS::KalmanState::Projected);
   }
   virtual void TearDown() {}
-  MAUS::KalmanSite old_site;
-  MAUS::KalmanSite new_site;
+  MAUS::KalmanState old_site;
+  MAUS::KalmanState new_site;
   double mx, my, deltaZ;
   void set_up_sites();
   static const double err = 1e-2;
@@ -63,7 +63,7 @@ TEST_F(KalmanStraightPropagatorTest, propagator_test) {
   propagator->CalculatePredictedState(&old_site, &new_site);
 
   TMatrixD a_projected(4, 1);
-  a_projected = new_site.a(MAUS::KalmanSite::Projected);
+  a_projected = new_site.a(MAUS::KalmanState::Projected);
 
   double expected_x = mx*deltaZ;
   double expected_y = my*deltaZ;
@@ -73,5 +73,4 @@ TEST_F(KalmanStraightPropagatorTest, propagator_test) {
   // track->calc_covariance(&old_site, &new_site);
   // Test COVARIANCE
 }
-
 }

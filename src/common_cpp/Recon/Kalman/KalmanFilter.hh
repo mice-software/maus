@@ -31,7 +31,7 @@
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -53,29 +53,31 @@ class KalmanFilter {
 
   /** @brief  Runs the filter stage by calling the other member functions.
    */
-  void Process(KalmanSitesPArray sites, int current_site);
+  void Process(KalmanStatesPArray sites, int current_site);
 
   /** @brief  Computes the filtered state.
    */
-  void CalculateFilteredState(KalmanSite *a_site);
+  void CalculateFilteredState(KalmanState *a_site);
 
   /** @brief  Computes the filtered covariance matrix.
    */
-  void UpdateCovariance(KalmanSite *a_site);
+  void UpdateCovariance(KalmanState *a_site);
+
+  TMatrixD SolveMeasurementEquation(const TMatrixD &a, const TMatrixD &s);
 
   /** @brief  Computes the difference between the estimation and measurement for different stages.
    */
-  void SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state);
+  void SetResidual(KalmanState *a_site, KalmanState::State kalman_state);
 
-  void UpdateV(const KalmanSite *a_site);
+  void UpdateV(const KalmanState *a_site);
 
-  void UpdateH(const KalmanSite *a_site);
+  void UpdateH(const KalmanState *a_site);
 
-  void UpdateW(const KalmanSite *a_site);
+  void UpdateW(const KalmanState *a_site);
 
-  void UpdateK(const KalmanSite *a_site);
+  void UpdateK(const KalmanState *a_site);
 
-  void ComputePull(KalmanSite *a_site);
+  void ComputePull(KalmanState *a_site);
 
   TMatrixD H() const { return _H; }
 
@@ -85,6 +87,8 @@ class KalmanFilter {
   TMatrixD _V;
 
   TMatrixD _H;
+
+  TMatrixD _S;
 
   TMatrixD _W;
 

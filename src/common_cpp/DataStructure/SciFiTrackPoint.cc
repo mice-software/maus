@@ -19,33 +19,46 @@
 
 namespace MAUS {
 
-SciFiTrackPoint::SciFiTrackPoint() : _id(-1),
-                                     _f_chi2(0.),
-                                     _s_chi2(0.),
+SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
+                                     _station(-1),
+                                     _plane(-1),
+                                     _f_chi2(-1),
+                                     _s_chi2(-1),
                                      _x(0.),
                                      _px(0.),
                                      _y(0.),
                                      _py(0.),
+                                     _pz(0.),
+                                     _pull(-1),
+                                     _residual(-1),
+                                     _smoothed_residual(-1),
                                      _mc_x(0.),
                                      _mc_px(0.),
                                      _mc_y(0.),
                                      _mc_py(0.),
-                                     _pull(0.),
-                                     _residual(0.),
-                                     _smoothed_residual(0.) {}
+                                     _mc_pz(0.) {}
 
 SciFiTrackPoint::~SciFiTrackPoint() {}
 
-SciFiTrackPoint::SciFiTrackPoint(const KalmanSite *kalman_site) {
-  _id = kalman_site->id();
+SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
+  int id = kalman_site->id();
+  if ( id < 0 ) {
+    _tracker = 0;
+  } else {
+    _tracker = 1;
+  }
+  id = abs(id);
+  _station = id/3;
+  _plane   = (id-1)%3;
 
-  _f_chi2 = kalman_site->chi2(KalmanSite::Filtered);
-  _s_chi2 = kalman_site->chi2(KalmanSite::Smoothed);
+  _f_chi2 = kalman_site->chi2(KalmanState::Filtered);
+  _s_chi2 = kalman_site->chi2(KalmanState::Smoothed);
 
-  TMatrixD state_vector = kalman_site->a(KalmanSite::Smoothed);
+  TMatrixD state_vector = kalman_site->a(KalmanState::Smoothed);
   int dimension = state_vector.GetNrows();
 
   if ( dimension == 4 ) {
+    _pz = 200; // MeV/c
     _x  = state_vector(0, 0);
     _px = state_vector(1, 0);
     _y  = state_vector(2, 0);
@@ -55,6 +68,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanSite *kalman_site) {
     _px = state_vector(1, 0)/fabs(state_vector(4, 0));
     _y  = state_vector(2, 0);
     _py = state_vector(3, 0)/fabs(state_vector(4, 0));
+    _pz = 1./fabs(state_vector(4, 0));
   }
 
   ThreeVector mc_mom = kalman_site->true_momentum();
@@ -63,14 +77,17 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanSite *kalman_site) {
   _mc_px = mc_mom.x();
   _mc_y  = mc_pos.y();
   _mc_py = mc_mom.y();
+  _mc_pz = mc_mom.z();
 
-  _pull              = kalman_site->residual(KalmanSite::Projected)(0, 0);
-  _residual          = kalman_site->residual(KalmanSite::Filtered)(0, 0);
-  _smoothed_residual = kalman_site->residual(KalmanSite::Smoothed)(0, 0);
+  _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
+  _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
+  _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
-  _id = point.id();
+  _tracker = point.tracker();
+  _station = point.station();
+  _plane   = point.plane();
 
   _f_chi2 = point.f_chi2();
   _s_chi2 = point.s_chi2();
@@ -79,11 +96,13 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _px = point.px();
   _y  = point.y();
   _py = point.py();
+  _pz = point.pz();
 
   _mc_x  = point.mc_x();
   _mc_px = point.mc_px();
   _mc_y  = point.mc_y();
   _mc_py = point.mc_py();
+  _mc_pz = point.mc_pz();
 
   _pull              = point.pull();
   _residual          = point.residual();
@@ -94,7 +113,9 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
-  _id = rhs.id();
+  _tracker = rhs.tracker();
+  _station = rhs.station();
+  _plane   = rhs.plane();
 
   _f_chi2 = rhs.f_chi2();
   _s_chi2 = rhs.s_chi2();
@@ -103,11 +124,13 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _px = rhs.px();
   _y  = rhs.y();
   _py = rhs.py();
+  _pz = rhs.pz();
 
   _mc_x  = rhs.mc_x();
   _mc_px = rhs.mc_px();
   _mc_y  = rhs.mc_y();
   _mc_py = rhs.mc_py();
+  _mc_pz = rhs.mc_pz();
 
   _pull              = rhs.pull();
   _residual          = rhs.residual();

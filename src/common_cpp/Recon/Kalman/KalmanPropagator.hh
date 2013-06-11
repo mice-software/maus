@@ -33,7 +33,7 @@
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
@@ -51,19 +51,19 @@ class KalmanPropagator {
 
   /** @brief  Main worker for the forward propagation.
    */
-  void Extrapolate(KalmanSitesPArray sites, int i);
+  void Extrapolate(KalmanStatesPArray sites, int i);
 
   /** @brief  Calculates the Propagator Matrix (F) for the current extrapolation.
    */
-  virtual void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site) = 0;
+  virtual void UpdatePropagator(const KalmanState *old_site, const KalmanState *new_site) = 0;
 
   /** @brief  Calculates the state vector prediction at the next site.
    */
-  virtual void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site) = 0;
+  virtual void CalculatePredictedState(const KalmanState *old_site, KalmanState *new_site) = 0;
 
   /** @brief  Projects the Covariance matrix.
    */
-  void CalculateCovariance(const KalmanSite *old_site, KalmanSite *new_site);
+  void CalculateCovariance(const KalmanState *old_site, KalmanState *new_site);
 
   /** @brief  Calculates the Energy loss according to Bethe Bloch formula.
    */
@@ -71,31 +71,32 @@ class KalmanPropagator {
 
   /** @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
    */
-  void SubtractEnergyLoss(const KalmanSite *old_site, KalmanSite *new_site);
+  void SubtractEnergyLoss(const KalmanState *old_site, KalmanState *new_site);
 
   /** @brief  Computes the contribution of MCS to the covariance matrix.
    */
-  void CalculateSystemNoise(const KalmanSite *old_site, const KalmanSite *new_site);
+  void CalculateSystemNoise(const KalmanState *old_site, const KalmanState *new_site);
 
   /** @brief  Smoothes the last fitted point, for which filtered values = smoothed ones.
    */
-  void PrepareForSmoothing(KalmanSitesPArray sites);
+  void PrepareForSmoothing(KalmanStatesPArray sites);
 
   /** @brief  Smoothes the track points all the way to the beggining of the track.
    */
-  void Smooth(KalmanSitesPArray sites, int id);
+  void Smooth(KalmanStatesPArray sites, int id);
 
   /** @brief  Builds the member matrix _A.
    */
-  void UpdateBackTransportationMatrix(const KalmanSite *optimum_site, const KalmanSite *smoothing_site);
+  void UpdateBackTransportationMatrix(const KalmanState *optimum_site,
+                                      const KalmanState *smoothing_site);
 
   /** @brief  Propagates backwards from one site to the previous.
    */
-  void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
+  void SmoothBack(const KalmanState *optimum_site, KalmanState *smoothing_site);
 
   /** @brief  Returns the width of the scattering angle distribution, according to the Highland formula.
    */
-  double HighlandFormula(double z, double L0, double beta, double p)
+  double HighlandFormula(double z, double L0, double beta, double p);
 
  protected:
   bool _use_MCS;

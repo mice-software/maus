@@ -14,21 +14,21 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "gtest/gtest.h"
 
 namespace {
-class KalmanSiteTest : public ::testing::Test {
+class KalmanStateTest : public ::testing::Test {
  protected:
-  KalmanSiteTest()  {}
-  virtual ~KalmanSiteTest() {}
+  KalmanStateTest()  {}
+  virtual ~KalmanStateTest() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
 };
 
-TEST_F(KalmanSiteTest, getters_and_setters_test) {
+TEST_F(KalmanStateTest, getters_and_setters_test) {
   // Build a Kalman Site
-  MAUS::KalmanSite a_site = MAUS::KalmanSite();
+  MAUS::KalmanState a_site = MAUS::KalmanState();
   a_site.Initialise(5);
   int id = 13;
   a_site.set_id(id);
@@ -75,92 +75,92 @@ TEST_F(KalmanSiteTest, getters_and_setters_test) {
   covariance_residual(1, 1) = 4.;
 
   // Set them all.
-  a_site.set_a(projected_a, MAUS::KalmanSite::Projected);
-  a_site.set_residual(pull, MAUS::KalmanSite::Projected);
+  a_site.set_a(projected_a, MAUS::KalmanState::Projected);
+  a_site.set_residual(pull, MAUS::KalmanState::Projected);
 
-  a_site.set_a(a, MAUS::KalmanSite::Filtered);
-  a_site.set_residual(residual, MAUS::KalmanSite::Filtered);
-  a_site.set_chi2(f_chi2, MAUS::KalmanSite::Filtered);
+  a_site.set_a(a, MAUS::KalmanState::Filtered);
+  a_site.set_residual(residual, MAUS::KalmanState::Filtered);
+  a_site.set_chi2(f_chi2, MAUS::KalmanState::Filtered);
 
-  a_site.set_a(smoothed_a, MAUS::KalmanSite::Smoothed);
-  a_site.set_residual(smoothed_residual, MAUS::KalmanSite::Smoothed);
-  a_site.set_chi2(s_chi2, MAUS::KalmanSite::Smoothed);
-  a_site.set_covariance_residual(covariance_residual, MAUS::KalmanSite::Smoothed);
+  a_site.set_a(smoothed_a, MAUS::KalmanState::Smoothed);
+  a_site.set_residual(smoothed_residual, MAUS::KalmanState::Smoothed);
+  a_site.set_chi2(s_chi2, MAUS::KalmanState::Smoothed);
+  a_site.set_covariance_residual(covariance_residual, MAUS::KalmanState::Smoothed);
 
   // Now, we can quickly check that these states were set as expected.
   // Expectations can't handle TMatrices, so we'll be comparing first element of each.
   EXPECT_EQ(a_site.id(), id);
-  EXPECT_EQ(a_site.residual(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(a_site.residual(MAUS::KalmanState::Projected)(0, 0),
             pull(0, 0));
-  EXPECT_EQ(a_site.residual(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(a_site.residual(MAUS::KalmanState::Filtered)(0, 0),
             residual(0, 0));
-  EXPECT_EQ(a_site.residual(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(a_site.residual(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_residual(0, 0));
-  EXPECT_EQ(a_site.a(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(a_site.a(MAUS::KalmanState::Projected)(0, 0),
             projected_a(0, 0));
-  EXPECT_EQ(a_site.a(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(a_site.a(MAUS::KalmanState::Filtered)(0, 0),
             a(0, 0));
-  EXPECT_EQ(a_site.a(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(a_site.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(a_site.chi2(MAUS::KalmanSite::Filtered),
+  EXPECT_EQ(a_site.chi2(MAUS::KalmanState::Filtered),
             f_chi2);
-  EXPECT_EQ(a_site.chi2(MAUS::KalmanSite::Smoothed),
+  EXPECT_EQ(a_site.chi2(MAUS::KalmanState::Smoothed),
             s_chi2);
 
   // Are the copy constructor and the assignment operator working? Check them.
   // First, copy...
-  MAUS::KalmanSite copy = MAUS::KalmanSite(a_site);
+  MAUS::KalmanState copy = MAUS::KalmanState(a_site);
   EXPECT_EQ(copy.id(), id);
-  EXPECT_EQ(copy.residual(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(copy.residual(MAUS::KalmanState::Projected)(0, 0),
             pull(0, 0));
-  EXPECT_EQ(copy.residual(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(copy.residual(MAUS::KalmanState::Filtered)(0, 0),
             residual(0, 0));
-  EXPECT_EQ(copy.residual(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(copy.residual(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_residual(0, 0));
-  EXPECT_EQ(copy.a(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(copy.a(MAUS::KalmanState::Projected)(0, 0),
             projected_a(0, 0));
-  EXPECT_EQ(copy.a(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(copy.a(MAUS::KalmanState::Filtered)(0, 0),
             a(0, 0));
-  EXPECT_EQ(copy.a(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(copy.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(copy.chi2(MAUS::KalmanSite::Filtered),
+  EXPECT_EQ(copy.chi2(MAUS::KalmanState::Filtered),
             f_chi2);
-  EXPECT_EQ(copy.chi2(MAUS::KalmanSite::Smoothed),
+  EXPECT_EQ(copy.chi2(MAUS::KalmanState::Smoothed),
             s_chi2);
-  EXPECT_EQ(copy.covariance_residual(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(copy.covariance_residual(MAUS::KalmanState::Smoothed)(0, 0),
             covariance_residual(0, 0));
 
   // Now, the assignment.
-  MAUS::KalmanSite second_copy;
+  MAUS::KalmanState second_copy;
   second_copy = copy;
   EXPECT_EQ(second_copy.id(), id);
-  EXPECT_EQ(second_copy.residual(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(second_copy.residual(MAUS::KalmanState::Projected)(0, 0),
             pull(0, 0));
-  EXPECT_EQ(second_copy.residual(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(second_copy.residual(MAUS::KalmanState::Filtered)(0, 0),
             residual(0, 0));
-  EXPECT_EQ(second_copy.residual(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(second_copy.residual(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_residual(0, 0));
-  EXPECT_EQ(second_copy.a(MAUS::KalmanSite::Projected)(0, 0),
+  EXPECT_EQ(second_copy.a(MAUS::KalmanState::Projected)(0, 0),
             projected_a(0, 0));
-  EXPECT_EQ(second_copy.a(MAUS::KalmanSite::Filtered)(0, 0),
+  EXPECT_EQ(second_copy.a(MAUS::KalmanState::Filtered)(0, 0),
             a(0, 0));
-  EXPECT_EQ(second_copy.a(MAUS::KalmanSite::Smoothed)(0, 0),
+  EXPECT_EQ(second_copy.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(second_copy.chi2(MAUS::KalmanSite::Filtered),
+  EXPECT_EQ(second_copy.chi2(MAUS::KalmanState::Filtered),
             f_chi2);
-  EXPECT_EQ(second_copy.chi2(MAUS::KalmanSite::Smoothed),
+  EXPECT_EQ(second_copy.chi2(MAUS::KalmanState::Smoothed),
             s_chi2);
-  EXPECT_EQ(second_copy.covariance_residual(MAUS::KalmanSite::Smoothed)(1, 1),
+  EXPECT_EQ(second_copy.covariance_residual(MAUS::KalmanState::Smoothed)(1, 1),
             covariance_residual(1, 1));
 
   // Bad requests
-  EXPECT_THROW(a_site.set_chi2(0., MAUS::KalmanSite::Initialized),
+  EXPECT_THROW(a_site.set_chi2(0., MAUS::KalmanState::Initialized),
                Squeal);
-  EXPECT_THROW(a_site.set_covariance_residual(covariance_residual, MAUS::KalmanSite::Initialized),
+  EXPECT_THROW(a_site.set_covariance_residual(covariance_residual, MAUS::KalmanState::Initialized),
                Squeal);
-  EXPECT_THROW(a_site.set_residual(smoothed_residual, MAUS::KalmanSite::Initialized),
+  EXPECT_THROW(a_site.set_residual(smoothed_residual, MAUS::KalmanState::Initialized),
                Squeal);
-  EXPECT_THROW(a_site.set_covariance_matrix(covariance_residual, MAUS::KalmanSite::Initialized),
+  EXPECT_THROW(a_site.set_covariance_matrix(covariance_residual, MAUS::KalmanState::Initialized),
                Squeal);
 }
 }

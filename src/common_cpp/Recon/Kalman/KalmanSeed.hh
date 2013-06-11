@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <map>
 
 #include "TMatrixD.h"
 #include "TMath.h"
@@ -86,9 +87,9 @@ class KalmanSeed {
    */
   TMatrixD initial_state_vector() const { return _a0; }
 
-  /** @brief Loops over the clusters in the event and makes a KalmanSite for each.
+  /** @brief Loops over the clusters in the event and makes a KalmanState for each.
    */
-  void BuildKalmanSites();
+  void BuildKalmanStates();
 
   bool is_helical()  const { return _helical; }
 
@@ -100,9 +101,9 @@ class KalmanSeed {
 
   int n_parameters() const { return _n_parameters; }
 
-  KalmanSitesPArray GetKalmanSites() const { return _kalman_sites; }
+  KalmanStatesPArray GetKalmanStates() const { return _kalman_sites; }
 
-  void SetKalmanSites(KalmanSitesPArray sites) { _kalman_sites = sites; }
+  void SetKalmanStates(KalmanStatesPArray sites) { _kalman_sites = sites; }
 
   void SetField(double bz) { _Bz = bz; }
 
@@ -129,15 +130,15 @@ class KalmanSeed {
 
   SciFiClusterPArray _clusters;
 
-  KalmanSitesPArray _kalman_sites;
+  KalmanStatesPArray _kalman_sites;
+
+  int _tracker;
 
   bool _straight;
 
   bool _helical;
 
   int _n_parameters;
-
-  int _tracker;
 
   int _particle_charge;
 };
@@ -161,7 +162,7 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
 
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
 
-  BuildKalmanSites();
+  BuildKalmanStates();
 }
 } // ~namespace MAUS
 

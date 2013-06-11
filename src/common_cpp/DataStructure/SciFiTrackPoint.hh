@@ -21,6 +21,7 @@
 // C headers
 #include <assert.h>
 #include <iostream>
+#include <cmath>
 
 // C++ headers
 #include <string>
@@ -29,57 +30,161 @@
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
 class SciFiTrackPoint {
  public:
+  /** @brief  Constructor.
+   */
   SciFiTrackPoint();
 
+  /** @brief  Destructor.
+   */
   virtual ~SciFiTrackPoint();
 
-  explicit SciFiTrackPoint(const KalmanSite *kalman_site);
+  /** @brief  Constructs a SciFiTrackPoint from a KalmanState.
+   */
+  explicit SciFiTrackPoint(const KalmanState *kalman_site);
 
+  /** @brief  Copy constructor.
+   */
   SciFiTrackPoint(const SciFiTrackPoint &site);
 
+  /** @brief  Assignment operator.
+   */
   SciFiTrackPoint& operator=(const SciFiTrackPoint& site);
 
-  void set_id(int id)                           { _id     = id;         }
+  /** @brief  Sets tracker number.
+   */
+  void set_tracker(int tracker)                 { _tracker     = tracker; }
+
+  /** @brief  Sets station number.
+   */
+  void set_station(int station)                 { _station     = station; }
+
+  /** @brief  Sets plane number.
+   */
+  void set_plane(int plane)                     { _plane     = plane;   }
+
+  /** @brief  Sets the filtered chi2 for this track point.
+   */
   void set_f_chi2(double f_chi2)                { _f_chi2 = f_chi2;     }
+
+  /** @brief  Sets the smoothed chi2 for this track point.
+   */
   void set_s_chi2(double s_chi2)                { _s_chi2 = s_chi2;     }
+
+  /** @brief  Sets the x coordinate.
+   */
   void set_x(double x)                          { _x      = x;          }
+
+  /** @brief  Sets the x momentum component.
+   */
   void set_px(double px)                        { _px     = px;         }
+
+  /** @brief  Sets the y coordinate.
+   */
   void set_y(double y)                          { _y      = y;          }
+
+  /** @brief  Sets the y momentum component.
+   */
   void set_py(double py)                        { _py     = py;         }
+
+  /** @brief  Sets the z momentum component.
+   */
+  void set_pz(double pz)                        { _pz     = pz;         }
+
+  /** @brief  Sets pull (residual of the projected state).
+   */
+  void set_pull(double pull)                    { _pull   = pull;       }
+
+  /** @brief  Sets residual for the filtered state.
+   */
+  void set_residual(double residual)            { _residual = residual; }
+
+  /** @brief  Sets residual for the smoothed state.
+   */
+  void set_smoothed_residual(double s_residual) { _smoothed_residual = s_residual; }
+
   void set_mc_x(double mc_x)                    { _mc_x   = mc_x;       }
   void set_mc_px(double mc_px)                  { _mc_px  = mc_px;      }
   void set_mc_y(double mc_y)                    { _mc_y   = mc_y;       }
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
-  void set_pull(double pull)                    { _pull   = pull;       }
-  void set_residual(double residual)            { _residual = residual; }
-  void set_smoothed_residual(double s_residual) { _smoothed_residual = s_residual; }
+  void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
 
-  int id()                   const { return _id;       }
+  /** @brief  Returns the tracker number.
+   */
+  int tracker()              const { return _tracker;  }
+
+  /** @brief  Returns the station number.
+   */
+  int station()              const { return _station;  }
+
+  /** @brief  Returns the plane number.
+   */
+  int plane()                const { return _plane;    }
+
+  /** @brief  Returns filtered chi2 value.
+   */
   double f_chi2()            const { return _f_chi2;   }
+
+  /** @brief  Returns the smoothed chi2 value.
+   */
   double s_chi2()            const { return _s_chi2;   }
+
+  /** @brief  Returns the x position.
+   */
   double x()                 const { return _x;        }
+
+  /** @brief  Returns the x momentum component.
+   */
   double px()                const { return _px;       }
+
+  /** @brief  Returns the y position.
+   */
   double y()                 const { return _y;        }
+
+  /** @brief  Returns the y momentum component.
+   */
   double py()                const { return _py;       }
+
+  /** @brief  Returns the z momentum component.
+   */
+  double pz()                const { return _pz;       }
+
+  /** @brief  Returns the residual of the projected state.
+   */
+  double pull()              const { return _pull;     }
+
+  /** @brief  Returns the residual of the filtered state.
+   */
+  double residual()          const { return _residual; }
+
+  /** @brief  Returns the residual of the smoothed state.
+   */
+  double smoothed_residual() const { return _smoothed_residual; }
+
   double mc_x()              const { return _mc_x;     }
   double mc_px()             const { return _mc_px;    }
   double mc_y()              const { return _mc_y;     }
   double mc_py()             const { return _mc_py;    }
-  double pull()              const { return _pull;     }
-  double residual()          const { return _residual; }
-  double smoothed_residual() const { return _smoothed_residual; }
+  double mc_pz()             const { return _mc_pz;    }
 
  private:
-  /** @brief Site id.
+  /** @brief The tracker the trackpoint belongs to.
    */
-  int _id;
+  int _tracker;
+
+  /** @brief The station the trackpoint belongs to.
+   */
+  int _station;
+
+  /** @brief The plane the trackpoint belongs to.
+   */
+  int _plane;
 
   /** @brief filtered chi2
    */
@@ -89,21 +194,48 @@ class SciFiTrackPoint {
    */
   double _s_chi2;
 
-  /// The state vector.
+  /** @brief x position
+   */
   double _x;
+
+  /** @brief x momentum component
+   */
   double _px;
+
+  /** @brief y position
+   */
   double _y;
+
+  /** @brief y momentum component
+   */
   double _py;
+
+  /** @brief z momentum component
+   */
+  double _pz;
+
+  /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
+   */
+  double covariance[5][5];
+
+  /** @brief projected residual
+   */
+  double _pull;
+
+  /** @brief filtered residual
+   */
+  double _residual;
+
+  /** @brief smoothed residual
+   */
+  double _smoothed_residual;
+
   /// The TRUTH state vector.
   double _mc_x;
   double _mc_px;
   double _mc_y;
   double _mc_py;
-
-  /// The residuals.
-  double _pull;
-  double _residual;
-  double _smoothed_residual;
+  double _mc_pz;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

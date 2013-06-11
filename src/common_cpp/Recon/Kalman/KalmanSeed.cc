@@ -31,15 +31,17 @@ bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
   return ( a->get_station() < b->get_station() );
 }
 
-KalmanSeed::KalmanSeed() : _straight(false),
+KalmanSeed::KalmanSeed() : _Bz(0.),
+                           _straight(false),
                            _helical(false),
-                           _Bz(0.),
+                           _n_parameters(-1),
                            _particle_charge(-1) {}
 
-KalmanSeed::KalmanSeed(SciFiGeometryMap map): _geometry_map(map),
+KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
+                                              _geometry_map(map),
                                               _straight(false),
                                               _helical(false),
-                                              _Bz(0.),
+                                              _n_parameters(-1),
                                               _particle_charge(-1) {
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
@@ -66,7 +68,7 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _kalman_sites.resize(rhs._kalman_sites.size());
   for (size_t i = 0; i < rhs._kalman_sites.size(); ++i) {
-    _kalman_sites[i] = new KalmanSite(*rhs._kalman_sites[i]);
+    _kalman_sites[i] = new KalmanState(*rhs._kalman_sites[i]);
   }
   return *this;
 }
@@ -86,15 +88,15 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _kalman_sites.resize(seed._kalman_sites.size());
   for (size_t i = 0; i < seed._kalman_sites.size(); ++i) {
-    _kalman_sites[i] = new KalmanSite(*seed._kalman_sites[i]);
+    _kalman_sites[i] = new KalmanState(*seed._kalman_sites[i]);
   }
 }
 
-void KalmanSeed::BuildKalmanSites() {
+void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
     SciFiCluster& cluster = (*_clusters[j]);
-    KalmanSite* a_site = new KalmanSite();
+    KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
     int id = cluster.get_id();
@@ -125,8 +127,8 @@ void KalmanSeed::BuildKalmanSites() {
   }
   C(0, 0) = _plane_width*_plane_width/12.;
   C(2, 2) = _plane_width*_plane_width/12.;
-  _kalman_sites[0]->set_a(_a0, KalmanSite::Projected);
-  _kalman_sites[0]->set_covariance_matrix(C, KalmanSite::Projected);
+  _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
+  _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
 
   for ( size_t j = 0; j < numb_sites; ++j ) {
     ThreeVector true_position = _clusters[j]->get_true_position();

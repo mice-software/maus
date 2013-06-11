@@ -15,11 +15,11 @@
  *
  */
 
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 
 namespace MAUS {
 
-KalmanSite::KalmanSite(): _current_state(Initialized),
+KalmanState::KalmanState(): _current_state(Initialized),
                           _z(0.),
                           _id(-1),
                           _f_chi2(0.),
@@ -28,9 +28,9 @@ KalmanSite::KalmanSite(): _current_state(Initialized),
                           _mc_pos(ThreeVector()),
                           _mc_mom(ThreeVector()) {}
 
-KalmanSite::~KalmanSite() {}
+KalmanState::~KalmanState() {}
 
-KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
+KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
                                                 _z(0.),
                                                 _id(-1),
                                                 _f_chi2(0.),
@@ -38,36 +38,36 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
                                                 _direction(ThreeVector()),
                                                 _mc_pos(ThreeVector()),
                                                 _mc_mom(ThreeVector()) {
-  int dim = site.a(KalmanSite::Projected).GetNrows();
+  int dim = site.a(KalmanState::Projected).GetNrows();
   Initialise(dim);
 
   _z = site.z();
   _id= site.id();
-  _f_chi2 = site.chi2(KalmanSite::Filtered);
-  _s_chi2 = site.chi2(KalmanSite::Smoothed);
+  _f_chi2 = site.chi2(KalmanState::Filtered);
+  _s_chi2 = site.chi2(KalmanState::Smoothed);
   _direction = site.direction();
   _mc_pos = site.true_position();
   _mc_mom = site.true_momentum();
 
-  _projected_a = site.a(KalmanSite::Projected);
-  _a           = site.a(KalmanSite::Filtered);
-  _smoothed_a  = site.a(KalmanSite::Smoothed);
-  _a_excluded  = site.a(KalmanSite::Excluded);
+  _projected_a = site.a(KalmanState::Projected);
+  _a           = site.a(KalmanState::Filtered);
+  _smoothed_a  = site.a(KalmanState::Smoothed);
+  _a_excluded  = site.a(KalmanState::Excluded);
 
-  _projected_C = site.covariance_matrix(KalmanSite::Projected);
-  _C           = site.covariance_matrix(KalmanSite::Filtered);
-  _smoothed_C  = site.covariance_matrix(KalmanSite::Smoothed);
-  _C_excluded  = site.covariance_matrix(KalmanSite::Excluded);
+  _projected_C = site.covariance_matrix(KalmanState::Projected);
+  _C           = site.covariance_matrix(KalmanState::Filtered);
+  _smoothed_C  = site.covariance_matrix(KalmanState::Smoothed);
+  _C_excluded  = site.covariance_matrix(KalmanState::Excluded);
 
   _v = site.measurement();
 
-  _pull                 = site.residual(KalmanSite::Projected);
-  _residual             = site.residual(KalmanSite::Filtered);
-  _smoothed_residual    = site.residual(KalmanSite::Smoothed);
-  _excluded_residual    = site.residual(KalmanSite::Excluded);
-  _covariance_residual          = site.covariance_residual(KalmanSite::Filtered);
-  _covariance_smoothed_residual = site.covariance_residual(KalmanSite::Smoothed);
-  _covariance_excluded_residual = site.covariance_residual(KalmanSite::Excluded);
+  _pull                 = site.residual(KalmanState::Projected);
+  _residual             = site.residual(KalmanState::Filtered);
+  _smoothed_residual    = site.residual(KalmanState::Smoothed);
+  _excluded_residual    = site.residual(KalmanState::Excluded);
+  _covariance_residual          = site.covariance_residual(KalmanState::Filtered);
+  _covariance_smoothed_residual = site.covariance_residual(KalmanState::Smoothed);
+  _covariance_excluded_residual = site.covariance_residual(KalmanState::Excluded);
 
   _input_shift = site.input_shift();
   _input_shift_covariance = site.input_shift_covariance();
@@ -78,40 +78,40 @@ KalmanSite::KalmanSite(const KalmanSite &site): _current_state(Initialized),
   _current_state = site.current_state();
 }
 
-KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
+KalmanState& KalmanState::operator=(const KalmanState &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
-  int dim = rhs.a(KalmanSite::Projected).GetNrows();
+  int dim = rhs.a(KalmanState::Projected).GetNrows();
   this->Initialise(dim);
 
   _z  = rhs.z();
   _id = rhs.id();
-  _f_chi2 = rhs.chi2(KalmanSite::Filtered);
-  _s_chi2 = rhs.chi2(KalmanSite::Smoothed);
+  _f_chi2 = rhs.chi2(KalmanState::Filtered);
+  _s_chi2 = rhs.chi2(KalmanState::Smoothed);
   _direction = rhs.direction();
   _mc_pos = rhs.true_position();
   _mc_mom = rhs.true_momentum();
 
-  _projected_a = rhs.a(KalmanSite::Projected);
-  _a           = rhs.a(KalmanSite::Filtered);
-  _smoothed_a  = rhs.a(KalmanSite::Smoothed);
-  _a_excluded  = rhs.a(KalmanSite::Excluded);
+  _projected_a = rhs.a(KalmanState::Projected);
+  _a           = rhs.a(KalmanState::Filtered);
+  _smoothed_a  = rhs.a(KalmanState::Smoothed);
+  _a_excluded  = rhs.a(KalmanState::Excluded);
 
-  _projected_C = rhs.covariance_matrix(KalmanSite::Projected);
-  _C           = rhs.covariance_matrix(KalmanSite::Filtered);
-  _smoothed_C  = rhs.covariance_matrix(KalmanSite::Smoothed);
-  _C_excluded  = rhs.covariance_matrix(KalmanSite::Excluded);
+  _projected_C = rhs.covariance_matrix(KalmanState::Projected);
+  _C           = rhs.covariance_matrix(KalmanState::Filtered);
+  _smoothed_C  = rhs.covariance_matrix(KalmanState::Smoothed);
+  _C_excluded  = rhs.covariance_matrix(KalmanState::Excluded);
 
   _v = rhs.measurement();
 
-  _pull                 = rhs.residual(KalmanSite::Projected);
-  _residual             = rhs.residual(KalmanSite::Filtered);
-  _smoothed_residual    = rhs.residual(KalmanSite::Smoothed);
-  _excluded_residual    = rhs.residual(KalmanSite::Excluded);
-  _covariance_residual          = rhs.covariance_residual(KalmanSite::Filtered);
-  _covariance_smoothed_residual = rhs.covariance_residual(KalmanSite::Smoothed);
-  _covariance_excluded_residual = rhs.covariance_residual(KalmanSite::Excluded);
+  _pull                 = rhs.residual(KalmanState::Projected);
+  _residual             = rhs.residual(KalmanState::Filtered);
+  _smoothed_residual    = rhs.residual(KalmanState::Smoothed);
+  _excluded_residual    = rhs.residual(KalmanState::Excluded);
+  _covariance_residual          = rhs.covariance_residual(KalmanState::Filtered);
+  _covariance_smoothed_residual = rhs.covariance_residual(KalmanState::Smoothed);
+  _covariance_excluded_residual = rhs.covariance_residual(KalmanState::Excluded);
 
   _input_shift = rhs.input_shift();
   _input_shift_covariance = rhs.input_shift_covariance();
@@ -124,7 +124,7 @@ KalmanSite& KalmanSite::operator=(const KalmanSite &rhs) {
   return *this;
 }
 
-void KalmanSite::Initialise(int dim) {
+void KalmanState::Initialise(int dim) {
   // The state vector.
   _projected_a.ResizeTo(dim, 1);
 
@@ -158,7 +158,7 @@ void KalmanSite::Initialise(int dim) {
   _shift_covariance.ResizeTo(3, 3);
 }
 
-void KalmanSite::set_a(TMatrixD a, State kalman_state) {
+void KalmanState::set_a(TMatrixD a, State kalman_state) {
   switch ( kalman_state ) {
     case(Projected) :
       _projected_a = a;
@@ -175,11 +175,11 @@ void KalmanSite::set_a(TMatrixD a, State kalman_state) {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::set_a"));
+            "KalmanState::set_a"));
   }
 }
 
-TMatrixD KalmanSite::a(State desired_state) const {
+TMatrixD KalmanState::a(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _projected_a;
@@ -196,11 +196,11 @@ TMatrixD KalmanSite::a(State desired_state) const {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::get_a"));
+            "KalmanState::get_a"));
   }
 }
 
-void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
+void KalmanState::set_covariance_matrix(TMatrixD C, State kalman_state) {
   switch ( kalman_state ) {
     case(Projected) :
       _projected_C = C;
@@ -217,11 +217,11 @@ void KalmanSite::set_covariance_matrix(TMatrixD C, State kalman_state) {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::set_covariance_matrix"));
+            "KalmanState::set_covariance_matrix"));
   }
 }
 
-TMatrixD KalmanSite::covariance_matrix(State desired_state) const {
+TMatrixD KalmanState::covariance_matrix(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _projected_C;
@@ -239,11 +239,11 @@ TMatrixD KalmanSite::covariance_matrix(State desired_state) const {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::get_covariance_matrix"));
+            "KalmanState::get_covariance_matrix"));
   }
 }
 
-void KalmanSite::set_residual(TMatrixD residual, State kalman_state) {
+void KalmanState::set_residual(TMatrixD residual, State kalman_state) {
   switch ( kalman_state ) {
     case(Projected) :
       _pull = residual;
@@ -260,11 +260,11 @@ void KalmanSite::set_residual(TMatrixD residual, State kalman_state) {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::set_residual"));
+            "KalmanState::set_residual"));
   }
 }
 
-TMatrixD KalmanSite::residual(State desired_state) const {
+TMatrixD KalmanState::residual(State desired_state) const {
   switch ( desired_state ) {
     case(Projected) :
       return _pull;
@@ -281,11 +281,11 @@ TMatrixD KalmanSite::residual(State desired_state) const {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::get_residual"));
+            "KalmanState::get_residual"));
   }
 }
 
-void KalmanSite::set_covariance_residual(TMatrixD C, State kalman_state) {
+void KalmanState::set_covariance_residual(TMatrixD C, State kalman_state) {
   switch ( kalman_state ) {
     case(Filtered) :
       _covariance_residual = C;
@@ -299,11 +299,11 @@ void KalmanSite::set_covariance_residual(TMatrixD C, State kalman_state) {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::set_covariance_residual"));
+            "KalmanState::set_covariance_residual"));
   }
 }
 
-TMatrixD KalmanSite::covariance_residual(State st) const {
+TMatrixD KalmanState::covariance_residual(State st) const {
   switch ( st ) {
     case(Filtered) :
       return _covariance_residual;
@@ -317,11 +317,11 @@ TMatrixD KalmanSite::covariance_residual(State st) const {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::get_covariance_matrix"));
+            "KalmanState::get_covariance_matrix"));
   }
 }
 
-void KalmanSite::set_chi2(double chi2, State kalman_state) {
+void KalmanState::set_chi2(double chi2, State kalman_state) {
   switch ( kalman_state ) {
     case(Filtered) :
       _f_chi2 = chi2;
@@ -334,11 +334,11 @@ void KalmanSite::set_chi2(double chi2, State kalman_state) {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::set_chi2"));
+            "KalmanState::set_chi2"));
   }
 }
 
-double KalmanSite::chi2(State desired_state) const {
+double KalmanState::chi2(State desired_state) const {
   switch ( desired_state ) {
     case(Filtered) :
       return _f_chi2;
@@ -349,7 +349,7 @@ double KalmanSite::chi2(State desired_state) const {
     default :
       throw(Squeal(Squeal::recoverable,
             "Bad request.",
-            "KalmanSite::get_chi2"));
+            "KalmanState::get_chi2"));
   }
 }
 

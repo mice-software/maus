@@ -24,48 +24,94 @@
 #include <vector>
 
 // MAUS headers
-#include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 
 namespace MAUS {
 
-// TODO: Comments.
-
 class SciFiTrack {
  public:
   /** @brief Constructor.
-   *
    */
   SciFiTrack();
 
+  /** @brief Destructor.
+   */
   virtual ~SciFiTrack();
 
+  /** @brief Copy constructor.
+   */
   SciFiTrack(const SciFiTrack &a_track);
 
+  /** @brief Assignment operator.
+   */
   SciFiTrack& operator=(const SciFiTrack &a_track);
 
-  int  tracker() const      { return _tracker; }
+  /** @brief Sets the tracker number.
+   */
   void set_tracker(int tracker) { _tracker = tracker; }
 
-  double f_chi2()    const   { return _f_chi2; }
-  void   set_f_chi2(double chi2) { _f_chi2 = chi2; }
+  /** @brief Sets the filtered chi2.
+   */
+  void set_f_chi2(double chi2) { _f_chi2 = chi2; }
 
-  double s_chi2()    const   { return _s_chi2; }
-  void   set_s_chi2(double chi2) { _s_chi2 = chi2; }
+  /** @brief Sets the smoothed chi2.
+   */
+  void set_s_chi2(double chi2) { _s_chi2 = chi2; }
 
-  int  ndf()     const   { return _ndf; }
+  /** @brief Sets the ndf for this track.
+   */
   void set_ndf(int ndf)      { _ndf = ndf; }
 
+  /** @brief Sets the P-value for the chi2 and ndf found.
+   */
+  void set_P_value(double p_value) { _P_value = p_value; }
+
+  /** @brief Sets the charge of the fitted particle.
+   */
+  void set_charge(int charge) { _charge = charge; }
+
+  /** @brief Sets trackpoints vector.
+   */
+  void set_scifitrackpoints(SciFiTrackPointPArray points);
+
+  /** @brief Returns the tracker number.
+   */
+  int tracker() const      { return _tracker; }
+
+  /** @brief Returns the filtered chi2.
+   */
+  double f_chi2()    const   { return _f_chi2; }
+
+  /** @brief Returns the smoothed chi2.
+   */
+  double s_chi2()    const   { return _s_chi2; }
+
+  /** @brief Returns the ndf.
+   */
+  int ndf()     const   { return _ndf; }
+
+  /** @brief Returns the P-value.
+   */
   double P_value()    const   { return _P_value; }
-  void   set_P_value(double p_value) { _P_value = p_value; }
 
+  /** @brief Returns the charge of the fitted particle.
+   */
+  int charge()        const   { return _charge; }
+
+  /** @brief Returns the array of SciFiTrackPoints which belong to this track.
+   */
   SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
-  void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
-  // this leaks.
-  void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
 
+  /** @brief Adds a SciFiTrackPoint to the member array.
+   */
+  void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
+
+  /** @brief Enumeration of the possible types of SciFi tracks.
+   */
   enum AlgorithmUsed { kalman_straight, kalman_helical };
 
+  /** @brief Returns the type of algorithm used to reconstruct this track.
+   */
   AlgorithmUsed GetAlgorithmUsed() { return _algorithm_used; }
 
  private:
@@ -79,9 +125,7 @@ class SciFiTrack {
 
   double _P_value;
 
-  double _mass;
-
-  double _charge;
+  int _charge;
 
   AlgorithmUsed _algorithm_used;
 

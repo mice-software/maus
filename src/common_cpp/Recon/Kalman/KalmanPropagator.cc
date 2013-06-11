@@ -39,18 +39,18 @@ KalmanPropagator::KalmanPropagator() : _n_parameters(0) {
   FibreParameters.RMS            = (*json)["SciFiParams_RMS"].asDouble();
 }
 
-void KalmanPropagator::Extrapolate(KalmanSitesPArray sites, int i) {
+void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
   // Get current site...
-  KalmanSite *new_site = sites.at(i);
+  KalmanState *new_site = sites.at(i);
 
   // ... and the site we will extrapolate from.
-  const KalmanSite *old_site = sites.at(i-1);
+  const KalmanState *old_site = sites.at(i-1);
 
   // Calculate prediction for the state vector.
   CalculatePredictedState(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
-  if ( old_site->a(KalmanSite::Filtered).GetNrows()==5 && _use_Eloss )
+  if ( _n_parameters == 5 && _use_Eloss )
     SubtractEnergyLoss(old_site, new_site);
 
   // Calculate the system noise...
@@ -61,13 +61,13 @@ void KalmanPropagator::Extrapolate(KalmanSitesPArray sites, int i) {
   // covariance matrix.
   CalculateCovariance(old_site, new_site);
 
-  new_site->set_current_state(KalmanSite::Projected);
+  new_site->set_current_state(KalmanState::Projected);
 }
 
 // C_proj = _F * C_old * _Ft + _Q;
-void KalmanPropagator::CalculateCovariance(const KalmanSite *old_site,
-                                           KalmanSite *new_site) {
-  TMatrixD C_old = old_site->covariance_matrix(KalmanSite::Filtered);
+void KalmanPropagator::CalculateCovariance(const KalmanState *old_site,
+                                           KalmanState *new_site) {
+  TMatrixD C_old = old_site->covariance_matrix(KalmanState::Filtered);
 
   TMatrixD F_transposed(_n_parameters, _n_parameters);
   F_transposed.Transpose(_F);
@@ -75,15 +75,14 @@ void KalmanPropagator::CalculateCovariance(const KalmanSite *old_site,
   TMatrixD C_new(_n_parameters, _n_parameters);
   C_new = _F*C_old*F_transposed + _Q;
 
-  new_site->set_covariance_matrix(C_new, KalmanSite::Projected);
+  new_site->set_covariance_matrix(C_new, KalmanState::Projected);
 }
 
 // Returns (beta) * (-dE/dx). Formula and constants from PDG.
 double KalmanPropagator::BetheBlochStoppingPower(double p) {
   double muon_mass      = Recon::Constants::MuonMass;
-  double electron_mass  = Recon::Constants::::Electron_Mass();
+  double electron_mass  = Recon::Constants::ElectronMass;
   double muon_mass2     = muon_mass*muon_mass;
-  double electron_mass2 = electron_mass*electron_mass;
 
   double E = TMath::Sqrt(muon_mass2+p*p);
 
@@ -113,17 +112,17 @@ double KalmanPropagator::BetheBlochStoppingPower(double p) {
   return beta*dEdx;
 }
 
-void KalmanPropagator::SubtractEnergyLoss(const KalmanSite *old_site,
-                                          KalmanSite *new_site) {
+void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
+                                          KalmanState *new_site) {
   //
   // Get the momentum vector to be corrected.
   TMatrixD a_old(_n_parameters, 1);
-  a_old = new_site->a(KalmanSite::Projected);
+  a_old = new_site->a(KalmanState::Projected);
   double kappa = a_old(4, 0);
   double px    = a_old(1, 0)/kappa;
   double py    = a_old(3, 0)/kappa;
   double pz = 1./fabs(kappa);
-  int sign = kappa/fabs(kappa);
+  int sign = static_cast<int> (kappa/fabs(kappa));
   ThreeVector old_momentum(px, py, pz);
   //
   // Compute the correction using Bethe Bloch's formula.
@@ -136,21 +135,21 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanSite *old_site,
   //
   // Update momentum estimate at the site.
   TMatrixD a_subtracted(_n_parameters, 1);
-  a_subtracted = new_site->a(KalmanSite::Projected);
+  a_subtracted = new_site->a(KalmanState::Projected);
   a_subtracted(1, 0) = new_momentum.x()/new_momentum.z();
   a_subtracted(3, 0) = new_momentum.y()/new_momentum.z();
   a_subtracted(4, 0) = sign/new_momentum.z();
-  new_site->set_a(a_subtracted, KalmanSite::Projected);
+  new_site->set_a(a_subtracted, KalmanState::Projected);
 }
 
-void KalmanPropagator::CalculateSystemNoise(const KalmanSite *old_site,
-                                            const KalmanSite *new_site) {
+void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
+                                            const KalmanState *new_site) {
   double plane_width = FibreParameters.Plane_Width;
 
   double deltaZ = new_site->z() - old_site->z();
   double deltaZ_squared = deltaZ*deltaZ;
 
-  TMatrixD a = new_site->a(KalmanSite::Projected);
+  TMatrixD a = new_site->a(KalmanState::Projected);
   double mx    = a(1, 0);
   double my    = a(3, 0);
   double kappa = a(4, 0);
@@ -222,36 +221,36 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanSite *old_site,
 
 double KalmanPropagator::HighlandFormula(double z, double L0,
                                          double beta, double p) {
-  double HighlandConstant = Recon::Utils::HighlandConstant;
+  double HighlandConstant = Recon::Constants::HighlandConstant;
   double result = HighlandConstant*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
   return result;
 }
 
 ////////////////
-void KalmanPropagator::PrepareForSmoothing(KalmanSitesPArray sites) {
-  KalmanSite *last_site = sites.back();
-  TMatrixD a_smooth = last_site->a(KalmanSite::Filtered);
-  last_site->set_a(a_smooth, KalmanSite::Smoothed);
+void KalmanPropagator::PrepareForSmoothing(KalmanStatesPArray sites) {
+  KalmanState *last_site = sites.back();
+  TMatrixD a_smooth = last_site->a(KalmanState::Filtered);
+  last_site->set_a(a_smooth, KalmanState::Smoothed);
 
-  TMatrixD C_smooth = last_site->covariance_matrix(KalmanSite::Filtered);
-  last_site->set_covariance_matrix(C_smooth, KalmanSite::Smoothed);
+  TMatrixD C_smooth = last_site->covariance_matrix(KalmanState::Filtered);
+  last_site->set_covariance_matrix(C_smooth, KalmanState::Smoothed);
 
   TMatrixD residual(2, 1);
-  residual = last_site->residual(KalmanSite::Filtered);
-  last_site->set_residual(residual, KalmanSite::Smoothed);
-  last_site->set_current_state(KalmanSite::Smoothed);
+  residual = last_site->residual(KalmanState::Filtered);
+  last_site->set_residual(residual, KalmanState::Smoothed);
+  last_site->set_current_state(KalmanState::Smoothed);
 
   // Set smoothed chi2.
-  double f_chi2 = last_site->chi2(KalmanSite::Filtered);
-  last_site->set_chi2(f_chi2, KalmanSite::Smoothed);
+  double f_chi2 = last_site->chi2(KalmanState::Filtered);
+  last_site->set_chi2(f_chi2, KalmanState::Smoothed);
 }
 
-void KalmanPropagator::Smooth(KalmanSitesPArray sites, int id) {
+void KalmanPropagator::Smooth(KalmanStatesPArray sites, int id) {
   // Get site to be smoothed...
-  KalmanSite *smoothing_site = sites.at(id);
+  KalmanState *smoothing_site = sites.at(id);
 
   // ... and the already perfected site.
-  const KalmanSite *optimum_site = sites.at(id+1);
+  const KalmanState *optimum_site = sites.at(id+1);
 
   // Set the propagator right.
   UpdatePropagator(optimum_site, smoothing_site);
@@ -262,18 +261,18 @@ void KalmanPropagator::Smooth(KalmanSitesPArray sites, int id) {
   // Compute smoothed a_k and C_k
   SmoothBack(optimum_site, smoothing_site);
 
-  smoothing_site->set_current_state(KalmanSite::Smoothed);
+  smoothing_site->set_current_state(KalmanState::Smoothed);
 }
 
-void KalmanPropagator::UpdateBackTransportationMatrix(const KalmanSite *optimum_site,
-                                                      const KalmanSite *smoothing_site) {
+void KalmanPropagator::UpdateBackTransportationMatrix(const KalmanState *optimum_site,
+                                                      const KalmanState *smoothing_site) {
   UpdatePropagator(smoothing_site, optimum_site);
   TMatrixD Cp(_n_parameters, _n_parameters);
-  Cp = optimum_site->covariance_matrix(KalmanSite::Projected);
+  Cp = optimum_site->covariance_matrix(KalmanState::Projected);
   Cp.Invert();
 
   TMatrixD C(_n_parameters, _n_parameters);
-  C = smoothing_site->covariance_matrix(KalmanSite::Filtered);
+  C = smoothing_site->covariance_matrix(KalmanState::Filtered);
 
   TMatrixD _F_transposed(_n_parameters, _n_parameters);
   _F_transposed.Transpose(_F);
@@ -281,27 +280,27 @@ void KalmanPropagator::UpdateBackTransportationMatrix(const KalmanSite *optimum_
   _A = C*_F_transposed*Cp;
 }
 
-void KalmanPropagator::SmoothBack(const KalmanSite *optimum_site,
-                                  KalmanSite *smoothing_site) {
+void KalmanPropagator::SmoothBack(const KalmanState *optimum_site,
+                                  KalmanState *smoothing_site) {
   // Set smoothed state.
-  TMatrixD a     = smoothing_site->a(KalmanSite::Filtered);
-  TMatrixD a_opt = optimum_site->a(KalmanSite::Smoothed);
-  TMatrixD ap    = optimum_site->a(KalmanSite::Projected);
+  TMatrixD a     = smoothing_site->a(KalmanState::Filtered);
+  TMatrixD a_opt = optimum_site->a(KalmanState::Smoothed);
+  TMatrixD ap    = optimum_site->a(KalmanState::Projected);
 
   TMatrixD a_smooth = a + _A* (a_opt - ap);
 
-  smoothing_site->set_a(a_smooth, KalmanSite::Smoothed);
+  smoothing_site->set_a(a_smooth, KalmanState::Smoothed);
 
   // Set the smoothed covariance matrix.
-  TMatrixD C     = smoothing_site->covariance_matrix(KalmanSite::Filtered);
-  TMatrixD C_opt = optimum_site->covariance_matrix(KalmanSite::Smoothed);
-  TMatrixD Cp    = optimum_site->covariance_matrix(KalmanSite::Projected);
+  TMatrixD C     = smoothing_site->covariance_matrix(KalmanState::Filtered);
+  TMatrixD C_opt = optimum_site->covariance_matrix(KalmanState::Smoothed);
+  TMatrixD Cp    = optimum_site->covariance_matrix(KalmanState::Projected);
 
   TMatrixD temp1    = _A*(C_opt - Cp);
   TMatrixD temp2    = TMatrixD(temp1, TMatrixD::kMultTranspose, _A);
   TMatrixD C_smooth = C+temp2;
 
-  smoothing_site->set_covariance_matrix(C_smooth, KalmanSite::Smoothed);
+  smoothing_site->set_covariance_matrix(C_smooth, KalmanState::Smoothed);
 }
 
 } // ~namespace MAUS

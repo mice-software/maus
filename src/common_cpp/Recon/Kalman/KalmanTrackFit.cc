@@ -42,7 +42,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // Current seed.
     KalmanSeed* seed = seeds[i];
 
-    KalmanSitesPArray sites = seed->GetKalmanSites();
+    KalmanStatesPArray sites = seed->GetKalmanStates();
     if ( seed->is_straight() ) {
       _propagator = new KalmanStraightPropagator();
     } else if ( seed->is_helical() ) {
@@ -70,7 +70,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
       _propagator->Smooth(sites, k);
       _filter->UpdateH(sites.at(k));
-      _filter->SetResidual(sites.at(k), KalmanSite::Smoothed);
+      _filter->SetResidual(sites.at(k), KalmanState::Smoothed);
     }
     SciFiTrack *track = new SciFiTrack();
     // Calculate the chi2 of this track.
@@ -88,20 +88,20 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
   }
 }
 
-void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanSitesPArray sites) {
+void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
   double f_chi2 = 0.;
   double s_chi2 = 0.;
   // Find the ndf for this track: numb measurements - numb parameters to be estimated
-  int n_sites = sites.size();
+  size_t n_sites = sites.size();
   // Find n_parameters by looking at the dimension of the state vector.
-  int n_parameters = sites.at(0)->a(KalmanSite::Filtered).GetNrows();
+  int n_parameters = sites.at(0)->a(KalmanState::Filtered).GetNrows();
 
   int ndf = n_sites - n_parameters;
 
   for ( size_t i = 0; i < n_sites; ++i ) {
-    KalmanSite *site = sites.at(i);
-    f_chi2 += site->chi2(KalmanSite::Filtered);
-    s_chi2 += site->chi2(KalmanSite::Smoothed);
+    KalmanState *site = sites.at(i);
+    f_chi2 += site->chi2(KalmanState::Filtered);
+    s_chi2 += site->chi2(KalmanState::Smoothed);
   }
   double P_value = TMath::Prob(f_chi2, ndf);
   track->set_f_chi2(f_chi2);
@@ -110,7 +110,7 @@ void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanSitesPArray sites) {
   track->set_P_value(P_value);
 }
 
-void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanSitesPArray sites) {
+void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites) {
   double pvalue = track->P_value();
   if ( pvalue != pvalue ) return;
   for ( size_t i = 0; i < sites.size(); ++i ) {
@@ -120,24 +120,24 @@ void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanSitesPArra
   event.add_scifitrack(track);
 }
 
-void KalmanTrackFit::DumpInfo(KalmanSitesPArray sites) {
+void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
   size_t numb_sites = sites.size();
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
-    KalmanSite* site = sites.at(i);
+    KalmanState* site = sites.at(i);
     Squeak::mout(Squeak::info)
     << "=========================================="  << "\n"
     << "SITE ID: " << site->id() << "\n"
     << "SITE Z: " << site->z()   << "\n"
     << "Measurement: " << (site->measurement())(0, 0) << "\n"
-    << "Projection: " << (site->a(KalmanSite::Projected))(0, 0) << " "
-                      << (site->a(KalmanSite::Projected))(1, 0) << " "
-                      << (site->a(KalmanSite::Projected))(2, 0) << " "
-                      << (site->a(KalmanSite::Projected))(3, 0) << "\n"
+    << "Projection: " << (site->a(KalmanState::Projected))(0, 0) << " "
+                      << (site->a(KalmanState::Projected))(1, 0) << " "
+                      << (site->a(KalmanState::Projected))(2, 0) << " "
+                      << (site->a(KalmanState::Projected))(3, 0) << "\n"
     << "================Residuals================"   << "\n"
-    << (site->residual(KalmanSite::Projected))(0, 0)  << "\n"
-    << (site->residual(KalmanSite::Filtered))(0, 0)   << "\n"
-    << (site->residual(KalmanSite::Smoothed))(0, 0)   << "\n"
+    << (site->residual(KalmanState::Projected))(0, 0)  << "\n"
+    << (site->residual(KalmanState::Filtered))(0, 0)   << "\n"
+    << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
     << "=========================================="
     << std::endl;
   }

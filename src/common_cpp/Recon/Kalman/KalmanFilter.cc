@@ -30,6 +30,9 @@ KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim) {
   // Measurement equation.
   _H.ResizeTo(2, _n_parameters);
   _H.Zero();
+  // Alignment shifts
+  _S.ResizeTo(2, 3);
+  _S.Zero();
   // Measurement error.
   _V.ResizeTo(2, 2);
   _V.Zero();
@@ -43,9 +46,9 @@ KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim) {
 
 KalmanFilter::~KalmanFilter() {}
 
-void KalmanFilter::Process(KalmanSitesPArray sites, int current_site) {
+void KalmanFilter::Process(KalmanStatesPArray sites, int current_site) {
   // Get Site...
-  KalmanSite *a_site = sites.at(current_site);
+  KalmanState *a_site = sites.at(current_site);
 
   // Update measurement error:
   UpdateV(a_site);
@@ -62,11 +65,11 @@ void KalmanFilter::Process(KalmanSitesPArray sites, int current_site) {
   // Cp = (C-KHC)
   UpdateCovariance(a_site);
 
-  a_site->set_current_state(KalmanSite::Filtered);
+  a_site->set_current_state(KalmanState::Filtered);
 }
 
 
-void KalmanFilter::UpdateV(const KalmanSite *a_site) {
+void KalmanFilter::UpdateV(const KalmanState *a_site) {
   // Fibre constants.
   double pitch         = FibreParameters.Pitch;
   // Active radius in units of channel width.
@@ -84,7 +87,7 @@ void KalmanFilter::UpdateV(const KalmanSite *a_site) {
   _V(1, 1) = sigma_beta*sigma_beta;
 }
 
-void KalmanFilter::UpdateH(const KalmanSite *a_site) {
+void KalmanFilter::UpdateH(const KalmanState *a_site) {
   ThreeVector dir = a_site->direction();
 
   double dx = dir.x();
@@ -102,13 +105,19 @@ void KalmanFilter::UpdateH(const KalmanSite *a_site) {
   _H(0, 2) =  dx/pitch;
   _H(1, 0) = -perp_y/pitch;
   _H(1, 2) =  perp_x/pitch;
+
+  _S.Zero();
+  _S(0, 0) =  dy/pitch;
+  _S(0, 1) = -dx/pitch;
+  _S(1, 0) =  perp_y/pitch;
+  _S(1, 1) = -perp_x/pitch;
 }
 
 // W = [ V + H C_k-1 Ht + S cov_S_k-1 St ]-1
 // W = [ V +    A       +      B         ]-1
-void KalmanFilter::UpdateW(const KalmanSite *a_site) {
+void KalmanFilter::UpdateW(const KalmanState *a_site) {
   TMatrixD C_a(_n_parameters, _n_parameters);
-  C_a = a_site->covariance_matrix(KalmanSite::Projected);
+  C_a = a_site->covariance_matrix(KalmanState::Projected);
 
   TMatrixD C_s = a_site->input_shift_covariance();
 
@@ -120,11 +129,11 @@ void KalmanFilter::UpdateW(const KalmanSite *a_site) {
   _W.Invert();
 }
 
-void KalmanFilter::UpdateK(const KalmanSite *a_site) {
+void KalmanFilter::UpdateK(const KalmanState *a_site) {
   // Kalman Gain: K = C Ht (V + H C Ht)-1
   //              K =  A   (V +  B )-1
   //              K =  A W
-  TMatrixD C = a_site->covariance_matrix(KalmanSite::Projected);
+  TMatrixD C = a_site->covariance_matrix(KalmanState::Projected);
 
   TMatrixD A = TMatrixD(C, TMatrixD::kMultTranspose, _H);
 
@@ -132,55 +141,61 @@ void KalmanFilter::UpdateK(const KalmanSite *a_site) {
   _K = A * _W;
 }
 
-void KalmanFilter::ComputePull(KalmanSite *a_site) {
+void KalmanFilter::ComputePull(KalmanState *a_site) {
   // PULL = m - ha
   TMatrixD measurement = a_site->measurement();
-  TMatrixD a           = a_site->a(KalmanSite::Projected);
+  TMatrixD a           = a_site->a(KalmanState::Projected);
   TMatrixD shifts      = a_site->input_shift();
 
-  TMatrixD HA = _H*a;
+  TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
   TMatrixD pull(2, 1);
   pull = measurement - HA;
 
-  a_site->set_residual(pull, KalmanSite::Projected);
+  a_site->set_residual(pull, KalmanState::Projected);
 }
-/*
-TMatrixD KalmanTrack::SolveMeasurementEquation(const TMatrixD &a,
-                                               const TMatrixD &s) {
+
+TMatrixD KalmanFilter::SolveMeasurementEquation(const TMatrixD &a,
+                                                const TMatrixD &s) {
   TMatrixD ha(2, 1);
   ha = _H * a;
 
-  return ha;
+  TMatrixD Ss(2, 1);
+  Ss = _S * s;
+
+  TMatrixD result(2, 1);
+  result = ha + Ss;
+
+  return result;
 }
-*/
-void KalmanFilter::CalculateFilteredState(KalmanSite *a_site) {
+
+void KalmanFilter::CalculateFilteredState(KalmanState *a_site) {
   // Calculate the pull,
-  TMatrixD pull = a_site->residual(KalmanSite::Projected);
+  TMatrixD pull = a_site->residual(KalmanState::Projected);
 
   // compute the filtered state via
   // a' = a + K*pull
-  TMatrixD a = a_site->a(KalmanSite::Projected);
+  TMatrixD a = a_site->a(KalmanState::Projected);
 
   TMatrixD a_filt(_n_parameters, 1);
   a_filt = a + _K*pull;
 
-  a_site->set_a(a_filt, KalmanSite::Filtered);
+  a_site->set_a(a_filt, KalmanState::Filtered);
 
   // Residual.
-  SetResidual(a_site, KalmanSite::Filtered);
+  SetResidual(a_site, KalmanState::Filtered);
 }
 
-void KalmanFilter::SetResidual(KalmanSite *a_site, KalmanSite::State kalman_state) {
+void KalmanFilter::SetResidual(KalmanState *a_site, KalmanState::State kalman_state) {
   // PULL = measurement - ha
   TMatrixD measurement = a_site->measurement();
   TMatrixD a = a_site->a(kalman_state);
-  TMatrixD s = a_site->input_shift();
+  TMatrixD shifts = a_site->input_shift();
 
   // Solve the measurement equation again,
   // this time passing the FILTERED state to find the
   // residual.
-  TMatrixD HA = _H * a;
+  TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
   TMatrixD residual(2, 1);
   residual = measurement - HA;
@@ -207,9 +222,9 @@ void KalmanFilter::SetResidual(KalmanSite *a_site, KalmanSite::State kalman_stat
   a_site->set_chi2(fabs(chi2(0, 0)), kalman_state);
 }
 
-void KalmanFilter::UpdateCovariance(KalmanSite *a_site) {
+void KalmanFilter::UpdateCovariance(KalmanState *a_site) {
   // Cp = (1-KH)C
-  TMatrixD C_old = a_site->covariance_matrix(KalmanSite::Projected);
+  TMatrixD C_old = a_site->covariance_matrix(KalmanState::Projected);
 
   TMatrixD I(_n_parameters, _n_parameters);
   I.UnitMatrix();
@@ -217,7 +232,7 @@ void KalmanFilter::UpdateCovariance(KalmanSite *a_site) {
   TMatrixD C_new(_n_parameters, _n_parameters);
   C_new = ( I - _K*_H ) * C_old;
 
-  a_site->set_covariance_matrix(C_new, KalmanSite::Filtered);
+  a_site->set_covariance_matrix(C_new, KalmanState::Filtered);
 }
 
 } // ~namespace MAUS

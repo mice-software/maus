@@ -55,11 +55,11 @@ class KalmanStraightPropagator : public KalmanPropagator {
 
   /** @brief Calculates the propagator (F), using Taylor expansion at current site.
    */
-  void UpdatePropagator(const KalmanSite *old_site, const KalmanSite *new_site);
+  void UpdatePropagator(const KalmanState *old_site, const KalmanState *new_site);
 
   /** @brief Calculates the projected state.
    */
-  void CalculatePredictedState(const KalmanSite *old_site, KalmanSite *new_site);
+  void CalculatePredictedState(const KalmanState *old_site, KalmanState *new_site);
 };
 
 } // ~namespace MAUS

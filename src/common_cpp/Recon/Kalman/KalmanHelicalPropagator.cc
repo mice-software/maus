@@ -36,15 +36,15 @@ KalmanHelicalPropagator::KalmanHelicalPropagator(double Bz) : KalmanPropagator()
 
 KalmanHelicalPropagator::~KalmanHelicalPropagator() {}
 
-void KalmanHelicalPropagator::CalculatePredictedState(const KalmanSite *old_site,
-                                                      KalmanSite *new_site) {
+void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_site,
+                                                      KalmanState *new_site) {
   // Find dz (mm).
   double new_z  = new_site->z();
   double old_z  = old_site->z();
   double deltaZ = (new_z-old_z);
 
   // Get old state vector...
-  TMatrixD old_a    = old_site->a(KalmanSite::Filtered);
+  TMatrixD old_a    = old_site->a(KalmanState::Filtered);
   double old_x      = old_a(0, 0);
   double old_mx     = old_a(1, 0);
   double old_y      = old_a(2, 0);
@@ -69,13 +69,13 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanSite *old_site
   a_projected(3, 0) = new_my;
   a_projected(4, 0) = old_kappa;
 
-  new_site->set_a(a_projected, KalmanSite::Projected);
+  new_site->set_a(a_projected, KalmanState::Projected);
 
   UpdatePropagator(old_site, new_site);
 }
 
-void KalmanHelicalPropagator::UpdatePropagator(const KalmanSite *old_site,
-                                               const KalmanSite *new_site) {
+void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
+                                               const KalmanState *new_site) {
   // Reset propagator.
   _F.Zero();
 
@@ -87,7 +87,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanSite *old_site,
   double deltaZ = (new_z-old_z);
 
   // Get current state vector...
-  TMatrixD site = new_site->a(KalmanSite::Projected);
+  TMatrixD site = new_site->a(KalmanState::Projected);
   double mx     = site(1, 0);
   double my     = site(3, 0);
   double kappa  = site(4, 0);

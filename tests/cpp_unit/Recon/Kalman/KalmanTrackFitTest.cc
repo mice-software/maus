@@ -29,6 +29,6 @@ class KalmanTrackFitTest : public ::testing::Test {
 };
 
 TEST_F(KalmanTrackFitTest, none) {
-  MAUS::KalmanTrackFit *manager;
+  // MAUS::KalmanTrackFit *manager;
 }
 } // namespace

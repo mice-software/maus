@@ -23,6 +23,7 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _s_chi2(-1),
                           _ndf(-1),
                           _P_value(-1),
+                          _charge(0),
                           _trackpoints(0) {
 }
 
@@ -31,36 +32,52 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _s_chi2(-1),
                                                    _ndf(-1),
                                                    _P_value(-1),
+                                                   _charge(0),
                                                    _trackpoints(0) {
   _tracker   = a_track.tracker();
   _f_chi2    = a_track.f_chi2();
   _s_chi2    = a_track.s_chi2();
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
+  _charge = a_track.charge();
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
-
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
-    if (this == &a_track) {
-        return *this;
-    }
-    _tracker = a_track.tracker();
-    _f_chi2  = a_track.f_chi2();
-    _s_chi2  = a_track.s_chi2();
-    _ndf     = a_track.ndf();
-    _P_value = a_track.P_value();
+  if (this == &a_track) {
+    return *this;
+  }
+  _tracker = a_track.tracker();
+  _f_chi2  = a_track.f_chi2();
+  _s_chi2  = a_track.s_chi2();
+  _ndf     = a_track.ndf();
+  _P_value = a_track.P_value();
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
 
-    return *this;
+  return *this;
+}
+
+void SciFiTrack::set_scifitrackpoints(SciFiTrackPointPArray points) {
+  // Delete any existing track points.
+  std::vector<SciFiTrackPoint*>::iterator track_point;
+  for (track_point = _trackpoints.begin();
+       track_point!= _trackpoints.end(); ++track_point) {
+    delete (*track_point);
+  }
+
+  // Make the deep copy.
+  _trackpoints.resize(points.size());
+  for (size_t i = 0; i < points.size(); ++i) {
+    _trackpoints[i] = new SciFiTrackPoint(*points.at(i));
+  }
 }
 
 SciFiTrack::~SciFiTrack() {
