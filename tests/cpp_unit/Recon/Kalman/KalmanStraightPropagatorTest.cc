@@ -15,18 +15,41 @@
  *
  */
 
-/*
-#include "src/common_cpp/Recon/Kalman/StraightTrack.hh"
+
+#include "src/common_cpp/Recon/Kalman/KalmanStraightPropagator.hh"
 #include "gtest/gtest.h"
 
 // TODO: Test propagation of covariance.
 
 namespace {
-class StraightTrackTest : public ::testing::Test {
+class KalmanStraightPropagatorTest : public ::testing::Test {
  protected:
-  StraightTrackTest()  {}
-  virtual ~StraightTrackTest() {}
-  virtual void SetUp()    {}
+  KalmanStraightPropagatorTest()  {}
+  virtual ~KalmanStraightPropagatorTest() {}
+  virtual void SetUp() {
+    old_site.Initialise(4);
+    new_site.Initialise(4);
+    deltaZ = 1100.0;
+    new_site.set_id(0);
+    new_site.set_z(deltaZ);
+    old_site.set_z(0.0);
+
+    mx = 2.0;
+    my = 3.0;
+    TMatrixD a(4, 1);
+    a(0, 0) = 0.0;
+    a(1, 0) = mx;
+    a(2, 0) = 0.0;
+    a(3, 0) = my;
+    old_site.set_a(a, MAUS::KalmanSite::Filtered);
+
+    TMatrixD C(4, 4);
+    C.Zero();
+    for ( int i = 0; i < 4; ++i ) {
+      C(i, i) = 100.; // dummy values
+    }
+    old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
+  }
   virtual void TearDown() {}
   MAUS::KalmanSite old_site;
   MAUS::KalmanSite new_site;
@@ -35,38 +58,9 @@ class StraightTrackTest : public ::testing::Test {
   static const double err = 1e-2;
 };
 
-void StraightTrackTest::set_up_sites() {
-  old_site.Initialise(4);
-  new_site.Initialise(4);
-  deltaZ = 1100.0;
-  new_site.set_id(0);
-  new_site.set_z(deltaZ);
-  old_site.set_z(0.0);
-
-  mx = 2.0;
-  my = 3.0;
-  TMatrixD a(4, 1);
-  a(0, 0) = 0.0;
-  a(1, 0) = mx;
-  a(2, 0) = 0.0;
-  a(3, 0) = my;
-  old_site.set_a(a, MAUS::KalmanSite::Filtered);
-
-  TMatrixD C(4, 4);
-  C.Zero();
-  for ( int i = 0; i < 4; ++i ) {
-     C(i, i) = 100.; // dummy values
-  }
-  old_site.set_covariance_matrix(C, MAUS::KalmanSite::Projected);
-}
-
-TEST_F(StraightTrackTest, propagator_test) {
-  set_up_sites();
-
-  MAUS::KalmanTrack *track = new MAUS::StraightTrack();
-  track->Initialise();
-  // track->UpdatePropagator(&old_site, &new_site);
-  track->CalculatePredictedState(&old_site, &new_site);
+TEST_F(KalmanStraightPropagatorTest, propagator_test) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanStraightPropagator();
+  propagator->CalculatePredictedState(&old_site, &new_site);
 
   TMatrixD a_projected(4, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
@@ -75,11 +69,9 @@ TEST_F(StraightTrackTest, propagator_test) {
   double expected_y = my*deltaZ;
   EXPECT_EQ(expected_x, a_projected(0, 0));
   EXPECT_EQ(expected_y, a_projected(2, 0));
-  delete track;
+  delete propagator;
   // track->calc_covariance(&old_site, &new_site);
-  // DO SOMETHING WITH COVARIANCE
+  // Test COVARIANCE
 }
 
 }
-
-*/

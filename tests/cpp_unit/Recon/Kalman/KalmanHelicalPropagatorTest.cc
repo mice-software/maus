@@ -15,16 +15,14 @@
  *
  */
 
-/*
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
 #include "gtest/gtest.h"
 
 namespace {
-class HelicalTrackTest : public ::testing::Test {
+class KalmanHelicalPropagatorTest : public ::testing::Test {
  protected:
-  HelicalTrackTest() {}
-  virtual ~HelicalTrackTest() {}
+  KalmanHelicalPropagatorTest() {}
+  virtual ~KalmanHelicalPropagatorTest() {}
   virtual void SetUp()    {
     old_site.Initialise(5);
     new_site.Initialise(5);
@@ -64,13 +62,13 @@ class HelicalTrackTest : public ::testing::Test {
   double x0, y0, mx0, my0, kappa;
   double x1, y1, mx1, my1;
   TMatrixD a;
+  static const double _Bz = 4;
   static const double err = 2.e-4;
 };
 
-TEST_F(HelicalTrackTest, test_propagation) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
-  track->CalculatePredictedState(&old_site, &new_site);
+TEST_F(KalmanHelicalPropagatorTest, test_propagation) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
+  propagator->CalculatePredictedState(&old_site, &new_site);
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanSite::Projected);
 
@@ -80,7 +78,46 @@ TEST_F(HelicalTrackTest, test_propagation) {
   EXPECT_NEAR(my1,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
 
-  delete track;
+  delete propagator;
 }
+
+TEST_F(KalmanHelicalPropagatorTest, test_energy_loss) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
+  propagator->CalculatePredictedState(&old_site, &new_site);
+
+  TMatrixD a_old = old_site.a(MAUS::KalmanSite::Projected);
+  propagator->SubtractEnergyLoss(&old_site, &new_site);
+  TMatrixD a     = new_site.a(MAUS::KalmanSite::Projected);
+  EXPECT_LT(a(4, 0), a_old(4, 0));
+}
+
+TEST_F(KalmanHelicalPropagatorTest, test_covariance_extrapolation) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
+  propagator->CalculatePredictedState(&old_site, &new_site);
+
+  propagator->CalculateCovariance(&old_site, &new_site);
+
+  // Verify that the covariance GROWS when we extrapolate.
+  // Not much we can do with this.
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
+                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
+    }
+  }
+  //
+  // MCS increases matrix elements.
+  //
+  propagator->CalculateSystemNoise(&old_site, &new_site);
+  propagator->CalculateCovariance(&old_site, &new_site);
+  for ( int j = 0; j < 5; j++ ) {
+    for ( int k = 0; k < 5; k++ ) {
+      if ( new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k)>0 )
+      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
+                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
+    }
+  }
+  delete propagator;
+}
+
 } // namespace
-*/

@@ -59,15 +59,15 @@ class KalmanTrackFit {
 
   /** @brief Loops over the track points in the finished track calculating the chi2.
    */
-  void ComputeChi2(SciFiTrack *track);
+  void ComputeChi2(SciFiTrack *track, KalmanSitesPArray sites);
 
   /** @brief Saves the track into the SciFiEvent for data structure output.
    */
-  void Save(SciFiEvent &event, SciFiTrack *track);
+  void Save(SciFiEvent &event, SciFiTrack *track, KalmanSitesPArray sites);
 
   /** @brief Prints some info about the fitting evolution.
    */
-  void DumpInfo(SciFiTrack *track);
+  void DumpInfo(KalmanSitesPArray sites);
 
  private:
   bool _use_MCS;

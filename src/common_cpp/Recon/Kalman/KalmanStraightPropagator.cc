@@ -35,9 +35,6 @@ KalmanStraightPropagator::~KalmanStraightPropagator() {}
 
 void KalmanStraightPropagator::UpdatePropagator(const KalmanSite *old_site,
                                                 const KalmanSite *new_site) {
-  // Reset.
-  _F.Zero();
-
   // Find dz between sites.
   double new_z = new_site->z();
   double old_z = old_site->z();
@@ -55,7 +52,7 @@ void KalmanStraightPropagator::CalculatePredictedState(const KalmanSite *old_sit
 
   TMatrixD a = old_site->a(KalmanSite::Filtered);
 
-  TMatrixD a_projected = TMatrixD(_F, TMatrixD::kMult, a);
+  TMatrixD a_projected = _F*a;
 
   new_site->set_a(a_projected, KalmanSite::Projected);
 }

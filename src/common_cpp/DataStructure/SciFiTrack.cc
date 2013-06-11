@@ -37,7 +37,12 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   _s_chi2    = a_track.s_chi2();
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
-  _trackpoints = a_track.scifitrackpoints();
+
+  _trackpoints.resize(a_track._trackpoints.size());
+  for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
+    _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
+  }
+
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
@@ -49,7 +54,12 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     _s_chi2  = a_track.s_chi2();
     _ndf     = a_track.ndf();
     _P_value = a_track.P_value();
-    _trackpoints = a_track.scifitrackpoints();
+
+  _trackpoints.resize(a_track._trackpoints.size());
+  for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
+    _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
+  }
+
     return *this;
 }
 
@@ -59,12 +69,6 @@ SciFiTrack::~SciFiTrack() {
   for (track_point = _trackpoints.begin();
        track_point!= _trackpoints.end(); ++track_point) {
     delete (*track_point);
-  }
-
-  std::vector<KalmanSite*>::iterator site;
-  for (site = _kalman_sites.begin();
-       site!= _kalman_sites.end(); ++site) {
-    delete (*site);
   }
 }
 

@@ -29,6 +29,8 @@
 
 namespace MAUS {
 
+// TODO: Comments.
+
 class SciFiTrack {
  public:
   /** @brief Constructor.
@@ -39,8 +41,6 @@ class SciFiTrack {
   virtual ~SciFiTrack();
 
   SciFiTrack(const SciFiTrack &a_track);
-
-  // explicit SciFiTrack(const KalmanTrack *kalman_track);
 
   SciFiTrack& operator=(const SciFiTrack &a_track);
 
@@ -61,12 +61,8 @@ class SciFiTrack {
 
   SciFiTrackPointPArray scifitrackpoints()      const   { return _trackpoints; }
   void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
+  // this leaks.
   void set_scifitrackpoints(SciFiTrackPointPArray trackpoints)  { _trackpoints = trackpoints; }
-
-  KalmanSitesPArray GetKalmanSites()  { return _kalman_sites;        }
-  KalmanSite* GetKalmanSite(int i)    { return _kalman_sites[i];     }
-  size_t GetNumberKalmanSites() const { return _kalman_sites.size(); }
-  void SetKalmanSites(KalmanSitesPArray sites) { _kalman_sites = sites; }
 
   enum AlgorithmUsed { kalman_straight, kalman_helical };
 
@@ -90,8 +86,6 @@ class SciFiTrack {
   AlgorithmUsed _algorithm_used;
 
   SciFiTrackPointPArray _trackpoints;
-
-  KalmanSitesPArray _kalman_sites;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

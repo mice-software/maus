@@ -90,8 +90,6 @@ class KalmanSeed {
    */
   void BuildKalmanSites();
 
-  // void SetField(SciFiGeometryMap _plane_map);
-
   bool is_helical()  const { return _helical; }
 
   bool is_straight() const { return _straight; }
@@ -140,7 +138,7 @@ class KalmanSeed {
   int _n_parameters;
 
   int _tracker;
-  
+
   int _particle_charge;
 };
 

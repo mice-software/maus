@@ -77,10 +77,16 @@ class SciFiTrackPoint {
   double smoothed_residual() const { return _smoothed_residual; }
 
  private:
-  /// Site id.
+  /** @brief Site id.
+   */
   int _id;
-  /// The Chi2 at this site.
+
+  /** @brief filtered chi2
+   */
   double _f_chi2;
+
+  /** @brief smoothed chi2
+   */
   double _s_chi2;
 
   /// The state vector.

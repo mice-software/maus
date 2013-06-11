@@ -15,22 +15,23 @@
  *
  */
 
-/*
 #include <stdlib.h>
 
-#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/HelicalTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanFilter.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSite.hh"
 
 #include "gtest/gtest.h"
 
 namespace MAUS {
 
-class KalmanTrackTest : public ::testing::Test {
+class KalmanFilterTest : public ::testing::Test {
  protected:
-  KalmanTrackTest()  {}
-  virtual ~KalmanTrackTest() {}
+  KalmanFilterTest()  {}
+  virtual ~KalmanFilterTest() {}
   virtual void SetUp()    {
+    _Bz = 4;
+
     old_site.Initialise(5);
     new_site.Initialise(5);
     // Old site.
@@ -67,43 +68,26 @@ class KalmanTrackTest : public ::testing::Test {
   virtual void TearDown() {}
   MAUS::KalmanSite old_site;
   MAUS::KalmanSite new_site;
+  double _Bz;
+  static const int dim = 5;
   std::vector<MAUS::KalmanSite> kalman_sites;
 };
 
-TEST_F(KalmanTrackTest, test_constructor) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
-  EXPECT_EQ(track->ndf(), 0.);
-  EXPECT_EQ(track->tracker(), -1);
-  delete track;
+TEST_F(KalmanFilterTest, test_constructor) {
+  MAUS::KalmanFilter *filter = new MAUS::KalmanFilter(dim);
+  //EXPECT_EQ(track->ndf(), 0.);
+  //EXPECT_EQ(track->tracker(), -1);
+  delete filter;
 }
 
-//
-// ------- Projection ------------
-//
-TEST_F(KalmanTrackTest, test_energy_loss) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
-  track->CalculatePredictedState(&old_site, &new_site);
-
-  TMatrixD a_old = old_site.a(KalmanSite::Projected);
-  track->SubtractEnergyLoss(&old_site, &new_site);
-  TMatrixD a     = new_site.a(KalmanSite::Projected);
-  EXPECT_LT(a(4, 0), a_old(4, 0));
-}
-
-//
-// ------- Filtering ------------
-//
-TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
+TEST_F(KalmanFilterTest, test_update_H_for_misalignments) {
+  MAUS::KalmanFilter *filter = new MAUS::KalmanFilter(dim);
   ThreeVector direction_plane0_tracker0(0., 1., 0.);
   ThreeVector direction_plane1_tracker0(0.866, -0.5, 0.0);
   ThreeVector direction_plane2_tracker0(-0.866, -0.5, 0.0);
 
   MAUS::KalmanSite *a_site= new MAUS::KalmanSite();
-  a_site->Initialise(5);
+  a_site->Initialise(dim);
   a_site->set_direction(direction_plane0_tracker0);
 
   // Say we have a measurement...
@@ -124,12 +108,11 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   TMatrixD s(3, 1);
   s.Zero();
 
-  track->UpdateH(a_site);
+  filter->UpdateH(a_site);
 
   // TMatrixD HA = track->SolveMeasurementEquation(a, s);
-  TMatrixD HA = track->H()*a;
+  TMatrixD HA = filter->H()*a;
   EXPECT_NEAR(measurement(0, 0), HA(0, 0), 1e-6);
-*/
 
 /*
   // now, we introduce a shift in x.
@@ -150,14 +133,12 @@ TEST_F(KalmanTrackTest, test_update_H_for_misalignments) {
   ThreeVector perp = direction_plane1_tracker0.Orthogonal();
 */
 
-/*
   delete a_site;
-  delete track;
+  delete filter;
 }
 
-TEST_F(KalmanTrackTest, test_filtering_methods) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
+TEST_F(KalmanFilterTest, test_filtering_methods) {
+  MAUS::KalmanFilter *filter = new MAUS::KalmanFilter(dim);
 
   ThreeVector direction_plane0_tracker0(0., 1., 0.);
   ThreeVector direction_plane1_tracker0(0.866, -0.5, 0.0);
@@ -179,42 +160,42 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   a_site->set_a(a, MAUS::KalmanSite::Projected);
   TMatrixD s(3, 1);
   s.Zero();
-  track->UpdateH(a_site);
-  TMatrixD HA = track->H()*a; // SolveMeasurementEquation(a, s);
+  filter->UpdateH(a_site);
+  TMatrixD HA = filter->H()*a; // SolveMeasurementEquation(a, s);
 
   EXPECT_TRUE(HA(0, 0) > 0);
   // 2nd case.
   a(0, 0) = 2.;
   a(2, 0) = 60.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->H()*a;
+  HA = filter->H()*a;
 
   EXPECT_TRUE(HA(0, 0) < 0);
   // 3rd case
   a(0, 0) = -30.;
   a(2, 0) = 30.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->H()*a;
+  HA = filter->H()*a;
 
   EXPECT_TRUE(HA(0, 0) < 0);
   // 4th case
   a(0, 0) = -50.;
   a(2, 0) = -5.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->H()*a;
+  HA = filter->H()*a;
 
   EXPECT_TRUE(HA(0, 0) < 0);
   // 5th case
   a(0, 0) = -2.;
   a(2, 0) = -60.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->H()*a;
+  HA = filter->H()*a;
   EXPECT_TRUE(HA(0, 0) > 0);
   // 6th case
   a(0, 0) = 30.;
   a(2, 0) = -30.;
   a_site->set_a(a, MAUS::KalmanSite::Projected);
-  HA = track->H()*a;
+  HA = filter->H()*a;
 
   EXPECT_TRUE(HA(0, 0) > 0);
 
@@ -222,7 +203,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
 
   // So we have H ready. Let's test the built of W.
   // For that, we will need V.
-  track->UpdateV(a_site);
+  filter->UpdateV(a_site);
   TMatrixD C(5, 5);
   TMatrixD C_S(3, 3);
   a_site->set_covariance_matrix(C, KalmanSite::Projected);
@@ -231,54 +212,7 @@ TEST_F(KalmanTrackTest, test_filtering_methods) {
   // this breaks.
   // EXPECT_THROW(track->UpdateW(a_site), Squeal);
   delete a_site;
-  delete track;
+  delete filter;
 }
 
-TEST_F(KalmanTrackTest, test_covariance_extrapolation) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack();
-  track->Initialise();
-  track->set_momentum(200.);
-  track->CalculatePredictedState(&old_site, &new_site);
-
-  track->CalculateCovariance(&old_site, &new_site);
-
-  // Verify that the covariance GROWS when we extrapolate.
-  // Not much we can do with this.
-  for ( int j = 0; j < 5; j++ ) {
-    for ( int k = 0; k < 5; k++ ) {
-      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
-                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
-    }
-  }
-  //
-  // MCS increases matrix elements.
-  //
-  track->CalculateSystemNoise(&old_site, &new_site);
-  track->CalculateCovariance(&old_site, &new_site);
-  for ( int j = 0; j < 5; j++ ) {
-    for ( int k = 0; k < 5; k++ ) {
-      if ( new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k)>0 )
-      EXPECT_GE(new_site.covariance_matrix(MAUS::KalmanSite::Projected)(j, k),
-                old_site.covariance_matrix(MAUS::KalmanSite::Filtered)(j, k));
-    }
-  }
-  delete track;
-}
-*/
-
-/*
-TEST_F(KalmanTrackTest, test_exclusion_of_site) {
-  MAUS::KalmanTrack *track = new MAUS::HelicalTrack(false, false);
-  track->Initialise();
-  track->Extrapolate(kalman_sites, 1);
-  track->Filter(kalman_sites, 1);
-  track->PrepareForSmoothing(&new_site);
-  track->SmoothBack(&new_site, &old_site);
-  track->ExcludeSite(&new_site);
-  TMatrixD smoothed_residual = new_site.residual(MAUS::KalmanSite::Smoothed);
-  TMatrixD excluded_residual = new_site.residual(MAUS::KalmanSite::Excluded);
-  EXPECT_GT(fabs(excluded_residual(0, 0)), fabs(smoothed_residual(0, 0)));
-}
-*/
-// } // ~namespace MAUS
-
+} // ~namespace MAUS

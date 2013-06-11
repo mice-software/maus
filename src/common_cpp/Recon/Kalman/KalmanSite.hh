@@ -32,6 +32,8 @@
 
 namespace MAUS {
 
+// TODO : Change class name to KalmanState.
+
 struct SciFiParams {
   /// Polystyrene's atomic number.
   double Z;

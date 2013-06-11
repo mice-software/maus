@@ -123,8 +123,8 @@ void KalmanSeed::BuildKalmanSites() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  C(0, 0) = 1.;//_plane_width*_plane_width/12.;
-  C(2, 2) = 1.;//_plane_width*_plane_width/12.;
+  C(0, 0) = _plane_width*_plane_width/12.;
+  C(2, 2) = _plane_width*_plane_width/12.;
   _kalman_sites[0]->set_a(_a0, KalmanSite::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanSite::Projected);
 
@@ -158,7 +158,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   }
   // Get seed values.
   double r  = seed->get_R();
-  double c = CLHEP::c_light*1.e-3;
+  // Get pt in MeV.
+  double c = CLHEP::c_light;
   double pt = _particle_charge*c*Bfield*r;
 
   double dsdz  = seed->get_dsdz();
