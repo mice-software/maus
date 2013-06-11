@@ -138,8 +138,8 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
         for data in self.returncodes.keys():
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
-               '/test_analyze_data_online/reference_plots_'+str(data)+'/*.root')
-            for ref_root in glob.glob(ref_dir):
+               '/test_analyze_data_online/reference_plots_'+str(data)+'/')
+            for ref_root in glob.glob(ref_dir+'*.root'):
                 test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
                                                    test_root,
@@ -149,6 +149,15 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             for key, value in pass_dict.iteritems():
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
+        eor_dir = ref_dir+'/end_of_run/'
+        self.assertTrue(os.path.exists(eor_dir))
+        ref_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.png')]
+        eor_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.json')]
+        for item in ref_png:
+            self.assertTrue(item in eor_png, msg = 'Failed to find '+item)
+        for item in eor_png:
+            self.assertTrue(item in ref_png, msg = 'Failed to find '+item)
+      
 
 if __name__ == "__main__":
     unittest.main()
