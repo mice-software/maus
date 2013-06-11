@@ -17,12 +17,9 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanPropagator.hh"
 #include "src/common_cpp/Utils/Globals.hh"
-#include "Recon/Global/Particle.hh"
+#include "src/common_cpp/Utils/Constants.hh"
 
-// TODO: Where do we store the mass value?
-//       throw if numb_sites out of range.
-//       MCS: Highland formula should be in a function.
-//       add straggling to propagation. (optional)
+// TODO: add straggling to propagation. (optional)
 
 namespace MAUS {
 
@@ -83,18 +80,19 @@ void KalmanPropagator::CalculateCovariance(const KalmanSite *old_site,
 
 // Returns (beta) * (-dE/dx). Formula and constants from PDG.
 double KalmanPropagator::BetheBlochStoppingPower(double p) {
-  double _mass = 105.65837;
-  double muon_mass2 = _mass*_mass;
-  double electron_mass = BetheBlochParameters::Electron_Mass();
+  double muon_mass      = Recon::Constants::MuonMass;
+  double electron_mass  = Recon::Constants::::Electron_Mass();
+  double muon_mass2     = muon_mass*muon_mass;
+  double electron_mass2 = electron_mass*electron_mass;
 
   double E = TMath::Sqrt(muon_mass2+p*p);
 
   double beta = p/E;
   double beta2= beta*beta;
-  double gamma = E/_mass;
+  double gamma = E/muon_mass;
   double gamma2= gamma*gamma;
 
-  double K = BetheBlochParameters::K();
+  double K = Recon::Constants::BetheBlochParameters::K();
   double A = FibreParameters.A;
   double I = FibreParameters.Mean_Excitation_Energy;
   double I2= I*I;
@@ -102,8 +100,8 @@ double KalmanPropagator::BetheBlochStoppingPower(double p) {
 
   double outer_term = K*Z/(A*beta2);
 
-  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/_mass) +
-                (electron_mass*electron_mass/(_mass*_mass)));
+  double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
+                (electron_mass*electron_mass/(muon_mass*muon_mass)));
 
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
   double last_term = Tmax*Tmax/(gamma2*muon_mass2);
@@ -167,15 +165,12 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanSite *old_site,
   double py = my/kappa;
   double p = TMath::Sqrt(px*px+py*py+pz*pz); // MeV/c
 
-  // FIX!!!
-  double _mass = 105.7; // MeV/c2
-  double muon_mass2 = _mass*_mass;
+  double muon_mass = Recon::Constants::MuonMass;
+  double muon_mass2 = muon_mass*muon_mass;
   double E = TMath::Sqrt(muon_mass2+p*p);
   double beta = p/E;
 
-  // Highland formula.
-  // make 13.6 a const
-  double C = 13.6*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+  double C = HighlandFormula(z, L0, beta, p);
 
   double C2 = C*C;
 
@@ -223,6 +218,13 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanSite *old_site,
   _Q(3, 2) = deltaZ*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
+}
+
+double KalmanPropagator::HighlandFormula(double z, double L0,
+                                         double beta, double p) {
+  double HighlandConstant = Recon::Utils::HighlandConstant;
+  double result = HighlandConstant*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+  return result;
 }
 
 ////////////////

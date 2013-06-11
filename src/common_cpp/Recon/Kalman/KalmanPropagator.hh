@@ -39,13 +39,6 @@
 
 namespace MAUS {
 
-typedef struct BetheBloch {
-  /// Bethe Bloch constant in MeV g-1 cm2 (for A=1gmol-1)
-  static const double K() { return 0.307075; }
-  /// The electron mass is a parameter of Bethe-Bloch's formula.
-  static const double Electron_Mass() { return 0.511; }
-} BetheBlochParameters;
-
 class KalmanPropagator {
  public:
   /** @brief  Default constructor.
@@ -99,6 +92,10 @@ class KalmanPropagator {
   /** @brief  Propagates backwards from one site to the previous.
    */
   void SmoothBack(const KalmanSite *optimum_site, KalmanSite *smoothing_site);
+
+  /** @brief  Returns the width of the scattering angle distribution, according to the Highland formula.
+   */
+  double HighlandFormula(double z, double L0, double beta, double p)
 
  protected:
   bool _use_MCS;
