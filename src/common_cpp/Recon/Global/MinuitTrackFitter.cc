@@ -28,6 +28,7 @@
 #include "TMinuit.h"
 #include "json/json.h"
 
+#include "CLHEP/Units/PhysicalConstants.h"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TrackPoint.hh"
 #include "Interface/Squeal.hh"
@@ -71,30 +72,49 @@ for (size_t index = 0; index < 6; ++index) {
 }
 
 MinuitTrackFitter::MinuitTrackFitter(
-    const OpticsModel & optics_model,
+    OpticsModel const * optics_model,
     const double start_plane)
-    : TrackFitter(optics_model, start_plane) {
+    : TrackFitter(optics_model, start_plane), rounds_(0) {
   // Setup *global* scope Minuit object
   common_cpp_optics_recon_minuit_track_fitter_minuit
     = new TMinuit(kPhaseSpaceDimension);
-  TMinuit * minimiser
+  TMinuit * minimizer
     = common_cpp_optics_recon_minuit_track_fitter_minuit;
 
-  Json::Value const * configuration = optics_model.configuration();
+  Json::Value const * configuration = optics_model_->configuration();
 
   const double max_iterations = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_max_iterations",
       JsonWrapper::intValue).asInt();
-  minimiser->SetMaxIterations(max_iterations);
+  minimizer->SetMaxIterations(max_iterations);
 
-  minimiser->SetObjectFit(this);
+  rounds_ = JsonWrapper::GetProperty(
+      *configuration, "global_recon_minuit_rounds",
+      JsonWrapper::intValue).asInt();
+  if (rounds_ < 2) {
+    rounds_ = 2;
+  }
 
-  minimiser->SetFCN(
+  minimizer->SetObjectFit(this);
+
+  minimizer->SetFCN(
     common_cpp_optics_recon_minuit_track_fitter_score_function);
+
+  ResetParameters();
+}
+
+MinuitTrackFitter::~MinuitTrackFitter() {
+  delete common_cpp_optics_recon_minuit_track_fitter_minuit;
+}
+
+void MinuitTrackFitter::ResetParameters() {
+  TMinuit * minimizer
+    = common_cpp_optics_recon_minuit_track_fitter_minuit;
 
   // setup the index, name, init value, step size, min, and max value for each
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
+  Json::Value const * configuration = optics_model_->configuration();
   const Json::Value parameters = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_parameters",
       JsonWrapper::arrayValue);
@@ -114,35 +134,23 @@ MinuitTrackFitter::MinuitTrackFitter(
     const double max_value = JsonWrapper::GetProperty(
         parameter, "max_value", JsonWrapper::realValue).asDouble();
 
-    minimiser->mnparm(index, name, initial_value, value_step,
+    minimizer->mnparm(index, name, initial_value, value_step,
                        min_value, max_value, error_flag);
     if (fixed) {
-      minimiser->FixParameter(index);
+      minimizer->FixParameter(index);
     }
   }
-  /*
-  minimiser->mnparm(0, "Time", 0., 0.1, -2., 2., error_flag);   // ns
-  minimiser->mnparm(1, "Energy", 1860., 1, 105.7, 1860., error_flag);  // MeV
-  minimiser->mnparm(2, "X", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(3, "Px", 0., 0.1, -100., 100, error_flag);    // MeV/c
-  minimiser->mnparm(4, "Y", 0, 0.001, -150., 150., error_flag);      // mm
-  minimiser->mnparm(5, "Py", 0., 0.1, -100., 100, error_flag);    // MeV/c
-  minimiser->FixParameter(1);
-  */
 }
 
-MinuitTrackFitter::~MinuitTrackFitter() {
-  delete common_cpp_optics_recon_minuit_track_fitter_minuit;
-}
-
-void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track) {
+void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
+                            const std::string mapper_name) {
   std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
   std::cout.flush();
   *const_cast<std::vector<const TrackPoint*>*>(&detector_events_)
     = raw_track->GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): Fitting track with "
-            << detector_events_.size() << "track points." << std::endl;
+            << detector_events_.size() << " track points." << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl;
   particle_id_ = raw_track->get_pid();
 
@@ -154,23 +162,70 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track) 
   }
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 2" << std::endl;
 
+  ResetParameters();
+
+  TMinuit * minimizer
+    = common_cpp_optics_recon_minuit_track_fitter_minuit;
+
+  PhaseSpaceVector current_value;
+   for (size_t index = 0; index < kPhaseSpaceDimension; ++index) {
+    Double_t value, error;
+    minimizer->GetParameter(index, value, error);
+    current_value[index] = value;
+  }
+  std::cout << "DEBUG MinuitTrackFitter::Fit: Initial Value: " << current_value
+            << std::endl;
   // Find the start plane coordinates that minimize the score for the calculated
   // track based off of this track point (i.e. best fits the measured track
   // points from the detectors).
-  TMinuit * minimiser
-    = common_cpp_optics_recon_minuit_track_fitter_minuit;
-  // Int_t status = minimiser->Migrad();
-  minimiser->Migrad();
-  // TODO(plane1@hawk.iit.edu) Handle status from minimiser
+  //
+  // Alternate fixing the position and momentum variables while performing
+  // minimization so that only variables with the same scale are used for any
+  // particular run
+  for (size_t round = 0; round < rounds_; ++round) {
+    minimizer->Release(0);
+    minimizer->FixParameter(1);
+    minimizer->Release(2);
+    minimizer->FixParameter(3);
+    minimizer->Release(4);
+    minimizer->FixParameter(5);
+    // Int_t status = minimizer->Migrad();
+    minimizer->Migrad();
+    //minimizer->mnsimp();
+    // TODO(plane1@hawk.iit.edu) Handle status from minimizer
+    for (size_t index = 0; index < 6; ++index) {
+      Double_t value, error;
+      minimizer->GetParameter(index, value, error);
+      current_value[index] = value;
+    }
+    std::cout << "DEBUG MinuitTrackFitter::Fit: Current Value " << round << "A: "
+              << current_value << std::endl;
+
+    minimizer->FixParameter(0);
+    minimizer->Release(1);
+    minimizer->FixParameter(2);
+    minimizer->Release(3);
+    minimizer->FixParameter(4);
+    minimizer->Release(5);
+    minimizer->Migrad();
+    for (size_t index = 0; index < 6; ++index) {
+      Double_t value, error;
+      minimizer->GetParameter(index, value, error);
+      current_value[index] = value;
+    }
+    std::cout << "DEBUG MinuitTrackFitter::Fit: Current Value " << round << "B: "
+              << current_value << std::endl;
+  }
 
   size_t particle_event
     = raw_track->GetTrackPoints()[0]->get_particle_event();
 
   for (std::vector<TrackPoint>::iterator reconstructed_point
           = reconstructed_points_.begin();
-       reconstructed_point < reconstructed_points_.end();
+       reconstructed_point != reconstructed_points_.end();
        ++reconstructed_point) {
     reconstructed_point->set_particle_event(particle_event);
+    reconstructed_point->set_mapper_name(mapper_name);
     track->AddTrackPoint(new TrackPoint(*reconstructed_point));
   }
   track->set_pid(raw_track->get_pid());
@@ -184,9 +239,12 @@ Double_t MinuitTrackFitter::ScoreTrack(
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
+  const double time_calibration = 1.16;
+  /*
   const double t0 = reference_pgparticle.time;
   const double E0 = reference_pgparticle.energy;
   const double P0 = reference_pgparticle.pz;
+  */
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
@@ -203,20 +261,33 @@ std::cout.flush();
                                start_plane_track_coordinates[4],
                                start_plane_track_coordinates[5]);
   // If the guess is not physical then return a horrible score
-  if (!ValidGuess(guess)) {
+  if (!ValidVector(guess)) {
 //    return std::numeric_limits<double>::max();
     return 1.0e+15;
   }
-  TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
-      guess, optics_model_->primary_plane(), particle_id_);
-  reconstructed_points_.push_back(primary);
+  std::cout << "DEBUG MinuitTrackFitter::ScoreTrack: particle ID = "
+            << particle_id_ << std::endl;
+  try {
+    TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
+        guess, optics_model_->primary_plane(), particle_id_);
+    reconstructed_points_.push_back(primary);
+  } catch (Squeal squeal) {
+      std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
+                << "something bad happened during track fitting: "
+                << squeal.what() << std::endl;
+    return 1.0e+15;
+  }
 
   std::vector<const TrackPoint*>::const_iterator event
     = detector_events_.begin();
 
   // calculate chi^2
   Double_t chi_squared = 0.0;
-  for (size_t index = 0; event < detector_events_.end(); ++index) {
+  size_t index = 0;
+  for (std::vector<const TrackPoint*>::const_iterator event
+        = detector_events_.begin();
+       event != detector_events_.end();
+       ++event) {
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Guess: "
           << guess << std::endl;
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Measured: "
@@ -252,13 +323,20 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Uncertainties: "
 
     // save the calculated track point in case this is the
     // last (best fitting) track
-    reconstructed_points_.push_back(
-      helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
+    try {
+      reconstructed_points_.push_back(
+        helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
+    } catch (Squeal squeal) {
+        std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
+                  << "something bad happened during track fitting: "
+                  << squeal.what() << std::endl;
+      return 1.0e+15;
+    }
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
           << reconstructed_points_.size() << std::endl;
 
     const double weights[36] = {
-      1., 0., 0., 0., 0., 0.,
+      ::CLHEP::c_light, 0., 0., 0., 0., 0.,
       0., 1., 0., 0., 0., 0.,
       0., 0., 1., 0., 0., 0.,
       0., 0., 0., 1., 0., 0.,
@@ -270,26 +348,48 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
     // Sum the squares of the differences between the calculated phase space
     // coordinates (point) and the measured coordinates (event).
     // TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
+    const PhaseSpaceVector time_comp_vector(time_calibration, 0, 0, 0, 0, 0);
     PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(**event);
     PhaseSpaceVector residual = PhaseSpaceVector(
-      weight_matrix * (event_point - point));
-    ParticleOpticalVector normalized_residual(event_point, t0, E0, P0);
-    normalized_residual -= ParticleOpticalVector(point, t0, E0, P0);
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Point: "
-          << point << std::endl;
+      weight_matrix * (event_point - point - time_comp_vector));
+    /*
+    ParticleOpticalVector normalized_event(event_point,
+                                           t0 + time_calibration, E0, P0);
+    ParticleOpticalVector normalized_estimate(point, t0, E0, P0);
+    ParticleOpticalVector normalized_residual(
+      normalized_event - normalized_estimate);
+    */
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Event: "
           << event_point << std::endl;
+/*
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Event: "
+          << normalized_event << std::endl;
+*/
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Estimate: "
+          << point << std::endl;
+/*
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Estimate: "
+          << normalized_estimate << std::endl;
+*/
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual: "
           << residual << std::endl;
+/*
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
-          << normalized_residual << std::endl;
-    chi_squared += (transpose(normalized_residual)
-                    * uncertainties
-                    * normalized_residual)[0];
+          << setprecision(20) << normalized_residual << std::endl;
+    const double residual_squared = (transpose(normalized_residual)
+                                     * uncertainties
+                                     * normalized_residual)[0];
+*/
+    const double residual_squared = (transpose(residual)
+                                     * uncertainties
+                                     * residual)[0];
+std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual Squared: "
+          << residual_squared << std::endl;
+    chi_squared += residual_squared;
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Chi Squared: "
           << chi_squared << std::endl;
 
-    ++event;
+    ++index;
   }
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
           << "Energy = " << guess[1] << "\tScore = " << chi_squared << std::endl;
@@ -297,7 +397,8 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
   return chi_squared;
 }
 
-bool MinuitTrackFitter::ValidGuess(const PhaseSpaceVector & guess) const {
+/*
+bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
   bool valid = true;
 
   if (guess != guess) {
@@ -307,9 +408,10 @@ bool MinuitTrackFitter::ValidGuess(const PhaseSpaceVector & guess) const {
 
   return valid;
 }
-/*
-bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
-  const double mass = Particle::GetInstance()->GetMass(guess.particle_id());
+*/
+
+bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
+  const double mass = Particle::GetInstance().GetMass(particle_id_);
   const double E = guess.E();
   const double px = guess.Px();
   const double py = guess.Py();
@@ -322,17 +424,12 @@ bool MinuitTrackFitter::ValidGuess(const TrackPoint & guess) const {
   } else if (::sqrt(px*px + py*py + mass*mass) > E) {
     // Energy cannot be greater than the sum of the squares of the transverse
     // momenta and mass
-std::cout << "DEBUG ValidGuess(): Energy is less than the sum of the squares of the transverse momenta and mass." << std::endl;
-    valid = false;
-  } else if (::abs(start_plane_ - guess.z()) > 1) {
-    // The z coordinate cannot be significantly different from the start plane
-std::cout << "DEBUG ValidGuess(): The z coordinate differs significantly from the start plane." << std::endl;
+    std::cout << "DEBUG ValidVector(): Guess is off mass shell" << std::endl;
     valid = false;
   }
 
   return valid;
 }
-*/
 
 const size_t MinuitTrackFitter::kPhaseSpaceDimension = 6;
 

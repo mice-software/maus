@@ -55,7 +55,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   //  Constructors
   // *************************
 
-  explicit PolynomialOpticsModel(const Json::Value & configuration);
+  explicit PolynomialOpticsModel(Json::Value const * const configuration);
 
   /** @brief no memory allocated so doesn't do anything.
    */

@@ -57,7 +57,7 @@ class TransferMapOpticsModel : public OpticsModel {
   /* @brief initialize the generator using the configuration.
    * @params configuration the configuration as a Json document
    */
-  explicit TransferMapOpticsModel(const Json::Value & configuration);
+  explicit TransferMapOpticsModel(Json::Value const * const configuration);
 
   ~TransferMapOpticsModel();
 
@@ -89,7 +89,6 @@ class TransferMapOpticsModel : public OpticsModel {
   const dataCards * data_cards_;
   const MiceMaterials * mice_materials_;
   const MiceModule * mice_module_;
-  const Json::Value * maus_configuration_;
 
   std::map<long, const TransferMap *> transfer_maps_;
   Primary reference_primary_;

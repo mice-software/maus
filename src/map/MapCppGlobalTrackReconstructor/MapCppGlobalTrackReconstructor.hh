@@ -89,6 +89,7 @@ class MapCppGlobalTrackReconstructor {
   std::string process(std::string document);
 
  private:
+  Json::Value configuration_;
   OpticsModel * optics_model_;
   MAUS::recon::global::TrackFitter * track_fitter_;
 
@@ -97,8 +98,8 @@ class MapCppGlobalTrackReconstructor {
   static const std::string kClassname;
   BTField * electromagnetic_field_;
 
-  void SetupOpticsModel(const Json::Value & configuration);
-  void SetupTrackFitter(const Json::Value & configuration);
+  void SetupOpticsModel();
+  void SetupTrackFitter();
   void LoadRawTracks(
       GlobalEvent const * const global_event,
       MAUS::DataStructure::Global::TrackPArray & tracks) const;

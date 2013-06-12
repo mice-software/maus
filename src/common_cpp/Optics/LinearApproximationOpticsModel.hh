@@ -34,7 +34,7 @@ class LinearApproximationOpticsModel : public TransferMapOpticsModel {
   //  Constructors
   // *************************
 
-  explicit LinearApproximationOpticsModel(const Json::Value & configuration)
+  explicit LinearApproximationOpticsModel(Json::Value const * configuration)
       : TransferMapOpticsModel(configuration) { }
 
   ~LinearApproximationOpticsModel() { }

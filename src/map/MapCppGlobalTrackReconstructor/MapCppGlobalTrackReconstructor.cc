@@ -81,8 +81,8 @@ MapCppGlobalTrackReconstructor::~MapCppGlobalTrackReconstructor() {
 bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
   // parse the JSON document.
   try {
-    Json::Value configuration = JsonWrapper::StringToJson(configuration_string);
-    Json::Value physics_processes = configuration["physics_processes"];
+    configuration_ = JsonWrapper::StringToJson(configuration_string);
+    Json::Value physics_processes = configuration_["physics_processes"];
     if ((physics_processes != Json::Value("mean_energy_loss"))
         && (physics_processes != Json::Value("none"))) {
       throw(Squeal(Squeal::nonRecoverable,
@@ -92,9 +92,9 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
                   "MAUS::MapCppGlobalTrackReconstructor::birth()"));
     }
     DataStructureHelper::GetInstance().GetDetectorAttributes(
-        configuration, detectors_);
-    SetupOpticsModel(configuration);
-    SetupTrackFitter(configuration);
+        configuration_, detectors_);
+    SetupOpticsModel();
+    SetupTrackFitter();
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
       squee, MapCppGlobalTrackReconstructor::kClassname);
@@ -133,7 +133,7 @@ std::string MapCppGlobalTrackReconstructor::process(
 
   MAUS::ReconEventPArray::const_iterator recon_event;
   for (recon_event = recon_events->begin();
-      recon_event < recon_events->end();
+      recon_event != recon_events->end();
       ++recon_event) {
     MAUS::GlobalEvent * const global_event = (*recon_event)->GetGlobalEvent();
 
@@ -143,13 +143,15 @@ std::string MapCppGlobalTrackReconstructor::process(
     // Fit each raw track and store best fit track in global_event
     GlobalDS::TrackPArray::const_iterator raw_track;
     for (raw_track = raw_tracks.begin();
-         raw_track < raw_tracks.end();
+         raw_track != raw_tracks.end();
          ++raw_track) {
       GlobalDS::Track * best_fit_track = new GlobalDS::Track();
       best_fit_track->set_mapper_name(kClassname);
       best_fit_track->AddTrack(*raw_track);
 
-      track_fitter_->Fit(*raw_track, best_fit_track);
+      std::cout << "DEBUG MapCppGlobalTrackReconstructor::process: "
+                << "raw track PID: " << (*raw_track)->get_pid() << std::endl;
+      track_fitter_->Fit(*raw_track, best_fit_track, kClassname);
 
       global_event->add_track_recursive(best_fit_track);
     }
@@ -177,16 +179,15 @@ bool MapCppGlobalTrackReconstructor::death() {
   return true;  // successful
 }
 
-void MapCppGlobalTrackReconstructor::SetupOpticsModel(
-    const Json::Value & configuration) {
+void MapCppGlobalTrackReconstructor::SetupOpticsModel() {
 fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 0\n");
 fflush(stdout);
   Json::Value optics_model_names = JsonWrapper::GetProperty(
-      configuration,
+      configuration_,
       "global_recon_optics_models",
       JsonWrapper::arrayValue);
   Json::Value optics_model_name = JsonWrapper::GetProperty(
-      configuration,
+      configuration_,
       "global_recon_optics_model",
       JsonWrapper::stringValue);
   size_t model;
@@ -222,7 +223,7 @@ fflush(stdout);
     case 2: {
 fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1c\n");
 fflush(stdout);
-     optics_model_ = new PolynomialOpticsModel(configuration);
+     optics_model_ = new PolynomialOpticsModel(&configuration_);
       break;
     }
     case 3: {
@@ -239,7 +240,7 @@ fflush(stdout);
       // "Linear Approximation"
 fprintf(stdout, "CHECKPOINT SetupOpticsModel() 1.1e\n");
 fflush(stdout);
-     optics_model_ = new LinearApproximationOpticsModel(configuration);
+     optics_model_ = new LinearApproximationOpticsModel(&configuration_);
       break;
     }
     default: {
@@ -259,14 +260,13 @@ fprintf(stdout, "CHECKPOINT: SetupOpticsModel() 3\n");
 fflush(stdout);
 }
 
-void MapCppGlobalTrackReconstructor::SetupTrackFitter(
-    const Json::Value & configuration) {
+void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
   Json::Value fitter_names = JsonWrapper::GetProperty(
-      configuration,
+      configuration_,
       "global_recon_track_fitters",
       JsonWrapper::arrayValue);
   Json::Value fitter_name = JsonWrapper::GetProperty(
-      configuration,
+      configuration_,
       "global_recon_track_fitter",
       JsonWrapper::stringValue);
   size_t fitter;
@@ -280,7 +280,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter(
     case 0: {
       // Minuit
       double start_plane = optics_model_->primary_plane();
-      track_fitter_ = new MinuitTrackFitter(*optics_model_, start_plane);
+      track_fitter_ = new MinuitTrackFitter(optics_model_, start_plane);
       break;
     }
     case 1: {

@@ -186,12 +186,12 @@ PolynomialOpticsModelTest::kCovarianceMatrix(
 
 TEST_F(PolynomialOpticsModelTest, Constructor) {
   const PolynomialOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
 }
 
 TEST_F(PolynomialOpticsModelTest, Accessors) {
   PolynomialOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
   double primary_plane = optics_model.primary_plane();
   ASSERT_DOUBLE_EQ(kPrimaryPlane, primary_plane);
 
@@ -202,7 +202,7 @@ TEST_F(PolynomialOpticsModelTest, Accessors) {
 
 TEST_F(PolynomialOpticsModelTest, Transport) {
   PolynomialOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
 
 std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
           << "CHECKPOINT 0" << std::endl;
@@ -296,7 +296,7 @@ TEST_F(PolynomialOpticsModelTest, UnsupportedAlgorithms) {
        iter < algorithms.end();
        ++iter) {
     (*config)["PolynomialOpticsModel_algorithm"] = Json::Value(*iter);
-    PolynomialOpticsModel optics_model(*config);
+    PolynomialOpticsModel optics_model(config);
     bool algorithm_failed = false;
     try {
       optics_model.Build();

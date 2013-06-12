@@ -141,7 +141,7 @@ std::string MapCppGlobalRawTracks::process(std::string run_data_string) {
   MAUS::ReconEventPArray::const_iterator recon_event;
   MAUS::GlobalEvent * global_event;
   for (recon_event = recon_events->begin();
-      recon_event < recon_events->end();
+      recon_event != recon_events->end();
       ++recon_event) {
     global_event = new GlobalEvent();
     // Load the ReconEvent, and import it into the GlobalEvent
@@ -179,17 +179,17 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
 
     // Load TOF and SciFi tracks from the appropriate recon event trees
     GlobalDS::TrackPArray tof_tracks;
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
           << "Loading TOF track..." << std::endl;
     LoadTOFTrack(recon_event, tof_tracks);
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
           << "Loaded " << tof_tracks.size() << " TOF tracks." << std::endl;
 
     GlobalDS::TrackPArray sci_fi_tracks;
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
           << "Loading SciFi track..." << std::endl;
     LoadSciFiTrack(recon_event, sci_fi_tracks);
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
+std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
           << "Loaded " << sci_fi_tracks.size() << " SciFi tracks." << std::endl;
 
   // Assuming there are an equal number of TOF and SciFi tracks,
@@ -199,11 +199,12 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
   while (tof_track != tof_tracks.end() ||
           sci_fi_track != sci_fi_tracks.end()) {
     std::vector<GlobalDS::TrackPoint const *> tof_track_points;
-    if (tof_track != tof_tracks.end()) {
-      tof_track_points = (*tof_track)->GetTrackPoints();
-    }
     std::vector<GlobalDS::TrackPoint const *>::iterator tof_track_point;
     if (tof_track != tof_tracks.end()) {
+      tof_track_points = (*tof_track)->GetTrackPoints();
+std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+          << "TOF track has " << tof_track_points.size() << " track points."
+          << std::endl;
       tof_track_point = tof_track_points.begin();
     }
 
@@ -217,6 +218,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
     GlobalDS::Track * combined_track = new GlobalDS::Track();
     combined_track->set_mapper_name(kClassname);
     if (tof_track != tof_tracks.end()) {
+      combined_track->set_pid((*tof_track)->get_pid());
       //combined_track->AddTrack(*tof_track);
       while (tof_track_point != tof_track_points.end()) {
         combined_track->AddTrackPoint(
@@ -267,9 +269,18 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const std::vector<TOFSpacePoint> tof2_space_points
     = space_point_events.GetTOF2SpacePointArray();
 
+  std::cout << "DEBUG LoadTOFTrack: space points in TOF0: "
+            << tof0_space_points.size() << "\tTOF1: "
+            << tof1_space_points.size() << std::endl;
   if (tof0_space_points.size() != tof1_space_points.size()) {
     std::cout << "DEBUG LoadTOFTrack: track has different number of "
-              << "space points in TOF0 and TOF1...skipping." << std::endl;
+              << "space points in TOF0 (" << tof0_space_points.size() << ")"
+              << " and TOF1 (" << tof1_space_points.size() << ")...skipping."
+              << std::endl;
+    return;
+  } else if (tof0_space_points.size() == 0) {
+    std::cout << "DEBUG LoadTOFTrack: track has no space points...skipping."
+              << std::endl;
     return;
   }
 
@@ -292,7 +303,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const Detector& tof0 = tof0_mapping->second;
   std::vector<TOFSpacePoint>::const_iterator tof0_space_point;
   for (tof0_space_point = tof0_space_points.begin();
-       tof0_space_point < tof0_space_points.end();
+       tof0_space_point != tof0_space_points.end();
        ++tof0_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     PopulateTOFTrackPoint(tof0, tof0_space_point, 40., 10, track_point);
@@ -316,7 +327,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const Detector& tof1 = tof1_mapping->second;
   std::vector<TOFSpacePoint>::const_iterator tof1_space_point;
   for (tof1_space_point = tof1_space_points.begin();
-       tof1_space_point < tof1_space_points.end();
+       tof1_space_point != tof1_space_points.end();
        ++tof1_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     PopulateTOFTrackPoint(tof1, tof1_space_point, 60., 7, track_point);
@@ -342,7 +353,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const Detector& tof2 = tof2_mapping->second;
   std::vector<TOFSpacePoint>::const_iterator tof2_space_point;
   for (tof2_space_point = tof2_space_points.begin();
-       tof2_space_point < tof2_space_points.end();
+       tof2_space_point != tof2_space_points.end();
        ++tof2_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     PopulateTOFTrackPoint(tof2, tof2_space_point, 60., 10, track_point);
@@ -432,7 +443,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   std::vector<GlobalDS::TrackPoint *>::iterator track_point;
   size_t point_index = 0;
   for (track_point = track_points.begin();
-       track_point < track_points.end();
+       track_point != track_points.end();
        ++track_point) {
     (*track_point)->set_momentum(momenta[point_index++]);
 
@@ -668,7 +679,7 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
 
   GlobalDS::Track * track = new GlobalDS::Track();
   for (SciFiSpacePointPArray::const_iterator space_point = space_points.begin();
-       space_point < space_points.end();
+       space_point != space_points.end();
        ++space_point) {
 
     const int tracker = (*space_point)->get_tracker();
@@ -721,7 +732,7 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   const SciFiClusterPArray clusters = (*scifi_space_point)->get_channels();
   //double time = 0;
   for (SciFiClusterPArray::const_iterator cluster = clusters.begin();
-      cluster < clusters.end();
+      cluster != clusters.end();
       ++cluster) {
     //time += (*cluster)->get_time();
     ThreeVector true_momentum = (*cluster)->get_true_momentum();

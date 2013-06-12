@@ -56,8 +56,8 @@ using recon::global::DataStructureHelper;
 // ******************************
 
 TransferMapOpticsModel::TransferMapOpticsModel(
-    const Json::Value & configuration) {
-  configuration_ = &configuration;
+      Json::Value const * const configuration)
+    : OpticsModel(configuration) {
   // Reference Particle
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUS::MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle

@@ -45,7 +45,8 @@ namespace MAUS {
 using MAUS::PhaseSpaceVector;
 using recon::global::ParticleOpticalVector;
 
-PolynomialOpticsModel::PolynomialOpticsModel(const Json::Value & configuration)
+PolynomialOpticsModel::PolynomialOpticsModel(
+      Json::Value const * const configuration)
       : TransferMapOpticsModel(configuration), algorithm_(kNone) {
   // Determine which fitting algorithm to use
   SetupAlgorithm();

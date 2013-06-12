@@ -169,12 +169,12 @@ LinearApproximationOpticsModelTest::kCovarianceMatrix(
 
 TEST_F(LinearApproximationOpticsModelTest, Constructor) {
   const LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
 }
 
 TEST_F(LinearApproximationOpticsModelTest, Accessors) {
   LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
   double primary_plane = optics_model.primary_plane();
   ASSERT_DOUBLE_EQ(kPrimaryPlane, primary_plane);
 
@@ -185,7 +185,7 @@ TEST_F(LinearApproximationOpticsModelTest, Accessors) {
 
 TEST_F(LinearApproximationOpticsModelTest, Transport) {
   LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
   // The configuration specifies a 2m drift between -1m and +1 m.
   optics_model.Build();
 
