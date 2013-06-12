@@ -78,7 +78,7 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
   ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
-  B_field *= plane_rotation;
+  // B_field *= plane_rotation;
   double Tracker_Bz = B_field.z();
   // std::cerr << "Mag Field: " << Tracker_Bz << std::endl;
   return Tracker_Bz;

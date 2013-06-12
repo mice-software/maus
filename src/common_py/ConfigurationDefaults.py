@@ -236,7 +236,6 @@ SciFiCrossTalkSigma = 50.0
 SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
-
 SciFiParams_Z = 5.61291
 SciFiParams_Plane_Width = 0.6523
 SciFiParams_Radiation_Legth = 424.0
