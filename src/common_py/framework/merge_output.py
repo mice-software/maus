@@ -210,7 +210,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         """
         spill_doc = json.loads(spill)
         if not "maus_event_type" in spill_doc.keys():
-            raise KeyError("Event with no maus_event_type")
+            raise KeyError("%s\nEvent has no maus_event_type" % \
+                                                json.dumps(spill_doc, indent=2))
         if spill_doc["maus_event_type"] != "Spill":
             if not self.outputer.save(str(spill)):
                 print "Failed to execute Output"

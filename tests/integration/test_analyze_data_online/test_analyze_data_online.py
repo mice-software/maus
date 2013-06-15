@@ -96,8 +96,9 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         if os.path.exists(target):
             os.remove(target)
             time.sleep(1)
-        share = os.environ["MAUS_THIRD_PARTY"]+"/third_party/install/share/"
-        share = share+"04235/04235.000"
+        share = os.path.expandvars(
+                      "${MAUS_THIRD_PARTY}/third_party/install/share/test_data")
+        share = share+"04235.000"
         print "Linking", share, "to", target 
         os.symlink(share, target)
         online_okay = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
@@ -128,7 +129,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Check that analyze_data_online makes good histos for full run
         """
-        for data in ['04235.000']:
+        for data in ["04234_04235.cat"]:
             self.returncodes[data] = run_process(data, '_histos')
         for key, ret_code in self.returncodes.iteritems():
             self.assertEquals(ret_code, 0)
