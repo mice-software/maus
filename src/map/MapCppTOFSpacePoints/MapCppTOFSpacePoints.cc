@@ -403,6 +403,7 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
 
   // Get the calibration correction.
   double dT = _map.dT(xChannelKey, xTriggerPixelKey, charge);
+  std::cout << "dt= " << dT << std::endl;
   if (dT == TOFCalibrationMap::NOCALIB)
     return  false;
 

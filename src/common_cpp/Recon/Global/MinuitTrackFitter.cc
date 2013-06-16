@@ -81,12 +81,8 @@ MinuitTrackFitter::MinuitTrackFitter(
   TMinuit * minimizer
     = common_cpp_optics_recon_minuit_track_fitter_minuit;
 
+  /*
   Json::Value const * configuration = optics_model_->configuration();
-
-  const double max_iterations = JsonWrapper::GetProperty(
-      *configuration, "global_recon_minuit_max_iterations",
-      JsonWrapper::intValue).asInt();
-  minimizer->SetMaxIterations(max_iterations);
 
   rounds_ = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_rounds",
@@ -94,6 +90,7 @@ MinuitTrackFitter::MinuitTrackFitter(
   if (rounds_ < 2) {
     rounds_ = 2;
   }
+  */
 
   minimizer->SetObjectFit(this);
 
@@ -153,6 +150,8 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
             << detector_events_.size() << " track points." << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0.5" << std::endl;
   particle_id_ = raw_track->get_pid();
+  std::cout << "DEBUG MinuitTrackFitter::Fit(): particle ID: "
+            << particle_id_ << std::endl;
 
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl;
   if (detector_events_.size() < 2) {
@@ -182,39 +181,26 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   // Alternate fixing the position and momentum variables while performing
   // minimization so that only variables with the same scale are used for any
   // particular run
-  for (size_t round = 0; round < rounds_; ++round) {
-    minimizer->Release(0);
-    minimizer->FixParameter(1);
-    minimizer->Release(2);
-    minimizer->FixParameter(3);
-    minimizer->Release(4);
-    minimizer->FixParameter(5);
-    // Int_t status = minimizer->Migrad();
-    minimizer->Migrad();
-    //minimizer->mnsimp();
-    // TODO(plane1@hawk.iit.edu) Handle status from minimizer
-    for (size_t index = 0; index < 6; ++index) {
-      Double_t value, error;
-      minimizer->GetParameter(index, value, error);
-      current_value[index] = value;
-    }
-    std::cout << "DEBUG MinuitTrackFitter::Fit: Current Value " << round << "A: "
-              << current_value << std::endl;
 
-    minimizer->FixParameter(0);
-    minimizer->Release(1);
-    minimizer->FixParameter(2);
-    minimizer->Release(3);
-    minimizer->FixParameter(4);
-    minimizer->Release(5);
-    minimizer->Migrad();
-    for (size_t index = 0; index < 6; ++index) {
-      Double_t value, error;
-      minimizer->GetParameter(index, value, error);
-      current_value[index] = value;
-    }
-    std::cout << "DEBUG MinuitTrackFitter::Fit: Current Value " << round << "B: "
-              << current_value << std::endl;
+  Json::Value const * const configuration = optics_model_->configuration();
+  const std::string method = JsonWrapper::GetProperty(
+      *configuration, "global_recon_minuit_minimizer",
+      JsonWrapper::stringValue).asString();
+  const double max_iterations = JsonWrapper::GetProperty(
+      *configuration, "global_recon_minuit_max_iterations",
+      JsonWrapper::intValue).asInt();
+  const double max_EDM = JsonWrapper::GetProperty(
+      *configuration, "global_recon_minuit_max_edm",
+      JsonWrapper::realValue).asDouble();
+
+  Int_t err = 0;
+  Double_t args[2] = {max_iterations, max_EDM};
+  minimizer->mnexcm(method.c_str(), args, 2, err);
+
+  for (size_t index = 0; index < 6; ++index) {
+    Double_t value, error;
+    minimizer->GetParameter(index, value, error);
+    current_value[index] = value;
   }
 
   size_t particle_event
@@ -318,8 +304,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
     };
     const Matrix<double> error_matrix(6, 6, errors);
     const CovarianceMatrix uncertainties(error_matrix*error_matrix);
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Uncertainties: "
-          << uncertainties << std::endl;
+//std::cerr << uncertainties << std::endl;
 
     // save the calculated track point in case this is the
     // last (best fitting) track
@@ -336,7 +321,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
           << reconstructed_points_.size() << std::endl;
 
     const double weights[36] = {
-      ::CLHEP::c_light, 0., 0., 0., 0., 0.,
+      1., 0., 0., 0., 0., 0.,
       0., 1., 0., 0., 0., 0.,
       0., 0., 1., 0., 0., 0.,
       0., 0., 0., 1., 0., 0.,
@@ -351,7 +336,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
     const PhaseSpaceVector time_comp_vector(time_calibration, 0, 0, 0, 0, 0);
     PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(**event);
     PhaseSpaceVector residual = PhaseSpaceVector(
-      weight_matrix * (event_point - point - time_comp_vector));
+      weight_matrix * (event_point - point));// - time_comp_vector));
     /*
     ParticleOpticalVector normalized_event(event_point,
                                            t0 + time_calibration, E0, P0);
@@ -381,16 +366,22 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
                                      * normalized_residual)[0];
 */
     const double residual_squared = (transpose(residual)
-                                     * uncertainties
+                                     * inverse(uncertainties)
                                      * residual)[0];
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual Squared: "
+    //std::cerr << transpose(residual) << "\n" << inverse(uncertainties) << std::endl;
+    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual Squared: "
           << residual_squared << std::endl;
     chi_squared += residual_squared;
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Chi Squared: "
-          << chi_squared << std::endl;
-
+/*
+std::cerr << "xm: " << event_point.x() << " pxm: " << event_point.Px() << " ym: " << event_point.y() << " pym: " << event_point.Py()
+          << " xr: " << point.x() << " pxr: " << point.Px() << " yr: " << point.y() << " pyr: " << point.Py()
+          << " dx: " << residual.x() << " dpx: " << residual.Px() << " dy: " << residual.y() << " dpy: " << residual.Py()
+          << " chi2: " << chi_squared << std::endl;
+*/
+std::cerr << residual << " = " << event_point << " - " << point << " -- chi2: " << chi_squared << std::endl;
     ++index;
   }
+  std::cerr << std::endl;
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
           << "Energy = " << guess[1] << "\tScore = " << chi_squared << std::endl;
 

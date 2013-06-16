@@ -165,9 +165,9 @@ const PhaseSpaceVector PhaseSpaceVector::operator/(const double& rhs) const {
 }
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {
-  out << "t: " << vector[0] << "E: "   << vector[1]
-      << "x: " << vector[2] << "Px: "  << vector[3]
-      << "y: " << vector[4] << "Py: "  << vector[5];
+  out << "t: " << vector[0] << " E: "   << vector[1]
+      << " x: " << vector[2] << " Px: "  << vector[3]
+      << " y: " << vector[4] << " Py: "  << vector[5];
 
   return out;
 }

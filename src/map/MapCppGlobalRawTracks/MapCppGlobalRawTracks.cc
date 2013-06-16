@@ -268,6 +268,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     = space_point_events.GetTOF1SpacePointArray();
   const std::vector<TOFSpacePoint> tof2_space_points
     = space_point_events.GetTOF2SpacePointArray();
+  
 
   std::cout << "DEBUG LoadTOFTrack: space points in TOF0: "
             << tof0_space_points.size() << "\tTOF1: "
@@ -395,18 +396,27 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     * GlobalDS::PID particle_id = IdentifyParticle(beta);
     * plus code to create multiple hypotheses (i.e. pion/muon ambiguity)
     */
+    /*
     GlobalDS::PID particle_id
       = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
+    */
+    MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+    MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+      = simulator->GetReferenceParticle();
+    const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
     double mass = Particle::GetInstance().GetMass(particle_id);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "mass: " << mass << std::endl;
 
+    /*
     double energy = FindEnergy(mass, delta_z, delta_t);
     double beta = ::sqrt(1 - ::pow(mass / energy, 2));
     for (size_t slab = 0; slab < (2*index); ++slab) {
       energy -= TOFSlabEnergyLoss(beta, mass);
       beta = ::sqrt(1 - ::pow(mass / energy, 2));
     }
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
+              << "beta: " << beta << std::endl;
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "energy: " << energy << std::endl;
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
@@ -421,19 +431,14 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
                                           / ::CLHEP::c_light,
                                     beta * energy,
                                     energy);
-    /*
-    momenta[index] = TLorentzVector(gamma * mass * delta_x / delta_t
-                                          / ::CLHEP::c_light,
-                                    gamma * mass * delta_y / delta_t
-                                          / ::CLHEP::c_light,
-                                    gamma * mass * delta_z / delta_t
-                                          / ::CLHEP::c_light,
-                                    energy);
     */
-                                    // gamma * mass);
+    momenta[index] = TLorentzVector(reference_pgparticle.px,
+                                    reference_pgparticle.py,
+                                    reference_pgparticle.pz,
+                                    reference_pgparticle.energy);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "Particle: " << Particle::GetInstance().GetName(particle_id)
-              << "\tbeta: " << beta << "\t 4-momentum: (" << momenta[index].T()
+              << "\t 4-momentum: (" << momenta[index].T()
               << ", " << momenta[index].X()
               << ", " << momenta[index].Y() << ", " << momenta[index].Z()
               << ")" << std::endl;
@@ -453,8 +458,14 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   track->SortTrackPointsByZ();
 
   // FIXME(Lane) For now assume we've selected only muon tracks and no decays
+  /*
   const GlobalDS::PID particle_id
     = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
+  */
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   track->set_pid(particle_id);
 
   tof_tracks.push_back(track);
@@ -541,20 +552,33 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
   const double slab_length = 25.;  // mm
   const double drift_length = delta_z - 2 * slab_length;
   const double beta_0 = delta_z / actual_delta_t / ::CLHEP::c_light;
+  std::cout << "DEBUG FindEnergy: delta_z: " << delta_z << "\tdelta_t: "
+            << actual_delta_t << std::endl;
   const double gamma_0 = 1. / std::sqrt(1 - beta_0*beta_0);
   const double E_0 = gamma_0 * mass;
-  std::cout << "DEBUG FindEnergy: E0 = " << E_0 << std::endl;
   double E = E_0;
   double beta[4];
   double delta_t[3];
   double E_max = reference_energy + 50.;  // allow for momentum spread
   double E_min = 0;
+  if (beta_0 > 1) {
+    E = E_max;
+  }
+  std::cout << "DEBUG FindEnergy: beta0: " << beta_0 << "\tE0: " << E
+            << std::endl;
+  bool energy_too_low = false;
 
   for (size_t iteration = 0; iteration < 10; ++iteration) {
     double slab_energy_loss = 0.;
     for (size_t index = 0; index < 4; ++index) {
       beta[index] = ::sqrt(1 - ::pow(mass / (E - slab_energy_loss), 2));
+      if (beta[index] == 0.) {
+        energy_too_low = true;
+      }
       slab_energy_loss += TOFSlabEnergyLoss(beta[index], mass);
+      if ((slab_energy_loss > E) || (slab_energy_loss != slab_energy_loss)) {
+        energy_too_low = true;
+      }
     }
     std::cout << "DEBUG FindEnergy: beta[0] = " << beta[0]
               << "\tbeta[1] = " << beta[1]
@@ -585,16 +609,16 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
               << "\tdt = " << total_delta_t << std::endl;
     std::cout << "DEBUG FindEnergy: Min E = " << E_min
               << "\tMax E = " << E_max << std::endl;
-    if (residual_delta_t > 0.) {
-      // energy is too high
-      E_max = E;
-      E = (E_min + E) / 2;
-    } else if (residual_delta_t < 0.){
+    if (energy_too_low || (total_delta_t != total_delta_t)
+        || (residual_delta_t < 0.)){
       // energy is too low
       E_min = E;
       E = (E + E_max) / 2;
-    } else {
-      break;
+      energy_too_low = false;
+    } else if (residual_delta_t > 0.) {
+      // energy is too high
+      E_max = E;
+      E = (E_min + E) / 2;
     }
     std::cout << "DEBUG FindEnergy: E[" << iteration << "] = " << E << std::endl;
   }
@@ -613,7 +637,14 @@ double MapCppGlobalRawTracks::TOFSlabEnergyLoss(const double beta,
   for (size_t step = 0; step < slab_length; ++step) {
     const double dEdx = TOFMeanStoppingPower(beta_i, mass);
     E_i -= dEdx;
+    if (E_i < mass) {
+      E_i = mass;
+      break;
+    }
     beta_i = ::sqrt(1 - ::pow(mass / E_i, 2));
+    std::cout << "DEBUG TOFSlabEnergyLoss: dE/dx[" << step << "]: " << dEdx
+              << "\t E_i: " << E_i
+              << "\t mass: " << mass << "\tbeta_i: " << beta_i << std::endl;
   }
   return E_0 - E_i;
 }
@@ -634,34 +665,34 @@ double MapCppGlobalRawTracks::TOFMeanStoppingPower(const double beta,
   const double Z_over_A = 0.53768;
   const double I = 6.87e-5;  // MeV (68.7 eV)
 
-  std::cout << "DEBUG TOFMeanStoppingPower: beta = " << beta << "\tgamma = "
-            << gamma << "\tTmax = " << Tmax << std::endl;
-  /*
+  std::cout << "DEBUG TOFMeanStoppingPower: beta: " << beta << "\tgamma: "
+            << gamma << "\tTmax: " << Tmax << std::endl;
+  double density_effect = 0.;
   const double x0 = 0.1647;
   const double x1 = 2.5031;
   const double Cbar = 3.2999;
   const double a = 0.1645;
   const double k = 3.2224;
   const double x = beta * gamma;
-  double density_effect;
   if (x >= x1) {
     density_effect = 2 * ::log(10) * x - Cbar;
   } else if ((x0 <= x) && (x < x1)) {
     density_effect = 2 * ::log(10) * x - Cbar + a * ::pow(x1-x, k);
-  } else {  // (x < x0)
-    density_effect = 0.
-  }
-  */
-  const double density_effect = 0.;
-  
+  }  // (x < x0)
+
   const double log_operand = 2 * me * beta2 * gamma2 * Tmax / (I*I);
-  std::cout << "DEBUG TOFMeanStoppingPower: ln operand = " << log_operand
+  std::cout << "DEBUG TOFMeanStoppingPower: ln operand: " << log_operand
             << std::endl;
 
   // Bethe-Bloch equation times the density of polystyrene in MeV / mm
-  return K * Z_over_A / beta2
-           * (  0.5 * ::log(log_operand) - beta2 - density_effect / 2)
-           * density / 10.;
+  const double stopping_power
+    = K * Z_over_A / beta2
+    * (  0.5 * ::log(log_operand) - beta2 - density_effect / 2)
+    * density / 10.;
+  std::cout << "DEBUG TOFMeanStoppingPower: Stopping Power: " << stopping_power
+            << std::endl;
+
+  return stopping_power;
 }
 
 /** LoadSciFiTrack
@@ -701,8 +732,14 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
   track->SortTrackPointsByZ();
 
   // FIXME(Lane) For now assume we've selected only muon tracks and no decays
+  /*
   const GlobalDS::PID particle_id
     = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
+  */
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   track->set_pid(particle_id);
 
   sci_fi_tracks.push_back(track);
@@ -757,8 +794,14 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): " << std::endl
   track_point->set_mapper_name(kClassname);
 
   // FIXME(Lane) For now assume we've selected only muon tracks and no decays
+  /*
   const GlobalDS::PID particle_id
     = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
+  */
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   const double beta = Beta(particle_id, momentum.mag());
   const double energy = momentum.mag() / beta;
   TLorentzVector four_momentum(
