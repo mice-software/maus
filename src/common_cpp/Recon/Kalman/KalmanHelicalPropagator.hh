@@ -67,6 +67,10 @@ class KalmanHelicalPropagator : public KalmanPropagator {
    */
   void CalculatePredictedState(const KalmanState *old_site, KalmanState *new_site);
 
+  /** @brief Returns the momentum of the track at the point.
+   */
+  double GetTrackMomentum(const KalmanState *a_site);
+
  private:
   double _Bz;
 };

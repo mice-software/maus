@@ -179,7 +179,6 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
     double Bz = _geometry_helper.GetFieldValue(tracker);
     KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
     seed->SetField(Bz);
-    std::cerr << "Tracker " << tracker << " has field " << Bz << std::endl;
     seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
     seeds.push_back(seed);
   }

@@ -43,7 +43,6 @@ namespace MAUS {
  *
  */
 class KalmanStraightPropagator : public KalmanPropagator {
-  // friend KalmanStraightBackPropagator;
  public:
   /** @brief Straight Track constructor.
    */
@@ -60,6 +59,10 @@ class KalmanStraightPropagator : public KalmanPropagator {
   /** @brief Calculates the projected state.
    */
   void CalculatePredictedState(const KalmanState *old_site, KalmanState *new_site);
+
+  /** @brief Returns the momentum of the track. In the straight track case, p is just a guess.
+   */
+  double GetTrackMomentum(const KalmanState *a_site);
 };
 
 } // ~namespace MAUS

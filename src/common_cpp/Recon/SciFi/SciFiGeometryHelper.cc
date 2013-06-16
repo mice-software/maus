@@ -41,22 +41,23 @@ void SciFiGeometryHelper::Build() {
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
+      // Get the fibre rotation wrt the tracker frame.
       G4RotationMatrix fibre_rotation(module->relativeRotation(module->mother() // plane
                                                                ->mother()));    // tracker
 
       direction *= fibre_rotation;
 
-      // The plane rotation. Identity matrix for tracker 0,
-      // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 1 (180 degrees rot. around y).
+      // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
+      // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
       const MiceModule* plane = module->mother();
       G4RotationMatrix plane_rotation(plane->relativeRotation(plane->mother()  // tracker
                                                               ->mother()));    // solenoid
 
       ThreeVector position  = clhep_to_root(module->globalPosition());
-      position *= plane_rotation;
       ThreeVector reference = GetReferenceFramePosition(tracker_n);
-      // The if statements are used so that the stations Z is always > 0.
-      ThreeVector tracker_ref_frame_pos = reference - position;
+
+      ThreeVector tracker_ref_frame_pos = position-reference;
+      tracker_ref_frame_pos *= plane_rotation;
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction    = direction;
@@ -78,9 +79,8 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
   ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
-  // B_field *= plane_rotation;
+  B_field *= plane_rotation;
   double Tracker_Bz = B_field.z();
-  // std::cerr << "Mag Field: " << Tracker_Bz << std::endl;
   return Tracker_Bz;
 }
 

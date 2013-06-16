@@ -211,7 +211,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Set up Seed object with spacepoints.
   //
   MAUS::KalmanSeed seed;
-  seed.SetField(4);
+  seed.SetField(-0.004);
   //
   // Now set up a Straight Pattern Recognition Track
   //
@@ -223,7 +223,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double PI = acos(-1.);
   double phi_0 = 0.;
   int charge = -1;
-  double field = -4;
+  double field = -0.004;
   double pt = charge*0.3*field*r;
   double pz = pt*tan_lambda;
   double kappa = charge*fabs(1./pz);

@@ -96,7 +96,11 @@ class KalmanPropagator {
 
   /** @brief  Returns the width of the scattering angle distribution, according to the Highland formula.
    */
-  double HighlandFormula(double z, double L0, double beta, double p);
+  double HighlandFormula(double L0, double beta, double p);
+
+  /** @brief  Returns the track momentum at a plane.
+   */
+  virtual double GetTrackMomentum(const KalmanState *a_site) = 0;
 
  protected:
   bool _use_MCS;

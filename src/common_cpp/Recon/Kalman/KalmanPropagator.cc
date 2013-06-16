@@ -145,6 +145,8 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
 void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
                                             const KalmanState *new_site) {
   double plane_width = FibreParameters.Plane_Width;
+  // Plane lenght in units of radiation lenght (~0.0015).
+  double L0          = FibreParameters.R0(plane_width);
 
   double deltaZ = new_site->z() - old_site->z();
   double deltaZ_squared = deltaZ*deltaZ;
@@ -152,24 +154,15 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   TMatrixD a = new_site->a(KalmanState::Projected);
   double mx    = a(1, 0);
   double my    = a(3, 0);
-  double kappa = a(4, 0);
 
-  // Charge of incoming particle is given by the sign of kappa.
-  double z = kappa/fabs(kappa);
-  // Plane lenght in units of radiation lenght (~0.0015).
-  double L0 = FibreParameters.R0(plane_width);
-
-  double pz = 1./kappa;
-  double px = mx/kappa;
-  double py = my/kappa;
-  double p = TMath::Sqrt(px*px+py*py+pz*pz); // MeV/c
+  double p = GetTrackMomentum(old_site);
 
   double muon_mass = Recon::Constants::MuonMass;
   double muon_mass2 = muon_mass*muon_mass;
   double E = TMath::Sqrt(muon_mass2+p*p);
   double beta = p/E;
 
-  double C = HighlandFormula(z, L0, beta, p);
+  double C = HighlandFormula(L0, beta, p);
 
   double C2 = C*C;
 
@@ -219,10 +212,11 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   _Q(3, 3) = c_my_my;
 }
 
-double KalmanPropagator::HighlandFormula(double z, double L0,
-                                         double beta, double p) {
+double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   double HighlandConstant = Recon::Constants::HighlandConstant;
-  double result = HighlandConstant*z*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+  // Note that the z factor (charge of the incoming particle) is omitted.
+  // We don't need to consider |z| > 1.
+  double result = HighlandConstant*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
   return result;
 }
 

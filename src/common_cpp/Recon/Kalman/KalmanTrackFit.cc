@@ -78,7 +78,6 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // Optional printing.
     if ( _verbose )
       DumpInfo(sites);
-
     Save(event, track, sites);
     // Free memory allocated and reset pointers to NULL.
     delete _propagator;

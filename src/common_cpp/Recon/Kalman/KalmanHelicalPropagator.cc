@@ -52,7 +52,7 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   double old_kappa  = old_a(4, 0);
 
   double particle_charge = old_kappa/fabs(old_kappa);
-  double c      = CLHEP::c_light*1.e-3;
+  double c      = CLHEP::c_light;
   double a      = c*particle_charge*_Bz;
   double sine   = sin(a*deltaZ*old_kappa);
   double cosine = cos(a*deltaZ*old_kappa);
@@ -84,7 +84,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   double old_z = old_site->z();
 
   // Delta Z in mm
-  double deltaZ = (new_z-old_z);
+  double deltaZ = 0; // (new_z-old_z);
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);
@@ -95,7 +95,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
 
   double particle_charge = kappa/fabs(kappa);
   // constant in units MeV/mm
-  double c = CLHEP::c_light*1.e-3;
+  double c = CLHEP::c_light;
   double a = c*particle_charge*_Bz;
 
   // Define factors to be used in the matrix.
@@ -158,6 +158,19 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(4, 3) = 0.;
   // @kappa/@kappa
   _F(4, 4) = 1.;
+}
+
+double KalmanHelicalPropagator::GetTrackMomentum(const KalmanState *a_site) {
+  TMatrixD a = a_site->a(KalmanState::Projected);
+  double mx    = a(1, 0);
+  double my    = a(3, 0);
+  double kappa = a(4, 0);
+
+  double pz = 1./kappa;
+  double px = mx/kappa;
+  double py = my/kappa;
+  double p = TMath::Sqrt(px*px+py*py+pz*pz); // MeV/c
+  return p;
 }
 
 } // ~namespace MAUS

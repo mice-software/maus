@@ -57,4 +57,10 @@ void KalmanStraightPropagator::CalculatePredictedState(const KalmanState *old_si
   new_site->set_a(a_projected, KalmanState::Projected);
 }
 
+double KalmanStraightPropagator::GetTrackMomentum(const KalmanState *a_site) {
+  // For the straight track case, we can't estimate pz without the TOF's.
+  // So we just assume 200 MeV/c.
+  return 200.;
+}
+
 } // ~namespace MAUS
