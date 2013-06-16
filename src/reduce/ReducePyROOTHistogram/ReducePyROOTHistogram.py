@@ -27,6 +27,8 @@ import os
 import ErrorHandler
 import ROOT
 
+import framework.utilities
+
 class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
     @class ReducePyROOTHistogram.ReducePyROOTHistogram is a base class
@@ -224,11 +226,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Save to and reload from temporary file.
         file_name = "%s_tmp.%s" % (image_tag, self.image_type)
         canvas.Print(file_name)
-        tmp_file = open(file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(file_name)
+        framework.utilities.convert_binary_to_string(file_name, True)
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}
@@ -263,11 +261,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         for histo in histos:
             histo.Write()
         rfile.Close()
-        tmp_file = open(file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(file_name)
+        framework.utilities.convert_binary_to_string(file_name, True)
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}

@@ -19,8 +19,13 @@ Tests for utilities module.
 
 # pylint: disable=C0103
 
+import os
 import unittest
+import ROOT
+import base64
+import md5
 
+import framework
 from docstore.DocumentStore import DocumentStore
 from docstore.DocumentStore import DocumentStoreException
 from docstore.InMemoryDocumentStore import InMemoryDocumentStore
@@ -404,5 +409,37 @@ class CeleryNodeExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C
         self.assertEquals(node_status, exception.node_status,
             "Unexpected node status")
 
+class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
+    """
+    Test class for framework.utilities.convert_binary_to_string.
+    """
+
+    def test_convert_binary_to_string(self):
+        """
+        Test conversion binary file to string
+        """
+        canvas = ROOT.TCanvas("test", "test")
+        fname = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_image.png")
+        copy1 = "tmp/image_test_copy1.png"
+        copy2 = "tmp/image_test_copy2.png"
+        canvas.Print(fname)
+
+        my_string = framework.utilities.convert_binary_to_string(fname, False)
+        self.assertTrue(os.path.exists(fname))
+        open(copy1, "w").write(base64.b64decode(my_string))
+        # compare md5sum, assert equal
+        self.assertEqual(md5.new(open(fname).read()).digest(), 
+                         md5.new(open(copy1).read()).digest())
+
+
+        my_string = framework.utilities.convert_binary_to_string(fname, True)
+        self.assertFalse(os.path.exists(fname))
+        # compare md5sum, assert equal
+        open(copy2, "w").write(base64.b64decode(my_string))
+        self.assertEqual(md5.new(open(copy1).read()).digest(), 
+                         md5.new(open(copy2).read()).digest())
+            
+
 if __name__ == '__main__':
     unittest.main()
+
