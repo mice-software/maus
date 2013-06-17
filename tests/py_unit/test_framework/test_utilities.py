@@ -21,7 +21,6 @@ Tests for utilities module.
 
 import os
 import unittest
-import ROOT
 import base64
 import md5
 
@@ -409,6 +408,12 @@ class CeleryNodeExceptionTestCase(unittest.TestCase): # pylint: disable=R0904, C
         self.assertEquals(node_status, exception.node_status,
             "Unexpected node status")
 
+def _file_md5(file_name):
+    """Return md5 for contents of file with file_name"""
+    fin = open(file_name)
+    _md5 = md5.new(fin.read())
+    return _md5.digest() # pylint: disable=E1121
+
 class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     Test class for framework.utilities.convert_binary_to_string.
@@ -418,18 +423,19 @@ class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904,
         """
         Test conversion binary file to string
         """
-        canvas = ROOT.TCanvas("test", "test")
-        fname = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_image.png")
-        copy1 = "tmp/image_test_copy1.png"
-        copy2 = "tmp/image_test_copy2.png"
-        canvas.Print(fname)
+
+        fname = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_binary.dat")
+        copy1 = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_binary_copy1.dat")
+        copy2 = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_binary_copy2.dat")
+        fout = open(fname, "wb")
+        fout.write("1")
+        fout.close()
 
         my_string = framework.utilities.convert_binary_to_string(fname, False)
         self.assertTrue(os.path.exists(fname))
         open(copy1, "w").write(base64.b64decode(my_string))
         # compare md5sum, assert equal
-        self.assertEqual(md5.new(open(fname).read()).digest(), 
-                         md5.new(open(copy1).read()).digest())
+        self.assertEqual(_file_md5(fname), _file_md5(copy1))
 
         my_string = framework.utilities.convert_binary_to_string(fname, 0)
         self.assertTrue(os.path.exists(fname))
@@ -438,8 +444,7 @@ class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertFalse(os.path.exists(fname))
         # compare md5sum, assert equal
         open(copy2, "w").write(base64.b64decode(my_string))
-        self.assertEqual(md5.new(open(copy1).read()).digest(), 
-                         md5.new(open(copy2).read()).digest())
+        self.assertEqual(_file_md5(copy1), _file_md5(copy2))
             
         my_string = framework.utilities.convert_binary_to_string(copy1, 1)
         self.assertFalse(os.path.exists(copy1))

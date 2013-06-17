@@ -29,17 +29,33 @@
 #undef _XOPEN_SOURCE
 #endif
 
-#include <Python.h>
+#include "Python.h"
 
 namespace MAUS {
 namespace Utils {
 
+/** Wrapper class for handling conversion of binary file contents to a string
+ * 
+ *  Wraps framework.utilities.convert_binary_to_string
+ */
 class ConvertBinaryToString {
   public:
+    /** Constructor - imports python function
+     *
+     *  import framework.utilities and get function convert_binary_to_string
+     */
     ConvertBinaryToString();
 
+    /** Destructor - relinquish references to Python functions and modules
+     */
     ~ConvertBinaryToString();
 
+    /** convert a binary file into a string in memory
+     *
+     *  @param file_name string file name for the file to be converted
+     *  @param delete_file set to True to delete the file once it has been 
+     *         converted; set to False to leave it as is
+     */
     std::string convert(std::string file_name, bool delete_file);
 
   private:
@@ -50,7 +66,6 @@ class ConvertBinaryToString {
     PyObject* _utils_mod;
     PyObject* _utils_mod_dict;
 };
-
 }
 }
 

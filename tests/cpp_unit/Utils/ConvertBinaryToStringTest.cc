@@ -27,7 +27,7 @@
 namespace {
 
 TEST(ConvertBinaryToStringTest, AllocationTest) {
-    using namespace MAUS::Utils;
+    using MAUS::Utils::ConvertBinaryToString;
     // check alloc dealloc
     ConvertBinaryToString* my_eval_1 = new ConvertBinaryToString();
     delete my_eval_1;
@@ -46,7 +46,7 @@ TEST(ConvertBinaryToStringTest, AllocationTest) {
 }
 
 TEST(ConvertBinaryToStringTest, ConversionTest) {
-    using namespace MAUS::Utils;
+    using MAUS::Utils::ConvertBinaryToString;
     std::string fname = "test_binary.dat";
     std::ofstream fout(fname.c_str());
     fout << "1";
@@ -55,15 +55,14 @@ TEST(ConvertBinaryToStringTest, ConversionTest) {
     start_time.tv_sec = 0;
     start_time.tv_nsec = 0;
     end_time.tv_sec = 0;
-    end_time.tv_nsec = 100000000;
-    nanosleep (&start_time, &end_time);
+    end_time.tv_nsec = 10000000;
+    nanosleep(&start_time, &end_time);
 
     ConvertBinaryToString converter;
     EXPECT_EQ(converter.convert(fname, false), "MQ==");
     EXPECT_EQ(converter.convert(fname, true), "MQ==");
-    nanosleep (&start_time, &end_time);
+    nanosleep(&start_time, &end_time);
     EXPECT_THROW(converter.convert(fname, true), Squeal); // file is gone
 }
-
 }
 

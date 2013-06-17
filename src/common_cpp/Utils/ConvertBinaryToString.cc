@@ -38,15 +38,15 @@ ConvertBinaryToString::~ConvertBinaryToString() {
 
 void ConvertBinaryToString::clear() {
     // clear any memory allocations
-    if ( _utils_mod != NULL) {
+    if (_utils_mod != NULL) {
         Py_DECREF(_utils_mod);
         _utils_mod = NULL;
     }
-    if ( _utils_mod_dict != NULL) {
+    if (_utils_mod_dict != NULL) {
         Py_DECREF(_utils_mod_dict);
         _utils_mod_dict = NULL;
     }
-    if ( _convert_func != NULL) {
+    if (_convert_func != NULL) {
         Py_DECREF(_convert_func);
         _convert_func = NULL;
     }
@@ -59,7 +59,7 @@ void ConvertBinaryToString::reset() {
     _utils_mod = PyImport_ImportModule("framework.utilities");
     if (_utils_mod == NULL) {
         PyErr_PrintEx(1);
-        throw( Squeal(Squeal::recoverable, 
+        throw(Squeal(Squeal::recoverable,
                       "Failed to import framework.utilities module",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -68,7 +68,7 @@ void ConvertBinaryToString::reset() {
     _utils_mod_dict = PyModule_GetDict(_utils_mod);
     if (_utils_mod_dict == NULL) {
         PyErr_PrintEx(1);
-        throw( Squeal(Squeal::recoverable, 
+        throw(Squeal(Squeal::recoverable,
                       "Failed to find framework.utilities.__dict__",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -79,7 +79,7 @@ void ConvertBinaryToString::reset() {
     Py_INCREF(_convert_func); // Apparently PyDict_GetItemString does not INCREF
     if (_convert_func == NULL || !PyCallable_Check(_convert_func)) {
         PyErr_PrintEx(1);
-        throw( Squeal(Squeal::recoverable,
+        throw(Squeal(Squeal::recoverable,
                       "Failed to find convert_binary_to_string",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -90,7 +90,7 @@ std::string ConvertBinaryToString::convert
     // build input values and check for errors
     // nb int(bool) does always return 0 or 1, I checked C++ standard
     PyObject* py_arg = Py_BuildValue("(si)", file_name.c_str(),
-                                     int(delete_file));
+                                     static_cast<int>(delete_file));
     if (py_arg == NULL) {
         PyErr_Clear();
         PyErr_PrintEx(1);
@@ -99,7 +99,7 @@ std::string ConvertBinaryToString::convert
                    "ConvertBinaryToString::convert"));
     }
 
-    // check that _convert_func is valid; run the evaluator to calculate 
+    // check that _convert_func is valid; run the evaluator to calculate
     // function value; check for errors
     if (_convert_func == NULL || PyCallable_Check(_convert_func) == 0)  {
         Py_DECREF(py_arg);
@@ -121,7 +121,7 @@ std::string ConvertBinaryToString::convert
     char * my_cstr = NULL;
     PyArg_Parse(py_value, "s", &my_cstr);
     std::string string_out(my_cstr);
-    
+
     // clean up
     Py_DECREF(py_value);
     Py_DECREF(py_arg);
@@ -129,7 +129,6 @@ std::string ConvertBinaryToString::convert
     // return
     return string_out;
 }
-
 }
 }
 
