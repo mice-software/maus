@@ -431,6 +431,8 @@ class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertEqual(md5.new(open(fname).read()).digest(), 
                          md5.new(open(copy1).read()).digest())
 
+        my_string = framework.utilities.convert_binary_to_string(fname, 0)
+        self.assertTrue(os.path.exists(fname))
 
         my_string = framework.utilities.convert_binary_to_string(fname, True)
         self.assertFalse(os.path.exists(fname))
@@ -439,6 +441,9 @@ class ConvertBinaryToStringTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertEqual(md5.new(open(copy1).read()).digest(), 
                          md5.new(open(copy2).read()).digest())
             
+        my_string = framework.utilities.convert_binary_to_string(copy1, 1)
+        self.assertFalse(os.path.exists(copy1))
+
 
 if __name__ == '__main__':
     unittest.main()

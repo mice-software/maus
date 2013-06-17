@@ -45,7 +45,6 @@ def convert_binary_to_string(binary_file_name, remove_binary_file):
         os.remove(binary_file_name)
     return encoded_data
 
-
 class DataflowUtilities: # pylint: disable=W0232
     """
     @class DataflowUtilities.
