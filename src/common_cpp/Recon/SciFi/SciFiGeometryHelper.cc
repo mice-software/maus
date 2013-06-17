@@ -22,8 +22,7 @@ namespace MAUS {
 SciFiGeometryHelper::SciFiGeometryHelper() {}
 
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &modules)
-                                        : _modules(modules),
-                                          _mT_to_T(1000.) {}
+                                        : _modules(modules) {}
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
 
@@ -41,11 +40,15 @@ void SciFiGeometryHelper::Build() {
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
+      ThreeVector perpendicular(-1., 0, 0);
       // Get the fibre rotation wrt the tracker frame.
       G4RotationMatrix fibre_rotation(module->relativeRotation(module->mother() // plane
                                                                ->mother()));    // tracker
 
-      direction *= fibre_rotation;
+      direction     *= fibre_rotation;
+      perpendicular *= fibre_rotation;
+      std::cerr << tracker_n << " " << station_n << " " << plane_n << std::endl;
+      std::cerr << direction.x() << " " << direction.y() << " " << direction.z() << std::endl;
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -60,10 +63,11 @@ void SciFiGeometryHelper::Build() {
       tracker_ref_frame_pos *= plane_rotation;
 
       SciFiPlaneGeometry this_plane;
-      this_plane.Direction    = direction;
-      this_plane.Position     = tracker_ref_frame_pos;
-      this_plane.CentralFibre = centralfibre;
-      this_plane.Pitch        = pitch;
+      this_plane.Direction     = direction;
+      this_plane.Perpendicular = perpendicular;
+      this_plane.Position      = tracker_ref_frame_pos;
+      this_plane.CentralFibre  = centralfibre;
+      this_plane.Pitch         = pitch;
       int plane_id =  3*(station_n-1) + (plane_n+1);
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));

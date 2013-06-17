@@ -36,6 +36,7 @@ namespace MAUS {
  */
 struct SciFiPlaneGeometry {
   ThreeVector Direction;
+  ThreeVector Perpendicular;
   ThreeVector Position;
   double CentralFibre;
   double Pitch;
@@ -95,8 +96,6 @@ class SciFiGeometryHelper {
   std::vector<const MiceModule*> _modules;
 
   SciFiGeometryMap _geometry_map;
-
-  double _mT_to_T;
 
   double _field_value[2];
 }; // Don't forget this trailing colon!!!!
