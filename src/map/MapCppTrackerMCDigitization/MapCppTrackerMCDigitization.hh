@@ -88,11 +88,12 @@ class MapCppTrackerMCDigitization {
   void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
                         int event_num, MAUS::SciFiDigitPArray &digits);
 
-  /** @brief computes npe from energy deposits.
-   */
-  void add_elec_noise(MAUS::SciFiDigitPArray &digits, int spill_num,
-                      int event_num);
   /** @brief simulates signal noise.
+   */
+  void add_elec_noise(MAUS::SciFiDigitPArray &digits, int seed,
+                      int spill_num, int event_num);
+
+  /** @brief computes npe from energy deposits.
    */
   double compute_npe(double edep, int chanNo, MAUS::SciFiHit *ahit);
 
