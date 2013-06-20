@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_KLEVENT_
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/KLEventDigit.hh"
 #include "src/common_cpp/DataStructure/KLEventCellHit.hh"
 
@@ -60,7 +60,7 @@ class KLEvent {
     KLEventDigit _kl_digits;
     KLEventCellHit _kl_cell_hits;
 
-    ClassDef(KLEvent, 1)
+    MAUS_VERSIONED_CLASS_DEF(KLEvent)
 };
 }
 
