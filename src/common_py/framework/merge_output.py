@@ -213,7 +213,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             raise KeyError("%s\nEvent has no maus_event_type" % \
                                                 json.dumps(spill_doc, indent=2))
         if spill_doc["maus_event_type"] != "Spill":
-            if not self.outputer.save(str(spill)):
+            outputter_ret = self.outputer.save(str(spill))
+            if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
         else:
             # Check for change in run.
@@ -228,7 +229,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 self.start_of_run()
            # Handle current spill.
             merged_spill = self.merger.process(spill)
-            if not self.outputer.save(str(merged_spill)):
+            outputter_ret = self.outputer.save(str(spill))
+            if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
             self.spill_process_count += 1
             print "Spills processed: %d" % self.spill_process_count
@@ -374,7 +376,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             except pymongo.errors.OperationFailure as err:
                 if retry_counter >= max_number_of_retries:
                     print 'Failed to access docstore - giving up'
-                    raise DocumentStoreException(err)
+                    raise err #DocumentStoreException(err)
                 time.sleep(retry_time)
                 retry_counter += 1
                 print 'Failed to access docstore', retry_counter

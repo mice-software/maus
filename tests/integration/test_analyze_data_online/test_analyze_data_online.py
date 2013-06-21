@@ -92,13 +92,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         if not os.path.exists(TMP_DIR):
             os.makedirs(TMP_DIR)
 
-        target =  TMP_DIR+"04235.000"
-        if os.path.exists(target):
+        target =  TMP_DIR+"04234_04235.cat"
+        if os.path.lexists(target):
+            print 'Removing', target
             os.remove(target)
             time.sleep(1)
         share = os.path.expandvars(
-                      "${MAUS_THIRD_PARTY}/third_party/install/share/test_data")
-        share = share+"04235.000"
+                     "${MAUS_THIRD_PARTY}/third_party/install/share/test_data/")
+        share = share+"04234_04235.cat"
         print "Linking", share, "to", target 
         os.symlink(share, target)
         online_okay = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
@@ -129,17 +130,15 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Check that analyze_data_online makes good histos for full run
         """
-        for data in ["04234_04235.cat"]:
-            self.returncodes[data] = run_process(data, '_histos')
-        for key, ret_code in self.returncodes.iteritems():
-            self.assertEquals(ret_code, 0)
+        returncode = run_process("04234_04235.cat", '_histos')
+        self.assertEquals(returncode, 0)
         pass_dict = {}
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
         for data in self.returncodes.keys():
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
-               '/test_analyze_data_online/reference_plots_'+str(data)+'/')
+               '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
                 test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
@@ -150,6 +149,8 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             for key, value in pass_dict.iteritems():
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
+        test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
+          'test_analyze_data_online/04234_04235.cat_histos/end_of_run/4235')
         eor_dir = ref_dir+'/end_of_run/'
         self.assertTrue(os.path.exists(eor_dir))
         ref_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.png')]

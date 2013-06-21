@@ -59,7 +59,7 @@ class OutputPyImage:
         self.file_prefix = "image"
         self.directory = os.getcwd()
         self.end_of_run_directory = os.getcwd()+'/end_of_run/'
-        self.last_event = {}
+        self.last_event = {'maus_event_type':'Image', 'image_list':[]}
         self.run_number = -9999
 
     def birth(self, config_json):
@@ -103,7 +103,11 @@ class OutputPyImage:
             print json_doc
             raise KeyError("Expected maus_event_type in json_doc")
         if json_doc["maus_event_type"] == "Image":
+            if "image_list" not in json_doc:
+                print json_doc
+                raise KeyError("Expected image_list in json_doc")      
             self.last_event = json_doc
+            print self.last_event
             for image in json_doc["image_list"]:
                 self.__handle_image(image, False)
         elif json_doc["maus_event_type"] == "RunFooter":

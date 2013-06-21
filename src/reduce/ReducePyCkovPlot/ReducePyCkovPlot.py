@@ -77,7 +77,7 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
-                return [{}]
+                return []
         
         if not self.get_space_points(spill):
             raise ValueError("space points not in spill")

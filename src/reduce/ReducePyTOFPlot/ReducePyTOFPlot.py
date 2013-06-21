@@ -186,7 +186,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
-                return [{}]
+                return []
         # elif spill["daq_event_type"] != "physics_event":
         #    return spill
 
