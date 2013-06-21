@@ -20,12 +20,12 @@ histograms using ROOT.
 # Turn off false positives related to ROOT
 #pylint: disable = E1101
 
-import base64
 import json
-import os
 
 import ErrorHandler
 import ROOT
+
+import framework.utilities
 
 class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
@@ -163,13 +163,9 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         except Exception: # pylint:disable=W0703
             ErrorHandler.HandleException(json_doc, self)
             return unicode(json.dumps(json_doc))
-
+        image_list = [image['image'] for image in result]
         # Convert results to strings.
-        doc_list = []
-        for doc in result:
-            doc_list.append(json.dumps(doc))
-            doc_list.append("\n")
-        return unicode("".join(doc_list))
+        return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 
     def _update_histograms(self, spill):
         """
@@ -228,11 +224,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Save to and reload from temporary file.
         file_name = "%s_tmp.%s" % (image_tag, self.image_type)
         canvas.Print(file_name)
-        tmp_file = open(file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(file_name)
+        encoded_data = framework.utilities.convert_binary_to_string(file_name,
+                                                                    True)
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}
@@ -267,11 +260,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         for histo in histos:
             histo.Write()
         rfile.Close()
-        tmp_file = open(file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(file_name)
+        encoded_data = framework.utilities.convert_binary_to_string(file_name,
+                                                                    True)
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}

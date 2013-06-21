@@ -35,7 +35,9 @@ def kill_maus_apps():
     """
     Kill any lurking maus_apps
     """
-    ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+    # columns = 1024 stops ps from truncating the line (and we fail to detect
+    # the maus-app call)
+    ps_out =  subprocess.check_output(['ps', '-e', '-F', '--columns=1024'])
     pids = []
     for line in ps_out.split('\n')[1:]:
         if line.find('manage.py') > -1 and line.find('runserver') > -1:
