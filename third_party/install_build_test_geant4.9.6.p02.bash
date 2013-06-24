@@ -12,7 +12,7 @@ source env.sh
 source env.sh
 bash third_party/bash/29expat.bash
 bash third_party/bash/32clhep2.1.1.0.bash
-bash third_party/bash/36geant4.9.6.bash
+bash third_party/bash/35geant4.9.6.bash
 source env_geant4.9.6.p02.sh
 scons -c
 scons -j8
