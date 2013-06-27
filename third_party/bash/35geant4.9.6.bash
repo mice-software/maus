@@ -87,19 +87,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 ################################################################################
 
 export G4DEBUG=1
-export G4VERS=geant4.9.5.p01
+export G4VERS=geant4.9.6.p02
 export G4SYSTEM=$arch-g++
 export G4VIS_BUILD_DAWNFILE_DRIVER=1
 export G4VIS_USE_DAWNFILE=1
 export G4VIS_USE=0
 export G4OPTIMISE=2
 export OGLHOME=/usr/X11R6
-export G4DATA="\${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.5.1/data"
-export G4LEDATA="\${G4DATA}/G4EMLOW6.23/"
-export G4ABLADATA="\${G4DATA}/G4ABLA3.0/"
-export G4NEUTRONDATA="\${G4DATA}/G4NDL3.13/"
-export G4LEVELGAMMADATA="\${G4DATA}/PhotonEvaporation2.2/"
-export G4RADIOACTIVEDATA="\${G4DATA}/RadioactiveDecay3.4/"
+export G4DATA="\${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.6.2/data"
+export G4LEDATA="\${G4DATA}/G4EMLOW6.32/"
+export G4ABLADATA="\${G4DATA}/G4NEUTRONXS1.2/"
+export G4NEUTRONDATA="\${G4DATA}/G4NDL4.2/"
+export G4LEVELGAMMADATA="\${G4DATA}/PhotonEvaporation2.3/"
+export G4RADIOACTIVEDATA="\${G4DATA}/RadioactiveDecay3.6/"
 export G4SAIDXSDATA="\${G4DATA}/G4SAIDDATA1.1/"
 # GEANT4 installs to lib64 on 64bit systems
 export LD_LIBRARY_PATH="${MAUS_THIRD_PARTY}/third_party/install/lib64:${LD_LIBRARY_PATH}"
