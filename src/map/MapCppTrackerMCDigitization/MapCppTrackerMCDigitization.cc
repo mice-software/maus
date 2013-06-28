@@ -27,12 +27,12 @@ MapCppTrackerMCDigitization::MapCppTrackerMCDigitization()
 }
 
 MapCppTrackerMCDigitization::~MapCppTrackerMCDigitization() {
-    if (_spill_json != NULL) {
-        delete _spill_json;
-    }
-    if (_spill_cpp != NULL) {
-        delete _spill_cpp;
-    }
+  if (_spill_json != NULL) {
+    delete _spill_json;
+  }
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+  }
 }
 
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {

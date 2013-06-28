@@ -71,6 +71,8 @@ class MapCppTrackerDigits {
    */
   std::string process(std::string document);
 
+  void read_in_json(std::string document);
+
   void save_to_json(MAUS::Spill &spill);
 
  private:
@@ -79,7 +81,9 @@ class MapCppTrackerDigits {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value _json_root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.

@@ -45,13 +45,6 @@ void RealDataDigitization::initialise() {
 }
 
 void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
-  // Check for existant pointers to ReconEvents and DAQData
-  if ( spill.GetDAQData() == NULL )
-    spill.SetDAQData(new DAQData());
-
-  if (spill.GetReconEvents() == NULL)
-    spill.SetReconEvents(new ReconEventArray());
-
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
 

@@ -24,6 +24,19 @@
 
 namespace MAUS {
 
+MapCppTrackerDigits::MapCppTrackerDigits()
+    : _spill_json(NULL), _spill_cpp(NULL) {
+}
+
+bool MapCppTrackerDigits::~MapCppTrackerDigits() {
+  if (_spill_json != NULL) {
+    delete _spill_json;
+  }
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+  }
+}
+
 bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerDigits";
   return true;
@@ -33,17 +46,49 @@ bool MapCppTrackerDigits::death() {
   return true;
 }
 
-std::string MapCppTrackerDigits::process(std::string document) {
+void MapCppTrackerDigits::read_in_json(std::string document) {
   Json::FastWriter writer;
-  Spill spill;
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+    _spill_cpp = NULL;
+  }
 
   try {
-    // Load input.
-    root = JsonWrapper::StringToJson(document);
-    if ( root.isMember("daq_data") && !(root["daq_data"].isNull()) ) {
+    json_root = JsonWrapper::StringToJson(document);
+    if ( json_root.isMember("daq_data") && !(json_root["daq_data"].isNull()) ) {
+      SpillProcessor spill_proc;
+      _spill_cpp = spill_proc.JsonToCpp(json_root);
+    }
+  } catch(...) {
+    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
+    std::stringstream ss;
+    ss << _classname << " says:" << reader.getFormatedErrorMessages();
+    errors["bad_json_document"] = ss.str();
+    _spill_cpp->GetErrors();
+  }
+
+  // Check for existant pointers to ReconEvents and DAQData
+  if ( _spill_cpp.GetDAQData() == NULL )
+    _spill_cpp.SetDAQData(new DAQData());
+
+  if (_spill_cpp.GetReconEvents() == NULL)
+    _spill_cpp.SetReconEvents(new ReconEventArray());
+}
+
+
+std::string MapCppTrackerDigits::process(std::string document) {
+  Json::FastWriter writer;
+
+  read_in_json(document);
+  Spill& spill = *_spill_cpp;
+
+  try {
+    if ( spill ) {
       // Get daq data.
-      Json::Value daq = root.get("daq_data", 0);
-      // Process the input.
+      Json::Value daq = _json_root.get("daq_data", 0);
+      // Fill spill object with 
       RealDataDigitization real;
       real.initialise();
       real.process(spill, daq);
@@ -68,6 +113,13 @@ std::string MapCppTrackerDigits::process(std::string document) {
 void MapCppTrackerDigits::save_to_json(Spill &spill) {
   SpillProcessor spill_proc;
   root = *spill_proc.CppToJson(spill, "");
+
+    SpillProcessor spill_proc;
+    if (_spill_json != NULL) {
+        delete _spill_json;
+        _spill_json = NULL;
+    }
+    _spill_json = spill_proc.CppToJson(spill, "");
 }
 
 } // ~namespace MAUS
