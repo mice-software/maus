@@ -42,6 +42,10 @@ namespace MAUS {
 
 class TrackerDataManager {
   public:
+
+    /** Make the Pattern Recognition reducer a friend for testing purposes */
+    friend class ReduceCppPatternRecognition;
+
     /** Constructor */
     TrackerDataManager();
 

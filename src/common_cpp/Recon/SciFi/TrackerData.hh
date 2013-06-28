@@ -40,14 +40,10 @@ namespace MAUS {
 
 class TrackerData {
   public:
-    /** Constructor */
-    TrackerData();
-
-    /** Destructor */
-    ~TrackerData();
 
     /** Make tracker data manager a friend, far easier than writing all the getters and setters */
     friend class TrackerDataManager;
+    friend class ReduceCppPatternRecognition;
 
     /** Make tracker data plotters friends */
     friend class TrackerDataPlotterBase;
@@ -55,6 +51,12 @@ class TrackerData {
     friend class TrackerDataPlotterTracks;
     friend class TrackerDataPlotterSpoints;
     friend class TrackerDataPlotterInfoBox;
+
+    /** Constructor */
+    TrackerData();
+
+    /** Destructor */
+    ~TrackerData();
 
     /** Clear all data, and set all vectors to zero size */
     void clear();
