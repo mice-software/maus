@@ -345,6 +345,8 @@ mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumen
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# refresh rate for refreshing plots
+reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"

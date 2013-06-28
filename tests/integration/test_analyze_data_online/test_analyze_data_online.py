@@ -20,6 +20,7 @@ test_analyze_online.py - Note that I never ran this test successfully! Always
 skips until someone sorts out the environment on the test server.
 """
 
+import shutil
 import sys
 import os
 import subprocess
@@ -65,7 +66,8 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     env_cp['MAUS_WEB_MEDIA'] = my_tmp+'/'
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp+'/raw/'
     proc = subprocess.Popen(['python', ANALYZE_EXE,
-                             '--DAQ_online_file', TMP_DIR+data_file_name],
+                             '--DAQ_online_file', TMP_DIR+data_file_name,
+                             '--reduce_plot_refresh_rate', '20'],
                              env=env_cp, stdout=log,
                              stderr=subprocess.STDOUT)
     if send_signal != None:
@@ -84,13 +86,13 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Clear any lockfile that exists
         """
-        self.returncodes = {}
         if os.path.exists(LOCKFILE):
             os.remove(LOCKFILE)
             print 'Cleared lockfile'
             time.sleep(1)
-        if not os.path.exists(TMP_DIR):
-            os.makedirs(TMP_DIR)
+        if os.path.exists(TMP_DIR):
+            shutil.rmtree(TMP_DIR)
+        os.makedirs(TMP_DIR)
 
         target =  TMP_DIR+"04234_04235.cat"
         if os.path.lexists(target):
@@ -136,11 +138,12 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
-        for data in self.returncodes.keys():
+        for data in ['04234_04235.cat_histos']:
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
                '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
-                test_root = temp_dir(data+'_histos')+ref_root.split('/')[-1]
+                test_root = temp_dir('04234_04235.cat_histos')+\
+                                                         ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
                                                    test_root,
                                                    ref_root,
@@ -150,11 +153,11 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
         test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
-          'test_analyze_data_online/04234_04235.cat_histos/end_of_run/4235')
-        eor_dir = ref_dir+'/end_of_run/'
+                             'test_analyze_data_online/04234_04235.cat_histos/')
+        eor_dir = test_dir+'/end_of_run/end_of_run/4235/'
         self.assertTrue(os.path.exists(eor_dir))
         ref_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.png')]
-        eor_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.json')]
+        eor_png = [item.split('/')[-1] for item in glob.glob(eor_dir+'*.png')]
         for item in ref_png:
             self.assertTrue(item in eor_png, msg = 'Failed to find '+item)
         for item in eor_png:

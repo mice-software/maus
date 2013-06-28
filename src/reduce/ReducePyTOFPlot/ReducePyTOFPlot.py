@@ -23,7 +23,7 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
-
+import datetime
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
@@ -156,13 +156,14 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         # Read in configuration flags and parameters - these will
         # overwrite whatever defaults were set in __init__.
-        if 'refresh_rate' in config_doc:
-            self.refresh_rate = int(config_doc["refresh_rate"])
+        if 'reduce_plot_refresh_rate' in config_doc:
+            self.refresh_rate = int(config_doc["reduce_plot_refresh_rate"])
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()
         self.run_ended = False
         return True
+
 
     def _update_histograms(self, spill):
         """
@@ -178,6 +179,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
+        print "update start", datetime.datetime.now()
         if not spill.has_key("daq_event_type"):
             raise ValueError("No event type")
         if spill["daq_event_type"] == "end_of_run":
@@ -187,8 +189,6 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 return self.get_histogram_images()
             else:
                 return []
-        # elif spill["daq_event_type"] != "physics_event":
-        #    return spill
 
         # do not try to get data from start/end spill markers
         data_spill = True
@@ -197,20 +197,25 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
               or spill["daq_event_type"] == "end_of_burst":
             data_spill = False
 
+        print "get slab hits", datetime.datetime.now()
         # Get TOF slab hits & fill the relevant histograms.
         if data_spill and not self.get_slab_hits(spill): 
             raise ValueError("slab_hits not in spill")
 
+        print "get space points", datetime.datetime.now()
         # Get TOF space points & fill histograms.
         if data_spill and not self.get_space_points(spill):
             raise ValueError("space_points not in spill")
 
+        print "checking for refresh canvases", datetime.datetime.now()
         # Refresh canvases at requested frequency.
         if self.spill_count % self.refresh_rate == 0:
+            print "will refresh canvases", datetime.datetime.now()
             self.update_histos()
             return self.get_histogram_images()
         else:
-            return [spill]
+            print "wont refresh canvases", datetime.datetime.now()
+            return []
 
     def get_slab_hits(self, spill):
         """ 

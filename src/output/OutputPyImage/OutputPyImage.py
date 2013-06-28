@@ -100,20 +100,20 @@ class OutputPyImage:
         """
         json_doc = json.loads(document)
         if "maus_event_type" not in json_doc.keys():
-            print json_doc
             raise KeyError("Expected maus_event_type in json_doc")
         if json_doc["maus_event_type"] == "Image":
             if "image_list" not in json_doc:
-                print json_doc
                 raise KeyError("Expected image_list in json_doc")      
             self.last_event = json_doc
-            print self.last_event
             for image in json_doc["image_list"]:
                 self.__handle_image(image, False)
         elif json_doc["maus_event_type"] == "RunFooter":
             self.run_number = json_doc["run_number"]
             for image in self.last_event["image_list"]:
                 self.__handle_image(image, True)
+        else:
+            print "OutputPyImage will not process maus event of type "+\
+                                                str(json_doc["maus_event_type"])
 
     def death(self): #pylint: disable=R0201
         """
