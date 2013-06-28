@@ -46,7 +46,7 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
     TrackerDataPlotterInfoBox();
 
     /** Constructor allowing setting of some of the box parameters */
-    TrackerDataPlotterInfoBox(double canvas_width, double canvas_height,
+    TrackerDataPlotterInfoBox(int canvas_width, int canvas_height,
                               double line1_pos, double line2_pos);
 
     /** Destructor  */
@@ -85,8 +85,8 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
     int _tot_3stracks_t2;
 
     /** Parameters of the TCanvas */
-    double _canvas_width;
-    double _canvas_height;
+    int _canvas_width;
+    int _canvas_height;
 
     /** Position of the seperator lines in the info box */
     double _line1_pos;

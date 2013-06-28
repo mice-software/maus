@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
-  MAUS::TrackerDataPlotterInfoBox *infoBoxPlotter
-                                  = new MAUS::TrackerDataPlotterInfoBox(275.0, 600.0, 0.585, 0.93);
+  MAUS::TrackerDataPlotterBase *infoBoxPlotter
+                                  = new MAUS::TrackerDataPlotterInfoBox(275, 600, 0.585, 0.93);
   std::vector<MAUS::TrackerDataPlotterBase*> plotters;
   plotters.push_back(xyzPlotter);
   plotters.push_back(infoBoxPlotter);
