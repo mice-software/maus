@@ -6,6 +6,7 @@
 *~
 *.tmp
 .coverage
+tmp
 build/*
 env.sh
 env.csh

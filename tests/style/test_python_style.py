@@ -169,7 +169,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
     def test_python_style(self): #pylint: disable=R0201
         """
-        @brief walk up from $MAUS_ROOT_DIR and run pylint looking for errors
+        Run pylint looking for python style errors
 
         Walks the tree and looks for errors. Measures number of errors by
         counting the number of lines in the pylint summary file. If this
@@ -206,6 +206,11 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
       'tests/cpp_unit/Reconstruction/Global/global_recon_config.py', # data file
       'tests/cpp_unit/Reconstruction/Global/single_muon_json.py', # data file
       'tests/integration/test_simulation/test_tracking_speed/configuration.py']
+      'bin/examples/simulate_particles_in_grid/'+\
+                      'simulate_particles_in_grid_configuration.py', # data file
+      'tests/integration/test_simulation/test_simulate_fs2a_cooling/'+\
+                      'simulate_fs2a_configuration.py', # data file
+    ]
 
 if __name__ == '__main__':
     unittest.main()
