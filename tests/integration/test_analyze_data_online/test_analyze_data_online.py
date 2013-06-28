@@ -82,7 +82,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
 
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
-    def setUp(self): # pylint: disable=C0103
+    def _setUp(self): # pylint: disable=C0103
         """
         Clear any lockfile that exists
         """
@@ -154,14 +154,16 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             self.assertEquals(test_pass, True)
         test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
                              'test_analyze_data_online/04234_04235.cat_histos/')
-        eor_dir = test_dir+'/end_of_run/end_of_run/4235/'
-        self.assertTrue(os.path.exists(eor_dir))
-        ref_png = [item.split('/')[-1] for item in glob.glob(ref_dir+'*.png')]
+        eor_dir = test_dir+'end_of_run/4235/'
+        self.assertTrue(os.path.exists(eor_dir), msg="Failed to find "+eor_dir)
+        ref_png = [item.split('/')[-1] for item in glob.glob(test_dir+'*.png')]
         eor_png = [item.split('/')[-1] for item in glob.glob(eor_dir+'*.png')]
         for item in ref_png:
-            self.assertTrue(item in eor_png, msg = 'Failed to find '+item)
+            self.assertTrue(item in eor_png, msg = "Failed to find '"+item+\
+                            "' in "+str(eor_dir)+" "+str(eor_png))
         for item in eor_png:
-            self.assertTrue(item in ref_png, msg = 'Failed to find '+item)
+            self.assertTrue(item in ref_png, msg = "Failed to find '"+item+\
+                            "' in "+str(eor_dir)+" "+str(ref_png))
       
 
 if __name__ == "__main__":

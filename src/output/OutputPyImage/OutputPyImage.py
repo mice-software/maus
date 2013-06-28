@@ -104,7 +104,8 @@ class OutputPyImage:
         if json_doc["maus_event_type"] == "Image":
             if "image_list" not in json_doc:
                 raise KeyError("Expected image_list in json_doc")      
-            self.last_event = json_doc
+            if len(json_doc["image_list"]) > 0: # could search for unique tags
+                self.last_event = json_doc
             for image in json_doc["image_list"]:
                 self.__handle_image(image, False)
         elif json_doc["maus_event_type"] == "RunFooter":
@@ -169,7 +170,7 @@ class OutputPyImage:
             directory = self.end_of_run_directory+"/"+str(self.run_number)
         if not os.path.exists(directory):
             os.makedirs(directory) 
-        if (not os.path.isdir(directory)):
+        if not os.path.isdir(directory):
             raise ValueError("image_directory is a file: %s" % directory)
         file_path = os.path.join(directory, file_name)
         return file_path
