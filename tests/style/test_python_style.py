@@ -205,7 +205,7 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
       'src/common_py/ConfigurationDefaults.py', # data file
       'tests/cpp_unit/Reconstruction/Global/global_recon_config.py', # data file
       'tests/cpp_unit/Reconstruction/Global/single_muon_json.py', # data file
-      'tests/integration/test_simulation/test_tracking_speed/configuration.py']
+      'tests/integration/test_simulation/test_tracking_speed/configuration.py',
       'bin/examples/simulate_particles_in_grid/'+\
                       'simulate_particles_in_grid_configuration.py', # data file
       'tests/integration/test_simulation/test_simulate_fs2a_cooling/'+\

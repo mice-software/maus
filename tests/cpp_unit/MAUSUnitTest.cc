@@ -41,7 +41,7 @@ int parse_flags(int argc, char **argv) {
     };
     int option = 0;
     int option_index = 0;
-    while(option != -1) {
+    while (option != -1) {
         option = getopt_long_only(argc, argv, "", long_options, &option_index);
         if (option == _verbose_level) {
             std::stringstream ss(optarg);
