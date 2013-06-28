@@ -132,8 +132,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Check that analyze_data_online makes good histos for full run
         """
-        returncode = run_process("04234_04235.cat", '_histos')
-        self.assertEquals(returncode, 0)
+        self.assertEquals(0, run_process("04234_04235.cat", '_histos'))
         pass_dict = {}
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
@@ -142,8 +141,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
                '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
-                test_root = temp_dir('04234_04235.cat_histos')+\
-                                                         ref_root.split('/')[-1]
+                test_root = temp_dir(data)+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
                                                    test_root,
                                                    ref_root,

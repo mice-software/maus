@@ -23,7 +23,6 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
-import datetime
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 

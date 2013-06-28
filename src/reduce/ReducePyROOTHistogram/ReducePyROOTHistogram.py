@@ -152,7 +152,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         try:
             json_doc = json.loads(json_string.rstrip())
         except Exception: # pylint:disable=W0703
-            ErrorHandler.HandleException(json_doc, self)
+            def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
 
         self.spill_count = self.spill_count + 1
@@ -161,7 +161,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         try:
             result = self._update_histograms(json_doc)
         except Exception: # pylint:disable=W0703
-            ErrorHandler.HandleException(json_doc, self)
+            def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
         image_list = [image['image'] for image in result]
         # Convert results to strings.
