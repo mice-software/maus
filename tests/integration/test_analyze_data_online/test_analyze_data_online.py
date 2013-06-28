@@ -82,7 +82,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
 
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
-    def _setUp(self): # pylint: disable=C0103
+    def setUp(self): # pylint: disable=C0103
         """
         Clear any lockfile that exists
         """
@@ -94,14 +94,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             shutil.rmtree(TMP_DIR)
         os.makedirs(TMP_DIR)
 
-        target =  TMP_DIR+"04234_04235.cat"
+        target =  TMP_DIR+"test_data.cat"
         if os.path.lexists(target):
             print 'Removing', target
             os.remove(target)
             time.sleep(1)
         share = os.path.expandvars(
                      "${MAUS_THIRD_PARTY}/third_party/install/share/test_data/")
-        share = share+"04234_04235.cat"
+        share = share+"test_data.cat"
         print "Linking", share, "to", target 
         os.symlink(share, target)
         online_okay = os.path.expandvars('$MAUS_ROOT_DIR/tests/integration/'+\
@@ -132,12 +132,12 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Check that analyze_data_online makes good histos for full run
         """
-        self.assertEquals(0, run_process("04234_04235.cat", '_histos'))
+        self.assertEquals(0, run_process("test_data.cat", '_histos'))
         pass_dict = {}
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
-        for data in ['04234_04235.cat_histos']:
+        for data in ['test_data.cat_histos']:
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
                '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
@@ -151,7 +151,7 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
         test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
-                             'test_analyze_data_online/04234_04235.cat_histos/')
+                             'test_analyze_data_online/test_data.cat_histos/')
         eor_dir = test_dir+'end_of_run/4235/'
         self.assertTrue(os.path.exists(eor_dir), msg="Failed to find "+eor_dir)
         ref_png = [item.split('/')[-1] for item in glob.glob(test_dir+'*.png')]

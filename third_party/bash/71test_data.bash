@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-run_list="04234 04235"
+run_list="04234 04258 04235"
 if [ ! -n "${MAUS_THIRD_PARTY+x}" ]; then
     echo
     echo "FATAL: MAUS_THIRD_PARTY is not set" >&2
@@ -56,6 +56,21 @@ do
 done
 
 echo "INFO: Concatenating run data"
-cat ${destdir}/04234.000 ${destdir}/04235.000 \
-                                              >& ${destdir}/04234_04235.cat
+cat_file=${destdir}/test_data.cat
+if [ -e ${cat_file} ]
+then
+    rm ${cat_file}
+fi
+touch ${destdir}/test_data.cat
+for item in ${run_list}
+do
+    file_list=`ls ${destdir}/${item}.0*`
+    for a_file in ${file_list}
+    do
+        cat ${cat_file} ${a_file} >& ${cat_file}.tmp
+        mv ${cat_file}.tmp ${cat_file}
+    done
+done
+echo "INFO: Following files were downloaded"
+ls ${destdir}
 
