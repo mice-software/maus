@@ -42,6 +42,10 @@ namespace MAUS {
 
 class TrackerDataManager {
   public:
+
+    /** Make the Pattern Recognition reducer a friend for testing purposes */
+    friend class ReduceCppPatternRecognition;
+
     /** Constructor */
     TrackerDataManager();
 
@@ -57,6 +61,12 @@ class TrackerDataManager {
     /**  Draw data using TrackerDataPlotter classes */
     void draw(std::vector<TrackerDataPlotterBase*> plotters);
 
+    /** Get whether to print track info to screen */
+    bool get_print_tracks() { return _print_tracks; }
+
+    /** Get whether to print seed info to screen */
+    bool get_print_seeds() { return _print_seeds; }
+
     /** Make a circle using ROOT TArc function */
     TArc make_circle(double x0, double y0, double rad);
 
@@ -64,7 +74,8 @@ class TrackerDataManager {
     TF1 make_str_track(double c, double m, double zmin, double zmax);
 
     /** Make a function for the z-x projection of the helix */
-    TF1 make_xz(double circle_x0, double rad, double dsdz, double sz_c, double zmin, double zmax);
+    TF1 make_xz(int handness, double circle_x0, double rad, double dsdz,
+                double sz_c, double zmin, double zmax);
 
     /** Make a function for the z-y projection of the helix */
     TF1 make_yz(double circle_y0, double rad, double dsdz, double sz_c, double zmin, double zmax);
@@ -81,9 +92,18 @@ class TrackerDataManager {
     /** Print info for whole run */
     void print_run_info();
 
+    /** Set whether to print track info to screen */
+    void set_print_tracks(bool b) { _print_tracks = b; }
+
+    /** Set whether to print seed info to screen */
+    void set_print_seeds(bool b) { _print_seeds = b; }
+
   private:
     // Bit of physics, factor translating radius to transverse momentum, pt = _RtoPt * rad
     static const double _RtoPt = 1.2;
+
+    bool _print_tracks;
+    bool _print_seeds;
 
     // Variables to hold running totals over multiple spills
     int _t1_sp;

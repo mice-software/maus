@@ -38,7 +38,9 @@
 namespace MAUS {
 
 TrackerDataManager::TrackerDataManager()
-  : _t1_sp(0),
+  : _print_tracks(true),
+    _print_seeds(true),
+    _t1_sp(0),
     _t2_sp(0),
     _t1_seeds(0),
     _t2_seeds(0),
@@ -66,16 +68,21 @@ void TrackerDataManager::process(const Spill *spill) {
     std::cout << "\nOpening spill " << spill->GetSpillNumber() << std::endl;
 
     // Loop over recon events
-    for (size_t i = 0;  i < spill->GetReconEvents()->size(); ++i) {
+    for (size_t i = 0; i < spill->GetReconEvents()->size(); ++i) {
       SciFiEvent *evt = (*spill->GetReconEvents())[i]->GetSciFiEvent();
+
+      _t1._spill_num = spill->GetSpillNumber();
+      _t2._spill_num = spill->GetSpillNumber();
 
       // Loop over digits
       for (size_t j = 0; j < evt->digits().size(); ++j) {
         SciFiDigit *dig = evt->digits()[j];
         if ( dig->get_tracker() == 0 ) {
           ++_t1._num_digits;
+          _t1._num_events = spill->GetReconEvents()->size();
         } else if ( dig->get_tracker() == 1 ) {
           ++_t2._num_digits;
+          _t2._num_events = spill->GetReconEvents()->size();
         }
       }
 
@@ -129,7 +136,7 @@ void TrackerDataManager::process(const Spill *spill) {
         SciFiHelicalPRTrack *trk = evt->helicalprtracks()[j];
 
         // Print track info to screen
-        print_track_info(trk, i);
+        if (_print_tracks) print_track_info(trk, i);
 
         // Pull out turning angles for each track seed
         std::vector<double> phi_i;
@@ -144,6 +151,7 @@ void TrackerDataManager::process(const Spill *spill) {
         double rad = trk->get_R();
         double dsdz = trk->get_dsdz();
         double sz_c = trk->get_line_sz_c();
+        int handness = -1;
 
         if ( trk->get_tracker() == 0 ) {
           if ( trk->get_num_points() == 5 ) ++_t1._num_htracks_5pt;
@@ -153,7 +161,7 @@ void TrackerDataManager::process(const Spill *spill) {
           _t1._seeds_s.push_back(s_i);
           _t1._trks_xy.push_back(make_circle(x0, y0, rad));
           dsdz = - dsdz;  // Needed due to the way we plot...
-          _t1._trks_xz.push_back(make_xz(x0, rad, dsdz, sz_c, _zmin, _zmax));
+          _t1._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
           _t1._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
         } else if ( trk->get_tracker() == 1 ) {
           if ( trk->get_num_points() == 5 ) ++_t2._num_htracks_5pt;
@@ -162,16 +170,16 @@ void TrackerDataManager::process(const Spill *spill) {
           _t2._seeds_phi.push_back(phi_i);
           _t2._seeds_s.push_back(s_i);
           _t2._trks_xy.push_back(make_circle(x0, y0, rad));
-          _t2._trks_xz.push_back(make_xz(x0, rad, dsdz, sz_c, _zmin, _zmax));
+          _t2._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
           _t2._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
         }
 
         // Loop over track seed spacepoints
-        std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\n";
+        if (_print_seeds) std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\n";
         for ( size_t j = 0; j < trk->get_spacepoints().size(); ++j ) {
           if ( trk->get_tracker() == 0 ) ++_t1._num_seeds;
           if ( trk->get_tracker() == 1 ) ++_t2._num_seeds;
-          print_seed_info(trk, j);
+          if (_print_seeds) print_seed_info(trk, j);
         }
       } // ~ loop over helical tracks
     } // ~ loop over recon events
@@ -249,14 +257,15 @@ TF1 TrackerDataManager::make_str_track(double c, double m, double zmin, double z
   return trk;
 };
 
-TF1 TrackerDataManager::make_xz(double circle_x0, double rad, double dsdz,
+TF1 TrackerDataManager::make_xz(int handness, double circle_x0, double rad, double dsdz,
                                 double sz_c, double zmin, double zmax) {
     // The x in the cos term is actually representing z (the indep variable)
-    TF1 func = TF1("xz_func", "[0]+([1]*cos((1/[1])*([2]*x+[3])))", zmin, zmax);
+    TF1 func = TF1("xz_func", "[0]+[4]*([1]*cos((1/[1])*([2]*x+[3])))", zmin, zmax);
     func.SetParameter(0, circle_x0);
     func.SetParameter(1, rad);
     func.SetParameter(2, dsdz);
     func.SetParameter(3, sz_c);
+    func.SetParameter(4, handness);
     func.SetLineColor(kBlue);
     return func;
 };

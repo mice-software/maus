@@ -45,8 +45,8 @@ TrackerDataPlotterInfoBox::TrackerDataPlotterInfoBox()
     _tot_5stracks_t2(0),
     _tot_4stracks_t2(0),
     _tot_3stracks_t2(0),
-    _canvas_width(275.0),
-    _canvas_height(600.0),
+    _canvas_width(275),
+    _canvas_height(600),
     _line1_pos(0.585),
     _line2_pos(0.93) {
     _p_label = new TPaveText(.0, .0, 0.55, 1.0);
@@ -56,7 +56,7 @@ TrackerDataPlotterInfoBox::TrackerDataPlotterInfoBox()
     _line2 = new TLine(0.0, _line2_pos, 1.0, _line2_pos);
 }
 
-TrackerDataPlotterInfoBox::TrackerDataPlotterInfoBox(double canvas_width, double canvas_height,
+TrackerDataPlotterInfoBox::TrackerDataPlotterInfoBox(int canvas_width, int canvas_height,
                                                      double line1_pos, double line2_pos)
   : TrackerDataPlotterBase(),
     _setup_true(false),
@@ -139,8 +139,11 @@ TCanvas* TrackerDataPlotterInfoBox::operator() ( TrackerData &t1, TrackerData &t
   if ( aCanvas ) {
     lCanvas = aCanvas;
   } else {
-    if (_Canvas) delete _Canvas;
+    if (_Canvas) {
+      _Canvas->Clear();
+    } else {
     _Canvas = new TCanvas("c_info", "Info Box", 1500, 000, _canvas_width, _canvas_height);
+    }
     lCanvas = _Canvas;
   }
 
@@ -215,7 +218,6 @@ TCanvas* TrackerDataPlotterInfoBox::operator() ( TrackerData &t1, TrackerData &t
   _line1->Draw();
   _line2->Draw();
   lCanvas->Update();
-  lCanvas->SaveAs("infoBox.pdf");
 
   return lCanvas;
 }
