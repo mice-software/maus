@@ -50,6 +50,10 @@ namespace MAUS {
 
 class MapCppTrackerDigits {
  public:
+  MapCppTrackerDigits();
+
+  ~MapCppTrackerDigits();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -71,9 +75,9 @@ class MapCppTrackerDigits {
    */
   std::string process(std::string document);
 
-  void read_in_json(std::string document);
+  void read_in_json(std::string json_data);
 
-  void save_to_json(MAUS::Spill &spill);
+  void save_to_json(MAUS::Spill *spill);
 
  private:
   /// This should be the classname

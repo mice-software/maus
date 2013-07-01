@@ -24,11 +24,10 @@
 
 namespace MAUS {
 
-MapCppTrackerDigits::MapCppTrackerDigits()
-    : _spill_json(NULL), _spill_cpp(NULL) {
-}
+MapCppTrackerDigits::MapCppTrackerDigits(): _spill_json(NULL),
+                                            _spill_cpp(NULL) {}
 
-bool MapCppTrackerDigits::~MapCppTrackerDigits() {
+MapCppTrackerDigits::~MapCppTrackerDigits() {
   if (_spill_json != NULL) {
     delete _spill_json;
   }
@@ -46,7 +45,41 @@ bool MapCppTrackerDigits::death() {
   return true;
 }
 
-void MapCppTrackerDigits::read_in_json(std::string document) {
+std::string MapCppTrackerDigits::process(std::string document) {
+  Json::FastWriter writer;
+
+  read_in_json(document);
+
+  try {
+    if ( _json_root.isMember("daq_data") && !(_json_root["daq_data"].isNull()) ) {
+      // Get daq data.
+      Json::Value daq = _json_root.get("daq_data", 0);
+      // Fill spill object with
+      RealDataDigitization real;
+      real.initialise();
+      real.process(_spill_cpp, daq);
+      // Save to JSON output.
+      save_to_json(_spill_cpp);
+    } else {
+      return writer.write(_json_root);
+    }
+  // If an exception is caught, the JSON file returned is the same that was read-in (_json_root)...
+  } catch(Squeal& squee) {
+    squee.Print();
+    return writer.write(_json_root);
+  } catch(...) {
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says:" << reader.getFormatedErrorMessages();
+    errors["bad_json_document"] = ss.str();
+    _json_root["errors"] = errors;
+    return writer.write(_json_root);
+  }
+  // ... if everything went alright, we return a modified spill (_spill_json).
+  return writer.write(*_spill_json);
+}
+
+void MapCppTrackerDigits::read_in_json(std::string json_data) {
   Json::FastWriter writer;
   if (_spill_cpp != NULL) {
     delete _spill_cpp;
@@ -54,11 +87,9 @@ void MapCppTrackerDigits::read_in_json(std::string document) {
   }
 
   try {
-    json_root = JsonWrapper::StringToJson(document);
-    if ( json_root.isMember("daq_data") && !(json_root["daq_data"].isNull()) ) {
-      SpillProcessor spill_proc;
-      _spill_cpp = spill_proc.JsonToCpp(json_root);
-    }
+    _json_root = JsonWrapper::StringToJson(json_data);
+    SpillProcessor spill_proc;
+    _spill_cpp = spill_proc.JsonToCpp(_spill_json);
   } catch(...) {
     Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
@@ -68,58 +99,15 @@ void MapCppTrackerDigits::read_in_json(std::string document) {
     errors["bad_json_document"] = ss.str();
     _spill_cpp->GetErrors();
   }
-
-  // Check for existant pointers to ReconEvents and DAQData
-  if ( _spill_cpp.GetDAQData() == NULL )
-    _spill_cpp.SetDAQData(new DAQData());
-
-  if (_spill_cpp.GetReconEvents() == NULL)
-    _spill_cpp.SetReconEvents(new ReconEventArray());
 }
 
-
-std::string MapCppTrackerDigits::process(std::string document) {
-  Json::FastWriter writer;
-
-  read_in_json(document);
-  Spill& spill = *_spill_cpp;
-
-  try {
-    if ( spill ) {
-      // Get daq data.
-      Json::Value daq = _json_root.get("daq_data", 0);
-      // Fill spill object with 
-      RealDataDigitization real;
-      real.initialise();
-      real.process(spill, daq);
-      // Save to JSON output.
-      save_to_json(spill);
-    }
-  } catch(Squeal& squee) {
-    squee.Print();
-    root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
-  } catch(...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-  return writer.write(root);
-}
-
-void MapCppTrackerDigits::save_to_json(Spill &spill) {
+void MapCppTrackerDigits::save_to_json(Spill *spill) {
   SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill, "");
-
-    SpillProcessor spill_proc;
-    if (_spill_json != NULL) {
-        delete _spill_json;
-        _spill_json = NULL;
-    }
-    _spill_json = spill_proc.CppToJson(spill, "");
+  if (_spill_json != NULL) {
+      delete _spill_json;
+      _spill_json = NULL;
+  }
+  _spill_json = spill_proc.CppToJson(*spill, "");
 }
 
 } // ~namespace MAUS

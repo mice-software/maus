@@ -124,7 +124,7 @@ TEST_F(RealDataDigitizationTest, test_process) {
   Json::Value daq = root.get("daq_data", 0);
 
   RealDataDigitization test_case;
-  test_case.process(spill, daq);
+  test_case.process(&spill, daq);
   ASSERT_TRUE(spill.GetReconEvents()->size() > 0);
   // Needs more...
 }

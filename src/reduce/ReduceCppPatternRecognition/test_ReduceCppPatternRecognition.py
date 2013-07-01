@@ -90,8 +90,7 @@ class ReduceCppPatternRecognitionTestCase(unittest.TestCase):
         self.reducer.death()
         foutput = ROOT.TFile('reduce_pattern_recognition.root')
         stracks = foutput.Get('stracks')
-        # Ed: Removing this assertion just for now...
-        # self.assertEqual(stracks.GetEntries(), 7)
+        self.assertEqual(stracks.GetEntries(), 9) #TODO: Check this test
 
     def tearDown(self): #pylint: disable = C0103
         """Check death works"""

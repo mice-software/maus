@@ -122,6 +122,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
     SciFiDigitPArray digits;
+    int seed = mc_evt->GetPrimary()->GetRandomSeed();
     if ( mc_evt->GetSciFiHits() ) {
       construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
                        static_cast<int>(event_i), digits);
@@ -129,7 +130,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
     // Adds Effects of Noise from Electrons to MC
     // if (_configJSON["SciFiNoiseFlag"].asInt()) {
-    //  add_elec_noise(digits, spill.GetSpillNumber(), static_cast<int>(event_i));
+    //  add_elec_noise(digits, seed, spill.GetSpillNumber(), static_cast<int>(event_i));
     // }
 
     // Make a SciFiEvent to hold the digits produced
@@ -220,14 +221,14 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
   } // ends 'for' loop over hits
 }
 
-void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits,
+void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits, int seed,
                                                  int spill_num, int event_num) {
   double numPE;
   int exist_flag, entry;
   double cross_sigma, cross_amp, dark_prob;
   double time1 = 0.;
 
-  srand(time(NULL));
+  srand(seed);
   for ( int i = 0; i < modules.size(); i++ ) {
     int nChannels = 2*((modules[i]->propertyDouble("CentralFibre"))+0.5);
     for ( int j = 0; j < nChannels; j++ ) {

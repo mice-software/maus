@@ -214,6 +214,9 @@ class PatternRecognition {
     bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
                       std::vector<double> &true_dphi);
 
+    bool find_n_turns2(const std::vector<double> &dz, const std::vector<double> &dphi,
+                       std::vector<double> &true_dphi);
+
 
     /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
      *
