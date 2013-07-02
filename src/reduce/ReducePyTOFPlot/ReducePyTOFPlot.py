@@ -23,7 +23,6 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
-
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
@@ -156,13 +155,14 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         # Read in configuration flags and parameters - these will
         # overwrite whatever defaults were set in __init__.
-        if 'refresh_rate' in config_doc:
-            self.refresh_rate = int(config_doc["refresh_rate"])
+        if 'reduce_plot_refresh_rate' in config_doc:
+            self.refresh_rate = int(config_doc["reduce_plot_refresh_rate"])
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()
         self.run_ended = False
         return True
+
 
     def _update_histograms(self, spill):
         """
@@ -186,9 +186,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
-                return [{}]
-        # elif spill["daq_event_type"] != "physics_event":
-        #    return spill
+                return []
 
         # do not try to get data from start/end spill markers
         data_spill = True
@@ -210,7 +208,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             self.update_histos()
             return self.get_histogram_images()
         else:
-            return [spill]
+            return []
 
     def get_slab_hits(self, spill):
         """ 

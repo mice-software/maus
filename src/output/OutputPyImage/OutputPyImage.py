@@ -59,7 +59,7 @@ class OutputPyImage:
         self.file_prefix = "image"
         self.directory = os.getcwd()
         self.end_of_run_directory = os.getcwd()+'/end_of_run/'
-        self.last_event = {}
+        self.last_event = {'maus_event_type':'Image', 'image_list':[]}
         self.run_number = -9999
 
     def birth(self, config_json):
@@ -100,16 +100,21 @@ class OutputPyImage:
         """
         json_doc = json.loads(document)
         if "maus_event_type" not in json_doc.keys():
-            print json_doc
             raise KeyError("Expected maus_event_type in json_doc")
         if json_doc["maus_event_type"] == "Image":
-            self.last_event = json_doc
+            if "image_list" not in json_doc:
+                raise KeyError("Expected image_list in json_doc")      
+            if len(json_doc["image_list"]) > 0: # could search for unique tags
+                self.last_event = json_doc
             for image in json_doc["image_list"]:
                 self.__handle_image(image, False)
         elif json_doc["maus_event_type"] == "RunFooter":
             self.run_number = json_doc["run_number"]
             for image in self.last_event["image_list"]:
                 self.__handle_image(image, True)
+        else:
+            print "OutputPyImage will not process maus event of type "+\
+                                                str(json_doc["maus_event_type"])
 
     def death(self): #pylint: disable=R0201
         """
@@ -165,7 +170,7 @@ class OutputPyImage:
             directory = self.end_of_run_directory+"/"+str(self.run_number)
         if not os.path.exists(directory):
             os.makedirs(directory) 
-        if (not os.path.isdir(directory)):
+        if not os.path.isdir(directory):
             raise ValueError("image_directory is a file: %s" % directory)
         file_path = os.path.join(directory, file_name)
         return file_path

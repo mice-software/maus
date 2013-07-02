@@ -130,7 +130,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 raise ValueError("collection is not specified")
             else:
                 self.collection = self.config["doc_collection_name"]
-        else:   
+        else:
             self.collection = collection_name
 
     def start_of_job(self, job_header):
@@ -210,9 +210,11 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         """
         spill_doc = json.loads(spill)
         if not "maus_event_type" in spill_doc.keys():
-            raise KeyError("Event with no maus_event_type")
+            raise KeyError("%s\nEvent has no maus_event_type" % \
+                                                json.dumps(spill_doc, indent=2))
         if spill_doc["maus_event_type"] != "Spill":
-            if not self.outputer.save(str(spill)):
+            outputter_ret = self.outputer.save(str(spill))
+            if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
         else:
             # Check for change in run.
@@ -227,7 +229,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 self.start_of_run()
            # Handle current spill.
             merged_spill = self.merger.process(spill)
-            if not self.outputer.save(str(merged_spill)):
+            outputter_ret = self.outputer.save(str(merged_spill))
+            if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
             self.spill_process_count += 1
             print "Spills processed: %d" % self.spill_process_count
@@ -362,6 +365,9 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @param max_number_of_retries Integer number of times to retry accessing
                document before giving up
         @param retry_time time to wait between retries 
+        @throws DocumentStoreException if there was a problem accessing the
+                docstore
+        @throws StopIteration if the docstore was empty
         """
         # Note retry counter 
         retry_counter = 0
@@ -370,7 +376,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 return _docs.next()
             except StopIteration:
                 raise
-            except pymongo.errors.OperationFailure as err:
+            except (AssertionError, pymongo.errors.OperationFailure) as err:
                 if retry_counter >= max_number_of_retries:
                     print 'Failed to access docstore - giving up'
                     raise DocumentStoreException(err)
