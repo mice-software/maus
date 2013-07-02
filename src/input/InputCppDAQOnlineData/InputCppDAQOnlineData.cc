@@ -51,6 +51,14 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
 
   // _dataProcessManager.DumpProcessors();
 
+  // online mimic is available for testing purposes only
+  if (configJSON.isMember("DAQ_online_file") &&
+      configJSON["DAQ_online_file"].asString() != "") {
+    Squeak::mout(Squeak::debug) << "Using online file mimic with file "
+                                << configJSON["DAQ_online_file"].asString()
+                                << std::endl;
+    setMonitorSrc(configJSON["DAQ_online_file"].asString());
+  }
   return true;
 }
 

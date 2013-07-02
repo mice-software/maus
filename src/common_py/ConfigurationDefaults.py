@@ -296,13 +296,16 @@ Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
+DAQ_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
+                     # data from a file - mock-up of online for testing, not for
+                     # production use (use offline recon here)
 
 # tof digitization
 TOFconversionFactor = 0.005 # MeV
 TOFpmtTimeResolution = 0.1 # nanosecond
 TOFattenuationLength = 140 * 10 # mm
 TOFadcConversionFactor = 0.125
-TOFtdcConversionFactor = 0.0244140625 # nanosecond
+TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 

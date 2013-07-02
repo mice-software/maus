@@ -21,6 +21,7 @@ Tests for MongoDBDocumentStore module.
 import pymongo
 import unittest
 
+import docstore
 from docstore.MongoDBDocumentStore import MongoDBDocumentStore
 from test_docstore.test_DocumentStoreBase import DocumentStoreTests
 
@@ -88,7 +89,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         parameters = {"mongodb_host":"nonExistant", "mongodb_port":999999}
         try:
             self._data_store.connect(parameters)
-        except pymongo.errors.ConnectionFailure:
+        except docstore.DocumentStore.DocumentStoreException:
             pass
 
     def test_connect_bad_port(self):
@@ -100,7 +101,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         parameters = {"mongodb_host":self._host, "mongodb_port":999999}
         try:
             self._data_store.connect(parameters)
-        except pymongo.errors.ConnectionFailure:
+        except docstore.DocumentStore.DocumentStoreException:
             pass
 
     def test_connect_no_database_name(self):

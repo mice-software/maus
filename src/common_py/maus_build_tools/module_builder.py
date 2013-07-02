@@ -234,6 +234,8 @@ class ModuleBuilder:
                 # map -> MapCpp, input -> InputCpp, etc
                 if parts[2].find(my_type.capitalize()+'Cpp') == 0:
                     print 'Found C++ module: %s' % parts[2]
+                    if os.path.exists(fail_path(directory)):
+                        os.remove(fail_path(directory))
                     self.subproject(directory, self.env, self.conf)
                     if build_okay(directory):
                         cpp_libs.append(parts[2])
@@ -294,6 +296,16 @@ def build_maus_lib(filename, stuff_to_import):
 
     file_to_import.close()
 
+def fail_path(directory):
+    """
+    Return the name of the temporary file that flags a failed subproject build
+    """
+    _fail_path = os.path.split(directory)[-1]
+    _fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp',
+                                                     _fail_path+'_failed_build')
+    _fail_path = os.path.expandvars(_fail_path)
+    return _fail_path
+
 def build_okay(directory):
     """
     Return true if the project at <directory> built okay. Else return false.
@@ -302,8 +314,5 @@ def build_okay(directory):
     So to indicate a failed build we make a temporary file called
     <project>_failed_build in sconscript and then look for it here.
     """
-    fail_path = os.path.split(directory)[-1]
-    fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
-    fail_path = os.path.expandvars(fail_path)
-    return not os.path.exists(fail_path)
+    return not os.path.exists(fail_path(directory))
 

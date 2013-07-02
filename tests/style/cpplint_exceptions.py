@@ -68,6 +68,11 @@ exceptions[os.path.join(CPP_CM, 'Maths','Vector.hh')] = [
  'cpplint confused by STL copy constructor', 'lane')
 ]
 
+exceptions[os.path.join(CPP_CM, 'DataStructure', 'ThreeVector.hh')] = [
+('	  ThreeVector(const TVector3& value) : TVector3(value) {}',
+ 'explicit conversion is okay from ROOT to ThreeVectpr', 'rogers')
+]
+
 exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
 ('  } catch (Squeal squee) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')

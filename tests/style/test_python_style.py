@@ -204,8 +204,8 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
       'src/common_py/SpillSchema.py', # data file
       'src/common_py/ConfigurationDefaults.py', # data file
       'tests/cpp_unit/Reconstruction/Global/global_recon_config.py', # data file
-      'tests/cpp_unit/Reconstruction/Global/single_muon_json.py'] # data file
-
+      'tests/cpp_unit/Reconstruction/Global/single_muon_json.py', # data file
+      'tests/integration/test_simulation/test_tracking_speed/configuration.py']
 
 if __name__ == '__main__':
     unittest.main()

@@ -84,7 +84,7 @@ def process_birth(pids, config_id, transform, configuration, run_number):
     Create and birth a new transform. This is invoked in a sub-process
     via a call from the Celery master process. Any existing transform
     is death-ed first. 
-    @aram pids List of process IDs whose process_birth method has been
+    @param pids List of process IDs whose process_birth method has been
     invoked. If this process is in the list then this method just returns
     (PID, None).
     @param config_id Configuration ID from client.
@@ -117,6 +117,8 @@ def process_birth(pids, config_id, transform, configuration, run_number):
             MausConfiguration.configuration = configuration
             MausConfiguration.transform = transform
             MausConfiguration.config_id = config_id
+            if logger.isEnabledFor(logging.INFO):
+                logger.info("Finished birthing transforms %s" % transform)
         except Exception as exc: # pylint:disable = W0703
             status = {}
             status["error"] = str(exc.__class__)

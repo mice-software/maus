@@ -70,7 +70,7 @@ beam = {
     ##### PIONS #####
     { # as above...
        "reference":{
-           "position":{"x":0.0, "y":-0.0, "z":-5500.0},
+           "position":{"x":0.0, "y":-0.0, "z":0.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
            "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
        },
@@ -88,7 +88,7 @@ beam = {
     ##### ELECTRONS #####
     { # as above...
         "reference":{
-            "position":{"x":0.0, "y":-0.0, "z":-5500.0},
+            "position":{"x":0.0, "y":-0.0, "z":0.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
         },

@@ -3,7 +3,7 @@
 
 # Setup env.sh environment for MAUS installation
 
-root_version=root_v5.30.03
+root_version=root_v5.34.07
 
 maus_root_dir=`pwd -P`
 maus_third_party=""
@@ -204,6 +204,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
         export maus_assert_active=0 # enable assert() command - disabled by default
                                     # as better to use exceptions
      fi
+
+     source "\${MAUS_THIRD_PARTY}/third_party/install/lib/maus-apps/env.sh"
 
      echo "SUCCESS: MAUS setup"
 else

@@ -44,8 +44,8 @@ TEST_F(SciFiSpacePointRecTest, test_process) {
   int channel = 106;
   double npe = 3.2;
   double time = 12.2;
-  Hep3Vector direction(0.0, 0.0, 1.0);
-  Hep3Vector position(1.0, 2.0, 3.0);
+  ThreeVector direction(0.0, 0.0, 1.0);
+  ThreeVector position(1.0, 2.0, 3.0);
 
   SciFiCluster *Cluster = new SciFiCluster();
 
@@ -82,10 +82,10 @@ TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
   SciFiCluster* c1 = new SciFiCluster();
   SciFiCluster* c2 = new SciFiCluster();
 
-  Hep3Vector pos1(5.78222, -11.6053, -751.132);
-  Hep3Vector pos2(-50.6352, -0.604, -749.828);
-  Hep3Vector dir1(-0.866025, -0.5, 0);
-  Hep3Vector dir2(0.866025, -0.5, 0);
+  ThreeVector pos1(5.78222, -11.6053, -751.132);
+  ThreeVector pos2(-50.6352, -0.604, -749.828);
+  ThreeVector dir1(-0.866025, -0.5, 0);
+  ThreeVector dir2(0.866025, -0.5, 0);
 
   c1->set_direction(dir1);
 
@@ -98,8 +98,8 @@ TEST_F(SciFiSpacePointRecTest, test_duplet_radius) {
   bool test_1 = a_test.duplet_within_radius(c1, c2);
   EXPECT_TRUE(test_1);
 
-  Hep3Vector pos3(300.0, -11.6053, -751.132);
-  Hep3Vector pos4(300.0, -0.604, -749.828);
+  ThreeVector pos3(300.0, -11.6053, -751.132);
+  ThreeVector pos4(300.0, -0.604, -749.828);
   c1->set_direction(pos3);
   c2->set_direction(pos4);
   bool test_2 = a_test.duplet_within_radius(c1, c2);
