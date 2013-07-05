@@ -55,7 +55,10 @@ class TrackerDataManager {
     friend class ReduceCppPatternRecognition;
 
     // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataManagerTest, TestClear);
     FRIEND_TEST(TrackerDataManagerTest, TestConstructor);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessDigits);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessClusters);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessHtrks);
 
     /** Constructor */

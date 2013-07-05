@@ -55,6 +55,8 @@ class TrackerData {
     // Macros to allow friendship with the gtests
     FRIEND_TEST(TrackerDataTest, TestConstructor);
     FRIEND_TEST(TrackerDataTest, TestClear);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessDigits);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessClusters);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessHtrks);
 
     /** Constructor */

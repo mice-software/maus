@@ -33,8 +33,6 @@
 #include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
 
-
-
 namespace MAUS {
 
 TrackerDataManager::TrackerDataManager()
