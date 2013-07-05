@@ -34,6 +34,11 @@
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerData.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
 
@@ -80,8 +85,25 @@ class TrackerDataManager {
     /** Make a function for the z-y projection of the helix */
     TF1 make_yz(double circle_y0, double rad, double dsdz, double sz_c, double zmin, double zmax);
 
-    /** Main control function. spill is a const pointer to const data. */
+    /** Main control function, processes a spill */
     void process(const Spill *spill);
+
+    /** Process the scifi digits in the current event.  Need to pass the spill as well
+        as we use the digits to pull out the number of recon events in each tracker.
+     */
+    void process_digits(const Spill *spill, const std::vector<SciFiDigit*> digits);
+
+    /** Process the scifi clusters in the current event */
+    void process_clusters(const std::vector<SciFiCluster*> clusters);
+
+    /** Process the scifi spacepoints in the current event */
+    void process_spoints(const std::vector<SciFiSpacePoint*> spoints);
+
+    /** Process the scifi pattern recognition straight tracks in the current event */
+    void process_strks(const std::vector<SciFiStraightPRTrack*> strks);
+
+    /** Process the scifi pattern recognition helical tracks in the current event */
+    void process_htrks(const std::vector<SciFiHelicalPRTrack*> htrks);
 
     /** Print info about the track */
     void print_track_info(const SciFiHelicalPRTrack * const trk, int trk_num);

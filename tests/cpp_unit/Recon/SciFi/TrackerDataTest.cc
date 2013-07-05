@@ -62,7 +62,7 @@ TEST_F(TrackerDataTest, TestClear) {
   TF1 f1("f1", "2*x", 0.0, 1.0);
   std::vector<double> x;
   x.push_back(1.0);
-  
+
   // Set the member variables to some non-zero values
   td._spill_num = 1;
   td._trker_num = 1;
@@ -89,10 +89,10 @@ TEST_F(TrackerDataTest, TestClear) {
   td._trks_xz.push_back(f1);
   td._trks_yz.push_back(f1);
   td._trks_sz.push_back(f1);
-  
+
   // Clear the container
   td.clear();
-  
+
   // Check everything is set to zero
   EXPECT_EQ(0, td._spill_num);
   EXPECT_EQ(0, td._trker_num);
