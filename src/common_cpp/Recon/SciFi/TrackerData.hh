@@ -33,6 +33,8 @@
 #include "TArc.h"
 #include "TF1.h"
 
+#include "gtest/gtest_prod.h"
+
 // MAUS headers
 
 
@@ -41,16 +43,17 @@ namespace MAUS {
 class TrackerData {
   public:
 
-    /** Make tracker data manager a friend, far easier than writing all the getters and setters */
+    /** Make various classes a friend, far easier than writing all the getters and setters */
     friend class TrackerDataManager;
     friend class ReduceCppPatternRecognition;
-
-    /** Make tracker data plotters friends */
     friend class TrackerDataPlotterBase;
     friend class TrackerDataPlotterXYZ;
     friend class TrackerDataPlotterTracks;
     friend class TrackerDataPlotterSpoints;
     friend class TrackerDataPlotterInfoBox;
+
+    // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataTest, TestConstructor);
 
     /** Constructor */
     TrackerData();
