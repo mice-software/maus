@@ -52,6 +52,8 @@ verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
+                                        # exception
 
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
@@ -72,8 +74,8 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 10000 # particles are killed after this number of
-                                # steps (assumed to be stuck in the fields)
+maximum_number_of_steps = 500000 # particles are killed after this number of
+                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
