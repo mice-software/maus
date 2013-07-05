@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-ReducePyTOFPlot fills TOF histograms for slab hits and space points,
+ReducePyKLPlot fills KL histograms for digits and slab hits,
 draws them, refreshes the canvases and prints to eps at the end of
 run.
 """
@@ -111,6 +112,9 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Has an end_of_run been processed?
         self.run_ended = False
 
+        self.cnv = None
+        self.style = None
+
     def _configure_at_birth(self, config_doc):
         """
         Configure worker from data cards. Overrides super-class method. 
@@ -129,8 +133,7 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         return True
 
     def _update_histograms(self, spill):
-       
-
+        """Update the Histograms """
         if not spill.has_key("daq_event_type"):
             raise ValueError("No event type")
         if spill["daq_event_type"] == "end_of_run":
@@ -143,19 +146,12 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # elif spill["daq_event_type"] != "physics_event":
         #    return spill
 
-        # do not try to get data from start/end spill markers
-        data_spill = True
-        if spill["daq_event_type"] == "start_of_run" \
-              or spill["daq_event_type"] == "start_of_burst" \
-              or spill["daq_event_type"] == "end_of_burst":
-            data_spill = False
-
         # Get KL digits & fill the relevant histograms.
-        if data_spill and not self.get_digits(spill): 
+        if not self.get_digits(spill): 
             raise ValueError("kl digits not in spill")
 
         # Get KL cell hits & fill the relevant histograms.
-        if data_spill and not self.get_cell_hits(spill): 
+        if not self.get_cell_hits(spill): 
             raise ValueError("cell hits not in spill")
 
         # Refresh canvases at requested frequency.
@@ -248,21 +244,18 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         @param self Object reference.
         """ 
-        # have root run quietly without verbose informationals
-        ROOT.gErrorIgnoreLevel = 1001
-
         # white canvas
-        ROOT.gROOT.SetStyle("Plain")
+        self.cnv = ROOT.gROOT.SetStyle("Plain")
         
         #turn off stat box
-        ROOT.gStyle.SetOptStat(0)
+        self.style = ROOT.gStyle.SetOptStat(0)
         
         #sensible color palette
-        ROOT.gStyle.SetPalette(1)
+        self.style = ROOT.gStyle.SetPalette(1)
         
         # xy grid on canvas
-        ROOT.gStyle.SetPadGridX(1)
-        ROOT.gStyle.SetPadGridY(1)
+        self.style = ROOT.gStyle.SetPadGridX(1)
+        self.style = ROOT.gStyle.SetPadGridY(1)
  
         # define histograms
         self.hadc = ROOT.TH1F("h1", "ADC", 100, 0, 5000)
@@ -302,15 +295,14 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         number of spills is divisible by the refresh rate.
         @param self Object reference.
         """
-
-        self.canvas_kl.cd(1)
-        self.hadc.Draw()
-        self.canvas_kl.cd(2)
-        self.hadc_product.Draw()
-        self.canvas_kl.cd(3)
-        self.hprofile.Draw()
-        self.canvas_kl.cd(4)
-        self.digitkl.Draw("text&&colz")
+        #self.canvas_kl.cd(1)
+        #self.hadc.Draw()
+        #self.canvas_kl.cd(2)
+        #self.hadc_product.Draw()
+        #self.canvas_kl.cd(3)
+        #self.hprofile.Draw()
+        #self.canvas_kl.cd(4)
+        #self.digitkl.Draw("text&&colz")
         self.canvas_kl.Update()
 
     def get_histogram_images(self):       
@@ -319,7 +311,6 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @returns list of 1 JSON document containing the images.
         """
         image_list = []
-
         tag = "KL"
         keywords = ["KL"]
         description = "KL"
