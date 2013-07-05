@@ -32,6 +32,9 @@
 #include "TArc.h"
 #include "TF1.h"
 
+// Google test headers
+#include "gtest/gtest_prod.h"
+
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
@@ -50,6 +53,10 @@ class TrackerDataManager {
 
     /** Make the Pattern Recognition reducer a friend for testing purposes */
     friend class ReduceCppPatternRecognition;
+
+    // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataManagerTest, TestConstructor);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessHtrks);
 
     /** Constructor */
     TrackerDataManager();
