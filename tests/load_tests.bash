@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/env bash
 # force nosetests here otherwise use easy_install default python - which is 
 # hard coded to whatever easy_install was set up with (not right if we move code)
 # Issue #819
@@ -9,9 +9,6 @@ if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
 fi
 
 
-MAUS_TEST_PLOT_DIR=${MAUS_ROOT_DIR}/tests/integration/plots/ \
 python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v \
---exclude-dir tests/integration/test_simulation/test_physics_model_full \
---exclude-dir tests/integration/load_tests \
-${MAUS_ROOT_DIR}/tests/integration
+${MAUS_ROOT_DIR}/tests/integration/load_tests
 
