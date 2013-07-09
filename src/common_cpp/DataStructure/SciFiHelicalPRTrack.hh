@@ -29,6 +29,7 @@
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
 #include "src/common_cpp/DataStructure/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SimpleCircle.hh"
@@ -38,7 +39,7 @@ namespace MAUS {
 
 typedef std::vector<double> DoubleArray;
 
-class SciFiHelicalPRTrack {
+class SciFiHelicalPRTrack : public SciFiBasePRTrack {
   public:
 
     /** Default constructor */

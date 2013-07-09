@@ -26,11 +26,12 @@
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
 #include "src/common_cpp/DataStructure/SimpleLine.hh"
 
 namespace MAUS {
 
-class SciFiStraightPRTrack {
+class SciFiStraightPRTrack : public SciFiBasePRTrack {
   public:
     /** Default constructor */
     SciFiStraightPRTrack();
