@@ -73,9 +73,9 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   // What DOESN'T change is the plane relative rotation wrt the tracker frame.
   std::cerr << "Module name: " << _module->fullName() << "\n"
             << "Module GLOBAL rotation: " << _module->globalRotation() << "\n"
-            << "Plane direction: " << dir << "\n"
-            //<< "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
-            << "Rotation relatively to: \n" 
+            // << "Plane direction: " << dir << "\n"
+            // << "Mother Logical Volume is: " << mlv->GetLogicalVolume()->GetName() << "\n"
+            << "Rotation relatively to: \n"
             << "Station: " << _module->relativeRotation(_module->mother()) << "\n"
             << "Tracker: " << _module->relativeRotation(_module->mother()->mother()) << "\n"
             << "Solenoid: " << _module->relativeRotation(_module->mother()->mother()->mother()) << "\n"

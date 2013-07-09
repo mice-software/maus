@@ -40,15 +40,21 @@ void SciFiGeometryHelper::Build() {
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
-      ThreeVector perpendicular(-1., 0, 0);
+      ThreeVector perpendicular(1., 0., 0.);
       // Get the fibre rotation wrt the tracker frame.
       G4RotationMatrix fibre_rotation(module->relativeRotation(module->mother() // plane
+                                                               ->mother()->mother()->mother()));    // tracker, solenoid
+      G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                                ->mother()));    // tracker
 
       direction     *= fibre_rotation;
-      perpendicular *= fibre_rotation;
-      std::cerr << tracker_n << " " << station_n << " " << plane_n << std::endl;
-      std::cerr << direction.x() << " " << direction.y() << " " << direction.z() << std::endl;
+      perpendicular *= internal_fibre_rotation;
+
+      /*
+      std::cerr << tracker_n         << " " << station_n         << " " << plane_n           << std::endl;
+      std::cerr << direction.x()     << " " << direction.y()     << " " << direction.z()     << std::endl;
+      std::cerr << perpendicular.x() << " " << perpendicular.y() << " " << perpendicular.z() << std::endl;
+      */
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).

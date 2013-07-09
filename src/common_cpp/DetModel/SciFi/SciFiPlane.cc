@@ -58,16 +58,21 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4String doubletName = mod->fullName() + "Doublet";
   G4String coreName    = mod->fullName() + "DoubletCores";
 
-  G4RotationMatrix* trot = new G4RotationMatrix(mod->relativeRotation(mod->mother()));
+  // Rotation of the fibre wrt the station body.
+  G4RotationMatrix* pRot = new G4RotationMatrix(mod->relativeRotation(mod->mother()->mother()));
 
-  // this is a fibre
+  // This is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,
                             0.0 * deg, 360.0 * deg);
 
   logicDoublet = new G4LogicalVolume(solidDoublet, mater, doubletName, 0, 0, 0);
 
-  physiDoublet = placeCore = new G4PVPlacement(trot, mod->position(),
+  // Note from G4PVPlacement.hh:
+  // Initialise a single volume, positioned in a frame which is rotated by
+  // "*pRot" and traslated by tlate, relative to the coordinate system of the
+  // mother volume "mlv->GetLogicalVolume()".
+  physiDoublet = placeCore = new G4PVPlacement(pRot, mod->position(),
                                                logicDoublet, doubletName,
                                                mlv->GetLogicalVolume(),
                                                false, 0);
