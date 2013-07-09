@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/SimpleHelix.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 
 namespace MAUS {
 

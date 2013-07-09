@@ -27,7 +27,7 @@
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 
 namespace MAUS {
 
