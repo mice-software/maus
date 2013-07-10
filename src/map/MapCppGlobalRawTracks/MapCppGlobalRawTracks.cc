@@ -34,31 +34,32 @@
 #include "json/json.h"
 
 // Legacy/G4MICE
+#include "Config/MiceModule.hh"
 #include "Interface/Squeal.hh"
 
 // MAUS
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
-#include "src/common_cpp/DataStructure/Data.hh"
-#include "src/common_cpp/DataStructure/GlobalEvent.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
-#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
-#include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
-#include "src/common_cpp/DataStructure/Global/Track.hh"
-#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "DataStructure/Data.hh"
+#include "DataStructure/GlobalEvent.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/SciFiSpacePoint.hh"
+#include "DataStructure/TOFEventSpacePoint.hh"
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "DataStructure/Global/BasePoint.hh"
+#include "DataStructure/Global/SpacePoint.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
-#include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
-#include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "Recon/Global/DataStructureHelper.hh"
+#include "Recon/Global/Detector.hh"
+#include "Recon/Global/Particle.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "Utils/Globals.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Utils/CppErrorHandler.hh"
 
 namespace MAUS {
 
@@ -177,23 +178,36 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
     MAUS::ReconEvent * recon_event,
     MAUS::GlobalEvent * global_event) {
 
-    // Load TOF and SciFi tracks from the appropriate recon event trees
-    GlobalDS::TrackPArray tof_tracks;
-std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
-          << "Loading TOF track..." << std::endl;
-    LoadTOFTrack(recon_event, tof_tracks);
-std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
-          << "Loaded " << tof_tracks.size() << " TOF tracks." << std::endl;
+  // Load TOF and SciFi tracks from the appropriate recon event trees
+  GlobalDS::TrackPArray tracks;
+  std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+            << "Loading TOF track..." << std::endl;
+  LoadTOFTrack(recon_event, tracks);
+  size_t tof_track_count = tracks.size();
+  std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+            << "Loaded " << tof_track_count << " TOF tracks." << std::endl;
 
-    GlobalDS::TrackPArray sci_fi_tracks;
-std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
-          << "Loading SciFi track..." << std::endl;
-    LoadSciFiTrack(recon_event, sci_fi_tracks);
-std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
-          << "Loaded " << sci_fi_tracks.size() << " SciFi tracks." << std::endl;
+  /*
+  GlobalDS::TrackPArray sci_fi_tracks;
+  std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+            << "Loading SciFi track..." << std::endl;
+  */
+  LoadSciFiTrack(recon_event, tracks);
+  size_t sci_fi_track_count = tracks.size() - tof_track_count;
+  std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+            << "Loaded " << sci_fi_track_count << " SciFi tracks."
+            << std::endl;
+
+  // FIXME(Lane) currently assuming only one track...
+  if (tracks.size() > 0) {
+    tracks[0]->SortTrackPointsByZ();
+    tracks[0]->set_mapper_name(kClassname);
+    global_event->add_track_recursive(tracks[0]);
+  }
 
   // Assuming there are an equal number of TOF and SciFi tracks,
   // merge each pair of tracks based on z position of the detectors
+  /*
   GlobalDS::TrackPArray::iterator tof_track = tof_tracks.begin();
   GlobalDS::TrackPArray::iterator sci_fi_track = sci_fi_tracks.begin();
   while (tof_track != tof_tracks.end() ||
@@ -250,6 +264,7 @@ std::cerr << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
       ++sci_fi_track;
     }
   }
+  */
 
   recon_event->SetGlobalEvent(global_event);
 }
@@ -272,7 +287,8 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
 
   std::cout << "DEBUG LoadTOFTrack: space points in TOF0: "
             << tof0_space_points.size() << "\tTOF1: "
-            << tof1_space_points.size() << std::endl;
+            << tof1_space_points.size() << "\tTOF2: "
+            << tof2_space_points.size() << std::endl;
   if (tof0_space_points.size() != tof1_space_points.size()) {
     std::cout << "DEBUG LoadTOFTrack: track has different number of "
               << "space points in TOF0 (" << tof0_space_points.size() << ")"
@@ -371,7 +387,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
 
   // Approximate momenta by using tof0/tof1 and tof1/tof2 position deltas
   TLorentzVector momenta[3];
-  for (size_t index = 0; index < 2; ++index) {
+  for (size_t index = 0; index < 3; ++index) {
     double delta_x = deltas[index].X();
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "delta_x: " << delta_x << std::endl;
@@ -455,7 +471,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     track->AddTrackPoint(*track_point);
   }
 
-  track->SortTrackPointsByZ();
+  //track->SortTrackPointsByZ();
 
   // FIXME(Lane) For now assume we've selected only muon tracks and no decays
   /*
@@ -479,13 +495,33 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
     const double slab_width,
     const size_t number_of_slabs,
     GlobalDS::TrackPoint * track_point) {
+  MiceModule const * const geometry
+    = Globals::GetInstance()->GetReconstructionMiceModules();
+  std::vector<const MiceModule *> module;
+  DataStructureHelper helper = DataStructureHelper::GetInstance();
+  switch (detector.id()) {
+    case GlobalDS::kTOF0:
+      module = helper.FindModulesByName(geometry, "TOF0.dat");
+      break;
+    case GlobalDS::kTOF1:
+      module = helper.FindModulesByName(geometry, "TOF1Detector.dat");
+      break;
+    case GlobalDS::kTOF2:
+      module = helper.FindModulesByName(geometry, "TOF2Detector.dat");
+      break;
+    default: break;
+  }
+  if (module.size() == 0) {
+    return;
+  }
+  const double z = module[0]->globalPosition().z();
   std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: "
             << std::endl
             << "\tPhys. Event #: " << tof_space_point->GetPhysEventNumber()
             << std::endl;
   std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: " << std::endl
             << "\tID: " << detector.id() << std::endl
-            << "\tPlane: " << detector.plane() << std::endl
+            << "\tz-position: " << z << std::endl
             << "\tUncertainties: " << detector.uncertainties() << std::endl;
   double max_xy = slab_width * ::floor(number_of_slabs / 2.0);
   if (number_of_slabs % 2 == 0) {
@@ -508,7 +544,6 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
   // and vice versa
   const double x = slab_width * tof_space_point->GetSlaby() - max_xy;
   const double y = slab_width * tof_space_point->GetSlabx() - max_xy;
-  const double z = detector.plane();
   const double t = tof_space_point->GetTime();
   TLorentzVector position(x, y, z, t);
   space_point->set_position(position);
@@ -699,27 +734,43 @@ double MapCppGlobalRawTracks::TOFMeanStoppingPower(const double beta,
  */
 void MapCppGlobalRawTracks::LoadSciFiTrack(
     MAUS::ReconEvent const * const recon_event,
-    GlobalDS::TrackPArray & sci_fi_tracks) {
-  const double z_offset
-    = detectors_.find(GlobalDS::kTracker1_5)->second.plane();
-  std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): "
-            << "z offset: " << z_offset << std::endl;
+    GlobalDS::TrackPArray & tracks) {
+  if (tracks.size() == 0) {
+    std::cout << "DEBUG LoadSciFiTrack: no TOF tracks to add SciFi tracks to!"
+              << std::endl;
+    return;
+  }
 
   SciFiEvent const * const sci_fi_event = recon_event->GetSciFiEvent();
   SciFiSpacePointPArray space_points = sci_fi_event->spacepoints();
 
-  GlobalDS::Track * track = new GlobalDS::Track();
+  // FIXME(Lane) currently assuming only one track...
+  GlobalDS::Track * track = tracks[0];
   for (SciFiSpacePointPArray::const_iterator space_point = space_points.begin();
        space_point != space_points.end();
        ++space_point) {
 
     const int tracker = (*space_point)->get_tracker();
     const int station = (*space_point)->get_station();
+    std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrackPoint(): "
+              << "\tTracker: " << tracker
+              << "\tStation: " << station << std::endl;
     const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
-        GlobalDS::kTracker1 + 6 * tracker + station);
-    const Detector& detector = detectors_.find(detector_id)->second;
+        GlobalDS::kTracker0 + 6 * tracker + station);
+    MAUS::recon::global::DetectorMap::const_iterator detector_mapping
+      = detectors_.find(detector_id);
+    if (detector_mapping == detectors_.end()) {
+      std::stringstream message;
+      message << "Couldn't find configuration for detector Tracker "
+              << tracker << " Station " << station
+              << "(id=" << detector_id << ")";
+      throw(Squeal(Squeal::nonRecoverable,
+                   message.str(),
+                   "MapCppGlobalRawTracks::LoadSciFiTrack()"));
+    }
+    const Detector& detector = detector_mapping->second;
 
-  std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint(): "
+  std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrackPoint(): "
             << "\tSciFi Space Point:" << std::endl
             << "\tDetector: " << detector_id
             << "\tStation: " << station << std::endl;
@@ -729,20 +780,15 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
     track->AddTrackPoint(track_point);
   }
 
-  track->SortTrackPointsByZ();
+  //track->SortTrackPointsByZ();
 
-  // FIXME(Lane) For now assume we've selected only muon tracks and no decays
-  /*
-  const GlobalDS::PID particle_id
-    = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
-  */
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
   const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   track->set_pid(particle_id);
 
-  sci_fi_tracks.push_back(track);
+  tracks.push_back(track);
 }
 
 /** PopulateSciFiTrackPoint
@@ -757,6 +803,10 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
 
   // FIXME(Lane) not sure what to put here
   space_point->set_geometry_path("");
+
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
 
   ThreeVector position = (*scifi_space_point)->get_position();
   const double time = (*scifi_space_point)->get_time();
@@ -773,7 +823,7 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
       ++cluster) {
     //time += (*cluster)->get_time();
     ThreeVector true_momentum = (*cluster)->get_true_momentum();
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): " << std::endl
+std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
         << "\tTrue Momentum: " << true_momentum << std::endl;
     momentum += true_momentum;
   }
@@ -785,7 +835,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): " << std::endl
   momentum.setX(momentum.x() + ::CLHEP::RandGauss::shoot(0., 3.));
   momentum.setY(momentum.y() + ::CLHEP::RandGauss::shoot(0., 3.));
   momentum.setZ(momentum.z() + ::CLHEP::RandGauss::shoot(0., 20.));
-std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): " << std::endl
+std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
         << "\tSmeared Momentum: " << momentum << std::endl;
 
   dynamic_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
@@ -798,9 +848,6 @@ std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack(): " << std::endl
   const GlobalDS::PID particle_id
     = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
   */
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
   const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   const double beta = Beta(particle_id, momentum.mag());
   const double energy = momentum.mag() / beta;

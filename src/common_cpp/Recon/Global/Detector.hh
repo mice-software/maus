@@ -37,23 +37,20 @@ class Detector {
   /* @brief Create with the given input values.
    */
   Detector(const MAUS::DataStructure::Global::DetectorPoint id,
-           const double plane,
            const CovarianceMatrix & uncertainties);
 
   Detector(const Detector & original_instance)
-      : id_(original_instance.id_), plane_(original_instance.plane_),
+      : id_(original_instance.id_),
         uncertainties_(original_instance.uncertainties_) { }
 
   ~Detector();
 
   const MAUS::DataStructure::Global::DetectorPoint id() const;
-  const double plane() const;
   const CovarianceMatrix & uncertainties() const;
  protected:
   Detector();
 
   MAUS::DataStructure::Global::DetectorPoint id_;
-  double plane_;
   CovarianceMatrix uncertainties_;
 };
 

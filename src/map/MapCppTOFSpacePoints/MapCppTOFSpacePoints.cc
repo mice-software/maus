@@ -87,6 +87,8 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
 bool MapCppTOFSpacePoints::death()  {return true;}
 
 std::string MapCppTOFSpacePoints::process(std::string document) {
+  std::cout << "DEBUG MapCppTOFSpacePoints::process| Entry Checkpoint"
+            << std::endl;
   //  JsonCpp setup
   Json::FastWriter writer;
   Json::Value root;
@@ -151,6 +153,9 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
                n_station++) {
             std::string detector = _stationKeys[n_station];
             if (xSlabHits.isMember(detector))
+              std::cout << "DEBUG MapCppTOFSpacePoints::process| "
+                        << "processing event " << n_event << " station "
+                        << n_station << std::endl;
               root["recon_events"][n_event]["tof_event"]["tof_space_points"]
                    [detector] = processTOFStation(xSlabHits, detector, n_event);
           }
@@ -177,6 +182,8 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
 Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
                                                     std::string detector,
                                                     unsigned int part_event) {
+  std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
+            << "Entry Checkpoint" << std::endl;
   // Get the slab hits document for this TOF station.
   Json::Value xDocPartEvent = JsonWrapper::GetProperty(xSlabHits,
                                                        detector,
@@ -184,6 +191,8 @@ Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
   Json::Value xDocPartEventSpacePoints(Json::arrayValue);
   if (xDocPartEvent.isArray()) {
     int n_slab_hits = xDocPartEvent.size();
+    std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
+              << "# Slab Hits: " << n_slab_hits << std::endl;
     // Delete the information from the previous particle event.
     _xPlane0Hits.resize(0);
     _xPlane1Hits.resize(0);
@@ -199,6 +208,8 @@ Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
       int xPlane  = JsonWrapper::GetProperty(xThisSlabHit,
                                              "plane",
                                              JsonWrapper::intValue).asInt();
+      std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
+                << "Slab Plane: " << xPlane << std::endl;
 
       // According to the convention used in the cabling file the horizontal
       // slabs are always in plane 0 and the vertical slabs are always in
@@ -214,8 +225,12 @@ Json::Value MapCppTOFSpacePoints::processTOFStation(Json::Value &xSlabHits,
     }
 
     // If this is the trigger station find the pixel that is giving the trigger.
-    if (detector == _triggerStation)
+    if (detector == _triggerStation) {
       _triggerhit_pixels[part_event] = findTriggerPixel(xDocPartEvent);
+      std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
+                << "Trigger Pixel: " << _triggerhit_pixels[part_event]
+                << std::endl;
+    }
     // If we do not know the trigger pixel there is no way to reconstruct the
     // time.
     if (_triggerhit_pixels[part_event] != "unknown") {
@@ -254,6 +269,10 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(Json::Value xDocPartEvent) {
       double t_x, t_y;
       if (calibrateSlabHit(xTriggerPixelKey, xSlabHit_X, t_x) &&
           calibrateSlabHit(xTriggerPixelKey, xSlabHit_Y, t_y)) {
+        std::cout << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
+                  << "t_x: " << t_x << "\tt_y: " << t_y
+                  << "\t_findTriggerPixelCut: " << _findTriggerPixelCut
+                  << std::endl;
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
           // std::cout << xTriggerPixelKey << std::endl;
@@ -383,12 +402,15 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
   int charge;
   // Charge of the digit can be unset because of the Zero suppresion of the
   // fADCs.
-  if (xPmtHit.isMember("charge"))
+  if (xPmtHit.isMember("charge")) {
     charge= JsonWrapper::GetProperty(xPmtHit,
                                      "charge",
                                      JsonWrapper::intValue).asInt();
-  else
-    return  false;
+  } else {
+    std::cout << "DEBUG MapCppTOFSpacePoints::calibratePmtHit: "
+              << "!xPmtHit.isMember(\"charge\")" << std::endl;
+    return false;
+  }
 
   std::string keyStr
     = JsonWrapper::GetProperty(xPmtHit,

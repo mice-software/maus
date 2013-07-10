@@ -225,7 +225,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
-  const double time_calibration = 1.16;
+  const double time_calibration = 0;
   /*
   const double t0 = reference_pgparticle.time;
   const double E0 = reference_pgparticle.energy;
@@ -365,6 +365,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
                                      * uncertainties
                                      * normalized_residual)[0];
 */
+    residual -= time_comp_vector;
     const double residual_squared = (transpose(residual)
                                      * inverse(uncertainties)
                                      * residual)[0];

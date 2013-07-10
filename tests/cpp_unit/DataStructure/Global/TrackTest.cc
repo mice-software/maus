@@ -47,11 +47,11 @@ TEST_F(TrackTestDS, test_getters_setters) {
   ASSERT_EQ(MAUS::DataStructure::Global::kDetectorPointSize - 1,
             static_cast<int>(MAUS::DataStructure::Global::kEMR));
   unsigned int detectorpoints =
-      (1u << MAUS::DataStructure::Global::kTracker2_5);
+      (1u << MAUS::DataStructure::Global::kTracker1_5);
   detectorpoints += (1u << MAUS::DataStructure::Global::kTOF0_1);
   detectorpoints += (1u << MAUS::DataStructure::Global::kCalorimeter);
   detectorpoints += (1u << MAUS::DataStructure::Global::kVirtual);
-  detectorpoints += (1u << MAUS::DataStructure::Global::kTracker1_3);
+  detectorpoints += (1u << MAUS::DataStructure::Global::kTracker0_3);
 
   std::vector<std::string> geometry_paths;
   geometry_paths.push_back("Nowhere");
@@ -113,10 +113,10 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
 
   DataStructure::Global::DetectorPoint dpArray[kArraySize] =
       { MAUS::DataStructure::Global::kVirtual,
-        MAUS::DataStructure::Global::kTracker1_1,
-        MAUS::DataStructure::Global::kTracker1_2,
-        MAUS::DataStructure::Global::kTracker1_3,
-        MAUS::DataStructure::Global::kTracker1_4,
+        MAUS::DataStructure::Global::kTracker0_1,
+        MAUS::DataStructure::Global::kTracker0_2,
+        MAUS::DataStructure::Global::kTracker0_3,
+        MAUS::DataStructure::Global::kTracker0_4,
         MAUS::DataStructure::Global::kVirtual };
 
   std::string pathArray[kArraySize] =
@@ -190,10 +190,10 @@ TEST_F(TrackTestDS, test_TrackPoint_Access) {
   std::vector<MAUS::DataStructure::Global::DetectorPoint> dps =
       track.GetDetectorPoints();
   // MAUS::DataStructure::Global::kVirtual    // 1
-  // MAUS::DataStructure::Global::kTracker1_1 // 2
-  // MAUS::DataStructure::Global::kTracker1_2 // 3
-  // MAUS::DataStructure::Global::kTracker1_3 // Removed
-  // MAUS::DataStructure::Global::kTracker1_4 // 4
+  // MAUS::DataStructure::Global::kTracker0_1 // 2
+  // MAUS::DataStructure::Global::kTracker0_2 // 3
+  // MAUS::DataStructure::Global::kTracker0_3 // Removed
+  // MAUS::DataStructure::Global::kTracker0_4 // 4
   // MAUS::DataStructure::Global::kVirtual    // Doesn't count twice
   ASSERT_EQ(4U, dps.size());
 

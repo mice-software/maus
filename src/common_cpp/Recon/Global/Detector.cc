@@ -31,9 +31,8 @@ namespace global {
 using MAUS::DataStructure::Global::DetectorPoint;
 
 Detector::Detector(const DetectorPoint id,
-                   const double plane,
                    const CovarianceMatrix & uncertainties)
-    : id_(id), plane_(plane), uncertainties_(uncertainties) {
+    : id_(id), uncertainties_(uncertainties) {
 }
 
 Detector::~Detector() {
@@ -41,10 +40,6 @@ Detector::~Detector() {
 
 const DetectorPoint Detector::id() const {
   return id_;
-}
-
-const double Detector::plane() const {
-  return plane_;
 }
 
 const CovarianceMatrix & Detector::uncertainties() const {

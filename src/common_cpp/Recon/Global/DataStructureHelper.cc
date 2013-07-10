@@ -24,19 +24,22 @@
 
 #include "TLorentzVector.h"
 
-#include "src/common_cpp/DataStructure/GlobalEvent.hh"
-#include "src/common_cpp/DataStructure/Primary.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
-#include "src/common_cpp/DataStructure/Global/Track.hh"
-#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
-#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
-#include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
-#include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
-#include "src/common_cpp/Recon/Global/Detector.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "DataStructure/GlobalEvent.hh"
+#include "DataStructure/Primary.hh"
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/Global/PrimaryChain.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
+#include "DataStructure/Global/ReconEnums.hh"
+#include "JsonCppProcessors/GlobalEventProcessor.hh"
+#include "Recon/Global/DataStructureHelper.hh"
+#include "Recon/Global/Detector.hh"
+#include "Recon/Global/Particle.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
+#include "Utils/Globals.hh"
+#include "Config/MiceModule.hh"
 
+// legacy classes outside the MAUS namespace
 namespace MAUS {
 namespace recon {
 namespace global {
@@ -53,6 +56,123 @@ using MAUS::recon::global::Particle;
 const DataStructureHelper& DataStructureHelper::GetInstance() {
   static DataStructureHelper instance;
   return instance;
+}
+
+// This differes from the function in MiceModule in that it searches based on
+// just the local name, not the full node path name. The former is just a lazy
+// way of doing a tree traversal without parsing the node path name. This
+// function has no knowledge of where the node is located and will return nodes
+// of the same local name under different mother nodes.
+std::vector<const MiceModule *> DataStructureHelper::FindModulesByName(
+    const MiceModule * module,
+    std::string name) const {
+  std::vector<const MiceModule*> modules;
+
+  if (module->name() == name)
+    modules.push_back(module);
+
+  for (int index = 0; index < module->daughters(); ++index) {
+    std::vector<const MiceModule *> tmp
+      = FindModulesByName(module->daughter(index), name);
+    std::vector<const MiceModule *>::iterator daughter_module;
+    for (daughter_module = tmp.begin();
+         daughter_module != tmp.end();
+         ++daughter_module) {
+      modules.push_back(*daughter_module);
+    }
+  }
+
+  return modules;
+}
+
+double DataStructureHelper::GetDetectorZPosition(
+    const GlobalDS::DetectorPoint detector_id) const {
+  MiceModule const * const geometry
+    = Globals::GetInstance()->GetReconstructionMiceModules();
+  std::vector<const MiceModule *> modules;
+
+  std::stringstream detector_name;
+  std::cout << "Root MiceModule " << geometry->fullName() << " has "
+            << geometry->daughters() << " daughters." << std::endl;
+  switch (detector_id) {
+    case GlobalDS::kTOF0: {
+      detector_name << "TOF0.dat";
+      modules = FindModulesByName(geometry, detector_name.str());
+      break;
+    }
+    case GlobalDS::kTOF1: {
+      detector_name << "TOF1Detector.dat";
+      modules = FindModulesByName(geometry, detector_name.str());
+      break;
+    }
+    case GlobalDS::kTOF2: {
+      detector_name << "TOF2Detector.dat";
+      modules = FindModulesByName(geometry, detector_name.str());
+      break;
+    }
+    case GlobalDS::kTracker0_1:
+    case GlobalDS::kTracker0_2:
+    case GlobalDS::kTracker0_3:
+    case GlobalDS::kTracker0_4:
+    case GlobalDS::kTracker0_5:
+    case GlobalDS::kTracker1_1:
+    case GlobalDS::kTracker1_2:
+    case GlobalDS::kTracker1_3:
+    case GlobalDS::kTracker1_4:
+    case GlobalDS::kTracker1_5: {
+      GlobalDS::DetectorPoint station = GlobalDS::DetectorPoint(
+        detector_id - GlobalDS::kTracker0);
+      if (station > 5) {
+        station = GlobalDS::DetectorPoint(detector_id - GlobalDS::kTracker1);
+        detector_name << "Tracker1Station";
+      } else {
+        detector_name << "TrackerStation";
+      }
+      detector_name << station << ".dat";
+      std::vector<const MiceModule *> mothers
+        = FindModulesByName(geometry, detector_name.str());
+      if (mothers.size() == 1) {
+        const std::string view_name = "TrackerViewW.dat";
+        modules = FindModulesByName(mothers[0], view_name);
+        detector_name << "/" << view_name;  // for exception message if needed
+      } else if (mothers.size() > 1) {
+        std::stringstream message;
+        message << "Found multiple reconstruction mapping detectors named \""
+                << detector_name.str() << "\".";
+        throw(Squeal(Squeal::recoverable,
+                      message.str(),
+                      "DataStructureHelper::GetDetectorZPosition()"));
+      } else {
+        std::stringstream message;
+        message << "Couldn't find reconstruction mapping detector \""
+                << detector_name.str() << "\".";
+        throw(Squeal(Squeal::recoverable,
+                      message.str(),
+                      "DataStructureHelper::GetDetectorZPosition()"));
+      }
+      break;
+    }
+    default: detector_name << "unknown";
+  }
+
+
+  if (modules.size() == 0) {
+    std::stringstream message;
+    message << "Couldn't find reconstruction mapping detector \""
+            << detector_name.str() << "\".";
+    throw(Squeal(Squeal::recoverable,
+                  message.str(),
+                  "DataStructureHelper::GetDetectorZPosition()"));
+  } else if (modules.size() > 1) {
+    std::stringstream message;
+    message << "Found multiple reconstruction mapping detectors named \""
+            << detector_name.str() << "\".";
+    throw(Squeal(Squeal::recoverable,
+                  message.str(),
+                  "DataStructureHelper::GetDetectorZPosition()"));
+  }
+
+  return modules[0]->globalPosition().z();
 }
 
 void DataStructureHelper::GetDetectorAttributes(
@@ -72,16 +192,12 @@ void DataStructureHelper::GetDetectorAttributes(
         detector_json, "id", JsonWrapper::intValue);
     const DetectorPoint id = DetectorPoint(id_json.asInt());
 
-    const Json::Value plane_json = JsonWrapper::GetProperty(
-        detector_json, "plane", JsonWrapper::realValue);
-    const double plane = plane_json.asDouble();
-
     const Json::Value uncertainties_json = JsonWrapper::GetProperty(
         detector_json, "uncertainties", JsonWrapper::arrayValue);
     const CovarianceMatrix uncertainties
         = GetJsonCovarianceMatrix(uncertainties_json);
 
-    const Detector detector(id, plane, uncertainties);
+    const Detector detector(id, uncertainties);
     detectors.insert(std::pair<DetectorPoint, Detector>(id, detector));
   }
 }

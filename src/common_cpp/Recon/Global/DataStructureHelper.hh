@@ -34,7 +34,11 @@
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
+class MiceModule;
+
 namespace MAUS {
+namespace GlobalDS = ::MAUS::DataStructure::Global;
+
 namespace recon {
 namespace global {
 
@@ -42,6 +46,9 @@ class DataStructureHelper {
  public:
   ~DataStructureHelper() { }
   static const DataStructureHelper& GetInstance();
+  std::vector<const MiceModule *> FindModulesByName(const MiceModule * module,
+                                                    std::string name) const;
+  double GetDetectorZPosition(const GlobalDS::DetectorPoint detector_id) const;
   void GetDetectorAttributes(const Json::Value& json_document,
                              DetectorMap& detectors)
                                       const;
