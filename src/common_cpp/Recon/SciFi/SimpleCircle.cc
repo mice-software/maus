@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 
 namespace MAUS {
 

@@ -55,10 +55,14 @@ class TrackerDataManager {
     friend class ReduceCppPatternRecognition;
 
     // Macros to allow friendship with the gtests
-    FRIEND_TEST(TrackerDataManagerTest, TestClear);
     FRIEND_TEST(TrackerDataManagerTest, TestConstructor);
+    FRIEND_TEST(TrackerDataManagerTest, TestClear);
+    FRIEND_TEST(TrackerDataManagerTest, TestDraw);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcess);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessDigits);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessClusters);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessSpoints);
+    FRIEND_TEST(TrackerDataManagerTest, TestProcessStrks);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessHtrks);
 
     /** Constructor */
@@ -69,9 +73,6 @@ class TrackerDataManager {
 
     /** Clear data for this spill only */
     void clear_spill();
-
-    /**  Clear all data */
-    void clear_run();
 
     /**  Draw data using TrackerDataPlotter classes */
     void draw(std::vector<TrackerDataPlotterBase*> plotters);
@@ -121,50 +122,28 @@ class TrackerDataManager {
     /** Print info about the seeds in a track */
     void print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num);
 
-    /** Print info for whole run */
-    void print_run_info();
-
     /** Set whether to print track info to screen */
     void set_print_tracks(bool b) { _print_tracks = b; }
 
     /** Set whether to print seed info to screen */
     void set_print_seeds(bool b) { _print_seeds = b; }
 
-  private:
-    // Bit of physics, factor translating radius to transverse momentum, pt = _RtoPt * rad
-    static const double _RtoPt = 1.2;
-
+  protected:
     bool _print_tracks;
     bool _print_seeds;
 
-    // Variables to hold running totals over multiple spills
-    int _t1_sp;
-    int _t2_sp;
-
-    int _t1_seeds;
-    int _t2_seeds;
-
-    int _t1_5pt_strks;
-    int _t1_4pt_strks;
-    int _t1_3pt_strks;
-    int _t2_5pt_strks;
-    int _t2_4pt_strks;
-    int _t2_3pt_strks;
-
-    int _t1_5pt_htrks;
-    int _t1_4pt_htrks;
-    int _t1_3pt_htrks;
-    int _t2_5pt_htrks;
-    int _t2_4pt_htrks;
-    int _t2_3pt_htrks;
-
-    // Some plotting parameters
-    static const double _zmin = 0.0;
-    static const double _zmax = 1200.0;
 
     // The data associated with each tracker for one spill
     TrackerData _t1;
     TrackerData _t2;
+
+  private:
+    // Bit of physics, factor translating radius to transverse momentum, pt = _RtoPt * rad
+    static const double _RtoPt = 1.2;
+
+    // Some plotting parameters
+    static const double _zmin = 0.0;
+    static const double _zmax = 1200.0;
 };
 
 } // ~namespace MAUS

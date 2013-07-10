@@ -35,9 +35,9 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/LSQFit.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
-#include "src/common_cpp/DataStructure/SimpleHelix.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"

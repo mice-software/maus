@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 #include "gtest/gtest.h"
 
 namespace MAUS {
