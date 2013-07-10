@@ -35,6 +35,7 @@
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
+#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
 
 namespace MAUS {
 
@@ -50,6 +51,23 @@ TEST_F(TrackerDataManagerTest, TestConstructor) {
   TrackerDataManager tdm;
   EXPECT_TRUE(tdm._print_tracks);
   EXPECT_TRUE(tdm._print_seeds);
+}
+
+TEST_F(TrackerDataManagerTest, TestDraw) {
+  // Set up and use an infoBox plotter to test the draw method
+  TrackerDataManager tdm;
+  TrackerDataPlotterInfoBox * infoBox = new TrackerDataPlotterInfoBox();
+
+  // Check that the infoBox is not reading as setup first
+  ASSERT_FALSE(infoBox->_setup_true);
+
+  // Now draw with the data manager
+  std::vector<TrackerDataPlotterBase*> plotters;
+  plotters.push_back(infoBox);
+  tdm.draw(plotters);
+
+  // Check the infoBox has now been initialised
+  EXPECT_TRUE(infoBox->_setup_true);
 }
 
 TEST_F(TrackerDataManagerTest, TestProcess) {

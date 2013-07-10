@@ -27,6 +27,9 @@
 // C++ headers
 #include <string>
 
+// Google test headers
+#include "gtest/gtest_prod.h"
+
 // ROOT headers
 #include "TCanvas.h"
 #include "TPaveText.h"
@@ -41,6 +44,8 @@ namespace MAUS {
 
 class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
   public:
+    // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataManagerTest, TestDraw);
 
     /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
     TrackerDataPlotterInfoBox();
