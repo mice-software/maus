@@ -15,6 +15,11 @@
  *
  */
 
+/*
+TODO: Check why the y coordinate comes out inverted for an unrotated tracker.
+      Solutions is hacked for now.
+*/
+
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 
 namespace MAUS {
@@ -187,12 +192,15 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   ThreeVector p2 = crossing_pos(vcluster, wcluster);
   ThreeVector p3 = crossing_pos(ucluster, wcluster);
   ThreeVector position = (p1+p2+p3)/3.;
+  // if (vcluster->get_tracker() == 1) position = ThreeVector(position.x(), -position.y(), position.z());
   triplet->set_position(position);
 
+  /*
   ThreeVector mc_position = vcluster->get_true_position();
-  std::cerr << "Tracker: "  << vcluster->get_tracker() << "\n"
-            << "Position: " << position.x() << " " << position.y() << " " << position.z() << "\n"
-            << "MC: " << mc_position.x() << " " << mc_position.y() << " " << mc_position.z() << std::endl;
+  std::cerr << "Tracker:  "  << vcluster->get_tracker() << " "  << vcluster->get_station() << "\n"
+  << "Position: " << position.x() << " " << position.y() << " " << position.z() << "\n"
+  << "True MC Position: " << mc_position.x() << " " << mc_position.y() << " " << mc_position.z() << std::endl;
+  */
 
   // Vector p stores the crossing position of views v and w.
   ThreeVector p(p2);

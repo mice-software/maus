@@ -33,8 +33,6 @@
 #include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
 
-
-
 namespace MAUS {
 
 TrackerDataManager::TrackerDataManager()
@@ -69,119 +67,14 @@ void TrackerDataManager::process(const Spill *spill) {
 
     // Loop over recon events
     for (size_t i = 0; i < spill->GetReconEvents()->size(); ++i) {
-      SciFiEvent *evt = (*spill->GetReconEvents())[i]->GetSciFiEvent();
-
       _t1._spill_num = spill->GetSpillNumber();
       _t2._spill_num = spill->GetSpillNumber();
-
-      // Loop over digits
-      for (size_t j = 0; j < evt->digits().size(); ++j) {
-        SciFiDigit *dig = evt->digits()[j];
-        if ( dig->get_tracker() == 0 ) {
-          ++_t1._num_digits;
-          _t1._num_events = spill->GetReconEvents()->size();
-        } else if ( dig->get_tracker() == 1 ) {
-          ++_t2._num_digits;
-          _t2._num_events = spill->GetReconEvents()->size();
-        }
-      }
-
-      // Loop over clusters
-      for (size_t j = 0; j < evt->clusters().size(); ++j) {
-        SciFiCluster *clus = evt->clusters()[j];
-        if ( clus->get_tracker() == 0 ) {
-          ++_t1._num_clusters;
-        } else if ( clus->get_tracker() == 1 ) {
-          ++_t2._num_clusters;
-        }
-      }
-
-      // Loop over spacepoints
-      for (size_t j = 0; j < evt->spacepoints().size(); ++j) {
-        SciFiSpacePoint *sp = evt->spacepoints()[j];
-        ThreeVector pos = sp->get_position();
-        if ( sp->get_tracker() == 0 ) {
-          ++_t1._num_spoints;
-          _t1._spoints_x.push_back(pos.x());
-          _t1._spoints_y.push_back(pos.y());
-          _t1._spoints_z.push_back(pos.z());
-        } else if ( sp->get_tracker() == 1 ) {
-          ++_t2._num_spoints;
-          _t2._spoints_x.push_back(pos.x());
-          _t2._spoints_y.push_back(pos.y());
-          _t2._spoints_z.push_back(pos.z());
-        }
-      }
-
-      // Love over straight tracks
-      for (size_t j = 0; j < evt->straightprtracks().size(); ++j) {
-        SciFiStraightPRTrack *trk = evt->straightprtracks()[j];
-        if ( trk->get_tracker() == 0 ) {
-          if ( trk->get_num_points() == 5 ) ++_t1._num_stracks_5pt;
-          if ( trk->get_num_points() == 4 ) ++_t1._num_stracks_4pt;
-          if ( trk->get_num_points() == 3 ) ++_t1._num_stracks_3pt;
-          _t1._trks_str_xz.push_back(make_str_track(trk->get_x0(), trk->get_mx(), _zmin, _zmax));
-          _t1._trks_str_yz.push_back(make_str_track(trk->get_y0(), trk->get_my(), _zmin, _zmax));
-        } else if ( trk->get_tracker() == 1 ) {
-          if ( trk->get_num_points() == 5 ) ++_t2._num_stracks_5pt;
-          if ( trk->get_num_points() == 4 ) ++_t2._num_stracks_4pt;
-          if ( trk->get_num_points() == 3 ) ++_t2._num_stracks_3pt;
-          _t2._trks_str_xz.push_back(make_str_track(trk->get_x0(), trk->get_mx(), _zmin, _zmax));
-          _t2._trks_str_yz.push_back(make_str_track(trk->get_y0(), trk->get_my(), _zmin, _zmax));
-        }
-      }
-
-      // Loop over helical tracks
-      for (size_t j = 0; j < evt->helicalprtracks().size(); ++j) {
-        SciFiHelicalPRTrack *trk = evt->helicalprtracks()[j];
-
-        // Print track info to screen
-        if (_print_tracks) print_track_info(trk, i);
-
-        // Pull out turning angles for each track seed
-        std::vector<double> phi_i;
-        std::vector<double> s_i;
-        for ( size_t j = 0; j < trk->get_phi().size(); ++j ) {
-          phi_i.push_back(trk->get_phi()[j]);
-          s_i.push_back(trk->get_phi()[j]*trk->get_R());
-        }
-
-        double x0 = trk->get_circle_x0();
-        double y0 = trk->get_circle_y0();
-        double rad = trk->get_R();
-        double dsdz = trk->get_dsdz();
-        double sz_c = trk->get_line_sz_c();
-        int handness = -1;
-
-        if ( trk->get_tracker() == 0 ) {
-          if ( trk->get_num_points() == 5 ) ++_t1._num_htracks_5pt;
-          if ( trk->get_num_points() == 4 ) ++_t1._num_htracks_4pt;
-          if ( trk->get_num_points() == 3 ) ++_t1._num_htracks_3pt;
-          _t1._seeds_phi.push_back(phi_i);
-          _t1._seeds_s.push_back(s_i);
-          _t1._trks_xy.push_back(make_circle(x0, y0, rad));
-          dsdz = - dsdz;  // Needed due to the way we plot...
-          _t1._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
-          _t1._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
-        } else if ( trk->get_tracker() == 1 ) {
-          if ( trk->get_num_points() == 5 ) ++_t2._num_htracks_5pt;
-          if ( trk->get_num_points() == 4 ) ++_t2._num_htracks_4pt;
-          if ( trk->get_num_points() == 3 ) ++_t2._num_htracks_3pt;
-          _t2._seeds_phi.push_back(phi_i);
-          _t2._seeds_s.push_back(s_i);
-          _t2._trks_xy.push_back(make_circle(x0, y0, rad));
-          _t2._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
-          _t2._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
-        }
-
-        // Loop over track seed spacepoints
-        if (_print_seeds) std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\n";
-        for ( size_t j = 0; j < trk->get_spacepoints().size(); ++j ) {
-          if ( trk->get_tracker() == 0 ) ++_t1._num_seeds;
-          if ( trk->get_tracker() == 1 ) ++_t2._num_seeds;
-          if (_print_seeds) print_seed_info(trk, j);
-        }
-      } // ~ loop over helical tracks
+      SciFiEvent *evt = (*spill->GetReconEvents())[i]->GetSciFiEvent();
+      process_digits(spill, evt->digits());
+      process_clusters(evt->clusters());
+      process_spoints(evt->spacepoints());
+      process_strks(evt->straightprtracks());
+      process_htrks(evt->helicalprtracks());
     } // ~ loop over recon events
 
     // Update run totals held by the manager class
@@ -200,6 +93,120 @@ void TrackerDataManager::process(const Spill *spill) {
     _t2_4pt_htrks += _t2._num_htracks_4pt;
     _t2_3pt_htrks += _t2._num_htracks_3pt;
   } // ~ check event is a physics event
+};
+
+void TrackerDataManager::process_digits(const Spill *spill, const std::vector<SciFiDigit*> digits) {
+  for (size_t i = 0; i < digits.size(); ++i) {
+    SciFiDigit *dig = digits[i];
+    if ( dig->get_tracker() == 0 ) {
+      ++_t1._num_digits;
+      _t1._num_events = spill->GetReconEvents()->size();
+    } else if ( dig->get_tracker() == 1 ) {
+      ++_t2._num_digits;
+      _t2._num_events = spill->GetReconEvents()->size();
+    }
+  }
+};
+
+void TrackerDataManager::process_clusters(const std::vector<SciFiCluster*> clusters) {
+  for (size_t i = 0; i < clusters.size(); ++i) {
+    SciFiCluster *clus = clusters[i];
+    if ( clus->get_tracker() == 0 ) {
+      ++_t1._num_clusters;
+    } else if ( clus->get_tracker() == 1 ) {
+      ++_t2._num_clusters;
+    }
+  }
+};
+
+void TrackerDataManager::process_spoints(const std::vector<SciFiSpacePoint*> spoints) {
+  for (size_t i = 0; i < spoints.size(); ++i) {
+    SciFiSpacePoint *sp = spoints[i];
+    ThreeVector pos = sp->get_position();
+    if ( sp->get_tracker() == 0 ) {
+      ++_t1._num_spoints;
+      _t1._spoints_x.push_back(pos.x());
+      _t1._spoints_y.push_back(pos.y());
+      _t1._spoints_z.push_back(pos.z());
+    } else if ( sp->get_tracker() == 1 ) {
+      ++_t2._num_spoints;
+      _t2._spoints_x.push_back(pos.x());
+      _t2._spoints_y.push_back(pos.y());
+      _t2._spoints_z.push_back(pos.z());
+    }
+  }
+};
+
+void TrackerDataManager::process_strks(const std::vector<SciFiStraightPRTrack*> strks) {
+  for (size_t i = 0; i < strks.size(); ++i) {
+    SciFiStraightPRTrack *trk = strks[i];
+    if ( trk->get_tracker() == 0 ) {
+      if ( trk->get_num_points() == 5 ) ++_t1._num_stracks_5pt;
+      if ( trk->get_num_points() == 4 ) ++_t1._num_stracks_4pt;
+      if ( trk->get_num_points() == 3 ) ++_t1._num_stracks_3pt;
+      _t1._trks_str_xz.push_back(make_str_track(trk->get_x0(), trk->get_mx(), _zmin, _zmax));
+      _t1._trks_str_yz.push_back(make_str_track(trk->get_y0(), trk->get_my(), _zmin, _zmax));
+    } else if ( trk->get_tracker() == 1 ) {
+      if ( trk->get_num_points() == 5 ) ++_t2._num_stracks_5pt;
+      if ( trk->get_num_points() == 4 ) ++_t2._num_stracks_4pt;
+      if ( trk->get_num_points() == 3 ) ++_t2._num_stracks_3pt;
+      _t2._trks_str_xz.push_back(make_str_track(trk->get_x0(), trk->get_mx(), _zmin, _zmax));
+      _t2._trks_str_yz.push_back(make_str_track(trk->get_y0(), trk->get_my(), _zmin, _zmax));
+    }
+  }
+};
+
+void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> htrks) {
+  for (size_t i = 0; i < htrks.size(); ++i) {
+    SciFiHelicalPRTrack *trk = htrks[i];
+
+    // Print track info to screen
+    if (_print_tracks) print_track_info(trk, i);
+
+    // Pull out turning angles for each track seed
+    std::vector<double> phi_i;
+    std::vector<double> s_i;
+    for ( size_t i = 0; i < trk->get_phi().size(); ++i ) {
+      phi_i.push_back(trk->get_phi()[i]);
+      s_i.push_back(trk->get_phi()[i]*trk->get_R());
+    }
+
+    double x0 = trk->get_circle_x0();
+    double y0 = trk->get_circle_y0();
+    double rad = trk->get_R();
+    double dsdz = trk->get_dsdz();
+    double sz_c = trk->get_line_sz_c();
+    int handness = -1;
+
+    if ( trk->get_tracker() == 0 ) {
+      if ( trk->get_num_points() == 5 ) ++_t1._num_htracks_5pt;
+      if ( trk->get_num_points() == 4 ) ++_t1._num_htracks_4pt;
+      if ( trk->get_num_points() == 3 ) ++_t1._num_htracks_3pt;
+      _t1._seeds_phi.push_back(phi_i);
+      _t1._seeds_s.push_back(s_i);
+      _t1._trks_xy.push_back(make_circle(x0, y0, rad));
+      dsdz = - dsdz;  // Needed due to the way we plot...
+      _t1._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
+      _t1._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
+    } else if ( trk->get_tracker() == 1 ) {
+      if ( trk->get_num_points() == 5 ) ++_t2._num_htracks_5pt;
+      if ( trk->get_num_points() == 4 ) ++_t2._num_htracks_4pt;
+      if ( trk->get_num_points() == 3 ) ++_t2._num_htracks_3pt;
+      _t2._seeds_phi.push_back(phi_i);
+      _t2._seeds_s.push_back(s_i);
+      _t2._trks_xy.push_back(make_circle(x0, y0, rad));
+      _t2._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
+      _t2._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
+    }
+
+    // Loop over track seed spacepoints
+    if (_print_seeds) std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\n";
+    for ( size_t j = 0; j < trk->get_spacepoints().size(); ++j ) {
+      if ( trk->get_tracker() == 0 ) ++_t1._num_seeds;
+      if ( trk->get_tracker() == 1 ) ++_t2._num_seeds;
+      if (_print_seeds) print_seed_info(trk, j);
+    }
+  }  // ~loop over helical tracks
 };
 
 void TrackerDataManager::clear_spill() {

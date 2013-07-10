@@ -41,14 +41,27 @@ void SciFiGeometryHelper::Build() {
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
       ThreeVector perpendicular(1., 0., 0.);
+
+      CLHEP::HepRotation zflip;
+      const Hep3Vector rowx(-1., 0., 0.);
+      const Hep3Vector rowy(0., -1., 0.);
+      const Hep3Vector rowz(0., 0., 0.);
+      zflip.setRows(rowx, rowy, rowz);
+      G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
+
       // Get the fibre rotation wrt the tracker frame.
-      G4RotationMatrix fibre_rotation(module->relativeRotation(module->mother() // plane
-                                                               ->mother()->mother()->mother()));    // tracker, solenoid
+      //G4RotationMatrix global_fibre_rotation(module->relativeRotation(module->mother() // plane
+      //                                                         ->mother()->mother()->mother()));    // tracker, solenoid
       G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                                ->mother()));    // tracker
 
-      direction     *= fibre_rotation;
-      perpendicular *= internal_fibre_rotation;
+      direction     *= internal_fibre_rotation;
+      // perpendicular *= (*trot);
+      perpendicular *= global_fibre_rotation;//*zflip;
+
+      // if ( global_fibre_rotation == internal_fibre_rotation ) perpendicular *= zflip;
+
+      // perpendicular *= global_fibre_rotation;
 
       /*
       std::cerr << tracker_n         << " " << station_n         << " " << plane_n           << std::endl;
