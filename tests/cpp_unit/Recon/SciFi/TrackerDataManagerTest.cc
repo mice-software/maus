@@ -93,13 +93,14 @@ TEST_F(TrackerDataManagerTest, TestProcess) {
       if (i == 5) trk->set_num_points(5);
     }
   }
-
   sfevt->set_helicalprtrack(htrks);
 
   // Process the spill
   tdm.process(spill);
 
-  // Check the internal data manager state is correct
+  // Check some of the data manager internal state is correct
+  EXPECT_EQ(1, tdm._t1._spill_num);
+  EXPECT_EQ(1, tdm._t2._spill_num);
   EXPECT_EQ(1, tdm._t1._num_spoints);
   EXPECT_EQ(1, tdm._t2._num_spoints);
   EXPECT_EQ(1, tdm._t1._num_htracks_5pt);
