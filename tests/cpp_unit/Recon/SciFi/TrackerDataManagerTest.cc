@@ -27,6 +27,13 @@
 #include "gtest/gtest_prod.h"
 
 // MAUS headers
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiDigit.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
 
 namespace MAUS {
@@ -43,62 +50,67 @@ TEST_F(TrackerDataManagerTest, TestConstructor) {
   TrackerDataManager tdm;
   EXPECT_TRUE(tdm._print_tracks);
   EXPECT_TRUE(tdm._print_seeds);
-  EXPECT_EQ(0, tdm._t1_sp);
-  EXPECT_EQ(0, tdm._t2_sp);
-  EXPECT_EQ(0, tdm._t1_seeds);
-  EXPECT_EQ(0, tdm._t2_seeds);
-  EXPECT_EQ(0, tdm._t1_5pt_strks);
-  EXPECT_EQ(0, tdm._t1_4pt_strks);
-  EXPECT_EQ(0, tdm._t1_3pt_strks);
-  EXPECT_EQ(0, tdm._t2_5pt_strks);
-  EXPECT_EQ(0, tdm._t2_4pt_strks);
-  EXPECT_EQ(0, tdm._t2_3pt_strks);
-  EXPECT_EQ(0, tdm._t1_5pt_htrks);
-  EXPECT_EQ(0, tdm._t1_4pt_htrks);
-  EXPECT_EQ(0, tdm._t1_3pt_htrks);
-  EXPECT_EQ(0, tdm._t2_5pt_htrks);
-  EXPECT_EQ(0, tdm._t2_4pt_htrks);
-  EXPECT_EQ(0, tdm._t2_3pt_htrks);
 }
 
-TEST_F(TrackerDataManagerTest, TestClear) {
+TEST_F(TrackerDataManagerTest, TestProcess) {
+
+  // Some setup
   TrackerDataManager tdm;
+  Spill* spill = new Spill();
+  spill->SetDaqEventType("physics_event");
+  spill->SetSpillNumber(1);
+  std::vector<ReconEvent*>* revts = new std::vector<ReconEvent*>;
+  ReconEvent* revt =  new ReconEvent();
+  revts->push_back(revt);
+  SciFiEvent* sfevt = new SciFiEvent();
+  revt->SetSciFiEvent(sfevt);
+  spill->SetReconEvents(revts);
 
-  tdm._t1_sp = 1;
-  tdm._t2_sp = 1;
-  tdm._t1_seeds = 1;
-  tdm._t2_seeds = 1;
-  tdm._t1_5pt_strks = 1;
-  tdm._t1_4pt_strks = 1;
-  tdm._t1_3pt_strks = 1;
-  tdm._t2_5pt_strks = 1;
-  tdm._t2_4pt_strks = 1;
-  tdm._t2_3pt_strks = 1;
-  tdm._t1_5pt_htrks = 1;
-  tdm._t1_4pt_htrks = 1;
-  tdm._t1_3pt_htrks = 1;
-  tdm._t2_5pt_htrks = 1;
-  tdm._t2_4pt_htrks = 1;
-  tdm._t2_3pt_htrks = 1;
+  // Set up some spacepoints
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  sp1->set_tracker(0);
+  sp2->set_tracker(1);
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp1);
+  spnts.push_back(sp2);
+  sfevt->set_spacepoints(spnts);
 
-  tdm.clear_run();
+  // Set up some straight and helical Pattern Recogntion tracks
+  std::vector<SciFiHelicalPRTrack*> htrks;
+  for (int i = 0; i < 6; ++i) {
+    SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
+    htrks.push_back(trk);
+    if (i < 3) {
+      trk->set_tracker(0);
+      if (i == 0) trk->set_num_points(3);
+      if (i == 1) trk->set_num_points(4);
+      if (i == 2) trk->set_num_points(5);
+    } else {
+      trk->set_tracker(1);
+      if (i == 3) trk->set_num_points(3);
+      if (i == 4) trk->set_num_points(4);
+      if (i == 5) trk->set_num_points(5);
+    }
+  }
 
-  EXPECT_EQ(0, tdm._t1_sp);
-  EXPECT_EQ(0, tdm._t2_sp);
-  EXPECT_EQ(0, tdm._t1_seeds);
-  EXPECT_EQ(0, tdm._t2_seeds);
-  EXPECT_EQ(0, tdm._t1_5pt_strks);
-  EXPECT_EQ(0, tdm._t1_4pt_strks);
-  EXPECT_EQ(0, tdm._t1_3pt_strks);
-  EXPECT_EQ(0, tdm._t2_5pt_strks);
-  EXPECT_EQ(0, tdm._t2_4pt_strks);
-  EXPECT_EQ(0, tdm._t2_3pt_strks);
-  EXPECT_EQ(0, tdm._t1_5pt_htrks);
-  EXPECT_EQ(0, tdm._t1_4pt_htrks);
-  EXPECT_EQ(0, tdm._t1_3pt_htrks);
-  EXPECT_EQ(0, tdm._t2_5pt_htrks);
-  EXPECT_EQ(0, tdm._t2_4pt_htrks);
-  EXPECT_EQ(0, tdm._t2_3pt_htrks);
+  sfevt->set_helicalprtrack(htrks);
+
+  // Process the spill
+  tdm.process(spill);
+
+  // Check the internal data manager state is correct
+  EXPECT_EQ(1, tdm._t1._num_spoints);
+  EXPECT_EQ(1, tdm._t2._num_spoints);
+  EXPECT_EQ(1, tdm._t1._num_htracks_5pt);
+  EXPECT_EQ(1, tdm._t1._num_htracks_4pt);
+  EXPECT_EQ(1, tdm._t1._num_htracks_3pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_5pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_4pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_3pt);
+
+  // Tidy up. Deleting spill should deallocated all other memory.
+  delete spill;
 }
 
 TEST_F(TrackerDataManagerTest, TestProcessClusters) {
@@ -148,6 +160,7 @@ TEST_F(TrackerDataManagerTest, TestProcessDigits) {
 
 TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   TrackerDataManager tdm;
+  tdm.set_print_seeds(false);
 
   // Set up some tracks
   std::vector<SciFiHelicalPRTrack*> trks;
@@ -175,18 +188,26 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   double dsdz = 1.0;
   double sz_c = 1.0;
   int handness = -1;
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  std::vector<SciFiSpacePoint*> spnts1;
+  spnts1.push_back(sp1);
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  std::vector<SciFiSpacePoint*> spnts2;
+  spnts2.push_back(sp2);
   trks[0]->set_phi(phi_i);
   trks[0]->set_R(rad);
   trks[0]->set_circle_x0(x0);
   trks[0]->set_circle_y0(y0);
   trks[0]->set_dsdz(dsdz);
   trks[0]->set_line_sz_c(sz_c);
+  trks[0]->set_spacepoints(spnts1);
   trks[3]->set_phi(phi_i);
   trks[3]->set_R(rad);
   trks[3]->set_circle_x0(x0);
   trks[3]->set_circle_y0(y0);
   trks[3]->set_dsdz(dsdz);
   trks[3]->set_line_sz_c(sz_c);
+  trks[3]->set_spacepoints(spnts2);
 
   // Run them through the function and check the output
   tdm.process_htrks(trks);
@@ -202,6 +223,8 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   EXPECT_NEAR(phi_i[0]*rad, tdm._t2._seeds_s[0][0], 0.01);
   EXPECT_EQ(phi_i[0], tdm._t2._seeds_phi[0][0]);
   EXPECT_NEAR(phi_i[0]*rad, tdm._t1._seeds_s[0][0], 0.01);
+  EXPECT_EQ(1, tdm._t1._num_seeds);
+  EXPECT_EQ(1, tdm._t2._num_seeds);
 
   // Check the first created x-y projections
   TArc arc1 = tdm._t1._trks_xy[0];
@@ -238,6 +261,117 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   EXPECT_EQ(rad, yz2.GetParameter(1));
   EXPECT_EQ(-dsdz, yz2.GetParameter(2)); // Note the minus sign
   EXPECT_EQ(sz_c, yz2.GetParameter(3));
+
+  // Tidy up
+  delete sp1;
+  sp1 = NULL;
+  delete sp2;
+  sp2 = NULL;
+  for (int i = 0; i < 6; ++i) {
+    delete trks[i];
+  }
+}
+
+TEST_F(TrackerDataManagerTest, TestProcessSpoints) {
+
+  // Some setup
+  TrackerDataManager tdm;
+  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
+  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
+  ThreeVector pos1(1.0, 2.0, 3.0);
+  ThreeVector pos2(4.0, 5.0, 6.0);
+  sp1->set_tracker(0);
+  sp2->set_tracker(1);
+  sp1->set_position(pos1);
+  sp2->set_position(pos2);
+  std::vector<SciFiSpacePoint*> spnts;
+  spnts.push_back(sp1);
+  spnts.push_back(sp2);
+
+  // Process the spoints
+  tdm.process_spoints(spnts);
+
+  // Check the data manager internal state correctly matches
+  EXPECT_EQ(1, tdm._t1._num_spoints);
+  EXPECT_EQ(pos1.x(), tdm._t1._spoints_x[0]);
+  EXPECT_EQ(pos1.y(), tdm._t1._spoints_y[0]);
+  EXPECT_EQ(pos1.z(), tdm._t1._spoints_z[0]);
+  EXPECT_EQ(1, tdm._t2._num_spoints);
+  EXPECT_EQ(pos2.x(), tdm._t2._spoints_x[0]);
+  EXPECT_EQ(pos2.y(), tdm._t2._spoints_y[0]);
+  EXPECT_EQ(pos2.z(), tdm._t2._spoints_z[0]);
+
+  delete sp1;
+  delete sp2;
+}
+
+
+TEST_F(TrackerDataManagerTest, TestProcessStrks) {
+  TrackerDataManager tdm;
+
+  // Set up some tracks
+  double x0_1 = 1.0;
+  double mx_1 = 2.0;
+  double y0_1 = 3.0;
+  double my_1 = 4.0;
+  double x0_2 = 5.0;
+  double mx_2 = 6.0;
+  double y0_2 = 7.0;
+  double my_2 = 8.0;
+  std::vector<SciFiStraightPRTrack*> trks;
+  for (int i = 0; i < 6; ++i) {
+    SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
+    trks.push_back(trk);
+    if (i < 3) {
+      trk->set_tracker(0);
+      if (i == 0) trk->set_num_points(3);
+      if (i == 1) trk->set_num_points(4);
+      if (i == 2) trk->set_num_points(5);
+    } else {
+      trk->set_tracker(1);
+      if (i == 3) trk->set_num_points(3);
+      if (i == 4) trk->set_num_points(4);
+      if (i == 5) trk->set_num_points(5);
+    }
+  }
+  // Only bother to more fully initialise the first track in each tracker
+  trks[0]->set_x0(x0_1);
+  trks[0]->set_mx(mx_1);
+  trks[0]->set_y0(y0_1);
+  trks[0]->set_my(my_1);
+  trks[3]->set_x0(x0_2);
+  trks[3]->set_mx(mx_2);
+  trks[3]->set_y0(y0_2);
+  trks[3]->set_my(my_2);
+
+  // Run them through the function and check the output
+  tdm.process_strks(trks);
+
+  // Check the spill totals
+  EXPECT_EQ(1, tdm._t1._num_stracks_5pt);
+  EXPECT_EQ(1, tdm._t1._num_stracks_4pt);
+  EXPECT_EQ(1, tdm._t1._num_stracks_3pt);
+  EXPECT_EQ(1, tdm._t2._num_stracks_5pt);
+  EXPECT_EQ(1, tdm._t2._num_stracks_4pt);
+  EXPECT_EQ(1, tdm._t2._num_stracks_3pt);
+
+  // Check the first created z-x projections
+  TF1 xz1 = tdm._t1._trks_str_xz[0];
+  EXPECT_EQ(x0_1, xz1.GetParameter(0));
+  EXPECT_EQ(mx_1, xz1.GetParameter(1));
+
+  TF1 xz2 = tdm._t2._trks_str_xz[0];
+  EXPECT_EQ(x0_2, xz2.GetParameter(0));
+  EXPECT_EQ(mx_2, xz2.GetParameter(1));
+
+  // Check the first created z-y projections
+  TF1 yz1 = tdm._t1._trks_str_yz[0];
+  EXPECT_EQ(y0_1, yz1.GetParameter(0));
+  EXPECT_EQ(my_1, yz1.GetParameter(1));
+
+  TF1 yz2 = tdm._t2._trks_str_yz[0];
+  EXPECT_EQ(y0_2, yz2.GetParameter(0));
+  EXPECT_EQ(my_2, yz2.GetParameter(1));
 
   // Tidy up
   for (int i = 0; i < 6; ++i) {

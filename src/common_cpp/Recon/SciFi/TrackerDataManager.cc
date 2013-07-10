@@ -37,23 +37,7 @@ namespace MAUS {
 
 TrackerDataManager::TrackerDataManager()
   : _print_tracks(true),
-    _print_seeds(true),
-    _t1_sp(0),
-    _t2_sp(0),
-    _t1_seeds(0),
-    _t2_seeds(0),
-    _t1_5pt_strks(0),
-    _t1_4pt_strks(0),
-    _t1_3pt_strks(0),
-    _t2_5pt_strks(0),
-    _t2_4pt_strks(0),
-    _t2_3pt_strks(0),
-    _t1_5pt_htrks(0),
-    _t1_4pt_htrks(0),
-    _t1_3pt_htrks(0),
-    _t2_5pt_htrks(0),
-    _t2_4pt_htrks(0),
-    _t2_3pt_htrks(0) {
+    _print_seeds(true) {
   // Do nothing
 };
 
@@ -76,22 +60,6 @@ void TrackerDataManager::process(const Spill *spill) {
       process_strks(evt->straightprtracks());
       process_htrks(evt->helicalprtracks());
     } // ~ loop over recon events
-
-    // Update run totals held by the manager class
-    _t1_sp += _t1._num_spoints;
-    _t2_sp += _t2._num_spoints;
-    _t1_5pt_htrks += _t1._num_stracks_5pt;
-    _t1_4pt_htrks += _t1._num_stracks_4pt;
-    _t1_3pt_htrks += _t1._num_stracks_3pt;
-    _t2_5pt_htrks += _t2._num_stracks_5pt;
-    _t2_4pt_htrks += _t2._num_stracks_4pt;
-    _t2_3pt_htrks += _t2._num_stracks_3pt;
-    _t1_5pt_htrks += _t1._num_htracks_5pt;
-    _t1_4pt_htrks += _t1._num_htracks_4pt;
-    _t1_3pt_htrks += _t1._num_htracks_3pt;
-    _t2_5pt_htrks += _t2._num_htracks_5pt;
-    _t2_4pt_htrks += _t2._num_htracks_4pt;
-    _t2_3pt_htrks += _t2._num_htracks_3pt;
   } // ~ check event is a physics event
 };
 
@@ -214,27 +182,6 @@ void TrackerDataManager::clear_spill() {
   _t2.clear();
 };
 
-void TrackerDataManager::clear_run() {
-  _t1_sp = 0;
-  _t2_sp = 0;
-  _t1_seeds = 0;
-  _t2_seeds = 0;
-  _t1_5pt_strks = 0;
-  _t1_4pt_strks = 0;
-  _t1_3pt_strks = 0;
-  _t2_5pt_strks = 0;
-  _t2_4pt_strks = 0;
-  _t2_3pt_strks = 0;
-  _t1_5pt_htrks = 0;
-  _t1_4pt_htrks = 0;
-  _t1_3pt_htrks = 0;
-  _t2_5pt_htrks = 0;
-  _t2_4pt_htrks = 0;
-  _t2_3pt_htrks = 0;
-
-  clear_spill();
-};
-
 void TrackerDataManager::draw(std::vector<TrackerDataPlotterBase*> plotters) {
   // Loop over all the plotters and draw
   // TCanvas* lCanvas = NULL;
@@ -321,25 +268,6 @@ void TrackerDataManager::print_seed_info(const SciFiHelicalPRTrack * const trk, 
   std::cout <<  std::setprecision(4) << mom.y() << "\t";
   std::cout <<  std::setprecision(4) << pt_mc << "\t";
   std::cout <<  std::setprecision(4) << mom.z() << "\n";
-};
-
-void TrackerDataManager::print_run_info() {
-  std::cout << "T1 spacepoints: " <<  _t1_sp << std::endl;
-  std::cout << "T2 spacepoints: " <<  _t2_sp << std::endl;
-  std::cout << "T1 seeds: " <<  _t1_seeds << std::endl;
-  std::cout << "T2 seeds: " <<  _t2_seeds << std::endl;
-  std::cout << "T1 5 point straight tracks: " <<  _t2_5pt_strks << std::endl;
-  std::cout << "T1 4 point straight tracks: " <<  _t2_4pt_strks << std::endl;
-  std::cout << "T1 3 point straight tracks: " <<  _t2_3pt_strks << std::endl;
-  std::cout << "T2 5 point straight tracks: " <<  _t2_5pt_strks << std::endl;
-  std::cout << "T2 4 point straight tracks: " <<  _t2_4pt_strks << std::endl;
-  std::cout << "T2 3 point straight tracks: " <<  _t2_3pt_strks << std::endl;
-  std::cout << "T1 5 point helical tracks: " <<  _t2_5pt_htrks << std::endl;
-  std::cout << "T1 4 point helical tracks: " <<  _t2_4pt_htrks << std::endl;
-  std::cout << "T1 3 point helical tracks: " <<  _t2_3pt_htrks << std::endl;
-  std::cout << "T2 5 point helical tracks: " <<  _t2_5pt_htrks << std::endl;
-  std::cout << "T2 4 point helical tracks: " <<  _t2_4pt_htrks << std::endl;
-  std::cout << "T2 3 point helical tracks: " <<  _t2_3pt_htrks << std::endl;
 };
 
 } // ~namespace MAUS
