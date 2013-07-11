@@ -148,12 +148,12 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @returns JSON document containing current histogram.
         """
         # Load and validate the JSON document.
+        def_doc = {"maus_event_type":"Image", "image_list":[]}
         try:
             json_doc = json.loads(json_string.rstrip())
         except Exception: # pylint:disable=W0703
-            json_doc = {}
-            ErrorHandler.HandleException(json_doc, self)
-            return unicode(json.dumps(json_doc))
+            def_doc = ErrorHandler.HandleException(def_doc, self)
+            return unicode(json.dumps(def_doc))
 
         self.spill_count = self.spill_count + 1
 
@@ -161,8 +161,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         try:
             result = self._update_histograms(json_doc)
         except Exception: # pylint:disable=W0703
-            ErrorHandler.HandleException(json_doc, self)
-            return unicode(json.dumps(json_doc))
+            def_doc = ErrorHandler.HandleException(def_doc, self)
+            return unicode(json.dumps(def_doc))
         image_list = [image['image'] for image in result]
         # Convert results to strings.
         return json.dumps({"maus_event_type":"Image", "image_list":image_list})

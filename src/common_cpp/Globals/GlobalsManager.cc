@@ -15,11 +15,10 @@
  *
  */
 
-#include "src/legacy/Interface/Squeal.hh"
-#include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/RunActionManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
@@ -37,7 +36,7 @@ namespace MAUS {
 // then legacy cards and run data
 void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
     if (Globals::_process != NULL) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
       "Attempt to initialise Globals when it was already initialised",
                       "GlobalsManager::InitialiseGlobals"));
     }
@@ -54,6 +53,9 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        bool stack = JsonWrapper::GetProperty
+               (config, "will_do_stack_trace", JsonWrapper::booleanValue).asBool();
+        Exception::SetWillDoStackTrace(stack);
         // we set up logging but for now leave singleton-like access
         // meaning that we can't reinitialise the logging
         Logging::setStandardOutputs(verbose_level);
@@ -87,7 +89,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
             process->_recon_field_constructor =
                                  new BTFieldConstructor(process->_recon_mods);
         }
-    } catch(Squeal squee) {
+    } catch(Exception squee) {
         Globals::_process = NULL;
         delete process;
         throw squee;
@@ -98,7 +100,7 @@ void GlobalsManager::DeleteGlobals() {
     // we don't delete the MICERun as this isn't really meant to be deleted
     // (it's legacy anyway)
     if (Globals::_process == NULL) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
              "Attempt to delete Globals when it was not initialised",
                       "GlobalsManager::DeleteGlobals"));
     }

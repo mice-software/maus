@@ -326,6 +326,7 @@ class RunSettings: #pylint: disable = R0902
                    os.path.join(self.download_target, 'ParentGeometryFile.dat'),
             '-output_root_file_name', self.mc_file_name,
             '-verbose_level', '0',
+            '-will_do_stack_trace', 'False',
         ]
     
     def get_reconstruction_parameters(self):
@@ -344,6 +345,7 @@ class RunSettings: #pylint: disable = R0902
             '-daq_data_file', str(self.run_number),
             '-daq_data_path', './',
             '-verbose_level', '0',
+            '-will_do_stack_trace', 'False',
         ]
 
     def get_download_parameters(self):

@@ -32,6 +32,15 @@ The routines can be controlled by a number of settings that enable users to spec
  > ${MAUS_ROOT_DIR}/bin/simulate_mice.py \
                     --simulation_geometry_filename Test.dat
 \end{verbatim}
+to run the Monte Carlo against a given geometry. As another example, it is possible to run the data reconstruction against a given run
+\begin{verbatim}
+> cd ${MAUS_ROOT_DIR} 
+> ${MAUS_ROOT_DIR}/bin/analyze_data_offline.py \
+                    --daq_data_file 02873 \
+                    --daq_data_path src/input/InputCppDAQData
+\end{verbatim}
+This will run against data in run \verb|02873| looking for files in directory \verb|src/input/InputCppDAQData|.
+
 To get a (long) list of all command line variables use the \verb|-h| switch.
 \begin{verbatim}
  > ${MAUS_ROOT_DIR}/bin/simulate_mice.py -h

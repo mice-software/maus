@@ -52,6 +52,8 @@ verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
+                                        # exception
 
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
@@ -72,8 +74,8 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 10000 # particles are killed after this number of
-                                # steps (assumed to be stuck in the fields)
+maximum_number_of_steps = 500000 # particles are killed after this number of
+                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
@@ -345,9 +347,17 @@ mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumen
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# refresh rate for refreshing plots
+reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"
 end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+
+# deltas for numerical derivative calculation of Optics transfer maps
+TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
+                                 "x":0.1, "Px":0.1,
+                                 "y":0.1, "Py":0.1}
+
