@@ -137,14 +137,14 @@ double DataStructureHelper::GetDetectorZPosition(
         detector_name << "/" << view_name;  // for exception message if needed
       } else if (mothers.size() > 1) {
         std::stringstream message;
-        message << "Found multiple reconstruction mapping detectors named \""
+        message << "Found multiple detector geometry modules named \""
                 << detector_name.str() << "\".";
         throw(Squeal(Squeal::recoverable,
                       message.str(),
                       "DataStructureHelper::GetDetectorZPosition()"));
       } else {
         std::stringstream message;
-        message << "Couldn't find reconstruction mapping detector \""
+        message << "Couldn't find detector geometry module \""
                 << detector_name.str() << "\".";
         throw(Squeal(Squeal::recoverable,
                       message.str(),

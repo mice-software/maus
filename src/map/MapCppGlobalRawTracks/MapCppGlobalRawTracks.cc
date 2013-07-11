@@ -495,26 +495,8 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
     const double slab_width,
     const size_t number_of_slabs,
     GlobalDS::TrackPoint * track_point) {
-  MiceModule const * const geometry
-    = Globals::GetInstance()->GetReconstructionMiceModules();
-  std::vector<const MiceModule *> module;
   DataStructureHelper helper = DataStructureHelper::GetInstance();
-  switch (detector.id()) {
-    case GlobalDS::kTOF0:
-      module = helper.FindModulesByName(geometry, "TOF0.dat");
-      break;
-    case GlobalDS::kTOF1:
-      module = helper.FindModulesByName(geometry, "TOF1Detector.dat");
-      break;
-    case GlobalDS::kTOF2:
-      module = helper.FindModulesByName(geometry, "TOF2Detector.dat");
-      break;
-    default: break;
-  }
-  if (module.size() == 0) {
-    return;
-  }
-  const double z = module[0]->globalPosition().z();
+  const double z = helper.GetDetectorZPosition(detector.id());
   std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: "
             << std::endl
             << "\tPhys. Event #: " << tof_space_point->GetPhysEventNumber()
@@ -809,8 +791,10 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
     = simulator->GetReferenceParticle();
 
   ThreeVector position = (*scifi_space_point)->get_position();
+  DataStructureHelper helper = DataStructureHelper::GetInstance();
+  const double z = helper.GetDetectorZPosition(detector.id());
   const double time = (*scifi_space_point)->get_time();
-  TLorentzVector four_position(position.x(), position.y(), position.z(), time);
+  TLorentzVector four_position(position.x(), position.y(), z, time);
   space_point->set_position(four_position);
 
   // FIXME(Lane) Replace MC momentum with official track momentum when that
