@@ -30,6 +30,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "src/common_cpp/Utils/Exception.hh"
+
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
@@ -120,15 +122,21 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     if (optics == NULL) {
         PyErr_SetString(PyExc_TypeError,
                         "Failed to resolve self as OpticsModel in __init__");
-        return 1;
+        return -1;
     }
+    // legal python to call initialised_object.__init__() to reinitialise, so 
+    // handle this case
     if (optics->model != NULL) {
-        PyErr_SetString(PyExc_RuntimeError,
-                        "C++ OpticsModel was unexpectedly initialised already");
-        return 1;
+        delete optics->model;
+        optics->model = NULL;
     }
-    optics->model = new MAUS::LinearApproximationOpticsModel(
-                                              Globals::GetConfigurationCards());
+    try {
+        Json::Value* cards = Globals::GetConfigurationCards();
+        optics->model = new MAUS::LinearApproximationOpticsModel(*cards);
+    } catch (Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, exc.what());
+        return -1;
+    }
     return 0;
 }
 
