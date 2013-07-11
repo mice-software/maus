@@ -46,6 +46,8 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
   public:
     // Macros to allow friendship with the gtests
     FRIEND_TEST(TrackerDataManagerTest, TestDraw);
+    FRIEND_TEST(TrackerDataPlotterInfoBoxTest, TestConstructor);
+    FRIEND_TEST(TrackerDataPlotterInfoBoxTest, TestBrackets);
 
     /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
     TrackerDataPlotterInfoBox();

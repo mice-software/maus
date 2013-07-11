@@ -137,12 +137,16 @@ TCanvas* TrackerDataPlotterInfoBox::operator() ( TrackerData &t1, TrackerData &t
   // If canvas if passed in use it, otherwise initialise the member canvas
   TCanvas* lCanvas(NULL);
   if ( aCanvas ) {
+    std::cout << "Using input canvas at " << aCanvas << std::endl;
     lCanvas = aCanvas;
+    _Canvas = aCanvas;
   } else {
     if (_Canvas) {
+      std::cout << "Using current local canvas at " << _Canvas << std::endl;
       _Canvas->Clear();
     } else {
     _Canvas = new TCanvas("c_info", "Info Box", 1500, 000, _canvas_width, _canvas_height);
+    std::cout << "Creating new canvas at " << _Canvas << std::endl;
     }
     lCanvas = _Canvas;
   }
