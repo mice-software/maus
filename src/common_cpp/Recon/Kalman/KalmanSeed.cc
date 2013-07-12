@@ -21,9 +21,9 @@
 
 namespace MAUS {
 
-// Ascending site number.
-bool SortByID(const SciFiCluster *a, const SciFiCluster *b) {
-  return ( a->get_id() < b->get_id() );
+// Ascending z.
+bool SortByZ(const SciFiCluster *a, const SciFiCluster *b) {
+  return ( a->get_z() < b->get_z() );
 }
 
 // Ascending station number.
@@ -263,7 +263,7 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
     }
   }
 
-  std::sort(_clusters.begin(), _clusters.end(), SortByID);
+  std::sort(_clusters.begin(), _clusters.end(), SortByZ);
   std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
 }
 
