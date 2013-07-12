@@ -121,7 +121,7 @@ class InMemoryDocumentStore(DocumentStore):
         else:
             return None
 
-    def get_since(self, collection, earliest = None):
+    def get_since(self, collection_name, earliest = None):
         """ 
         Get the documents added since the given date from the data 
         store or None if there is none.
@@ -135,7 +135,7 @@ class InMemoryDocumentStore(DocumentStore):
         Documents are sorted earliest to latest.
         """
         since = []
-        collection = self.__data_store[collection]
+        collection = self.__data_store[collection_name]
         if (earliest == None):
             for (docid, doc) in collection['hash'].items():
                 since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})

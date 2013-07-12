@@ -75,7 +75,7 @@ class MongoDBDocumentStore(DocumentStore):
         """
         return self.__data_store.collection_names()
 
-    def create_collection(self, collection, maximum_number_of_documents):
+    def create_collection(self, collection, maximum_document_size):
         """ 
         Create a collection. If it already exists, this is a no-op.
         An index is created on the "date" field.
@@ -85,7 +85,7 @@ class MongoDBDocumentStore(DocumentStore):
         if (not collection in self.__data_store.collection_names()):
             self.__data_store.create_collection(collection,
                           capped=True,
-                          max=maximum_number_of_documents)
+                          size=maximum_document_size)
             collection = self.__data_store[collection]
             collection.create_index("date")
         

@@ -168,10 +168,15 @@ class OutputPyImage:
         directory = self.directory
         if is_end_of_run:
             directory = self.end_of_run_directory+"/"+str(self.run_number)
-        if not os.path.exists(directory):
-            os.makedirs(directory) 
-        if not os.path.isdir(directory):
-            raise ValueError("image_directory is a file: %s" % directory)
+        # Rogers - coincident call to makedirs from two reducers caused crash -
+        # add try ... except ...
+        try:
+            if not os.path.exists(directory):
+                os.makedirs(directory) 
+            if not os.path.isdir(directory):
+                raise ValueError("image_directory is a file: %s" % directory)
+        except OSError:
+            pass
         file_path = os.path.join(directory, file_name)
         return file_path
 

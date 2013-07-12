@@ -341,7 +341,7 @@ configuration_file = "" # should be set on the command line only (else ignored)
 
 doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
 doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
-doc_store_event_cache_size = 1000 # Maximum number of documents (tyically DAQ events) to cache at any one time in multiprocessing mode, as used by e.g. online code. Corresponds to ~ n/3 spills
+doc_store_event_cache_size = 10**8 # Maximum size of the Mongo cache to cache at any one time in multiprocessing mode, as used by e.g. online code. Corresponds to ~ n/3 spills.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
