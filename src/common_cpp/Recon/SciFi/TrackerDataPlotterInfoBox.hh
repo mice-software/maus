@@ -59,7 +59,7 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
     /** Destructor  */
     virtual ~TrackerDataPlotterInfoBox();
 
-    /** Overloaded brackets operator, takes in the data, does all the work */
+    /** Overloaded brackets operator, takes in the data, does all the work. */
     TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL);
 
     /** Setup the TPaves, can't be done in constructor as need to have chosen a canvas beforehand */

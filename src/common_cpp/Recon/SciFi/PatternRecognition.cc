@@ -102,6 +102,7 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
+    /*
     for ( size_t i = 0; i < evt.spacepoints().size(); ++i ) {
       double x = evt.spacepoints()[i]->get_position().x();
       double y = evt.spacepoints()[i]->get_position().y();
@@ -110,6 +111,7 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
       ThreeVector pos(x, y, z);
       evt.spacepoints()[i]->set_position(pos);
     }
+    */
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = sort_by_tracker(evt.spacepoints());
 
@@ -133,6 +135,7 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
     std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
 
     // Put the spacepoints back the way we found them
+    /*
     for ( size_t i = 0; i < evt.spacepoints().size(); ++i ) {
       double x = evt.spacepoints()[i]->get_position().x();
       double y = evt.spacepoints()[i]->get_position().y();
@@ -151,6 +154,7 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
       std::cerr << "circle_x0: " << circle_x0;
       std::cerr << "->" << evt.helicalprtracks()[i]->get_circle_x0() << std::endl;
     }
+    */
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }

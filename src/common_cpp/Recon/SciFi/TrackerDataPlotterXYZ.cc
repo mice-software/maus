@@ -47,7 +47,7 @@ TCanvas* TrackerDataPlotterXYZ::operator() ( TrackerData &t1, TrackerData &t2, T
     if (_Canvas) {
       _Canvas->Clear();
     } else {
-      _Canvas = new TCanvas("sp_xy", "Spacepoint x-y Projections", 200, 10, 700, 500);
+      _Canvas = new TCanvas("sp_trk_xy", "Spacepoint x-y Projections", 200, 10, 700, 500);
     }
     _Canvas->Divide(3, 2);
     lCanvas = _Canvas;

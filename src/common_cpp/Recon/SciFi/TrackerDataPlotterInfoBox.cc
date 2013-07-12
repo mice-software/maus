@@ -139,7 +139,6 @@ TCanvas* TrackerDataPlotterInfoBox::operator() ( TrackerData &t1, TrackerData &t
   if ( aCanvas ) {
     std::cout << "Using input canvas at " << aCanvas << std::endl;
     lCanvas = aCanvas;
-    _Canvas = aCanvas;
   } else {
     if (_Canvas) {
       std::cout << "Using current local canvas at " << _Canvas << std::endl;

@@ -15,12 +15,8 @@
  *
  */
 
-// C++ vector
-#include <vector>
-
 // ROOT headers
-#include "TArc.h"
-#include "TF1.h"
+#include "TCanvas.h"
 
 // Google test headers
 #include "gtest/gtest.h"
@@ -130,11 +126,12 @@ TEST_F(TrackerDataPlotterInfoBoxTest, TestBrackets) {
   // Send data to infoBox twice to check accumulates, and check Canvases assigned properly
   TCanvas* c1 = new TCanvas();
   TCanvas* c2 = (*infoBox)(t1, t2, c1);
-  EXPECT_TRUE(c1==infoBox->_Canvas);
-  TCanvas* c3 = (*infoBox)(t1, t2);
-  EXPECT_TRUE(c1==infoBox->_Canvas);
-  EXPECT_TRUE(c1==c2);
-  EXPECT_TRUE(c1==c3);
+  EXPECT_TRUE(c1 == c2);
+  TCanvas* c3 = (*infoBox)(t1, t2); // No canvas passed so should switch to internal canvas
+  EXPECT_TRUE(c3 == infoBox->_Canvas);
+  delete c1;
+  c1 = NULL;
+  c2 = NULL;
 
   // Check infoBox internal state (not bothering to check internal state of root TPaveTexts etc)
   EXPECT_EQ(2, infoBox->_tot_digits_t1);
@@ -155,7 +152,7 @@ TEST_F(TrackerDataPlotterInfoBoxTest, TestBrackets) {
   EXPECT_EQ(4, infoBox->_tot_5htracks_t2);
   EXPECT_EQ(4, infoBox->_tot_4htracks_t2);
   EXPECT_EQ(4, infoBox->_tot_3htracks_t2);
-  delete infoBox; // Deletes the Canvas too
+  delete infoBox; // Deletes the current canvas too
 }
 
 } // ~namespace MAUS
