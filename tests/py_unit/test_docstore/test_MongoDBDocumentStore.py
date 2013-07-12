@@ -37,6 +37,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         @param self Object reference.
         """
         unittest.TestCase.setUp(self)
+        DocumentStoreTests.setUp(self)
         self._host = "localhost"
         self._port = 27017
         try:
@@ -50,12 +51,13 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         self._database_name = self.__class__.__name__
         self._collection = self.__class__.__name__
         self._data_store = MongoDBDocumentStore()
+
         parameters = {
             "mongodb_host":self._host,
             "mongodb_port":self._port,
             "mongodb_database_name":self._database_name}
         self._data_store.connect(parameters)
-        self._data_store.create_collection(self._collection)
+        self._data_store.create_collection(self._collection, self._max_size)
 
     def tearDown(self):
         """

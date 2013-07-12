@@ -40,11 +40,13 @@ class DocumentStore: # pylint: disable=W0232
         """
         pass
 
-    def create_collection(self, collection):
+    def create_collection(self, collection, maximum_number_of_documents):
         """ 
         Create a collection. If it already exists, this is a no-op.
         @param self Object reference.
         @param collection Collection name.
+        @param maximum number of documents that can be stored. If further
+               documents are added, documents with lower id will be dropped
         """
         pass
 
@@ -120,14 +122,6 @@ class DocumentStore: # pylint: disable=W0232
         @param self Object reference.
         @param collection Collection name.
         @param docid Document ID.
-        """
-        pass
-
-    def delete_collection(self, collection):
-        """ 
-        Delete collection.
-        @param self Object reference.
-        @param collection Collection name.
         """
         pass
 

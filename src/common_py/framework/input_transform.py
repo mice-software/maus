@@ -251,7 +251,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         # Purge the document store.
         print("Purging document store")
         DocumentStoreUtilities.create_doc_store_collection(self.doc_store,
-            self.collection)
+            self.collection, self.config["doc_store_event_cache_size"])
         # Do an initial check for active Celery nodes.
         print("Checking for active Celery nodes...")
         num_nodes = CeleryUtilities.ping_celery_nodes()
