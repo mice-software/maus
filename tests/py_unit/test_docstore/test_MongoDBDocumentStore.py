@@ -119,5 +119,25 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         except KeyError:
             pass
 
+    def test_put_max(self):
+        """
+        Test put for > max_id.
+        @param self Object reference.
+        """
+        # Insert document.
+        doc = {"a":"b"}
+        max_size = 0
+        # first determine the max number of documents in the docstore
+        # (I don't know how storage is done so I can't figure this out)
+        self._data_store.put(self._collection, "0", doc)
+        while self._data_store.get(self._collection, "0") != None:
+            self._data_store.put(self._collection, str(max_size), doc)
+            max_size += 1
+        count = self._data_store.count(self._collection)
+        for i in range(5):
+            self._data_store.put(self._collection, str(max_size+i), doc)
+            self.assertEquals(self._data_store.count(self._collection), count)
+        
+
 if __name__ == '__main__':
     unittest.main()

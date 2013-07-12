@@ -24,11 +24,6 @@ from docstore.DocumentStore import DocumentStore
 class InMemoryDocumentStore(DocumentStore):
     """
     In-memory document store.
-
-    We store data in two columns - 'data' is a list containing items one for
-    each entry; 'hash' is a map from id to data entry. This structure allows
-    fast hashing lookups by id and also max_size (removing first item from the
-    list)    
     """
 
     def __init__(self):
@@ -46,19 +41,15 @@ class InMemoryDocumentStore(DocumentStore):
         """
         return self.__data_store.keys()
 
-    def create_collection(self, collection, max_number_of_documents):
+    def create_collection(self, collection, maximum_size = 1e9):
         """ 
         Create a collection. If it already exists, this is a no-op.
         @param self Object reference.
         @param collection Collection name.
-        @param max_number_of_documents Limit the collection to hold at most this
-               number of documents.
+        @param maximum_size Ignored.
         """
         if (not self.__data_store.has_key(collection)):
             self.__data_store[collection] = {}
-            self.__data_store[collection]['data'] = []
-            self.__data_store[collection]['hash'] = {}
-            self.__data_store[collection]['max_docs'] = max_number_of_documents
 
     def has_collection(self, collection):
         """ 
@@ -76,7 +67,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param collection Collection name.
         @return ID list.
         """
-        return self.__data_store[collection]['hash'].keys()
+        return self.__data_store[collection].keys()
 
     def count(self, collection):
         """ 
@@ -85,7 +76,7 @@ class InMemoryDocumentStore(DocumentStore):
         @param collection Collection name.
         @return number >= 0.
         """
-        return len(self.__data_store[collection]['data'])
+        return len(self.__data_store[collection].keys())
 
     def put(self, collection, docid, doc):
         """ 
@@ -99,13 +90,7 @@ class InMemoryDocumentStore(DocumentStore):
         """
         # Get (YYYY,MM,DD,HH,MM,SS,MILLI)
         current_time = datetime.fromtimestamp(time.time())
-        _hash = self.__data_store[collection]['hash']
-        _data = self.__data_store[collection]['data']
-        _data.append((doc, current_time, docid))
-        _hash[docid] = _data[-1]
-        if len(_data) > self.__data_store[collection]['max_docs']:
-            del _hash[_data[0][2]] 
-            self.__data_store[collection]['data'] = _data[1:]
+        self.__data_store[collection][docid] = (doc, current_time)
 
     def get(self, collection, docid):
         """ 
@@ -116,12 +101,12 @@ class InMemoryDocumentStore(DocumentStore):
         @param docid Document ID.
         @return document or None.
         """
-        if self.__data_store[collection]['hash'].has_key(docid):
-            return self.__data_store[collection]['hash'][docid][0]
+        if self.__data_store[collection].has_key(docid):
+            return self.__data_store[collection][docid][0]
         else:
             return None
 
-    def get_since(self, collection_name, earliest = None):
+    def get_since(self, collection, earliest = None):
         """ 
         Get the documents added since the given date from the data 
         store or None if there is none.
@@ -135,16 +120,27 @@ class InMemoryDocumentStore(DocumentStore):
         Documents are sorted earliest to latest.
         """
         since = []
-        collection = self.__data_store[collection_name]
+        collection = self.__data_store[collection]
         if (earliest == None):
-            for (docid, doc) in collection['hash'].items():
+            for (docid, doc) in collection.items():
                 since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})
         else:
-            for (docid, doc) in collection['hash'].items():
+            for (docid, doc) in collection.items():
                 if (doc[1] > earliest):
                     since.append({'_id':docid, 'date':doc[1], 'doc':doc[0]})
         sorted_since = sorted(since, key=lambda item: item['date'])
         return iter(sorted_since)
+
+    def delete_document(self, collection, docid):
+        """ 
+        Delete the document with the given ID from the data store.
+        If there is no such document then this is a no-op.
+        @param self Object reference.
+        @param collection Collection name.
+        @param docid Document ID.
+        """
+        if self.__data_store[collection].has_key(docid):
+            self.__data_store[collection].pop(docid)
 
     def delete_collection(self, collection):
         """ 

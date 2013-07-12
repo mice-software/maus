@@ -40,13 +40,13 @@ class DocumentStore: # pylint: disable=W0232
         """
         pass
 
-    def create_collection(self, collection, maximum_number_of_documents):
+    def create_collection(self, collection, maximum_size = 1e9):
         """ 
         Create a collection. If it already exists, this is a no-op.
         @param self Object reference.
         @param collection Collection name.
-        @param maximum number of documents that can be stored. If further
-               documents are added, documents with lower id will be dropped
+        @param maximum_size maximum size of the database (optional, some 
+               docstore implementations do not use this parameter)
         """
         pass
 

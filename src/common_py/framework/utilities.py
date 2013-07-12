@@ -182,7 +182,7 @@ class DocumentStoreUtilities: # pylint: disable=W0232
         return doc_store
 
     @staticmethod
-    def create_doc_store_collection(doc_store, collection, max_docs):
+    def create_doc_store_collection(doc_store, collection, max_doc_size):
         """
         Create a collection in the document store. If it exists already
         then it is deleted.
@@ -195,7 +195,7 @@ class DocumentStoreUtilities: # pylint: disable=W0232
         try:
             if (doc_store.has_collection(collection)):
                 doc_store.delete_collection(collection)
-            doc_store.create_collection(collection, max_docs)
+            doc_store.create_collection(collection, max_doc_size)
         except Exception as exc:
             raise DocumentStoreException(exc)
 

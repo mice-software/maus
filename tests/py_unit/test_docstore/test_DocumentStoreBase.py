@@ -34,7 +34,7 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         """
         Set the max_size for doc store collections
         """
-        self._max_size = 10
+        self._max_size = 1000
 
     def test_empty_collection(self):
         """
@@ -112,23 +112,6 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         # Validate.
         self.assertEquals(nudoc, self._data_store.get(self._collection, "ID"),
             "Unexpected document for ID")
-
-    def test_put_max(self):
-        """
-        Test put for > max_id.
-        @param self Object reference.
-        """
-        # Insert document.
-        doc = {"a1":"b1", "c1":"d1"}
-        for i in range(self._max_size+5):
-            self._data_store.put(self._collection, str(i), doc)
-        for i in range(5):
-            doc_out = self._data_store.get(self._collection, str(i))
-            self.assertEquals(doc_out, None)
-        for i in range(5, self._max_size):
-            doc_out = self._data_store.get(self._collection, str(i))
-            self.assertEquals(doc, doc_out)
-
 
     def insert_documents(self, number, sleep_time = 0):
         """
