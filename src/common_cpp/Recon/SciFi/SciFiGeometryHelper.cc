@@ -42,22 +42,14 @@ void SciFiGeometryHelper::Build() {
       ThreeVector direction(0., 1., 0.);
       ThreeVector perpendicular(1., 0., 0.);
 
-      CLHEP::HepRotation zflip;
-      const Hep3Vector rowx(-1., 0., 0.);
-      const Hep3Vector rowy(0., -1., 0.);
-      const Hep3Vector rowz(0., 0., 0.);
-      zflip.setRows(rowx, rowy, rowz);
-      G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
-
-      // Get the fibre rotation wrt the tracker frame.
-      //G4RotationMatrix global_fibre_rotation(module->relativeRotation(module->mother() // plane
-      //                                                         ->mother()->mother()->mother()));    // tracker, solenoid
+      // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
+      const MiceModule* plane = module->mother();
       G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
-                                                               ->mother()));    // tracker
+                                                                        ->mother()));    // tracker/ station??
 
       direction     *= internal_fibre_rotation;
-      // perpendicular *= (*trot);
-      perpendicular *= global_fibre_rotation;//*zflip;
+      perpendicular *= internal_fibre_rotation;
+      // perpendicular *= yflip;
 
       // if ( global_fibre_rotation == internal_fibre_rotation ) perpendicular *= zflip;
 
@@ -71,7 +63,7 @@ void SciFiGeometryHelper::Build() {
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
-      const MiceModule* plane = module->mother();
+      // const MiceModule* plane = module->mother();
       G4RotationMatrix plane_rotation(plane->relativeRotation(plane->mother()  // tracker
                                                               ->mother()));    // solenoid
 

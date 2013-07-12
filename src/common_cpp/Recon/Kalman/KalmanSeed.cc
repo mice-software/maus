@@ -192,25 +192,40 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   a(2, 0) = y;
   a(3, 0) = py*kappa;
   a(4, 0) = kappa;
-/*
+
   std::cerr << "Tracker " << _tracker << " has field " << _Bz <<". c is " << c << std::endl;
   std::cerr << "P: " << px << " " << py << " " << pz << std::endl;
   a.Print();
   std::cerr << "MC pos and mom: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
             <<  mc_px<< " " <<  mc_py<< " " <<  mc_pz << std::endl;
-*/
+
   return a;
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  double x, y;
+  double x, y, z;
+  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
   if ( _tracker == 0 ) {
     x = spacepoints.back()->get_position().x();
     y = spacepoints.back()->get_position().y();
+    z = spacepoints.back()->get_position().z();
+    mc_x  = spacepoints.back()->get_channels()[0]->get_true_position().x();
+    mc_y  = spacepoints.back()->get_channels()[0]->get_true_position().y();
+    mc_z  = spacepoints.back()->get_channels()[0]->get_true_position().z();
+    mc_px = spacepoints.back()->get_channels()[0]->get_true_momentum().x();
+    mc_py = spacepoints.back()->get_channels()[0]->get_true_momentum().y();
+    mc_pz = spacepoints.back()->get_channels()[0]->get_true_momentum().z();
   } else if ( _tracker == 1 ) {
     x = spacepoints.front()->get_position().x();
     y = spacepoints.front()->get_position().y();
+    z = spacepoints.front()->get_position().z();
+    mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
+    mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
+    mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
+    mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
+    mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
+    mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
   } else {
     x = y = -666; // removes a compiler warning.
     throw(Squeal(Squeal::recoverable,
@@ -226,6 +241,12 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
+
+  std::cerr << "Tracker " << _tracker << std::endl;
+  std::cerr << "Gradients: " << mx << " " << my << std::endl;
+  a.Print();
+  std::cerr << "MC pos and gradient: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
+  <<  mc_px/mc_pz<< " " <<  mc_py/mc_pz << std::endl;
 
   return a;
 }

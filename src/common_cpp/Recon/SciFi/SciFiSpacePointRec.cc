@@ -195,12 +195,10 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   // if (vcluster->get_tracker() == 1) position = ThreeVector(position.x(), -position.y(), position.z());
   triplet->set_position(position);
 
-  /*
   ThreeVector mc_position = vcluster->get_true_position();
   std::cerr << "Tracker:  "  << vcluster->get_tracker() << " "  << vcluster->get_station() << "\n"
   << "Position: " << position.x() << " " << position.y() << " " << position.z() << "\n"
   << "True MC Position: " << mc_position.x() << " " << mc_position.y() << " " << mc_position.z() << std::endl;
-  */
 
   // Vector p stores the crossing position of views v and w.
   ThreeVector p(p2);

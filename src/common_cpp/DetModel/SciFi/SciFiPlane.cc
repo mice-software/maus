@@ -59,8 +59,16 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4String coreName    = mod->fullName() + "DoubletCores";
 
   // Rotation of the fibre wrt the station body.
-  G4RotationMatrix* pRot = new G4RotationMatrix(mod->relativeRotation(mod->mother()->mother()));
+  G4RotationMatrix* pRot = new G4RotationMatrix(mod->relativeRotation(mod->mother()));
 
+  CLHEP::HepRotation xflip;
+  const Hep3Vector rowx(1., 0., 0.);
+  const Hep3Vector rowy(0., -1., 0.);
+  const Hep3Vector rowz(0., 0., -1.);
+  xflip.setRows(rowx, rowy, rowz);
+
+  // this is the rotation of the fibre array
+  (*pRot) = (*pRot)*xflip;
   // This is a fibre
   solidDoublet = new G4Tubs(doubletName, 0.0,
                             tr, doubletThickness / 2.0,

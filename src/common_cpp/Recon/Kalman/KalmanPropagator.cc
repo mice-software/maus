@@ -129,7 +129,12 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
   double plane_width = FibreParameters.Plane_Width;
   double Delta_p = BetheBlochStoppingPower(old_momentum.mag())*plane_width;
   //
-  // Reduce momentum vector accordingly.
+  // Reduce/increase momentum vector accordingly.
+  // Indeed, for tracker 0, we want to ADD energy
+  // beause we are not following the energy loss.
+  if ( old_site->id() < 0 ) {
+    Delta_p = -Delta_p;
+  }
   double reduction_factor = (old_momentum.mag()-Delta_p)/old_momentum.mag();
   ThreeVector new_momentum = old_momentum*reduction_factor;
   //
