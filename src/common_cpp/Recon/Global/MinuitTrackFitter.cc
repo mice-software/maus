@@ -379,7 +379,10 @@ std::cerr << "xm: " << event_point.x() << " pxm: " << event_point.Px() << " ym: 
           << " dx: " << residual.x() << " dpx: " << residual.Px() << " dy: " << residual.y() << " dpy: " << residual.Py()
           << " chi2: " << chi_squared << std::endl;
 */
-std::cerr << residual << " = " << event_point << " - " << point << " -- chi2: " << chi_squared << std::endl;
+std::cerr << residual << std::endl
+          << " = " << event_point << std::endl
+          << " - " << point << std::endl
+          << " -- chi2: " << chi_squared << std::endl;
     ++index;
   }
   std::cerr << std::endl;

@@ -793,7 +793,9 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   ThreeVector position = (*scifi_space_point)->get_position();
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   const double z = helper.GetDetectorZPosition(detector.id());
-  const double time = (*scifi_space_point)->get_time();
+  // FIXME(Lane) need tracker timestamp that is synched with TOF timestamp
+  // const double time = (*scifi_space_point)->get_time();
+  const double time = 0.;
   TLorentzVector four_position(position.x(), position.y(), z, time);
   space_point->set_position(four_position);
 

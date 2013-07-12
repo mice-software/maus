@@ -139,7 +139,9 @@ PolynomialMap::GetCoefficientsAsVector() const {
 }
 
 PolynomialMap* PolynomialMap::Recentred(double * point) const {
-  throw(Squeal(Squeal::nonRecoverable, "Recentred not implemented", "PolynomialMap::Recentred"));
+  throw(Squeal(Squeal::nonRecoverable,
+        "Recentred not implemented",
+        "PolynomialMap::Recentred"));
 }
 
 void  PolynomialMap::F(const double* point, double* value) const {

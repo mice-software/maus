@@ -217,6 +217,20 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
         }
       }
 
+      // check for poorly configured mapping virtual detectors
+      const double selection_error
+        = ::abs(end_plane - static_cast<double>(transfer_map_entry->first));
+      const double max_selection_error = 10.;  // 1 cm
+      if (selection_error > max_selection_error) {
+        std::ostringstream message_buffer;
+        message_buffer << "Difference in z-position between closest mapping "
+                       << "detector (z=" << transfer_map_entry->first << ") "
+                       << " and target detector " << "(z=" << end_plane << ") "
+                       << "exceeds tollerance for accurate mapping.";
+        throw(Squeal(Squeal::nonRecoverable, message_buffer.str(),
+                     "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
+      }
+
       found_entry = true;
     }
   }
