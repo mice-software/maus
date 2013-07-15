@@ -66,8 +66,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     env_cp['MAUS_WEB_MEDIA'] = my_tmp+'/'
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp+'/raw/'
     proc = subprocess.Popen(['python', ANALYZE_EXE,
-                             '--DAQ_online_file', TMP_DIR+data_file_name,
-                             '--reduce_plot_refresh_rate', '20'],
+                             '--DAQ_online_file', TMP_DIR+data_file_name],
                              env=env_cp, stdout=log,
                              stderr=subprocess.STDOUT)
     if send_signal != None:
