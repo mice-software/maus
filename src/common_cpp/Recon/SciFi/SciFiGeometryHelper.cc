@@ -35,6 +35,7 @@ void SciFiGeometryHelper::Build() {
          module->propertyExists("Station", "int") &&
          module->propertyExists("Plane", "int") ) {
       int tracker_n = module->propertyInt("Tracker");
+  std::cerr << "Tracker " << tracker_n << std::endl;
       int station_n = module->propertyInt("Station");
       int plane_n   = module->propertyInt("Plane");
       double pitch        = module->propertyDouble("Pitch");
@@ -94,7 +95,9 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
   ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
+  std::cerr << "Bfield before rotation: " << B_field.z() << std::endl;
   B_field *= plane_rotation;
+  std::cerr << "Bfield after rotation: " << B_field.z() << std::endl;
   double Tracker_Bz = B_field.z();
   return Tracker_Bz;
 }
