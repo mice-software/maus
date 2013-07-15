@@ -47,6 +47,8 @@ class MongoDBDocumentStore(DocumentStore):
         - mongodb_database_name - MongoDB database name. This is a
           mandatory parameter. If the database does not exist then it
           is created.
+        - mongodb_size - MongoDB maximum size. MAUS always uses capped
+          databases. This is a mandatory parameter
 
         @param self Object reference.
         @param parameters Connection information.
@@ -73,18 +75,20 @@ class MongoDBDocumentStore(DocumentStore):
         """
         return self.__data_store.collection_names()
 
-    def create_collection(self, collection):
+    def create_collection(self, collection, maximum_size=1e9):
         """ 
         Create a collection. If it already exists, this is a no-op.
         An index is created on the "date" field.
         @param self Object reference.
         @param collection Collection name.
+        @param maximum_size maximum size in bytes of the document store.
         """
         if (not collection in self.__data_store.collection_names()):
-            self.__data_store.create_collection(collection)
+            self.__data_store.create_collection(collection,
+                          capped=True,
+                          size=maximum_size)
             collection = self.__data_store[collection]
             collection.create_index("date")
-        #print self.__data_store[collection].count()
         
     def has_collection(self, collection):
         """ 
@@ -172,7 +176,7 @@ class MongoDBDocumentStore(DocumentStore):
                                    {"date":{"$gt":earliest}}).sort("date")
             return result
         except pymongo.errors.OperationFailure as exc:
-            raise DocumentStoreException(exc)
+            raise DocumentStoreException(exc)      
 
     def delete_document(self, collection, docid):
         """ 

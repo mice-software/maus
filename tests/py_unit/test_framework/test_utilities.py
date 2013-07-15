@@ -243,13 +243,13 @@ class DocumentStoreUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904
         @param self Object reference.
         """
         doc_store = InMemoryDocumentStore()
-        doc_store.create_collection("test")
-        doc_store.put("test", "1", {})
-        doc_store.put("test", "2", {})
+        doc_store.create_collection("test", -1)
+        doc_store.put("test", "1", {"a":"a"})
+        doc_store.put("test", "2", {"a":"a"})
         self.assertEquals(2, doc_store.count("test"), 
             "Expected 2 documents")
         DocumentStoreUtilities.create_doc_store_collection(doc_store,
-            "test")
+            "test", -1)
         # Collection should have been deleted and recreated.
         self.assertEquals(0, doc_store.count("test"), 
             "Expected 0 documents")
@@ -263,7 +263,7 @@ class DocumentStoreUtilitiesTestCase(unittest.TestCase): # pylint: disable=R0904
         with self.assertRaisesRegexp(DocumentStoreException,
             ".*"):
             DocumentStoreUtilities.create_doc_store_collection( \
-                doc_store, "fail")
+                doc_store, "fail", 1)
 
 class MockDocumentStore(DocumentStore): 
     """

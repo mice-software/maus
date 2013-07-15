@@ -30,6 +30,11 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
     mixing this in must define a docstore.DocumentStore object in
     self._datastore and a collection name in self._collection.
     """
+    def setUp(self):
+        """
+        Set the max_size for doc store collections
+        """
+        self._max_size = 1000
 
     def test_empty_collection(self):
         """
@@ -56,7 +61,7 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         names = ["DocumentStoreTest1", "DocumentStoreTest2",
             "DocumentStoreTest3"]
         for name in names:
-            self._data_store.create_collection(name)
+            self._data_store.create_collection(name, 1)
         for name in names:
             self.assertTrue(
                 self._data_store.has_collection(name),
@@ -197,32 +202,12 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         since = self._data_store.get_since(self._collection, pre_time)
         self.validate_documents(docs_all, since)
 
-    def test_delete_document(self):
-        """
-        Test delete_document.
-        @param self Object reference.
-        """
-        self._data_store.put(self._collection, "ID1", {"a1":"b1", "c1":"d1"})
-        self._data_store.put(self._collection, "ID2", {"a2":"b2", "c2":"d2"})
-        self._data_store.delete_document(self._collection, "ID1")
-        self.assertEquals(1, self._data_store.count(self._collection),
-            "Unexpected len")
-        ids = self._data_store.get_ids(self._collection)
-        self.assertEquals(1, len(ids), "Unexpected number of IDs")
-        self.assertTrue(not "ID1" in ids, "ID1 was not in ids")
-
-        self._data_store.delete_document(self._collection, "ID2")
-        self.assertEquals(0,  self._data_store.count(self._collection),
-            "Unexpected len")
-        ids = self._data_store.get_ids(self._collection)
-        self.assertEquals(0, len(ids), "Unexpected number of IDs")
-
     def test_delete_collection(self):
         """
         Test delete_collection.
         @param self Object reference.
         """
-        self._data_store.create_collection("DocumentStoreTest")
+        self._data_store.create_collection("DocumentStoreTest", 1)
         self.assertTrue(
             self._data_store.has_collection("DocumentStoreTest"),
             "Expected to find new collection")

@@ -233,7 +233,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
             self.spill_process_count += 1
-            print "Spills processed: %d" % self.spill_process_count
+            print "DAQ events processed: %d" % self.spill_process_count
 
     def execute(self, job_header, job_footer, will_run_until_ctrl_c=True):
         """
