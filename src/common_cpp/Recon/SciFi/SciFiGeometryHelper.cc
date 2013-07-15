@@ -45,7 +45,7 @@ void SciFiGeometryHelper::Build() {
       // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
       const MiceModule* plane = module->mother();
       G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
-                                                                        ->mother()));    // tracker/ station??
+                                               ->mother()));  // tracker/ station??
 
       direction     *= internal_fibre_rotation;
       perpendicular *= internal_fibre_rotation;
