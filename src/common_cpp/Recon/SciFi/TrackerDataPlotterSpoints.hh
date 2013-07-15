@@ -27,6 +27,7 @@
 // ROOT headers
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/TrackerData.hh"
@@ -37,6 +38,9 @@ namespace MAUS {
 
 class TrackerDataPlotterSpoints : public TrackerDataPlotterBase {
   public:
+    // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataPlotterSpointsTest, TestConstructor);
+    FRIEND_TEST(TrackerDataPlotterSpointsTest, TestBrackets);
 
     /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
     TrackerDataPlotterSpoints();
@@ -47,7 +51,7 @@ class TrackerDataPlotterSpoints : public TrackerDataPlotterBase {
     /** Overloaded brackets operator, takes in the data, does all the work */
     TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL);
 
-  private:
+  protected:
     TGraph *_gr_xy1;
     TGraph *_gr_zx1;
     TGraph *_gr_zy1;

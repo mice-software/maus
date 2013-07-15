@@ -101,16 +101,16 @@ void KalmanFilter::UpdateH(const KalmanState *a_site) {
   double pitch = FibreParameters.Pitch;
 
   _H.Zero();
-  _H(0, 0) = -dy/pitch;
-  _H(0, 2) =  dx/pitch;
-  _H(1, 0) = -perp_y/pitch;
-  _H(1, 2) =  perp_x/pitch;
+  _H(0, 0) =  dy/pitch;
+  _H(0, 2) = -dx/pitch;
+  _H(1, 0) =  perp_y/pitch;
+  _H(1, 2) = -perp_x/pitch;
 
   _S.Zero();
-  _S(0, 0) =  dy/pitch;
-  _S(0, 1) = -dx/pitch;
-  _S(1, 0) =  perp_y/pitch;
-  _S(1, 1) = -perp_x/pitch;
+  _S(0, 0) = -dy/pitch;
+  _S(0, 1) =  dx/pitch;
+  _S(1, 0) = -perp_y/pitch;
+  _S(1, 1) =  perp_x/pitch;
 }
 
 // W = [ V + H C_k-1 Ht + S cov_S_k-1 St ]-1

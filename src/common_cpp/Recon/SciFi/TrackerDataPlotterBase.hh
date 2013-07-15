@@ -45,8 +45,11 @@ class TrackerDataPlotterBase {
     /** Virtual void overloaded brackets operator, used to set the data & optionally the canvas */
     virtual TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL ) = 0;
 
+    /** Return the member Canvas */
+    TCanvas* get_canvas() { return _Canvas; }
+
   protected:
-    TCanvas *_Canvas;
+    TCanvas* _Canvas;
 };
 
 } // ~namespace MAUS

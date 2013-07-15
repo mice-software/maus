@@ -123,14 +123,6 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   clust->set_direction(plane_direction);
   clust->set_position(position);
   clust->set_alpha(alpha);
-
-  std::cerr << tracker << " " << station << " " << plane << std::endl;
-  std::cerr << "Dir " << plane_direction.x() << " " << plane_direction.y() << " " << plane_direction.z() << std::endl;
-  std::cerr << "Pos " << position.x() << " " << position.y() << " " << position.z() << std::endl;
-  std::cerr << "MC "  << clust->get_true_position().x() << " "
-                      << clust->get_true_position().y() << " "
-                      << clust->get_true_position().z() << std::endl;
-
 }
 
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {

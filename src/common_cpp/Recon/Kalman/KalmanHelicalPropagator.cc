@@ -84,7 +84,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   double old_z = old_site->z();
 
   // Delta Z in mm
-  double deltaZ = 0; // (new_z-old_z);
+  double deltaZ = (new_z-old_z);
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);

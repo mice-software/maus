@@ -23,7 +23,7 @@ namespace MAUS {
 
 // Ascending z.
 bool SortByZ(const SciFiCluster *a, const SciFiCluster *b) {
-  return ( a->get_z() < b->get_z() );
+  return ( a->get_position().z() < b->get_position().z() );
 }
 
 // Ascending station number.
@@ -142,32 +142,16 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
   double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
-  if ( _tracker == 0 ) {
-    x = spacepoints.back()->get_position().x();
-    y = spacepoints.back()->get_position().y();
-    z = spacepoints.back()->get_position().z();
-    mc_x  = spacepoints.back()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.back()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.back()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.back()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.back()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.back()->get_channels()[0]->get_true_momentum().z();
-  } else if ( _tracker == 1 ) {
-    x = spacepoints.front()->get_position().x();
-    y = spacepoints.front()->get_position().y();
-    z = spacepoints.front()->get_position().z();
-    mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
-  } else {
-    x = y = z = -666; // removes a compiler warning.
-    throw(Squeal(Squeal::recoverable,
-                 "Pattern Recon has bad tracker number.",
-                 "KalmanSeed::ComputeInitialStateVector"));
-  }
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
+  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
+  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
+  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
+  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
+  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
+  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
+
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
@@ -206,32 +190,16 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
   double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
-  if ( _tracker == 0 ) {
-    x = spacepoints.back()->get_position().x();
-    y = spacepoints.back()->get_position().y();
-    z = spacepoints.back()->get_position().z();
-    mc_x  = spacepoints.back()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.back()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.back()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.back()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.back()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.back()->get_channels()[0]->get_true_momentum().z();
-  } else if ( _tracker == 1 ) {
-    x = spacepoints.front()->get_position().x();
-    y = spacepoints.front()->get_position().y();
-    z = spacepoints.front()->get_position().z();
-    mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
-  } else {
-    x = y = -666; // removes a compiler warning.
-    throw(Squeal(Squeal::recoverable,
-      "Pattern Recon has bad tracker number.",
-      "KalmanSeed::ComputeInitialStateVector"));
-  }
+
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
+  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
+  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
+  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
+  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
+  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
+  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
 
   double mx = seed->get_mx();
   double my = seed->get_my();

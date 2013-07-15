@@ -36,7 +36,9 @@ SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
                                      _mc_px(0.),
                                      _mc_y(0.),
                                      _mc_py(0.),
-                                     _mc_pz(0.) {}
+                                     _mc_pz(0.) {
+  _covariance.ResizeTo(5, 5);
+}
 
 SciFiTrackPoint::~SciFiTrackPoint() {}
 
@@ -82,6 +84,17 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
   _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
   _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
+
+  TMatrixD C = kalman_site->covariance_matrix(KalmanState::Smoothed);
+  C.ResizeTo(5, 5);
+  _covariance = C;
+/*
+  for ( int row_i = 0; row_i < 5; row_i++ ) {
+    std::vector<double> a_row = { C(row_i, 0), C(row_i, 1), C(row_i, 2), C(row_i, 3), C(row_i, 4) };
+    // _covariance = *(C.GetMatrixArray());
+    _covariance.push_back(a_row);
+  }
+*/
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
@@ -107,6 +120,8 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _pull              = point.pull();
   _residual          = point.residual();
   _smoothed_residual = point.smoothed_residual();
+
+  _covariance= point.covariance();
 }
 
 SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
@@ -135,6 +150,8 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _pull              = rhs.pull();
   _residual          = rhs.residual();
   _smoothed_residual = rhs.smoothed_residual();
+
+  _covariance= rhs.covariance();
 
   return *this;
 }

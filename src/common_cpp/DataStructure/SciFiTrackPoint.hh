@@ -97,6 +97,10 @@ class SciFiTrackPoint {
    */
   void set_pz(double pz)                        { _pz     = pz;         }
 
+  /** @brief  Sets the covariance matrix.
+   */
+  void set_covariance(TMatrixD covariance)     { _covariance = covariance; }
+
   /** @brief  Sets pull (residual of the projected state).
    */
   void set_pull(double pull)                    { _pull   = pull;       }
@@ -154,6 +158,10 @@ class SciFiTrackPoint {
   /** @brief  Returns the z momentum component.
    */
   double pz()                const { return _pz;       }
+
+  /** @brief  Returns the covariance matrix.
+   */
+  TMatrixD covariance()        const { return _covariance; }
 
   /** @brief  Returns the residual of the projected state.
    */
@@ -216,7 +224,7 @@ class SciFiTrackPoint {
 
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */
-  double covariance[5][5];
+  TMatrixD _covariance;
 
   /** @brief projected residual
    */

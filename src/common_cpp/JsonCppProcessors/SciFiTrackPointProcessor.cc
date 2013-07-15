@@ -73,5 +73,8 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor() {
     RegisterValueBranch("s_residual", &_double_proc,
                         &SciFiTrackPoint::smoothed_residual,
                         &SciFiTrackPoint::set_smoothed_residual, false);
+    RegisterValueBranch("covariance", &_matrix_proc,
+                        &SciFiTrackPoint::covariance,
+                        &SciFiTrackPoint::set_covariance, false);
 }
 } // ~namespace MAUS

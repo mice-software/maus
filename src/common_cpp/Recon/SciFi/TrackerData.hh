@@ -61,6 +61,8 @@ class TrackerData {
     FRIEND_TEST(TrackerDataManagerTest, TestProcessSpoints);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessStrks);
     FRIEND_TEST(TrackerDataManagerTest, TestProcessHtrks);
+    FRIEND_TEST(TrackerDataPlotterInfoBoxTest, TestBrackets);
+    FRIEND_TEST(TrackerDataPlotterSpointsTest, TestBrackets);
 
     /** Constructor */
     TrackerData();

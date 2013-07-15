@@ -33,6 +33,7 @@ class SciFiTrackPointProcessor : public ObjectProcessor<SciFiTrackPoint> {
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
+    ObjectProcessor<TMatrixD> _matrix_proc;
 };
 } // ~namespace MAUS
 

@@ -46,16 +46,18 @@ TrackerDataPlotterSpoints::~TrackerDataPlotterSpoints() {
 
 TCanvas* TrackerDataPlotterSpoints::operator() ( TrackerData &t1, TrackerData &t2,
                                                  TCanvas* aCanvas) {
-  // If canvas if passed in use it, otherwise initialise the member canvas
+  // If canvas is passed in use it, otherwise use the member canvas
   TCanvas* lCanvas(NULL);
   if ( aCanvas ) {
     // TODO check number of pads = 6
     lCanvas = aCanvas;
-  } else {
-    if (_Canvas) delete _Canvas;
+    std::cerr << "Using input canvas at " << aCanvas << std::endl;
+  } else { // If the local canvas is setup, delete it, and make it fresh
+    if ( _Canvas ) delete _Canvas;
     _Canvas = new TCanvas("sp_xy", "Spacepoint x-y Projections", 200, 10, 700, 500);
     _Canvas->Divide(3, 2);
     lCanvas = _Canvas;
+    std::cerr << "Creating new local canvas at " << _Canvas << std::endl;
   }
 
   // Draw the spacepoints
