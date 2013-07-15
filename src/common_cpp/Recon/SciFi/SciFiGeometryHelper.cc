@@ -35,7 +35,6 @@ void SciFiGeometryHelper::Build() {
          module->propertyExists("Station", "int") &&
          module->propertyExists("Plane", "int") ) {
       int tracker_n = module->propertyInt("Tracker");
-  std::cerr << "Tracker " << tracker_n << std::endl;
       int station_n = module->propertyInt("Station");
       int plane_n   = module->propertyInt("Plane");
       double pitch        = module->propertyDouble("Pitch");
@@ -50,17 +49,6 @@ void SciFiGeometryHelper::Build() {
 
       direction     *= internal_fibre_rotation;
       perpendicular *= internal_fibre_rotation;
-      // perpendicular *= yflip;
-
-      // if ( global_fibre_rotation == internal_fibre_rotation ) perpendicular *= zflip;
-
-      // perpendicular *= global_fibre_rotation;
-
-      /*
-      std::cerr << tracker_n         << " " << station_n         << " " << plane_n           << std::endl;
-      std::cerr << direction.x()     << " " << direction.y()     << " " << direction.z()     << std::endl;
-      std::cerr << perpendicular.x() << " " << perpendicular.y() << " " << perpendicular.z() << std::endl;
-      */
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -95,9 +83,7 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
   ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
-  std::cerr << "Bfield before rotation: " << B_field.z() << std::endl;
   B_field *= plane_rotation;
-  std::cerr << "Bfield after rotation: " << B_field.z() << std::endl;
   double Tracker_Bz = B_field.z();
   return Tracker_Bz;
 }

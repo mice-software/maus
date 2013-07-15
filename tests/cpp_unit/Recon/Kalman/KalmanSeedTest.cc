@@ -243,9 +243,9 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   //
   EXPECT_EQ(a.GetNrows(), 5);
   EXPECT_NEAR(a(0, 0), x, err);
-  EXPECT_NEAR(a(1, 0), pt*cos(phi_0+PI/2.)*kappa, err);
+  EXPECT_NEAR(a(1, 0), pt*cos(phi_0+PI/2.)*fabs(kappa), err);
   EXPECT_NEAR(a(2, 0), y, err);
-  EXPECT_NEAR(a(3, 0), pt*sin(phi_0+PI/2.)*kappa, err);
+  EXPECT_NEAR(a(3, 0), pt*sin(phi_0+PI/2.)*fabs(kappa), err);
 }
 
 } // ~namespace MAUS

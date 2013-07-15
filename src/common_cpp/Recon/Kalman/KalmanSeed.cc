@@ -172,9 +172,9 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = px*kappa;
+  a(1, 0) = px*fabs(kappa);
   a(2, 0) = y;
-  a(3, 0) = py*kappa;
+  a(3, 0) = py*fabs(kappa);
   a(4, 0) = kappa;
 
   std::cerr << "Tracker " << _tracker << " has field " << _Bz <<". c is " << c << std::endl;
