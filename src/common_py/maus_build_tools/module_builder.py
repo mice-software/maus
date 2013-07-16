@@ -58,17 +58,26 @@ class ModuleBuilder:
                    exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
     # Determine if the project uses SWIG to build, and pass to either
-    # build_project_SWIG or build_project_CAPI
+    # build_project_swig or build_project_capi
     def build_project(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+        """
+        Add a particular subproject to the build list
+
+        Buildit is called by SConscript files to request that we build a module.
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param dependencies list of projects on which this project depends
+        @return True on success
+        """
         name = project.split('/')[-1]
         potential_swig_file = os.path.join(MAUS_ROOT_DIR, project, name + '.i')
         if os.path.isfile(potential_swig_file):
-            self.build_project_Swig(localenv, project, dependencies)
+            self.build_project_swig(localenv, project, dependencies)
         else:
-            self.build_project_CAPI(localenv, project, dependencies)
+            self.build_project_capi(localenv, project, dependencies)
 
-    #sets up the build for a given project
-    def build_project_Swig(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+    #sets up the build for a given project, using SWIG
+    def build_project_swig(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
         """
         Add a particular subproject to the build list
 
@@ -127,8 +136,8 @@ class ModuleBuilder:
         self.env.Install(full_build_dir, tests)
         return True
 
-    #sets up the build for a given project
-    def build_project_CAPI(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+    #sets up the build for a given project, using the C/Python API
+    def build_project_capi(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
         """
         Add a particular subproject to the build list
 
@@ -188,12 +197,12 @@ class ModuleBuilder:
         pywraptemplate = os.path.join(MAUS_ROOT_DIR,
                                       'src/map/Templates/MapCppTemplate.py')
         pywrap = os.path.join(builddir, '%s.py' % name)
-        f1 = open(pywraptemplate, 'r')
-        f2 = open(pywrap, 'w')
-        for line in f1:
-            f2.write(line.replace('MapCppTemplate',name))
-        f1.close()
-        f2.close()
+        file1 = open(pywraptemplate, 'r')
+        file2 = open(pywrap, 'w')
+        for line in file1:
+            file2.write(line.replace('MapCppTemplate', name))
+        file1.close()
+        file2.close()
 
         # Locate the test file
         tests = glob.glob('test_*.py')

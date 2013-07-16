@@ -169,11 +169,10 @@ class MapPyGroup:
         """
         nu_spill = spill
         for worker in self._workers:
-            worker_name = worker.__class__.__name__
-            # If the current worker is a MapPyXXX worker, and the
+            # If the current worker is a MapPy??? worker, and the
             # current nu_spill isn't a std::string, do the conversion
             # first.
-            if (not hasattr(worker, 'CanConvert') and
+            if (not hasattr(worker, 'can_convert') and
                 type(nu_spill) is not StringType):
                 nu_spill = data_to_string.convert(nu_spill)
             nu_spill = worker.process(nu_spill)
