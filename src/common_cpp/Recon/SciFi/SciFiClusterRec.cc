@@ -59,7 +59,7 @@ std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   return seeds_in_event;
 }
 
-void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   &seeds) {
+void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) {
   size_t seeds_size = seeds.size();
   for ( size_t i = 0; i < seeds_size; i++ ) {
     if ( !(seeds[i]->is_used()) ) {
@@ -108,16 +108,17 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
     "SciFiClusterRec::process_cluster"));
   }
   SciFiPlaneGeometry this_plane = (*iterator).second;
-  ThreeVector plane_direction = this_plane.Direction;
-  ThreeVector plane_position  = this_plane.Position;
-  double Pitch                = this_plane.Pitch;
-  double CentralFibre         = this_plane.CentralFibre;
+  ThreeVector plane_direction   = this_plane.Direction;
+  ThreeVector plane_position    = this_plane.Position;
+  ThreeVector plane_perp        = this_plane.Perpendicular;
+  double Pitch                  = this_plane.Pitch;
+  double CentralFibre           = this_plane.CentralFibre;
   // alpha is the distance to the central fibre.
-  double alpha   = clust->get_channel() - CentralFibre;
+  double alpha   = clust->get_channel()-CentralFibre;
   double dist_mm = Pitch * 7.0 / 2.0 * alpha;
 
-  ThreeVector perp(-plane_direction.y(), plane_direction.x(), plane_direction.z());
-  ThreeVector position = dist_mm * perp + plane_position;
+  // ThreeVector
+  ThreeVector position = dist_mm * plane_perp + plane_position;
 
   clust->set_direction(plane_direction);
   clust->set_position(position);

@@ -18,8 +18,8 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/Recon/SciFi/LSQFit.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
 
 namespace MAUS {
 

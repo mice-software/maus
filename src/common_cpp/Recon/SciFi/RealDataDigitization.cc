@@ -44,13 +44,13 @@ void RealDataDigitization::initialise() {
   }
 }
 
-void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
+void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
   // Check for existant pointers to ReconEvents and DAQData
-  if ( spill.GetDAQData() == NULL )
-    spill.SetDAQData(new DAQData());
+  if ( spill->GetDAQData() == NULL )
+    spill->SetDAQData(new DAQData());
 
-  if (spill.GetReconEvents() == NULL)
-    spill.SetReconEvents(new ReconEventArray());
+  if (spill->GetReconEvents() == NULL)
+    spill->SetReconEvents(new ReconEventArray());
 
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
@@ -80,25 +80,18 @@ void RealDataDigitization::process(Spill &spill, Json::Value const &daq) {
       continue;
     }
 
-    // spill.GetDAQData()->SetTracker0DaqArray(tracker0);
-    // spill.GetDAQData()->SetTracker1DaqArray(tracker1);
-
-    // std::cerr << "DAQ sizes: " << std::endl;
-    // std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-    // std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
     tracker0.push_back(tracker0daq_event); // end of event. push back.
     tracker1.push_back(tracker1daq_event); // end of event. push back.
 
-
     ReconEvent * revt = new ReconEvent();
     revt->SetSciFiEvent(new SciFiEvent(*event));
-    spill.GetReconEvents()->push_back(revt);
+    spill->GetReconEvents()->push_back(revt);
   }  // ends loop over events (i)
-  spill.GetDAQData()->SetTracker0DaqArray(tracker0);
-  spill.GetDAQData()->SetTracker1DaqArray(tracker1);
+  spill->GetDAQData()->SetTracker0DaqArray(tracker0);
+  spill->GetDAQData()->SetTracker1DaqArray(tracker1);
   std::cerr << "DAQ sizes: " << std::endl;
-  std::cerr << spill.GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-  std::cerr << spill.GetDAQData()->GetTracker1DaqArraySize() << std::endl;
+  std::cerr << spill->GetDAQData()->GetTracker0DaqArraySize() << std::endl;
+  std::cerr << spill->GetDAQData()->GetTracker1DaqArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB(Json::Value input_event,

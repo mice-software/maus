@@ -35,9 +35,9 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/LSQFit.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
-#include "src/common_cpp/DataStructure/SimpleHelix.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
@@ -213,6 +213,9 @@ class PatternRecognition {
      */
     bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
                       std::vector<double> &true_dphi);
+
+    bool find_n_turns2(const std::vector<double> &dz, const std::vector<double> &dphi,
+                       std::vector<double> &true_dphi);
 
 
     /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis

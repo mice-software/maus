@@ -1,7 +1,7 @@
-load_root_file :
+scifi_offline_viewer : scifi_offline_viewer.cc
 	@echo "Running with ${MAUS_ROOT_DIR} on "
 	@echo `uname -a` # note this Makefile fails on Ubuntu due to ROOT errors
-	g++ load_root_file.cc -o load_root_file \
+	g++ scifi_offline_viewer.cc -o scifi_offline_viewer \
 	                      -I${MAUS_ROOT_DIR}/ \
 	                      -I${MAUS_ROOT_DIR}/src/common_cpp \
 	                      -I${MAUS_ROOT_DIR}/src/legacy \
@@ -14,5 +14,5 @@ load_root_file :
 	                       -Wl,--no-as-needed
 
 clean:
-	rm load_root_file;
+	rm scifi_offline_viewer;
 

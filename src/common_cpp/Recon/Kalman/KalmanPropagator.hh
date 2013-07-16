@@ -70,6 +70,10 @@ class KalmanPropagator {
   double BetheBlochStoppingPower(double p);
 
   /** @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
+   *
+   * NOTE: In the case of tracker 0, the energy subtraction corresponds to an "energy
+   *       adition" in the particle tracking UP the beamline.
+   *
    */
   void SubtractEnergyLoss(const KalmanState *old_site, KalmanState *new_site);
 

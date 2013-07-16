@@ -30,22 +30,22 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
 
     old_site.Initialise(5);
     new_site.Initialise(5);
-    kappa = 1./200.;
+    kappa = -1./200.;
     x0 = 0.;
     y0 = 5.;
     z0 = 0.;
-    mx0 = 15.*kappa;
-    my0 = 15.*kappa;
+    mx0 = 15.*fabs(kappa);
+    my0 = 15.*fabs(kappa);
 
     x1 = -8.0019;
     y1 = 34.614;
     z1 = 350.;
-    mx1 = -20.513*kappa;
-    my1 = 5.4042*kappa;
+    mx1 = -20.513*fabs(kappa);
+    my1 = 5.4042*fabs(kappa);
 
     old_site.set_z(z0);
     new_site.set_z(z1);
-    new_site.set_id(16);
+    new_site.set_id(15);
 
     a.ResizeTo(5, 1);
     a(0, 0) = x0;
@@ -79,13 +79,13 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation) {
   propagator->CalculatePredictedState(&old_site, &new_site);
   TMatrixD a_projected(5, 1);
   a_projected = new_site.a(MAUS::KalmanState::Projected);
-/*
+
   EXPECT_NEAR(x1,    a_projected(0, 0), err);
   EXPECT_NEAR(mx1,   a_projected(1, 0), err);
   EXPECT_NEAR(y1,    a_projected(2, 0), err);
   EXPECT_NEAR(my1,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
-*/
+
   delete propagator;
 }
 // Removed for now: needs to call Globals::GetConfigurationCards()

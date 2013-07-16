@@ -41,7 +41,7 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   // Find dz (mm).
   double new_z  = new_site->z();
   double old_z  = old_site->z();
-  double deltaZ = (new_z-old_z);
+  double deltaZ = new_z-old_z;
 
   // Get old state vector...
   TMatrixD old_a    = old_site->a(KalmanState::Filtered);
@@ -50,16 +50,16 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   double old_y      = old_a(2, 0);
   double old_my     = old_a(3, 0);
   double old_kappa  = old_a(4, 0);
-
   double particle_charge = old_kappa/fabs(old_kappa);
+
   double c      = CLHEP::c_light;
   double a      = c*particle_charge*_Bz;
-  double sine   = sin(a*deltaZ*old_kappa);
-  double cosine = cos(a*deltaZ*old_kappa);
+  double sine   = sin(a*deltaZ*fabs(old_kappa));
+  double cosine = cos(a*deltaZ*fabs(old_kappa));
 
-  double new_x  = old_x + (1./old_kappa)*(old_mx*sine/a - old_my*(1.-cosine)/a);
+  double new_x  = old_x + (particle_charge/old_kappa)*(old_mx*sine/a - old_my*(1.-cosine)/a);
   double new_mx = old_mx*cosine - old_my*sine;
-  double new_y  = old_y + (1./old_kappa)*(old_my*sine/a + old_mx*(1.-cosine)/a);
+  double new_y  = old_y + (particle_charge/old_kappa)*(old_my*sine/a + old_mx*(1.-cosine)/a);
   double new_my = old_my*cosine + old_mx*sine;
 
   TMatrixD a_projected(_n_parameters, 1);
@@ -84,7 +84,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   double old_z = old_site->z();
 
   // Delta Z in mm
-  double deltaZ = 0; // (new_z-old_z);
+  double deltaZ = (new_z-old_z);
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);
@@ -92,15 +92,13 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   double my     = site(3, 0);
   double kappa  = site(4, 0);
   double kappa2 = kappa*kappa;
-
   double particle_charge = kappa/fabs(kappa);
-  // constant in units MeV/mm
-  double c = CLHEP::c_light;
-  double a = c*particle_charge*_Bz;
 
   // Define factors to be used in the matrix.
-  double sine   = sin(a*deltaZ*kappa);
-  double cosine = cos(a*deltaZ*kappa);
+  double c      = CLHEP::c_light;
+  double a      = c*particle_charge*_Bz;
+  double sine   = sin(a*deltaZ*fabs(kappa));
+  double cosine = cos(a*deltaZ*fabs(kappa));
 
   // @x/@x
   _F(0, 0) = 1.;

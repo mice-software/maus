@@ -41,7 +41,6 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
   for ( size_t i = 0; i < seeds.size(); ++i ) {
     // Current seed.
     KalmanSeed* seed = seeds[i];
-
     KalmanStatesPArray sites = seed->GetKalmanStates();
     if ( seed->is_straight() ) {
       _propagator = new KalmanStraightPropagator();

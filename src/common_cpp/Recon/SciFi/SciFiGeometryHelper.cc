@@ -22,8 +22,7 @@ namespace MAUS {
 SciFiGeometryHelper::SciFiGeometryHelper() {}
 
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &modules)
-                                        : _modules(modules),
-                                          _mT_to_T(1000.) {}
+                                        : _modules(modules) {}
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
 
@@ -41,15 +40,19 @@ void SciFiGeometryHelper::Build() {
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
-      // Get the fibre rotation wrt the tracker frame.
-      G4RotationMatrix fibre_rotation(module->relativeRotation(module->mother() // plane
-                                                               ->mother()));    // tracker
+      ThreeVector perpendicular(1., 0., 0.);
 
-      direction *= fibre_rotation;
+      // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
+      const MiceModule* plane = module->mother();
+      G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
+                                               ->mother()));  // tracker/ station??
+
+      direction     *= internal_fibre_rotation;
+      perpendicular *= internal_fibre_rotation;
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
-      const MiceModule* plane = module->mother();
+      // const MiceModule* plane = module->mother();
       G4RotationMatrix plane_rotation(plane->relativeRotation(plane->mother()  // tracker
                                                               ->mother()));    // solenoid
 
@@ -60,10 +63,11 @@ void SciFiGeometryHelper::Build() {
       tracker_ref_frame_pos *= plane_rotation;
 
       SciFiPlaneGeometry this_plane;
-      this_plane.Direction    = direction;
-      this_plane.Position     = tracker_ref_frame_pos;
-      this_plane.CentralFibre = centralfibre;
-      this_plane.Pitch        = pitch;
+      this_plane.Direction     = direction;
+      this_plane.Perpendicular = perpendicular;
+      this_plane.Position      = tracker_ref_frame_pos;
+      this_plane.CentralFibre  = centralfibre;
+      this_plane.Pitch         = pitch;
       int plane_id =  3*(station_n-1) + (plane_n+1);
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));

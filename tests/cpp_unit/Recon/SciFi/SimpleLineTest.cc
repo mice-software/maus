@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "gtest/gtest.h"
 
 namespace MAUS {

@@ -68,7 +68,7 @@ class RealDataDigitization {
    *  @params spill A SciFiSpill to be filled
    *  @params input_event The DAQ JSON Tracker Event
    */
-  void process(Spill &spill, Json::Value const &input_event);
+  void process(Spill *spill, Json::Value const &input_event);
 
   void process_VLSB(Json::Value input_event,
                       SciFiEvent* event,

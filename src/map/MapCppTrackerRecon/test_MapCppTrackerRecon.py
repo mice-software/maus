@@ -98,6 +98,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         success = self.mapper.birth(json.dumps(self.cfg))
         self.assertTrue(success)
         # Read in a spill of mc data containing 5 straight tracks
+        # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
+        #          os.environ.get("MAUS_ROOT_DIR"))
         test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
@@ -108,11 +110,11 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         result = self.mapper.process(data)
         spill_out = json.loads(result)
         self.assertTrue('recon_events' in spill_out)
-        self.assertEqual(5, len(spill_out['recon_events']))
+        self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
         revt = spill_out['recon_events'][0]
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(31, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])

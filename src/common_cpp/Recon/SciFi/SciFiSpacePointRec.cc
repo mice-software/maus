@@ -15,6 +15,11 @@
  *
  */
 
+/*
+TODO: Check why the y coordinate comes out inverted for an unrotated tracker.
+      Solutions is hacked for now.
+*/
+
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 
 namespace MAUS {

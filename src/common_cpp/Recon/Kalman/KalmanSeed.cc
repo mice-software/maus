@@ -21,9 +21,9 @@
 
 namespace MAUS {
 
-// Ascending site number.
-bool SortByID(const SciFiCluster *a, const SciFiCluster *b) {
-  return ( a->get_id() < b->get_id() );
+// Ascending z.
+bool SortByZ(const SciFiCluster *a, const SciFiCluster *b) {
+  return ( a->get_position().z() < b->get_position().z() );
 }
 
 // Ascending station number.
@@ -142,32 +142,16 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
   double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
-  if ( _tracker == 0 ) {
-    x = spacepoints.back()->get_position().x();
-    y = spacepoints.back()->get_position().y();
-    z = spacepoints.back()->get_position().z();
-    mc_x  = spacepoints.back()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.back()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.back()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.back()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.back()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.back()->get_channels()[0]->get_true_momentum().z();
-  } else if ( _tracker == 1 ) {
-    x = spacepoints.front()->get_position().x();
-    y = spacepoints.front()->get_position().y();
-    z = spacepoints.front()->get_position().z();
-    mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-    mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-    mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-    mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-    mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-    mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
-  } else {
-    x = y = z = -666; // removes a compiler warning.
-    throw(Squeal(Squeal::recoverable,
-                 "Pattern Recon has bad tracker number.",
-                 "KalmanSeed::ComputeInitialStateVector"));
-  }
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
+  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
+  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
+  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
+  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
+  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
+  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
+
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
@@ -188,9 +172,9 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = px*kappa;
+  a(1, 0) = px*fabs(kappa);
   a(2, 0) = y;
-  a(3, 0) = py*kappa;
+  a(3, 0) = py*fabs(kappa);
   a(4, 0) = kappa;
 
   std::cerr << "Tracker " << _tracker << " has field " << _Bz <<". c is " << c << std::endl;
@@ -198,24 +182,24 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   a.Print();
   std::cerr << "MC pos and mom: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
             <<  mc_px<< " " <<  mc_py<< " " <<  mc_pz << std::endl;
+
   return a;
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  double x, y;
-  if ( _tracker == 0 ) {
-    x = spacepoints.back()->get_position().x();
-    y = spacepoints.back()->get_position().y();
-  } else if ( _tracker == 1 ) {
-    x = spacepoints.front()->get_position().x();
-    y = spacepoints.front()->get_position().y();
-  } else {
-    x = y = -666; // removes a compiler warning.
-    throw(Squeal(Squeal::recoverable,
-      "Pattern Recon has bad tracker number.",
-      "KalmanSeed::ComputeInitialStateVector"));
-  }
+  double x, y, z;
+  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
+
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
+  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
+  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
+  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
+  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
+  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
+  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
 
   double mx = seed->get_mx();
   double my = seed->get_my();
@@ -225,6 +209,12 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
+
+  std::cerr << "Tracker " << _tracker << std::endl;
+  std::cerr << "Gradients: " << mx << " " << my << std::endl;
+  a.Print();
+  std::cerr << "MC pos and gradient: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
+  <<  mc_px/mc_pz<< " " <<  mc_py/mc_pz << std::endl;
 
   return a;
 }
@@ -241,7 +231,7 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
     }
   }
 
-  std::sort(_clusters.begin(), _clusters.end(), SortByID);
+  std::sort(_clusters.begin(), _clusters.end(), SortByZ);
   std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
 }
 

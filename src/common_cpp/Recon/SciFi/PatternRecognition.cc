@@ -34,9 +34,6 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/DataStructure/SimpleLine.hh"
-#include "src/common_cpp/DataStructure/SimpleCircle.hh"
-#include "src/common_cpp/DataStructure/SimpleHelix.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 
@@ -105,16 +102,16 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
+    /*
     for ( size_t i = 0; i < evt.spacepoints().size(); ++i ) {
       double x = evt.spacepoints()[i]->get_position().x();
       double y = evt.spacepoints()[i]->get_position().y();
       double z = evt.spacepoints()[i]->get_position().z();
-      z = fabs(z);
-      // std::cout << "setting z to " << z << std::endl;
+      x = -x;
       ThreeVector pos(x, y, z);
       evt.spacepoints()[i]->set_position(pos);
-      // std::cout << "z is " << evt.spacepoints()[i]->get_position().z() << "\n";
     }
+    */
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = sort_by_tracker(evt.spacepoints());
 
@@ -136,6 +133,28 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
     }// ~Loop over trackers
     std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
     std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
+
+    // Put the spacepoints back the way we found them
+    /*
+    for ( size_t i = 0; i < evt.spacepoints().size(); ++i ) {
+      double x = evt.spacepoints()[i]->get_position().x();
+      double y = evt.spacepoints()[i]->get_position().y();
+      double z = evt.spacepoints()[i]->get_position().z();
+      x = -x;
+      ThreeVector pos(x, y, z);
+      evt.spacepoints()[i]->set_position(pos);
+    }
+
+    // Swap the x0 sign, again part of the temp geometry fix
+    for ( size_t i = 0; i < evt.helicalprtracks().size(); ++i ) {
+      double circle_x0 = evt.helicalprtracks()[i]->get_circle_x0();
+      evt.helicalprtracks()[i]->set_circle_x0(-circle_x0);
+      double x0 = evt.helicalprtracks()[i]->get_x0();
+      evt.helicalprtracks()[i]->set_x0(-x0);
+      std::cerr << "circle_x0: " << circle_x0;
+      std::cerr << "->" << evt.helicalprtracks()[i]->get_circle_x0() << std::endl;
+    }
+    */
   } else {
     std::cout << "No spacepoints in event" << std::endl;
   }
@@ -721,6 +740,51 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
   }
   return true;
 }
+
+bool PatternRecognition::find_n_turns2(const std::vector<double> &dz,
+                                       const std::vector<double> &dphi,
+                                       std::vector<double> &true_dphi) {
+  true_dphi = dphi;
+  bool found = false;
+
+  // Setup the a vector holding the values of n to try
+  int myints[] = {0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
+  std::vector<int> n_values(myints, myints + sizeof(myints) / sizeof(int));
+
+  // Loop over n, the number of extra turns completed by the final station
+  for (size_t n = 0; n < n_values.size(); ++n) {
+
+    // Find dphi/dz using last station (assumes vectors are already ordered by z)
+    bool pass = true;
+    double ratio = (dphi.back() + 2*n*CLHEP::pi) / dz.back();
+
+    // Calculate the expected dphi_i values using this ratio
+    for (size_t j = 0; j < true_dphi.size(); ++j) {
+      true_dphi[j] = ratio * dphi[j];
+      // Find the remainder of the corrected value divided by 2pi
+      double remainder = fmod(true_dphi[j], (2*CLHEP::pi));
+      // Take away the observed dphi_i value from the remainder. If n is correct should be near 0.
+      double residual = remainder - dphi[j];
+      if ( residual > _AB_cut ) pass = false;
+    }
+
+    // If all the residuals passed the cut, accept this n, and break out of the top level loop
+    if ( pass ) {
+      found = true;
+      break;
+    }
+  }
+
+  // Calc expected the true dphi_i using the found values
+  if ( found ) { // If we suceeding in finding corrections which pass the cuts
+    for (size_t i = 0; i < true_dphi.size(); ++i) {
+      true_dphi[i] = true_dphi.back() - dphi.back() + true_dphi[i];
+    }
+    return true;
+  } else { // Abort finding dsdz if we fail to find any single n turns correction
+    return false;
+  }
+};
 
 double PatternRecognition::calc_phi(double xpos, double ypos, const SimpleCircle &circle) {
   // Note this function returns phi_i + phi_0, unless using x0, y0 in which case it returns phi_0
