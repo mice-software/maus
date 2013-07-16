@@ -52,7 +52,6 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
     _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
     _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
     _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
-    _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
     _SciFiFiberConvFactor  = (*json)["SciFiFiberConvFactor"].asDouble();
     _SciFiFiberTrappingEff = (*json)["SciFiFiberTrappingEff"].asDouble();
     _SciFiFiberMirrorEff   = (*json)["SciFiFiberMirrorEff"].asDouble();
@@ -65,20 +64,6 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
                  _SciFiFiberTransmissionEff *
                  _SciFiMUXTransmissionEff *
                  _SciFivlpcQE;
-    // ______________________________________________
-    _configJSON = *json;
-    assert(_configJSON.isMember("SciFiPerChanFlag"));
-    if (_configJSON["SciFiPerChanFlag"].asInt()) {
-      std::ifstream calib_file;
-      calib_file.open("SciFiChanCal.txt");
-      while ( calib_file.good() ) {
-        std::string temp;
-        getline(calib_file, temp);
-        argCal += temp;
-      }
-      calib_reader.parse(argCal, _calib_list);
-      // std::cerr << _calib_list["entries"][1]["good"] <<"\n";
-    }
     // ______________________________________________
     return true;
   } catch(Squeal& squee) {
@@ -122,16 +107,10 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
     SciFiDigitPArray digits;
-    int seed = mc_evt->GetPrimary()->GetRandomSeed();
     if ( mc_evt->GetSciFiHits() ) {
       construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
                        static_cast<int>(event_i), digits);
     }
-
-    // Adds Effects of Noise from Electrons to MC
-    // if (_configJSON["SciFiNoiseFlag"].asInt()) {
-    //  add_elec_noise(digits, seed, spill.GetSpillNumber(), static_cast<int>(event_i));
-    // }
 
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
@@ -189,7 +168,6 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
        // Get nPE from this hit.
       double edep = a_hit->GetEnergyDeposited();
       double nPE  = edep*_eV_to_phe;
-      // double nPE = compute_npe(edep, chanNo, a_hit);
 
       // Compute tdc count.
       double time1   = a_hit->GetTime();
@@ -221,83 +199,6 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
   } // ends 'for' loop over hits
 }
 
-void MapCppTrackerMCDigitization::add_elec_noise(SciFiDigitPArray &digits, int seed,
-                                                 int spill_num, int event_num) {
-  double numPE;
-  int exist_flag, entry;
-  double cross_sigma, cross_amp, dark_prob;
-  double time1 = 0.;
-
-  srand(seed);
-  for ( int i = 0; i < modules.size(); i++ ) {
-    int nChannels = 2*((modules[i]->propertyDouble("CentralFibre"))+0.5);
-    for ( int j = 0; j < nChannels; j++ ) {
-      numPE = 0.;
-      exist_flag = 0;
-      int tracker = modules[i]->propertyInt("Tracker");
-      int station = modules[i]->propertyInt("Station");
-      int plane   = modules[i]->propertyInt("Plane");
-
-      for ( int k = 0; k < digits.size(); k++ ) {
-        if ( digits[k]->get_tracker() == tracker &&
-             digits[k]->get_station() == station &&
-             digits[k]->get_plane()   == plane   &&
-             digits[k]->get_channel() == j ) {
-          numPE = digits[k]->get_npe();
-          entry = k;
-          exist_flag = 1;
-          continue;
-        }
-      }
-
-      if (_configJSON["SciFiPerChanFlag"].asInt()) {
-        for ( int l = 0; l < _calib_list.size(); l++ ) {
-          if ( _calib_list[l]["tracker"].asInt() == tracker &&
-               _calib_list[l]["station"].asInt() == station &&
-               _calib_list[l]["plane"].asInt()   == plane   &&
-               _calib_list[l]["channel"].asInt() == j ) {
-            if (_calib_list[l].isMember("SciFiCrossTalkSigma")) {
-              cross_sigma = _calib_list[l]["SciFiCrossTalkSigma"].asDouble();
-            } else { cross_sigma = _configJSON["SciFiCrossTalkSigma"].asDouble(); }
-            if (_calib_list[l].isMember("SciFiCrossTalkAmplitude")) {
-              cross_amp   = _calib_list[l]["SciFiCrossTalkAmplitude"].asDouble();
-            } else { cross_amp   = _configJSON["SciFiCrossTalkAmplitude"].asDouble(); }
-            if (_calib_list[l].isMember("SciFiDarkCountProababilty")) {
-              dark_prob   = _calib_list[l]["SciFiDarkCountProababilty"].asDouble();
-            } else { dark_prob   = _configJSON["SciFiDarkCountProababilty"].asDouble(); }
-            continue;
-          }
-        }
-      }  else {
-         cross_sigma = _configJSON["SciFiCrossTalkSigma"].asDouble();
-         cross_amp   = _configJSON["SciFiCrossTalkAmplitude"].asDouble();
-         dark_prob   = _configJSON["SciFiDarkCountProababilty"].asDouble();
-      }
-
-      double param = (static_cast<double>(rand()) / RAND_MAX);
-      double cross_param = -cross_sigma*(param - 1.0)*(param - 1.0);
-      numPE += cross_amp * exp(cross_param);
-
-      double dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
-      while (dark_count > 1) {
-        numPE += 1.0;
-        dark_count = (static_cast<double>(rand()) / RAND_MAX) + dark_prob;
-      }
-      if ( exist_flag ) {
-        digits[entry]->set_npe(numPE);
-        continue;
-      }
-      std::cerr << _SciFiNPECut << " " << numPE << std::endl;
-      if (numPE > _SciFiNPECut) {
-        SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
-                                             tracker, station, plane,
-                                             j, numPE, time1);
-        digits.push_back(a_digit);
-      }
-    }
-  }
-}
-
 int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
   double tmpcounts;
 
@@ -318,68 +219,6 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   int chanNo      = static_cast<int> (floor(fiberNumber/7.0));
 
   return chanNo;
-}
-
-double MapCppTrackerMCDigitization::compute_npe(double edep,
-                                                int chanNo,
-                                                MAUS::SciFiHit *ahit) {
-  int tracker, plane, station, channel;
-  Json::Value _calibrations;
-  tracker = ahit->GetChannelId()->GetTrackerNumber();
-  station = ahit->GetChannelId()->GetStationNumber();
-  plane   = ahit->GetChannelId()->GetPlaneNumber();
-
-  if (_configJSON["SciFiPerChanFlag"].asInt()) {
-    for (int i = 0; i < _calib_list.size(); i++) {
-      if (_calib_list[i]["tracker"].asInt() == tracker &&
-          _calib_list[i]["station"].asInt() == station &&
-          _calib_list[i]["plane"].asInt()   == plane   &&
-          _calib_list[i]["channel"].asInt() == chanNo) {
-        if (_calib_list[i].isMember("SciFiFiberConvFactor")) {
-          _calibrations["SciFiFiberConvFactor"] =
-          _calib_list[i]["SciFiFiberConvFactor"];
-        } else {_calibrations["SciFiFiberConvFactor"] =
-                _configJSON["SciFiFiberConvFactor"];}
-        if (_calib_list[i].isMember("SciFiFiberTrappingEff")) {
-          _calibrations["SciFiFiberTrappingEff"] =
-          _calib_list[i]["SciFiFiberTrappingEff"];
-        } else {_calibrations["SciFiFiberTrappingEff"] =
-                _configJSON["SciFiFiberTrappingEff"];}
-        if (_calib_list[i].isMember("SciFiFiberMirrorEff")) {
-          _calibrations["SciFiFiberMirrorEff"] =
-          _calib_list[i]["SciFiFiberMirrorEff"];
-        } else {_calibrations["SciFiFiberMirrorEff"] =
-                _configJSON["SciFiFiberMirrorEff"];}
-        if (_calib_list[i].isMember("SciFiFiberTransmissionEff")) {
-          _calibrations["SciFiFiberTransmissionEff"] =
-          _calib_list[i]["SciFiFiberTransmissionEff"];
-        } else {_calibrations["SciFiFiberTransmissionEff"] =
-                _configJSON["SciFiFiberTransmissionEff"];}
-        if (_calib_list[i].isMember("SciFiMUXTransmissionEff")) {
-          _calibrations["SciFiMUXTransmissionEff"] =
-          _calib_list[i]["SciFiMUXTransmissionEff"];
-        } else {_calibrations["SciFiMUXTransmissionEff"] =
-                _configJSON["SciFiMUXTransmissionEff"];}
-        if (_calib_list[i].isMember("SciFiMUXTransmissionEff")) {
-          _calibrations["SciFivlpcQE"] =
-          _calib_list[i]["SciFivlpcQE"];
-        } else {_calibrations["SciFivlpcQE"] =
-                _configJSON["SciFivlpcQE"];}
-        continue;
-      }
-    }
-  } else {
-      _calibrations["SciFiFiberConvFactor"]      = _configJSON["SciFiFiberConvFactor"];
-      _calibrations["SciFiFiberTrappingEff"]     = _configJSON["SciFiFiberTrappingEff"];
-      _calibrations["SciFiFiberMirrorEff"]       = _configJSON["SciFiFiberMirrorEff"];
-      _calibrations["SciFiFiberTransmissionEff"] = _configJSON["SciFiFiberTransmissionEff"];
-      _calibrations["SciFiMUXTransmissionEff"]   = _configJSON["SciFiMUXTransmissionEff"];
-      _calibrations["SciFivlpcQE"]               = _configJSON["SciFivlpcQE"];
-  }
-
-  double numbPE = edep*_eV_to_phe;
-
-  return numbPE;
 }
 
 int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {

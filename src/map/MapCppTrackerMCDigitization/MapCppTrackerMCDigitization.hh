@@ -24,12 +24,8 @@
 #define _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
 
 // C headers
-#include <assert.h>
 #include <json/json.h>
-
-#include <CLHEP/Random/RandPoisson.h>
 #include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
@@ -88,15 +84,6 @@ class MapCppTrackerMCDigitization {
   void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
                         int event_num, MAUS::SciFiDigitPArray &digits);
 
-  /** @brief simulates signal noise.
-   */
-  void add_elec_noise(MAUS::SciFiDigitPArray &digits, int seed,
-                      int spill_num, int event_num);
-
-  /** @brief computes npe from energy deposits.
-   */
-  double compute_npe(double edep, int chanNo, MAUS::SciFiHit *ahit);
-
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
   int compute_chan_no(MAUS::SciFiHit *ahit);
@@ -120,17 +107,13 @@ class MapCppTrackerMCDigitization {
  private:
   /// This should be the classname
   std::string _classname;
-  /// This will contain the configuration
-  Json::Value _configJSON;
   /// This will contain the root value after parsing
   Json::Value* _spill_json;
   Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
-  Json::Reader calib_reader;
-  std::string argCal;
-  Json::Value _calib_list;
-
+  /// The ratio of deposited eV to NPE
+  double _eV_to_phe;
   double _SciFiNPECut;
   double _SciFivlpcEnergyRes;
   double _SciFiadcFactor;
@@ -143,7 +126,6 @@ class MapCppTrackerMCDigitization {
   double _SciFivlpcQE;
   double _SciFiFiberTransmissionEff;
   double _SciFiMUXTransmissionEff;
-  double _eV_to_phe;
 
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
