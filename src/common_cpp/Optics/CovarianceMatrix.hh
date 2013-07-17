@@ -23,6 +23,8 @@
 #include <vector>
 #include <iostream>
 
+#include "TMatrixDSym.h"
+
 #include "Maths/SymmetricMatrix.hh"
 #include "Optics/PhaseSpaceVector.hh"
 
@@ -79,6 +81,11 @@ class CovarianceMatrix : public SymmetricMatrix {
    *          block elements of the HepSymMatrix object.
    */
   explicit CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix);
+
+  /** @brief  TMatrixDSym copy constructor. This copies only the first 6x6
+   *          block elements of the TMatrixDSym object.
+   */
+  explicit CovarianceMatrix(const TMatrixDSym& root_sym_matrix);
 
   /** @brief  Construct from an array of doubles in row-major order.
    */

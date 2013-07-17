@@ -205,67 +205,6 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
     global_event->add_track_recursive(tracks[0]);
   }
 
-  // Assuming there are an equal number of TOF and SciFi tracks,
-  // merge each pair of tracks based on z position of the detectors
-  /*
-  GlobalDS::TrackPArray::iterator tof_track = tof_tracks.begin();
-  GlobalDS::TrackPArray::iterator sci_fi_track = sci_fi_tracks.begin();
-  while (tof_track != tof_tracks.end() ||
-          sci_fi_track != sci_fi_tracks.end()) {
-    std::vector<GlobalDS::TrackPoint const *> tof_track_points;
-    std::vector<GlobalDS::TrackPoint const *>::iterator tof_track_point;
-    if (tof_track != tof_tracks.end()) {
-      tof_track_points = (*tof_track)->GetTrackPoints();
-std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
-          << "TOF track has " << tof_track_points.size() << " track points."
-          << std::endl;
-      tof_track_point = tof_track_points.begin();
-    }
-
-    std::vector<GlobalDS::TrackPoint const *> sci_fi_track_points
-      = (*sci_fi_track)->GetTrackPoints();
-    std::vector<GlobalDS::TrackPoint const *>::iterator sci_fi_track_point;
-    if (sci_fi_track != sci_fi_tracks.end()) {
-      sci_fi_track_point = sci_fi_track_points.begin();
-    }
-
-    GlobalDS::Track * combined_track = new GlobalDS::Track();
-    combined_track->set_mapper_name(kClassname);
-    if (tof_track != tof_tracks.end()) {
-      combined_track->set_pid((*tof_track)->get_pid());
-      //combined_track->AddTrack(*tof_track);
-      while (tof_track_point != tof_track_points.end()) {
-        combined_track->AddTrackPoint(
-          new GlobalDS::TrackPoint(**tof_track_point));
-        ++tof_track_point;
-      }
-    }
-    if (sci_fi_track != sci_fi_tracks.end()) {
-      //combined_track->AddTrack(*sci_fi_track);
-      while (sci_fi_track_point != sci_fi_track_points.end()) {
-        combined_track->AddTrackPoint(
-          new GlobalDS::TrackPoint(**sci_fi_track_point));
-        ++sci_fi_track_point;
-      }
-    }
-
-    if (combined_track->GetTrackPoints().size() > 0) {
-      combined_track->SortTrackPointsByZ();
-      global_event->add_track_recursive(combined_track);
-std::cerr << "DEBUG MapCppGlobalRawTracks::LoadLiveData(): "
-          << "Combined track size: " << combined_track->GetTrackPoints().size()
-          << std::endl;
-    }
-
-    if (tof_track != tof_tracks.end()) {
-      ++tof_track;
-    }
-    if (sci_fi_track != sci_fi_tracks.end()) {
-      ++sci_fi_track;
-    }
-  }
-  */
-
   recon_event->SetGlobalEvent(global_event);
 }
 
@@ -793,7 +732,7 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   ThreeVector position = (*scifi_space_point)->get_position();
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   const double z = helper.GetDetectorZPosition(detector.id());
-  // FIXME(Lane) need tracker timestamp that is synched with TOF timestamp
+  // TODO(Lane) need tracker timestamp that is synched with TOF timestamp
   // const double time = (*scifi_space_point)->get_time();
   const double time = 0.;
   TLorentzVector four_position(position.x(), position.y(), z, time);
@@ -827,6 +766,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
   dynamic_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
 
+  track_point->set_particle_event((*scifi_space_point)->get_event());
   track_point->set_mapper_name(kClassname);
 
   // FIXME(Lane) For now assume we've selected only muon tracks and no decays

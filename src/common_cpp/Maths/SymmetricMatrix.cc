@@ -75,6 +75,12 @@ SymmetricMatrix::SymmetricMatrix(
   }
 }
 
+SymmetricMatrix::SymmetricMatrix(const TMatrixDSym& root_sym_matrix)
+    : Matrix<double>() {
+  const double * data = root_sym_matrix.GetMatrixArray();
+  build_matrix(root_sym_matrix.GetNrows(), data);
+}
+
 SymmetricMatrix::SymmetricMatrix(const size_t size)
     : Matrix<double>(size, size) {}
 

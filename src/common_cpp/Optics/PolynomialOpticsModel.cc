@@ -184,17 +184,19 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
                                     position.x(), momentum.x(),
                                     position.y(), momentum.y());
 
+  std::cerr << "Primaries:" << std::endl;
   std::vector<PhaseSpaceVector> primaries;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
       PhaseSpaceVector primary;
 
       for (size_t k = 0; k < i; ++k) {
-        primary[k] = 1.;
+        primary[k] = deltas_[k];  // non-zero, lower triangular elements
       }
-      double delta = deltas_[j];
-      primary[j] = delta;
+      primary[j] = deltas_[j];  // diagonal element
 
+      // std::cerr << (primary + reference_vector) << std::endl;
+      std::cerr << primary << std::endl;
       primaries.push_back(primary + reference_vector);
     }
   }
@@ -206,12 +208,13 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
     base_block_length = primaries.size();
   }
 
-  int summand;
   for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
-    summand = row / base_block_length;
+    PhaseSpaceVector deltas = deltas_ * (row / base_block_length);
     PhaseSpaceVector primary
-      = primaries[row % base_block_length] + summand;
+      = primaries[row % base_block_length] - reference_vector + deltas;
 
+    // std::cerr << (primary + reference_vector) << std::endl;
+    std::cerr << primary << std::endl;
     primaries.push_back(primary + reference_vector);
   }
   return primaries;
@@ -280,6 +283,8 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
       // Fit to first order and then fit to higher orders with the
       // first order map as a constraint
       polynomial_map = PolynomialMap::PolynomialLeastSquaresFit(
+          points, values, polynomial_order_, weights_);
+      /*
           points, values, 1, weights_);
       if (polynomial_order_ > 1) {
         PolynomialMap * linear_polynomial_map = polynomial_map;
@@ -287,6 +292,7 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
             points, values, polynomial_order_,
             linear_polynomial_map->GetCoefficientsAsVector(), weights_);
       }
+      */
       break;
     case kConstrainedLeastSquares:
       // constrained least squares

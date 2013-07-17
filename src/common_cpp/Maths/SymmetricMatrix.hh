@@ -24,6 +24,8 @@
 #include <vector>
 #include <utility>
 
+#include "TMatrixDSym.h"
+
 #include "Interface/Squeal.hh"
 #include "Maths/Complex.hh"
 #include "Maths/Matrix.hh"
@@ -116,6 +118,11 @@ class SymmetricMatrix : public Matrix<double> {
    */
   explicit SymmetricMatrix(const ::CLHEP::HepSymMatrix& hep_matrix);
 
+  /** @brief  TMatrixDSym copy constructor. This copies only the first 6x6
+   *          block elements of the TMatrixDSym object.
+   */
+  explicit SymmetricMatrix(const TMatrixDSym& root_sym_matrix);
+
   /** @brief Construct a matrix and fill all fields with 0
    *
    *  @params size number of rows/columns
@@ -199,7 +206,7 @@ class SymmetricMatrix : public Matrix<double> {
 
   // build the matrix with size^2 elements initialised to array data in
   // row major order
-  void build_matrix(const size_t size,  double const * const data);
+    void build_matrix(const size_t size,  double const * const data);
 };
 }  // namespace MAUS
 

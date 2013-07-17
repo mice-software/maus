@@ -27,6 +27,7 @@
 
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Units/PhysicalConstants.h"
+#include "TMatrixDSym.h"
 
 #include "Interface/Squeal.hh"
 #include "Maths/Matrix.hh"
@@ -104,9 +105,9 @@ CovarianceMatrix::CovarianceMatrix(const SymmetricMatrix& symmetric_matrix)
   if (   (symmetric_matrix.number_of_rows() < 6)
       || (symmetric_matrix.number_of_columns() < 6)) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a SymmetricMatrix containing "
-                 "fewer than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
+          "Attempted to construct with a SymmetricMatrix containing "
+          "fewer than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(SymmetricMatrix<double>)"));
   }
   build_matrix(6);
   for (size_t row = 1; row <= 6; ++row) {
@@ -121,9 +122,9 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
   if (   (hep_sym_matrix.num_row() < 6)
       || (hep_sym_matrix.num_col() < 6)) {
     throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a HepSymMatrix containing fewer "
-                 "than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
+          "Attempted to construct with a HepSymMatrix containing fewer "
+          "than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(CLHEP::HepSymMatrix<double>)"));
   }
   build_matrix(6);
   double element;
@@ -134,6 +135,19 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
       Matrix<double>::operator()(column, row) = element;
     }
   }
+}
+
+CovarianceMatrix::CovarianceMatrix(const TMatrixDSym& root_sym_matrix)
+    : SymmetricMatrix(root_sym_matrix) {
+  if (   (root_sym_matrix.GetNrows() < 6)
+      || (root_sym_matrix.GetNcols() < 6)) {
+    throw(Squeal(Squeal::recoverable,
+          "Attempted to construct with a TMatrixDSym containing fewer "
+          "than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(TMatrixDSym<double>)"));
+  }
+  const double * data = root_sym_matrix.GetMatrixArray();
+  build_matrix(6, data);
 }
 
 CovarianceMatrix::CovarianceMatrix(double const * const array_matrix)

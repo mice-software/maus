@@ -685,8 +685,12 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
     try {
       F2_inverse = inverse(F2);
     } catch(Squeal squee) {
+    std::stringstream message;
+    message << "Could not find constrained least squares fit for data. "
+            << "Nested exception:" << std::endl
+            << "\"" << squee.GetMessage() << "\"" << std::endl;
       throw(Squeal(Squeal::recoverable,
-            "Could not find least squares fit for data",
+            message.str(),
             "PolynomialMap::ConstrainedPolynomialLeastSquaresFit"));
     }
     Vector<double> AVec = F2_inverse * Fy;

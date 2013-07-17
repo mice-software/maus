@@ -168,6 +168,8 @@ typedef std::vector<MAUS::DataStructure::Global::TrackPoint> TrackPointArray;
 typedef std::vector<MAUS::DataStructure::Global::TrackPoint *>
   TrackPointPArray;
 typedef std::vector<const MAUS::DataStructure::Global::TrackPoint *>
+  TrackPointCPArray;
+typedef std::vector<const MAUS::DataStructure::Global::TrackPoint *>
   ConstTrackPointPArray;
 } // ~namespace Global
 } // ~namespace DataStructure
