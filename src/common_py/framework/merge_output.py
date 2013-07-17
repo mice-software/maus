@@ -154,6 +154,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
         """
+        self.spill_process_count = 0
         self.end_of_run_spill = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
@@ -233,7 +234,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             if outputter_ret != None and outputter_ret != False:
                 print "Failed to execute Output"
             self.spill_process_count += 1
-            print "DAQ events processed: %d" % self.spill_process_count
+            print "Processed %d DAQ events from run %s" % \
+                  (self.spill_process_count, self.run_number)
 
     def execute(self, job_header, job_footer, will_run_until_ctrl_c=True):
         """
@@ -310,8 +312,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     doc_id = doc["_id"]
                     doc_time = doc["date"]
                     spill = doc["doc"]
-                    print "Read event %s (dated %s)" % (doc_id,
-                                                        doc_time)
+                    print "<%s> Read event %s reconstructed at %s)" % \
+                          (str(datetime.now().time()), doc_id, doc_time)
                     if (doc_time > self.last_time):
                         self.last_time = doc_time
                     self.process_event(spill)

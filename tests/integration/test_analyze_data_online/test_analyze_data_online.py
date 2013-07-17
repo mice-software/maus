@@ -66,8 +66,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     env_cp['MAUS_WEB_MEDIA'] = my_tmp+'/'
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp+'/raw/'
     proc = subprocess.Popen(['python', ANALYZE_EXE,
-                             '--DAQ_online_file', TMP_DIR+data_file_name,
-                             '--reduce_plot_refresh_rate', '20'],
+                             '--DAQ_online_file', TMP_DIR+data_file_name],
                              env=env_cp, stdout=log,
                              stderr=subprocess.STDOUT)
     if send_signal != None:
@@ -132,6 +131,11 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         """
         Check that analyze_data_online makes good histos for full run
         """
+        # test_data.cat is a merge of several runs; we look for histos from the
+        # last run and check that they are correct; note sometimes we get false
+        # fails because online recon is still processing the previous run during
+        # next run processing (because we don't have appropriate time delay
+        # between spills)
         self.assertEquals(0, run_process("test_data.cat", '_histos'))
         pass_dict = {}
         test_pass = True

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 run_list="04234 04258 04235"
+cat_list="04234 04258 04234 04258 04234 04258 04234 04258 04234 04258 04235 04235 04235 04235 04235"
 if [ ! -n "${MAUS_THIRD_PARTY+x}" ]; then
     echo
     echo "FATAL: MAUS_THIRD_PARTY is not set" >&2
@@ -62,7 +63,7 @@ then
     rm ${cat_file}
 fi
 touch ${destdir}/test_data.cat
-for item in ${run_list}
+for item in ${cat_list}
 do
     file_list=`ls ${destdir}/${item}.0*`
     for a_file in ${file_list}

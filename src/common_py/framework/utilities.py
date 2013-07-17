@@ -175,7 +175,7 @@ class DocumentStoreUtilities: # pylint: disable=W0232
                 % (doc_store_class, DocumentStore))
         # Connect to the document store.
         try:
-            doc_store.connect(config) 
+            doc_store.connect(config)
         except Exception as exc:
             sys.excepthook(*sys.exc_info())
             raise DocumentStoreException(exc)

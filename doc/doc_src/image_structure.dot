@@ -1,0 +1,22 @@
+digraph G {
+  image_event [shape=record, label="{image_event|dict}"]
+    maus_event_type [shape=record, label="{maus_event_type|string}"]
+    image_list [shape=record, label="{[]|list}"]
+      image [shape=record, label="{image|dict}"]
+        image_tag [shape=record, label="{tag|string}"]
+        image_keywords_list [shape=record, label="{keywords|list}"]
+        image_keywords [shape=record, label="{[]|string}"]
+        image_description [shape=record, label="{description|string}"]
+        image_data [shape=record, label="{data|base64 encoded image}"]
+        image_type [shape=record, label="{image_type|string}"]
+  image_event -> maus_event_type
+  image_event -> image_list
+      image_list -> image
+          image -> image_tag
+          image -> image_keywords_list
+              image_keywords_list -> image_keywords
+          image -> image_type
+          image -> image_data
+          image -> image_description
+  
+}
