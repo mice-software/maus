@@ -298,9 +298,11 @@ Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
-DAQ_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
+daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
                      # data from a file - mock-up of online for testing, not for
                      # production use (use offline recon here)
+daq_online_spill_delay_time = 0. # delay in seconds between daq reads, intended
+                                 # for mocking MICE target pulses
 
 # tof digitization
 TOFconversionFactor = 0.005 # MeV

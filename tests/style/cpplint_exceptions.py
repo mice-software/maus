@@ -223,3 +223,9 @@ exceptions[os.path.join(CPP_CM,
  ' all processed objects inherit from TObject',
  'taylor'),
 ]
+
+exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData', 
+                       'InputCppDAQOnlineData.cc')] = [
+('      _sleep_time.tv_sec = static_cast<long>(delay_time);',
+ 'This really is a long, it is defined in time.h.', 'rogers')
+]
