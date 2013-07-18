@@ -37,18 +37,17 @@ void SciFiGeometryHelper::Build() {
       int tracker_n = module->propertyInt("Tracker");
       int station_n = module->propertyInt("Station");
       int plane_n   = module->propertyInt("Plane");
+
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
       ThreeVector direction(0., 1., 0.);
-      ThreeVector perpendicular(1., 0., 0.);
 
       // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
       const MiceModule* plane = module->mother();
       G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
-                                                                        ->mother()));    // tracker/ station??
+                                               ->mother()));  // tracker/ station??
 
       direction     *= internal_fibre_rotation;
-      perpendicular *= internal_fibre_rotation;
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -64,7 +63,6 @@ void SciFiGeometryHelper::Build() {
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction     = direction;
-      this_plane.Perpendicular = perpendicular;
       this_plane.Position      = tracker_ref_frame_pos;
       this_plane.CentralFibre  = centralfibre;
       this_plane.Pitch         = pitch;

@@ -23,9 +23,18 @@ SciFiTrackProcessor::SciFiTrackProcessor()
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiTrack::tracker,
                         &SciFiTrack::set_tracker, false);
-    RegisterValueBranch("chi2", &_double_proc,
+    RegisterValueBranch("algorithm", &_int_proc,
+                        &SciFiTrack::GetAlgorithmUsed,
+                        &SciFiTrack::SetAlgorithmUsed, false);
+    RegisterValueBranch("charge", &_int_proc,
+                        &SciFiTrack::charge,
+                        &SciFiTrack::set_charge, false);
+    RegisterValueBranch("f_chi2", &_double_proc,
                         &SciFiTrack::f_chi2,
                         &SciFiTrack::set_f_chi2, false);
+    RegisterValueBranch("s_chi2", &_double_proc,
+                        &SciFiTrack::s_chi2,
+                        &SciFiTrack::set_s_chi2, false);
     RegisterValueBranch("ndf", &_int_proc,
                         &SciFiTrack::ndf,
                         &SciFiTrack::set_ndf, false);

@@ -88,6 +88,7 @@ class PatternRecognitionTest : public ::testing::Test {
   }
 };
 
+/*
 TEST_F(PatternRecognitionTest, test_process_good) {
 
   PatternRecognition pr;
@@ -247,6 +248,7 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
 
   // evt descoping will delete the spacepoints
 }
+*/
 
 TEST_F(PatternRecognitionTest, test_make_tracks) {
 

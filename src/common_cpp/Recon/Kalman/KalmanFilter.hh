@@ -53,7 +53,7 @@ class KalmanFilter {
 
   /** @brief  Runs the filter stage by calling the other member functions.
    */
-  void Process(KalmanStatesPArray sites, int current_site);
+  void Process(KalmanState *a_site);
 
   /** @brief  Computes the filtered state.
    */

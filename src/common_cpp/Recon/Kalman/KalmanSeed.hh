@@ -109,6 +109,14 @@ class KalmanSeed {
 
   double GetField() const { return _Bz; }
 
+  int tracker() const { return _tracker; }
+
+  void set_tracker(int tracker) { _tracker = tracker; }
+
+  int charge() const { return _particle_charge; }
+
+  void set_charge(int charge) { _particle_charge = charge; }
+
  private:
   /** @brief Initial 'guess' of the state vector [x, mx, y, my, (kappa)].
    */

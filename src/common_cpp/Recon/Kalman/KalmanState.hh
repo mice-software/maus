@@ -216,7 +216,7 @@ class KalmanState {
 };
 
 typedef std::vector<KalmanState*> KalmanStatesPArray;
-//typedef std::vector< std::vector<double> > CovarianceMatrix;
+// typedef std::vector< std::vector<double> > CovarianceMatrix;
 
 } // ~namespace MAUS
 

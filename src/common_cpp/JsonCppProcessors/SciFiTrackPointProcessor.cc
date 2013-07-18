@@ -18,7 +18,7 @@
 
 namespace MAUS {
 
-SciFiTrackPointProcessor::SciFiTrackPointProcessor() {
+SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoubleProcessor) {
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiTrackPoint::tracker,
                         &SciFiTrackPoint::set_tracker, false);

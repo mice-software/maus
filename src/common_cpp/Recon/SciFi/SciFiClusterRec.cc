@@ -110,15 +110,14 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
   SciFiPlaneGeometry this_plane = (*iterator).second;
   ThreeVector plane_direction   = this_plane.Direction;
   ThreeVector plane_position    = this_plane.Position;
-  ThreeVector plane_perp        = this_plane.Perpendicular;
   double Pitch                  = this_plane.Pitch;
   double CentralFibre           = this_plane.CentralFibre;
   // alpha is the distance to the central fibre.
   double alpha   = clust->get_channel()-CentralFibre;
   double dist_mm = Pitch * 7.0 / 2.0 * alpha;
 
-  // ThreeVector
-  ThreeVector position = dist_mm * plane_perp + plane_position;
+  ThreeVector perp = plane_direction.Orthogonal();
+  ThreeVector position = dist_mm * perp + plane_position;
 
   clust->set_direction(plane_direction);
   clust->set_position(position);

@@ -39,7 +39,8 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   _s_chi2    = a_track.s_chi2();
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
-  _charge = a_track.charge();
+  _charge    = a_track.charge();
+  _algorithm_used = a_track._algorithm_used;
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
@@ -56,6 +57,8 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   _s_chi2  = a_track.s_chi2();
   _ndf     = a_track.ndf();
   _P_value = a_track.P_value();
+  _charge  = a_track.charge();
+  _algorithm_used = a_track._algorithm_used;
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {

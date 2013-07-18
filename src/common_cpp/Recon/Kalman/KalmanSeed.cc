@@ -35,14 +35,14 @@ KalmanSeed::KalmanSeed() : _Bz(0.),
                            _straight(false),
                            _helical(false),
                            _n_parameters(-1),
-                           _particle_charge(-1) {}
+                           _particle_charge(1) {}
 
 KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
                                               _geometry_map(map),
                                               _straight(false),
                                               _helical(false),
                                               _n_parameters(-1),
-                                              _particle_charge(-1) {
+                                              _particle_charge(1) {
   Json::Value *json = Globals::GetConfigurationCards();
   _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
   _plane_width = (*json)["SciFiParams_Plane_Width"].asDouble();
@@ -156,7 +156,9 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
-  double pt = _particle_charge*c*_Bz*r;
+  // Charge guess should come from PR.
+  // int _particle_charge = seed->get_charge();
+  double pt = -_particle_charge*c*_Bz*r;
 
   double dsdz  = seed->get_dsdz();
   double tan_lambda = 1./dsdz;
@@ -177,7 +179,7 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   a(3, 0) = py*fabs(kappa);
   a(4, 0) = kappa;
 
-  std::cerr << "Tracker " << _tracker << " has field " << _Bz <<". c is " << c << std::endl;
+  std::cerr << "Tracker " << _tracker << " has field " << _Bz << std::endl;
   std::cerr << "P: " << px << " " << py << " " << pz << std::endl;
   a.Print();
   std::cerr << "MC pos and mom: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
@@ -211,9 +213,10 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   a(3, 0) = my;
 
   std::cerr << "Tracker " << _tracker << std::endl;
+  std::cerr << "Position " << x << " " << y << std::endl;
   std::cerr << "Gradients: " << mx << " " << my << std::endl;
   a.Print();
-  std::cerr << "MC pos and gradient: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
+  std::cerr << "MC pos and gradient: " << mc_x << " " <<  mc_y << " " <<  mc_z << " "
   <<  mc_px/mc_pz<< " " <<  mc_py/mc_pz << std::endl;
 
   return a;

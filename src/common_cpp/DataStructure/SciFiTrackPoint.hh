@@ -99,7 +99,7 @@ class SciFiTrackPoint {
 
   /** @brief  Sets the covariance matrix.
    */
-  void set_covariance(TMatrixD covariance)     { _covariance = covariance; }
+  void set_covariance(std::vector<double> covariance)     { _covariance = covariance; }
 
   /** @brief  Sets pull (residual of the projected state).
    */
@@ -161,7 +161,7 @@ class SciFiTrackPoint {
 
   /** @brief  Returns the covariance matrix.
    */
-  TMatrixD covariance()        const { return _covariance; }
+  std::vector<double> covariance()        const { return _covariance; }
 
   /** @brief  Returns the residual of the projected state.
    */
@@ -224,7 +224,7 @@ class SciFiTrackPoint {
 
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */
-  TMatrixD _covariance;
+  std::vector<double> _covariance;
 
   /** @brief projected residual
    */

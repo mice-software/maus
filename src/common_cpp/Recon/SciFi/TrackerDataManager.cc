@@ -214,7 +214,7 @@ TF1 TrackerDataManager::make_str_track(double c, double m, double zmin, double z
 TF1 TrackerDataManager::make_xz(int handness, double circle_x0, double rad, double dsdz,
                                 double sz_c, double zmin, double zmax) {
     // The x in the cos term is actually representing z (the indep variable)
-    TF1 func = TF1("xz_func", "[0]+[4]*([1]*cos((1/[1])*([2]*x+[3])))", zmin, zmax);
+    TF1 func = TF1("xz_func", "[0]-[4]*([1]*cos((1/[1])*([2]*x+[3])))", zmin, zmax);
     func.SetParameter(0, circle_x0);
     func.SetParameter(1, rad);
     func.SetParameter(2, dsdz);

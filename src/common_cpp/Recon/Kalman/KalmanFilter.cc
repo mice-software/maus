@@ -46,10 +46,7 @@ KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim) {
 
 KalmanFilter::~KalmanFilter() {}
 
-void KalmanFilter::Process(KalmanStatesPArray sites, int current_site) {
-  // Get Site...
-  KalmanState *a_site = sites.at(current_site);
-
+void KalmanFilter::Process(KalmanState *a_site) {
   // Update measurement error:
   UpdateV(a_site);
 

@@ -37,11 +37,11 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
     mx0 = 15.*fabs(kappa);
     my0 = 15.*fabs(kappa);
 
-    x1 = -8.0019;
-    y1 = 34.614;
+    x1 = 29.614;
+    y1 = -3.0019;
     z1 = 350.;
-    mx1 = -20.513*fabs(kappa);
-    my1 = 5.4042*fabs(kappa);
+    mx1 = 0.027021;
+    my1 = -0.10257;
 
     old_site.set_z(z0);
     new_site.set_z(z1);

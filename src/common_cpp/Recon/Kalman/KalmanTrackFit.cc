@@ -42,9 +42,12 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     // Current seed.
     KalmanSeed* seed = seeds[i];
     KalmanStatesPArray sites = seed->GetKalmanStates();
+    SciFiTrack *track = new SciFiTrack();
     if ( seed->is_straight() ) {
+      track->SetAlgorithmUsed(SciFiTrack::kalman_straight);
       _propagator = new KalmanStraightPropagator();
     } else if ( seed->is_helical() ) {
+      track->SetAlgorithmUsed(SciFiTrack::kalman_helical);
       double Bz   = seed->GetField();
       _propagator = new KalmanHelicalPropagator(Bz);
     }
@@ -54,24 +57,31 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     _filter = new KalmanFilter(n_parameters);
 
     // Filter the first state.
-    _filter->Process(sites, 0);
+    std::cerr << "Filtering first state" << std::endl;
+    _filter->Process(sites.front());
 
     // Run the extrapolation & filter chain.
     size_t numb_measurements = sites.size();
     for ( size_t j = 1; j < numb_measurements; ++j ) {
+      std::cerr << "Extrapolating to" << j << std::endl;
       // Predict the state vector at site i...
       _propagator->Extrapolate(sites, j);
       // ... Filter...
-      _filter->Process(sites, j);
+      std::cerr << "Filtering " << j << std::endl;
+      _filter->Process(sites.at(j));
     }
     _propagator->PrepareForSmoothing(sites);
     // ...and Smooth back all sites.
     for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+      std::cerr << "Smoothing " << k << std::endl;
       _propagator->Smooth(sites, k);
       _filter->UpdateH(sites.at(k));
       _filter->SetResidual(sites.at(k), KalmanState::Smoothed);
     }
-    SciFiTrack *track = new SciFiTrack();
+
+    track->set_tracker(seed->tracker());
+    track->set_charge(seed->charge());
+
     // Calculate the chi2 of this track.
     ComputeChi2(track, sites);
     // Optional printing.

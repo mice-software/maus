@@ -36,7 +36,6 @@ namespace MAUS {
  */
 struct SciFiPlaneGeometry {
   ThreeVector Direction;
-  ThreeVector Perpendicular;
   ThreeVector Position;
   double CentralFibre;
   double Pitch;
