@@ -49,22 +49,16 @@ OpticsModel* get_optics_model(PyOpticsModel* py_model) {
     return py_model->model;
 }
 
-/// Dummy function
-static PyObject* get(PyObject* self, PyObject* args) {
-    return NULL;
-}
-
-/// Dummy function
-static PyObject* get_static(PyObject* self, PyObject* args) {
-    return NULL;
-}
-
-
 static PyMethodDef _methods[] = {
-{"get", (PyCFunction)get,           METH_VARARGS, "Docstring"},
-{"get_static", (PyCFunction)get_static, METH_STATIC, "Docstring"},
 {NULL}
 };
+
+const char* module_docstring =
+  "optics_model module; merely a place holder for OpticsModel";
+
+const char* class_docstring =
+  "OpticsModel provides bindings for transporting particles and beam ellipses.";
+
 
 static PyTypeObject PyOpticsModelType = {
     PyObject_HEAD_INIT(NULL)
@@ -88,7 +82,7 @@ static PyTypeObject PyOpticsModelType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "optics.OpticsModel docstring",           /* tp_doc */
+    class_docstring,           /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */
@@ -105,35 +99,39 @@ static PyTypeObject PyOpticsModelType = {
     0,                         /* tp_dictoffset */
     (initproc)_init,      /* tp_init */
     (allocfunc)_alloc,    /* tp_alloc, called by new */
-    (newfunc)_new,   /* tp_new */
+    0, // (newfunc)_new,   /* tp_new */
     (freefunc)_free, /* tp_free, called by dealloc */
 };
 
 PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
-    PyOpticsModel* optics = (PyOpticsModel*)malloc(sizeof(PyOpticsModel));
+    void* void_optics = malloc(sizeof(PyOpticsModel));
+    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(void_optics);
     optics->model = NULL;
     optics->ob_refcnt = 1;
     optics->ob_type = type;
-    return (PyObject*)optics;
+    return reinterpret_cast<PyObject*>(optics);
 }
 
 int _init(PyObject* self, PyObject *args, PyObject *kwds) {
-    PyOpticsModel* optics = (PyOpticsModel*)self;
+    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(self);
+    // failed to cast or self was not initialised - something horrible happened
     if (optics == NULL) {
         PyErr_SetString(PyExc_TypeError,
                         "Failed to resolve self as OpticsModel in __init__");
         return -1;
     }
-    // legal python to call initialised_object.__init__() to reinitialise, so 
+    // legal python to call initialised_object.__init__() to reinitialise, so
     // handle this case
     if (optics->model != NULL) {
         delete optics->model;
         optics->model = NULL;
     }
+    // now initialise the internal optics model; for now hardcoded to
+    // LinearApproximationOpticsModel
     try {
         Json::Value* cards = Globals::GetConfigurationCards();
         optics->model = new MAUS::LinearApproximationOpticsModel(*cards);
-    } catch (Exception exc) {
+    } catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
         return -1;
     }
@@ -141,8 +139,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
 }
 
 PyObject *_new(PyTypeObject *type, Py_ssize_t nitems) {
-    PyOpticsModel* optics = (PyOpticsModel*)_alloc(type, nitems);
-    return (PyObject*)optics;
+    return _alloc(type, nitems);
 }
 
 void _dealloc(PyOpticsModel * self) {
@@ -161,12 +158,13 @@ PyMODINIT_FUNC initoptics_model(void) {
     PyOpticsModelType.tp_new = PyType_GenericNew;
     if (PyType_Ready(&PyOpticsModelType) < 0) return;
 
-    PyObject* module = Py_InitModule3("optics_model", NULL, "optics model docstring");
+    PyObject* module = Py_InitModule3("optics_model", NULL, module_docstring);
     if (module == NULL) return;
 
     PyTypeObject* optics_model_type = &PyOpticsModelType;
     Py_INCREF(optics_model_type);
-    PyModule_AddObject(module, "OpticsModel", (PyObject*)optics_model_type);
+    PyModule_AddObject(module, "OpticsModel",
+                       reinterpret_cast<PyObject*>(optics_model_type));
 }
 
 }  // namespace PyOpticsModel

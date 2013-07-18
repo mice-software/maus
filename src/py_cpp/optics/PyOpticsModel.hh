@@ -36,6 +36,8 @@ class OpticsModel; // note this is just in MAUS namespace
 namespace PyOpticsModel {
 
 /** PyOpticsModel is the python implementation of the C++ OpticsModel class
+
+ Provides bindings for transporting particles and beam ellipses
  */
 typedef struct {
     PyObject_HEAD;
@@ -43,18 +45,36 @@ typedef struct {
 } PyOpticsModel;
 
 /** _alloc allocates memory for PyOpticsModel
+ *
+ *  @param type - pointer to a PyOpticsModelType object, as defined in
+ *         PyOpticsModel.cc
+ *
+ *  returns a PyOpticsModel* (cast as a PyObject*); caller owns this memory
  */
-PyObject *_alloc(PyTypeObject *self, Py_ssize_t nitems);
+PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
 
 /** _new allocates and initialises memory for PyOpticsModel
+ *
+ *  Not used
  */
 PyObject *_new(PyTypeObject *self, Py_ssize_t nitems);
 
 /** _init initialises an allocated PyOpticsModel object
+ *
+ *  @param self an initialised PyOpticsModel* cast as a PyObject*; caller owns
+ *         this memory
+ *  @param args not used
+ *  @param kwds not used
+ *
+ *  @returns 0 on success; -1 on failure
  */
 int _init(PyObject* self, PyObject *args, PyObject *kwds);
 
-/** deallocate memory */
+/** deallocate memory
+ *
+ *  @params self an initialised PyOpticsModel*; memory will be freed by this 
+ *          function
+ */
 void _dealloc(PyOpticsModel * self);
 
 /** synonym for dealloc */
@@ -68,8 +88,8 @@ void _free(PyOpticsModel * self);
 PyMODINIT_FUNC initoptics_model(void);
 
 /** Return the C++ optics model associated with a PyOpticsModel 
- *  
- *  OpticsModel still owns the memory allocated to PyOpticsModel
+ *
+ *  PyOpticsModel still owns the memory allocated to OpticsModel
  */
 OpticsModel* get_optics_model(PyOpticsModel* py_model);
 
