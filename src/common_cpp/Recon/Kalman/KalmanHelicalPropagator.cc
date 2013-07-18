@@ -53,7 +53,7 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   double charge = old_kappa/fabs(old_kappa);
 
   double c      = CLHEP::c_light;
-  double a      = c*charge*_Bz;
+  double a      = -c*charge*_Bz;
   double sine   = sin(a*deltaZ*charge*old_kappa);
   double cosine = cos(a*deltaZ*charge*old_kappa);
 
@@ -98,7 +98,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
 
   // Define factors to be used in the matrix.
   double c      = CLHEP::c_light;
-  double a      = c*charge*_Bz;
+  double a      = -c*charge*_Bz;
   double sine   = sin(a*deltaZ*charge*kappa);
   double cosine = cos(a*deltaZ*charge*kappa);
 
