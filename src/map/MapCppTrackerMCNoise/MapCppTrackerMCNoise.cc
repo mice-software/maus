@@ -164,7 +164,6 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) {
               continue;
             }
           }
-          std::cerr << "exist_flag: " << exist_flag << "\n";
           if ( !exist_flag ) {
             temp_digits.push_back(a_digit);
           }
