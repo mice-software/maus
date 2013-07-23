@@ -72,78 +72,6 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
   static const double err = 1.e-3;
 };
 
-
-/*
-TEST_F(KalmanHelicalPropagatorTest, test_propagation) {
-  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
-  propagator->CalculatePredictedState(&old_site, &new_site);
-  TMatrixD a_projected(5, 1);
-  a_projected = new_site.a(MAUS::KalmanState::Projected);
-
-  EXPECT_NEAR(x1,    a_projected(0, 0), err);
-  EXPECT_NEAR(mx1,   a_projected(1, 0), err);
-  EXPECT_NEAR(y1,    a_projected(2, 0), err);
-  EXPECT_NEAR(my1,   a_projected(3, 0), err);
-  EXPECT_NEAR(kappa, a_projected(4, 0), err);
-
-  delete propagator;
-}
-*/
-
-TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker0) {
-  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_tracker0_Bz);
-  MAUS::KalmanState state_0;
-  MAUS::KalmanState state_15;
-
-  state_0.Initialise(5);
-  state_15.Initialise(5);
-
-  // inverting x and z; swaping 0 <->15
-  double x15 = 85.9232;
-  double y15 = -8.36646;
-  double z15 = -11856.;
-  double px15 = -37.4872;
-  double py15 = 62.7714;
-  double pz15 = 206.014;
-  double mx15 = -px15/pz15;
-  double my15 = -py15/pz15;
-  double charge = 1.;
-  double kappa = charge/pz15;
-
-  double x0 = 3.259;
-  double y0 = 75.5381;
-  double z0 = -12306.5;
-  double px0 = 63.2164;
-  double py0 = -36.7519;
-  double pz0 = 206.01;
-  double mx0 = -px0/pz0;
-  double my0 = -py0/pz0;
-
-  state_0.set_z(z0);
-  state_15.set_z(z15);
-  state_15.set_id(15);
-
-  TMatrixD a(5, 1);
-  a(0, 0) = x0;
-  a(1, 0) = mx0;
-  a(2, 0) = y0;
-  a(3, 0) = my0;
-  a(4, 0) = kappa;
-  state_0.set_a(a, MAUS::KalmanState::Filtered);
-
-  propagator->CalculatePredictedState(&state_0, &state_15);
-  TMatrixD a_projected(5, 1);
-  a_projected = state_15.a(MAUS::KalmanState::Projected);
-
-  EXPECT_NEAR(x15,    a_projected(0, 0), err);
-  EXPECT_NEAR(mx15,   a_projected(1, 0), err);
-  EXPECT_NEAR(y15,    a_projected(2, 0), err);
-  EXPECT_NEAR(my15,   a_projected(3, 0), err);
-  EXPECT_NEAR(kappa, a_projected(4, 0), err);
-
-  delete propagator;
-}
-
 TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_tracker1_Bz);
   MAUS::KalmanState state_0;
@@ -163,10 +91,10 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   double charge = 1.;
   double kappa  = charge/pz0;
 
-  double x15  = 98.4653;
-  double y15  = -8.77902;
+  double x15  = 98.65861;
+  double y15  = -9.12456;
   double z15  = 16472.6;
-  double px15 = 23.8564;
+  double px15 = 24.22770;
   double py15 = 44.5266;
   double pz15 = 212.686;
   double mx15 = px15/pz15;

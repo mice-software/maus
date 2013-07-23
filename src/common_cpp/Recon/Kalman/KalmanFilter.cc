@@ -24,7 +24,7 @@ KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim) {
   Json::Value *json = Globals::GetConfigurationCards();
-  FibreParameters.Active_Radius  = (*json)["SciFiParams_Active_Radius"].asDouble();
+  FibreParameters.Station_Radius = (*json)["SciFiParams_Station_Radius"].asDouble();
   FibreParameters.Plane_Width    = (*json)["SciFiParams_Plane_Width"].asDouble();
   FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
   // Measurement equation.
@@ -69,11 +69,12 @@ void KalmanFilter::Process(KalmanState *a_site) {
 void KalmanFilter::UpdateV(const KalmanState *a_site) {
   // Fibre constants.
   double pitch         = FibreParameters.Pitch;
-  // Active radius in units of channel width.
-  double active_radius = FibreParameters.Active_Radius/pitch;
-
+  // Station radius in units of channel width.
+  std::cerr << FibreParameters.Station_Radius << std::endl;
+  double station_radius = FibreParameters.Station_Radius/pitch;
+  std::cerr << station_radius << std::endl;
   double alpha = (a_site->measurement())(0, 0);
-  double length = 2.*TMath::Sqrt(active_radius*active_radius -
+  double length = 2.*TMath::Sqrt(station_radius*station_radius -
                                  alpha*alpha);
 
   double sigma_beta = length/TMath::Sqrt(12.);
@@ -82,6 +83,7 @@ void KalmanFilter::UpdateV(const KalmanState *a_site) {
   _V.Zero();
   _V(0, 0) = sigma_alpha*sigma_alpha;
   _V(1, 1) = sigma_beta*sigma_beta;
+  _V.Print();
 }
 
 void KalmanFilter::UpdateH(const KalmanState *a_site) {

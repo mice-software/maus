@@ -35,7 +35,7 @@ KalmanPropagator::KalmanPropagator() : _n_parameters(0) {
   FibreParameters.Mean_Excitation_Energy = (*json)["SciFiParams_Mean_Excitation_Energy"].asDouble();
   FibreParameters.A              = (*json)["SciFiParams_A"].asDouble();
   FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
-  FibreParameters.Active_Radius  = (*json)["SciFiParams_Active_Radius"].asDouble();
+  FibreParameters.Station_Radius = (*json)["SciFiParams_Station_Radius"].asDouble();
   FibreParameters.RMS            = (*json)["SciFiParams_RMS"].asDouble();
 }
 
@@ -183,36 +183,36 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   // x x
   _Q(0, 0) = deltaZ_squared*c_mx_mx;
   // x mx
-  _Q(0, 1) = deltaZ*c_mx_mx;
+  _Q(0, 1) = -deltaZ*c_mx_mx;
   // x y
   _Q(0, 2) = deltaZ_squared*c_mx_my;
   // x my
-  _Q(0, 3) = deltaZ*c_mx_my;
+  _Q(0, 3) = -deltaZ*c_mx_my;
 
   // mx x
-  _Q(1, 0) = deltaZ*c_mx_mx;
+  _Q(1, 0) = -deltaZ*c_mx_mx;
   // mx mx
   _Q(1, 1) = c_mx_mx;
   // mx y
-  _Q(1, 2) = deltaZ*c_mx_my;
+  _Q(1, 2) = -deltaZ*c_mx_my;
   // mx my
   _Q(1, 3) = c_mx_my;
 
   // y x
   _Q(2, 0) = deltaZ_squared*c_mx_my;
   // y mx
-  _Q(2, 1) = deltaZ*c_mx_my;
+  _Q(2, 1) = -deltaZ*c_mx_my;
   // y y
   _Q(2, 2) = deltaZ_squared*c_my_my;
   // y my
-  _Q(2, 3) = deltaZ*c_my_my;
+  _Q(2, 3) = -deltaZ*c_my_my;
 
   // my x
-  _Q(3, 0) = deltaZ*c_mx_my;
+  _Q(3, 0) = -deltaZ*c_mx_my;
   // my mx
   _Q(3, 1) = c_mx_my;
   // my y
-  _Q(3, 2) = deltaZ*c_my_my;
+  _Q(3, 2) = -deltaZ*c_my_my;
   // my my
   _Q(3, 3) = c_my_my;
 }

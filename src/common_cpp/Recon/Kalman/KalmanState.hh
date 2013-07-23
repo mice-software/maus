@@ -32,8 +32,6 @@
 
 namespace MAUS {
 
-// TODO : Change class name to KalmanState.
-
 struct SciFiParams {
   /// Polystyrene's atomic number.
   double Z;
@@ -51,8 +49,8 @@ struct SciFiParams {
   double A;
   /// Channel width in mm
   double Pitch;
-  /// Active Radius in mm
-  double Active_Radius;
+  /// Station Radius in mm
+  double Station_Radius;
   /// RMS per channel measurement (um).
   double RMS;
 };

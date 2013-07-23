@@ -60,9 +60,15 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   double sine   = sin(a*deltaZ*fabs(old_kappa));
   double cosine = cos(a*deltaZ*fabs(old_kappa));
 
-  double new_x  = old_x + (old_mx*sine)/(a*charge*old_kappa) - old_my*(1.-cosine)/(a*charge*old_kappa);
+  // Calculate the new track parameters.
+  double new_x  = old_x + (old_mx*sine)/(a*charge*old_kappa)
+                  - old_my*(1.-cosine)/(a*charge*old_kappa);
+
   double new_mx = old_mx*cosine - old_my*sine;
-  double new_y  = old_y + (old_my*sine)/(a*charge*old_kappa) + old_mx*(1.-cosine)/(a*charge*old_kappa);
+
+  double new_y  = old_y + (old_my*sine)/(a*charge*old_kappa)
+                  + old_mx*(1.-cosine)/(a*charge*old_kappa);
+
   double new_my = old_my*cosine + old_mx*sine;
 
   TMatrixD a_projected(_n_parameters, 1);
