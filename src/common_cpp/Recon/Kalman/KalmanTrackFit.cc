@@ -57,23 +57,19 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     _filter = new KalmanFilter(n_parameters);
 
     // Filter the first state.
-    std::cerr << "Filtering first state" << std::endl;
     _filter->Process(sites.front());
 
     // Run the extrapolation & filter chain.
     size_t numb_measurements = sites.size();
     for ( size_t j = 1; j < numb_measurements; ++j ) {
-      std::cerr << "Extrapolating to" << j << std::endl;
       // Predict the state vector at site i...
       _propagator->Extrapolate(sites, j);
       // ... Filter...
-      std::cerr << "Filtering " << j << std::endl;
       _filter->Process(sites.at(j));
     }
     _propagator->PrepareForSmoothing(sites);
     // ...and Smooth back all sites.
     for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
-      std::cerr << "Smoothing " << k << std::endl;
       _propagator->Smooth(sites, k);
       _filter->UpdateH(sites.at(k));
       _filter->SetResidual(sites.at(k), KalmanState::Smoothed);
