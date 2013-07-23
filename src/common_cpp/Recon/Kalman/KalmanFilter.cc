@@ -70,9 +70,8 @@ void KalmanFilter::UpdateV(const KalmanState *a_site) {
   // Fibre constants.
   double pitch         = FibreParameters.Pitch;
   // Station radius in units of channel width.
-  std::cerr << FibreParameters.Station_Radius << std::endl;
   double station_radius = FibreParameters.Station_Radius/pitch;
-  std::cerr << station_radius << std::endl;
+
   double alpha = (a_site->measurement())(0, 0);
   double length = 2.*TMath::Sqrt(station_radius*station_radius -
                                  alpha*alpha);
@@ -83,7 +82,6 @@ void KalmanFilter::UpdateV(const KalmanState *a_site) {
   _V.Zero();
   _V(0, 0) = sigma_alpha*sigma_alpha;
   _V(1, 1) = sigma_beta*sigma_beta;
-  _V.Print();
 }
 
 void KalmanFilter::UpdateH(const KalmanState *a_site) {

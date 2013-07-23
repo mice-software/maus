@@ -97,14 +97,6 @@ void KalmanSeed::BuildKalmanStates() {
   for ( size_t j = 0; j < numb_sites; ++j ) {
     SciFiCluster& cluster = (*_clusters[j]);
 
-    std::cerr << "tracker: " << cluster.get_tracker() << " "
-    << cluster.get_true_position().x() << " "
-    << cluster.get_true_position().y() << " "
-    << cluster.get_true_position().z() << " "
-    << cluster.get_true_momentum().x() << " "
-    << cluster.get_true_momentum().y() << " "
-    << cluster.get_true_momentum().z() << std::endl;
-
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
@@ -190,12 +182,6 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   a(2, 0) = y;
   a(3, 0) = py*fabs(kappa);
   a(4, 0) = kappa;
-
-  std::cerr << "Tracker " << _tracker << " has field " << _Bz << std::endl;
-  std::cerr << "P: " << px << " " << py << " " << pz << std::endl;
-  a.Print();
-  std::cerr << "MC pos and mom: " << mc_x << " " <<  mc_y<< " " <<  mc_z << " "
-            <<  mc_px<< " " <<  mc_py<< " " <<  mc_pz << std::endl;
 
   return a;
 }

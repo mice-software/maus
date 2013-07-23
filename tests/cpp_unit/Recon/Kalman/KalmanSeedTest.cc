@@ -222,7 +222,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Is this Pi really necessary?
   double PI = acos(-1.);
   double phi_0 = 0.;
-  int charge = -1;
+  int charge = -1.;
   double field = -0.004;
   double pt = charge*0.3*field*r;
   double pz = pt*tan_lambda;
