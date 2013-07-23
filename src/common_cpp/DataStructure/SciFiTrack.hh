@@ -112,7 +112,7 @@ class SciFiTrack {
 
   /** @brief Returns the type of algorithm used to reconstruct this track.
    */
-  int GetAlgorithmUsed() const { return (int) _algorithm_used; }
+  int GetAlgorithmUsed() const { return static_cast<int> (_algorithm_used); }
 
   void SetAlgorithmUsed(int algorithm) { _algorithm_used = (AlgorithmUsed) algorithm; }
 

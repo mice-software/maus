@@ -96,6 +96,15 @@ void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
     SciFiCluster& cluster = (*_clusters[j]);
+
+    std::cerr << "tracker: " << cluster.get_tracker() << " "
+    << cluster.get_true_position().x() << " "
+    << cluster.get_true_position().y() << " "
+    << cluster.get_true_position().z() << " "
+    << cluster.get_true_momentum().x() << " "
+    << cluster.get_true_momentum().y() << " "
+    << cluster.get_true_momentum().z() << std::endl;
+
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
@@ -168,6 +177,9 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double kappa = _particle_charge*fabs(1./pz);
 
   double phi_0 = seed->get_phi0();
+  if ( _tracker == 0 ) {
+    phi_0 = seed->get_phi().back();
+  }
   double phi = phi_0 + TMath::PiOver2();
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
@@ -211,13 +223,6 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
-
-  std::cerr << "Tracker " << _tracker << std::endl;
-  std::cerr << "Position " << x << " " << y << std::endl;
-  std::cerr << "Gradients: " << mx << " " << my << std::endl;
-  a.Print();
-  std::cerr << "MC pos and gradient: " << mc_x << " " <<  mc_y << " " <<  mc_z << " "
-  <<  mc_px/mc_pz<< " " <<  mc_py/mc_pz << std::endl;
 
   return a;
 }

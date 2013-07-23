@@ -27,27 +27,26 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
     // if (!MAUS::Globals::HasInstance()) {
     //   MAUS::GlobalsManager::InitialiseGlobals("src/common_py/ConfigurationDefaults.py");
     // }
-
     old_site.Initialise(5);
     new_site.Initialise(5);
-    kappa = -1./200.;
-    x0 = 0.;
-    y0 = 5.;
-    z0 = 0.;
-    mx0 = 15.*fabs(kappa);
-    my0 = 15.*fabs(kappa);
+    double kappa = -1./200.;
+    double x0 = 0.;
+    double y0 = 5.;
+    double z0 = 0.;
+    double mx0 = 15.*fabs(kappa);
+    double my0 = 15.*fabs(kappa);
 
-    x1 = 29.614;
-    y1 = -3.0019;
-    z1 = 350.;
-    mx1 = 0.027021;
-    my1 = -0.10257;
+    double x1 = 29.614;
+    double y1 = -3.0019;
+    double z1 = 350.;
+    double mx1 = 0.027021;
+    double my1 = -0.10257;
 
     old_site.set_z(z0);
     new_site.set_z(z1);
     new_site.set_id(15);
 
-    a.ResizeTo(5, 1);
+    TMatrixD a(5, 1);
     a(0, 0) = x0;
     a(1, 0) = mx0;
     a(2, 0) = y0;
@@ -66,14 +65,15 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
   }
   MAUS::KalmanState old_site;
   MAUS::KalmanState new_site;
-  double z0, z1;
-  double x0, y0, mx0, my0, kappa;
-  double x1, y1, mx1, my1;
-  TMatrixD a;
+  // TMatrixD a;
   static const double _Bz = -0.004;
+  static const double _tracker0_Bz = -0.0039815;
+  static const double _tracker1_Bz = -0.00400066;
   static const double err = 1.e-3;
 };
 
+
+/*
 TEST_F(KalmanHelicalPropagatorTest, test_propagation) {
   MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
   propagator->CalculatePredictedState(&old_site, &new_site);
@@ -88,6 +88,115 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation) {
 
   delete propagator;
 }
+*/
+
+TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker0) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_tracker0_Bz);
+  MAUS::KalmanState state_0;
+  MAUS::KalmanState state_15;
+
+  state_0.Initialise(5);
+  state_15.Initialise(5);
+
+  // inverting x and z; swaping 0 <->15
+  double x15 = 85.9232;
+  double y15 = -8.36646;
+  double z15 = -11856.;
+  double px15 = -37.4872;
+  double py15 = 62.7714;
+  double pz15 = 206.014;
+  double mx15 = -px15/pz15;
+  double my15 = -py15/pz15;
+  double charge = 1.;
+  double kappa = charge/pz15;
+
+  double x0 = 3.259;
+  double y0 = 75.5381;
+  double z0 = -12306.5;
+  double px0 = 63.2164;
+  double py0 = -36.7519;
+  double pz0 = 206.01;
+  double mx0 = -px0/pz0;
+  double my0 = -py0/pz0;
+
+  state_0.set_z(z0);
+  state_15.set_z(z15);
+  state_15.set_id(15);
+
+  TMatrixD a(5, 1);
+  a(0, 0) = x0;
+  a(1, 0) = mx0;
+  a(2, 0) = y0;
+  a(3, 0) = my0;
+  a(4, 0) = kappa;
+  state_0.set_a(a, MAUS::KalmanState::Filtered);
+
+  propagator->CalculatePredictedState(&state_0, &state_15);
+  TMatrixD a_projected(5, 1);
+  a_projected = state_15.a(MAUS::KalmanState::Projected);
+
+  EXPECT_NEAR(x15,    a_projected(0, 0), err);
+  EXPECT_NEAR(mx15,   a_projected(1, 0), err);
+  EXPECT_NEAR(y15,    a_projected(2, 0), err);
+  EXPECT_NEAR(my15,   a_projected(3, 0), err);
+  EXPECT_NEAR(kappa, a_projected(4, 0), err);
+
+  delete propagator;
+}
+
+TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_tracker1_Bz);
+  MAUS::KalmanState state_0;
+  MAUS::KalmanState state_15;
+
+  state_0.Initialise(5);
+  state_15.Initialise(5);
+
+  double x0  = 19.4509;
+  double y0  = 6.86145;
+  double z0  = 16021.6;
+  double px0 = 5.04953;
+  double py0 = -50.4535;
+  double pz0 = 212.641;
+  double mx0 = px0/pz0;
+  double my0 = py0/pz0;
+  double charge = 1.;
+  double kappa  = charge/pz0;
+
+  double x15  = 98.4653;
+  double y15  = -8.77902;
+  double z15  = 16472.6;
+  double px15 = 23.8564;
+  double py15 = 44.5266;
+  double pz15 = 212.686;
+  double mx15 = px15/pz15;
+  double my15 = py15/pz15;
+
+  state_0.set_z(z0);
+  state_15.set_z(z15);
+  state_15.set_id(15);
+
+  TMatrixD a(5, 1);
+  a(0, 0) = x0;
+  a(1, 0) = mx0;
+  a(2, 0) = y0;
+  a(3, 0) = my0;
+  a(4, 0) = kappa;
+  state_0.set_a(a, MAUS::KalmanState::Filtered);
+
+  propagator->CalculatePredictedState(&state_0, &state_15);
+  TMatrixD a_projected(5, 1);
+  a_projected = state_15.a(MAUS::KalmanState::Projected);
+
+  EXPECT_NEAR(x15,    a_projected(0, 0), err);
+  EXPECT_NEAR(mx15,   a_projected(1, 0), err);
+  EXPECT_NEAR(y15,    a_projected(2, 0), err);
+  EXPECT_NEAR(my15,   a_projected(3, 0), err);
+  EXPECT_NEAR(kappa, a_projected(4, 0), err);
+
+  delete propagator;
+}
+
 // Removed for now: needs to call Globals::GetConfigurationCards()
 /*
 TEST_F(KalmanHelicalPropagatorTest, test_energy_loss) {
