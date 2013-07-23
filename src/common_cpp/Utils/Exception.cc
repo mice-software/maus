@@ -24,33 +24,48 @@
 #include <ostream>
 #include <sstream>
 
-#include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
 
-const size_t   Squeal::_maxStackSize = 100;
+#include "src/common_cpp/Utils/Exception.hh"
 
-Squeal::Squeal() throw() {
+namespace MAUS {
+
+const size_t   Exception::_maxStackSize = 100;
+bool Exception::_willDoStackTrace = true;
+
+Exception::Exception() throw() {
   Squeak::mout();
 }
 
-Squeal::Squeal(exceptionLevel level, std::string errorMessage,
+Exception::Exception(exceptionLevel level, std::string errorMessage,
                                                    std::string location) throw()
       : exception(), _message(errorMessage), _location(location),
-        _stacktrace(MakeStackTrace(2)), _what(), _level(level) {
+        _stacktrace(""), _what(), _level(level) {
   Squeak::mout();  // make sure we initialise Squeak otherwise can get segv
   // use std::vector as dynamic array
   SetWhat(_message+" at "+_location);
+  if (_willDoStackTrace)
+      _stacktrace = MakeStackTrace(2);
 }
 
-void Squeal::Print() {
+void Exception::Print() {
   Squeak::mout(_level) << _message << "\n";
   Squeak::mout(Squeak::debug) << "Error at " << _location << "\n";
-  if (_stacktrace != "")
+  if (_willDoStackTrace && _stacktrace != "")
     Squeak::mout(Squeak::debug) << "Stack trace\n" << GetStackTrace() << "\n";
 }
 
+
+void Exception::SetWillDoStackTrace(bool willDoStackTrace) {
+    _willDoStackTrace = willDoStackTrace;
+}
+
+bool Exception::GetWillDoStackTrace() {
+    return _willDoStackTrace;
+}
+
 #ifndef NO_STACKTRACE
-std::string Squeal::MakeStackTrace(size_t skipTrace) {
+std::string Exception::MakeStackTrace(size_t skipTrace) {
   size_t stackSize;
   void * stackAddress[_maxStackSize];
   char **stackNames;
@@ -67,6 +82,6 @@ std::string Squeal::MakeStackTrace(size_t skipTrace) {
 #endif
 
 #ifdef NO_STACKTRACE
-std::string Squeal::MakeStackTrace(size_t skipTrace) {return "";}
+std::string Exception::MakeStackTrace(size_t skipTrace) {return "";}
 #endif
-
+}

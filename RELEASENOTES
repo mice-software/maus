@@ -5,6 +5,21 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.6.0
+  The following functionality was added:
+    - New DAQ build script
+    - New daq test file 04234 in third_party/source
+    - Several changes to online tests
+    - New TOF Reducer for calibration
+    - stability improvements
+
+MAUS-v0.5.5
+  The following functionality was added:
+    - VRML viewer support
+    - Datamover plots
+    - Stability improvements
+  If upgrading from a previous version, please redo the entire installation
+
 MAUS-v0.5.4
   The following functionality was added:
     - Stability and testing of online code was improved

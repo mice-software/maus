@@ -41,11 +41,12 @@ class InMemoryDocumentStore(DocumentStore):
         """
         return self.__data_store.keys()
 
-    def create_collection(self, collection):
+    def create_collection(self, collection, maximum_size = 1e9):
         """ 
         Create a collection. If it already exists, this is a no-op.
         @param self Object reference.
         @param collection Collection name.
+        @param maximum_size Ignored.
         """
         if (not self.__data_store.has_key(collection)):
             self.__data_store[collection] = {}

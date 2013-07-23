@@ -251,7 +251,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         # Purge the document store.
         print("Purging document store")
         DocumentStoreUtilities.create_doc_store_collection(self.doc_store,
-            self.collection)
+            self.collection, self.config["doc_store_event_cache_size"])
         # Do an initial check for active Celery nodes.
         print("Checking for active Celery nodes...")
         num_nodes = CeleryUtilities.ping_celery_nodes()
@@ -301,11 +301,11 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         if DataflowUtilities.get_event_type(event_json) == "Spill":
             current_run_number = DataflowUtilities.get_run_number(event_json)
             if current_run_number != self.run_number:
-                self.spill_input_count += 1
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
+            self.spill_input_count += 1
             self.submit_spill_to_celery(event)
 
     @staticmethod

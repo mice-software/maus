@@ -112,6 +112,12 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         time.sleep(5)
         self.assertEquals(proc.poll(), 0) # pylint: disable=E1101
 
+    def test_input_cpp_daq_online(self): # pylint:disable=R0201
+        """
+        _test_online_okay: Check that maus daq online library imports okay
+        """
+        from MAUS import InputCppDAQOnlineData # pylint:disable=E0611,W0612
+
 if __name__ == "__main__":
     unittest.main()
 
