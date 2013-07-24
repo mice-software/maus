@@ -285,8 +285,7 @@ class TestCppStyle(unittest.TestCase): #pylint: disable=R0904
 
     def test_cpp_style(self):
         """
-        @brief This is the main test - walks the directory structure and looks 
-        for errors using cpplint
+        Run cpplint looking for C++ style errors
         """
         file_name = os.path.join(MAUS_ROOT_DIR, 'tmp', 'cpplint.out')
         walker(MAUS_ROOT_DIR, EXCLUDE_DIRS, EXCLUDE_FILES, file_name)
