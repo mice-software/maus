@@ -55,6 +55,21 @@ struct SciFiParams {
   double RMS;
 };
 
+struct AirParams {
+  /// Air mean atomic number.
+  double Z;
+  /// Air radiation lenght in mm
+  double Radiation_Legth;
+  /// Fractional Radiation Length
+  double R0(double lenght) { return lenght/Radiation_Legth; }
+  /// Density in g.cm-3
+  double Density;
+  /// Mean excitation energy in eV.
+  double Mean_Excitation_Energy;
+  /// Atomic number in g.mol-1 per styrene monomer
+  double A;
+};
+
 /** @class KalmanState
  *
  *  @brief A KalmanState is a tracker plane. Each tracker contains 15 (if all planes are hit).
