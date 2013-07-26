@@ -118,9 +118,10 @@ TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
                                                       pFiberPitch).getFiberPitch();
 
   // ... compare with MICE Note 135
-  EXPECT_EQ(note135_core_diameter, fetched_outer_diameter);
-  EXPECT_EQ(note135_fiber_diameter, fetched_fiber_diameter);
-  EXPECT_EQ(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch);
+  EXPECT_NEAR(note135_core_diameter, fetched_outer_diameter, 1e-12);
+  EXPECT_NEAR(note135_fiber_diameter, fetched_fiber_diameter, 1e-12);
+  EXPECT_NEAR(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch,
+                                                                         1e-12);
 }
 
 TEST_F(DoubletFiberParamTest, test_compute_transformation) {

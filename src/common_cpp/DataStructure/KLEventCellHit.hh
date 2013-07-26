@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/KLCellHit.hh"
 
@@ -62,7 +62,7 @@ class KLEventCellHit {
   private:
     KLCellHitArray _kl;
 
-    ClassDef(KLEventCellHit, 1)
+    MAUS_VERSIONED_CLASS_DEF(KLEventCellHit)
 };
 }
 

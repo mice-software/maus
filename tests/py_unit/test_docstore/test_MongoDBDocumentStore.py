@@ -37,6 +37,7 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         @param self Object reference.
         """
         unittest.TestCase.setUp(self)
+        DocumentStoreTests.setUp(self)
         self._host = "localhost"
         self._port = 27017
         try:
@@ -50,12 +51,13 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         self._database_name = self.__class__.__name__
         self._collection = self.__class__.__name__
         self._data_store = MongoDBDocumentStore()
+
         parameters = {
             "mongodb_host":self._host,
             "mongodb_port":self._port,
             "mongodb_database_name":self._database_name}
         self._data_store.connect(parameters)
-        self._data_store.create_collection(self._collection)
+        self._data_store.create_collection(self._collection, self._max_size)
 
     def tearDown(self):
         """
@@ -116,6 +118,26 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
             self._data_store.connect(parameters)
         except KeyError:
             pass
+
+    def test_put_max(self):
+        """
+        Test put for > max_id.
+        @param self Object reference.
+        """
+        # Insert document.
+        doc = {"a":"b"}
+        max_size = 0
+        # first determine the max number of documents in the docstore
+        # (I don't know how storage is done so I can't figure this out)
+        self._data_store.put(self._collection, "0", doc)
+        while self._data_store.get(self._collection, "0") != None:
+            self._data_store.put(self._collection, str(max_size), doc)
+            max_size += 1
+        count = self._data_store.count(self._collection)
+        for i in range(5):
+            self._data_store.put(self._collection, str(max_size+i), doc)
+            self.assertEquals(self._data_store.count(self._collection), count)
+        
 
 if __name__ == '__main__':
     unittest.main()

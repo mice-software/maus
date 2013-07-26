@@ -19,12 +19,31 @@ MAUS framework utilities module.
 
 import socket
 import sys
+import base64
+import os
 
 from celery.task.control import discard_all # pylint: disable=E0611, F0401
 from celery.task.control import inspect # pylint: disable=E0611, F0401
 from celery.task.control import broadcast # pylint: disable=E0611, F0401
 from docstore.DocumentStore import DocumentStore
 from docstore.DocumentStore import DocumentStoreException
+
+def convert_binary_to_string(binary_file_name, remove_binary_file):
+    """
+    Read in a binary file and convert it into a string for use in json documents
+    @param binary_file_name string containing the file name of the binary file
+           that will be read
+    @param remove_binary_file boolean; set to True to remove the binary file 
+           after converting to a string; set to False to delete the binary file
+           after converting
+    """
+    tmp_file = open(binary_file_name, 'r')
+    data = tmp_file.read()
+    encoded_data = base64.b64encode(data)
+    tmp_file.close()
+    if remove_binary_file:
+        os.remove(binary_file_name)
+    return encoded_data
 
 class DataflowUtilities: # pylint: disable=W0232
     """
@@ -156,25 +175,27 @@ class DocumentStoreUtilities: # pylint: disable=W0232
                 % (doc_store_class, DocumentStore))
         # Connect to the document store.
         try:
-            doc_store.connect(config) 
+            doc_store.connect(config)
         except Exception as exc:
             sys.excepthook(*sys.exc_info())
             raise DocumentStoreException(exc)
         return doc_store
 
     @staticmethod
-    def create_doc_store_collection(doc_store, collection):
+    def create_doc_store_collection(doc_store, collection, max_doc_size):
         """
         Create a collection in the document store. If it exists already
         then it is deleted.
         @param doc_store Document store.
         @param collection Collection name.
+        @param max_docs Maximum number of documents that will be held by the
+               collection.
         @throws DocumentStoreException if there is a problem.
         """
         try:
             if (doc_store.has_collection(collection)):
                 doc_store.delete_collection(collection)
-            doc_store.create_collection(collection)
+            doc_store.create_collection(collection, max_doc_size)
         except Exception as exc:
             raise DocumentStoreException(exc)
 
