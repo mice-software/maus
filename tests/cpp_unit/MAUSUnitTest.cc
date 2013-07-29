@@ -15,7 +15,10 @@
  *
  */
 
+#include <getopt.h>
+
 #include <string>
+#include <sstream>
 
 #include "gtest/gtest.h"
 
@@ -24,15 +27,48 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
-Json::Value SetupConfig() {
+extern char *optarg;
+
+// return value is verbose_level, if we change the flags we will need to change
+// the call structure slightly...
+int parse_flags(int argc, char **argv) {
+    int _verbose_level = 1;
+    int _help = 2;
+    option long_options[] = {
+              {"verbose_level", required_argument, NULL, _verbose_level},
+              {"help", no_argument, NULL, _help},
+              {NULL, 0, NULL, 0}
+    };
+    int option = 0;
+    int option_index = 0;
+    while (option != -1) {
+        option = getopt_long_only(argc, argv, "", long_options, &option_index);
+        if (option == _verbose_level) {
+            std::stringstream ss(optarg);
+            int verbose_level = 2;
+            ss >> verbose_level;
+            return verbose_level;
+        } else if (option == _help) {
+            std::cerr << "\n\nThis test program takes MAUS defined options:\n"
+                      << "      --verbose_level=(integer)\n"
+                      << "      verbose level for MAUS IO\n"
+                      << std::endl;
+        }// else probably a gtest flag, so ignore
+    }
+    return 2;
+}
+
+Json::Value SetupConfig(int verbose_level) {
+  std::cerr << "Running with verbose level " << verbose_level << std::endl;
   Json::Value config(Json::objectValue);
   config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";
   config["maximum_number_of_steps"] = 10000;
+  config["will_do_stack_trace"] = true;
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
-  config["verbose_level"] = 2;
+  config["verbose_level"] = verbose_level;
   config["geant4_visualisation"] = false;
   config["physics_model"] = "QGSP_BERT";
   config["reference_physics_processes"] = "mean_energy_loss";
@@ -67,8 +103,10 @@ int main(int argc, char **argv) {
   int test_out = -1;
   try {
       std::cout << "Initialising Globals" << std::endl;
-      MAUS::GlobalsManager::InitialiseGlobals
-                                     (JsonWrapper::JsonToString(SetupConfig()));
+      int verbose_level = parse_flags(argc, argv);
+      MAUS::GlobalsManager::InitialiseGlobals(
+                JsonWrapper::JsonToString(SetupConfig(verbose_level))
+      );
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();

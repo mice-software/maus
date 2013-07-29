@@ -157,11 +157,10 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
                                             const KalmanState *new_site) {
   // Define fibre material parameters.
   double plane_width = FibreParameters.Plane_Width;
-  int numb_planes = new_site->id() - old_site->id();
+  int numb_planes = fabs(new_site->id() - old_site->id());
   double total_plane_length = numb_planes*plane_width;
   // Plane lenght in units of radiation lenght (~0.0015 per plane).
   double plane_L0 = FibreParameters.R0(total_plane_length);
-
   // Get particle's parameters (gradients and total momentum).
   TMatrixD a = new_site->a(KalmanState::Projected);
   double mx    = a(1, 0);
@@ -176,14 +175,13 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   TMatrixD Q2(_n_parameters, _n_parameters);
   double deltaZ = new_site->z() - old_site->z();
   // Check if we need to add propagation in air.
-  if ( deltaZ > plane_width*2. ) {
+  if ( deltaZ > total_plane_length ) {
     double air_lenght = deltaZ-total_plane_length;
     double air_L0     = AirParameters.R0(air_lenght);
     Q2 = BuildQ(air_L0, air_lenght, mx, my, p);
   }
 
   _Q = Q1+Q2;
-  _Q.Print();
 }
 
 TMatrixD KalmanPropagator::BuildQ(double L0,
@@ -191,7 +189,6 @@ TMatrixD KalmanPropagator::BuildQ(double L0,
                                   double mx,
                                   double my,
                                   double p) {
-  std::cerr << L0  << " "  << deltaZ << " "  << mx << " "  << my << " "  << p << std::endl;
   double deltaZ_squared = deltaZ*deltaZ;
 
   double muon_mass = Recon::Constants::MuonMass;
@@ -248,7 +245,6 @@ TMatrixD KalmanPropagator::BuildQ(double L0,
   // my my
   Q(3, 3) = c_my_my;
 
-  Q.Print();
   return Q;
 }
 
@@ -257,7 +253,6 @@ double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   // Note that the z factor (charge of the incoming particle) is omitted.
   // We don't need to consider |z| > 1.
   double result = HighlandConstant*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
-  std::cerr << result << std::endl;
   return result;
 }
 

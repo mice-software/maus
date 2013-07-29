@@ -277,14 +277,14 @@ TEST_F(TanhTest, TanhGetTanhDiffIndicesTest) {
 // tanh + derivatives
 TEST_F(TanhTest, GetTanhTest) {
   for (double x = -10.; x < 11; x++)
-    ASSERT_EQ(_d_tanh.GetTanh(x, 0), tanh((x+_x0)/_lambda));
+    ASSERT_NEAR(_d_tanh.GetTanh(x, 0), tanh((x+_x0)/_lambda), 1e-9);
   test_deriv(_d_tanh, &Tanh::GetTanh, 1e-6, -10., 10., 1e-6, 6);
 }
 
 // neg tanh + derivatives (tanh(-x+x0))
 TEST_F(TanhTest, GetNegTanhTest) {
   for (double x = -10.; x < 11; x++)
-    ASSERT_EQ(_d_tanh.GetNegTanh(x, 0), tanh((x-_x0)/_lambda));
+    ASSERT_NEAR(_d_tanh.GetNegTanh(x, 0), tanh((x-_x0)/_lambda), 1e-9);
   test_deriv(_d_tanh, &Tanh::GetNegTanh, 1e-6, -10., 10., 1e-6, 6);
 }
 

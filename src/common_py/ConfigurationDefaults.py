@@ -52,6 +52,8 @@ verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
+                                        # exception
 
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
@@ -72,8 +74,8 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 10000 # particles are killed after this number of
-                                # steps (assumed to be stuck in the fields)
+maximum_number_of_steps = 500000 # particles are killed after this number of
+                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
@@ -326,9 +328,11 @@ Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
-DAQ_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
+daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
                      # data from a file - mock-up of online for testing, not for
                      # production use (use offline recon here)
+daq_online_spill_delay_time = 0. # delay in seconds between daq reads, intended
+                                 # for mocking MICE target pulses
 
 # tof digitization
 TOFconversionFactor = 0.005 # MeV
@@ -369,13 +373,18 @@ configuration_file = "" # should be set on the command line only (else ignored)
 
 doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
 doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
+doc_store_event_cache_size = 10**8 # Maximum size of the Mongo cache to cache at any one time in multiprocessing mode, as used by e.g. online code. Corresponds to ~ n/3 spills.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# refresh rate for refreshing plots
+reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"
+end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()

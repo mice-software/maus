@@ -1,0 +1,37 @@
+Configuration Test
+{
+  Dimensions 1. 1. 10. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+  Module Solenoid
+  {
+    PropertyString     Volume   None
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyHep3Vector Rotation 0. 0. 0. mm
+    PropertyString FieldType      Solenoid
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/fs2a.fld
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         150. // coil length along z
+    PropertyDouble Thickness      150. // coil radial thickness
+    PropertyDouble InnerRadius    350. // coil inner radius
+    PropertyDouble ScaleFactor    106.66
+  }
+  Module OutputPlane1
+  {
+    PropertyString Volume None
+    PropertyHep3Vector Position 0. 0. -2000. mm
+    PropertyString SensitiveDetector Virtual
+  }
+  Module OutputPlane2
+  {
+    PropertyString Volume None
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyString SensitiveDetector Virtual
+  }
+  Module OutputPlane3
+  {
+    PropertyString Volume None
+    PropertyHep3Vector Position 0. 0. 2000. mm
+    PropertyString SensitiveDetector Virtual
+  }
+}
