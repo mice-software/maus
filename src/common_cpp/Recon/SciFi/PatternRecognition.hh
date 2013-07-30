@@ -231,20 +231,6 @@ class PatternRecognition {
      */
     double calc_phi(double xpos, double ypos, const SimpleCircle &circle);
 
-    /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
-     *
-     * Alternative algorithm for calculating the turning angle from the x' axis, 
-     * returning (phi_i + phi_0). In the case that x0 and y0 are used, it returns phi_0. 
-     * Do not confuse the returned angle with phi_i itself,
-     * the turning angle wrt the x' axis not the x axis.
-     * 
-     * @param xpos - x position of spacepoint
-     * @param ypos - y position of  spacepoint
-     * @param circle - Contains the helix center
-     *
-     */
-    double old_calc_phi(double xpos, double ypos, const SimpleCircle &circle);
-
     /** @brief Changes dphi vector to ds vector
      *
      *  Just scalar multiplication of each element dphi_ji by R.

@@ -36,6 +36,7 @@
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSZ.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
 
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -68,10 +69,12 @@ int main(int argc, char *argv[]) {
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
+  MAUS::TrackerDataPlotterBase *szPlotter = new MAUS::TrackerDataPlotterSZ();
   MAUS::TrackerDataPlotterBase *infoBoxPlotter
                                   = new MAUS::TrackerDataPlotterInfoBox(275, 600, 0.585, 0.93);
   std::vector<MAUS::TrackerDataPlotterBase*> plotters;
   plotters.push_back(xyzPlotter);
+  plotters.push_back(szPlotter);
   plotters.push_back(infoBoxPlotter);
 
   // Loop over all events
