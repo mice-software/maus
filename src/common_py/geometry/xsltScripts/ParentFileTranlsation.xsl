@@ -153,12 +153,12 @@
                             PropertyDouble Height <xsl:value-of select="Dimensions/@height"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyDouble Width <xsl:value-of select="Dimensions/@width"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyDouble Length <xsl:value-of select="Dimensions/@length"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
-                            PropertyDouble FieldStrength <xsl:value-of select="FieldStrength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="FieldStrength/@units"/>
-                            PropertyInt Pole <xsl:value-of select="Pole/@Value"/>
-                            PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@Value"/>
+                            PropertyDouble FieldStrength <xsl:value-of select="FieldStrength/@value"/><xsl:text> </xsl:text><xsl:value-of select="FieldStrength/@units"/>
+                            PropertyInt Pole <xsl:value-of select="Pole/@value"/>
+                            PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@value"/>
                             PropertyString EndFieldType <xsl:value-of select="EndFieldType/@name"/>
-                            PropertyDouble EndLength <xsl:value-of select="EndLength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
-                            PropertyDouble CentreLength <xsl:value-of select="CentreLength/@Value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble EndLength <xsl:value-of select="EndLength/@value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
+                            PropertyDouble CentreLength <xsl:value-of select="CentreLength/@value"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             }
                 </xsl:for-each>
                 <xsl:for-each select="MICE_Information/G4Field_Information/Solenoid">
@@ -169,10 +169,10 @@
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyString FileName <xsl:value-of select="FileName/@name"/>
-                            PropertyDouble CurrentDensity <xsl:value-of select="CurrentDensity/@Value"/>
-                            PropertyDouble Length <xsl:value-of select="Length/@Value"/>
-                            PropertyDouble Thickness <xsl:value-of select="Thickness/@Value"/>
-                            PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@Value"/>
+                            PropertyDouble CurrentDensity <xsl:value-of select="CurrentDensity/@value"/>
+                            PropertyDouble Length <xsl:value-of select="Length/@value"/>
+                            PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
+                            PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
                             ScaleFactor <xsl:value-of select="ScaleFactor/@name"/>
                             }
                 </xsl:for-each>
