@@ -386,6 +386,7 @@ class Chi2Test(BaseTest):
         self.content   = []
         self.n_events  = 0
         self.pid       = -13
+        self.errors    =[]
         self.chi2   = 0.
         self.chi2_prob   = 0.
         self.chi2_tol    = 1.
@@ -395,7 +396,7 @@ class Chi2Test(BaseTest):
     def __repr__(self):
         return 'Chi2Test.new('+repr(self.variable)+','+repr(self.units)+','+\
                 repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+\
-                ','+repr(self.pid)+','+repr(self.chi2)+','+\
+                ','+repr(self.pid)+','+repr(self.errors)+','+repr(self.chi2)+','+\
                 repr(self.chi2_prob)+','+repr(self.chi2_tol)+','+repr(self.n_bins)+\
                 ')'
 
@@ -405,7 +406,7 @@ class Chi2Test(BaseTest):
                str(self.chi2)+' probability '+str(self.chi2_prob)+\
                ' tolerance '+str(self.chi2_tol)+' : '+str(self.test_result())
 
-    def new(variable, units, bins, content, n_events, pid, chi2, chi2_prob, chi2_tol, n_bins): #pylint: disable=R0913, C0301
+    def new(variable, units, bins, content, n_events, pid,errors, chi2, chi2_prob, chi2_tol, n_bins): #pylint: disable=R0913, C0301
         """
         Initialises the object
         """
@@ -416,6 +417,7 @@ class Chi2Test(BaseTest):
         my_chi2_test.content   = copy.deepcopy(content)
         my_chi2_test.n_events  = copy.deepcopy(n_events)
         my_chi2_test.pid       = copy.deepcopy(pid)
+        my_chi2_test.errors    = copy.deepcopy(errors)
         my_chi2_test.chi2   = copy.deepcopy(chi2)
         my_chi2_test.chi2_prob   = copy.deepcopy(chi2_prob)
         my_chi2_test.chi2_tol    = copy.deepcopy(chi2_tol)
@@ -430,7 +432,7 @@ class Chi2Test(BaseTest):
         Return a copy of the object
         """
         return Chi2Test.new(self.variable, self.units, self.bins, self.n_events, 
-                self.content, self.pid, self.chi2, self.chi2_prob, self.chi2_tol,
+                self.content, self.pid,self.errors, self.chi2, self.chi2_prob, self.chi2_tol,
                 self.n_bins)
 
     def cdf_function(contents):
@@ -547,8 +549,8 @@ class Chi2Test(BaseTest):
             data=Chi2Test.pdf_function(test_data_list[3].content)
         if material=='Al':
             data=Chi2Test.pdf_function(test_data_list[4].content)
-        if material=='Fe':
-            data=Chi2Test.pdf_function(test_data_list[5].content)
+      #  if material=='Fe':
+         #   data=Chi2Test.pdf_function(test_data_list[5].content)
             
         return data
         
@@ -573,7 +575,7 @@ class Chi2Test(BaseTest):
             for i, val in enumerate(c_out): 
 
                   
-                chi+=((val-(data[i]))**2)/(data[i])
+                chi+=((val-data[i])**2)/((data[i])+(val))
             
             chi_array.append(chi)#adds end chi to an array 
              
@@ -583,7 +585,16 @@ class Chi2Test(BaseTest):
 
    
     def chi_plots(chi2_test_list,geo_list):
+       # data_file  = open("MUSCAT_data.dat")
+       # test_data_list=eval(data_file.read())
+       # geo_list=[]
+        #geo_list.append(test_data_list.geo)
+
         
+                                                                  
+        
+       
+        #data=Chi2Test.pdf_function(test_data_list.content)
         data=[]
         data=Chi2Test.get_data(geo_list)
         pz=float(Chi2Test.get_initial_pz(geo_list))
@@ -603,22 +614,26 @@ class Chi2Test(BaseTest):
                   ymin=0.0001, ymax=10, line_color=10)
         hist.Draw('Y+')
        
+        errors=array('d')
         
-        
-
         BaseTest._hists_theta.append(hist)
-
+       # for j, test in enumerate(chi2_test_list):
+       #     if j==1:
+        #        errors=(test.errors)
+       # print "EEERRRROOROORS", errors
         for k, test in  enumerate(chi2_test_list): 
             bin_array=Chi2Test._get_bins(test.bins)
-
+            
 
             
-               
+            weight=test.n_events/10000
+            print "N/N WEIGHT", weight
             theta_arr=array('d')
-            
+         #   errors=(test.errors)
             for i in range(1,len(bin_array)):
                 theta=bin_array[i-1]/(pz)
                 theta_arr.append(theta)
+                
             bins=sorted(theta_arr)
             runarray=array('d',bins)  
             hist=ROOT.TH1D("theta/rad","theta/rad", len(theta_arr)-1,theta_arr)
@@ -629,18 +644,25 @@ class Chi2Test(BaseTest):
             chi_array=array('d')
             
             chi=0
-            
-            error=[]
-            for i, b in enumerate(data):
-                error.append(b/100)
-            
+           # M=0
+          #  N=0
+          #  for i, val in enumerate(c_out):
+          #      M+=val
+          #  print "M", M
+          #  for i, val in enumerate(data):
+          #      N+=data[i]
+          #  print "N", N
+          #  for i, val in enumerate(c_out):
+          #      weight+=((1/(M*N))*((M*val)-(N*data[i]))/(val+data[i]))
+          #      print "WEIGHT", weight
             for i, val in enumerate(c_out): 
 
-                 
-                chi+=((val-(data[i]))**2)/(error[i])
-            
+                
+                chi+=weight*((val-data[i])**2)/(data[i]+val)
+                print "value", val, "data", data[i], "chi", chi
                 chi_array.append(chi) 
-            print chi 
+ 
+            print "CHIARRAY", chi
             for i, value in enumerate(chi_array):
                      
            
@@ -677,7 +699,7 @@ class Chi2Test(BaseTest):
         """
         Plot the distributions used for the chi2 test.
         """
-        
+       
         code=[]
         sort_name = geo_list.name.split(' ')[1:] # strip out code name/version number
         
@@ -856,10 +878,10 @@ class Chi2Test(BaseTest):
     
     def run_test(self, test_bunch):
        
-        data_file  = open("MUSCAT_data.dat")
+        data_file  = open("muscat_data.dat")
         test_data_list=eval(data_file.read())
         geo_list=[]
-        #geo_list.append(test_data_list.geo)
+       # geo_list.append(test_data_list.geo)
 
         
         
