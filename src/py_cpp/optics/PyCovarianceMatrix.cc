@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,10 @@
 #include "Maths/SymmetricMatrix.hh"
 
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
+
+#define MAUS_PYCOVARIANCEMATRIX_CC
 #include "src/py_cpp/optics/PyCovarianceMatrix.hh"
+#undef MAUS_PYCOVARIANCEMATRIX_CC
 
 namespace MAUS {
 namespace PyCovarianceMatrix {
@@ -45,17 +48,6 @@ namespace PyCovarianceMatrix {
 static PyMemberDef _members[] = {
 {NULL}
 };
-
-CovarianceMatrix* get_covariance_matrix(PyCovarianceMatrix* py_cm) {
-    return py_cm->cov_mat;
-}
-
-void set_covariance_matrix(PyCovarianceMatrix* py_cm, CovarianceMatrix* cm) {
-    if (py_cm->cov_mat != NULL) {
-        delete py_cm->cov_mat;
-    }
-    py_cm->cov_mat = cm;
-}
 
 static PyMethodDef _methods[] = {
 
@@ -75,7 +67,7 @@ static PyTypeObject PyCovarianceMatrixType = {
     "covariance_matrix.CovarianceMatrix",         /*tp_name*/
     sizeof(PyCovarianceMatrix),           /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    (destructor)_dealloc, /*tp_dealloc*/
+    (destructor)_free, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -187,10 +179,6 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-void _dealloc(PyCovarianceMatrix * self) {
-    _free(self);
-}
-
 void _free(PyCovarianceMatrix * self) {
     if (self != NULL) {
         if (self->cov_mat != NULL)
@@ -285,7 +273,7 @@ PyObject* create_from_twiss_parameters
     PyTypeObject* cm_type = &PyCovarianceMatrixType;
     Py_INCREF(cm_type);
     PyObject* py_cm = _alloc(cm_type, 0); // py_cm is a python cov matrix
-    set_covariance_matrix(reinterpret_cast<PyCovarianceMatrix*>(py_cm), cm);
+    C_API::set_covariance_matrix(py_cm, cm);
     Py_INCREF(py_cm);
     return py_cm;
 }
@@ -376,16 +364,12 @@ PyObject* create_from_penn_parameters
     PyTypeObject* cm_type = &PyCovarianceMatrixType;
     Py_INCREF(cm_type);
     PyObject* py_cm = _alloc(cm_type, 0); // py_cm is a python cov matrix
-    set_covariance_matrix(reinterpret_cast<PyCovarianceMatrix*>(py_cm), cm);
+    C_API::set_covariance_matrix(py_cm, cm);
     Py_INCREF(py_cm);
     return py_cm;
 }
 
 static PyMethodDef _keywdarg_methods[] = {
-    /* The cast of the function is necessary since PyCFunction values
-     * only take two PyObject* parameters, and keywdarg_parrot() takes
-     * three.
-     */
     {"create_from_penn_parameters", (PyCFunction)create_from_penn_parameters,
     METH_VARARGS|METH_KEYWORDS, create_from_penn_parameters_docstring.c_str()},
     {"create_from_twiss_parameters", (PyCFunction)create_from_twiss_parameters,
@@ -402,9 +386,33 @@ PyMODINIT_FUNC initcovariance_matrix(void) {
 
     PyTypeObject* cm_type = &PyCovarianceMatrixType;
     Py_INCREF(cm_type);
-    PyModule_AddObject(module, "CovarianceMatrix",
-                       reinterpret_cast<PyObject*>(cm_type));
+    PyModule_AddObject(module, "CovarianceMatrix", reinterpret_cast<PyObject*>(cm_type));
+
+    // C API
+    PyObject* cov_mat_dict = PyModule_GetDict(module);
+    PyObject* cem_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_matrix, NULL);
+    PyObject* gcm_c_api = PyCObject_FromVoidPtr((void *)C_API::get_covariance_matrix, NULL);
+    PyObject* scm_c_api = PyCObject_FromVoidPtr((void *)C_API::set_covariance_matrix, NULL);
+    PyDict_SetItemString(cov_mat_dict, "C_API_CREATE_EMPTY_MATRIX_1", cem_c_api);
+    PyDict_SetItemString(cov_mat_dict, "C_API_GET_COVARIANCE_MATRIX_1", gcm_c_api);
+    PyDict_SetItemString(cov_mat_dict, "C_API_SET_COVARIANCE_MATRIX_1", scm_c_api);
 }
 
+CovarianceMatrix* C_API::get_covariance_matrix(PyObject* py_cm) {
+    return reinterpret_cast<PyCovarianceMatrix*>(py_cm)->cov_mat;
+}
+
+void C_API::set_covariance_matrix(PyObject* py_cm_o, CovarianceMatrix* cm) {
+    PyCovarianceMatrix* py_cm = reinterpret_cast<PyCovarianceMatrix*>(py_cm_o);
+    if (py_cm->cov_mat != NULL) {
+        delete py_cm->cov_mat;
+    }
+    py_cm->cov_mat = cm;
+}
+
+
+PyObject *C_API::create_empty_matrix() {
+    return _alloc(&PyCovarianceMatrixType, 0);
+}
 }
 }

@@ -30,16 +30,129 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <limits>
+
 #include "src/common_cpp/Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
-#include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
+#include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
+#include "src/common_cpp/Optics/CovarianceMatrix.hh"
 
+#include "src/py_cpp/optics/PyCovarianceMatrix.hh"
 #include "src/py_cpp/optics/PyOpticsModel.hh"
 
 namespace MAUS {
 namespace PyOpticsModel {
+
+std::string transport_covariance_matrix_docstring =
+std::string("Transport a CovarianceMatrix from z_start to z_end.\n\n")+
+std::string("Penn defines a parameterisation for cylindrically symmetric\n")+
+std::string("beam ellipses that is often followed in solenodial beam\n")+
+std::string("optics. Following parameters are mandatory:\n")+
+std::string(" - cov_matrix (covariance_matrix): covariance matrix object\n")+
+std::string("Returns a covariance_matrix object");
+
+// note we don't use Transport(cov_matrix, start, end) as this can make a
+// segmentation fault
+PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
+                                                               PyObject *kwds) {
+    PyOpticsModel* py_optics_model = reinterpret_cast<PyOpticsModel*>(self);
+    if (py_optics_model == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to interpret self as an optics_model");
+        return NULL;
+    }
+    OpticsModel* optics_model = get_optics_model(py_optics_model);
+
+    PyObject* py_cm_in = NULL;
+    double end_plane = std::numeric_limits<double>::max()/10.;
+    static char *kwlist[] = {(char*)"cov_matrix", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
+                                         &py_cm_in, &end_plane)) {
+        return NULL;
+    }
+    CovarianceMatrix* cm_in =
+                            PyCovarianceMatrix::get_covariance_matrix(py_cm_in);
+    if (cm_in == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                       "Failed to extract a covariance matrix from cov_matrix");
+        return NULL;
+    }
+    CovarianceMatrix* cm_out = NULL;
+    try {
+        cm_out = new CovarianceMatrix(optics_model->Transport
+                                                           (*cm_in, end_plane));
+    }
+    catch (Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, exc.what());
+        return NULL;
+    }
+    PyObject* py_cm_out = PyCovarianceMatrix::create_empty_matrix();
+    PyCovarianceMatrix::set_covariance_matrix(py_cm_out, cm_out);
+    Py_INCREF(py_cm_out);
+    return py_cm_out;
+}
+
+void CheckAndAddTransferMatrixZPosition(double z_position) {
+    
+}
+
+PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
+    void* void_optics = malloc(sizeof(PyOpticsModel));
+    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(void_optics);
+    optics->model = NULL;
+    optics->ob_refcnt = 1;
+    optics->ob_type = type;
+    return reinterpret_cast<PyObject*>(optics);
+}
+
+bool is_built = false;
+
+int _init(PyObject* self, PyObject *args, PyObject *kwds) {
+    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(self);
+    // failed to cast or self was not initialised - something horrible happened
+    if (optics == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve self as OpticsModel in __init__");
+        return -1;
+    }
+    // legal python to call initialised_object.__init__() to reinitialise, so
+    // handle this case
+    if (optics->model != NULL) {
+        delete optics->model;
+        optics->model = NULL;
+    }
+    // now initialise the internal optics model; for now hardcoded to
+    // PolynomialOpticsModel
+    try {
+        Json::Value* cards = Globals::GetConfigurationCards();
+        optics->model = new MAUS::PolynomialOpticsModel(*cards);
+        optics->model->Build();
+        is_built = true;  // done by constructor
+    } catch(Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, exc.what());
+        return -1;
+    }
+    return 0;
+}
+
+PyObject *_new(PyTypeObject *type, Py_ssize_t nitems) {
+    return _alloc(type, nitems);
+}
+
+void _dealloc(PyOpticsModel * self) {
+    _free(self);
+}
+
+void _free(PyOpticsModel * self) {    
+    if (self != NULL) {
+        if (self->model != NULL)
+            delete self->model;
+        delete self;
+    }
+}
 
 static PyMemberDef _members[] = {
 {NULL}
@@ -50,6 +163,8 @@ OpticsModel* get_optics_model(PyOpticsModel* py_model) {
 }
 
 static PyMethodDef _methods[] = {
+{"transport_covariance_matrix", (PyCFunction)transport_covariance_matrix,
+ METH_VARARGS|METH_KEYWORDS, transport_covariance_matrix_docstring.c_str()},
 {NULL}
 };
 
@@ -58,7 +173,6 @@ const char* module_docstring =
 
 const char* class_docstring =
   "OpticsModel provides bindings for transporting particles and beam ellipses.";
-
 
 static PyTypeObject PyOpticsModelType = {
     PyObject_HEAD_INIT(NULL)
@@ -103,68 +217,24 @@ static PyTypeObject PyOpticsModelType = {
     (freefunc)_free, /* tp_free, called by dealloc */
 };
 
-PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
-    void* void_optics = malloc(sizeof(PyOpticsModel));
-    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(void_optics);
-    optics->model = NULL;
-    optics->ob_refcnt = 1;
-    optics->ob_type = type;
-    return reinterpret_cast<PyObject*>(optics);
-}
-
-int _init(PyObject* self, PyObject *args, PyObject *kwds) {
-    PyOpticsModel* optics = reinterpret_cast<PyOpticsModel*>(self);
-    // failed to cast or self was not initialised - something horrible happened
-    if (optics == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to resolve self as OpticsModel in __init__");
-        return -1;
-    }
-    // legal python to call initialised_object.__init__() to reinitialise, so
-    // handle this case
-    if (optics->model != NULL) {
-        delete optics->model;
-        optics->model = NULL;
-    }
-    // now initialise the internal optics model; for now hardcoded to
-    // LinearApproximationOpticsModel
-    try {
-        Json::Value* cards = Globals::GetConfigurationCards();
-        optics->model = new MAUS::LinearApproximationOpticsModel(*cards);
-    } catch(Exception exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
-        return -1;
-    }
-    return 0;
-}
-
-PyObject *_new(PyTypeObject *type, Py_ssize_t nitems) {
-    return _alloc(type, nitems);
-}
-
-void _dealloc(PyOpticsModel * self) {
-    _free(self);
-}
-
-void _free(PyOpticsModel * self) {
-    if (self != NULL) {
-        if (self->model != NULL)
-            delete self->model;
-        delete self;
-    }
-}
-
 PyMODINIT_FUNC initoptics_model(void) {
     PyOpticsModelType.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&PyOpticsModelType) < 0) return;
+    if (PyType_Ready(&PyOpticsModelType) < 0)
+        return;
+
+    int success = PyCovarianceMatrix::import_PyCovarianceMatrix();
+    if (success != 1)
+        return;
 
     PyObject* module = Py_InitModule3("optics_model", NULL, module_docstring);
-    if (module == NULL) return;
+    if (module == NULL)
+        return;
 
     PyTypeObject* optics_model_type = &PyOpticsModelType;
     Py_INCREF(optics_model_type);
     PyModule_AddObject(module, "OpticsModel",
                        reinterpret_cast<PyObject*>(optics_model_type));
+
 }
 
 }  // namespace PyOpticsModel

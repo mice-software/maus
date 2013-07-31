@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 #endif
 
 #include <Python.h>
+
+#ifdef MAUS_PYCOVARIANCEMATRIX_CC
 
 namespace MAUS {
 
@@ -67,9 +69,6 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds);
  *  @params self an initialised PyCovarianceMatrix*; memory will be freed by
  *          this function
  */
-void _dealloc(PyCovarianceMatrix * self);
-
-/** synonym for dealloc */
 void _free(PyCovarianceMatrix * self);
 
 /** Initialise covariance_matrix module
@@ -80,29 +79,24 @@ void _free(PyCovarianceMatrix * self);
  */
 PyMODINIT_FUNC initcovariance_matrix(void);
 
-/** Return the C++ covariance matrix associated with a PyCovarianceMatrix
- *
- *  \param py_cm Python representation of the covariance matrix
- *
- *  PyCovarianceMatrix still owns the memory allocated to CovarianceMatrix
- */
-CovarianceMatrix* get_covariance_matrix(PyCovarianceMatrix* py_cm);
-
-/** Set the C++ covariance matrix associated with a PyCovarianceMatrix
- *
- *  \param py_cm Python representation of the covariance matrix
- *  \param cm  C++ representation of the covariance matrix
- *
- *  PyCovarianceMatrix takes ownership of the memory allocated to cm
- */
-void set_covariance_matrix(PyCovarianceMatrix* py_cm, CovarianceMatrix* cm);
-
 /** Create a PyCovarianceMatrix from penn parameters
+ *  
+ *  \param self - not used
+ *  \param args - value arguments
+ *  \param kwds - keyword arguments
+ *
+ *  \returns PyCovarianceMatrix cast to a PyObject - caller owns this memory
  */
 PyObject* create_from_penn_parameters
                                (PyObject *self, PyObject *args, PyObject *kwds);
 
 /** Create a PyCovarianceMatrix from twiss parameters
+ *  
+ *  \param self - not used
+ *  \param args - value arguments
+ *  \param kwds - keyword arguments
+ *
+ *  \returns PyCovarianceMatrix cast to a PyObject - caller owns this memory
  */
 PyObject* create_from_twiss_parameters
                                (PyObject *self, PyObject *args, PyObject *kwds);
@@ -118,7 +112,99 @@ PyObject* create_from_twiss_parameters
  *  \throws MAUS::Exception if array has wrong shape or is not a numpy_array
  */
 CovarianceMatrix* create_from_numpy_matrix(PyObject *numpy_array);
+
+/** C_API defines functions that can be accessed by other C libraries
+ *
+ *  To access these functions, don't #include this file; use import instead
+ */
+
+namespace C_API {
+
+/** Allocate a new PyCovarianceMatrix
+ *
+ *  \returns PyCovarianceMatrix* cast as a PyObject* with cm pointer set to NULL
+ */
+static PyObject *create_empty_matrix();
+
+/** Return the C++ covariance matrix associated with a PyCovarianceMatrix
+ *
+ *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
+ *         of the covariance matrix
+ *
+ *  PyCovarianceMatrix still owns the memory allocated to CovarianceMatrix
+ */
+static CovarianceMatrix* get_covariance_matrix(PyObject* py_cm);
+
+/** Set the C++ covariance matrix associated with a PyCovarianceMatrix
+ *
+ *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
+ *               of the covariance matrix
+ *  \param cm  C++ representation of the covariance matrix. PyCovarianceMatrix
+ *             takes ownership of the memory allocated to cm
+ */
+static void set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
+}
 }
 }
 
-#endif
+#else
+
+/** MAUS::PyOpticsModel::PyCovarianceMatrix C API objects
+ *
+ *  Because of the way python does share libraries, we have to explicitly import
+ *  C functions via the Python API, which is done at import time. This mimics 
+ *  the functions in MAUS::PyCovarianceMatrix. Full documentation is found
+ *  there.
+ */
+namespace MAUS {
+namespace PyCovarianceMatrix {
+
+/** import the PyCovarianceMatrix C_API
+ *
+ *  set the 
+ *
+ *  @returns 0 if the import fails; return 1 if it is a success
+ */
+int import_PyCovarianceMatrix();
+
+PyObject* (*create_empty_matrix)() = NULL;
+void (*set_covariance_matrix)(PyObject* py_cm, CovarianceMatrix* cm) = NULL;
+CovarianceMatrix* (*get_covariance_matrix)(PyObject* py_cm) = NULL;
+}
+}
+
+int MAUS::PyCovarianceMatrix::import_PyCovarianceMatrix() {
+  PyObject* cm_module = PyImport_ImportModule("maus_cpp.covariance_matrix");
+  if(cm_module == NULL) {
+      return 0;
+  } else {
+    PyObject *cm_dict  = PyModule_GetDict(cm_module);
+
+    PyObject* cem_c_api = PyDict_GetItemString(cm_dict,
+                                                 "C_API_CREATE_EMPTY_MATRIX_1");
+    void* cem_void = (void*)PyCObject_AsVoidPtr(cem_c_api);
+    PyCovarianceMatrix::create_empty_matrix =
+                                    reinterpret_cast<PyObject* (*)()>(cem_void);
+
+    PyObject* gcm_c_api = PyDict_GetItemString(cm_dict,
+                                               "C_API_GET_COVARIANCE_MATRIX_1");
+    void* gcm_void = (void*)PyCObject_AsVoidPtr(gcm_c_api);
+    PyCovarianceMatrix::get_covariance_matrix =
+                   reinterpret_cast<CovarianceMatrix* (*)(PyObject*)>(gcm_void);
+
+    PyObject* scm_c_api = PyDict_GetItemString(cm_dict,
+                                               "C_API_SET_COVARIANCE_MATRIX_1");
+    void* scm_void = (void*)PyCObject_AsVoidPtr(scm_c_api);
+    PyCovarianceMatrix::set_covariance_matrix =
+             reinterpret_cast<void (*)(PyObject*, CovarianceMatrix*)>(scm_void);
+    if ((create_empty_matrix == NULL) ||
+        (set_covariance_matrix == NULL) ||
+        (get_covariance_matrix == NULL))
+        return 0;
+  }
+  return 1;
+}
+
+#endif  // MAUS_PYCOVARIANCEMATRIX_CC
+#endif  // _SRC_PY_CPP_PYCOVARIANCEMATRIX_HH_
+

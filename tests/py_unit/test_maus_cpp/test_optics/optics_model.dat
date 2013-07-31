@@ -1,0 +1,66 @@
+
+Configuation OpticsTest
+{
+  PropertyHep3Vector Dimensions 10 10 10 m
+  PropertyString Material Galactic
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 0.1*@RepeatNumber m
+      PropertyString SensitiveDetector Virtual
+      PropertyBool RepeatModule2 True
+      PropertyInt  NumberOfRepeats 30
+  }
+  Module Quadrupole
+  {
+    // Physical model
+    PropertyString Volume         None
+    PropertyHep3Vector Position 0.0 0.0 0.5 m
+    // Field model
+    PropertyString FieldType           Multipole
+    PropertyInt    Pole                2 //Quad field
+    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+    PropertyDouble FieldStrength       0.1     T //normalise to 1 T/m
+    PropertyDouble Height              0.4     m
+    PropertyDouble Width               0.4     m     
+    PropertyDouble Length              1.0     m
+    PropertyString EndFieldType        HardEdged
+    PropertyDouble CentreLength        0.25  m
+    PropertyDouble EndLength           0.1  m
+  }
+  Module Quadrupole
+  {
+    // Physical model
+    PropertyString Volume         None
+    PropertyHep3Vector Position 0.0 0.0 1.0 m
+    // Field model
+    PropertyString FieldType           Multipole
+    PropertyInt    Pole                2 //Quad field
+    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+    PropertyDouble FieldStrength      -0.1     T
+    PropertyDouble Height              0.4     m
+    PropertyDouble Width               0.4     m     
+    PropertyDouble Length              1.0     m
+    PropertyString EndFieldType        HardEdged
+    PropertyDouble CentreLength        0.25  m
+    PropertyDouble EndLength           0.1  m
+  }
+  Module Quadrupole
+  {
+    // Physical model
+    PropertyString Volume         None
+    PropertyHep3Vector Position 0.0 0.0 1.5 m
+    // Field model
+    PropertyString FieldType           Multipole
+    PropertyInt    Pole                2 //Quad field
+    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+    PropertyDouble FieldStrength       0.1     T
+    PropertyDouble Height              0.4     m
+    PropertyDouble Width               0.4     m     
+    PropertyDouble Length              1.0     m
+    PropertyString EndFieldType        HardEdged
+    PropertyDouble CentreLength        0.25  m
+    PropertyDouble EndLength           0.1  m
+  }
+}
+

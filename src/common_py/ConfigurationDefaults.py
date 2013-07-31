@@ -356,6 +356,11 @@ end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 
+PolynomialOpticsModel_order = 1
+PolynomialOpticsModel_algorithms = ["LeastSquares",
+                    "ConstrainedLeastSquares", "ConstrainedChiSquared",
+                    "SweepingChiSquared", "SweepingChiSquaredWithVariableWalls"]
+PolynomialOpticsModel_algorithm = "LeastSquares"
 # deltas for numerical derivative calculation of Optics transfer maps
 TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,

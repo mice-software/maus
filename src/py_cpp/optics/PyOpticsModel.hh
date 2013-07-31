@@ -31,7 +31,9 @@
 
 namespace MAUS {
 
-class OpticsModel; // note this is just in MAUS namespace
+// note following are in MAUS namespace
+class OpticsModel;
+class CovarianceMatrix;
 
 namespace PyOpticsModel {
 
@@ -51,13 +53,7 @@ typedef struct {
  *
  *  returns a PyOpticsModel* (cast as a PyObject*); caller owns this memory
  */
-PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
-
-/** _new allocates and initialises memory for PyOpticsModel
- *
- *  Not used
- */
-PyObject *_new(PyTypeObject *self, Py_ssize_t nitems);
+static PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
 
 /** _init initialises an allocated PyOpticsModel object
  *
@@ -68,17 +64,17 @@ PyObject *_new(PyTypeObject *self, Py_ssize_t nitems);
  *
  *  @returns 0 on success; -1 on failure
  */
-int _init(PyObject* self, PyObject *args, PyObject *kwds);
+static int _init(PyObject* self, PyObject *args, PyObject *kwds);
 
 /** deallocate memory
  *
  *  @params self an initialised PyOpticsModel*; memory will be freed by this 
  *          function
  */
-void _dealloc(PyOpticsModel * self);
+static void _dealloc(PyOpticsModel * self);
 
 /** synonym for dealloc */
-void _free(PyOpticsModel * self);
+static void _free(PyOpticsModel * self);
 
 /** Initialise optics_model module
  *
@@ -91,8 +87,21 @@ PyMODINIT_FUNC initoptics_model(void);
  *
  *  PyOpticsModel still owns the memory allocated to OpticsModel
  */
-OpticsModel* get_optics_model(PyOpticsModel* py_model);
+static OpticsModel* get_optics_model(PyOpticsModel* py_model);
 
+/** Transport an object from a to b
+ *
+ *  \param self a PyOpticsModel
+ *  \param args arguments to the function (not used)
+ *  \param kwds keyword arguments to the function - see docstring
+ *
+ *  \return a new transported object
+ *
+ *  Note that we do not overload functions as in the C++ library as python
+ *  support for overloading is poor.
+ */
+static PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
+                                                                PyObject *kwds);
 }  // namespace PyOpticsModel
 }  // namespace MAUS
 
