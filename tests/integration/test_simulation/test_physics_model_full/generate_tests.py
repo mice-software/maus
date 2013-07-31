@@ -13,15 +13,26 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Generates tests for subsequent call by test_runner
-"""
-
+import ROOT
+import glob
 import sys
-import xboa.Common as Common
+
+sys.path.insert(0, '/home/hep/sm1208/maus/tests/integration/test_simulation/test_physics_model_full')# adds this to path
+sys.path.insert(0, '/home/hep/sm1208/maus/tests/integration/plots/test_physics_model_full')# adds this to path
+
+
+#imports files, if code imported it is not run
+from physics_model_test import plotter
+from physics_model_test import geometry
 from physics_model_test import all_tests
 from physics_model_test import code_setup
 from physics_model_test.factory import TestFactory
+
+import Configuration  # MAUS configuration (datacards) module
+import maus_cpp.globals as maus_globals # MAUS C++ calls
+import maus_cpp.field as field # MAUS field map calls
+import xboa.Common as Common # xboa post-processor library
+
 
 def _ke2p(kinetic_energy):
     """
@@ -53,6 +64,251 @@ LH2_ONLY_CONFIGURATIONS = [ # icool_elms recommends step size of 5 mm
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 
+LH2_CONFIGURATION = [ # icool_elms recommends step size of 5 mm
+{'__material__':'lH2' , '__thickness__':576.,  '__momentum__':207.,
+ '__pid__':13, '__step__':.1, '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':30.0, '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':50., '__nev__':10000, '__seed__':1},
+{'__material__':'lH2',  '__thickness__':576.,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+
+LITHIUM_HYDRIDE_CONFIGURATION= [ 
+{'__material__':'LITHIUM_HYDRIDE' , '__thickness__':63.,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'LITHIUM_HYDRIDE',  '__thickness__':63.,  '__momentum__':207., 
+ '__pid__':13, '__step__':100.0, '__nev__':10000, '__seed__':1},
+]
+
+BE_CONFIGURATION= [ 
+{'__material__':'Be' , '__thickness__':23,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+FE_CONFIGURATION= [ 
+{'__material__':'Fe' , '__thickness__':1.1,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+AL_CONFIGURATION= [ 
+{'__material__':'Al' , '__thickness__':5.77,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+CU_CONFIGURATION= [ 
+{'__material__':'Cu' , '__thickness__':0.93,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.8, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+LI_CONFIGURATION= [ 
+{'__material__':'Li' , '__thickness__':100.58,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.8, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.58,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+C_CONFIGURATION= [ 
+{'__material__':'C' , '__thickness__':13.85,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.8, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+PROTON_CONFIGURATION= [ 
+{'__material__':'Be' , '__thickness__':0.000702,  '__momentum__':207,
+ '__pid__':2212, '__step__':0.0001, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.0005, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.001, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.005, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.01, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.05, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.1, '__nev__':10000, '__seed__':1},
+]
+
+
+TI_CONFIGURATION= [ 
+{'__material__':'Ti' , '__thickness__':2.31,  '__momentum__':207.,
+ '__pid__':2212, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':2212, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+
+
+
+NI_CONFIGURATION= [ 
+{'__material__':'Ni' , '__thickness__':0.92,  '__momentum__':207.,
+ '__pid__':-13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Ni',  '__thickness__':0.92,  '__momentum__':207., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+SI_CONFIGURATION= [ 
+{'__material__':'Si' , '__thickness__':6.08,  '__momentum__':207.,
+ '__pid__':13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Si',  '__thickness__':6.08,  '__momentum__':207., 
+ '__pid__':13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+CR_CONFIGURATION= [ 
+{'__material__':'Cr' , '__thickness__':1.3,  '__momentum__':207.,
+ '__pid__':-13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'Cr',  '__thickness__':1.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+
+P_CONFIGURATION= [ 
+{'__material__':'P' , '__thickness__':6.3,  '__momentum__':207.,
+ '__pid__':-13, '__step__':0.1, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':0.5, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':1.0, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':5.0, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':10.0, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':50.0, '__nev__':10000, '__seed__':1},
+{'__material__':'P',  '__thickness__':6.3,  '__momentum__':207., 
+ '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
+]
+
+
 BE_PLUG_CONFIGURATIONS = [
 {'__material__':'Be',   '__thickness__':100., '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
@@ -70,6 +326,65 @@ BE_PLUG_CONFIGURATIONS = [
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 ]
 
+TIMS_CONFIGURATION= [ 
+{'__material__':'lH2' , '__thickness__':576.,  '__momentum__':207.,
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':100.,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':23.,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':13.85,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':5.77,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Ti',  '__thickness__':2.31,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Cu',  '__thickness__':0.93,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':1.1,  '__momentum__':207., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+]
+
+MUSCAT_CONFIGURATION= [ 
+{'__material__':'lH2' , '__thickness__':109.,  '__momentum__':172.,
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Li',  '__thickness__':12.78,  '__momentum__':172., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':3.73,  '__momentum__':172., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'C',  '__thickness__':2.50,  '__momentum__':172., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Al',  '__thickness__':1.5,  '__momentum__':172., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+{'__material__':'Fe',  '__thickness__':0.24,  '__momentum__':172., 
+ '__pid__':13, '__step__':1, '__nev__':10000, '__seed__':1},
+]
+
+
+
+NEW2_CONFIGURATION= [ 
+{'__material__':'lH2' , '__thickness__':109,  '__momentum__':172.,
+ '__pid__':13, '__step__':1, '__nev__':100000, '__seed__':1},
+]
+
+BE_FOIL_CONFIGURATION= [ 
+{'__material__':'Be' , '__thickness__':0.000702,  '__momentum__':11.,
+ '__pid__':2212, '__step__':0.000001, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.000005, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.00001, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.00005, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.0001, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.000702,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.0005, '__nev__':10000, '__seed__':1},
+{'__material__':'Be',  '__thickness__':0.0007023,  '__momentum__':11., 
+ '__pid__':2212, '__step__':0.001, '__nev__':10000, '__seed__':1},
+]
+
+
 MICE_CONFIGURATIONS = [
 {'__material__':'LITHIUM_HYDRIDE',  '__thickness__':10.,  '__momentum__':100.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
@@ -85,7 +400,7 @@ MICE_CONFIGURATIONS = [
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 {'__material__':'lHe',  '__thickness__':350.,  '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
-{'__material__':'STEEL304', '__thickness__':0.5, '__momentum__':200.,
+{'__material__':'STEEL304', '__thickness__':0.5, '__mo10000mentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
 {'__material__':'Cu',   '__thickness__':5., '__momentum__':200.,
  '__pid__':-13, '__step__':100., '__nev__':10000, '__seed__':1},
@@ -164,10 +479,14 @@ ERIT_CONFIGURATIONS = [
 N_KS_DIVS = 500
 # test factory dynamically decides on n_bins, bin width
 TESTS = [
-  all_tests.KSTest.new('px', 'MeV/c', [-50.+x for x in range(N_KS_DIVS+1)],
-                   [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS),
-  all_tests.KSTest.new('energy', 'MeV', [202.+x/4. for x in range(N_KS_DIVS+1)],
-                   [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS)
+   all_tests.KSTest.new('px', 'MeV/c', [-50.+x for x in range(N_KS_DIVS+1)],
+                    [0]*N_KS_DIVS, 10000, 1.0, 10000,0.0,0.01, N_KS_DIVS),
+   # all_tests.KSTest.new('pz', 'MeV/c', [-50.+x for x in range(N_KS_DIVS+1)],
+                   #  [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS),
+  # all_tests.KSTest.new('energy', 'MeV', [202.+x/4. for x in range(N_KS_DIVS+1)],
+                 #   [0]*N_KS_DIVS, 10000, 1.0, 10000, 0.0, 0.01, N_KS_DIVS),
+  
+ 
 ]
 
 def main():
@@ -195,7 +514,7 @@ where <code_n> is one of"""
         if arg == 'muon1' or arg == 'icool_elms':
             test_factory.build_test_data(LH2_ONLY_CONFIGURATIONS)
         else:
-            test_factory.build_test_data(MICE_CONFIGURATIONS)
+            test_factory.build_test_data(MUSCAT_CONFIGURATION)
     sys.exit(0)
 
 if __name__ == '__main__':

@@ -167,12 +167,15 @@ class IcoolSetup(CodeSetup):
         """Initialise - does nothing"""
         CodeSetup.__init__(self)
         if os.getenv('ICOOL') == None:
-            raise EnvironmentError("Need to define $ICOOL environment "+\
-                                   "variable with ICOOL executable path")
-        if os.getenv('ICOOL_VERSION') == None:
-            raise EnvironmentError("Need to define $ICOOL_VERSION "+\
-                                   "environment variable with ICOOL version")
-        self._version = os.getenv('ICOOL_VERSION')
+            icool_version = open(os.path.expandvars('/home/hep/sm1208/icool/README'))\
+                                                                     .readline()
+            icool_version = icool_version.rstrip('\n')
+            icool_version = icool_version.split(' ')[-1]
+            self._version = icool_version
+
+        else:
+            
+            self._version = os.getenv('ICOOL')
 
 
     def __str__(self):
@@ -202,6 +205,9 @@ class IcoolSetup(CodeSetup):
               'STEEL304':'FE',
               'Cu':'CU',
               'C':'C',
+              'Ti':'TI',
+              'Li':'LI',
+              'Fe':'FE'
         }
         return conversions[value]
 
@@ -212,7 +218,9 @@ class IcoolSetup(CodeSetup):
 
     def get_executable(self):
         """Executable is simulate_mice.py"""
-        return os.path.expandvars('$ICOOL')
+    
+        return os.path.join('/home/hep/sm1208/icool','icool')
+       
 
     def get_parameters(self):
         """Command line parameter to specify control files"""
@@ -237,12 +245,19 @@ class G4blSetup(CodeSetup):
     def __init__(self):
         """Initialise - does nothing"""
         CodeSetup.__init__(self)
+
         if os.getenv('G4BL') == None:
-            raise EnvironmentError("Need to define $G4BL environment "+\
-                                   "variable with G4Beamline executable path")
+            g4bl_version = open(os.path.expandvars('/home/hep/sm1208/G4beamline-2.14/README'))\
+                                                                     .readline()
+            g4bl_version = g4bl_version.rstrip('\n')
+            g4bl_version = g4bl_version.split(' ')[-1]
+            self._version = g4bl_version
         if os.getenv('G4BL_VERSION') == None:
-            raise EnvironmentError("Need to define $G4BL_VERSION "+\
-                                   "environment variable with G4bl version")
+            g4bl_version = open(os.path.expandvars('/home/hep/sm1208/G4beamline-2.14/README'))\
+                                                                     .readline()
+            g4bl_version = g4bl_version.rstrip('\n')
+            g4bl_version = g4bl_version.split(' ')[-1]
+            self._version = g4bl_version
         self._version = os.getenv('G4BL_VERSION')
 
     def __str__(self):
@@ -276,7 +291,7 @@ class G4blSetup(CodeSetup):
 
     def get_executable(self):
         """Executable is simulate_mice.py"""
-        return os.getenv('G4BL')
+        return os.path.join('/home/hep/sm1208/G4beamline-2.14/bin','g4bl')
 
     def get_parameters(self):
         """Command line parameter to specify control files"""
@@ -446,22 +461,21 @@ class IcoolElmsSetup(IcoolSetup):
     in directory pointed to by $ICOOL_ELMSDB environment variable.
     """
     def __init__(self):
-        """
-        Additional initialisation is environment variable giving location of
-        elmsdb
-        """
+       
         super(IcoolElmsSetup, self).__init__()
-        if os.getenv('ICOOL_ELMSDB') == None:
-            raise EnvironmentError("Need to define $ICOOL_ELMSDB "+\
-                                  "environment variable with ELMS data")
-        run_dir = os.path.expandvars("${ICOOL_ELMSDB}/RunDirectory.txt")
+        #if os.getenv('ICOOL_ELMSDB') == None:
+            #raise EnvironmentError("/home/hep/sm1208/icool/elms")
+        run_dir = os.path.expandvars("/home/hep/sm1208/icool/elms/RunDirectory.txt")
         if not os.path.isfile(run_dir):
             raise EnvironmentError("Couldn't find "+run_dir+" needed for elms")
-        elms_db = "${ICOOL_ELMSDB}/ELMSFv3run*"
+        elms_db = "/home/hep/sm1208/icool/elms/ELMSFv3run*"
         if len(glob.glob(os.path.expandvars(elms_db))) < 1:
             raise EnvironmentError("Couldn't find files like "+elms_db+\
                                                             " needed for elms")
         IcoolElmsSetup._substitute_elmscom()
+        
+      
+       
 
     def __str__(self):
         """Return icool_elms_<version>"""

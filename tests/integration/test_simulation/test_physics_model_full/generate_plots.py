@@ -1,36 +1,34 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
-#
-#  MAUS is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  MAUS is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
-
+#  
 """
 Generates plots using test data in ref_data and tmp folder
 """
-
 import glob
+import sys
+sys.path.insert(0, '/home/hep/sm1208/maus/tests/integration/test_simulation/test_physics_model_full')#adds this to path
 
+#imports files, if code imported it is not run
 from physics_model_test import plotter
 from physics_model_test import geometry
+from physics_model_test.all_tests import KSTest
+
 
 def main():
     """
     Search for test data in geometry.ref_data('./') and geometry.temp('./'); if
     found, plot it
     """
-    reference_data = glob.glob(geometry.ref_data("*.dat"))
-    test_data = []
-    plotter.plot(reference_data+test_data)
+    reference_data = glob.glob(geometry.ref_data("*.ref_data.dat"))
+   # reference_data2 = glob.glob(geometry.ref_data("icool.3.30.ref_data.dat"))
+ 
+    test_data = ["MUSCAT_data.dat"]
 
-if __name__ == "__main__":
+    plotter.plot(reference_data+test_data)
+   # RMS=plotter.histograms[index].GetRMS()
+   # MEAN=plotter.histograms[index].GetMean()
+
+
+
+
+if __name__ == "__main__":  #make the file usable as a script as well as an importable module
     main()
     raw_input()
