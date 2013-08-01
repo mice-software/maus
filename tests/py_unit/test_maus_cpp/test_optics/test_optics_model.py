@@ -28,6 +28,8 @@ import Configuration
 import maus_cpp.globals
 import maus_cpp.covariance_matrix
 from maus_cpp.covariance_matrix import CovarianceMatrix
+import maus_cpp.phase_space_vector
+from maus_cpp.phase_space_vector import PhaseSpaceVector
 import maus_cpp.optics_model
 from maus_cpp.optics_model import OpticsModel
 
@@ -74,8 +76,11 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         optics = OpticsModel()
         optics.__init__() # legal, should reinitialise
 
-    def _test_transport_covariance_matrix_no_virtuals(self):
-        """Test maus_cpp.optics_model.Optics().transport() with no virtuals"""
+    def test_transport_covariance_matrix_bad(self):
+        """
+        Test maus_cpp.optics_model.Optics().transport_covariance_matrix()
+        with no virtuals
+        """
         self._set_geometry("Test.dat")
         optics = OpticsModel()
         cm_in = CovarianceMatrix()
@@ -84,12 +89,46 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
             self.assertTrue(False, "Should throw when no virtuals")
         except RuntimeError:
             pass
+        try:
+            cm_out = optics.transport_covariance_matrix("should be a cm")
+            self.assertTrue(False, "Should throw when wrong type passed")
+        except RuntimeError:
+            pass
 
     def test_transport_covariance_matrix(self):
-        """Test maus_cpp.optics_model.Optics().transport()"""
+        """Test maus_cpp.optics_model.Optics().transport_covariance_matrix()"""
         optics = OpticsModel()
-        cm_in = CovarianceMatrix()
+        cm_in = maus_cpp.covariance_matrix.create_from_penn_parameters(
+                  mass=105.658, momentum=200., emittance_t=6., beta_t=333.,
+                 emittance_l=1., beta_l=10.)
         cm_out = optics.transport_covariance_matrix(cm_in)
+
+    def test_transport_phase_space_vector_bad(self):
+        """
+        Test maus_cpp.optics_model.Optics().transport_phase_space_vector() with
+        no virtuals
+        """
+        return
+        self._set_geometry("Test.dat")
+        optics = OpticsModel()
+        psv_in = PhaseSpaceVector()
+        try:
+            psv_out = optics.transport_phase_space_vector(psv_in)
+            self.assertTrue(False, "Should throw when no virtuals")
+        except RuntimeError:
+            pass
+        try:
+            psv_out = optics.transport_phase_space_vector("should be a psv")
+            self.assertTrue(False, "Should throw when wrong type passed")
+        except RuntimeError:
+            pass
+
+    def test_transport_phase_space_vector(self):
+        """Test maus_cpp.optics_model.Optics().transport_phase_space_vector()"""
+        optics = OpticsModel()
+        psv_in = PhaseSpaceVector(0., 226., 0., 0., 0., 0.)
+        psv_out = optics.transport_phase_space_vector(psv_in)
+
 
 if __name__ == "__main__":
     unittest.main()

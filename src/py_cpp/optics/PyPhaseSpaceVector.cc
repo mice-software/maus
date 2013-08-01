@@ -27,6 +27,7 @@
 #include <Python.h>
 #include <structmember.h>
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
 #define MAUS_PYPHASESPACEVECTOR_CC
@@ -36,13 +37,190 @@
 namespace MAUS {
 namespace PyPhaseSpaceVector {
 
+PyObject* get(PyObject* self,
+              double (PhaseSpaceVector::*get_function)() const) {
+    PhaseSpaceVector* psv = C_API::get_phase_space_vector(self);
+    if (psv == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve self as a PhaseSpaceVector");
+        return NULL;
+    }
+    double value = (psv->*get_function)();
+    PyObject* py_value = Py_BuildValue("d", value);
+    if (py_value == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyCovarianceMatrix failed to get value");
+        return NULL;
+    }
+    Py_INCREF(py_value);
+    return py_value;
+}
+
+PyObject* set(PyObject* self, PyObject *args, PyObject *kwds,
+              void (PhaseSpaceVector::*set_function)(double value)) {
+    PhaseSpaceVector* psv = C_API::get_phase_space_vector(self);
+    if (psv == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve self as a PhaseSpaceVector");
+        return NULL;
+    }
+
+    double value = 0;
+    static char *kwlist[] = {(char*)"value", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|", kwlist, &value)) {
+        return NULL;
+    }
+    (psv->*set_function)(value);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_t_docstring =
+std::string("Returns the time [ns]");
+
+PyObject* get_t(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::t);
+}
+
+std::string get_energy_docstring =
+std::string("Returns the energy [MeV]");
+
+PyObject* get_energy(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::E);
+}
+
+std::string get_x_docstring =
+std::string("Returns the horizontal position x [mm]");
+
+PyObject* get_x(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::x);
+}
+
+std::string get_px_docstring =
+std::string("Returns the horizontal component of momentum px [MeV/c]");
+
+PyObject* get_px(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::Px);
+}
+
+std::string get_y_docstring =
+std::string("Returns the vertical position y [mm]");
+
+PyObject* get_y(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::y);
+}
+
+std::string get_py_docstring =
+std::string("Returns the vertical component of momentum py [MeV/c]");
+
+PyObject* get_py(PyObject* self, PyObject *args, PyObject *kwds) {
+    return get(self, &PhaseSpaceVector::Py);
+}
+
+std::string set_t_docstring =
+std::string("Set the time\n\n")+
+std::string("- value (float) phase space vector time [ns]")+
+std::string("Returns None");
+
+PyObject* set_t(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_t);
+}
+
+std::string set_energy_docstring =
+std::string("Set the energy\n\n")+
+std::string("- value (float) phase space vector energy [MeV]")+
+std::string("Returns None");
+
+PyObject* set_energy(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_energy);
+}
+
+std::string set_x_docstring =
+std::string("Set the horizontal position\n\n")+
+std::string("- value (float) horizontal position [mm]")+
+std::string("Returns None");
+
+PyObject* set_x(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_x);
+}
+
+std::string set_px_docstring =
+std::string("Set the horizontal component of momentum\n\n")+
+std::string("- value (float) momentum px [MeV/c]")+
+std::string("Returns None");
+
+PyObject* set_px(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_Px);
+}
+
+std::string set_y_docstring =
+std::string("Set the vertical position\n\n")+
+std::string("- value (float) vertical position [mm]")+
+std::string("Returns None");
+
+PyObject* set_y(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_y);
+}
+
+std::string set_py_docstring =
+std::string("Set the vertical component of momentum\n\n")+
+std::string("- value (float) vertical momentum [MeV/c]")+
+std::string("Returns None");
+
+PyObject* set_py(PyObject* self, PyObject *args, PyObject *kwds) {
+    return set(self, args, kwds, &PhaseSpaceVector::set_Py);
+}
+
 static PyMemberDef _members[] = {
 {NULL}
 };
 
 static PyMethodDef _methods[] = {
+{"get_t", (PyCFunction)get_t, METH_VARARGS|METH_KEYWORDS,
+                                                       get_t_docstring.c_str()},
+{"get_energy", (PyCFunction)get_energy, METH_VARARGS|METH_KEYWORDS,
+                                                  get_energy_docstring.c_str()},
+{"get_x", (PyCFunction)get_x, METH_VARARGS|METH_KEYWORDS,
+                                                  get_x_docstring.c_str()},
+{"get_px", (PyCFunction)get_px, METH_VARARGS|METH_KEYWORDS,
+                                                  get_px_docstring.c_str()},
+{"get_y", (PyCFunction)get_y, METH_VARARGS|METH_KEYWORDS,
+                                                  get_y_docstring.c_str()},
+{"get_py", (PyCFunction)get_py, METH_VARARGS|METH_KEYWORDS,
+                                                  get_py_docstring.c_str()},
+
+{"set_t", (PyCFunction)set_t, METH_VARARGS|METH_KEYWORDS,
+                                                 set_t_docstring.c_str()},
+{"set_energy", (PyCFunction)set_energy, METH_VARARGS|METH_KEYWORDS,
+                                                 set_energy_docstring.c_str()},
+{"set_x", (PyCFunction)set_x, METH_VARARGS|METH_KEYWORDS,
+                                                 set_x_docstring.c_str()},
+{"set_px", (PyCFunction)set_px, METH_VARARGS|METH_KEYWORDS,
+                                                 set_px_docstring.c_str()},
+{"set_y", (PyCFunction)set_y, METH_VARARGS|METH_KEYWORDS,
+                                                 set_y_docstring.c_str()},
+{"set_py", (PyCFunction)set_py, METH_VARARGS|METH_KEYWORDS,
+                                                 set_py_docstring.c_str()},
 {NULL}
 };
+
+
+static PyObject* _str(PyObject * self) {
+    PhaseSpaceVector* psv = C_API::get_phase_space_vector(self);
+    if (psv == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyPhaseSpaceVector not initialised properly");
+        return NULL;
+    }
+    char buffer[1024];
+    snprintf(buffer, 1024, " [%10g, %10g, %10g, %10g, %10g, %10g]",
+      (*psv).t(), (*psv).energy(),
+      (*psv).x(), (*psv).Px(),
+      (*psv).y(), (*psv).Py());
+    return PyString_FromString(buffer);
+}
+
+
 
 const char* module_docstring =
   "phase_space_vector module; merely a place holder for PhaseSpaceVector class";
@@ -62,13 +240,13 @@ static PyTypeObject PyPhaseSpaceVectorType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
+    _str,                      /*tp_repr*/
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    0,                         /*tp_str*/
+    _str,                      /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -119,25 +297,25 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
         delete py_psv->psv;
         py_psv->psv = NULL;
     }
-    /*
+    
+    double t(0), E(0), x(0), px(0), y(0), py(0);
     // try to extract a numpy array from the arguments
-    static char *kwlist[] = {(char*)"matrix"};
-    PyObject* array = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &array)) {
+    static char *kwlist[] = {(char*)"t", (char*)"energy",
+                             (char*)"x", (char*)"px",
+                             (char*)"y", (char*)"py", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddd|", kwlist, &t, &E,
+                                                                    &x, &px,
+                                                                    &y, &py)) {
         // error message is set in PyArg_Parse...
         return -1;
     }
-    // now initialise the internal covariance matrix
+    // now initialise the internal phase space vector
     try {
-        if (array == NULL)
-            cm->cov_mat = new MAUS::CovarianceMatrix();
-        else
-            cm->cov_mat = create_from_numpy_matrix(array);
+        py_psv->psv = new PhaseSpaceVector(t, E, x, px, y, py);
     } catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
         return -1;
     }
-    */
     return 0;
 }
 
@@ -148,7 +326,6 @@ void _free(PyPhaseSpaceVector * self) {
         delete self;
     }
 }
-
 
 static PyMethodDef _keywdarg_methods[] = {
     {NULL,  NULL}   /* sentinel */
@@ -167,14 +344,24 @@ PyMODINIT_FUNC initphase_space_vector(void) {
 
     // C API
     PyObject* psv_dict = PyModule_GetDict(module);
+    PyObject* cev_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_vector, NULL);
     PyObject* gpsv_c_api = PyCObject_FromVoidPtr((void *)C_API::get_phase_space_vector, NULL);
     PyObject* spsv_c_api = PyCObject_FromVoidPtr((void *)C_API::set_phase_space_vector, NULL);
+    PyDict_SetItemString(psv_dict, "C_API_CREATE_EMPTY_VECTOR", cev_c_api);
     PyDict_SetItemString(psv_dict, "C_API_GET_PHASE_SPACE_VECTOR", gpsv_c_api);
     PyDict_SetItemString(psv_dict, "C_API_SET_PHASE_SPACE_VECTOR", spsv_c_api);
 }
 
+PyObject *C_API::create_empty_vector() {
+    return _alloc(&PyPhaseSpaceVectorType, 0);
+}
+
 PhaseSpaceVector* C_API::get_phase_space_vector(PyObject* py_psv) {
-    return reinterpret_cast<PyPhaseSpaceVector*>(py_psv)->psv;
+    PyPhaseSpaceVector* psv_ = reinterpret_cast<PyPhaseSpaceVector*>(py_psv);
+    if (psv_ == NULL)
+        return NULL;
+    else
+        return psv_->psv;    
 }
 
 void C_API::set_phase_space_vector(PyObject* py_psv_o, PhaseSpaceVector* psv) {

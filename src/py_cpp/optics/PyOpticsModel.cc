@@ -33,25 +33,25 @@
 #include <limits>
 
 #include "src/common_cpp/Utils/Exception.hh"
-
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Optics/OpticsModel.hh"
+
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
+#include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "src/common_cpp/Optics/OpticsModel.hh"
 
 #include "src/py_cpp/optics/PyCovarianceMatrix.hh"
+#include "src/py_cpp/optics/PyPhaseSpaceVector.hh"
 #include "src/py_cpp/optics/PyOpticsModel.hh"
 
 namespace MAUS {
 namespace PyOpticsModel {
 
 std::string transport_covariance_matrix_docstring =
-std::string("Transport a CovarianceMatrix from z_start to z_end.\n\n")+
-std::string("Penn defines a parameterisation for cylindrically symmetric\n")+
-std::string("beam ellipses that is often followed in solenodial beam\n")+
-std::string("optics. Following parameters are mandatory:\n")+
-std::string(" - cov_matrix (covariance_matrix): covariance matrix object\n")+
-std::string("Returns a covariance_matrix object");
+std::string("Transport a CovarianceMatrix.\n\n")+
+std::string(" - cov_matrix (covariance_matrix): CovarianceMatrix object\n")+
+std::string("   that represents the start CovarianceMatrix\n")+
+std::string("Returns a new transported covariance_matrix object");
 
 // note we don't use Transport(cov_matrix, start, end) as this can make a
 // segmentation fault
@@ -95,8 +95,53 @@ PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
     return py_cm_out;
 }
 
-void CheckAndAddTransferMatrixZPosition(double z_position) {
-    
+
+std::string transport_phase_space_vector_docstring =
+std::string("Transport a PhaseSpaceVector.\n\n")+
+std::string(" - phase_space_vector (PhaseSpaceVector): phase space vector\n")+
+std::string("   object that represents the start coordinate\n")+
+std::string("Returns a new transported PhaseSpaceVector");
+
+// note we don't use Transport(cov_matrix, start, end) as this can make a
+// segmentation fault
+PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
+                                                               PyObject *kwds) {
+    PyOpticsModel* py_optics_model = reinterpret_cast<PyOpticsModel*>(self);
+    if (py_optics_model == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to interpret self as an optics_model");
+        return NULL;
+    }
+    OpticsModel* optics_model = get_optics_model(py_optics_model);
+
+    PyObject* py_psv_in = NULL;
+    double end_plane = std::numeric_limits<double>::max()/10.;
+    static char *kwlist[] = {(char*)"phase_space_vector", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
+                                         &py_psv_in, &end_plane)) {
+        return NULL;
+    }
+    PhaseSpaceVector* psv_in =
+                          PyPhaseSpaceVector::get_phase_space_vector(py_psv_in);
+    if (psv_in == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                "Failed to extract a PhaseSpaceVector from phase_space_vector");
+        return NULL;
+    }
+    PhaseSpaceVector* psv_out = NULL;
+    try {
+        psv_out = new PhaseSpaceVector(optics_model->Transport
+                                                          (*psv_in, end_plane));
+    }
+    catch (Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, exc.what());
+        return NULL;
+    }
+    PyObject* py_psv_out = PyPhaseSpaceVector::create_empty_vector();
+    PyPhaseSpaceVector::set_phase_space_vector(py_psv_out, psv_out);
+    Py_INCREF(py_psv_out);
+    return py_psv_out;
 }
 
 PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
@@ -165,6 +210,8 @@ OpticsModel* get_optics_model(PyOpticsModel* py_model) {
 static PyMethodDef _methods[] = {
 {"transport_covariance_matrix", (PyCFunction)transport_covariance_matrix,
  METH_VARARGS|METH_KEYWORDS, transport_covariance_matrix_docstring.c_str()},
+{"transport_phase_space_vector", (PyCFunction)transport_phase_space_vector,
+ METH_VARARGS|METH_KEYWORDS, transport_phase_space_vector_docstring.c_str()},
 {NULL}
 };
 
@@ -223,6 +270,9 @@ PyMODINIT_FUNC initoptics_model(void) {
         return;
 
     int success = PyCovarianceMatrix::import_PyCovarianceMatrix();
+    if (success != 1)
+        return;
+    success = PyPhaseSpaceVector::import_PyPhaseSpaceVector();
     if (success != 1)
         return;
 

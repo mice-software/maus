@@ -16,7 +16,7 @@
 # pylint: disable=C0103
 
 """
-Test maus_cpp.optics_model
+Test maus_cpp.phase_space_vector
 """
 
 import unittest
@@ -26,15 +26,80 @@ import numpy
 import maus_cpp
 from maus_cpp.phase_space_vector import PhaseSpaceVector
 
-class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
-    """Test maus_cpp.optics_model"""
-    def setUp(self):
-        """does nothing"""
-        pass
+class PhaseSpaceVectorTestCase(unittest.TestCase): # pylint: disable=R0904
+    """Test maus_cpp.phase_space_vector"""
 
     def test_init(self):
-        """Test maus_cpp.optics_model.__init__() and deallocation"""
-        psv = PhaseSpaceVector()
+        """Test maus_cpp.phase_space_vector.__init__() and deallocation"""
+        psv = PhaseSpaceVector(t=1, energy=2., x=3., px=4., y=5., py=6.)
+        self.assertAlmostEqual(psv.get_t(), 1.)
+        self.assertAlmostEqual(psv.get_energy(), 2.)
+        self.assertAlmostEqual(psv.get_x(), 3.)
+        self.assertAlmostEqual(psv.get_px(), 4.)
+        self.assertAlmostEqual(psv.get_y(), 5.)
+        self.assertAlmostEqual(psv.get_py(), 6.)
+        try:
+            psv = PhaseSpaceVector(t=1, energy=2., x=3., px=4., y=5.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+        try:
+            psv = PhaseSpaceVector(t=1, energy=2., x=3., px=4., py=6.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+        try:
+            psv = PhaseSpaceVector(t=1, energy=2., x=3., y=5., py=6.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+        try:
+            psv = PhaseSpaceVector(t=1, energy=2., px=4., y=5., py=6.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+        try:
+            psv = PhaseSpaceVector(t=1, x=3., px=4., y=5., py=6.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+        try:
+            psv = PhaseSpaceVector(energy=2., x=3., px=4., y=5., py=6.)
+            self.assertTrue(False, "Expected type error")
+        except TypeError:
+            pass
+
+    def test_get_set(self):
+        """Test maus_cpp.phase_space_vector get_<> and set_<>"""
+        psv = PhaseSpaceVector(t=1, energy=2., x=3., px=4., y=5., py=6.)
+        test_value = 1.
+        method_list = [(psv.get_t,  psv.set_t),
+                       (psv.get_energy, psv.set_energy),
+                       (psv.get_x,  psv.set_x),
+                       (psv.get_px, psv.set_px),
+                       (psv.get_y,  psv.set_y),
+                       (psv.get_py, psv.set_py)]
+        for getter, setter in method_list:
+            self.assertAlmostEqual(getter(bob="nonsense"), test_value)
+            setter(test_value+10.)
+            self.assertAlmostEqual(getter(), test_value+10.)
+            setter(value=test_value+10.)
+            try:
+                setter(value=test_value+10., bob="nonsense")
+                self.assertTrue(False, "Should have thrown an exception")
+            except TypeError:
+                pass
+            test_value += 1.
+
+    def test_repr(self):
+        """Test maus_cpp.PhaseSpaceVector.__repr__ and __str__"""
+        psv = PhaseSpaceVector(t=1, energy=2., x=3., px=4., y=5., py=6.)
+        psv_as_list = eval(psv.__repr__())
+        for i, value in enumerate(psv_as_list):
+            self.assertAlmostEqual(value, float(i+1))
+        psv_as_list = eval(psv.__str__())
+        for i, value in enumerate(psv_as_list):
+            self.assertAlmostEqual(value, float(i+1))
 
 if __name__ == "__main__":
     unittest.main()

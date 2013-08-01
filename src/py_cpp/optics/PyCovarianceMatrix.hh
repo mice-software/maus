@@ -44,6 +44,39 @@ typedef struct {
     CovarianceMatrix* cov_mat;
 } PyCovarianceMatrix;
 
+/** @namespace C_API defines functions that can be accessed by other C libraries
+ *
+ *  To access these functions, don't #include this file; use 
+ *  int import_PyCovarianceMatrix() instead otherwise you will get segmentation
+ *  fault
+ */
+namespace C_API {
+
+/** Allocate a new PyCovarianceMatrix
+ *
+ *  \returns PyCovarianceMatrix* cast as a PyObject* with cm pointer set to NULL
+ */
+static PyObject *create_empty_matrix();
+
+/** Return the C++ covariance matrix associated with a PyCovarianceMatrix
+ *
+ *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
+ *         of the covariance matrix
+ *
+ *  PyCovarianceMatrix still owns the memory allocated to CovarianceMatrix
+ */
+static CovarianceMatrix* get_covariance_matrix(PyObject* py_cm);
+
+/** Set the C++ covariance matrix associated with a PyCovarianceMatrix
+ *
+ *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
+ *               of the covariance matrix
+ *  \param cm  C++ representation of the covariance matrix. PyCovarianceMatrix
+ *             takes ownership of the memory allocated to cm
+ */
+static void set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
+}
+
 /** _alloc allocates memory for PyCovarianceMatrix
  *
  *  @param type - pointer to a PyCovarianceMatrixType object, as defined in
@@ -79,6 +112,15 @@ void _free(PyCovarianceMatrix * self);
  */
 PyMODINIT_FUNC initcovariance_matrix(void);
 
+/** Get the value of an element 
+ *  
+ *  \param self - not used
+ *  \param args - not used
+ *  \param kwds - keyword arguments; row, column for matrix row, column
+ *
+ */
+static PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds);
+
 /** Create a PyCovarianceMatrix from penn parameters
  *  
  *  \param self - not used
@@ -112,38 +154,6 @@ PyObject* create_from_twiss_parameters
  *  \throws MAUS::Exception if array has wrong shape or is not a numpy_array
  */
 CovarianceMatrix* create_from_numpy_matrix(PyObject *numpy_array);
-
-/** C_API defines functions that can be accessed by other C libraries
- *
- *  To access these functions, don't #include this file; use import instead
- */
-
-namespace C_API {
-
-/** Allocate a new PyCovarianceMatrix
- *
- *  \returns PyCovarianceMatrix* cast as a PyObject* with cm pointer set to NULL
- */
-static PyObject *create_empty_matrix();
-
-/** Return the C++ covariance matrix associated with a PyCovarianceMatrix
- *
- *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
- *         of the covariance matrix
- *
- *  PyCovarianceMatrix still owns the memory allocated to CovarianceMatrix
- */
-static CovarianceMatrix* get_covariance_matrix(PyObject* py_cm);
-
-/** Set the C++ covariance matrix associated with a PyCovarianceMatrix
- *
- *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
- *               of the covariance matrix
- *  \param cm  C++ representation of the covariance matrix. PyCovarianceMatrix
- *             takes ownership of the memory allocated to cm
- */
-static void set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
-}
 }
 }
 
@@ -161,11 +171,13 @@ namespace PyCovarianceMatrix {
 
 /** import the PyCovarianceMatrix C_API
  *
- *  set the 
+ *  Makes the functions in C_API available in the MAUS::PyCovarianceMatrix
+ *  namespace, for other python/C code
  *
  *  @returns 0 if the import fails; return 1 if it is a success
  */
 int import_PyCovarianceMatrix();
+
 
 PyObject* (*create_empty_matrix)() = NULL;
 void (*set_covariance_matrix)(PyObject* py_cm, CovarianceMatrix* cm) = NULL;

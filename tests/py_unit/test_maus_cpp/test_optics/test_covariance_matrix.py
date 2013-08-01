@@ -25,6 +25,7 @@ import numpy
 
 import maus_cpp
 from maus_cpp.covariance_matrix import CovarianceMatrix
+from xboa.Bunch import Bunch
 
 class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
     """Test maus_cpp.optics_model"""
@@ -58,12 +59,109 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
 
         # no test for positive definite (there should be); leave this here as a
         # reminder...
-        test_data = [[-j*i for j in range(1, 7)] for i in range(1, 7)]
+        test_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
         test_array = numpy.array(test_data)
-        CovarianceMatrix(test_array)
-        print cm1, cm2, cm3
+        cov = CovarianceMatrix(test_array)
+        for j in range(1, 7):
+            for i in range(1, 7):
+                self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
 
-    def _test_create_from_twiss_parameters(self):
+    def test_get_element(self):
+        """Test covariance matrix get_element function"""
+        test_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
+        test_array = numpy.array(test_data)
+        cov = CovarianceMatrix(test_array)
+        for j in range(1, 7):
+            for i in range(1, 7):
+                self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
+
+        # check access by value name
+        cov.get_element(row=1, column=1)
+        try:
+            cov.get_element(row=1)
+            self.assertTrue(False, "column is mandatory")
+        except TypeError:
+            pass
+        try:
+            cov.get_element(column=1)
+            self.assertTrue(False, "row is mandatory")
+        except TypeError:
+            pass
+
+        # check bounds
+        try:
+            cov.get_element(0, 1)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.get_element(1, 0)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.get_element(6, 7)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.get_element(7, 6)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+
+
+    def test_set_element(self):
+        """Test covariance matrix set_element function"""
+        test_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
+        cov = CovarianceMatrix()
+        for j in range(1, 7):
+            for i in range(1, 7):
+                cov.set_element(i, j, test_data[i-1][j-1])
+                self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
+        # check set by value name
+        cov.set_element(row=1, column=1, value=0.)
+        try:
+            cov.set_element(row=1, column=1)
+            self.assertTrue(False, "value is mandatory")
+        except TypeError:
+            pass
+        try:
+            cov.set_element(row=1, value=1)
+            self.assertTrue(False, "row is mandatory")
+        except TypeError:
+            pass
+        try:
+            cov.set_element(column=1, value=1)
+            self.assertTrue(False, "row is mandatory")
+        except TypeError:
+            pass
+
+
+        try:
+            cov.set_element(1, 0, 0)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.set_element(0, 1, 0)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.set_element(6, 7, 0)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+        try:
+            cov.set_element(7, 6, 0)
+            self.assertTrue(False, "Should throw when out of bounds")
+        except IndexError:
+            pass
+
+
+
+    def test_create_from_twiss_parameters(self):
         """Test maus_cpp.covariance_matrix.create_from_penn_parameters"""
         try:
             maus_cpp.covariance_matrix.create_from_twiss_parameters()
@@ -74,29 +172,52 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
                       (mass=105.658, momentum=200.,
                        emittance_x=6., beta_x=333.,
                        emittance_y=6., beta_y=333.,
-                       emittance_l=1., beta_l=10.)
+                       emittance_l=100., beta_l=10.)
         cm2 = maus_cpp.covariance_matrix.create_from_twiss_parameters \
                       (mass=105.658, momentum=200.,
                        emittance_x=6., beta_x=333.,
                        emittance_y=6., beta_y=333.,
-                       emittance_l=1., beta_l=10.,
+                       emittance_l=100., beta_l=10.,
                        alpha_x=0., alpha_y=0., alpha_l=0.,
                        dispersion_x=0., dispersion_prime_x=0.,
                        dispersion_y=0., dispersion_prime_y=0.)
-
+        for i in range(1, 7):
+            for j in range(i, 7):
+                self.assertEqual(cm1.get_element(i, j), cm2.get_element(i, j))
+ 
         cm3 = maus_cpp.covariance_matrix.create_from_twiss_parameters \
                       (mass=105.658, momentum=200.,
                        emittance_x=6., beta_x=333.,
-                       emittance_y=6., beta_y=333.,
+                       emittance_y=5., beta_y=250.,
                        emittance_l=1., beta_l=10.,
-                       alpha_x=1., alpha_y=1., alpha_l=1.,
+                       alpha_x=1., alpha_y=2., alpha_l=1.,
                        dispersion_x=1., dispersion_prime_x=1.,
-                       dispersion_y=1., dispersion_prime_y=1.)
+                       dispersion_y=3., dispersion_prime_y=3.)
         cm4 = maus_cpp.covariance_matrix.create_from_twiss_parameters \
                       (105.658, 200.,
-                       6., 333., 6., 333., 1., 10.,
-                       1., 1., 1., 1., 1., 1., 1.)
-        print cm1, cm2, cm3, cm4
+                       6., 333., 5., 250., 1., 10.,
+                       1., 2., 1., 1., 1., 3., 3.)
+        for i in range(1, 7):
+            for j in range(i, 7):
+                self.assertEqual(cm3.get_element(i, j), cm4.get_element(i, j))
+        bunch = Bunch.build_ellipse_2d(10., 1., 1., 200., 105.658, False)
+        for i in range(0, 2):
+            for j in range(0, 2):
+                self.assertLess(2.*abs(bunch[i, j]-cm4.get_element(i+1, j+1))/ \
+                                   abs(bunch[i, j]+cm4.get_element(i+1, j+1)),
+                                   1.e-3)
+        bunch = Bunch.build_ellipse_2d(333., 1., 6., 200., 105.658, False)
+        for i in range(2, 4):
+            for j in range(2, 4):
+                a = bunch[i-2, j-2]
+                b = cm4.get_element(i+1, j+1)
+                self.assertLess(2.*abs(a-b)/abs(a+b), 1.e-3)
+        bunch = Bunch.build_ellipse_2d(250., 2., 5., 200., 105.658, False)
+        for i in range(4, 6):
+            for j in range(4, 6):
+                a = bunch[i-4, j-4]
+                b = cm4.get_element(i+1, j+1)
+                self.assertLess(2.*abs(a-b)/abs(a+b), 1.e-3)
             
     def test_create_from_penn_parameters(self):
         """Test maus_cpp.covariance_matrix.create_from_penn_parameters"""
@@ -114,6 +235,9 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
                        charge=1., bz=0., ltwiddle=0., dispersion_x=0.,
                        dispersion_prime_x=0., dispersion_y=0.,
                        dispersion_prime_y=0.)
+        for i in range(1, 7):
+            for j in range(i, 7):
+                self.assertEqual(cm1.get_element(i, j), cm2.get_element(i, j))
 
         cm3 = maus_cpp.covariance_matrix.create_from_penn_parameters \
                       (mass=105.658, momentum=200., emittance_t=6., beta_t=333.,
@@ -125,8 +249,31 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
                       (105.658, 200., 6., 333.,
                        1., 10., 1., 1.,
                        -1., 4.e-3, 1., 1., 1., 1., 1.)
-        print cm1, cm2, cm3, cm4
+        for i in range(1, 7):
+            for j in range(i, 7):
+                self.assertEqual(cm3.get_element(i, j), cm4.get_element(i, j))
+        bunch = Bunch.build_ellipse_2d(10., 1., 1., 200., 105.658, False)
+        for i in range(0, 2):
+            for j in range(0, 2):
+                self.assertLess(2.*abs(bunch[i, j]-cm4.get_element(i+1, j+1))/ \
+                                   abs(bunch[i, j]+cm4.get_element(i+1, j+1)),
+                                   1.e-3)
+        bunch = Bunch.build_penn_ellipse(6., 105.658, 333.,
+                                         1., 200., 1., 4.e-3, -1.)
+        for i in range(0, 4):
+            for j in range(0, 4):
+                self.assertAlmostEqual(bunch[i, j], cm4.get_element(i+3, j+3))
 
+    def test_repr(self):
+        """Test maus_cpp.covariance_matrix.__repr__()"""
+        ref_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
+        ref_array = numpy.array(ref_data)
+        cov = CovarianceMatrix(ref_array)
+        test_array = eval(repr(cov))
+        for i, x_array in enumerate(test_array):
+            for j, x in enumerate(x_array):
+               self.assertAlmostEqual(x, ref_data[i][j])
+                
 
 if __name__ == "__main__":
     unittest.main()

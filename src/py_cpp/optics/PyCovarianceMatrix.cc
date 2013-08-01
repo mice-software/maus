@@ -45,14 +45,98 @@
 namespace MAUS {
 namespace PyCovarianceMatrix {
 
-static PyMemberDef _members[] = {
-{NULL}
-};
+std::string get_element_docstring = 
+std::string("Get an element of the covariance matrix\n\n")+
+std::string(" - row (int) Row from which to get the element\n")+
+std::string(" - column (int) Column from which to get the element\n")+
+std::string("Returns the corresponding covariance (float)");
 
-static PyMethodDef _methods[] = {
+PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
+    CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
+    if (cm == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyCovarianceMatrix not initialised properly");
+        return NULL;
+    }
 
-{NULL}
-};
+    int row = 0;
+    int col = 0;
+    double value = 0;
+    static char *kwlist[] = {(char*)"row", (char*)"column"};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|", kwlist, &row, &col)) {
+        return NULL;
+    }
+
+    try {
+        value = (*cm)(row, col);
+    } catch (Exception exc) {
+        PyErr_SetString(PyExc_IndexError, exc.what());
+        return NULL;
+    }
+    PyObject* py_value = Py_BuildValue("d", value);
+    if (py_value == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyCovarianceMatrix failed to get value");
+        return NULL;
+    }
+    Py_INCREF(py_value);
+    return py_value;
+}
+
+std::string set_element_docstring = 
+std::string("Set an element of the covariance matrix\n\n")+
+std::string(" - row (int) Row from which to get the element\n")+
+std::string(" - column (int) Column from which to get the element\n")+
+std::string(" - value (float) Column from which to get the element\n")+
+std::string("Returns None");
+
+PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
+    CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
+    if (cm == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyCovarianceMatrix not initialised properly");
+        return NULL;
+    }
+
+    int row = 0;
+    int col = 0;
+    double value = 0;
+    static char *kwlist[] = {(char*)"row", (char*)"column", (char*)"value",
+                                                                          NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iid|", kwlist, &row, &col,
+                                                                      &value)) {
+        return NULL;
+    }
+
+    try {
+        cm->set(row, col, value);
+    } catch (Exception exc) {
+        PyErr_SetString(PyExc_IndexError, exc.what());
+        return NULL;
+    }
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject* _str(PyObject * self) {
+    CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
+    if (cm == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "PyCovarianceMatrix not initialised properly");
+        return NULL;
+    }
+    char buffer[1024];
+    snprintf(buffer, 1024, " [[%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g]]",
+      (*cm)(1, 1), (*cm)(1, 2), (*cm)(1, 3), (*cm)(1, 4), (*cm)(1, 5), (*cm)(1, 6),
+      (*cm)(2, 1), (*cm)(2, 2), (*cm)(2, 3), (*cm)(2, 4), (*cm)(2, 5), (*cm)(2, 6),
+      (*cm)(3, 1), (*cm)(3, 2), (*cm)(3, 3), (*cm)(3, 4), (*cm)(3, 5), (*cm)(3, 6),
+      (*cm)(4, 1), (*cm)(4, 2), (*cm)(4, 3), (*cm)(4, 4), (*cm)(4, 5), (*cm)(4, 6),
+      (*cm)(5, 1), (*cm)(5, 2), (*cm)(5, 3), (*cm)(5, 4), (*cm)(5, 5), (*cm)(5, 6),
+      (*cm)(6, 1), (*cm)(6, 2), (*cm)(6, 3), (*cm)(6, 4), (*cm)(6, 5), (*cm)(6, 6));
+    return PyString_FromString(buffer);
+}
+
+
 
 const char* module_docstring =
   "covariance_matrix module; merely a place holder for CovarianceMatrix class";
@@ -60,6 +144,18 @@ const char* module_docstring =
 const char* class_docstring =
   "CovarianceMatrix provides bindings for beam ellipses.";
 
+
+static PyMemberDef _members[] = {
+{NULL}
+};
+
+static PyMethodDef _methods[] = {
+{"get_element", (PyCFunction)get_element,
+ METH_VARARGS|METH_KEYWORDS, get_element_docstring.c_str()},
+{"set_element", (PyCFunction)set_element,
+ METH_VARARGS|METH_KEYWORDS, set_element_docstring.c_str()},
+{NULL}
+};
 
 static PyTypeObject PyCovarianceMatrixType = {
     PyObject_HEAD_INIT(NULL)
@@ -72,13 +168,13 @@ static PyTypeObject PyCovarianceMatrixType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
+    _str,                      /*tp_repr*/
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    0,                         /*tp_str*/
+    _str,                      /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -193,26 +289,26 @@ std::string("Create a CovarianceMatrix from Penn parameters.\n\n")+
 std::string("Penn defines a parameterisation for cylindrically symmetric\n")+
 std::string("beam ellipses that is often followed in solenodial beam\n")+
 std::string("optics. Following parameters are mandatory:\n")+
-std::string(" - mass (double): nominal particle mass for beam particles\n")+
+std::string(" - mass (float): nominal particle mass for beam particles\n")+
 std::string("   [MeV/c^2]\n")+
-std::string(" - momentum (double): nominal particle momentum for beam\n")+
+std::string(" - momentum (float): nominal particle momentum for beam\n")+
 std::string("   particles [MeV/c]\n")+
-std::string(" - emittance_x (double): horizontal emittance [mm]\n")+
-std::string(" - beta_x (double): horizontal optical beta function [mm]\n")+
-std::string(" - emittance_y (double): vertical emittance [mm]\n")+
-std::string(" - beta_y (double): vertical optical beta function [mm]\n")+
-std::string(" - emittance_l (double): longitudinal emittance [?]\n")+
-std::string(" - beta_l (double): longitudinal optical beta function [?]\n\n")+
+std::string(" - emittance_x (float): horizontal emittance [mm]\n")+
+std::string(" - beta_x (float): horizontal optical beta function [mm]\n")+
+std::string(" - emittance_y (float): vertical emittance [mm]\n")+
+std::string(" - beta_y (float): vertical optical beta function [mm]\n")+
+std::string(" - emittance_l (float): longitudinal emittance [?]\n")+
+std::string(" - beta_l (float): longitudinal optical beta function [?]\n\n")+
 std::string("Following parameters are optional, taking given default if not\n")+
 std::string("specified by the user:\n")+
-std::string(" - alpha_x (double, 0): horizontal optical alpha function\n")+
-std::string(" - alpha_y (double, 0): vertical optical alpha function\n")+
-std::string(" - alpha_l (double, 0): longitudinal optical alpha function\n")+
-std::string(" - dispersion_x (double, 0): dispersion in x direction [?]\n")+
-std::string(" - dispersion_prime_x (double, 0): dispersion prime in\n")+
+std::string(" - alpha_x (float, 0): horizontal optical alpha function\n")+
+std::string(" - alpha_y (float, 0): vertical optical alpha function\n")+
+std::string(" - alpha_l (float, 0): longitudinal optical alpha function\n")+
+std::string(" - dispersion_x (float, 0): dispersion in x direction [?]\n")+
+std::string(" - dispersion_prime_x (float, 0): dispersion prime in\n")+
 std::string("   horizontal direction (derivative with respect to s) [?]\n")+
-std::string(" - dispersion_y (double, 0): dispersion in y direction [?]\n")+
-std::string(" - dispersion_prime_y (double, 0): dispersion prime in\n")+
+std::string(" - dispersion_y (float, 0): dispersion in y direction [?]\n")+
+std::string(" - dispersion_prime_y (float, 0): dispersion prime in\n")+
 std::string("   vertical direction (derivative with respect to s) [?]\n");
 
 PyObject* create_from_twiss_parameters
@@ -241,7 +337,9 @@ PyObject* create_from_twiss_parameters
                 (char*)"dispersion_y", (char*)"dispersion_prime_y", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddddd|ddddddd", kwlist,
-        &mass, &momentum, &emittance_x, &beta_x, &emittance_x, &beta_x,
+        &mass, &momentum,
+        &emittance_x, &beta_x,
+        &emittance_y, &beta_y,
         &emittance_l, &beta_l,
         &alpha_x, &alpha_y, &alpha_l,
         &dispersion_x, &dispersion_prime_x,
@@ -284,27 +382,27 @@ std::string("Create a CovarianceMatrix from Penn parameters.\n\n")+
 std::string("Penn defines a parameterisation for cylindrically symmetric\n")+
 std::string("beam ellipses that is often followed in solenodial beam\n")+
 std::string("optics. Following parameters are mandatory:\n")+
-std::string(" - mass (double): nominal particle mass for beam particles\n")+
+std::string(" - mass (float): nominal particle mass for beam particles\n")+
 std::string("   [MeV/c^2]\n")+
-std::string(" - momentum (double): nominal particle momentum for beam\n")+
+std::string(" - momentum (float): nominal particle momentum for beam\n")+
 std::string("   particles [MeV/c]\n")+
-std::string(" - emittance_t (double): transverse emittance [mm]\n")+
-std::string(" - beta_t (double): transverse optical beta function [mm]\n")+
-std::string(" - emittance_l (double): longitudinal emittance [?]\n")+
-std::string(" - beta_l (double): longitudinal optical beta function [?]\n\n")+
+std::string(" - emittance_t (float): transverse emittance [mm]\n")+
+std::string(" - beta_t (float): transverse optical beta function [mm]\n")+
+std::string(" - emittance_l (float): longitudinal emittance [?]\n")+
+std::string(" - beta_l (float): longitudinal optical beta function [?]\n\n")+
 std::string("Following parameters are optional, taking given default if not\n")+
 std::string("specified by the user:\n")+
-std::string(" - alpha_t (double, 0.): transverse optical alpha function\n")+
-std::string(" - alpha_l (double, 0.): longitudinal optical alpha function\n")+
-std::string(" - charge (double): nominal charge of particles [e+ charge]\n")+
-std::string(" - bz (double): longitudinal magnetic field. If non-zero,\n")+
+std::string(" - alpha_t (float, 0.): transverse optical alpha function\n")+
+std::string(" - alpha_l (float, 0.): longitudinal optical alpha function\n")+
+std::string(" - charge (float): nominal charge of particles [e+ charge]\n")+
+std::string(" - bz (float): longitudinal magnetic field. If non-zero,\n")+
 std::string("   the beam kinetic angular momentum. Note units are [kT]\n")+
-std::string(" - ltwiddle (double): normalised canonical angular momentum\n")+
-std::string(" - dispersion_x (double): dispersion in x direction [?]\n")+
-std::string(" - dispersion_prime_x (double): dispersion prime in x\n")+
+std::string(" - ltwiddle (float): normalised canonical angular momentum\n")+
+std::string(" - dispersion_x (float): dispersion in x direction [?]\n")+
+std::string(" - dispersion_prime_x (float): dispersion prime in x\n")+
 std::string("   direction (derivative with respect to s) [?]\n")+
-std::string(" - dispersion_y (double): dispersion in y direction [?]\n")+
-std::string(" - dispersion_prime_x (double): dispersion prime in y\n")+
+std::string(" - dispersion_y (float): dispersion in y direction [?]\n")+
+std::string(" - dispersion_prime_x (float): dispersion prime in y\n")+
 std::string("   direction (derivative with respect to s) [?]\n");
 
 PyObject* create_from_penn_parameters
@@ -409,7 +507,6 @@ void C_API::set_covariance_matrix(PyObject* py_cm_o, CovarianceMatrix* cm) {
     }
     py_cm->cov_mat = cm;
 }
-
 
 PyObject *C_API::create_empty_matrix() {
     return _alloc(&PyCovarianceMatrixType, 0);

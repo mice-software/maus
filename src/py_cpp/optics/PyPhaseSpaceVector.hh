@@ -35,6 +35,8 @@ namespace MAUS {
 
 class PhaseSpaceVector; // note this is just in MAUS namespace
 
+/** Methods for the PyPhaseSpaceVector object
+ */
 namespace PyPhaseSpaceVector {
 
 /** PyPhaseSpaceVector is the python implementation of the C++ PhaseSpaceVector
@@ -43,6 +45,42 @@ typedef struct {
     PyObject_HEAD;
     PhaseSpaceVector* psv;
 } PyPhaseSpaceVector;
+
+/** @namespace C_API defines functions that can be accessed by other C libraries
+ *
+ *  To access these functions, you must call import_PyPhaseSpaceVector()
+ *  (otherwise you will get segmentation fault)
+ */
+namespace C_API {
+
+/** Create a new empty PyPhaseSpaceVector (psv is NULL)
+ *
+ *  Caller owns the returned memory
+ */
+
+static PyObject* create_empty_vector();
+
+/** Return the C++ PhaseSpaceVector associated with a PyPhaseSpaceVector
+ *
+ *  \param py_psv PyPhaseSpaceVector* cast as a PyObject*. Python representation
+ *         of the phase space vector
+ *
+ *  PyPhaseSpaceVector still owns the memory allocated to PhaseSpaceVector
+ */
+static PhaseSpaceVector* get_phase_space_vector(PyObject* py_psv);
+
+/** Set the C++ phase space vector associated with a PyPhaseSpaceVector
+ *
+ *  \param py_psv PyPhaseSpaceVector* cast as a PyObject*. Python representation
+ *               of the phase space vector
+ *  \param psv  C++ representation of the phase space vector. PyPhaseSpaceVector
+ *             takes ownership of the memory allocated to psv
+ */
+static void set_phase_space_vector(PyObject* py_psv, PhaseSpaceVector* psv);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~ PyPhaseSpaceVector private methods ~~~~~~~~~~~~~~~~~~~~~
+// most are available as native python functions
 
 /** _alloc allocates memory for PyPhaseSpaceVector
  *
@@ -57,8 +95,8 @@ static PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
  *
  *  @param self an initialised PyPhaseSpaceVector* cast as a PyObject*; caller
  *         owns this memory
- *  @param args
- *  @param kwds
+ *  @param args not used
+ *  @param kwds accepts t, energy, x, px, y, py keywords; see python docstring
  *
  *  @returns 0 on success; -1 on failure
  */
@@ -79,30 +117,147 @@ static void _free(PyPhaseSpaceVector * self);
  */
 PyMODINIT_FUNC initphase_space_vector(void);
 
-namespace C_API {
-
-/** Return the C++ PhaseSpaceVector associated with a PyPhaseSpaceVector
+/** get time t [ns]
  *
- *  \param py_psv PyPhaseSpaceVector* cast as a PyObject*. Python representation
- *         of the phase space vector
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
  *
- *  PyPhaseSpaceVector still owns the memory allocated to PhaseSpaceVector
+ *  @returns a PyObject float containing time t
  */
-static PhaseSpaceVector* get_phase_space_vector(PyObject* py_psv);
+static PyObject* get_t(PyObject* self, PyObject *args, PyObject *kwds);
 
-/** Set the C++ phase space vector associated with a PyPhaseSpaceVector
+/** get energy E [MeV]
  *
- *  \param py_psv PyPhaseSpaceVector* cast as a PyObject*. Python representation
- *               of the phase space vector
- *  \param psv  C++ representation of the phase space vector. PyPhaseSpaceVector
- *             takes ownership of the memory allocated to psv
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
+ *
+ *  @returns a PyObject float containing energy E
  */
-static void set_phase_space_vector(PyObject* py_psv, PhaseSpaceVector* psv);
-}
+static PyObject* get_energy(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** get x (horizontal) position [mm]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
+ *
+ *  @returns a PyObject float containing position x
+ */
+static PyObject* get_x(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** get px (horizontal component of momentum) [MeV/c]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
+ *
+ *  @returns a PyObject float containing momentum px
+ */
+static PyObject* get_px(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** get y (vertical position) [mm]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
+ *
+ *  @returns a PyObject float containing position y
+ */
+static PyObject* get_y(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** get py (vertical component of momentum) [MeV/c]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds not used
+ *
+ *  @returns a PyObject float containing momentum py
+ */
+static PyObject* get_py(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set t (time) [ns]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_t(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set E (energy) [MeV/c]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_energy(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set x (horizontal position) [mm]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_x(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set px (horizontal component of momentum) [MeV/c]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_px(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set y (vertical position) [mm]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_y(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** set py (vertical component of momentum) [MeV/c]
+ *
+ *  @params self a PyPhaseSpaceVector
+ *  @params args not used
+ *  @params kwds accepts keyword value (float)
+ *
+ *  @returns None
+ */
+static PyObject* set_py(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** Template for get functions */
+static PyObject* get(PyObject* self,
+                     double (PhaseSpaceVector::*get_function)() const);
+
+/** Template for set functions */
+static PyObject* set(PyObject* self,
+                     PyObject *args,
+                     PyObject *kwds,
+                     void (PhaseSpaceVector::*set_function)(double value));
+
+/** Return a python string describing the phase space vector
+ *
+ *  Returns string formatted like a python list with contents:
+ *    time [ns], energy [MeV], x [mm], px [MeV/c], y [mm], py [MeV/c]
+ */
+static PyObject* _str(PyObject * self);
 }
 }
 
 #else // ifdef MAUS_PYPHASESPACEVECTOR_CC
+
 
 /** MAUS::PyOpticsModel::PyPhaseSpaceVector C API objects
  *
@@ -110,12 +265,15 @@ static void set_phase_space_vector(PyObject* py_psv, PhaseSpaceVector* psv);
  *  C functions via the Python API, which is done at import time. This mimics 
  *  the functions in MAUS::PyPhaseSpaceVector. Full documentation is found
  *  there.
+ *
+ *  Hacky implementation of public keyword in C++
  */
 namespace MAUS {
 namespace PyPhaseSpaceVector {
 /** import the PyPhaseSpaceVector C_API
  *
- *  set the 
+ *  Make the functions in C_API namespace available to other C modules.
+ *  Functions will be in namespace MAUS::PyPhaseSpaceVector.
  *
  *  @returns 0 if the import fails; return 1 if it is a success
  */
@@ -123,6 +281,9 @@ int import_PyPhaseSpaceVector();
 
 void (*set_phase_space_vector)(PyObject* py_psv, PhaseSpaceVector* psv) = NULL;
 PhaseSpaceVector* (*get_phase_space_vector)(PyObject* py_psv) = NULL;
+PyObject* (*create_empty_vector)() = NULL;
+}
+}
 
 int MAUS::PyPhaseSpaceVector::import_PyPhaseSpaceVector() {
   PyObject* psv_module = PyImport_ImportModule("maus_cpp.phase_space_vector");
@@ -142,13 +303,19 @@ int MAUS::PyPhaseSpaceVector::import_PyPhaseSpaceVector() {
     void* spsv_void = (void*)PyCObject_AsVoidPtr(spsv_c_api);
     PyPhaseSpaceVector::set_phase_space_vector =
             reinterpret_cast<void (*)(PyObject*, PhaseSpaceVector*)>(spsv_void);
-    if ((set_phase_space_vector == NULL) ||
+
+    PyObject* cev_c_api = PyDict_GetItemString(psv_dict,
+                                               "C_API_CREATE_EMPTY_VECTOR");
+    void* cev_void = (void*)PyCObject_AsVoidPtr(cev_c_api);
+    PyPhaseSpaceVector::create_empty_vector =
+            reinterpret_cast<PyObject* (*)()>(cev_void);
+
+    if ((create_empty_vector == NULL) ||
+        (set_phase_space_vector == NULL) ||
         (get_phase_space_vector == NULL))
         return 0;
   }
   return 1;
-}
-}
 }
 #endif  // #ifdef MAUS_PYPHASESPACEVECTOR_CC
 #endif  // _SRC_PY_CPP_PYPHASESPACEVECTOR_HH_
