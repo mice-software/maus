@@ -19,8 +19,6 @@
 
 namespace MAUS {
 
-// TODO: Add covariance to data structure.
-
 KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
                                    _filter(NULL) {
   //

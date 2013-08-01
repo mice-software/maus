@@ -120,9 +120,6 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(0, 2) = 0.;
   // @x/@my
   _F(0, 3) = (cosine-1.)/(a*charge*kappa);
-  // @x/@kappa
-  // _F(0, 4) = (1./(a*charge*kappa2))*(my*(1.-cosine) - mx*sine)
-  //           + (deltaZ/kappa) * (mx*cosine - my*sine);
 
   // @mx/@x
   _F(1, 0) = 0.;
@@ -132,8 +129,6 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(1, 2) = 0.;
   // @mx/@my
   _F(1, 3) = -sine;
-  // @mx/@kappa
-  // _F(1, 4) = -a*deltaZ*charge * ( mx*sine + my*cosine );
 
   // @y/@x
   _F(2, 0) = 0.;
@@ -143,9 +138,6 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(2, 2) = 1.;
   // @y/@my
   _F(2, 3) = sine/(a*charge*kappa);
-  // @y/@kappa
-  // _F(2, 4) =  (1./(a*charge*kappa2))*(mx*cosine - mx - my*sine)
-  //             + (deltaZ/kappa) *(my*cosine + mx*sine); // - mx*sine ?
 
   // @my/@x
   _F(3, 0) = 0.;
@@ -155,8 +147,6 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(3, 2) = 0.;
   // @my/@my
   _F(3, 3) = cosine;
-  // @my/@kappa
-  // _F(3, 4) = a*deltaZ*charge * ( mx*cosine - my*sine );
 
   // @kappa/@x
   _F(4, 0) = 0.;
