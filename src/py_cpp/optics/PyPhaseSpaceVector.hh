@@ -258,7 +258,6 @@ static PyObject* _str(PyObject * self);
 
 #else // ifdef MAUS_PYPHASESPACEVECTOR_CC
 
-
 /** MAUS::PyOpticsModel::PyPhaseSpaceVector C API objects
  *
  *  Because of the way python does share libraries, we have to explicitly import

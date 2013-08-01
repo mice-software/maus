@@ -24,6 +24,7 @@ import unittest
 import numpy
 
 import maus_cpp
+from maus_cpp import covariance_matrix
 from maus_cpp.covariance_matrix import CovarianceMatrix
 from xboa.Bunch import Bunch
 
@@ -35,24 +36,35 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
 
     def test_init(self):
         """Test maus_cpp.optics_model.__init__() and deallocation"""
+        cov = CovarianceMatrix()
+        for j in range(1, 7):
+            for i in range(1, 7):
+                self.assertEqual(0., cov.get_element(i, j))
+ 
+    def test_covariance_matrix(self):
+        """Test maus_cpp.optics_model.__init__() and deallocation"""
         test_data = [[j*i for j in range(1, 7)] for i in range(1, 7)]
         test_array = numpy.array(test_data)
-        cm1 = CovarianceMatrix()
-        cm2 = CovarianceMatrix(test_array)
-        cm3 = CovarianceMatrix(matrix=test_array)
         try:
-            CovarianceMatrix(1)
+            cm1 = covariance_matrix.create_from_matrix()
+            self.assertTrue(False, "Should have thrown a TypeError")
+        except TypeError:
+            pass
+        cm2 = covariance_matrix.create_from_matrix(test_array)
+        cm3 = covariance_matrix.create_from_matrix(matrix=test_array)
+        try:
+            covariance_matrix.create_from_matrix(1)
             self.assertTrue(False, "Should have thrown a RuntimeError")
         except RuntimeError:
             pass
         try:
-            CovarianceMatrix(numpy.array([[1.]]))
+            covariance_matrix.create_from_matrix(numpy.array([[1.]]))
             self.assertTrue(False, "Should have thrown a RuntimeError")
         except RuntimeError:
             pass
         try:
             test_data[1][1] = 'a'
-            CovarianceMatrix(test_data)
+            covariance_matrix.create_from_matrix(test_data)
             self.assertTrue(False, "Should have thrown a RuntimeError")
         except RuntimeError:
             pass
@@ -61,7 +73,7 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         # reminder...
         test_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
         test_array = numpy.array(test_data)
-        cov = CovarianceMatrix(test_array)
+        cov = covariance_matrix.create_from_matrix(test_array)
         for j in range(1, 7):
             for i in range(1, 7):
                 self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
@@ -70,7 +82,7 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         """Test covariance matrix get_element function"""
         test_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
         test_array = numpy.array(test_data)
-        cov = CovarianceMatrix(test_array)
+        cov = covariance_matrix.create_from_matrix(test_array)
         for j in range(1, 7):
             for i in range(1, 7):
                 self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
@@ -268,7 +280,7 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         """Test maus_cpp.covariance_matrix.__repr__()"""
         ref_data = [[float(-j*i) for j in range(1, 7)] for i in range(1, 7)]
         ref_array = numpy.array(ref_data)
-        cov = CovarianceMatrix(ref_array)
+        cov = covariance_matrix.create_from_matrix(ref_array)
         test_array = eval(repr(cov))
         for i, x_array in enumerate(test_array):
             for j, x in enumerate(x_array):

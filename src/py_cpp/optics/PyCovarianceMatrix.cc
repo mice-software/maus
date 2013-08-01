@@ -251,26 +251,8 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     }
     // legal python to call initialised_object.__init__() to reinitialise, so
     // handle this case
-    if (cm->cov_mat != NULL) {
-        delete cm->cov_mat;
-        cm->cov_mat = NULL;
-    }
-    // try to extract a numpy array from the arguments
-    static char *kwlist[] = {(char*)"matrix"};
-    PyObject* array = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &array)) {
-        // error message is set in PyArg_Parse...
-        return -1;
-    }
-    // now initialise the internal covariance matrix
-    try {
-        if (array == NULL)
-            cm->cov_mat = new MAUS::CovarianceMatrix();
-        else
-            cm->cov_mat = create_from_numpy_matrix(array);
-    } catch(Exception exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
-        return -1;
+    if (cm->cov_mat == NULL) {
+        cm->cov_mat = new MAUS::CovarianceMatrix();
     }
     return 0;
 }
@@ -467,7 +449,42 @@ PyObject* create_from_penn_parameters
     return py_cm;
 }
 
+std::string create_from_matrix_docstring =
+std::string("Create a covariance matrix from a numpy matrix\n\n")+
+std::string(" - matrix (numpy matrix) 6x6 matrix [various units] containing\n")+
+std::string("   covariances with variables ordered like\n")+
+std::string("   (t, energy, x, px, y, py)\n")+
+std::string("Returns the constructed covariance matrix");
+
+PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
+    PyCovarianceMatrix* cm =
+            reinterpret_cast<PyCovarianceMatrix*>(C_API::create_empty_matrix());
+    // failed to cast or self was not initialised - something horrible happened
+    if (cm == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to allocate memory for PyCovarianceMatrix");
+        return NULL;
+    }
+    // try to extract a numpy array from the arguments
+    static char *kwlist[] = {(char*)"matrix"};
+    PyObject* array = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &array)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    // now initialise the internal covariance matrix
+    try {
+        cm->cov_mat = create_from_numpy_matrix(array);
+    } catch(Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, exc.what());
+        return NULL;
+    }
+    return reinterpret_cast<PyObject*>(cm);
+}
+
 static PyMethodDef _keywdarg_methods[] = {
+    {"create_from_matrix", (PyCFunction)create_from_matrix,
+    METH_VARARGS|METH_KEYWORDS, create_from_matrix_docstring.c_str()},
     {"create_from_penn_parameters", (PyCFunction)create_from_penn_parameters,
     METH_VARARGS|METH_KEYWORDS, create_from_penn_parameters_docstring.c_str()},
     {"create_from_twiss_parameters", (PyCFunction)create_from_twiss_parameters,
