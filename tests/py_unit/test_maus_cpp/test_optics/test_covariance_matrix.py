@@ -148,8 +148,6 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
             self.assertTrue(False, "row is mandatory")
         except TypeError:
             pass
-
-
         try:
             cov.set_element(1, 0, 0)
             self.assertTrue(False, "Should throw when out of bounds")
@@ -285,7 +283,6 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         for i, x_array in enumerate(test_array):
             for j, x in enumerate(x_array):
                self.assertAlmostEqual(x, ref_data[i][j])
-                
 
 if __name__ == "__main__":
     unittest.main()

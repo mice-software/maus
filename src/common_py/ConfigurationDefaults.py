@@ -364,5 +364,5 @@ PolynomialOpticsModel_algorithm = "LeastSquares"
 # deltas for numerical derivative calculation of Optics transfer maps
 TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
-                                 "y":0.1, "Py":0.1}
+                                 "y":0.1, "Py":0.01}
 

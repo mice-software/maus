@@ -6,10 +6,10 @@ Configuation OpticsTest
   Module Virtual
   {
       PropertyString Volume None
-      PropertyHep3Vector Position 0.0 0.0 0.1*@RepeatNumber m
+      PropertyHep3Vector Position 0.0 0.0 1000.*@RepeatNumber mm
       PropertyString SensitiveDetector Virtual
       PropertyBool RepeatModule2 True
-      PropertyInt  NumberOfRepeats 2
+      PropertyInt  NumberOfRepeats 1
   }
   Module Quadrupole
   {

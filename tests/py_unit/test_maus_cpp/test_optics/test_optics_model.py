@@ -37,7 +37,7 @@ GEO = \
      "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_optics/optics_model.dat"
 
 REF = {
-    "position":{"x":0., "y":0., "z":0.},
+    "position":{"x":0., "y":0., "z":-1e-9},
     "momentum":{"x":0., "y":0., "z":1.},
     "particle_id":-13, "energy":226., "random_seed":0, "time":0.
 }
@@ -100,8 +100,25 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         optics = OpticsModel()
         cm_in = maus_cpp.covariance_matrix.create_from_penn_parameters(
                   mass=105.658, momentum=200., emittance_t=6., beta_t=333.,
-                 emittance_l=1., beta_l=10.)
+                 emittance_l=1., beta_l=10., bz=0.)
         cm_out = optics.transport_covariance_matrix(cm_in)
+        # check energy, px RMS does not change (no fields)
+        for i in [2, 4, 6]:
+            self.assertAlmostEqual(cm_in.get_element(i, i),
+                                   cm_out.get_element(i, i), 1)
+        # check no coupling between phase space planes
+        for i in range(3):
+            for j in range(3):
+                if i != j:
+                    self.assertLess(abs(cm_out.get_element(2*i+1, 2*j+1)), 1e-2)
+                    self.assertLess(abs(cm_out.get_element(2*i+1, 2*j+2)), 1e-2)
+                    self.assertLess(abs(cm_out.get_element(2*i+2, 2*j+1)), 1e-2)
+                    self.assertLess(abs(cm_out.get_element(2*i+2, 2*j+2)), 1e-2)
+        # check that we have some growth of correlation between e.g. x, px
+        for i in range(3):
+            self.assertGreater(abs(cm_out.get_element(2*i+1, 2*i+2)), 1.)
+        self.assertAlmostEqual(cm_out.get_element(3, 4),
+                               cm_out.get_element(5, 6), 2)
 
     def test_transport_phase_space_vector_bad(self):
         """
@@ -127,11 +144,18 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
         """Test maus_cpp.optics_model.Optics().transport_phase_space_vector()"""
         optics = OpticsModel()
         psv_in = maus_cpp.phase_space_vector.create_from_coordinates \
-                                                      (0., 226., 0., 0., 0., 0.)
+                                                      (0., 226., 1., 2., 3., 4.)
         psv_out = optics.transport_phase_space_vector(psv_in)
-
+        pz = (226.**2+105.658**2.)**0.5
+        print psv_in
+        print psv_out
+        self.assertAlmostEqual(psv_out.get_t(), 230./pz)
+        self.assertAlmostEqual(psv_out.get_energy(), 230., 3)
+        self.assertAlmostEqual(psv_out.get_x(), 1.+2./pz*1000., 3)
+        self.assertAlmostEqual(psv_out.get_px(), 2., 3)
+        self.assertAlmostEqual(psv_out.get_y(), 3.+4./pz*1000., 3)
+        self.assertAlmostEqual(psv_out.get_py(), 4., 3)
 
 if __name__ == "__main__":
     unittest.main()
-
 
