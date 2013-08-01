@@ -291,13 +291,32 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
                     "Failed to resolve self as PyPhaseSpaceVector in __init__");
         return -1;
     }
-    // legal python to call initialised_object.__init__() to reinitialise, so
-    // handle this case
-    if (py_psv->psv != NULL) {
-        delete py_psv->psv;
-        py_psv->psv = NULL;
+    // legal to call __init__ on an existing object
+    if (py_psv->psv == NULL)
+        py_psv->psv = new PhaseSpaceVector(0., 0., 0., 0., 0., 0.);
+    return 0;
+}
+
+std::string create_from_coordinates_docstring =
+std::string("Create a new phase space vector given coordinates\n\n")+
+std::string(" - t (float) time [ns]\n")+
+std::string(" - energy (float) energy [MeV]\n")+
+std::string(" - x (float) horizontal position [mm]\n")+
+std::string(" - px (float) horizontal component of momentum [MeV/c]\n")+
+std::string(" - y (float) vertical position [mm]\n")+
+std::string(" - py (float) vertical component of momentum [MeV/c]\n")+
+std::string("Returns the new phase space vector");
+
+PyObject* create_from_coordinates(PyObject* self,
+                                  PyObject *args,
+                                  PyObject *kwds) {
+    PyPhaseSpaceVector* py_psv =
+           reinterpret_cast<PyPhaseSpaceVector*>(C_API::create_empty_vector());
+    if (py_psv == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                    "Failed to initialise PyPhaseSpaceVector");
+        return NULL;
     }
-    
     double t(0), E(0), x(0), px(0), y(0), py(0);
     // try to extract a numpy array from the arguments
     static char *kwlist[] = {(char*)"t", (char*)"energy",
@@ -307,16 +326,17 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
                                                                     &x, &px,
                                                                     &y, &py)) {
         // error message is set in PyArg_Parse...
-        return -1;
+        return NULL;
     }
     // now initialise the internal phase space vector
     try {
         py_psv->psv = new PhaseSpaceVector(t, E, x, px, y, py);
     } catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
-        return -1;
+        return NULL;
     }
-    return 0;
+    Py_INCREF(py_psv);
+    return reinterpret_cast<PyObject*>(py_psv);
 }
 
 void _free(PyPhaseSpaceVector * self) {
@@ -328,6 +348,9 @@ void _free(PyPhaseSpaceVector * self) {
 }
 
 static PyMethodDef _keywdarg_methods[] = {
+    {"create_from_coordinates", (PyCFunction)create_from_coordinates,
+    METH_VARARGS|METH_KEYWORDS, create_from_coordinates_docstring.c_str()},
+
     {NULL,  NULL}   /* sentinel */
 };
 

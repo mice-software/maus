@@ -126,7 +126,8 @@ class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
     def test_transport_phase_space_vector(self):
         """Test maus_cpp.optics_model.Optics().transport_phase_space_vector()"""
         optics = OpticsModel()
-        psv_in = PhaseSpaceVector(0., 226., 0., 0., 0., 0.)
+        psv_in = maus_cpp.phase_space_vector.create_from_coordinates \
+                                                      (0., 226., 0., 0., 0., 0.)
         psv_out = optics.transport_phase_space_vector(psv_in)
 
 
