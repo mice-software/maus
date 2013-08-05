@@ -91,7 +91,8 @@ class RealDataDigitization {
   /** @brief Converts read-out map into SciFi Fibre map
    */
   bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
-                            int &tracker, int &station, int &plane, int &channel) const;
+                            int &tracker, int &station, int &plane, int &channel,
+                            int &extWG, int &inWG, int &WGfib) const;
 
   /** @brief Reads the bad channel list from file.
    */

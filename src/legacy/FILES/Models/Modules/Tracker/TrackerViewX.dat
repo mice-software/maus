@@ -3,13 +3,13 @@
 // The U View of the tracker fibres.
 //
 
-Module TrackerViewU
+Module TrackerViewX
 {
   Volume Cylinder
   Dimensions 18.9 0.06273 cm
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
-  PropertyInt Plane 0
+  PropertyInt Plane 2
   PropertyDouble ActiveRadius 158.5 mm
   PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm

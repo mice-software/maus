@@ -15,12 +15,12 @@
  *
  */
 
-/*
-TODO: Check why the y coordinate comes out inverted for an unrotated tracker.
-      Solutions is hacked for now.
-*/
-
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <fstream>
 
 namespace MAUS {
 
@@ -196,6 +196,19 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
 
   // Vector p stores the crossing position of views v and w.
   ThreeVector p(p2);
+
+  std::ofstream myfile;
+  myfile.open ("spacepoint_realdata.txt", std::ios::app);
+  for ( int i = 0; i < 3; i++ ) {
+    int tracker = channels[i]->get_tracker();
+    int station = channels[i]->get_station();
+    int plane = channels[i]->get_plane();
+    int channel = channels[i]->get_channel();
+    double npe = channels[i]->get_npe();
+    myfile << tracker << " " << station << " " << plane << " "
+          << channel << " " << npe << "\n";
+  }
+  myfile.close();
 
   // Now, determine the perpendicular distance from the hit on the X view
   // to the intersection of the V and W views

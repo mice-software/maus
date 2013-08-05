@@ -15,17 +15,17 @@ Module TrackerStation5
   PropertyDouble OpticsMaterialLength 0 mm
   Module Tracker/Tracker0Station5ViewV.dat
   {
-    Position 0.0 0.0 0.6398 mm
+    Position 0.0 0.0 -0.6398 mm
     Rotation 0.0 0.0 -120.0 degree
   }
   Module Tracker/Tracker0Station5ViewW.dat
   {
-    Position 0.0 0.0 -0.00125 cm
+    Position 0.0 0.0 0.00125 cm
     Rotation 0.0 0.0 120.0 degree
   }
-  Module Tracker/Tracker0Station5ViewU.dat
+  Module Tracker/Tracker0Station5ViewX.dat
   {
-    Position 0.0 0.0 -0.6648 mm
+    Position 0.0 0.0 0.6648 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerMylar.dat
