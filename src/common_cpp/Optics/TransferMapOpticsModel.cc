@@ -93,7 +93,7 @@ TransferMapOpticsModel::~TransferMapOpticsModel() {
 void TransferMapOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<Primary> primaries = Primaries();
-  const std::vector<PhaseSpaceVector> primary_vectors;
+  std::vector<PhaseSpaceVector> primary_vectors;
   Json::Value primaries_json;
   for (std::vector<Primary>::const_iterator primary = primaries.begin();
        primary < primaries.end();
@@ -111,8 +111,7 @@ void TransferMapOpticsModel::Build() {
     PhaseSpaceVector primary_vector(primary->GetTime(), primary->GetEnergy(),
                                     position.x(), momentum.x(),
                                     position.y(), momentum.y());
-    const_cast<std::vector<PhaseSpaceVector>*>(&primary_vectors)
-      ->push_back(primary_vector);
+    primary_vectors.push_back(primary_vector);
   }
 
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
@@ -224,6 +223,7 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
       if (selection_error > max_selection_error) {
         std::ostringstream message_buffer;
         message_buffer << "Difference in z-position between closest mapping "
+                       << setprecision(10)
                        << "detector (z=" << transfer_map_entry->first << ") "
                        << " and target detector " << "(z=" << end_plane << ") "
                        << "exceeds tollerance for accurate mapping.";

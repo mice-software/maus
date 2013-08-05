@@ -72,8 +72,7 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
   static const size_t kPhaseSpaceDimension;
 
   size_t rounds_;
-  const std::vector<const MAUS::DataStructure::Global::TrackPoint *>
-  detector_events_;
+  std::vector<const MAUS::DataStructure::Global::TrackPoint *> detector_events_;
   std::vector<MAUS::DataStructure::Global::TrackPoint> reconstructed_points_;
   MAUS::DataStructure::Global::PID particle_id_;
 

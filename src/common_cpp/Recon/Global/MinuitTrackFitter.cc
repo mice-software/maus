@@ -143,8 +143,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
                             const std::string mapper_name) {
   std::cout << "CHECKPOINT Fit(): BEGIN" << std::endl;
   std::cout.flush();
-  *const_cast<std::vector<const TrackPoint*>*>(&detector_events_)
-    = raw_track->GetTrackPoints();
+  detector_events_ = raw_track->GetTrackPoints();
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 0" << std::endl;
   std::cout << "DEBUG MinuitTrackFitter::Fit(): Fitting track with "
             << detector_events_.size() << " track points." << std::endl;

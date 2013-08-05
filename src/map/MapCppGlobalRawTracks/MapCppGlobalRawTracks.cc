@@ -153,10 +153,11 @@ std::string MapCppGlobalRawTracks::process(std::string run_data_string) {
   CppJsonSpillConverter serialize;
   Json::FastWriter writer;
   std::string output = writer.write(*serialize(run_data));
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
             << "Output: " << std::endl
             << output << std::endl;
-
+  */
   delete run_data;
 
   return output;
@@ -180,24 +181,28 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
 
   // Load TOF and SciFi tracks from the appropriate recon event trees
   GlobalDS::TrackPArray tracks;
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
             << "Loading TOF track..." << std::endl;
+  */
   LoadTOFTrack(recon_event, tracks);
   size_t tof_track_count = tracks.size();
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
             << "Loaded " << tof_track_count << " TOF tracks." << std::endl;
-
+  */
   /*
   GlobalDS::TrackPArray sci_fi_tracks;
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
             << "Loading SciFi track..." << std::endl;
   */
   LoadSciFiTrack(recon_event, tracks);
+  /*
   size_t sci_fi_track_count = tracks.size() - tof_track_count;
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
             << "Loaded " << sci_fi_track_count << " SciFi tracks."
             << std::endl;
-
+  */
   // FIXME(Lane) currently assuming only one track...
   if (tracks.size() > 0) {
     tracks[0]->SortTrackPointsByZ();
@@ -223,11 +228,12 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const std::vector<TOFSpacePoint> tof2_space_points
     = space_point_events.GetTOF2SpacePointArray();
   
-
+  /*
   std::cout << "DEBUG LoadTOFTrack: space points in TOF0: "
             << tof0_space_points.size() << "\tTOF1: "
             << tof1_space_points.size() << "\tTOF2: "
             << tof2_space_points.size() << std::endl;
+  */
   if (tof0_space_points.size() != tof1_space_points.size()) {
     std::cout << "DEBUG LoadTOFTrack: track has different number of "
               << "space points in TOF0 (" << tof0_space_points.size() << ")"
@@ -266,11 +272,13 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     track_points.push_back(track_point);
 
     last_position[0] = track_point->get_position();
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "\t TOF0 4-position: (" << last_position[0].T()
               << ", " << last_position[0].X()
               << ", " << last_position[0].Y() << ", " << last_position[0].Z()
               << ")" << std::endl;
+    */
   }
 
   MAUS::recon::global::DetectorMap::const_iterator tof1_mapping
@@ -290,11 +298,13 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     track_points.push_back(track_point);
 
     last_position[1] = track_point->get_position();
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "\t TOF1 4-position: (" << last_position[1].T()
               << ", " << last_position[1].X()
               << ", " << last_position[1].Y() << ", " << last_position[1].Z()
               << ")" << std::endl;
+    */
   }
   deltas[0] = last_position[1] - last_position[0];
   deltas[1] = deltas[0];
@@ -316,11 +326,13 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     track_points.push_back(track_point);
 
     last_position[2] = track_point->get_position();
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "\t TOF2 4-position: (" << last_position[2].T()
               << ", " << last_position[2].X()
               << ", " << last_position[2].Y() << ", " << last_position[2].Z()
               << ")" << std::endl;
+    */
   }
   deltas[2] = last_position[2] - last_position[1];
 
@@ -328,17 +340,23 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   TLorentzVector momenta[3];
   for (size_t index = 0; index < 3; ++index) {
     double delta_x = deltas[index].X();
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "delta_x: " << delta_x << std::endl;
+    */
     double delta_y = deltas[index].Y();
     double delta_z = deltas[index].Z();
+    /*
     double delta_t = deltas[index].T();
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "delta_t: " << delta_t << std::endl;
+    */
+    /*
     double delta_l = std::sqrt(delta_x*delta_x + delta_y*delta_y
                                 + delta_z*delta_z);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "delta_l: " << delta_l << std::endl;
+    */
     /*
     double beta = delta_l / delta_t / ::CLHEP::c_light;
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
@@ -359,10 +377,11 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
       = simulator->GetReferenceParticle();
     const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
+    /*
     double mass = Particle::GetInstance().GetMass(particle_id);
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "mass: " << mass << std::endl;
-
+    */
     /*
     double energy = FindEnergy(mass, delta_z, delta_t);
     double beta = ::sqrt(1 - ::pow(mass / energy, 2));
@@ -391,12 +410,14 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
                                     reference_pgparticle.py,
                                     reference_pgparticle.pz,
                                     reference_pgparticle.energy);
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadTOFTrack(): "
               << "Particle: " << Particle::GetInstance().GetName(particle_id)
               << "\t 4-momentum: (" << momenta[index].T()
               << ", " << momenta[index].X()
               << ", " << momenta[index].Y() << ", " << momenta[index].Z()
               << ")" << std::endl;
+    */
   }
 
   // Set each track point's 4-momentum and add to the track
@@ -461,19 +482,25 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
   space_point->set_geometry_path("");
   
   // GetSlaby() gets the number of the slab that is *oriented* in the y
-  // direction (i.e. the one that gives an approximate x coordinate)
-  // and vice versa
+  // direction For TOF0 this is the slab that gives an approximate x coordinate)
+  // and vice versa. For TOF1 and TOF2 it yields the y coordinate.
+  /*
+  std::cout << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint(): "
+            << "Vertical Slab: " << tof_space_point->GetSlaby()
+            << "\tHorizontal Slab: " << tof_space_point->GetSlabx() << std::endl;
+  */
   const double x = slab_width * tof_space_point->GetSlaby() - max_xy;
   const double y = slab_width * tof_space_point->GetSlabx() - max_xy;
   const double t = tof_space_point->GetTime();
   TLorentzVector position(x, y, z, t);
   space_point->set_position(position);
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint(): "
             << "position: (" << space_point->get_position().T() << ","
             << space_point->get_position().X() << ","
             << space_point->get_position().Y() << ","
             << space_point->get_position().Z() << ")" << std::endl;
-
+  */
   dynamic_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
   track_point->set_particle_event(tof_space_point->GetPhysEventNumber());
@@ -508,8 +535,10 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
   const double slab_length = 25.;  // mm
   const double drift_length = delta_z - 2 * slab_length;
   const double beta_0 = delta_z / actual_delta_t / ::CLHEP::c_light;
+  /*
   std::cout << "DEBUG FindEnergy: delta_z: " << delta_z << "\tdelta_t: "
             << actual_delta_t << std::endl;
+  */
   const double gamma_0 = 1. / std::sqrt(1 - beta_0*beta_0);
   const double E_0 = gamma_0 * mass;
   double E = E_0;
@@ -520,8 +549,10 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
   if (beta_0 > 1) {
     E = E_max;
   }
+  /*
   std::cout << "DEBUG FindEnergy: beta0: " << beta_0 << "\tE0: " << E
             << std::endl;
+  */
   bool energy_too_low = false;
 
   for (size_t iteration = 0; iteration < 10; ++iteration) {
@@ -536,6 +567,7 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
         energy_too_low = true;
       }
     }
+    /*
     std::cout << "DEBUG FindEnergy: beta[0] = " << beta[0]
               << "\tbeta[1] = " << beta[1]
               << "\tbeta[2] = " << beta[2]
@@ -548,14 +580,15 @@ double MapCppGlobalRawTracks::FindEnergy(const double mass,
               << "\tdE[1] = " << TOFSlabEnergyLoss(beta[1], mass)
               << "\tdE[2] = " << TOFSlabEnergyLoss(beta[2], mass)
               << "\tdE[3] = " << TOFSlabEnergyLoss(beta[3], mass) << std::endl;
-
+    */
     delta_t[0] = slab_length / ((beta[0] + beta[1]) / 2) / ::CLHEP::c_light;
     delta_t[1] = drift_length / beta[1] / ::CLHEP::c_light;
     delta_t[2] = slab_length / ((beta[1] + beta[2]) / 2) / ::CLHEP::c_light;
+    /*
     std::cout << "DEBUG FindEnergy: delta_t[0] = " << delta_t[0]
               << "\tdelta_t[1] = " << delta_t[1]
               << "\tdelta_t[2] = " << delta_t[2] << std::endl;
-
+    */
     double total_delta_t = 0.;
     for (size_t index = 0; index < 3; ++index) {
       total_delta_t += delta_t[index];
@@ -673,9 +706,11 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
 
     const int tracker = (*space_point)->get_tracker();
     const int station = (*space_point)->get_station();
+    /*
     std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrackPoint(): "
               << "\tTracker: " << tracker
               << "\tStation: " << station << std::endl;
+    */
     const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
         GlobalDS::kTracker0 + 6 * tracker + station);
     MAUS::recon::global::DetectorMap::const_iterator detector_mapping
@@ -690,12 +725,12 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
                    "MapCppGlobalRawTracks::LoadSciFiTrack()"));
     }
     const Detector& detector = detector_mapping->second;
-
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrackPoint(): "
             << "\tSciFi Space Point:" << std::endl
             << "\tDetector: " << detector_id
             << "\tStation: " << station << std::endl;
-
+    */
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     PopulateSciFiTrackPoint(detector, space_point, track_point);
     track->AddTrackPoint(track_point);
@@ -717,7 +752,7 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
 void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
     const MAUS::recon::global::Detector & detector,
     const SciFiSpacePointPArray::const_iterator & scifi_space_point,
-    MAUS::DataStructure::Global::TrackPoint * track_point) {
+    GlobalDS::TrackPoint * track_point) {
   GlobalDS::SpacePoint * space_point = new GlobalDS::SpacePoint();
 
   space_point->set_detector(detector.id());
@@ -735,7 +770,12 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   // TODO(Lane) need tracker timestamp that is synched with TOF timestamp
   // const double time = (*scifi_space_point)->get_time();
   const double time = 0.;
-  TLorentzVector four_position(position.x(), position.y(), z, time);
+  TLorentzVector four_position;
+  if (detector.id() <= GlobalDS::kTracker0_5) {
+    four_position = TLorentzVector(-position.x(), position.y(), z, time);
+  } else {
+    four_position = TLorentzVector(position.x(), position.y(), z, time);
+  }
   space_point->set_position(four_position);
 
   // FIXME(Lane) Replace MC momentum with official track momentum when that
@@ -748,8 +788,10 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
       ++cluster) {
     //time += (*cluster)->get_time();
     ThreeVector true_momentum = (*cluster)->get_true_momentum();
-std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
-        << "\tTrue Momentum: " << true_momentum << std::endl;
+    /*
+    std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
+            << "\tTrue Momentum: " << true_momentum << std::endl;
+    */
     momentum += true_momentum;
   }
   //time /= clusters.size();
@@ -760,9 +802,10 @@ std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
   momentum.setX(momentum.x() + ::CLHEP::RandGauss::shoot(0., 3.));
   momentum.setY(momentum.y() + ::CLHEP::RandGauss::shoot(0., 3.));
   momentum.setZ(momentum.z() + ::CLHEP::RandGauss::shoot(0., 20.));
-std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
-        << "\tSmeared Momentum: " << momentum << std::endl;
-
+  /*
+  std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
+          << "\tSmeared Momentum: " << momentum << std::endl;
+  */
   dynamic_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
 
@@ -780,7 +823,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
   TLorentzVector four_momentum(
     momentum.x(), momentum.y(), momentum.z(), energy);
   track_point->set_momentum(four_momentum);
-
+  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint(): "
             << "\tSciFi Space Point:" << std::endl
             << std::setprecision(10)
@@ -791,7 +834,7 @@ std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrack(): " << std::endl
             << "\tMomentum: (" << four_momentum.Px() << ", "
             << four_momentum.Py() << ", " << four_momentum.Pz() << ", "
             << four_momentum.Pt() << ")" << std::endl;
-
+  */
   CovarianceMatrix covariances = detector.uncertainties();
   TLorentzVector position_errors(::sqrt(covariances(3, 3)),
                                   ::sqrt(covariances(5, 5)),
