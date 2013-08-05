@@ -1,4 +1,4 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 # 
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # pylint: disable=C0103
 
 """
-Test maus_cpp.optics_model
+Test maus_cpp.covariance_matrix
 """
 
 import unittest
@@ -28,21 +28,21 @@ from maus_cpp import covariance_matrix
 from maus_cpp.covariance_matrix import CovarianceMatrix
 from xboa.Bunch import Bunch
 
-class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
-    """Test maus_cpp.optics_model"""
+class CovarianceMatrixTestCase(unittest.TestCase): # pylint: disable=R0904
+    """Test maus_cpp.covariance_matrix"""
     def setUp(self):
         """does nothing"""
         pass
 
     def test_init(self):
-        """Test maus_cpp.optics_model.__init__() and deallocation"""
+        """Test maus_cpp.covariance_matrix.__init__() and deallocation"""
         cov = CovarianceMatrix()
         for j in range(1, 7):
             for i in range(1, 7):
                 self.assertEqual(0., cov.get_element(i, j))
  
     def test_covariance_matrix(self):
-        """Test maus_cpp.optics_model.__init__() and deallocation"""
+        """Test maus_cpp.covariance_matrix.__init__() and deallocation"""
         test_data = [[j*i for j in range(1, 7)] for i in range(1, 7)]
         test_array = numpy.array(test_data)
         try:

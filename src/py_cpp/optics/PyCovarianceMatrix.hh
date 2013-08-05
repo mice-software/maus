@@ -84,25 +84,28 @@ static void set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
  *
  *  returns a PyCovarianceMatrix* (cast as a PyObject*); caller owns this memory
  */
-PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
+static PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems);
 
 /** _init initialises an allocated PyCovarianceMatrix object
  *
  *  @param self an initialised PyCovarianceMatrix* cast as a PyObject*; caller
  *         owns this memory
- *  @param args should be PyTuple with one element, a 6*6 numpy matrix
+ *  @param args not used
  *  @param kwds not used
  *
  *  @returns 0 on success; -1 on failure
  */
-int _init(PyObject* self, PyObject *args, PyObject *kwds);
+static int _init(PyObject* self, PyObject *args, PyObject *kwds);
 
 /** deallocate memory
  *
  *  @params self an initialised PyCovarianceMatrix*; memory will be freed by
  *          this function
  */
-void _free(PyCovarianceMatrix * self);
+static void _free(PyCovarianceMatrix * self);
+
+/** Return a Python string representation of the PyCovarianceMatrix */
+static PyObject* _str(PyObject * self);
 
 /** Initialise covariance_matrix module
  *
@@ -129,7 +132,7 @@ static PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds);
  *
  *  \returns PyCovarianceMatrix cast to a PyObject - caller owns this memory
  */
-PyObject* create_from_penn_parameters
+static PyObject* create_from_penn_parameters
                                (PyObject *self, PyObject *args, PyObject *kwds);
 
 /** Create a PyCovarianceMatrix from twiss parameters
@@ -140,8 +143,20 @@ PyObject* create_from_penn_parameters
  *
  *  \returns PyCovarianceMatrix cast to a PyObject - caller owns this memory
  */
-PyObject* create_from_twiss_parameters
+static PyObject* create_from_twiss_parameters
                                (PyObject *self, PyObject *args, PyObject *kwds);
+
+/** Create a PyCovarianceMatrix from a numpy matrix
+ *  
+ *  \param self - not used
+ *  \param args - value arguments
+ *  \param kwds - keyword arguments; takes one keywd, matrix which is a 6x6
+ *                numpy matrix
+ *
+ *  \returns PyCovarianceMatrix cast to a PyObject - caller owns this memory
+ */
+static PyObject* create_from_matrix
+                               (PyObject* self, PyObject *args, PyObject *kwds);
 
 /** Create a PyCovarianceMatrix from a numpy matrix
  *
@@ -153,7 +168,7 @@ PyObject* create_from_twiss_parameters
  *
  *  \throws MAUS::Exception if array has wrong shape or is not a numpy_array
  */
-CovarianceMatrix* create_from_numpy_matrix(PyObject *numpy_array);
+static CovarianceMatrix* create_from_numpy_matrix(PyObject *numpy_array);
 }
 }
 

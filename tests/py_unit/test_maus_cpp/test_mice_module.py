@@ -1,0 +1,156 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+# pylint: disable=C0103
+
+"""
+Test maus_cpp.mice_module
+"""
+
+import unittest
+import os
+
+import maus_cpp
+from maus_cpp.mice_module import MiceModule
+
+class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
+    """
+    Test maus_cpp.mice_module
+    """
+    def setUp(self):
+        """open test mice module"""
+        self.test = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_py.dat")
+        self.mod = MiceModule(file_name=self.test)
+
+    def test_init(self):
+        """check initialise mice module"""
+        try:
+            mod = MiceModule()
+            self.assertTrue(False, "Should have thrown an error")
+        except TypeError:
+            pass
+        try:
+            mod = MiceModule(file_name="Test.dat", bob="")
+            self.assertTrue(False, "Should have thrown an error")
+        except TypeError:
+            pass
+        mod = MiceModule(file_name="Test.dat")
+
+    def test_get_property(self):
+        """Test mice_module get property"""
+        self.mod.get_property(name="Str", type="String")
+        try:
+            self.mod.get_property("Str", "Not_String")
+            self.assertTrue(False, "Should have thrown typeerror")
+        except TypeError:
+            pass
+
+    def test_get_property_string(self):
+        """Test mice_module get property string"""
+        self.assertEqual(self.mod.get_property("Str", "StrinG"),
+                         "Galactic")
+        try:
+            self.mod.get_property("str", "String")
+            self.assertTrue(False, "Should have thrown keyerror")
+        except KeyError:
+            pass
+
+    def test_get_property_double(self):
+        """Test mice_module get property double"""
+        self.assertAlmostEqual(self.mod.get_property("Dbl", "DoublE"),
+                               100.)
+        try:
+            self.mod.get_property("dbl", "DoublE")
+            self.assertTrue(False, "Should have thrown keyerror")
+        except KeyError:
+            pass
+
+    def test_get_property_bool(self):
+        """Test mice_module get property bool"""
+        self.assertEqual(self.mod.get_property("BoolTrue", "BooL"),
+                         True)
+        self.assertEqual(self.mod.get_property("BoolFalse", "bOOl"),
+                         False)
+        try:
+            self.mod.get_property("booltrue", "bOOl")
+            self.assertTrue(False, "Should have thrown keyerror")
+        except KeyError:
+            pass
+
+    def test_get_property_int(self):
+        """Test mice_module get property int"""
+        self.assertEqual(self.mod.get_property("Int", "InT"),
+                         -1)
+        try:
+            self.mod.get_property("INT", "int")
+            self.assertTrue(False, "Should have thrown keyerror")
+        except KeyError:
+            pass
+
+    def test_get_property_hep3vector(self):
+        """Test mice_module get property hep3vector"""
+        h3v = self.mod.get_property("H3v", "HEP3VECTOR")
+        self.assertAlmostEqual(h3v["x"], 1.)
+        self.assertAlmostEqual(h3v["y"], 2.)
+        self.assertAlmostEqual(h3v["z"], 3.)
+        try:
+            self.mod.get_property("h3v", "HEP3VECTOR")
+            self.assertTrue(False, "Should have thrown keyerror")
+        except KeyError:
+            pass
+
+    def test_set_property(self):
+        """Test mice_module set property"""
+        self.mod.set_property(name="SET", type="StrinG", value="XYZ")
+        self.assertEqual(self.mod.get_property("SET", "string"), "XYZ")
+        try:
+            self.mod.get_property("Str", "Not_String")
+            self.assertTrue(False, "Should have thrown typeerror")
+        except TypeError:
+            pass
+        try:
+            self.mod.set_property("SET", "string", 1.)
+        except TypeError:
+            pass
+        self.mod.set_property("SET", "bool", 1)
+        self.assertTrue(self.mod.get_property("SET", "bool"))
+        self.mod.set_property("SET", "bool", 0)
+        self.assertFalse(self.mod.get_property("SET", "bool"))
+      
+    def test_set_property_hep3vector(self):
+        """Test mice_module set property for hep3vectors"""
+        test_in = {"x":1., "y":2., "z":3.}
+        self.mod.set_property(name="h3v_a", type="hep3vector", value=test_in)
+        test_out = self.mod.get_property(name="h3v_a", type="hEP3vectOR") 
+        for key, value in test_out.iteritems():
+            self.assertAlmostEqual(test_in[key], test_out[key])
+        try:
+            self.mod.set_property(name="h3v_b", type="hEP3vectOR",
+                                  value={"x":1., "y":1.})
+            self.assertTrue(False)
+        except KeyError:
+            pass
+        try:
+            self.mod.set_property(name="h3v_a", type="hEP3vectOR",
+                                  value={"x":"a", "y":1., "z":1.})
+            self.assertTrue(False)
+        except TypeError:
+            pass
+
+
+
+if __name__ == "__main__":
+    unittest.main()
+

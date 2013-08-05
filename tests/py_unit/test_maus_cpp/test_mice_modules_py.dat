@@ -1,0 +1,10 @@
+Configuration Test
+{
+  PropertyBool       BoolTrue  True
+  PropertyBool       BoolFalse False
+  PropertyString     Str       Galactic
+  PropertyDouble     Dbl       100.0 mm
+  PropertyHep3Vector H3v       1. 2. 3 mm
+  PropertyInt        Int       -1
+}
+

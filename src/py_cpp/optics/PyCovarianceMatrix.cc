@@ -136,14 +136,11 @@ static PyObject* _str(PyObject * self) {
     return PyString_FromString(buffer);
 }
 
-
-
 const char* module_docstring =
-  "covariance_matrix module; merely a place holder for CovarianceMatrix class";
+  "covariance_matrix module for the CovarianceMatrix class";
 
 const char* class_docstring =
   "CovarianceMatrix provides bindings for beam ellipses.";
-
 
 static PyMemberDef _members[] = {
 {NULL}
