@@ -214,6 +214,7 @@ class PatternRecognition {
     bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
                       std::vector<double> &true_dphi);
 
+    /** Test version of find_n_turns, not for normal use */
     bool find_n_turns2(const std::vector<double> &dz, const std::vector<double> &dphi,
                        std::vector<double> &true_dphi);
 

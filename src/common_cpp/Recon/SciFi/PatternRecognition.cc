@@ -768,14 +768,15 @@ void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
 
 bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts) {
 
-  double dT_first, dT_last;
+  double dT_first = 0.0;
+  double dT_last = 0.0;
   /* TODO Waiting for Spacepoints to have time added ****
   double dT_first = good_spnts.front()->get_time();
   double dT_last  = good_spnts.back()->get_time();
   */
   double dZ = fabs(good_spnts.back()->get_position().z() - good_spnts.front()->get_position().z());
 
-  double dS;
+  double dS = 0.0;
   if ( _straight_pr_on && !_helical_pr_on ) // If you are ONLY looking at straight tracks
     dS = dZ;
   else if ( _helical_pr_on ) // if you are trying to reconstruc EITHER straight OR helical tracks
