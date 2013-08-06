@@ -45,15 +45,15 @@ SciFiDigit& SciFiDigit::operator=(const SciFiDigit& _scifidigit) {
     if (this == &_scifidigit) {
         return *this;
     }
-    _spill = _scifidigit._spill;
-    _event = _scifidigit._event;
+    _spill   = _scifidigit._spill;
+    _event   = _scifidigit._event;
     _tracker = _scifidigit._tracker;
     _station = _scifidigit._station;
-    _plane = _scifidigit._plane;
+    _plane   = _scifidigit._plane;
     _channel = _scifidigit._channel;
-    _npe = _scifidigit._npe;
-    _time = _scifidigit._time;
-    _used = _scifidigit._used;
+    _npe     = _scifidigit._npe;
+    _time    = _scifidigit._time;
+    _used    = _scifidigit._used;
     return *this;
 }
 

@@ -193,6 +193,33 @@ TEST_F(SciFiSpacePointRecTest, test_make_cluster_container) {
   }
 }
 
+TEST_F(SciFiSpacePointRecTest, test_crossing_position) {
+  // Calculate the crossing position of two clusters.
+  // The expected crossing coordinates are:
+  double expected_x = 7.;
+  double expected_y = 10.;
+  double expected_z = 0.;
+
+  SciFiCluster* view_X = new SciFiCluster();
+  ThreeVector dir1(0., 1., 0.);
+  ThreeVector pos1(expected_x, 0., expected_z);
+  view_X->set_direction(dir1);
+  view_X->set_position(pos1);
+
+  SciFiCluster* view_W = new SciFiCluster();
+  ThreeVector dir2(1., 0., 0.);
+  ThreeVector pos2(0., expected_y, expected_z);
+  view_W->set_direction(dir2);
+  view_W->set_position(pos2);
+
+  SciFiSpacePointRec a_test;
+  ThreeVector intersection = a_test.crossing_pos(view_X, view_W);
+
+  EXPECT_EQ(expected_x, intersection.x());
+  EXPECT_EQ(expected_y, intersection.y());
+  EXPECT_EQ(expected_z, intersection.z());
+}
+
 /*
 TEST_F(SciFiSpacePointRecTest, test_builds) {
   SciFiCluster* c1 = new SciFiCluster();

@@ -1,0 +1,61 @@
+\section{Kuno's Conjecture}
+\label{App1Kuno}
+
+For a given triplet space-point, the sum of the channel number of each
+cluster will be a constant. 
+
+To see how this comes about, consider the coordinate system defined by
+the $u$, $v$ and $w$ axes in the station reference frame shown in
+figure \ref{Fig:Stnuvw}.
+The $u$, $v$ and $w$ coordinates my be written in terms of the polar
+coordinates $(r, \phi)$ as follows:
+\begin{eqnarray}
+  u & = & r \cos [ \phi ]                                       \\
+  v & = & r \cos \left[ \frac{2\pi}{3}-\phi \right]             \\
+  w & = & r \cos \left[ \frac{4\pi}{3}-\phi \right]
+\end{eqnarray}
+The sum $u+v+w$ may now be written: 
+\begin{eqnarray}
+  u + v + w & = & r \left\{
+                      \cos \phi  + 
+                      \cos \left[ \frac{2\pi}{3}-\phi \right] + 
+                      \cos \left[ \frac{4\pi}{3}-\phi \right] 
+                    \right\}                                     \\
+            & = & r \left\{
+                      \cos \phi + 
+                      \left[ 
+                        \cos \left( \frac{2 \pi}{3} \right) \cos \phi +
+                        \sin \left( \frac{2 \pi}{3} \right) \sin \phi +
+                      \right] +        \right.                   \\
+            &  &  ~ \left. \left[ 
+                        \cos \left(-\frac{2 \pi}{3} \right) \cos \phi +
+                        \sin \left(-\frac{2 \pi}{3} \right) \sin \phi +
+                      \right] 
+                    \right\}                                    \\
+            & = & r \left\{
+                      \cos \phi + 
+                      2 \cos \left( \frac{2 \pi}{3} \right) \cos \phi
+                    \right\}                                     \\
+            & = & r \left\{
+                      \cos \phi +
+                      \left[ - \cos \phi \right]
+                    \right\}                                     \\
+            & = & 0
+\end{eqnarray}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]%
+      {11-Appendix-1-Kuno-conjecture/Figures/kuno.eps}
+  \end{center}
+  \caption{
+    Schematic representation of a point and the three plane 
+    orientations.
+  }
+  \label{Fig:Stnuvw}
+\end{figure}
+
+If the sum is performed using the fibre numbers for the channels hit,
+the sum of the the three views will equal the sum of the
+central-fibre numbers, i.e. if the central fibre numbers of each of
+the $u$, $v$ and $w$ doublet-layers is $106.5$, then the sum of
+channel numbers will be $106.5+106.5+105.5 = 318.5$. 
