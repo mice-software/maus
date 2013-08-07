@@ -413,10 +413,10 @@ class PatternRecognition {
     static const double _circ_res_cut = 5;      /** Road cut for circle fit in mm */
     static const double _R_res_cut = 150.0;     /** Road cut for circle radius in mm */
     static const double _chisq_cut = 15;        /** Cut on the chi^2 of the least sqs fit in mm */
-    static const double _sz_chisq_cut = 20.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
+    static const double _sz_chisq_cut = 4.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
     static const double _helix_chisq_cut = 100; /** Cut on the helix chi^2 in mm (not used) */
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .5;             /** Need to decide on appropriate cut here!!! */
+    static const double _AB_cut = .15;             /** Need to decide on appropriate cut here!!! */
     static const double _active_diameter = 300.0; /** Active volume diameter a tracker in mm */
     bool _helical_pr_on;                          /** Flag to turn on helical pr (0 off, 1 on) */
     bool _straight_pr_on;                         /** Flag to turn on straight pr (0 off, 1 on) */

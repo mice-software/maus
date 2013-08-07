@@ -663,26 +663,42 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
                                       std::vector<double> &true_dphi) {
   true_dphi = dphi;
 
-  for (size_t i = 0; i < (dz.size() - 1); ++i) { // Loop over the separation between stations
+  // Setup the a vector holding the values of n to try
+  int myints[] = {0, -1, 1, -2, 2, -3, 3};
+  std::vector<int> n_values(myints, myints + sizeof(myints) / sizeof(int));
+
+  for (size_t i = 1; i < dz.size(); ++i) { // Loop over the separation between stations
     bool found = false;
     int true_n = -1;
     int true_m = -1;
-    for (int n = 0; n < _n_limit; ++n) {
+    for (size_t n = 0; n < n_values.size(); ++n) {
       if ( found ) break;
-      for (int m = 0; m < _m_limit; ++m) {
+      for (size_t m = 0; m < n_values.size(); ++m) {
         // Remainder should be ~0 if correct n_ji and m are found
-        double remainder = fabs((((true_dphi[i+1] + 2*m*CLHEP::pi) / (true_dphi[i] + 2*n*CLHEP::pi))
-                                   - (dz[i+1] / dz[i])) / (dz[i+1] / dz[i]));
-        // std::cerr << "find_n_turns: dz_i = " << dz[i] << ", dphi_i = " << dphi[i];
-        // std::cerr << ", true_dphi_i = " << true_dphi[i];
-        // std::cerr << ", dz_j = " << dz[i+1] << ", dphi_j = " << dphi[i+1];
-        // std::cerr << ", true_dphi_j = " << true_dphi[i+1];
-        // std::cerr << ", m = " << m << ", n = " << n << ", remainder = " << remainder;
+        double remainder = 10.0;
+        if ( i == 1 ) {
+          remainder = fabs((((dphi[i] + 2*n_values[m]*CLHEP::pi)
+                              / (dphi[0] + 2*n_values[n]*CLHEP::pi))
+                              - (dz[i] / dz[0])) / (dz[i] / dz[0]));
+        } else {
+          remainder = fabs((((dphi[i] + 2*n_values[m]*CLHEP::pi) / (true_dphi[0]))
+                               - (dz[i] / dz[0])) / (dz[i] / dz[0]));
+        }
+        /*
+        std::cerr << "find_n_turns: i = " << i
+             << ", m = " << n_values[m] << ", n = " << n_values[n]
+             << ", dz_i = " << dz[i] << ", dz ratio = " << dz[i] / dz[0]
+             << ", dphi_i = " << dphi[i] << ", dphi ratio = " << dphi[i] / dphi[0];
+             << ", corrected dphi_i = " << dphi[i] + 2*n_values[m]*CLHEP::pi
+             << ", corrected dphi ratio = " << (dphi[i] + 2*n_values[m]*CLHEP::pi) / (true_dphi[0])
+             << ", remainder = " << remainder;
+        */
+
         if ( remainder < _AB_cut ) {
           // std::cerr << ", passed\n";
           found = true;
-          true_n = n;
-          true_m = m;
+          true_n = n_values[n];
+          true_m = n_values[m];
           break;
         } else {
           // std::cerr << ", failed\n";
@@ -690,8 +706,12 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
       }
     }
     if ( found ) { // If we suceeding in finding corrections which pass the cut
-      if ( i == 0 ) true_dphi[i] = dphi[i] + 2*true_n*CLHEP::pi; // Only correct old on first pass
-      true_dphi[i+1] = dphi[i+1] + 2*true_m*CLHEP::pi;
+      if ( i == 1 ) {
+        true_dphi[0] = dphi[0] + 2*true_n*CLHEP::pi; // Only correct old on first pass
+        // std::cerr << "find_n_turns: true_dphi[0] = " << true_dphi[0] << std::endl;
+      }
+      true_dphi[i] = dphi[i] + 2*true_m*CLHEP::pi;
+      // std::cerr << "find_n_turns: true_dphi[i] = " << true_dphi[i] << std::endl;
     } else { // Abort finding dsdz if we fail to find any single n turns correction
       return false;
     }
