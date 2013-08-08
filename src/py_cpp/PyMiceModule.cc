@@ -43,14 +43,17 @@
 namespace MAUS {
 namespace PyMiceModule {
 
-MiceModule* C_API::get_mice_module(PyObject* self) {
-    PyMiceModule* py_mod = reinterpret_cast<PyMiceModule*>(self);
-    if (py_mod == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to resolve self as PyMiceModule");
-        return NULL;
-    }
-    return py_mod->mod;   
+
+std::string get_name_docstring =
+std::string("Get the name of this MiceModule\n\n")+
+std::string("  Takes no arguments.\n")+
+std::string("Returns a python string containing the module name.");
+
+PyObject *get_name(PyObject* self, PyObject *args, PyObject *kwds) {
+    MiceModule* mod = C_API::get_mice_module(self);
+    PyObject* py_string = PyString_FromString(mod->name().c_str());
+    Py_INCREF(py_string);
+    return py_string;
 }
 
 std::string get_property_docstring =
@@ -267,6 +270,87 @@ PyObject *set_property(PyObject* self, PyObject *args, PyObject *kwds) {
     return Py_None;
 }
 
+std::string get_children_docstring =
+std::string("Get child modules of this MiceModule\n\n")+
+std::string("  Takes no arguments.\n")+
+std::string("Returns a python list containing a deep copy of all child\n")+
+std::string("MiceModules.");
+
+PyObject *get_children(PyObject* self, PyObject *args, PyObject *kwds) {
+    MiceModule* mod = C_API::get_mice_module(self);
+    std::vector<MiceModule*> daughter_list = mod->allDaughters();    
+    PyObject* py_list = PyList_New(daughter_list.size());
+    Py_INCREF(py_list);
+    for (size_t i = 0; i < daughter_list.size(); ++i) {
+        if (daughter_list[i] == NULL) {
+            PyErr_SetString(PyExc_RuntimeError, "Could not find MiceModule");
+            return NULL;
+        }
+        PyObject* py_mod = C_API::create_empty_module();
+        Py_INCREF(py_mod);
+        MiceModule* new_child = MiceModule::deepCopy(*daughter_list[i], false);
+        C_API::set_mice_module(py_mod, new_child);
+        PyList_SetItem(py_list, i, py_mod);
+    }
+    return py_list;
+}
+
+
+bool will_circle(const MiceModule* ancestor, const MiceModule* child) {
+    if (ancestor == NULL)
+        return false;
+    else if (ancestor == child)
+        return true;
+    else
+        return will_circle(ancestor->mother(), child);
+}
+
+std::string set_children_docstring =
+std::string("Set child modules of this MiceModule\n\n")+
+std::string("  - children (list) list of MiceModule objects. The existing\n")+
+std::string("  children will be replaced by deep copies of those in the\n")+
+std::string("  list. The parent module of the children is updated to this\n")+
+std::string("  MiceModule.\n")+
+std::string("Returns None.");
+
+PyObject *set_children(PyObject* self, PyObject *args, PyObject *kwds) {
+    MiceModule* mod = C_API::get_mice_module(self);
+    if (mod == NULL)
+        return NULL;
+
+    PyObject* py_children = NULL;
+    static char *kwlist[] = {(char*)"children", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &py_children)) {
+        return NULL;
+    }
+    if (!PyList_Check(py_children)) {
+        PyErr_SetString(PyExc_TypeError, "Argument should be a list");
+        return NULL;
+    }
+    std::vector<MiceModule*> children;
+    for (int i = 0; i < PyList_Size(py_children); ++i) {
+        PyObject* py_child = PyList_GetItem(py_children, i);
+        MiceModule* child = C_API::get_mice_module(py_child);
+        if (child == NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                            "List object was not a MiceModule");
+            return NULL;  // no memory allocated and module unchanged
+        }
+        children.push_back(MiceModule::deepCopy(*child, false));
+    }
+    while (mod->allDaughters().size() > 0) {
+        mod->allDaughters()[0]->setMother(NULL);
+        delete mod->allDaughters()[0];
+        mod->removeDaughter(mod->allDaughters()[0]);
+    }
+    for (size_t i = 0; i < children.size(); ++i) {
+        mod->addDaughter(children[i]);
+        children[i]->setMother(mod);
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
 
 PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
     void* void_mod = malloc(sizeof(PyMiceModule));
@@ -307,7 +391,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
 
 void _free(PyMiceModule * self) {
     if (self != NULL) {
-        if (self->mod != NULL)
+        if (self->mod != NULL && self->mod->mother() == NULL)
             free(self->mod);
         free(self);
     }
@@ -328,10 +412,16 @@ PyObject* _str(PyObject * self) {
 const char* module_docstring =
   "mice_module for geometry and field definitions including MiceModule class";
 
-std::string class_docstring_str = 
+std::string class_docstring_str =
 std::string("MiceModule provides bindings for defining geometries.\n\n")+
-std::string("For guidance on setting up a MiceModule, see MAUS\n")+
-std::string("documentation chapter \"How to Define a Geometry\".\n")+
+std::string("\n")+
+std::string("MiceModules are representations of the MAUS geometry and.\n")+
+std::string("fields. They are structured as a tree; for now the tree is\n")+
+std::string("mono-directional. Each level of the tree holds properties that\n")+
+std::string("reflect the geometry objects at that level and child modules\n")+
+std::string("that can be used to access lower level geometry objects. \n")+
+std::string("\n")+
+std::string("See MAUS documentation chapter \"How to Define a Geometry\".\n")+
 std::string("\n")+
 std::string("__init__(file_name)\n")+
 std::string("  Constructor for a new MiceModule.\n")+
@@ -348,6 +438,12 @@ static PyMemberDef _members[] = {
 };
 
 static PyMethodDef _methods[] = {
+{"get_name", (PyCFunction)get_name,
+ METH_VARARGS|METH_KEYWORDS, get_name_docstring.c_str()},
+{"set_children", (PyCFunction)set_children,
+ METH_VARARGS|METH_KEYWORDS, set_children_docstring.c_str()},
+{"get_children", (PyCFunction)get_children,
+ METH_VARARGS|METH_KEYWORDS, get_children_docstring.c_str()},
 {"get_property", (PyCFunction)get_property,
  METH_VARARGS|METH_KEYWORDS, get_property_docstring.c_str()},
 {"set_property", (PyCFunction)set_property,
@@ -368,13 +464,13 @@ static PyTypeObject PyMiceModuleType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                      /*tp_repr*/
+    _str,                      /*tp_repr*/
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    0,                      /*tp_str*/
+    _str,                      /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -409,23 +505,54 @@ PyMODINIT_FUNC initmice_module(void) {
     if (PyType_Ready(&PyMiceModuleType) < 0)
         return;
 
-    PyObject* module = Py_InitModule("mice_module", _keywdarg_methods); //, module_docstring);
+    PyObject* module = Py_InitModule
+                           ("mice_module", _keywdarg_methods);//, module_docstring);
     if (module == NULL) return;
 
     PyTypeObject* mm_type = &PyMiceModuleType;
     Py_INCREF(mm_type);
-    PyModule_AddObject(module, "MiceModule", reinterpret_cast<PyObject*>(mm_type));
+    PyModule_AddObject
+                   (module, "MiceModule", reinterpret_cast<PyObject*>(mm_type));
 
     // C API
-    /*
-    PyObject* mm_dict = PyModule_GetDict(module);
-    PyObject* cem_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_matrix, NULL);
-    PyObject* gcm_c_api = PyCObject_FromVoidPtr((void *)C_API::get_covariance_matrix, NULL);
-    PyObject* scm_c_api = PyCObject_FromVoidPtr((void *)C_API::set_covariance_matrix, NULL);
-    PyDict_SetItemString(cov_mat_dict, "C_API_CREATE_EMPTY_MATRIX_1", cem_c_api);
-    PyDict_SetItemString(cov_mat_dict, "C_API_GET_COVARIANCE_MATRIX_1", gcm_c_api);
-    PyDict_SetItemString(cov_mat_dict, "C_API_SET_COVARIANCE_MATRIX_1", scm_c_api);
-    */
+    PyObject* mod_dict = PyModule_GetDict(module);
+    PyObject* cem_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_module, NULL);
+    PyObject* gmm_c_api = PyCObject_FromVoidPtr((void *)C_API::get_mice_module, NULL);
+    PyObject* smm_c_api = PyCObject_FromVoidPtr((void *)C_API::set_mice_module, NULL);
+    PyDict_SetItemString(mod_dict, "C_API_CREATE_EMPTY_MODULE", cem_c_api);
+    PyDict_SetItemString(mod_dict, "C_API_GET_MICE_MODULE", gmm_c_api);
+    PyDict_SetItemString(mod_dict, "C_API_SET_MICE_MODULE", smm_c_api);
+}
+
+
+PyObject* C_API::create_empty_module() {
+    return _alloc(&PyMiceModuleType, 0);
+}
+
+MiceModule* C_API::get_mice_module(PyObject* self) {
+    if (self->ob_type != &PyMiceModuleType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve object as MiceModule");
+        return NULL;
+    }
+    PyMiceModule* py_mod = reinterpret_cast<PyMiceModule*>(self);
+    return py_mod->mod;
+}
+
+int C_API::set_mice_module(PyObject* self, MiceModule* mod) {
+    if (self->ob_type != &PyMiceModuleType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve object as MiceModule");
+        return 0;
+    }
+    PyMiceModule* py_mod = reinterpret_cast<PyMiceModule*>(self);
+    if (py_mod->mod != NULL) {
+        delete mod;
+    }
+    // I can't keep memory consistent if I allow access back up the tree.
+    mod->setMother(NULL);
+    py_mod->mod = mod;
+    return 1;
 }
 }
 }

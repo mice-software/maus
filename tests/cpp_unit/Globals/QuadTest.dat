@@ -1,0 +1,16 @@
+
+Module QuadTypeQC
+{
+//Physical model
+  PropertyString Material            Fe
+  PropertyHep3Vector Dimensions 1. 1. 1. m
+//Field model
+  PropertyString FieldType           Multipole
+  PropertyInt    Pole                2 //Quad field
+  PropertyDouble FieldStrength       1.    //normalise to 1 T/m
+  PropertyDouble Height              1.    m
+  PropertyDouble Width               1.    m     
+  PropertyDouble Length              10.   m
+  PropertyString EndFieldType        HardEdged
+}
+

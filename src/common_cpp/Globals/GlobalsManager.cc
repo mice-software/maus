@@ -173,6 +173,38 @@ void GlobalsManager::SetRunActionManager(RunActionManager* run_action) {
     }
     Globals::_process->_run_action_manager = run_action;
 }
+
+void GlobalsManager::ResetMCFields() {
+    typedef std::vector<BTField*>::iterator field_iter;
+    // we don't just delete and new as this would kill existing pointers to the
+    // field map (e.g. held by G4 stuff).
+
+    // get hold of the fields
+    BTFieldConstructor* field = reinterpret_cast<BTFieldConstructor*>
+                                   (Globals::_process->GetMCFieldConstructor());
+    BTFieldGroup* mfield =
+       reinterpret_cast<BTFieldGroup*>(field->GetMagneticField());
+    BTFieldGroup* emfield =
+       reinterpret_cast<BTFieldGroup*>(field->GetElectroMagneticField());
+    // clear fields
+    std::vector<BTField*> field_v = mfield->GetFields();
+    for(field_iter it = field_v.begin(); it!=field_v.end(); it++)
+        mfield->Erase((*it), false);
+    field_v = emfield->GetFields();
+    for(field_iter it = field_v.begin();it!=field_v.end(); it++)
+        if(*it != mfield)
+            emfield->Erase((*it), false);
+    // redo some initialisation stuff
+    mfield->Close();
+    emfield->Close();
+    // now rebuild the fields
+    field->BuildFields(Globals::_process->_mc_mods);
+    // and print
+    Squeak::mout(Squeak::debug) << "New fields" << std::endl;
+    field->Print(Squeak::mout(Squeak::debug)); 
+}
+
+
 /*
 void GlobalsManager::SetGeant4Manager
                                            (MAUSGeant4Manager* geant4_manager) {
@@ -180,13 +212,6 @@ void GlobalsManager::SetGeant4Manager
         delete Globals::_process->_maus_geant4_manager;
     }
     Globals::_process->_maus_geant4_manager = geant4_manager;
-}
-
-void GlobalsManager::SetBTFieldConstructor(BTFieldConstructor* field) {
-    if (Globals::GetInstance()->_field_constructor != NULL) {
-        delete Globals::_process->_field_constructor;
-    }
-    Globals::_process->_field_constructor = field;
 }
 
 void GlobalsManager::SetErrorHandler(CppErrorHandler* error_handler) {

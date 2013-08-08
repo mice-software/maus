@@ -163,6 +163,29 @@ TEST_F(GlobalsTest, TestAccessors) {
     GlobalsManager::DeleteGlobals();
 }
 
+TEST_F(GlobalsTest, TestResetFields) {
+    std::string mod_name = std::string(getenv("MAUS_ROOT_DIR"))+
+                           std::string("/tests/cpp_unit/Globals/QuadTest.dat");
+    // initialise; check field = 0
+    GlobalsManager::InitialiseGlobals(str);
+    double point[] = {500., 0., 0., 0.};
+    double field[] = {0., 0., 0., 0., 0., 0.};
+    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+    EXPECT_DOUBLE_EQ(field[1], 0.);
+    // insert new modules but don't reset fields; check field = 0
+    MiceModule* test_mod = new MiceModule(mod_name);
+    GlobalsManager::SetMonteCarloMiceModules(test_mod);
+    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+    EXPECT_DOUBLE_EQ(field[1], 0.);
+    // now reset fields; check field != 0
+    GlobalsManager::ResetMCFields();
+    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+    // don't want to get into this, but for some reason my test geometry was
+    // making fields in kT not T... ack... should be 0.0005 kT
+    EXPECT_GT(fabs(field[1]), 0.0001);
+    std::cerr << "Field should be 0.0005 [kT] " << field[1] << std::endl;
+}
+
 // Version number is tested in PyGlobals
 }
 

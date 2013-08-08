@@ -286,26 +286,26 @@ PyObject* (*create_empty_vector)() = NULL;
 
 int MAUS::PyPhaseSpaceVector::import_PyPhaseSpaceVector() {
   PyObject* psv_module = PyImport_ImportModule("maus_cpp.phase_space_vector");
-  if(psv_module == NULL) {
+  if (psv_module == NULL) {
       return 0;
   } else {
     PyObject *psv_dict  = PyModule_GetDict(psv_module);
 
     PyObject* gpsv_c_api = PyDict_GetItemString(psv_dict,
                                                "C_API_GET_PHASE_SPACE_VECTOR");
-    void* gpsv_void = (void*)PyCObject_AsVoidPtr(gpsv_c_api);
+    void* gpsv_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(gpsv_c_api));
     PyPhaseSpaceVector::get_phase_space_vector =
                   reinterpret_cast<PhaseSpaceVector* (*)(PyObject*)>(gpsv_void);
 
     PyObject* spsv_c_api = PyDict_GetItemString(psv_dict,
                                                "C_API_SET_PHASE_SPACE_VECTOR");
-    void* spsv_void = (void*)PyCObject_AsVoidPtr(spsv_c_api);
+    void* spsv_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(spsv_c_api));
     PyPhaseSpaceVector::set_phase_space_vector =
             reinterpret_cast<void (*)(PyObject*, PhaseSpaceVector*)>(spsv_void);
 
     PyObject* cev_c_api = PyDict_GetItemString(psv_dict,
                                                "C_API_CREATE_EMPTY_VECTOR");
-    void* cev_void = (void*)PyCObject_AsVoidPtr(cev_c_api);
+    void* cev_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(cev_c_api));
     PyPhaseSpaceVector::create_empty_vector =
             reinterpret_cast<PyObject* (*)()>(cev_void);
 

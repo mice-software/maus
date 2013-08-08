@@ -30,6 +30,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <string>
 #include <limits>
 
 #include "src/common_cpp/Utils/Exception.hh"
@@ -67,7 +68,7 @@ PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
 
     PyObject* py_cm_in = NULL;
     double end_plane = std::numeric_limits<double>::max()/10.;
-    static char *kwlist[] = {(char*)"cov_matrix", NULL};
+    static char *kwlist[] = {const_cast<char*>("cov_matrix"), NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
                                          &py_cm_in, &end_plane)) {
@@ -85,7 +86,7 @@ PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
         cm_out = new CovarianceMatrix(optics_model->Transport
                                                            (*cm_in, end_plane));
     }
-    catch (Exception exc) {
+    catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
         return NULL;
     }
@@ -116,7 +117,7 @@ PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
 
     PyObject* py_psv_in = NULL;
     double end_plane = std::numeric_limits<double>::max()/10.;
-    static char *kwlist[] = {(char*)"phase_space_vector", NULL};
+    static char *kwlist[] = {const_cast<char*>("phase_space_vector"), NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
                                          &py_psv_in, &end_plane)) {
@@ -134,7 +135,7 @@ PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
         psv_out = new PhaseSpaceVector(optics_model->Transport
                                                           (*psv_in, end_plane));
     }
-    catch (Exception exc) {
+    catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
         return NULL;
     }
@@ -191,7 +192,7 @@ void _dealloc(PyOpticsModel * self) {
     _free(self);
 }
 
-void _free(PyOpticsModel * self) {    
+void _free(PyOpticsModel * self) {
     if (self != NULL) {
         if (self->model != NULL)
             delete self->model;
@@ -209,9 +210,9 @@ OpticsModel* get_optics_model(PyOpticsModel* py_model) {
 
 static PyMethodDef _methods[] = {
 {"transport_covariance_matrix", (PyCFunction)transport_covariance_matrix,
- METH_VARARGS|METH_KEYWORDS, transport_covariance_matrix_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, transport_covariance_matrix_docstring.c_str()},
 {"transport_phase_space_vector", (PyCFunction)transport_phase_space_vector,
- METH_VARARGS|METH_KEYWORDS, transport_phase_space_vector_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, transport_phase_space_vector_docstring.c_str()},
 {NULL}
 };
 
@@ -284,9 +285,7 @@ PyMODINIT_FUNC initoptics_model(void) {
     Py_INCREF(optics_model_type);
     PyModule_AddObject(module, "OpticsModel",
                        reinterpret_cast<PyObject*>(optics_model_type));
-
 }
-
 }  // namespace PyOpticsModel
 }  // namespace MAUS
 

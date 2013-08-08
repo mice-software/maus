@@ -202,26 +202,26 @@ CovarianceMatrix* (*get_covariance_matrix)(PyObject* py_cm) = NULL;
 
 int MAUS::PyCovarianceMatrix::import_PyCovarianceMatrix() {
   PyObject* cm_module = PyImport_ImportModule("maus_cpp.covariance_matrix");
-  if(cm_module == NULL) {
+  if (cm_module == NULL) {
       return 0;
   } else {
     PyObject *cm_dict  = PyModule_GetDict(cm_module);
 
     PyObject* cem_c_api = PyDict_GetItemString(cm_dict,
                                                  "C_API_CREATE_EMPTY_MATRIX_1");
-    void* cem_void = (void*)PyCObject_AsVoidPtr(cem_c_api);
+    void* cem_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(cem_c_api));
     PyCovarianceMatrix::create_empty_matrix =
                                     reinterpret_cast<PyObject* (*)()>(cem_void);
 
     PyObject* gcm_c_api = PyDict_GetItemString(cm_dict,
                                                "C_API_GET_COVARIANCE_MATRIX_1");
-    void* gcm_void = (void*)PyCObject_AsVoidPtr(gcm_c_api);
+    void* gcm_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(gcm_c_api));
     PyCovarianceMatrix::get_covariance_matrix =
                    reinterpret_cast<CovarianceMatrix* (*)(PyObject*)>(gcm_void);
 
     PyObject* scm_c_api = PyDict_GetItemString(cm_dict,
                                                "C_API_SET_COVARIANCE_MATRIX_1");
-    void* scm_void = (void*)PyCObject_AsVoidPtr(scm_c_api);
+    void* scm_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(scm_c_api));
     PyCovarianceMatrix::set_covariance_matrix =
              reinterpret_cast<void (*)(PyObject*, CovarianceMatrix*)>(scm_void);
     if ((create_empty_matrix == NULL) ||

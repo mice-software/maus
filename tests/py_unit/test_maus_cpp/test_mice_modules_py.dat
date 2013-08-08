@@ -6,5 +6,25 @@ Configuration Test
   PropertyDouble     Dbl       100.0 mm
   PropertyHep3Vector H3v       1. 2. 3 mm
   PropertyInt        Int       -1
+  MiceModule TestMod1
+  {
+      PropertyInt        IV       1
+  }
+  MiceModule TestMod2
+  {
+      PropertyInt        IV       2
+  }
+  MiceModule TestMod3
+  {
+      PropertyInt        IV       3
+  }
+  // for testing ResetField in globals.py
+  PropertyString FieldType           Multipole
+  PropertyInt    Pole                2 //Quad field
+  PropertyDouble FieldStrength       1.    T //normalise to 1 T/m
+  PropertyDouble Height              1.    m
+  PropertyDouble Width               1.    m     
+  PropertyDouble Length              10.   m
+  PropertyString EndFieldType        HardEdged
 }
 

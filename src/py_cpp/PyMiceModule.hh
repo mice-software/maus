@@ -27,7 +27,9 @@
 #undef _XOPEN_SOURCE
 #endif
 
-#include "Python.h"
+#include <Python.h>
+
+#include <string>
 
 #ifdef MAUS_PYMICEMODULE_CC
 
@@ -38,6 +40,12 @@ namespace MAUS {
 namespace PyMiceModule {
 
 /** PyMiceModule is the python implementation of the C++ MiceModule
+ *
+ *  Note about memory management: In order to keep the memory usage self
+ *  consistent all functions that access (get) the MiceModule tree deep copy the
+ *  associated MiceModule and Python owns the memory. All functions that update
+ *  (set) the MiceModule tree deep copy the associated MiceModule and MAUS owns
+ *  the memory.
  */
 typedef struct {
     PyObject_HEAD;
@@ -46,9 +54,8 @@ typedef struct {
 
 /** @namespace C_API defines functions that can be accessed by other C libraries
  *
- *  To access these functions, don't #include this file; use 
- *  int import_PyMiceModule() instead otherwise you will get a segmentation
- *  fault
+ *  To access these functions, first call int import_PyMiceModule(). This will
+ *  also set up and put C_API objects into the MAUS::PyMiceModule namespace
  */
 namespace C_API {
 
@@ -56,7 +63,7 @@ namespace C_API {
  *
  *  \returns PyMiceModule* cast as a PyObject* with mod pointer set to NULL
  */
-static PyObject *create_empty_matrix();
+static PyObject *create_empty_module();
 
 /** Return the C++ MiceModule associated with a PyMiceModule
  *
@@ -71,11 +78,22 @@ static MiceModule* get_mice_module(PyObject* py_mod);
  *
  *  \param py_mod PyMiceModule* cast as a PyObject*. Python representation
  *               of the mice module
- *  \param cm  C++ representation of the mice module. PyMiceModule
- *             takes ownership of the memory allocated to mod
+ *  \param mod  C++ representation of the mice module. PyMiceModule
+ *             takes ownership of the memory allocated to mod. Always sets
+ *             mod->mother() as NULL to avoid memory problems.
+ *  Returns 1 on success, 0 on failure.
  */
-static void set_mice_module(PyObject* py_mod, MiceModule* mod);
+static int set_mice_module(PyObject* py_mod, MiceModule* mod);
 }
+
+/** get name of this PyMiceModule
+ *   - self a PyObject of type PyMiceModule
+ *   - args not used
+ *   - kwds not used
+ *  Returns a python string with the name of this MiceModule 
+ */
+static PyObject *get_children(PyObject* self, PyObject *args, PyObject *kwds);
+
 
 /** get child modules of this PyMiceModule
  *   - self a PyObject of type PyMiceModule
@@ -111,14 +129,6 @@ static PyObject *get_property(PyObject* self, PyObject *args, PyObject *kwds);
  *  Returns PyNone
  */
 static PyObject *set_property(PyObject* self, PyObject *args, PyObject *kwds);
-
-/** get the name of the MiceModule
- *   - self a PyObject of type PyMiceModule
- *   - args not used
- *   - kwds not used
- *  Returns the short name of the module, not including parent names
- */
-static PyObject *get_name(PyObject* self, PyObject *args, PyObject *kwds);
 
 /** _alloc allocates memory for PyMiceModule
  *
@@ -186,5 +196,58 @@ bool set_property_hep3vector_one
 
 }  // namespace PyMiceModule
 }  // namespace MAUS
-#endif  // MAUS_PYMICEMODULE_CC
-#endif  // _SRC_PY_CPP_PYMICEMODULE_HH_
+#else // MAUS_PYMICEMODULE_CC
+
+namespace MAUS {
+namespace PyMiceModule {
+
+/** import the PyMiceModule C_API
+ *
+ *  Makes the functions in C_API available in the MAUS::PyMiceModule
+ *  namespace, for other python/C code
+ *
+ *  @returns 0 if the import fails; return 1 if it is a success
+ */
+int import_PyMiceModule();
+
+PyObject* (*create_empty_module)() = NULL;
+int (*set_mice_module)(PyObject* py_mod, MiceModule* mod) = NULL;
+MiceModule* (*get_mice_module)(PyObject* py_mod) = NULL;
+}  // namespace PyMiceModule
+}  // namespace MAUS
+
+int MAUS::PyMiceModule::import_PyMiceModule() {
+  PyObject* mod_module = PyImport_ImportModule("maus_cpp.mice_module");
+  if (mod_module == NULL) {
+      return 0;
+  } else {
+    PyObject *mod_dict  = PyModule_GetDict(mod_module);
+
+    PyObject* cem_c_api = PyDict_GetItemString(mod_dict,
+                                                 "C_API_CREATE_EMPTY_MODULE");
+    void* cem_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(cem_c_api));
+    PyMiceModule::create_empty_module =
+                                    reinterpret_cast<PyObject* (*)()>(cem_void);
+
+    PyObject* gmm_c_api = PyDict_GetItemString(mod_dict,
+                                               "C_API_GET_MICE_MODULE");
+    void* gmm_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(gmm_c_api));
+    PyMiceModule::get_mice_module =
+                   reinterpret_cast<MiceModule* (*)(PyObject*)>(gmm_void);
+
+    PyObject* smm_c_api = PyDict_GetItemString(mod_dict,
+                                               "C_API_SET_MICE_MODULE");
+    void* smm_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(smm_c_api));
+    PyMiceModule::set_mice_module =
+             reinterpret_cast<int (*)(PyObject*, MiceModule*)>(smm_void);
+    if ((create_empty_module == NULL) ||
+        (set_mice_module == NULL) ||
+        (get_mice_module == NULL))
+        return 0;
+  }
+  return 1;
+}
+
+
+#endif // MAUS_PYMICEMODULE_CC
+#endif // _SRC_PY_CPP_PYMICEMODULE_HH_

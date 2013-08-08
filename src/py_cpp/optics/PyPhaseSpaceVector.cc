@@ -27,11 +27,13 @@
 #include <Python.h>
 #include <structmember.h>
 
+#include <string>
+
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 
 #define MAUS_PYPHASESPACEVECTOR_CC
-#include "PyPhaseSpaceVector.hh"
+#include "src/py_cpp/optics/PyPhaseSpaceVector.hh"
 #undef MAUS_PYPHASESPACEVECTOR_CC
 
 namespace MAUS {
@@ -66,7 +68,7 @@ PyObject* set(PyObject* self, PyObject *args, PyObject *kwds,
     }
 
     double value = 0;
-    static char *kwlist[] = {(char*)"value", NULL};
+    static char *kwlist[] = {const_cast<char*>("value"), NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|", kwlist, &value)) {
         return NULL;
     }
@@ -213,7 +215,7 @@ static PyObject* _str(PyObject * self) {
         return NULL;
     }
     char buffer[1024];
-    snprintf(buffer, 1024, " [%10g, %10g, %10g, %10g, %10g, %10g]",
+    snprintf(buffer, sizeof(buffer), " [%10g, %10g, %10g, %10g, %10g, %10g]",
       (*psv).t(), (*psv).energy(),
       (*psv).x(), (*psv).Px(),
       (*psv).y(), (*psv).Py());
@@ -319,9 +321,12 @@ PyObject* create_from_coordinates(PyObject* self,
     }
     double t(0), E(0), x(0), px(0), y(0), py(0);
     // try to extract a numpy array from the arguments
-    static char *kwlist[] = {(char*)"t", (char*)"energy",
-                             (char*)"x", (char*)"px",
-                             (char*)"y", (char*)"py", NULL};
+    static char *kwlist[] = {const_cast<char*>("t"),
+                             const_cast<char*>("energy"),
+                             const_cast<char*>("x"),
+                             const_cast<char*>("px"),
+                             const_cast<char*>("y"),
+                             const_cast<char*>("py"), NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddd|", kwlist, &t, &E,
                                                                     &x, &px,
                                                                     &y, &py)) {
@@ -358,18 +363,23 @@ PyMODINIT_FUNC initphase_space_vector(void) {
     PyPhaseSpaceVectorType.tp_new = PyType_GenericNew;
     if (PyType_Ready(&PyPhaseSpaceVectorType) < 0) return;
 
-    PyObject* module = Py_InitModule("phase_space_vector", _keywdarg_methods); //, module_docstring);
+    PyObject* module = Py_InitModule3
+                    ("phase_space_vector", _keywdarg_methods, module_docstring);
     if (module == NULL) return;
 
     PyTypeObject* psv_type = &PyPhaseSpaceVectorType;
     Py_INCREF(psv_type);
-    PyModule_AddObject(module, "PhaseSpaceVector", reinterpret_cast<PyObject*>(psv_type));
+    PyModule_AddObject
+            (module, "PhaseSpaceVector", reinterpret_cast<PyObject*>(psv_type));
 
     // C API
     PyObject* psv_dict = PyModule_GetDict(module);
-    PyObject* cev_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_vector, NULL);
-    PyObject* gpsv_c_api = PyCObject_FromVoidPtr((void *)C_API::get_phase_space_vector, NULL);
-    PyObject* spsv_c_api = PyCObject_FromVoidPtr((void *)C_API::set_phase_space_vector, NULL);
+    PyObject* cev_c_api = PyCObject_FromVoidPtr
+                    (reinterpret_cast<void*>(C_API::create_empty_vector), NULL);
+    PyObject* gpsv_c_api = PyCObject_FromVoidPtr
+                 (reinterpret_cast<void*>(C_API::get_phase_space_vector), NULL);
+    PyObject* spsv_c_api = PyCObject_FromVoidPtr
+                 (reinterpret_cast<void*>(C_API::set_phase_space_vector), NULL);
     PyDict_SetItemString(psv_dict, "C_API_CREATE_EMPTY_VECTOR", cev_c_api);
     PyDict_SetItemString(psv_dict, "C_API_GET_PHASE_SPACE_VECTOR", gpsv_c_api);
     PyDict_SetItemString(psv_dict, "C_API_SET_PHASE_SPACE_VECTOR", spsv_c_api);
@@ -384,7 +394,7 @@ PhaseSpaceVector* C_API::get_phase_space_vector(PyObject* py_psv) {
     if (psv_ == NULL)
         return NULL;
     else
-        return psv_->psv;    
+        return psv_->psv;
 }
 
 void C_API::set_phase_space_vector(PyObject* py_psv_o, PhaseSpaceVector* psv) {
@@ -394,8 +404,6 @@ void C_API::set_phase_space_vector(PyObject* py_psv_o, PhaseSpaceVector* psv) {
     }
     py_psv->psv = psv;
 }
-
-
 }
 }
 

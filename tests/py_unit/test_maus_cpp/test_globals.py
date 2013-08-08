@@ -22,9 +22,12 @@ Test maus_cpp.globals
 import json
 import StringIO
 import unittest
+import os
 
 import Configuration
+import maus_cpp.field
 import maus_cpp.globals
+from maus_cpp.mice_module import MiceModule
 
 class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
     """Test maus_cpp.globals"""
@@ -40,6 +43,7 @@ reconstruction_geometry_filename = "Test.dat"
         """))
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
+        self.alt_mod = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_py.dat")
 
     def tearDown(self): # pylint: disable = C0103
         """Reset the globals"""
@@ -97,6 +101,59 @@ reconstruction_geometry_filename = "Test.dat"
         self.assertEqual(maus_cpp.globals.get_version_number(), dc_version)
         maus_cpp.globals.death()
         
+    def test_get_monte_carlo_mice_modules(self):
+        """Test maus_cpp.globals.get_monte_carlo_mice_modules()"""
+        maus_cpp.globals.birth(self.config)
+        self.assertEqual(
+                maus_cpp.globals.get_monte_carlo_mice_modules().get_name(),
+                'Test.dat'
+        )
+        maus_cpp.globals.death()
+        try:
+            maus_cpp.globals.get_monte_carlo_mice_modules()
+            self.assertTrue(False, 'Should throw')
+        except RuntimeError:
+            pass
+
+    def test_set_monte_carlo_mice_modules(self):
+        """Test maus_cpp.globals.get_monte_carlo_mice_modules()"""
+        maus_cpp.globals.birth(self.config)
+        mod = MiceModule(self.alt_mod)
+        maus_cpp.globals.set_monte_carlo_mice_modules(mod)
+        self.assertEqual(
+                  maus_cpp.globals.get_monte_carlo_mice_modules().get_name(),
+                  "test_mice_modules_py.dat")
+        maus_cpp.globals.death()
+        try:
+            maus_cpp.globals.get_monte_carlo_mice_modules()
+            self.assertTrue(False, 'Should throw')
+        except RuntimeError:
+            pass
+
+    def test_set_monte_carlo_mice_modules_fields(self):
+        """Test maus_cpp.globals.get_monte_carlo_mice_modules() fields"""
+        maus_cpp.globals.birth(self.config)
+        mod_no_field = MiceModule("Test.dat")
+        mod_field = MiceModule(self.alt_mod)
+        # check keywords
+        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field,
+                                                      rebuild_fields=True,
+                                                      rebuild_geant4=False)        
+        self.assertAlmostEqual(
+                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
+                  0.0)
+        # check ordering
+        maus_cpp.globals.set_monte_carlo_mice_modules(mod_field,
+                                                      True,
+                                                      False)        
+        self.assertAlmostEqual(
+                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
+                  0.5)
+        # check defaults
+        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field)
+        self.assertAlmostEqual(
+                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
+                  0.0)
 
 if __name__ == "__main__":
     unittest.main()

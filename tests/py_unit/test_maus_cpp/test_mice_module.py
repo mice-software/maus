@@ -48,6 +48,12 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
             pass
         mod = MiceModule(file_name="Test.dat")
 
+    def test_get_name(self):
+      """Test MiceModule.get_name()"""
+      self.assertEqual(self.mod.get_name(), "test_mice_modules_py.dat")
+      for i, child in enumerate(self.mod.get_children()):
+          self.assertEqual(child.get_name(), "TestMod"+str(i+1))
+
     def test_get_property(self):
         """Test mice_module get property"""
         self.mod.get_property(name="Str", type="String")
@@ -149,7 +155,41 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         except TypeError:
             pass
 
+    def test_get_children(self):
+        """Test MiceModule get_children"""
+        children = self.mod.get_children()
+        self.assertEqual(len(children), 3)
+        ints = sorted([child.get_property('IV', 'int') for child in children])
+        self.assertEqual(ints, [1, 2, 3])
+        self.mod.get_children()[0].set_property('IV', 'int', 999)
+        # this behaviour is expected - get_children() does a deep copy
+        self.assertEqual \
+                     (self.mod.get_children()[0].get_property('IV', 'int'), 1)
 
+    def test_set_children(self):
+        """Test MiceModule get_children"""
+        test_children = [MiceModule(self.test) for i in range(2)]
+        for i, child in enumerate(test_children):
+            child.set_property('test', 'int', i)
+        self.mod.set_children(test_children)
+        for i, child in enumerate(self.mod.get_children()):
+            self.assertEqual(child.get_property('test', 'int'), i)
+        self.mod.set_children([]) # should be okay
+        try:
+            self.mod.set_children(10)
+            self.assertTrue(False, 'Should have thrown typeerror')
+        except TypeError:
+            pass
+        try:
+            self.mod.set_children([10])
+            self.assertTrue(False, 'Should have thrown typeerror')
+        except TypeError:
+            pass
+
+    def test_print(self):
+        """Test MiceModule print"""
+        self.assertEqual(type(str(self.mod)), type(''))
+        self.assertGreater(str(self.mod).find(self.mod.get_name()), -1)
 
 if __name__ == "__main__":
     unittest.main()
