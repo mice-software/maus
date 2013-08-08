@@ -55,12 +55,8 @@ PyObject* Convert(PyObject *dummy, PyObject *args) {
   // Convert the Json::Value to a std::string
   std::string json_str = JsonWrapper::JsonToString(*json_value);
 
-  std::cout << "PyDataToString" << std::endl;
-  std::cout << json_str << std::endl;
-  // std::cout << json_value->asString() << std::endl;
-  
   // Export the std::string is a Python string.
-  PyObject* py_string = Py_BuildValue("s", json_str.c_str());
+  PyObject* py_string = PyString_FromString(json_str.c_str());
   return py_string;
 }
 
