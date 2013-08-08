@@ -63,6 +63,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
 
   void Build();
 
+  const std::vector<long> GetAvailableMapPositions() const;
  protected:
   Algorithm algorithm_;
   size_t polynomial_order_;

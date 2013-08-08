@@ -49,6 +49,7 @@ namespace global {
 
 using MAUS::DataStructure::Global::Track;
 using MAUS::DataStructure::Global::TrackPoint;
+namespace GlobalDS = MAUS::DataStructure::Global;
 
 void common_cpp_optics_recon_minuit_track_fitter_score_function(
     Int_t &    number_of_parameters,
@@ -165,22 +166,9 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   TMinuit * minimizer
     = common_cpp_optics_recon_minuit_track_fitter_minuit;
 
-  PhaseSpaceVector current_value;
-   for (size_t index = 0; index < kPhaseSpaceDimension; ++index) {
-    Double_t value, error;
-    minimizer->GetParameter(index, value, error);
-    current_value[index] = value;
-  }
-  std::cout << "DEBUG MinuitTrackFitter::Fit: Initial Value: " << current_value
-            << std::endl;
   // Find the start plane coordinates that minimize the score for the calculated
   // track based off of this track point (i.e. best fits the measured track
   // points from the detectors).
-  //
-  // Alternate fixing the position and momentum variables while performing
-  // minimization so that only variables with the same scale are used for any
-  // particular run
-
   Json::Value const * const configuration = optics_model_->configuration();
   const std::string method = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_minimizer",
@@ -196,15 +184,62 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   Double_t args[2] = {max_iterations, max_EDM};
   minimizer->mnexcm(method.c_str(), args, 2, err);
 
-  for (size_t index = 0; index < 6; ++index) {
+  DataStructureHelper helper = DataStructureHelper::GetInstance();
+
+  GlobalDS::TrackPointCPArray raw_points = raw_track->GetTrackPoints();
+  size_t particle_event = raw_points[0]->get_particle_event();
+
+  PhaseSpaceVector fit_primary;
+  for (size_t index = 0; index < kPhaseSpaceDimension; ++index) {
     Double_t value, error;
     minimizer->GetParameter(index, value, error);
-    current_value[index] = value;
+    fit_primary[index] = value;
+  }
+  std::cout << "DEBUG MinuitTrackFitter::Fit: Fit Primary: " << fit_primary
+            << std::endl;
+  try {
+    TrackPoint track_point = helper.PhaseSpaceVector2TrackPoint(
+        fit_primary,
+        optics_model_->primary_plane(),
+        particle_id_);
+    track_point.set_particle_event(particle_event);
+    track_point.set_mapper_name(mapper_name);
+    track->AddTrackPoint(new TrackPoint(track_point));
+  } catch (Squeal squeal) {
+      std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
+                << "something bad happened during track fitting: "
+                << squeal.what() << std::endl;
+      // FIXME(Lane) handle better by reporting horrible score or something
   }
 
-  size_t particle_event
-    = raw_track->GetTrackPoints()[0]->get_particle_event();
 
+  // TODO Iterate through the raw track points and use their z-positions
+  //      for fit primary transport
+
+  // Reconstruct the track from the fit primary
+  std::vector<long>::const_iterator map_z;
+  for (map_z = map_positions.begin(); map_z != map_positions.end(); ++map_z) {
+    // transport the fit primary to the desired z-position
+    const PhaseSpaceVector point = optics_model_->Transport(fit_primary, map_z);
+    std::cout << "DEBUG MinuitTrackFitter::Fit: track point: " << point << std::endl;
+    TrackPoint track_point;
+    try {
+      track_point
+        = helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
+    } catch (Squeal squeal) {
+        std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
+                  << "something bad happened during track fitting: "
+                  << squeal.what() << std::endl;
+        // FIXME(Lane) handle better by reporting horrible score or something
+    }
+
+    track_point->set_particle_event(particle_event);
+    track_point->set_mapper_name(mapper_name);
+    track->AddTrackPoint(new TrackPoint(*track_point));
+  }
+  track->set_pid(raw_track->get_pid());
+
+  /*
   for (std::vector<TrackPoint>::iterator reconstructed_point
           = reconstructed_points_.begin();
        reconstructed_point != reconstructed_points_.end();
@@ -214,6 +249,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
     track->AddTrackPoint(new TrackPoint(*reconstructed_point));
   }
   track->set_pid(raw_track->get_pid());
+  */
 
 std::cout << "CHECKPOINT Fit(): END" << std::endl;
 std::cout.flush();
@@ -252,6 +288,7 @@ std::cout.flush();
   }
   std::cout << "DEBUG MinuitTrackFitter::ScoreTrack: particle ID = "
             << particle_id_ << std::endl;
+  /*
   try {
     TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
         guess, optics_model_->primary_plane(), particle_id_);
@@ -262,6 +299,7 @@ std::cout.flush();
                 << squeal.what() << std::endl;
     return 1.0e+15;
   }
+  */
 
   std::vector<const TrackPoint*>::const_iterator event
     = detector_events_.begin();
@@ -307,6 +345,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
 
     // save the calculated track point in case this is the
     // last (best fitting) track
+    /*
     try {
       reconstructed_points_.push_back(
         helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
@@ -316,6 +355,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
                   << squeal.what() << std::endl;
       return 1.0e+15;
     }
+    */
 std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
           << reconstructed_points_.size() << std::endl;
 
@@ -365,6 +405,8 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
                                      * normalized_residual)[0];
 */
     residual -= time_comp_vector;
+    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Weighted Residual: "
+          << (inverse(uncertainties) * residual) << std::endl;
     const double residual_squared = (transpose(residual)
                                      * inverse(uncertainties)
                                      * residual)[0];

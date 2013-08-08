@@ -103,6 +103,8 @@ class MapCppGlobalTrackReconstructor {
   void LoadRawTracks(
       GlobalEvent const * const global_event,
       MAUS::DataStructure::Global::TrackPArray & tracks) const;
+  void InsertIntermediateTrackPoints(
+      MAUS::DataStructure::Global::Track * track) const;
 };
 
 }  // namespace MAUS

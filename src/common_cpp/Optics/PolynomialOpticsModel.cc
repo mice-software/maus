@@ -25,6 +25,7 @@
 #include <map>
 
 #include <iomanip>
+#include <list>
 #include <sstream>
 #include <vector>
 
@@ -130,6 +131,19 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
     transfer_maps_[station_hits->first]
       = CalculateTransferMap(primary_vectors, station_hits->second);
   }
+}
+
+const std::vector<long> PolynomialOpticsModel::GetAvailableMapPositions()
+    const {
+  std::vector<long> positions;
+  std::map<long, const TransferMap *>::const_iterator maps;
+  // insertion sort the map keys (z-positions)
+  for (maps = transfer_maps_.begin(); maps != transfer_maps_.end(); ++maps) {
+    positions.push_back(maps->first);
+  }
+  std::sort(positions.begin(), positions.end());  // just in case
+
+  return positions;
 }
 
 void PolynomialOpticsModel::SetupAlgorithm() {

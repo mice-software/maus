@@ -153,6 +153,8 @@ std::string MapCppGlobalTrackReconstructor::process(
                 << "raw track PID: " << (*raw_track)->get_pid() << std::endl;
       track_fitter_->Fit(*raw_track, best_fit_track, kClassname);
 
+      InsertIntermediateTrackPoints(best_fit_track);
+
       global_event->add_track_recursive(best_fit_track);
     }
 
@@ -327,6 +329,78 @@ void MapCppGlobalTrackReconstructor::LoadRawTracks(
       tracks.push_back(*global_track);
     }
   }
+}
+
+void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
+    GlobalDS::Track * track) const {
+  PolynomialOpticsModel * const optics_model
+    = dynamic_cast<MAUS::PolynomialOpticsModel*>(optics_model_);
+  if (optics_model == NULL) {
+    throw(Squeal(Squeal::nonRecoverable,
+                "Could not reconstruct intermediate track points: the optics "
+                "model being used is not yet fully supported.,
+                "MAUS::MapCppGlobalTrackReconstructor::"
+                "InsertIntermediateTrackPoints()"));
+  }
+
+  // Get the fit track points
+  GlobalDS::TrackPointCPArray fit_points = track->GetTrackPoints()
+
+  // Convert the first fit track point into a PhaseSpaceVector for transporting
+  GlobalDS::TrackPoint const * const fit_primary_track_point = fit_points[0];
+  DataStructureHelper helper = DataStructureHelper::GetInstance();
+  PhaseSpaceVector fit_primary
+    = helper.TrackPoint2PhaseSpaceVector(fit_primary_track_point);
+
+  // Construct a list of detector z-keys (z-position rounded to nearest integer)
+  std::vector<long> z_keys;
+  GlobalDS::TrackPointCPArray::const_iterator fit_point
+    = fit_points.begin();
+  for (fit_point = detector_events_.begin();
+       fit_point != detector_events_.end();
+       ++fit_point) {
+    // calculate the next guess
+    const double z = (*fit_point)->get_position().Z();
+    long z_key = (z>=0?static_cast<long>(z+.5):static_cast<long>(z-.5));
+    z_keys.push_back(z_key);
+  }
+
+  // Reconstruct the intermediate track points by transporting the fit primary
+  // to all desired intermediate z-positions
+  std::vector<long>::const_iterator z_key = z_keys.begin();
+  const std::vector<long> map_positions
+    = optics_model->GetAvailableMapPositions();
+  std::vector<long>::const_iterator map_z;
+  for (map_z = map_positions.begin(); map_z != map_positions.end(); ++map_z) {
+    // locate the next detector z-position
+    while (z_key != z_keys.end() && (*z_key) < (*map_z)) {
+      ++z_key;
+    }
+
+    // transport the fit primary to the desired z-position
+    const PhaseSpaceVector point = optics_model_->Transport(fit_primary, map_z);
+    std::cout << "DEBUG MinuitTrackFitter::Fit: track point: " << point << std::endl;
+
+    // skip if we've already added this point to the track during fitting
+    if ((*z_key) == (*map_z)) {
+      continue;
+    }
+
+    // add the reconstructed intermediate to the track
+    TrackPoint track_point;
+    try {
+      track_point
+        = helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
+    } catch (Squeal squeal) {
+        std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
+                  << "something bad happened during track fitting: "
+                  << squeal.what() << std::endl;
+    }
+
+    track_point->set_mapper_name(kClassname);
+    track->AddTrackPoint(new TrackPoint(*track_point));
+  }
+  track->SortTrackPointsByZ();
 }
 
 const std::string MapCppGlobalTrackReconstructor::kClassname
