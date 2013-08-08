@@ -30,7 +30,6 @@ class MapCppTemplate():
         return _MapCppTemplate.process(self.this, *args)
 
     def __init__(self):
-        print "__init__ called here"
         this = _MapCppTemplate.module_new()
         try:
             self.this.append(this)
@@ -38,8 +37,23 @@ class MapCppTemplate():
             self.this = this
 
     def __del__(self):
-        print "__del__ called here"
         _MapCppTemplate.module_delete(self.this)
+
+    def set_input(self, *args):
+        """
+        Sets the input type (MAUS::Data or Json::Value) that a
+        MapBase inherited class will receive.  This is provided by the
+        templating fucntionality of MapBase.
+        """
+        return _MapCppTemplate.set_input(self.this, *args)
+
+    def get_output(self):
+        """
+        Returns the output type (MAUS::Data or Json::Value) that a
+        MapBase inherited class will return.  This is provided by the
+        templating fucntionality of MapBase.
+        """
+        return _MapCppTemplate.get_output(self.this)
 
     def can_convert(self):# pylint:disable = R0201
         """
