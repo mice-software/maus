@@ -186,9 +186,6 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
 
   DataStructureHelper helper = DataStructureHelper::GetInstance();
 
-  GlobalDS::TrackPointCPArray raw_points = raw_track->GetTrackPoints();
-  size_t particle_event = raw_points[0]->get_particle_event();
-
   PhaseSpaceVector fit_primary;
   for (size_t index = 0; index < kPhaseSpaceDimension; ++index) {
     Double_t value, error;
@@ -202,7 +199,6 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
         fit_primary,
         optics_model_->primary_plane(),
         particle_id_);
-    track_point.set_particle_event(particle_event);
     track_point.set_mapper_name(mapper_name);
     track->AddTrackPoint(new TrackPoint(track_point));
   } catch (Squeal squeal) {
@@ -213,19 +209,19 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   }
 
 
-  // TODO Iterate through the raw track points and use their z-positions
-  //      for fit primary transport
-
-  // Reconstruct the track from the fit primary
-  std::vector<long>::const_iterator map_z;
-  for (map_z = map_positions.begin(); map_z != map_positions.end(); ++map_z) {
+  // Reconstruct the fit track from the fit primary
+  GlobalDS::TrackPointCPArray raw_points = raw_track->GetTrackPoints();
+  size_t particle_event = raw_points[0]->get_particle_event();
+  GlobalDS::TrackPointCPArray::const_iterator raw_point = raw_points.begin();
+  for (; raw_point != raw_points.end(); ++raw_point) {
     // transport the fit primary to the desired z-position
-    const PhaseSpaceVector point = optics_model_->Transport(fit_primary, map_z);
+    const double z = (*raw_point)->get_position().Z();
+    const PhaseSpaceVector point = optics_model_->Transport(fit_primary, z);
     std::cout << "DEBUG MinuitTrackFitter::Fit: track point: " << point << std::endl;
+
     TrackPoint track_point;
     try {
-      track_point
-        = helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
+      track_point = helper.PhaseSpaceVector2TrackPoint(point, z, particle_id_);
     } catch (Squeal squeal) {
         std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                   << "something bad happened during track fitting: "
@@ -233,9 +229,9 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
         // FIXME(Lane) handle better by reporting horrible score or something
     }
 
-    track_point->set_particle_event(particle_event);
-    track_point->set_mapper_name(mapper_name);
-    track->AddTrackPoint(new TrackPoint(*track_point));
+    track_point.set_particle_event(particle_event);
+    track_point.set_mapper_name(mapper_name);
+    track->AddTrackPoint(new TrackPoint(track_point));
   }
   track->set_pid(raw_track->get_pid());
 
