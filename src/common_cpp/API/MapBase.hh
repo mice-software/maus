@@ -93,15 +93,15 @@ class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
   /*!\brief Set input format
    */
   void set_input(std::string);
-    
+
   /*!\brief Get input format
    */
   std::string get_input();
-    
+
   /*!\brief Get output format
    */
   std::string get_output();
-    
+
  private:
   /*!\brief Process data
    *

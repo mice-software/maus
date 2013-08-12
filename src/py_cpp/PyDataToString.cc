@@ -26,25 +26,25 @@ namespace MAUS {
 namespace PyDataToString {
 
 std::string Convert_DocString =
-  std::string("Convert an input PyCapsule object, containing either\n\n")+
+    std::string("Convert an input PyCapsule object, containing either\n\n")+
     std::string("MAUS::Data or Json::Value pointer into a std::string.\n\n")+
     std::string("This can then be used by any of the MapPyXXX methods.");
-    
+
 PyObject* Convert(PyObject *dummy, PyObject *args) {
   // Input shoudl be a single PyCapsule
   PyObject* obj0 = NULL;
-  if (!PyArg_ParseTuple(args,"O:Convert", &obj0)) {
+  if (!PyArg_ParseTuple(args, "O:Convert", &obj0)) {
     return NULL;
   }
 
   // Read the Input into a Json::Value type
   Json::Value* json_value = NULL;
   void* vptr;
-  if(PyCapsule_IsValid(obj0, "Json::Value")) {
+  if (PyCapsule_IsValid(obj0, "Json::Value")) {
     // Input is Json::Value type, so fill the json_value pointer.
     vptr = PyCapsule_GetPointer(obj0, "Json::Value");
     json_value = static_cast<Json::Value*>(vptr);
-  } else if(PyCapsule_IsValid(obj0, "MAUS::Data")) {
+  } else if (PyCapsule_IsValid(obj0, "MAUS::Data")) {
     // Input is MAUS::Data type, so call a converter to produce a Json::Value.
     vptr = PyCapsule_GetPointer(obj0, "MAUS::Data");
     MAUS::Data* data_cpp = static_cast<MAUS::Data*>(vptr);
@@ -61,9 +61,9 @@ PyObject* Convert(PyObject *dummy, PyObject *args) {
 }
 
 static PyMethodDef methods[] = {
-{"convert", (PyCFunction)Convert,
- METH_VARARGS, Convert_DocString.c_str()},
-{NULL, NULL, 0, NULL}
+  { "convert", (PyCFunction)Convert,
+    METH_VARARGS, Convert_DocString.c_str()},
+  {NULL, NULL, 0, NULL}
 };
 
 PyMODINIT_FUNC initdata_to_string(void) {
@@ -73,5 +73,3 @@ PyMODINIT_FUNC initdata_to_string(void) {
 }
 }
 }
-
-

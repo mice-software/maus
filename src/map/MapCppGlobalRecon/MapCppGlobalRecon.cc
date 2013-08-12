@@ -23,7 +23,7 @@
 
 namespace MAUS {
 MapCppGlobalRecon::MapCppGlobalRecon()
-    : MapBase<MAUS::Data, MAUS::Data>("MapCppGlobalRecon") {};
+    : MapBase<MAUS::Data, MAUS::Data>("MapCppGlobalRecon") {}
 
 void MapCppGlobalRecon::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only.

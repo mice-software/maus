@@ -76,8 +76,6 @@ class MapCppExampleJSONValueInput : public MapBase<Json::Value, Json::Value> {
 
   /// JSON Reader for parsing the JSON Config Document
   Json::Reader _reader;
-  
 }; // Don't forget this trailing colon!!!!
 } // ~MAUS
-
 #endif

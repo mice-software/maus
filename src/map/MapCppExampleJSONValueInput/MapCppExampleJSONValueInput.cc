@@ -21,7 +21,7 @@
 
 namespace MAUS {
 MapCppExampleJSONValueInput::MapCppExampleJSONValueInput()
-    : MapBase<Json::Value, Json::Value>("MapCppExampleJSONValueInput") {};
+    : MapBase<Json::Value, Json::Value>("MapCppExampleJSONValueInput") {}
 
 void MapCppExampleJSONValueInput::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only.
@@ -46,5 +46,4 @@ Json::Value* MapCppExampleJSONValueInput::_process(Json::Value* json) const {
             << "\tSpill: " << (*json)["spill_number"].asInt() << std::endl;
   return new Json::Value(*json);
 }
-
 } // ~MAUS

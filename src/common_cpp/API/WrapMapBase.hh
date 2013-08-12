@@ -1,7 +1,25 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _SRC_COMMON_CPP_API_WRAPMAPBASE_
 #define _SRC_COMMON_CPP_API_WRAPMAPBASE_
 
 #include <Python.h>
+
+#include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -25,7 +43,7 @@ class WrapMapBase {
                            ModuleClassName).c_str())) {
       return NULL;
     }
-    
+
     MODULE* module = new MODULE();
     void* vptr = static_cast<void*>(module);
     PyObject *resultobj = PyCapsule_New(vptr, "Module", NULL);
@@ -49,7 +67,7 @@ class WrapMapBase {
       PyErr_SetString(InvalidModuleError, error.c_str());
       return NULL;
     }
-  
+
     void* vptr = PyCapsule_GetPointer(obj0, "Module");
     MODULE* module = static_cast<MODULE*>(vptr);
     delete module;
@@ -111,7 +129,6 @@ class WrapMapBase {
 
   /// Set the MODULE object's input format.
   static PyObject* ModuleSetInput(PyObject *self, PyObject *args) {
-
     PyObject* obj0 = NULL;
     const char *input_char = NULL;
 
@@ -154,7 +171,6 @@ class WrapMapBase {
 
   /// Get the MODULE object's output format.
   static PyObject* ModuleGetOutput(PyObject *self, PyObject *args) {
-
     PyObject* obj0 = NULL;
 
     // Interpret the input as a PyObject*, otherwise fail.
@@ -220,61 +236,60 @@ class WrapMapBase {
     }
     void* vptr0 = PyCapsule_GetPointer(obj0, "Module");
     MODULE* module = static_cast<MODULE*>(vptr0);
-  
+
     // input_type can be either: std::string, MAUS::Data* or Json::Value*.
     std::string input_type  = module->get_input();
-    
-    if(input_type.compare("std::string") == 0) {
+
+    if (input_type.compare("std::string") == 0) {
       // std::string input
-      if(!PyString_Check(obj1)) {
+      if (!PyString_Check(obj1)) {
         std::string error;
         error  = "Expected std::string, data of wrong type";
         PyErr_SetString(InvalidInputError, error.c_str());
         return NULL;
-      }        
+      }
       std::string event_string(PyString_AsString(obj1));
-      
+
       // Convert the string to a Json::Value
       Json::Value imported_json = JsonWrapper::StringToJson(event_string);
       PyObject *resultobj = module->process_pyobj(&imported_json);
       return resultobj;
     }
-    
-    if(input_type.compare("Json::Value") == 0) {
+
+    if (input_type.compare("Json::Value") == 0) {
       // Json::Value* input
-      if(!PyCapsule_IsValid(obj1, "Json::Value")) {
+      if (!PyCapsule_IsValid(obj1, "Json::Value")) {
         std::string error;
         error  = "Expected Json::Value pointer, data of wrong type";
         PyErr_SetString(InvalidInputError, error.c_str());
         return NULL;
-      }        
+      }
       void* vptr1 = PyCapsule_GetPointer(obj1, "Json::Value");
       Json::Value* input_json = static_cast<Json::Value*>(vptr1);
       PyObject *resultobj = module->process_pyobj(input_json);
       return resultobj;
     }
-    
-    if(input_type.compare("MAUS::Data") == 0) {
+
+    if (input_type.compare("MAUS::Data") == 0) {
       // MAUS::Data* input
-      if(!PyCapsule_IsValid(obj1, "MAUS::Data")) {
+      if (!PyCapsule_IsValid(obj1, "MAUS::Data")) {
         std::string error;
         error  = "Expected MAUS::Data pointer, data of wrong type";
         PyErr_SetString(InvalidInputError, error.c_str());
         return NULL;
-      }        
+      }
       void* vptr1 = PyCapsule_GetPointer(obj1, "MAUS::Data");
       MAUS::Data* input_data = static_cast<MAUS::Data*>(vptr1);
       PyObject *resultobj = module->process_pyobj(input_data);
       return resultobj;
     }
-    
+
     std::string error;
     error  = "Second input PyCapsule must contain; 'std::string',";
     error += " 'Json::Value' or 'MAUS::Data'";
     PyErr_SetString(InvalidInputError, error.c_str());
     return NULL;
-    
   }
 };
-} // ~MAUS
+}  // ~MAUS
 #endif
