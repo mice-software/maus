@@ -80,7 +80,7 @@ if [ $? != 0 ]; then
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"
     exit 1
 fi
-exit 0
+
 echo "Run the tests"
 bash ${MAUS_ROOT_DIR}/tests/unit_tests.bash  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]
