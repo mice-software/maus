@@ -14,6 +14,10 @@ PyMethodDef ModuleMethods[] = {
    METH_VARARGS,    "Running ModuleBase::birth()."},
   {"death",         WrapMapBase<MAUS::MapCppGlobalRecon>::ModuleDeath,
    METH_VARARGS,    "Running ModuleBase::death()."},
+  {"set_input",     WrapMapBase<MAUS::MapCppGlobalRecon>::ModuleSetInput,
+   METH_VARARGS,    "Running ModuleBase::set_input()."},
+  {"get_output",    WrapMapBase<MAUS::MapCppGlobalRecon>::ModuleGetOutput,
+   METH_VARARGS,    "Running ModuleBase::get_output()."},
   {"process",       WrapMapBase<MAUS::MapCppGlobalRecon>::ModuleProcess,
    METH_VARARGS,    "Running ModuleBase::process()."},
   {NULL, NULL, 0, NULL}
@@ -40,6 +44,13 @@ PyMODINIT_FUNC init_MapCppGlobalRecon(void) {
                                 NULL, NULL);
   Py_INCREF(InvalidInputError);
   PyModule_AddObject(m, "InvalidInput", InvalidInputError);
+
+  InvalidOutputError =
+      PyErr_NewExceptionWithDoc((char *)"_MapCppGlobalRecon.InvalidOutput",
+                                (char *)"Invalid Output defined.",
+                                NULL, NULL);
+  Py_INCREF(InvalidOutputError);
+  PyModule_AddObject(m, "InvalidOutput", InvalidOutputError);
 
 }
 
