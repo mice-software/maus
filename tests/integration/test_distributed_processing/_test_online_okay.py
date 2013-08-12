@@ -35,7 +35,9 @@ def kill_maus_apps():
     """
     Kill any lurking maus_apps
     """
-    ps_out =  subprocess.check_output(['ps', '-e', '-F'])
+    # columns = 1024 stops ps from truncating the line (and we fail to detect
+    # the maus-app call)
+    ps_out =  subprocess.check_output(['ps', '-e', '-F', '--columns=1024'])
     pids = []
     for line in ps_out.split('\n')[1:]:
         if line.find('manage.py') > -1 and line.find('runserver') > -1:
@@ -109,6 +111,12 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         kill_maus_apps()
         time.sleep(5)
         self.assertEquals(proc.poll(), 0) # pylint: disable=E1101
+
+    def test_input_cpp_daq_online(self): # pylint:disable=R0201
+        """
+        _test_online_okay: Check that maus daq online library imports okay
+        """
+        from MAUS import InputCppDAQOnlineData # pylint:disable=E0611,W0612
 
 if __name__ == "__main__":
     unittest.main()

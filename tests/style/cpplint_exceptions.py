@@ -318,3 +318,10 @@ exceptions[os.path.join(MAP,
  'from a string literal',
  'taylor')
 ]
+
+exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData', 
+                       'InputCppDAQOnlineData.cc')] = [
+('      _sleep_time.tv_sec = static_cast<long>(delay_time);',
+ 'This really is a long, it is defined in time.h.', 'rogers')
+]
+

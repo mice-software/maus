@@ -1,0 +1,177 @@
+\chapter{TOF Detector}
+\label{chapter:tof}
+This chapter describes the time-of-flight (TOF) simulation and reconstruction software. The simulation is designed to produce digits similar to ``real data'' and the reconstruction is agnostic about whether the digits are from simulation or data acquisition.
+
+\section{Simulation}
+\begin{itemize}
+\item {\bf{Geometry}}\\ 
+For the most upstream TOF -- TOF0 -- to be simulated, it is essential that the $z$ where the beam starts be upstream of the detector.
+ 
+In the standard Step VI geometry as described in \verb|Stage6.dat|, this is at \verb|-14200 mm| and for the Step IV geometry described in \verb|Stage4.dat| it is at \verb|2773 mm|
+
+The internal geometry of the TOF detector and the positioning of the slabs are defined in the MiceModules represenation . The numbering convention is the same as that for the DAQ and is described in MICE-Notes 251 and 286. It is worth keeping in mind the plane numbering convention since the current naming scheme is suboptimal:\\
+\begin{itemize}
+\item \verb|station| refers to the TOF station -- TOF0, TOF1, TOF2
+\item \verb|plane| refers to the horizontal/vertical planes within a station
+\item \verb|plane 0| means horizontal slabs -- slabs are oriented horizontally. They measure $y$
+\item \verb|plane 1| means vertical slabs -- slabs are oriented vertically. They measure $x$
+\end{itemize}
+
+The $z$ locations of TOF0 and TOF1 are specified in the \verb|Beamline.dat| file and the $z$ of TOF2 is specified in the main geometry description file, for e.g. \verb|Stage6.dat|
+\item {\bf{Hits}}\\
+GEANT hits are generated for all tracks which pass through a TOF slab. 
+``True'' TOF hits are described by the \verb|MAUS::Hit| class and contain the GEANT4 information prior to digitization. The members of the class are listed below.
+\begin{table*}
+\begin{center}
+\caption{True TOF hit class members.}
+\begin{tabularx}{\linewidth}{lX}
+\multicolumn{2}{l}{\emph{The GEANT TOF hits are encoded with the following information.}} \\
+\hline
+Name & Meaning \\
+\hline
+\verb|channel_id| & Class \verb|TOFChannelId*| contains \verb|station,plane,slab| \\
+\verb|energy_deposited| & \verb|double| -- energy deposited by track in the slab\\
+\verb|position| & \verb|ThreeVector| -- $x,y,z$ of hit at the slab\\
+\verb|momentum| & \verb|ThreeVector| -- $p_x,p_y,p_z$ of particle at slab\\
+\verb|time| & \verb|double| -- hit time\\
+\verb|charge| & \verb|double| -- PDG charge of particle that produced this hit\\
+\verb|track_id| & \verb|G4Track| -- ID of the GEANT track that produced this hit\\
+\verb|particle_id| & \verb|ThreeVector| -- PDG code of the particle that produced this hit\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}
+
+
+
+
+\end{itemize}
+\subsection{Digitization}
+Each GEANT hit in the TOF is associated with a slab based on the 
+geometry described in the TOF MiceModules. If a hit's position does not 
+correspond to a physical slab (for instance if the hit is outside the fiducial volume) the hit is not digitized.
+The energy deposited in the slab and the hit time are then digitized as described below.
+\begin{itemize}
+\item {\bf{Charge digitization}}
+The energy deposited by a hit in a slab is first converted to units of photoelectrons. The photoelectron yield from a hit is attenuated by the distance from the hit to the PMT, then smeared by the photoelectron resolution. The yields from all hits in a given slab are then added and the summed photoelectron yield is converted to ADC (In principle, this should be done not on an event-by-event basis but rather on a trigger-basis. In the absence of a real trigger, all hits in a slab are now merged)
+\item {\bf{Time digitization}}
+The hit time is propogated to the PMTs at either end of the slab. The speed of light in the scintillator, based on earlier calibration, is controlled by the \verb|TOFscintLightSpeed| data card. The time is then smeared by the PMT time resolution and converted to TDC. 
+\end{itemize}
+After converting the energy deposit to ADC and the time to TDC, the TDC values are ``uncalibrated'' so that at the reconstruction stage they can be corrected just as is done with real data.
+
+The data cards that control the digitization are listed in Table 9.2. \\
+NOTE: Do not modify the default values.
+\begin{table*}
+\begin{center}
+\caption{Data cards for TOF digitization.}
+\begin{tabularx}{\linewidth}{lXX}
+\hline
+Name & Meaning & Default\\
+\hline
+\verb|TOFconversionFactor| & conversion & \verb|0.005 MeV|\\
+\verb|TOFpmtTimeResolution| & resolution for smearing the PMT time& \verb|0.1 ns|\\
+\verb|TOFattenuationLength| & light attenuation in slabs & \verb|1400 mm|\\
+\verb|TOFadcConversionFactor| & conversion from charge to ADC & \verb|0.125|\\
+\verb|TOFtdcConversionFactor| & conversion from time to TDC & \verb|0.025|\\
+\verb|TOFpmtQuantumEfficiency| & PMT collection efficiency & \verb|0.25| \\
+\verb|TOFscintLightSpeed| & propogation speed in slab & \verb|170 mm/ns|\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\section{Reconstruction}
+The reconstruction software treats both data and Monte Carlo the same way.
+In the case of real data, the input to the reconstruction chain is TOF Digits (\verb|MapCppTOFDigit|) and in the case of Monte Carlo it is the digitized information from \verb|MapCppTOFMCDigitizer|.
+\begin{itemize}
+\item {\bf{Digits}} (\verb|MapCppTOFDigit,MapCppTOFMCDigitizer|)
+Digits are formed from the V1724 ADCs and V1290 TDCs. 
+\item {\bf{Slab Hits}} (\verb|MapCppTOFSlabHits|)
+The SlabHits routine takes individual PMT digits and associates them to reconstruct the hit in the slab. All PMT digits are considered. If there are multiple hits associated with a PMT, the hit which is earliest in time is taken to be the real hit. Then, if both PMTs on a slab have hits, the SlabHit is formed. The TDC values are converted to time (\verb|ToftdcConversionFactor|) and the hit time and charge associated with the slab hit are taken to be the average of the two PMT times and charges respectively. In addition, the charge product of the PMT charges is also formed.
+\item {\bf{Space Points}} (\verb|MapCppTOFSpacePoints|)
+A space point pixel in the TOF is a combination of $x$ and $y$ slab hits.
+All combinations of $x$ and $y$ slab hits in a given station are considered.
+If the station is a trigger station, an attempt is made to find the ``trigger pixel'' -- i.e. the $x,y$ combination that triggered this event. This is done by applying calibration corrections to the slab hits, and then asking if the average time in this pixel is consistent with the trigger within some tolerance. In other words, if 
+$t_x$ and $t_y$ are the times corresponding to the $x$ and $y$ slab hits, 
+is $\frac{t_{x,calib} + t_{y,calib}}{2} < t_{triggercut}$? If no $x,y$ combination produces a trigger pixel, the space point reconstruction stops and no space points are formed. This is because to apply the calibration corrections to the slab hit times, it is essential know the trigger pixel.
+
+Once a trigger pixel is found, all $x,y$ slab hit combinations are again treated as space point candidates. The calibration corrections are applied to these hit times. If $\mid t_x - t_y \mid$ is consistent with the resolution of the detector, the combination is said to be a space point. The space point thus formed contains the following information
+\begin{table*}
+\begin{center}
+\caption{TOFSpacePoint class members.}
+\begin{tabularx}{\linewidth}{lX}
+\hline
+Name & Meaning \\
+\hline
+\verb|pixel_key| & \verb|string| encoded with the TOF station,plane,slab\\
+\verb|slabY| & \verb|int| encoded with the TOF station,plane,slab\\
+\verb|slabX| & \verb|int| encoded with the TOF station,plane,slab\\
+\verb|time| & \verb|double| -- calibrated space point time\\
+\verb|charge| & \verb|int| -- average of the charges of the constitutent slabs\\
+\verb|charge_product| & \verb|int| -- average of charge products of the constitutent slabs\\
+\verb|dt| & \verb|double| -- time difference between the $x$ and $y$ slabs $=$ resolution\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\end{itemize}
+\begin{table*}
+\begin{center}
+\caption{Data cards for TOF reconstruction.}
+\begin{tabularx}{\linewidth}{lXX}
+\hline
+Name & Meaning & Default\\
+\hline
+\verb|TOF_trigger_station| & conversion & \verb|0.005 MeV|\\
+\verb|TOF_findTriggerPixelCut| & resolution for smearing the PMT time& \verb|0.1 ns|\\
+\verb|TOF_makeSpacePiontCut| & PMT collection efficiency & \verb|0.25| \\
+\verb|Enable_t0_correction| & light attenuation in slabs & \verb|1400 mm|\\
+\verb|Enable_triggerDelay_correction| & conversion from charge to ADC & \verb|0.125|\\
+\verb|Enable_timeWalk_correction| & conversion from time to TDC & \verb|0.025|\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}
+This is used by the reconstuction of the TOF detectors|
+\verb|#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"|
+\verb|#TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"|
+\verb|#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"|
+\verb|#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"|
+\verb|#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"|
+\verb|#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"|
+\verb|# the date for which we want the cabling and calibration|
+\verb|# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format|
+\verb|#TOF_calib_date_from = 'current'|
+\verb|TOF_calib_date_from = '2010-08-10 00:00:00'|
+\verb|TOF_cabling_date_from = 'current'|
+\verb|Enable_timeWalk_correction = True|
+\verb|Enable_triggerDelay_correction = True|
+\verb|Enable_t0_correction = True|
+
+\section{Database}
+\begin{itemize}
+\item Constants in the CDB
+\item Datacards
+\item Routines to access
+\begin{table*}
+\begin{center}
+\caption{Data cards for accessing calibrations from CDB.}
+\begin{tabularx}{\linewidth}{lXX}
+\hline
+Name & Meaning & Default\\
+\hline
+\verb|TOF_calib_date_from| & conversion & \verb|'2010-08-10 00:00:00'||\\
+\verb|TOF_cabling_date_from| & conversion & \verb|current|\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage} 
+\end{tabularx}
+\end{center}
+\end{table*}
+\end{itemize}
+
+

@@ -54,7 +54,7 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             keys = []
             keys.append("tof_cut_e")
             keys.append("tof_cut_mu")
-            keys.append("refresh_rate")
+            keys.append("reduce_plot_refresh_rate")
 
             for i in range(len(keys)):
                 if keys[i] in config_doc:
@@ -77,7 +77,7 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
-                return [{}]
+                return []
         
         if not self.get_space_points(spill):
             raise ValueError("space points not in spill")
@@ -91,7 +91,7 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             self.update_histos()
             return self.get_histogram_images()
         else:
-            return [spill]
+            return []
 
     def get_space_points(self, spill):#pylint: disable=R0911,R0912,R0914
         """Get space points from JSON"""

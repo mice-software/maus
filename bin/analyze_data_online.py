@@ -130,8 +130,9 @@ def maus_merge_output_process(maus_output_log, reducer_name, output_name,
     proc = subprocess.Popen(
                        ['python', maus_red, '-mongodb_database_name='+MONGODB,
                         '-type_of_dataflow=multi_process_merge_output',
-                        '-output_json_file_name='+output_name]+_extra_args,
-                       stdout=log, stderr=subprocess.STDOUT)
+                        '-output_json_file_name='+output_name,
+                        '-reduce_plot_refresh_rate=60']+_extra_args,
+                        stdout=log, stderr=subprocess.STDOUT)
     print 'with pid', proc.pid # pylint: disable = E1101
     return proc
 

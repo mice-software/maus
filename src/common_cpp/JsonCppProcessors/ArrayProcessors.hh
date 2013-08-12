@@ -109,9 +109,8 @@ class ValueArrayProcessor : public ProcessorBase<std::vector<ArrayContents> > {
   public:
     /** @Constructor
      *
-     *  @param contents_processor is a pointer that will be used to process the 
-     *  target contents. PointerArrayProcessor takes ownership of the memory
-     *  allocated to contents_processor.
+     *  @param ArrayContentsProcessor is a pointer that will be used to process 
+     *  the target contents.
      */
     explicit ValueArrayProcessor
                          (ProcessorBase<ArrayContents>* ArrayContentsProcessor);

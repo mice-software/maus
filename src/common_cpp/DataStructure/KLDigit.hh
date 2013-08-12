@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -112,7 +112,7 @@ class KLDigit {
     int _cell;
     int _position_max;
 
-    ClassDef(KLDigit, 1)
+    MAUS_VERSIONED_CLASS_DEF(KLDigit)
 };
 }
 
