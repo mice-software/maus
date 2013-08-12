@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <Python.h>
+
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
