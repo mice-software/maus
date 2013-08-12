@@ -168,14 +168,20 @@ class MapPyGroup:
         @return result spill modified by the group members.
         """
         nu_spill = spill
+        output_type = 'std::string'
         for worker in self._workers:
-            # If the current worker is a MapPy??? worker, and the
-            # current nu_spill isn't a std::string, do the conversion
-            # first.
-            if (not hasattr(worker, 'can_convert') and
-                type(nu_spill) is not StringType):
-                nu_spill = data_to_string.convert(nu_spill)
-            nu_spill = worker.process(nu_spill)
+            # Can the current worker do the necessary conversion?
+            if (not hasattr(worker, 'can_convert')):
+                # Worker can't convert, so need to do it for it.
+                if (output_type != 'std::string'):
+                    # But only if it's not already in string format
+                    nu_spill = data_to_string.convert(nu_spill)
+                nu_spill = worker.process(nu_spill)
+                output_type = 'std::string'
+            else:
+                worker.set_input(output_type)
+                nu_spill = worker.process(nu_spill)
+                output_type = worker.get_output()
 
         # Always return a string type
         if (type(nu_spill) is not StringType):
