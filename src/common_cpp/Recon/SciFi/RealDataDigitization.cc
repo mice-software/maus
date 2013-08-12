@@ -34,8 +34,8 @@ void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool map = load_mapping("mapping_7.txt");
+  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
     throw(Squeal(Squeal::recoverable,
@@ -146,7 +146,7 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
     double tdc_gain     = calibration_[bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -235,7 +235,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -293,7 +293,6 @@ bool RealDataDigitization::load_calibration(std::string file) {
     return false;
 
   size_t n_channels = calibration_data.size();
-
   for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
     int bank            = calibration_data[i]["bank"].asInt();
     int channel_n       = calibration_data[i]["channel"].asInt();
@@ -398,7 +397,7 @@ bool RealDataDigitization::load_bad_channels() {
 
   while ( !inf.eof() ) {
     inf >> bad_bank >> bad_chan_ro;
-    _good_chan[bad_bank][bad_chan_ro] = false;
+    //_good_chan[bad_bank][bad_chan_ro] = false;
   }
 
   return true;
