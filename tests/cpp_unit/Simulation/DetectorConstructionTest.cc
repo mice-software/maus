@@ -41,9 +41,8 @@ class DetectorConstructionTest : public ::testing::Test {
     }
 
     ~DetectorConstructionTest() {
-        dc->SetMiceModules(*Globals::GetInstance()->GetMonteCarloMiceModules());
-        dc->ResetGeometry();
-        dc->ResetFields();
+        MiceModule mod("Test.dat");
+        dc->SetMiceModules(mod);
     }
 
     void SetUp() {}
@@ -60,7 +59,6 @@ TEST_F(DetectorConstructionTest, RootVolumeTest) {
     // I dont test anywhere that the volume name is updated. I dont know how
     MiceModule mod(mod_path+"RootVolumeTest.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     // Check that root volume gets correct size - tracks end on boundary edge
     // Check that user limits were set - track has (size/step_size)+1 steps
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
@@ -88,7 +86,6 @@ TEST_F(DetectorConstructionTest, RootVolumeTest) {
 TEST_F(DetectorConstructionTest, RootVolumeTestMaterial) {
     MiceModule mod(mod_path+"RootVolumeTestMaterial.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     // roughly minimum ionising
     // eloss = 11 MeV in 350 mm 
     p.energy = 226.;
@@ -107,7 +104,6 @@ TEST_F(DetectorConstructionTest, NormalVolumePlacementTest) {
     // Check rotation and translations
     MiceModule mod(mod_path+"VolumeTestPlacement.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     Json::Value steps = out["tracks"][Json::Value::UInt(0)]["steps"];
     EXPECT_DOUBLE_EQ(steps[Json::Value::UInt(0)]["position"]["z"].asDouble(),
@@ -124,7 +120,6 @@ TEST_F(DetectorConstructionTest, NormalVolumeMaterialTest) {
     // Check material
     MiceModule mod(mod_path+"VolumeTestMaterial.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     p.energy = 226.;
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     Json::Value steps = out["tracks"][Json::Value::UInt(0)]["steps"];
@@ -140,7 +135,6 @@ TEST_F(DetectorConstructionTest, NormalVolumeUserLimitsTest) {
     // Check material
     MiceModule mod(mod_path+"VolumeTestUserLimits.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
 
     // start and end of track same - due to kinetic energy threshold
     // beware kinetic_energy_threshold datacard = 0.1
@@ -176,21 +170,20 @@ TEST_F(DetectorConstructionTest, NormalVolumeVisTest) {
     // Check that vis doesnt blow up (what else to do?)
     MiceModule mod(mod_path+"VolumeTestVisAtt.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
 }
 
 TEST_F(DetectorConstructionTest, NormalVolumeNoneRecursionTest) {
     // Check that recursion through MiceModules does throw an exception
     MiceModule mod(mod_path+"VolumeTestNone.dat");
-    dc->SetMiceModules(mod);
-    EXPECT_THROW(dc->ResetGeometry(), MAUS::Exception);
+    bool cout_alive = Squeak::coutIsActive();
+    EXPECT_THROW(dc->SetMiceModules(mod), MAUS::Exception);
+    EXPECT_EQ(Squeak::coutIsActive(), cout_alive);
 }
 
 
 TEST_F(DetectorConstructionTest, BuildSensitiveDetectorTest) {
     MiceModule mod(mod_path+"SDTest.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     EXPECT_EQ(dc->GetSDSize(), 3);
     for (int i = 0; i < dc->GetSDSize(); ++i)
         EXPECT_EQ(dc->GetSDHits(i).size(), size_t(0));
@@ -210,12 +203,7 @@ TEST_F(DetectorConstructionTest, BuildSensitiveDetectorTest) {
     EXPECT_THROW(dc->GetSDHits(dc->GetSDSize()), MAUS::Exception);
 
     MiceModule mod_error(mod_path+"SDErrorTest.dat");
-    dc->SetMiceModules(mod_error);
-    EXPECT_THROW(dc->ResetGeometry(), MAUS::Exception);
-
-    MiceModule mod2(mod_path+"RootVolumeTest.dat");
-    dc->SetMiceModules(mod2);
-    dc->ResetGeometry();
+    EXPECT_THROW(dc->SetMiceModules(mod_error), MAUS::Exception);
 }
 
 TEST_F(DetectorConstructionTest, SetDatacardVariablesTest) {
@@ -225,10 +213,8 @@ TEST_F(DetectorConstructionTest, SetDatacardVariablesTest) {
 TEST_F(DetectorConstructionTest, BuildG4DetectorVolumeTest) {
     MiceModule mod(mod_path+"G4DetectorTest.dat");
     dc->SetMiceModules(mod);
-    dc->ResetGeometry();
     MiceModule modError(mod_path+"G4DetectorTestError.dat");
-    dc->SetMiceModules(modError);
-    EXPECT_THROW(dc->ResetGeometry(), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(modError), MAUS::Exception);
 }
 
 void SetStepperType(DetectorConstruction* dc, std::string type) {
@@ -242,25 +228,20 @@ TEST_F(DetectorConstructionTest, SetSteppingAlgorithmTest) {
     MiceModule modMag(mod_path+"MagFieldTest.dat");
     std::string models[] = {"Classic", "ClassicalRK4", "SimpleHeum",
               "ImplicitEuler", "SimpleRunge", "ExplicitEuler", "CashKarpRKF45"};
-    dc->SetMiceModules(modEM);
     for (int i = 0; i < 7; ++i) {
         SetStepperType(dc, models[i]);
-        dc->ResetFields();
+        dc->SetMiceModules(modEM);
     }
     SetStepperType(dc, "error");
-    EXPECT_THROW(dc->ResetFields(), MAUS::Exception);
-    dc->SetMiceModules(modMag);
+    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
     for (int i = 0; i < 7; ++i) {
         SetStepperType(dc, models[i]);
-        dc->ResetFields();
+        dc->SetMiceModules(modMag);
     }
     SetStepperType(dc, "error");
-    EXPECT_THROW(dc->ResetFields(), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
     SetStepperType(dc, "ClassicalRK4");
 }
-
-// TEST_F(DetectorConstructionTest, SetSteppingAccuracyTest) {
-// }
 }
 }
 

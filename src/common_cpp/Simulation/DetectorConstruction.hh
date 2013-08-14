@@ -73,7 +73,7 @@ public:
    *   @param cards (borrowed reference) - the control variables. Caller still
    *          owns memory allocated to cards
    */
-  DetectorConstruction(const MiceModule& model, const Json::Value& cards);
+  DetectorConstruction(const Json::Value& cards);
 
   /** Destructor */
   ~DetectorConstruction();
@@ -120,24 +120,17 @@ public:
 
   /** Set the mice modules
    *
-   *  Note that Geant4 and field maps will not be updated until Reset...
-   *  functions are called.
+   *  Updates Geant4 geometry and MC field maps according to the new geoemtry
    *
    *  Caller owns memory referenced by mods (makes a deep copy)
    */
   inline void SetMiceModules(const MiceModule& mods);
 
-  /** Reset the Geant4 geometry according to a new set of mice modules
-   *
-   *  Does not reset fields.
-   */
-  void ResetGeometry();
+private:
 
-  /** Reset the MAUS/Geant4 field maps according to a new set of mice modules
-   */
+  void ResetGeometry();
   void ResetFields();
 
-private:
 
   std::vector<MAUS::MAUSSD*> _SDs; // G4 owns the memory - this is borrowed
 
@@ -219,6 +212,8 @@ inline void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
     if (_model != NULL)
         delete _model;
     _model = MiceModule::deepCopy(mods, false);
+    ResetGeometry();
+    ResetFields();
 }
 
 } // Simulation

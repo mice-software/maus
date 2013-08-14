@@ -78,9 +78,10 @@ class GlobalsManager {
 
     /** Set the MC Geometry MiceModules
      *
-     *  Globals takes ownership of memory allocated to root_module. Note that
-     *  Geant4 and the field maps are not updated here; need to explicitly call
-     *  Reset functions below for this effect.
+     *  Globals takes ownership of memory allocated to root_module. If
+     *  root_module is non-NULL, this triggers also an update of the mc fields
+     *  and geant4 geometry. If root_module is NULL, then mc fields and geant4
+     *  are left untouched.
      */
     static void SetMonteCarloMiceModules(MiceModule* root_module);
 
@@ -96,16 +97,10 @@ class GlobalsManager {
      */
     static void SetRunActionManager(RunActionManager* manager);
 
-    /** Reset Geant4 geometry, for example to use an updated MiceModules set.
+    /** Do any final memory clean-up before exiting the program.
      *
-     *  Does not reset fields.
+     *  Following execution of this function, MAUS will no longer be usable
      */
-    static void ResetGeant4Geometry();
-
-    /** Reset field maps, for example to use an updated MiceModules set. */
-    static void ResetMCFields();
-
-    /** */
     static void Finally();
 
   private:

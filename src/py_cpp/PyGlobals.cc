@@ -58,11 +58,8 @@ std::string("call to set_monte_carlo_mice_modules(...)\n")+
 std::string("Throws an exception if globals have not been initialised.");
 
 std::string SetMonteCarloMiceModules_DocString =
-std::string("Set the simulation geometry.\n\n")+
+std::string("Set the simulation geometry and fields.\n\n")+
 std::string("  - modules (MiceModule) the new geometry object.\n")+
-std::string("  - reset_fields (bool) set to true to reset the fields\n")+
-std::string("  - reset_geometry (bool) set to true to reset the geant4\n")+
-std::string("    physical geometry.\n")+
 std::string("Returns None. Throws an exception if globals have not been\n")+
 std::string("initialised.");
 
@@ -194,17 +191,12 @@ PyObject* SetMonteCarloMiceModules
                              (PyObject* self, PyObject* args, PyObject *kwds) {
     if (!Globals::HasInstance()) {
         PyErr_SetString(PyExc_RuntimeError,
-                  "Attempt to get MC mice modules but globals not birthed");
+                  "Attempt to set MC mice modules but globals not birthed");
         return NULL;
     }
     PyObject* py_mod = NULL;
-    int rebuild_fields = 1;
-    int rebuild_g4 = 1;
-    static char *kwlist[] = {const_cast<char*>("module"),
-                             const_cast<char*>("rebuild_fields"),
-                             const_cast<char*>("rebuild_geant4"), NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|ii", kwlist, &py_mod,
-                                     &rebuild_fields, &rebuild_g4)) {
+    static char *kwlist[] = {const_cast<char*>("module"), NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &py_mod)) {
         return NULL;
     }
 
@@ -214,8 +206,6 @@ PyObject* SetMonteCarloMiceModules
         return NULL;
     }
     GlobalsManager::SetMonteCarloMiceModules(mod);
-    if (rebuild_fields)
-        GlobalsManager::ResetMCFields();
     Py_INCREF(Py_None);
     return Py_None;
 }

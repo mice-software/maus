@@ -61,7 +61,6 @@ class GlobalsTest : public ::testing::Test {
             GlobalsManager::InitialiseGlobals(str);
         }
         GlobalsManager::SetMonteCarloMiceModules(root);
-        GlobalsManager::ResetMCFields();
     }
 
     void SetUp() {}
@@ -146,7 +145,7 @@ TEST_F(GlobalsTest, TestAccessors) {
                    GlobalsManager::SetLegacyCards, new dataCards());
     test_accessors(Globals::GetMonteCarloMiceModules,
                    GlobalsManager::SetMonteCarloMiceModules,
-                   new MiceModule());
+                   new MiceModule("Test.dat"));
     test_accessors(Globals::GetReconstructionMiceModules,
                    GlobalsManager::SetReconstructionMiceModules,
                    new MiceModule());
@@ -176,13 +175,9 @@ TEST_F(GlobalsTest, TestResetFields) {
     double field[] = {0., 0., 0., 0., 0., 0.};
     Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
     EXPECT_DOUBLE_EQ(field[1], 0.);
-    // insert new modules but don't reset fields; check field = 0
+    // now reset fields; check field != 0
     MiceModule* test_mod = new MiceModule(mod_name);
     GlobalsManager::SetMonteCarloMiceModules(test_mod);
-    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
-    EXPECT_DOUBLE_EQ(field[1], 0.);
-    // now reset fields; check field != 0
-    GlobalsManager::ResetMCFields();
     Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
     // check field value
     EXPECT_DOUBLE_EQ(fabs(field[0]), 1.);

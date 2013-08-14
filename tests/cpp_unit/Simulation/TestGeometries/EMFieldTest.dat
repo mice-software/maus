@@ -1,10 +1,11 @@
-Configuration Box 
+Configuration EMFieldTest 
 {
-  Dimensions 10. 10. 20. mm
+  Dimensions 10. 10. 1000. mm
   PropertyString Material Galactic
   PropertyDouble G4StepMax 100 mm
   Module RF
   {
+    PropertyHep3Vector Position 0. 0. 500. mm
     PropertyString Volume None
     PropertyString FieldType PillBox
     PropertyString CavityMode Unphased 

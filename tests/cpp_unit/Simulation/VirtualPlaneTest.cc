@@ -51,7 +51,9 @@ class VirtualPlaneTest : public ::testing::Test {
     vp_tau = VirtualPlane::BuildVirtualPlane(rot, pos, 100., false, 5.,
                         BTTracker::tau_field, VirtualPlane::new_station, false);
   }
-  virtual ~VirtualPlaneTest() {}
+  virtual ~VirtualPlaneTest() {
+  }
+
   virtual void SetUp() {}
   virtual void TearDown() {}
 
@@ -154,11 +156,11 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   VirtualPlane vp_z_local = VirtualPlane::BuildVirtualPlane(rot, pos, 100.,
                           false, 5., BTTracker::z, VirtualPlane::ignore, true);
   std::string mod_name = std::string(getenv("MAUS_ROOT_DIR"))+
-                         std::string("/tests/cpp_unit/Globals/QuadTest.dat");
+                         std::string("/tests/cpp_unit/Simulation/")+
+                         std::string("TestGeometries/MagFieldTest.dat");
   MiceModule* mod_orig = Globals::GetMonteCarloMiceModules();
   MiceModule* test_mod = new MiceModule(mod_name);
   GlobalsManager::SetMonteCarloMiceModules(test_mod);
-  GlobalsManager::ResetMCFields();
 
   VirtualPlaneManager vpm;
   vpm.ConstructVirtualPlanes(
@@ -211,7 +213,6 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   EXPECT_NEAR(hit_l.GetBField().y(), h_b.y(), 1e-6);
   EXPECT_NEAR(hit_l.GetBField().z(), h_b.z(), 1e-6);
   GlobalsManager::SetMonteCarloMiceModules(mod_orig);
-  GlobalsManager::ResetMCFields();
 }
 
 TEST_F(VirtualPlaneTest, ComparePositionTest) {

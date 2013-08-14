@@ -82,7 +82,6 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         process->_legacy_mice_run->miceModule = process->_mc_mods;
         process->_maus_geant4_manager = MAUSGeant4Manager::GetInstance();
         process->_mc_field_constructor = process->_maus_geant4_manager->GetField();
-        process->_maus_geant4_manager->SetPhases();
         process->_mc_field_constructor->Print(Squeak::mout(Squeak::info));
         if (process->_recon_mods == process->_mc_mods) {
             process->_recon_field_constructor = process->_mc_field_constructor;
@@ -179,6 +178,8 @@ void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
         delete Globals::_process->_mc_mods;
     }
     Globals::_process->_mc_mods = mc_mods;
+    if (mc_mods != NULL)
+        Globals::_process->GetGeant4Manager()->SetMiceModules(*mc_mods);
 }
 
 void GlobalsManager::SetLegacyCards(dataCards* legacy_cards) {
@@ -195,25 +196,6 @@ void GlobalsManager::SetRunActionManager(RunActionManager* run_action) {
     Globals::_process->_run_action_manager = run_action;
 }
 
-void GlobalsManager::ResetMCFields() {
-    // first set mods
-    MAUSGeant4Manager* g4man = Globals::_process->GetGeant4Manager();
-    g4man->GetGeometry()->SetMiceModules(*Globals::_process->_mc_mods);
-    // and now update fields
-    BTFieldConstructor* field = reinterpret_cast<BTFieldConstructor*>
-                                   (Globals::_process->GetMCFieldConstructor());
-    Squeak::mout(Squeak::debug) << "New fields" << std::endl;
-    field->Print(Squeak::mout(Squeak::debug)); 
-}
-
-void GlobalsManager::ResetGeant4Geometry() {
-    MAUSGeant4Manager* g4man = Globals::_process->GetGeant4Manager();
-    g4man->GetGeometry()->SetMiceModules(*Globals::_process->_mc_mods);
-    Globals::_process->_maus_geant4_manager->GetGeometry()->ResetGeometry();
-    VirtualPlaneManager* virt_man = new VirtualPlaneManager();
-    virt_man->ConstructVirtualPlanes(Globals::_process->_mc_mods);
-    g4man->SetVirtualPlanes(virt_man);
-}
 
 /*
 void GlobalsManager::SetGeant4Manager

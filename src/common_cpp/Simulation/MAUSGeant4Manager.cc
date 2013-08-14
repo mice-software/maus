@@ -52,10 +52,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
-    MiceModule* model = Globals::GetInstance()->GetMonteCarloMiceModules();
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
     // just set up a dummy geometry
-    _detector   = new Simulation::DetectorConstruction(*model, *cards);
+    _detector   = new Simulation::DetectorConstruction(*cards);
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
@@ -71,12 +70,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_eventAct);
     _runManager->SetUserAction(new MAUSStackingAction);
     _runManager->SetUserAction(new MAUSRunAction);
-    _virtPlanes = new VirtualPlaneManager;
-    _virtPlanes->ConstructVirtualPlanes(model);
     _runManager->Initialize();
     // now set up full geometry
-    _detector->ResetGeometry();
-    _detector->ResetFields();
+    SetMiceModules(*Globals::GetInstance()->GetMonteCarloMiceModules());
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -165,5 +161,12 @@ BTFieldConstructor* MAUSGeant4Manager::GetField() {
   return _detector->GetField();
 }
 
+// should be const MiceModule
+void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
+    _virtPlanes = new VirtualPlaneManager;
+    _virtPlanes->ConstructVirtualPlanes(&module);
+    _detector->SetMiceModules(module);
+    SetPhases();
+}
 }  // namespace MAUS
 

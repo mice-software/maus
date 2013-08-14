@@ -153,6 +153,13 @@ class MAUSGeant4Manager {
      */
     ~MAUSGeant4Manager();
 
+    /** Reset the simulation with a new geometry set
+     *
+     *  @param module root module of the new geometry set. Field definitions and
+     *         Geant4 geometry definitions will be taken from this module.
+     */
+    void SetMiceModules(MiceModule& module);
+
   private:
     MAUSGeant4Manager();
     MAUSGeant4Manager(const MAUSGeant4Manager& copy);
@@ -164,7 +171,7 @@ class MAUSGeant4Manager {
     MAUSSteppingAction*         _stepAct;
     MAUSTrackingAction*         _trackAct;
     MAUSEventAction*            _eventAct;
-    Simulation::DetectorConstruction*       _detector;
+    Simulation::DetectorConstruction*  _detector;
     VirtualPlaneManager*        _virtPlanes;
     MAUSVisManager*             _visManager;
 

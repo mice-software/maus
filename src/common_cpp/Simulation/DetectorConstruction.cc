@@ -84,19 +84,15 @@
 
 namespace MAUS {
 namespace Simulation {
-DetectorConstruction::DetectorConstruction
-                            (const MiceModule& model, const Json::Value& cards)
-  : _model(MiceModule::deepCopy(model, false)), 
-    _btField(NULL), _miceMagneticField(NULL),
+DetectorConstruction::DetectorConstruction(const Json::Value& cards)
+  : _model(), _btField(NULL), _miceMagneticField(NULL),
     _miceElectroMagneticField(NULL), _rootLogicalVolume(NULL),
     _rootPhysicalVolume(NULL), _stepper(NULL), _chordFinder(NULL),
     _rootVisAtts(NULL), _equationM(NULL), _equationE(NULL) {
   _event = new MICEEvent();
-
   SetDatacardVariables(cards);
   SetBTMagneticField();
   _materials = fillMaterials(NULL);
-
   if (_materials == NULL)
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire MiceMaterials",
@@ -189,10 +185,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   // Set up the logical volume
   G4Box* rootBox = new G4Box("Default", 1, 1, 1);
   G4Material* rootMat = _materials->materialByName("Galactic");
-  _rootLogicalVolume = new G4LogicalVolume
-                                    (rootBox, rootMat, _model->name(), 0, 0, 0);
+  _rootLogicalVolume = new G4LogicalVolume(rootBox, rootMat, "Dummy", 0, 0, 0);
   _rootPhysicalVolume = new G4PVPlacement(0, G4ThreeVector(),
-             _model->name(), _rootLogicalVolume, 0, false, 0, _checkVolumes);
+                   "DummyPV", _rootLogicalVolume, 0, false, 0, _checkVolumes);
   // we never visualise the root LV
   _rootVisAtts = new G4VisAttributes(false);
   _rootLogicalVolume->SetVisAttributes(_rootVisAtts);
@@ -236,8 +231,13 @@ void DetectorConstruction::ResetGeometry() {
   bool cout_alive = Squeak::coutIsActive();
   if (_checkVolumes && !cout_alive)
       Squeak::activateCout(true);
+  try {
   for(int i = 0; i < _model->daughters(); ++i)
-      AddDaughter(_model->daughter(i), _rootPhysicalVolume);
+    AddDaughter(_model->daughter(i), _rootPhysicalVolume);
+  } catch(Exception exc) {
+    Squeak::activateCout(cout_alive);
+    throw exc;
+  }
   Squeak::activateCout(cout_alive);
   // close the geometry
   G4GeometryManager::GetInstance()->CloseGeometry();
