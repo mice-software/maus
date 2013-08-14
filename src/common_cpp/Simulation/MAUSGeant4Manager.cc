@@ -23,6 +23,7 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
@@ -53,7 +54,8 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager = new G4RunManager;
     MiceModule* model = Globals::GetInstance()->GetMonteCarloMiceModules();
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
-    _detector   = new MICEDetectorConstruction(model, cards );
+    // just set up a dummy geometry
+    _detector   = new Simulation::DetectorConstruction(*model, *cards);
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
@@ -70,19 +72,20 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(new MAUSStackingAction);
     _runManager->SetUserAction(new MAUSRunAction);
     _virtPlanes = new VirtualPlaneManager;
-    _virtPlanes->ConstructVirtualPlanes(
-      GetField(),
-      model
-    );
+    _virtPlanes->ConstructVirtualPlanes(model);
     _runManager->Initialize();
+    // now set up full geometry
+    _detector->ResetGeometry();
+    _detector->ResetFields();
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
-    delete _runManager;
     if (_visManager != NULL) {
-        delete _visManager;
+       delete _visManager;
     }
+    delete _runManager;
     _isClosed = true;
+    delete _virtPlanes;
 }
 
 void MAUSGeant4Manager::SetPhases() {
@@ -157,5 +160,10 @@ void MAUSGeant4Manager::SetVisManager() {
       _visManager->Initialize();
   }
 }
+
+BTFieldConstructor* MAUSGeant4Manager::GetField() {
+  return _detector->GetField();
+}
+
 }  // namespace MAUS
 

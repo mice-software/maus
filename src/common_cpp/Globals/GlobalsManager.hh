@@ -78,7 +78,9 @@ class GlobalsManager {
 
     /** Set the MC Geometry MiceModules
      *
-     *  Globals takes ownership of memory allocated to root_module
+     *  Globals takes ownership of memory allocated to root_module. Note that
+     *  Geant4 and the field maps are not updated here; need to explicitly call
+     *  Reset functions below for this effect.
      */
     static void SetMonteCarloMiceModules(MiceModule* root_module);
 
@@ -94,11 +96,17 @@ class GlobalsManager {
      */
     static void SetRunActionManager(RunActionManager* manager);
 
-    /** Reset Geant4, for example to use an updated MiceModules set. */
-    static void ResetGeant4();
+    /** Reset Geant4 geometry, for example to use an updated MiceModules set.
+     *
+     *  Does not reset fields.
+     */
+    static void ResetGeant4Geometry();
 
     /** Reset field maps, for example to use an updated MiceModules set. */
     static void ResetMCFields();
+
+    /** */
+    static void Finally();
 
   private:
     // disallow copy and assign

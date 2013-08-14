@@ -99,7 +99,10 @@ keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_mu":False, "anti_nu_mu":False,
                           "nu_tau":False, "anti_nu_tau":False,
 }
-kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+max_step_length = 100. # default maximum step size during tracking (override with G4StepMax in MiceModule)
+max_track_time = 1.e9 # kill tracks with time above max_time (override with G4TimeMax in MiceModule)
+max_track_length = 1.e8 # kill tracks with track length above max_track_length (override with G4TrackMax in MiceModule)
+kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold (override with G4KinMin in MiceModule)
 field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 

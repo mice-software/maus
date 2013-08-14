@@ -47,6 +47,8 @@ class GlobalsTest : public ::testing::Test {
                       (*Globals::GetInstance()->GetConfigurationCards());
         // watch out - this breaks the test order!
         // always force GlobalsManager to not exist at start
+        root = MiceModule::deepCopy
+                                  (*Globals::GetMonteCarloMiceModules(), false);
         if (Globals::HasInstance()) {
             GlobalsManager::DeleteGlobals();
         }
@@ -58,14 +60,16 @@ class GlobalsTest : public ::testing::Test {
         if (!Globals::HasInstance()) {
             GlobalsManager::InitialiseGlobals(str);
         }
+        GlobalsManager::SetMonteCarloMiceModules(root);
+        GlobalsManager::ResetMCFields();
     }
 
     void SetUp() {}
     void TearDown() {}
 
     std::string str;
-
   private:
+    MiceModule* root;
 };
 
 // Also here we check that GetProcessDataManager works
@@ -180,10 +184,16 @@ TEST_F(GlobalsTest, TestResetFields) {
     // now reset fields; check field != 0
     GlobalsManager::ResetMCFields();
     Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
-    // don't want to get into this, but for some reason my test geometry was
-    // making fields in kT not T... ack... should be 0.0005 kT
-    EXPECT_GT(fabs(field[1]), 0.0001);
-    std::cerr << "Field should be 0.0005 [kT] " << field[1] << std::endl;
+    // check field value
+    EXPECT_DOUBLE_EQ(fabs(field[0]), 1.);
+    EXPECT_DOUBLE_EQ(fabs(field[1]), 2.);
+    EXPECT_DOUBLE_EQ(fabs(field[2]), 3.);
+}
+
+TEST_F(GlobalsTest, TestResetGeant4Geometry) {
+// Check that Virtual Planes are rebuilt okay
+// Check that Materials and volumes are rebuilt okay
+// Check that sensitive detectors are rebuilt okay
 }
 
 // Version number is tested in PyGlobals

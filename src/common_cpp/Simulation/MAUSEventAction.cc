@@ -17,6 +17,9 @@
 
 #include <vector>
 
+#include "src/common_cpp/Utils/Exception.hh"
+
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
@@ -31,6 +34,13 @@ MAUSEventAction::MAUSEventAction()
 }
 
 void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
+    if (_virtPlanes == NULL ||
+        _tracking == NULL ||
+        _stepping == NULL ||
+        _geometry==NULL)
+        throw(Exception(Exception::recoverable,
+                        "EventAction::SetEvents not called",
+                        "EventAction::BeginOfEventAction"));
     _virtPlanes->StartOfEvent();
     if (_tracking->GetWillKeepTracks())
         _tracking->SetTracks(Json::Value(Json::arrayValue));

@@ -23,7 +23,7 @@
 
 // should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/FillMaterials.hh"
-#include "src/legacy/Simulation/MICEDetectorConstruction.hh"
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
@@ -36,6 +36,10 @@ namespace MAUS {
 
 class MAUSVisManager;
 class MAUSPhysicsList;
+
+namespace Simulation {
+class DetectorConstruction;
+}
 
 /** @class MAUSGeant4Manager
  *
@@ -83,7 +87,7 @@ class MAUSGeant4Manager {
 
     /** @brief Get the Geometry
      */
-    MICEDetectorConstruction* GetGeometry() const {return _detector;}
+    Simulation::DetectorConstruction* GetGeometry() const {return _detector;}
 
     /** @brief Get the VirtualPlanes
      */
@@ -139,8 +143,9 @@ class MAUSGeant4Manager {
      */
     MAUSVisManager* GetVisManager() {return _visManager;}
 
-    BTFieldConstructor* GetField() {return _detector->GetField();}
-
+    /** @brief Get the MAUS field manager object
+     */
+    BTFieldConstructor* GetField();
 
     /** Delete the manager and close any existing simulation
      *
@@ -159,7 +164,7 @@ class MAUSGeant4Manager {
     MAUSSteppingAction*         _stepAct;
     MAUSTrackingAction*         _trackAct;
     MAUSEventAction*            _eventAct;
-    MICEDetectorConstruction*   _detector;
+    Simulation::DetectorConstruction*       _detector;
     VirtualPlaneManager*        _virtPlanes;
     MAUSVisManager*             _visManager;
 

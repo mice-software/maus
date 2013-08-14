@@ -30,11 +30,12 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
+
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 class G4Step;
 class G4StepPoint;
@@ -221,6 +222,12 @@ class VirtualPlane {
   ::CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
   ::CLHEP::HepRotation _rotation;  // if var is u, then this will give rotation
   bool               _allowBackwards;
+
+  inline const BTField* GetField() const {
+      return reinterpret_cast<BTField*>
+             (Globals::GetInstance()->GetMCFieldConstructor());
+  }
+
   friend class VirtualPlaneManager;
 };
 
@@ -257,12 +264,14 @@ class VirtualPlaneManager {
    *  additional virtual plane definitions.
    *
    *  @params field pointer to the global field group. If this is NULL, will
-   *          make an empty field.
+   *          make an empty field. Caller owns memory allocated to model.
    *  @params model pointer to the global model. Will construct virtual planes
    *          off any Module with "PropertyString SensitiveDetector Envelope" or
-   *          "PropertyString SensitiveDetector Virtual"
+   *          "PropertyString SensitiveDetector Virtual". Model is a borrowed
+   *          reference. VirtualPlanes hopes field stays alive for as long as
+   *          VirtualPlanes are required (eek).
    */
-  void ConstructVirtualPlanes(const BTField* field, MiceModule* model);
+  void ConstructVirtualPlanes(MiceModule* model);
 
   /** @brief Check to see if a step straddles a VirtualPlane
    *
@@ -285,17 +294,6 @@ class VirtualPlaneManager {
    * to ignore.
    */
   void StartOfEvent();
-
-  /** @brief Return a pointer to the field object used for tracking
-   */
-  const BTField* GetField() { return _field;}
-
-  /** @brief Set the pointer to the field object used for tracking
-   */
-  void SetField(const BTField* field) {
-    _field = field;
-    VirtualPlane::_field = field;
-  }
 
   /** @brief Get a pointer to the MiceModule based on StationNumber
    *
@@ -379,15 +377,12 @@ class VirtualPlaneManager {
 
   ::CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
 
-  const BTField*            _field;
   bool                      _useVirtualPlanes;
   std::vector<VirtualPlane*> _planes;
   // associate MiceModule with each plane in _planes
   std::map<VirtualPlane*, const MiceModule*>  _mods;
   std::vector<int>          _nHits;  // numberOfHits in each plane
   Json::Value               _hits;
-
-  static const BTFieldGroup       _default_field;  // _field defaults to this
 };
 }
 #endif

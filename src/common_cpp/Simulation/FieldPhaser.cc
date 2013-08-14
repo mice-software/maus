@@ -38,8 +38,7 @@ FieldPhaser::~FieldPhaser() {
 
 void FieldPhaser::SetUp() {
     MiceModule mod;
-    _phaserVirtualPlanes.ConstructVirtualPlanes
-                           (Globals::GetInstance()->GetMCFieldConstructor(), &mod);
+    _phaserVirtualPlanes.ConstructVirtualPlanes(&mod);
     // set up
     std::vector<BTPhaser::FieldForPhasing*> cavities =
                            BTPhaser::GetInstance()->GetFieldsForPhasing();

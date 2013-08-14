@@ -1,0 +1,18 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 20. mm
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module RF
+  {
+    PropertyString Volume None
+    PropertyString FieldType PillBox
+    PropertyString CavityMode Unphased 
+    PropertyString FieldDuringPhasing None
+    PropertyDouble Frequency 201.
+    PropertyDouble PeakEField 10.
+    PropertyDouble TimeDelay 10.
+    PropertyDouble Length 500 mm
+  }
+}
+

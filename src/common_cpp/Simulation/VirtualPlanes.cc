@@ -34,7 +34,6 @@
 
 namespace MAUS {
 
-const BTField*         VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
 
 /////////////////////// VirtualPlane //////////////////
@@ -100,7 +99,7 @@ void VirtualPlane::FillBField(VirtualHit * aHit, const G4Step * aStep) const {
   double point[4] =
      {aHit->GetPos()[0], aHit->GetPos()[1], aHit->GetPos()[2], aHit->GetTime()};
   double field[6] = {0., 0., 0., 0., 0., 0.};
-  _field->GetFieldValue(point, field);
+  GetField()->GetFieldValue(point, field);
   aHit->SetBField(CLHEP::Hep3Vector(field[0], field[1], field[2]));
   aHit->SetEField(CLHEP::Hep3Vector(field[3], field[4], field[5]));
 }
@@ -187,7 +186,7 @@ double * VirtualPlane::Integrate(G4StepPoint* aPoint) const {
   double* x_in = ExtractPointData(aPoint);
   double  step = _step;
   if (GetIndependentVariable(aPoint) > _independentVariable) step *= -1.;
-  BTTracker::integrate(_independentVariable, x_in, _field, _planeType, step,
+  BTTracker::integrate(_independentVariable, x_in, GetField(), _planeType, step,
                        aPoint->GetCharge(), _position, _rotation);
   return x_in;
 }
@@ -204,15 +203,12 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
 
 //////////////////////// VirtualPlaneManager //////////////////////////
 
-const BTFieldGroup VirtualPlaneManager::_default_field;
-
-VirtualPlaneManager::VirtualPlaneManager() : _field(NULL),
+VirtualPlaneManager::VirtualPlaneManager() :
       _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
       _hits(Json::arrayValue) {
 }
 
 VirtualPlaneManager::~VirtualPlaneManager() {
-  _field = NULL;
   _useVirtualPlanes = false;
   _nHits = std::vector<int>();
   _mods = std::map<VirtualPlane*, const MiceModule*>();
@@ -261,7 +257,7 @@ void VirtualPlaneManager::StartOfEvent() {
 }
 
 void VirtualPlaneManager::ConstructVirtualPlanes
-                                     (const BTField* field, MiceModule* model) {
+                                     (MiceModule* model) {
   std::vector<const MiceModule*> modules   =
              model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes =
@@ -270,9 +266,6 @@ void VirtualPlaneManager::ConstructVirtualPlanes
   for (unsigned int i = 0; i < modules.size(); i++) {
     AddPlane(new VirtualPlane(ConstructFromModule(modules[i])), modules[i]);
   }
-  _field = field;
-  if (_field == NULL) _field = &_default_field;
-  VirtualPlane::_field = _field;
 }
 
 VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {

@@ -23,6 +23,7 @@
 #include "src/common_cpp/Utils/RunActionManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
@@ -143,6 +144,26 @@ void GlobalsManager::DeleteGlobals() {
     Globals::_process = NULL;
 };
 
+void GlobalsManager::Finally() {
+  Squeak::mout(Squeak::info) << "Closing MAUS - going to clean up" << std::endl;
+  if (Globals::_process->_maus_geant4_manager != NULL) {
+      delete Globals::_process->_maus_geant4_manager;
+  }
+  GlobalsManager::DeleteGlobals();
+
+/*
+  if (Globals::_process->_error_handler != NULL) {
+    delete Globals::_process->_error_handler;
+  }
+  if (Globals::_process->_legacy_mice_run != NULL) {
+    delete Globals::_process->_legacy_mice_run;
+  }
+  if (Globals::_process->_configuration_cards != NULL) {
+    delete Globals::_process->_configuration_cards;
+  }
+*/
+}
+
 void GlobalsManager::SetReconstructionMiceModules
                                                       (MiceModule* recon_mods) {
     if (Globals::GetInstance()->_recon_mods != NULL &&
@@ -175,35 +196,24 @@ void GlobalsManager::SetRunActionManager(RunActionManager* run_action) {
 }
 
 void GlobalsManager::ResetMCFields() {
-    typedef std::vector<BTField*>::iterator field_iter;
-    // we don't just delete and new as this would kill existing pointers to the
-    // field map (e.g. held by G4 stuff).
-
-    // get hold of the fields
+    // first set mods
+    MAUSGeant4Manager* g4man = Globals::_process->GetGeant4Manager();
+    g4man->GetGeometry()->SetMiceModules(*Globals::_process->_mc_mods);
+    // and now update fields
     BTFieldConstructor* field = reinterpret_cast<BTFieldConstructor*>
                                    (Globals::_process->GetMCFieldConstructor());
-    BTFieldGroup* mfield =
-       reinterpret_cast<BTFieldGroup*>(field->GetMagneticField());
-    BTFieldGroup* emfield =
-       reinterpret_cast<BTFieldGroup*>(field->GetElectroMagneticField());
-    // clear fields
-    std::vector<BTField*> field_v = mfield->GetFields();
-    for(field_iter it = field_v.begin(); it!=field_v.end(); it++)
-        mfield->Erase((*it), false);
-    field_v = emfield->GetFields();
-    for(field_iter it = field_v.begin();it!=field_v.end(); it++)
-        if(*it != mfield)
-            emfield->Erase((*it), false);
-    // redo some initialisation stuff
-    mfield->Close();
-    emfield->Close();
-    // now rebuild the fields
-    field->BuildFields(Globals::_process->_mc_mods);
-    // and print
     Squeak::mout(Squeak::debug) << "New fields" << std::endl;
     field->Print(Squeak::mout(Squeak::debug)); 
 }
 
+void GlobalsManager::ResetGeant4Geometry() {
+    MAUSGeant4Manager* g4man = Globals::_process->GetGeant4Manager();
+    g4man->GetGeometry()->SetMiceModules(*Globals::_process->_mc_mods);
+    Globals::_process->_maus_geant4_manager->GetGeometry()->ResetGeometry();
+    VirtualPlaneManager* virt_man = new VirtualPlaneManager();
+    virt_man->ConstructVirtualPlanes(Globals::_process->_mc_mods);
+    g4man->SetVirtualPlanes(virt_man);
+}
 
 /*
 void GlobalsManager::SetGeant4Manager

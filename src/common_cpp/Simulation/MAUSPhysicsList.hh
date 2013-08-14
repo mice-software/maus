@@ -23,6 +23,8 @@
 #include "Geant4/G4VUserPhysicsList.hh"
 
 class G4VModularPhysicsList;
+class G4StepLimiter;
+class G4UserSpecialCuts;
 
 namespace MAUS {
 
@@ -215,6 +217,8 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     double      _productionThreshold;
 
     G4VModularPhysicsList* _list;
+    std::vector<G4StepLimiter*> _limits;
+    std::vector<G4UserSpecialCuts*> _specialCuts;
 };
 }
 

@@ -185,8 +185,8 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
 
   VirtualPlaneManager* vpm = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
   vpm->SetVirtualHits(Json::Value(Json::arrayValue));
-  vpm->ConstructVirtualPlanes(NULL, &mod);
-  vpm->ConstructVirtualPlanes(NULL, &mod);
+  vpm->ConstructVirtualPlanes(&mod);
+  vpm->ConstructVirtualPlanes(&mod);
 
   G4Step*  step  = new G4Step();
   G4Track* track = SetG4TrackAndStep(step);

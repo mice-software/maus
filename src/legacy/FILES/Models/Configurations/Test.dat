@@ -5,12 +5,12 @@
 
 Configuration Test
 {
-  Dimensions 1. 1. 50. m
+  Dimensions 1. 1. 3. m
   PropertyString Material Galactic
   PropertyDouble G4StepMax 100.0 mm
   Module Box
   {
-    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyHep3Vector Position 0. 0. 55. mm
     PropertyHep3Vector Rotation 0. 0. 0. mm
     PropertyString     Volume   Box
     PropertyHep3Vector Dimensions 10. 10. 10. cm
