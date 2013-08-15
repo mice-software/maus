@@ -20,17 +20,18 @@
 
 #include <string>
 #include <vector>
-#include <json/json.h>
 
 #ifdef TESTS_CPP_UNIT_SIMULATION_DETECTORCONSTRUCTORTEST_CC
   #include "gtest/gtest_prod.h"
 #endif
 
+#include "json/json.h"
+
 #include "Geant4/G4VUserDetectorConstruction.hh"
 #include "Geant4/G4UniformMagField.hh"
 #include "Geant4/G4RotationMatrix.hh"
 
-#include "DetModel/MAUSSD.hh"  
+#include "DetModel/MAUSSD.hh"
 
 #include "src/legacy/Interface/MiceMaterials.hh"
 #include "src/legacy/Config/MiceModule.hh"
@@ -65,7 +66,7 @@ namespace Simulation {
  *  interpreting the corresponding commands for Geant4 to use
  */
 class DetectorConstruction : public G4VUserDetectorConstruction {
-public:
+ public:
   /** Constructor - initialises some variables but does not construct
    *
    *   @param model - description of the geometry. DetectorConstruction makes a
@@ -73,7 +74,7 @@ public:
    *   @param cards (borrowed reference) - the control variables. Caller still
    *          owns memory allocated to cards
    */
-  DetectorConstruction(const Json::Value& cards);
+  explicit DetectorConstruction(const Json::Value& cards);
 
   /** Destructor */
   ~DetectorConstruction();
@@ -126,7 +127,7 @@ public:
    */
   inline void SetMiceModules(const MiceModule& mods);
 
-private:
+ private:
 
   void ResetGeometry();
   void ResetFields();
@@ -143,24 +144,24 @@ private:
                              G4VPhysicalVolume* moth,
                              MiceModule* mod);
   void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
-  void SetUserLimits( G4LogicalVolume* logic, MiceModule* module);
-  void SetMagneticField( G4LogicalVolume* logic, MiceModule* module);
+  void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);
+  void SetMagneticField(G4LogicalVolume* logic, MiceModule* module);
   void SetVisAttributes(G4LogicalVolume* logic, MiceModule* mod);
 
   void SetBTMagneticField();
-  
-  void AddDaughter( MiceModule*, G4VPhysicalVolume* );
+
+  void AddDaughter(MiceModule*, G4VPhysicalVolume*);
 
   void GeometryCleanup();
 
-  //Set G4 Stepping Accuracy parameters
+  // Set G4 Stepping Accuracy parameters
   void SetSteppingAccuracy();
-  //Set G4 Stepping Algorithm
+  // Set G4 Stepping Algorithm
   void SetSteppingAlgorithm();
   // Throw an exception if Volume of all children != None
-  void CheckForVolumeInChildren(MiceModule* mod, MiceModule* recurse=NULL);
+  void CheckForVolumeInChildren(MiceModule* mod, MiceModule* recurse = NULL);
 
-  //Build a Q35 using Q35.hh methods
+  // Build a Q35 using Q35.hh methods
   G4LogicalVolume* BuildQ35(MiceModule * mod);
 
   MICEEvent* _event;
@@ -215,7 +216,6 @@ inline void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
     ResetGeometry();
     ResetFields();
 }
-
 } // Simulation
 } // MAUS
 #endif  // _SRC_COMMON_CPP_SIMULATION_DETECTORCONSTRUCTION_HH_

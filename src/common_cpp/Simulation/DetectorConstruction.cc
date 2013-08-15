@@ -178,7 +178,6 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
                                              JsonWrapper::realValue).asDouble();
   _stepMax = JsonWrapper::GetProperty(cards, "max_step_length",
                                              JsonWrapper::realValue).asDouble();
-
 }
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
@@ -232,7 +231,7 @@ void DetectorConstruction::ResetGeometry() {
   if (_checkVolumes && !cout_alive)
       Squeak::activateCout(true);
   try {
-  for(int i = 0; i < _model->daughters(); ++i)
+  for (int i = 0; i < _model->daughters(); ++i)
     AddDaughter(_model->daughter(i), _rootPhysicalVolume);
   } catch(Exception exc) {
     Squeak::activateCout(cout_alive);
@@ -289,10 +288,11 @@ void DetectorConstruction::BuildG4DetectorVolume(G4PVPlacement** place,
       _ckovMirrors.push_back(new CkovMirror(mod, mat, moth));
       *logic = _ckovMirrors.back()->logicalMirror();
       *place = _ckovMirrors.back()->placementMirror();
-    } else
+    } else {
       throw Exception(Exception::nonRecoverable,
                       "Unknown G4Detector type "+detector,
                       "DetectorConstruction::AddDaughter");
+    }
 }
 
 void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
@@ -315,10 +315,10 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
     Squeak::errorLevel my_err = Squeak::debug;
     if (mod->mother()->isRoot()) my_err = Squeak::info;
     Squeak::mout(my_err) << "Placing " << mod->name() << " of type "
-                        << mod->volType() << " position: " 
-                        << mod->globalPosition() << " mm, rotationVector: " 
+                        << mod->volType() << " position: "
+                        << mod->globalPosition() << " mm, rotationVector: "
                         << mod->globalRotation().getAxis()
-                        << " angle: "  << mod->globalRotation().delta()/degree 
+                        << " angle: "  << mod->globalRotation().delta()/degree
                         << " degrees, volume: "
                         << solid->GetCubicVolume()/meter/meter/meter << " m^3, ";
     if (mod->propertyExistsThis("Material", "string"))
@@ -331,8 +331,8 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
 void DetectorConstruction::SetVisAttributes
                                      (G4LogicalVolume* logic, MiceModule* mod) {
   bool vis = true;
-  if (mod->propertyExistsThis( "Invisible", "bool"))
-    vis = ! mod->propertyBoolThis( "Invisible");
+  if (mod->propertyExistsThis("Invisible", "bool"))
+    vis = !mod->propertyBoolThis("Invisible");
   if (vis) {
     double red = 0.;
     double green = 0.;
@@ -356,11 +356,10 @@ void DetectorConstruction::BuildSensitiveDetector
         !_everythingSpecialVirtual)
         return;
     // there is no way to delete sensitive detectors; all we can do is disable
-    // old ones and ensure that we use a unique naming convention so we only 
+    // old ones and ensure that we use a unique naming convention so we only
     // add detectors once.
     std::string sdName = mod->propertyStringThis("SensitiveDetector");
-    if (sdName == "SpecialVirtual" || _everythingSpecialVirtual)
-    {
+    if (sdName == "SpecialVirtual" || _everythingSpecialVirtual) {
       SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
       logic->SetSensitiveDetector(specVirtSD);
       _SDs.push_back(specVirtSD);
@@ -380,12 +379,13 @@ void DetectorConstruction::BuildSensitiveDetector
       // disabled
     } else if (sdName == "CKOV") {
       // disabled
-    } else if (sdName != "Virtual" && sdName != "Envelope")
+    } else if (sdName != "Virtual" && sdName != "Envelope") {
       // Virtual and Envelope are special cases
-      throw(Exception(Exception::recoverable, 
+      throw(Exception(Exception::recoverable,
             "Sensitive detector type "+sdName+" not recognised in module "+
             mod->fullName(),
             "DetectorConstruction::AddDaughter(...)"));
+    }
 }
 
 void DetectorConstruction::SetUserLimits
@@ -396,13 +396,13 @@ void DetectorConstruction::SetUserLimits
     double kinMin = _keThreshold;
 
     if (module->propertyExistsThis("G4StepMax", "double"))
-        stepMax  = module->propertyDouble( "G4StepMax" );
+        stepMax  = module->propertyDouble("G4StepMax");
     if (module->propertyExistsThis("G4TrackMax", "double"))
-        trackMax = module->propertyDouble( "G4TrackMax" );
-    if (module->propertyExistsThis("G4TimeMax", "double")) 
-        timeMax  = module->propertyDouble( "G4TimeMax" );
+        trackMax = module->propertyDouble("G4TrackMax");
+    if (module->propertyExistsThis("G4TimeMax", "double"))
+        timeMax  = module->propertyDouble("G4TimeMax");
     if (module->propertyExistsThis("G4KinMin", "double"))
-        kinMin   = module->propertyDouble( "G4KinMin" );
+        kinMin   = module->propertyDouble("G4KinMin");
     _userLims.push_back(new G4UserLimits(stepMax, trackMax, timeMax, kinMin));
     logic->SetUserLimits(_userLims.back());
 }
@@ -421,15 +421,12 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   G4FieldManager*        fieldMgr     =
          G4TransportationManager::GetTransportationManager()->GetFieldManager();
 
-  if (!_btField->HasRF())
-  { // No rf field, default integration
+  if (!_btField->HasRF()) { // No rf field, default integration
     fieldMgr->SetDetectorField(_miceMagneticField);
     if (_equationM != NULL)
       delete _equationM;
     _equationM = new G4Mag_UsualEqRhs(_miceMagneticField);
-  }
-  else
-  { // Electrical field are present, used full E.M.
+  } else { // Electrical field are present, used full E.M.
     fieldMgr->SetFieldChangesEnergy(true);
     fieldMgr->SetDetectorField(_miceElectroMagneticField);
     if (_equationE != NULL)
@@ -446,8 +443,8 @@ void DetectorConstruction::SetSteppingAlgorithm() {
     _stepper = NULL;
   }
 
-  //Scan through the list of steppers
-  if (_stepperType == "Classic" || _stepperType=="ClassicalRK4") {
+  // Scan through the list of steppers
+  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
     if (!_btField->HasRF()) _stepper = new G4ClassicalRK4(_equationM);
     else                    _stepper = new G4ClassicalRK4(_equationE, 8);
   } else if (_stepperType == "SimpleHeum") {
@@ -465,27 +462,29 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   } else if (_stepperType == "CashKarpRKF45") {
     if (!_btField->HasRF()) _stepper = new G4CashKarpRKF45(_equationM);
     else                    _stepper = new G4CashKarpRKF45(_equationE, 8);
-  } else throw(Squeal(Squeal::recoverable,
-                    "stepping_algorithm '"+_stepperType+"' not found",
-                    "DetectorConstruction::SetSteppingAlgorithm()"));
+  } else {
+    throw(Squeal(Squeal::recoverable,
+                "stepping_algorithm '"+_stepperType+"' not found",
+                "DetectorConstruction::SetSteppingAlgorithm()"));
+  }
   _chordFinder =  new G4ChordFinder(_miceMagneticField, 0.1*mm, _stepper);
   fieldMgr->SetChordFinder(_chordFinder);
 }
 
-//Set G4 Stepping Accuracy parameters
+// Set G4 Stepping Accuracy parameters
 void DetectorConstruction::SetSteppingAccuracy() {
   G4FieldManager* fieldMgr
        = G4TransportationManager::GetTransportationManager()->GetFieldManager();
   if (_deltaOneStep > 0)
-    fieldMgr->SetDeltaOneStep( _deltaOneStep );
+    fieldMgr->SetDeltaOneStep(_deltaOneStep);
   if (_deltaIntersection > 0)
-    fieldMgr->SetDeltaIntersection( _deltaIntersection );
+    fieldMgr->SetDeltaIntersection(_deltaIntersection);
   if (_missDistance > 0)
-    fieldMgr->GetChordFinder()->SetDeltaChord( _missDistance );
+    fieldMgr->GetChordFinder()->SetDeltaChord(_missDistance);
   if (_epsilonMin > 0)
-    fieldMgr->SetMinimumEpsilonStep( _epsilonMin );
+    fieldMgr->SetMinimumEpsilonStep(_epsilonMin);
   if (_epsilonMax > 0)
-    fieldMgr->SetMaximumEpsilonStep( _epsilonMax );
+    fieldMgr->SetMaximumEpsilonStep(_epsilonMax);
 }
 
 Json::Value DetectorConstruction::GetSDHits(size_t i) {
@@ -517,10 +516,10 @@ void DetectorConstruction::ResetFields() {
        reinterpret_cast<BTFieldGroup*>(_btField->GetElectroMagneticField());
     // clear fields
     std::vector<BTField*> field_v = mfield->GetFields();
-    for(field_iter it = field_v.begin(); it!=field_v.end(); it++)
+    for (field_iter it = field_v.begin(); it != field_v.end(); it++)
         mfield->Erase((*it), false);
     field_v = emfield->GetFields();
-    for(field_iter it = field_v.begin(); it!=field_v.end(); it++)
+    for (field_iter it = field_v.begin(); it != field_v.end(); it++)
         if (*it != mfield)
             emfield->Erase((*it), false);
     // redo some initialisation stuff

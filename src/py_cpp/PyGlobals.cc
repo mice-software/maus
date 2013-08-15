@@ -205,7 +205,14 @@ PyObject* SetMonteCarloMiceModules
     if (mod == NULL) {
         return NULL;
     }
-    GlobalsManager::SetMonteCarloMiceModules(mod);
+    try {
+        GlobalsManager::SetMonteCarloMiceModules(mod);
+    } catch(Exception exc) {
+        std::string message = std::string("Failed to set MiceModules\n")+
+                              std::string(exc.what());
+        PyErr_SetString(PyExc_ValueError, message.c_str());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     return Py_None;
 }

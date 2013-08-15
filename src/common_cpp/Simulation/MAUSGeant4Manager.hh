@@ -95,10 +95,9 @@ class MAUSGeant4Manager {
 
     /** @brief Set the VirtualPlanes
      *
-     *  Nb: this loses the pointer to the original virtual planes - so if caller
-     *  don't want to keep them, caller must delete the original virtual planes.
+     *  MAUSGeant4Manager takes ownership of memory allocated to the planes
      */
-    void SetVirtualPlanes(VirtualPlaneManager* virt) {_virtPlanes = virt;}
+    inline void SetVirtualPlanes(VirtualPlaneManager* virt);
 
     /** @brief Phased fields in the geometry (e.g. RF cavities)
      *
@@ -183,6 +182,11 @@ class MAUSGeant4Manager {
     static bool _isClosed;
 };
 
+inline void MAUSGeant4Manager::SetVirtualPlanes(VirtualPlaneManager* virt) {
+    if (_virtPlanes != NULL)
+        delete _virtPlanes;
+    _virtPlanes = virt;
+}
 }  // namespace MAUS
 
 #endif  // _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_

@@ -49,6 +49,14 @@ VirtualPlane::VirtualPlane() {
   _multipass = VirtualPlane::ignore;
 }
 
+VirtualPlane::VirtualPlane(const VirtualPlane& rhs)
+  : _planeType(rhs._planeType), _independentVariable(rhs._independentVariable),
+    _step(rhs._step), _radialExtent(rhs._radialExtent),
+    _globalCoordinates(rhs._globalCoordinates), _multipass(rhs._multipass),
+    _position(rhs._position), _rotation(rhs._rotation),
+    _allowBackwards(rhs._allowBackwards) {
+}
+
 VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
                            CLHEP::Hep3Vector pos, double radialExtent,
                            bool globalCoordinates, double indie,
@@ -203,8 +211,8 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
 
 //////////////////////// VirtualPlaneManager //////////////////////////
 
-VirtualPlaneManager::VirtualPlaneManager() :
-      _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
+VirtualPlaneManager::VirtualPlaneManager()
+    : _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
       _hits(Json::arrayValue) {
 }
 
@@ -214,6 +222,15 @@ VirtualPlaneManager::~VirtualPlaneManager() {
   _mods = std::map<VirtualPlane*, const MiceModule*>();
   for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
   _planes = std::vector<VirtualPlane*>();
+}
+
+VirtualPlaneManager::VirtualPlaneManager(VirtualPlaneManager& rhs)
+          :  _useVirtualPlanes(rhs._useVirtualPlanes), _planes(), _mods(),
+             _nHits(rhs._nHits), _hits(rhs._hits) {
+  for (size_t i = 0; i < rhs._planes.size(); ++i) {
+    _planes.push_back(new VirtualPlane(*rhs._planes[i]));
+    _mods[_planes[i]] = rhs._mods[rhs._planes[i]];
+  }
 }
 
 // Point here is if I go round e.g. a ring, station number should be

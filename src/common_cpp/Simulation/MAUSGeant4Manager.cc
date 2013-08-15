@@ -42,13 +42,14 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
   return _instance;
 }
 
-MAUSGeant4Manager::MAUSGeant4Manager() {
+MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     if (_instance != NULL)
         throw(Squeal(
               Squeal::recoverable,
               "Attempt to initialise MAUSGeant4Manager twice",
               "MAUSGeant4Manager::MAUSGeant4Manager"));
     _instance = this;
+    SetVirtualPlanes(new VirtualPlaneManager);
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
@@ -163,7 +164,6 @@ BTFieldConstructor* MAUSGeant4Manager::GetField() {
 
 // should be const MiceModule
 void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
-    _virtPlanes = new VirtualPlaneManager;
     _virtPlanes->ConstructVirtualPlanes(&module);
     _detector->SetMiceModules(module);
     SetPhases();

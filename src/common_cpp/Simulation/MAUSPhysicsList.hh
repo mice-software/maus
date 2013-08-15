@@ -19,6 +19,7 @@
 #define _SRC_COMMON_CPP_SIMULATION_MAUSPHYSICSLIST_HH_
 
 #include <string>
+#include <vector>
 
 #include "Geant4/G4VUserPhysicsList.hh"
 

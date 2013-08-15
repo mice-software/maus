@@ -40,10 +40,11 @@ class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
         config_options = StringIO.StringIO(unicode("""
 simulation_geometry_filename = "Test.dat"
 reconstruction_geometry_filename = "Test.dat"
+simulation_reference_particle = {}
         """))
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
-        self.alt_mod = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_py.dat")
+        self.alt_mod = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_globals.dat")
 
     def tearDown(self): # pylint: disable = C0103
         """Reset the globals"""
@@ -116,44 +117,17 @@ reconstruction_geometry_filename = "Test.dat"
             pass
 
     def test_set_monte_carlo_mice_modules(self):
-        """Test maus_cpp.globals.get_monte_carlo_mice_modules()"""
-        maus_cpp.globals.birth(self.config)
-        mod = MiceModule(self.alt_mod)
-        maus_cpp.globals.set_monte_carlo_mice_modules(mod)
-        self.assertEqual(
-                  maus_cpp.globals.get_monte_carlo_mice_modules().get_name(),
-                  "test_mice_modules_py.dat")
-        maus_cpp.globals.death()
-        try:
-            maus_cpp.globals.get_monte_carlo_mice_modules()
-            self.assertTrue(False, 'Should throw')
-        except RuntimeError:
-            pass
-
-    def test_set_monte_carlo_mice_modules_fields(self):
         """Test maus_cpp.globals.get_monte_carlo_mice_modules() fields"""
         maus_cpp.globals.birth(self.config)
         mod_no_field = MiceModule("Test.dat")
         mod_field = MiceModule(self.alt_mod)
         # check keywords
-        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field,
-                                                      rebuild_fields=True,
-                                                      rebuild_geant4=False)        
+        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field)        
         self.assertAlmostEqual(
-                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
-                  0.0)
-        # check ordering
-        maus_cpp.globals.set_monte_carlo_mice_modules(mod_field,
-                                                      True,
-                                                      False)        
-        self.assertAlmostEqual(
-                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
-                  0.5)
-        # check defaults
-        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field)
-        self.assertAlmostEqual(
-                  maus_cpp.field.get_field_value(500., 0., 0., 0.)[1],
-                  0.0)
+                       maus_cpp.field.get_field_value(500., 0., 0., 0.)[1], 0.0)
+        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_field)
+        field = maus_cpp.field.get_field_value(500., 0., 0., 0.)
+        self.assertAlmostEqual(field[1], 0.0)
 
 if __name__ == "__main__":
     unittest.main()

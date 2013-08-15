@@ -86,12 +86,14 @@ double MAUSEvaluator::evaluate(std::string function) {
 
     // now put transform py_value into C++ double
     double value = 0.;
-    PyArg_Parse(py_value, "d", &value);
-
+    if (!PyArg_Parse(py_value, "d", &value)) {
+        throw(Squeal(Squeal::recoverable,
+                   "Failed to evaluate expression \""+function+"\"",
+                   "MAUSEvaluator::evaluate"));
+    }
     // clean up
     Py_DECREF(py_value);
     Py_DECREF(py_arg);
-
     // return
     return value;
 }

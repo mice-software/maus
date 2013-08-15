@@ -30,12 +30,13 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <string>
+
 #include "numpy/arrayobject.h"
 
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
-#include "Maths/SymmetricMatrix.hh"
-
+#include "src/common_cpp/Maths/SymmetricMatrix.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 
 #define MAUS_PYCOVARIANCEMATRIX_CC
@@ -45,7 +46,7 @@
 namespace MAUS {
 namespace PyCovarianceMatrix {
 
-std::string get_element_docstring = 
+std::string get_element_docstring =
 std::string("Get an element of the covariance matrix\n\n")+
 std::string(" - row (int) Row from which to get the element\n")+
 std::string(" - column (int) Column from which to get the element\n")+
@@ -62,15 +63,16 @@ PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
     int row = 0;
     int col = 0;
     double value = 0;
-    static char *kwlist[] = {(char*)"row", (char*)"column"};
+    static char *kwlist[] = {const_cast<char*>("row"),
+                             const_cast<char*>("column"), NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|", kwlist, &row, &col)) {
         return NULL;
     }
 
     try {
         value = (*cm)(row, col);
-    } catch (Exception exc) {
-        PyErr_SetString(PyExc_IndexError, exc.what());
+    } catch(Exception& exc) {
+        PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
     PyObject* py_value = Py_BuildValue("d", value);
@@ -83,7 +85,7 @@ PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
     return py_value;
 }
 
-std::string set_element_docstring = 
+std::string set_element_docstring =
 std::string("Set an element of the covariance matrix\n\n")+
 std::string(" - row (int) Row from which to get the element\n")+
 std::string(" - column (int) Column from which to get the element\n")+
@@ -101,8 +103,10 @@ PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
     int row = 0;
     int col = 0;
     double value = 0;
-    static char *kwlist[] = {(char*)"row", (char*)"column", (char*)"value",
-                                                                          NULL};
+    static char *kwlist[] = {const_cast<char*>("row"),
+                             const_cast<char*>("column"),
+                             const_cast<char*>("value"),
+                             NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "iid|", kwlist, &row, &col,
                                                                       &value)) {
         return NULL;
@@ -110,8 +114,8 @@ PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         cm->set(row, col, value);
-    } catch (Exception exc) {
-        PyErr_SetString(PyExc_IndexError, exc.what());
+    } catch(Exception& exc) {
+        PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
     Py_INCREF(Py_None);
@@ -126,7 +130,10 @@ static PyObject* _str(PyObject * self) {
         return NULL;
     }
     char buffer[1024];
-    snprintf(buffer, 1024, " [[%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g],\n  [%10g, %10g, %10g, %10g, %10g, %10g]]",
+    std::string row =  "[%10g, %10g, %10g, %10g, %10g, %10g]";
+    std::string matrix = " ["+row+",\n  "+row+",\n   "+row+",\n   "+row+
+                            ",\n   "+row+",\n   "+row+"]";
+    snprintf(buffer, sizeof(buffer), matrix.c_str(),
       (*cm)(1, 1), (*cm)(1, 2), (*cm)(1, 3), (*cm)(1, 4), (*cm)(1, 5), (*cm)(1, 6),
       (*cm)(2, 1), (*cm)(2, 2), (*cm)(2, 3), (*cm)(2, 4), (*cm)(2, 5), (*cm)(2, 6),
       (*cm)(3, 1), (*cm)(3, 2), (*cm)(3, 3), (*cm)(3, 4), (*cm)(3, 5), (*cm)(3, 6),
@@ -148,9 +155,9 @@ static PyMemberDef _members[] = {
 
 static PyMethodDef _methods[] = {
 {"get_element", (PyCFunction)get_element,
- METH_VARARGS|METH_KEYWORDS, get_element_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, get_element_docstring.c_str()},
 {"set_element", (PyCFunction)set_element,
- METH_VARARGS|METH_KEYWORDS, set_element_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, set_element_docstring.c_str()},
 {NULL}
 };
 
@@ -221,7 +228,7 @@ CovarianceMatrix* create_from_numpy_matrix(PyObject* numpy_array) {
     if (PyArray_DIM(array, 0) != 6 || PyArray_DIM(array, 1) != 6) {
         throw(Exception(Exception::recoverable,
                         "numpy_array had wrong size - should be 6x6 matrix",
-                        "PyCovarianceMatrix::create_from_numpy_matrix")); 
+                        "PyCovarianceMatrix::create_from_numpy_matrix"));
     }
     SymmetricMatrix raw_mat(6);
     for (size_t i = 0; i < 6; ++i)
@@ -231,7 +238,7 @@ CovarianceMatrix* create_from_numpy_matrix(PyObject* numpy_array) {
             if (value == NULL) {
                 throw(Exception(Exception::recoverable,
                                "numpy_array had wrong data type",
-                               "PyCovarianceMatrix::create_from_numpy_matrix")); 
+                               "PyCovarianceMatrix::create_from_numpy_matrix"));
             }
             raw_mat.set(i+1, j+1, *value);
         }
@@ -307,13 +314,17 @@ PyObject* create_from_twiss_parameters
     double dispersion_prime_x = 0.;
     double dispersion_y = 0.;
     double dispersion_prime_y = 0.;
-    static char *kwlist[] = {(char*)"mass", (char*)"momentum",
-                (char*)"emittance_x", (char*)"beta_x",
-                (char*)"emittance_y", (char*)"beta_y",
-                (char*)"emittance_l", (char*)"beta_l",
-                (char*)"alpha_x", (char*)"alpha_y", (char*)"alpha_l",
-                (char*)"dispersion_x", (char*)"dispersion_prime_x",
-                (char*)"dispersion_y", (char*)"dispersion_prime_y", NULL};
+    static char *kwlist[] = {const_cast<char*>("mass"),
+                             const_cast<char*>("momentum"),
+                const_cast<char*>("emittance_x"), const_cast<char*>("beta_x"),
+                const_cast<char*>("emittance_y"), const_cast<char*>("beta_y"),
+                const_cast<char*>("emittance_l"), const_cast<char*>("beta_l"),
+                const_cast<char*>("alpha_x"), const_cast<char*>("alpha_y"),
+                const_cast<char*>("alpha_l"),
+                const_cast<char*>("dispersion_x"),
+                const_cast<char*>("dispersion_prime_x"),
+                const_cast<char*>("dispersion_y"),
+                const_cast<char*>("dispersion_prime_y"), NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddddd|ddddddd", kwlist,
         &mass, &momentum,
@@ -401,13 +412,17 @@ PyObject* create_from_penn_parameters
     double dispersion_prime_x = 0.;
     double dispersion_y = 0.;
     double dispersion_prime_y = 0.;
-    static char *kwlist[] = {(char*)"mass", (char*)"momentum",
-                (char*)"emittance_t", (char*)"beta_t",
-                (char*)"emittance_l", (char*)"beta_l",
-                (char*)"alpha_t", (char*)"alpha_l", (char*)"charge",
-                (char*)"bz", (char*)"ltwiddle", (char*)"dispersion_x",
-                (char*)"dispersion_prime_x", (char*)"dispersion_y",
-                (char*)"dispersion_prime_y", NULL};
+    static char *kwlist[] = {const_cast<char*>("mass"),
+                             const_cast<char*>("momentum"),
+                const_cast<char*>("emittance_t"), const_cast<char*>("beta_t"),
+                const_cast<char*>("emittance_l"), const_cast<char*>("beta_l"),
+                const_cast<char*>("alpha_t"), const_cast<char*>("alpha_l"),
+                const_cast<char*>("charge"),
+                const_cast<char*>("bz"), const_cast<char*>("ltwiddle"),
+                const_cast<char*>("dispersion_x"),
+                const_cast<char*>("dispersion_prime_x"),
+                const_cast<char*>("dispersion_y"),
+                const_cast<char*>("dispersion_prime_y"), NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddd|ddddddddd", kwlist,
         &mass, &momentum, &emittance_t, &beta_t, &emittance_l, &beta_l,
@@ -463,7 +478,7 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
         return NULL;
     }
     // try to extract a numpy array from the arguments
-    static char *kwlist[] = {(char*)"matrix"};
+    static char *kwlist[] = {const_cast<char*>("matrix")};
     PyObject* array = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &array)) {
         // error message is set in PyArg_Parse...
@@ -472,8 +487,8 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
     // now initialise the internal covariance matrix
     try {
         cm->cov_mat = create_from_numpy_matrix(array);
-    } catch(Exception exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
+    } catch(Exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
     return reinterpret_cast<PyObject*>(cm);
@@ -493,21 +508,26 @@ PyMODINIT_FUNC initcovariance_matrix(void) {
     PyCovarianceMatrixType.tp_new = PyType_GenericNew;
     if (PyType_Ready(&PyCovarianceMatrixType) < 0) return;
 
-    PyObject* module = Py_InitModule("covariance_matrix", _keywdarg_methods); //, module_docstring);
+    PyObject* module = Py_InitModule3("covariance_matrix", _keywdarg_methods,
+                                                           module_docstring);
     if (module == NULL) return;
 
     PyTypeObject* cm_type = &PyCovarianceMatrixType;
     Py_INCREF(cm_type);
-    PyModule_AddObject(module, "CovarianceMatrix", reinterpret_cast<PyObject*>(cm_type));
+    PyModule_AddObject(module, "CovarianceMatrix",
+                                          reinterpret_cast<PyObject*>(cm_type));
 
     // C API
     PyObject* cov_mat_dict = PyModule_GetDict(module);
-    PyObject* cem_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_matrix, NULL);
-    PyObject* gcm_c_api = PyCObject_FromVoidPtr((void *)C_API::get_covariance_matrix, NULL);
-    PyObject* scm_c_api = PyCObject_FromVoidPtr((void *)C_API::set_covariance_matrix, NULL);
-    PyDict_SetItemString(cov_mat_dict, "C_API_CREATE_EMPTY_MATRIX_1", cem_c_api);
-    PyDict_SetItemString(cov_mat_dict, "C_API_GET_COVARIANCE_MATRIX_1", gcm_c_api);
-    PyDict_SetItemString(cov_mat_dict, "C_API_SET_COVARIANCE_MATRIX_1", scm_c_api);
+    PyObject* cem_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void*>
+                                            (C_API::create_empty_matrix), NULL);
+    PyObject* gcm_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void*>
+                                          (C_API::get_covariance_matrix), NULL);
+    PyObject* scm_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void*>
+                                          (C_API::set_covariance_matrix), NULL);
+    PyDict_SetItemString(cov_mat_dict, "C_API_CREATE_EMPTY_MATRIX", cem_c_api);
+    PyDict_SetItemString(cov_mat_dict, "C_API_GET_COVARIANCE_MATRIX", gcm_c_api);
+    PyDict_SetItemString(cov_mat_dict, "C_API_SET_COVARIANCE_MATRIX", scm_c_api);
 }
 
 CovarianceMatrix* C_API::get_covariance_matrix(PyObject* py_cm) {

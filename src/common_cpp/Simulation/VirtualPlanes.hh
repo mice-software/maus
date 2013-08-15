@@ -71,6 +71,9 @@ class VirtualPlane {
    */
   VirtualPlane();
 
+  /** @brief Copy constructor makes a deepcopy of the virtual plane */
+  VirtualPlane(const VirtualPlane& vplane);
+
   /** @brief Destructor; no memory allocated so does nothing.
    */
   ~VirtualPlane() {}
@@ -216,7 +219,6 @@ class VirtualPlane {
   double             _radialExtent;
   bool               _globalCoordinates;
   multipass_handler  _multipass;
-  static const BTField*    _field;
   static stepping    _stepping;
 
   ::CLHEP::Hep3Vector  _position;  // if var is u, then this will give origin
@@ -247,6 +249,9 @@ class VirtualPlaneManager {
   /** @brief Constructor
    */
   VirtualPlaneManager();
+
+  /** @brief Copy constructor makes a deep copy of the Manager */
+  VirtualPlaneManager(VirtualPlaneManager& rhs);
 
   /** @brief Destructor
    *

@@ -31,6 +31,7 @@
 #include <ctype.h>
 
 #include <sstream>
+#include <vector>
 
 #include "src/legacy/Config/MiceModule.hh"
 
@@ -65,13 +66,14 @@ std::string("Returns a value of the appropriate type");
 PyObject* get_bool(MiceModule* mod, std::string name) {
     try {
         bool out = mod->propertyBoolThis(name);
-        PyObject* py_out = Py_BuildValue("b", int(out));
+        int out_int = out ? 1 : 0; //  ooh I feel so dirty
+        PyObject* py_out = Py_BuildValue("b", (out));
         Py_INCREF(py_out);
         return py_out;
     } catch(Exception exc) {
         PyErr_SetString(PyExc_KeyError, exc.what());
         return NULL;
-    } 
+    }
 }
 
 PyObject* get_int(MiceModule* mod, std::string name) {
@@ -83,7 +85,7 @@ PyObject* get_int(MiceModule* mod, std::string name) {
     } catch(Exception exc) {
         PyErr_SetString(PyExc_KeyError, exc.what());
         return NULL;
-    } 
+    }
 }
 
 PyObject* get_double(MiceModule* mod, std::string name) {
@@ -95,7 +97,7 @@ PyObject* get_double(MiceModule* mod, std::string name) {
     } catch(Exception exc) {
         PyErr_SetString(PyExc_KeyError, exc.what());
         return NULL;
-    } 
+    }
 }
 
 PyObject* get_string(MiceModule* mod, std::string name) {
@@ -107,7 +109,7 @@ PyObject* get_string(MiceModule* mod, std::string name) {
     } catch(Exception exc) {
         PyErr_SetString(PyExc_KeyError, exc.what());
         return NULL;
-    } 
+    }
 }
 
 PyObject* get_hep3vector(MiceModule* mod, std::string name) {
@@ -128,7 +130,7 @@ PyObject* get_hep3vector(MiceModule* mod, std::string name) {
     } catch(Exception exc) {
         PyErr_SetString(PyExc_KeyError, exc.what());
         return NULL;
-    } 
+    }
 }
 
 PyObject *get_property(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -140,7 +142,8 @@ PyObject *get_property(PyObject* self, PyObject *args, PyObject *kwds) {
     }
     const char* name = NULL;
     const char* c_type = NULL;
-    static char *kwlist[] = {(char*)"name", (char*)"type", NULL};
+    static char *kwlist[] = {const_cast<char*>("name"),
+                             const_cast<char*>("type"), NULL};
     if (!PyArg_ParseTupleAndKeywords
                                   (args, kwds, "ss|", kwlist, &name, &c_type)) {
         return NULL;
@@ -221,8 +224,9 @@ PyObject *set_property(PyObject* self, PyObject *args, PyObject *kwds) {
     const char* name = NULL;
     const char* c_type = NULL;
     PyObject* py_value = NULL;
-    static char *kwlist[] =
-                          {(char*)"name", (char*)"type", (char*)"value", NULL};
+    static char *kwlist[] = {const_cast<char*>("name"),
+                             const_cast<char*>("type"),
+                             const_cast<char*>("value"), NULL};
     if (!PyArg_ParseTupleAndKeywords
                       (args, kwds, "ssO|", kwlist, &name, &c_type, &py_value)) {
         return NULL;
@@ -278,7 +282,7 @@ std::string("MiceModules.");
 
 PyObject *get_children(PyObject* self, PyObject *args, PyObject *kwds) {
     MiceModule* mod = C_API::get_mice_module(self);
-    std::vector<MiceModule*> daughter_list = mod->allDaughters();    
+    std::vector<MiceModule*> daughter_list = mod->allDaughters();
     PyObject* py_list = PyList_New(daughter_list.size());
     Py_INCREF(py_list);
     for (size_t i = 0; i < daughter_list.size(); ++i) {
@@ -319,7 +323,7 @@ PyObject *set_children(PyObject* self, PyObject *args, PyObject *kwds) {
         return NULL;
 
     PyObject* py_children = NULL;
-    static char *kwlist[] = {(char*)"children", NULL};
+    static char *kwlist[] = {const_cast<char*>("children"), NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &py_children)) {
         return NULL;
     }
@@ -375,14 +379,14 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
         delete mod->mod;
     }
     char* file_name;
-    static char *kwlist[] = {(char*)"file_name", NULL};
+    static char *kwlist[] = {const_cast<char*>("file_name"), NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|", kwlist, &file_name)) {
         return -1;
     }
 
     try {
         mod->mod = new MiceModule(std::string(file_name));
-    } catch (Exception exc) {
+    } catch(Exception exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return -1;
     }
@@ -439,17 +443,15 @@ static PyMemberDef _members[] = {
 
 static PyMethodDef _methods[] = {
 {"get_name", (PyCFunction)get_name,
- METH_VARARGS|METH_KEYWORDS, get_name_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, get_name_docstring.c_str()},
 {"set_children", (PyCFunction)set_children,
- METH_VARARGS|METH_KEYWORDS, set_children_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, set_children_docstring.c_str()},
 {"get_children", (PyCFunction)get_children,
- METH_VARARGS|METH_KEYWORDS, get_children_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, get_children_docstring.c_str()},
 {"get_property", (PyCFunction)get_property,
- METH_VARARGS|METH_KEYWORDS, get_property_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, get_property_docstring.c_str()},
 {"set_property", (PyCFunction)set_property,
- METH_VARARGS|METH_KEYWORDS, set_property_docstring.c_str()},
-//{"set_element", (PyCFunction)set_element,
-// METH_VARARGS|METH_KEYWORDS, set_element_docstring.c_str()},
+  METH_VARARGS|METH_KEYWORDS, set_property_docstring.c_str()},
 {NULL}
 };
 
@@ -505,8 +507,8 @@ PyMODINIT_FUNC initmice_module(void) {
     if (PyType_Ready(&PyMiceModuleType) < 0)
         return;
 
-    PyObject* module = Py_InitModule
-                           ("mice_module", _keywdarg_methods);//, module_docstring);
+    PyObject* module = Py_InitModule3
+                           ("mice_module", _keywdarg_methods, module_docstring);
     if (module == NULL) return;
 
     PyTypeObject* mm_type = &PyMiceModuleType;
@@ -516,9 +518,12 @@ PyMODINIT_FUNC initmice_module(void) {
 
     // C API
     PyObject* mod_dict = PyModule_GetDict(module);
-    PyObject* cem_c_api = PyCObject_FromVoidPtr((void *)C_API::create_empty_module, NULL);
-    PyObject* gmm_c_api = PyCObject_FromVoidPtr((void *)C_API::get_mice_module, NULL);
-    PyObject* smm_c_api = PyCObject_FromVoidPtr((void *)C_API::set_mice_module, NULL);
+    PyObject* cem_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void *>
+                                            (C_API::create_empty_module), NULL);
+    PyObject* gmm_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void *>
+                                                (C_API::get_mice_module), NULL);
+    PyObject* smm_c_api = PyCObject_FromVoidPtr(reinterpret_cast<void *>
+                                                (C_API::set_mice_module), NULL);
     PyDict_SetItemString(mod_dict, "C_API_CREATE_EMPTY_MODULE", cem_c_api);
     PyDict_SetItemString(mod_dict, "C_API_GET_MICE_MODULE", gmm_c_api);
     PyDict_SetItemString(mod_dict, "C_API_SET_MICE_MODULE", smm_c_api);

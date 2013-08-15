@@ -37,7 +37,7 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
     if (_virtPlanes == NULL ||
         _tracking == NULL ||
         _stepping == NULL ||
-        _geometry==NULL)
+        _geometry == NULL)
         throw(Exception(Exception::recoverable,
                         "EventAction::SetEvents not called",
                         "EventAction::BeginOfEventAction"));

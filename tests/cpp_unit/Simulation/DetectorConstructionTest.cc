@@ -49,10 +49,9 @@ class DetectorConstructionTest : public ::testing::Test {
     void TearDown() {}
 
     MAUSPrimaryGeneratorAction::PGParticle p;
-    DetectorConstruction* dc; 
+    DetectorConstruction* dc;
     std::string mod_path;
   private:
-
 };
 
 TEST_F(DetectorConstructionTest, RootVolumeTest) {
@@ -87,7 +86,7 @@ TEST_F(DetectorConstructionTest, RootVolumeTestMaterial) {
     MiceModule mod(mod_path+"RootVolumeTestMaterial.dat");
     dc->SetMiceModules(mod);
     // roughly minimum ionising
-    // eloss = 11 MeV in 350 mm 
+    // eloss = 11 MeV in 350 mm
     p.energy = 226.;
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     Json::Value steps = out["tracks"][Json::Value::UInt(0)]["steps"];
@@ -207,7 +206,7 @@ TEST_F(DetectorConstructionTest, BuildSensitiveDetectorTest) {
 }
 
 TEST_F(DetectorConstructionTest, SetDatacardVariablesTest) {
-    // nothing terribly productive to test    
+    // nothing terribly productive to test
 }
 
 TEST_F(DetectorConstructionTest, BuildG4DetectorVolumeTest) {

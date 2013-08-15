@@ -208,7 +208,7 @@ void MAUSPhysicsList::SetSpecialProcesses() {
   while ( (*theParticleIterator)() ) {
     G4ProcessManager* pmanager = theParticleIterator->value()->
                                                             GetProcessManager();
-    // step limiter for G4StepMax parameter; _limits exists for memory cleanup 
+    // step limiter for G4StepMax parameter; _limits exists for memory cleanup
     _limits.push_back(new G4StepLimiter);
     pmanager->AddProcess(_limits.back(), -1, -1, 2);
     // track limiter for G4KinMax, etc
