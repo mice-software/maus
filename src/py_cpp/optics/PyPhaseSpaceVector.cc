@@ -331,6 +331,7 @@ PyObject* create_from_coordinates(PyObject* self,
                                                                     &x, &px,
                                                                     &y, &py)) {
         // error message is set in PyArg_Parse...
+        free(py_psv);
         return NULL;
     }
     // now initialise the internal phase space vector
@@ -338,6 +339,7 @@ PyObject* create_from_coordinates(PyObject* self,
         py_psv->psv = new PhaseSpaceVector(t, E, x, px, y, py);
     } catch(Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
+        free(py_psv);
         return NULL;
     }
     Py_INCREF(py_psv);
@@ -348,7 +350,7 @@ void _free(PyPhaseSpaceVector * self) {
     if (self != NULL) {
         if (self->psv != NULL)
             delete self->psv;
-        delete self;
+        free(self);
     }
 }
 

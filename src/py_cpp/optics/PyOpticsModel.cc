@@ -206,7 +206,7 @@ void _free(PyOpticsModel * self) {
     if (self != NULL) {
         if (self->model != NULL)
             delete self->model;
-        delete self;
+        free(self);
     }
 }
 

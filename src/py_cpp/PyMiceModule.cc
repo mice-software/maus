@@ -67,7 +67,7 @@ PyObject* get_bool(MiceModule* mod, std::string name) {
     try {
         bool out = mod->propertyBoolThis(name);
         int out_int = out ? 1 : 0; //  ooh I feel so dirty
-        PyObject* py_out = Py_BuildValue("b", (out));
+        PyObject* py_out = Py_BuildValue("b", out_int);
         Py_INCREF(py_out);
         return py_out;
     } catch(Exception exc) {
@@ -396,7 +396,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
 void _free(PyMiceModule * self) {
     if (self != NULL) {
         if (self->mod != NULL && self->mod->mother() == NULL)
-            free(self->mod);
+            delete self->mod;
         free(self);
     }
 }

@@ -256,7 +256,7 @@ void _free(PyCovarianceMatrix * self) {
     if (self != NULL) {
         if (self->cov_mat != NULL)
             delete self->cov_mat;
-        delete self;
+        free(self);
     }
 }
 
@@ -349,9 +349,7 @@ PyObject* create_from_twiss_parameters
             dispersion_prime_y));
     // Allocate a PyCovarianceMatrix
     // I *think* the INCREF on the TypeObject here is correct
-    PyTypeObject* cm_type = &PyCovarianceMatrixType;
-    Py_INCREF(cm_type);
-    PyObject* py_cm = _alloc(cm_type, 0); // py_cm is a python cov matrix
+    PyObject* py_cm = C_API::create_empty_matrix();
     C_API::set_covariance_matrix(py_cm, cm);
     Py_INCREF(py_cm);
     return py_cm;
@@ -444,9 +442,7 @@ PyObject* create_from_penn_parameters
           dispersion_prime_y));
     // Allocate a PyCovarianceMatrix
     // I *think* the INCREF on the TypeObject here is correct
-    PyTypeObject* cm_type = &PyCovarianceMatrixType;
-    Py_INCREF(cm_type);
-    PyObject* py_cm = _alloc(cm_type, 0); // py_cm is a python cov matrix
+    PyObject* py_cm = C_API::create_empty_matrix();
     C_API::set_covariance_matrix(py_cm, cm);
     Py_INCREF(py_cm);
     return py_cm;
@@ -466,6 +462,7 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
     if (cm == NULL) {
         PyErr_SetString(PyExc_TypeError,
                         "Failed to allocate memory for PyCovarianceMatrix");
+        free(cm);
         return NULL;
     }
     // try to extract a numpy array from the arguments
@@ -473,6 +470,7 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
     PyObject* array = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &array)) {
         // error message is set in PyArg_Parse...
+        free(cm);
         return NULL;
     }
     // now initialise the internal covariance matrix
@@ -480,8 +478,10 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
         cm->cov_mat = create_from_numpy_matrix(array);
     } catch(Exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+        free(cm);
         return NULL;
     }
+    Py_INCREF(cm);
     return reinterpret_cast<PyObject*>(cm);
 }
 
