@@ -38,10 +38,12 @@
 #include "DataStructure/MCEvent.hh"
 #include "DataStructure/ReconEvent.hh"
 #include "DataStructure/Spill.hh"
+#include "DataStructure/VirtualHit.hh"
 #include "DataStructure/ThreeVector.hh"
 #include "DataStructure/Global/ReconEnums.hh"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TrackPoint.hh"
+#include "Optics/PolynomialOpticsModel.hh"
 #include "Recon/Global/DataStructureHelper.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "Utils/Globals.hh"
@@ -51,8 +53,7 @@
 namespace MAUS {
 
 namespace GlobalDS = ::MAUS::DataStructure::Global;
-using MAUS::DataStructure::Global::Track;
-using MAUS::DataStructure::Global::TrackPoint;
+namespace Recon = ::MAUS::recon::global;
 
 MapCppPolynomialMapResiduals::MapCppPolynomialMapResiduals() {
 }
@@ -63,9 +64,11 @@ MapCppPolynomialMapResiduals::~MapCppPolynomialMapResiduals() {
 bool MapCppPolynomialMapResiduals::birth(std::string configuration_string) {
   // parse the JSON document.
   try {
-    configuration_ = JsonWrapper::StringToJson(configuration_string);
+    Json::Value configuration = JsonWrapper::StringToJson(configuration_string);
 
     optics_model_ = new PolynomialOpticsModel(&configuration);
+
+    optics_model_->Build();
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
       squee, MapCppPolynomialMapResiduals::kClassname);
@@ -76,36 +79,16 @@ bool MapCppPolynomialMapResiduals::birth(std::string configuration_string) {
     return false;
   }
 
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
-  switch (reference_pgparticle.pid) {
-    case MAUS::DataStructure::Global::kEPlus:
-    case MAUS::DataStructure::Global::kMuPlus:
-    case MAUS::DataStructure::Global::kPiPlus:
-      beam_polarity_ = 1;
-      break;
-    case MAUS::DataStructure::Global::kEMinus:
-    case MAUS::DataStructure::Global::kMuMinus:
-    case MAUS::DataStructure::Global::kPiMinus:
-      beam_polarity_ = -1;
-      break;
-    default:
-      throw(Squeal(Squeal::nonRecoverable,
-                   "Reference particle is not a pion+/-, muon+/-, or e+/-.",
-                   "MapCppPolynomialMapResiduals::birth()"));
-
-  }
-
   return true;  // Sucessful parsing
 }
 
 std::string MapCppPolynomialMapResiduals::process(std::string run_data_string) {
-  return ProcessRun(DeserializeRun(
-    JsonWrapper::StringToJson(run_data_string));
+  Json::Value run_data = JsonWrapper::StringToJson(run_data_string);
+  ProcessableObject<Data> run = DeserializeRun(run_data);
+  return ProcessRun(run);
 }
 
-ProcessableObject<MAUS::Data> MapCppPolynomialMapResiduals::DeserializeRun(
+ProcessableObject<Data> MapCppPolynomialMapResiduals::DeserializeRun(
     Json::Value & run) const {
   if (run.isNull() || run.empty()) {
     return ProcessableObject<MAUS::Data>(
@@ -113,28 +96,28 @@ ProcessableObject<MAUS::Data> MapCppPolynomialMapResiduals::DeserializeRun(
                   "\"Failed to parse input document\"}}"));
   } else {
     JsonCppSpillConverter deserialize;
-    return ProcessableObject<MAUS::Data>(deserialize(&run));
+    return ProcessableObject<Data>(deserialize(&run));
   }
 }
 
 std::string MapCppPolynomialMapResiduals::ProcessRun(
-    ProcessableObject<MAUS::Data> & run_data) const {
+    ProcessableObject<Data> & run_data) const {
   if (run_data.error_string() != NULL) {
     return *run_data.error_string();
   } else if (run_data.object() == NULL) {
     return std::string("{\"errors\":{\"failed_json_cpp_conversion\":"
                         "\"Failed to convert Json to C++ Data object\"}}");
   } else {
-    const MAUS::Data * run = run_data.object();
-    ProcessableObject<Bool> result
+    const Data * run = run_data.object();
+    ProcessableObject<bool> result
       = ProcessSpill(run->GetSpill());
     return SerializeRun(run, result);
   }
 }
 
 std::string MapCppPolynomialMapResiduals::SerializeRun(
-    const MAUS::Data * run,
-    ProcessableObject<Bool> result) const {
+    const Data * run,
+    ProcessableObject<bool> result) const {
   if (result.error_string() != NULL) {
     return *result.error_string();
   } else {
@@ -148,10 +131,10 @@ std::string MapCppPolynomialMapResiduals::SerializeRun(
   }
 }
 
-ProcessableObject<Bool> MapCppPolynomialMapResiduals::ProcessSpill(
+ProcessableObject<bool> MapCppPolynomialMapResiduals::ProcessSpill(
     const MAUS::Spill * spill) const {
   if (spill == NULL) {
-    return ProcessableObject<MAUS::Spill>(
+    return ProcessableObject<bool>(
       std::string("{\"errors\":{\"null_spill\":"
                   "\"The run data did not contain a spill.\"}}"));
   } else {
@@ -159,21 +142,49 @@ ProcessableObject<Bool> MapCppPolynomialMapResiduals::ProcessSpill(
   }
 }
 
-ProcessableObject<Bool> GenerateResiduals(
+ProcessableObject<bool> MapCppPolynomialMapResiduals::GenerateResiduals(
     const MCEventPArray * mc_events,
     const MAUS::ReconEventPArray * recon_events) const {
   std::vector<std::vector<PhaseSpaceVector> > mc_tracks
     = ExtractMonteCarloTracks(mc_events);
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Extracted " << mc_tracks.size() << " MC tracks."
+            << std::endl;
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Extracted " << mc_tracks[0].size() << " MC track points per track."
+            << std::endl;
+
+  std::vector<Primary *> primaries = ExtractBeamPrimaries(mc_events);
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Extracted " << primaries.size() << " primaries."
+            << std::endl;
+  std::vector<long> z_positions = optics_model_->GetAvailableMapPositions();
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "There are " << z_positions.size() << " maps available."
+            << std::endl;
   std::vector<std::vector<PhaseSpaceVector> > mapped_tracks
     = TransportBeamPrimaries(
         optics_model_,
-        optics_model->GetAvailableMapPositions(),
-        ExtractBeamPrimaries(mc_events));
+        z_positions,
+        primaries);
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Mapped " << mapped_tracks.size() << " primaries."
+            << std::endl;
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Obtained " << mapped_tracks[0].size() << " mapped hits."
+            << std::endl;
 
   const std::vector<std::vector<PhaseSpaceVector> > residuals
     = CalculateResiduals(mapped_tracks, mc_tracks);
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Calculated " << residuals.size() << " residual tracks."
+            << std::endl;
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+            << "Calculated " << residuals[0].size() << " residuals per track."
+            << std::endl;
 
-  ProcessableObject<Bool> result = WriteResiduals(*recon_events, residuals);
+  ProcessableObject<bool> result
+    = WriteResiduals(*recon_events, z_positions, residuals);
   return result;
 }
 
@@ -184,9 +195,9 @@ MapCppPolynomialMapResiduals::ExtractMonteCarloTracks(
   MCEventPArray::const_iterator mc_event = mc_events->begin();
   while (mc_event != mc_events->end()) {
     std::vector<PhaseSpaceVector> track;
-    VirtualHitArray hits = (*mc_event)->GetVirtualHits();
-    VirtualHitArray::const_iterator hit = hits.begin();
-    while (hit != hits.end()) {
+    VirtualHitArray * hits = (*mc_event)->GetVirtualHits();
+    VirtualHitArray::const_iterator hit = hits->begin();
+    while (hit != hits->end()) {
       track.push_back(VirtualHit2PhaseSpaceVector(*hit));
       ++hit;
     }
@@ -196,10 +207,10 @@ MapCppPolynomialMapResiduals::ExtractMonteCarloTracks(
   return tracks;
 }
 
-std::vector<PhaseSpaceVector>
+std::vector<Primary *>
 MapCppPolynomialMapResiduals::ExtractBeamPrimaries(
     const MCEventPArray * mc_events) const {
-  std::vector<PhaseSpaceVector> primaries;
+  std::vector<Primary *> primaries;
   MCEventPArray::const_iterator mc_event = mc_events->begin();
   while (mc_event != mc_events->end()) {
     primaries.push_back((*mc_event)->GetPrimary());
@@ -210,8 +221,8 @@ MapCppPolynomialMapResiduals::ExtractBeamPrimaries(
 
 std::vector<std::vector<PhaseSpaceVector> >
 MapCppPolynomialMapResiduals::CalculateResiduals(
-    std::vector<std::vector<PhaseSpaceVector> > & mapped_tracks,
-    std::vector<std::vector<PhaseSpaceVector> > & mc_tracks) const {
+    const std::vector<std::vector<PhaseSpaceVector> > & mapped_tracks,
+    const std::vector<std::vector<PhaseSpaceVector> > & mc_tracks) const {
   std::vector<std::vector<PhaseSpaceVector> > residuals;
   if (mapped_tracks.size() != mc_tracks.size()) {
     return residuals;
@@ -231,10 +242,14 @@ MapCppPolynomialMapResiduals::CalculateResiduals(
 
 std::vector<PhaseSpaceVector>
 MapCppPolynomialMapResiduals::CalculateResiduals(
-    std::vector<PhaseSpaceVector> & mapped_hits,
-    std::vector<PhaseSpaceVector> & mc_hits) const {
+    const std::vector<PhaseSpaceVector> & mapped_hits,
+    const std::vector<PhaseSpaceVector> & mc_hits) const {
   std::vector<PhaseSpaceVector> residuals;
   if (mapped_hits.size() != mc_hits.size()) {
+    std::cout << "DEBUG MapCppPolynomialMapResiduals::CalculateResiduals: "
+              << "Hit count mismatch. # Mapped Hits: " << mapped_hits.size()
+              << "\t# MC Hits: " << mc_hits.size()
+              << std::endl;
     return residuals;
   }
 
@@ -247,45 +262,54 @@ MapCppPolynomialMapResiduals::CalculateResiduals(
     ++mapped_hit;
     ++mc_hit;
   }
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::CalculateResiduals: "
+            << "Calculated " << residuals.size() << " residuals."
+            << std::endl;
   return residuals;
 }
 
 std::vector<std::vector<PhaseSpaceVector> >
 MapCppPolynomialMapResiduals::TransportBeamPrimaries(
-    const PolynomialOpticsModel & optics_model,
-    std::vector<long> & z_positions,
-    std::vector<Primary> & primaries) const {
+    PolynomialOpticsModel const * const optics_model,
+    std::vector<long> z_positions,
+    std::vector<Primary *> primaries) const {
   std::vector<std::vector<PhaseSpaceVector> > tracks;
-  std::vector<Primary>::const_iterator primary = primaries.begin();
+  std::vector<Primary *>::const_iterator primary = primaries.begin();
   while (primary != primaries.end()) {
     std::vector<PhaseSpaceVector> track;
     std::vector<long>::const_iterator z_position = z_positions.begin();
     while (z_position != z_positions.end()) {
-      track.push_back(optics_model.Transport(
-        Primary2PhaseSpaceVector(*primary), *z_position));
+      track.push_back(optics_model->Transport(
+        Primary2PhaseSpaceVector(**primary), *z_position));
       ++z_position;
     }
+    std::cout << "DEBUG MapCppPolynomialMapResiduals::TransportBeamPrimaries: "
+              << "Transported primary to " << track.size() << " detectors."
+              << std::endl;
     tracks.push_back(track);
     ++primary;
   }
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::TransportBeamPrimaries: "
+            << "Transported " << tracks.size() << " primaries."
+            << std::endl;
   return tracks;
 }
 
 PhaseSpaceVector MapCppPolynomialMapResiduals::VirtualHit2PhaseSpaceVector(
-    Primary hit) const {
+    const VirtualHit & hit) const {
   const double time = hit.GetTime();
   const double mass = hit.GetMass();
   const ThreeVector positions = hit.GetPosition();
   const ThreeVector momenta = hit.GetMomentum();
   const double momentum = momenta.mag();
   const double p2 = momentum*momentum;
-  const energy = p2 / ::sqrt(mass*mass + p2);
+  const double energy = p2 / ::sqrt(mass*mass + p2);
   return PhaseSpaceVector(time, energy, positions.x(), momenta.x(),
                           positions.y(), momenta.y());
 }
 
 PhaseSpaceVector MapCppPolynomialMapResiduals::Primary2PhaseSpaceVector(
-    VirtualHit primary) const {
+    const Primary & primary) const {
   const double time = primary.GetTime();
   const double energy = primary.GetEnergy();
   const ThreeVector positions = primary.GetPosition();
@@ -294,29 +318,38 @@ PhaseSpaceVector MapCppPolynomialMapResiduals::Primary2PhaseSpaceVector(
                           positions.y(), momenta.y());
 }
 
-ProcessableObject<Bool> MapCppPolynomialMapResiduals::WriteResiduals(
-    const std::vector<std::vector<PhaseSpaceVector> > & residuals,
-    const ReconEventPArray & recon_events) const {
+ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
+    const ReconEventPArray & recon_events,
+    const std::vector<long> z_positions,
+    const std::vector<std::vector<PhaseSpaceVector> > & residuals) const {
   if (residuals.size() != recon_events.size()) {
-    return Processableobject<Bool>(
+    return ProcessableObject<bool>(
       std::string("{\"errors\":{\"size_mismatch\":"
                   "\"The number of track residuals is not the same as the "
                   "number of recon events.\"}}"));
   }
+  std::cout << "DEBUG MapCppPolynomialMapResiduals::WriteResiduals: "
+            << "writing " << residuals.size() << "residual tracks."
+            << std::endl;
 
   ReconEventPArray::const_iterator recon_event = recon_events.begin();
   std::vector<std::vector<PhaseSpaceVector> >::const_iterator track_residual
     = residuals.begin();
   while (track_residual != residuals.end()) {
-    Track * track = new Track();
+    std::cout << "DEBUG MapCppPolynomialMapResiduals::WriteResiduals: "
+              << "writing " << track_residual->size() << "residual track points."
+              << std::endl;
+    GlobalDS::Track * track = new GlobalDS::Track();
     track->set_mapper_name(kClassname);
     std::vector<PhaseSpaceVector>::const_iterator residual
       = track_residual->begin();
+    std::vector<long>::const_iterator z_position = z_positions.begin();
     while (residual != track_residual->end()) {
-      TrackPoint track_point
-        = DataStructureHelper::GetInstance().PhaseSpaceVector2TrackPoint(
-            *residual);
-      track->AddTrackPoint(new TrackPoint(track_point));
+      GlobalDS::TrackPoint track_point
+        = Recon::DataStructureHelper::GetInstance().PhaseSpaceVector2TrackPoint(
+            *residual, static_cast<double>(*z_position), GlobalDS::kMuMinus);
+      track->AddTrackPoint(new GlobalDS::TrackPoint(track_point));
+      ++z_position;
       ++residual;
     }
     GlobalEvent * global_event = new GlobalEvent();
@@ -325,7 +358,7 @@ ProcessableObject<Bool> MapCppPolynomialMapResiduals::WriteResiduals(
     ++recon_event;
     ++track_residual;
   }
-  return ProcessableObject<Bool>(true);
+  return ProcessableObject<bool>(new bool(true));
 }
 
 bool MapCppPolynomialMapResiduals::death() {

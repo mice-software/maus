@@ -32,27 +32,36 @@
 
 // MAUS
 #include "DataStructure/Global/Track.hh"
+#include "DataStructure/Data.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/Primary.hh"
+#include "DataStructure/ReconEvent.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
 
 namespace MAUS {
 
-class CovarianceMatrix;
-class GlobalEvent;
+class PolynomialOpticsModel;
 class ReconEvent;
-class TOFSpacePoint;
-class SciFiSpacePoint;
 
-namespace DataStructure {
-namespace Global {
-  class TrackPoint;
-}
-}
-
-namespace recon {
-namespace global {
-}  // namespace global
-}  // namespace recon
+// Object for use with process functions
+template <typename Type>
+class ProcessableObject {
+  public:
+  ProcessableObject(Type * object)
+      : object_(object), error_string_(NULL) { }
+  ProcessableObject(const std::string error_string)
+      : object_(NULL), error_string_(new std::string(error_string)) { }
+  ~ProcessableObject() {
+    if (!object_) delete object_;
+    if (!error_string_) delete error_string_;
+  }
+  Type * object() { return object_; };
+  std::string * error_string() { return error_string_; }
+  private:
+  Type * object_;
+  std::string * error_string_;
+};
 
 /** @class MapCppPolynomialMapResiduals
  *  Reconstruct tracks at the desired longitudinal spacing using the desired
@@ -60,7 +69,7 @@ namespace global {
  */
 class MapCppPolynomialMapResiduals {
  public:
-  typedef int (A::*Method)();
+  // typedef int (MapCppPolynomialMapResiduals::*Method)();
 
   /** @brief Allocates the global-scope Minuit instance used for minimization.
    */
@@ -95,65 +104,48 @@ class MapCppPolynomialMapResiduals {
   std::string process(std::string document);
 
  private:
-  Json::Value configuration_;
-  MAUS::recon::global::DetectorMap detectors_;
   PolynomialOpticsModel * optics_model_;
-  int beam_polarity_;
 
   static const std::string kClassname;
-
-  // Object for use with process functions
-  template <typename Type>
-  class ProcessableObject {
-   public:
-    ProcessableObject(const Type * object)
-        : object_(object, error_string_(NULL) { }
-    ProcessableObject(const std::string error_string)
-        : object_(NULL), error_string_(new std::string(error_string)) { }
-    Type * object() { return object; };
-    const std::string * error_string() { return error_string_; }
-   private:
-    Type * object_;
-    std::string * error_string_;
-  }
 
   // ****************************
   //  Spill Processing Functions
   // ****************************
 
-  ProcessableObject<MAUS::Data> DeserializeRun(
+  ProcessableObject<Data> DeserializeRun(
       Json::Value & run) const;
   std::string ProcessRun(
-      ProcessableObject<MAUS::Data> & run_data) const;
+      ProcessableObject<Data> & run_data) const;
   std::string SerializeRun(
-      const MAUS::Data * run,
-      ProcessableObject<Bool> result) const;
-  ProcessableObject<Bool> ProcessSpill(
-      const MAUS::Spill * spill) const;
-  ProcessableObject<Bool> GenerateResiduals(
+      const Data * run,
+      ProcessableObject<bool> result) const;
+  ProcessableObject<bool> ProcessSpill(
+      const Spill * spill) const;
+  ProcessableObject<bool> GenerateResiduals(
       const MCEventPArray * mc_events,
-      const MAUS::ReconEventPArray * recon_events) const;
+      const ReconEventPArray * recon_events) const;
   std::vector<std::vector<PhaseSpaceVector> > ExtractMonteCarloTracks(
       const MCEventPArray * mc_events) const;
-  std::vector<PhaseSpaceVector> ExtractBeamPrimaries(
+  std::vector<Primary *> ExtractBeamPrimaries(
       const MCEventPArray * mc_events) const;
   std::vector<std::vector<PhaseSpaceVector> > CalculateResiduals(
-      std::vector<std::vector<PhaseSpaceVector> > & mapped_tracks,
-      std::vector<std::vector<PhaseSpaceVector> > & mc_tracks) const;
+      const std::vector<std::vector<PhaseSpaceVector> > & mapped_tracks,
+      const std::vector<std::vector<PhaseSpaceVector> > & mc_tracks) const;
   std::vector<PhaseSpaceVector> CalculateResiduals(
-      std::vector<PhaseSpaceVector> & mapped_hits,
-      std::vector<PhaseSpaceVector> & mc_hits) const;
+      const std::vector<PhaseSpaceVector> & mapped_hits,
+      const std::vector<PhaseSpaceVector> & mc_hits) const;
   std::vector<std::vector<PhaseSpaceVector> > TransportBeamPrimaries(
-      const PolynomialOpticsModel & optics_model,
-      std::vector<long> & z_positions,
-      std::vector<Primary> & primaries) const;
+      PolynomialOpticsModel const * const optics_model,
+      std::vector<long> z_positions,
+      std::vector<Primary *> primaries) const;
   PhaseSpaceVector VirtualHit2PhaseSpaceVector(
-      Primary hit) const;
+      const VirtualHit & hit) const;
   PhaseSpaceVector Primary2PhaseSpaceVector(
-      VirtualHit primary) const;
-  ProcessableObject<Bool> WriteResiduals(
-      const std::vector<std::vector<PhaseSpaceVector> > & residuals,
-      const ReconEventPArray & recon_events) const;
+      const Primary & primary) const;
+  ProcessableObject<bool> WriteResiduals(
+      const ReconEventPArray & recon_events,
+      const std::vector<long> z_positions,
+      const std::vector<std::vector<PhaseSpaceVector> > & residuals) const;
 };
 
 }  // namespace MAUS

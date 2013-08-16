@@ -84,6 +84,7 @@ class TransferMapOpticsModel : public OpticsModel {
                                      const double end_plane) const;
 
  protected:
+  bool built_;
   const TransferMap * GenerateTransferMap(const double plane) const;
 
   const dataCards * data_cards_;

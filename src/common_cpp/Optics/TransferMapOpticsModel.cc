@@ -57,7 +57,7 @@ using recon::global::DataStructureHelper;
 
 TransferMapOpticsModel::TransferMapOpticsModel(
       Json::Value const * const configuration)
-    : OpticsModel(configuration) {
+    : OpticsModel(configuration), built_(false) {
   // Reference Particle
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUS::MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
@@ -183,6 +183,8 @@ std::cerr << "DEBUG TransferMapOpticsModel::Build: "
     transfer_maps_[station_hits->first]
       = CalculateTransferMap(primary_vectors, station_hits->second);
   }
+
+  built_ = true;
 }
 
 const TransferMap * TransferMapOpticsModel::FindTransferMap(
@@ -244,7 +246,12 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
 
 const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
     const double plane) const {
-  if (transfer_maps_.size() == 0) {
+  if (!built_) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "No transfer maps available since the optics model has not "
+                  "been built yet. Call Build() first.",
+                  "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
+  } else if (transfer_maps_.size() == 0) {
     throw(Squeal(Squeal::nonRecoverable,
                  "No transfer maps to choose from.",
                  "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));

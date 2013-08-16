@@ -48,7 +48,8 @@ using recon::global::ParticleOpticalVector;
 
 PolynomialOpticsModel::PolynomialOpticsModel(
       Json::Value const * const configuration)
-      : TransferMapOpticsModel(configuration), algorithm_(kNone) {
+      : TransferMapOpticsModel(configuration),
+        algorithm_(kNone) {
   // Determine which fitting algorithm to use
   SetupAlgorithm();
 
@@ -131,10 +132,19 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
     transfer_maps_[station_hits->first]
       = CalculateTransferMap(primary_vectors, station_hits->second);
   }
+
+  built_ = true;
 }
 
 const std::vector<long> PolynomialOpticsModel::GetAvailableMapPositions()
     const {
+  if (!built_) {
+    throw(Squeal(Squeal::nonRecoverable,
+                  "No transfer maps available since the optics model has not "
+                  "been built yet. Call Build() first.",
+                  "MAUS::PolynomialOpticsModel::GetAvailableMapPositions()"));
+  }
+
   std::vector<long> positions;
   std::map<long, const TransferMap *>::const_iterator maps;
   // insertion sort the map keys (z-positions)
