@@ -99,7 +99,7 @@ PyObject* Birth(PyObject *dummy, PyObject *args) {
   std::string cards(temp);
   try {
     GlobalsManager::InitialiseGlobals(cards);
-  } catch(std::exception& exc) {
+  } catch(Exception exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }

@@ -6,61 +6,32 @@ Configuation OpticsTest
   Module Virtual
   {
       PropertyString Volume None
-      PropertyHep3Vector Position 0.0 0.0 1000.*@RepeatNumber mm
+      PropertyHep3Vector Position 0.0 0.0 1000. mm
       PropertyString SensitiveDetector Virtual
-      PropertyBool RepeatModule2 True
-      PropertyInt  NumberOfRepeats 1
   }
-  Module Quadrupole
+  Module Virtual
   {
-    // Physical model
-    PropertyString Volume         None
-    PropertyHep3Vector Position 0.0 0.0 0.5 m
-    // Field model
-    PropertyString FieldType           Multipole
-    PropertyInt    Pole                2 //Quad field
-    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
-    PropertyDouble FieldStrength       0.0     T //normalise to 1 T/m
-    PropertyDouble Height              0.4     m
-    PropertyDouble Width               0.4     m     
-    PropertyDouble Length              1.0     m
-    PropertyString EndFieldType        HardEdged
-    PropertyDouble CentreLength        0.25  m
-    PropertyDouble EndLength           0.1  m
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 2000. mm
+      PropertyString SensitiveDetector Virtual
   }
-  Module Quadrupole
+  Module Virtual
   {
-    // Physical model
-    PropertyString Volume         None
-    PropertyHep3Vector Position 0.0 0.0 1.0 m
-    // Field model
-    PropertyString FieldType           Multipole
-    PropertyInt    Pole                2 //Quad field
-    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
-    PropertyDouble FieldStrength      -0.0     T
-    PropertyDouble Height              0.4     m
-    PropertyDouble Width               0.4     m     
-    PropertyDouble Length              1.0     m
-    PropertyString EndFieldType        HardEdged
-    PropertyDouble CentreLength        0.25  m
-    PropertyDouble EndLength           0.1  m
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 3000. mm
+      PropertyString SensitiveDetector Virtual
   }
-  Module Quadrupole
+  Module Virtual
   {
-    // Physical model
-    PropertyString Volume         None
-    PropertyHep3Vector Position 0.0 0.0 1.5 m
-    // Field model
-    PropertyString FieldType           Multipole
-    PropertyInt    Pole                2 //Quad field
-    PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
-    PropertyDouble FieldStrength       0.0     T
-    PropertyDouble Height              0.4     m
-    PropertyDouble Width               0.4     m     
-    PropertyDouble Length              1.0     m
-    PropertyString EndFieldType        HardEdged
-    PropertyDouble CentreLength        0.25  m
-    PropertyDouble EndLength           0.1  m
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 4000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 5000. mm
+      PropertyString SensitiveDetector Virtual
   }
 }
 

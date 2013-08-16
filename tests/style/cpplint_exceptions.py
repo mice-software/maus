@@ -225,13 +225,15 @@ exceptions[os.path.join(CPP_CM,
 ]
 
 exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyCovarianceMatrix.hh')] = [
-('                   reinterpret_cast<CovarianceMatrix* (*)(PyObject*)>(gcm_void);',
+('                   reinterpret_cast<CovarianceMatrix* (*)'+\
+                                                      '(PyObject*)>(gcm_void);',
 'cpplint misinterprets function pointer as a cast',
 'rogers')
 ]
 
 exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyPhaseSpaceVector.hh')] = [
-('                  reinterpret_cast<PhaseSpaceVector* (*)(PyObject*)>(gpsv_void);',
+('                  reinterpret_cast<PhaseSpaceVector* (*)'+\
+                                                     '(PyObject*)>(gpsv_void);',
 'cpplint misinterprets function pointer as a cast',
 'rogers')
 ]

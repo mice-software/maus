@@ -52,6 +52,9 @@ std::string transport_covariance_matrix_docstring =
 std::string("Transport a CovarianceMatrix.\n\n")+
 std::string(" - cov_matrix (covariance_matrix): CovarianceMatrix object\n")+
 std::string("   that represents the start CovarianceMatrix\n")+
+std::string(" - end_position (float): z position for tracking. Optics\n")+
+std::string("   will attempt to track to the nearest VirtualPlane to this\n")+
+std::string("   z position.\n")+
 std::string("Returns a new transported covariance_matrix object");
 
 // note we don't use Transport(cov_matrix, start, end) as this can make a
@@ -68,9 +71,10 @@ PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
 
     PyObject* py_cm_in = NULL;
     double end_plane = std::numeric_limits<double>::max()/10.;
-    static char *kwlist[] = {const_cast<char*>("cov_matrix"), NULL};
+    static char *kwlist[] = {const_cast<char*>("cov_matrix"),
+                             const_cast<char*>("end_position"), NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Od", kwlist,
                                          &py_cm_in, &end_plane)) {
         return NULL;
     }
@@ -101,6 +105,9 @@ std::string transport_phase_space_vector_docstring =
 std::string("Transport a PhaseSpaceVector.\n\n")+
 std::string(" - phase_space_vector (PhaseSpaceVector): phase space vector\n")+
 std::string("   object that represents the start coordinate\n")+
+std::string(" - end_position (float): z position for tracking. Optics\n")+
+std::string("   will attempt to track to the nearest VirtualPlane to this\n")+
+std::string("   z position.\n")+
 std::string("Returns a new transported PhaseSpaceVector");
 
 // note we don't use Transport(cov_matrix, start, end) as this can make a
@@ -117,9 +124,10 @@ PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
 
     PyObject* py_psv_in = NULL;
     double end_plane = std::numeric_limits<double>::max()/10.;
-    static char *kwlist[] = {const_cast<char*>("phase_space_vector"), NULL};
+    static char *kwlist[] = {const_cast<char*>("phase_space_vector"),
+                             const_cast<char*>("end_position"), NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Od", kwlist,
                                          &py_psv_in, &end_plane)) {
         return NULL;
     }
@@ -135,7 +143,7 @@ PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
         psv_out = new PhaseSpaceVector(optics_model->Transport
                                                           (*psv_in, end_plane));
     }
-    catch(Exception exc) {
+    catch(Exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, exc.what());
         return NULL;
     }
@@ -174,7 +182,9 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     // PolynomialOpticsModel
     try {
         Json::Value* cards = Globals::GetConfigurationCards();
+        // just gets deltas (dx, dy, ...) and polynomial order
         optics->model = new MAUS::PolynomialOpticsModel(*cards);
+        // uses MAUS::Globals::MAUSGeant4Manager for geometry, etc
         optics->model->Build();
         is_built = true;  // done by constructor
     } catch(Exception exc) {

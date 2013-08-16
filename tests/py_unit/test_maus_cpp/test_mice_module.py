@@ -22,7 +22,6 @@ Test maus_cpp.mice_module
 import unittest
 import os
 
-import maus_cpp
 from maus_cpp.mice_module import MiceModule
 
 class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
@@ -31,13 +30,14 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
     """
     def setUp(self):
         """open test mice module"""
-        self.test = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_py.dat")
+        self.test = os.path.expandvars(
+        "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_py.dat")
         self.mod = MiceModule(file_name=self.test)
 
     def test_init(self):
         """check initialise mice module"""
         try:
-            mod = MiceModule()
+            mod = MiceModule() # pylint: disable=W0612
             self.assertTrue(False, "Should have thrown an error")
         except TypeError:
             pass
@@ -49,10 +49,10 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         mod = MiceModule(file_name="Test.dat")
 
     def test_get_name(self):
-      """Test MiceModule.get_name()"""
-      self.assertEqual(self.mod.get_name(), "test_mice_modules_py.dat")
-      for i, child in enumerate(self.mod.get_children()):
-          self.assertEqual(child.get_name(), "TestMod"+str(i+1))
+        """Test MiceModule.get_name()"""
+        self.assertEqual(self.mod.get_name(), "test_mice_modules_py.dat")
+        for i, child in enumerate(self.mod.get_children()):
+            self.assertEqual(child.get_name(), "TestMod"+str(i+1))
 
     def test_get_property(self):
         """Test mice_module get property"""
@@ -140,7 +140,7 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         test_in = {"x":1., "y":2., "z":3.}
         self.mod.set_property(name="h3v_a", type="hep3vector", value=test_in)
         test_out = self.mod.get_property(name="h3v_a", type="hEP3vectOR") 
-        for key, value in test_out.iteritems():
+        for key in test_out.keys():
             self.assertAlmostEqual(test_in[key], test_out[key])
         try:
             self.mod.set_property(name="h3v_b", type="hEP3vectOR",

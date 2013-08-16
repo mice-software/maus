@@ -54,11 +54,8 @@ std::string("Returns the corresponding covariance (float)");
 
 PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
     CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
-    if (cm == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "PyCovarianceMatrix not initialised properly");
+    if (cm == NULL)
         return NULL;
-    }
 
     int row = 0;
     int col = 0;
@@ -94,11 +91,8 @@ std::string("Returns None");
 
 PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
     CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
-    if (cm == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "PyCovarianceMatrix not initialised properly");
+    if (cm == NULL)
         return NULL;
-    }
 
     int row = 0;
     int col = 0;
@@ -124,11 +118,8 @@ PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
 static PyObject* _str(PyObject * self) {
     CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
-    if (cm == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "PyCovarianceMatrix not initialised properly");
+    if (cm == NULL)
         return NULL;
-    }
     char buffer[1024];
     std::string row =  "[%10g, %10g, %10g, %10g, %10g, %10g]";
     std::string matrix = " ["+row+",\n  "+row+",\n   "+row+",\n   "+row+
@@ -531,15 +522,26 @@ PyMODINIT_FUNC initcovariance_matrix(void) {
 }
 
 CovarianceMatrix* C_API::get_covariance_matrix(PyObject* py_cm) {
+    if (py_cm == NULL || py_cm->ob_type != &PyCovarianceMatrixType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Could not resolve object to a CovarianceMatrix");
+        return NULL;
+    }
     return reinterpret_cast<PyCovarianceMatrix*>(py_cm)->cov_mat;
 }
 
-void C_API::set_covariance_matrix(PyObject* py_cm_o, CovarianceMatrix* cm) {
+int C_API::set_covariance_matrix(PyObject* py_cm_o, CovarianceMatrix* cm) {
+    if (py_cm_o == NULL || py_cm_o->ob_type != &PyCovarianceMatrixType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Could not resolve object to a CovarianceMatrix");
+        return 0;
+    }
     PyCovarianceMatrix* py_cm = reinterpret_cast<PyCovarianceMatrix*>(py_cm_o);
     if (py_cm->cov_mat != NULL) {
         delete py_cm->cov_mat;
     }
     py_cm->cov_mat = cm;
+    return 1;
 }
 
 PyObject *C_API::create_empty_matrix() {

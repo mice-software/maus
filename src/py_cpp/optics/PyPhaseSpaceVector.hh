@@ -55,7 +55,8 @@ namespace C_API {
 
 /** Create a new empty PyPhaseSpaceVector (psv is NULL)
  *
- *  Caller owns the returned memory
+ *  \returns NULL on failure or the object on success. Caller owns the returned
+ *           object
  */
 
 static PyObject* create_empty_vector();
@@ -63,9 +64,10 @@ static PyObject* create_empty_vector();
 /** Return the C++ PhaseSpaceVector associated with a PyPhaseSpaceVector
  *
  *  \param py_psv PyPhaseSpaceVector* cast as a PyObject*. Python representation
- *         of the phase space vector
+ *         of the phase space vector.
  *
- *  PyPhaseSpaceVector still owns the memory allocated to PhaseSpaceVector
+ *  \returns NULL on failure or the object on success. PyPhaseSpaceVector still
+ *          owns the memory allocated to PhaseSpaceVector.
  */
 static PhaseSpaceVector* get_phase_space_vector(PyObject* py_psv);
 
@@ -75,8 +77,10 @@ static PhaseSpaceVector* get_phase_space_vector(PyObject* py_psv);
  *               of the phase space vector
  *  \param psv  C++ representation of the phase space vector. PyPhaseSpaceVector
  *             takes ownership of the memory allocated to psv
+ *
+ *  \returns 0 on failure, 1 on success
  */
-static void set_phase_space_vector(PyObject* py_psv, PhaseSpaceVector* psv);
+static int set_phase_space_vector(PyObject* py_psv, PhaseSpaceVector* psv);
 }
 
 // ~~~~~~~~~~~~~~~~~~~~ PyPhaseSpaceVector private methods ~~~~~~~~~~~~~~~~~~~~~
@@ -278,7 +282,7 @@ namespace PyPhaseSpaceVector {
  */
 int import_PyPhaseSpaceVector();
 
-void (*set_phase_space_vector)(PyObject* py_psv, PhaseSpaceVector* psv) = NULL;
+int (*set_phase_space_vector)(PyObject* py_psv, PhaseSpaceVector* psv) = NULL;
 PhaseSpaceVector* (*get_phase_space_vector)(PyObject* py_psv) = NULL;
 PyObject* (*create_empty_vector)() = NULL;
 }
@@ -301,7 +305,7 @@ int MAUS::PyPhaseSpaceVector::import_PyPhaseSpaceVector() {
                                                "C_API_SET_PHASE_SPACE_VECTOR");
     void* spsv_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(spsv_c_api));
     PyPhaseSpaceVector::set_phase_space_vector =
-            reinterpret_cast<void (*)(PyObject*, PhaseSpaceVector*)>(spsv_void);
+            reinterpret_cast<int (*)(PyObject*, PhaseSpaceVector*)>(spsv_void);
 
     PyObject* cev_c_api = PyDict_GetItemString(psv_dict,
                                                "C_API_CREATE_EMPTY_VECTOR");

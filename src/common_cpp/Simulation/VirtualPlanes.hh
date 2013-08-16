@@ -311,6 +311,8 @@ class VirtualPlaneManager {
   int GetStationNumberFromModule(const MiceModule* module);
 
   /** @brief Return a vector of planes controlled by the plane manager
+   *
+   *  VirtualPlaneManager owns the memory pointed at by GetPlanes()
    */
   std::vector<VirtualPlane*> GetPlanes() {return _planes;}
 

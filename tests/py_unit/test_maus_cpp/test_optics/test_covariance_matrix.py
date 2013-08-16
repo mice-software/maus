@@ -48,6 +48,7 @@ class CovarianceMatrixTestCase(unittest.TestCase): # pylint: disable=R0904
         try:
             cm1 = covariance_matrix.create_from_matrix()
             self.assertTrue(False, "Should have thrown a TypeError")
+            print cm1
         except TypeError:
             pass
         cm2 = covariance_matrix.create_from_matrix(test_array)
@@ -77,6 +78,7 @@ class CovarianceMatrixTestCase(unittest.TestCase): # pylint: disable=R0904
         for j in range(1, 7):
             for i in range(1, 7):
                 self.assertEqual(test_data[i-1][j-1], cov.get_element(i, j))
+                self.assertEqual(cm2.get_element(i, j), cm3.get_element(i, j))
 
     def test_get_element(self):
         """Test covariance matrix get_element function"""
@@ -282,7 +284,7 @@ class CovarianceMatrixTestCase(unittest.TestCase): # pylint: disable=R0904
         test_array = eval(repr(cov))
         for i, x_array in enumerate(test_array):
             for j, x in enumerate(x_array):
-               self.assertAlmostEqual(x, ref_data[i][j])
+                self.assertAlmostEqual(x, ref_data[i][j])
 
 if __name__ == "__main__":
     unittest.main()

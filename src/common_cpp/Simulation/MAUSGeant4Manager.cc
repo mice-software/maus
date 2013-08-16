@@ -82,7 +82,8 @@ MAUSGeant4Manager::~MAUSGeant4Manager() {
     }
     delete _runManager;
     _isClosed = true;
-    delete _virtPlanes;
+    if (_virtPlanes != NULL)
+        delete _virtPlanes;
 }
 
 void MAUSGeant4Manager::SetPhases() {
@@ -164,6 +165,7 @@ BTFieldConstructor* MAUSGeant4Manager::GetField() {
 
 // should be const MiceModule
 void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
+    SetVirtualPlanes(new VirtualPlaneManager);
     _virtPlanes->ConstructVirtualPlanes(&module);
     _detector->SetMiceModules(module);
     SetPhases();

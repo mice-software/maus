@@ -21,10 +21,8 @@ Test maus_cpp.phase_space_vector
 
 import unittest
 
-import numpy
-
 import maus_cpp
-from maus_cpp.phase_space_vector import PhaseSpaceVector
+import maus_cpp.phase_space_vector
 from maus_cpp.phase_space_vector import create_from_coordinates
 
 class PhaseSpaceVectorTestCase(unittest.TestCase): # pylint: disable=R0904
@@ -33,6 +31,9 @@ class PhaseSpaceVectorTestCase(unittest.TestCase): # pylint: disable=R0904
     def test_init(self):
         """Test maus_cpp.phase_space_vector.init()"""
         psv = maus_cpp.phase_space_vector.PhaseSpaceVector()
+        psv_as_list = eval(psv.__repr__())
+        for var in psv_as_list:
+            self.assertAlmostEqual(var, 0.)
 
     def test_create_from_coordinates(self):
         """Test maus_cpp.phase_space_vector.create_from_coordinates()"""

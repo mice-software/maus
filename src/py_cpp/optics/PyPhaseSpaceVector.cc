@@ -390,19 +390,28 @@ PyObject *C_API::create_empty_vector() {
 }
 
 PhaseSpaceVector* C_API::get_phase_space_vector(PyObject* py_psv) {
-    PyPhaseSpaceVector* psv_ = reinterpret_cast<PyPhaseSpaceVector*>(py_psv);
-    if (psv_ == NULL)
+    if (py_psv == NULL || py_psv->ob_type != &PyPhaseSpaceVectorType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Could not resolve variable into a PhaseSpaceVector");
         return NULL;
-    else
-        return psv_->psv;
+    }
+    PyPhaseSpaceVector* psv_ = reinterpret_cast<PyPhaseSpaceVector*>(py_psv);
+    return psv_->psv;
 }
 
-void C_API::set_phase_space_vector(PyObject* py_psv_o, PhaseSpaceVector* psv) {
-    PyPhaseSpaceVector* py_psv = reinterpret_cast<PyPhaseSpaceVector*>(py_psv_o);
+int C_API::set_phase_space_vector(PyObject* py_psv_o, PhaseSpaceVector* psv) {
+    if (py_psv_o == NULL || py_psv_o->ob_type != &PyPhaseSpaceVectorType) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Could not resolve variable into a PhaseSpaceVector");
+        return 0;
+    }
+    PyPhaseSpaceVector* py_psv =
+                                reinterpret_cast<PyPhaseSpaceVector*>(py_psv_o);
     if (py_psv->psv != NULL) {
         delete py_psv->psv;
     }
     py_psv->psv = psv;
+    return 1;
 }
 }
 }

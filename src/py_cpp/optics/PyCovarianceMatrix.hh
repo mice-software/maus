@@ -46,15 +46,16 @@ typedef struct {
 
 /** @namespace C_API defines functions that can be accessed by other C libraries
  *
- *  To access these functions, don't #include this file; use 
- *  int import_PyCovarianceMatrix() instead otherwise you will get segmentation
- *  fault
+ *  To access these functions call int import_PyCovarianceMatrix() otherwise you
+ *  will get a segmentation fault. The import will place the C_API functions in
+ *  the MAUS::PyCovarianceMatrix namespace.
  */
 namespace C_API {
 
 /** Allocate a new PyCovarianceMatrix
  *
- *  \returns PyCovarianceMatrix* cast as a PyObject* with cm pointer set to NULL
+ *  \returns PyCovarianceMatrix* cast as a PyObject* with cm pointer set to
+ *  NULL. Caller owns the memory allocated to PyCovarianceMatrix*
  */
 static PyObject *create_empty_matrix();
 
@@ -63,7 +64,9 @@ static PyObject *create_empty_matrix();
  *  \param py_cm PyCovarianceMatrix* cast as a PyObject*. Python representation
  *         of the covariance matrix
  *
- *  PyCovarianceMatrix still owns the memory allocated to CovarianceMatrix
+ *  \returns NULL on failure and raises a TypeError. On success returns the
+ *  CovarianceMatrix. PyCovarianceMatrix still owns the memory allocated to
+ *  CovarianceMatrix.
  */
 static CovarianceMatrix* get_covariance_matrix(PyObject* py_cm);
 
@@ -73,8 +76,10 @@ static CovarianceMatrix* get_covariance_matrix(PyObject* py_cm);
  *               of the covariance matrix
  *  \param cm  C++ representation of the covariance matrix. PyCovarianceMatrix
  *             takes ownership of the memory allocated to cm
+ *
+ *  \returns 1 on success, 0 on failure and raises a TypeError
  */
-static void set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
+static int set_covariance_matrix(PyObject* py_cm, CovarianceMatrix* cm);
 }
 
 /** _alloc allocates memory for PyCovarianceMatrix
@@ -195,7 +200,7 @@ int import_PyCovarianceMatrix();
 
 
 PyObject* (*create_empty_matrix)() = NULL;
-void (*set_covariance_matrix)(PyObject* py_cm, CovarianceMatrix* cm) = NULL;
+int (*set_covariance_matrix)(PyObject* py_cm, CovarianceMatrix* cm) = NULL;
 CovarianceMatrix* (*get_covariance_matrix)(PyObject* py_cm) = NULL;
 }
 }
@@ -208,7 +213,7 @@ int MAUS::PyCovarianceMatrix::import_PyCovarianceMatrix() {
     PyObject *cm_dict  = PyModule_GetDict(cm_module);
 
     PyObject* cem_c_api = PyDict_GetItemString(cm_dict,
-                                                 "C_API_CREATE_EMPTY_MATRIX");
+                                               "C_API_CREATE_EMPTY_MATRIX");
     void* cem_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(cem_c_api));
     PyCovarianceMatrix::create_empty_matrix =
                                     reinterpret_cast<PyObject* (*)()>(cem_void);
@@ -223,7 +228,7 @@ int MAUS::PyCovarianceMatrix::import_PyCovarianceMatrix() {
                                                "C_API_SET_COVARIANCE_MATRIX");
     void* scm_void = reinterpret_cast<void*>(PyCObject_AsVoidPtr(scm_c_api));
     PyCovarianceMatrix::set_covariance_matrix =
-             reinterpret_cast<void (*)(PyObject*, CovarianceMatrix*)>(scm_void);
+             reinterpret_cast<int (*)(PyObject*, CovarianceMatrix*)>(scm_void);
     if ((create_empty_matrix == NULL) ||
         (set_covariance_matrix == NULL) ||
         (get_covariance_matrix == NULL))

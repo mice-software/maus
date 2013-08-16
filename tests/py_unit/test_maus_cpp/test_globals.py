@@ -40,11 +40,11 @@ class GlobalsTestCase(unittest.TestCase): # pylint: disable=R0904
         config_options = StringIO.StringIO(unicode("""
 simulation_geometry_filename = "Test.dat"
 reconstruction_geometry_filename = "Test.dat"
-simulation_reference_particle = {}
         """))
         self.config = Configuration.Configuration().getConfigJSON(
                                                          config_options, False)
-        self.alt_mod = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_globals.dat")
+        self.alt_mod = os.path.expandvars(
+                "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_globals.dat")
 
     def tearDown(self): # pylint: disable = C0103
         """Reset the globals"""
@@ -122,7 +122,7 @@ simulation_reference_particle = {}
         mod_no_field = MiceModule("Test.dat")
         mod_field = MiceModule(self.alt_mod)
         # check keywords
-        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field)        
+        maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_no_field)
         self.assertAlmostEqual(
                        maus_cpp.field.get_field_value(500., 0., 0., 0.)[1], 0.0)
         maus_cpp.globals.set_monte_carlo_mice_modules(module=mod_field)
