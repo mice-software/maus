@@ -191,6 +191,18 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertEqual(type(str(self.mod)), type(''))
         self.assertGreater(str(self.mod).find(self.mod.get_name()), -1)
 
+    def test_reload_repeat_module2(self):
+        """Check that we can reload RepeatModule2 directive"""
+        self.test = os.path.expandvars(
+        "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/mice_mod_repeat.dat")
+        for index in range(3):
+            print "LOAD", index
+            self.mod = MiceModule(file_name=self.test)
+            mod_list = self.mod.get_children()
+            z_list = [mod.get_property("Position", "Hep3Vector")["z"] for mod in mod_list]
+            for i, z in enumerate(sorted(z_list)):                
+                self.assertAlmostEqual(i*1000., z)
+
 if __name__ == "__main__":
     unittest.main()
 

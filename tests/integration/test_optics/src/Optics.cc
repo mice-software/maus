@@ -80,6 +80,9 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["default_keep_or_kill"] = true;
   json_config["keep_or_kill_particles"] = "{}";
   json_config["kinetic_energy_threshold"] = 0.1;
+  json_config["max_step_length"] = 100.;
+  json_config["max_track_time"] = 1.e9;
+  json_config["max_track_length"] = 1.e8;
   json_config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
