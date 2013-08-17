@@ -48,9 +48,15 @@ namespace PyCovarianceMatrix {
 
 std::string get_element_docstring =
 std::string("Get an element of the covariance matrix\n\n")+
-std::string(" - row (int) Row from which to get the element\n")+
-std::string(" - column (int) Column from which to get the element\n")+
-std::string("Returns the corresponding covariance (float)");
+std::string(" - row (int) Row from which to get the element, indexed from 1\n")+
+std::string("   to 6 inclusive\n")+
+std::string(" - column (int) Column from which to get the element, indexed\n")+
+std::string("   from 1 to 6 inclusive\n")+
+std::string("Covariances are for vector U with variables ordered like\n")+
+std::string("   (t, energy, x, px, y, py)\n")+
+std::string("with standard Geant4 system of units\n")+
+std::string("   ([ns], [MeV], [mm], [MeV/c], [mm], [MeV/c])\n")+
+std::string("Returns the corresponding covariance (float).");
 
 PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
     CovarianceMatrix* cm = C_API::get_covariance_matrix(self);
@@ -84,9 +90,15 @@ PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_element_docstring =
 std::string("Set an element of the covariance matrix\n\n")+
-std::string(" - row (int) Row from which to get the element\n")+
-std::string(" - column (int) Column from which to get the element\n")+
+std::string(" - row (int) Row from which to get the element, indexed from 1\n")+
+std::string("   to 6 inclusive\n")+
+std::string(" - column (int) Column from which to get the element, indexed\n")+
+std::string("   from 1 to 6 inclusive\n")+
 std::string(" - value (float) Column from which to get the element\n")+
+std::string("Covariances are for vector U with variables ordered like\n")+
+std::string("   (t, energy, x, px, y, py)\n")+
+std::string("with standard Geant4 system of units\n")+
+std::string("   ([ns], [MeV], [mm], [MeV/c], [mm], [MeV/c])\n")+
 std::string("Returns None");
 
 PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -137,8 +149,11 @@ static PyObject* _str(PyObject * self) {
 const char* module_docstring =
   "covariance_matrix module for the CovarianceMatrix class";
 
-const char* class_docstring =
-  "CovarianceMatrix provides bindings for beam ellipses.";
+std::string class_docstring =
+std::string("CovarianceMatrix provides bindings for beam ellipses.\n\n")+
+std::string("__init__()\n")+
+std::string("    Takes no arguments. Initialises the covariance matrix to a\n")+
+std::string("    6x6 matrix with elements all 0.\n");
 
 static PyMemberDef _members[] = {
 {NULL}
@@ -174,7 +189,7 @@ static PyTypeObject PyCovarianceMatrixType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    class_docstring,           /* tp_doc */
+    class_docstring.c_str(),           /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */

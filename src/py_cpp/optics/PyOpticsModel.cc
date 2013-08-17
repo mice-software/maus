@@ -229,8 +229,16 @@ static PyMethodDef _methods[] = {
 const char* module_docstring =
   "optics_model module; merely a place holder for OpticsModel";
 
-const char* class_docstring =
-  "OpticsModel provides bindings for transporting particles and beam ellipses.";
+std::string class_docstring =
+std::string("OpticsModel transports particles and beam ellipses.\n\n")+
+std::string("OpticsModel provides bindings to transport particles and beam\n")+
+std::string("ellipses.\n\n")+
+std::string("__init__()\n")+
+std::string("    Takes no arguments. Sets up the OpticsModel with datacards\n")+
+std::string("    and geometry stored in globals. Transport is initialised\n")+
+std::string("    by expansion relative to 'simulation_reference_particle'\n")+
+std::string("    datacard which also defines the start position for all\n")+
+std::string("    transport.");
 
 static PyTypeObject PyOpticsModelType = {
     PyObject_HEAD_INIT(NULL)
@@ -254,7 +262,7 @@ static PyTypeObject PyOpticsModelType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    class_docstring,           /* tp_doc */
+    class_docstring.c_str(),           /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */

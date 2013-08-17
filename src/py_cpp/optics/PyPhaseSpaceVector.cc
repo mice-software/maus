@@ -78,42 +78,42 @@ PyObject* set(PyObject* self, PyObject *args, PyObject *kwds,
 }
 
 std::string get_t_docstring =
-std::string("Returns the time [ns]");
+std::string("Returns the time [ns]\n");
 
 PyObject* get_t(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::t);
 }
 
 std::string get_energy_docstring =
-std::string("Returns the energy [MeV]");
+std::string("Returns the total energy (not kinetic energy) [MeV]\n");
 
 PyObject* get_energy(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::E);
 }
 
 std::string get_x_docstring =
-std::string("Returns the horizontal position x [mm]");
+std::string("Returns the horizontal position x [mm]\n");
 
 PyObject* get_x(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::x);
 }
 
 std::string get_px_docstring =
-std::string("Returns the horizontal component of momentum px [MeV/c]");
+std::string("Returns the horizontal component of momentum px [MeV/c]\n");
 
 PyObject* get_px(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::Px);
 }
 
 std::string get_y_docstring =
-std::string("Returns the vertical position y [mm]");
+std::string("Returns the vertical position y [mm]\n");
 
 PyObject* get_y(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::y);
 }
 
 std::string get_py_docstring =
-std::string("Returns the vertical component of momentum py [MeV/c]");
+std::string("Returns the vertical component of momentum py [MeV/c]\n");
 
 PyObject* get_py(PyObject* self, PyObject *args, PyObject *kwds) {
     return get(self, &PhaseSpaceVector::Py);
@@ -121,7 +121,7 @@ PyObject* get_py(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_t_docstring =
 std::string("Set the time\n\n")+
-std::string("- value (float) phase space vector time [ns]")+
+std::string("- value (float) phase space vector time [ns]\n")+
 std::string("Returns None");
 
 PyObject* set_t(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -129,8 +129,8 @@ PyObject* set_t(PyObject* self, PyObject *args, PyObject *kwds) {
 }
 
 std::string set_energy_docstring =
-std::string("Set the energy\n\n")+
-std::string("- value (float) phase space vector energy [MeV]")+
+std::string("Set the total energy (not kinetic energy)\n\n")+
+std::string("- value (float) phase space vector energy [MeV]\n")+
 std::string("Returns None");
 
 PyObject* set_energy(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -139,7 +139,7 @@ PyObject* set_energy(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_x_docstring =
 std::string("Set the horizontal position\n\n")+
-std::string("- value (float) horizontal position [mm]")+
+std::string("- value (float) horizontal position [mm]\n")+
 std::string("Returns None");
 
 PyObject* set_x(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -148,7 +148,7 @@ PyObject* set_x(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_px_docstring =
 std::string("Set the horizontal component of momentum\n\n")+
-std::string("- value (float) momentum px [MeV/c]")+
+std::string("- value (float) momentum px [MeV/c]\n")+
 std::string("Returns None");
 
 PyObject* set_px(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -157,7 +157,7 @@ PyObject* set_px(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_y_docstring =
 std::string("Set the vertical position\n\n")+
-std::string("- value (float) vertical position [mm]")+
+std::string("- value (float) vertical position [mm]\n")+
 std::string("Returns None");
 
 PyObject* set_y(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -166,7 +166,7 @@ PyObject* set_y(PyObject* self, PyObject *args, PyObject *kwds) {
 
 std::string set_py_docstring =
 std::string("Set the vertical component of momentum\n\n")+
-std::string("- value (float) vertical momentum [MeV/c]")+
+std::string("- value (float) vertical momentum [MeV/c]\n")+
 std::string("Returns None");
 
 PyObject* set_py(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -227,8 +227,13 @@ static PyObject* _str(PyObject * self) {
 const char* module_docstring =
   "phase_space_vector module; merely a place holder for PhaseSpaceVector class";
 
-const char* class_docstring =
-  "PhaseSpaceVector provides bindings for particle tracks.";
+std::string class_docstring =
+std::string("PhaseSpaceVector provides bindings for particle tracks.\n\n")+
+std::string("__init__()\n")+
+std::string("    Takes no arguments. Returns a PhaseSpaceVector initialised\n")+
+std::string("    0. Note that PhaseSpaceVector coordinates are considered\n")+
+std::string("    relative to 0, not relative to the\n")+
+std::string("    'simulation_reference_particle'.\n");
 
 
 static PyTypeObject PyPhaseSpaceVectorType = {
@@ -253,7 +258,7 @@ static PyTypeObject PyPhaseSpaceVectorType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    class_docstring,           /* tp_doc */
+    class_docstring.c_str(),           /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */
@@ -357,7 +362,6 @@ void _free(PyPhaseSpaceVector * self) {
 static PyMethodDef _keywdarg_methods[] = {
     {"create_from_coordinates", (PyCFunction)create_from_coordinates,
     METH_VARARGS|METH_KEYWORDS, create_from_coordinates_docstring.c_str()},
-
     {NULL,  NULL}   /* sentinel */
 };
 
