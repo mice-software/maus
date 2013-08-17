@@ -195,7 +195,7 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         """Check that we can reload RepeatModule2 directive"""
         self.test = os.path.expandvars(
         "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/mice_mod_repeat.dat")
-        for index in range(3):
+        for index in range(3): #pylint: disable=W0612
             self.mod = MiceModule(file_name=self.test)
             mod_list = self.mod.get_children()
             z_list = [mod.get_property("Position", "Hep3Vector")["z"] \
