@@ -24,13 +24,15 @@
 
 #include "json/json.h"
 
-#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/Interface/Squeal.hh"
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
+
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 namespace MAUS {
 
@@ -207,6 +209,11 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
   aHit.SetStationNumber(station);
   if (!_globalCoordinates) TransformToLocalCoordinates(&aHit);
   return aHit;
+}
+
+const BTField* VirtualPlane::GetField() const {
+      return reinterpret_cast<BTField*>
+                                 (MAUSGeant4Manager::GetInstance()->GetField());
 }
 
 //////////////////////// VirtualPlaneManager //////////////////////////

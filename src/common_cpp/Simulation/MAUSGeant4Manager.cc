@@ -141,7 +141,7 @@ Json::Value MAUSGeant4Manager::Tracking
     event_array.append(event);
     _eventAct->SetEvents(event_array);
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
-    Globals::GetMCFieldConstructor()->Print(Squeak::mout(Squeak::debug));
+    GetField()->Print(Squeak::mout(Squeak::debug));
     GetRunManager()->BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
     return _eventAct->GetEvents()[Json::Value::UInt(0)];
@@ -168,7 +168,8 @@ void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
     SetVirtualPlanes(new VirtualPlaneManager);
     _virtPlanes->ConstructVirtualPlanes(&module);
     _detector->SetMiceModules(module);
-    SetPhases();
+    if (Globals::GetMCFieldConstructor() != NULL)
+        SetPhases();
 }
 }  // namespace MAUS
 

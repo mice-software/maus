@@ -99,7 +99,7 @@ PyObject* Birth(PyObject *dummy, PyObject *args) {
   std::string cards(temp);
   try {
     GlobalsManager::InitialiseGlobals(cards);
-  } catch(Exception exc) {
+  } catch(std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
@@ -207,9 +207,9 @@ PyObject* SetMonteCarloMiceModules
     }
     try {
         GlobalsManager::SetMonteCarloMiceModules(mod);
-    } catch(Exception exc) {
+    } catch(std::exception& exc) {
         std::string message = std::string("Failed to set MiceModules\n")+
-                              std::string(exc.what());
+                              std::string((&exc)->what());
         PyErr_SetString(PyExc_ValueError, message.c_str());
         return NULL;
     }

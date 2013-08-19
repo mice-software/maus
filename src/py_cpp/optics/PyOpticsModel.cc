@@ -90,8 +90,8 @@ PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
         cm_out = new CovarianceMatrix(optics_model->Transport
                                                            (*cm_in, end_plane));
     }
-    catch(Exception exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
+    catch(std::exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
     PyObject* py_cm_out = PyCovarianceMatrix::create_empty_matrix();
@@ -143,8 +143,8 @@ PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
         psv_out = new PhaseSpaceVector(optics_model->Transport
                                                           (*psv_in, end_plane));
     }
-    catch(Exception& exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
+    catch(std::exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
     PyObject* py_psv_out = PyPhaseSpaceVector::create_empty_vector();
@@ -187,8 +187,8 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
         // uses MAUS::Globals::MAUSGeant4Manager for geometry, etc
         optics->model->Build();
         is_built = true;  // done by constructor
-    } catch(Exception exc) {
-        PyErr_SetString(PyExc_RuntimeError, exc.what());
+    } catch(std::exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return -1;
     }
     return 0;

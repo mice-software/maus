@@ -58,6 +58,10 @@ class MAUSGeant4Manager {
      *
      *  Get the instance of the MAUSGeant4Manager. This will construct the
      *  MAUSGeant4Manager if required.
+     *
+     *  Note: Construction requires only MC MiceModules and Configuration cards
+     *  to be defined on Globals (this is part of the general globals set up so
+     *  we like to know dependencies).
      */
     static MAUSGeant4Manager* GetInstance();
 
@@ -156,6 +160,9 @@ class MAUSGeant4Manager {
      *
      *  @param module root module of the new geometry set. Field definitions and
      *         Geant4 geometry definitions will be taken from this module.
+     *
+     *  Resets the phases if the field on Globals has been set (this is a
+     *  dependency for restting the phase).
      */
     void SetMiceModules(MiceModule& module);
 

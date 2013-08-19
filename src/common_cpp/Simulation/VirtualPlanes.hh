@@ -35,7 +35,6 @@
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/Globals.hh"
 
 class G4Step;
 class G4StepPoint;
@@ -225,10 +224,7 @@ class VirtualPlane {
   ::CLHEP::HepRotation _rotation;  // if var is u, then this will give rotation
   bool               _allowBackwards;
 
-  inline const BTField* GetField() const {
-      return reinterpret_cast<BTField*>
-             (Globals::GetInstance()->GetMCFieldConstructor());
-  }
+  const BTField* GetField() const;
 
   friend class VirtualPlaneManager;
 };

@@ -210,9 +210,9 @@ void DetectorConstruction::ResetGeometry() {
 
   // now change the rootBox dimensions (and LV name)
   G4Box* rootBox = reinterpret_cast<G4Box*>(_rootLogicalVolume->GetSolid());
-  rootBox->SetXHalfLength(_model->propertyHep3Vector("Dimensions").x()/2.);
-  rootBox->SetYHalfLength(_model->propertyHep3Vector("Dimensions").y()/2.);
-  rootBox->SetZHalfLength(_model->propertyHep3Vector("Dimensions").z()/2.);
+  rootBox->SetXHalfLength(_model->propertyHep3Vector("Dimensions").x());
+  rootBox->SetYHalfLength(_model->propertyHep3Vector("Dimensions").y());
+  rootBox->SetZHalfLength(_model->propertyHep3Vector("Dimensions").z());
   _rootLogicalVolume->UpdateMaterial(rootMat);
   _rootLogicalVolume->SetName(_model->name());
   // update the voxel header whatever this is (some G4 optimisation routine)

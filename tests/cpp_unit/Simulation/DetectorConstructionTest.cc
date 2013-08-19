@@ -62,20 +62,20 @@ TEST_F(DetectorConstructionTest, RootVolumeTest) {
     // Check that user limits were set - track has (size/step_size)+1 steps
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     double z_end = out["tracks"][Json::Value::UInt(0)]["final_position"]["z"].asDouble();
-    EXPECT_DOUBLE_EQ(z_end, 1500.);
-    EXPECT_EQ(out["tracks"][Json::Value::UInt(0)]["steps"].size(), size_t(3));
+    EXPECT_DOUBLE_EQ(z_end, 3000.);
+    EXPECT_EQ(out["tracks"][Json::Value::UInt(0)]["steps"].size(), size_t(4));
     p.pz = 0.;
     p.px = 1.;
     out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     double x_end = out["tracks"][Json::Value::UInt(0)]["final_position"]["x"].asDouble();
-    EXPECT_DOUBLE_EQ(x_end, 500.);
+    EXPECT_DOUBLE_EQ(x_end, 1000.);
     EXPECT_EQ(out["tracks"][Json::Value::UInt(0)]["steps"].size(), size_t(2));
     p.px = 0.;
     p.py = 1.;
     out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     double y_end = out["tracks"][Json::Value::UInt(0)]["final_position"]["y"].asDouble();
-    EXPECT_DOUBLE_EQ(y_end, 1000.);
-    EXPECT_EQ(out["tracks"][Json::Value::UInt(0)]["steps"].size(), size_t(2));
+    EXPECT_DOUBLE_EQ(y_end, 2000.);
+    EXPECT_EQ(out["tracks"][Json::Value::UInt(0)]["steps"].size(), size_t(3));
     // check that no energy deposited in vacuum
     Json::Value steps = out["tracks"][Json::Value::UInt(0)]["steps"];
     double edep = steps[Json::Value::UInt(0)]["energy_deposited"].asDouble();
