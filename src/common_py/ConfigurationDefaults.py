@@ -112,6 +112,7 @@ delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.
 miss_distance = -1.
+maximum_module_depth = 10 # maximum depth for MiceModules as used by the simulation
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False

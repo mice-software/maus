@@ -160,6 +160,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   void SetSteppingAlgorithm();
   // Throw an exception if Volume of all children != None
   void CheckForVolumeInChildren(MiceModule* mod, MiceModule* recurse = NULL);
+  // Throw an exception if module is more than _maxModDepth deep
+  void CheckModuleDepth(MiceModule* moduel);
 
   // Build a Q35 using Q35.hh methods
   G4LogicalVolume* BuildQ35(MiceModule * mod);
@@ -188,6 +190,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   G4Mag_UsualEqRhs* _equationM;
   G4EqMagElectricField* _equationE;
 
+  size_t _maxModDepth;
   std::string _stepperType;
   std::string _physicsProcesses;
   bool _checkVolumes;

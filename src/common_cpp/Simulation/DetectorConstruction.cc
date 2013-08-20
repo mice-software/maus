@@ -151,6 +151,9 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
     throw(Squeal(Squeal::recoverable,
                  "Failed to acquire datacards",
                  "DetectorConstruction::DetectorConstruction()"));
+  _maxModDepth = JsonWrapper::GetProperty
+        (cards, "maximum_module_depth", JsonWrapper::intValue).asUInt();
+
   _checkVolumes = JsonWrapper::GetProperty
         (cards, "check_volume_overlaps", JsonWrapper::booleanValue).asBool();
   _stepperType = JsonWrapper::GetProperty(cards,
@@ -245,6 +248,7 @@ void DetectorConstruction::ResetGeometry() {
 
 void DetectorConstruction::AddDaughter
                                     (MiceModule* mod, G4VPhysicalVolume* moth) {
+  CheckModuleDepth(mod);
   G4LogicalVolume* logic = NULL;
   G4PVPlacement* place = NULL;
   if (mod->propertyExistsThis("G4Detector", "string")) {
@@ -535,6 +539,8 @@ void DetectorConstruction::CheckForVolumeInChildren
                                   (MiceModule* mod, MiceModule* recurse) {
     if (recurse == NULL)
         recurse = mod;
+    else
+        CheckModuleDepth(recurse);
     if (recurse->volType() != "None") {
         throw(Exception(Exception::recoverable,
           "MiceModule "+mod->name()+" with Volume None has child module "+
@@ -542,7 +548,7 @@ void DetectorConstruction::CheckForVolumeInChildren
           " - but should be None",
           "DetectorConstruction::CheckForVolumeInChildren"));
     } else {
-        for (int i = 0; i < mod->daughters(); ++i) {
+        for (int i = 0; i < recurse->daughters(); ++i) {
             CheckForVolumeInChildren(mod, recurse->daughter(i));
         }
     }
@@ -579,6 +585,21 @@ void DetectorConstruction::GeometryCleanup() {
   }
   _ckovMirrors = std::vector<CkovMirror*>();
   */
+}
+
+void DetectorConstruction::CheckModuleDepth(MiceModule* module) {
+  MiceModule* mother = module->mother();
+  size_t recursionDepth = 1;
+  while (mother != NULL) {
+    mother = mother->mother();
+    ++recursionDepth;
+  }
+  if (recursionDepth > _maxModDepth) {
+      throw(Exception(Exception::recoverable,
+        "MiceModule "+module->fullName()+" is more than "+
+        STLUtils::ToString(_maxModDepth)+" levels deep",
+        "DetectorConstruction::CheckModuleDepth"));
+  }
 }
 }
 }
