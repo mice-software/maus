@@ -24,7 +24,7 @@ import copy
 import ctypes
 from xboa.Bunch import Bunch
 from array import array
-
+from physics_model_test.geometry import Geometry
 #import physics_model_test.runner
 #TODO: pylint:disable=W0511
 # * For the actual physics list tests, I should add a test on emittance change,
@@ -486,8 +486,7 @@ class Chi2Test(BaseTest):
         data_file  = open("MUSCAT_data.dat")
         test_data_list = eval(data_file.read())
        
-        hist   = test_bunch.histogram_var_bins(self.variable, +\
-                 self.bins, self.units)
+        hist   = test_bunch.histogram_var_bins(self.variable, self.bins, self.units)
                                                                    
         chi2_test_out = self.deepcopy()
         
@@ -513,7 +512,7 @@ class Chi2Test(BaseTest):
                       for x in Chi2Test.pdf_function(chi2_test_out.content)]
         
       
-        for i in enumerate(test_data_list):
+        for i, geo in enumerate(test_data_list):
             for test in test_data_list[i].tests:
                 chi = 0
                 data_pdf = [test.n_events*x \
@@ -521,15 +520,15 @@ class Chi2Test(BaseTest):
                 print "DATA PDF", data_pdf
                 weight_sim = 0
                 weight_data = 0
-                for i in enumerate(sim_pdf):
+                for i, s in enumerate(sim_pdf):
                     weight_sim += sim_pdf[i]
             
-                for i in enumerate(data_pdf):
+                for i, d in enumerate(data_pdf):
                     weight_data += data_pdf[i]
           
                 
                
-                for i in enumerate(data_pdf):
+                for i, d in enumerate(data_pdf):
                
                       
                     chi += (1/(weight_sim*weight_data))*\
