@@ -61,6 +61,7 @@ int parse_flags(int argc, char **argv) {
 Json::Value SetupConfig(int verbose_level) {
   std::cerr << "Running with verbose level " << verbose_level << std::endl;
   Json::Value config(Json::objectValue);
+  config["maximum_module_depth"] = 50;
   config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";

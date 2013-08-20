@@ -323,11 +323,14 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
                         << mod->globalPosition() << " mm, rotationVector: "
                         << mod->globalRotation().getAxis()
                         << " angle: "  << mod->globalRotation().delta()/degree
-                        << " degrees, volume: "
+                        << " degrees, volume (incl daughters): "
                         << solid->GetCubicVolume()/meter/meter/meter << " m^3, ";
     if (mod->propertyExistsThis("Material", "string"))
         Squeak::mout(my_err) << " material: "
-                            << mod->propertyStringThis("Material") << std::endl;
+                            << mod->propertyStringThis("Material")
+                            << " mass (excl daughters): "
+                            << (*logic)->GetMass(false, false)/kilogram
+                            << " kg" << std::endl;
     else
         Squeak::mout(my_err)  << std::endl;
 }

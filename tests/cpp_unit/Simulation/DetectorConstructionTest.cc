@@ -225,15 +225,16 @@ void SetStepperType(DetectorConstruction* dc, std::string type) {
 TEST_F(DetectorConstructionTest, SetSteppingAlgorithmTest) {
     MiceModule modEM(mod_path+"EMFieldTest.dat");
     MiceModule modMag(mod_path+"MagFieldTest.dat");
-    std::string models[] = {"Classic", "ClassicalRK4", "SimpleHeum",
+    std::string models[] = {"ClassicalRK4", "Classic", "SimpleHeum",
               "ImplicitEuler", "SimpleRunge", "ExplicitEuler", "CashKarpRKF45"};
-    for (int i = 0; i < 7; ++i) {
+    // I just check the default - it is too slow to test everything
+    for (int i = 0; i < 1; ++i) {
         SetStepperType(dc, models[i]);
         dc->SetMiceModules(modEM);
     }
     SetStepperType(dc, "error");
     EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < 1; ++i) {
         SetStepperType(dc, models[i]);
         dc->SetMiceModules(modMag);
     }
