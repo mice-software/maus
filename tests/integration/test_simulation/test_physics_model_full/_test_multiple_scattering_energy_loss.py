@@ -35,7 +35,7 @@ class MaterialsAndSteppingTest(unittest.TestCase): # pylint: disable=R0904
         """
         Test all examples in ref_data directory with names like maus.*.dat
         """
-        reference_data = glob.glob(geometry.ref_data("*.dat"))
+        reference_data = glob.glob(geometry.ref_data("MUSCAT_data.dat"))
         test_data = []
         (passes, fails, warns) = (0, 0, 0)
         for test_in in reference_data:
