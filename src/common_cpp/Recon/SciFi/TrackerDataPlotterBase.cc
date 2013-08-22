@@ -21,7 +21,9 @@
 
 namespace MAUS {
 
-TrackerDataPlotterBase::TrackerDataPlotterBase() : _Canvas(NULL) {
+TrackerDataPlotterBase::TrackerDataPlotterBase() : _SaveOutput(false),
+                                                   _OutputName("TrackerPlotter.pdf"),
+                                                   _Canvas(NULL) {
   // Do nothing
 }
 

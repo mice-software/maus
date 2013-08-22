@@ -69,6 +69,8 @@ int main(int argc, char *argv[]) {
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
+  xyzPlotter->SetSaveOutput(false);
+  xyzPlotter->SetOutputName("xyzPlotterOutput.pdf");
   MAUS::TrackerDataPlotterBase *szPlotter = new MAUS::TrackerDataPlotterSZ();
   MAUS::TrackerDataPlotterBase *infoBoxPlotter
                                   = new MAUS::TrackerDataPlotterInfoBox(275, 600, 0.585, 0.93);
@@ -78,7 +80,8 @@ int main(int argc, char *argv[]) {
   plotters.push_back(infoBoxPlotter);
 
   // Loop over all events
-  while (infile >> readEvent != NULL) {
+  while ( infile >> readEvent != NULL ) {
+    std::cout << "Loading data\n";
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
@@ -88,13 +91,18 @@ int main(int argc, char *argv[]) {
         std::cout << "Press Enter to Continue";
         std::cin.ignore();
       }
+      std::cout << "Finishing spill " << spill->GetSpillNumber() << std::endl;
+      tdm.clear_spill();
+    } else {
+      std::cout << "Not a usable spill\n";
     }
-    tdm.clear_spill();
   }
 
   // Tidy up
+  std::cout << "Finishing up\n";
   delete xyzPlotter;
   delete infoBoxPlotter;
+  delete szPlotter;
   infile.close();
   theApp.Run();
 }

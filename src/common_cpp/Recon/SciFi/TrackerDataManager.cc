@@ -18,6 +18,7 @@
 // C++ headers
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 // ROOT Headers
 #include "TROOT.h"
@@ -194,11 +195,15 @@ void TrackerDataManager::clear_spill() {
 
 void TrackerDataManager::draw(std::vector<TrackerDataPlotterBase*> plotters) {
   // Loop over all the plotters and draw
-  // TCanvas* lCanvas = NULL;
+  TCanvas* lCanvas = NULL;
   for ( size_t i = 0; i < plotters.size(); ++i ) {
     TrackerDataPlotterBase * plt = plotters[i];
     if (plt) {
-      (*plt)(_t1, _t2);
+      lCanvas = (*plt)(_t1, _t2);
+      if (plt->GetSaveOutput()) {
+        std::string fName = plt->GetOutputName();
+        lCanvas->SaveAs(fName.c_str());
+      }
     } else {
       std::cerr << "Error: Empty plotter pointer passed\n";
     }
