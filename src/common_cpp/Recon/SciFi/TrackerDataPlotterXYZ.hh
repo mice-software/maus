@@ -50,7 +50,8 @@ class TrackerDataPlotterXYZ : public TrackerDataPlotterBase {
     /** Overloaded brackets operator, takes in the data, does all the work */
     TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL);
 
-  private:
+  protected:
+    bool _boolSave;
     TrackerDataPlotterSpoints *_spointsPlotter;
     TrackerDataPlotterTracks *_trksPlotter;
 };

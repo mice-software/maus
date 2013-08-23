@@ -27,9 +27,10 @@
 namespace MAUS {
 
 TrackerDataPlotterXYZ::TrackerDataPlotterXYZ()
-  : TrackerDataPlotterBase() {
-  _spointsPlotter = new TrackerDataPlotterSpoints();
-  _trksPlotter = new TrackerDataPlotterTracks();
+  : _boolSave(false),
+    TrackerDataPlotterBase() {
+    _spointsPlotter = new TrackerDataPlotterSpoints();
+    _trksPlotter = new TrackerDataPlotterTracks();
 }
 
 TrackerDataPlotterXYZ::~TrackerDataPlotterXYZ() {

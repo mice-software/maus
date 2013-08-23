@@ -26,12 +26,12 @@ namespace MAUS {
 
 TrackerDataPlotterSpoints::TrackerDataPlotterSpoints()
   : TrackerDataPlotterBase(),
-  _gr_xy1(NULL),
-  _gr_zx1(NULL),
-  _gr_zy1(NULL),
-  _gr_xy2(NULL),
-  _gr_zx2(NULL),
-  _gr_zy2(NULL) {
+    _gr_xy1(NULL),
+    _gr_zx1(NULL),
+    _gr_zy1(NULL),
+    _gr_xy2(NULL),
+    _gr_zx2(NULL),
+    _gr_zy2(NULL) {
   // Do nothing
 }
 

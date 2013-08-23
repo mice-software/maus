@@ -55,9 +55,21 @@ int main(int argc, char *argv[]) {
   // Check if the user wants to pause between evts, indicated by making second argument to code "1"
   std::string str_pause;
   bool bool_pause = false;
-  if (argc > 2) {
+  bool bool_save = false;
+  std::string save_type = "";
+  if (argc == 3) {
     std::string s1 = std::string(argv[2]);
     if (s1 == "1") bool_pause = true;
+  } else if (argc == 4) {
+    std::string s1 = std::string(argv[2]);
+    if (s1 == "1") bool_pause = true;
+    save_type = std::string(argv[3]);
+    if (save_type == "eps" || "pdf" || "png") {
+      std::cout << "Saving plots as " << save_type << " files.";
+      bool_save = true;
+    } else {
+      std::cerr << "Invalid graphics output type given";
+    }
   }
 
   // Some set up
@@ -106,3 +118,4 @@ int main(int argc, char *argv[]) {
   infile.close();
   theApp.Run();
 }
+
