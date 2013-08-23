@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <cmath>
 
 // ROOT headers
@@ -52,37 +53,35 @@ int main(int argc, char *argv[]) {
   // First argument to code should be the input ROOT file name
   std::string filename = std::string(argv[1]);
 
-  // Check if the user wants to pause between evts, indicated by making second argument to code "1"
-  std::string str_pause;
+  // Parse any extra arguments supplied
+  //   -p -> pause between events
+  //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
   bool bool_save = false;
   std::string save_type = "";
-  if (argc == 3) {
-    std::string s1 = std::string(argv[2]);
-    if (s1 == "1") bool_pause = true;
-  } else if (argc == 4) {
-    std::string s1 = std::string(argv[2]);
-    if (s1 == "1") bool_pause = true;
-    save_type = std::string(argv[3]);
-    if (save_type == "eps" || "pdf" || "png") {
-      std::cout << "Saving plots as " << save_type << " files.";
-      bool_save = true;
-    } else {
-      std::cerr << "Invalid graphics output type given";
+
+  for (int i = 2; i < argc; i++) {
+    if ( std::strcmp(argv[i], "-p") == 0 ) {
+      std::cout << "Will wait for user input between spills\n";
+      bool_pause = true;
+    } else if ( std::strcmp(argv[i], "-g") == 0 ) {
+      if ( (i+1) < argc ) save_type = argv[i + 1];
+      if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
+        std::cout << "Saving plots as " << save_type << " files.\n";
+        bool_save = true;
+      } else {
+        std::cerr << "Invalid graphics output type given\n";
+      }
     }
   }
-
-  // Some set up
-  TApplication theApp("App", &argc, argv);
-  std::cout << "Opening file " << filename << std::endl;
-  MAUS::Data data;
-  irstream infile(filename.c_str(), "Spill");
 
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
-  xyzPlotter->SetSaveOutput(false);
-  xyzPlotter->SetOutputName("xyzPlotterOutput.pdf");
+  if (bool_save) {
+    xyzPlotter->SetSaveOutput(true);
+    xyzPlotter->SetOutputName("xyzPlotterOutput." + save_type);
+  }
   MAUS::TrackerDataPlotterBase *szPlotter = new MAUS::TrackerDataPlotterSZ();
   MAUS::TrackerDataPlotterBase *infoBoxPlotter
                                   = new MAUS::TrackerDataPlotterInfoBox(275, 600, 0.585, 0.93);
@@ -91,9 +90,14 @@ int main(int argc, char *argv[]) {
   plotters.push_back(szPlotter);
   plotters.push_back(infoBoxPlotter);
 
-  // Loop over all events
+  // Set up ROOT app, input file, and MAUS data class
+  TApplication theApp("App", &argc, argv);
+  std::cout << "Opening file " << filename << std::endl;
+  irstream infile(filename.c_str(), "Spill");
+  MAUS::Data data;
+
+  // Loop over all spills
   while ( infile >> readEvent != NULL ) {
-    std::cout << "Loading data\n";
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
@@ -103,7 +107,6 @@ int main(int argc, char *argv[]) {
         std::cout << "Press Enter to Continue";
         std::cin.ignore();
       }
-      std::cout << "Finishing spill " << spill->GetSpillNumber() << std::endl;
       tdm.clear_spill();
     } else {
       std::cout << "Not a usable spill\n";
@@ -111,7 +114,6 @@ int main(int argc, char *argv[]) {
   }
 
   // Tidy up
-  std::cout << "Finishing up\n";
   delete xyzPlotter;
   delete infoBoxPlotter;
   delete szPlotter;

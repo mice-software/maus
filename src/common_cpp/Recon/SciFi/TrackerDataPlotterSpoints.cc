@@ -51,13 +51,13 @@ TCanvas* TrackerDataPlotterSpoints::operator() ( TrackerData &t1, TrackerData &t
   if ( aCanvas ) {
     // TODO check number of pads = 6
     lCanvas = aCanvas;
-    std::cerr << "Using input canvas at " << aCanvas << std::endl;
+    // std::cerr << "Using input canvas at " << aCanvas << std::endl;
   } else { // If the local canvas is setup, delete it, and make it fresh
     if ( _Canvas ) delete _Canvas;
     _Canvas = new TCanvas("sp_xy", "Spacepoint x-y Projections", 200, 10, 700, 500);
     _Canvas->Divide(3, 2);
     lCanvas = _Canvas;
-    std::cerr << "Creating new local canvas at " << _Canvas << std::endl;
+    // std::cerr << "Creating new local canvas at " << _Canvas << std::endl;
   }
 
   // Draw the spacepoints
@@ -119,7 +119,7 @@ TCanvas* TrackerDataPlotterSpoints::operator() ( TrackerData &t1, TrackerData &t
   lCanvas->cd(6);
   if ( _gr_zy2  ) delete _gr_zy2;
   TGraph * gr_zy2 = new TGraph(t2._spoints_z.size(), &(t2._spoints_z[0]), &(t2._spoints_y[0]));
-  gr_zy2->SetTitle("Tracker 2 Z-X Projection");
+  gr_zy2->SetTitle("Tracker 2 Z-Y Projection");
   gr_zy2->GetXaxis()->SetTitle("z(mm)");
   gr_zy2->GetYaxis()->SetTitle("y(mm)");
   gr_zy2->SetMarkerStyle(20);
