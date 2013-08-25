@@ -213,7 +213,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   MAUS::KalmanSeed seed;
   seed.SetField(-0.004);
   //
-  // Now set up a Straight Pattern Recognition Track
+  // Now set up a Helical Pattern Recognition Track
   //
   MAUS::SciFiHelicalPRTrack helical_track;
   double r     = 10.; // mm
@@ -227,6 +227,9 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double pt = charge*0.3*field*r;
   double pz = pt*tan_lambda;
   double kappa = charge*fabs(1./pz);
+  DoubleArray phi;
+  phi.push_back(phi_0);
+  helical_track.set_phi(phi);
   helical_track.set_tracker(0);
   helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);

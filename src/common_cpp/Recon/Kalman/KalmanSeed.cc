@@ -141,12 +141,10 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   x = spacepoints.front()->get_position().x();
   y = spacepoints.front()->get_position().y();
   z = spacepoints.front()->get_position().z();
-
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
-
   // Charge guess should come from PR.
   // int _particle_charge = seed->get_charge();
 
@@ -158,8 +156,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double pz = pt*tan_lambda;
 
   double kappa = _particle_charge*fabs(1./pz);
-
   double phi_0 = seed->get_phi0();
+
   if ( _tracker == 0 ) {
     phi_0 = seed->get_phi().back();
   }
