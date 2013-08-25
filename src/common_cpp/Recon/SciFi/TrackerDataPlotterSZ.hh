@@ -15,15 +15,14 @@
  *
  */
 
-/** @class TrackerDataPlotterXYZ
+/** @class TrackerDataPlotterSZ
  *
- *  Calls the spacepoints and tracks plotting classes, drawing both on the same canvas,
- *  to give an full set of XYZ views
+ *  Plots the tracker seed spacepoints in s-z for both trackers, including the fits, using ROOT
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERXYZ_
-#define _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERXYZ_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSZ_
+#define _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSZ_
 
 // ROOT headers
 #include "TCanvas.h"
@@ -32,28 +31,28 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/TrackerData.hh"
 #include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterTracks.hh"
 
 
 namespace MAUS {
 
-class TrackerDataPlotterXYZ : public TrackerDataPlotterBase {
+class TrackerDataPlotterSZ : public TrackerDataPlotterBase {
   public:
+    // Macros to allow friendship with the gtests
+    FRIEND_TEST(TrackerDataPlotterSZTest, TestConstructor);
+    FRIEND_TEST(TrackerDataPlotterSZTest, TestBrackets);
 
     /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
-    TrackerDataPlotterXYZ();
+    TrackerDataPlotterSZ();
 
     /** Destructor. Delete graph objects (member canvas is deleted by base class). */
-    virtual ~TrackerDataPlotterXYZ();
+    virtual ~TrackerDataPlotterSZ();
 
     /** Overloaded brackets operator, takes in the data, does all the work */
     TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL);
 
   protected:
-    bool _boolSave;
-    TrackerDataPlotterSpoints *_spointsPlotter;
-    TrackerDataPlotterTracks *_trksPlotter;
+    TGraph *_gr_sz1;
+    TGraph *_gr_sz2;
 };
 
 } // ~namespace MAUS

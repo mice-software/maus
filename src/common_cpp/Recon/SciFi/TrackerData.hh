@@ -48,6 +48,7 @@ class TrackerData {
     friend class ReduceCppPatternRecognition;
     friend class TrackerDataPlotterBase;
     friend class TrackerDataPlotterXYZ;
+    friend class TrackerDataPlotterSZ;
     friend class TrackerDataPlotterTracks;
     friend class TrackerDataPlotterSpoints;
     friend class TrackerDataPlotterInfoBox;

@@ -18,6 +18,7 @@
 // C++ headers
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 // ROOT Headers
 #include "TROOT.h"
@@ -139,6 +140,12 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
       s_i.push_back(trk->get_phi()[i]*trk->get_R());
     }
 
+    // Pull out the z coord for each track seed
+    std::vector<double> z_i;
+    for ( size_t i = 0; i < trk->get_spacepoints().size(); ++i ) {
+      z_i.push_back(trk->get_spacepoints()[i]->get_position().z());
+    }
+
     double x0 = trk->get_circle_x0();
     double y0 = trk->get_circle_y0();
     double rad = trk->get_R();
@@ -150,21 +157,25 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
       if ( trk->get_num_points() == 5 ) ++_t1._num_htracks_5pt;
       if ( trk->get_num_points() == 4 ) ++_t1._num_htracks_4pt;
       if ( trk->get_num_points() == 3 ) ++_t1._num_htracks_3pt;
+      _t1._seeds_z.push_back(z_i);
       _t1._seeds_phi.push_back(phi_i);
       _t1._seeds_s.push_back(s_i);
       _t1._trks_xy.push_back(make_circle(x0, y0, rad));
-      dsdz = - dsdz;  // Needed due to the way we plot...
+      // dsdz = - dsdz;  // Needed due to the way we plot...
       _t1._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
       _t1._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
+      _t1._trks_sz.push_back(make_str_track(sz_c, dsdz, _zmin, _zmax));
     } else if ( trk->get_tracker() == 1 ) {
       if ( trk->get_num_points() == 5 ) ++_t2._num_htracks_5pt;
       if ( trk->get_num_points() == 4 ) ++_t2._num_htracks_4pt;
       if ( trk->get_num_points() == 3 ) ++_t2._num_htracks_3pt;
+      _t2._seeds_z.push_back(z_i);
       _t2._seeds_phi.push_back(phi_i);
       _t2._seeds_s.push_back(s_i);
       _t2._trks_xy.push_back(make_circle(x0, y0, rad));
       _t2._trks_xz.push_back(make_xz(handness, x0, rad, dsdz, sz_c, _zmin, _zmax));
       _t2._trks_yz.push_back(make_yz(y0, rad, dsdz, sz_c, _zmin, _zmax));
+      _t2._trks_sz.push_back(make_str_track(sz_c, dsdz, _zmin, _zmax));
     }
 
     // Loop over track seed spacepoints
@@ -184,11 +195,15 @@ void TrackerDataManager::clear_spill() {
 
 void TrackerDataManager::draw(std::vector<TrackerDataPlotterBase*> plotters) {
   // Loop over all the plotters and draw
-  // TCanvas* lCanvas = NULL;
+  TCanvas* lCanvas = NULL;
   for ( size_t i = 0; i < plotters.size(); ++i ) {
     TrackerDataPlotterBase * plt = plotters[i];
     if (plt) {
-      (*plt)(_t1, _t2);
+      lCanvas = (*plt)(_t1, _t2);
+      if (plt->GetSaveOutput()) {
+        std::string fName = plt->GetOutputName();
+        lCanvas->SaveAs(fName.c_str());
+      }
     } else {
       std::cerr << "Error: Empty plotter pointer passed\n";
     }

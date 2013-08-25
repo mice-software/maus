@@ -21,7 +21,7 @@ the spill and various distributions for difference particle types
 #pylint: disable = C0103, R0801
 
 
-simulation_geometry_filename = "Stage6.dat" 
+simulation_geometry_filename = "test_tof_geom.dat" 
 spill_generator_number_of_spills = 15
 verbose_level = 0
 beam = {

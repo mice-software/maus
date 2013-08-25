@@ -20,7 +20,10 @@
 
 namespace MAUS {
 
-TrackerDataPlotterTracks::TrackerDataPlotterTracks() : TrackerDataPlotterBase() {}
+TrackerDataPlotterTracks::TrackerDataPlotterTracks()
+                         : TrackerDataPlotterBase() {
+  // Do nothing
+}
 
 TrackerDataPlotterTracks::~TrackerDataPlotterTracks() {}
 

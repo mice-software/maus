@@ -24,12 +24,14 @@
 #ifndef _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERBASE_
 #define _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERBASE_
 
+// C++ headers
+#include <string>
+
 // ROOT headers
 #include "TCanvas.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-
 
 namespace MAUS {
 
@@ -45,10 +47,18 @@ class TrackerDataPlotterBase {
     /** Virtual void overloaded brackets operator, used to set the data & optionally the canvas */
     virtual TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL ) = 0;
 
+    void SetSaveOutput(bool SaveOutput) { _SaveOutput = SaveOutput; }
+    bool GetSaveOutput() { return _SaveOutput; }
+
+    void SetOutputName(std::string OutputName) { _OutputName = OutputName; }
+    std::string GetOutputName() { return _OutputName; }
+
     /** Return the member Canvas */
     TCanvas* get_canvas() { return _Canvas; }
 
   protected:
+    bool _SaveOutput;
+    std::string _OutputName;
     TCanvas* _Canvas;
 };
 

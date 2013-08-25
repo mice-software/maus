@@ -259,13 +259,13 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   TF1 xz1 = tdm._t1._trks_xz[0];
   EXPECT_EQ(x0, xz1.GetParameter(0));
   EXPECT_EQ(rad, xz1.GetParameter(1));
-  EXPECT_EQ(-dsdz, xz1.GetParameter(2)); // Note the minus sign
+  EXPECT_EQ(dsdz, xz1.GetParameter(2));
   EXPECT_EQ(sz_c, xz1.GetParameter(3));
   EXPECT_EQ(handness, xz1.GetParameter(4));
   TF1 xz2 = tdm._t1._trks_xz[0];
   EXPECT_EQ(x0, xz2.GetParameter(0));
   EXPECT_EQ(rad, xz2.GetParameter(1));
-  EXPECT_EQ(-dsdz, xz2.GetParameter(2)); // Note the minus sign
+  EXPECT_EQ(dsdz, xz2.GetParameter(2));
   EXPECT_EQ(sz_c, xz2.GetParameter(3));
   EXPECT_EQ(handness, xz2.GetParameter(4));
 
@@ -273,12 +273,12 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   TF1 yz1 = tdm._t1._trks_yz[0];
   EXPECT_EQ(y0, yz1.GetParameter(0));
   EXPECT_EQ(rad, yz1.GetParameter(1));
-  EXPECT_EQ(-dsdz, yz1.GetParameter(2)); // Note the minus sign
+  EXPECT_EQ(dsdz, yz1.GetParameter(2));
   EXPECT_EQ(sz_c, yz1.GetParameter(3));
   TF1 yz2 = tdm._t1._trks_yz[0];
   EXPECT_EQ(y0, yz2.GetParameter(0));
   EXPECT_EQ(rad, yz2.GetParameter(1));
-  EXPECT_EQ(-dsdz, yz2.GetParameter(2)); // Note the minus sign
+  EXPECT_EQ(dsdz, yz2.GetParameter(2));
   EXPECT_EQ(sz_c, yz2.GetParameter(3));
 
   // Tidy up
