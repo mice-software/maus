@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTrackerRecon 
+/** @class MapCppTrackerRecon
  *  Digitize events by running Tracker electronics simulation.
  *
  */
@@ -29,32 +29,44 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-#include <cmath>
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 // Other headers
+#include "Interface/Squeal.hh"
 #include "Interface/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 
-#include "src/common_cpp/DataStructure/SciFiDigit.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
 
+struct SciFiPlaneGeometry;
+
 class MapCppTrackerRecon {
+
  public:
+  /** Constructor - initialises pointers to NULL */
+  MapCppTrackerRecon();
+
+  /** Constructor - deletes any allocated memory */
+  ~MapCppTrackerRecon();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -99,6 +111,15 @@ class MapCppTrackerRecon {
   void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                            MAUS::SciFiEvent &evt);
 
+  /** Performs the final track fit
+   *
+   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
+   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
+   *
+   *  \param evt the current SciFiEvent
+   */
+  void track_fit(MAUS::SciFiEvent &evt);
+
   /** Takes json data and returns a Sc
    *
    *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
@@ -106,7 +127,7 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  bool read_in_json(std::string json_data, MAUS::Spill &spill);
+  void read_in_json(std::string json_data);
 
   void save_to_json(MAUS::Spill &spill);
 
@@ -118,18 +139,21 @@ class MapCppTrackerRecon {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.
-  double minPE;
+  double  _min_npe;
   /// Value above which reconstruction is aborted.
-  int ClustException;
+  int _size_exception;
   /// Pattern recognition flags
   bool _helical_pr_on;
   bool _straight_pr_on;
-  ///  Vector with the MICE SciFi Modules.
-  std::vector<const MiceModule*> modules;
+  bool _kalman_on;
+
+  ///  Map of the planes geometry.
+  SciFiGeometryHelper _geometry_helper;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
