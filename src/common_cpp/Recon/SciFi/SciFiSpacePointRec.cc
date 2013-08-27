@@ -35,8 +35,7 @@ void SciFiSpacePointRec::process(SciFiEvent &event) {
 
 void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
                                                 std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
-  int clusters_size = evt.clusters().size();
-  for ( int cl = 0; cl < clusters_size; cl++ ) {
+  for ( size_t cl = 0; cl < evt.clusters().size(); ++cl ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
     int tracker = a_cluster->get_tracker();
     int station = a_cluster->get_station();
@@ -50,22 +49,22 @@ void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,
   // For each tracker,
   for ( int Tracker = 0; Tracker < 2; Tracker++ ) {
     // For each station,
-    for ( int Station = 0; Station < 6; Station++ ) {
+    for ( int Station = 1; Station < 6; Station++ ) {
       // Make all possible combinations of doublet
       // clusters from each of the 3 views...
       // looping over all clusters in plane 0 (view v)
-      int numb_clusters_in_v = clusters[Tracker][Station][0].size();
-      int numb_clusters_in_w = clusters[Tracker][Station][1].size();
-      int numb_clusters_in_u = clusters[Tracker][Station][2].size();
-      for ( int cla = 0; cla < numb_clusters_in_v; cla++ ) {
+      size_t numb_clusters_in_v = clusters[Tracker][Station][0].size();
+      size_t numb_clusters_in_w = clusters[Tracker][Station][1].size();
+      size_t numb_clusters_in_u = clusters[Tracker][Station][2].size();
+      for ( size_t cla = 0; cla < numb_clusters_in_v; ++cla ) {
         SciFiCluster* candidate_A = (clusters[Tracker][Station][0])[cla];
 
         // Looping over all clusters in plane 1 (view w)
-        for ( int clb = 0; clb < numb_clusters_in_w; clb++ ) {
+        for ( size_t clb = 0; clb < numb_clusters_in_w; ++clb ) {
           SciFiCluster* candidate_B = (clusters[Tracker][Station][1])[clb];
 
           // Looping over all clusters in plane 2 (view u)
-          for ( int clc = 0; clc < numb_clusters_in_u; clc++ ) {
+          for ( size_t clc = 0; clc < numb_clusters_in_u; ++clc ) {
             SciFiCluster* candidate_C = (clusters[Tracker][Station][2])[clc];
 
             if ( kuno_accepts(candidate_A, candidate_B, candidate_C) &&
@@ -90,13 +89,13 @@ void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt,
         for ( int Station = 0; Station < 6; Station++ ) {  // for each station
           // Make all possible combinations of doublet clusters from views 0 & 1
           // looping over all clusters in view 0, then 1
-          for ( unsigned int cla = 0;
+          for ( size_t cla = 0;
                 cla < clusters[Tracker][Station][a_plane].size(); cla++ ) {
           SciFiCluster* candidate_A =
                           (clusters[Tracker][Station][a_plane])[cla];
 
             // Looping over all clusters in view 1,2, then 2
-            for ( unsigned int clb = 0;
+            for ( size_t clb = 0;
                   clb < clusters[Tracker][Station][another_plane].size();
                   clb++ ) {
               SciFiCluster* candidate_B =
@@ -179,15 +178,15 @@ bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
 // like position and respective standard deviation
 void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   std::vector<SciFiCluster*> channels = triplet->get_channels();
-  SciFiCluster *xcluster = channels[0];
+  SciFiCluster *vcluster = channels[0];
   SciFiCluster *wcluster = channels[1];
-  SciFiCluster *vcluster = channels[2];
+  SciFiCluster *ucluster = channels[2];
 
   // This is the position of the space-point
-  ThreeVector p1 = crossing_pos(vcluster, xcluster);
+  ThreeVector p1 = crossing_pos(vcluster, ucluster);
   ThreeVector p2 = crossing_pos(vcluster, wcluster);
-  ThreeVector p3 = crossing_pos(xcluster, wcluster);
-  ThreeVector position = (p1+p2+p3)/3.0;
+  ThreeVector p3 = crossing_pos(ucluster, wcluster);
+  ThreeVector position = (p1+p2+p3)/3.;
   triplet->set_position(position);
 
   // Vector p stores the crossing position of views v and w.
@@ -195,15 +194,15 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
 
   // Now, determine the perpendicular distance from the hit on the X view
   // to the intersection of the V and W views
-  ThreeVector x_dir(xcluster->get_direction());
-  ThreeVector x_pos(xcluster->get_position());
+  ThreeVector x_dir(ucluster->get_direction());
+  ThreeVector x_pos(ucluster->get_position());
 
   // Assume that the station is perpendicular to the Z axis
   // get_chi_squared(x_pos,p);
   double x1 = x_pos.x();
   double y1 = x_pos.y();
-  double x2 = x_pos.x() + 10.0*x_dir.x();
-  double y2 = x_pos.y() + 10.0*x_dir.y();
+  double x2 = x_pos.x() + 10.*x_dir.x();
+  double y2 = x_pos.y() + 10.*x_dir.y();
   double x0 = p.x();
   double y0 = p.y();
 
@@ -213,30 +212,22 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   double chi2 = (dist*dist)/0.064;
   triplet->set_chi2(chi2);
 
-/*
-    std::ofstream out2("spacepoints.txt", std::ios::out | std::ios::app);
-    out2 << xcluster->get_true_position().x() << " "
-         <<   xcluster->get_true_position().y() << " "
-         << xcluster->get_true_position().z() << " "
-         << position.x() << " " << position.y() << " "
-         << position.z() << " " << xcluster->get_tracker() << " "
-         << xcluster->get_station() << "\n";
-    out2.close();
-*/
-
   // Determine time
   double time_A = vcluster->get_time();
-  double time_B = xcluster->get_time();
+  double time_B = ucluster->get_time();
   double time_C = wcluster->get_time();
-  // std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << " " << time_C << "\n";
-  double time = (time_A + time_B + time_C) / 3.0;
-  double time_error = 0.0;
+
+  double time = (time_A + time_B + time_C) / 3.;
+  double time_error = 0.;
   time_error += (time_A-time)*time_A;
   time_error += (time_B-time)*time_B;
   time_error += (time_C-time)*time_C;
-  time_error = sqrt(time_error);
-  // double time_res = time_A - time;
+  time_error = TMath::Sqrt(time_error);
+  if (time_error != time_error) time_error = 0;
+  double time_res = time_A - time;
   triplet->set_time(time);
+  triplet->set_time_error(time_error);
+  triplet->set_time_res(time_res);
 }
 
 void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
@@ -253,66 +244,69 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
   // Determine time
   double time_A = clusterA->get_time();
   double time_B = clusterB->get_time();
-  double time = (time_A + time_B) / 2.0;
-  std::cerr << "SPACEPOINT TIMING: " << time_A << " " << time_B << "\n";
-  double time_error = 0.0;
+  double time = (time_A + time_B) / 2.;
+
+  double time_error = 0.;
   time_error += (time_A-time)*time_A;
   time_error += (time_B-time)*time_B;
-  time_error = sqrt(time_error);
-  // double time_res = time_A - time;
+  time_error = TMath::Sqrt(time_error);
+  if (time_error != time_error) time_error = 0;
+  double time_res = time_A - time;
   duplet->set_time(time);
+  duplet->set_time_error(time_error);
+  duplet->set_time_res(time_res);
 }
 
 // This function calculates the intersection position of two clusters.
 // The position of a space-point will be the mean
 // of all 3 possible intersections.
 ThreeVector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
-                                         SciFiCluster* c2) {
-    ThreeVector d1 = c1->get_direction();
+                                             SciFiCluster* c2) {
+  ThreeVector d1 = c1->get_direction();
 
-    ThreeVector d2 = c2->get_direction();
+  ThreeVector d2 = c2->get_direction();
 
-    ThreeVector c1_pos(c1->get_position());
+  ThreeVector c1_pos(c1->get_position());
 
-    ThreeVector c2_pos(c2->get_position());
+  ThreeVector c2_pos(c2->get_position());
 
-    CLHEP::HepMatrix m1(3, 3, 0);
+  CLHEP::HepMatrix m1(3, 3, 0);
 
-    m1[0][0] = (c2_pos-c1_pos).x();
-    m1[0][1] = (c2_pos-c1_pos).y();
-    m1[0][2] = (c2_pos-c1_pos).z();
+  m1[0][0] = (c2_pos-c1_pos).x();
+  m1[0][1] = (c2_pos-c1_pos).y();
+  m1[0][2] = (c2_pos-c1_pos).z();
 
-    m1[1][0] = d2.x();
-    m1[1][1] = d2.y();
-    m1[1][2] = d2.z();
+  m1[1][0] = d2.x();
+  m1[1][1] = d2.y();
+  m1[1][2] = d2.z();
 
-    m1[2][0] = (d1.cross(d2)).x();
-    m1[2][1] = (d1.cross(d2)).y();
-    m1[2][2] = (d1.cross(d2)).z();
+  m1[2][0] = (d1.cross(d2)).x();
+  m1[2][1] = (d1.cross(d2)).y();
+  m1[2][2] = (d1.cross(d2)).z();
 
-    CLHEP::HepMatrix m2(3, 3, 0);
+  CLHEP::HepMatrix m2(3, 3, 0);
 
-    m2[0][0] = (c2_pos-c1_pos).x();
-    m2[0][1] = (c2_pos-c1_pos).y();
-    m2[0][2] = (c2_pos-c1_pos).z();
+  m2[0][0] = (c2_pos-c1_pos).x();
+  m2[0][1] = (c2_pos-c1_pos).y();
+  m2[0][2] = (c2_pos-c1_pos).z();
 
-    m2[1][0] = d1.x();
-    m2[1][1] = d1.y();
-    m2[1][2] = d1.z();
+  m2[1][0] = d1.x();
+  m2[1][1] = d1.y();
+  m2[1][2] = d1.z();
 
-    m2[2][0] = (d1.cross(d2)).x();
-    m2[2][1] = (d1.cross(d2)).y();
-    m2[2][2] = (d1.cross(d2)).z();
+  m2[2][0] = (d1.cross(d2)).x();
+  m2[2][1] = (d1.cross(d2)).y();
+  m2[2][2] = (d1.cross(d2)).z();
 
-    double t1 = m1.determinant() / pow((d1.cross(d2)).mag(), 2.);
-    double t2 = m2.determinant() / pow((d1.cross(d2)).mag(), 2.);
+  double t1 = m1.determinant() / pow((d1.cross(d2)).mag(), 2.);
+  double t2 = m2.determinant() / pow((d1.cross(d2)).mag(), 2.);
 
-    ThreeVector p1 = c1_pos+t1*d1;
-    ThreeVector p2 = c2_pos+t2*d2;
+  ThreeVector p1 = c1_pos+t1*d1;
+  ThreeVector p2 = c2_pos+t2*d2;
 
-    ThreeVector an_intersection = (p1+p2)/2.;
+  ThreeVector an_intersection = (p1+p2)/2.;
 
-    return an_intersection;
+  return an_intersection;
 }
 
 } // ~namespace MAUS

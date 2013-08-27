@@ -27,9 +27,9 @@
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
 namespace MAUS {
-
 
 /** @class SciFiEvent A container to hold other SciFi containers, representing a particle event
  *
@@ -71,16 +71,20 @@ class SciFiEvent {
     SciFiSpacePointPArray seeds() const { return _scifiseeds; }
 
     /** Straight Pattern Recognition tracks */
-    void add_straightprtrack(SciFiStraightPRTrack track) {
+    void add_straightprtrack(SciFiStraightPRTrack* track) {
                              _scifistraightprtracks.push_back(track); }
-    void set_straightprtrack(SciFiStraightPRTrackArray tracks) { _scifistraightprtracks = tracks; }
-    SciFiStraightPRTrackArray straightprtracks() const { return _scifistraightprtracks; }
+    void set_straightprtrack(SciFiStraightPRTrackPArray tracks) { _scifistraightprtracks = tracks; }
+    SciFiStraightPRTrackPArray straightprtracks() const { return _scifistraightprtracks; }
 
     /** Helical Pattern Recognition tracks */
-    void add_helicalprtrack(SciFiHelicalPRTrack track) { _scifihelicalprtracks.push_back(track); }
-    void set_helicalprtrack(SciFiHelicalPRTrackArray tracks) { _scifihelicalprtracks = tracks; }
-    SciFiHelicalPRTrackArray helicalprtracks() const { return _scifihelicalprtracks; }
+    void add_helicalprtrack(SciFiHelicalPRTrack* track) { _scifihelicalprtracks.push_back(track); }
+    void set_helicalprtrack(SciFiHelicalPRTrackPArray tracks) { _scifihelicalprtracks = tracks; }
+    SciFiHelicalPRTrackPArray helicalprtracks() const { return _scifihelicalprtracks; }
 
+    /** Kalman tracks */
+    void add_scifitrack(SciFiTrack *a_track) { _scifitracks.push_back(a_track); }
+    void set_scifitracks(SciFiTrackPArray tracks) { _scifitracks = tracks; }
+    SciFiTrackPArray scifitracks() const { return _scifitracks; }
 
   private:
 
@@ -97,10 +101,13 @@ class SciFiEvent {
     SciFiSpacePointPArray               _scifiseeds;
 
     /** Straight tracks */
-    SciFiStraightPRTrackArray           _scifistraightprtracks;
+    SciFiStraightPRTrackPArray          _scifistraightprtracks;
 
     /** Helical tracks */
-    SciFiHelicalPRTrackArray            _scifihelicalprtracks;
+    SciFiHelicalPRTrackPArray           _scifihelicalprtracks;
+
+    /** Kalman tracks */
+    SciFiTrackPArray                     _scifitracks;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiEvent)
 };

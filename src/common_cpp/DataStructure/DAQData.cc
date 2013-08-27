@@ -21,12 +21,12 @@ namespace MAUS {
 
 DAQData::DAQData()
     : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger() {
+      _kl(), _tag(), _tof0(), _trigger(), _tracker0(), _tracker1() {
 }
 
 DAQData::DAQData(const DAQData& _daqdata)
     : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger() {
+      _kl(), _tag(), _tof0(), _trigger(), _tracker0(), _tracker1() {
     *this = _daqdata;
 }
 
@@ -150,7 +150,49 @@ void DAQData::SetTOF2DaqArray(TOF2DaqArray tof2) {
     }
     _tof2 = tof2;
 }
+//
+Tracker0DaqArray DAQData::GetTracker0DaqArray() const {
+    return _tracker0;
+}
 
+TrackerDaq* DAQData::GetTracker0DaqArrayElement(size_t index) const {
+    return _tracker0[index];
+}
+
+size_t DAQData::GetTracker0DaqArraySize() const {
+    return _tracker0.size();
+}
+
+void DAQData::SetTracker0DaqArray(Tracker0DaqArray tracker0) {
+    for (size_t i = 0; i < _tracker0.size(); ++i) {
+        if (_tracker0[i] != NULL) {
+            delete _tracker0[i];
+        }
+    }
+    _tracker0 = tracker0;
+}
+
+Tracker1DaqArray DAQData::GetTracker1DaqArray() const {
+    return _tracker1;
+}
+
+TrackerDaq* DAQData::GetTracker1DaqArrayElement(size_t index) const {
+    return _tracker1[index];
+}
+
+size_t DAQData::GetTracker1DaqArraySize() const {
+    return _tracker1.size();
+}
+
+void DAQData::SetTracker1DaqArray(Tracker1DaqArray tracker1) {
+    for (size_t i = 0; i < _tracker1.size(); ++i) {
+        if (_tracker1[i] != NULL) {
+            delete _tracker1[i];
+        }
+    }
+    _tracker1 = tracker1;
+}
+//
 UnknownArray DAQData::GetUnknownArray() const {
     return _unknown;
 }

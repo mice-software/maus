@@ -70,7 +70,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         self.assertTrue(self.mapper.death())
 
     def test_process(self):
-        """ Test of the process function of MapCppTrackerMCDigitization """
+        """ Test of the process function """
         root_dir = os.environ.get("MAUS_ROOT_DIR")
         assert root_dir != None
         assert os.path.isdir(root_dir)
@@ -93,7 +93,8 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        print revt['sci_fi_event']['digits']
+        self.assertEqual(34, len(revt['sci_fi_event']['digits']))
         # Close file
         _file.close()
 

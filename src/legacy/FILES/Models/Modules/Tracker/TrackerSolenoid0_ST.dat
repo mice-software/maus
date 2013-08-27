@@ -13,9 +13,9 @@ Module TrackerSolenoid0_ST
   PropertyBool Invisible 1
   PropertyInt KalmanSolenoid 1
   PropertyInt KalmanSolenoidNumber 0
-  Module Tracker/Tracker0_ST.dat
+  Module Tracker/Tracker0.dat
   {
-    Position 0.0 0.0 -416.5 mm
-    Rotation 0.0 0.0 0.0 degree
+    Position 0.0 0.0 416.5 mm
+    Rotation 0.0 180.0 0.0 degree
   }
 }

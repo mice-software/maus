@@ -31,7 +31,6 @@
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
-
 namespace MAUS {
 
 class SciFiCluster {
@@ -108,6 +107,10 @@ class SciFiCluster {
 
   int get_id() const { return _id; }
 
+  SciFiDigitPArray get_digits() const { return _digits; }
+
+  void set_digits(SciFiDigitPArray digits) { _digits = digits; }
+
   void set_true_momentum(ThreeVector p) { _true_p = p; }
 
   ThreeVector get_true_momentum() const { return _true_p; }
@@ -127,11 +130,12 @@ class SciFiCluster {
 
   ThreeVector _direction, _position;
 
+  SciFiDigitPArray _digits;
+
   MAUS_VERSIONED_CLASS_DEF(SciFiCluster)
 }; // Don't forget this trailing colon!!!!
 
 typedef std::vector<SciFiCluster*> SciFiClusterPArray;
-
 } // ~namespace MAUS
 
 #endif

@@ -16,11 +16,10 @@
 
 """Tests for ReduceCppPatternRecognition"""
 # pylint: disable = C0103
-import os
 import json
 import unittest
 from Configuration import Configuration
-import ROOT
+# import ROOT
 import MAUS
 
 # pylint: disable = R0904
@@ -46,28 +45,51 @@ class ReduceCppPatternRecognitionTestCase(unittest.TestCase):
         success = self.reducer.birth(self.c.getConfigJSON())
         self.assertTrue(success)
 
-    def test_process(self):
-        """Check ReduceCppPatternRecognition process function"""
-        fname = ('%s/src/reduce/ReduceCppPatternRecognition/test_spills.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(fname, 'r')
-        # Add some helical track events
-        data = fin.readline()
-        self.reducer.process(data)
-        data = fin.readline()
-        self.reducer.process(data)
-        # Add some straight track events
-        data = fin.readline()
-        self.reducer.process(data)
-        data = fin.readline()
-        self.reducer.process(data)
-        self.reducer.death()
-        #pylint: disable = E1101
-        foutput = ROOT.TFile('reduce_pattern_recognition.root')
-        circles = foutput.Get('circles')
-        self.assertEqual(circles.GetEntries(), 8)
-        strks = foutput.Get('stracks')
-        self.assertEqual(strks.GetEntries(), 5)
+    #def test_process_helical(self):
+        #"""Check ReduceCppPatternRecognition process function helical"""
+        #fname = ('%s/src/reduce/ReduceCppPatternRecognition/h_spills.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #fin = open(fname, 'r')
+        ## Remove header lines
+        #fin.readline()
+        #fin.readline()
+        ## Add some helical track events
+        #print 'Adding first spill'
+        #data = fin.readline()
+        #self.reducer.process(data)
+        #print 'Adding second spill'
+        #data = fin.readline()
+        #self.reducer.process(data)
+        ##pylint: disable = E1101
+        #print 'Checking output file'
+        #self.reducer.death()
+        #foutput = ROOT.TFile('reduce_pattern_recognition.root')
+        #htracks = foutput.Get('htracks')
+        #self.assertEqual(htracks.GetEntries(), 20)
+
+    #def test_process_straight(self):
+        #"""Check ReduceCppPatternRecognition process function straight"""
+        #fname = ('%s/src/reduce/ReduceCppPatternRecognition/s_spills.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #fin = open(fname, 'r')
+        ## Remove header lines and first spill
+        #fin.readline()
+        #fin.readline()
+        #fin.readline()
+        #fin.readline()
+        ## Add some straight track events
+        #print 'Adding first spill'
+        #data = fin.readline()
+        #self.reducer.process(data)
+        #print 'Adding second spill'
+        #data = fin.readline()
+        #self.reducer.process(data)
+        ##pylint: disable = E1101
+        #print 'Checking output file'
+        #self.reducer.death()
+        #foutput = ROOT.TFile('reduce_pattern_recognition.root')
+        #stracks = foutput.Get('stracks')
+        #self.assertEqual(stracks.GetEntries(), 9)
 
     def tearDown(self): #pylint: disable = C0103
         """Check death works"""

@@ -1,0 +1,213 @@
+\subsection{Pattern recognition}
+\label{Sect:PatRec}
+
+\subsubsection{Straight-line pattern recognition}
+\label{SubSect:SLPatRec}
+
+In the absense of a magnetic field, the tracks passing through the
+tracker may be described using a straight line in three dimensions.
+Taking the $z$ coordinate as the independent parameter, the track
+parameters may be taken to be:
+\begin{equation}
+ {\bf v_{\rm sl}} =
+ \left( 
+   \begin{array}{c}
+     x_0 \\
+     y_0 \\
+     t_x \\
+     t_y
+   \end{array}
+ \right)\,;
+\end{equation}
+where, $x_0$ and $y_0$ are the position at which the track crosses the
+tracker reference surface, $t_x = \frac{dx}{dz}$ and 
+$t_y = \frac{dy}{dz}$. 
+The track model may then be written:
+\begin{eqnarray}
+  x & = & x_0 + z t_x {\rm~and} \\
+  y & = & y_0 + z t_y \,.
+\end{eqnarray}
+
+Pattern recognition then procedes as follows.
+A space-point is chosen in each of two stations, $i$ and $j$ where $i$
+and $j$ label two different stations and $j>i$.
+Ideally, $i=1$ and $j=5$.
+However, a search of all combinations of pairs for which $j-i>1$ is
+made, taking the pairs in the order of decreasing separation in $z$;
+i.e. in order of decreasing $\Delta z_{ji} = z_j - z_i$. 
+Initial values for the track parameters,
+\begin{equation}
+ {\bf v_{\rm sl}^{\rm Init}} =
+ \left( 
+   \begin{array}{c}
+     x_0^{\rm Init} \\
+     y_0^{\rm Init} \\
+     t_x^{\rm Init} \\
+     t_y^{\rm Init}
+   \end{array}
+ \right)\,,
+\end{equation}
+are then calculated as follows:
+\begin{eqnarray}
+  t_x^{\rm Init} & = & \frac{x_j - x_i}{z_j - z_i} \,;        \\
+  x_0^{\rm Init} & = & x_i - z_i t_x^{\rm Init}      \,;        \\
+  t_y^{\rm Init} & = & \frac{y_j - y_i}{z_j - z_i} \,; {\rm~and} \\
+  y_0^{\rm Init} & = & y_i - z_i t_y^{\rm Init} \,;
+\end{eqnarray}
+where $(x_i, y_i, z_i)$ are the coordinates of space-point $i$, etc.
+A search is then made for space-points in each of the stations, $k$,
+between station $i$ and station $j$.
+The distance between the $x$ and $y$ coordinates of the space-points
+in the stations $k;\,j<k<i$ and the line defined by the initial track
+parameters is then calculated at the reference surface of station $k$
+as follows:
+\begin{eqnarray}
+  \delta x_k & = & x_k - (x_0^{\rm Init} + z_k t_x^{\rm Init}) {\rm~and} \\
+  \delta y_k & = & y_k - (y_0^{\rm Init} + z_k t_y^{\rm Init}) \,.
+\end{eqnarray}
+Points are accepted as part of a ``trial'' track if:
+\begin{eqnarray}
+  | \delta x_k | & < & \Delta_x {\rm~and} \\
+  | \delta y_k | & < & \Delta_y \,.
+\end{eqnarray}
+If at least one space-point statisfies this selection, a ``trial track''
+is formed consisting of the space-points selected in stations 
+$i$, $k$, ... and $j$.
+
+For each ``trial track'', a straight-line fit is performed to
+calculate the fit $\chi^2$:
+\begin{equation}
+  \chi^2 = \chi_x^2 + \chi_y^2 \,.
+\end{equation}
+Expressions for the evaluation of $\chi^2_x$ and $\chi^2_y$ are given
+in Appendix \ref{App:LS-SL-fit}.
+If the fit $\chi^2$ satisfies:
+\begin{equation}
+  \frac{\chi^2}{N-2} < \chi^2_{\rm cut} \,,
+\end{equation}
+then the trial track is accepted and the pattern-recognition track
+parameters and covariance matrix are calculated using the expressions
+given in Appendix \ref{App:LS-SL-fit}.
+
+\subsubsection{Helix pattern recognition}
+\label{SubSect:SLPatRec}
+
+\paragraph{Helix parameters}
+
+In the presence of a magnetic field, the tracks passing through the
+tracker may be described using a helix.
+In tracker coordinates, the tracks form circles in the $(x, y)$
+plane.
+Defining $s$ to be the length of the arc swept out by the track in the
+$(x, y)$ plane, a track may be described using a straight line in the
+$(s, z)$ plane.
+Taking the $z$ coordinate as the independent parameter, the track
+parameters may be taken to be:
+\begin{equation}
+ {\bf v_{\rm hlx}} =
+ \left( 
+   \begin{array}{c}
+     x_0    \\
+     y_0    \\
+     \psi_0 \\
+     t_s    \\
+     \rho
+   \end{array}
+ \right)\,;
+\end{equation}
+where, $x_0$ and $y_0$ are the position at which the track crosses the
+tracker reference surface, $\psi$ is the azimuthal angle of the line
+tangent to the track in the $(x, y)$ plane, $t_s = \frac{ds}{dz}$ and 
+$\rho$ is the radius of curvature. 
+The angle $\psi$ is chosen such that:
+\begin{equation}
+  {\bf \hat{\psi}_0} = {\bf \hat{k}} \times {\bf \hat{r}} \, ;
+\end{equation}
+where ${\bf \hat{r}}$ is the unit vector in the direction $(x_0, y_0)$
+and ${\bf \hat{k}}$ is the unit vector parallel to the $z$ axis.
+${\bf \hat{\psi}_0}$ is the unit vector tangent to the track and in
+the direction is defined by $\psi_0$.
+With this definition, the projection on the $(x, y)$ plane of a
+positive track propagating in the positive $z$ direction sweeps
+anticlockwise.
+
+\paragraph{Track model for pattern recognition}
+
+To build up the track model, consider a track-based coordinate system
+which has its origin at the point $(x_0, y_0)$ and in which the
+$x'$ axis is parallel to the line joining $(x_0, y_0)$ to the
+centre of the circle descibed by the track, the $y'$ axis is parallel
+to ${\bf \hat{\psi}_0}$ and the $z'$ axis is parallel to 
+${\bf \hat{k}}$ (see figure \ref{Fig:PatRecTrkMdl}).
+In the primed coordinate system, the $(x', y')$ track model may now be
+written: 
+\begin{eqnarray}
+  x' = \rho \
+\end{eqnarray}
+
+The track model may now be written:
+\begin{eqnarray}
+  x & = & x_0 + z t_x {\rm~and} \\
+  y & = & y_0 + z t_y \,.
+\end{eqnarray}
+
+Pattern recognition then procedes as follows.
+A space-point is chosen in each of two stations, $i$ and $j$ where $i$
+and $j$ label two different stations and $j>i$.
+Ideally, $i=1$ and $j=5$.
+However, a search of all combinations of pairs for which $j-i>1$ is
+made, taking the pairs in the order of decreasing separation in $z$;
+i.e. in order of decreasing $\Delta z_{ji} = z_j - z_i$. 
+Initial values for the track parameters,
+\begin{equation}
+ {\bf v_{\rm sl}^{\rm Init}} =
+ \left( 
+   \begin{array}{c}
+     x_0^{\rm Init} \\
+     y_0^{\rm Init} \\
+     t_x^{\rm Init} \\
+     t_y^{\rm Init}
+   \end{array}
+ \right)\,,
+\end{equation}
+are then calculated as follows:
+\begin{eqnarray}
+  t_x^{\rm Init} & = & \frac{x_j - x_i}{z_j - z_i} \,;        \\
+  x_0^{\rm Init} & = & x_i - z_i t_x^{\rm Init}      \,;        \\
+  t_y^{\rm Init} & = & \frac{y_j - y_i}{z_j - z_i} \,; {\rm~and} \\
+  y_0^{\rm Init} & = & y_i - z_i t_y^{\rm Init} \,;
+\end{eqnarray}
+where $(x_i, y_i, z_i)$ are the coordinates of space-point $i$, etc.
+A search is then made for space-points in each of the stations, $k$,
+between station $i$ and station $j$.
+The distance between the $x$ and $y$ coordinates of the space-points
+in the stations $k;\,j<k<i$ and the line defined by the initial track
+parameters is then calculated at the reference surface of station $k$
+as follows:
+\begin{eqnarray}
+  \delta x_k & = & x_k - (x_0^{\rm Init} + z_k t_x^{\rm Init}) {\rm~and} \\
+  \delta y_k & = & y_k - (y_0^{\rm Init} + z_k t_y^{\rm Init}) \,.
+\end{eqnarray}
+Points are accepted as part of a ``trial'' track if:
+\begin{eqnarray}
+  | \delta x_k | & < & \Delta_x {\rm~and} \\
+  | \delta y_k | & < & \Delta_y \,.
+\end{eqnarray}
+If at least one space-point statisfies this selection, a ``trial track''
+is formed consisting of the space-points selected in stations 
+$i$, $k$, ... and $j$.
+
+For each ``trial track'', a straight-line fit is performed to
+calculate the fit $\chi^2$:
+\begin{equation}
+  \chi^2 = \chi_x^2 + \chi_y^2 \,.
+\end{equation}
+Expressions for the evaluation of $\chi^2_x$ and $\chi^2_y$ are given
+in Appendix \ref{App:LS-SL-fit}.
+If the fit $\chi^2$ satisfies:
+\begin{equation}
+  \frac{\chi^2}{N-2} < \chi^2_{\rm cut} \,,
+\end{equation}
+then the trial track is accepted and the pattern-recognition track
+parameters and covariance matrix are calculated using the expressions
+given in Appendix \ref{App:LS-SL-fit}.
