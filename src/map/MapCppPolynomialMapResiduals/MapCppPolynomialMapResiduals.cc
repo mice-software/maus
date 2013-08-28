@@ -145,14 +145,25 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::ProcessSpill(
 ProcessableObject<bool> MapCppPolynomialMapResiduals::GenerateResiduals(
     const MCEventPArray * mc_events,
     const MAUS::ReconEventPArray * recon_events) const {
+  if (mc_events == NULL) {
+    return ProcessableObject<bool>(
+      std::string("{\"errors\":{\"null_spill\":"
+                  "\"The run data did not contain any Recon events.\"}}"));
+  }
   std::vector<std::vector<PhaseSpaceVector> > mc_tracks
     = ExtractMonteCarloTracks(mc_events);
   std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
             << "Extracted " << mc_tracks.size() << " MC tracks."
             << std::endl;
-  std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
-            << "Extracted " << mc_tracks[0].size() << " MC track points per track."
-            << std::endl;
+  if (mc_tracks.size() > 0) {
+    std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
+              << "Extracted " << mc_tracks[0].size() << " MC track points per track."
+              << std::endl;
+  } else {
+    return ProcessableObject<bool>(
+      std::string("{\"errors\":{\"null_spill\":"
+                  "\"The run data did not contain any MC hits.\"}}"));
+  }
 
   std::vector<Primary *> primaries = ExtractBeamPrimaries(mc_events);
   std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
@@ -196,12 +207,14 @@ MapCppPolynomialMapResiduals::ExtractMonteCarloTracks(
   while (mc_event != mc_events->end()) {
     std::vector<PhaseSpaceVector> track;
     VirtualHitArray * hits = (*mc_event)->GetVirtualHits();
-    VirtualHitArray::const_iterator hit = hits->begin();
-    while (hit != hits->end()) {
-      track.push_back(VirtualHit2PhaseSpaceVector(*hit));
-      ++hit;
+    if (hits != NULL) {
+      VirtualHitArray::const_iterator hit = hits->begin();
+      while (hit != hits->end()) {
+        track.push_back(VirtualHit2PhaseSpaceVector(*hit));
+        ++hit;
+      }
+      tracks.push_back(track);
     }
-    tracks.push_back(track);
     ++mc_event;
   }
   return tracks;
@@ -258,7 +271,9 @@ MapCppPolynomialMapResiduals::CalculateResiduals(
   std::vector<PhaseSpaceVector>::const_iterator mc_hit
     = mc_hits.begin();
   while (mapped_hit != mapped_hits.end()) {
-    residuals.push_back(*mapped_hit - *mc_hit);
+    // residuals.push_back(*mapped_hit - *mc_hit);
+    // residuals.push_back(*mc_hit);
+    residuals.push_back(*mapped_hit);
     ++mapped_hit;
     ++mc_hit;
   }
@@ -322,7 +337,9 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
     const ReconEventPArray & recon_events,
     const std::vector<long> z_positions,
     const std::vector<std::vector<PhaseSpaceVector> > & residuals) const {
+std::cout << "CHECKPOINT 0" << std::endl;
   if (residuals.size() != recon_events.size()) {
+std::cout << "CHECKPOINT 0.5" << std::endl;
     return ProcessableObject<bool>(
       std::string("{\"errors\":{\"size_mismatch\":"
                   "\"The number of track residuals is not the same as the "
@@ -333,8 +350,12 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
             << std::endl;
 
   ReconEventPArray::const_iterator recon_event = recon_events.begin();
+std::cout << "CHECKPOINT 1" << std::endl;
   std::vector<std::vector<PhaseSpaceVector> >::const_iterator track_residual
     = residuals.begin();
+std::cout << "CHECKPOINT 2" << std::endl;
+  size_t particle_event = 0;
+std::cout << "CHECKPOINT 3" << std::endl;
   while (track_residual != residuals.end()) {
     std::cout << "DEBUG MapCppPolynomialMapResiduals::WriteResiduals: "
               << "writing " << track_residual->size() << "residual track points."
@@ -348,6 +369,7 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
       GlobalDS::TrackPoint track_point
         = Recon::DataStructureHelper::GetInstance().PhaseSpaceVector2TrackPoint(
             *residual, static_cast<double>(*z_position), GlobalDS::kMuMinus);
+      track_point.set_particle_event(particle_event);
       track->AddTrackPoint(new GlobalDS::TrackPoint(track_point));
       ++z_position;
       ++residual;
@@ -357,7 +379,9 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
     (*recon_event)->SetGlobalEvent(global_event);
     ++recon_event;
     ++track_residual;
+    ++particle_event;
   }
+std::cout << "CHECKPOINT 4" << std::endl;
   return ProcessableObject<bool>(new bool(true));
 }
 

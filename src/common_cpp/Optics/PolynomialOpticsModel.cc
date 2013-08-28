@@ -201,15 +201,12 @@ void PolynomialOpticsModel::SetupAlgorithm() {
 const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
   size_t num_poly_coefficients
     = PolynomialMap::NumberOfPolynomialCoefficients(6, polynomial_order_);
-  ThreeVector position = reference_primary_.GetPosition();
-  ThreeVector momentum = reference_primary_.GetMomentum();
-  PhaseSpaceVector reference_vector(reference_primary_.GetTime(),
-                                    reference_primary_.GetEnergy(),
-                                    position.x(), momentum.x(),
-                                    position.y(), momentum.y());
+  std::vector<PhaseSpaceVector> primaries;
+
+  // The (0,0,0,0,0,0) case produces a polynomial vector (1,0,0,...,0)
+  // primaries.push_back(reference_trajectory_);
 
   std::cerr << "Primaries:" << std::endl;
-  std::vector<PhaseSpaceVector> primaries;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
       PhaseSpaceVector primary;
@@ -219,9 +216,9 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
       }
       primary[j] = deltas_[j];  // diagonal element
 
-      // std::cerr << (primary + reference_vector) << std::endl;
+      // std::cerr << (primary + reference_trajectory_) << std::endl;
       std::cerr << primary << std::endl;
-      primaries.push_back(primary + reference_vector);
+      primaries.push_back(primary + reference_trajectory_);
     }
   }
   size_t base_block_length = primaries.size();
@@ -235,11 +232,11 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
   for (size_t row = base_block_length; row < num_poly_coefficients; ++row) {
     PhaseSpaceVector deltas = deltas_ * (row / base_block_length);
     PhaseSpaceVector primary
-      = primaries[row % base_block_length] - reference_vector + deltas;
+      = primaries[row % base_block_length] - reference_trajectory_ + deltas;
 
-    // std::cerr << (primary + reference_vector) << std::endl;
+    // std::cerr << (primary + reference_trajectory_) << std::endl;
     std::cerr << primary << std::endl;
-    primaries.push_back(primary + reference_vector);
+    primaries.push_back(primary + reference_trajectory_);
   }
   return primaries;
 }
@@ -250,12 +247,14 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     const std::vector<PhaseSpaceVector> & start_plane_hits,
     const std::vector<PhaseSpaceVector> & station_hits)
     const {
+  #if 0
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
   const double t0 = reference_pgparticle.time;
   const double E0 = reference_pgparticle.energy;
   const double P0 = reference_pgparticle.pz;
+  #endif
 
   if (start_plane_hits.size() != station_hits.size()) {
     std::stringstream message;
@@ -269,11 +268,16 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   std::vector< std::vector<double> > points;
   for (size_t pt_index = 0; pt_index < start_plane_hits.size(); ++pt_index) {
+    /*
     ParticleOpticalVector start_plane_point(start_plane_hits[pt_index],
                                             t0, E0, P0);
+    */
+    PhaseSpaceVector start_plane_point(
+      start_plane_hits[pt_index] - reference_trajectory_);
+
     std::vector<double> point;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      #if 0
+      #if 1
         point.push_back(start_plane_point[coord_index]);
       #else
         point.push_back(start_plane_hits[pt_index][coord_index]);
@@ -284,10 +288,15 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   std::vector< std::vector<double> > values;
   for (size_t val_index = 0; val_index < station_hits.size(); ++val_index) {
+    /*
     ParticleOpticalVector station_value(station_hits[val_index], t0, E0, P0);
+    */
+    PhaseSpaceVector station_value(
+      station_hits[val_index] - reference_trajectory_);
+
     std::vector<double> value;
     for (size_t coord_index = 0; coord_index < 6; ++coord_index) {
-      #if 0
+      #if 1
         value.push_back(station_value[coord_index]);
       #else
         value.push_back(station_hits[val_index][coord_index]);
@@ -352,16 +361,8 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
                     "PolynomialOpticsModel::CalculateTransferMap()"));
   }
 
-  ThreeVector reference_position = reference_primary_.GetPosition();
-  ThreeVector reference_momentum = reference_primary_.GetMomentum();
-  PhaseSpaceVector reference_particle(reference_primary_.GetTime(),
-                                      reference_primary_.GetEnergy(),
-                                      reference_position.x(),
-                                      reference_momentum.x(),
-                                      reference_position.y(),
-                                      reference_momentum.y());
   TransferMap * transfer_map = new PolynomialTransferMap(
-    *polynomial_map, reference_particle);
+    *polynomial_map, reference_trajectory_);
   delete polynomial_map;
 
   return transfer_map;

@@ -67,6 +67,13 @@ TransferMapOpticsModel::TransferMapOpticsModel(
 
   primary_plane_ = reference_pgparticle.z;
 
+  ThreeVector position = reference_primary_.GetPosition();
+  ThreeVector momentum = reference_primary_.GetMomentum();
+  reference_trajectory_ = PhaseSpaceVector(reference_primary_.GetTime(),
+                                           reference_primary_.GetEnergy(),
+                                           position.x(), momentum.x(),
+                                           position.y(), momentum.y());
+
   // First plane particle coordinate deltas
   Json::Value delta_values = JsonWrapper::GetProperty(
       *configuration_,

@@ -257,11 +257,11 @@ Double_t MinuitTrackFitter::ScoreTrack(
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
   const double time_calibration = 0;
-  /*
-  const double t0 = reference_pgparticle.time;
-  const double E0 = reference_pgparticle.energy;
-  const double P0 = reference_pgparticle.pz;
-  */
+  #if 0
+    const double t0 = reference_pgparticle.time;
+    const double E0 = reference_pgparticle.energy;
+    const double P0 = reference_pgparticle.pz;
+  #endif
 std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
 std::cout.flush();
   // clear the last saved track
@@ -317,7 +317,7 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Measured: "
     #if 0
       ParticleOpticalVector(
         optics_model_->Transport(ParticleOpticalVector(guess, t0, E0, P0),
-                                 end_plane)),
+                                 end_plane),
         t0, E0, P0);
     #else
       optics_model_->Transport(guess, end_plane);

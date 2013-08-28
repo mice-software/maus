@@ -93,6 +93,7 @@ class TransferMapOpticsModel : public OpticsModel {
 
   std::map<long, const TransferMap *> transfer_maps_;
   Primary reference_primary_;
+  PhaseSpaceVector reference_trajectory_;
   double time_offset_;
   PhaseSpaceVector deltas_;
 
