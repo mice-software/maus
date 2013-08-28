@@ -46,7 +46,13 @@
 
 SciFiPlane::SciFiPlane(MiceModule* mod,
                        G4Material* mater,
-                       G4VPhysicalVolume *mlv) {
+                       G4VPhysicalVolume *mlv)
+                     : keepSolidDoublet(false),
+                       keepLogicDoublet(false),
+                       keepPhysiDoublet(false),
+                       keepSolidCore(false),
+                       keepLogicCore(false),
+                       keepPhysiCore(false) {
   G4double tr = mod->dimensions().x();
   G4double fd = mod->propertyDouble("FibreDiameter");
   G4double fp = mod->propertyDouble("Pitch");
@@ -104,12 +110,12 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
 }
 
 SciFiPlane::~SciFiPlane() {
-  delete physiDoublet;
-  delete physiCore;
+  if (!keepPhysiDoublet) delete physiDoublet;
+  if (!keepPhysiCore) delete physiCore;
 
-  delete solidDoublet;
-  delete solidCore;
+  if (!keepSolidDoublet) delete solidDoublet;
+  if (!keepSolidCore) delete solidCore;
 
-  delete logicDoublet;
-  delete logicCore;
+  if (!keepLogicDoublet) delete logicDoublet;
+  if (!keepLogicCore) delete logicCore;
 }

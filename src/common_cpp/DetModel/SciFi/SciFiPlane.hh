@@ -62,7 +62,38 @@ class SciFiPlane {
 
   int get_numb_fibres() const { return _numFibres; }
 
+  /** @brief Set the flag to choose to keep the solid doublet memory after destruction of the plane
+   */
+  void setKeepSolidDoublet(bool aKeep) { keepSolidDoublet = aKeep; }
+
+  /** @brief Set the flag to choose to keep the logic doublet memory after destruction of the plane
+   */
+  void setKeepLogicDoublet(bool aKeep) { keepLogicDoublet = aKeep; }
+
+  /** @brief Set the flag to choose to keep the physi doublet memory after destruction of the plane
+   */
+  void setKeepPhysiDoublet(bool aKeep) { keepPhysiDoublet = aKeep; }
+
+    /** @brief Set the flag to choose to keep the solid core memory after destruction of the plane
+   */
+  void setKeepSolidCore(bool aKeep) { keepSolidCore = aKeep; }
+
+  /** @brief Set the flag to choose to keep the logic core memory after destruction of the plane
+   */
+  void setKeepLogicCore(bool aKeep) { keepLogicCore = aKeep; }
+
+  /** @brief Set the flag to choose to keep the physi core memory after destruction of the plane
+   */
+  void setKeepPhysiCore(bool aKeep) { keepPhysiCore = aKeep; }
+
  private:
+  bool keepSolidDoublet;
+  bool keepLogicDoublet;
+  bool keepPhysiDoublet;
+  bool keepSolidCore;
+  bool keepLogicCore;
+  bool keepPhysiCore;
+
   int _numFibres;
 
   G4Tubs*            solidDoublet;
