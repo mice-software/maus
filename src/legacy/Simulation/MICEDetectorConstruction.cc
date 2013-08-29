@@ -145,11 +145,8 @@ void    MICEDetectorConstruction::addDaughter( MiceModule* mod, G4VPhysicalVolum
     if( detector == "SciFiPlane" )
     {
       SciFiPlane* plane = new SciFiPlane( mod, mat, moth );
-      plane->setKeepLogicCore(true);
-      plane->setKeepPhysiCore(true);
       logic = plane->logicalCore();
       place = plane->placementCore();
-      delete plane;
     }
     else if ( detector == "KLGlue" )
     {

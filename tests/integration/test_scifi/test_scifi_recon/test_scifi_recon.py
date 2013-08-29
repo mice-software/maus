@@ -65,38 +65,30 @@ class TestSciFiRecon(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree()
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
-        tree.GetEntry(0)  # Use the 3rd spill
+        tree.GetEntry(1)
         spill = data.GetSpill()
+        print "Using spill " + str(spill.GetSpillNumber());
 
         self.assertEqual(spill.GetDaqEventType(), "physics_event")
         self.assertEqual(spill.GetReconEvents().size(), 2)
 
+        # Use the first recon event only
         evt = spill.GetReconEvents()[0].GetSciFiEvent()
-        self.assertEqual(evt.spacepoints().size(), 10)
 
         # Check have found tracks with correct params & correct seed spoints
+        self.assertEqual(evt.spacepoints().size(), 10)
         trks = evt.helicalprtracks()
         self.assertEqual(trks.size(), 2)
 
         sds0 = trks[0].get_spacepoints() # Tracker 1
-        self.assertEqual(round(trks[0].get_R() - 6.28, 2), 0.0)
-        self.assertEqual(round(trks[0].get_dsdz() - 0.0348, 4), 0.0)
+        self.assertAlmostEqual(trks[0].get_R(), 38.68, 2)
+        self.assertAlmostEqual(trks[0].get_dsdz(), -0.2304, 4)
         self.assertEqual(sds0.size(), 5)
-        self.assertEqual(round(sds0[0].get_position().x() - (-10.46), 2), 0.0)
-        self.assertEqual(round(sds0[1].get_position().x() - (-5.48), 2), 0.0)
-        self.assertEqual(round(sds0[2].get_position().x() - (-0.50), 2), 0.0)
-        self.assertEqual(round(sds0[3].get_position().x() - (-8.47), 2), 0.0)
-        self.assertEqual(round(sds0[4].get_position().x() - (-12.70), 2), 0.0)
 
         sds1 = trks[1].get_spacepoints() # Tracker 2
-        self.assertEqual(round(trks[1].get_R() - 18.57, 2), 0.0)
-        self.assertEqual(round(trks[1].get_dsdz() - 0.1180, 4), 0.0)
+        self.assertAlmostEqual(trks[1].get_R(), 18.86, 2)
+        self.assertAlmostEqual(trks[1].get_dsdz(), 0.1155, 4)
         self.assertEqual(sds1.size(), 5)
-        self.assertEqual(round(sds1[0].get_position().x() - (18.93), 2), 0.0)
-        self.assertEqual(round(sds1[1].get_position().x() - (-0.75), 2), 0.0)
-        self.assertEqual(round(sds1[2].get_position().x() - (-14.45), 2), 0.0)
-        self.assertEqual(round(sds1[3].get_position().x() - (13.95), 2), 0.0)
-        self.assertEqual(round(sds1[4].get_position().x() - (9.47), 2), 0.0)
 
 if __name__ == "__main__":
     unittest.main()
