@@ -16,17 +16,19 @@
 import ROOT
 import glob
 import sys
+import os
 
-sys.path.insert(0, '/home/hep/sm1208/maus/tests/integration/test_simulation/test_physics_model_full')# adds this to path
-sys.path.insert(0, '/home/hep/sm1208/maus/tests/integration/plots/test_physics_model_full')# adds this to path
+mrd = os.environ['MAUS_ROOT_DIR']
 
+sys.path.insert(0, mrd+'/tests/integration/test_simulation/test_physics_model_full')# adds this to path
+sys.path.insert(0, mrd+'/tests/integration/plots/test_physics_model_full')# adds this to path
 
 #imports files, if code imported it is not run
-from physics_model_test import plotter
-from physics_model_test import geometry
-from physics_model_test import all_tests
-from physics_model_test import code_setup
-from physics_model_test.factory import TestFactory
+import plotter
+import geometry
+import all_tests
+import code_setup
+from factory import TestFactory
 
 import Configuration  # MAUS configuration (datacards) module
 import maus_cpp.globals as maus_globals # MAUS C++ calls
