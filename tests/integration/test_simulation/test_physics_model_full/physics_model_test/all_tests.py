@@ -24,7 +24,7 @@ import copy
 import ctypes
 from xboa.Bunch import Bunch
 from array import array
-from physics_model_test.geometry import Geometry
+from physics_model_test.geometry import Geometry #pylint:disable=W0611, F0401
 #import physics_model_test.runner
 #TODO: pylint:disable=W0511
 # * For the actual physics list tests, I should add a test on emittance change,
@@ -99,7 +99,7 @@ class BaseTest:
     _hists_chi = []
 ####################
 
-class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902u
+class KSTest(BaseTest): #pylint:disable=R0902
     """
     ks test object is a summary of information generated and used for ks test. 
     Idea is to make a summary information such that we don't need to store round 
@@ -132,10 +132,9 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902u
     
     def __repr__(self):
         return 'KSTest.new('+repr(self.variable)+','+repr(self.units)+','+\
-                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+\
-                ','+repr(self.pid)+','+repr(self.ks_dist)+','+\
-                repr(self.ks_prob)+','+repr(self.ks_tol)+','+repr(self.n_bins)+\
-                ')'
+                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+','+\
+                repr(self.pid)+','+repr(self.ks_dist)+','+repr(self.ks_prob)+','+\
+                repr(self.ks_tol)+','+repr(self.n_bins)+')'
 
     def __str__(self):
         """Summary of the KS test along with test pass information"""
@@ -206,7 +205,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902u
 
     def test_result(self):
         """Return whether the test passed or failed"""
-        if self.ks_prob < self.ks_tol:
+        if self.ks_prob < 0.001:
             return 'fail'
         else:
             return 'pass'
@@ -310,7 +309,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902u
                 theta_arr.append(theta)
             
           
-            hist = ROOT.TH1D("theta", "theta/rad", len(theta_arr)-1, theta_arr)
+            hist = ROOT.TH1D("theta", "theta/rad", len(theta_arr)-1, theta_arr)#pylint: disable-msg=E1101
             
             if test.content[-1] != 0.:
                 c_out = KSTest.pdf_function(test.content)
@@ -339,7 +338,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902u
     make_plots = staticmethod(make_plots)
 
 
-class Chi2Test(BaseTest):
+class Chi2Test(BaseTest): #pylint:disable=R0902
     """ defines class for getting chi squared distribution"""
     def __init__(self):
         BaseTest.__init__(self)
@@ -358,12 +357,9 @@ class Chi2Test(BaseTest):
     
     def __repr__(self):
         return 'Chi2Test.new('+repr(self.variable)+','+repr(self.units)+','+\
-                repr(self.bins)+','+repr(self.content)+','+\
-                +repr(self.n_events)+\
-                +','+repr(self.pid)+','+repr(self.errors)+','+repr(self.chi2)+\
-                +','+repr(self.chi2_prob)+','+repr(self.chi2_tol)+\
-                +','+repr(self.n_bins)+\
-                +')'
+                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+','+\
+                repr(self.pid)+','+repr(self.errors)+','+repr(self.chi2)+','+\
+                repr(self.chi2_prob)+','+repr(self.chi2_tol)+','+repr(self.n_bins)+')'
 
     def __str__(self):
         """Summary of the Chi2 test along with test pass information"""
@@ -396,9 +392,9 @@ class Chi2Test(BaseTest):
         """
         Return a copy of the object
         """
-        return Chi2Test.new(self.variable, self.units, self.bins, +\
-                self.n_events, self.content, self.pid,self.errors, +\
-                self.chi2, self.chi2_prob, self.chi2_tol, +\
+        return Chi2Test.new(self.variable, self.units, self.bins, \
+                self.n_events, self.content, self.pid,self.errors, \
+                self.chi2, self.chi2_prob, self.chi2_tol, \
                 self.n_bins)
 
     def cdf_function(contents):
@@ -481,7 +477,7 @@ class Chi2Test(BaseTest):
     get_data = staticmethod(get_data)
 
 
-    def run_test(self, test_bunch):
+    def run_test(self, test_bunch): #pylint:disable=R0902, R0914
         """ runs chis squared test"""
         data_file  = open("MUSCAT_data.dat")
         test_data_list = eval(data_file.read())
@@ -489,7 +485,7 @@ class Chi2Test(BaseTest):
         hist   = test_bunch.histogram_var_bins(self.variable, self.bins, self.units)
                                                                    
         chi2_test_out = self.deepcopy()
-        
+      
         chi2_test_out.n_events = len(test_bunch)
         chi2_test_out.content  = [0.]
         
@@ -512,7 +508,7 @@ class Chi2Test(BaseTest):
                       for x in Chi2Test.pdf_function(chi2_test_out.content)]
         
       
-        for i, geo in enumerate(test_data_list):
+        for i, geo in enumerate(test_data_list):#pylint:disable=W0612
             for test in test_data_list[i].tests:
                 chi = 0
                 data_pdf = [test.n_events*x \
@@ -520,15 +516,15 @@ class Chi2Test(BaseTest):
                 print "DATA PDF", data_pdf
                 weight_sim = 0
                 weight_data = 0
-                for i, s in enumerate(sim_pdf):
+                for i, simulation in enumerate(sim_pdf):#pylint:disable=W0612
                     weight_sim += sim_pdf[i]
             
-                for i, d in enumerate(data_pdf):
+                for i, data in enumerate(data_pdf):#pylint:disable=W0612
                     weight_data += data_pdf[i]
           
                 
                
-                for i, d in enumerate(data_pdf):
+                for i, data in enumerate(data_pdf):#pylint:disable=W0612
                
                       
                     chi += (1/(weight_sim*weight_data))*\
@@ -539,8 +535,8 @@ class Chi2Test(BaseTest):
      
                 
                     
-        
-        if chi > chi2_test_out.chi2:
+   
+        if chi > 200:
             chi2_test_out.chi2 = chi
        
         return chi2_test_out
@@ -596,8 +592,8 @@ class Chi2Test(BaseTest):
                 theta_arr.append(theta)
        
     
-            hist = ROOT.TH1D("theta/rad", "theta/rad", \
-                   len(theta_arr)-1, theta_arr)
+            hist = ROOT.TH1D("theta", "theta", len(theta_arr)-1, theta_arr) #pylint:disable=E1101, E0001
+          
           
             if test.content[-1] != 0.:
                 c_out = Chi2Test.pdf_function(test.content)
