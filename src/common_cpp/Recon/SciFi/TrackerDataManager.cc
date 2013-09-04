@@ -258,6 +258,7 @@ void TrackerDataManager::print_track_info(const SciFiHelicalPRTrack * const trk,
   std::cout << "Tracker " << trk->get_tracker() << + ", ";
   std::cout << "Track " << trk_num << ", ";
   std::cout << "Num points " << trk->get_num_points() << ", ";
+  std::cout << "R = " << std::setprecision(4) << trk->get_R() << "mm, ";
   std::cout << "X0 = " << std::setprecision(4) << trk->get_circle_x0() << "mm, ";
   std::cout << "Y0 = " <<  std::setprecision(4) << trk->get_circle_y0() << "mm, ";
   std::cout << "dsdz " <<  std::setprecision(4) << trk->get_dsdz() << ", ";
