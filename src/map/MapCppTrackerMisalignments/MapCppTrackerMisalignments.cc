@@ -28,8 +28,8 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    _spill_cpp(NULL),
                                                                    _root_file(NULL),
                                                                    _iteraction(0),
-                                                                   //_tree(NULL),
-                                                                   //_tracker0_graphs(NULL),
+                                                                   // _tree(NULL),
+                                                                   // _tracker0_graphs(NULL),
                                                                    _t0s2(NULL),
                                                                    _t0s3(NULL),
                                                                    _t0s4(NULL),
@@ -39,7 +39,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    _t1s4(NULL),
                                                                    t1st3residual(NULL),
                                                                    _likelihood(NULL) {
-                                                                   //_probability(NULL) {
+                                                                   // _probability(NULL) {
   _root_file = new TFile("misalignments.root", "RECREATE");
 /*
   _t0s2 = new TGraph();
@@ -54,8 +54,8 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
   _t0s4->SetName("t0s4");
   _t0s4->SetLineColor(kGreen);
 */
-  //_tracker0_graphs = new TMultiGraph("tracker0","tracker0");
-  _tracker1_graphs = new TMultiGraph("tracker1","tracker1");
+  // _tracker0_graphs = new TMultiGraph("tracker0","tracker0");
+  _tracker1_graphs = new TMultiGraph("tracker1", "tracker1");
 
   _t1s2 = new TGraph();
   _t1s2->SetName("t1s2");
@@ -149,15 +149,21 @@ bool MapCppTrackerMisalignments::death() {
   _root_file->cd();
   // _tracker0_graphs->Write("", TObject::kOverwrite);
   _tracker1_graphs->Write("", TObject::kOverwrite);
-  //_t1s2->Write("t1s2");
-  //_t1s3->Write("t1s3");
-  //_t1s4->Write("t1s4");
-  TH1D *final_probability2 = (TH1D*)_x_shift_pdfs.at(1)->GetHistogram()->Clone("final_probability2");
-  TH1D *final_probability3 = (TH1D*)_x_shift_pdfs.at(2)->GetHistogram()->Clone("final_probability3");
-  TH1D *final_probability4 = (TH1D*)_x_shift_pdfs.at(3)->GetHistogram()->Clone("final_probability4");
+  // _t1s2->Write("t1s2");
+  // _t1s3->Write("t1s3");
+  // _t1s4->Write("t1s4");
+  TH1D *final_probability2 = reinterpret_cast<TH1D*>
+                              (_x_shift_pdfs.at(1)->GetHistogram()->Clone("final_probability2"));
+  TH1D *final_probability3 = reinterpret_cast<TH1D*>
+                              (_x_shift_pdfs.at(2)->GetHistogram()->Clone("final_probability3"));
+  TH1D *final_probability4 = reinterpret_cast<TH1D*>
+                              (_x_shift_pdfs.at(3)->GetHistogram()->Clone("final_probability4"));
 
-  TH1D *likelihood=(TH1D*)(&_likelihood->GetLikelihoodOfData(2.0))->Clone("likelihood");
-  TH2D *total_likelihood=(TH2D*)_likelihood->GetHistogram()->Clone("total_likelihood");
+  TH1D *likelihood = reinterpret_cast<TH1D*>
+                     ((&_likelihood->GetLikelihoodOfData(2.0))->Clone("likelihood"));
+
+  TH2D *total_likelihood = reinterpret_cast<TH1D*>
+                           (_likelihood->GetHistogram()->Clone("total_likelihood"));
 
   _root_file->Write();
   _root_file->Close();
@@ -260,14 +266,14 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
     double old_mean = _x_shift_pdfs.at(station_index)->GetMean();
     std::cerr << "Station " << station_i << ", old mean: "
               << old_mean << "; new residual: " << residuals.x() << std::endl;
-    double suggested_new_shift = residuals.x()-old_mean;
+    double suggested_new_shift = residuals.x() - old_mean;
     _x_shift_pdfs.at(station_index)->
                   ComputeNewPosterior(_likelihood->GetLikelihoodOfData(suggested_new_shift));
-    if ( _tracker==1 && station_i==3 ) {
-      //double old_mean = _x_shift_pdfs.at(2)->GetMean();
-      //double rms  = _x_shift_pdfs.at(2)->GetRMS();
-      //std::cerr << old_mean << " " << rms << std::endl;
-      //_x_shift_pdfs.at(2)->ComputeNewPosterior(_likelihood->GetLikelihoodOfData(residuals.x()));
+    if ( _tracker == 1 && station_i == 3 ) {
+      // double old_mean = _x_shift_pdfs.at(2)->GetMean();
+      // double rms  = _x_shift_pdfs.at(2)->GetRMS();
+      // std::cerr << old_mean << " " << rms << std::endl;
+      // _x_shift_pdfs.at(2)->ComputeNewPosterior(_likelihood->GetLikelihoodOfData(residuals.x()));
 
       // myfile << residuals.x() << " " << updated_value << "\n";
       t1st3residual->Fill(residuals.x());
@@ -284,10 +290,6 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
   _t1s2->SetPoint(n_points, n_points, _x_shifts[_tracker][1]);
   _t1s3->SetPoint(n_points, n_points, _x_shifts[_tracker][2]);
   _t1s4->SetPoint(n_points, n_points, _x_shifts[_tracker][3]);
-
-  //std::ofstream myfile;
-  //myfile.open ("mis.txt", std::ios::app);
-  //myfile.close();
 }
 
 ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray spacepoints,
@@ -313,10 +315,14 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
                    spacepoint_fit.at(2)->get_position().x() - x_shift_copy.at(2)->GetMean(),
                    spacepoint_fit.at(3)->get_position().x() - x_shift_copy.at(3)->GetMean()};
 
-  Double_t ay[] = {spacepoint_fit.at(0)->get_position().y(),//-_y_shifts[_tracker][spacepoints.at(0)->get_station()-1],
-                   spacepoint_fit.at(1)->get_position().y(),//-_y_shifts[_tracker][spacepoints.at(1)->get_station()-1],
-                   spacepoint_fit.at(2)->get_position().y(),//-_y_shifts[_tracker][spacepoints.at(2)->get_station()-1],
-                   spacepoint_fit.at(3)->get_position().y()};//-_y_shifts[_tracker][spacepoints.at(3)->get_station()-1]};
+  Double_t ay[] = {spacepoint_fit.at(0)->get_position().y(),
+// -_y_shifts[_tracker][spacepoints.at(0)->get_station()-1],
+                   spacepoint_fit.at(1)->get_position().y(),
+// -_y_shifts[_tracker][spacepoints.at(1)->get_station()-1],
+                   spacepoint_fit.at(2)->get_position().y(),
+// -_y_shifts[_tracker][spacepoints.at(2)->get_station()-1],
+                   spacepoint_fit.at(3)->get_position().y()};
+// -_y_shifts[_tracker][spacepoints.at(3)->get_station()-1]};
 
   Double_t az[] = {spacepoint_fit.at(0)->get_position().z(),
                    spacepoint_fit.at(1)->get_position().z(),
@@ -349,9 +355,13 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
   // Now that the fit is done, we can calculate the residual.
   double spacepoint_z = spacepoints.at(station_array_index)->get_position().z();
   double sp_x = spacepoints.at(station_array_index)->get_position().x();
-  double projected_x = param_xz[0]+param_xz[1]*spacepoints.at(station_array_index)->get_position().z();
   double sp_y = spacepoints.at(station_array_index)->get_position().y();
-  double projected_y = param_yz[0]+param_yz[1]*spacepoints.at(station_array_index)->get_position().z();
+
+  double projected_x = param_xz[0] + param_xz[1] *
+                       spacepoints.at(station_array_index)->get_position().z();
+
+  double projected_y = param_yz[0] + param_yz[1] *
+                       spacepoints.at(station_array_index)->get_position().z();
 
   double x_residual = projected_x - sp_x;
   double y_residual = projected_y - sp_y;

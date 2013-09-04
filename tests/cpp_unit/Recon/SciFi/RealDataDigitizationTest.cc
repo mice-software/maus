@@ -91,10 +91,12 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
   int extWG, inWG, WGfib;
 
   bool correct = test_case.get_StatPlaneChannel(board, bank, chan_ro,
-                                                tracker, station, plane, channel, extWG, inWG, WGfib);
+                                                tracker, station, plane,
+                                                channel, extWG, inWG, WGfib);
   EXPECT_TRUE(correct);
   bool wrong = test_case.get_StatPlaneChannel(board, bad_bank, chan_ro,
-                                              tracker, station, plane, channel, extWG, inWG, WGfib);
+                                              tracker, station, plane,
+                                              channel, extWG, inWG, WGfib);
   EXPECT_FALSE(wrong);
 }
 

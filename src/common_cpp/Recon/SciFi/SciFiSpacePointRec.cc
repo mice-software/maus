@@ -197,19 +197,6 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   // Vector p stores the crossing position of views v and w.
   ThreeVector p(p2);
 
-  std::ofstream myfile;
-  myfile.open ("spacepoint_realdata.txt", std::ios::app);
-  for ( int i = 0; i < 3; i++ ) {
-    int tracker = channels[i]->get_tracker();
-    int station = channels[i]->get_station();
-    int plane = channels[i]->get_plane();
-    int channel = channels[i]->get_channel();
-    double npe = channels[i]->get_npe();
-    myfile << tracker << " " << station << " " << plane << " "
-          << channel << " " << npe << "\n";
-  }
-  myfile.close();
-
   // Now, determine the perpendicular distance from the hit on the X view
   // to the intersection of the V and W views
   ThreeVector x_dir(ucluster->get_direction());

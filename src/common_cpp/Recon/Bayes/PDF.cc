@@ -40,7 +40,7 @@ PDF& PDF::operator=(const PDF &rhs) {
     return *this;
   }
 
-  _probability = reinterpret_cast<TH1D*>rhs._probability->Clone("clone");
+  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone("clone"));
 
   _n_bins = rhs._n_bins;
 
@@ -48,7 +48,7 @@ PDF& PDF::operator=(const PDF &rhs) {
 }
 
 PDF::PDF(const PDF &pdf) {
-  _probability = reinterpret_cast<TH1D*>pdf._probability->Clone("clone");
+  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone("clone"));
   _n_bins = pdf._n_bins;
 }
 

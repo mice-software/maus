@@ -33,7 +33,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <vector>
+#include <algorithm>
 #include "TMath.h"
 #include "TMultiGraph.h"
 #include "TGraph.h"
@@ -126,9 +126,9 @@ class MapCppTrackerMisalignments {
   Json::Reader reader;
 
   TFile *_root_file;
-  //TTree *_tree;
+  // TTree *_tree;
 
-  //TMultiGraph *_tracker0_graphs;
+  // TMultiGraph *_tracker0_graphs;
   TGraph *_t0s2;
   TGraph *_t0s3;
   TGraph *_t0s4;
@@ -147,7 +147,7 @@ class MapCppTrackerMisalignments {
   std::vector<double> _history[2][5];
 
   Likelihood *_likelihood;
-  //PDF *_probability;
+  // PDF *_probability;
   std::vector<PDF*> _x_shift_pdfs;
 
   double _x_shifts[2][5];
