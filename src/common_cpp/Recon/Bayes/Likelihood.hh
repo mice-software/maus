@@ -56,12 +56,12 @@ class Likelihood {
 
   void Build(std::string model, double sigma, double number_of_tosses);
 
-  TH1D GetLikelihoodOfData(double param);
+  TH1D GetLikelihood(double param);
 
-  TH2D* GetHistogram() const { return _likelihood; }
+  TH2D* GetJoint() const { return _joint; }
 
  private:
-  TH2D *_likelihood;
+  TH2D *_joint;
 
   int _n_bins;
 

@@ -28,8 +28,6 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    _spill_cpp(NULL),
                                                                    _root_file(NULL),
                                                                    _iteraction(0),
-                                                                   // _tree(NULL),
-                                                                   // _tracker0_graphs(NULL),
                                                                    _t0s2(NULL),
                                                                    _t0s3(NULL),
                                                                    _t0s4(NULL),
@@ -39,7 +37,6 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    _t1s4(NULL),
                                                                    t1st3residual(NULL),
                                                                    _likelihood(NULL) {
-                                                                   // _probability(NULL) {
   _root_file = new TFile("misalignments.root", "RECREATE");
 /*
   _t0s2 = new TGraph();
@@ -160,10 +157,10 @@ bool MapCppTrackerMisalignments::death() {
                               (_x_shift_pdfs.at(3)->GetHistogram()->Clone("final_probability4"));
 
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((&_likelihood->GetLikelihoodOfData(2.0))->Clone("likelihood"));
+                     ((&_likelihood->GetLikelihood(2.0))->Clone("likelihood"));
 
-  TH2D *total_likelihood = reinterpret_cast<TH1D*>
-                           (_likelihood->GetHistogram()->Clone("total_likelihood"));
+  TH2D *joint = reinterpret_cast<TH2D*>
+                           (_likelihood->GetJoint()->Clone("joint"));
 
   _root_file->Write();
   _root_file->Close();
@@ -268,7 +265,7 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
               << old_mean << "; new residual: " << residuals.x() << std::endl;
     double suggested_new_shift = residuals.x() - old_mean;
     _x_shift_pdfs.at(station_index)->
-                  ComputeNewPosterior(_likelihood->GetLikelihoodOfData(suggested_new_shift));
+                  ComputeNewPosterior(_likelihood->GetLikelihood(suggested_new_shift));
     if ( _tracker == 1 && station_i == 3 ) {
       // double old_mean = _x_shift_pdfs.at(2)->GetMean();
       // double rms  = _x_shift_pdfs.at(2)->GetRMS();

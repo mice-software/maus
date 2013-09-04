@@ -25,9 +25,9 @@ Likelihood::Likelihood(std::string name,
                        double max) : _n_bins(n_bins),
                                      _min(min),
                                      _max(max),
-                                     _likelihood(NULL) {
+                                     _joint(NULL) {
   const char *c_name = name.c_str();
-  _likelihood = new TH2D(c_name, c_name, n_bins, min, max, n_bins, min, max);
+  _joint = new TH2D(c_name, c_name, n_bins, min, max, n_bins, min, max);
 }
 
 Likelihood::~Likelihood() {}
@@ -50,17 +50,17 @@ void Likelihood::Build(std::string model, double sigma, double number_of_tosses)
 
   for ( int param_bin = 0; param_bin < _n_bins; param_bin++ ) {
     for ( int toss = 0; toss < number_of_tosses; toss++ ) {
-      double param = _likelihood->GetXaxis()->GetBinCenter(param_bin);
+      double param = _joint->GetXaxis()->GetBinCenter(param_bin);
       double data_value = rand.Gaus(param, sigma);
-      _likelihood->Fill(param, data_value);
+      _joint->Fill(param, data_value);
     }
   }
 }
 
 // Returns P(Data|parameter)
-TH1D Likelihood::GetLikelihoodOfData(double data) {
+TH1D Likelihood::GetLikelihood(double data) {
   // This is the histogram to be returned.
-  TH1D likelihood_of_data("", "", _n_bins, _min, _max);
+  TH1D likelihood("", "", _n_bins, _min, _max);
   // The value observed (the data) corresponds to some
   // bin number in the Y axis of the TH2D.
   double data_bin = (data+_max)*(_n_bins/(_max-_min));
@@ -68,13 +68,13 @@ TH1D Likelihood::GetLikelihoodOfData(double data) {
   // in the paramenter axis (the x-axis) and fill our likelihood histogram.
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
     // The likelihood in a particular bin.
-    double l = _likelihood->GetBinContent(param_bin, data_bin);
+    double l = _joint->GetBinContent(param_bin, data_bin);
     // The parameter value the x-bin corresponds to.
-    double parameter_value = _likelihood->GetXaxis()->GetBinCenter(param_bin);
+    double parameter_value = _joint->GetXaxis()->GetBinCenter(param_bin);
     // And fill the histogram.
-    likelihood_of_data.Fill(parameter_value, l);
+    likelihood.Fill(parameter_value, l);
   }
-  return likelihood_of_data;
+  return likelihood;
 }
 
 } // ~namespace MAUS
