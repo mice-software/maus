@@ -99,7 +99,7 @@ class MapCppTrackerMisalignments {
   double mean_value_update(std::vector<double> list);
 
   MAUS::ThreeVector fit_removing_one_station(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
-                                       int station);
+                                             int station);
 
   /** Takes json data and returns a Sc
    *
@@ -125,10 +125,11 @@ class MapCppTrackerMisalignments {
   ///  JsonCpp setup
   Json::Reader reader;
 
+  /// This will store
   TFile *_root_file;
   // TTree *_tree;
 
-  // TMultiGraph *_tracker0_graphs;
+  TMultiGraph *_tracker0_graphs;
   TGraph *_t0s2;
   TGraph *_t0s3;
   TGraph *_t0s4;

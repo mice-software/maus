@@ -28,6 +28,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    _spill_cpp(NULL),
                                                                    _root_file(NULL),
                                                                    _iteraction(0),
+                                                                   _tracker0_graphs(NULL),
                                                                    _t0s2(NULL),
                                                                    _t0s3(NULL),
                                                                    _t0s4(NULL),
@@ -38,7 +39,9 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
                                                                    t1st3residual(NULL),
                                                                    _likelihood(NULL) {
   _root_file = new TFile("misalignments.root", "RECREATE");
-/*
+
+  // Tracker 0 Graphs -------------
+  _tracker0_graphs = new TMultiGraph("tracker0", "tracker0");
   _t0s2 = new TGraph();
   _t0s2->SetName("t0s2");
   _t0s2->SetLineColor(kBlue);
@@ -50,8 +53,8 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
   _t0s4 = new TGraph();
   _t0s4->SetName("t0s4");
   _t0s4->SetLineColor(kGreen);
-*/
-  // _tracker0_graphs = new TMultiGraph("tracker0","tracker0");
+
+  // Tracker 1 Graphs -------------
   _tracker1_graphs = new TMultiGraph("tracker1", "tracker1");
 
   _t1s2 = new TGraph();
@@ -96,7 +99,7 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
   _tree->Branch("y_res", &_y_residual, "y_res/D");
   _tree->Branch("iter", &_iteraction, "iter/I");
 */
-  std::string lname("likelihood_station3");
+  std::string lname("joint");
   std::string pname("prob_station3");
   double shift_min = -5.;
   double shift_max = 5.;
@@ -109,8 +112,7 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
 
   for ( int station_index = 0; station_index < 5; station_index++ ) {
     std::string pname("prob_station");
-    std::ostringstream number;   // stream used for the conversion
-    // insert the textual representation of 'Number' in the characters in the stream
+    std::ostringstream number;
     number << station_index+1;
     pname = pname + number.str();
     PDF *_probability = new PDF(pname, n_bins, shift_min, shift_max);
@@ -123,7 +125,6 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
     }
     // Json::Value *json = Globals::GetConfigurationCards();
     // _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
-
     return true;
   } catch(Squeal& squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
@@ -134,30 +135,27 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
 }
 
 bool MapCppTrackerMisalignments::death() {
-/*
   _tracker0_graphs->Add(_t0s2);
   _tracker0_graphs->Add(_t0s3);
   _tracker0_graphs->Add(_t0s4);
-*/
+
   _tracker1_graphs->Add(_t1s2);
   _tracker1_graphs->Add(_t1s3);
   _tracker1_graphs->Add(_t1s4);
 
   _root_file->cd();
-  // _tracker0_graphs->Write("", TObject::kOverwrite);
+  _tracker0_graphs->Write("", TObject::kOverwrite);
   _tracker1_graphs->Write("", TObject::kOverwrite);
-  // _t1s2->Write("t1s2");
-  // _t1s3->Write("t1s3");
-  // _t1s4->Write("t1s4");
+
   TH1D *final_probability2 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs.at(1)->GetHistogram()->Clone("final_probability2"));
+                              (_x_shift_pdfs.at(1)->GetHistogram()->Clone("pdf_st2"));
   TH1D *final_probability3 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs.at(2)->GetHistogram()->Clone("final_probability3"));
+                              (_x_shift_pdfs.at(2)->GetHistogram()->Clone("pdf_st3"));
   TH1D *final_probability4 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs.at(3)->GetHistogram()->Clone("final_probability4"));
+                              (_x_shift_pdfs.at(3)->GetHistogram()->Clone("pdf_st4"));
 
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((&_likelihood->GetLikelihood(2.0))->Clone("likelihood"));
+                     ((&_likelihood->GetLikelihood(1.2))->Clone("likelihood"));
 
   TH2D *joint = reinterpret_cast<TH2D*>
                            (_likelihood->GetJoint()->Clone("joint"));
@@ -177,9 +175,7 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
-    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
-        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Simple linear fit over spacepoints x,y.
         if ( event->spacepoints().size() == 5 ) {
@@ -187,7 +183,7 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
         }
       }
     } else {
-      std::cout << "No recon events found\n";
+      std::cerr << "No recon events found\n";
     }
     save_to_json(spill);
   } catch(Squeal& squee) {
@@ -255,42 +251,40 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
   _tracker = spacepoints.front()->get_tracker();
 
   for ( int station_i = 2; station_i < 5; station_i++ ) {
+    std::cerr << "Fitting removing station " << station_i << std::endl;
+
     ThreeVector residuals = fit_removing_one_station(spacepoints, station_i);
-    _history[_tracker][station_i-1].push_back(residuals.x());
-    double updated_value = mean_value_update(_history[_tracker][station_i-1]);
-    _x_shifts[_tracker][station_i-1] = updated_value;
+    std::cerr << "Residual found: " << residuals.x() << std::endl;
+
+    // _history[_tracker][station_i-1].push_back(residuals.x());
+    // double updated_value = mean_value_update(_history[_tracker][station_i-1]);
+    // _x_shifts[_tracker][station_i-1] = updated_value;
     int station_index = station_i-1;
     double old_mean = _x_shift_pdfs.at(station_index)->GetMean();
-    std::cerr << "Station " << station_i << ", old mean: "
-              << old_mean << "; new residual: " << residuals.x() << std::endl;
-    double suggested_new_shift = residuals.x() - old_mean;
+    double suggested_new_shift = old_mean + residuals.x();
     _x_shift_pdfs.at(station_index)->
                   ComputeNewPosterior(_likelihood->GetLikelihood(suggested_new_shift));
     if ( _tracker == 1 && station_i == 3 ) {
-      // double old_mean = _x_shift_pdfs.at(2)->GetMean();
-      // double rms  = _x_shift_pdfs.at(2)->GetRMS();
-      // std::cerr << old_mean << " " << rms << std::endl;
-      // _x_shift_pdfs.at(2)->ComputeNewPosterior(_likelihood->GetLikelihoodOfData(residuals.x()));
-
-      // myfile << residuals.x() << " " << updated_value << "\n";
       t1st3residual->Fill(residuals.x());
     }
+    std::cerr << "Station " << station_i << ", old mean: "
+              << old_mean << "; new residual: " << residuals.x() << "\n"
+              << "suggested_new_shift: " << suggested_new_shift << " , new mean: "
+              << _x_shift_pdfs.at(station_index)->GetMean() << std::endl;
   }
-
-  // posterior = prior * likelihood->Observation(_x_residual);
-  // prior = posterior;
-
-  // double new_x_estimate = posterior->mean_value();
 
   int n_points = _t1s3->GetN();
   std::cerr << "n_points: " << n_points << std::endl;
-  _t1s2->SetPoint(n_points, n_points, _x_shifts[_tracker][1]);
-  _t1s3->SetPoint(n_points, n_points, _x_shifts[_tracker][2]);
-  _t1s4->SetPoint(n_points, n_points, _x_shifts[_tracker][3]);
+  // _t1s2->SetPoint(n_points, n_points, _x_shifts[_tracker][1]);
+  // _t1s3->SetPoint(n_points, n_points, _x_shifts[_tracker][2]);
+  // _t1s4->SetPoint(n_points, n_points, _x_shifts[_tracker][3]);
+  _t1s2->SetPoint(n_points, n_points, _x_shift_pdfs.at(1)->GetMean());
+  _t1s3->SetPoint(n_points, n_points, _x_shift_pdfs.at(2)->GetMean());
+  _t1s4->SetPoint(n_points, n_points, _x_shift_pdfs.at(3)->GetMean());
 }
 
 ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray spacepoints,
-                                                                     int station) {
+                                                                 int station) {
   const Int_t nrVar  = 2;
   const Int_t nrPnts = 4;
   // Erase a station for the fit.
@@ -298,14 +292,8 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
   int station_array_index = station-1;
   SpacePointArray spacepoint_fit = spacepoints;
   std::vector<PDF*> x_shift_copy  = _x_shift_pdfs;
-  spacepoint_fit.erase(spacepoint_fit.begin()+station_array_index);
-  x_shift_copy.erase(x_shift_copy.begin()+station_array_index);
-
-  std::cerr << "Removed station " << station << std::endl;
-  std::cerr << x_shift_copy.at(0)->GetMean() << " "
-            << x_shift_copy.at(1)->GetMean() << " "
-            << x_shift_copy.at(2)->GetMean() << " "
-            << x_shift_copy.at(3)->GetMean() << std::endl;
+  spacepoint_fit.erase(spacepoint_fit.begin() + station_array_index);
+  x_shift_copy  .erase(x_shift_copy.begin()   + station_array_index);
 
   Double_t ax[] = {spacepoint_fit.at(0)->get_position().x() - x_shift_copy.at(0)->GetMean(),
                    spacepoint_fit.at(1)->get_position().x() - x_shift_copy.at(1)->GetMean(),
@@ -313,13 +301,13 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
                    spacepoint_fit.at(3)->get_position().x() - x_shift_copy.at(3)->GetMean()};
 
   Double_t ay[] = {spacepoint_fit.at(0)->get_position().y(),
-// -_y_shifts[_tracker][spacepoints.at(0)->get_station()-1],
+  // -_y_shifts[_tracker][spacepoints.at(0)->get_station()-1],
                    spacepoint_fit.at(1)->get_position().y(),
-// -_y_shifts[_tracker][spacepoints.at(1)->get_station()-1],
+  // -_y_shifts[_tracker][spacepoints.at(1)->get_station()-1],
                    spacepoint_fit.at(2)->get_position().y(),
-// -_y_shifts[_tracker][spacepoints.at(2)->get_station()-1],
+  // -_y_shifts[_tracker][spacepoints.at(2)->get_station()-1],
                    spacepoint_fit.at(3)->get_position().y()};
-// -_y_shifts[_tracker][spacepoints.at(3)->get_station()-1]};
+  // -_y_shifts[_tracker][spacepoints.at(3)->get_station()-1]};
 
   Double_t az[] = {spacepoint_fit.at(0)->get_position().z(),
                    spacepoint_fit.at(1)->get_position().z(),
@@ -350,18 +338,13 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
   // y = a + b z
 
   // Now that the fit is done, we can calculate the residual.
-  double spacepoint_z = spacepoints.at(station_array_index)->get_position().z();
-  double sp_x = spacepoints.at(station_array_index)->get_position().x();
-  double sp_y = spacepoints.at(station_array_index)->get_position().y();
+  ThreeVector position = spacepoints.at(station_array_index)->get_position();
 
-  double projected_x = param_xz[0] + param_xz[1] *
-                       spacepoints.at(station_array_index)->get_position().z();
+  double projected_x = param_xz[0] + param_xz[1] * position.z();
+  double projected_y = param_yz[0] + param_yz[1] * position.z();
 
-  double projected_y = param_yz[0] + param_yz[1] *
-                       spacepoints.at(station_array_index)->get_position().z();
-
-  double x_residual = projected_x - sp_x;
-  double y_residual = projected_y - sp_y;
+  double x_residual = projected_x - position.x();
+  double y_residual = projected_y - position.y();
 
   ThreeVector residuals(x_residual, y_residual, 0);
   return residuals;
@@ -383,19 +366,5 @@ double MapCppTrackerMisalignments::mean_value_update(std::vector<double> list) {
 
   return updated;
 }
-/*
-void MapCppTrackerMisalignments::kalman_fitter(SciFiEvent *evt) {
-  size_t number_scifitracks = evt->scifitracks().size();
-  // Read in misalignment estimates and their covariance.
-  KalmanMisalignmentWorker worker;
 
-  // Run Kalman Filter ignoring 1 station.
-  for ( int station = 1; station < 6; station++ ) {
-    worker.fit_without(station);
-  }
-
-  // Check chi2 of the new track.
-
-}
-*/
 } // ~namespace MAUS
