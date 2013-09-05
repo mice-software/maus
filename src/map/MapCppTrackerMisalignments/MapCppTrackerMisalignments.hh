@@ -94,12 +94,15 @@ class MapCppTrackerMisalignments {
    */
   std::string process(std::string document);
 
-  void simple_linear_fit(MAUS::SciFiEvent *evt);
+  void process(MAUS::SciFiEvent *evt);
 
   double mean_value_update(std::vector<double> list);
 
-  MAUS::ThreeVector fit_removing_one_station(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
-                                             int station);
+  void linear_fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
+                  double &x0,
+                  double &mx,
+                  double &y0,
+                  double &my);
 
   /** Takes json data and returns a Sc
    *
@@ -113,7 +116,7 @@ class MapCppTrackerMisalignments {
   void save_to_json(MAUS::Spill &spill);
 
  private:
-  typedef std::vector<SciFiSpacePoint*> SpacePointArray;
+  typedef std::vector<MAUS::SciFiSpacePoint*> SpacePointArray;
 
   /// This should be the classname
   std::string _classname;
@@ -139,6 +142,7 @@ class MapCppTrackerMisalignments {
   TGraph *_t1s4;
 
   TH1D *t1st3residual;
+
   int _tracker;
   int _station;
   double _x_residual;

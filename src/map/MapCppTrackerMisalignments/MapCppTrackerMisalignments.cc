@@ -69,7 +69,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() : _spill_json(NULL),
   _t1s4->SetName("t1s4");
   _t1s4->SetLineColor(kGreen);
 
-  t1st3residual = new TH1D("t1st3residual", "t1st3residual", 70, -9, 9);
+  t1st3residual = new TH1D("t1st3residual", "t1st3residual", 100, -10, 10);
 }
 
 MapCppTrackerMisalignments::~MapCppTrackerMisalignments() {
@@ -101,13 +101,13 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
 */
   std::string lname("joint");
   std::string pname("prob_station3");
-  double shift_min = -5.;
-  double shift_max = 5.;
-  int n_bins = 100;
+  double shift_min = -10.;
+  double shift_max = 10.;
+  int n_bins = 200;
 
   _likelihood = new Likelihood(lname, n_bins, shift_min, shift_max);
-  double sigma = 1.8; // mm
-  int number_of_tosses = 100000;
+  double sigma = 2.5; // mm
+  int number_of_tosses = 2000000;
   _likelihood->Build("gaussian", sigma, number_of_tosses);
 
   for ( int station_index = 0; station_index < 5; station_index++ ) {
@@ -179,7 +179,7 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Simple linear fit over spacepoints x,y.
         if ( event->spacepoints().size() == 5 ) {
-          simple_linear_fit(event);
+          process(event);
         }
       }
     } else {
@@ -235,7 +235,7 @@ void MapCppTrackerMisalignments::save_to_json(Spill &spill) {
     _spill_json = spill_proc.CppToJson(spill, "");
 }
 
-void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
+void MapCppTrackerMisalignments::process(SciFiEvent *evt) {
   // Check the quality of the track.
   size_t number_scifitracks = evt->scifitracks().size();
   double P_value = 0;
@@ -250,27 +250,45 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
   _iteraction++;
   _tracker = spacepoints.front()->get_tracker();
 
-  for ( int station_i = 2; station_i < 5; station_i++ ) {
-    std::cerr << "Fitting removing station " << station_i << std::endl;
+  double x0, mx, y0, my;
+  linear_fit(spacepoints, x0, mx, y0, my);
 
-    ThreeVector residuals = fit_removing_one_station(spacepoints, station_i);
-    std::cerr << "Residual found: " << residuals.x() << std::endl;
+  for ( int station_i = 2; station_i < 5; station_i++ ) {
+    int station_array_index = station_i-1;
+    // Now that the fit is done, we can calculate the residual.
+    ThreeVector position = spacepoints.at(station_array_index)->get_position();
+    double projected_x = x0 + mx * position.z();
+    double projected_y = y0 + my * position.z();
+
+    double x_residual = projected_x - position.x();
+    double y_residual = projected_y - position.y();
+
+    std::cerr << "Residual found: " << x_residual << ", " << y_residual << std::endl;
 
     // _history[_tracker][station_i-1].push_back(residuals.x());
     // double updated_value = mean_value_update(_history[_tracker][station_i-1]);
     // _x_shifts[_tracker][station_i-1] = updated_value;
-    int station_index = station_i-1;
-    double old_mean = _x_shift_pdfs.at(station_index)->GetMean();
-    double suggested_new_shift = old_mean + residuals.x();
-    _x_shift_pdfs.at(station_index)->
+    double old_mean = _x_shift_pdfs.at(station_array_index)->GetMean();
+    // double suggested_new_shift = old_mean + residuals.x();
+    double suggested_new_shift = old_mean+x_residual;
+    _x_shift_pdfs.at(station_array_index)->
                   ComputeNewPosterior(_likelihood->GetLikelihood(suggested_new_shift));
     if ( _tracker == 1 && station_i == 3 ) {
-      t1st3residual->Fill(residuals.x());
+      t1st3residual->Fill(x_residual);
+     std::string name("st3_iter_");
+     std::ostringstream number;
+     number << _iteraction;
+     name = name + number.str();
+     const char *c_name = name.c_str();
+      TH1D *probability3 = reinterpret_cast<TH1D*>
+                              (_x_shift_pdfs.at(2)->GetHistogram()->Clone(c_name));
+      _root_file->cd();
+      probability3->Write();
     }
     std::cerr << "Station " << station_i << ", old mean: "
-              << old_mean << "; new residual: " << residuals.x() << "\n"
+              << old_mean << "; new residual: " << x_residual << "\n"
               << "suggested_new_shift: " << suggested_new_shift << " , new mean: "
-              << _x_shift_pdfs.at(station_index)->GetMean() << std::endl;
+              << _x_shift_pdfs.at(station_array_index)->GetMean() << std::endl;
   }
 
   int n_points = _t1s3->GetN();
@@ -283,22 +301,26 @@ void MapCppTrackerMisalignments::simple_linear_fit(SciFiEvent *evt) {
   _t1s4->SetPoint(n_points, n_points, _x_shift_pdfs.at(3)->GetMean());
 }
 
-ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray spacepoints,
-                                                                 int station) {
+void MapCppTrackerMisalignments::linear_fit(SpacePointArray spacepoints,
+                                            double &x0,
+                                            double &mx,
+                                            double &y0,
+                                            double &my) {
   const Int_t nrVar  = 2;
-  const Int_t nrPnts = 4;
+  const Int_t nrPnts = 5;
   // Erase a station for the fit.
   // We copy the spacepoints vector and delete the selected station.
-  int station_array_index = station-1;
+  // int station_array_index = station-1;
   SpacePointArray spacepoint_fit = spacepoints;
   std::vector<PDF*> x_shift_copy  = _x_shift_pdfs;
-  spacepoint_fit.erase(spacepoint_fit.begin() + station_array_index);
-  x_shift_copy  .erase(x_shift_copy.begin()   + station_array_index);
+  // spacepoint_fit.erase(spacepoint_fit.begin() + station_array_index);
+  // x_shift_copy  .erase(x_shift_copy.begin()   + station_array_index);
 
-  Double_t ax[] = {spacepoint_fit.at(0)->get_position().x() - x_shift_copy.at(0)->GetMean(),
+  Double_t ax[] = {spacepoint_fit.at(0)->get_position().x(),
                    spacepoint_fit.at(1)->get_position().x() - x_shift_copy.at(1)->GetMean(),
                    spacepoint_fit.at(2)->get_position().x() - x_shift_copy.at(2)->GetMean(),
-                   spacepoint_fit.at(3)->get_position().x() - x_shift_copy.at(3)->GetMean()};
+                   spacepoint_fit.at(3)->get_position().x() - x_shift_copy.at(3)->GetMean(),
+                   spacepoint_fit.at(4)->get_position().x() };
 
   Double_t ay[] = {spacepoint_fit.at(0)->get_position().y(),
   // -_y_shifts[_tracker][spacepoints.at(0)->get_station()-1],
@@ -306,15 +328,17 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
   // -_y_shifts[_tracker][spacepoints.at(1)->get_station()-1],
                    spacepoint_fit.at(2)->get_position().y(),
   // -_y_shifts[_tracker][spacepoints.at(2)->get_station()-1],
-                   spacepoint_fit.at(3)->get_position().y()};
+                   spacepoint_fit.at(3)->get_position().y(),
   // -_y_shifts[_tracker][spacepoints.at(3)->get_station()-1]};
+                   spacepoint_fit.at(4)->get_position().y()};
 
   Double_t az[] = {spacepoint_fit.at(0)->get_position().z(),
                    spacepoint_fit.at(1)->get_position().z(),
                    spacepoint_fit.at(2)->get_position().z(),
-                   spacepoint_fit.at(3)->get_position().z()};
+                   spacepoint_fit.at(3)->get_position().z(),
+                   spacepoint_fit.at(4)->get_position().z()};
 
-  Double_t ae[] = {1., 1., 1., 1.};
+  Double_t ae[] = {1., 1., 1., 1., 1.};
 
   TVectorD x;
   x.Use(nrPnts, ax);
@@ -337,17 +361,11 @@ ThreeVector MapCppTrackerMisalignments::fit_removing_one_station(SpacePointArray
   const TVectorD param_yz = NormalEqn(Ayz, y, e);
   // y = a + b z
 
-  // Now that the fit is done, we can calculate the residual.
-  ThreeVector position = spacepoints.at(station_array_index)->get_position();
+  x0 = param_xz[0];
+  mx = param_xz[1];
 
-  double projected_x = param_xz[0] + param_xz[1] * position.z();
-  double projected_y = param_yz[0] + param_yz[1] * position.z();
-
-  double x_residual = projected_x - position.x();
-  double y_residual = projected_y - position.y();
-
-  ThreeVector residuals(x_residual, y_residual, 0);
-  return residuals;
+  y0 = param_yz[0];
+  my = param_yz[1];
 }
 
 double MapCppTrackerMisalignments::mean_value_update(std::vector<double> list) {
