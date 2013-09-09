@@ -15,24 +15,25 @@
  *
  */
 
-#include "src/common_cpp/Recon/Bayes/Likelihood.hh"
+#include "src/common_cpp/Recon/Bayes/JointPDF.hh"
 
 namespace MAUS {
 
-Likelihood::Likelihood(std::string name,
-                       double n_bins,
+JointPDF::JointPDF(std::string name,
+                       double bin_width,
                        double min,
-                       double max) : _n_bins(n_bins),
+                       double max) : _bin_width(bin_width),
                                      _min(min),
                                      _max(max),
                                      _joint(NULL) {
   const char *c_name = name.c_str();
-  _joint = new TH2D(c_name, c_name, n_bins, min, max, n_bins, min, max);
+  _n_bins = static_cast<int> ((max-min)/_bin_width);
+  _joint = new TH2D(c_name, c_name, _n_bins, min, max, _n_bins, min, max);
 }
 
-Likelihood::~Likelihood() {}
+JointPDF::~JointPDF() {}
 
-Likelihood& Likelihood::operator=(const Likelihood &rhs) {
+JointPDF& JointPDF::operator=(const JointPDF &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
@@ -40,15 +41,15 @@ Likelihood& Likelihood::operator=(const Likelihood &rhs) {
   return *this;
 }
 
-Likelihood::Likelihood(const Likelihood &pdf) {}
+JointPDF::JointPDF(const JointPDF &pdf) {}
 
-void Likelihood::Build(std::string model, double sigma, double number_of_tosses) {
+void JointPDF::Build(std::string model, double sigma, double number_of_tosses) {
   if ( model != "gaussian" ) {
     std::cerr << "Model not implemented. Aborting" << std::endl;
   }
   TRandom rand;
 
-  for ( int param_bin = 0; param_bin < _n_bins; param_bin++ ) {
+  for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
     for ( int toss = 0; toss < number_of_tosses; toss++ ) {
       double param = _joint->GetXaxis()->GetBinCenter(param_bin);
       double data_value = rand.Gaus(param, sigma);
@@ -58,21 +59,21 @@ void Likelihood::Build(std::string model, double sigma, double number_of_tosses)
 }
 
 // Returns P(Data|parameter)
-TH1D Likelihood::GetLikelihood(double data) {
+TH1D JointPDF::GetLikelihood(double data) {
   // This is the histogram to be returned.
   TH1D likelihood("", "", _n_bins, _min, _max);
   // The value observed (the data) corresponds to some
   // bin number in the Y axis of the TH2D.
   double data_bin = (data+_max)*(_n_bins/(_max-_min));
   // Now, for this Y-bin, we are going to swipe all possible values
-  // in the paramenter axis (the x-axis) and fill our likelihood histogram.
+  // in the paramenter axis (the x-axis) and fill our JointPDF histogram.
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
-    // The likelihood in a particular bin.
-    double l = _joint->GetBinContent(param_bin, data_bin);
+    // The probability in a particular bin.
+    double p = _joint->GetBinContent(param_bin, data_bin);
     // The parameter value the x-bin corresponds to.
     double parameter_value = _joint->GetXaxis()->GetBinCenter(param_bin);
     // And fill the histogram.
-    likelihood.Fill(parameter_value, l);
+    likelihood.Fill(parameter_value, p);
   }
   return likelihood;
 }

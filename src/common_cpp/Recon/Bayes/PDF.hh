@@ -62,6 +62,8 @@ class PDF {
   TH1D *_probability;
 
   int _n_bins;
+
+  double _bin_width;
 };
 
 } // ~namespace MAUS

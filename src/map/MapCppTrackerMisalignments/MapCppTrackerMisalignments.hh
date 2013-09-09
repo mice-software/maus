@@ -59,7 +59,7 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 #include "src/common_cpp/Recon/Bayes/PDF.hh"
-#include "src/common_cpp/Recon/Bayes/Likelihood.hh"
+#include "src/common_cpp/Recon/Bayes/JointPDF.hh"
 
 namespace MAUS {
 
@@ -95,8 +95,6 @@ class MapCppTrackerMisalignments {
   std::string process(std::string document);
 
   void process(MAUS::SciFiEvent *evt);
-
-  double mean_value_update(std::vector<double> list);
 
   void linear_fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
                   double &x0,
@@ -141,7 +139,9 @@ class MapCppTrackerMisalignments {
   TGraph *_t1s3;
   TGraph *_t1s4;
 
+  TH1D *t1st2residual;
   TH1D *t1st3residual;
+  TH1D *t1st4residual;
 
   int _tracker;
   int _station;
@@ -151,7 +151,7 @@ class MapCppTrackerMisalignments {
 
   std::vector<double> _history[2][5];
 
-  Likelihood *_likelihood;
+  JointPDF *_jointPDF;
   // PDF *_probability;
   std::vector<PDF*> _x_shift_pdfs;
 

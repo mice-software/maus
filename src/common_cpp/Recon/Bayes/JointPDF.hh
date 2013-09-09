@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef Likelihood_HH
-#define Likelihood_HH
+#ifndef JointPDF_HH
+#define JointPDF_HH
 
 // C headers
 #include <assert.h>
@@ -37,33 +37,35 @@
 
 namespace MAUS {
 
-/** @class Likelihood
+/** @class JointPDF
  *
  *  @brief A Probability Distribution Function.
  *
  */
-class Likelihood {
+class JointPDF {
  public:
-  Likelihood();
+  JointPDF();
 
-  Likelihood(std::string name, double n_bins, double bin_min, double bin_max);
+  JointPDF(std::string name, double bin_width, double bin_min, double bin_max);
 
-  ~Likelihood();
+  ~JointPDF();
 
-  Likelihood(const Likelihood &site);
+  JointPDF(const JointPDF &site);
 
-  Likelihood& operator=(const Likelihood& pdf);
+  JointPDF& operator=(const JointPDF& pdf);
 
   void Build(std::string model, double sigma, double number_of_tosses);
 
   TH1D GetLikelihood(double param);
 
-  TH2D* GetJoint() const { return _joint; }
+  TH2D* GetJointPDF() const { return _joint; }
 
  private:
   TH2D *_joint;
 
   int _n_bins;
+
+  double _bin_width;
 
   double _min;
 

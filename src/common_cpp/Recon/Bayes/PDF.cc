@@ -21,11 +21,13 @@ namespace MAUS {
 PDF::PDF() {}
 
 PDF::PDF(std::string name,
-         double bins,
+         double bin_width,
          double min,
-         double max) : _n_bins(bins), _probability(NULL) {
+         double max) : _bin_width(bin_width), _probability(NULL) {
   const char *c_name = name.c_str();
-  _probability = new TH1D(c_name, c_name, bins, min, max);
+  _n_bins = static_cast<int> ((max-min)/_bin_width);
+
+  _probability = new TH1D(c_name, c_name, _n_bins, min, max);
 
   for ( int bin = 1; bin <= _n_bins; bin++ ) {
     double bin_centre = _probability->GetXaxis()->GetBinCenter(bin);
