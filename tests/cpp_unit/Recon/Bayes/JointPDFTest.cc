@@ -32,7 +32,7 @@ class JointPDFTest : public ::testing::Test {
     std::string pname("prob_station3");
     double shift_min = -10.;
     double shift_max = 10.;
-    double bin_width = 0.2;
+    double bin_width = 0.1;
     _JointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
     double sigma = 1.5; // mm
     int number_of_tosses = 1000000;
@@ -40,11 +40,11 @@ class JointPDFTest : public ::testing::Test {
   }
   virtual void TearDown() {}
   JointPDF *_JointPDF;
-  static const double err = 0.001;
+  static const double err = 0.005;
 };
 
 TEST_F(JointPDFTest, test_mean) {
-  double expected_mean = 1.2;
+  double expected_mean = 0;
   TH1D *likelihood = reinterpret_cast<TH1D*>
                      ((&_JointPDF->GetLikelihood(expected_mean))->Clone("JointPDF"));
 

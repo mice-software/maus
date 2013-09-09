@@ -27,7 +27,7 @@ PDF::PDF(std::string name,
   const char *c_name = name.c_str();
   _n_bins = static_cast<int> ((max-min)/_bin_width);
 
-  _probability = new TH1D(c_name, c_name, _n_bins, min, max);
+  _probability = new TH1D(c_name, c_name, _n_bins, min-bin_width/2., max-bin_width/2.);
 
   for ( int bin = 1; bin <= _n_bins; bin++ ) {
     double bin_centre = _probability->GetXaxis()->GetBinCenter(bin);
