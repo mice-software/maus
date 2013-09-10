@@ -46,7 +46,7 @@ class JointPDFTest : public ::testing::Test {
 TEST_F(JointPDFTest, test_mean) {
   double expected_mean = 0;
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((&_JointPDF->GetLikelihood(expected_mean))->Clone("JointPDF"));
+                     ((_JointPDF->GetLikelihood(expected_mean)).Clone("JointPDF"));
 
   double mean = likelihood->GetMean();
   EXPECT_NEAR(expected_mean, mean, err);
