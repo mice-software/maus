@@ -67,7 +67,6 @@ TH1D JointPDF::GetLikelihood(double data) {
   // The value observed (the data) corresponds to some
   // bin number in the Y axis of the TH2D.
   int data_bin = (data+_max)*(_n_bins/(_max-_min));
-  std::cerr << "data_bin " << data_bin << std::endl;
   // Now, for this Y-bin, we are going to swipe all possible values
   // in the paramenter axis (the x-axis) and fill our JointPDF histogram.
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {

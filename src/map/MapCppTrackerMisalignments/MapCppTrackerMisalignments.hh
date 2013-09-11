@@ -128,16 +128,21 @@ class MapCppTrackerMisalignments {
 
   /// This will store
   TFile *_root_file;
-  // TTree *_tree;
 
   TMultiGraph *_tracker0_graphs;
-  TGraph *_t0s2;
-  TGraph *_t0s3;
-  TGraph *_t0s4;
+  TGraph *_t0s2_x;
+  TGraph *_t0s3_x;
+  TGraph *_t0s4_x;
+  TGraph *_t0s2_y;
+  TGraph *_t0s3_y;
+  TGraph *_t0s4_y;
   TMultiGraph *_tracker1_graphs;
-  TGraph *_t1s2;
-  TGraph *_t1s3;
-  TGraph *_t1s4;
+  TGraph *_t1s2_x;
+  TGraph *_t1s3_x;
+  TGraph *_t1s4_x;
+  TGraph *_t1s2_y;
+  TGraph *_t1s3_y;
+  TGraph *_t1s4_y;
 
   TH1D *t1st2residual;
   TH1D *t1st3residual;
@@ -149,14 +154,17 @@ class MapCppTrackerMisalignments {
   double _y_residual;
   int _iteraction;
 
-  std::vector<double> _history[2][5];
+  //std::vector<double> _history[2][5];
 
   JointPDF *_jointPDF;
   // PDF *_probability;
-  std::vector<PDF*> _x_shift_pdfs;
+  //std::vector<PDF*> _x_shift_pdfs;
+  //std::vector<PDF*> _y_shift_pdfs;
+  PDF* _x_shift_pdfs[2][6];
+  PDF* _y_shift_pdfs[2][6];
 
-  double _x_shifts[2][5];
-  double _y_shifts[2][5];
+  //double _x_shifts[2][5];
+  //double _y_shifts[2][5];
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

@@ -33,23 +33,27 @@ class JointPDFTest : public ::testing::Test {
     double shift_min = -10.;
     double shift_max = 10.;
     double bin_width = 0.1;
-    _JointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
+    _jointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
     double sigma = 1.5; // mm
     int number_of_tosses = 1000000;
-    _JointPDF->Build("gaussian", sigma, number_of_tosses);
+    _jointPDF->Build("gaussian", sigma, number_of_tosses);
   }
-  virtual void TearDown() {}
-  JointPDF *_JointPDF;
+  virtual void TearDown() {
+    delete _jointPDF;
+  }
+  JointPDF *_jointPDF;
   static const double err = 0.005;
 };
 
 TEST_F(JointPDFTest, test_mean) {
   double expected_mean = 0;
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((&_JointPDF->GetLikelihood(expected_mean))->Clone("JointPDF"));
+                     ((&_jointPDF->GetLikelihood(expected_mean))->Clone("JointPDF"));
 
   double mean = likelihood->GetMean();
   EXPECT_NEAR(expected_mean, mean, err);
+
+
 }
 
 } // ~namespace MAUS
