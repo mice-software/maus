@@ -132,7 +132,7 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
   double bin_width = 0.02;
 
   _jointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
-  double sigma = 2.0; // mm
+  double sigma = 1.8; // mm
   int number_of_tosses = 20000000;
   _jointPDF->Build("gaussian", sigma, number_of_tosses);
 
@@ -188,18 +188,18 @@ bool MapCppTrackerMisalignments::death() {
   _tracker1_graphs->Write("", TObject::kOverwrite);
 
   TH1D *final_probability2 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][2]->GetHistogram()->Clone("x_st2"));
+                              (_x_shift_pdfs[1][2]->probability()->Clone("x_st2"));
   TH1D *final_probability3 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][3]->GetHistogram()->Clone("x_st3"));
+                              (_x_shift_pdfs[1][3]->probability()->Clone("x_st3"));
   TH1D *final_probability4 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][4]->GetHistogram()->Clone("x_st4"));
+                              (_x_shift_pdfs[1][4]->probability()->Clone("x_st4"));
 
   TH1D *final_probability2y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][2]->GetHistogram()->Clone("y_st2"));
+                              (_y_shift_pdfs[1][2]->probability()->Clone("y_st2"));
   TH1D *final_probability3y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][3]->GetHistogram()->Clone("y_st3"));
+                              (_y_shift_pdfs[1][3]->probability()->Clone("y_st3"));
   TH1D *final_probability4y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][4]->GetHistogram()->Clone("y_st4"));
+                              (_y_shift_pdfs[1][4]->probability()->Clone("y_st4"));
 
   TH1D *likelihood = reinterpret_cast<TH1D*>
                      (_jointPDF->GetLikelihood(1.2).Clone("likelihood"));
@@ -319,7 +319,7 @@ void MapCppTrackerMisalignments::process(SciFiEvent *evt) {
       name = name + number.str();
       const char *c_name = name.c_str();
       TH1D *probability3 = reinterpret_cast<TH1D*>
-                             (_x_shift_pdfs[tracker][station]->GetHistogram()->Clone(c_name));
+                             (_x_shift_pdfs[tracker][station]->probability()->Clone(c_name));
       _root_file->cd();
       probability3->Write();
     } else if ( station == 2 ) {

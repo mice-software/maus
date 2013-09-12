@@ -51,34 +51,22 @@ class PDF {
 
   void ComputeNewPosterior(TH1D likelihood);
 
-  TH1D* GetHistogram() const { return _probability; }
-
   double GetMean()     const { return _probability->GetMean(); }
 
-  double GetRMS()      const { return _probability->GetRMS(); }
+  double GetRMS()      const { return _probability->GetRMS();  }
 
-  int GetNBins()       const { return _n_bins; }
-/*
-  std::string Name() const { return _name; }
+  TH1D *probability()  const { return _probability; }
 
-  int NBins()        const { return _n_bins; }
+  std::string name()   const { return _name;        }
 
-  double BinWidth()  const { return _bin_width; }
+  int n_bins()         const { return _n_bins;      }
 
-  double Min()       const { return _min; }
+  double bin_width()   const { return _bin_width;   }
 
-  double Max()       const { return _max; }
+  double min()         const { return _min;         }
 
-  SetName;
+  double max()         const { return _max;         }
 
-  SetNBins;
-
-  SetBinWidth;
-
-  SetMin;
-
-  SetMax();
-*/
  private:
   TH1D *_probability;
 
