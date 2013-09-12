@@ -73,7 +73,7 @@ TEST_F(JointPDFTest, test_binning) {
 TEST_F(JointPDFTest, test_mean) {
   double expected_mean = 0;
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     (_jointPDF->GetLikelihood(expected_mean).Clone("likelihood"));
+                     ((_JointPDF->GetLikelihood(expected_mean)).Clone("JointPDF"));
   double mean = likelihood->GetMean();
   EXPECT_NEAR(expected_mean, mean, err);
 }

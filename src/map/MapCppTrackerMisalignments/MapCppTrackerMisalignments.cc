@@ -202,7 +202,7 @@ bool MapCppTrackerMisalignments::death() {
                               (_y_shift_pdfs[1][4]->probability()->Clone("y_st4"));
 
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     (_jointPDF->GetLikelihood(1.2).Clone("likelihood"));
+                     ((_jointPDF->GetLikelihood(1.2)).Clone("likelihood"));
 
   TH2D *joint = reinterpret_cast<TH2D*>
                            (_jointPDF->GetJointPDF()->Clone("joint"));
