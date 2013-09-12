@@ -137,6 +137,12 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["momentum"]["x"].asDouble(), point->GetMomentum().x());
   EXPECT_DOUBLE_EQ(out["momentum"]["y"].asDouble(), point->GetMomentum().y());
   EXPECT_DOUBLE_EQ(out["momentum"]["z"].asDouble(), point->GetMomentum().z());
+  EXPECT_DOUBLE_EQ(out["b_field"]["x"].asDouble(), 0.);
+  EXPECT_DOUBLE_EQ(out["b_field"]["y"].asDouble(), 0.);
+  EXPECT_DOUBLE_EQ(out["b_field"]["z"].asDouble(), 0.);
+  EXPECT_DOUBLE_EQ(out["e_field"]["x"].asDouble(), 0.);
+  EXPECT_DOUBLE_EQ(out["e_field"]["y"].asDouble(), 0.);
+  EXPECT_DOUBLE_EQ(out["e_field"]["z"].asDouble(), 0.);
   EXPECT_DOUBLE_EQ(out["energy_deposited"].asDouble(), 8.);
   EXPECT_DOUBLE_EQ(out["energy"].asDouble(), point->GetTotalEnergy());
   EXPECT_DOUBLE_EQ(out["time"].asDouble(), point->GetGlobalTime());
