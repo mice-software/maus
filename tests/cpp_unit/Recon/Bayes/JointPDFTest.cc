@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include "src/common_cpp/Recon/Bayes/JointPDF.hh"
+#include "src/common_cpp/Recon/Bayes/PDF.hh"
 
 #include "gtest/gtest.h"
 
@@ -35,7 +36,7 @@ class JointPDFTest : public ::testing::Test {
     _bin_width = 0.1;
     _jointPDF = new JointPDF(lname, _bin_width, _shift_min, _shift_max);
     double sigma = 1.5; // mm
-    int number_of_tosses = 1000000;
+    int number_of_tosses = 100000;
     _jointPDF->Build("gaussian", sigma, number_of_tosses);
   }
   virtual void TearDown() {
@@ -57,7 +58,7 @@ TEST_F(JointPDFTest, test_binning) {
   // Must assert that bin 0 and bin nbins have their centres
   // falling on the extremes we defined for our PDF.
   // Must also check that the middle bin corresponds to 0.
-  int n_bins = _jointPDF->GetNBins();
+  int n_bins = _jointPDF->n_bins();
   // centre of bin 1
   double bin_1_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(1);
   EXPECT_EQ(_shift_min, bin_1_centre);
@@ -75,6 +76,25 @@ TEST_F(JointPDFTest, test_mean) {
                      (_jointPDF->GetLikelihood(expected_mean).Clone("likelihood"));
   double mean = likelihood->GetMean();
   EXPECT_NEAR(expected_mean, mean, err);
+}
+
+TEST_F(JointPDFTest, test_posterior) {
+  // Assert the prior is flat.
+  EXPECT_NEAR(0., _pdf->GetMean(), err);
+
+  // Build a posterior.
+  double new_shift = 1.2;
+  TH1D *likelihood = reinterpret_cast<TH1D*>
+                     (_jointPDF->GetLikelihood(new_shift).Clone("likelihood"));
+  EXPECT_NEAR(new_shift, likelihood->GetMean(), err);
+
+  std::string pname("prob_station");
+  PDF *_pdf = new PDF(pname, _bin_width, _shift_min, _shift_max);
+  _pdf->ComputeNewPosterior(*likelihood);
+  // Check if the posterior is correct.
+  EXPECT_NEAR(new_shift, _pdf->GetMean(), err);
+
+  delete _jointPDF;
 }
 
 } // ~namespace MAUS

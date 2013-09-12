@@ -133,7 +133,7 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
 
   _jointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
   double sigma = 1.8; // mm
-  int number_of_tosses = 20000000;
+  int number_of_tosses = 200000000;
   _jointPDF->Build("gaussian", sigma, number_of_tosses);
 
   for ( int tracker = 0; tracker < 2; tracker++ ) {
