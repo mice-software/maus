@@ -68,8 +68,8 @@ void SciFiGeometryHelper::Build() {
       SciFiPlaneGeometry this_plane;
       this_plane.Direction     = direction;
       // TO BE REMOVED. Ed
-      // tracker_ref_frame_pos.setX(0);
-      // tracker_ref_frame_pos.setY(0);
+      tracker_ref_frame_pos.setX(0);
+      tracker_ref_frame_pos.setY(0);
       this_plane.Position      = tracker_ref_frame_pos;
       this_plane.CentralFibre  = centralfibre;
       this_plane.Pitch         = pitch;

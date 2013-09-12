@@ -73,15 +73,12 @@ TEST_F(JointPDFTest, test_binning) {
 TEST_F(JointPDFTest, test_mean) {
   double expected_mean = 0;
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((_JointPDF->GetLikelihood(expected_mean)).Clone("JointPDF"));
+                     ((_jointPDF->GetLikelihood(expected_mean)).Clone("JointPDF"));
   double mean = likelihood->GetMean();
   EXPECT_NEAR(expected_mean, mean, err);
 }
 
 TEST_F(JointPDFTest, test_posterior) {
-  // Assert the prior is flat.
-  EXPECT_NEAR(0., _pdf->GetMean(), err);
-
   // Build a posterior.
   double new_shift = 1.2;
   TH1D *likelihood = reinterpret_cast<TH1D*>
@@ -89,12 +86,14 @@ TEST_F(JointPDFTest, test_posterior) {
   EXPECT_NEAR(new_shift, likelihood->GetMean(), err);
 
   std::string pname("prob_station");
-  PDF *_pdf = new PDF(pname, _bin_width, _shift_min, _shift_max);
-  _pdf->ComputeNewPosterior(*likelihood);
+  PDF *pdf = new PDF(pname, _bin_width, _shift_min, _shift_max);
+  // Assert the prior is flat.
+  EXPECT_NEAR(0., pdf->GetMean(), err);
+  pdf->ComputeNewPosterior(*likelihood);
   // Check if the posterior is correct.
-  EXPECT_NEAR(new_shift, _pdf->GetMean(), err);
+  EXPECT_NEAR(new_shift, pdf->GetMean(), err);
 
-  delete _jointPDF;
+  delete pdf;
 }
 
 } // ~namespace MAUS
