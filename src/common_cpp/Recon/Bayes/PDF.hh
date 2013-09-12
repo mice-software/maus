@@ -29,8 +29,6 @@
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
-//#include "src/common_cpp/DataStructure/SciFiCluster.hh"
-//#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
@@ -55,10 +53,32 @@ class PDF {
 
   TH1D* GetHistogram() const { return _probability; }
 
-  double GetMean() const { return _probability->GetMean(); }
+  double GetMean()     const { return _probability->GetMean(); }
 
-  double GetRMS()  const { return _probability->GetRMS(); }
+  double GetRMS()      const { return _probability->GetRMS(); }
 
+  int GetNBins()       const { return _n_bins; }
+/*
+  std::string Name() const { return _name; }
+
+  int NBins()        const { return _n_bins; }
+
+  double BinWidth()  const { return _bin_width; }
+
+  double Min()       const { return _min; }
+
+  double Max()       const { return _max; }
+
+  SetName;
+
+  SetNBins;
+
+  SetBinWidth;
+
+  SetMin;
+
+  SetMax();
+*/
  private:
   TH1D *_probability;
 

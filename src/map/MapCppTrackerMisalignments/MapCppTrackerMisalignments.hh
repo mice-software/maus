@@ -148,23 +148,12 @@ class MapCppTrackerMisalignments {
   TH1D *t1st3residual;
   TH1D *t1st4residual;
 
-  int _tracker;
-  int _station;
-  double _x_residual;
-  double _y_residual;
   int _iteraction;
 
-  //std::vector<double> _history[2][5];
-
   JointPDF *_jointPDF;
-  // PDF *_probability;
-  //std::vector<PDF*> _x_shift_pdfs;
-  //std::vector<PDF*> _y_shift_pdfs;
+
   PDF* _x_shift_pdfs[2][6];
   PDF* _y_shift_pdfs[2][6];
-
-  //double _x_shifts[2][5];
-  //double _y_shifts[2][5];
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

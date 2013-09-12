@@ -24,8 +24,8 @@ bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
   return ( a->get_station() < b->get_station() );
 }
 
-MapCppTrackerMisalignments::MapCppTrackerMisalignments() :
-                            _spill_json(NULL),
+MapCppTrackerMisalignments::MapCppTrackerMisalignments()
+                           :_spill_json(NULL),
                             _classname("MapCppTrackerMisalignments"),
                             _spill_cpp(NULL),
                             _root_file(NULL),
@@ -53,45 +53,62 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments() :
   _tracker0_graphs = new TMultiGraph("tracker0", "tracker0");
   _t0s2_x = new TGraph();
   _t0s2_x->SetName("t0s2_x");
+  _t0s2_x->SetTitle("tracker 0, station 2, #Delta x");
   _t0s2_x->SetLineColor(kBlue);
   _t0s3_x = new TGraph();
   _t0s3_x->SetName("t0s3_x");
+  _t0s3_x->SetTitle("tracker 0, station 3, #Delta x");
   _t0s3_x->SetLineColor(kRed);
   _t0s4_x = new TGraph();
   _t0s4_x->SetName("t0s4_x");
+  _t0s4_x->SetTitle("tracker 0, station 4, #Delta x");
   _t0s4_x->SetLineColor(kGreen);
 
   _t0s2_y = new TGraph();
   _t0s2_y->SetName("t0s2_y");
+  _t0s2_y->SetTitle("tracker 0, station 2, #Delta y");
   _t0s2_y->SetLineColor(kBlue);
+  _t0s2_y->SetLineStyle(2);
   _t0s3_y = new TGraph();
   _t0s3_y->SetName("t0s3_y");
+  _t0s3_y->SetTitle("tracker 0, station 3, #Delta y");
   _t0s3_y->SetLineColor(kRed);
+  _t0s3_y->SetLineStyle(2);
   _t0s4_y = new TGraph();
   _t0s4_y->SetName("t0s4_y");
+  _t0s4_y->SetTitle("tracker 0, station 4, #Delta y");
   _t0s4_y->SetLineColor(kGreen);
+  _t0s4_y->SetLineStyle(2);
   // Tracker 1 Graphs -------------
   _tracker1_graphs = new TMultiGraph("tracker1", "tracker1");
-
   _t1s2_x = new TGraph();
   _t1s2_x->SetName("t1s2_x");
+  _t1s2_x->SetTitle("tracker 1, station 2, #Delta x");
   _t1s2_x->SetLineColor(kBlue);
   _t1s3_x = new TGraph();
   _t1s3_x->SetName("t1s3_x");
+  _t1s3_x->SetTitle("tracker 1, station 3, #Delta x");
   _t1s3_x->SetLineColor(kRed);
   _t1s4_x = new TGraph();
   _t1s4_x->SetName("t1s4_x");
+  _t1s4_x->SetTitle("tracker 1, station 4, #Delta x");
   _t1s4_x->SetLineColor(kGreen);
 
   _t1s2_y = new TGraph();
   _t1s2_y->SetName("t1s2_y");
+  _t1s2_y->SetTitle("tracker 1, station 2, #Delta y");
   _t1s2_y->SetLineColor(kBlue);
+  _t1s2_y->SetLineStyle(2);
   _t1s3_y = new TGraph();
   _t1s3_y->SetName("t1s3_y");
+  _t1s3_y->SetTitle("tracker 1, station 3, #Delta y");
   _t1s3_y->SetLineColor(kRed);
+  _t1s3_y->SetLineStyle(2);
   _t1s4_y = new TGraph();
   _t1s4_y->SetName("t1s4_y");
+  _t1s4_y->SetTitle("tracker 1, station 4, #Delta y");
   _t1s4_y->SetLineColor(kGreen);
+  _t1s4_y->SetLineStyle(2);
 
   t1st2residual = new TH1D("t1st2residual", "t1st2residual", 100, -10, 10);
   t1st3residual = new TH1D("t1st3residual", "t1st3residual", 100, -10, 10);
@@ -110,13 +127,13 @@ MapCppTrackerMisalignments::~MapCppTrackerMisalignments() {
 bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
   std::string lname("joint");
   std::string pname("prob_station3");
-  double shift_min = -10.;
-  double shift_max = 10.;
-  double bin_width = 0.1;
+  double shift_min = -8.;
+  double shift_max = 8.;
+  double bin_width = 0.02;
 
   _jointPDF = new JointPDF(lname, bin_width, shift_min, shift_max);
-  double sigma = 2.5; // mm
-  int number_of_tosses = 2000000;
+  double sigma = 2.0; // mm
+  int number_of_tosses = 20000000;
   _jointPDF->Build("gaussian", sigma, number_of_tosses);
 
   for ( int tracker = 0; tracker < 2; tracker++ ) {
@@ -185,7 +202,7 @@ bool MapCppTrackerMisalignments::death() {
                               (_y_shift_pdfs[1][4]->GetHistogram()->Clone("y_st4"));
 
   TH1D *likelihood = reinterpret_cast<TH1D*>
-                     ((&_jointPDF->GetLikelihood(1.2))->Clone("likelihood"));
+                     (_jointPDF->GetLikelihood(1.2).Clone("likelihood"));
 
   TH2D *joint = reinterpret_cast<TH2D*>
                            (_jointPDF->GetJointPDF()->Clone("joint"));
@@ -208,7 +225,7 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Simple linear fit over spacepoints x,y.
-        if ( event->spacepoints().size() == 5 ) {
+        if ( event->spacepoints().size() == 5 && event->scifitracks().size() ) {
           process(event);
         }
       }
@@ -266,15 +283,6 @@ void MapCppTrackerMisalignments::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerMisalignments::process(SciFiEvent *evt) {
-  // Check the quality of the track.
-  size_t number_scifitracks = evt->scifitracks().size();
-  double P_value = 0;
-  if ( !number_scifitracks ) {
-    return;
-    // P_value = evt->scifitracks()[0]->P_value();
-  }
-  // if ( P_value < 0.1 ) return;
-
   SpacePointArray spacepoints = evt->spacepoints();
   std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
 
@@ -284,29 +292,26 @@ void MapCppTrackerMisalignments::process(SciFiEvent *evt) {
   double x0, mx, y0, my;
   linear_fit(spacepoints, x0, mx, y0, my);
 
-  for ( int station_i = 2; station_i < 5; station_i++ ) {
-    int station_array_index = station_i-1;
+  for ( int station = 2; station < 5; station++ ) {
     // Now that the fit is done, we can calculate the residual.
-    ThreeVector position = spacepoints.at(station_array_index)->get_position();
+    ThreeVector position = spacepoints.at(station-1)->get_position();
     double projected_x = x0 + mx * position.z();
     double projected_y = y0 + my * position.z();
 
-    double x_residual = projected_x - (position.x() + _x_shift_pdfs[tracker][station_i]->GetMean());
-    double y_residual = projected_y - (position.y() + _y_shift_pdfs[tracker][station_i]->GetMean());
+    double x_residual = projected_x - (position.x() + _x_shift_pdfs[tracker][station]->GetMean());
+    double y_residual = projected_y - (position.y() + _y_shift_pdfs[tracker][station]->GetMean());
 
-    std::cerr << "Residual found: " << x_residual << ", " << y_residual << std::endl;
-
-    double old_x = _x_shift_pdfs[tracker][station_i]->GetMean();
-    double old_y = _y_shift_pdfs[tracker][station_i]->GetMean();
+    double old_x = _x_shift_pdfs[tracker][station]->GetMean();
+    double old_y = _y_shift_pdfs[tracker][station]->GetMean();
 
     double new_x_shift = old_x+x_residual;
     double new_y_shift = old_y+y_residual;
 
-    _x_shift_pdfs[tracker][station_i]->
+    _x_shift_pdfs[tracker][station]->
                   ComputeNewPosterior(_jointPDF->GetLikelihood(new_x_shift));
-    _y_shift_pdfs[tracker][station_i]->
+    _y_shift_pdfs[tracker][station]->
                   ComputeNewPosterior(_jointPDF->GetLikelihood(new_y_shift));
-    if ( _tracker == 1 && station_i == 3 ) {
+    if ( station == 3 ) {
       t1st3residual->Fill(x_residual);
       std::string name("st3_iter_");
       std::ostringstream number;
@@ -314,18 +319,16 @@ void MapCppTrackerMisalignments::process(SciFiEvent *evt) {
       name = name + number.str();
       const char *c_name = name.c_str();
       TH1D *probability3 = reinterpret_cast<TH1D*>
-                             (_x_shift_pdfs[tracker][station_i]->GetHistogram()->Clone(c_name));
+                             (_x_shift_pdfs[tracker][station]->GetHistogram()->Clone(c_name));
       _root_file->cd();
       probability3->Write();
-    } else if ( station_i == 2 ) {
+    } else if ( station == 2 ) {
       t1st2residual->Fill(x_residual);
-    } else if ( station_i == 4 ) {
+    } else if ( station == 4 ) {
       t1st4residual->Fill(x_residual);
     }
-    std::cerr << "Station " << station_i << ", old mean: "
-              << old_x << "; new residual: " << x_residual << "\n"
-              << "suggested_new_shift: " << new_x_shift << " , new mean: "
-              << _x_shift_pdfs[tracker][station_i]->GetMean() << std::endl;
+    std::cerr << "Station " << station << " "
+              << _x_shift_pdfs[tracker][station]->GetMean() << std::endl;
   }
 
   int n_points = _t0s2_x->GetN();

@@ -60,6 +60,8 @@ class JointPDF {
 
   TH2D* GetJointPDF() const { return _joint; }
 
+  int GetNBins() const { return _n_bins; }
+
  private:
   TH2D *_joint;
 

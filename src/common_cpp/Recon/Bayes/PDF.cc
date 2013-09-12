@@ -25,18 +25,17 @@ PDF::PDF() : _probability(NULL),
              _min(0.),
              _max(0.) {}
 
-PDF::PDF(std::string name,
-         double bin_width,
-         double min,
-         double max) : _probability(NULL),
-                       _name(name),
-                       _bin_width(bin_width),
-                       _min(min),
-                       _max(max) {
-  const char *c_name = name.c_str();
-  _n_bins = static_cast<int> ((max-min)/_bin_width);
+PDF::PDF(std::string name, double bin_width, double min, double max)
+                                                : _probability(NULL),
+                                                  _name(name),
+                                                  _bin_width(bin_width) {
+  _min = min - _bin_width/2.;
+  _max = max + _bin_width/2.;
 
-  _probability = new TH1D(c_name, c_name, _n_bins, min, max);
+  const char *c_name = name.c_str();
+  _n_bins = static_cast<int> ( ((max-min)/_bin_width)+1 );
+
+  _probability = new TH1D(c_name, c_name, _n_bins, _min, _max);
 
   for ( int bin = 1; bin <= _n_bins; bin++ ) {
     double bin_centre = _probability->GetXaxis()->GetBinCenter(bin);
