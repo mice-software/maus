@@ -20,7 +20,7 @@ Module TrackerSolenoid1
   Module Tracker/Tracker1.dat
   {
     Position 0.0 0.0 416.5 mm
-    Rotation 0.0 180.0 0.0 degree
+    Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerCoil.dat
   {

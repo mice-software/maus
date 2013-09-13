@@ -35,10 +35,11 @@ class InMemoryDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # py
         @param self Object reference.
         """
         unittest.TestCase.setUp(self)
+        DocumentStoreTests.setUp(self)
         self._data_store = InMemoryDocumentStore()
         self._data_store.connect({})
         self._collection = self.__class__.__name__
-        self._data_store.create_collection(self._collection)
+        self._data_store.create_collection(self._collection, self._max_size)
 
     def tearDown(self):
         """

@@ -5,7 +5,54 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
-MAUS -0.5.1
+MAUS-v0.7.0
+  The following functionality was added:
+    - SciFi Track Reconstruction
+    - Several changes to SciFi MC digitization
+    - Documentation for SciFi reconstruction
+    - Optional build for GEANT 4.9.6
+    - New third party library - expat
+  If upgrading from a previous version, redo the entire installation
+
+MAUS-v0.6.0
+  The following functionality was added:
+    - New DAQ build script
+    - New daq test file 04234 in third_party/source
+    - Several changes to online tests
+    - New TOF Reducer for calibration
+    - stability improvements
+
+MAUS-v0.5.5
+  The following functionality was added:
+    - VRML viewer support
+    - Datamover plots
+    - Stability improvements
+  If upgrading from a previous version, please redo the entire installation
+
+MAUS-v0.5.4
+  The following functionality was added:
+    - Stability and testing of online code was improved
+  If upgrading from a previous version, please redo the entire installation
+
+MAUS-v0.5.3
+  The following functionality was added:
+    - The ROOT version was updated to the latest version 5.34.07
+  If upgrading from a previous version, the following third party library
+  scripts need to be rerun
+    - third_party/bash/21root.bash
+
+MAUS-v0.5.2
+  The following functionality was added:
+    - An example was added for accessing the data structure from a standalone
+      C++ application
+    - TOF integration test was added
+    - A bug preventing reconstruction of single station data was resolved
+  If upgrading from a previous version, the following third party library
+  scripts need to be rerun
+    - third_party/bash/44cdb.bash
+    - third_party/bash/51xboa.bash
+
+MAUS-v0.5.1
   The following functionality was added:
     - Global recon data structure was added
   If upgrading from a previous version, the following third party library

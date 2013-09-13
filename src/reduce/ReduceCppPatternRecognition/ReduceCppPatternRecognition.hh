@@ -16,39 +16,24 @@
  */
 
 
-/** @class 
- *
- */
+/** @class Reducer used to plot to tracker data */
+
 #ifndef _REDUCECPPPATTERNRECOGNITION_H
 #define _REDUCECPPPATTERNRECOGNITION_H
 
+// C++ includes
 #include <string>
 #include <vector>
 #include <map>
 
 #include "json/json.h"
 
+// MAUS includes
 #include "src/common_cpp/DataStructure/Spill.hh"
-
-// Root
-#include "TTree.h"
-#include "TH1I.h"
-#include "TFile.h"
-#include "TAxis.h"
-#include "TGraph.h"
-#include "TMultiGraph.h"
-#include "TCanvas.h"
-#include "TApplication.h"
-#include "TStyle.h"
-#include "TPad.h"
-#include "TROOT.h"
-#include "TColor.h"
-#include "TGFrame.h"
-#include "TVirtualPad.h"
-#include "TFrame.h"
-#include "TF1.h"
-#include "TArc.h"
-#include "TPaveText.h"
+#include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
+#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
+#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
 
 namespace MAUS {
 
@@ -56,100 +41,35 @@ class ReduceCppPatternRecognition {
 
  public:
 
- /** @brief Sets up the worker
-  *
-  *  @param argJsonConfigDocument a JSON document with
-  *         the configuration.
-  */
-  bool birth(std::string argJsonConfigDocument);
+  /** @brief Sets up the worker
+   *  @param argJsonConfigDocument a JSON document with the configuration.
+   */
+  bool birth(std::string aJsonConfigDocument);
 
- /** @brief Shutdowns the worker
-  *
-  *  This takes no arguments and does nothing.
-  */
+  /** @brief Shutdowns the worker, does nothing */
   bool death();
 
- /** @brief process JSON document
-  *
-  *  @param document Receive a document with slab hits and return
-  *  a document with space points.
+  /** @brief Process JSON document */
+  std::string process(std::string aDocument);
+
+  /** @brief Return the spill object */
+  MAUS::Spill* get_spill() { return mSpill; }
+
+  /** @brief Takes json data and returns a Spill
+  *   @param json_data a string holding spill's worth of data in json format
   */
-  std::string process(std::string document);
-
-  int const get_num_stracks() { return _stracks.GetEntries(); }
-  int const get_num_circles() { return _circles.GetEntries(); }
-  int const get_num_spoints() { return _spoints.GetEntries(); }
-  MAUS::Spill get_spill() { return _spill; }
-
-  /** Takes json data and returns a Spill
-  *
-  *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
-  *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
-  *
-  *  \param json_data a string holding spill's worth of data in json format
-  */
-  bool read_in_json(std::string json_data);
-
-  void draw_histos(TTree * t1, TCanvas * c1);
-  void draw_graphs(TTree * t1, TCanvas * c1);
-  void draw_stracks(TCanvas * c1);
-  void draw_circles(TCanvas * c1);
-  TF1 make_strack(double c, double m);
-  TArc make_circle(double x0, double y0, double R);
-  void clear_tracks();
-
-  void Save();
-  void update_info(TCanvas * c1, TPaveText *pt);
+  bool read_in_json(std::string aJsonData);
 
  private:
 
-  Json::Value root;
+  std::string mClassname;
+  Json::Value mRoot;
+  Spill *mSpill;
 
-  std::string _classname;
-  std::string _filename;
-
-  int _nSpills;
-  // int _number_spacepoints;
-  static const int _trk_lower_bound = 1300;
-  static const int _trk_upper_bound = 0;
-  double tracker2;
-
-  TTree _digits;
-  double _npe;
-  int _tracker_dig;
-
-  TTree _spoints;
-  TTree _spoints_1spill;
-  int _tracker;
-  int _station;
-  int _type;
-  double _x;
-  double _y;
-  double _z;
-
-  TTree _stracks;
-  int _num_points_str;
-  double _mx;
-  double _my;
-  double _x0;
-  double _y0;
-
-  TTree _circles;
-  int _num_points_circ;
-  double _circle_x0;
-  double _circle_y0;
-  double _circle_R;
-
-  // Vectors to hold the tracks in each projection in each tracker
-  std::vector<TF1> _trks_zx_trkr0;
-  std::vector<TF1> _trks_zy_trkr0;
-  std::vector<TF1> _trks_zx_trkr1;
-  std::vector<TF1> _trks_zy_trkr1;
-  std::vector<TArc> _circles_xy_trkr0;
-  std::vector<TArc> _circles_xy_trkr1;
-
-  // The current spill
-  Spill _spill;
+  TrackerDataManager mDataManager;
+  TrackerDataPlotterBase *mXYZPlotter;
+  TrackerDataPlotterBase *mInfoBoxPlotter;
+  std::vector<TrackerDataPlotterBase*> mPlotters;
 };
 
 } // ~namespace MAUS

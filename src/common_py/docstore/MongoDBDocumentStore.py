@@ -22,6 +22,7 @@ import time
 import pymongo
 
 from docstore.DocumentStore import DocumentStore
+from docstore.DocumentStore import DocumentStoreException
 
 class MongoDBDocumentStore(DocumentStore):
     """
@@ -38,27 +39,33 @@ class MongoDBDocumentStore(DocumentStore):
         
     def connect(self, parameters = None):
         """ 
-        Connect to the data store. The connection is configured
-        via the following parameters:
+        Connect to the data store and purge existing data. 
 
-        -mongodb_host - MongoDB host name. This is a mandatory parameter.
-        -mongodb_port - MongoDB port. This is a mandatory parameter.
-        -mongodb_database_name - MongoDB database name. This is a
-         mandatory parameter. If the database does not exist then it
-         is created.
+        The connection is configured via the following parameters:
+        - mongodb_host - MongoDB host name. This is a mandatory parameter.
+        - mongodb_port - MongoDB port. This is a mandatory parameter.
+        - mongodb_database_name - MongoDB database name. This is a
+          mandatory parameter. If the database does not exist then it
+          is created.
+        - mongodb_size - MongoDB maximum size. MAUS always uses capped
+          databases. This is a mandatory parameter
 
         @param self Object reference.
         @param parameters Connection information.
         @throws KeyError. If mongodb_host, mongodb_port or
         mongodb_database_name are not provided. 
-        @throws pymongo.errors.AutoReconnect. If the database cannot
+        @throws DocumentStoreException. If the database cannot
         be contacted using the given host and port.
         """
-        self.__mongodb = pymongo.Connection(
-            parameters["mongodb_host"],
-            parameters["mongodb_port"])
-        self.__data_store = \
-            self.__mongodb[parameters["mongodb_database_name"]]
+        try:
+            self.__mongodb = pymongo.Connection(
+                parameters["mongodb_host"],
+                parameters["mongodb_port"])
+            self.__data_store = \
+                self.__mongodb[parameters["mongodb_database_name"]]
+            self.__mongodb.drop_database(parameters["mongodb_database_name"])
+        except pymongo.errors.AutoReconnect as exc:
+            raise DocumentStoreException(exc)
 
     def collection_names(self):
         """ 
@@ -68,15 +75,18 @@ class MongoDBDocumentStore(DocumentStore):
         """
         return self.__data_store.collection_names()
 
-    def create_collection(self, collection):
+    def create_collection(self, collection, maximum_size=1e9):
         """ 
         Create a collection. If it already exists, this is a no-op.
         An index is created on the "date" field.
         @param self Object reference.
         @param collection Collection name.
+        @param maximum_size maximum size in bytes of the document store.
         """
         if (not collection in self.__data_store.collection_names()):
-            self.__data_store.create_collection(collection)
+            self.__data_store.create_collection(collection,
+                          capped=True,
+                          size=maximum_size)
             collection = self.__data_store[collection]
             collection.create_index("date")
         
@@ -130,12 +140,18 @@ class MongoDBDocumentStore(DocumentStore):
         @param collection Collection name.
         @param docid Document ID.
         @return document or None.
+        @throws DocumentStoreException if the operation fails - currently not
+                sure under what circumstances operation failure may occur
         """
-        doc = self.__data_store[collection].find_one({"_id":docid})
-        if doc != None:
-            return doc['doc']
-        else:
-            return None
+        try:
+            doc = self.__data_store[collection].find_one({"_id":docid},
+                                                         timeout=False)
+            if doc != None:
+                return doc['doc']
+            else:
+                return None
+        except pymongo.errors.OperationFailure as exc:
+            raise DocumentStoreException(exc)
 
     def get_since(self, collection, earliest = None):
         """ 
@@ -149,13 +165,18 @@ class MongoDBDocumentStore(DocumentStore):
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
         Documents are sorted earliest to latest.
+        @throws DocumentStoreException if the operation fails - currently not
+                sure under what circumstances operation failure may occur
         """
-        if (earliest == None):
-            result = self.__data_store[collection].find().sort("date")
-        else:
-            result = self.__data_store[collection].find(\
-                {"date":{"$gt":earliest}}).sort("date")
-        return result
+        try:
+            if (earliest == None):
+                result = self.__data_store[collection].find().sort("date")
+            else:
+                result = self.__data_store[collection].find(\
+                                   {"date":{"$gt":earliest}}).sort("date")
+            return result
+        except pymongo.errors.OperationFailure as exc:
+            raise DocumentStoreException(exc)      
 
     def delete_document(self, collection, docid):
         """ 
@@ -174,6 +195,14 @@ class MongoDBDocumentStore(DocumentStore):
         @param collection Collection name.
         """
         self.__data_store.drop_collection(collection)
+
+    def delete_database(self, database):
+        """ 
+        Delete database.
+        @param self Object reference.
+        @param database Database name.
+        """
+        self.__mongodb.drop_database(database)
 
     def disconnect(self):
         """

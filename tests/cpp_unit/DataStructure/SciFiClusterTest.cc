@@ -34,14 +34,14 @@ class SciFiClusterTestDS : public ::testing::Test {
 TEST_F(SciFiClusterTestDS, test_from_default_constructor) {
   SciFiCluster *cluster = new SciFiCluster();
   EXPECT_FALSE(cluster->is_used());
-  EXPECT_EQ(cluster->get_spill(), 0);
-  EXPECT_EQ(cluster->get_event(), 0);
-  EXPECT_EQ(cluster->get_tracker(), 0);
-  EXPECT_EQ(cluster->get_station(), 0);
-  EXPECT_EQ(cluster->get_plane(), 0);
-  EXPECT_EQ(cluster->get_channel(), 0);
-  EXPECT_EQ(cluster->get_npe(), 0.0);
-  EXPECT_EQ(cluster->get_time(), 0.0);
+  EXPECT_EQ(cluster->get_spill(), -1);
+  EXPECT_EQ(cluster->get_event(), -1);
+  EXPECT_EQ(cluster->get_tracker(), -1);
+  EXPECT_EQ(cluster->get_station(), -1);
+  EXPECT_EQ(cluster->get_plane(), -1);
+  EXPECT_EQ(cluster->get_channel(), -1);
+  EXPECT_EQ(cluster->get_npe(), -1);
+  EXPECT_EQ(cluster->get_time(), -1);
 }
 
 TEST_F(SciFiClusterTestDS, test_from_copy_constructor) {

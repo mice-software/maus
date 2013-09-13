@@ -19,28 +19,57 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
-
 namespace MAUS {
+MapCppTrackerMCDigitization::MapCppTrackerMCDigitization()
+    : _spill_json(NULL), _spill_cpp(NULL) {
+}
+
+MapCppTrackerMCDigitization::~MapCppTrackerMCDigitization() {
+  if (_spill_json != NULL) {
+    delete _spill_json;
+  }
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+  }
+}
 
 bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
-
   _classname = "MapCppTrackerMCDigitization";
-  Json::Reader reader;
 
-  // Check if the JSON document can be parsed, else return error only
-  if (!reader.parse(argJsonConfigDocument, _configJSON))
-    return false;
-
-  // Get the tracker modules; they will be necessary for the channel number calculation
-  assert(_configJSON.isMember("simulation_geometry_filename"));
-  std::string filename = _configJSON["simulation_geometry_filename"].asString();
-  _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-  assert(_configJSON.isMember("SciFiNPECut"));
-  SciFiNPECut = _configJSON["SciFiNPECut"].asDouble();
-
-  return true;
+  try {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    static MiceModule* mice_modules = Globals::GetMonteCarloMiceModules();
+    modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    Json::Value *json = Globals::GetConfigurationCards();
+    // Load constants.
+    _SciFiNPECut        = (*json)["SciFiDigitNPECut"].asDouble();
+    _SciFivlpcEnergyRes = (*json)["SciFivlpcEnergyRes"].asDouble();
+    _SciFiadcFactor     = (*json)["SciFiadcFactor"].asDouble();
+    _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
+    _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
+    _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
+    _SciFiFiberConvFactor  = (*json)["SciFiFiberConvFactor"].asDouble();
+    _SciFiFiberTrappingEff = (*json)["SciFiFiberTrappingEff"].asDouble();
+    _SciFiFiberMirrorEff   = (*json)["SciFiFiberMirrorEff"].asDouble();
+    _SciFivlpcQE           = (*json)["SciFivlpcQE"].asDouble();
+    _SciFiFiberTransmissionEff = (*json)["SciFiFiberTransmissionEff"].asDouble();
+    _SciFiMUXTransmissionEff   = (*json)["SciFiMUXTransmissionEff"].asDouble();
+    _eV_to_phe = _SciFiFiberConvFactor *
+                 _SciFiFiberTrappingEff *
+                 ( 1.0 + _SciFiFiberMirrorEff ) *
+                 _SciFiFiberTransmissionEff *
+                 _SciFiMUXTransmissionEff *
+                 _SciFivlpcQE;
+    // ______________________________________________
+    return true;
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
 }
 
 bool MapCppTrackerMCDigitization::death() {
@@ -48,22 +77,21 @@ bool MapCppTrackerMCDigitization::death() {
 }
 
 std::string MapCppTrackerMCDigitization::process(std::string document) {
-
-  std::cout << "Begining tracker MC digitisation\n";
   Json::FastWriter writer;
 
   // Set up a spill object, then continue only if MC event array is initialised
-  Spill spill = read_in_json(document);
+  read_in_json(document);
+  Spill& spill = *_spill_cpp;
+
   if ( spill.GetMCEvents() ) {
-    std::cout << "Found " << spill.GetMCEventSize() << " MC events\n";
   } else {
     std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
-    Json::Value errors;
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << "MC event array not initialised, aborting digitisation";
     errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
+    save_to_json(spill);
+    return writer.write(*_spill_json);
   }
 
   // ================= Reconstruction =========================
@@ -73,7 +101,6 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     ReconEventPArray* revts = new ReconEventPArray();
     spill.SetReconEvents(revts);
   }
-
   // Construct digits from hits for each MC event
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
@@ -99,30 +126,31 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     }
   }
   // ==========================================================
-
   save_to_json(spill);
-  return writer.write(root);
+  return writer.write(*_spill_json);
 }
 
-Spill MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
-
+void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
   Json::FastWriter writer;
-  Spill spill;
+  Json::Value json_root;
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+    _spill_cpp = NULL;
+  }
 
   try {
-    root = JsonWrapper::StringToJson(json_data);
+    json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
-    spill = *spill_proc.JsonToCpp(root);
+    _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
-    std::cerr << "Bad json document" << std::endl;
-    Json::Value errors;
+    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    writer.write(root);
+    _spill_cpp->GetErrors();
   }
-  return spill;
 }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
@@ -133,30 +161,31 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       SciFiHit *a_hit = &hits->at(hit_i);
       a_hit->GetChannelId()->SetUsed(true);
 
-      // Get nPE from this hit.
-      double edep = a_hit->GetEnergyDeposited();
-      double nPE  = compute_npe(edep);
-
-      // Compute tdc count.
-      double time   = a_hit->GetTime();
-      // int tdcCounts = compute_tdc_counts(time);
       int chanNo = compute_chan_no(a_hit);
 
-      // loop over all the other hits
+       // Get nPE from this hit.
+      double edep = a_hit->GetEnergyDeposited();
+      double nPE  = edep*_eV_to_phe;
+
+      // Compute tdc count.
+      double time1   = a_hit->GetTime();
+      // int tdcCounts = compute_tdc_counts(time1);
+
+      // Loop over all the other hits.
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
           MAUS::SciFiHit *same_digit = &(*hits)[hit_j];
           double edep_j = same_digit->GetEnergyDeposited();
-          nPE  += compute_npe(edep_j);
+          nPE += edep_j*_eV_to_phe;
           same_digit->GetChannelId()->SetUsed(true);
-        } // if-statement
-      } // ends l-loop over all the array
+        }
+      } // ends loop over all the array
       int tracker = a_hit->GetChannelId()->GetTrackerNumber();
       int station = a_hit->GetChannelId()->GetStationNumber();
-      int plane = a_hit->GetChannelId()->GetPlaneNumber();
+      int plane   = a_hit->GetChannelId()->GetPlaneNumber();
 
       SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
-                                           tracker, station, plane, chanNo, nPE, time);
+                                           tracker, station, plane, chanNo, nPE, time1);
       // .start. TO BE REMOVED .start.//
       ThreeVector position = a_hit->GetPosition();
       ThreeVector momentum = a_hit->GetMomentum();
@@ -168,18 +197,14 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
   } // ends 'for' loop over hits
 }
 
-int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
+int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
   double tmpcounts;
-  assert(_configJSON.isMember("SciFivlpcTimeRes"));
-  assert(_configJSON.isMember("SciFitdcFactor"));
-  tmpcounts = CLHEP::RandGauss::shoot(time,
-                                      _configJSON["SciFivlpcTimeRes"].asDouble())*
-                                      _configJSON["SciFitdcFactor"].asDouble();
+
+  tmpcounts = CLHEP::RandGauss::shoot(time1, _SciFivlpcTimeRes)*_SciFitdcFactor;
 
   // Check for saturation of TDCs
-  assert(_configJSON.isMember("SciFitdcBits"));
-  if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
-    tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
+  if ( tmpcounts > pow(2.0, _SciFitdcBits) - 1.0 ) {
+    tmpcounts = pow(2.0, _SciFitdcBits) - 1.0;
   }
 
   int tdcCounts = static_cast <int> (floor(tmpcounts));
@@ -187,60 +212,11 @@ int MapCppTrackerMCDigitization::compute_tdc_counts(double time) {
 }
 
 int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
-  int tracker = ahit->GetChannelId()->GetTrackerNumber();
-  int station = ahit->GetChannelId()->GetStationNumber();
-  int plane   = ahit->GetChannelId()->GetPlaneNumber();
-
-  // std::cout << "Time: " << ahit->GetTime() << std::endl;
-  // std::cout << tracker << " " << station << " " << plane << std::endl;
-  const MiceModule* this_plane = NULL;
-  for ( unsigned int j = 0; !this_plane && j < modules.size(); j++ ) {
-    if ( modules[j]->propertyExists("Tracker", "int") &&
-         modules[j]->propertyInt("Tracker") == tracker &&
-         modules[j]->propertyExists("Station", "int") &&
-         modules[j]->propertyInt("Station") == station &&
-         modules[j]->propertyExists("Plane", "int") &&
-         modules[j]->propertyInt("Plane") == plane )
-      // save the module corresponding to this plane
-      this_plane = modules[j];
-  }
-  // std::cerr << tracker << " " << station << " " << plane << std::endl;
-  assert(this_plane != NULL);
-
-  int numberFibres = static_cast<int> (7*2*(this_plane->propertyDouble("CentralFibre")+0.5));
+  // This is the channel number computed from the fibre number.
   int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
-  int chanNo;
-
-  if ( tracker == 0 ) {
-    // start counting from the other end
-    chanNo = static_cast<int> (floor((numberFibres-fiberNumber)/7.0));
-  } else {
-    chanNo = static_cast<int> (floor(fiberNumber/7.0));
-  }
+  int chanNo      = static_cast<int> (floor(fiberNumber/7.0));
 
   return chanNo;
-}
-
-double MapCppTrackerMCDigitization::compute_npe(double edep) {
-      assert(_configJSON.isMember("SciFiFiberConvFactor"));
-      double numbPE = _configJSON["SciFiFiberConvFactor"].asDouble() * edep;
-
-      assert(_configJSON.isMember("SciFiFiberTrappingEff"));
-      numbPE *= _configJSON["SciFiFiberTrappingEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFiFiberMirrorEff"));
-      numbPE *= ( 1.0 + _configJSON["SciFiFiberMirrorEff"].asDouble());
-
-      assert(_configJSON.isMember("SciFiFiberTransmissionEff"));
-      numbPE *= _configJSON["SciFiFiberTransmissionEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFiMUXTransmissionEff"));
-      numbPE *= _configJSON["SciFiMUXTransmissionEff"].asDouble();
-
-      assert(_configJSON.isMember("SciFivlpcQE"));
-      numbPE *= _configJSON["SciFivlpcQE"].asDouble();
-
-      return numbPE;
 }
 
 int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
@@ -248,20 +224,13 @@ int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
   if ( numb_pe == 0 ) return 0;
 
   // Throw the dice and generate the ADC count
-  // value for the energy summed for each channel
-  assert(_configJSON.isMember("SciFivlpcEnergyRes"));
-
-  // get adc count by generating a gaussian distribution with mean "numb_pe"
-  tmpcounts = CLHEP::RandGauss::shoot(numb_pe,
-                                      _configJSON["SciFivlpcEnergyRes"].asDouble());
-
-  assert(_configJSON.isMember("SciFiadcFactor"));
-  tmpcounts *= _configJSON["SciFiadcFactor"].asDouble();
+  // value for the energy summed for each channel.
+  tmpcounts = CLHEP::RandGauss::shoot(numb_pe, _SciFivlpcEnergyRes) *
+              _SciFiadcFactor;
 
   // Check for saturation of ADCs
-  assert(_configJSON.isMember("SciFitdcBits"));
-  if ( tmpcounts > pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0 ) {
-    tmpcounts = pow(2.0, _configJSON["SciFitdcBits"].asDouble()) - 1.0;
+  if ( tmpcounts > pow(2.0, _SciFitdcBits) - 1.0 ) {
+    tmpcounts = pow(2.0, _SciFitdcBits) - 1.0;
   }
 
   int adcCounts = static_cast <int> (floor(tmpcounts));
@@ -293,9 +262,12 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
 }
 
 void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
-  SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill, "");
+    SpillProcessor spill_proc;
+    if (_spill_json != NULL) {
+        delete _spill_json;
+        _spill_json = NULL;
+    }
+    _spill_json = spill_proc.CppToJson(spill, "");
 }
 
 } // ~namespace MAUS
-

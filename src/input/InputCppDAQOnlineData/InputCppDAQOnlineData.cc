@@ -24,6 +24,8 @@ InputCppDAQOnlineData::InputCppDAQOnlineData()
   std::cerr << "MAUS running in online mode" << std::endl;
   _classname = "InputCppDAQOnlineData";
   Squeak::activateCout(true);
+  _sleep_time.tv_sec = 0;
+  _sleep_time.tv_nsec = 0;
 }
 
 bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
@@ -51,12 +53,27 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
 
   // _dataProcessManager.DumpProcessors();
 
+  // online mimic is available for testing purposes only
+  if (configJSON.isMember("daq_online_file") &&
+      configJSON["daq_online_file"].asString() != "") {
+    Squeak::mout(Squeak::debug) << "Using online file mimic with file "
+                                << configJSON["daq_online_file"].asString()
+                                << std::endl;
+    setMonitorSrc(configJSON["daq_online_file"].asString());
+  }
+  if (configJSON.isMember("daq_online_spill_delay_time")) {
+      double delay_time = configJSON["daq_online_spill_delay_time"].asDouble();
+      _sleep_time.tv_sec = static_cast<long>(delay_time);
+      _sleep_time.tv_nsec = 1000000000L*(delay_time-_sleep_time.tv_sec);
+  }
   return true;
 }
 
 bool InputCppDAQOnlineData::readNextEvent() {
   // Use the MDmonitoring object to get the next event.
   _eventPtr = _dataManager->GetNextEvent();
+  // Add a delay (for mocking target time structure)
+  nanosleep(&_sleep_time, (struct timespec *)NULL);
   // std::cerr << "THIS IS THE eventPtr " << (void*)_eventPtr << " REALLY blah" << std::endl;
   if (!_eventPtr)
     return false;

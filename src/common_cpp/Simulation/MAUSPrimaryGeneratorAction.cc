@@ -28,6 +28,7 @@
 
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/legacy/Interface/STLUtils.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
@@ -69,7 +70,10 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if (!isInWorldVolume(part.x, part.y, part.z)) {
     throw(Squeal(Squeal::recoverable,
-                 "Particle is outside world volume",
+                 "Particle is outside world volume at position ("+
+                 STLUtils::ToString(part.x)+", "+
+                 STLUtils::ToString(part.y)+", "+
+                 STLUtils::ToString(part.z)+")",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   }
   gun->SetParticleDefinition(particle);

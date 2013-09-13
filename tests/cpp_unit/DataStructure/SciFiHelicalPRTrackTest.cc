@@ -48,7 +48,6 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_circle_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_tracker(), -1);
   EXPECT_EQ(prtrack.get_num_points(), -1);
-  EXPECT_EQ(prtrack.get_phi_i().size(), size);
   EXPECT_EQ(prtrack.get_spacepoints().size(), size);
 }
 
@@ -68,7 +67,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_parameter_constructor) {
 TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   double phi0 = 3.0;
   double psi0 = -1.0;
-  CLHEP::Hep3Vector pos0(1.0, 2.0, 1100.0);
+  ThreeVector pos0(1.0, 2.0, 1100.0);
   SimpleLine line_sz;
   SimpleCircle circle;
   line_sz.set_c(1.0);
@@ -115,16 +114,15 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   trk1.set_circle_y0(circle_y0);
   trk1.set_circle_chisq(circle_chisq);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
 
   std::vector<double> phi_i(0);
   phi_i.push_back(1.0);
   phi_i.push_back(-2.0);
-  trk1.set_phi_i(phi_i);
 
   SciFiHelicalPRTrack trk2(trk1);
 
@@ -143,10 +141,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_circle_chisq(), circle_chisq);
   EXPECT_EQ(trk2.get_tracker(), tracker);
   EXPECT_EQ(trk2.get_num_points(), num_points);
-  ASSERT_EQ(trk2.get_phi_i().size(), 2);
-  EXPECT_EQ(trk2.get_phi_i()[0], 1.0);
-  EXPECT_EQ(trk2.get_phi_i()[1], -2.0);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
@@ -187,7 +182,6 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_helix_constructor) {
   EXPECT_EQ(prtrack.get_circle_x0(), -1);
   EXPECT_EQ(prtrack.get_circle_y0(), -1);
   EXPECT_EQ(prtrack.get_circle_chisq(), -1);
-  EXPECT_EQ(prtrack.get_phi_i().size(), 0);
   EXPECT_EQ(prtrack.get_spacepoints().size(), size);
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
@@ -217,16 +211,11 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   trk1.set_circle_y0(circle_y0);
   trk1.set_circle_chisq(circle_chisq);
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
   trk1.set_spacepoints(spoints);
-
-  std::vector<double> phi_i(0);
-  phi_i.push_back(1.0);
-  phi_i.push_back(-2.0);
-  trk1.set_phi_i(phi_i);
 
   SciFiHelicalPRTrack trk2;
   trk2 = trk1;
@@ -248,10 +237,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(trk2.get_circle_chisq(), circle_chisq);
   EXPECT_EQ(trk2.get_tracker(), tracker);
   EXPECT_EQ(trk2.get_num_points(), num_points);
-  ASSERT_EQ(trk2.get_phi_i().size(), size);
-  EXPECT_EQ(trk2.get_phi_i()[0], 1.0);
-  EXPECT_EQ(trk2.get_phi_i()[1], -2.0);
-  EXPECT_EQ(trk2.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
@@ -271,9 +257,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   double circle_y0 = 7.0;
   double circle_chisq = 8.0;
 
-  SciFiSpacePoint spoint;
-  spoint.set_tracker(tracker);
-  SciFiSpacePointArray spoints;
+  SciFiSpacePoint *spoint = new SciFiSpacePoint();
+  spoint->set_tracker(tracker);
+  SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
 
   SciFiHelicalPRTrack prtrack;
@@ -313,7 +299,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
 
-  EXPECT_EQ(prtrack.get_spacepoints()[0].get_tracker(), tracker);
+  EXPECT_EQ(prtrack.get_spacepoints()[0]->get_tracker(), tracker);
 }
 
-} // namespace
+} // ~namespace MAUS

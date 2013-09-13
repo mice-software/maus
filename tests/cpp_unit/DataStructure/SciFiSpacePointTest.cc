@@ -16,7 +16,7 @@
  */
 
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
+// #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 
 #include "gtest/gtest.h"
 
@@ -87,8 +87,6 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   EXPECT_EQ(plane2, sp.get_channels()[1]->get_plane());
   EXPECT_EQ(type, sp.get_type());
 }
-
-
 
 TEST_F(SciFiSpacePointTestDS, test_default_constructor) {
   unsigned int size = 0;

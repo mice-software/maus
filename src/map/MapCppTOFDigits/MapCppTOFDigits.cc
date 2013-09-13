@@ -227,7 +227,10 @@ Json::Value MapCppTOFDigits::makeDigits(Json::Value xDocDetData,
 
           // Get flash ADC info and appent it to the digit. The info from the Tdc is
           // passed as well in order to find the ascosiated adc values.
-          getAdc(xDocfAdc, xDocTdc[TdcHitCount], xDocTheDigit);
+          if (!getAdc(xDocfAdc, xDocTdc[TdcHitCount], xDocTheDigit)) {
+             xDocTheDigit["charge_mm"] = 0;
+             xDocTheDigit["charge_pm"] = 0;
+          };
 
           // Get the trigger leading and trailing times and add them to the digit.
           getTrig(xDocPartEvent_trigger, xDocTdc[TdcHitCount], xDocTheDigit);
@@ -304,6 +307,10 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
                                                         "charge_pm",
                                                         JsonWrapper::intValue );
 
+      if (!xDocfAdc[AdcHitCount].isMember("charge_mm"))
+          xDocDigit["charge_mm"] = 0;
+      if (!xDocfAdc[AdcHitCount].isMember("charge_pm"))
+          xDocDigit["charge_pm"] = 0;
       if (xDocDigit["part_event_number"] != xDocfAdc[AdcHitCount]["part_event_number"]) {
         throw(Squeal(Squeal::recoverable,
               std::string("Wrong part_event_number!"),

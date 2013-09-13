@@ -50,7 +50,7 @@ class DoubletFiberParamTest : public ::testing::Test {
     note135_fiber_pitch = 0.427;    // mm
     calculated_fiber_half_length = 152.7126; // mm
     expected_delta_phi = 6.28319;
-    calculated_X = 47.7375;
+    calculated_X = -47.7375;
     calculated_Y = 0;
     calculated_Z = -0.13867;
   }
@@ -118,13 +118,14 @@ TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
                                                       pFiberPitch).getFiberPitch();
 
   // ... compare with MICE Note 135
-  EXPECT_EQ(note135_core_diameter, fetched_outer_diameter);
-  EXPECT_EQ(note135_fiber_diameter, fetched_fiber_diameter);
-  EXPECT_EQ(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch);
+  EXPECT_NEAR(note135_core_diameter, fetched_outer_diameter, 1e-12);
+  EXPECT_NEAR(note135_fiber_diameter, fetched_fiber_diameter, 1e-12);
+  EXPECT_NEAR(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch,
+                                                                         1e-12);
 }
 
 TEST_F(DoubletFiberParamTest, test_compute_transformation) {
-std::string filename = "Stage4.dat";
+  std::string filename = "Stage4.dat";
   std::vector<const MiceModule*> modules;
   MiceModule*      _module;
   _module = new MiceModule(filename);

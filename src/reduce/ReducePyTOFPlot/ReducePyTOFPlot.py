@@ -23,7 +23,6 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
-
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
@@ -156,13 +155,14 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         # Read in configuration flags and parameters - these will
         # overwrite whatever defaults were set in __init__.
-        if 'refresh_rate' in config_doc:
-            self.refresh_rate = int(config_doc["refresh_rate"])
+        if 'reduce_plot_refresh_rate' in config_doc:
+            self.refresh_rate = int(config_doc["reduce_plot_refresh_rate"])
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()
         self.run_ended = False
         return True
+
 
     def _update_histograms(self, spill):
         """
@@ -186,9 +186,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
-                return [{}]
-        # elif spill["daq_event_type"] != "physics_event":
-        #    return spill
+                return []
 
         # do not try to get data from start/end spill markers
         data_spill = True
@@ -210,7 +208,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             self.update_histos()
             return self.get_histogram_images()
         else:
-            return [spill]
+            return []
 
     def get_slab_hits(self, spill):
         """ 
@@ -677,6 +675,24 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @returns list of 3 JSON documents containing the images.
         """
         image_list = []
+
+        # construct a list of histos to put in the root canvas
+        histos = [self._ht01, self._ht02, self._ht12, self.hspslabx_0,
+                  self.hspslabx_1, self.hspslabx_2, self.hspslaby_0, 
+                  self.hspslaby_1, self.hspslaby_2, self.hnsp_0, self.hnsp_1,
+                  self.hnsp_2]
+        for tof_station_hists in self.hpmthits: # histo for each pmt
+            for tof_plane_hists in tof_station_hists:
+                histos += tof_plane_hists
+        for tof_station_hists in self.hslabhits: # histo for each plane
+            histos += tof_station_hists
+        histos += self.hspxy # hist for each station
+        # now add them to the root/json document
+        tag = __name__
+        content = __name__
+        doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
+        image_list.append(doc)
+
 
         # Slab Hits X
         # file label = tof_hit_x.eps

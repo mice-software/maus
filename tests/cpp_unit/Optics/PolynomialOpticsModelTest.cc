@@ -51,7 +51,7 @@
 
 using MAUS::PolynomialOpticsModel;
 
-Json::Value SetupConfig();
+Json::Value SetupConfig(int verbose_level);
 
 class PolynomialOpticsModelTest : public testing::Test {
  public:
@@ -139,7 +139,7 @@ class PolynomialOpticsModelTest : public testing::Test {
     MAUS::GlobalsManager::DeleteGlobals();
     // SetupConfig() is defined in MAUSUnitTest.cc
     MAUS::GlobalsManager::InitialiseGlobals(
-        JsonWrapper::JsonToString(SetupConfig()));
+        JsonWrapper::JsonToString(SetupConfig(2)));
     MAUS::MAUSGeant4Manager::GetInstance()
         ->SetVirtualPlanes(default_virtual_planes_);
     std::cout << "*** Reset Globals ***" << std::endl;

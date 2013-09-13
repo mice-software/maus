@@ -50,6 +50,10 @@ namespace MAUS {
 
 class MapCppTrackerDigits {
  public:
+  MapCppTrackerDigits();
+
+  ~MapCppTrackerDigits();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -71,7 +75,9 @@ class MapCppTrackerDigits {
    */
   std::string process(std::string document);
 
-  void save_to_json(MAUS::Spill &spill);
+  void read_in_json(std::string json_data);
+
+  void save_to_json(MAUS::Spill *spill);
 
  private:
   /// This should be the classname
@@ -79,7 +85,9 @@ class MapCppTrackerDigits {
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value _json_root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
   ///  Cut value for npe.

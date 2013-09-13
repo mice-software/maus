@@ -47,7 +47,7 @@
 
 using MAUS::LinearApproximationOpticsModel;
 
-Json::Value SetupConfig();
+Json::Value SetupConfig(int verbose_level);
 
 class LinearApproximationOpticsModelTest : public testing::Test {
  public:
@@ -122,10 +122,10 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     MAUS::GlobalsManager::DeleteGlobals();
     // SetupConfig() is defined in MAUSUnitTest.cc
     MAUS::GlobalsManager::InitialiseGlobals(
-        JsonWrapper::JsonToString(SetupConfig()));
-    MAUS::MAUSGeant4Manager::GetInstance() ->SetVirtualPlanes(
-        const_cast<MAUS::VirtualPlaneManager *>(default_virtual_planes_));
-    delete virtual_planes_;
+        JsonWrapper::JsonToString(SetupConfig(2)));
+    MAUS::MAUSGeant4Manager::GetInstance()
+        ->SetVirtualPlanes(default_virtual_planes_);
+    std::cout << "*** Reset Globals ***" << std::endl;
   }
 
   static const double kPrimaryPlane;

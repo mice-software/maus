@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -97,7 +97,7 @@ class KLCellHit {
     std::string _detector;
     int _part_event_number;
 
-    ClassDef(KLCellHit, 1)
+    MAUS_VERSIONED_CLASS_DEF(KLCellHit)
 };
 }
 

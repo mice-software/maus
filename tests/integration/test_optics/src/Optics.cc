@@ -64,6 +64,7 @@ void  PhaseCavities(::PhaseSpaceVector ref) {
 MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
 {
   Json::Value json_config(Json::objectValue);
+  json_config["will_do_stack_trace"] = Json::Value(true);
   json_config["verbose_level"] = Json::Value(1);
   json_config["maximum_number_of_steps"] = Json::Value(25000);
   json_config["geant4_visualisation"] = Json::Value(false);
@@ -538,8 +539,8 @@ void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
   ofstream out(outfile.c_str());
   if(!out) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
   std::string out_names_arr[] = {
-      "mean_t", "mean_E", "mean_x", "mean_Px", "mean_y", "mean_Py", "mean_z", "mean_Pz", "planeType", "planeNumber", "statisticalWeight", "betaTrans", "alphaTrans", "gammaTrans", "phiTrans", "angularMommentum", "amplitudePzCovariance", "beta_x", "alpha_x", "gamma_x", "phi_x", "beta_y", "alpha_y", "gamma_y", "phi_y", "beta_t", "alpha_t", "gamma_t", "dispersion_x", "dispersion_y", "emittance_x", "emittance_y", "emittance_t", "emittance4D", "emittance6D"};
-  std::vector<std::string> out_names(out_names_arr, out_names_arr+35);
+      "mean_t", "mean_E", "mean_x", "mean_Px", "mean_y", "mean_Py", "mean_z", "mean_Pz", "planeType", "planeNumber", "statisticalWeight", "betaTrans", "alphaTrans", "gammaTrans", "phiTrans", "traceTrans", "angularMommentum", "amplitudePzCovariance", "beta_x", "alpha_x", "gamma_x", "phi_x", "beta_y", "alpha_y", "gamma_y", "phi_y", "beta_t", "alpha_t", "gamma_t", "dispersion_x", "dispersion_y", "emittance_x", "emittance_y", "emittance_t", "emittance4D", "emittance6D"};
+  std::vector<std::string> out_names(out_names_arr, out_names_arr+36);
   for(int j=0; j<6; j++) {
     for(int k=0; k<6; k++)
       out_names.push_back("Covariance("+names[j]+","+names[k]+")");
@@ -555,11 +556,14 @@ void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     double alpha_x=cov.GetTwoDAlpha(1), gamma_x=cov.GetTwoDGamma(1), alpha_y=cov.GetTwoDAlpha(2),     gamma_y=cov.GetTwoDGamma(2), 
            alpha_t=cov.GetTwoDAlpha(0), gamma_t=cov.GetTwoDGamma(0), alpha_trans=cov.GetAlphaTrans(), gamma_trans=cov.GetGammaTrans(),
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
-    double phi_trans(0), phi_x(0), phi_y(0);
+    double phi_trans(0), phi_x(0), phi_y(0), trace_trans(0.);
     if(i>0) {
       try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
       try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
       phi_trans = (phi_x+phi_y)/2.;
+      for (size_t k = 0; k < 4; ++k) {
+          trace_trans += tms[i-1]->GetFirstOrderMap()[k+2][k+2];
+      }
     }
     for(int j=0; j<6; j++) {
       json_cov[out_names[j]] = f_theBank.sums[j];
@@ -568,13 +572,13 @@ void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     json_cov[out_names[7]] = f_theBank.pz;
     json_cov[out_names[8]] = f_theBank.planeType;
     json_cov[out_names[9]] = f_theBank.planeNumber;
-    double out_list[] = {f_theBank.weight, f_theBank.beta_p, alpha_trans, gamma_trans, phi_trans, f_theBank.l_can, f_theBank.amplitudePzCovariance, f_theBank.beta[1], alpha_x, gamma_x, phi_x, f_theBank.beta[2], alpha_y, gamma_y, phi_y, f_theBank.beta[0], alpha_t, gamma_t, disp_x, disp_y, f_theBank.em2d[1], f_theBank.em2d[2], f_theBank.em2d[0], f_theBank.em4dXY, f_theBank.em6dTXY};
-    for(int j=0; j<25; j++)
+    double out_list[] = {f_theBank.weight, f_theBank.beta_p, alpha_trans, gamma_trans, phi_trans, trace_trans, f_theBank.l_can, f_theBank.amplitudePzCovariance, f_theBank.beta[1], alpha_x, gamma_x, phi_x, f_theBank.beta[2], alpha_y, gamma_y, phi_y, f_theBank.beta[0], alpha_t, gamma_t, disp_x, disp_y, f_theBank.em2d[1], f_theBank.em2d[2], f_theBank.em2d[0], f_theBank.em4dXY, f_theBank.em6dTXY};
+    for(int j=0; j<26; j++)
         json_cov[out_names[j+10]] = out_list[j];
     int l = 0;
     for(int j=0; j<6; j++) {
       for(int k=0; k<6; k++) {
-        json_cov[out_names[l+35]] = matrix[i].GetKineticCovariances()[j][k];
+        json_cov[out_names[l+36]] = matrix[i].GetKineticCovariances()[j][k];
         l++;
       }
     }

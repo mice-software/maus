@@ -51,8 +51,6 @@ std::string GetVersionNumber_DocString =
   std::string("x is the major version number, y is the minor version number,")+
   std::string("and z is the patch number. Ignores all arguments.");
 
-
-
 static PyMethodDef methods[] = {
 {"birth", (PyCFunction)Birth,
     METH_VARARGS, Birth_DocString.c_str()},
@@ -64,14 +62,14 @@ static PyMethodDef methods[] = {
     METH_VARARGS, GetConfigurationCards_DocString.c_str()},
 {"get_version_number", (PyCFunction)GetVersionNumber,
     METH_VARARGS, GetVersionNumber_DocString.c_str()},
-{NULL, NULL, 0, NULL}
+    {NULL, NULL, 0, NULL}
 };
 
 PyObject* Birth(PyObject *dummy, PyObject *args) {
   const char* temp = NULL;
   if (!PyArg_ParseTuple(args, "s", &temp)) {
     PyErr_SetString(PyExc_TypeError,
-         "Failed to recognise arguments to Globals.birth as a string");
+         "Failed to recognise arghas_instanceuments to Globals.birth as a string");
     return NULL;
   }
   std::string cards(temp);
@@ -112,14 +110,14 @@ PyObject* HasInstance(PyObject *dummy, PyObject *args) {
 PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args) {
     if (!Globals::HasInstance()) {
         PyErr_SetString(PyExc_RuntimeError,
-                  "Attempt to get configuration cards but globals not birthed");
+            "Attempt to get configuration cards but globals not birthed");
         return NULL;
     }
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
     if (cards == NULL) {
         PyErr_SetString(PyExc_RuntimeError,
-            "Attempt to get configuration cards failed but cards were not initialised");
-        return NULL;
+         "Attempt to get configuration cards failed but cards were not initialised");
+         return NULL;
     }
     std::string json_str = JsonWrapper::JsonToString(*cards);
     const char* json = json_str.c_str();
@@ -143,7 +141,6 @@ PyObject* GetVersionNumber(PyObject *dummy, PyObject *args) {
     }
     return version_py;
 }
-
 
 PyMODINIT_FUNC initglobals(void) {
   Py_Initialize();

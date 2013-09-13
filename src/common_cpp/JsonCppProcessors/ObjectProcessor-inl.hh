@@ -28,6 +28,7 @@
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerRefItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefItem.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/PointerTRefArrayItem.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ObjectProcessorNS/IgnoreItem.hh"
 
 namespace MAUS {
 
@@ -134,6 +135,17 @@ void ObjectProcessor<ObjectType>::RegisterConstantBranch(
 }
 
 template <class ObjectType>
+void ObjectProcessor<ObjectType>::RegisterIgnoredBranch(
+                    std::string branch_name,
+                    bool is_required) {
+    using ObjectProcessorNS::BaseItem;
+    using ObjectProcessorNS::IgnoreItem;
+    BaseItem<ObjectType>* item = new IgnoreItem<ObjectType>
+                                                    (branch_name, is_required);
+    _items[branch_name] = item;
+}
+
+template <class ObjectType>
 ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue) {
@@ -143,8 +155,16 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
     if (_throws_if_unknown_branches && HasUnknownBranches(json_object)) {
+        Json::Value::Members members = json_object.getMemberNames();
+        std::string unknown = "";
+        for (Json::Value::Members::iterator it = members.begin();
+                                                    it != members.end(); ++it) {
+            if (_items.find(*it) == _items.end()) {
+                unknown += *it+" ";
+            }
+        }
         throw(Squeal(Squeal::recoverable,
-                     "Failed to recognise all json properties",
+                     "Failed to recognise all json properties "+unknown,
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
     ObjectType* cpp_object = new ObjectType();

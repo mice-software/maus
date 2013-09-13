@@ -91,20 +91,23 @@ def build_user_guide():
 
 def build_third_party_tarball():
     """Build tarball of third party libraries"""
-    print """Building third party tarball - source is MAUS_THIRD_PARTY, """+\
-          """target is MAUS_ROOT_DIR"""
-#    proc = subprocess.Popen([
-#                       "bash",
-#                       os.environ['MAUS_THIRD_PARTY']+\
-#                                      "/third_party/bash/40python_extras.bash",
-#                       "1"])
-  
+    print "Refreshing python libraries"
+    proc = subprocess.Popen([
+                       "bash",
+                       os.environ['MAUS_THIRD_PARTY']+\
+                                      "/third_party/bash/40python_extras.bash",
+                       "-cg"])
+    proc.wait() #pylint: disable=E1101
+    print "Getting targets for third_party libraries"
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
-    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz"]
+    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz",
+                 "source/*.egg", "source/*.tar", "source/*.tarz"]
     tarball_targets = []
     tarball_name = "third_party_libraries_incl_python.tar.gz"
     for targets in glob_list:
         tarball_targets += glob.glob(targets)
+    print """Building third party tarball - source is MAUS_THIRD_PARTY, """+\
+          """target is MAUS_ROOT_DIR"""
     proc = subprocess.Popen(["tar", "-czf",
                              tarball_name]
                              +tarball_targets)
@@ -152,7 +155,6 @@ def main():
     print "Doing server build"
     build_user_guide()
     build_doxygen()
-    build_test_output()
     build_third_party_tarball()
     scp_in, version = copy_targets()
     if len(sys.argv) > 1:

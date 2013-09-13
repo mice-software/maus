@@ -18,10 +18,13 @@
 #ifndef _MAUS_SRC_INPUT_INPUTCPPDAQONLINEDATA_INPUTCPPDAQONLINEDATA_H__
 #define _MAUS_SRC_INPUT_INPUTCPPDAQONLINEDATA_INPUTCPPDAQONLINEDATA_H__
 
+#include <time.h>
+
 #include <string>
 
+#include "daq/MDmonitoring.hh"
+
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
-#include "third_party/install/include/daq/MDmonitoring.hh"
 
 class InputCppDAQOnlineData : public InputCppDAQData {
 
@@ -53,6 +56,10 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   */
   bool readNextEvent();
 
+  /** Set the monitor source by a filename
+   *
+   *  \param mon file name of the source
+   */
   void setMonitorSrc(std::string mon) {
     _dataManager->setMonSrc(mon);
     _dataManager->Init();
@@ -62,6 +69,7 @@ class InputCppDAQOnlineData : public InputCppDAQData {
 
   /** Data manager object. */
   MDmonitoring * _dataManager;
+  struct timespec _sleep_time; // time.h
 };
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__
