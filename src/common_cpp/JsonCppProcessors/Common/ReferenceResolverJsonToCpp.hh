@@ -219,7 +219,7 @@ class RefManager {
   public:
     /** Get the static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has not been Birthed.
+     *  throws a Exception if RefManager has not been Birthed.
      */
     static RefManager& GetInstance();
 
@@ -229,13 +229,13 @@ class RefManager {
 
     /** Allocate a static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has already been birthed
+     *  throws a Exception if RefManager has already been birthed
      */
     static void Birth();
 
     /** Delete the static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has not been birthed
+     *  throws a Exception if RefManager has not been birthed
      */
     static void Death();
 

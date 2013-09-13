@@ -26,7 +26,7 @@
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/Vector.hh"
 
@@ -242,7 +242,7 @@ Vector<double> eigenvalues(const SymmetricMatrix& matrix) {
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get eigenvalues of non-square matrix",
                  "MAUS::eigenvalues") );
   }
@@ -253,7 +253,7 @@ Vector<double> eigenvalues(const SymmetricMatrix& matrix) {
   gsl_eigen_symm_free(workspace);
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvalues"));
   }
@@ -267,7 +267,7 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get eigensystem of non-square matrix",
                  "MAUS::eigensystem") );
   }
@@ -282,7 +282,7 @@ std::pair<Vector<double>, Matrix<double> > eigensystem(
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
     gsl_matrix_free(eigenvectors);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }

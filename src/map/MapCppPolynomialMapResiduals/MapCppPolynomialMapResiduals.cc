@@ -28,7 +28,7 @@
 #include "json/json.h"
 
 // Legacy/G4MICE
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 // MAUS
 #include "Converter/DataConverters/JsonCppSpillConverter.hh"
@@ -69,9 +69,9 @@ bool MapCppPolynomialMapResiduals::birth(std::string configuration_string) {
     optics_model_ = new PolynomialOpticsModel(&configuration);
 
     optics_model_->Build();
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
-      squee, MapCppPolynomialMapResiduals::kClassname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
+      exception, MapCppPolynomialMapResiduals::kClassname);
     return false;
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(

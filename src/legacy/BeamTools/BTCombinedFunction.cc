@@ -1,6 +1,6 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTCombinedFunction.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/Squeak.hh"
 
 BTCombinedFunction::BTCombinedFunction
@@ -69,7 +69,7 @@ double BTCombinedFunction::GetFieldAtPoleTip(int pole)
 			return b0 * _fieldIndex*(_fieldIndex+1)/(2*_radiusOfCurvature*_radiusOfCurvature)*_width/2.*_width/2.;
 		}
 		default:
-			throw (Squeal(Squeal::nonRecoverable, "Combined Function pole out of range", "BTCombinedFunction::GetFieldAtPoleTip(int)"));
+			throw (Exception(Exception::nonRecoverable, "Combined Function pole out of range", "BTCombinedFunction::GetFieldAtPoleTip(int)"));
 	}
 }
 

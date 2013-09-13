@@ -208,7 +208,7 @@ TEST_F(KalmanFilterTest, test_filtering_methods) {
   a_site->set_input_shift_covariance(C_S);
 
   // this breaks.
-  // EXPECT_THROW(track->UpdateW(a_site), Squeal);
+  // EXPECT_THROW(track->UpdateW(a_site), Exception);
   delete a_site;
   delete filter;
 }

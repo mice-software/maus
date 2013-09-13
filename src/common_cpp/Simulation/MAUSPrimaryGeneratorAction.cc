@@ -54,22 +54,22 @@ MAUSPrimaryGeneratorAction::PGParticle MAUSPrimaryGeneratorAction::Pop() {
 
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   if (_part_q.size() == 0)
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No primary particles",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   PGParticle part = Pop();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* particle = particleTable->FindParticle(part.pid);
   if ( particle == NULL )
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle pid not recognised",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if ( part.energy < particle->GetPDGMass() )
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle total energy less than particle mass",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if (!isInWorldVolume(part.x, part.y, part.z)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle is outside world volume at position ("+
                  STLUtils::ToString(part.x)+", "+
                  STLUtils::ToString(part.y)+", "+
@@ -88,7 +88,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
   if ( part.seed < 0 || part.seed > uint_max ) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   }
@@ -123,7 +123,7 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
     seed = JsonWrapper::GetProperty
                       (particle, "random_seed", JsonWrapper::intValue).asUInt();
   } catch (std::exception stde) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to convert Json::Value integer \"random_seed\" to "
                  "unsigned int.",
                  "MAUSPrimaryGeneratorAction::PGParticle::ReadJson"));

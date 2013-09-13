@@ -88,7 +88,7 @@ namespace Optics
     //Make a station id from a special hit
     StationId(SpecialHit hit); 
     //Make a station id from a MiceModule
-    StationId(const MiceModule& mod) throw(Squeal);
+    StationId(const MiceModule& mod) throw(Exception);
     //Return string that names the station type (virtual, special, ...)
     std::string  StationTypeByString() const;
     station_type StationType()         const {return _type;}

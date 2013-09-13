@@ -113,7 +113,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
     for (size_t i=0; i<5; ++i) {
-        EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
+        EXPECT_THROW(primary->GeneratePrimaries(event), Exception);
     }
  
     delete event;
@@ -151,7 +151,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     val["seed"] = Json::Value(-1);
     try {
       part_out.ReadJson(val);
-    } catch (Squeal squeal) {
+    } catch (Exception exception) {
       passed = true;
     }
     EXPECT_TRUE(passed);

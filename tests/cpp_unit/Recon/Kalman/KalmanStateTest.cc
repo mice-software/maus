@@ -155,12 +155,12 @@ TEST_F(KalmanStateTest, getters_and_setters_test) {
 
   // Bad requests
   EXPECT_THROW(a_site.set_chi2(0., MAUS::KalmanState::Initialized),
-               Squeal);
+               Exception);
   EXPECT_THROW(a_site.set_covariance_residual(covariance_residual, MAUS::KalmanState::Initialized),
-               Squeal);
+               Exception);
   EXPECT_THROW(a_site.set_residual(smoothed_residual, MAUS::KalmanState::Initialized),
-               Squeal);
+               Exception);
   EXPECT_THROW(a_site.set_covariance_matrix(covariance_residual, MAUS::KalmanState::Initialized),
-               Squeal);
+               Exception);
 }
 }

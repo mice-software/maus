@@ -9,7 +9,7 @@
 
 #include "Interface/dataCards.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::ms;
 using CLHEP::mm;
@@ -52,7 +52,7 @@ dataCards::dataCards(const std::string& app) : client(app)
   initializeApplicationCodes();
   std::map<std::string,int>::iterator i = appCode.find(client);
   if (i == appCode.end()) {
-    throw(Squeal(Squeal::recoverable, "Unrecognized client application for datacards", "dataCards(...)"));
+    throw(Exception(Exception::recoverable, "Unrecognized client application for datacards", "dataCards(...)"));
   }
   fillCards(i->second);
 }
@@ -110,7 +110,7 @@ void dataCards::fillCards(int app)
   }
   else
   {
-    throw(Squeal(Squeal::recoverable, "Unrecognized client application for datacards", "dataCards::fillCards"));
+    throw(Exception(Exception::recoverable, "Unrecognized client application for datacards", "dataCards::fillCards"));
   }
   cs["FileTag"] = ""; //Can be used as a component of output filenames for various applications, being descriptive of the beam and analysis, e.g. 400MeVpions. Convenient for batch scripts.
 
@@ -497,7 +497,7 @@ int dataCards::readKeys(std::istream& in)
       is >> vd;
     }
     else {
-      throw(Squeal(Squeal::recoverable, "Error reading key "+t+". Bad data format", "dataCards::readKeys"));
+      throw(Exception(Exception::recoverable, "Error reading key "+t+". Bad data format", "dataCards::readKeys"));
     }
     cvec[i] = vd;
   }
@@ -506,7 +506,7 @@ int dataCards::readKeys(std::istream& in)
       }
     }
     if (ok != 1)
-      throw(Squeal(Squeal::recoverable, "Failed to recognise datacard "+t+".", "dataCards::readKeys"));
+      throw(Exception(Exception::recoverable, "Failed to recognise datacard "+t+".", "dataCards::readKeys"));
   }
   return 1;
 }
@@ -515,19 +515,19 @@ double dataCards::fetchValueDouble(const std::string& key)
 {
   InputDataCardsDouble::iterator i=cd.find(key);
   if (i == cd.end())
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueDouble"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueDouble"));
   return i->second;
 }
 
 int dataCards::fetchValueInt(const std::string& key){
  InputDataCardsInt::iterator i=ci.find(key);
  if( i == ci.end())
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
  else
    return i->second;
  InputDataCardsDouble::iterator i2=cd.find(key); // only gets here if not
  if( i2 == cd.end())                             // stored as int
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
  return (int) i->second;
 }
 
@@ -535,7 +535,7 @@ Hep3Vector dataCards::fetchValue3Vector(const std::string& key)
 {
   InputDataCards3Vector::iterator i=c3v.find(key);
   if (i == c3v.end())
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValue3Vector"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValue3Vector"));
   return i->second;
 }
 
@@ -543,7 +543,7 @@ std::string dataCards::fetchValueString(const std::string& key)
 {
   InputDataCardsString::iterator i=cs.find(key);
   if (i == cs.end())
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueString"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueString"));
   return i->second;
 }
 
@@ -551,7 +551,7 @@ std::vector<double> dataCards::fetchValueVector(const std::string& key)
 {
   InputDataCardsVector::iterator i=cv.find(key);
   if (i == cv.end())
-    throw(Squeal(Squeal::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueVector"));
+    throw(Exception(Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueVector"));
   return i->second;
 }
 
@@ -588,7 +588,7 @@ void dataCards::printValue(const std::string& key)
     std::cout << ")";
     return;
   }
-  throw(Squeal(Squeal::recoverable, "datacard "+key+" not found.", "dataCards::printValue"));
+  throw(Exception(Exception::recoverable, "datacard "+key+" not found.", "dataCards::printValue"));
 }
 
 std::ostream& operator<<(std::ostream& o, const dataCards& d)

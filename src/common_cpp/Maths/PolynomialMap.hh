@@ -463,7 +463,7 @@ class PolynomialMap : public VectorMap {
 
       /** transform coefficient from subspace space_in to subspace space_out,
        * both subspaces of some larger space if any of coeff variables is not
-       * in space_out OR not in space_in, leave this coeff untouched and Squeal
+       * in space_out OR not in space_in, leave this coeff untouched and Exception
        * so for coeff({1,2},0,1.1),
        * coeff.space_transform({0,2,3,5}, {4,7,1,2,3,0}) would return
        * coeff({3,4},5,1.1)

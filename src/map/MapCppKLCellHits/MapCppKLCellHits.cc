@@ -21,7 +21,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
@@ -40,8 +40,8 @@ bool MapCppKLCellHits::birth(std::string argJsonConfigDocument) {
     //  this will contain the configuration
 
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -99,9 +99,9 @@ std::string MapCppKLCellHits::process(std::string document) {
 	}
       }
     }
-  } catch(Squeal squee) {
+  } catch(Exception exception) {
     root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
+                                       ->HandleException(root, exception, _classname);
   } catch(std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);

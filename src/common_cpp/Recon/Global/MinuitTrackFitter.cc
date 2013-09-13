@@ -31,7 +31,7 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TrackPoint.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
@@ -155,7 +155,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
 
   std::cout << "DEBUG MinuitTrackFitter::Fit(): CHECKPOINT 1" << std::endl;
   if (detector_events_.size() < 2) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Not enough track points to fit track (need at least two).",
                  "MAUS::MinuitTrackFitter::Fit()"));
   }
@@ -201,10 +201,10 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
         particle_id_);
     track_point.set_mapper_name(mapper_name);
     track->AddTrackPoint(new TrackPoint(track_point));
-  } catch (Squeal squeal) {
+  } catch (Exception exception) {
       std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                 << "something bad happened during track fitting: "
-                << squeal.what() << std::endl;
+                << exception.what() << std::endl;
       // FIXME(Lane) handle better by reporting horrible score or something
   }
 
@@ -222,10 +222,10 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
     TrackPoint track_point;
     try {
       track_point = helper.PhaseSpaceVector2TrackPoint(point, z, particle_id_);
-    } catch (Squeal squeal) {
+    } catch (Exception exception) {
         std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                   << "something bad happened during track fitting: "
-                  << squeal.what() << std::endl;
+                  << exception.what() << std::endl;
         // FIXME(Lane) handle better by reporting horrible score or something
     }
 
@@ -289,10 +289,10 @@ std::cout.flush();
     TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
         guess, optics_model_->primary_plane(), particle_id_);
     reconstructed_points_.push_back(primary);
-  } catch (Squeal squeal) {
+  } catch (Exception exception) {
       std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                 << "something bad happened during track fitting: "
-                << squeal.what() << std::endl;
+                << exception.what() << std::endl;
     return 1.0e+15;
   }
   */
@@ -345,10 +345,10 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
     try {
       reconstructed_points_.push_back(
         helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
-    } catch (Squeal squeal) {
+    } catch (Exception exception) {
         std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                   << "something bad happened during track fitting: "
-                  << squeal.what() << std::endl;
+                  << exception.what() << std::endl;
       return 1.0e+15;
     }
     */

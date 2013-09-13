@@ -25,7 +25,7 @@
 
 #include "src/common_cpp/JsonCppProcessors/ProcessorBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/STLUtils.hh"
 
 namespace MAUS {
@@ -75,7 +75,7 @@ void RefManager::SetPointerAsValue
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (table->_data_hash.find(pointer) != table->_data_hash.end())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " to hash table when it was already added",
@@ -90,7 +90,7 @@ void RefManager::SetPointerAsValue
           GetTypedPointerValueTable<TObject>();
       if (tableTObject->_data_hash.find(tobject_pointer) !=
           tableTObject->_data_hash.end())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " to TObject hash table when it was already added",
@@ -104,14 +104,14 @@ std::string RefManager::GetPointerAsValue(PointerType* pointer) {
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (!table) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Attempt to get pointer for json address "+
                      STLUtils::ToString(pointer)+
                      " when it was never added",
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     }
     if (table->_data_hash.find(pointer) == table->_data_hash.end())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Attempt to get pointer for json address "+
                      STLUtils::ToString(pointer)+
                      " when it was never added",

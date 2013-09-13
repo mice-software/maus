@@ -51,7 +51,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
      */
     void PostUserTrackingAction(const G4Track*);
 
-    /** @brief Set the tracks; must be a json array, else throws a Squeal
+    /** @brief Set the tracks; must be a json array, else throws a Exception
      */
     void SetTracks(Json::Value tracks);
 

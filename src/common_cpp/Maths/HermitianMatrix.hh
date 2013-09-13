@@ -24,7 +24,7 @@
 #include <vector>
 #include <utility>
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Maths/Complex.hh"
 #include "Maths/Vector.hh"
 #include "Maths/Matrix.hh"

@@ -31,7 +31,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "BeamTools/BTTracker.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
@@ -239,7 +239,7 @@ TEST_F(LinearApproximationOpticsModelTest, Transport) {
   bool transport_failed = false;
   try {
     optics_model.Transport(off_shell_vector, kPrimaryPlane);
-  } catch (Squeal squeal) {
+  } catch (Exception exception) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);

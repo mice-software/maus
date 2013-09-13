@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 /** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
@@ -44,7 +44,7 @@ class DAQChannelKey {
   DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
 
-  explicit DAQChannelKey(std::string keyStr) throw(Squeal);
+  explicit DAQChannelKey(std::string keyStr) throw(Exception);
 
   virtual ~DAQChannelKey() {}
 
@@ -52,7 +52,7 @@ class DAQChannelKey {
   bool operator!=( DAQChannelKey key );
 
   friend std::ostream& operator<< ( std::ostream& stream, DAQChannelKey key );
-  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )  throw(Squeal);
+  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )  throw(Exception);
 
   std::string detector() {return _detector;}
 

@@ -25,7 +25,7 @@
 
 #include "BeamTools/BTMultipole.hh"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/Squeak.hh"
 
 const BTMultipole * BTMultipole::staticMultipole = NULL;
@@ -69,11 +69,11 @@ void BTMultipole::Init(int pole, double fieldAtWidth,
       if (curvature == "StraightEnds") _curvature = straightEnds;
       if (curvature == "Constant" || curvature == "") _curvature = constant;
       if (_width >= fabs(_rCurv))
-        throw(Squeal(Squeal::nonRecoverable,
+        throw(Exception(Exception::nonRecoverable,
               "Multipole with width > radius of curvature",
               "BTMultipole::BTMultipole"));
       if (_length > fabs(2*pi*_rCurv))
-        throw(Squeal(Squeal::nonRecoverable,
+        throw(Exception(Exception::nonRecoverable,
                      "Multipole with bending angle > 360 degrees",
                      "BTMultipole::BTMultipole"));
       _endRotation = CLHEP::HepRotation(CLHEP::Hep3Vector(0, 1, 0),
@@ -112,7 +112,7 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotated(const double * Point) const {
     case momentumBased:
       return TransformToRotatedMomentumBased(Point);
     default:
-      throw(Squeal(Squeal::nonRecoverable, "Did not recognise curvature model",
+      throw(Exception(Exception::nonRecoverable, "Did not recognise curvature model",
                    "BTMultipole::TransformToRotated(const double*)"));
   }
 }
@@ -187,7 +187,7 @@ double BTMultipole::RadiusOfCurvature(double sRelativeToEnd) const {
       return _momentum/EMfield[1]/CLHEP::eplus/CLHEP::c_light;
     }
     default:
-      throw(Squeal(Squeal::nonRecoverable, "Did not recognise curvature model",
+      throw(Exception(Exception::nonRecoverable, "Did not recognise curvature model",
                    "BTMultipole::RadiusOfCurvature(double)"));
   }
 }
@@ -204,7 +204,7 @@ void BTMultipole::TransformToRectangular
     case momentumBased:
       return TransformToRectangularMomentumBased(point, value);
     default:
-      throw(Squeal(Squeal::nonRecoverable, "Did not recognise curvature model",
+      throw(Exception(Exception::nonRecoverable, "Did not recognise curvature model",
                 "BTMultipole::TransformToRectangular(const double*, double*)"));
   }
 }
@@ -349,7 +349,7 @@ void BTMultipole::SetupReferenceTrajectory() {
                                            &s, sMax, &h, y);
       if (status != GSL_SUCCESS) {
         Print(Squeak::mout(Squeak::debug));
-        throw(Squeal(Squeal::nonRecoverable,
+        throw(Exception(Exception::nonRecoverable,
                     "Error calculating reference trajectory",
                     "BTMultipole::SetupReferenceTrajectory()"));
       }
@@ -389,7 +389,7 @@ double BTMultipole::IntegralB(double dxOffset) const {
                                          _length, &h, y);
     if (status != GSL_SUCCESS) {
       Print(Squeak::mout(Squeak::debug));
-      throw(Squeal(Squeal::nonRecoverable, "Error integrating reference By",
+      throw(Exception(Exception::nonRecoverable, "Error integrating reference By",
                    "BTMultipole::SetupMagnitude()"));
     }
     step++;

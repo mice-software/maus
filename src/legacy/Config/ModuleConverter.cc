@@ -1,6 +1,6 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "Config/MiceModule.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Config/ModuleConverter.hh"
 #include "Interface/Squeak.hh"
 
@@ -22,7 +22,7 @@ MCHit ModuleConverter::ModuleToHit(const MiceModule* mod)
   if     (longS == "Energy")        {mom[3] = longD;      mom[2] = sqrt(longD*longD  -mass*mass);}
   else if(longS == "KineticEnergy") {mom[3] = longD+mass; mom[2] = sqrt(mom[3]*mom[3]-mass*mass);}
   else if(longS == "Momentum" || longS == "ZMomentum") {mom[2] = longD; mom[3] = sqrt(longD*longD+mass*mass);}
-  else throw(Squeal(Squeal::recoverable, "Beam ellipse longitudinal variable "+longS+" not recognised in Module "+mod->name(), "ModuleConverter::ModuleToHit(MiceModule*)"));
+  else throw(Exception(Exception::recoverable, "Beam ellipse longitudinal variable "+longS+" not recognised in Module "+mod->name(), "ModuleConverter::ModuleToHit(MiceModule*)"));
   HepLorentzVector pos(mod->globalPosition(), mod->propertyDouble("Time"));
   mom *= mod->globalRotation();
   hit.setPosition(pos.v());
@@ -50,10 +50,10 @@ CLHEP::HepSymMatrix ModuleConverter::ModuleToBeamEllipse(const MiceModule* mod, 
   }
 
   double dx=0., dy=0., dpx=0., dpy=0.; //dispersion, dispersion prime
-  try{dx  = mod->propertyDouble("Dispersion_X"     );} catch(Squeal squee) {}
-  try{dy  = mod->propertyDouble("Dispersion_Y"     );} catch(Squeal squee) {}
-  try{dpx = mod->propertyDouble("DispersionPrime_X");} catch(Squeal squee) {}
-  try{dpy = mod->propertyDouble("DispersionPrime_Y");} catch(Squeal squee) {}
+  try{dx  = mod->propertyDouble("Dispersion_X"     );} catch(Exception exception) {}
+  try{dy  = mod->propertyDouble("Dispersion_Y"     );} catch(Exception exception) {}
+  try{dpx = mod->propertyDouble("DispersionPrime_X");} catch(Exception exception) {}
+  try{dpy = mod->propertyDouble("DispersionPrime_Y");} catch(Exception exception) {}
   if(ellipseDef == "Penn")
   {
     double bz = 0;
@@ -106,7 +106,7 @@ int ModuleConverter::MassToPdgPid(double mass, double tolerance)
   }
   std::stringstream iss;
   iss << mass; 
-  throw(Squeal(Squeal::recoverable, "Did not recognise pid "+iss.str()+" for mass calculation", "ModuleConverter::MassToPdgPid"));
+  throw(Exception(Exception::recoverable, "Did not recognise pid "+iss.str()+" for mass calculation", "ModuleConverter::MassToPdgPid"));
 }
 
 double ModuleConverter::PdgPidToMass(int pid)
@@ -114,7 +114,7 @@ double ModuleConverter::PdgPidToMass(int pid)
   pid = abs(pid);
   FillPdgPidToMass();
   if(_pdgPidToMass.find(pid) != _pdgPidToMass.end()) return _pdgPidToMass[pid];
-  else {std::stringstream iss; iss << pid; throw(Squeal(Squeal::recoverable, "Did not recognise pid "+iss.str()+" for mass calculation", "ModuleConverter::PdgPidToMass"));}
+  else {std::stringstream iss; iss << pid; throw(Exception(Exception::recoverable, "Did not recognise pid "+iss.str()+" for mass calculation", "ModuleConverter::PdgPidToMass"));}
 }
 
 double ModuleConverter::PdgPidToCharge(int pid)
@@ -122,7 +122,7 @@ double ModuleConverter::PdgPidToCharge(int pid)
   int abs_pid = abs(pid);
   FillPdgPidToCharge();
   if(_pdgPidToCharge.find(abs_pid) != _pdgPidToCharge.end()) return _pdgPidToCharge[abs_pid]*abs_pid/pid*CLHEP::eplus;
-  else {std::stringstream iss; iss << pid; throw(Squeal(Squeal::recoverable, "Did not recognise pid "+iss.str()+" for charge calculation", "ModuleConverter::PdgPidToCharge"));}
+  else {std::stringstream iss; iss << pid; throw(Exception(Exception::recoverable, "Did not recognise pid "+iss.str()+" for charge calculation", "ModuleConverter::PdgPidToCharge"));}
 }
 
 CLHEP::HepSymMatrix ModuleConverter::SetCovariances(MCHit hit, double bz,

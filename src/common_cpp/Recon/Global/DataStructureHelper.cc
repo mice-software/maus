@@ -139,14 +139,14 @@ double DataStructureHelper::GetDetectorZPosition(
         std::stringstream message;
         message << "Found multiple detector geometry modules named \""
                 << detector_name.str() << "\".";
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                       message.str(),
                       "DataStructureHelper::GetDetectorZPosition()"));
       } else {
         std::stringstream message;
         message << "Couldn't find detector geometry module \""
                 << detector_name.str() << "\".";
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                       message.str(),
                       "DataStructureHelper::GetDetectorZPosition()"));
       }
@@ -160,14 +160,14 @@ double DataStructureHelper::GetDetectorZPosition(
     std::stringstream message;
     message << "Couldn't find reconstruction mapping detector \""
             << detector_name.str() << "\".";
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                   message.str(),
                   "DataStructureHelper::GetDetectorZPosition()"));
   } else if (modules.size() > 1) {
     std::stringstream message;
     message << "Found multiple reconstruction mapping detectors named \""
             << detector_name.str() << "\".";
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                   message.str(),
                   "DataStructureHelper::GetDetectorZPosition()"));
   }
@@ -237,7 +237,7 @@ TrackPoint DataStructureHelper::PhaseSpaceVector2TrackPoint(
         pz = 0.;
       //}
       /*
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                    "PhaseSpaceVector is off mass shell.",
                    "DataStructureHelper::PhaseSpaceVector2TrackPoint()"));
       */
@@ -392,7 +392,7 @@ GlobalTrackPoint DataStructureHelper::TrackPointToGlobalTrackPoint(
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {
   if (value.size() < static_cast<Json::Value::UInt>(6)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Not enough row elements to convert JSON to CovarianceMatrix",
                  "DataStructureHelper::GetJsonCovarianceMatrix()"));
   }
@@ -402,8 +402,8 @@ CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
   for (size_t row = 0; row < 6; ++row) {
     const Json::Value row_json = value[row];
     if (row_json.size() < static_cast<Json::Value::UInt>(6)) {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Not enough column elements to convert JSON to CovarianceMatrix",
           "DataStructureHelper::GetJsonCovarianceMatrix()"));
     }

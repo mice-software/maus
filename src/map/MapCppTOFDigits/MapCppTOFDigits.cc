@@ -19,7 +19,7 @@
 #include "Utils/JsonWrapper.hh"
 #include "Utils/TOFChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppTOFDigits/MapCppTOFDigits.hh"
@@ -84,8 +84,8 @@ bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
     }
 
   return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -167,9 +167,9 @@ std::string MapCppTOFDigits::process(std::string document) {
         }
       }
     }
-  } catch(Squeal squee) {
+  } catch(Exception exception) {
     root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
+                                       ->HandleException(root, exception, _classname);
   } catch(std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);
@@ -282,7 +282,7 @@ Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) {
 
 bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
                              Json::Value xDocTdcHit,
-                             Json::Value &xDocDigit) throw(Squeal) {
+                             Json::Value &xDocDigit) throw(Exception) {
 
   int n_Adc_hits = xDocfAdc.size();
   std::string xTofKey_str = JsonWrapper::GetProperty(xDocDigit,
@@ -312,12 +312,12 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
       if (!xDocfAdc[AdcHitCount].isMember("charge_pm"))
           xDocDigit["charge_pm"] = 0;
       if (xDocDigit["part_event_number"] != xDocfAdc[AdcHitCount]["part_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::getAdc"));
       }
       if (xDocDigit["phys_event_number"] != xDocfAdc[AdcHitCount]["phys_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::getAdc"));
       }
@@ -331,7 +331,7 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
 
 bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
                               Json::Value xDocTdcHit,
-                              Json::Value &xDocDigit ) throw(Squeal) {
+                              Json::Value &xDocDigit ) throw(Exception) {
   Json::Value xDocT = JsonWrapper::GetProperty(xDocTrig, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
   int n_count = xDocT.size();
@@ -351,12 +351,12 @@ bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
                                                                     JsonWrapper::intValue);
 
       if (xDocDigit["part_event_number"] != Trig["part_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::getTrig"));
       }
       if (xDocDigit["phys_event_number"] != Trig["phys_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::getTrig"));
       }
@@ -370,7 +370,7 @@ bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
 
 bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
                                  Json::Value xDocTdcHit,
-                                 Json::Value &xDocDigit ) throw(Squeal) {
+                                 Json::Value &xDocDigit ) throw(Exception) {
   Json::Value xDocTR = JsonWrapper::GetProperty(xDocTrigReq, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit, "geo", JsonWrapper::intValue).asInt();
   int n_req_count = xDocTR.size();
@@ -392,12 +392,12 @@ bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
                                                                             JsonWrapper::intValue);
 
       if (xDocDigit["part_event_number"] != TrigReq["part_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::getTrigReq"));
       }
       if (xDocDigit["phys_event_number"] != TrigReq["phys_event_number"]) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::getTrigReq"));
       }

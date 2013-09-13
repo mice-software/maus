@@ -192,7 +192,7 @@ void PhaseSpaceVector::set(double value, std::string name)
 		case 23: setEy(value); break;
 		case 24: setEz(value); break;
 		default: 
-			throw Squeal(Squeal::recoverable, "Variable "+name+" not recognised", "PhaseSpaceVector::set(double, string)");
+			throw Exception(Exception::recoverable, "Variable "+name+" not recognised", "PhaseSpaceVector::set(double, string)");
 	}
 }
 
@@ -213,7 +213,7 @@ void PhaseSpaceVector::setConservingMass(double value, std::string name)
 
 PhaseSpaceVector PhaseSpaceVector::interpolate(std::vector<PhaseSpaceVector> psv, std::string variableName, double variable)
 {
-  if(psv.size() < 1) throw(Squeal(Squeal::recoverable, "Interpolating PhaseSpaceVector array with length 0", "PhaseSpaceVector::interpolate"));
+  if(psv.size() < 1) throw(Exception(Exception::recoverable, "Interpolating PhaseSpaceVector array with length 0", "PhaseSpaceVector::interpolate"));
 	int    point = -1;
 	int    i     = 0;
 	double delta = 0;

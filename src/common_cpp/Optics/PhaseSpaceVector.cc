@@ -23,7 +23,7 @@
 #include <iostream>
 #include "CLHEP/Units/PhysicalConstants.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -35,7 +35,7 @@ PhaseSpaceVector::PhaseSpaceVector()
 PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
     : Vector<double>() {
   if (original_instance.size() < 6) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to construct with a Vector<double> containing "
                  "fewer than six elements",
                  "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));

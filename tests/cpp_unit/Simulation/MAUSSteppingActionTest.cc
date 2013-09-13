@@ -83,7 +83,7 @@ TEST_F(MAUSSteppingActionTest, GetSetTest) {
   stepping->SetWillKeepSteps(false);
   EXPECT_EQ(stepping->GetWillKeepSteps(), false);
 
-  EXPECT_THROW(stepping->SetSteps(Json::Value(Json::objectValue)), Squeal);
+  EXPECT_THROW(stepping->SetSteps(Json::Value(Json::objectValue)), Exception);
   Json::Value array(Json::arrayValue);
   array.append(Json::Value("Hello"));
   EXPECT_NO_THROW(stepping->SetSteps(array));

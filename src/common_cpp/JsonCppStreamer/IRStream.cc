@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 #include "JsonCppStreamer/IRStream.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 irstream::irstream(const char* fileName,
 		   const char* treeName,
@@ -32,7 +32,7 @@ irstream::irstream(const char* fileName,
       << treeName
       << "' was not found in the tree."
       <<std::endl;
-    throw Squeal(Squeal::nonRecoverable,
+    throw Exception(Exception::nonRecoverable,
 		 "irstream object not correctly initialised as couldn;t find requested TTree.",
 		 "irstream::irstream(const char*, const char*, const char*)");
   }
@@ -46,7 +46,7 @@ void irstream::open(const char* fileName,
     Squeak::mout(Squeak::error)
       << "Couldn't open ROOT TFile as no filename given"
       << std::endl;
-    throw Squeal(Squeal::recoverable,
+    throw Exception(Exception::recoverable,
 		 "Cannot open file as null \"\" string passed as filename",
 		 "void irstream::open(const char*, const char*, const char*)");
   }
@@ -56,7 +56,7 @@ void irstream::open(const char* fileName,
     Squeak::mout(Squeak::error)
       << "ROOT TFile opened incorrectly"
       << std::endl;
-    throw Squeal(Squeal::recoverable,
+    throw Exception(Exception::recoverable,
 		 "TFile object not opened properly",
 		 "void irstream::open(const char*, const char*, const char*)");
   }
@@ -68,7 +68,7 @@ void irstream::open(const char* fileName,
       << treeName
       << "' was not found in the tree."
       << std::endl;
-    throw Squeal(Squeal::recoverable,
+    throw Exception(Exception::recoverable,
 		 "Could not find requested TTree.",
 		 "void irstream::open(const char*, const char*, const char*)");
   }

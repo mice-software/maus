@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/API/APIExceptions.hh"
 #include "src/common_cpp/API/ModuleBase.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -41,18 +41,18 @@ namespace MAUS {
     FRIEND_TEST(ModuleBaseTest, TestDeath);
   };
 
-  class testclass_squeal : public ModuleBase {
+  class testclass_exception : public ModuleBase {
   public:
-    testclass_squeal(): ModuleBase("TestClass") {}
+    testclass_exception(): ModuleBase("TestClass") {}
   private:
     virtual void _birth(const std::string&) {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _birth",
+      throw Exception(Exception::recoverable,
+		   "Expected Test Exception in _birth",
 		   "void _birth (const std::string&)");
     }
     virtual void _death() {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _death",
+      throw Exception(Exception::recoverable,
+		   "Expected Test Exception in _death",
 		   "void _death ()");
     }
 
@@ -119,13 +119,13 @@ namespace MAUS {
       << "Fail: Didn't run _birth code."
       << std::endl;
     /////////////////////////////////////////////////////
-    testclass_squeal tc_s;
+    testclass_exception tc_s;
     try {
       tc_s.birth("TestConfig");
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
+	<< "Fail: Exception should have been handled"
 	<< std::endl;
     }
 
@@ -170,13 +170,13 @@ namespace MAUS {
       << std::endl;
 
     /////////////////////////////////////////////////////
-    testclass_squeal tc_s;
+    testclass_exception tc_s;
     try {
       tc_s.death();
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
+	<< "Fail: Exception should have been handled"
 	<< std::endl;
     }
 

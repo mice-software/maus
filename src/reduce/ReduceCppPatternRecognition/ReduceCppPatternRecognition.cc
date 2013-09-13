@@ -23,7 +23,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
@@ -48,8 +48,8 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, mClassname);
+  } catch(Exception exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, mClassname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
   }
@@ -67,9 +67,9 @@ std::string ReduceCppPatternRecognition::process(std::string aDocument) {
         mDataManager.process(mSpill);
         mDataManager.draw(mPlotters);
       }
-    } catch(Squeal squee) {
-      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
-      mRoot = MAUS::CppErrorHandler::getInstance()->HandleSqueal(mRoot, squee, mClassname);
+    } catch(Exception exception) {
+      Squeak::mout(Squeak::error) << exception.GetMessage() << std::endl;
+      mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exception, mClassname);
     } catch(std::exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);

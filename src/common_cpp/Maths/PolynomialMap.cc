@@ -30,7 +30,7 @@
 
 #include "Interface/Interpolator.hh"
 #include "Interface/Mesh.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 #include "Maths/Vector.hh"
@@ -139,7 +139,7 @@ PolynomialMap::GetCoefficientsAsVector() const {
 }
 
 PolynomialMap* PolynomialMap::Recentred(double * point) const {
-  throw(Squeal(Squeal::nonRecoverable,
+  throw(Exception(Exception::nonRecoverable,
         "Recentred not implemented",
         "PolynomialMap::Recentred"));
 }
@@ -191,14 +191,14 @@ unsigned int PolynomialMap::PolynomialOrder() const {
 
 PolynomialMap * PolynomialMap::Inverse() const {
   // FIXME(plane1@hawk.iit.edu): implement
-  throw(Squeal(Squeal::recoverable,
+  throw(Exception(Exception::recoverable,
                "Not implemented.",
                "PolynomialMap::Inverse()"));
 }
 
 PolynomialMap PolynomialMap::Inverse(int max_order) const {
   // FIXME(plane1@hawk.iit.edu): implement
-  throw(Squeal(Squeal::recoverable,
+  throw(Exception(Exception::recoverable,
                "Not implemented.",
                "PolynomialMap::Inverse(int)"));
 }
@@ -365,12 +365,12 @@ void PolynomialMap::PrintHeader(std::ostream& out, char int_separator,
 Vector<double> PolynomialMap::Means
        (std::vector<std::vector<double> > values, std::vector<double> weights) {
   if (values.size() < 1) {
-    throw(Squeal
-           (Squeal::recoverable, "No input values", "PolynomialMap::Means"));
+    throw(Exception
+           (Exception::recoverable, "No input values", "PolynomialMap::Means"));
   }
   if (values[0].size() < 1) {
-    throw(Squeal
-            (Squeal::recoverable, "Dimension < 1", "PolynomialMap::Means"));
+    throw(Exception
+            (Exception::recoverable, "Dimension < 1", "PolynomialMap::Means"));
   }
   if (weights.size() != values.size()) {
     weights = std::vector<double>(values.size(), 1.);
@@ -405,13 +405,13 @@ SymmetricMatrix PolynomialMap::Covariances(
     const Vector<double>&                             means) {
   size_t npoints = values.size();
   if (npoints < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No input values",
                  "PolynomialMap::Covariances()"));
   }
   size_t dim = values[0].size();
   if (dim < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Dimension < 1",
                  "PolynomialMap::Covariances()"));
   }
@@ -549,7 +549,7 @@ std::cout << "]" << std::endl;
       message << "The number of weights (" << weights.size() << ") "
               << "does not equal the number of data points (" << nPoints << ")"
               << std::endl;
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                   message.str(),
                   "PolynomialMap::PolynomialLeastSquaresFit"));
     }
@@ -582,12 +582,12 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   Matrix<double> F2_inverse;
   try {
     F2_inverse = inverse(F2);
-  } catch(Squeal squee) {
+  } catch(Exception exception) {
     delete polynomial_map;
     std::stringstream message;
     message << "Could not find least squares fit for data. Nested exception:"
-            << std::endl << "\"" << squee.GetMessage() << "\"" << std::endl;
-    throw(Squeal(Squeal::recoverable,
+            << std::endl << "\"" << exception.GetMessage() << "\"" << std::endl;
+    throw(Exception(Exception::recoverable,
                  message.str(),
                  "PolynomialMap::PolynomialLeastSquaresFit"));
   }
@@ -617,14 +617,14 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
   // treat each like a 1D vector
   size_t nPoints    = points.size();
   if (nPoints < 1) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "No data for LLS Fit",
       "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
   if (values.size() != nPoints) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "Misaligned array in LLS Fit",
       "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
@@ -684,12 +684,12 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
     Matrix<double> F2_inverse;
     try {
       F2_inverse = inverse(F2);
-    } catch(Squeal squee) {
+    } catch(Exception exception) {
     std::stringstream message;
     message << "Could not find constrained least squares fit for data. "
             << "Nested exception:" << std::endl
-            << "\"" << squee.GetMessage() << "\"" << std::endl;
-      throw(Squeal(Squeal::recoverable,
+            << "\"" << exception.GetMessage() << "\"" << std::endl;
+      throw(Exception(Exception::recoverable,
             message.str(),
             "PolynomialMap::ConstrainedPolynomialLeastSquaresFit"));
     }
@@ -742,8 +742,8 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
   try {
     inverse_covaraiance_matrix = inverse(covariances);
   }
-  catch(Squeal squee) {
-    throw(Squeal(Squeal::recoverable,
+  catch(Exception exception) {
+    throw(Exception(Exception::recoverable,
                  "Failed to find least squares fit for data",
                  "PolynomialMap::Chi2ConstrainedLeastSquaresFit"));
   }
@@ -782,7 +782,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
       map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
                 xin, xout, polynomialOrder, coeffs, weights);
     }
-    catch(Squeal squee) {
+    catch(Exception exception) {
       map = NULL;
       chi2 = chi2Limit * 2.;
     }
@@ -814,7 +814,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
     err << "PolynomialMap::Chi2ConstrainedLeastSquaresFit failed to "
         << "converge. Best fit had <chi2> = " << chi2
         << " compared to limit " << chi2Limit << std::endl;
-    throw(Squeal(Squeal::recoverable, err.str(),
+    throw(Exception(Exception::recoverable, err.str(),
           "PolynomialMap::Chi2ConstrainedLeastSquaresFit(...)"));
   }
   if (chi2End != NULL) *chi2End = discard; // save discard at end for future use
@@ -912,7 +912,7 @@ void PolynomialMap::PolynomialCoefficient::SpaceTransform
   for (size_t con = 0; con < in_variables.size(); con++) {
     if (mapping.find(in_variables[con]) != mapping.end()) {
       in_variables[con] = mapping[in_variables[con]];
-    } else { throw(Squeal(Squeal::recoverable,
+    } else { throw(Exception(Exception::recoverable,
                     "Input variable not found in space transform",
                     "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
     }
@@ -920,7 +920,7 @@ void PolynomialMap::PolynomialCoefficient::SpaceTransform
   if (mapping.find(_outVar) != mapping.end()) {
     _outVar = mapping[_outVar];
   } else {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Output variable not found in space transform",
                  "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
   }
@@ -934,18 +934,18 @@ double PolynomialMap::GetAvgChi2OfDifference(
     std::vector< std::vector<double> > out) {
   std::vector< std::vector<double> > out_p;
   if (in.size() < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No data in input",
                  "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   if (in.size() != out.size()) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
      "Input data and output data misaligned for calculation of chi2 difference",
      "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   for (size_t i = 0; i < in.size(); ++i) {
     if (in[i].size() != PointDimension() || out[i].size() != ValueDimension())
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                    "Bad input data for calculation of chi2 difference",
                    "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }

@@ -23,7 +23,7 @@
 #include <ostream>
 #include <vector>
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 namespace MAUS {
 // Forward declarations for CovarianceMatrix.hh

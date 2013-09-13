@@ -23,7 +23,7 @@
 #include <ostream>
 #include <vector>
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/TransferMap.hh"
 

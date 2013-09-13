@@ -72,9 +72,9 @@ public:
 	//Get the sum of childrens' vector potential
 	CLHEP::HepLorentzVector GetVectorPotential(CLHEP::HepLorentzVector position) const;
 	void                    GetVectorPotential(const double point[4], double * potential) const 
-	{throw(Squeal(Squeal::recoverable, "Not implemented!", "BTFieldGroup::GetVectorPotential(const double*, double*)"));}
+	{throw(Exception(Exception::recoverable, "Not implemented!", "BTFieldGroup::GetVectorPotential(const double*, double*)"));}
 	void                    GetVectorPotentialDifferential(const double point[4], double * potential, int axis) const
-	{throw(Squeal(Squeal::recoverable, "Not implemented!", "BTFieldGroup::GetVectorPotentialDifferential"));}
+	{throw(Exception(Exception::recoverable, "Not implemented!", "BTFieldGroup::GetVectorPotentialDifferential"));}
 	CLHEP::HepLorentzVector GetLocalCoordinates(CLHEP::HepLorentzVector position, unsigned int fieldNumber) const;
 	//Add all fields to the mesh; update this field's bounding box; set _closed to true; repeat for any parent fields
   //note you have to call Close() before attempting to use the fieldgroup for e.g. GetFieldValue()

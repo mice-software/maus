@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
@@ -83,13 +83,13 @@ TEST(STLUtilsTest, ReplaceVariablesTest) {
     EXPECT_EQ(STLUtils::ReplaceVariables("some_string_${MAUS_ROOT_DIR}"),
                                          "some_string_"+mrd);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), Squeal);
+                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_$MAUS_ROOT_DIR}"), Squeal);
+                      ("some_string_$MAUS_ROOT_DIR}"), Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_${MAUS_ROOT_DIR"), Squeal);
+                      ("some_string_${MAUS_ROOT_DIR"), Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_$MAUS_ROOT_DIR"), Squeal);
+                      ("some_string_$MAUS_ROOT_DIR"), Exception);
 }
 }
 

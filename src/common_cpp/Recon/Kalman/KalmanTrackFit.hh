@@ -28,7 +28,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"

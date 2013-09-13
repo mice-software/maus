@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/FieldTools/SectorField.hh"
 
@@ -247,7 +247,7 @@ TEST(SectorFieldTest, SetPolarBoundingBoxThrowTest) {
         EXPECT_THROW(test.SetPolarBoundingBox(bb_polar[i][0], bb_polar[i][1],
                                               bb_polar[i][2], bb_polar[i][3],
                                               bb_polar[i][4], bb_polar[i][5]),
-                     Squeal) << i;
+                     Exception) << i;
     }
 }
 }

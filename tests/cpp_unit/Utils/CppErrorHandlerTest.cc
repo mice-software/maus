@@ -4,7 +4,7 @@
 
 #include "json/json.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace {
@@ -13,18 +13,18 @@ using namespace MAUS;
 class CppErrorHandlerTest : public ::testing::Test {
 protected:
   CppErrorHandlerTest() : obj(Json::objectValue), 
-                          squee(Squeal::recoverable, "a_test", "exc::test"),
-                          std_exc(&squee) {
+                          exception(Exception::recoverable, "a_test", "exc::test"),
+                          std_exc(&exception) {
   }
   virtual ~CppErrorHandlerTest() {}
   Json::Value obj;
-  Squeal      squee;
+  Exception      exception;
   std::exception* std_exc;  
 };
 
-TEST_F(CppErrorHandlerTest, HandleSquealTest) {
+TEST_F(CppErrorHandlerTest, HandleExceptionTest) {
   Json::Value value = 
-           CppErrorHandler::getInstance()->HandleSqueal(obj, squee, "exc_test");
+           CppErrorHandler::getInstance()->HandleException(obj, exception, "exc_test");
   EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
            Json::Value("<class 'ErrorHandler.CppError'>: a_test at exc::test"));
 }
@@ -41,8 +41,8 @@ TEST_F(CppErrorHandlerTest, HandleStdExcNoJsonTest) {
   // not much to be done here... could check stderr or so?
 }
 
-TEST_F(CppErrorHandlerTest, HandleSquealNoJsonTest) {
-  CppErrorHandler::getInstance()->HandleSquealNoJson(squee, "exc_test");
+TEST_F(CppErrorHandlerTest, HandleExceptionNoJsonTest) {
+  CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, "exc_test");
   // not much to be done here... could check stderr or so?
 }
 

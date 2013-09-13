@@ -55,7 +55,7 @@ protected:
 TEST_F(MiceModToG4SolidTest, checkDimTest) {
   MiceModule mod;
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions", CLHEP::Hep3Vector(1.,1.,0.) );
-  ASSERT_THROW   ( MiceModToG4Solid::checkDim(&mod, 3), Squeal );
+  ASSERT_THROW   ( MiceModToG4Solid::checkDim(&mod, 3), Exception );
   ASSERT_NO_THROW( MiceModToG4Solid::checkDim(&mod, 2) );
 }
 
@@ -72,11 +72,11 @@ TEST_F(MiceModToG4SolidTest, buildWedgeTest) {
   EXPECT_DOUBLE_EQ(((G4Trd*)sol)->GetZHalfLength (), 1.5);
   if (sol!=NULL) delete sol; sol=NULL;
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(0., 1., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 0., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 1., 0.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildWedge(&mod), Exception );
 }
 
 MiceModule trapezoid_module( double aX1, double aX2, double aY1, double aY2, double aZ ) {
@@ -89,10 +89,10 @@ MiceModule trapezoid_module( double aX1, double aX2, double aY1, double aY2, dou
   	  mod.addPropertyDouble( "TrapezoidHeightY2", aY2 );
   	  mod.addPropertyDouble( "TrapezoidLengthZ", aZ );
   	  return mod;
-  } catch( Squeal squee ){
-	  std::string error = squee.GetMessage();
+  } catch( Exception exception ){
+	  std::string error = exception.GetMessage();
 	  std::cerr << "Exception in trapezoid_module: " << error << std::endl;
-	  throw( Squeal( Squeal::recoverable, "Error in MiceModToG4Test: " + error + "\'", "trapezoid_module"));
+	  throw( Exception( Exception::recoverable, "Error in MiceModToG4Test: " + error + "\'", "trapezoid_module"));
   }
 }
 
@@ -124,11 +124,11 @@ TEST_F(MiceModToG4SolidTest, buildBoxTest) {
   EXPECT_DOUBLE_EQ(((G4Box*)sol)->GetZHalfLength(), 1.5);
   if (sol!=NULL) delete sol; sol=NULL;
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(0., 1., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 0., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 1., 0.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildBox(&mod), Exception );
 }
 
 TEST_F(MiceModToG4SolidTest, buildCylinderTest) {
@@ -142,9 +142,9 @@ TEST_F(MiceModToG4SolidTest, buildCylinderTest) {
   EXPECT_DOUBLE_EQ(((G4Tubs*)sol)->GetZHalfLength(), 1.0);
   if (sol!=NULL) delete sol; sol=NULL;
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(0., 1., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildCylinder(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildCylinder(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 0., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildCylinder(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildCylinder(&mod), Exception );
 }
 
 TEST_F(MiceModToG4SolidTest, buildTubeTest) {
@@ -159,13 +159,13 @@ TEST_F(MiceModToG4SolidTest, buildTubeTest) {
   if (sol!=NULL) delete sol; sol=NULL;
   //Check we catch errors before G4 throws
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(2., 1., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(0., 1., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 0., 1.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1., 1., 0.) );
-  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Squeal );
+  ASSERT_THROW   ( sol = MiceModToG4Solid::buildTube(&mod), Exception );
 }
 
 TEST_F(MiceModToG4SolidTest, buildSphereTest) {
@@ -196,37 +196,37 @@ TEST_F(MiceModToG4SolidTest, buildSphereTest) {
 
   //Check we catch errors before G4 throws
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(2.,1.,-1.) );
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1.,-1.,-1.) );
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(-1.,1.,-1.) );
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1.,2.,-1.) );
   //G4 throws if delta angle is negative, otherwise seems ok - but I want to force users to make valid input
   mod.addPropertyHep3Vector("Phi",   CLHEP::Hep3Vector(100.*deg,  -10.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.addPropertyHep3Vector("Phi",   CLHEP::Hep3Vector(500.*deg,  10.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.addPropertyHep3Vector("Phi",   CLHEP::Hep3Vector(5.*deg,   500.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.addPropertyHep3Vector("Phi",   CLHEP::Hep3Vector(5.*deg,    10.*deg,-1.));
   mod.addPropertyHep3Vector("Theta", CLHEP::Hep3Vector(100.*deg,  -10.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.addPropertyHep3Vector("Theta", CLHEP::Hep3Vector(500.*deg,  10.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
   mod.addPropertyHep3Vector("Theta", CLHEP::Hep3Vector(5.*deg,   500.*deg,-1.));
-  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Squeal );
+  ASSERT_THROW( sol = MiceModToG4Solid::buildSphere(&mod), Exception );
 
 }
 
 TEST_F(MiceModToG4SolidTest, buildPolyconeTest) {
   MiceModule mod;
-  ASSERT_THROW(MiceModToG4Solid::buildPolycone(&mod), Squeal); //test properly in polycone.hh
+  ASSERT_THROW(MiceModToG4Solid::buildPolycone(&mod), Exception); //test properly in polycone.hh
 }
 
 TEST_F(MiceModToG4SolidTest, buildMultipoleTest) {
   MiceModule mod;
-  ASSERT_THROW(MiceModToG4Solid::buildMultipole(&mod), Squeal); //test properly in multipole.hh
+  ASSERT_THROW(MiceModToG4Solid::buildMultipole(&mod), Exception); //test properly in multipole.hh
 }
 
 
@@ -252,21 +252,21 @@ TEST_F(MiceModToG4SolidTest, buildTorusTest) {
   EXPECT_DOUBLE_EQ(sol->GetSPhi(), 5.*deg );
   EXPECT_DOUBLE_EQ(sol->GetDPhi(), 10.*deg );
   MiceModule mod1 = torus_module(1.5, 1.0, 5.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod1), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod1), Exception);
   MiceModule mod2 = torus_module(-0.1, 1.0, 5.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod2), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod2), Exception);
   MiceModule mod3 = torus_module(0.5, 3.0, 5.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod3), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod3), Exception);
   MiceModule mod4 = torus_module(0.5, 0.25, 5.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod4), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod4), Exception);
   MiceModule mod5 = torus_module(0.5, 1.0, -1.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod5), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod5), Exception);
   MiceModule mod6 = torus_module(0.5, 1.0, 361.*deg, 10.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod6), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod6), Exception);
   MiceModule mod7 = torus_module(0.5, 1.0, 5.*deg, -1.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod7), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod7), Exception);
   MiceModule mod8 = torus_module(0.5, 1.0, 5.*deg, 361.*deg, 2.0);
-  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod8), Squeal);
+  ASSERT_THROW(sol = (G4Torus*)MiceModToG4Solid::buildTorus(&mod8), Exception);
 }
 
 TEST_F(MiceModToG4SolidTest, buildEllipticalConeTest) {
@@ -281,14 +281,14 @@ TEST_F(MiceModToG4SolidTest, buildEllipticalConeTest) {
   MiceModule mod2;
   mod2.addPropertyDouble("ZCut", -1.0) ;
   mod2.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(2.0, 3.0, 4.0));
-  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Squeal);
+  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Exception);
   MiceModule mod3;
   mod3.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(-1.0, 3.0, 4.0));
-  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Squeal);
+  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Exception);
   mod3.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1.0, -3.0, 4.0));
-  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Squeal);
+  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Exception);
   mod3.setProperty<CLHEP::Hep3Vector>("Dimensions",CLHEP::Hep3Vector(1.0, 3.0, -4.0));
-  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Squeal);
+  ASSERT_THROW(sol = (G4EllipticalCone*)MiceModToG4Solid::buildEllipticalCone(&mod2), Exception);
 }
 
 

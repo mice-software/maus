@@ -32,7 +32,7 @@
 #include "json/json.h"
 
 // Legacy/G4MICE
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 // MAUS
 #include "Converter/DataConverters/JsonCppSpillConverter.hh"
@@ -85,7 +85,7 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
     Json::Value physics_processes = configuration_["physics_processes"];
     if ((physics_processes != Json::Value("mean_energy_loss"))
         && (physics_processes != Json::Value("none"))) {
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                   "The \"physics_processes\" configuration variable should be "
                   "set to \"mean_energy_loss\" or \"none\" to avoid collisions "
                   "of the test particles with walls.",
@@ -95,9 +95,9 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
         configuration_, detectors_);
     SetupOpticsModel();
     SetupTrackFitter();
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
-      squee, MapCppGlobalTrackReconstructor::kClassname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
+      exception, MapCppGlobalTrackReconstructor::kClassname);
     return false;
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
@@ -207,7 +207,7 @@ fflush(stdout);
       /* TODO(plane1@hawk.iit.edu)
       optics_model_ = new DifferentiatingOpticsModel();
       */
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "DifferentiatingOpticsModel is not yet implemented.",
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()"));
       break;
@@ -217,7 +217,7 @@ fflush(stdout);
       /* TODO(plane1@hawk.iit.edu)
       optics_model_ = new IntegratingOpticsModel();
       */
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "IntegratingOpticsModel is not yet implemented.",
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
       break;
@@ -233,7 +233,7 @@ fflush(stdout);
       /* TODO(plane1@hawk.iit.edu)
       optics_model_ = new RungeKuttaOpticsModel();
       */
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "RungeKuttaOpticsModel is not yet implemented.",
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
       break;
@@ -249,7 +249,7 @@ fflush(stdout);
       std::string message("Unsupported optics model \"");
       message += optics_model_name.asString();
       message += std::string("\" in recon configuration.");
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupOpticsModel()()"));
     }
@@ -290,7 +290,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
       /* TODO(plane1@hawk.iit.edu)
       track_fitter_ = new KalmanFilterTrackFitter(optics_model_);
       */
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "KalmanFilterTrackFitter is not yet implemented.",
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
       break;
@@ -300,7 +300,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
       /* TODO(plane1@hawk.iit.edu)
       track_fitter_ = new TOFTrackFitter(optics_model_);
       */
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "TOFTrackFitter is not yet implemented.",
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
       break;
@@ -309,7 +309,7 @@ void MapCppGlobalTrackReconstructor::SetupTrackFitter() {
       std::string message("Unsupported track fitter \"");
       message += fitter_name.asString();
       message += std::string("\" in recon configuration.");
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    message.c_str(),
                    "MapCppGlobalTrackReconstructor::SetupTrackFitter()"));
     }
@@ -336,7 +336,7 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
   PolynomialOpticsModel * const optics_model
     = dynamic_cast<MAUS::PolynomialOpticsModel*>(optics_model_);
   if (optics_model == NULL) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
                 "Could not reconstruct intermediate track points: the optics "
                 "model being used is not yet fully supported.",
                 "MAUS::MapCppGlobalTrackReconstructor::"
@@ -395,11 +395,11 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
     try {
       track_point
         = helper.PhaseSpaceVector2TrackPoint(point, *map_z, particle_id);
-    } catch (Squeal squeal) {
+    } catch (Exception exception) {
         std::cerr << "DEBUG MapCppGlobalTrackReconstructor"
                   << "::InsertIntermediateTrackPoints: "
                   << "something bad happened during track fitting: "
-                  << squeal.what() << std::endl;
+                  << exception.what() << std::endl;
     }
 
     track_point.set_mapper_name(kClassname);

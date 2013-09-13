@@ -30,7 +30,7 @@
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/BeamTools/BTConstantField.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 
 namespace MAUS {
@@ -73,7 +73,7 @@ TEST_F(VirtualPlaneTest, ConstructorTest) {  // tests most Get functions also
   EXPECT_NEAR(vp_tau.GetRotation().phiY(), rot.phiY(), 1e-9);
   EXPECT_NEAR(vp_tau.GetRotation().phiZ(), rot.phiZ(), 1e-9);
   EXPECT_THROW(VirtualPlane::BuildVirtualPlane(rot, pos, 1., true, 5.,
-               BTTracker::tau_potential, VirtualPlane::ignore, true), Squeal);
+               BTTracker::tau_potential, VirtualPlane::ignore, true), Exception);
 }
 
 TEST_F(VirtualPlaneTest, GetIndependentVariableZTest) {
@@ -185,7 +185,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   EXPECT_NEAR(hit.GetEField().z(), 0, 1e-9);
 
   step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2e6, 3.e6, 4.));
-  EXPECT_THROW(vp_z.BuildNewHit(step, 99), Squeal);  // outside radial cut
+  EXPECT_THROW(vp_z.BuildNewHit(step, 99), Exception);  // outside radial cut
   step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2, 3., 4.));
 
   VirtualHit hit_l = vp_z_local.BuildNewHit(step, 99);
@@ -263,7 +263,7 @@ TEST_F(VirtualPlaneManagerTest, GetSetFieldTest) {
 
 TEST_F(VirtualPlaneManagerTest, GetSetHitsTest) {
   Json::Value not_array(Json::objectValue);
-  EXPECT_THROW(vpm.SetVirtualHits(not_array), Squeal);
+  EXPECT_THROW(vpm.SetVirtualHits(not_array), Exception);
 
   Json::Value array(Json::arrayValue);
   array.append(Json::Value("hello"));
@@ -284,7 +284,7 @@ TEST_F(VirtualPlaneManagerTest, ConstructVirtualPlanes) {  // also GetPlanes()
 
   mod3.addPropertyString("SensitiveDetector", "");
   vpm.ConstructVirtualPlanes(NULL, &mod3);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod3), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod3), Exception);
   EXPECT_EQ(vpm.GetPlanes().size(), (size_t) 2);
 
   vpm.ConstructVirtualPlanes(NULL, &mod2);
@@ -316,9 +316,9 @@ void __test_indep(std::string indep_string,
 TEST_F(VirtualPlaneManagerTest, ConstructFromModule_IndepVariableTest) {
   // throw unless PlaneTime is set
   size_t vpm_size = vpm.GetPlanes().size();
-  EXPECT_THROW(__test_indep("t", BTTracker::t, -4., mod, vpm), Squeal);
-  EXPECT_THROW(__test_indep("tau", BTTracker::t, -4., mod, vpm), Squeal);
-  EXPECT_THROW(__test_indep("time", BTTracker::t, 4., mod, vpm), Squeal);
+  EXPECT_THROW(__test_indep("t", BTTracker::t, -4., mod, vpm), Exception);
+  EXPECT_THROW(__test_indep("tau", BTTracker::t, -4., mod, vpm), Exception);
+  EXPECT_THROW(__test_indep("time", BTTracker::t, 4., mod, vpm), Exception);
   EXPECT_EQ(vpm_size, vpm.GetPlanes().size());  // check no planes alloc'd
 
   // have to construct in order of indep variable magnitude
@@ -346,7 +346,7 @@ TEST_F(VirtualPlaneManagerTest, ConstructFromModule_MultiplePassesTest) {
   __test_multipass("SameStation",  VirtualPlane::same_station, mod, vpm);
   __test_multipass("NewStation",  VirtualPlane::new_station, mod, vpm);
   __test_multipass("Ignore",  VirtualPlane::ignore, mod, vpm);
-  EXPECT_THROW(__test_multipass("X",  VirtualPlane::ignore, mod, vpm), Squeal);
+  EXPECT_THROW(__test_multipass("X",  VirtualPlane::ignore, mod, vpm), Exception);
 }
 
 TEST_F(VirtualPlaneManagerTest, ConstructFromModule_OtherStuffTest) {
@@ -380,12 +380,12 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
   SetG4TrackAndStep(step);  // prestep is at z=4 poststep at z=8
 
   vpm.VirtualPlanesSteppingAction(step);
-  EXPECT_THROW(vpm.GetNumberOfHits(0), Squeal);
+  EXPECT_THROW(vpm.GetNumberOfHits(0), Exception);
   EXPECT_EQ(vpm.GetNumberOfHits(1), 0);
   for (size_t i = 2; i <= 4; ++i)
     EXPECT_EQ(vpm.GetNumberOfHits(i), 1) << "Failed on station " << i;
   EXPECT_EQ(vpm.GetNumberOfHits(5), 0);
-  EXPECT_THROW(vpm.GetNumberOfHits(6), Squeal);
+  EXPECT_THROW(vpm.GetNumberOfHits(6), Exception);
 
   Json::Value json = vpm.GetVirtualHits();
   ASSERT_EQ(json.size(), (Json::UInt) 3);
@@ -493,11 +493,11 @@ TEST_F(VirtualPlaneManagerTest, GetModuleFromStationNumberTest) {
   mod_alt.addPropertyString("SensitiveDetector", "Virtual");
   mod_alt.addPropertyHep3Vector("Position", "0 0 2 m");
   vpm.ConstructVirtualPlanes(NULL, &mod);
-  EXPECT_THROW(vpm.GetModuleFromStationNumber(0), Squeal);
+  EXPECT_THROW(vpm.GetModuleFromStationNumber(0), Exception);
   EXPECT_EQ(vpm.GetModuleFromStationNumber(1), &mod);
   EXPECT_EQ(vpm.GetModuleFromStationNumber(2), &mod);
   vpm.ConstructVirtualPlanes(NULL, &mod_alt);
-  EXPECT_THROW(vpm.GetModuleFromStationNumber(0), Squeal);
+  EXPECT_THROW(vpm.GetModuleFromStationNumber(0), Exception);
   EXPECT_EQ(vpm.GetModuleFromStationNumber(1), &mod);
   EXPECT_EQ(vpm.GetModuleFromStationNumber(2), &mod_alt);
   EXPECT_EQ(vpm.GetModuleFromStationNumber(3), &mod);
@@ -511,7 +511,7 @@ TEST_F(VirtualPlaneManagerTest, GetStationNumberFromModuleTest) {
 
   vpm.ConstructVirtualPlanes(NULL, &mod);
   EXPECT_EQ(vpm.GetStationNumberFromModule(&mod), 1);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_alt), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_alt), Exception);
   vpm.ConstructVirtualPlanes(NULL, &mod_alt);
   EXPECT_EQ(vpm.GetStationNumberFromModule(&mod), 1);
   EXPECT_EQ(vpm.GetStationNumberFromModule(&mod_alt), 2);
@@ -530,7 +530,7 @@ TEST_F(VirtualPlaneManagerTest, RemovePlaneTest) {
   set_1.insert(2);
   vpm.RemovePlanes(set_1);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[0]));
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Exception);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[4]));
@@ -539,11 +539,11 @@ TEST_F(VirtualPlaneManagerTest, RemovePlaneTest) {
   set_2.insert(1);
   set_2.insert(4);
   vpm.RemovePlanes(set_2);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[0]), Squeal);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[0]), Exception);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Exception);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[3]));
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[4]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[4]), Exception);
 }
 
 TEST_F(VirtualPlaneManagerTest, RemovePlanesTest) {
@@ -558,18 +558,18 @@ TEST_F(VirtualPlaneManagerTest, RemovePlanesTest) {
   std::vector<VirtualPlane*> planes = vpm.GetPlanes();
   vpm.RemovePlane(planes[1]);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[0]));
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Exception);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[3]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[4]));
 
   vpm.RemovePlane(planes[0]);
   vpm.RemovePlane(planes[4]);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[0]), Squeal);
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[0]), Exception);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[1]), Exception);
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[2]));
   EXPECT_NO_THROW(vpm.GetStationNumberFromModule(&mod_a[3]));
-  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[4]), Squeal);
+  EXPECT_THROW(vpm.GetStationNumberFromModule(&mod_a[4]), Exception);
 }
 
 TEST_F(VirtualPlaneManagerTest, ReadWriteHitTest) {

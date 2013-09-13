@@ -38,7 +38,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace JsonWrapper {
   /** @brief List of data types allowed by json
@@ -64,11 +64,11 @@ namespace JsonWrapper {
    *
    *  @param json_in raw string holding the configuration information
    *
-   *  Read in a string and return as a Json value. Throw a Squeal if the reader
+   *  Read in a string and return as a Json value. Throw a Exception if the reader
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  Json::Value StringToJson(const std::string& json_in) throw(Squeal);
+  Json::Value StringToJson(const std::string& json_in) throw(Exception);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
@@ -82,12 +82,12 @@ namespace JsonWrapper {
    *  @param value_index index of the value in the array
    *  @param value_type type of the value we want to get
    *
-   *  Returns the Json::Value on success. Throws an exception of type Squeal on
+   *  Returns the Json::Value on success. Throws an exception of type Exception on
    *  failure
    */
   Json::Value GetItem(const Json::Value& array,
                       const size_t value_index,
-                      const JsonType value_type) throw(Squeal);
+                      const JsonType value_type) throw(Exception);
 
   /** @brief Get a property from a Json object (hash)
    *
@@ -96,11 +96,11 @@ namespace JsonWrapper {
    *  @param value_type type of the value we want to get
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
-   *  Squeal.
+   *  Exception.
    */
   Json::Value GetProperty(const Json::Value& object,
                           const std::string& value_name,
-                          const JsonType value_type) throw(Squeal);
+                          const JsonType value_type) throw(Exception);
 
 
   /** @brief Convert from a json three vector to a CLHEP three vector
@@ -109,7 +109,7 @@ namespace JsonWrapper {
    *         an exception if the conversion fails.
    */
   CLHEP::Hep3Vector JsonToThreeVector(const Json::Value& json_vec)
-      throw(Squeal);
+      throw(Exception);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
@@ -121,7 +121,7 @@ namespace JsonWrapper {
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(Squeal);
+  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(Exception);
 
   /** @brief Return true if types are equal or anyValue
    */
@@ -219,7 +219,7 @@ namespace Path {
   /** @brief Return the json value corresponding to a given path
    *
    *  Return the json value located at a given path. If the path cannot be
-   *  accessed, throw a Squeal.
+   *  accessed, throw a Exception.
    */
   Json::Value& DereferencePath(Json::Value& json, const std::string& path);
 

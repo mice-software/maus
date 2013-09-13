@@ -19,7 +19,7 @@
 #include "Utils/JsonWrapper.hh"
 #include "Utils/KLChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppKLDigits/MapCppKLDigits.hh"
@@ -68,8 +68,8 @@ bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
     }
 
   return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -134,9 +134,9 @@ std::string MapCppKLDigits::process(std::string document) {
 	  }
       }
     }
-  } catch(Squeal squee) {
+  } catch(Exception exception) {
     root = MAUS::CppErrorHandler::getInstance()
-      ->HandleSqueal(root, squee, _classname);
+      ->HandleException(root, exception, _classname);
   } catch(std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
       ->HandleStdExc(root, exc, _classname);

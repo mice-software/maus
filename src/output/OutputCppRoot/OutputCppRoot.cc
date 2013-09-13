@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
@@ -65,8 +65,8 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
                                 std::string branch_name) {
     // watch for double frees (does close() delete data_cpp?)
     if (_outfile == NULL) {
-        throw(Squeal(Squeal(
-          Squeal::recoverable,
+        throw(Exception(Exception(
+          Exception::recoverable,
           "OutputCppRoot was not initialised properly",
           "OutputCppRoot::write_event"
         )));
@@ -135,7 +135,7 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
     } else if (type == "RunFooter") {
         return _run_footer_tp;
     } else {
-        throw Squeal(Squeal::recoverable,
+        throw Exception(Exception::recoverable,
                      "Failed to recognise maus_event_type "+type,
                      "OutputCppRoot::get_event_type");
     }

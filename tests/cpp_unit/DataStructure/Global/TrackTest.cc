@@ -18,7 +18,7 @@
 #include "src/common_cpp/DataStructure/Global/SpacePoint.hh"
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "gtest/gtest.h"
 
@@ -501,17 +501,17 @@ TEST_F(TrackTestDS, test_Throws) {
   MAUS::DataStructure::Global::TrackPoint *tp2 =
       new MAUS::DataStructure::Global::TrackPoint();
 
-  ASSERT_THROW(track0.AddTrackPoint(tp0), Squeal);
+  ASSERT_THROW(track0.AddTrackPoint(tp0), Exception);
 
   track0.AddTrackPoint(tp1);
 
-  ASSERT_THROW(track0.RemoveTrackPoint(tp0), Squeal);
+  ASSERT_THROW(track0.RemoveTrackPoint(tp0), Exception);
   ASSERT_NO_THROW(track0.RemoveTrackPoint(tp1));
-  ASSERT_THROW(track0.RemoveTrackPoint(tp2), Squeal);
+  ASSERT_THROW(track0.RemoveTrackPoint(tp2), Exception);
 
-  ASSERT_THROW(track0.RemoveTrack(track1), Squeal);
-  ASSERT_THROW(track0.RemoveTrack(track2), Squeal);
+  ASSERT_THROW(track0.RemoveTrack(track1), Exception);
+  ASSERT_THROW(track0.RemoveTrack(track2), Exception);
 
-  ASSERT_THROW(track0.RemoveGeometryPath("Narnia"), Squeal);
+  ASSERT_THROW(track0.RemoveGeometryPath("Narnia"), Exception);
 }
 } // ~namespace MAUS

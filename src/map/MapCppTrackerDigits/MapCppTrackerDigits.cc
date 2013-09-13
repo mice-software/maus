@@ -19,7 +19,7 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
@@ -64,8 +64,8 @@ std::string MapCppTrackerDigits::process(std::string document) {
       return writer.write(_json_root);
     }
   // If an exception is caught, the JSON file returned is the same that was read-in (_json_root)...
-  } catch(Squeal& squee) {
-    squee.Print();
+  } catch(Exception& exception) {
+    exception.Print();
     return writer.write(_json_root);
   } catch(...) {
     Json::Value errors;

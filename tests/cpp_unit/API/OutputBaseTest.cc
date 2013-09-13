@@ -41,14 +41,14 @@ namespace MAUS {
       FRIEND_TEST(OutputBaseTest, TestCopyConstructor);
   };
 
-  class MyOutputter_squeal : public MyOutputter {
+  class MyOutputter_exception : public MyOutputter {
     public:
-      MyOutputter_squeal() : MyOutputter() {}
+      MyOutputter_exception() : MyOutputter() {}
 
     private:
       virtual bool _save(int* i) {
-        throw Squeal(Squeal::recoverable,
-           "Expected Test Squeal in _save",
+        throw Exception(Exception::recoverable,
+           "Expected Test Exception in _save",
            "int* _save(int* t) const");
       }
   };
@@ -131,13 +131,13 @@ namespace MAUS {
     int* dub = 0;
     ASSERT_FALSE(mm2.save(dub));
     /////////////////////////////////////////////////////
-    MyOutputter_squeal mm_s;
+    MyOutputter_exception mm_s;
     try {
       mm_s.save(i1);
     }
     catch(...) {
       ASSERT_TRUE(false)
-        << "Fail: Squeal should have been handled"
+        << "Fail: Exception should have been handled"
         << std::endl;
     }
 

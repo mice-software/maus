@@ -56,7 +56,7 @@ class MAUSEvaluator {
      *
      *  Enables to add a symbol that can be used when evaluating expressions.
      *  The python interpreter will substitute <value> for <name>. Throw a
-     *  Squeal if the name was not valid.
+     *  Exception if the name was not valid.
      */
     void set_variable(std::string name, double value);
 

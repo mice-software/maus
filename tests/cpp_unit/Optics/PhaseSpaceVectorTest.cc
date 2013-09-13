@@ -24,7 +24,7 @@
 
 #include "gtest/gtest.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "Maths/Vector.hh"
 
@@ -82,7 +82,7 @@ TEST_F(PhaseSpaceVectorTest, VectorConstructor) {
   try {
     const PhaseSpaceVector bad_ps_vector(bad_vector);
     testpass = false;
-  } catch (Squeal squeal) {}
+  } catch (Exception exception) {}
   ASSERT_TRUE(testpass);
 }
 

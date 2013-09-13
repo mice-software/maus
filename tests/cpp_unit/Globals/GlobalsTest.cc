@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Interface/dataCards.hh"
 
@@ -73,8 +73,8 @@ TEST_F(GlobalsTest, TestInitialiseDestruct) {
     // Check that we get an exception if initialising with bad data and that
     // _process is still NULL
     EXPECT_THROW
-          (GlobalsManager::InitialiseGlobals("not json"), Squeal);
-    EXPECT_THROW(Globals::GetInstance(), Squeal);
+          (GlobalsManager::InitialiseGlobals("not json"), Exception);
+    EXPECT_THROW(Globals::GetInstance(), Exception);
 
     // Check that we don't get an exception if initialising with good data and
     // that _process is not NULL. We will check the member data initialisation
@@ -86,10 +86,10 @@ TEST_F(GlobalsTest, TestInitialiseDestruct) {
     // Try deleting
     GlobalsManager::DeleteGlobals();
     // Check that we now get an exception on delete (already deleted)
-    EXPECT_THROW(GlobalsManager::DeleteGlobals(), Squeal);
+    EXPECT_THROW(GlobalsManager::DeleteGlobals(), Exception);
 
     // Check that we now get an exception (the pointer allocated to NULL)
-    EXPECT_THROW(Globals::GetInstance(), Squeal);
+    EXPECT_THROW(Globals::GetInstance(), Exception);
 
     // Check that we can reinitialise okay
     GlobalsManager::InitialiseGlobals(str);

@@ -17,7 +17,7 @@
 #include "gtest/gtest.h" 
 
 #include "src/legacy/Interface/dataCards.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include <sstream>
 
@@ -65,7 +65,7 @@ TEST_F(dataCardsTest, readKeysTest)
   EXPECT_EQ(dc.fetchValueInt   (key_int), val_int);
   EXPECT_EQ(dc.fetchValueDouble(key_dub), val_dub);
   EXPECT_EQ(dc.fetchValueString(key_str), val_str);
-  EXPECT_THROW(dc.readKeys(ss_bad_key),   Squeal);
+  EXPECT_THROW(dc.readKeys(ss_bad_key),   Exception);
 }
 
 

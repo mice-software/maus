@@ -34,12 +34,12 @@ template <class ParentType>
 void ConstantItem<ParentType>::_SetCppChild
                       (const Json::Value& parent_json, ParentType& parent_cpp) {
     if (_required && !parent_json.isMember(_branch)) {
-            throw Squeal(Squeal::recoverable,
+            throw Exception(Exception::recoverable,
             "Missing required branch "+_branch+" converting json->cpp",
             "ConstantItem::_SetCppChild");
     } else if (parent_json.isMember(_branch) && !JsonWrapper::AlmostEqual
                                (parent_json[_branch], _child_value, 1e-9)) {
-            throw Squeal(Squeal::recoverable,
+            throw Exception(Exception::recoverable,
             "Wrong value in branch "+_branch+": "+
                             JsonWrapper::JsonToString(parent_json[_branch]),
             "ConstantItem::_SetCppChild");

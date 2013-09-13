@@ -2,9 +2,9 @@
 #include "Tensor3.hh"
 
 /*
-const Squeal Tensor::_outOfRange = Squeal(Squeal::recoverable, "Tensor index out of range",       "Tensor::Tensor");
-const Squeal Tensor::_outOfRank  = Squeal(Squeal::recoverable, "Tensor rank out of range",        "Tensor::Tensor");
-const Squeal Tensor::_lowRank    = Squeal(Squeal::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor");
+const Exception Tensor::_outOfRange = Exception(Exception::recoverable, "Tensor index out of range",       "Tensor::Tensor");
+const Exception Tensor::_outOfRank  = Exception(Exception::recoverable, "Tensor rank out of range",        "Tensor::Tensor");
+const Exception Tensor::_lowRank    = Exception(Exception::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor");
 */
 
 Tensor::Tensor(std::vector<int> size, double val) : _data(NULL), _size(size)
@@ -34,7 +34,7 @@ Tensor::~Tensor()
 void Tensor::SetTensor(std::vector<int> size, double val)
 {
 	_size = size;
-	if(size.size() < 4) throw( Squeal(Squeal::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor"));
+	if(size.size() < 4) throw( Exception(Exception::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor"));
 	else if(size.size() == 4)
 	{
 		_data = new Tensor*[size[0]];
@@ -185,7 +185,7 @@ std::vector<int> Tensor::IndexToIndices(int index, int tensorSize, int startDime
 
 double Tensor::Get(std::vector<int> position) const
 {
-	if(int(position.size()) != GetRank()) throw(Squeal(Squeal::recoverable, "Get rank different to Tensor rank", "Tensor::Get"));
+	if(int(position.size()) != GetRank()) throw(Exception(Exception::recoverable, "Get rank different to Tensor rank", "Tensor::Get"));
 	const Tensor* val = this;
 	if(GetRank()>3)
 	{

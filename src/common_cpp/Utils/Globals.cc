@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/legacy/Interface/STLUtils.hh"
@@ -31,7 +31,7 @@ Globals* Globals::GetInstance() {
         return _process;
     } else {
         // watch out here, error handler not initialised(!)
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      std::string("Attempt to get Globals ")+
                           "instance when it has not been initialised",
                           "Globals::GetInstance()"));

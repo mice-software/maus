@@ -30,7 +30,7 @@
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "Maths/Vector.hh"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 namespace MAUS {
 
@@ -84,7 +84,7 @@ PhaseSpaceVector LinearApproximationTransferMap::Transport(
 
   double energy = vector.E();
   if (mass_ > energy) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
                  "Attempting to transport a particle that is off mass shell.",
                  "MAUS::LinearApproximationOpticsModel::Transport()"));
   }

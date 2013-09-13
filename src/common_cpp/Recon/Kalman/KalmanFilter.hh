@@ -30,7 +30,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"

@@ -35,7 +35,7 @@
 
 // Legacy/G4MICE
 #include "Config/MiceModule.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 
 // MAUS
 #include "Converter/DataConverters/JsonCppSpillConverter.hh"
@@ -83,9 +83,9 @@ bool MapCppGlobalRawTracks::birth(std::string configuration_string) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors_);
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(
-      squee, MapCppGlobalRawTracks::kClassname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
+      exception, MapCppGlobalRawTracks::kClassname);
     return false;
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
@@ -108,7 +108,7 @@ bool MapCppGlobalRawTracks::birth(std::string configuration_string) {
       beam_polarity_ = -1;
       break;
     default:
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "Reference particle is not a pion+/-, muon+/-, or e+/-.",
                    "MapCppGlobalRawTracks::birth()"));
 
@@ -258,7 +258,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   MAUS::recon::global::DetectorMap::const_iterator tof0_mapping
     = detectors_.find(GlobalDS::kTOF0);
   if (tof0_mapping == detectors_.end()) {
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "Unable to find info for detector TOF0",
                    "MapCppGlobalRawTracks::LoadTOFTrack()"));
   }
@@ -284,7 +284,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   MAUS::recon::global::DetectorMap::const_iterator tof1_mapping
     = detectors_.find(GlobalDS::kTOF1);
   if (tof1_mapping == detectors_.end()) {
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "Unable to find info for detector TOF1",
                    "MapCppGlobalRawTracks::LoadTOFTrack()"));
   }
@@ -312,7 +312,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   MAUS::recon::global::DetectorMap::const_iterator tof2_mapping
     = detectors_.find(GlobalDS::kTOF2);
   if (tof2_mapping == detectors_.end()) {
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    "Unable to find info for detector TOF2",
                    "MapCppGlobalRawTracks::LoadTOFTrack()"));
   }
@@ -720,7 +720,7 @@ void MapCppGlobalRawTracks::LoadSciFiTrack(
       message << "Couldn't find configuration for detector Tracker "
               << tracker << " Station " << station
               << "(id=" << detector_id << ")";
-      throw(Squeal(Squeal::nonRecoverable,
+      throw(Exception(Exception::nonRecoverable,
                    message.str(),
                    "MapCppGlobalRawTracks::LoadSciFiTrack()"));
     }

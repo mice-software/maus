@@ -33,7 +33,7 @@
 
 #include "json/json.h"
 #include "Utils/TOFChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
@@ -50,7 +50,7 @@ class TOFPixelKey {
   TOFPixelKey(int st, int slX, int slY, string d)
   :_station(st), _slabX(slX), _slabY(slY), _detector(d) {}
 
-  explicit TOFPixelKey(string keyStr) throw(Squeal);
+  explicit TOFPixelKey(string keyStr) throw(Exception);
 
   virtual ~TOFPixelKey() {}
 
@@ -58,7 +58,7 @@ class TOFPixelKey {
   bool operator!=( TOFPixelKey key );
 
   friend ostream& operator<<( ostream& stream, TOFPixelKey key );
-  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Exception);
 
   string detector() {return _detector;}
 

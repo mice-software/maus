@@ -13,7 +13,7 @@
 #include <sstream>
 #include <cmath>
 #include "Interface/MiceMaterials.hh"
-#include "Interface/Squeal.hh"
+#include "Interface/Exception.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::mm;
 using CLHEP::cm2;
@@ -32,9 +32,9 @@ MiceMaterials::MiceMaterials( bool noG4 )
 {
   if( noG4 )
   {
-    if(getenv( "MICEFILES" ) == NULL) throw(Squeal(Squeal::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
-    if(getenv( "COMPILER" )  == NULL) throw(Squeal(Squeal::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
-    if(getenv( "G4VERS" )    == NULL) throw(Squeal(Squeal::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
+    if(getenv( "MICEFILES" ) == NULL) throw(Exception(Exception::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
+    if(getenv( "COMPILER" )  == NULL) throw(Exception(Exception::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
+    if(getenv( "G4VERS" )    == NULL) throw(Exception(Exception::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
     std::string fname = std::string( getenv( "MICEFILES" ) ) + "/Models/Materials/micematerials_" 
                       + std::string( getenv( "COMPILER" ) ) + "_"
                       + std::string( getenv( "G4VERS" ) ) + ".txt";
@@ -143,13 +143,13 @@ void MiceMaterials::addMaterial( G4Material* mat, std::string name )
 G4Material* MiceMaterials::materialByName( std::string mat ) const
 {
   if ( _materials.find( mat ) == _materials.end() ) {
-    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(Exception(Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
   }
   G4Material* matter = _materials.find( mat )->second;
 
   if( ! matter ) // can't find this material!
   {
-    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(Exception(Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
     matter = _materials.find( "Galactic" )->second;
   }
 

@@ -47,14 +47,14 @@ namespace MAUS {
     FRIEND_TEST(MapBaseTest, TestCopyConstructor);
   };
 
-  class MyMapper_squeal : public MyMapper {
+  class MyMapper_exception : public MyMapper {
   public:
-    MyMapper_squeal() : MyMapper() {}
+    MyMapper_exception() : MyMapper() {}
 
   private:
     virtual int* _process(double* t) const {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _process",
+      throw Exception(Exception::recoverable,
+		   "Expected Test Exception in _process",
 		   "int* _process(double* t) const");
     }
   };
@@ -161,13 +161,13 @@ namespace MAUS {
 	<< std::endl;
     }
     /////////////////////////////////////////////////////
-    MyMapper_squeal mm_s;
+    MyMapper_exception mm_s;
     try {
       mm_s.process(d);
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
+	<< "Fail: Exception should have been handled"
 	<< std::endl;
     }
 

@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/ConvertBinaryToString.hh"
 
 namespace {
@@ -62,7 +62,7 @@ TEST(ConvertBinaryToStringTest, ConversionTest) {
     EXPECT_EQ(converter.convert(fname, false), "MQ==");
     EXPECT_EQ(converter.convert(fname, true), "MQ==");
     nanosleep(&start_time, &end_time);
-    EXPECT_THROW(converter.convert(fname, true), Squeal); // file is gone
+    EXPECT_THROW(converter.convert(fname, true), Exception); // file is gone
 }
 }
 

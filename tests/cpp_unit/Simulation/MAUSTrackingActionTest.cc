@@ -99,7 +99,7 @@ TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
     ASSERT_EQ(json_track[1]["final_position"].type(), Json::objectValue);
 
     end->SetTrackID(4);
-    EXPECT_THROW(tracking->PostUserTrackingAction(end), Squeal);
+    EXPECT_THROW(tracking->PostUserTrackingAction(end), Exception);
 }
 
 } // namespace
