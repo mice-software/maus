@@ -28,10 +28,8 @@ code version, and geometry; group tests belonging to the same tests
 
 import os
 import ROOT
-import math
 
-import xboa 
-import xboa.Common as Common
+
 
 from physics_model_test.geometry import Geometry # pylint: disable=W0611
 from physics_model_test.all_tests import KSTest
@@ -66,25 +64,25 @@ def histogram_title(geo):
     sort_name = ''.join(sort_name)
     sort_name = sort_name.replace('/', '')
     return sort_name
-    print sort_name
+  
 
-def get_material(geo):
-    filename=histogram_title(geo)
+def get_material(geo): # pylint: disable = C0111
+
     sort_name = geo.name.split(' ')[1:] # strip out code name/version number
-    material=sort_name[2]
+    material = sort_name[2]
     return material
     
 
-def get_thickness(geo):
-    filename=histogram_title(geo)
-    sort_name = geo.name.split(' ')[1:] # strip out code name/version number
-    t=sort_name[0]
-    return t
+def get_thickness(geo): # pylint: disable = C0111
 
-def get_mom(geo):
-    filename=histogram_title(geo)
     sort_name = geo.name.split(' ')[1:] # strip out code name/version number
-    mom=sort_name[5]
+    thick = sort_name[0]
+    return thick
+
+def get_mom(geo): # pylint: disable = C0111
+   
+    sort_name = geo.name.split(' ')[1:] 
+    mom = sort_name[5]
     return mom
 
 def get_step(geo):
@@ -93,11 +91,10 @@ def get_step(geo):
     This will return step size
     """
     
-    filename=histogram_title(geo)
-    #f3 = open('steps.txt', 'a')
+    
     sort_name = geo.name.split(' ')[1:] # strip out code name/version number
-    steps=sort_name[8]
-    #f3.write(steps+"\n")
+    steps = sort_name[8]
+ 
     return steps
 
 
@@ -193,24 +190,22 @@ def build_legend(canvas, tests, test_dict, histograms):
     canvas.Update()
     LEGENDS.append(leg)
 
-def get_mean(tests, test_dict, histograms):
+def get_mean(tests , test_dict, histograms):# pylint: disable = C0111
     legends = [code_name(test_dict[a_test]) for a_test in tests]
     
-    for index, leg in enumerate(legends):
-        f = open('mean.txt', 'a')
+    for index in enumerate(legends): 
+        
         mean = str(histograms[index].GetMean())
-        #print 'mean',  histograms[index].GetMean()
-        #f.write(mean+"\n")
+       
         return mean
 
-def get_rms(tests, test_dict, histograms):
+def get_rms(tests , test_dict, histograms): # pylint: disable = C0111
     legends = [code_name(test_dict[a_test]) for a_test in tests]
     
-    for index, leg in enumerate(legends):
-        #f = open('mean.txt', 'a')
+    for index, leg in enumerate(legends): # pylint: disable = W0612
+       
         rms = str(histograms[index].GetRMS())
-        #print 'mean',  histograms[index].GetMean()
-        #f.write(mean+"\n")
+       
         return rms
 
 def set_margins(canvas):
@@ -256,12 +251,12 @@ def plot_muscat_compare(file_list):
         for test_list in test_group:
             
             
-            (canv,h_list)=Chi2Test.make_plots(test_list,test_dict[test_list[0]])
-            (canv,h_list)=Chi2Test.chi_plots(test_list,test_dict[test_list[0]])
+            (canv , h_list)=Chi2Test.make_plots(test_list)
+            
             build_legend(canv, test_list, test_dict, h_list[1:])
             build_title(canv, test_dict[test_list[0]])
-            code=code_name(test_dict[test_list[0]])
-            title=histogram_title(test_dict[test_list[0]])
+            #code=code_name(test_dict[test_list[0]])
+            #title=histogram_title(test_dict[test_list[0]])
            
      
             fname = file_name(test_dict[test_list[0]], test_list[0])
@@ -269,8 +264,8 @@ def plot_muscat_compare(file_list):
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
                 canv.Print(plot_path)
-            
     return 0
+
 
 def plot(file_list):
     """
@@ -287,7 +282,7 @@ def plot(file_list):
     for geo_list in geo_groups:
         (test_group, test_dict) = group_tests(geo_list)
         for test_list in test_group:
-            (canv,h_list)= KSTest.make_plots(test_list)
+            (canv , h_list)= KSTest.make_plots(test_list)
             
           
 
@@ -295,19 +290,16 @@ def plot(file_list):
             
             build_legend(canv, test_list, test_dict, h_list[1:])
             build_title(canv, test_dict[test_list[0]])
-            code=code_name(test_dict[test_list[0]])
-            title=histogram_title(test_dict[test_list[0]])
+            #code=code_name(test_dict[test_list[0]])
+            #title=histogram_title(test_dict[test_list[0]])
            
             set_margins(canv)
             
             fname = file_name(test_dict[test_list[0]], test_list[0])
-   
             for form in PLOT_FORMATS:
                 plot_path = os.path.join(PLOT_DIR, fname+'.'+form)
                 canv.Print(plot_path)
-            
     return 0
-
 
 
 

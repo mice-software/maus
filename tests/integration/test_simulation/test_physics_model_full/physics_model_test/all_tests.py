@@ -132,8 +132,10 @@ class KSTest(BaseTest): #pylint:disable=R0902
     
     def __repr__(self):
         return 'KSTest.new('+repr(self.variable)+','+repr(self.units)+','+\
-                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+','+\
-                repr(self.pid)+','+repr(self.ks_dist)+','+repr(self.ks_prob)+','+\
+                repr(self.bins)+','+repr(self.content)+','+\
+                repr(self.n_events)+','+\
+                repr(self.pid)+','+\
+                repr(self.ks_dist)+','+repr(self.ks_prob)+','+\
                 repr(self.ks_tol)+','+repr(self.n_bins)+')'
 
     def __str__(self):
@@ -309,7 +311,7 @@ class KSTest(BaseTest): #pylint:disable=R0902
                 theta_arr.append(theta)
             
           
-            hist = ROOT.TH1D("theta", "theta/rad", len(theta_arr)-1, theta_arr)#pylint: disable-msg=E1101
+            hist = ROOT.TH1D("theta", "theta/rad", len(theta_arr)-1, theta_arr)#pylint:disable=E1101, C0301
             
             if test.content[-1] != 0.:
                 c_out = KSTest.pdf_function(test.content)
@@ -357,9 +359,11 @@ class Chi2Test(BaseTest): #pylint:disable=R0902
     
     def __repr__(self):
         return 'Chi2Test.new('+repr(self.variable)+','+repr(self.units)+','+\
-                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+','+\
+                repr(self.bins)+','+repr(self.content)+','+\
+                repr(self.n_events)+','+\
                 repr(self.pid)+','+repr(self.errors)+','+repr(self.chi2)+','+\
-                repr(self.chi2_prob)+','+repr(self.chi2_tol)+','+repr(self.n_bins)+')'
+                repr(self.chi2_prob)+','+repr(self.chi2_tol)+','+\
+                repr(self.n_bins)+')'
 
     def __str__(self):
         """Summary of the Chi2 test along with test pass information"""
@@ -482,7 +486,8 @@ class Chi2Test(BaseTest): #pylint:disable=R0902
         data_file  = open("MUSCAT_data.dat")
         test_data_list = eval(data_file.read())
        
-        hist   = test_bunch.histogram_var_bins(self.variable, self.bins, self.units)
+        hist   = test_bunch.histogram_var_bins(self.variable, \
+                                                self.bins, self.units)
                                                                    
         chi2_test_out = self.deepcopy()
       
@@ -592,7 +597,7 @@ class Chi2Test(BaseTest): #pylint:disable=R0902
                 theta_arr.append(theta)
        
     
-            hist = ROOT.TH1D("theta", "theta", len(theta_arr)-1, theta_arr) #pylint:disable=E1101, E0001
+            hist = ROOT.TH1D("theta", "theta", len(theta_arr)-1, theta_arr) #pylint:disable=E1101, C0301
           
           
             if test.content[-1] != 0.:

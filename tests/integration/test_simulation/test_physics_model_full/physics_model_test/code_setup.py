@@ -167,7 +167,8 @@ class IcoolSetup(CodeSetup):
         """Initialise - does nothing"""
         CodeSetup.__init__(self)
         if os.getenv('ICOOL') == None:
-            icool_version = open(os.path.expandvars('/home/hep/sm1208/icool/README'))\
+            icool_version = open(os.path.\
+                                  expandvars('/home/hep/sm1208/icool/README'))\
                                                                      .readline()
             icool_version = icool_version.rstrip('\n')
             icool_version = icool_version.split(' ')[-1]
@@ -238,75 +239,7 @@ class IcoolSetup(CodeSetup):
         """Bunch is station 2"""
         return 5
 
-class G4blSetup(CodeSetup):
-    """
-    Conversions and setup for G4Beamline
-    """
-    def __init__(self):
-        """Initialise - does nothing"""
-        CodeSetup.__init__(self)
 
-        if os.getenv('G4BL') == None:
-            g4bl_version = open(os.path.expandvars('/home/hep/sm1208/G4beamline-2.14/README'))\
-                                                                     .readline()
-            g4bl_version = g4bl_version.rstrip('\n')
-            g4bl_version = g4bl_version.split(' ')[-1]
-            self._version = g4bl_version
-        if os.getenv('G4BL_VERSION') == None:
-            g4bl_version = open(os.path.expandvars('/home/hep/sm1208/G4beamline-2.14/README'))\
-                                                                     .readline()
-            g4bl_version = g4bl_version.rstrip('\n')
-            g4bl_version = g4bl_version.split(' ')[-1]
-            self._version = g4bl_version
-        self._version = os.getenv('G4BL_VERSION')
-
-    def __str__(self):
-        """Return name of this code"""
-        return 'g4bl_'+self._version
-
-    def convert_position(self, value):
-        """Does nothing"""
-        return value
-
-    def convert_momentum(self, value):
-        """Does nothing"""
-        return value
-
-    def convert_pid(self, value):
-        """Does nothing"""
-        return value
-
-    def convert_material(self, value):
-        """Does nothing"""
-        conversions = {
-            'lH2':'LH2', 'LITHIUM_HYDRIDE':'LITHIUM_HYDRIDE', 'Al':'Al', 
-            'Be':'Be', 'lHe':'lHe', 'STEEL304':'Fe','Cu':'Cu', 'C':'C',
-        }
-        return conversions[value] 
-
-    def get_substitutions(self):
-        """Input file is configuration file and geometry definitions"""
-        return {geometry.source('g4bl/g4bl_deck.in'):\
-                geometry.temp('g4bl_deck')}
-
-    def get_executable(self):
-        """Executable is simulate_mice.py"""
-        return os.path.join('/home/hep/sm1208/G4beamline-2.14/bin','g4bl')
-
-    def get_parameters(self):
-        """Command line parameter to specify control files"""
-        return [geometry.temp('g4bl_deck')]
-
-    def get_output_filename(self):
-        """Output filename dynamically pulls MAUS version from README"""
-        return 'g4bl.'+self._version+'.ref_data.dat'
-
-    def get_bunch_read_keys(self):
-        """I/O type is maus_root_virtual_hit"""
-        return ('icool_for009',  geometry.temp('for009_g4bl.txt'))
-
-    def get_bunch_index(self):
-        return 2
 
 class G4MICESetup(CodeSetup):
     """
@@ -465,7 +398,9 @@ class IcoolElmsSetup(IcoolSetup):
         super(IcoolElmsSetup, self).__init__()
         #if os.getenv('ICOOL_ELMSDB') == None:
             #raise EnvironmentError("/home/hep/sm1208/icool/elms")
-        run_dir = os.path.expandvars("/home/hep/sm1208/icool/elms/RunDirectory.txt")
+        run_dir = os.path.expandvars(\
+                                      "/home/hep/sm1208/icool/elms/"+\
+                                        "RunDirectory.txt")
         if not os.path.isfile(run_dir):
             raise EnvironmentError("Couldn't find "+run_dir+" needed for elms")
         elms_db = "/home/hep/sm1208/icool/elms/ELMSFv3run*"
