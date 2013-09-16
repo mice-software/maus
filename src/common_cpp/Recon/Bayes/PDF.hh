@@ -23,6 +23,7 @@
 
 // C++ headers
 #include <vector>
+#include <iostream>
 #include <string>
 #include "TH1D.h"
 #include "TMath.h"
@@ -51,11 +52,11 @@ class PDF {
 
   void ComputeNewPosterior(TH1D likelihood);
 
-  double GetMean()     const { return _probability->GetMean(); }
+  double GetMean()     const { return _probability.GetMean(); }
 
-  double GetRMS()      const { return _probability->GetRMS();  }
+  double GetRMS()      const { return _probability.GetRMS();  }
 
-  TH1D *probability()  const { return _probability; }
+  TH1D probability()  const { return _probability; }
 
   std::string name()   const { return _name;        }
 
@@ -68,7 +69,7 @@ class PDF {
   double max()         const { return _max;         }
 
  private:
-  TH1D *_probability;
+  TH1D _probability;
 
   std::string _name;
 

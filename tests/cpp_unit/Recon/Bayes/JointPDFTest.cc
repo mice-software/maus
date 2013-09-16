@@ -60,13 +60,13 @@ TEST_F(JointPDFTest, test_binning) {
   // Must also check that the middle bin corresponds to 0.
   int n_bins = _jointPDF->n_bins();
   // centre of bin 1
-  double bin_1_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(1);
+  double bin_1_centre = _jointPDF->GetJointPDF().GetXaxis()->GetBinCenter(1);
   EXPECT_EQ(_shift_min, bin_1_centre);
   // centre of middle bin (x=0).
-  double middle_bin_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(n_bins/2+1);
+  double middle_bin_centre = _jointPDF->GetJointPDF().GetXaxis()->GetBinCenter(n_bins/2+1);
   EXPECT_NEAR(0., middle_bin_centre, 1e-10);
   // centre of bin nbins
-  double bin_n_bins_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(n_bins);
+  double bin_n_bins_centre = _jointPDF->GetJointPDF().GetXaxis()->GetBinCenter(n_bins);
   EXPECT_EQ(_shift_max, bin_n_bins_centre);
 }
 

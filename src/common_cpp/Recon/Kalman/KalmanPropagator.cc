@@ -157,15 +157,15 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
                                             const KalmanState *new_site) {
   // Define fibre material parameters.
   double plane_width = FibreParameters.Plane_Width;
-  int numb_planes = fabs(new_site->id() - old_site->id());
+  int numb_planes = abs(new_site->id() - old_site->id());
   double total_plane_length = numb_planes*plane_width;
   // Plane lenght in units of radiation lenght (~0.0015 per plane).
   double plane_L0 = FibreParameters.R0(total_plane_length);
   // Get particle's parameters (gradients and total momentum).
   TMatrixD a = new_site->a(KalmanState::Projected);
-  double mx    = a(1, 0);
-  double my    = a(3, 0);
-  double p = GetTrackMomentum(old_site);
+  double mx  = a(1, 0);
+  double my  = a(3, 0);
+  double p   = GetTrackMomentum(old_site);
 
   // Compute the fibre effect.
   TMatrixD Q1(_n_parameters, _n_parameters);

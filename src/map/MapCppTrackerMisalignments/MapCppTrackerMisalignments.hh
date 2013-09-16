@@ -94,7 +94,9 @@ class MapCppTrackerMisalignments {
    */
   std::string process(std::string document);
 
-  void process(MAUS::SciFiEvent *evt);
+  std::vector< std::vector<MAUS::SciFiSpacePoint*> > setup(MAUS::SciFiEvent *event);
+
+  void process(std::vector<MAUS::SciFiSpacePoint*> spacepoints);
 
   void linear_fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
                   double &x0,
@@ -150,10 +152,10 @@ class MapCppTrackerMisalignments {
 
   int _iteraction;
 
-  JointPDF *_jointPDF;
+  JointPDF _jointPDF;
 
-  PDF* _x_shift_pdfs[2][6];
-  PDF* _y_shift_pdfs[2][6];
+  std::vector< std::vector<PDF> > _x_shift_pdfs;
+  std::vector< std::vector<PDF> > _y_shift_pdfs;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

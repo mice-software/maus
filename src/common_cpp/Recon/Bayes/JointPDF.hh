@@ -58,7 +58,7 @@ class JointPDF {
 
   TH1D GetLikelihood(double param);
 
-  TH2D* GetJointPDF() const { return _joint;     }
+  TH2D GetJointPDF()  const { return _joint;     }
 
   std::string name()  const { return _name;      }
 
@@ -71,7 +71,7 @@ class JointPDF {
   double max()        const { return _max;       }
 
  private:
-  TH2D *_joint;
+  TH2D _joint;
 
   std::string _name;
 
