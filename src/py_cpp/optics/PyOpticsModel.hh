@@ -89,7 +89,7 @@ PyMODINIT_FUNC initoptics_model(void);
  */
 static OpticsModel* get_optics_model(PyOpticsModel* py_model);
 
-/** Transport an object from a to b
+/** Transport a CovarianceMatrix from a to b
  *
  *  \param self a PyOpticsModel
  *  \param args arguments to the function (not used)
@@ -101,6 +101,20 @@ static OpticsModel* get_optics_model(PyOpticsModel* py_model);
  *  support for overloading is poor.
  */
 static PyObject* transport_covariance_matrix(PyObject *self, PyObject *args,
+                                                                PyObject *kwds);
+
+/** Transport a PhaseSpaceVector from a to b
+ *
+ *  \param self a PyOpticsModel
+ *  \param args arguments to the function (not used)
+ *  \param kwds keyword arguments to the function - see docstring
+ *
+ *  \return a new transported object
+ *
+ *  Note that we do not overload functions as in the C++ library as python
+ *  support for overloading is poor.
+ */
+static PyObject* transport_phase_space_vector(PyObject *self, PyObject *args,
                                                                 PyObject *kwds);
 }  // namespace PyOpticsModel
 }  // namespace MAUS
