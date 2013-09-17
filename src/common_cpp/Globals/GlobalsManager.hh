@@ -62,7 +62,6 @@ class GlobalsManager {
      */
     static void InitialiseGlobals(std::string json_datacards);
 
-
     /** Deallocate memory and set singleton instance to NULL
      *
      *  It is possible to delete the Globals and then reinitialise
@@ -72,20 +71,37 @@ class GlobalsManager {
     static void DeleteGlobals();
 
     /** Set the Reconstruction Geometry MiceModules
+     *
+     *  Globals takes ownership of memory allocated to root_module
      */
     static void SetReconstructionMiceModules(MiceModule* root_module);
 
     /** Set the MC Geometry MiceModules
+     *
+     *  Globals takes ownership of memory allocated to root_module. If
+     *  root_module is non-NULL, this triggers also an update of the mc fields
+     *  and geant4 geometry. If root_module is NULL, then mc fields and geant4
+     *  are left untouched.
      */
     static void SetMonteCarloMiceModules(MiceModule* root_module);
 
     /** Set legacy datacards. Old global run controls (please dont use)
+     *
+     *  Globals takes ownership of memory allocated to cards
      */
     static void SetLegacyCards(dataCards* cards);
 
     /** Set RunActionManager. Data updated run-by-run.
+     *
+     *  Globals takes ownership of memory allocated to manager
      */
     static void SetRunActionManager(RunActionManager* manager);
+
+    /** Do any final memory clean-up before exiting the program.
+     *
+     *  Following execution of this function, MAUS will no longer be usable
+     */
+    static void Finally();
 
   private:
     // disallow copy and assign

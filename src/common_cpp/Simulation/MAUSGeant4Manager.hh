@@ -23,7 +23,7 @@
 
 // should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/FillMaterials.hh"
-#include "src/legacy/Simulation/MICEDetectorConstruction.hh"
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 #include "src/common_cpp/Simulation/MAUSTrackingAction.hh"
@@ -36,6 +36,10 @@ namespace MAUS {
 
 class MAUSVisManager;
 class MAUSPhysicsList;
+
+namespace Simulation {
+class DetectorConstruction;
+}
 
 /** @class MAUSGeant4Manager
  *
@@ -54,6 +58,10 @@ class MAUSGeant4Manager {
      *
      *  Get the instance of the MAUSGeant4Manager. This will construct the
      *  MAUSGeant4Manager if required.
+     *
+     *  Note: Construction requires only MC MiceModules and Configuration cards
+     *  to be defined on Globals (this is part of the general globals set up so
+     *  we like to know dependencies).
      */
     static MAUSGeant4Manager* GetInstance();
 
@@ -83,7 +91,7 @@ class MAUSGeant4Manager {
 
     /** @brief Get the Geometry
      */
-    MICEDetectorConstruction* GetGeometry() const {return _detector;}
+    Simulation::DetectorConstruction* GetGeometry() const {return _detector;}
 
     /** @brief Get the VirtualPlanes
      */
@@ -91,10 +99,9 @@ class MAUSGeant4Manager {
 
     /** @brief Set the VirtualPlanes
      *
-     *  Nb: this loses the pointer to the original virtual planes - so if caller
-     *  don't want to keep them, caller must delete the original virtual planes.
+     *  MAUSGeant4Manager takes ownership of memory allocated to the planes
      */
-    void SetVirtualPlanes(VirtualPlaneManager* virt) {_virtPlanes = virt;}
+    inline void SetVirtualPlanes(VirtualPlaneManager* virt);
 
     /** @brief Phased fields in the geometry (e.g. RF cavities)
      *
@@ -139,14 +146,25 @@ class MAUSGeant4Manager {
      */
     MAUSVisManager* GetVisManager() {return _visManager;}
 
-    BTFieldConstructor* GetField() {return _detector->GetField();}
-
+    /** @brief Get the MAUS field manager object
+     */
+    BTFieldConstructor* GetField();
 
     /** Delete the manager and close any existing simulation
      *
      *  Note that it is a feature of Geant4 that the geometry cannot be reopened
      */
     ~MAUSGeant4Manager();
+
+    /** Reset the simulation with a new geometry set
+     *
+     *  @param module root module of the new geometry set. Field definitions and
+     *         Geant4 geometry definitions will be taken from this module.
+     *
+     *  Resets the phases if the field on Globals has been set (this is a
+     *  dependency for restting the phase).
+     */
+    void SetMiceModules(MiceModule& module);
 
   private:
     MAUSGeant4Manager();
@@ -159,7 +177,7 @@ class MAUSGeant4Manager {
     MAUSSteppingAction*         _stepAct;
     MAUSTrackingAction*         _trackAct;
     MAUSEventAction*            _eventAct;
-    MICEDetectorConstruction*   _detector;
+    Simulation::DetectorConstruction*  _detector;
     VirtualPlaneManager*        _virtPlanes;
     MAUSVisManager*             _visManager;
 
@@ -171,6 +189,11 @@ class MAUSGeant4Manager {
     static bool _isClosed;
 };
 
+inline void MAUSGeant4Manager::SetVirtualPlanes(VirtualPlaneManager* virt) {
+    if (_virtPlanes != NULL)
+        delete _virtPlanes;
+    _virtPlanes = virt;
+}
 }  // namespace MAUS
 
 #endif  // _SRC_CPP_CORE_SIMULATION_MAUSGEANT4MANAGER_HH_

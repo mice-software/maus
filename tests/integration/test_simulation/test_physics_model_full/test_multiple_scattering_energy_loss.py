@@ -21,9 +21,9 @@ import unittest
 import glob
 import os 
 
-from physics_model_test import plotter
-from physics_model_test import runner
-from physics_model_test import geometry
+from physics_model_test import plotter #pylint: disable=F0401
+from physics_model_test import runner #pylint: disable=F0401
+from physics_model_test import geometry #pylint: disable=F0401
 
 class MaterialsAndSteppingTest(unittest.TestCase): # pylint: disable=R0904
     """

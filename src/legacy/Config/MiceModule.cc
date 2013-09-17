@@ -62,25 +62,27 @@ MiceModule&	MiceModule::operator=( MiceModule& rhs )
 
 MiceModule* MiceModule::deepCopy(const MiceModule& rhs, bool insertInMother)
 {
-   MiceModule * mod = new MiceModule();
-   mod->_isroot      = rhs._isroot;
-   mod->_name        = rhs._name;
-   mod->_mother      = rhs._mother;
-   mod->_bools       = rhs._bools;
-   mod->_ints        = rhs._ints;
-   mod->_doubles     = rhs._doubles;
-   mod->_strings     = rhs._strings;
-   mod->_hep3vectors = rhs._hep3vectors;
+    MiceModule * mod = new MiceModule();
+    mod->_isroot      = rhs._isroot;
+    mod->_name        = rhs._name;
+    mod->_mother      = rhs._mother;
+    mod->_rotation    = rhs._rotation;
+    mod->_bools       = rhs._bools;
+    mod->_ints        = rhs._ints;
+    mod->_doubles     = rhs._doubles;
+    mod->_strings     = rhs._strings;
+    mod->_hep3vectors = rhs._hep3vectors;
+    mod->_parameters = rhs._parameters;
 
-   for(unsigned int i=0; i<rhs._daughters.size(); i++)
-   {
+    for(unsigned int i=0; i<rhs._daughters.size(); i++)
+    {
        mod->_daughters.push_back(deepCopy( *(rhs._daughters[i]) ));
        mod->_daughters[i]->_mother = mod;
-   }
-   if(insertInMother && mod->_mother) 
+    }
+    if(insertInMother && mod->_mother) 
       mod->_mother->_daughters.push_back(mod);
 
-   return mod;
+    return mod;
 }
 
 void	MiceModule::checkNames()
@@ -536,7 +538,7 @@ Hep3Vector		MiceModule::propertyHep3Vector( std::string property ) const
   catch(Squeal squee)
   {
     std::string error = squee.GetMessage();
-    throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyDouble"));
+    throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyHep3Vector"));
   }
 
   return prop_h3v;
