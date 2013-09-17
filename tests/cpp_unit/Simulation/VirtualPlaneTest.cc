@@ -31,6 +31,7 @@
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/BeamTools/BTConstantField.hh"
+#include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/legacy/Interface/Squeal.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 
@@ -185,12 +186,16 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
                                            // different - but near enough
   EXPECT_EQ(hit.GetPID(), -13);
   EXPECT_EQ(hit.GetMass(), mass);
-  EXPECT_NEAR(hit.GetBField().x(), 1, 1e-9);
-  EXPECT_NEAR(hit.GetBField().y(), 2, 1e-9);
-  EXPECT_NEAR(hit.GetBField().z(), 3, 1e-9);
-  EXPECT_NEAR(hit.GetEField().x(), 0, 1e-9);
-  EXPECT_NEAR(hit.GetEField().y(), 0, 1e-9);
-  EXPECT_NEAR(hit.GetEField().z(), 0, 1e-9);
+  double point[4] = {hit.GetPos().x(), hit.GetPos().y(), hit.GetPos().z(),
+                     hit.GetTime()};
+  double field[6] = {0., 0., 0., 0., 0., 0.};
+  Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+  EXPECT_NEAR(hit.GetBField().x(), field[0], 1e-9);
+  EXPECT_NEAR(hit.GetBField().y(), field[1], 1e-9);
+  EXPECT_NEAR(hit.GetBField().z(), field[2], 1e-9);
+  EXPECT_NEAR(hit.GetEField().x(), field[3], 1e-9);
+  EXPECT_NEAR(hit.GetEField().y(), field[4], 1e-9);
+  EXPECT_NEAR(hit.GetEField().z(), field[5], 1e-9);
 
   step->GetPreStepPoint()->SetPosition(CLHEP::Hep3Vector(2e6, 3.e6, 4.));
   EXPECT_THROW(vp_z.BuildNewHit(step, 99), Squeal);  // outside radial cut
