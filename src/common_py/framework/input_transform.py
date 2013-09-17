@@ -20,6 +20,7 @@ Multi-process dataflows module.
 import os
 import json
 import socket
+import celery.states
 
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import CeleryUtilities
@@ -104,6 +105,8 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         self.transformer = transformer
         self.config_doc = config_doc
         self.config = json.loads(self.config_doc)
+        # Maximum number of tasks in queue
+        self.timeout = self.config['reconstruction_timeout']
         # Unique ID for execution.
         self.config_id = "%s-%s" % (socket.gethostname(), os.getpid())
         # Current run number (from spills).
@@ -128,6 +131,10 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         else:
             self.collection = self.config["doc_collection_name"]
 
+    def revoke_celery_tasks(self):
+        for task in self.celery_tasks:
+            task.revoke(terminate=True)
+
     def poll_celery_tasks(self):
         """
         Wait for tasks currently being executed by Celery nodes to 
@@ -138,41 +145,34 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         using the document store.
         """
         # Check each submitted Celery task.
-        num_tasks = len(self.celery_tasks)
-        current = 0
-        while (current < num_tasks):
-            result = self.celery_tasks[current]
+        print 'Polling celery queue'
+        for task in self.celery_tasks:
+            result = self.celery_tasks[-1]
             try:
-                # Catch any RabbitMQ errors when querying status.
-                is_successful = result.successful()
-                is_failed = result.failed()
+                is_successful = result.successful() and not result.failed()
                 result_result = result.result
                 result_traceback = result.traceback
             except socket.error as exc:
                 raise RabbitMQException(exc)
-            if is_successful:
-                self.celery_tasks.pop(current)
-                num_tasks -= 1
-                spill = result_result
+            print "    Celery task %s status is %s" % (result.task_id,
+                                                       result.state)
+            if result.state in celery.states.READY_STATES: # means finished
+                if result.successful():
+                    spill = result_result
+                    try:
+                        if spill != None:
+                            self.doc_store.put(self.collection,
+                                str(self.spill_process_count), spill)
+                    except Exception as exc:
+                        raise DocumentStoreException(exc)
+                else:
+                    self.spill_fail_count += 1
+                self.celery_tasks.pop(-1)
                 self.spill_process_count += 1
-                print " Celery task %s SUCCESS " % (result.task_id)
-                print "   SAVING to collection %s (with ID %s)" \
-                    % (self.collection, self.spill_process_count)
-                try:
-                    self.doc_store.put(self.collection,
-                        str(self.spill_process_count), spill)
-                except Exception as exc:
-                    raise DocumentStoreException(exc)
                 self.print_counts()
-            elif is_failed:
-                self.celery_tasks.pop(current)
-                self.spill_fail_count += 1
-                num_tasks -= 1
-                print " Celery task %s FAILED : %s : %s" \
-                    % (result.task_id, result_result, result_traceback)
-                self.print_counts()
-            else:
-                current += 1
+            else: #pending, retry, etc
+                pass
+        print len(self.celery_tasks), 'tasks remain in queue'
 
     def submit_spill_to_celery(self, spill):
         """
@@ -182,11 +182,11 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         @throws RabbitMQException if RabbitMQ cannot be contacted.
         """
         try:
-            result = \
-                execute_transform.delay(spill, self.config_id) # pylint:disable=E1101, C0301
+            result = execute_transform.apply_async(
+                      args=[spill, self.config_id]) # pylint:disable=E1101
         except socket.error as exc:
             raise RabbitMQException(exc)
-        print "Task ID: %s" % result.task_id
+        print "Submitting task %s" % result.task_id
         # Save asynchronous result object for checking task status. 
         self.celery_tasks.append(result)
 
@@ -199,7 +199,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         @param run_number New run number.
         """
         print "New run detected...waiting for current processing to complete"
-        # Wait for current tasks, from previous run, to complete.
+        # Force kill current tasks, from previous run, to complete.
         # This also ensures their timestamps < those of next run.
         while (len(self.celery_tasks) != 0):
             self.poll_celery_tasks()
@@ -221,6 +221,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         @param run_number Old run number.
         @return None
         """
+        #self.revoke_celery_tasks()
         run_footer_list = CeleryUtilities.death_celery(self.run_number)
         for footer in run_footer_list:
             self.submit_spill_to_celery(footer)

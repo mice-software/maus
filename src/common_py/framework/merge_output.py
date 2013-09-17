@@ -148,8 +148,11 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
  
     def start_of_run(self):
         """
-        Prepare for a new run by updating the local run number then
-        birthing the merger and outputer. 
+        Prepare for a new run
+
+        Calls maus_cpp.globals.start_of_run(), births the merger, writes the
+        start_of_run and handles some internal bureaucracy
+
         @param self Object reference.
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
@@ -163,19 +166,20 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             raise WorkerBirthFailedException(self.merger.__class__)
         run_header = maus_cpp.run_action_manager.start_of_run(self.run_number)
         if self.write_headers:
+            print "SAVE RUN HEADER", run_header
             self.outputer.save(run_header)
 
     def end_of_run(self):
         """
-        End a run by sending an end_of_run spill through the merger
-        and outputer then death the merger and outputer. The end_of_run
-        spill is the last one that was encountered before a change
-        in run was detected. If there was no such end_of_run then
-        a dummy is created.
+        End a run
+        
+        Sends an end_of_run spill through the merger and outputer then deaths
+        the merger. The end_of_run spill is the last one that was encountered
+        before a change in run was detected. If there was no such end_of_run
+        then a dummy is created.
+
         @param self Object reference.
         @throws WorkerDeathFailedException if death returns False.
-        @throws Exception if there is a problem when passing the
-        end_of_run through or when death is called.
         """
         if (self.end_of_run_spill == None):
             print "  Missing an end_of_run spill..."
@@ -192,6 +196,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             raise WorkerDeathFailedException(self.merger.__class__)
         run_footer = maus_cpp.run_action_manager.end_of_run(self.run_number)
         if self.write_headers:
+            print "SAVE RUN FOOTER", run_footer
             self.outputer.save(run_footer)
         print "---------- END RUN %d ----------" % self.run_number
 
@@ -211,12 +216,12 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         """
         spill_doc = json.loads(spill)
         if not "maus_event_type" in spill_doc.keys():
-            raise KeyError("%s\nEvent has no maus_event_type" % \
-                                                json.dumps(spill_doc, indent=2))
+            print json.dumps(spill_doc, indent=2)
+            raise KeyError("Event has no maus_event_type")
         if spill_doc["maus_event_type"] != "Spill":
             outputter_ret = self.outputer.save(str(spill))
-            if outputter_ret != None and outputter_ret != False:
-                print "Failed to execute Output"
+            if not (outputter_ret == None or outputter_ret == True):
+                raise RuntimeError("Failed to execute Output")
         else:
             # Check for change in run.
             spill_run_number = DataflowUtilities.get_run_number(spill_doc)
@@ -228,11 +233,11 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     self.end_of_run()
                 self.run_number = spill_run_number
                 self.start_of_run()
-           # Handle current spill.
+            # Handle current spill.
             merged_spill = self.merger.process(spill)
             outputter_ret = self.outputer.save(str(merged_spill))
-            if outputter_ret != None and outputter_ret != False:
-                print "Failed to execute Output"
+            if not (outputter_ret == None or outputter_ret == True):
+                raise RuntimeError("Failed to execute Output")
             self.spill_process_count += 1
             print "Processed %d DAQ events from run %s" % \
                   (self.spill_process_count, self.run_number)
@@ -297,6 +302,8 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @returns False if a keyboard interrupt is received, indicating that the
                  iteration should not wait for new data
         """
+        # More darkness - MongoDB is very unstable/picky. This has been tuned
+        # to work with MongoDB even for larger datasets
         sys.stdout.flush()
         sys.stderr.flush()
         keyboard_interrupt = False
@@ -312,11 +319,15 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     doc_id = doc["_id"]
                     doc_time = doc["date"]
                     spill = doc["doc"]
-                    print "<%s> Read event %s reconstructed at %s)" % \
-                          (str(datetime.now().time()), doc_id, doc_time)
-                    if (doc_time > self.last_time):
+                    print "<%s> Read event %s reconstructed at %s compared to last_time %s with %s more docs)" % \
+                          (str(datetime.now().time()), str(doc_id), str(doc_time), str(self.last_time), str(len(doc)))
+                    if (doc_time >= self.last_time):
                         self.last_time = doc_time
-                    self.process_event(spill)
+                    try:
+                        self.process_event(spill)
+                    except TypeError:
+                        print spill
+                        raise
                     sys.stdout.flush()
                     sys.stderr.flush()
                 except StopIteration:
@@ -360,10 +371,13 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         return description
 
     @staticmethod
-    def docs_next(_docs, max_number_of_retries=0, retry_time=1):
+    def docs_next(_docs):
         """
-        Try to access document from the iterator a few times before giving up
-        @param _docs iterable that points at a set of documents on the docstore
+        Try to access document from the iterator - if it possible we
+        pop it from front; else try to next() it; else give up
+
+        @param _docs list or generator that yields a set of documents on the
+               docstore
         @param max_number_of_retries Integer number of times to retry accessing
                document before giving up
         @param retry_time time to wait between retries 
@@ -372,18 +386,16 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         @throws StopIteration if the docstore was empty
         """
         # Note retry counter 
-        retry_counter = 0
         while True:
             try:
-                return _docs.next()
+                try:
+                    return _docs.pop(0)
+                except AttributeError:
+                    return _docs.next()
+                except IndexError:
+                    raise StopIteration("Ran out of events")
             except StopIteration:
                 raise
-            except (AssertionError, pymongo.errors.OperationFailure) as err:
-                if retry_counter >= max_number_of_retries:
-                    print 'Failed to access docstore - giving up'
-                    raise DocumentStoreException(err)
-                time.sleep(retry_time)
-                retry_counter += 1
-                print 'Failed to access docstore', retry_counter
-
+            except Exception:
+                raise DocumentStoreException("Failed to access document store")      
 
