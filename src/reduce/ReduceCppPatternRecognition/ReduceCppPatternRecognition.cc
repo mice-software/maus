@@ -23,7 +23,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"

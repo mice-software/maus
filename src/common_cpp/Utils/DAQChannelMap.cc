@@ -18,6 +18,8 @@
 #include "Interface/Squeak.hh"
 #include "Utils/DAQChannelMap.hh"
 
+namespace MAUS {
+
 ////////////////////////////////////////////////////////////
 
 DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Exception) {
@@ -166,3 +168,4 @@ std::string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
   return "unknown";
 }
 
+}  // namespace MAUS

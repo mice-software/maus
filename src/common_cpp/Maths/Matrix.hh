@@ -41,7 +41,7 @@
 #include "gsl/gsl_matrix.h"
 #include "gsl/gsl_blas.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Complex.hh"
 #include "Maths/Vector.hh"
 

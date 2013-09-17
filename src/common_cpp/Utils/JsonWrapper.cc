@@ -21,16 +21,16 @@
 
 #include "json/json.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 Json::Value JsonWrapper::StringToJson(const std::string& json_in)
-    throw(Exception) {
+    throw(MAUS::Exception) {
   Json::Reader reader;
   Json::Value  json_out;
   bool parsingSuccessful = reader.parse(json_in, json_out);
   if (!parsingSuccessful) {
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Failed to parse Json configuration. Json reports\n"
                                       +reader.getFormatedErrorMessages(),
           "JsonWrapper::StringToJson()"));
@@ -47,21 +47,21 @@ std::string JsonWrapper::JsonToString(const Json::Value& val) {
 Json::Value JsonWrapper::GetItem(const Json::Value & array,
                                  const size_t value_index,
                                  const JsonType value_type)
-    throw(Exception) {
+    throw(MAUS::Exception) {
   if (array.type() != Json::arrayValue) {
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Attempting to find Json item but not an array",
                  "JsonWrapper::GetPropertyStrict"));
   }
   if (value_index >= array.size()) {
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                          "Index out of range "+STLUtils::ToString(value_index)
                                                       +" in Json array lookup",
                          "JsonWrapper::GetItemStrict"));
   }
   if (SimilarType(ValueTypeToJsonType(array[value_index].type()), value_type))
     return array[value_index];
-  throw(Exception(Exception::recoverable,
+  throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Value of wrong type in Json array lookup",
                "JsonWrapper::GetItemStrict"));
 }
@@ -69,9 +69,9 @@ Json::Value JsonWrapper::GetItem(const Json::Value & array,
 Json::Value JsonWrapper::GetProperty(const Json::Value& object,
                                      const std::string& name,
                                      const JsonType value_type)
-    throw(Exception) {
+    throw(MAUS::Exception) {
   if (object.type() != Json::objectValue) {
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Attempting to find Json property "+name+" but not an object",
                  "JsonWrapper::GetPropertyStrict"));
   }
@@ -79,12 +79,12 @@ Json::Value JsonWrapper::GetProperty(const Json::Value& object,
     if (SimilarType(ValueTypeToJsonType(object[name].type()), value_type)) {
       return object[name];
     } else {  // type incorrect
-      throw(Exception(Exception::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Property "+name+"  had wrong type in Json object lookup",
                    "JsonWrapper::GetPropertyStrict"));
     }
   } else {  // not a member
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Property "+name+"  not found in Json object lookup",
                  "JsonWrapper::GetPropertyStrict"));
   }
@@ -102,14 +102,14 @@ JsonWrapper::JsonType JsonWrapper::ValueTypeToJsonType(
     case Json::arrayValue: return arrayValue;
     case Json::objectValue: return objectValue;
     default:
-      throw(Exception(Exception::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Json ValueType not recognised",
                    "JsonWrapper::ValueTypeToJsonType"));
   }
 }
 
 Json::ValueType JsonWrapper::JsonTypeToValueType(const JsonWrapper::JsonType tp)
-    throw(Exception) {
+    throw(MAUS::Exception) {
   switch (tp) {
     case nullValue:    return Json::nullValue;
     case intValue:     return Json::intValue;
@@ -120,7 +120,7 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(const JsonWrapper::JsonType tp)
     case arrayValue:   return Json::arrayValue;
     case objectValue:  return Json::objectValue;
     case anyValue: default:
-      throw(Exception(Exception::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Could not convert anyValue to Json ValueType",
                    "JsonWrapper::JsonTypeToValueType"));
   }
@@ -128,9 +128,9 @@ Json::ValueType JsonWrapper::JsonTypeToValueType(const JsonWrapper::JsonType tp)
 }
 
 CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector(const Json::Value& j_vec)
-    throw(Exception) {
+    throw(MAUS::Exception) {
   if (!j_vec.isObject())
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "Could not convert Json value of non-object type "
                 "to three vector",
                 "JsonWrapper::JsonToThreeVector(...)"
@@ -228,7 +228,7 @@ Json::Value JsonWrapper::ObjectMerge(const Json::Value& object_1,
     // check we have objects
     if (object_1.type() != Json::objectValue ||
         object_2.type() != Json::objectValue) {
-        throw(Exception(Exception::recoverable,
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
                      "Expecting object type for object merge",
                      "JsonWrapper::ObjectMerge"));
     }
@@ -269,7 +269,7 @@ Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
                                     const Json::Value& array_2) {
     if (array_1.type() != Json::arrayValue ||
         array_2.type() != Json::arrayValue) {
-        throw(Exception(Exception::recoverable,
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
                      "Expecting array type for array merge",
                      "JsonWrapper::ArrayMerge"));
     }
@@ -291,7 +291,7 @@ std::string JsonWrapper::ValueTypeToString(const Json::ValueType tp) {
     case Json::arrayValue: return "arrayValue";
     case Json::objectValue: return "objectValue";
     default:
-      throw(Exception(Exception::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Json ValueType not recognised",
                    "JsonWrapper::ValueTypeToJsonType"));
   }
@@ -316,7 +316,7 @@ void JsonWrapper::Path::SetPath(Json::Value& json, const std::string& path) {
 void JsonWrapper::Path::AppendPath(Json::Value& json,
                                    const std::string& branch_name) {
     if (branch_name.find("/") != std::string::npos)
-        throw(Exception(Exception::recoverable,
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
                      "/ not allowed in branch names",
                      "JsonWrapper::AppendPath"));
     std::string old_path = GetPath(json);
@@ -370,7 +370,7 @@ Json::Value& JsonWrapper::Path::DereferencePath(Json::Value& json,
     default:
       break;
   }
-  throw(Exception(Exception::recoverable,
+  throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Could not dig through path "+dereferenced_path+
                " from json value "+JsonToString(json),
                "JsonWrapper::DereferencePath"));

@@ -40,7 +40,7 @@ std::map<std::string, MapSecond>* ObjectMapValueProcessor<MapSecond>::JsonToCpp
                                               (const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue &&
         json_object.type() != Json::nullValue) {
-        throw Exception(Exception::recoverable,
+        throw MAUS::Exception(Exception::recoverable,
                     "Can only convert json objects to maps",
                     "ObjectMapValueProcessor::JsonToCpp");
     }

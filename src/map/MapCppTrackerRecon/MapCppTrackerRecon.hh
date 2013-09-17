@@ -35,7 +35,7 @@
 #include <map>
 
 // Other headers
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"

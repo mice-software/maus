@@ -19,7 +19,7 @@
 #include "Utils/JsonWrapper.hh"
 #include "Utils/KLChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppKLDigits/MapCppKLDigits.hh"

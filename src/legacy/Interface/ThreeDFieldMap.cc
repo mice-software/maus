@@ -5,6 +5,7 @@
 #include <sstream>
 #include <map>
 #include <fstream>
+#include "Utils/Exception.hh"
 
 ThreeDFieldMap::ThreeDFieldMap (std::string interpolation, std::string fileName, std::string fileType,
                                std::string symmetry)
@@ -12,10 +13,10 @@ ThreeDFieldMap::ThreeDFieldMap (std::string interpolation, std::string fileName,
 {
 	SetSymmetry(symmetry);
 	Squeak::mout(Squeak::debug) << "Loading 3d field map file \'"+fileName+"\'" << std::endl;
-	if(fileType!="g4bl3dGrid") throw(Exception(Exception::recoverable, "Did not recognise file type \'"+fileType+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
+	if(fileType!="g4bl3dGrid") throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise file type \'"+fileType+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
 	fileName = ReplaceVariables(fileName);
 	std::ifstream in(fileName.c_str());
-	if(!in) throw(Exception(Exception::recoverable, "Could not open file \'"+fileName+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
+	if(!in) throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not open file \'"+fileName+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
 	myInterpolator = LoadBeamlineMap(in, Interpolator3dGridTo3d::triLinear);
 }
 
@@ -53,7 +54,7 @@ Interpolator3dGridTo3d* ThreeDFieldMap::LoadBeamlineMap(std::istream& fin, Inter
 		in >> name;
 		in >> name >> scaleStr;
 		if(scaleStr.size() < 2) 
-			throw( Exception(Exception::recoverable, "Scale \'"+scaleStr+"\' formatting not recognised", "ThreeDFieldMap::LoadBeamlineMap") );
+			throw(MAUS::Exception(MAUS::Exception::recoverable, "Scale \'"+scaleStr+"\' formatting not recognised", "ThreeDFieldMap::LoadBeamlineMap") );
 		scaleStr = scaleStr.substr(1,scaleStr.size()-2);
 		std::stringstream scaleStream(scaleStr);
 		scaleStream >> localScale;
@@ -162,7 +163,7 @@ std::string	ThreeDFieldMap::ReplaceVariables( std::string fileName )
       for( int vpos = pos; vpos < end; ++vpos )
         variable += fileName[vpos];
       if(getenv( variable.c_str() ) == NULL) 
-          throw(Exception(Exception::recoverable, "Error - "+variable+" environment variable was not defined", "ThreeDFieldMap::ReplaceVariables"));
+          throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - "+variable+" environment variable was not defined", "ThreeDFieldMap::ReplaceVariables"));
       fullName += std::string( getenv( variable.c_str() ) );
       pos = end + 1;
     }

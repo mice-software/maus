@@ -73,8 +73,8 @@ TEST_F(GlobalsTest, TestInitialiseDestruct) {
     // Check that we get an exception if initialising with bad data and that
     // _process is still NULL
     EXPECT_THROW
-          (GlobalsManager::InitialiseGlobals("not json"), Exception);
-    EXPECT_THROW(Globals::GetInstance(), Exception);
+          (GlobalsManager::InitialiseGlobals("not json"), MAUS::Exception);
+    EXPECT_THROW(Globals::GetInstance(), MAUS::Exception);
 
     // Check that we don't get an exception if initialising with good data and
     // that _process is not NULL. We will check the member data initialisation
@@ -86,10 +86,10 @@ TEST_F(GlobalsTest, TestInitialiseDestruct) {
     // Try deleting
     GlobalsManager::DeleteGlobals();
     // Check that we now get an exception on delete (already deleted)
-    EXPECT_THROW(GlobalsManager::DeleteGlobals(), Exception);
+    EXPECT_THROW(GlobalsManager::DeleteGlobals(), MAUS::Exception);
 
     // Check that we now get an exception (the pointer allocated to NULL)
-    EXPECT_THROW(Globals::GetInstance(), Exception);
+    EXPECT_THROW(Globals::GetInstance(), MAUS::Exception);
 
     // Check that we can reinitialise okay
     GlobalsManager::InitialiseGlobals(str);

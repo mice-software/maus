@@ -31,6 +31,7 @@
 #include "json/json.h"
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 
+namespace MAUS {
 
 class MapCppTOFSlabHits {
 
@@ -73,4 +74,7 @@ class MapCppTOFSlabHits {
 
   double _tdcV1290_conversion_factor;
 };
+
+}
+
 #endif

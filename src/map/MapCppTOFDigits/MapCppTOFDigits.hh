@@ -40,6 +40,8 @@
 #include "Config/MiceModule.hh"  //  from old file?
 #include "Utils/TOFChannelMap.hh"
 
+namespace MAUS {
+
 class MapCppTOFDigits {
 
  public:
@@ -107,5 +109,8 @@ class MapCppTOFDigits {
   bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Exception);
   bool map_init;
 };
+
+}
+
 #endif
 

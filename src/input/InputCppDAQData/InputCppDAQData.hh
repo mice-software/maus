@@ -36,6 +36,8 @@
 #include "Utils/DAQChannelMap.hh"
 #include "Interface/Squeak.hh"
 
+namespace MAUS {
+
 /** \class InputCppDAQData
 * Load MICE raw data and unpack it into a JSON stream.
 * 
@@ -209,5 +211,7 @@ class InputCppDAQData {
   */
   std::string event_type_to_str(int pType);
 };
+
+}
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

@@ -41,14 +41,14 @@ namespace MAUS {
     FRIEND_TEST(InputBaseTest, TestCopyConstructor);
   };
 
-  class MyInputter_exception : public MyInputter {
+  class MyInputter_maus_exception : public MyInputter {
   public:
-    MyInputter_exception() : MyInputter() {}
+    MyInputter_maus_exception() : MyInputter() {}
 
   private:
     virtual int* _emitter_cpp() {
-      throw Exception(Exception::recoverable,
-                   "Expected Test Exception in _emitter_cpp",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+                   "Expected Test MAUS::Exception in _emitter_cpp",
                    "int* _emitter_cpp()");
     }
   };
@@ -122,13 +122,13 @@ namespace MAUS {
       << std::endl;
 
     /////////////////////////////////////////////////////
-    MyInputter_exception mm_s;
+    MyInputter_maus_exception mm_s;
     try {
       mm_s.emitter_cpp();
     }
     catch(...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
@@ -139,7 +139,7 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 

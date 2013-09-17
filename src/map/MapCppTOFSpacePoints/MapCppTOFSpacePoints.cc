@@ -21,10 +21,12 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppTOFSpacePoints/MapCppTOFSpacePoints.hh"
+
+namespace MAUS {
 
 bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
@@ -452,4 +454,4 @@ bool MapCppTOFSpacePoints::calibrateSlabHit(TOFPixelKey xTriggerPixelKey,
   return false;
 }
 
-
+}

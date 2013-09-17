@@ -119,7 +119,7 @@ void MAUSEvaluator::clear() {
 void MAUSEvaluator::reset() {
   // check that we don't have anything allocated already
   clear();
-  // NOTE: I don't throw Exceptions here because I'm nervous about
+  // NOTE: I don't throw MAUS::Exceptions here because I'm nervous about
   // set up/tear down order
   // initialise evaluator module
   _evaluator_mod = PyImport_ImportModule("evaluator");

@@ -17,6 +17,8 @@
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 
+namespace MAUS {
+
 int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV1290 argument
@@ -644,4 +646,6 @@ Json::Value xfAdcHit;
     xfAdcHit.append(_data[i]);
   }
   return xfAdcHit;
+}
+
 }

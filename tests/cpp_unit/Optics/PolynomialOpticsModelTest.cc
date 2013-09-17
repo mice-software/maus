@@ -35,7 +35,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "BeamTools/BTTracker.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PolynomialOpticsModel.hh"
@@ -255,7 +255,7 @@ std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
     output_vector = optics_model.Transport(input_vector,
                                            kPrimaryPlane+1000.,
                                            kPrimaryPlane+2000.);
-  } catch (Exception exception) {
+  } catch (MAUS::Exception exception) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);
@@ -300,7 +300,7 @@ TEST_F(PolynomialOpticsModelTest, UnsupportedAlgorithms) {
     bool algorithm_failed = false;
     try {
       optics_model.Build();
-    } catch (Exception exception) {
+    } catch (MAUS::Exception exception) {
       algorithm_failed = true;
       std::cout << "DEBUG PolynomialOpticsModelTest_UnsupportedAlgorithms: "
                 << "Algorithm \"" << *iter << "\" failed." << std::endl;

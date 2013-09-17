@@ -19,7 +19,7 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {

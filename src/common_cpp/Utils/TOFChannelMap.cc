@@ -18,6 +18,8 @@
 
 #include "Utils/TOFChannelMap.hh"
 
+namespace MAUS {
+
 TOFChannelMap::~TOFChannelMap() {
   for (unsigned int i = 0;i < _tofKey.size();i++) {
     delete _tofKey[i];
@@ -376,3 +378,4 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     Py_XDECREF(py_arg);
 }
 
+}

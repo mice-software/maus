@@ -21,10 +21,12 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppTOFSlabHits/MapCppTOFSlabHits.hh"
+
+namespace MAUS {
 
 bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
@@ -281,3 +283,4 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
   return xDocSlabHit;
 }
 
+}

@@ -30,7 +30,7 @@ TEST(PrimitivesProcessorsTest, DoubleJsonToCpp) {
   double* value = proc.JsonToCpp(Json::Value(1.));
   EXPECT_EQ(*value, 1.);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), MAUS::Exception);
 }
 
 TEST(PrimitivesProcessorsTest, DoubleCppToJson) {
@@ -49,7 +49,7 @@ TEST(PrimitivesProcessorsTest, BoolJsonToCpp) {
   bool* value = proc.JsonToCpp(Json::Value(true));
   EXPECT_EQ(*value, true);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), MAUS::Exception);
 }
 
 TEST(PrimitivesProcessorsTest, BoolCppToJson) {
@@ -68,7 +68,7 @@ TEST(PrimitivesProcessorsTest, StringJsonToCpp) {
   std::string* value = proc.JsonToCpp(Json::Value("string"));
   EXPECT_EQ(*value, "string");
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value(1.)), Exception);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value(1.)), MAUS::Exception);
 }
 
 TEST(PrimitivesProcessorsTest, StringCppToJson) {
@@ -87,7 +87,7 @@ TEST(PrimitivesProcessorsTest, IntJsonToCpp) {
   int* value = proc.JsonToCpp(Json::Value(1));
   EXPECT_EQ(*value, 1);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), MAUS::Exception);
 }
 
 TEST(PrimitivesProcessorsTest, IntCppToJson) {
@@ -113,7 +113,7 @@ TEST(PrimitivesProcessorsTest, UIntJsonToCpp) {
   EXPECT_EQ(*value, static_cast<unsigned int>(0));
   delete value;
 
-  EXPECT_THROW(proc.JsonToCpp(Json::Value(-1)), Exception); // negative int
+  EXPECT_THROW(proc.JsonToCpp(Json::Value(-1)), MAUS::Exception); // negative int
 
   unsigned int uint_in = 1;
   value = proc.JsonToCpp(Json::Value(uint_in)); // uint
@@ -130,7 +130,7 @@ TEST(PrimitivesProcessorsTest, UIntJsonToCpp) {
   EXPECT_EQ(*value, static_cast<unsigned int>(2147483648));
   delete value;
 
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), MAUS::Exception);
 }
 
 TEST(PrimitivesProcessorsTest, UIntCppToJson) {

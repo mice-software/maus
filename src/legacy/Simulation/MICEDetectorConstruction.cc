@@ -82,16 +82,16 @@ MICEDetectorConstruction::MICEDetectorConstruction(MiceModule* model, Json::Valu
   _checkVolumes = JsonWrapper::GetProperty
         (*_cards, "check_volume_overlaps", JsonWrapper::booleanValue).asBool();
   if (_cards == NULL)
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire datacards",
                  "MiceDetectorConstruction::MiceDetectorConstruction()"));
 
   if (_model == NULL)
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire MiceModule",
                  "MiceDetectorConstruction::MiceDetectorConstruction()"));
   if (_materials == NULL)
-    throw(Exception(Exception::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire MiceMaterials",
                  "MiceDetectorConstruction::MiceDetectorConstruction()"));
 }
@@ -370,7 +370,7 @@ void MICEDetectorConstruction::setSteppingAlgorithm()
     if(!_btField->HasRF()) pStepper = new G4CashKarpRKF45(fEquationM);
     else                   pStepper = new G4CashKarpRKF45(fEquationE, 8);
   }
-  else throw(Exception(Exception::recoverable,
+  else throw(MAUS::Exception(MAUS::Exception::recoverable,
                     "stepping_algorithm '"+stepperType+"' not found",
                     "MICEDetectorConstruction::setSteppingAlgorithm()"));
 

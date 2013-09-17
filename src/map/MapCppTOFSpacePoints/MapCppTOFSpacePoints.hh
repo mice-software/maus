@@ -32,6 +32,8 @@
 
 #include "Utils/TOFCalibrationMap.hh"
 
+namespace MAUS {
+
 class MapCppTOFSpacePoints {
 
  public:
@@ -91,4 +93,7 @@ class MapCppTOFSpacePoints {
   Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
   bool _map_init;
 };
+
+}
+
 #endif

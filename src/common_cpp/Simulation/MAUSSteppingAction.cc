@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "Interface/Squeak.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/MICERun.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"

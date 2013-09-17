@@ -17,7 +17,7 @@
 
 
 #include "JsonCppStreamer/RStream.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 rstream::rstream(const char* filename, const char* mode)
   : m_tree(0),
@@ -26,7 +26,7 @@ rstream::rstream(const char* filename, const char* mode)
     Squeak::mout(Squeak::fatal)
       << "Couldn't open ROOT TFile as no filename or open mode given"
       << std::endl;
-    throw Exception(Exception::nonRecoverable,
+    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
 		 "rstream object not correctly initialised as null \"\" string passed as filename or open mode.",
 		 "rstream::rstream(const char*, const char*)");
   }
@@ -36,7 +36,7 @@ rstream::rstream(const char* filename, const char* mode)
     Squeak::mout(Squeak::fatal)
       << "ROOT TFile opened incorrectly"
       << std::endl;
-    throw Exception(Exception::nonRecoverable,
+    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
 		 "rstream object not correctly initialised as TFile not opened properly",
 		 "rstream::rstream(const char*, const char*)");
   }

@@ -4,7 +4,7 @@
 
 #include "json/json.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace {
@@ -13,12 +13,12 @@ using namespace MAUS;
 class CppErrorHandlerTest : public ::testing::Test {
 protected:
   CppErrorHandlerTest() : obj(Json::objectValue), 
-                          exception(Exception::recoverable, "a_test", "exc::test"),
+                          exception(MAUS::Exception::recoverable, "a_test", "exc::test"),
                           std_exc(&exception) {
   }
   virtual ~CppErrorHandlerTest() {}
   Json::Value obj;
-  Exception      exception;
+  MAUS::Exception      exception;
   std::exception* std_exc;  
 };
 

@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 

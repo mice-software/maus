@@ -31,7 +31,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "BeamTools/BTTracker.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
@@ -143,7 +143,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
   static const double kCovariances[36];
   static const MAUS::CovarianceMatrix kCovarianceMatrix;
  private:
-  MAUS::VirtualPlaneManager const * const default_virtual_planes_;
+  MAUS::VirtualPlaneManager * const default_virtual_planes_;
   MAUS::VirtualPlaneManager * const virtual_planes_;
 };
 
@@ -239,7 +239,7 @@ TEST_F(LinearApproximationOpticsModelTest, Transport) {
   bool transport_failed = false;
   try {
     optics_model.Transport(off_shell_vector, kPrimaryPlane);
-  } catch (Exception exception) {
+  } catch (MAUS::Exception exception) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);

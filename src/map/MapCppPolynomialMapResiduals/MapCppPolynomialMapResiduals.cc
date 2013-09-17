@@ -28,7 +28,7 @@
 #include "json/json.h"
 
 // Legacy/G4MICE
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 // MAUS
 #include "Converter/DataConverters/JsonCppSpillConverter.hh"

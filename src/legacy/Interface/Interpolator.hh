@@ -12,7 +12,6 @@
 #include <math.h>
 #include <vector>
 
-#include "Interface/Exception.hh"
 #include "Interface/Mesh.hh"
 #include "Interface/Spline1D.hh"
 #include "Interface/Interpolation/VectorMap.hh"

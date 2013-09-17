@@ -83,13 +83,13 @@ TEST(STLUtilsTest, ReplaceVariablesTest) {
     EXPECT_EQ(STLUtils::ReplaceVariables("some_string_${MAUS_ROOT_DIR}"),
                                          "some_string_"+mrd);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), Exception);
+                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), MAUS::Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_$MAUS_ROOT_DIR}"), Exception);
+                      ("some_string_$MAUS_ROOT_DIR}"), MAUS::Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_${MAUS_ROOT_DIR"), Exception);
+                      ("some_string_${MAUS_ROOT_DIR"), MAUS::Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_$MAUS_ROOT_DIR"), Exception);
+                      ("some_string_$MAUS_ROOT_DIR"), MAUS::Exception);
 }
 }
 

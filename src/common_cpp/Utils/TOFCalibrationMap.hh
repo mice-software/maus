@@ -33,9 +33,11 @@
 
 #include "json/json.h"
 #include "Utils/TOFChannelMap.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+
+namespace MAUS {
 
 /** Identifier for a single TOF pixel.
  * This class is used to hold and manage all the information needed
@@ -271,6 +273,8 @@ class TOFCalibrationMap {
   bool LoadTriggerCalib();
   bool pymod_ok;
 };
+
+}
 
 #endif
 

@@ -19,7 +19,9 @@
 #include <string>
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 #include "Config/MiceModule.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
+
+namespace MAUS {
 
 //////////////////////////////////////////////////////////////////////
 bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
@@ -525,3 +527,5 @@ bool MapCppTOFMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) {
   }
 }
 //=====================================================================
+
+}

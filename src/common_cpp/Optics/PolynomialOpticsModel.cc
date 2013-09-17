@@ -29,7 +29,7 @@
 #include <sstream>
 #include <vector>
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"

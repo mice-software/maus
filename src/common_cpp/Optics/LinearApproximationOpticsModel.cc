@@ -30,7 +30,7 @@
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "Maths/Vector.hh"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 

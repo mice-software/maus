@@ -17,6 +17,8 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
+namespace MAUS {
+
 InputCppDAQData::InputCppDAQData(std::string pDataPath,
                                    std::string pRunNum) {
   _classname = "InputCppDAQData";
@@ -321,9 +323,4 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
   return event_type;
 }
 
-
-
-
-
-
-
+}

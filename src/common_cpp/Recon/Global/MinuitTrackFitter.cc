@@ -31,7 +31,7 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TrackPoint.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"

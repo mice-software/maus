@@ -58,7 +58,7 @@ void Interpolator3dGridTo3d::Set(ThreeDGrid* grid,
             _interpolator[2] = new TriLinearInterpolator(grid, Bz);
             break;
         default:
-            throw(Exception(Exception::recoverable,
+            throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Did not recognise interpolation algorithm",
                    "Interpolator3dGridTo3d::Set")
       );

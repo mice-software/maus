@@ -29,7 +29,7 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "TMatrixDSym.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 

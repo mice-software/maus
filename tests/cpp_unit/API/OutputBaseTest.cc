@@ -41,14 +41,14 @@ namespace MAUS {
       FRIEND_TEST(OutputBaseTest, TestCopyConstructor);
   };
 
-  class MyOutputter_exception : public MyOutputter {
+  class MyOutputter_maus_exception : public MyOutputter {
     public:
-      MyOutputter_exception() : MyOutputter() {}
+      MyOutputter_maus_exception() : MyOutputter() {}
 
     private:
       virtual bool _save(int* i) {
-        throw Exception(Exception::recoverable,
-           "Expected Test Exception in _save",
+        throw MAUS::Exception(MAUS::Exception::recoverable,
+           "Expected Test MAUS::Exception in _save",
            "int* _save(int* t) const");
       }
   };
@@ -131,13 +131,13 @@ namespace MAUS {
     int* dub = 0;
     ASSERT_FALSE(mm2.save(dub));
     /////////////////////////////////////////////////////
-    MyOutputter_exception mm_s;
+    MyOutputter_maus_exception mm_s;
     try {
       mm_s.save(i1);
     }
     catch(...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
@@ -148,7 +148,7 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 

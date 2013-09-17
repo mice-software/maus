@@ -1,6 +1,6 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include <cmath>
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/RFFieldMap.hh"
 
 // Constructor to read in a RF cavity field map
@@ -60,7 +60,7 @@ void RFFieldMap::ReadMap(const std::string& mapFile, const std::string& fileType
 	}
 	catch(...)
 	{
-		throw(Exception(Exception::recoverable, "There was a problem accessing the RFFieldMap", "RFFieldMap::ReadMap"));
+		throw(MAUS::Exception(MAUS::Exception::recoverable, "There was a problem accessing the RFFieldMap", "RFFieldMap::ReadMap"));
 	}
 }
 
@@ -203,7 +203,7 @@ std::string	RFFieldMap::ReplaceVariables( std::string fileName )
       for( int vpos = pos; vpos < end; ++vpos )
         variable += fileName[vpos];
       if(getenv( variable.c_str() ) == NULL) 
-          throw(Exception(Exception::recoverable, "Error - "+variable+" environment variable was not defined", "RFFieldMap::ReplaceVariables"));
+          throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - "+variable+" environment variable was not defined", "RFFieldMap::ReplaceVariables"));
       fullName += std::string( getenv( variable.c_str() ) );
       pos = end + 1;
     }

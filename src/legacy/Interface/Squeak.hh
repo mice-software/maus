@@ -26,7 +26,7 @@
 
 #include "json/value.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 /// Squeak class is designed to redirect output to std::out or file
 
@@ -64,9 +64,9 @@ class Squeak {
   static std::ostream & mout(errorLevel level);
 
   /// Returns a reference to the ostream corresponding to the exceptionLevel
-  static std::ostream & mout(Exception::exceptionLevel level);
+  static std::ostream & mout(MAUS::Exception::exceptionLevel level);
 
-  /// Set the ostream for a given error level (Exception)
+  /// Set the ostream for a given error level (MAUS::Exception)
   static void setAnOutput(errorLevel level, std::ostream& out);
 
   /// Set the ostream for all items below "verboseLevel" to /dev/null

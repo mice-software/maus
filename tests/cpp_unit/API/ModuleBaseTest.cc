@@ -41,18 +41,18 @@ namespace MAUS {
     FRIEND_TEST(ModuleBaseTest, TestDeath);
   };
 
-  class testclass_exception : public ModuleBase {
+  class testclass_maus_exception : public ModuleBase {
   public:
-    testclass_exception(): ModuleBase("TestClass") {}
+    testclass_maus_exception(): ModuleBase("TestClass") {}
   private:
     virtual void _birth(const std::string&) {
-      throw Exception(Exception::recoverable,
-		   "Expected Test Exception in _birth",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _birth",
 		   "void _birth (const std::string&)");
     }
     virtual void _death() {
-      throw Exception(Exception::recoverable,
-		   "Expected Test Exception in _death",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _death",
 		   "void _death ()");
     }
 
@@ -119,13 +119,13 @@ namespace MAUS {
       << "Fail: Didn't run _birth code."
       << std::endl;
     /////////////////////////////////////////////////////
-    testclass_exception tc_s;
+    testclass_maus_exception tc_s;
     try {
       tc_s.birth("TestConfig");
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -136,7 +136,7 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -170,13 +170,13 @@ namespace MAUS {
       << std::endl;
 
     /////////////////////////////////////////////////////
-    testclass_exception tc_s;
+    testclass_maus_exception tc_s;
     try {
       tc_s.death();
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -187,7 +187,7 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 

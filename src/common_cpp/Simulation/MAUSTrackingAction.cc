@@ -68,7 +68,7 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
         Json::Value json_track = _tracks[_tracks.size()-1];
         if (json_track["track_id"] != aTrack->GetTrackID()) {
-            throw Exception(Exception::recoverable,
+            throw MAUS::Exception(Exception::recoverable,
                          "Track ID misalignment",
                          "MAUSTrackingAction::PostUserTrackingAction");
         }

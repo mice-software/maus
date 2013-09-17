@@ -33,7 +33,7 @@
 #include "json/json.h"
 
 // Legacy/G4MICE
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 // MAUS

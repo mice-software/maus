@@ -26,7 +26,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 

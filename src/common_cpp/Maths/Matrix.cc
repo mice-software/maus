@@ -38,7 +38,7 @@
 #include "gsl/gsl_eigen.h"
 #include "json/json.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 #include "Utils/JsonWrapper.hh"
 

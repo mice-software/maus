@@ -37,6 +37,8 @@
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
+namespace MAUS {
+
 using std::string;
 using std::ostream;
 using std::istream;
@@ -184,6 +186,8 @@ class TOFChannelMap {
   PyObject* _get_cabling_func;
   bool pymod_ok;
 };
+
+}  // namespace MAUS
 
 #endif
 

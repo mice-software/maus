@@ -24,7 +24,7 @@
 #include <vector>
 #include <map>
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "DataStructure/Primary.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"

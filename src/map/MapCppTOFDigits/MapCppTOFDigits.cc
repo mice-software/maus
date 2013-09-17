@@ -19,10 +19,12 @@
 #include "Utils/JsonWrapper.hh"
 #include "Utils/TOFChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppTOFDigits/MapCppTOFDigits.hh"
+
+namespace MAUS {
 
 bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
 
@@ -407,4 +409,6 @@ bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
   }
 
   return false;
+}
+
 }

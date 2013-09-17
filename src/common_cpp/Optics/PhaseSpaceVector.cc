@@ -23,7 +23,7 @@
 #include <iostream>
 #include "CLHEP/Units/PhysicalConstants.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {

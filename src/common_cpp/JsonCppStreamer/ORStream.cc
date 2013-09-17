@@ -19,7 +19,7 @@
 #include <string>
 
 #include "JsonCppStreamer/ORStream.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
   orstream::orstream(const char* fileName,
 		     const char* treeName,
@@ -41,7 +41,7 @@
       Squeak::mout(Squeak::error)
         << "Couldn't open ROOT TFile as no filename given"
         << std::endl;
-      throw Exception(Exception::recoverable,
+      throw MAUS::Exception(MAUS::Exception::recoverable,
 		   "Cannot open file as null \"\" string passed as filename",
 		   "void orstream::open(const char*, const char*, const char*, const char*)");
     }
@@ -51,14 +51,14 @@
       Squeak::mout(Squeak::error)
         << "ROOT TFile opened incorrectly"
         << std::endl;
-      throw Exception(Exception::recoverable,
+      throw MAUS::Exception(MAUS::Exception::recoverable,
 		   "TFile object not opened properly",
 		   "void orstream::open(const char*, const char*, const char*, const char*)");
     }
     TObject* tree_search = m_file->Get(treeName);
     if (tree_search != NULL) {
         if (strcmp(tree_search->ClassName(), "TTree") != 0)
-            throw(Exception(Exception::recoverable,
+            throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Attempt to open TTree with existing non-tree object in the way",
                  "void orstream::open(...)"));
         Squeak::mout(Squeak::debug)

@@ -26,7 +26,7 @@
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/Vector.hh"
 

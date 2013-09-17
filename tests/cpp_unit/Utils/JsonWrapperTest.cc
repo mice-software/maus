@@ -27,7 +27,7 @@ TEST(JsonWrapperTest, StringToJson) {
   Json::Value val = JsonWrapper::StringToJson(good_json);
   EXPECT_EQ(val, Json::Value(Json::objectValue));
   std::string bad_json = "{";
-  EXPECT_THROW(JsonWrapper::StringToJson(bad_json), Exception);
+  EXPECT_THROW(JsonWrapper::StringToJson(bad_json), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, JsonToString) {
@@ -45,13 +45,13 @@ TEST(JsonWrapperTest, GetItemTest) {
     EXPECT_EQ(Json::Value(static_cast<int>(i+2)),
       JsonWrapper::GetItem(good_val, i, JsonWrapper::anyValue));
     EXPECT_THROW( // bad type
-     JsonWrapper::GetItem(good_val, i, JsonWrapper::stringValue), Exception);
+     JsonWrapper::GetItem(good_val, i, JsonWrapper::stringValue), MAUS::Exception);
   }
   Json::Value empty_array =  JsonWrapper::StringToJson("[]");
   EXPECT_THROW( // empty value
-    JsonWrapper::GetItem(empty_array, 0, JsonWrapper::anyValue), Exception);
+    JsonWrapper::GetItem(empty_array, 0, JsonWrapper::anyValue), MAUS::Exception);
   EXPECT_THROW( // out of range item
-    JsonWrapper::GetItem(good_val, 4, JsonWrapper::anyValue), Exception);
+    JsonWrapper::GetItem(good_val, 4, JsonWrapper::anyValue), MAUS::Exception);
 
 }
 
@@ -70,7 +70,7 @@ TEST(JsonWrapperTest, GetPropertyTest) {
     for (unsigned int j = 0; j < 5; ++j) {
       if ( i != j )
       EXPECT_THROW(
-           JsonWrapper::GetProperty(good_val, gets[i], types[j]), Exception)
+           JsonWrapper::GetProperty(good_val, gets[i], types[j]), MAUS::Exception)
         << i << " " << j << " " << gets[i];
      }
   EXPECT_EQ(Json::Value(2.5),
@@ -87,7 +87,7 @@ TEST(JsonWrapperTest, GetPropertyTest) {
                    JsonWrapper::GetProperty(good_val, gets[5], types[5]));
   Json::Value emptyProp =  JsonWrapper::StringToJson("{}");
   EXPECT_THROW( // non-existent property
-    JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue), Exception);
+    JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, TypeConversionTest) {
@@ -103,7 +103,7 @@ TEST(JsonWrapperTest, TypeConversionTest) {
     EXPECT_EQ(JsonWrapper::JsonTypeToValueType(wr_tp[i]), js_tp[i]);
     EXPECT_EQ(JsonWrapper::ValueTypeToJsonType(js_tp[i]), wr_tp[i]);
   };
-  EXPECT_THROW(JsonWrapper::JsonTypeToValueType(JsonWrapper::anyValue), Exception);
+  EXPECT_THROW(JsonWrapper::JsonTypeToValueType(JsonWrapper::anyValue), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, SimilarTypeTest) {
@@ -232,10 +232,10 @@ TEST(JsonWrapperTest, ObjectMergeTest) {
   EXPECT_EQ(object_merged["array"].size(), size_t(2));
   EXPECT_EQ(object_merged["string"], Json::Value("string_value"));
   // throw because common non-array properties
-  EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, object_1), Exception);
+  EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, object_1), MAUS::Exception);
   // throw because non-objects
-  EXPECT_THROW(JsonWrapper::ObjectMerge(int_1, object_1), Exception);
-  EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, int_1), Exception);
+  EXPECT_THROW(JsonWrapper::ObjectMerge(int_1, object_1), MAUS::Exception);
+  EXPECT_THROW(JsonWrapper::ObjectMerge(object_1, int_1), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, ArrayMergeTest) {
@@ -252,8 +252,8 @@ TEST(JsonWrapperTest, ArrayMergeTest) {
   EXPECT_EQ(array_merged[2], Json::Value("bob"));
   EXPECT_EQ(array_merged[3], Json::Value(3));
   // non-array in merge
-  EXPECT_THROW(JsonWrapper::ArrayMerge(int_1, array_1), Exception);
-  EXPECT_THROW(JsonWrapper::ArrayMerge(array_1, int_1), Exception);
+  EXPECT_THROW(JsonWrapper::ArrayMerge(int_1, array_1), MAUS::Exception);
+  EXPECT_THROW(JsonWrapper::ArrayMerge(array_1, int_1), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, JsonValueTypeToStringTest) {
@@ -270,7 +270,7 @@ TEST(JsonWrapperTest, PathHandlingTest) {
   EXPECT_EQ(JsonWrapper::Path::GetPath(test), "#test/append");
   JsonWrapper::Path::AppendPath(test, 1);
   EXPECT_EQ(JsonWrapper::Path::GetPath(test), "#test/append/1");
-  EXPECT_THROW(JsonWrapper::Path::AppendPath(test, "append/"), Exception);
+  EXPECT_THROW(JsonWrapper::Path::AppendPath(test, "append/"), MAUS::Exception);
   Json::Value test_2;
   JsonWrapper::Path::AppendPath(test_2, "append");
   EXPECT_EQ(JsonWrapper::Path::GetPath(test_2), "#append");
@@ -300,11 +300,11 @@ TEST(JsonWrapperTest, PathDereferenceTest) {
             Json::Value("test_2"));
   // not an object or array
   Json::Value not_branch(1);
-  EXPECT_THROW(JsonWrapper::Path::DereferencePath(not_branch, "#1"), Exception);
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(not_branch, "#1"), MAUS::Exception);
   // branch does not exist
-  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#no_branch"), Exception);
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#no_branch"), MAUS::Exception);
   // array element does not exist
-  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#object_0/2"), Exception);
+  EXPECT_THROW(JsonWrapper::Path::DereferencePath(test, "#object_0/2"), MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, SetPathRecursiveTest) {

@@ -31,7 +31,7 @@
 #include "gsl/gsl_vector_complex_double.h"
 
 #include "Maths/Complex.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 

@@ -30,7 +30,7 @@
 
 #include "Interface/Interpolator.hh"
 #include "Interface/Mesh.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 #include "Maths/Vector.hh"

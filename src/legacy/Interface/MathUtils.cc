@@ -28,7 +28,7 @@
 #include "gsl/gsl_errno.h"
 
 #include "Interface/MathUtils.hh"
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Interface/STLUtils.hh"
 
 // Use

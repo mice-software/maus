@@ -26,7 +26,7 @@
 
 #include "TMatrixDSym.h"
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Complex.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/Vector.hh"

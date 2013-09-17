@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "Interface/Exception.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"

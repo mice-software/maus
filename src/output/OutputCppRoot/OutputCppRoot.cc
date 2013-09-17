@@ -135,7 +135,7 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
     } else if (type == "RunFooter") {
         return _run_footer_tp;
     } else {
-        throw Exception(Exception::recoverable,
+        throw MAUS::Exception(Exception::recoverable,
                      "Failed to recognise maus_event_type "+type,
                      "OutputCppRoot::get_event_type");
     }

@@ -50,7 +50,7 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     spill->SetDAQData(new DAQData());
 
   if (spill->GetReconEvents() == NULL)
-    spill->SetReconEvents(new ReconEventArray());
+    spill->SetReconEvents(new ReconEventPArray());
 
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];

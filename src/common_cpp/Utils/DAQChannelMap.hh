@@ -31,6 +31,8 @@
 
 #include "Utils/Exception.hh"
 
+namespace MAUS {
+
 /** Identifier for a single DAQ channel.
  * This class is used to hold and manage all the information needed
  * to identifiy one DAQ Channel.
@@ -135,6 +137,7 @@ class DAQChannelMap {
   std::vector<DAQChannelKey*> _chKey;
 };
 
+}  // namespace MAUS
 
 #endif
 
