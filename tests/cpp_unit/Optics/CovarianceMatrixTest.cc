@@ -324,7 +324,7 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
   // TMatrixDSym copy
   const TMatrixDSym root_sym_matrix(6, non_positive_definite_data_);
   const CovarianceMatrix root_covariances(root_sym_matrix);
-  ASSERT_EQ(root_covariances, positive_definite_matrix_);
+  ASSERT_EQ(root_covariances, non_positive_definite_matrix_);
 
   TMatrixDSym root_too_small(4);
   Double_t seed = 2.;
