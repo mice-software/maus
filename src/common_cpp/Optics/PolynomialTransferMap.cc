@@ -27,7 +27,7 @@
 #include "Recon/Global/ParticleOpticalVector.hh"
 
 namespace MAUS {
-  
+
 using MAUS::recon::global::ParticleOpticalVector;
 
 // ##############################

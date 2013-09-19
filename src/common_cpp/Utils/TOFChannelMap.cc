@@ -377,5 +377,4 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     Py_XDECREF(py_value);
     Py_XDECREF(py_arg);
 }
-
 }

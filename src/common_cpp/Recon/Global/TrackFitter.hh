@@ -20,9 +20,8 @@
 #ifndef SRC_COMMON_CPP_RECONSTRUCTION_TRACK_FITTER_HH
 #define SRC_COMMON_CPP_RECONSTRUCTION_TRACK_FITTER_HH
 
+#include <string>
 #include <vector>
-
-//#include "DataStructure/Global/Track.hh"
 
 namespace MAUS {
 

@@ -211,7 +211,6 @@ class InputCppDAQData {
   */
   std::string event_type_to_str(int pType);
 };
-
 }
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

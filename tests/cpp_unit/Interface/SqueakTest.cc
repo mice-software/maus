@@ -44,7 +44,8 @@ TEST(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
 // test mout(MAUS::Exception::exceptionLevel)
 TEST(SqueakTest, SqueakMoutExceptionTest) {
   std::stringstream sstr;
-  MAUS::Exception::exceptionLevel exc[] = {MAUS::Exception::recoverable, MAUS::Exception::nonRecoverable};
+  MAUS::Exception::exceptionLevel exc[] = {
+    MAUS::Exception::recoverable, MAUS::Exception::nonRecoverable};
   Squeak::errorLevel err[] = {Squeak::error, Squeak::fatal};
   for (int i = 0; i < 2; ++i) {
     Squeak::setAnOutput(err[i], sstr);

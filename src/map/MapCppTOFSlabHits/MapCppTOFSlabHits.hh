@@ -74,7 +74,6 @@ class MapCppTOFSlabHits {
 
   double _tdcV1290_conversion_factor;
 };
-
 }
 
 #endif

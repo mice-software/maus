@@ -647,5 +647,4 @@ Json::Value xfAdcHit;
   }
   return xfAdcHit;
 }
-
 }

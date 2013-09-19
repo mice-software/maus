@@ -31,7 +31,7 @@ namespace MAUS {
 class OpticsModel {
  public:
   OpticsModel() : configuration_(NULL) { }
-  OpticsModel(Json::Value const * const configuration)
+  explicit OpticsModel(Json::Value const * const configuration)
       : configuration_(configuration) { }
   virtual ~OpticsModel() { }
 

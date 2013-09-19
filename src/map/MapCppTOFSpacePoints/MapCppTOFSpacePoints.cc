@@ -420,7 +420,7 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
                                JsonWrapper::stringValue).asString();
   TOFChannelKey xChannelKey(keyStr);
 
-  double raw_time 
+  double raw_time
     = JsonWrapper::GetProperty(xPmtHit,
                                "raw_time",
                                JsonWrapper::realValue).asDouble();
@@ -453,5 +453,4 @@ bool MapCppTOFSpacePoints::calibrateSlabHit(TOFPixelKey xTriggerPixelKey,
   }
   return false;
 }
-
 }

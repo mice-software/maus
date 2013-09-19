@@ -342,7 +342,6 @@ class DBBDataProcessor : public MDarranger {
   */
   virtual int Process(MDdataContainer* dc);
 };
-
 }
 
 #endif  // _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_H__

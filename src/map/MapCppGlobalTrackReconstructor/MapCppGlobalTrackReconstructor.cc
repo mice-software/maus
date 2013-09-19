@@ -334,7 +334,7 @@ void MapCppGlobalTrackReconstructor::LoadRawTracks(
 void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
     GlobalDS::Track * track) const {
   PolynomialOpticsModel * const optics_model
-    = dynamic_cast<MAUS::PolynomialOpticsModel*>(optics_model_);
+    = static_cast<MAUS::PolynomialOpticsModel*>(optics_model_);
   if (optics_model == NULL) {
     throw(Exception(Exception::nonRecoverable,
                 "Could not reconstruct intermediate track points: the optics "
@@ -353,7 +353,7 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
     = helper.TrackPoint2PhaseSpaceVector(*fit_primary_track_point);
 
   // Construct a list of detector z-keys (z-position rounded to nearest integer)
-  std::vector<long> z_keys;
+  std::vector<int64_t> z_keys;
   GlobalDS::TrackPointCPArray::const_iterator fit_point
     = fit_points.begin();
   for (fit_point = fit_points.begin();
@@ -361,17 +361,17 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
        ++fit_point) {
     // calculate the next guess
     const double z = (*fit_point)->get_position().Z();
-    long z_key = (z>=0?static_cast<long>(z+.5):static_cast<long>(z-.5));
+    int64_t z_key = (z >= 0?static_cast<int64_t>(z+.5):static_cast<int64_t>(z-.5));
     z_keys.push_back(z_key);
   }
 
   // Reconstruct the intermediate track points by transporting the fit primary
   // to all desired intermediate z-positions
   const GlobalDS::PID particle_id = track->get_pid();
-  std::vector<long>::const_iterator z_key = z_keys.begin();
-  const std::vector<long> map_positions
+  std::vector<int64_t>::const_iterator z_key = z_keys.begin();
+  const std::vector<int64_t> map_positions
     = optics_model->GetAvailableMapPositions();
-  std::vector<long>::const_iterator map_z;
+  std::vector<int64_t>::const_iterator map_z;
   for (map_z = map_positions.begin(); map_z != map_positions.end(); ++map_z) {
     // locate the next detector z-position
     while (z_key != z_keys.end() && (*z_key) < (*map_z)) {

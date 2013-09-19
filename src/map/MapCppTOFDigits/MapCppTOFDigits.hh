@@ -106,10 +106,11 @@ class MapCppTOFDigits {
    *  @param document Receive a document with raw data and return
    *  a document with digits
    */
-  bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Exception);
+  bool getTrig(Json::Value xDocTrig,
+               Json::Value xDocTdcHit,
+               Json::Value &xDocDigit) throw(Exception);
   bool map_init;
 };
-
 }
 
 #endif

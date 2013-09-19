@@ -282,5 +282,4 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
 
   return xDocSlabHit;
 }
-
 }

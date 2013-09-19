@@ -256,14 +256,6 @@ Double_t MinuitTrackFitter::ScoreTrack(
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
-  const double time_calibration = 0;
-  #if 0
-    const double t0 = reference_pgparticle.time;
-    const double E0 = reference_pgparticle.energy;
-    const double P0 = reference_pgparticle.pz;
-  #endif
-std::cout << "CHECKPOINT ScoreTrack(): 0" << std::endl;
-std::cout.flush();
   // clear the last saved track
   reconstructed_points_.clear();
 
@@ -337,23 +329,6 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
     };
     const Matrix<double> error_matrix(6, 6, errors);
     const CovarianceMatrix uncertainties(error_matrix*error_matrix);
-//std::cerr << uncertainties << std::endl;
-
-    // save the calculated track point in case this is the
-    // last (best fitting) track
-    /*
-    try {
-      reconstructed_points_.push_back(
-        helper.PhaseSpaceVector2TrackPoint(point, end_plane, particle_id_));
-    } catch (Exception exception) {
-        std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
-                  << "something bad happened during track fitting: "
-                  << exception.what() << std::endl;
-      return 1.0e+15;
-    }
-    */
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
-          << reconstructed_points_.size() << std::endl;
 
     const double weights[36] = {
       1., 0., 0., 0., 0., 0.,
@@ -367,80 +342,25 @@ std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Pushed track point #"
 
     // Sum the squares of the differences between the calculated phase space
     // coordinates (point) and the measured coordinates (event).
-    // TrackPoint residual = TrackPoint(weight_matrix * (point - (*events)));
-    const PhaseSpaceVector time_comp_vector(time_calibration, 0, 0, 0, 0, 0);
     PhaseSpaceVector event_point = helper.TrackPoint2PhaseSpaceVector(**event);
     PhaseSpaceVector residual = PhaseSpaceVector(
-      weight_matrix * (event_point - point));// - time_comp_vector));
-    /*
-    ParticleOpticalVector normalized_event(event_point,
-                                           t0 + time_calibration, E0, P0);
-    ParticleOpticalVector normalized_estimate(point, t0, E0, P0);
-    ParticleOpticalVector normalized_residual(
-      normalized_event - normalized_estimate);
-    */
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Event: "
-          << event_point << std::endl;
-/*
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Event: "
-          << normalized_event << std::endl;
-*/
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Estimate: "
-          << point << std::endl;
-/*
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Estimate: "
-          << normalized_estimate << std::endl;
-*/
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual: "
-          << residual << std::endl;
-/*
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Normalized Residual: "
-          << setprecision(20) << normalized_residual << std::endl;
-    const double residual_squared = (transpose(normalized_residual)
-                                     * uncertainties
-                                     * normalized_residual)[0];
-*/
-    residual -= time_comp_vector;
-    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Weighted Residual: "
-          << (inverse(uncertainties) * residual) << std::endl;
+      weight_matrix * (event_point - point));
     const double residual_squared = (transpose(residual)
                                      * inverse(uncertainties)
                                      * residual)[0];
-    //std::cerr << transpose(residual) << "\n" << inverse(uncertainties) << std::endl;
     std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Residual Squared: "
           << residual_squared << std::endl;
     chi_squared += residual_squared;
-/*
-std::cerr << "xm: " << event_point.x() << " pxm: " << event_point.Px() << " ym: " << event_point.y() << " pym: " << event_point.Py()
-          << " xr: " << point.x() << " pxr: " << point.Px() << " yr: " << point.y() << " pyr: " << point.Py()
-          << " dx: " << residual.x() << " dpx: " << residual.Px() << " dy: " << residual.y() << " dpy: " << residual.Py()
-          << " chi2: " << chi_squared << std::endl;
-*/
-std::cerr << residual << std::endl
-          << " = " << event_point << std::endl
-          << " - " << point << std::endl
-          << " -- chi2: " << chi_squared << std::endl;
+    std::cerr << residual << std::endl
+              << " = " << event_point << std::endl
+              << " - " << point << std::endl
+              << " -- chi2: " << chi_squared << std::endl;
     ++index;
   }
   std::cerr << std::endl;
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): "
-          << "Energy = " << guess[1] << "\tScore = " << chi_squared << std::endl;
 
   return chi_squared;
 }
-
-/*
-bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
-  bool valid = true;
-
-  if (guess != guess) {
-    // No NaN guesses
-    valid = false;
-  }
-
-  return valid;
-}
-*/
 
 bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
   const double mass = Particle::GetInstance().GetMass(particle_id_);
@@ -449,14 +369,13 @@ bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
   const double py = guess.Py();
 
   bool valid = true;
-  
+
   if (guess != guess) {
     // No NaN guesses
     valid = false;
   } else if (::sqrt(px*px + py*py + mass*mass) > E) {
     // Energy cannot be greater than the sum of the squares of the transverse
     // momenta and mass
-    std::cout << "DEBUG ValidVector(): Guess is off mass shell" << std::endl;
     valid = false;
   }
 
@@ -464,7 +383,6 @@ bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
 }
 
 const size_t MinuitTrackFitter::kPhaseSpaceDimension = 6;
-
 }  // namespace global
 }  // namespace recon
 }  // namespace MAUS

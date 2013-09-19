@@ -322,5 +322,4 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
   }
   return event_type;
 }
-
 }

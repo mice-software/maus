@@ -20,6 +20,7 @@
 
 #include "Optics/PolynomialOpticsModel.hh"
 
+#include <algorithm>
 #include <cfloat>
 #include <cmath>
 #include <map>
@@ -108,7 +109,7 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
   }
 
   // Map stations to hits in each virtual track
-  std::map<long, std::vector<PhaseSpaceVector> > station_hits_map;
+  std::map<int64_t, std::vector<PhaseSpaceVector> > station_hits_map;
 size_t count = 0;
   for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
@@ -121,7 +122,7 @@ std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
           << "\t# station Zs: " << station_hits_map.size() << std::endl;
 
   // Calculate transfer maps from the primary plane to each station plane
-  std::map<long, std::vector<PhaseSpaceVector> >::iterator station_hits;
+  std::map<int64_t, std::vector<PhaseSpaceVector> >::iterator station_hits;
   for (station_hits = station_hits_map.begin();
        station_hits != station_hits_map.end();
        ++station_hits) {
@@ -136,7 +137,7 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
   built_ = true;
 }
 
-const std::vector<long> PolynomialOpticsModel::GetAvailableMapPositions()
+const std::vector<int64_t> PolynomialOpticsModel::GetAvailableMapPositions()
     const {
   if (!built_) {
     throw(Exception(Exception::nonRecoverable,
@@ -145,8 +146,8 @@ const std::vector<long> PolynomialOpticsModel::GetAvailableMapPositions()
                   "MAUS::PolynomialOpticsModel::GetAvailableMapPositions()"));
   }
 
-  std::vector<long> positions;
-  std::map<long, const TransferMap *>::const_iterator maps;
+  std::vector<int64_t> positions;
+  std::map<int64_t, const TransferMap *>::const_iterator maps;
   // insertion sort the map keys (z-positions)
   for (maps = transfer_maps_.begin(); maps != transfer_maps_.end(); ++maps) {
     positions.push_back(maps->first);

@@ -527,5 +527,4 @@ bool MapCppTOFMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) {
   }
 }
 //=====================================================================
-
 }

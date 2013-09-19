@@ -73,7 +73,6 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   MDmonitoring * _dataManager;
   struct timespec _sleep_time; // time.h
 };
-
 }
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

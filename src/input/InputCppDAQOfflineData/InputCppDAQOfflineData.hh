@@ -88,7 +88,6 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */
   bool _calib_Events_Only;
 };
-
 }
 
 #endif

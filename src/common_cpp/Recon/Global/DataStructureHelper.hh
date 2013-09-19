@@ -62,7 +62,7 @@ class DataStructureHelper {
       const MAUS::DataStructure::Global::PID particle_id) const;
   MAUS::Primary PGParticle2Primary(
       MAUS::MAUSPrimaryGeneratorAction::PGParticle& pgparticle) const;
-  
+
   /*
   void GetGlobalRawTracks(const Json::Value& recon_event,
                           const DetectorMap& detectors,
@@ -83,7 +83,7 @@ class DataStructureHelper {
       const bool on_mass_shell);
   */
  protected:
-  DataStructureHelper() { };
+  DataStructureHelper() { }
   CovarianceMatrix GetJsonCovarianceMatrix(
       const Json::Value& value) const;
 };

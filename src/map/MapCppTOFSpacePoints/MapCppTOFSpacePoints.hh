@@ -93,7 +93,6 @@ class MapCppTOFSpacePoints {
   Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
   bool _map_init;
 };
-
 }
 
 #endif

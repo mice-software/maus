@@ -169,7 +169,7 @@ ProcessableObject<bool> MapCppPolynomialMapResiduals::GenerateResiduals(
   std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
             << "Extracted " << primaries.size() << " primaries."
             << std::endl;
-  std::vector<long> z_positions = optics_model_->GetAvailableMapPositions();
+  std::vector<int64_t> z_positions = optics_model_->GetAvailableMapPositions();
   std::cout << "DEBUG MapCppPolynomialMapResiduals::GenerateResiduals: "
             << "There are " << z_positions.size() << " maps available."
             << std::endl;
@@ -286,13 +286,13 @@ MapCppPolynomialMapResiduals::CalculateResiduals(
 std::vector<std::vector<PhaseSpaceVector> >
 MapCppPolynomialMapResiduals::TransportBeamPrimaries(
     PolynomialOpticsModel const * const optics_model,
-    std::vector<long> z_positions,
+    std::vector<int64_t> z_positions,
     std::vector<Primary *> primaries) const {
   std::vector<std::vector<PhaseSpaceVector> > tracks;
   std::vector<Primary *>::const_iterator primary = primaries.begin();
   while (primary != primaries.end()) {
     std::vector<PhaseSpaceVector> track;
-    std::vector<long>::const_iterator z_position = z_positions.begin();
+    std::vector<int64_t>::const_iterator z_position = z_positions.begin();
     while (z_position != z_positions.end()) {
       track.push_back(optics_model->Transport(
         Primary2PhaseSpaceVector(**primary), *z_position));
@@ -335,7 +335,7 @@ PhaseSpaceVector MapCppPolynomialMapResiduals::Primary2PhaseSpaceVector(
 
 ProcessableObject<bool> MapCppPolynomialMapResiduals::WriteResiduals(
     const ReconEventPArray & recon_events,
-    const std::vector<long> z_positions,
+    const std::vector<int64_t> z_positions,
     const std::vector<std::vector<PhaseSpaceVector> > & residuals) const {
 std::cout << "CHECKPOINT 0" << std::endl;
   if (residuals.size() != recon_events.size()) {
@@ -364,7 +364,7 @@ std::cout << "CHECKPOINT 3" << std::endl;
     track->set_mapper_name(kClassname);
     std::vector<PhaseSpaceVector>::const_iterator residual
       = track_residual->begin();
-    std::vector<long>::const_iterator z_position = z_positions.begin();
+    std::vector<int64_t>::const_iterator z_position = z_positions.begin();
     while (residual != track_residual->end()) {
       GlobalDS::TrackPoint track_point
         = Recon::DataStructureHelper::GetInstance().PhaseSpaceVector2TrackPoint(

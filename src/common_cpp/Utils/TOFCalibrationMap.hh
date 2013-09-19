@@ -273,7 +273,6 @@ class TOFCalibrationMap {
   bool LoadTriggerCalib();
   bool pymod_ok;
 };
-
 }
 
 #endif

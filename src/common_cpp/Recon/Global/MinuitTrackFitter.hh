@@ -20,6 +20,7 @@
 #ifndef SRC_COMMON_CPP_OPTICS_RECONSTRUCTION_MINUIT_TRACK_FITTER_HH
 #define SRC_COMMON_CPP_OPTICS_RECONSTRUCTION_MINUIT_TRACK_FITTER_HH
 
+#include <string>
 #include <vector>
 
 #include "TMinuit.h"

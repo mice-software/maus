@@ -112,7 +112,6 @@ bool InputCppDAQOfflineData::readNextEvent() {
 
   return true;
 }
-
 }
 
 

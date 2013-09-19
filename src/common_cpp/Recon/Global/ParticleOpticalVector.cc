@@ -40,10 +40,6 @@ ParticleOpticalVector::ParticleOpticalVector(
     const PhaseSpaceVector& vector,
     const double t0, const double E0, const double P0)
     : PhaseSpaceVector() {
-std::cout << "DEBUG ParticleOpticalVector::ParticleOpticalVector():" << std::endl
-          << "\tt0: " << t0 << "\tE0: " << E0 << "\tP0: " << P0 << std::endl;
-std::cout << "DEBUG ParticleOpticalVector::ParticleOpticalVector(): PS Vector"
-          << std::endl << vector << std::endl;
   const double beta0 = P0 / E0;
   const double gamma0 = 1. / ::sqrt(1 - beta0*beta0);
   // const double k = beta0 * ::CLHEP::c_light * gamma0 / (1 + gamma0);
@@ -55,8 +51,6 @@ std::cout << "DEBUG ParticleOpticalVector::ParticleOpticalVector(): PS Vector"
   set_a(vector.Px() / P0);
   set_y(vector.y());
   set_b(vector.Py() / P0);
-std::cout << "DEBUG ParticleOpticalVector::ParticleOpticalVector(): PO Vector"
-          << std::endl << *this << std::endl;
 }
 
 ParticleOpticalVector::ParticleOpticalVector(

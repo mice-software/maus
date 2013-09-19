@@ -48,16 +48,20 @@ class ReconEvent;
 template <typename Type>
 class ProcessableObject {
   public:
-  ProcessableObject(Type * object)
+  explicit ProcessableObject(Type * object)
       : object_(object), error_string_(NULL) { }
-  ProcessableObject(const std::string error_string)
+  explicit ProcessableObject(const std::string error_string)
       : object_(NULL), error_string_(new std::string(error_string)) { }
   ~ProcessableObject() {
     if (!object_) delete object_;
     if (!error_string_) delete error_string_;
   }
-  Type * object() { return object_; };
-  std::string * error_string() { return error_string_; }
+  Type * object() {
+    return object_;
+  }
+  std::string * error_string() {
+    return error_string_;
+  }
   private:
   Type * object_;
   std::string * error_string_;
@@ -136,7 +140,7 @@ class MapCppPolynomialMapResiduals {
       const std::vector<PhaseSpaceVector> & mc_hits) const;
   std::vector<std::vector<PhaseSpaceVector> > TransportBeamPrimaries(
       PolynomialOpticsModel const * const optics_model,
-      std::vector<long> z_positions,
+      std::vector<int64_t> z_positions,
       std::vector<Primary *> primaries) const;
   PhaseSpaceVector VirtualHit2PhaseSpaceVector(
       const VirtualHit & hit) const;
@@ -144,7 +148,7 @@ class MapCppPolynomialMapResiduals {
       const Primary & primary) const;
   ProcessableObject<bool> WriteResiduals(
       const ReconEventPArray & recon_events,
-      const std::vector<long> z_positions,
+      const std::vector<int64_t> z_positions,
       const std::vector<std::vector<PhaseSpaceVector> > & residuals) const;
 };
 

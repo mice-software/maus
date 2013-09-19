@@ -410,5 +410,4 @@ bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
 
   return false;
 }
-
 }

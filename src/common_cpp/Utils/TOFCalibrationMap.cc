@@ -572,5 +572,4 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
 
   return true;
 }
-
 }

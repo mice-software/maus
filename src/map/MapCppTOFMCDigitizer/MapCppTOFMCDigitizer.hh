@@ -83,7 +83,6 @@ class MapCppTOFMCDigitizer {
   double gentime;
   bool fDebug;
 };
-
 }
 
 #endif  //  _COMPONENTS_MAP_MAPCPPTOFMCDIGITIZER_H_

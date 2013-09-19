@@ -232,17 +232,14 @@ TrackPoint DataStructureHelper::PhaseSpaceVector2TrackPoint(
               << "\ty: " << vector.y() << "\tPy: " << py
               << "\tz: " << z << "\tPz: " << pz << std::endl;
     if (pz != pz) {
-      //pz = ::sqrt(energy*energy - mass*mass);
-      //if (pz != pz) {
-        pz = 0.;
-      //}
+      pz = 0.;
       /*
       throw(Exception(Exception::recoverable,
                    "PhaseSpaceVector is off mass shell.",
                    "DataStructureHelper::PhaseSpaceVector2TrackPoint()"));
       */
     }
-              
+
     const TLorentzVector momentum(px, py, pz, energy);
     track_point.set_momentum(momentum);
 

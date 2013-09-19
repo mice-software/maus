@@ -91,7 +91,7 @@ class TransferMapOpticsModel : public OpticsModel {
   const MiceMaterials * mice_materials_;
   const MiceModule * mice_module_;
 
-  std::map<long, const TransferMap *> transfer_maps_;
+  std::map<int64_t, const TransferMap *> transfer_maps_;
   Primary reference_primary_;
   PhaseSpaceVector reference_trajectory_;
   double time_offset_;
@@ -110,7 +110,7 @@ class TransferMapOpticsModel : public OpticsModel {
    * from station ID to hits recorded by that station.
    */
   void MapStationsToHits(
-      std::map<long, std::vector<PhaseSpaceVector> > &
+      std::map<int64_t, std::vector<PhaseSpaceVector> > &
       station_hits,
       const Json::Value & event);
 
