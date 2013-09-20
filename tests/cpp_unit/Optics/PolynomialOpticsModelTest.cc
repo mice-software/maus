@@ -189,6 +189,28 @@ TEST_F(PolynomialOpticsModelTest, Constructor) {
       MAUS::Globals::GetConfigurationCards());
 }
 
+/*
+TEST_F(PolynomialOpticsModelTest, Build) {
+  // Bad build -- incomplete particle tracks
+  Json::Value * config = MAUS::Globals::GetConfigurationCards();
+  (*config)["reference_physics_processes"] = Json::Value("mean_energy_loss");
+  (*config)["physics_processes"] = Json::Value("mean_energy_loss");
+  (*config)["particle_decay"] = Json::Value(true);
+  (*config)["muon_half_life"] = Json::Value(1.0);  // 1 ns -> ~25 cm
+  std::string config_string = JsonWrapper::JsonToString(*config);
+  MAUS::GlobalsManager::DeleteGlobals();
+  MAUS::GlobalsManager::InitialiseGlobals(config_string);
+  PolynomialOpticsModel bad_optics_model_1(config);
+  bool success = false;
+  try {
+    bad_optics_model_1.Build();
+  } catch (MAUS::Exception exception) {
+    success = true;
+  }
+  EXPECT_TRUE(success);
+}
+*/
+
 TEST_F(PolynomialOpticsModelTest, Accessors) {
   PolynomialOpticsModel optics_model(
       MAUS::Globals::GetConfigurationCards());
@@ -200,17 +222,35 @@ TEST_F(PolynomialOpticsModelTest, Accessors) {
   ASSERT_DOUBLE_EQ(kPrimaryPlane+1000., primary_plane);
 }
 
+TEST_F(PolynomialOpticsModelTest, AvailablePositions) {
+  PolynomialOpticsModel optics_model(
+      MAUS::Globals::GetConfigurationCards());
+
+  // Bad position query before model is built
+  bool success = false;
+  try {
+    optics_model.GetAvailableMapPositions();
+  } catch (MAUS::Exception exception) {
+    success = true;
+  }
+  EXPECT_TRUE(success);
+
+  // One position per virtual detectors
+  optics_model.Build();
+  const std::vector<int64_t> positions
+    = optics_model.GetAvailableMapPositions();
+  const size_t position_count = positions.size();
+  // start, mid, and end virtual detectors
+  EXPECT_EQ(position_count, static_cast<size_t>(3));
+}
+
 TEST_F(PolynomialOpticsModelTest, Transport) {
   PolynomialOpticsModel optics_model(
       MAUS::Globals::GetConfigurationCards());
 
-std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
-          << "CHECKPOINT 0" << std::endl;
   // The configuration specifies a 2m drift between 1m and 3m.
   optics_model.Build();
 
-std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
-          << "CHECKPOINT 1" << std::endl;
   // Check transport to start plane
   MAUS::PhaseSpaceVector input_vector(0., 226., 1., 0., 3., 0.);
   MAUS::PhaseSpaceVector output_vector = optics_model.Transport(input_vector,
@@ -228,8 +268,6 @@ std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
     }
   }
 
-std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
-          << "CHECKPOINT 2" << std::endl;
   // Check transport to end plane
   MAUS::PhaseSpaceVector expected_vector(7.5466, 226., 1., 0., 3., 0.);
   output_vector = optics_model.Transport(input_vector, kPrimaryPlane+2000.);
@@ -237,8 +275,6 @@ std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
-std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
-          << "CHECKPOINT 3" << std::endl;
   // Check transport to mid plane
   expected_vector = MAUS::PhaseSpaceVector(3.7733, 226., 1., 0., 3., 0.);
   output_vector = optics_model.Transport(input_vector, kPrimaryPlane+1000.);
@@ -246,8 +282,6 @@ std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
-std::cout << "DEBUG PolynomialOpticsModelTest.Transport: "
-          << "CHECKPOINT 4" << std::endl;
   // Check transport from mid plane to end plane (should fail because the
   // Inverse() function in PolynomialMap is not implemented)
   bool transport_failed = false;

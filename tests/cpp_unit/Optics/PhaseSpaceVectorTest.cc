@@ -47,6 +47,7 @@ class PhaseSpaceVectorTest : public testing::Test {
 
  protected:
   static const double kData[10];
+  static const double kDoubleData[6];
 };
 
 // *************************************************
@@ -55,6 +56,8 @@ class PhaseSpaceVectorTest : public testing::Test {
 
 const double PhaseSpaceVectorTest::kData[10]
   = {3.1, 4.1, 5.9, 2.6, 5.3, 5.8, 9.7, 9.3, 2.3, 8.4};  // 10 elem.
+const double PhaseSpaceVectorTest::kDoubleData[6]
+  = {6.2, 8.2, 11.8, 5.2, 10.6, 11.6};
 
 
 // ***********
@@ -110,6 +113,135 @@ TEST_F(PhaseSpaceVectorTest, ParameterConstructor) {
   ASSERT_EQ(ps_vector.size(), (size_t) 6);
   for (size_t index = 0; index < 6; ++index) {
     EXPECT_EQ(ps_vector[index], kData[index]);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, VectorAsignmentOperators) {
+  const PhaseSpaceVector ps_vector(kData);
+  PhaseSpaceVector test_vector;
+  test_vector = ps_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+
+  const double multiplier[6] = {2.0, 2.0, 2.0, 2.0, 2.0, 2.0};
+  const PhaseSpaceVector multiplier_vector(multiplier);
+
+  test_vector += ps_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  test_vector -= ps_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+
+  test_vector *= multiplier_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  test_vector /= multiplier_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, ScalarAssignmentOperators) {
+  const PhaseSpaceVector ps_vector(kData);
+
+  const double summand = 1.0;
+  const double summand_array[6] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  const PhaseSpaceVector summand_vector(summand_array);
+  PhaseSpaceVector compare_vector(kData);
+  compare_vector += summand_vector;
+  PhaseSpaceVector test_vector(kData);
+  test_vector += summand;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], compare_vector[index], 1.e-6);
+  }
+
+  test_vector -= summand;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+
+  const double multiplier = 2.0;
+  test_vector *= multiplier;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  test_vector /= multiplier;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, VectorAlgebraicOperators) {
+  const PhaseSpaceVector ps_vector(kData);
+  PhaseSpaceVector test_vector;
+
+  const PhaseSpaceVector summand_vector(kData);
+  test_vector = ps_vector + summand_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  const PhaseSpaceVector zero_vector;
+  test_vector = ps_vector - summand_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], 0.0, 1.e-6);
+  }
+
+  const double multiplier[6] = {2.0, 2.0, 2.0, 2.0, 2.0, 2.0};
+  const PhaseSpaceVector multiplier_vector(multiplier);
+  test_vector = ps_vector * multiplier_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  const PhaseSpaceVector one_vector;
+  test_vector = test_vector / multiplier_vector;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kData[index], 1.e-6);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, ScalarAlgebraicOperators) {
+  const PhaseSpaceVector ps_vector(kData);
+
+  const double summand = 1.0;
+  const double summand_array[6] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  const PhaseSpaceVector summand_vector(summand_array);
+  PhaseSpaceVector compare_vector(kData);
+  compare_vector += summand_vector;
+  PhaseSpaceVector test_vector;
+
+  test_vector = ps_vector + summand;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], compare_vector[index], 1.e-6);
+  }
+
+  compare_vector = PhaseSpaceVector(kData);
+  compare_vector -= summand_vector;
+  test_vector = ps_vector - summand;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], compare_vector[index], 1.e-6);
+  }
+
+  const double multiplier = 2.0;
+  test_vector = ps_vector * multiplier;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], kDoubleData[index], 1.e-6);
+  }
+
+  test_vector = ps_vector / multiplier;
+  compare_vector = PhaseSpaceVector(kData);
+  compare_vector /= multiplier;
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_NEAR(test_vector[index], compare_vector[index], 1.e-6);
   }
 }
 
