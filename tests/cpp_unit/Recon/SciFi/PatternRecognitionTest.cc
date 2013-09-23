@@ -1128,6 +1128,26 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   delete sp5;
 }
 
+TEST_F(PatternRecognitionTest, test_find_n_turns) {
+
+  PatternRecognition pr;
+
+  // T1 positives
+  double arr_z[] = {1100.41, 750.48, 450.48, 200.617, 0.6523};
+  std::vector<double> z(arr_z, arr_z + sizeof(arr_z) / sizeof(double));
+  double arr_phi[] = {1.80696, 3.93027, 5.81611, 1.16642, 2.39529};
+  std::vector<double> phi(arr_phi, arr_phi + sizeof(arr_phi) / sizeof(double));
+  std::vector<double> true_phi;
+  pr.find_n_turns(z, phi, true_phi);
+  double epsilon = 0.01;
+  ASSERT_EQ(true_phi.size(), 5);
+  EXPECT_NEAR(true_phi[0], 1.80696, epsilon);
+  EXPECT_NEAR(true_phi[1], 3.93027, epsilon);
+  EXPECT_NEAR(true_phi[2], 5.81611, epsilon);
+  EXPECT_NEAR(true_phi[3], 7.44961, epsilon);
+  EXPECT_NEAR(true_phi[4], 8.67847, epsilon);
+}
+
 TEST_F(PatternRecognitionTest, test_make_3pt_circle) {
 
   PatternRecognition pr;
