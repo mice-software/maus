@@ -77,7 +77,6 @@
 #include "DetModel/Virtual/SpecialVirtualSD.hh"
 
 // non-legacy
-#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
@@ -196,6 +195,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   return _rootPhysicalVolume;
 }
 
+void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
+    if (_model != NULL)
+        delete _model;
+    _model = MiceModule::deepCopy(mods, false);
+    std::cerr << "SETMICEMODULES " << _model->name() << std::endl;
+    ResetGeometry();
+    ResetFields();
+}
+
 void DetectorConstruction::ResetGeometry() {
   // open the geometry
   G4GeometryManager::GetInstance()->OpenGeometry();
@@ -203,7 +211,7 @@ void DetectorConstruction::ResetGeometry() {
   G4Material* rootMat = _materials->materialByName
                                            (_model->propertyString("Material"));
   // we have to remove daughter volumes before changing rootLV dimensions - in
-  // case daughter volumes are outside the rootLV volume (makes a G4Exc)
+  // case daughter volumes are outside of the rootLV volume (makes a G4Exc)
   while (_rootLogicalVolume->GetNoDaughters() > 0) {
       G4VPhysicalVolume* vol = _rootLogicalVolume->GetDaughter(0);
       if (vol != NULL && _rootLogicalVolume->IsDaughter(vol)) {
@@ -244,6 +252,9 @@ void DetectorConstruction::ResetGeometry() {
   // close the geometry
   G4GeometryManager::GetInstance()->CloseGeometry();
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
+  G4RunManager::GetRunManager()->Initialize();  // makes a G4 segv
+  // std::cout << "Dumping new geometry" << std::endl;  // need verbose level 0
+  // G4RunManager::GetRunManager()->DumpRegion();
 }
 
 void DetectorConstruction::AddDaughter

@@ -159,7 +159,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   std::string mod_name = std::string(getenv("MAUS_ROOT_DIR"))+
                          std::string("/tests/cpp_unit/Simulation/")+
                          std::string("TestGeometries/MagFieldTest.dat");
-  MiceModule* mod_orig = Globals::GetMonteCarloMiceModules();
+  MiceModule* mod_orig = MiceModule::deepCopy(*Globals::GetMonteCarloMiceModules());
   MiceModule* test_mod = new MiceModule(mod_name);
   GlobalsManager::SetMonteCarloMiceModules(test_mod);
 

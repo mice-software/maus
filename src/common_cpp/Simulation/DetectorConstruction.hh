@@ -125,7 +125,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    *
    *  Caller owns memory referenced by mods (makes a deep copy)
    */
-  inline void SetMiceModules(const MiceModule& mods);
+  void SetMiceModules(const MiceModule& mods);
 
  private:
 
@@ -211,14 +211,6 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
     FRIEND_TEST(DetectorConstructionTest, SetSteppingAccuracyTest);
   #endif
 };
-
-inline void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
-    if (_model != NULL)
-        delete _model;
-    _model = MiceModule::deepCopy(mods, false);
-    ResetGeometry();
-    ResetFields();
-}
 } // Simulation
 } // MAUS
 #endif  // _SRC_COMMON_CPP_SIMULATION_DETECTORCONSTRUCTION_HH_
