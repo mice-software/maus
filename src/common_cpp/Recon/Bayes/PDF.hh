@@ -29,8 +29,6 @@
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
-#include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
@@ -53,17 +51,34 @@ class PDF {
 
   void ComputeNewPosterior(TH1D likelihood);
 
-  TH1D* GetHistogram() const { return _probability; }
+  double GetMean()     const { return _probability->GetMean(); }
 
-  double GetMean() const { return _probability->GetMean(); }
-  double GetRMS()  const { return _probability->GetRMS(); }
+  double GetRMS()      const { return _probability->GetRMS();  }
+
+  TH1D *probability()  const { return _probability; }
+
+  std::string name()   const { return _name;        }
+
+  int n_bins()         const { return _n_bins;      }
+
+  double bin_width()   const { return _bin_width;   }
+
+  double min()         const { return _min;         }
+
+  double max()         const { return _max;         }
 
  private:
   TH1D *_probability;
 
+  std::string _name;
+
   int _n_bins;
 
   double _bin_width;
+
+  double _min;
+
+  double _max;
 };
 
 } // ~namespace MAUS

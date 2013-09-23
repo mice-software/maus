@@ -18,16 +18,24 @@
 #include "src/common_cpp/Recon/Bayes/PDF.hh"
 
 namespace MAUS {
-PDF::PDF() {}
+PDF::PDF() : _probability(NULL),
+             _name(""),
+             _n_bins(0),
+             _bin_width(0.),
+             _min(0.),
+             _max(0.) {}
 
-PDF::PDF(std::string name,
-         double bin_width,
-         double min,
-         double max) : _bin_width(bin_width), _probability(NULL) {
+PDF::PDF(std::string name, double bin_width, double min, double max)
+                                                : _probability(NULL),
+                                                  _name(name),
+                                                  _bin_width(bin_width) {
+  _min = min - _bin_width/2.;
+  _max = max + _bin_width/2.;
+
   const char *c_name = name.c_str();
-  _n_bins = static_cast<int> ((max-min)/_bin_width);
+  _n_bins = static_cast<int> ( ((max-min)/_bin_width)+1 );
 
-  _probability = new TH1D(c_name, c_name, _n_bins, min-bin_width/2., max-bin_width/2.);
+  _probability = new TH1D(c_name, c_name, _n_bins, _min, _max);
 
   for ( int bin = 1; bin <= _n_bins; bin++ ) {
     double bin_centre = _probability->GetXaxis()->GetBinCenter(bin);
@@ -42,16 +50,29 @@ PDF& PDF::operator=(const PDF &rhs) {
     return *this;
   }
 
-  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone("clone"));
+  _name = rhs._name;
+  const char *c_name = _name.c_str();
 
-  _n_bins = rhs._n_bins;
+  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone(c_name));
+
+  _n_bins    = rhs._n_bins;
+  _bin_width = rhs._bin_width;
+  _min       = rhs._min;
+  _max       = rhs._max;
 
   return *this;
 }
 
 PDF::PDF(const PDF &pdf) {
-  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone("clone"));
-  _n_bins = pdf._n_bins;
+  _name = pdf._name;
+  const char *c_name = _name.c_str();
+
+  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone(c_name));
+
+  _n_bins    = pdf._n_bins;
+  _bin_width = pdf._bin_width;
+  _min       = pdf._min;
+  _max       = pdf._max;
 }
 
 void PDF::ComputeNewPosterior(TH1D likelihood) {
