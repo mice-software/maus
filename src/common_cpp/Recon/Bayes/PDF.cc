@@ -19,7 +19,7 @@
 #include <iostream>
 
 namespace MAUS {
-PDF::PDF() : _probability(),
+PDF::PDF() : _probability(NULL),
              _name(""),
              _n_bins(0),
              _bin_width(0.),
@@ -27,7 +27,7 @@ PDF::PDF() : _probability(),
              _max(0.) {}
 
 PDF::PDF(std::string name, double bin_width, double min, double max)
-                                                : //_probability(NULL),
+                                                : _probability(NULL),
                                                   _name(name),
                                                   _bin_width(bin_width) {
   _min = min - _bin_width/2.;
@@ -36,27 +36,29 @@ PDF::PDF(std::string name, double bin_width, double min, double max)
   const char *c_name = name.c_str();
   _n_bins = static_cast<int> ( ((max-min)/_bin_width)+1 );
 
-  _probability = TH1D(c_name, c_name, _n_bins, _min, _max);
+  _probability = new TH1D(c_name, c_name, _n_bins, _min, _max);
 
   for ( int bin = 1; bin <= _n_bins; bin++ ) {
-    double bin_centre = _probability.GetXaxis()->GetBinCenter(bin);
-    _probability.Fill(bin_centre, 1./_n_bins);
+    double bin_centre = _probability->GetXaxis()->GetBinCenter(bin);
+    _probability->Fill(bin_centre, 1./_n_bins);
   }
 }
 
 PDF::~PDF() {
-  // delete _probability;
+  delete _probability;
 }
 
 PDF& PDF::operator=(const PDF &rhs) {
+  std::cerr << "assign operator " << std::endl;
   if ( this == &rhs ) {
     return *this;
   }
 
   _name = rhs._name;
+  const char *c_name = _name.c_str();
 
-  _probability = TH1D(rhs._probability);
-
+  // _probability = TH1D(rhs._probability);
+  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone(c_name));
 
   _n_bins    = rhs._n_bins;
   _bin_width = rhs._bin_width;
@@ -68,8 +70,10 @@ PDF& PDF::operator=(const PDF &rhs) {
 
 PDF::PDF(const PDF &pdf) {
   _name = pdf._name;
-
-  _probability = TH1D(pdf._probability);
+  const char *c_name = _name.c_str();
+  std::cerr << "copy constructor " << std::endl;
+  // _probability = TH1D(rhs._probability);
+  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone(c_name));
 
   _n_bins    = pdf._n_bins;
   _bin_width = pdf._bin_width;
@@ -79,12 +83,12 @@ PDF::PDF(const PDF &pdf) {
 
 void PDF::ComputeNewPosterior(TH1D likelihood) {
   // posterior = prior*likelihood
-  _probability.Multiply(&likelihood);
+  _probability->Multiply(&likelihood);
 
   // The likelihood isn't a PDF. Get around this
   // by normalizing the resulting posterior.
-  double norm = 1./_probability.Integral();
-  _probability.Scale(norm);
+  double norm = 1./_probability->Integral();
+  _probability->Scale(norm);
 }
 
 } // ~namespace MAUS

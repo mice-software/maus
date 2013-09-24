@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-JointPDF::JointPDF(): _joint(),
+JointPDF::JointPDF(): _joint(NULL),
                       _name(""),
                       _n_bins(0),
                       _bin_width(0.),
@@ -29,28 +29,31 @@ JointPDF::JointPDF(): _joint(),
 JointPDF::JointPDF(std::string name,
                        double bin_width,
                        double min,
-                       double max) : //_joint(NULL),
+                       double max) : _joint(NULL),
                                      _bin_width(bin_width) {
   _min = min - _bin_width/2.;
   _max = max + _bin_width/2.;
 
   const char *c_name = name.c_str();
   _n_bins = static_cast<int> ( ((max-min)/_bin_width)+1 );
-  _joint = TH2D(c_name, c_name,
+  _joint = new TH2D(c_name, c_name,
                     _n_bins, _min, _max,
                     _n_bins, _min, _max);
 }
 
-JointPDF::~JointPDF() {}
+JointPDF::~JointPDF() {
+  delete _joint;
+}
 
 JointPDF& JointPDF::operator=(const JointPDF &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
   _name = rhs._name;
+  const char *c_name = _name.c_str();
 
-  _joint = TH2D(rhs._joint);
-
+  //  _joint = TH2D(rhs._joint);
+  _joint = reinterpret_cast<TH2D*>(rhs._joint->Clone(c_name));
 
   _n_bins    = rhs._n_bins;
   _bin_width = rhs._bin_width;
@@ -62,8 +65,10 @@ JointPDF& JointPDF::operator=(const JointPDF &rhs) {
 
 JointPDF::JointPDF(const JointPDF &joint) {
   _name = joint._name;
+  const char *c_name = _name.c_str();
 
-  _joint = TH2D(joint._joint);
+  //  _joint = TH2D(joint._joint);
+  _joint = reinterpret_cast<TH2D*>(joint._joint->Clone(c_name));
 
   _n_bins    = joint._n_bins;
   _bin_width = joint._bin_width;
@@ -71,26 +76,28 @@ JointPDF::JointPDF(const JointPDF &joint) {
   _max       = joint._max;
 }
 
-void JointPDF::Build(std::string model, double sigma, double number_of_tosses) {
+void JointPDF::Build(std::string model, double sigma, int number_of_tosses) {
   if ( model != "gaussian" ) {
     std::cerr << "Model not implemented. Aborting" << std::endl;
   }
-  TRandom rand;
 
+  TF1 *gaussian = new TF1("gaussian","gaus(0)", _min*2., _max*2.);
+  gaussian->SetParameters(1, 0., sigma);
+
+  TH1F *h = new TH1F("temp", "temp", _n_bins*2, _min*2., _max*2.);
+  h->FillRandom("gaussian", number_of_tosses);
+
+  int centroid_shift = -1;
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
-    for ( int toss = 0; toss < number_of_tosses; toss++ ) {
-      double param = _joint.GetXaxis()->GetBinCenter(param_bin);
-      double data_value = rand.Gaus(param, sigma);
-      _joint.Fill(param, data_value);
+    centroid_shift++;
+    for ( int D_bin = 1; D_bin <= _n_bins; D_bin++ ) {
+      int corresponding_bin = D_bin+_n_bins-centroid_shift;
+      double probability = h->GetBinContent(corresponding_bin);
+      _joint->SetBinContent(param_bin, D_bin, probability);
     }
   }
-/*
-  TF1 gaussian("gaussian","[1]*gaus([0])", _min, _max);
-  gaussian->SetParameters(param, sigma);
 
-  h = new TH1F("", "", _n_bins, _min, _max);
-  h->FillRandom("gaussian", number_of_tosses);
-*/
+  delete h;
 }
 
 // Returns P(Data|parameter)
@@ -105,11 +112,11 @@ TH1D JointPDF::GetLikelihood(double data) {
   // in the paramenter axis (the x-axis) and fill our JointPDF histogram.
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
     // The probability in a particular bin.
-    double p = _joint.GetBinContent(param_bin, data_bin);
+    double p = _joint->GetBinContent(param_bin, data_bin);
     // The parameter value the x-bin corresponds to.
-    double parameter_value = _joint.GetXaxis()->GetBinCenter(param_bin);
+    // double parameter_value = _joint.GetXaxis()->GetBinCenter(param_bin);
     // And fill the histogram.
-    likelihood.Fill(parameter_value, p);
+    likelihood.SetBinContent(param_bin, p);
   }
   return likelihood;
 }

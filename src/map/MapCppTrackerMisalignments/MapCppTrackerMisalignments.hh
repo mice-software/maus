@@ -154,8 +154,8 @@ class MapCppTrackerMisalignments {
 
   JointPDF _jointPDF;
 
-  std::vector< std::vector<PDF> > _x_shift_pdfs;
-  std::vector< std::vector<PDF> > _y_shift_pdfs;
+  std::vector< std::vector<PDF*> > _x_shift_pdfs;
+  std::vector< std::vector<PDF*> > _y_shift_pdfs;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!
