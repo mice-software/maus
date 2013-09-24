@@ -73,6 +73,9 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     - "tof_time_01" - TOF01 time.
     - "tof_time_12" - TOF12 time.
     - "tof_time_02" - TOF02 time.
+    - "tof0_nsp_spill" - TOF0 spacepoints per spill
+    - "tof1_nsp_spill" - TOF1 spacepoints per spill
+    - "tof2_nsp_spill" - TOF2 spacepoints per spill
 
     If "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
@@ -133,6 +136,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.hnsp_0 = None
         self.hnsp_1 = None
         self.hnsp_2 = None
+        self.hnsp_spill = None
+        self.hnsp_vs_spill = None
         self.hslabhits = None
 
         self.canvas_tof = None
@@ -140,11 +145,14 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_hits_x = None
         self.canvas_hits_y = None
         self.canvas_nsp = None
+        self.canvas_nsp_spill = None
+        self.canvas_nsp_vs_spill = None
         self.canvas_sp_x = None
         self.canvas_sp_y = None
         self.canvas_sp_xy = None
         # Has an end_of_run been processed?
         self.run_ended = False
+        self.spillnum = 0
 
     def _configure_at_birth(self, config_doc):
         """
@@ -281,9 +289,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "space_points" in
         the spill.
         """
+        self.spillnum = self.spillnum + 1
         if 'recon_events' not in spill:
             # print 'no reco'
             return False
+
+        nsp_spill = []
+        nsp_spill = [0] * 3
 
         for evn in range(len(spill['recon_events'])):
             if 'tof_event' not in spill['recon_events'][evn]:
@@ -312,12 +324,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             if 'tof2' in space_points:
                 sp_tof2 = space_points['tof2']
 
-            # print 'nsp012= ', len(sp_tof0), len(sp_tof1), len(sp_tof2)
+            # print 'nsp012= ', evn, len(sp_tof0), len(sp_tof1), len(sp_tof2)
          
             # TOF0
             if sp_tof0:
                 # print '..evt ',evn,' nsp0: ',len(sp_tof0)
                 self.hnsp_0.Fill(len(sp_tof0))
+                nsp_spill[0] = nsp_spill[0] + len(sp_tof0)
                 for i in range(len(sp_tof0)):
                     if sp_tof0[i]:
                         # print 'nsp0: ',i,sp_tof0[i]
@@ -338,6 +351,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             if sp_tof2:
                 # print '..evt ', evn, ' nsp2: ', len(sp_tof2)
                 self.hnsp_2.Fill(len(sp_tof2))
+                nsp_spill[2] = nsp_spill[2] + len(sp_tof2)
                 for i in range(len(sp_tof2)):
                     if sp_tof2[i]:
                         spnt_x = sp_tof2[i]["slabX"]
@@ -364,6 +378,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             if sp_tof1:
                 # print '..evt ',evn,' nsp1: ',len(sp_tof1)
                 self.hnsp_1.Fill(len(sp_tof1))
+                nsp_spill[1] = nsp_spill[1] + len(sp_tof1)
                 for i in range(len(sp_tof1)):
                     if sp_tof1[i]:
                         # print 'nsp1: ', i, sp_tof1[i]
@@ -381,7 +396,12 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                                 self._ht01.Fill(t_1-t_0)
                                 # print 'tof01: ', t_1-t_0
             else:
-                self.hnsp_1.Fill(0)           
+                self.hnsp_1.Fill(0)
+               
+        for j in range (3): 
+            if nsp_spill[j] > 0:
+                self.hnsp_spill[j].Fill(nsp_spill[j])
+            self.hnsp_vs_spill[j].Fill(self.spillnum, nsp_spill[j])
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914
@@ -450,6 +470,30 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                                  4, -0.5, 3.5)
         self.hnsp_2.SetFillColor(4)
         self.hnsp_2.SetLineColor(4)
+
+        self.hnsp_spill = []
+        self.hnsp_vs_spill = []
+        for i in range (0, 3):
+            hcolor = pow(2, i)
+            histname = "hnsp_vs_spill_tof%d" % (i)
+            title = "TOF%d Space Points in Spill;Spill;#Space Points" % (i)
+            nbins = 5000
+            xlo = 1.0
+            xhi = 0.0
+            self.hnsp_vs_spill.append(ROOT.TH1F(histname,
+                                              title,
+                                              nbins, xlo, xhi))
+            self.hnsp_vs_spill[i].SetBit(ROOT.TH1.kCanRebin)
+
+            histname = "hnsp_spill_tof%d" % (i)
+            title = "#Space Points in Spill;#space points per spill;;"
+            nbins = 60
+            xlo = -0.5
+            xhi = 59.5
+            self.hnsp_spill.append(ROOT.TH1F(histname,
+                                              title,
+                                              nbins, xlo, xhi))
+            self.hnsp_spill[i].SetLineColor(hcolor)
 
         self.hslabhits = [[]]
         for i in range (0, 3):
@@ -532,6 +576,23 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.hnsp_1.Draw()
         self.hnsp_0.Draw("same")
         self.hnsp_2.Draw("same")
+
+        # Number of Space points per spill
+        self.canvas_nsp_spill = ROOT.TCanvas("nsp_spill", "nsp_spill", 800, 800)
+        self.canvas_nsp_spill.cd()
+        for i in range (3):
+            if i == 0:
+                self.hnsp_spill[i].Draw()
+            else:
+                self.hnsp_spill[i].Draw("same")
+
+        # Number of Space points per spill
+        self.canvas_nsp_vs_spill = ROOT.TCanvas("nsp_vs_spill", 
+                                              "nsp_vs_spill", 800, 900)
+        self.canvas_nsp_vs_spill.Divide(1, 3)
+        for i in range(3):
+            self.canvas_nsp_vs_spill.cd(i+1)
+            self.hnsp_vs_spill[i].Draw()
 
         # SP x 1d
         self.canvas_sp_x = ROOT.TCanvas("sp_x", "sp_x", 800, 800)
@@ -652,6 +713,21 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         leg.AddEntry(self.hnsp_2, "TOF2", "l")
         self.canvas_nsp.Update()
 
+        leg = self.canvas_nsp_spill.BuildLegend(0.6, 0.7, 0.89, 0.89)
+        leg.Clear()
+        leg.AddEntry(self.hnsp_spill[0], "TOF0", "l")
+        leg.AddEntry(self.hnsp_spill[1], "TOF1", "l")
+        leg.AddEntry(self.hnsp_spill[2], "TOF2", "l")
+        all_max_y = []
+        for i in range (3):
+            a_hist = self.hnsp_spill[i]
+            all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
+        for i in range (3):
+            self.hnsp_spill[i].SetMaximum(max(all_max_y)*1.1+1)
+        self.canvas_nsp_spill.Update()
+
+        self.canvas_nsp_vs_spill.Update()
+
         leg = self.canvas_sp_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
         leg.Clear()
         leg.AddEntry(self.hspslabx_0, "TOF0", "l")
@@ -680,7 +756,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         histos = [self._ht01, self._ht02, self._ht12, self.hspslabx_0,
                   self.hspslabx_1, self.hspslabx_2, self.hspslaby_0, 
                   self.hspslaby_1, self.hspslaby_2, self.hnsp_0, self.hnsp_1,
-                  self.hnsp_2]
+                  self.hnsp_2]+self.hnsp_spill+\
+                  self.hnsp_vs_spill
         for tof_station_hists in self.hpmthits: # histo for each pmt
             for tof_plane_hists in tof_station_hists:
                 histos += tof_plane_hists
@@ -731,6 +808,24 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         description = "TOF Number of Space Points"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_nsp)
+        image_list.append(doc)
+
+        # number of space points per spill
+        # file label = tof_nsp_spill.eps
+        tag = "tof_nSpacePoints_spill"
+        keywords = ["TOF", "spacepoints", "spill"]
+        description = "TOF Number of Space Points in spill"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, keywords, description, tag, self.canvas_nsp_spill)
+        image_list.append(doc)
+
+        # number of space points per spill
+        # file label = tof_nsp_vs_spill.eps
+        tag = "tof_nSpacePoints_vs_spill"
+        keywords = ["TOF", "spacepoints", "spillnum"]
+        description = "TOF Number of Space Points vs spill"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, keywords, description, tag, self.canvas_nsp_vs_spill)
         image_list.append(doc)
 
         # Spacepoints X
