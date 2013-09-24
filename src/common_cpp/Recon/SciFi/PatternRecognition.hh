@@ -205,19 +205,22 @@ class PatternRecognition {
      * Find the number of 2pi rotations that occured between each stations. This is
      * necessary in order to later evaluate s, the track path length in x-y, used to find ds/dz.
      *
-     * @param dz - the separation in z between successive spacepoints in the order seen by the beam
-     * @param dphi - the separation in phi (the turning angle) between successive spacepoints
-     *               in the order seen by the beam
-     * @param true_phip - the output corrected phi prime coordinate
-     *                    (prime indicates relative to the first spacepoint) 
+     * @param z - the z coord of each spacepoint in the order seen by the beam
+     * @param phi - the turning angle between successive spacepoints in the order seen by the beam
+     * @param true_phi - the corrected turing angles
      */
-    bool find_n_turns(const std::vector<double> &dz, const std::vector<double> &dphi,
-                      std::vector<double> &true_dphi);
+    bool find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
+                      std::vector<double> &true_phi);
 
-    /** Test version of find_n_turns, not for normal use */
-    bool find_n_turns2(const std::vector<double> &dz, const std::vector<double> &dphi,
-                       std::vector<double> &true_dphi);
-
+    /** @brief Short function to calculate the remainder of a division of num / denom
+     * 
+     * Short function to calculate the remainder of a division of num / denom, slightly 
+     * different to cmath's fod
+     * 
+     * @param num - the numerator
+     * @param denom - the denominator
+     */
+    double my_mod(const double num, const double denom);
 
     /** @brief Calculates the turning angle of a spacepoint w.r.t. the x' axis
      *
@@ -234,14 +237,13 @@ class PatternRecognition {
 
     /** @brief Changes dphi vector to ds vector
      *
-     *  Just scalar multiplication of each element dphi_ji by R.
+     *  Just scalar multiplication of each element phi by R.
      *
      * @param R - radius of helix
-     * @param dphi - vector containing dphi_ji for each station step
-     * @param ds - vector containing ds_ji for each station step (corresponding to dz_ji's)
+     * @param phi - vector containing turning angle for each spacepoint
      *
      */
-    void dphi_to_ds(double R, const std::vector<double> &dphi, std::vector<double> &ds);
+     std::vector<double> phi_to_s(const double R, const std::vector<double> &phi);
 
     /** @brief Checks that the spacepoints in trial track fall within longest acceptable time range
      *
@@ -403,8 +405,8 @@ class PatternRecognition {
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
-    static const int _m_limit = 3;          /** Max number of turns between stations allowed */
-    static const int _n_limit = 3;          /** Max number of turns between stations allowed */
+    static const int _m_limit = 3;           /** Max number of turns between stations allowed */
+    static const int _n_limit = 3;           /** Max number of turns between stations allowed */
     static const double _sd_1to4 = 0.3844;   /** Position error associated with stations 1 t0 4 */
     static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
     static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */
@@ -413,18 +415,19 @@ class PatternRecognition {
     static const double _circ_res_cut = 5;      /** Road cut for circle fit in mm */
     static const double _R_res_cut = 150.0;     /** Road cut for circle radius in mm */
     static const double _chisq_cut = 15;        /** Cut on the chi^2 of the least sqs fit in mm */
-    static const double _sz_chisq_cut = 4.0;   /** Cut on the sz chi^2 from least sqs fit in mm */
+    static const double _sz_chisq_cut = 4.0;    /** Cut on the sz chi^2 from least sqs fit in mm */
     static const double _helix_chisq_cut = 100; /** Cut on the helix chi^2 in mm (not used) */
     static const double _chisq_diff = 3.;
-    static const double _AB_cut = .15;             /** Need to decide on appropriate cut here!!! */
+    static const double _n_turns_cut = 0.75;  /** Cut to decide if a given n turns value is good */
+    // static const double _AB_cut = .15;
     static const double _active_diameter = 300.0; /** Active volume diameter a tracker in mm */
     bool _helical_pr_on;                          /** Flag to turn on helical pr (0 off, 1 on) */
     bool _straight_pr_on;                         /** Flag to turn on straight pr (0 off, 1 on) */
 
     static const double _Pt_max = 180.; /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
-    static const double _Pz_min = 50.; /** MeV/c min Pz for helical tracks (this is a guess) */
+    static const double _Pz_min = 50.;  /** MeV/c min Pz for helical tracks (this is a guess) */
 
-    LSQFit _lsq;
+    LSQFit _lsq;  /** The linear least squares fitting class instance */
 
     // Some output files - only to be kept when in development stages
     std::ofstream * _f_res;

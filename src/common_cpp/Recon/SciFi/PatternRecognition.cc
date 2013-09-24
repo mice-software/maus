@@ -590,16 +590,11 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     std::sort(spnts.begin(), spnts.end(), compare_spoints_ascending_z);
 
   // Find each z_i and phi_i value for each spacepoint relative to the first spacepoint
-  std::vector<double> x_i;        // Vector of the x coord of each successive spacepoint
-  std::vector<double> y_i;        // Vector of the y coord of each successive spacepoint
-  std::vector<double> z_i;        // Vector of the z coord of each successive spacepoint
-  std::vector<double> dz;         // The distance in z from the first spacepoint
-  std::vector<double> dphi;       // The distance in phi from the first spacepoint
-  std::vector<double> true_dphi;  // dphi corrected for any extra 2*n*pi rotations
-  std::vector<double> phi_err;    // The errors on the phi_i
-
-  // Find the phi value of the first spacepoint
-  double phi_1 = calc_phi(spnts[0]->get_position().x(), spnts[0]->get_position().y(), circle);
+  std::vector<double> x_i;         // Vector of the x coord of each successive spacepoint
+  std::vector<double> y_i;         // Vector of the y coord of each successive spacepoint
+  std::vector<double> z_i;         // Vector of the z coord of each successive spacepoint
+  std::vector<double> true_phi_i;  // phi corrected for any extra 2*n*pi rotations
+  std::vector<double> phi_err;     // The errors on the phi_i
 
   // Loop over the spacepoints
   for (std::vector<SciFiSpacePoint*>::const_iterator it = spnts.begin(); it != spnts.end(); ++it) {
@@ -608,15 +603,6 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     z_i.push_back((*it)->get_position().z());
     phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
 
-    // Calculate each dz_ji and dphi_ji value (separation in z and phi between spacepoints)
-    if ( it != spnts.begin() ) {
-      dz.push_back(fabs((*it)->get_position().z() - (*(spnts.begin()))->get_position().z()));
-      // dphi is negative means later spacepoint has gone over 2pi so we add to 2pi to compensate
-      if ( (*(phi_i.end()-1) - phi_1) > 0 )
-        dphi.push_back(*(phi_i.end()-1) - phi_1);
-      else
-        dphi.push_back((*(phi_i.end()-1)) + 2*CLHEP::pi - phi_1);
-    }
 
     // Set the phi_i errors
     double sd_phi = -1.0;
@@ -627,23 +613,17 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     phi_err.push_back(sd_phi);
   }
 
-  // Calculate any 2*n*pi correction to the phi_i
-  bool success = find_n_turns(dz, dphi, true_dphi);
-  if (!success) {
-    std::cerr << "Failed to find turns between stations" << std::endl;
+  // Find the track charge and the number of turns made between tracker stations
+  bool success = find_n_turns(z_i, phi_i, true_phi_i);
+  if (success) {
+    phi_i = true_phi_i;
+  } else {
+    std::cerr << "Failed to find n turns" << std::endl;
     return false;
   }
 
-  // Set phi_i to the corrected values
-  for ( size_t i = 0; i < true_dphi.size(); ++i ) {
-    phi_i[i+1] = true_dphi[i] + phi_1;  // As first phi_i is just phi_1
-    // std::cerr << "dz[" << i << "] is " << dz[i] << ", dphi[" << i << "] is " << dphi[i];
-    // std::cerr << ", true_dphi[" << i << "] is " << true_dphi[i] << std::endl;
-  }
-
   // Using the circle radius and the true_dphi, calc the s_i (distance in x-y between sp)
-  std::vector<double> s_i;
-  dphi_to_ds(circle.get_R(), phi_i, s_i);
+  std::vector<double> s_i = phi_to_s(circle.get_R(), true_phi_i);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
   _lsq.linear_fit(z_i, s_i, phi_err, line_sz);
@@ -654,114 +634,111 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     return false;
   } else {
     if ( _debug > 0 ) std::cerr << "Passed s-z cut, ds/dz is " << line_sz.get_m() << "\n";
+    phi_i = true_phi_i;
     return true;
   }
 }
 
-bool PatternRecognition::find_n_turns(const std::vector<double> &dz,
-                                      const std::vector<double> &dphi,
-                                      std::vector<double> &true_dphi) {
-  true_dphi = dphi;
-
-  // Setup the a vector holding the values of n to try
-  int myints[] = {0, -1, 1, -2, 2, -3, 3};
-  std::vector<int> n_values(myints, myints + sizeof(myints) / sizeof(int));
-
-  for (size_t i = 1; i < dz.size(); ++i) { // Loop over the separation between stations
-    bool found = false;
-    int true_n = -1;
-    int true_m = -1;
-    for (size_t n = 0; n < n_values.size(); ++n) {
-      if ( found ) break;
-      for (size_t m = 0; m < n_values.size(); ++m) {
-        // Remainder should be ~0 if correct n_ji and m are found
-        double remainder = 10.0;
-        if ( i == 1 ) {
-          remainder = fabs((((dphi[i] + 2*n_values[m]*CLHEP::pi)
-                              / (dphi[0] + 2*n_values[n]*CLHEP::pi))
-                              - (dz[i] / dz[0])) / (dz[i] / dz[0]));
-        } else {
-          remainder = fabs((((dphi[i] + 2*n_values[m]*CLHEP::pi) / (true_dphi[0]))
-                               - (dz[i] / dz[0])) / (dz[i] / dz[0]));
-        }
-        /*
-        std::cerr << "find_n_turns: i = " << i
-             << ", m = " << n_values[m] << ", n = " << n_values[n]
-             << ", dz_i = " << dz[i] << ", dz ratio = " << dz[i] / dz[0]
-             << ", dphi_i = " << dphi[i] << ", dphi ratio = " << dphi[i] / dphi[0];
-             << ", corrected dphi_i = " << dphi[i] + 2*n_values[m]*CLHEP::pi
-             << ", corrected dphi ratio = " << (dphi[i] + 2*n_values[m]*CLHEP::pi) / (true_dphi[0])
-             << ", remainder = " << remainder;
-        */
-
-        if ( remainder < _AB_cut ) {
-          // std::cerr << ", passed\n";
-          found = true;
-          true_n = n_values[n];
-          true_m = n_values[m];
-          break;
-        } else {
-          // std::cerr << ", failed\n";
-        }
-      }
-    }
-    if ( found ) { // If we suceeding in finding corrections which pass the cut
-      if ( i == 1 ) {
-        true_dphi[0] = dphi[0] + 2*true_n*CLHEP::pi; // Only correct old on first pass
-        // std::cerr << "find_n_turns: true_dphi[0] = " << true_dphi[0] << std::endl;
-      }
-      true_dphi[i] = dphi[i] + 2*true_m*CLHEP::pi;
-      // std::cerr << "find_n_turns: true_dphi[i] = " << true_dphi[i] << std::endl;
-    } else { // Abort finding dsdz if we fail to find any single n turns correction
-      return false;
-    }
-  }
-  return true;
-}
-
-bool PatternRecognition::find_n_turns2(const std::vector<double> &dz,
-                                       const std::vector<double> &dphi,
-                                       std::vector<double> &true_dphi) {
-  true_dphi = dphi;
-  bool found = false;
-
-  // Setup the a vector holding the values of n to try
-  int myints[] = {0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
-  std::vector<int> n_values(myints, myints + sizeof(myints) / sizeof(int));
-
-  // Loop over n, the number of extra turns completed by the final station
-  for (size_t n = 0; n < n_values.size(); ++n) {
-
-    // Find dphi/dz using last station (assumes vectors are already ordered by z)
-    bool pass = true;
-    double ratio = (dphi.back() + 2*n*CLHEP::pi) / dz.back();
-
-    // Calculate the expected dphi_i values using this ratio
-    for (size_t j = 0; j < true_dphi.size(); ++j) {
-      true_dphi[j] = ratio * dphi[j];
-      // Find the remainder of the corrected value divided by 2pi
-      double remainder = fmod(true_dphi[j], (2*CLHEP::pi));
-      // Take away the observed dphi_i value from the remainder. If n is correct should be near 0.
-      double residual = remainder - dphi[j];
-      if ( residual > _AB_cut ) pass = false;
-    }
-
-    // If all the residuals passed the cut, accept this n, and break out of the top level loop
-    if ( pass ) {
-      found = true;
-      break;
-    }
-  }
-
-  // Calc expected the true dphi_i using the found values
-  if ( found ) { // If we suceeding in finding corrections which pass the cuts
-    for (size_t i = 0; i < true_dphi.size(); ++i) {
-      true_dphi[i] = true_dphi.back() - dphi.back() + true_dphi[i];
-    }
-    return true;
-  } else { // Abort finding dsdz if we fail to find any single n turns correction
+bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
+                                      std::vector<double> &true_phi) {
+  // Sanity checks
+  if ( (z.size() != phi.size()) || (z.size() < 3) || (z.size() > 5) ) {
+    std::cerr << "find_n_turns: bad arguments supplied, aborting";
     return false;
   }
+
+  true_phi.clear();
+  true_phi.resize(phi.size());
+  // Separations are calculated in z and phi between each station and the first station seen by
+  // the beam (station 5 for T1, station 1 for T2).
+  std::vector<double> dz;
+  std::vector<double> dphi;
+  // 'Close' refers to a calculation of the corrected angle based on a value on our current value
+  // of n for the last angle sep, then inferring the other angle seps using the station z separation
+  std::vector<double> close_dphi(phi.size(), 0.0);
+  std::vector<double> close_phi(phi.size(), 0.0);
+
+  // Calculate the separations in phi and z between stations
+  // std::cout << "i\tphi\tdphi\tz\tdz" << std::endl;
+  for (size_t i = 0; i < phi.size(); ++i) {
+    dz.push_back(z[i] - z[0]);
+    dphi.push_back(phi[i] - phi[0]);
+    if ( dphi[i] < 0.0 )
+      dphi[i] = dphi[i] + 2*CLHEP::pi;
+    // std::cout << i << "\t" << phi[i] << "\t" << dphi[i] << "\t" << z[i] << "\t" << dz[i] << "\n";
+  }
+
+  // Setup a vector holding the values of n to try
+  int myints[] = {0, 1, -1, 2, -2, 3, -3};
+  std::vector<int> n_values(myints, myints + sizeof(myints) / sizeof(int));
+
+  // Loop over n_values, the number of extra turns completed by the particle by the *final* station
+  bool found = false;
+  int true_n = 0;
+  // std::cout << "n\tj\tdphi\tclose_dphi\trem\tres" << std::endl;
+  for (size_t i = 0; i < n_values.size(); ++i) {
+    // Calc a value of the last turning angle sep based on the current value of n
+    close_dphi.back() = dphi.back() + 2*n_values[i]*CLHEP::pi;
+
+    // Loop over the other turning angles
+    bool pass = true;
+    for (size_t j = 1; j < close_dphi.size(); ++j) {
+      // Use this last angle sep and the separation between stations in z to calc the
+      // other corrected turning angle separations
+      close_dphi[j] = close_dphi.back() * ( dz[j] / dz.back());
+
+      // If a sufficiently small residual is produced, accept current n as correct, for this angle
+      double remainder = my_mod(close_dphi[j], 2*CLHEP::pi);
+      double residual = fabs(remainder) - fabs(dphi[j]);
+      // std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j]
+      //          << "\t" << remainder << "\t" << residual << std::endl;
+      if ( fabs(residual) > _n_turns_cut ) pass = false;
+    }
+
+    // If n was accepted for all the turning angles
+    if (pass) {
+      found = true;
+      true_n = n_values[i];
+      break;
+    }
+  } // ~Loop over n_values
+
+  // If we have found a value of n which was accepted, calc the true turning angles
+  int charge = 0;
+  if (found) {
+    if ( true_n < 0 ) {
+      charge = -1;
+    } else {
+      charge = 1;
+    }
+    std::cout << "Found particle track with charge " << charge << std::endl;
+
+    // Transfor dphi to phi
+    for (size_t i = 0; i < close_dphi.size(); ++i) {
+      close_phi[i] = close_dphi[i] + phi[0];
+    }
+    // Correct close phi to true phi, by working the number of turns that need to be added to each
+    // angle, then using this to correct the angles directly without relying on the z ratios
+    for (size_t i = 0; i < close_phi.size(); ++i) {
+      double diff = fabs(phi[i] - close_phi[i]);
+      if ( diff < CLHEP::pi ) {
+        true_phi[i] = phi[i];
+      } else if ( diff < 3*CLHEP::pi ) {
+        true_phi[i] = phi[i] + 2*charge*CLHEP::pi;
+      } else if ( diff < 5*CLHEP::pi ) {
+        true_phi[i] = phi[i] + 4*charge*CLHEP::pi;
+      } else if ( diff < 7*CLHEP::pi ) {
+        true_phi[i] = phi[i] + 6*charge*CLHEP::pi;
+      }
+    }
+    return true;
+  } else {
+    return false;
+  }
+};
+
+double PatternRecognition::my_mod(const double num, const double denom) {
+  return num - (denom * floor(num / denom));
 };
 
 
@@ -777,13 +754,12 @@ double PatternRecognition::calc_phi(double xpos, double ypos, const SimpleCircle
     return angle;
 } // ~calculate_phi(...)
 
-void PatternRecognition::dphi_to_ds(double R, const std::vector<double> &dphi,
-                                    std::vector<double> &ds) {
-  // This function performs scaler multiplication on the input vector.
-  for ( int i = 0; i < static_cast<int>(dphi.size()); ++i ) {
-    double ds_ji = dphi[i] * R;
-    ds.push_back(ds_ji);
+std::vector<double> PatternRecognition::phi_to_s(const double R, const std::vector<double> &phi) {
+  std::vector<double> s_i;
+  for ( int i = 0; i < static_cast<int>(phi.size()); ++i ) {
+    s_i.push_back(phi[i] * R);
   }
+  return s_i;
 } // ~dphi_to_ds(...)
 
 bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts) {
