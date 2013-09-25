@@ -19,11 +19,9 @@ ReducePyTofCalib gets slab hits and makes a Tree for calibration.
 # Turn off false positives related to ROOT
 #pylint: disable = E1101
 # Disable messages about too many branches and too many lines.
-#pylint: disable = R0912
-#pylint: disable = R0914
-#pylint: disable = R0915
+#pylint: disable = R0912, R0914, R0915
 #pylint: disable = C0103
-#pylint: disable = W0201, W0612
+#pylint: disable = W0201, W0612, W0613
 import json
 import ROOT
 from array import array
@@ -52,8 +50,12 @@ class ReducePyTofCalib: # pylint: disable=R0902
         # Refresh_rate determines how often (in spill counts) the
         # canvases are updated.
         self.run_ended = False
+        self.calib_file = "tofcalibdata_"
+        if not self.__make_tree():
+            print 'ReducePyTofCalib: Failed to make tree'
+            return
 
-    def birth(self):
+    def birth(self, config_json):
         """
         Configure worker from data cards. Overrides super-class method. 
         @param self Object reference.
@@ -61,10 +63,6 @@ class ReducePyTofCalib: # pylint: disable=R0902
         @returns True if configuration succeeded.
         """
         # setup the root tree
-        if not self.__make_tree():
-            print 'ReducePyTofCalib: Failed to make tree'
-            return False
-        self.calib_file = "tofcalibdata_"
         self.run_ended = False
         return True
 

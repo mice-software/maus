@@ -37,24 +37,28 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   // Get the calibration text files from the Json document.
   // This is no longer done. Calibration is got from CDB now
   // - DR, 12/11/12
+  Json::Value t0_file;
+  Json::Value tw_file;
+  Json::Value trigger_file;
   std::string _tof_source = JsonWrapper::GetProperty(configJSON,
                                                "TOF_calib_source",
                                                JsonWrapper::stringValue).asString();
   bool fromDB = true;
-  if (_tof_source == "file")
+  if (_tof_source == "file") {
       fromDB = false;
-  // Check what needs to be done.
-  Json::Value t0_file = JsonWrapper::GetProperty(configJSON,
-                                                 "TOF_T0_calibration_file",
-                                                 JsonWrapper::stringValue);
+      // Check what needs to be done.
+      t0_file = JsonWrapper::GetProperty(configJSON,
+                                         "TOF_T0_calibration_file",
+                                         JsonWrapper::stringValue);
 
-  Json::Value tw_file = JsonWrapper::GetProperty(configJSON,
-                                                 "TOF_TW_calibration_file",
-                                                 JsonWrapper::stringValue);
+      tw_file = JsonWrapper::GetProperty(configJSON,
+                                         "TOF_TW_calibration_file",
+                                         JsonWrapper::stringValue);
 
-  Json::Value trigger_file = JsonWrapper::GetProperty(configJSON,
-                                                      "TOF_Trigger_calibration_file",
-                                                      JsonWrapper::stringValue);
+      trigger_file = JsonWrapper::GetProperty(configJSON,
+                                              "TOF_Trigger_calibration_file",
+                                              JsonWrapper::stringValue);
+  }
   // Check what needs to be done.
   _do_timeWalk_correction = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_timeWalk_correction",
