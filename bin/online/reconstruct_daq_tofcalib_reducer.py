@@ -41,13 +41,13 @@ def run():
     # Uncomment and change the following if you want to hard
     # code a different default path.
 #    data_cards_list.append("image_directory='%s'\n" % os.getcwd())
+    # set the TDC conversion factor such that time is in picosec
+    data_cards_list.append("TOFtdcConversionFactor %d\"\n" % 25)
 
     # Convert data_cards to string.    
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
     # Set up the input that reads from DAQ
-#    my_input = MAUS.InputCppDAQData()
-#    my_input = MAUS.InputCppDAQOnlineData()
     my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
 
     # Create an empty array of mappers, then populate it
@@ -57,8 +57,8 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
     # Histogram reducer.
-    reducer = MAUS.ReduceCppTofCalib()
-    #reducer = MAUS.ReducePyDoNothing()
+    reducer = MAUS.ReducePyTofCalib()
+    #reducer = MAUS.ReduceCppTofCalib()
     # Save output ROOT file
     output_worker = MAUS.OutputCppRoot()
 
