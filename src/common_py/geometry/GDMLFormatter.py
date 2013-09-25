@@ -42,14 +42,19 @@ class Formatter: #pylint: disable = R0902
                     outputted GDML files
         """
         self.g4_step_max = Configreader().g4_step_max
-        self.tof_0_file_number = Configreader().tof_0_file_number
-	self.tof_1_file_number = Configreader().tof_1_file_number
-	self.tof_2_file_number = Configreader().tof_2_file_number
-        self.ckov_file_number  = Configreader().ckov_file_number
-        self.acc1_file_number  = Configreader().acc1_file_number
-        self.acc2_file_number  = Configreader().acc2_file_number
-        self.kl_file_number    = Configreader().kl_file_number
-        self.emr_file_number   = Configreader().emr_file_number
+        self.tof_0_file_number    = Configreader().tof_0_file_number
+	self.tof_1_file_number    = Configreader().tof_1_file_number
+	self.tof_2_file_number    = Configreader().tof_2_file_number
+        self.ckov_file_number     = Configreader().ckov_file_number
+        self.acc1_file_number     = Configreader().acc1_file_number
+        self.acc2_file_number     = Configreader().acc2_file_number
+        self.kl_file_number       = Configreader().kl_file_number
+        self.emr_file_number      = Configreader().emr_file_number
+        self.tracker0_file_number = Configreader().tracker0_file_number
+        self.tracker1_file_number = Configreader().tracker1_file_number
+        self.absorber0_file_number= Configreader().absorber0_file_number
+        self.absorber1_file_number= Configreader().absorber1_file_number
+        self.absorber2_file_number= Configreader().absorber2_file_number
         self.path_in = path_in
         self.path_out = path_out + '/'
         self.beamline_file = None
@@ -157,12 +162,31 @@ class Formatter: #pylint: disable = R0902
 	acc2_file_number = doc.createElement("Acc2FileNumber")
 	acc2_file_number.setAttribute("number", str(self.acc2_file_number))
 	file_numbers.appendChild(acc2_file_number)
+        
 	kl_file_number = doc.createElement("KLFileNumber")
 	kl_file_number.setAttribute("number", str(self.kl_file_number))
 	file_numbers.appendChild(kl_file_number)
+        
 	emr_file_number = doc.createElement("EMRFileNumber")
 	emr_file_number.setAttribute("number", str(self.emr_file_number))
 	file_numbers.appendChild(emr_file_number)
+        
+	tracker0_file_number = doc.createElement("Tracker0FileNumber")
+	tracker0_file_number.setAttribute("number", str(self.tracker0_file_number))
+	file_numbers.appendChild(tracker0_file_number)
+	tracker1_file_number = doc.createElement("Tracker1FileNumber")
+	tracker1_file_number.setAttribute("number", str(self.tracker1_file_number))
+	file_numbers.appendChild(tracker1_file_number)
+        
+	absorber0_file_number = doc.createElement("Absorber0FileNumber")
+	absorber0_file_number.setAttribute("number", str(self.absorber0_file_number))
+	file_numbers.appendChild(absorber0_file_number)
+	absorber1_file_number = doc.createElement("Absorber1FileNumber")
+	absorber1_file_number.setAttribute("number", str(self.absorber1_file_number))
+	file_numbers.appendChild(absorber1_file_number)
+	absorber2_file_number = doc.createElement("Absorber2FileNumber")
+	absorber2_file_number.setAttribute("number", str(self.absorber2_file_number))
+	file_numbers.appendChild(absorber2_file_number)
 
         if file_numbers != None:
             top_node.appendChild(file_numbers)

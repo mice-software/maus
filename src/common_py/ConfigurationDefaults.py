@@ -274,14 +274,19 @@ get_beamline_stop_time = ""
 # This following section gives the files numbers of each detector. The numbers speficy the technical drawing
 # number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
 # and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
-tof_0_file_number = "Iges_0"
-tof_1_file_number = "Iges_1"
-tof_2_file_number = "Iges_3"
-ckov_file_number = "Iges_6"
-acc1_file_number = "Iges_7"
-acc2_file_number = "Iges_8"
-kl_file_number = "Iges_4"
-emr_file_number = "Iges_5"
+tof_0_file_number = "Iges_10"
+tof_1_file_number = "Iges_11"
+tof_2_file_number = "Iges_13"
+ckov_file_number = "Iges_19"
+acc1_file_number = "Iges_20"
+acc2_file_number = "Iges_21"
+kl_file_number = "Iges_14"
+emr_file_number = "Iges_15"
+tracker0_file_number = "Iges_17"
+tracker1_file_number = "Iges_18"
+absorber0_file_number = "9999"
+absorber1_file_number = "Iges_16"
+absorber2_file_number = "9999"
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1

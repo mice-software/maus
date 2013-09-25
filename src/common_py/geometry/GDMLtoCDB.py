@@ -22,6 +22,7 @@ GDMLtoCDB contains two classes:
 
 import os
 import cdb
+import csv
 
 from geometry.ConfigReader import Configreader
 
@@ -200,7 +201,7 @@ class Downloader: #pylint: disable = R0902
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
         return self.wsdlurl
-            
+        
     def download_current(self, downloadpath):
         """
         @Method download_current, this method downloads the current valid 

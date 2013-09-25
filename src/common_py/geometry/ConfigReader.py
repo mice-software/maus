@@ -71,6 +71,8 @@ class Configreader(): #pylint: disable = R0903, R0902
 	self.acc2_file_number = config_dict['acc2_file_number']
 	self.kl_file_number = config_dict['kl_file_number']
 	self.emr_file_number = config_dict['emr_file_number']
-
-
-
+        self.tracker0_file_number = config_dict['tracker0_file_number']
+        self.tracker1_file_number = config_dict['tracker1_file_number']
+        self.absorber0_file_number = config_dict['absorber0_file_number']
+        self.absorber1_file_number = config_dict['absorber1_file_number']
+        self.absorber2_file_number = config_dict['absorber2_file_number']
