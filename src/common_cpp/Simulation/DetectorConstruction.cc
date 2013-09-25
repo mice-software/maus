@@ -199,7 +199,6 @@ void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
     if (_model != NULL)
         delete _model;
     _model = MiceModule::deepCopy(mods, false);
-    std::cerr << "SETMICEMODULES " << _model->name() << std::endl;
     ResetGeometry();
     ResetFields();
 }
