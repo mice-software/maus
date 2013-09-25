@@ -49,7 +49,6 @@ PDF::~PDF() {
 }
 
 PDF& PDF::operator=(const PDF &rhs) {
-  std::cerr << "assign operator " << std::endl;
   if ( this == &rhs ) {
     return *this;
   }
@@ -57,8 +56,7 @@ PDF& PDF::operator=(const PDF &rhs) {
   _name = rhs._name;
   const char *c_name = _name.c_str();
 
-  // _probability = TH1D(rhs._probability);
-  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone(c_name));
+  _probability = static_cast<TH1D*>(rhs._probability->Clone(c_name));
 
   _n_bins    = rhs._n_bins;
   _bin_width = rhs._bin_width;
@@ -71,9 +69,8 @@ PDF& PDF::operator=(const PDF &rhs) {
 PDF::PDF(const PDF &pdf) {
   _name = pdf._name;
   const char *c_name = _name.c_str();
-  std::cerr << "copy constructor " << std::endl;
-  // _probability = TH1D(rhs._probability);
-  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone(c_name));
+
+  _probability = static_cast<TH1D*>(pdf._probability->Clone(c_name));
 
   _n_bins    = pdf._n_bins;
   _bin_width = pdf._bin_width;
@@ -82,7 +79,6 @@ PDF::PDF(const PDF &pdf) {
 }
 
 void PDF::ComputeNewPosterior(TH1D likelihood) {
-  // posterior = prior*likelihood
   _probability->Multiply(&likelihood);
 
   // The likelihood isn't a PDF. Get around this

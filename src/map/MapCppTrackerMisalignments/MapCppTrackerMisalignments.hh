@@ -131,6 +131,7 @@ class MapCppTrackerMisalignments {
   /// This will store
   TFile *_root_file;
 
+  std::vector< std::vector<TGraph*> > _graph_map;
   TMultiGraph *_tracker0_graphs;
   TGraph *_t0s2_x;
   TGraph *_t0s3_x;
@@ -154,8 +155,8 @@ class MapCppTrackerMisalignments {
 
   JointPDF _jointPDF;
 
-  std::vector< std::vector<PDF*> > _x_shift_pdfs;
-  std::vector< std::vector<PDF*> > _y_shift_pdfs;
+  std::vector< std::vector<PDF> > _x_shift_pdfs;
+  std::vector< std::vector<PDF> > _y_shift_pdfs;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

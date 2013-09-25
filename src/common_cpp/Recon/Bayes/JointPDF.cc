@@ -53,7 +53,7 @@ JointPDF& JointPDF::operator=(const JointPDF &rhs) {
   const char *c_name = _name.c_str();
 
   //  _joint = TH2D(rhs._joint);
-  _joint = reinterpret_cast<TH2D*>(rhs._joint->Clone(c_name));
+  _joint = static_cast<TH2D*>(rhs._joint->Clone(c_name));
 
   _n_bins    = rhs._n_bins;
   _bin_width = rhs._bin_width;
@@ -68,7 +68,7 @@ JointPDF::JointPDF(const JointPDF &joint) {
   const char *c_name = _name.c_str();
 
   //  _joint = TH2D(joint._joint);
-  _joint = reinterpret_cast<TH2D*>(joint._joint->Clone(c_name));
+  _joint = static_cast<TH2D*>(joint._joint->Clone(c_name));
 
   _n_bins    = joint._n_bins;
   _bin_width = joint._bin_width;
@@ -107,7 +107,7 @@ TH1D JointPDF::GetLikelihood(double data) {
   // The value observed (the data) corresponds to some
   // bin number in the Y axis of the TH2D.
   // FIX THIS
-  int data_bin = static_cast<int> ( (data+_max)*(_n_bins/(_max-_min))+1 );
+  int data_bin = static_cast<int> ( (data+_max)*(_n_bins/(_max-_min)) + 1);
   // Now, for this Y-bin, we are going to swipe all possible values
   // in the paramenter axis (the x-axis) and fill our JointPDF histogram.
   for ( int param_bin = 1; param_bin <= _n_bins; param_bin++ ) {
