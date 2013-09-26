@@ -50,6 +50,7 @@ class ReducePyTofCalib: # pylint: disable=R0902
         # Refresh_rate determines how often (in spill counts) the
         # canvases are updated.
         self.run_ended = False
+        self.tdcPico = 1000.0
         self.calib_file = "tofcalibdata_"
         if not self.__make_tree():
             print 'ReducePyTofCalib: Failed to make tree'
@@ -163,10 +164,10 @@ class ReducePyTofCalib: # pylint: disable=R0902
                         q0 = 0
                         q1 = 0
                         if ("pmt0" in dethits[i]):
-                            rt0 = dethits[i]["pmt0"]["raw_time"]
+                            rt0 = dethits[i]["pmt0"]["raw_time"] * self.tdcPico
                             q0 = dethits[i]["pmt0"]["charge"]
                         if ("pmt1" in dethits[i]):
-                            rt1 = dethits[i]["pmt1"]["raw_time"]
+                            rt1 = dethits[i]["pmt1"]["raw_time"] * self.tdcPico
                             q1 = dethits[i]["pmt1"]["charge"]
 
                         if station == "tof0":

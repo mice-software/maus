@@ -28,7 +28,7 @@ def run():
     # card. 
     data_cards_list.append("root_batch_mode='%d'\n" % 1)
     # refresh_rate = once in how many spills should canvases be updated
-    data_cards_list.append("refresh_rate='%d'\n" % 1)
+    data_cards_list.append("refresh_rate='%d'\n" % 5)
     # Add auto-numbering to the image tags. If False then each
     # histogram output for successive spills will have the same tag
     # so there are no spill-specific histograms. This is the
@@ -40,29 +40,25 @@ def run():
     # else the current directory is used.
     # Uncomment and change the following if you want to hard
     # code a different default path.
-#    data_cards_list.append("image_directory='%s'\n" % os.getcwd())
-    # set the TDC conversion factor such that time is in picosec
-    data_cards_list.append("TOFtdcConversionFactor='%d'\n" % 25)
+    #data_cards_list.append("image_directory='%s'\n" % os.getcwd())
 
     # Convert data_cards to string.    
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
     # Set up the input that reads from DAQ
     my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
-
+ 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    my_map.append(MAUS.MapCppTOFDigits())
-    my_map.append(MAUS.MapCppTOFSlabHits())
-    my_map.append(MAUS.MapCppTOFSpacePoints())
-    # Calib reducer.
-    # The C++ reducer crashes somewhere related to swig
-    # The Python reducer works OK
-    reducer = MAUS.ReducePyTofCalib()
-    #reducer = MAUS.ReduceCppTofCalib()
-    # Save output ROOT file
-    output_worker = MAUS.OutputCppRoot()
+    my_map.append(MAUS.MapCppKLDigits())
+    my_map.append(MAUS.MapCppKLCellHits())
+    # Histogram reducer.
+    reducer = MAUS.ReducePyKLPlot()
+    #reducer = MAUS.ReducePyDoNothing()
+    # Save images as EPS and meta-data as JSON.
+    #output_worker = MAUS.OutputPyDoNothing()
+    output_worker = MAUS.OutputPyImage()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 

@@ -55,6 +55,7 @@ REDUCER_LIST = [
   'reconstruct_daq_tof_reducer.py',
   'reconstruct_daq_tofcalib_reducer.py',
   'reconstruct_daq_ckov_reducer.py',
+  'reconstruct_daq_kl_reducer.py',
   'reconstruct_monitor_reducer.py',
 ]
 
