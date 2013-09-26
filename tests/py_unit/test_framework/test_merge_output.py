@@ -4,17 +4,13 @@ Tests for merge_output function
 
 import json
 import unittest
-import StringIO
 
 import maus_cpp.globals
 import Configuration
 import ReducePyDoNothing
-import OutputPyImage
 import framework
 import framework.merge_output
 import docstore.InMemoryDocumentStore
-
-from framework.utilities import DataflowUtilities
 
 class OutputPyTest(): # pylint: disable=R0902
     """Mockup Outputter for testing porpoises"""
@@ -59,7 +55,8 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         """Move system args out of the way"""
         self.test_red = ReducePyDoNothing.ReducePyDoNothing()
         self.test_out = OutputPyTest()
-        self.cards_json = json.loads(Configuration.Configuration().getConfigJSON())
+        self.cards_json = json.loads(
+                                  Configuration.Configuration().getConfigJSON())
         self.cards_json['doc_store_class'] = \
                           'docstore.InMemoryDocumentStore.InMemoryDocumentStore'
         self.cards_json['doc_collection_name'] = 'test_merge_output'
@@ -92,7 +89,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
                                                         doc_store = 'dummy')
         self.assertEquals(merge_out.doc_store, 'dummy')
 
-    def test_start_of_job_throw_on_return(self):
+    def test_start_of_job_1(self): #
         """Check merge_output start of job throws with incorrect return value"""
         job_header = ['header']
         self.test_out.birth_ret = True
@@ -108,7 +105,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         except framework.merge_output.WorkerBirthFailedException:
             pass
 
-    def test_start_of_job_write_headers(self):
+    def test_start_of_job_2(self):
         """Check merge_output start of job writes headers"""
         job_header = ['header']
         self.merge_out.write_headers = True
@@ -122,7 +119,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
 
     # Under start of run I don't test merger is birthed okay; can't be bothered
     # to mock a merger
-    def test_start_of_run_reset_counters(self):
+    def test_start_of_run_1(self):
         """Check merge_output start of run resets counters"""
         self.merge_out.run_number = -999
         self.merge_out.spill_process_count = 100
@@ -131,7 +128,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEquals(self.merge_out.spill_process_count, 0)
         self.assertEquals(self.merge_out.end_of_run_spill, None)
 
-    def test_start_of_run_write_headers(self):
+    def test_start_of_run_2(self):
         """Check merge_output start of run writes headers"""
         self.merge_out.run_number = -999
         self.merge_out.start_of_run()
@@ -198,11 +195,11 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEquals(type(self.merge_out.get_dataflow_description()),
                           type(''))
 
-    def _docs_generator(self, exception=None):
+    def _docs_generator(self, exception=None): # pylint: disable=R0201
         """Test document generator"""
         for i in range(1):
             if exception != None:
-                raise exception
+                raise exception # pylint: disable=E0702
             yield i
 
     def test_docs_next(self):
@@ -235,7 +232,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         except framework.merge_output.DocumentStoreException:
             pass
 
-    def test_process_event_bad_spill(self):
+    def test_process_event_1(self):
         """test merge_output process_event with a bad spill"""
         try:
             self.merge_out.process_event(1)
@@ -253,7 +250,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         except KeyError:
             pass
 
-    def test_process_event_not_spill_event(self):
+    def test_process_event_2(self):
         """test merge_output process_event with maus_event_type != Spill"""
         self.test_out.save_ret = None
         self.merge_out.process_event(json.dumps({'maus_event_type':'Test'}))
@@ -266,7 +263,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         except RuntimeError:
             pass
 
-    def test_process_event_spill_event_basic(self):
+    def test_process_event_3(self):
         """test merge_output process_event with basic Spill maus_event_type"""
         spill_test = json.dumps({'maus_event_type':'Spill', 'run_number':1})
         self.merge_out.run_number = 1
@@ -282,7 +279,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         except RuntimeError:
             pass
 
-    def test_process_event_spill_event_end_of_run(self):
+    def test_process_event_4(self):
         """test merge_output process_event with end_of_run spill"""
         spill_test = json.dumps({'maus_event_type':'Spill',
                                  'run_number':-999,
@@ -293,7 +290,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEquals(json.dumps(self.merge_out.end_of_run_spill),
                           spill_test)
 
-    def test_process_event_spill_event_start_of_run_run_number(self):
+    def test_process_event_5(self):
         """test merge_output process_event with change of run_number"""
         spill_test = json.dumps({'maus_event_type':'Spill',
                                  'run_number':1234,
@@ -313,7 +310,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEqual(json.loads(saves[-1])['maus_event_type'], 'Spill')
         self.assertEqual(json.loads(saves[-1])['run_number'], 1234)
 
-    def test_process_event_spill_event_start_of_run_first_run_number(self):
+    def test_process_event_6(self):
         """test merge_output process_event with first change of run_number"""
         spill_test = json.dumps({'maus_event_type':'Spill',
                                  'run_number':1234,
@@ -330,6 +327,7 @@ class MergeOutputTestCase(unittest.TestCase): #pylint: disable = R0904
         self.assertEqual(json.loads(saves[-1])['run_number'], 1234)
 
     def test_execute(self):
+        """test execute(...) not implemented"""
         pass
   
 if __name__ == "__main__":

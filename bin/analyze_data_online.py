@@ -49,13 +49,76 @@ import pymongo
 MONGODB = 'maus-new' # no '.' character
 LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
 PROCESSES = []
+# maximum % of total memory usage before a process is restarted
+MAX_MEM_USAGE = 15.
+
+# time between polls in seconds
 POLL_TIME = 10
+
+# list of reducers to be used in the online job
 REDUCER_LIST = [
   'reconstruct_daq_scalars_reducer.py',
   'reconstruct_daq_tof_reducer.py',
   'reconstruct_daq_ckov_reducer.py',
   'reconstruct_monitor_reducer.py',
 ]
+
+class OnlineProcess:
+    """
+    Wrapper for a subprocess POpen object
+
+    Wraps a subprocess with additional functionality to check memory usage and
+    kill the subprocess and restart it in the case of a leak. See #1328.
+    """
+
+    def __init__(self, subprocess_arg_list, log_file):
+        """
+        Set up the log file and start the subprocess
+        """
+        self.arg_list = subprocess_arg_list
+        self.log_name = log_file
+        self.log = open(log_file, "w")
+        self.subproc = None
+        self._start_process()
+
+    def poll(self):
+        """
+        Returns None if the process is running or the returncode if it finished
+
+        Checks memory footprint for the subprocess and restarts the process if
+        it exceeeds MAX_MEM_USAGE
+        """
+        proc = self.subproc
+        poll_out = proc.poll()
+        if poll_out == None:
+            mem_usage = self.memory_usage()
+            if mem_usage > MAX_MEM_USAGE:
+                print mem_usage, "% of memory used for process", proc.pid, \
+                      "which exceeds the maximum", MAX_MEM_USAGE, \
+                      "% - restarting the process"
+                cleanup([self])
+                self._start_process()
+            print str(proc.pid).rjust(6), str(mem_usage).ljust(6),
+        else:
+            print '\nProcess', proc.pid, 'failed'
+        return poll_out
+
+    def memory_usage(self):
+        """
+        Return the memory usage (%) of the associated subprocess
+        """
+        ps_out = subprocess.check_output(['ps', '-p', str(self.subproc.pid),
+                                          'h', '-o%mem'])
+        return float(ps_out.strip(' \n'))
+
+    def _start_process(self):
+        """
+        Start the subprocess
+        """
+        self.subproc = subprocess.Popen(self.arg_list, \
+                                      stdout=self.log, stderr=subprocess.STDOUT)
+        print 'Started process with pid', self.subproc.pid, 'and log file', \
+              self.log_name
 
 def poll_processes(proc_list):
     """
@@ -64,12 +127,7 @@ def poll_processes(proc_list):
     """
     all_ok = True
     for proc in proc_list:
-        running = proc.poll() == None
-        all_ok = all_ok and running
-        if running:
-            print '.',
-        else:
-            print '\nProcess', proc.pid, 'failed'
+        all_ok = all_ok and proc.poll() == None
     print
     return all_ok
 
@@ -77,11 +135,9 @@ def celeryd_process(celeryd_log_file_name):
     """
     Open the celery demon process - sets up workers for MAUS to reconstruct on
     """
-    print 'Starting celery with log file ', celeryd_log_file_name,
-    log = open(celeryd_log_file_name, 'w')
-    proc = subprocess.Popen(['celeryd', '-c8', '-lINFO', '--purge'], \
-                                           stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid # pylint: disable = E1101
+    print 'Starting celery... ',
+    proc = OnlineProcess(['celeryd', '-c8', '-lINFO', '--purge'],
+                         celeryd_log_file_name)
     return proc
 
 def maus_web_app_process(maus_web_log_file_name):
@@ -89,13 +145,10 @@ def maus_web_app_process(maus_web_log_file_name):
     Open the maus web app process - dynamically generates web pages for MAUS
     output display
     """
-    print 'Starting maus web app with log file ', maus_web_log_file_name,
-    log = open(maus_web_log_file_name, 'w')
+    print 'Starting maus web app...',
     maus_web = os.path.join(os.environ['MAUS_WEB_DIR'], 'src/mausweb/manage.py')
-    proc = subprocess.Popen(
-                       ['python', maus_web, 'runserver', 'localhost:9000'],
-                       stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid # pylint: disable = E1101
+    proc = OnlineProcess(['python', maus_web, 'runserver', 'localhost:9000'],
+                         maus_web_log_file_name)
     return proc
 
 def maus_input_transform_process(maus_input_log, _extra_args):
@@ -103,18 +156,16 @@ def maus_input_transform_process(maus_input_log, _extra_args):
     Open the input transform process - runs against data and performs
     reconstruction, leaving reconstructed data in a database somewhere.
     """
-    print 'Starting reconstruction with log file ', maus_input_log,
-    log = open(maus_input_log, 'w')
+    print 'Starting input-transform...',
     maus_inp = \
              os.path.join(os.environ['MAUS_ROOT_DIR'],
                           'bin/online/analyze_data_online_input_transform.py')
-    proc = subprocess.Popen(
-                       ['python', maus_inp, '-mongodb_database_name='+MONGODB,
-                        '-type_of_dataflow=multi_process_input_transform',
-				        '-verbose_level=0',
-						'-DAQ_hostname=miceraid5']+_extra_args,
-                       stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid # pylint: disable = E1101
+    proc = OnlineProcess(['python', maus_inp,
+                          '-mongodb_database_name='+MONGODB,
+                          '-type_of_dataflow=multi_process_input_transform',
+				                  '-verbose_level=0',
+						              '-DAQ_hostname=miceraid5']+_extra_args,
+                          maus_input_log)
     return proc
     
 def maus_merge_output_process(maus_output_log, reducer_name, output_name,
@@ -123,17 +174,15 @@ def maus_merge_output_process(maus_output_log, reducer_name, output_name,
     Open the merge output process - runs against reconstructed data and collects
     into a bunch of histograms.
     """
-    print 'Starting reconstruction with log file ', maus_output_log,
-    log = open(maus_output_log, 'w')
+    print 'Starting reducer...',
     maus_red = os.path.join(os.environ['MAUS_ROOT_DIR'], 'bin/online',
                                                                    reducer_name)
-    proc = subprocess.Popen(
-                       ['python', maus_red, '-mongodb_database_name='+MONGODB,
-                        '-type_of_dataflow=multi_process_merge_output',
-                        '-output_json_file_name='+output_name,
-                        '-reduce_plot_refresh_rate=60']+_extra_args,
-                        stdout=log, stderr=subprocess.STDOUT)
-    print 'with pid', proc.pid # pylint: disable = E1101
+    proc = OnlineProcess(['python', maus_red,
+                          '-mongodb_database_name='+MONGODB,
+                          '-type_of_dataflow=multi_process_merge_output',
+                          '-output_json_file_name='+output_name,
+                          '-reduce_plot_refresh_rate=60']+_extra_args,
+                          maus_output_log)
     return proc
 
 def monitor_mongodb(url, database_name, file_handle):
@@ -210,6 +259,16 @@ def force_kill_maus_web_app():
         os.kill(pid, signal.SIGKILL)
         print "Killed", pid
 
+def remove_lockfile():
+    """
+    Delete the lockfile
+    """
+    if os.path.exists(LOCKFILE):
+        os.remove(LOCKFILE)
+        print 'Cleared lockfile'
+    else:
+        print 'Strange, I lost the lockfile...'
+
 def clear_lockfile():
     """
     Clear an existing lockfile
@@ -250,27 +309,28 @@ def make_lockfile(_procs):
     fout = open(LOCKFILE, 'w')
     print >> fout, os.getpid()
     for proc in _procs  :
-        print >> fout, proc.pid
+        print >> fout, proc.subproc.pid
     fout.close()
 
 def cleanup(_procs):
     """
-    Kill any subprocesses of this process
+    Kill any subprocesses in _procs list of OnlineProcesses
     """
     returncode = 0
-    print 'Exiting... killing all MAUS processes'
-    for process in _procs:
+    for online_process in _procs:
+        process = online_process.subproc
         if process.poll() == None:
             print 'Attempting to kill process', str(process.pid)
             process.send_signal(signal.SIGINT)
     while len(_procs) > 0:
         _proc_alive = []
-        for process in _procs:
+        for online_process in _procs:
+            process = online_process.subproc
             print 'Polling process', process.pid,
             if process.poll() == None:
                 print '... process did not die - it is still working '+\
                       '(check the log file)'
-                _proc_alive.append(process)
+                _proc_alive.append(online_process)
             else:
                 print '... process', str(process.pid), \
                       'is dead with return code', str(process.returncode)
@@ -278,11 +338,6 @@ def cleanup(_procs):
         sys.stdout.flush()
         _procs = _proc_alive
         time.sleep(10)
-    if os.path.exists(LOCKFILE):
-        os.remove(LOCKFILE)
-        print 'Cleared lockfile'
-    else:
-        print 'Strange, I lost the lockfile...'
     return returncode
 
 def main():
@@ -314,7 +369,6 @@ def main():
             reduce_log = os.path.join(log_dir, reducer[0:-3]+'.log')
             PROCESSES.append(maus_merge_output_process(reduce_log,
                                               reducer, debug_json, extra_args))
-
         make_lockfile(PROCESSES)
         print '\nCTRL-C to quit\n'
         mongo_log = open(os.path.join(log_dir, 'mongodb.log'), 'w')
@@ -330,6 +384,7 @@ def main():
         returncode = 1
     finally:
         returncode = cleanup(PROCESSES)+returncode
+        remove_lockfile()
         sys.exit(returncode)
 
 if __name__ == "__main__":

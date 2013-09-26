@@ -20,7 +20,10 @@ Multi-process dataflows module.
 import os
 import json
 import socket
+import time
+
 import celery.states
+import celery.task.control
 
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import CeleryUtilities
@@ -132,26 +135,27 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             self.collection = self.config["doc_collection_name"]
 
     def revoke_celery_tasks(self):
+        """Revoke the celery tasks"""
         for task in self.celery_tasks:
-            task.revoke(terminate=True)
+            print "    Celery task %s status is %s" % (task.task_id,
+                                                       task.state)
+            celery.task.control.revoke(task.task_id, terminate=True)
+            print "    REVOKED at start of new run"
+        self.celery_tasks = []
 
     def poll_celery_tasks(self):
         """
-        Wait for tasks currently being executed by Celery nodes to 
-        complete.
+        Loop over existing tasks; remove from the queue if they are completed
         @param self Object reference.
         @throws RabbitMQException if RabbitMQ cannot be contacted.
-        @throws DocumentStoreException if there is a problem
-        using the document store.
+        @throws DocumentStoreException if there is a problem using the document
+                store.
         """
-        # Check each submitted Celery task.
         print 'Polling celery queue'
-        for task in self.celery_tasks:
-            result = self.celery_tasks[-1]
+        temp_queue = []
+        for result in self.celery_tasks:
             try:
-                is_successful = result.successful() and not result.failed()
                 result_result = result.result
-                result_traceback = result.traceback
             except socket.error as exc:
                 raise RabbitMQException(exc)
             print "    Celery task %s status is %s" % (result.task_id,
@@ -167,11 +171,11 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
                         raise DocumentStoreException(exc)
                 else:
                     self.spill_fail_count += 1
-                self.celery_tasks.pop(-1)
                 self.spill_process_count += 1
                 self.print_counts()
             else: #pending, retry, etc
-                pass
+                temp_queue.append(result)
+        self.celery_tasks = temp_queue
         print len(self.celery_tasks), 'tasks remain in queue'
 
     def submit_spill_to_celery(self, spill):
@@ -201,8 +205,11 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         print "New run detected...waiting for current processing to complete"
         # Force kill current tasks, from previous run, to complete.
         # This also ensures their timestamps < those of next run.
-        while (len(self.celery_tasks) != 0):
-            self.poll_celery_tasks()
+        time.sleep(10)
+        # Should get hit by timeout in mauscelery.tasks.py
+        self.poll_celery_tasks()
+        # Anything still alive must have stuck
+        self.revoke_celery_tasks()
         self.run_number = run_number
         # Configure Celery nodes.
         print "---------- RUN %d ----------" % self.run_number

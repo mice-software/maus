@@ -17,13 +17,11 @@ Multi-process dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
 from datetime import datetime
 import json
 import sys
 import os
 
-import pymongo.errors
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
 from framework.utilities import DocumentStoreUtilities
@@ -319,8 +317,10 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     doc_id = doc["_id"]
                     doc_time = doc["date"]
                     spill = doc["doc"]
-                    print "<%s> Read event %s reconstructed at %s compared to last_time %s with %s more docs)" % \
-                          (str(datetime.now().time()), str(doc_id), str(doc_time), str(self.last_time), str(len(doc)))
+                    print "<"+str(datetime.now().time())+"> Read event "+\
+                          str(doc_id)+" reconstructed at "+str(doc_time)+\
+                          " compared to last_time "+str(self.last_time)+\
+                          " with "+str(len(doc))+" more docs)"
                     if (doc_time >= self.last_time):
                         self.last_time = doc_time
                     try:
@@ -397,5 +397,5 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             except StopIteration:
                 raise
             except Exception:
-                raise DocumentStoreException("Failed to access document store")      
+                raise DocumentStoreException("Failed to access document store")
 
