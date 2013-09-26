@@ -88,6 +88,8 @@ class TrackerData {
     int _num_htracks_5pt;
     int _num_htracks_4pt;
     int _num_htracks_3pt;
+    int _num_pos_tracks;
+    int _num_neg_tracks;
 
     // Spacepoint data
     std::vector<double> _spoints_x;

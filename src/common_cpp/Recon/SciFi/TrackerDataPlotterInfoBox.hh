@@ -80,6 +80,8 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
     int _tot_5stracks_t1;
     int _tot_4stracks_t1;
     int _tot_3stracks_t1;
+    int _tot_pos_tracks_t1;
+    int _tot_neg_tracks_t1;
 
     int _tot_digits_t2;
     int _tot_clusters_t2;
@@ -90,6 +92,8 @@ class TrackerDataPlotterInfoBox : public TrackerDataPlotterBase {
     int _tot_5stracks_t2;
     int _tot_4stracks_t2;
     int _tot_3stracks_t2;
+    int _tot_pos_tracks_t2;
+    int _tot_neg_tracks_t2;
 
     /** Parameters of the TCanvas */
     int _canvas_width;

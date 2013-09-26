@@ -566,7 +566,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
   ThreeVector pos_0(x0, y0, -1);
   SciFiHelicalPRTrack *track = NULL;
-  track = new SciFiHelicalPRTrack(-1, n_points, pos_0, phi_0, psi_0, c_trial, line_sz);
+  track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, psi_0, c_trial, line_sz);
   track->set_phi(phi_i);
   // if (spnts[0]->get_tracker() == 0) track->set_dsdz(-track->get_dsdz());  // sign flip for t1
 

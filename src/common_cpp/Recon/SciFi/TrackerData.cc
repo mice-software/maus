@@ -35,6 +35,8 @@ TrackerData::TrackerData() {
   _num_htracks_5pt = 0;
   _num_htracks_4pt = 0;
   _num_htracks_3pt = 0;
+  _num_pos_tracks = 0;
+  _num_neg_tracks = 0;
 };
 
 TrackerData::~TrackerData() {
@@ -55,6 +57,8 @@ void TrackerData::clear() {
   _num_htracks_5pt = 0;
   _num_htracks_4pt = 0;
   _num_htracks_3pt = 0;
+  _num_pos_tracks = 0;
+  _num_neg_tracks = 0;
   _spoints_x.clear();
   _spoints_x.resize(0);
   _spoints_y.clear();

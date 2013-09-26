@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
   }
   MAUS::TrackerDataPlotterBase *szPlotter = new MAUS::TrackerDataPlotterSZ();
   MAUS::TrackerDataPlotterBase *infoBoxPlotter
-                                  = new MAUS::TrackerDataPlotterInfoBox(275, 600, 0.585, 0.93);
+                                  = new MAUS::TrackerDataPlotterInfoBox(300, 750, 0.585, 0.945);
   std::vector<MAUS::TrackerDataPlotterBase*> plotters;
   plotters.push_back(xyzPlotter);
   plotters.push_back(szPlotter);
