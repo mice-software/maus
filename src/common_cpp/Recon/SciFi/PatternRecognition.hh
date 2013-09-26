@@ -198,7 +198,7 @@ class PatternRecognition {
      * @param line_sz - The output fitted line in s-z projection.
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                   std::vector<double> &phi_i, SimpleLine &line_sz);
+                   std::vector<double> &phi_i, SimpleLine &line_sz, int &charge);
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *
@@ -210,7 +210,7 @@ class PatternRecognition {
      * @param true_phi - the corrected turing angles
      */
     bool find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
-                      std::vector<double> &true_phi);
+                      std::vector<double> &true_phi, int &charge);
 
     /** @brief Short function to calculate the remainder of a division of num / denom
      * 

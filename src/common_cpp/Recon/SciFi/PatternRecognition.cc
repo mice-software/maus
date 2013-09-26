@@ -552,15 +552,15 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Perform the s - z fit
   SimpleLine line_sz;
   std::vector<double> phi_i; // to hold change between turning angles wrt first spacepoint
-  double phi_0; // initial turning angle
-  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz);
+  int charge = 0;            // the particle track charge
+  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz, charge);
   if (!good_dsdz) {
     if ( _debug > 0 ) std::cerr << "dsdz fit failed, looping..." << std::endl;
     return NULL;
   }
 
   // Form the helical track
-  phi_0 = phi_i[0];
+  double phi_0 = phi_i[0];
   double psi_0 = phi_0 + (CLHEP::pi / 2);
   double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
   double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
@@ -581,7 +581,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
 bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts,
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
-                                   SimpleLine &line_sz) {
+                                   SimpleLine &line_sz, int &charge) {
 
   // Sort spacepoints in order seen by the beam (descending z for T1, ascending z for T2)
   if (spnts[0]->get_tracker() == 0)
@@ -590,16 +590,11 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     std::sort(spnts.begin(), spnts.end(), compare_spoints_ascending_z);
 
   // Find each z_i and phi_i value for each spacepoint relative to the first spacepoint
-  std::vector<double> x_i;         // Vector of the x coord of each successive spacepoint
-  std::vector<double> y_i;         // Vector of the y coord of each successive spacepoint
   std::vector<double> z_i;         // Vector of the z coord of each successive spacepoint
-  std::vector<double> true_phi_i;  // phi corrected for any extra 2*n*pi rotations
   std::vector<double> phi_err;     // The errors on the phi_i
 
   // Loop over the spacepoints
   for (std::vector<SciFiSpacePoint*>::const_iterator it = spnts.begin(); it != spnts.end(); ++it) {
-    x_i.push_back((*it)->get_position().x());
-    y_i.push_back((*it)->get_position().y());
     z_i.push_back((*it)->get_position().z());
     phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
 
@@ -614,7 +609,8 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Find the track charge and the number of turns made between tracker stations
-  bool success = find_n_turns(z_i, phi_i, true_phi_i);
+  std::vector<double> true_phi_i;  // phi corrected for any extra 2*n*pi rotations
+  bool success = find_n_turns(z_i, phi_i, true_phi_i, charge);
   if (success) {
     phi_i = true_phi_i;
   } else {
@@ -640,7 +636,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
 }
 
 bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
-                                      std::vector<double> &true_phi) {
+                                      std::vector<double> &true_phi, int &charge) {
   // Sanity checks
   if ( (z.size() != phi.size()) || (z.size() < 3) || (z.size() > 5) ) {
     std::cerr << "find_n_turns: bad arguments supplied, aborting";
@@ -704,7 +700,6 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
   } // ~Loop over n_values
 
   // If we have found a value of n which was accepted, calc the true turning angles
-  int charge = 0;
   if (found) {
     if ( true_n < 0 ) {
       charge = -1;

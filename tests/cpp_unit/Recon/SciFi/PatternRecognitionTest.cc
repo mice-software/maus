@@ -1114,9 +1114,11 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   SimpleLine line_sz;
   std::vector<double> dphi;
   int n_points = 5;
+  int charge = 0;
 
-  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz);
+  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz, charge);
 
+  ASSERT_EQ(charge, 1);
   EXPECT_NEAR(line_sz.get_c(), 15.47, epsilon);
   EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
   EXPECT_NEAR(line_sz.get_chisq(), 1.005 , epsilon);
@@ -1138,8 +1140,10 @@ TEST_F(PatternRecognitionTest, test_find_n_turns) {
   double arr_phi[] = {1.80696, 3.93027, 5.81611, 1.16642, 2.39529};
   std::vector<double> phi(arr_phi, arr_phi + sizeof(arr_phi) / sizeof(double));
   std::vector<double> true_phi;
-  pr.find_n_turns(z, phi, true_phi);
+  int charge = 0;
+  pr.find_n_turns(z, phi, true_phi, charge);
   double epsilon = 0.01;
+  ASSERT_EQ(charge, 1);
   ASSERT_EQ(true_phi.size(), 5);
   EXPECT_NEAR(true_phi[0], 1.80696, epsilon);
   EXPECT_NEAR(true_phi[1], 3.93027, epsilon);
