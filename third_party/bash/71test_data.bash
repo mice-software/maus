@@ -3,11 +3,13 @@
 stagedir=${MAUS_THIRD_PARTY}/third_party/source/
 destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
 
-
 if [ "$#" -gt 0 ]; then
+    # if there are command line arguments it should be a list of run numbers
+    # eventually this becomes a load test (but online recon is failing right now)
     run_list=$@
     cat_list=$@
 else
+    # if there are no command line arguments we generate default data set
     run_list="04234 04258 04235"
     cat_list="04234 04258 04234 04258 04234 04258 04234 04258 04234 04258 04235 04235 04235 04235 04235"
 fi
