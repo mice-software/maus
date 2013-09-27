@@ -388,6 +388,8 @@ mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumen
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# in multiprocessing mode, the timeout after which reconstruction of an event will be abandonded [s]
+reconstruction_timeout = 10
 # refresh rate for refreshing plots
 reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
