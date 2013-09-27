@@ -5,7 +5,7 @@ destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
 
 
 if [ "$#" -gt 0 ]; then
-    run_list="" #$@
+    run_list=$@
     cat_list=$@
 else
     run_list="04234 04258 04235"
