@@ -137,7 +137,6 @@ class MongoDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyl
         for i in range(5):
             self._data_store.put(self._collection, str(max_size+i), doc)
             self.assertEquals(self._data_store.count(self._collection), count)
-        
 
 if __name__ == '__main__':
     unittest.main()
