@@ -17,39 +17,57 @@
 
 #include <string>
 
+#include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
+
+#include "src/py_cpp/PyMiceModule.hh"
 
 #include "src/py_cpp/PyGlobals.hh"
 
 namespace MAUS {
 namespace PyGlobals {
 std::string Birth_DocString =
-  std::string("Initialise MAUS globals.\n\n")+
-  std::string("Initialise the MAUS globals such as error handling, C++ ")+
-  std::string("logging, field maps and GEANT4 interfaces. ")+
-  std::string("Takes one argument which should be the json configuration ")+
-  std::string("datacards formatted as a string. Throws an exception if ")+
-  std::string("globals are already initialised.");
+std::string("Initialise MAUS globals.\n\n")+
+std::string("Initialise the MAUS globals such as error handling, C++\n")+
+std::string("logging, field maps and GEANT4 interfaces.\n")+
+std::string("  Takes one argument which should be the json configuration\n")+
+std::string("datacards formatted as a string. Throws an exception if\n")+
+std::string("globals are already initialised.");
 
 std::string Death_DocString =
-  std::string("Destruct MAUS globals.\n\nIgnores all arguments. ")+
-  std::string("Throws an exception if globals are not initialised already.");
+std::string("Destruct MAUS globals.\n\n  Ignores all arguments.\n")+
+std::string("Throws an exception if globals are not initialised already.\n");
 
 std::string HasInstance_DocString =
-  std::string("Check if MAUS globals have been initialised. Ignores all ")+
-  std::string("arguments. Returns 1 if globals have been initialised, else 0");
+std::string("Check if MAUS globals have been initialised.\n\n")+
+std::string("  Ignores all arguments.\n")+
+std::string("Returns 1 if globals have been initialised, else 0.");
 
 std::string GetConfigurationCards_DocString =
-  std::string("Return the configuration cards as a string. Throws an exception if globals have")+
-  std::string(" not been initialised.");
+std::string("Return the configuration cards as a string.\n\n")+
+std::string("Throws an exception if globals have not been initialised.");
+
+std::string GetMonteCarloMiceModules_DocString =
+std::string("Get the geometry used for simulation.\n\n")+
+std::string("  Ignores all arguments.\n")+
+std::string("Return a deepcopy of the simulation geometry as a MiceModule\n")+
+std::string("object. Note that the actual geometry will only be updated by a\n")+
+std::string("call to set_monte_carlo_mice_modules(...)\n")+
+std::string("Throws an exception if globals have not been initialised.");
+
+std::string SetMonteCarloMiceModules_DocString =
+std::string("Set the simulation geometry and fields.\n\n")+
+std::string("  - modules (MiceModule) the new geometry object.\n")+
+std::string("Returns None. Throws an exception if globals have not been\n")+
+std::string("initialised.");
 
 std::string GetVersionNumber_DocString =
-  std::string("Return the MAUS version number as a string like x.y.z.\n\n")+
-  std::string("Return the MAUS version number as a string like x.y.z where.")+
-  std::string("x is the major version number, y is the minor version number,")+
-  std::string("and z is the patch number. Ignores all arguments.");
+std::string("Return the MAUS version number as a string like x.y.z.\n\n")+
+std::string("Return the MAUS version number as a string like x.y.z where\n")+
+std::string("x is the major version number, y is the minor version number,\n")+
+std::string("and z is the patch number. Ignores all arguments.");
 
 static PyMethodDef methods[] = {
 {"birth", (PyCFunction)Birth,
@@ -60,6 +78,10 @@ static PyMethodDef methods[] = {
     METH_VARARGS, HasInstance_DocString.c_str()},
 {"get_configuration_cards", (PyCFunction)GetConfigurationCards,
     METH_VARARGS, GetConfigurationCards_DocString.c_str()},
+{"get_monte_carlo_mice_modules", (PyCFunction)GetMonteCarloMiceModules,
+    METH_VARARGS|METH_KEYWORDS, GetMonteCarloMiceModules_DocString.c_str()},
+{"set_monte_carlo_mice_modules", (PyCFunction)SetMonteCarloMiceModules,
+    METH_VARARGS|METH_KEYWORDS, SetMonteCarloMiceModules_DocString.c_str()},
 {"get_version_number", (PyCFunction)GetVersionNumber,
     METH_VARARGS, GetVersionNumber_DocString.c_str()},
     {NULL, NULL, 0, NULL}
@@ -142,10 +164,62 @@ PyObject* GetVersionNumber(PyObject *dummy, PyObject *args) {
     return version_py;
 }
 
+PyObject* GetMonteCarloMiceModules
+                             (PyObject* dummy, PyObject* args, PyObject *kwds) {
+    if (!Globals::HasInstance()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                  "Attempt to get MC mice modules but globals not birthed");
+        return NULL;
+    }
+    PyObject* py_mod = MAUS::PyMiceModule::create_empty_module();
+    if (py_mod == NULL) {
+        return NULL;
+    }
+    MiceModule* mod_orig = Globals::GetMonteCarloMiceModules();
+    MiceModule* mod = mod_orig->deepCopy(*mod_orig, false);
+    int success = PyMiceModule::set_mice_module(py_mod, mod);
+    if (success == 0) {
+        delete mod;
+        return NULL;
+    }
+    return py_mod;
+}
+
+PyObject* SetMonteCarloMiceModules
+                             (PyObject* self, PyObject* args, PyObject *kwds) {
+    if (!Globals::HasInstance()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                  "Attempt to set MC mice modules but globals not birthed");
+        return NULL;
+    }
+    PyObject* py_mod = NULL;
+    static char *kwlist[] = {const_cast<char*>("module"), NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &py_mod)) {
+        return NULL;
+    }
+
+    MiceModule* mod = MiceModule::deepCopy
+                               (*PyMiceModule::get_mice_module(py_mod), false);
+    if (mod == NULL) {
+        return NULL;
+    }
+    try {
+        GlobalsManager::SetMonteCarloMiceModules(mod);
+    } catch(std::exception& exc) {
+        std::string message = std::string("Failed to set MiceModules\n")+
+                              std::string((&exc)->what());
+        PyErr_SetString(PyExc_ValueError, message.c_str());
+        return NULL;
+    }
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 PyMODINIT_FUNC initglobals(void) {
   Py_Initialize();
   PyObject* maus_module = Py_InitModule("globals", methods);
   if (maus_module == NULL) return;
+  MAUS::PyMiceModule::import_PyMiceModule();
 }
 }  // namespace PyGlobals
 }  // namespace MAUS

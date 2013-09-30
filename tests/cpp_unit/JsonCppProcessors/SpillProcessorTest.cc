@@ -48,7 +48,9 @@ std::string STEP =
         std::string("{\"proper_time\":1.,\"path_length\":2.,\"time\":3.,")+
         std::string("\"energy\":4.,\"energy_deposited\":5.,")+
         std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
-        std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
+        std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
+        std::string("\"b_field\":{\"x\":11.,\"y\":12.,\"z\":13.},")+
+        std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.}}");
 
 std::string TRACK_SEED =
         std::string("{\"particle_id\":1,\"track_id\":2,\"kill_reason\":\"Z\",")+

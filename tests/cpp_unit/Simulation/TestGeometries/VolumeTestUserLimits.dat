@@ -1,0 +1,18 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 20. mm
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module UserLimits
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 20. mm
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyString Material Galactic
+    PropertyDouble G4StepMax  1. mm
+    PropertyDouble G4TrackMax 2. mm
+    PropertyDouble G4TimeMax  0.04 ns
+    PropertyDouble G4KinMin   1. MeV
+  }
+}
+

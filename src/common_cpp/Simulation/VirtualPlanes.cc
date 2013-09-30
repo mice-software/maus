@@ -24,7 +24,6 @@
 
 #include "json/json.h"
 
-#include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/Interface/Squeal.hh"
@@ -32,9 +31,11 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 
+#include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+
 namespace MAUS {
 
-const BTField*         VirtualPlane::_field    = NULL;
 VirtualPlane::stepping VirtualPlane::_stepping = VirtualPlane::integrate;
 
 /////////////////////// VirtualPlane //////////////////
@@ -48,6 +49,14 @@ VirtualPlane::VirtualPlane() {
   _independentVariable = 0.;
   _globalCoordinates   = false;
   _multipass = VirtualPlane::ignore;
+}
+
+VirtualPlane::VirtualPlane(const VirtualPlane& rhs)
+  : _planeType(rhs._planeType), _independentVariable(rhs._independentVariable),
+    _step(rhs._step), _radialExtent(rhs._radialExtent),
+    _globalCoordinates(rhs._globalCoordinates), _multipass(rhs._multipass),
+    _position(rhs._position), _rotation(rhs._rotation),
+    _allowBackwards(rhs._allowBackwards) {
 }
 
 VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
@@ -100,7 +109,7 @@ void VirtualPlane::FillBField(VirtualHit * aHit, const G4Step * aStep) const {
   double point[4] =
      {aHit->GetPos()[0], aHit->GetPos()[1], aHit->GetPos()[2], aHit->GetTime()};
   double field[6] = {0., 0., 0., 0., 0., 0.};
-  _field->GetFieldValue(point, field);
+  GetField()->GetFieldValue(point, field);
   aHit->SetBField(CLHEP::Hep3Vector(field[0], field[1], field[2]));
   aHit->SetEField(CLHEP::Hep3Vector(field[3], field[4], field[5]));
 }
@@ -187,7 +196,7 @@ double * VirtualPlane::Integrate(G4StepPoint* aPoint) const {
   double* x_in = ExtractPointData(aPoint);
   double  step = _step;
   if (GetIndependentVariable(aPoint) > _independentVariable) step *= -1.;
-  BTTracker::integrate(_independentVariable, x_in, _field, _planeType, step,
+  BTTracker::integrate(_independentVariable, x_in, GetField(), _planeType, step,
                        aPoint->GetCharge(), _position, _rotation);
   return x_in;
 }
@@ -202,22 +211,33 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
   return aHit;
 }
 
+const BTField* VirtualPlane::GetField() const {
+      return reinterpret_cast<BTField*>
+                                 (MAUSGeant4Manager::GetInstance()->GetField());
+}
+
 //////////////////////// VirtualPlaneManager //////////////////////////
 
-const BTFieldGroup VirtualPlaneManager::_default_field;
-
-VirtualPlaneManager::VirtualPlaneManager() : _field(NULL),
-      _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
+VirtualPlaneManager::VirtualPlaneManager()
+    : _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
       _hits(Json::arrayValue) {
 }
 
 VirtualPlaneManager::~VirtualPlaneManager() {
-  _field = NULL;
   _useVirtualPlanes = false;
   _nHits = std::vector<int>();
   _mods = std::map<VirtualPlane*, const MiceModule*>();
   for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
   _planes = std::vector<VirtualPlane*>();
+}
+
+VirtualPlaneManager::VirtualPlaneManager(VirtualPlaneManager& rhs)
+          :  _useVirtualPlanes(rhs._useVirtualPlanes), _planes(), _mods(),
+             _nHits(rhs._nHits), _hits(rhs._hits) {
+  for (size_t i = 0; i < rhs._planes.size(); ++i) {
+    _planes.push_back(new VirtualPlane(*rhs._planes[i]));
+    _mods[_planes[i]] = rhs._mods[rhs._planes[i]];
+  }
 }
 
 // Point here is if I go round e.g. a ring, station number should be
@@ -261,7 +281,7 @@ void VirtualPlaneManager::StartOfEvent() {
 }
 
 void VirtualPlaneManager::ConstructVirtualPlanes
-                                     (const BTField* field, MiceModule* model) {
+                                     (MiceModule* model) {
   std::vector<const MiceModule*> modules   =
              model->findModulesByPropertyString("SensitiveDetector", "Virtual");
   std::vector<const MiceModule*> envelopes =
@@ -270,9 +290,6 @@ void VirtualPlaneManager::ConstructVirtualPlanes
   for (unsigned int i = 0; i < modules.size(); i++) {
     AddPlane(new VirtualPlane(ConstructFromModule(modules[i])), modules[i]);
   }
-  _field = field;
-  if (_field == NULL) _field = &_default_field;
-  VirtualPlane::_field = _field;
 }
 
 VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
