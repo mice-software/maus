@@ -522,7 +522,7 @@ bool TOFCalibrationMap::LoadT0Calib() {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadT0Calib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -549,7 +549,7 @@ bool TOFCalibrationMap::LoadTWCalib() {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadTWCalib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -571,7 +571,7 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
     }
   } catch(Squeal e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTriggerFile. Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadTriggerCalib. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }

@@ -80,7 +80,13 @@ class ReducePyTofCalib: # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
-        spill = json.loads(spill_doc)
+        try:
+            spill = json.loads(spill_doc)
+        except ValueError:
+            spill = {"errors": {"bad_json_document":
+                                "unable to do json.loads on input"} }
+            return json.dumps(spill)
+ 
         if 'daq_event_type' not in spill:
             raise ValueError("No event type")
 
@@ -91,10 +97,13 @@ class ReducePyTofCalib: # pylint: disable=R0902
               or spill["daq_event_type"] == "end_of_run":
             data_spill = False
 
-        self.rnum = spill["run_number"]
+        self.rnum = '000'
+        if 'run_number' in spill:
+            self.rnum = spill["run_number"]
         # Get TOF slab hits & fill the relevant histograms.
-        if data_spill and not self.get_slab_hits(spill): 
-            raise ValueError("slab_hits not in spill")
+        #if data_spill and not self.get_slab_hits(spill): 
+            # raise ValueError("slab_hits not in spill")
+        self.get_slab_hits(spill)
 
         return spill_doc
 
@@ -108,12 +117,14 @@ class ReducePyTofCalib: # pylint: disable=R0902
         the spill.
         """
         if 'recon_events' not in spill:
-            raise ValueError("recon_events not in spill")
+            # raise ValueError("recon_events not in spill")
+            return False
         # print 'nevt = ', len(spill['recon_events']), spill['recon_events']
         for evn in range(len(spill['recon_events'])):
             if 'tof_event' not in spill['recon_events'][evn]:
                 # print 'no tof event'
-                raise ValueError("tof_event not in recon_events")
+                # raise ValueError("tof_event not in recon_events")
+                return False
             # Return if we cannot find slab_hits in the event.
             if 'tof_slab_hits' not in spill['recon_events'][evn]['tof_event']:
                 return False
@@ -134,19 +145,24 @@ class ReducePyTofCalib: # pylint: disable=R0902
             self.t0[0] = self.t1[0] = self.t2[0] = self.t3[0] = 0.
             self.t4[0] = self.t5[0] = self.t6[0] = self.t7[0] = 0.
             self.t8[0] = self.t9[0] = self.t10[0] = self.t11[0] = 0.
-       
-            # loop over detector stations ie tof0,tof1,tof2
+      
+            ntof0_sh = ntof1_sh = ntof2_sh = 0
+            if 'tof0' not in slabhits or slabhits['tof0'] == None:
+                continue
+            if 'tof1' not in slabhits or slabhits['tof1'] == None:
+                continue
+            if 'tof2' not in slabhits or slabhits['tof2'] == None:
+                continue
+            ntof0_sh = len(slabhits['tof0'])
+            ntof1_sh = len(slabhits['tof1'])
+            ntof2_sh = len(slabhits['tof2'])
+
+            # require 2 hits in each TOF
+            # perhaps this requirement is too stringent (?)
+            if ntof0_sh != 2 or ntof1_sh != 2 or ntof2_sh != 2:
+                continue
             for index, station in enumerate(dets):
-                # leave if we cannot find slab hits for this detector
-                if station not in slabhits:
-                    continue
                 dethits = slabhits[station]
-                # print 'idx,stn: ',index,station,len(dethits),dethits
-                # loop over all slab hits for this detector station
-                if dethits == None:
-                    continue
-                if len(dethits) != 2:
-                    continue
                 for i in range(len(dethits)):
                     # make sure it is not null
                     if (dethits[i]):
@@ -211,6 +227,7 @@ class ReducePyTofCalib: # pylint: disable=R0902
                                 self.t9[0] = rt1
                                 self.adc10[0] = q0
                                 self.adc11[0] = q1
+                # print station,len(dethits)
             self.dataTree.Fill()
         return True
 

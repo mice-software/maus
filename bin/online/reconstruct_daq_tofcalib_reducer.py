@@ -55,7 +55,7 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
-    my_map.append(MAUS.MapCppTOFSpacePoints())
+    # my_map.append(MAUS.MapCppTOFSpacePoints())
     # Calib reducer.
     # The C++ reducer crashes somewhere related to swig
     # The Python reducer works OK

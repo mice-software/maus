@@ -153,6 +153,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Has an end_of_run been processed?
         self.run_ended = False
         self.spillnum = 0
+        self.have_sp = False
 
     def _configure_at_birth(self, config_doc):
         """
@@ -209,7 +210,9 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # Get TOF space points & fill histograms.
         if data_spill and not self.get_space_points(spill):
-            raise ValueError("space_points not in spill")
+            # raise ValueError("space_points not in spill")
+            self.have_sp = False
+            print __name__, ': ', 'No space_points in spill'
 
         # Refresh canvases at requested frequency.
         if self.spill_count % self.refresh_rate == 0:
@@ -325,6 +328,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 sp_tof2 = space_points['tof2']
 
             # print 'nsp012= ', evn, len(sp_tof0), len(sp_tof1), len(sp_tof2)
+            self.have_sp = True
          
             # TOF0
             if sp_tof0:
@@ -411,7 +415,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @param self Object reference.
         """ 
         # have root run quietly without verbose informationals
-        ROOT.gErrorIgnoreLevel = 1001
+        ROOT.gErrorIgnoreLevel = 4001
 
         # white canvas
         ROOT.gROOT.SetStyle("Plain")
@@ -706,44 +710,45 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 leg.AddEntry(self.hpmthits[2][plane][pmt], "TOF2,"+pnum, "l")
                 self.canvas_pmt[ind].Update()
 
-        leg = self.canvas_nsp.BuildLegend(0.6, 0.7, 0.89, 0.89)
-        leg.Clear()
-        leg.AddEntry(self.hnsp_0, "TOF0", "l")
-        leg.AddEntry(self.hnsp_1, "TOF1", "l")
-        leg.AddEntry(self.hnsp_2, "TOF2", "l")
-        self.canvas_nsp.Update()
+        if self.have_sp is True:
+            leg = self.canvas_nsp.BuildLegend(0.6, 0.7, 0.89, 0.89)
+            leg.Clear()
+            leg.AddEntry(self.hnsp_0, "TOF0", "l")
+            leg.AddEntry(self.hnsp_1, "TOF1", "l")
+            leg.AddEntry(self.hnsp_2, "TOF2", "l")
+            self.canvas_nsp.Update()
 
-        leg = self.canvas_nsp_spill.BuildLegend(0.6, 0.7, 0.89, 0.89)
-        leg.Clear()
-        leg.AddEntry(self.hnsp_spill[0], "TOF0", "l")
-        leg.AddEntry(self.hnsp_spill[1], "TOF1", "l")
-        leg.AddEntry(self.hnsp_spill[2], "TOF2", "l")
-        all_max_y = []
-        for i in range (3):
-            a_hist = self.hnsp_spill[i]
-            all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
-        for i in range (3):
-            self.hnsp_spill[i].SetMaximum(max(all_max_y)*1.1+1)
-        self.canvas_nsp_spill.Update()
+            leg = self.canvas_nsp_spill.BuildLegend(0.6, 0.7, 0.89, 0.89)
+            leg.Clear()
+            leg.AddEntry(self.hnsp_spill[0], "TOF0", "l")
+            leg.AddEntry(self.hnsp_spill[1], "TOF1", "l")
+            leg.AddEntry(self.hnsp_spill[2], "TOF2", "l")
+            all_max_y = []
+            for i in range (3):
+                a_hist = self.hnsp_spill[i]
+                all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
+            for i in range (3):
+                self.hnsp_spill[i].SetMaximum(max(all_max_y)*1.1+1)
+            self.canvas_nsp_spill.Update()
 
-        self.canvas_nsp_vs_spill.Update()
+            self.canvas_nsp_vs_spill.Update()
 
-        leg = self.canvas_sp_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
-        leg.Clear()
-        leg.AddEntry(self.hspslabx_0, "TOF0", "l")
-        leg.AddEntry(self.hspslabx_1, "TOF1", "l")
-        leg.AddEntry(self.hspslabx_2, "TOF2", "l")
-        self.canvas_sp_x.Update()
-        leg = self.canvas_sp_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
-        leg.Clear()
-        leg.AddEntry(self.hspslaby_0, "TOF0", "l")
-        leg.AddEntry(self.hspslaby_1, "TOF1", "l")
-        leg.AddEntry(self.hspslaby_2, "TOF2", "l")
-        self.canvas_sp_y.Update()
-        for i in range (3):
-            self.canvas_sp_xy[i].Update()
-        for i in range (3):
-            self.canvas_tof[i].Update()
+            leg = self.canvas_sp_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
+            leg.Clear()
+            leg.AddEntry(self.hspslabx_0, "TOF0", "l")
+            leg.AddEntry(self.hspslabx_1, "TOF1", "l")
+            leg.AddEntry(self.hspslabx_2, "TOF2", "l")
+            self.canvas_sp_x.Update()
+            leg = self.canvas_sp_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
+            leg.Clear()
+            leg.AddEntry(self.hspslaby_0, "TOF0", "l")
+            leg.AddEntry(self.hspslaby_1, "TOF1", "l")
+            leg.AddEntry(self.hspslaby_2, "TOF2", "l")
+            self.canvas_sp_y.Update()
+            for i in range (3):
+                self.canvas_sp_xy[i].Update()
+            for i in range (3):
+                self.canvas_tof[i].Update()
 
     def get_histogram_images(self):       
         """
