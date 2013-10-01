@@ -1,0 +1,16 @@
+
+Module SDErrorTest
+{
+  PropertyString Material            Fe
+  PropertyHep3Vector Dimensions 10. 10. 50. m
+  PropertyInt Cell 1
+
+  Module Envelope
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. m
+    PropertyHep3Vector Position 0. 0. 2. m
+    PropertyString     SensitiveDetector Error
+  }
+}
+

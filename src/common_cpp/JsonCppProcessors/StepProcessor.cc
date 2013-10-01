@@ -33,6 +33,10 @@ StepProcessor::StepProcessor() {
                                                       &Step::SetPosition, true);
     RegisterValueBranch("momentum", &_three_vec_proc, &Step::GetMomentum,
                                                       &Step::SetMomentum, true);
+    RegisterValueBranch("b_field", &_three_vec_proc, &Step::GetBField,
+                                                     &Step::SetBField, true);
+    RegisterValueBranch("e_field", &_three_vec_proc, &Step::GetEField,
+                                                     &Step::SetEField, true);
 }
 }
 

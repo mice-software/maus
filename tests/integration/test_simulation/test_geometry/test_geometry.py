@@ -57,9 +57,8 @@ class MapCppSimulationTestCase(unittest.TestCase): # pylint: disable = R0904
         outname = out_dir+'/test_geometry_'+filename
         my_stdout = open(outname, 'w')
         proc = subprocess.Popen(args, stdout=my_stdout, \
-                                      stderr=my_stdout)
+                                      stderr=subprocess.STDOUT)
         proc.wait()
-        my_stdout.close()
         self.assertEqual(proc.returncode, 0, 
             msg="Test geometry failed in "+filename+" with return code "+\
                 str(proc.returncode)+". Output in "+outname)

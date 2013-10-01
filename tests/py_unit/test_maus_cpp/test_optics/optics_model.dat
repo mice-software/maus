@@ -1,0 +1,37 @@
+
+Configuation OpticsTest
+{
+  PropertyHep3Vector Dimensions 10 10 10 m
+  PropertyString Material Galactic
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 1000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 2000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 3000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 4000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+  Module Virtual
+  {
+      PropertyString Volume None
+      PropertyHep3Vector Position 0.0 0.0 5000. mm
+      PropertyString SensitiveDetector Virtual
+  }
+}
+
