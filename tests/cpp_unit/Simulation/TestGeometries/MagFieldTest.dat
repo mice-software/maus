@@ -1,0 +1,17 @@
+
+Module FieldTest
+{
+//Physical model
+  PropertyString Material            Fe
+  PropertyHep3Vector Dimensions 1. 1. 1. m
+//Field model
+  Module Field
+  {
+    Volume None
+    PropertyString FieldType     CylindricalField
+    PropertyHep3Vector ConstantField 1. 2. 3.
+    PropertyDouble     Length        1. m
+    PropertyDouble     FieldRadius   1. m
+  }
+}
+

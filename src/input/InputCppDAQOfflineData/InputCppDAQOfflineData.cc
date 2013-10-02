@@ -18,7 +18,7 @@
 #include "src/input/InputCppDAQOfflineData/InputCppDAQOfflineData.hh"
 
 InputCppDAQOfflineData::InputCppDAQOfflineData(std::string pDataPath, std::string pFilename)
-:InputCppDAQData::InputCppDAQData(), _dataPaths(pDataPath), _datafiles(pFilename), _eventsCount(0) {
+:InputCppDAQData::InputCppDAQData(), _dataPaths(pDataPath), _datafiles(pFilename) {
   _classname = "InputCppDAQOfflineData";
 }
 
@@ -93,7 +93,6 @@ bool InputCppDAQOfflineData::readNextEvent() {
     if (_eventsCount >= _maxNumEvents)
       return false;
 
-  _eventsCount++;
 
   // cout << "InputCppDAQData::readNextEvent   event " << _eventsCount << endl;
 

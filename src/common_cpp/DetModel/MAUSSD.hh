@@ -27,6 +27,8 @@
 #define _COMMONCPP_DETMODEL_MAUSSD_H_
 
 #include <vector>
+#include <string>
+#include <map>
 
 #include "json/json.h"
 
@@ -36,21 +38,50 @@
 
 namespace MAUS {
 
+/** MAUSSD is the base class for all G4 sensitive detectors
+ *
+ *  MAUSSD provides an abstraction layer for sensitive detectors to provide a
+ *  common interface; handled by DetectorConstruction
+ */
 class MAUSSD : public G4VSensitiveDetector {
  public:
+  /** Constructor for the MAUSSD
+   *
+   *  Use the module name to generate the sensitive detector name. Geant4 uses
+   *  name as a unique ID for the sensitive detector.
+   */
   explicit MAUSSD(MiceModule* mod);
 
+  /** True if the SD has at least one hit in its _hits array */
   bool isHit();
+
+  /** Returns the number of hits in the Sensitive Detector */
   int GetNHits() { return _hits.size(); }
+
+  /** Clears all hits in the sensitive detector */
   void ClearHits() { _hits.clear(); }
+
+  /** Return the detector hits */
   Json::Value GetHits() { return _hits; }
+
+  /** Reset the SD list
+   *
+   *  If the Geant4 SD list has been modified during this geometry iteration,
+   *  inactive all SDs from this geometry iteration and increment the iteration
+   *  number.
+   */
+  static void ResetSDs();
 
  protected:
   Json::Value _hits;
 
   MiceModule* _module;
-};
+  static std::string namePrefix();
 
+ private:
+  static int _uniqueID;
+  static std::map<std::string, bool> _hasVolumes;
+};
 }  //  ends MAUS namespace
 
 #endif  //  _COMMONCPP_DETMODEL_MAUSSD_H_

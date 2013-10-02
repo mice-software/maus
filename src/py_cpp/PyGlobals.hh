@@ -45,24 +45,38 @@ static PyObject* Birth(PyObject *dummy, PyObject *args);
  * Delete MAUS globals. Ignores all arguments. Throws a RuntimeError if MAUS
  * globals were never set. Returns Py_None.
  */
-PyObject* Death(PyObject *dummy, PyObject *args);
+static PyObject* Death(PyObject *dummy, PyObject *args);
 
 /* @brief Check if MAUS has been initialised
  *
  * Check for initalisation of MAUS globals. Ignores all arguments. Returns
  * PyObject integer 1 if library is initialised, 0 if it is not
  */
-PyObject* HasInstance(PyObject *dummy, PyObject *args);
+static PyObject* HasInstance(PyObject *dummy, PyObject *args);
 
 /* @brief Get Json configuration datacards
  *
  * Returns NULL if Globals were not initialised
  */
-PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args);
+static PyObject* GetConfigurationCards(PyObject* dummy, PyObject* args);
+
+/* @brief Get Monte Carlo MiceModules
+ *
+ * Returns NULL if Globals were not initialised
+ */
+static PyObject* GetMonteCarloMiceModules
+                              (PyObject* dummy, PyObject* args, PyObject *kwds);
+
+/* @brief Get Monte Carlo MiceModules
+ *
+ * Returns NULL if Globals were not initialised
+ */
+static PyObject* SetMonteCarloMiceModules
+                              (PyObject* dummy, PyObject* args, PyObject *kwds);
 
 /* @brief Get the MAUS version number as a Python string like x.y.z
  */
-PyObject* GetVersionNumber(PyObject *dummy, PyObject *args);
+static PyObject* GetVersionNumber(PyObject *dummy, PyObject *args);
 }  // namespace PyGlobals
 }  // namespace MAUS
 

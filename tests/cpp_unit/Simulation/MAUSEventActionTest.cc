@@ -40,6 +40,7 @@ TEST(MAUSEventActionTest, SetGetEventsTest) {
 TEST(MAUSEventActionTest, BeginOfEventActionTest) {
     MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
     Json::Value tracks(Json::arrayValue);
+    _g4->GetEventAction()->SetEvents(Json::Value(Json::arrayValue));
     tracks[Json::Value::UInt(0)] = Json::Value(1);
     Json::Value virtual_hits;
     virtual_hits[1] = Json::Value(0);

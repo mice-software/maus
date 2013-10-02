@@ -5,6 +5,16 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.7.1
+  The following changes were made:
+    - Memory leak fix for MAUS-Online
+    - New KL reducer 
+    - Python-TofCalib reducer and updated TOF plots
+    - Optics API
+    - Various changes to MC, added MuScat data
+    - New third party library - numpy
+  If upgrading from a previous version, redo the entire installation
+
 MAUS-v0.7.0
   The following functionality was added:
     - SciFi Track Reconstruction
