@@ -58,10 +58,8 @@ TEST_F(TrackerDataPlotterInfoBoxTest, TestConstructor) {
   EXPECT_EQ(0, infoBox->_tot_5stracks_t2);
   EXPECT_EQ(0, infoBox->_tot_4stracks_t2);
   EXPECT_EQ(0, infoBox->_tot_3stracks_t2);
-  EXPECT_EQ(275, infoBox->_canvas_width);
-  EXPECT_EQ(600, infoBox->_canvas_height);
-  EXPECT_EQ(0.585, infoBox->_line1_pos);
-  EXPECT_EQ(0.93, infoBox->_line2_pos);
+  EXPECT_EQ(300, infoBox->_canvas_width);
+  EXPECT_EQ(750, infoBox->_canvas_height);
   delete infoBox;
 
   // Test the copy constructor

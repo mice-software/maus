@@ -45,9 +45,12 @@ TCanvas* TrackerDataPlotterSZ::operator() ( TrackerData &t1, TrackerData &t2, TC
   if ( aCanvas ) {
     // TODO check number of pads = 6
     lCanvas = aCanvas;
-  } else { // If the local canvas is setup, delete it, and make it fresh
-    if ( _Canvas ) delete _Canvas;
+  } else {
+    if (_Canvas) {
+      _Canvas->Clear();
+    } else {
     _Canvas = new TCanvas("sz", "Track S-Z Projection", 200, 10, 700, 500);
+    }
     _Canvas->Divide(2);
     lCanvas = _Canvas;
   }

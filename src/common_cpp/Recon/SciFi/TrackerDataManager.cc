@@ -157,6 +157,8 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
       if ( trk->get_num_points() == 5 ) ++_t1._num_htracks_5pt;
       if ( trk->get_num_points() == 4 ) ++_t1._num_htracks_4pt;
       if ( trk->get_num_points() == 3 ) ++_t1._num_htracks_3pt;
+      if ( trk->get_charge() == 1 ) ++_t1._num_pos_tracks;
+      if ( trk->get_charge() == -1 ) ++_t1._num_neg_tracks;
       _t1._seeds_z.push_back(z_i);
       _t1._seeds_phi.push_back(phi_i);
       _t1._seeds_s.push_back(s_i);
@@ -169,6 +171,8 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
       if ( trk->get_num_points() == 5 ) ++_t2._num_htracks_5pt;
       if ( trk->get_num_points() == 4 ) ++_t2._num_htracks_4pt;
       if ( trk->get_num_points() == 3 ) ++_t2._num_htracks_3pt;
+      if ( trk->get_charge() == 1 ) ++_t2._num_pos_tracks;
+      if ( trk->get_charge() == -1 ) ++_t2._num_neg_tracks;
       _t2._seeds_z.push_back(z_i);
       _t2._seeds_phi.push_back(phi_i);
       _t2._seeds_s.push_back(s_i);
@@ -258,9 +262,10 @@ void TrackerDataManager::print_track_info(const SciFiHelicalPRTrack * const trk,
   std::cout << "Tracker " << trk->get_tracker() << + ", ";
   std::cout << "Track " << trk_num << ", ";
   std::cout << "Num points " << trk->get_num_points() << ", ";
+  std::cout << "Charge " << trk->get_charge() << ", ";
   std::cout << "R = " << std::setprecision(4) << trk->get_R() << "mm, ";
   std::cout << "X0 = " << std::setprecision(4) << trk->get_circle_x0() << "mm, ";
-  std::cout << "Y0 = " <<  std::setprecision(4) << trk->get_circle_y0() << "mm, ";
+  std::cout << "Y0 = " <<  std::setprecision(4) << trk->get_circle_y0() << "mm,\n";
   std::cout << "dsdz " <<  std::setprecision(4) << trk->get_dsdz() << ", ";
   std::cout << "pt = " <<  std::setprecision(4) << pt << "MeV/c, ";
   std::cout << "pz = " <<  std::setprecision(4) << pz << "MeV/c, ";
@@ -275,15 +280,15 @@ void TrackerDataManager::print_seed_info(const SciFiHelicalPRTrack * const trk, 
   MAUS::ThreeVector mom = clus->get_true_momentum();
   double t = trk->get_spacepoints()[seed_num]->get_time();
   double pt_mc = sqrt(mom.x()*mom.x()+mom.y()*mom.y());
-  std::cout <<  std::setprecision(4) << pos.x() << "\t";
-  std::cout <<  std::setprecision(4) << pos.y() << "\t";
-  std::cout <<  std::setprecision(4) << pos.z() << "\t";
-  std::cout <<  std::setprecision(12) << t << "\t";
-  std::cout <<  std::setprecision(4) << trk->get_phi()[seed_num] << "\t";
-  std::cout <<  std::setprecision(4) << mom.x() << "\t";
-  std::cout <<  std::setprecision(4) << mom.y() << "\t";
-  std::cout <<  std::setprecision(4) << pt_mc << "\t";
-  std::cout <<  std::setprecision(4) << mom.z() << "\n";
+  std::cout << std::setprecision(4) << pos.x() << "\t";
+  std::cout << std::setprecision(4) << pos.y() << "\t";
+  std::cout << std::setprecision(4) << pos.z() << "\t";
+  std::cout << std::setprecision(12) << t << "\t";
+  std::cout << std::setprecision(4) << trk->get_phi()[seed_num] << "\t";
+  std::cout << std::setprecision(4) << mom.x() << "\t";
+  std::cout << std::setprecision(4) << mom.y() << "\t";
+  std::cout << std::setprecision(4) << pt_mc << "\t";
+  std::cout << std::setprecision(4) << mom.z() << "\n";
 };
 
 } // ~namespace MAUS
