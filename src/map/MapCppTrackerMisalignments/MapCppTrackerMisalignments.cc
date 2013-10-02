@@ -29,23 +29,21 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
                             _spill_json(NULL),
                             _spill_cpp(NULL),
                             _root_file(NULL),
+                            _station_rms(0.),
                             _tracker0_graphs(NULL),
+                            _tracker1_graphs(NULL),
                             _t0s2_x(NULL),
                             _t0s3_x(NULL),
                             _t0s4_x(NULL),
-                            _t0s2_y(NULL),
-                            _t0s3_y(NULL),
-                            _t0s4_y(NULL),
-                            _tracker1_graphs(NULL),
                             _t1s2_x(NULL),
                             _t1s3_x(NULL),
                             _t1s4_x(NULL),
-                            _t1s2_y(NULL),
-                            _t1s3_y(NULL),
-                            _t1s4_y(NULL),
-                            t1st2residual(NULL),
-                            t1st3residual(NULL),
-                            t1st4residual(NULL), //{//,
+                            _t0st2residual(NULL),
+                            _t0st3residual(NULL),
+                            _t0st4residual(NULL),
+                            _t1st2residual(NULL),
+                            _t1st3residual(NULL),
+                            _t1st4residual(NULL),
                             _jointPDF() {
   _root_file = new TFile("misalignments.root", "RECREATE");
 
@@ -63,7 +61,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
   _t0s4_x->SetName("t0s4_x");
   _t0s4_x->SetTitle("tracker 0, station 4, #Delta x");
   _t0s4_x->SetLineColor(kGreen);
-
+/*
   _t0s2_y = new TGraph();
   _t0s2_y->SetName("t0s2_y");
   _t0s2_y->SetTitle("tracker 0, station 2, #Delta y");
@@ -79,6 +77,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
   _t0s4_y->SetTitle("tracker 0, station 4, #Delta y");
   _t0s4_y->SetLineColor(kGreen);
   _t0s4_y->SetLineStyle(2);
+*/
   // Tracker 1 Graphs -------------
   _tracker1_graphs = new TMultiGraph("tracker1", "tracker1");
   _t1s2_x = new TGraph();
@@ -93,7 +92,7 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
   _t1s4_x->SetName("t1s4_x");
   _t1s4_x->SetTitle("tracker 1, station 4, #Delta x");
   _t1s4_x->SetLineColor(kGreen);
-
+/*
   _t1s2_y = new TGraph();
   _t1s2_y->SetName("t1s2_y");
   _t1s2_y->SetTitle("tracker 1, station 2, #Delta y");
@@ -109,12 +108,11 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
   _t1s4_y->SetTitle("tracker 1, station 4, #Delta y");
   _t1s4_y->SetLineColor(kGreen);
   _t1s4_y->SetLineStyle(2);
-
+*/
   std::vector<TGraph*> tracker0_graphs;
   std::vector<TGraph*> tracker1_graphs;
   _graph_map.push_back(tracker0_graphs);
   _graph_map.push_back(tracker1_graphs);
-
   _graph_map[0].push_back(_t0s2_x);
   _graph_map[0].push_back(_t0s3_x);
   _graph_map[0].push_back(_t0s4_x);
@@ -122,9 +120,22 @@ MapCppTrackerMisalignments::MapCppTrackerMisalignments()
   _graph_map[1].push_back(_t1s3_x);
   _graph_map[1].push_back(_t1s4_x);
 
-  t1st2residual = new TH1D("t1st2residual", "t1st2residual", 70, -2, 2);
-  t1st3residual = new TH1D("t1st3residual", "t1st3residual", 70, -2, 2);
-  t1st4residual = new TH1D("t1st4residual", "t1st4residual", 70, -2, 2);
+  _t0st2residual = new TH1D("t0st2residual", "t0st2residual", 100, -2, 2);
+  _t0st3residual = new TH1D("t0st3residual", "t0st3residual", 100, -2, 2);
+  _t0st4residual = new TH1D("t0st4residual", "t0st4residual", 100, -2, 2);
+  _t1st2residual = new TH1D("t1st2residual", "t1st2residual", 100, -2, 2);
+  _t1st3residual = new TH1D("t1st3residual", "t1st3residual", 100, -2, 2);
+  _t1st4residual = new TH1D("t1st4residual", "t1st4residual", 100, -2, 2);
+  std::vector<TH1D*> tracker0_residuals;
+  std::vector<TH1D*> tracker1_residuals;
+  _residuals.push_back(tracker0_residuals);
+  _residuals.push_back(tracker1_residuals);
+  _residuals[0].push_back(_t0st2residual);
+  _residuals[0].push_back(_t0st3residual);
+  _residuals[0].push_back(_t0st4residual);
+  _residuals[1].push_back(_t1st2residual);
+  _residuals[1].push_back(_t1st3residual);
+  _residuals[1].push_back(_t1st4residual);
 }
 
 MapCppTrackerMisalignments::~MapCppTrackerMisalignments() {
@@ -134,12 +145,27 @@ MapCppTrackerMisalignments::~MapCppTrackerMisalignments() {
   if (_spill_cpp != NULL) {
       delete _spill_cpp;
   }
-
-  // _x_shift_pdfs
-  // _y_shift_pdfs
 }
 
 bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
+  try {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    Json::Value *json = Globals::GetConfigurationCards();
+    _station_rms = (*json)["SciFiParams_RMS"].asDouble();
+    _station_rms/=1000.; // convert microns to mm.
+    initialize_PDFs();
+    return true;
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
+}
+
+void MapCppTrackerMisalignments::initialize_PDFs() {
   std::string lname("joint");
   std::string pname("prob_station3");
   double shift_min = -3.;
@@ -147,10 +173,9 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
   double bin_width = 0.001;
 
   _jointPDF = JointPDF(lname, bin_width, shift_min, shift_max);
-  double sigma = 0.43; // mm
 
   int number_of_tosses = 700000000;
-  _jointPDF.Build("gaussian", sigma, number_of_tosses);
+  _jointPDF.Build("gaussian", _station_rms, number_of_tosses);
 
   std::vector<PDF> tracker0_x_PDFS;
   std::vector<PDF> tracker1_x_PDFS;
@@ -170,84 +195,50 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
       tracker_n << tracker;
       pname_x = pname_x + tracker_n.str()+ station_n.str();
       pname_y = pname_y + tracker_n.str()+ station_n.str();
-      //PDF *probability_x = new PDF(pname_x, bin_width, shift_min, shift_max);
-      //PDF *probability_y = new PDF(pname_y, bin_width, shift_min, shift_max);
       PDF probability_x(pname_x, bin_width, shift_min, shift_max);
       PDF probability_y(pname_y, bin_width, shift_min, shift_max);
       _x_shift_pdfs[tracker].push_back(probability_x);
       _y_shift_pdfs[tracker].push_back(probability_y);
     }
   }
-  try {
-    if (!Globals::HasInstance()) {
-      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
-    // Json::Value *json = Globals::GetConfigurationCards();
-    // _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
-    return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-  }
-  return false;
 }
 
 bool MapCppTrackerMisalignments::death() {
   _tracker0_graphs->Add(_t0s2_x);
   _tracker0_graphs->Add(_t0s3_x);
   _tracker0_graphs->Add(_t0s4_x);
-  _tracker0_graphs->Add(_t0s2_y);
-  _tracker0_graphs->Add(_t0s3_y);
-  _tracker0_graphs->Add(_t0s4_y);
 
   _tracker1_graphs->Add(_t1s2_x);
   _tracker1_graphs->Add(_t1s3_x);
   _tracker1_graphs->Add(_t1s4_x);
-  _tracker1_graphs->Add(_t1s2_y);
-  _tracker1_graphs->Add(_t1s3_y);
-  _tracker1_graphs->Add(_t1s4_y);
 
   _root_file->cd();
   _tracker0_graphs->Write("", TObject::kOverwrite);
   _tracker1_graphs->Write("", TObject::kOverwrite);
-  // Tracker 0 final PDF's.
-  TH1D *final_probability02 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[0][2].probability()->Clone("x_t0st2"));
-  TH1D *final_probability03 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[0][3].probability()->Clone("x_t0st3"));
-  TH1D *final_probability04 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[0][4].probability()->Clone("x_t0st4"));
 
-  TH1D *final_probability02y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[0][2].probability()->Clone("y_t0st2"));
-  TH1D *final_probability03y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[0][3].probability()->Clone("y_t0st3"));
-  TH1D *final_probability04y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[0][4].probability()->Clone("y_t0st4"));
 
-  // Tracker 1 final PDF's.
-  TH1D *final_probability2 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][2].probability()->Clone("x_t1st2"));
-  TH1D *final_probability3 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][3].probability()->Clone("x_t1st3"));
-  TH1D *final_probability4 = reinterpret_cast<TH1D*>
-                              (_x_shift_pdfs[1][4].probability()->Clone("x_t1st4"));
+  std::cerr << "-----------------------------------"
+            << "Reached run end; Misaligments are: " << std::endl;
 
-  TH1D *final_probability2y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][2].probability()->Clone("y_t1st2"));
-  TH1D *final_probability3y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][3].probability()->Clone("y_t1st3"));
-  TH1D *final_probability4y = reinterpret_cast<TH1D*>
-                              (_y_shift_pdfs[1][4].probability()->Clone("y_t1st4"));
+  for ( int tracker = 0; tracker < 2; tracker++ ) {
+    for ( int station = 2; station < 5; station++ ) {
+      _x_shift_pdfs[tracker][station].probability()->Write("", TObject::kOverwrite);
+      _y_shift_pdfs[tracker][station].probability()->Write("", TObject::kOverwrite);
+      std::cerr << tracker << " " << station << ": "
+                << _x_shift_pdfs[tracker][station].probability()->GetMean() << " +/- "
+                << _x_shift_pdfs[tracker][station].probability()->GetRMS() << std::endl;
+    }
+  }
 
-  TH1D *likelihood = reinterpret_cast<TH1D*>
+  TH1D *likelihood = static_cast<TH1D*>
                      ((_jointPDF.GetLikelihood(1.2)).Clone("likelihood"));
 
-  TH2D *joint = reinterpret_cast<TH2D*>
-                           (_jointPDF.GetJointPDF()->Clone("joint"));
+  TH2D *joint = static_cast<TH2D*>
+                (_jointPDF.GetJointPDF()->Clone("joint"));
 
-  _root_file->Write();
+  likelihood->Write("", TObject::kOverwrite);
+  joint->Write("", TObject::kOverwrite);
+
   _root_file->Close();
 
   return true;
@@ -310,8 +301,8 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
     save_to_json(spill);
   } catch(Squeal& squee) {
     squee.Print();
-    // _spill_json = MAUS::CppErrorHandler::getInstance()
-    //                                   ->HandleSqueal(_spill_json, squee, _classname);
+    *_spill_json = MAUS::CppErrorHandler::getInstance()
+                                       ->HandleSqueal(_spill_json, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
@@ -370,7 +361,7 @@ void MapCppTrackerMisalignments::process(SpacePointArray spacepoints) {
     double x_residual = projected_x - (position.x() + _x_shift_pdfs[tracker][station].GetMean());
     double y_residual = projected_y - (position.y() + _y_shift_pdfs[tracker][station].GetMean());
     if ( x_residual != x_residual || y_residual != y_residual ) return;
-    if ( fabs(x_residual) > 2. || fabs(y_residual) > 2. ) return;
+    if ( fabs(x_residual) > 3. || fabs(y_residual) > 3. ) return;
 
     double old_x = _x_shift_pdfs[tracker][station].GetMean();
     double old_y = _y_shift_pdfs[tracker][station].GetMean();
@@ -381,10 +372,12 @@ void MapCppTrackerMisalignments::process(SpacePointArray spacepoints) {
     _y_shift_pdfs[tracker][station].
                   ComputeNewPosterior(_jointPDF.GetLikelihood(new_y_shift));
 
-    // _residuals[tracker][station]->Fill(x_residual);
+    _residuals[tracker][station-2]->Fill(x_residual);
+    /*
+    // Uncomment this section for saving the evolution of the PDF
+    // in station 3 of tracker 1.
     if ( tracker == 1 && station == 3 ) {
       _iteraction++;
-      t1st3residual->Fill(x_residual);
       std::string name("st3_iter_");
       std::ostringstream number;
       number << _iteraction;
@@ -394,11 +387,8 @@ void MapCppTrackerMisalignments::process(SpacePointArray spacepoints) {
                              (_x_shift_pdfs[tracker][station].probability()->Clone(c_name));
       _root_file->cd();
       probability3->Write();
-    } else if ( station == 2 ) {
-      t1st2residual->Fill(x_residual);
-    } else if ( station == 4 ) {
-      t1st4residual->Fill(x_residual);
     }
+    */
     std::cerr << "Tracker " << tracker << ", station " << station << ": "
               << _x_shift_pdfs[tracker][station].GetMean() << std::endl;
     // Update TGraph.
