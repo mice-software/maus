@@ -4,7 +4,7 @@ type_of_dataflow = 'pipeline_single_thread'
 
 output_json_file_name = "maus_output.json"
 output_json_file_type = "text"
-output_root_file_name = "maus_output.root"
+output_root_file_name = "maus_output_negatives.root"
 
 
 # Used, for now, to determine what level of c++ log messages are reported to the user
