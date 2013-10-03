@@ -33,7 +33,7 @@ maximum_number_of_steps = 1000
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+    "particle_id":13, "energy":226.0, "time":0.0, "random_seed":10
 }
 # geant4 physics model
 physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
