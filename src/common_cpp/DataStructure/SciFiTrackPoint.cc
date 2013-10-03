@@ -82,9 +82,6 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _mc_py = mc_mom.y();
   _mc_pz = mc_mom.z();
 
-  std::cerr << "Recon: " << _x << " " << _px << " " << _y << " " << _py << " " << _pz << std::endl;
-  std::cerr << "MC: " << _mc_x << " " << _mc_px << " " << _mc_y << " " << _mc_py << " " << _mc_pz << std::endl;
-
   _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
   _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
   _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);

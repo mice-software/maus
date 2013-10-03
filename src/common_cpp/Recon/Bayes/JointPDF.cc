@@ -81,7 +81,7 @@ void JointPDF::Build(std::string model, double sigma, int number_of_tosses) {
     std::cerr << "Model not implemented. Aborting" << std::endl;
   }
 
-  TF1 *gaussian = new TF1("gaussian","gaus(0)", _min*2., _max*2.);
+  TF1 *gaussian = new TF1("gaussian", "gaus(0)", _min*2., _max*2.);
   gaussian->SetParameters(1, 0., sigma);
 
   TH1F *h = new TH1F("temp", "temp", _n_bins*2, _min*2., _max*2.);

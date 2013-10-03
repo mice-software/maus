@@ -258,7 +258,7 @@ std::vector< std::vector<MAUS::SciFiSpacePoint*> >
 
   // Iterate over all the spacepoints and fill the container.
   std::vector<SciFiSpacePoint*>::iterator spacepoint;
-  for( spacepoint = all_spacepoints.begin();
+  for ( spacepoint = all_spacepoints.begin();
        spacepoint != all_spacepoints.end(); spacepoint++ ) {
     int tracker = (*spacepoint)->get_tracker();
     container[tracker].push_back(*spacepoint);
@@ -393,7 +393,8 @@ void MapCppTrackerMisalignments::process(SpacePointArray spacepoints) {
               << _x_shift_pdfs[tracker][station].GetMean() << std::endl;
     // Update TGraph.
     int n_points = _graph_map[tracker][station-2]->GetN();
-    _graph_map[tracker][station-2]->SetPoint(n_points, n_points, _x_shift_pdfs[tracker][station].GetMean());
+    _graph_map[tracker][station-2]->SetPoint(n_points, n_points,
+                                    _x_shift_pdfs[tracker][station].GetMean());
   }
 }
 
