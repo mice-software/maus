@@ -354,6 +354,7 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
 //    double ZNum = it->second->GetZ();
 //    double ANum = it->second->GetA();
     double meanExE = it->second->GetIonisation()->GetMeanExcitationEnergy();
+    std::cerr << it->second->GetName() << " " << X0 << " " << meanExE << std::endl;
     double densityCor = it->second->GetIonisation()->GetAdensity();
     materials_list->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, -1, -1, meanExE, densityCor );
 //    materials_list->updateProperties( it->first, chemical, density, state, temp, press, edens, X0, L0, ZNum, ANum, meanExE, densityCor );

@@ -160,7 +160,8 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   int numb_planes = abs(new_site->id() - old_site->id());
   double total_plane_length = numb_planes*plane_width;
   // Plane lenght in units of radiation lenght (~0.0015 per plane).
-  double plane_L0 = FibreParameters.R0(total_plane_length);
+  double effective_plane_lenght = 0.5*total_plane_length;
+  double plane_L0 = FibreParameters.R0(effective_plane_lenght);
   // Get particle's parameters (gradients and total momentum).
   TMatrixD a = new_site->a(KalmanState::Projected);
   double mx  = a(1, 0);
@@ -169,17 +170,19 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
 
   // Compute the fibre effect.
   TMatrixD Q1(_n_parameters, _n_parameters);
-  Q1 = BuildQ(plane_L0, total_plane_length, mx, my, p);
+  Q1 = BuildQ(plane_L0, effective_plane_lenght, mx, my, p);
 
   // Compute Air effect (if necessary).
   TMatrixD Q2(_n_parameters, _n_parameters);
   double deltaZ = new_site->z() - old_site->z();
   // Check if we need to add propagation in air.
-  if ( deltaZ > total_plane_length ) {
+  if ( deltaZ > 3.*plane_width ) {
     double air_lenght = deltaZ-total_plane_length;
     double air_L0     = AirParameters.R0(air_lenght);
     Q2 = BuildQ(air_L0, air_lenght, mx, my, p);
   }
+  Q1.Print();
+  Q2.Print();
 
   _Q = Q1+Q2;
 }

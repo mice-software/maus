@@ -47,40 +47,48 @@ def main(file_name):
     # Momentum histos 
     mom_n_bins = 100
 
-    t1_pt = ROOT.TH1D("t1_pt", "T1 Transverse Momentum", \
+    t1_pt = ROOT.TH1D("t1_pt", "T1 pt", \
                       mom_n_bins, 0, 150)
     t1_pt.GetXaxis().SetTitle("p_{T}^{MC} (MeV/c)")
 
-    t1_pz = ROOT.TH1D("t1_pz", "T1 Longitudinal Momentum", \
-                      mom_n_bins, 50, 300)
+    t1_pz = ROOT.TH1D("t1_pz", "T1 pz", \
+                      mom_n_bins, -300, -50)
     t1_pz.GetXaxis().SetTitle("p_{z}^{MC} (MeV/c)")
 
-    t2_pt = ROOT.TH1D("t2_pt", "T2 Transverse Momentum", \
+    t2_pt = ROOT.TH1D("t2_pt", "T2 pt", \
                       mom_n_bins, 0, 150)
     t2_pt.GetXaxis().SetTitle("p_{T}^{MC} (MeV/c)")
 
-    t2_pz = ROOT.TH1D("t2_pz", "T2 Longitudinal Momentum", \
+    t2_pz = ROOT.TH1D("t2_pz", "T2 pz", \
                       mom_n_bins, 50, 300)
     t2_pz.GetXaxis().SetTitle("p_{z}^{MC} (MeV/c)")
 
     # Momentum residual histos
     res_n_bins = 100
 
-    t1_pt_res = ROOT.TH1D("t1_pt_res", "T1 Transverse Momentum Residual", \
-                      res_n_bins, -10, 10)
+    t1_pt_res = ROOT.TH1D("t1_pt_res", "T1 pt Residual", \
+                      res_n_bins, -5, 5)
     t1_pt_res.GetXaxis().SetTitle("p_{T}^{MC} - p_{T} (MeV/c)")
 
-    t1_pz_res = ROOT.TH1D("t1_pz_res", "T1 Longitudinal Momentum Residual", \
-                      res_n_bins, -200, 400)
+    t1_pz_res = ROOT.TH1D("t1_pz_res", "T1 pz Residual", \
+                      res_n_bins, -30, 30)
     t1_pz_res.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
 
-    t2_pt_res = ROOT.TH1D("t2_pt_res", "T2 Transverse Momentum Residual", \
-                      res_n_bins, -10, 10)
+    t1_pz_res_log = ROOT.TH1D("t1_pz_res_log", "T1 pz Residual", \
+                      res_n_bins, -500, 500)
+    t1_pz_res_log.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
+
+    t2_pt_res = ROOT.TH1D("t2_pt_res", "T2 pt Residual", \
+                      res_n_bins, -5, 5)
     t2_pt_res.GetXaxis().SetTitle("p_{T}^{MC} - p_{T} (MeV/c)")
 
-    t2_pz_res = ROOT.TH1D("t2_pz_res", "T2 Longitudinal Momentum Residual", \
-                      res_n_bins, -200, 400)
+    t2_pz_res = ROOT.TH1D("t2_pz_res", "T2 pz Residual", \
+                      res_n_bins, -30, 30)
     t2_pz_res.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
+
+    t2_pz_res_log = ROOT.TH1D("t2_pz_res_log", "T1 pz Residual", \
+                      res_n_bins, -500, 500)
+    t2_pz_res_log.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
 
     print "Looping over spills"
     for i in range(tree.GetEntries()):
@@ -122,15 +130,17 @@ def main(file_name):
                         pt_mc = pt_mc / trk.get_spacepoints().size()
                         pz_mc = pz_mc / trk.get_spacepoints().size()
                         if trk.get_tracker() == 0:
-                            t1_pt.Fill(pt_mc)
-                            t1_pz.Fill(pz_mc)
+                            t1_pt.Fill(pt)
+                            t1_pz.Fill(pz)
                             t1_pt_res.Fill(pt_mc - pt)
                             t1_pz_res.Fill(pz_mc - (-pz)) # Note extra - sign
+                            t1_pz_res_log.Fill(pz_mc - (-pz))
                         elif trk.get_tracker() == 1:
-                            t2_pt.Fill(pt_mc)
-                            t2_pz.Fill(pz_mc)
+                            t2_pt.Fill(pt)
+                            t2_pz.Fill(pz)
                             t2_pt_res.Fill(pt_mc - pt)
                             t2_pz_res.Fill(pz_mc - pz)
+                            t2_pz_res_log.Fill(pz_mc - pz)
                     else:
                         print "Bad track, skipping"
 
@@ -138,94 +148,61 @@ def main(file_name):
     # Draw the histograms and write to disk
     print "Drawing histograms"
 
-    cMomLog = ROOT.TCanvas("cMomLog","cMomLog")
-    cMomLog.Draw()
-    cMomLog.Divide(2, 2)
-    p1 = cMomLog.cd(1)
-    p1.SetLogy()
+    # Transverse momentum histos
+    cPt = ROOT.TCanvas("cPt","cPt")
+    cPt.Divide(3, 2)
+
+    cPt.cd(1)
     t1_pt.Draw()
-    cMomLog.Update()
-
-    p1 = cMomLog.cd(2)
-    p1.SetLogy()
-    t1_pz.Draw()
-    cMomLog.Update()
-
-    p1 = cMomLog.cd(3)
-    p1.SetLogy()
-    t2_pt.Draw()
-    cMomLog.Update()
-
-    p1 = cMomLog.cd(4)
-    p1.SetLogy()
-    t2_pz.Draw()
-    cMomLog.Update()
-
-    cResLog = ROOT.TCanvas("cResLog","cResLog")
-    cResLog.Draw()
-    cResLog.Divide(2, 2)
-    p1 = cResLog.cd(1)
+    cPt.Update()
+    cPt.cd(2)
+    t1_pt_res.Draw()
+    cPt.Update()
+    p1 = cPt.cd(3)
     p1.SetLogy()
     t1_pt_res.Draw()
-    cResLog.Update()
+    cPt.Update()
 
-    p1 = cResLog.cd(2)
-    p1.SetLogy()
-    t1_pz_res.Draw()
-    cResLog.Update()
-
-    p1 = cResLog.cd(3)
-    p1.SetLogy()
-    t2_pt_res.Draw()
-    cResLog.Update()
-
-    p1 = cResLog.cd(4)
-    p1.SetLogy()
-    t2_pz_res.Draw()
-    cResLog.Update()
-
-    cMom = ROOT.TCanvas("cMom","cMom")
-    cMom.Draw()
-    cMom.Divide(2, 2)
-    cMom.cd(1)
-    t1_pt.Draw()
-    cMom.Update()
-
-    cMom.cd(2)
-    t1_pz.Draw()
-    cMom.Update()
-
-    cMom.cd(3)
+    cPt.cd(4)
     t2_pt.Draw()
-    cMom.Update()
-
-    cMom.cd(4)
-    t2_pz.Draw()
-    cMom.Update()
-
-    cRes = ROOT.TCanvas("cRes","cRes")
-    cRes.Draw()
-    cRes.Divide(2, 2)
-    cRes.cd(1)
-    t1_pt_res.Draw()
-    cRes.Update()
-
-    cRes.cd(2)
-    t1_pz_res.Draw()
-    cRes.Update()
-
-    cRes.cd(3)
+    cPt.Update()
+    cPt.cd(5)
     t2_pt_res.Draw()
-    cRes.Update()
+    cPt.Update()
+    p1 = cPt.cd(6)
+    p1.SetLogy()
+    t2_pt_res.Draw()
+    cPt.Update()
 
-    cRes.cd(4)
+    # Longitudinal momentum histos
+    cPz = ROOT.TCanvas("cPz","cPz")
+    cPz.Divide(3, 2)
+
+    cPz.cd(1)
+    t1_pz.Draw()
+    cPz.Update()
+    cPz.cd(2)
+    t1_pz_res.Draw()
+    cPz.Update()
+    p1 = cPz.cd(3)
+    p1.SetLogy()
+    t1_pz_res_log.Draw()
+    cPz.Update()
+
+    cPz.cd(4)
+    t2_pz.Draw()
+    cPz.Update()
+    cPz.cd(5)
     t2_pz_res.Draw()
-    cRes.Update()
+    cPz.Update()
+    p1 = cPz.cd(6)
+    p1.SetLogy()
+    t2_pz_res_log.Draw()
+    cPz.Update()
 
-    cMomLog.Print('mc_log_momentum_analysis.pdf')
-    cResLog.Print('residual_log_momentum_analysis.pdf')
-    cMom.Print('mc_momentum_analysis.pdf')
-    cRes.Print('residual_momentum_analysis.pdf')
+    # Save the histos
+    cPt.Print('mc_pt_analysis.pdf')
+    cPz.Print('mc_pz_analysis.pdf')
 
     # Save to a ROOT file too
     out_file = ROOT.TFile("momentum_analysis_out.root", "recreate")
@@ -234,6 +211,8 @@ def main(file_name):
     t1_pz.Write()
     t2_pt.Write()
     t2_pz.Write()
+    cPt.Write()
+    cPz.Write()
     out_file.Close()
 
     raw_input("Press any key when ready to close...")
