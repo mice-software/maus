@@ -38,9 +38,9 @@ struct SciFiParams {
   /// Width of the fibre plane in mm.
   double Plane_Width;
   /// Fibre radiation lenght in mm
-  double Radiation_Legth;
+  double Radiation_Length;
   /// Fractional Radiation Length
-  double R0(double lenght) { return lenght/Radiation_Legth; }
+  double R0(double lenght) { return lenght/Radiation_Length; }
   /// Density in g.cm-3
   double Density;
   /// Mean excitation energy in eV.
@@ -59,9 +59,9 @@ struct AirParams {
   /// Air mean atomic number.
   double Z;
   /// Air radiation lenght in mm
-  double Radiation_Legth;
+  double Radiation_Length;
   /// Fractional Radiation Length
-  double R0(double lenght) { return lenght/Radiation_Legth; }
+  double R0(double lenght) { return lenght/Radiation_Length; }
   /// Density in g.cm-3
   double Density;
   /// Mean excitation energy in eV.
