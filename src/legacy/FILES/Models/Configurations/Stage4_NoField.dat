@@ -1,6 +1,6 @@
 //Simple geometry for testing straight track recon in trackers
 
-Configuration TrackerStraightFitTest
+Configuration Stage4_NoField
 {
   Dimensions 6. 6. 31. m
   PropertyString Material AIR
