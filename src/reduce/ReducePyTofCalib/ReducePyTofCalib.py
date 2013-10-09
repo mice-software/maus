@@ -223,8 +223,8 @@ class ReducePyTofCalib: # pylint: disable=R0902
                                 self.adc9[0] = q1
                             if plane_num == 1:
                                 self.slabF[0] = pos
-                                self.t8[0] = rt0
-                                self.t9[0] = rt1
+                                self.t10[0] = rt0
+                                self.t11[0] = rt1
                                 self.adc10[0] = q0
                                 self.adc11[0] = q1
                 # print station,len(dethits)

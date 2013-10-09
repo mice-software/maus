@@ -434,8 +434,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         ROOT.gStyle.SetFillColor(0)
         # define histograms
         self._ht01 = ROOT.TH1F("ht01", "TOF0->1;Time (ns);;", 200, 20, 40)
-        self._ht12 = ROOT.TH1F("ht12", "TOF1->2;Time (ns);;", 200, 0, 20)
-        self._ht02 = ROOT.TH1F("ht02", "TOF0->2;Time (ns);;", 200, 30, 50)
+        self._ht12 = ROOT.TH1F("ht12", "TOF1->2;Time (ns);;", 200, 25, 45)
+        self._ht02 = ROOT.TH1F("ht02", "TOF0->2;Time (ns);;", 300, 50, 80)
         
         
         self.hspslabx_0 = ROOT.TH1F("spx0", "SpacePoints X-plane;SlabX;",
@@ -446,17 +446,13 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                                      10, -0.5, 9.5)
         self.hspslaby_1 = ROOT.TH1F("spy1", "SpacePoints Y-plane;SlabY;",
                                      10, -0.5, 9.5)
-        self.hspslabx_1.SetFillColor(2)
         self.hspslabx_1.SetLineColor(2)
-        self.hspslaby_1.SetFillColor(2) 
         self.hspslaby_1.SetLineColor(2) 
         self.hspslabx_2 = ROOT.TH1F("spx2", "SpacePoints X-plane;SlabX;",
                                      10, -0.5, 9.5)
         self.hspslaby_2 = ROOT.TH1F("spy2", "SpacePoints Y-plane;SlabY;",
                                      10, -0.5, 9.5)
-        self.hspslabx_2.SetFillColor(4)
         self.hspslabx_2.SetLineColor(4)
-        self.hspslaby_2.SetFillColor(4) 
         self.hspslaby_2.SetLineColor(4) 
         
         self.hnsp_0 = ROOT.TH1F("hnsp_0", 
@@ -466,13 +462,11 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.hnsp_1 = ROOT.TH1F("hnsp_1", 
                                 "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
-        self.hnsp_1.SetFillColor(2)
         self.hnsp_1.SetLineColor(2)
         #self.hnsp_1.SetFillStyle(4000)
         self.hnsp_2 = ROOT.TH1F("hnsp_2", 
                                  "#Space Points;#space points in event;;",
                                  4, -0.5, 3.5)
-        self.hnsp_2.SetFillColor(4)
         self.hnsp_2.SetLineColor(4)
 
         self.hnsp_spill = []
@@ -517,7 +511,6 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 if i == 0:
                     self.hslabhits[i][j].SetLineColor(i+1)
                 else:
-                    self.hslabhits[i][j].SetFillColor(2*i)
                     self.hslabhits[i][j].SetLineColor(2*i)
 
         self.hpmthits = [[[]]]
@@ -537,7 +530,6 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     if i == 0:
                         self.hpmthits[i][j][k].SetLineColor(i+1)
                     else:
-                        self.hpmthits[i][j][k].SetFillColor(2*i)
                         self.hpmthits[i][j][k].SetLineColor(2*i)
 
         # Create canvases
@@ -620,7 +612,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             self.canvas_sp_xy.append(ROOT.TCanvas(cname, cname, c_x, c_x))
             self.canvas_sp_xy[i].cd()
             hname = "hspxy_%d" % (i)
-            htitle = "tof%d: space points;SlabX;SlabY" % (i)
+            htitle = "tof%d: space points;SlabY;SlabX" % (i)
             nbins = 10
             edgelo = -0.5
             edgehi = 9.5
@@ -681,7 +673,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             a_hist = hists[1]
             all_max_y.append(a_hist.GetBinContent(a_hist.GetMaximumBin()))
         for hists in self.hslabhits[0:-1]:
-            hists[1].SetMaximum(max(all_max_y)+1)
+            hists[1].SetMaximum(max(all_max_y)*1.1+1)
 
         leg.AddEntry(self.hslabhits[0][1], "TOF0", "l")
         leg.AddEntry(self.hslabhits[1][1], "TOF1", "l")
@@ -704,7 +696,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     all_max_y.append(\
                                    a_hist.GetBinContent(a_hist.GetMaximumBin()))
                 for hists in self.hpmthits[0:-1]:
-                    hists[plane][pmt].SetMaximum(max(all_max_y)+1)
+                    hists[plane][pmt].SetMaximum(max(all_max_y)*1.1+1)
                 leg.AddEntry(self.hpmthits[0][plane][pmt], "TOF0,"+pnum, "l")
                 leg.AddEntry(self.hpmthits[1][plane][pmt], "TOF1,"+pnum, "l")
                 leg.AddEntry(self.hpmthits[2][plane][pmt], "TOF2,"+pnum, "l")
@@ -733,12 +725,33 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             self.canvas_nsp_vs_spill.Update()
 
+
+            all_max_y = []
+            all_max_y.append(self.hspslabx_0.GetBinContent(+\
+                             self.hspslabx_0.GetMaximumBin()))
+            all_max_y.append(self.hspslabx_1.GetBinContent(+\
+                             self.hspslabx_1.GetMaximumBin()))
+            all_max_y.append(self.hspslabx_2.GetBinContent(+\
+                             self.hspslabx_2.GetMaximumBin()))
+            self.hspslabx_0.SetMaximum(max(all_max_y)*1.1+1)
+            self.hspslabx_1.SetMaximum(max(all_max_y)*1.1+1)
+            self.hspslabx_2.SetMaximum(max(all_max_y)*1.1+1)
             leg = self.canvas_sp_x.BuildLegend(0.6, 0.7, 0.89, 0.89)
             leg.Clear()
             leg.AddEntry(self.hspslabx_0, "TOF0", "l")
             leg.AddEntry(self.hspslabx_1, "TOF1", "l")
             leg.AddEntry(self.hspslabx_2, "TOF2", "l")
             self.canvas_sp_x.Update()
+            all_max_y = []
+            all_max_y.append(self.hspslaby_0.GetBinContent(+\
+                             self.hspslaby_0.GetMaximumBin()))
+            all_max_y.append(self.hspslaby_1.GetBinContent(+\
+                             self.hspslaby_1.GetMaximumBin()))
+            all_max_y.append(self.hspslaby_2.GetBinContent(+\
+                             self.hspslaby_2.GetMaximumBin()))
+            self.hspslaby_0.SetMaximum(max(all_max_y)*1.1+1)
+            self.hspslaby_1.SetMaximum(max(all_max_y)*1.1+1)
+            self.hspslaby_2.SetMaximum(max(all_max_y)*1.1+1)
             leg = self.canvas_sp_y.BuildLegend(0.6, 0.7, 0.89, 0.89)
             leg.Clear()
             leg.AddEntry(self.hspslaby_0, "TOF0", "l")
