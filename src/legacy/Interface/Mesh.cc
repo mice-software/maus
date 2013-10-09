@@ -129,8 +129,12 @@ void TwoDGrid::Add(VectorMap* map) //add *map if it has not already been added
 void TwoDGrid::SetConstantSpacing()
 {
     _constantSpacing = true;
-    for(unsigned int i=0; i<_x.size()-1; i++) if( fabs(1-(_x[i+1]-_x[i])/(_x[1]-_x[0])) > 1e-9 ) _constantSpacing = false;
-    for(unsigned int i=0; i<_y.size()-1; i++) if( fabs(1-(_y[i+1]-_y[i])/(_y[1]-_y[0])) > 1e-9 ) _constantSpacing = false;
+    for (unsigned int i = 0; i < _x.size()-1; i++)
+        if (fabs(1-(_x[i+1]-_x[i])/(_x[1]-_x[0])) > 1e-9)
+            _constantSpacing = false;
+    for (unsigned int i = 0; i < _y.size()-1; i++)
+        if (fabs(1-(_y[i+1]-_y[i])/(_y[1]-_y[0])) > 1e-9)
+            _constantSpacing = false;
 }
 
 Mesh::Iterator TwoDGrid::Nearest(const double* position) const
