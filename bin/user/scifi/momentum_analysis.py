@@ -39,10 +39,10 @@ def main(file_name):
     a_pz = array('d', [0])
     a_n_points = array('i', [0])
     a_trker_num = array('i', [0])
-    out_tree.SetBranchAddress("pt", a_pt)
-    out_tree.SetBranchAddress("pz", a_pz)
-    out_tree.SetBranchAddress("n_points", a_n_points)
-    out_tree.SetBranchAddress("trker_num", a_trker_num)
+    out_tree.Branch("pt", a_pt, "pt/D")
+    out_tree.Branch("pz", a_pz, "pz/D")
+    out_tree.Branch("n_points", a_n_points, "n_points/D")
+    out_tree.Branch("trker_num", a_trker_num, "trker_num/D")
 
     # Momentum histos 
     mom_n_bins = 100
@@ -86,7 +86,7 @@ def main(file_name):
                       res_n_bins, -30, 30)
     t2_pz_res.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
 
-    t2_pz_res_log = ROOT.TH1D("t2_pz_res_log", "T1 pz Residual", \
+    t2_pz_res_log = ROOT.TH1D("t2_pz_res_log", "T2 pz Residual", \
                       res_n_bins, -500, 500)
     t2_pz_res_log.GetXaxis().SetTitle("p_{z}^{MC} - p_{z} (MeV/c)")
 
