@@ -23,6 +23,8 @@ TwoDGrid::TwoDGrid(int xSize, const double *x, int ySize, const double *y)  : _x
 {
   if(xSize < 2 || ySize < 2) throw(Squeal(Squeal::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
   SetConstantSpacing();
+  delete [] x;
+  delete [] y; 
 }
 
 TwoDGrid::TwoDGrid(std::vector<double> x, std::vector<double> y)  : _x (x), _y(y), _xSize(x.size()), _ySize(y.size()), _maps(), _constantSpacing(false)
@@ -127,8 +129,12 @@ void TwoDGrid::Add(VectorMap* map) //add *map if it has not already been added
 void TwoDGrid::SetConstantSpacing()
 {
     _constantSpacing = true;
-    for(unsigned int i=0; i<_x.size()-1; i++) if( fabs(1-(_x[i+1]-_x[i])/(_x[1]-_x[0])) > 1e-9 ) _constantSpacing = false;
-    for(unsigned int i=0; i<_y.size()-1; i++) if( fabs(1-(_y[i+1]-_y[i])/(_y[1]-_y[0])) > 1e-9 ) _constantSpacing = false;
+    for (unsigned int i = 0; i < _x.size()-1; i++)
+        if (fabs(1-(_x[i+1]-_x[i])/(_x[1]-_x[0])) > 1e-9)
+            _constantSpacing = false;
+    for (unsigned int i = 0; i < _y.size()-1; i++)
+        if (fabs(1-(_y[i+1]-_y[i])/(_y[1]-_y[0])) > 1e-9)
+            _constantSpacing = false;
 }
 
 Mesh::Iterator TwoDGrid::Nearest(const double* position) const
