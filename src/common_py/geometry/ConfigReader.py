@@ -76,3 +76,4 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.absorber0_file_number = config_dict['absorber0_file_number']
         self.absorber1_file_number = config_dict['absorber1_file_number']
         self.absorber2_file_number = config_dict['absorber2_file_number']
+
