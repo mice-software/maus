@@ -148,7 +148,11 @@
                             {
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
-                            ScaleFactor <xsl:value-of select="ScaleFactor/@value"/>
+                            ScaleFactor <xsl:choose>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">1.0+($D1Current-240.516)/263.708</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">1.0+($D2Current-240.516)/263.708</xsl:when>
+                                <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
+                            </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
                             PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
                             PropertyString FieldMapMode <xsl:value-of select="FieldMapMode/@name"/>
