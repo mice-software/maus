@@ -55,9 +55,6 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
             "daq_event_type":"physics_event",
             "recon_events":[],
             "mc_events":[],
-            #"test_branch":{"test_child_by_value":{},
-            #               "test_child_by_ref":ref,
-            #               "test_child_array":[None, ref, None, ref]},
             "maus_event_type":"Spill",
         }
         self.test_job_header = {

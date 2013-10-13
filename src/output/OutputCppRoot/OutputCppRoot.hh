@@ -20,6 +20,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/API/OutputBase.hh"
@@ -70,6 +71,12 @@ class OutputCppRoot : public OutputBase<std::string> {
       ModuleBase::death();
   }
 
+  enum output_mode {
+      one_big_file,
+      one_file_per_run,
+      end_of_run_file_per_run
+  };
+
  private:
   void _birth(const std::string& json_datacards);
 
@@ -92,12 +99,20 @@ class OutputCppRoot : public OutputBase<std::string> {
 
   event_type get_event_type(const Json::Value& data_json);
 
+  std::string file_name(int run_number);
+
+  template <class DataT>
+  void check_file_exists(DataT data_cpp);
+
+  template <class DataT>
+  int run_number(DataT* data_cpp);
 
   bool _save(std::string json_document);
 
   orstream* _outfile;
 
   std::string _fname;
+  std::string _end_of_run_dir;
   std::string _outfile_branch;
   JobHeaderData _job_header_cpp;
   RunHeaderData _run_header_cpp;
@@ -105,6 +120,8 @@ class OutputCppRoot : public OutputBase<std::string> {
   RunFooterData _run_footer_cpp;
   JobFooterData _job_footer_cpp;
   std::ofstream log;
+  std::vector<int> _run_numbers;
+  output_mode _mode;
 };
 }
 

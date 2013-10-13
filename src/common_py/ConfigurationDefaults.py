@@ -38,6 +38,7 @@ output_json_file_type = "text"
 
 input_root_file_name = "maus_input.root"
 output_root_file_name = "maus_output.root"
+output_root_file_mode = "one_big_file"
 
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
