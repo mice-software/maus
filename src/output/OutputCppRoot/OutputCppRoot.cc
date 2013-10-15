@@ -15,6 +15,9 @@
  *
  */
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <algorithm>
 
 #include "src/legacy/Interface/Squeal.hh"
@@ -41,7 +44,7 @@
 
 namespace MAUS {
 OutputCppRoot::OutputCppRoot() : OutputBase<std::string>("OutputCppRoot"),
-     _outfile(NULL), _fname(""), _end_of_run_dir("./"), _outfile_branch(""), 
+     _outfile(NULL), _fname(""), _end_of_run_dir("./"), _outfile_branch(""),
      _run_numbers(), _mode(one_big_file) {
 }
 
@@ -53,7 +56,35 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     Json::Value datacards = JsonWrapper::StringToJson(json_datacards);
     _fname = JsonWrapper::GetProperty(datacards,
                   "output_root_file_name", JsonWrapper::stringValue).asString();
-    // Setup output stream
+    if (_fname == "") {
+        throw(Squeal(
+          Squeal::recoverable,
+          "output_root_file_name is empty",
+          "OutputCppRoot::birth"
+        ));
+    }
+    std::string mode = JsonWrapper::GetProperty(datacards,
+                  "output_root_file_mode", JsonWrapper::stringValue).asString();
+    if (mode == "one_big_file") {
+        _mode = one_big_file;
+    } else if (mode == "one_file_per_run") {
+        _mode = one_file_per_run;
+    } else if (mode == "end_of_run_file_per_run") {
+        _mode = end_of_run_file_per_run;
+    } else {
+        throw(Squeal(
+          Squeal::recoverable,
+          "output_root_file_name '"+mode+"' is not valid; should be one of\n"+
+          std::string("   one_big_file\n")+
+          std::string("   one_file_per_run\n")+
+          std::string("   end_of_run_file_per_run\n"),
+          "OutputCppRoot::birth"
+        ));
+    }
+    _end_of_run_dir = JsonWrapper::GetProperty(
+                                          datacards,
+                                          "end_of_run_output_root_directory",
+                                          JsonWrapper::stringValue).asString();
   } catch(...) {
     death();
     throw;
@@ -79,8 +110,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         ));
     }
 
-    std::cerr << "JSON EV TYPE " << data_json["maus_event_type"] <<
-              << "CPP EV TYPE " << data_cpp->GetEventType() << std::endl;
     std::string data_type = data_cpp->GetEventType();
     if (_outfile_branch != data_type) {
         if (_outfile->is_open())
@@ -89,9 +118,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         _outfile->open(file_name(run).c_str(), data_type.c_str(),
                        "MAUS output data", "UPDATE");
         _outfile_branch = data_type;
-        std::cerr << "Reopened "+_outfile_branch << std::endl;
     }
-    std::cerr << "Writing to "+_outfile_branch << std::endl;
     (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
 
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
@@ -181,6 +208,16 @@ std::string OutputCppRoot::file_name(int run_number) {
     return "";
 }
 
+std::string OutputCppRoot::dir_name(int run_number) {
+    std::string file = file_name(run_number);
+      size_t slash = file.find_last_of('/');
+      if (slash == std::string::npos) {   // file -> file_1234
+          return "./";
+      } else {  // file.root -> file_1234.root
+          return file.substr(0, slash);
+      }
+}
+
 template <class DataT>
 void OutputCppRoot::check_file_exists(DataT data_cpp) {
     std::string event = data_cpp->GetEventType();
@@ -194,7 +231,21 @@ void OutputCppRoot::check_file_exists(DataT data_cpp) {
             if (std::binary_search(_run_numbers.begin(), _run_numbers.end(), run))
                 return;
     }
-    std::cerr << "Creating file "+file_name(run)+" with event type "+data_cpp->GetEventType() << std::endl;
+    if (_outfile != NULL) {
+        if (_outfile->is_open())
+            _outfile->close();
+        delete _outfile;
+    }
+    struct stat attributes;
+    std::string dir = dir_name(run);
+    if (stat(dir.c_str(), &attributes) < 0 || !S_ISDIR(attributes.st_mode)) {
+        // if stat fails, maybe the directory doesnt exists
+        if (mkdir(dir.c_str(), ACCESSPERMS) == -1) {
+            throw Squeal(Squeal::recoverable, "Failed to make directory "+dir,
+                         "OutputCppRoot::check_file_exists");
+        }
+    }
+    // S_ISDIR(attributes.st_mode) - return True if it's a directory...
     _outfile = new orstream(file_name(run).c_str(),
                             data_cpp->GetEventType().c_str(),
                             "MAUS output data", "RECREATE");

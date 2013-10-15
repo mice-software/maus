@@ -72,9 +72,9 @@ class OutputCppRoot : public OutputBase<std::string> {
   }
 
   enum output_mode {
-      one_big_file,
-      one_file_per_run,
-      end_of_run_file_per_run
+      one_big_file = 0,
+      one_file_per_run = 1,
+      end_of_run_file_per_run = 2
   };
 
  private:
@@ -100,6 +100,8 @@ class OutputCppRoot : public OutputBase<std::string> {
   event_type get_event_type(const Json::Value& data_json);
 
   std::string file_name(int run_number);
+
+  std::string dir_name(int run_number);
 
   template <class DataT>
   void check_file_exists(DataT data_cpp);
