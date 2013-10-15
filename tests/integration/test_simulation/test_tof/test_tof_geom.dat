@@ -1,0 +1,23 @@
+// Stage 6 Floor Plan, z=0 at middle H absorber
+
+Configuration Stage6
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+  Module TOF/TOF0.dat
+  {
+    Position 0. 0. -14.18255 m
+    Rotation 0. 0. 0. degree
+  }
+  Module TOF/TOF1.dat
+  {
+    Position 0. 0. -6.38345 m
+    Rotation 0. 0. 0. degree
+  }
+  Module TOF/TOF2.dat
+  {
+    Position 0. 0. 6.5245 m
+    Rotation 0. 0. 0. degree
+  }
+}

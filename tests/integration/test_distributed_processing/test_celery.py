@@ -18,16 +18,22 @@ executing transforms on spills.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=E1101
 # pylint: disable=C0103
 
 import json
 import unittest
+import subprocess
+import signal
+import time
 
 from datetime import datetime
  
+import celery
 from celery.task.control import broadcast #pylint: disable=E0611, F0401
 from celery.task.control import inspect #pylint: disable=E0611, F0401
 
+import maus_cpp
 from Configuration import Configuration
 from MapPyTestMap import MapPyTestMap
 from mauscelery.tasks import execute_transform
@@ -36,6 +42,20 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
     """
     Test class for Celery workers configured for MAUS.
     """
+
+    proc = None
+    default_config = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+        time.sleep(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.proc != None:
+            print "Killing celeryd process", cls.proc.pid
+            cls.proc.send_signal(signal.SIGKILL)
 
     def setUp(self):
         """ 
@@ -54,13 +74,16 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                                        "Skip - No active Celery workers")
         # Get the current MAUS version.
         configuration  = Configuration()
-        config_doc = configuration.getConfigJSON()
-        config_dictionary = json.loads(config_doc)
+        self.config_doc = configuration.getConfigJSON()
+        config_dictionary = json.loads(self.config_doc)
         self.__version = config_dictionary["maus_version"]
         # Reset the worker. Invoke twice in case the first attempt
         # fails due to mess left by previous test.
         self.reset_worker()
         self.reset_worker()
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        maus_cpp.globals.birth(self.config_doc)
 
     def reset_worker(self): # pylint:disable = R0201
         """
@@ -71,12 +94,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         config_id = datetime.now().microsecond
         broadcast("birth", 
-            arguments={"configuration":"""{"maus_version":"%s"}""" \
-                       % self.__version,
+            arguments={"configuration":self.config_doc,
                        "transform":"MapPyDoNothing", 
                        "config_id":config_id}, reply=True)
 
-    def birth(self, config_id, configuration = "{}", transform = "MapPyDoNothing"): # pylint:disable = R0201, C0301
+    def birth(self, config_id, configuration = None,
+              transform = "MapPyDoNothing", merge_configuration = False): # pylint:disable = R0201, C0301
         """
         Configure the Celery workers, via a broadcast.
         @param self Object reference.
@@ -85,10 +108,19 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         @param transform Transform specification.
         @return status of update.
         """
+        if configuration == None:
+            configuration = self.config_doc
+        elif merge_configuration:
+            my_config = json.loads(self.config_doc)
+            config_user = json.loads(configuration)
+            for key in config_user:
+                my_config[key] = config_user[key]
+            configuration = json.dumps(my_config)
         return broadcast("birth", 
             arguments={"configuration":configuration, \
                        "transform":transform, 
-                       "config_id":config_id}, reply=True)
+                       "config_id":config_id,
+                       "run_number":1}, reply=True)
 
     def validate_configuration(self, configuration, transform,
         config_id = None):
@@ -123,7 +155,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                 "Configuration has no configuration entry")
             self.assertEquals(configuration,
                 worker_config["configuration"],
-                "Unexpected configuration value")
+                "Unexpected configuration value\n\n%s\n\n%s" % (configuration,
+                worker_config["configuration"]))
             self.assertTrue(worker_config.has_key("transform"),
                 "Configuration has no transform entry")
             self.assertEquals(transform, worker_config["transform"],
@@ -172,24 +205,19 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                 self.assertTrue(len(errors) > 0, 
                     "Expected a list of error information")
 
-    def test_get_maus_config(self):
-        """
-        Test get_maus_configuration broadcast command.
-        @param self Object reference.
-        """
-        # Check using default values.
-        configuration = """{"maus_version":"%s"}""" % self.__version
-        self.validate_configuration(configuration, "MapPyDoNothing")
-
     def test_birth(self):
         """
-        Test birth broadcast command.
+        Test birth broadcast command. 
+
+        Note we also test mausworker.get_maus_configuration here.
+
         @param self Object reference.
         """
         config_id = datetime.now().microsecond
         transform = "MapPyPrint"
-        configuration = """{"TOFconversionFactor":%s, "maus_version":"%s"}""" \
-            % (config_id, self.__version)
+        configuration = json.loads(self.config_doc)
+        configuration["TOFconversionFactor"] = 1
+        configuration = json.dumps(configuration)
         result = self.birth(config_id, configuration, transform)
         print "birth(OK): %s " % result
         # Check the status and that the configuration has been 
@@ -293,12 +321,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         Test death broadcast command.
         @param self Object reference.
         """
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         result.sort()
         print "death: %s " % result
         self.validate_status(result)
         # Expect subsequent attempt to succeed.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
 
     def test_death_exception(self):
@@ -316,11 +344,11 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # Check the status is OK.
         self.validate_status(result)
         # Now death the transform.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         print "death(transform.death exception): %s " % result
         self.validate_status(result, "error")
         # Expect subsequent attempt to succeed.
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
 
     def test_process(self):
@@ -352,16 +380,53 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         configuration = """{"maus_version":"%s"}""" % self.__version
         result = self.birth(config_id, configuration, transform)
         self.validate_status(result)
-        result = broadcast("death", reply=True)
+        result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
         # Call process.
-        result = execute_transform.delay("{}", 1) 
+        result = execute_transform.delay("{}", 1)
         # Wait for it to complete.
         try:
             result.wait()
         except Exception:  # pylint:disable = W0703
             pass
         self.assertTrue(result.failed(), "Expected failure")
+
+    def test_process_timeout(self):
+        """
+        Test process timeout.
+        @param self Object reference.
+        """
+        config_id = datetime.now().microsecond
+        transform = "MapPyTestMap"
+        # check that process does not time out when execution is quick
+        configuration = """{"maus_version":"%s", "process_delay":9.0}""" \
+                                                                % self.__version
+        result = self.birth(config_id, configuration, transform, True)
+        self.validate_status(result)
+        # Call process.
+        result = execute_transform.delay("{}", 1)
+        # Wait for it to complete.
+        print "Executing delayed transform"
+        result.wait()
+
+        # check that process does time out when execution is slow
+        configuration = """{"maus_version":"%s", "process_delay":15.0}""" \
+                                                                % self.__version
+        result = self.birth(config_id, configuration, transform, True)
+        self.validate_status(result)
+        # Call process. Check that time_limit flag is ignored
+        # (true for celery version < 3); if we move to a new version of celery,
+        # this should fail; and we should change the timeout to be soft coded
+        result = execute_transform.apply_async(["{}", 1], time_limit=20.)
+        # Wait for it to complete.
+        try:
+            print "Executing delayed transform"
+            result.wait()
+            self.assertTrue(False, 'Should have failed')
+        except celery.exceptions.TimeLimitExceeded:  # pylint:disable = W0703
+            pass
+        # should have failed
+        self.assertEqual(result.state, 'FAILURE')
 
 if __name__ == '__main__':
     unittest.main()

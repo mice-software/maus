@@ -20,12 +20,12 @@ histograms using ROOT.
 # Turn off false positives related to ROOT
 #pylint: disable = E1101
 
-import base64
 import json
-import os
 
 import ErrorHandler
 import ROOT
+
+import framework.utilities
 
 class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
@@ -148,12 +148,12 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @returns JSON document containing current histogram.
         """
         # Load and validate the JSON document.
+        def_doc = {"maus_event_type":"Image", "image_list":[]}
         try:
             json_doc = json.loads(json_string.rstrip())
         except Exception: # pylint:disable=W0703
-            json_doc = {}
-            ErrorHandler.HandleException(json_doc, self)
-            return unicode(json.dumps(json_doc))
+            def_doc = ErrorHandler.HandleException(def_doc, self)
+            return unicode(json.dumps(def_doc))
 
         self.spill_count = self.spill_count + 1
 
@@ -161,15 +161,11 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         try:
             result = self._update_histograms(json_doc)
         except Exception: # pylint:disable=W0703
-            ErrorHandler.HandleException(json_doc, self)
-            return unicode(json.dumps(json_doc))
-
+            def_doc = ErrorHandler.HandleException(def_doc, self)
+            return unicode(json.dumps(def_doc))
+        image_list = [image['image'] for image in result]
         # Convert results to strings.
-        doc_list = []
-        for doc in result:
-            doc_list.append(json.dumps(doc))
-            doc_list.append("\n")
-        return unicode("".join(doc_list))
+        return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 
     def _update_histograms(self, spill):
         """
@@ -228,11 +224,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Save to and reload from temporary file.
         file_name = "%s_tmp.%s" % (image_tag, self.image_type)
         canvas.Print(file_name)
-        tmp_file = open(file_name, 'r')
-        data = tmp_file.read()
-        encoded_data = base64.b64encode(data)
-        tmp_file.close()
-        os.remove(file_name)
+        encoded_data = framework.utilities.convert_binary_to_string(file_name,
+                                                                    True)
         # Build JSON document.
         json_doc = {}
         json_doc["image"] = {}
@@ -240,5 +233,41 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         json_doc["image"]["description"] = description
         json_doc["image"]["tag"] = image_tag
         json_doc["image"]["image_type"] = self.image_type
+        json_doc["image"]["data"] = encoded_data
+        return json_doc
+ 
+    def get_root_doc(self, keywords, description, tag, histos):
+        """
+        Build a JSON document holding ROOT tfile data. This saves
+        the list of ROOT histo objects to a temporary file and 
+        then reloads it.
+
+        @param self Object reference.
+        @param keywords List of image keywords.
+        @param description String describing the image.
+        @param tag ROOT TFile tag.
+        @param histos List of ROOT histo objects.
+        @returns JSON document.
+        """
+        if (self.auto_number):
+            image_tag = "%s%06d" % (tag, self.spill_count)
+        else:
+            image_tag = tag
+        # Save to and reload from temporary file.
+        file_name = "%s_tmp.%s" % (image_tag, 'root')
+
+        rfile = ROOT.TFile(file_name, 'RECREATE')
+        for histo in histos:
+            histo.Write()
+        rfile.Close()
+        encoded_data = framework.utilities.convert_binary_to_string(file_name,
+                                                                    True)
+        # Build JSON document.
+        json_doc = {}
+        json_doc["image"] = {}
+        json_doc["image"]["keywords"] = keywords
+        json_doc["image"]["description"] = description
+        json_doc["image"]["tag"] = image_tag
+        json_doc["image"]["image_type"] = 'root'
         json_doc["image"]["data"] = encoded_data
         return json_doc

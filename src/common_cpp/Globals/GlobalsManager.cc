@@ -15,15 +15,15 @@
  *
  */
 
-#include "src/legacy/Interface/Squeal.hh"
-#include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/RunActionManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
@@ -37,7 +37,7 @@ namespace MAUS {
 // then legacy cards and run data
 void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
     if (Globals::_process != NULL) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
       "Attempt to initialise Globals when it was already initialised",
                       "GlobalsManager::InitialiseGlobals"));
     }
@@ -54,6 +54,9 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        bool stack = JsonWrapper::GetProperty
+               (config, "will_do_stack_trace", JsonWrapper::booleanValue).asBool();
+        Exception::SetWillDoStackTrace(stack);
         // we set up logging but for now leave singleton-like access
         // meaning that we can't reinitialise the logging
         Logging::setStandardOutputs(verbose_level);
@@ -78,8 +81,14 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         }
         process->_legacy_mice_run->miceModule = process->_mc_mods;
         process->_maus_geant4_manager = MAUSGeant4Manager::GetInstance();
-        process->_mc_field_constructor = process->_maus_geant4_manager->GetField();
+        process->_mc_field_constructor =
+                                      process->_maus_geant4_manager->GetField();
+        // requires process->_mc_field_constructor to be set
         process->_maus_geant4_manager->SetPhases();
+        if (process->_mc_field_constructor == NULL)
+            throw(Exception(Exception::nonRecoverable,
+                            "No field map was found in geant4 manager",
+                            "GlobalsManager::InitialiseGlobals(...)"));
         process->_mc_field_constructor->Print(Squeak::mout(Squeak::info));
         if (process->_recon_mods == process->_mc_mods) {
             process->_recon_field_constructor = process->_mc_field_constructor;
@@ -87,7 +96,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
             process->_recon_field_constructor =
                                  new BTFieldConstructor(process->_recon_mods);
         }
-    } catch(Squeal squee) {
+    } catch(Exception squee) {
         Globals::_process = NULL;
         delete process;
         throw squee;
@@ -98,7 +107,7 @@ void GlobalsManager::DeleteGlobals() {
     // we don't delete the MICERun as this isn't really meant to be deleted
     // (it's legacy anyway)
     if (Globals::_process == NULL) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
              "Attempt to delete Globals when it was not initialised",
                       "GlobalsManager::DeleteGlobals"));
     }
@@ -141,6 +150,26 @@ void GlobalsManager::DeleteGlobals() {
     Globals::_process = NULL;
 };
 
+void GlobalsManager::Finally() {
+  Squeak::mout(Squeak::info) << "Closing MAUS - going to clean up" << std::endl;
+  if (Globals::_process->_maus_geant4_manager != NULL) {
+      delete Globals::_process->_maus_geant4_manager;
+  }
+  GlobalsManager::DeleteGlobals();
+
+/*
+  if (Globals::_process->_error_handler != NULL) {
+    delete Globals::_process->_error_handler;
+  }
+  if (Globals::_process->_legacy_mice_run != NULL) {
+    delete Globals::_process->_legacy_mice_run;
+  }
+  if (Globals::_process->_configuration_cards != NULL) {
+    delete Globals::_process->_configuration_cards;
+  }
+*/
+}
+
 void GlobalsManager::SetReconstructionMiceModules
                                                       (MiceModule* recon_mods) {
     if (Globals::GetInstance()->_recon_mods != NULL &&
@@ -156,6 +185,8 @@ void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
         delete Globals::_process->_mc_mods;
     }
     Globals::_process->_mc_mods = mc_mods;
+    if (mc_mods != NULL)
+        Globals::_process->GetGeant4Manager()->SetMiceModules(*mc_mods);
 }
 
 void GlobalsManager::SetLegacyCards(dataCards* legacy_cards) {
@@ -171,6 +202,8 @@ void GlobalsManager::SetRunActionManager(RunActionManager* run_action) {
     }
     Globals::_process->_run_action_manager = run_action;
 }
+
+
 /*
 void GlobalsManager::SetGeant4Manager
                                            (MAUSGeant4Manager* geant4_manager) {
@@ -178,13 +211,6 @@ void GlobalsManager::SetGeant4Manager
         delete Globals::_process->_maus_geant4_manager;
     }
     Globals::_process->_maus_geant4_manager = geant4_manager;
-}
-
-void GlobalsManager::SetBTFieldConstructor(BTFieldConstructor* field) {
-    if (Globals::GetInstance()->_field_constructor != NULL) {
-        delete Globals::_process->_field_constructor;
-    }
-    Globals::_process->_field_constructor = field;
 }
 
 void GlobalsManager::SetErrorHandler(CppErrorHandler* error_handler) {

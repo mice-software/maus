@@ -88,8 +88,8 @@ class MapCppTOFDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(n_digits_part_ev1_tof1, 3)
         digit2_part_ev1_tof1 = \
               spill_out['recon_events'][1]['tof_event']['tof_digits']['tof1'][2]
-        self.assertFalse('charge_mm' in digit2_part_ev1_tof1)
-        self.assertFalse('charge_pm' in digit2_part_ev1_tof1)
+        self.assertEqual(0, digit2_part_ev1_tof1 ['charge_mm'])
+        self.assertEqual(0, digit2_part_ev1_tof1 ['charge_pm'])
 
     def __test_process_tof2_digits(self, spill_out):
         """Test tof2 digits"""

@@ -29,6 +29,9 @@ class MAUSGeant4Manager;
 class VirtualPlaneManager;
 class MAUSTrackingAction;
 class MAUSSteppingAction;
+namespace Simulation {
+class DetectorConstruction;
+}
 
 /** @class MAUSEventAction
  *
@@ -93,7 +96,7 @@ class MAUSEventAction : public G4UserEventAction {
     VirtualPlaneManager* _virtPlanes;
     MAUSTrackingAction* _tracking;
     MAUSSteppingAction* _stepping;
-    MICEDetectorConstruction* _geometry;
+    Simulation::DetectorConstruction* _geometry;
 };
 }
 

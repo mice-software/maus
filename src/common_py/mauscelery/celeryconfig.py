@@ -32,8 +32,9 @@ BROKER_VHOST = "maushost"
 # AMQP backend is non-persistent by default.
 # Can only fetch the result of a task once as it is sent as a message.
 CELERY_RESULT_BACKEND = "amqp"
-# Results expire in 5 minutes.
-CELERY_AMQP_TASK_RESULT_EXPIRES = 300
+# Results expire in 30 seconds.
+CELERY_TASK_RESULT_EXPIRES = 30
+#CELERY_AMQP_TASK_RESULT_EXPIRES = 30 deprecated
 
 # List modules each worker should import.
 CELERY_IMPORTS = ("mauscelery.state", "mauscelery.tasks", \

@@ -51,13 +51,13 @@
 
 using MAUS::LinearApproximationOpticsModel;
 
-Json::Value SetupConfig();
+Json::Value SetupConfig(int verbose_level);
 
 class LinearApproximationOpticsModelTest : public testing::Test {
  public:
   LinearApproximationOpticsModelTest()
-      : default_virtual_planes_(MAUS::MAUSGeant4Manager::GetInstance()
-                                ->GetVirtualPlanes()) {
+      : default_virtual_planes_(new MAUS::VirtualPlaneManager(*
+            MAUS::MAUSGeant4Manager::GetInstance()->GetVirtualPlanes())) {
     MAUS::MAUSGeant4Manager * simulation
         = MAUS::MAUSGeant4Manager::GetInstance();
     /*
@@ -111,29 +111,29 @@ class LinearApproximationOpticsModelTest : public testing::Test {
 
     std::cout << "Globals:" << std::endl
               << (*MAUS::Globals::GetConfigurationCards()) << std::endl;
-
-    simulation->SetVirtualPlanes(&virtual_planes_);
+    virtual_planes_ = new MAUS::VirtualPlaneManager();
+    simulation->SetVirtualPlanes(virtual_planes_);
     MAUS::VirtualPlane start_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., -1000.), -1, true,
         -1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
 
     MAUS::VirtualPlane mid_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 0.), -1, true,
         0., BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
 
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 1000.), -1, true,
         1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
   }
 
   ~LinearApproximationOpticsModelTest() {
     MAUS::GlobalsManager::DeleteGlobals();
     // SetupConfig() is defined in MAUSUnitTest.cc
     MAUS::GlobalsManager::InitialiseGlobals(
-        JsonWrapper::JsonToString(SetupConfig()));
+        JsonWrapper::JsonToString(SetupConfig(2)));
     MAUS::MAUSGeant4Manager::GetInstance()
         ->SetVirtualPlanes(default_virtual_planes_);
     std::cout << "*** Reset Globals ***" << std::endl;
@@ -153,7 +153,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
   static const double kCovariances[36];
   static const MAUS::CovarianceMatrix kCovarianceMatrix;
  private:
-  MAUS::VirtualPlaneManager virtual_planes_;
+  MAUS::VirtualPlaneManager * virtual_planes_;
   MAUS::VirtualPlaneManager * default_virtual_planes_;
 };
 

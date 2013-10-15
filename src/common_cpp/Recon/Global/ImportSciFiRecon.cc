@@ -31,7 +31,7 @@ void ImportSciFiRecon::process(const MAUS::SciFiEvent &scifi_event,
   Squeak::mout(Squeak::debug) << "Import SciFi" << std::endl;
 
   // Import the straight tracks
-  const MAUS::SciFiStraightPRTrackArray straightarray
+  const MAUS::SciFiStraightPRTrackPArray straightarray
       = scifi_event.straightprtracks();
 
   if (!straightarray.empty()) {
@@ -39,7 +39,7 @@ void ImportSciFiRecon::process(const MAUS::SciFiEvent &scifi_event,
   }
 
   // Import the helical tracks
-  const MAUS::SciFiHelicalPRTrackArray helicalarray
+  const MAUS::SciFiHelicalPRTrackPArray helicalarray
       = scifi_event.helicalprtracks();
 
   if (!helicalarray.empty()) {
@@ -48,7 +48,7 @@ void ImportSciFiRecon::process(const MAUS::SciFiEvent &scifi_event,
 }
 
 void ImportSciFiRecon::ImportStraightTracks(
-    const MAUS::SciFiStraightPRTrackArray straightarray,
+    const MAUS::SciFiStraightPRTrackPArray straightarray,
     MAUS::GlobalEvent* global_event,
     std::string mapper_name) {
   if (straightarray.empty()) {
@@ -74,7 +74,7 @@ void ImportSciFiRecon::ImportStraightTracks(
 }
 
 void ImportSciFiRecon::ImportHelicalTracks(
-    const MAUS::SciFiHelicalPRTrackArray helicalarray,
+    const MAUS::SciFiHelicalPRTrackPArray helicalarray,
     MAUS::GlobalEvent* global_event,
     std::string mapper_name) {
   if (helicalarray.empty()) {
@@ -93,11 +93,11 @@ void ImportSciFiRecon::ImportHelicalTracks(
       new MAUS::DataStructure::Global::PrimaryChain(local_mapper_name);
 
   // Loop over the input array, accessing each track
-  MAUS::SciFiHelicalPRTrackArray::const_iterator track_iter;
+  MAUS::SciFiHelicalPRTrackPArray::const_iterator track_iter;
   for (track_iter = helicalarray.begin();
       track_iter != helicalarray.end();
       ++track_iter) {
-    const SciFiHelicalPRTrack* helical_track = &(*track_iter);
+    const SciFiHelicalPRTrack* helical_track = *track_iter;
 
     Squeak::mout(Squeak::debug)
         << "\t\tHelical Track:\t"

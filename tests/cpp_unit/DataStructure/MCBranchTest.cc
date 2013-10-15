@@ -33,12 +33,16 @@ TEST(MCEventTest, StepTest) {
     Step my_step;
     my_step.SetPosition(ThreeVector(1., 2., 3.));
     my_step.SetMomentum(ThreeVector(-1, -2, -3));
+    my_step.SetBField(ThreeVector(4., 5., 6.));
+    my_step.SetEField(ThreeVector(7., 8., 9.));
     my_step.SetProperTime(10.);
     my_step.SetPathLength(11.);
     my_step.SetEnergy(12.);
     my_step.SetEnergyDeposited(13.);
     EXPECT_EQ(my_step.GetPosition(), ThreeVector(1., 2., 3.));
     EXPECT_EQ(my_step.GetMomentum(), ThreeVector(-1., -2., -3.));
+    EXPECT_EQ(my_step.GetBField(), ThreeVector(4., 5., 6.));
+    EXPECT_EQ(my_step.GetEField(), ThreeVector(7., 8., 9.));
     EXPECT_EQ(my_step.GetProperTime(), 10.);
     EXPECT_EQ(my_step.GetPathLength(), 11.);
     EXPECT_EQ(my_step.GetEnergy(), 12.);
@@ -48,6 +52,8 @@ TEST(MCEventTest, StepTest) {
     Step my_step_copy(my_step);
     EXPECT_EQ(my_step.GetPosition(), my_step_copy.GetPosition());
     EXPECT_EQ(my_step.GetMomentum(), my_step_copy.GetMomentum());
+    EXPECT_EQ(my_step.GetBField(), my_step_copy.GetBField());
+    EXPECT_EQ(my_step.GetEField(), my_step_copy.GetEField());
     EXPECT_EQ(my_step.GetPathLength(), my_step_copy.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_copy.GetEnergy());
     EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_copy.GetEnergyDeposited());
@@ -57,6 +63,8 @@ TEST(MCEventTest, StepTest) {
     my_step_equal = my_step;
     EXPECT_EQ(my_step.GetPosition(), my_step_equal.GetPosition());
     EXPECT_EQ(my_step.GetMomentum(), my_step_equal.GetMomentum());
+    EXPECT_EQ(my_step.GetBField(), my_step_equal.GetBField());
+    EXPECT_EQ(my_step.GetEField(), my_step_equal.GetEField());
     EXPECT_EQ(my_step.GetPathLength(), my_step_equal.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_equal.GetEnergy());
     EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_equal.GetEnergyDeposited());

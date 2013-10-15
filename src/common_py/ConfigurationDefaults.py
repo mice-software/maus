@@ -52,6 +52,8 @@ verbose_level = 1
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
+will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
+                                        # exception
 
 # set how headers and footers are handled - "append" will set to
 # append headers and footers to the output; dont_append will set to not append
@@ -72,8 +74,8 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 10000 # particles are killed after this number of
-                                # steps (assumed to be stuck in the fields)
+maximum_number_of_steps = 500000 # particles are killed after this number of
+                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
@@ -97,7 +99,10 @@ keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_mu":False, "anti_nu_mu":False,
                           "nu_tau":False, "anti_nu_tau":False,
 }
-kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+max_step_length = 100. # default maximum step size during tracking (override with G4StepMax in MiceModule)
+max_track_time = 1.e9 # kill tracks with time above max_time (override with G4TimeMax in MiceModule)
+max_track_length = 1.e8 # kill tracks with track length above max_track_length (override with G4TrackMax in MiceModule)
+kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold (override with G4KinMin in MiceModule)
 field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
@@ -107,6 +112,7 @@ delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.
 miss_distance = -1.
+maximum_module_depth = 10 # maximum depth for MiceModules as used by the simulation
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -224,8 +230,33 @@ SciFi_sigma_tracker0_station5 = 0.4298 # mm
 SciFi_sigma_triplet = 0.3844 # mm
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
-SciFiPRHelicalOn = 1
-SciFiPRStraightOn = 1
+SciFiPRHelicalOn = True # Flag to turn on the tracker helical pattern recognition
+SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognition
+SciFiSD1To4 = 0.3844 # Position error associated with stations 1 t0 4 (mm)
+SciFiSD5 = 0.4298 # Position error associated with station 5 (mm)
+SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
+SciFiPerChanFlag = 0
+SciFiNoiseFlag = 0
+SciFiDigitNPECut = 1.5 # photoelectrons
+SciFiCrossTalkSigma = 50.0
+SciFiCrossTalkAmplitude = 1.5
+SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
+SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
+SciFiParams_Z = 5.61291
+SciFiParams_Plane_Width = 0.6523
+SciFiParams_Radiation_Legth = 424.0
+SciFiParams_Density = 1.06
+SciFiParams_Mean_Excitation_Energy = 68.7
+SciFiParams_A = 104.15
+SciFiParams_Pitch = 1.4945
+SciFiParams_Station_Radius = 160.
+SciFiParams_RMS = 370.
+SciFiSeedCovariance = 1000 # Error estimate for Seed values of the Kalman Fit
+SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
+SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
+SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
+SciFiUpdateMisalignments = False # Do Misalignment Search & Update
+SciFiKalmanVerbose  = False # Dump information per fitted track
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -306,7 +337,7 @@ V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
 Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 45
+VLSB_C_Zero_Suppression_Threshold = 60
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -314,6 +345,11 @@ Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
+daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
+                     # data from a file - mock-up of online for testing, not for
+                     # production use (use offline recon here)
+daq_online_spill_delay_time = 0. # delay in seconds between daq reads, intended
+                                 # for mocking MICE target pulses
 
 # tof digitization
 TOFconversionFactor = 0.005 # MeV
@@ -326,19 +362,28 @@ TOFscintLightSpeed =  170.0 # mm/ns
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
-#TOF_trigger_station = "tof0"
+
+# this sets the source for the calibrations
+# by default it is from CDB
+# set it to 'file' if you want to load local files
+# if you set file, then uncomment the calib files below
+TOF_calib_source = "CDB"
+
 #TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePiontCut = 0.5 # nanosecond
+
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
 TOF_calib_date_from = 'current'
 TOF_cabling_date_from = 'current'
+
 Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
@@ -354,13 +399,31 @@ configuration_file = "" # should be set on the command line only (else ignored)
 
 doc_store_class = "docstore.MongoDBDocumentStore.MongoDBDocumentStore"
 doc_collection_name = "spills" # Default document collection name. Only needed if using multi_process mode. If "auto" then a collection name will be auto-generated for spills output by input-transform workflows.
+doc_store_event_cache_size = 10**8 # Maximum size of the Mongo cache to cache at any one time in multiprocessing mode, as used by e.g. online code. Corresponds to ~ n/3 spills.
 
 mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
 mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# in multiprocessing mode, the timeout after which reconstruction of an event will be abandonded [s]
+reconstruction_timeout = 10
+# refresh rate for refreshing plots
+reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"
+end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+
+PolynomialOpticsModel_order = 1
+PolynomialOpticsModel_algorithms = ["LeastSquares",
+                    "ConstrainedLeastSquares", "ConstrainedChiSquared",
+                    "SweepingChiSquared", "SweepingChiSquaredWithVariableWalls"]
+PolynomialOpticsModel_algorithm = "LeastSquares"
+# deltas for numerical derivative calculation of Optics transfer maps
+TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
+                                 "x":0.1, "Px":0.1,
+                                 "y":0.1, "Py":0.01}
+

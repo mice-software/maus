@@ -36,7 +36,7 @@ class SciFiStraightPRTrackProcessor : public ObjectProcessor<SciFiStraightPRTrac
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
-    ValueArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;
+    PointerArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;
 };
 } // ~namespace MAUS
 

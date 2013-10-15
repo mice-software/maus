@@ -7,7 +7,8 @@ if [ $? != 0 ]; then
 fi
 
 ./configure
-source env.sh
+source env.sh # fails due to no maus-apps installed - it's okay
+set -e
 ./third_party/build_all.bash
 source env.sh
 bash third_party/bash/29expat.bash

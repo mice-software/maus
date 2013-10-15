@@ -20,6 +20,7 @@ Multi-process dataflows module.
 from datetime import datetime
 import json
 import sys
+import os
 
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import DataflowUtilities
@@ -127,7 +128,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                 raise ValueError("collection is not specified")
             else:
                 self.collection = self.config["doc_collection_name"]
-        else:   
+        else:
             self.collection = collection_name
 
     def start_of_job(self, job_header):
@@ -145,12 +146,16 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
  
     def start_of_run(self):
         """
-        Prepare for a new run by updating the local run number then
-        birthing the merger and outputer. 
+        Prepare for a new run
+
+        Calls maus_cpp.globals.start_of_run(), births the merger, writes the
+        start_of_run and handles some internal bureaucracy
+
         @param self Object reference.
         @throws WorkerBirthFailedException if birth returns False.
         @throws Exception if there is a problem when birth is called.
         """
+        self.spill_process_count = 0
         self.end_of_run_spill = None
         print "---------- START RUN %d ----------" % self.run_number
         print("BIRTH merger %s" % self.merger.__class__)
@@ -159,19 +164,20 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             raise WorkerBirthFailedException(self.merger.__class__)
         run_header = maus_cpp.run_action_manager.start_of_run(self.run_number)
         if self.write_headers:
+            print "SAVE RUN HEADER", run_header
             self.outputer.save(run_header)
 
     def end_of_run(self):
         """
-        End a run by sending an end_of_run spill through the merger
-        and outputer then death the merger and outputer. The end_of_run
-        spill is the last one that was encountered before a change
-        in run was detected. If there was no such end_of_run then
-        a dummy is created.
+        End a run
+        
+        Sends an end_of_run spill through the merger and outputer then deaths
+        the merger. The end_of_run spill is the last one that was encountered
+        before a change in run was detected. If there was no such end_of_run
+        then a dummy is created.
+
         @param self Object reference.
         @throws WorkerDeathFailedException if death returns False.
-        @throws Exception if there is a problem when passing the
-        end_of_run through or when death is called.
         """
         if (self.end_of_run_spill == None):
             print "  Missing an end_of_run spill..."
@@ -188,6 +194,7 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             raise WorkerDeathFailedException(self.merger.__class__)
         run_footer = maus_cpp.run_action_manager.end_of_run(self.run_number)
         if self.write_headers:
+            print "SAVE RUN FOOTER", run_footer
             self.outputer.save(run_footer)
         print "---------- END RUN %d ----------" % self.run_number
 
@@ -207,10 +214,12 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         """
         spill_doc = json.loads(spill)
         if not "maus_event_type" in spill_doc.keys():
-            raise KeyError("Event with no maus_event_type")
+            print json.dumps(spill_doc, indent=2)
+            raise KeyError("Event has no maus_event_type")
         if spill_doc["maus_event_type"] != "Spill":
-            if not self.outputer.save(str(spill)):
-                print "Failed to execute Output"
+            outputter_ret = self.outputer.save(str(spill))
+            if not (outputter_ret == None or outputter_ret == True):
+                raise RuntimeError("Failed to execute Output")
         else:
             # Check for change in run.
             spill_run_number = DataflowUtilities.get_run_number(spill_doc)
@@ -222,12 +231,14 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
                     self.end_of_run()
                 self.run_number = spill_run_number
                 self.start_of_run()
-           # Handle current spill.
+            # Handle current spill.
             merged_spill = self.merger.process(spill)
-            if not self.outputer.save(str(merged_spill)):
-                print "Failed to execute Output"
+            outputter_ret = self.outputer.save(str(merged_spill))
+            if not (outputter_ret == None or outputter_ret == True):
+                raise RuntimeError("Failed to execute Output")
             self.spill_process_count += 1
-            print "Spills processed: %d" % self.spill_process_count
+            print "Processed %d DAQ events from run %s" % \
+                  (self.spill_process_count, self.run_number)
 
     def execute(self, job_header, job_footer, will_run_until_ctrl_c=True):
         """
@@ -247,7 +258,13 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         outputting a spill, birthing or deathing the merger or
         outputer or merging an end_of_run spill.
         """
-        # Darkness and sinister evil - somewhere in the combination of ROOT,
+        # Darkness and sinister evil 1 - the loop structure and exception
+        # handling in this code is quite elaborate. Requirements:
+        # * If we receive a sigint we should exit after clearing mongo buffer
+        # * If mongo access throws an error we should ignore it
+        # * See #1190
+
+        # Darkness and sinister evil 2 - somewhere in the combination of ROOT,
         # SWIG, Python; I get a segmentation fault from OutputCppRoot fillevent
         # (*_outfile) << fillEvent; command depending
         # on which function I call outputer.save(...) from when outputer is
@@ -261,42 +278,84 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             self.start_of_job(job_header)
             run_again = True # always run once
             while run_again:
-                run_again = will_run_until_ctrl_c
+                run_again = will_run_until_ctrl_c and self._execute_inner_loop()
+        except KeyboardInterrupt:
+            print "Received SIGINT and dying"
+            sys.exit(0)
+        except Exception:
+            sys.excepthook(*sys.exc_info())
+            raise
+        finally:
+            # Finish the final run, if it was started; then finish the job
+            if (self.run_number != None):
+                print "No more data and set to stop - ending run"
+                self.end_of_run()
+            print "Ending job"
+            self.end_of_job(self.job_footer)
+
+    def _execute_inner_loop(self):
+        """
+        Get documents off the doc store and process them.
+
+        @returns False if a keyboard interrupt is received, indicating that the
+                 iteration should not wait for new data
+        """
+        # More darkness - MongoDB is very unstable/picky. This has been tuned
+        # to work with MongoDB even for larger datasets
+        sys.stdout.flush()
+        sys.stderr.flush()
+        keyboard_interrupt = False
+        try:
+            docs = self.doc_store.get_since(self.collection,
+                                            self.last_time)
+            # Iterate using while, not for, since docs is an
+            # iterator which streams data from database and we
+            # want to detect database errors.
+            while True:
                 try:
-                    docs = self.doc_store.get_since(self.collection,
-                                                    self.last_time)
-                except Exception as exc:
-                    sys.excepthook(*sys.exc_info())
-                    raise DocumentStoreException(exc)
-                # Iterate using while, not for, since docs is an
-                # iterator which streams data from database and we
-                # want to detect database errors.
-                while True:
-                    try:
-                        doc = docs.next()
-                    except StopIteration:
-                        # No more data so exit inner loop.
-                        break
-                    except Exception as exc:
-                        raise DocumentStoreException(exc)
+                    doc = self.docs_next(docs)
                     doc_id = doc["_id"]
                     doc_time = doc["date"]
                     spill = doc["doc"]
-                    print "Read event %s (dated %s)" % (doc_id, doc_time)
-                    if (doc_time > self.last_time):
+                    print "<"+str(datetime.now().time())+"> Read event "+\
+                          str(doc_id)+" reconstructed at "+str(doc_time)+\
+                          " compared to last_time "+str(self.last_time)+\
+                          " with "+str(len(doc))+" more docs)"
+                    if (doc_time >= self.last_time):
                         self.last_time = doc_time
-                    self.process_event(spill)
+                    try:
+                        self.process_event(spill)
+                    except TypeError:
+                        print spill
+                        raise
+                    sys.stdout.flush()
+                    sys.stderr.flush()
+                except StopIteration:
+                    # No more data so exit inner loop.
+                    raise
+                except KeyboardInterrupt:
+                    # If there is a keyboard interrupt we should clear
+                    # the buffer before quitting
+                    print "Received SIGINT in", os.getpid(), \
+                          "- processing open spills before quitting"
+                    keyboard_interrupt = True
+        except StopIteration:
+            # No more data so exit inner loop. If we have received a
+            # SIGINT anywhere, end the loop; otherwise wait for data
+            if keyboard_interrupt:
+                print "Finished processing spills and exiting on SIGINT"
+                return False
         except KeyboardInterrupt:
-            print "Received SIGINT - closing"
-            sys.exit(0)
-        except:
-            raise
-        finally:
-            # Finish the final run.
-            print "No more data and set to stop - ending run"
-            self.end_of_run()
-            print "Ending job"
-            self.end_of_job(self.job_footer)
+            # If there is a keyboard interrupt we should clear
+            # the buffer before quitting
+            print "Received SIGINT in", os.getpid(), \
+                  "- processing open spills before quitting"
+            return False
+        except DocumentStoreException:
+            # Some instability in MongoDB - ignore and carry on
+            sys.excepthook(*sys.exc_info())
+            print "Caught document store error - ignore and carry on"
+        return not keyboard_interrupt
 
     @staticmethod
     def get_dataflow_description():
@@ -310,3 +369,33 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
         description += \
             "http://micewww.pp.rl.ac.uk/projects/maus/wiki/MAUSDevs\n"
         return description
+
+    @staticmethod
+    def docs_next(_docs):
+        """
+        Try to access document from the iterator - if it possible we
+        pop it from front; else try to next() it; else give up
+
+        @param _docs list or generator that yields a set of documents on the
+               docstore
+        @param max_number_of_retries Integer number of times to retry accessing
+               document before giving up
+        @param retry_time time to wait between retries 
+        @throws DocumentStoreException if there was a problem accessing the
+                docstore
+        @throws StopIteration if the docstore was empty
+        """
+        # Note retry counter 
+        while True:
+            try:
+                try:
+                    return _docs.pop(0)
+                except AttributeError:
+                    return _docs.next()
+                except IndexError:
+                    raise StopIteration("Ran out of events")
+            except StopIteration:
+                raise
+            except Exception:
+                raise DocumentStoreException("Failed to access document store")
+

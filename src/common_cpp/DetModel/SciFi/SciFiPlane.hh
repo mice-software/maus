@@ -39,8 +39,7 @@ class G4VPhysicalVolume;
  */
 
 class SciFiPlane {
-  public:
-
+ public:
   /** @brief Constructor taking information from the SciFiTrackerGeom class
    */
   SciFiPlane(MiceModule* mod, G4Material* mater, G4VPhysicalVolume* mlv);
@@ -64,7 +63,6 @@ class SciFiPlane {
   int get_numb_fibres() const { return _numFibres; }
 
  private:
-
   int _numFibres;
 
   G4Tubs*            solidDoublet;
@@ -74,14 +72,6 @@ class SciFiPlane {
   G4Tubs*            solidCore;
   G4LogicalVolume*   logicCore;
   G4VPhysicalVolume* physiCore;
-
-  G4Tubs*            solidCladding1;
-  G4LogicalVolume*   logicCladding1;
-  G4VPhysicalVolume* physiCladding1;
-
-  G4Tubs*            solidCladding2;
-  G4LogicalVolume*   logicCladding2;
-  G4VPhysicalVolume* physiCladding2;
 
   G4PVPlacement*     placeCore;
 };

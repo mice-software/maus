@@ -24,12 +24,8 @@
 #define _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
 
 // C headers
-#include <assert.h>
 #include <json/json.h>
-
-#include <CLHEP/Random/RandPoisson.h>
 #include <CLHEP/Random/RandGauss.h>
-#include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
@@ -43,11 +39,21 @@
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
 class MapCppTrackerMCDigitization {
  public:
+  /** Constructor - initialises pointers to NULL */
+  MapCppTrackerMCDigitization();
+
+  /** Constructor - deletes any allocated memory */
+  ~MapCppTrackerMCDigitization();
+
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
@@ -71,16 +77,12 @@ class MapCppTrackerMCDigitization {
   /** @brief reads in json data to a Spill object
    *
    */
-  MAUS::Spill read_in_json(std::string json_data);
+  void read_in_json(std::string json_data);
 
   /** @brief builds digits
    */
   void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
                         int event_num, MAUS::SciFiDigitPArray &digits);
-
-  /** @brief computes npe from energy deposits.
-   */
-  double compute_npe(double edep);
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
@@ -103,18 +105,27 @@ class MapCppTrackerMCDigitization {
   void save_to_json(MAUS::Spill &spill);
 
  private:
-  /// This is the Mice Module
-  MiceModule*      _module;
   /// This should be the classname
   std::string _classname;
-  /// This will contain the configuration
-  Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value root;
+  Json::Value* _spill_json;
+  Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;
-
-  double SciFiNPECut;
+  /// The ratio of deposited eV to NPE
+  double _eV_to_phe;
+  double _SciFiNPECut;
+  double _SciFivlpcEnergyRes;
+  double _SciFiadcFactor;
+  double _SciFitdcBits;
+  double _SciFivlpcTimeRes;
+  double _SciFitdcFactor;
+  double _SciFiFiberConvFactor;
+  double _SciFiFiberTrappingEff;
+  double _SciFiFiberMirrorEff;
+  double _SciFivlpcQE;
+  double _SciFiFiberTransmissionEff;
+  double _SciFiMUXTransmissionEff;
 
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
