@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -57,10 +58,10 @@ void common_cpp_optics_recon_minuit_track_fitter_score_function(
     Double_t & score,
     Double_t * phase_space_coordinate_values,
     Int_t      execution_stage_flag) {
-for (size_t index = 0; index < 6; ++index) {
-  std::cout << "DEBUG common_..._score_function: coordinate[" << index << "] = "
-            << phase_space_coordinate_values[index] << std::endl;
-}
+  for (size_t index = 0; index < 6; ++index) {
+    std::cout << "DEBUG common_..._score_function: coordinate[" << index << "] = "
+              << phase_space_coordinate_values[index] << std::endl;
+  }
   // common_cpp_optics_recon_minuit_track_fitter_minuit is defined
   // globally in the header file
   TMinuit * minuit
@@ -82,17 +83,6 @@ MinuitTrackFitter::MinuitTrackFitter(
   TMinuit * minimizer
     = common_cpp_optics_recon_minuit_track_fitter_minuit;
 
-  /*
-  Json::Value const * configuration = optics_model_->configuration();
-
-  rounds_ = JsonWrapper::GetProperty(
-      *configuration, "global_recon_minuit_rounds",
-      JsonWrapper::intValue).asInt();
-  if (rounds_ < 2) {
-    rounds_ = 2;
-  }
-  */
-
   minimizer->SetObjectFit(this);
 
   minimizer->SetFCN(
@@ -113,10 +103,23 @@ void MinuitTrackFitter::ResetParameters() {
   // phase space variable (mins and maxes calculated from 800MeV/c ISIS beam)
   int error_flag = 0;
   Json::Value const * configuration = optics_model_->configuration();
+  if (configuration == NULL) {
+    throw(Exception(Exception::nonRecoverable,
+          "Initialized with a null configuration.",
+          "MAUS::MinuitTrackFitter::ResetParameters()"));
+  }
   const Json::Value parameters = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_parameters",
       JsonWrapper::arrayValue);
   const Json::Value::UInt parameter_count = parameters.size();
+  if (parameter_count != 6) {
+    std::stringstream message;
+    message << "Expected 6 elements in \"global_recon_minuit_parameters\""
+            << " but found " << parameter_count << "." << std::endl;
+    throw(Exception(Exception::nonRecoverable,
+          message.str(),
+          "MAUS::MinuitTrackFitter::ResetParameters()"));
+  }
   for (Json::Value::UInt index = 0; index < parameter_count; ++index) {
     const Json::Value parameter = parameters[index];
     const std::string name = JsonWrapper::GetProperty(
@@ -170,6 +173,11 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   // track based off of this track point (i.e. best fits the measured track
   // points from the detectors).
   Json::Value const * const configuration = optics_model_->configuration();
+  if (configuration == NULL) {
+    throw(Exception(Exception::nonRecoverable,
+          "Initialized with a null configuration.",
+          "MAUS::MinuitTrackFitter::Fit()"));
+  }
   const std::string method = JsonWrapper::GetProperty(
       *configuration, "global_recon_minuit_minimizer",
       JsonWrapper::stringValue).asString();
@@ -234,21 +242,6 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
     track->AddTrackPoint(new TrackPoint(track_point));
   }
   track->set_pid(raw_track->get_pid());
-
-  /*
-  for (std::vector<TrackPoint>::iterator reconstructed_point
-          = reconstructed_points_.begin();
-       reconstructed_point != reconstructed_points_.end();
-       ++reconstructed_point) {
-    reconstructed_point->set_particle_event(particle_event);
-    reconstructed_point->set_mapper_name(mapper_name);
-    track->AddTrackPoint(new TrackPoint(*reconstructed_point));
-  }
-  track->set_pid(raw_track->get_pid());
-  */
-
-std::cout << "CHECKPOINT Fit(): END" << std::endl;
-std::cout.flush();
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
@@ -271,23 +264,10 @@ Double_t MinuitTrackFitter::ScoreTrack(
                                start_plane_track_coordinates[5]);
   // If the guess is not physical then return a horrible score
   if (!ValidVector(guess)) {
-//    return std::numeric_limits<double>::max();
     return 1.0e+15;
   }
   std::cout << "DEBUG MinuitTrackFitter::ScoreTrack: particle ID = "
             << particle_id_ << std::endl;
-  /*
-  try {
-    TrackPoint primary = helper.PhaseSpaceVector2TrackPoint(
-        guess, optics_model_->primary_plane(), particle_id_);
-    reconstructed_points_.push_back(primary);
-  } catch (Exception exception) {
-      std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
-                << "something bad happened during track fitting: "
-                << exception.what() << std::endl;
-    return 1.0e+15;
-  }
-  */
 
   std::vector<const TrackPoint*>::const_iterator event
     = detector_events_.begin();
@@ -299,23 +279,16 @@ Double_t MinuitTrackFitter::ScoreTrack(
         = detector_events_.begin();
        event != detector_events_.end();
        ++event) {
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Guess: "
-          << guess << std::endl;
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Measured: "
-          << *event << std::endl;
+    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Guess: "
+              << guess << std::endl;
+    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Measured: "
+              << *event << std::endl;
     // calculate the next guess
     const double end_plane = (*event)->get_position().Z();
     PhaseSpaceVector point =
-    #if 0
-      ParticleOpticalVector(
-        optics_model_->Transport(ParticleOpticalVector(guess, t0, E0, P0),
-                                 end_plane),
-        t0, E0, P0);
-    #else
       optics_model_->Transport(guess, end_plane);
-    #endif
-std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
-          << point << std::endl;
+    std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
+              << point << std::endl;
 
     TLorentzVector position_error = (*event)->get_position_error();
     TLorentzVector momentum_error = (*event)->get_momentum_error();

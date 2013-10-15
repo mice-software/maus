@@ -53,9 +53,6 @@ class ParticleOpticalVector : public MAUS::PhaseSpaceVector {
       const MAUS::PhaseSpaceVector& vector,
       const double t0, const double E0, const double P0);
 
-  explicit ParticleOpticalVector(
-      const MAUS::PhaseSpaceVector& original_instance);
-
   /* @brief  Copy constructor.
    */
   ParticleOpticalVector(const ParticleOpticalVector & original_instance);
@@ -123,8 +120,8 @@ class ParticleOpticalVector : public MAUS::PhaseSpaceVector {
   double b()            const {return (*this)[5];}
 
   // mutators
-  void set_l(double time)                 {(*this)[0] = time;}
-  void set_delta(double energy)           {(*this)[1] = energy;}
+  void set_l(double l)                    {(*this)[0] = l;}
+  void set_delta(double delta)            {(*this)[1] = delta;}
   void set_x(double x)                    {(*this)[2] = x;}
   void set_a(double a)                    {(*this)[3] = a;}
   void set_y(double y)                    {(*this)[4] = y;}

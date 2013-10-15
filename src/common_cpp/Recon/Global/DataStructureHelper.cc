@@ -233,11 +233,6 @@ TrackPoint DataStructureHelper::PhaseSpaceVector2TrackPoint(
               << "\tz: " << z << "\tPz: " << pz << std::endl;
     if (pz != pz) {
       pz = 0.;
-      /*
-      throw(Exception(Exception::recoverable,
-                   "PhaseSpaceVector is off mass shell.",
-                   "DataStructureHelper::PhaseSpaceVector2TrackPoint()"));
-      */
     }
 
     const TLorentzVector momentum(px, py, pz, energy);
@@ -275,116 +270,6 @@ MAUS::Primary DataStructureHelper::PGParticle2Primary(
 
   return primary;
 }
-
-/*
-void DataStructureHelper::GetGlobalRawTracks(
-    const Json::Value& recon_event,
-    const std::map<DetectorPoint, Detector>& detectors,
-    std::vector<Track>& raw_tracks) {
-  GetGlobalTracks(recon_event, "raw_tracks", detectors, raw_tracks);
-}
-
-void DataStructureHelper::GetGlobalTracks(
-    const Json::Value& recon_event,
-    const std::map<DetectorPoint, Detector>& detectors,
-    std::vector<Track>& tracks) {
-  GetGlobalTracks(recon_event, "tracks", detectors, tracks);
-}
-
-void DataStructureHelper::GetGlobalTracks(
-    const Primary& recon_event,
-    const std::string& json_node_name,
-    const std::map<Detector::ID, Detector>& detectors,
-    std::vector<Track>& raw_tracks) {
-  Json::Value global_event = JsonWrapper::GetProperty(
-      recon_event, "global_event", JsonWrapper::objectValue);
-  Json::Value global_raw_tracks = JsonWrapper::GetProperty(
-      global_event, json_node_name, JsonWrapper::arrayValue);
-  size_t num_tracks = global_raw_tracks.size();
-  for (size_t track_index = 0; track_index < num_tracks; ++track_index) {
-    GlobalTrackProcessor deserializer;
-std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 1" << std::endl;
-    GlobalTrack * const global_raw_track = deserializer.JsonToCpp(
-      global_raw_tracks[track_index]);
-std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 2" << std::endl;
-    GlobalTrackPointArray global_track_points
-      = global_raw_track->track_points();
-std::cout << "DEBUG DataStructureHelper::GetGlobalTracks(): CHECKPOINT 3" << std::endl;
-    delete global_raw_track;
-
-    Track raw_track;
-    for (GlobalTrackPointArray::const_iterator global_track_point
-            = global_track_points.begin();
-         global_track_point < global_track_points.end();
-         ++global_track_point) {
-      ThreeVector position = global_track_point->position();
-      ThreeVector momentum = global_track_point->momentum();
-      MAUS::DataStructure::Global::PID particle_id
-        = MAUS::DataStructure::Global::PID(global_track_point->particle_id());
-      TrackPoint track_point(global_track_point->time(),
-                             global_track_point->energy(),
-                             position.x(), momentum.x(),
-                             position.y(), momentum.y(),
-                             particle_id, position.z());
-      const DetectorMap::const_iterator detector_map_entry = detectors.find(
-        DetectorPoint(global_track_point->detector_id()));
-      if (detector_map_entry != detectors.end()) {
-        track_point.set_detector_id(detector_map_entry->second.id());
-      }
-
-      raw_track.push_back(track_point);
-    }
-    raw_tracks.push_back(raw_track);
-  }
-}
-
-Json::Value DataStructureHelper::TrackToJson(const Track & track) {
-  GlobalTrackPointArray global_track_points;
-
-  for (Track::const_iterator track_point = track.begin();
-       track_point < track.end();
-       ++track_point) {
-    GlobalTrackPoint global_track_point
-      = TrackPointToGlobalTrackPoint(*track_point);
-    global_track_points.push_back(global_track_point);
-  }
-
-  GlobalTrack global_track;
-  global_track.set_track_points(global_track_points);
-
-  GlobalTrackProcessor serializer;
-  Json::Value * json_pointer = serializer.CppToJson(global_track, "");
-  Json::Value json = *json_pointer;
-  delete json_pointer;
-  return json;
-}
-
-GlobalTrackPoint DataStructureHelper::TrackPointToGlobalTrackPoint(
-    const MAUS::recon::global::TrackPoint& track_point) {
-  return TrackPointToGlobalTrackPoint(track_point, true);
-}
-
-GlobalTrackPoint DataStructureHelper::TrackPointToGlobalTrackPoint(
-    const MAUS::recon::global::TrackPoint& track_point,
-    const bool on_mass_shell) {
-  GlobalTrackPoint global_track_point;
-  global_track_point.set_time(track_point.time());
-  global_track_point.set_energy(track_point.energy());
-  ThreeVector position(track_point.x(), track_point.y(), track_point.z());
-  global_track_point.set_position(position);
-  double pz = 0;
-  if (on_mass_shell) {
-    pz = track_point.Pz();
-  }
-  ThreeVector momentum(track_point.Px(),
-                        track_point.Py(),
-                        pz);
-  global_track_point.set_momentum(momentum);
-  global_track_point.set_detector_id(track_point.detector_id());
-  global_track_point.set_particle_id(track_point.particle_id());
-  return global_track_point;
-}
-*/
 
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {

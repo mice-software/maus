@@ -54,10 +54,6 @@ ParticleOpticalVector::ParticleOpticalVector(
 }
 
 ParticleOpticalVector::ParticleOpticalVector(
-    const PhaseSpaceVector& original_instance)
-    : PhaseSpaceVector(original_instance) { }
-
-ParticleOpticalVector::ParticleOpticalVector(
     const ParticleOpticalVector& original_instance)
     : PhaseSpaceVector(original_instance) { }
 

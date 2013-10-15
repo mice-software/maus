@@ -28,7 +28,12 @@
 #include "json/reader.h"
 #include "json/value.h"
 
+#include "DataStructure/Global/ReconEnums.hh"
+#include "Recon/Global/Detector.hh"
 #include "Utils/Exception.hh"
+
+namespace Recon = MAUS::recon::global;
+namespace GlobalDS = MAUS::DataStructure::Global;
 
 Json::Value SetupConfig(int verbose_level);
 
@@ -51,6 +56,18 @@ class DetectorTest : public testing::Test {
 // test cases
 // ***********
 
-TEST_F(DetectorTest, Constructor) {
+TEST_F(DetectorTest, All) {
+  const double uncertainty_data[36] = {
+    1.,  0.,   0.,   0.,   0.,   0.,
+    0.,  1.,   0.,   0.,   0.,   0.,
+    0.,  0.,   1.,   0.,   0.,   0.,
+    0.,  0.,   0.,   1.,   0.,   0.,
+    0.,  0.,   0.,   0.,   1.,   0.,
+    0.,  0.,   0.,   0.,   0.,   1.
+  };
+  const MAUS::CovarianceMatrix uncertainties(uncertainty_data);
+  const Recon::Detector detector(GlobalDS::kTOF1, uncertainties);
+  EXPECT_EQ(GlobalDS::kTOF1, detector.id());
+  EXPECT_EQ(uncertainties, detector.uncertainties());
 }
 
