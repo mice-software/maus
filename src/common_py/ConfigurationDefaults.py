@@ -44,6 +44,8 @@ output_root_file_name = "maus_output.root"
 #                    maus_output_1111.root
 # end_of_run_file_per_run - as above, and places in 
 #        <end_of_run_output_root_directory>/<run_number>/<output_root_file_name>
+#      users responsibility to ensure that <end_of_run_output_root_directory> 
+#      exists but MAUS will make <run_number> subdirectories
 output_root_file_mode = "one_big_file"
 end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of_run/" \
               if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()

@@ -245,7 +245,7 @@ void OutputCppRoot::check_file_exists(DataT data_cpp) {
                          "OutputCppRoot::check_file_exists");
         }
     }
-    // S_ISDIR(attributes.st_mode) - return True if it's a directory...
+    // S_ISDIR(attributes.st_mode) - returns True if it's a directory...
     _outfile = new orstream(file_name(run).c_str(),
                             data_cpp->GetEventType().c_str(),
                             "MAUS output data", "RECREATE");

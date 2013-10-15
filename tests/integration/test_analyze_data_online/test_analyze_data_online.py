@@ -59,6 +59,8 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
         os.remove(raw_dir)
         time.sleep(1)
     os.symlink(my_tmp, raw_dir)
+    time.sleep(1)
+    os.mkdir(raw_dir+'/end_of_run')
     log = open(my_tmp+"test_analyze_data_online.log", "w")
     print "Running analyze online"
     print "Point your browser at http://localhost:9000/maus/"
@@ -167,6 +169,8 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         for item in eor_png:
             self.assertTrue(item in ref_png, msg = "Failed to find '"+item+\
                             "' in "+str(eor_dir)+" "+str(ref_png))
+        self.assertTrue(
+               os.path.exists(eor_dir+'/reconstruct_daq_tofcalib_reducer.root'))
       
 
 if __name__ == "__main__":
