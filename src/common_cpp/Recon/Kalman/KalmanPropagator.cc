@@ -160,7 +160,7 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   int numb_planes = abs(new_site->id() - old_site->id());
   double total_plane_length = numb_planes*plane_width;
   // Plane lenght in units of radiation lenght (~0.0015 per plane).
-  double effective_plane_lenght = 0.4*total_plane_length;
+  double effective_plane_lenght = 0.5*total_plane_length;
   double plane_L0 = FibreParameters.R0(effective_plane_lenght);
   // Get particle's parameters (gradients and total momentum).
   TMatrixD a = new_site->a(KalmanState::Projected);
