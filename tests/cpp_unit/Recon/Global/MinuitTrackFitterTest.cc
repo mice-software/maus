@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 
+#include "TLorentzVector.h"
 #include "TMinuit.h"
 #include "TObject.h"
 #include "gtest/gtest.h"
@@ -32,11 +33,16 @@
 
 #include "Utils/Exception.hh"
 #include "Utils/JsonWrapper.hh"
+#include "DataStructure/Global/Track.hh"
+#include "DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/Optics/OpticsModel.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "Recon/Global/DataStructureHelper.hh"
 #include "Recon/Global/MinuitTrackFitter.hh"
+#include "Recon/Global/Particle.hh"
 
+namespace GlobalDS = MAUS::DataStructure::Global;
 namespace Recon = MAUS::recon::global;
 
 Json::Value SetupConfig(int verbose_level);
@@ -65,15 +71,36 @@ class DummyOpticsModel : public MAUS::OpticsModel {
 class MinuitTrackFitterTest : public testing::Test, public TObject {
  public:
   MinuitTrackFitterTest() {
-    configuration_ = JsonWrapper::StringToJson(kConfigurationString);
+    for (int index = 0; index < 3; ++index) {
+      GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+      TLorentzVector four_position(kStartVector[2]+index, kStartVector[4]+index,
+                                    0.0, kStartVector[0]+index);
+      track_point->set_position(four_position);
+      TLorentzVector position_error(1.0, 1.0, 1.0, 1.0);
+      track_point->set_position_error(position_error);
+
+      TLorentzVector four_momentum(kStartVector[3]+index, kStartVector[5]+index,
+                                    280.7780432, kStartVector[1]+index);
+      track_point->set_momentum(four_momentum);
+      TLorentzVector momentum_error(1.0, 1.0, 1.0, 1.0);
+      track_point->set_momentum_error(momentum_error);
+      detector_events_.push_back(track_point);
+    }
   }
 
   ~MinuitTrackFitterTest() {
+    for (int index = 0; index < 3; ++index) {
+      delete detector_events_[index];
+    }
   }
 
  protected:
   static const std::string kConfigurationString;
-  Json::Value configuration_;
+  static const Json::Value kConfiguration;
+  static const double kMuonMass;
+  static const Double_t kStartVector[6];
+  std::vector<const GlobalDS::TrackPoint *> detector_events_;
+  static const DummyOpticsModel kOpticsModel;
 };
 
 // *************************************************
@@ -81,38 +108,107 @@ class MinuitTrackFitterTest : public testing::Test, public TObject {
 // *************************************************
 
 const std::string MinuitTrackFitterTest::kConfigurationString = "{"
-"\"global_recon_minuit_minimizer\": \'MINIMIZE\'"
-"\"global_recon_minuit_max_iterations\": 2000"
-"\"global_recon_minuit_max_edm\": 1e-4"
-"\"global_recon_minuit_rounds\": 7"
-"\"global_recon_minuit_parameters\": ["
-"  {\"name\":\"Time\", \"fixed\":False, \"initial_value\":0.,"
-"   \"value_step\":0.1, \"min_value\":-3.0, \"max_value\":3.0},"
-"  {\"name\":\"Energy\", \"fixed\":False, \"initial_value\":226.19,"
-"   \"value_step\":0.01, \"min_value\":150., \"max_value\":300.},"
-"  {\"name\":\"x\", \"fixed\":False, \"initial_value\":0.,"
-"   \"value_step\":0.1, \"min_value\":-30., \"max_value\":30.},"
-"  {\"name\":\"Px\", \"fixed\":False, \"initial_value\":0.,"
-"   \"value_step\":0.1, \"min_value\":-5., \"max_value\":5.},"
-"  {\"name\":\"y\", \"fixed\":False, \"initial_value\":0.,"
-"   \"value_step\":0.1, \"min_value\":-30., \"max_value\":30.},"
-"  {\"name\":\"Py\", \"fixed\":False, \"initial_value\":0.,"
-"   \"value_step\":0.1, \"min_value\":-5., \"max_value\":5.}"
+"\"global_recon_minuit_minimizer\":\"MINIMIZE\",\n"
+"\"global_recon_minuit_max_iterations\":2000,\n"
+"\"global_recon_minuit_max_edm\":1e-9,\n"
+"\"global_recon_minuit_rounds\":7,\n"
+"\"global_recon_minuit_parameters\":[\n"
+  "{\"name\":\"Time\", \"fixed\":false, \"initial_value\":0.,"
+  " \"value_step\":0.1, \"min_value\":-3.0, \"max_value\":3.0},\n"
+  "{\"name\":\"Energy\", \"fixed\":false, \"initial_value\":226.19,\n"
+  " \"value_step\":0.01, \"min_value\":250., \"max_value\":350.},\n"
+  "{\"name\":\"x\", \"fixed\":false, \"initial_value\":0.,\n"
+  " \"value_step\":0.1, \"min_value\":-15., \"max_value\":15.},\n"
+  "{\"name\":\"Px\", \"fixed\":false, \"initial_value\":0.,\n"
+  " \"value_step\":0.1, \"min_value\":-15., \"max_value\":15.},\n"
+  "{\"name\":\"y\", \"fixed\":false, \"initial_value\":0.,"
+  " \"value_step\":0.1, \"min_value\":-15., \"max_value\":15.},\n"
+  "{\"name\":\"Py\", \"fixed\":false, \"initial_value\":0.,"
+  " \"value_step\":0.1, \"min_value\":-15., \"max_value\":15.}"
 "]"
 "}";
+
+const double MinuitTrackFitterTest::kMuonMass
+  = Recon::Particle::GetInstance().GetMass(GlobalDS::kMuMinus);
+
+const Json::Value MinuitTrackFitterTest::kConfiguration
+  = JsonWrapper::StringToJson(kConfigurationString);
+
+const DummyOpticsModel MinuitTrackFitterTest::kOpticsModel
+  = DummyOpticsModel(&kConfiguration);
+
+const Double_t MinuitTrackFitterTest::kStartVector[6] = {
+  0.0, 300.0, 5.0, 7.0, 9.0, 11.0 };
 
 // ***********
 // test cases
 // ***********
 
 TEST_F(MinuitTrackFitterTest, Constructor) {
-  TMinuit * minimizer = new TMinuit(6);
-
-  DummyOpticsModel optics_model(&configuration_);
-  minimizer->SetObjectFit(this);
-
-  minimizer->SetFCN(
-    Recon::common_cpp_optics_recon_minuit_track_fitter_score_function);
-  // Recon::common_cpp_optics_recon_minuit_track_fitter_score_function();
+  bool success = true;
+  try {
+    Recon::MinuitTrackFitter fitter(&kOpticsModel, 0.);
+  } catch (MAUS::Exception exception) {
+    success = false;
+  }
+  EXPECT_TRUE(success);
 }
 
+TEST_F(MinuitTrackFitterTest, ScoreTrack) {
+  Double_t score = Recon::MinuitTrackFitter::ScoreTrack(
+                      kStartVector,
+                      kOpticsModel,
+                      kMuonMass,
+                      detector_events_);
+  // chi^2 = 6*0^2 + 6*1^2 + 6*2^2 = 30. (see init. of detector_events_)
+  EXPECT_NEAR(30.0, score, 1e-9);
+}
+
+TEST_F(MinuitTrackFitterTest, Fit) {
+    Recon::MinuitTrackFitter fitter(&kOpticsModel, 0.);
+
+    std::vector<const GlobalDS::TrackPoint *> raw_track_points;
+    GlobalDS::Track raw_track;
+    for (int index = 0; index < 3; ++index) {
+      GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+      TLorentzVector four_position(kStartVector[2]+index, kStartVector[4]+index,
+                                    0.0, kStartVector[0]+index);
+      track_point->set_position(four_position);
+      TLorentzVector position_error(1.0, 1.0, 1.0, 1.0);
+      track_point->set_position_error(position_error);
+
+      TLorentzVector four_momentum(kStartVector[3]+index, kStartVector[5]+index,
+                                    280.7780432, kStartVector[1]+index);
+      track_point->set_momentum(four_momentum);
+      TLorentzVector momentum_error(1.0, 1.0, 1.0, 1.0);
+      track_point->set_momentum_error(momentum_error);
+
+      raw_track_points.push_back(track_point);
+      raw_track.AddTrackPoint(track_point);
+    }
+
+    GlobalDS::Track fit_track;
+    fitter.Fit(&raw_track, &fit_track, "MinuitTrackFitterTest");
+
+    // Check fit_track
+    for (int index = 0; index < 3; ++index) {
+      delete raw_track_points[index];
+    }
+
+    std::vector<const GlobalDS::TrackPoint *> fit_track_points
+      = fit_track.GetTrackPoints();
+    ASSERT_EQ(size_t(4), fit_track_points.size());
+
+    const GlobalDS::TrackPoint * fit_primary_point = fit_track_points[0];
+    Recon::DataStructureHelper helper = Recon::DataStructureHelper::GetInstance();
+    MAUS::PhaseSpaceVector fit_primary_vector
+      = helper.TrackPoint2PhaseSpaceVector(*fit_primary_point);
+
+    /* Since the dummy optics model does identity transport, one would expect
+     * the fit to settle on the 2nd detector event given the way the
+     * detector events are defined
+     */
+    for (int index = 0; index < 6; ++index) {
+      EXPECT_NEAR(kStartVector[index]+1., fit_primary_vector[index], 1.e-6);
+    }
+}

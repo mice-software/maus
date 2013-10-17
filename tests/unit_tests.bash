@@ -15,7 +15,6 @@ if [ $maus_lcov ]; then
         if which lcov >& /dev/null; then # check for lcov existence
             echo Clearing lcov
             lcov -q -b ${MAUS_ROOT_DIR} --directory ${MAUS_ROOT_DIR}/src --zerocounters -q
-            lcov --capture --initial -b ${MAUS_ROOT_DIR} --directory ${MAUS_ROOT_DIR}/src --output-file maus.info
         else
             echo ERROR: lcov not found - despite environment variable set
             exit 1
@@ -34,8 +33,8 @@ python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
         echo Building lcov output
-        lcov  -q --no-checksum -b ${MAUS_ROOT_DIR} --directory ${MAUS_ROOT_DIR}/src --capture --output-file maus.info
-        genhtml --highlight --legend -o ${MAUS_ROOT_DIR}/doc/cpp_coverage/ maus.info
+        lcov  -q -b ${MAUS_ROOT_DIR} --directory ${MAUS_ROOT_DIR}/src --capture --output-file maus.info
+        genhtml -o ${MAUS_ROOT_DIR}/doc/cpp_coverage/ maus.info
     fi
 fi
 

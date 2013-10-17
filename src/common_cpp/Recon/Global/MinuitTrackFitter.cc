@@ -70,7 +70,11 @@ void common_cpp_optics_recon_minuit_track_fitter_score_function(
   MinuitTrackFitter * track_fitter
     = static_cast<MinuitTrackFitter *>(minuit->GetObjectFit());
 
-  score = track_fitter->ScoreTrack(phase_space_coordinate_values);
+  score = MinuitTrackFitter::ScoreTrack(
+            phase_space_coordinate_values,
+            *track_fitter->optics_model_,
+            Particle::GetInstance().GetMass(track_fitter->particle_id_),
+            track_fitter->detector_events_);
 }
 
 MinuitTrackFitter::MinuitTrackFitter(
@@ -245,13 +249,10 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
 }
 
 Double_t MinuitTrackFitter::ScoreTrack(
-    Double_t * const start_plane_track_coordinates) {
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
-  // clear the last saved track
-  reconstructed_points_.clear();
-
+    Double_t const * const start_plane_track_coordinates,
+    const MAUS::OpticsModel & optics_model,
+    const double mass,
+    const std::vector<const GlobalDS::TrackPoint *> & detector_events) {
   DataStructureHelper helper = DataStructureHelper::GetInstance();
 
   // Setup the start plane track point based on the Minuit initial conditions
@@ -263,21 +264,19 @@ Double_t MinuitTrackFitter::ScoreTrack(
                                start_plane_track_coordinates[4],
                                start_plane_track_coordinates[5]);
   // If the guess is not physical then return a horrible score
-  if (!ValidVector(guess)) {
+  if (!MinuitTrackFitter::ValidVector(guess, mass)) {
     return 1.0e+15;
   }
-  std::cout << "DEBUG MinuitTrackFitter::ScoreTrack: particle ID = "
-            << particle_id_ << std::endl;
 
   std::vector<const TrackPoint*>::const_iterator event
-    = detector_events_.begin();
+    = detector_events.begin();
 
   // calculate chi^2
   Double_t chi_squared = 0.0;
   size_t index = 0;
   for (std::vector<const TrackPoint*>::const_iterator event
-        = detector_events_.begin();
-       event != detector_events_.end();
+        = detector_events.begin();
+       event != detector_events.end();
        ++event) {
     std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Guess: "
               << guess << std::endl;
@@ -286,7 +285,7 @@ Double_t MinuitTrackFitter::ScoreTrack(
     // calculate the next guess
     const double end_plane = (*event)->get_position().Z();
     PhaseSpaceVector point =
-      optics_model_->Transport(guess, end_plane);
+      optics_model.Transport(guess, end_plane);
     std::cout << "DEBUG MinuitTrackFitter::ScoreTrack(): Calculated: "
               << point << std::endl;
 
@@ -335,8 +334,8 @@ Double_t MinuitTrackFitter::ScoreTrack(
   return chi_squared;
 }
 
-bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess) const {
-  const double mass = Particle::GetInstance().GetMass(particle_id_);
+bool MinuitTrackFitter::ValidVector(const PhaseSpaceVector & guess,
+                                    const double mass) {
   const double E = guess.E();
   const double px = guess.Px();
   const double py = guess.Py();

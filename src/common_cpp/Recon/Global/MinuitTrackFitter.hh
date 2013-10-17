@@ -68,7 +68,16 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
 
   ~MinuitTrackFitter();
 
-  Double_t ScoreTrack(Double_t * const start_plane_track_coordinates);
+  static Double_t ScoreTrack(
+      Double_t const * const start_plane_track_coordinates,
+      const MAUS::OpticsModel & optics_model,
+      const double mass,
+      const std::vector<const MAUS::DataStructure::Global::TrackPoint *> &
+                                                               detector_events);
+
+  friend void common_cpp_optics_recon_minuit_track_fitter_score_function(
+      Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
+
  protected:
   static const size_t kPhaseSpaceDimension;
 
@@ -78,7 +87,8 @@ class MinuitTrackFitter : public TrackFitter, public TObject {
   MAUS::DataStructure::Global::PID particle_id_;
 
   void ResetParameters();
-  bool ValidVector(const MAUS::PhaseSpaceVector & guess) const;
+  static bool ValidVector(const MAUS::PhaseSpaceVector & guess,
+                          const double mass);
   MinuitTrackFitter();
 };
 
