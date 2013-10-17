@@ -1,4 +1,4 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -43,8 +43,16 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         Define cards and initialise Output
         """
         self.output = OutputCppRoot.OutputCppRoot()
-        self.outfile = os.path.join \
-                 (os.environ["MAUS_ROOT_DIR"], "tmp", "test_outputCppRoot.root")
+        self.outdir = os.environ["MAUS_ROOT_DIR"]+"/tmp/test_output_cpp_root/"
+        self.outfile = self.outdir+"test_outputCppRoot.root"
+        try:
+            os.mkdir(self.outdir)
+        except OSError:
+            pass
+        try:
+            os.mkdir(self.outdir+"/end_of_run/")
+        except OSError:
+            pass
         self.on_error_standard = ErrorHandler.DefaultHandler().on_error
         #ref = {"$ref":"#test_branch/double_by_value"}
         self.test_data = {
@@ -55,9 +63,6 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
             "daq_event_type":"physics_event",
             "recon_events":[],
             "mc_events":[],
-            #"test_branch":{"test_child_by_value":{},
-            #               "test_child_by_ref":ref,
-            #               "test_child_array":[None, ref, None, ref]},
             "maus_event_type":"Spill",
         }
         self.test_job_header = {
@@ -84,12 +89,16 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         self.cards = Configuration.Configuration().getConfigJSON()
         self.cards = json.loads(self.cards)
         self.cards["output_root_file_name"] = self.outfile
+        self.cards["output_root_file_mode"] = "one_big_file"
+        self.cards["end_of_run_output_root_directory"] = \
+                                                      self.outdir+"/end_of_run/"
         self.cards["verbose_level"] = 2
         self.cards = json.dumps(self.cards)
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         maus_cpp.globals.birth(self.cards)
         self.output.birth(self.cards)
+        #ErrorHandler.DefaultHandler().on_error = 'raise'
 
     def tearDown(self): # pylint: disable=C0103, C0202
         """
@@ -123,12 +132,23 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         Check that we can birth and death properly
         """
         an_output = OutputCppRoot.OutputCppRoot()
-        #self.assertRaises(ErrorHandler.CppError, an_output.birth, '{}')
-        #self.assertRaises(ErrorHandler.CppError, an_output.birth,
-        #                  '{"output_root_file_name":""}')
-        # for now this does NOT return an exception... needs fixing
+        # for now this does NOT return an exception... looks like it is caught
+        # by the API... set ErrorHandler.on_error to 'raise' and we raise a
+        # std::exception killing the tests (oops)
         an_output.birth(json.dumps({}))
-        an_output.birth(json.dumps({'output_root_file_name':''}))
+        an_output.birth(json.dumps({'output_root_file_name':'',
+                                    'output_root_file_mode':'one_big_file',
+                                    'end_of_run_output_root_directory':'tmp'}))
+        an_output.birth(json.dumps({'output_root_file_name':'test.root',
+                                    'output_root_file_mode':'',
+                                    'end_of_run_output_root_directory':'tmp'}))
+        an_output.birth(json.dumps({'output_root_file_name':'test.root',
+                                    'output_root_file_mode':'one',
+                                    'end_of_run_output_root_directory':'tmp'}))
+        # this is okay (dir can just be '')
+        an_output.birth(json.dumps({'output_root_file_name':'test.root',
+                                    'output_root_file_mode':'one_big_file',
+                                    'end_of_run_output_root_directory':''}))
         an_output.birth(self.cards)
         an_output.death()
 
@@ -169,11 +189,13 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         self.assertFalse(self._save_event(json.dumps({"":{}})))
         self.assertFalse(self._save_event(''))
 
-    def __check_job_header(self, json_conf_text, n_entries, entry):
+    def __check_job_header(self, json_conf_text, n_entries, entry, fname=None):
         """
         Check that json_header entry has json_conf_text 
         """
-        root_file = ROOT.TFile(self.outfile, "READ") # pylint: disable = E1101
+        if fname == None:
+            fname = self.outfile
+        root_file = ROOT.TFile(fname, "READ") # pylint: disable = E1101
         job_header = ROOT.MAUS.JobHeaderData() # pylint: disable = E1101
         tree = root_file.Get("JobHeader")
         tree.SetBranchAddress("job_header", job_header)
@@ -183,11 +205,13 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
                          json_conf_text)
         root_file.Close()
 
-    def __check_job_footer(self, datetime_string, n_entries, entry):
+    def __check_job_footer(self, datetime_string, n_entries, entry, fname=None):
         """
         Check that json_footer entry has datetime_string
         """
-        root_file = ROOT.TFile(self.outfile, "READ") # pylint: disable = E1101
+        if fname == None:
+            fname = self.outfile
+        root_file = ROOT.TFile(fname, "READ") # pylint: disable = E1101
         job_footer = ROOT.MAUS.JobFooterData() # pylint: disable = E1101
         tree = root_file.Get("JobFooter")
         tree.SetBranchAddress("job_footer", job_footer)
@@ -197,11 +221,13 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
                          datetime_string)
         root_file.Close()
 
-    def __check_run_header(self, run_number, n_entries, entry):
+    def __check_run_header(self, run_number, n_entries, entry, fname=None):
         """
         Check that json_header entry has json_conf_text 
         """
-        root_file = ROOT.TFile(self.outfile, "READ") # pylint: disable = E1101
+        if fname == None:
+            fname = self.outfile
+        root_file = ROOT.TFile(fname, "READ") # pylint: disable = E1101
         run_header = ROOT.MAUS.RunHeaderData() # pylint: disable = E1101
         tree = root_file.Get("RunHeader")
         tree.SetBranchAddress("run_header", run_header)
@@ -273,6 +299,99 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         self.__check_job_header("output cpp root test", 2, 0)
         self.__check_job_header("output cpp root test 2", 2, 1)
         self.__check_job_footer("1977-04-04T00:00:00.000000", 2, 1)
+
+    def test_one_file_per_run(self):
+        """
+        test_OutputCppRoot.test_one_file_per_run: one_file_per_run option
+        """
+        my_output = OutputCppRoot.OutputCppRoot()
+        cards_py = json.loads(self.cards)
+        cards_py["output_root_file_mode"] = "one_file_per_run"
+        self.cards = json.dumps(cards_py)
+        my_output.birth(self.cards)
+        self.test_data["run_number"] = 10
+        self.test_run_header["run_number"] = 10
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_data)
+            ))
+        for i in range(2): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_run_header)
+            ))
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_data)
+            ))
+        self.test_run_header["run_number"] = 9
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_run_header)
+            ))
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_job_header)
+            ))
+        my_output.death()
+        self.__check_job_header("output cpp root test", 3, 0,
+                                        self.outdir+"test_outputCppRoot_0.root")
+        self.__check_run_header(10, 2, 0,
+                                       self.outdir+"test_outputCppRoot_10.root")
+        self.__check_run_header(9, 3, 0,
+                                        self.outdir+"test_outputCppRoot_9.root")
+
+    def test_end_of_run_file_per_run(self):
+        """
+        test_OutputCppRoot.test_one_file_per_run: end_of_run_file_per_run option
+        """
+        my_output = OutputCppRoot.OutputCppRoot()
+        cards_py = json.loads(self.cards)
+        cards_py["output_root_file_mode"] = "end_of_run_file_per_run"
+        cards_py["output_root_file_name"] = "test_outputCppRoot.root"
+        cards_py["end_of_run_output_root_directory"] = \
+                                                      self.outdir+"/end_of_run/"
+        self.cards = json.dumps(cards_py)
+        my_output.birth(self.cards)
+        self.test_data["run_number"] = 10
+        self.test_run_header["run_number"] = 10
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_data)
+            ))
+        for i in range(2): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_run_header)
+            ))
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_data)
+            ))
+        self.test_run_header["run_number"] = 9
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_run_header)
+            ))
+        self.assertTrue(my_output.save(
+            json.dumps(self.test_job_footer)
+        ))
+        self.test_run_footer["run_number"] = 9
+        self.assertTrue(my_output.save(
+            json.dumps(self.test_run_footer)
+        ))
+        for i in range(3): # pylint: disable = W0612
+            self.assertTrue(my_output.save(
+                json.dumps(self.test_job_header)
+            ))
+        my_output.death()
+        self.__check_job_header("output cpp root test", 3, 0,
+                           self.outdir+"/end_of_run/0/test_outputCppRoot.root")
+        self.__check_run_header(10, 2, 0,
+                           self.outdir+"/end_of_run/10/test_outputCppRoot.root")
+        self.__check_run_header(9, 3, 0,
+                           self.outdir+"/end_of_run/9/test_outputCppRoot.root")
+        self.__check_job_footer("1977-04-04T00:00:00.000000", 1, 0,
+                           self.outdir+"/end_of_run/0/test_outputCppRoot.root")
+
 
 if __name__ == "__main__":
     unittest.main()
