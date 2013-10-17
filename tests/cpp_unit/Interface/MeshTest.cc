@@ -6,12 +6,12 @@
 
 #include "Interface/Mesh.hh"
 
-bool           Test2DGrid      (TwoDGrid&   v_mesh, std::ostream& out, bool constSpacing);
+void           Test2DGrid      (TwoDGrid&   v_mesh, std::ostream& out, bool constSpacing);
 bool           Test3DGrid      (ThreeDGrid& v_mesh, std::ostream& out, bool constSpacing);
 bool           TestNDGrid      (NDGrid&     v_mesh, std::ostream& out, bool constSpacing);
 bool           TestMeshIterator(Mesh& mesh, std::ostream& out);
 
-bool Test2DGrid(TwoDGrid& v_mesh, std::ostream& out, bool constSpacing)
+void Test2DGrid(TwoDGrid& v_mesh, std::ostream& out, bool constSpacing)
 {
     bool testpass = true;
     const TwoDGrid c_mesh = v_mesh;
@@ -19,20 +19,19 @@ bool Test2DGrid(TwoDGrid& v_mesh, std::ostream& out, bool constSpacing)
     std::vector<double> yVec = v_mesh.yVector();
     double *            xArr = v_mesh.newXArray();
     double *            yArr = v_mesh.newYArray();
-    testpass &= int(xVec.size()) == c_mesh.xSize();
-    testpass &= int(yVec.size()) == c_mesh.ySize();
-    out << " setup " << int(testpass) << " ";
+    EXPECT_EQ(int(xVec.size()), c_mesh.xSize());
+    EXPECT_EQ(int(yVec.size()), c_mesh.ySize());
 
     for(unsigned int i=0; i<xVec.size(); i++)
     {
-        testpass &= fabs(xVec[i] - v_mesh.x(i+1)) < 1e-9;
-        testpass &= fabs(xVec[i] - c_mesh.x(i+1)) < 1e-9;
-        testpass &= fabs(xArr[i] - v_mesh.x(i+1)) < 1e-9;
+        EXPECT_LT(fabs(xVec[i] - v_mesh.x(i+1)), 1e-9);
+        EXPECT_LT(fabs(xVec[i] - c_mesh.x(i+1)), 1e-9);
+        EXPECT_LT(fabs(xArr[i] - v_mesh.x(i+1)), 1e-9);
         for(unsigned int j=0; j<yVec.size(); j++)
         {
-            testpass &= fabs(yVec[j] - v_mesh.y(j+1)) < 1e-9;
-            testpass &= fabs(yVec[j] - c_mesh.y(j+1)) < 1e-9;
-            testpass &= fabs(yArr[j] - v_mesh.y(j+1)) < 1e-9;
+            EXPECT_LT(fabs(yVec[j] - v_mesh.y(j+1)), 1e-9);
+            EXPECT_LT(fabs(yVec[j] - c_mesh.y(j+1)), 1e-9);
+            EXPECT_LT(fabs(yArr[j] - v_mesh.y(j+1)), 1e-9);
         }
     }
     out << " val " <<  int(testpass) << " ";
@@ -45,47 +44,51 @@ bool Test2DGrid(TwoDGrid& v_mesh, std::ostream& out, bool constSpacing)
     {
         x = xVec[i-1] + (xVec[i] - xVec[i-1])/2.;
         c_mesh.xLowerBound(x, xInd);
-        testpass &= (xInd == int(i-1));
+        EXPECT_EQ(xInd, int(i-1));
         for(unsigned int j=1; j<yVec.size(); j++)
         {
             y = yVec[j-1] + (yVec[j] - yVec[j-1])/2.;
             c_mesh.yLowerBound(y, yInd);
-            testpass &= (yInd == int(j-1));
+            EXPECT_EQ(yInd, int(j-1));
             c_mesh.LowerBound(x,xInd,y,yInd);
-            testpass &= (xInd == int(i-1)) && (yInd == int(j-1));
+            EXPECT_EQ(xInd, int(i-1));
+            EXPECT_EQ(yInd, int(j-1));
         }
     }
     x = xVec.back() + 1.;
     c_mesh.xLowerBound(x, xInd);
-    testpass &= (xInd == int(xVec.size()-1));
+    EXPECT_EQ(xInd, int(xVec.size()-1));
 
     y = yVec.back() + 1.;
     c_mesh.yLowerBound(y, yInd);
-    testpass &= (yInd == int(yVec.size()-1));
+    EXPECT_EQ(yInd, int(yVec.size()-1));
     c_mesh.LowerBound(x,xInd,y,yInd);
-    testpass &= (xInd == int(xVec.size()-1)) && (yInd == int(yVec.size()-1));
+    EXPECT_EQ(xInd, int(xVec.size()-1));
+    EXPECT_EQ(yInd, int(yVec.size()-1));
 
     x = xVec.front() - 1.;
     c_mesh.xLowerBound(x, xInd);
-    testpass &= (xInd == -1);
+    EXPECT_EQ(xInd, -1);
 
     y = yVec.front() - 1.;
     c_mesh.yLowerBound(y, yInd);
-    testpass &= (yInd == -1);
+    EXPECT_EQ(yInd, -1);
     c_mesh.LowerBound(x,xInd,y,yInd);
-    testpass &= (xInd == -1) && (yInd == -1);
+    EXPECT_EQ(xInd, -1); 
+    EXPECT_EQ(yInd, -1);
     out << " lower_bound " << int(testpass) << " "; 
 
-    testpass &= c_mesh.Begin().ToInteger() == 0;
-    testpass &= c_mesh.End().ToInteger() == int(xVec.size() * yVec.size()); // one past the end
+    EXPECT_EQ(c_mesh.Begin().ToInteger(), 0);
+    EXPECT_EQ(c_mesh.End().ToInteger(), int(xVec.size() * yVec.size())); // one past the end
     std::vector<double> pos(2);
     std::vector<double> c_pos(2);
     int itIndex = 0;
     for(Mesh::Iterator it = c_mesh.Begin(); it != c_mesh.End(); it++)
     {
         c_mesh.Position(it, &pos[0]);
-        testpass &= (c_mesh.ToInteger(it) == itIndex++);
-        testpass &= (c_mesh.x(it[0]) == pos[0] && c_mesh.y(it[1]) == pos[1]);
+        EXPECT_EQ(c_mesh.ToInteger(it), itIndex++);
+        EXPECT_EQ(c_mesh.x(it[0]), pos[0]);
+        EXPECT_EQ(c_mesh.y(it[1]), pos[1]);
     }
     std::vector<int> st(2,0);
     for(st[0]=1; st[0]<int(xVec.size()); st[0]++)
@@ -93,52 +96,57 @@ bool Test2DGrid(TwoDGrid& v_mesh, std::ostream& out, bool constSpacing)
         {
             Mesh::Iterator it(st, &c_mesh);
             c_mesh.CentrePosition(it, &c_pos[0]);
-            testpass &= ((xVec[st[0]-1]+xVec[st[0]])/2. - c_pos[0]) < 1e-9 && fabs((yVec[st[1]-1]+yVec[st[1]])/2. - c_pos[1]) < 1e-9;
+            EXPECT_LT((xVec[st[0]-1]+xVec[st[0]])/2. - c_pos[0], 1e-9);
+            EXPECT_LT(fabs((yVec[st[1]-1]+yVec[st[1]])/2. - c_pos[1]), 1e-9);
         }
     for(Mesh::Iterator it = c_mesh.Begin(); it != c_mesh.End(); it++)
     {
         c_mesh.Position(it, &pos[0]);
         c_pos[0] = pos[0] - 1e-5; c_pos[1] = pos[1] - 1e-5;
-        testpass &= c_mesh.Nearest(&c_pos[0]) == it;
+        EXPECT_EQ(c_mesh.Nearest(&c_pos[0]), it);
         c_pos[0] = pos[0] - 1e-5; c_pos[1] = pos[1] + 1e-5;
-        testpass &= c_mesh.Nearest(&c_pos[0]) == it;
+        EXPECT_EQ(c_mesh.Nearest(&c_pos[0]), it);
         c_pos[0] = pos[0] + 1e-5; c_pos[1] = pos[1] - 1e-5;
-        testpass &= c_mesh.Nearest(&c_pos[0]) == it;
+        EXPECT_EQ(c_mesh.Nearest(&c_pos[0]), it);
         c_pos[0] = pos[0] + 1e-5; c_pos[1] = pos[1] + 1e-5;
-        testpass &= c_mesh.Nearest(&c_pos[0]) == it;
+        EXPECT_EQ(c_mesh.Nearest(&c_pos[0]), it);
     }
     c_pos[0] = 1e6; c_pos[1] = 1e6;
-    testpass &= c_mesh.Nearest(&c_pos[0]).ToInteger() < c_mesh.End().ToInteger() && c_mesh.Nearest(&c_pos[0]).ToInteger() >= 0;
+    EXPECT_LT(c_mesh.Nearest(&c_pos[0]).ToInteger(), c_mesh.End().ToInteger());
+    EXPECT_GE(c_mesh.Nearest(&c_pos[0]).ToInteger(), 0);
     c_pos[0] = -1e6; 
-    testpass &= c_mesh.Nearest(&c_pos[0]).ToInteger() < c_mesh.End().ToInteger() && c_mesh.Nearest(&c_pos[0]).ToInteger() >= 0;
+    EXPECT_LT(c_mesh.Nearest(&c_pos[0]).ToInteger(), c_mesh.End().ToInteger());
+    EXPECT_GE(c_mesh.Nearest(&c_pos[0]).ToInteger(), 0);
     c_pos[1] = -1e6; 
-    testpass &= c_mesh.Nearest(&c_pos[0]).ToInteger() < c_mesh.End().ToInteger() && c_mesh.Nearest(&c_pos[0]).ToInteger() >= 0;
+    EXPECT_LT(c_mesh.Nearest(&c_pos[0]).ToInteger(), c_mesh.End().ToInteger());
+    EXPECT_GE(c_mesh.Nearest(&c_pos[0]).ToInteger(), 0);
     c_pos[0] =  1e6; 
-    testpass &= c_mesh.Nearest(&c_pos[0]).ToInteger() < c_mesh.End().ToInteger() && c_mesh.Nearest(&c_pos[0]).ToInteger() >= 0;
+    EXPECT_LT(c_mesh.Nearest(&c_pos[0]).ToInteger(), c_mesh.End().ToInteger());
+    EXPECT_GE(c_mesh.Nearest(&c_pos[0]).ToInteger(), 0);
 
     out << " iter " << int(testpass) << " ";
 
-    testpass &= (c_mesh.MinX() == xVec.front());
-    testpass &= (c_mesh.MaxX() == xVec.back ());
-    testpass &= (c_mesh.MinY() == yVec.front());
-    testpass &= (c_mesh.MaxY() == yVec.back ());
+    EXPECT_EQ(c_mesh.MinX(), xVec.front());
+    EXPECT_EQ(c_mesh.MaxX(), xVec.back ());
+    EXPECT_EQ(c_mesh.MinY(), yVec.front());
+    EXPECT_EQ(c_mesh.MaxY(), yVec.back ());
 
     v_mesh.SetX(xVec.size(), xArr);
     v_mesh.SetY(yVec.size(), yArr);
-    for(unsigned int i=0; i<xVec.size(); i++) testpass &= fabs(xVec[i] - v_mesh.x(i+1)) < 1e-9;
-    for(unsigned int i=0; i<yVec.size(); i++) testpass &= fabs(yVec[i] - v_mesh.y(i+1)) < 1e-9;
-    testpass &= c_mesh.PositionDimension() == 2;
-    testpass &= c_mesh.GetConstantSpacing() == constSpacing;
+    for(unsigned int i=0; i<xVec.size(); i++)
+        EXPECT_LT(fabs(xVec[i] - v_mesh.x(i+1)), 1e-9);
+    for(unsigned int i=0; i<yVec.size(); i++)
+        EXPECT_LT(fabs(yVec[i] - v_mesh.y(i+1)), 1e-9);
+    EXPECT_EQ(c_mesh.PositionDimension(), 2);
+    EXPECT_EQ(c_mesh.GetConstantSpacing(), constSpacing);
     v_mesh.SetConstantSpacing();
-    testpass &= v_mesh.GetConstantSpacing() == constSpacing;
+    EXPECT_EQ(v_mesh.GetConstantSpacing(), constSpacing);
     v_mesh.SetConstantSpacing(!constSpacing);
-    testpass &= v_mesh.GetConstantSpacing() != constSpacing;
+    EXPECT_NE(v_mesh.GetConstantSpacing(), constSpacing);
     out << " misc " << int(testpass) << " " ;
 
     delete [] xArr;
     delete [] yArr;
-    return testpass;
-
 /* NOT TESTED:
     void    Add(VectorMap* map); //add *map if it has not already been added
     void    Remove(VectorMap* map); //remove *map if it exists; delete this if there are no more VectorMaps
@@ -483,28 +491,29 @@ bool TestMeshIterator(Mesh& mesh, std::ostream& out)
     {
         for(Mesh::Iterator comp = mesh.Begin(); comp<it; comp++) 
         {
-            if(comp <  it) lessThan   = true  && lessThan;
-            if(comp >  it) moreThan   = false && lessThan;
-            if(comp >= it) moreThanEq = false && lessThan;
-            if(comp <= it) lessThanEq = true  && lessThan;
-            if(comp == it) equal      = false && lessThan;
-            if(comp != it) notEqual   = true  && lessThan;
+            // note we are testing the operator here...
+            EXPECT_TRUE(comp < it);
+            EXPECT_TRUE(comp <= it);
+            EXPECT_TRUE(comp != it);
+            EXPECT_FALSE(comp > it);
+            EXPECT_FALSE(comp >= it);
+            EXPECT_FALSE(comp == it);
         }
         Mesh::Iterator comp = it;
-        if(comp <  it) lessThan   = false && lessThan;
-        if(comp >  it) moreThan   = false && lessThan;
-        if(comp >= it) moreThanEq = true  && lessThan;
-        if(comp <= it) lessThanEq = true  && lessThan;
-        if(comp == it) equal      = true  && lessThan;
-        if(comp != it) notEqual   = false && lessThan;
+        EXPECT_FALSE(comp < it);
+        EXPECT_TRUE(comp <= it);
+        EXPECT_FALSE(comp != it);
+        EXPECT_FALSE(comp > it);
+        EXPECT_TRUE(comp >= it);
+        EXPECT_TRUE(comp == it);
         for(Mesh::Iterator comp = mesh.End(); comp!=it; comp--) 
         {
-            if(comp <  it) lessThan   = false && lessThan;
-            if(comp >  it) moreThan   = true  && lessThan;
-            if(comp >= it) moreThanEq = true  && lessThan;
-            if(comp <= it) lessThanEq = false && lessThan;
-            if(comp == it) equal      = true  && lessThan;
-            if(comp != it) notEqual   = false && lessThan;
+            EXPECT_FALSE(comp < it);
+            EXPECT_FALSE(comp <= it);
+            EXPECT_TRUE(comp != it);
+            EXPECT_TRUE(comp > it);
+            EXPECT_TRUE(comp >= it);
+            EXPECT_FALSE(comp == it);
         }
     }
     out <<"lt "<<int(lessThan)<<" mt "<<int(moreThan)<< " lte "<< int(lessThanEq)<<" mte "<< int(moreThanEq)<<" eq "<<int(equal)<<" neq "<<int(notEqual)
@@ -521,9 +530,14 @@ TEST(MeshTest, testAll) {
     int    number[3] = {4, 8, 12};
 
     std::vector< std::vector<double> > coordinatesConst(3);
-    for(int i=0; i<3; i++)
-        for(int j=0; j<number[i]; j++)
-            coordinatesConst[i].push_back( min[i] + delta[i]*j);
+    double** coordinatesConstArray = new double*[3];
+    for(int i=0; i<3; i++) {
+        coordinatesConstArray[i] = new double[number[i]];
+        for(int j=0; j<number[i]; j++) {
+            coordinatesConst[i].push_back(min[i] + delta[i]*j);
+            coordinatesConstArray[i][j] = min[i] + delta[i]*j;
+        }
+    }
 
     std::vector< std::vector<double> > coordinatesVar(3);
     for(int i=0; i<3; i++)
@@ -531,26 +545,32 @@ TEST(MeshTest, testAll) {
             coordinatesVar[i].push_back( min[i] + delta[i]*j*j);
 
     TwoDGrid *   const2DGrid1 = new TwoDGrid(delta[0], delta[1], min[0], min[1], number[0], number[1]);
-    TwoDGrid *   const2DGrid2 = new TwoDGrid(coordinatesConst[0].size(), &coordinatesConst[0][0], coordinatesConst[1].size(), &coordinatesConst[1][0]);
+    TwoDGrid *   const2DGrid2 = new TwoDGrid(
+                                          number[0], coordinatesConstArray[0],
+                                          number[1], coordinatesConstArray[1]
+                                    );
     TwoDGrid *   const2DGrid3 = new TwoDGrid(coordinatesConst[0], coordinatesConst[1]);
     TwoDGrid *   var2DGrid1   = new TwoDGrid(coordinatesVar[0],   coordinatesVar[1]  );
 
     out << "\n\n***********   2d Const 1 **********" << std::endl;
-    EXPECT_TRUE(Test2DGrid(*const2DGrid1, out, true));
+    Test2DGrid(*const2DGrid1, out, true);
     EXPECT_TRUE(TestMeshIterator(*const2DGrid1, out));
     out << "\n\n***********   2d Const 2 **********" << std::endl;
-    EXPECT_TRUE(Test2DGrid(*const2DGrid2, out, true));
+    Test2DGrid(*const2DGrid2, out, true);
     EXPECT_TRUE(TestMeshIterator(*const2DGrid2, out));
     out << "\n\n***********   2d Const 3 ********** " << std::endl;
-    EXPECT_TRUE(Test2DGrid(*const2DGrid3, out, true));
+    Test2DGrid(*const2DGrid3, out, true);
     EXPECT_TRUE(TestMeshIterator(*const2DGrid3, out));
     out << "\n\n***********   2d_Var_1 **********" << std::endl;
-    EXPECT_TRUE(Test2DGrid(*var2DGrid1, out, false));
+    Test2DGrid(*var2DGrid1, out, false);
     EXPECT_TRUE(TestMeshIterator(*var2DGrid1,   out));
     delete const2DGrid1;
     delete const2DGrid2;
     delete const2DGrid3;
     delete var2DGrid1;
+    // other memory is cleaned by the TwoDGrid();
+    delete [] coordinatesConstArray[2];
+    delete [] coordinatesConstArray;
 
     ThreeDGrid * const3DGrid1 = new ThreeDGrid(delta[0], delta[1], delta[2], min[0], min[1], min[2], number[0], number[1], number[2]);
     ThreeDGrid * const3DGrid2 = new ThreeDGrid(coordinatesConst[0].size(), &coordinatesConst[0][0], 
