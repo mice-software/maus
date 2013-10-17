@@ -67,53 +67,65 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 	_magneticField       ->SetGridSize( BTFieldGroup::GetGridDefault() );
 	_electroMagneticField->SetGridSize( BTFieldGroup::GetGridDefault() );
 	try {
-	int ignoredAmalgamated = 0;
-	_needsPhases = false;
-	BTSolenoid::ClearStaticMaps();
-	std::vector<const MiceModule*> daughterModules;
-	for(int fields = 0; fields < _numberOfFieldTypes; fields++)
-	{
-		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
-		for(unsigned int i=0; i<daughterModules.size(); i++)
-		{ try{
-			BTField * newField;
-			const MiceModule * theModule   = daughterModules[i];
-			if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool"))
-			{
-				if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //don't use, the BTFieldAmalgamation should deal with it
-				{ignoredAmalgamated++; newField = NULL;}
-				else{ newField = GetField(theModule); } //not amalgamated, use as normal
-			}
-			else{   newField    = GetField(theModule); } //not amalgamated, use as normal
-			Hep3Vector         position    = theModule->globalPosition();
-			HepRotation        rotation    = theModule->globalRotation();
-			double             scaleFactor = theModule->globalScaleFactor();
-  		if(newField==NULL) {;} //error do nothing
-			else if(newField->DoesFieldChangeEnergy())
-				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
-			else
-				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
-			SetName(newField, theModule);
-		}
-		catch(MAUS::Exception exception) {std::cerr << "Error while loading fields from module "+daughterModules[i]->fullName() << std::endl; exception.Print(); exit(1);}
-		catch(...)          
-		{std::cerr << "Unhandled exception while loading fields from module "+daughterModules[i]->fullName()+" - bailing" << std::endl; exit(1);}
-		}
-	}
-  _magneticField->Close();
-  _electroMagneticField->Close();
+  	int ignoredAmalgamated = 0;
+  	_needsPhases = false;
+  	BTSolenoid::ClearStaticMaps();
+  	std::vector<const MiceModule*> daughterModules;
+  	for(int fields = 0; fields < _numberOfFieldTypes; fields++)
+  	{
+  		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
+  		for(unsigned int i=0; i<daughterModules.size(); i++)
+  		{
+  		  try {
+    			BTField * newField;
+    			const MiceModule * theModule   = daughterModules[i];
+    			if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool"))
+    			{
+    				if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //don't use, the BTFieldAmalgamation should deal with it
+    				{ignoredAmalgamated++; newField = NULL;}
+    				else{ newField = GetField(theModule); } //not amalgamated, use as normal
+    			}
+    			else{   newField    = GetField(theModule); } //not amalgamated, use as normal
+    			Hep3Vector         position    = theModule->globalPosition();
+    			HepRotation        rotation    = theModule->globalRotation();
+    			double             scaleFactor = theModule->globalScaleFactor();
+      		if(newField==NULL) {;} //error do nothing
+    			else if(newField->DoesFieldChangeEnergy())
+    				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
+    			else
+    				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
+    			SetName(newField, theModule);
+    		} catch(MAUS::Exception exception) {
+    		  std::cerr << "Error while loading fields from module "
+    		            << daughterModules[i]->fullName() << std::endl;
+    		  exception.Print(); exit(1);
+    		} catch(...) {
+    		  std::cerr << "Unhandled exception while loading fields from module "
+    		            << daughterModules[i]->fullName() << " - bailing"
+    		            << std::endl;
+    		  exit(1);
+    		}
+  		}
+  	}
+    _magneticField->Close();
+    _electroMagneticField->Close();
 
-	WriteFieldMaps();
-	if(_amalgamatedFields != ignoredAmalgamated)
-	{
-		std::stringstream in;
-		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
-		   << _amalgamatedFields << " in Amalgamation MiceModules";
-		throw(MAUS::Exception(MAUS::Exception::recoverable, in.str(), "BTFieldConstructor()"));
+  	WriteFieldMaps();
+  	if(_amalgamatedFields != ignoredAmalgamated)
+  	{
+  		std::stringstream in;
+  		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
+  		   << _amalgamatedFields << " in Amalgamation MiceModules";
+  		throw(MAUS::Exception(MAUS::Exception::recoverable, in.str(), "BTFieldConstructor()"));
+  	}
+	} catch(MAUS::Exception exception) {
+	  exception.Print();
+	  exit(1);
+	} catch(...) {
+	  std::cerr << "Unhandled exception while loading fields - bailing"
+	            << std::endl;
+	  exit(1);
 	}
-	}
-	catch(MAUS::Exception exception) {exception.Print(); exit(1);}
-	catch(...)          {std::cerr << "Unhandled exception while loading fields - bailing" << std::endl; exit(1);}
 }
 
 bool BTFieldConstructor::ModuleHasElectromagneticField(const MiceModule * theModule)
