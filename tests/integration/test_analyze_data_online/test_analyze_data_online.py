@@ -145,11 +145,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
-        for data in ['test_data.cat_histos']:
+        test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
+                             'test_analyze_data_online/test_data.cat_histos/')
+        eor_dir = test_dir+'end_of_run/4235/'
+        for data in [eor_dir]:
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
                '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
-                test_root = temp_dir(data)+ref_root.split('/')[-1]
+                test_root = data+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
                                                    test_root,
                                                    ref_root,
@@ -158,9 +161,6 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             for key, value in pass_dict.iteritems():
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
-        test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
-                             'test_analyze_data_online/test_data.cat_histos/')
-        eor_dir = test_dir+'end_of_run/4235/'
         self.assertTrue(os.path.exists(eor_dir), msg="Failed to find "+eor_dir)
         ref_png = [item.split('/')[-1] for item in glob.glob(test_dir+'*.png')]
         eor_png = [item.split('/')[-1] for item in glob.glob(eor_dir+'*.png')]
