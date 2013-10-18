@@ -34,6 +34,7 @@ Two classes are defined:
 """
 
 import json
+import os
 
 import numpy
 import ROOT
@@ -76,7 +77,7 @@ class Lattice:
     said lattice
     """
 
-    def __init__(self, momentum, z_start, coil_currents):
+    def __init__(self, momentum, z_start, coil_currents, lattice_file):
         """
         Initialises some data
 
@@ -91,7 +92,7 @@ class Lattice:
         self.optics_model = None
         self.first = True
         self.coil_currents = coil_currents
-        self.lattice_file = "Stage4.Coils.dat"
+        self.lattice_file = lattice_file
         self.setup_lattice(coil_currents)
 
     def setup_lattice(self, coil_currents):
@@ -283,7 +284,7 @@ class LatticeOptimiser:
     Wrapper for the ROOT TMinuit optimisation routines
     """
 
-    def __init__(self, momentum, focus, match1, match2):
+    def __init__(self, momentum, focus, match1, match2, lattice_file):
         """
         Initialise the LatticeOptimiser
 
@@ -293,8 +294,12 @@ class LatticeOptimiser:
         self.focus = focus
         self.match2 = match2
         self.optimiser = None
-        self.lattice = Lattice(momentum, self.z_start,
-                  {"MatchCoil1":match1, "MatchCoil2":match2, "FocusCoil":focus})
+        self.lattice = Lattice(
+                  momentum,
+                  self.z_start,
+                  {"MatchCoil1":match1, "MatchCoil2":match2, "FocusCoil":focus},
+                  lattice_file
+            )
         self.m1_limit = self.current_limit(281., 4830, 201.3, 46.2)
         self.m2_limit = self.current_limit(286., 3192, 199.5, 30.9)
 
@@ -418,7 +423,11 @@ def main():
 Welcome to the MAUS optics matching example.
 
 Setting up the lattice, as in the plot_step_4_beta_function.py example."""
-    lattice_optimiser = LatticeOptimiser(200., 113.95, 100., 100.)
+    lattice_file = os.path.expandvars(
+                "${MAUS_ROOT_DIR}/bin/examples/optics_examples/Stage4.Coils.dat"
+              )
+
+    lattice_optimiser = LatticeOptimiser(200., 113.95, 100., 100., lattice_file)
 
     print "Now plotting beta and Bz before doing any optimisation"
     bz_canvas, bz_graph_1 = lattice_optimiser.lattice.plot_field(
