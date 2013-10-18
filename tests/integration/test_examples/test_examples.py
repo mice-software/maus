@@ -1,4 +1,4 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ Run the examples and check they return 0
 # pylint: disable=E1101
 
 import time
-import sys
 import os
 import glob
 import subprocess
@@ -38,14 +37,12 @@ def get_images():
     return image_list
 
 def safe_mkdir(my_dir):
-    if os.path.exists(my_dir):
-        if not os.path.isdir(my_dir):
-            raise OSError("Ack, a file was there already "+plot_dir)
-    else:
-        try:
-            os.mkdir(my_dir)
-        except OSError:
-            sys.excepthook(*sys.exc_info())
+    """
+    Make sure a directory exists at my_dir, making a new one if it does not and
+    raising OSError if there is something blocking
+    """
+    if not os.path.isdir(my_dir):
+        os.mkdir(my_dir)
 
 
 def move_images(_images_before, _images_after, _example_name):
