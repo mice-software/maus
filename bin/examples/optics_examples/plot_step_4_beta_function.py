@@ -25,7 +25,7 @@ propagate a covariance matrix (beam ellispe) through the transfer matrices,
 plotting the result.
 """
 
-
+import os
 import json
 
 import ROOT
@@ -194,7 +194,10 @@ def main():
     Make a plot of z, bz
     """
     print "Welcome to MAUS optics example"
-    lattice = Lattice(200., -2900., "Stage4.Coils.dat")
+    lattice_file = os.path.expandvars(
+                "${MAUS_ROOT_DIR}/bin/examples/optics_examples/Stage4.Coils.dat"
+              )
+    lattice = Lattice(200., -2900., lattice_file)
     lattice.setup_lattice()
     print """
 We plot Bz as a function of z along the axis. The maus_cpp.field module is used
