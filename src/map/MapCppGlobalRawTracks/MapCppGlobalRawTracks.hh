@@ -125,7 +125,7 @@ class MapCppGlobalRawTracks {
   double TOFSlabEnergyLoss(const double beta, const double mass) const;
   double TOFMeanStoppingPower(const double beta, const double mass) const;
 
-  void LoadSciFiTrack(
+  void LoadSciFiTracks(
       MAUS::ReconEvent const * const recon_event,
       MAUS::DataStructure::Global::TrackPArray & sci_fi_tracks);
 

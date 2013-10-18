@@ -195,7 +195,7 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
             << "Loading SciFi track..." << std::endl;
   */
-  LoadSciFiTrack(recon_event, tracks);
+  LoadSciFiTracks(recon_event, tracks);
   /*
   size_t sci_fi_track_count = tracks.size() - tof_track_count;
   std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
@@ -544,61 +544,65 @@ double MapCppGlobalRawTracks::TOFMeanStoppingPower(const double beta,
   return stopping_power;
 }
 
-/** LoadSciFiTrack
+/** LoadSciFiTracks
  */
-void MapCppGlobalRawTracks::LoadSciFiTrack(
+void MapCppGlobalRawTracks::LoadSciFiTracks(
     MAUS::ReconEvent const * const recon_event,
     GlobalDS::TrackPArray & tracks) {
   if (tracks.size() == 0) {
-    std::cout << "DEBUG LoadSciFiTrack: no TOF tracks to add SciFi tracks to!"
-              << std::endl;
-    return;
+    // Add a new track if none previously existed
+    GlobalDS::Track * track = new GlobalDS::Track();
+    tracks.push_back(track);
   }
 
-  SciFiEvent const * const sci_fi_event = recon_event->GetSciFiEvent();
-  SciFiSpacePointPArray space_points = sci_fi_event->spacepoints();
+  SciFiEvent const * const scifi_event = recon_event->GetSciFiEvent();
+  SciFiTrackPArray scifi_tracks = scifi_event->scifitracks();
+  SciFiTrackPArray::const_iterator scifi_track = scifi_tracks.begin();
+  while (scifi_track != scifi_tracks.end()) {
+    SciFiTrackPointPArray scifi_track_points = scifi_track->scifitrackpoints();
+    SciFiTrackPointPArray::const_iterator scifi_track_point
+      = scifi_track_points.begin();
+    while (scifi_track_point != scifi_track_points.end()) {
+      const int tracker = (*scifi_track_point)->tracker();
+      const int station = (*scifi_track_point)->station();
+      const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
+          GlobalDS::kTracker0 + 6 * tracker + station);
+      MAUS::recon::global::DetectorMap::const_iterator detector_mapping
+        = detectors_.find(detector_id);
+      if (detector_mapping == detectors_.end()) {
+        std::stringstream message;
+        message << "Couldn't find configuration for detector Tracker "
+                << tracker << " Station " << station
+                << "(id=" << detector_id << ")";
+        throw(Exception(Exception::nonRecoverable,
+                     message.str(),
+                     "MapCppGlobalRawTracks::LoadSciFiTrack()"));
+      }
+      const Detector& detector = detector_mapping->second;
+      GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+      PopulateSciFiTrackPoint(detector, scifi_track_point, track_point);
 
-  // FIXME(Lane) currently assuming only one track...
-  GlobalDS::Track * track = tracks[0];
-  for (SciFiSpacePointPArray::const_iterator space_point = space_points.begin();
-       space_point != space_points.end();
-       ++space_point) {
+      MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+      MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+        = simulator->GetReferenceParticle();
+      const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
 
-    const int tracker = (*space_point)->get_tracker();
-    const int station = (*space_point)->get_station();
-    const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
-        GlobalDS::kTracker0 + 6 * tracker + station);
-    MAUS::recon::global::DetectorMap::const_iterator detector_mapping
-      = detectors_.find(detector_id);
-    if (detector_mapping == detectors_.end()) {
-      std::stringstream message;
-      message << "Couldn't find configuration for detector Tracker "
-              << tracker << " Station " << station
-              << "(id=" << detector_id << ")";
-      throw(Exception(Exception::nonRecoverable,
-                   message.str(),
-                   "MapCppGlobalRawTracks::LoadSciFiTrack()"));
+      GlobalDS::TrackPArray::const_iterator track = tracks.begin();
+      while (track != tracks.end()) {
+        // FIXME(Lane) this will have to change once PID functionality exists
+        track->set_pid(particle_id);
+
+        track->AddTrackPoint(track_point);
+      }
     }
-    const Detector& detector = detector_mapping->second;
-    GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
-    PopulateSciFiTrackPoint(detector, space_point, track_point);
-    track->AddTrackPoint(track_point);
   }
-
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
-  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
-  track->set_pid(particle_id);
-
-  tracks.push_back(track);
 }
 
 /** PopulateSciFiTrackPoint
  */
 void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
     const MAUS::recon::global::Detector & detector,
-    const SciFiSpacePointPArray::const_iterator & scifi_space_point,
+    const SciFiTrackPointPArray::const_iterator & scifi_track_point,
     GlobalDS::TrackPoint * track_point) {
   GlobalDS::SpacePoint * space_point = new GlobalDS::SpacePoint();
 
@@ -611,56 +615,31 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
 
-  ThreeVector position = (*scifi_space_point)->get_position();
   DataStructureHelper helper = DataStructureHelper::GetInstance();
+  const double x = (detector.id() <= GlobalDS::kTracker0_5)?
+                   -scifi_track_point->x():scifi_track_point->x();
+  const double y = scifi_track_point->y();
   const double z = helper.GetDetectorZPosition(detector.id());
-  // TODO(Lane) need tracker timestamp that is synched with TOF timestamp
-  // const double time = (*scifi_space_point)->get_time();
+  // No timestamp in the SciFiEvent/Track/TrackPoint data structure
   const double time = 0.;
-  TLorentzVector four_position;
-  if (detector.id() <= GlobalDS::kTracker0_5) {
-    four_position = TLorentzVector(-position.x(), position.y(), z, time);
-  } else {
-    four_position = TLorentzVector(position.x(), position.y(), z, time);
-  }
+  TLorentzVector four_position(x, y, z, time);
   space_point->set_position(four_position);
 
-  // FIXME(Lane) Replace MC momentum with official track momentum when that
-  // information becomes available.
-  ThreeVector momentum;
-  const SciFiClusterPArray clusters = (*scifi_space_point)->get_channels();
-  // double time = 0;
-  for (SciFiClusterPArray::const_iterator cluster = clusters.begin();
-      cluster != clusters.end();
-      ++cluster) {
-    // time += (*cluster)->get_time();
-    ThreeVector true_momentum = (*cluster)->get_true_momentum();
-    momentum += true_momentum;
-  }
-  // time /= clusters.size();
-  if (clusters.size() > 0) {
-    momentum /= clusters.size();
-  }
-  // smear the MC momentum1.293e+04
-  momentum.setX(momentum.x() + ::CLHEP::RandGauss::shoot(0., 3.));
-  momentum.setY(momentum.y() + ::CLHEP::RandGauss::shoot(0., 3.));
-  momentum.setZ(momentum.z() + ::CLHEP::RandGauss::shoot(0., 20.));
   static_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
 
-  track_point->set_particle_event((*scifi_space_point)->get_event());
+  // FIXME(Lane) Need to get event number, but now using SciFi track points
+  //track_point->set_particle_event((*scifi_space_point)->get_event());
   track_point->set_mapper_name(kClassname);
 
-  // FIXME(Lane) For now assume we've selected only muon tracks and no decays
-  /*
-  const GlobalDS::PID particle_id
-    = GlobalDS::PID(GlobalDS::kMuPlus * beam_polarity_);
-  */
+  const double Px = scifi_track_point->px();
+  const double Py = scifi_track_point->py();
+  const double Pz = scifi_track_point->pz();
+  const double momentum = ::sqrt(Px*Px + Py*Py + Pz*Pz);
   const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
-  const double beta = Beta(particle_id, momentum.mag());
-  const double energy = momentum.mag() / beta;
-  TLorentzVector four_momentum(
-    momentum.x(), momentum.y(), momentum.z(), energy);
+  const double beta = Beta(particle_id, momentum);
+  const double energy = P / beta;
+  TLorentzVector four_momentum(Px, Py, Pz, energy);
   track_point->set_momentum(four_momentum);
   /*
   std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint(): "
