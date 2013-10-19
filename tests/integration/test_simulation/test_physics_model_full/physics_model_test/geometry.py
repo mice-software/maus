@@ -147,7 +147,7 @@ class Geometry:
             for fin, fout in substitution_files.iteritems():
                 Common.substitute(fin, fout, self.substitutions)
             proc = subprocess.Popen([executable]+command_line_args)
-            proc.wait()
+            proc.wait() # pylint: disable = E1101
         finally:
             os.chdir(here)
 

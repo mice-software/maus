@@ -16,7 +16,6 @@
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 
-
 namespace MAUS {
 
 SciFiEvent::SciFiEvent() {
@@ -26,10 +25,10 @@ SciFiEvent::SciFiEvent() {
   _scifiseeds.resize(0);
   _scifistraightprtracks.resize(0);
   _scifihelicalprtracks.resize(0);
+  _scifitracks.resize(0);
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-
     _scifidigits.resize(_scifievent._scifidigits.size());
     for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
       _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
@@ -52,18 +51,24 @@ SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
 
     _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+      _scifistraightprtracks[i] =
+          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
     }
 
     _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+      _scifihelicalprtracks[i] =
+          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
     }
 
-    // *this = _scifievent;
+    _scifitracks.resize(_scifievent._scifitracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
+      _scifitracks[i] = _scifievent._scifitracks[i];
+    }
 }
 
 SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
+  std::cerr << "IN = operator " << std::endl;
     if (this == &_scifievent) {
         return *this;
     }
@@ -85,19 +90,25 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
 
     _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] = _scifievent._scifistraightprtracks[i];
+      _scifistraightprtracks[i] =
+          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
     }
 
     _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
     for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] = _scifievent._scifihelicalprtracks[i];
+      _scifihelicalprtracks[i] =
+          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
+    }
+
+    _scifitracks.resize(_scifievent._scifitracks.size());
+    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
+      _scifitracks[i] = _scifievent._scifitracks[i];
     }
 
     return *this;
 }
 
 SciFiEvent::~SciFiEvent() {
-
   std::vector<SciFiDigit*>::iterator digit;
   for (digit = _scifidigits.begin(); digit!= _scifidigits.end(); ++digit) {
     delete (*digit);
@@ -116,6 +127,24 @@ SciFiEvent::~SciFiEvent() {
   std::vector<SciFiSpacePoint*>::iterator seed;
   for (seed = _scifiseeds.begin(); seed!= _scifiseeds.end(); ++seed) {
     delete (*seed);
+  }
+
+  std::vector<SciFiStraightPRTrack*>::iterator strack;
+  for (strack = _scifistraightprtracks.begin();
+       strack!= _scifistraightprtracks.end(); ++strack) {
+    delete (*strack);
+  }
+
+  std::vector<SciFiHelicalPRTrack*>::iterator htrack;
+  for (htrack = _scifihelicalprtracks.begin();
+       htrack!= _scifihelicalprtracks.end(); ++htrack) {
+    delete (*htrack);
+  }
+
+  std::vector<SciFiTrack*>::iterator track;
+  for (track = _scifitracks.begin();
+       track!= _scifitracks.end(); ++track) {
+    delete (*track);
   }
 }
 

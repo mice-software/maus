@@ -1,4 +1,4 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ Run the examples and check they return 0
 # Popen false errors
 # pylint: disable=E1101
 
-import sys
+import time
 import os
 import glob
 import subprocess
@@ -36,22 +36,25 @@ def get_images():
         image_list += glob.glob("*."+extension)
     return image_list
 
+def safe_mkdir(my_dir):
+    """
+    Make sure a directory exists at my_dir, making a new one if it does not and
+    raising OSError if there is something blocking
+    """
+    if not os.path.isdir(my_dir):
+        os.mkdir(my_dir)
+
+
 def move_images(_images_before, _images_after, _example_name):
     """
     move any new images (in images_after, not in images_before)
     """
     plot_dir = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration',
                                                             'plots', 'examples')
-    try:
-        os.mkdir(plot_dir)
-    except OSError:
-        sys.excepthook(*sys.exc_info())
-    
+    safe_mkdir(plot_dir)
     plot_dir = os.path.join(plot_dir, _example_name)
-    try:
-        os.mkdir(plot_dir)
-    except OSError: # probably the directory already exists
-        sys.excepthook(*sys.exc_info())
+    safe_mkdir(plot_dir)
+
     for image in _images_after:
         if image not in _images_before:
             file_name = os.path.split(image)[1]
@@ -62,17 +65,21 @@ def run_example(example_name):
     """
     Run an example as an executable
     """
-    os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp'))
+    log_dir = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'test_examples')
+    safe_mkdir(log_dir)
+    os.chdir(log_dir)
     images_before = get_images()
     mangled_name = os.path.split(example_name)[-1] # just the file name
     mangled_name = os.path.splitext(mangled_name)[0] # just the prefix
-    log = 'test_examples_'+mangled_name+'.log'
-    log = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp", log)
+    log = mangled_name+'.log'
+    log = os.path.join(log_dir, log)
     log_file = open(log, 'w')
     print 'Running', example_name, 'logging in', log
-    proc = subprocess.Popen([example_name],
+    proc = subprocess.Popen([example_name], stdin=subprocess.PIPE,
                             stdout=log_file, stderr=subprocess.STDOUT)
-    proc.communicate('\n')
+    while proc.poll() == None:
+        proc.communicate('\n')
+        time.sleep(1)
     proc.wait()
     move_images(images_before, get_images(), mangled_name)
     return proc, log
@@ -87,8 +94,10 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         Get everything in bin/examples and check it runs with returncode 0
         """
         examples_dir = os.path.join\
-                       (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*.py")
-        examples = glob.glob(examples_dir)
+                   (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*.py")
+        examples_subdir = os.path.join\
+                   (os.environ["MAUS_ROOT_DIR"], "bin", "examples", "*", "*.py")
+        examples = glob.glob(examples_dir)+glob.glob(examples_subdir)
         for item in examples:
             proc, log = run_example(item)
             self.assertEqual(proc.returncode, 0, msg="Check logfile "+log)

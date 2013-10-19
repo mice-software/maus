@@ -247,7 +247,6 @@ CovarianceMatrix TransferMapOpticsModel::Transport(
     const CovarianceMatrix & covariances,
     const double end_plane) const {
   TransferMap const * transfer_map = GenerateTransferMap(end_plane);
-
   if (transfer_map == NULL) {
     throw(Squeal(Squeal::nonRecoverable,
                   "Got NULL transfer map.",

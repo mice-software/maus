@@ -15,23 +15,18 @@
  *
  */
 #include "src/common_cpp/Recon/SciFi/SciFiClusterRec.hh"
-#include <algorithm>
-
-#include "src/common_cpp/Utils/ThreeVectorUtils.hh"
-
-#include "Geant4/G4ThreeVector.hh"
-#include "Geant4/G4RotationMatrix.hh"
-
 
 namespace MAUS {
 
-SciFiClusterRec::SciFiClusterRec() {}
+SciFiClusterRec::SciFiClusterRec():_size_exception(0),
+                                   _min_npe(0.) {}
 
-SciFiClusterRec::SciFiClusterRec(int cluster_exception, double min_npe,
-                                 std::vector<const MiceModule*> modules)
-                                 :_size_exception(cluster_exception),
-                                  _min_npe(min_npe),
-                                  _modules(modules) {}
+SciFiClusterRec::SciFiClusterRec(int cluster_exception,
+                                 double min_npe,
+                                 const std::map<int, SciFiPlaneGeometry> &geometry_map):
+                                   _size_exception(cluster_exception),
+                                   _min_npe(min_npe),
+                                   _geometry_map(geometry_map) {}
 
 SciFiClusterRec::~SciFiClusterRec() {}
 
@@ -57,23 +52,23 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
 
 std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   std::vector<SciFiDigit*> seeds_in_event;
-  for ( unsigned int dig = 0; dig < evt.digits().size(); dig++ ) {
+  for ( size_t dig = 0; dig < evt.digits().size(); ++dig ) {
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
       seeds_in_event.push_back(evt.digits()[dig]);
   }
   return seeds_in_event;
 }
 
-void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   &seeds) {
-  int seeds_size = seeds.size();
-  for ( int i = 0; i < seeds_size; i++ ) {
-    if ( !seeds[i]->is_used() ) {
+void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) {
+  size_t seeds_size = seeds.size();
+  for ( size_t i = 0; i < seeds_size; i++ ) {
+    if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
 
       double pe = seed->get_npe();
       // Look for a neighbour.
-      for ( int j = i+1; j < seeds_size; j++ ) {
+      for ( size_t j = i+1; j < seeds_size; ++j ) {
         if ( are_neighbours(seeds[i], seeds[j]) ) {
           neigh = seeds[j];
         }
@@ -96,116 +91,43 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>   
 }
 
 void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
-  // Get the MiceModule of the plane...
   int tracker = clust->get_tracker();
   int station = clust->get_station();
   int plane   = clust->get_plane();
-  const MiceModule* this_plane = NULL;
-  this_plane = find_plane(tracker, station, plane);
-  assert(this_plane != NULL);
-  // compute it's direction & position in TRF...
-  ThreeVector trf_dir(0., 1., 0.);
-  ThreeVector trf_pos(0., 0., 0.);
-  double alpha;
-  construct(clust, this_plane, trf_dir, trf_pos, alpha);
 
-  clust->set_direction(trf_dir);
-  clust->set_position(trf_pos);
-
-  clust->set_alpha(alpha);
-  int id = 15*tracker + 3*(station-1) + (plane);
+  int id =  3*(station-1) + (plane+1);
+  id = ( tracker == 0 ? -id : id );
   clust->set_id(id);
-  /*
-   std::cerr << "----------Clustering--------- \n"
-            << "Site ID: " << id << "\n"
-            << "Tracker " << tracker << ", station " << station << ", plane " << plane << "\n"
-            << "Fibre direction: " << dir << "\n"
-            << "Position: " << tracker_ref_frame_pos << "\n";
-  */
-}
 
-void SciFiClusterRec::construct(SciFiCluster *clust,
-                                const MiceModule* this_plane,
-                                ThreeVector &dir,
-                                ThreeVector &tracker_ref_frame_pos,
-                                double &alpha) {
-  ThreeVector perp(-1., 0., 0.);
-
-  CLHEP::HepRotation zflip;
-  const Hep3Vector rowx(-1., 0., 0.);
-  const Hep3Vector rowy(0., 1., 0.);
-  const Hep3Vector rowz(0., 0., -1.);
-  zflip.setRows(rowx, rowy, rowz);
-  G4RotationMatrix trot(this_plane->globalRotation());
-  // Rotations of the planes in the Tracker Reference Frame.
-  if ( clust->get_tracker() == 0 ) {
-    trot= trot*zflip;
-    dir  *= trot;
-    perp *= trot;
-  } else if ( clust->get_tracker() == 1 ) {
-    dir  *= trot;
-    perp *= trot;
+  std::map<int, SciFiPlaneGeometry>::iterator iterator;
+  iterator = _geometry_map.find(id);
+  // Throw if the plane isn't found.
+  if ( iterator == _geometry_map.end() ) {
+    throw(Squeal(Squeal::nonRecoverable,
+    "Failed to find SciFi plane in _geometry_map.",
+    "SciFiClusterRec::process_cluster"));
   }
+  SciFiPlaneGeometry this_plane = (*iterator).second;
+  ThreeVector plane_direction   = this_plane.Direction;
+  ThreeVector plane_position    = this_plane.Position;
+  double Pitch                  = this_plane.Pitch;
+  double CentralFibre           = this_plane.CentralFibre;
+  // alpha is the distance to the central fibre.
+  double alpha   = clust->get_channel()-CentralFibre;
+  double dist_mm = Pitch * 7.0 / 2.0 * alpha;
 
-  double Pitch = this_plane->propertyDouble("Pitch");
-  double CentralFibre = this_plane->propertyDouble("CentralFibre");
-  double dist_mm = Pitch * 7.0 / 2.0 * (clust->get_channel() - CentralFibre);
-  ThreeVector plane_position = clhep_to_root(this_plane->globalPosition());
+  ThreeVector perp = plane_direction.Orthogonal();
   ThreeVector position = dist_mm * perp + plane_position;
-  ThreeVector reference = get_reference_frame_pos(clust->get_tracker());
 
-  tracker_ref_frame_pos = position - reference;
-
-  // ThreeVector tracker_ref_frame_pos;
-  if ( clust->get_tracker() == 0 ) {
-    tracker_ref_frame_pos = - (position - reference);
-  } else if ( clust->get_tracker() == 1 ) {
-    tracker_ref_frame_pos = position - reference;
-  }
-
-  alpha = clust->get_channel() - CentralFibre;
-  if ( clust->get_tracker() == 1 ) {
-    alpha = -alpha;
-  }
-}
-
-const MiceModule* SciFiClusterRec::find_plane(int tracker, int station, int plane) {
-  const MiceModule* scifi_plane = NULL;
-  for ( unsigned int j = 0; !scifi_plane && j < _modules.size(); j++ ) {
-    // Find the right module
-    if ( _modules[j]->propertyExists("Tracker", "int") &&
-         _modules[j]->propertyExists("Station", "int") &&
-         _modules[j]->propertyExists("Plane", "int")  &&
-         _modules[j]->propertyInt("Tracker") ==
-         tracker &&
-         _modules[j]->propertyInt("Station") ==
-         station &&
-         _modules[j]->propertyInt("Plane") ==
-         plane ) {
-         // Save the module
-      scifi_plane = _modules[j];
-    }
-  }
-  return scifi_plane;
-}
-
-ThreeVector SciFiClusterRec::get_reference_frame_pos(int tracker) {
-  // Reference plane is plane 0, station 1 of current tracker.
-  int station = 1;
-  int plane   = 0;
-  const MiceModule* reference_plane = NULL;
-  reference_plane = find_plane(tracker, station, plane);
-
-  assert(reference_plane != NULL);
-  ThreeVector reference_pos = clhep_to_root(reference_plane->globalPosition());
-
-  return reference_pos;
+  clust->set_direction(plane_direction);
+  clust->set_position(position);
+  clust->set_alpha(alpha);
 }
 
 bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
   bool neigh = false;
 
-  if ( !seed_j->is_used() && // seed is unused
+  if ( !(seed_j->is_used()) && // seed is unused
        seed_j->get_spill() == seed_i->get_spill() && // same spill
        seed_j->get_event() == seed_i->get_event() && // same event
        seed_j->get_tracker() == seed_i->get_tracker() && // same tracker

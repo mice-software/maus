@@ -15,58 +15,49 @@
  *
  */
 
-#include <algorithm>
-
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 
-#include "Riostream.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "TGraphErrors.h"
-#include "TDecompChol.h"
-#include "TDecompSVD.h"
-#include "TF1.h"
-
 namespace MAUS {
+
+MapCppTrackerRecon::MapCppTrackerRecon()
+    : _spill_json(NULL), _spill_cpp(NULL) {
+}
+
+MapCppTrackerRecon::~MapCppTrackerRecon() {
+  if (_spill_json != NULL) {
+      delete _spill_json;
+  }
+  if (_spill_cpp != NULL) {
+      delete _spill_cpp;
+  }
+}
 
 bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppTrackerRecon";
 
-  // JsonCpp string -> JSON::Value converter
-  Json::Reader reader;
+  try {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    Json::Value *json = Globals::GetConfigurationCards();
+    _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
+    _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
+    _size_exception = (*json)["SciFiClustExcept"].asInt();
+    _min_npe        = (*json)["SciFiNPECut"].asDouble();
 
-  // Check if the JSON document can be parsed, else return error only.
-  bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
-  if (!parsingSuccessful) {
-    return false;
+    MiceModule* module = Globals::GetReconstructionMiceModules();
+    std::vector<const MiceModule*> modules =
+      module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+    _geometry_helper = SciFiGeometryHelper(modules);
+    _geometry_helper.Build();
+    return true;
+  } catch(Squeal& squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
-
-  // Get the tracker modules.
-  assert(_configJSON.isMember("reconstruction_geometry_filename"));
-  std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
-  std::cerr << "Using geomtry: " << filename << std::endl;
-  MiceModule* _module;
-  _module = new MiceModule(filename);
-  modules = _module->findModulesByPropertyString("SensitiveDetector", "SciFi");
-
-  // Get minPE cut value.
-  assert(_configJSON.isMember("SciFiNPECut"));
-  minPE = _configJSON["SciFiNPECut"].asDouble();
-
-  // Get the value above which an Exception is thrown
-  assert(_configJSON.isMember("SciFiClustExcept"));
-  ClustException = _configJSON["SciFiClustExcept"].asInt();
-
-  // Get the flags for turning straight and helical pr on or off
-  assert(_configJSON.isMember("SciFiPRHelicalOn"));
-  _helical_pr_on = _configJSON["SciFiPRHelicalOn"].asBool();
-  assert(_configJSON.isMember("SciFiPRStraightOn"));
-  _straight_pr_on = _configJSON["SciFiPRStraightOn"].asBool();
-
-  return true;
+  return false;
 }
 
 bool MapCppTrackerRecon::death() {
@@ -74,81 +65,96 @@ bool MapCppTrackerRecon::death() {
 }
 
 std::string MapCppTrackerRecon::process(std::string document) {
-  std::cout << "Reconstructing tracker data\n";
   Json::FastWriter writer;
 
   // Read in json data
-  Spill spill;
-  bool success = read_in_json(document, spill);
-  if (!success)
-    return writer.write(root);
+  read_in_json(document);
+  Spill& spill = *_spill_cpp;
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
+    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
+        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
-          std::cout << "Building clusters\n";
           cluster_recon(*event);
         }
         // Build SpacePoints.
         if ( event->clusters().size() ) {
-          std::cout << "Building spacepoints\n";
           spacepoint_recon(*event);
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          std::cout << "Calling Pattern Recognition..." << std::endl;
+          std::cout << "Calling Pattern Recognition, helical " << _helical_pr_on;
+          std::cout << ", straight " << _straight_pr_on << std::endl;
           pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
           std::cout << "Pattern Recognition complete." << std::endl;
         }
-
+        // Kalman Track Fit.
+        if ( _kalman_on ) {
+          if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
+            track_fit(*event);
+          }
+        }
         print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
+  } catch(Squeal& squee) {
+    squee.Print();
+    // _spill_json = MAUS::CppErrorHandler::getInstance()
+    //                                   ->HandleSqueal(_spill_json, squee, _classname);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["recon_failed"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
+    (*_spill_json)["errors"] = errors;
+    return writer.write(_spill_json);
   }
-  return writer.write(root);
+  return writer.write(*_spill_json);
 }
 
-bool MapCppTrackerRecon::read_in_json(std::string json_data, Spill &spill) {
-
+void MapCppTrackerRecon::read_in_json(std::string json_data) {
   Json::Reader reader;
+  Json::Value json_root;
   Json::FastWriter writer;
 
+  if (_spill_cpp != NULL) {
+    delete _spill_cpp;
+    _spill_cpp = NULL;
+  }
+
   try {
-    root = JsonWrapper::StringToJson(json_data);
+    json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
-    spill = *spill_proc.JsonToCpp(root);
-    return true;
+    _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
-    Json::Value errors;
+    std::cerr << "Bad json document" << std::endl;
+    _spill_cpp = new Spill();
+    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
     errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    writer.write(root);
-    return false;
+    _spill_cpp->GetErrors();
   }
 }
 
 void MapCppTrackerRecon::save_to_json(Spill &spill) {
-  SpillProcessor spill_proc;
-  root = *spill_proc.CppToJson(spill, "");
+    SpillProcessor spill_proc;
+    if (_spill_json != NULL) {
+        delete _spill_json;
+        _spill_json = NULL;
+    }
+    _spill_json = spill_proc.CppToJson(spill, "");
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) {
-  SciFiClusterRec clustering(ClustException, minPE, modules);
+  SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_helper.GeometryMap());
   clustering.process(evt);
 }
 
@@ -163,13 +169,43 @@ void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const boo
   pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
+void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
+  std::vector<KalmanSeed*> seeds;
+  size_t number_helical_tracks  = evt.helicalprtracks().size();
+  size_t number_straight_tracks = evt.straightprtracks().size();
+
+  for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
+    int tracker = evt.helicalprtracks()[track_i]->get_tracker();
+    double Bz = _geometry_helper.GetFieldValue(tracker);
+    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
+    seed->SetField(Bz);
+    seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
+    seeds.push_back(seed);
+  }
+
+  for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
+    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
+    seed->Build<SciFiStraightPRTrack>(evt.straightprtracks()[track_i]);
+    seeds.push_back(seed);
+  }
+
+  if ( seeds.size() ) {
+    KalmanTrackFit fit;
+    fit.Process(seeds, evt);
+  }
+}
+
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cout << event.digits().size() << " "
-            << event.clusters().size() << " "
-            << event.spacepoints().size() << "; "
-            << event.straightprtracks().size() << " "
-            << event.helicalprtracks().size() << " " << std::endl;
+  Squeak::mout(Squeak::info) << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  Squeak::mout(Squeak::info) << std::endl;
 }
 
 } // ~namespace MAUS
-

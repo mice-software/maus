@@ -1,0 +1,31 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 20. mm
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module Box
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 6. 6. 6. mm
+    PropertyString Material Galactic
+    PropertyHep3Vector Position 0. 0. 0. m
+    PropertyHep3Vector Rotation 0. 0. 0. degree
+    Module RotatedBox1
+    {
+      PropertyString     Volume Box
+      PropertyString Material Galactic
+      PropertyHep3Vector Dimensions 2. 2. 2. mm
+      PropertyHep3Vector Position 0. 0. 1. mm
+      PropertyHep3Vector Rotation 0. 45. 0. degree
+      Module RotatedBox2
+      {
+        PropertyString     Volume Box
+        PropertyString     Material Galactic
+        PropertyHep3Vector Dimensions 0.1 0.1 0.1 mm
+        PropertyHep3Vector Position 0. 0. 0. m
+        PropertyHep3Vector Rotation 0. 45. 0. degree
+      }
+    }
+  }
+}
+

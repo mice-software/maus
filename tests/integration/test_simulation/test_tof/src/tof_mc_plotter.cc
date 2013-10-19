@@ -55,6 +55,7 @@ void ana_mc(char* ifname, char* ofname) {
   TFile* fout = new TFile(ofname, "recreate");
   TH1F* tof01 = new TH1F("tof01", ";TOF0-1 time;", 120, 28., 36.);
   TH1F* tof12 = new TH1F("tof12", ";TOF1-2 time;", 600, 25., 60.);
+  TH1F* tof01_2 = new TH1F("tof01_2", ";TOF0-1 time;", 65, 28., 32.);
 
   // get the number of entries in the tree
   int nspills = t1->GetEntries();
@@ -103,6 +104,7 @@ void ana_mc(char* ifname, char* ofname) {
         MAUS::TOFSpacePoint sp0 = tof_sp.GetTOF0SpacePointArrayElement(0);
         MAUS::TOFSpacePoint sp1 = tof_sp.GetTOF1SpacePointArrayElement(0);
         tof01->Fill(sp1.GetTime()-sp0.GetTime());
+        tof01_2->Fill(sp1.GetTime()-sp0.GetTime());
       }
       if (tof1_spar.size() == 1 && tof2_spar.size() == 1) {
         MAUS::TOFSpacePoint sp2 = tof_sp.GetTOF2SpacePointArrayElement(0);

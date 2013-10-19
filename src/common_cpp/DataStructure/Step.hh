@@ -86,9 +86,23 @@ class Step {
     /** Sets the energy deposited during the step */
     void SetEnergyDeposited(double edep);
 
+    /** Returns the magnetic field at the step point */
+    ThreeVector GetBField() const;
+
+    /** Sets the magnetic field at the step point */
+    void SetBField(ThreeVector field);
+
+    /** Returns the electric field at the step point */
+    ThreeVector GetEField() const;
+
+    /** Sets the electric field at the step point */
+    void SetEField(ThreeVector field);
+
   private:
     ThreeVector _position;
     ThreeVector _momentum;
+    ThreeVector _bfield;
+    ThreeVector _efield;
     double _proper_time;
     double _path_length;
     double _time;

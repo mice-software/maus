@@ -85,6 +85,22 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
 
+    double f_pos[4] = {point->GetPosition().x(), point->GetPosition().y(),
+                       point->GetPosition().z(), point->GetGlobalTime()};
+    double field[6] = {0., 0., 0., 0., 0., 0.};
+    MAUSGeant4Manager::GetInstance()->GetField()->GetFieldValue(f_pos, field);
+    Json::Value bfield;
+    bfield["x"] = field[0];
+    bfield["y"] = field[1];
+    bfield["z"] = field[2];
+    step["b_field"] = bfield;
+
+    Json::Value efield;
+    efield["x"] = field[3];
+    efield["y"] = field[4];
+    efield["z"] = field[5];
+    step["e_field"] = efield;
+
     step["energy"] = point->GetTotalEnergy();
     step["proper_time"] = point->GetProperTime();
     step["path_length"] = aTrack->GetTrackLength();

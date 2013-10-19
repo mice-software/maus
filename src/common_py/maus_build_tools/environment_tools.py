@@ -154,7 +154,6 @@ def get_environment():
                         "%s/src/legacy" % maus_root,
                         "%s/src/common_cpp" % maus_root,
                         "%s/" % maus_root])
-
     env['USE_G4'] = False
     env['USE_ROOT'] = False
     env['USE_UNPACKER'] = False
@@ -282,6 +281,19 @@ def set_gsl(conf, env): # pylint: disable=W0613
         my_exit(1)
     if not conf.CheckLib('gslcblas'):
         print "ERROR: Cound't find GSL (required for ROOT)."
+        my_exit(1)
+
+def set_numpy(conf, env): # pylint: disable=W0613
+    """
+    Setup numpy
+    """
+    conf.env.Append(LIBS = ['npymath'])
+    if not conf.CheckLib('npymath'):
+        print "ERROR: Cound't find Numpy library"
+        my_exit(1)
+    # note other includes require Python
+    if not conf.CheckCXXHeader('numpy/utils.h'):
+        print "ERROR: Cound't find Numpy includes"
         my_exit(1)
 
 
@@ -568,6 +580,7 @@ LIBS = {
     'compiler':set_cpp,
     'python':set_python,
     'gsl':set_gsl,
+    'numpy':set_numpy,
     'root':set_root,
     'clhep':set_clhep,
     'geant4':set_geant4,

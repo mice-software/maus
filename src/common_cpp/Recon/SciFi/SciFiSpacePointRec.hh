@@ -31,6 +31,7 @@
 #include <CLHEP/Random/RandExponential.h>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Matrix/Matrix.h>
+#include <TMath.h>
 
 // C++ headers
 #include <cmath>
@@ -50,7 +51,7 @@ namespace MAUS {
 
 class SciFiSpacePointRec {
  public:
-  SciFiSpacePointRec(); // Default constructor
+  SciFiSpacePointRec();
 
   ~SciFiSpacePointRec();
 
@@ -87,7 +88,7 @@ class SciFiSpacePointRec {
   static const int _acceptable_radius = 160; // mm
   static const int _kuno_0_5   = 320;
   static const int _kuno_else  = 318;
-  static const int _kuno_toler = 2;
+  static const int _kuno_toler = 3;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

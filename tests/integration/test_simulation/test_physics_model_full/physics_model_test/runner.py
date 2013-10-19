@@ -48,6 +48,7 @@ import sys
 
 from physics_model_test.all_tests import BaseTest # pylint: disable=W0611
 from physics_model_test.all_tests import KSTest # pylint: disable=W0611
+from physics_model_test.all_tests import Chi2Test # pylint: disable=W0611
 from physics_model_test.all_tests import HitEqualityTest # pylint: disable=W0611
 from physics_model_test.geometry import Geometry # pylint: disable=W0611
 

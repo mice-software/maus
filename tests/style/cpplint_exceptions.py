@@ -28,7 +28,6 @@ exceptions = { #pylint: disable=C0103
 CPP_CM = os.path.join('src','common_cpp')
 LEGACY = os.path.join('src','LEGACY')
 TST = os.path.join('tests', 'cpp_unit')
-MAP = os.path.join('src','map')
 
 exceptions[os.path.join(CPP_CM, 'Simulation',
                                            'MAUSPrimaryGeneratorAction.hh')] = [
@@ -225,103 +224,29 @@ exceptions[os.path.join(CPP_CM,
  'taylor'),
 ]
 
-exceptions[os.path.join(MAP,
-                        'MapCppGlobalRecon',
-                        'MapCppGlobalReconModule.cc')] = [
-('      PyErr_NewExceptionWithDoc((char *)"_MapCppGlobalRecon.InvalidModule",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Module pointer passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)"_MapCppGlobalRecon.InvalidInput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Input passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)"_MapCppGlobalRecon.InvalidOutput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Output defined.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor')
-]
-
-exceptions[os.path.join(MAP,
-                        'MapCppExampleJSONValueInput',
-                        'MapCppExampleJSONValueInputModule.cc')] = [
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleJSONValueInput.InvalidModule",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Module pointer passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleJSONValueInput.InvalidInput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Input passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleJSONValueInput.InvalidOutput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Output defined.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor')
-]
-
-exceptions[os.path.join(MAP,
-                        'MapCppExampleMAUSDataInput',
-                        'MapCppExampleMAUSDataInputModule.cc')] = [
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleMAUSDataInput.InvalidModule",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)' +
- '"Invalid Module pointer passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleMAUSDataInput.InvalidInput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Input passed in.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('      PyErr_NewExceptionWithDoc((char *)' +
- '"_MapCppExampleMAUSDataInput.InvalidOutput",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor'),
-('                                (char *)"Invalid Output defined.",',
- 'A C style cast is required to provide python with a char * ' +
- 'from a string literal',
- 'taylor')
-]
-
 exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData', 
                        'InputCppDAQOnlineData.cc')] = [
 ('      _sleep_time.tv_sec = static_cast<long>(delay_time);',
  'This really is a long, it is defined in time.h.', 'rogers')
+]
+
+exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyCovarianceMatrix.hh')] = [
+('                   reinterpret_cast<CovarianceMatrix* (*)'+\
+                                                      '(PyObject*)>(gcm_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
+]
+
+exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyPhaseSpaceVector.hh')] = [
+('                  reinterpret_cast<PhaseSpaceVector* (*)'+\
+                                                     '(PyObject*)>(gpsv_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
+]
+
+exceptions[os.path.join('src', 'py_cpp', 'PyMiceModule.hh')] = [
+('                   reinterpret_cast<MiceModule* (*)(PyObject*)>(gmm_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
 ]
 

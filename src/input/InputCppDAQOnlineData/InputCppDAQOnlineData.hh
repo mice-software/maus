@@ -22,8 +22,9 @@
 
 #include <string>
 
+#include "daq/MDmonitoring.hh"
+
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
-#include "third_party/install/include/daq/MDmonitoring.hh"
 
 class InputCppDAQOnlineData : public InputCppDAQData {
 
