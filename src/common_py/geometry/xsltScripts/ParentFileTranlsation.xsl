@@ -43,41 +43,53 @@
 
                             <xsl:for-each select="MICE_Information/Configuration_Information/run/magnet"><xsl:choose>
 		            
-                            <xsl:when test="contains(@name, 'D1')">Substitution $D1Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'D1')">Substitution $D1Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $D1Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'D2')">Substitution $D2Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'D2')">Substitution $D2Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $D2Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'DS')">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'DS')">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $DSPolarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q1')">Substitution $Q1Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q1')">Substitution $Q1Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q1Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q2')">Substitution $Q2Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q2')">Substitution $Q2Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q2Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q3')">Substitution $Q3Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q3')">Substitution $Q3Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q3Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q4')">Substitution $Q4Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q4')">Substitution $Q4Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q4Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q5')">Substitution $Q5Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q5')">Substitution $Q5Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q5Polarity <xsl:value-of select="@polarity"/><xsl:text>
 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q6')">Substitution $Q6Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q6')">Substitution $Q6Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q6Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q7')">Substitution $Q7Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q7')">Substitution $Q7Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q7Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q8')">Substitution $Q8Current <xsl:value-of select="@setCurrent"/><xsl:text>
-                                
+                            <xsl:when test="contains(@name, 'Q8')">Substitution $Q8Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q8Polarity <xsl:value-of select="@polarity"/><xsl:text>
+                              
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'Q9')">Substitution $Q9Current <xsl:value-of select="@setCurrent"/><xsl:text>
+                            <xsl:when test="contains(@name, 'Q9')">Substitution $Q9Current <xsl:value-of select="@setCurrent"/>
+			    Substitution $Q9Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
@@ -149,8 +161,8 @@
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">1.0+($D1Current-240.516)/263.708</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">1.0+($D2Current-240.516)/263.708</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">$D1Polarity*(1.0+($D1Current-240.516)/263.708)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">$D2Polarity*(1.0+($D2Current-240.516)/263.708)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -174,15 +186,15 @@
                             PropertyDouble Width <xsl:value-of select="Dimensions/@width"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>
                             PropertyDouble Length <xsl:value-of select="Dimensions/@length"/><xsl:text> </xsl:text><xsl:value-of select="Dimensions/@units"/>                     
                             PropertyDouble FieldStrength <xsl:choose>
-                                <xsl:when test="contains($QuadName, 'Q1') and boolean($run_number)">$Q1Current/96.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q2') and boolean($run_number)">$Q2Current/96.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q3') and boolean($run_number)">$Q3Current/96.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q4') and boolean($run_number)">$Q4Current/174.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q5') and boolean($run_number)">$Q5Current/174.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q6') and boolean($run_number)">$Q6Current/174.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q7') and boolean($run_number)">$Q7Current/174.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q8') and boolean($run_number)">$Q8Current/174.0</xsl:when>
-                                <xsl:when test="contains($QuadName, 'Q9') and boolean($run_number)">$Q9Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q1') and boolean($run_number)">$Q1Polarity*$Q1Current/96.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q2') and boolean($run_number)">$Q2Polarity*$Q2Current/96.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q3') and boolean($run_number)">$Q3Polarity*$Q3Current/96.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q4') and boolean($run_number)">$Q4Polarity*$Q4Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q5') and boolean($run_number)">$Q5Polarity*$Q5Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q6') and boolean($run_number)">$Q6Polarity*$Q6Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q7') and boolean($run_number)">$Q7Polarity*$Q7Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q8') and boolean($run_number)">$Q8Polarity*$Q8Current/174.0</xsl:when>
+                                <xsl:when test="contains($QuadName, 'Q9') and boolean($run_number)">$Q9Polarity*$Q9Current/174.0</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="FieldStrength/@value"/></xsl:otherwise>
                             </xsl:choose><xsl:text> </xsl:text><xsl:value-of select="FieldStrength/@units"/>
                             PropertyInt Pole <xsl:value-of select="Pole/@value"/>
