@@ -21,6 +21,8 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
+#include "V1731.hh"
+
 namespace MAUS {
 
 /** @class V1724 comment
@@ -86,17 +88,53 @@ class V1724 {
     /** Sets PhysEventNumber */
     void SetPhysEventNumber(int phys_event_number);
 
+    /** Returns SampleArray */
+    SampleArray GetSampleArray() const;
+
+    /** Get an element from SampleArray (needed for PyROOT) */
+    int GetSampleArrayElement(size_t index) const;
+
+    /** Get size of SampleArray (needed for PyROOT) */
+    size_t GetSampleArraySize() const;
+
+    /** Sets SampleArray */
+    void SetSampleArray(SampleArray samples);
+
     /** Returns ChargePm */
     int GetChargePm() const;
 
     /** Sets ChargePm */
     void SetChargePm(int charge_pm);
 
+    /** Returns ArrivalTime */
+    int GetArrivalTime() const;
+
+    /** Sets ArrivalTime */
+    void SetArrivalTime(int arrival_time);
+
     /** Returns ChannelKey */
     std::string GetChannelKey() const;
 
     /** Sets ChannelKey */
     void SetChannelKey(std::string channel_key);
+
+    /** Returns PositionMin */
+    int GetPositionMin() const;
+
+    /** Sets PositionMin */
+    void SetPositionMin(int position_min);
+
+    /** Returns PulseArea */
+    int GetPulseArea() const;
+
+    /** Sets PulseArea */
+    void SetPulseArea(int pulse_area);
+
+    /** Returns MaxPos */
+    int GetMaxPos() const;
+
+    /** Sets MaxPos */
+    void SetMaxPos(int max_pos);
 
     /** Returns TriggerTimeTag */
     double GetTriggerTimeTag() const;
@@ -142,12 +180,17 @@ class V1724 {
 
   private:
     int _ldc_id;
+    SampleArray _samples;
     int _charge_mm;
     int _equip_type;
     std::string _detector;
     int _phys_event_number;
     int _charge_pm;
+    int _arrival_time;
     std::string _channel_key;
+    int _position_min;
+    int _pulse_area;
+    int _max_pos;
     double _trigger_time_tag;
     int _time_stamp;
     int _pedestal;

@@ -16,18 +16,18 @@
 
 #include <iostream>
 
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "Spill.hh"
 
 namespace MAUS {
 
 Spill::Spill()
-        : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
 }
 
 Spill::Spill(const Spill& md)
-        : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
   *this = md;
@@ -53,15 +53,6 @@ Spill& Spill::operator=(const Spill& md) {
         _scalars = NULL;
     } else {
         _scalars = new Scalars(*md._scalars);
-    }
-
-    if (_emr != NULL) {
-        delete _emr;
-    }
-    if (md._emr == NULL) {
-        _emr = NULL;
-    } else {
-        _emr = new EMRSpillData(*md._emr);
     }
 
     if (_mc != NULL) {
@@ -107,9 +98,7 @@ Spill::~Spill() {
     if (_scalars != NULL) {
         delete _scalars;
     }
-    if (_emr != NULL) {
-        delete _emr;
-    }
+
     if (_mc != NULL) {
         for (size_t i = 0; i < _mc->size(); ++i) {
             delete (*_mc)[i];
@@ -127,20 +116,12 @@ Spill::~Spill() {
     }
 }
 
-void Spill::SetScalars(Scalars* scalars) {
+void Spill::SetScalars(Scalars *scalars) {
   _scalars = scalars;
 }
 
 Scalars* Spill::GetScalars() const {
   return _scalars;
-}
-
-void Spill::SetEMRSpillData(EMRSpillData* emr) {
-  _emr = emr;
-}
-
-EMRSpillData* Spill::GetEMRSpillData() const {
-  return _emr;
 }
 
 void Spill::SetMCEvents(MCEventArray* mc) {
@@ -159,7 +140,7 @@ ReconEventArray* Spill::GetReconEvents() const {
   return _recon;
 }
 
-void Spill::SetDAQData(DAQData* daq) {
+void Spill::SetDAQData(DAQData *daq) {
   _daq = daq;
 }
 
@@ -190,7 +171,6 @@ void Spill::SetDaqEventType(std::string type) {
 std::string Spill::GetDaqEventType() const {
     return _daq_event_type;
 }
-
 
 void Spill::SetErrors(ErrorsMap errors) {
   _errors = errors;

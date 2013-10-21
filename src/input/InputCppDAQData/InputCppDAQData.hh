@@ -33,7 +33,6 @@
 #include "unpacking/MDfragment.h"
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
-#include "Utils/DAQChannelMap.hh"
 #include "Interface/Squeak.hh"
 
 /** \class InputCppDAQData

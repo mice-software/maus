@@ -14,19 +14,19 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/DAQData.hh"
+#include "DAQData.hh"
 
 
 namespace MAUS {
 
 DAQData::DAQData()
     : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger(), _tracker0(), _tracker1() {
+      _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
 }
 
 DAQData::DAQData(const DAQData& _daqdata)
     : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger(), _tracker0(), _tracker1() {
+      _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
     *this = _daqdata;
 }
 
@@ -44,6 +44,10 @@ DAQData& DAQData::operator=(const DAQData& _daqdata) {
     SetTagArray(_daqdata._tag);
     SetTOF0DaqArray(_daqdata._tof0);
     SetTriggerArray(_daqdata._trigger);
+    SetEMRDaq(_daqdata._emr);
+    SetTracker0DaqArray(_daqdata._tracker0);
+    SetTracker1DaqArray(_daqdata._tracker1);
+
     return *this;
 }
 
@@ -57,9 +61,11 @@ DAQData::~DAQData() {
     SetTagArray(TagArray());
     SetTOF0DaqArray(TOF0DaqArray());
     SetTriggerArray(TriggerArray());
+    SetTracker0DaqArray(Tracker0DaqArray());
+    SetTracker1DaqArray(Tracker1DaqArray());
 }
 
-V830 DAQData::GetV830() const {
+V830& DAQData::GetV830() {
     return _V830;
 }
 
@@ -67,7 +73,7 @@ void DAQData::SetV830(V830 V830) {
     _V830 = V830;
 }
 
-TriggerRequestArray DAQData::GetTriggerRequestArray() const {
+TriggerRequestArray& DAQData::GetTriggerRequestArray() {
     return _trigger_request;
 }
 
@@ -88,7 +94,7 @@ void DAQData::SetTriggerRequestArray(TriggerRequestArray trigger_request) {
     _trigger_request = trigger_request;
 }
 
-TOF1DaqArray DAQData::GetTOF1DaqArray() const {
+TOF1DaqArray& DAQData::GetTOF1DaqArray() {
     return _tof1;
 }
 
@@ -109,7 +115,7 @@ void DAQData::SetTOF1DaqArray(TOF1DaqArray tof1) {
     _tof1 = tof1;
 }
 
-CkovArray DAQData::GetCkovArray() const {
+CkovArray& DAQData::GetCkovArray() {
     return _ckov;
 }
 
@@ -130,7 +136,7 @@ void DAQData::SetCkovArray(CkovArray ckov) {
     _ckov = ckov;
 }
 
-TOF2DaqArray DAQData::GetTOF2DaqArray() const {
+TOF2DaqArray& DAQData::GetTOF2DaqArray() {
     return _tof2;
 }
 
@@ -150,8 +156,8 @@ void DAQData::SetTOF2DaqArray(TOF2DaqArray tof2) {
     }
     _tof2 = tof2;
 }
-//
-Tracker0DaqArray DAQData::GetTracker0DaqArray() const {
+
+Tracker0DaqArray& DAQData::GetTracker0DaqArray() {
     return _tracker0;
 }
 
@@ -172,7 +178,7 @@ void DAQData::SetTracker0DaqArray(Tracker0DaqArray tracker0) {
     _tracker0 = tracker0;
 }
 
-Tracker1DaqArray DAQData::GetTracker1DaqArray() const {
+Tracker1DaqArray& DAQData::GetTracker1DaqArray() {
     return _tracker1;
 }
 
@@ -192,8 +198,8 @@ void DAQData::SetTracker1DaqArray(Tracker1DaqArray tracker1) {
     }
     _tracker1 = tracker1;
 }
-//
-UnknownArray DAQData::GetUnknownArray() const {
+
+UnknownArray& DAQData::GetUnknownArray() {
     return _unknown;
 }
 
@@ -214,7 +220,7 @@ void DAQData::SetUnknownArray(UnknownArray unknown) {
     _unknown = unknown;
 }
 
-KLArray DAQData::GetKLArray() const {
+KLArray& DAQData::GetKLArray() {
     return _kl;
 }
 
@@ -235,7 +241,7 @@ void DAQData::SetKLArray(KLArray kl) {
     _kl = kl;
 }
 
-TagArray DAQData::GetTagArray() const {
+TagArray& DAQData::GetTagArray() {
     return _tag;
 }
 
@@ -256,7 +262,7 @@ void DAQData::SetTagArray(TagArray tag) {
     _tag = tag;
 }
 
-TOF0DaqArray DAQData::GetTOF0DaqArray() const {
+TOF0DaqArray& DAQData::GetTOF0DaqArray() {
     return _tof0;
 }
 
@@ -277,7 +283,7 @@ void DAQData::SetTOF0DaqArray(TOF0DaqArray tof0) {
     _tof0 = tof0;
 }
 
-TriggerArray DAQData::GetTriggerArray() const {
+TriggerArray& DAQData::GetTriggerArray() {
     return _trigger;
 }
 
@@ -296,6 +302,15 @@ void DAQData::SetTriggerArray(TriggerArray trigger) {
         }
     }
     _trigger = trigger;
+}
+
+EMRDaq& DAQData::GetEMRDaq() {
+    return _emr;
+}
+
+
+void DAQData::SetEMRDaq(EMRDaq emr) {
+    _emr = emr;
 }
 }
 
