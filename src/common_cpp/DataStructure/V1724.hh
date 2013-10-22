@@ -21,7 +21,7 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
-#include "V1731.hh"
+#include "DataStructure/V1731.hh"
 
 namespace MAUS {
 

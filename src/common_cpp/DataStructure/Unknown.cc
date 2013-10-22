@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Unknown.hh"
+#include "DataStructure/Unknown.hh"
 
 
 namespace MAUS {

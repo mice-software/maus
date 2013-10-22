@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/V1731.hh"
+#include "DataStructure/V1731.hh"
 
 namespace MAUS {
 

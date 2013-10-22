@@ -14,9 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include "Spill.hh"
+#include "DataStructure/Spill.hh"
 
 namespace MAUS {
 

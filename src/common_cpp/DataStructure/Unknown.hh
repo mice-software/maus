@@ -21,9 +21,9 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
-#include "V1290.hh"
-#include "V1724.hh"
-#include "V1731.hh"
+#include "DataStructure/V1290.hh"
+#include "DataStructure/V1724.hh"
+#include "DataStructure/V1731.hh"
 
 namespace MAUS {
 // Needed for ROOT

@@ -19,17 +19,17 @@
 
 #include <vector>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "KLDaq.hh"
-#include "Trigger.hh"
-#include "TOFDaq.hh"
-#include "V830.hh"
-#include "CkovDaq.hh"
-#include "EMRDaq.hh"
-#include "Unknown.hh"
-#include "TriggerRequest.hh"
-#include "Tag.hh"
-#include "TrackerDaq.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/KLDaq.hh"
+#include "DataStructure/Trigger.hh"
+#include "DataStructure/TOFDaq.hh"
+#include "DataStructure/V830.hh"
+#include "DataStructure/CkovDaq.hh"
+#include "DataStructure/EMRDaq.hh"
+#include "DataStructure/Unknown.hh"
+#include "DataStructure/TriggerRequest.hh"
+#include "DataStructure/Tag.hh"
+#include "DataStructure/TrackerDaq.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -206,7 +206,7 @@ class DAQData {
     void SetTriggerArray(TriggerArray trigger);
 
     /** Returns EMRDaqArray */
-    EMRDaq& GetEMRDaq() ;
+    EMRDaq& GetEMRDaq();
 
     /** Sets EMRDaqArray */
     void SetEMRDaq(EMRDaq emr);

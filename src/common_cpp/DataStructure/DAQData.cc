@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DAQData.hh"
+#include "DataStructure/DAQData.hh"
 
 
 namespace MAUS {

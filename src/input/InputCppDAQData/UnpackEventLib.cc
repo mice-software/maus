@@ -209,7 +209,7 @@ void V1290CppDataProcessor::fill_daq_data() {
     _daq_data->GetUnknownArray().resize(npe);
 
 
-  for (unsigned int ipe=0; ipe<npe; ipe++) {
+  for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::TOFDaq *tof0_daq = _daq_data->GetTOF0DaqArrayElement(ipe);
     if (!tof0_daq)
       _daq_data->GetTOF0DaqArray()[ipe] = new MAUS::TOFDaq;
@@ -306,7 +306,7 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
    * This process should be called only with MDfragmentV1724 argument.
    */
 
-  //cout << "This is V1724CppDataProcessor::Process" << endl;
+  // cout << "This is V1724CppDataProcessor::Process" << endl;
 
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1724) )  return CastError;
   MDpartEventV1724* xV1724Evnt = static_cast<MDpartEventV1724*>(aPartEventPtr);
@@ -336,7 +336,7 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
 
   // Loop over all the channels
   for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
-    if (xV1724Evnt->GetLength(xCh) ) {
+    if ( xV1724Evnt->GetLength(xCh) ) {
       unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*V1724_SAMPLES_PER_WORD;
       vector<int> data;
       for (unsigned int j = 0; j < xSamples; j++) {
@@ -351,7 +351,7 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       string xDetector;
       DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
       if (xKey) {
-        xV1724hit.SetChannelKey( xKey->str() );
+        xV1724hit.SetChannelKey(xKey->str());
         xDetector = xKey->detector();
       } else {
         xDetector = "unknown";
@@ -361,15 +361,15 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       xV1724hit.SetPartEventNumber(xV1724Evnt->GetEventCount());
       xV1724hit.SetPhysEventNumber(this->GetPhysEventNumber());
       xV1724hit.SetTimeStamp(this->GetTimeStamp());
-      xV1724hit.SetChargeMm( this->get_charge(ceaMinMax) );
-      xV1724hit.SetChargePm( this->get_charge(ceaPedMin) );
+      xV1724hit.SetChargeMm(this->get_charge(ceaMinMax));
+      xV1724hit.SetChargePm(this->get_charge(ceaPedMin));
       int max_position = 0;
       xV1724hit.SetPulseArea(this->get_pos_signal_area(max_position));
       xV1724hit.SetPositionMin(this->get_min_position());
       xV1724hit.SetMaxPos(max_position);
       xV1724hit.SetArrivalTime(this->get_arrival_time());
       xV1724hit.SetTriggerTimeTag(xV1724Evnt->GetTriggerTimeTag());
-      xV1724hit.SetPedestal((int)(this->get_pedestal()+0.5));
+      xV1724hit.SetPedestal(static_cast<int>(this->get_pedestal()+0.5));
       xV1724hit.SetSampleArray(_data);
 
       if (xDetector == "tof0")
@@ -415,7 +415,7 @@ void V1724CppDataProcessor::fill_daq_data() {
     _daq_data->GetUnknownArray().resize(npe);
 
 
-  for (unsigned int ipe=0; ipe<npe; ipe++) {
+  for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::TOFDaq *tof0_daq = _daq_data->GetTOF0DaqArrayElement(ipe);
     if (!tof0_daq)
       _daq_data->GetTOF0DaqArray()[ipe] = new MAUS::TOFDaq;
@@ -531,7 +531,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
    * This process should be called only with MDfragmentV1731 argument.
    */
 
-  //cout << "This is V1731CppDataProcessor::Process" << endl;
+  // cout << "This is V1731CppDataProcessor::Process" << endl;
 
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1731) )  return CastError;
   MDpartEventV1731* xV1731Evnt = static_cast<MDpartEventV1731*>(aPartEventPtr);
@@ -560,7 +560,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Loop over all the channels
 
   for (unsigned int xCh = 0; xCh < V1731_NCHANNELS; xCh++) {
-    if (xV1731Evnt->GetLength(xCh) ) {
+    if ( xV1731Evnt->GetLength(xCh) ) {
       vector<int> data;
       unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*V1731_SAMPLES_PER_WORD;
       for (unsigned int j = 0; j < xSamples; j++) {
@@ -575,7 +575,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       string xDetector;
       DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
       if (xKey) {
-        xV1731hit.SetChannelKey( xKey->str() );
+        xV1731hit.SetChannelKey(xKey->str());
         xDetector = xKey->detector();
       } else {
         xDetector = "unknown";
@@ -593,7 +593,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       xV1731hit.SetMaxPos(this->get_max_position());
       xV1731hit.SetArrivalTime(this->get_arrival_time());
       xV1731hit.SetTriggerTimeTag(xV1731Evnt->GetTriggerTimeTag());
-      xV1731hit.SetPedestal((int)(this->get_pedestal()+0.5));
+      xV1731hit.SetPedestal(static_cast<int>(this->get_pedestal()+0.5));
       xV1731hit.SetSampleArray(_data);
 
       if (xDetector == "emr")
@@ -620,7 +620,7 @@ void V1731CppDataProcessor::fill_daq_data() {
   if (_daq_data->GetUnknownArraySize() != npe)
     _daq_data->GetUnknownArray().resize(npe);
 
-  for (unsigned int ipe=0; ipe<npe; ipe++) {
+  for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::CkovDaq *ckov_daq = _daq_data->GetCkovArrayElement(ipe);
     if (!ckov_daq)
       _daq_data->GetCkovArray()[ipe] = new MAUS::CkovDaq;

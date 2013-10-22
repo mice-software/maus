@@ -21,12 +21,12 @@
 #include <map>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "DAQData.hh"
-#include "Scalars.hh"
-#include "MCEvent.hh"
-#include "ReconEvent.hh"
-#include "TestBranch.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/DAQData.hh"
+#include "DataStructure/Scalars.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;

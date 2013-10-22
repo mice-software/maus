@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "Utils/VersionNumber.hh"
 
 namespace MAUS {
 // Needed for ROOT
