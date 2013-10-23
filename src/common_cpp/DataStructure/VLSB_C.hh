@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -127,7 +127,7 @@ class VLSB_C {
     int _ldc_id;
     int _geo;
 
-    ClassDef(VLSB_C, 1)
+    MAUS_VERSIONED_CLASS_DEF(VLSB_C)
 };
 }
 
