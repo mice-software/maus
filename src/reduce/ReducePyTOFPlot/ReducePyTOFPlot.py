@@ -340,7 +340,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                         # print 'nsp0: ',i,sp_tof0[i]
                         spnt_x = sp_tof0[i]["slabX"]
                         spnt_y = sp_tof0[i]["slabY"]
-                        self.hspxy[0].Fill(spnt_x, spnt_y)
+                        self.hspxy[0].Fill(spnt_y, spnt_x)
                         self.hspslabx_0.Fill(spnt_x)
                         self.hspslaby_0.Fill(spnt_y)
                         # print '... ', i
@@ -360,7 +360,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     if sp_tof2[i]:
                         spnt_x = sp_tof2[i]["slabX"]
                         spnt_y = sp_tof2[i]["slabY"]
-                        self.hspxy[2].Fill(spnt_x, spnt_y)
+                        self.hspxy[2].Fill(spnt_y, spnt_x)
                         self.hspslabx_2.Fill(spnt_x)
                         self.hspslaby_2.Fill(spnt_y)
                         if sp_tof1 is not None :
@@ -388,7 +388,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                         # print 'nsp1: ', i, sp_tof1[i]
                         spnt_x = sp_tof1[i]["slabX"]
                         spnt_y = sp_tof1[i]["slabY"]
-                        self.hspxy[1].Fill(spnt_x, spnt_y)
+                        self.hspxy[1].Fill(spnt_y, spnt_x)
                         self.hspslabx_1.Fill(spnt_x)
                         self.hspslaby_1.Fill(spnt_y)
                         # print '... ', i

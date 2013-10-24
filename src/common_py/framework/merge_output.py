@@ -277,8 +277,15 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             self.job_footer = job_footer
             self.start_of_job(job_header)
             run_again = True # always run once
+            the_time = datetime.now()
             while run_again:
-                run_again = will_run_until_ctrl_c and self._execute_inner_loop()
+                # enforce one second delay on MongoDB lookups (otherwise the
+                # lookups are too frequent and MongoDB chews up processor - we
+                # pull down a local queue anyway)
+                if (datetime.now()-the_time).seconds > 0:
+                    the_time = datetime.now()
+                    run_again = will_run_until_ctrl_c and \
+                                self._execute_inner_loop()
         except KeyboardInterrupt:
             print "Received SIGINT and dying"
             sys.exit(0)

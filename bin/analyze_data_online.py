@@ -44,6 +44,7 @@ import os
 import signal
 import subprocess
 import time
+import string # pylint: disable=W0402
 import pymongo
 
 MONGODB = 'maus-new' # no '.' character
@@ -179,11 +180,19 @@ def maus_merge_output_process(maus_output_log, reducer_name, output_name,
     print 'Starting reducer...',
     maus_red = os.path.join(os.environ['MAUS_ROOT_DIR'], 'bin/online',
                                                                    reducer_name)
+    # strip trailing .py or whatever
+    root_name = string.join(reducer_name.split('.')[0:-1], '.')
+    if root_name == '':
+        root_name = reducer_name
+    root_name += '.root'
     proc = OnlineProcess(['python', maus_red,
                           '-mongodb_database_name='+MONGODB,
                           '-type_of_dataflow=multi_process_merge_output',
                           '-output_json_file_name='+output_name,
-                          '-reduce_plot_refresh_rate=60']+_extra_args,
+                          '-reduce_plot_refresh_rate=60',
+                          '-output_root_file_name='+root_name,
+                          '-output_root_file_mode=end_of_run_file_per_run']+\
+                          _extra_args,
                           maus_output_log)
     return proc
 

@@ -97,7 +97,7 @@ class Uploader: #pylint: disable = R0902
         the test server depending on whether this is specified by __init__.
         """
         #self.wsdlurl = self.config.cdb_upload_url+\
-        #                                        self.config.geometry_upload_wsdl
+        #                    self.config.geometry_upload_wsdl
         #self.geometry_cdb.set_url(self.wsdlurl)
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:

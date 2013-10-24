@@ -21,8 +21,6 @@ from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
-# ROTATEDXSL = os.environ["MAUS_ROOT_DIR"] + \
-#                      "/src/common_py/geometry/xsltScripts/RotatedGeometryFileTranslation.xsl"
 TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
@@ -66,7 +64,9 @@ class GDMLtomaus(): #pylint: disable = R0903
                 found_file = os.path.join(self.path, fname)
                 self.material_file = found_file
                 self.material_file_path = os.path.abspath(self.material_file)
-            if fname == 'fastradModel.gdml' or fname == 'FastradModel.gdml' or fname == 'Step_IV.gdml':
+            if fname == 'fastradModel.gdml' or \
+                   fname == 'FastradModel.gdml' or \
+                   fname == 'Step_IV.gdml':
                 found_file = os.path.join(self.path, fname)
                 self.config_file = found_file
             if fname.find('Maus_Information') >= 0:
