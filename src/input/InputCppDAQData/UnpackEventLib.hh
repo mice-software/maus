@@ -35,9 +35,9 @@
 #include "unpacking/MDfragmentVLSB_C.h"
 #include "unpacking/MDfragmentV830.h"
 #include "unpacking/MDfragmentDBB.h"
+#include "unpacking/MDfragmentDBBChain.h"
 #include "unpacking/MDequipMap.h"
 
-#include "Utils/DAQChannelMap.hh"
 #include "src/input/InputCppDAQData/fADCDataProcessor.hh"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,26 +181,6 @@ class V1731DataProcessor : public fADCDataProcessor {
   virtual int Process(MDdataContainer* dc);
 };
 
-/** On Fragment Event V830
- * This class unpacks a V830 (scaler) board hit.
- */
-class V830DataProcessor : public MDarranger {
- public:
-  V830DataProcessor() {_equipment="V830";}
-  virtual ~V830DataProcessor() {}
-
- /** Unpack a single event to JSON.
-  *
-  * This function unpacks a single spill event,
-  * recorded by equipment CAEN V830 (scaler)
-  * into a JSON sub-tree.
-  *
-  * \param[in,out] dc Pointer to the event to process.
-  * Will be casted to MDpartEventV830.
-  */
-  virtual int Process(MDdataContainer* dc);
-};
-
 typedef std::vector<MAUS::V1731>           V1731HitArray;
 typedef std::vector<V1731HitArray>   V1731PartEventArray;
 
@@ -234,6 +214,64 @@ class V1731CppDataProcessor : public fADCDataProcessor {
   V1731PartEventArray _emr_spill;
   V1731PartEventArray _ckov_spill;
   V1731PartEventArray _unknown_spill;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** On Fragment Event V830
+ * This class unpacks a V830 (scaler) board hit.
+ */
+class V830DataProcessor : public MDarranger {
+ public:
+  V830DataProcessor() {_equipment="V830";}
+  virtual ~V830DataProcessor() {}
+
+ /** Unpack a single event to JSON.
+  *
+  * This function unpacks a single spill event,
+  * recorded by equipment CAEN V830 (scaler)
+  * into a JSON sub-tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * Will be casted to MDpartEventV830.
+  */
+  virtual int Process(MDdataContainer* dc);
+};
+
+class V830CppDataProcessor : public MDarranger {
+ public:
+  V830CppDataProcessor() {_equipment="V830";}
+  virtual ~V830CppDataProcessor() {}
+
+ /** Unpack a single event to MAUS Data Structure..
+  *
+  * This function unpacks a single event,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment V830 (scaler)
+  * Will be casted to MDfragmentV830.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+  private:
+
+  DAQChannelMap* _chMap;
+
+  std::string _equipment;
+
+  MAUS::V830 _v830_spill;
+
+
+  MAUS::DAQData  *_daq_data;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -300,6 +338,70 @@ class DBBDataProcessor : public MDarranger {
   * Will be casted to MDfragmentDBB.
   */
   virtual int Process(MDdataContainer* dc);
+};
+
+#define DBB_TRIGGER_CHANNEL 4
+
+class DBBCppDataProcessor : public MDarranger {
+ public:
+  DBBCppDataProcessor()  {_equipment="DBB";}
+
+  virtual ~DBBCppDataProcessor() {}
+
+ /** Unpack a single event part to MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment DBB (EMR board)
+  * Will be casted to MDfragmentDBB.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+  static void set_spill_data(MDfragmentDBB *fragment, MAUS::DBBSpillData *dbb_spill);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset() {_spill.clear();}
+
+ private:
+
+  MAUS::DBBArray _spill;
+};
+
+class DBBChainCppDataProcessor : public MDarranger {
+ public:
+  DBBChainCppDataProcessor()  {_equipment="DBBChain";}
+
+  virtual ~DBBChainCppDataProcessor() {}
+
+ /** Unpack a single event part to the MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the MAUS Data Structur tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment a chain of 6 DBBs (EMR boards)
+  * Will be casted to MDfragmentDBBChain.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset() {_spill.clear();}
+
+ private:
+
+  MAUS::DBBArray _spill;
 };
 
 

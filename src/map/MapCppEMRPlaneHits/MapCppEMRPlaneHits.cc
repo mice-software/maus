@@ -15,10 +15,7 @@
  *
  */
 
-#include "map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
-
-// using namespace std;
-using namespace MAUS;
+#include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
 // bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
 bool MapCppEMRPlaneHits::birth() {
@@ -26,17 +23,22 @@ bool MapCppEMRPlaneHits::birth() {
   _emrMap.InitFromFile("../../maus-data/src/toolslib/EMRChannelMap.txt");
   _trigger_window_lower = -400;
   _trigger_window_upper = 1000;
+
+  return true;
 }
 
-bool MapCppEMRPlaneHits::death() {}
+bool MapCppEMRPlaneHits::death() {
+  return true;
+}
 
-string MapCppEMRPlaneHits::process(string document) {}
+string MapCppEMRPlaneHits::process(string document) {
+  return std::string("");
+}
 
-// void MapCppEMRPlaneHits::process(Spill *spill) {
-void MapCppEMRPlaneHits::process(Data *data) {
+void MapCppEMRPlaneHits::process(MAUS::Data *data) {
 
-  Spill *spill    = data->GetSpill();
-  EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
+  MAUS::Spill *spill    = data->GetSpill();
+  MAUS::EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
   int nPartEvents = emr_data.GetV1731NumPartEvents();
 //   cout << "nPartEvts: " << nPartEvents << endl;
   reset_data_tmp(nPartEvents);
@@ -48,27 +50,27 @@ void MapCppEMRPlaneHits::process(Data *data) {
   fill(spill, nPartEvents);
 }
 
-void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
 //   cout << "DBBArraySize: " << EMRdaq.GetDBBArraySize() << endl;
   int nDBBs = EMRdaq.GetDBBArraySize();
   for (int idbb = 0; idbb < nDBBs; idbb++) {
 
-    DBBSpillData dbb = EMRdaq.GetDBBArrayElement(idbb);
+    MAUS::DBBSpillData dbb = EMRdaq.GetDBBArrayElement(idbb);
     if ( dbb.GetTriggerCount() != nPartTrigger ) {
-      stringstream ss;
-      ss << "ERROR in  MapCppEMRPlaneHits::processDBB: trigger count is wrong ("
-         << dbb.GetTriggerCount() << "!=" << nPartTrigger << ")";
-      throw MDexception(ss.str());
+      Squeak::mout(Squeak::error)
+      << "ERROR in  MapCppEMRPlaneHits::processDBB: number of triggers mismatch ("
+      << dbb.GetTriggerCount() << "!=" << nPartTrigger << ")" << std::endl;
+      return;
     }
 
     int xLDC    = dbb.GetLdcId();
     int xSpill = dbb.GetSpillNumber();
     int xGeo    = dbb.GetDBBId();
     int nHits   = dbb.GetDBBHitsArraySize();
-    int nTr     = dbb.GetDBBTriggersArraySize();
+//     int nTr     = dbb.GetDBBTriggersArraySize();
 
     for (int ihit = 0; ihit < nHits; ihit++) {
-      DBBHit this_hit = dbb.GetDBBHitsArrayElement(ihit);
+      MAUS::DBBHit this_hit = dbb.GetDBBHitsArrayElement(ihit);
       int xCh = this_hit.GetChannel();
       int lt  = this_hit.GetLTime();
       int tt  = this_hit.GetTTime();
@@ -78,15 +80,15 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
       EMRChannelKey *emr_key = _emrMap.find(&daq_key);
       if (emr_key) {
         int xPlane = emr_key->plane();
-        int xOri   = emr_key->orientation();
+//         int xOri   = emr_key->orientation();
         int xBar   = emr_key->bar();
 //         cout << *emr_key << " --> lt: " << lt << "  tt: " << tt << endl;
 
         for (int ipe = 0; ipe < nPartTrigger; ipe++) {
-          DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(ipe);
+          MAUS::DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(ipe);
           int tr_lt = this_trigger.GetLTime();
-          int tr_tt = this_trigger.GetTTime();
-          int xCh   = this_trigger.GetChannel();
+//           int tr_tt = this_trigger.GetTTime();
+//           int xCh   = this_trigger.GetChannel();
 
           if (ihit == 0) { // Set the plane information only when processing the very first hit.
             _emr_events_tmp2[ipe][xPlane]._time  = tr_lt;
@@ -95,7 +97,7 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
 
           int delta_t = lt - tr_lt;
           if (delta_t > _trigger_window_lower && delta_t < _trigger_window_upper) {
-            EMRBarHit bHit;
+            MAUS::EMRBarHit bHit;
             bHit.SetTot(tt-lt);
             bHit.SetDeltaT(delta_t - _trigger_window_lower);
 //             cout << "*---> " << *emr_key << " --> trigger_Id: " << ipe
@@ -110,17 +112,17 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
   }
 }
 
-void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processFADC(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
 //   cout << "GetV1731NumPartEvents: " << EMRdaq.GetV1731NumPartEvents() << endl;
 
   for (int ipe = 0; ipe < nPartTrigger; ipe++) {
 
-    V1731HitArray fADChits = EMRdaq.GetV1731PartEvent(ipe);
+    MAUS::V1731HitArray fADChits = EMRdaq.GetV1731PartEvent(ipe);
     int nHits = fADChits.size();
 //     cout << "PartEvent " << ipe << "  --> " << nHits << " hits\n" << endl;
 
     for (int ihit = 0; ihit < nHits; ihit++) {
-      V1731 fADChit = fADChits[ihit];
+      MAUS::V1731 fADChit = fADChits[ihit];
       int xLDC  = fADChit.GetLdcId();
       int xGeo  = fADChit.GetGeo();
       int xCh   = fADChit.GetChannel();
@@ -129,7 +131,7 @@ void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
 
       DAQChannelKey daq_key(xLDC, xGeo, xCh, 121, "emr");
 //       cout << daq_key << endl;
-      MAUS::EMRChannelKey *emr_key = _emrMap.find(&daq_key);
+      EMRChannelKey *emr_key = _emrMap.find(&daq_key);
       if (emr_key) {
         int xPlane = emr_key->plane();
         int xOri   = emr_key->orientation();
@@ -143,19 +145,19 @@ void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
   }
 }
 
-void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
-  ReconEventArray *recEvts =  spill->GetReconEvents();
+void MapCppEMRPlaneHits::fill(MAUS::Spill *spill, int nPartTrigger) {
+  MAUS::ReconEventArray *recEvts =  spill->GetReconEvents();
   if (recEvts->size() == 0) {
     for (int ipe = 0; ipe < nPartTrigger; ipe++)
-      recEvts->push_back(new ReconEvent);
+      recEvts->push_back(new MAUS::ReconEvent);
   }
 
   for (int ipe = 0; ipe < nPartTrigger; ipe++) {
-    EMREvent *evt = new EMREvent;
-    EMRPlaneHitArray plArray;
+    MAUS::EMREvent *evt = new MAUS::EMREvent;
+    MAUS::EMRPlaneHitArray plArray;
 
     for (int ipl = 0; ipl < NUM_DBB_PLANES; ipl++) {
-      EMRPlaneHit *plHit = new EMRPlaneHit;
+      MAUS::EMRPlaneHit *plHit = new MAUS::EMRPlaneHit;
       plHit->SetPlane(ipl);
       plHit->SetTrigger(ipe);
 
@@ -172,12 +174,12 @@ void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
       plHit->SetSpill(xSpill);
       plHit->SetDeltaT(xDeltaT);
 
-      EMRBarArray barArray;
+      MAUS::EMRBarArray barArray;
 
       for (int ibar = 0; ibar < NUM_DBB_CHANNELS; ibar++) {
         int nHits = _emr_events_tmp4[ipe][ipl][ibar].size();
         if ( nHits ) {
-          EMRBar *bar = new EMRBar;
+          MAUS::EMRBar *bar = new MAUS::EMRBar;
           bar->SetBar(ibar);
           bar->SetEMRBarHitArray(_emr_events_tmp4[ipe][ipl][ibar]);
           barArray.push_back(bar);

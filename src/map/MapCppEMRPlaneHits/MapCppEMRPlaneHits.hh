@@ -29,13 +29,13 @@
 #include <vector>
 #include <map>
 
+#include "Utils/EMRChannelMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
 #include "DataStructure/DAQData.hh"
 #include "DataStructure/EMRDaq.hh"
 #include "DataStructure/DBBSpillData.hh"
-#include "DataStructure/EMRChannelMap.hh"
 #include "DataStructure/EMRBar.hh"
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
@@ -101,7 +101,7 @@ class MapCppEMRPlaneHits {
 
   std::string _classname;
 
-  MAUS::EMRChannelMap _emrMap;
+  EMRChannelMap _emrMap;
 
   int _trigger_window_lower;
   int _trigger_window_upper;

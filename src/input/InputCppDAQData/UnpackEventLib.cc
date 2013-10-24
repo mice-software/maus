@@ -197,40 +197,40 @@ void V1290CppDataProcessor::fill_daq_data() {
   unsigned int npe = _tof1_spill.size();
 
   if (_daq_data->GetTOF0DaqArraySize() != npe)
-    _daq_data->GetTOF0DaqArray().resize(npe);
+    _daq_data->GetTOF0DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetTOF1DaqArraySize() != npe)
-    _daq_data->GetTOF1DaqArray().resize(npe);
+    _daq_data->GetTOF1DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetTOF2DaqArraySize() != npe)
-    _daq_data->GetTOF2DaqArray().resize(npe);
+    _daq_data->GetTOF2DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetUnknownArraySize() != npe)
-    _daq_data->GetUnknownArray().resize(npe);
+    _daq_data->GetUnknownArrayPtr()->resize(npe);
 
 
   for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::TOFDaq *tof0_daq = _daq_data->GetTOF0DaqArrayElement(ipe);
     if (!tof0_daq)
-      _daq_data->GetTOF0DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF0DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF0DaqArrayElement(ipe)->SetV1290Array(_tof0_spill[ipe]);
 
     MAUS::TOFDaq *tof1_daq = _daq_data->GetTOF1DaqArrayElement(ipe);
     if (!tof1_daq)
-      _daq_data->GetTOF1DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF1DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF1DaqArrayElement(ipe)->SetV1290Array(_tof1_spill[ipe]);
 
     MAUS::TOFDaq *tof2_daq = _daq_data->GetTOF2DaqArrayElement(ipe);
     if (!tof2_daq)
-      _daq_data->GetTOF2DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF2DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF2DaqArrayElement(ipe)->SetV1290Array(_tof2_spill[ipe]);
 
     MAUS::Unknown *unknown = _daq_data->GetUnknownArrayElement(ipe);
     if (!unknown)
-      _daq_data->GetUnknownArray()[ipe] = new MAUS::Unknown;
+      (*_daq_data->GetUnknownArrayPtr())[ipe] = new MAUS::Unknown;
     _daq_data->GetUnknownArrayElement(ipe)->SetV1290Array(_unknown_spill[ipe]);
   }
 }
@@ -397,58 +397,58 @@ void V1724CppDataProcessor::fill_daq_data() {
   unsigned int npe = _tof1_spill.size();
 
   if (_daq_data->GetTOF0DaqArraySize() != npe)
-    _daq_data->GetTOF0DaqArray().resize(npe);
+    _daq_data->GetTOF0DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetTOF1DaqArraySize() != npe)
-    _daq_data->GetTOF1DaqArray().resize(npe);
+    _daq_data->GetTOF1DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetTOF2DaqArraySize() != npe)
-    _daq_data->GetTOF2DaqArray().resize(npe);
+    _daq_data->GetTOF2DaqArrayPtr()->resize(npe);
 
   if (_daq_data->GetKLArraySize() != npe)
-    _daq_data->GetKLArray().resize(npe);
+    _daq_data->GetKLArrayPtr()->resize(npe);
 
   if (_daq_data->GetTagArraySize() != npe)
-    _daq_data->GetTagArray().resize(npe);
+    _daq_data->GetTagArrayPtr()->resize(npe);
 
   if (_daq_data->GetUnknownArraySize() != npe)
-    _daq_data->GetUnknownArray().resize(npe);
+    _daq_data->GetUnknownArrayPtr()->resize(npe);
 
 
   for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::TOFDaq *tof0_daq = _daq_data->GetTOF0DaqArrayElement(ipe);
     if (!tof0_daq)
-      _daq_data->GetTOF0DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF0DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF0DaqArrayElement(ipe)->SetV1724Array(_tof0_spill[ipe]);
 
     MAUS::TOFDaq *tof1_daq = _daq_data->GetTOF1DaqArrayElement(ipe);
     if (!tof1_daq)
-      _daq_data->GetTOF1DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF1DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF1DaqArrayElement(ipe)->SetV1724Array(_tof1_spill[ipe]);
 
     MAUS::TOFDaq *tof2_daq = _daq_data->GetTOF2DaqArrayElement(ipe);
     if (!tof2_daq)
-      _daq_data->GetTOF2DaqArray()[ipe] = new MAUS::TOFDaq;
+      (*_daq_data->GetTOF2DaqArrayPtr())[ipe] = new MAUS::TOFDaq;
 
     _daq_data->GetTOF2DaqArrayElement(ipe)->SetV1724Array(_tof2_spill[ipe]);
 
     MAUS::KLDaq *kl_daq = _daq_data->GetKLArrayElement(ipe);
     if (!kl_daq)
-      _daq_data->GetKLArray()[ipe] = new MAUS::KLDaq;
+      (*_daq_data->GetKLArrayPtr())[ipe] = new MAUS::KLDaq;
 
     _daq_data->GetKLArrayElement(ipe)->SetV1724Array(_kl_spill[ipe]);
 
     MAUS::Tag *tag_daq = _daq_data->GetTagArrayElement(ipe);
     if (!tag_daq)
-      _daq_data->GetTagArray()[ipe] = new MAUS::Tag;
+      (*_daq_data->GetTagArrayPtr())[ipe] = new MAUS::Tag;
 
     _daq_data->GetTagArrayElement(ipe)->SetV1724Array(_tag_spill[ipe]);
 
     MAUS::Unknown *unknown = _daq_data->GetUnknownArrayElement(ipe);
     if (!unknown)
-      _daq_data->GetUnknownArray()[ipe] = new MAUS::Unknown;
+      (*_daq_data->GetUnknownArrayPtr())[ipe] = new MAUS::Unknown;
     _daq_data->GetUnknownArrayElement(ipe)->SetV1724Array(_unknown_spill[ipe]);
   }
 }
@@ -612,24 +612,24 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
 
 void V1731CppDataProcessor::fill_daq_data() {
   unsigned int npe = _emr_spill.size();
-  _daq_data->GetEMRDaq().SetV1731PartEventArray(_emr_spill);
+  _daq_data->GetEMRDaqPtr()->SetV1731PartEventArray(_emr_spill);
 
   if (_daq_data->GetCkovArraySize() != npe)
-    _daq_data->GetCkovArray().resize(npe);
+    _daq_data->GetCkovArrayPtr()->resize(npe);
 
   if (_daq_data->GetUnknownArraySize() != npe)
-    _daq_data->GetUnknownArray().resize(npe);
+    _daq_data->GetUnknownArrayPtr()->resize(npe);
 
   for (unsigned int ipe = 0; ipe < npe; ipe++) {
     MAUS::CkovDaq *ckov_daq = _daq_data->GetCkovArrayElement(ipe);
     if (!ckov_daq)
-      _daq_data->GetCkovArray()[ipe] = new MAUS::CkovDaq;
+      (*_daq_data->GetCkovArrayPtr())[ipe] = new MAUS::CkovDaq;
 
     _daq_data->GetCkovArrayElement(ipe)->SetV1731Array(_ckov_spill[ipe]);
 
     MAUS::Unknown *unknown = _daq_data->GetUnknownArrayElement(ipe);
     if (!unknown)
-      _daq_data->GetUnknownArray()[ipe] = new MAUS::Unknown;
+      (*_daq_data->GetUnknownArrayPtr())[ipe] = new MAUS::Unknown;
     _daq_data->GetUnknownArrayElement(ipe)->SetV1731Array(_unknown_spill[ipe]);
   }
 }
@@ -687,6 +687,64 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
 
   (*_docSpill)[_equipment] = pBoardDoc;
   return OK;
+}
+
+#define V830_NCHANNELS   32
+
+int V830CppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  /**
+   * Cast the argument to structure it points to.
+   * This process should be called only with MDfragmentV830 argument.
+   */
+//   cout << "This is V830CppDataProcessor::Process " << xEvCounter << endl;
+
+  if ( typeid(*aFragPtr) != typeid(MDfragmentV830) ) return CastError;
+  MDfragmentV830* xV830Fragment = static_cast<MDfragmentV830*>(aFragPtr);
+
+  if ( !xV830Fragment->IsValid() )
+    return GenericError;
+
+  _v830_spill.SetLdcId(this->GetLdcId());
+  _v830_spill.SetEquipType(this->GetEquipmentType());
+  _v830_spill.SetTimeStamp(this->GetTimeStamp());
+  _v830_spill.SetPhysEventNumber(this->GetPhysEventNumber());
+
+  MAUS::Channels xChannels;
+
+  uint32_t * ptr = xV830Fragment->Get32bWordPtr(0);
+  MDdataWordV830 xDataWord(ptr);
+  unsigned int xWordCount(0);
+
+  // Loop over all the channels
+  while ( xWordCount < xV830Fragment->GetWordCount() ) {
+    uint32_t dt= xDataWord.GetDataType();
+    switch ( dt ) {
+      case DWV830_Measurement:
+      {
+        int xCh = xDataWord.GetChannel();
+        int xValue = xDataWord.GetMeasurement();
+        xChannels.SetCh(xCh, xValue);
+      }
+      case DWV830_Header:
+      {
+         _v830_spill.SetGeo(xDataWord.GetGeo());
+         break;
+      }
+    }
+    xWordCount++;
+    xDataWord.SetDataPtr(++ptr);
+  }
+  _v830_spill.SetChannels(xChannels);
+  return OK;
+}
+
+void V830CppDataProcessor::fill_daq_data() {
+  _daq_data->SetV830(_v830_spill);
+}
+
+void V830CppDataProcessor::reset() {
+  MAUS::Channels ch;
+  _v830_spill.SetChannels(ch);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -875,5 +933,134 @@ int DBBDataProcessor::Process(MDdataContainer* aFragPtr) {
   return OK;
 }
 
+int DBBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentDBB argument.
+
+//   cout << "This is DBBCppDataProcessor::Process" << endl;
+  if ( typeid(*aFragPtr) != typeid(MDfragmentDBB) ) return CastError;
+
+  MDfragmentDBB* xDBBFragment = static_cast<MDfragmentDBB*>(aFragPtr);
+
+  if ( !xDBBFragment->IsValid() )
+    return GenericError;
+
+//   xDBBFragment->Dump();
+  MAUS::DBBSpillData xDBBSpill;
+  xDBBSpill.SetLdcId(this->GetLdcId());
+  xDBBSpill.SetTimeStamp(this->GetTimeStamp());
+  set_spill_data(xDBBFragment, &xDBBSpill);
+
+  _spill.push_back(xDBBSpill);
+
+  return OK;
+}
+
+void DBBCppDataProcessor::set_spill_data(MDfragmentDBB *fragment, MAUS::DBBSpillData *dbb_spill) {
+  int xLdc, xGeo;
+  string xDetector = "emr";
+
+  dbb_spill->SetDetector(xDetector);
+  xGeo = fragment->GetGeo();
+  xLdc = dbb_spill->GetLdcId();
+  dbb_spill->SetDBBId(xGeo);
+  dbb_spill->SetLdcId(xLdc);
+  dbb_spill->SetSpillNumber(fragment->GetSpillNumber());
+  dbb_spill->SetSpillWidth(fragment->GetSpillWidth());
+  dbb_spill->SetTriggerCount(fragment->GetTriggerCount());
+  dbb_spill->SetHitCount(fragment->GetHitCount());
+
+  MAUS::DBBHitsArray hits;
+  MAUS::DBBHitsArray triggers;
+
+  // Loop over all the channels
+  for (unsigned int xCh = 0; xCh < DBB_NCHANNELS; xCh++) {
+    // Get the number of leading edge hits.
+    int xHitsL = fragment->GetNLeadingEdgeHits(xCh);
+    // Get the number of trailing edge hits.
+    int xHitsT = fragment->GetNTrailingEdgeHits(xCh);
+
+    // By definition the number of the leading edge hits has to be equal
+    // to the number of the trailing edge hits but some times this is not true.
+    int xMaxHits = MAX(xHitsL, xHitsT);
+
+    int xLT, xTT;  // Lead and Trail times
+    for (int xHit = 0; xHit < xMaxHits; xHit++) {
+
+      MAUS::DBBHit hit;
+      hit.SetLDC(xLdc);
+      hit.SetGEO(xGeo);
+      hit.SetChannel(xCh);
+
+      if (xHit < xHitsL) {
+        xLT = fragment->GetHitMeasurement(xHit,  // Hit ID
+                                             xCh,  // Channel ID
+                                             'l');
+      } else {
+        // If no trailing edge hit set the value og time to -99.
+        xLT = 0;
+      }
+
+      if (xHit < xHitsT) {
+        xTT = fragment->GetHitMeasurement(xHit,  // Hit ID
+                                              xCh,  // Channel ID
+                                              't');
+      } else {
+        // If no trailing edge hit set the value og time to -99.
+        xTT = 0;
+      }
+      hit.SetLTime(xLT);
+      hit.SetTTime(xTT);
+
+      if (xCh == DBB_TRIGGER_CHANNEL)
+        triggers.push_back(hit);
+      else
+        hits.push_back(hit);
+    }
+  }
+  dbb_spill->SetDBBHitsArray(hits);
+  dbb_spill->SetDBBTriggersArray(triggers);
+}
+
+void DBBCppDataProcessor::fill_daq_data() {
+  _daq_data->GetEMRDaqPtr()->SetDBBArray(_spill);
+}
+
+#define DBB_TRIGGER_CHANNEL 4
+
+int DBBChainCppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  /** Cast the argument to structure it points to.
+      This process should be called only with MDfragmentDBB argument. */
+//   cout << "This is DBBChainCppDataProcessor::Process" << endl;
+
+  if ( typeid(*aFragPtr) != typeid(MDfragmentDBBChain) )
+    return CastError;
+
+  MDfragmentDBBChain* xDBBChainFragment = static_cast<MDfragmentDBBChain*>(aFragPtr);
+
+  /** Loop over the elements of the chain */
+  for (int i = 0; i < DBBS_IN_CHAIN; i++) {
+    MDfragmentDBB* xDBBFragment =  xDBBChainFragment->getFragmentDBB(i);
+
+    if ( !xDBBFragment->IsValid() )
+      return GenericError;
+
+//     xDBBFragment->Dump();
+    MAUS::DBBSpillData xDBBSpill;
+
+    /** Fill into the data structure */
+    xDBBSpill.SetLdcId(this->GetLdcId());
+    xDBBSpill.SetTimeStamp(this->GetTimeStamp());
+
+    DBBCppDataProcessor::set_spill_data(xDBBFragment, &xDBBSpill);
+
+    _spill.push_back(xDBBSpill);
+  }
+  return OK;
+}
+
+void DBBChainCppDataProcessor::fill_daq_data() {
+  _daq_data->GetEMRDaqPtr()->SetDBBArray(_spill);
+}
 //////////////////////////////////////////////////////////////////////////////////////////////
 

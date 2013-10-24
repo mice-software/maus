@@ -65,7 +65,7 @@ DAQData::~DAQData() {
     SetTracker1DaqArray(Tracker1DaqArray());
 }
 
-V830& DAQData::GetV830() {
+V830 DAQData::GetV830() const {
     return _V830;
 }
 
@@ -73,8 +73,12 @@ void DAQData::SetV830(V830 V830) {
     _V830 = V830;
 }
 
-TriggerRequestArray& DAQData::GetTriggerRequestArray() {
+TriggerRequestArray DAQData::GetTriggerRequestArray() const {
     return _trigger_request;
+}
+
+TriggerRequestArray* DAQData::GetTriggerRequestArrayPtr() {
+    return &_trigger_request;
 }
 
 TriggerRequest* DAQData::GetTriggerRequestArrayElement(size_t index) const {
@@ -94,8 +98,12 @@ void DAQData::SetTriggerRequestArray(TriggerRequestArray trigger_request) {
     _trigger_request = trigger_request;
 }
 
-TOF1DaqArray& DAQData::GetTOF1DaqArray() {
+TOF1DaqArray DAQData::GetTOF1DaqArray() const {
     return _tof1;
+}
+
+TOF1DaqArray* DAQData::GetTOF1DaqArrayPtr() {
+    return &_tof1;
 }
 
 TOFDaq* DAQData::GetTOF1DaqArrayElement(size_t index) const {
@@ -115,8 +123,12 @@ void DAQData::SetTOF1DaqArray(TOF1DaqArray tof1) {
     _tof1 = tof1;
 }
 
-CkovArray& DAQData::GetCkovArray() {
+CkovArray DAQData::GetCkovArray() const {
     return _ckov;
+}
+
+CkovArray* DAQData::GetCkovArrayPtr() {
+    return &_ckov;
 }
 
 CkovDaq* DAQData::GetCkovArrayElement(size_t index) const {
@@ -136,8 +148,12 @@ void DAQData::SetCkovArray(CkovArray ckov) {
     _ckov = ckov;
 }
 
-TOF2DaqArray& DAQData::GetTOF2DaqArray() {
+TOF2DaqArray DAQData::GetTOF2DaqArray() const {
     return _tof2;
+}
+
+TOF2DaqArray* DAQData::GetTOF2DaqArrayPtr() {
+    return &_tof2;
 }
 
 TOFDaq* DAQData::GetTOF2DaqArrayElement(size_t index) const {
@@ -157,8 +173,12 @@ void DAQData::SetTOF2DaqArray(TOF2DaqArray tof2) {
     _tof2 = tof2;
 }
 
-Tracker0DaqArray& DAQData::GetTracker0DaqArray() {
+Tracker0DaqArray DAQData::GetTracker0DaqArray() const {
     return _tracker0;
+}
+
+Tracker0DaqArray* DAQData::GetTracker0DaqArrayPtr() {
+    return &_tracker0;
 }
 
 TrackerDaq* DAQData::GetTracker0DaqArrayElement(size_t index) const {
@@ -178,8 +198,12 @@ void DAQData::SetTracker0DaqArray(Tracker0DaqArray tracker0) {
     _tracker0 = tracker0;
 }
 
-Tracker1DaqArray& DAQData::GetTracker1DaqArray() {
+Tracker1DaqArray DAQData::GetTracker1DaqArray() const {
     return _tracker1;
+}
+
+Tracker1DaqArray* DAQData::GetTracker1DaqArrayPtr() {
+    return &_tracker1;
 }
 
 TrackerDaq* DAQData::GetTracker1DaqArrayElement(size_t index) const {
@@ -199,10 +223,13 @@ void DAQData::SetTracker1DaqArray(Tracker1DaqArray tracker1) {
     _tracker1 = tracker1;
 }
 
-UnknownArray& DAQData::GetUnknownArray() {
+UnknownArray DAQData::GetUnknownArray() const {
     return _unknown;
 }
 
+UnknownArray* DAQData::GetUnknownArrayPtr() {
+    return &_unknown;
+}
 Unknown* DAQData::GetUnknownArrayElement(size_t index) const {
     return _unknown[index];
 }
@@ -220,8 +247,12 @@ void DAQData::SetUnknownArray(UnknownArray unknown) {
     _unknown = unknown;
 }
 
-KLArray& DAQData::GetKLArray() {
+KLArray DAQData::GetKLArray() const {
     return _kl;
+}
+
+KLArray* DAQData::GetKLArrayPtr() {
+    return &_kl;
 }
 
 KLDaq* DAQData::GetKLArrayElement(size_t index) const {
@@ -241,8 +272,12 @@ void DAQData::SetKLArray(KLArray kl) {
     _kl = kl;
 }
 
-TagArray& DAQData::GetTagArray() {
+TagArray DAQData::GetTagArray() const {
     return _tag;
+}
+
+TagArray* DAQData::GetTagArrayPtr() {
+    return &_tag;
 }
 
 Tag* DAQData::GetTagArrayElement(size_t index) const {
@@ -262,8 +297,12 @@ void DAQData::SetTagArray(TagArray tag) {
     _tag = tag;
 }
 
-TOF0DaqArray& DAQData::GetTOF0DaqArray() {
+TOF0DaqArray DAQData::GetTOF0DaqArray() const {
     return _tof0;
+}
+
+TOF0DaqArray* DAQData::GetTOF0DaqArrayPtr() {
+    return &_tof0;
 }
 
 TOFDaq* DAQData::GetTOF0DaqArrayElement(size_t index) const {
@@ -283,8 +322,12 @@ void DAQData::SetTOF0DaqArray(TOF0DaqArray tof0) {
     _tof0 = tof0;
 }
 
-TriggerArray& DAQData::GetTriggerArray() {
+TriggerArray DAQData::GetTriggerArray() const {
     return _trigger;
+}
+
+TriggerArray* DAQData::GetTriggerArrayPtr() {
+    return &_trigger;
 }
 
 Trigger* DAQData::GetTriggerArrayElement(size_t index) const {
@@ -304,10 +347,13 @@ void DAQData::SetTriggerArray(TriggerArray trigger) {
     _trigger = trigger;
 }
 
-EMRDaq& DAQData::GetEMRDaq() {
+EMRDaq DAQData::GetEMRDaq() const {
     return _emr;
 }
 
+EMRDaq* DAQData::GetEMRDaqPtr() {
+  return &_emr;
+}
 
 void DAQData::SetEMRDaq(EMRDaq emr) {
     _emr = emr;
