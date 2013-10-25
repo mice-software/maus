@@ -24,9 +24,6 @@ InputCppDAQOfflineData::InputCppDAQOfflineData(std::string pDataPath, std::strin
 
 bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
 
-  if (!InputCppDAQData::birth(jsonDataCards))
-    return false;
-
   if ( _dataFileManager.GetNFiles() ) {
      return false;  // Faile because files are already open.
   }
@@ -79,6 +76,9 @@ bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
     << std::endl;
     return false;
   }
+
+  if (!InputCppDAQData::birth(jsonDataCards))
+    return false;
 
   // _dataProcessManager.DumpProcessors();
 

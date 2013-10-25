@@ -14,17 +14,75 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "Utils/CppErrorHandler.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Utils/DAQChannelMap.hh"
+#include "Interface/dataCards.hh"
 
 #include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
-// bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
-bool MapCppEMRPlaneHits::birth() {
+bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppEMRPlaneHits";
-  _emrMap.InitFromFile("../../maus-data/src/toolslib/EMRChannelMap.txt");
-  _trigger_window_lower = -400;
-  _trigger_window_upper = 1000;
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
-  return true;
+  if (!pMAUS_ROOT_DIR) {
+    Squeak::mout(Squeak::error)
+    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+    return false;
+  }
+
+  try {
+    //  JsonCpp setup
+    Json::Value configJSON;
+    Json::Value map_file_name;
+    Json::Value xEnable_V1731_Unpacking;
+    Json::Value xEnable_DBB_Unpacking;
+
+    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+
+    map_file_name = JsonWrapper::GetProperty(configJSON,
+                                             "EMR_cabling_file",
+                                             JsonWrapper::stringValue);
+
+    std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
+    bool loaded = _emrMap.InitFromFile(xMapFile);
+    if (!loaded)
+      return false;
+
+    // !!!!!!!!!!!!!!!!!!!!!!
+    _trigger_window_lower = -400;
+    _trigger_window_upper = 1000;
+    // !!!!!!!!!!!!!!!!!!!!!!
+
+    xEnable_V1731_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_V1731_Unpacking",
+                                                       JsonWrapper::booleanValue);
+    if (!xEnable_V1731_Unpacking.asBool()) {
+      Squeak::mout(Squeak::warning)
+      << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+      << " Are you shure you want this?"
+      << std::endl;
+    }
+
+    xEnable_DBB_Unpacking   = JsonWrapper::GetProperty(configJSON,
+                                                       "Enable_DBB_Unpacking",
+                                                       JsonWrapper::booleanValue);
+    if (!xEnable_DBB_Unpacking.asBool()) {
+      Squeak::mout(Squeak::warning)
+      << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+      << " Are you shure you want this?"
+      << std::endl;
+    }
+
+    return true;
+  } catch(Squeal squee) {
+    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(std::exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+
+  return false;
 }
 
 bool MapCppEMRPlaneHits::death() {
@@ -32,7 +90,8 @@ bool MapCppEMRPlaneHits::death() {
 }
 
 string MapCppEMRPlaneHits::process(string document) {
-  return std::string("");
+
+  return document;
 }
 
 void MapCppEMRPlaneHits::process(MAUS::Data *data) {

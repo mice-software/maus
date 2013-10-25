@@ -81,3 +81,8 @@ bool InputCppDAQOnlineData::readNextEvent() {
   return true;
 }
 
+void InputCppDAQOnlineData::setMonitorSrc(std::string mon) {
+  _dataManager->setMonSrc(mon);
+  _dataManager->Init();
+}
+

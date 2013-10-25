@@ -25,6 +25,11 @@
 #ifndef _MAP_MAPCPPEMRPLANEHITS_H_
 #define _MAP_MAPCPPEMRPLANEHITS_H_
 
+// C headers
+#include <assert.h>
+#include <json/json.h>
+
+// C++ headers
 #include <string>
 #include <vector>
 #include <map>
@@ -70,8 +75,7 @@ class MapCppEMRPlaneHits {
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-//   bool birth(std::string argJsonConfigDocument);
-  bool birth();
+  bool birth(std::string argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
@@ -90,7 +94,7 @@ class MapCppEMRPlaneHits {
  *  @param
  */
   void process(MAUS::Data *data);
-//   void process(MAUS::Spill *spill);
+
  private:
 
   void processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger);
