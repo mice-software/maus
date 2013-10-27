@@ -19,7 +19,9 @@
 
 namespace MAUS {
 
-SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
+SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
+                                     _event(-1),
+                                     _tracker(-1),
                                      _station(-1),
                                      _plane(-1),
                                      _channel(666),
@@ -49,6 +51,9 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   } else {
     _tracker = 1;
   }
+  _spill = kalman_site->spill();
+  _event = kalman_site->event();
+
   id = abs(id);
   _station = id/3;
   _plane   = (id-1)%3;
@@ -95,6 +100,9 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
+  _spill = point.spill();
+  _event = point.event();
+
   _tracker = point.tracker();
   _station = point.station();
   _plane   = point.plane();
@@ -126,6 +134,8 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
+  _spill   = rhs.spill();
+  _event   = rhs.event();
   _tracker = rhs.tracker();
   _station = rhs.station();
   _plane   = rhs.plane();

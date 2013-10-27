@@ -57,21 +57,29 @@ class SciFiTrackPoint {
    */
   SciFiTrackPoint& operator=(const SciFiTrackPoint& site);
 
+  /** @brief  Sets spill number.
+   */
+  void set_spill(int spill)                     { _spill   = spill;   }
+
+  /** @brief  Sets event number.
+   */
+  void set_event(int event)                     { _event   = event;   }
+
   /** @brief  Sets tracker number.
    */
-  void set_tracker(int tracker)                 { _tracker   = tracker; }
+  void set_tracker(int tracker)                 { _tracker = tracker; }
 
   /** @brief  Sets station number.
    */
-  void set_station(int station)                 { _station   = station; }
+  void set_station(int station)                 { _station = station; }
 
   /** @brief  Sets plane number.
    */
-  void set_plane(int plane)                     { _plane     = plane;   }
+  void set_plane(int plane)                     { _plane   = plane;   }
 
   /** @brief  Sets channel number.
    */
-  void set_channel(double channel)              { _channel   = channel; }
+  void set_channel(double channel)              { _channel = channel; }
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
@@ -122,6 +130,14 @@ class SciFiTrackPoint {
   void set_mc_y(double mc_y)                    { _mc_y   = mc_y;       }
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
   void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
+
+  /** @brief  Returns the spill number.
+   */
+  int spill()                const { return _spill;    }
+
+  /** @brief  Returns the event number.
+   */
+  int event()                const { return _event;    }
 
   /** @brief  Returns the tracker number.
    */
@@ -190,6 +206,14 @@ class SciFiTrackPoint {
   double mc_pz()             const { return _mc_pz;    }
 
  private:
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _spill;
+
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _event;
+
   /** @brief The tracker the trackpoint belongs to.
    */
   int _tracker;

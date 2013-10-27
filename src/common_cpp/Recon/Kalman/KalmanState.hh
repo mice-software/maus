@@ -102,6 +102,10 @@ class KalmanState {
 
   void Build(SciFiCluster *cluster);
 
+  void set_spill(int spill) { _spill = spill; }
+
+  void set_event(int event) { _event = event; }
+
   /** @brief Sets the state vector at the site.
    */
   void set_a(TMatrixD a, State current_state);
@@ -145,6 +149,9 @@ class KalmanState {
 
   void set_current_state(State kalman_state)       { _current_state = kalman_state; }
 
+  int spill()                            const { return _spill; }
+
+  int event()                            const { return _event; }
 
   State current_state()                  const { return _current_state; }
 
@@ -179,6 +186,10 @@ class KalmanState {
   ThreeVector true_position()      const { return _mc_pos; }
 
  private:
+  /// The spill.
+  int _spill;
+  /// The event number.
+  int _event;
   /// State of the site.
   State _current_state;
   /// Z placement of the site (mm).
