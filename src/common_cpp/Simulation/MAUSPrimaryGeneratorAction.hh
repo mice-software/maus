@@ -60,7 +60,7 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     explicit PGParticle(VirtualHit hit);
     void ReadJson(Json::Value pg_particle);
     Json::Value WriteJson();
-    double x, y, z, time, px, py, pz, energy;
+    double x, y, z, time, px, py, pz, sx, sy, sz, energy;
     int pid;
     unsigned int seed;
   };

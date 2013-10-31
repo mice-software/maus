@@ -85,6 +85,22 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
 
+
+//################################################//
+
+  //  Json::Value spin;
+   // spin["x"] = point->GetSpin().x();
+  //  spin["y"] = point->GetSpin().y();
+   // spin["z"] = point->GetSpin().z();
+    //step["spin"] = spin;
+
+
+
+//################################################//
+
+
+
+
     step["energy"] = point->GetTotalEnergy();
     step["proper_time"] = point->GetProperTime();
     step["path_length"] = aTrack->GetTrackLength();

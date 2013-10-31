@@ -39,6 +39,8 @@ VirtualHitProcessor::VirtualHitProcessor() {
                                                 &VirtualHit::SetPosition, true);
     RegisterValueBranch("momentum", &_three_vec_proc, &VirtualHit::GetMomentum,
                                                 &VirtualHit::SetMomentum, true);
+    RegisterValueBranch("spin", &_three_vec_proc, &VirtualHit::GetSpin,
+                                                &VirtualHit::SetSpin, true);
     RegisterValueBranch("b_field", &_three_vec_proc, &VirtualHit::GetBField,
                                                   &VirtualHit::SetBField, true);
     RegisterValueBranch("e_field", &_three_vec_proc, &VirtualHit::GetEField,

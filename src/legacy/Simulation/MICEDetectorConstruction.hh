@@ -54,7 +54,6 @@ public:
 
   BTFieldConstructor* GetField() {return _btField;}
 
-private:
 
   std::vector<MAUS::MAUSSD*> _SDs; // todo: add get/set 
   
@@ -63,7 +62,7 @@ private:
   void  setUserLimits( G4LogicalVolume*, MiceModule* );
 
   void  setMagneticField( G4LogicalVolume*, MiceModule* );
-
+  void AllowSpinTracking();
   //Set G4 Stepping Accuracy parameters
   void  setSteppingAccuracy();
   //Set G4 Stepping Algorithm

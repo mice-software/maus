@@ -82,6 +82,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["kinetic_energy_threshold"] = 0.1;
   config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
     std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
     std::string("\"random_seed\":10}")

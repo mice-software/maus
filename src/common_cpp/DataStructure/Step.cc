@@ -18,7 +18,7 @@
 
 namespace MAUS {
 
-Step::Step() : _position(0, 0, 0), _momentum(0, 0, 0), _proper_time(0),
+Step::Step() : _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0), _proper_time(0), //added spin
                _path_length(0), _time(0), _energy(0), _energy_deposited(0) {
 }
 
@@ -32,6 +32,7 @@ Step& Step::operator=(const Step& step) {
     }
     _position = step._position;
     _momentum = step._momentum;
+    _spin = step._spin; //added
     _proper_time = step._proper_time;
     _path_length = step._path_length;
     _time = step._time;
@@ -59,6 +60,15 @@ ThreeVector Step::GetMomentum() const {
 void Step::SetMomentum(ThreeVector mom) {
     _momentum = mom;
 }
+//################################################################################
+ThreeVector Step::GetSpin() const {
+    return _spin;
+}
+
+void Step::SetSpin(ThreeVector spin) {
+    _spin = spin;
+}
+//##################################################################################
 
 double Step::GetProperTime() const {
     return _proper_time;

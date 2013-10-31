@@ -56,6 +56,21 @@ class Step {
     /** Sets the momentum of the step */
     void SetMomentum(ThreeVector mom);
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    /** Returns the spin of the step */
+    ThreeVector GetSpin() const;
+
+    /** Sets the spin of the step */
+    void SetSpin(ThreeVector spin);
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+
+
+
+
     /** Returns the proper time of the step */
     double GetProperTime() const;
 
@@ -89,6 +104,7 @@ class Step {
   private:
     ThreeVector _position;
     ThreeVector _momentum;
+    ThreeVector _spin; // added
     double _proper_time;
     double _path_length;
     double _time;
