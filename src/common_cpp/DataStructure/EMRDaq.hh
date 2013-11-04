@@ -36,14 +36,13 @@ class EMRDaq {
     EMRDaq();
 
     /** Copy constructor - any pointers are deep copied */
-    EMRDaq(const EMRDaq& _tofdaq);
+    EMRDaq(const EMRDaq& _emrdaq);
 
     /** Equality operator - any pointers are deep copied */
-    EMRDaq& operator=(const EMRDaq& _tofdaq);
+    EMRDaq& operator=(const EMRDaq& _emrdaq);
 
     /** Destructor - any member pointers are deleted */
     virtual ~EMRDaq();
-
 
     /** Returns V1731PartEventArray */
     V1731PartEventArray GetV1731PartEventArray() const;

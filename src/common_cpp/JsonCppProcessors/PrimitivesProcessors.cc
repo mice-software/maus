@@ -109,7 +109,7 @@ Json::Value* UIntProcessor::CppToJson(const unsigned int& cpp_uint) {
 
 Json::Value* UIntProcessor::CppToJson
                               (const unsigned int& cpp_uint, std::string path) {
-  Json::Value* json_uint = new Json::Value(cpp_uint);
+  Json::Value* json_uint = new Json::Value(Json::UInt(cpp_uint));
   JsonWrapper::Path::SetPath(*json_uint, path);
   return json_uint;
 }

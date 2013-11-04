@@ -159,21 +159,30 @@ void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
 
 bool JsonWrapper::AlmostEqual(const Json::Value& value_1,
                               const Json::Value& value_2,
-                              const double tolerance) {
+                              const double tolerance,
+                              bool int_permissive) {
     if (value_1.type() != value_2.type()) {
-        return false;
+        if (!int_permissive) {
+            return false;
+        }
+        if ((value_1.isInt() && value_2.isUInt()) ||
+            (value_2.isInt() && value_1.isUInt())) {
+            return value_1.asInt() == value_2.asInt();
+        } else {
+            return false;
+        }
     }
     switch (value_1.type()) {
         case Json::objectValue:
-            return ObjectEqual(value_1, value_2, tolerance);
+            return ObjectEqual(value_1, value_2, tolerance, int_permissive);
         case Json::arrayValue:
-            return ArrayEqual(value_1, value_2, tolerance);
+            return ArrayEqual(value_1, value_2, tolerance, int_permissive);
         case Json::realValue:
             return fabs(value_1.asDouble() - value_2.asDouble()) < tolerance;
         case Json::stringValue:
             return value_1.asString() == value_2.asString();
         case Json::uintValue:
-            return value_1.asUInt() == value_2.asUInt();
+            return value_1.asInt() == value_2.asInt();
         case Json::intValue:
             return value_1.asInt() == value_2.asInt();
         case Json::booleanValue:
@@ -187,7 +196,8 @@ bool JsonWrapper::AlmostEqual(const Json::Value& value_1,
 
 bool JsonWrapper::ObjectEqual(const Json::Value& value_1,
                               const Json::Value& value_2,
-                              const double tolerance) {
+                              const double tolerance,
+                              bool int_permissive) {
     // get keys, assure that ordering is same
     std::vector<std::string> keys_1 = value_1.getMemberNames();
     std::vector<std::string> keys_2 = value_2.getMemberNames();
@@ -199,7 +209,8 @@ bool JsonWrapper::ObjectEqual(const Json::Value& value_1,
     }
     // check values are same
     for (size_t i = 0; i < keys_1.size(); ++i) {
-        if (!AlmostEqual(value_1[keys_1[i]], value_2[keys_1[i]], tolerance)) {
+        if (!AlmostEqual(value_1[keys_1[i]], value_2[keys_1[i]], tolerance,
+                         int_permissive)) {
             return false;
         }
     }
@@ -209,14 +220,15 @@ bool JsonWrapper::ObjectEqual(const Json::Value& value_1,
 
 bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
                              const Json::Value& value_2,
-                             const double tolerance) {
+                             const double tolerance,
+                             bool int_permissive) {
     // check length is same
     if (value_1.size() != value_2.size()) {
         return false;
     }
     // check each item is the same (recursively)
     for (size_t i = 0; i < value_1.size(); ++i) {
-        if (!AlmostEqual(value_1[i], value_2[i], tolerance)) {
+        if (!AlmostEqual(value_1[i], value_2[i], tolerance, int_permissive)) {
             return false;
         }
     }
