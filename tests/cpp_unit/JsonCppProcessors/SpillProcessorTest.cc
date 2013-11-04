@@ -128,7 +128,7 @@ std::string SPILL_SEED =
     std::string("\"maus_event_type\":\"Spill\"");
 
 std::string SPILL_ALL = SPILL_SEED+","+
-    std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
+    std::string("\"scalars\":{}, ")+
     std::string("\"mc_events\":[], \"recon_events\":[], \"test_branch\":"+
                 TEST_BRANCH("test_branch/")+"}");
 

@@ -41,7 +41,7 @@ void test_value(ProcessorBase<TYPE>* proc, std::string test_string) {
     Json::Value* json_out = NULL;
     json_out = proc->CppToJson(*cpp_type, "");
     ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(*json_out);
-    EXPECT_PRED3(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9);
+    EXPECT_PRED4(JsonWrapper::AlmostEqual, json_in, *json_out, 1e-9, true);
     delete cpp_type;
     delete json_out;
     ReferenceResolver::JsonToCpp::RefManager::Death();
