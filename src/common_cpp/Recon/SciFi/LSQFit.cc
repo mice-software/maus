@@ -135,8 +135,8 @@ bool LSQFit::circle_fit(const std::vector<SciFiSpacePoint*> &spnts, SimpleCircle
   else
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
-  if ( R < 0. )
-    std::cout << "R was < 0 geometrically but taking abs_val for physical correctness\n";
+  // if ( R < 0. )
+  //  std::cout << "R was < 0 but taking abs_val for physical correctness\n";
   R = fabs(R);
 
   if (R > _R_res_cut) return false; // Cannot be larger than 150mm or the track is not contained

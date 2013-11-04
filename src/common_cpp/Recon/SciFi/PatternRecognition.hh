@@ -401,7 +401,7 @@ class PatternRecognition {
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
   private:
-    static const int _debug = 2;             /** Verbosity: 0=little, 1=more couts, 2=files too */
+    static const int _debug = 0;             /** Verbosity: 0=little, 1=more couts, 2=files too */
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */

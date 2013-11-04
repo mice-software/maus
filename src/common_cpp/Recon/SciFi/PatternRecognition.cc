@@ -121,10 +121,12 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
         make_all_tracks(track_type, trker_no, spnts_by_station, evt);
       }
     }// ~Loop over trackers
+    /*
     std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
     std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
+    */
   } else {
-    std::cout << "No spacepoints in event" << std::endl;
+    if (_debug > 0) std::cout << "No spacepoints in event" << std::endl;
   }
 };
 
@@ -706,7 +708,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     } else {
       charge = 1;
     }
-    std::cout << "Found particle track with charge " << charge << std::endl;
+    // std::cout << "Found particle track with charge " << charge << std::endl;
 
     // Transfor dphi to phi
     for (size_t i = 0; i < close_dphi.size(); ++i) {

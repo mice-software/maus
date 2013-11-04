@@ -55,10 +55,10 @@ on_error = 'none' # none, halt or raise
 keep_only_muon_tracks = False
 
 # Used by MapCppSimulation
-keep_tracks = False # set to true to keep start and end point of every track
+keep_tracks = False # set to truStage4_NoField.dat" #end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "TrackerStraightFitTest.dat" # geometry used by simulation
+simulation_geometry_filename = "TrackerStraightFitTe" # geometry used by simulation
 maximum_number_of_steps = 10000 # particles are killed after this number of
                                 # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
