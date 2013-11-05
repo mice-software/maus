@@ -45,10 +45,10 @@ DBBSpillDataProcessor::DBBSpillDataProcessor() : _int_proc(), _string_proc(),
           ("detector", &_string_proc, &DBBSpillData::GetDetector,
           &DBBSpillData::SetDetector, true);
     RegisterValueBranch
-          ("dbb_hits_array", &_dbb_hit_proc, &DBBSpillData::GetDBBHitsArray,
+          ("dbb_hits", &_dbb_hit_proc, &DBBSpillData::GetDBBHitsArray,
           &DBBSpillData::SetDBBHitsArray, true);
     RegisterValueBranch
-          ("dbb_triggers_array", &_dbb_hit_proc, 
+          ("dbb_triggers", &_dbb_hit_proc,
           &DBBSpillData::GetDBBTriggersArray,
           &DBBSpillData::SetDBBTriggersArray, true);
 }

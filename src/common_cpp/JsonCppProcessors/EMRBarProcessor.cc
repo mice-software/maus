@@ -14,31 +14,19 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
-
-#include "src/common_cpp/DataStructure/EMREvent.hh"
-#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRBarHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRBarProcessor.hh"
 
 namespace MAUS {
 
-/** @class EMREventProcessor Conversions for EMREvent between C++ and Json 
- *
- */
-
-class EMREventProcessor : public ObjectProcessor<EMREvent> {
-  public:
-    /** Set up processors and register branches
-     *
-     *  Everything else is handled by the base class
-     */
-    EMREventProcessor();
-
-  private:
-    PointerArrayProcessor<EMRPlaneHit> _plane_hit_proc;
-};
+EMRBarProcessor::EMRBarProcessor() : _hit_arr_proc(new EMRBarHitProcessor()) {
+    RegisterValueBranch
+          ("bar", &_int_proc, &EMRBar::GetBar,
+          &EMRBar::SetBar, true);
+    RegisterValueBranch
+          ("emr_bar_hits", &_hit_arr_proc, &EMRBar::GetEMRBarHitArray,
+          &EMRBar::SetEMRBarHitArray, true);
+}
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
 

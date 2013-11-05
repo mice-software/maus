@@ -18,7 +18,6 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DBBHITPROCESSOR_
 
 #include "src/common_cpp/DataStructure/DBBHit.hh"
-#include "src/common_cpp/DataStructure/DBBHit.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"

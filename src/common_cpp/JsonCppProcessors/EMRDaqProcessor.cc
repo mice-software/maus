@@ -19,7 +19,7 @@
 namespace MAUS {
 
 EMRDaqProcessor::EMRDaqProcessor()
-    : _V1731_proc(new ValueArrayProcessor<V1731>(new V1731Processor)), 
+    : _V1731_proc(new ValueArrayProcessor<V1731>(new V1731Processor)),
       _dbb_proc(new DBBSpillDataProcessor) {
     RegisterValueBranch // zero suppression removes V1724 arrays
           ("V1731", &_V1731_proc, &EMRDaq::GetV1731PartEventArray,
