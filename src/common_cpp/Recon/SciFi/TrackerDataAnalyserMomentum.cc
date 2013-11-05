@@ -149,21 +149,31 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
 void TrackerDataAnalyserMomentum::analyse(bool show) {
   // Draw the histos
   gStyle->SetOptStat(111111);
+  gStyle->SetLabelSize(0.05, "XYZ");
+  gStyle->SetTitleOffset(1.15, "X");
+  gStyle->SetStatW(0.3);
+  gStyle->SetStatH(0.2);
   _cResiduals = new TCanvas("cResiduals", "Mometum Residuals");
   _cResiduals->Divide(3, 2);
   _cResiduals->cd(1);
+  _t1_pt_res->UseCurrentStyle();
   _t1_pt_res->Draw();
   _cResiduals->cd(2);
+  _t1_pz_res->UseCurrentStyle();
   _t1_pz_res->Draw();
   TVirtualPad* pad = _cResiduals->cd(3);
   pad->SetLogy();
+  _t1_pz_res_log->UseCurrentStyle();
   _t1_pz_res_log->Draw();
   _cResiduals->cd(4);
+  _t2_pt_res->UseCurrentStyle();
   _t2_pt_res->Draw();
   _cResiduals->cd(5);
+  _t2_pz_res->UseCurrentStyle();
   _t2_pz_res->Draw();
   pad = _cResiduals->cd(6);
   pad->SetLogy();
+  _t2_pz_res_log->UseCurrentStyle();
   _t2_pz_res_log->Draw();
 
   // Draw the graphs
@@ -184,6 +194,7 @@ void TrackerDataAnalyserMomentum::analyse(bool show) {
   _t1_pz_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
   _t1_pz_res_pt->GetYaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
   _t1_pz_res_pt->GetYaxis()->SetTitleOffset(1.4);
+  _t1_pz_res_pt->GetYaxis()->SetRangeUser(-200, 200);
   _t1_pz_res_pt->Draw("AP");
 
   _cGraphs->cd(3);
@@ -200,6 +211,7 @@ void TrackerDataAnalyserMomentum::analyse(bool show) {
   _t2_pz_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
   _t2_pz_res_pt->GetYaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
   _t2_pz_res_pt->GetYaxis()->SetTitleOffset(1.4);
+  _t2_pz_res_pt->GetYaxis()->SetRangeUser(-200, 200);
   _t2_pz_res_pt->Draw("AP");
 }
 
@@ -213,7 +225,7 @@ bool TrackerDataAnalyserMomentum::save(std::string save_type) {
     if (_cGraphs) {
       std::string save_name = "mom_res_graphs.";
       save_name += save_type;
-      _cResiduals->Print(save_name.c_str());
+      _cGraphs->Print(save_name.c_str());
     }
   } else {
     std::cerr << "Invalid graphics output type given\n";

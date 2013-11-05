@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   }
 
   analyser.analyse(true);
-  analyser.save();
+  analyser.save(save_type);
 
   // Tidy up
   infile.close();
