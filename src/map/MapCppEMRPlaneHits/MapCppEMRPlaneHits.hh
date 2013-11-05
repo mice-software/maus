@@ -113,6 +113,5 @@ class MapCppEMRPlaneHits {
   EMREventVector_2     _emr_events_tmp2;
   EMREventVector_4     _emr_events_tmp4;
 };
-
 #endif
 

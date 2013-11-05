@@ -14,10 +14,13 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "Utils/CppErrorHandler.hh"
 #include "Utils/JsonWrapper.hh"
 #include "Utils/DAQChannelMap.hh"
 #include "Interface/dataCards.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 
 #include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
@@ -90,13 +93,20 @@ bool MapCppEMRPlaneHits::death() {
 }
 
 string MapCppEMRPlaneHits::process(string document) {
-
+  Json::Value spill_json = JsonWrapper::StringToJson(document);
+  MAUS::Data* spill_cpp = MAUS::JsonCppSpillConverter().convert(&spill_json);
+  process(spill_cpp);
+  Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(spill_cpp);
+  document = JsonWrapper::JsonToString(*spill_json_out);
+  delete spill_json_out;
   return document;
 }
 
 void MapCppEMRPlaneHits::process(MAUS::Data *data) {
 
   MAUS::Spill *spill    = data->GetSpill();
+  if (spill->GetDAQData() == NULL)
+      return;
   MAUS::EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
   int nPartEvents = emr_data.GetV1731NumPartEvents();
 //   cout << "nPartEvts: " << nPartEvents << endl;

@@ -211,6 +211,7 @@ TEST(SpillProcessorTest, TestBranchProcessorTest) {
 TEST(SpillProcessorTest, SpillProcessorTest) {
     SpillProcessor proc;
     ProcessorTest::test_value(&proc, SPILL_MINIMAL);
+    std::cerr << SPILL_MINIMAL << std::endl;
     ProcessorTest::test_value(&proc, SPILL_ALL);
 }
 }

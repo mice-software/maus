@@ -79,12 +79,6 @@ TEST(DAQProcessorTest, DAQDataProcessorTest) {
     DAQDataProcessor proc;
     ProcessorTest::test_value(&proc, DAQDATA);
 }
-
-/*
-TEST(DAQProcessorTest, DAQDataProcessorTest) {
-    DAQDataProcessor proc;  // just a minimal recon event here
-    ProcessorTest::test_value(&proc, DAQDATA);
-}*/
 } // DAQPROCESSORTEST
 } // MAUS
 
