@@ -40,8 +40,8 @@ std::string DBBSPILLDATA =
         std::string("{\"ldc_id\":-1,\"dbb_id\":-2,\"spill_number\":-4,")+
         std::string("\"spill_width\":-5,\"trigger_count\":-6,")+
         std::string("\"hit_count\":-7,\"time_stamp\":-8,\"detector\":\"abc\",")+
-        std::string("\"dbb_hits_array\":["+DBBHIT+","+DBBHIT+"],")+
-        std::string("\"dbb_triggers_array\":["+DBBHIT+","+DBBHIT+"]}");
+        std::string("\"dbb_hits\":["+DBBHIT+","+DBBHIT+"],")+
+        std::string("\"dbb_triggers\":["+DBBHIT+","+DBBHIT+"]}");
 
 std::string EMRDAQ =
         std::string("{\"V1731\":[], \"dbb\":[")+DBBSPILLDATA+","+DBBSPILLDATA+
@@ -75,10 +75,10 @@ TEST(DAQProcessorTest, EMRDaqProcessorTest) {
     ProcessorTest::test_value(&proc, EMRDAQ);
 }
 
-TEST(DAQProcessorTest, DAQDataProcessorTest) {
-    DAQDataProcessor proc;
-    ProcessorTest::test_value(&proc, DAQDATA);
-}
+//TEST(DAQProcessorTest, DAQDataProcessorTest) {
+//    DAQDataProcessor proc;
+//    ProcessorTest::test_value(&proc, DAQDATA);
+//}
 } // DAQPROCESSORTEST
 } // MAUS
 

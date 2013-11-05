@@ -98,6 +98,7 @@ string MapCppEMRPlaneHits::process(string document) {
   process(spill_cpp);
   Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(spill_cpp);
   document = JsonWrapper::JsonToString(*spill_json_out);
+  delete spill_cpp;
   delete spill_json_out;
   return document;
 }
