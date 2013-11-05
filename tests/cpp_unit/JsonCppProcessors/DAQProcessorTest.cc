@@ -61,22 +61,22 @@ std::string DAQDATA =
         std::string("\"emr\":"+EMRDAQ+"}");
 
 TEST(DAQProcessorTest, DBBHitProcessorTest) {
-    DBBHitProcessor proc;  // just a minimal recon event here
+    DBBHitProcessor proc;
     ProcessorTest::test_value(&proc, DBBHIT);
 }
 
 TEST(DAQProcessorTest, DBBSpillDataProcessorTest) {
-    DBBSpillDataProcessor proc;  // just a minimal recon event here
+    DBBSpillDataProcessor proc;
     ProcessorTest::test_value(&proc, DBBSPILLDATA);
 }
 
 TEST(DAQProcessorTest, EMRDaqProcessorTest) {
-    EMRDaqProcessor proc;  // just a minimal recon event here
+    EMRDaqProcessor proc;
     ProcessorTest::test_value(&proc, EMRDAQ);
 }
 
 TEST(DAQProcessorTest, DAQDataProcessorTest) {
-    DAQDataProcessor proc;  // just a minimal recon event here
+    DAQDataProcessor proc;
     ProcessorTest::test_value(&proc, DAQDATA);
 }
 

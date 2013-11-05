@@ -39,6 +39,9 @@
 //         example, if we never touch "energy" or something, it never gets used.
 //         But checking this is a lot of work...
 
+// Tests the MC branch and the Spill overall
+// Recon branch should go in ReconEventProcessorTest (this is getting unwieldy)
+
 namespace MAUS {
 namespace SpillProcessorTest {
 
@@ -133,7 +136,6 @@ std::string SPILL_ALL = SPILL_SEED+","+
                 TEST_BRANCH("test_branch/")+"}");
 
 std::string SPILL_MINIMAL = SPILL_SEED+"}";
-
 
 TEST(SpillProcessorTest, ThreeVectorProcessorTest) {
     ThreeVectorProcessor proc;

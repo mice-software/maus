@@ -19,6 +19,7 @@
 #include <string>
 
 #include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
+#include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverJsonToCpp.hh"
 
 namespace MAUS {
 namespace ProcessorTest {
