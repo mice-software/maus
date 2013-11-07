@@ -31,7 +31,10 @@
 // ROOT headers
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TH1.h"
+#include "TFile.h"
+#include "TTree.h"
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -54,34 +57,58 @@ class TrackerDataAnalyserMomentum {
     void setUp();
 
     /** Produce the final plots using the accumulated data */
-    void analyse(bool show = false);
+    void analyse();
+
+    /** Make pz resolution graphs, as a function of pt_mc */
+    void make_pz_resolutions();
+
+    /** Calculate the pz resolution for a particular pt_mc interval,
+     *  by plotting a histo of the pz_mc - pz for the interval,
+     *  fitting a gaussian, and returning the sigma and error on sigma.
+     */
+    void calc_pz_resolution(const int trker, const TCut cut,
+                            double &res, double &res_err);
 
     /** Save the plots with the input file type */
-    bool save(std::string save_type = "pdf");
+    bool save_graphics(std::string save_type = "pdf");
+
+    /** Save the root objects to the input root file*/
+    void save_root();
 
   protected:
-    std::vector<double> _t1_vPt;
+    int _tracker_num;
+    int _charge;
+    double _pt;
+    double _pz;
+    double _pt_mc;
+    double _pz_mc;
+
+    std::vector<double> _t1_vPtMc;
     std::vector<double> _t1_vPt_res;
     std::vector<double> _t1_vPz;
     std::vector<double> _t1_vPz_res;
-    std::vector<double> _t2_vPt;
+    std::vector<double> _t2_vPtMc;
     std::vector<double> _t2_vPt_res;
     std::vector<double> _t2_vPz;
     std::vector<double> _t2_vPz_res;
 
+    TFile* _out_file;
+    TTree* _tree;
+
     TH1D* _t1_pt_res;
-    TH1D* _t1_pt_res_log;
     TH1D* _t1_pz_res;
     TH1D* _t1_pz_res_log;
     TGraph* _t1_pt_res_pt;
     TGraph* _t1_pz_res_pt;
 
     TH1D* _t2_pt_res;
-    TH1D* _t2_pt_res_log;
     TH1D* _t2_pz_res;
     TH1D* _t2_pz_res_log;
     TGraph* _t2_pt_res_pt;
     TGraph* _t2_pz_res_pt;
+
+    TGraphErrors* _t1_pz_resol;
+    TGraphErrors* _t2_pz_resol;
 
     TCanvas* _cResiduals;
     TCanvas* _cGraphs;

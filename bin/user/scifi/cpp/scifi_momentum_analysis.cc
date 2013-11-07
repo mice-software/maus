@@ -94,8 +94,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  analyser.analyse(true);
-  analyser.save(save_type);
+  analyser.analyse();
+  analyser.save_graphics(save_type);
+  analyser.make_pz_resolutions();
+  analyser.save_root();
 
   // Tidy up
   infile.close();

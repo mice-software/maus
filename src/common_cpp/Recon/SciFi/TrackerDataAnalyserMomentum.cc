@@ -22,6 +22,10 @@
 #include "TAxis.h"
 #include "TVirtualPad.h"
 #include "TStyle.h"
+#include "TCut.h"
+#include "TF1.h"
+#include "TH1.h"
+#include "Rtypes.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/TrackerDataAnalyserMomentum.hh"
@@ -39,7 +43,15 @@
 namespace MAUS {
 
 TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
-  : _t1_pt_res(NULL),
+  : _tracker_num(0),
+    _charge(0),
+    _pt(0.0),
+    _pz(0.0),
+    _pt_mc(0.0),
+    _pz_mc(0.0),
+    _out_file(NULL),
+    _tree(NULL),
+    _t1_pt_res(NULL),
     _t1_pz_res(NULL),
     _t1_pz_res_log(NULL),
     _t1_pt_res_pt(NULL),
@@ -49,12 +61,16 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _t2_pz_res_log(NULL),
     _t2_pt_res_pt(NULL),
     _t2_pz_res_pt(NULL),
+    _t1_pz_resol(NULL),
+    _t2_pz_resol(NULL),
     _cResiduals(NULL),
     _cGraphs(NULL) {
   // Do nothing
 }
 
 TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
+  if (_out_file) delete _out_file;
+  if (_tree) delete _tree;
   if (_t1_pt_res) delete _t1_pt_res;
   if (_t1_pz_res) delete _t1_pz_res;
   if (_t1_pz_res_log) delete _t1_pz_res_log;
@@ -65,12 +81,23 @@ TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
   if (_t2_pz_res_log) delete _t1_pz_res_log;
   if (_t2_pt_res_pt) delete _t2_pz_res_pt;
   if (_t2_pz_res_pt) delete _t2_pt_res_pt;
+  if (_t1_pz_resol) delete _t1_pz_resol;
+  if (_t2_pz_resol) delete _t2_pz_resol;
   if (_cResiduals) delete _cResiduals;
   if (_cGraphs) delete _cGraphs;
 }
 
 void TrackerDataAnalyserMomentum::setUp() {
   int res_n_bins = 100;
+  _out_file = new TFile("momentum_analysis_output.root", "recreate");
+  _tree = new TTree("tree", "Momentum Residual Data");
+  _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
+  _tree->Branch("charge", &_charge, "charge/I");
+  _tree->Branch("pt", &_pt, "pt/D");
+  _tree->Branch("pz", &_pz, "pz/D");
+  _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
+  _tree->Branch("pz_mc", &_pz_mc, "pz_mc/D");
+
   _t1_pt_res = new TH1D("t1_pt_res", "T1 p_{t} Residual", res_n_bins, -5, 5);
   _t1_pz_res = new TH1D("t1_pz_res", "T1 p_{z} Residual", res_n_bins, -30, 30);
   _t1_pz_res_log = new TH1D("t1_pz_res_log", "T1 p_{z} Residual", res_n_bins, -500, 500);
@@ -96,10 +123,10 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
       for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
         SciFiHelicalPRTrack* trk = htrks[iTrk];
         if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
-          double pt = 1.2 * trk->get_R();
-          double pz = pt / trk->get_dsdz();
-          double pt_mc = 0.0;
-          double pz_mc = 0.0;
+          _pt = 1.2 * trk->get_R();
+          _pz = _pt / trk->get_dsdz();
+          _pt_mc = 0.0;
+          _pz_mc = 0.0;
           for (size_t iSp = 0; iSp < trk->get_spacepoints().size(); ++iSp) {
             SciFiSpacePoint* seed = trk->get_spacepoints()[iSp];
             double seed_px_mc = 0.0;
@@ -114,28 +141,31 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
             seed_px_mc /= seed->get_channels().size();
             seed_py_mc /= seed->get_channels().size();
             seed_pz_mc /= seed->get_channels().size();
-            pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
-            pz_mc += seed_pz_mc;
+            _pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
+            _pz_mc += seed_pz_mc;
           }
-          pt_mc /= trk->get_spacepoints().size();
-          pz_mc /= trk->get_spacepoints().size();
+          _pt_mc /= trk->get_spacepoints().size();
+          _pz_mc /= trk->get_spacepoints().size();
           if (trk->get_tracker() == 0) {
-            _t1_pt_res->Fill(pt_mc - pt);
-            _t1_pz_res->Fill(pz_mc + trk->get_charge()*pz);
-            _t1_pz_res_log->Fill(pz_mc + trk->get_charge()*pz);
-            _t1_vPt.push_back(pt);
-            _t1_vPt_res.push_back(pt_mc - pt);
-            _t1_vPz.push_back(pz);
-            _t1_vPz_res.push_back(pz_mc + trk->get_charge()*pz);
+            _t1_pt_res->Fill(_pt_mc - _pt);
+            _t1_pz_res->Fill(_pz_mc + trk->get_charge()*_pz);
+            _t1_pz_res_log->Fill(_pz_mc + trk->get_charge()*_pz);
+            _t1_vPtMc.push_back(_pt_mc);
+            _t1_vPt_res.push_back(_pt_mc - _pt);
+            _t1_vPz.push_back(_pz);
+            _t1_vPz_res.push_back(_pz_mc + trk->get_charge()*_pz);
           } else if (trk->get_tracker() == 1) {
-            _t2_pt_res->Fill(pt_mc - pt);
-            _t2_pz_res->Fill(pz_mc - trk->get_charge()*pz);
-            _t2_pz_res_log->Fill(pz_mc - trk->get_charge()*pz);
-            _t2_vPt.push_back(pt);
-            _t2_vPt_res.push_back(pt_mc - pt);
-            _t2_vPz.push_back(pz);
-            _t2_vPz_res.push_back(pz_mc - trk->get_charge()*pz);
+            _t2_pt_res->Fill(_pt_mc - _pt);
+            _t2_pz_res->Fill(_pz_mc - trk->get_charge()*_pz);
+            _t2_pz_res_log->Fill(_pz_mc - trk->get_charge()*_pz);
+            _t2_vPtMc.push_back(_pt_mc);
+            _t2_vPt_res.push_back(_pt_mc - _pt);
+            _t2_vPz.push_back(_pz);
+            _t2_vPz_res.push_back(_pz_mc - trk->get_charge()*_pz);
           }
+          _tracker_num = trk->get_tracker();
+          _charge = trk->get_charge();
+          _tree->Fill();
         } else {
           std::cout << "Bad track, skipping" << std::endl;
         }
@@ -146,7 +176,7 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
   }
 }
 
-void TrackerDataAnalyserMomentum::analyse(bool show) {
+void TrackerDataAnalyserMomentum::analyse() {
   // Draw the histos
   gStyle->SetOptStat(111111);
   gStyle->SetLabelSize(0.05, "XYZ");
@@ -181,41 +211,140 @@ void TrackerDataAnalyserMomentum::analyse(bool show) {
   _cGraphs->Divide(2, 2);
 
   _cGraphs->cd(1);
-  _t1_pt_res_pt = new TGraph(_t1_vPt.size(), &_t1_vPt[0], &_t1_vPt_res[0]);
-  _t1_pt_res_pt->SetTitle("T1 p_{t} res vs. p_{t}");
-  _t1_pt_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
+  _t1_pt_res_pt = new TGraph(_t1_vPtMc.size(), &_t1_vPtMc[0], &_t1_vPt_res[0]);
+  _t1_pt_res_pt->SetName("_t1_pt_res_pt");
+  _t1_pt_res_pt->SetTitle("T1 p_{t} res vs. p_{t}^{MC}");
+  _t1_pt_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
   _t1_pt_res_pt->GetYaxis()->SetTitle("p_{t}^{MC} - p_{t} (MeV/c)");
   _t1_pt_res_pt->GetYaxis()->SetTitleOffset(1.4);
   _t1_pt_res_pt->Draw("AP");
 
   _cGraphs->cd(2);
-  _t1_pz_res_pt = new TGraph(_t1_vPt.size(), &_t1_vPt[0], &_t1_vPz_res[0]);
-  _t1_pz_res_pt->SetTitle("T1 p_{z} res vs. p_{t}");
-  _t1_pz_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
+  _t1_pz_res_pt = new TGraph(_t1_vPtMc.size(), &_t1_vPtMc[0], &_t1_vPz_res[0]);
+  _t1_pz_res_pt->SetName("_t1_pz_res_pt");
+  _t1_pz_res_pt->SetTitle("T1 p_{z} res vs. p_{t}^{MC}");
+  _t1_pz_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
   _t1_pz_res_pt->GetYaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
   _t1_pz_res_pt->GetYaxis()->SetTitleOffset(1.4);
   _t1_pz_res_pt->GetYaxis()->SetRangeUser(-200, 200);
   _t1_pz_res_pt->Draw("AP");
 
   _cGraphs->cd(3);
-  _t2_pt_res_pt = new TGraph(_t2_vPt.size(), &_t2_vPt[0], &_t2_vPt_res[0]);
-  _t2_pt_res_pt->SetTitle("T2 p_{t} res vs. p_{t}");
-  _t2_pt_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
+  _t2_pt_res_pt = new TGraph(_t2_vPtMc.size(), &_t2_vPtMc[0], &_t2_vPt_res[0]);
+  _t2_pt_res_pt->SetName("_t2_pt_res_pt");
+  _t2_pt_res_pt->SetTitle("T2 p_{t} res vs. p_{t}^{MC}");
+  _t2_pt_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
   _t2_pt_res_pt->GetYaxis()->SetTitle("p_{t}^{MC} - p_{t} (MeV/c)");
   _t2_pt_res_pt->GetYaxis()->SetTitleOffset(1.4);
   _t2_pt_res_pt->Draw("AP");
 
   _cGraphs->cd(4);
-  _t2_pz_res_pt = new TGraph(_t2_vPt.size(), &_t2_vPt[0], &_t2_vPz_res[0]);
-  _t2_pz_res_pt->SetTitle("T2 p_{z} res vs. p_{t}");
-  _t2_pz_res_pt->GetXaxis()->SetTitle("p_{t} (MeV/c)");
+  _t2_pz_res_pt = new TGraph(_t2_vPtMc.size(), &_t2_vPtMc[0], &_t2_vPz_res[0]);
+  _t2_pz_res_pt->SetName("_t2_pz_res_pt");
+  _t2_pz_res_pt->SetTitle("T2 p_{z} res vs. p_{t}^{MC}");
+  _t2_pz_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
   _t2_pz_res_pt->GetYaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
   _t2_pz_res_pt->GetYaxis()->SetTitleOffset(1.4);
   _t2_pz_res_pt->GetYaxis()->SetRangeUser(-200, 200);
   _t2_pz_res_pt->Draw("AP");
 }
 
-bool TrackerDataAnalyserMomentum::save(std::string save_type) {
+void TrackerDataAnalyserMomentum::make_pz_resolutions() {
+  int nPoints = 10;
+
+  std::vector<TCut> vCuts(nPoints);     // The cuts defining the pt_mc intervals
+  std::vector<double> vPt(nPoints);     // The centre of the pt_mc intervals
+  std::vector<double> vPtErr(nPoints);  // The width of the intervals
+  std::vector<double> vRes(nPoints);    // The resulatant pz resolutions
+  std::vector<double> vResErr(nPoints); // The errors assocaited with the pz res
+
+  // Cuts in pt_mc in 20 MeV/c intervals
+  vCuts[0] = "pt_mc>=0&&pt_mc<10";
+  vCuts[1] = "pt_mc>=10&&pt_mc<20";
+  vCuts[2] = "pt_mc>=20&&pt_mc<30";
+  vCuts[3] = "pt_mc>=30&&pt_mc<40";
+  vCuts[4] = "pt_mc>=40&&pt_mc<50";
+  vCuts[5] = "pt_mc>=50&&pt_mc<60";
+  vCuts[6] = "pt_mc>=60&&pt_mc<70";
+  vCuts[7] = "pt_mc>=70&&pt_mc<80";
+  vCuts[8] = "pt_mc>=80&&pt_mc<90";
+  vCuts[9] = "pt_mc>=90&&pt_mc<100";
+
+  vPt[0] = 5.0;
+  vPt[1] = 15.0;
+  vPt[2] = 25.0;
+  vPt[3] = 35.0;
+  vPt[4] = 45.0;
+  vPt[5] = 55.0;
+  vPt[6] = 65.0;
+  vPt[7] = 75.0;
+  vPt[8] = 85.0;
+  vPt[9] = 95.0;
+
+  vPtErr[0] = 5.0;
+  vPtErr[1] = 5.0;
+  vPtErr[2] = 5.0;
+  vPtErr[3] = 5.0;
+  vPtErr[4] = 5.0;
+  vPtErr[5] = 5.0;
+  vPtErr[6] = 5.0;
+  vPtErr[7] = 5.0;
+  vPtErr[8] = 5.0;
+  vPtErr[9] = 5.0;
+
+  TCut cutT1 = "tracker_num==0";
+  TCut cutT2 = "tracker_num==1";
+
+  for (int i = 0; i < nPoints; ++i) {
+    TCut input_cut = vCuts[i]&&cutT1;
+    calc_pz_resolution(0, input_cut, vRes[i], vResErr[i]);
+    std::cerr << "vRes[" << i << "] = " << vRes[i] << std::endl;
+    std::cerr << "vResErr[" << i << "] = " << vResErr[i] << std::endl;
+  }
+  _t1_pz_resol = new TGraphErrors(nPoints, &vPt[0], &vRes[0],
+                                  &vPtErr[0], &vResErr[0]);
+  _t1_pz_resol->SetName("t1_pz_resol");
+  _t1_pz_resol->SetTitle("T1 p_{z} Resolution");
+  _t1_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+  _t1_pz_resol->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
+
+  for (int i = 0; i < nPoints; ++i) {
+    TCut input_cut = vCuts[i]&&cutT2;
+    calc_pz_resolution(1, input_cut, vRes[i], vResErr[i]);
+    std::cerr << "vRes["  << i << "] = " << vRes[i] << std::endl;
+    std::cerr << "vResErr[" << i << "] = " << vResErr[i] << std::endl;
+  }
+  _t2_pz_resol = new TGraphErrors(nPoints, &vPt[0], &vRes[0],
+                                  &vPtErr[0], &vResErr[0]);
+  _t2_pz_resol->SetName("t2_pz_resol");
+  _t2_pz_resol->SetTitle("T2 p_{z} Resolution");
+  _t2_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+  _t2_pz_resol->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
+}
+
+void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker,
+                                                     const TCut cut,
+                                                     double &res,
+                                                     double &res_err) {
+  if (_tree) {
+    TCanvas temp;
+    if (trker == 0) {
+      _tree->Draw("pz_mc-pz>>h1", cut);
+    } else if (trker == 1) {
+      _tree->Draw("pz_mc+pz>>h1", cut);
+    }
+    TH1 *h1 = reinterpret_cast<TH1*>(gPad->GetPrimitive("h1"));
+    h1->Fit("gaus");
+    TF1 *fit1 = h1->GetFunction("gaus");
+    res = fit1->GetParameter(2);
+    res_err = fit1->GetParError(2);
+    delete h1;
+  } else {
+    std::cerr << "Tree pointer invalid" << std::endl;
+  }
+}
+
+bool TrackerDataAnalyserMomentum::save_graphics(std::string save_type) {
   if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
     if (_cResiduals) {
       std::string save_name = "mom_res_histos.";
@@ -232,6 +361,36 @@ bool TrackerDataAnalyserMomentum::save(std::string save_type) {
     return false;
   }
   return true;
+}
+
+void TrackerDataAnalyserMomentum::save_root() {
+  if (_out_file) {
+    _out_file->cd();
+    if (_tree) _tree->Write();
+
+    if (_t1_pt_res) _t1_pt_res->Write();
+    if (_t1_pz_res) _t1_pz_res->Write();
+    if (_t1_pz_res_log) _t1_pz_res_log->Write();
+    if (_t1_pt_res_pt) _t1_pt_res_pt->Write();
+    if (_t1_pz_res_pt) _t1_pz_res_pt->Write();
+
+    if (_t2_pt_res) _t2_pt_res->Write();
+    if (_t2_pz_res) _t2_pz_res->Write();
+    if (_t2_pz_res_log) _t2_pz_res_log->Write();
+    if (_t2_pt_res_pt) _t2_pt_res_pt->Write();
+    if (_t2_pz_res_pt) _t2_pz_res_pt->Write();
+
+    if (_t1_pz_resol) _t1_pz_resol->Write();
+    if (_t2_pz_resol) _t2_pz_resol->Write();
+
+    if (_cResiduals) _cResiduals->Write();
+    if (_cGraphs) _cGraphs->Write();
+
+    _out_file->Write();
+    _out_file->Close();
+  } else {
+    std::cerr << "Invalid ROOT file pointer provided" << std::endl;
+  }
 }
 
 } // ~namespace MAUS
