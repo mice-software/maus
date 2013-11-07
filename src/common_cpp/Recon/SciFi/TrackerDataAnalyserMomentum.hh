@@ -53,15 +53,6 @@ class TrackerDataAnalyserMomentum {
     /** Takes in the data, one spill at a time */
     void accumulate(Spill* spill);
 
-    /** Set up ROOT objects (too much work for constructor) */
-    void setUp();
-
-    /** Produce the final plots using the accumulated data */
-    void analyse();
-
-    /** Make pz resolution graphs, as a function of pt_mc */
-    void make_pz_resolutions();
-
     /** Calculate the pz resolution for a particular pt_mc interval,
      *  by plotting a histo of the pz_mc - pz for the interval,
      *  fitting a gaussian, and returning the sigma and error on sigma.
@@ -69,11 +60,29 @@ class TrackerDataAnalyserMomentum {
     void calc_pz_resolution(const int trker, const TCut cut,
                             double &res, double &res_err);
 
+    /** Make all plots and histograms using accumulated data */
+    void make_all();
+
+    /** Make pz resolution graphs, as a function of pt_mc */
+    void make_pz_resolutions();
+
+    /** Produce the final residual histograms using the accumulated data */
+    void make_residual_histograms();
+
+    /** Produce the final residual graphs using the accumulated data */
+    void make_residual_graphs();
+
+    /** Produce the final resolution graphs using the accumulated data */
+    void make_resolution_graphs();
+
     /** Save the plots with the input file type */
     bool save_graphics(std::string save_type = "pdf");
 
     /** Save the root objects to the input root file*/
     void save_root();
+
+    /** Set up ROOT objects (too much work for constructor) */
+    void setUp();
 
   protected:
     int _tracker_num;
@@ -83,6 +92,7 @@ class TrackerDataAnalyserMomentum {
     double _pt_mc;
     double _pz_mc;
 
+    // Vectors used to store momentum data used to produce graphs
     std::vector<double> _t1_vPtMc;
     std::vector<double> _t1_vPt_res;
     std::vector<double> _t1_vPz;
@@ -92,26 +102,31 @@ class TrackerDataAnalyserMomentum {
     std::vector<double> _t2_vPz;
     std::vector<double> _t2_vPz_res;
 
-    TFile* _out_file;
-    TTree* _tree;
+    TFile* _out_file;  // The output ROOT file
+    TTree* _tree;      // The output ROOT tree
 
+    // Residual histograms
     TH1D* _t1_pt_res;
     TH1D* _t1_pz_res;
     TH1D* _t1_pz_res_log;
-    TGraph* _t1_pt_res_pt;
-    TGraph* _t1_pz_res_pt;
-
     TH1D* _t2_pt_res;
     TH1D* _t2_pz_res;
     TH1D* _t2_pz_res_log;
+
+    // Residual graphs
+    TGraph* _t1_pt_res_pt;
+    TGraph* _t1_pz_res_pt;
     TGraph* _t2_pt_res_pt;
     TGraph* _t2_pz_res_pt;
 
+    // Resolution graphs
     TGraphErrors* _t1_pz_resol;
     TGraphErrors* _t2_pz_resol;
 
+    // The ROOT canvases
     TCanvas* _cResiduals;
     TCanvas* _cGraphs;
+    TCanvas* _cResolutions;
 };
 
 } // ~namespace MAUS
