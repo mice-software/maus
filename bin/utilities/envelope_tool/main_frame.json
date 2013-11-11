@@ -1,0 +1,21 @@
+{
+"type":"main_frame",
+"name":"Envelope Tool",
+"children":[{
+    "type":"canvas",
+    "width":1000,
+    "height":500
+}, {
+    "type":"horizontal_frame",
+    "children":[{
+        "type":"button",
+        "name":"&Beam Setup"
+    }, {
+        "type":"button",
+        "name":"&Magnet Setup"
+    }, {
+        "type":"button",
+        "name":"E&xit"
+    }]
+}]
+}

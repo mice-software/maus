@@ -1,0 +1,360 @@
+{
+"type":"transient_frame",
+"name":"Beam Setup",
+"children":[{
+    "type":"vertical_frame",
+    "children":[{
+        "type":"horizontal_frame",
+        "layout":"close_v",
+        "children":[{
+            "type":"label",
+            "label_length":2,
+            "name":""
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "name":"x",
+            "tool_tip":"Transverse position of the beam"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "name":"y",
+            "tool_tip":"Vertical position of the beam"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "name":"z",
+            "tool_tip":"Longitudinal position of the beam"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close_v",
+        "children":[{
+            "type":"label",
+            "label_length":2,
+            "name":""
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "name":"px",
+            "tool_tip":"Transverse momentum of the beam"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "name":"py",
+            "tool_tip":"Vertical momentum of the beam"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"200.0",
+            "name":"pz",
+            "tool_tip":"Longitudinal momentum of the beam"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close_v",
+        "children":[{
+            "type":"label",
+            "label_length":2,
+            "name":""
+        }, {
+            "type":"named_text_entry",
+            "default_text":"-13",
+            "name":"pid",
+            "tool_tip":"Particle identification (from pdg)"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"normal",
+        "children":[{
+            "type":"label",
+            "label_length":2,
+            "name":""
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "layout":"close_v",
+            "name":"",
+            "label_length":4
+        }, {
+            "type":"label",
+            "layout":"close",
+            "label_length":6,
+            "name":"t"
+        }, {
+            "type":"label",
+            "layout":"close",
+            "label_length":6,
+            "name":"Energy"
+        }, {
+            "type":"label",
+            "layout":"close",
+            "label_length":6,
+            "name":"x"
+        }, {
+            "type":"label",
+            "layout":"close",
+            "label_length":6,
+            "name":"Px"
+        }, {
+            "type":"label",
+            "layout":"close",
+            "label_length":6,
+            "name":"y"
+        }, {
+            "type":"label",
+            "label_length":6,
+            "layout":"close",
+            "name":"Py"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"t"
+        }, {
+            "type":"text_entry",
+            "name":"tt",
+            "entry_length":9,
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "name":"te",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"tx",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"tpx",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"ty",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"tpy",
+            "default_text":"0"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"Energy"
+        }, {
+            "type":"text_entry",
+            "name":"et",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"ee",
+            "entry_length":9,
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "name":"ex",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"epx",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"ey",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"epy",
+            "default_text":"0"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"t"
+        }, {
+            "type":"text_entry",
+            "name":"xt",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"xe",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"xx",
+            "entry_length":9,
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"xpx",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"xy",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"xpy",
+            "default_text":"0"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"Px"
+        }, {
+            "type":"text_entry",
+            "name":"pxt",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"pxe",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"pxx",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pxpx",
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pxy",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pxpy",
+            "default_text":"0"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"y"
+        }, {
+            "type":"text_entry",
+            "name":"yt",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"ye",
+            "entry_length":9,
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "name":"yx",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"ypx",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"yy",
+            "default_text":"1"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"ypy",
+            "default_text":"0"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"label",
+            "label_length":6,
+            "name":"Energy"
+        }, {
+            "type":"text_entry",
+            "name":"pyt",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"pye",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "name":"pyx",
+            "entry_length":9,
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pypx",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pyy",
+            "default_text":"0"
+        }, {
+            "type":"text_entry",
+            "entry_length":9,
+            "name":"pypy",
+            "default_text":"1"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"button",
+            "name":"&Twiss"
+        }, {
+            "type":"button",
+            "name":"&Penn"
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"button",
+            "name":"&Okay"
+        }, {
+            "type":"button",
+            "name":"&Cancel"
+        }]
+    }]
+}]
+}
