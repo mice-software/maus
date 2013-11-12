@@ -2,6 +2,7 @@
 "type":"main_frame",
 "name":"Envelope Tool",
 "children":[{
+    "name":"main_canvas",
     "type":"canvas",
     "width":1000,
     "height":500
@@ -13,6 +14,9 @@
     }, {
         "type":"button",
         "name":"&Magnet Setup"
+    }, {
+        "type":"button",
+        "name":"&Plot Setup"
     }, {
         "type":"button",
         "name":"E&xit"

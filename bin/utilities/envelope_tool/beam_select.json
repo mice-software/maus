@@ -60,7 +60,7 @@
             "type":"named_text_entry",
             "default_text":"-13",
             "name":"pid",
-            "tool_tip":"Particle identification (from pdg)"
+            "tool_tip":"Particle identification (from pdg) - mu+"
         }]
     }, {
         "type":"horizontal_frame",
