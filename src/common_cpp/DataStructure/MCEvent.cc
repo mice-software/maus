@@ -23,13 +23,13 @@
 namespace MAUS {
 
 MCEvent::MCEvent()
-       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _tof_hits(NULL),
-         _special_virtual_hits(NULL), _tracks(NULL) {
+       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL), 
+         _tof_hits(NULL), _special_virtual_hits(NULL), _tracks(NULL) {
 }
 
 MCEvent::MCEvent(const MCEvent& md)
-       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _tof_hits(NULL),
-         _special_virtual_hits(NULL), _tracks(NULL) {
+       : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL),
+         _tof_hits(NULL), _special_virtual_hits(NULL), _tracks(NULL) {
   *this = md;
 }
 
@@ -62,6 +62,15 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _sci_fi_hits = NULL;
     } else {
         _sci_fi_hits = new SciFiHitArray(*md._sci_fi_hits);
+    }
+
+    if (_sci_fi_noise_hits != NULL) {
+        delete _sci_fi_noise_hits;
+    }
+    if (md._sci_fi_noise_hits == NULL) {
+        _sci_fi_noise_hits = NULL;
+    } else {
+        _sci_fi_noise_hits = new SciFiNoiseHitPArray(*md._sci_fi_noise_hits);
     }
 
     if (_tof_hits != NULL) {
@@ -107,6 +116,10 @@ MCEvent::~MCEvent() {
     if (_sci_fi_hits != NULL) {
         delete _sci_fi_hits;
         _sci_fi_hits = NULL;
+    }
+    if (_sci_fi_noise_hits != NULL) {
+        delete _sci_fi_noise_hits;
+        _sci_fi_noise_hits = NULL;
     }
     if (_tof_hits != NULL) {
         delete _tof_hits;
@@ -161,6 +174,17 @@ void MCEvent::SetSciFiHits(SciFiHitArray* hits) {
         delete _sci_fi_hits;
     }
     _sci_fi_hits = hits;
+}
+
+SciFiNoiseHitPArray* MCEvent::GetSciFiNoiseHits() const {
+    return _sci_fi_noise_hits;
+}
+
+void MCEvent::SetSciFiNoiseHits(SciFiNoiseHitPArray* noise_hits) {
+    if (_sci_fi_noise_hits != NULL) {
+        delete _sci_fi_noise_hits;
+    }
+    _sci_fi_noise_hits = noise_hits;
 }
 
 TOFHitArray* MCEvent::GetTOFHits() const {

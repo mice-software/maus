@@ -15,11 +15,6 @@ Configuration Stage4_NoField
     Position 0. 0. 12172.74 mm
     Rotation 0. 0. 0. degree
   }
-  Module AFC/AbsorberFocusCoil.dat
-  {
-    Position 0. 0. 14205.74 mm
-    Rotation 0. 0. 0. degree
-  }
   Module Tracker/TrackerSolenoid1_ST.dat
   {
     Position 0. 0. 16155.74 mm

@@ -58,17 +58,18 @@ bool MapCppTrackerMCNoise::death() {
 
 std::string MapCppTrackerMCNoise::process(std::string document) {
   Json::FastWriter writer;
+  std::cerr << "Start Process\n";
 
   // Set up a spill object, then continue only if MC event array is initialised
   read_in_json(document);
   Spill& spill = *_spill_cpp;
 
-  if ( spill.GetReconEvents() ) {
+  if ( spill.GetMCEvents() ) {
   } else {
-    std::cerr << "Recon event array not initialised, aborting noise for this spill\n";
+    std::cerr << "MC event array not initialised, aborting noise for this spill\n";
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
-    ss << _classname << " says:" << "Recon event array not initialised, aborting noise";
+    ss << _classname << " says:" << "MC event array not initialised, aborting noise";
     errors["missing_branch"] = ss.str();
     save_to_json(spill);
     return writer.write(*_spill_json);
@@ -117,10 +118,9 @@ void MapCppTrackerMCNoise::save_to_json(Spill &spill) {
 }
 
 void MapCppTrackerMCNoise::dark_count(Spill &spill) {
-
   int spill_n = spill.GetSpillNumber();
-  int time1 = 0;  // Fix: Need to assign a value to this!
-  int exist_flag, D_NPE;
+  double time1 = 0.;  // Fix: Need to assign a value to this!
+  double D_NPE;
 
   /*************************************************************************************
   * Description:
@@ -130,14 +130,12 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) {
   * a simple calculation in the birth function
   **************************************************************************************/
 
-  for ( unsigned int event_i = 0; event_i < spill.GetReconEvents()->size(); event_i++ ) {
-    SciFiDigitPArray digits = spill.GetReconEvents()->at(event_i)->GetSciFiEvent()->digits();
-    SciFiDigitPArray temp_digits;
+  for ( unsigned int event_i = 0; event_i < spill.GetMCEvents()->size(); event_i++ ) {
+    SciFiNoiseHitArray* noise_hits = new SciFiNoiseHitArray();
     for ( unsigned int mod_i = 0; mod_i < SF_modules.size(); mod_i++ ) {
       int nChannels = static_cast <int>
                       (2*((SF_modules[mod_i]->propertyDouble("CentralFibre"))+0.5));
       for ( int chan_i = 0; chan_i < nChannels; chan_i++ ) {
-        exist_flag = 0;
         D_NPE = CLHEP::RandPoisson::shoot(poisson_mean);
 
         /********************************************************************************
@@ -151,22 +149,10 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) {
           int tracker = SF_modules[mod_i]->propertyInt("Tracker");
           int station = SF_modules[mod_i]->propertyInt("Station");
           int plane   = SF_modules[mod_i]->propertyInt("Plane");
-          SciFiDigit *a_digit = new SciFiDigit(spill_n, event_i,
-                                             tracker, station, plane,
-                                             chan_i, D_NPE, time1);
-          for ( unsigned int dig_i = 0; dig_i < digits.size(); dig_i++ ) {
-            if ( digits.at(dig_i)->get_tracker() == a_digit->get_tracker() &&
-                 digits.at(dig_i)->get_station() == a_digit->get_station() &&
-                 digits.at(dig_i)->get_plane()   == a_digit->get_plane()   &&
-                 digits.at(dig_i)->get_channel() == a_digit->get_channel() ) {
-              digits.at(dig_i)->set_npe(digits.at(dig_i)->get_npe()+a_digit->get_npe());
-              exist_flag = 1;
-              continue;
-            }
-          }
-          if ( !exist_flag ) {
-            temp_digits.push_back(a_digit);
-          }
+          SciFiNoiseHit a_noise_hit(spill_n, event_i,
+                                    tracker, station, plane,
+                                    chan_i, D_NPE, time1);
+		  noise_hits->push_back(a_noise_hit);
         }
       }
     }
@@ -177,10 +163,7 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) {
     * into the SciFiDigit array and merged back into the spill.
     ************************************************************************************/
 
-    for ( unsigned int temp_i = 0; temp_i < temp_digits.size(); temp_i++ ) {
-      digits.push_back(temp_digits.at(temp_i));
-    }
-    spill.GetReconEvents()->at(event_i)->GetSciFiEvent()->set_digits(digits);
+    spill.GetMCEvents()->at(event_i)->SetSciFiNoiseHits(noise_hits);
   } // end of event_i of spill_n, start of event_i+1.
 }
 }

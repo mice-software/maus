@@ -19,6 +19,7 @@
 
 #include <vector>
 
+#include "src/common_cpp/DataStructure/SciFiNoiseHit.hh"
 #include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
                                                // forward declaration of this
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -32,10 +33,12 @@ class Primary;
 class SciFiChannelId;
 class TOFChannelId;
 class SpecialVirtualChannelId;
+class SciFiNoiseHit;
 
 typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<SciFiHit> SciFiHitArray;
+typedef std::vector<SciFiNoiseHit> SciFiNoiseHitPArray;
 typedef std::vector<TOFHit> TOFHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
 
@@ -103,6 +106,15 @@ class MCEvent {
    */
   void SetSciFiHits(SciFiHitArray* hits);
 
+  /** Get the hits pertaining to this event MCEvent still owns NoiseHitArray*.
+   */
+  SciFiNoiseHitArray* GetSciFiNoiseHits() const;
+
+  /** Set the hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by noise_hits.
+   */
+  void SetSciFiNoiseHits(SciFiNoiseHitArray* noise_hits);
+
   /** Get the TOF hits pertaining to this event MCEvent still owns HitArray*.
    */
   TOFHitArray* GetTOFHits() const;
@@ -136,6 +148,7 @@ class MCEvent {
   Primary* _primary;
   VirtualHitArray* _virtuals;
   SciFiHitArray* _sci_fi_hits;
+  SciFiNoiseHitArray* _sci_fi_noise_hits;
   TOFHitArray* _tof_hits;
   SpecialVirtualHitArray* _special_virtual_hits;
   TrackArray* _tracks;
