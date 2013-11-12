@@ -27,11 +27,6 @@ Module TrackerSolenoid0
     Position 0.0 0.0 -416.5 mm
     Rotation 0.0 180.0 0.0 degree
   }
-  Module Tests/VirtualPlane.dat
-  {
-    Position 0.0 0.0 -416.5 mm
-    Rotation 0.0 0.0 0.0 degree
-  }
   Module Tracker/TrackerCoil.dat
   {
     Position 0.0 0.0 0.0 cm
