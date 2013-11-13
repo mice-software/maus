@@ -113,7 +113,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                            xsl = str(TRACKERXSL), output = str(outputfile2))
             tracker_file.parse_xslt()
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \
-            #                          xsl = str(ROTATEDXSL), output = str(outputfile3))
+            #                  xsl = str(ROTATEDXSL), output = str(outputfile3))
             # rotated_file.parse_xslt()                       
             print "Configuration File Converted"
             length = len(self.step_files)
