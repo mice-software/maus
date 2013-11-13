@@ -13,6 +13,8 @@ from gui.window import Window
 
 import xboa.Hit
 from xboa.Hit import Hit
+import xboa.Bunch
+from xboa.Bunch import Bunch
 import xboa.Common as Common
 
 import Configuration
@@ -99,13 +101,6 @@ class Lattice:
         for z_pos in z_list:
             children.append(self._virtual_plane(z_pos))
         self.mice_modules.set_children(children)
-        print len(children)
-        for child in children:
-            try:
-                print child.get_property("Position", "Hep3Vector"),
-                print child.get_property("SensitiveDetector", "String")
-            except KeyError:
-                print
         return z_list
 
     def _set_fields_recursive(self, mice_mod, field_dict):
@@ -138,6 +133,150 @@ class Lattice:
         mod = maus_cpp.mice_module.MiceModule("VirtualPlane.dat").get_children()[0]
         mod.set_property("Position", "Hep3Vector", {"x":0., "y":0., "z":z})
         return mod
+
+class EllipseWrapper():
+    def __init__(self):
+        pass
+
+    def get_emittance(self):
+        pass
+
+class Plotter:
+    def __init__(self, plot_options, canvas, ref_list, ellipse_list):
+        self.ref_list = ref_list
+        self.ellipse_list = ellipse_list
+        self.var_type = PlotSetup.get_variable_type(plot_options)
+        self.first_var = PlotSetup.get_first_var(plot_options)
+        self.x_var = []
+        self.y_var = []
+        try:
+            self.set_variables_function()()
+        except KeyError:
+            raise KeyError("Did not recognise plot option "+str(self.var_type))
+
+        plot_name = self.var_type+":"+self.first_var
+        canvas.cd()
+        hist, graph_list = Common.make_root_multigraph(plot_name,
+                                    self.x_var, "z [mm]", self.y_var, plot_name)
+        hist.Draw()
+        for graph in graph_list:
+            graph.Draw()
+        canvas.Update()
+
+    def get_means(self):
+        self.y_var = [[reference[self.first_var] for reference in self.ref_list]]
+        self.x_var = [[reference['z'] for reference in self.ref_list]]
+
+    def get_rms(self):
+        my_var = self.ellipse_var.index(self.first_var)+1
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[ell.get_element(my_var, my_var)**0.5 \
+                                                  for ell in self.ellipse_list]]
+
+    def get_envelope(self):
+        self.get_rms()
+        self.x_var *= 2
+        rms_list = self.y_var[0]
+        self.y_var = [range(len(rms_list)), range(len(rms_list))]
+        for i, item in enumerate(rms_list):
+            ref_var = self.ref_list[i][self.first_var]
+            self.y_var[0][i] = ref_var-rms_list[i]
+            self.y_var[1][i] = ref_var+rms_list[i]
+
+    def get_beta(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            beta = 0
+            axes = self.axis_dict[self.first_var]
+            axes = [self.ellipse_var.index(var)+1 for var in axes]
+            for axis in axes:
+                beta += ell.get_element(axis, axis)/float(len(axes))
+            beta /= ref['mass']*self._get_emittance(ref, ell)/ref['p']
+            self.y_var[0].append(beta)
+
+    def get_alpha(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            alpha = 0
+            axes = self.axis_dict[self.first_var]
+            axes = [self.ellipse_var.index(var)+1 for var in axes]
+            for axis in axes:
+                alpha -= ell.get_element(axis+1, axis)/float(len(axes))
+            alpha /= ref['mass']*self._get_emittance(ref, ell)
+            self.y_var[0].append(alpha)
+
+    def get_gamma(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            gamma = 0
+            axes = self.axis_dict[self.first_var]
+            axes = [self.ellipse_var.index(var)+1 for var in axes]
+            for axis in axes:
+                gamma -= ell.get_element(axis+1, axis+1)/float(len(axes))
+            gamma /= ref['mass']*self._get_emittance(ref, ell)*ref['p']
+            self.y_var[0].append(gamma)
+
+    def get_emittance(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            self.y_var[0].append(self._get_emittance(self.ref_list[i], ell))
+
+    def get_dispersion(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            energy = self.ref_list[i]['energy']
+            axis_str = self.axis_dict[self.first_var][0]
+            axis_int = self.ellipse_var.index(axis_str)+1
+            disp = ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
+            self.y_var[0].append(disp)
+
+    def get_dispersion_prime(self):
+        self.x_var = [[ref['z'] for ref in self.ref_list]]
+        self.y_var = [[]]
+        for i, ell in enumerate(self.ellipse_list):
+            energy = self.ref_list[i]['energy']
+            axis_str = self.axis_dict[self.first_var][0]
+            axis_int = self.ellipse_var.index(axis_str)+2
+            disp_p = ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
+            self.y_var[0].append(disp_p)
+
+    def _get_emittance(self, ref, ellipse):
+        matrix = []
+        axis_list = self.axis_dict[self.first_var]
+        el_list = self.el_dict[self.first_var]
+        bunch = Bunch.new_from_hits([ref])
+        cov_matrix = [None]*len(el_list)
+        for cov_i, ell_i in enumerate(el_list):
+            cov_matrix[cov_i] = [None]*len(el_list)
+            for cov_j, ell_j in enumerate(el_list):
+                cov_matrix[cov_i][cov_j] = ellipse.get_element(ell_i, ell_j)
+        cov_matrix = numpy.array(cov_matrix)
+        return bunch.get_emittance(axis_list, cov_matrix)
+
+    def set_variables_function(self):
+        plot_options_dict = {
+            "mean":self.get_means,
+            "envelope":self.get_envelope,
+            "RMS":self.get_rms,
+            "beta":self.get_beta,
+            "alpha":self.get_alpha,
+            "gamma":self.get_gamma,
+            "emittance":self.get_emittance,
+            "dispersion":self.get_dispersion,
+            "dispersion_prime":self.get_dispersion_prime
+        }
+        return plot_options_dict[self.var_type]
+
+    ellipse_var = ['t', 'energy', 'x', 'px', 'y', 'py']
+    axis_dict = {'x':['x'], 'y':['y'], 'transverse':['x', 'y'],
+                 'longitudinal':['t']}
+    el_dict = {'x':range(3, 5), 'y':range(5, 7), 'transverse':range(3, 7),
+               'longitudinal':range(1, 3)}
 
 class TwissSetup:
     def __init__(self, beam_select, root_frame):
@@ -376,24 +515,30 @@ class MagnetSetup:
         return geometry_list
 
 class PlotSetup():
-    def __init__(self, main_window, parent):
+    def __init__(self, main_window, parent, selected):
         self.main_window = main_window
         self.parent = parent
-        self.options_list = {
-            "type":"vertical_frame",
-            "children":[
-                 {"type":"horizontal_frame", "children":[]}
-            ]
-        }
+        self.selected = selected
         self.window = Window(ROOT.gClient.GetRoot(),
                              parent,
-                             "plot_setup.json",
-                             {"plot_setup_action":self.plot_setup_action})
-
+                             "plot_setup.json")
+        for i, item in enumerate(self.selected):
+            self.window.set_action("variable_type_"+str(i), "drop_down",
+                                  "Selected(Int_t)", self.select_action)
+            type_frame = self.window.get_frame("variable_type_"+str(i), "drop_down")
+            type_frame.Select(item["variable_type"])
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
 
     def okay_action(self):
+        type_int = self.window.get_frame_dict("variable_type_0",
+                                             "drop_down")["frame"].GetSelected()
+        first_int = self.window.get_frame_dict("first_var_0",
+                                            "drop_down")["frame"].GetSelected()
+        self.main_window.plot_setup_options = [{
+            "variable_type":type_int,
+            "first_var":first_int
+        }]
         self.main_window.update_plot()
         self.window.close_window()
         self.main_window.plot_setup = None
@@ -402,28 +547,85 @@ class PlotSetup():
         self.window.close_window()
         self.main_window.plot_setup = None
 
-    def plot_setup_action(self, item):
-        for option in self.options_list["children"]:
-            if len(option["children"]) == 0:
-                option["children"].append({
-                    "type":"drop_down",
-                    "name":"variable_type",
-                    "entries":self.variable_type_select,
-                    "selected":0
-                })
-        return self.options_list
+    def select_action(self):
+        for i, item in enumerate(self.selected):
+            type_select = self.window.get_frame_dict("variable_type_"+str(i),
+                                                     "drop_down")["frame"]
+            first_var_select = self.window.get_frame_dict("first_var_"+str(i),
+                                                    "drop_down")["frame"]
+            selected_type_int = type_select.GetSelected()
+            selected_type_str = self.type_list[selected_type_int]
+            var_list_name = self.type_variables_dict[selected_type_str][0]
+            var_list = self.select_lists[var_list_name]
+            first_var_select.RemoveAll()
+            for i, entry in enumerate(var_list):
+                first_var_select.AddEntry(entry, i)
+            first_var_select.Select(item["first_var"])
 
-    variable_type_select = ["<Select plot variable>",
-                            "mean",
-                            "envelope",
-                            "RMS",
-                            "beta",
-                            "alpha",
-                            "gamma",
-                            "emittance",
-                            "dispersion",
-                            "dispersion_prime"]
-    
+    @staticmethod
+    def get_variable_type(options):
+        var_type_int = options[0]["variable_type"]
+        return PlotSetup.type_list[var_type_int]
+
+    @staticmethod
+    def get_first_var(options):
+        var_type_string = PlotSetup.get_variable_type(options)
+        select_list_key = PlotSetup.type_variables_dict[var_type_string][0]
+        select_list = PlotSetup.select_lists[select_list_key]
+        first_var_int = options[0]["first_var"]
+        return select_list[first_var_int]
+
+    type_list = [
+        "<Select plot type>",
+        "mean",
+        "envelope",
+        "RMS",
+        "beta",
+        "alpha",
+        "gamma",
+        "emittance",
+        "dispersion",
+        "dispersion_prime"
+    ]
+
+    select_lists = {
+        "no_var":[
+            "",
+        ], "optics_var":[
+            "<Select plot variable>",
+            "x",
+            "y",
+            "transverse",
+            "longitudinal"
+        ], "physics_var":[
+            "<Select plot variable>"
+        ]+Hit.get_variables(), "kinematic_var":[
+            "<Select plot variable>",
+            "x",
+            "y",
+            "px",
+            "py",
+            "t",
+            "energy"
+        ], "disp_var":[
+            "<Select plot variable>",
+            "x",
+            "y"
+        ]
+    }
+
+    type_variables_dict = {
+        "<Select plot type>":["no_var"],
+        "mean":["physics_var"],
+        "envelope":["kinematic_var"],
+        "RMS":["kinematic_var"],
+        "beta":["optics_var"],
+        "alpha":["optics_var"],
+        "gamma":["optics_var"],
+        "emittance":["optics_var"],
+        "dispersion":["disp_var"],
+        "dispersion_prime":["disp_var"],
+    }
 
 class MainWindow():
     def __init__(self):
@@ -434,6 +636,7 @@ class MainWindow():
         self.beam_select = None
         self.magnet_setup = None
         self.plot_setup = None
+        self.plot_setup_options = [{"variable_type":0, "first_var":0}]
         self.window.set_button_action("&Beam Setup", self.beam_button_action)
         self.window.set_button_action("&Magnet Setup", self.magnet_button_action)
         self.window.set_button_action("&Plot Setup", self.plot_button_action)
@@ -452,21 +655,16 @@ class MainWindow():
 
     def plot_button_action(self):
         if self.plot_setup == None:
-            self.plot_setup = PlotSetup(self, self.window.main_frame)
+            self.plot_setup = PlotSetup(self, self.window.main_frame,
+                                        self.plot_setup_options)
 
     def exit_button_action(self):
         self.window.close_window()
 
     def update_plot(self):
         canvas = self.window.get_frame_dict("main_canvas", "canvas")["frame"].GetCanvas()
-        canvas.cd()
         ref_list, ellipse_list = self.lattice.run_lattice()
-        z_list = [ref["z"] for ref in ref_list]
-        sigma_x_list = [ellipse.get_element(3, 3)**0.5 for ellipse in ellipse_list]
-        hist, graph = Common.make_root_graph('sigma x', z_list, 'Z position', sigma_x_list, 'sigma(x)', ymin=0.)
-        hist.Draw()
-        graph.Draw()
-        canvas.Update()
+        Plotter(self.plot_setup_options, canvas, ref_list, ellipse_list)
 
 if __name__ == '__main__':
     try:

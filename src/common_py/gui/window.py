@@ -66,7 +66,6 @@ class NamedTextEntry:
         self.label = ROOT.TGLabel(self.frame, "a"*label_length)
         self.label.SetTextJustify(ROOT.TGLabel.kTextLeft)
         self.text_entry = ROOT.TGTextEntry(self.frame, "a"*entry_length, 0)
-        print self.name, self.text_entry
         self.frame.AddFrame(self.label, layout("close_v"))
         self.frame.AddFrame(self.text_entry, layout("close_v"))
         self.text_entry.SetText(default_text)
@@ -118,25 +117,19 @@ class Window():
     def get_frame_dict(self, frame_name, frame_type, frame_list=None):  
         if frame_list == None:
             frame_list = self.data["children"]
-        for item in frame_list:
-            if "name" in item and "type" in item:
-                if item["name"] == frame_name and item["type"] == frame_type:
-                    return item
-            # if we have not found the frame dict here, then recurse into 
-            # children
-            if "children" in item:
-                frame = self.get_frame_dict(frame_name,
-                                            frame_type,
-                                            item["children"])
-                if frame != None:
-                    return frame
+        frame = self._get_frame_dict_recurse(frame_name, frame_type, frame_list)
+        if frame == None:
+            raise ValueError("Could not find frame of name "+str(frame_name)+\
+                             " type "+str(frame_type))
+        return frame
+
+    def set_action(self, frame_name, frame_type, frame_socket, action):
+        frame = self.get_frame(frame_name, frame_type)
+        self.socket_list.append(ROOT.TPyDispatcher(action))
+        frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 'Dispatch()')
 
     def set_button_action(self, button_name, action):
-        button = self.get_frame(button_name, "button")
-        self.socket_list.append(ROOT.TPyDispatcher(action))
-        button.Connect('Clicked()', 'TPyDispatcher', self.socket_list[-1],
-                       'Dispatch()')
-
+        self.set_action(button_name, "button", "Clicked()", action)
 
     def get_text_entry(self, name, value_type):
         text_entry, text_length = self._find_text_entry(name)
@@ -149,8 +142,25 @@ class Window():
             my_value = my_value[0:text_length-1]
         text_entry.SetText(my_value)
 
+    def _get_frame_dict_recurse(self, frame_name, frame_type, frame_list=None):  
+        for item in frame_list:
+            if "name" in item and "type" in item:
+                if item["name"] == frame_name and item["type"] == frame_type:
+                    return item
+            # if we have not found the frame dict here, then recurse into 
+            # children
+            if "children" in item:
+                frame = self._get_frame_dict_recurse(frame_name,
+                                                      frame_type,
+                                                      item["children"])
+                if frame != None:
+                    return frame
+
     def _find_text_entry(self, name):
-        value_dict = self.get_frame_dict(name, 'named_text_entry')
+        try:
+            value_dict = self.get_frame_dict(name, 'named_text_entry')
+        except ValueError:
+            value_dict = None
         entry_length = DEFAULT_TEXT_LENGTH
         if value_dict != None:
             if "entry_length" in value_dict:

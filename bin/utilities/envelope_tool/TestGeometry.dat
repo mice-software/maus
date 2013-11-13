@@ -3,7 +3,6 @@ Configuration TestGeometry
 {
     Dimensions 1 1 20 m
     PropertyString Material Galactic
-    PropertyDouble G4StepMax 100.0 mm
     Substitution $Test 1e-3 
     Module CenterCoil
     {
