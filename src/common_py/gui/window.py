@@ -217,9 +217,6 @@ class Window():
             elif item["type"] == "button":
                 name = item["name"]
                 item["frame"] = ROOT.TGTextButton(parent, name, 50)
-            elif item["type"] == "button":
-                name = item["name"]
-                item["frame"] = ROOT.TGTextButton(parent, name, 50)
             elif item["type"] == "text_entry":
                 entry_length = DEFAULT_TEXT_LENGTH
                 if "entry_length" in item:
@@ -233,6 +230,9 @@ class Window():
                 item["frame"].Resize(150, 20)
                 if "selected" in item:
                     item["frame"].Select(item["selected"])
+            elif item["type"] == "check_button":
+                item["frame"] = ROOT.TGCheckButton(parent, item["text"])
+                item["frame"].SetState(item["default_state"])
             else:
                 raise ValueError("Did not recognise item type "+item["type"])
             layout_option = "normal"

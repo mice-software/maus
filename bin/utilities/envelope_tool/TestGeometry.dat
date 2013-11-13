@@ -19,6 +19,8 @@ Configuration TestGeometry
       PropertyDouble Thickness      22.1
       PropertyDouble InnerRadius    258.
       PropertyString FieldName      CC
+      PropertyHep3Vector NominalAperture 258. 258. 2000 mm
+      PropertyHep3Vector NominalOuter    350. 350. 2000 mm
     }
     Module QuadTypeQC
     {
@@ -37,6 +39,8 @@ Configuration TestGeometry
       PropertyString EndFieldType        Tanh
       PropertyDouble ScaleFactor         +1
       PropertyString FieldName           Q2
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
     }
     Module QuadTypeQC
     {
@@ -55,6 +59,8 @@ Configuration TestGeometry
       PropertyString EndFieldType        Tanh
       PropertyDouble ScaleFactor         -1
       PropertyString FieldName           Q3
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
     }
     Module QuadTypeQC
     {
@@ -73,6 +79,8 @@ Configuration TestGeometry
       PropertyString EndFieldType        Tanh
       PropertyDouble ScaleFactor         +1
       PropertyString FieldName           Q4
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
     }
     Module QuadTypeQC
     {
@@ -91,6 +99,8 @@ Configuration TestGeometry
       PropertyString EndFieldType        Tanh
       PropertyDouble ScaleFactor         -1
       PropertyString FieldName           Q5
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
     }
     Module QuadTypeQC
     {
@@ -109,5 +119,7 @@ Configuration TestGeometry
       PropertyString EndFieldType        Tanh
       PropertyDouble ScaleFactor         +1
       PropertyString FieldName           Q6
-    }
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+   }
 }

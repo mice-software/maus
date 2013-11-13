@@ -82,10 +82,9 @@ class Lattice:
         return self._get_fields_recursive(self.mice_modules, [])
 
     def set_fields(self, field_list):
-        print field_list
         field_dict = {}
         for field in field_list:
-            field_dict[field[0]] = field[2]
+            field_dict[field["field_name"]] = field["scale_factor"]
         self.mice_modules = self._set_fields_recursive(self.mice_modules, field_dict)
         
     def set_beam(self, reference, ellipse):
@@ -107,7 +106,8 @@ class Lattice:
         try:
             my_name = mice_mod.get_property("FieldName", "string")
             if my_name in field_dict:
-                mice_mod.set_property("ScaleFactor", "double", field_dict[my_name])
+                scale = field_dict[my_name]
+                mice_mod.set_property("ScaleFactor", "double", scale)
         except KeyError, ValueError:
             pass
         child_list = []
@@ -118,10 +118,10 @@ class Lattice:
 
     def _get_fields_recursive(self, mice_mod, field_list):
         try:
-            my_type = mice_mod.get_property("FieldType", "string")
-            my_name = mice_mod.get_property("FieldName", "string")
-            my_scale_factor = mice_mod.get_property("ScaleFactor", "double")
-            field_list.append((my_name, my_type, my_scale_factor))
+            my_props = {}
+            for key in self.property_dict:
+                my_props[key] = mice_mod.get_property(*self.property_dict[key])
+            field_list.append(my_props)
         except KeyError, ValueError:
             pass
         for child in mice_mod.get_children():
@@ -134,34 +134,73 @@ class Lattice:
         mod.set_property("Position", "Hep3Vector", {"x":0., "y":0., "z":z})
         return mod
 
-class EllipseWrapper():
-    def __init__(self):
-        pass
-
-    def get_emittance(self):
-        pass
+    property_dict = {
+        "field_name":("FieldName", "string"),
+        "field_type":("FieldType", "string"),
+        "scale_factor":("ScaleFactor", "double"),
+        "aperture":("NominalAperture", "hep3vector"),
+        "outer":("NominalOuter", "hep3vector"),
+        "position":("Position", "hep3vector")
+    }
 
 class Plotter:
-    def __init__(self, plot_options, canvas, ref_list, ellipse_list):
+    def __init__(self, plot_options, canvas, ref_list, ellipse_list, magnets):
         self.ref_list = ref_list
         self.ellipse_list = ellipse_list
         self.var_type = PlotSetup.get_variable_type(plot_options)
         self.first_var = PlotSetup.get_first_var(plot_options)
         self.x_var = []
         self.y_var = []
+        self.polylines = []
+        self.magnets = magnets
         try:
             self.set_variables_function()()
         except KeyError:
             raise KeyError("Did not recognise plot option "+str(self.var_type))
-
+        if plot_options[0]["plot_apertures"]:
+            self.get_apertures()
         plot_name = self.var_type+":"+self.first_var
         canvas.cd()
         hist, graph_list = Common.make_root_multigraph(plot_name,
                                     self.x_var, "z [mm]", self.y_var, plot_name)
         hist.Draw()
         for graph in graph_list:
-            graph.Draw()
+            graph.SetLineColor(1)
+            graph.Draw('l')
         canvas.Update()
+
+    def get_apertures(self):
+        axis = self.first_var
+        magnet_x, magnet_y = [], []
+        for a_magnet in self.magnets:
+            x_list = [
+                a_magnet["aperture"][axis],
+                a_magnet["aperture"][axis],
+                a_magnet["outer"][axis],
+                a_magnet["outer"][axis],
+                a_magnet["aperture"][axis],
+            ]
+            z_list = [
+                -a_magnet["aperture"]["z"]/2.,
+                +a_magnet["aperture"]["z"]/2.,
+                +a_magnet["outer"]["z"]/2.,
+                -a_magnet["outer"]["z"]/2.,
+                -a_magnet["aperture"]["z"]/2.,
+            ]
+            z_list = [z_pos+a_magnet["position"]["z"] for z_pos in z_list]
+            if self._show_physical_apertures():
+                x_list = [x_pos+a_magnet["position"][axis] for x_pos in x_list]
+                magnet_x.append(z_list)
+                magnet_y.append([-x for x in x_list])
+            magnet_x.append(z_list)
+            magnet_y.append(x_list)
+        if not self._show_physical_apertures():
+            graph_max = max([max(y_temp) for y_temp in self.y_var])
+            field_min = min([min(y_temp) for y_temp in magnet_y])
+            scale = self.scale_factor*graph_max/field_min
+            magnet_y = [[y_var*scale for y_var in y_temp] for y_temp in magnet_y]
+        self.x_var += magnet_x
+        self.y_var += magnet_y
 
     def get_means(self):
         self.y_var = [[reference[self.first_var] for reference in self.ref_list]]
@@ -258,6 +297,10 @@ class Plotter:
         cov_matrix = numpy.array(cov_matrix)
         return bunch.get_emittance(axis_list, cov_matrix)
 
+    def _show_physical_apertures(self):
+        return self.var_type in ["envelope", "mean"] and \
+               self.first_var in ["x", "y"]
+
     def set_variables_function(self):
         plot_options_dict = {
             "mean":self.get_means,
@@ -277,6 +320,7 @@ class Plotter:
                  'longitudinal':['t']}
     el_dict = {'x':range(3, 5), 'y':range(5, 7), 'transverse':range(3, 7),
                'longitudinal':range(1, 3)}
+    scale_factor = 1.1
 
 class TwissSetup:
     def __init__(self, beam_select, root_frame):
@@ -480,7 +524,8 @@ class MagnetSetup:
             try:
                 name = frame["name"]
                 scale_factor = float(frame["text_entry"].text_entry.GetText())
-                field_list_out.append((name, "", scale_factor))
+                field_list_out.append({"field_name":name,
+                                       "scale_factor":scale_factor})
             except KeyError:
                 pass
         self.main_window.lattice.set_fields(field_list_out)
@@ -501,15 +546,15 @@ class MagnetSetup:
         "children":[]}
         if len(field_list) == 0:
             geometry_list["children"].append({"type":"label",
-                    "name":"     No fields in lattice",
+                    "name":"No fields in lattice",
                     "label_length":30})
             return geometry_list
         for field in field_list:
             geometry_list["children"].append({
               "type":"named_text_entry",
-              "default_text":str(field[2]),
+              "default_text":str(field["scale_factor"]),
               "label_length":10,
-              "name":str(field[0]),
+              "name":str(field["field_name"]),
               "tool_tip":"Longitudinal beta function"
             })
         return geometry_list
@@ -535,9 +580,11 @@ class PlotSetup():
                                              "drop_down")["frame"].GetSelected()
         first_int = self.window.get_frame_dict("first_var_0",
                                             "drop_down")["frame"].GetSelected()
+        plot_apertures = self.window.get_frame("plot_apertures", "check_button").IsOn()
         self.main_window.plot_setup_options = [{
             "variable_type":type_int,
-            "first_var":first_int
+            "first_var":first_int,
+            "plot_apertures":plot_apertures
         }]
         self.main_window.update_plot()
         self.window.close_window()
@@ -636,7 +683,7 @@ class MainWindow():
         self.beam_select = None
         self.magnet_setup = None
         self.plot_setup = None
-        self.plot_setup_options = [{"variable_type":0, "first_var":0}]
+        self.plot_setup_options = [{"variable_type":0, "first_var":0, "plot_apertures":True}]
         self.window.set_button_action("&Beam Setup", self.beam_button_action)
         self.window.set_button_action("&Magnet Setup", self.magnet_button_action)
         self.window.set_button_action("&Plot Setup", self.plot_button_action)
@@ -664,7 +711,7 @@ class MainWindow():
     def update_plot(self):
         canvas = self.window.get_frame_dict("main_canvas", "canvas")["frame"].GetCanvas()
         ref_list, ellipse_list = self.lattice.run_lattice()
-        Plotter(self.plot_setup_options, canvas, ref_list, ellipse_list)
+        Plotter(self.plot_setup_options, canvas, ref_list, ellipse_list, self.lattice.get_field_list())
 
 if __name__ == '__main__':
     try:

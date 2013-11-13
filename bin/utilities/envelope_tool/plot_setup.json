@@ -28,6 +28,14 @@
     }, {
         "type":"horizontal_frame",
         "children":[{
+            "type":"check_button",
+            "name":"plot_apertures",
+            "text":"Plot Apertures",
+            "default_state":1
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
             "type":"button",
             "name":"&Okay"
           }, {
