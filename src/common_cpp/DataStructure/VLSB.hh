@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
 
@@ -120,7 +120,7 @@ class VLSB {
     int _discriminator;
     int _ldc_id;
 
-    ClassDef(VLSB, 1)
+    MAUS_VERSIONED_CLASS_DEF(VLSB)
 };
 }
 
