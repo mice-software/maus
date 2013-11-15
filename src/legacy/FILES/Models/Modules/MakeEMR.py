@@ -40,7 +40,7 @@ class G4MiceGeoBase:
 
     def SetRotation( self, Phi, Theta, Psi ):
         """
-        @method SetRotation This method sets the global rotation of the Detector with euler angles
+        @method SetRotation This method sets the global rotation of the Detector with Tait-Bryan angles
         """
         self.Phi = Phi
         self.Theta = Theta
