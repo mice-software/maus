@@ -1,10 +1,29 @@
-#!/usr/bin/env python
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+# 
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
+# pylint does not import ROOT
+# pylint: disable=E1101
+
+"""
+Module handles GUI elements for making python GUIs within MAUS. 
+
+An interface is provided that enables layout to be defined using json
+configuration files.
+"""
+
 import json
-import os
-import sys
-import math
 import ROOT
 
 KNORMAL = ROOT.TGLayoutHints.kLHintsNormal
@@ -14,29 +33,71 @@ DEFAULT_TEXT_LENGTH = 10
 WINDOW_LIST = []
 
 def layout(option):
+    """
+    Select a layout option for the element
+      - option: string layout option - either normal (default), close (close 
+                packed), close_v, close_h (close packed in only vertical or 
+                horizontal direction)
+    Returns an instance of ROOT.TGLayoutHints.
+
+    Throws a ValueError if the option is not recognised.
+    """
     close = 1
     normal = 5
     if option == "normal":
-        return ROOT.TGLayoutHints(KNORMAL, 5, 5, 5, 5)
+        return ROOT.TGLayoutHints(KNORMAL, normal, normal, normal, normal)
     if option == "close": # close_packed
-        return ROOT.TGLayoutHints(KNORMAL, 1, 1, 1, 1)
+        return ROOT.TGLayoutHints(KNORMAL, close, close, close, close)
     if option == "close_v": # close packed vertically
-        return ROOT.TGLayoutHints(KNORMAL, 5, 5, 1, 1)
+        return ROOT.TGLayoutHints(KNORMAL, normal, normal, close, close)
     if option == "close_h": # close_packed horizontally
-        return ROOT.TGLayoutHints(KNORMAL, 5, 5, 5, 5)
+        return ROOT.TGLayoutHints(KNORMAL, close, close, normal, normal)
+    raise ValueError("Failed to recognise layout option "+str(option))
 
 class Label:
+    """
+    Wrapper for ROOT TGLabel
+
+    I couldn't find an elegant way to build a ROOT TGLabel with a particular
+    width; so I fill the label with default characters, and then update once
+    the window is drawn with the actual text. Note that ROOT default font is not
+    fixed width, so fill characters should have some width.
+    """
     def __init__(self, parent, name, label_length, alignment, _layout):
+        """
+        Initialise the label
+
+          - parent; parent ROOT frame
+          - name; text that will fill the label
+          - label_length; width of the label
+          - alignment; integer index defining how the text is aligned within the
+            label
+        """
         self.name = name
         self.frame = ROOT.TGLabel(parent, "a"*label_length)
         self.frame.SetTextJustify(alignment)
         parent.AddFrame(self.frame, layout(_layout))
 
     def update(self):
+        """Call to update the text once the window is built"""
         self.frame.SetText(self.name)
 
     @staticmethod
     def new_from_dict(my_dict, parent):
+        """
+        Build a Label based on a dictionary
+            - my_dict; dictionary of string:value pairs defining the layout
+                - type; should be "label"
+                - name; text to fill the label
+                - alignment; 'right', 'center' or 'left' to align the text.
+                    Vertical alignment is always center
+                - label_length; Integer defining the default width of the label. 
+                - layout; see layout function...
+              alignment, label_length, layout are optional
+            - parent; reference to the parent frame
+        Return value is the dictionary with additional entry "frame" appended
+        containing a reference to the TGLabel object
+        """
         if my_dict["type"] != "label":
             raise ValueError("Not a label")
         name = my_dict["name"]
@@ -50,17 +111,35 @@ class Label:
             label_length = my_dict["label_length"]
         else:
             my_dict["label_length"] = label_length
-        layout = "normal"
+        _layout = "normal"
         if "layout" in my_dict:
-            layout = my_dict["layout"]
+            _layout = my_dict["layout"]
         else:
-            my_dict["layout"] = layout
-        my_dict["label"] = Label(parent, name, label_length, alignment, layout)
+            my_dict["layout"] = _layout
+        my_dict["label"] = Label(parent, name, label_length, alignment, _layout)
         my_dict["frame"] = my_dict["label"].frame
         return my_dict
 
-class NamedTextEntry:
-    def __init__(self, parent, name, default_text, entry_length=10, label_length=5, tooltip=""):
+class NamedTextEntry: # pylint: disable=R0913
+    """
+    A named text entry is a label followed by a text entry box.
+
+    These are used frequently enough that it is worthwhile to make a special
+    entry for this.
+    """
+    def __init__(self, parent, name, default_text, entry_length=10, \
+                 label_length=5, tooltip=""):
+        """
+        Initialise the text entry
+          - parent; parent frame
+          - name; string name that will appear in the label and is used to name
+            the text entry
+          - default_text; text that will be placed in the text entry by default
+          - entry_length; width of the text entry field (number of characters)
+          - label_length; width of the label (number of characters)
+          - tooltip; text to place in a tool tip - if empty string, no tool tip
+            will be made.
+        """
         self.frame = ROOT.TGHorizontalFrame(parent)
         self.name = name
         self.label = ROOT.TGLabel(self.frame, "a"*label_length)
@@ -69,19 +148,41 @@ class NamedTextEntry:
         self.frame.AddFrame(self.label, layout("close_v"))
         self.frame.AddFrame(self.text_entry, layout("close_v"))
         self.text_entry.SetText(default_text)
-        self.text_entry.SetToolTipText(tooltip)
+        if tooltip != "":
+            self.text_entry.SetToolTipText(tooltip)
 
     def update(self):
+        """
+        Update the label to contain actual text
+        """
         self.label.SetText(self.name)
 
     @staticmethod
     def new_from_dict(my_dict, parent):
+        """
+        Initialise a text entry from a dictionary
+          - my_dict; dictionary containing configuration options
+              - type; should be string like 'named_text_entry'
+              - name; text to put in the label
+              - default_text; default text that fills the text entry box
+              - tool_tip; make a tool tip next to the text entry
+              - entry_length (optional); width of the text entry box (number of
+                characters)
+              - label_length (optional); width of the label (number of
+                characters)
+          - parent; parent frame
+        Return value is the dictionary with "text_entry" field and "frame" field
+        appended containing references to the NamedTextEntry and the actual
+        TGTextEntry box
+        """
         if my_dict["type"] != "named_text_entry":
             raise ValueError("Not a text box")
         name = my_dict["name"]
         default = my_dict["default_text"]
-        tool_tip = my_dict["tool_tip"]
         entry_length = DEFAULT_TEXT_LENGTH
+        tool_tip = ""
+        if "tool_tip" in my_dict:
+            tool_tip = my_dict["tool_tip"]
         if "entry_length" in my_dict:
             entry_length = my_dict["entry_length"]
         else:
@@ -91,30 +192,74 @@ class NamedTextEntry:
             label_length = my_dict["label_length"]
         else:
             my_dict["label_length"] = label_length
-        my_dict["text_entry"] = NamedTextEntry(parent, name, default, entry_length, label_length, tooltip=tool_tip)
+        my_dict["text_entry"] = NamedTextEntry(parent, name, default,
+                                   entry_length, label_length, tooltip=tool_tip)
         my_dict["frame"] = my_dict["text_entry"].frame
         return my_dict
 
-class Window():
-    def __init__(self, p, main, data_file, manipulator_dict=None):
+class Window(): # pylint: disable=R0201
+    """
+    This is the main class in this module. Initialise a window based on a json
+    configuration file and layout the elements.
+
+    Layout options
+      Json configuration should be a dictionary. The top level object requires
+      following fields
+        - type; either main_frame (builds a TGMainFrame) or transient_frame 
+          (builds a TGTransientFrmae
+        - name; window name
+    """
+
+    def __init__(self, parent, main, data_file, manipulator_dict=None):
+        """
+        Initialise the window
+          - parent; parent ROOT frame (e.g. TGMainFrame/TGTransientFrame)
+          - main; top level TGMainFrame for the whole GUI
+          - data_file; string containing the file name for the layout data
+          - manipulator_dict; if there are any frames of type "special", this
+            dictionary maps to a function which performs the layout for that
+            frame.
+        """
         self.data = open(data_file).read()
         self.data = json.loads(self.data)
         self.main_frame = None
         self.update_list = []
-        self.remove_list = []
         self.socket_list = []
         self.manipulators = manipulator_dict
         try:
-            self._setup_frame(p, main)
+            self._setup_frame(parent, main)
         except Exception:
             raise
         return None
 
+    def close_window(self):
+        """
+        Close the window
+        """
+        self.main_frame.CloseWindow()
+
     def get_frame(self, frame_name, frame_type, frame_list=None):
+        """
+        Get the frame with given name and type from a frame list
+          - frame_name; specify the "name" field in the frame's dictionary
+          - frame_type; specify the "type" field in the frame's dictionary
+          - frame_list; search within this list. If not defined, will use the
+            top level frames list (self.data)
+        Returns a ROOT TGFrame object. Raises ValueError if no frame was found
+        """
         frame_dict = self.get_frame_dict(frame_name, frame_type, frame_list)
         return frame_dict["frame"]
 
     def get_frame_dict(self, frame_name, frame_type, frame_list=None):  
+        """
+        Get the frame dictionary with given name and type from a frame list
+          - frame_name; specify the "name" field in the frame's dictionary
+          - frame_type; specify the "type" field in the frame's dictionary
+          - frame_list; search within this list. If not defined, will use the
+            top level frames list (self.data)
+        Returns a dictionary object containing the frame configuration. The ROOT
+        TGFrame object is mapped to the "frame" key.
+        """
         if frame_list == None:
             frame_list = self.data["children"]
         frame = self._get_frame_dict_recurse(frame_name, frame_type, frame_list)
@@ -124,25 +269,68 @@ class Window():
         return frame
 
     def set_action(self, frame_name, frame_type, frame_socket, action):
+        """
+        Set an action that will occur on a given signal
+          - frame_name; string containing the name of the frame that makes the
+            signal
+          - frame_type; string containing the type of the frame that makes the
+            signal
+          - frame_socket; string containing the name of the ROOT function that
+            makes the signal. If the ROOT function takes arguments, those must
+            be specified too
+          - action; function that will be called when the specified signal is
+            dispatched
+        e.g.  my_window.set_action("select_box", "drop_down", "Selected(Int_t)",
+                                   select_action)
+        will call select_action() when the frame with "type":"drop_down" and
+        "name":"select_box" makes a signal Selected(Int_t).
+        """
         frame = self.get_frame(frame_name, frame_type)
         self.socket_list.append(ROOT.TPyDispatcher(action))
-        frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 'Dispatch()')
+        frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 
+                      'Dispatch()')
 
     def set_button_action(self, button_name, action):
+        """
+        Set an action that will occur when a button emits a  Clicked() signal
+            - button_name; name of the button
+            - action; function that will be called when the button is clicked
+        """
         self.set_action(button_name, "button", "Clicked()", action)
 
     def get_text_entry(self, name, value_type):
+        """
+        Get the text stored in either a text_entry or a named_text_entry
+            - name; name of the text entry
+            - value_type; convert the value to the given type.
+        Returns a value of type value_type.
+        Raises a type error if the conversion fails (string conversion will 
+        always succeed).
+        """
         text_entry, text_length = self._find_text_entry(name)
+        if text_length:
+            pass
         return value_type(text_entry.GetText())
 
     def set_text_entry(self, name, value):
+        """
+        Set the text stored in either a text_entry or a named_text_entry
+            - name; name of the text entry
+            - value; put the given value in the text_entry, converting to a
+                     string using the value's __str__ method. The resultant 
+                     string will be truncated to the width of the text entry.
+        """
         text_entry, text_length = self._find_text_entry(name)
         my_value = str(value)
         if len(my_value) > text_length-1:
             my_value = my_value[0:text_length-1]
         text_entry.SetText(my_value)
 
-    def _get_frame_dict_recurse(self, frame_name, frame_type, frame_list=None):  
+    def _get_frame_dict_recurse(self, frame_name, frame_type, frame_list=None):
+        """
+        (Private) recursively search for a frame of a given name and type.
+        Called by get_frame_dict.
+        """
         for item in frame_list:
             if "name" in item and "type" in item:
                 if item["name"] == frame_name and item["type"] == frame_type:
@@ -157,6 +345,11 @@ class Window():
                     return frame
 
     def _find_text_entry(self, name):
+        """
+        (Private) find a text entry. Search first for named_text_entry, if that
+        fails search for text_entry. Return the TGTextEntry and the length of
+        the text entry (number of characters).
+        """
         try:
             value_dict = self.get_frame_dict(name, 'named_text_entry')
         except ValueError:
@@ -175,12 +368,17 @@ class Window():
         return value_dict["frame"], entry_length
 
     def _setup_frame(self, parent, main):
+        """
+        (Private) set up the frame. Parse the json file and convert to ROOT 
+        TGFrames, lay out the windows and so forth.
+        """
         if self.data["type"] == "transient_frame":
             self.main_frame = ROOT.TGTransientFrame(parent, main)
         elif self.data["type"] == "main_frame":
             self.main_frame = ROOT.TGMainFrame(parent)
         else:
-            raise ValueError("Failed to recognise frame type "+str(self.data["type"]))
+            raise ValueError("Failed to recognise frame type "+\
+                             str(self.data["type"]))
         self._expand_frames(self.data["children"], self.main_frame)
         self.data["frame"] = self.main_frame
         self.main_frame.SetWindowName(self.data["name"])
@@ -190,62 +388,98 @@ class Window():
         self._label_update()
 
     def _label_update(self):
+        """
+        (Private) once the labels are laid out, with width enforced by fake
+        string data, update the labels with the real text. A bit hacky.
+        """
         for item in self.update_list:
             item.update()
 
     def _expand_frames(self, frames, parent):
+        """
+        Parse the json object, adding frames to all json items
+        """
         for frames_index, item in enumerate(frames):
             if item["type"] == "special":
                 manipulator_name = item["manipulator"]
                 item = self.manipulators[manipulator_name](item)
                 frames[frames_index] = item
-            if item["type"] == "horizontal_frame":
-                item["frame"] = ROOT.TGHorizontalFrame(parent)
-            elif item["type"] == "vertical_frame":
-                item["frame"] = ROOT.TGVerticalFrame(parent)
-            elif item["type"] == "named_text_entry":
-                item = NamedTextEntry.new_from_dict(item, parent)
-                self.update_list.append(item["text_entry"])
-                self.remove_list.append((item["text_entry"].frame, item["text_entry"].text_entry))
-            elif item["type"] == "canvas":
-                item["frame"] = ROOT.TRootEmbeddedCanvas('canvas',
-                                          parent, item["width"], item["height"])
-                item["frame"].Draw()
-            elif item["type"] == "label":
-                item = Label.new_from_dict(item, parent)
-                self.update_list.append(item["label"])
-            elif item["type"] == "button":
-                name = item["name"]
-                item["frame"] = ROOT.TGTextButton(parent, name, 50)
-            elif item["type"] == "text_entry":
-                entry_length = DEFAULT_TEXT_LENGTH
-                if "entry_length" in item:
-                    entry_length = item["entry_length"]
-                item["frame"] = ROOT.TGTextEntry(parent, "a"*entry_length, 0)
-                self.remove_list.append((parent, item["frame"]))
-            elif item["type"] == "drop_down":
-                item["frame"] = ROOT.TGComboBox(parent)
-                for i, entry in enumerate(item["entries"]):
-                    item["frame"].AddEntry(entry, i)
-                item["frame"].Resize(150, 20)
-                if "selected" in item:
-                    item["frame"].Select(item["selected"])
-            elif item["type"] == "check_button":
-                item["frame"] = ROOT.TGCheckButton(parent, item["text"])
-                item["frame"].SetState(item["default_state"])
+            if item["type"] in self.parse_item_dict.keys():
+                parser = self.parse_item_dict[item["type"]]
+                parser(self, parent, item)
             else:
                 raise ValueError("Did not recognise item type "+item["type"])
             layout_option = "normal"
             if "layout" in item.keys():
-                layout_option = "layout"
+                layout_option = item["layout"]
             parent.AddFrame(item["frame"], layout(layout_option))
-            if item["type"] == "text_entry":
-                item["frame"].SetText(item["default_text"])
             if "children" in item:
                 self._expand_frames(item["children"], item["frame"])
 
-    def close_window(self):
-        for item in self.remove_list:
-            item[0].RemoveFrame(item[1])
-        self.main_frame.CloseWindow()
+    def _parse_horizontal_frame(self, parent, item):
+        """parse a horizontal_frame into a TGHorizontalFrame"""
+        item["frame"] = ROOT.TGHorizontalFrame(parent)
+
+    def _parse_vertical_frame(self, parent, item):
+        """parse a vertical_frame into a TGVerticalFrame"""
+        item["frame"] = ROOT.TGVerticalFrame(parent)
+
+    def _parse_named_text_entry(self, parent, item):
+        """parse a name_text_entry into a NamedEntry"""
+        item = NamedTextEntry.new_from_dict(item, parent)
+        self.update_list.append(item["text_entry"])
+
+    def _parse_canvas(self, parent, item):
+        """parse a canvas into a TRootEmbeddedCanvas"""
+        item["frame"] = ROOT.TRootEmbeddedCanvas('canvas',
+                                         parent, item["width"], item["height"])
+        item["frame"].Draw()
+
+    def _parse_label(self, parent, item):
+        """parse a label into a TGLabel"""
+        item = Label.new_from_dict(item, parent)
+        self.update_list.append(item["label"])
+
+    def _parse_button(self, parent, item):
+        """parse a text_button into a TGTextButton"""
+        name = item["name"]
+        item["frame"] = ROOT.TGTextButton(parent, name, 50)
+
+    def _parse_text_entry(self, parent, item):
+        """parse a text_entry into a TGTextEntry"""
+        entry_length = DEFAULT_TEXT_LENGTH
+        if "entry_length" in item:
+            entry_length = item["entry_length"]
+        item["frame"] = ROOT.TGTextEntry(parent, "a"*entry_length, 0)
+        # use default, then change to get width right?
+        default_text = ""
+        if "default_text" in item:
+            default_text = item["default_text"]
+        item["frame"].SetText(default_text)
+
+    def _parse_drop_down(self, parent, item):
+        """parse a drop_down into a TGComboBox"""
+        item["frame"] = ROOT.TGComboBox(parent)
+        for i, entry in enumerate(item["entries"]):
+            item["frame"].AddEntry(entry, i)
+        item["frame"].Resize(150, 20)
+        if "selected" in item:
+            item["frame"].Select(item["selected"])
+
+    def _parse_check_button(self, parent, item):
+        """parse a check_button into a TGCheckButton"""
+        item["frame"] = ROOT.TGCheckButton(parent, item["text"])
+        item["frame"].SetState(item["default_state"])
+
+    parse_item_dict = {
+         "horizontal_frame":_parse_horizontal_frame,
+         "vertical_frame":_parse_vertical_frame,
+         "named_text_entry":_parse_named_text_entry,
+         "canvas":_parse_canvas,
+         "label":_parse_label,
+         "button":_parse_button,
+         "text_entry":_parse_text_entry,
+         "drop_down":_parse_drop_down,
+         "check_button":_parse_check_button,
+    }
 

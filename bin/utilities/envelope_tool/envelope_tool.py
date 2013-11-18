@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import math
+import copy
 import numpy
 import ROOT
 
@@ -21,18 +22,20 @@ import Configuration
 
 import maus_cpp.field
 import maus_cpp.globals
+import maus_cpp.simulation
 import maus_cpp.covariance_matrix
 import maus_cpp.optics_model
 
+SHARE_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/bin/utilities/envelope_tool/share/")
+
 class Lattice:
     def __init__(self):
-        self.ref = None
-        self.ellipse = None
         self.lattice = None
         self.mice_modules = None
         self.optics_model = None
         self.config = None
-        self.z_list = []
+        self.ref_list = []
+        self.ellipse_list = []
         self._set_defaults()
         self.run_lattice()
 
@@ -42,41 +45,30 @@ class Lattice:
           - initial_momentum: beam momentum at lattice start
           - z_start: start position for tracking/beam propagation
         """
-        self.config["simulation_reference_particle"] = {
-          "random_seed": 0,
-          "energy":self.ref["energy"],
-          "particle_id":self.ref["pid"],
-          "time":self.ref["t"],
-          "position":{"x":self.ref["x"], "y":self.ref["y"], "z":self.ref["z"]},
-          "momentum":{"x":self.ref["px"], "y":self.ref["py"], "z":self.ref["pz"]}
-        }
+        self.config["simulation_reference_particle"] = \
+                              self.ref_list[0].get_maus_dict('maus_primary')[0]
+        self.config["simulation_reference_particle"]["random_seed"] = 0
+        self.config["physics_processes"] = "mean_energy_loss"
         config_str = json.dumps(self.config)
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         maus_cpp.globals.birth(config_str)
         maus_cpp.globals.set_monte_carlo_mice_modules(self.mice_modules)
-        self.optics_model = maus_cpp.optics_model.OpticsModel()
-        refs = []
-        ellipses = []
-        for z_pos in self.z_list:
-            ellipses.append(self.optics_model.transport_covariance_matrix(
-                                          self.ellipse,
-                                          z_pos))
-            refs.append(self.ref.deepcopy())
-            refs[-1]['z'] = z_pos
-        return refs, ellipses
+        self._tracking()
 
     def _set_defaults(self):
         config_str = Configuration.Configuration().getConfigJSON(command_line_args=True)
         self.config = json.loads(config_str)
         ref_json = self.config["simulation_reference_particle"]
-        self.ref = Hit.new_from_maus_object("maus_primary", ref_json, 0)
+        self.ref_list = [Hit.new_from_maus_object("maus_primary", ref_json, 0)]
         ell_data = [[float(i == j) for i in range(6)] for j in range(6)]
         np_diag = numpy.array(ell_data)
-        self.ellipse = maus_cpp.covariance_matrix.create_from_matrix(np_diag)
+        self.ellipse_list = [maus_cpp.covariance_matrix.create_from_matrix(np_diag)]
         self.lattice = self.config["simulation_geometry_filename"]
         self.mice_modules = maus_cpp.mice_module.MiceModule(self.lattice)
-        self.z_list = self._setup_geometry(50., 10000.)
+        children = self.mice_modules.get_children()
+        children.append(self._virtual_plane(self.ref_list[0]['z']))
+        self.mice_modules.set_children(children)
 
     def get_field_list(self):
         return self._get_fields_recursive(self.mice_modules, [])
@@ -88,19 +80,14 @@ class Lattice:
         self.mice_modules = self._set_fields_recursive(self.mice_modules, field_dict)
         
     def set_beam(self, reference, ellipse):
-        self.ref = reference
-        self.ellipse = ellipse
+        self.ref_list = [reference]
+        self.ellipse_list = [ellipse]
+        print self.ref_list
+        print self.ellipse_list
+
 
     def get_beam(self):
-        return self.ref, self.ellipse
-
-    def _setup_geometry(self, z_step, z_max):
-        children = self.mice_modules.get_children()
-        z_list = [z for z in numpy.arange(self.ref["z"], z_max+z_step/2, z_step)]
-        for z_pos in z_list:
-            children.append(self._virtual_plane(z_pos))
-        self.mice_modules.set_children(children)
-        return z_list
+        return self.ref_list[0], self.ellipse_list[0]
 
     def _set_fields_recursive(self, mice_mod, field_dict):
         try:
@@ -130,9 +117,30 @@ class Lattice:
 
     @staticmethod
     def _virtual_plane(z):
-        mod = maus_cpp.mice_module.MiceModule("VirtualPlane.dat").get_children()[0]
+        mod = maus_cpp.mice_module.MiceModule(SHARE_DIR+"VirtualPlane.dat").get_children()[0]
         mod.set_property("Position", "Hep3Vector", {"x":0., "y":0., "z":z})
         return mod
+
+    def _tracking(self):
+        mc_event = [{"primary":self.ref_list[0].get_maus_dict('maus_primary')[0]}]
+        mc_event[0]["primary"]["random_seed"] = 0
+        mc_event = maus_cpp.simulation.track_particles(json.dumps(mc_event))
+        mc_event = json.loads(mc_event)
+        virtual_list = mc_event[0]["virtual_hits"]
+        self.ref_list = [self.ref_list[0]]+[
+                      Hit.new_from_maus_object('maus_virtual_hit', virtual, 0) \
+                                                   for virtual in virtual_list]
+        ellipse = self.ellipse_list[0]
+        try:
+            self.optics_model = maus_cpp.optics_model.OpticsModel()
+            self.ellipse_list = [self.ellipse_list[0]]
+            for ref in self.ref_list:
+                ell = self.optics_model.transport_covariance_matrix(ellipse, 
+                                                                    ref['z'])
+                self.ellipse_list.append(ell)
+        except RuntimeError:
+            pass # beam transport failed
+        return self.ref_list, self.ellipse_list
 
     property_dict = {
         "field_name":("FieldName", "string"),
@@ -140,7 +148,8 @@ class Lattice:
         "scale_factor":("ScaleFactor", "double"),
         "aperture":("NominalAperture", "hep3vector"),
         "outer":("NominalOuter", "hep3vector"),
-        "position":("Position", "hep3vector")
+        "position":("Position", "hep3vector"),
+        "rotation":("Rotation", "hep3vector")
     }
 
 class Plotter:
@@ -154,9 +163,12 @@ class Plotter:
         self.polylines = []
         self.magnets = magnets
         try:
-            self.set_variables_function()()
+            if self.var_type != "mean" and len(self.ellipse_list) <= 1:
+                print "Failed to propagate ellipses"
+            else:
+                self.set_variables_function()()
         except KeyError:
-            raise KeyError("Did not recognise plot option "+str(self.var_type))
+            print "Did not recognise plot option "+str(self.var_type)
         if plot_options[0]["plot_apertures"]:
             self.get_apertures()
         plot_name = self.var_type+":"+self.first_var
@@ -170,7 +182,9 @@ class Plotter:
         canvas.Update()
 
     def get_apertures(self):
-        axis = self.first_var
+        if len(self.magnets) == 0:
+            return
+        axis = self._axis()
         magnet_x, magnet_y = [], []
         for a_magnet in self.magnets:
             x_list = [
@@ -180,27 +194,70 @@ class Plotter:
                 a_magnet["outer"][axis],
                 a_magnet["aperture"][axis],
             ]
-            z_list = [
-                -a_magnet["aperture"]["z"]/2.,
-                +a_magnet["aperture"]["z"]/2.,
-                +a_magnet["outer"]["z"]/2.,
-                -a_magnet["outer"]["z"]/2.,
-                -a_magnet["aperture"]["z"]/2.,
-            ]
-            z_list = [z_pos+a_magnet["position"]["z"] for z_pos in z_list]
-            if self._show_physical_apertures():
-                x_list = [x_pos+a_magnet["position"][axis] for x_pos in x_list]
+            if self.position_is_start_dict[a_magnet["field_type"]]:
+                z_list = [
+                    0.,
+                    +a_magnet["aperture"]["z"],
+                    +a_magnet["outer"]["z"],
+                    0.,
+                    0.,
+                ]
+            else:
+                z_list = [
+                    -a_magnet["aperture"]["z"]/2.,
+                    +a_magnet["aperture"]["z"]/2.,
+                    +a_magnet["outer"]["z"]/2.,
+                    -a_magnet["outer"]["z"]/2.,
+                    -a_magnet["aperture"]["z"]/2.,
+                ]
+            if self._show_physical_apertures(): # as in physical scalings
+                z_pair, x_pair = self._transform(z_list, x_list, a_magnet)
+                magnet_x += z_pair
+                magnet_y += x_pair
+            else:
+                z_list = [z_pos+a_magnet["position"]["z"] for z_pos in z_list]
                 magnet_x.append(z_list)
-                magnet_y.append([-x for x in x_list])
-            magnet_x.append(z_list)
-            magnet_y.append(x_list)
-        if not self._show_physical_apertures():
+                magnet_y.append(x_list)
+        if not self._show_physical_apertures(): # non-physical scalings
             graph_max = max([max(y_temp) for y_temp in self.y_var])
-            field_min = min([min(y_temp) for y_temp in magnet_y])
-            scale = self.scale_factor*graph_max/field_min
-            magnet_y = [[y_var*scale for y_var in y_temp] for y_temp in magnet_y]
+            graph_min = min([min(y_temp) for y_temp in self.y_var])
+            graph_delta = max([max(y_temp) for y_temp in self.y_var])-\
+                          graph_min
+            if graph_delta == 0.:
+                graph_delta = 1.
+            field_min = min([a_magnet["aperture"][axis] for a_magnet in self.magnets])
+            field_max = max([a_magnet["outer"][axis] for a_magnet in self.magnets])
+            field_delta = field_max-field_min
+            if field_delta == 0.:
+                field_delta = 1.
+            scaling = self.scale_factor*graph_delta/field_delta
+            offset = (graph_max-field_min*scaling)+graph_delta*self.stay_clear
+            for this_magnet_y in magnet_y:
+                for i in range(5):
+                    this_magnet_y[i] = this_magnet_y[i]*scaling+offset
         self.x_var += magnet_x
         self.y_var += magnet_y
+
+    def _axis(self):
+        if self.first_var in ["x", "y"]:
+            return self.first_var
+        else:
+            return "x"
+
+    def _transform(self, points_x, points_y, a_magnet):
+        axis = self._axis()
+        phi = a_magnet["rotation"][{"x":"y", "y":"x"}[axis]]
+        translation = [a_magnet["position"]["z"], a_magnet["position"][axis]]
+        list_points_x = [points_x, copy.deepcopy(points_x)]
+        list_points_y = [points_y, copy.deepcopy(points_y)]
+        list_points_y[1] = [-y for y in list_points_y[1]]
+        for i in range(2):
+            for j in range(len(points_x)):
+                x_temp = list_points_x[i][j]*math.cos(phi)+list_points_y[i][j]*math.sin(phi)
+                y_temp = list_points_y[i][j]*math.cos(phi)-list_points_x[i][j]*math.sin(phi)
+                list_points_x[i][j] = x_temp+translation[0]
+                list_points_y[i][j] = y_temp+translation[1]
+        return list_points_x, list_points_y
 
     def get_means(self):
         self.y_var = [[reference[self.first_var] for reference in self.ref_list]]
@@ -218,9 +275,10 @@ class Plotter:
         rms_list = self.y_var[0]
         self.y_var = [range(len(rms_list)), range(len(rms_list))]
         for i, item in enumerate(rms_list):
-            ref_var = self.ref_list[i][self.first_var]
-            self.y_var[0][i] = ref_var-rms_list[i]
-            self.y_var[1][i] = ref_var+rms_list[i]
+            if i < len(self.ref_list):
+                ref_var = self.ref_list[i][self.first_var]
+                self.y_var[0][i] = ref_var-rms_list[i]
+                self.y_var[1][i] = ref_var+rms_list[i]
 
     def get_beta(self):
         self.x_var = [[ref['z'] for ref in self.ref_list]]
@@ -298,8 +356,8 @@ class Plotter:
         return bunch.get_emittance(axis_list, cov_matrix)
 
     def _show_physical_apertures(self):
-        return self.var_type in ["envelope", "mean"] and \
-               self.first_var in ["x", "y"]
+        return self.var_type in ["envelope", "mean", "<Select plot type>"] and \
+               self.first_var in ["x", "y", ""]
 
     def set_variables_function(self):
         plot_options_dict = {
@@ -320,13 +378,19 @@ class Plotter:
                  'longitudinal':['t']}
     el_dict = {'x':range(3, 5), 'y':range(5, 7), 'transverse':range(3, 7),
                'longitudinal':range(1, 3)}
-    scale_factor = 1.1
+    scale_factor = 0.2
+    stay_clear = 0.05
+
+    position_is_start_dict = {
+        "Multipole":True,
+        "Solenoid":False
+    }
 
 class TwissSetup:
     def __init__(self, beam_select, root_frame):
         self.window = Window(ROOT.gClient.GetRoot(),
                              root_frame,
-                             "twiss_setup.json")
+                             SHARE_DIR+"twiss_setup.json")
         self.beam_select = beam_select
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
@@ -363,7 +427,7 @@ class PennSetup:
     def __init__(self, beam_select, root_frame):
         self.window = Window(ROOT.gClient.GetRoot(),
                              root_frame,
-                             "penn_setup.json")
+                             SHARE_DIR+"penn_setup.json")
         self.beam_select = beam_select
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
@@ -425,7 +489,7 @@ class BeamSelect:
     def __init__(self, main_window, parent):
         self.window = Window(ROOT.gClient.GetRoot(),
                              parent,
-                             "beam_select.json")
+                             SHARE_DIR+"beam_select.json")
         self.main_window = main_window
         self.parent = parent
         self.matrix_select = None
@@ -450,6 +514,7 @@ class BeamSelect:
             return
         self.main_window.lattice.set_beam(self.get_reference(),
                                           self.get_matrix())
+        self.main_window.lattice.run_lattice()
         self.main_window.update_plot()
         self.window.close_window()
         self.main_window.beam_select = None
@@ -498,21 +563,16 @@ class BeamSelect:
         return Hit.new_from_dict(ref_dict, "energy")
 
     def set_reference(self, ref_hit):
-        for var in ["x", "y", "z", "px", "py", "pz", "pid"]: 
-            var_dict = self.window.get_frame_dict(var, "named_text_entry")
-            var_text_entry = var_dict["text_entry"].text_entry
-            var_text_entry.SetText(str(ref_hit[var]))
-        pid_name = Common.pdg_pid_to_name[ref_hit["pid"]]
-        var_text_entry.SetToolTipText("Particle identification (from pdg) - "+\
-                                      pid_name)
-
+        for var in ["x", "y", "z", "px", "py", "pz", "pid"]:
+            self.window.set_text_entry(var, ref_hit[var])
+ 
 class MagnetSetup:
     def __init__(self, main_window, parent):
         self.main_window = main_window
         self.parent = parent
         self.window = Window(ROOT.gClient.GetRoot(),
                              parent,
-                             "magnet_setup.json",
+                             SHARE_DIR+"magnet_setup.json",
                              {"magnet_setup_action":self.magnet_setup_action})
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
@@ -529,6 +589,7 @@ class MagnetSetup:
             except KeyError:
                 pass
         self.main_window.lattice.set_fields(field_list_out)
+        self.main_window.lattice.run_lattice()
         self.main_window.update_plot()
         self.window.close_window()
         self.main_window.magnet_setup = None
@@ -566,7 +627,7 @@ class PlotSetup():
         self.selected = selected
         self.window = Window(ROOT.gClient.GetRoot(),
                              parent,
-                             "plot_setup.json")
+                             SHARE_DIR+"plot_setup.json")
         for i, item in enumerate(self.selected):
             self.window.set_action("variable_type_"+str(i), "drop_down",
                                   "Selected(Int_t)", self.select_action)
@@ -678,7 +739,7 @@ class MainWindow():
     def __init__(self):
         self.window = Window(ROOT.gClient.GetRoot(),
                              ROOT.gClient.GetRoot(),
-                             "main_frame.json")
+                             SHARE_DIR+"main_frame.json")
         self.lattice = Lattice()
         self.beam_select = None
         self.magnet_setup = None
@@ -688,6 +749,7 @@ class MainWindow():
         self.window.set_button_action("&Magnet Setup", self.magnet_button_action)
         self.window.set_button_action("&Plot Setup", self.plot_button_action)
         self.window.set_button_action("E&xit", self.exit_button_action)
+        self.update_plot()
 
     def beam_button_action(self):
         if self.beam_select == None:
@@ -710,8 +772,7 @@ class MainWindow():
 
     def update_plot(self):
         canvas = self.window.get_frame_dict("main_canvas", "canvas")["frame"].GetCanvas()
-        ref_list, ellipse_list = self.lattice.run_lattice()
-        Plotter(self.plot_setup_options, canvas, ref_list, ellipse_list, self.lattice.get_field_list())
+        Plotter(self.plot_setup_options, canvas, self.lattice.ref_list, self.lattice.ellipse_list, self.lattice.get_field_list())
 
 if __name__ == '__main__':
     try:
