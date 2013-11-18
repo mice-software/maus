@@ -208,6 +208,56 @@ class Window(): # pylint: disable=R0201
         - type; either main_frame (builds a TGMainFrame) or transient_frame 
           (builds a TGTransientFrmae
         - name; window name
+        - children; list of child frames, each of which is a dict
+
+      Window initialisation iterates over the child dicts and parses each one
+      into a child TGFrame.  All frames support a "layout" entry, which 
+      determines the amount of padding that will be placed around the entry.
+        - "layout"; set the amount of padding in the frame. Can be either
+          "normal" to make standard padding (5 units in each direction), "close"
+          padding (1 unit in each direction), "close_v" (1 unit vertically, 5
+          horizontally) or "close_h" (1 unit horizontally, 5 vertically) 
+      The "type" entry of the dictionary determines the type of TGFrame that 
+      will be contructed. Options are:
+      - "horizontal_frame"; makes a TGHorizontalFrame, with a list of children.
+          - "children": list of child frames to place in the horizontal frame
+            Each sub-frame will be placed horizontally next to the previous one.
+      - "vertical_frame"; makes a TGVerticalFrame, with a list of children.
+          - "children": list of child frames to place in the horizontal frame.
+            Each sub-frame will be placed vertically below the previous one.
+      - "label"; makes a text TGLabel
+          - "name": name of the label
+          - "label_length": width of space allocated to the label in characters.
+             (Default 5)
+      - "text_entry"; makes a TGTextEntry
+          - "name": name of the label
+          - "label_length": width of space allocated to the label in characters.
+             (Default 5)
+      - "named_text_entry": makes a NamedTextEntry, which is a collection of
+         TGHorizontalFrame, TGLabel and TGTextEntry. See NamedTextEntry 
+         documentation for more details.
+      - "button": makes a TGTextButton i.e. standard click button
+          - "name": text to be used on the button; put an ampersand in to set a
+            hot key
+      - "drop_down": make a TGComboBox i.e. a drop down box.
+          - "entries": list of strings, each of which becomes an entry in the
+            drop down box, indexing from 0
+          - "selected": integer determining the entry that will be selected
+            initialliy (Default 0)
+      - "check_button": make a TGCheckButton i.e. a true/false tick box
+          - "text": text to place next to the check button
+          - "default_state": set to 1 to make the box ticked by default, 0 to
+            make it unticked
+      - "special": user-defined GUI elements can be added at RunTime by making a
+        special.
+          - "manipulator": name of the manipulator to use for this special item.
+            manipulators are set at the initialisation stage by passing a
+            dictionary to manipulator_dict. Dictionary should contain a mapping
+            that maps string "manipulator" to the function that will be called
+            at run time to set up the "special" GUI element. The "manipulator"
+            function should take the GUI element dict as an argument and return
+            it at the end. The returned GUI element dict will be used to 
+            construct the GUI element as per normal.
     """
 
     def __init__(self, parent, main, data_file, manipulator_dict=None):
