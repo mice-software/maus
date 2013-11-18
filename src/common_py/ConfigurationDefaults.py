@@ -79,7 +79,8 @@ maximum_number_of_steps = 500000 # particles are killed after this number of
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
+    "spin":{"x":0.0, "y":0.0, "z":1.0}
 }
 everything_special_virtual = False
 
@@ -109,7 +110,12 @@ delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.
 miss_distance = -1.
+######################
 
+Enable_Spin_Traking = 'True'
+spin = "string"
+
+#######################
 # geant4 visualisation (not event display)
 geant4_visualisation = False
 visualisation_viewer = "VRML2FILE"  # only supported option

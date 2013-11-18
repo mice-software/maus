@@ -404,12 +404,12 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
     def test_birth_beam_polarisation(self):
         """tests polarisation"""
 
-        self._beam._Beam__birth_beam_polarisation(TEST_POL)      
-        
+        self._beam._Beam__birth_beam_polarisation(TEST_POL)  #_Beam_    
         self.assertEqual(self._beam.beam_polarisation, "Flat")
+
 ################################################################################################
     def test_birth(self):
-        """Overall check birth works"""
+        """ Overall check birth works """
         a_beam = beam.Beam()
         
         #a_beam.birth(TEST_BIRTH, "binomial", 2) #NEED TO WORKOUT HOW TO FIX THIS

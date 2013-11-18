@@ -141,8 +141,9 @@ class Beam(): # pylint: disable=R0902
         self.momentum_defined_by = "energy"
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
-        """
+        
         self.beam_polarisation = "Flat"
+        """
         self.beam_mean_x = 1.0
         self.beam_mean_y = 2.0
         self.beam_mean_z = 3.0
@@ -195,17 +196,17 @@ class Beam(): # pylint: disable=R0902
     def __birth_reference_particle(self, beam_definition):
         """Setup the reference particle - of type maus_primary"""
         
-        try:
-            if 'sigma_x' in beam_definition.keys():
-                raise RuntimeError('Found sigma_x in '+str(beam_definition.keys()))
-            self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
+        #try:
+         #   if 'sigma_x' in beam_definition.keys():
+          #      raise RuntimeError('Found sigma_x in '+str(beam_definition.keys()))
+        self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
                                                 beam_definition['reference'], 0)
             
             
-        except:
-            sys.excepthook(*sys.exc_info())
-            raise ValueError("Failed to parse reference particle "+\
-                             str(beam_definition['reference']))
+        #except:
+         #   sys.excepthook(*sys.exc_info())
+        #    raise ValueError("Failed to parse reference particle "+\
+         #                    str(beam_definition['reference']))
 
     def __birth_transverse_ellipse(self, beam_def):
         """
@@ -331,10 +332,10 @@ class Beam(): # pylint: disable=R0902
             self.beam_mean[i] = self.reference[key]
         self.beam_mean[5] = self.reference[self.momentum_defined_by]
 
-    """
+    
     def __birth_beam_polarisation(self, beam_def):
        
-    #    self.beam_polarisation = beam_def["beam_polarisation"]
+        self.beam_polarisation = beam_def["beam_polarisation"]
        # ref = self.reference
          
 
@@ -359,7 +360,7 @@ class Beam(): # pylint: disable=R0902
        # else:
         #    raise ValueError('no polarisation set')
 
-    """
+    
     def make_one_primary(self):
         """
         Make a primary particle.
@@ -404,7 +405,7 @@ class Beam(): # pylint: disable=R0902
         particle_array = numpy.random.multivariate_normal\
                                               (self.beam_mean, self.beam_matrix)
         if self.transverse_mode == "pencil":
-            for i in range(4):
+            for i in range(4): 
                 particle_array[i] = self.beam_mean[i]
         if self.longitudinal_mode == "pencil":
             particle_array[4] = self.beam_mean[4]

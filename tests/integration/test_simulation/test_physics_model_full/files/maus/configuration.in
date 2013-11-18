@@ -3,9 +3,10 @@ import xboa
 momentum = __momentum__
 pid = __pid__
 number_of_events = __nev__
-
+thickness = __thickness__
+step = __step__
 energy = (momentum**2.+xboa.Common.pdg_pid_to_mass[abs(pid)]**2.)**0.5
-
+maximum_number_of_steps = int(2*thickness/step)
 spill_generator_number_of_spills =  number_of_events/100
 beam = {
     "particle_generator":"counter", # routine for generating empty primaries
