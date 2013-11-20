@@ -1,3 +1,6 @@
+"""Test configuration for envelope tool"""
+#pylint: disable=C0103
+
 import os
 
 simulation_geometry_filename = os.path.expandvars("${MAUS_ROOT_DIR}/tests/"+\

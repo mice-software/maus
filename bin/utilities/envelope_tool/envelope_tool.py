@@ -120,7 +120,7 @@ def main():
         print "Pressed Ctrl-C"
     finally:
         print "done"
-        return 0
+        return 0 # pylint: disable=W0150
 
 if __name__ == '__main__':
     main()

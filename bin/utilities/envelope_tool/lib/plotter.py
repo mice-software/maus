@@ -25,7 +25,7 @@ import numpy
 from xboa.Bunch import Bunch
 import xboa.Common as Common
 
-from plot_setup import PlotSetup # pylint: disable=W0403
+from plot_setup import PlotSetup # pylint: disable=W0403, F0401
 
 class Plotter:
     """

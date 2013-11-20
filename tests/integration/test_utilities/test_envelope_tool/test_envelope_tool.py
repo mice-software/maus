@@ -235,6 +235,7 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.assertEqual(self.beam_setup.matrix_select, None)
 
     def test_penn_setup_b0(self):
+        """Test the B0 button"""
         sys.argv += ["--configuration_file", TEST_DIR+"test_config_2.py"]
         self.main_window.lattice = lattice.Lattice() # resets fields I hope
         self.beam_setup.window.get_frame("&Penn", "button").Clicked()
@@ -413,18 +414,18 @@ class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
     def test_lattice_get_set_beam(self):
         """Test lattice - get set beam"""
         sys.argv += ["--configuration_file", TEST_DIR+"test_config.py"]
-        lattice = envelope_tool.MainWindow().lattice
-        self.assertGreater(len(lattice.ref_list), 1)
-        self.assertGreater(len(lattice.ellipse_list), 1)
-        hit_ref, ellipse_ref = lattice.get_beam()
+        _lattice = envelope_tool.MainWindow().lattice
+        self.assertGreater(len(_lattice.ref_list), 1)
+        self.assertGreater(len(_lattice.ellipse_list), 1)
+        hit_ref, ellipse_ref = _lattice.get_beam()
         hit_ref['pid'] = 2212
         ellipse_ref.set_element(1, 1, 999)
-        lattice.set_beam(hit_ref, ellipse_ref)
-        hit, ellipse = lattice.get_beam()
+        _lattice.set_beam(hit_ref, ellipse_ref)
+        hit, ellipse = _lattice.get_beam()
         self.assertEqual(hit_ref['pid'], hit['pid'])
         self._ell_equal(ellipse, ellipse_ref)
-        self.assertEqual(len(lattice.ref_list), 1)
-        self.assertEqual(len(lattice.ellipse_list), 1)
+        self.assertEqual(len(_lattice.ref_list), 1)
+        self.assertEqual(len(_lattice.ellipse_list), 1)
 
 
     def test_lattice_run_lattice_ref(self):
@@ -432,21 +433,21 @@ class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
         # try changing the field configuration and reference particle; check
         # that the reference particle comes out okay
         sys.argv += ["--configuration_file", TEST_DIR+"test_config.py"]
-        lattice = envelope_tool.MainWindow().lattice
-        self.assertGreater(len(lattice.ref_list), 1)
-        self.assertGreater(len(lattice.ellipse_list), 1)
-        last_hit = lattice.ref_list[-1]
-        field_list = lattice.get_field_list()
+        _lattice = envelope_tool.MainWindow().lattice
+        self.assertGreater(len(_lattice.ref_list), 1)
+        self.assertGreater(len(_lattice.ellipse_list), 1)
+        last_hit = _lattice.ref_list[-1]
+        field_list = _lattice.get_field_list()
         print field_list
         for item in field_list:
             item["scale_factor"] *= 2.
-        lattice.set_fields(field_list)
-        hit_ref, ellipse_ref = lattice.get_beam()
+        _lattice.set_fields(field_list)
+        hit_ref, ellipse_ref = _lattice.get_beam()
         hit_ref['p'] = hit_ref['p']*2.
         hit_ref.mass_shell_condition('energy')
-        lattice.set_beam(hit_ref, ellipse_ref)
-        lattice.run_lattice()
-        test_hit = lattice.ref_list[-1]
+        _lattice.set_beam(hit_ref, ellipse_ref)
+        _lattice.run_lattice()
+        test_hit = _lattice.ref_list[-1]
         for pos in ['x', 'y', 'z']:
             self.assertAlmostEqual(last_hit[pos], test_hit[pos], 3)
         for mom in ['px', 'py', 'pz']:
@@ -457,16 +458,16 @@ class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
         # check that ellipse propagates okay
         # MICE SFoFo lattice nearly periodic with beta=431.
         sys.argv += ["--configuration_file", TEST_DIR+"test_config_2.py"]
-        lattice = envelope_tool.MainWindow().lattice
-        self.assertGreater(len(lattice.ref_list), 1)
-        self.assertGreater(len(lattice.ellipse_list), 1)
-        ref, ellipse = lattice.get_beam()
+        _lattice = envelope_tool.MainWindow().lattice
+        self.assertGreater(len(_lattice.ref_list), 1)
+        self.assertGreater(len(_lattice.ellipse_list), 1)
+        ref, ellipse = _lattice.get_beam()
         ellipse = maus_cpp.covariance_matrix.create_from_penn_parameters(
           ref["mass"], ref["p"], 1.0, 431., 10., 10.
         )
-        lattice.set_beam(ref, ellipse)
-        lattice.run_lattice()
-        last_ellipse = lattice.ellipse_list[-1]
+        _lattice.set_beam(ref, ellipse)
+        _lattice.run_lattice()
+        last_ellipse = _lattice.ellipse_list[-1]
         ratio_sxx = ellipse.get_element(3, 3)/last_ellipse.get_element(3, 3)
         self.assertLess(abs(ratio_sxx-1.), 5e-2)
         ratio_spp = ellipse.get_element(4, 4)/last_ellipse.get_element(4, 4)
