@@ -60,6 +60,8 @@ class Plotter:
         try:
             if self.var_type != "mean" and len(self.ellipse_list) <= 1:
                 print "Failed to propagate ellipses"
+            elif self.var_type == "mean" and len(self.ref_list) <= 1:
+                print "Failed to propagate reference trajectory"
             else:
                 self.set_variables_function()()
         except KeyError:
@@ -153,6 +155,18 @@ class Plotter:
                 list_points_y[i][j] = y_temp+translation[1]
         return list_points_x, list_points_y
 
+    def _curtail(self):
+        """
+        Require ref_list and ellipse_list have same length by cutting hits or
+        ellipses off the end (depending on which is longer)
+        """
+        if len(self.ellipse_list) == len(self.ref_list):
+            return
+        if len(self.ellipse_list) > len(self.ref_list):
+            self.ellipse_list = self.ellipse_list[0:len(self.ref_list)]
+        else:
+            self.ref_list = self.ref_list[0:len(self.ellipse_list)]
+
     def get_means(self):
         """Fill data for mean from ref_list and ellipse_list"""
         self.y_var = [[reference[self.first_var] \
@@ -161,6 +175,7 @@ class Plotter:
 
     def get_rms(self):
         """Fill data for RMS from ref_list and ellipse_list"""
+        self._curtail()
         my_var = self.ellipse_var.index(self.first_var)+1
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[ell.get_element(my_var, my_var)**0.5 \
@@ -184,6 +199,7 @@ class Plotter:
 
     def get_beta(self):
         """Fill data for optical beta from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
@@ -198,6 +214,7 @@ class Plotter:
 
     def get_alpha(self):
         """Fill data for alpha from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
@@ -212,6 +229,7 @@ class Plotter:
 
     def get_gamma(self):
         """Fill data for optical gamma from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
@@ -226,6 +244,7 @@ class Plotter:
 
     def get_emittance(self):
         """Fill data for emittance from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
@@ -233,17 +252,19 @@ class Plotter:
 
     def get_dispersion(self):
         """Fill data for D from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
             energy = self.ref_list[i]['energy']
             axis_str = self.axis_dict[self.first_var][0]
             axis_int = self.ellipse_var.index(axis_str)+1
-            disp = ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
+            disp = -ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
             self.y_var[0].append(disp)
 
     def get_dispersion_prime(self):
         """Fill data for D' from ref_list and ellipse_list"""
+        self._curtail()
         self.x_var = [[ref['z'] for ref in self.ref_list]]
         self.y_var = [[]]
         for i, ell in enumerate(self.ellipse_list):
@@ -264,7 +285,8 @@ class Plotter:
             for cov_j, ell_j in enumerate(el_list):
                 cov_matrix[cov_i][cov_j] = ellipse.get_element(ell_i, ell_j)
         cov_matrix = numpy.array(cov_matrix)
-        return bunch.get_emittance(axis_list, cov_matrix)
+        emittance = bunch.get_emittance(axis_list, cov_matrix)
+        return emittance
 
     def _show_physical_apertures(self):
         """
@@ -279,10 +301,14 @@ class Plotter:
         Fill graph data with apertures, scaled to occupy only the top 10% of the
         canvas
         """
-        graph_max = max([max(y_temp) for y_temp in self.y_var])
-        graph_min = min([min(y_temp) for y_temp in self.y_var])
-        graph_delta = max([max(y_temp) for y_temp in self.y_var])-\
-                      graph_min
+        graph_min = 0.
+        graph_max = 0.
+        graph_delta = 1.
+        if len(self.y_var) > 0 and len(self.y_var[0]) > 0:
+            graph_max = max([max(y_temp) for y_temp in self.y_var])
+            graph_min = min([min(y_temp) for y_temp in self.y_var])
+            graph_delta = max([max(y_temp) for y_temp in self.y_var])-\
+                          graph_min
         if graph_delta == 0.:
             graph_delta = 1.
         field_min = min([a_magnet["aperture"][axis] \

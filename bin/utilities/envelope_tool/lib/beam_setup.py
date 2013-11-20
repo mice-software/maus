@@ -31,18 +31,18 @@ SHARE_DIR = ""
 
 class TwissSetup:
     """GUI window to setup a beam according to 2D Twiss parameterisation"""
-    def __init__(self, beam_select, root_frame):
+    def __init__(self, beam_setup, root_frame):
         """Initialise the window"""
         self.window = Window(ROOT.gClient.GetRoot(), # pylint: disable = E1101
                              root_frame,
                              SHARE_DIR+"twiss_setup.json")
-        self.beam_select = beam_select
+        self.beam_setup = beam_setup
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
 
     def okay_action(self):
         """Handle a click on the Okay button, building the beam matrix"""
-        ref = self.beam_select.get_reference()
+        ref = self.beam_setup.get_reference()
         matrix = maus_cpp.covariance_matrix.create_from_twiss_parameters(
           mass = ref['mass'],
           momentum = ref['p'],
@@ -62,23 +62,23 @@ class TwissSetup:
           dispersion_prime_y = self.window.get_text_entry("disp_prime_y",
                                                           type(1.))
         )
-        self.beam_select.set_matrix(matrix)
+        self.beam_setup.set_matrix(matrix)
         self.window.close_window()
-        self.beam_select.matrix_select = None
+        self.beam_setup.matrix_select = None
 
     def cancel_action(self):
         """Handle a click on the Cancel button"""
         self.window.close_window()
-        self.beam_select.matrix_select = None
+        self.beam_setup.matrix_select = None
 
 class PennSetup:
     """GUI window to setup a beam according to 4D Penn parameterisation"""
-    def __init__(self, beam_select, root_frame):
+    def __init__(self, beam_setup, root_frame):
         """Initialise the window"""
         self.window = Window(ROOT.gClient.GetRoot(), # pylint: disable = E1101
                              root_frame,
                              SHARE_DIR+"penn_setup.json")
-        self.beam_select = beam_select
+        self.beam_setup = beam_setup
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
         self.window.set_button_action("Get &B0", self.get_b0_action)
@@ -87,7 +87,7 @@ class PennSetup:
 
     def okay_action(self):
         """Handle a click on the Okay button, building the beam matrix"""
-        ref = self.beam_select.get_reference()
+        ref = self.beam_setup.get_reference()
         matrix = maus_cpp.covariance_matrix.create_from_penn_parameters(
           mass = ref['mass'],
           momentum = ref['p'],
@@ -108,21 +108,21 @@ class PennSetup:
           dispersion_prime_y = self.window.get_text_entry("disp_prime_y",
                                                           type(1.))
         )
-        self.beam_select.set_matrix(matrix)
+        self.beam_setup.set_matrix(matrix)
         self.window.close_window()
-        self.beam_select.matrix_select = None
+        self.beam_setup.matrix_select = None
 
     def cancel_action(self):
         """Handle a click on the Cancel button"""
         self.window.close_window()
-        self.beam_select.matrix_select = None
+        self.beam_setup.matrix_select = None
 
     def get_b0_action(self):
         """
         Handle a click on the Get B0 button, getting B magnitude at the location
         of the reference particle
         """
-        ref = self.beam_select.get_reference()
+        ref = self.beam_setup.get_reference()
         b_vec = maus_cpp.field.get_field_value(ref['x'], ref['y'], ref['z'],
                                                ref['t'])
         _b0 = (b_vec[0]**2+b_vec[1]**2+b_vec[2]**2)**0.5
@@ -134,15 +134,15 @@ class PennSetup:
         would be required to get a constant beta function, given other settings
         (reference particle, B0, Lc)
         """
-        _b0 = self.window.get_text_entry("B0", type(1.))*1e-3 # kT
+        _b0 = abs(self.window.get_text_entry("B0", type(1.))*1e-3) # kT
         if abs(_b0) < 1e-9:
             raise ValueError(
               "Constant beta requires B0 is not 0. "+\
               "Modify the B0 field and try again."
             )
         _lc = self.window.get_text_entry("Lc", type(1.)) # kT
-        mom = self.beam_select.get_reference()['p'] # MeV/c
-        charge = abs(self.beam_select.get_reference()['charge']) # eplus
+        mom = self.beam_setup.get_reference()['p'] # MeV/c
+        charge = abs(self.beam_setup.get_reference()['charge']) # eplus
         beta = (1+_lc**2)**0.5 * 2.*charge*mom/Common.constants['c_light']/_b0
         self.window.set_text_entry('alpha_trans', 0.0)
         self.window.set_text_entry('beta_trans', beta) # beta in mm
@@ -187,7 +187,7 @@ class BeamSetup:
         self.main_window.lattice.run_lattice()
         self.main_window.update_plot()
         self.window.close_window()
-        self.main_window.beam_select = None
+        self.main_window.beam_setup = None
     
     def cancel_action(self):
         """
@@ -197,7 +197,7 @@ class BeamSetup:
             print "Close the matrix_select window"
             return
         self.window.close_window()
-        self.main_window.beam_select = None
+        self.main_window.beam_setup = None
 
     def set_matrix(self, matrix):
         """

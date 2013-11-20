@@ -59,26 +59,6 @@ class Lattice:
         maus_cpp.globals.set_monte_carlo_mice_modules(self.mice_modules)
         self._tracking()
 
-    def _set_defaults(self):
-        """
-        Setup the lattice according to the configuration specified in the usual
-        way
-        """
-        config_str = Configuration.Configuration().getConfigJSON(
-                                                        command_line_args=True)
-        self.config = json.loads(config_str)
-        ref_json = self.config["simulation_reference_particle"]
-        self.ref_list = [Hit.new_from_maus_object("maus_primary", ref_json, 0)]
-        ell_data = [[float(i == j) for i in range(6)] for j in range(6)]
-        np_diag = numpy.array(ell_data)
-        self.ellipse_list = [
-                         maus_cpp.covariance_matrix.create_from_matrix(np_diag)]
-        self.lattice = self.config["simulation_geometry_filename"]
-        self.mice_modules = maus_cpp.mice_module.MiceModule(self.lattice)
-        children = self.mice_modules.get_children() #pylint: disable=E1103
-        children.append(self._virtual_plane(self.ref_list[0]['z']))
-        self.mice_modules.set_children(children) #pylint: disable=E1103
-
     def get_field_list(self):
         """
         Recursively interrogate the mice modules building up a list of fields
@@ -108,9 +88,6 @@ class Lattice:
         """
         self.ref_list = [reference]
         self.ellipse_list = [ellipse]
-        print self.ref_list
-        print self.ellipse_list
-
 
     def get_beam(self):
         """
@@ -118,6 +95,26 @@ class Lattice:
         ellipse
         """
         return self.ref_list[0], self.ellipse_list[0]
+
+    def _set_defaults(self):
+        """
+        Setup the lattice according to the configuration specified in the usual
+        way
+        """
+        config_str = Configuration.Configuration().getConfigJSON(
+                                                        command_line_args=True)
+        self.config = json.loads(config_str)
+        ref_json = self.config["simulation_reference_particle"]
+        self.ref_list = [Hit.new_from_maus_object("maus_primary", ref_json, 0)]
+        ell_data = [[float(i == j) for i in range(6)] for j in range(6)]
+        np_diag = numpy.array(ell_data)
+        self.ellipse_list = [
+                         maus_cpp.covariance_matrix.create_from_matrix(np_diag)]
+        self.lattice = self.config["simulation_geometry_filename"]
+        self.mice_modules = maus_cpp.mice_module.MiceModule(self.lattice)
+        children = self.mice_modules.get_children() #pylint: disable=E1103
+        children.append(self._virtual_plane(self.ref_list[0]['z']))
+        self.mice_modules.set_children(children) #pylint: disable=E1103
 
     def _set_fields_recursive(self, mice_mod, field_dict):
         """

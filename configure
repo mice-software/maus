@@ -122,7 +122,7 @@ cat > env.sh <<EOF
 if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MAUS_ROOT_DIR="${maus_root_dir}"
-
+     export MAUS_TMP_DIR="${maus_root_dir}/tmp"
      export MAUS_THIRD_PARTY="${maus_third_party}"
      echo "INFO: Using third party libraries from ${maus_third_party}"
      # hack to get scons working (doesnt do well with --prefix_dir on build)

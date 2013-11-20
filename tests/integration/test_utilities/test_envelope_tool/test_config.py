@@ -1,6 +1,7 @@
 import os
 
-simulation_geometry_filename = os.path.expandvars("${MAUS_ROOT_DIR}/bin/utilities/envelope_tool/share/TestGeometry.dat")
+simulation_geometry_filename = os.path.expandvars("${MAUS_ROOT_DIR}/tests/"+\
+              "integration/test_utilities/test_envelope_tool/TestGeometry.dat")
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":1600.0, "y":0.0, "z":0.0},
     "momentum":{"x":-0.5, "y":0.0, "z":0.5},

@@ -62,7 +62,7 @@ class MainWindow():
                              ROOT.gClient.GetRoot(), # pylint: disable=E1101
                              SHARE_DIR+"main_frame.json")
         self.lattice = Lattice()
-        self.beam_select = None
+        self.beam_setup = None
         self.magnet_setup = None
         self.plot_setup = None
         self.plot_setup_options = [{"variable_type":0,
@@ -77,11 +77,11 @@ class MainWindow():
 
     def beam_button_action(self):
         """Handle a Beam Setup button press"""
-        if self.beam_select == None:
-            self.beam_select = BeamSetup(self, self.window.main_frame)
+        if self.beam_setup == None:
+            self.beam_setup = BeamSetup(self, self.window.main_frame)
             ref, ellipse = self.lattice.get_beam()
-            self.beam_select.set_reference(ref)
-            self.beam_select.set_matrix(ellipse)
+            self.beam_setup.set_reference(ref)
+            self.beam_setup.set_matrix(ellipse)
 
     def magnet_button_action(self):
         """Handle a Magnet Setup button press"""
@@ -116,8 +116,11 @@ def main():
             time.sleep(0.1)
     except Exception: # pylint: disable=W0703
         sys.excepthook(*sys.exc_info())
+    except KeyboardInterrupt:
+        print "Pressed Ctrl-C"
     finally:
         print "done"
+        return 0
 
 if __name__ == '__main__':
     main()
