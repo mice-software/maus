@@ -20,7 +20,6 @@ Test maus_cpp.simulation
 """
 
 import unittest
-import os
 import json
 import StringIO
 
@@ -44,7 +43,7 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         maus_cpp.globals.death()
 
     def _test_track_particles_bad(self):
-        """test maus_cpp.simulation.track_particles"""
+        """test maus_cpp.simulation.track_particles - error handling"""
         try:
             maus_cpp.simulation.track_particles()
             self.assertTrue(False, "Should have thrown TypeError")
@@ -67,6 +66,7 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
             pass
 
     def test_track_particles_good(self):
+        """test maus_cpp.simulation.track_particles - good json"""     
         out = maus_cpp.simulation.track_particles("[]")
         self.assertEqual(out, "[]")
         ref = {
@@ -77,7 +77,7 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
         mc_in = [{"primary":ref}, {"primary":ref}]
         mc_out = maus_cpp.simulation.track_particles(json.dumps(mc_in))
         mc_out = json.loads(mc_out)
-        self.assertEqual(len(mc_in), len(mc_out))                                 
+        self.assertEqual(len(mc_in), len(mc_out))
         for i, event in enumerate(mc_out):
             self.assertTrue("primary" in event.keys())
             prim_in = mc_in[i]["primary"]
