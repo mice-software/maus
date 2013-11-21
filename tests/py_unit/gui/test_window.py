@@ -85,7 +85,8 @@ class TestAncillaries(unittest.TestCase):
 
 class TestFunctionWrapper(unittest.TestCase):
     """Small test case for function_wrapper and FunctionWrapper class"""
-    def _my_function(self, message, alt_message=None):
+    def _my_function(self, message, alt_message=None): # pylint: disable=R0201
+        """Test function to wrap"""
         if alt_message == None:
             return message
         if message == "exception":

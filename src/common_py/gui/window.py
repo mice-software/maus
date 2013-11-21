@@ -215,7 +215,7 @@ def function_wrapper(function):
     """
     return FunctionWrapper(function).execute
 
-class FunctionWrapper:
+class FunctionWrapper: #pylint: disable=R0903
     """
     Function wrapper to intervene before TPyDispatcher handles python errors
     """
@@ -231,7 +231,7 @@ class FunctionWrapper:
         """
         try:
             return self.function(*args, **keywdargs)
-        except:
+        except: # pylint: disable=W0702, W0142
             sys.excepthook(*sys.exc_info())
 
 class Window(): # pylint: disable=R0201
