@@ -27,6 +27,7 @@ import ROOT
 from xboa.Hit import Hit
 
 from gui.window import Window
+from gui.window import GuiError
 
 class PlotSetup():
     """
@@ -62,6 +63,8 @@ class PlotSetup():
                                             "drop_down")["frame"].GetSelected()
         plot_apertures = self.window.get_frame("plot_apertures",
                                                "check_button").IsOn()
+        if type_int != 0 and first_int == 0:
+            raise GuiError("Please select plot variable")
         self.main_window.plot_setup_options = [{
             "variable_type":type_int,
             "first_var":first_int,
@@ -116,6 +119,8 @@ class PlotSetup():
         first_var_int = options[0]["first_var"]
         return select_list[first_var_int]
 
+    my_hit_get_variables = [var for var in Hit.get_variables() if len(var)]
+
     type_list = [
         "<Select plot type>",
         "mean",
@@ -140,7 +145,7 @@ class PlotSetup():
             "longitudinal"
         ], "physics_var":[
             "<Select plot variable>"
-        ]+Hit.get_variables(), "kinematic_var":[
+        ]+my_hit_get_variables, "kinematic_var":[
             "<Select plot variable>",
             "x",
             "y",

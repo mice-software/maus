@@ -28,6 +28,7 @@ import os
 import sys
 import ROOT
 
+import gui.gui_exception_handler
 from gui.window import Window
 
 ENV_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/bin/utilities/envelope_tool/")
@@ -112,10 +113,9 @@ def main():
     set_share_dirs()
     try:
         main_window = MainWindow()
+        gui.gui_exception_handler.set_error_level("exceptions")
         while main_window.window.main_frame != None:
-            time.sleep(0.1)
-    except Exception: # pylint: disable=W0703
-        sys.excepthook(*sys.exc_info())
+            time.sleep(1)
     except KeyboardInterrupt:
         print "Pressed Ctrl-C"
     finally:

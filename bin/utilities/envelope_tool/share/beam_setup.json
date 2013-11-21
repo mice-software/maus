@@ -191,7 +191,7 @@
         "children":[{
             "type":"label",
             "label_length":6,
-            "name":"t"
+            "name":"x"
         }, {
             "type":"text_entry",
             "name":"xt",
@@ -305,7 +305,7 @@
         "children":[{
             "type":"label",
             "label_length":6,
-            "name":"Energy"
+            "name":"Py"
         }, {
             "type":"text_entry",
             "name":"pyt",

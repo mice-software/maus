@@ -29,10 +29,11 @@ class MagnetSetup:
         """Initialise the GUI window"""
         self.main_window = main_window
         self.parent = parent
+        manipulators = {"magnet_setup_action":self.magnet_setup_action}
         self.window = Window(ROOT.gClient.GetRoot(), # pylint: disable = E1101
                              parent,
-                             self.share_dir+"magnet_setup.json",
-                             {"magnet_setup_action":self.magnet_setup_action})
+                             data_file = self.share_dir+"magnet_setup.json",
+                             manipulator_dict = manipulators)
         self.window.set_button_action("&Okay", self.okay_action)
         self.window.set_button_action("&Cancel", self.cancel_action)
 

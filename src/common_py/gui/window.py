@@ -23,6 +23,7 @@ An interface is provided that enables layout to be defined using json
 configuration files.
 """
 
+import sys
 import json
 import ROOT
 
@@ -53,6 +54,17 @@ def layout(option):
     if option == "close_h": # close_packed horizontally
         return ROOT.TGLayoutHints(KNORMAL, close, close, normal, normal)
     raise ValueError("Failed to recognise layout option "+str(option))
+
+class GuiError(Exception):
+    """
+    GuiErrot can be thrown when user wants to catch and handle errors that
+    are specifically related to gui errors (and e.g. let other errors pass
+    through to caller)
+    """
+    def __init__(self, *args, **kwargs):
+        """Initialise Exception base class"""
+        Exception.__init__(self, *args, **kwargs)
+
 
 class Label:
     """
@@ -197,6 +209,31 @@ class NamedTextEntry: # pylint: disable=R0913
         my_dict["frame"] = my_dict["text_entry"].frame
         return my_dict
 
+def function_wrapper(function):
+    """
+    Lightweight wrapper to intervene before TPyDispatcher handles python errors
+    """
+    return FunctionWrapper(function).execute
+
+class FunctionWrapper:
+    """
+    Function wrapper to intervene before TPyDispatcher handles python errors
+    """
+    def __init__(self, function):
+        """
+        Lightweight class that adds some error handling
+        """
+        self.function = function
+
+    def execute(self, *args, **keywdargs):
+        """
+        Handle the errors from python function calls as I want
+        """
+        try:
+            return self.function(*args, **keywdargs)
+        except:
+            sys.excepthook(*sys.exc_info())
+
 class Window(): # pylint: disable=R0201
     """
     This is the main class in this module. Initialise a window based on a json
@@ -260,33 +297,49 @@ class Window(): # pylint: disable=R0201
             construct the GUI element as per normal.
     """
 
-    def __init__(self, parent, main, data_file, manipulator_dict=None):
+    def __init__(self, parent, main, data_file=None, # pylint: disable = R0913
+                 json_data=None, manipulator_dict=None):
         """
         Initialise the window
           - parent; parent ROOT frame (e.g. TGMainFrame/TGTransientFrame)
           - main; top level TGMainFrame for the whole GUI
           - data_file; string containing the file name for the layout data
+          - json_data; json object containing the layout data
           - manipulator_dict; if there are any frames of type "special", this
             dictionary maps to a function which performs the layout for that
             frame.
+        Throws an exception if both, or neither, of data_file and json_data are
+        defined - caller must define the window layout in one and only one place
         """
-        self.data = open(data_file).read()
-        self.data = json.loads(self.data)
+        if data_file != None and json_data != None:
+            raise ValueError("Define only one of json_data and data_file")
+        if data_file == None and json_data == None:
+            raise ValueError("Must define json_data or data_file")
+        if data_file != None:
+            self.data = open(data_file).read()
+            self.data = json.loads(self.data)
+        else:
+            self.data = json_data
+        if manipulator_dict == None:
+            manipulator_dict = {}
         self.main_frame = None
         self.update_list = []
         self.socket_list = []
+        self.tg_text_entries = {}
         self.manipulators = manipulator_dict
-        try:
-            self._setup_frame(parent, main)
-        except Exception:
-            raise
+        self._setup_frame(parent, main)
         return None
 
     def close_window(self):
         """
         Close the window
         """
+        # root v5.34 - makes segv if I don't disable the text entry before
+        # closing
+        for tg_text_entry in self.tg_text_entries.values():
+            tg_text_entry.SetState(0)
         self.main_frame.CloseWindow()
+        self.main_frame = None
 
     def get_frame(self, frame_name, frame_type, frame_list=None):
         """
@@ -336,7 +389,7 @@ class Window(): # pylint: disable=R0201
         "name":"select_box" makes a signal Selected(Int_t).
         """
         frame = self.get_frame(frame_name, frame_type)
-        self.socket_list.append(ROOT.TPyDispatcher(action))
+        self.socket_list.append(ROOT.TPyDispatcher(function_wrapper(action)))
         frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 
                       'Dispatch()')
 
@@ -360,7 +413,12 @@ class Window(): # pylint: disable=R0201
         text_entry, text_length = self._find_text_entry(name)
         if text_length:
             pass
-        return value_type(text_entry.GetText())
+        try:
+            value = value_type(text_entry.GetText())
+            return value
+        except ValueError:
+            raise GuiError("Failed to parse text entry "+name+" as "+\
+                           str(value_type))
 
     def set_text_entry(self, name, value):
         """
@@ -452,6 +510,9 @@ class Window(): # pylint: disable=R0201
         for frames_index, item in enumerate(frames):
             if item["type"] == "special":
                 manipulator_name = item["manipulator"]
+                if manipulator_name not in self.manipulators:
+                    raise ValueError("Manipulator "+manipulator_name+\
+                                     " has not been defined")
                 item = self.manipulators[manipulator_name](item)
                 frames[frames_index] = item
             if item["type"] in self.parse_item_dict.keys():
@@ -477,6 +538,7 @@ class Window(): # pylint: disable=R0201
     def _parse_named_text_entry(self, parent, item):
         """parse a name_text_entry into a NamedEntry"""
         item = NamedTextEntry.new_from_dict(item, parent)
+        self.tg_text_entries[item["name"]] = item["text_entry"].text_entry
         self.update_list.append(item["text_entry"])
 
     def _parse_canvas(self, parent, item):
@@ -506,6 +568,7 @@ class Window(): # pylint: disable=R0201
         if "default_text" in item:
             default_text = item["default_text"]
         item["frame"].SetText(default_text)
+        self.tg_text_entries[item["name"]] = item["frame"]
 
     def _parse_drop_down(self, parent, item):
         """parse a drop_down into a TGComboBox"""

@@ -17,6 +17,7 @@
 GUI handler for setting up a beam
 """
 
+import numpy
 import ROOT
 from xboa.Hit import Hit
 
@@ -26,6 +27,7 @@ import maus_cpp
 import maus_cpp.field
 
 from gui.window import Window
+from gui.window import GuiError
 
 SHARE_DIR = ""
 
@@ -63,6 +65,7 @@ class TwissSetup:
                                                           type(1.))
         )
         self.beam_setup.set_matrix(matrix)
+        self.beam_setup.get_matrix() # check for consistency
         self.window.close_window()
         self.beam_setup.matrix_select = None
 
@@ -109,6 +112,7 @@ class PennSetup:
                                                           type(1.))
         )
         self.beam_setup.set_matrix(matrix)
+        self.beam_setup.get_matrix() # check for consistency
         self.window.close_window()
         self.beam_setup.matrix_select = None
 
@@ -183,7 +187,7 @@ class BeamSetup:
             print "Close the matrix_select window"
             return
         self.main_window.lattice.set_beam(self.get_reference(),
-                                          self.get_matrix())
+                                          self.get_matrix())   
         self.main_window.lattice.run_lattice()
         self.main_window.update_plot()
         self.window.close_window()
@@ -216,22 +220,26 @@ class BeamSetup:
 
         Returns a maus_cpp.covariance_matrix.CovarianceMatrix object
         """
-        matrix = maus_cpp.covariance_matrix.CovarianceMatrix()
+        np_matrix = numpy.zeros([6, 6])
         for i, var_i in enumerate(["t", "e", "x", "px", "y", "py"]):
             for j, var_j in enumerate(["t", "e", "x", "px", "y", "py"]):
-                value = self.window.get_text_entry(var_i+var_j, type(1.))
-                if j > i:
-                    delta = matrix.get_element(i+1, j+1) -\
-                            matrix.get_element(j+1, i+1)
-                    if abs(delta) > 1e-6:
-                        err = "Matrix has non-symmetric element Cov("+\
-                                var_i+","+var_j+") with delta "+str(delta)+"."
-                        err += "This element must be symmetric - upper "+\
-                                 "diagonal should be equal to lower diagonal."
-                        raise ValueError(err)
+                value1 = self.window.get_text_entry(var_i+var_j, type(1.))
+                value2 = self.window.get_text_entry(var_j+var_i, type(1.))
+                delta = abs(value1 - value2)
+                if delta > 1e-6:
+                    err = "Matrix has non-symmetric element Cov("+\
+                            var_i+","+var_j+") with delta "+str(delta)+"."
+                    err += "This element must be symmetric - upper "+\
+                             "diagonal should be equal to lower diagonal."
+                    raise GuiError(err)
                 else:
-                    matrix.set_element(i+1, j+1, value)
-        return matrix
+                    np_matrix[i, j] = value1
+        evals = numpy.linalg.eigvals(np_matrix)
+        if not numpy.all(evals > 0):
+            evals = [i for i in evals]
+            raise GuiError("Beam ellipse should be positive definite but "+\
+                           " eigenvalues were not all positive: "+str(evals))
+        return maus_cpp.covariance_matrix.create_from_matrix(np_matrix)
 
     def set_reference(self, ref_hit):
         """
@@ -252,8 +260,15 @@ class BeamSetup:
             var_dict = self.window.get_frame_dict(var, "named_text_entry")
             ref_dict[var] = float(var_dict["text_entry"].text_entry.GetText())
         pid_dict = self.window.get_frame_dict("pid", "named_text_entry")
-        ref_dict["pid"] = int(pid_dict["text_entry"].text_entry.GetText())
-        ref_dict["mass"] = Common.pdg_pid_to_mass[abs(ref_dict["pid"])]
-        ref_dict["charge"] = Common.pdg_pid_to_charge[abs(ref_dict["pid"])]
-        return Hit.new_from_dict(ref_dict, "energy")
+        try:
+            ref_dict["pid"] = int(pid_dict["text_entry"].text_entry.GetText())
+            ref_dict["mass"] = Common.pdg_pid_to_mass[abs(ref_dict["pid"])]
+            ref_dict["charge"] = Common.pdg_pid_to_charge[abs(ref_dict["pid"])]
+        except KeyError:
+            raise GuiError("Did not recognise reference particle pid")
+        try:
+            hit = Hit.new_from_dict(ref_dict, "energy")
+        except Exception:
+            raise GuiError("Failed to generate a reference particle")
+        return hit
 

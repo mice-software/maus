@@ -19,8 +19,11 @@ Test ROOT gui wrapper
 
 # pylint: disable=E1101, R0904, C0103
 
+import sys
+import StringIO
 import unittest
 import os
+import json
 
 import ROOT
 
@@ -80,6 +83,27 @@ class TestAncillaries(unittest.TestCase):
                        "default_text":"a"}
         gui.window.NamedTextEntry.new_from_dict(test_dict_2, self.frame)
 
+class TestFunctionWrapper(unittest.TestCase):
+    """Small test case for function_wrapper and FunctionWrapper class"""
+    def _my_function(self, message, alt_message=None):
+        if alt_message == None:
+            return message
+        if message == "exception":
+            raise RuntimeError(message)
+        return alt_message
+
+    def test_function_wrapper(self):
+        """Test gui.window.function_wrapper"""
+        func = gui.window.function_wrapper(self._my_function)
+        self.assertEqual(func("hello"), "hello")
+        self.assertEqual(func("hello", "world"), "world")
+        self.assertEqual(func("hello", alt_message="world"), "world")
+        temp_stderr = sys.stderr
+        sys.stderr = StringIO.StringIO()
+        func("exception", alt_message="world")
+        self.assertNotEqual(sys.stderr.getvalue(), "")
+        sys.stderr = temp_stderr
+
 class TestWindow(unittest.TestCase):
     """
     Test GUI window class
@@ -98,8 +122,10 @@ class TestWindow(unittest.TestCase):
         self.window_2 = gui.window.Window(self.window_1.main_frame,
                                           self.window_1.main_frame,
                                           self.test_dir+"/test_window_2.json",
-                                          self._manipulators)
+                                          manipulator_dict=self._manipulators)
         self._clicked = 0
+        self.json_data = open(self.test_dir+"/test_window_2.json").read()
+        self.json_data = json.loads(self.json_data)
 
     def tearDown(self):
         """tear down"""
@@ -115,8 +141,13 @@ class TestWindow(unittest.TestCase):
         """Test button action"""
         self._clicked += 1
 
+
     def test_init(self):
         """gui.window.Window initialisation"""
+        window_3 = gui.window.Window(ROOT.gClient.GetRoot(),
+                                     ROOT.gClient.GetRoot(),
+                                     json_data=self.json_data,
+                                     manipulator_dict=self._manipulators)
         frame_names = ["test_"+str(i) for i in range(1, 9)]
         frame_types = {
             "test_1":"vertical_frame",
@@ -131,6 +162,7 @@ class TestWindow(unittest.TestCase):
         }
         for name in frame_names:
             self.window_2.get_frame(name, frame_types[name])
+            window_3.get_frame(name, frame_types[name])
         label_text = self.window_2.get_frame("test_3", "label").GetText()
         self.assertEqual(label_text, "test_3") # check the labels updated
         named_dict = self.window_2.get_frame_dict("test_4", "named_text_entry")
@@ -149,7 +181,22 @@ class TestWindow(unittest.TestCase):
             self.assertTrue(False, msg="Should have thrown ValueError")
         except ValueError:
             pass
-
+        try:
+            fname = self.test_dir+"/test_window_2.json"
+            window_3 = gui.window.Window(ROOT.gClient.GetRoot(),
+                                         ROOT.gClient.GetRoot(),
+                                         data_file=fname,
+                                         json_data=self.json_data,
+                                         manipulator_dict=self._manipulators)
+            self.assertTrue(False, msg="Should have thrown ValueError")
+        except ValueError:
+            pass
+        try:
+            window_3 = gui.window.Window(ROOT.gClient.GetRoot(),
+                                         ROOT.gClient.GetRoot())
+            self.assertTrue(False, msg="Should have thrown ValueError")
+        except ValueError:
+            pass
     def test_close_window(self):
         """gui.window.Window close_window"""
         self.window_1.close_window()

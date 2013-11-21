@@ -183,7 +183,6 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.beam_setup.set_reference(self.hit_red)
         self.beam_setup.window.get_frame("&Cancel", "button").Clicked()
         for var in Hit.get_variables():
-            print var, self.main_window.lattice.ref_list[0][var], test_ref[var]
             self.assertAlmostEqual(self.main_window.lattice.ref_list[0][var],
                                    test_ref[var], 3)
         self._ell_equal(self.main_window.lattice.ellipse_list[0], test_matrix)
@@ -438,7 +437,6 @@ class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.assertGreater(len(_lattice.ellipse_list), 1)
         last_hit = _lattice.ref_list[-1]
         field_list = _lattice.get_field_list()
-        print field_list
         for item in field_list:
             item["scale_factor"] *= 2.
         _lattice.set_fields(field_list)
