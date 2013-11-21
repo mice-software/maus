@@ -10,7 +10,7 @@ Configuration TestGeometry
        PropertyHep3Vector Position 0.0 0.0 0.0+0.05*@RepeatNumber m
        PropertyString     SensitiveDetector Virtual
        PropertyBool       RepeatModule2 True
-       PropertyInt        NumberOfRepeats 200
+       PropertyInt        NumberOfRepeats 60
     }
     Module QuadTypeQC
     {

@@ -24,6 +24,7 @@ import signal
 import subprocess
 import os
 import unittest
+import ROOT
 
 from xboa.Hit import Hit
 import xboa.Common as Common
@@ -59,11 +60,11 @@ def _ell_equal(ellipse_1, ellipse_2):
 
 
 # pylint: disable=C0103
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class EnvelopeToolTest(unittest.TestCase): # pylint: disable=R0904
     """Tests for envelope main window"""
     def setUp(self):
         envelope_tool.set_share_dirs()
-
 
     def test_command_line(self):
         """Test we can run envelope tool from the command line okay"""
@@ -101,7 +102,7 @@ class EnvelopeToolTest(unittest.TestCase): # pylint: disable=R0904
         time.sleep(1)
         self.assertEqual(main_window.window.main_frame, None)
 
-
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
     """Tests for beam setup and subwindows"""
 
@@ -121,8 +122,8 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.cov = CovarianceMatrix()
         for i in range(1, 7):
             for j in range(1, 7):
-                self.cov.set_element(i, j, -i*j)
-
+                self.cov.set_element(i, j, i*j)
+            self.cov.set_element(i, i, i*i+50.)
 
     def _ell_equal(self, ell1, ell2):
         """Wrapper for _ell_equal"""
@@ -148,7 +149,7 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
             for j, ax_j in enumerate(axis_list):
                 value = self.beam_setup.window.get_text_entry(ax_i+ax_j,
                                                               type(1.))
-                self.assertAlmostEqual(value, -(i+1.)*(j+1.))
+                self.assertAlmostEqual(self.cov.get_element(i+1, j+1), value)
                 self.assertAlmostEqual(self.cov.get_element(i+1, j+1),
                                        test.get_element(i+1, j+1))
         
@@ -255,11 +256,11 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
 
     def test_twiss_setup(self):
         """Test twiss_setup logic"""
-        test_dict = {"beta_x":444., "alpha_x":1., "emittance_x":6.0,
-                     "beta_y":222., "alpha_y":2., "emittance_y":3.0,
-                     "beta_l":10., "alpha_l":-1., "emittance_l":20.,
-                     "disp_x":5., "disp_prime_x":1.,
-                     "disp_y":11., "disp_prime_y":2.
+        test_dict = {"beta_x":444., "alpha_x":0.1, "emittance_x":6.0,
+                     "beta_y":222., "alpha_y":0.2, "emittance_y":3.0,
+                     "beta_l":10., "alpha_l":-0.1, "emittance_l":20.,
+                     "disp_x":0.5, "disp_prime_x":0.1,
+                     "disp_y":0.11, "disp_prime_y":0.2
                     }
         ref = self.beam_setup.get_reference()
 
@@ -320,6 +321,7 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.assertEqual(main_window.plot_setup, None)
         self.assertEqual(main_window.plot_setup_options, test_options)
 
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
     """Tests for magnet setup"""
     @classmethod
@@ -449,7 +451,7 @@ class MagnetSetupTest(unittest.TestCase): # pylint: disable=R0904
         for pos in ['x', 'y', 'z']:
             self.assertAlmostEqual(last_hit[pos], test_hit[pos], 3)
         for mom in ['px', 'py', 'pz']:
-            self.assertAlmostEqual(last_hit[mom]*2., test_hit[mom], 3)
+            self.assertAlmostEqual(last_hit[mom]*2., test_hit[mom], 1)
 
     def test_lattice_run_lattice_ellipses(self):
         """Test lattice - run lattice"""

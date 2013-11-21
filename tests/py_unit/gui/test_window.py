@@ -29,6 +29,7 @@ import ROOT
 
 import gui.window
 
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class TestAncillaries(unittest.TestCase):
     """
     Test GUI helper classes
@@ -83,6 +84,7 @@ class TestAncillaries(unittest.TestCase):
                        "default_text":"a"}
         gui.window.NamedTextEntry.new_from_dict(test_dict_2, self.frame)
 
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class TestFunctionWrapper(unittest.TestCase):
     """Small test case for function_wrapper and FunctionWrapper class"""
     def _my_function(self, message, alt_message=None): # pylint: disable=R0201
@@ -105,6 +107,7 @@ class TestFunctionWrapper(unittest.TestCase):
         self.assertNotEqual(sys.stderr.getvalue(), "")
         sys.stderr = temp_stderr
 
+@unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
 class TestWindow(unittest.TestCase):
     """
     Test GUI window class
