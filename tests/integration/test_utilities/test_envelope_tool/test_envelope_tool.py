@@ -42,6 +42,8 @@ sys.argv = sys.argv[0:1]
 import envelope_tool # pylint: disable=F0401
 import lattice # pylint: disable=F0401
 
+# pylint: disable=R0904, E1101, C0103
+
 def _ell_equal(ellipse_1, ellipse_2):
     """Check that ellipse_1 and ellipse_2 are almost equal"""
     for i in range(1, 7):
@@ -59,9 +61,8 @@ def _ell_equal(ellipse_1, ellipse_2):
     return True, ""
 
 
-# pylint: disable=C0103
 @unittest.skipIf(ROOT.gROOT.IsBatch(), "Needs a GUI window")
-class EnvelopeToolTest(unittest.TestCase): # pylint: disable=R0904
+class EnvelopeToolTest(unittest.TestCase):
     """Tests for envelope main window"""
     def setUp(self):
         envelope_tool.set_share_dirs()
