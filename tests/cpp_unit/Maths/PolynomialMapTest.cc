@@ -729,3 +729,107 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   } catch (MAUS::Exception exception) {}
   ASSERT_TRUE(testpass);
 }
+
+/*
+TEST_F(PolynomialMapTest, MakePolynomialVector) {
+  const double point_data[2] = {1.0, 2.0};
+  Vector<double> point(point_data, 2);
+  Vector<double> polynomial_vector;
+  test.polynomial_map_->MakePolynomialVector(point, polynomial_vector);
+  for (size_t index = 0; index < 2; ++index) {
+    EXPECT_NEAR(point[index], point_data[index], 1.e-6);
+  }
+}
+*/
+
+TEST_F(PolynomialMapTest, SetCoefficients) {
+  Matrix<double> coefficient_matrix(3, 6, 0.);  // initialize all elements to zero
+  PolynomialMap test_map(2, coefficient_matrix);
+  const double coefficients[18] = {
+    1., 2., 3., 4., 5., 6.,
+    0., 1., 4., 9., 16., 25.,
+    -1., -2., -3., -4., -5., -6.,
+  };
+  coefficient_matrix = Matrix<double>(3, 6, coefficients);
+  test_map.SetCoefficients(coefficient_matrix);
+  const Matrix<double> test_coefficient_matrix
+    = test_map.GetCoefficientsAsMatrix();
+  const Matrix<double> master_coefficient_matrix
+    = polynomial_map_->GetCoefficientsAsMatrix();
+  for (size_t row = 0; row < 3; ++row) {
+    for (size_t column = 0; column < 6; ++column) {
+      EXPECT_NEAR(test_coefficient_matrix(row+1, column+1),
+                  master_coefficient_matrix(row+1, column+1),
+                  1.e-6);
+    }
+  }
+}
+
+TEST_F(PolynomialMapTest, UnmakePolynomialVector) {
+  const double point_data[2] = {1.0, 2.0};
+  Vector<double> point(point_data, 2);
+  Vector<double> polynomial_vector;
+  polynomial_map_->MakePolynomialVector(point, polynomial_vector);
+  polynomial_map_->UnmakePolynomialVector(polynomial_vector, point);
+  for (size_t index = 0; index < 2; ++index) {
+    EXPECT_NEAR(point[index], point_data[index], 1.e-6);
+  }
+
+  Vector<double> empty_point;
+  polynomial_map_->UnmakePolynomialVector(polynomial_vector, empty_point);
+  for (size_t index = 0; index < 2; ++index) {
+    EXPECT_NEAR(empty_point[index], point_data[index], 1.e-6);
+  }
+
+  Vector<double> wrong_size_point(4);
+  bool testpass = true;
+  try {
+    polynomial_map_->UnmakePolynomialVector(polynomial_vector, wrong_size_point);
+    testpass = false;
+  } catch (MAUS::Exception exception) {}
+  ASSERT_TRUE(testpass);
+
+  double polynomial_vector_data[polynomial_vector.size()];
+  polynomial_map_->MakePolynomialVector(point_data, polynomial_vector_data);
+  double point_test[2];
+  polynomial_map_->UnmakePolynomialVector(polynomial_vector_data, point_test);
+  for (size_t index = 0; index < 2; ++index) {
+    EXPECT_NEAR(point_test[index], point_data[index], 1.e-6);
+  }
+}
+
+TEST_F(PolynomialMapTest, generate_polynomial_2) {
+  const double y0[3] = {1., 0., -1.};
+  const double y1[3] = {7., 10., -7.};
+  for (size_t value_var_index = 0; value_var_index < 3; ++value_var_index) {
+    Vector<double> polynomial = generate_polynomial_2D(*polynomial_map_,
+                                                      0,    // point var index
+                                                      value_var_index,
+                                                      0.,   // point var min
+                                                      1.,   // point var max
+                                                      1.);  // point var delta
+    const double y[2] = {y0[value_var_index], y1[value_var_index]};
+    for (size_t index = 0; index < 2; ++index) {
+      EXPECT_NEAR(y[index], polynomial[index], 1.e-6);
+    }
+  }
+}
+
+TEST_F(PolynomialMapTest, RecentredNotSupported) {
+  bool testpass = true;
+  try {
+    double * point = NULL;
+    polynomial_map_->Recentred(point);
+    testpass = false;
+  } catch (MAUS::Exception exception) {}
+  ASSERT_TRUE(testpass);
+}
+
+TEST_F(PolynomialMapTest, InverseNotSupported) {
+  bool testpass = true;
+  try {
+    polynomial_map_->Inverse();
+    testpass = false;
+  } catch (MAUS::Exception exception) {}
+  ASSERT_TRUE(testpass);
+}

@@ -44,7 +44,7 @@
 #include "DataStructure/GlobalEvent.hh"
 #include "DataStructure/MCEvent.hh"
 #include "DataStructure/ReconEvent.hh"
-#include "DataStructure/SciFiSpacePoint.hh"
+#include "DataStructure/SciFiTrackPoint.hh"
 #include "DataStructure/TOFEventSpacePoint.hh"
 #include "DataStructure/ThreeVector.hh"
 #include "DataStructure/Global/ReconEnums.hh"
@@ -559,7 +559,7 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
   SciFiTrackPArray scifi_tracks = scifi_event->scifitracks();
   SciFiTrackPArray::const_iterator scifi_track = scifi_tracks.begin();
   while (scifi_track != scifi_tracks.end()) {
-    SciFiTrackPointPArray scifi_track_points = scifi_track->scifitrackpoints();
+    SciFiTrackPointPArray scifi_track_points = (*scifi_track)->scifitrackpoints();
     SciFiTrackPointPArray::const_iterator scifi_track_point
       = scifi_track_points.begin();
     while (scifi_track_point != scifi_track_points.end()) {
@@ -590,9 +590,9 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
       GlobalDS::TrackPArray::const_iterator track = tracks.begin();
       while (track != tracks.end()) {
         // FIXME(Lane) this will have to change once PID functionality exists
-        track->set_pid(particle_id);
+        (*track)->set_pid(particle_id);
 
-        track->AddTrackPoint(track_point);
+        (*track)->AddTrackPoint(track_point);
       }
     }
   }
@@ -617,8 +617,8 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
 
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   const double x = (detector.id() <= GlobalDS::kTracker0_5)?
-                   -scifi_track_point->x():scifi_track_point->x();
-  const double y = scifi_track_point->y();
+                   -(*scifi_track_point)->x():(*scifi_track_point)->x();
+  const double y = (*scifi_track_point)->y();
   const double z = helper.GetDetectorZPosition(detector.id());
   // No timestamp in the SciFiEvent/Track/TrackPoint data structure
   const double time = 0.;
@@ -632,13 +632,13 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   //track_point->set_particle_event((*scifi_space_point)->get_event());
   track_point->set_mapper_name(kClassname);
 
-  const double Px = scifi_track_point->px();
-  const double Py = scifi_track_point->py();
-  const double Pz = scifi_track_point->pz();
+  const double Px = (*scifi_track_point)->px();
+  const double Py = (*scifi_track_point)->py();
+  const double Pz = (*scifi_track_point)->pz();
   const double momentum = ::sqrt(Px*Px + Py*Py + Pz*Pz);
   const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   const double beta = Beta(particle_id, momentum);
-  const double energy = P / beta;
+  const double energy = momentum / beta;
   TLorentzVector four_momentum(Px, Py, Pz, energy);
   track_point->set_momentum(four_momentum);
   /*
@@ -665,8 +665,6 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
                                   0.,
                                   ::sqrt(covariances(2, 2)));
   track_point->set_momentum_error(momentum_errors);
-
-  track_point->set_charge((*scifi_space_point)->get_npe());
 }
 
 /* Take an educated guess at the particle ID based on the axial velocity

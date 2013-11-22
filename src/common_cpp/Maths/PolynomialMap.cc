@@ -120,11 +120,16 @@ void PolynomialMap::SetCoefficients(std::vector<PolynomialCoefficient> coeff) {
 }
 
 void PolynomialMap::SetCoefficients(Matrix<double> coeff) {
+  coefficient_matrix_  = coeff;
+  polynomial_vector_ = std::vector<PolynomialCoefficient>();
   for (size_t i = 0; i < coeff.number_of_rows() &&
                      i < coefficient_matrix_.number_of_rows(); ++i) {
     for (size_t j = 0; j < coeff.number_of_columns() &&
                      j < coefficient_matrix_.number_of_columns(); ++j) {
-      coefficient_matrix_(i+1, j+1) = coeff(i+1, j+1);
+      polynomial_vector_.push_back(
+          PolynomialMap::PolynomialCoefficient(index_key_by_vector_[j],
+          i,
+          coefficient_matrix_(i+1, j+1) ) );
     }
   }
 }
@@ -210,6 +215,16 @@ PolynomialMap * PolynomialMap::Clone() const {
 Vector<double>&  PolynomialMap::MakePolynomialVector(const Vector<double>& point,
                                                      Vector<double>& polyVector)
     const {
+  const size_t poly_vec_len = NumberOfPolynomialCoefficients(PointDimension(),
+                                                             PolynomialOrder());
+  if (polyVector.size() == 0) {
+    polyVector = Vector<double>(poly_vec_len);
+  } else if (polyVector.size() != poly_vec_len) {
+    throw(Exception(Exception::recoverable,
+                    "Polynomial vector object is not empty "
+                    "and is not of correct size.",
+                    "PolynomialMap::MakePolynomialVector"));
+  }
   for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
     polyVector[i] = 1.;
     for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
@@ -233,9 +248,16 @@ double*  PolynomialMap::MakePolynomialVector(const double* point,
 Vector<double> &  PolynomialMap::UnmakePolynomialVector(
     const Vector<double> & polyVector, Vector<double> & point)
     const {
-  size_t size = NumberOfPolynomialCoefficients(PointDimension(),
-                                            PolynomialOrder());
-  for (size_t index = 0; index < size; ++index) {
+  const size_t point_len = PointDimension();
+  if (point.size() == 0) {
+    point = Vector<double>(point_len);
+  } else if (point.size() != point_len) {
+    throw(Exception(Exception::recoverable,
+                    "Point object is not empty "
+                    "and is not of correct size.",
+                    "PolynomialMap::UnmakePolynomialVector"));
+  }
+  for (size_t index = 0; index < point_len; ++index) {
       point[index] = polyVector[index+1];
   }
   return point;
@@ -244,8 +266,7 @@ Vector<double> &  PolynomialMap::UnmakePolynomialVector(
 double * PolynomialMap::UnmakePolynomialVector(double const * const polyVector,
                                                double * point)
     const {
-  size_t size = NumberOfPolynomialCoefficients(PointDimension(),
-                                            PolynomialOrder());
+  const size_t size = PointDimension();
   for (size_t index = 0; index < size; ++index) {
       point[index] = polyVector[index+1];
   }
@@ -1034,24 +1055,27 @@ std::vector< std::vector<double> > PolynomialMap::PointShell(
   return point_box;
 }
 
-Vector<double> generate_polynomial_2D(
-    const PolynomialMap & map,
-    const size_t variable_index,
-    const double input_min,
-    const double input_max,
-    const double input_increment) {
-  const size_t point_dimension = map.ValueDimension();
+Vector<double> generate_polynomial_2D(const PolynomialMap & map,
+                                      const size_t point_variable_index,
+                                      const size_t value_variable_index,
+                                      const double point_variable_min,
+                                      const double point_variable_max,
+                                      const double point_variable_increment) {
+  const size_t point_dimension = map.PointDimension();
   const size_t value_dimension = map.ValueDimension();
-  Vector<double> input(point_dimension, 0.);
-  Vector<double> output(value_dimension);
+  Vector<double> point(point_dimension, 0.);
+  Vector<double> value(value_dimension);
 
-  size_t plot_size = size_t((input_max - input_min) / input_increment + 1);
+  size_t plot_size = size_t((point_variable_max - point_variable_min)
+                            / point_variable_increment + 1);
   Vector<double> plot(plot_size);
   size_t plot_index = 0;
-  for (double value = input_min; value <= input_max; value += input_increment) {
-    input[variable_index] = value;
-    map.F(input, output);
-    plot[plot_index++] = output[variable_index];
+  for (double point_variable_value = point_variable_min;
+       point_variable_value <= point_variable_max;
+       point_variable_value += point_variable_increment) {
+    point[point_variable_index] = point_variable_value;
+    map.F(point, value);
+    plot[plot_index++] = value[value_variable_index];
   }
 
   return plot;

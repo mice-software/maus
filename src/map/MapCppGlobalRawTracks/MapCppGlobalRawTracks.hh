@@ -41,7 +41,7 @@ class CovarianceMatrix;
 class GlobalEvent;
 class ReconEvent;
 class TOFSpacePoint;
-class SciFiSpacePoint;
+class SciFiTrackPoint;
 
 namespace DataStructure {
 namespace Global {
@@ -131,7 +131,7 @@ class MapCppGlobalRawTracks {
 
   void PopulateSciFiTrackPoint(
       const MAUS::recon::global::Detector & detector,
-      const std::vector<SciFiSpacePoint *>::const_iterator & scifi_space_point,
+      const std::vector<SciFiTrackPoint *>::const_iterator & scifi_track_point,
       MAUS::DataStructure::Global::TrackPoint * track_point);
 
 
