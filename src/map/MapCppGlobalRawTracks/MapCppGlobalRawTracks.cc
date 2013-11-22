@@ -665,6 +665,8 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
                                   0.,
                                   ::sqrt(covariances(2, 2)));
   track_point->set_momentum_error(momentum_errors);
+
+  // track_point->set_charge((*scifi_track_point)->get_npe());
 }
 
 /* Take an educated guess at the particle ID based on the axial velocity
