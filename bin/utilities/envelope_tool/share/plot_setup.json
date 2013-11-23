@@ -1,0 +1,46 @@
+{
+"type":"transient_frame",
+"name":"Plot Setup",
+"children":[{
+              "type":"horizontal_frame", 
+              "children":[{
+                  "type":"drop_down",
+                  "name":"variable_type_0",
+                  "entries":[
+                      "<Select plot type>",
+                      "mean",
+                      "envelope",
+                      "RMS",
+                      "beta",
+                      "alpha",
+                      "gamma",
+                      "emittance",
+                      "dispersion",
+                      "dispersion_prime"
+                  ],
+                  "selected":0
+              }, {
+                  "type":"drop_down",
+                  "name":"first_var_0",
+                  "entries":[""],
+                  "selected":0
+              }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"check_button",
+            "name":"plot_apertures",
+            "text":"Plot Apertures",
+            "default_state":1
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"button",
+            "name":"&Okay"
+          }, {
+              "type":"button",
+              "name":"&Cancel"
+        }]
+    }]
+}
