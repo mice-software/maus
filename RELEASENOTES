@@ -5,6 +5,10 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.7.5
+  The following changes were made:
+    - stability fixes
+  If upgrading from a previous version, redo the entire installation
 MAUS-v0.7.4
   The following changes were made:
     - Step IV geometry and CDB interface
