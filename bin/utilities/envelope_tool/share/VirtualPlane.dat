@@ -1,0 +1,11 @@
+MiceModule VirtualPlane
+{
+    MiceModule VirtualPlane
+    {
+        Volume None
+        PropertyHep3Vector Position 0.0 0.0 0.0 mm
+        PropertyString SensitiveDetector Virtual
+    }
+}
+
+
