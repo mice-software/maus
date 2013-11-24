@@ -103,9 +103,15 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
   for ( unsigned int event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
     MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
     SciFiDigitPArray digits;
+    SciFiMCLookupArray* lookups = new SciFiMCLookupArray;
     if ( mc_evt->GetSciFiHits() ) {
-      construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(),
-                       static_cast<int>(event_i), digits);
+      construct_digits(mc_evt->GetSciFiHits(),
+                       spill.GetSpillNumber(), static_cast<int>(event_i),
+                       digits);
+      for (int digit_i = 0; digit_i < digits.size(); digit_i++) {
+        SciFiMCLookup lookup(digits.at(digit_i));
+        (*lookups).push_back(lookup);
+      }
     }
     if ( mc_evt->GetSciFiNoiseHits() ) {
       add_noise(mc_evt->GetSciFiNoiseHits(), digits);
@@ -114,6 +120,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
+    mc_evt->SetSciFiLookup(lookups);
 
     // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
     // otherwise make a new Recon event to hold the SciFiEvent
@@ -154,17 +161,15 @@ void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
   }
 }
 
-void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
-                                                   int event_num, SciFiDigitPArray &digits) {
+void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits,
+                                                   int spill_num, int event_num,
+                                                   SciFiDigitPArray &digits) {
 
   for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
     if ( !hits->at(hit_i).GetChannelId()->GetUsed() ) {
+
       SciFiHit *a_hit = &hits->at(hit_i);
       a_hit->GetChannelId()->SetUsed(true);
-      int ID = digits.size() + 1000 * event_num + 1000000 * spill_num;
-      std::cerr<< "ID number for this hit: " << ID << "\n";
-      hits->at(hit_i).GetChannelId()->SetID(ID);
-      std::cerr << "ID number set in ChannelId: " << a_hit->GetChannelId()->GetID() << "\n";
 
       int chanNo = compute_chan_no(a_hit);
 
@@ -176,6 +181,18 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       double time1   = a_hit->GetTime();
       // int tdcCounts = compute_tdc_counts(time1);
 
+      // Pull tracker/station/plane information from geometry
+      int tracker = a_hit->GetChannelId()->GetTrackerNumber();
+      int station = a_hit->GetChannelId()->GetStationNumber();
+      int plane   = a_hit->GetChannelId()->GetPlaneNumber();
+
+      // Create Digit for use with MC lookup, will update NPE later
+      SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
+                                           tracker, station, plane, chanNo, nPE, time1);
+
+      SciFiMCLookup lookup(a_digit);
+      a_hit->GetChannelId()->SetID(lookup.GetID());
+
       // Loop over all the other hits.
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
@@ -183,21 +200,19 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
           double edep_j = same_digit->GetEnergyDeposited();
           nPE += edep_j*_eV_to_phe;
           same_digit->GetChannelId()->SetUsed(true);
-          hits->at(hit_j).GetChannelId()->SetID(ID);
+          same_digit->GetChannelId()->SetID(lookup.GetID());
         }
       } // ends loop over all the array
-      int tracker = a_hit->GetChannelId()->GetTrackerNumber();
-      int station = a_hit->GetChannelId()->GetStationNumber();
-      int plane   = a_hit->GetChannelId()->GetPlaneNumber();
 
-      SciFiDigit *a_digit = new SciFiDigit(spill_num, event_num,
-                                           tracker, station, plane, chanNo, nPE, time1);
+      a_digit->set_npe(nPE);
+
       // .start. TO BE REMOVED .start.//
       ThreeVector position = a_hit->GetPosition();
       ThreeVector momentum = a_hit->GetMomentum();
       a_digit->set_true_position(position);
       a_digit->set_true_momentum(momentum);
       // .end. TO BE REMOVED .end.//
+
       digits.push_back(a_digit);
     }
   } // ends 'for' loop over hits
@@ -227,27 +242,25 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noise,
         double digit_npe = digits.at(digit_i)->get_npe();
         double noise_npe = noise->at(noise_j).GetNPE();
         digits.at(digit_i)->set_npe(digit_npe + noise_npe);
+        SciFiMCLookup lookup(digits.at(digit_i));
         noise->at(noise_j).SetUsed(true);
-        int ID = digit_i + 1000 * digits.at(digit_i)->get_event()
-                         + 1000000 * digits.at(digit_i)->get_spill();
-        noise->at(noise_j).SetID(ID);
+        noise->at(noise_j).SetID(lookup.GetID());
         continue;
 
         // Checks if noise is one channel removed from a digit
-      } else if(digits.at(digit_i)->get_tracker() == noise->at(noise_j).GetTracker() &&
-                digits.at(digit_i)->get_station() == noise->at(noise_j).GetStation() &&
-                digits.at(digit_i)->get_plane()   == noise->at(noise_j).GetPlane()   &&
-                abs(digits.at(digit_i)->get_channel() - noise->at(noise_j).GetChannel()) <= 1.0 &&
-                noise->at(noise_j).GetUsed() == false) {
+      } else if (digits.at(digit_i)->get_tracker() == noise->at(noise_j).GetTracker() &&
+                 digits.at(digit_i)->get_station() == noise->at(noise_j).GetStation() &&
+                 digits.at(digit_i)->get_plane()   == noise->at(noise_j).GetPlane()   &&
+                 abs(digits.at(digit_i)->get_channel() - noise->at(noise_j).GetChannel()) <= 1.0 &&
+                 noise->at(noise_j).GetUsed() == false) {
         SciFiNoiseHit a_noise = noise->at(noise_j);
         SciFiDigit* a_digit = new SciFiDigit(a_noise.GetSpill(), a_noise.GetEvent(),
                            a_noise.GetTracker(), a_noise.GetStation(), a_noise.GetPlane(),
                            a_noise.GetChannel(), a_noise.GetNPE(), a_noise.GetTime());
-        int ID = digits.size() + 1000 * digits.at(digit_i)->get_event()
-                               + 1000000 * digits.at(digit_i)->get_spill();
         digits.push_back(a_digit);
+        SciFiMCLookup lookup(a_digit);
         noise->at(noise_j).SetUsed(true);
-        noise->at(noise_j).SetID(ID);
+        noise->at(noise_j).SetID(lookup.GetID());
         continue;
       }
     }
@@ -255,19 +268,17 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noise,
     // Checks if noise is above NPE cutoff
     if (noise->at(noise_j).GetNPE() >= _SciFiNPECut &&
         noise->at(noise_j).GetUsed() == false) {
-        std::cerr<<"Condition 3\n";
       SciFiNoiseHit a_noise = noise->at(noise_j);
       SciFiDigit* a_digit = new SciFiDigit(a_noise.GetSpill(), a_noise.GetEvent(),
-                                           a_noise.GetTracker(), a_noise.GetStation(), 
+                                           a_noise.GetTracker(), a_noise.GetStation(),
                                            a_noise.GetPlane(), a_noise.GetChannel(),
                                            a_noise.GetNPE(), a_noise.GetTime());
-     int ID = digits.size() + 1000 * noise->at(noise_j).GetEvent()
-                            + 1000000 * noise->at(noise_j).GetSpill();
       digits.push_back(a_digit);
+      SciFiMCLookup lookup(a_digit);
       noise->at(noise_j).SetUsed(true);
-      noise->at(noise_j).SetID(ID);
+      noise->at(noise_j).SetID(lookup.GetID());
     }
-  }  
+  }
 }
 
 int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {

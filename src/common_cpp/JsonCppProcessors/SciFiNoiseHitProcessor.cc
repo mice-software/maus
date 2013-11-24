@@ -46,7 +46,7 @@ SciFiNoiseHitProcessor::SciFiNoiseHitProcessor() {
     RegisterValueBranch("used", &_bool_proc,
                         &SciFiNoiseHit::GetUsed,
                         &SciFiNoiseHit::SetUsed, true);
-    RegisterValueBranch("digit_id", &_int_proc,
+    RegisterValueBranch("digit_id", &_double_proc,
                         &SciFiNoiseHit::GetID,
                         &SciFiNoiseHit::SetID, true);
 }

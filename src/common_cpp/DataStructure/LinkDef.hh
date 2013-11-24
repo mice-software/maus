@@ -97,6 +97,9 @@
 
 #pragma link C++ class MAUS::SciFiNoiseHit+;
 #pragma link C++ class std::vector<MAUS::SciFiNoiseHit*>+;
+#pragma link C++ class MAUS::SciFiMCLookup+;
+#pragma link C++ class std::vector<MAUS::SciFiMCLookup*>+;
+
 
 #pragma link C++ class MAUS::VLSB+;
 #pragma link C++ class std::vector<MAUS::VLSB>;

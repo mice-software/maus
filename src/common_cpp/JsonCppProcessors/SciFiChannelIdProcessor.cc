@@ -31,7 +31,7 @@ SciFiChannelIdProcessor::SciFiChannelIdProcessor() {
     RegisterValueBranch("plane_number", &_int_proc,
                         &SciFiChannelId::GetPlaneNumber,
                         &SciFiChannelId::SetPlaneNumber, true);
-    RegisterValueBranch("digit_id", &_int_proc,
+    RegisterValueBranch("digit_id", &_double_proc,
                         &SciFiChannelId::GetID,
                         &SciFiChannelId::SetID, false);
 }

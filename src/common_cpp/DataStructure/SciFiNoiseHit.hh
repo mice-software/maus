@@ -40,12 +40,12 @@ class SciFiNoiseHit {
 
     /** Destructor (does nothing)*/
     virtual ~SciFiNoiseHit();
-	
+
     /** Get the spill number */
     int GetSpill() const { return _spill; }
     /** Set the spill number */
     void SetSpill(int spill) { _spill = spill; }
-	
+
     /** Get the event number */
     int GetEvent() const {return _event;}
     /** Set the event number */
@@ -65,44 +65,43 @@ class SciFiNoiseHit {
     int GetPlane() const {return _plane;}
     /** Set the plane number */
     void SetPlane(int plane) {_plane = plane;}
-	
+
     /** Get the channel number */
     int GetChannel() const {return _channel;}
     /** Set the channel number */
     void SetChannel(int channel) {_channel = channel;}
-	
+
 	/** Get NPE */
 	double GetNPE() const {return _npe;}
 	/** Set NPE */
 	void SetNPE(double npe) {_npe = npe;}
-	
+
 	/** Get Time */
 	double GetTime() const {return _time;}
 	/** Set Time */
 	void SetTime(double time) {_time = time;}
-    
+
     /** Get Used */
     bool GetUsed() const {return _used;}
     /** Set Used */
     void SetUsed(bool used) {_used = used;}
-    
+
     /** Get the Hit-Digit ID */
-    int GetID() const {return _digit_id;}
+    double GetID() const {return _digit_id;}
     /** Set the Hit-Digit ID */
-    void SetID(int digit_id) {_digit_id = digit_id;}
+    void SetID(double digit_id) {_digit_id = digit_id;}
 
   private:
 	int _spill, _event;
 	int _tracker, _station, _plane, _channel;
 	double  _npe, _time;
     bool _used;
-    int _digit_id;
+    double _digit_id;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiNoiseHit)
 };
 
-typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
-
+// typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray
 }
 
 #endif

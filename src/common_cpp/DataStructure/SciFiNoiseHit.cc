@@ -36,7 +36,7 @@ SciFiNoiseHit::SciFiNoiseHit(const SciFiNoiseHit& noise)
     : _spill(noise._spill), _event(noise._event),
       _tracker(noise._tracker), _station(noise._station), _plane(noise._plane),
 	  _channel(noise._channel), _npe(noise._npe), _time(noise._npe), _used(noise._used),
-      _digit_id(noise._digit_id){
+      _digit_id(noise._digit_id) {
 }
 
 SciFiNoiseHit& SciFiNoiseHit::operator=(const SciFiNoiseHit& noise) {

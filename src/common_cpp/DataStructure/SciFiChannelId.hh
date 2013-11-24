@@ -66,12 +66,12 @@ class SciFiChannelId {
 
     /** Set the used flag */
     void SetUsed(bool used);
-    
+
     /** Get the Hit-Digit ID */
-    int GetID() const;
-    
+    double GetID() const;
+
     /** Set the Hit-Digit ID */
-    void SetID(int digit_id);
+    void SetID(double digit_id);
 
   private:
     int _fibre;
@@ -80,7 +80,7 @@ class SciFiChannelId {
     int _plane;
 
     bool _used;
-    int _digit_id;
+    double _digit_id;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiChannelId)
 };

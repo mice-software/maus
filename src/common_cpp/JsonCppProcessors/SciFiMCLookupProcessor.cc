@@ -14,27 +14,18 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-
-#include "src/common_cpp/DataStructure/SciFiChannelId.hh"
-
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
+#include "src/common_cpp/JsonCppProcessors/SciFiMCLookupProcessor.hh"
 
 namespace MAUS {
 
-/** @class SciFiChannelProcessor processor for the sci fi channel id */
-class SciFiChannelIdProcessor : public ObjectProcessor<SciFiChannelId> {
- public:
-    /** Constructor - registers the branch structure */
-    SciFiChannelIdProcessor();
+SciFiMCLookupProcessor::SciFiMCLookupProcessor() {
+    /*: _scifidigit_proc(new SciFiDigit()) { */
 
- private:
-    IntProcessor _int_proc;
-    DoubleProcessor _double_proc;
-};
+    RegisterValueBranch("digit_ID", &_double_proc,
+	                    &SciFiMCLookup::GetID,
+					    &SciFiMCLookup::SetID, true);
+// RegisterValueBranch ("digit", &_scifidigit_proc,
+//                      &SciFiMCLookup::GetDigit,
+// 					 &SciFiMCLookup::SetDigit, true);
 }
-
-#endif
-
+}
