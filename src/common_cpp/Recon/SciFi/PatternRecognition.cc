@@ -103,13 +103,13 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
     // Some setup
     evt.set_spacepoints_used_flag(false);
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
-    spnts_by_tracker = sort_by_tracker(evt.spacepoints());
+    spnts_by_tracker = SciFiTools::sort_by_tracker(evt.spacepoints());
 
     // Loop over trackers
     for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
       // Split spacepoints according to which station they occured in
       SpacePoint2dPArray spnts_by_station(_n_stations);
-      sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+      SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
 
       // Make the helical and straight tracks, depending on flags
       if ( _helical_pr_on ) {
@@ -121,10 +121,12 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
         make_all_tracks(track_type, trker_no, spnts_by_station, evt);
       }
     }// ~Loop over trackers
+    /*
     std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
     std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
+    */
   } else {
-    std::cout << "No spacepoints in event" << std::endl;
+    if (_debug > 0) std::cout << "No spacepoints in event" << std::endl;
   }
 };
 
@@ -132,7 +134,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
                                          SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) {
 
   // Count how many stations have at least one *unused* spacepoint
-  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  int num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
 
   // Make the tracks
   if (num_stations_hit == 5) {
@@ -141,14 +143,14 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_5tracks(track_type, trker_no, spnts_by_station, strks, htrks);
     add_tracks(trker_no, strks, htrks, evt);
   }
-  num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
   if (num_stations_hit > 3) {
     std::vector<SciFiStraightPRTrack*> strks;
     std::vector<SciFiHelicalPRTrack*> htrks;
     make_4tracks(track_type, trker_no, spnts_by_station, strks, htrks);
     add_tracks(trker_no, strks, htrks, evt);
   }
-  num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
   if (num_stations_hit > 2  && track_type != 1) { // No 3pt tracks for helical
     std::vector<SciFiStraightPRTrack*> strks;
     std::vector<SciFiHelicalPRTrack*> htrks;
@@ -194,7 +196,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
   int n_points = 4;
 
   // Count how many stations have at least one *unused* spacepoint
-  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  int num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
 
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
@@ -203,7 +205,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
 
     for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
       // Recount how many stations have at least one unused spacepoint
-      num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+      num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
       // If there are enough occupied stations left to make a 4 point track, keep making tracks
       if ( num_stations_hit  >= n_points ) {
         std::vector<int> ignore_stations(1, i);
@@ -223,7 +225,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
-    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    SciFiTools::stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
 
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
@@ -254,7 +256,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
   int n_points = 3;
 
   // Count how many stations have at least one *unused* spacepoint
-  int num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+  int num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
 
   bool sufficient_hit_stations = true;
 
@@ -268,7 +270,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
         for (int j = i + 1; j < 5; ++j) { // Loop of second station to ignore
           if ( sufficient_hit_stations ) {
             // Recount how many stations have at least one unused spacepoint
-            num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+            num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
             // If there are enough occupied stations left to make a 3pt track, keep making tracks
             if ( num_stations_hit  >= n_points ) {
               std::vector<int> ignore_stations;
@@ -288,14 +290,14 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
-    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    SciFiTools::stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
     std::vector<int> ignore_stations;
 
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 1 ) {
       for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
         // Recount how many stations have at least one unused spacepoint
-        num_stations_hit = num_stations_with_unused_spnts(spnts_by_station);
+        num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
         // If there are enough occupied stations left to make a 4 point track, keep making tracks
         if ( num_stations_hit  >= n_points ) {
           ignore_stations.clear();
@@ -315,7 +317,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
-    stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
+    SciFiTools::stations_with_unused_spnts(spnts_by_station, stations_hit, stations_not_hit);
 
     // Make the tracks
     if ( static_cast<int>(stations_not_hit.size()) == 2 ) {
@@ -355,14 +357,14 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
     // Check the outer spacepoint is unused and enough stations are left with unused sp
     if ( spnts_by_station[o_st_num][outer_sp]->get_used() ||
-          num_stations_with_unused_spnts(spnts_by_station) < n_points) continue;
+          SciFiTools::num_stations_with_unused_spnts(spnts_by_station) < n_points) continue;
 
     // Loop over spacepoints in inner station
     for ( size_t inner_sp = 0; inner_sp < spnts_by_station[i_st_num].size(); ++inner_sp ) {
 
       // Check the inner spacepoint is unused and enough stations are left with unused sp
       if ( spnts_by_station[i_st_num][inner_sp]->get_used() ||
-           num_stations_with_unused_spnts(spnts_by_station) < n_points ) continue;
+           SciFiTools::num_stations_with_unused_spnts(spnts_by_station) < n_points ) continue;
 
       // Vector to hold the good spacepoints in each station
       std::vector<SciFiSpacePoint*> good_spnts;
@@ -373,8 +375,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
       // Draw a straight line between spacepoints in outer most and inner most stations
       SimpleLine line_x, line_y;
-      draw_line(spnts_by_station[o_st_num][outer_sp],
-                spnts_by_station[i_st_num][inner_sp], line_x, line_y);
+      SciFiTools::draw_line(spnts_by_station[o_st_num][outer_sp],
+                            spnts_by_station[i_st_num][inner_sp], line_x, line_y);
 
       // Loop over intermediate stations and compare spacepoints with the line
       for ( int st_num = i_st_num + 1; st_num < o_st_num; ++st_num ) {
@@ -391,7 +393,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
             if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
               SciFiSpacePoint *sp = spnts_by_station[st_num][sp_no];
               double dx = 0, dy = 0;
-              calc_straight_residual(sp, line_x, line_y, dx, dy);
+              SciFiTools::calc_straight_residual(sp, line_x, line_y, dx, dy);
               if ( _debug > 1 ) {
                 *_f_res << trker_no << "\t" << st_num << "\t" << n_points << "\t";
                 *_f_res << dx << "\t" << dy << "\n";
@@ -415,7 +417,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
             SciFiSpacePoint * sp = spnts_by_station[st_num][best_sp];
             good_spnts.push_back(sp);
             double dx = 0, dy = 0;
-            calc_straight_residual(sp, line_x, line_y, dx, dy);
+            SciFiTools::calc_straight_residual(sp, line_x, line_y, dx, dy);
             if ( _debug > 1 ) {
               *_f_res_chosen << trker_no << "\t" << st_num << "\t" << n_points << "\t";
               *_f_res_chosen << dx << "\t" << dy << "\n";
@@ -596,7 +598,8 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   // Loop over the spacepoints
   for (std::vector<SciFiSpacePoint*>::const_iterator it = spnts.begin(); it != spnts.end(); ++it) {
     z_i.push_back((*it)->get_position().z());
-    phi_i.push_back(calc_phi((*it)->get_position().x(), (*it)->get_position().y(), circle));
+    phi_i.push_back(SciFiTools::calc_phi((*it)->get_position().x(),
+                    (*it)->get_position().y(), circle));
 
 
     // Set the phi_i errors
@@ -619,7 +622,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Using the circle radius and the true_dphi, calc the s_i (distance in x-y between sp)
-  std::vector<double> s_i = phi_to_s(circle.get_R(), true_phi_i);
+  std::vector<double> s_i = SciFiTools::phi_to_s(circle.get_R(), true_phi_i);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
   _lsq.linear_fit(z_i, s_i, phi_err, line_sz);
@@ -684,7 +687,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       close_dphi[j] = close_dphi.back() * ( dz[j] / dz.back());
 
       // If a sufficiently small residual is produced, accept current n as correct, for this angle
-      double remainder = my_mod(close_dphi[j], 2*CLHEP::pi);
+      double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
       // std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j]
       //          << "\t" << remainder << "\t" << residual << std::endl;
@@ -706,7 +709,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     } else {
       charge = 1;
     }
-    std::cout << "Found particle track with charge " << charge << std::endl;
+    // std::cout << "Found particle track with charge " << charge << std::endl;
 
     // Transfor dphi to phi
     for (size_t i = 0; i < close_dphi.size(); ++i) {
@@ -731,31 +734,6 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     return false;
   }
 };
-
-double PatternRecognition::my_mod(const double num, const double denom) {
-  return num - (denom * floor(num / denom));
-};
-
-
-double PatternRecognition::calc_phi(double xpos, double ypos, const SimpleCircle &circle) {
-    // Note this function returns phi_i + phi_0, unless using x0, y0 in which case it returns phi_0
-    double angle = atan2(ypos - circle.get_y0(), xpos - circle.get_x0());
-    if ( angle < 0. ) angle += 2. * CLHEP::pi; // TODO is this ok if have different sign particles?
-
-    // std::cerr << "calc_phi: x is " << xpos << ", y is " << ypos << ", R is " << circle.get_R();
-    // std::cerr << ", X0 is " << circle.get_x0() << ", Y0 is " << circle.get_y0();
-    // std::cerr << ", phi is " << angle << "\n";
-
-    return angle;
-} // ~calculate_phi(...)
-
-std::vector<double> PatternRecognition::phi_to_s(const double R, const std::vector<double> &phi) {
-  std::vector<double> s_i;
-  for ( int i = 0; i < static_cast<int>(phi.size()); ++i ) {
-    s_i.push_back(phi[i] * R);
-  }
-  return s_i;
-} // ~dphi_to_ds(...)
 
 bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts) {
 
@@ -944,69 +922,6 @@ bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_station
   return true;
 } // ~set_seed_stations(...)
 
-void PatternRecognition::sort_by_station(const std::vector<SciFiSpacePoint*> &spnts,
-                                         SpacePoint2dPArray &spnts_by_station) {
-  for ( int st_num = 0; st_num < static_cast<int>(spnts_by_station.size()); ++st_num ) {
-    for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-      if ( spnts[i]->get_station() == st_num + 1 ) {
-        spnts_by_station[st_num].push_back(spnts[i]);
-      }
-    }
-  }
-} // ~sort_by_station(...)
-
-SpacePoint2dPArray PatternRecognition::sort_by_tracker(const SciFiSpacePointPArray &spnts) {
-  SpacePoint2dPArray spnts_by_tracker(_n_trackers);
-  for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
-    for ( size_t i = 0; i < spnts.size(); ++i ) {
-      if ( spnts[i]->get_tracker() == trker_no ) {
-        spnts_by_tracker[trker_no].push_back(spnts[i]);
-      }
-    }
-  }
-  return spnts_by_tracker;
-}
-
-int PatternRecognition::num_stations_with_unused_spnts(
-                                                    const SpacePoint2dPArray &spnts_by_station) {
-
-  int stations_hit = 0;
-
-  for ( int i = 0; i < static_cast<int>(spnts_by_station.size()); ++i ) {
-    int unused_sp = 0;
-    for ( int j = 0; j < static_cast<int>(spnts_by_station[i].size()); ++j ) {
-      if ( !spnts_by_station[i][j]->get_used() ) {
-        ++unused_sp;
-      }
-    }
-    if ( unused_sp > 0 ) {
-      ++stations_hit;
-    }
-  }
-  return stations_hit;
-} // ~num_stations_with_unused_spnts(...)
-
-void PatternRecognition::stations_with_unused_spnts(const SpacePoint2dPArray &spnts_by_station,
-                                                    std::vector<int> &stations_hit,
-                                                    std::vector<int> &stations_not_hit) {
-  stations_hit.clear();
-  stations_not_hit.clear();
-
-  for ( int i = 0; i < static_cast<int>(spnts_by_station.size()); ++i ) {
-    int unused_sp = 0;
-    for ( int j = 0; j < static_cast<int>(spnts_by_station[i].size()); ++j ) {
-      if ( !spnts_by_station[i][j]->get_used() ) {
-        ++unused_sp;
-      }
-    }
-    if ( unused_sp > 0 ) {
-      stations_hit.push_back(i);
-    } else if ( unused_sp == 0 ) {
-      stations_not_hit.push_back(i);
-    }
-  }
-} // ~stations_with_unused_spnts(...)
-
 bool PatternRecognition::set_ignore_stations(const std::vector<int> &ignore_stations,
                                              int &ignore_st_1, int &ignore_st_2) {
   ignore_st_1 = -1, ignore_st_2 = -1;
@@ -1023,97 +938,5 @@ bool PatternRecognition::set_ignore_stations(const std::vector<int> &ignore_stat
   }
   return true;
 } // ~set_ignore_stations(...)
-
-void PatternRecognition::draw_line(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2,
-                                   SimpleLine &line_x, SimpleLine &line_y) {
-
-  ThreeVector pos_outer = sp1->get_position();
-  ThreeVector pos_inner = sp2->get_position();
-
-  line_x.set_m(( pos_inner.x() - pos_outer.x()) / (pos_inner.z() - pos_outer.z() ));
-  line_x.set_c(pos_outer.x() - ( pos_outer.z() * line_x.get_m()) );
-  line_y.set_m(( pos_inner.y() - pos_outer.y()) / (pos_inner.z() - pos_outer.z() ));
-  line_y.set_c(pos_outer.y() - ( pos_outer.z() *  line_y.get_m() ));
-} // ~draw_line(...)
-
-void PatternRecognition::calc_straight_residual(const SciFiSpacePoint *sp, const SimpleLine &line_x,
-                                       const SimpleLine &line_y, double &dx, double &dy) {
-
-    ThreeVector pos = sp->get_position();
-    dx = pos.x() - ( line_x.get_c() + ( pos.z() * line_x.get_m() ) );
-    dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
-} // ~calc_straight_residual(...)
-
-double PatternRecognition::calc_circle_residual(const SciFiSpacePoint *sp, const SimpleCircle &c) {
-    ThreeVector pos = sp->get_position();
-    double delta = sqrt(((pos.x()-c.get_x0()) * (pos.x()-c.get_x0())) +
-                        ((pos.y()-c.get_y0()) * (pos.y()-c.get_y0()))) - c.get_R();
-    return delta;
-} // ~calc_circle_residual(...)
-
-SimpleCircle PatternRecognition::make_3pt_circle(const SciFiSpacePoint *sp1,
-                                                 const SciFiSpacePoint *sp2,
-                                                 const SciFiSpacePoint *sp3) {
-  SimpleCircle c;
-  ThreeVector pos1 = sp1->get_position();
-  ThreeVector pos2 = sp2->get_position();
-  ThreeVector pos3 = sp3->get_position();
-
-  // Calculate alpha
-  Double_t arr_a[] = {pos1.x(), pos1.y(), 1.0,
-                      pos2.x(), pos2.y(), 1.0,
-                      pos3.x(), pos3.y(), 1.0};
-  TMatrixD mat_a(3, 3, arr_a);
-  double alpha = det3by3(mat_a);
-  c.set_alpha(alpha);
-
-  // Calculate beta
-  Double_t arr_b[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.y(), 1.0,
-                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.y(), 1.0,
-                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.y(), 1.0};
-  TMatrixD mat_b(3, 3, arr_b);
-  double beta = - det3by3(mat_b);
-  c.set_beta(beta);
-
-  // Calculate gamma
-  Double_t arr_g[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.x(), 1.0,
-                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.x(), 1.0,
-                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.x(), 1.0};
-  TMatrixD mat_g(3, 3, arr_g);
-  double gamma = det3by3(mat_g);
-  c.set_gamma(gamma);
-
-  // Calculate kappa
-  Double_t arr_k[] = {(pos1.x()*pos1.x())+(pos1.y()*pos1.y()), pos1.x(), pos1.y(),
-                      (pos2.x()*pos2.x())+(pos2.y()*pos2.y()), pos2.x(), pos2.y(),
-                      (pos3.x()*pos3.x())+(pos3.y()*pos3.y()), pos3.x(), pos3.y()};
-  TMatrixD mat_k(3, 3, arr_k);
-  double kappa = - det3by3(mat_k);
-  c.set_kappa(kappa);
-
-  // Calculate the dependent parameters
-  double x0 = - beta / (2 * alpha);
-  c.set_x0(x0);
-
-  double y0 = - gamma / (2 * alpha);
-  c.set_y0(y0);
-
-  double R = sqrt(((beta*beta+gamma*gamma)/(4*alpha*alpha))-(kappa/alpha));
-  c.set_R(R);
-
-  return c;
-} // ~make_3pt_circle
-
-double PatternRecognition::det3by3(const TMatrixD &m) {
-  if ( m.GetNrows() == 3 && m.GetNcols() == 3 ) {
-    double det = m(0, 0)*(m(1, 1)*m(2, 2)-m(1, 2)*m(2, 1)) +
-                 m(0, 1)*(m(1, 2)*m(2, 0)-m(1, 0)*m(2, 2)) +
-                 m(0, 2)*(m(1, 0)*m(2, 1)-m(1, 1)*m(2, 0));
-    return det;
-  } else {
-    std::cerr << "Error: PatternRecognition::det3by3 says: Bad matrix given" << std::endl;
-    return 0;
-  }
-}
 
 } // ~namespace MAUS
