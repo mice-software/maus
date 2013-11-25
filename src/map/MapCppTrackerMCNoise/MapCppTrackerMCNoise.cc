@@ -58,7 +58,6 @@ bool MapCppTrackerMCNoise::death() {
 
 std::string MapCppTrackerMCNoise::process(std::string document) {
   Json::FastWriter writer;
-  std::cerr << "Start Process\n";
 
   // Set up a spill object, then continue only if MC event array is initialised
   read_in_json(document);
