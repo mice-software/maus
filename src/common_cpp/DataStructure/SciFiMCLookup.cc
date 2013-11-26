@@ -19,21 +19,21 @@
 
 namespace MAUS {
 
-SciFiMCLookup::SciFiMCLookup(): _digit_Id(0) {
+SciFiMCLookup::SciFiMCLookup(): _digit_Id(0), _noise(false), _noise_size(0) {
 }
 
 SciFiMCLookup::SciFiMCLookup(const SciFiMCLookup& lookup)
-    : _digit_Id(0) {
+    : _digit_Id(0), _noise(false), _noise_size(0) {
 	*this = lookup;
 }
 
-SciFiMCLookup::SciFiMCLookup(const SciFiDigit& digit) {
+SciFiMCLookup::SciFiMCLookup(const SciFiDigit& digit): _noise(false), _noise_size(0) {
 	_digit_Id = 1 * digit.get_channel() + 1000 * digit.get_plane() +
                 10000 * digit.get_station() + 100000 * digit.get_tracker() +
 				1000000 * digit.get_event() + 10000000 * digit.get_spill();
 }
 
-SciFiMCLookup::SciFiMCLookup(const SciFiDigit* digit) {
+SciFiMCLookup::SciFiMCLookup(const SciFiDigit* digit): _noise(false), _noise_size(0) {
 	_digit_Id = 1 * digit->get_channel() + 1000 * digit->get_plane() +
                 10000 * digit->get_station() + 100000 * digit->get_tracker() +
 				1000000 * digit->get_event() + 10000000 * digit->get_spill();
@@ -43,7 +43,9 @@ SciFiMCLookup& SciFiMCLookup::operator=(const SciFiMCLookup& lookup) {
     if (this == &lookup) {
         return *this;
     }
-	_digit_Id = lookup._digit_Id;
+	_digit_Id   = lookup._digit_Id;
+	_noise      = lookup._noise;
+	_noise_size = lookup._noise_size;
     return *this;
 }
 

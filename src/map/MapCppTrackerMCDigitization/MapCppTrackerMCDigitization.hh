@@ -86,7 +86,9 @@ class MapCppTrackerMCDigitization {
                         int spill_num, int event_num,
                         MAUS::SciFiDigitPArray &digits);
 
-  void add_noise(MAUS::SciFiNoiseHitArray *noise, MAUS::SciFiDigitPArray &digits);
+  void add_noise(MAUS::SciFiNoiseHitArray *noises, MAUS::SciFiDigitPArray &digits);
+
+  void lookup_noise(MAUS::SciFiNoiseHitArray *noises, MAUS::SciFiMCLookupArray *lookups);
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */

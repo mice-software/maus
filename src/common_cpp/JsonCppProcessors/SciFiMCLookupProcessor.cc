@@ -24,6 +24,12 @@ SciFiMCLookupProcessor::SciFiMCLookupProcessor() {
     RegisterValueBranch("digit_ID", &_double_proc,
 	                    &SciFiMCLookup::GetID,
 					    &SciFiMCLookup::SetID, true);
+	RegisterValueBranch("NoiseNPE", &_double_proc,
+	                    &SciFiMCLookup::GetNoiseNPE,
+						&SciFiMCLookup::SetNoiseNPE, true);
+	RegisterValueBranch("Noise", &_bool_proc,
+	                    &SciFiMCLookup::GetNoise,
+						&SciFiMCLookup::SetNoise, true);
 // RegisterValueBranch ("digit", &_scifidigit_proc,
 //                      &SciFiMCLookup::GetDigit,
 // 					 &SciFiMCLookup::SetDigit, true);

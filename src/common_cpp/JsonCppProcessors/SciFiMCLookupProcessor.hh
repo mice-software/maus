@@ -34,6 +34,7 @@ class SciFiMCLookupProcessor : public ObjectProcessor<SciFiMCLookup> {
 
   private:
     DoubleProcessor _double_proc;
+    BoolProcessor _bool_proc;
 //  ValueArrayProcessor<SciFiDigit> _scifidigit_proc;
 };
 }

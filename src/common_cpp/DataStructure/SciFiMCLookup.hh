@@ -47,8 +47,20 @@ class SciFiMCLookup {
 	/** Set ID number */
 	void SetID(double digit_Id) { _digit_Id = digit_Id; }
 
+	/** Return true or false, is noise part of this digit? */
+	bool GetNoise() const {return _noise;}
+	/** Set noise truth */
+	void SetNoise(bool noise) {_noise = noise;}
+
+	/** Get noise size in NPE */
+	double GetNoiseNPE() const {return _noise_size;}
+	/** Set noise size in NPE */
+	void SetNoiseNPE(double noise_size) {_noise_size = noise_size;}
+
   private:
+    double _noise_size;
 	double _digit_Id;
+	bool _noise;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiMCLookup)
 };
