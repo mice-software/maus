@@ -17,23 +17,23 @@
 
 #include "gtest/gtest.h"
 
-#include "src/common_cpp/Recon/SciFi/LSQFit.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 
 namespace MAUS {
 
-class LSQFitTest : public ::testing::Test {
+class LeastSquaresFitterTest : public ::testing::Test {
  protected:
-  LSQFitTest()  {}
-  virtual ~LSQFitTest() {}
+  LeastSquaresFitterTest()  {}
+  virtual ~LeastSquaresFitterTest() {}
   virtual void SetUp()    {}
   virtual void TearDown() {}
 };
 
-TEST_F(LSQFitTest, test_circle_fit) {
+TEST_F(LeastSquaresFitterTest, test_circle_fit) {
 
-  LSQFit lsq(0.3844, 0.4298, 150.0);
+  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
 
   // Set up spacepoints from an MC helical track
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
@@ -78,9 +78,9 @@ TEST_F(LSQFitTest, test_circle_fit) {
   EXPECT_NEAR(circle.get_chisq(), 0.0994, epsilon);
 }
 
-TEST_F(LSQFitTest, test_linear_fit) {
+TEST_F(LeastSquaresFitterTest, test_linear_fit) {
 
-  LSQFit lsq(0.3844, 0.4298, 150.0);
+  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
 
   // Test with a simple line, c = 2, m = 1, with three points, small errors
   std::vector<double> x, y, y_err;

@@ -34,7 +34,7 @@
 #include "TMatrixD.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/LSQFit.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
@@ -269,7 +269,7 @@ class PatternRecognition {
     static const double _Pt_max = 180.; /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     static const double _Pz_min = 50.;  /** MeV/c min Pz for helical tracks (this is a guess) */
 
-    LSQFit _lsq;  /** The linear least squares fitting class instance */
+    LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
 
     // Some output files - only to be kept when in development stages
     std::ofstream * _f_res;

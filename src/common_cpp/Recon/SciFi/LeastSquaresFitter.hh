@@ -15,14 +15,14 @@
  *
  */
 
-/** @class LSQFit
+/** @class LeastSquaresFitter
  *
  * Least Squares Fitting algorithms encapsulated in a class
  *
  */
 
-#ifndef LSQFIT_HH
-#define LSQFIT_HH
+#ifndef LEASTSQUARESFITTER_HH
+#define LEASTSQUARESFITTER_HH
 
 // C++ headers
 #include <vector>
@@ -34,16 +34,16 @@
 
 namespace MAUS {
 
-class LSQFit {
+class LeastSquaresFitter {
   public:
 
     /** @brief Default constructor
      */
-    LSQFit(double sd_1to4, double sd_5, double R_res_cut);
+    LeastSquaresFitter(double sd_1to4, double sd_5, double R_res_cut);
 
     /** @brief Default destructor, does nothing
      */
-    ~LSQFit();
+    ~LeastSquaresFitter();
 
     /** @brief Set the member variables using the Global singleton class */
     bool LoadGlobals();

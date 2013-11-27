@@ -20,21 +20,21 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/LSQFit.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
 namespace MAUS {
 
-LSQFit::LSQFit(double sd_1to4, double sd_5, double R_res_cut) {
+LeastSquaresFitter::LeastSquaresFitter(double sd_1to4, double sd_5, double R_res_cut) {
   _sd_1to4 = sd_1to4;
   _sd_5 = sd_5;
   _R_res_cut = R_res_cut;
 }
 
-LSQFit::~LSQFit() {}
+LeastSquaresFitter::~LeastSquaresFitter() {}
 
-bool LSQFit::LoadGlobals() {
+bool LeastSquaresFitter::LoadGlobals() {
   if (!Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
     _sd_1to4 = (*json)["SciFiSD1To4"].asDouble();
@@ -46,7 +46,7 @@ bool LSQFit::LoadGlobals() {
   }
 }
 
-void LSQFit::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
+void LeastSquaresFitter::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
                         const std::vector<double> &_y_err, SimpleLine &line) {
 
   int n_points = static_cast<int>(_x.size());
@@ -86,7 +86,8 @@ void LSQFit::linear_fit(const std::vector<double> &_x, const std::vector<double>
   line.set_chisq_dof(result[0][0] / n_points);
 } // ~linear_fit(...)
 
-bool LSQFit::circle_fit(const std::vector<SciFiSpacePoint*> &spnts, SimpleCircle &circle) {
+bool LeastSquaresFitter::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
+                                    SimpleCircle &circle) {
 
   int n_points = static_cast<int>(spnts.size());
   CLHEP::HepMatrix A(n_points, 3); // rows, columns

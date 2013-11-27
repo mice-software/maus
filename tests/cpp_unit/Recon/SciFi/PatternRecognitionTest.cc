@@ -21,7 +21,7 @@
 
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
-#include "src/common_cpp/Recon/SciFi/LSQFit.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
@@ -1078,7 +1078,7 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   spnts.push_back(sp4);
   spnts.push_back(sp5);
 
-  LSQFit lsq(0.3844, 0.4298, 150.0);
+  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
   SimpleCircle circle;
   bool good_radius = lsq.circle_fit(spnts, circle);
 
