@@ -16,25 +16,26 @@
 
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiDigitProcessor.hh"
 
-#include "src/common_cpp/DataStructure/SciFiChannelId.hh"
+#include "src/common_cpp/DataStructure/SciFiMCLookup.hh"
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFICHANNELIDPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFIMCLOOKUPPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_SCIFIMCLOOKUPPROCESSOR_HH_
 
 namespace MAUS {
 
-/** @class SciFiChannelProcessor processor for the sci fi channel id */
-class SciFiChannelIdProcessor : public ObjectProcessor<SciFiChannelId> {
- public:
+/** @class SciFiMCLookupProcessor processor for SciFiMCLookup */
+class SciFiMCLookupProcessor : public ObjectProcessor<SciFiMCLookup> {
+  public:
     /** Constructor - registers the branch structure */
-    SciFiChannelIdProcessor();
+	SciFiMCLookupProcessor();
 
- private:
-    IntProcessor _int_proc;
+  private:
     DoubleProcessor _double_proc;
+    BoolProcessor _bool_proc;
+//  ValueArrayProcessor<SciFiDigit> _scifidigit_proc;
 };
 }
-
 #endif
-
