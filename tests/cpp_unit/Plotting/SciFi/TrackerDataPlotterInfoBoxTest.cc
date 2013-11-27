@@ -23,7 +23,7 @@
 #include "gtest/gtest_prod.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
 
 namespace MAUS {
 

@@ -31,8 +31,8 @@
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataManager.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
 
 namespace MAUS {
 

@@ -17,7 +17,7 @@
 
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
 
 namespace MAUS {
 

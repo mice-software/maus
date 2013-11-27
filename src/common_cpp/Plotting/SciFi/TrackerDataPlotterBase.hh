@@ -31,7 +31,7 @@
 #include "TCanvas.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
 
 namespace MAUS {
 

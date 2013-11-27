@@ -22,7 +22,7 @@
 #include "TAxis.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSZ.hh"
 
 
 namespace MAUS {

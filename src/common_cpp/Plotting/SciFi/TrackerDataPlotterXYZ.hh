@@ -30,10 +30,10 @@
 #include "TGraph.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterTracks.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSpoints.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterTracks.hh"
 
 
 namespace MAUS {

@@ -27,8 +27,8 @@
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSpoints.hh"
 
 namespace MAUS {
 

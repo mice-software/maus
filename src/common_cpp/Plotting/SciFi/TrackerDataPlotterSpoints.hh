@@ -15,44 +15,49 @@
  *
  */
 
-/** @class TrackerDataPlotterSZ
+/** @class TrackerDataPlotterSpoints
  *
- *  Plots the tracker seed spacepoints in s-z for both trackers, including the fits, using ROOT
+ *  Plots the tracker spacepoints in xy, zx, yz for both trackers, using ROOT
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSZ_
-#define _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSZ_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSPOINTS_
+#define _SRC_COMMON_CPP_RECON_SCIFI_TRACKERDATAPLOTTERSPOINTS_
 
 // ROOT headers
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
 
 
 namespace MAUS {
 
-class TrackerDataPlotterSZ : public TrackerDataPlotterBase {
+class TrackerDataPlotterSpoints : public TrackerDataPlotterBase {
   public:
     // Macros to allow friendship with the gtests
-    FRIEND_TEST(TrackerDataPlotterSZTest, TestConstructor);
-    FRIEND_TEST(TrackerDataPlotterSZTest, TestBrackets);
+    FRIEND_TEST(TrackerDataPlotterSpointsTest, TestConstructor);
+    FRIEND_TEST(TrackerDataPlotterSpointsTest, TestBrackets);
 
     /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
-    TrackerDataPlotterSZ();
+    TrackerDataPlotterSpoints();
 
     /** Destructor. Delete graph objects (member canvas is deleted by base class). */
-    virtual ~TrackerDataPlotterSZ();
+    virtual ~TrackerDataPlotterSpoints();
 
     /** Overloaded brackets operator, takes in the data, does all the work */
     TCanvas* operator() ( TrackerData &t1, TrackerData &t2, TCanvas* aCanvas = NULL);
 
   protected:
-    TGraph *_gr_sz1;
-    TGraph *_gr_sz2;
+    TGraph *_gr_xy1;
+    TGraph *_gr_zx1;
+    TGraph *_gr_zy1;
+    TGraph *_gr_xy2;
+    TGraph *_gr_zx2;
+    TGraph *_gr_zy2;
 };
 
 } // ~namespace MAUS

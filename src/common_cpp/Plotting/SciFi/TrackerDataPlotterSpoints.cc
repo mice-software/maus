@@ -19,7 +19,7 @@
 #include "TAxis.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSpoints.hh"
 
 
 namespace MAUS {
