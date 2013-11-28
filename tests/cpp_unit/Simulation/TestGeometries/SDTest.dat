@@ -1,0 +1,66 @@
+
+Module SDTest
+{
+  PropertyString Material Galactic
+  PropertyHep3Vector Dimensions 10. 10. 8. m
+  PropertyInt Cell 1
+  PropertyInt Slab 1
+  PropertyInt Plane 1
+  PropertyInt Station 1
+  PropertyDouble CentralFibre 1
+  PropertyDouble Pitch 1
+  PropertyInt Tracker 1
+  PropertyDouble G4StepMax 1000. mm
+  Module TOF
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 0. m
+    PropertyString     SensitiveDetector TOF
+  }
+  Module SciFi
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 0.5 m
+    PropertyString     SensitiveDetector SciFi
+  }
+  Module SpecialSD
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 1.0 m
+    PropertyString     SensitiveDetector SpecialVirtual
+  }
+  Module Ckov
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 1.5 m
+    // CKOV SD does not inherit from MAUSSD and will not produce any MC
+    PropertyString     SensitiveDetector CKOV
+  }
+  Module KL
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 2.0 m
+    // KL SD does not inherit from MAUSSD and will not produce any MC
+    //PropertyString     SensitiveDetector KL
+  }
+  Module Virtual
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 2.5 m
+    PropertyString     SensitiveDetector Virtual
+  }
+  Module Envelope
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 3.0 m
+    PropertyString     SensitiveDetector Envelope
+  }
+}
+

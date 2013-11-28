@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 # MAUS is free software: you can redistribute it and/or modify

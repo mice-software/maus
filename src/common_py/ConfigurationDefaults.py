@@ -39,6 +39,17 @@ output_json_file_type = "text"
 input_root_file_name = "maus_input.root"
 output_root_file_name = "maus_output.root"
 
+# one_big_file - puts everything in output_root_file_name
+# one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
+#                    maus_output_1111.root
+# end_of_run_file_per_run - as above, and places in 
+#        <end_of_run_output_root_directory>/<run_number>/<output_root_file_name>
+#      users responsibility to ensure that <end_of_run_output_root_directory> 
+#      exists but MAUS will make <run_number> subdirectories
+output_root_file_mode = "one_big_file"
+end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of_run/" \
+              if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
 # 0 = debug info (and std::cout)
@@ -99,7 +110,10 @@ keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_mu":False, "anti_nu_mu":False,
                           "nu_tau":False, "anti_nu_tau":False,
 }
-kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold
+max_step_length = 100. # default maximum step size during tracking (override with G4StepMax in MiceModule)
+max_track_time = 1.e9 # kill tracks with time above max_time (override with G4TimeMax in MiceModule)
+max_track_length = 1.e8 # kill tracks with track length above max_track_length (override with G4TrackMax in MiceModule)
+kinetic_energy_threshold = 0.1 # kill tracks with initial kinetic energy below energy_threshold (override with G4KinMin in MiceModule)
 field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
@@ -109,6 +123,7 @@ delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.
 miss_distance = -1.
+maximum_module_depth = 10 # maximum depth for MiceModules as used by the simulation
 
 # geant4 visualisation (not event display)
 geant4_visualisation = False
@@ -302,6 +317,24 @@ get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""
 
+# File Numbers
+# This following section gives the files numbers of each detector. The numbers speficy the technical drawing
+# number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
+# and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
+tof_0_file_number = "Iges_10"
+tof_1_file_number = "Iges_11"
+tof_2_file_number = "Iges_13"
+ckov_file_number = "Iges_19"
+acc1_file_number = "Iges_20"
+acc2_file_number = "Iges_21"
+kl_file_number = "Iges_14"
+emr_file_number = "Iges_15"
+tracker0_file_number = "Iges_17"
+tracker1_file_number = "Iges_18"
+absorber0_file_number = "9999"
+absorber1_file_number = "Iges_16"
+absorber2_file_number = "9999"
+
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
@@ -345,19 +378,28 @@ TOFscintLightSpeed =  170.0 # mm/ns
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
-#TOF_trigger_station = "tof0"
+
+# this sets the source for the calibrations
+# by default it is from CDB
+# set it to 'file' if you want to load local files
+# if you set file, then uncomment the calib files below
+TOF_calib_source = "CDB"
+
 #TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePiontCut = 0.5 # nanosecond
+
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
 TOF_calib_date_from = 'current'
 TOF_cabling_date_from = 'current'
+
 Enable_timeWalk_correction = True
 Enable_triggerDelay_correction = True
 Enable_t0_correction = True
@@ -380,6 +422,8 @@ mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumen
 mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
 mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocucmentStore.
 
+# in multiprocessing mode, the timeout after which reconstruction of an event will be abandonded [s]
+reconstruction_timeout = 10
 # refresh rate for refreshing plots
 reduce_plot_refresh_rate = 5
 # Default OutputPyImage image directory. MAUS web application directory.
@@ -388,3 +432,14 @@ image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_
 end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+
+PolynomialOpticsModel_order = 1
+PolynomialOpticsModel_algorithms = ["LeastSquares",
+                    "ConstrainedLeastSquares", "ConstrainedChiSquared",
+                    "SweepingChiSquared", "SweepingChiSquaredWithVariableWalls"]
+PolynomialOpticsModel_algorithm = "LeastSquares"
+# deltas for numerical derivative calculation of Optics transfer maps
+TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
+                                 "x":0.1, "Px":0.1,
+                                 "y":0.1, "Py":0.01}
+

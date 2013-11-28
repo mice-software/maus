@@ -1,0 +1,28 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 20. mm
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module Visible
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 4. mm
+    PropertyString Material lH2
+    PropertyDouble RedColour 0.5
+    PropertyDouble BlueColour 0.5
+    PropertyDouble GreenColour 0.5
+  }
+  Module Invisible
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 1. mm
+    PropertyHep3Vector Position 0. 0. 2. mm
+    PropertyString Material lH2
+    PropertyDouble RedColour 0.5
+    PropertyDouble BlueColour 0.5
+    PropertyDouble GreenColour 0.5
+    PropertyBool Invisible True
+  }
+}
+
