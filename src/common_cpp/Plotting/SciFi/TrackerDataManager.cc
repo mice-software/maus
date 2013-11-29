@@ -37,8 +37,8 @@
 namespace MAUS {
 
 TrackerDataManager::TrackerDataManager()
-  : _print_tracks(true),
-    _print_seeds(true) {
+  : _print_tracks(false),
+    _print_seeds(false) {
   // Do nothing
 };
 
@@ -48,8 +48,8 @@ TrackerDataManager::~TrackerDataManager() {
 
 void TrackerDataManager::process(const Spill *spill) {
   if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
-    std::cout << "\nOpening spill " << spill->GetSpillNumber() << std::endl;
-
+    if (_print_tracks || _print_seeds) std::cout << "TrackerDataManager: Opening spill "
+      << spill->GetSpillNumber() << std::endl;
     // Loop over recon events
     for (size_t i = 0; i < spill->GetReconEvents()->size(); ++i) {
       _t1._spill_num = spill->GetSpillNumber();

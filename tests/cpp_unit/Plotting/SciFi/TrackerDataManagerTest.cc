@@ -49,8 +49,8 @@ class TrackerDataManagerTest : public ::testing::Test {
 
 TEST_F(TrackerDataManagerTest, TestConstructor) {
   TrackerDataManager tdm;
-  EXPECT_TRUE(tdm._print_tracks);
-  EXPECT_TRUE(tdm._print_seeds);
+  EXPECT_FALSE(tdm._print_tracks);
+  EXPECT_FALSE(tdm._print_seeds);
 }
 
 TEST_F(TrackerDataManagerTest, TestDraw) {
