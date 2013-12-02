@@ -106,13 +106,104 @@ class TestFactory:
         """
         # iterates over histogrammed bunch and looks for impurity
         # better to use raw data...
+        impurity = 500./bunch.bunch_weight()
+        #if impurity > 0.01:
+            #impurity = 0.01
+        mean = bunch.mean([var])[var]
+        sigma = bunch.moment([var, var])**0.5
+        print "mean", mean
+        print "sigma" , sigma
+        n_bins = len(bunch)/500
+        min_max = [mean-7.*sigma, mean+7.*sigma]##
+        for count in range(2): # pylint: disable=W0612
+            bins = [min_max[0]+i*(min_max[1]-min_max[0])/float(n_bins) \
+                                                         for i in range(n_bins)]
+            hist = bunch.histogram_var_bins(var, bins, '')
+            values = [item[0] for item in hist[0]] # get rid of numpy array
+            min_max = [None, None]
+            sum_wt = 0.
+            for index, val in enumerate(values):
+                sum_wt += val/sum(values)
+                if min_max[0] == None and sum_wt > impurity/2.:
+                    min_max[0] = bins[index]
+                if min_max[1] == None and sum_wt > 1.-impurity/2.:
+                    min_max[1] = bins[index+1]
+            if min_max[0] == None:
+                min_max[0] = bins[0]
+            if min_max[1] == None:
+                min_max[1] = bins[-1]
+            delta = min_max[1] - min_max[0]
+            min_max[1] += delta*0.1
+            min_max[0] -= delta*0.1
+            
+        #min_max[1]=min_max[1]*10
+        #min_max[0]=min_max[0]*10
+        print "min max", min_max
+        return min_max
+      
+    _get_min_max = staticmethod(_get_min_max)
+
+    def build_ks_test(self, test, config, bunch):
+        """
+        Build a ks test based on a configuration and bunch data
+        """
+        pid = config['__pid__']
+        test.pid = pid
+        bunch.conditional_remove({'pid':pid}, operator.ne)
+        print len(bunch)
+        [xmin, xmax] = self._get_min_max(test.variable, bunch)
+        xmin *= Common.units[test.units]
+        xmax *= Common.units[test.units]
+        test.n_bins = config['__nev__']/500
+        test.contents = [index for index in range(test.n_bins)]
+        
+        test.bins = [(xmin+(xmax-xmin)*x/float(test.n_bins)) \
+                      for x in range(test.n_bins+1)] 
+ 
+        
+        print "bins:", test.bins, "content:", test.contents
+    
+        return test
+
+    
+    def build_chi2_test(self, test, config, bunch):\
+        #pylint:disable=R0902,C0111,R0201
+
+        pid = config['__pid__']
+        test.pid = pid
+        bunch.conditional_remove({'pid':pid}, operator.ne)
+        
+        
+        test.n_bins = config['__nev__']/500
+        test.contents = [index for index in range(test.n_bins)]
+        test.errors = [index*0 for index in range(test.n_bins)]
+        test.bins = [-19.8, -16.13, -12.97, -10.27, -7.96, -5.97, \
+                       -4.25, -2.79, -1.54,\
+                       -0.468, 0.468, 1.54, 2.79, 4.25, 5.97, \
+                        7.96, 10.27, 12.97, 16.13, 19.8]
+        print "bins:", test.bins, "content:", test.contents  
+    
+        return test    
+            
+
+    def _get_min_max_compare(var, bunch): # pylint: disable=R0914
+        """
+        Return minimum and maximum bins
+        
+        Choose bin based on mean_x-n_sigma_bins*sigma_x; but we calculate
+        sigma_x and mean_x after applying a cut on the tails to remove outliers 
+        (at mean_x-n_sigma_bins*sigma_x. var is string variable, bunch is the
+        bunch.
+        """
+        # iterates over histogrammed bunch and looks for impurity
+        # better to use raw data...
         impurity = 100./bunch.bunch_weight()
-        if impurity > 0.01:
-            impurity = 0.01
+       # if impurity > 0.01:
+            #impurity = 0.01
         mean = bunch.mean([var])[var]
         sigma = bunch.moment([var, var])**0.5
         n_bins = len(bunch)/100
-        min_max = [mean-5.*sigma, mean+5.*sigma]
+        min_max = [mean-8*sigma, mean+8*sigma]
         for count in range(2): # pylint: disable=W0612
             bins = [min_max[0]+i*(min_max[1]-min_max[0])/float(n_bins) \
                                                          for i in range(n_bins)]
@@ -134,24 +225,9 @@ class TestFactory:
             min_max[1] += delta*0.1
             min_max[0] -= delta*0.1
         return min_max
-    _get_min_max = staticmethod(_get_min_max)
+    _get_min_max_compare = staticmethod(_get_min_max_compare)
 
-    def build_ks_test(self, test, config, bunch):
-        """
-        Build a ks test based on a configuration and bunch data
-        """
-        pid = config['__pid__']
-        test.pid = pid
-        bunch.conditional_remove({'pid':pid}, operator.ne)
-        print len(bunch)
-        [xmin, xmax] = self._get_min_max(test.variable, bunch)
-        xmin *= Common.units[test.units]
-        xmax *= Common.units[test.units]
-        test.n_bins = config['__nev__']/100
-        test.content = [index for index in range(test.n_bins)]
-        test.bins = [xmin+(xmax-xmin)*x/float(test.n_bins) \
-                                          for x in range(test.n_bins+1)]
-        return test
+    
 
     def build_geometry(self, config):
         """Build and run a set of tests for a specific geometry set up"""
@@ -168,7 +244,7 @@ class TestFactory:
         bunch = geo.read_bunch()
         #adjust the geometry
         for i, test in enumerate(geo.tests):
-            test = self.build_ks_test(test, config, bunch)
+            test = self.build_chi2_test(test, config, bunch)
             geo.tests[i]  = test.run_test(bunch)
         print geo.name
         sys.stdout.flush()

@@ -213,6 +213,11 @@ Interpolator3dGridTo3d* SectorMagneticFieldMapIO::GetInterpolator
             By[i][j] = new double[grid->zSize()];
             Bz[i][j] = new double[grid->zSize()];
             for (int k = 0; k < grid->zSize() && j >= y_start; ++k) {
+                if (index >= static_cast<int>(field_points.size())) {
+                   throw Exception(Exception::recoverable,
+                                   "Field grid is not rectangular",
+                                   "SectorMagneticFieldMapIO::GetInterpolator");
+                }
                 Bx[i][j][k] = field_points[index][3];
                 By[i][j][k] = field_points[index][4];
                 Bz[i][j][k] = field_points[index][5];

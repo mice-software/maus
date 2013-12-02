@@ -67,6 +67,9 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
     } else if (_triggerStation == "tof0") {
       _stationKeys.push_back("tof1");
       _stationKeys.push_back("tof2");
+    } else if (_triggerStation == "tof2") {
+      _stationKeys.push_back("tof0");
+      _stationKeys.push_back("tof1");
     } else {
       Squeak::mout(Squeak::error)
       << "Error in MapCppTOFSpacePoints::birth. TOF trigger station is wrong."
@@ -95,14 +98,6 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
   Json::FastWriter writer;
   Json::Value root;
   Json::Value xEventType;
-  if (!_map_init) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to initialize calibration map";
-    errors["no_tofcalib"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
   // Check if the JSON document can be parsed, else return error only
   try {root = JsonWrapper::StringToJson(document);}
   catch(...) {
@@ -110,6 +105,14 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
     std::stringstream ss;
     ss << _classname << " says: Failed to parse input document";
     errors["bad_json_document"] = ss.str();
+    root["errors"] = errors;
+    return writer.write(root);
+  }
+  if (!_map_init) {
+    Json::Value errors;
+    std::stringstream ss;
+    ss << _classname << " says: Failed to initialize calibration map";
+    errors["no_tofcalib"] = ss.str();
     root["errors"] = errors;
     return writer.write(root);
   }

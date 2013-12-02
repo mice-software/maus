@@ -55,11 +55,11 @@ BTFieldConstructor::BTFieldConstructor(MiceModule * rootModule) :
 
 BTFieldConstructor::~BTFieldConstructor() {
     MAUS::SectorMagneticFieldMap::ClearFieldCache();
-    std::cerr << "DELETE field" << std::endl;
 }
 
 void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 {
+  delete BTPhaser::GetInstance();
 	SetDefaults();
 	if(GetGridDefault()[0]<2 || GetGridDefault()[1]<2 || GetGridDefault()[2]<2) 
 		throw(MAUS::Exception(MAUS::Exception::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));

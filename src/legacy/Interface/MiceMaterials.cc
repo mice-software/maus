@@ -12,6 +12,8 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+
+#include "Geant4/G4Material.hh"
 #include "Interface/MiceMaterials.hh"
 #include "Utils/Exception.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
@@ -286,5 +288,19 @@ void MiceMaterials::updateProperties( std::string name, std::string chemical, do
   _aNumber[ name ] = ANum;
   _meanExcitationEnergy[ name ] = meanExE;
   _densityCorrection[ name ] = densityCor;  
+}
+
+MiceMaterials::~MiceMaterials() {
+    // There is a G4 memory leak where
+    //   G4Material::G4MaterialPropertiesTable::G4MaterialPropertyVector
+    // contains a list of pointers to G4MPVEntry which are alloc'd on the stack
+    // but cannot be reached by user to delete them and are not handled properly
+    // in G4MaterialPropertyVector destructor 
+    typedef std::map<std::string, G4Material*>::iterator mat_iter;
+    for (mat_iter it = _materials.begin(); it != _materials.end(); ++it) {
+        G4Material* mat = (*it).second;
+        if (mat->GetMaterialPropertiesTable() != NULL)
+            delete mat->GetMaterialPropertiesTable();
+    }
 }
 

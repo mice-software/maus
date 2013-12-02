@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+<!--++++++++++++++++++++++++++++++++++BASE TYPES+++++++++++++++++++++++++++++++++++++++++-->    
+<xs:complexType name="NameType">
+    <xs:attribute name="name" use="required"/>
+</xs:complexType>
+<xs:complexType name="CylinderType">
+    <xs:attribute name="radius" use="required"/>
+    <xs:attribute name="length" use="required"/>
+    <xs:attribute name="units" use="required"/>
+</xs:complexType>
+<xs:complexType name="XYZType">
+    <xs:attribute name="x" use="required"/>
+    <xs:attribute name="y" use="required"/>
+    <xs:attribute name="z" use="required"/>
+    <xs:attribute name="units" use="required"/>
+</xs:complexType>
+<xs:complexType name="RGBType">
+    <xs:attribute name="r" use="optional"/>
+    <xs:attribute name="g" use="optional"/>
+    <xs:attribute name="b" use="optional"/>
+</xs:complexType>   
+<xs:complexType name="NType">
+    <xs:attribute name="x" use="required"/>
+    <xs:attribute name="units" use="optional"/>
+</xs:complexType>
+
+<!--++++++++++++++++++++++++++++++++++MIDDLE TYPES+++++++++++++++++++++++++++++++++++++++++-->
+    <xs:complexType name="SolenoidType">
+        <xs:sequence>
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="MagneticField" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Invisible" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="KalmanSolenoid" type="NType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Cryostat" minOccurs="1" type="CryostatType" maxOccurs="1"/>
+            <xs:element name="Diffuser" minOccurs="0" type=" DiffuserType" maxOccurs="1"/>
+            <xs:element name="Tracker" minOccurs="1" type="TrackerType" maxOccurs="1"/>
+            <xs:element name="TrackerCoil" minOccurs="1" type="TrackerCoilType" maxOccurs="1"/>          
+        </xs:sequence>
+7~        <xs:attribute name="number" use="required" type="xs:int"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="CryostatType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="Dimensions" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType" maxOccurs="1"/>
+            <xs:element name="Material" minOccurs="1" type="NameType" maxOccurs="1"/>
+            
+            <xs:element name="CryostatOuterVessel" minOccurs="1" type="CyrostatOuterVesselType" maxOccurs="1"/>
+            <xs:element name="CryostatInnerTube" minOccurs="1" type="CryostatInnerTubeType" maxOccurs="1"/>
+            <xs:element name="CryostatFrontEndPlate" minOccurs="1" type="CryostatFrontEndPlateType" maxOccurs="1"/>
+            <xs:element name="CryostatBackEndPlate" minOccurs="1" type="CryostatBackEndPlateType" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="number" use="required"/>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="CyrostatOuterVesselType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType"/>
+            <xs:element name="Dimensions" minOccurs="1" type="XYZType"/>
+            <xs:element name="Material" minOccurs="1" type="NameType"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="CryostatInnerTubeType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType"/>
+            <xs:element name="Dimensions" minOccurs="1" type="XYZType"/>
+            <xs:element name="Material" minOccurs="1" type="NameType"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="CryostatBackEndPlateType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType"/>
+            <xs:element name="Dimensions" minOccurs="1" type="XYZType"/>
+            <xs:element name="Material" minOccurs="1" type="NameType"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="CryostatFrontEndPlateType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType"/>
+            <xs:element name="Dimensions" minOccurs="1" type="XYZType"/>
+            <xs:element name="Material" minOccurs="1" type="NameType"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="DiffuserType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Rotation" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Diffuser_Disc3" type="Diffuser_Disc3Type" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Diffuser_UpstreamPlane" type="Diffuser_UpstreamPlaneType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="Diffuser_Disc3Type">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+            
+            <xs:element name="DiffuserBool" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Volume" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="Dimensions" minOccurs="1" type="CylinderType" maxOccurs="1"/>
+            <xs:element name="Material" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="RGB_Values" minOccurs="1" type="RGBType" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="Diffuser_UpstreamPlaneType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType"/>
+            <xs:element name="Rotation" type="XYZType"/>
+        
+            <xs:element name="Volume" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="Dimensions" minOccurs="1" type="CylinderType" maxOccurs="1"/>
+            <xs:element name="Material" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="SensitiveDectector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SteppingInto" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SteepingThrough" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="TrackerType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" minOccurs="1" type="NameType" maxOccurs="1"/>
+            <xs:element name="Dimensions" minOccurs="1" type="CylinderType" maxOccurs="1"/>
+            <xs:element name="Tracker" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Invisible" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" minOccurs="1" type="NameType" maxOccurs="1"/>
+            
+            <xs:element name="TrackerRef" type="TrackerRefType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="TrackerStation" type="TrackerStationType" minOccurs="0" maxOccurs="5"/>
+            <xs:element name="Tracker1Station" type="Tracker1StationType" minOccurs="0" maxOccurs="5"/>
+        </xs:sequence>
+        <xs:attribute name="number" use="required" type="xs:int"/>
+    </xs:complexType>
+    
+    <xs:complexType name="TrackerRefType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RBG_Values" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Station" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Plane" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SensitiveDetector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="number" use="required" type="xs:int"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="TrackerStationType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="0" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="0" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RBG_Values" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Station" type="NType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="OpticsMaterialLength" type="NType"></xs:element>
+            
+            <xs:element name="TrackerView" type="TrackerViewType" minOccurs="0" maxOccurs="3"></xs:element>
+            <xs:element name="Tracker0Station5View" type="Tracker0Station5ViewType" minOccurs="0" maxOccurs="3"></xs:element>
+            <xs:element name="TrackerMylar" type="TrackerMylarType" minOccurs="3" maxOccurs="3"></xs:element>
+        </xs:sequence>
+        <xs:attribute name="number" use="optional" type="xs:int"></xs:attribute>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="Tracker1StationType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RBG_Values" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Station" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="OpticsMaterialLength" type="NType"></xs:element>
+            
+            <xs:element name="TrackerView" type="TrackerViewType" minOccurs="0" maxOccurs="3"></xs:element>
+            <xs:element name="Tracker0Station5View" type="Tracker0Station5ViewType" minOccurs="0" maxOccurs="3"></xs:element>
+            <xs:element name="TrackerMylar" type="TrackerMylarType" minOccurs="3" maxOccurs="3"></xs:element>
+        </xs:sequence>
+        <xs:attribute name="number" use="required" type="xs:int"></xs:attribute>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="TrackerViewType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SensitiveDectector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Plane" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ActiveRadius" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Pitch" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FibreDiameter" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CoreDiameter" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CentralFibre" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Invisible" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="G4Detector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="G4StepMax" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="letter" use="required" type="xs:string"/>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="Tracker0Station5ViewType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SensitiveDectector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Plane" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ActiveRadius" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Pitch" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FibreDiameter" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CoreDiameter" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CentralFibre" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Invisible" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="G4Detector" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="G4StepMax" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="letter" use="required" type="xs:string"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="TrackerMylarType">
+        <xs:sequence>
+            <xs:element name="Position" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            <xs:element name="Rotation" minOccurs="1" type="XYZType" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Dimensions" type="CylinderType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RBG_Values" type="RGBType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="TrackerCoilType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Rotation" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="Dimension" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="MatchCoil" type="MatchCoilType" minOccurs="2" maxOccurs="2"/>
+            <xs:element name="EndCoil" type="EndCoilType" minOccurs="2" maxOccurs="2"/>
+            <xs:element name="CenterCoil" type="CenterCoilType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="MatchCoilType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Rotation" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ScaleFactor" type="NType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="Dimension" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RGBColor" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="FieldType" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FileName" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CurrentDensity" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Length" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Thickness" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="InnerRadius" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FieldTolerance" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="number" type="xs:int" use="required"/>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="EndCoilType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Rotation" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ScaleFactor" type="NType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="Dimension" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RGBColor" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="FieldType" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FileName" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CurrentDensity" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Length" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Thickness" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="InnerRadius" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FieldTolerance" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="number" type="xs:int" use="required"/>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="CenterCoilType">
+        <xs:sequence>
+            <xs:element name="Position" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Rotation" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ScaleFactor" type="NType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="Volume" type="NameType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="Dimension" type="XYZType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="RGBColor" type="RGBType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Material" type="NameType" minOccurs="1" maxOccurs="1"/>
+            
+            <xs:element name="FieldType" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FileName" type="NameType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="CurrentDensity" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Length" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Thickness" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="InnerRadius" type="NType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="FieldTolerance" type="NType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="to_print" use="optional"/>
+    </xs:complexType>
+    
+    
+
+
+<!--++++++++++++++++++++++++++++++++++BASE TYPES+++++++++++++++++++++++++++++++++++++++++-->
+<xs:element name="Tracker_Information">
+    <xs:complexType>
+        <xs:sequence>
+            <xs:element name="TrackerSolenoid" type="SolenoidType" minOccurs="0" maxOccurs="2"/>
+            <xs:element name="TrackerSingleStation" type="TrackerStationType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:element>
+
+</xs:schema>

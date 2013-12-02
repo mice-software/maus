@@ -52,8 +52,8 @@ Json::Value SetupConfig(int verbose_level);
 class LinearApproximationOpticsModelTest : public testing::Test {
  public:
   LinearApproximationOpticsModelTest()
-      : default_virtual_planes_(MAUS::MAUSGeant4Manager::GetInstance()
-                                ->GetVirtualPlanes()),
+      : default_virtual_planes_(new MAUS::VirtualPlaneManager(
+          *MAUS::MAUSGeant4Manager::GetInstance()->GetVirtualPlanes())),
         virtual_planes_(new MAUS::VirtualPlaneManager()) {
     MAUS::MAUSGeant4Manager * simulation
         = MAUS::MAUSGeant4Manager::GetInstance();

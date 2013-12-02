@@ -23,6 +23,7 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
@@ -41,19 +42,20 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
   return _instance;
 }
 
-MAUSGeant4Manager::MAUSGeant4Manager() {
+MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     if (_instance != NULL)
         throw(Exception(
               Exception::recoverable,
               "Attempt to initialise MAUSGeant4Manager twice",
               "MAUSGeant4Manager::MAUSGeant4Manager"));
     _instance = this;
+    SetVirtualPlanes(new VirtualPlaneManager);
     _visManager = NULL;  // set by GetVisManager
     SetVisManager();
     _runManager = new G4RunManager;
-    MiceModule* model = Globals::GetInstance()->GetMonteCarloMiceModules();
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
-    _detector   = new MICEDetectorConstruction(model, cards );
+    // just set up a dummy geometry
+    _detector   = new Simulation::DetectorConstruction(*cards);
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
@@ -69,20 +71,19 @@ MAUSGeant4Manager::MAUSGeant4Manager() {
     _runManager->SetUserAction(_eventAct);
     _runManager->SetUserAction(new MAUSStackingAction);
     _runManager->SetUserAction(new MAUSRunAction);
-    _virtPlanes = new VirtualPlaneManager;
-    _virtPlanes->ConstructVirtualPlanes(
-      GetField(),
-      model
-    );
     _runManager->Initialize();
+    // now set up full geometry
+    SetMiceModules(*Globals::GetInstance()->GetMonteCarloMiceModules());
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
-    delete _runManager;
     if (_visManager != NULL) {
-        delete _visManager;
+       delete _visManager;
     }
+    delete _runManager;
     _isClosed = true;
+    if (_virtPlanes != NULL)
+        delete _virtPlanes;
 }
 
 void MAUSGeant4Manager::SetPhases() {
@@ -140,7 +141,7 @@ Json::Value MAUSGeant4Manager::Tracking
     event_array.append(event);
     _eventAct->SetEvents(event_array);
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
-    Globals::GetMCFieldConstructor()->Print(Squeak::mout(Squeak::debug));
+    GetField()->Print(Squeak::mout(Squeak::debug));
     GetRunManager()->BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
     return _eventAct->GetEvents()[Json::Value::UInt(0)];
@@ -156,6 +157,19 @@ void MAUSGeant4Manager::SetVisManager() {
       _visManager = new MAUSVisManager;
       _visManager->Initialize();
   }
+}
+
+BTFieldConstructor* MAUSGeant4Manager::GetField() {
+  return _detector->GetField();
+}
+
+// should be const MiceModule
+void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
+    SetVirtualPlanes(new VirtualPlaneManager);
+    _virtPlanes->ConstructVirtualPlanes(&module);
+    _detector->SetMiceModules(module);
+    if (Globals::GetMCFieldConstructor() != NULL)
+        SetPhases();
 }
 }  // namespace MAUS
 

@@ -25,7 +25,6 @@ MagFieldMap::MagFieldMap(Interpolator3dSolenoidalTo3d* Interpolator)
                 myZMin( Interpolator->GetGrid()->y(1) ), myZMax( Interpolator->GetGrid()->y(numberOfZCoords) ),
                 myRMin( Interpolator->GetGrid()->x(1) ), myRMax( Interpolator->GetGrid()->x(numberOfRCoords) )
 {
-
 }
 
 MagFieldMap::MagFieldMap(const MagFieldMap & rhs) :
@@ -49,6 +48,7 @@ MagFieldMap::~MagFieldMap()
 {
 	for(unsigned int i=0; i<sheetInformation.size(); i++)
 		delete [] sheetInformation[i];
+  delete myInterpolator;
 }
 
 void MagFieldMap::ReadMap(const std::string& mapFile, const std::string& fileType, std::string interpolation)
@@ -424,6 +424,15 @@ void MagFieldMap::ReadG4MiceBinaryMap(std::ifstream &fMap, std::string algorithm
 	myRMax = rCoordinates[numberOfRCoords-1];
 	TwoDGrid* grid = new TwoDGrid(numberOfRCoords, rCoordinates, numberOfZCoords, zCoordinates);
 	myInterpolator = new Interpolator3dSolenoidalTo3d(grid, inputBr, inputBz, algorithm);
+  // myInterpolator does not take ownership of memory so we now need to clean up
+	for(int i=0; i<numberOfRCoords; i++)
+	{
+		delete [] inputBr[i];
+		delete [] inputBz[i];
+	}
+	delete [] inputBr;
+	delete [] inputBz;
+
 
 //	myInterpolator = new SplineInterpolator(rCoordinates[1]-rCoordinates[0], zCoordinates[1]-zCoordinates[0], myZMin, numberOfRCoords, numberOfZCoords,
 //	                   inputBz, inputBr);

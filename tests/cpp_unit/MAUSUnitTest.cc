@@ -61,6 +61,7 @@ int parse_flags(int argc, char **argv) {
 Json::Value SetupConfig(int verbose_level) {
   std::cerr << "Running with verbose level " << verbose_level << std::endl;
   Json::Value config(Json::objectValue);
+  config["maximum_module_depth"] = 50;
   config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";
@@ -80,6 +81,9 @@ Json::Value SetupConfig(int verbose_level) {
   config["default_keep_or_kill"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";
   config["kinetic_energy_threshold"] = 0.1;
+  config["max_step_length"] = 100.;
+  config["max_track_time"] = 1.e9;
+  config["max_track_length"] = 1.e8;
   config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
@@ -116,7 +120,7 @@ int main(int argc, char **argv) {
   } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
-  MAUS::GlobalsManager::DeleteGlobals();
+  MAUS::GlobalsManager::Finally();
   return test_out;
 }
 

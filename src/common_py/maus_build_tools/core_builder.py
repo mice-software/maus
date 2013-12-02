@@ -93,6 +93,7 @@ def build_python_modules(env):
     built first.
     """
     target_files = glob.glob("src/py_cpp/*cc")
+    target_files += glob.glob("src/py_cpp/*/*cc")
     init_all = []
 
     for ccpath in target_files:

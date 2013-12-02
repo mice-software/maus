@@ -57,6 +57,9 @@ class BTFieldConstructor : public BTFieldGroup
 {
 public:
   /// Set up the fields using root module
+  ///
+  /// @param rootModule borrowed reference to the geometry structure. Caller
+  ///        owns memory allocated to the rootModule.
 	BTFieldConstructor(MiceModule * rootModule);
   /// Set up some defaults
 	BTFieldConstructor();

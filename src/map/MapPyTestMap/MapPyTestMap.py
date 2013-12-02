@@ -20,6 +20,7 @@ Map for use in testing other components.
 # pylint: disable=C0103
 
 import json
+import time
 
 import maus_cpp.globals
 
@@ -30,6 +31,7 @@ class MapPyTestMap: # pylint:disable = R0902
     OK = 0
     FAIL = 1
     EXCEPTION = 2
+
 
     def __init__(self, map_id = ""):
         """
@@ -44,6 +46,8 @@ class MapPyTestMap: # pylint:disable = R0902
         self.birth_called = False
         self.process_called = False
         self.death_called = False
+        # number of seconds to sleep during process(...)
+        self.process_delay = None
         # Flags holding result of these function calls.
         self.__process_result = MapPyTestMap.OK
         self.__death_result = MapPyTestMap.OK
@@ -73,6 +77,8 @@ class MapPyTestMap: # pylint:disable = R0902
             self.__process_result = config["process_result"]
         if (config.has_key("death_result")):
             self.__death_result = config["death_result"]
+        if (config.has_key("process_delay")):
+            self.process_delay = config["process_delay"]
         assert(maus_cpp.globals.has_instance())
         return True
 
@@ -90,6 +96,9 @@ class MapPyTestMap: # pylint:disable = R0902
         to birth had a process_result key with value EXCEPTION
         """
         self.process_called = True
+        if (self.process_delay != None):
+            print "Sleeping for", self.process_delay, "seconds"
+            time.sleep(self.process_delay)
         if (self.__process_result == MapPyTestMap.EXCEPTION):
             raise ValueError("Process exception")
         spill = json.loads(spill_doc)

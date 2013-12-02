@@ -1,0 +1,5 @@
+Configuration RootVolumeTest {
+  PropertyHep3Vector Dimensions 1. 2. 0.01 m
+  PropertyString Material lH2
+  PropertyDouble G4StepMax 0.001 m
+}

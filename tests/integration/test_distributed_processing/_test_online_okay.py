@@ -23,7 +23,6 @@ online-capable machines)
 
 import os 
 import unittest
-import celery.task.control # pylint: disable=E0611, F0401
 import pymongo
 import pymongo.errors
 import subprocess
@@ -73,15 +72,14 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         try:
             proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
             time.sleep(5)
-            active_nodes = \
-                  celery.task.control.inspect().active() # pylint: disable=E1101
+            proc_alive = proc.poll()
         except Exception: #pylint: disable=W0703
             sys.excepthook(*sys.exc_info())
             self.assertTrue(False)
         finally:
             if proc.poll() == None:
                 proc.send_signal(signal.SIGKILL)
-        self.assertNotEqual(active_nodes, None)
+        self.assertEqual(proc_alive, None)
 
     def test_mongodb_is_alive(self):
         """

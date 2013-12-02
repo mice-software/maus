@@ -204,6 +204,18 @@ exceptions[os.path.join(TST, 'Optics',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
+exceptions[os.path.join(TST, 'Recon/Global',
+                        'DataStructureHelperTest.cc')] = [
+('    } catch (MAUS::Exception& exception) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(TST, 'Recon/Global',
+                        'MinuitTrackFitterTest.cc')] = [
+('  } catch (MAUS::Exception exception) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
 exceptions[os.path.join(CPP_CM, 
                         'JsonCppProcessors',
                         'Common',
@@ -248,4 +260,28 @@ exceptions[os.path.join(MAP, 'MapCppGlobalTrackReconstructor',
                         'MapCppGlobalTrackReconstructor.cc')] = [
 ('    } catch (Exception exception) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+('  } catch (Exception exception) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
+
+exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyCovarianceMatrix.hh')] = [
+('                   reinterpret_cast<CovarianceMatrix* (*)'+\
+                                                      '(PyObject*)>(gcm_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
+]
+
+exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyPhaseSpaceVector.hh')] = [
+('                  reinterpret_cast<PhaseSpaceVector* (*)'+\
+                                                     '(PyObject*)>(gpsv_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
+]
+
+exceptions[os.path.join('src', 'py_cpp', 'PyMiceModule.hh')] = [
+('                   reinterpret_cast<MiceModule* (*)(PyObject*)>(gmm_void);',
+'cpplint misinterprets function pointer as a cast',
+'rogers')
+]
+
+

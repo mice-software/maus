@@ -47,6 +47,8 @@ class GlobalsTest : public ::testing::Test {
                       (*Globals::GetInstance()->GetConfigurationCards());
         // watch out - this breaks the test order!
         // always force GlobalsManager to not exist at start
+        root = MiceModule::deepCopy
+                                  (*Globals::GetMonteCarloMiceModules(), false);
         if (Globals::HasInstance()) {
             GlobalsManager::DeleteGlobals();
         }
@@ -58,14 +60,15 @@ class GlobalsTest : public ::testing::Test {
         if (!Globals::HasInstance()) {
             GlobalsManager::InitialiseGlobals(str);
         }
+        GlobalsManager::SetMonteCarloMiceModules(root);
     }
 
     void SetUp() {}
     void TearDown() {}
 
     std::string str;
-
   private:
+    MiceModule* root;
 };
 
 // Also here we check that GetProcessDataManager works
@@ -142,7 +145,7 @@ TEST_F(GlobalsTest, TestAccessors) {
                    GlobalsManager::SetLegacyCards, new dataCards());
     test_accessors(Globals::GetMonteCarloMiceModules,
                    GlobalsManager::SetMonteCarloMiceModules,
-                   new MiceModule());
+                   new MiceModule("Test.dat"));
     test_accessors(Globals::GetReconstructionMiceModules,
                    GlobalsManager::SetReconstructionMiceModules,
                    new MiceModule());
@@ -161,6 +164,31 @@ TEST_F(GlobalsTest, TestAccessors) {
                    static_cast<MAUSGeant4Manager*>(NULL));
 */
     GlobalsManager::DeleteGlobals();
+}
+
+TEST_F(GlobalsTest, TestResetFields) {
+    std::string mod_name = std::string(getenv("MAUS_ROOT_DIR"))+
+                           std::string("/tests/cpp_unit/Globals/QuadTest.dat");
+    // initialise; check field = 0
+    GlobalsManager::InitialiseGlobals(str);
+    double point[] = {500., 0., 0., 0.};
+    double field[] = {0., 0., 0., 0., 0., 0.};
+    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+    EXPECT_DOUBLE_EQ(field[1], 0.);
+    // now reset fields; check field != 0
+    MiceModule* test_mod = new MiceModule(mod_name);
+    GlobalsManager::SetMonteCarloMiceModules(test_mod);
+    Globals::GetMCFieldConstructor()->GetFieldValue(point, field);
+    // check field value
+    EXPECT_DOUBLE_EQ(fabs(field[0]), 1.);
+    EXPECT_DOUBLE_EQ(fabs(field[1]), 2.);
+    EXPECT_DOUBLE_EQ(fabs(field[2]), 3.);
+}
+
+TEST_F(GlobalsTest, TestResetGeant4Geometry) {
+// Check that Virtual Planes are rebuilt okay
+// Check that Materials and volumes are rebuilt okay
+// Check that sensitive detectors are rebuilt okay
 }
 
 // Version number is tested in PyGlobals

@@ -21,9 +21,9 @@ import unittest
 import glob
 import os 
 
-from physics_model_test import plotter
-from physics_model_test import runner
-from physics_model_test import geometry
+from physics_model_test import plotter #pylint: disable=F0401
+from physics_model_test import runner #pylint: disable=F0401
+from physics_model_test import geometry #pylint: disable=F0401
 
 class MaterialsAndSteppingTest(unittest.TestCase): # pylint: disable=R0904
     """
@@ -35,8 +35,8 @@ class MaterialsAndSteppingTest(unittest.TestCase): # pylint: disable=R0904
         """
         Test all examples in ref_data directory with names like maus.*.dat
         """
-        reference_data = glob.glob(geometry.ref_data("*.dat"))
-        test_data = []
+        reference_data = glob.glob(geometry.ref_data("MUSCAT_data.dat"))
+        test_data = glob.glob(geometry.ref_data("maus.0.3.3.ref_data.dat"))
         (passes, fails, warns) = (0, 0, 0)
         for test_in in reference_data:
             test_name = os.path.split(test_in)[-1]

@@ -56,8 +56,9 @@ Json::Value SetupConfig(int verbose_level);
 class PolynomialOpticsModelTest : public testing::Test {
  public:
   PolynomialOpticsModelTest()
-      : default_virtual_planes_(MAUS::MAUSGeant4Manager::GetInstance()
-                                ->GetVirtualPlanes()) {
+      : default_virtual_planes_(
+          new MAUS::VirtualPlaneManager(*MAUS::MAUSGeant4Manager::GetInstance()
+                                  ->GetVirtualPlanes())) {
     MAUS::MAUSGeant4Manager * simulation
         = MAUS::MAUSGeant4Manager::GetInstance();
 
@@ -114,25 +115,25 @@ class PolynomialOpticsModelTest : public testing::Test {
 
     std::cout << "Globals:" << std::endl
               << (*MAUS::Globals::GetConfigurationCards()) << std::endl;
-
-    simulation->SetVirtualPlanes(&virtual_planes_);
+    virtual_planes_ = new MAUS::VirtualPlaneManager();
+    simulation->SetVirtualPlanes(virtual_planes_);
     MAUS::VirtualPlane start_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane),
         -1, true,
         kPrimaryPlane, BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
 
     MAUS::VirtualPlane mid_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane+1000.),
         -1, true,
         kPrimaryPlane+1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
 
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane+2000.),
         -1, true,
         kPrimaryPlane+2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
-    virtual_planes_.AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    virtual_planes_->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
   }
 
   ~PolynomialOpticsModelTest() {
@@ -159,9 +160,10 @@ class PolynomialOpticsModelTest : public testing::Test {
   static const double kPrimaryPlane;
   static const double kCovariances[36];
   static const MAUS::CovarianceMatrix kCovarianceMatrix;
+  MAUS::VirtualPlaneManager* virtual_planes_;
+  MAUS::VirtualPlaneManager* default_virtual_planes_;
+
  private:
-  MAUS::VirtualPlaneManager virtual_planes_;
-  MAUS::VirtualPlaneManager * default_virtual_planes_;
 };
 
 // *************************************************
@@ -250,7 +252,6 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
 
   // The configuration specifies a 2m drift between 1m and 3m.
   optics_model.Build();
-
   // Check transport to start plane
   MAUS::PhaseSpaceVector input_vector(0., 226., 1., 0., 3., 0.);
   MAUS::PhaseSpaceVector output_vector = optics_model.Transport(input_vector,

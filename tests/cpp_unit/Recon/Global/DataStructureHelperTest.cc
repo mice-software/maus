@@ -193,7 +193,7 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     detector_name << "TrackerStation" << (index+1) << ".dat";
     tracker0_stations[index] = new MiceModule(tracker0,
                                               detector_name.str());
-    tracker0_stations[index]->addPropertyHep3Vector("Position", 
+    tracker0_stations[index]->addPropertyHep3Vector("Position",
       Hep3Vector(0., 0., 10*(index-2)));
     tracker0->addDaughter(tracker0_stations[index]);
 
@@ -212,7 +212,7 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     detector_name << "Tracker1Station" << (index+1) << ".dat";
     tracker1_stations[index] = new MiceModule(tracker1,
                                               detector_name.str());
-    tracker1_stations[index]->addPropertyHep3Vector("Position", 
+    tracker1_stations[index]->addPropertyHep3Vector("Position",
       Hep3Vector(0., 0., 10*(index-2)));
     tracker1->addDaughter(tracker1_stations[index]);
 
@@ -302,8 +302,8 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
   size_t index = 0;
   while (detector != detectors.end()) {
     const GlobalDS::DetectorPoint id = detector->first;
-   EXPECT_EQ(ids[index], id);
-   const MAUS::CovarianceMatrix uncertainties
+    EXPECT_EQ(ids[index], id);
+    const MAUS::CovarianceMatrix uncertainties
       = detector->second.uncertainties();
     for (size_t row = 0; row < 6; ++row) {
       for (size_t column = 0; column < 6; ++column) {

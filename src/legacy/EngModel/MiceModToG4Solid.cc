@@ -46,6 +46,7 @@ G4VSolid* buildSolid ( MiceModule* mod )
     if(volume == "boolean")   return buildBoolean  (mod);
     if(volume == "multipole") return buildMultipole(mod);
     if(volume == "ellipticalcone")  return buildEllipticalCone (mod);
+    if(volume == "trapezoid") return buildTrapezoid(mod);
     throw(MAUS::Exception(MAUS::Exception::recoverable, "Volume "+mod->volType()+" not recognised in module "+mod->fullName(), 
                                       "MiceModToG4Solid::buildSolid") );
 }

@@ -629,7 +629,7 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   track_point->set_space_point(space_point);
 
   // FIXME(Lane) Need to get event number, but now using SciFi track points
-  //track_point->set_particle_event((*scifi_space_point)->get_event());
+  // track_point->set_particle_event((*scifi_space_point)->get_event());
   track_point->set_mapper_name(kClassname);
 
   const double Px = (*scifi_track_point)->px();

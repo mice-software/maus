@@ -1,0 +1,19 @@
+Configuration EMFieldTest 
+{
+  Dimensions 10. 10. 20. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 0.100 m
+  Module RF
+  {
+    Position 0 0 0.500 m
+    PropertyString Volume None
+    PropertyString FieldType PillBox
+    PropertyString CavityMode Unphased 
+    PropertyString FieldDuringPhasing TimeVarying
+    PropertyDouble Frequency 0.201
+    PropertyDouble PeakEField 10.
+    PropertyDouble ReferenceParticlePhase 90 degree
+    PropertyDouble Length 0.500 m
+  }
+}
+

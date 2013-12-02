@@ -41,19 +41,28 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   // Get the calibration text files from the Json document.
   // This is no longer done. Calibration is got from CDB now
   // - DR, 12/11/12
-  /*
-  Json::Value t0_file = JsonWrapper::GetProperty(configJSON,
-                                                 "TOF_T0_calibration_file",
-                                                 JsonWrapper::stringValue);
+  Json::Value t0_file;
+  Json::Value tw_file;
+  Json::Value trigger_file;
+  std::string _tof_source = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_calib_source",
+                                               JsonWrapper::stringValue).asString();
+  bool fromDB = true;
+  if (_tof_source == "file") {
+      fromDB = false;
+      // Check what needs to be done.
+      t0_file = JsonWrapper::GetProperty(configJSON,
+                                         "TOF_T0_calibration_file",
+                                         JsonWrapper::stringValue);
 
-  Json::Value tw_file = JsonWrapper::GetProperty(configJSON,
-                                                 "TOF_TW_calibration_file",
-                                                 JsonWrapper::stringValue);
+      tw_file = JsonWrapper::GetProperty(configJSON,
+                                         "TOF_TW_calibration_file",
+                                         JsonWrapper::stringValue);
 
-  Json::Value trigger_file = JsonWrapper::GetProperty(configJSON,
-                                                      "TOF_Trigger_calibration_file",
-                                                      JsonWrapper::stringValue);
-  */
+      trigger_file = JsonWrapper::GetProperty(configJSON,
+                                              "TOF_Trigger_calibration_file",
+                                              JsonWrapper::stringValue);
+  }
   // Check what needs to be done.
   _do_timeWalk_correction = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_timeWalk_correction",
@@ -87,17 +96,20 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
-
-  /*
-  std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
-  std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
-  std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
-  // Load the calibration constants.
-  // bool loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
-  */
-  // get calib from DB instead of file, the above line is replaced by the one below
-  if (!pymod_ok) return false;
-  bool loaded = this->InitializeFromCDB();
+  bool loaded;
+  if (!fromDB) {
+      // std::cout << ">>>>>>> initializing from FILE<<<<<" << std::endl;
+      std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
+      std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
+      std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
+      // Load the calibration constants.
+      loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
+  } else {
+      // std::cout << ">>>>>>> initializing from CDB<<<<<" << std::endl;
+      // get calib from DB instead of file, the above line is replaced by the one below
+      if (!pymod_ok) return false;
+      loaded = this->InitializeFromCDB();
+  }
   if (!loaded)
     return false;
 
@@ -514,7 +526,7 @@ bool TOFCalibrationMap::LoadT0Calib() {
     }
   } catch(MAUS::Exception e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadT0Calib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -541,7 +553,7 @@ bool TOFCalibrationMap::LoadTWCalib() {
     }
   } catch(MAUS::Exception e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadTWCalib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
@@ -563,7 +575,7 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
     }
   } catch(MAUS::Exception e) {
     Squeak::mout(Squeak::error)
-    << "Error in TOFCalibrationMap::LoadTriggerFile. Error during loading. " << std::endl
+    << "Error in TOFCalibrationMap::LoadTriggerCalib. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
     return false;
   }
