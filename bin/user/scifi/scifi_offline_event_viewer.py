@@ -118,8 +118,8 @@ class Tracker:
                 x0 = trk.get_circle_x0()
                 y0 = trk.get_circle_y0()
                 dsdz = trk.get_dsdz()
-                if ( trker_num == 0 ):
-                    dsdz = -dsdz  # Needed due to the way we plot
+                # if ( trker_num == 0 ):
+                #    dsdz = -dsdz  # Needed due to the way we plot
                 rad = trk.get_R()
                 self.seeds_circles.append(make_circle(x0, y0, rad))
                 # Pull out the turning angles of each seed spacepoint
@@ -305,6 +305,9 @@ def main(file_name):
     start_num = 1
     start_num = raw_input('Enter the first spill number to start from: ')
 
+    bad_t1_spills = []
+    bad_t2_spills = []
+
     # Loop over spills
     for i in range(int(start_num)-1, tree.GetEntries()):
         tree.GetEntry(i)
@@ -336,7 +339,10 @@ def main(file_name):
             mg = draw_sz(t1.seeds_z, t1.seeds_s, t2.seeds_z, t2.seeds_s, \
                          t1.sz_fits, t2.sz_fits, c_trk_sz)
             c_trk_sz.Update()
-            # if ( t1.num_htracks < 1):
+            if ( t1.num_htracks < 1):
+              bad_t1_spills.append(spill.GetSpillNumber())
+            if ( t2.num_htracks < 1):
+              bad_t2_spills.append(spill.GetSpillNumber())
               # raw_input("Found one!")
             raw_input("Press any key to move to the next spill...")
             print 'Helical tracks found: ' + \
@@ -351,6 +357,10 @@ def main(file_name):
 
     print "Closing root file"
     root_file.Close()
+    print "Found t1 bad spills: "
+    print t1_bad_spills
+    print "Found t2 bad spills: "
+    print t2_bad_spills
 
 def make_line(m, c, xmin, xmax):
     """ Create a straight line using the ROOT TF1 class """
