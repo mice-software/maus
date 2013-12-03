@@ -77,6 +77,8 @@ int main(int argc, char *argv[]) {
 
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
+  tdm.set_print_tracks(true);
+  tdm.set_print_seeds(true);
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
   if (bool_save) {
     xyzPlotter->SetSaveOutput(true);

@@ -494,8 +494,8 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     std::vector<SciFiSpacePoint*> &current_spnts,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) {
+  if (_verb > 0) std::cout << "make_helix: no. of current spnts: " << current_spnts.size() << "\n";
 
-  if (_verb) std::cout << "make_helix: number of current spnts = " << current_spnts.size() << "\n";
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
   set_ignore_stations(ignore_stations, ignore_st_1, ignore_st_2);
@@ -516,24 +516,42 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
   // Loop over spacepoints in current station
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
-    if ( spnts_by_station[stat_num][sp_num]->get_used() ) continue;
+    // If the current sp is used, skip it
+    if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
+      if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipping\n";
+      continue;
+    }
+
+    // Add the current spnt to the list being tried at present
+    if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding... ";
+    current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
+    if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
+
     // If we are on the last station, attempt to form a track using the spacepoints collected
     if (stat_num == stat_num_max) {
-      current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
       SciFiHelicalPRTrack* trk = form_track(n_points, current_spnts);
+
       // If we found a track, clear current spacepoints to trigger break out to outer most station
       if ( trk != NULL ) {
+        if (_verb > 0) std::cout << "Found track, adding" << std::endl;
         htrks.push_back(trk);
         current_spnts.clear();
         current_spnts.resize(0);
         return;
+      } else {
+        current_spnts.pop_back();
       }
-    // If not on the final station, add current spacepoint from this station and move on to next
+
+    // If not on the final station, move on to next
     } else {
-      current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
+
       // If we are not on the first station and current_spnts is empty, break out as track was found
-      if ( stat_num != stat_num_min && current_spnts.size() == 0 ) return;
+      if ( stat_num != stat_num_min && current_spnts.size() == 0 )
+        return;
+      // If we we have current spnts, remove the last tried, before trying another
+      else if ( current_spnts.size() != 0 )
+        current_spnts.pop_back();
     }
   }
   return;

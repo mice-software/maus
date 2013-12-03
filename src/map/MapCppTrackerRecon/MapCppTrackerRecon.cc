@@ -161,6 +161,7 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                                              SciFiEvent &evt) {
   PatternRecognition pr1;
+  pr1.set_verbosity(0);
   pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 
