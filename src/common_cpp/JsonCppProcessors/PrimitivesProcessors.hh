@@ -104,6 +104,32 @@ class UIntProcessor : public ProcessorBase<unsigned int> {
                              (const unsigned int& cpp_double, std::string path);
 };
 
+/** Processor to convert between C++ long long int and Json::stringValue
+ */
+class LLUIntProcessor : public ProcessorBase<unsigned long long> {
+  public:
+    typedef unsigned long long lluint;
+
+    /** Convert from Json::stringValue to long long unsigned int
+     *
+     *  If we have a Json::Value that
+     *    - has a minus sign as first character
+     *    - does not parse to an lluint
+     *    - is not a string type at all
+     *  throw an exception
+     */
+    virtual lluint* JsonToCpp(const Json::Value& json_str);
+
+    /** Convert from unsigned int to Json::stringValue
+     */
+    virtual Json::Value* CppToJson(const lluint& cpp_double);
+
+    /** Convert from unsigned int to Json::stringValue
+     */
+    virtual Json::Value* CppToJson(const lluint& cpp_double,
+                                   std::string path);
+};
+
 /** Processor to convert between C++ nool and Json::boolValue
  */
 class BoolProcessor : public ProcessorBase<bool> {

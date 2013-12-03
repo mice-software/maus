@@ -19,6 +19,8 @@
 
 namespace MAUS {
 
+typedef LLUIntProcessor::lluint lluint;
+
 double* DoubleProcessor::JsonToCpp(const Json::Value& json_double) {
   if (json_double.isNumeric()) {
       return new double (json_double.asDouble());
@@ -113,6 +115,40 @@ Json::Value* UIntProcessor::CppToJson
   JsonWrapper::Path::SetPath(*json_uint, path);
   return json_uint;
 }
+
+
+lluint* LLUIntProcessor::JsonToCpp(const Json::Value& json_string) {
+    if (!json_string.isString()) {
+      throw(Squeal(
+          Squeal::recoverable,
+          "Failed to convert json value to long long int - not a string type",
+          "LLUIntProcessor::JsonToCpp"
+      ));
+    }
+    std::string cpp_string = json_string.asString();
+    if (cpp_string[0] == '-') {
+      throw(Squeal(
+          Squeal::recoverable,
+          "Failed to convert json value to long long int - value was negative",
+          "LLUIntProcessor::JsonToCpp"
+      ));        
+    }
+    lluint* cpp_int = new lluint(STLUtils::FromString<lluint>(cpp_string));
+    return cpp_int;
+}
+
+Json::Value* LLUIntProcessor::CppToJson
+                                    (const lluint& cpp_lluint) {
+  return new Json::Value(STLUtils::ToString(cpp_lluint));
+}
+
+Json::Value* LLUIntProcessor::CppToJson
+                              (const lluint& cpp_lluint, std::string path) {
+  Json::Value* json_lluint = CppToJson(cpp_lluint);
+  JsonWrapper::Path::SetPath(*json_lluint, path);
+  return json_lluint;
+}
+
 
 bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
   if (json_bool.isBool()) {

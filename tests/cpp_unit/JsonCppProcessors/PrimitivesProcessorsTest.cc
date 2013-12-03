@@ -15,6 +15,7 @@
  */
 
 #include <string>
+#include <limits>
 
 #include "gtest/gtest.h"
 
@@ -24,6 +25,8 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 
 namespace MAUS {
+
+typedef LLUIntProcessor::lluint lluint;
 
 TEST(PrimitivesProcessorsTest, DoubleJsonToCpp) {
   DoubleProcessor proc;
@@ -142,6 +145,37 @@ TEST(PrimitivesProcessorsTest, UIntCppToJson) {
   value_json = proc.CppToJson(value_cpp, "path");
   EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
+}
+
+TEST(PrimitivesProcessorsTest, LLUIntCppToJson) {
+  LLUIntProcessor proc;
+  lluint value_cpp = std::numeric_limits<lluint>::max();
+  Json::Value* value_json = proc.CppToJson(value_cpp);
+  lluint* value_cpp_2 = proc.JsonToCpp(*value_json);
+  EXPECT_EQ(value_cpp, *value_cpp_2);
+  delete value_cpp_2;
+  delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
+  delete value_json;
+}
+
+TEST(PrimitivesProcessorsTest, LLUIntJsonToCpp) {
+  LLUIntProcessor proc;
+  Json::Value value_json;
+
+  value_json = Json::Value("0");
+  lluint* value_cpp = proc.JsonToCpp(value_json);
+  EXPECT_EQ(*value_cpp, lluint(0));
+
+  value_json = Json::Value("-0");
+  EXPECT_THROW(proc.JsonToCpp(value_json), Squeal);
+
+  value_json = Json::Value("abc");
+  EXPECT_THROW(proc.JsonToCpp(value_json), Squeal);
+
+  value_json = Json::Value(1);
+  EXPECT_THROW(proc.JsonToCpp(value_json), Squeal);
 }
 }
 
