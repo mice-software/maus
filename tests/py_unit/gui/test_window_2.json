@@ -1,0 +1,42 @@
+{
+"type":"transient_frame",
+"name":"Window 2",
+"children":[{
+        "type":"vertical_frame",
+        "name":"test_1"
+    }, {
+        "type":"horizontal_frame",
+        "layout":"close_v",
+        "name":"test_2"
+    }, {
+        "type":"label",
+        "label_length":19,
+        "name":"test_3"
+    }, {
+        "type":"named_text_entry",
+        "default_text":"test",
+        "tool_tip":"Transverse position of the beam",
+        "name":"test_4"
+    }, {
+        "type":"button",
+        "name":"test_5"
+    }, {
+        "type":"drop_down",
+        "entries":["0", "1"],
+        "selected":1,
+        "name":"test_6"
+    }, {
+        "type":"check_button",
+        "text":"Test Check Button",
+        "default_state":1,
+        "name":"test_7"
+    }, {
+        "type":"special",
+        "manipulator":"test_manipulator_1",
+        "name":"test_8"
+    }, {
+        "type":"text_entry",
+        "default_text":"text",
+        "name":"test_9"
+    }]
+}

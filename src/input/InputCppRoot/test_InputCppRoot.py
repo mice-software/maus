@@ -47,7 +47,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
@@ -210,7 +209,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree2 = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree2.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
@@ -242,7 +240,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301

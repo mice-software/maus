@@ -41,7 +41,7 @@ class MapPyScalersDumpTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_something(self):
         """ Check against different issues"""
-        inputter = MAUS.InputCppDAQData(self._datapath, self._datafile)
+        inputter = MAUS.InputCppDAQOfflineData(self._datapath, self._datafile)
         inputter.birth( self._c.getConfigJSON() )
 
         success = self.mapper.birth("{}")

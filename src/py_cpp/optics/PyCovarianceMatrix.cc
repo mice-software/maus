@@ -396,7 +396,7 @@ std::string(" - dispersion_x (float): dispersion in x direction [?]\n")+
 std::string(" - dispersion_prime_x (float): dispersion prime in x\n")+
 std::string("   direction (derivative with respect to s) [?]\n")+
 std::string(" - dispersion_y (float): dispersion in y direction [?]\n")+
-std::string(" - dispersion_prime_x (float): dispersion prime in y\n")+
+std::string(" - dispersion_prime_y (float): dispersion prime in y\n")+
 std::string("   direction (derivative with respect to s) [?]\n");
 
 PyObject* create_from_penn_parameters
