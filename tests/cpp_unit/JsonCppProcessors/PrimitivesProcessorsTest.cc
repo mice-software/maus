@@ -26,8 +26,6 @@
 
 namespace MAUS {
 
-typedef LLUIntProcessor::lluint lluint;
-
 TEST(PrimitivesProcessorsTest, DoubleJsonToCpp) {
   DoubleProcessor proc;
   double* value = proc.JsonToCpp(Json::Value(1.));
@@ -149,9 +147,9 @@ TEST(PrimitivesProcessorsTest, UIntCppToJson) {
 
 TEST(PrimitivesProcessorsTest, LLUIntCppToJson) {
   LLUIntProcessor proc;
-  lluint value_cpp = std::numeric_limits<lluint>::max();
+  uint64 value_cpp = std::numeric_limits<uint64>::max();
   Json::Value* value_json = proc.CppToJson(value_cpp);
-  lluint* value_cpp_2 = proc.JsonToCpp(*value_json);
+  uint64* value_cpp_2 = proc.JsonToCpp(*value_json);
   EXPECT_EQ(value_cpp, *value_cpp_2);
   delete value_cpp_2;
   delete value_json;
@@ -165,8 +163,8 @@ TEST(PrimitivesProcessorsTest, LLUIntJsonToCpp) {
   Json::Value value_json;
 
   value_json = Json::Value("0");
-  lluint* value_cpp = proc.JsonToCpp(value_json);
-  EXPECT_EQ(*value_cpp, lluint(0));
+  uint64* value_cpp = proc.JsonToCpp(value_json);
+  EXPECT_EQ(*value_cpp, static_cast<uint64>(0));
 
   value_json = Json::Value("-0");
   EXPECT_THROW(proc.JsonToCpp(value_json), Squeal);
