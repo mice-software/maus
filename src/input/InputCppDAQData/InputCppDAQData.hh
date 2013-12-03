@@ -163,36 +163,26 @@ class InputCppDAQData {
   DAQChannelMap _map;
 
   /** Processor for TDC particle event data. */
-  V1290DataProcessor     *_v1290PartEventProc_json;
   V1290CppDataProcessor  *_v1290PartEventProc_cpp;
 
   /** Processor for fADC V1724 particle event data. */
-  V1724DataProcessor     *_v1724PartEventProc_json;
   V1724CppDataProcessor  *_v1724PartEventProc_cpp;
 
   /** Processor for fADC V1731 particle event data. */
-  V1731DataProcessor     *_v1731PartEventProc_json;
   V1731CppDataProcessor  *_v1731PartEventProc_cpp;
 
   /** Processor for scaler data. */
-  V830DataProcessor      *_v830FragmentProc_json;
   V830CppDataProcessor   *_v830FragmentProc_cpp;
 
   /** Processor for VLSB data. */
-  VLSBDataProcessor      *_vLSBFragmentProc_json;
-
- /** Processor for VLSB data from the cosmic test in Lab7.
-  */
-  VLSB_CDataProcessor    *_vLSB_cFragmentProc_json;
+  VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
  /** Processor for DBB data.
   */
-  DBBDataProcessor     *_DBBFragmentProc_json;
   DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
  /** Processor for DBBChain data.
   */
-//   DBBChainDataProcessor     *_DBBChainFragmentProc_json;
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
  /** Enum of event types
@@ -205,6 +195,8 @@ class InputCppDAQData {
     DBB = 141,
     VLSB_C = 80
   };
+
+  bool json_out;  // !!!!!!!!!!!!!!!!
 
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.

@@ -16,6 +16,10 @@
  */
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 
 InputCppDAQData::InputCppDAQData() {
   _classname = "InputCppDAQData";
@@ -23,26 +27,12 @@ InputCppDAQData::InputCppDAQData() {
   _eventsCount = 0;
 
   _v1290PartEventProc_cpp  = NULL;
-  _v1290PartEventProc_json = NULL;
-
   _v1724PartEventProc_cpp  = NULL;
-  _v1724PartEventProc_json = NULL;
-
   _v1731PartEventProc_cpp  = NULL;
-  _v1731PartEventProc_json = NULL;
-
   _v830FragmentProc_cpp    = NULL;
-  _v830FragmentProc_json   = NULL;
-
-  _vLSB_cFragmentProc_json = NULL;
-
-  _vLSBFragmentProc_json   = NULL;
-
+  _vLSBFragmentProc_cpp   = NULL;
   _DBBFragmentProc_cpp     = NULL;
-  _DBBFragmentProc_json    = NULL;
-
   _DBBChainFragmentProc_cpp = NULL;
-//   _DBBChainFragmentProc_json = NULL;
 }
 
 
@@ -61,6 +51,31 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     return false;
   }
 
+  // Comfigure the V830 (scaler) data processor.
+  initProcessor(_v830FragmentProc_cpp, configJSON);
+
+  // Comfigure the V1290 (TDC) data processor.
+  initProcessor(_v1290PartEventProc_cpp,  configJSON);
+
+  // Comfigure the V1724 (TOF and KL fADC) data processor.
+  initProcessor(_v1724PartEventProc_cpp, configJSON);
+  configureZeroSupression(_v1724PartEventProc_cpp, configJSON);
+
+  // Comfigure the V1731 (CKOV and EMR fADC) data processor.
+  initProcessor(_v1731PartEventProc_cpp, configJSON);
+  configureZeroSupression(_v1731PartEventProc_cpp, configJSON);
+
+  // Comfigure the VLSB (tracker board) data processor.
+  initProcessor(_vLSBFragmentProc_cpp, configJSON);
+  configureZeroSupression(_vLSBFragmentProc_cpp, configJSON);
+
+  // Comfigure the DBB (EMR board) data processor.
+  initProcessor(_DBBFragmentProc_cpp, configJSON);
+
+  // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
+  initProcessor(_DBBChainFragmentProc_cpp, configJSON);
+
+
   assert(configJSON.isMember("DAQ_cabling_file"));
   std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
@@ -77,70 +92,10 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     return false;
   }
 
-  assert(configJSON.isMember("Input_Use_JSON"));
-  bool json_out = configJSON["Input_Use_JSON"].asBool();
+  // Set the map (a static data member) of all the processors.
+  MDarranger::set_DAQ_map(&_map);
 
-  if (json_out) {
-    // Comfigure the V830 (scaler) data processor.
-    initProcessor(_v830FragmentProc_json, configJSON);
-
-    // Comfigure the V1290 (TDC) data processor.
-    initProcessor(_v1290PartEventProc_json, configJSON);
-
-    // Comfigure the V1724 (fADC) data processor.
-    initProcessor(_v1724PartEventProc_json, configJSON);
-    configureZeroSupression(_v1724PartEventProc_json, configJSON);
-
-    // Comfigure the V1731 (fADC) data processor.
-    initProcessor(_v1731PartEventProc_json, configJSON);
-    configureZeroSupression(_v1731PartEventProc_json, configJSON);
-
-    // Comfigure the VLSB (tracker board) data processor.
-    initProcessor<VLSBDataProcessor>(_vLSBFragmentProc_json, configJSON);
-    configureZeroSupression(_vLSBFragmentProc_json, configJSON);
-
-    // Comfigure the VLSB (tracker board) data processor.
-    // This is for the old version of the VLSB equipment used in the cosmic test in lab7
-    initProcessor<VLSB_CDataProcessor>(_vLSB_cFragmentProc_json, configJSON);
-    configureZeroSupression(_vLSB_cFragmentProc_json, configJSON);
-
-    // Comfigure the DBB (EMR board) data processor.
-    initProcessor(_DBBFragmentProc_json, configJSON);
-
-    // Comfigure the DBB (EMR board) data processor.
-//     initProcessor(_DBBChainFragmentProc_json, configJSON);
-  } else {
-    // Comfigure the V830 (scaler) data processor.
-    initProcessor(_v830FragmentProc_cpp, configJSON);
-
-    // Comfigure the V1290 (TDC) data processor.
-    initProcessor(_v1290PartEventProc_cpp,  configJSON);
-
-    // Comfigure the V1724 (fADC) data processor.
-    initProcessor(_v1724PartEventProc_cpp, configJSON);
-    configureZeroSupression(_v1724PartEventProc_cpp, configJSON);
-
-    // Comfigure the V1731 (fADC) data processor.
-    initProcessor(_v1731PartEventProc_cpp, configJSON);
-    configureZeroSupression(_v1731PartEventProc_cpp, configJSON);
-
-    // Comfigure the VLSB (tracker board) data processor.
-//     initProcessor<VLSBDataProcessor>(_vLSBFragmentProc_cpp, configJSON);
-//     configureZeroSupression(_vLSBFragmentProc_cpp, configJSON);
-
-    // Comfigure the VLSB (tracker board) data processor.
-    // This is for the old version of the VLSB equipment used in the cosmic test in lab7
-//     initProcessor<VLSB_CDataProcessor>(_vLSB_cFragmentProc_cpp, configJSON);
-//     configureZeroSupression(_vLSB_cFragmentProc_cpp, configJSON);
-
-    // Comfigure the DBB (EMR board) data processor.
-    initProcessor(_DBBFragmentProc_cpp, configJSON);
-
-    // Comfigure the DBB (EMR board) data processor.
-    initProcessor(_DBBChainFragmentProc_cpp, configJSON);
-  }
-
-  // _dataProcessManager.DumpProcessors();
+//   _dataProcessManager.DumpProcessors();
 
   return true;
 }
@@ -152,48 +107,52 @@ bool InputCppDAQData::readNextEvent() {
   << "ERROR : InputCppDAQData is a base imput class and can not be used to access the DAQ data!"
   << std::endl << "*** Use InputCppDAQOfflineData or InputCppDAQOnlineData instead. ***"
   << std::endl << std::endl;
-  std::cerr << "22 _DBBFragmentProc_cpp: " << _DBBFragmentProc_cpp << std::endl;
+
   return false;
 }
 
 void InputCppDAQData::getCurEvent(MAUS::Data *data) {
 
-  MAUS::DAQData *daq_data = data->GetSpill()->GetDAQData();
+  MAUS::Spill* spill = data->GetSpill();
   try {
     // Now do the loop over the binary DAQ data.
     _dataProcessManager.Process(_eventPtr);
+//     data->SetEventType("Spill");
+    unsigned int event_type = _dataProcessManager.GetEventType();
 
-     if (_DBBFragmentProc_cpp) {
-      _DBBFragmentProc_cpp->set_daq_data(daq_data);
+    // The data is processed and is ready to be filled in daq_data.
+    spill->SetDaqEventType(event_type_to_str(event_type));
+    spill->SetRunNumber(_dataProcessManager.GetRunNumber());
+    spill->SetSpillNumber(_dataProcessManager.GetSpillNumber());
+
+    if (event_type == PHYSICS_EVENT) {
+      MAUS::DAQData *daq_data = new MAUS::DAQData;
+      // Set the map (a static data member) of all the processors.
+      MDarranger::set_daq_data(daq_data);
+
+    if (_DBBFragmentProc_cpp)
       _DBBFragmentProc_cpp->fill_daq_data();
-     }
 
-    if (_DBBChainFragmentProc_cpp) {
-      _DBBChainFragmentProc_cpp->set_daq_data(daq_data);
+    if (_DBBChainFragmentProc_cpp)
       _DBBChainFragmentProc_cpp->fill_daq_data();
-    }
 
-    if (_v1731PartEventProc_cpp) {
-      _v1731PartEventProc_cpp->set_daq_data(daq_data);
+    if (_v1731PartEventProc_cpp)
       _v1731PartEventProc_cpp->fill_daq_data();
-    }
 
-    if (_v1724PartEventProc_cpp) {
-      _v1724PartEventProc_cpp->set_daq_data(daq_data);
+    if (_v1724PartEventProc_cpp)
       _v1724PartEventProc_cpp->fill_daq_data();
-    }
 
-    if (_v1290PartEventProc_cpp) {
-      _v1290PartEventProc_cpp->set_daq_data(daq_data);
+    if (_v1290PartEventProc_cpp)
       _v1290PartEventProc_cpp->fill_daq_data();
-    }
 
-    if (_v830FragmentProc_cpp) {
-      _v830FragmentProc_cpp->set_daq_data(daq_data);
+    if (_v830FragmentProc_cpp)
       _v830FragmentProc_cpp->fill_daq_data();
-    }
 
-    data->GetSpill()->SetDAQData(daq_data);
+    if (_vLSBFragmentProc_cpp)
+      _vLSBFragmentProc_cpp->fill_daq_data();
+
+    spill->SetDAQData(daq_data);
+    }
   }
   // Deal with exceptions
   catch(MDexception & lExc) {
@@ -205,9 +164,23 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     std::stringstream ss;
     ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event " << std::endl
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    MAUS::ErrorsMap errors = data->GetSpill()->GetErrors();
+    MAUS::ErrorsMap errors = spill->GetErrors();
     errors["bad_data_input"] = ss.str();
-    data->GetSpill()->SetErrors(errors);
+    spill->SetErrors(errors);
+  }
+  catch(Squeal squee) {
+    Squeak::mout(Squeak::error) << squee.GetLocation() << ": "
+    << squee.GetMessage() << std::endl
+    << "*** MAUS exception in void  "
+    << "InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
+    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
+
+    std::stringstream ss;
+    ss << squee.GetLocation() << " says:" << squee.GetMessage() << "  Phys. Event " << std::endl
+    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
+    MAUS::ErrorsMap errors = spill->GetErrors();
+    errors["bad_data_input"] = ss.str();
+    spill->SetErrors(errors);
   }
   catch(std::exception & lExc) {
     Squeak::mout(Squeak::error) << lExc.what() << std::endl
@@ -218,9 +191,9 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     std::stringstream ss;
     ss << _classname << " says:" << lExc.what() << " Phys. Event "
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    MAUS::ErrorsMap errors = data->GetSpill()->GetErrors();
+    MAUS::ErrorsMap errors = spill->GetErrors();
     errors["bad_data_input"] = ss.str();
-    data->GetSpill()->SetErrors(errors);
+    spill->SetErrors(errors);
   }
   catch(...) {
     Squeak::mout(Squeak::error) << "*** void InputCppDAQData::getCurEvent(MAUS::Data *data) : "
@@ -230,136 +203,50 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     std::stringstream ss;
     ss << _classname << " says: Unknown exception occurred. Phys. Event "
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    MAUS::ErrorsMap errors = data->GetSpill()->GetErrors();
+    MAUS::ErrorsMap errors = spill->GetErrors();
     errors["bad_data_input"] = ss.str();
-    data->GetSpill()->SetErrors(errors);
+    spill->SetErrors(errors);
   }
 
   this->resetAllProcessors();
 }
 
 std::string InputCppDAQData::getCurEvent() {
-  // Create new Json documents.
-  Json::Value xDocRoot;  // Root of the event
-  Json::FastWriter xJSONWr;
-  Json::Value xDocSpill;
 
-  // Order all processor classes to fill in xDocSpill.
-  if (_v1290PartEventProc_json)
-    _v1290PartEventProc_json->set_JSON_doc(&xDocSpill);
+  MAUS::Data  *data_cpp  = new MAUS::Data;
+  MAUS::Spill *spill_cpp = new MAUS::Spill;
+  data_cpp->SetSpill(spill_cpp);
+  this->getCurEvent(data_cpp);
 
-  if (_v1724PartEventProc_json)
-    _v1724PartEventProc_json->set_JSON_doc(&xDocSpill);
-
-  if (_v1731PartEventProc_json)
-    _v1731PartEventProc_json->set_JSON_doc(&xDocSpill);
-
-  if (_v830FragmentProc_json)
-    _v830FragmentProc_json->set_JSON_doc(&xDocSpill);
-
-  if (_vLSBFragmentProc_json)
-    _vLSBFragmentProc_json->set_JSON_doc(&xDocSpill);
-
-  if (_vLSB_cFragmentProc_json)
-    _vLSB_cFragmentProc_json->set_JSON_doc(&xDocSpill);
-
-  if (_DBBFragmentProc_json)
-    _DBBFragmentProc_json->set_JSON_doc(&xDocSpill);
-
-//   if (_DBBChainFragmentProc_json)
-//     _DBBChainFragmentProc_json->set_JSON_doc(&xDocSpill);
-
-  // Now do the loop over the binary DAQ data.
-  try {
-    _dataProcessManager.Process(_eventPtr);
-  }
-  // Deal with exceptions
-  catch(MDexception & lExc) {
-    Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
-    << "*** Unpacking exception in InputCppDAQData::getCurEvent() : " << std::endl;
-    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << lExc.GetDescription() << "  Phys. Event " << std::endl
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
-  }
-  catch(std::exception & lExc) {
-    Squeak::mout(Squeak::error) << lExc.what() << std::endl
-    << "*** Standard exception in InputCppDAQData::getCurEvent() : " << std::endl;
-    Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << lExc.what() << " Phys. Event "
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
-  }
-  catch(...) {
-    Squeak::mout(Squeak::error) <<
-    "*** InputCppDAQData::getCurEvent() : Unknown exception occurred." << std::endl;
-    Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::endl;
-    xDocSpill.clear();
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Unknown exception occurred. Phys. Event "
-    << _dataProcessManager.GetPhysEventNumber() << " skipped!";
-    errors["bad_data_input"] = ss.str();
-    xDocRoot["errors"] = errors;
-  }
-
-  // Finally attach the spill to the document root
-  if (xDocSpill.type() != Json::nullValue) {
-    xDocRoot["daq_data"] = xDocSpill;
-  }
-  xDocRoot["spill_number"] = _dataProcessManager.GetSpillNumber();
-  unsigned int event_type = _dataProcessManager.GetEventType();
-  xDocRoot["daq_event_type"] = event_type_to_str(event_type);
-  xDocRoot["run_number"] = _dataProcessManager.GetRunNumber();
-  xDocRoot["maus_event_type"] = Json::Value("Spill");
-  // cout << xDocRoot << endl;
-
+  Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(data_cpp);
+//   std::cerr << *spill_json_out << std::endl;
+  delete data_cpp;
   _eventsCount++;
-  return xJSONWr.write(xDocRoot);
+
+  Json::FastWriter xJSONWr;
+  return xJSONWr.write(*spill_json_out);
 }
 
 bool InputCppDAQData::death() {
   // Free the memory.
   if (_v1290PartEventProc_cpp)    delete _v1290PartEventProc_cpp;
-  if (_v1290PartEventProc_json)   delete _v1290PartEventProc_json;
-
   if (_v1724PartEventProc_cpp)    delete _v1724PartEventProc_cpp;
-  if (_v1724PartEventProc_json)   delete _v1724PartEventProc_json;
-
   if (_v1731PartEventProc_cpp)    delete _v1731PartEventProc_cpp;
-  if (_v1731PartEventProc_json)   delete _v1731PartEventProc_json;
-
   if (_v830FragmentProc_cpp)      delete _v830FragmentProc_cpp;
-  if (_v830FragmentProc_json)     delete _v830FragmentProc_json;
-
-  if (_vLSBFragmentProc_json)     delete _vLSBFragmentProc_json;
-
-  if (_vLSB_cFragmentProc_json)   delete _vLSB_cFragmentProc_json;
-
+  if (_vLSBFragmentProc_cpp)     delete _vLSBFragmentProc_cpp;
   if (_DBBFragmentProc_cpp)       delete _DBBFragmentProc_cpp;
-  if (_DBBFragmentProc_json)      delete _DBBFragmentProc_json;
-
   if (_DBBChainFragmentProc_cpp)  delete _DBBChainFragmentProc_cpp;
-//   if (_DBBChainFragmentProc_json) delete _DBBChainFragmentProc_json;
 
   return true;
 }
 
 void InputCppDAQData::resetAllProcessors() {
+  // Reset all the processors.
   if (_v1290PartEventProc_cpp)     _v1290PartEventProc_cpp->reset();
   if (_v1724PartEventProc_cpp)     _v1724PartEventProc_cpp->reset();
   if (_v1731PartEventProc_cpp)     _v1731PartEventProc_cpp->reset();
   if (_v830FragmentProc_cpp)       _v830FragmentProc_cpp->reset();
-//   if (_vLSBFragmentProc_cpp)       _vLSBFragmentProc_cpp->reset();
-//   if (_vLSB_cFragmentProc_cpp)     _vLSB_cFragmentProc_cpp->reset();
+  if (_vLSBFragmentProc_cpp)       _vLSBFragmentProc_cpp->reset();
   if (_DBBFragmentProc_cpp)        _DBBFragmentProc_cpp->reset();
   if (_DBBChainFragmentProc_cpp)   _DBBChainFragmentProc_cpp->reset();
 }
@@ -376,8 +263,6 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
   bool enableThis = configJSON[xDataCard].asBool();
 
   if (enableThis) {
-    processor->set_DAQ_map(&_map);
-
     // Get a pointer to the equipment fragment object from the static equipment map.
     unsigned int xFragType = MDequipMap::GetType(xName);
     MDfragment* xFragPtr = MDequipMap::GetFragmentPtr(xFragType);
@@ -458,9 +343,6 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
   }
   return event_type;
 }
-
-
-
 
 
 

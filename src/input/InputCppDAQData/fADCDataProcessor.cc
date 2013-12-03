@@ -16,6 +16,8 @@
  */
 
 #include "src/input/InputCppDAQData/fADCDataProcessor.hh"
+MAUS::DAQData* MDarranger::_daq_data = 0;
+DAQChannelMap* MDarranger::_chMap = 0;
 
 int fADCDataProcessor::get_area() {
   int area = 0;
@@ -25,15 +27,30 @@ int fADCDataProcessor::get_area() {
 }
 
 void fADCDataProcessor::set_pedestal() {
-  /* check if there is no signal in first 40 bins */
-  double area = 0;
-  if (_data.size() < SIGNAL_INTEGRATION_WINDOW)
+
+  if (_data.size() < SIGNAL_INTEGRATION_WINDOW*3) {
     _pedestal = 0;
 
-  if (_data.size() > SIGNAL_INTEGRATION_WINDOW) {
-    for (unsigned int i = 0; i < SIGNAL_INTEGRATION_WINDOW; i++) {
-       area += _data[i];
-    }
+     throw(Squeal(Squeal::recoverable,
+           "The data size is too short.",
+           "fADCDataProcessor::set_pedestal()"));
+  }
+
+  /* check if there is no signal in first 40 bins */
+  vector<int>::iterator min;
+  min = min_element(_data.begin(), _data.end());
+  int pos = distance(_data.begin(), min);
+
+  double area = 0;
+  int i_0, i = 0;
+  if (pos > SIGNAL_INTEGRATION_WINDOW)
+    i_0 = 0;
+  else
+    i_0 = _data.size() - SIGNAL_INTEGRATION_WINDOW;
+
+  while (i < SIGNAL_INTEGRATION_WINDOW) {
+     area += _data[i+i_0];
+     i++;
   }
   _pedestal = area/SIGNAL_INTEGRATION_WINDOW;
 }
@@ -62,10 +79,10 @@ int fADCDataProcessor::print_data() {
       i++;
     }
   }
+  return _data.size();
 }
 
-int fADCDataProcessor::get_neg_signal_area(int&pos) {
-  // print_data();
+int fADCDataProcessor::get_neg_signal_area(int& pos) {
   vector<int>::iterator it = _data.begin();
   vector<int>::iterator min;
   int area = 0;
@@ -73,15 +90,17 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
     min = min_element(_data.begin(), _data.end());
     pos = distance(_data.begin(), min);
     int nSamples = 0;
-    if (pos > SIGNAL_INTEGRATION_WINDOW) { // was: pos > 10
+    if (pos > 10)
       it = min -  10;
-      while (it < min + SIGNAL_INTEGRATION_WINDOW - 10 && it < _data.end()) {
-        // area += abs(*it - _pedestal);
-        area += *it;
-        // std::cout << "val: " << *it << "  integr. area: " << area << std::endl;
-        it++;
-        nSamples++;
-      }
+    else
+      it = _data.begin();
+
+    while (it < min + SIGNAL_INTEGRATION_WINDOW - 10 && it < _data.end()) {
+      // area += abs(*it - _pedestal);
+      area += *it;
+      // std::cout << "val: " << *it << "  integr. area: " << area << std::endl;
+      it++;
+      nSamples++;
     }
     return static_cast<int>(_pedestal*nSamples-area+0.5);
   }
@@ -91,21 +110,23 @@ int fADCDataProcessor::get_neg_signal_area(int&pos) {
 
 int fADCDataProcessor::get_pos_signal_area(int& pos) {
   vector<int>::iterator it = _data.begin();
-  vector<int>::iterator min;
+  vector<int>::iterator max;
   int area = 0;
   if (_data.size()) {
-    min = min_element(_data.begin(), _data.end());
-    pos = distance(_data.begin(), min);
+    max = max_element(_data.begin(), _data.end());
+    pos = distance(_data.begin(), max);
     int nSamples = 0;
-    if (pos > SIGNAL_INTEGRATION_WINDOW) { // was: pos > 10
-      it = min -  10;
-      while (it < min + SIGNAL_INTEGRATION_WINDOW - 10 && it < _data.end()) {
-        // area += abs(*it - _pedestal);
-        area += *it;
-        // std::cout << "val: " << *it << "  integr. area: " << area << std::endl;
-        it++;
-        nSamples++;
-      }
+    if (pos > 10)
+      it = max -  10;
+    else
+      it = _data.begin();
+
+    while (it < max + SIGNAL_INTEGRATION_WINDOW - 10 && it < _data.end()) {
+      // area += abs(*it - _pedestal);
+      area += *it;
+      // std::cout << "val: " << *it << "  integr. area: " << area << std::endl;
+      it++;
+      nSamples++;
     }
     return static_cast<int>(-_pedestal*nSamples+area+0.5);
   }

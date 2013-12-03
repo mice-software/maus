@@ -57,13 +57,19 @@ class V1724Processor : public ObjectProcessor<V1724> {
     IntProcessor _phys_event_number_proc;
     IntProcessor _charge_pm_proc;
     StringProcessor _channel_key_proc;
-    DoubleProcessor _trigger_time_tag_proc;
+    IntProcessor _trigger_time_tag_proc;
     IntProcessor _time_stamp_proc;
-    IntProcessor _pedestal_proc;
+    DoubleProcessor _pedestal_proc;
     IntProcessor _part_event_number_proc;
     IntProcessor _geo_proc;
     IntProcessor _position_max_proc;
     IntProcessor _channel_proc;
+
+//     ValueArrayProcessor<int> _samples_proc;
+//     IntProcessor _arrival_time_proc;
+//     IntProcessor _position_min_proc;
+//     IntProcessor _pulse_area_proc;
+//     IntProcessor _max_pos_proc;
 };
 }  // namespace MAUS
 

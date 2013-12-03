@@ -99,7 +99,6 @@ int V1290CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
    * Cast the argument to structure it points to.
    * This process should be called only with MDfragmentV1290 argument.
    */
-//   cout << "This is V1290CppDataProcessor::Process " << xEvCounter << endl;
   if ( typeid(*aPartEventPtr) != typeid(MDpartEventV1290) )  return CastError;
   MDpartEventV1290* xV1290Evnt = static_cast<MDpartEventV1290*>(aPartEventPtr);
 //   xV1290Evnt->Dump();
@@ -109,10 +108,13 @@ int V1290CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
     return GenericError;
 
   unsigned int xPartEv = this->GetPartEventNumber();
+//   cerr << "This is V1290CppDataProcessor::Process " << xPartEv << endl;
   if (xPartEv+1 > _tof0_spill.size()) {
     _tof0_spill.resize(xPartEv+1);
     _tof1_spill.resize(xPartEv+1);
     _tof2_spill.resize(xPartEv+1);
+    _tr_spill.resize(xPartEv+1);
+    _tr_req_spill.resize(xPartEv+1);
     _unknown_spill.resize(xPartEv+1);
   }
   // Put static data into the Data Structure.
@@ -174,6 +176,7 @@ int V1290CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
         xV1290hit.SetChannelKey(xKey->str());
         xDetector = xKey->detector();
       } else {
+        xV1290hit.SetChannelKey("unknown");
         xDetector = "unknown";
       }
       xV1290hit.SetDetector(xDetector);
@@ -184,6 +187,10 @@ int V1290CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
        _tof1_spill[xPartEv].push_back(xV1290hit);
       else if (xDetector == "tof2")
        _tof2_spill[xPartEv].push_back(xV1290hit);
+      else if (xDetector == "trigger")
+        _tr_spill[xPartEv].push_back(xV1290hit);
+      else if (xDetector == "trigger_request")
+        _tr_req_spill[xPartEv].push_back(xV1290hit);
       else
        _unknown_spill[xPartEv].push_back(xV1290hit);
     }
@@ -204,6 +211,12 @@ void V1290CppDataProcessor::fill_daq_data() {
 
   if (_daq_data->GetTOF2DaqArraySize() != npe)
     _daq_data->GetTOF2DaqArrayPtr()->resize(npe);
+
+  if (_daq_data->GetTriggerRequestArraySize() != npe)
+    _daq_data->GetTriggerRequestArrayPtr()->resize(npe);
+
+  if (_daq_data->GetTriggerArraySize() != npe)
+    _daq_data->GetTriggerArrayPtr()->resize(npe);
 
   if (_daq_data->GetUnknownArraySize() != npe)
     _daq_data->GetUnknownArrayPtr()->resize(npe);
@@ -228,6 +241,18 @@ void V1290CppDataProcessor::fill_daq_data() {
 
     _daq_data->GetTOF2DaqArrayElement(ipe)->SetV1290Array(_tof2_spill[ipe]);
 
+    MAUS::Trigger *tr_daq = _daq_data->GetTriggerArrayElement(ipe);
+    if (!tr_daq)
+      (*_daq_data->GetTriggerArrayPtr())[ipe] = new MAUS::Trigger;
+
+    _daq_data->GetTriggerArrayElement(ipe)->SetV1290Array(_tr_spill[ipe]);
+
+    MAUS::TriggerRequest *tr_req_daq = _daq_data->GetTriggerRequestArrayElement(ipe);
+    if (!tr_req_daq)
+      (*_daq_data->GetTriggerRequestArrayPtr())[ipe] = new MAUS::TriggerRequest;
+
+    _daq_data->GetTriggerRequestArrayElement(ipe)->SetV1290Array(_tr_req_spill[ipe]);
+
     MAUS::Unknown *unknown = _daq_data->GetUnknownArrayElement(ipe);
     if (!unknown)
       (*_daq_data->GetUnknownArrayPtr())[ipe] = new MAUS::Unknown;
@@ -239,6 +264,8 @@ void V1290CppDataProcessor::reset() {
   _tof0_spill.clear();
   _tof1_spill.clear();
   _tof2_spill.clear();
+  _tr_spill.clear();
+  _tr_req_spill.clear();
   _unknown_spill.clear();
 }
 
@@ -336,17 +363,21 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
 
   // Loop over all the channels
   for (unsigned int xCh = 0; xCh < V1724_NCHANNELS; xCh++) {
-    if ( xV1724Evnt->GetLength(xCh) ) {
-      unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*V1724_SAMPLES_PER_WORD;
-      vector<int> data;
-      for (unsigned int j = 0; j < xSamples; j++) {
-        int sample = xV1724Evnt->GetSampleData(xCh,  // Channel ID
-                                               j);  // Sample ID
-        data.push_back(sample);
-      }
-      xV1724hit.SetSampleArray(data);
-      this->set_pedestal();
 
+    if (xV1724Evnt->GetLength(xCh) == 0) continue;
+
+    unsigned int xSamples = ( xV1724Evnt->GetLength(xCh) )*V1724_SAMPLES_PER_WORD;
+    for (unsigned int j = 0; j < xSamples; j++) {
+      int sample = xV1724Evnt->GetSampleData(xCh,  // Channel ID
+                                             j);  // Sample ID
+      _data.push_back(sample);
+    }
+    xV1724hit.SetSampleArray(_data);
+    this->set_pedestal();
+    int charge_mm = this->get_charge(ceaMinMax);
+
+    if ( !_zero_suppression ||
+       (_zero_suppression && charge_mm > _zs_threshold) ) {
       xV1724hit.SetChannel(xCh);
       string xDetector;
       DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
@@ -362,14 +393,14 @@ int V1724CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       xV1724hit.SetPhysEventNumber(this->GetPhysEventNumber());
       xV1724hit.SetTimeStamp(this->GetTimeStamp());
       xV1724hit.SetChargeMm(this->get_charge(ceaMinMax));
-      xV1724hit.SetChargePm(this->get_charge(ceaPedMin));
+      xV1724hit.SetChargePm(this->get_charge(ceaPedMax));
       int max_position = 0;
       xV1724hit.SetPulseArea(this->get_pos_signal_area(max_position));
       xV1724hit.SetPositionMin(this->get_min_position());
-      xV1724hit.SetMaxPos(max_position);
+      xV1724hit.SetPositionMax(max_position);
       xV1724hit.SetArrivalTime(this->get_arrival_time());
       xV1724hit.SetTriggerTimeTag(xV1724Evnt->GetTriggerTimeTag());
-      xV1724hit.SetPedestal(static_cast<int>(this->get_pedestal()+0.5));
+      xV1724hit.SetPedestal(this->get_pedestal());
       xV1724hit.SetSampleArray(_data);
 
       if (xDetector == "tof0")
@@ -507,13 +538,14 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
       xfAdcHit["position_min"] = this->get_min_position();
       xfAdcHit["pedestal"]     = this->get_pedestal();
       xfAdcHit["samples"]      = this ->get_samples();
-      DAQChannelKey* xKey = _chMap->find(xLdc, xGeo, xCh, xEquip);
+      DAQChannelKey* xKey      = _chMap->find(xLdc, xGeo, xCh, xEquip);
       if (xKey) {
         xDetector = xKey->detector();
         xfAdcHit["channel_key"]   = xKey->str();
         xfAdcHit["detector"]      = xDetector;
       } else {
         xfAdcHit["detector"] = xDetector = "unknown";
+        xfAdcHit["channel_key"]   = "unknown";
       }
       xfAdcHit["channel"]        = xCh;
 
@@ -561,14 +593,13 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
 
   for (unsigned int xCh = 0; xCh < V1731_NCHANNELS; xCh++) {
     if ( xV1731Evnt->GetLength(xCh) ) {
-      vector<int> data;
       unsigned int xSamples = ( xV1731Evnt->GetLength(xCh) )*V1731_SAMPLES_PER_WORD;
       for (unsigned int j = 0; j < xSamples; j++) {
         int sample = xV1731Evnt->GetSampleData(xCh,  // Channel ID
                                                j);  // Sample ID
-        data.push_back(sample);
+        _data.push_back(sample);
       }
-      xV1731hit.SetSampleArray(data);
+      xV1731hit.SetSampleArray(_data);
       this->set_pedestal();
 
       xV1731hit.SetChannel(xCh);
@@ -593,7 +624,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       xV1731hit.SetMaxPos(this->get_max_position());
       xV1731hit.SetArrivalTime(this->get_arrival_time());
       xV1731hit.SetTriggerTimeTag(xV1731Evnt->GetTriggerTimeTag());
-      xV1731hit.SetPedestal(static_cast<int>(this->get_pedestal()+0.5));
+      xV1731hit.SetPedestal(this->get_pedestal());
       xV1731hit.SetSampleArray(_data);
 
       if (xDetector == "emr")
@@ -677,8 +708,8 @@ int V830DataProcessor::Process(MDdataContainer* aFragPtr) {
       }
       case DWV830_Header:
       {
-         pBoardDoc["geo"] = Json::Value(xDataWord.GetGeo());
-         break;
+        pBoardDoc["geo"] = Json::Value(xDataWord.GetGeo());
+        break;
       }
     }
     xWordCount++;
@@ -696,7 +727,7 @@ int V830CppDataProcessor::Process(MDdataContainer* aFragPtr) {
    * Cast the argument to structure it points to.
    * This process should be called only with MDfragmentV830 argument.
    */
-//   cout << "This is V830CppDataProcessor::Process " << xEvCounter << endl;
+//   cerr << "This is V830CppDataProcessor::Process " << endl;
 
   if ( typeid(*aFragPtr) != typeid(MDfragmentV830) ) return CastError;
   MDfragmentV830* xV830Fragment = static_cast<MDfragmentV830*>(aFragPtr);
@@ -724,11 +755,12 @@ int V830CppDataProcessor::Process(MDdataContainer* aFragPtr) {
         int xCh = xDataWord.GetChannel();
         int xValue = xDataWord.GetMeasurement();
         xChannels.SetCh(xCh, xValue);
+        break;
       }
       case DWV830_Header:
       {
-         _v830_spill.SetGeo(xDataWord.GetGeo());
-         break;
+        _v830_spill.SetGeo(xDataWord.GetGeo());
+        break;
       }
     }
     xWordCount++;
@@ -804,6 +836,105 @@ int VLSBDataProcessor::Process(MDdataContainer* aFragPtr) {
   }
 
   return OK;
+}
+
+int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  // Cast the argument to structure it points to.
+  // This process should be called only with MDfragmentVLSB_C argument.
+  if ( typeid(*aFragPtr) != typeid(MDfragmentVLSB) )
+    return CastError;
+
+//   std::cerr << "VLSBDataProcessor::Process" << std::endl;
+  MDfragmentVLSB* xVLSBFragment = static_cast<MDfragmentVLSB*>(aFragPtr);
+
+  if ( !xVLSBFragment->IsValid() )
+    return GenericError;
+
+  MAUS::VLSB xVLSBhit;
+  int xLdc, xAdc, xTimeStamp, xPhysEvNum;
+  unsigned int xPartEv;
+  string xDetector;
+
+  xLdc = this->GetLdcId();
+  xTimeStamp = this->GetTimeStamp();
+  xPhysEvNum = this->GetPhysEventNumber();
+  // Get the number of data words.
+  uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
+
+  // Loop over the data.
+  uint32_t xWordCount(0);
+  while (xWordCount < nDataWords) {
+    xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
+    if (xPartEv > _tracker1_spill.size()) {
+      _tracker1_spill.resize(xPartEv);
+      _tracker0_spill.resize(xPartEv);
+      _single_st_spill.resize(xPartEv);
+    }
+
+    xAdc = xVLSBFragment->GetAdc(xWordCount);
+    if (!_zero_suppression ||
+        (_zero_suppression && xAdc > _zs_threshold) ) {
+      xVLSBhit.SetLdcId(xLdc);
+      xVLSBhit.SetEquipType(this->GetEquipmentType());
+      xVLSBhit.SetTimeStamp(xTimeStamp);
+      xVLSBhit.SetPhysEventNumber(xPhysEvNum);
+      xVLSBhit.SetBankID(xVLSBFragment->GetBoardID());
+      xVLSBhit.SetADC(xAdc);
+      xVLSBhit.SetPartEventNumber(xPartEv);
+      xVLSBhit.SetChannel(xVLSBFragment->GetChannel(xWordCount));
+      xVLSBhit.SetTDC(xVLSBFragment->GetTdc(xWordCount));
+      xVLSBhit.SetDiscriminator(xVLSBFragment->GetDiscriBit(xWordCount));
+
+      if (xLdc == 0) {
+        xDetector = "tracker0";
+        xVLSBhit.SetDetector(xDetector);
+        _tracker0_spill[xPartEv].push_back(xVLSBhit);
+
+      } else if (xLdc == 2) {
+        xDetector = "tracker1";
+        xVLSBhit.SetDetector(xDetector);
+        _tracker1_spill[xPartEv].push_back(xVLSBhit);
+      }
+      /* else if (xLdc == 3) {
+        xDetector = "single_station";
+        xVLSBhit.SetDetector(xDetector);
+        _single_st_spill[xPartEv].push_back(xVLSBhit);
+      }*/
+    }
+    xWordCount++;
+  }
+
+  return OK;
+}
+
+
+void VLSBCppDataProcessor::fill_daq_data() {
+  unsigned int npe = _tracker1_spill.size();
+
+  if (_daq_data->GetTracker0DaqArraySize() != npe)
+    _daq_data->GetTracker0DaqArrayPtr()->resize(npe);
+
+  if (_daq_data->GetTracker1DaqArraySize() != npe)
+    _daq_data->GetTracker1DaqArrayPtr()->resize(npe);
+
+
+  for (unsigned int ipe = 0; ipe < npe; ipe++) {
+    MAUS::TrackerDaq *tracker0_daq = _daq_data->GetTracker0DaqArrayElement(ipe);
+    if (!tracker0_daq)
+      (*_daq_data->GetTracker0DaqArrayPtr())[ipe] = new MAUS::TrackerDaq;
+    _daq_data->GetTracker0DaqArrayElement(ipe)->SetVLSBArray(_tracker0_spill[ipe]);
+
+    MAUS::TrackerDaq *tracker1_daq = _daq_data->GetTracker1DaqArrayElement(ipe);
+    if (!tracker1_daq)
+      (*_daq_data->GetTracker1DaqArrayPtr())[ipe] = new MAUS::TrackerDaq;
+    _daq_data->GetTracker1DaqArrayElement(ipe)->SetVLSBArray(_tracker1_spill[ipe]);
+  }
+}
+
+void VLSBCppDataProcessor::reset() {
+  _tracker1_spill.clear();
+  _tracker0_spill.clear();
+  _single_st_spill.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

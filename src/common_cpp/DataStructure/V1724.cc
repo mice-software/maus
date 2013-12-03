@@ -162,11 +162,11 @@ void V1724::SetMaxPos(int max_pos) {
     _max_pos = max_pos;
 }
 
-double V1724::GetTriggerTimeTag() const {
+int V1724::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }
 
-void V1724::SetTriggerTimeTag(double trigger_time_tag) {
+void V1724::SetTriggerTimeTag(int trigger_time_tag) {
     _trigger_time_tag = trigger_time_tag;
 }
 
@@ -178,11 +178,11 @@ void V1724::SetTimeStamp(int time_stamp) {
     _time_stamp = time_stamp;
 }
 
-int V1724::GetPedestal() const {
+double V1724::GetPedestal() const {
     return _pedestal;
 }
 
-void V1724::SetPedestal(int pedestal) {
+void V1724::SetPedestal(double pedestal) {
     _pedestal = pedestal;
 }
 

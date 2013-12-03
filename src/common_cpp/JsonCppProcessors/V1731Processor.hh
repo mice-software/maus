@@ -66,12 +66,12 @@ class V1731Processor : public ObjectProcessor<V1731> {
     IntProcessor _position_min_proc;
     IntProcessor _pulse_area_proc;
     IntProcessor _max_pos_proc;
-    DoubleProcessor _trigger_time_tag_proc;
+    IntProcessor _trigger_time_tag_proc;
     IntProcessor _time_stamp_proc;
     StringProcessor _detector_proc;
     IntProcessor _part_event_number_proc;
     IntProcessor _geo_proc;
-    IntProcessor _pedestal_proc;
+    DoubleProcessor _pedestal_proc;
     IntProcessor _channel_proc;
 };
 }  // namespace MAUS

@@ -52,17 +52,17 @@ class MDarranger : public MDprocessor {
  /** This function sets the pointer to the DAQData object.
   * \param[in] dd The pointer to the DAQData objevt.
   */
-  void set_daq_data(MAUS::DAQData *dd) {_daq_data = dd;}
+  static void set_daq_data(MAUS::DAQData *dd) {_daq_data = dd;}
 
   /** Gets the json document where DAQ data is written
    */
-  MAUS::DAQData* get_daq_data() {return _daq_data;}
+  static MAUS::DAQData* get_daq_data() {return _daq_data;}
 
   /**
   * This function sets the DAQ map.
   * \param[in] map The DAQ channel map.
   */
-  void set_DAQ_map(DAQChannelMap* map) {_chMap = map;}
+  static void set_DAQ_map(DAQChannelMap* map) {_chMap = map;}
 
   string get_equipment_name() {return _equipment;}
 
@@ -77,12 +77,12 @@ class MDarranger : public MDprocessor {
   * It is created at the beginning of the spill.
   *
   **/
-  MAUS::DAQData  *_daq_data;
+  static MAUS::DAQData  *_daq_data;
 
   /** The DAQ channel map.
   * It is used to group all channels belonging to a given detector.
   **/
-  DAQChannelMap* _chMap;
+  static DAQChannelMap* _chMap;
 
   /** The name of the DAQ equipment. **/
   string _equipment;

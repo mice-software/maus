@@ -136,10 +136,10 @@ class V1731 {
     void SetMaxPos(int max_pos);
 
     /** Returns TriggerTimeTag */
-    double GetTriggerTimeTag() const;
+    int GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
-    void SetTriggerTimeTag(double trigger_time_tag);
+    void SetTriggerTimeTag(int trigger_time_tag);
 
     /** Returns TimeStamp */
     int GetTimeStamp() const;
@@ -166,10 +166,10 @@ class V1731 {
     void SetGeo(int geo);
 
     /** Returns Pedestal */
-    int GetPedestal() const;
+    double GetPedestal() const;
 
     /** Sets Pedestal */
-    void SetPedestal(int pedestal);
+    void SetPedestal(double pedestal);
 
     /** Returns Channel */
     int GetChannel() const;
@@ -189,12 +189,12 @@ class V1731 {
     int _position_min;
     int _pulse_area;
     int _max_pos;
-    double _trigger_time_tag;
+    int _trigger_time_tag;
     int _time_stamp;
     std::string _detector;
     int _part_event_number;
     int _geo;
-    int _pedestal;
+    double _pedestal;
     int _channel;
 
     MAUS_VERSIONED_CLASS_DEF(V1731)

@@ -75,10 +75,10 @@ TEST(DAQProcessorTest, EMRDaqProcessorTest) {
     ProcessorTest::test_value(&proc, EMRDAQ);
 }
 
-//TEST(DAQProcessorTest, DAQDataProcessorTest) {
+// TEST(DAQProcessorTest, DAQDataProcessorTest) {
 //    DAQDataProcessor proc;
 //    ProcessorTest::test_value(&proc, DAQDATA);
-//}
+// }
 } // DAQPROCESSORTEST
 } // MAUS
 

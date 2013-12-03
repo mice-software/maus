@@ -56,8 +56,8 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # Get a single event and check it's the right size
         self.assertTrue(self.mapper.readNextEvent())
         data = self.mapper.getCurEvent()
-        # Data shold be 80 (first event is start of burst)
-        self.assertEqual(len(data), 96)
+        # Data shold be 108 (first event is start of burst)
+        self.assertEqual(len(data), 108)
         self.assertTrue(self.mapper.death())
         return
 
@@ -80,10 +80,10 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
 
         # Check the md5 sum matches the expected value
         # changed checksum to reflect the run_num addition
-        # changed checksum from 15abbb1d734e6d72b4270a399af2406a
-        # to reflect Gene's ckov unpacking changes - Oct 12,2012
+        # changed checksum from ca8fb803f65c2ef93327379bee9399d0
+        # to reflect new changes due to the cpp data - Dec 1,2013
         self.assertEqual(digester.hexdigest(), \
-                         'ca8fb803f65c2ef93327379bee9399d0')
+                         'cbd776e83ed3ab3e96f2bdf28b5adcb4')
 
         self.assertTrue(self.mapper.death())
 

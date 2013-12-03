@@ -50,14 +50,14 @@ namespace JsonWrapper {
    */
   enum JsonType {
     nullValue,     // 'null' value
-    uintValue,     // unsigned integer value;
+    uintValue,     // unsigned integer value
     intValue,      // signed integer value
     realValue,     // double value
-    stringValue,   // UTF-8 string value.
+    stringValue,   // UTF-8 string value
     booleanValue,  // bool value
     arrayValue,    // array value (ordered list)
-    objectValue,   // object value (collection of name/value pairs).
-    anyValue       // object value (collection of name/value pairs).
+    objectValue,   // object value (collection of name/value pairs)
+    anyValue       // object value (collection of name/value pairs)
   };
 
   /** @brief Convert a string to a Json::Value tree 
@@ -148,7 +148,7 @@ namespace JsonWrapper {
   bool AlmostEqual(const Json::Value& value_1,
                    const Json::Value& value_2,
                    const double tolerance,
-                   bool int_permissive=false);
+                   bool int_permissive = false);
 
   /** @brief Check for equality between json arrays
    *
@@ -163,7 +163,7 @@ namespace JsonWrapper {
   bool ArrayEqual(const Json::Value& value_1,
                   const Json::Value& value_2,
                   const double tolerance,
-                  bool int_permissive=false);
+                  bool int_permissive = false);
 
   /** @brief Check for equality between json objects
    *
@@ -178,7 +178,7 @@ namespace JsonWrapper {
   bool ObjectEqual(const Json::Value& value_1,
                    const Json::Value& value_2,
                    const double tolerance,
-                   bool int_permissive=false);
+                   bool int_permissive = false);
 
 
   /** @brief Merge two json objects

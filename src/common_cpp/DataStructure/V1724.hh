@@ -137,10 +137,10 @@ class V1724 {
     void SetMaxPos(int max_pos);
 
     /** Returns TriggerTimeTag */
-    double GetTriggerTimeTag() const;
+    int GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
-    void SetTriggerTimeTag(double trigger_time_tag);
+    void SetTriggerTimeTag(int trigger_time_tag);
 
     /** Returns TimeStamp */
     int GetTimeStamp() const;
@@ -149,10 +149,10 @@ class V1724 {
     void SetTimeStamp(int time_stamp);
 
     /** Returns Pedestal */
-    int GetPedestal() const;
+    double GetPedestal() const;
 
     /** Sets Pedestal */
-    void SetPedestal(int pedestal);
+    void SetPedestal(double pedestal);
 
     /** Returns PartEventNumber */
     int GetPartEventNumber() const;
@@ -191,9 +191,9 @@ class V1724 {
     int _position_min;
     int _pulse_area;
     int _max_pos;
-    double _trigger_time_tag;
+    int _trigger_time_tag;
     int _time_stamp;
-    int _pedestal;
+    double _pedestal;
     int _part_event_number;
     int _geo;
     int _position_max;

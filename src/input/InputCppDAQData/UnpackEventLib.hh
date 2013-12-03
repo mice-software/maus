@@ -94,6 +94,8 @@ class V1290CppDataProcessor : public MDarranger {
   V1290PartEventArray _tof0_spill;
   V1290PartEventArray _tof1_spill;
   V1290PartEventArray _tof2_spill;
+  V1290PartEventArray _tr_spill;
+  V1290PartEventArray _tr_req_spill;
   V1290PartEventArray _unknown_spill;
 };
 
@@ -264,20 +266,13 @@ class V830CppDataProcessor : public MDarranger {
 
   private:
 
-  DAQChannelMap* _chMap;
-
-  std::string _equipment;
-
   MAUS::V830 _v830_spill;
-
-
-  MAUS::DAQData  *_daq_data;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/** On Fragment Event VLSB_C
- * This class unpacks a VLSB_C board hit (tracker cosmic test in Lab7).
+/** On Fragment Event VLSB
+ * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
  */
 class VLSBDataProcessor : public ZeroSupressionFilter {
  public:
@@ -294,6 +289,44 @@ class VLSBDataProcessor : public ZeroSupressionFilter {
   * Will be casted to MDfragmentVLSB.
   */
   virtual int Process(MDdataContainer* dc);
+};
+
+/** On Fragment Event VLSB
+ * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
+ */
+
+typedef std::vector<MAUS::VLSB>           TrackerHitArray;
+typedef std::vector<TrackerHitArray>      TtackerPartEventArray;
+
+class VLSBCppDataProcessor : public ZeroSupressionFilter {
+ public:
+  VLSBCppDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB";}
+  virtual ~VLSBCppDataProcessor() {}
+
+ /** Unpack a single event part to JSON.
+  *
+  * This function unpacks a single particle event,
+  * recorded by equipment VLSB (tracker board)
+  * into a JSON sub-tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * Will be casted to MDfragmentVLSB.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+  /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+  private:
+
+  TtackerPartEventArray _tracker1_spill;
+  TtackerPartEventArray _tracker0_spill;
+  TtackerPartEventArray _single_st_spill;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
