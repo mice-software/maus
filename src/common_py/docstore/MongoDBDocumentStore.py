@@ -19,6 +19,7 @@ MongoDB-based document store.
 
 from datetime import datetime
 import time
+import bisect
 import pymongo
 
 from docstore.DocumentStore import DocumentStore
@@ -153,10 +154,11 @@ class MongoDBDocumentStore(DocumentStore):
         except pymongo.errors.OperationFailure as exc:
             raise DocumentStoreException(exc)
 
+
     def get_since(self, collection, earliest = None):
         """ 
-        Get the documents added since the given date from the data 
-        store or None if there is none.
+        Get the documents added with date > the given date from the data 
+        store or empty list if there is none.
         @param self Object reference.
         @param collection Collection name.
         @param earliest datetime representing date of interest. If
@@ -165,15 +167,30 @@ class MongoDBDocumentStore(DocumentStore):
         {'_id':id, 'date':date, 'doc':doc} where date is in the
         Python datetime format e.g. YYYY-MM-DD HH:MM:SS.MILLIS.
         Documents are sorted earliest to latest.
+        @returns 
         @throws DocumentStoreException if the operation fails - currently not
                 sure under what circumstances operation failure may occur
         """
         try:
-            if (earliest == None):
-                result = self.__data_store[collection].find().sort("date")
-            else:
-                result = self.__data_store[collection].find(\
-                                   {"date":{"$gt":earliest}}).sort("date")
+            result = [item for item in \
+                              self.__data_store[collection].find()]
+            result.sort(key=lambda item: item['date'])
+            # if we want to truncate by time stamp, then use bisect algorithm on
+            # sorted list
+            # note that I used to do this in the call to find(...) but was
+            # failing with obnoxious MongoDB error
+            if earliest != None:
+                result_temp = [(item["date"], item) for item in result]
+                index = bisect.bisect_right(result_temp, (earliest, None))
+                # bug in datetime comparator? returning as bisect_left - not as
+                # bisect_right; so we explicitly exclude this case
+                if index >= len(result_temp):
+                    return []
+                if result_temp[index][0] == earliest:
+                    if index >= len(result_temp):
+                        return []
+                    index += 1
+                result = [item[1] for item in result_temp[index:]]
             return result
         except pymongo.errors.OperationFailure as exc:
             raise DocumentStoreException(exc)      

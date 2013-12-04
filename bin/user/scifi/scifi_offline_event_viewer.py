@@ -340,9 +340,9 @@ def main(file_name):
                          t1.sz_fits, t2.sz_fits, c_trk_sz)
             c_trk_sz.Update()
             if ( t1.num_htracks < 1):
-              bad_t1_spills.append(spill.GetSpillNumber())
+                bad_t1_spills.append(spill.GetSpillNumber())
             if ( t2.num_htracks < 1):
-              bad_t2_spills.append(spill.GetSpillNumber())
+                bad_t2_spills.append(spill.GetSpillNumber())
               # raw_input("Found one!")
             raw_input("Press any key to move to the next spill...")
             print 'Helical tracks found: ' + \
@@ -358,9 +358,9 @@ def main(file_name):
     print "Closing root file"
     root_file.Close()
     print "Found t1 bad spills: "
-    print t1_bad_spills
+    print bad_t1_spills
     print "Found t2 bad spills: "
-    print t2_bad_spills
+    print bad_t2_spills
 
 def make_line(m, c, xmin, xmax):
     """ Create a straight line using the ROOT TF1 class """

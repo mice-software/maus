@@ -32,13 +32,13 @@
 #include "TGClient.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSZ.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataManager.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSpoints.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
 
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"

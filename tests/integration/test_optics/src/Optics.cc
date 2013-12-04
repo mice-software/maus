@@ -64,6 +64,7 @@ void  PhaseCavities(::PhaseSpaceVector ref) {
 MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
 {
   Json::Value json_config(Json::objectValue);
+  json_config["maximum_module_depth"] = 50;
   json_config["will_do_stack_trace"] = Json::Value(true);
   json_config["verbose_level"] = Json::Value(1);
   json_config["maximum_number_of_steps"] = Json::Value(25000);
@@ -80,6 +81,9 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["default_keep_or_kill"] = true;
   json_config["keep_or_kill_particles"] = "{}";
   json_config["kinetic_energy_threshold"] = 0.1;
+  json_config["max_step_length"] = 100.;
+  json_config["max_track_time"] = 1.e9;
+  json_config["max_track_length"] = 1.e8;
   json_config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+

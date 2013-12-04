@@ -68,8 +68,10 @@ class Uploader: #pylint: disable = R0902
                         generated automatically
         """
         self.config = Configreader()
-        self.wsdlurl = None
-        self.geometry_cdb = cdb.GeometrySuperMouse()
+        self.wsdlurl = self.config.cdb_upload_url+\
+                                                self.config.geometry_upload_wsdl
+        print '"'+self.wsdlurl+'"'
+        self.geometry_cdb = cdb.GeometrySuperMouse(self.wsdlurl)
         self.textfile = textfile
         self.text = ""
         if type(notes) != str:
@@ -94,9 +96,9 @@ class Uploader: #pylint: disable = R0902
         This method sets up a connection to either the supermouse server or
         the test server depending on whether this is specified by __init__.
         """
-        self.wsdlurl = self.config.cdb_upload_url+\
-                                                self.config.geometry_upload_wsdl
-        self.geometry_cdb.set_url(self.wsdlurl)
+        #self.wsdlurl = self.config.cdb_upload_url+\
+        #                    self.config.geometry_upload_wsdl
+        #self.geometry_cdb.set_url(self.wsdlurl)
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status
@@ -153,7 +155,7 @@ class Uploader: #pylint: disable = R0902
             _dt = self.config.geometry_upload_valid_from
             fin = open(zipped_file, 'r')
             _gdml = fin.read()
-            self.geometry_cdb = cdb.GeometrySuperMouse()
+            #self.geometry_cdb = cdb.GeometrySuperMouse()
             self.geometry_cdb.set_gdml(_gdml, _dt, self.notes)
             
 class Downloader: #pylint: disable = R0902

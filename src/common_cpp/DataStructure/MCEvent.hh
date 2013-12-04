@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include "src/common_cpp/DataStructure/SciFiNoiseHit.hh"
+#include "src/common_cpp/DataStructure/SciFiMCLookup.hh"
 #include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
                                                // forward declaration of this
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -32,10 +34,14 @@ class Primary;
 class SciFiChannelId;
 class TOFChannelId;
 class SpecialVirtualChannelId;
+class SciFiNoiseHit;
+class SciFiMCLookup;
 
 typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<SciFiHit> SciFiHitArray;
+typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
+typedef std::vector<SciFiMCLookup> SciFiMCLookupArray;
 typedef std::vector<TOFHit> TOFHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
 
@@ -103,6 +109,20 @@ class MCEvent {
    */
   void SetSciFiHits(SciFiHitArray* hits);
 
+  /** Get the hits pertaining to this event MCEvent still owns NoiseHitArray */
+  SciFiNoiseHitArray* GetSciFiNoiseHits() const;
+
+  /** Set the hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by noise_hits.
+   */
+  void SetSciFiNoiseHits(SciFiNoiseHitArray* noise_hits);
+
+  /** Get copy of SciFiDigits from MC branch */
+  SciFiMCLookupArray* GetSciFiLookup() const;
+
+  /** Set the copy of SciFiDigits from MC branch */
+  void SetSciFiLookup(SciFiMCLookupArray* sci_fi_lookup);
+
   /** Get the TOF hits pertaining to this event MCEvent still owns HitArray*.
    */
   TOFHitArray* GetTOFHits() const;
@@ -136,6 +156,8 @@ class MCEvent {
   Primary* _primary;
   VirtualHitArray* _virtuals;
   SciFiHitArray* _sci_fi_hits;
+  SciFiNoiseHitArray* _sci_fi_noise_hits;
+  SciFiMCLookupArray* _sci_fi_lookup;
   TOFHitArray* _tof_hits;
   SpecialVirtualHitArray* _special_virtual_hits;
   TrackArray* _tracks;

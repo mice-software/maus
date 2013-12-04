@@ -27,7 +27,12 @@ from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 
-@task(name="mauscelery.maustasks.MausGenericTransformTask")
+# NOTE that the time_limit is hard coded! Decorators require hard codedness;
+# the time_limit parameter appears to be available as a parameter to celery
+# (see https://github.com/celery/celery/issues/802) but appears to require
+# celery > 3.0 or so. I believe decorators are resolved when they are first
+# encountered by the parser (but others may know more) - Rogers
+@task(name="mauscelery.maustasks.MausGenericTransformTask", time_limit=10)
 def execute_transform(spill, client_id = "Unknown"):
     """
     MAUS Celery transform task used by sub-processes to execute jobs

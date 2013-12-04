@@ -32,7 +32,7 @@
 #include "TGClient.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataAnalyserMomentum.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 

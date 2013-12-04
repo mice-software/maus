@@ -14,8 +14,8 @@ import unittest
 import glob
 import copy
 
-import cpplint_exceptions
-import cpplint
+import cpplint_exceptions # pylint: disable=F0401
+import cpplint # pylint: disable=F0401
 
 # pylint: disable=C0301
 

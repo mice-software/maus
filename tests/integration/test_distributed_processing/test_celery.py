@@ -29,9 +29,11 @@ import time
 
 from datetime import datetime
  
+import celery
 from celery.task.control import broadcast #pylint: disable=E0611, F0401
 from celery.task.control import inspect #pylint: disable=E0611, F0401
 
+import maus_cpp
 from Configuration import Configuration
 from MapPyTestMap import MapPyTestMap
 from mauscelery.tasks import execute_transform
@@ -79,6 +81,9 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # fails due to mess left by previous test.
         self.reset_worker()
         self.reset_worker()
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        maus_cpp.globals.birth(self.config_doc)
 
     def reset_worker(self): # pylint:disable = R0201
         """
@@ -93,7 +98,8 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
                        "transform":"MapPyDoNothing", 
                        "config_id":config_id}, reply=True)
 
-    def birth(self, config_id, configuration = None, transform = "MapPyDoNothing"): # pylint:disable = R0201, C0301
+    def birth(self, config_id, configuration = None,
+              transform = "MapPyDoNothing", merge_configuration = False): # pylint:disable = R0201, C0301
         """
         Configure the Celery workers, via a broadcast.
         @param self Object reference.
@@ -104,6 +110,12 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         """
         if configuration == None:
             configuration = self.config_doc
+        elif merge_configuration:
+            my_config = json.loads(self.config_doc)
+            config_user = json.loads(configuration)
+            for key in config_user:
+                my_config[key] = config_user[key]
+            configuration = json.dumps(my_config)
         return broadcast("birth", 
             arguments={"configuration":configuration, \
                        "transform":transform, 
@@ -371,13 +383,50 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         result = broadcast("death", arguments={"run_number":1}, reply=True)
         self.validate_status(result)
         # Call process.
-        result = execute_transform.delay("{}", 1) 
+        result = execute_transform.delay("{}", 1)
         # Wait for it to complete.
         try:
             result.wait()
         except Exception:  # pylint:disable = W0703
             pass
         self.assertTrue(result.failed(), "Expected failure")
+
+    def test_process_timeout(self):
+        """
+        Test process timeout.
+        @param self Object reference.
+        """
+        config_id = datetime.now().microsecond
+        transform = "MapPyTestMap"
+        # check that process does not time out when execution is quick
+        configuration = """{"maus_version":"%s", "process_delay":9.0}""" \
+                                                                % self.__version
+        result = self.birth(config_id, configuration, transform, True)
+        self.validate_status(result)
+        # Call process.
+        result = execute_transform.delay("{}", 1)
+        # Wait for it to complete.
+        print "Executing delayed transform"
+        result.wait()
+
+        # check that process does time out when execution is slow
+        configuration = """{"maus_version":"%s", "process_delay":15.0}""" \
+                                                                % self.__version
+        result = self.birth(config_id, configuration, transform, True)
+        self.validate_status(result)
+        # Call process. Check that time_limit flag is ignored
+        # (true for celery version < 3); if we move to a new version of celery,
+        # this should fail; and we should change the timeout to be soft coded
+        result = execute_transform.apply_async(["{}", 1], time_limit=20.)
+        # Wait for it to complete.
+        try:
+            print "Executing delayed transform"
+            result.wait()
+            self.assertTrue(False, 'Should have failed')
+        except celery.exceptions.TimeLimitExceeded:  # pylint:disable = W0703
+            pass
+        # should have failed
+        self.assertEqual(result.state, 'FAILURE')
 
 if __name__ == '__main__':
     unittest.main()

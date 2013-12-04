@@ -1,0 +1,202 @@
+// Stage 6 coil currents
+// I use repeat placements for Focus Coils - you may prefer just to explicitly write out each one
+
+Module Stage4Coils
+{
+  PropertyString Material Galactic
+  PropertyHep3Vector Dimensions 1000.0 1000.0 10000.0 mm 
+
+  Substitution $FieldMapMode Write
+  Substitution $SolenoidOffset (2750.)
+
+  Module VirtualPlane
+  {
+    Volume None
+    Position 0.0 0.0 -3000.0+@RepeatNumber*100 mm
+    Rotation 0.0 0.0 0.0 degree
+    PropertyString SensitiveDetector Virtual
+    PropertyBool   RepeatModule2 True
+    PropertyInt    NumberOfRepeats 60
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 -205.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +113.95
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 +205.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -113.95
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+  }
+  Module MatchCoil1
+  {
+    Volume None
+    Position 0.0 0.0 -3611.0+$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +113.13
+    //Field
+    PropertyString FieldType      Solenoid
+    PropertyString FieldMapMode   $FieldMapMode
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match1.fld
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         201.3
+    PropertyDouble Thickness      46.2
+    PropertyDouble InnerRadius    258.
+  }
+  Module MatchCoil1
+  {
+    Volume None
+    Position 0.0 0.0 3611.0-$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -113.13
+    // Field
+    PropertyString FieldType      Solenoid
+    PropertyString FieldMapMode   $FieldMapMode
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/match1.fld
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         201.3
+    PropertyDouble Thickness      46.2
+    PropertyDouble InnerRadius    258.
+  }
+  Module MatchCoil2
+  {
+    Volume None
+    Position 0.0 0.0 -4051.+$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +140.69
+    // Field
+    PropertyString FieldType         Solenoid
+    PropertyString FieldMapMode      $FieldMapMode
+    PropertyString FileName          ${MAUS_ROOT_DIR}/tmp/match2.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length            199.5
+    PropertyDouble Thickness         30.9
+    PropertyDouble InnerRadius       258.
+  }
+  Module MatchCoil2
+  {
+    Volume None
+    Position 0.0 0.0 4051.-$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -140.69
+    // Field
+    PropertyString FieldType         Solenoid
+    PropertyString FieldMapMode      $FieldMapMode
+    PropertyString FileName          ${MAUS_ROOT_DIR}/tmp/match2.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length            199.5
+    PropertyDouble Thickness         30.9
+    PropertyDouble InnerRadius       258.
+  }
+  Module EndCoil1
+  {
+    Volume None
+    Position 0.0 0.0 -4451+$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +127.37
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/end1.fld
+    PropertyDouble CurrentDensity  1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness       60.9
+    PropertyDouble InnerRadius     258.
+  }
+  Module EndCoil1
+  {
+    Volume None
+    Position 0.0 0.0 4451-$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -127.37
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/end1.fld
+    PropertyDouble CurrentDensity  1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness       60.9
+    PropertyDouble InnerRadius     258.
+  }
+  Module CenterCoil
+  {
+    Volume None
+    Position 0.0 0.0 -5201.+$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +152.44
+    // Field
+    PropertyString FieldType      Solenoid
+    PropertyString FieldMapMode   $FieldMapMode
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/center.fld
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         1314.3
+    PropertyDouble Thickness      22.1
+    PropertyDouble InnerRadius    258.
+  }
+  Module CenterCoil
+  {
+    Volume None
+    Position 0.0 0.0 5201.-$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -152.44
+    // Field
+    PropertyString FieldType      Solenoid
+    PropertyString FieldMapMode   $FieldMapMode
+    PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/center.fld
+    PropertyDouble CurrentDensity 1.
+    PropertyDouble Length         1314.3
+    PropertyDouble Thickness      22.1
+    PropertyDouble InnerRadius    258.
+  }
+  Module EndCoil2
+  {
+    Volume None
+    Position 0.0 0.0 -5951+$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor +135.18
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/end2.fld
+    PropertyDouble CurrentDensity  1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness       67.8 
+    PropertyDouble InnerRadius     258.
+  }
+  Module EndCoil2
+  {
+    Volume None
+    Position 0.0 0.0 5951-$SolenoidOffset mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -135.18
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/end2.fld
+    PropertyDouble CurrentDensity  1.
+    PropertyDouble Length          110.6
+    PropertyDouble Thickness       67.8 
+    PropertyDouble InnerRadius     258.
+  }
+}
+

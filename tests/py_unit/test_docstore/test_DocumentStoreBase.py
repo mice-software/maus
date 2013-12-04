@@ -195,6 +195,14 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         # Expect the second batch only.
         since = self._data_store.get_since(self._collection, mid_time)
         self.validate_documents(docs_post_mid, since)
+        # Get the date of the last doc in the store
+        since = self._data_store.get_since(self._collection, mid_time)
+        for doc in since:
+            my_time = doc['date']
+        # Check that when my_time == valid document, it is not in return values
+        # This prevents reconstructing the same spill multiple times
+        since = self._data_store.get_since(self._collection, my_time)
+        self.validate_documents({}, since)
         # Expect all.
         docs_all = {}
         docs_all.update(docs_pre_mid)

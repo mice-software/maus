@@ -19,9 +19,9 @@
 #define _MAUS_INPUTCPPREALDATA_CABLINGTOOLS_HH_
 
 
+#include <Python.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <Python.h>
 #include <limits.h>
 #include <string>
 #include <vector>

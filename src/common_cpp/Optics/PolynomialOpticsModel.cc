@@ -60,6 +60,7 @@ void PolynomialOpticsModel::Build() {
   // Iterate through each First plane hit
   MAUSGeant4Manager * simulator = MAUSGeant4Manager::GetInstance();
   simulator->GetPhysicsList()->BeginOfRunAction();
+
   std::map<int, std::vector<TrackPoint> > station_hits_map;
   std::vector<TrackPoint>::const_iterator first_plane_hit;
   for (first_plane_hit = first_plane_hits.begin();

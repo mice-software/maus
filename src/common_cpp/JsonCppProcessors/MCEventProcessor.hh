@@ -24,6 +24,10 @@
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 
 #include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/TrackProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiNoiseHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/SciFiMCLookupProcessor.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 
@@ -37,6 +41,8 @@ class MCEventProcessor : public ObjectProcessor<MCEvent> {
 
  private:
     ValueArrayProcessor<SciFiHit> _sci_fi_hit_proc;
+    ValueArrayProcessor<SciFiNoiseHit> _sci_fi_noise_hit_proc;
+	ValueArrayProcessor<SciFiMCLookup> _sci_fi_lookup_proc;
     ValueArrayProcessor<TOFHit> _tof_hit_proc;
     ValueArrayProcessor<SpecialVirtualHit> _special_virtual_hit_proc;
     ValueArrayProcessor<Track> _track_proc;

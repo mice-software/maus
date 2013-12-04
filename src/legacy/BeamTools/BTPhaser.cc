@@ -13,8 +13,12 @@ BTPhaser::BTPhaser() : _allPhasesSet(false),
 
 BTPhaser::~BTPhaser()
 {
-	for(int i=0; i<(int)_rfData.size(); i++) delete _rfData[i];
+	for (size_t i=0; i<_rfData.size(); i++) delete _rfData[i];
 	_rfData = std::vector<RFData*>(0);
+  for (size_t i=0; i<_fields.size(); ++i) delete _fields[i];
+	_fields = std::vector<FieldForPhasing*>(0);
+  if (this == _instance)
+    _instance = NULL;
 }
 
 bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
