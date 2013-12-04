@@ -22,6 +22,8 @@
 #include "BeamTools/BTRFFieldMap.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
+#include "Utils/Exception.hh"
+
 std::string       BTFieldConstructor::_defaultSolenoidMode = "";
 const int         BTFieldConstructor::_numberOfFieldTypes  = 14;
 const std::string BTFieldConstructor::_fieldTypes[15] 
