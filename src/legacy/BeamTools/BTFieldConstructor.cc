@@ -22,7 +22,7 @@
 #include "BeamTools/BTRFFieldMap.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
-#include "Utils/Exception.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 
 std::string       BTFieldConstructor::_defaultSolenoidMode = "";
 const int         BTFieldConstructor::_numberOfFieldTypes  = 14;
@@ -73,35 +73,35 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
   	_needsPhases = false;
   	BTSolenoid::ClearStaticMaps();
   	std::vector<const MiceModule*> daughterModules;
-  	for(int fields = 0; fields < _numberOfFieldTypes; fields++)
-  	{
+  	for(int fields = 0; fields < _numberOfFieldTypes; fields++) {
   		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
-  		for(unsigned int i=0; i<daughterModules.size(); i++)
-  		{
+  		for(unsigned int i=0; i<daughterModules.size(); i++) {
   		  try {
     			BTField * newField;
     			const MiceModule * theModule   = daughterModules[i];
-    			if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool"))
-    			{
-    				if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //don't use, the BTFieldAmalgamation should deal with it
-    				{ignoredAmalgamated++; newField = NULL;}
-    				else{ newField = GetField(theModule); } //not amalgamated, use as normal
+    			if (daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool")) {
+    				if (daughterModules[i]->propertyBoolThis("IsAmalgamated")) { //don't use, the BTFieldAmalgamation should deal with it
+    				  ignoredAmalgamated++; newField = NULL;
+    				} else {
+    				  newField = GetField(theModule);  // not amalgamated, use as normal
+    				}
+    			} else {
+    			  newField    = GetField(theModule); //not amalgamated, use as normal
     			}
-    			else{   newField    = GetField(theModule); } //not amalgamated, use as normal
     			Hep3Vector         position    = theModule->globalPosition();
     			HepRotation        rotation    = theModule->globalRotation();
     			double             scaleFactor = theModule->globalScaleFactor();
-      		if(newField==NULL) {;} //error do nothing
-    			else if(newField->DoesFieldChangeEnergy())
+    			if ((newField!=NULL) && (newField->DoesFieldChangeEnergy())) {
     				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
-    			else
+    			} else {
     				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
+    		  }
     			SetName(newField, theModule);
-    		} catch(MAUS::Exception exception) {
+    		} catch (MAUS::Exception exception) {
     		  std::cerr << "Error while loading fields from module "
     		            << daughterModules[i]->fullName() << std::endl;
     		  exception.Print(); exit(1);
-    		} catch(...) {
+    		} catch (...) {
     		  std::cerr << "Unhandled exception while loading fields from module "
     		            << daughterModules[i]->fullName() << " - bailing"
     		            << std::endl;
@@ -113,17 +113,16 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
     _electroMagneticField->Close();
 
   	WriteFieldMaps();
-  	if(_amalgamatedFields != ignoredAmalgamated)
-  	{
+  	if(_amalgamatedFields != ignoredAmalgamated) {
   		std::stringstream in;
   		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
   		   << _amalgamatedFields << " in Amalgamation MiceModules";
   		throw(MAUS::Exception(MAUS::Exception::recoverable, in.str(), "BTFieldConstructor()"));
   	}
-	} catch(MAUS::Exception exception) {
+	} catch (MAUS::Exception exception) {
 	  exception.Print();
 	  exit(1);
-	} catch(...) {
+	} catch (...) {
 	  std::cerr << "Unhandled exception while loading fields - bailing"
 	            << std::endl;
 	  exit(1);
