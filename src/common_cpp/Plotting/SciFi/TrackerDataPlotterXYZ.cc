@@ -55,11 +55,9 @@ TCanvas* TrackerDataPlotterXYZ::operator() ( TrackerData &t1, TrackerData &t2, T
   }
 
   // Plot the spacepoints
-  std::cout << "Calling spacepoint plotting...\n";
   (*_spointsPlotter)(t1, t2, lCanvas);
 
   // Plot the track fits
-  std::cout << "Calling track plotting...\n";
   (*_trksPlotter)(t1, t2, lCanvas);
 
   return lCanvas;

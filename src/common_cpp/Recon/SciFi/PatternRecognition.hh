@@ -230,20 +230,29 @@ class PatternRecognition {
     bool set_ignore_stations(const std::vector<int> &ignore_stations,
                              int &ignore_station_1, int &ignore_station_2);
 
-    /** @brief Return helical PR on flag */
+    /** @brief Return helical PatRec on flag */
     bool get_helical_pr_on() { return _helical_pr_on; }
 
-    /** @brief Return straight PR on flag */
-    bool get_straight_pr_on() { return _straight_pr_on; }
-
-    /** @brief Set helical PR on flag */
+    /** @brief Set helical PatRec on flag */
     void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
 
-    /** @brief Set straight PR on flag */
+    /** @brief Return straight PatRec on flag */
+    bool get_straight_pr_on() { return _straight_pr_on; }
+
+    /** @brief Set straight PatRec on flag */
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
+    /** @brief Return the verbosity level */
+    bool get_verbosity() { return _verb; }
+
+    /** @brief Set the verbosity level */
+    void set_verbosity(const bool verb) { _verb = verb; }
+
+    /** @brief Set up the residual data output files, and set the verbosity level to 2 */
+    void initialise_residual_files();
+
   private:
-    static const int _debug = 0;             /** Verbosity: 0=little, 1=more couts, 2=files too */
+    int _verb;             /** Verbosity: 0=little, 1=more couts, 2=files too */
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
