@@ -56,11 +56,23 @@ int main(int argc, char *argv[]) {
   // Parse any extra arguments supplied
   //   -p -> pause between events
   //   -g -> enables saving xyz plots and gives output graphics file type
+  //   -f -> select the first tree entry to start from
   bool bool_pause = false;
   bool bool_save = false;
+
+
   std::string save_type = "";
+  int start_num = 0;
+  std::stringstream ss1;
 
   for (int i = 2; i < argc; i++) {
+    if ( std::strcmp(argv[i], "-f") == 0 ) {
+      if ( (i+1) < argc ) {
+        ss1 << argv[i + 1];
+        ss1 >> start_num;
+        std::cout << "Starting from entry: " << start_num << std::endl;
+      }
+    }
     if ( std::strcmp(argv[i], "-p") == 0 ) {
       std::cout << "Will wait for user input between spills\n";
       bool_pause = true;
@@ -99,6 +111,7 @@ int main(int argc, char *argv[]) {
   MAUS::Data data;
 
   // Loop over all spills
+  if (start_num > 0) infile.set_current_event(start_num);
   while ( infile >> readEvent != NULL ) {
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();

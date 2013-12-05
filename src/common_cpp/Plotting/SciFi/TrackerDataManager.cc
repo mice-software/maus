@@ -183,7 +183,11 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
     }
 
     // Loop over track seed spacepoints
-    if (_print_seeds) std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\n";
+    if (_print_seeds) {
+      std::cout << "x\ty\tz\ttime\t\tphi\tpx_mc\tpy_mc\tpt_mc\tpz_mc\t";
+      std::cout << "px_mc1\tpx_mc2\tpx_mc3\tpy_mc1\tpy_mc2\tpy_mc3\tpz_mc1\tpz_mc2\tpz_mc3\n";
+    }
+
     for ( size_t j = 0; j < trk->get_spacepoints().size(); ++j ) {
       if ( trk->get_tracker() == 0 ) ++_t1._num_seeds;
       if ( trk->get_tracker() == 1 ) ++_t2._num_seeds;
@@ -276,19 +280,65 @@ void TrackerDataManager::print_track_info(const SciFiHelicalPRTrack * const trk,
 
 void TrackerDataManager::print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num) {
   MAUS::ThreeVector pos = trk->get_spacepoints()[seed_num]->get_position();
-  MAUS::SciFiCluster *clus = trk->get_spacepoints()[seed_num]->get_channels()[0];
-  MAUS::ThreeVector mom = clus->get_true_momentum();
+  std::vector<MAUS::SciFiCluster*> chans = trk->get_spacepoints()[seed_num]->get_channels();
   double t = trk->get_spacepoints()[seed_num]->get_time();
-  double pt_mc = sqrt(mom.x()*mom.x()+mom.y()*mom.y());
+
+  double seed_px_mc = 0.0;
+  double seed_py_mc = 0.0;
+  double seed_pz_mc = 0.0;
+  double px_mc1 = 0.0;
+  double px_mc2 = 0.0;
+  double px_mc3 = 0.0;
+  double py_mc1 = 0.0;
+  double py_mc2 = 0.0;
+  double py_mc3 = 0.0;
+  double pz_mc1 = 0.0;
+  double pz_mc2 = 0.0;
+  double pz_mc3 = 0.0;
+  for (size_t iCl = 0; iCl < chans.size(); ++iCl) {
+    ThreeVector p_mc = chans[iCl]->get_true_momentum();
+    seed_px_mc += p_mc.x();
+    seed_py_mc += p_mc.y();
+    seed_pz_mc += p_mc.z();
+    if (iCl == 0) {
+      px_mc1 = p_mc.x();
+      py_mc1 = p_mc.y();
+      pz_mc1 = p_mc.z();
+    }
+    if (iCl == 1) {
+      px_mc2 = p_mc.x();
+      py_mc2 = p_mc.y();
+      pz_mc2 = p_mc.z();
+    }
+    if (iCl == 2) {
+      px_mc3 = p_mc.x();
+      py_mc3 = p_mc.y();
+      pz_mc3 = p_mc.z();
+    }
+  }
+  seed_px_mc /= chans.size();
+  seed_py_mc /= chans.size();
+  seed_pz_mc /= chans.size();
+  double pt_mc = sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
+
   std::cout << std::setprecision(4) << pos.x() << "\t";
   std::cout << std::setprecision(4) << pos.y() << "\t";
   std::cout << std::setprecision(4) << pos.z() << "\t";
   std::cout << std::setprecision(12) << t << "\t";
   std::cout << std::setprecision(4) << trk->get_phi()[seed_num] << "\t";
-  std::cout << std::setprecision(4) << mom.x() << "\t";
-  std::cout << std::setprecision(4) << mom.y() << "\t";
+  std::cout << std::setprecision(4) << seed_px_mc << "\t";
+  std::cout << std::setprecision(4) << seed_py_mc << "\t";
   std::cout << std::setprecision(4) << pt_mc << "\t";
-  std::cout << std::setprecision(4) << mom.z() << "\n";
+  std::cout << std::setprecision(4) << seed_pz_mc << "\t";
+  std::cout << std::setprecision(4) << px_mc1 << "\t";
+  std::cout << std::setprecision(4) << px_mc2 << "\t";
+  std::cout << std::setprecision(4) << px_mc3 << "\t";
+  std::cout << std::setprecision(4) << py_mc1 << "\t";
+  std::cout << std::setprecision(4) << py_mc2 << "\t";
+  std::cout << std::setprecision(4) << py_mc3 << "\t";
+  std::cout << std::setprecision(4) << pz_mc1 << "\t";
+  std::cout << std::setprecision(4) << pz_mc2 << "\t";
+  std::cout << std::setprecision(4) << pz_mc3 << "\n";
 };
 
 } // ~namespace MAUS

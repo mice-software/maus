@@ -155,22 +155,28 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
           _pz = _pt / trk->get_dsdz();
           _pt_mc = 0.0;
           _pz_mc = 0.0;
-          // Loop over seed spacepoints associated with the track
+          // Loop over seed spacepoints associated with the track,
+          // and the clusters forming that,
           // to calculate  average MC truth momentum
           for (size_t iSp = 0; iSp < trk->get_spacepoints().size(); ++iSp) {
             SciFiSpacePoint* seed = trk->get_spacepoints()[iSp];
             double seed_px_mc = 0.0;
             double seed_py_mc = 0.0;
             double seed_pz_mc = 0.0;
+            int num_skipped = 0;
             for (size_t iCl = 0; iCl < seed->get_channels().size(); ++iCl) {
               ThreeVector p_mc = seed->get_channels()[iCl]->get_true_momentum();
-              seed_px_mc += p_mc.x();
-              seed_py_mc += p_mc.y();
-              seed_pz_mc += p_mc.z();
+              if ( p_mc.z() > 1.0 ) { // Cut to remove bad clusters from the analysis
+                seed_px_mc += p_mc.x();
+                seed_py_mc += p_mc.y();
+                seed_pz_mc += p_mc.z();
+              } else {
+                ++num_skipped;
+              }
             }
-            seed_px_mc /= seed->get_channels().size();
-            seed_py_mc /= seed->get_channels().size();
-            seed_pz_mc /= seed->get_channels().size();
+            seed_px_mc /= (seed->get_channels().size() - num_skipped);
+            seed_py_mc /= (seed->get_channels().size() - num_skipped);
+            seed_pz_mc /= (seed->get_channels().size() - num_skipped);
             _pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
             _pz_mc += seed_pz_mc;
           }
