@@ -85,8 +85,10 @@ class TrackerDataAnalyserMomentum {
     void setUp();
 
   protected:
+    int _spill_num;
     int _tracker_num;
     int _charge;
+    int _num_points;
     double _pt;
     double _pz;
     double _pt_mc;

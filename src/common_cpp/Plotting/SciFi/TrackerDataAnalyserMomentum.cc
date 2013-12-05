@@ -43,8 +43,10 @@
 namespace MAUS {
 
 TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
-  : _tracker_num(0),
+  : _spill_num(0),
+    _tracker_num(0),
     _charge(0),
+    _num_points(0),
     _pt(0.0),
     _pz(0.0),
     _pt_mc(0.0),
@@ -95,8 +97,10 @@ void TrackerDataAnalyserMomentum::setUp() {
 
   // Set up the output tree
   _tree = new TTree("tree", "Momentum Residual Data");
+  _tree->Branch("spill_num", &_spill_num, "spill_num/I");
   _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
   _tree->Branch("charge", &_charge, "charge/I");
+  _tree->Branch("num_points", &_num_points, "num_points/I");
   _tree->Branch("pt", &_pt, "pt/D");
   _tree->Branch("pz", &_pz, "pz/D");
   _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
@@ -137,6 +141,7 @@ void TrackerDataAnalyserMomentum::setUp() {
 
 void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
   if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
+    _spill_num = spill->GetSpillNumber();
     // Loop over recon events in the spill
     for (size_t iRevt = 0; iRevt < spill->GetReconEvents()->size(); ++iRevt) {
       SciFiEvent *evt = (*spill->GetReconEvents())[iRevt]->GetSciFiEvent();
@@ -145,6 +150,7 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
       for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
         SciFiHelicalPRTrack* trk = htrks[iTrk];
         if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
+          _num_points = trk->get_num_points();
           _pt = 1.2 * trk->get_R();
           _pz = _pt / trk->get_dsdz();
           _pt_mc = 0.0;
