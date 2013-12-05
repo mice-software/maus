@@ -83,6 +83,12 @@ class TrackerDataManager {
     /** Get whether to print seed info to screen */
     bool get_print_seeds() { return _print_seeds; }
 
+    /** Return tracker 1 data container */
+    TrackerData get_t1_data() { return _t1; }
+
+    /** Return tracker 2 data container */
+    TrackerData get_t2_data() { return _t2; }
+
     /** Make a circle using ROOT TArc function */
     TArc make_circle(double x0, double y0, double rad);
 
