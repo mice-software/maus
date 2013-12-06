@@ -130,10 +130,10 @@ class V1731 {
     void SetPulseArea(int pulse_area);
 
     /** Returns MaxPos */
-    int GetMaxPos() const;
+    int GetPositionMax() const;
 
     /** Sets MaxPos */
-    void SetMaxPos(int max_pos);
+    void SetPositionMax(int max_pos);
 
     /** Returns TriggerTimeTag */
     int GetTriggerTimeTag() const;
@@ -188,7 +188,7 @@ class V1731 {
     std::string _channel_key;
     int _position_min;
     int _pulse_area;
-    int _max_pos;
+    int _position_max;
     int _trigger_time_tag;
     int _time_stamp;
     std::string _detector;

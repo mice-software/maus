@@ -23,7 +23,7 @@ EMREventProcessor::EMREventProcessor()
       : _plane_hit_proc(new EMRPlaneHitProcessor) {
     RegisterValueBranch("emr_plane_hits", &_plane_hit_proc,
                         &EMREvent::GetEMRPlaneHitArray,
-                        &EMREvent::SetEMRPlaneHitArray, true);
+                        &EMREvent::SetEMRPlaneHitArray, false);
 }
 }  // namespace MAUS
 

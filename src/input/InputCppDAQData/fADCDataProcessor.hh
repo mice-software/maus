@@ -113,7 +113,7 @@ class ZeroSupressionFilter : public MDarranger {
 // do not increment inside following macro! (e.g.: MAX( ++a, ++b );
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-#define SIGNAL_INTEGRATION_WINDOW 40
+#define SIGNAL_INTEGRATION_WINDOW 30
 
 class fADCDataProcessor : public ZeroSupressionFilter {
  public:

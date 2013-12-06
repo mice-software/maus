@@ -154,14 +154,6 @@ void V1724::SetPulseArea(int pulse_area) {
     _pulse_area = pulse_area;
 }
 
-int V1724::GetMaxPos() const {
-    return _max_pos;
-}
-
-void V1724::SetMaxPos(int max_pos) {
-    _max_pos = max_pos;
-}
-
 int V1724::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }

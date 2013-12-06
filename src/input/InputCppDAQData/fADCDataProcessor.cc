@@ -27,8 +27,9 @@ int fADCDataProcessor::get_area() {
 }
 
 void fADCDataProcessor::set_pedestal() {
-
-  if (_data.size() < SIGNAL_INTEGRATION_WINDOW*3) {
+  int size = _data.size();
+//   cerr << size << endl;
+  if (size < SIGNAL_INTEGRATION_WINDOW*2) {
     _pedestal = 0;
 
      throw(Squeal(Squeal::recoverable,

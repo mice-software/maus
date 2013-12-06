@@ -36,7 +36,7 @@ namespace MAUS {
  *  @var _channel_key_proc_proc Processor for _channel_key
  *  @var _position_min_proc_proc Processor for _position_min
  *  @var _pulse_area_proc_proc Processor for _pulse_area
- *  @var _max_pos_proc_proc Processor for _max_pos
+ *  @var _position_max_proc Processor for _position_max
  *  @var _trigger_time_tag_proc_proc Processor for _trigger_time_tag
  *  @var _time_stamp_proc_proc Processor for _time_stamp
  *  @var _detector_proc_proc Processor for _detector
@@ -65,7 +65,7 @@ class V1731Processor : public ObjectProcessor<V1731> {
     StringProcessor _channel_key_proc;
     IntProcessor _position_min_proc;
     IntProcessor _pulse_area_proc;
-    IntProcessor _max_pos_proc;
+    IntProcessor _position_max_proc;
     IntProcessor _trigger_time_tag_proc;
     IntProcessor _time_stamp_proc;
     StringProcessor _detector_proc;

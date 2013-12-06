@@ -531,11 +531,11 @@ int V1731DataProcessor::Process(MDdataContainer* aPartEventPtr) {
         (_zero_suppression && charge_mm > _zs_threshold) ) {
       xfAdcHit["charge_mm"]    = charge_mm;
       xfAdcHit["charge_pm"]    = this->get_charge(ceaPedMin);
-      int dummy_var = 0;
-      xfAdcHit["pulse_area"]   = this->get_neg_signal_area(dummy_var);
-      xfAdcHit["max_pos"]      = this->get_max_position();
+      int position_min = 0;
+      xfAdcHit["pulse_area"]   = this->get_neg_signal_area(position_min);
+      xfAdcHit["position_min"] = position_min;
+      xfAdcHit["position_max"] = this->get_max_position();
       xfAdcHit["arrival_time"] = this->get_arrival_time();
-      xfAdcHit["position_min"] = this->get_min_position();
       xfAdcHit["pedestal"]     = this->get_pedestal();
       xfAdcHit["samples"]      = this ->get_samples();
       DAQChannelKey* xKey      = _chMap->find(xLdc, xGeo, xCh, xEquip);
@@ -621,7 +621,7 @@ int V1731CppDataProcessor::Process(MDdataContainer* aPartEventPtr) {
       int min_position = 0;
       xV1731hit.SetPulseArea(this->get_neg_signal_area(min_position));
       xV1731hit.SetPositionMin(min_position);
-      xV1731hit.SetMaxPos(this->get_max_position());
+      xV1731hit.SetPositionMax(this->get_max_position());
       xV1731hit.SetArrivalTime(this->get_arrival_time());
       xV1731hit.SetTriggerTimeTag(xV1731Evnt->GetTriggerTimeTag());
       xV1731hit.SetPedestal(this->get_pedestal());

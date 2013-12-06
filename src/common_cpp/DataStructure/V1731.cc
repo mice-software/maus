@@ -21,7 +21,7 @@ namespace MAUS {
 V1731::V1731()
     : _ldc_id(0), _samples(), _charge_mm(0), _equip_type(0),
       _phys_event_number(0), _charge_pm(0), _arrival_time(0), _channel_key(""),
-      _position_min(0), _pulse_area(0), _max_pos(0), _trigger_time_tag(0),
+      _position_min(0), _pulse_area(0), _position_max(0), _trigger_time_tag(0),
       _time_stamp(0), _detector(""), _part_event_number(0), _geo(0),
       _pedestal(0), _channel(0) {
 }
@@ -29,7 +29,7 @@ V1731::V1731()
 V1731::V1731(const V1731& _v1731)
     : _ldc_id(0), _samples(), _charge_mm(0), _equip_type(0),
       _phys_event_number(0), _charge_pm(0), _arrival_time(0), _channel_key(""),
-      _position_min(0), _pulse_area(0), _max_pos(0), _trigger_time_tag(0),
+      _position_min(0), _pulse_area(0), _position_max(0), _trigger_time_tag(0),
       _time_stamp(0), _detector(""), _part_event_number(0), _geo(0),
       _pedestal(0), _channel(0) {
     *this = _v1731;
@@ -49,7 +49,7 @@ V1731& V1731::operator=(const V1731& _v1731) {
     SetChannelKey(_v1731._channel_key);
     SetPositionMin(_v1731._position_min);
     SetPulseArea(_v1731._pulse_area);
-    SetMaxPos(_v1731._max_pos);
+    SetPositionMax(_v1731._position_max);
     SetTriggerTimeTag(_v1731._trigger_time_tag);
     SetTimeStamp(_v1731._time_stamp);
     SetDetector(_v1731._detector);
@@ -151,12 +151,12 @@ void V1731::SetPulseArea(int pulse_area) {
     _pulse_area = pulse_area;
 }
 
-int V1731::GetMaxPos() const {
-    return _max_pos;
+int V1731::GetPositionMax() const {
+    return _position_max;
 }
 
-void V1731::SetMaxPos(int max_pos) {
-    _max_pos = max_pos;
+void V1731::SetPositionMax(int max_pos) {
+    _position_max = max_pos;
 }
 
 int V1731::GetTriggerTimeTag() const {

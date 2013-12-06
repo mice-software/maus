@@ -15,29 +15,74 @@
 
 """Tests for MapCppEMRPlaneHits"""
 
+import os
 import json
 import unittest
-from MAUS import MapCppEMRPlaneHits
+from Configuration import Configuration
+import MAUS
 
 class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapCppEMRPlaneHits"""
-    def setUp(self): #pylint: disable=C0103
-        """Set up a minimal spill"""
-        self.minimal_spill = {"spill_number":1,
-                              "run_number":-1,
-                              "daq_event_type":"physics_event",
-                              "errors":{"an_error":"message"},
-                              "maus_event_type":"Spill"}
-        self.mapper = MapCppEMRPlaneHits()
+    @classmethod
+    def setUpClass(cls): # pylint: disable = C0103
+        """Sets a mapper and configuration"""
+        cls.mapper = MAUS.MapCppEMRPlaneHits()
+        cls.c = Configuration()
 
-    def tearDown(self): #pylint: disable=C0103
-        """Does nothing"""
-        pass
+    def test_empty(self):
+        """Check can handle empty configuration"""
+        result = self.mapper.birth("")
+        self.assertFalse(result)
+        result = self.mapper.process("")
+        doc = json.loads(result)
+        self.assertTrue("errors" in doc)
+        self.assertTrue("bad_json_document" in doc["errors"] or 
+                        "no_channel_map" in doc["errors"])
 
-    def test_json_convert(self):
-        """Test the json conversion works okay"""
-        test_output = self.mapper.process(json.dumps(self.minimal_spill))
-        self.assertEqual(json.loads(test_output), self.minimal_spill)
+    def test_init(self):
+        """Check birth with default configuration"""
+        success = self.mapper.birth(self. c.getConfigJSON())
+        self.assertTrue(success)
+
+    def test_no_data(self):
+        """Check that nothing happens in absence of data"""
+        test1 = ('%s/src/map/MapCppEMRPlaneHits/noDataTest.json' % 
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test1,'r')
+        data = fin.read()
+        # test with no data.
+        result = self.mapper.process(data)
+        spill_out = json.loads(result)
+        n_ev = len(spill_out['recon_events'])
+        #print spill_out["errors"]
+        self.assertEqual(0, n_ev)
+        self.assertFalse("bad_json_document" in spill_out["errors"])
+        self.assertFalse("bad_cpp_data" in spill_out["errors"])
+
+    def test_process(self):
+        """Test MapCppEMRPlaneHits process method"""
+        test2 = ('%s/src/map/MapCppEMRPlaneHits/processTest.json' % 
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test2,'r')
+        data = fin.read()
+        # test with some crazy events.
+        result = self.mapper.process(data)
+        #spill_in = json.loads(data)
+        spill_out = json.loads(result)
+        #print spill_out["errors"]
+        self.assertFalse("bad_json_document" in spill_out["errors"])
+        self.assertFalse("bad_cpp_data" in spill_out["errors"])
+        n_ev = len(spill_out['recon_events'])
+        self.assertEqual(3, n_ev)
+        n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
+                                ['emr_plane_hits'])
+        self.assertEqual(1, n_hits_0)
+        n_hits_1 = len(spill_out['recon_events'][1]['emr_event']\
+                                ['emr_plane_hits'])
+        self.assertEqual(2, n_hits_1)
+        n_hits_2 = len(spill_out['recon_events'][2]['emr_event']\
+                                ['emr_plane_hits'])
+        self.assertEqual(1, n_hits_2)
 
 if __name__ == "__main__":
     unittest.main()

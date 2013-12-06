@@ -188,7 +188,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
                                      "run_number":12})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
                                      "run_number":13})
-        
+
         # job footers
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
