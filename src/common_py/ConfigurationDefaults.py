@@ -330,6 +330,11 @@ absorber0_file_number = "9999"
 absorber1_file_number = "Iges_16"
 absorber2_file_number = "9999"
 
+# Survey fit information
+survey_measurement_record = "Rotation_test.dat"
+survey_reference_position  = "Rotation_test.reference"
+use_gdml_source           = False
+
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
 Phys_Events_Only = False
