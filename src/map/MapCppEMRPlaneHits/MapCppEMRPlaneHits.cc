@@ -97,10 +97,10 @@ string MapCppEMRPlaneHits::process(string document) {
   Json::Value spill_json;
   try {
     spill_json = JsonWrapper::StringToJson(document);
-  } catch(Squeal squee) {
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << squee.what() << std::endl;
+//     ss << squee.what() << std::endl;
     ss << _classname << " says: Failed to parse input document";
     errors["bad_json_document"] = ss.str();
     spill_json["errors"] = errors;
@@ -110,10 +110,10 @@ string MapCppEMRPlaneHits::process(string document) {
   MAUS::Data* spill_cpp;
   try {
     spill_cpp = MAUS::JsonCppSpillConverter().convert(&spill_json);
-  } catch(Squeal squee) {
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << squee.what() << std::endl;
+//     ss << squee.what() << std::endl;
     ss << _classname << " says: Failed to convert the input document into MAUS::Data";
     errors["bad_json_document"] = ss.str();
     spill_json["errors"] = errors;
@@ -125,10 +125,10 @@ string MapCppEMRPlaneHits::process(string document) {
   Json::Value* spill_json_out;
   try {
     spill_json_out = MAUS::CppJsonSpillConverter().convert(spill_cpp);
-  } catch(Squeal squee) {
+  } catch(...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << squee.what() << std::endl;
+//     ss << squee.what() << std::endl;
     ss << _classname << " says: Failed to convert the output MAUS::Data into Json";
     errors["bad_cpp_data"] = ss.str();
     spill_json["errors"] = errors;
