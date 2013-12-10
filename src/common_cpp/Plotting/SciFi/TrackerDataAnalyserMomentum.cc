@@ -25,6 +25,7 @@
 #include "TCut.h"
 #include "TF1.h"
 #include "TH1.h"
+#include "TMath.h"
 #include "Rtypes.h"
 
 // MAUS headers
@@ -158,30 +159,43 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
           // Loop over seed spacepoints associated with the track,
           // and the clusters forming that,
           // to calculate  average MC truth momentum
+          int num_spoint_skipped = 0;
           for (size_t iSp = 0; iSp < trk->get_spacepoints().size(); ++iSp) {
             SciFiSpacePoint* seed = trk->get_spacepoints()[iSp];
             double seed_px_mc = 0.0;
             double seed_py_mc = 0.0;
             double seed_pz_mc = 0.0;
-            int num_skipped = 0;
+            int num_clus_skipped = 0;
             for (size_t iCl = 0; iCl < seed->get_channels().size(); ++iCl) {
               ThreeVector p_mc = seed->get_channels()[iCl]->get_true_momentum();
-              if ( p_mc.z() > 1.0 ) { // Cut to remove bad clusters from the analysis
+              if ( fabs(p_mc.z()) > _pz_mc_cut ) { // Cut to remove bad clusters from the analysis
                 seed_px_mc += p_mc.x();
                 seed_py_mc += p_mc.y();
                 seed_pz_mc += p_mc.z();
               } else {
-                ++num_skipped;
+                std::cerr << "Low cluster MC pz of " << p_mc.z() << ", skipping cluster\n";
+                ++num_clus_skipped;
               }
             }
-            seed_px_mc /= (seed->get_channels().size() - num_skipped);
-            seed_py_mc /= (seed->get_channels().size() - num_skipped);
-            seed_pz_mc /= (seed->get_channels().size() - num_skipped);
-            _pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
-            _pz_mc += seed_pz_mc;
+            if ((seed->get_channels().size() - num_clus_skipped) > 0) {
+              seed_px_mc /= (seed->get_channels().size() - num_clus_skipped);
+              seed_py_mc /= (seed->get_channels().size() - num_clus_skipped);
+              seed_pz_mc /= (seed->get_channels().size() - num_clus_skipped);
+              _pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
+              _pz_mc += seed_pz_mc;
+            } else {
+              std::cerr << "Spoint with " << num_clus_skipped << " bad MC cluster momenta found,";
+              std::cerr << " skipping spoint\n";
+              ++num_spoint_skipped;
+              continue;
+            }
           }
-          _pt_mc /= trk->get_spacepoints().size();
-          _pz_mc /= trk->get_spacepoints().size();
+          _pt_mc /= (trk->get_spacepoints().size() - num_spoint_skipped);
+          _pz_mc /= (trk->get_spacepoints().size() - num_spoint_skipped);
+          if ( TMath::IsNaN(_pt_mc) || TMath::IsNaN(_pz_mc) ) {
+            std::cerr << "Track with bad MC momenta found, skipping track\n";
+            continue;
+          }
           // Fill the vectors and tree with the extracted recon and MC momenta
           if (trk->get_tracker() == 0) {
             _t1_pt_res->Fill(_pt_mc - _pt);

@@ -129,6 +129,9 @@ class TrackerDataAnalyserMomentum {
     TCanvas* _cResiduals;
     TCanvas* _cGraphs;
     TCanvas* _cResolutions;
+
+  private:
+    static const double _pz_mc_cut = 5.0;
 };
 
 } // ~namespace MAUS
