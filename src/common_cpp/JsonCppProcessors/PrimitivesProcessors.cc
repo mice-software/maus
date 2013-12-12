@@ -114,6 +114,40 @@ Json::Value* UIntProcessor::CppToJson
   return json_uint;
 }
 
+
+uint64* LLUIntProcessor::JsonToCpp(const Json::Value& json_string) {
+    if (!json_string.isString()) {
+      throw(Squeal(
+          Squeal::recoverable,
+          "Failed to convert json value to long long int - not a string type",
+          "LLUIntProcessor::JsonToCpp"
+      ));
+    }
+    std::string cpp_string = json_string.asString();
+    if (cpp_string[0] == '-') {
+      throw(Squeal(
+          Squeal::recoverable,
+          "Failed to convert json value to long long int - value was negative",
+          "LLUIntProcessor::JsonToCpp"
+      ));
+    }
+    uint64* cpp_int = new uint64(STLUtils::FromString<uint64>(cpp_string));
+    return cpp_int;
+}
+
+Json::Value* LLUIntProcessor::CppToJson
+                                    (const uint64& cpp_uint64) {
+  return new Json::Value(STLUtils::ToString(cpp_uint64));
+}
+
+Json::Value* LLUIntProcessor::CppToJson
+                              (const uint64& cpp_uint64, std::string path) {
+  Json::Value* json_uint64 = CppToJson(cpp_uint64);
+  JsonWrapper::Path::SetPath(*json_uint64, path);
+  return json_uint64;
+}
+
+
 bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
   if (json_bool.isBool()) {
       return new bool (json_bool.asBool());
