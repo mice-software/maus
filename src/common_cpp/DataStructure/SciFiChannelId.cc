@@ -84,11 +84,11 @@ void SciFiChannelId::SetUsed(bool used) {
     _used = used;
 }
 
-double SciFiChannelId::GetID() const {
+long SciFiChannelId::GetID() const {
     return _digit_id;
 }
 
-void SciFiChannelId::SetID(double digit_id) {
+void SciFiChannelId::SetID(long digit_id) {
     _digit_id = digit_id;
 }
 
