@@ -26,7 +26,6 @@ from geometry.GDMLtoMAUSModule import GDMLtomaus
 from geometry.ConfigReader import Configreader
 from geometry.GDMLFormatter import Formatter
 from geometry.GDMLPacker import Unpacker
-from geometry.LocationFit import ElementRotationTranslation
 
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
@@ -48,24 +47,24 @@ def main():
     except OSError:
         pass
     #Download file
-    #geometry_downloader = Downloader()
-    #if configuration.geometry_download_by == "run_number":
-    #    geometry_downloader.download_geometry_by_run \
-    #                   (configuration.geometry_download_run_number, gdml_cache)
-    #elif configuration.geometry_download_by == "current":
-    #    geometry_downloader.download_current(gdml_cache)
-    #elif configuration.geometry_download_by == "id":
-    #    geometry_downloader.download_geometry_by_id \
-    #                     (configuration.geometry_download_id, gdml_cache)
-    #else:
-    #    raise KeyError("Didn't recognise 'geometry_download_by' option '"+\
-    #            configuration.geometry_download_by+"'. Should be on of\n"+\
-    #                       "run_number\ncurrent\nid\n")
+    geometry_downloader = Downloader()
+
+    if configuration.geometry_download_by == "run_number":
+        geometry_downloader.download_geometry_by_run \
+                        (configuration.geometry_download_run_number, gdml_cache)
+    elif configuration.geometry_download_by == "current":
+        geometry_downloader.download_current(gdml_cache)
+    elif configuration.geometry_download_by == "id":
+        geometry_downloader.download_geometry_by_id \
+                                (configuration.geometry_download_id, gdml_cache)
+    else:
+        raise KeyError("Didn't recognise 'geometry_download_by' option '"+\
+               configuration.geometry_download_by+"'. Should be on of\n"+\
+               "run_number\ncurrent\nid\n")
     #Unzip file
-    #zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
-    #zipped_geom = Unpacker(zip_filename, gdml_cache)
-    # zipped_geom.unzip_file()
-    # fit the detector information to the survey points.
+    zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
+    zipped_geom = Unpacker(zip_filename, gdml_cache)
+    zipped_geom.unzip_file()
     surveyFit = ElementRotationTranslation()
     surveyFit.execute('MICE_Information/Detector_Information/TOF/TOF0')
     surveyFit.execute('MICE_Information/Detector_Information/TOF/TOF1')

@@ -331,9 +331,10 @@ absorber1_file_number = "Iges_16"
 absorber2_file_number = "9999"
 
 # Survey fit information
-survey_measurement_record = "Rotation_test.dat"
-survey_reference_position  = "Rotation_test.reference"
-use_gdml_source           = False
+survey_measurement_record = "%s/files/geometry/download/gdml/FastradModel.gdml" % os.environ.get("MAUS_ROOT_DIR")
+# This file should include position references and true locations of each detector.
+survey_reference_position = "%s/files/geometry/download/gdml/Maus_Information.gdml" % os.environ.get("MAUS_ROOT_DIR")
+use_gdml_source           = True
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
