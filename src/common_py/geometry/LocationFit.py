@@ -342,10 +342,10 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         return isgood
 
     def writefile(self):
-        # f = open(self.GDMLFile,'w')
-        # self.gdmlfile.saveTo(f)
+        f = open(self.GDMLFile,'w')
+        self.gdmlfile.saveTo(f)
         print self.gdmlfile
-        # f.close
+        f.close
         self.gdmlfile.freeDoc()
         
 
