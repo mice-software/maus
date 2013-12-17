@@ -30,13 +30,13 @@ SciFiMCLookup::SciFiMCLookup(const SciFiMCLookup& lookup)
 SciFiMCLookup::SciFiMCLookup(const SciFiDigit& digit): _noise(false), _noise_size(0) {
 	_digit_Id = 1 * digit.get_channel() + 1000 * digit.get_plane() +
                 10000 * digit.get_station() + 100000 * digit.get_tracker() +
-				1000000 * digit.get_event() + 10000000 * digit.get_spill();
+				1000000 * digit.get_event();
 }
 
 SciFiMCLookup::SciFiMCLookup(const SciFiDigit* digit): _noise(false), _noise_size(0) {
 	_digit_Id = 1 * digit->get_channel() + 1000 * digit->get_plane() +
                 10000 * digit->get_station() + 100000 * digit->get_tracker() +
-				1000000 * digit->get_event() + 10000000 * digit->get_spill();
+				1000000 * digit->get_event();
 }
 
 SciFiMCLookup& SciFiMCLookup::operator=(const SciFiMCLookup& lookup) {
