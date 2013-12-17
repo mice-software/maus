@@ -19,8 +19,8 @@
 namespace MAUS {
 
 SciFiNoiseHit::SciFiNoiseHit():_spill(0), _event(0),
-							   _tracker(0), _station(0), _plane(0),
-							   _channel(0), _npe(0.), _time(0.), _used(false),
+                               _tracker(0), _station(0), _plane(0),
+                               _channel(0), _npe(0.), _time(0.), _used(false),
                                _digit_id(0) {
 }
 
@@ -35,28 +35,28 @@ SciFiNoiseHit::SciFiNoiseHit(int spill, int event, int tracker, int station,
 SciFiNoiseHit::SciFiNoiseHit(const SciFiNoiseHit& noise)
     : _spill(noise._spill), _event(noise._event),
       _tracker(noise._tracker), _station(noise._station), _plane(noise._plane),
-	  _channel(noise._channel), _npe(noise._npe), _time(noise._npe), _used(noise._used),
+      _channel(noise._channel), _npe(noise._npe), _time(noise._npe), _used(noise._used),
       _digit_id(noise._digit_id) {
+}
+
+SciFiNoiseHit::~SciFiNoiseHit() {
 }
 
 SciFiNoiseHit& SciFiNoiseHit::operator=(const SciFiNoiseHit& noise) {
     if (this == &noise) {
         return *this;
     }
-	_spill = noise._spill;
-	_event = noise._event;
+    _spill = noise._spill;
+    _event = noise._event;
     _tracker = noise._tracker;
     _station = noise._station;
     _plane = noise._plane;
-	_channel = noise._channel;
-	_npe = noise._npe;
+    _channel = noise._channel;
+    _npe = noise._npe;
     _time = noise._time;
     _used = noise._used;
     _digit_id = noise._digit_id;
     return *this;
-}
-
-SciFiNoiseHit::~SciFiNoiseHit() {
 }
 
 } // ~namespace MAUS

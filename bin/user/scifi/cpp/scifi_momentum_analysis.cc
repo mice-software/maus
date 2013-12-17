@@ -35,7 +35,6 @@
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
-
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 /** Analyse Tracker momentum data using ROOT */
