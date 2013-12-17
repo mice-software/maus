@@ -44,6 +44,7 @@
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
 #include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 
 
 namespace MAUS {
@@ -138,6 +139,7 @@ class TrackerDataManager {
     bool _print_tracks;
     bool _print_seeds;
 
+    SciFiLookup _lookup;
 
     // The data associated with each tracker for one spill
     TrackerData _t1;
