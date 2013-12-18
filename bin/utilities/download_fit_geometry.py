@@ -26,6 +26,7 @@ from geometry.GDMLtoMAUSModule import GDMLtomaus
 from geometry.ConfigReader import Configreader
 from geometry.GDMLFormatter import Formatter
 from geometry.GDMLPacker import Unpacker
+from geometry.LocationFit import ElementRotationTranslation
 
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
