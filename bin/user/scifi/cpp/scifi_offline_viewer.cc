@@ -54,23 +54,32 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Parse any extra arguments supplied
-  //   -p -> pause between events
+  //   -p -> pause between spills
+  //   -w -> wait for input milliseconds between spills
   //   -g -> enables saving xyz plots and gives output graphics file type
   //   -f -> select the first tree entry to start from
   bool bool_pause = false;
   bool bool_save = false;
 
-
   std::string save_type = "";
   int start_num = 0;
-  std::stringstream ss1;
+  int wait_time = 0;
 
   for (int i = 2; i < argc; i++) {
     if ( std::strcmp(argv[i], "-f") == 0 ) {
       if ( (i+1) < argc ) {
+        std::stringstream ss1;
         ss1 << argv[i + 1];
         ss1 >> start_num;
         std::cout << "Starting from entry: " << start_num << std::endl;
+      }
+    }
+    if ( std::strcmp(argv[i], "-w") == 0 ) {
+      if ( (i+1) < argc ) {
+        std::stringstream ss1;
+        ss1 << argv[i + 1];
+        ss1 >> wait_time;
+        std::cout << "Waiting " << wait_time << " milliseconds between events" << std::endl;
       }
     }
     if ( std::strcmp(argv[i], "-p") == 0 ) {
@@ -126,6 +135,7 @@ int main(int argc, char *argv[]) {
     } else {
       std::cout << "Not a usable spill\n";
     }
+    usleep(wait_time*1000);
   }
 
   // Tidy up
