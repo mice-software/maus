@@ -217,6 +217,7 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
 void MapCppGlobalRawTracks::LoadTOFTrack(
     MAUS::ReconEvent const * const recon_event,
     GlobalDS::TrackPArray & tof_tracks) {
+  const int particle_event_number = recon_event->GetPartEventNumber();
   const TOFEvent * tof_event = recon_event->GetTOFEvent();
   const TOFEventSpacePoint space_point_events
     = tof_event->GetTOFEventSpacePoint();
@@ -267,6 +268,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof0_space_point != tof0_space_points.end();
        ++tof0_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+    track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof0, tof0_space_point, 40., 10, track_point);
     track_points.push_back(track_point);
 
@@ -286,6 +288,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof1_space_point != tof1_space_points.end();
        ++tof1_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+    track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof1, tof1_space_point, 60., 7, track_point);
     track_points.push_back(track_point);
 
@@ -307,6 +310,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
        tof2_space_point != tof2_space_points.end();
        ++tof2_space_point) {
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+    track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof2, tof2_space_point, 60., 10, track_point);
     track_points.push_back(track_point);
 
@@ -390,7 +394,6 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
   space_point->set_position(position);
   static_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
-  track_point->set_particle_event(tof_space_point->GetPhysEventNumber());
   track_point->set_mapper_name(kClassname);
 
   track_point->set_position(position);
@@ -555,6 +558,7 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
     tracks.push_back(track);
   }
 
+  const int particle_event_number = recon_event->GetPartEventNumber();
   SciFiEvent const * const scifi_event = recon_event->GetSciFiEvent();
   SciFiTrackPArray scifi_tracks = scifi_event->scifitracks();
   SciFiTrackPArray::const_iterator scifi_track = scifi_tracks.begin();
@@ -580,6 +584,7 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
       }
       const Detector& detector = detector_mapping->second;
       GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
+      track_point->set_particle_event(particle_event_number);
       PopulateSciFiTrackPoint(detector, scifi_track_point, track_point);
 
       MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
@@ -628,8 +633,6 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   static_cast<GlobalDS::BasePoint*>(track_point)->operator=(*space_point);
   track_point->set_space_point(space_point);
 
-  // FIXME(Lane) Need to get event number, but now using SciFi track points
-  // track_point->set_particle_event((*scifi_space_point)->get_event());
   track_point->set_mapper_name(kClassname);
 
   const double Px = (*scifi_track_point)->px();

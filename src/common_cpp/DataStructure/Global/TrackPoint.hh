@@ -82,7 +82,7 @@ class TrackPoint : public BasePoint {
   // Getters and Setters for the member variables
 
   /// Set the index of the particle event that created this track point.
-  void set_particle_event(const int mapper_name);
+  void set_particle_event(const int particle_event);
 
   /// Get the name for the mapper which produced the track, #_mapper_name.
   int get_particle_event() const;

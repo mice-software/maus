@@ -193,7 +193,7 @@ const CovarianceMatrix CovarianceMatrix::CreateFromPennParameters(
   double sigma_E_E  =  emittance_l * mass * gamma_l * momentum;
 
   double sigma_x_t  =  0.;
-  double sigma_x_E  = -dispersion_x * sigma_E_E / energy;
+  double sigma_x_E  =  dispersion_x * sigma_E_E / energy;
   double sigma_x_x  =  emittance_t * beta_t * mass / momentum;
 
   double sigma_Px_t =  0.;
@@ -202,7 +202,7 @@ const CovarianceMatrix CovarianceMatrix::CreateFromPennParameters(
   double sigma_Px_Px=  mass * momentum * emittance_t * gamma_t;
 
   double sigma_y_t  =  0.;
-  double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
+  double sigma_y_E  = dispersion_y * sigma_E_E / energy;
   double sigma_y_x  =   0.;
   // this differes from G. Penn's paper
   double sigma_y_Px =  mass * emittance_t

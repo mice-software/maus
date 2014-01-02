@@ -196,8 +196,13 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   Double_t args[2] = {max_iterations, max_EDM};
   minimizer->mnexcm(method.c_str(), args, 2, err);
 
+  // Get the particle event for this track
+  GlobalDS::TrackPointCPArray raw_points = raw_track->GetTrackPoints();
+  size_t particle_event = raw_points[0]->get_particle_event();
+
   DataStructureHelper helper = DataStructureHelper::GetInstance();
 
+  // Add a TrackPoint to the recon track for the fit primary
   PhaseSpaceVector fit_primary;
   for (size_t index = 0; index < kPhaseSpaceDimension; ++index) {
     Double_t value, error;
@@ -212,6 +217,8 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
         optics_model_->primary_plane(),
         particle_id_);
     track_point.set_mapper_name(mapper_name);
+    track_point.set_detector(MAUS::DataStructure::Global::kUndefined);
+    track_point.set_particle_event(particle_event);
     track->AddTrackPoint(new TrackPoint(track_point));
   } catch (Exception exception) {
       std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
@@ -221,9 +228,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
   }
 
 
-  // Reconstruct the fit track from the fit primary
-  GlobalDS::TrackPointCPArray raw_points = raw_track->GetTrackPoints();
-  size_t particle_event = raw_points[0]->get_particle_event();
+  // Add the fit points to the recon track by transporting the fit primary
   GlobalDS::TrackPointCPArray::const_iterator raw_point = raw_points.begin();
   for (; raw_point != raw_points.end(); ++raw_point) {
     // transport the fit primary to the desired z-position
@@ -243,6 +248,7 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
 
     track_point.set_particle_event(particle_event);
     track_point.set_mapper_name(mapper_name);
+    track_point.set_detector((*raw_point)->get_detector());
     track->AddTrackPoint(new TrackPoint(track_point));
   }
   track->set_pid(raw_track->get_pid());

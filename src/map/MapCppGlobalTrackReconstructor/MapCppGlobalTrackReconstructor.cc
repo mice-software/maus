@@ -348,6 +348,7 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
 
   // Convert the first fit track point into a PhaseSpaceVector for transporting
   GlobalDS::TrackPoint const * const fit_primary_track_point = fit_points[0];
+  size_t particle_event = fit_primary_track_point->get_particle_event();
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   PhaseSpaceVector fit_primary
     = helper.TrackPoint2PhaseSpaceVector(*fit_primary_track_point);
@@ -403,6 +404,7 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
     }
 
     track_point.set_mapper_name(kClassname);
+    track_point.set_particle_event(particle_event);
     track->AddTrackPoint(new GlobalDS::TrackPoint(track_point));
   }
   track->SortTrackPointsByZ();

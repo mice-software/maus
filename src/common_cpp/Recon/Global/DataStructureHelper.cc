@@ -238,7 +238,7 @@ TrackPoint DataStructureHelper::PhaseSpaceVector2TrackPoint(
     const TLorentzVector momentum(px, py, pz, energy);
     track_point.set_momentum(momentum);
 
-    track_point.set_detector(MAUS::DataStructure::Global::kVirtual);
+    track_point.set_detector(MAUS::DataStructure::Global::kUndefined);
     return track_point;
 }
 
