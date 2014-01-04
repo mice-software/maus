@@ -94,6 +94,7 @@ double DataStructureHelper::GetDetectorZPosition(
   std::stringstream detector_name;
   std::cout << "Root MiceModule " << geometry->fullName() << " has "
             << geometry->daughters() << " daughters." << std::endl;
+  std::cout << "Selecting on detector " << detector_id << std::endl;
   switch (detector_id) {
     case GlobalDS::kTOF0: {
       detector_name << "TOF0.dat";
@@ -122,7 +123,7 @@ double DataStructureHelper::GetDetectorZPosition(
     case GlobalDS::kTracker1_5: {
       GlobalDS::DetectorPoint station = GlobalDS::DetectorPoint(
         detector_id - GlobalDS::kTracker0);
-      if (station > 5) {
+      if (station > 5) {  // 5 stations per tracker
         station = GlobalDS::DetectorPoint(detector_id - GlobalDS::kTracker1);
         detector_name << "Tracker1Station";
       } else {
@@ -132,7 +133,10 @@ double DataStructureHelper::GetDetectorZPosition(
       std::vector<const MiceModule *> mothers
         = FindModulesByName(geometry, detector_name.str());
       if (mothers.size() == 1) {
-        const std::string view_name = "TrackerViewW.dat";
+        std::string view_name = "TrackerViewW.dat";
+        if (detector_id == GlobalDS::kTracker0_5) {
+          view_name = "Tracker0Station5ViewW.dat";
+        }
         modules = FindModulesByName(mothers[0], view_name);
         detector_name << "/" << view_name;  // for exception message if needed
       } else if (mothers.size() > 1) {
@@ -155,6 +159,7 @@ double DataStructureHelper::GetDetectorZPosition(
     default: detector_name << "unknown";
   }
 
+  std::cout << "Detector name: " << detector_name.str() << std::endl;
 
   if (modules.size() == 0) {
     std::stringstream message;
@@ -171,6 +176,8 @@ double DataStructureHelper::GetDetectorZPosition(
                   message.str(),
                   "DataStructureHelper::GetDetectorZPosition()"));
   }
+
+  std::cout << "Detector z position: " << modules[0]->globalPosition().z() << std::endl;
 
   return modules[0]->globalPosition().z();
 }

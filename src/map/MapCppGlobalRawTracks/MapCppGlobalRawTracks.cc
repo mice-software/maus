@@ -202,11 +202,17 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
             << "Loaded " << sci_fi_track_count << " SciFi tracks."
             << std::endl;
   */
-  // FIXME(Lane) currently assuming only one track...
-  if (tracks.size() > 0) {
-    tracks[0]->SortTrackPointsByZ();
-    tracks[0]->set_mapper_name(kClassname);
-    global_event->add_track_recursive(tracks[0]);
+  GlobalDS::TrackPArray::iterator track;
+  for (track = tracks.begin(); track != tracks.end(); ++track) {
+    if ((*track)->GetTrackPoints().size() >= 2) {
+      (*track)->SortTrackPointsByZ();
+      (*track)->set_mapper_name(kClassname);
+      global_event->add_track_recursive(*track);
+    } else {
+      std::cout << "DEBUG MapCppGlobalRawTracks::AssembleRawTracks(): "
+                << "Skipping track with only " << (*track)->GetTrackPoints().size() << " points."
+                << std::endl;
+    }
   }
 
   recon_event->SetGlobalEvent(global_event);
@@ -228,12 +234,12 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
   const std::vector<TOFSpacePoint> tof2_space_points
     = space_point_events.GetTOF2SpacePointArray();
 
-  /*
+  // FIXME: Each space point in a particular detector is a separate track branch
+
   std::cout << "DEBUG LoadTOFTrack: space points in TOF0: "
             << tof0_space_points.size() << "\tTOF1: "
             << tof1_space_points.size() << "\tTOF2: "
             << tof2_space_points.size() << std::endl;
-  */
   if (tof0_space_points.size() != tof1_space_points.size()) {
     std::cout << "DEBUG LoadTOFTrack: track has different number of "
               << "space points in TOF0 (" << tof0_space_points.size() << ")"
@@ -548,6 +554,7 @@ double MapCppGlobalRawTracks::TOFMeanStoppingPower(const double beta,
 }
 
 /** LoadSciFiTracks
+ *  Assumes tracks have already been added to each recon_event.
  */
 void MapCppGlobalRawTracks::LoadSciFiTracks(
     MAUS::ReconEvent const * const recon_event,
@@ -557,18 +564,47 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
     GlobalDS::Track * track = new GlobalDS::Track();
     tracks.push_back(track);
   }
+  const size_t num_global_tracks = tracks.size();
 
   const int particle_event_number = recon_event->GetPartEventNumber();
+
   SciFiEvent const * const scifi_event = recon_event->GetSciFiEvent();
   SciFiTrackPArray scifi_tracks = scifi_event->scifitracks();
+
+  // Duplicate each global track for each additional SciFi track. When done
+  // the order will be A1,B1,C1,...,A2,B2,C2,...; where A,B,C represent unique
+  // global tracks and 1,2,3 index the SciFi track.
+  const size_t num_scifi_tracks = scifi_tracks.size();
+  tracks.resize(num_global_tracks * num_scifi_tracks);
+  GlobalDS::TrackPArray::iterator track;
+  for (size_t copy_index = 1; copy_index < num_scifi_tracks; ++copy_index) {
+    track = tracks.begin();
+    for (size_t trk_index = 0; trk_index < num_global_tracks; ++trk_index) {
+      tracks.push_back(new GlobalDS::Track(**track));
+      ++track;
+    }
+  }
+  track = tracks.begin();
+
+  std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
+            << "\t# Previous Global Tracks: " << num_global_tracks << std::endl
+            << "\t# SciFi Tracks: " << num_scifi_tracks << std::endl
+            << "\tNew # Global Tracks: " << tracks.size() << std::endl;
+
   SciFiTrackPArray::const_iterator scifi_track = scifi_tracks.begin();
-  while (scifi_track != scifi_tracks.end()) {
-    SciFiTrackPointPArray scifi_track_points = (*scifi_track)->scifitrackpoints();
+  for (; scifi_track != scifi_tracks.end(); ++scifi_track) {
+    SciFiTrackPointPArray scifi_track_points
+      = (*scifi_track)->scifitrackpoints();
     SciFiTrackPointPArray::const_iterator scifi_track_point
       = scifi_track_points.begin();
-    while (scifi_track_point != scifi_track_points.end()) {
+    GlobalDS::TrackPArray::iterator track_begin = track;
+    GlobalDS::TrackPArray::iterator track_end = track + num_global_tracks;
+    for (; scifi_track_point != scifi_track_points.end(); ++scifi_track_point) {
       const int tracker = (*scifi_track_point)->tracker();
       const int station = (*scifi_track_point)->station();
+      std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
+                << "\tTracker: " << tracker << "\tStation: " << station
+                << "\tPz: " << (*scifi_track_point)->pz() << std::endl;
       const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
           GlobalDS::kTracker0 + 6 * tracker + station);
       MAUS::recon::global::DetectorMap::const_iterator detector_mapping
@@ -592,15 +628,27 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
         = simulator->GetReferenceParticle();
       const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
 
-      GlobalDS::TrackPArray::const_iterator track = tracks.begin();
-      while (track != tracks.end()) {
+      // For each SciFi track, add it's track points to the associated set of
+      // global track copies
+      for (; track != track_end; ++track) {
+        if (track == tracks.end()) {
+          throw(Exception(Exception::nonRecoverable,
+                       "insufficient number of global tracks to accomodate"
+                       "the number of SciFi tracks",
+                       "MapCppGlobalRawTracks::LoadSciFiTracks()"));
+        }
         // FIXME(Lane) this will have to change once PID functionality exists
         (*track)->set_pid(particle_id);
 
+        std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTracks(): "
+                  << "Adding track point...";
         (*track)->AddTrackPoint(track_point);
-      }
-    }
-  }
+        std::cout << "DONE!" << std::endl;
+      }  // end for loop over global tracks
+      track = track_begin;  // reset for next SciFi track point
+    }  // end for loop over SciFi track points
+    track += num_global_tracks;  // go to the next set of global tracks
+  }  // end for loop over SciFi tracks
 }
 
 /** PopulateSciFiTrackPoint
@@ -625,6 +673,9 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
                    -(*scifi_track_point)->x():(*scifi_track_point)->x();
   const double y = (*scifi_track_point)->y();
   const double z = helper.GetDetectorZPosition(detector.id());
+  std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint: "
+            << "z position of detector with ID " << detector.id() << " is "
+            << z << std::endl;
   // No timestamp in the SciFiEvent/Track/TrackPoint data structure
   const double time = 0.;
   TLorentzVector four_position(x, y, z, time);
@@ -644,7 +695,6 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   const double energy = momentum / beta;
   TLorentzVector four_momentum(Px, Py, Pz, energy);
   track_point->set_momentum(four_momentum);
-  /*
   std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint(): "
             << "\tSciFi Space Point:" << std::endl
             << std::setprecision(10)
@@ -655,7 +705,6 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
             << "\tMomentum: (" << four_momentum.Px() << ", "
             << four_momentum.Py() << ", " << four_momentum.Pz() << ", "
             << four_momentum.Pt() << ")" << std::endl;
-  */
   CovarianceMatrix covariances = detector.uncertainties();
   TLorentzVector position_errors(::sqrt(covariances(3, 3)),
                                   ::sqrt(covariances(5, 5)),
@@ -670,6 +719,8 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   track_point->set_momentum_error(momentum_errors);
 
   // track_point->set_charge((*scifi_track_point)->get_npe());
+  std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint(): END!"
+            << std::endl;
 }
 
 /* Take an educated guess at the particle ID based on the axial velocity
