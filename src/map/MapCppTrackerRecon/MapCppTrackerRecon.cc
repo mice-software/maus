@@ -73,9 +73,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
-    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
-        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
@@ -87,10 +85,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          std::cout << "Calling Pattern Recognition, helical " << _helical_pr_on;
-          std::cout << ", straight " << _straight_pr_on << std::endl;
           pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
-          std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
         if ( _kalman_on ) {
@@ -167,6 +162,7 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                                              SciFiEvent &evt) {
   PatternRecognition pr1;
+  pr1.set_verbosity(0);
   pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 

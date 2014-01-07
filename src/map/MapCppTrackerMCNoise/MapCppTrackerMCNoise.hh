@@ -35,14 +35,13 @@
 // MAUS headers
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/SciFiNoiseHit.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 

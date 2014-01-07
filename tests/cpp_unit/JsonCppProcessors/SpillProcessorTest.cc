@@ -71,7 +71,8 @@ std::string PRIMARY =
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string SF_CHANNEL_ID =
-    std::string("{\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
+    std::string("{\"digit_id\":0.0,")+
+    std::string("\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
     std::string("\"tracker_number\":4}");
 
 std::string TOF_CHANNEL_ID =

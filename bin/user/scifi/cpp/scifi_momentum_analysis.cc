@@ -32,10 +32,9 @@
 #include "TGClient.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerDataAnalyserMomentum.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
-
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
 
 /** Analyse Tracker momentum data using ROOT */
@@ -94,8 +93,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  analyser.analyse(true);
-  analyser.save();
+  analyser.make_residual_histograms();
+  analyser.make_residual_graphs();
+  analyser.make_pz_resolutions();
+  analyser.make_resolution_graphs();
+  analyser.save_graphics(save_type);
+  analyser.save_root();
 
   // Tidy up
   infile.close();

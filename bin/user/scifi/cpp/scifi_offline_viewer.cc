@@ -32,13 +32,13 @@
 #include "TGClient.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/TrackerData.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataManager.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSpoints.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterXYZ.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterSZ.hh"
-#include "src/common_cpp/Recon/SciFi/TrackerDataPlotterInfoBox.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerData.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataManager.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSpoints.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterSZ.hh"
+#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
 
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -54,13 +54,34 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Parse any extra arguments supplied
-  //   -p -> pause between events
+  //   -p -> pause between spills
+  //   -w -> wait for input milliseconds between spills
   //   -g -> enables saving xyz plots and gives output graphics file type
+  //   -f -> select the first tree entry to start from
   bool bool_pause = false;
   bool bool_save = false;
+
   std::string save_type = "";
+  int start_num = 0;
+  int wait_time = 0;
 
   for (int i = 2; i < argc; i++) {
+    if ( std::strcmp(argv[i], "-f") == 0 ) {
+      if ( (i+1) < argc ) {
+        std::stringstream ss1;
+        ss1 << argv[i + 1];
+        ss1 >> start_num;
+        std::cout << "Starting from entry: " << start_num << std::endl;
+      }
+    }
+    if ( std::strcmp(argv[i], "-w") == 0 ) {
+      if ( (i+1) < argc ) {
+        std::stringstream ss1;
+        ss1 << argv[i + 1];
+        ss1 >> wait_time;
+        std::cout << "Waiting " << wait_time << " milliseconds between events" << std::endl;
+      }
+    }
     if ( std::strcmp(argv[i], "-p") == 0 ) {
       std::cout << "Will wait for user input between spills\n";
       bool_pause = true;
@@ -77,6 +98,8 @@ int main(int argc, char *argv[]) {
 
   // Set up the data manager and plotters
   MAUS::TrackerDataManager tdm;
+  tdm.set_print_tracks(true);
+  tdm.set_print_seeds(true);
   MAUS::TrackerDataPlotterBase *xyzPlotter = new MAUS::TrackerDataPlotterXYZ();
   if (bool_save) {
     xyzPlotter->SetSaveOutput(true);
@@ -97,6 +120,7 @@ int main(int argc, char *argv[]) {
   MAUS::Data data;
 
   // Loop over all spills
+  if (start_num > 0) infile.set_current_event(start_num);
   while ( infile >> readEvent != NULL ) {
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();
@@ -111,6 +135,7 @@ int main(int argc, char *argv[]) {
     } else {
       std::cout << "Not a usable spill\n";
     }
+    usleep(wait_time*1000);
   }
 
   // Tidy up

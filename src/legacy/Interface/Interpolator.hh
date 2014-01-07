@@ -142,7 +142,6 @@ class Interpolator3dSolenoidalTo3d : public VectorMap
 public:
 	Interpolator3dSolenoidalTo3d(TwoDGrid* grid, double ** Br, double ** Bz, std::string interpolationAlgorithm="LinearCubic");
 	Interpolator3dSolenoidalTo3d() : _interpolator(), _coordinates(NULL) {;}
-	Interpolator3dSolenoidalTo3d(Interpolator2dGridTo1d* interpol[2]);
 	~Interpolator3dSolenoidalTo3d();
 
 	//Build interpolator from component info
@@ -155,7 +154,7 @@ public:
 	unsigned int ValueDimension()                    const {return 3;}
 	TwoDGrid*    GetMesh()                                 {return _coordinates;}
 	TwoDGrid*    GetGrid()                                 {return _coordinates;}
-	void         SetGrid(TwoDGrid* grid, bool regular=true){_coordinates = grid;}
+	void         SetGrid(TwoDGrid* grid, bool regular=true){_coordinates = grid; _coordinates->Add(this);}
 
 private:
 	static interpolationAlgorithm Algorithm(std::string algo);
