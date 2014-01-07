@@ -17,9 +17,14 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
+#include <vector>
+
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/EMRPlaneHit.hh"
 
 namespace MAUS {
+
+typedef std::vector<EMRPlaneHit*> EMRPlaneHitArray;
 
 /** @class EMREvent comment
  *
@@ -39,8 +44,14 @@ class EMREvent {
     /** Destructor - any member pointers are deleted */
     virtual ~EMREvent();
 
+    /** Returns  */
+    EMRPlaneHitArray GetEMRPlaneHitArray() const;
+
+    /** Sets  */
+    void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
 
   private:
+    EMRPlaneHitArray _emrplanehitarray;
 
     MAUS_VERSIONED_CLASS_DEF(EMREvent)
 };

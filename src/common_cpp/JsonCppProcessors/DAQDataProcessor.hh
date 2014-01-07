@@ -23,6 +23,7 @@
 #include "src/common_cpp/JsonCppProcessors/KLDaqProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TOFDaqProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRDaqProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TagProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TriggerProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TriggerRequestProcessor.hh"
@@ -63,6 +64,7 @@ class DAQDataProcessor : public ObjectProcessor<DAQData> {
     PointerArrayProcessor<KLDaq> _kl_proc;
     PointerArrayProcessor<Tag> _tag_proc;
     PointerArrayProcessor<TOFDaq> _tof0_proc;
+    EMRDaqProcessor _emr_proc;
     PointerArrayProcessor<Trigger> _trigger_proc;
 };
 }  // namespace MAUS

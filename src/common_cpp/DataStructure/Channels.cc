@@ -333,5 +333,74 @@ int Channels::GetCh9() const {
 void Channels::SetCh9(int ch9) {
     _ch9 = ch9;
 }
+
+void Channels::SetCh(int xCh, int xValue) {
+    switch ( xCh ) {
+        case 0:
+            this->SetCh0(xValue);
+        case 1:
+            this->SetCh1(xValue);
+        case 2:
+            this->SetCh2(xValue);
+        case 3:
+            this->SetCh3(xValue);
+        case 4:
+            this->SetCh4(xValue);
+        case 5:
+            this->SetCh5(xValue);
+        case 6:
+            this->SetCh6(xValue);
+        case 7:
+            this->SetCh7(xValue);
+        case 8:
+            this->SetCh8(xValue);
+        case 9:
+            this->SetCh9(xValue);
+        case 10:
+            this->SetCh10(xValue);
+        case 11:
+            this->SetCh11(xValue);
+        case 12:
+            this->SetCh12(xValue);
+        case 13:
+            this->SetCh13(xValue);
+        case 14:
+            this->SetCh14(xValue);
+        case 15:
+            this->SetCh15(xValue);
+        case 16:
+            this->SetCh16(xValue);
+        case 17:
+            this->SetCh17(xValue);
+        case 18:
+            this->SetCh18(xValue);
+        case 19:
+            this->SetCh19(xValue);
+        case 20:
+            this->SetCh20(xValue);
+        case 21:
+            this->SetCh21(xValue);
+        case 22:
+            this->SetCh22(xValue);
+        case 23:
+            this->SetCh23(xValue);
+        case 24:
+            this->SetCh24(xValue);
+        case 25:
+            this->SetCh25(xValue);
+        case 26:
+            this->SetCh26(xValue);
+        case 27:
+            this->SetCh27(xValue);
+        case 28:
+            this->SetCh28(xValue);
+        case 29:
+            this->SetCh29(xValue);
+        case 30:
+            this->SetCh30(xValue);
+        case 31:
+            this->SetCh31(xValue);
+    }
+}
 }
 

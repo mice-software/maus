@@ -67,7 +67,7 @@ bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
       << std::endl;
     }
 
-  return true;
+    return true;
   } catch(Squeal squee) {
     MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
   } catch(std::exception exc) {

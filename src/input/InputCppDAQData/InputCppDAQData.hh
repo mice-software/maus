@@ -33,7 +33,9 @@
 #include "unpacking/MDfragment.h"
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
-#include "Utils/DAQChannelMap.hh"
+#include "DataStructure/Data.hh"
+#include "DataStructure/Spill.hh"
+#include "DataStructure/DAQData.hh"
 #include "Interface/Squeak.hh"
 
 /** \class InputCppDAQData
@@ -61,7 +63,7 @@ class InputCppDAQData {
   * \param[in] pDataPath The (directory) path to read the data from
   * \param[in] pFilename The filename to read from the pDataPath directory
   */
-  InputCppDAQData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQData();
 
   /** Initialise the Unpacker.
   *
@@ -88,6 +90,8 @@ class InputCppDAQData {
   * \return JSON document containing the unpacked DAQ data.
   */
   std::string getCurEvent();
+
+  void getCurEvent(MAUS::Data *data);
 
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
@@ -159,38 +163,27 @@ class InputCppDAQData {
   DAQChannelMap _map;
 
   /** Processor for TDC particle event data. */
-  V1290DataProcessor*  _v1290PartEventProc;
+  V1290CppDataProcessor  *_v1290PartEventProc_cpp;
 
   /** Processor for fADC V1724 particle event data. */
-  V1724DataProcessor*  _v1724PartEventProc;
+  V1724CppDataProcessor  *_v1724PartEventProc_cpp;
 
   /** Processor for fADC V1731 particle event data. */
-  V1731DataProcessor*  _v1731PartEventProc;
+  V1731CppDataProcessor  *_v1731PartEventProc_cpp;
 
   /** Processor for scaler data. */
-  V830DataProcessor*  _v830FragmentProc;
+  V830CppDataProcessor   *_v830FragmentProc_cpp;
 
   /** Processor for VLSB data. */
-  VLSBDataProcessor* _vLSBFragmentProc;
-
- /** Processor for VLSB data from the cosmic test in Lab7.
-  */
-  VLSB_CDataProcessor* _vLSB_cFragmentProc;
+  VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
  /** Processor for DBB data.
   */
-  DBBDataProcessor* _DBBFragmentProc;
+  DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
-  /** Paths to the data.
-  * This string has to contain one or more space separated paths.
+ /** Processor for DBBChain data.
   */
-  std::string _dataPaths;
-
-  /** File and run names within _dataPaths.
-  * This string has to contain one or more space separated
-  * file names or run numbers.
-  */
-  std::string _datafiles;
+  DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
  /** Enum of event types
   */
@@ -203,11 +196,15 @@ class InputCppDAQData {
     VLSB_C = 80
   };
 
+  bool json_out;  // !!!!!!!!!!!!!!!!
+
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
+
+  void resetAllProcessors();
 };
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

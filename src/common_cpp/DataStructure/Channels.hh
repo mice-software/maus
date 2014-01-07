@@ -264,6 +264,8 @@ class Channels {
     /** Sets Ch9 */
     void SetCh9(int ch9);
 
+    void SetCh(int xCh, int xValue);
+
   private:
     int _ch27;
     int _ch26;

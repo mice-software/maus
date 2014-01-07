@@ -21,13 +21,12 @@
 #include <map>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "src/common_cpp/DataStructure/DAQData.hh"
-#include "src/common_cpp/DataStructure/EMRSpillData.hh"
-#include "src/common_cpp/DataStructure/Scalars.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/TestBranch.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/DAQData.hh"
+#include "DataStructure/Scalars.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
 typedef std::vector<ReconEvent*> ReconEventArray;
@@ -54,16 +53,11 @@ class Spill {
   virtual ~Spill();
 
   /** Set the scalars information */
-  void SetScalars(Scalars* scalars);
+  void SetScalars(Scalars *scalars);
 
   /** Get the scalars information */
   Scalars* GetScalars() const;
 
-  /** Set the EMR Spill information */
-  void SetEMRSpillData(EMRSpillData* emr);
-
-  /** Get the EMR Spill information */
-  EMRSpillData* GetEMRSpillData() const;
 
   /** Set the DAQ output */
   void SetDAQData(DAQData* daq);
@@ -134,9 +128,9 @@ class Spill {
   TestBranch* GetTestBranch() const;
 
  private:
+
   DAQData* _daq;
   Scalars* _scalars;
-  EMRSpillData* _emr;
   MCEventArray* _mc;
   ReconEventArray* _recon;
   int _spill_number;

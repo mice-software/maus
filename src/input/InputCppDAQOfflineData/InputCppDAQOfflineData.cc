@@ -24,9 +24,6 @@ InputCppDAQOfflineData::InputCppDAQOfflineData(std::string pDataPath, std::strin
 
 bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
 
-  if (!InputCppDAQData::birth(jsonDataCards))
-    return false;
-
   if ( _dataFileManager.GetNFiles() ) {
      return false;  // Faile because files are already open.
   }
@@ -80,6 +77,9 @@ bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
     return false;
   }
 
+  if (!InputCppDAQData::birth(jsonDataCards))
+    return false;
+
   // _dataProcessManager.DumpProcessors();
 
   return true;
@@ -93,7 +93,7 @@ bool InputCppDAQOfflineData::readNextEvent() {
     if (_eventsCount >= _maxNumEvents)
       return false;
 
-  // cout << "InputCppDAQData::readNextEvent   event " << _eventsCount << endl;
+//   cerr << "InputCppDAQData::readNextEvent   event: " << _eventsCount << endl;
 
   // Use the MDfileManager object to get the next event.
   if (_phys_Events_Only && (!_calib_Events_Only))
