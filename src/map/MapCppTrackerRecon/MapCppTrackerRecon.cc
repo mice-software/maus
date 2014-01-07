@@ -98,6 +98,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
+        std::cerr << "no problem\n";
         print_event_info(*event);
       }
     } else {
