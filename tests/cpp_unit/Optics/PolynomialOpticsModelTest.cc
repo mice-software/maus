@@ -206,7 +206,7 @@ TEST_F(PolynomialOpticsModelTest, Build) {
   bool success = false;
   try {
     bad_optics_model_1.Build();
-  } catch (MAUS::Exception exception) {
+  } catch (MAUS::Exception exc) {
     success = true;
   }
   EXPECT_TRUE(success);
@@ -232,7 +232,7 @@ TEST_F(PolynomialOpticsModelTest, AvailablePositions) {
   bool success = false;
   try {
     optics_model.GetAvailableMapPositions();
-  } catch (MAUS::Exception exception) {
+  } catch (MAUS::Exception exc) {
     success = true;
   }
   EXPECT_TRUE(success);
@@ -290,7 +290,7 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
     output_vector = optics_model.Transport(input_vector,
                                            kPrimaryPlane+1000.,
                                            kPrimaryPlane+2000.);
-  } catch (MAUS::Exception exception) {
+  } catch (MAUS::Exception exc) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);
@@ -335,7 +335,7 @@ TEST_F(PolynomialOpticsModelTest, UnsupportedAlgorithms) {
     bool algorithm_failed = false;
     try {
       optics_model.Build();
-    } catch (MAUS::Exception exception) {
+    } catch (MAUS::Exception exc) {
       algorithm_failed = true;
       std::cout << "DEBUG PolynomialOpticsModelTest_UnsupportedAlgorithms: "
                 << "Algorithm \"" << *iter << "\" failed." << std::endl;

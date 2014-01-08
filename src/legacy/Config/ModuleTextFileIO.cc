@@ -93,7 +93,7 @@ void ModuleTextFileIO::readModule(std::string name, std::istream& in)
 			else if(key=="" || key =="//" || key=="!"); //ignore white space and comments  
 			else throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)"));
 		}
-		catch(MAUS::Exception exception) { throw exception;}
+		catch(MAUS::Exception exc) { throw exc;}
 		catch(...) {throw MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)");}
 	}
 	checkRepeats();
@@ -296,7 +296,7 @@ void ModuleTextFileIO::parseString(const std::string& source, int& out)
   try {
       out = static_cast<int>(_evaluator->evaluate(value));
   }
-  catch (MAUS::Exception exception) {
+  catch (MAUS::Exception exc) {
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
   }
 }
@@ -312,8 +312,8 @@ void ModuleTextFileIO::parseString(const std::string& source, double& out)
   try {
       out = _evaluator->evaluate(value);
   }
-  catch (MAUS::Exception exception) {
-      exception.Print();
+  catch (MAUS::Exception exc) {
+      exc.Print();
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not convert "+source+" to a double", "ModuleTextFileIO::parseString(const std::string&, double&)"));
   }
   if (_units == NULL) _units = new MAUS::MAUSEvaluator();

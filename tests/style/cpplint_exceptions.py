@@ -80,17 +80,17 @@ exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
 ]
 
 exceptions[os.path.join(TST, 'Maths', 'VectorTest.cc')] = [
-('  } catch (MAUS::Exception exception) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
 exceptions[os.path.join(TST, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
-('  } catch (MAUS::Exception exception) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
 exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
-('  } catch (MAUS::Exception exception) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
@@ -186,33 +186,33 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
 ]
 
 exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
-('  } catch (MAUS::Exception exception) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Optics',
                         'LinearApproximationOpticsModelTest.cc')] = [
-('  } catch (MAUS::Exception exception) {',
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Optics',
                         'PolynomialOpticsModelTest.cc')] = [
-('  } catch (MAUS::Exception exception) {',
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (MAUS::Exception exception) {',
+('    } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Recon/Global',
                         'DataStructureHelperTest.cc')] = [
-('    } catch (MAUS::Exception& exception) {',
+('    } catch (MAUS::Exception& exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Recon/Global',
                         'MinuitTrackFitterTest.cc')] = [
-('  } catch (MAUS::Exception exception) {',
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
@@ -250,17 +250,17 @@ exceptions[os.path.join(CPP_CM, 'Simulation',
 
 exceptions[os.path.join(CPP_CM, 'Recon/Global',
                         'MinuitTrackFitter.cc')] = [
-('  } catch (Exception exception) {',
+('  } catch (Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (Exception exception) {',
+('    } catch (Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(MAP, 'MapCppGlobalTrackReconstructor',
                         'MapCppGlobalTrackReconstructor.cc')] = [
-('    } catch (Exception exception) {',
+('    } catch (Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('  } catch (Exception exception) {',
+('  } catch (Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 

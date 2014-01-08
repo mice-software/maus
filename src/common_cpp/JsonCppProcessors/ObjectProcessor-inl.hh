@@ -171,11 +171,11 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetCppChild(json_object, *cpp_object);
-        } catch(Exception exception) {
+        } catch(Exception exc) {
             delete cpp_object;
-            exception.SetMessage("In branch "+it->first+"\n"
-                            +exception.GetMessage());
-            throw exception;
+            exc.SetMessage("In branch "+it->first+"\n"
+                            +exc.GetMessage());
+            throw exc;
         }
     }
     return cpp_object;
@@ -189,11 +189,11 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetJsonChild(cpp_object, *json_object);
-        } catch(Exception exception) {
+        } catch(Exception exc) {
             delete json_object;
-            exception.SetMessage("In branch "+it->first+"\n"
-                            +exception.GetMessage());
-            throw exception;
+            exc.SetMessage("In branch "+it->first+"\n"
+                            +exc.GetMessage());
+            throw exc;
         }
     }
     return json_object;

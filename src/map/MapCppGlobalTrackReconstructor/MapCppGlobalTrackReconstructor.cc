@@ -95,9 +95,9 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
         configuration_, detectors_);
     SetupOpticsModel();
     SetupTrackFitter();
-  } catch(Exception& exception) {
+  } catch(Exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
-      exception, MapCppGlobalTrackReconstructor::kClassname);
+      exc, MapCppGlobalTrackReconstructor::kClassname);
     return false;
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
@@ -396,11 +396,11 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
     try {
       track_point
         = helper.PhaseSpaceVector2TrackPoint(point, *map_z, particle_id);
-    } catch (Exception exception) {
+    } catch (Exception exc) {
         std::cerr << "DEBUG MapCppGlobalTrackReconstructor"
                   << "::InsertIntermediateTrackPoints: "
                   << "something bad happened during track fitting: "
-                  << exception.what() << std::endl;
+                  << exc.what() << std::endl;
     }
 
     track_point.set_mapper_name(kClassname);

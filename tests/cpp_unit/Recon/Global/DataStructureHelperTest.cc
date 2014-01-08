@@ -128,7 +128,7 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     try {
       DataStructureHelper::GetInstance().GetDetectorZPosition(
         detector_ids[index]);
-    } catch (MAUS::Exception& exception) {
+    } catch (MAUS::Exception& exc) {
       success = true;
     }
     EXPECT_TRUE(success);
@@ -162,13 +162,13 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     try {
       DataStructureHelper::GetInstance().GetDetectorZPosition(
         detector_ids[index]);
-    } catch (MAUS::Exception& exception) {
+    } catch (MAUS::Exception& exc) {
       success = true;
     }
     EXPECT_TRUE(success);
   }
 
-  // create a new root module since the next SetReconstrucionMiceModules() call
+  // create a new root module since the next SetReconstructionMiceModules() call
   // will delete the original used during the above missing module tests
   recon_modules = new MiceModule(NULL, "root");
 
@@ -197,8 +197,14 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
       Hep3Vector(0., 0., 10*(index-2)));
     tracker0->addDaughter(tracker0_stations[index]);
 
-    MiceModule * tracker_view_w = new MiceModule(tracker0_stations[index],
-                                                 "TrackerViewW.dat");
+    MiceModule * tracker_view_w = NULL;
+    if (index == 4) {  // Station 5
+      tracker_view_w = new MiceModule(tracker0_stations[index],
+                                      "Tracker0Station5ViewW.dat");
+    } else {
+      tracker_view_w = new MiceModule(tracker0_stations[index],
+                                      "TrackerViewW.dat");
+    }
     tracker_view_w->addPropertyHep3Vector("Position", Hep3Vector(0., 0., 0.));
     tracker0_stations[index]->addDaughter(tracker_view_w);
   }

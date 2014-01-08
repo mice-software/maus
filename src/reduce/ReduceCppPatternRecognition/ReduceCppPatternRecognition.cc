@@ -48,8 +48,8 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
     return true;
-  } catch(Exception exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, mClassname);
+  } catch(Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, mClassname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
   }
@@ -67,9 +67,9 @@ std::string ReduceCppPatternRecognition::process(std::string aDocument) {
         mDataManager.process(mSpill);
         mDataManager.draw(mPlotters);
       }
-    } catch(Exception exception) {
-      Squeak::mout(Squeak::error) << exception.GetMessage() << std::endl;
-      mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exception, mClassname);
+    } catch(Exception exc) {
+      Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
+      mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
     } catch(std::exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);

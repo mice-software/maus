@@ -365,7 +365,7 @@ std::vector< ::TransferMap*> MakePolyfitMaps(
         // Add a mapping between the station and the transfer map that links the
         // start plane and that station.
         AddStationToMapping(it->first, maps.back());
-      } catch(MAUS::Exception exception) {
+      } catch(MAUS::Exception exc) {
         Squeak::mout(Squeak::warning) << "Failed to find " << order
                                       << " order transfer map for plane "
                                       << it->first << " from "
@@ -563,8 +563,8 @@ void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
     double phi_trans(0), phi_x(0), phi_y(0), trace_trans(0.);
     if(i>0) {
-      try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exception) {}
-      try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exception) {}
+      try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
       for (size_t k = 0; k < 4; ++k) {
           trace_trans += tms[i-1]->GetFirstOrderMap()[k+2][k+2];
@@ -630,8 +630,8 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
     double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exception) {}
-      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exception) {}
+      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
     }
     for(int j=0; j<6; j++)
@@ -722,8 +722,8 @@ void RootOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exception) {}
-      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exception) {}
+      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
     }
     //Set the address to the variables in the plane bank
@@ -879,8 +879,8 @@ namespace Optimiser
       minimiser->mnparm(i, g_parameters[i]->name.c_str(), g_parameters[i]->value, g_parameters[i]->delta, g_parameters[i]->min, g_parameters[i]->max, errFlag);
       if(g_parameters[i]->fixed) minimiser->FixParameter(i); 
     }
-    try{g_rebuild_simulation = mod->propertyBool("RebuildSimulation");} catch(MAUS::Exception exception) {}
-    try{g_redo_tracking = mod->propertyBool("RedoTracking");} catch(MAUS::Exception exception) {}
+    try{g_rebuild_simulation = mod->propertyBool("RebuildSimulation");} catch(MAUS::Exception exc) {}
+    try{g_redo_tracking = mod->propertyBool("RedoTracking");} catch(MAUS::Exception exc) {}
     //Final setup
     minimiser->SetFCN(RunOptics);
     double argList[2];
@@ -995,7 +995,7 @@ namespace Optimiser
       ss << "EnvelopeOut" << index << "_";
       std::string name;
       try{ name = mod->propertyString(ss.str()+"Name"); }
-      catch(MAUS::Exception exception) {return;}
+      catch(MAUS::Exception exc) {return;}
       std::string var  = mod->propertyString(ss.str()+"Type");
       try{ var += " "+mod->propertyString(ss.str()+"Variable");} catch(...) {;}
       for(int i=0; i<int(var.size()); i++)

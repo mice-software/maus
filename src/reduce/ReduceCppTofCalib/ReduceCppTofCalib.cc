@@ -40,8 +40,8 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
     return true;
-  } catch(Exception exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
+  } catch(Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }

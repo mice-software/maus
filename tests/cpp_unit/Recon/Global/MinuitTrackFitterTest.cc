@@ -148,7 +148,7 @@ TEST_F(MinuitTrackFitterTest, Constructor) {
   bool success = true;
   try {
     Recon::MinuitTrackFitter fitter(&kOpticsModel, 0.);
-  } catch (MAUS::Exception exception) {
+  } catch (MAUS::Exception exc) {
     success = false;
   }
   EXPECT_TRUE(success);

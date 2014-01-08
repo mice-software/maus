@@ -77,9 +77,9 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
         mpl->Setup();
         return mpl;
     }
-    catch(Exception exception) {
+    catch(Exception exc) {
         delete mpl;
-        throw exception;
+        throw exc;
     }
   } else {
     throw(Exception(Exception::recoverable,

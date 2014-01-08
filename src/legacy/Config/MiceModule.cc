@@ -407,7 +407,7 @@ bool                    MiceModule::propertyBool( std::string property ) const
   if( propertyExistsThis( property, "bool" ) )
     prop = _bools.find( property )->second;
   else if( _mother )
-    try{prop = _mother->propertyBool( property );} catch(MAUS::Exception exception) {prop_exists = false;}
+    try{prop = _mother->propertyBool( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else
     prop_exists = false;
   if (!prop_exists)
@@ -438,9 +438,9 @@ int                  MiceModule::propertyInt( std::string property ) const
       ModuleTextFileIO::setEvaluator(_parameters);
       ModuleTextFileIO::parseString(prop_str, prop_int);
     }
-    catch(MAUS::Exception exception)
+    catch(MAUS::Exception exc)
     {
-      std::string error = exception.GetMessage();
+      std::string error = exc.GetMessage();
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyInt"));
     }
   }
@@ -472,9 +472,9 @@ double                  MiceModule::propertyDouble( std::string property ) const
       ModuleTextFileIO::setEvaluator(_parameters);
       ModuleTextFileIO::parseString(prop_str, prop_dbl);
     }
-    catch(MAUS::Exception exception)
+    catch(MAUS::Exception exc)
     {
-      std::string error = exception.GetMessage();
+      std::string error = exc.GetMessage();
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyDouble"));
     }
   }
@@ -502,7 +502,7 @@ std::string             MiceModule::propertyString( std::string property ) const
   if( propertyExistsThis( property, "string" ) )
     prop = _strings.find( property )->second;
   else if( _mother )
-    try{prop = _mother->propertyString( property );} catch(MAUS::Exception exception) {prop_exists = false;}
+    try{prop = _mother->propertyString( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else prop_exists = false;
   if (!prop_exists)
     throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyString");
@@ -528,16 +528,16 @@ Hep3Vector		MiceModule::propertyHep3Vector( std::string property ) const
   if( propertyExistsThis( property, "Hep3Vector" ) )
     prop_str = _hep3vectors.find( property )->second;
   else if(  _mother )
-    try{return _mother->propertyHep3Vector( property );} catch(MAUS::Exception exception) {prop_exists = false;}
+    try{return _mother->propertyHep3Vector( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else prop_exists = false;
   if (!prop_exists)
     throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyHep3Vector");
   try{
     ModuleTextFileIO::parseString(prop_str, prop_h3v);
   }
-  catch(MAUS::Exception exception)
+  catch(MAUS::Exception exc)
   {
-    std::string error = exception.GetMessage();
+    std::string error = exc.GetMessage();
     throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyHep3Vector"));
   }
 

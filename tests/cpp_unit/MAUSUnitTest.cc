@@ -114,9 +114,9 @@ int main(int argc, char **argv) {
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();
-  } catch(MAUS::Exception exception) {
-      std::cerr << exception.GetMessage() << "\n" << exception.GetLocation() << "\n"
-                << exception.GetStackTrace() << std::endl;
+  } catch(MAUS::Exception exc) {
+      std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"
+                << exc.GetStackTrace() << std::endl;
   } catch(std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }

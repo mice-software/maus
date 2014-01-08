@@ -207,8 +207,8 @@ G4VSolid* buildSolid ( MiceModule* mod )
 			if( widthX1 < 0. || widthX2 < 0. || heightY1 < 0. || heightY2 < 0. || lengthZ < 0. )  throw(MAUS::Exception(MAUS::Exception::recoverable, "Negative parameter for dimension in  "+mod->fullName(), "MiceModToG4Solid::buildTrapezoid"));
 			return new G4Trd( mod->name() + "Trapezoid", widthX1, widthX2, heightY1, heightY2, lengthZ );
 		}
-		catch(MAUS::Exception exception){
-		      std::string error = exception.GetMessage();
+		catch(MAUS::Exception exc){
+		      std::string error = exc.GetMessage();
 		      throw(MAUS::Exception(MAUS::Exception::recoverable, "Error building a trapezoid: " + error + "\'", "MiceModToG4Solid::buildTrapezoid"));
 		}
 	}

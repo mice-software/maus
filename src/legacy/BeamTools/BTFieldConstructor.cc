@@ -97,10 +97,10 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
     				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
     		  }
     			SetName(newField, theModule);
-    		} catch (MAUS::Exception exception) {
+    		} catch (MAUS::Exception exc) {
     		  std::cerr << "Error while loading fields from module "
     		            << daughterModules[i]->fullName() << std::endl;
-    		  exception.Print(); exit(1);
+    		  exc.Print(); exit(1);
     		} catch (...) {
     		  std::cerr << "Unhandled exception while loading fields from module "
     		            << daughterModules[i]->fullName() << " - bailing"
@@ -119,8 +119,8 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
   		   << _amalgamatedFields << " in Amalgamation MiceModules";
   		throw(MAUS::Exception(MAUS::Exception::recoverable, in.str(), "BTFieldConstructor()"));
   	}
-	} catch (MAUS::Exception exception) {
-	  exception.Print();
+	} catch (MAUS::Exception exc) {
+	  exc.Print();
 	  exit(1);
 	} catch (...) {
 	  std::cerr << "Unhandled exception while loading fields - bailing"

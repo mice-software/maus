@@ -91,8 +91,8 @@ MiceModule trapezoid_module( double aX1, double aX2, double aY1, double aY2, dou
   	  mod.addPropertyDouble( "TrapezoidHeightY2", aY2 );
   	  mod.addPropertyDouble( "TrapezoidLengthZ", aZ );
   	  return mod;
-  } catch( MAUS::Exception exception ){
-	  std::string error = exception.GetMessage();
+  } catch( MAUS::Exception exc ){
+	  std::string error = exc.GetMessage();
 	  std::cerr << "Exception in trapezoid_module: " << error << std::endl;
 	  throw( MAUS::Exception( MAUS::Exception::recoverable, "Error in MiceModToG4Test: " + error + "\'", "trapezoid_module"));
   }

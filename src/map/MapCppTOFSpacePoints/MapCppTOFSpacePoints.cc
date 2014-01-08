@@ -80,8 +80,8 @@ bool MapCppTOFSpacePoints::birth(std::string argJsonConfigDocument) {
     }
 
   return true;
-  } catch(Exception exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
+  } catch(Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -171,9 +171,9 @@ std::string MapCppTOFSpacePoints::process(std::string document) {
         }
       }
     }
-  } catch(Exception exception) {
+  } catch(Exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleException(root, exception, _classname);
+                                       ->HandleException(root, exc, _classname);
   } catch(std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);

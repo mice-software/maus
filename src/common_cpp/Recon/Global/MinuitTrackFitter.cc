@@ -220,10 +220,10 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
     track_point.set_detector(MAUS::DataStructure::Global::kUndefined);
     track_point.set_particle_event(particle_event);
     track->AddTrackPoint(new TrackPoint(track_point));
-  } catch (Exception exception) {
+  } catch (Exception exc) {
       std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                 << "something bad happened during track fitting: "
-                << exception.what() << std::endl;
+                << exc.what() << std::endl;
       // FIXME(Lane) handle better by reporting horrible score or something
   }
 
@@ -239,10 +239,10 @@ void MinuitTrackFitter::Fit(Track const * const raw_track, Track * const track,
     TrackPoint track_point;
     try {
       track_point = helper.PhaseSpaceVector2TrackPoint(point, z, particle_id_);
-    } catch (Exception exception) {
+    } catch (Exception exc) {
         std::cerr << "DEBUG MinuitTrackFitter::ScoreTrack: "
                   << "something bad happened during track fitting: "
-                  << exception.what() << std::endl;
+                  << exc.what() << std::endl;
         // FIXME(Lane) handle better by reporting horrible score or something
     }
 

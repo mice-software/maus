@@ -151,7 +151,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     val["seed"] = Json::Value(-1);
     try {
       part_out.ReadJson(val);
-    } catch (MAUS::Exception exception) {
+    } catch (MAUS::Exception exc) {
       passed = true;
     }
     EXPECT_TRUE(passed);

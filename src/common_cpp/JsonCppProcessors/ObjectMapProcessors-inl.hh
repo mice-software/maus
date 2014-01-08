@@ -51,9 +51,9 @@ std::map<std::string, MapSecond>* ObjectMapValueProcessor<MapSecond>::JsonToCpp
         MapSecond* cpp_out;
         try {
             cpp_out = _proc->JsonToCpp(json_object[names[i]]);
-        } catch(Exception exception) {
+        } catch(Exception exc) {
             delete my_map;
-            throw exception;
+            throw exc;
         }
         (*my_map)[names[i]] = *cpp_out;
         delete cpp_out;
@@ -80,9 +80,9 @@ Json::Value* ObjectMapValueProcessor<MapSecond>::CppToJson
         std::string child_path = GetPath(path, it->first);
         try {
             json_out = _proc->CppToJson(it->second, child_path);
-        } catch(Exception exception) {
+        } catch(Exception exc) {
             delete json_object;
-            throw exception;
+            throw exc;
         }
         (*json_object)[it->first] = *json_out;
         JsonWrapper::Path::SetPath((*json_object)[it->first], child_path);

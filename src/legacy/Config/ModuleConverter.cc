@@ -50,10 +50,10 @@ CLHEP::HepSymMatrix ModuleConverter::ModuleToBeamEllipse(const MiceModule* mod, 
   }
 
   double dx=0., dy=0., dpx=0., dpy=0.; //dispersion, dispersion prime
-  try{dx  = mod->propertyDouble("Dispersion_X"     );} catch(MAUS::Exception exception) {}
-  try{dy  = mod->propertyDouble("Dispersion_Y"     );} catch(MAUS::Exception exception) {}
-  try{dpx = mod->propertyDouble("DispersionPrime_X");} catch(MAUS::Exception exception) {}
-  try{dpy = mod->propertyDouble("DispersionPrime_Y");} catch(MAUS::Exception exception) {}
+  try{dx  = mod->propertyDouble("Dispersion_X"     );} catch(MAUS::Exception exc) {}
+  try{dy  = mod->propertyDouble("Dispersion_Y"     );} catch(MAUS::Exception exc) {}
+  try{dpx = mod->propertyDouble("DispersionPrime_X");} catch(MAUS::Exception exc) {}
+  try{dpy = mod->propertyDouble("DispersionPrime_Y");} catch(MAUS::Exception exc) {}
   if(ellipseDef == "Penn")
   {
     double bz = 0;
