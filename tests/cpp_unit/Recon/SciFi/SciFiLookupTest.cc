@@ -38,9 +38,9 @@ class SciFiLookupTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
-TEST_F(SciFiLookupTest, test_make_hits_map) {
+TEST_F(SciFiLookupTest, test_get_digit_id) {
 
-  // Set up a digit with an expected id number of 100012123
+  // Set up a digit with an expected id number of 100012023
   uint64_t id = 100012023;
   int event_num = 100;
   int tracker = 0;
@@ -54,7 +54,30 @@ TEST_F(SciFiLookupTest, test_make_hits_map) {
   dig->set_plane(plane);
   dig->set_channel(channel);
 
-  // Set up the corresponding hits
+  // Check the lookup output
+  SciFiLookup lu;
+  EXPECT_EQ(id, lu.get_digit_id(dig));
+
+  delete dig;
+}
+
+TEST_F(SciFiLookupTest, test_make_maps) {
+
+  // Set up a digit with an expected id number of 100012023
+  uint64_t id = 100012023;
+  int event_num = 100;
+  int tracker = 0;
+  int station = 1;
+  int plane = 2;
+  int channel = 23;
+  SciFiDigit* dig = new SciFiDigit();
+  dig->set_event(event_num);
+  dig->set_tracker(tracker);
+  dig->set_station(station);
+  dig->set_plane(plane);
+  dig->set_channel(channel);
+
+  // Set up corresponding hits for the digit
   std::vector<SciFiHit> *hits = new std::vector<SciFiHit>;
   SciFiHit* hit1 = new SciFiHit();
   SciFiHit* hit2 = new SciFiHit();
@@ -67,10 +90,17 @@ TEST_F(SciFiLookupTest, test_make_hits_map) {
   hits->push_back(*hit1);
   hits->push_back(*hit2);
 
+  // Set up a corresponding noise hit for the digit
+  std::vector<SciFiNoiseHit> *noise = new std::vector<SciFiNoiseHit>;
+  SciFiNoiseHit* nhit1 = new SciFiNoiseHit();
+  nhit1->SetID(static_cast<double>(id));
+  noise->push_back(*nhit1);
+
   // Set up the correspoding MCEvent
   std::vector<MCEvent*> *mcevts = new std::vector<MCEvent*>;
   MCEvent *mcevt = new MCEvent();
   mcevt->SetSciFiHits(hits);
+  mcevt->SetSciFiNoiseHits(noise);
   mcevts->push_back(mcevt);
 
   // Set up the correspoding SciFiEvent
@@ -88,16 +118,27 @@ TEST_F(SciFiLookupTest, test_make_hits_map) {
   spill->SetMCEvents(mcevts);
   spill->SetReconEvents(revts);
 
-  // Run the Lookup
+  // Run the Lookup for the hits
   SciFiLookup lu;
   lu.make_hits_map(mcevt);
   std::vector<SciFiHit*> out_hits;
   bool success = lu.get_hits(dig, out_hits);
 
-  // Check the results
+  // Check the hits results
   ASSERT_TRUE(success);
-  ASSERT_EQ(id, lu.get_digit_id(dig));
-  ASSERT_EQ(2, static_cast<int>(out_hits.size()));
+  EXPECT_EQ(2, static_cast<int>(out_hits.size()));
+
+  // Run the Lookup for the noise
+  lu.make_noise_map(mcevt);
+  std::vector<SciFiNoiseHit*> out_noise;
+  success = lu.get_noise(dig, out_noise);
+
+  // Check the noise results
+  ASSERT_TRUE(success);
+  EXPECT_EQ(1, static_cast<int>(out_noise.size()));
+
+  // Clean up
+  delete spill;
 }
 
 } // ~namespace MAUS
