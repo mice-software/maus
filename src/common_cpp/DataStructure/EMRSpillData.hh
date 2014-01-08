@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "Utils/VersionNumber.hh"
 
 namespace MAUS {
 /** Stub class for EMR data on the spill level

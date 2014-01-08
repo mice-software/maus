@@ -24,6 +24,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "Utils/Exception.hh"
+
 /** STLUtils namespace contains useful utility functions for the STL.
  *
  *  There are a few things one would like to do for Standard Template Library
@@ -112,6 +114,7 @@ std::string ToString(TEMP_CLASS value);
  * 
  *  The following operations must be defined for TEMP_CLASS
  *    - std::istream& operator>>(Temp, std::istream&)
+ *  Throws a MAUS::Exception if the conversion fails
  */ 
 template <class TEMP_CLASS>
 TEMP_CLASS FromString(std::string value);
@@ -169,6 +172,11 @@ TEMP_CLASS FromString(std::string value) {
   std::stringstream ss(value);
   TEMP_CLASS out;
   ss >> out;
+  if (ss.fail()) {
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+                            "Failed to parse "+value,
+                            "STLUtils::FromString(...)");
+  }
   return out;
 }
 }

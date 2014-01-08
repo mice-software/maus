@@ -236,6 +236,14 @@ exceptions[os.path.join(CPP_CM,
  'taylor'),
 ]
 
+exceptions[os.path.join(CPP_CM,
+                        'JsonCppProcessors',
+                        'PrimitivesProcessors.hh')] = [
+('typedef unsigned long long uint64;',
+ 'This is setting up the uint64 that cpplint wants',
+ 'rogers'),
+]
+
 exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData', 
                        'InputCppDAQOnlineData.cc')] = [
 ('      _sleep_time.tv_sec = static_cast<long>(delay_time);',

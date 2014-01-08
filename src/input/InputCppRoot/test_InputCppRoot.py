@@ -47,7 +47,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301
@@ -189,7 +188,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
                                      "run_number":12})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
                                      "run_number":13})
-        
+
         # job footers
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
@@ -210,7 +209,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree2 = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree2.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301
@@ -242,7 +240,6 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
         spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
         spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301

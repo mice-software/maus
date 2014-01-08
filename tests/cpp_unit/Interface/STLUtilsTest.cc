@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "Utils/Exception.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/legacy/Interface/STLUtils.hh"
 
 namespace {
@@ -66,6 +66,7 @@ TEST(STLUtilsTest, ToStringTest) {
 TEST(STLUtilsTest, FromStringTest) {
   EXPECT_EQ(STLUtils::FromString<int>("1"), 1);
   EXPECT_EQ(STLUtils::FromString<std::string>("1"), std::string("1"));
+  EXPECT_THROW(STLUtils::FromString<int>("a"), MAUS::Exception);
 }
 
 TEST(STLUtilsTest, ReplaceVariablesTest) {
@@ -83,7 +84,8 @@ TEST(STLUtilsTest, ReplaceVariablesTest) {
     EXPECT_EQ(STLUtils::ReplaceVariables("some_string_${MAUS_ROOT_DIR}"),
                                          "some_string_"+mrd);
     EXPECT_THROW(STLUtils::ReplaceVariables
-                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"), MAUS::Exception);
+                      ("some_string_${UNDEFINED_ENV_VAR_ZSSDFDSASD}"),
+                       MAUS::Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables
                       ("some_string_$MAUS_ROOT_DIR}"), MAUS::Exception);
     EXPECT_THROW(STLUtils::ReplaceVariables

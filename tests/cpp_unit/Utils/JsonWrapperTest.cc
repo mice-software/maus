@@ -160,12 +160,26 @@ TEST(JsonWrapperTest, AlmostEqualTest) {
   EXPECT_TRUE(JsonWrapper::AlmostEqual(arr_1, arr_1, 1e-9));
   EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_1, arr_2, 1e-9));
 
+  Json::Value arr_3, arr_4, arr_5;
+  arr_3.append(int_1);
+  arr_4.append(uint_1);
+  arr_5.append(real_1);
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(arr_3, arr_4, 1e-9, true));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_3, arr_4, 1e-9, false));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(arr_3, arr_5, 1e-9, true));
+
   // more object tests below
   Json::Value obj_1(Json::objectValue), obj_2(Json::objectValue);
   obj_1["1"] = int_1;
   obj_2["1"] = int_2;
   EXPECT_TRUE(JsonWrapper::AlmostEqual(obj_1, obj_1, 1e-9));
   EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_1, obj_2, 1e-9));
+
+  Json::Value obj_3(Json::objectValue), obj_4(Json::objectValue);
+  obj_3["1"] = int_1;
+  obj_4["1"] = uint_1;
+  EXPECT_TRUE(JsonWrapper::AlmostEqual(obj_3, obj_4, 1e-9, true));
+  EXPECT_FALSE(JsonWrapper::AlmostEqual(obj_3, obj_4, 1e-9, false));
 }
 
 TEST(JsonWrapperTest, ArrayEqualTest) {

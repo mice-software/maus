@@ -25,6 +25,7 @@
 #include "src/map/MapCppKLDigits/MapCppKLDigits.hh"
 
 namespace MAUS {
+
 bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
 
   _classname = "MapCppKLDigits";
@@ -34,7 +35,8 @@ bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
   if (!pMAUS_ROOT_DIR) {
     Squeak::mout(Squeak::error)
     << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?"
+                                << std::endl;
     return false;
   }
 
@@ -67,11 +69,11 @@ bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
       << std::endl;
     }
 
-  return true;
+    return true;
   } catch(Exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
+    CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
   return false;
@@ -135,10 +137,10 @@ std::string MapCppKLDigits::process(std::string document) {
       }
     }
   } catch(Exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
+    root = CppErrorHandler::getInstance()
       ->HandleException(root, exc, _classname);
   } catch(std::exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
+    root = CppErrorHandler::getInstance()
       ->HandleStdExc(root, exc, _classname);
   }
 

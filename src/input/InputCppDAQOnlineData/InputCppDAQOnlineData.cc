@@ -65,7 +65,7 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
   }
   if (configJSON.isMember("daq_online_spill_delay_time")) {
       double delay_time = configJSON["daq_online_spill_delay_time"].asDouble();
-      _sleep_time.tv_sec = static_cast<int64>(delay_time);
+      _sleep_time.tv_sec = static_cast<int64_t>(delay_time);
       _sleep_time.tv_nsec = 1000000000L*(delay_time-_sleep_time.tv_sec);
   }
   return true;
@@ -81,5 +81,10 @@ bool InputCppDAQOnlineData::readNextEvent() {
     return false;
 
   return true;
+}
+
+void InputCppDAQOnlineData::setMonitorSrc(std::string mon) {
+  _dataManager->setMonSrc(mon);
+  _dataManager->Init();
 }
 }

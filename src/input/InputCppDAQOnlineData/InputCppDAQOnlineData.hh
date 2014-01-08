@@ -62,10 +62,7 @@ class InputCppDAQOnlineData : public InputCppDAQData {
    *
    *  \param mon file name of the source
    */
-  void setMonitorSrc(std::string mon) {
-    _dataManager->setMonSrc(mon);
-    _dataManager->Init();
-  }
+  void setMonitorSrc(std::string mon);
 
  private:
 

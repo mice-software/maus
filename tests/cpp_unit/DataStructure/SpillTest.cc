@@ -59,9 +59,9 @@ TEST(SpillTest, SpillTest) {
     Scalars* scalars_2 = new Scalars();
     Scalars* scalars_null = NULL;
 
-    EMRSpillData* emr_1 = new EMRSpillData();
-    EMRSpillData* emr_2 = new EMRSpillData();
-    EMRSpillData* emr_null = NULL;
+//     EMRSpillData* emr_1 = new EMRSpillData();
+//     EMRSpillData* emr_2 = new EMRSpillData();
+//     EMRSpillData* emr_null = NULL;
 
     MCEventPArray* mc_1 = new MCEventPArray();
     MCEventPArray* mc_2 = new MCEventPArray();
@@ -78,14 +78,14 @@ TEST(SpillTest, SpillTest) {
     // check allocation from NULL okay
     my_spill.SetDAQData(daq_1);
     my_spill.SetScalars(scalars_1);
-    my_spill.SetEMRSpillData(emr_1);
+//     my_spill.SetEMRSpillData(emr_1);
     my_spill.SetMCEvents(mc_1);
     my_spill.SetReconEvents(rec_1);
     my_spill.SetSpillNumber(1);
     my_spill.SetErrors(errors_1);
     EXPECT_EQ(my_spill.GetDAQData(), daq_1);
     EXPECT_EQ(my_spill.GetScalars(), scalars_1);
-    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_1);
+//     EXPECT_EQ(my_spill.GetEMRSpillData(), emr_1);
     EXPECT_EQ(my_spill.GetMCEvents(), mc_1);
     EXPECT_EQ(my_spill.GetReconEvents(), rec_1);
     EXPECT_EQ(my_spill.GetSpillNumber(), 1);
@@ -94,12 +94,12 @@ TEST(SpillTest, SpillTest) {
     // check reallocation okay
     my_spill.SetDAQData(daq_2);
     my_spill.SetScalars(scalars_2);
-    my_spill.SetEMRSpillData(emr_2);
+//     my_spill.SetEMRSpillData(emr_2);
     my_spill.SetMCEvents(mc_2);
     my_spill.SetReconEvents(rec_2);
     EXPECT_EQ(my_spill.GetDAQData(), daq_2);
     EXPECT_EQ(my_spill.GetScalars(), scalars_2);
-    EXPECT_EQ(my_spill.GetEMRSpillData(), emr_2);
+//     EXPECT_EQ(my_spill.GetEMRSpillData(), emr_2);
     EXPECT_EQ(my_spill.GetMCEvents(), mc_2);
     EXPECT_EQ(my_spill.GetReconEvents(), rec_2);
 
@@ -107,7 +107,7 @@ TEST(SpillTest, SpillTest) {
     Spill my_spill_copy(my_spill);
     EXPECT_NE(my_spill.GetDAQData(), my_spill_copy.GetDAQData());
     EXPECT_NE(my_spill.GetScalars(), my_spill_copy.GetScalars());
-    EXPECT_NE(my_spill.GetEMRSpillData(), my_spill_copy.GetEMRSpillData());
+//     EXPECT_NE(my_spill.GetEMRSpillData(), my_spill_copy.GetEMRSpillData());
     EXPECT_NE(my_spill.GetMCEvents(), my_spill_copy.GetMCEvents());
     EXPECT_NE
             (my_spill.GetReconEvents(), my_spill_copy.GetReconEvents());
@@ -119,7 +119,7 @@ TEST(SpillTest, SpillTest) {
     my_spill_equal = my_spill;
     EXPECT_NE(my_spill.GetDAQData(), my_spill_equal.GetDAQData());
     EXPECT_NE(my_spill.GetScalars(), my_spill_equal.GetScalars());
-    EXPECT_NE(my_spill.GetEMRSpillData(), my_spill_equal.GetEMRSpillData());
+//     EXPECT_NE(my_spill.GetEMRSpillData(), my_spill_equal.GetEMRSpillData());
     EXPECT_NE(my_spill.GetMCEvents(), my_spill_equal.GetMCEvents());
     EXPECT_NE
            (my_spill.GetReconEvents(), my_spill_equal.GetReconEvents());
@@ -138,7 +138,7 @@ TEST(SpillTest, SpillTest) {
     my_spill_equal = default_event;
     EXPECT_EQ(daq_null, my_spill_equal.GetDAQData());
     EXPECT_EQ(scalars_null, my_spill_equal.GetScalars());
-    EXPECT_EQ(emr_null, my_spill_equal.GetEMRSpillData());
+//     EXPECT_EQ(emr_null, my_spill_equal.GetEMRSpillData());
     EXPECT_EQ(mc_null, my_spill_equal.GetMCEvents());
     EXPECT_EQ(rec_null, my_spill_equal.GetReconEvents());
 /*
