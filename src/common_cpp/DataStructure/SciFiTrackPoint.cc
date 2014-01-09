@@ -56,6 +56,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
 
   id = abs(id);
   _station = std::ceil(id/3.);
+  // std::cerr << id << " " << _station << std::endl;
   _plane   = (id-1)%3;
   // std::cerr << id << " " << _station << " " << _plane << std::endl;
   _channel = kalman_site->measurement()(0, 0);

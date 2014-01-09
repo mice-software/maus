@@ -254,7 +254,6 @@ double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   // Note that the z factor (charge of the incoming particle) is omitted.
   // We don't need to consider |z| > 1.
   double result = HighlandConstant*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
-  // std::cerr << "Highland: " << result << std::endl;
   return result;
 }
 
