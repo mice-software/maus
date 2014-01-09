@@ -19,6 +19,8 @@
 
 #include "src/input/InputCppDAQOnlineData/InputCppDAQOnlineData.hh"
 
+namespace MAUS {
+
 InputCppDAQOnlineData::InputCppDAQOnlineData()
 :InputCppDAQData::InputCppDAQData() {
   std::cerr << "MAUS running in online mode" << std::endl;
@@ -63,7 +65,7 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
   }
   if (configJSON.isMember("daq_online_spill_delay_time")) {
       double delay_time = configJSON["daq_online_spill_delay_time"].asDouble();
-      _sleep_time.tv_sec = static_cast<long>(delay_time);
+      _sleep_time.tv_sec = static_cast<int64_t>(delay_time);
       _sleep_time.tv_nsec = 1000000000L*(delay_time-_sleep_time.tv_sec);
   }
   return true;
@@ -85,4 +87,4 @@ void InputCppDAQOnlineData::setMonitorSrc(std::string mon) {
   _dataManager->setMonSrc(mon);
   _dataManager->Init();
 }
-
+}

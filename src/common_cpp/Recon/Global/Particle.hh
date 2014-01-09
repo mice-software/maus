@@ -33,7 +33,7 @@ namespace global {
 
 class Particle {
  public:
-  static Particle const * GetInstance();
+  static const Particle & GetInstance();
   ~Particle();
 
   /* @brief returns the unique name of the particle referenced by id.
@@ -53,7 +53,6 @@ class Particle {
   std::map<MAUS::DataStructure::Global::PID, std::string> names_;
   std::map<MAUS::DataStructure::Global::PID, double> masses_;
   std::map<MAUS::DataStructure::Global::PID, int> charges_;
-
  private:
   void AddParticleDefinition(MAUS::DataStructure::Global::PID pid,
                              std::string name,

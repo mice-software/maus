@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/FieldTools/SectorMagneticFieldMap.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -32,11 +33,11 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapNoSymmetry) {
     std::string map_file = SECTORMAGNETICMAP;
 
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                               (map_file, "Nonsense", units, "Dipole"), Squeal);
+                               (map_file, "Nonsense", units, "Dipole"), Exception);
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                         ("Nonsense", "tosca_sector_1", units, "Dipole"), Squeal);
+                         ("Nonsense", "tosca_sector_1", units, "Dipole"), Exception);
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                         (map_file, "tosca_sector_1", units, "nonsense"), Squeal);
+                         (map_file, "tosca_sector_1", units, "nonsense"), Exception);
 
 
     Interpolator3dGridTo3d* interpolator_none = SectorMagneticFieldMapIO::

@@ -50,7 +50,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         test_conf_json['Enable_triggerDelay_correction'] = False
         test_conf_json['Enable_timeWalk_correction'] = False
         test_conf_json['TOF_findTriggerPixelCut'] = 1.001
-        test_conf_json['TOF_makeSpacePiontCut'] = 1.001
+        test_conf_json['TOF_makeSpacePointCut'] = 1.001
         #print testConfJSON
         test_configuration = json.dumps(test_conf_json)
         success = self.mapper.birth(test_configuration)
@@ -66,7 +66,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         # test with no data.
         result = self.mapper.process(data)
         spill_out = json.loads(result)
-        self.assertFalse('space_points' in spill_out)
+        self.assertFalse('tof_space_points' in spill_out)
 
     def __get_space_point(self, spill, tof, event): # pylint: disable=R0201
         """Return the space point for given tof and particle event"""

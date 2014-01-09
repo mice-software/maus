@@ -77,12 +77,12 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
         mpl->Setup();
         return mpl;
     }
-    catch(Squeal squee) {
+    catch(Exception exc) {
         delete mpl;
-        throw squee;
+        throw exc;
     }
   } else {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
         "Failed to recognise physics list model "+physModel,
         "MAUSPhysicsList::GetMAUSPhysicsList()")
     );

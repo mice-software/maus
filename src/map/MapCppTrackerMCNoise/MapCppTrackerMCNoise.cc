@@ -44,8 +44,8 @@ bool MapCppTrackerMCNoise::birth(std::string argJsonConfigDocument) {
     _configJSON = Globals::GetConfigurationCards();
     poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
     return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }

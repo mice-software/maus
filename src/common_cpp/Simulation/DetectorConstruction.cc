@@ -93,7 +93,7 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   SetBTMagneticField();
   _materials = fillMaterials(NULL);
   if (_materials == NULL)
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire MiceMaterials",
                  "DetectorConstruction::DetectorConstruction()"));
 }
@@ -147,7 +147,7 @@ DetectorConstruction::~DetectorConstruction() {
 
 void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
   if (&cards == NULL)
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire datacards",
                  "DetectorConstruction::DetectorConstruction()"));
   _maxModDepth = JsonWrapper::GetProperty
@@ -480,7 +480,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
     if (!_btField->HasRF()) _stepper = new G4CashKarpRKF45(_equationM);
     else                    _stepper = new G4CashKarpRKF45(_equationE, 8);
   } else {
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "stepping_algorithm '"+_stepperType+"' not found",
                 "DetectorConstruction::SetSteppingAlgorithm()"));
   }

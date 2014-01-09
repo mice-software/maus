@@ -40,6 +40,8 @@
 
 #include "src/input/InputCppDAQData/fADCDataProcessor.hh"
 
+namespace MAUS {
+
 ////////////////////////////////////////////////////////////////////////////////
 
 /** On Particle Event V1290
@@ -436,7 +438,7 @@ class DBBChainCppDataProcessor : public MDarranger {
 
   MAUS::DBBArray _spill;
 };
-
+}
 
 #endif  // _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_H__
 

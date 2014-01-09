@@ -16,6 +16,9 @@
  */
 
 #include "Utils/EMRChannelMap.hh"
+#include "Utils/Exception.hh"
+
+namespace MAUS {
 
 EMRChannelMap::~EMRChannelMap() {
   for (unsigned int i = 0;i < _emrKey.size();i++) {
@@ -46,7 +49,7 @@ bool EMRChannelMap::InitFromFile(string filename) {
       _emrKey.push_back(emrkey);
       _dbbKey.push_back(dbbkey);
     }
-  } catch(Squeal e) {
+  } catch(Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in EMRChannelMap::InitFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;
@@ -81,8 +84,8 @@ EMRChannelKey* EMRChannelMap::find(std::string daqKeyStr) {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "EMRChannelMap::find(std::string)"));
   }
@@ -100,13 +103,13 @@ int EMRChannelMap::getOrientation(int plane) {
 }
 //////////////////////////////////////////////////////////////////////////
 
-EMRChannelKey::EMRChannelKey(string keyStr) throw(Squeal) {
+EMRChannelKey::EMRChannelKey(string keyStr) throw(Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted EMR Channel Key"),
                  "EMRChannelKey::EMRChannelKey(std::string)"));
   }
@@ -142,12 +145,12 @@ ostream& operator<<( ostream& stream, EMRChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Squeal) {
+istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception) {
   string xLabel;
   stream >> xLabel >> key._plane >> key._orientation >> key._bar >> key._detector;
 
   if (xLabel != "EMRChannelKey") {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted EMR Channel Key"),
                  "istream& operator>>(istream& stream, EMRChannelKey)"));
   }
@@ -160,5 +163,4 @@ string EMRChannelKey::str() {
   xConv << (*this);
   return xConv.str();
 }
-
-
+}

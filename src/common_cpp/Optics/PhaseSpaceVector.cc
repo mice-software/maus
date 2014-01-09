@@ -23,7 +23,7 @@
 #include <iostream>
 #include "CLHEP/Units/PhysicalConstants.h"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -35,7 +35,7 @@ PhaseSpaceVector::PhaseSpaceVector()
 PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
     : Vector<double>() {
   if (original_instance.size() < 6) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to construct with a Vector<double> containing "
                  "fewer than six elements",
                  "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));
@@ -66,10 +66,102 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
 
 PhaseSpaceVector::~PhaseSpaceVector() { }
 
+// *************************
+//  Assignment Operators
+// *************************
+
 PhaseSpaceVector & PhaseSpaceVector::operator=(const PhaseSpaceVector & rhs) {
   (*this).Vector<double>::operator=(rhs);
 
   return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const double& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const double& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const double& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const double& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+// *************************
+//  Algebraic Operators
+// *************************
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) /= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const double& rhs) const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const double& rhs) const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const double& rhs) const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const double& rhs) const {
+  return PhaseSpaceVector(*this) /= rhs;
 }
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {

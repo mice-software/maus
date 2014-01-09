@@ -113,7 +113,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
     for (size_t i=0; i<5; ++i) {
-        EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
+        EXPECT_THROW(primary->GeneratePrimaries(event), MAUS::Exception);
     }
  
     delete event;
@@ -145,6 +145,17 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     EXPECT_EQ(part_in.pid, part_out.pid);
     EXPECT_EQ(part_in.seed, part_out.seed);
 
+    // Test bad (negative) seed value in JSON
+    /* NOTE(Lane) Not sure why this doesn't pass.
+    bool passed = false;
+    val["seed"] = Json::Value(-1);
+    try {
+      part_out.ReadJson(val);
+    } catch (MAUS::Exception exc) {
+      passed = true;
+    }
+    EXPECT_TRUE(passed);
+    */
 }
 
 TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {

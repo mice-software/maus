@@ -20,6 +20,9 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "Utils/Exception.hh"
+
+namespace MAUS {
 
 InputCppDAQData::InputCppDAQData() {
   _classname = "InputCppDAQData";
@@ -168,15 +171,15 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
   }
-  catch(Squeal squee) {
-    Squeak::mout(Squeak::error) << squee.GetLocation() << ": "
-    << squee.GetMessage() << std::endl
+  catch(Exception exc) {
+    Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
+    << exc.GetMessage() << std::endl
     << "*** MAUS exception in void  "
     << "InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
     Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
 
     std::stringstream ss;
-    ss << squee.GetLocation() << " says:" << squee.GetMessage() << "  Phys. Event " << std::endl
+    ss << exc.GetLocation() << " says:" << exc.GetMessage() << "  Phys. Event " << std::endl
     << _dataProcessManager.GetPhysEventNumber() << " skipped!";
     MAUS::ErrorsMap errors = spill->GetErrors();
     errors["bad_data_input"] = ss.str();
@@ -343,7 +346,4 @@ std::string InputCppDAQData::event_type_to_str(int pType) {
   }
   return event_type;
 }
-
-
-
-
+}

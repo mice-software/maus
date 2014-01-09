@@ -24,6 +24,7 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
+namespace MAUS {
 
 class InputCppDAQOfflineData : public InputCppDAQData {
 
@@ -83,6 +84,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */
   bool _calib_Events_Only;
 };
+}
 
 #endif
 

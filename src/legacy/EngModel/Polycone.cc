@@ -4,7 +4,7 @@
 //
 
 #include "EngModel/Polycone.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 
 const double Polycone::_phiStart = 0*degree;
@@ -21,7 +21,7 @@ Polycone::Polycone(MiceModule *theModule) : _zCoordinates(NULL), _rInner(NULL), 
 	std::ifstream fin(fullFileName.c_str());
 	if(!fin)
 	{
-		throw(Squeal(Squeal::nonRecoverable, "Could not find polycone file "+fileName, "Polycone::Polycone(MiceModule)"));
+		throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Could not find polycone file "+fileName, "Polycone::Polycone(MiceModule)"));
 		return;
 	}
 	Squeak::mout(Squeak::debug) << "LOADING POLYCONE " << fileName << std::endl;
@@ -60,7 +60,7 @@ std::string	Polycone::replaceVariables( std::string fileName )
       for( int vpos = pos; vpos < end; ++vpos )
         variable += fileName[vpos];
       if(getenv( variable.c_str() ) == NULL) 
-          throw(Squeal(Squeal::recoverable, "Error - "+variable+" environment variable was not defined", "Polycone::replaceVariables"));
+          throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - "+variable+" environment variable was not defined", "Polycone::replaceVariables"));
       fullName += std::string( getenv( variable.c_str() ) );
       pos = end + 1;
     }
@@ -101,7 +101,7 @@ void Polycone::GetNumberOfCoordinates(std::istream & fin)
 	fin >> _numberOfCoordinates;
 	//skip rest of line
 	std::getline(fin, key);
-	if(!fin) throw(Squeal(Squeal::nonRecoverable, "Error in polycone input", "Polcone.cc::GetNumberOfCoordinates()"));
+	if(!fin) throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Error in polycone input", "Polcone.cc::GetNumberOfCoordinates()"));
 }
 
 void Polycone::GetUnits(std::istream & fin)
@@ -114,7 +114,7 @@ void Polycone::GetUnits(std::istream & fin)
 	_units = theUnits.evaluate(unitsString);
 	//skip rest of line
 	std::getline(fin, key);
-	if(!fin) throw(Squeal(Squeal::nonRecoverable, "Error in polycone input", "Polcone.cc::GetUnits()"));
+	if(!fin) throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Error in polycone input", "Polcone.cc::GetUnits()"));
 }
 
 void Polycone::GetShellCoordinates(std::istream & fin)
@@ -134,7 +134,7 @@ void Polycone::GetShellCoordinates(std::istream & fin)
 		_rInner[i]       *= _units;
 		_rOuter[i]       *= _units;
 	}
-	if(!fin) throw(Squeal(Squeal::nonRecoverable, "Error in polycone input", "Polcone.cc::GetShellCoordinates()"));
+	if(!fin) throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Error in polycone input", "Polcone.cc::GetShellCoordinates()"));
 
 }
 
@@ -154,7 +154,7 @@ void Polycone::GetFillCoordinates(std::istream & fin)
 		_zCoordinates[i] *= _units;
 		_rInner[i]      *= _units;
 	}
-	if(!fin) throw(Squeal(Squeal::nonRecoverable, "Error in polycone input", "Polcone.cc::GetFillCoordinates()"));
+	if(!fin) throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Error in polycone input", "Polcone.cc::GetFillCoordinates()"));
 }
 
 G4Polycone * Polycone::GetShell()

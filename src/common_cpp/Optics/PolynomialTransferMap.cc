@@ -24,8 +24,12 @@
 #include "Maths/PolynomialMap.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "Recon/Global/ParticleOpticalVector.hh"
 
 namespace MAUS {
+
+using MAUS::recon::global::ParticleOpticalVector;
+
 // ##############################
 //  PolynomialTransferMap public
 // ##############################
@@ -101,7 +105,12 @@ PhaseSpaceVector PolynomialTransferMap::Transport(
             << "Input Vector = " << std::endl << input_vector << std::endl;
   // operate on the input vector with the polynomial map
   MAUS::PhaseSpaceVector output_vector;
+  #if 1
+  polynomial_map_->F(input_vector-(*reference_trajectory_in_), output_vector);
+  output_vector += (*reference_trajectory_out_);
+  #else
   polynomial_map_->F(input_vector, output_vector);
+  #endif
   std::cout << "DEBUG PolynomialTransferMap::Transport() "
             << "Transported Vector = " << std::endl << output_vector
             << std::endl;

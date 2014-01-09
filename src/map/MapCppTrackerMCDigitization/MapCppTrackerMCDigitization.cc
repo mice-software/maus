@@ -14,7 +14,9 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 
 namespace MAUS {
@@ -62,8 +64,8 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
                  _SciFivlpcQE;
     // ______________________________________________
     return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -96,7 +98,7 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
 
   // Check the Recon event array is initialised, and if not make it so
   if ( !spill.GetReconEvents() ) {
-    ReconEventArray* revts = new ReconEventArray();
+    ReconEventPArray* revts = new ReconEventPArray();
     spill.SetReconEvents(revts);
   }
   // Construct digits from hits for each MC event

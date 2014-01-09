@@ -16,6 +16,10 @@
  */
 
 #include "src/input/InputCppDAQData/fADCDataProcessor.hh"
+#include "Utils/Exception.hh"
+
+namespace MAUS {
+
 MAUS::DAQData* MDarranger::_daq_data = 0;
 DAQChannelMap* MDarranger::_chMap = 0;
 
@@ -32,7 +36,7 @@ void fADCDataProcessor::set_pedestal() {
   if (size < SIGNAL_INTEGRATION_WINDOW*2) {
     _pedestal = 0;
 
-     throw(Squeal(Squeal::recoverable,
+     throw(Exception(Exception::recoverable,
            "The data size is too short.",
            "fADCDataProcessor::set_pedestal()"));
   }
@@ -248,4 +252,5 @@ Json::Value xfAdcHit;
     xfAdcHit.append(_data[i]);
   }
   return xfAdcHit;
+}
 }

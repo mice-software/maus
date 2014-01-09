@@ -23,34 +23,40 @@
 #include <vector>
 #include <iostream>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Recon/Global/TrackPoint.hh"
 #include "Maths/Vector.hh"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
 const TransferMap * LinearApproximationOpticsModel::CalculateTransferMap(
-    const std::vector<recon::global::TrackPoint> & start_plane_hits,
-    const std::vector<recon::global::TrackPoint> & station_hits)
+    const std::vector<MAUS::PhaseSpaceVector> & start_plane_hits,
+    const std::vector<MAUS::PhaseSpaceVector> & station_hits)
     const {
   const MAUS::DataStructure::Global::PID particle_id
-    = MAUS::DataStructure::Global::PID(start_plane_hits[0].particle_id());
+    = MAUS::DataStructure::Global::PID(reference_primary_.GetParticleId());
+  const double mass
+    = recon::global::Particle::GetInstance().GetMass(particle_id);
 
-  double start_plane = start_plane_hits[0].z();
+  double start_plane = reference_primary_.GetPosition().z();
 
   double hit_total = 0.0;
-  std::vector<recon::global::TrackPoint>::const_iterator hit;
+  std::vector<MAUS::PhaseSpaceVector>::const_iterator hit;
   for (hit = station_hits.begin(); hit != station_hits.end(); ++hit) {
-    hit_total += hit->z();
+    const double energy = hit->energy();
+    const double momentum = ::sqrt(energy*energy - mass*mass);
+    const double beta = momentum / energy;
+    const double delta_t = hit->time() - time_offset_
+                         - reference_primary_.GetTime();
+    const double delta_z = beta * ::CLHEP::c_light * delta_t;
+    hit_total += (reference_primary_.GetPosition().z() + delta_z);
   }
   double end_plane = hit_total / station_hits.size();
-
-  const double mass
-    = recon::global::Particle::GetInstance()->GetMass(particle_id);
 
   return new LinearApproximationTransferMap(start_plane, end_plane, mass);
 }
@@ -78,7 +84,7 @@ PhaseSpaceVector LinearApproximationTransferMap::Transport(
 
   double energy = vector.E();
   if (mass_ > energy) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
                  "Attempting to transport a particle that is off mass shell.",
                  "MAUS::LinearApproximationOpticsModel::Transport()"));
   }

@@ -6,7 +6,7 @@
 #include "BTField.hh"
 #include "BTPillBox.hh"
 #include "BTPhaser.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "micegsl.hh"
 #include <string>
 
@@ -210,7 +210,7 @@ BTPillBox::phasingFieldModel BTPillBox::StringToPhaseModel(std::string phaseMode
 	else if(phaseModel == "timevarying")                    return normal;
 	else if(phaseModel == "electrostatic")                  return electrostatic;
 	else if(phaseModel == "nofield"||phaseModel == "none")  return noField;
-	else throw(Squeal(Squeal::recoverable, "Did not recognise field phasing model "+phaseModel, "BTPillBox::SetFieldDuringPhasing"));
+	else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise field phasing model "+phaseModel, "BTPillBox::SetFieldDuringPhasing"));
 	return noField;
 }
 

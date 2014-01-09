@@ -29,8 +29,6 @@
 #include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
-typedef std::vector<ReconEvent*> ReconEventArray;
-typedef std::vector<MCEvent*> MCEventArray;
 typedef std::map<std::string, std::string> ErrorsMap;
 
 /** @class Spill stores data for all items in a given spill
@@ -66,10 +64,10 @@ class Spill {
   DAQData* GetDAQData() const;
 
   /** Set the MC events */
-  void SetMCEvents(MCEventArray* events);
+  void SetMCEvents(MCEventPArray* events);
 
   /** Get the MC events */
-  MCEventArray* GetMCEvents() const;
+  MCEventPArray* GetMCEvents() const;
 
   /** Get a single MC event (needed for PyROOT) */
   MCEvent& GetAnMCEvent(size_t i) const {
@@ -82,10 +80,10 @@ class Spill {
   }
 
   /** Set the Recon events */
-  void SetReconEvents(ReconEventArray* ReconEvent);
+  void SetReconEvents(ReconEventPArray* ReconEvent);
 
   /** Get the Recon events */
-  ReconEventArray* GetReconEvents() const;
+  ReconEventPArray* GetReconEvents() const;
 
   /** Get a single Recon event (needed for PyROOT) */
   ReconEvent& GetAReconEvent(int i) const {
@@ -131,8 +129,8 @@ class Spill {
 
   DAQData* _daq;
   Scalars* _scalars;
-  MCEventArray* _mc;
-  ReconEventArray* _recon;
+  MCEventPArray* _mc;
+  ReconEventPArray* _recon;
   int _spill_number;
   int _run_number;
   std::string _daq_event_type;

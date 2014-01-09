@@ -17,6 +17,8 @@
 
 #include "src/input/InputCppDAQOfflineData/InputCppDAQOfflineData.hh"
 
+namespace MAUS {
+
 InputCppDAQOfflineData::InputCppDAQOfflineData(std::string pDataPath, std::string pFilename)
 :InputCppDAQData::InputCppDAQData(), _dataPaths(pDataPath), _datafiles(pFilename) {
   _classname = "InputCppDAQOfflineData";
@@ -110,8 +112,7 @@ bool InputCppDAQOfflineData::readNextEvent() {
 
   return true;
 }
-
-
+}
 
 
 

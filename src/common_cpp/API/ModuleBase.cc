@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/API/ModuleBase.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
@@ -29,8 +29,8 @@ namespace MAUS {
     try {
       _birth(s);
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    catch(Exception& s) {
+      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
     catch(std::exception & e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
@@ -44,8 +44,8 @@ namespace MAUS {
     try {
       _death();
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    catch(Exception& s) {
+      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
     catch(std::exception & e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);

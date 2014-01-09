@@ -36,6 +36,8 @@
  * containing all the daq spill information.
  */
 
+namespace MAUS {
+
 class MDarranger : public MDprocessor {
  public:
   MDarranger() {}
@@ -198,5 +200,5 @@ class fADCDataProcessor : public ZeroSupressionFilter {
   /// Pedestal level of the signal */
   double _pedestal;
 };
-
+}
 #endif

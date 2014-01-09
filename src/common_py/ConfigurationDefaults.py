@@ -390,7 +390,7 @@ TOF_calib_source = "CDB"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 
 TOF_findTriggerPixelCut = 0.5 # nanosecond
-TOF_makeSpacePiontCut = 0.5 # nanosecond
+TOF_makeSpacePointCut = 0.5 # nanosecond
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format

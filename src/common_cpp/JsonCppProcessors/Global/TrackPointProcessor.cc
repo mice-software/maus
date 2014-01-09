@@ -22,6 +22,12 @@ namespace Global {
 
 TrackPointProcessor::TrackPointProcessor() {
   RegisterValueBranch(
+      "particle_event", &_int_proc,
+      &MAUS::DataStructure::Global::TrackPoint::get_particle_event,
+      &MAUS::DataStructure::Global::TrackPoint::set_particle_event,
+      true);
+
+  RegisterValueBranch(
       "mapper_name", &_string_proc,
       &MAUS::DataStructure::Global::TrackPoint::get_mapper_name,
       &MAUS::DataStructure::Global::TrackPoint::set_mapper_name,
@@ -47,7 +53,7 @@ TrackPointProcessor::TrackPointProcessor() {
       "space_point",
       &MAUS::DataStructure::Global::TrackPoint::get_space_point_tref,
       &MAUS::DataStructure::Global::TrackPoint::set_space_point_tref,
-      true);
+      false);
 
   RegisterBaseClass(
       "basepoint", &_base_proc,
