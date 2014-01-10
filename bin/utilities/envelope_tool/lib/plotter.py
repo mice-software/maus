@@ -259,7 +259,7 @@ class Plotter:
             energy = self.ref_list[i]['energy']
             axis_str = self.axis_dict[self.first_var][0]
             axis_int = self.ellipse_var.index(axis_str)+1
-            disp = -ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
+            disp = ell.get_element(2, axis_int)*energy/ell.get_element(2, 2)
             self.y_var[0].append(disp)
 
     def get_dispersion_prime(self):
