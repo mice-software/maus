@@ -23,6 +23,8 @@
 
 // C++ headers
 #include <vector>
+//#include "CLHEP/Vector/Rotation.h"
+//#include "CLHEP/Geometry/Transform3D.h"
 #include "TMath.h"
 #include "TMatrixD.h"
 
@@ -101,6 +103,8 @@ class KalmanState {
   void Initialise(int dim);
 
   void Build(SciFiCluster *cluster);
+
+  //void MoveToGlobalFrame(ThreeVector ref_pos, CLHEP::HepRotation rotation);
 
   void set_spill(int spill) { _spill = spill; }
 

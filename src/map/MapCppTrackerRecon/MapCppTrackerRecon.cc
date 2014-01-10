@@ -93,7 +93,6 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
-        std::cerr << "no problem\n";
         print_event_info(*event);
       }
     } else {
@@ -188,12 +187,24 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 
   if ( seeds.size() ) {
     KalmanTrackFit fit;
+    //fit.SaveGeometry(_geometry_helper.RefPos(), _geometry_helper.Rot());
     fit.Process(seeds, evt);
   }
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  Squeak::mout(Squeak::info) << event.digits().size() << " "
+  std::cerr << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                                << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  std::cerr << std::endl;
+/*  Squeak::mout(Squeak::info) << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
                               << event.straightprtracks().size() << " "
@@ -204,6 +215,7 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
   }
   Squeak::mout(Squeak::info) << std::endl;
+*/
 }
 
 } // ~namespace MAUS

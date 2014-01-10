@@ -26,7 +26,10 @@ namespace MAUS {
 SciFiGeometryHelper::SciFiGeometryHelper() {}
 
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &modules)
-                                        : _modules(modules) {}
+                                        : _modules(modules) {
+  _RefPos.resize(2);
+  _Rot.resize(2);
+}
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
 
@@ -48,7 +51,7 @@ void SciFiGeometryHelper::Build() {
 
       // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
       const MiceModule* plane = module->mother();
-      G4RotationMatrix internal_fibre_rotation(module->relativeRotation(module->mother() // plane
+      HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                ->mother()));  // tracker/ station??
 
       direction     *= internal_fibre_rotation;
@@ -56,7 +59,7 @@ void SciFiGeometryHelper::Build() {
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
       // const MiceModule* plane = module->mother();
-      G4RotationMatrix plane_rotation(plane->relativeRotation(plane->mother()  // tracker
+      HepRotation plane_rotation(plane->relativeRotation(plane->mother()  // tracker
                                                               ->mother()));    // solenoid
 
       ThreeVector position  = clhep_to_root(module->globalPosition());
@@ -68,8 +71,8 @@ void SciFiGeometryHelper::Build() {
       SciFiPlaneGeometry this_plane;
       this_plane.Direction     = direction;
       // TO BE REMOVED. Ed
-      tracker_ref_frame_pos.setX(0);
-      tracker_ref_frame_pos.setY(0);
+      // tracker_ref_frame_pos.setX(0);
+      // tracker_ref_frame_pos.setY(0);
       this_plane.Position      = tracker_ref_frame_pos;
       this_plane.CentralFibre  = centralfibre;
       this_plane.Pitch         = pitch;
@@ -77,12 +80,14 @@ void SciFiGeometryHelper::Build() {
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));
       _field_value[tracker_n] = FieldValue(reference, plane_rotation);
+      std::cerr << tracker_ref_frame_pos.x() << " " << tracker_ref_frame_pos.y()
+                << " " << direction.x() << " " << direction.y() << std::endl;
     }
   }
 }
 
 double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
-                                       G4RotationMatrix plane_rotation) {
+                                       HepRotation plane_rotation) {
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {global_position.x(), global_position.y(), global_position.z(), 0.};
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
