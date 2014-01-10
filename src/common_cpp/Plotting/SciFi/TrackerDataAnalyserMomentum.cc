@@ -144,7 +144,7 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
     _spill_num = spill->GetSpillNumber();
     // Loop over recon events in the spill
     for (size_t iRevt = 0; iRevt < spill->GetReconEvents()->size(); ++iRevt) {
-      MCEvent *mc_evt = (*spill->GetMCEvents())[iRevt];
+      // MCEvent *mc_evt = (*spill->GetMCEvents())[iRevt];
       SciFiEvent *evt = (*spill->GetReconEvents())[iRevt]->GetSciFiEvent();
       std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
       // Loop over helical pattern recognition tracks in event
