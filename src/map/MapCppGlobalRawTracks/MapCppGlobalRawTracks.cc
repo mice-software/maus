@@ -602,6 +602,19 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
     for (; scifi_track_point != scifi_track_points.end(); ++scifi_track_point) {
       const int tracker = (*scifi_track_point)->tracker();
       const int station = (*scifi_track_point)->station();
+      if ((station < 1) || (station > 5)) {
+        std::stringstream message;
+        message << "Invalid station number in Tracker "
+                << tracker << ": " << station << ".";
+        /* ignore for now in order not to be blocked issue #1394
+        throw(Exception(Exception::nonRecoverable,
+                     message.str(),
+                     "MapCppGlobalRawTracks::LoadSciFiTrack()"));
+        */
+        std::cout << "ERROR in MapCppGlobalRawTracks::LoadSciFiTrack(): "
+                  << message << std::endl;
+        continue;
+      }
       std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
                 << "\tTracker: " << tracker << "\tStation: " << station
                 << "\tPz: " << (*scifi_track_point)->pz() << std::endl;

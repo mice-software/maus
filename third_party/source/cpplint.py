@@ -1480,7 +1480,7 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
       fncall = match.group(1)    # look inside the parens for function calls
       break
 
-  # Except in if/for/while/switch, there should never be space
+  # Except in if/for/while/switch/catch, there should never be space
   # immediately inside parens (eg "f( 3, 4 )").  We make an exception
   # for nested parens ( (a+b) + c ).  Likewise, there should never be
   # a space before a ( when it's a function argument.  I assume it's a
@@ -1494,7 +1494,7 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
   # Note that we assume the contents of [] to be short enough that
   # they'll never need to wrap.
   if (  # Ignore control structures.
-      not Search(r'\b(if|for|while|switch|return|delete)\b', fncall) and
+      not Search(r'\b(if|for|while|switch|return|delete|catch)\b', fncall) and
       # Ignore pointers/references to functions.
       not Search(r' \([^)]+\)\([^)]*(\)|,$)', fncall) and
       # Ignore pointers/references to arrays.
