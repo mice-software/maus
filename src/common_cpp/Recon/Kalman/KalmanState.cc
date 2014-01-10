@@ -174,7 +174,7 @@ void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos) {//, CLHEP::HepRotation
   _smoothed_a(0, 0) = sign*pos.x();
   _smoothed_a(1, 0) = mom.x();
   _smoothed_a(2, 0) = pos.y();
-  _smoothed_a(1, 0) = mom.y();
+  _smoothed_a(3, 0) = mom.y();
   _z = pos.z();
 
   _smoothed_a.Print();
