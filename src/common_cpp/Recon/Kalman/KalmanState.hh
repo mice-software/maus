@@ -23,14 +23,15 @@
 
 // C++ headers
 #include <vector>
-//#include "CLHEP/Vector/Rotation.h"
-//#include "CLHEP/Geometry/Transform3D.h"
+
 #include "TMath.h"
 #include "TMatrixD.h"
 
 #include "Interface/Squeal.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
+//#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+//#include "CLHEP/Vector/Rotation.h"
 
 namespace MAUS {
 
@@ -104,7 +105,7 @@ class KalmanState {
 
   void Build(SciFiCluster *cluster);
 
-  //void MoveToGlobalFrame(ThreeVector ref_pos, CLHEP::HepRotation rotation);
+  void MoveToGlobalFrame(ThreeVector ref_pos);//, CLHEP::HepRotation rotation);
 
   void set_spill(int spill) { _spill = spill; }
 

@@ -157,26 +157,32 @@ void KalmanState::Initialise(int dim) {
   _shift.ResizeTo(3, 1);
   _shift_covariance.ResizeTo(3, 3);
 }
-/*
-void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos, CLHEP::HepRotation rotation) {
-  std::cout << _id << std::endl;
-  _smoothed_a.Print();
+
+void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos) {//, CLHEP::HepRotation rotation) {
+  std::cerr << _id << " " << _z << std::endl;
+  //_smoothed_a.Print();
 
   ThreeVector pos(_smoothed_a(0, 0), _smoothed_a(2, 0), _z);
   ThreeVector mom(_smoothed_a(1, 0), _smoothed_a(3, 0), 1.);
 
-  pos = (pos-ref_pos)*rotation;
-  mom = mom*rotation;
+  //pos *= rotation.inverse();
+  pos += ref_pos;
 
-  _smoothed_a(0, 0) = pos.x();
+  //mom *= rotation;
+  int sign = 1;
+  if ( _id < 0 ) sign = -1;
+  _smoothed_a(0, 0) = sign*pos.x();
   _smoothed_a(1, 0) = mom.x();
   _smoothed_a(2, 0) = pos.y();
   _smoothed_a(1, 0) = mom.y();
   _z = pos.z();
 
   _smoothed_a.Print();
+  std::cerr << "---- MC Truth ----" << std::endl;
+  std::cerr << _mc_pos.x() << " " << _mc_pos.y() << " " << _mc_pos.z() << std::endl;
+  std::cerr << _mc_mom.x() << " " << _mc_mom.y() << " " << _mc_mom.z() << std::endl;
 }
-*/
+
 void KalmanState::set_a(TMatrixD a, State kalman_state) {
   switch ( kalman_state ) {
     case(Projected) :

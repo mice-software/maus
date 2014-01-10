@@ -24,9 +24,7 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/legacy/Config/MiceModule.hh"
-// #include "Geant4/G4RotationMatrix.hh"
 #include "CLHEP/Vector/Rotation.h"
-#include "CLHEP/Geometry/Transform3D.h"
 #include "src/common_cpp/Utils/ThreeVectorUtils.hh"
 
 namespace MAUS {
@@ -92,6 +90,10 @@ class SciFiGeometryHelper {
   SciFiGeometryMap GeometryMap() const { return _geometry_map; }
 
   double GetFieldValue(int tracker) const { return _field_value[tracker]; }
+
+  std::vector<ThreeVector> RefPos()  const { return _RefPos; };
+
+  std::vector<HepRotation> Rot()     const { return _Rot;    };
 
  private:
   std::vector<const MiceModule*> _modules;

@@ -21,6 +21,7 @@ namespace MAUS {
 
 MapCppTrackerRecon::MapCppTrackerRecon()
     : _spill_json(NULL), _spill_cpp(NULL) {
+  Squeak::activateCerr(true);
 }
 
 MapCppTrackerRecon::~MapCppTrackerRecon() {
@@ -187,12 +188,13 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 
   if ( seeds.size() ) {
     KalmanTrackFit fit;
-    //fit.SaveGeometry(_geometry_helper.RefPos(), _geometry_helper.Rot());
+    fit.SaveGeometry(_geometry_helper.RefPos(), _geometry_helper.Rot());
     fit.Process(seeds, evt);
   }
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
+
   std::cerr << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
@@ -204,7 +206,8 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
   }
   std::cerr << std::endl;
-/*  Squeak::mout(Squeak::info) << event.digits().size() << " "
+/*
+  Squeak::mout(Squeak::info) << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
                               << event.straightprtracks().size() << " "

@@ -15,10 +15,6 @@
  *
  */
 
-/*
-TODO: take back changes in plane position.
-*/
-
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 namespace MAUS {
@@ -65,14 +61,15 @@ void SciFiGeometryHelper::Build() {
       ThreeVector position  = clhep_to_root(module->globalPosition());
       ThreeVector reference = GetReferenceFramePosition(tracker_n);
 
+      _RefPos[tracker_n] = reference;
+      _Rot[tracker_n]    = plane_rotation;
+
       ThreeVector tracker_ref_frame_pos = position-reference;
       tracker_ref_frame_pos *= plane_rotation;
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction     = direction;
-      // TO BE REMOVED. Ed
-      // tracker_ref_frame_pos.setX(0);
-      // tracker_ref_frame_pos.setY(0);
+
       this_plane.Position      = tracker_ref_frame_pos;
       this_plane.CentralFibre  = centralfibre;
       this_plane.Pitch         = pitch;
@@ -80,8 +77,6 @@ void SciFiGeometryHelper::Build() {
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));
       _field_value[tracker_n] = FieldValue(reference, plane_rotation);
-      std::cerr << tracker_ref_frame_pos.x() << " " << tracker_ref_frame_pos.y()
-                << " " << direction.x() << " " << direction.y() << std::endl;
     }
   }
 }
