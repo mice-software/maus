@@ -599,25 +599,29 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
       = scifi_track_points.begin();
     GlobalDS::TrackPArray::iterator track_begin = track;
     GlobalDS::TrackPArray::iterator track_end = track + num_global_tracks;
+    // FIXME(Lane) remove workaround code once bug #1394 is fixed
+    int last_station = 1;
+    double last_x;
     for (; scifi_track_point != scifi_track_points.end(); ++scifi_track_point) {
       const int tracker = (*scifi_track_point)->tracker();
-      const int station = (*scifi_track_point)->station();
-      if ((station < 1) || (station > 5)) {
-        std::stringstream message;
-        message << "Invalid station number in Tracker "
-                << tracker << ": " << station << ".";
-        /* ignore for now in order not to be blocked issue #1394
-        throw(Exception(Exception::nonRecoverable,
-                     message.str(),
-                     "MapCppGlobalRawTracks::LoadSciFiTrack()"));
-        */
-        std::cout << "ERROR in MapCppGlobalRawTracks::LoadSciFiTrack(): "
-                  << message << std::endl;
-        continue;
+      int station = (*scifi_track_point)->station();
+      // ==== compensate for bug #1394 ===
+      ++station;
+      const double x = (*scifi_track_point)->x();
+      if (((station-last_station) == 1) && ::abs(x-last_x) < .1) {
+        --station;
       }
+      last_station = station;
+      last_x = x;
+      // =================================
       std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
                 << "\tTracker: " << tracker << "\tStation: " << station
-                << "\tPz: " << (*scifi_track_point)->pz() << std::endl;
+                << std::endl
+                << "\tr=(" << (*scifi_track_point)->x() << ", "
+                << (*scifi_track_point)->y() << ")"
+                << "\tP=(" << (*scifi_track_point)->px() << ", "
+                << (*scifi_track_point)->py() << ", "
+                << (*scifi_track_point)->pz() << ")" << std::endl;
       const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
           GlobalDS::kTracker0 + 6 * tracker + station);
       MAUS::recon::global::DetectorMap::const_iterator detector_mapping
