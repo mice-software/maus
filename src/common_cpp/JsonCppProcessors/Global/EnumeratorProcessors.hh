@@ -49,7 +49,7 @@ class EnumDetectorPointProcessor
      *  MAUS::DataStructure::Global::DetectorPoint
      *
      *  If json_double cannot be converted to a
-     *  MAUS::DataStructure::Global::DetectorPoint, throw a Squeal
+     *  MAUS::DataStructure::Global::DetectorPoint, throw a Exception
      */
     virtual MAUS::DataStructure::Global::DetectorPoint*
     JsonToCpp(const Json::Value& json_int);
@@ -77,7 +77,7 @@ class EnumPIDProcessor
     /** Convert from Json::numericValue to MAUS::DataStructure::Global::PID
      *
      *  If json_double cannot be converted to a
-     *  MAUS::DataStructure::Global::PID, throw a Squeal
+     *  MAUS::DataStructure::Global::PID, throw a Exception
      */
     virtual MAUS::DataStructure::Global::PID* JsonToCpp(
         const Json::Value& json_double);

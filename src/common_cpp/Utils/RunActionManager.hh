@@ -70,8 +70,8 @@ class RunActionManager {
     /** Replace current_item with new_item in run_data vector.
      *
      *  If current_item is not in the run_data vector, throw a
-     *  Squeal. If new_item is already in the run_data vector or is NULL, throw
-     *  a Squeal.
+     *  Exception. If new_item is already in the run_data vector or is NULL, throw
+     *  a Exception.
      *
      *  Memory allocated to current_item is still allocated, but no longer owned
      *  by RunActionManager (i.e. now owned by caller).
@@ -81,7 +81,7 @@ class RunActionManager {
     /** Add item to the RunActionManager
      *
      *  RunActionManager now owns this memory (will clean it on delete). Throw
-     *  a Squeal if item is already in the run_actions or item is NULL.
+     *  a Exception if item is already in the run_actions or item is NULL.
      */
     void PushBack(RunActionBase* item);
 

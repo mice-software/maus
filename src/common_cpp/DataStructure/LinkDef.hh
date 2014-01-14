@@ -174,6 +174,17 @@
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::PrimaryChain*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TRefTrackPair*>+;
 
+#pragma link C++ class MAUS::EMRDaq+;
+#pragma link C++ class MAUS::DBBHit+;
+// #pragma link C++ class std::vector<MAUS::DBBHit>+;
+#pragma link C++ class MAUS::DBBHitsArray+;
+#pragma link C++ class MAUS::DBBSpillData+;
+#pragma link C++ class MAUS::EMRBar+;
+#pragma link C++ class MAUS::EMRBarHit+;
+#pragma link C++ class MAUS::EMRPlaneHit+;
+// #pragma link C++ class std::vector<EMRBar*>+;
+// #pragma link C++ class std::vector<EMRBarHit>+;
+
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;
 

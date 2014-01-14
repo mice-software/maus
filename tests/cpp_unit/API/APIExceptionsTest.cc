@@ -52,7 +52,7 @@ namespace MAUS {
     UnhandledException ue("MyClass");
 
     std::string ret = "An unhandled exception was thrown by 'MyClass'"\
-      " which was not of type 'Squeal' or deriving from 'std::exception'";
+      " which was not of type 'Exception' or deriving from 'std::exception'";
 
     ASSERT_FALSE(strcmp(ret.c_str(), ue._what()))
       << "Fail: _what() failed, didn't return the expected string"

@@ -24,6 +24,7 @@
 #include <sstream>
 #include <fstream>
 
+#include "TMatrixDSym.h"
 #include "gtest/gtest.h"
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Random/Random.h"
@@ -155,6 +156,22 @@ TEST_F(SymmetricMatrixTest, HepSymMatrixConstructor) {
   // check that handles 0 length okay
   ::CLHEP::HepSymMatrix matrix_hep1;
   SymmetricMatrix matrix_d1(matrix_hep1);
+  ASSERT_EQ(matrix_d1.size(), (size_t) 0);
+}
+
+TEST_F(SymmetricMatrixTest, RootSymMatrixConstructor) {
+  TMatrixDSym matrix_root0(size_);
+  Double_t seed = 2.;
+  matrix_root0.RandomizePD(-2., 2., seed);
+  const SymmetricMatrix matrix_d0(matrix_root0);
+  ASSERT_EQ(matrix_d0.size(), (size_t) size_);
+  for (size_t i = 1; i <= size_; ++i)
+    for (size_t j = 1; j <= size_; ++j)
+      EXPECT_EQ(matrix_d0(i, j), matrix_root0(i-1, j-1));
+
+  // check that handles 0 length okay
+  TMatrixDSym matrix_root1;
+  SymmetricMatrix matrix_d1(matrix_root1);
   ASSERT_EQ(matrix_d1.size(), (size_t) 0);
 }
 

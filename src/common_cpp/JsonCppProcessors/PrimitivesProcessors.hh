@@ -25,13 +25,15 @@
 
 namespace MAUS {
 
+typedef unsigned long long uint64;
+
 /** Processor to convert between C++ double and Json::numericValue
  */
 class DoubleProcessor : public ProcessorBase<double> {
   public:
     /** Convert from Json::numericValue to double
      *
-     *  If json_double cannot be converted to a double, throw a Squeal
+     *  If json_double cannot be converted to a double, throw a Exception
      */
     virtual double* JsonToCpp(const Json::Value& json_double);
 
@@ -50,7 +52,7 @@ class StringProcessor : public ProcessorBase<std::string> {
   public:
     /** Convert from Json::numericValue to double
      *
-     *  If json_string cannot be converted to a double, throw a Squeal
+     *  If json_string cannot be converted to a double, throw a Exception
      */
     virtual std::string* JsonToCpp(const Json::Value& json_string);
 
@@ -71,7 +73,7 @@ class IntProcessor : public ProcessorBase<int> {
   public:
     /** Convert from Json::intValue to int
      *
-     *  If json_string cannot be converted to a int, throw a Squeal
+     *  If json_string cannot be converted to a int, throw a Exception
      */
     virtual int* JsonToCpp(const Json::Value& json_int);
 
@@ -104,13 +106,37 @@ class UIntProcessor : public ProcessorBase<unsigned int> {
                              (const unsigned int& cpp_double, std::string path);
 };
 
+/** Processor to convert between C++ long long int and Json::stringValue
+ */
+class LLUIntProcessor : public ProcessorBase<uint64> {
+  public:
+    /** Convert from Json::stringValue to long long unsigned int
+     *
+     *  If we have a Json::Value that
+     *    - has a minus sign as first character
+     *    - does not parse to an uint64
+     *    - is not a string type at all
+     *  throw an exception
+     */
+    virtual uint64* JsonToCpp(const Json::Value& json_str);
+
+    /** Convert from unsigned int to Json::stringValue
+     */
+    virtual Json::Value* CppToJson(const uint64& cpp_double);
+
+    /** Convert from unsigned int to Json::stringValue
+     */
+    virtual Json::Value* CppToJson(const uint64& cpp_double,
+                                   std::string path);
+};
+
 /** Processor to convert between C++ nool and Json::boolValue
  */
 class BoolProcessor : public ProcessorBase<bool> {
   public:
     /** Convert from Json::boolValue to bool
      *
-     *  If json_bool cannot be converted to a bool, throw a Squeal
+     *  If json_bool cannot be converted to a bool, throw a Exception
      */
     virtual bool* JsonToCpp(const Json::Value& json_bool);
 

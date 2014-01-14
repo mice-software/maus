@@ -104,7 +104,7 @@ const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int p
     }
   }
   if ( this_plane == NULL ) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
     "Failed to find tracker plane.",
     "SciFiGeometryHelper::find_plane"));
   }

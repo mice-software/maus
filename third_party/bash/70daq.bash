@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
 version=0.3.2
-filename=monitor_test.tar
 directory=daq-${version}
-url=http://micewww.pp.rl.ac.uk/attachments/1187/monitor_test.tar
+
+#filename=monitor_test.tar
+#url=http://micewww.pp.rl.ac.uk/attachments/1187/monitor_test.tar
+
+filename=libmonitor.tarz
+url=http://dpnc.unige.ch/~yordan/libmonitor.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -14,6 +18,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Source archive doesn't exist.  Downloading..."
 
 	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
+	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}.md5
 
     fi
 
@@ -39,12 +44,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	#sleep 1
 	#scons install
 
-        cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/libMDMonitor.a" "${MAUS_ROOT_DIR}/third_party/install/lib"
+        cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/libMDMonitor.a" "${MAUS_ROOT_DIR}/third_party/install/lib"
 	#cat MDmonitoring.hh |sed "s;#include \"monitor.h\";//#include \"monitor.h\";" | sed "s;#include \"event.h\";//#include \"event.h\";" > tmp.hh
 	#mv tmp.hh MDmonitoring.hh
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/montest/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
 	#cd -
 	#rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
 	echo

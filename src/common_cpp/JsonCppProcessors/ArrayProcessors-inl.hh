@@ -42,7 +42,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -63,7 +63,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 if (RefManager::HasInstance())
                     RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
-        } catch(Squeal squee) {
+        } catch(Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             for (size_t j = 0; j < vec->size(); ++j) {
                 if ((*vec)[j] != NULL) {
@@ -71,7 +71,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 }
             }
             delete vec;
-            throw squee;
+            throw exc;
         }
     }
     return vec;
@@ -106,10 +106,10 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             if (RefManager::HasInstance())
                 RefManager::GetInstance().SetPointerAsValue
                                                (cpp_array[i], GetPath(path, i));
-        } catch(Squeal squee) {
+        } catch(Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
-            throw squee;
+            throw exc;
         }
     }
     return json_array;
@@ -142,7 +142,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -158,10 +158,10 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
             ArrayContents* data = _proc->JsonToCpp(json_array[i]);
             (*vec)[i] = *data;
             delete data;
-        } catch(Squeal squee) {
+        } catch(Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
-            throw squee;
+            throw exc;
         }
     }
     return vec;
@@ -189,10 +189,10 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
             (*json_array)[i] = *data; // json copies memory but not path
             JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
-        } catch(Squeal squee) {
+        } catch(Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
-            throw squee;
+            throw exc;
         }
     }
     return json_array;
@@ -212,7 +212,7 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
     using ReferenceResolver::JsonToCpp::VectorResolver;
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -235,10 +235,10 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
                     RefManager::GetInstance().AddReference(res);
                 }
             }
-        } catch(Squeal squee) {
+        } catch(Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
-            throw squee;
+            throw exc;
         }
     }
     return vec;

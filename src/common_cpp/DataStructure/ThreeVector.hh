@@ -65,11 +65,16 @@ class ThreeVector : public TVector3 {
 	  ThreeVector(double x = 0.0, double y = 0.0, double z = 0.0)
       : TVector3(x, y, z) {}
 
-    /** Assignment operator */
+    /** Assignment operators */
     inline ThreeVector& operator=(const ThreeVector& vec) {
         if (this == &vec)
             return *this;
         SetXYZ(vec.x(), vec.y(), vec.z());
+        return *this;
+    }
+
+    inline ThreeVector& operator/=(const double& d) {
+        (*this) *= (1./d);
         return *this;
     }
 
@@ -105,8 +110,8 @@ class ThreeVector : public TVector3 {
     MAUS_VERSIONED_CLASS_DEF(ThreeVector)
 };
 
-inline const ThreeVector operator /(const ThreeVector& v, const double& d) {
-    return v*(1./d);
+inline ThreeVector operator/(const ThreeVector& v, const double& d) {
+    return ThreeVector(v) /= d;
 }
 
 inline bool operator==(const ThreeVector& v1, const ThreeVector& v2) {

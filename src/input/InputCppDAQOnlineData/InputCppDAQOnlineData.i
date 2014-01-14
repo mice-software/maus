@@ -8,7 +8,7 @@
 %include "std_string.i"
 %include "src/input/InputCppDAQData/InputCppDAQData.i"
 
-%feature("shadow") InputCppDAQOnlineData::emitter() %{
+%feature("shadow") MAUS::InputCppDAQOnlineData::emitter() %{
 def emitter(self):
   while (self.readNextEvent()):
 	print self.getCurEvent()

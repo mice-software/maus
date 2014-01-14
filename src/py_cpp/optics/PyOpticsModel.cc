@@ -183,7 +183,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     try {
         Json::Value* cards = Globals::GetConfigurationCards();
         // just gets deltas (dx, dy, ...) and polynomial order
-        optics->model = new MAUS::PolynomialOpticsModel(*cards);
+        optics->model = new MAUS::PolynomialOpticsModel(cards);
         // uses MAUS::Globals::MAUSGeant4Manager for geometry, etc
         optics->model->Build();
         is_built = true;  // done by constructor

@@ -12,7 +12,7 @@
 #include "Config/MiceModule.hh"
 #include "Config/ModuleTextFileIO.hh"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 // Constructor takes the name of a file from which information is read in to instantiate this module or sub component
 
@@ -281,14 +281,14 @@ double   MiceModule::globalScaleFactor() const
 
 void MiceModule::addPropertyBool( std::string name, std::string val ) {
   if(_bools.find(name) != _bools.end()) 
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
   _bools[name] = val;
 }
 
 void MiceModule::addPropertyBool( std::string name, bool val )
 { 
   if(_bools.find(name) != _bools.end()) 
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyBool "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyBool")); 
 
   std::stringstream myInpStream;
   myInpStream << val;
@@ -305,7 +305,7 @@ void MiceModule::addPropertyInt( std::string name, int val )
 void MiceModule::addPropertyInt( std::string name, std::string val )
 {
   if(_ints.find(name) != _ints.end())
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyInt "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyInt")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyInt "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyInt")); 
   _ints[name] = val;
 }
 
@@ -320,14 +320,14 @@ void MiceModule::addPropertyDouble( std::string name, double val )
 void MiceModule::addPropertyDouble( std::string name, std::string val )
 { 
   if(_doubles.find(name) != _doubles.end())
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyDouble "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyDouble")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyDouble "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyDouble")); 
   _doubles[name] = val;
 }
 
 void MiceModule::addPropertyString( std::string name, std::string val )
 { 
   if(_strings.find(name) != _strings.end()) 
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyString "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyString")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyString "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyString")); 
   _strings[name] = val;
 }
 
@@ -342,7 +342,7 @@ void MiceModule::addPropertyHep3Vector( std::string name, CLHEP::Hep3Vector val 
 void MiceModule::addPropertyHep3Vector( std::string name, std::string val )
 { 
   if(_hep3vectors.find(name) != _hep3vectors.end()) 
-    throw(Squeal(Squeal::recoverable, "Attempt to add PropertyHep3Vector "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyHep3Vector")); 
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to add PropertyHep3Vector "+name+" twice in module "+this->fullName(), "MiceModule::addPropertyHep3Vector")); 
   _hep3vectors[name] = val; 
 }
 
@@ -363,7 +363,7 @@ bool                    MiceModule::propertyExists( std::string property, std::s
     exists = ( _strings.find( property ) != _strings.end() ) || ( _mother && _mother->propertyExists( property, type ) );
   else if( type == "Hep3Vector" || type == "HEP3VECTOR" || type == "hep3vector" )
     exists = ( _hep3vectors.find( property ) != _hep3vectors.end() ) || ( _mother && _mother->propertyExists( property, type ) );
-  else throw(Squeal(Squeal::recoverable, "Property type "+type+" not recognised", "MiceModule::propertyExists"));
+  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Property type "+type+" not recognised", "MiceModule::propertyExists"));
 
   return exists;
 }
@@ -384,7 +384,7 @@ bool                    MiceModule::propertyExistsThis( std::string property, st
     exists = _strings.find( property ) != _strings.end();
   else if( type == "Hep3Vector" || type == "HEP3VECTOR" || type == "hep3vector" )
     exists = _hep3vectors.find( property ) != _hep3vectors.end();
-  else throw(Squeal(Squeal::recoverable, "Property type "+type+" not recognised", "MiceModule::propertyExists"));
+  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Property type "+type+" not recognised", "MiceModule::propertyExists"));
 
   return exists;
 }
@@ -395,7 +395,7 @@ bool                    MiceModule::propertyBoolThis( std::string property ) con
   if(propertyExistsThis(property, "bool")) 
     return propertyBool(property);
   else                                       
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyBoolThis");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyBoolThis");
 }
 
 bool                    MiceModule::propertyBool( std::string property ) const
@@ -407,11 +407,11 @@ bool                    MiceModule::propertyBool( std::string property ) const
   if( propertyExistsThis( property, "bool" ) )
     prop = _bools.find( property )->second;
   else if( _mother )
-    try{prop = _mother->propertyBool( property );} catch(Squeal squee) {prop_exists = false;}
+    try{prop = _mother->propertyBool( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else
     prop_exists = false;
   if (!prop_exists)
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyBool");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyBool");
   ModuleTextFileIO::parseString(prop, prop_bool);
 
   return prop_bool;
@@ -423,7 +423,7 @@ int                    MiceModule::propertyIntThis( std::string property ) const
   if(propertyExistsThis(property, "int")) 
     return propertyInt(property);
   else                                       
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyIntThis");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyIntThis");
 }
 
 // Return the named int property
@@ -438,16 +438,16 @@ int                  MiceModule::propertyInt( std::string property ) const
       ModuleTextFileIO::setEvaluator(_parameters);
       ModuleTextFileIO::parseString(prop_str, prop_int);
     }
-    catch(Squeal squee)
+    catch(MAUS::Exception exc)
     {
-      std::string error = squee.GetMessage();
-      throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyInt"));
+      std::string error = exc.GetMessage();
+      throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyInt"));
     }
   }
   else if( _mother )
     prop_int = _mother->propertyInt( property );
   else
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyInt");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyInt");
   return prop_int;
 }
 
@@ -456,7 +456,7 @@ double                  MiceModule::propertyDoubleThis( std::string property ) c
   if( propertyExistsThis( property, "double" ) )
     return propertyDouble(property);
   else
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyDoubleThis");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyDoubleThis");
 }
 
 
@@ -472,16 +472,16 @@ double                  MiceModule::propertyDouble( std::string property ) const
       ModuleTextFileIO::setEvaluator(_parameters);
       ModuleTextFileIO::parseString(prop_str, prop_dbl);
     }
-    catch(Squeal squee)
+    catch(MAUS::Exception exc)
     {
-      std::string error = squee.GetMessage();
-      throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyDouble"));
+      std::string error = exc.GetMessage();
+      throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyDouble"));
     }
   }
   else if( _mother )
     prop_dbl = _mother->propertyDouble( property );
   else
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyDouble");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyDouble");
   return prop_dbl;
 }
 
@@ -491,7 +491,7 @@ std::string                    MiceModule::propertyStringThis( std::string prope
   if(propertyExistsThis(property, "string")) 
     return propertyString(property);
   else                                       
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyStringThis");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyStringThis");
 }
 
 std::string             MiceModule::propertyString( std::string property ) const
@@ -502,10 +502,10 @@ std::string             MiceModule::propertyString( std::string property ) const
   if( propertyExistsThis( property, "string" ) )
     prop = _strings.find( property )->second;
   else if( _mother )
-    try{prop = _mother->propertyString( property );} catch(Squeal squee) {prop_exists = false;}
+    try{prop = _mother->propertyString( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else prop_exists = false;
   if (!prop_exists)
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyString");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyString");
 
   return prop;
 }
@@ -516,7 +516,7 @@ CLHEP::Hep3Vector   MiceModule::propertyHep3VectorThis( std::string property ) c
   if(propertyExistsThis(property, "hep3vector")) 
     return propertyHep3Vector(property);
   else                                       
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyHep3VectorThis");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyHep3VectorThis");
 }
 
 Hep3Vector		MiceModule::propertyHep3Vector( std::string property ) const
@@ -528,17 +528,17 @@ Hep3Vector		MiceModule::propertyHep3Vector( std::string property ) const
   if( propertyExistsThis( property, "Hep3Vector" ) )
     prop_str = _hep3vectors.find( property )->second;
   else if(  _mother )
-    try{return _mother->propertyHep3Vector( property );} catch(Squeal squee) {prop_exists = false;}
+    try{return _mother->propertyHep3Vector( property );} catch(MAUS::Exception exc) {prop_exists = false;}
   else prop_exists = false;
   if (!prop_exists)
-    throw Squeal(Squeal::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyHep3Vector");
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyHep3Vector");
   try{
     ModuleTextFileIO::parseString(prop_str, prop_h3v);
   }
-  catch(Squeal squee)
+  catch(MAUS::Exception exc)
   {
-    std::string error = squee.GetMessage();
-    throw(Squeal(Squeal::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyHep3Vector"));
+    std::string error = exc.GetMessage();
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error parsing MiceModule "+fullName()+" property "+property+". Error was reported as \'"+error+"\'", "MiceModule::propertyHep3Vector"));
   }
 
   return prop_h3v;

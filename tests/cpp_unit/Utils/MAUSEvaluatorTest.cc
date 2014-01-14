@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/Utils/MAUSEvaluator.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 TEST(MAUSEvaluatorTest, AllocationTest) {
     // check alloc dealloc
@@ -44,7 +44,7 @@ TEST(MAUSEvaluatorTest, EvaluateRawTest) {
     MAUS::MAUSEvaluator my_eval = MAUS::MAUSEvaluator();
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+2."), 3);
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.*cm+2.*m"), 2010.);
-    EXPECT_THROW(my_eval.evaluate("bob"), Squeal); // unknown variable
+    EXPECT_THROW(my_eval.evaluate("bob"), MAUS::Exception); // unknown variable
 }
 
 TEST(MAUSEvaluatorTest, EvaluateVariableTest) {
@@ -64,6 +64,6 @@ TEST(MAUSEvaluatorTest, ResetTest) {
     my_eval.set_variable("test_var", 2.); // basic check
     EXPECT_DOUBLE_EQ(my_eval.evaluate("1.+test_var"), 3.);
     my_eval.reset();
-    EXPECT_THROW(my_eval.evaluate("1.+test_var"), Squeal);
+    EXPECT_THROW(my_eval.evaluate("1.+test_var"), MAUS::Exception);
 }
 
