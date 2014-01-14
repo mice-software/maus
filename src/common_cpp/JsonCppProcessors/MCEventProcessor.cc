@@ -20,14 +20,13 @@ namespace MAUS {
 
 MCEventProcessor::MCEventProcessor()
     : _sci_fi_hit_proc(new SciFiHitProcessor()),
-	  _sci_fi_noise_hit_proc(new SciFiNoiseHitProcessor()),
-	  _sci_fi_lookup_proc(new SciFiMCLookupProcessor()),
+      _sci_fi_noise_hit_proc(new SciFiNoiseHitProcessor()),
       _tof_hit_proc(new TOFHitProcessor()),
       _special_virtual_hit_proc(new SpecialVirtualHitProcessor()),
       _track_proc(new TrackProcessor()),
       _virtual_hit_proc(new VirtualHitProcessor()) {
     RegisterPointerBranch
-		("primary", &_primary_proc, &MCEvent::GetPrimary,
+        ("primary", &_primary_proc, &MCEvent::GetPrimary,
                                     &MCEvent::SetPrimary, true);
     RegisterPointerBranch
         ("sci_fi_hits", &_sci_fi_hit_proc, &MCEvent::GetSciFiHits,
@@ -35,9 +34,6 @@ MCEventProcessor::MCEventProcessor()
     RegisterPointerBranch
         ("sci_fi_noise_hits", &_sci_fi_noise_hit_proc, &MCEvent::GetSciFiNoiseHits,
                                                        &MCEvent::SetSciFiNoiseHits, false);
-	RegisterPointerBranch
-		("sci_fi_lookup", &_sci_fi_lookup_proc, &MCEvent::GetSciFiLookup,
-                                                &MCEvent::SetSciFiLookup, false	);
     RegisterPointerBranch
         ("tof_hits", &_tof_hit_proc, &MCEvent::GetTOFHits,
                                      &MCEvent::SetTOFHits, false);
@@ -50,4 +46,3 @@ MCEventProcessor::MCEventProcessor()
                       &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, false);
 }
 }
-

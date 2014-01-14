@@ -39,8 +39,6 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
-#include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
-
 
 namespace MAUS {
 
@@ -146,9 +144,7 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
     _spill_num = spill->GetSpillNumber();
     // Loop over recon events in the spill
     for (size_t iRevt = 0; iRevt < spill->GetReconEvents()->size(); ++iRevt) {
-      SciFiLookup lookup;
-      MCEvent *mc_evt = (*spill->GetMCEvents())[iRevt];
-      lookup.make_hits_map(mc_evt);
+      // MCEvent *mc_evt = (*spill->GetMCEvents())[iRevt];
       SciFiEvent *evt = (*spill->GetReconEvents())[iRevt]->GetSciFiEvent();
       std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
       // Loop over helical pattern recognition tracks in event

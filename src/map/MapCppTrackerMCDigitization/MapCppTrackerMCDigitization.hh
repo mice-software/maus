@@ -38,7 +38,6 @@
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/DataStructure/SciFiMCLookup.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/Globals.hh"
@@ -76,19 +75,15 @@ class MapCppTrackerMCDigitization {
   std::string process(std::string document);
 
   /** @brief reads in json data to a Spill object
-   *
    */
   void read_in_json(std::string json_data);
 
   /** @brief builds digits
    */
-  void construct_digits(MAUS::SciFiHitArray *hits,
-                        int spill_num, int event_num,
+  void construct_digits(MAUS::SciFiHitArray *hits, int spill_num, int event_num,
                         MAUS::SciFiDigitPArray &digits);
 
   void add_noise(MAUS::SciFiNoiseHitArray *noises, MAUS::SciFiDigitPArray &digits);
-
-  void lookup_noise(MAUS::SciFiNoiseHitArray *noises, MAUS::SciFiMCLookupArray *lookups);
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */

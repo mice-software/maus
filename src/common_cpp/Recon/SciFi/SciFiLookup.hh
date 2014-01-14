@@ -25,7 +25,7 @@
 // C++ headers
 #include <vector>
 #include <map>
-// #include <cstdint>  // Need C++11
+#include "stdint.h"
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/MCEvent.hh"
@@ -50,24 +50,23 @@ class SciFiLookup {
     bool make_noise_map(MCEvent* evt);
 
     /** @brief Return a vector of SciFiHits used to make a SciFiDigit */
-    bool get_hits(const SciFiDigit* dig, std::vector<SciFiHit*>);
+    bool get_hits(const SciFiDigit* dig, std::vector<SciFiHit*> &hits);
 
     /** @brief Return a vector of SciFiNoiseHits used to make a SciFiDigit */
-    bool get_noise(const SciFiDigit* dig, std::vector<SciFiNoiseHit*>);
+    bool get_noise(const SciFiDigit* dig, std::vector<SciFiNoiseHit*> &noise);
 
     /** @brief Return a vector of SciFiNoiseHits used to make a SciFiDigit */
-    unsigned long long get_digit_id(const SciFiDigit* digit);
+    uint64_t get_digit_id(const SciFiDigit* digit);
 
     /** @brief Return the digit to hits map */
-    std::map<unsigned long long, std::vector<SciFiHit*> > get_hits_map() { return _hits_map; }
+    std::map<uint64_t, std::vector<SciFiHit*> > get_hits_map() { return _hits_map; }
 
     /** @brief Return the digit to noise hits map */
-    std::map<unsigned long long, std::vector<SciFiNoiseHit*> > get_noise_map()
-                                                                              { return _noise_map; }
+    std::map<uint64_t, std::vector<SciFiNoiseHit*> > get_noise_map() { return _noise_map; }
 
   private:
-    std::map<unsigned long long, std::vector<SciFiHit*> > _hits_map;
-    std::map<unsigned long long, std::vector<SciFiNoiseHit*> > _noise_map;
+    std::map<uint64_t, std::vector<SciFiHit*> > _hits_map;
+    std::map<uint64_t, std::vector<SciFiNoiseHit*> > _noise_map;
 };
 
 } // ~namespace MAUS

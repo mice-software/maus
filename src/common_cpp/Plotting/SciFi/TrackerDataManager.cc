@@ -85,15 +85,14 @@ void TrackerDataManager::process_digits(const Spill *spill, const std::vector<Sc
     // Quick check of lookup
     std::vector<SciFiHit*> hits;
     if ( _lookup.get_hits(dig, hits) ) {
+      // std::cerr << hits.size() << " hits returned by lookup for digit id "
+      //      << _lookup.get_digit_id(dig) <<  ", channel = " << dig->get_channel() << std::endl;
       if ( hits.size() > 0 ) {
         if (hits[0]) {
           ThreeVector hit_mom = hits[0]->GetMomentum();
-          std::cout << "Hit 0 mom: " << hit_mom.x() << "\t" << hit_mom.y() << hit_mom.z() << "\n";
         } else {
           std::cerr << "Invalid hit pointer returned by lookup" << std::endl;
         }
-      } else {
-        std::cerr << "0 hits returned by lookup" << std::endl;
       }
     } else {
       std::cerr << "Hits lookup failed, lookup returned false" << std::endl;

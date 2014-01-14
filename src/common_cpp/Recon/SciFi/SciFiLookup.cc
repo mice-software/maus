@@ -40,7 +40,7 @@ bool SciFiLookup::make_hits_map(MCEvent* evt) {
   std::vector<SciFiHit> *hits = evt->GetSciFiHits();
   for ( size_t i = 0; i < hits->size(); ++i ) {
     SciFiHit *hit = &(hits->at(i));
-    unsigned long long id = (unsigned long long)hit->GetChannelId()->GetID();
+    uint64_t id = (uint64_t)hit->GetChannelId()->GetID();
     // If id is not in map, make a hits vector for the key, and add the current hit
     if ( _hits_map.find(id) == _hits_map.end() ) {
       std::vector<SciFiHit*> v1;
@@ -65,7 +65,7 @@ bool SciFiLookup::make_noise_map(MCEvent* evt) {
   std::vector<SciFiNoiseHit> *hits = evt->GetSciFiNoiseHits();
   for ( size_t i = 0; i < hits->size(); ++i ) {
     SciFiNoiseHit *hit = &(hits->at(i));
-    unsigned long long id = (unsigned long long)hit->GetID();
+    uint64_t id = (uint64_t)hit->GetID();
     // If id is not in map, make a hits vector for the key, and add the current hit
     if ( _noise_map.find(id) == _noise_map.end() ) {
       std::vector<SciFiNoiseHit*> v1;
@@ -79,19 +79,23 @@ bool SciFiLookup::make_noise_map(MCEvent* evt) {
   return true;
 }
 
-bool SciFiLookup::get_hits(const SciFiDigit* dig, std::vector<SciFiHit*> hits) {
-  if (dig && _hits_map.size() > 0) {
-    unsigned long long digit_id = (unsigned long long)get_digit_id(dig);
+bool SciFiLookup::get_hits(const SciFiDigit* dig, std::vector<SciFiHit*> &hits) {
+  if (!dig) {
+    std::cerr << "SciFiLookup: Bad digit pointer passed" << std::endl;
+    return false;
+  } else if (_hits_map.size() < 1) {
+    std::cerr << "SciFiLookup: No hits in map, cannot perfom lookup" << std::endl;
+    return false;
+  } else {
+    uint64_t digit_id = (uint64_t)get_digit_id(dig);
     hits = _hits_map[digit_id];
     return true;
-  } else {
-    return false;
   }
 }
 
-bool SciFiLookup::get_noise(const SciFiDigit* dig, std::vector<SciFiNoiseHit*> noise) {
+bool SciFiLookup::get_noise(const SciFiDigit* dig, std::vector<SciFiNoiseHit*> &noise) {
   if (dig && _noise_map.size() > 0) {
-    unsigned long long digit_id = (unsigned long long)get_digit_id(dig);
+    uint64_t digit_id = (uint64_t)get_digit_id(dig);
     noise = _noise_map[digit_id];
     return true;
   } else {
@@ -99,10 +103,9 @@ bool SciFiLookup::get_noise(const SciFiDigit* dig, std::vector<SciFiNoiseHit*> n
   }
 }
 
-unsigned long long SciFiLookup::get_digit_id(const SciFiDigit* dig) {
-  unsigned long long digit_id = 1 * dig->get_channel() + 1000 * dig->get_plane() +
-                  10000 * dig->get_station() + 100000 * dig->get_tracker() +
-                  1000000 * dig->get_event();
+uint64_t SciFiLookup::get_digit_id(const SciFiDigit* dig) {
+  uint64_t digit_id = dig->get_channel() + 1000 * dig->get_plane() + 10000 * dig->get_station()
+                                         + 100000 * dig->get_tracker() + 1000000 * dig->get_event();
   return digit_id;
 }
 

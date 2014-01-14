@@ -71,15 +71,15 @@ class SciFiNoiseHit {
     /** Set the channel number */
     void SetChannel(int channel) {_channel = channel;}
 
-	/** Get NPE */
-	double GetNPE() const {return _npe;}
-	/** Set NPE */
-	void SetNPE(double npe) {_npe = npe;}
+    /** Get NPE */
+    double GetNPE() const {return _npe;}
+    /** Set NPE */
+    void SetNPE(double npe) {_npe = npe;}
 
-	/** Get Time */
-	double GetTime() const {return _time;}
-	/** Set Time */
-	void SetTime(double time) {_time = time;}
+    /** Get Time */
+    double GetTime() const {return _time;}
+    /** Set Time */
+    void SetTime(double time) {_time = time;}
 
     /** Get Used */
     bool GetUsed() const {return _used;}
@@ -92,9 +92,9 @@ class SciFiNoiseHit {
     void SetID(double digit_id) {_digit_id = digit_id;}
 
   private:
-	int _spill, _event;
-	int _tracker, _station, _plane, _channel;
-	double  _npe, _time;
+    int _spill, _event;
+    int _tracker, _station, _plane, _channel;
+    double  _npe, _time;
     bool _used;
     double _digit_id;
 
