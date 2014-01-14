@@ -29,7 +29,7 @@
 #include <fstream>
 
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 
 using std::string;
@@ -37,6 +37,8 @@ using std::ostream;
 using std::istream;
 using std::ifstream;
 using std::stringstream;
+
+namespace MAUS {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 /** Identifier for a single EMR channel.
@@ -52,14 +54,14 @@ class EMRChannelKey {
   EMRChannelKey(int pl, int o, int b, string d)
   : _plane(pl), _orientation(o), _bar(b), _detector(d) {}
 
-  explicit EMRChannelKey(string keyStr) throw(Squeal);
+  explicit EMRChannelKey(string keyStr) throw(Exception);
   virtual ~EMRChannelKey() {}
 
   bool operator==( EMRChannelKey key );
   bool operator!=( EMRChannelKey key );
 
   friend ostream& operator<<( ostream& stream, EMRChannelKey key );
-  friend istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception);
 
   /** This function converts the DAQChannelKey into string.
   * \return String identifier.
@@ -133,10 +135,6 @@ class EMRChannelMap {
   std::vector<EMRChannelKey*>   _emrKey;
   std::vector<DAQChannelKey*>   _dbbKey;
 };
+}
+
 #endif
-
-
-
-
-
-

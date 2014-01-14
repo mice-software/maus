@@ -17,6 +17,8 @@
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 
+namespace MAUS {
+
 int V1290DataProcessor::Process(MDdataContainer* aPartEventPtr) {
   // Cast the argument to structure it points to.
   // This process should be called only with MDfragmentV1290 argument
@@ -1193,5 +1195,5 @@ int DBBChainCppDataProcessor::Process(MDdataContainer* aFragPtr) {
 void DBBChainCppDataProcessor::fill_daq_data() {
   _daq_data->GetEMRDaqPtr()->SetDBBArray(_spill);
 }
+}
 //////////////////////////////////////////////////////////////////////////////////////////////
-

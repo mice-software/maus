@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
@@ -57,8 +57,8 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     _fname = JsonWrapper::GetProperty(datacards,
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     if (_fname == "") {
-        throw(Squeal(
-          Squeal::recoverable,
+        throw(Exception(
+          Exception::recoverable,
           "output_root_file_name is empty",
           "OutputCppRoot::birth"
         ));
@@ -72,8 +72,8 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     } else if (mode == "end_of_run_file_per_run") {
         _mode = end_of_run_file_per_run;
     } else {
-        throw(Squeal(
-          Squeal::recoverable,
+        throw(Exception(
+          Exception::recoverable,
           "output_root_file_name '"+mode+"' is not valid; should be one of\n"+
           std::string("   one_big_file\n")+
           std::string("   one_file_per_run\n")+
@@ -103,8 +103,8 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     data_cpp = conv.convert(&data_json);
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
-        throw(Squeal(
-          Squeal::recoverable,
+        throw(Exception(
+          Exception::recoverable,
           "OutputCppRoot was not initialised properly",
           "OutputCppRoot::write_event"
         ));
@@ -172,7 +172,7 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
     } else if (type == "RunFooter") {
         return _run_footer_tp;
     } else {
-        throw Squeal(Squeal::recoverable,
+        throw MAUS::Exception(Exception::recoverable,
                      "Failed to recognise maus_event_type "+type,
                      "OutputCppRoot::get_event_type");
     }
@@ -241,7 +241,7 @@ void OutputCppRoot::check_file_exists(DataT data_cpp) {
     if (stat(dir.c_str(), &attributes) < 0 || !S_ISDIR(attributes.st_mode)) {
         // if stat fails, maybe the directory doesnt exists
         if (mkdir(dir.c_str(), ACCESSPERMS) == -1) {
-            throw Squeal(Squeal::recoverable, "Failed to make directory "+dir,
+            throw Exception(Exception::recoverable, "Failed to make directory "+dir,
                          "OutputCppRoot::check_file_exists");
         }
     }

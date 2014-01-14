@@ -8,6 +8,9 @@ Release Notes
 MAUS-v0.7.6
   The following changes were made:
     - EMR Reconstruction
+    - first version of Global Track Reconstruction
+    - stability fixes for online reconstruction
+    - calls to squeals replaced by exceptions
     - support for long long integers
   If upgrading from a previous version, redo the entire installation
 MAUS-v0.7.5

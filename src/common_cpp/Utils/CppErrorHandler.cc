@@ -29,8 +29,8 @@ namespace MAUS {
 
 CppErrorHandler* CppErrorHandler::instance = NULL;
 
-Json::Value CppErrorHandler::HandleSqueal
-                         (Json::Value val, Squeal exc, std::string class_name) {
+Json::Value CppErrorHandler::HandleException
+                         (Json::Value val, Exception exc, std::string class_name) {
   Squeak::mout(Squeak::debug) << "Stack trace:" << exc.GetStackTrace()
                                                                    << std::endl;
   return getInstance()->ExceptionToPython(exc.what(), val, class_name);
@@ -41,8 +41,8 @@ Json::Value CppErrorHandler::HandleStdExc
   return getInstance()->ExceptionToPython((&exc)->what(), val, class_name);
 }
 
-void CppErrorHandler::HandleSquealNoJson(Squeal exc, std::string class_name) {
-  HandleSqueal(Json::Value(), exc, class_name);
+void CppErrorHandler::HandleExceptionNoJson(Exception exc, std::string class_name) {
+  HandleException(Json::Value(), exc, class_name);
 }
 
 void CppErrorHandler::HandleStdExcNoJson

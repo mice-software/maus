@@ -38,6 +38,8 @@
 #include "DataStructure/DAQData.hh"
 #include "Interface/Squeak.hh"
 
+namespace MAUS {
+
 /** \class InputCppDAQData
 * Load MICE raw data and unpack it into a JSON stream.
 * 
@@ -206,5 +208,6 @@ class InputCppDAQData {
 
   void resetAllProcessors();
 };
+}
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

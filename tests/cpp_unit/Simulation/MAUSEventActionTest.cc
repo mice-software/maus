@@ -19,7 +19,7 @@
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 using MAUS::MAUSEventAction;
 using MAUS::MAUSGeant4Manager;
@@ -27,11 +27,11 @@ using MAUS::MAUSGeant4Manager;
 TEST(MAUSEventActionTest, SetGetEventsTest) {
     MAUSEventAction* _eventAct
                            = MAUSGeant4Manager::GetInstance()->GetEventAction();
-    EXPECT_THROW(_eventAct->SetEvents(Json::Value(Json::objectValue)), Squeal);
+    EXPECT_THROW(_eventAct->SetEvents(Json::Value(Json::objectValue)), MAUS::Exception);
     Json::Value event_array = Json::Value(Json::arrayValue);
     event_array.append(Json::Value(Json::objectValue));
     event_array.append(Json::Value(Json::arrayValue));
-    EXPECT_THROW(_eventAct->SetEvents(event_array), Squeal);
+    EXPECT_THROW(_eventAct->SetEvents(event_array), MAUS::Exception);
     event_array[1] = Json::Value(Json::objectValue);
     EXPECT_NO_THROW(_eventAct->SetEvents(event_array));
     EXPECT_EQ(event_array, _eventAct->GetEvents());
@@ -58,7 +58,7 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     // _events out of range
     Json::Value events = Json::Value(Json::arrayValue);
     _g4->GetEventAction()->SetEvents(events);
-    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Squeal);
+    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
 
     Json::Value::UInt zero(0);
     events.append(Json::Value(Json::objectValue));
@@ -81,7 +81,7 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
 
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
     // _events out of range
-    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Squeal);
+    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
 
     // reset _primary index
     _g4->GetEventAction()->SetEvents(events);

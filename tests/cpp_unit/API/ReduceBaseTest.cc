@@ -40,14 +40,14 @@ namespace MAUS {
     FRIEND_TEST(ReduceBaseTest, TestCopyConstructor);
   };
 
-  class MyReducer_squeal : public MyReducer {
+  class MyReducer_maus_exception : public MyReducer {
   public:
-    MyReducer_squeal() : MyReducer() {}
+    MyReducer_maus_exception() : MyReducer() {}
 
   private:
     virtual int* _process(int* t) {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _process",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _process",
 		   "int* _process(int* t) const");
     }
   };
@@ -140,13 +140,13 @@ namespace MAUS {
 	<< std::endl;
     }
     /////////////////////////////////////////////////////
-    MyReducer_squeal mm_s;
+    MyReducer_maus_exception mm_s;
     try {
       mm_s.process(i);
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -157,7 +157,7 @@ namespace MAUS {
     }
     catch(...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 

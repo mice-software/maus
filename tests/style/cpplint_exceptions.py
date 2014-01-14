@@ -27,6 +27,7 @@ exceptions = { #pylint: disable=C0103
 
 CPP_CM = os.path.join('src','common_cpp')
 LEGACY = os.path.join('src','LEGACY')
+MAP = os.path.join('src', 'map')
 TST = os.path.join('tests', 'cpp_unit')
 
 exceptions[os.path.join(CPP_CM, 'Simulation',
@@ -79,17 +80,22 @@ exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
 ]
 
 exceptions[os.path.join(TST, 'Maths', 'VectorTest.cc')] = [
-('  } catch (Squeal squeal) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
 exceptions[os.path.join(TST, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
-('  } catch (Squeal squeal) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
 exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
-('  } catch (Squeal squeal) {}',
+('  } catch (MAUS::Exception exc) {}',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane')
+]
+
+exceptions[os.path.join(CPP_CM, 'Optics', 'TransferMapOpticsModel.cc')] = [
+('  } catch (std::exception ex) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
@@ -180,27 +186,33 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
 ]
 
 exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
-('  } catch (Squeal squeal) {}',
+('  } catch (MAUS::Exception exc) {}',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Optics',
                         'LinearApproximationOpticsModelTest.cc')] = [
-('  } catch (Squeal squeal) {',
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Optics',
                         'PolynomialOpticsModelTest.cc')] = [
-('  } catch (Squeal squeal) {',
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (Squeal squeal) {',
+('    } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join(TST, 'Recon/Global',
-                        'TrackPointTest.cc')] = [
-('  } catch (Squeal squeal) {',
+                        'DataStructureHelperTest.cc')] = [
+('    } catch (MAUS::Exception& exc) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(TST, 'Recon/Global',
+                        'MinuitTrackFitterTest.cc')] = [
+('  } catch (MAUS::Exception exc) {',
  '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
@@ -238,6 +250,28 @@ exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData',
  'This really is a long, it is defined in time.h.', 'rogers')
 ]
 
+exceptions[os.path.join(CPP_CM, 'Simulation',
+                        'MAUSPrimaryGeneratorAction.cc')] = [
+('  } catch (std::exception stde) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(CPP_CM, 'Recon/Global',
+                        'MinuitTrackFitter.cc')] = [
+('  } catch (Exception exc) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+('    } catch (Exception exc) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
+exceptions[os.path.join(MAP, 'MapCppGlobalTrackReconstructor',
+                        'MapCppGlobalTrackReconstructor.cc')] = [
+('    } catch (Exception exc) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+('  } catch (Exception exc) {',
+ '"catch" is a keyword like "for" and "if", not a function', 'lane'),
+]
+
 exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyCovarianceMatrix.hh')] = [
 ('                   reinterpret_cast<CovarianceMatrix* (*)'+\
                                                       '(PyObject*)>(gcm_void);',
@@ -257,4 +291,5 @@ exceptions[os.path.join('src', 'py_cpp', 'PyMiceModule.hh')] = [
 'cpplint misinterprets function pointer as a cast',
 'rogers')
 ]
+
 

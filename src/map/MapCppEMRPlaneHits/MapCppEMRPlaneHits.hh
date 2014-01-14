@@ -46,6 +46,8 @@
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
 
+namespace MAUS {
+
 typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector;
 typedef std::vector<EMRBarHitsVector>   EMRBarVector;
 typedef std::vector<EMRBarVector>       EMRPlaneVector;
@@ -113,5 +115,6 @@ class MapCppEMRPlaneHits {
   EMREventVector_2     _emr_events_tmp2;
   EMREventVector_4     _emr_events_tmp4;
 };
-#endif
+}
 
+#endif

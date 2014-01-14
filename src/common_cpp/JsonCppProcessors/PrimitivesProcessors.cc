@@ -14,8 +14,12 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+
+#include <sstream>
+
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -23,8 +27,8 @@ double* DoubleProcessor::JsonToCpp(const Json::Value& json_double) {
   if (json_double.isNumeric()) {
       return new double (json_double.asDouble());
   } else {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to double",
           "DoubleProcessor::JsonToCpp"
       ));
@@ -47,8 +51,8 @@ std::string* StringProcessor::JsonToCpp(const Json::Value& json_string) {
   if (json_string.isString()) {
       return new std::string (json_string.asString());
   } else {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to string",
           "StringProcessor::JsonToCpp"
       ));
@@ -70,8 +74,8 @@ int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
   if (json_int.isInt()) {
       return new int (json_int.asInt());
   } else {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to integer",
           "IntProcessor::JsonToCpp"
       ));
@@ -95,9 +99,12 @@ unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
   } else if (json_uint.isInt() && json_uint.asInt() >= 0) {
       return new unsigned int (json_uint.asUInt());
   } else {
-      throw(Squeal(
-          Squeal::recoverable,
-          "Failed to convert json value to unsigned int",
+      std::stringstream message;
+      message << "Failed to convert json value \"" << json_uint << "\""
+              << " to unsigned int";
+      throw(Exception(
+          Exception::recoverable,
+          message.str(),
           "UIntProcessor::JsonToCpp"
       ));
   }
@@ -117,16 +124,16 @@ Json::Value* UIntProcessor::CppToJson
 
 uint64* LLUIntProcessor::JsonToCpp(const Json::Value& json_string) {
     if (!json_string.isString()) {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to long long int - not a string type",
           "LLUIntProcessor::JsonToCpp"
       ));
     }
     std::string cpp_string = json_string.asString();
     if (cpp_string[0] == '-') {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to long long int - value was negative",
           "LLUIntProcessor::JsonToCpp"
       ));
@@ -152,8 +159,8 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
   if (json_bool.isBool()) {
       return new bool (json_bool.asBool());
   } else {
-      throw(Squeal(
-          Squeal::recoverable,
+      throw(Exception(
+          Exception::recoverable,
           "Failed to convert json value to bool",
           "BoolProcessor::JsonToCpp"
       ));

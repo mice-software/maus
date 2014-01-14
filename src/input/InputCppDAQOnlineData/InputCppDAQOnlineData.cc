@@ -19,6 +19,8 @@
 
 #include "src/input/InputCppDAQOnlineData/InputCppDAQOnlineData.hh"
 
+namespace MAUS {
+
 InputCppDAQOnlineData::InputCppDAQOnlineData()
 :InputCppDAQData::InputCppDAQData() {
   std::cerr << "MAUS running in online mode" << std::endl;
@@ -85,4 +87,4 @@ void InputCppDAQOnlineData::setMonitorSrc(std::string mon) {
   _dataManager->setMonSrc(mon);
   _dataManager->Init();
 }
-
+}

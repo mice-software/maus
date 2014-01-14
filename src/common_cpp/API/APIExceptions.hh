@@ -55,7 +55,7 @@ namespace MAUS {
       std::string* ret = new std::string();
       *ret +="An unhandled exception was thrown by '";
       *ret += _classname;
-      *ret += "' which was not of type 'Squeal' or deriving from 'std::exception'";
+      *ret += "' which was not of type 'Exception' or deriving from 'std::exception'";
       return ret->c_str();
     }
     FRIEND_TEST(APIExceptionsTest, TestUnhandledExceptionConstructor);

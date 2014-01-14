@@ -21,10 +21,12 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppTOFSlabHits/MapCppTOFSlabHits.hh"
+
+namespace MAUS {
 
 bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
@@ -45,8 +47,8 @@ bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
                                                            JsonWrapper::realValue).asDouble();
 
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -104,9 +106,9 @@ std::string MapCppTOFSlabHits::process(std::string document) {
         }
       }
     }
-  } catch(Squeal squee) {
+  } catch(Exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
+                                       ->HandleException(root, exc, _classname);
   } catch(std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);
@@ -280,4 +282,4 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
 
   return xDocSlabHit;
 }
-
+}

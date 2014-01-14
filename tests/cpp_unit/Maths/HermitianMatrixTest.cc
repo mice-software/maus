@@ -190,7 +190,7 @@ const MAUS::complex HermitianMatrixTest::complex_scaling_factor_
 
 TEST_F(HermitianMatrixTest, DefaultConstructor) {
   HermitianMatrix matrix_h0;
-  ASSERT_EQ(matrix_h0.size(),     (size_t) 0);
+  ASSERT_EQ(matrix_h0.size(), (size_t) 0);
 }
 
 TEST_F(HermitianMatrixTest, CopyConstructor) {
@@ -234,7 +234,8 @@ TEST_F(HermitianMatrixTest, Set) {
 TEST_F(HermitianMatrixTest, Assignment) {
   // plain vanilla assignment
   const HermitianMatrix matrix_h0(size_, complex_data_);
-  HermitianMatrix matrix_h1 = matrix_h0;
+  HermitianMatrix matrix_h1;
+  matrix_h1 = matrix_h0;
   EXPECT_TRUE(equal(matrix_h1, matrix_h0));
 }
 

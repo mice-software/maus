@@ -24,6 +24,8 @@
 
 #include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
+namespace MAUS {
+
 bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppEMRPlaneHits";
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
@@ -79,10 +81,10 @@ bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
     }
 
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exc) {
+    CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
   return false;
@@ -107,14 +109,14 @@ string MapCppEMRPlaneHits::process(string document) {
     return JsonWrapper::JsonToString(spill_json);
   }
 
-  MAUS::Data* spill_cpp;
+  Data* spill_cpp;
   try {
-    spill_cpp = MAUS::JsonCppSpillConverter().convert(&spill_json);
+    spill_cpp = JsonCppSpillConverter().convert(&spill_json);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
 //     ss << squee.what() << std::endl;
-    ss << _classname << " says: Failed to convert the input document into MAUS::Data";
+    ss << _classname << " says: Failed to convert the input document into Data";
     errors["bad_json_document"] = ss.str();
     spill_json["errors"] = errors;
     return JsonWrapper::JsonToString(spill_json);
@@ -124,12 +126,12 @@ string MapCppEMRPlaneHits::process(string document) {
 
   Json::Value* spill_json_out;
   try {
-    spill_json_out = MAUS::CppJsonSpillConverter().convert(spill_cpp);
+    spill_json_out = CppJsonSpillConverter().convert(spill_cpp);
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
 //     ss << squee.what() << std::endl;
-    ss << _classname << " says: Failed to convert the output MAUS::Data into Json";
+    ss << _classname << " says: Failed to convert the output Data into Json";
     errors["bad_cpp_data"] = ss.str();
     spill_json["errors"] = errors;
     return JsonWrapper::JsonToString(spill_json);
@@ -143,12 +145,12 @@ string MapCppEMRPlaneHits::process(string document) {
   return document;
 }
 
-void MapCppEMRPlaneHits::process(MAUS::Data *data) {
+void MapCppEMRPlaneHits::process(Data *data) {
 
-  MAUS::Spill *spill    = data->GetSpill();
+  Spill *spill    = data->GetSpill();
   if (spill->GetDAQData() == NULL)
       return;
-  MAUS::EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
+  EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
   int nPartEvents = emr_data.GetV1731NumPartEvents();
 //   cout << "nPartEvts: " << nPartEvents << endl;
   reset_data_tmp(nPartEvents);
@@ -160,12 +162,12 @@ void MapCppEMRPlaneHits::process(MAUS::Data *data) {
   fill(spill, nPartEvents);
 }
 
-void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
 //   cout << "DBBArraySize: " << EMRdaq.GetDBBArraySize() << endl;
   int nDBBs = EMRdaq.GetDBBArraySize();
   for (int idbb = 0; idbb < nDBBs; idbb++) {
 
-    MAUS::DBBSpillData dbb = EMRdaq.GetDBBArrayElement(idbb);
+    DBBSpillData dbb = EMRdaq.GetDBBArrayElement(idbb);
     if ( dbb.GetTriggerCount() != nPartTrigger ) {
       Squeak::mout(Squeak::error)
       << "ERROR in  MapCppEMRPlaneHits::processDBB: number of triggers mismatch ("
@@ -180,7 +182,7 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
 //     int nTr     = dbb.GetDBBTriggersArraySize();
 
     for (int ihit = 0; ihit < nHits; ihit++) {
-      MAUS::DBBHit this_hit = dbb.GetDBBHitsArrayElement(ihit);
+      DBBHit this_hit = dbb.GetDBBHitsArrayElement(ihit);
       int xCh = this_hit.GetChannel();
       int lt  = this_hit.GetLTime();
       int tt  = this_hit.GetTTime();
@@ -195,7 +197,7 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
 //         cout << *emr_key << " --> lt: " << lt << "  tt: " << tt << endl;
 
         for (int ipe = 0; ipe < nPartTrigger; ipe++) {
-          MAUS::DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(ipe);
+          DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(ipe);
           int tr_lt = this_trigger.GetLTime();
 //           int tr_tt = this_trigger.GetTTime();
 //           int xCh   = this_trigger.GetChannel();
@@ -207,7 +209,7 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
 
           int delta_t = lt - tr_lt;
           if (delta_t > _trigger_window_lower && delta_t < _trigger_window_upper) {
-            MAUS::EMRBarHit bHit;
+            EMRBarHit bHit;
             bHit.SetTot(tt-lt);
             bHit.SetDeltaT(delta_t - _trigger_window_lower);
 //             cout << "*---> " << *emr_key << " --> trigger_Id: " << ipe
@@ -222,17 +224,17 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
   }
 }
 
-void MapCppEMRPlaneHits::processFADC(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
 //   cout << "GetV1731NumPartEvents: " << EMRdaq.GetV1731NumPartEvents() << endl;
 
   for (int ipe = 0; ipe < nPartTrigger; ipe++) {
 
-    MAUS::V1731HitArray fADChits = EMRdaq.GetV1731PartEvent(ipe);
+    V1731HitArray fADChits = EMRdaq.GetV1731PartEvent(ipe);
     int nHits = fADChits.size();
 //     cout << "PartEvent " << ipe << "  --> " << nHits << " hits\n" << endl;
 
     for (int ihit = 0; ihit < nHits; ihit++) {
-      MAUS::V1731 fADChit = fADChits[ihit];
+      V1731 fADChit = fADChits[ihit];
       int xLDC  = fADChit.GetLdcId();
       int xGeo  = fADChit.GetGeo();
       int xCh   = fADChit.GetChannel();
@@ -255,19 +257,19 @@ void MapCppEMRPlaneHits::processFADC(MAUS::EMRDaq EMRdaq, int nPartTrigger) {
   }
 }
 
-void MapCppEMRPlaneHits::fill(MAUS::Spill *spill, int nPartTrigger) {
-  MAUS::ReconEventArray *recEvts =  spill->GetReconEvents();
+void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
   if (recEvts->size() == 0) {
     for (int ipe = 0; ipe < nPartTrigger; ipe++)
-      recEvts->push_back(new MAUS::ReconEvent);
+      recEvts->push_back(new ReconEvent);
   }
 
   for (int ipe = 0; ipe < nPartTrigger; ipe++) {
-    MAUS::EMREvent *evt = new MAUS::EMREvent;
-    MAUS::EMRPlaneHitArray plArray;
+    EMREvent *evt = new EMREvent;
+    EMRPlaneHitArray plArray;
 
     for (int ipl = 0; ipl < NUM_DBB_PLANES; ipl++) {
-      MAUS::EMRPlaneHit *plHit = new MAUS::EMRPlaneHit;
+      EMRPlaneHit *plHit = new EMRPlaneHit;
       plHit->SetPlane(ipl);
       plHit->SetTrigger(ipe);
 
@@ -284,12 +286,12 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill, int nPartTrigger) {
       plHit->SetSpill(xSpill);
       plHit->SetDeltaT(xDeltaT);
 
-      MAUS::EMRBarArray barArray;
+      EMRBarArray barArray;
 
       for (int ibar = 0; ibar < NUM_DBB_CHANNELS; ibar++) {
         int nHits = _emr_events_tmp4[ipe][ipl][ibar].size();
         if ( nHits ) {
-          MAUS::EMRBar *bar = new MAUS::EMRBar;
+          EMRBar *bar = new EMRBar;
           bar->SetBar(ibar);
           bar->SetEMRBarHitArray(_emr_events_tmp4[ipe][ipl][ibar]);
           barArray.push_back(bar);
@@ -329,4 +331,5 @@ void MapCppEMRPlaneHits::reset_data_tmp(int nPartEvts) {
   for (int ipe = 0; ipe < nPartEvts ;ipe++) {
     _emr_events_tmp2[ipe].resize(NUM_DBB_PLANES);
   }
+}
 }

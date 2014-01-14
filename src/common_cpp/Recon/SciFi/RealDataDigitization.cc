@@ -38,7 +38,7 @@ void RealDataDigitization::initialise() {
   bool map = load_mapping("mapping_7.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
           "RealDataDigitization::process"));
   }
@@ -50,7 +50,7 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     spill->SetDAQData(new DAQData());
 
   if (spill->GetReconEvents() == NULL)
-    spill->SetReconEvents(new ReconEventArray());
+    spill->SetReconEvents(new ReconEventPArray());
 
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
@@ -271,7 +271,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker Calibration.",
           "RealDataDigitization::load_calibration"));
   }
@@ -309,7 +309,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker Mapping.",
           "RealDataDigitization::load_mapping"));
   }
@@ -369,7 +369,7 @@ bool RealDataDigitization::load_bad_channels() {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker bad channel list.",
           "RealDataDigitization::load_bad_channels"));
   }

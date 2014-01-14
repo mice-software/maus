@@ -33,7 +33,7 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -47,7 +47,7 @@ namespace MAUS {
 /** @class CppErrorHandler
  *  \brief Handler for c++ errors
  *
- *  In MAUS we typically have two sorts of errors - Squeals (which are specific
+ *  In MAUS we typically have two sorts of errors - Exceptions (which are specific
  *  to MAUS) and std::exceptions (which are more generic). These static
  *  functions are used to handle the errors, by default handing them up to the
  *  PyErrorHandler (See src/common_py/ErrorHandler).
@@ -65,10 +65,10 @@ class CppErrorHandler {
    * error handler.
    *
    *  @param val Json document that will take any error
-   *  @param exc the (MAUS Squeal) exception
+   *  @param exc the (MAUS Exception) exception
    *  @param class_name the name of the class that generated the error
    */
-  Json::Value HandleSqueal(Json::Value val, Squeal exc, std::string class_name);
+  Json::Value HandleException(Json::Value val, Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
@@ -78,7 +78,7 @@ class CppErrorHandler {
    *  @param exc the (std) exception
    *  @param class_name the name of the class that generated the error
    */
-  void HandleSquealNoJson(Squeal exc, std::string class_name);
+  void HandleExceptionNoJson(Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *

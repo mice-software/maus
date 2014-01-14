@@ -5,6 +5,7 @@
 
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/legacy/Config/ModuleConverter.hh"
@@ -88,7 +89,7 @@ namespace Optics
     //Make a station id from a special hit
     StationId(SpecialHit hit); 
     //Make a station id from a MiceModule
-    StationId(const MiceModule& mod) throw(Squeal);
+    StationId(const MiceModule& mod) throw(MAUS::Exception);
     //Return string that names the station type (virtual, special, ...)
     std::string  StationTypeByString() const;
     station_type StationType()         const {return _type;}

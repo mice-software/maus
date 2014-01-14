@@ -20,7 +20,7 @@
 
 #include "CovarianceMatrix.hh"
 #include "PhaseSpaceVector.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 class Material
 {
