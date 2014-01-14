@@ -1,1 +1,1 @@
-{"tests/integration/geometries/simulate_mice.py": 1, "src/input/InputCppDAQData/test_InputCppDAQData.py": 1}
+{"tests/integration/geometries/simulate_mice.py": 1, "src/map/MapCppEMRPlaneHits/test_map_cpp_emr_plane_hits.py": 1, "bin/analyze_data_offline.py": 1, "src/input/InputCppDAQData/test_InputCppDAQData.py": 1}
