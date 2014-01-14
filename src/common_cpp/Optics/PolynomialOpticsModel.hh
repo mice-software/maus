@@ -21,6 +21,7 @@
 
 #include <vector>
 
+#include "src/common_cpp/DataStructure/Primary.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/TransferMapOpticsModel.hh"
 
@@ -54,7 +55,7 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
   //  Constructors
   // *************************
 
-  explicit PolynomialOpticsModel(const Json::Value & configuration);
+  explicit PolynomialOpticsModel(Json::Value const * const configuration);
 
   /** @brief no memory allocated so doesn't do anything.
    */
@@ -62,17 +63,18 @@ class PolynomialOpticsModel : public TransferMapOpticsModel {
 
   void Build();
 
+  const std::vector<int64_t> GetAvailableMapPositions() const;
  protected:
   Algorithm algorithm_;
   size_t polynomial_order_;
   std::vector<double> weights_;
 
   // override base class version
-  const std::vector<recon::global::TrackPoint> BuildFirstPlaneHits();
+  const std::vector<PhaseSpaceVector> PrimaryVectors();
 
   const TransferMap * CalculateTransferMap(
-    const std::vector<recon::global::TrackPoint> & start_plane_hits,
-    const std::vector<recon::global::TrackPoint> & station_hits)
+    const std::vector<PhaseSpaceVector> & start_plane_hits,
+    const std::vector<PhaseSpaceVector> & end_plane_hits)
     const;
 
   void SetupAlgorithm();

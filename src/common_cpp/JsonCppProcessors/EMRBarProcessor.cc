@@ -12,17 +12,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#ifndef SQUEAL_HH
-#define SQUEAL_HH
+#include "src/common_cpp/JsonCppProcessors/EMRBarHitProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRBarProcessor.hh"
 
-#include "src/common_cpp/Utils/Exception.hh"
+namespace MAUS {
 
-/** This is deprecated and will be removed; please use MAUS::Exception */
-typedef MAUS::Exception Squeal;
-
-#endif
+EMRBarProcessor::EMRBarProcessor() : _hit_arr_proc(new EMRBarHitProcessor()) {
+    RegisterValueBranch
+          ("bar", &_int_proc, &EMRBar::GetBar,
+          &EMRBar::SetBar, true);
+    RegisterValueBranch
+          ("emr_bar_hits", &_hit_arr_proc, &EMRBar::GetEMRBarHitArray,
+          &EMRBar::SetEMRBarHitArray, true);
+}
+}  // namespace MAUS
 
 

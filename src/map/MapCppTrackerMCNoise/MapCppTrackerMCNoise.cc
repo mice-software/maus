@@ -1,3 +1,4 @@
+
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -44,8 +45,8 @@ bool MapCppTrackerMCNoise::birth(std::string argJsonConfigDocument) {
     _configJSON = Globals::GetConfigurationCards();
     poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
     return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -85,8 +86,10 @@ std::string MapCppTrackerMCNoise::process(std::string document) {
 }
 
 void MapCppTrackerMCNoise::read_in_json(std::string json_data) {
-  Json::FastWriter writer;
+  Json::Reader reader;
   Json::Value json_root;
+  Json::FastWriter writer;
+
   if (_spill_cpp != NULL) {
     delete _spill_cpp;
     _spill_cpp = NULL;
@@ -97,7 +100,7 @@ void MapCppTrackerMCNoise::read_in_json(std::string json_data) {
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
   } catch(...) {
-    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
+    std::cerr << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
     std::stringstream ss;
@@ -165,4 +168,6 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) {
     spill.GetMCEvents()->at(event_i)->SetSciFiNoiseHits(noise_hits);
   } // end of event_i of spill_n, start of event_i+1.
 }
-}
+
+} // ~namespace MAUS
+

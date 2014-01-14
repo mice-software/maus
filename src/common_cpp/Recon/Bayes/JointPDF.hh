@@ -29,7 +29,6 @@
 #include "TMatrixD.h"
 #include "TRandom.h"
 
-#include "Interface/Squeal.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 

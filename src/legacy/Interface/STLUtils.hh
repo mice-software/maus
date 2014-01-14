@@ -24,7 +24,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 /** STLUtils namespace contains useful utility functions for the STL.
  *
@@ -124,7 +124,7 @@ TEMP_CLASS FromString(std::string value);
  *
  *  Search through a string looking for environment variables with format like
  *  "my_${ENV_VARIABLE}_string". Replace the ${ENV_VARIABLE} with the value of
- *  the environment variable. Throw a Squeal if the environment variable could
+ *  the environment variable. Throw a Exception if the environment variable could
  *  not be found.
  */
 std::string ReplaceVariables(std::string fileName);
@@ -173,8 +173,9 @@ TEMP_CLASS FromString(std::string value) {
   TEMP_CLASS out;
   ss >> out;
   if (ss.fail()) {
-      throw Squeal(Squeal::recoverable, "Failed to parse "+value,
-                   "STLUtils::FromString(...)");
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+                            "Failed to parse "+value,
+                            "STLUtils::FromString(...)");
   }
   return out;
 }

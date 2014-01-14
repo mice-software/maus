@@ -27,7 +27,7 @@
 
 namespace MiceModToG4Solid
 {
-	//! Build some G4VSolid. throw a Squeal if it isn't supported.
+	//! Build some G4VSolid. throw a Exception if it isn't supported.
 	G4VSolid * buildSolid    ( MiceModule* mod );
         
         //! Builds a G4Tessllated solid.
@@ -92,7 +92,7 @@ namespace MiceModToG4Solid
 	//! Get a MiceModule from some file
 	MiceModule* getModule      (MiceModule* mod, std::string modName);
 
-	//! throw a Squeal if mod->Dimensions() are <= 0. length is either 2 or 3 (depending on 
+	//! throw a Exception if mod->Dimensions() are <= 0. length is either 2 or 3 (depending on 
 	//! how many parameters the dimensions takes
 	void       checkDim(MiceModule* mod, size_t length);
 }

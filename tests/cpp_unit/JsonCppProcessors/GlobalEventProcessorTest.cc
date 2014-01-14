@@ -38,8 +38,8 @@ class GlobalEventProcessorTestClass : public ::testing::Test {
     // Fill Cpp GlobalEvent
     detector_array[0] = MAUS::DataStructure::Global::kUndefined;
     detector_array[1] = MAUS::DataStructure::Global::kVirtual;
-    detector_array[2] = MAUS::DataStructure::Global::kTracker1_1;
-    detector_array[3] = MAUS::DataStructure::Global::kTracker2_2;
+    detector_array[2] = MAUS::DataStructure::Global::kTracker0_1;
+    detector_array[3] = MAUS::DataStructure::Global::kTracker1_2;
 
     for (int i = 0; i < 4; ++i) {
       _track_point.push_back(new MAUS::DataStructure::Global::TrackPoint());

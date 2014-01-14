@@ -13,7 +13,7 @@ Module TrackerStation5
   PropertyInt Station 5
   PropertyString Material POLYSTYRENE
   PropertyDouble OpticsMaterialLength 0 mm
-  Module Tracker/Tracker0Station5ViewV.dat
+  Module Tracker/TrackerViewV.dat
   {
     Position 0.0 0.0 -0.6398 mm
     Rotation 0.0 0.0 -120.0 degree

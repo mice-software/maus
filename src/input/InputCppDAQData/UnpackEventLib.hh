@@ -35,70 +35,12 @@
 #include "unpacking/MDfragmentVLSB_C.h"
 #include "unpacking/MDfragmentV830.h"
 #include "unpacking/MDfragmentDBB.h"
+#include "unpacking/MDfragmentDBBChain.h"
 #include "unpacking/MDequipMap.h"
 
-#include "Utils/DAQChannelMap.hh"
+#include "src/input/InputCppDAQData/fADCDataProcessor.hh"
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-/** MDarranger
- * Simple class to hold and arrange the Json document
- * containing all the daq spill information.
- */
-
-class MDarranger : public MDprocessor {
- public:
-  MDarranger() {}
-  virtual ~MDarranger() {}
-
-  /** Sets the json document to which the MDarranger will write
-   */
-  void set_JSON_doc(Json::Value *doc) {_docSpill = doc;}
-
-  /** Gets the json document where DAQ data is written
-   */
-  Json::Value* get_JSON_doc() {return _docSpill;}
-
-  /**
-  * This function sets the DAQ map.
-  * \param[in] map The DAQ channel map.
-  */
-  void set_DAQ_map(DAQChannelMap* map) {_chMap = map;}
-
-  string get_equipment_name() {return _equipment;}
-
- protected:
-  /** The JSON node to put the data under.
- * It is created at the beginning of the spill.
- **/
-  Json::Value* _docSpill;
-
-  /** The DAQ channel map.
-  * It is used to group all channels belonging to a given detector.
-  **/
-  DAQChannelMap* _chMap;
-  string _equipment;
-};
-
-class ZeroSupressionFilter : public MDarranger {
-
- public:
-
-  ZeroSupressionFilter() :_zero_suppression(0), _zs_threshold(0) {}
-  virtual ~ZeroSupressionFilter() {}
-
-  void set_zero_supression(bool zs) { _zero_suppression = zs; }
-  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
-
- protected:
-
-  /// If true - do zero suppression
-  bool _zero_suppression;
-
-  /// Value of the threshold used for zero suppression */
-  int _zs_threshold;
-};
+namespace MAUS {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -113,102 +55,52 @@ class V1290DataProcessor : public MDarranger {
  /** Unpack a single event to JSON.
   *
   * This function unpacks a single particle event,
-	* recorded by equipment CAEN V1290 (TDC)
+  * recorded by equipment CAEN V1290 (TDC)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* Will be casted to MDpartEventV1290.
+  * Will be casted to MDpartEventV1290.
   */
   virtual int Process(MDdataContainer* dc);
 };
 
+typedef std::vector<MAUS::V1290>           V1290HitArray;
+typedef std::vector<V1290HitArray>   V1290PartEventArray;
 
-////////////////////////////////////////////////////////////////////////////////
-// do not increment inside following macro! (e.g.: MAX( ++a, ++b );
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
-class fADCDataProcessor : public ZeroSupressionFilter {
+class V1290CppDataProcessor : public MDarranger {
  public:
+  V1290CppDataProcessor() {_equipment="V1290";}
+  virtual ~V1290CppDataProcessor() {}
 
-  fADCDataProcessor() :ZeroSupressionFilter() {}
-  ~fADCDataProcessor() {}
-
-  /** Return the position of the maximum.
-  * This function returns the number of the sample having maximum amplitude.
+ /** Unpack a single event to MAUS Data Structure..
+  *
+  * This function unpacks a single event,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment CAEN V1290 (TOF TDC board)
+  * Will be casted to MDfragmentV1290.
   */
-  int get_max_position();
+  virtual int Process(MDdataContainer* dc);
 
-  /** Return the position of the minimum.
-   * This function returns the number of the sample having minimum amplitude.
-   */
-
-  int get_min_position();
-
-  int get_arrival_time();
-  /** Return the area of the signal.
-  * This function returns the area of the signal. The pedestal is subtracted.
-  * The integration is done in window starting 10 samples before the maximum
-  * and ending 20 samples after the maximum.
-  * \param[out] pos The number of the sample having maximum amplitude.
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
   */
-  int get_signal_area(int &pos);
+  void fill_daq_data();
 
-  int get_neg_signal_area(int &pos);
+  void reset();
 
-  int get_pedestal_area(int &pos);
+  private:
 
-  /** Return the measured value for the given sample
-  * \param[in] i The number of the sample.
-  */
-  int get_point(int i) const { return _data[i]; }
-
-  /// Return the vector of samples
-  vector<int> get_data() const { return _data; }
-
-  /// Return each fADC sample value
-  Json::Value get_samples();
-
-  /** Return the area of the signal.
-  * This function returns the area of the signal. The pedestal is subtracted.
-  * The integration is done using the whole acquisition window.
-  */
-
-  int get_area();
-
-  /// Return the data member _pedestal
-  int get_pedestal() const { return _pedestal; }
-
-  /** Return the charge of the signal.
-  * This function returns the charge of the signal calculated by the specified
-  * algorithm.
-  * \param[in] Algorithm identifier of the algorithm.
-  */
-  int get_charge(int Algorithm = ceaPedMax);
-
-  enum chargeEstimationAlgorithm {
-    ceaMinMax, /// Simplest algorithm
-    ceaFractionDescriminatorThreshold, /// not implemented
-    ceaPedMax,
-    ceaPedMin ,
-  };
-
-  /**Return the charge of the Cherenkov Singal (negative pulse)
-  Uses same Algorithm.  
-  */
-  int get_charge_ckov(int Algorithm = ceaPedMin);
-
- protected:
-
-  void set_pedestal();
-  int chargeMinMax();
-  int chargePedMax();
-  int chargePedMin();
-  /// vector of samples (measurements) */
-  vector<int> _data;
-
-  /// Pedestal level of the signal */
-  int _pedestal;
+  V1290PartEventArray _tof0_spill;
+  V1290PartEventArray _tof1_spill;
+  V1290PartEventArray _tof2_spill;
+  V1290PartEventArray _tr_spill;
+  V1290PartEventArray _tr_req_spill;
+  V1290PartEventArray _unknown_spill;
 };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -224,13 +116,50 @@ class V1724DataProcessor : public fADCDataProcessor {
   /** Unpack a single event to JSON.
   *
   * This function unpacks a single particle event,
-	* recorded by equipment CAEN V1724 (flash ADC)
+  * recorded by equipment CAEN V1724 (flash ADC)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* Will be casted to MDpartEventV1724.
+  * Will be casted to MDpartEventV1724.
   */
   virtual int Process(MDdataContainer* dc);
+};
+
+typedef std::vector<MAUS::V1724>           V1724HitArray;
+typedef std::vector<V1724HitArray>   V1724PartEventArray;
+
+class V1724CppDataProcessor : public fADCDataProcessor {
+ public:
+  V1724CppDataProcessor() {_equipment="V1724";}
+  virtual ~V1724CppDataProcessor() {}
+
+ /** Unpack a single event to MAUS Data Structure..
+  *
+  * This function unpacks a single event,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment V1724 (TOF or KL board)
+  * Will be casted to MDfragmentV1724.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+ private:
+
+  V1724PartEventArray _tof0_spill;
+  V1724PartEventArray _tof1_spill;
+  V1724PartEventArray _tof2_spill;
+  V1724PartEventArray _kl_spill;
+  V1724PartEventArray _tag_spill;
+  V1724PartEventArray _unknown_spill;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,14 +176,51 @@ class V1731DataProcessor : public fADCDataProcessor {
  /** Unpack a single event to JSON.
   *
   * This function unpacks a single particle event,
-	* recorded by equipment CAEN V1731 (flash ADC)
+  * recorded by equipment CAEN V1731 (flash ADC)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* Will be casted to MDpartEventV1731.
+  * Will be casted to MDpartEventV1731.
   */
   virtual int Process(MDdataContainer* dc);
 };
+
+typedef std::vector<MAUS::V1731>           V1731HitArray;
+typedef std::vector<V1731HitArray>   V1731PartEventArray;
+
+#define V1731_SAMPLES_PER_WORD   4
+class V1731CppDataProcessor : public fADCDataProcessor {
+ public:
+  V1731CppDataProcessor() {_equipment="V1731";}
+  virtual ~V1731CppDataProcessor() {}
+
+ /** Unpack a single event to MAUS Data Structure..
+  *
+  * This function unpacks a single event,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment V1731 (EMR or CKOV board)
+  * Will be casted to MDfragmentV1731.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+ private:
+
+  V1731PartEventArray _emr_spill;
+  V1731PartEventArray _ckov_spill;
+  V1731PartEventArray _unknown_spill;
+};
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** On Fragment Event V830
  * This class unpacks a V830 (scaler) board hit.
@@ -267,19 +233,48 @@ class V830DataProcessor : public MDarranger {
  /** Unpack a single event to JSON.
   *
   * This function unpacks a single spill event,
-	* recorded by equipment CAEN V830 (scaler)
+  * recorded by equipment CAEN V830 (scaler)
   * into a JSON sub-tree.
   *
   * \param[in,out] dc Pointer to the event to process.
-	* Will be casted to MDpartEventV830.
+  * Will be casted to MDpartEventV830.
   */
   virtual int Process(MDdataContainer* dc);
 };
 
+class V830CppDataProcessor : public MDarranger {
+ public:
+  V830CppDataProcessor() {_equipment="V830";}
+  virtual ~V830CppDataProcessor() {}
+
+ /** Unpack a single event to MAUS Data Structure..
+  *
+  * This function unpacks a single event,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment V830 (scaler)
+  * Will be casted to MDfragmentV830.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+  private:
+
+  MAUS::V830 _v830_spill;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
-/** On Fragment Event VLSB_C
- * This class unpacks a VLSB_C board hit (tracker cosmic test in Lab7).
+/** On Fragment Event VLSB
+ * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
  */
 class VLSBDataProcessor : public ZeroSupressionFilter {
  public:
@@ -296,6 +291,44 @@ class VLSBDataProcessor : public ZeroSupressionFilter {
   * Will be casted to MDfragmentVLSB.
   */
   virtual int Process(MDdataContainer* dc);
+};
+
+/** On Fragment Event VLSB
+ * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
+ */
+
+typedef std::vector<MAUS::VLSB>           TrackerHitArray;
+typedef std::vector<TrackerHitArray>      TtackerPartEventArray;
+
+class VLSBCppDataProcessor : public ZeroSupressionFilter {
+ public:
+  VLSBCppDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB";}
+  virtual ~VLSBCppDataProcessor() {}
+
+ /** Unpack a single event part to JSON.
+  *
+  * This function unpacks a single particle event,
+  * recorded by equipment VLSB (tracker board)
+  * into a JSON sub-tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * Will be casted to MDfragmentVLSB.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+  /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+  private:
+
+  TtackerPartEventArray _tracker1_spill;
+  TtackerPartEventArray _tracker0_spill;
+  TtackerPartEventArray _single_st_spill;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -342,6 +375,70 @@ class DBBDataProcessor : public MDarranger {
   virtual int Process(MDdataContainer* dc);
 };
 
+#define DBB_TRIGGER_CHANNEL 4
+
+class DBBCppDataProcessor : public MDarranger {
+ public:
+  DBBCppDataProcessor()  {_equipment="DBB";}
+
+  virtual ~DBBCppDataProcessor() {}
+
+ /** Unpack a single event part to MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the Data Structure tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment DBB (EMR board)
+  * Will be casted to MDfragmentDBB.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+  static void set_spill_data(MDfragmentDBB *fragment, MAUS::DBBSpillData *dbb_spill);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset() {_spill.clear();}
+
+ private:
+
+  MAUS::DBBArray _spill;
+};
+
+class DBBChainCppDataProcessor : public MDarranger {
+ public:
+  DBBChainCppDataProcessor()  {_equipment="DBBChain";}
+
+  virtual ~DBBChainCppDataProcessor() {}
+
+ /** Unpack a single event part to the MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the MAUS Data Structur tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment a chain of 6 DBBs (EMR boards)
+  * Will be casted to MDfragmentDBBChain.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset() {_spill.clear();}
+
+ private:
+
+  MAUS::DBBArray _spill;
+};
+}
 
 #endif  // _MAUS_INPUTCPPDATA_UNPACKEVENTLIB_H__
 

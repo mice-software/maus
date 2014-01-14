@@ -30,7 +30,7 @@
 
 #include "Interface/Interpolator.hh"
 #include "Interface/Mesh.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 #include "Maths/Vector.hh"
@@ -120,11 +120,16 @@ void PolynomialMap::SetCoefficients(std::vector<PolynomialCoefficient> coeff) {
 }
 
 void PolynomialMap::SetCoefficients(Matrix<double> coeff) {
+  coefficient_matrix_  = coeff;
+  polynomial_vector_ = std::vector<PolynomialCoefficient>();
   for (size_t i = 0; i < coeff.number_of_rows() &&
                      i < coefficient_matrix_.number_of_rows(); ++i) {
     for (size_t j = 0; j < coeff.number_of_columns() &&
                      j < coefficient_matrix_.number_of_columns(); ++j) {
-      coefficient_matrix_(i+1, j+1) = coeff(i+1, j+1);
+      polynomial_vector_.push_back(
+          PolynomialMap::PolynomialCoefficient(index_key_by_vector_[j],
+          i,
+          coefficient_matrix_(i+1, j+1) ) );
     }
   }
 }
@@ -139,7 +144,9 @@ PolynomialMap::GetCoefficientsAsVector() const {
 }
 
 PolynomialMap* PolynomialMap::Recentred(double * point) const {
-  throw(Squeal(Squeal::nonRecoverable, "Recentred not implemented", "PolynomialMap::Recentred"));
+  throw(Exception(Exception::nonRecoverable,
+        "Recentred not implemented",
+        "PolynomialMap::Recentred"));
 }
 
 void  PolynomialMap::F(const double* point, double* value) const {
@@ -189,14 +196,14 @@ unsigned int PolynomialMap::PolynomialOrder() const {
 
 PolynomialMap * PolynomialMap::Inverse() const {
   // FIXME(plane1@hawk.iit.edu): implement
-  throw(Squeal(Squeal::recoverable,
+  throw(Exception(Exception::recoverable,
                "Not implemented.",
                "PolynomialMap::Inverse()"));
 }
 
 PolynomialMap PolynomialMap::Inverse(int max_order) const {
   // FIXME(plane1@hawk.iit.edu): implement
-  throw(Squeal(Squeal::recoverable,
+  throw(Exception(Exception::recoverable,
                "Not implemented.",
                "PolynomialMap::Inverse(int)"));
 }
@@ -208,6 +215,16 @@ PolynomialMap * PolynomialMap::Clone() const {
 Vector<double>&  PolynomialMap::MakePolynomialVector(const Vector<double>& point,
                                                      Vector<double>& polyVector)
     const {
+  const size_t poly_vec_len = NumberOfPolynomialCoefficients(PointDimension(),
+                                                             PolynomialOrder());
+  if (polyVector.size() == 0) {
+    polyVector = Vector<double>(poly_vec_len);
+  } else if (polyVector.size() != poly_vec_len) {
+    throw(Exception(Exception::recoverable,
+                    "Polynomial vector object is not empty "
+                    "and is not of correct size.",
+                    "PolynomialMap::MakePolynomialVector"));
+  }
   for (size_t i = 0; i < index_key_by_vector_.size(); ++i) {
     polyVector[i] = 1.;
     for (size_t j = 0; j < index_key_by_vector_[i].size(); ++j) {
@@ -231,9 +248,16 @@ double*  PolynomialMap::MakePolynomialVector(const double* point,
 Vector<double> &  PolynomialMap::UnmakePolynomialVector(
     const Vector<double> & polyVector, Vector<double> & point)
     const {
-  size_t size = NumberOfPolynomialCoefficients(PointDimension(),
-                                            PolynomialOrder());
-  for (size_t index = 0; index < size; ++index) {
+  const size_t point_len = PointDimension();
+  if (point.size() == 0) {
+    point = Vector<double>(point_len);
+  } else if (point.size() != point_len) {
+    throw(Exception(Exception::recoverable,
+                    "Point object is not empty "
+                    "and is not of correct size.",
+                    "PolynomialMap::UnmakePolynomialVector"));
+  }
+  for (size_t index = 0; index < point_len; ++index) {
       point[index] = polyVector[index+1];
   }
   return point;
@@ -242,8 +266,7 @@ Vector<double> &  PolynomialMap::UnmakePolynomialVector(
 double * PolynomialMap::UnmakePolynomialVector(double const * const polyVector,
                                                double * point)
     const {
-  size_t size = NumberOfPolynomialCoefficients(PointDimension(),
-                                            PolynomialOrder());
+  const size_t size = PointDimension();
   for (size_t index = 0; index < size; ++index) {
       point[index] = polyVector[index+1];
   }
@@ -363,12 +386,12 @@ void PolynomialMap::PrintHeader(std::ostream& out, char int_separator,
 Vector<double> PolynomialMap::Means
        (std::vector<std::vector<double> > values, std::vector<double> weights) {
   if (values.size() < 1) {
-    throw(Squeal
-           (Squeal::recoverable, "No input values", "PolynomialMap::Means"));
+    throw(Exception
+           (Exception::recoverable, "No input values", "PolynomialMap::Means"));
   }
   if (values[0].size() < 1) {
-    throw(Squeal
-            (Squeal::recoverable, "Dimension < 1", "PolynomialMap::Means"));
+    throw(Exception
+            (Exception::recoverable, "Dimension < 1", "PolynomialMap::Means"));
   }
   if (weights.size() != values.size()) {
     weights = std::vector<double>(values.size(), 1.);
@@ -403,13 +426,13 @@ SymmetricMatrix PolynomialMap::Covariances(
     const Vector<double>&                             means) {
   size_t npoints = values.size();
   if (npoints < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No input values",
                  "PolynomialMap::Covariances()"));
   }
   size_t dim = values[0].size();
   if (dim < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Dimension < 1",
                  "PolynomialMap::Covariances()"));
   }
@@ -547,7 +570,7 @@ std::cout << "]" << std::endl;
       message << "The number of weights (" << weights.size() << ") "
               << "does not equal the number of data points (" << nPoints << ")"
               << std::endl;
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                   message.str(),
                   "PolynomialMap::PolynomialLeastSquaresFit"));
     }
@@ -580,12 +603,12 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   Matrix<double> F2_inverse;
   try {
     F2_inverse = inverse(F2);
-  } catch(Squeal squee) {
+  } catch(Exception exc) {
     delete polynomial_map;
     std::stringstream message;
     message << "Could not find least squares fit for data. Nested exception:"
-            << std::endl << "\"" << squee.GetMessage() << "\"" << std::endl;
-    throw(Squeal(Squeal::recoverable,
+            << std::endl << "\"" << exc.GetMessage() << "\"" << std::endl;
+    throw(Exception(Exception::recoverable,
                  message.str(),
                  "PolynomialMap::PolynomialLeastSquaresFit"));
   }
@@ -615,14 +638,14 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
   // treat each like a 1D vector
   size_t nPoints    = points.size();
   if (nPoints < 1) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "No data for LLS Fit",
       "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
   if (values.size() != nPoints) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "Misaligned array in LLS Fit",
       "PolynomialMap::ConstrainedPolynomialLeastSquaresFit(...)"));
   }
@@ -682,9 +705,13 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
     Matrix<double> F2_inverse;
     try {
       F2_inverse = inverse(F2);
-    } catch(Squeal squee) {
-      throw(Squeal(Squeal::recoverable,
-            "Could not find least squares fit for data",
+    } catch(Exception exc) {
+    std::stringstream message;
+    message << "Could not find constrained least squares fit for data. "
+            << "Nested exception:" << std::endl
+            << "\"" << exc.GetMessage() << "\"" << std::endl;
+      throw(Exception(Exception::recoverable,
+            message.str(),
             "PolynomialMap::ConstrainedPolynomialLeastSquaresFit"));
     }
     Vector<double> AVec = F2_inverse * Fy;
@@ -736,8 +763,8 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
   try {
     inverse_covaraiance_matrix = inverse(covariances);
   }
-  catch(Squeal squee) {
-    throw(Squeal(Squeal::recoverable,
+  catch(Exception exc) {
+    throw(Exception(Exception::recoverable,
                  "Failed to find least squares fit for data",
                  "PolynomialMap::Chi2ConstrainedLeastSquaresFit"));
   }
@@ -776,7 +803,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
       map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
                 xin, xout, polynomialOrder, coeffs, weights);
     }
-    catch(Squeal squee) {
+    catch(Exception exc) {
       map = NULL;
       chi2 = chi2Limit * 2.;
     }
@@ -808,7 +835,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
     err << "PolynomialMap::Chi2ConstrainedLeastSquaresFit failed to "
         << "converge. Best fit had <chi2> = " << chi2
         << " compared to limit " << chi2Limit << std::endl;
-    throw(Squeal(Squeal::recoverable, err.str(),
+    throw(Exception(Exception::recoverable, err.str(),
           "PolynomialMap::Chi2ConstrainedLeastSquaresFit(...)"));
   }
   if (chi2End != NULL) *chi2End = discard; // save discard at end for future use
@@ -906,7 +933,7 @@ void PolynomialMap::PolynomialCoefficient::SpaceTransform
   for (size_t con = 0; con < in_variables.size(); con++) {
     if (mapping.find(in_variables[con]) != mapping.end()) {
       in_variables[con] = mapping[in_variables[con]];
-    } else { throw(Squeal(Squeal::recoverable,
+    } else { throw(Exception(Exception::recoverable,
                     "Input variable not found in space transform",
                     "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
     }
@@ -914,7 +941,7 @@ void PolynomialMap::PolynomialCoefficient::SpaceTransform
   if (mapping.find(_outVar) != mapping.end()) {
     _outVar = mapping[_outVar];
   } else {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Output variable not found in space transform",
                  "PolynomialMap::PolynomialCoefficient::SpaceTransform"));
   }
@@ -928,18 +955,18 @@ double PolynomialMap::GetAvgChi2OfDifference(
     std::vector< std::vector<double> > out) {
   std::vector< std::vector<double> > out_p;
   if (in.size() < 1) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No data in input",
                  "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   if (in.size() != out.size()) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
      "Input data and output data misaligned for calculation of chi2 difference",
      "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
   for (size_t i = 0; i < in.size(); ++i) {
     if (in[i].size() != PointDimension() || out[i].size() != ValueDimension())
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                    "Bad input data for calculation of chi2 difference",
                    "PolynomialMap::GetAvgChi2OfDifference(...)"));
   }
@@ -1028,24 +1055,27 @@ std::vector< std::vector<double> > PolynomialMap::PointShell(
   return point_box;
 }
 
-Vector<double> generate_polynomial_2D(
-    const PolynomialMap & map,
-    const size_t variable_index,
-    const double input_min,
-    const double input_max,
-    const double input_increment) {
-  const size_t point_dimension = map.ValueDimension();
+Vector<double> generate_polynomial_2D(const PolynomialMap & map,
+                                      const size_t point_variable_index,
+                                      const size_t value_variable_index,
+                                      const double point_variable_min,
+                                      const double point_variable_max,
+                                      const double point_variable_increment) {
+  const size_t point_dimension = map.PointDimension();
   const size_t value_dimension = map.ValueDimension();
-  Vector<double> input(point_dimension, 0.);
-  Vector<double> output(value_dimension);
+  Vector<double> point(point_dimension, 0.);
+  Vector<double> value(value_dimension);
 
-  size_t plot_size = size_t((input_max - input_min) / input_increment + 1);
+  size_t plot_size = size_t((point_variable_max - point_variable_min)
+                            / point_variable_increment + 1);
   Vector<double> plot(plot_size);
   size_t plot_index = 0;
-  for (double value = input_min; value <= input_max; value += input_increment) {
-    input[variable_index] = value;
-    map.F(input, output);
-    plot[plot_index++] = output[variable_index];
+  for (double point_variable_value = point_variable_min;
+       point_variable_value <= point_variable_max;
+       point_variable_value += point_variable_increment) {
+    point[point_variable_index] = point_variable_value;
+    map.F(point, value);
+    plot[plot_index++] = value[value_variable_index];
   }
 
   return plot;

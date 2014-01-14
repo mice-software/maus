@@ -17,7 +17,7 @@ digraph G {
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector, Double z2): PhaseSpaceVector\lTransport(CovarianceMatrix, Double z2): PhaseSpaceVector\lTransport(PhaseSpaceVector, Double z1, Double z2): PhaseSpaceVector\lTransport(CovarianceMatrix, Double z1, Double z2): PhaseSpaceVector\l}"
   ]
 
   TrackFitter [
@@ -33,7 +33,10 @@ digraph G {
   DifferentiatingOpticsModel [
   ]
 
-  LeastSquaresOpticsModel [
+  LinearApproximationOpticsModel [
+  ]
+
+  PolynomialOpticsModel [
   ]
 
   TransferMap [
@@ -42,6 +45,9 @@ digraph G {
   ]
 
   PolynomialMap [
+  ]
+
+  LinearApproximationTransferMap [
   ]
 
   PolynomialTransferMap [
@@ -72,7 +78,9 @@ digraph G {
   RungeKuttaOpticsModel -> OpticsModel
   IntegratingOpticsModel -> OpticsModel
   DifferentiatingOpticsModel -> OpticsModel
-  LeastSquaresOpticsModel -> OpticsModel
+  PolynomialOpticsModel -> OpticsModel
+  LinearApproximationOpticsModel -> OpticsModel
+  LinearApproximationTransferMap -> TransferMap
   PolynomialTransferMap -> TransferMap
   RungeKuttaTransferMap -> TransferMap
   MinuitTrackFitter -> TrackFitter

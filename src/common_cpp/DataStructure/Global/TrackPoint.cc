@@ -26,6 +26,7 @@ namespace Global {
 // Default constructor
 TrackPoint::TrackPoint()
     : BasePoint(),
+      _particle_event(-1),
       _mapper_name(""),
       _charge(0.),
       _momentum(0., 0., 0., 0.),
@@ -35,6 +36,7 @@ TrackPoint::TrackPoint()
 // Copy contructor
 TrackPoint::TrackPoint(const TrackPoint &track_point)
     : BasePoint(track_point),
+      _particle_event(track_point.get_particle_event()),
       _mapper_name(track_point.get_mapper_name()),
       _charge(track_point.get_charge()),
       _momentum(track_point.get_momentum()),
@@ -51,6 +53,7 @@ TrackPoint& TrackPoint::operator=(const TrackPoint &track_point) {
   }
   BasePoint::operator=(track_point);
 
+  _particle_event  = track_point.get_particle_event();
   _mapper_name     = track_point.get_mapper_name();
   _charge          = track_point.get_charge();
   _momentum        = track_point.get_momentum();
@@ -68,6 +71,7 @@ TrackPoint* TrackPoint::Clone() {
   // Clone the BasePoint elements
   this->BasePoint::Clone(tpNew);
 
+  tpNew->set_particle_event(this->get_particle_event());
   tpNew->set_mapper_name(this->get_mapper_name());
   tpNew->set_charge(this->get_charge());
   tpNew->set_momentum(this->get_momentum());
@@ -82,6 +86,14 @@ TrackPoint* TrackPoint::Clone() {
   tpNew->set_space_point(this->get_space_point());
 
   return tpNew;
+}
+
+void TrackPoint::set_particle_event(const int particle_event) {
+  _particle_event = particle_event;
+}
+
+int TrackPoint::get_particle_event() const {
+  return _particle_event;
 }
 
 void TrackPoint::set_mapper_name(std::string mapper_name) {

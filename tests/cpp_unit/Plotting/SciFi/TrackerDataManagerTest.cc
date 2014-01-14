@@ -154,7 +154,7 @@ TEST_F(TrackerDataManagerTest, TestProcessDigits) {
 
   Spill* spill = new Spill();
   ReconEvent* revt = NULL;
-  ReconEventArray* revts = new ReconEventArray();
+  ReconEventPArray* revts = new ReconEventPArray();
   revts->push_back(revt);
   spill->SetReconEvents(revts);
 
