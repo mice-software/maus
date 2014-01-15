@@ -601,18 +601,25 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
     GlobalDS::TrackPArray::iterator track_end = track + num_global_tracks;
     // FIXME(Lane) remove workaround code once bug #1394 is fixed
     int last_station = 1;
-    double last_x;
+    double last_position[2];
     for (; scifi_track_point != scifi_track_points.end(); ++scifi_track_point) {
       const int tracker = (*scifi_track_point)->tracker();
       int station = (*scifi_track_point)->station();
       // ==== compensate for bug #1394 ===
       ++station;
-      const double x = (*scifi_track_point)->x();
-      if (((station-last_station) == 1) && ::abs(x-last_x) < .1) {
-        --station;
+      const double position[2] = {
+        (*scifi_track_point)->x(), (*scifi_track_point)->y()
+      };
+      if (((station-last_station) > 0) &&
+          (::abs(position[0]-last_position[0]) < .1) &&
+          (::abs(position[1]-last_position[1]) < .1)) {
+        station = last_station;
+      } else if (station > 5) {
+        station = 5;
       }
       last_station = station;
-      last_x = x;
+      last_position[0] = position[0];
+      last_position[1] = position[1];
       // =================================
       std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
                 << "\tTracker: " << tracker << "\tStation: " << station
