@@ -163,6 +163,7 @@ class TestWindow(unittest.TestCase):
             "test_7":"check_button",
             "test_8":"label",
             "test_9":"text_entry",
+            "test_10":"list_box",
         }
         for name in frame_names:
             self.window_2.get_frame(name, frame_types[name])
@@ -174,6 +175,10 @@ class TestWindow(unittest.TestCase):
         self.assertEqual(label_text, "test_4") # check the labels updated
         text_entered = self.window_2.get_frame("test_9", "text_entry").GetText()
         self.assertEqual(text_entered, "text")
+        selected = ROOT.TList()
+        lbox = self.window_2.get_frame("test_10", "list_box")
+        selected = [i for i in range(lbox.GetNumberOfEntries()) if lbox.GetSelection(i)]
+        self.assertEqual(selected, [0, 2])
 
     def test_init_exceptions(self):
         """gui.window.Window initialisation - exceptions"""
@@ -201,6 +206,7 @@ class TestWindow(unittest.TestCase):
             self.assertTrue(False, msg="Should have thrown ValueError")
         except ValueError:
             pass
+
     def test_close_window(self):
         """gui.window.Window close_window"""
         self.window_1.close_window()

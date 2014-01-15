@@ -38,5 +38,10 @@
         "type":"text_entry",
         "default_text":"text",
         "name":"test_9"
+    }, {
+        "type":"list_box",
+        "entries":["pizza", "paella", "lasagne", "roast beef"],
+        "selected":[0, 2],
+        "name":"test_10"
     }]
 }

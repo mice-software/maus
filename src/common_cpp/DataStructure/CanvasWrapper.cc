@@ -15,37 +15,37 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/Image.hh"
+#include "TCanvas.h"
+
+#include "src/common_cpp/DataStructure/CanvasWrapper.hh"
 
 namespace MAUS {
-Image::Image() : _run_number(0), _spill_number(0),
-    _input_time(), _output_time(), _canvas_wrappers() {
+CanvasWrapper::CanvasWrapper() : _description(""), _canvas(NULL) {
 }
 
-Image::Image(const Image& data) {
+CanvasWrapper::CanvasWrapper(const CanvasWrapper& data) : _canvas(NULL) {
     *this = data;
 }
 
-Image& Image::operator=(const Image& rhs) {
+CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     if (this == &rhs)
         return *this;
-    _run_number = rhs._run_number;
-    _spill_number = rhs._spill_number;
-    _input_time = rhs._input_time;
-    _output_time = rhs._output_time;
-    _canvas_wrappers = rhs._canvas_wrappers;
+    _description = rhs._description;
+    if (_canvas == NULL)
+        delete _canvas;
+    _canvas = dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
     return *this;
 }
 
-Image::~Image() {
+CanvasWrapper::~CanvasWrapper() {
+    if (_canvas != NULL)
+        delete _canvas;
 }
 
-void Image::SetCanvasWrappers(std::vector<CanvasWrapper> wrappers) {
-    _canvas_wrappers = wrappers;
-}
-
-std::vector<CanvasWrapper> Image::GetCanvasWrappers() const {
-    return _canvas_wrappers;
+void CanvasWrapper::SetCanvas(TCanvas* canvas) {
+    if (_canvas != NULL)
+        delete _canvas;
+    _canvas = canvas;
 }
 } // namespace MAUS
 

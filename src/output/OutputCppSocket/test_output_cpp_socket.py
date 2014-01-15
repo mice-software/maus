@@ -80,7 +80,7 @@ class OutputCppSocketTest(unittest.TestCase):
         print "Client using port", cls.port
         cls.proc = subprocess.Popen([
               "python",
-              "src/OutputCppSocket/test_output_cpp_socket.py",
+              "src/output/OutputCppSocket/test_output_cpp_socket.py",
               "receiver"
         ], stdin=subprocess.PIPE)
 
@@ -105,12 +105,14 @@ class OutputCppSocketTest(unittest.TestCase):
         while not valid:
             my_socket = ROOT.TSocket("localhost", self.port)
             valid = my_socket.IsValid()
-            time.sleep(0.1)            
+            time.sleep(0.1)
         print "Client socket accepted"
+        cpx = ROOT.TCanvas("px canvas", "px canvas")
         hpx = ROOT.TH1F("hpx","px distribution", 100, -4, 4)
         hpx.FillRandom("gaus", 100000);
+        hpx.Draw()
         message = ROOT.TMessage(ROOT.TMessage.kMESS_OBJECT)
-        message.WriteObject(hpx)
+        message.WriteObject(cpx)
 
         print "Client sending message"
         my_socket.Send(message)

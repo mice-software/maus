@@ -19,15 +19,13 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_IMAGE_HH_
 
 #include <string>
+#include <vector>
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/DateTime.hh"
-
-class TCanvas;
+#include "src/common_cpp/DataStructure/CanvasWrapper.hh"
 
 namespace MAUS {
-
-class Image;
 
 /** ImageData is the root of the MAUS image structure
  *
@@ -73,38 +71,18 @@ class Image {
     /** Get the output time */
     DateTime GetOutputTime() const {return _output_time;}
 
-    /** Set the image description */
-    void SetDescription(std::string description) {_description = description;}
+    /** Set the std::vector of canvas wrappers */
+    void SetCanvasWrappers(std::vector<MAUS::CanvasWrapper> wrappers);
 
-    /** Get the image description */
-    std::string GetDescription() const {return _description;}
-
-    /** Set text accompanying the image */
-    void SetText(std::string text) {_text = text;}
-
-    /** Get text accompanying the image */
-    std::string GetText() const {return _text;}
-
-    /** Set the ROOT canvas
-     *
-     *  Image takes ownership of memory allocated to the TCanvas object
-     */
-    void SetCanvas(TCanvas* canvas);
-
-    /** Get the ROOT canvas
-     *
-     *  Image still owns memory allocated to the TCanvas object
-     */
-    TCanvas* GetCanvas() {return _canvas;}
+    /** Get the std::vector of canvas wrappers */
+    std::vector<MAUS::CanvasWrapper> GetCanvasWrappers() const;
 
   private:
-    std::string _description;
-    std::string _text;
     int _run_number;
     int _spill_number;
     DateTime _input_time;
     DateTime _output_time;
-    TCanvas* _canvas;
+    std::vector<MAUS::CanvasWrapper> _canvas_wrappers;
 
     MAUS_VERSIONED_CLASS_DEF(Image);
 };

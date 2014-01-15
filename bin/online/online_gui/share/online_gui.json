@@ -1,0 +1,75 @@
+{
+"type":"main_frame",
+"name":"Online Reconstruction",
+"children":[{
+    "type":"vertical_frame",
+    "children":[{
+        "type":"horizontal_frame",
+        "children":[{
+            "name":"main_canvas",
+            "type":"canvas",
+            "width":1000,
+            "height":500
+        }, {
+            "type":"vertical_frame",
+            "name":"canvas_options",
+            "children":[{
+                "type":"horizontal_frame",
+                "children":[{
+                    "type":"button",
+                    "name":"&<",
+                    "tool_tip":"Rotate back one canvas"
+                }, {
+                    "type":"button",
+                    "name":"&Pause",
+                    "tool_tip":"Load and draw new canvas from the socket, even if paused"
+                }, {
+                    "type":"button",
+                    "name":"&>",
+                    "tool_tip":"Rotate forwards one canvas"
+                }]
+            }, {
+                "type":"named_text_entry",
+                "default_text":"10.0",
+                "label_length":25,
+                "name":"Canvas rotate speed",
+                "tool_tip":"Time between changes of canvas (s)"
+            }, {
+                "type":"named_text_entry",
+                "default_text":"10.0",
+                "label_length":25,
+                "name":"Canvas reload rate",
+                "tool_tip":"Time between canvas reloads (s)"
+            }, {
+                "type":"horizontal_frame",
+                "children":[{
+                    "type":"button",
+                    "name":"&Redraw",
+                    "tool_tip":"Redraw canvas with currently loaded data"
+                }, {
+                    "type":"button",
+                    "name":"Re&load",
+                    "tool_tip":"Load and draw new canvas from the socket, even if paused"
+                }, {
+                    "type":"button",
+                    "name":"&Help"
+                }]
+            }, {
+                "type":"list_box",
+                "name":"canvas_select",
+                "entries":["ht01", "spx0", "spx1", "spx2", "spy0", "spy1", "htof", "tof_A", "tof_B"],
+                "selected":[]
+            }]
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+                "type":"button",
+                "name":"&Reconnect"
+            },{
+                "type":"button",
+                "name":"E&xit"
+            }]
+   }]   
+}]
+}

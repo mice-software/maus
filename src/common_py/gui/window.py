@@ -281,6 +281,11 @@ class Window(): # pylint: disable=R0201
             drop down box, indexing from 0
           - "selected": integer determining the entry that will be selected
             initialliy (Default 0)
+      - "list_box": make a TGListBox i.e. a list multiselect box.
+          - "entries": list of strings, each of which becomes an entry in the
+            drop down box, indexing from 0
+          - "selected": list of integers determining the entries that will be 
+            selected initialliy (Default is an empty list)
       - "check_button": make a TGCheckButton i.e. a true/false tick box
           - "text": text to place next to the check button
           - "default_state": set to 1 to make the box ticked by default, 0 to
@@ -570,12 +575,22 @@ class Window(): # pylint: disable=R0201
         item["frame"].SetText(default_text)
         self.tg_text_entries[item["name"]] = item["frame"]
 
+    def _parse_list_box(self, parent, item):
+        """parse a list_box into a TGListBox"""
+        item["frame"] = ROOT.TGListBox(parent)
+        for i, entry in enumerate(item["entries"]):
+            item["frame"].AddEntry(entry, i)
+        item["frame"].SetMultipleSelections(True)
+        item["frame"].Resize(150, 20)
+        if "selected" in item:
+            for selected in item["selected"]:
+                item["frame"].Select(selected)
+
     def _parse_drop_down(self, parent, item):
         """parse a drop_down into a TGComboBox"""
         item["frame"] = ROOT.TGComboBox(parent)
         for i, entry in enumerate(item["entries"]):
             item["frame"].AddEntry(entry, i)
-        item["frame"].Resize(150, 20)
         if "selected" in item:
             item["frame"].Select(item["selected"])
 
@@ -592,6 +607,7 @@ class Window(): # pylint: disable=R0201
          "label":_parse_label,
          "button":_parse_button,
          "text_entry":_parse_text_entry,
+         "list_box":_parse_list_box,
          "drop_down":_parse_drop_down,
          "check_button":_parse_check_button,
     }

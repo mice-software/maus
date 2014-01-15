@@ -43,7 +43,7 @@ void OutputCppSocket::_death() {
     }
     _socket = NULL;
 }
-
+`
 bool OutputCppSocket::_save(ImageData* image) {
     return false;
 }
