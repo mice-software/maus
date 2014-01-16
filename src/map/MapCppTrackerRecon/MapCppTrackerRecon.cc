@@ -194,7 +194,6 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-
   std::cerr << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
