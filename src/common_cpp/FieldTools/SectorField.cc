@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/FieldTools/SectorField.hh"
 
@@ -76,28 +76,28 @@ void SectorField::SetPolarBoundingBox
                         (double bbMinR, double bbMinY, double bbMinPhi,
                          double bbMaxR, double bbMaxY, double bbMaxPhi) {
     if (bbMinR > bbMaxR) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                "Bounding box minimum radius was greater than maximum radius",
                "SectorField::SetPolarBoundingBox"));
     }
     if (bbMinR < 0.) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                "Bounding box radius must be positive",
                "SectorField::SetPolarBoundingBox"));
     }
     if (bbMinY > bbMaxY) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                "Bounding box minimum y was greater than maximum y",
                "SectorField::SetPolarBoundingBox"));
     }
     if (bbMinY > bbMaxY) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                "Bounding box minimum angle was greater than maximum angle",
                "SectorField::SetPolarBoundingBox"));
     }
     if (bbMinPhi < -2.*M_PI || bbMinPhi > 2.*M_PI ||
         bbMaxPhi < -2.*M_PI || bbMaxPhi > 2.*M_PI) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                "Bounding box angles must be in range -2*M_PI < phi < 2*M_PI",
                "SectorField::SetPolarBoundingBox"));
     }

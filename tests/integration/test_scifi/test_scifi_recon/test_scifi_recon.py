@@ -67,7 +67,7 @@ class TestSciFiRecon(unittest.TestCase): # pylint: disable=R0904
         tree.SetBranchAddress("data", data)
         tree.GetEntry(1)
         spill = data.GetSpill()
-        print "Using spill " + str(spill.GetSpillNumber());
+        print "Using spill " + str(spill.GetSpillNumber())
 
         self.assertEqual(spill.GetDaqEventType(), "physics_event")
         self.assertEqual(spill.GetReconEvents().size(), 2)

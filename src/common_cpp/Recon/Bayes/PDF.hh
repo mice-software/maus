@@ -29,8 +29,6 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "Interface/Squeal.hh"
-
 namespace MAUS {
 
 /** @class pdf

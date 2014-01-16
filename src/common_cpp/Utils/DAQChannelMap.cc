@@ -18,15 +18,17 @@
 #include "Interface/Squeak.hh"
 #include "Utils/DAQChannelMap.hh"
 
+namespace MAUS {
+
 ////////////////////////////////////////////////////////////
 
-DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Squeal) {
+DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "DAQChannelKey::DAQChannelKey(std::string)"));
   }
@@ -65,12 +67,12 @@ std::ostream& operator<<( std::ostream& stream, const DAQChannelKey key ) {
   return stream;
 }
 
-std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Squeal) {
+std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Exception) {
   std::string xLabel;
   stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
 
   if (xLabel != "DAQChannelKey") {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "istream& operator>>(istream&, DAQChannelKey)"));
   }
@@ -110,7 +112,7 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
       _chKey.push_back(key);
       lineNum++;
     }
-  }catch(Squeal e) {
+  }catch(Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromFile : Error during loading." << std::endl
     << "in file : " << filename << " line " << lineNum
@@ -149,8 +151,8 @@ DAQChannelKey* DAQChannelMap::find(std::string daqKeyStr) {
   try {
     xKeyConv << daqKeyStr;
     xKeyConv >> xKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "DAQChannelKey::DAQChannelKey(std::string)"));
   }
@@ -166,3 +168,4 @@ std::string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
   return "unknown";
 }
 
+}  // namespace MAUS

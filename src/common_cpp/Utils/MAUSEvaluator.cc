@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/MAUSEvaluator.hh"
 
@@ -41,7 +41,7 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
     py_arg = Py_BuildValue("(sd)", name.c_str(), value);
     if (py_arg == NULL) {
         PyErr_Clear();
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               "Failed to resolve arguments to set_variable",
               "MAUSEvaluator::evaluate"));
     }
@@ -53,7 +53,7 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
     if (py_value == NULL) {
         PyErr_Clear();
         Py_DECREF(py_arg);
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Failed to parse variable "+name,
                      "MAUSEvaluator::evaluate"));
     }
@@ -68,7 +68,7 @@ double MAUSEvaluator::evaluate(std::string function) {
     py_arg = Py_BuildValue("(s)", function.c_str());
     if (py_arg == NULL) {
         PyErr_Clear();
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                    "Failed to build function "+function,
                    "MAUSEvaluator::evaluate"));
     }
@@ -79,7 +79,7 @@ double MAUSEvaluator::evaluate(std::string function) {
     if (py_value == NULL) {
         PyErr_Clear();
         Py_DECREF(py_arg);
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                    "Failed to evaluate expression \""+function+"\"",
                    "MAUSEvaluator::evaluate"));
     }
@@ -87,7 +87,7 @@ double MAUSEvaluator::evaluate(std::string function) {
     // now put transform py_value into C++ double
     double value = 0.;
     if (!PyArg_Parse(py_value, "d", &value)) {
-        throw(Squeal(Squeal::recoverable,
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Failed to evaluate expression \""+function+"\"",
                    "MAUSEvaluator::evaluate"));
     }
@@ -121,7 +121,7 @@ void MAUSEvaluator::clear() {
 void MAUSEvaluator::reset() {
   // check that we don't have anything allocated already
   clear();
-  // NOTE: I don't throw Squeals here because I'm nervous about
+  // NOTE: I don't throw MAUS::Exceptions here because I'm nervous about
   // set up/tear down order
   // initialise evaluator module
   _evaluator_mod = PyImport_ImportModule("evaluator");

@@ -18,7 +18,7 @@
 
 #include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverCppToJson.hh"
 #include "src/common_cpp/JsonCppProcessors/Common/ReferenceResolverJsonToCpp.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 namespace ReferenceResolver {
@@ -38,13 +38,13 @@ TEST(ReferenceResolverJsonToCppTest, ResolverTest) {
                                           ("#data", &TestClass::SetData, &test);
     RefManager::GetInstance().SetPointerAsValue("#data", &child);
     EXPECT_THROW(RefManager::GetInstance().SetPointerAsValue("#data", &child),
-                 Squeal);
+                 MAUS::Exception);
     res.ResolveReferences();
     EXPECT_TRUE(test._data == &child);
 
     RefManager::Death();
     RefManager::Birth();
-    EXPECT_THROW(res.ResolveReferences(), Squeal);
+    EXPECT_THROW(res.ResolveReferences(), MAUS::Exception);
     EXPECT_TRUE(test._data == NULL);
     RefManager::Death();
 }
@@ -61,8 +61,8 @@ TEST(ReferenceResolverJsonToCppTest, VectorResolverTest) {
     RefManager::Death();
     RefManager::Birth();
     VectorResolver<double> res2("#data", &vec, 1);
-    EXPECT_THROW(res2.ResolveReferences(), Squeal);
-    EXPECT_THROW(res.ResolveReferences(), Squeal);
+    EXPECT_THROW(res2.ResolveReferences(), MAUS::Exception);
+    EXPECT_THROW(res.ResolveReferences(), MAUS::Exception);
     EXPECT_TRUE(vec[0] == NULL);
     RefManager::Death();
 }
@@ -72,11 +72,11 @@ TEST(ReferenceResolverJsonToCppTest, RefManagerBirthTest) {
     EXPECT_FALSE(RefManager::HasInstance());
     RefManager::Birth();
     EXPECT_TRUE(RefManager::HasInstance());
-    EXPECT_THROW(RefManager::Birth(), Squeal);
+    EXPECT_THROW(RefManager::Birth(), MAUS::Exception);
     RefManager::Death();
     EXPECT_FALSE(RefManager::HasInstance());
-    EXPECT_THROW(RefManager::Death(), Squeal);
-    EXPECT_THROW(RefManager::GetInstance(), Squeal);
+    EXPECT_THROW(RefManager::Death(), MAUS::Exception);
+    EXPECT_THROW(RefManager::GetInstance(), MAUS::Exception);
     RefManager::Birth();
     EXPECT_NO_THROW(RefManager::GetInstance());
     RefManager::Death();
@@ -106,7 +106,7 @@ TEST(ReferenceResolverCppToJsonTest, TypedResolverTest) {
     TypedResolver<double> res(&child, "#test");
     RefManager::GetInstance().SetPointerAsValue(&child, "PATH TO BRANCH");
     EXPECT_THROW(RefManager::GetInstance().
-                           SetPointerAsValue(&child, "PATH TO BRANCH"), Squeal);
+                           SetPointerAsValue(&child, "PATH TO BRANCH"), MAUS::Exception);
     res.ResolveReferences(parent);
 
     Json::Value test(Json::objectValue);
@@ -115,14 +115,14 @@ TEST(ReferenceResolverCppToJsonTest, TypedResolverTest) {
     RefManager::Death(); // clear static data
     RefManager::Birth();
     parent["test"] = Json::Value("bob");
-    EXPECT_THROW(res.ResolveReferences(parent), Squeal);
+    EXPECT_THROW(res.ResolveReferences(parent), MAUS::Exception);
     EXPECT_EQ(parent["test"], Json::Value()) << parent["test"];
 
     // NULL handling
     TypedResolver<double> res_null(null, "#test");
     RefManager::GetInstance().SetPointerAsValue(null, "SHOULD IGNORE");
     RefManager::GetInstance().SetPointerAsValue(null, "SHOULD IGNORE");
-    EXPECT_THROW(RefManager::GetInstance().GetPointerAsValue(null), Squeal);
+    EXPECT_THROW(RefManager::GetInstance().GetPointerAsValue(null), MAUS::Exception);
 
     RefManager::Death();
 }
@@ -131,11 +131,11 @@ TEST(ReferenceResolverCppToJsonTest, RefManagerBirthTest) {
     EXPECT_FALSE(RefManager::HasInstance());
     RefManager::Birth();
     EXPECT_TRUE(RefManager::HasInstance());
-    EXPECT_THROW(RefManager::Birth(), Squeal);
+    EXPECT_THROW(RefManager::Birth(), MAUS::Exception);
     RefManager::Death();
     EXPECT_FALSE(RefManager::HasInstance());
-    EXPECT_THROW(RefManager::Death(), Squeal);
-    EXPECT_THROW(RefManager::GetInstance(), Squeal);
+    EXPECT_THROW(RefManager::Death(), MAUS::Exception);
+    EXPECT_THROW(RefManager::GetInstance(), MAUS::Exception);
     RefManager::Birth();
     EXPECT_NO_THROW(RefManager::GetInstance());
     RefManager::Death();

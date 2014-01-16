@@ -46,7 +46,7 @@ bool KLChannelMap::InitFromFile(string filename) {
       _klKey.push_back(klkey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Squeal e) {
+  } catch(Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in KLChannelMap::InitFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;
@@ -82,8 +82,8 @@ KLChannelKey* KLChannelMap::find(std::string daqKeyStr) {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "KLChannelMap::find(std::string)"));
   }
@@ -94,13 +94,13 @@ KLChannelKey* KLChannelMap::find(std::string daqKeyStr) {
 
 //////////////////////////////////////////////////////////////////////////
 
-KLChannelKey::KLChannelKey(string keyStr) throw(Squeal) {
+KLChannelKey::KLChannelKey(string keyStr) throw(Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted KL Channel Key"),
                  "KLChannelKey::KLChannelKey(std::string)"));
   }
@@ -162,11 +162,11 @@ ostream& operator<<( ostream& stream, KLChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, KLChannelKey &key ) throw(Squeal) {
+istream& operator>>( istream& stream, KLChannelKey &key ) throw(Exception) {
   string xLabel;
   stream >> xLabel >> key._cell >> key._pmt >> key._detector;
   if (xLabel != "KLChannelKey") {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted KL Channel Key"),
                  "istream& operator>>(istream& stream, KLChannelKey)"));
   }

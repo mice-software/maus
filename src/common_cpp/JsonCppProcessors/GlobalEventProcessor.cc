@@ -15,6 +15,10 @@
  */
 
 #include "src/common_cpp/JsonCppProcessors/GlobalEventProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/PrimaryChainProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/SpacePointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackPointProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/TrackProcessor.hh"
 
 namespace MAUS {
 

@@ -8,7 +8,7 @@
 
 #include "CLHEP/Matrix/Matrix.h"
 #include "CLHEP/Matrix/Vector.h"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 //#include "Tensor3.hh"
 
 #include <vector>

@@ -45,8 +45,7 @@
 
 
 // Other headers
-#include "Interface/Squeal.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Exception.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"

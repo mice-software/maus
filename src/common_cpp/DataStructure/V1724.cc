@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/V1724.hh"
+#include "DataStructure/V1724.hh"
 
 
 namespace MAUS {
@@ -66,6 +66,22 @@ void V1724::SetLdcId(int ldc_id) {
     _ldc_id = ldc_id;
 }
 
+SampleArray V1724::GetSampleArray() const {
+    return _samples;
+}
+
+int V1724::GetSampleArrayElement(size_t index) const {
+    return _samples[index];
+}
+
+size_t V1724::GetSampleArraySize() const {
+    return _samples.size();
+}
+
+void V1724::SetSampleArray(SampleArray samples) {
+    _samples = samples;
+}
+
 int V1724::GetChargeMm() const {
     return _charge_mm;
 }
@@ -106,6 +122,14 @@ void V1724::SetChargePm(int charge_pm) {
     _charge_pm = charge_pm;
 }
 
+int V1724::GetArrivalTime() const {
+    return _arrival_time;
+}
+
+void V1724::SetArrivalTime(int arrival_time) {
+    _arrival_time = arrival_time;
+}
+
 std::string V1724::GetChannelKey() const {
     return _channel_key;
 }
@@ -114,11 +138,27 @@ void V1724::SetChannelKey(std::string channel_key) {
     _channel_key = channel_key;
 }
 
-double V1724::GetTriggerTimeTag() const {
+int V1724::GetPositionMin() const {
+    return _position_min;
+}
+
+void V1724::SetPositionMin(int position_min) {
+    _position_min = position_min;
+}
+
+int V1724::GetPulseArea() const {
+    return _pulse_area;
+}
+
+void V1724::SetPulseArea(int pulse_area) {
+    _pulse_area = pulse_area;
+}
+
+int V1724::GetTriggerTimeTag() const {
     return _trigger_time_tag;
 }
 
-void V1724::SetTriggerTimeTag(double trigger_time_tag) {
+void V1724::SetTriggerTimeTag(int trigger_time_tag) {
     _trigger_time_tag = trigger_time_tag;
 }
 
@@ -130,11 +170,11 @@ void V1724::SetTimeStamp(int time_stamp) {
     _time_stamp = time_stamp;
 }
 
-int V1724::GetPedestal() const {
+double V1724::GetPedestal() const {
     return _pedestal;
 }
 
-void V1724::SetPedestal(int pedestal) {
+void V1724::SetPedestal(double pedestal) {
     _pedestal = pedestal;
 }
 

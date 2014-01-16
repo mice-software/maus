@@ -41,7 +41,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "DataStructure/Global/Track.hh"
 #include "DataStructure/Global/TRefTrackPair.hh"
 

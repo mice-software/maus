@@ -155,6 +155,8 @@ class MCEvent {
 
   MAUS_VERSIONED_CLASS_DEF(MCEvent)
 };
+
+typedef std::vector<MCEvent*> MCEventPArray;
 }
 
 #endif

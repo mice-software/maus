@@ -58,7 +58,39 @@ class PhaseSpaceVector : public Vector<double> {
 
   ~PhaseSpaceVector();
 
-  PhaseSpaceVector & operator=(const PhaseSpaceVector & rhs);
+  // *************************
+  //  Assignment Operators
+  // *************************
+  PhaseSpaceVector& operator =(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator+=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator-=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator*=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator/=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator+=(const double& rhs);
+  PhaseSpaceVector& operator-=(const double& rhs);
+  PhaseSpaceVector& operator*=(const double& rhs);
+  PhaseSpaceVector& operator/=(const double& rhs);
+
+  // *************************
+  //  Algebraic Operators
+  // *************************
+  const PhaseSpaceVector operator+(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator-(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator*(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator/(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator+(const double& rhs) const;
+  const PhaseSpaceVector operator-(const double& rhs) const;
+  const PhaseSpaceVector operator*(const double& rhs) const;
+  const PhaseSpaceVector operator/(const double& rhs) const;
 
   // accessors
   double time()       const {return (*this)[0];}

@@ -34,6 +34,7 @@
 
 // MAUS headers
 #include "Config/MiceModule.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/Globals.hh"

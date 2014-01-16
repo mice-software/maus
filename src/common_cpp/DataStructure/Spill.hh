@@ -21,17 +21,14 @@
 #include <map>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "src/common_cpp/DataStructure/DAQData.hh"
-#include "src/common_cpp/DataStructure/EMRSpillData.hh"
-#include "src/common_cpp/DataStructure/Scalars.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/TestBranch.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/DAQData.hh"
+#include "DataStructure/Scalars.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
-typedef std::vector<ReconEvent*> ReconEventArray;
-typedef std::vector<MCEvent*> MCEventArray;
 typedef std::map<std::string, std::string> ErrorsMap;
 
 /** @class Spill stores data for all items in a given spill
@@ -54,16 +51,11 @@ class Spill {
   virtual ~Spill();
 
   /** Set the scalars information */
-  void SetScalars(Scalars* scalars);
+  void SetScalars(Scalars *scalars);
 
   /** Get the scalars information */
   Scalars* GetScalars() const;
 
-  /** Set the EMR Spill information */
-  void SetEMRSpillData(EMRSpillData* emr);
-
-  /** Get the EMR Spill information */
-  EMRSpillData* GetEMRSpillData() const;
 
   /** Set the DAQ output */
   void SetDAQData(DAQData* daq);
@@ -72,10 +64,10 @@ class Spill {
   DAQData* GetDAQData() const;
 
   /** Set the MC events */
-  void SetMCEvents(MCEventArray* events);
+  void SetMCEvents(MCEventPArray* events);
 
   /** Get the MC events */
-  MCEventArray* GetMCEvents() const;
+  MCEventPArray* GetMCEvents() const;
 
   /** Get a single MC event (needed for PyROOT) */
   MCEvent& GetAnMCEvent(size_t i) const {
@@ -88,10 +80,10 @@ class Spill {
   }
 
   /** Set the Recon events */
-  void SetReconEvents(ReconEventArray* ReconEvent);
+  void SetReconEvents(ReconEventPArray* ReconEvent);
 
   /** Get the Recon events */
-  ReconEventArray* GetReconEvents() const;
+  ReconEventPArray* GetReconEvents() const;
 
   /** Get a single Recon event (needed for PyROOT) */
   ReconEvent& GetAReconEvent(int i) const {
@@ -134,11 +126,11 @@ class Spill {
   TestBranch* GetTestBranch() const;
 
  private:
+
   DAQData* _daq;
   Scalars* _scalars;
-  EMRSpillData* _emr;
-  MCEventArray* _mc;
-  ReconEventArray* _recon;
+  MCEventPArray* _mc;
+  ReconEventPArray* _recon;
   int _spill_number;
   int _run_number;
   std::string _daq_event_type;
