@@ -11,18 +11,22 @@ url=http://dpnc.unige.ch/~yordan/libmonitor.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ] &&
+       [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5" ]
     then
         echo "INFO: Found source archive in 'source' directory"
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
+        rm -f "${MAUS_ROOT_DIR}/third_party/source/${filename}"
+        rm -f "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5"
 
 	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
 	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}.md5
 
     fi
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ] &&
+       [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5" ]
     then
 	echo "INFO: Source archive exists."
         echo
