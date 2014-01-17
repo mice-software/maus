@@ -99,14 +99,14 @@ class TypedResolver : public Resolver {
  *  Call Birth() before parsing the data tree and Death() when you are finished
  *  parsing. Otherwise you will leave stray data that MAUS will attempt to reuse
  *  next time ResolveReferences() is called. We are reasonably strict about
- *  throwing Squeals to encourage the user to be careful about Birth() and
+ *  throwing Exceptions to encourage the user to be careful about Birth() and
  *  Death() for this reason.
  */
 class RefManager {
   public:
     /** Get the static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has not been Birthed.
+     *  throws a Exception if RefManager has not been Birthed.
      */
     static RefManager& GetInstance();
 
@@ -116,13 +116,13 @@ class RefManager {
 
     /** Allocate a static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has already been birthed
+     *  throws a Exception if RefManager has already been birthed
      */
     static void Birth();
 
     /** Delete the static instance of the RefManager
      *
-     *  throws a Squeal if RefManager has not been birthed
+     *  throws a Exception if RefManager has not been birthed
      */
     static void Death();
 

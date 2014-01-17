@@ -33,8 +33,6 @@ SpillProcessor::SpillProcessor() :_mc_array_proc(new MCEventProcessor()),
          ("scalars", &_scal_proc, &Spill::GetScalars, &Spill::SetScalars, false);
     RegisterPointerBranch
          ("daq_data", &_daq_proc, &Spill::GetDAQData, &Spill::SetDAQData, false);
-    RegisterPointerBranch("emr_spill_data", &_emr_proc,
-                        &Spill::GetEMRSpillData, &Spill::SetEMRSpillData, false);
     RegisterPointerBranch("mc_events", &_mc_array_proc, &Spill::GetMCEvents,
                                                     &Spill::SetMCEvents, false);
     RegisterPointerBranch("recon_events", &_recon_array_proc,

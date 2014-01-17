@@ -27,7 +27,8 @@ SciFiLookup::SciFiLookup() : _hits_map(),
 
 SciFiLookup::~SciFiLookup() {
   // Do nothing
-}
+}gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=combinedpdf.pdf -dBATCH 1.pdf 2.pdf 3.pdf
+
 
 bool SciFiLookup::make_hits_map(MCEvent* evt) {
   // Check the pointer is valid

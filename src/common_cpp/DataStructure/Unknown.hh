@@ -21,15 +21,21 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
-#include "src/common_cpp/DataStructure/V1290.hh"
+#include "DataStructure/V1290.hh"
+#include "DataStructure/V1724.hh"
+#include "DataStructure/V1731.hh"
 
 namespace MAUS {
 // Needed for ROOT
 typedef std::vector<V1290> V1290Array;
+typedef std::vector<V1724> V1724Array;
+typedef std::vector<V1731> V1731Array;
 
 /** @class Unknown comment
  *
  *  @var V1290  <--description-->
+ *  @var V1724  <--description-->
+ *  @var V1731  <--description-->
  */
 
 class Unknown {
@@ -59,8 +65,34 @@ class Unknown {
     /** Sets V1290Array */
     void SetV1290Array(V1290Array V1290);
 
+    /** Returns V1724Array */
+    V1724Array GetV1724Array() const;
+
+    /** Get an element from V1724Array (needed for PyROOT) */
+    V1724 GetV1724ArrayElement(size_t index) const;
+
+    /** Get size of V1724Array (needed for PyROOT) */
+    size_t GetV1724ArraySize() const;
+
+    /** Sets V1724Array */
+    void SetV1724Array(V1724Array V1724);
+
+    /** Returns V1731Array */
+    V1731Array GetV1731Array() const;
+
+    /** Get an element from V1731Array (needed for PyROOT) */
+    V1731 GetV1731ArrayElement(size_t index) const;
+
+    /** Get size of V1731Array (needed for PyROOT) */
+    size_t GetV1731ArraySize() const;
+
+    /** Sets V1731Array */
+    void SetV1731Array(V1731Array V1731);
+
   private:
     V1290Array _V1290;
+    V1724Array _V1724;
+    V1731Array _V1731;
 
     MAUS_VERSIONED_CLASS_DEF(Unknown)
 };

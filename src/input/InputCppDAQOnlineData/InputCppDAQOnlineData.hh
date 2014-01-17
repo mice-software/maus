@@ -26,6 +26,8 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
+namespace MAUS {
+
 class InputCppDAQOnlineData : public InputCppDAQData {
 
  public:
@@ -60,10 +62,7 @@ class InputCppDAQOnlineData : public InputCppDAQData {
    *
    *  \param mon file name of the source
    */
-  void setMonitorSrc(std::string mon) {
-    _dataManager->setMonSrc(mon);
-    _dataManager->Init();
-  }
+  void setMonitorSrc(std::string mon);
 
  private:
 
@@ -71,5 +70,6 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   MDmonitoring * _dataManager;
   struct timespec _sleep_time; // time.h
 };
+}
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

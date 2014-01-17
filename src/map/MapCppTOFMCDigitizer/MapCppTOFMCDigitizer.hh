@@ -41,6 +41,8 @@
 #include "Config/MiceModule.hh"
 #include "Utils/TOFCalibrationMap.hh"
 
+namespace MAUS {
+
 class MapCppTOFMCDigitizer {
  public:
   bool birth(std::string argJsonConfigDocument);
@@ -81,5 +83,6 @@ class MapCppTOFMCDigitizer {
   double gentime;
   bool fDebug;
 };
+}
 
 #endif  //  _COMPONENTS_MAP_MAPCPPTOFMCDIGITIZER_H_

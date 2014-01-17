@@ -18,6 +18,8 @@
 
 #include "Utils/TOFChannelMap.hh"
 
+namespace MAUS {
+
 TOFChannelMap::~TOFChannelMap() {
   for (unsigned int i = 0;i < _tofKey.size();i++) {
     delete _tofKey[i];
@@ -81,7 +83,7 @@ bool TOFChannelMap::InitFromFile(string filename) {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Squeal e) {
+  } catch(Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromFile : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
@@ -112,7 +114,7 @@ bool TOFChannelMap::InitFromCDB() {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Squeal e) {
+  } catch(Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromCDB : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
@@ -155,8 +157,8 @@ TOFChannelKey* TOFChannelMap::find(std::string daqKeyStr) {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::find(std::string)"));
   }
@@ -170,8 +172,8 @@ DAQChannelKey* TOFChannelMap::findfAdcKey(std::string tdcKeyStr) {
   try {
     xConv << tdcKeyStr;
     xConv >> xDaqKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::findfAdcKey(std::string)"));
   }
@@ -192,8 +194,8 @@ DAQChannelKey* TOFChannelMap::findTdcKey(std::string adcKeyStr) {
   try {
     xConv << adcKeyStr;
     xConv >> xDaqKey;
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::findTdcKey(std::string)"));
   }
@@ -210,13 +212,13 @@ DAQChannelKey* TOFChannelMap::findTdcKey(std::string adcKeyStr) {
 
 //////////////////////////////////////////////////////////////////////////
 
-TOFChannelKey::TOFChannelKey(string keyStr) throw(Squeal) {
+TOFChannelKey::TOFChannelKey(string keyStr) throw(Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted TOF Channel Key"),
                  "TOFChannelKey::TOFChannelKey(std::string)"));
   }
@@ -288,12 +290,12 @@ ostream& operator<<( ostream& stream, TOFChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal) {
+istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exception) {
   string xLabel;
   stream >> xLabel >> key._station >> key._plane >> key._slab >> key._pmt >> key._detector;
 
   if (xLabel != "TOFChannelKey") {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  std::string("corrupted TOF Channel Key"),
                  "istream& operator>>(istream& stream, TOFChannelKey)"));
   }
@@ -354,7 +356,7 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
   std::cout << "Building" << std::endl;
   if (py_arg == NULL) {
     PyErr_Clear();
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
               "Failed to resolve arguments to get_cabling",
               "MAUSEvaluator::evaluate"));
     }
@@ -367,7 +369,7 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     if (py_value == NULL) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Failed to parse argument "+devname,
                      "GetCabling::get_cabling"));
     }
@@ -375,4 +377,4 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     Py_XDECREF(py_value);
     Py_XDECREF(py_arg);
 }
-
+}

@@ -19,7 +19,6 @@
 
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
-
 namespace MAUS {
 
 GlobalEvent::GlobalEvent()

@@ -19,19 +19,15 @@
 
 #include "Recon/Global/Particle.hh"
 
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "Interface/Squeak.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
-
-using MAUS::recon::global::Particle;
+  using MAUS::DataStructure::Global::PID;
 
 Particle::Particle() {
-  typedef std::pair<MAUS::DataStructure::Global::PID, std::string> name_pair;
-  typedef std::pair<MAUS::DataStructure::Global::PID, double>      mass_pair;
-  typedef std::pair<MAUS::DataStructure::Global::PID, int>         charge_pair;
-
   AddParticleDefinition(MAUS::DataStructure::Global::kNoPID,
                         "none",
                         0.,
@@ -175,8 +171,8 @@ Particle::Particle() {
 
 Particle::~Particle() { }
 
-Particle const * Particle::GetInstance() {
-  return &Particle::kSingleton;
+const Particle & Particle::GetInstance() {
+  return Particle::kSingleton;
 }
 
 std::string Particle::GetName(MAUS::DataStructure::Global::PID id) const {

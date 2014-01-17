@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "src/legacy/Interface/Squeak.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/legacy/Interface/Mesh.hh"
 #include "src/legacy/Interface/STLUtils.hh"
@@ -51,7 +51,7 @@ SectorMagneticFieldMap::SectorMagneticFieldMap(std::string file_name,
         SectorMagneticFieldMap* tgt = _fields[file_name];
         if (_symmetry != tgt-> _symmetry || _units != tgt->_units ||
             _format != tgt->_format || _filename != tgt->_filename) {
-            throw(Squeal(Squeal::recoverable,
+            throw(Exception(Exception::recoverable,
                "Attempt to construct different SectorFieldMaps with same file "+
                std::string("but different settings"),
                "SectorMagneticFieldMap::SectorMagneticFieldMap(...)"));
@@ -111,7 +111,7 @@ SectorMagneticFieldMap::symmetry SectorMagneticFieldMap::StringToSymmetry
     if (sym == "Dipole") {
         return dipole;
     }
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Didn't recognise symmetry type "+sym,
           "SectorMagneticFieldMap::StringToSymmetry"));
 }
@@ -124,7 +124,7 @@ std::string SectorMagneticFieldMap::SymmetryToString
     if (sym == dipole) {
         return "Dipole";
     }
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Didn't recognise symmetry type",
                  "SectorMagneticFieldMap::SymmetryToString"));
 }
@@ -165,11 +165,11 @@ Interpolator3dGridTo3d* SectorMagneticFieldMapIO::ReadMap
             return ReadToscaMap(file_name, units, symmetry);
         }
     } catch(std::exception& exc) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Failed to read file "+file_name+" with "+(&exc)->what(),
                      "SectorMagneticFieldMapIO::ReadMap"));
     }
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Didn't recognise map type "+file_type,
                  "SectorMagneticFieldMapIO::ReadMap"));
     return NULL;
@@ -260,14 +260,14 @@ std::vector< std::vector<double> > SectorMagneticFieldMapIO::ReadLines
     std::vector< std::vector<double> > field_points;
     std::string line;
     if (units.size() != 6) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                     "Units should be of length 6",
                     "SectorMagneticFieldMapIO::ReadMap"));
     }
 
     std::ifstream fin(file_name.c_str());
     if (!fin || !fin.is_open()) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Failed to open file "+file_name,
                      "SectorMagneticFieldMapIO::ReadMap"));
     }

@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
 
 #include "src/common_cpp/DataStructure/EMREvent.hh"
+#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 namespace MAUS {
@@ -35,6 +36,7 @@ class EMREventProcessor : public ObjectProcessor<EMREvent> {
     EMREventProcessor();
 
   private:
+    PointerArrayProcessor<EMRPlaneHit> _plane_hit_proc;
 };
 }  // namespace MAUS
 

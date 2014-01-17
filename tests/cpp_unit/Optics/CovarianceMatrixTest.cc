@@ -284,7 +284,7 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
   try {
     const CovarianceMatrix rows_too_small_covariances(rows_too_small);
     testpass = false;
-  } catch (Squeal squeal) {}
+  } catch (MAUS::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   const Matrix<double> columns_too_small(4, 6, 1.);
@@ -292,7 +292,7 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
   try {
     const CovarianceMatrix columns_too_small_covariances(columns_too_small);
     testpass = false;
-  } catch (Squeal squeal) {}
+  } catch (MAUS::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // SymmetricMatrix copies
@@ -305,7 +305,7 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
   try {
     const CovarianceMatrix too_small_covariances(too_small);
     testpass = false;
-  } catch (Squeal squeal) {}
+  } catch (MAUS::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // HepSymMatrix copy
@@ -318,7 +318,22 @@ TEST_F(CovarianceMatrixTest, CopyConstructors) {
   try {
     const CovarianceMatrix too_small_hep(hep_too_small);
     testpass = false;
-  } catch (Squeal squeal) {}
+  } catch (MAUS::Exception exc) {}
+  ASSERT_TRUE(testpass);
+
+  // TMatrixDSym copy
+  const TMatrixDSym root_sym_matrix(6, non_positive_definite_data_);
+  const CovarianceMatrix root_covariances(root_sym_matrix);
+  ASSERT_EQ(root_covariances, non_positive_definite_matrix_);
+
+  TMatrixDSym root_too_small(4);
+  Double_t seed = 2.;
+  root_too_small.RandomizePD(-2, 2, seed);
+  testpass = true;
+  try {
+    const CovarianceMatrix too_small_covariances(root_too_small);
+    testpass = false;
+  } catch (MAUS::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 

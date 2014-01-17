@@ -31,7 +31,7 @@
 
 
 #include "src/common_cpp/Utils/DAQChannelMap.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/Squeak.hh"
 
 using std::string;
@@ -55,7 +55,7 @@ class KLChannelKey {
   KLChannelKey(int cl, int pmt, string d)
   :_cell(cl), _pmt(pmt), _detector(d) {}
 
-  explicit KLChannelKey(string keyStr) throw(Squeal);
+  explicit KLChannelKey(string keyStr) throw(Exception);
   virtual ~KLChannelKey() {}
 
   bool operator==( KLChannelKey key );
@@ -75,7 +75,7 @@ class KLChannelKey {
   string GetOppositeSidePMTStr();
 
   friend ostream& operator<<( ostream& stream, KLChannelKey key );
-  friend istream& operator>>( istream& stream, KLChannelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, KLChannelKey &key ) throw(Exception);
 
   string detector() const {return _detector;}
 

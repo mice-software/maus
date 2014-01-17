@@ -21,7 +21,7 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -39,7 +39,7 @@ class IProcessor {
     /** Convert from the Json representation to the cpp representation
      *
      *  Memory for CppRepresentation should be allocated by this function. If
-     *  the conversion fails, throw a Squeal - don't return NULL or allocate
+     *  the conversion fails, throw a Exception - don't return NULL or allocate
      *  memory.
      */
     virtual CppRepresentation* JsonToCpp
@@ -48,7 +48,7 @@ class IProcessor {
     /** Convert from the Cpp representation to the json representation
      *
      *  Memory for the json representation should be allocated by this function.
-     *  If the conversion fails, throw a Squeal - don't return NULL or allocate
+     *  If the conversion fails, throw a Exception - don't return NULL or allocate
      *  memory.
      */
     virtual Json::Value* CppToJson

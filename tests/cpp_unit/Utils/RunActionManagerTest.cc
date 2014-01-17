@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
@@ -63,13 +63,13 @@ TEST(RunActionManagerTest, TestPushBack) {
     delete data_run;
     ASSERT_EQ(RunActionTest::reference_count, 0);
     data_run = new RunActionManager();
-    EXPECT_THROW(data_run->PushBack(NULL), Squeal);
+    EXPECT_THROW(data_run->PushBack(NULL), MAUS::Exception);
     delete data_run;
 
     RunActionTest* data_run_action = new RunActionTest();
     data_run = new RunActionManager();
     data_run->PushBack(data_run_action);
-    EXPECT_THROW(data_run->PushBack(data_run_action), Squeal);
+    EXPECT_THROW(data_run->PushBack(data_run_action), MAUS::Exception);
     delete data_run;
 }
 
@@ -126,10 +126,10 @@ TEST(RunActionManagerTest, TestSwap) {
     EXPECT_EQ(run_action_2->_my_run_number, 11);
 
     // run_action_1 is not in data_run
-    EXPECT_THROW(data_run->Swap(run_action_1, run_action_3), Squeal);
+    EXPECT_THROW(data_run->Swap(run_action_1, run_action_3), MAUS::Exception);
     data_run->PushBack(run_action_3);
     // run_action_3 is already in data_run
-    EXPECT_THROW(data_run->Swap(run_action_2, run_action_3), Squeal);
+    EXPECT_THROW(data_run->Swap(run_action_2, run_action_3), MAUS::Exception);
     delete data_run;
     delete run_action_1;
 }

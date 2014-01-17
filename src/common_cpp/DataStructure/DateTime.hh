@@ -56,7 +56,7 @@ class DateTime {
      *     YYYY-MM-DDTHH:MM:SS.mmmmmm\n
      *  where T is a user defined separator.
      *
-     *  Throws a Squeal if formatting is not correct
+     *  Throws a Exception if formatting is not correct
      */
     void SetDateTime(std::string datetime);
 

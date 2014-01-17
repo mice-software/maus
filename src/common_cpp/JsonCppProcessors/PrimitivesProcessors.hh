@@ -33,7 +33,7 @@ class DoubleProcessor : public ProcessorBase<double> {
   public:
     /** Convert from Json::numericValue to double
      *
-     *  If json_double cannot be converted to a double, throw a Squeal
+     *  If json_double cannot be converted to a double, throw a Exception
      */
     virtual double* JsonToCpp(const Json::Value& json_double);
 
@@ -52,7 +52,7 @@ class StringProcessor : public ProcessorBase<std::string> {
   public:
     /** Convert from Json::numericValue to double
      *
-     *  If json_string cannot be converted to a double, throw a Squeal
+     *  If json_string cannot be converted to a double, throw a Exception
      */
     virtual std::string* JsonToCpp(const Json::Value& json_string);
 
@@ -73,7 +73,7 @@ class IntProcessor : public ProcessorBase<int> {
   public:
     /** Convert from Json::intValue to int
      *
-     *  If json_string cannot be converted to a int, throw a Squeal
+     *  If json_string cannot be converted to a int, throw a Exception
      */
     virtual int* JsonToCpp(const Json::Value& json_int);
 
@@ -136,7 +136,7 @@ class BoolProcessor : public ProcessorBase<bool> {
   public:
     /** Convert from Json::boolValue to bool
      *
-     *  If json_bool cannot be converted to a bool, throw a Squeal
+     *  If json_bool cannot be converted to a bool, throw a Exception
      */
     virtual bool* JsonToCpp(const Json::Value& json_bool);
 

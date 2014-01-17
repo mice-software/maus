@@ -15,7 +15,7 @@
  */
 
 #include "src/legacy/Interface/Interpolation/Interpolator3dGridTo3d.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 Interpolator3dGridTo3d::Interpolator3dGridTo3d
                                            (const Interpolator3dGridTo3d& rhs) {
@@ -58,7 +58,7 @@ void Interpolator3dGridTo3d::Set(ThreeDGrid* grid,
             _interpolator[2] = new TriLinearInterpolator(grid, Bz);
             break;
         default:
-            throw(Squeal(Squeal::recoverable,
+            throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Did not recognise interpolation algorithm",
                    "Interpolator3dGridTo3d::Set")
       );
