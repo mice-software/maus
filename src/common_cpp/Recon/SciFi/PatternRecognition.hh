@@ -399,7 +399,7 @@ class PatternRecognition {
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
   private:
-    static const int _debug = 2;             /** Verbosity: 0=little, 1=more couts, 2=files too */
+    static const int _debug = 0;             /** Verbosity: 0=little, 1=more couts */
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
@@ -425,12 +425,6 @@ class PatternRecognition {
     static const double _Pz_min = 50.; /** MeV/c min Pz for helical tracks (this is a guess) */
 
     LSQFit _lsq;
-
-    // Some output files - only to be kept when in development stages
-    std::ofstream * _f_res;
-    std::ofstream * _f_res_good;
-    std::ofstream * _f_res_chosen;
-    std::ofstream * _f_trks;
 };
 
 } // ~namespace MAUS
