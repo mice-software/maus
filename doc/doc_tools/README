@@ -1,0 +1,52 @@
+##############################################################
+#                                                            #
+#   INSTRUCTIONS:                                            #
+#   1. Run generate_third_party_doc.py                       #
+#   2. Run generate_MAUS_doc.py                              #
+#   3. Open ../index.html in order to browse documentation   #
+#                                                            #
+##############################################################
+
+The files "generate_third_party_doc.py" and "generate_MAUS_doc.py" will
+generate the doxygen documentation for third party libraries (currently ROOT,
+Geant4, CLHEP, and JsonCpp) and MAUS (split up into framework, DataStructure,
+Input, Map, Reduce, Output) respectively. Documentations can be browsed via
+doc/index.html which is created at the end of "generate_MAUS_doc.py".
+If your MAUS installation is set up to use third party libaries from elsewhere
+(as given by the environment variable MAUS_THIRD_PARTY), third party
+documentation will be stored there. Paths in index.hthml are automatically
+adjusted.
+THIRD PARTY DOCUMENTATION HAS TO BE GENERATED BEFORE THE MAUS DOCUMENTATION
+IN ORDER FOR DERIVED CLASSES TO BE INCLUDED PROPERLY.
+
+NOTE: There is some seemingly invalid LaTeX code in three of the ROOT source
+files resulting in the image generation for these equations failing when
+creating the ROOT doxygen documentation. The relevant files are in
+third_party/build/root_v5.34.07/include/Math and are named
+VavilovAccurateCdf.h, VavilovAccuratePdf.h, and VavilovAccurateQuantile.h.
+The problematic equation starts on line 53, 51, and 53 respectively. To fix,
+replace with the same equation from VavilovAccurate.h line 50-53, specifically
+remove the ampersands around the "=" in the first line and replace "\der t" by
+"d t" in the third line.
+
+The directories from which the documentation is created are listed below.
+(* used to maintain functionality in case of third party library updates.)
+
+THIRD PARTY:
+ROOT:           /third_party/build/root_v{version}/include/
+                /third_party/build/root_v{version}/lib/
+Geant4:         /third_party/build/geant{version}/source/
+CLHEP:          /third_party/build/clhep-{version}/
+JsonCpp:        /third_party/build/jsoncpp-src-{version}/include/
+                /third_party/build/jsoncpp-src-{version}/src/;
+
+MAUS:
+Framework:      /src/common_cpp/ with the exception of /src/common_cpp/DataStructure/
+                /src/common_py/
+                /src/py_cpp/
+                /src/legacy/;
+DataStructure:  /src/common_cpp/DataStructure/
+Input:          /src/input/
+Map:            /src/map/
+Reducer:        /src/reduce/
+Output:         /src/output/
