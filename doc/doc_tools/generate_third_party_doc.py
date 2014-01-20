@@ -43,7 +43,7 @@ def main():
         if tplibpath_dict.get(tplib) != None:
             run_doxygen(tplib, tplibinput_dict[tplib])
     print 'Third party libraries documentation built.'
-    print 'Now run "generate_MAUS_doc.py" to build MAUS documentation.'
+    print 'Now run "generate_maus_doc.py" to build MAUS documentation.'
     exit()
 
 
