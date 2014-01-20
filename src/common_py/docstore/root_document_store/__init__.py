@@ -11,10 +11,10 @@ interfaces to the document queue
 * client_socket is a convenience wrapper for the ROOT TSocket
 """
 
-from _server_socket import ServerSocket
-from _client_socket import ClientSocket
-from _client_socket import ControlMessage
-#from _document_queue import DocumentQueue
-#from _root_document_store import RootDocumentStore
+from _server_socket import SocketManager
+from _socket_error import SocketError
+from _control_message import ControlMessage
+from _document_queue import DocumentQueue
+from _root_document_store import RootDocumentStore
 
 all = []
