@@ -1,37 +1,48 @@
 #!/bin/env python
 
-# Generate an html file ("index.html") to allow easy access to the documentation for the various components.
-# This file is run automatically at the end of "generate_MAUS_doc.py" and generally does not need to be run by itself.
+"""Create index file to access documentation components."""
+
+# Generate an html file ("index.html") to allow easy access to the
+# documentation for the various components.
+# This file is run automatically at the end of "generate_MAUS_doc.py" and
+# generally does not need to be run by itself.
 # For more information see README.
 
 import os
 
 def main():
+    """Main"""
     create_index_html()
     
 def create_index_html():
-    Paths = [os.environ.get('MAUS_THIRD_PARTY'),os.environ.get('MAUS_ROOT_DIR')]
-    # Get the locations of the local MAUS installation and the location of the third party libraries
-    # relative to the point where their absolute paths branch.
-    TPPathSegment = Paths[0][len(os.path.commonprefix(Paths)):]
-    MausPathSegment = Paths[1][len(os.path.commonprefix(Paths)):]
+    """Create the html file"""
+    paths = [os.environ.get('MAUS_THIRD_PARTY'),
+             os.environ.get('MAUS_ROOT_DIR')]
+    # Get the locations of the local MAUS installation and the location of the
+    # third party libraries relative to the point where their absolute paths
+    # branch.
+    tppath_segment = paths[0][len(os.path.commonprefix(paths)):]
+    maus_path_segment = paths[1][len(os.path.commonprefix(paths)):]
     # Need to deal with the case where the two paths are the same
-    if not TPPathSegment:
-        RelTPPath = ''
+    if not tppath_segment:
+        rel_tppath = ''
     # Generate the appropriate paths to link to the third party libaries.
     else:
-        RelTPPath = TPPathSegment + '/doc/'
-        DirPrepend = '../'
-        for n in range(MausPathSegment.count('/')+1):
-            DirPrepend = DirPrepend + '../'
-        RelTPPath = DirPrepend + RelTPPath
-    # These need to be defined manually because it is possible that third party and MAUS documentation are in the same directory.
-    RootSegment = '<li><a href="' + RelTPPath + 'doxygen_root/html/index.html">ROOT</a></li>\n'
-    Geant4Segment = '<li><a href="' + RelTPPath + 'doxygen_geant4/html/index.html">Geant4</a></li>\n'
-    ClhepSegment = '<li><a href="' + RelTPPath + 'doxygen_clhep/html/index.html">CLHEP</a></li>\n'
-    JsonCppSegment = '<li><a href="' + RelTPPath + 'doxygen_jsoncpp/html/index.html">JsonCpp</a></li>\n'
+        rel_tppath = tppath_segment + '/doc/'
+        dir_prepend = '../'*(maus_path_segment.count('/')+2)
+        rel_tppath = dir_prepend + rel_tppath
+    # These need to be defined manually because it is possible that third party
+    # and MAUS documentation are in the same directory.
+    root_segment = ('<li><a href="' + rel_tppath +
+                    'doxygen_root/html/index.html">ROOT</a></li>\n')
+    geant4_segment = ('<li><a href="' + rel_tppath +
+                      'doxygen_geant4/html/index.html">Geant4</a></li>\n')
+    clhep_segment = ('<li><a href="' + rel_tppath +
+                     'doxygen_clhep/html/index.html">CLHEP</a></li>\n')
+    jsoncpp_segment = ('<li><a href="' + rel_tppath +
+                       'doxygen_jsoncpp/html/index.html">JsonCpp</a></li>\n')
     # Fixed components of the index file.
-    Upper = """
+    upper_html_snippet = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,20 +75,22 @@ div
      <li class="title">Third Party Documentation</li>
       <ul>
     """
-    Lower = """
+    lower_html_snippet = """
       </ul>
  </ul>
 </div>
 </body>
 </html>
     """
-    f = open('../index.html', 'w')
-    f.write(Upper + RootSegment + Geant4Segment + ClhepSegment + JsonCppSegment + Lower)
-    f.close()
+    file1 = open('../index.html', 'w')
+    file1.write(upper_html_snippet + root_segment + geant4_segment +
+                clhep_segment + jsoncpp_segment + lower_html_snippet)
+    file1.close()
 
 if __name__ == "__main__":
     print "Typically you don't need to run this file by itself."
     print "It is automatically executed at the end of generate_MAUS_doc.py."
-    print "Only execute this file if the documentation has already been compiled."
-    raw_input('If you would still like to generate the index file, please press Enter.')
+    print "Only execute this file if documentation has already been compiled."
+    raw_input('If you would still like to generate the index file, '
+              'please press Enter.')
     main()
