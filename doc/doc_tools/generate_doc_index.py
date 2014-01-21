@@ -13,7 +13,11 @@ import os
 def main():
     """Main"""
     create_index_html()
-    
+
+def commonprefix(*args):
+    """Fix behaviour of commonprefix function"""
+    return os.path.commonprefix(*args).rpartition('/')[0]
+
 def create_index_html():
     """Create the html file"""
     paths = [os.environ.get('MAUS_THIRD_PARTY'),
@@ -21,8 +25,8 @@ def create_index_html():
     # Get the locations of the local MAUS installation and the location of the
     # third party libraries relative to the point where their absolute paths
     # branch.
-    tppath_segment = paths[0][len(os.path.commonprefix(paths)):]
-    maus_path_segment = paths[1][len(os.path.commonprefix(paths)):]
+    tppath_segment = paths[0][len(commonprefix(paths))+1:]
+    maus_path_segment = paths[1][len(commonprefix(paths))+1:]
     # Need to deal with the case where the two paths are the same
     if not tppath_segment:
         rel_tppath = ''
