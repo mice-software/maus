@@ -164,7 +164,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
      # python scripts for running doxygen
-     export PYTHONPATH="$PYTHONPATH:$MAUS_ROOT_DIR/doc/doc_tools"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/doc/doc_tools:\$PYTHONPATH"
 
      # Celery
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
