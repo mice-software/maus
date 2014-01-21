@@ -157,8 +157,8 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
     _station_rms/=1000.; // convert microns to mm.
     initialize_PDFs();
     return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception &exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
   } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
@@ -299,10 +299,8 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
       std::cerr << "No recon events found\n";
     }
     save_to_json(spill);
-  } catch(Squeal& squee) {
-    squee.Print();
-    *_spill_json = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(_spill_json, squee, _classname);
+  } catch(Exception &exception) {
+    exception.Print();
   } catch(...) {
     Json::Value errors;
     std::stringstream ss;
