@@ -30,7 +30,6 @@ from docstore.DocumentStore import DocumentStore
 from _socket_manager import SocketManager
 from _control_message import ControlMessage
 
-
 class RootDocumentStore(DocumentStore):
 
     def __init__(self, timeout, poll_time):
@@ -95,7 +94,7 @@ class RootDocumentStore(DocumentStore):
         return msg.return_value
 
     def put(self, collection, docid, root_data):
-        msg = self._parse_function((collection, docid, doc), {}, root_data)
+        msg = self._parse_function((collection, docid), {}, root_data)
         return msg.return_value
 
     def get(self, collection, docid):
