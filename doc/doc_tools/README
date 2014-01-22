@@ -16,6 +16,8 @@ If your MAUS installation is set up to use third party libaries from elsewhere
 (as given by the environment variable MAUS_THIRD_PARTY), third party
 documentation will be stored there. Paths in index.hthml are automatically
 adjusted.
+Both scripts can be run with the argument --noprompt in order not to prompt for
+confirmation.
 THIRD PARTY DOCUMENTATION HAS TO BE GENERATED BEFORE THE MAUS DOCUMENTATION
 IN ORDER FOR DERIVED CLASSES TO BE INCLUDED PROPERLY.
 

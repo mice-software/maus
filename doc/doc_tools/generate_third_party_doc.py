@@ -30,7 +30,7 @@ def main():
         print 'Please build third party libraries before running this script.'
         print 'Aborting.'
         exit()
-    tplibpath_dict = find_paths(thirdpartylibs, maus_thirdparty_build)
+    tplibpath_dict = find_paths(thirdpartylibs, maus_thirdparty_build, prompt)
     if prompt != 0:
         raw_input('If everything is correct, please press enter to compile '
                   'documentation')
@@ -56,7 +56,7 @@ def main():
 # Check if third party libraries are installed and if there are doubles.
 # Then create dictionary with paths to all the newest versions.
 
-def find_paths(thirdpartylibs, maus_thirdparty_build):
+def find_paths(thirdpartylibs, maus_thirdparty_build, prompt):
     """Find paths to highest version numbers of installed third party libs"""
     tplib_dict = dict([ (i, []) for i in thirdpartylibs])
     tplibpath_dict = dict()
