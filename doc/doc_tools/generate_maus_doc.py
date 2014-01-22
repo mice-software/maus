@@ -5,6 +5,7 @@
 
 import subprocess
 import os
+import sys
 from generate_doc_index import create_index_html
 
 if os.environ.get('MAUS_THIRD_PARTY') == None:
@@ -15,6 +16,9 @@ if os.environ.get('MAUS_THIRD_PARTY') == None:
 
 def main():
     """Generate list of tagfiles, then trigger doxygen for components"""
+    prompt = 1
+    if len(sys.argv) > 1 and str(sys.argv[1]) == '--noprompt':
+        prompt = 0
     maus_thirdparty = os.environ['MAUS_THIRD_PARTY']
     maus_rootdir = os.environ['MAUS_ROOT_DIR']
     thirdpartylibs = ['root', 'geant4', 'clhep', 'jsoncpp']
@@ -33,29 +37,10 @@ def main():
         if os.path.isfile(tppath):
             tagfiles.append(tppath)
             print 'Tagfile found: ' + tppath
-    # Case where we have 0 or 0 < # < expected tagfiles found.
-    if len(tagfiles) == 0:
-        print ('No Tagfiles found. Most likely, third party documentation has '
-              'not been compiled.')
-    elif len(tagfiles) <= 3:
-        print ('Only found tagfiles for ' + str(len(tagfiles)) +
-              ' out of 4 third party libraries.')
-        print ('Maybe there was a problem with compiling third party '
-              'documentation?')
-    # If fewer tagfiles than expected found, prompt whether documentation
-    # should still be compiled.
-    if len(tagfiles) <= 3:
-        choice = ''
-        while choice not in ['c', 'a']:
-            choice = raw_input('Would you like to [c]ontinue anyway or '
-                               '[a]bort ')
-            if choice == 'a':
-                exit()
-            else:
-                continue
-
-    raw_input('If everything is correct, please press enter to compile ' +
-              'documentation')
+    check_tagfiles(tagfiles, prompt)
+    if prompt != 0:
+        raw_input('If everything is correct, please press enter to compile ' +
+                  'documentation')
     
     # A list of all tagfiles with doc location. MAUS component tagfiles are
     # added one by one as they are created.
@@ -77,6 +62,30 @@ def main():
         tagfiles = tagfiles + ' ' + tagfilesmaus_dict[component]
     create_index_html()
     exit()
+
+
+def check_tagfiles(tagfiles, prompt):
+    """Check for tagfiles, if missing prompt user for how to proceed"""
+    # Case where we have 0 or 0 < # < expected tagfiles found.
+    if len(tagfiles) == 0:
+        print ('No Tagfiles found. Most likely, third party documentation has '
+              'not been compiled.')
+    elif len(tagfiles) <= 3:
+        print ('Only found tagfiles for ' + str(len(tagfiles)) +
+              ' out of 4 third party libraries.')
+        print ('Maybe there was a problem with compiling third party '
+              'documentation?')
+    # If fewer tagfiles than expected found, prompt whether documentation
+    # should still be compiled.
+    if len(tagfiles) <= 3:
+        choice = ''
+        while choice not in ['c', 'a'] and prompt != 0:
+            choice = raw_input('Would you like to [c]ontinue anyway or '
+                               '[a]bort ')
+            if choice == 'a':
+                exit()
+            else:
+                continue
 
 
 # framework and datastructure need own snippets due to some special settings

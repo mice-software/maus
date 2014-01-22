@@ -6,6 +6,7 @@
 import subprocess
 import os
 import fnmatch
+import sys
 
 if os.environ.get('MAUS_THIRD_PARTY') == None:
     print 'MAUS_THIRD_PARTY environment variable not set.'
@@ -15,6 +16,10 @@ if os.environ.get('MAUS_THIRD_PARTY') == None:
 
 def main():
     """Generate list of third party libraries, then run doxygen on them"""
+    prompt = 1
+    if len(sys.argv) > 1 and str(sys.argv[1]) == '--noprompt':
+        prompt = 0
+
     maus_thirdparty = os.environ['MAUS_THIRD_PARTY']
     maus_thirdparty_build = maus_thirdparty + '/third_party/build/'
     thirdpartylibs = ['root', 'geant4', 'clhep', 'jsoncpp']
@@ -26,8 +31,9 @@ def main():
         print 'Aborting.'
         exit()
     tplibpath_dict = find_paths(thirdpartylibs, maus_thirdparty_build)
-    raw_input('If everything is correct, please press enter to compile '
-              'documentation')
+    if prompt != 0:
+        raw_input('If everything is correct, please press enter to compile '
+                  'documentation')
     # Input folders follow different conventions for the libraries, so have to
     # be defined manually
     tplibinput_dict = dict()
@@ -65,7 +71,7 @@ def find_paths(thirdpartylibs, maus_thirdparty_build):
             print ('WARNING: Library ' + tplib +
                   ' not found in third party directory')
             choice = ''
-            while choice not in ['s', 'a']:
+            while choice not in ['s', 'a'] and prompt != 0:
                 choice = raw_input('[s]kip, [a]bort program ')
                 if choice == 'a':
                     exit()
