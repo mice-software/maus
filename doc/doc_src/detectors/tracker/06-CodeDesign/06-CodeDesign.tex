@@ -25,8 +25,7 @@ This map performs the main reconstruction work, moving from digits to cluster to
  \item SciFiSpacepointRecon - spacepoint reconstruction from cluster
  \item PatternRecognition - association of spacepoints to tracks, and crude initial track fit
 \end{itemize}
-
-The backend classes for the final track fit are stored under \verb;src/common_cpp/Recon/Kalman; and  \verb;src/common_cpp/Recon/Bayes;, the top level class being KalmanTrackFit.  Other classes used include:
+The backend classes for the final track fit are stored under \verb;src/common_cpp/Recon/Kalman; and  \verb;src/common_cpp/Recon/Bayes;, the top level class being KalmanTrackFit. Other classes used include:
 
 \begin{itemize}
  \item KalmanFilter
@@ -35,6 +34,9 @@ The backend classes for the final track fit are stored under \verb;src/common_cp
  \item KalmanState
  \item KalmanSeed
 \end{itemize}
+
+\subsubsection{ReduceCppPatternRecognition}
+This reducer displays spacepoints and pattern recognition tracks by tracker, in the $x-y$, $x-z$ and $y-z$ projections.  It also creates an InfoBox, which displays various information for the spill and run, such as the number of clusters, spacepoints, etc.  The plots are made using ROOT TGraphs, and the InfoBox with a TPaveText. 
 
 
 

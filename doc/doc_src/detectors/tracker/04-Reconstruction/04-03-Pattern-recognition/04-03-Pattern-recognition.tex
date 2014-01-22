@@ -1,8 +1,8 @@
 \subsection{Pattern recognition}
-\label{Sect:PatRec}
+\label{Sect:SciFiPatRec}
 
 \subsubsection{Straight-line pattern recognition}
-\label{SubSect:SLPatRec}
+\label{SubSect:SciFiSLPatRec}
 
 In the absence of a magnetic field, the tracks passing through the tracker may be described using a straight line in three dimensions. Taking the $z$ coordinate as the independent parameter, the track parameters may be taken to be:
 
@@ -69,7 +69,7 @@ Expressions for the evaluation of $\chi^2_x$ and $\chi^2_y$ are given in Appendi
 then the trial track is accepted and the pattern-recognition track parameters and covariance matrix are calculated using the expressions given in Appendix \ref{App:LS-SL-fit}.
 
 \subsubsection{Helix pattern recognition}
-\label{SubSect:SLPatRec}
+\label{SubSect:SciFiSLPatRec}
 
 \paragraph{Helix parameters}
 
@@ -167,7 +167,7 @@ where:
 
 \paragraph{Collecting space-points in the $(x, y)$ plane}
 
-Helix pattern recognition follows the same conceptual steps as the straight-line pattern recognition described in section \ref{SubSect:SLPatRec} A space-point is chosen in each of three stations, $i$, $j$ and $k$ where $k>j>i$. Ideally, $i=1$, $j=3$ and $k=5$. However, a search of all combinations of three space-points for which $k-j>0$ and $j-i>0$ is made, taking the combinations in the order of decreasing separation in $z$; i.e. in order of decreasing $\Delta z_{kj} = z_k - z_j$ and $\Delta z_{ji} = z_j - z_i$. 
+Helix pattern recognition follows the same conceptual steps as the straight-line pattern recognition described in section \ref{SubSect:SciFiSLPatRec} A space-point is chosen in each of three stations, $i$, $j$ and $k$ where $k>j>i$. Ideally, $i=1$, $j=3$ and $k=5$. However, a search of all combinations of three space-points for which $k-j>0$ and $j-i>0$ is made, taking the combinations in the order of decreasing separation in $z$; i.e. in order of decreasing $\Delta z_{kj} = z_k - z_j$ and $\Delta z_{ji} = z_j - z_i$. 
 
 A circle in the $(x, y)$ plane may be written (see Appendix~\ref{App:Crcl3Pnts}):
 
@@ -275,6 +275,8 @@ The final step in gathering the points in $(s, z)$ is to perform a straight line
 then an attempt is made to fit a helix to the set of space points that make up the track.
 
 \paragraph{Helix fit}
+
+At present, pattern recognition does not employ a full 3D helix fit, due to the complexity of performing a non-linear least squares fit.  The following is for reference only.
 
 The construction of the tracker allows the helical locus of the points on the track to be parmeterised as a function of $z$. The step from station $i$ to station $j$, a change in the $z$ position of the track of $\Delta z_{ji} = z_j - z_i$, results in a change in $\phi'$, and therefore $s$, where:
 

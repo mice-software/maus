@@ -1,5 +1,5 @@
 \section{Data structure}
-\label{Sect:DataStructure}
+\label{Sect:SciFiDataStructure}
 
 The tracker data structure, a subset of the general MAUS data structure, is shown in figure~\ref{Fig:DataStructure}.  The basic unit of the MAUS data structure is the spill, representing the data produced by a single actuation of the MICE target.  All MAUS modules (mappers, reducers, etc.) act on one spill at a time.  The spill is then split into two sides, Monte Carlo data and reconstructed data.  A key rule is that MC data must never be stored on the reconstruction side. Each side has its own event class, representing data corresponding to a single MICE particle trigger event.  The relationship between the spill and the MC and recon event objects is one-to-many. 
 

@@ -1,5 +1,5 @@
 \subsection{Space-point reconstruction}
-\label{Sect:SpcPnt}
+\label{Sect:SciFiSpcPnt}
 
 This section describes the space-point reconstruction, the algebra by which the cluster positions are translated in to tracker coordinates and, to some extent, the algorithm.
 
@@ -22,7 +22,7 @@ Once all triplet space-points have been found, doublet space-points are created 
 \subsubsection{Crossing-position calculation}
 
 \paragraph{Doublet space-points}
-\label{Para:DblSpPnt}
+\label{Para:DoubletSpacepoint}
 
 The position of the doublet space-point in station coordinates, ${\bf r}_s$, is given by:
 
@@ -74,9 +74,15 @@ The position of the space-point may now be obtained from equation~\ref{Eq:DSP1} 
 
 \paragraph{Triplet space-points}
 
-As shown in figure~\ref{Fig:SenseArea}, the fibres layout is of one of two types. In one case (right panel of figure~\ref{Fig:SenseArea}), the centre of the channels, one in each of the three views, cross intersect at a single point. In this case, the position of the crossing can be calculated as described in section~\ref{Para:DblSpPnt}. When the area of overlap of the three channels forms a triangle (figure~\ref{Fig:SenseArea} left panel), the centre of area of overlap is given by:
+As shown in figure~\ref{Fig:SenseArea}, the fibres layout is of one of two types. In one case (right panel of figure~\ref{Fig:SenseArea}), the centre of the channels, one in each of the three views, cross intersect at a single point. In this case, the position of the crossing can be calculated as described in section~\ref{Para:DoubletSpacepoint}. When the area of overlap of the three channels forms a triangle (figure~\ref{Fig:SenseArea} left panel), the centre of area of overlap is given by:
 
 \begin{eqnarray}
   \bar{x} & = & \frac{2}{3}c_p \, {\rm ; and}       \\
   \bar{y} & = & 0 \, .
 \end{eqnarray}
+
+\begin{figure}
+    \includegraphics[width=0.7\linewidth]{detectors/tracker/04-Reconstruction/04-02-Space-points/Figures/SpacepointError.pdf}
+  \caption{Right panel: Fibre arrangement in station 5 of tracker 1. Left panel: Fibre arrangement in the rest of the stations. The shaded region shows the intersection of the three channels is triangle for every station other than station 5, where itwill be an hexagon.}
+  \label{Fig:SenseArea}
+\end{figure}
