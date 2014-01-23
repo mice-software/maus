@@ -248,11 +248,8 @@ class PatternRecognition {
     /** @brief Set the verbosity level */
     void set_verbosity(const bool verb) { _verb = verb; }
 
-    /** @brief Set up the residual data output files, and set the verbosity level to 2 */
-    void initialise_residual_files();
-
   private:
-    int _verb;             /** Verbosity: 0=little, 1=more couts, 2=files too */
+    int _verb;                               /** Verbosity: 0=little, 1=more couts */
     static const int _n_trackers = 2;        /** Number of trackers */
     static const int _n_stations = 5;        /** Number of stations per tracker */
     static const int _n_bins = 100;          /** Number of bins in each residuals histogram */
@@ -279,12 +276,6 @@ class PatternRecognition {
     static const double _Pz_min = 50.;  /** MeV/c min Pz for helical tracks (this is a guess) */
 
     LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
-
-    // Some output files - only to be kept when in development stages
-    std::ofstream * _f_res;
-    std::ofstream * _f_res_good;
-    std::ofstream * _f_res_chosen;
-    std::ofstream * _f_trks;
 };
 
 } // ~namespace MAUS
