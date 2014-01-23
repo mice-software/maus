@@ -1,20 +1,20 @@
 """
 root_document_store contains tools necessary to make a ROOT-based doc queue
 
-Provides server side tools
-* document_queue holds the actual documents stored
-* server_socket handles connection requests to the document_queue
-
-Provides client side tools
-* root_document_store is the main client side module, providing direct 
-interfaces to the document queue
-* client_socket is a convenience wrapper for the ROOT TSocket
+* RootDocumentDB holds the actual documents stored; this provides the 
+  server-side database
+* RootDocumentStore provides client-side access to the DocDB
+* SocketManager handles connection to and messaging between sockets 
+* SocketError is thrown if SocketManager makes and error
+* ControlMessage provides an application-level API for messaging between sockets
+  and provides a low level messaging protocol based around ROOT data types
 """
 
-from _server_socket import SocketManager
+from _socket_manager import SocketManager
 from _socket_error import SocketError
 from _control_message import ControlMessage
-from _document_queue import DocumentQueue
+from _root_document_db import RootDocumentDB
 from _root_document_store import RootDocumentStore
 
-all = []
+all = [SocketManager, SocketError, ControlMessage, RootDocumentDB,
+       RootDocumentStore]

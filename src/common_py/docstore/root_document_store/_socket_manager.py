@@ -14,41 +14,44 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-server_socket wraps the ROOT TServerSocket
-
-SocketManager scans for TSockets broadcasting over a range of ports and opens
-communication with any discovered TSockets. SocketManager will poll the TSockets
-with a user-defined frequency and append any messages to the in-memory queue.
+SocketManager wrapper wraps the ROOT TServerSocket
 """
 
+import inspect
 import sys
 import time
 import threading
 import Queue
 
 import ROOT
-from docstore.root_document_store import SocketError
-from docstore.root_document_store import ControlMessage
+from _socket_error import SocketError
+from _control_message import ControlMessage
 
 class SocketManager:
-    def __init__(self, listen_port, timeout, retry_time):
+    """
+    SocketManager scans for TSockets broadcasting over a range of ports and 
+    opens communication with any discovered TSockets. SocketManager will poll 
+    the TSockets with a user-defined frequency and append any messages to the 
+    in-memory queue.
+    """
+    def __init__(self, listen_port, broadcast_port_list, timeout, retry_time):
         self.retry_time = retry_time
+        self.broadcast_port_list = broadcast_port_list
         self.socket_queue = Queue.Queue() # Fifo queue makes iterating easy
-        self.port_list = []
         self.message_queue = Queue.Queue() # Fifo queue makes iterating easy
-        self._listen_dict = {}
-        if listen_port != None:
+        self.send_message_queue = Queue.Queue()
+        self._start_listening_for_messages()
+        self._start_message_sender()
+        self.listen_port = listen_port
+        if self.listen_port != None:
             self.accept_connection(listen_port, timeout, retry_time)
-        self._listen_for_messages()
 
-    def close_all(self, timeout):
-        start = time.time()
-        while len(self.port_list) > 0 and \
-              (timeout < 0. or time.time()-start < timeout):
-            self.close_connection(self.port_list[0], False)
-        if len(self.port_list) > 0:
-            raise SocketError("Failed to close all sockets - left "+\
-                              str(self.port_list))
+    def close_all(self, force):
+        for socket in self._loop_over_sockets_unsafe():
+            if force:
+                socket.Close("force")
+            else:
+                socket.Close("")
 
     def send_message(self, port, message):
         if type(message) == type(ControlMessage()):
@@ -56,24 +59,32 @@ class SocketManager:
         else:
             raise SocketError("Message must be a ControlMessage - got "+\
                               str(type(message)))
-        my_message = ROOT.TMessage(ROOT.TMessage.kMESS_OBJECT)
-        my_message.WriteObject(root_message)
         try:
-            socket = self.get_socket(port)
-            socket.Send(my_message)
-            self.put_socket(socket)
-        except:
+            print "QUEUEING", message.id
+            self.send_message_queue.put_nowait((port, root_message))
+            #socket = self.get_socket(port)
+            #socket.Send(root_message)
+            #self.put_socket(socket)
+        except SocketError:
             raise SocketError("SocketManager knows nothing about sockets on "+\
                               "port "+str(port))
 
 
     def connect(self, url, port, timeout, retry_time):
-        return self._request_socket(url, port, timeout, retry_time)
+        start = time.time()
+        print "Request socket", timeout
+        self._request_socket(url, port, timeout, retry_time)
+        timeout = timeout - (time.time()-start)
+        print "Await response", timeout
+        time.sleep(retry_time)
+        self.get_next_message(timeout, retry_time)
 
     def close_connection(self, port, force):
-        if port not in self.port_list:
-            raise SocketError("No socket found on port "+str(port))
-        self._close_connection(port, force)
+        socket = self.get_socket(port)
+        if force:
+            socket.Close("force")
+        else:
+            socket.Close("")
 
     def accept_connection(self, listen_port, timeout, retry_time):
         my_thread = threading.Thread(target=self._accept_socket,
@@ -81,100 +92,173 @@ class SocketManager:
         my_thread.daemon = True
         my_thread.start()
 
-    def _listen_for_messages(self):
+    def port_list(self):
+        return [socket.GetLocalPort() for socket in self._loop_over_sockets()]
+
+    def get_socket(self, port):
+        """
+        Get a socket from the socket queue; caller now owns the socket and must
+        put it back when finished with it
+
+        - port: integer corresponding to the socket LocalPort
+
+        Throws a KeyError if the socket is not in the queue. Note that if 
+        another thread is using a socket, it may not be in the queue - even if
+        it has been opened by the socket manager
+        """
+        for socket in self._loop_over_sockets():
+            if socket.GetLocalPort() == port:
+                return socket
+        raise SocketError("Could not find socket in socket_queue")
+
+    def put_socket(self, socket):
+        if socket.IsValid() and socket not in [self._loop_over_sockets()]:
+            self.socket_queue.put_nowait(socket)
+        else:
+            raise SocketError("Socket was not valid")
+
+    def get_next_message(self, timeout, retry_time):
+        start = time.time()
+        while time.time() - start < timeout or timeout <= 0.:
+            try:
+                (port, message_in) = self.message_queue.get_nowait()
+                if message_in.class_name == self.__class__.__name__ and \
+                                                not message_in.acknowledge:
+                    try: # call the appropriate function
+                        message_in.acknowledge = True
+                        print "RECEIVING", message_in
+                        func_call = getattr(self, message_in.function)
+                        args = tuple(message_in.args)
+                        message_in.return_value = func_call(*args)
+                        print func_call, message_in.return_value
+                    except Exception: # handle the error
+                        message_in.data = []
+                        exc_name = str(sys.exc_info()[0])
+                        exc_msg = str(sys.exc_info()[1])
+                        message_in.errors[exc_name] = exc_msg
+                    finally: # return to user
+                        print "RETURNING", self.port_list(), message_in
+                        self.send_message(port, message_in)
+                        return
+                else: # not for us, put it back on the queue
+                    self.message_queue.put((port, message_in), False)
+            except Queue.Empty: # no messages, keep polling
+                pass
+            time.sleep(retry_time)
+
+    def _loop_over_sockets(self):
+        """
+        Loop over sockets in the socket queue; put them back in the queue after
+        caller is done
+        """
+        for socket in self._loop_over_sockets_unsafe():
+            yield socket
+            self.socket_queue.put_nowait(socket)
+
+    def _loop_over_sockets_unsafe(self):
+        """
+        Loop over sockets in the socket queue; dont put them back in the queue 
+        after caller is done
+        """
+        sock_list = []
+        while True:
+            try: 
+                socket = self.socket_queue.get_nowait()
+            except Queue.Empty: 
+                raise StopIteration("No sockets in socket_queue")
+            sock_list.append(socket)
+            yield socket
+            # finished - we have looped once and not found the socket
+            finished = socket in sock_list
+            if finished:
+                raise StopIteration("Looped over the queue")
+
+
+    def _start_listening_for_messages(self):
         """
         Start a new thread listening for messages on each alive port
 
         If there is already an existing thread, then don't start a new one
         """
-        for port in self.port_list:
-            if port in self._listen_dict and self._listen_dict[port].is_alive():
-                continue
-            self._listen_dict[port] = threading.Thread(
-                                          target=self._listen_for_messages_port,
-                                          args=(port,
-                                                self.retry_time))
-            self._listen_dict[port].daemon = True
-            self._listen_dict[port].start()
+        my_thread = threading.Thread(target=self._listen_for_messages,
+                         args=(self.retry_time,))
+        my_thread.daemon = True
+        my_thread.start()
 
-    def _listen_for_messages_port(self, port, retry_time):
+    def _start_message_sender(self):
+        my_thread = threading.Thread(target=self._send_queued_messages,
+                                     args=(self.retry_time,))
+        my_thread.daemon = True
+        my_thread.start()
+        
+
+    def _send_queued_messages(self, retry_time):
         while True:
-            time.sleep(retry_time)
-            message = ROOT.TMessage()
-            try:
-                socket = self.get_socket(port)
-                if not socket.IsValid():
-                    self.put_socket(socket)
-                    break
-                socket.Recv(message)
-                self.put_socket(socket)
-            except KeyError:
-                pass # someone else was using the socket
-            if message == None or message.GetClass() == None:
-                # waiting for message
-                continue
-            elif message.GetClass() == ROOT.TTree().Class():
-                # control message
+            for socket in self._loop_over_sockets():
                 try:
-                    ctrl_message = ControlMessage.new_from_root_repr(message)
-                    self.message_queue.put((socket.GetLocalPort(), ctrl_message), False)
-                except TypeError:
-                    raise SocketError("Malformed control message")
-            elif message.What() != ROOT.EMessageTypes.kMESS_OBJECT:
-                raise SocketError( # bad type
-                          "Malformed message - should be kMESS_OBJECT type")
+                    port, message = self.send_message_queue.get_nowait()
+                    if socket.GetLocalPort() == port:
+                        print "SENDING", port, message
+                        socket.Send(message)
+                    else:
+                        self.send_message_queue.put_nowait((port, message))
+                except Queue.Empty:
+                    pass
+                time.sleep(retry_time)
 
-    def _parse_control_message(self, control_message):
-        msg = control_message.message
-        if control_message.is_open_message():
-            self._accept_socket(msg["open"]["port"],
-                                msg["open"]["timeout"],
-                                msg["open"]["retry_time"])
-        if control_message.is_close_message():
-            self._close_connection(msg["close"]["port"],
-                                   msg["close"]["force"])
-        if control_message.is_text_message():
-            print "LOG-"+str(msg["message"]["verbose_level"])+":", \
-                  msg["message"]["text"]
+    def _listen_for_messages(self, retry_time):
+        while True:
+            message = ROOT.TMessage()
+            for socket in self._loop_over_sockets():
+                if socket.IsValid():
+                    socket.Recv(message)
+                    self._queue_received_message(socket.GetLocalPort(), message)
+            time.sleep(retry_time)
 
-    def _close_connection(self, port, force):
-        if port not in self.port_list:
-            raise SocketError(
-                  "SocketManager knows nothing about sockets on port"+str(port))
-        socket = self.get_socket(port)
-        self.port_list.remove(port)
-        if force:
-            socket.Close("force")
+    def _queue_received_message(self, port, message):
+        if message == None or message.GetClass() == None:
+            # waiting for message
+            return
+        elif message.GetClass() == ROOT.TObjArray().Class():
+            print "RECEIVED", message
+            # control message
+            try:
+                ctrl_message = ControlMessage.new_from_root_repr(message)
+                self.message_queue.put((port, ctrl_message), False)
+            except TypeError:
+                msg = str(sys.exc_info()[1])
+                raise SocketError("Malformed control message: "+msg)
         else:
-            socket.Close("")
+            raise SocketError( # bad type
+                      "Malformed message - should be ROOT.TObjArray type")
+            
 
     def _request_socket(self, url, port, timeout, retry_time):
+        print "REQUEST SOCKET", url, port
         start_time = time.time()
         valid = False
         while not valid and \
               (timeout < 0 or time.time() - start_time < timeout) and \
-              port not in self.port_list:
+              port not in self.port_list():
             tmp_socket = ROOT.TSocket(url, port)
             tmp_socket.SetOption(ROOT.TSocket.kNoBlock, 1)
             valid = tmp_socket.IsValid()
             if not valid:
                 time.sleep(retry_time)
         if valid:
-            print "Request socket - local", tmp_socket.GetLocalInetAddress().GetHostName(), tmp_socket.GetLocalInetAddress().GetPort()
-            print "Request socket - remote", tmp_socket.GetInetAddress().GetHostName(), tmp_socket.GetInetAddress().GetPort()
+            print "REQUEST SOCKET OK", url, port
             port = tmp_socket.GetLocalPort()
             self.put_socket(tmp_socket)
-            print "Listening"
-            self._listen_for_messages()
             return port
         else:
             raise SocketError("Failed to connect to "+str(url)+":"+str(port))
 
     def _accept_socket(self, port, timeout, retry_time):
+        print "ACCEPT SOCKET", port
+        start_time = time.time()
         server_socket = ROOT.TServerSocket(port, True)
         server_socket.SetOption(ROOT.TServerSocket.kNoBlock, 1)
         tcp_socket_index = server_socket.GetDescriptor()
-        start_time = time.time()
         accepted_socket_index = ROOT.gSystem.AcceptConnection(tcp_socket_index)
         while accepted_socket_index < 0 and \
               (timeout < 0 or time.time()-start_time < timeout):
@@ -193,45 +277,35 @@ class SocketManager:
         socket.fAddress = ROOT.gSystem.GetPeerName(accepted_socket_index)
         socket.fSecContext = 0
         if socket.GetDescriptor() >= 0:
-          ROOT.gROOT.GetListOfSockets().Add(socket)
-        print "Accept socket - local", socket.GetLocalInetAddress().GetHostName(), socket.GetLocalInetAddress().GetPort()
-        print "Accept socket - remote", socket.GetInetAddress().GetHostName(), socket.GetInetAddress().GetPort()
+            ROOT.gROOT.GetListOfSockets().Add(socket)
+        if port != self.listen_port:
+            print "ACCEPT SOCKET", port, "OK"
+            self.put_socket(socket)
+            return
 
+        new_port = self.broadcast_port_list.pop()    
+        self.accept_connection(new_port, timeout, retry_time)
         self.put_socket(socket)
-        print "Listen"
-        self._listen_for_messages()
-        print "Done"
-
-    def get_socket(self, port):
-        """
-        Get a socket from the socket queue; caller now owns the socket and must
-        put it back when finished with it
-
-        - port: integer corresponding to the socket LocalPort
-
-        Throws a KeyError if the socket is not in the queue. Note that if 
-        another thread is using a socket, it may not be in the queue - even if
-        it has been opened by the socket manager
-        """
-        # Never access items in sock_list - this breaks the threading
-        sock_list = []
-        while True:
-            try: 
-                socket = self.socket_queue.get_nowait()
-            except Queue.Empty: 
-                raise KeyError("No sockets in socket_queue")
-            sock_list.append(socket)
-            if socket.GetLocalPort() == port:
-                return socket
-            else:
-                # finished - we have looped once and not found the socket
-                finished = socket in sock_list
-                self.socket_queue.put_nowait(socket)
-                if finished:
-                    raise KeyError("Could not find socket in socket queue")
-                        
-    def put_socket(self, socket):
-        if socket.GetLocalPort() not in self.port_list:
-            self.port_list.append(socket.GetLocalPort())
-        self.socket_queue.put_nowait(socket)
+        req_args = (
+            socket.GetLocalInetAddress().GetHostAddress(),
+            new_port, -1., 0.01)
+        ctrl = ControlMessage("SocketManager", "_request_socket", req_args)
+        self.send_message(port, ctrl)
+        while (timeout < 0 or time.time()-start_time < timeout):
+            try:
+                (port, message_in) = self.message_queue.get_nowait()
+                if message_in.id == ctrl.id and message_in.acknowledge == True:
+                    break
+            except Queue.Empty:
+                pass
+            #time.sleep(retry_time)
+        print "CLOSING LISTEN SOCKET"
+        del server_socket
+        try:
+            self.get_socket(port).Close() # close the socket
+        except SocketError:
+            pass
+        self.accept_connection(port, timeout-(time.time()-start_time),
+                               retry_time)
+        print "Done accepting"
 

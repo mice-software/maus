@@ -13,6 +13,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+SocketError
+"""
+
 class SocketError(Exception):
     """
     SocketError is thrown when there is a problem connecting with a socket
