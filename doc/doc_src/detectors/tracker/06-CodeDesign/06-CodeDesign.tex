@@ -5,10 +5,12 @@
 
 The main body of the tracker code is implemented as three distinct MAUS map modules and, at present, one reducer module.  There also exist various helpful top-level user tools, and the tracker geometry, calibration and configuration files. A diagram showing the tracker software data flow with the corresponding modules is shown in figure~\ref{Fig:DataFlow}, with the following sections expanding on each area.
 
-\begin{figure}[htb]
-    \includegraphics[width=1.0\textwidth]{detectors/tracker/06-CodeDesign/Figures/DataFlow.pdf}
-    \caption{Schematic of the tracker software data showing MC and Real data input, and subsequent reconstruction. MAUS modules corresponding to given process are indicated (MapCppTrackerRecon encompasses all of the reconstruction, shown in blue).  Once digits have been formed, reconstruction is agnostic as to whether the MC or Real path was followed.}
-    \label{Fig:DataFlow}
+\begin{figure}[p]
+  \begin{center}
+    \includegraphics[width=1.10\textwidth, angle=90]{detectors/tracker/06-CodeDesign/Figures/DataFlow.pdf}
+  \end{center}
+  \caption{Schematic of the tracker software data showing MC and Real data input, and subsequent reconstruction. MAUS modules corresponding to given process are indicated (MapCppTrackerRecon encompasses all of the reconstruction, shown in blue).  Once digits have been formed, reconstruction is agnostic as to whether the MC or Real path was followed.}
+  \label{Fig:DataFlow}
 \end{figure}
 
 \subsubsection{MapCppTrackerDigits}

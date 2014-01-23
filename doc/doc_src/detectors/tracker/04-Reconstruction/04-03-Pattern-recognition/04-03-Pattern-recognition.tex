@@ -61,15 +61,16 @@ If at least one space-point satisfies this selection, a ``trial track'' is forme
 \begin{equation}
   \chi^2 = \chi_x^2 + \chi_y^2 \,.
 \end{equation}
-Expressions for the evaluation of $\chi^2_x$ and $\chi^2_y$ are given in Appendix~\ref{App:LS-SL-fit}. If the fit $\chi^2$ satisfies:
+If the fit $\chi^2$ satisfies:
+% Expressions for the evaluation of $\chi^2_x$ and $\chi^2_y$ are given in Appendix~\ref{App:LS-SL-fit}. 
 
 \begin{equation}
   \frac{\chi^2}{N-2} < \chi^2_{\rm cut} \,,
 \end{equation}
-then the trial track is accepted and the pattern-recognition track parameters and covariance matrix are calculated using the expressions given in Appendix \ref{App:LS-SL-fit}.
+then the trial track is accepted. % and the pattern-recognition track parameters and covariance matrix are calculated using the expressions given in Appendix \ref{App:LS-SL-fit}.
 
 \subsubsection{Helix pattern recognition}
-\label{SubSect:SciFiSLPatRec}
+\label{SubSect:SciFiHelicalPatRec}
 
 \paragraph{Helix parameters}
 
@@ -169,7 +170,7 @@ where:
 
 Helix pattern recognition follows the same conceptual steps as the straight-line pattern recognition described in section \ref{SubSect:SciFiSLPatRec} A space-point is chosen in each of three stations, $i$, $j$ and $k$ where $k>j>i$. Ideally, $i=1$, $j=3$ and $k=5$. However, a search of all combinations of three space-points for which $k-j>0$ and $j-i>0$ is made, taking the combinations in the order of decreasing separation in $z$; i.e. in order of decreasing $\Delta z_{kj} = z_k - z_j$ and $\Delta z_{ji} = z_j - z_i$. 
 
-A circle in the $(x, y)$ plane may be written (see Appendix~\ref{App:Crcl3Pnts}):
+A circle in the $(x, y)$ plane may be written (see Appendix~\ref{App:SciFiThreePointCircle}):
 
 \begin{equation}
   \alpha(x^2+y^2) + \beta x + \gamma y + \kappa = 0 \, ;
@@ -185,7 +186,7 @@ where:
                   - \frac{\kappa}{\alpha}
                   } \, ;
 \end{eqnarray}
-and $(X_0, Y_0)$ are the coordinates of the centre of the circle. Initial values for $\alpha$, $\beta$, $\gamma$ and $\kappa$ are obtained as described in Appendix \ref{App:Crcl3Pnts}. The distance between the $x$ and $y$ coordinates of the space-points in the stations $l;\,l \ne i, j, k$ and the circle defined by equation \ref{Eq:HPRCrclPrm} is given by:
+and $(X_0, Y_0)$ are the coordinates of the centre of the circle. Initial values for $\alpha$, $\beta$, $\gamma$ and $\kappa$ are obtained as described in Appendix \ref{App:SciFiThreePointCircle}. The distance between the $x$ and $y$ coordinates of the space-points in the stations $l;\,l \ne i, j, k$ and the circle defined by equation \ref{Eq:HPRCrclPrm} is given by:
 
 \begin{equation}
   \delta = \sqrt{(x_l-X_0)^2 + (y_l-Y_0)^2} - \rho \,.
@@ -209,7 +210,8 @@ Points are accepted as part of a ``trial'' track if:
 \end{eqnarray}
 If at least one space-point satisfies this selection, a ``trial track'' is formed consisting of the space-points selected in stations $i$, $j$, $k$, ... and $l$.
 
-For each ``trial track'', a circle fit is performed to calculate the fit $\chi_C^2$. The circle fit and expressions for the evaluation of $\chi^2_C$ are given in Appendix \ref{App:LS-Crcl-fit}. If $\chi^2_C$ satisfies:
+For each ``trial track'', a circle fit is performed to calculate the fit $\chi_C^2$. If $\chi^2_C$ satisfies:
+% The circle fit and expressions for the evaluation of $\chi^2_C$ are given in Appendix \ref{App:LS-Crcl-fit}.
 
 \begin{equation}
   \frac{\chi^2}{N-3} < \chi^2_{C~{\rm cut}} \,,
@@ -333,7 +335,7 @@ and:
 \begin{equation}
   \phi'_i = \phi_0 + \Delta \Psi_{i0} \, .
 \end{equation}
-The helix fit described in Appendix~\ref{App:HlxFt} proceeds by minimizing:
+The helix fit described in Appendix~\ref{App:SciFiHelicalTrackPatternRecognition} proceeds by minimizing:
 
 \begin{equation}
   \chi^2_{\rm hlx} = 
