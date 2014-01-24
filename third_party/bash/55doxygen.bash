@@ -40,12 +40,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	sleep 1
 	tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-	mv ${MAUS_ROOT_DIR}/third_party/build/root ${MAUS_ROOT_DIR}/third_party/build/${directory}
 	cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-		
-	echo
 	echo "INFO: Configuring:"
-	echo
 	sleep 1
 	./configure --prefix ${MAUS_ROOT_DIR}/third_party/install
 	echo
