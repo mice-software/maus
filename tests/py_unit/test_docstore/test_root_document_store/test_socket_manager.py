@@ -29,6 +29,7 @@ import time
 import os
 import threading
 import atexit
+import json
 
 import ROOT
 import xboa.Common as Common
@@ -38,6 +39,8 @@ from docstore.root_document_store import SocketError
 from docstore.root_document_store import ControlMessage
 
 NEXT_PORT = 49050
+
+sys.setcheckinterval(10)
 
 class SocketManagerTest(unittest.TestCase):
     """
@@ -55,27 +58,35 @@ class SocketManagerTest(unittest.TestCase):
         """
         Test SocketManager.connect
         """
-        msg = [ControlMessage() for i in range(3)]
-        ports = [self.port+i for i in range(1, 4)]
-        server_socket = SocketManager(self.port, copy.deepcopy(ports), -1., 0.01)
-        socks = [SocketManager(None, [], -1., 0.01) for i in range(3)]
+        retry = 0.01
+        msg_in = [ControlMessage() for i in range(3)]
+        ports = [self.port+i for i in range(1, 10)]
+        server_socket = SocketManager(self.port, copy.deepcopy(ports), -1., retry)
+        socks = [SocketManager(self.port, [], -1., retry) for i in range(3)]
         for i, sock_manager in enumerate(socks):
-            sock_manager.connect("localhost", self.port, 10, 0.01)
-            time.sleep(1)
-        print msg
-        print ports
-        print socks
+            sock_manager.connect("localhost", ports[i], 10, retry)
         for i, sock_manager in enumerate(socks):
-            sock_manager.send_message(ports[i], msg[i])
-        time.sleep(1)
+            server_socket.send_message(ports[i], msg_in[i])
+
+        self.assertEqual(sorted(server_socket.port_list()), ports[0:3])
+        remote_ports = [sock.socket_list()[0]['remote_port'] for sock in socks]
+        for i, sock_manager in enumerate(socks):
+            self.assertEqual(sorted(remote_ports), ports[0:3])
+        for sock_man in [server_socket]+socks:
+            print json.dumps(sock_man.socket_list(), indent=2)
+        for sock_man in [server_socket]+socks:
+            sock_man.start_processing()
+        time.sleep(2)
         msg_out = []
-        while True:
-              try:
-                  msg_out.append(server_socket.message_queue.get_nowait())
-              except Queue.Empty:
-                  break
-        print msg
-        print msg_out
+        for i, sock_manager in enumerate(socks):
+            while True:
+                  try:
+                      msg_out.append(sock_manager.message_queue.get_nowait()[1])
+                  except Queue.Empty:
+                      break
+        msg_ids_in = sorted([a_msg.id for a_msg in msg_in])
+        msg_ids_out = sorted([a_msg.id for a_msg in msg_out])
+        self.assertEqual(msg_ids_in, msg_ids_out)        
 
     def _test_server_socket_close_connection(self):
         """

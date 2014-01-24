@@ -22,6 +22,7 @@ import sys
 import time
 import threading
 import Queue
+import json
 
 import ROOT
 from _socket_error import SocketError
@@ -34,17 +35,18 @@ class SocketManager:
     the TSockets with a user-defined frequency and append any messages to the 
     in-memory queue.
     """
-    def __init__(self, listen_port, broadcast_port_list, timeout, retry_time):
+    def __init__(self, listen_port, listen_port_list, timeout, retry_time):
         self.retry_time = retry_time
-        self.broadcast_port_list = broadcast_port_list
+        self.broadcast_port_list = None #broadcast_port_list
         self.socket_queue = Queue.Queue() # Fifo queue makes iterating easy
         self.message_queue = Queue.Queue() # Fifo queue makes iterating easy
         self.send_message_queue = Queue.Queue()
+        for listen_port in listen_port_list:
+            self.accept_connection(listen_port, timeout, retry_time)
+
+    def start_processing(self):
         self._start_listening_for_messages()
         self._start_message_sender()
-        self.listen_port = listen_port
-        if self.listen_port != None:
-            self.accept_connection(listen_port, timeout, retry_time)
 
     def close_all(self, force):
         for socket in self._loop_over_sockets_unsafe():
@@ -77,7 +79,7 @@ class SocketManager:
         timeout = timeout - (time.time()-start)
         print "Await response", timeout
         time.sleep(retry_time)
-        self.get_next_message(timeout, retry_time)
+        #self.get_next_message(timeout, retry_time)
 
     def close_connection(self, port, force):
         socket = self.get_socket(port)
@@ -146,6 +148,18 @@ class SocketManager:
                 pass
             time.sleep(retry_time)
 
+    def socket_list(self):
+        my_list = []
+        for socket in self._loop_over_sockets():
+            my_list.append({
+                "local_port":socket.GetLocalPort(),
+                "local_address":socket.GetLocalInetAddress().GetHostAddress(),
+                "remote_port":socket.GetPort(),
+                "local_address":socket.GetInetAddress().GetHostAddress(),
+                "valid":socket.IsValid()
+            })
+        return my_list
+
     def _loop_over_sockets(self):
         """
         Loop over sockets in the socket queue; put them back in the queue after
@@ -162,17 +176,16 @@ class SocketManager:
         """
         sock_list = []
         while True:
-            try: 
+            try:
                 socket = self.socket_queue.get_nowait()
             except Queue.Empty: 
                 raise StopIteration("No sockets in socket_queue")
-            sock_list.append(socket)
-            yield socket
             # finished - we have looped once and not found the socket
-            finished = socket in sock_list
-            if finished:
+            if socket in sock_list:
+                self.socket_queue.put_nowait(socket)
                 raise StopIteration("Looped over the queue")
-
+            yield socket
+            sock_list.append(socket)
 
     def _start_listening_for_messages(self):
         """
@@ -198,9 +211,10 @@ class SocketManager:
                 try:
                     port, message = self.send_message_queue.get_nowait()
                     if socket.GetLocalPort() == port:
-                        print "SENDING", port, message
+                        print "SENDING", "sock", id(self), port, message
                         socket.Send(message)
                     else:
+                        print "NOT SENDING", "sock", id(self), port
                         self.send_message_queue.put_nowait((port, message))
                 except Queue.Empty:
                     pass
@@ -208,8 +222,8 @@ class SocketManager:
 
     def _listen_for_messages(self, retry_time):
         while True:
-            message = ROOT.TMessage()
             for socket in self._loop_over_sockets():
+                message = ROOT.TMessage()
                 if socket.IsValid():
                     socket.Recv(message)
                     self._queue_received_message(socket.GetLocalPort(), message)
@@ -278,10 +292,9 @@ class SocketManager:
         socket.fSecContext = 0
         if socket.GetDescriptor() >= 0:
             ROOT.gROOT.GetListOfSockets().Add(socket)
-        if port != self.listen_port:
-            print "ACCEPT SOCKET", port, "OK"
-            self.put_socket(socket)
-            return
+        print "ACCEPT SOCKET", port, "OK"
+        self.put_socket(socket)
+        return
 
         new_port = self.broadcast_port_list.pop()    
         self.accept_connection(new_port, timeout, retry_time)
@@ -298,7 +311,6 @@ class SocketManager:
                     break
             except Queue.Empty:
                 pass
-            #time.sleep(retry_time)
         print "CLOSING LISTEN SOCKET"
         del server_socket
         try:
