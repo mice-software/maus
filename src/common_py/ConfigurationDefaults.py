@@ -74,13 +74,14 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 500000 # particles are killed after this number of
+maximum_number_of_steps = 50000000 # particles are killed after this number of
                                  # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
     "spin":{"x":0.0, "y":0.0, "z":1.0}
+    "beam_polarisation" : "Flat"
 }
 everything_special_virtual = False
 
@@ -165,6 +166,7 @@ beam = {
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
+       "spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### PIONS #####
     { # as above...
@@ -183,6 +185,7 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
        "coupling":{"coupling_mode":"none"}
+       "spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### ELECTRONS #####
     { # as above...
@@ -201,6 +204,7 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
         "coupling":{"coupling_mode":"none"}
+        "spin":{"x":0.0, "y":0.0, "z":1.0}
     }]
 }
 

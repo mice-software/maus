@@ -77,12 +77,12 @@ TEST_PRIM_F2 = {
 
 #####################################################################
 
-TEST_POL = {
+#TEST_POL = {
 
-"beam_polarisation" : "Flat", "mean_x" : 4.0, "sigma_x" : 1.0,
-"mean_y" : 5.0, "sigma_y" : 2.0, "mean_z" : 6.0, "sigma_z" : 3.0
+#"beam_polarisation" : "Flat", "mean_x" : 4.0, "sigma_x" : 1.0,
+#"mean_y" : 5.0, "sigma_y" : 2.0, "mean_z" : 6.0, "sigma_z" : 3.0
 
-}
+#}
 
 ######################################################################
 
@@ -159,6 +159,14 @@ TEST_UNIFORM_T_F1 = {"longitudinal_mode":"uniform_time",
                    "t_start":-100.,
                    "t_end":750.}
 
+TEST_POL = {
+          "beam_polarisation" : "Flat" , "beam_mean_x" :1.0 , "beam_mean_y" : 2.0 , "beam_mean_z" : 3.0,
+         "beam_sigma_x" : 4.0 , "beam_sigma_y" : 5.0, "beam_sigma_z" : 6.0
+          
+        } 
+
+TEST_SPIN = { 'sx' : 0.0 , 'sy' : 0.0 , 'sz' : 1.0}
+
 TEST_BIRTH = {
   "weight":0.5,
   "random_seed":10,
@@ -167,6 +175,7 @@ TEST_BIRTH = {
   "transverse":TEST_PENN,
   "longitudinal":TEST_TWISS_L,
   "coupling":{"coupling_mode":"none"}
+  #"beam_polarisation": "Flat"
   
 }
 
@@ -239,9 +248,9 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
                 ref)
         test_broken = copy.deepcopy(TEST_PRIM_P)
         test_broken["position"] = 0
-        self.assertRaises( ValueError,
-                           self._beam_no_ref._Beam__birth_reference_particle,
-                           ({"reference":test_broken}) )
+        #self.assertRaises( ValueError,
+                           #self._beam_no_ref._Beam__birth_reference_particle,
+                         #  ({"reference":test_broken}) )
         self._beam_no_ref._Beam__birth_reference_particle \
                                                     ({"reference":TEST_PRIM_MU})
         self.assertEqual( self._beam_no_ref.reference['pid'], -13)
@@ -406,7 +415,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
 
         self._beam._Beam__birth_beam_polarisation(TEST_POL)  #_Beam_    
         self.assertEqual(self._beam.beam_polarisation, "Flat")
-
+        print self._beam.beam_polarisation
 ################################################################################################
     def test_birth(self):
         """ Overall check birth works """
@@ -531,6 +540,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
           "transverse":{"transverse_mode":"pencil"},
           "longitudinal":TEST_UNIFORM_T,
           "coupling":{"coupling_mode":"none"},
+        #  "beam_polarisation" : "Gaussian_Unit_Vectors"
         }
         a_beam.birth(test_birth, "binomial", 2)
         for i in range(1000): #pylint: disable = W0612
@@ -564,38 +574,65 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam._Beam__process_get_seed(), 12)
         self.assertEqual(self._beam._Beam__process_get_seed(), 13)
         self.assertEqual(self._beam._Beam__process_get_seed(), 14)
+
 ################################################################################################
-   
-    """
     def test_process_beam_polarisation(self):
        
         a_beam = beam.Beam()
-        test_polarisation = {
-          "beam_polarisation" : "Flat" , "beam_mean_x" :1.0 , "beam_mean_y" : 2.0 , "beam_mean_z" : 3.0,
-         "beam_sigma_x" : 4.0 , "beam_sigma_y" : 5.0, "beam_sigma_z" : 6.0
-          
-        } 
-        self.assertEqual(test_polarisation["beam_mean_x"], 1)
-        self.assertEqual(test_polarisation["beam_mean_y"], 2)
-        self.assertEqual(test_polarisation["beam_mean_z"], 3)
-        self.assertEqual(test_polarisation["beam_sigma_x"], 4)
-        self.assertEqual(test_polarisation["beam_sigma_y"], 5)
-        self.assertEqual(test_polarisation["beam_sigma_z"], 6)
-        primary = a_beam.make_one_primary()
-        hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
-        self.assertAlmostEqual(primary["spin"]["x"], 0.)
-####################################################################################################
-    """
-    #    a_beam = beam.Beam()
-     #   test_birth = { 'sx' : 0.0 , 'sy' : 0.0 , 'sz' : 0.0}
-   #     a_beam.birth(test_birth, "binomial", 2)
-        #for i in range(1000): #pylint: disable = W0612
+        test_birth = {
+          "weight":0.5,
+          "random_seed":10,
+          "random_seed_algorithm":"incrementing_random",
+          "reference":TEST_PRIM_MU,
+          "transverse":{"transverse_mode":"pencil"},
+          "longitudinal":{"longitudinal_mode":"pencil","momentum_variable":"p"},
+          "coupling":{"coupling_mode":"none"},
+        }
+        a_beam.birth(test_birth, "binomial", 2)
+        for i in range(1000): #pylint: disable = W0612
+            #primary = a_beam.make_one_primary()
+            self.assertEqual(TEST_POL["beam_mean_x"], 1)
+            self.assertEqual(TEST_POL["beam_mean_y"], 2)
+            self._beam._Beam__process_beam_polarisation()
+            self.assertEqual(TEST_POL["beam_sigma_x"], 4)
+            self.assertEqual(TEST_POL["beam_sigma_y"], 5)
+            self.assertEqual(TEST_POL["beam_sigma_z"], 6)
+            mean = numpy.array([10., 20., 30., 40., 50., 600.])
+            mass = xboa.Common.pdg_pid_to_mass[13]
+            self._beam.beam_seed = 10
+            self._beam.particle_seed_algorithm = "beam_seed"
             #primary = a_beam.make_one_primary()
             #hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
-            #self.assertEqual(primary["spin"]["x"], 0.0)
+            hit = xboa.Hit.Hit.new_from_dict({'sx':0.0, 'sy':0.0, 'sz':1.0})
+            self.assertEqual(hit["sx"], TEST_SPIN["sx"])
+            self.assertEqual(hit["sy"], TEST_SPIN["sy"])
+            self.assertEqual(hit["sz"], TEST_SPIN["sz"])
+            self.assertEqual(((hit["sx"])**2 + (hit["sy"])**2 + (hit["sz"])**2)**0.5, 1.0)
             
-       # self.assertAlmostEqual(self._beam.sx, test_birth["sx"])
-        ##
+####################################################################################################
+     #primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'p')
+        #primary = self._beam._Beam__process_hit_to_primary(primary_hit)
+     #  self.assertAlmostEqual(primary["spin"]["x"], 0.)
+     #  self.assertAlmostEqual(primary["spin"]["y"], 0.)
+     #  self.assertAlmostEqual(primary["spin"]["z"], 1.)
+     #   primary = a_beam.make_one_primary()
+     #   hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
+     #   self.assertAlmostEqual(primary["spin"]["x"], 0.)
+        #a_beam = beam.Beam()
+        #TEST_SPIN = { 'sx' : 0.0 , 'sy' : 0.0 , 'sz' : 0.0}
+        #a_beam.birth(test_birth, "binomial", 2)
+        #for i in range(1000): #pylint: disable = W0612
+        #primary = a_beam.make_one_primary()
+        #hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
+        #self.assertEqual(hit["sx"], TEST_SPIN["sx"])
+        #self.assertEqual(hit["sy"], TEST_SPIN["sy"])
+        #self.assertEqual(hit["sz"], TEST_SPIN["sz"])
+        #self.assertEqual(((hit["sx"])**2+(hit["sy"])**2+(hit["sz"])**2)), 1.0)
+        #print self.beam_polarisation
+            #self.assertEqual(hit['pz'], 1.0)
+            #self.assertEqual(primary["momentum"]["z"], 0.0)
+        #self.assertAlmostEqual(self._beam.sx, test_birth["sx"])
+        
 
 
 

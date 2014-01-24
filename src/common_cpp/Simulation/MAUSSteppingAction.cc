@@ -88,11 +88,11 @@ Json::Value MAUSSteppingAction::StepToJson
 
 //################################################//
 
-  //  Json::Value spin;
-   // spin["x"] = point->GetSpin().x();
-  //  spin["y"] = point->GetSpin().y();
-   // spin["z"] = point->GetSpin().z();
-    //step["spin"] = spin;
+    Json::Value spin;
+    spin["x"] = point->GetSpin().x();
+    spin["y"] = point->GetSpin().y();
+    spin["z"] = point->GetSpin().z();
+    step["spin"] = spin;
 
 
 
