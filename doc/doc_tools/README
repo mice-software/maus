@@ -1,11 +1,13 @@
-##############################################################
-#                                                            #
-#   INSTRUCTIONS:                                            #
-#   1. Run generate_third_party_doc.py                       #
-#   2. Run generate_MAUS_doc.py                              #
-#   3. Open ../index.html in order to browse documentation   #
-#                                                            #
-##############################################################
+############################################################################
+#                                                                          #
+#   INSTRUCTIONS:                                                          #
+#   1. Run generate_third_party_doc.py                                     #
+#   2. Run generate_MAUS_doc.py                                            #
+#   3. Open ../index.html in order to browse documentation                 #
+#   NOTE: The scripts should always be run from *this* directory           #
+#   (doc/doc_tools/) otherwise the doxygen config file will not be found   #
+#                                                                          #
+############################################################################
 
 The files "generate_third_party_doc.py" and "generate_MAUS_doc.py" will
 generate the doxygen documentation for third party libraries (currently ROOT,
@@ -18,8 +20,13 @@ documentation will be stored there. Paths in index.hthml are automatically
 adjusted.
 Both scripts can be run with the argument --noprompt in order not to prompt for
 confirmation.
+
 THIRD PARTY DOCUMENTATION HAS TO BE GENERATED BEFORE THE MAUS DOCUMENTATION
 IN ORDER FOR DERIVED CLASSES TO BE INCLUDED PROPERLY.
+
+Note that dot, part of Graphviz (http://graphviz.org/), has to be installed
+in order for graphs to be generated. You can, however, still generate the
+documentation without it.
 
 NOTE: There is some seemingly invalid LaTeX code in three of the ROOT source
 files resulting in the image generation for these equations failing when
@@ -32,7 +39,6 @@ remove the ampersands around the "=" in the first line and replace "\der t" by
 "d t" in the third line.
 
 The directories from which the documentation is created are listed below.
-(* used to maintain functionality in case of third party library updates.)
 
 THIRD PARTY:
 ROOT:           /third_party/build/root_v{version}/include/
