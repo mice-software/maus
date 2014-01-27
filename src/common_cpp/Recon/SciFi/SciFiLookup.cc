@@ -29,6 +29,7 @@ SciFiLookup::~SciFiLookup() {
   // Do nothing
 }
 
+
 bool SciFiLookup::make_hits_map(MCEvent* evt) {
   // Check the pointer is valid
   if (!evt) {

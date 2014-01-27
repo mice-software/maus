@@ -39,17 +39,6 @@ output_json_file_type = "text"
 input_root_file_name = "maus_input.root"
 output_root_file_name = "maus_output.root"
 
-# one_big_file - puts everything in output_root_file_name
-# one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
-#                    maus_output_1111.root
-# end_of_run_file_per_run - as above, and places in
-#        <end_of_run_output_root_directory>/<run_number>/<output_root_file_name>
-#      users responsibility to ensure that <end_of_run_output_root_directory>
-#      exists but MAUS will make <run_number> subdirectories
-output_root_file_mode = "one_big_file"
-end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of_run/" \
-              if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
-
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
 # 0 = debug info (and std::cout)
@@ -105,7 +94,7 @@ production_threshold = 0.5 # set the threshold for delta ray production [mm]
 kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
-keep_or_kill_particles = {"mu+":True, "mu-":True,
+keep_or_kill_particles = {"mu+":True, "mu-":True,   
                           "nu_e":False, "anti_nu_e":False,
                           "nu_mu":False, "anti_nu_mu":False,
                           "nu_tau":False, "anti_nu_tau":False,
@@ -282,7 +271,7 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuratio
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
 geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
-                                    # the currently valid geometry or 'id' to use the cdb internal id
+                                    # the currently valid geometry or 'id' to use the cdb internal id 
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_run_number = 0
@@ -307,37 +296,18 @@ get_ids_create_file = True
 #get beamline information
 # This executable will give the run numbers of the runs which the CDB has information on.
 # The information is the magnet currents, reasons for run and other information which
-# is specific to that run. When downloading a geometry by run number the beamline
+# is specific to that run. When downloading a geometry by run number the beamline 
 # information is merged with the geometrical infomation. Options for querying
 # beamline information are; 'all_entries' returns a list of all run numbers with beamline info.
 #                           'run_number'  prints whether info is held for this run number or not.
 #                           'dates'       returns a list of run numbers with info during specified time period.
-get_beamline_by = "all_entries"
+get_beamline_by = "all_entries" 
 get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""
 
-# File Numbers
-# This following section gives the files numbers of each detector. The numbers speficy the technical drawing
-# number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
-# and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
-tof_0_file_number = "Iges_10"
-tof_1_file_number = "Iges_11"
-tof_2_file_number = "Iges_13"
-ckov_file_number = "Iges_19"
-acc1_file_number = "Iges_20"
-acc2_file_number = "Iges_21"
-kl_file_number = "Iges_14"
-emr_file_number = "Iges_15"
-tracker0_file_number = "Iges_17"
-tracker1_file_number = "Iges_18"
-absorber0_file_number = "9999"
-absorber1_file_number = "Iges_16"
-absorber2_file_number = "9999"
-
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
-Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
 Enable_V1290_Unpacking = True
@@ -347,7 +317,6 @@ Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
 Enable_VLSB_C_Unpacking = True
 Enable_DBB_Unpacking = True
-Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
@@ -395,7 +364,7 @@ TOF_calib_source = "CDB"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 
 TOF_findTriggerPixelCut = 0.5 # nanosecond
-TOF_makeSpacePointCut = 0.5 # nanosecond
+TOF_makeSpacePiontCut = 0.5 # nanosecond
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
@@ -408,9 +377,6 @@ Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
 KL_cabling_file = "/files/cabling/KLChannelMap.txt"
-
-# this is used by the reconstuction of the EMR detectors
-EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
