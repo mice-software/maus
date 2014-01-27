@@ -65,8 +65,9 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
     for ( int bank = 0; bank < 4; bank++ ) {
       for ( int chan_ro = 0; chan_ro < 128; chan_ro++ ) {
         int tracker, station, plane, channel;
+        int extWG, inWG, WGfib;
         test_case.get_StatPlaneChannel(board, bank, chan_ro,
-                                       tracker, station, plane, channel);
+                                       tracker, station, plane, channel, extWG, inWG, WGfib);
         if ( tracker == -1 ) {
           missing_channel_counter += 1;
         }
@@ -87,12 +88,15 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
   int plane = 0;
   int channel = 0;
   int bad_bank = 99;
+  int extWG, inWG, WGfib;
 
   bool correct = test_case.get_StatPlaneChannel(board, bank, chan_ro,
-                                                tracker, station, plane, channel);
+                                                tracker, station, plane,
+                                                channel, extWG, inWG, WGfib);
   EXPECT_TRUE(correct);
   bool wrong = test_case.get_StatPlaneChannel(board, bad_bank, chan_ro,
-                                                tracker, station, plane, channel);
+                                              tracker, station, plane,
+                                              channel, extWG, inWG, WGfib);
   EXPECT_FALSE(wrong);
 }
 

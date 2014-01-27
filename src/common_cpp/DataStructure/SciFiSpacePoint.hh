@@ -135,6 +135,7 @@ class SciFiSpacePoint {
 };  // Don't forget this trailing colon!!!!
 
 typedef std::vector<SciFiSpacePoint*> SciFiSpacePointPArray;
+typedef std::vector< std::vector<SciFiSpacePoint*> > SpacePoint2dPArray;
 typedef std::vector<SciFiSpacePoint> SciFiSpacePointArray;
 
 } // ~namespace MAUS
