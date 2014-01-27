@@ -49,47 +49,12 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
 }
 
 PatternRecognition::PatternRecognition(): _verb(0),
-                                          _lsq(_sd_1to4, _sd_5, _R_res_cut),
-                                          _f_res(NULL),
-                                          _f_res_good(NULL),
-                                          _f_res_chosen(NULL),
-                                          _f_trks(NULL) {
+                                          _lsq(_sd_1to4, _sd_5, _R_res_cut) {
   // Do nothing;
-};
-
-PatternRecognition::~PatternRecognition() {
-  if ( _f_res ) {
-    _f_res->close();
-    delete _f_res;
-    _f_res = NULL;
-  }
-  if ( _f_res_good ) {
-    _f_res_good->close();
-    delete _f_res_good;
-    _f_res_good = NULL;
-  }
-  if ( _f_res_chosen ) {
-    _f_res_chosen->close();
-    delete  _f_res_chosen;
-    _f_res_chosen = NULL;
-  }
-  if ( _f_trks ) {
-    _f_trks->close();
-    delete _f_trks;
-    _f_trks = NULL;
-  }
 }
 
-void PatternRecognition::initialise_residual_files() {
-  _verb = 2;
-  _f_res = new ofstream();
-  _f_res->open("residuals.dat", std::ios::app);
-  _f_res_good = new ofstream();
-  _f_res_good->open("residuals_good.dat", std::ios::app);
-  _f_res_chosen = new ofstream();
-  _f_res_chosen->open("residuals_chosen.dat", std::ios::app);
-  _f_trks = new ofstream();
-  _f_trks->open("tracks.dat", std::ios::app);
+PatternRecognition::~PatternRecognition() {
+  // Do nothing
 }
 
 void PatternRecognition::process(const bool helical_pr_on, const bool straight_pr_on,
@@ -121,10 +86,6 @@ void PatternRecognition::process(const bool helical_pr_on, const bool straight_p
         make_all_tracks(track_type, trker_no, spnts_by_station, evt);
       }
     }// ~Loop over trackers
-    /*
-    std::cout << "Number of straight tracks found: " << evt.straightprtracks().size() << "\n\n";
-    std::cout << "Number of helical tracks found: " << evt.helicalprtracks().size() << "\n\n";
-    */
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
   }
@@ -391,24 +352,13 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
             // If the spacepoint has not already been used in a track fit
             if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
-              SciFiSpacePoint *sp = spnts_by_station[st_num][sp_no];
-              double dx = 0, dy = 0;
-              SciFiTools::calc_straight_residual(sp, line_x, line_y, dx, dy);
-              if ( _verb > 1 ) {
-                *_f_res << trker_no << "\t" << st_num << "\t" << n_points << "\t";
-                *_f_res << dx << "\t" << dy << "\n";
-              }
-
               // Apply roadcuts & find the spoints with the smallest residuals for the line
+              double dx = 0, dy = 0;
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
-                if ( _verb > 1 ) {
-                  *_f_res_good << trker_no << "\t" << st_num << "\t" << n_points << "\t";
-                  *_f_res_good << dx << "\t" << dy << "\n";
-                }
-                if ( delta_sq > (dx*dx + dy*dy) )
+                if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
                   best_sp = sp_no;
-                // add_residuals(true, dx, dy, residuals);
+                }
               } // ~If pass roadcuts and beats previous best fit point
             } // ~If spacepoint is unused
           } // ~Loop over spacepoints
@@ -416,12 +366,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
           if (best_sp > -1) {
             SciFiSpacePoint * sp = spnts_by_station[st_num][best_sp];
             good_spnts.push_back(sp);
-            double dx = 0, dy = 0;
-            SciFiTools::calc_straight_residual(sp, line_x, line_y, dx, dy);
-            if ( _verb > 1 ) {
-              *_f_res_chosen << trker_no << "\t" << st_num << "\t" << n_points << "\t";
-              *_f_res_chosen << dx << "\t" << dy << "\n";
-            }
           }// ~if (counter > 0)
         } // ~if (st_num != ignore_station)
       } // ~Loop over intermediate stations
@@ -636,7 +580,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   if (success) {
     phi_i = true_phi_i;
   } else {
-    std::cerr << "Failed to find n turns" << std::endl;
+    if ( _verb > 0 ) std::cerr << "Failed to find n turns" << std::endl;
     return false;
   }
 
@@ -652,7 +596,6 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     return false;
   } else {
     if ( _verb > 0 ) std::cerr << "Passed s-z cut, ds/dz is " << line_sz.get_m() << "\n";
-    phi_i = true_phi_i;
     return true;
   }
 }
@@ -839,7 +782,7 @@ bool PatternRecognition::set_end_stations(const std::vector<int> ignore_stations
   return true;
 } // ~set_end_stations(...)
 
-// For helical Pattern Recognition use
+// For straight Pattern Recognition use
 bool PatternRecognition::set_seed_stations(const std::vector<int> ignore_stations,
                       int &o_st_num, int &i_st_num, int &mid_st_num) {
   if ( static_cast<int>(ignore_stations.size()) == 0 ) { // 5pt track case

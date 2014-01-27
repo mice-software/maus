@@ -1,0 +1,63 @@
+\section{Introduction}
+\label{Sect:SciFiIntroduction}
+
+\subsection{Overview}
+\label{SubSect:SciFiOverview}
+
+This chapter describes the software used to simulate and reconstruct the MICE scintillating fibre trackers. Section~\ref{Sect:SciFiDefinitions}, \ref{Sect:SciFiRefSurf&CoordSysts} and \ref{Sect:SciFiReconstructionAlgorithms} are reference sections providing descriptions of the official definitions, reference surfaces and coordinate systems, and reconstruction algorithms respectively.  The later sections provide descriptions of the code as implemented in MAUS.  A quick start guide regular users appears in below in section~\ref{SubSect:SciFiQuickStart}.
+
+\subsection{Quick start guide}
+\label{SubSect:SciFiQuickStart}
+
+Example scripts and datacards for the tracker reconstruction can be found in the \verb;bin/user/scifi; directory.  A typical top level python file to run a simulation with tracker reconstruction is shown below.
+
+\begin{lstlisting}[
+    language=Python,
+    caption={Example SciFi python script},
+    label=api:IModule, 
+    index={IModule},
+    emph={birth,death},
+    emphstyle={\color{DarkBlue}}
+  ]
+import io   #  generic python library for I/O
+import gzip #  For compressed output # pylint: disable=W0611
+import MAUS
+
+def run():
+    # This input generates empty spills,
+    # to be filled by the beam maker later
+    my_input = MAUS.InputPySpillGenerator()
+
+    # The mappers for to set up the simulation
+    my_map = MAUS.MapPyGroup()
+    my_map.append(MAUS.MapPyBeamMaker()) # beam construction
+    my_map.append(MAUS.MapCppSimulation())  #  geant4 sim
+    
+    # The mappers for tracker MC digitisation and recon
+    my_map.append(MAUS.MapCppTrackerMCDigitization()) 
+    my_map.append(MAUS.MapCppTrackerRecon())
+    
+    # Specify config parameters via a datacard
+    datacards = io.StringIO(u"")
+
+    # The Pattern Recognition reducer to display tracks
+    reducer = MAUS.ReduceCppPatternRecognition()
+
+    # Output to ROOT file
+    my_output = MAUS.OutputCppRoot()
+
+    # The Go() drives all the components you pass in
+    MAUS.Go(my_input, my_map, reducer, my_output, datacards)
+
+if __name__ == '__main__':
+    run()
+\end{lstlisting}
+
+\noindent
+Some important datacard parameters to consider when using the tracker software are:
+
+\begin{itemize}
+ \item \verb;SciFiPRHelicalOn; - set to True or False for helical pattern recognition
+ \item \verb;SciFiPRStraightOn; - set to True or False for straight pattern recognition
+ \item \verb;SciFiKalmanOn; - set to True or False for running the final track fit
+\end{itemize}

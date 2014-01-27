@@ -46,7 +46,7 @@ muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
 
 # geant4 visualisation (not event display)
-geant4_visualisation = True
+geant4_visualisation = False
 visualisation_viewer = "VRML2FILE"  # only supported option
 visualisation_theta = 90.
 visualisation_phi = 90.
