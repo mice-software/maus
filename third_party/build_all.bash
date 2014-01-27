@@ -37,8 +37,14 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # python environment, that will come later. Now HEP libraries
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
+    # removed geant 4.9.2
+    #${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
+    # added for geant 4.9.6
+    ${MAUS_ROOT_DIR}/third_party/bash/29expat.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/32clhep2.1.1.0.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash
+    # removed geant 4.9.2
+    #${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     # DAQ unpacking library
     ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash

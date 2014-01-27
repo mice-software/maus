@@ -37,6 +37,7 @@ namespace MAUS {
 bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
 
   mClassname = "ReduceCppPatternRecognition";
+  mDataManager.set_print_tracks(false);               // Do not print info about the PR tracks
   mDataManager.set_print_seeds(false);               // Do not print info about track seeds
   mXYZPlotter = new TrackerDataPlotterXYZ();         // The spacepoint and track plotter
   mInfoBoxPlotter = new TrackerDataPlotterInfoBox(); // The infobox plotter
@@ -57,10 +58,7 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
 }
 
 std::string ReduceCppPatternRecognition::process(std::string aDocument) {
-  std::cout << "Starting Pattern Recognition Reducer" << std::endl;
-
   bool read_success = read_in_json(aDocument);
-
   if (read_success) {
     try {
       if ( mSpill->GetReconEvents() ) {
@@ -76,7 +74,7 @@ std::string ReduceCppPatternRecognition::process(std::string aDocument) {
     }
     mDataManager.clear_spill();
   } else {
-    std::cerr << "Failed to import json to spill\n";
+    std::cerr << mClassname << ": Failed to import json to spill\n";
   }
   return JsonWrapper::JsonToString(mRoot);
 }
@@ -96,7 +94,7 @@ bool ReduceCppPatternRecognition::read_in_json(std::string aJsonData) {
   } catch (...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << mClassname << " says: Failed when importing JSON to Spill";
+    ss << mClassname << ": Failed when importing JSON to Spill";
     errors["bad_json_document"] = ss.str();
     mRoot["errors"] = errors;
     writer.write(mRoot);

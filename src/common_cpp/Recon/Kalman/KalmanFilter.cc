@@ -121,8 +121,13 @@ void KalmanFilter::UpdateW(const KalmanState *a_site) {
   TMatrixD A = TMatrixD(TMatrixD(_H, TMatrixD::kMult, C_a),
                         TMatrixD::kMultTranspose,
                         _H);
+
+  TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
+                        TMatrixD::kMultTranspose,
+                        _S);
+
   _W.Zero();
-  _W = _V + A;
+  _W = _V + A + B;
   _W.Invert();
 }
 

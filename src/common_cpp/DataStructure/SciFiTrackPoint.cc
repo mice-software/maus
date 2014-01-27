@@ -22,6 +22,7 @@ namespace MAUS {
 SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
                                      _station(-1),
                                      _plane(-1),
+                                     _channel(666),
                                      _f_chi2(-1),
                                      _s_chi2(-1),
                                      _x(0.),
@@ -51,6 +52,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   id = abs(id);
   _station = id/3;
   _plane   = (id-1)%3;
+  _channel = kalman_site->measurement()(0, 0);
 
   _f_chi2 = kalman_site->chi2(KalmanState::Filtered);
   _s_chi2 = kalman_site->chi2(KalmanState::Smoothed);
@@ -96,6 +98,7 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _tracker = point.tracker();
   _station = point.station();
   _plane   = point.plane();
+  _channel = point.channel();
 
   _f_chi2 = point.f_chi2();
   _s_chi2 = point.s_chi2();
@@ -126,6 +129,7 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _tracker = rhs.tracker();
   _station = rhs.station();
   _plane   = rhs.plane();
+  _channel = rhs.channel();
 
   _f_chi2 = rhs.f_chi2();
   _s_chi2 = rhs.s_chi2();

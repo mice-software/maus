@@ -22,13 +22,9 @@
 namespace MAUS {
 
 // Ascending z.
-bool SortByZ(const SciFiCluster *a, const SciFiCluster *b) {
+template <class element>
+bool SortByZ(const element *a, const element *b) {
   return ( a->get_position().z() < b->get_position().z() );
-}
-
-// Ascending station number.
-bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
-  return ( a->get_station() < b->get_station() );
 }
 
 KalmanSeed::KalmanSeed() : _Bz(0.),
@@ -142,23 +138,16 @@ void KalmanSeed::BuildKalmanStates() {
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
-  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
   x = spacepoints.front()->get_position().x();
   y = spacepoints.front()->get_position().y();
   z = spacepoints.front()->get_position().z();
-  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
-
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
   // Charge guess should come from PR.
   // int _particle_charge = seed->get_charge();
+
   double pt = -_particle_charge*c*_Bz*r;
 
   double dsdz  = seed->get_dsdz();
@@ -167,8 +156,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double pz = pt*tan_lambda;
 
   double kappa = _particle_charge*fabs(1./pz);
-
   double phi_0 = seed->get_phi0();
+
   if ( _tracker == 0 ) {
     phi_0 = seed->get_phi().back();
   }
@@ -189,17 +178,10 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
-  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
 
   x = spacepoints.front()->get_position().x();
   y = spacepoints.front()->get_position().y();
   z = spacepoints.front()->get_position().z();
-  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
 
   double mx = seed->get_mx();
   double my = seed->get_my();
@@ -225,8 +207,8 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
     }
   }
 
-  std::sort(_clusters.begin(), _clusters.end(), SortByZ);
-  std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
+  std::sort(_clusters.begin(), _clusters.end(), SortByZ<SciFiCluster>);
+  std::sort(spacepoints.begin(), spacepoints.end(), SortByZ<SciFiSpacePoint>);
 }
 
 } // ~namespace MAUS

@@ -35,8 +35,8 @@ def run():
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
     # SciFi
- #   my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-#    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+   # my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
+   # my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # Global Digits - post detector digitisation
 
