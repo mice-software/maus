@@ -710,7 +710,8 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
 
   track_point->set_mapper_name(kClassname);
 
-  const double Px = (*scifi_track_point)->px();
+  const double Px = (detector.id() <= GlobalDS::kTracker0_5)?
+                   -(*scifi_track_point)->px():(*scifi_track_point)->px();
   const double Py = (*scifi_track_point)->py();
   const double Pz = (*scifi_track_point)->pz();
   const double momentum = ::sqrt(Px*Px + Py*Py + Pz*Pz);

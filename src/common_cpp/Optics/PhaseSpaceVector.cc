@@ -21,8 +21,12 @@
 
 #include <cmath>
 #include <iostream>
-#include "CLHEP/Units/PhysicalConstants.h"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+#include "TLorentzVector.h"
+
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/VirtualHit.hh"
 #include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 
@@ -60,6 +64,42 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
     : Vector<double>() {
   const double data[6] = {
     t, E, x, px, y, py
+  };
+  build_vector(6, data);
+}
+
+PhaseSpaceVector::PhaseSpaceVector(const MAUS::VirtualHit & hit)
+    : MAUS::Vector<double>() {
+  const MAUS::ThreeVector position = hit.GetPosition();
+  const double mass = hit.GetMass();
+  const MAUS::ThreeVector momentum = hit.GetMomentum();
+  const double energy = ::sqrt(mass*mass + ::pow(momentum.mag(), 2.));
+  const double data[6] = {
+    hit.GetTime(), energy,
+    position.x(), momentum.x(),
+    position.y(), momentum.y()
+  };
+  build_vector(6, data);
+}
+
+PhaseSpaceVector::PhaseSpaceVector(const double time,
+                                   const double energy,
+                                   const MAUS::ThreeVector position,
+                                   const MAUS::ThreeVector momentum)
+    : MAUS::Vector<double>() {
+  const double data[6] = {
+    time, energy, position.x(), momentum.x(), position.y(), momentum.y()
+  };
+  build_vector(6, data);
+}
+
+PhaseSpaceVector::PhaseSpaceVector(const TLorentzVector position,
+                                   const TLorentzVector momentum)
+    : MAUS::Vector<double>() {
+  const double data[6] = {
+    position.T(), momentum.E(),
+    position.X(), momentum.Px(),
+    position.Y(), momentum.Py()
   };
   build_vector(6, data);
 }

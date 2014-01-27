@@ -22,6 +22,10 @@
 
 #include <iostream>
 
+#include "TLorentzVector.h"
+
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/VirtualHit.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -55,6 +59,16 @@ class PhaseSpaceVector : public Vector<double> {
   PhaseSpaceVector(const double t, const double E,
                    const double x, const double px,
                    const double y, const double py);
+
+  PhaseSpaceVector(const MAUS::VirtualHit & hit);
+
+  PhaseSpaceVector(const double time,
+                   const double energy,
+                   const MAUS::ThreeVector position,
+                   const MAUS::ThreeVector momentum);
+
+  PhaseSpaceVector(const TLorentzVector position,
+                   const TLorentzVector momentum);
 
   ~PhaseSpaceVector();
 
