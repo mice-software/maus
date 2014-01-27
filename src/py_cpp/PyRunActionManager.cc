@@ -69,7 +69,7 @@ PyObject* StartOfRun(PyObject *dummy, PyObject *args) {
     head_str = JsonWrapper::JsonToString(*head_json);
     delete head_json;
     delete run_header;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
@@ -100,7 +100,7 @@ PyObject* EndOfRun(PyObject *dummy, PyObject *args) {
     foot_str = JsonWrapper::JsonToString(*foot_json);
     delete foot_json;
     delete run_footer;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }

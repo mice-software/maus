@@ -60,7 +60,7 @@ class PhaseSpaceVector : public Vector<double> {
                    const double x, const double px,
                    const double y, const double py);
 
-  PhaseSpaceVector(const MAUS::VirtualHit & hit);
+  explicit PhaseSpaceVector(const MAUS::VirtualHit & hit);
 
   PhaseSpaceVector(const double time,
                    const double energy,

@@ -83,11 +83,11 @@ bool MapCppGlobalRawTracks::birth(std::string configuration_string) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors_);
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
       exception, MapCppGlobalRawTracks::kClassname);
     return false;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
       exc, MapCppGlobalRawTracks::kClassname);
     return false;
@@ -240,22 +240,13 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
             << tof0_space_points.size() << "\tTOF1: "
             << tof1_space_points.size() << "\tTOF2: "
             << tof2_space_points.size() << std::endl;
-  if (tof0_space_points.size() != tof1_space_points.size()) {
-    std::cout << "DEBUG LoadTOFTrack: track has different number of "
-              << "space points in TOF0 (" << tof0_space_points.size() << ")"
-              << " and TOF1 (" << tof1_space_points.size() << ")...skipping."
-              << std::endl;
-    return;
-  } else if (tof0_space_points.size() == 0) {
+  if (tof0_space_points.size() == 0) {
     std::cout << "DEBUG LoadTOFTrack: track has no space points...skipping."
               << std::endl;
     return;
   }
 
   GlobalDS::Track * track = new GlobalDS::Track();
-
-  TLorentzVector last_position[3];
-  TLorentzVector deltas[3];
 
   GlobalDS::TrackPointPArray track_points;
 
@@ -276,9 +267,7 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof0, tof0_space_point, 40., 10, track_point);
-    track_points.push_back(track_point);
-
-    last_position[0] = track_point->get_position();
+    track->AddTrackPoint(track_point);
   }
 
   MAUS::recon::global::DetectorMap::const_iterator tof1_mapping
@@ -296,12 +285,8 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof1, tof1_space_point, 60., 7, track_point);
-    track_points.push_back(track_point);
-
-    last_position[1] = track_point->get_position();
+    track->AddTrackPoint(track_point);
   }
-  deltas[0] = last_position[1] - last_position[0];
-  deltas[1] = deltas[0];
 
   MAUS::recon::global::DetectorMap::const_iterator tof2_mapping
     = detectors_.find(GlobalDS::kTOF2);
@@ -318,40 +303,8 @@ void MapCppGlobalRawTracks::LoadTOFTrack(
     GlobalDS::TrackPoint * track_point = new GlobalDS::TrackPoint();
     track_point->set_particle_event(particle_event_number);
     PopulateTOFTrackPoint(tof2, tof2_space_point, 60., 10, track_point);
-    track_points.push_back(track_point);
-
-    last_position[2] = track_point->get_position();
+    track->AddTrackPoint(track_point);
   }
-  deltas[2] = last_position[2] - last_position[1];
-
-  // Approximate momenta by using tof0/tof1 and tof1/tof2 position deltas
-  TLorentzVector momenta[3];
-  for (size_t index = 0; index < 3; ++index) {
-    MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-    MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-      = simulator->GetReferenceParticle();
-    momenta[index] = TLorentzVector(reference_pgparticle.px,
-                                    reference_pgparticle.py,
-                                    reference_pgparticle.pz,
-                                    reference_pgparticle.energy);
-  }
-
-  // Set each track point's 4-momentum and add to the track
-  std::vector<GlobalDS::TrackPoint *>::iterator track_point;
-  size_t point_index = 0;
-  for (track_point = track_points.begin();
-       track_point != track_points.end();
-       ++track_point) {
-    (*track_point)->set_momentum(momenta[point_index++]);
-
-    track->AddTrackPoint(*track_point);
-  }
-
-  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
-  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
-    = simulator->GetReferenceParticle();
-  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
-  track->set_pid(particle_id);
 
   tof_tracks.push_back(track);
 }

@@ -603,7 +603,7 @@ std::cout << "DEBUG PolynomialMap::PolynomialLeastSquaresFit() "
   Matrix<double> F2_inverse;
   try {
     F2_inverse = inverse(F2);
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     delete polynomial_map;
     std::stringstream message;
     message << "Could not find least squares fit for data. Nested exception:"
@@ -705,7 +705,7 @@ PolynomialMap* PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
     Matrix<double> F2_inverse;
     try {
       F2_inverse = inverse(F2);
-    } catch(Exception exc) {
+    } catch (Exception exc) {
     std::stringstream message;
     message << "Could not find constrained least squares fit for data. "
             << "Nested exception:" << std::endl
@@ -763,7 +763,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
   try {
     inverse_covaraiance_matrix = inverse(covariances);
   }
-  catch(Exception exc) {
+  catch (Exception exc) {
     throw(Exception(Exception::recoverable,
                  "Failed to find least squares fit for data",
                  "PolynomialMap::Chi2ConstrainedLeastSquaresFit"));
@@ -803,7 +803,7 @@ PolynomialMap* PolynomialMap::Chi2ConstrainedLeastSquaresFit(
       map = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
                 xin, xout, polynomialOrder, coeffs, weights);
     }
-    catch(Exception exc) {
+    catch (Exception exc) {
       map = NULL;
       chi2 = chi2Limit * 2.;
     }

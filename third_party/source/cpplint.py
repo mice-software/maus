@@ -65,6 +65,9 @@
 #  - Check for class declaration order (typedefs, consts, enums,
 #    ctor(s?), dtor, friend declarations, methods, member vars)
 #
+#  Modifications
+#  -------------
+#  - (P. Lane) Treat 'catch' control statements like if, for, switch, etc...
 
 """Does google-lint on c++ files.
 
@@ -1466,7 +1469,7 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
     error: The function to call with any errors found.
   """
 
-  # Since function calls often occur inside if/for/while/switch
+  # Since function calls often occur inside if/for/while/switch/catch
   # expressions - which have their own, more liberal conventions - we
   # first see if we should be looking inside such an expression for a
   # function call, to which we can apply more strict standards.
@@ -1474,7 +1477,8 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
   for pattern in (r'\bif\s*\((.*)\)\s*{',
                   r'\bfor\s*\((.*)\)\s*{',
                   r'\bwhile\s*\((.*)\)\s*[{;]',
-                  r'\bswitch\s*\((.*)\)\s*{'):
+                  r'\bswitch\s*\((.*)\)\s*{',
+                  r'\bcatch\s*\((.*)\)\s*{'):
     match = Search(pattern, line)
     if match:
       fncall = match.group(1)    # look inside the parens for function calls
@@ -1638,7 +1642,7 @@ def CheckSpacing(filename, clean_lines, linenum, error):
   """Checks for the correctness of various spacing issues in the code.
 
   Things we check for: spaces around operators, spaces after
-  if/for/while/switch, no spaces around parens in function calls, two
+  if/for/while/switch/catch, no spaces around parens in function calls, two
   spaces between code and comment, don't start a block with a blank
   line, don't end a function with a blank line, don't have too many
   blank lines in a row.
@@ -1797,18 +1801,18 @@ def CheckSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'whitespace/operators', 4,
           'Extra space for operator %s' % match.group(1))
 
-  # A pet peeve of mine: no spaces after an if, while, switch, or for
-  match = Search(r' (if\(|for\(|while\(|switch\()', line)
+  # A pet peeve of mine: no spaces after an if, while, switch, for, or catch
+  match = Search(r' (if\(|for\(|while\(|switch\(|catch\()', line)
   if match:
     error(filename, linenum, 'whitespace/parens', 5,
           'Missing space before ( in %s' % match.group(1))
 
-  # For if/for/while/switch, the left and right parens should be
+  # For if/for/while/switch/catch, the left and right parens should be
   # consistent about how many spaces are inside the parens, and
   # there should either be zero or one spaces inside the parens.
   # We don't want: "if ( foo)" or "if ( foo   )".
   # Exception: "for ( ; foo; bar)" and "for (foo; bar; )" are allowed.
-  match = Search(r'\b(if|for|while|switch)\s*'
+  match = Search(r'\b(if|for|while|switch|catch)\s*'
                  r'\(([ ]*)(.).*[^ ]+([ ]*)\)\s*{\s*$',
                  line)
   if match:
