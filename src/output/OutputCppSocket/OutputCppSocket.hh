@@ -18,14 +18,22 @@
 #ifndef _SRC_OUTPUT_OUTPUTCPPSOCKET_OUTPUTCPPSOCKET_HH_
 #define _SRC_OUTPUT_OUTPUTCPPSOCKET_OUTPUTCPPSOCKET_HH_
 
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
+#include <Python.h>
+
 #include <fstream>
 #include <string>
 #include <vector>
 
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/API/OutputBase.hh"
-
-class TSocket;
 
 namespace MAUS {
 
@@ -36,7 +44,7 @@ class ImageData;
  *  OutputCppSocket exports the data structure out as a ROOT TSocket
  */
 
-class OutputCppSocket : public OutputBase<std::string> {
+class OutputCppSocket : public OutputBase<ImageData*> {
  public:
   /** OutputCppSocket constructor - initialise to NULL
    */
@@ -48,20 +56,18 @@ class OutputCppSocket : public OutputBase<std::string> {
 
   /** Initialise member data using datacards
    *
-   *  @param json_datacards Json document containing datacards. Only card used
-   *         is root_output_file [string], the root file name
-   *
-   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
-   *  base class method
+   *  @param json_datacards Json document containing datacards. Cards used are
+   *         "output_cpp_socket_host" host to search for doc db
+   *         "output_cpp_socket_port" port to search for doc db
+   *         "output_cpp_socket_collection" collection name
+   *         "root_document_store_timeout" timeout if don't get a response
+   *         "root_document_store_poll_time" frequency to poll on e.g. connect
    */
   inline void birth(const std::string& json_datacards) {
       ModuleBase::birth(json_datacards);
   }
 
   /** Delete member data
-   *
-   *  Calls, in a roundabout way, _death(); required to force SWIG to see the
-   *  base class method
    */
   inline void death() {
       ModuleBase::death();
@@ -72,9 +78,23 @@ class OutputCppSocket : public OutputBase<std::string> {
 
   void _death();
 
+  /** Save a C++ Image in the docstore
+   *
+   *  @param Image* image to be saved
+   *  @returns true if successful
+   */
   bool _save(ImageData* image);
 
-  TSocket* _socket;
+  bool _save_py_object(PyObject* object);
+
+  PyObject* _get_root_document_store(double timeout, double poll_time);
+  void _connect(std::string host, int port);
+  void _create_collection(std::string collection, int maxsize);
+
+  PyObject* _string_to_py_json(std::string json_str);
+
+  PyObject* _root_doc_store;
+  int       _doc_id;
 };
 }
 

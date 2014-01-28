@@ -74,7 +74,7 @@ class RootDocumentDB:
     any more complicated this would really be necessary; for example, if I need
     to start cacheing on disk or whatever.
     """
-    def __init__(self, port, poll_time):
+    def __init__(self, port_list, poll_time):
         """
         Initialise the database.
         @param port RootDocumentDB port
@@ -87,7 +87,8 @@ class RootDocumentDB:
         """
         self.poll_time = poll_time
         self.collections = {}
-        self.server_socket = SocketManager(port, -1., self.poll_time)
+        self.server_socket = SocketManager(port_list, -1., self.poll_time, 1000)
+        self.server_socket.start_processing()
         my_thread = threading.Thread(target=self.poll_queue)
         my_thread.daemon = True
         my_thread.start()
@@ -102,7 +103,7 @@ class RootDocumentDB:
         """
         while True:
             try:
-                (port, message_in) = self.server_socket.message_queue.get(False)
+                (port, message_in) = self.server_socket.recv_message_queue.get(False)
                 if message_in.class_name == self.__class__.__name__:
                     try: # call the appropriate function
                         message_in.acknowledge = True
@@ -117,8 +118,12 @@ class RootDocumentDB:
                     finally: # return to user
                         self.server_socket.send_message(port, message_out)                
                 else: # not for us, put it back on the queue
-                    self.message_queue.put((port, message_in), False)
+                    self.recv_message_queue.put((port, message_in), False)
             except Queue.Empty: # no messages, keep polling
+                pass
+            try:
+                self.server_socket.check_error_queue()
+            except:
                 pass
             time.sleep(self.poll_time)
 

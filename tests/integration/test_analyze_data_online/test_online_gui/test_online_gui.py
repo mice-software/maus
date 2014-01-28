@@ -19,6 +19,7 @@
 """
 Tests for online_gui
 """
+import datetime
 import unittest
 import signal
 import sys
@@ -27,67 +28,65 @@ import time
 import os
 
 import ROOT
+import libMausCpp
 import xboa.Common as Common
 
-# hints: nmap for doing a port scan - nmap
-# hints: lsof -i :<PORT> for finding pid which is listening on port <PORT>
+from docstore.DocumentStore import DocumentStoreException
+from docstore.root_document_store import RootDocumentDB
+from docstore.root_document_store import RootDocumentStore
+from docstore.root_document_store import SocketError
 
-def get_port_procs(port):
-    try:
-        lsof = subprocess.check_output(['lsof', '-i', ':'+str(port)])
-    except subprocess.CalledProcessError:
-        return None
-    status = lsof.split('\n')[1]
-    pid_string = status.split()[1]
-    return int(pid_string)
-
+THIS = "${MAUS_ROOT_DIR}/tests/integration/test_analyze_data_online/"+\
+       "test_online_gui/test_online_gui.py"
+GUI = "${MAUS_ROOT_DIR}/bin/online/online_gui/online_gui.py"
 
 class OnlineGUIClient():
-    def __init__(self, client_name, port):
-        print "Client starting on port", port
-        try:
-            valid = False
-            while not valid:
-                my_socket = ROOT.TSocket("localhost", port)
-                valid = my_socket.IsValid()
-                time.sleep(0.1)
-            print "Client socket accepted"
-            image_data = ROOT.MAUS.ImageData() # pylint: disable = E1101
-            image = ROOT.MAUS.Image() # pylint: disable = E1101
-            image.SetRunNumber(1)
-            image.SetSpillNumber(2)
-            dt = ROOT.MAUS.DateTime()
-            dt.SetDateTime("2013-01-08T01:02:03.456789")
-            image.SetInputTime(dt)
-            dt.SetDateTime("2014-01-08T01:02:03.456789")
-            image.SetOutputTime(dt)
-            canvas_wrappers = image.GetCanvasWrappers()
-            wrap = ROOT.MAUS.CanvasWrapper()
-            cpx = ROOT.TCanvas("px canvas", "px canvas")
-            hpx = ROOT.TH1F("hpx","px distribution", 100, -4, 4)
-            hpx.FillRandom("gaus", 100000);
-            hpx.Draw()
-            wrap.SetCanvas(cpx)
-            wrap.SetDescription("canvas description")
-            canvas_wrappers.push_back(wrap)
-            image.SetCanvasWrappers(canvas_wrappers)
-            image_data.SetImage(image)
-            tree = ROOT.TTree("Image", "TTree") # pylint: disable = E1101
-            tree.Branch("image_data", image_data, image_data.GetSizeOf(), 1)
-
-            message = ROOT.TMessage(ROOT.TMessage.kMESS_OBJECT)
-            message.WriteObject(tree)
-
-            print "Client sending message"
-            my_socket.Send(message)
-            my_socket.Close()
-            print "Client waits 10 seconds..."
-            time.sleep(10)
-        except KeyboardInterrupt:
-            print "Server killed"
-            sys.stdout.flush()
-        finally:
-            sys.excepthook(*sys.exc_info())
+    def __init__(self, collection_name, port):
+        ROOT.gROOT.SetBatch(True)
+        print collection_name, port
+        rds = RootDocumentStore(1., 0.01)
+        rds.connect({"host":"localhost", "port":port})
+        rds.create_collection(collection_name, 10)
+        run = 9122
+        spill = 0
+        time.sleep(2)
+        while run % 100 != 0:
+            run += 1
+            spill = 1
+            canvas_list = []
+            now = ROOT.MAUS.DateTime()
+            for i in range(3):
+                cname = collection_name+"_"+str(run)+"_"+str(i)
+                canvas = ROOT.TCanvas(cname, cname)
+                hist = ROOT.TH1D("test hist", "test hist;x;y", 100, -1., 1.)
+                canvas_list.append((canvas, hist))
+            while spill % 100 != 0:
+                image_data = ROOT.MAUS.ImageData()
+                image = ROOT.MAUS.Image()
+                image.SetRunNumber(run)
+                image.SetSpillNumber(spill)
+                image.SetInputTime(now)
+                now.SetDateTime(datetime.datetime.now().isoformat())
+                image.SetOutputTime(now)
+                for canvas, hist in canvas_list:
+                    canvas_wrap = ROOT.MAUS.CanvasWrapper()
+                    canvas_wrap.SetDescription("Description of "+collection_name)
+                    canvas.cd()
+                    hist.FillRandom("gaus", 100)
+                    hist.Draw()
+                    canvas_wrap.SetCanvas(canvas)
+                    image.CanvasWrappersPushBack(canvas_wrap)
+                image_data.SetImage(image)
+                tree = ROOT.TTree("Image", "TTree")
+                tree.Branch("data", image_data, image_data.GetSizeOf(), 1)
+                tree.Fill()
+                try:
+                    rds.put(collection_name, spill, tree)
+                    print "+"+str(port)
+                except (DocumentStoreException, SocketError):
+                    print "-"+str(port)
+                spill += 1
+                time.sleep(1)
 
     def __del__(self):
         pass
@@ -95,40 +94,27 @@ class OnlineGUIClient():
 class OnlineGUITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        this = os.path.expandvars(
-            "${MAUS_ROOT_DIR}/tests/integration/test_analyze_data_online/"+\
-            "test_online_gui.py",
-        )
-        for port in cls.ports:
-            cls.clients[port] = subprocess.Popen([
-                  "python", this_exe, "sender", str(port)
-            ], stdin=subprocess.PIPE)
-
-    @classmethod
-    def tearDownClass(cls):
-        i = 0
-        print "Killing server subprocess"
-        for port, process in cls.clients:
-            process.send_signal(signal.SIGINT)
-            print "Killing process for port", cls.port,\
-                  "pid", get_port_procs(cls.port)
-        try:
-            os.kill(get_port_procs(cls.port), signal.SIGKILL)
-        except Exception:
-            print "Failed to kill process"
-
-    def setUp(self):
-        pass
+        rdb = RootDocumentDB(cls.db_input_ports+cls.db_output_ports, 0.01)
+        for port in cls.db_input_ports:
+            exe = os.path.expandvars(THIS)
+            subprocess.Popen(["python", exe, "outputter", str(port)])
 
     def test_online_gui(self):
-        pass
-        
-    ports = [9091, 9092, 9093]
-    clients = {}
+        exe = os.path.expandvars(GUI)
+        for port in self.db_output_ports:
+            subprocess.Popen(["python", exe,
+                              "--online_gui_host", "localhost",
+                              "--online_gui_port", str(port),
+            ])
+        raw_input()
+
+    db_input_ports = [9091, 9092, 9093]
+    db_output_ports = [9101, 9102, 9103]
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "sender":
-        OnlineGUIClient("test", int(sys.argv[2]))
+    if len(sys.argv) > 1 and sys.argv[1] == "outputter":
+        port = int(sys.argv[2])
+        OnlineGUIClient("test_"+str(port), port)
     else:
         unittest.main()
 

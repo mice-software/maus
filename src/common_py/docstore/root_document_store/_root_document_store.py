@@ -29,6 +29,7 @@ import ROOT
 from docstore.DocumentStore import DocumentStoreException
 from docstore.DocumentStore import DocumentStore
 from _socket_manager import SocketManager
+from _socket_error import SocketError
 from _control_message import ControlMessage
 
 class RootDocumentStore(DocumentStore):
@@ -69,7 +70,7 @@ class RootDocumentStore(DocumentStore):
         self.port = None
         self.timeout = timeout
         self.poll_time = poll_time
-        self._socket_manager = SocketManager(None, self.timeout, poll_time)
+        self._socket_manager = SocketManager([], self.timeout, poll_time, 1000)
 
     def connect(self, parameters):
         """
@@ -85,6 +86,7 @@ class RootDocumentStore(DocumentStore):
                                                  port,
                                                  self.timeout,
                                                  self.poll_time)
+        self._socket_manager.start_processing()
 
     def create_collection(self, collection, maximum_size):
         """
@@ -229,13 +231,15 @@ class RootDocumentStore(DocumentStore):
         runtime by looking at the call stack.
         """
         if self.port == None:
-            raise DocumentStoreException(
-                                        "DocummentStore has not been connected")
+            raise DocumentStoreException("DocumentStore has not been connected")
         if data == None:
             data = []
         message = ControlMessage("RootDocumentDB", inspect.stack()[1][3],
                                  args, keywd_args, data)
-        self._socket_manager.send_message(self.port, message)
+        try:
+            self._socket_manager.send_message(self.port, message)
+        except SocketError as err:
+            raise DocumentStoreException(*err.args)
         return self._return_function(inspect.stack()[1][3], message.id)
 
     def _return_function(self, function_name, message_id):
@@ -258,7 +262,7 @@ class RootDocumentStore(DocumentStore):
             # message_queue is Fifo, so get; do_something; put; should just
             # loop over the queue waiting for our acknowledgement
             try: 
-                (port, ack) = self._socket_manager.message_queue.get_nowait()
+                (port, ack) = self._socket_manager.recv_message_queue.get_nowait()
                 if ack.acknowledge and message_id == ack.id:
                     if ack.errors == {}:
                         return ack
@@ -269,9 +273,15 @@ class RootDocumentStore(DocumentStore):
                         raise DocumentStoreException(
                             "RootDocumentDB failed with errors:\n"+error_string)
                 else:
-                    self._socket_manager.message_queue.put_nowait((port, ack))
+                    self._socket_manager.recv_message_queue.put_nowait((port, ack))
             except Queue.Empty:
                 pass #it's okay, just keep waiting
             time.sleep(self.poll_time)
         raise DocumentStoreException("Call to "+function_name+" failed to return")
+
+def _initialise_from_c(timeout, poll_time):
+    """
+    Wrapper for __init__ to help with C initialisation
+    """
+    return RootDocumentStore(timeout, poll_time)
 

@@ -15,6 +15,8 @@
  *
  */
 
+#include <iostream>
+
 #include "TCanvas.h"
 
 #include "src/common_cpp/DataStructure/CanvasWrapper.hh"
@@ -31,9 +33,16 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     if (this == &rhs)
         return *this;
     _description = rhs._description;
-    if (_canvas == NULL)
+    if (_canvas != NULL)
         delete _canvas;
-    _canvas = dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
+    if (rhs._canvas != NULL) {
+        _canvas = new TCanvas();
+        _canvas->cd(); 
+        dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
+        _canvas->SetTitle(rhs._canvas->GetTitle());
+    } else {
+        _canvas = NULL;
+    }
     return *this;
 }
 

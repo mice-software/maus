@@ -80,10 +80,9 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         DocumentStoreTests.setUp(self)
         self._host = "localhost"
         self._port = PORT
-        self._root_db = RootDocumentDB(self._port, 0.01)
-        self._data_store = RootDocumentStore(1., 0.01)
+        self._root_db = RootDocumentDB([self._port], 0.01)
+        self._data_store = RootDocumentStore(10., 0.01)
         self._collection = self.__class__.__name__
-
         parameters = {
             "host":self._host,
             "port":self._port}
@@ -124,7 +123,7 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         try: # put an int, not a ROOT document
             rds.put("test_collection", 0, 99)
             self.assertTrue(False, msg="Should have thrown")
-        except TypeError:
+        except DocumentStoreException:
             pass
         for i in range(90, 80, -1): # check we can only write 5 items
             rds.put("test_collection", i, ttree_data(i))

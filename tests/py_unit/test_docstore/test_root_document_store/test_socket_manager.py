@@ -51,145 +51,177 @@ class SocketManagerTest(unittest.TestCase):
         Assign a port
         """
         global NEXT_PORT
-        NEXT_PORT += 1
+        NEXT_PORT += 10
         self.port = NEXT_PORT
+        self.retry = 0.1
 
     def test_server_socket_connect(self):
         """
         Test SocketManager.connect
         """
-        retry = 0.01
-        msg_in = [ControlMessage() for i in range(3)]
+
         ports = [self.port+i for i in range(1, 10)]
-        server_socket = SocketManager(self.port, copy.deepcopy(ports), -1., retry)
-        socks = [SocketManager(self.port, [], -1., retry) for i in range(3)]
-        for i, sock_manager in enumerate(socks):
-            sock_manager.connect("localhost", ports[i], 10, retry)
-        for i, sock_manager in enumerate(socks):
-            server_socket.send_message(ports[i], msg_in[i])
+        msg_in = [ControlMessage() for i in range(10)]
 
-        self.assertEqual(sorted(server_socket.port_list()), ports[0:3])
-        remote_ports = [sock.socket_list()[0]['remote_port'] for sock in socks]
-        for i, sock_manager in enumerate(socks):
-            self.assertEqual(sorted(remote_ports), ports[0:3])
-        for sock_man in [server_socket]+socks:
-            print json.dumps(sock_man.socket_list(), indent=2)
-        for sock_man in [server_socket]+socks:
-            sock_man.start_processing()
-        time.sleep(2)
-        msg_out = []
-        for i, sock_manager in enumerate(socks):
-            while True:
-                  try:
-                      msg_out.append(sock_manager.message_queue.get_nowait()[1])
-                  except Queue.Empty:
-                      break
-        msg_ids_in = sorted([a_msg.id for a_msg in msg_in])
-        msg_ids_out = sorted([a_msg.id for a_msg in msg_out])
-        self.assertEqual(msg_ids_in, msg_ids_out)        
+        server = SocketManager(copy.deepcopy(ports), -1., self.retry, 100)
+        client = SocketManager([], -1., self.retry, 100)
+        client.connect("localhost", ports[0], 10., self.retry)
+        server.start_processing()
+        client.start_processing()
+        try:
+            for i in range(5):
+                server.send_message(ports[0], msg_in[0])
+            # one of them should get through
+            msg_out = client.recv_message_queue.get(True, 5.)[1]
+        except Queue.Empty:
+            server.check_error_queue()
+        self.assertEqual(msg_in[0].id, msg_out.id)
 
-    def _test_server_socket_close_connection(self):
+        # check max port is okay
+        server = SocketManager([65535], -1., self.retry, 100)
+        client = SocketManager([], -1., self.retry, 100)
+        client.connect("localhost", 65535, 10., self.retry)
+        try:
+            server = SocketManager([65536], -1., self.retry, 100)
+            self.assertTrue(False, "Should have raised")
+        except SocketError:
+            pass
+        try:
+            client.connect("localhost", 65536, 10., self.retry)
+            self.assertTrue(False, "Should have raised")
+        except SocketError:
+            pass
+
+
+    def test_server_socket_close_connection(self):
         """
         Test SocketManager.close_connection and SocketManager.close_all
         """
-        server_socket = SocketManager(49079, -1., 0.01)
+        server_socket = SocketManager(range(self.port, self.port+10), -1.,
+                                      self.retry)
         try: # not connected
-            server_socket.close_connection(49079, False)
+            server_socket.close_connection(self.port, False)
             self.assertTrue(False, msg="Should have thrown SocketError")
         except SocketError:
             pass
-        try: # not connected
-            server_socket.close_connection(49079, True)
-            self.assertTrue(False, msg="Should have thrown SocketError")
-        except SocketError:
-            pass
-        client_socket = SocketManager(None, -1., 0.01)
-        client_socket.connect("localhost", 49079, 2., 0.01)
+        client_socket = SocketManager([], -1., self.retry)
+        client_socket.connect("localhost", self.port, 2., self.retry)
+        client_socket.connect("localhost", self.port+1, 2., self.retry)
+        client_socket.connect("localhost", self.port+2, 2., self.retry)
         time.sleep(1)
-        port = client_socket.port_list()[-1]
-        socket = client_socket.get_socket(port)
-        client_socket.put_socket(socket)
-        time.sleep(1)
-        server_socket.close_connection(49079, True)
-        time.sleep(1)
-        self.assertEqual(len(server_socket.port_list()), 0)
+        self.assertEqual(len(server_socket.port_list()), 3)
+        self.assertEqual(len(client_socket.port_list()), 3)
+        server_socket.close_connection(self.port, True)
+        self.assertEqual(len(server_socket.port_list()), 2)
+        self.assertEqual(len(client_socket.port_list()), 3)
         server_socket.close_all(True)
-        time.sleep(1)
         client_socket.close_all(True)
+        self.assertEqual(len(server_socket.port_list()), 0)
+        self.assertEqual(len(client_socket.port_list()), 0)
+        time.sleep(0.1)
+        # close non-existent port
+        # close already-closed port
 
-    def _test_server_socket_send_message(self):
+    def test_server_socket_send_message(self):
         """
         Test SocketManager.send_message
         """
-        server_socket = SocketManager(self.port, -1., 0.01)
-        client_socket_1 = SocketManager(None, -1., 0.01)
-        client_socket_1.connect("localhost", self.port, 2., 0.01)
-        client_socket_2 = SocketManager(None, -1., 0.01)
-        client_socket_2.connect("localhost", self.port, 2., 0.01)
-        print "LSOF ", self.port
-        time.sleep(1)
-        self.assertEqual(len(server_socket.port_list()), 1)
-        self.assertEqual(len(client_socket_1.port_list()), 1)
-        self.assertEqual(len(client_socket_2.port_list()), 1)
-        server_port = server_socket.port_list()[0]
-        client_port_1 = client_socket_1.port_list()[0]
-        client_port_2 = client_socket_2.port_list()[0]
-        server_ctrl_msg = ControlMessage()
-        client_ctrl_msg_1 = ControlMessage()
-        client_ctrl_msg_2 = ControlMessage()
-        server_socket.send_message(server_port, server_ctrl_msg)
-        client_socket_1.send_message(client_port_1, client_ctrl_msg)
-        client_socket_2.send_message(client_port_2, client_ctrl_msg)
-        time.sleep(1)
-        server_msg_1 = server_socket.message_queue.get_nowait()[1]
-        server_msg_2 = server_socket.message_queue.get_nowait()[1]
-        ids = [server_msg_1.id, server_msg_2.id]
-        self.assertTrue(client_ctrl_msg_1.id in ids)
-        self.assertTrue(client_ctrl_msg_2.id in ids)
-        try:
-            client_msg = client_socket_1.message_queue.get_nowait()[1]
-        except Queue.Empty:
-            client_msg = client_socket_2.message_queue.get_nowait()[1]
-        self.assertEqual(server_ctrl_msg.id, client_msg.id)
-        server_socket.close_all(True)
-        client_socket_1.close_all(True)
-        client_socket_2.close_all(True)
+        # send good message, over correct port (of many)
+        # send good message with good data
+        server = SocketManager(range(self.port, self.port+10), -1., self.retry, 10000)
+        client = SocketManager([], -1., self.retry, 10000)
+        client.connect("localhost", self.port, 2., self.retry)
+        client.connect("localhost", self.port+1, 2., self.retry)
+        client.connect("localhost", self.port+2, 2., self.retry)
+        client_2 = SocketManager([], -1., self.retry, 10000)
+        client_2.connect("localhost", self.port+3, 2., self.retry)
+        sock_data = client.socket_list()[1]
+        sock_data_2 = client_2.socket_list()[0]
 
-    def _test_server_socket_send_bad_message(self):
+        server.start_processing()
+        client.start_processing()
+        client_2.start_processing()
+        message_in = ControlMessage()
+        message_in.data = [{"test":"data"}, {"more":["data"]}, {"a":"a"*10000}]
+        time.sleep(1)
+        for i in range(10):
+            client.send_message(sock_data["local_port"], message_in)
+            client_2.send_message(sock_data_2["local_port"], message_in)
+            time.sleep(0.1)
+
+        sock_count = {
+          sock_data["remote_port"]:0,
+          sock_data_2["remote_port"]:0,
+          "data":0,
+          "id":0
+        }
+        for i in range(101):
+            try:
+                message_out = server.recv_message_queue.get(True, 0.1)
+                sock_count[message_out[0]] += 1
+                if message_out[1].id == message_in.id:
+                    sock_count["id"] += 1
+                if message_out[1].data == message_in.data:
+                    sock_count["data"] += 1
+                if i % 100 == 0:
+                    print json.dumps(sock_count, indent=2)
+                if sock_count["data"] == 20:
+                    print json.dumps(sock_count, indent=2)
+                    break # all the sheep are in the field
+            except Queue.Empty:
+                pass
+        for key, value in sock_count.iteritems():
+            self.assertTrue(value > 0)
+        self.assertEqual(sock_count["data"], sock_count["id"])
+
+        server.close_all(True)
+        client.close_all(True)
+
+    def __check_raises_socket_error(self, sock_man, message, port):
+        try:
+            sock_man.send_message(port, message)
+            time.sleep(0.1)
+            sock_man.check_error_queue()
+            self.assertTrue(False, msg="Should have thrown")
+        except SocketError:
+            #sys.excepthook(*sys.exc_info())
+            pass
+
+    def test_server_socket_send_bad_message(self):
         """
         Test SocketManager.send_message with bad data
         """
-        server_socket = SocketManager(49084, -1., 0.01)
-        client_socket = SocketManager(None, -1., 0.01)
-        client_socket.connect("localhost", 49084, 2., 0.01)
+        server = SocketManager(range(self.port, self.port+10), -1., 0.01)
+        client = SocketManager([], -1., 0.01)
+        client.connect("localhost", self.port, -1., 0.01)
+        client.connect("localhost", self.port+1, -1., 0.01)
+        client.connect("localhost", self.port+2, -1., 0.01)
         time.sleep(1)
-        try: # wrong type
-            client_socket.send_message(49084, "wrong type")
-            self.assertTrue(False, msg="Should have thrown")
-        except SocketError:
-            pass
-        try: # wrong socket
-            client_socket.send_message(49085, ControlMessage())
-            self.assertTrue(False, msg="Should have thrown")
-        except SocketError:
-            pass
-        server_socket.close_all(True)
-        client_socket.close_all(True)
+        server.close_connection(self.port+2, True)
 
-    def _test_get_put_socket(self):
-        """
-        Test SocketManager.get_socket and SocketManager.put_socket
-        """
-        server_socket = SocketManager(self.port, -1., 0.01)
-        client_socket = SocketManager(None, -1., 0.01)
-        client_socket.connect("localhost", self.port, 2., 0.01)
-        time.sleep(1)
-        socket = server_socket.get_socket(self.port)
-        self.assertEqual(socket.GetLocalPort(), self.port)
-        self.assertEqual(server_socket.port_list(), [])
-        server_socket.put_socket(socket)
-        self.assertEqual(server_socket.port_list(), [self.port])
-        server_socket.put_socket(socket)
+        # send when start_processing not called
+        self.__check_raises_socket_error(server, ControlMessage(), self.port)
+        server.start_processing()
+        client.start_processing()
+        # check we can send (should be okay)
+        server.send_message(self.port, ControlMessage())
+        server.send_message(self.port+1, ControlMessage())
+        # send on closed port
+        self.__check_raises_socket_error(server, ControlMessage(), self.port+2)
+        # send on non-existent port
+        self.__check_raises_socket_error(server, ControlMessage(), self.port-1)
+        # send wrong type
+        self.__check_raises_socket_error(server, "wrong type", self.port)
+        ctrl_1 = ControlMessage()
+        ctrl_1.data = "Neither json nor ROOT"
+        # send message with wrong type in data
+        self.__check_raises_socket_error(server, ctrl_1, self.port)
+        ctrl_2 = ControlMessage()
+        ctrl_2.class_name = ctrl_1
+        # send message with non-serialisable type in json bit
+        self.__check_raises_socket_error(server, ctrl_2, self.port)
+        server.close_all(True)
+        client.close_all(True)
 
 if __name__ == "__main__":
     unittest.main()

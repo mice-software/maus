@@ -438,3 +438,8 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+root_document_store_timeout = 1.
+root_document_store_poll_time = 0.1
+online_gui_host = "localhost"
+online_gui_port = 41000
+

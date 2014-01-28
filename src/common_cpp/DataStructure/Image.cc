@@ -33,18 +33,24 @@ Image& Image::operator=(const Image& rhs) {
     _spill_number = rhs._spill_number;
     _input_time = rhs._input_time;
     _output_time = rhs._output_time;
-    _canvas_wrappers = rhs._canvas_wrappers;
+    for (size_t i = 0; i < _canvas_wrappers.size(); ++i)
+        delete _canvas_wrappers[i];
+    _canvas_wrappers = std::vector<MAUS::CanvasWrapper*>(rhs._canvas_wrappers.size(), NULL);
+    for (size_t i = 0; i < rhs._canvas_wrappers.size(); ++i)       
+        _canvas_wrappers[i] = new CanvasWrapper(*rhs._canvas_wrappers[i]);
     return *this;
 }
 
 Image::~Image() {
 }
 
-void Image::SetCanvasWrappers(std::vector<CanvasWrapper> wrappers) {
+void Image::SetCanvasWrappers(std::vector<CanvasWrapper*> wrappers) {
+    for (size_t i = 0; i < _canvas_wrappers.size(); ++i)
+        delete _canvas_wrappers[i];
     _canvas_wrappers = wrappers;
 }
 
-std::vector<CanvasWrapper> Image::GetCanvasWrappers() const {
+std::vector<CanvasWrapper*> Image::GetCanvasWrappers() const {
     return _canvas_wrappers;
 }
 } // namespace MAUS

@@ -72,20 +72,30 @@ class Image {
     DateTime GetOutputTime() const {return _output_time;}
 
     /** Set the std::vector of canvas wrappers */
-    void SetCanvasWrappers(std::vector<MAUS::CanvasWrapper> wrappers);
+    void SetCanvasWrappers(std::vector<MAUS::CanvasWrapper*> wrappers);
 
     /** Get the std::vector of canvas wrappers */
-    std::vector<MAUS::CanvasWrapper> GetCanvasWrappers() const;
+    std::vector<CanvasWrapper*> GetCanvasWrappers() const;
+
+    /** Push back new member of canvas wrappers 
+     *
+     *  Helper function for PyRoot morons
+     */
+    void CanvasWrappersPushBack(MAUS::CanvasWrapper* wrap) {
+        _canvas_wrappers.push_back(wrap);
+    }
 
   private:
     int _run_number;
     int _spill_number;
     DateTime _input_time;
     DateTime _output_time;
-    std::vector<MAUS::CanvasWrapper> _canvas_wrappers;
+    std::vector<MAUS::CanvasWrapper*> _canvas_wrappers;
 
     MAUS_VERSIONED_CLASS_DEF(Image);
 };
+
+typedef std::vector<MAUS::CanvasWrapper*> CanvasWrapperArray;
 }
 
 #endif
