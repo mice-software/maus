@@ -16,6 +16,11 @@
  */
 
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <fstream>
 
 namespace MAUS {
 

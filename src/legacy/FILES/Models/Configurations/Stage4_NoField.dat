@@ -1,0 +1,28 @@
+//Simple geometry for testing straight track recon in trackers
+
+Configuration Stage4_NoField
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 100.0 mm
+  Module BeamLine/BeamLine.dat
+  {
+    Position 0. 0. 6672.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tracker/TrackerSolenoid0_ST.dat
+  {
+    Position 0. 0. 12172.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Tracker/TrackerSolenoid1_ST.dat
+  {
+    Position 0. 0. 16155.74 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module TOF/TOF2.dat
+  {
+    Position 0. 0. 17905.74 mm
+    Rotation 0. 0. 0. degree
+  }
+}
