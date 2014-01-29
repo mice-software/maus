@@ -21,10 +21,12 @@ from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
-TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
-        "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
+#  TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
+#         "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
+DET_GDML = ['TOF0.gdml','TOF1.gdml','TOF2.gdml','Tracker0.gdml','Tracker1.gdml',\
+            'KL.gdml','Ckov.gdml','Disk_LiH.gdml']
 
 class GDMLtomaus(): #pylint: disable = R0903
     """
@@ -59,6 +61,7 @@ class GDMLtomaus(): #pylint: disable = R0903
         else:
             self.path = path
         gdmls = os.listdir(self.path)
+        # print gdmls
         for fname in gdmls:
             if fname.find('materials') >= 0:
                 found_file = os.path.join(self.path, fname)
@@ -72,21 +75,22 @@ class GDMLtomaus(): #pylint: disable = R0903
             if fname.find('Maus_Information') >= 0:
                 found_file = os.path.join(self.path, fname)
                 self.maus_information_file = found_file
-            if fname == 'Tracker.gdml':
-                found_file = os.path.join(self.path, fname)
-                self.tracker_file = found_file
+            # if fname == 'Tracker.gdml':
+            #     found_file = os.path.join(self.path, fname)
+            #     self.tracker_file = found_file
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Fastrad') < 0 \
                and fname.find('Maus_Information') < 0 \
                and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml' \
-               and fname.find('Step_IV') < 0\
-               and fname.find('Tracker') < 0:
+               and fname.find('Step_IV') < 0:
             
                 stepfile = os.path.join(self.path, fname)
                 self.step_files.append(stepfile)
-                
+        for name in self.step_files:
+            if name.find('Tracker')>0 :
+                print name
 
     def convert_to_maus(self, output):
         """
@@ -104,17 +108,18 @@ class GDMLtomaus(): #pylint: disable = R0903
             raise IOError('Output path doesnt exist '+str(output))
         else:
             outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
-            outputfile2 = os.path.join(output, "TrackerGeometryFile.dat")
+            # outputfile2 = os.path.join(output, "TrackerGeometryFile.dat")
             # outputfile3 = os.path.join(output, "RotatedGeometryFile.dat")
             config_file = CADImport(xmlin1 = str(self.config_file), \
                            xsl = str(CONFIGXSL), output = str(outputfile1))
             config_file.parse_xslt()
-            tracker_file = CADImport(xmlin1 = str(self.config_file), \
-                           xsl = str(TRACKERXSL), output = str(outputfile2))
-            tracker_file.parse_xslt()
+            # tracker_file = CADImport(xmlin1 = str(self.config_file), \
+            #                xsl = str(TRACKERXSL), output = str(outputfile2))
+            # tracker_file.parse_xslt()
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \
             #                          xsl = str(ROTATEDXSL), output = str(outputfile3))
-            # rotated_file.parse_xslt()                       
+            # rotated_file.parse_xslt()
+            
             print "Configuration File Converted"
             length = len(self.step_files)
             for num in range(0, length):
@@ -127,11 +132,19 @@ class GDMLtomaus(): #pylint: disable = R0903
                 outputfile = output + '/' + file_name[:-4] + 'dat'
                 step_file = CADImport(xmlin1 = str(self.step_files[num]), \
                                     xsl = str(MM_XSL), output = str(outputfile))
-                step_file.parse_xslt()
+                direct_translation = 0
+                for file in DET_GDML:
+                    if file_name == file:
+                        direct_translation = 1
+                if direct_translation:
+                    step_file.translate_gdml()
+                else:
+                    step_file.parse_xslt()
                 step_file = None
                 os.remove(self.step_files[num])
                 print "Converting " + str(num+1) + \
-                                        " of " + str(length) + " Geometry Files"
+                      " of " + str(length)
+                      
             os.remove(self.config_file)
             print "Files saved to " + str(output)
 

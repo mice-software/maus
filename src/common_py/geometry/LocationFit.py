@@ -22,7 +22,7 @@ within the CAD geometry coordinate system.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import os
 from Configuration import Configuration
 import json
 import ROOT
@@ -64,7 +64,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             self.RefFile = config_dict['survey_reference_position'] # 'Rotation_test.reference'
         self.result = []
 
-    def execute(self, detectorPath):
+    def execute(self, detectorPath, detectorFile):
         """
         @method execute: A subroutine to execute the fit based on a set of input data points.
         """
@@ -84,11 +84,13 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         # if all checks out then run the fit itself
         if isgood:
             self.result = self.FitQP()
-            print self.result
+            # print  self.result
             # if self.FitQP() == 0: isgood = True
             # else: isgood = False
             if len(self.result) ==  2 and self.UseGDML:
-                self.writeResulttoGDML(detectorPath)
+                if not self.writeResulttoGDML(detectorPath, detectorFile):
+                    print "Result not recorded to "+detectorPath
+                # print  "GDML corrected"
         else: #
             print "Fit abandoned"
 
@@ -107,7 +109,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             m = line.split()
             if len(m) != 6:
                 print 'Error: data invalid for the following line:'
-                print line
+                print  line
                 isgood = False
                 return isgood
             # otherwise the prospective data point is good.
@@ -132,16 +134,22 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                 self.initguess[0] = float(q.prop('x'))
                 self.initguess[1] = float(q.prop('y'))
                 self.initguess[2] = float(q.prop('z'))
-        print "Initial guess for detector location is ", self.initguess
+        # print  "Initial guess for detector location is ", self.initguess
         # clear all previous reference and data points
         self.refpoints  = []
         self.datapoints = []
-        for node in self.datafile.xpathEval(path + "/Survey"):
+        surveylist = self.datafile.xpathEval(path + "/Survey")
+        if len(surveylist)==0:
+            isgood == False
+            print 'No survey points identified for '+path
+            return isgood
+        
+        for node in surveylist:
             # Extract the expected survey point position from the xml file
             temp = array('d', (float(node.prop('x')), \
                                float(node.prop('y')), \
                                float(node.prop('z'))))
-            print "Location of survey point in detector coordinates: ", temp
+            # print  "Location of survey point in detector coordinates: ", temp
             self.refpoints.append(temp)
             # Search for the position for
             # the indicated file name. This is the measured position
@@ -149,6 +157,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             data = array('d', (0., 0., 0.) )
             error = array('d', (1.0, 1.0, 1.0) ) # assume a 1 mm resolution
             for q in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/position"):
+                # print  q.prop("name"), node.prop("gdml_posref")
                 if q.prop("name") == node.prop("gdml_posref"):
                     data[0] = float(q.prop('x'))
                     data[1] = float(q.prop('y'))
@@ -157,7 +166,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                     error[0] = 5. # float(q.prop('err'))
                     error[1] = 5. #float(q.prop('err'))
                     error[2] = 5. #float(q.prop('err'))
-                    print "Survey point in global coordinates: ", data
+                    # print  "Survey point in global coordinates: ", data
+                    break
             self.datapoints.append([data, error])
         return isgood
     
@@ -303,7 +313,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
 
         f[0] = chi2
 
-    def writeResulttoGDML(self, path):
+    def writeResulttoGDML(self, path, newFile):
         """
         @method writeResulttoGDML: A method to write out the result of
         a fit between a set of survey measurements and the reference points in
@@ -312,9 +322,21 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         isgood = True
         # path = "Detector_Information/TOF/TOF0"
         det = self.datafile.xpathEval(path)
-        PosRefName = det[0].prop("gdml_posref")
-        for q in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/position"):
-            if q.prop("name") == PosRefName:
+        if len(det)==0:
+            print "Path not found in Information file."
+            return False
+        else:
+            PosRefName = det[0].prop("gdml_posref")
+        # print  "Write results of "+path+" to GDML file in "+PosRefName
+        nodefound = 0
+        for node in self.gdmlfile.xpathEval("gdml/structure/volume/physvol"):
+            # print  "testing"+node.xpathEval("position")[0].prop("name")
+            if node.xpathEval("position")[0].prop("name") == PosRefName:
+                # print  "Reference Found"
+                if newFile: # and os.path.exists(newFile):
+                    filepath = node.xpathEval("file")[0]
+                    filepath.setProp('name', newFile)
+                q = node.xpathEval("position")[0]
                 x0 = float(q.prop('x'))
                 q.setProp('x', str(self.result[0][0]))
                 y0 = float(q.prop('y'))
@@ -323,28 +345,37 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                 q.setProp('z', str(self.result[0][2]))
                 line    = PosRefName
                 rotName = line.replace('pos','rot')
-                nodefound = 0
-                for r in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/rotation"):
-                    if r.prop("name") == rotName:
-                        nodefound = 1
-                        r.setProp('x', str(self.result[0][3]))
-                        r.setProp('y', str(self.result[0][4]))
-                        r.setProp('z', str(self.result[0][5]))
-                if nodefound == 0:
+                # print  "Position corrected"
+                nodefound = 1
+                if len(node.xpathEval("rotation")):
+                    r = node.xpathEval("rotation")[0]
+                    nodefound = 1
+                    r.setProp('x', str(self.result[0][3]))
+                    r.setProp('y', str(self.result[0][4]))
+                    r.setProp('z', str(self.result[0][5]))
+                else: 
                     rotNode = libxml2.newNode("rotation")
                     rotNode.setProp('name',rotName)
                     rotNode.setProp('x', str(self.result[0][3]))
                     rotNode.setProp('y', str(self.result[0][4]))
                     rotNode.setProp('z', str(self.result[0][5]))
                     q.addNextSibling(rotNode)
+                    #if len(node.xpathEval("rotationref")):
+                    #    rotref = node.xpathEval("rotationref")[0]
+                    #    rotref.freeNode()
+                    # print  "Rotation Written"
+                break
                 # print q.next()
+        if nodefound == 0:
+            isgood = False
+            print "Target node "+PosRefName+" in path "+ path +" not found in GDML file." 
         # newfile = self.GDMLFile.replace('.gdml','_ed.gdml')
         return isgood
 
     def writefile(self):
         f = open(self.GDMLFile,'w')
         self.gdmlfile.saveTo(f)
-        print self.gdmlfile
+        # print  self.gdmlfile
         f.close
         self.gdmlfile.freeDoc()
         
