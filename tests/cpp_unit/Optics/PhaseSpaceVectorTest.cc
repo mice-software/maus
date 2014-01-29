@@ -23,10 +23,18 @@
 #include <fstream>
 
 #include "gtest/gtest.h"
+#include "TLorentzVector.h"
 
-#include "Utils/Exception.hh"
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/VirtualHit.hh"
+#include "DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
+#include "Recon/Global/Particle.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
+
+namespace GlobalDS = MAUS::DataStructure::Global;
+namespace Recon = MAUS::recon::global;
 
 using MAUS::PhaseSpaceVector;
 using MAUS::Vector;
@@ -113,6 +121,44 @@ TEST_F(PhaseSpaceVectorTest, ParameterConstructor) {
   ASSERT_EQ(ps_vector.size(), (size_t) 6);
   for (size_t index = 0; index < 6; ++index) {
     EXPECT_EQ(ps_vector[index], kData[index]);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, VirtualHitConstructor) {
+  MAUS::VirtualHit virtual_hit;
+  virtual_hit.SetTime(kData[0]);
+  const double mass
+    = Recon::Particle::GetInstance().GetMass(GlobalDS::kMuMinus);
+  virtual_hit.SetMass(mass);
+  MAUS::ThreeVector position(kData[2], kData[4], kData[6]);
+  virtual_hit.SetPosition(position);
+  MAUS::ThreeVector momentum(kData[3], kData[5], kData[7]);
+  virtual_hit.SetMomentum(momentum);
+  const double energy = sqrt(mass*mass + momentum.mag()*momentum.mag());
+  const PhaseSpaceVector test_psv(virtual_hit);
+  const double data[6] = {
+    kData[0], energy, kData[2], kData[3], kData[4], kData[5]
+  };
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_EQ(test_psv[index], data[index]);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, ThreeVectorConstructor) {
+  MAUS::ThreeVector position(kData[2], kData[4], kData[6]);
+  MAUS::ThreeVector momentum(kData[3], kData[5], kData[7]);
+  const PhaseSpaceVector test_psv(kData[0], kData[1], position, momentum);
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_EQ(test_psv[index], kData[index]);
+  }
+}
+
+TEST_F(PhaseSpaceVectorTest, TLorentzVectorConstructor) {
+  TLorentzVector position(kData[2], kData[4], kData[6], kData[0]);
+  TLorentzVector momentum(kData[3], kData[5], kData[7], kData[1]);
+  const PhaseSpaceVector test_psv(position, momentum);
+  for (size_t index = 0; index < 6; ++index) {
+    EXPECT_EQ(test_psv[index], kData[index]);
   }
 }
 

@@ -70,7 +70,7 @@ PyObject* get_bool(MiceModule* mod, std::string name) {
         PyObject* py_out = Py_BuildValue("b", out_int);
         Py_INCREF(py_out);
         return py_out;
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
@@ -82,7 +82,7 @@ PyObject* get_int(MiceModule* mod, std::string name) {
         PyObject* py_out = Py_BuildValue("i", out);
         Py_INCREF(py_out);
         return py_out;
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
@@ -94,7 +94,7 @@ PyObject* get_double(MiceModule* mod, std::string name) {
         PyObject* py_out = Py_BuildValue("d", out);
         Py_INCREF(py_out);
         return py_out;
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
@@ -106,7 +106,7 @@ PyObject* get_string(MiceModule* mod, std::string name) {
         PyObject* py_out = Py_BuildValue("s", out.c_str());
         Py_INCREF(py_out);
         return py_out;
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
@@ -127,7 +127,7 @@ PyObject* get_hep3vector(MiceModule* mod, std::string name) {
         PyDict_SetItemString(py_out, "y", y);
         PyDict_SetItemString(py_out, "z", z);
         return py_out;
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
@@ -386,7 +386,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         mod->mod = new MiceModule(std::string(file_name));
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_ValueError, (&exc)->what());
         return -1;
     }

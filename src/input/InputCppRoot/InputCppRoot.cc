@@ -106,7 +106,7 @@ std::string InputCppRoot::_emitter_cpp() {
         }
     // if there was no branch of this type at all then we might get an exception
     // - let's just try the next type
-    } catch(const std::exception& exc) {
+    } catch (const std::exception& exc) {
         std::cerr << (&exc)->what() << std::endl;
         return advance_event_type();
     }

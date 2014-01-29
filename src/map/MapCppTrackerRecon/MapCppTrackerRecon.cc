@@ -52,9 +52,9 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     _geometry_helper = SciFiGeometryHelper(modules);
     _geometry_helper.Build();
     return true;
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -99,9 +99,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     exception.Print();
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -126,7 +126,7 @@ void MapCppTrackerRecon::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch(...) {
+  } catch (...) {
     std::cerr << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();

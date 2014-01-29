@@ -342,7 +342,7 @@ PyObject* create_from_coordinates(PyObject* self,
     // now initialise the internal phase space vector
     try {
         py_psv->psv = new PhaseSpaceVector(t, E, x, px, y, py);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         free(py_psv);
         return NULL;

@@ -40,9 +40,9 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
     return true;
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -232,7 +232,7 @@ bool ReduceCppTofCalib::loadSpill(std::string jsonDoc) {
     SpillProcessor spill_proc;
     _spill = *spill_proc.JsonToCpp(root);
     return true;
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says: Failed when importing JSON to Spill";

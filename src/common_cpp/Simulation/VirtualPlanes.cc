@@ -265,7 +265,7 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
           _nHits[i]++;
         }
       }
-    } catch(Exception exc) {}  // do nothing - just dont make a hit
+    } catch (Exception exc) {}  // do nothing - just dont make a hit
 }
 
 void VirtualPlaneManager::SetVirtualHits(Json::Value hits) {
