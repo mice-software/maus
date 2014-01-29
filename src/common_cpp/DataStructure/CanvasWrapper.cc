@@ -17,8 +17,10 @@
 
 #include <iostream>
 
+#include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/DataStructure/CanvasWrapper.hh"
 
 namespace MAUS {
@@ -36,10 +38,10 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     if (_canvas != NULL)
         delete _canvas;
     if (rhs._canvas != NULL) {
-        _canvas = new TCanvas();
-        _canvas->cd(); 
-        dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
-        _canvas->SetTitle(rhs._canvas->GetTitle());
+        _canvas = dynamic_cast<TCanvas*>(rhs._canvas->Clone());
+        //_canvas->cd();
+        //dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
+        //_canvas->SetTitle(rhs._canvas->GetTitle());
     } else {
         _canvas = NULL;
     }
@@ -56,5 +58,19 @@ void CanvasWrapper::SetCanvas(TCanvas* canvas) {
         delete _canvas;
     _canvas = canvas;
 }
+
+void CanvasWrapper::EmbedCanvas(TRootEmbeddedCanvas* embed) {
+    if (embed == NULL) {
+        throw Exception(Exception::recoverable, "EmbeddedCanvas was NULL",
+                        "CanvasWrapper::EmbedCanvas");
+    }
+    if (_canvas == NULL) {
+        throw Exception(Exception::recoverable, "Trying to adopt NULL canvas",
+                        "CanvasWrapper::EmbedCanvas");
+    }
+    embed->AdoptCanvas(_canvas);
+    _canvas = NULL; // embed now owns the memory
+}
+
 } // namespace MAUS
 

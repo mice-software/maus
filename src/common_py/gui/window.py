@@ -380,7 +380,8 @@ class Window(): # pylint: disable=R0201
         """
         Set an action that will occur on a given signal
           - frame_name; string containing the name of the frame that makes the
-            signal
+            signal; if frame_type is a named_text_entry, then the TGTextEntry
+            will be used
           - frame_type; string containing the type of the frame that makes the
             signal
           - frame_socket; string containing the name of the ROOT function that
@@ -394,6 +395,11 @@ class Window(): # pylint: disable=R0201
         "name":"select_box" makes a signal Selected(Int_t).
         """
         frame = self.get_frame(frame_name, frame_type)
+        # for named_text_entry, we want the text_entry, not the HorizontalFrame
+        # that wraps it
+        if frame_type == "named_text_entry":
+            frame = self._find_text_entry(frame_name)[0]
+            print frame, frame.GetText()
         self.socket_list.append(ROOT.TPyDispatcher(function_wrapper(action)))
         frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 
                       'Dispatch()')

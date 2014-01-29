@@ -23,6 +23,7 @@
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
 class TCanvas;
+class TRootEmbeddedCanvas;
 
 namespace MAUS {
 class CanvasWrapper {
@@ -56,6 +57,15 @@ class CanvasWrapper {
      *  Image still owns memory allocated to the TCanvas object
      */
     TCanvas* GetCanvas() {return _canvas;}
+
+    /** Embed the ROOT canvas in a TGEmbeddedCanvas, and set _canvas to NULL
+     *
+     *  Convenience function to embed TCanvas* in a TGEmbeddedCanvas. This is
+     *  implemented here because there is no other way to manage the python
+     *  reference counting (can't notify python that we no longer own TCanvas
+     *  memory from python interpreter)
+     */
+    void EmbedCanvas(TRootEmbeddedCanvas* target);
 
   private:
     std::string _description;

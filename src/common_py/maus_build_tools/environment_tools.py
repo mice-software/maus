@@ -308,6 +308,7 @@ def get_root_libs():
                 'Gpad', \
                 'Graf', \
                 'Graf3d', \
+                'Gui', \
                 'MathCore', \
                 'Minuit', \
                 'Hist', \

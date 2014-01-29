@@ -16,8 +16,10 @@
 
 #include "gtest/gtest.h"
 
+#include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/DataStructure/ImageData.hh"
 #include "src/common_cpp/DataStructure/Image.hh"
 #include "src/common_cpp/DataStructure/DateTime.hh"
@@ -80,5 +82,26 @@ TEST(ImageTest, CanvasWrapperTest) {
     EXPECT_EQ(cwrap_values.GetDescription(), cwrap_copy_vals.GetDescription());
     EXPECT_EQ(std::string("title"), 
               std::string(cwrap_copy_vals.GetCanvas()->GetTitle()));
+}
+
+TEST(ImageTest, EmbedCanvasWrapperTest) {
+    std::cerr << "A" << std::endl;
+    TRootEmbeddedCanvas embed(0, 0, 100, 100);
+    std::cerr << "1" << std::endl;
+    CanvasWrapper cwrap_def;
+    std::cerr << "2" << std::endl;
+    CanvasWrapper cwrap_values;
+    std::cerr << "3" << std::endl;
+    TCanvas* canv = new TCanvas("name", "title");
+    std::cerr << "4" << std::endl;
+    cwrap_values.SetCanvas(canv);
+    std::cerr << "5" << std::endl;
+    EXPECT_THROW(cwrap_def.EmbedCanvas(&embed), MAUS::Exception);
+    std::cerr << "6" << std::endl;
+    EXPECT_THROW(cwrap_values.EmbedCanvas(NULL), MAUS::Exception);
+    std::cerr << "B" << std::endl;
+    cwrap_values.EmbedCanvas(&embed);
+    std::cerr << "C" << std::endl;
+    EXPECT_EQ(embed.GetCanvas(), canv);
 }
 }

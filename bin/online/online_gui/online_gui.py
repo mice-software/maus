@@ -22,96 +22,303 @@ import os
 import sys
 import ROOT
 import Queue
+import threading
+import copy
 
 import gui.gui_exception_handler
+from gui.gui_exception_handler import GuiError
 from gui.window import Window
 from docstore.root_document_store import RootDocumentStore
 from Configuration import Configuration
+from threading_utils import ThreadedBool
+from threading_utils import ThreadedValue
+from threading_utils import generate_fifo_queue
+from threading_utils import go_back_fifo_queue
 
 ENV_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/bin/online/online_gui/")
 SHARE_DIR = (ENV_DIR+"share/")
-
-def _canvas_sort_predicate(canvas):
-    return (canvas["collection"], canvas["title"], canvas["input_time"])
 
 class OnlineGui():
     def __init__(self, datacards):
         """Initialise the main window"""
         self.last = datetime.datetime.now()
-        self.images = {}
         self.window = Window(ROOT.gClient.GetRoot(), # pylint: disable=E1101
                              ROOT.gClient.GetRoot(), # pylint: disable=E1101
                              SHARE_DIR+"online_gui.json")
-#        self.window.set_button_action("&Pause", self.pause_action)
-#        self.window.set_button_action("&Redraw", self.redraw_action)
-#        self.window.set_button_action("&Reload", self.redraw_action)
-#        self.window.set_button_action("&Reconnect", self.reconnect_action)
-#        self.window.set_button_action("&Help", self.help_action)
+        self.window.set_button_action("&Pause", self.pause_action)
+        self.window.set_button_action("&Redraw", self.redraw_action)
+        self.window.set_button_action("Re&load", self.reload_action)
+        self.window.set_button_action("&Reconnect", self.reconnect_action)
+        self.window.set_button_action("&Help", self.help_action)
         self.window.set_button_action("E&xit", self.exit_action)
+        self.window.set_button_action("&<", self.back_action)
+        self.window.set_button_action("&>", self.forward_action)
         self.window.get_frame("canvas_options", "vertical_frame").Resize(200, 500)
         self.window.get_frame("canvas_select", "list_box").Resize(200, 200)
-        self.docstore = None
-        self._init_docstore(datacards)
-        self._canvases_drawn = []
+        self.window.set_action("canvas_select", "list_box", "SelectionChanged()",
+                               self.canvas_select_action)
+        self.window.set_action("Rotate period", "named_text_entry",
+                               "ReturnPressed()", self.rotate_period_action)
+        self.window.set_action("Reload period", "named_text_entry",
+                               "ReturnPressed()", self.reload_period_action)
+        self._docstore = None
+        self._datacards = datacards
+        self._draw_titles = Queue.Queue()
         self._canvases_read = Queue.Queue()
-        self._rotate_period = 1.
-        self._reload_period = 1.
-        self._poll_docstore()
+        self._canvases_draw = ThreadedValue([])
+        self._redraw_target = None
+        self._paused = ThreadedValue(False)
+        rotate_tmp = self.window.get_text_entry("Rotate period", type(1.))
+        self._rotate_period = ThreadedValue(rotate_tmp)
+        reload_tmp = self.window.get_text_entry("Reload period", type(1.))
+        self._reload_period = ThreadedValue(reload_tmp)
+        self._poll_period = ThreadedValue(0.1)
+        self._help_text = ""
+        self._init_docstore()
+        self.start_polling()
 
-    def _init_docstore(self, datacards):
+    def _init_docstore(self):
+        datacards = self._datacards
         self.docstore = RootDocumentStore(
                   datacards["root_document_store_timeout"],
                   datacards["root_document_store_poll_time"])
         self.docstore.connect({"host":datacards["online_gui_host"],
                                "port":datacards["online_gui_port"]})
 
+    def start_polling(self):
+        my_thread = threading.Thread(target=self._poll_canvas_draw,
+                                     args=())
+        my_thread.daemon = True
+        my_thread.start()
+        my_thread = threading.Thread(target=self._poll_docstore,
+                                     args=())
+        my_thread.daemon = True
+        my_thread.start()
+
     def pause_action(self):
         """Handle a Pause/Unpause button press"""
-        pass
+        pause_button = self.window.get_frame("&Pause", "button")
+        if self._paused.get_value():
+            self._paused.set_value(False)
+            pause_button.SetText("&Pause")
+        else:
+            self._paused.set_value(True)
+            pause_button.SetText("&Play")
 
     def redraw_action(self):
-        """Handle a Redraw button press"""
-        pass
+        """
+        Handle a Redraw button press
 
-    def refresh_action(self):
+        Redraws self._redraw_target
+        """
+        if self._redraw_target == None:
+            raise GuiError("No canvases were loaded")
+        self._do_redraw(self._redraw_target)
+
+    def reload_action(self):
         """Handle a Refresh button press"""
-        pass
+        raise NotImplementedError("Not implemented")
 
     def reconnect_action(self):
         """Handle a Reconnect button press"""
-        self.docstore.disconnect()
-        self.docstore.connect()
-
-    def help_action(self):
-        """Handle a Help button press"""
-        pass
+        raise NotImplementedError("Not implemented")
 
     def exit_action(self):
         """Handle a Exit button press"""
+        self._paused.set_value(True) # tell polling to wait
+        time.sleep(self._poll_period.get_value()) # thinkapow
         self.window.close_window()
 
-    def _update_canvases(self):
-        pass
+    def help_action(self):
+        """Handle a Help button press"""
+        raise NotImplementedError("Not implemented")
+
+    def reload_period_action(self):
+        tmp_reload_period = self.window.get_text_entry("Reload period",
+                                                       type(1.))
+        tmp_reload_period = float(tmp_reload_period)
+        self._reload_period.set_value(tmp_reload_period)
+
+    def rotate_period_action(self):
+        tmp_rotate_period = self.window.get_text_entry("Rotate period",
+                                                       type(1.))
+        tmp_rotate_period = float(tmp_rotate_period)
+        self._rotate_period.set_value(tmp_rotate_period)
+
+    def forward_action(self):
+        self._draw_next()
+
+    def back_action(self):
+        go_back_fifo_queue(self._draw_titles)
+        go_back_fifo_queue(self._draw_titles)
+        self._draw_next()
+
+    def canvas_select_action(self):
+        """Handle an update the selected canvases"""
+        selected = self._get_canvas_selected()
+        new_draw_titles = Queue.Queue()
+        for item in selected:
+            new_draw_titles.put(item)
+        self._draw_titles = new_draw_titles
+
+    def _poll_canvas_draw(self):
+        """
+        Iterate over the canvas_draw queue, updating the GUI as appropriate
+
+        * Update the queue from the canvas_read queue
+        * Refresh the combo box with items in the canvases_draw queue
+        * Update the help page
+        """
+        poll_number = 0
+        while True:
+            poll_number += 1
+            self._draw_next()
+            self._sleepish(self._rotate_period)
+            # handle pause
+            while self._paused.get_value():
+                time.sleep(self._poll_period.get_value())
+
+    def _draw_next(self):
+        """
+        Draw the next canvas in the selected queue
+        """
+        canvases_draw = self._filter_canvases(self._canvases_draw.get_value())
+        if len(canvases_draw) > 0:
+            try:
+                title = self._draw_titles.get_nowait()
+                new_title = copy.deepcopy(title)
+                self._draw_titles.put(title)
+                for wrap in canvases_draw:
+                    print wrap.canvas_title(), new_title
+                    if wrap.canvas_title() == new_title:
+                        self._do_redraw(wrap)
+                        break
+            except Queue.Empty:
+                pass # no canvas selected
+            except ValueError:
+                print canvases_draw, new_title
+        self._canvases_draw.set_value(canvases_draw)
 
 
-    def _do_redraw(self):
-        self._loop_over_queue(self, queue)        
+    def _sleepish(self, sleep_length):
+        """
+        Sleep - but keep polling for changes to the sleep_length
+        * sleep_length - threaded value containing numeric sleep time
+        """
+        time_slept = 0.
+        poll_period = self._poll_period.get_value()
+        while sleep_length.get_value() - time_slept > poll_period:
+            time_slept += self._poll_period.get_value()
+            time.sleep(poll_period)
+
+    def _update_canvases_draw(self):
+        draw = [wrap.deepcopy() \
+                           for wrap in generate_fifo_queue(self._canvases_read)]
+        draw.sort(key = lambda wrap: wrap.sort_key())
+        return draw
+
+    def _do_redraw(self, wrap):
+        """
+        Draw the canvas wrap in the main_canvas
+        """
+        # wrap_copy is for ROOT
+        wrap_copy = wrap.deepcopy()
+        embedded_canvas = self.window.get_frame("main_canvas", "canvas")
+        # this eats the wrap_copy TCanvas
+        wrap_copy.canvas_wrapper.EmbedCanvas(embedded_canvas)
+        embedded_canvas.GetCanvas().Update()
+        # this _redraw_target is for the main thread
+        self._redraw_target = wrap.deepcopy()
 
     def _poll_docstore(self):
-        """Poll the doc store for documents"""
+        """
+        Poll the doc store for documents
+        """
         while True:
-            collections = self.docstore.collection_names()
-            temp_canvases = []
-            for collection_name in collections:
-                temp_canvases += self._get_canvases(collection_name)
-            # purge any duplicate canvases
-            self._purge_canvases(temp_canvases)
-            self.last = datetime.datetime.now()
-            time.sleep(self._reload_period)
+            print "_poll_docstore"
+            self._reload_canvases()
+            # now update GUI elements (each call iterates over the whole
+            # _canvases_draw queue)
+            self._update_canvas_select()
+            self._update_help_text()
+            self._sleepish(self._reload_period)
+            # handle pause
+            while self._paused.get_value():
+                time.sleep(self._poll_period.get_value())
 
-    def _get_canvases(self, collection_name):
+    def _update_canvas_select(self):
+        """
+        Update the list of canvases in the canvas_select frame
+        """
+        all_canvas_titles = [wrap.canvas_wrapper.GetCanvas().GetTitle() \
+                           for wrap in generate_fifo_queue(self._canvases_read)]
+        selected = self._get_canvas_selected()
+
+        select_box = self.window.get_frame("canvas_select", "list_box")
+        select_box.RemoveAll()
+        for i, title in enumerate(all_canvas_titles):
+            select_box.AddEntry(title, i)
+        for title in selected:
+            try:
+                index = all_canvas_titles.index(title)
+                select_box.Select(index)
+            except ValueError: # item was no longer in the select - ignore it
+                pass
+
+        # ROOT doesn't like redrawing the histogram titles properly - need to
+        # force it
+        self.window.get_frame("canvas_select", "list_box").Resize(200, 10)
+        self.window.get_frame("canvas_select", "list_box").Resize(200, 200)
+
+    def _get_canvas_selected(self):
+        """
+        Get the list of canvases selected in the canvas_select frame
+        """
+        select_box = self.window.get_frame("canvas_select", "list_box")
+        selected_root = ROOT.TList()
+        selected = []
+        select_box.GetSelectedEntries(selected_root)
+        while selected_root.Last() != None:
+            selected.insert(0, copy.deepcopy(selected_root.Last().GetText()))
+            selected_root.RemoveLast()
+        return selected
+
+    def _update_help_text(self):
+        help_text = copy.deepcopy(self._basic_help)
+        for canvas_wrap in generate_fifo_queue(self._canvases_read):
+            canvas_title = canvas_wrap.canvas_wrapper.GetCanvas().GetTitle()
+            help_text += "\n"+canvas_title+"\n"
+            help_text += canvas_wrap.canvas_wrapper.GetDescription()+"\n"
+        self._help_text = help_text
+
+    def _reload_canvases(self):
+        """
+        Reload canvases from the docstore
+        """
+        # get all of the collections (one for each reducer)
+        collections = self.docstore.collection_names()
         temp_canvases = []
-        doc_list = self.docstore.get_since(collection_name, self.last)
+        # update "last accessed" timestamp
+        self.last = datetime.datetime.now()
+        # get new canvases
+        for collection_name in collections:
+            temp_canvases += self._get_new_canvases(collection_name)
+        # purge any duplicate canvases
+        filtered_canvases = self._filter_canvases(temp_canvases)
+        # build a new queue and reassign _canvases_read
+        canvases_read = Queue.Queue()
+        for canvas in filtered_canvases:
+            canvases_read.put_nowait(canvas)
+        self._canvases_read = canvases_read
+
+    def _get_new_canvases(self, collection_name):
+        """
+        Get a list of new canvases from the collection
+        """
+        try:
+            doc_list = self.docstore.get_since(collection_name, self.last)
+        except DocumentStoreException:
+            sys.excepthook(*sys.exc_info())
         if len(doc_list) == 0:
             return []
         tree = doc_list[-1]["doc"]
@@ -120,76 +327,117 @@ class OnlineGui():
         if tree.GetEntries() == 0:
             return []
         tree.GetEntry()
-        image = image_data.GetImage()
-        canvas_wrappers = image.GetCanvasWrappers()
-        for wrap in canvas_wrappers:
-            # flatten off the data structure, purge ROOT evil
-            temp_canvases.append({
-                "collection":collection_name,
-                "title":wrap.GetCanvas().GetTitle(),
-                "canvas":wrap.GetCanvas(),
-                "description":wrap.GetDescription(),
-                "run_number":image.GetRunNumber(),
-                "spill_number":image.GetSpillNumber(),
-                "input_time":image.GetInputTime(),
-                "output_time":image.GetOutputTime(),
-            })
-        return temp_canvases
+        return CanvasRewrapped.new_list_from_image(collection_name,
+                                                   image_data.GetImage())
 
-    def _purge_canvases(self, new_canvases):
+    def _filter_canvases(self, new_canvases):
         """
         Enforce that we only have one copy with a given (collection, title)
 
-        Note that we want to keep the item with the highest input_time
+        Note that we want to keep the item with the highest input_time if there
+        is a choice
         """
-        combined_list = []
-        try:
-            while True:
-                combined_list.append(self._canvases_read.get_nowait())
-        except Queue.Empty:
-            pass
+        combined_list = [wrap.deepcopy() \
+                           for wrap in generate_fifo_queue(self._canvases_read)]
         combined_list += new_canvases
-        combined_list.sort(key=_canvas_sort_predicate)
-        temp_list = []
-        for i, item_1 in enumerate(combined_list[1:]):
-            item_2 = combined_list[i]
-            if item_1["collection"] == item_2["collection"] and \
-               item_1["title"] == item_2["title"]:
+        combined_list.sort(key=lambda wrap: wrap.sort_key())
+
+        if len(combined_list) == 0:
+            return []
+        filtered_list = []
+        for i, item_2 in enumerate(combined_list[1:]):
+            item_1 = combined_list[i]
+            if item_1.collection == item_2.collection and \
+               item_1.canvas_title() == item_2.canvas_title():
                 pass
             else:
-                temp_list.append(item_1)
-        for item in temp_list:
-            self._canvases_read.put_nowait(item)
+                filtered_list.append(item_1)
+        filtered_list.append(item_2)
+        return filtered_list
 
-    def _loop_over_queue(self, queue):
-        """
-        Loop over sockets in the socket queue; put them back in the queue after
-        caller is done
-        """
-        for item in self._loop_over_queue_unsafe(queue):
-            yield item
-            queue.put_nowait(item)
+    _basic_help = ""
 
-    def _loop_over_queue_unsafe(self, queue):
-        """
-        Loop over sockets in the socket queue; dont put them back in the queue 
-        after caller is done
-        """
-        item_list = []
-        while True:
-            try:
-                item = queue.get_nowait()
-            except Queue.Empty: 
-                raise StopIteration("No items in queue")
-            if item in item_list: # we have looped once
-                queue.put_nowait(item)
-                raise StopIteration("Looped over the queue")
-            yield item
-            item_list.append(item)
+class CanvasRewrapped:
+    """
+    Small wrapper class for canvas; differs from the interface class because
+    it flattens the data structure i.e. all of the time and run number
+    information is stored at the same level as the canvas
 
+    Store canvas_wrapper rather than canvas because I am not confident in
+    TCanvas copying - only want that logic once
+    """
+    def __init__(self):
+        """Initialise with dummy data"""
+        self.collection = ""
+        self.canvas_wrapper = None
+        self.run_number = 0
+        self.spill_number = 0
+        self.input_time = datetime.datetime.now().isoformat()
+        self.output_time = datetime.datetime.now().isoformat()
 
+    @classmethod
+    def new_from_c(cls, collection_name, image, c_canvas_wrapper):
+        """
+        Initialise from C++ data
+        @param collection_name string containing the name of the collection
+        @param image C++ ROOT.MAUS.Image object
+        @param image C++ ROOT.MAUS.CanvasWrapper object
+        @returns new CanvasRewrapped
+        """
+        wrap = CanvasRewrapped()
+        wrap.collection = collection_name
+        wrap.canvas_wrapper = ROOT.MAUS.CanvasWrapper(c_canvas_wrapper)
+        wrap.run_number = image.GetRunNumber()
+        wrap.spill_number = image.GetSpillNumber()
+        wrap.input_time = image.GetInputTime().GetDateTime()
+        wrap.output_time = image.GetOutputTime().GetDateTime()
+        return wrap
+
+    @classmethod
+    def new_list_from_image(self, collection_name, image):
+        """
+        Generate a new list of CanvasRewrappeds from an image
+        @param image an instance of ROOT.MAUS.Image() - will make one
+                CanvasRewrapped per CanvasWrapper on the image
+        """
+        wrap_list = []
+        wrapper_vector = image.GetCanvasWrappers()
+        for i in range(wrapper_vector.size()):
+            wrap_list.append(CanvasRewrapped.new_from_c(collection_name,
+                                                        image,
+                                                        wrapper_vector[i]))
+        return wrap_list
+
+    def deepcopy(self):
+        """
+        Make a deepcopy of self
+        """
+        wrap = CanvasRewrapped()
+        wrap.collection = self.collection
+        if self.canvas_wrapper == None:
+            wrap.canvas_wrapper = None
+        else:
+            wrap.canvas_wrapper = ROOT.MAUS.CanvasWrapper(self.canvas_wrapper)
+        wrap.run_number = self.run_number
+        wrap.spill_number = self.spill_number
+        wrap.input_time = self.input_time
+        wrap.output_time = self.output_time
+        return wrap
+
+    def sort_key(self):
+        """Return the key for sorting"""
+        return (self.collection,
+                self.canvas_title(),
+                self.input_time)
+
+    def canvas_title(self):
+        """Return the canvas title"""
+        return self.canvas_wrapper.GetCanvas().GetTitle()
 
 def get_datacards():
+    """
+    Return the datacards as a json document
+    """
     config = Configuration().getConfigJSON(command_line_args = True)
     return json.loads(config)
 

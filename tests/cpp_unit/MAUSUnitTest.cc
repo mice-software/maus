@@ -34,9 +34,16 @@ extern char *optarg;
 int parse_flags(int argc, char **argv) {
     int _verbose_level = 1;
     int _help = 2;
+    int _gtest = 3;
     option long_options[] = {
               {"verbose_level", required_argument, NULL, _verbose_level},
               {"help", no_argument, NULL, _help},
+              {"gtest_list_tests", no_argument, NULL, 0},
+              {"gtest_filter", required_argument, NULL, 0},
+              {"gtest_also_run_disabled_tests", no_argument, NULL, 0},
+              {"gtest_repeat", required_argument, NULL, 0},
+              {"gtest_shuffle", no_argument, NULL, 0},
+              {"gtest_random_seed", required_argument, NULL, 0},
               {NULL, 0, NULL, 0}
     };
     int option = 0;

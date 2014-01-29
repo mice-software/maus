@@ -30,15 +30,15 @@
                 }]
             }, {
                 "type":"named_text_entry",
-                "default_text":"10.0",
+                "default_text":"2.0",
                 "label_length":25,
-                "name":"Canvas rotate speed",
+                "name":"Rotate period",
                 "tool_tip":"Time between changes of canvas (s)"
             }, {
                 "type":"named_text_entry",
-                "default_text":"10.0",
+                "default_text":"2.0",
                 "label_length":25,
-                "name":"Canvas reload rate",
+                "name":"Reload period",
                 "tool_tip":"Time between canvas reloads (s)"
             }, {
                 "type":"horizontal_frame",
@@ -57,7 +57,7 @@
             }, {
                 "type":"list_box",
                 "name":"canvas_select",
-                "entries":["ht01", "spx0", "spx1", "spx2", "spy0", "spy1", "htof", "tof_A", "tof_B"],
+                "entries":[],
                 "selected":[]
             }]
         }]
