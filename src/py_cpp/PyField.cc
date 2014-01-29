@@ -51,7 +51,7 @@ PyObject* GetFieldValue(PyObject *dummy, PyObject *args) {
       return NULL;
     }
     maus_field->GetFieldValue(point, field);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }

@@ -29,13 +29,13 @@ namespace MAUS {
     try {
       _birth(s);
     }
-    catch(Exception& s) {
+    catch (Exception& s) {
       CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
-    catch(std::exception & e) {
+    catch (std::exception & e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
   }
@@ -44,13 +44,13 @@ namespace MAUS {
     try {
       _death();
     }
-    catch(Exception& s) {
+    catch (Exception& s) {
       CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
-    catch(std::exception & e) {
+    catch (std::exception & e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
   }

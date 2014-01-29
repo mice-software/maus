@@ -1,3 +1,5 @@
+all : scifi_offline_viewer
+
 scifi_offline_viewer : scifi_offline_viewer.cc
 	@echo "Running with ${MAUS_ROOT_DIR} on "
 	@echo `uname -a` # note this Makefile fails on Ubuntu due to ROOT errors
@@ -12,7 +14,7 @@ scifi_offline_viewer : scifi_offline_viewer.cc
 	                      `${ROOTSYS}/bin/root-config --glibs` \
 	                      -lMausCpp \
 	                       -Wl,--no-as-needed
-
+	                     
 clean:
 	rm scifi_offline_viewer;
 

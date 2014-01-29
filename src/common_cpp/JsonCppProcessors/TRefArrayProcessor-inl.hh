@@ -51,7 +51,7 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
           RefManager::GetInstance().AddReference(res);
         }
       }
-    } catch(Exception exc) {
+    } catch (Exception exc) {
       // if there's a problem, clean up before rethrowing the exception
       throw exc;
     }

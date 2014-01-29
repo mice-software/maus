@@ -93,7 +93,7 @@ namespace MAUS {
     try {
       tc1.birth("TestConfig");
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         <<"Fail: Birth function failed. Check ModuleBaseTest"
         << std::endl;
@@ -105,7 +105,7 @@ namespace MAUS {
     try {
       tc1.death();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         <<"Fail: Death function failed. Check ModuleBaseTest"
         << std::endl;
@@ -135,7 +135,7 @@ namespace MAUS {
     try {
       mm_s.save(i1);
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: MAUS::Exception should have been handled"
         << std::endl;
@@ -146,7 +146,7 @@ namespace MAUS {
     try {
       mm_e.save(i1);
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: MAUS::Exception should have been handled"
         << std::endl;
@@ -160,8 +160,8 @@ namespace MAUS {
         << "Fail: No exception thrown"
         << std::endl;
     }
-    catch(UnhandledException& e) {}
-    catch(...) {
+    catch (UnhandledException& e) {}
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Expected exception of type UnhandledException to be thrown"
         << std::endl;
