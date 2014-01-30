@@ -78,10 +78,11 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         """
         unittest.TestCase.setUp(self)
         DocumentStoreTests.setUp(self)
+        self._max_size = 5
         self._host = "localhost"
         self._port = PORT
-        self._root_db = RootDocumentDB([self._port], 0.01)
-        self._data_store = RootDocumentStore(10., 0.01)
+        self._root_db = RootDocumentDB([self._port, self._port+1], 0.1)
+        self._data_store = RootDocumentStore(10., 0.1)
         self._collection = self.__class__.__name__
         parameters = {
             "host":self._host,
@@ -97,7 +98,7 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         global PORT
         unittest.TestCase.tearDown(self)
         self._data_store.disconnect()
-        PORT += 1
+        PORT += 5
 
     def test_put_get_root_documents(self):
         """
@@ -132,6 +133,22 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         self.assertEqual(get_spill_number(data_out), 81)
         data_out = rds.get("test_collection", 90) # check we push old docs out
         self.assertEqual(data_out, None)
+
+    def test_disconnect_reconnect(self):
+        """
+        Check that we can disconnect from the DB
+        """
+        data_in = {"test":"document"}
+        self._data_store.disconnect()
+        try:
+            self._data_store.put(self._collection, 0, data_in)
+        except DocumentStoreException:
+            sys.excepthook(*sys.exc_info())
+        self._data_store.connect({"host":self._host, "port":self._port})
+        self._data_store.put(self._collection, 0, data_in)
+        data_out = self._data_store.get(self._collection, 0)
+        self.assertEqual(data_in, data_out)
+
 
 if __name__ == "__main__":
     unittest.main()

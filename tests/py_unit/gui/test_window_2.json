@@ -19,7 +19,8 @@
         "name":"test_4"
     }, {
         "type":"button",
-        "name":"test_5"
+        "name":"test_5",
+        "tool_tip":"tool"
     }, {
         "type":"drop_down",
         "entries":["0", "1"],

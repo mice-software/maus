@@ -18,41 +18,38 @@
                 "children":[{
                     "type":"button",
                     "name":"&<",
-                    "tool_tip":"Rotate back one canvas"
+                    "tool_tip":"Rotate back one canvas."
                 }, {
                     "type":"button",
                     "name":"&Pause",
-                    "tool_tip":"Load and draw new canvas from the socket, even if paused"
+                    "tool_tip":"Block interface from loading or redrawing canvases.\nReconstruction continues in the background."
                 }, {
                     "type":"button",
                     "name":"&>",
-                    "tool_tip":"Rotate forwards one canvas"
+                    "tool_tip":"Rotate forwards one canvas."
                 }]
             }, {
                 "type":"named_text_entry",
                 "default_text":"2.0",
                 "label_length":25,
                 "name":"Rotate period",
-                "tool_tip":"Time between changes of canvas (s)"
+                "tool_tip":"Time between changes of canvas (s).\nPress <CR> to update."
             }, {
                 "type":"named_text_entry",
                 "default_text":"2.0",
                 "label_length":25,
                 "name":"Reload period",
-                "tool_tip":"Time between canvas reloads (s)"
+                "tool_tip":"Time between canvas reloads (s).\nPress <CR> to update."
             }, {
                 "type":"horizontal_frame",
                 "children":[{
                     "type":"button",
                     "name":"&Redraw",
-                    "tool_tip":"Redraw canvas with currently loaded data"
+                    "tool_tip":"Redraw current canvas with currently loaded data."
                 }, {
                     "type":"button",
                     "name":"Re&load",
-                    "tool_tip":"Load and draw new canvas from the socket, even if paused"
-                }, {
-                    "type":"button",
-                    "name":"&Help"
+                    "tool_tip":"Load and draw new canvases from the socket, even if paused."
                 }]
             }, {
                 "type":"list_box",
@@ -65,10 +62,12 @@
         "type":"horizontal_frame",
         "children":[{
                 "type":"button",
-                "name":"&Reconnect"
+                "name":"Re&connect",
+                "tool_tip":"Attempt to disconnect and then reconnect with the reconstruction database"
             },{
                 "type":"button",
-                "name":"E&xit"
+                "name":"E&xit",
+                "tool_tip":"Exit the GUI. Reconstruction continues in the background."
             }]
    }]   
 }]

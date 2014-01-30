@@ -442,4 +442,5 @@ root_document_store_timeout = 1.
 root_document_store_poll_time = 0.1
 online_gui_host = "localhost"
 online_gui_port = 41000
+online_gui_default_canvases = []
 

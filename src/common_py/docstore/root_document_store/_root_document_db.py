@@ -87,7 +87,7 @@ class RootDocumentDB:
         """
         self.poll_time = poll_time
         self.collections = {}
-        self.server_socket = SocketManager(port_list, -1., self.poll_time, 1000)
+        self.server_socket = SocketManager(port_list, -1., self.poll_time, 10)
         self.server_socket.start_processing()
         my_thread = threading.Thread(target=self.poll_queue)
         my_thread.daemon = True

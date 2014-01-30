@@ -59,7 +59,8 @@ class RootDocumentStore(DocumentStore):
     (handled by _parse_function and _return function respectively).
     """
 
-    def __init__(self, timeout, poll_time):
+    def __init__(self, timeout, poll_time, n_socket_retries=3,
+                 retry_time=0.1, n_docstore_retries=3):
         """
         Initialise the document store
         @param timeout: maximum time to attempt a given communication with the
@@ -70,7 +71,10 @@ class RootDocumentStore(DocumentStore):
         self.port = None
         self.timeout = timeout
         self.poll_time = poll_time
-        self._socket_manager = SocketManager([], self.timeout, poll_time, 1000)
+        self._socket_manager = SocketManager([], self.timeout, poll_time,
+                                             n_socket_retries)
+        self.n_retries = n_docstore_retries
+        self.retry_time = 1
 
     def connect(self, parameters):
         """
@@ -87,6 +91,12 @@ class RootDocumentStore(DocumentStore):
                                                  self.timeout,
                                                  self.poll_time)
         self._socket_manager.start_processing()
+
+    def disconnect(self):
+        """
+        Disconnect from the RootDocumentDB
+        """
+        self._socket_manager.close_all(True)
 
     def create_collection(self, collection, maximum_size):
         """
@@ -213,7 +223,6 @@ class RootDocumentStore(DocumentStore):
         """
         self._socket_manager.close_all(self.timeout)
 
-
     def _parse_function(self, args, keywd_args, data = None):
         """
         Parse a function call into a ControlMessage and send over the wire
@@ -236,11 +245,22 @@ class RootDocumentStore(DocumentStore):
             data = []
         message = ControlMessage("RootDocumentDB", inspect.stack()[1][3],
                                  args, keywd_args, data)
-        try:
-            self._socket_manager.send_message(self.port, message)
-        except SocketError as err:
-            raise DocumentStoreException(*err.args)
-        return self._return_function(inspect.stack()[1][3], message.id)
+        # we retry both at socket level (see socket_manager) and at docstore
+        # level (below); attempting to increase robustness, but in the presence
+        # of lots of network traffic this can increase the amount of congestion
+        for i in range(self.n_retries):
+            try:
+                self._socket_manager.send_message(self.port, message)
+                return self._return_function(inspect.stack()[1][3], message.id)
+            except DocumentStoreException:
+                if i+1 == self.n_retries:
+                    raise
+            except SocketError as err:
+                if i+1 == self.n_retries:
+                    raise DocumentStoreException(*err.args)
+            time.sleep(self.retry_time)
+        # should never reach this line of code
+        raise DocumentStoreException("Internal error while contact docstore")
 
     def _return_function(self, function_name, message_id):
         """

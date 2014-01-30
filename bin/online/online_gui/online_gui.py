@@ -29,6 +29,7 @@ import gui.gui_exception_handler
 from gui.gui_exception_handler import GuiError
 from gui.window import Window
 from docstore.root_document_store import RootDocumentStore
+from docstore.DocumentStore import DocumentStoreException
 from Configuration import Configuration
 from threading_utils import ThreadedBool
 from threading_utils import ThreadedValue
@@ -45,11 +46,33 @@ class OnlineGui():
         self.window = Window(ROOT.gClient.GetRoot(), # pylint: disable=E1101
                              ROOT.gClient.GetRoot(), # pylint: disable=E1101
                              SHARE_DIR+"online_gui.json")
+        self._set_actions()
+        self._docstore = None
+        self._datacards = datacards
+        self._draw_titles = Queue.Queue()
+        for title in datacards["online_gui_default_canvases"]:
+            self._draw_titles.put(title)
+        self._canvases_read = Queue.Queue()
+        self._canvases_draw = ThreadedValue([])
+        self._redraw_target = None
+        self._paused = ThreadedValue(False)
+        rotate_tmp = self.window.get_text_entry("Rotate period", type(1.))
+        self._rotate_period = ThreadedValue(rotate_tmp)
+        reload_tmp = self.window.get_text_entry("Reload period", type(1.))
+        self._reload_period = ThreadedValue(reload_tmp)
+        self._poll_period = ThreadedValue(0.1)
+        self._collections = ThreadedValue([])
+        self._init_docstore()
+        self._start_polling()
+
+    def _set_actions(self):
+        """
+        Set up actions (responses to signals)
+        """
         self.window.set_button_action("&Pause", self.pause_action)
         self.window.set_button_action("&Redraw", self.redraw_action)
         self.window.set_button_action("Re&load", self.reload_action)
-        self.window.set_button_action("&Reconnect", self.reconnect_action)
-        self.window.set_button_action("&Help", self.help_action)
+        self.window.set_button_action("Re&connect", self.reconnect_action)
         self.window.set_button_action("E&xit", self.exit_action)
         self.window.set_button_action("&<", self.back_action)
         self.window.set_button_action("&>", self.forward_action)
@@ -61,31 +84,22 @@ class OnlineGui():
                                "ReturnPressed()", self.rotate_period_action)
         self.window.set_action("Reload period", "named_text_entry",
                                "ReturnPressed()", self.reload_period_action)
-        self._docstore = None
-        self._datacards = datacards
-        self._draw_titles = Queue.Queue()
-        self._canvases_read = Queue.Queue()
-        self._canvases_draw = ThreadedValue([])
-        self._redraw_target = None
-        self._paused = ThreadedValue(False)
-        rotate_tmp = self.window.get_text_entry("Rotate period", type(1.))
-        self._rotate_period = ThreadedValue(rotate_tmp)
-        reload_tmp = self.window.get_text_entry("Reload period", type(1.))
-        self._reload_period = ThreadedValue(reload_tmp)
-        self._poll_period = ThreadedValue(0.1)
-        self._help_text = ""
-        self._init_docstore()
-        self.start_polling()
 
     def _init_docstore(self):
+        """
+        Initialise the docstore
+        """
         datacards = self._datacards
-        self.docstore = RootDocumentStore(
+        self._docstore = RootDocumentStore(
                   datacards["root_document_store_timeout"],
-                  datacards["root_document_store_poll_time"])
-        self.docstore.connect({"host":datacards["online_gui_host"],
+                  datacards["root_document_store_poll_time"], 10, 10)
+        self._docstore.connect({"host":datacards["online_gui_host"],
                                "port":datacards["online_gui_port"]})
 
-    def start_polling(self):
+    def _start_polling(self):
+        """
+        Start polling the database and rotating the canvases
+        """
         my_thread = threading.Thread(target=self._poll_canvas_draw,
                                      args=())
         my_thread.daemon = True
@@ -112,16 +126,20 @@ class OnlineGui():
         Redraws self._redraw_target
         """
         if self._redraw_target == None:
-            raise GuiError("No canvases were loaded")
+            raise GuiError("No canvas to draw")
         self._do_redraw(self._redraw_target)
 
     def reload_action(self):
-        """Handle a Refresh button press"""
-        raise NotImplementedError("Not implemented")
+        """Handle a Reload button press"""
+        self._reload()
+        if self._redraw_target != None:
+            go_back_fifo_queue(self._draw_titles)
+            self._draw_next()
 
     def reconnect_action(self):
         """Handle a Reconnect button press"""
-        raise NotImplementedError("Not implemented")
+        self._docstore.disconnect()
+        self._init_docstore()
 
     def exit_action(self):
         """Handle a Exit button press"""
@@ -129,32 +147,32 @@ class OnlineGui():
         time.sleep(self._poll_period.get_value()) # thinkapow
         self.window.close_window()
 
-    def help_action(self):
-        """Handle a Help button press"""
-        raise NotImplementedError("Not implemented")
-
     def reload_period_action(self):
+        """Handle a change to the reload period"""
         tmp_reload_period = self.window.get_text_entry("Reload period",
                                                        type(1.))
         tmp_reload_period = float(tmp_reload_period)
         self._reload_period.set_value(tmp_reload_period)
 
     def rotate_period_action(self):
+        """Handle a change to the rotate period"""
         tmp_rotate_period = self.window.get_text_entry("Rotate period",
                                                        type(1.))
         tmp_rotate_period = float(tmp_rotate_period)
         self._rotate_period.set_value(tmp_rotate_period)
 
     def forward_action(self):
+        """Handle a click on the > forward button"""
         self._draw_next()
 
     def back_action(self):
+        """Handle a click on the < back button"""
         go_back_fifo_queue(self._draw_titles)
         go_back_fifo_queue(self._draw_titles)
         self._draw_next()
 
     def canvas_select_action(self):
-        """Handle an update the selected canvases"""
+        """Handle an update to the selected canvases"""
         selected = self._get_canvas_selected()
         new_draw_titles = Queue.Queue()
         for item in selected:
@@ -167,10 +185,10 @@ class OnlineGui():
 
         * Update the queue from the canvas_read queue
         * Refresh the combo box with items in the canvases_draw queue
-        * Update the help page
         """
         poll_number = 0
         while True:
+            print "redraw"
             poll_number += 1
             self._draw_next()
             self._sleepish(self._rotate_period)
@@ -189,14 +207,13 @@ class OnlineGui():
                 new_title = copy.deepcopy(title)
                 self._draw_titles.put(title)
                 for wrap in canvases_draw:
-                    print wrap.canvas_title(), new_title
                     if wrap.canvas_title() == new_title:
                         self._do_redraw(wrap)
                         break
             except Queue.Empty:
                 pass # no canvas selected
             except ValueError:
-                print canvases_draw, new_title
+                pass
         self._canvases_draw.set_value(canvases_draw)
 
 
@@ -235,16 +252,21 @@ class OnlineGui():
         Poll the doc store for documents
         """
         while True:
-            print "_poll_docstore"
-            self._reload_canvases()
-            # now update GUI elements (each call iterates over the whole
-            # _canvases_draw queue)
-            self._update_canvas_select()
-            self._update_help_text()
+            print "poll_docstore"
+            self._reload()
             self._sleepish(self._reload_period)
             # handle pause
             while self._paused.get_value():
                 time.sleep(self._poll_period.get_value())
+
+    def _reload(self):
+        """
+        Reload canvases; if the list of canvases changed, update the multiselect
+        """
+        self._reload_canvases()
+        # now update GUI elements (each call iterates over the whole
+        # _canvases_draw queue)
+        self._update_canvas_select()
 
     def _update_canvas_select(self):
         """
@@ -252,19 +274,18 @@ class OnlineGui():
         """
         all_canvas_titles = [wrap.canvas_wrapper.GetCanvas().GetTitle() \
                            for wrap in generate_fifo_queue(self._canvases_read)]
-        selected = self._get_canvas_selected()
 
         select_box = self.window.get_frame("canvas_select", "list_box")
         select_box.RemoveAll()
         for i, title in enumerate(all_canvas_titles):
             select_box.AddEntry(title, i)
-        for title in selected:
+        for title in generate_fifo_queue(self._draw_titles):
             try:
                 index = all_canvas_titles.index(title)
                 select_box.Select(index)
             except ValueError: # item was no longer in the select - ignore it
                 pass
-
+        go_back_fifo_queue(self._draw_titles)
         # ROOT doesn't like redrawing the histogram titles properly - need to
         # force it
         self.window.get_frame("canvas_select", "list_box").Resize(200, 10)
@@ -283,20 +304,17 @@ class OnlineGui():
             selected_root.RemoveLast()
         return selected
 
-    def _update_help_text(self):
-        help_text = copy.deepcopy(self._basic_help)
-        for canvas_wrap in generate_fifo_queue(self._canvases_read):
-            canvas_title = canvas_wrap.canvas_wrapper.GetCanvas().GetTitle()
-            help_text += "\n"+canvas_title+"\n"
-            help_text += canvas_wrap.canvas_wrapper.GetDescription()+"\n"
-        self._help_text = help_text
-
     def _reload_canvases(self):
         """
         Reload canvases from the docstore
         """
         # get all of the collections (one for each reducer)
-        collections = self.docstore.collection_names()
+        try:
+            collections = self._docstore.collection_names()
+        except DocumentStoreException, SocketError:
+            print "Failed to get collection names from the docstore"
+            return
+        self._collections.set_value(collections)
         temp_canvases = []
         # update "last accessed" timestamp
         self.last = datetime.datetime.now()
@@ -310,15 +328,17 @@ class OnlineGui():
         for canvas in filtered_canvases:
             canvases_read.put_nowait(canvas)
         self._canvases_read = canvases_read
+        self._collections.set_value(collections)
 
     def _get_new_canvases(self, collection_name):
         """
         Get a list of new canvases from the collection
         """
         try:
-            doc_list = self.docstore.get_since(collection_name, self.last)
+            doc_list = self._docstore.get_since(collection_name, self.last)
         except DocumentStoreException:
-            sys.excepthook(*sys.exc_info())
+            print "Failed to get documents from the docstore"
+            return []
         if len(doc_list) == 0:
             return []
         tree = doc_list[-1]["doc"]
@@ -354,8 +374,6 @@ class OnlineGui():
                 filtered_list.append(item_1)
         filtered_list.append(item_2)
         return filtered_list
-
-    _basic_help = ""
 
 class CanvasRewrapped:
     """

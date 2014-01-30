@@ -276,6 +276,7 @@ class Window(): # pylint: disable=R0201
       - "button": makes a TGTextButton i.e. standard click button
           - "name": text to be used on the button; put an ampersand in to set a
             hot key
+          - "tool_tip": text to be used as a tool tip
       - "drop_down": make a TGComboBox i.e. a drop down box.
           - "entries": list of strings, each of which becomes an entry in the
             drop down box, indexing from 0
@@ -399,7 +400,6 @@ class Window(): # pylint: disable=R0201
         # that wraps it
         if frame_type == "named_text_entry":
             frame = self._find_text_entry(frame_name)[0]
-            print frame, frame.GetText()
         self.socket_list.append(ROOT.TPyDispatcher(function_wrapper(action)))
         frame.Connect(frame_socket, 'TPyDispatcher', self.socket_list[-1], 
                       'Dispatch()')
@@ -567,6 +567,8 @@ class Window(): # pylint: disable=R0201
         """parse a text_button into a TGTextButton"""
         name = item["name"]
         item["frame"] = ROOT.TGTextButton(parent, name, 50)
+        if "tool_tip" in item:
+            item["frame"].SetToolTipText(item["tool_tip"])
 
     def _parse_text_entry(self, parent, item):
         """parse a text_entry into a TGTextEntry"""

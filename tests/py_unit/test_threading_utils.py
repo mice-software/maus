@@ -50,7 +50,6 @@ class ThreadedBoolTest(unittest.TestCase):
         _test.set_true()
         self.assertTrue(_test)
 
-
 class ThreadedValueTest(unittest.TestCase):
     """
     Test threaded value

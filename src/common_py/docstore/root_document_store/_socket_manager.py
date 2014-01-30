@@ -190,6 +190,8 @@ class SocketManager:
             try:
                  # Try to send all messages
                 for socket in self._loop_over_sockets():
+                    #print "SOCKET", socket.IsValid(), socket.GetLocalPort(), socket.GetLocalInetAddress().GetHostAddress(),\
+                    #      socket.GetPort(), socket.GetInetAddress().GetHostAddress()
                     sys.stdout.flush()
                     for item in self._loop_over_queue_unsafe(self.send_message_queue):
                         port, message, sends = item
@@ -216,7 +218,10 @@ class SocketManager:
                         while try_again:
                             socket.Recv(message)
                             try_again = self._queue_received_message(socket.GetLocalPort(), message)
-                            
+                # Drop any invalid sockets
+                for socket in self._loop_over_sockets_unsafe():
+                    if socket.IsValid():
+                        self.socket_queue.put(socket)
                 time.sleep(retry_time)
             except Exception as exc:
                 sys.excepthook(*sys.exc_info())
@@ -263,24 +268,29 @@ class SocketManager:
         server_socket.SetOption(ROOT.TServerSocket.kNoBlock, 1)
         tcp_socket_index = server_socket.GetDescriptor()
         accepted_socket_index = ROOT.gSystem.AcceptConnection(tcp_socket_index)
-        while accepted_socket_index < 0 and \
-              (timeout < 0 or time.time()-start_time < timeout):
-                sys.stdout.flush()
-                accepted_socket_index = ROOT.gSystem.AcceptConnection(tcp_socket_index)
-                sys.stdout.flush()
-                if accepted_socket_index < 0:
-                    time.sleep(retry_time)
-        sys.stdout.flush()
-        if accepted_socket_index < 0:
-            raise SocketError("Failed to accept connection on port "+\
-                                  str(port))
-        ROOT.gSystem.SetSockOpt(accepted_socket_index, ROOT.kReuseAddr, 1)
-        socket = ROOT.TSocket(accepted_socket_index)
-        socket.SetOption(ROOT.TSocket.kNoBlock, 1)
-        socket.fAddress = ROOT.gSystem.GetPeerName(accepted_socket_index)
-        socket.fSecContext = 0
-        if socket.GetDescriptor() >= 0:
-            ROOT.gROOT.GetListOfSockets().Add(socket)
-        self._put_socket(socket)
+        while True:
+            while accepted_socket_index < 0 and \
+                  (timeout < 0 or time.time()-start_time < timeout):
+                    sys.stdout.flush()
+                    accepted_socket_index = ROOT.gSystem.AcceptConnection(tcp_socket_index)
+                    sys.stdout.flush()
+                    if accepted_socket_index < 0:
+                        time.sleep(retry_time)
+
+            sys.stdout.flush()
+            if accepted_socket_index < 0:
+                raise SocketError("Failed to accept connection on port "+\
+                                      str(port))
+            ROOT.gSystem.SetSockOpt(accepted_socket_index, ROOT.kReuseAddr, 1)
+            socket = ROOT.TSocket(accepted_socket_index)
+            socket.SetOption(ROOT.TSocket.kNoBlock, 1)
+            socket.fAddress = ROOT.gSystem.GetPeerName(accepted_socket_index)
+            socket.fSecContext = 0
+            if socket.GetDescriptor() >= 0:
+                ROOT.gROOT.GetListOfSockets().Add(socket)
+            self._put_socket(socket)
+            sys.stdout.flush()
+            accepted_socket_index = ROOT.gSystem.AcceptConnection(tcp_socket_index)
+            time.sleep(retry_time)
         return
 
