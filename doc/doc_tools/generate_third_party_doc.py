@@ -104,7 +104,7 @@ def run_doxygen(tplib, input_path):
         echo CLASS_GRAPH = NO;
         echo COLLABORATION_GRAPH = NO;
         echo DIRECTORY_GRAPH = NO;
-        echo GROUP_GRAPH = NO;
+        echo GROUP_GRAPHS = NO;
         echo INCLUDED_BY_GRAPH = NO;
         echo INCLUDE_GRAPH = NO;
         echo OUTPUT_DIRECTORY = ${MAUS_THIRD_PARTY}/doc/doxygen_$0/;
