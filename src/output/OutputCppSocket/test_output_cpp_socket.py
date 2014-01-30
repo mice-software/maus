@@ -85,7 +85,10 @@ class OutputCppSocketTest(unittest.TestCase):
         ocs.save(get_image_data())
         # bad type, should throw (but what?)
         ocs.save(0)
-        
+
+    def test_output_cpp_socket_end_of_run(self):
+        raise NotImplementedError("Not implemented")
+
 if __name__ == "__main__":
     unittest.main()
 
