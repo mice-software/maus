@@ -142,7 +142,7 @@ class Beam(): # pylint: disable=R0902
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
         #############################################
-        self.beam_polarisation = "Flat"
+        self.beam_polarisation = "flat"
         self.beam_mean_x = 1.0
         self.beam_mean_y = 2.0
         self.beam_mean_z = 3.0
@@ -150,6 +150,9 @@ class Beam(): # pylint: disable=R0902
         self.beam_sigma_y = 5.0
         self.beam_sigma_z = 6.0
         #############################################
+
+
+
     def birth(self, beam_def, particle_generator, random_seed):
         """
         Construct the beam ellipes, reference particle and other beam data
@@ -169,7 +172,7 @@ class Beam(): # pylint: disable=R0902
         self.__birth_longitudinal_ellipse(beam_def["longitudinal"])
         self.__birth_trans_long_coupling(beam_def["coupling"])
         self.__birth_beam_mean()
-        self.__birth_beam_polarisation(beam_def["beam_polarisation"])
+        self.__birth_beam_polarisation(beam_def)
  
     def __birth_particle_generator(self, beam_def, particle_generator):
         """
@@ -333,33 +336,34 @@ class Beam(): # pylint: disable=R0902
 
     
     def __birth_beam_polarisation(self, beam_def):
-       
-        self.beam_polarisation = beam_def["beam_polarisation"]
-       # ref = self.reference
-         
+        self.beam_polarisation = {}
+        try:
+            self.beam_polarisation = beam_def["beam_polarisation"]
+        except KeyError:
+            self.beam_polarisation['polarisation_mode'] = 'flat'
 
-        if self.beam_polarisation == 'Flat':
+        if self.beam_polarisation['polarisation_mode'] == 'flat':
             
-            self.beam_mean_x = beam_def['mean_x'] = 0.
-            self.beam_mean_y = beam_def['mean_y'] = 0.
-            self.beam_sigma_x = beam_def['sigma_x'] = 1.
-            self.beam_sigma_y = beam_def['sigma_y'] = 1.
-            self.beam_mean_z = beam_def['mean_z'] = 0.
-            self.beam_sigma_z = beam_def['sigma_z'] = 1.
+            self.beam_mean_x = 0.
+            self.beam_mean_y = 0.
+            self.beam_mean_z = 0.
+            self.beam_sigma_x = 1.
+            self.beam_sigma_y = 1.
+            self.beam_sigma_z = 1.
             #if flat backward compatibility
-        if self.beam_polarisation == 'Gaussian_Unit_Vectors':
+        if self.beam_polarisation['polarisation_mode'] == 'gaussian_unit_vectors':
               
-            self.beam_mean_x = beam_def['mean_x'] = 1
-            self.beam_mean_y = beam_def['mean_y'] = 2
-            self.beam_sigma_x = beam_def['sigma_x'] = 4
-            self.beam_sigma_y = beam_def['sigma_y'] = 5
-            self.beam_mean_z = beam_def['mean_z'] = 3
-            self.beam_sigma_z = beam_def['sigma_z'] = 6
+            self.beam_mean_x = self.beam_polarisation['beam_mean_x']
+            self.beam_mean_y = self.beam_polarisation['beam_mean_y']
+            self.beam_mean_z = self.beam_polarisation['beam_mean_z']
+            self.beam_sigma_x = self.beam_polarisation['beam_sigma_x']
+            self.beam_sigma_y = self.beam_polarisation['beam_sigma_y']
+            self.beam_sigma_z = self.beam_polarisation['beam_sigma_z']
         
         #else:
             #raise ValueError('no polarisation set')
-
-    
+       
+        #print  self.beam_polarisation['polarisation_mode'] , self.beam_mean_x, self.beam_sigma_x
     def make_one_primary(self):
         """
         Make a primary particle.
@@ -376,7 +380,14 @@ class Beam(): # pylint: disable=R0902
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
+        spin_array= self.__process_beam_polarisation()
+        hit["sx"]=spin_array[0]
+        hit["sy"]=spin_array[1]
+        hit["sz"] = spin_array[2]
         primary = self.__process_hit_to_primary(hit)
+        primary["spin"] = {"x": hit["sx"] , "y":hit["sy"], "z":hit["sz"]}
+        
+        
         return primary
 
     def __process_beam_polarisation(self):
@@ -384,21 +395,20 @@ class Beam(): # pylint: disable=R0902
         """
         Generates a particle array for gaussians
         """
-        hit = xboa.Hit.Hit.new_from_dict({'sx':0.0, 'sy':0.0, 'sz':1.0})
-        beam_mean_matrix = [ self.beam_mean_x, self.beam_mean_y, self.beam_mean_z ]
-        gaussian_matrix = []
-        beam_sigma_matrix = [[((self.beam_sigma_x)**2) , 0., 0.] , [0., ((self.beam_sigma_y)**2), 0.] , [0., 0., ((self.beam_sigma_z)**2)]]
-        particle_array = []
-
-        if self.beam_polaristion == 'Gaussian_Unit_Vectors':
-             for i in range(3):
-                particle_array = numpy.random.multivariate_normal(beam_mean_matrix[i] ,((self.beam_sigma_matrix[i])[j] for j in range(3)) )
-             print "PARTICLE ARRAY" , particle_array
-        if self.beam_polaristion == 'Flat':
-             for i in range(3):
-                particle_array = numpy.random.multivariate_normal(0. , 1.)
-             print particle_array
-        return  particle_array
+        #hit = xboa.Hit.Hit.new_from_dict({'sx':0.0, 'sy':0.0, 'sz':1.0})
+        beam_mean_matrix = numpy.array([self.beam_mean_x, self.beam_mean_y, self.beam_mean_z])
+        beam_sigma_matrix = numpy.array([[((self.beam_sigma_x)**2) , 0., 0.] , [0., ((self.beam_sigma_y)**2), 0.] , [0., 0., ((self.beam_sigma_z)**2)]])
+       
+  
+        particle_array = numpy.random.multivariate_normal(beam_mean_matrix ,beam_sigma_matrix )
+        #print "PARTICLE ARRAY" , particle_array
+      
+        try:
+            array_norm = particle_array/(particle_array[0]**2+particle_array[1]**2+particle_array[2]**2)**0.5
+        except ZeroDivisionError:
+            array_norm = numpy.array([0., 0., 1.])
+        
+        return  array_norm
                 
     def __process_get_particle_array(self):
         """

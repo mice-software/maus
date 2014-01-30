@@ -81,7 +81,7 @@ simulation_reference_particle = { # used for setting particle phase
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
     "spin":{"x":0.0, "y":0.0, "z":1.0}
-    "beam_polarisation" : "Flat"
+   # "beam_polarisation" : "Flat"
 }
 everything_special_virtual = False
 
@@ -166,7 +166,7 @@ beam = {
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
-       "spin":{"x":0.0, "y":0.0, "z":1.0}
+       #"spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### PIONS #####
     { # as above...
@@ -185,7 +185,7 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
        "coupling":{"coupling_mode":"none"}
-       "spin":{"x":0.0, "y":0.0, "z":1.0}
+      # "spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### ELECTRONS #####
     { # as above...
@@ -204,7 +204,7 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
         "coupling":{"coupling_mode":"none"}
-        "spin":{"x":0.0, "y":0.0, "z":1.0}
+       # "spin":{"x":0.0, "y":0.0, "z":1.0}
     }]
 }
 

@@ -84,15 +84,16 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["y"] = point->GetMomentum().y();
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
-
+    
+    
 
 //################################################//
 
-    Json::Value spin;
-    spin["x"] = point->GetSpin().x();
-    spin["y"] = point->GetSpin().y();
-    spin["z"] = point->GetSpin().z();
-    step["spin"] = spin;
+    Json::Value Polarization;
+    Polarization["x"] = point->GetPolarization().x();
+    Polarization["y"] = point->GetPolarization().y();
+    Polarization["z"] = point->GetPolarization().z();
+    step["Polarization"] = Polarization;
 
 
 

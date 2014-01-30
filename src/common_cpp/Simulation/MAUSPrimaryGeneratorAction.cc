@@ -83,7 +83,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
                                  (part.px, part.py, part.pz));
  
   gun->
-  SetParticlePolarization(G4ThreeVector
+  SetParticleSpin(G4ThreeVector
                                    (part.sx, part.sy, part.sz));
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
