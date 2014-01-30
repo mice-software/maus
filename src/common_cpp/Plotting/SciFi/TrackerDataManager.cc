@@ -55,12 +55,6 @@ void TrackerDataManager::process(const Spill *spill) {
     for (size_t i = 0; i < spill->GetReconEvents()->size(); ++i) {
       _t1._spill_num = spill->GetSpillNumber();
       _t2._spill_num = spill->GetSpillNumber();
-      // Set up the MC lookup
-      if ( spill->GetMCEvents() ) {
-        if ( spill->GetMCEvents()->at(i) ) {
-          _lookup.make_hits_map((spill->GetMCEvents())->at(i));
-        }
-      }
       // Process the SciFi data objects
       SciFiEvent *evt = (*spill->GetReconEvents())[i]->GetSciFiEvent();
       process_digits(spill, evt->digits());
@@ -81,21 +75,6 @@ void TrackerDataManager::process_digits(const Spill *spill, const std::vector<Sc
     } else if ( dig->get_tracker() == 1 ) {
       ++_t2._num_digits;
       _t2._num_events = spill->GetReconEvents()->size();
-    }
-    // Quick check of lookup
-    std::vector<SciFiHit*> hits;
-    if ( _lookup.get_hits(dig, hits) ) {
-      // std::cerr << hits.size() << " hits returned by lookup for digit id "
-      //      << _lookup.get_digit_id(dig) <<  ", channel = " << dig->get_channel() << std::endl;
-      if ( hits.size() > 0 ) {
-        if (hits[0]) {
-          ThreeVector hit_mom = hits[0]->GetMomentum();
-        } else {
-          std::cerr << "Invalid hit pointer returned by lookup" << std::endl;
-        }
-      }
-    } else {
-      std::cerr << "Hits lookup failed, lookup returned false" << std::endl;
     }
   }
 };
