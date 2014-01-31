@@ -389,6 +389,10 @@ Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
     hit_v["momentum"]["x"] = hit.GetMomentum().x();
     hit_v["momentum"]["y"] = hit.GetMomentum().y();
     hit_v["momentum"]["z"] = hit.GetMomentum().z();
+    hit_v["spin"] = Json::Value(Json::objectValue);
+    hit_v["spin"]["x"] = hit.GetSpin().x();
+    hit_v["spin"]["y"] = hit.GetSpin().y();
+    hit_v["spin"]["z"] = hit.GetSpin().z();
     hit_v["proper_time"] = hit.GetProperTime();
     hit_v["path_length"] = hit.GetPathLength();
     hit_v["b_field"] = Json::Value(Json::objectValue);
@@ -424,6 +428,8 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
          JsonWrapper::GetProperty(v_hit, "position", JsonWrapper::objectValue);
     Json::Value mom_v =
          JsonWrapper::GetProperty(v_hit, "momentum", JsonWrapper::objectValue);
+    Json::Value spin_v =
+         JsonWrapper::GetProperty(v_hit, "spin", JsonWrapper::objectValue);
     Json::Value b_v =
          JsonWrapper::GetProperty(v_hit, "b_field", JsonWrapper::objectValue);
     Json::Value e_v =
@@ -442,6 +448,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
 
     hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
+    hit.SetSpin(JsonWrapper::JsonToThreeVector(spin_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
     hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
