@@ -66,9 +66,8 @@ class Configreader(): #pylint: disable = R0903, R0902
 	self.tof_0_file_number = config_dict['tof_0_file_number']
         self.tof_1_file_number = config_dict['tof_1_file_number']
         self.tof_2_file_number = config_dict['tof_2_file_number']
-        self.ckov_file_number = config_dict['ckov_file_number']
-        self.acc1_file_number = config_dict['acc1_file_number']
-        self.acc2_file_number = config_dict['acc2_file_number']
+        self.ckov1_file_number = config_dict['ckov1_file_number']
+        self.ckov2_file_number = config_dict['ckov2_file_number']
         self.kl_file_number = config_dict['kl_file_number']
         self.emr_file_number = config_dict['emr_file_number']
         self.tracker0_file_number = config_dict['tracker0_file_number']
@@ -77,3 +76,5 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.absorber1_file_number = config_dict['absorber1_file_number']
         self.absorber2_file_number = config_dict['absorber2_file_number']
 
+        self.survey_target_detectors = config_dict['survey_target_detectors']
+        

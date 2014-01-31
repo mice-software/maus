@@ -66,14 +66,10 @@ def main():
     zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
     zipped_geom = Unpacker(zip_filename, gdml_cache)
     zipped_geom.unzip_file()
+    
     surveyFit = ElementRotationTranslation()
-    surveyFit.execute('MICE_Information/Detector_Information/TOF/TOF0')
-    surveyFit.execute('MICE_Information/Detector_Information/TOF/TOF1')
-    surveyFit.execute('MICE_Information/Detector_Information/TOF/TOF2')
-    surveyFit.execute('MICE_Information/Detector_Information/KL')
-    surveyFit.execute('MICE_Information/Detector_Information/Cherenkov/Ckov1')
-    surveyFit.execute('MICE_Information/Detector_Information/Cherenkov/Ckov2')
-    surveyFit.writefile()
+    surveyFit.execute()
+    
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
     gdmls.format()

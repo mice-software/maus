@@ -27,7 +27,7 @@ from Configuration import Configuration
 import json
 import ROOT
 import libxml2
-from math import sin, cos
+from math import sin, cos, pi
 from array import array
 
 class ElementRotationTranslation: #pylint: disable = R0903, R0902
@@ -50,6 +50,10 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         # access configuration file
         inputs = Configuration().getConfigJSON(command_line_args = True)
         config_dict = json.loads(inputs)
+        # get the gdml directory
+        self.dl_dir   = os.path.join(config_dict['geometry_download_directory'],'gdml')
+        # get the survey target detectors
+        self.sfTarget = config_dict['survey_target_detectors']
         # extract data files from configuration files
         self.GDMLFile = config_dict['survey_measurement_record']
         self.XMLFile  = config_dict['survey_reference_position'] # 'Rotation_test.reference'
@@ -64,9 +68,31 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             self.RefFile = config_dict['survey_reference_position'] # 'Rotation_test.reference'
         self.result = []
 
-    def execute(self, detectorPath, detectorFile):
+    def execute(self):
         """
-        @method execute: A subroutine to execute the fit based on a set of input data points.
+        @method execute: Fit for all detectors indicated by the survey target list in the config file
+        """
+        
+        # A check (possibly redundant) to see if we will do anything
+        if not len(self.sfTarget): return False
+        # Run over all elements in the surveyed detectors
+        isgood = True
+        for target in self.sfTarget:
+            basepath = 'MICE_Information/Detector_Information/'
+            targetpath = os.path.join(basepath,target)
+            if target.find('TOF') >= 0:
+                targetpath = os.path.join(basepath,'TOF/'+target)
+            elif target.find('Ckov') >= 0:
+                targetpath = os.path.join(basepath,'Cherenkov/'+target)
+            if not self.FitForDetector(targetpath,target+'.gdml'):
+                isgood = False
+                print 'Fit Failed for '+target
+        self.writefile()
+        return isgood
+
+    def FitForDetector(self, detectorPath, detectorFile):
+        """
+        @method FitForDetectors: A subroutine to execute the fit based on a set of input data points.
         """
         isgood = True
         # extract the measured data
@@ -127,8 +153,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         """
         isgood = True
         # path = "DetectorInformation/TOF/TOF0"
-        
+        print path
         det = self.datafile.xpathEval(path)
+        # if len(det)==0:
         for q in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/position"):
             if q.prop("name") == det[0].prop("gdml_posref"):
                 self.initguess[0] = float(q.prop('x'))
@@ -333,15 +360,12 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             # print  "testing"+node.xpathEval("position")[0].prop("name")
             if node.xpathEval("position")[0].prop("name") == PosRefName:
                 # print  "Reference Found"
-                if newFile: # and os.path.exists(newFile):
+                if newFile and os.path.exists(os.path.join(self.dl_dir, newFile)):
                     filepath = node.xpathEval("file")[0]
                     filepath.setProp('name', newFile)
                 q = node.xpathEval("position")[0]
-                x0 = float(q.prop('x'))
                 q.setProp('x', str(self.result[0][0]))
-                y0 = float(q.prop('y'))
                 q.setProp('y', str(self.result[0][1]))
-                z0 = float(q.prop('z'))
                 q.setProp('z', str(self.result[0][2]))
                 line    = PosRefName
                 rotName = line.replace('pos','rot')
@@ -353,16 +377,18 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                     r.setProp('x', str(self.result[0][3]))
                     r.setProp('y', str(self.result[0][4]))
                     r.setProp('z', str(self.result[0][5]))
-                else: 
+                else:
+                    # if len(node.xpathEval("rotationref"))==1:
+                    #     rotref = node.xpathEval("rotationref")[0]
+                    #     rotref.unlinkNode()
+                    #     rotref.freeNode()
                     rotNode = libxml2.newNode("rotation")
                     rotNode.setProp('name',rotName)
-                    rotNode.setProp('x', str(self.result[0][3]))
-                    rotNode.setProp('y', str(self.result[0][4]))
-                    rotNode.setProp('z', str(self.result[0][5]))
+                    rotNode.setProp('x', str(self.result[0][3] * 180/pi))
+                    rotNode.setProp('y', str(self.result[0][4] * 180/pi))
+                    rotNode.setProp('z', str(self.result[0][5] * 180/pi))
+                    rotNode.setProp('unit','degree')
                     q.addNextSibling(rotNode)
-                    #if len(node.xpathEval("rotationref")):
-                    #    rotref = node.xpathEval("rotationref")[0]
-                    #    rotref.freeNode()
                     # print  "Rotation Written"
                 break
                 # print q.next()
