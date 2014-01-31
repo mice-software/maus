@@ -81,10 +81,9 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->SetParticleEnergy(part.energy-particle->GetPDGMass());
   gun->SetParticleMomentumDirection(G4ThreeVector
                                  (part.px, part.py, part.pz));
- 
-  gun->
-  SetParticleSpin(G4ThreeVector
-                                   (part.sx, part.sy, part.sz));
+//   gun->
+//  SetParticleSpin(G4ThreeVector
+ //                                  (part.sx, part.sy, part.sz));
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
   if ( part.seed < 0 || part.seed > uint_max ) {
