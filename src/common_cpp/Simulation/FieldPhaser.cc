@@ -101,7 +101,7 @@ void FieldPhaser::SetPhases() {
     }
     if (_phaserVirtualPlanes->GetPlanes().size() > 0) {
         TearDown();
-        throw(Squeal(Squeal::recoverable, "Failed to phase cavities",
+        throw(Exception(Exception::recoverable, "Failed to phase cavities",
               "FieldPhaser::PhaseCavities"));
     }
     TearDown();

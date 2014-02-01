@@ -18,6 +18,7 @@ M. Littlefield
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable=W0611
 import os
 import shutil
 import geometry
@@ -62,7 +63,8 @@ def main():
     #            configuration.geometry_download_by+"'. Should be on of\n"+\
     #                       "run_number\ncurrent\nid\n")
     #Unzip file
-    #zip_filename = os.path.join(gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
+    #zip_filename = os.path.join
+    #               (gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
     #zipped_geom = Unpacker(zip_filename, gdml_cache)
     # zipped_geom.unzip_file()
     # fit the detector information to the survey points.

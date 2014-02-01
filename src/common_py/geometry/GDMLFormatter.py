@@ -118,7 +118,7 @@ class Formatter: #pylint: disable = R0902
         xmldoc.writexml(fout)
         fout.close()
         
-    def add_other_info(self):
+    def add_other_info(self): #pylint: disable = R0914, R0915, C0301
         """
         @method add_other_information
         
@@ -170,20 +170,25 @@ class Formatter: #pylint: disable = R0902
         file_numbers.appendChild(emr_file_number)
         
         tracker0_file_number = doc.createElement("Tracker0FileNumber")
-        tracker0_file_number.setAttribute("number", str(self.tracker0_file_number))
+        tracker0_file_number.setAttribute("number", 
+                                          str(self.tracker0_file_number))
         file_numbers.appendChild(tracker0_file_number)
         tracker1_file_number = doc.createElement("Tracker1FileNumber")
-        tracker1_file_number.setAttribute("number", str(self.tracker1_file_number))
+        tracker1_file_number.setAttribute("number", 
+                                          str(self.tracker1_file_number))
         file_numbers.appendChild(tracker1_file_number)
         
         absorber0_file_number = doc.createElement("Absorber0FileNumber")
-        absorber0_file_number.setAttribute("number", str(self.absorber0_file_number))
+        absorber0_file_number.setAttribute("number", 
+                                           str(self.absorber0_file_number))
         file_numbers.appendChild(absorber0_file_number)
         absorber1_file_number = doc.createElement("Absorber1FileNumber")
-        absorber1_file_number.setAttribute("number", str(self.absorber1_file_number))
+        absorber1_file_number.setAttribute("number", 
+                                           str(self.absorber1_file_number))
         file_numbers.appendChild(absorber1_file_number)
         absorber2_file_number = doc.createElement("Absorber2FileNumber")
-        absorber2_file_number.setAttribute("number", str(self.absorber2_file_number))
+        absorber2_file_number.setAttribute("number", 
+                                           str(self.absorber2_file_number))
         file_numbers.appendChild(absorber2_file_number)
 
         if file_numbers != None:

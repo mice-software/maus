@@ -339,6 +339,7 @@ survey_target_detectors = []
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
+Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
 Enable_V1290_Unpacking = True
@@ -348,6 +349,7 @@ Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
 Enable_VLSB_C_Unpacking = True
 Enable_DBB_Unpacking = True
+Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
@@ -395,7 +397,7 @@ TOF_calib_source = "CDB"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 
 TOF_findTriggerPixelCut = 0.5 # nanosecond
-TOF_makeSpacePiontCut = 0.5 # nanosecond
+TOF_makeSpacePointCut = 0.5 # nanosecond
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
@@ -408,6 +410,9 @@ Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
 KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+
+# this is used by the reconstuction of the EMR detectors
+EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space

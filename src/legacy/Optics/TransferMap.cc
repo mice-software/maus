@@ -136,7 +136,7 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& aPhaseSpaceVecto
 Tensor  TransferMap::GetMap(int order)    const
 {
 	if(order > GetOrder() || order - 2 > int(_higherOrderMaps.size()) ) return Tensor(6, order+1, 0);
-	if(order < 3) throw(Squeal(Squeal::recoverable, "Use GetMap for maps of order > 2", "TransferMap::GetOrder(int)"));
+	if(order < 3) throw(MAUS::Exception(MAUS::Exception::recoverable, "Use GetMap for maps of order > 2", "TransferMap::GetOrder(int)"));
 	return *_higherOrderMaps[order-3];
 }
 
@@ -296,9 +296,17 @@ double TransferMap::PhaseAdvance(int axis, double angle) const
 double TransferMap::PhaseAdvance(int axis) const
 {
 	CLHEP::HepMatrix subMatrix = GetFirstOrderMap().sub(axis*2+1, axis*2+2, axis*2+1, axis*2+2);
-	double    phaseAdvance = acos( (subMatrix[0][0] + subMatrix[1][1])/2. ) ;
-	if(phaseAdvance != phaseAdvance) throw(Squeal(Squeal::recoverable, "Complex phase advance", "TransferMap::PhaseAdvance")); 
-	return    phaseAdvance;
+  // TM given by
+  // cos(\phi) + \alpha sin(\phi), \beta sin(\phi) / p
+  // - \gamma sin(\phi),            cos(\phi) - \alpha sin(\phi)
+  // we can get the phase advance quadrant by considering both sin(phi) and
+  // cos(phi) and using atan2(phi)
+  double n00 = (subMatrix[0][0]-subMatrix[1][1])/2.; // alpha sin(phi)
+  double sin_phi = sqrt(-n00*n00 - subMatrix[0][1]*subMatrix[1][0]); // ((-alpha^2 + beta gamma) sin^2(phi) )^0.5
+  double cos_phi = (subMatrix[0][0] + subMatrix[1][1])/2.; // cos(phi)
+	double phaseAdvance = atan2(sin_phi, cos_phi);
+	if(phaseAdvance != phaseAdvance) throw(MAUS::Exception(MAUS::Exception::recoverable, "Complex phase advance", "TransferMap::PhaseAdvance")); 
+	return phaseAdvance;
 }
 
 MAUS::PolynomialMap* TransferMap::GetPolynomialMap() {

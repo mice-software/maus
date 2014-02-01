@@ -118,7 +118,7 @@ class MiceModule
     //Return the named int property
     bool    propertyBoolThis( std::string propertyName ) const;
     //Return propertyBool in the closest ancestor, including this one, that has the property
-    //throw a Squeal if ancestor tree does not have the property
+    //throw a Exception if ancestor tree does not have the property
     bool    propertyBool( std::string propertyName ) const;
 
     unsigned int	numPropertyBool() const 						{ return _bools.size(); };
@@ -129,7 +129,7 @@ class MiceModule
     //Return the named int property
     int			propertyIntThis( std::string propertyName ) const;
     //Return propertyInt in the closest ancestor, including this one, that has the property
-    //throw a Squeal if ancestor tree does not have the property
+    //throw a Exception if ancestor tree does not have the property
     int			propertyInt( std::string propertyName ) const;
 
     unsigned int	numPropertyInt() const 							{ return _ints.size(); };
@@ -140,7 +140,7 @@ class MiceModule
     //Return the named double property
     double		propertyDoubleThis( std::string propertyName ) const;
     //Return propertyDouble in the closest ancestor, including this one, that has the property
-    //throw a Squeal if ancestor tree does not have the property
+    //throw a Exception if ancestor tree does not have the property
     double		propertyDouble( std::string propertyName ) const;
 
     unsigned int	numPropertyDouble() const 						{ return _doubles.size(); };
@@ -151,7 +151,7 @@ class MiceModule
     //Return the named double property
     std::string		propertyStringThis( std::string propertyName) const;
     //Return propertyString in the closest ancestor, including this one, that has the property
-    //throw a Squeal if ancestor tree does not have the property
+    //throw a Exception if ancestor tree does not have the property
     std::string		propertyString( std::string  propertyName) const;
 
     unsigned int	numPropertyString() const 						{ return _strings.size(); };
@@ -161,7 +161,7 @@ class MiceModule
     //Return the named double propertyHep3Vector
     Hep3Vector		propertyHep3VectorThis( std::string propertyName) const;
     //Return propertyHep3Vector in the closest ancestor, including this one, that has the property
-    //throw a Squeal if ancestor tree does not have the property
+    //throw a Exception if ancestor tree does not have the property
     Hep3Vector		propertyHep3Vector( std::string ) const;
     unsigned int	numPropertyHep3Vector() const 						{ return _hep3vectors.size(); };
     void		ithHep3Vector( int i, std::string& name, Hep3Vector& val ) const;

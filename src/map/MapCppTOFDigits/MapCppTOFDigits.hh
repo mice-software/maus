@@ -40,6 +40,8 @@
 #include "Config/MiceModule.hh"  //  from old file?
 #include "Utils/TOFChannelMap.hh"
 
+namespace MAUS {
+
 class MapCppTOFDigits {
 
  public:
@@ -91,21 +93,25 @@ class MapCppTOFDigits {
    *  @param xDocInfo Json document with the TDC digit information. This is needed
    *  so ascosiate the proper ADC data to corresponding TDC data.
    */
-  bool getAdc(Json::Value xDocAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
+  bool getAdc(Json::Value xDocAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Exception);
 
   /** @brief process JSON document
    *  @param xDocTrigReq Json document with the trigger request for a specific particle event
    *  @param xDocInfo 
    */
   bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit,
-                  Json::Value &xDocDigit) throw(Squeal);
+                  Json::Value &xDocDigit) throw(Exception);
 
   /** @brief process JSON document
    *  @param document Receive a document with raw data and return
    *  a document with digits
    */
-  bool getTrig(Json::Value xDocTrig, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Squeal);
+  bool getTrig(Json::Value xDocTrig,
+               Json::Value xDocTdcHit,
+               Json::Value &xDocDigit) throw(Exception);
   bool map_init;
 };
+}
+
 #endif
 

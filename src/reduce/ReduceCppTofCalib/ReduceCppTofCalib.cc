@@ -17,7 +17,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/reduce/ReduceCppTofCalib/ReduceCppTofCalib.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
@@ -40,8 +40,8 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
+  } catch(Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch(std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }

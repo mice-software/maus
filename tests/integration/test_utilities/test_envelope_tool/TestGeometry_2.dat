@@ -1,0 +1,90 @@
+// Stage 6 sfofo cell coils
+
+Module Stage4Coils
+{
+  PropertyString Material Galactic
+  PropertyHep3Vector Dimensions 1000.0 1000.0 3000.0 mm 
+
+  // Set to Read to make the code run faster (rather than regenerate each time)
+  Substitution $FieldMapMode Read
+  // we start the lattice offset so that we correctly account for fringe
+  // field of any cells before the start (make sure Bz is really periodic)
+  Substitution $StartOffset -1
+  // total number of cells in the lattice; 3 at the start, one for physics,
+  // three at the end (again we want to make sure Bz is really periodic)
+  // note MAUS will make the first element and subsequently $NCells repeats 
+  Substitution $NCells       2
+
+  Module VirtualPlane
+  {
+    Volume None
+    Position 0.0 0.0 @RepeatNumber*50 mm
+    Rotation 0.0 0.0 0.0 degree
+    PropertyString SensitiveDetector Virtual
+    PropertyBool   RepeatModule2 True
+    PropertyInt    NumberOfRepeats 27.5*2
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 +205.0+2750.*($StartOffset+@RepeatNumber) mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -113.95*(-1)**@RepeatNumber
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+    PropertyString FieldName           FC
+    PropertyHep3Vector NominalAperture 263. 263. 210. mm
+    PropertyHep3Vector NominalOuter    263.+84. 263.+84. 210. mm
+    // Repeat
+    PropertyBool   RepeatModule2 True
+    PropertyInt    NumberOfRepeats $NCells
+  }
+  Module CouplingCoil
+  {
+    Volume None
+    Position 0.0 0.0 +1375.0+2750.*($StartOffset+@RepeatNumber) mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -96.21*(-1)**@RepeatNumber
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/coupling.fld
+    PropertyDouble CurrentDensity    1.
+    PropertyDouble Length          250.
+    PropertyDouble Thickness       116.
+    PropertyDouble InnerRadius     725.
+    PropertyString FieldName           CC
+    PropertyHep3Vector NominalAperture 750. 750. 116. mm
+    PropertyHep3Vector NominalOuter    750.+84. 750.+84. 116. mm
+    // Repeat
+    PropertyBool   RepeatModule2 True
+    PropertyInt    NumberOfRepeats $NCells
+  }
+  Module FocusCoil
+  {
+    Volume None
+    Position 0.0 0.0 2750.-205.0+2750.*($StartOffset+@RepeatNumber) mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor -113.95*(-1)**@RepeatNumber
+    // Field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode    $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/focus.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            210.
+    PropertyDouble Thickness          84.
+    PropertyDouble InnerRadius       263.
+    PropertyString FieldName           FC
+    PropertyHep3Vector NominalAperture 263. 263. 210. mm
+    PropertyHep3Vector NominalOuter    263.+84. 263.+84. 210. mm
+    // Repeat
+    PropertyBool   RepeatModule2 True
+    PropertyInt    NumberOfRepeats $NCells
+  }
+}
+

@@ -5,6 +5,29 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.7.7
+  The following changes were made:
+    - updated third party daq installation
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.6
+  The following changes were made:
+    - EMR Reconstruction
+    - first version of Global Track Reconstruction
+    - stability fixes for online reconstruction
+    - calls to squeals replaced by exceptions
+    - support for long long integers
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.5
+  The following changes were made:
+    - stability fixes
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.4
+  The following changes were made:
+    - Step IV geometry and CDB interface
+    - Examples for Optics python API
+    - Citation for MAUS
+    - stability fixes
+  If upgrading from a previous version, redo the entire installation
 MAUS-v0.7.3
   The following changes were made:
     - OutputCppROOT now writes to EOR directory

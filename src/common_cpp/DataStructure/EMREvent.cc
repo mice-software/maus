@@ -14,26 +14,46 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/DataStructure/EMREvent.hh"
-
+#include "DataStructure/EMREvent.hh"
+#include "DataStructure/EMRPlaneHit.hh"
 
 namespace MAUS {
 
-EMREvent::EMREvent() {
+EMREvent::EMREvent()
+  : _emrplanehitarray() {
+//    for (int planeid=0; planeid<48; planeid++) {
+//         EMRPlaneHit emrplanehit;
+//         emrplanehit.SetPlane(planeid);
+//         _emrplanehitarray.push_back(emrplanehit);
+//    }
 }
 
 EMREvent::EMREvent(const EMREvent& _emrevent) {
-    *this = _emrevent;
+  *this = _emrevent;
 }
 
 EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
-    if (this == &_emrevent) {
+  if (this == &_emrevent) {
         return *this;
-    }
-    return *this;
+  }
+  SetEMRPlaneHitArray(_emrevent._emrplanehitarray);
+  return *this;
 }
 
 EMREvent::~EMREvent() {
+  int nplhits = _emrplanehitarray.size();
+  for (int i = 0; i < nplhits; i++)
+    delete _emrplanehitarray[i];
+
+  _emrplanehitarray.resize(0);
+}
+
+EMRPlaneHitArray EMREvent::GetEMRPlaneHitArray() const {
+  return _emrplanehitarray;
+}
+
+void EMREvent::SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray) {
+  _emrplanehitarray = emrplanehitarray;
 }
 }
 

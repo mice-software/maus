@@ -1,0 +1,174 @@
+
+Configuration TestGeometry
+{
+    Dimensions 5.01 5. 21 m
+    PropertyString Material Galactic
+    Substitution $Test 1e-3
+    Module Virtuals
+    {
+       Volume None
+       PropertyHep3Vector Position 0.0 0.0 0.0+0.05*@RepeatNumber m
+       PropertyString     SensitiveDetector Virtual
+       PropertyBool       RepeatModule2 True
+       PropertyInt        NumberOfRepeats 60
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      Position 1.6 0.0 0. m
+      Rotation 0.0 45.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test     T //normalise to 1 T/m
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+      PropertyDouble EndLength           0.1     m
+      PropertyDouble CentreLength        0.5     m
+      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         -1
+      PropertyString FieldName           Q1
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+    }
+    Module Dipole
+    {
+      Volume None
+      PropertyHep3Vector Position 0.3 0.0 1.2 m
+      PropertyHep3Vector Rotation 0.0 22.5 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                1 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       1.0   T
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+      PropertyDouble EndLength           0.1     m
+      PropertyDouble CentreLength        0.5     m
+      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         -0.9
+      PropertyString FieldName           D2
+      PropertyHep3Vector NominalAperture 500. 200. 550 mm
+      PropertyHep3Vector NominalOuter    600. 250. 550 mm
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      PropertyHep3Vector Position 0.0 0.0 2.0 m
+      PropertyHep3Vector Rotation 0.0 0.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test   T
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+      PropertyDouble EndLength           0.1     m
+      PropertyDouble CentreLength        0.5     m
+      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         +1
+      PropertyString FieldName           Q2
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+    }
+}
+    Module CenterCoil
+    {
+      Volume None
+      Position 1.6 0.0 0. m
+      Rotation 0.0 45.0 0.0 degree
+      ScaleFactor +200.
+      // Field
+      PropertyString FieldType      Solenoid
+      PropertyString FieldMapMode   Write
+      PropertyString FileName       ${MAUS_ROOT_DIR}/tmp/center.fld
+      PropertyDouble CurrentDensity 1.
+      PropertyDouble Length         2000. mm
+      PropertyDouble Thickness      20.
+      PropertyDouble InnerRadius    60.
+      PropertyString FieldName      CC
+      PropertyHep3Vector NominalAperture 258. 258. 2000 mm
+      PropertyHep3Vector NominalOuter    350. 350. 2000 mm
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      PropertyHep3Vector Position 0.0 0.0 3.0 m
+      PropertyHep3Vector Rotation 0.0 0.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test     T //normalise to 1 T/m
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+//      PropertyDouble EndLength           0.1     m
+//      PropertyDouble CentreLength        0.5     m
+//      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         -1
+      PropertyString FieldName           Q3
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      PropertyHep3Vector Position 0.0 0.0 4.0 m
+      PropertyHep3Vector Rotation 0.0 0.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test     T //normalise to 1 T/m
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+//      PropertyDouble EndLength           0.1     m
+//      PropertyDouble CentreLength        0.5     m
+//      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         +1
+      PropertyString FieldName           Q4
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      PropertyHep3Vector Position 0.0 0.0 5.0 m
+      PropertyHep3Vector Rotation 0.0 0.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test     T //normalise to 1 T/m
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+//      PropertyDouble EndLength           0.1     m
+//      PropertyDouble CentreLength        0.5     m
+//      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         -1
+      PropertyString FieldName           Q5
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+    }
+    Module QuadTypeQC
+    {
+      Volume None
+      PropertyHep3Vector Position 0.0 0.0 6.0 m
+      PropertyHep3Vector Rotation 0.0 0.0 0.0 degree
+      PropertyString FieldType           Multipole
+      PropertyInt    Pole                2 //Quad field
+      PropertyInt    MaxEndPole          3 //Simulate end field up to sextupole order
+      PropertyDouble FieldStrength       $Test   T
+      PropertyDouble Height              1.0     m
+      PropertyDouble Width               1.0     m     
+      PropertyDouble Length              1.0     m
+//      PropertyDouble EndLength           0.1     m
+//      PropertyDouble CentreLength        0.5     m
+//      PropertyString EndFieldType        Tanh
+      PropertyDouble ScaleFactor         +1
+      PropertyString FieldName           Q6
+      PropertyHep3Vector NominalAperture 172. 172. 550 mm
+      PropertyHep3Vector NominalOuter    250. 250. 550 mm
+   }
+}

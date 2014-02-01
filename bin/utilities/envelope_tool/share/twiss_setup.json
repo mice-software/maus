@@ -1,0 +1,111 @@
+{
+"type":"transient_frame",
+"name":"Twiss Setup",
+"children":[{
+    "type":"vertical_frame",
+    "children":[{
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"1000.0",
+            "label_length":10,
+            "name":"beta_x",
+            "tool_tip":"Horizontal beta function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"alpha_x",
+            "tool_tip":"Horizontal alpha function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"1.0",
+            "label_length":10,
+            "name":"emittance_x",
+            "tool_tip":"Horizontal emittance"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"1000.0",
+            "label_length":10,
+            "name":"beta_y",
+            "tool_tip":"Vertical beta function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"alpha_y",
+            "tool_tip":"Vertical alpha function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"1.0",
+            "label_length":10,
+            "name":"emittance_y",
+            "tool_tip":"Vertical emittance"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"10.0",
+            "label_length":10,
+            "name":"beta_l",
+            "tool_tip":"Longitudinal beta function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"alpha_l",
+            "tool_tip":"Longitudinal alpha function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"1.0",
+            "label_length":10,
+            "name":"emittance_l",
+            "tool_tip":"Longitudinal emittance"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_x",
+            "tool_tip":"Horizontal dispersion"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_prime_x",
+            "tool_tip":"Horizontal dispersion prime"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_y",
+            "tool_tip":"Vertical dispersion"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_prime_y",
+            "tool_tip":"Vertical dispersion prime"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"button",
+            "name":"&Okay"
+        }, {
+            "type":"button",
+            "name":"&Cancel"
+        }]
+    }]
+}]
+}

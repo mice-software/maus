@@ -38,7 +38,7 @@
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace JsonWrapper {
   /** @brief List of data types allowed by json
@@ -50,25 +50,25 @@ namespace JsonWrapper {
    */
   enum JsonType {
     nullValue,     // 'null' value
-    uintValue,     // unsigned integer value;
+    uintValue,     // unsigned integer value
     intValue,      // signed integer value
     realValue,     // double value
-    stringValue,   // UTF-8 string value.
+    stringValue,   // UTF-8 string value
     booleanValue,  // bool value
     arrayValue,    // array value (ordered list)
-    objectValue,   // object value (collection of name/value pairs).
-    anyValue       // object value (collection of name/value pairs).
+    objectValue,   // object value (collection of name/value pairs)
+    anyValue       // object value (collection of name/value pairs)
   };
 
   /** @brief Convert a string to a Json::Value tree 
    *
    *  @param json_in raw string holding the configuration information
    *
-   *  Read in a string and return as a Json value. Throw a Squeal if the reader
+   *  Read in a string and return as a Json value. Throw a Exception if the reader
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  Json::Value StringToJson(const std::string& json_in) throw(Squeal);
+  Json::Value StringToJson(const std::string& json_in) throw(MAUS::Exception);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
@@ -82,12 +82,12 @@ namespace JsonWrapper {
    *  @param value_index index of the value in the array
    *  @param value_type type of the value we want to get
    *
-   *  Returns the Json::Value on success. Throws an exception of type Squeal on
+   *  Returns the Json::Value on success. Throws an exception of type Exception on
    *  failure
    */
   Json::Value GetItem(const Json::Value& array,
                       const size_t value_index,
-                      const JsonType value_type) throw(Squeal);
+                      const JsonType value_type) throw(MAUS::Exception);
 
   /** @brief Get a property from a Json object (hash)
    *
@@ -96,11 +96,11 @@ namespace JsonWrapper {
    *  @param value_type type of the value we want to get
    *
    *  Attempt to access a branch from Json. If the branch is not found, throw a
-   *  Squeal.
+   *  Exception.
    */
   Json::Value GetProperty(const Json::Value& object,
                           const std::string& value_name,
-                          const JsonType value_type) throw(Squeal);
+                          const JsonType value_type) throw(MAUS::Exception);
 
 
   /** @brief Convert from a json three vector to a CLHEP three vector
@@ -109,7 +109,7 @@ namespace JsonWrapper {
    *         an exception if the conversion fails.
    */
   CLHEP::Hep3Vector JsonToThreeVector(const Json::Value& json_vec)
-      throw(Squeal);
+      throw(MAUS::Exception);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
@@ -121,7 +121,7 @@ namespace JsonWrapper {
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(Squeal);
+  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(MAUS::Exception);
 
   /** @brief Return true if types are equal or anyValue
    */
@@ -142,28 +142,43 @@ namespace JsonWrapper {
    *
    *  @param tolerance float tolerance - requirement is that
    *         fabs(float_1-float_2) < tolerance
+   *  @param int_permissive return true even if a is an int and b is a
+   *         uint (recursively)
    */
   bool AlmostEqual(const Json::Value& value_1,
                    const Json::Value& value_2,
-                   const double tolerance);
+                   const double tolerance,
+                   bool int_permissive = false);
 
   /** @brief Check for equality between json arrays
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
+   *
+   *  @param tolerance float tolerance - requirement is that
+   *         fabs(float_1-float_2) < tolerance
+   *  @param int_permissive return true even if a is an int and b is a
+   *         uint (recursively)
    */
   bool ArrayEqual(const Json::Value& value_1,
                   const Json::Value& value_2,
-                  const double tolerance);
+                  const double tolerance,
+                  bool int_permissive = false);
 
   /** @brief Check for equality between json objects
    *
    *  Check that value_1 == value_2, within float tolerance. Note that there is
    *  no type checking done here.
+   *
+   *  @param tolerance float tolerance - requirement is that
+   *         fabs(float_1-float_2) < tolerance
+   *  @param int_permissive return true even if a is an int and b is a
+   *         uint (recursively)
    */
   bool ObjectEqual(const Json::Value& value_1,
                    const Json::Value& value_2,
-                   const double tolerance);
+                   const double tolerance,
+                   bool int_permissive = false);
 
 
   /** @brief Merge two json objects
@@ -219,7 +234,7 @@ namespace Path {
   /** @brief Return the json value corresponding to a given path
    *
    *  Return the json value located at a given path. If the path cannot be
-   *  accessed, throw a Squeal.
+   *  accessed, throw a Exception.
    */
   Json::Value& DereferencePath(Json::Value& json, const std::string& path);
 

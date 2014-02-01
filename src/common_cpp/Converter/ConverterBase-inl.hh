@@ -17,7 +17,7 @@
 #ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_INL_
 #define _SRC_COMMON_CPP_CONVERTER_CONVERTERBASE_INL_
 #include <string>
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Utils/CppErrorHandler.hh"
 #include "API/APIExceptions.hh"
 
