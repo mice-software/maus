@@ -65,30 +65,27 @@ class TestSciFiRecon(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree()
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
-        tree.GetEntry(1)
-        spill = data.GetSpill()
-        print "Using spill " + str(spill.GetSpillNumber())
 
-        self.assertEqual(spill.GetDaqEventType(), "physics_event")
-        self.assertEqual(spill.GetReconEvents().size(), 2)
+        # Check the mean and standard deviation of some final track data
+        tree.Draw("_spill._recon._scifi_event._scifitracks._P_value>>h1")
+        h1 = ROOT.gDirectory.Get('h1')
+        self.assertGreater(h1.GetMean(), 0.93)
+        self.assertLess(h1.GetRMS(), 0.1)
 
-        # Use the first recon event only
-        evt = spill.GetReconEvents()[0].GetSciFiEvent()
+        tree.Draw("_spill._recon._scifi_event._scifitracks._f_chi2>>h2")
+        h2 = ROOT.gDirectory.Get('h2')
+        self.assertLess(h2.GetMean(), 10)
+        self.assertLess(h2.GetRMS(), 5)        
 
-        # Check have found tracks with correct params & correct seed spoints
-        self.assertEqual(evt.spacepoints().size(), 10)
-        trks = evt.helicalprtracks()
-        self.assertEqual(trks.size(), 2)
-
-        sds0 = trks[0].get_spacepoints() # Tracker 1
-        self.assertAlmostEqual(trks[0].get_R(), 38.68, 2)
-        self.assertAlmostEqual(trks[0].get_dsdz(), -0.2304, 4)
-        self.assertEqual(sds0.size(), 5)
-
-        sds1 = trks[1].get_spacepoints() # Tracker 2
-        self.assertAlmostEqual(trks[1].get_R(), 18.86, 2)
-        self.assertAlmostEqual(trks[1].get_dsdz(), 0.1155, 4)
-        self.assertEqual(sds1.size(), 5)
+        tree.Draw("_spill._recon._scifi_event._scifitracks._s_chi2>>h3")
+        h3 = ROOT.gDirectory.Get('h3')
+        self.assertLess(h3.GetMean(), 20)
+        self.assertLess(h3.GetRMS(), 10)
+        
+        # Most particles should be identified correctly as positives
+        tree.Draw("_spill._recon._scifi_event._scifitracks._charge>>h4")
+        h4 = ROOT.gDirectory.Get('h4')
+        self.assertGreater(h4.GetMean(), 0.95) 
 
 if __name__ == "__main__":
     unittest.main()

@@ -31,9 +31,13 @@ SciFiLookup::~SciFiLookup() {
 
 
 bool SciFiLookup::make_hits_map(MCEvent* evt) {
-  // Check the pointer is valid
+  // Check the pointers are valid
   if (!evt) {
     std::cerr << "Invalid MC event pointer supplied, aborting" << std::endl;
+    return false;
+  }
+  if (!evt->GetSciFiHits()) {
+    std::cerr << "Invalid MC Hits container pointer supplied, aborting" << std::endl;
     return false;
   }
 
