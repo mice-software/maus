@@ -113,9 +113,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             # print  self.result
             # if self.FitQP() == 0: isgood = True
             # else: isgood = False
-            if len(self.result) ==  2 and self.UseGDML:
-                if not self.writeResulttoGDML(detectorPath, detectorFile):
-                    print "Result not recorded to "+detectorPath
+        if len(self.result) ==  2 and self.UseGDML:
+            if not self.writeResulttoGDML(isgood, detectorPath, detectorFile):
+                print "Result not recorded to "+detectorPath
                 # print  "GDML corrected"
         else: #
             print "Fit abandoned"
@@ -340,13 +340,13 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
 
         f[0] = chi2
 
-    def writeResulttoGDML(self, path, newFile):
+    def writeResulttoGDML(self, isgood, path, newFile):
         """
         @method writeResulttoGDML: A method to write out the result of
         a fit between a set of survey measurements and the reference points in
         the detector frame to a GDML file describing the experimental geometry.
         """
-        isgood = True
+        
         # path = "Detector_Information/TOF/TOF0"
         det = self.datafile.xpathEval(path)
         if len(det)==0:
@@ -363,33 +363,34 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                 if newFile and os.path.exists(os.path.join(self.dl_dir, newFile)):
                     filepath = node.xpathEval("file")[0]
                     filepath.setProp('name', newFile)
-                q = node.xpathEval("position")[0]
-                q.setProp('x', str(self.result[0][0]))
-                q.setProp('y', str(self.result[0][1]))
-                q.setProp('z', str(self.result[0][2]))
-                line    = PosRefName
-                rotName = line.replace('pos','rot')
-                # print  "Position corrected"
-                nodefound = 1
-                if len(node.xpathEval("rotation")):
-                    r = node.xpathEval("rotation")[0]
+                if isgood: # the fit has been conducted and the result recorded
+                    q = node.xpathEval("position")[0]
+                    q.setProp('x', str(self.result[0][0]))
+                    q.setProp('y', str(self.result[0][1]))
+                    q.setProp('z', str(self.result[0][2]))
+                    line    = PosRefName
+                    rotName = line.replace('pos','rot')
+                    # print  "Position corrected"
                     nodefound = 1
-                    r.setProp('x', str(self.result[0][3]))
-                    r.setProp('y', str(self.result[0][4]))
-                    r.setProp('z', str(self.result[0][5]))
-                else:
-                    # if len(node.xpathEval("rotationref"))==1:
-                    #     rotref = node.xpathEval("rotationref")[0]
-                    #     rotref.unlinkNode()
-                    #     rotref.freeNode()
-                    rotNode = libxml2.newNode("rotation")
-                    rotNode.setProp('name',rotName)
-                    rotNode.setProp('x', str(self.result[0][3] * 180/pi))
-                    rotNode.setProp('y', str(self.result[0][4] * 180/pi))
-                    rotNode.setProp('z', str(self.result[0][5] * 180/pi))
-                    rotNode.setProp('unit','degree')
-                    q.addNextSibling(rotNode)
-                    # print  "Rotation Written"
+                    if len(node.xpathEval("rotation")):
+                        r = node.xpathEval("rotation")[0]
+                        nodefound = 1
+                        r.setProp('x', str(self.result[0][3]))
+                        r.setProp('y', str(self.result[0][4]))
+                        r.setProp('z', str(self.result[0][5]))
+                    else:
+                        # if len(node.xpathEval("rotationref"))==1:
+                        #     rotref = node.xpathEval("rotationref")[0]
+                        #     rotref.unlinkNode()
+                        #     rotref.freeNode()
+                        rotNode = libxml2.newNode("rotation")
+                        rotNode.setProp('name',rotName)
+                        rotNode.setProp('x', str(self.result[0][3] * 180/pi))
+                        rotNode.setProp('y', str(self.result[0][4] * 180/pi))
+                        rotNode.setProp('z', str(self.result[0][5] * 180/pi))
+                        rotNode.setProp('unit','degree')
+                        q.addNextSibling(rotNode)
+                        # print  "Rotation Written"
                 break
                 # print q.next()
         if nodefound == 0:
