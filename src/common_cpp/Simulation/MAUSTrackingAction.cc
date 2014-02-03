@@ -52,15 +52,15 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         momentum["z"] = aTrack->GetMomentum().z();
 
 
-       // Json::Value spin(Json::objectValue);
-       // spin["x"] = aTrack->GetSpin().x();
-       // spin["y"] = aTrack->GetSpin().y();
-       // spin["z"] = aTrack->GetSpin().z();
+        Json::Value Polarization(Json::objectValue);
+        Polarization["x"] = aTrack->GetPolarization().x();
+        Polarization["y"] = aTrack->GetPolarization().y();
+        Polarization["z"] = aTrack->GetPolarization().z();
 
         Json::Value json_track(Json::objectValue);
         json_track["initial_position"] = position;
         json_track["initial_momentum"] = momentum;
-     //   json_track["initial_spin"] = spin;        
+        json_track["initial_Polarization"] = Polarization;        
         json_track["particle_id"] = aTrack->GetDefinition()->GetPDGEncoding();
         json_track["track_id"] = aTrack->GetTrackID();
         json_track["parent_track_id"] = aTrack->GetParentID();
@@ -91,14 +91,14 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
         momentum["z"] = aTrack->GetMomentum().z();
 
 
-    //    Json::Value spin;
-      //  spin["x"] = aTrack->GetSpin().x();
-        //spin["y"] = aTrack->GetSpin().y();
-        //spin["z"] = aTrack->GetSpin().z();
+        Json::Value Polarization;
+        Polarization["x"] = aTrack->GetPolarization().x();
+        Polarization["y"] = aTrack->GetPolarization().y();
+        Polarization["z"] = aTrack->GetPolarization().z();
 
         json_track["final_position"] = position;
         json_track["final_momentum"] = momentum;
-  //      json_track["final_spin"] = spin;
+        json_track["final_Polarization"] = Polarization;
         if (_stepping->GetWillKeepSteps())
             json_track["steps"] = _stepping->GetSteps();
         _tracks[_tracks.size()-1] = json_track;
