@@ -37,8 +37,8 @@ LeastSquaresFitter::~LeastSquaresFitter() {}
 bool LeastSquaresFitter::LoadGlobals() {
   if (!Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
-    _sd_1to4 = (*json)["SciFiSD1To4"].asDouble();
-    _sd_5 = (*json)["SciFiSD5"].asDouble();
+    _sd_1to4 = (*json)["SciFi_sigma_triplet"].asDouble();
+    _sd_5 = (*json)["SciFi_sigma_tracker0_station5"].asDouble();
     _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
     return true;
   } else {
