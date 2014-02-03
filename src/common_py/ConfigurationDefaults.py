@@ -248,7 +248,6 @@ SciFiSD5 = 0.4298 # Position error associated with station 5 (mm)
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
 SciFiPerChanFlag = 0
 SciFiNoiseFlag = 0
-SciFiDigitNPECut = 1.5 # photoelectrons
 SciFiCrossTalkSigma = 50.0
 SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
