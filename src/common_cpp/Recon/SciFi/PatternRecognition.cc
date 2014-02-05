@@ -18,6 +18,7 @@
 // C headers
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Units/PhysicalConstants.h>
+#include <json/json.h>
 
 // C++ headers
 // #include <iostream>
@@ -35,6 +36,8 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 
 
 namespace MAUS {
@@ -48,20 +51,55 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
-PatternRecognition::PatternRecognition(): _verb(0),
-                                          _lsq(_sd_1to4, _sd_5, _R_res_cut) {
-  // Do nothing;
+PatternRecognition::PatternRecognition(): _straight_pr_on(true),
+                                          _helical_pr_on(true),
+                                          _verb(0),
+                                          _n_trackers(2),
+                                          _n_stations(5),
+                                          _sd_1to4(0.3844),
+                                          _sd_5(0.4298),
+                                          _sd_phi_1to4(1.0),
+                                          _sd_phi_5(1.0),
+                                          _res_cut(2.0),
+                                          _R_res_cut(150.0),
+                                          _chisq_cut(15.0),
+                                          _sz_chisq_cut(4.0),
+                                          _n_turns_cut(0.75),
+                                          _Pt_max(180.0),
+                                          _Pz_min(50.0) {
+  bool success = LoadGlobals();
+  if (!success) {
+    std::cerr << "WARNING: Pattern Recognition failed to load Globals, using default values\n";
+  }
 }
 
 PatternRecognition::~PatternRecognition() {
   // Do nothing
 }
 
-void PatternRecognition::process(const bool helical_pr_on, const bool straight_pr_on,
-                                 SciFiEvent &evt) {
+bool PatternRecognition::LoadGlobals() {
+  if (!Globals::HasInstance()) {
+    Json::Value *json = Globals::GetConfigurationCards();
+    _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _n_trackers = (*json)["SciFinTrackers"].asInt();
+    _n_stations = (*json)["SciFinStations"].asInt();
+    _sd_1to4 = (*json)["SciFi_sigma_triplet"].asDouble();
+    _sd_5 = (*json)["SciFi_sigma_tracker0_station5"].asDouble();
+    _sd_phi_1to4 = (*json)["SciFi_sigma_phi_1to4"].asDouble();
+    _sd_phi_5 = (*json)["SciFi_sigma_phi_5"].asDouble();
+    _res_cut = (*json)["SciFiStraightRoadCut"].asDouble();
+    _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
+    _n_turns_cut = (*json)["SciFiNTurnsCut"].asDouble();
+    _Pt_max = (*json)["SciFiMaxPt"].asDouble();
+    _Pz_min = (*json)["SciFiMinPz"].asDouble();
+    return true;
+  } else {
+    return false;
+  }
+}
 
-  set_helical_pr_on(helical_pr_on);
-  set_straight_pr_on(straight_pr_on);
+void PatternRecognition::process(SciFiEvent &evt) {
 
   if ( evt.spacepoints().size() > 0 ) {
 
@@ -398,8 +436,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
         // Fit track
         SimpleLine line_x, line_y;
-        _lsq.linear_fit(z, x, x_err, line_x);
-        _lsq.linear_fit(z, y, y_err, line_y);
+        LeastSquaresFitter::linear_fit(z, x, x_err, line_x);
+        LeastSquaresFitter::linear_fit(z, y, y_err, line_y);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _chisq_cut ) &&
@@ -506,7 +544,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Perform a circle fit now that we have found a set of spacepoints
   SimpleCircle c_trial;
-  bool good_radius = _lsq.circle_fit(spnts, c_trial);
+  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut, spnts, c_trial);
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( n_points - 2 ) < _chisq_cut ) ) {
@@ -588,7 +626,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   std::vector<double> s_i = SciFiTools::phi_to_s(circle.get_R(), true_phi_i);
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  _lsq.linear_fit(z_i, s_i, phi_err, line_sz);
+  LeastSquaresFitter::linear_fit(z_i, s_i, phi_err, line_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {

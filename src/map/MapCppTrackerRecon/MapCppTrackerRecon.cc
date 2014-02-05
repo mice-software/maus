@@ -40,8 +40,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
       GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
-    _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
     _size_exception = (*json)["SciFiClustExcept"].asInt();
     _min_npe        = (*json)["SciFiNPECut"].asDouble();
@@ -85,7 +85,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
+          pattern_recognition(*event);
         }
         // Kalman Track Fit.
         if ( _kalman_on ) {
@@ -156,11 +156,15 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
-                                             SciFiEvent &evt) {
-  PatternRecognition pr1;
+void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+  PatternRecognition pr1; // Pat rec constructor calls Globals again
   pr1.set_verbosity(0);
-  pr1.process(helical_pr_on, straight_pr_on, evt);
+  // We let the Map's helical and straight flags overide the interal pat rec variables for these,
+  // (pulled by pat rec from Globals) as this way we can customise which type runs for
+  // testing purposes.
+  pr1.set_helical_pr_on(_helical_pr_on);
+  pr1.set_straight_pr_on(_straight_pr_on);
+  pr1.process(evt);
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {

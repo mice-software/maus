@@ -33,8 +33,6 @@ class LeastSquaresFitterTest : public ::testing::Test {
 
 TEST_F(LeastSquaresFitterTest, test_circle_fit) {
 
-  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
-
   // Set up spacepoints from an MC helical track
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
   SciFiSpacePoint *sp2 = new SciFiSpacePoint();
@@ -67,7 +65,7 @@ TEST_F(LeastSquaresFitterTest, test_circle_fit) {
   spnts.push_back(sp4);
 
   SimpleCircle circle;
-  bool good_radius = lsq.circle_fit(spnts, circle);
+  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle);
 
   double epsilon = 0.01;
 
@@ -79,8 +77,6 @@ TEST_F(LeastSquaresFitterTest, test_circle_fit) {
 }
 
 TEST_F(LeastSquaresFitterTest, test_linear_fit) {
-
-  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
 
   // Test with a simple line, c = 2, m = 1, with three points, small errors
   std::vector<double> x, y, y_err;
@@ -95,7 +91,7 @@ TEST_F(LeastSquaresFitterTest, test_linear_fit) {
   y_err.push_back(0.05);
 
   SimpleLine line;
-  lsq.linear_fit(x, y, y_err, line);
+  LeastSquaresFitter::linear_fit(x, y, y_err, line);
 
   double epsilon = 0.00001;
 
