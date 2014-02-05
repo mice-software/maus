@@ -301,7 +301,9 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
   spnts[17] = sp1;
 
   // Perform the recon
-  pr.process(true, false, evt1); // Helical on, Straight off
+  pr.set_helical_pr_on(true);
+  pr.set_straight_pr_on(false);
+  pr.process(evt1);
 
   std::vector<SciFiStraightPRTrack*> strks;
   std::vector<SciFiHelicalPRTrack*> htrks;
@@ -1078,9 +1080,8 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   spnts.push_back(sp4);
   spnts.push_back(sp5);
 
-  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
   SimpleCircle circle;
-  bool good_radius = lsq.circle_fit(spnts, circle);
+  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle);
 
   double epsilon = 0.01;
 
