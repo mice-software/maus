@@ -45,7 +45,7 @@ namespace MAUS {
     try {
       c = getConverter<INPUT, OUTPUT>();
     }
-    catch(ConverterNotFoundException& e) {
+    catch (ConverterNotFoundException& e) {
       if (c) { delete c; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
       return 0;
@@ -58,14 +58,14 @@ namespace MAUS {
     try {
       o = c->convert(i);
     }
-    catch(Exception& s) {
+    catch (Exception& s) {
       CppErrorHandler::getInstance()->HandleExceptionNoJson(s, "ConverterFactory");
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
 //       if(c){ delete c; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
     }
-    catch(...) {
+    catch (...) {
       if (c) { delete c; }
       throw UnhandledException("ConverterFactory");
     }

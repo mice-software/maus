@@ -1,0 +1,134 @@
+\section{Circle parameters from three points}
+\label{App:SciFiThreePointCircle}
+
+A circle in the plane $z=0$ may be parameterised as:
+\begin{equation}
+  ( x - X_0 )^2 + ( y - Y_0 )^2 = \rho^2 \, ;
+\end{equation}
+where $(X_0, Y_0)$ is the position of the centre of the circle and $\rho$
+is its radius.
+Expanding:
+\begin{equation}
+  (x^2+y^2) - 2 X_0 x - 2 Y_0 y = \rho^2 -( X_0^2 + Y_0^2 ) \, ;
+\end{equation}
+which implies:
+\begin{equation}
+  \frac{(x^2+y^2)}{\rho^2 -( X_0^2 + Y_0^2 )} - 
+  \frac{2 X_0 x}{\rho^2 -( X_0^2 + Y_0^2 )}   - 
+  \frac{2 Y_0 y}{\rho^2 -( X_0^2 + Y_0^2 )} = 1 \, .
+\end{equation}
+The circle may be parameterised:
+\begin{equation}
+  \alpha(x^2+y^2) + \beta x + \gamma y + \kappa = 0 \, ;
+  \label{Eq:CrclPrm}
+\end{equation}
+where:
+\begin{eqnarray}
+  \alpha & = & \frac{1}{\rho^2 - ( X_0^2 + Y_0^2 )}        \, ;          \\
+  \beta  & = & -2 X_0 \alpha                           \, ;          \\
+  \gamma & = & -2 Y_0 \alpha                           \, ;          \\
+  \kappa & = & -1                                       \; .
+\end{eqnarray}
+These equations are readily inverted to yield:
+\begin{eqnarray}
+  X_0 & = & \frac{-\beta}{2 \alpha}                    \, ;
+  \label{Eq:Param1}                                                  \\
+  Y_0 & = & \frac{-\gamma}{2 \alpha}                   \, ; 
+  \label{Eq:Param2}                                                  \\
+  \rho   & = & \sqrt{
+                  \frac{\beta^2 + \gamma^2}{4 \alpha^2}
+                  - \frac{\kappa}{\alpha}
+                  } \, .
+  \label{Eq:Param3}
+\end{eqnarray}
+
+The equation of a circle passing through three points $(x_i,y_i)$,
+where $i=1,2,3$ can be found from:
+\begin{equation}
+  \left|
+    \begin{matrix}
+      x^2+y^2     & x  & y   & 1   \\
+      x_1^2+y_1^2 & x_1 & y_1 & 1   \\
+      x_2^2+y_2^2 & x_2 & y_2 & 1   \\
+      x_3^2+y_3^3 & x_3 & y_3 & 1
+    \end{matrix}
+  \right|
+  =0 \, ;
+\end{equation}
+which can be re-written as:
+\begin{equation}
+  (x^2+y^2)
+  \left|
+    \begin{matrix}
+      x_1 & y_1 & 1 \\
+      x_2 & y_2 & 1 \\
+      x_3 & y_3 & 1
+    \end{matrix}
+  \right|
+  -x
+  \left|
+    \begin{matrix}
+      x_1^2+y_1^2 & y_1 & 1 \\
+      x_2^2+y_2^2 & y_2 & 1 \\
+      x_3^2+y_3^3 & y_3 & 1
+    \end{matrix}
+  \right|
+  +y
+  \left|
+    \begin{matrix}
+      x_1^2+y_1^2 & x_1 & 1 \\
+      x_2^2+y_2^2 & x_2 & 1 \\
+      x_3^2+y_3^3 & x_3 & 1
+    \end{matrix}
+  \right|
+  -
+  \left|
+    \begin{matrix}
+      x_1^2+y_1^2 & x_1 & y_1 \\
+      x_2^2+y_2^2 & x_2 & y_2 \\
+      x_3^2+y_3^3 & x_3 & y_3
+    \end{matrix}
+  \right|
+  =0 \, .
+\end{equation}
+Comparing this relation with equation \ref{Eq:CrclPrm}:
+\begin{eqnarray}
+  \alpha & = & \left|
+                 \begin{matrix}
+                   x_1 & y_1 & 1\\
+                   x_2 & y_2 & 1\\
+                   x_3 & y_3 & 1
+                 \end{matrix}
+               \right|                                    \\
+  \beta  & = & -\left|
+                 \begin{matrix}
+                   x_1^2+y_1^2 & y_1 & 1\\
+                   x_2^2+y_2^2 & y_2 & 1\\
+                   x_3^2+y_3^3 & y_3  & 1
+                 \end{matrix}
+               \right|                                    \\
+  \gamma & = & \left|
+                 \begin{matrix}
+                   x_1^2+y_1^2 & x_1 & 1\\
+                   x_2^2+y_2^2 & x_2 & 1\\
+                   x_3^2+y_3^3 & x_3 & 1
+                 \end{matrix}
+               \right|                                   \\
+  \kappa & = & -\left|
+                 \begin{matrix}
+                   x_1^2+y_1^2 & x_1 & y_1 \\
+                   x_2^2+y_2^2 & x_2 & y_2 \\
+                   x_3^2+y_3^3 & x_3 & y_3
+                 \end{matrix}
+               \right| \, .
+\end{eqnarray}
+Noting that:
+\begin{equation}
+  (x + \frac{\beta}{2 \alpha})^2  +
+  (y + \frac{\gamma}{2 \alpha})^2 =
+  \left( \sqrt{\frac{\beta^2 + \gamma^2}{4 \alpha^2} -
+         \frac{\kappa}{\alpha} } 
+  \right)^2 \, .
+\end{equation}
+the position of the centre of the circle, $(X_0, Y_0)$ and its radius,
+$\rho$, are given by equations \ref{Eq:Param1} to \ref{Eq:Param3}.

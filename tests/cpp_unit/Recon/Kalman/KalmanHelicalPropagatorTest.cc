@@ -36,11 +36,11 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
     double mx0 = 15.*fabs(kappa);
     double my0 = 15.*fabs(kappa);
 
-    double x1 = 29.614;
-    double y1 = -3.0019;
+    // double x1 = 29.614;
+    // double y1 = -3.0019;
     double z1 = 350.;
-    double mx1 = 0.027021;
-    double my1 = -0.10257;
+    // double mx1 = 0.027021;
+    // double my1 = -0.10257;
 
     old_site.set_z(z0);
     new_site.set_z(z1);
@@ -137,6 +137,7 @@ TEST_F(KalmanHelicalPropagatorTest, test_energy_loss) {
   EXPECT_LT(a(4, 0), a_old(4, 0));
 }
 */
+
 TEST_F(KalmanHelicalPropagatorTest, test_covariance_extrapolation) {
   MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
   propagator->CalculatePredictedState(&old_site, &new_site);
@@ -163,6 +164,28 @@ TEST_F(KalmanHelicalPropagatorTest, test_covariance_extrapolation) {
                 old_site.covariance_matrix(MAUS::KalmanState::Filtered)(j, k));
     }
   }
+  delete propagator;
+}
+
+TEST_F(KalmanHelicalPropagatorTest, GetTrackMomentumTest) {
+  double px = 4.;
+  double py = 13.;
+  double pz = 200.;
+  double momentum = TMath::Sqrt(px*px+py*py+pz*pz);
+
+  TMatrixD a(5, 1);
+  a(0, 0) = 0.;
+  a(1, 0) = px/pz;
+  a(2, 0) = 0.;
+  a(3, 0) = py/pz;
+  a(4, 0) = 1./pz;
+
+  MAUS::KalmanState state;
+  state.Initialise(5);
+  state.set_a(a, MAUS::KalmanState::Projected);
+
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanHelicalPropagator(_Bz);
+  EXPECT_EQ(momentum, propagator->GetTrackMomentum(&state));
   delete propagator;
 }
 

@@ -74,7 +74,7 @@ PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         value = (*cm)(row, col);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
@@ -120,7 +120,7 @@ PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         cm->set(row, col, value);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
@@ -491,7 +491,7 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
     // now initialise the internal covariance matrix
     try {
         cm->cov_mat = create_from_numpy_matrix(array);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         free(cm);
         return NULL;

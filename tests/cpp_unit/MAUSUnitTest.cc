@@ -114,10 +114,10 @@ int main(int argc, char **argv) {
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();
-  } catch(MAUS::Exception exc) {
+  } catch (MAUS::Exception exc) {
       std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"
                 << exc.GetStackTrace() << std::endl;
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
   MAUS::GlobalsManager::Finally();

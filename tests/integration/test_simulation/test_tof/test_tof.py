@@ -85,7 +85,7 @@ class TestTof(unittest.TestCase): # pylint: disable=R0904
         return_code = run_plotter(input_root, output_root)
         self.assertEqual(return_code, 0)
         plotname = "tof01"
-        kthresh = 0.8
+        kthresh = 1e-3
         return_code = compare_plots(plotname)
         self.assert_(return_code > kthresh)
 

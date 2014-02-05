@@ -37,7 +37,7 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
-    def test_init(self):
+    def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
         self._mapper = InputCppDAQData()
         self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))

@@ -73,4 +73,12 @@ TEST_F(KalmanStraightPropagatorTest, propagator_test) {
   // track->calc_covariance(&old_site, &new_site);
   // Test COVARIANCE
 }
+
+TEST_F(KalmanStraightPropagatorTest, GetTrackMomentumTest) {
+  double momentum = 200.;
+  MAUS::KalmanState state;
+  MAUS::KalmanPropagator *propagator = new MAUS::KalmanStraightPropagator();
+  EXPECT_EQ(momentum, propagator->GetTrackMomentum(&state));
+  delete propagator;
+}
 }

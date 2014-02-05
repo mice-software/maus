@@ -63,35 +63,49 @@ class MAUSGeant4Manager;
  */
 class Globals {
   public:
-    /** Return a pointer to the singleton instance
+    /** Return a pointer to the singleton instance.
      *
      *  This returns a pointer to the singleton instance or throws an exception
      *  if it is not initialised yet. Initialisation should have been done by
      *  GlobalsManager.
+     *
+     *  Globals retains ownership of this memory
      */
     static Globals* GetInstance();
 
     /** Return true if the singleton has been initialised, else false
+     *
+     *  Globals retains ownership of this memory
      */
     static bool HasInstance();
 
     /** Get RunActionManager. Data updated run-by-run.
+     *
+     *  Globals retains ownership of this memory
      */
     static RunActionManager* GetRunActionManager();
 
     /** Get CppErrorHandler. Controls what happens to exceptions.
+     *
+     *  Globals retains ownership of this memory
      */
     static CppErrorHandler* GetErrorHandler();
 
     /** Get Configuration datacards. Global run controls.
+     *
+     *  Globals retains ownership of this memory
      */ 
     static Json::Value* GetConfigurationCards();
 
     /** Get legacy datacards. Old global run controls (please dont use)
+     *
+     *  Globals retains ownership of this memory
      */
     static dataCards* GetLegacyCards();
 
     /** Get the Monte Carlo BTFieldConstructor (controls access to field maps)
+     *
+     *  Globals retains ownership of this memory
      */
     static BTFieldConstructor* GetMCFieldConstructor();
 
@@ -100,6 +114,8 @@ class Globals {
      *  If simulation_geometry_filename is the same as 
      *  reconstruction_geometry_filename, this really points at the same memory
      *  (optimisation to avoid having to build the same thing twice)
+     *
+     *  Globals retains ownership of this memory
      */
     static BTFieldConstructor* GetReconFieldConstructor();
 
@@ -109,6 +125,8 @@ class Globals {
      *  If simulation_geometry_filename is the same as 
      *  reconstruction_geometry_filename, this really points at the same memory
      *  (optimisation to avoid having to build the same thing twice)
+     *
+     *  Globals retains ownership of this memory
      */
     static MAUSGeant4Manager* GetGeant4Manager();
 
@@ -123,6 +141,8 @@ class Globals {
      *  If simulation_geometry_filename is the same as 
      *  reconstruction_geometry_filename, this really points at the same memory
      *  (optimisation to avoid having to build the same thing twice)
+     *
+     *  Globals retains ownership of this memory
      */
     static MiceModule* GetMonteCarloMiceModules();
 
@@ -137,6 +157,8 @@ class Globals {
      *  If simulation_geometry_filename is the same as 
      *  reconstruction_geometry_filename, this really points at the same memory
      *  (optimisation to avoid having to build the same thing twice)
+     *
+     *  Globals retains ownership of this memory
      */
     static MiceModule* GetReconstructionMiceModules();
 

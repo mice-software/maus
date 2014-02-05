@@ -63,7 +63,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 if (RefManager::HasInstance())
                     RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             for (size_t j = 0; j < vec->size(); ++j) {
                 if ((*vec)[j] != NULL) {
@@ -106,7 +106,7 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             if (RefManager::HasInstance())
                 RefManager::GetInstance().SetPointerAsValue
                                                (cpp_array[i], GetPath(path, i));
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw exc;
@@ -158,7 +158,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
             ArrayContents* data = _proc->JsonToCpp(json_array[i]);
             (*vec)[i] = *data;
             delete data;
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
             throw exc;
@@ -189,7 +189,7 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
             (*json_array)[i] = *data; // json copies memory but not path
             JsonWrapper::Path::SetPath((*json_array)[i], GetPath(path, i));
             delete data; // so we need to clean up here
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw exc;
@@ -235,7 +235,7 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
                     RefManager::GetInstance().AddReference(res);
                 }
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
             throw exc;

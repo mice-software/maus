@@ -89,7 +89,7 @@ class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
         print revt['sci_fi_event']['digits']
-        self.assertEqual(122, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
         # Close file
         _file.close()
 
