@@ -67,9 +67,9 @@ namespace MAUS {
 
       _configCheck = true;
       return true;
-    } catch(Exception& exc) {
+    } catch (Exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
     }
     return false;
@@ -104,7 +104,7 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch(...) {
+    } catch (...) {
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -152,7 +152,7 @@ namespace MAUS {
     // prefer.
     try {
       data_cpp = json2cppconverter(data_json);
-    } catch(...) {
+    } catch (...) {
       Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
           << "converting json->cpp, ReduceCppGlobalPID" << std::endl;
     }
@@ -176,7 +176,7 @@ namespace MAUS {
                ++track_i) {
             MAUS::DataStructure::Global::Track* track =
 	      GlobalTrackArray->at(track_i);
-	    if (track->get_mapper_name() != "MapCppGlobalReconImport") continue;
+
             for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
                  ++pid_var_count) {
               _pid_vars[pid_var_count]->Fill_TH1(track);

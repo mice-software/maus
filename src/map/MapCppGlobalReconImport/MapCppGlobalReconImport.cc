@@ -74,7 +74,7 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch(...) {
+    } catch (...) {
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -125,7 +125,7 @@ namespace MAUS {
     try {
       data_cpp = json2cppconverter(data_json);
       delete data_json;
-    } catch(...) {
+    } catch (...) {
       Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
 	  << "converting json->cpp, MapCppGlobalReconImport" << std::endl;
     }
@@ -149,13 +149,11 @@ namespace MAUS {
     for (recon_event_iter = recon_events->begin();
 	 recon_event_iter != recon_events->end();
 	 ++recon_event_iter) {
-            std::cerr << "going through recon events" << std::endl;
-
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = recon_event->GetGlobalEvent();
       MAUS::recon::global::TrackMatching track_matching;
-      track_matching.FormTracks(global_event, _classname);
+      global_event = Import(recon_event);
     }
 
     data_json = cpp2jsonconverter(data_cpp);
@@ -172,7 +170,7 @@ namespace MAUS {
     return output_document;
   }
 
-  /*MAUS::GlobalEvent*
+  MAUS::GlobalEvent*
   MapCppGlobalReconImport::Import(MAUS::ReconEvent* recon_event) const {
     if (!recon_event) {
       throw(Exception(Exception::recoverable,
@@ -193,5 +191,5 @@ namespace MAUS {
     }
     // Return the new GlobalEvent, to be added to the ReconEvent
     return global_event;
-  }*/
+  }
 } // ~MAUS

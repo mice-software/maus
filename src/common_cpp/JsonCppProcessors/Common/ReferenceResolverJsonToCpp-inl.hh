@@ -67,7 +67,7 @@ template <class ParentType>
 void TRefResolver<ParentType>::ResolveReferences() {
     TObject* data_address = RefManager::GetInstance().
                                 GetPointerAsValue<TObject>(_ref_json_address);
-    (*_ref_cpp_parent.*_cpp_setter)(TRef(data_address));
+    (*_ref_cpp_parent.*_cpp_setter)(data_address);
     if (data_address == NULL)
         throw(Exception(Exception::recoverable,
               "Failed to resolve reference at "+_ref_json_address+

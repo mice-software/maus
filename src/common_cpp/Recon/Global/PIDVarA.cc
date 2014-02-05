@@ -46,9 +46,9 @@ namespace global {
       track_points = track->GetTrackPoints();
     // TODO(Pidcott) check that right detector enums are used
     MAUS::DataStructure::Global::DetectorPoint TOF0_DP =
-      MAUS::DataStructure::Global::kTOF0;
+      MAUS::DataStructure::Global::kTOF0_1;
     MAUS::DataStructure::Global::DetectorPoint TOF1_DP =
-      MAUS::DataStructure::Global::kTOF1;
+      MAUS::DataStructure::Global::kTOF1_1;
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
       ::iterator eachTP;
     for (eachTP = track_points.begin(); eachTP != track_points.end();

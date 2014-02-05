@@ -51,7 +51,7 @@ namespace global {
      *  
      *  @param global_event The Global Event, which will be changed
      */
-    void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
+    void FormTracks(MAUS::GlobalEvent* global_event);
 
   private:
     /// Disallow copy constructor as unnecessary

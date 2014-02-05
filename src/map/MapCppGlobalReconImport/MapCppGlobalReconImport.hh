@@ -86,7 +86,7 @@ namespace MAUS {
      *                  
      * @return global_event The GlobalEvent with spacepoints and track(s)
      */
-    //MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
+    MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
 
   private:
     /// Check that a valid configuration is passed to the process

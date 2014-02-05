@@ -69,8 +69,8 @@ void ObjectProcessor<ObjectType>::RegisterPointerReference(
 template <class ObjectType>
 void ObjectProcessor<ObjectType>::RegisterTRef(
     std::string branch_name,
-    TRef (ObjectType::*GetMethod)() const,
-    void (ObjectType::*SetMethod)(TRef value),
+    TObject* (ObjectType::*GetMethod)() const,
+    void (ObjectType::*SetMethod)(TObject* value),
     bool is_required) {
   using ObjectProcessorNS::BaseItem;
   using ObjectProcessorNS::PointerTRefItem;

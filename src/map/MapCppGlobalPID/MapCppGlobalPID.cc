@@ -47,7 +47,7 @@ namespace MAUS {
 
     _configCheck = true;
 
-     _hypotheses.clear();
+    _hypotheses.clear();
     _pid_vars.clear();
 
     std::string filename = std::string(pMAUS_ROOT_DIR) + "/PIDhists.root";
@@ -108,7 +108,7 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch(...) {
+    } catch (...) {
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -157,7 +157,7 @@ namespace MAUS {
     try {
       data_cpp = json2cppconverter(data_json);
       delete data_json;
-    } catch(...) {
+    } catch (...) {
       Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
           << " converting json->cpp, MapCppGlobalPID" << std::endl;
     }
@@ -170,20 +170,16 @@ namespace MAUS {
     const MAUS::Spill* _spill = data_cpp->GetSpill();
 
     if ( _spill->GetReconEvents() ) {
-    std::cerr << "spill" << std::endl;
       for ( unsigned int event_i = 0;
 	    event_i < _spill->GetReconEvents()->size(); ++event_i ) {
-	    std::cerr << "going through recon events" << std::endl;
         MAUS::GlobalEvent* global_event =
 	  _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
         std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
 	  global_event->get_tracks();
-	  std::cerr << "number of tracks in GE : " << GlobalTrackArray->size() << std::endl;
         for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
 	     ++track_i) {
           MAUS::DataStructure::Global::Track* track =
 	    GlobalTrackArray->at(track_i);
-	  if (track->get_mapper_name() != "MapCppGlobalReconImport") continue;
           // doubles to hold cumulative log likelihoods for each hypothesis
           double logL_200MeV_mu_plus = 0;
           double logL_200MeV_e_plus = 0;
@@ -245,7 +241,6 @@ namespace MAUS {
     std::string output_document = JsonWrapper::JsonToString(*data_json);
     delete data_json;
     delete data_cpp;
-    std::cerr << "end of process" << std::endl;
     return output_document;
   }
 } // ~MAUS

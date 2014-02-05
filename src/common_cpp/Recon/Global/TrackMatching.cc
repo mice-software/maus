@@ -26,16 +26,13 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  void TrackMatching::FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name) {
-    std::cerr << "TrackMatching is happening" << std::endl;
+  void TrackMatching::FormTracks(MAUS::GlobalEvent* global_event) {
 
     if (!global_event) {
       throw(Exception(Exception::recoverable,
 		   "Trying to import an empty global event.",
 		   "MapCppGlobalPID::TrackMatching"));
     }
-
-    std::cerr << "checked for global event" << std::endl;
 
     std::vector<MAUS::DataStructure::Global::SpacePoint*> *TOFspacepointarray =
       global_event->get_space_points();
@@ -51,24 +48,19 @@ namespace global {
     double TOF01offset = 30;
     double TOF12offset = 35;
     double allowance = 7.5;
-    std::cerr << "TOFspacepointarray->size() : " << TOFspacepointarray->size() << std::endl;
     for (unsigned int i = 0; i < TOFspacepointarray->size(); ++i) {
-      std::cerr << "entered tm for loop" << std::endl;
       MAUS::DataStructure::Global::SpacePoint* sp = TOFspacepointarray->at(i);
 
       MAUS::DataStructure::Global::TrackPoint* tp0;
       MAUS::DataStructure::Global::TrackPoint* tp1;
       MAUS::DataStructure::Global::TrackPoint* tp2;
-      if (sp->get_detector() == MAUS::DataStructure::Global::kTOF0) {
-        std::cerr<< "kTOF0" << std::endl;
+      if (sp->get_detector() == MAUS::DataStructure::Global::kTOF0_1) {
 	tp0 = new MAUS::DataStructure::Global::TrackPoint(sp);
 	TOF0tp.push_back(tp0);
-      } else if (sp->get_detector() == MAUS::DataStructure::Global::kTOF1) {
-        std::cerr<< "kTOF1" << std::endl;
+      } else if (sp->get_detector() == MAUS::DataStructure::Global::kTOF1_1) {
 	tp1 = new MAUS::DataStructure::Global::TrackPoint(sp);
 	TOF1tp.push_back(tp1);
-      } else if (sp->get_detector() == MAUS::DataStructure::Global::kTOF2) {
-        std::cerr<< "kTOF2" << std::endl;
+      } else if (sp->get_detector() == MAUS::DataStructure::Global::kTOF2_1) {
 	tp2 = new MAUS::DataStructure::Global::TrackPoint(sp);
 	TOF2tp.push_back(tp2);
       }
@@ -104,8 +96,6 @@ namespace global {
 	  TOFtrack->AddTrackPoint(tempTOF2tp[0]);
 	  global_event->add_track_point_recursive(tempTOF2tp[0]);
 	}
-  std::cerr << "towards the end of TrackMatching" << std::endl;
-  TOFtrack->set_mapper_name(mapper_name);
 	global_event->add_track_recursive(TOFtrack);
       } else {
 	Squeak::mout(Squeak::error) << "Global event returned multiple potential"
