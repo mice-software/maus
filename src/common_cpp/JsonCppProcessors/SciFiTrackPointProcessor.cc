@@ -28,6 +28,9 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("plane", &_int_proc,
                         &SciFiTrackPoint::plane,
                         &SciFiTrackPoint::set_plane, false);
+    RegisterValueBranch("channel", &_double_proc,
+                        &SciFiTrackPoint::channel,
+                        &SciFiTrackPoint::set_channel, false);
     RegisterValueBranch("f_chi2", &_double_proc,
                         &SciFiTrackPoint::f_chi2,
                         &SciFiTrackPoint::set_f_chi2, false);

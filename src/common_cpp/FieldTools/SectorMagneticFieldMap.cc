@@ -164,7 +164,7 @@ Interpolator3dGridTo3d* SectorMagneticFieldMapIO::ReadMap
         if (file_type == "tosca_sector_1") {
             return ReadToscaMap(file_name, units, symmetry);
         }
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         throw(Exception(Exception::recoverable,
                      "Failed to read file "+file_name+" with "+(&exc)->what(),
                      "SectorMagneticFieldMapIO::ReadMap"));

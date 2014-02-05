@@ -59,15 +59,19 @@ class SciFiTrackPoint {
 
   /** @brief  Sets tracker number.
    */
-  void set_tracker(int tracker)                 { _tracker     = tracker; }
+  void set_tracker(int tracker)                 { _tracker   = tracker; }
 
   /** @brief  Sets station number.
    */
-  void set_station(int station)                 { _station     = station; }
+  void set_station(int station)                 { _station   = station; }
 
   /** @brief  Sets plane number.
    */
   void set_plane(int plane)                     { _plane     = plane;   }
+
+  /** @brief  Sets channel number.
+   */
+  void set_channel(double channel)              { _channel   = channel; }
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
@@ -131,6 +135,10 @@ class SciFiTrackPoint {
    */
   int plane()                const { return _plane;    }
 
+  /** @brief  Returns the channel number.
+   */
+  double channel()           const { return _channel;  }
+
   /** @brief  Returns filtered chi2 value.
    */
   double f_chi2()            const { return _f_chi2;   }
@@ -193,6 +201,10 @@ class SciFiTrackPoint {
   /** @brief The plane the trackpoint belongs to.
    */
   int _plane;
+
+  /** @brief The channel measurement corresponding to the trackpoint.
+   */
+  double _channel;
 
   /** @brief filtered chi2
    */

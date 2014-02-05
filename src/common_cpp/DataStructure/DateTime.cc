@@ -67,7 +67,7 @@ bool DateTime::CheckFormat(std::string datetime) {
         out &= Check(datetime.substr(20, 6), 0, 1000000); // milliseconds
         out &= CheckSeparators(datetime); // separators
         return out;
-    } catch(Exception exc) {
+    } catch (Exception exc) {
         return false;
     }
 }

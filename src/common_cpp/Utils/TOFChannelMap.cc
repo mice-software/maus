@@ -83,7 +83,7 @@ bool TOFChannelMap::InitFromFile(string filename) {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Exception e) {
+  } catch (Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromFile : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
@@ -114,7 +114,7 @@ bool TOFChannelMap::InitFromCDB() {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Exception e) {
+  } catch (Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromCDB : Error during loading." << std::endl
     << e.GetMessage() << std::endl;

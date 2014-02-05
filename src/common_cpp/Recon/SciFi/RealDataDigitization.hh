@@ -91,7 +91,8 @@ class RealDataDigitization {
   /** @brief Converts read-out map into SciFi Fibre map
    */
   bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
-                            int &tracker, int &station, int &plane, int &channel) const;
+                            int &tracker, int &station, int &plane, int &channel,
+                            int &extWG, int &inWG, int &WGfib) const;
 
   /** @brief Reads the bad channel list from file.
    */
@@ -109,7 +110,7 @@ class RealDataDigitization {
   static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
-  static const double _pedestal_min       = 0.000000001;
+  static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
   Json::Value calibration_[_number_banks][_number_channels];

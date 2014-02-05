@@ -158,7 +158,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     }
   }
   // Deal with exceptions
-  catch(MDexception & lExc) {
+  catch (MDexception & lExc) {
     Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
     << "*** Unpacking exception in void  "
     << "InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
@@ -171,7 +171,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
   }
-  catch(Exception exc) {
+  catch (Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
     << exc.GetMessage() << std::endl
     << "*** MAUS exception in void  "
@@ -185,7 +185,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
   }
-  catch(std::exception & lExc) {
+  catch (std::exception & lExc) {
     Squeak::mout(Squeak::error) << lExc.what() << std::endl
     << "*** Standard exception in "
     << "void InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
@@ -198,7 +198,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
   }
-  catch(...) {
+  catch (...) {
     Squeak::mout(Squeak::error) << "*** void InputCppDAQData::getCurEvent(MAUS::Data *data) : "
     << "Unknown exception occurred." << std::endl;
     Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::endl;
@@ -281,7 +281,7 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
       }
     }
     // Deal with exceptions
-    catch(MDexception & lExc) {
+    catch (MDexception & lExc) {
       Squeak::mout(Squeak::error) << lExc.GetDescription() << std::endl
       << "*** Unpacking exception in InputCppDAQData::initProcessor() : " << endl;
     }

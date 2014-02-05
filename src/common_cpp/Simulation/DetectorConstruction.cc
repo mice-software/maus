@@ -243,7 +243,7 @@ void DetectorConstruction::ResetGeometry() {
   try {
   for (int i = 0; i < _model->daughters(); ++i)
     AddDaughter(_model->daughter(i), _rootPhysicalVolume);
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     Squeak::activateCout(cout_alive);
     throw exc;
   }

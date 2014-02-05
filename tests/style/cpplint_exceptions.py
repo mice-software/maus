@@ -74,31 +74,6 @@ exceptions[os.path.join(CPP_CM, 'DataStructure', 'ThreeVector.hh')] = [
  'explicit conversion is okay from ROOT to ThreeVectpr', 'rogers')
 ]
 
-exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
-('  } catch (Squeal squee) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Maths', 'VectorTest.cc')] = [
-('  } catch (MAUS::Exception exc) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
-('  } catch (MAUS::Exception exc) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
-('  } catch (MAUS::Exception exc) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(CPP_CM, 'Optics', 'TransferMapOpticsModel.cc')] = [
-('  } catch (std::exception ex) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
 exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.hh')] = [
 ('template<>           orstream& orstream::operator<< <short> (short&  d) {',
  'doesnt like the necessary specialisation', 'richards'),
@@ -185,37 +160,6 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
 
 ]
 
-exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
-('  } catch (MAUS::Exception exc) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Optics',
-                        'LinearApproximationOpticsModelTest.cc')] = [
-('  } catch (MAUS::Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Optics',
-                        'PolynomialOpticsModelTest.cc')] = [
-('  } catch (MAUS::Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (MAUS::Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Recon/Global',
-                        'DataStructureHelperTest.cc')] = [
-('    } catch (MAUS::Exception& exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Recon/Global',
-                        'MinuitTrackFitterTest.cc')] = [
-('  } catch (MAUS::Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
 exceptions[os.path.join(CPP_CM, 
                         'JsonCppProcessors',
                         'Common',
@@ -248,28 +192,6 @@ exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData',
                        'InputCppDAQOnlineData.cc')] = [
 ('      _sleep_time.tv_sec = static_cast<long>(delay_time);',
  'This really is a long, it is defined in time.h.', 'rogers')
-]
-
-exceptions[os.path.join(CPP_CM, 'Simulation',
-                        'MAUSPrimaryGeneratorAction.cc')] = [
-('  } catch (std::exception stde) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(CPP_CM, 'Recon/Global',
-                        'MinuitTrackFitter.cc')] = [
-('  } catch (Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(MAP, 'MapCppGlobalTrackReconstructor',
-                        'MapCppGlobalTrackReconstructor.cc')] = [
-('    } catch (Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('  } catch (Exception exc) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
 ]
 
 exceptions[os.path.join('src', 'py_cpp', 'optics', 'PyCovarianceMatrix.hh')] = [
