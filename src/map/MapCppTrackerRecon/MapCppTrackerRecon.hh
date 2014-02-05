@@ -108,8 +108,7 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
-                           MAUS::SciFiEvent &evt);
+  void pattern_recognition(MAUS::SciFiEvent &evt);
 
   /** Performs the final track fit
    *
@@ -148,8 +147,8 @@ class MapCppTrackerRecon {
   /// Value above which reconstruction is aborted.
   int _size_exception;
   /// Pattern recognition flags
-  bool _helical_pr_on;
   bool _straight_pr_on;
+  bool _helical_pr_on;
   bool _kalman_on;
 
   ///  Map of the planes geometry.
