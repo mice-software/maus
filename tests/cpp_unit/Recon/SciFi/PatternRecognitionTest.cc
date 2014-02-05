@@ -89,6 +89,26 @@ class PatternRecognitionTest : public ::testing::Test {
   }
 };
 
+TEST_F(PatternRecognitionTest, test_constructor) {
+  PatternRecognition pr;
+  EXPECT_TRUE(pr._straight_pr_on);
+  EXPECT_TRUE(pr._helical_pr_on);
+  EXPECT_EQ(0, pr._verb);
+  EXPECT_EQ(2, pr._n_trackers);
+  EXPECT_EQ(5, pr._n_stations);
+  EXPECT_EQ(0.3844, pr._sd_1to4);
+  EXPECT_EQ(0.4298, pr._sd_5);
+  EXPECT_EQ(1.0, pr._sd_phi_1to4);
+  EXPECT_EQ(1.0, pr._sd_phi_5);
+  EXPECT_EQ(2.0, pr._res_cut);
+  EXPECT_EQ(150.0, pr._R_res_cut);
+  EXPECT_EQ(15.0, pr._chisq_cut);
+  EXPECT_EQ(4.0, pr._sz_chisq_cut);
+  EXPECT_EQ(0.75, pr._n_turns_cut);
+  EXPECT_EQ(180.0, pr._Pt_max);
+  EXPECT_EQ(50.0, pr._Pz_min);
+}
+
 /*
 TEST_F(PatternRecognitionTest, test_process_good) {
 

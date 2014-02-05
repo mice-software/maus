@@ -33,6 +33,9 @@
 // ROOT headers
 #include "TMatrixD.h"
 
+// Third party library headers
+#include "gtest/gtest_prod.h"
+
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
@@ -48,6 +51,9 @@ namespace MAUS {
 
 class PatternRecognition {
   public:
+
+    /** Macro to allow friendship with the gtests */
+    FRIEND_TEST(PatternRecognitionTest, test_constructor);
 
     /** @brief Default constructor. Initialise variables,
      *         using globals if available, otherwise local defaults 
