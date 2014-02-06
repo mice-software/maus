@@ -26,7 +26,8 @@ CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
 DET_GDML = ['TOF0.gdml','TOF1.gdml','TOF2.gdml','Tracker0.gdml','Tracker1.gdml',\
-            'KL.gdml','Ckov.gdml','Disk_LiH.gdml']
+            'KL.gdml','Ckov1.gdml','Ckov2.gdml','Disk_LiH.gdml',\
+            'Wedge_LiH_90.gdml','Wedge_LiH_45.gdml','LH2.gdml']
 
 class GDMLtomaus(): #pylint: disable = R0903
     """
@@ -88,9 +89,6 @@ class GDMLtomaus(): #pylint: disable = R0903
             
                 stepfile = os.path.join(self.path, fname)
                 self.step_files.append(stepfile)
-        for name in self.step_files:
-            if name.find('Tracker')>0 :
-                print name
 
     def convert_to_maus(self, output):
         """

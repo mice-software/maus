@@ -213,11 +213,16 @@ class CADImport: #pylint: disable = R0903
                     if elem.prop('name') == solid[0].prop('ref'):
                         # do nothing
                         break
-                     
+                sphere  = datafile.xpathEval("gdml/solids/sphere")
+                for elem in sphere:
+                    if elem.prop('name') == solid[0].prop('ref'):
+                        result.append('Volume Sphere\n')
+                        result.append('Dimensions '+elem.prop('rmin')+' '+\
+                                      elem.prop('rmax')+' '+elem.prop('lunit')+'\n')
                 aux        = vol.xpathEval('auxiliary')
+                unit = "cm"
                 for elem in aux:
                     type, value = elem.prop('auxtype'), elem.prop('auxvalue')
-                    unit = "cm"
                     if type=='unit': unit = value
                     if type=='RedColour' or type=='BlueColour' or type=='GreenColour' \
                            or type=='G4StepMax' \
@@ -230,7 +235,8 @@ class CADImport: #pylint: disable = R0903
                     if type=='ActiveRadius' or type=='Pitch' or type=='FibreDiameter' \
                            or type=='CoreDiameter' or type=='CentralFibre' \
                            or type=='GlueThickness' or type=='FibreLength' \
-                           or type=='FibreSpacingY' or type=='FibreSpacingZ':
+                           or type=='FibreSpacingY' or type=='FibreSpacingZ'\
+                           or type=='OpticsMaterialLength':
                         result.append('PropertyDouble '+type+' '+value+' '+unit+'\n')
                     elif type=='numPlanes' or type=='Station' or type=='numPMTs' \
                              or type=='Plane' or type=='Tracker' or type=='Cell' \
@@ -246,7 +252,7 @@ class CADImport: #pylint: disable = R0903
                              or type=='BooleanModule2Type':
                         result.append('PropertyString '+type+' '+value+"\n")
                     elif type=='Invisible' or type=='UseDaughtersInOptics':
-                        result.append('PropertyBool'+type+' '+value+"\n")
+                        result.append('PropertyBool '+type+' '+value+"\n")
                     elif type=='Pmt1PosX':
                         result.append('PropertyHep3Vector Pmt1Pos '+value+' 0.0 0.0 cm\n')
                     elif type=='Pmt2PosX':
@@ -258,8 +264,9 @@ class CADImport: #pylint: disable = R0903
                     elif type=='BooleanModule1Pos' \
                          or type=='BooleanModule1Rot' \
                          or type=='BooleanModule2Pos' \
-                         or type=='BooleanModule2Rot':
-                        result.append('PropertyHep3Vector '+type+' '+value)
+                         or type=='BooleanModule2Rot' \
+                         or type=='Phi' or type=='Theta':
+                        result.append('PropertyHep3Vector '+type+' '+value+"\n")
                     
                 material = vol.xpathEval("materialref")
                 result.append("PropertyString Material "+material[0].prop("ref")+"\n")

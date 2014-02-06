@@ -55,15 +55,35 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         # get the survey target detectors
         self.sfTarget = config_dict['survey_target_detectors']
         # extract data files from configuration files
-        self.GDMLFile = config_dict['survey_measurement_record']
-        self.XMLFile  = config_dict['survey_reference_position'] # 'Rotation_test.reference'
-        # print self.GDMLFile, self.XMLFile
-        self.datafile = libxml2.parseFile(self.XMLFile)
-        self.gdmlfile = libxml2.parseFile(self.GDMLFile)
-        self.UseGDML  = config_dict['use_gdml_source']
+        # 
+        self.GDMLFile = ''
+        self.XMLFile = ''
         self.DataFile = ''
         self.RefFile  = ''
-        if not self.UseGDML:
+        
+        self.UseGDML  = config_dict['use_gdml_source']
+        if self.UseGDML:
+            # The survey information is in the CAD geometry file which should have one of these names
+            fnames = ['fastradModel','FastradModel.gdml','Step_IV.gdml']
+            for name in fnames:
+                tempfile = os.path.join(self.dl_dir,name)
+                if os.path.exists(tempfile):
+                    self.GDMLFile = tempfile
+                    # break on the first qualifing instance.
+                    break
+            # An override method --- if necessary
+            if config_dict['survey_measurement_record']:
+                self.GDMLFile = config_dict['survey_measurement_record']
+            # The default source of reference information for the fit.
+            self.XMLFile  = os.path.join(self.dl_dir,'Maus_Information.gdml')
+            if not os.path.exists(self.XMLFile):  self.XMLFile = ''
+            # An override method --- if necessary
+            if config_dict['survey_reference_position']:
+                self.XMLFile  = config_dict['survey_reference_position'] # 'Rotation_test.reference'
+            print self.GDMLFile, self.XMLFile
+            self.datafile = libxml2.parseFile(self.XMLFile)
+            self.gdmlfile = libxml2.parseFile(self.GDMLFile)
+        else:
             self.DataFile = config_dict['survey_measurement_record'] # 'Rotation_test.dat
             self.RefFile = config_dict['survey_reference_position'] # 'Rotation_test.reference'
         self.result = []
@@ -84,6 +104,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                 targetpath = os.path.join(basepath,'TOF/'+target)
             elif target.find('Ckov') >= 0:
                 targetpath = os.path.join(basepath,'Cherenkov/'+target)
+            elif target.find('Tracker') >=0:
+                targetpath = os.path.join(basepath,'Tracker/'+target)
             if not self.FitForDetector(targetpath,target+'.gdml'):
                 isgood = False
                 print 'Fit Failed for '+target

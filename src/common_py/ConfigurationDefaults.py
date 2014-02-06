@@ -330,9 +330,9 @@ absorber1_file_number = "Iges_16"
 absorber2_file_number = "9999"
 
 # Survey fit information
-survey_measurement_record = "%s/files/geometry/download/gdml/FastradModel.gdml" % os.environ.get("MAUS_ROOT_DIR")
+survey_measurement_record = ""
 # This file should include position references and true locations of each detector.
-survey_reference_position = "%s/files/geometry/download/gdml/Maus_Information.gdml" % os.environ.get("MAUS_ROOT_DIR")
+survey_reference_position = ""
 use_gdml_source           = True
 # Survey targets
 survey_target_detectors = []
