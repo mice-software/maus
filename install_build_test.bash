@@ -84,7 +84,7 @@ echo "Cleaning the MAUS build state"
 scons -c 2>>$FILE_STD 1>>$FILE_STD
 
 echo "Building MAUS"
-(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+(scons build -j8 || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
     cat $FILE_STD
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"

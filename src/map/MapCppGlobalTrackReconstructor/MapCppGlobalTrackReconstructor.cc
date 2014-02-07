@@ -95,11 +95,11 @@ bool MapCppGlobalTrackReconstructor::birth(std::string configuration_string) {
         configuration_, detectors_);
     SetupOpticsModel();
     SetupTrackFitter();
-  } catch(Exception& exc) {
+  } catch (Exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
       exc, MapCppGlobalTrackReconstructor::kClassname);
     return false;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
       exc, MapCppGlobalTrackReconstructor::kClassname);
     return false;
@@ -131,6 +131,14 @@ std::string MapCppGlobalTrackReconstructor::process(
     return run_data_string;
   }
 
+  // FIXME(Lane) remove once particle identification is working
+  // ===========================================================================
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
+  // ===========================================================================
+
   MAUS::ReconEventPArray::const_iterator recon_event;
   for (recon_event = recon_events->begin();
       recon_event != recon_events->end();
@@ -141,7 +149,8 @@ std::string MapCppGlobalTrackReconstructor::process(
     LoadRawTracks(global_event, raw_tracks);
     std::cerr << "Loaded " << raw_tracks.size() << " raw tracks." << std::endl;
     // Fit each raw track and store best fit track in global_event
-    GlobalDS::TrackPArray::const_iterator raw_track;
+    // FIXME(Lane) make const_iterator once particle identification is working
+    GlobalDS::TrackPArray::iterator raw_track;
     for (raw_track = raw_tracks.begin();
          raw_track != raw_tracks.end();
          ++raw_track) {
@@ -149,6 +158,10 @@ std::string MapCppGlobalTrackReconstructor::process(
       best_fit_track->set_mapper_name(kClassname);
       best_fit_track->AddTrack(*raw_track);
 
+      // FIXME(Lane) remove once particle identification is working
+      // =======================================================================
+      (*raw_track)->set_pid(particle_id);
+      // =======================================================================
       std::cout << "DEBUG MapCppGlobalTrackReconstructor::process: "
                 << "raw track PID: " << (*raw_track)->get_pid() << std::endl;
       track_fitter_->Fit(*raw_track, best_fit_track, kClassname);
@@ -368,7 +381,16 @@ void MapCppGlobalTrackReconstructor::InsertIntermediateTrackPoints(
 
   // Reconstruct the intermediate track points by transporting the fit primary
   // to all desired intermediate z-positions
-  const GlobalDS::PID particle_id = track->get_pid();
+  // FIXME(Lane) restore once particle identification is working
+  // const GlobalDS::PID particle_id = track->get_pid();
+  // FIXME(Lane) remove once particle identification is working
+  // ===========================================================================
+  MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
+  MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
+    = simulator->GetReferenceParticle();
+  const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
+  // ===========================================================================
+
   std::vector<int64_t>::const_iterator z_key = z_keys.begin();
   const std::vector<int64_t> map_positions
     = optics_model->GetAvailableMapPositions();

@@ -66,9 +66,9 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
                  _SciFivlpcQE;
     // ______________________________________________
     return true;
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -146,7 +146,7 @@ void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch(...) {
+  } catch (...) {
     Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();

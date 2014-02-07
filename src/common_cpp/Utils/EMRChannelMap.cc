@@ -49,7 +49,7 @@ bool EMRChannelMap::InitFromFile(string filename) {
       _emrKey.push_back(emrkey);
       _dbbKey.push_back(dbbkey);
     }
-  } catch(Exception e) {
+  } catch (Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in EMRChannelMap::InitFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;

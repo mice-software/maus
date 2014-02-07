@@ -41,8 +41,6 @@ scifi_analysis : scifi_analysis.cc
 	                      -lMausCpp \
 	                       -Wl,--no-as-needed
 	
-
-
 clean:
 	rm scifi_offline_viewer scifi_momentum_analysis scifi_analysis;
 
