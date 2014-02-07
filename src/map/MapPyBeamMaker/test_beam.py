@@ -480,7 +480,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEquals(self._beam.beam_sigma_y, 1.0)
         self.assertEquals(self._beam.beam_mean_z, 0.0)
         self.assertEquals(self._beam.beam_sigma_z, 1.0)
-        print self._beam.beam_polarisation
+        print "polarization test_beam", self._beam.beam_polarisation
         self._beam._Beam__birth_beam_polarisation(TEST_GAUSSIAN_UNITS)
         self.assertEquals(self._beam.beam_polarisation['polarisation_mode'], 'gaussian_unit_vectors')
         self.assertEquals(self._beam.beam_mean_x, 2.0)
@@ -489,7 +489,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEquals(self._beam.beam_sigma_y, 3.0)
         self.assertEquals(self._beam.beam_mean_z, 20.0)
         self.assertEquals(self._beam.beam_sigma_z, 30.0)
-        print self._beam.beam_polarisation
+        print "polarization test_beam", self._beam.beam_polarisation
 ################################################################################################
 
 

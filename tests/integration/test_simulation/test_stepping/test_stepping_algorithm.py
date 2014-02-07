@@ -60,7 +60,7 @@ class SteppingAlgorithmTest(unittest.TestCase): # pylint: disable = R0904
         Check that we can set the stepping algorithm okay in Geant4
         """
         rf_tests = ["ClassicalRK4", "Classic", "SimpleHeum", "ImplicitEuler",
-                    "SimpleRunge", "ExplicitEuler", "CashKarpRKF45"]
+                    "SimpleRunge", "ExplicitEuler", "CashKarpRKF45", "SpinTrack"]
         self.assertNotEqual(run_simulation(True, "Nonsense"), 0)
         self.assertNotEqual(run_simulation(False, "Nonsense"), 0)
 

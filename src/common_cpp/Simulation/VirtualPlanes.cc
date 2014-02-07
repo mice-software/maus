@@ -103,6 +103,7 @@ void VirtualPlane::FillBField(VirtualHit * aHit, const G4Step * aStep) const {
   _field->GetFieldValue(point, field);
   aHit->SetBField(CLHEP::Hep3Vector(field[0], field[1], field[2]));
   aHit->SetEField(CLHEP::Hep3Vector(field[3], field[4], field[5]));
+
 }
 
 bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
@@ -115,8 +116,10 @@ bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
 
 void VirtualPlane::FillKinematics
                                (VirtualHit * aHit, const G4Step * aStep) const {
-  G4ThreeVector pol = aStep->GetPreStepPoint()->GetPolarization();
-  std::cerr<<"polarization in VirtPlane"<< pol<<std::endl;
+  G4ThreeVector pol_start = aStep->GetPreStepPoint()->GetPolarization();
+  G4ThreeVector pol_end = aStep->GetPostStepPoint()->GetPolarization();
+  std::cerr<<"polarization in VirtPlane start"<< pol_start<<std::endl;
+  std::cerr<<"polarization in VirtPlane end"<< pol_end<<std::endl;
   double  x[12];
   double* x_from_beginning = NULL;
   double* x_from_end = NULL;
@@ -138,7 +141,7 @@ void VirtualPlane::FillKinematics
   for (int i = 0; i < 12; i++)
     x[i] = (x_from_end[i]-x_from_beginning[i])/(indep_end-indep_beg)
           *(_independentVariable-indep_beg)+x_from_beginning[i];
-  
+
   aHit->SetPos(CLHEP::Hep3Vector(x[1], x[2], x[3]));
   aHit->SetMomentum(CLHEP::Hep3Vector(x[5], x[6], x[7]));
   aHit->SetSpin(CLHEP::Hep3Vector(x[8],x[9],x[10])); //added/////
@@ -149,6 +152,8 @@ void VirtualPlane::FillKinematics
   aHit->SetTime(x[0]);
   aHit->SetProperTime(0.);
   aHit->SetPathLength(0.);
+  std::cerr<<"mom in VirtPlane"<<(aStep->GetPreStepPoint()->GetMomentum())<<std::endl;  
+  std::cerr<<"mom in VirtPlane"<<(aStep->GetPostStepPoint()->GetMomentum())<<std::endl;  
   delete [] x_from_beginning;
   delete [] x_from_end;
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
@@ -180,7 +185,7 @@ double * VirtualPlane::ExtractPointData(G4StepPoint *aPoint) const {
     x_in[i+1] = aPoint->GetPosition()[i];
     x_in[i+5] = aPoint->GetMomentum()[i];
     x_in[i+8] = aPoint->GetPolarization()[i]; //added/////////////
-    std::cerr << x_in[i+8] <<" "<<std::endl;
+    std::cerr << "extract data point"<<x_in[i+8] <<" "<<std::endl;
   }
   x_in[0] = aPoint->GetGlobalTime();
   x_in[4] = aPoint->GetTotalEnergy();
