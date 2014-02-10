@@ -31,12 +31,6 @@ MAUSEventAction::MAUSEventAction()
 }
 
 void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
-   
-    G4PrimaryVertex* pv = anEvent->GetPrimaryVertex();
-    G4PrimaryParticle* p = pv->GetPrimary(0);
-    std::cerr<<"pol in"<<p->GetPolarization()<<std::endl;
-      
-  
     _virtPlanes->StartOfEvent();
     if (_tracking->GetWillKeepTracks())
         _tracking->SetTracks(Json::Value(Json::arrayValue));
@@ -47,9 +41,6 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
 
 void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
     //  For each detector i
-    G4PrimaryVertex* pv = anEvent->GetPrimaryVertex();
-    G4PrimaryParticle* p = pv->GetPrimary(0);
-    std::cerr<<"pol out"<<p->GetPolarization()<<std::endl;
     if (_primary >= _events.size())
         throw(Squeal(Squeal::recoverable,
                      "Ran out of space in event array",

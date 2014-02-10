@@ -48,6 +48,7 @@ std::string STEP =
         std::string("{\"proper_time\":1.,\"path_length\":2.,\"time\":3.,")+
         std::string("\"energy\":4.,\"energy_deposited\":5.,")+
         std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
+        std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string TRACK_SEED =
@@ -66,6 +67,7 @@ std::string PRIMARY =
     std::string("{\"particle_id\":1,\"random_seed\":2,\"time\":3.,")+
     std::string("\"energy\":4.,")+
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
+    std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string SF_CHANNEL_ID =
@@ -105,6 +107,7 @@ std::string VIRTUAL_HIT =
     std::string("\"proper_time\":8.,\"path_length\":9.,")+
     std::string("\"position\":{\"x\":10.,\"y\":11.,\"z\":12.},")+
     std::string("\"momentum\":{\"x\":13.,\"y\":14.,\"z\":15.},")+
+    std::string("\"spin\":{\"x\":22.,\"y\":23.,\"z\":24.},")+
     std::string("\"b_field\":{\"x\":16.,\"y\":17.,\"z\":18.},")+
     std::string("\"e_field\":{\"x\":19.,\"y\":20.,\"z\":21.}}");
 

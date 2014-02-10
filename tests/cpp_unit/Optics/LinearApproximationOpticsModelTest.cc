@@ -82,6 +82,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     (*config)["simulation_reference_particle"] = JsonWrapper::StringToJson(
       std::string("{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":-1000.0},")+
       std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},")+
+      std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
       std::string("\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,")+
       std::string("\"random_seed\":2}")
     );
