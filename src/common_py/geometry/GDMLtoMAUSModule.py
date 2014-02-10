@@ -25,9 +25,10 @@ CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
 #         "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
-DET_GDML = ['TOF0.gdml','TOF1.gdml','TOF2.gdml','Tracker0.gdml','Tracker1.gdml',\
-            'KL.gdml','Ckov1.gdml','Ckov2.gdml','Disk_LiH.gdml',\
-            'Wedge_LiH_90.gdml','Wedge_LiH_45.gdml','LH2.gdml']
+DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
+            'Tracker0.gdml', 'Tracker1.gdml',\
+            'KL.gdml', 'Ckov1.gdml', 'Ckov2.gdml', 'Disk_LiH.gdml',\
+            'Wedge_LiH_90.gdml', 'Wedge_LiH_45.gdml', 'LH2.gdml']
 
 class GDMLtomaus(): #pylint: disable = R0903
     """
@@ -115,7 +116,7 @@ class GDMLtomaus(): #pylint: disable = R0903
             #                xsl = str(TRACKERXSL), output = str(outputfile2))
             # tracker_file.parse_xslt()
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \
-            #                          xsl = str(ROTATEDXSL), output = str(outputfile3))
+            #         xsl = str(ROTATEDXSL), output = str(outputfile3))
             # rotated_file.parse_xslt()
             
             print "Configuration File Converted"
@@ -131,8 +132,8 @@ class GDMLtomaus(): #pylint: disable = R0903
                 step_file = CADImport(xmlin1 = str(self.step_files[num]), \
                                     xsl = str(MM_XSL), output = str(outputfile))
                 direct_translation = 0
-                for file in DET_GDML:
-                    if file_name == file:
+                for det_file in DET_GDML:
+                    if file_name == det_file:
                         direct_translation = 1
                 if direct_translation:
                     step_file.translate_gdml()

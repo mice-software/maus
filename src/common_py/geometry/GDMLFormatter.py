@@ -43,8 +43,8 @@ class Formatter: #pylint: disable = R0902
         """
         self.g4_step_max = Configreader().g4_step_max
         self.tof_0_file_number     = Configreader().tof_0_file_number
-	self.tof_1_file_number     = Configreader().tof_1_file_number
-	self.tof_2_file_number     = Configreader().tof_2_file_number
+        self.tof_1_file_number     = Configreader().tof_1_file_number
+        self.tof_2_file_number     = Configreader().tof_2_file_number
         self.ckov1_file_number      = Configreader().ckov1_file_number
         self.ckov2_file_number      = Configreader().ckov2_file_number
         self.kl_file_number        = Configreader().kl_file_number

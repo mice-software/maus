@@ -85,7 +85,7 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
                                           datacards,
                                           "end_of_run_output_root_directory",
                                           JsonWrapper::stringValue).asString();
-  } catch(...) {
+  } catch (...) {
     death();
     throw;
   }
@@ -126,7 +126,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     }
     try {
         (*_outfile) << fillEvent;
-    } catch(...) {
+    } catch (...) {
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception

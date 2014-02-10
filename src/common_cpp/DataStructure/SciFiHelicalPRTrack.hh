@@ -46,15 +46,16 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     SciFiHelicalPRTrack();
 
     /** Constructor from parameters */
-    SciFiHelicalPRTrack(int tracker, int num_points, double x0, double y0, double z0, double phi0,
-                        double psi0, double dsdz, double R, double chisq);
+    SciFiHelicalPRTrack(int tracker, int num_points, int charge, double x0, double y0, double z0,
+                        double phi0, double psi0, double dsdz, double R, double chisq);
 
     /** Constructor from SimpleCircle and SimpleLine */
-    SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0, double phi0,
+    SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
                         double psi0, SimpleCircle circle, SimpleLine line_sz);
 
     /** Constructor from SimpleHelix */
-    SciFiHelicalPRTrack(int tracker, int num_points, ThreeVector pos0, SimpleHelix helix);
+    SciFiHelicalPRTrack(int tracker, int num_points, int charge,
+                        ThreeVector pos0, SimpleHelix helix);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
@@ -88,6 +89,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Set the number of points in a track (5, 4, or 3) */
     void set_num_points(int num_points) { _num_points = num_points; }
+
+    /** Get the track charge */
+    int get_charge() const { return _charge; }
+
+    /** Set the track charge */
+    void set_charge(int charge) { _charge = charge; }
 
     /** Get the intercept in x of the track with the tracker ref surface */
     double get_x0() const { return _x0; }
@@ -179,6 +186,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
   private:
     int _tracker;
     int _num_points;
+    int _charge;
     static const int _type = 1; // 0 for straight, 1 for helical
 
     double _x0;

@@ -22,7 +22,7 @@ import libxslt
 import math
 import numpy
 
-class CADImport: #pylint: disable = R0903
+class CADImport: #pylint: disable = R0903, C0103
     """
     @Class CADImport, GDML parser class.
     
@@ -37,7 +37,7 @@ class CADImport: #pylint: disable = R0903
 
     def __init__(self, xmlin1, xsl=None, xmlin2=None, \
              output=None, mergein=None, mergeout=None): 
-             #pylint: disable = R0912, R0913
+             #pylint: disable = R0912, R0913, C0103
         """
         @Method Class constructor
 
@@ -128,7 +128,7 @@ class CADImport: #pylint: disable = R0903
 
 
     def translate_gdml(self):
-
+        #pylint: disable = R0912, R0913, C0103
         '''
         
         @Method translate_gdml to parse an XML(GDML) to a MICE
@@ -164,6 +164,7 @@ class CADImport: #pylint: disable = R0903
         mmfile.close()
     
     def AccessModule(self, datafile, result, moduleName, volumenumber=-1):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
         '''
         @Method AccessModule to recursively generate a MICE module from a gdml file
         '''
@@ -179,35 +180,47 @@ class CADImport: #pylint: disable = R0903
             if vol.prop('name') == moduleName:
                 # find the reference to the solid used to generate the volume
                 solid      = vol.xpathEval("solidref")
-                # This solid corresponds to a box, tube, or other, that we do not know a priori
+                # This solid corresponds to a box, tube,
+                # or other, that we do not know a priori
                 box        = datafile.xpathEval("gdml/solids/box")
                 for elem in box:
-                    # Extract the properties of a box corresponding to the solid reference
+                    # Extract the properties of a box corresponding
+                    # to the solid reference
                     if elem.prop('name') == solid[0].prop('ref'):
                         result.append('Volume Box\n')
-                        result.append('Dimensions '+elem.prop('x')+' '+elem.prop('y')+' '+\
-                                      elem.prop('z')+' '+elem.prop('lunit')+'\n')
+                        result.append('Dimensions '+elem.prop('x')+\
+                                      ' '+elem.prop('y')+' '+\
+                                      elem.prop('z')+' '+\
+                                      elem.prop('lunit')+'\n')
                         break
                 tube       = datafile.xpathEval("gdml/solids/tube")
                 for elem in tube:
-                    # Extract the properties of a tube corresponding to the solid reference
+                    # Extract the properties of a tube corresponding
+                    # to the solid reference
                     if elem.prop('name') == solid[0].prop('ref'):
                         if elem.prop('rmin'):
                             result.append('Volume Tube\n')
-                            result.append('Dimensions '+elem.prop('rmin')+' '+elem.prop('rmax')+' '+\
-                                          elem.prop('z')+' '+elem.prop('lunit')+'\n')
+                            result.append('Dimensions '+\
+                                          elem.prop('rmin')+' '+\
+                                          elem.prop('rmax')+' '+\
+                                          elem.prop('z')+' '+\
+                                          elem.prop('lunit')+'\n')
                         else:
                             result.append('Volume Cylinder\n')
-                            result.append('Dimensions '+elem.prop('rmax')+' '+\
-                                          elem.prop('z')+' '+elem.prop('lunit')+'\n')
+                            result.append('Dimensions '+\
+                                          elem.prop('rmax')+' '+\
+                                          elem.prop('z')+' '+\
+                                          elem.prop('lunit')+'\n')
                         break
                 intersection = datafile.xpathEval("gdml/solids/intersection")
                 for elem in intersection:
-                    # if the solid name matches the element name, we leave the solid
-                    # definition to the auxiliary elements
+                    # if the solid name matches the element name, we leave
+                    # the solid definition to the auxiliary elements
                     if elem.prop('name') == solid[0].prop('ref'):
                         result.append('Volume Boolean')
                         break
+                # In the case of a volume subtraction do nothing for the
+                # time being.
                 subtraction = datafile.xpathEval("gdml/solids/subtraction")
                 for elem in subtraction:
                     if elem.prop('name') == solid[0].prop('ref'):
@@ -218,100 +231,164 @@ class CADImport: #pylint: disable = R0903
                     if elem.prop('name') == solid[0].prop('ref'):
                         result.append('Volume Sphere\n')
                         result.append('Dimensions '+elem.prop('rmin')+' '+\
-                                      elem.prop('rmax')+' '+elem.prop('lunit')+'\n')
+                                      elem.prop('rmax')+' '+\
+                                      elem.prop('lunit')+'\n')
                 aux        = vol.xpathEval('auxiliary')
                 unit = "cm"
+                # Get the auxhilary elements of the volume
                 for elem in aux:
-                    type, value = elem.prop('auxtype'), elem.prop('auxvalue')
-                    if type=='unit': unit = value
-                    if type=='RedColour' or type=='BlueColour' or type=='GreenColour' \
-                           or type=='G4StepMax' \
-                           or type=='Thickness[mm]' \
-                           or type=='DiameterOfPmt[mm]'\
-                           or type=='DiameterOfGate[mm]'\
-                           or type=='XoffsetOfPmt[mm]'\
-                           or type=='ZoffsetOfPmt[mm]':
-                        result.append('PropertyDouble '+type+' '+value+"\n")
-                    if type=='ActiveRadius' or type=='Pitch' or type=='FibreDiameter' \
-                           or type=='CoreDiameter' or type=='CentralFibre' \
-                           or type=='GlueThickness' or type=='FibreLength' \
-                           or type=='FibreSpacingY' or type=='FibreSpacingZ'\
-                           or type=='OpticsMaterialLength':
-                        result.append('PropertyDouble '+type+' '+value+' '+unit+'\n')
-                    elif type=='numPlanes' or type=='Station' or type=='numPMTs' \
-                             or type=='Plane' or type=='Tracker' or type=='Cell' \
-                             or type=='CkovPmtNum':
-                        result.append('PropertyInt '+type+' '+value+"\n")
-                    elif type=='SensitiveDetector' \
-                             or type=='Detector' \
-                             or type=='G4Detector' \
-                             or type=='BaseModule' \
-                             or type=='BooleanModule1' \
-                             or type=='BooleanModule1Type'\
-                             or type=='BooleanModule2' \
-                             or type=='BooleanModule2Type':
-                        result.append('PropertyString '+type+' '+value+"\n")
-                    elif type=='Invisible' or type=='UseDaughtersInOptics':
-                        result.append('PropertyBool '+type+' '+value+"\n")
-                    elif type=='Pmt1PosX':
-                        result.append('PropertyHep3Vector Pmt1Pos '+value+' 0.0 0.0 cm\n')
-                    elif type=='Pmt2PosX':
-                        result.append('PropertyHep3Vector Pmt2Pos '+value+' 0.0 0.0 cm\n')
-                    elif type=='Pmt1PosY':
-                        result.append('PropertyHep3Vector Pmt1Pos 0.0 '+value+' 0.0 cm\n')
-                    elif type=='Pmt2PosY':
-                        result.append('PropertyHep3Vector Pmt2Pos 0.0 '+value+' 0.0 cm\n')
-                    elif type=='BooleanModule1Pos' \
-                         or type=='BooleanModule1Rot' \
-                         or type=='BooleanModule2Pos' \
-                         or type=='BooleanModule2Rot' \
-                         or type=='Phi' or type=='Theta':
-                        result.append('PropertyHep3Vector '+type+' '+value+"\n")
-                    
+                    elemtype, value = elem.prop('auxtype'), elem.prop('auxvalue')
+                    # Extract units for double types
+                    if elemtype =='unit':
+                        unit = value
+                    # Extract unitless double elements
+                    if elemtype =='RedColour' \
+                           or elemtype == 'BlueColour'\
+                           or elemtype == 'GreenColour' \
+                           or elemtype == 'G4StepMax' \
+                           or elemtype == 'Thickness[mm]' \
+                           or elemtype == 'DiameterOfPmt[mm]'\
+                           or elemtype == 'DiameterOfGate[mm]'\
+                           or elemtype == 'XoffsetOfPmt[mm]'\
+                           or elemtype == 'ZoffsetOfPmt[mm]':
+                        result.append('PropertyDouble '+elemtype+' '+value+"\n")
+                    # Extract double typed elements with units
+                    if elemtype == 'ActiveRadius' \
+                           or elemtype == 'Pitch' or elemtype == 'FibreDiameter' \
+                           or elemtype == 'CoreDiameter' or elemtype == 'CentralFibre' \
+                           or elemtype == 'GlueThickness' or elemtype == 'FibreLength' \
+                           or elemtype == 'FibreSpacingY' or elemtype == 'FibreSpacingZ'\
+                           or elemtype == 'OpticsMaterialLength':
+                        result.append('PropertyDouble '+elemtype+' '\
+                                      +value+' '+unit+'\n')
+                    # Extract integer elements
+                    elif elemtype == 'numPlanes' \
+                             or elemtype == 'Station' or elemtype=='numPMTs' \
+                             or elemtype == 'Plane' or elemtype=='Tracker' \
+                             or elemtype == 'Cell' \
+                             or elemtype == 'CkovPmtNum':
+                        result.append('PropertyInt '+elemtype+' '+value+"\n")
+                    # Extract string typed elements
+                    elif elemtype == 'SensitiveDetector' \
+                             or elemtype == 'Detector' \
+                             or elemtype == 'G4Detector' \
+                             or elemtype == 'BaseModule' \
+                             or elemtype == 'BooleanModule1' \
+                             or elemtype == 'BooleanModule1Type'\
+                             or elemtype == 'BooleanModule2' \
+                             or elemtype == 'BooleanModule2Type':
+                        result.append('PropertyString '+elemtype+' '+value+"\n")
+                    # Extract boolean elements
+                    elif elemtype ==' Invisible'\
+                             or elemtype == 'UseDaughtersInOptics':
+                        result.append('PropertyBool '+elemtype+' '\
+                                      +value+"\n")
+                    # Extract selected vector typed elements
+                    elif elemtype == 'Pmt1PosX':
+                        result.append('PropertyHep3Vector Pmt1Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'Pmt2PosX':
+                        result.append('PropertyHep3Vector Pmt2Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'Pmt1PosY':
+                        result.append('PropertyHep3Vector Pmt1Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
+                    elif elemtype == 'Pmt2PosY':
+                        result.append('PropertyHep3Vector Pmt2Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
+                    # Specialized vector types
+                    elif elemtype == 'BooleanModule1Pos' \
+                         or elemtype == 'BooleanModule1Rot' \
+                         or elemtype == 'BooleanModule2Pos' \
+                         or elemtype == 'BooleanModule2Rot' \
+                         or elemtype == 'Phi' or elemtype == 'Theta':
+                        result.append('PropertyHep3Vector '+elemtype+' '+value+"\n")
+                # Get the material reference     
                 material = vol.xpathEval("materialref")
-                result.append("PropertyString Material "+material[0].prop("ref")+"\n")
+                result.append("PropertyString Material "+\
+                              material[0].prop("ref")+"\n")
+                # Access the physical volumes defined within the parent
                 physvol = vol.xpathEval("physvol")
                 for elem in physvol:
-                    self.AccessModule(datafile, result, \
-                                     elem.xpathEval("volumeref")[0].prop('ref'), volumenumber)
+                    vol_name = elem.xpathEval("volumeref")[0].prop('ref')
+                    # Access the daughter volume
+                    self.AccessModule(datafile, result, vol_name, \
+                                      volumenumber)
+                    # get the postion of the daughter
                     position = elem.xpathEval("position")[0]
-                    result.append("Position "+position.prop('x')+" "+position.prop('y')+' '+\
-                                  position.prop('z')+" "+position.prop('unit') + '\n')
+                    result.append("Position "+\
+                                  position.prop('x')+" "+\
+                                  position.prop('y')+' '+\
+                                  position.prop('z')+" "+\
+                                  position.prop('unit') + '\n')
+                    # get the rotation of the daughter
                     rotlist = elem.xpathEval("rotation")
+                    # Either a rotation is defined or a reference
+                    # to the identity rotation.
                     if len(rotlist):
                         rotation = elem.xpathEval("rotation")[0]
-                        result.append("Rotation "+rotation.prop('x')+" "+rotation.prop('y')+' '+\
-                                      rotation.prop('z')+" "+rotation.prop('unit')+'\n')
+                        result.append("Rotation "+\
+                                      rotation.prop('x')+" "+\
+                                      rotation.prop('y')+' '+\
+                                      rotation.prop('z')+" "+\
+                                      rotation.prop('unit')+'\n')
                     else:
+                        # If there is no rotation defined use the
+                        # null rotation.
                         result.append("Rotation 0.0 0.0 0.0 degree\n")
+                    # Bookkeeping for the MICE modules
                     if volumenumber > -1:
-                        result.append("} // End"+elem.xpathEval("volumeref")[0].prop('ref')\
+                        # If ending a replica volume add the replica number
+                        result.append("} // End"+vol_name\
                                       +str(volumenumber)+"\n\n")
                     else:
-                        result.append("} // End"+elem.xpathEval("volumeref")[0].prop('ref')+"\n\n")
+                        # Add the volume identity at the end for readability
+                        result.append("} // End"+vol_name+"\n\n")
+                # To simplify the definition of replicated volumes replicavol
+                # is available
                 replicavol = vol.xpathEval("replicavol")
                 for instance in replicavol:
+                    # get the volume reference 
                     basename = instance.xpathEval("volumeref")[0].prop('ref')
+                    # How many volumes are there?
                     nvolumes = float(instance.prop('number'))
+                    # On what axis is the volume replicated
                     replica   = instance.xpathEval("replicate_along_axis")
-                    deltapos  = float(replica[0].xpathEval("width")[0].prop('value'))
+                    # What is the change in position of the replica
+                    deltapos  = \
+                             float(replica[0].xpathEval("width")[0].prop('value'))
+                    # What is the unit of the change in position
                     deltaunit = replica[0].xpathEval("width")[0].prop('unit')
+                    # Some math to position the replicas in the MICE module
                     repOffset = deltapos * math.floor(nvolumes / 2.0)
                     minOffset = -repOffset
                     maxOffset = repOffset
+                    # Add an offset specific to odd and even numbers of elements
                     if int(nvolumes) % 2 == 0:
                         minOffset += deltapos * 0.5
                         maxOffset += deltapos * 0.5
                     elif int(nvolumes) % 2 ==1:
                         maxOffset += deltapos 
                     volumenumber = 0
+                    # Write the MICE module for each replica volume
                     for pos in numpy.arange(minOffset, maxOffset, deltapos):
-                        self.AccessModule(datafile, result, basename, volumenumber)
-                        result.append("PropertyInt Slab "+str(volumenumber)+"\n")
-                        if replica[0].xpathEval("direction")[0].prop('x') == '1':
-                            result.append("Position "+str(pos)+" 0.0 0.0 "+deltaunit+"\n")
-                        elif replica[0].xpathEval("direction")[0].prop('y') == '1':
-                            result.append("Position 0.0 "+str(pos)+" 0.0 "+deltaunit+"\n")
+                        # Write the volume from the file.
+                        self.AccessModule(datafile, result, \
+                                          basename, volumenumber)
+                        # Add the volume number to the output stream
+                        result.append("PropertyInt Slab "+\
+                                      str(volumenumber)+"\n")
+                        # Write the position of the volume
+                        if replica[0].xpathEval("direction")[0].prop('x') \
+                               == '1':
+                            result.append("Position "+\
+                                          str(pos)+" 0.0 0.0 "+deltaunit+"\n")
+                        elif replica[0].xpathEval("direction")[0].prop('y') \
+                                 == '1':
+                            result.append("Position 0.0 "+\
+                                          str(pos)+" 0.0 "+deltaunit+"\n")
+                        # Assume that there is a null rotation... is this right
                         result.append("Rotation 0.0 0.0 0.0 degree\n")
-                        result.append("} // End"+basename+str(volumenumber)+"\n\n")
+                        result.append("} // End"+basename+\
+                                      str(volumenumber)+"\n\n")
                         volumenumber += 1

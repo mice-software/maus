@@ -30,7 +30,7 @@ import libxml2
 from math import sin, cos, pi
 from array import array
 
-class ElementRotationTranslation: #pylint: disable = R0903, R0902
+class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
     """
     @class ElementRotationTranslation: This class fits for translations and rotations of
     a set of reference points in the detector system to place the detector in
@@ -42,7 +42,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
     Output still to be determined.
     """
     # initialize class
-    def __init__(self):
+    def __init__(self): #pylint: disable = R0903, R0902, C0103
         # initialize input data arrays
         self.refpoints  = []
         self.datapoints = []
@@ -88,7 +88,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             self.RefFile = config_dict['survey_reference_position'] # 'Rotation_test.reference'
         self.result = []
 
-    def execute(self):
+    def execute(self): #pylint: disable = R0903, R0902, C0103
         """
         @method execute: Fit for all detectors indicated by the survey target list in the config file
         """
@@ -97,29 +97,29 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         if not len(self.sfTarget): return False
         # Run over all elements in the surveyed detectors
         isgood = True
+        basepath = 'MICE_Information/Detector_Information/'
         for target in self.sfTarget:
-            basepath = 'MICE_Information/Detector_Information/'
-            targetpath = os.path.join(basepath,target)
+            targetpath = os.path.join(basepath, target)
             if target.find('TOF') >= 0:
-                targetpath = os.path.join(basepath,'TOF/'+target)
+                targetpath = os.path.join(basepath, 'TOF/'+target)
             elif target.find('Ckov') >= 0:
-                targetpath = os.path.join(basepath,'Cherenkov/'+target)
+                targetpath = os.path.join(basepath, 'Cherenkov/'+target)
             elif target.find('Tracker') >=0:
-                targetpath = os.path.join(basepath,'Tracker/'+target)
-            if not self.FitForDetector(targetpath,target+'.gdml'):
+                targetpath = os.path.join(basepath, 'Tracker/'+target)
+            if not self.FitForDetector(targetpath, target+'.gdml'):
                 isgood = False
                 print 'Fit Failed for '+target
-        self.writefile()
+        self.writefile()        
         return isgood
 
-    def FitForDetector(self, detectorPath, detectorFile):
+    def FitForDetector(self, detectorPath, detectorFile): #pylint: disable = R0903, R0902, C0103
         """
         @method FitForDetectors: A subroutine to execute the fit based on a set of input data points.
         """
         isgood = True
         # extract the measured data
         # if the GDML file is to be used, a list of files associated with the
-        # survey points must be provided. The order must match the reference points. 
+        # survey points must be provided. Order must match the reference points. 
         if self.UseGDML:
             isgood = self.extractDatafromGDML(detectorPath)
         # otherwise use a list of data points provided
@@ -178,7 +178,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         print path
         det = self.datafile.xpathEval(path)
         # if len(det)==0:
-        for q in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/position"):
+        for q in self.gdmlfile.xpathEval(\
+            "gdml/structure/volume/physvol/position"):
             if q.prop("name") == det[0].prop("gdml_posref"):
                 self.initguess[0] = float(q.prop('x'))
                 self.initguess[1] = float(q.prop('y'))
@@ -223,26 +224,22 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
     def extractRefPoints(self):
         """
         @method extractRefPoints: Get the detector reference point positions from a text file.
+        To be used for debugging purposes.
         """
         isgood = True
-        if False:  # self.UseCDB:
-            print 'Error: CDB record of survey reference has not yet been implemented'
-            isgood = False
-            return isgood
-        else: # read from data file
-            reffile = open(self.Reffile)
-            for line in reffile:
-                if line[0] == '#': continue
-                m = line.split()
-                if len(m) != 3:
-                    print 'Error: reference points invalid for the following line:'
-                    print line
-                    isgood = False
-                    return isgood
-                # otherwise the prospective reference point is good.
-                # write the file content to the refpoints array
-                data = array('d',(float(m[0]), float(m[1]), float(m[2])))
-                self.refpoints.append(data)
+        reffile = open(self.Reffile)
+        for line in reffile:
+            if line[0] == '#': continue
+            m = line.split()
+            if len(m) != 3:
+                print 'Error: reference points invalid for the line:'
+                print line
+                isgood = False
+                return isgood
+            # otherwise the prospective reference point is good.
+            # write the file content to the refpoints array
+            data = array('d',(float(m[0]), float(m[1]), float(m[2])))
+            self.refpoints.append(data)
         return isgood
     
     def sensibleDataSet(self):
@@ -258,7 +255,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         if len(self.refpoints) != len(self.datapoints):
             isgood = False
             print 'Warning: input arrays will be shortened for consistency.'
-            print '    This may result in an incompatability of the input data and reference points.'
+            print '     This may result in an incompatability of the input '
+            print '     data and reference points.'
             # Shorten the longer array
             if len(self.refpoints) > len(self.datapoints):
                 # check the difference in length
@@ -305,8 +303,10 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         gMinuit.mnexcm( "MIGRAD", arglist, 2, ierflag )
 
         # print results
-        amin, edm, errdef = ROOT.Double(0.18), ROOT.Double(0.19), ROOT.Double(0.20)
-        nvpar, nparx, icstat = ROOT.Long(1981), ROOT.Long(1983), ROOT.Long(1986)
+        amin, edm, errdef = \
+              ROOT.Double(0.18), ROOT.Double(0.19), ROOT.Double(0.20)
+        nvpar, nparx, icstat = \
+               ROOT.Long(1981), ROOT.Long(1983), ROOT.Long(1986)
         gMinuit.mnstat( amin, edm, errdef, nvpar, nparx, icstat )
         gMinuit.mnprin( 3, amin )
 
@@ -337,11 +337,13 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
         sz = sin(pars[5])
 
         xi = data
-        # print 'x0[0] = ', x0[0],', cosy = ', cy,', cosz = ', cz,'xi[0] = ', xi[0],', sinz = ', sz, 'xi[1] = ', xi[1],', siny = ', sy,'xi[2] = ', xi[2] 
+        
         xf = array('d', xi)
         xf[0] = x0[0] + cy*cz*xi[0] - cy*sz*xi[1] + sy*xi[2]
-        xf[1] = x0[1] + (cx*sz + sx*sy*cz)*xi[0] + (cx*cz - sx*sy*sz)*xi[1] - sx*cy*xi[2]
-        xf[2] = x0[2] + (sx*sz - cx*sy*cz)*xi[0] + (sx*cz + cx*sy*sz)*xi[1] - cx*cz*xi[2]
+        xf[1] = x0[1] + (cx*sz + sx*sy*cz)*xi[0] + \
+                (cx*cz - sx*sy*sz)*xi[1] - sx*cy*xi[2]
+        xf[2] = x0[2] + (sx*sz - cx*sy*cz)*xi[0] + \
+                (sx*cz + cx*sy*sz)*xi[1] - cx*cz*xi[2]
 
         return xf
 
@@ -354,7 +356,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             rotatedpoints = self.ApplyRotations(self.refpoints[i], par)
             
             for j in range(len(rotatedpoints)):
-                delta2 += (self.datapoints[i][0][j] - rotatedpoints[j]) * (self.datapoints[i][0][j] - rotatedpoints[j])
+                delta2 += (self.datapoints[i][0][j] - rotatedpoints[j]) \
+                          * (self.datapoints[i][0][j] - rotatedpoints[j])
                 sigma2 += self.datapoints[i][1][j] * self.datapoints[i][1][j]
                 
             chi2 += delta2 / sigma2 
@@ -382,7 +385,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
             # print  "testing"+node.xpathEval("position")[0].prop("name")
             if node.xpathEval("position")[0].prop("name") == PosRefName:
                 # print  "Reference Found"
-                if newFile and os.path.exists(os.path.join(self.dl_dir, newFile)):
+                if newFile and \
+                       os.path.exists(os.path.join(self.dl_dir, newFile)):
                     filepath = node.xpathEval("file")[0]
                     filepath.setProp('name', newFile)
                 if isgood: # the fit has been conducted and the result recorded
@@ -417,7 +421,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902
                 # print q.next()
         if nodefound == 0:
             isgood = False
-            print "Target node "+PosRefName+" in path "+ path +" not found in GDML file." 
+            print "Target node "+PosRefName+" in path "+ path \
+                  +" not found in GDML file." 
         # newfile = self.GDMLFile.replace('.gdml','_ed.gdml')
         return isgood
 
@@ -438,5 +443,5 @@ def testfit():
     fitter = ElementRotationTranslation()
     fitter.execute()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     testfit()

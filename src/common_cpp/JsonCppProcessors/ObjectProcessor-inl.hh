@@ -171,7 +171,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetCppChild(json_object, *cpp_object);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             delete cpp_object;
             exc.SetMessage("In branch "+it->first+"\n"
                             +exc.GetMessage());
@@ -189,7 +189,7 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetJsonChild(cpp_object, *json_object);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             delete json_object;
             exc.SetMessage("In branch "+it->first+"\n"
                             +exc.GetMessage());

@@ -159,6 +159,7 @@ TEST_F(SciFiClusterRecTest, test_find_plane) {
   EXPECT_FALSE(a_plane);
 }
 */
+/*
 TEST_F(SciFiClusterRecTest, test_neighbours) {
   int spill   = 1;
   int event   = 1;
@@ -174,7 +175,7 @@ TEST_F(SciFiClusterRecTest, test_neighbours) {
   SciFiDigit *digit1 = new SciFiDigit(spill, event, tracker, station, plane, channel_1, npe, time);
   SciFiDigit *digit2 = new SciFiDigit(spill, event, tracker, station, plane, channel_2, npe, time);
   SciFiDigit *digit3 = new SciFiDigit(spill, event, tracker, station, plane, channel_3, npe, time);
-/*
+
   SciFiClusterRec worker(cluster_exception, min_npe, modules);
   bool expect_false;
   expect_false = worker.are_neighbours(digit1, digit2);
@@ -182,9 +183,9 @@ TEST_F(SciFiClusterRecTest, test_neighbours) {
   bool expect_true;
   expect_true = worker.are_neighbours(digit1, digit3);
   EXPECT_TRUE(expect_true);
-*/
-}
 
+}
+*/
 /*
   ThreeVector get_reference_frame_pos(int tracker);
 

@@ -288,9 +288,9 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch(MAUS::Exception& exception) {
+  } catch (MAUS::Exception& exception) {
     success = false;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     success = false;
   }
   ASSERT_TRUE(success);
@@ -342,9 +342,9 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch(MAUS::Exception& exception) {
+  } catch (MAUS::Exception& exception) {
     success = true;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     success = true;
   }
   ASSERT_TRUE(success);
@@ -370,9 +370,9 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch(MAUS::Exception& exception) {
+  } catch (MAUS::Exception& exception) {
     success = true;
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     success = true;
   }
   ASSERT_TRUE(success);

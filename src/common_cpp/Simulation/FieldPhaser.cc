@@ -89,7 +89,7 @@ void FieldPhaser::SetPhases() {
                 ref = TryToPhase(v_hits);
        }
     }
-    catch(...) {}
+    catch (...) {}
     Squeak::mout(Squeak::info) << "\nMade " << n_attempts
           << " attempts to phase "
           << BTPhaser::GetInstance()->NumberOfCavities() << " cavities with "

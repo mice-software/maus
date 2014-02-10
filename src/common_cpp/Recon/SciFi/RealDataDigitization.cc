@@ -34,8 +34,8 @@ void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface...
-  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool map = load_mapping("mapping_7.txt");
+  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
@@ -84,14 +84,13 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     tracker1.push_back(tracker1daq_event); // end of event. push back.
 
     ReconEvent * revt = new ReconEvent();
-    revt->SetSciFiEvent(new SciFiEvent(*event));
+    // revt->SetSciFiEvent(new SciFiEvent(*event));
+    revt->SetSciFiEvent(event);
     spill->GetReconEvents()->push_back(revt);
+    // delete event;
   }  // ends loop over events (i)
   spill->GetDAQData()->SetTracker0DaqArray(tracker0);
   spill->GetDAQData()->SetTracker1DaqArray(tracker1);
-  std::cerr << "DAQ sizes: " << std::endl;
-  std::cerr << spill->GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-  std::cerr << spill->GetDAQData()->GetTracker1DaqArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB(Json::Value input_event,
@@ -147,7 +146,7 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
     double tdc_gain     = calibration_[bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -175,10 +174,6 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
   }  // ends loop over channels (j)
   tracker0daq_event->SetVLSBArray(vlsb_tracker0_array); // fill event with all vlsb digits
   tracker1daq_event->SetVLSBArray(vlsb_tracker1_array); // fill event with all vlsb digits
-
-  // std::cerr << "VLSB array sizes: " << std::endl;
-  // std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
-  // std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB_c(Json::Value input_event,
@@ -225,7 +220,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     }
 
     if ( !is_good_channel(bank, channel_ro) ) {
-      continue;
+      // continue;
     }
 
     // Get pedestal and gain from calibration.
@@ -236,7 +231,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -251,7 +246,11 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     */
     // Find tracker, station, plane, channel.
     int tracker, station, plane, channel;
-    bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
+    int extWG, inWG, WGfib;
+    bool found = get_StatPlaneChannel(board, bank, channel_ro,
+                                      tracker, station, plane,
+                                      channel, extWG, inWG, WGfib);
+
      // Exclude missing modules.
     if ( found ) { // pe > 1.0 &&
       SciFiDigit *digit = new SciFiDigit(spill, eventNo,
@@ -284,7 +283,6 @@ bool RealDataDigitization::load_calibration(std::string file) {
     return false;
 
   size_t n_channels = calibration_data.size();
-
   for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
     int bank            = calibration_data[i]["bank"].asInt();
     int channel_n       = calibration_data[i]["channel"].asInt();
@@ -338,7 +336,8 @@ bool RealDataDigitization::load_mapping(std::string file) {
 }
 
 bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                           int& tracker, int& station, int& plane, int& channel) const {
+                           int& tracker, int& station, int& plane, int& channel,
+                           int &extWG, int &inWG, int &WGfib) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
@@ -348,6 +347,9 @@ bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan
       plane = _view[i];
       channel = _fibre[i];
       tracker = _tracker[i];
+      extWG   = _extWG[i];
+      inWG    = _inWG[i];
+      WGfib   = _WGfib[i];
       found = true;
     }
   }
