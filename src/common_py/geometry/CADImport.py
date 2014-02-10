@@ -237,9 +237,10 @@ class CADImport: #pylint: disable = R0903, C0103
                 unit = "cm"
                 # Get the auxhilary elements of the volume
                 for elem in aux:
-                    elemtype, value = elem.prop('auxtype'), elem.prop('auxvalue')
+                    elemtype, value = \
+                              elem.prop('auxtype'), elem.prop('auxvalue')
                     # Extract units for double types
-                    if elemtype =='unit':
+                    if elemtype == 'unit':
                         unit = value
                     # Extract unitless double elements
                     if elemtype =='RedColour' \
@@ -254,17 +255,21 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
                     if elemtype == 'ActiveRadius' \
-                           or elemtype == 'Pitch' or elemtype == 'FibreDiameter' \
-                           or elemtype == 'CoreDiameter' or elemtype == 'CentralFibre' \
-                           or elemtype == 'GlueThickness' or elemtype == 'FibreLength' \
-                           or elemtype == 'FibreSpacingY' or elemtype == 'FibreSpacingZ'\
+                           or elemtype == 'Pitch'\
+                           or elemtype == 'FibreDiameter' \
+                           or elemtype == 'CoreDiameter'\
+                           or elemtype == 'CentralFibre' \
+                           or elemtype == 'GlueThickness'\
+                           or elemtype == 'FibreLength' \
+                           or elemtype == 'FibreSpacingY'\
+                           or elemtype == 'FibreSpacingZ'\
                            or elemtype == 'OpticsMaterialLength':
                         result.append('PropertyDouble '+elemtype+' '\
                                       +value+' '+unit+'\n')
                     # Extract integer elements
                     elif elemtype == 'numPlanes' \
-                             or elemtype == 'Station' or elemtype=='numPMTs' \
-                             or elemtype == 'Plane' or elemtype=='Tracker' \
+                             or elemtype == 'Station' or elemtype == 'numPMTs' \
+                             or elemtype == 'Plane' or elemtype == 'Tracker' \
                              or elemtype == 'Cell' \
                              or elemtype == 'CkovPmtNum':
                         result.append('PropertyInt '+elemtype+' '+value+"\n")
@@ -279,7 +284,7 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'BooleanModule2Type':
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
-                    elif elemtype ==' Invisible'\
+                    elif elemtype == ' Invisible'\
                              or elemtype == 'UseDaughtersInOptics':
                         result.append('PropertyBool '+elemtype+' '\
                                       +value+"\n")
@@ -302,7 +307,8 @@ class CADImport: #pylint: disable = R0903, C0103
                          or elemtype == 'BooleanModule2Pos' \
                          or elemtype == 'BooleanModule2Rot' \
                          or elemtype == 'Phi' or elemtype == 'Theta':
-                        result.append('PropertyHep3Vector '+elemtype+' '+value+"\n")
+                        result.append('PropertyHep3Vector '+\
+                                      elemtype+' '+value+"\n")
                 # Get the material reference     
                 material = vol.xpathEval("materialref")
                 result.append("PropertyString Material "+\
@@ -355,8 +361,8 @@ class CADImport: #pylint: disable = R0903, C0103
                     # On what axis is the volume replicated
                     replica   = instance.xpathEval("replicate_along_axis")
                     # What is the change in position of the replica
-                    deltapos  = \
-                             float(replica[0].xpathEval("width")[0].prop('value'))
+                    width = replica[0].xpathEval("width")[0].prop('value')
+                    deltapos  = float(width)
                     # What is the unit of the change in position
                     deltaunit = replica[0].xpathEval("width")[0].prop('unit')
                     # Some math to position the replicas in the MICE module

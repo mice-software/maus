@@ -30,7 +30,7 @@ import libxml2
 from math import sin, cos, pi
 from array import array
 
-class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
+class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
     """
     @class ElementRotationTranslation: This class fits for translations and rotations of
     a set of reference points in the detector system to place the detector in
@@ -51,7 +51,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         inputs = Configuration().getConfigJSON(command_line_args = True)
         config_dict = json.loads(inputs)
         # get the gdml directory
-        self.dl_dir   = os.path.join(config_dict['geometry_download_directory'],'gdml')
+        self.dl_dir = os.path.join(
+            config_dict['geometry_download_directory'],'gdml')
         # get the survey target detectors
         self.sfTarget = config_dict['survey_target_detectors']
         # extract data files from configuration files
@@ -63,10 +64,11 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         
         self.UseGDML  = config_dict['use_gdml_source']
         if self.UseGDML:
-            # The survey information is in the CAD geometry file which should have one of these names
-            fnames = ['fastradModel','FastradModel.gdml','Step_IV.gdml']
+            # The survey information is in the CAD geometry
+            # file which should have one of these names
+            fnames = ['fastradModel', 'FastradModel.gdml', 'Step_IV.gdml']
             for name in fnames:
-                tempfile = os.path.join(self.dl_dir,name)
+                tempfile = os.path.join(self.dl_dir, name)
                 if os.path.exists(tempfile):
                     self.GDMLFile = tempfile
                     # break on the first qualifing instance.
@@ -76,16 +78,17 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
                 self.GDMLFile = config_dict['survey_measurement_record']
             # The default source of reference information for the fit.
             self.XMLFile  = os.path.join(self.dl_dir,'Maus_Information.gdml')
-            if not os.path.exists(self.XMLFile):  self.XMLFile = ''
+            if not os.path.exists(self.XMLFile):
+                self.XMLFile = ''
             # An override method --- if necessary
             if config_dict['survey_reference_position']:
-                self.XMLFile  = config_dict['survey_reference_position'] # 'Rotation_test.reference'
+                self.XMLFile  = config_dict['survey_reference_position'] 
             print self.GDMLFile, self.XMLFile
             self.datafile = libxml2.parseFile(self.XMLFile)
             self.gdmlfile = libxml2.parseFile(self.GDMLFile)
         else:
-            self.DataFile = config_dict['survey_measurement_record'] # 'Rotation_test.dat
-            self.RefFile = config_dict['survey_reference_position'] # 'Rotation_test.reference'
+            self.DataFile = config_dict['survey_measurement_record']
+            self.RefFile = config_dict['survey_reference_position']
         self.result = []
 
     def execute(self): #pylint: disable = R0903, R0902, C0103
@@ -94,7 +97,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         """
         
         # A check (possibly redundant) to see if we will do anything
-        if not len(self.sfTarget): return False
+        if not len(self.sfTarget):
+            return False
         # Run over all elements in the surveyed detectors
         isgood = True
         basepath = 'MICE_Information/Detector_Information/'
@@ -112,23 +116,27 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         self.writefile()        
         return isgood
 
-    def FitForDetector(self, detectorPath, detectorFile): #pylint: disable = R0903, R0902, C0103
+    def FitForDetector(self, detectorPath, detectorFile):
+        #pylint: disable = R0903, R0902, C0103
         """
         @method FitForDetectors: A subroutine to execute the fit based on a set of input data points.
         """
         isgood = True
         # extract the measured data
         # if the GDML file is to be used, a list of files associated with the
-        # survey points must be provided. Order must match the reference points. 
+        # survey points must be provided. Order must match reference points. 
         if self.UseGDML:
             isgood = self.extractDatafromGDML(detectorPath)
         # otherwise use a list of data points provided
         else:
-            if not self.extractData():     isgood = False
+            if not self.extractData():
+                isgood = False
             # extract the detector reference points  
-            if not self.extractRefPoints():  isgood = False
+            if not self.extractRefPoints():
+                isgood = False
             # make sure that the set of data and reference points are matched
-            elif not self.sensibleDataSet(): isgood = False
+            elif not self.sensibleDataSet():
+                isgood = False
         # if all checks out then run the fit itself
         if isgood:
             self.result = self.FitQP()
@@ -153,7 +161,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         isgood = True
         datafile = open(self.DataFile)
         for line in datafile:
-            if line[0] == '#': continue
+            if line[0] == '#':
+                continue
             m = line.split()
             if len(m) != 6:
                 print 'Error: data invalid for the following line:'
@@ -169,7 +178,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
             
         return isgood
 
-    def extractDatafromGDML(self, path):
+    def extractDatafromGDML(self, path): #pylint: disable = C0301
         """
         @method extractData: Get the survey point positions from a GDML file.
         """
@@ -190,7 +199,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         self.datapoints = []
         surveylist = self.datafile.xpathEval(path + "/Survey")
         if len(surveylist)==0:
-            isgood == False
+            isgood = False
             print 'No survey points identified for '+path
             return isgood
         
@@ -206,7 +215,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
             # of the survey point.
             data = array('d', (0., 0., 0.) )
             error = array('d', (1.0, 1.0, 1.0) ) # assume a 1 mm resolution
-            for q in self.gdmlfile.xpathEval("gdml/structure/volume/physvol/position"):
+            ql = self.gdmlfile.xpathEval(
+                "gdml/structure/volume/physvol/position")
+            for q in ql:
                 # print  q.prop("name"), node.prop("gdml_posref")
                 if q.prop("name") == node.prop("gdml_posref"):
                     data[0] = float(q.prop('x'))
@@ -227,9 +238,10 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         To be used for debugging purposes.
         """
         isgood = True
-        reffile = open(self.Reffile)
+        reffile = open(self.RefFile)
         for line in reffile:
-            if line[0] == '#': continue
+            if line[0] == '#':
+                continue
             m = line.split()
             if len(m) != 3:
                 print 'Error: reference points invalid for the line:'
@@ -273,7 +285,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
                 
         return isgood
         
-    def FitQP(self):
+    def FitQP(self): #pylint: disable = E1101, R0914
         """
         @method FitQP: This method uses the ROOT Minuit algorithms
         to minimize the rotations and translations of the detector.
@@ -322,7 +334,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
     
 
     
-    def ApplyRotations(self, data, pars):
+    def ApplyRotations(self, data, pars): #pylint: disable = R0201
         """
         A somewhat general method of applying translations and rotations with the matrices explicitly written.
 
@@ -348,6 +360,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         return xf
 
     def fcn( self, npar, gin, f, par, iflag ):
+        #pylint: disable = W0613, R0913, C0111
         npoints = len(self.refpoints)
 
         # calculate chisquare of translated points
@@ -410,7 +423,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
                         #     rotref.unlinkNode()
                         #     rotref.freeNode()
                         rotNode = libxml2.newNode("rotation")
-                        rotNode.setProp('name',rotName)
+                        rotNode.setProp('name', rotName)
                         rotNode.setProp('x', str(self.result[0][3] * 180/pi))
                         rotNode.setProp('y', str(self.result[0][4] * 180/pi))
                         rotNode.setProp('z', str(self.result[0][5] * 180/pi))
@@ -426,11 +439,11 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103
         # newfile = self.GDMLFile.replace('.gdml','_ed.gdml')
         return isgood
 
-    def writefile(self):
+    def writefile(self): #pylint: disable = C0111, W0104
         f = open(self.GDMLFile,'w')
         self.gdmlfile.saveTo(f)
         # print  self.gdmlfile
-        f.close
+        f.close()
         self.gdmlfile.freeDoc()
         
 

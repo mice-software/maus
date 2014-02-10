@@ -31,7 +31,7 @@ from geometry.LocationFit import ElementRotationTranslation
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
 
-def main():
+def main(): # pylint: disable = C0103
     """
     This is the code for the executable file which downloads the current valid
     geometry. It takes the arguments of the download directory. It will download
@@ -67,8 +67,8 @@ def main():
     zipped_geom = Unpacker(zip_filename, gdml_cache)
     zipped_geom.unzip_file()
     
-    surveyFit = ElementRotationTranslation()
-    surveyFit.execute()
+    survey_fit = ElementRotationTranslation()
+    survey_fit.execute()
     
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
