@@ -81,9 +81,9 @@ bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
     }
 
     return true;
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
     CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
@@ -99,7 +99,7 @@ string MapCppEMRPlaneHits::process(string document) {
   Json::Value spill_json;
   try {
     spill_json = JsonWrapper::StringToJson(document);
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
 //     ss << squee.what() << std::endl;
@@ -112,7 +112,7 @@ string MapCppEMRPlaneHits::process(string document) {
   Data* spill_cpp;
   try {
     spill_cpp = JsonCppSpillConverter().convert(&spill_json);
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
 //     ss << squee.what() << std::endl;
@@ -127,7 +127,7 @@ string MapCppEMRPlaneHits::process(string document) {
   Json::Value* spill_json_out;
   try {
     spill_json_out = CppJsonSpillConverter().convert(spill_cpp);
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
 //     ss << squee.what() << std::endl;

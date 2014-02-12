@@ -33,6 +33,9 @@
 // ROOT headers
 #include "TMatrixD.h"
 
+// Third party library headers
+#include "gtest/gtest_prod.h"
+
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
@@ -49,16 +52,24 @@ namespace MAUS {
 class PatternRecognition {
   public:
 
-    /** @brief Default constructor */
+    /** Macro to allow friendship with the gtests */
+    FRIEND_TEST(PatternRecognitionTest, test_constructor);
+
+    /** @brief Default constructor. Initialise variables,
+     *         using globals if available, otherwise local defaults 
+     */
     PatternRecognition();
 
     /** @brief Default destructor */
     ~PatternRecognition();
 
+    /** @brief Set the member variables using the Global singleton class */
+    bool LoadGlobals();
+
     /** @brief Top level function to begin Pattern Recognition
       * @param evt - The SciFi event
       */
-    void process(const bool helical_pr_on, const bool straight_pr_on, SciFiEvent &evt);
+    void process(SciFiEvent &evt);
 
      /** @brief Small function to add trks to a SciFiEvent & to set the tracker number for them
       *  @param strks - The straight tracks vector
@@ -230,17 +241,17 @@ class PatternRecognition {
     bool set_ignore_stations(const std::vector<int> &ignore_stations,
                              int &ignore_station_1, int &ignore_station_2);
 
-    /** @brief Return helical PatRec on flag */
-    bool get_helical_pr_on() { return _helical_pr_on; }
-
-    /** @brief Set helical PatRec on flag */
-    void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
-
-    /** @brief Return straight PatRec on flag */
+    /** @brief Return the whether straight pat rec is on */
     bool get_straight_pr_on() { return _straight_pr_on; }
 
-    /** @brief Set straight PatRec on flag */
+    /** @brief Set whether or not to use straight pat rec */
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
+
+    /** @brief Return the whether helical pat rec is on */
+    bool get_helical_pr_on() { return _helical_pr_on; }
+
+    /** @brief Set whether or not to use helical pat rec */
+    void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
 
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
@@ -249,28 +260,23 @@ class PatternRecognition {
     void set_verbosity(const bool verb) { _verb = verb; }
 
   private:
-    int _verb;                               /** Verbosity: 0=little, 1=more couts */
-    static const int _n_trackers = 2;        /** Number of trackers */
-    static const int _n_stations = 5;        /** Number of stations per tracker */
-    static const double _sd_1to4 = 0.3844;   /** Position error associated with stations 1 t0 4 */
-    static const double _sd_5 = 0.4298;      /** Position error associated with station 5 */
-    static const double _sd_phi_1to4 = 1.0;  /** Rotation error associated with stations 1 t0 4 */
-    static const double _sd_phi_5 = 1.0;     /** Rotation error associated with station 5 */
-    static const double _res_cut = 2;           /** Road cut for linear fit in mm */
-    static const double _circ_res_cut = 5;      /** Road cut for circle fit in mm */
-    static const double _R_res_cut = 150.0;     /** Road cut for circle radius in mm */
-    static const double _chisq_cut = 15;        /** Cut on the chi^2 of the least sqs fit in mm */
-    static const double _sz_chisq_cut = 4.0;    /** Cut on the sz chi^2 from least sqs fit in mm */
-    static const double _chisq_diff = 3.;
-    static const double _n_turns_cut = 0.75;  /** Cut to decide if a given n turns value is good */
-    static const double _active_diameter = 300.0; /** Active volume diameter a tracker in mm */
-    bool _helical_pr_on;                          /** Flag to turn on helical pr (0 off, 1 on) */
-    bool _straight_pr_on;                         /** Flag to turn on straight pr (0 off, 1 on) */
-
-    static const double _Pt_max = 180.; /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
-    static const double _Pz_min = 50.;  /** MeV/c min Pz for helical tracks (this is a guess) */
-
-    LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
+    bool _straight_pr_on;      /** Straight pattern recogntion on or off */
+    bool _helical_pr_on;      /** Helical pattern recogntion on or off */
+    int _verb;                /** Verbosity: 0=little, 1=more couts */
+    int _n_trackers;          /** Number of trackers */
+    int _n_stations;          /** Number of stations per tracker */
+    double _sd_1to4;          /** Position error associated with stations 1 t0 4 */
+    double _sd_5;             /** Position error associated with station 5 */
+    double _sd_phi_1to4;      /** Rotation error associated with stations 1 t0 4 */
+    double _sd_phi_5;         /** Rotation error associated with station 5 */
+    double _res_cut;          /** Road cut for linear fit in mm */
+    double _R_res_cut;        /** Cut on the radius of the track helix in mm */
+    double _chisq_cut;        /** Cut on the chi^2 of the least sqs fit in mm */
+    double _sz_chisq_cut;     /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _n_turns_cut;      /** Cut to decide if a given n turns value is good */
+    double _Pt_max;           /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
+    double _Pz_min;           /** MeV/c min Pz for helical tracks (this is a guess) */
+    // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
 };
 
 } // ~namespace MAUS

@@ -49,9 +49,9 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
     return true;
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, mClassname);
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
   }
   return false;
@@ -65,10 +65,10 @@ std::string ReduceCppPatternRecognition::process(std::string aDocument) {
         mDataManager.process(mSpill);
         mDataManager.draw(mPlotters);
       }
-    } catch(Exception exc) {
+    } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
-    } catch(std::exception exc) {
+    } catch (std::exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);
     }
@@ -91,7 +91,7 @@ bool ReduceCppPatternRecognition::read_in_json(std::string aJsonData) {
     SpillProcessor spill_proc;
     mSpill = spill_proc.JsonToCpp(mRoot);
     return true;
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << mClassname << ": Failed when importing JSON to Spill";

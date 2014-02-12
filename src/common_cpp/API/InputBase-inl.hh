@@ -39,13 +39,13 @@ namespace MAUS {
     try {
       o = _emitter_cpp();
     }
-    catch(Exception& s) {
+    catch (Exception& s) {
       CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
     return o;

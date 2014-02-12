@@ -195,12 +195,27 @@ void MapCppTrackerMisalignments::initialize_PDFs() {
       tracker_n << tracker;
       pname_x = pname_x + tracker_n.str()+ station_n.str();
       pname_y = pname_y + tracker_n.str()+ station_n.str();
-      PDF probability_x(pname_x, bin_width, shift_min, shift_max);
-      PDF probability_y(pname_y, bin_width, shift_min, shift_max);
-      _x_shift_pdfs[tracker].push_back(probability_x);
-      _y_shift_pdfs[tracker].push_back(probability_y);
+
+      PDF *_probability_x = new PDF(pname_x, bin_width, shift_min, shift_max);
+      PDF *_probability_y = new PDF(pname_y, bin_width, shift_min, shift_max);
+      _x_shift_pdfs[tracker][station] = _probability_x;
+      _y_shift_pdfs[tracker][station] = _probability_y;
     }
   }
+
+  try {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
+    // Json::Value *json = Globals::GetConfigurationCards();
+    // _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
+    return true;
+    } catch (Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
+  } catch (std::exception& exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  }
+  return false;
 }
 
 bool MapCppTrackerMisalignments::death() {
@@ -299,9 +314,9 @@ std::string MapCppTrackerMisalignments::process(std::string document) {
       std::cerr << "No recon events found\n";
     }
     save_to_json(spill);
-  } catch(Exception &exception) {
+  } catch (Exception& exception) {
     exception.Print();
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -326,7 +341,7 @@ void MapCppTrackerMisalignments::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch(...) {
+  } catch (...) {
     std::cerr << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();

@@ -186,7 +186,7 @@ bool TOFCalibrationMap::LoadT0File(std::string t0File) {
       _reff[n] = reff;
       // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -219,7 +219,7 @@ bool TOFCalibrationMap::LoadTWFile(std::string twFile) {
       _twPar[n][3] = p3;
       // std::cout<< key << " pos:" << n << "  p0:" << p0 << "  p1:" << p1 << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -247,7 +247,7 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
       _Trt0.push_back(dt);
       // std::cout<< Pkey << "  dt:" << dt << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTriggerFile. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -524,7 +524,7 @@ bool TOFCalibrationMap::LoadT0Calib() {
       _reff[n] = reff;
       // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadT0Calib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -551,7 +551,7 @@ bool TOFCalibrationMap::LoadTWCalib() {
       _twPar[n][3] = p3;
        // std::cout<< key << " pos:" << n << "  p0:" << p0 << "  p1:" << p1 << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTWCalib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -573,7 +573,7 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
       _Trt0.push_back(dt);
        // std::cout<< Pkey << "  dt:" << dt << std::endl;
     }
-  } catch(MAUS::Exception e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTriggerCalib. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;

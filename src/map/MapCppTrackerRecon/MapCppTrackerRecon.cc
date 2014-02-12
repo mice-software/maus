@@ -41,8 +41,8 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
       GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
     }
     Json::Value *json = Globals::GetConfigurationCards();
-    _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
+    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
     _size_exception = (*json)["SciFiClustExcept"].asInt();
     _min_npe        = (*json)["SciFiNPECut"].asDouble();
@@ -53,9 +53,9 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     _geometry_helper = SciFiGeometryHelper(modules);
     _geometry_helper.Build();
     return true;
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -86,7 +86,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
+          pattern_recognition(*event);
         }
         // Kalman Track Fit.
         if ( _kalman_on ) {
@@ -100,9 +100,9 @@ std::string MapCppTrackerRecon::process(std::string document) {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
-  } catch(Exception& exception) {
+  } catch (Exception& exception) {
     exception.Print();
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -127,7 +127,7 @@ void MapCppTrackerRecon::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch(...) {
+  } catch (...) {
     std::cerr << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
@@ -157,11 +157,15 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
-                                             SciFiEvent &evt) {
-  PatternRecognition pr1;
+void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+  PatternRecognition pr1; // Pat rec constructor calls Globals again
   pr1.set_verbosity(0);
-  pr1.process(helical_pr_on, straight_pr_on, evt);
+  // We let the Map's helical and straight flags overide the interal pat rec variables for these,
+  // (pulled by pat rec from Globals) as this way we can customise which type runs for
+  // testing purposes.
+  pr1.set_helical_pr_on(_helical_pr_on);
+  pr1.set_straight_pr_on(_straight_pr_on);
+  pr1.process(evt);
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {

@@ -47,9 +47,9 @@ bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
                                                            JsonWrapper::realValue).asDouble();
 
     return true;
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
@@ -65,7 +65,7 @@ std::string MapCppTOFSlabHits::process(std::string document) {
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
   try {root = JsonWrapper::StringToJson(document);}
-  catch(...) {
+  catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says: Failed to parse input document";
@@ -106,10 +106,10 @@ std::string MapCppTOFSlabHits::process(std::string document) {
         }
       }
     }
-  } catch(Exception exc) {
+  } catch (Exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                        ->HandleException(root, exc, _classname);
-  } catch(std::exception exc) {
+  } catch (std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);
   }

@@ -97,7 +97,7 @@ PyObject* Birth(PyObject *dummy, PyObject *args) {
   std::string cards(temp);
   try {
     GlobalsManager::InitialiseGlobals(cards);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
@@ -108,7 +108,7 @@ PyObject* Birth(PyObject *dummy, PyObject *args) {
 PyObject* Death(PyObject *dummy, PyObject *args) {
   try {
     GlobalsManager::DeleteGlobals();
-  } catch(std::exception& exc) {  // shouldn't be able to throw an exception
+  } catch (std::exception& exc) {  // shouldn't be able to throw an exception
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
@@ -123,7 +123,7 @@ PyObject* HasInstance(PyObject *dummy, PyObject *args) {
       return Py_BuildValue("i", 1);
     else
       return Py_BuildValue("i", 0);
-  } catch(std::exception& exc) {  // shouldn't be able to throw an exception
+  } catch (std::exception& exc) {  // shouldn't be able to throw an exception
     PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
     return NULL;
   }
@@ -205,7 +205,7 @@ PyObject* SetMonteCarloMiceModules
     }
     try {
         GlobalsManager::SetMonteCarloMiceModules(mod);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         std::string message = std::string("Failed to set MiceModules\n")+
                               std::string((&exc)->what());
         PyErr_SetString(PyExc_ValueError, message.c_str());

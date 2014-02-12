@@ -46,7 +46,7 @@ bool KLChannelMap::InitFromFile(string filename) {
       _klKey.push_back(klkey);
       _fadcKey.push_back(fadckey);
     }
-  } catch(Exception e) {
+  } catch (Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in KLChannelMap::InitFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;

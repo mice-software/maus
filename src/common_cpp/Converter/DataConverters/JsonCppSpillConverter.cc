@@ -34,7 +34,7 @@ Data* JsonCppSpillConverter::_convert(const Json::Value* json_data) const {
     cpp_data->SetEvent(spill);
     return cpp_data;
   }
-  catch(...) {
+  catch (...) {
     if (ReferenceResolver::JsonToCpp::RefManager::HasInstance())
       ReferenceResolver::JsonToCpp::RefManager::Death();
     throw;
