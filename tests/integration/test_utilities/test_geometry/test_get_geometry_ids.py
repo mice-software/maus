@@ -84,7 +84,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
         fin = open(geometry_id_file, 'r')
         geometry_lines_found = 0
         for lines in fin.readlines():
-            if lines.find('Geometry Number = 1') >= 0:
+            if lines.find('Geometry Number = 1\n') >= 0:
                 geometry_lines_found += 1
             if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') \
                                                                            >= 0:
@@ -102,7 +102,7 @@ class TestGetGeometryIDS(unittest.TestCase): #pylint:disable= R0904
         fin = open(geometry_id_file, 'r')
         geometry_lines_found = 0
         for lines in fin.readlines():
-            if lines.find('Geometry Number = 1') >= 0:
+            if lines.find('Geometry Number = 1\n') >= 0:
                 geometry_lines_found += 1
             if lines.find('ValidFrom       = 2012-04-25 14:17:45.447614') \
                                                                            >= 0:
