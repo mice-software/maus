@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 def fix_geant4_1405():
     """
@@ -33,6 +34,8 @@ def fix_geant4_1405():
     stepping_out = stepping_in.replace(snippet_in, snippet_out)
     fout = open(step_path, "w")
     fout.write(stepping_out)
+    print "Modified\n  ", step_path, "\noriginal stored at\n  ", orig_path
+    subprocess.Popen(['diff', orig_path, step_path])
 
 
 if __name__ == "__main__":
