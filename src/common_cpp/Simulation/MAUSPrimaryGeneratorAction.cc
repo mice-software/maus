@@ -116,8 +116,6 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
                              (particle, "position", JsonWrapper::objectValue);
   Json::Value mom = JsonWrapper::GetProperty
                              (particle, "momentum", JsonWrapper::objectValue);
-  Json::Value spin = JsonWrapper::GetProperty
-                             (particle, "spin", JsonWrapper::objectValue);
   pid = JsonWrapper::GetProperty
                        (particle, "particle_id", JsonWrapper::intValue).asInt();
   seed = JsonWrapper::GetProperty
@@ -128,9 +126,15 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
   py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
   pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
-  sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();//added
-  sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();//added
-  sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();//added
+  try {
+      Json::Value spin = JsonWrapper::GetProperty
+                                 (particle, "spin", JsonWrapper::objectValue);
+      sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();//added
+      sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();//added
+      sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();//added
+  } catch (MAUS::Exception exc) {
+      // it's okay, caller is not interested in spin
+  }
   // theta = px/pz;
   energy = JsonWrapper::GetProperty
                         (particle, "energy", JsonWrapper::realValue).asDouble();

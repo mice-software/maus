@@ -84,23 +84,6 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["y"] = point->GetMomentum().y();
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
-    
-    
-
-//################################################//
-
-    Json::Value Polarization;
-    Polarization["x"] = point->GetPolarization().x();
-    Polarization["y"] = point->GetPolarization().y();
-    Polarization["z"] = point->GetPolarization().z();
-    step["Polarization"] = Polarization;
-
-
-
-//################################################//
-
-
-
 
     step["energy"] = point->GetTotalEnergy();
     step["proper_time"] = point->GetProperTime();
