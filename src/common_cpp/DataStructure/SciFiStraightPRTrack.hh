@@ -110,7 +110,9 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     int get_type() const { return _type; }
 
   private:
-    SciFiSpacePointPArray _spoints;
+    int _tracker;
+    int _num_points;
+    static const int _type = 0; // 0 for straight, 1 for helical
 
     double _x0;
     double _mx;
@@ -119,9 +121,7 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     double _my;
     double _y_chisq;
 
-    int _tracker;
-    int _num_points;
-    static const int _type = 0; // 0 for straight, 1 for helical
+    SciFiSpacePointPArray _spoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiStraightPRTrack)
 };

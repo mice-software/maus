@@ -6,23 +6,26 @@
 #  (at your option) any later version.
 #
 #  MAUS is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  but WITHOUT ANY WARRANTY; without even 
+#  the implied wlen(theta_arr)-1arranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+
 """Set of tests that can be run against output data"""
 
-import copy
-import ctypes
-
+import ROOT
 import xboa 
 import xboa.Common as Common
+import copy
+import ctypes
 from xboa.Bunch import Bunch
-import ROOT
-
+from array import array
+from physics_model_test.geometry import Geometry #pylint:disable=W0611, F0401
+#import physics_model_test.runner
 #TODO: pylint:disable=W0511
 # * For the actual physics list tests, I should add a test on emittance change,
 #   on output moments, on mean energy loss vs pdg formula, on mcs vs pdg
@@ -89,10 +92,14 @@ class BaseTest:
 
     _hists = []
 
+    _hists_energy_loss = []
 
+    _hists_theta = []
+ 
+    _hists_chi = []
 ####################
 
-class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
+class KSTest(BaseTest): #pylint:disable=R0902
     """
     ks test object is a summary of information generated and used for ks test. 
     Idea is to make a summary information such that we don't need to store round 
@@ -111,7 +118,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
     """
     def __init__(self):
         BaseTest.__init__(self)
-        self.variable  = ''
+        self.variable  = 0
         self.units     = ''
         self.bins      = []
         self.content   = []
@@ -121,13 +128,15 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         self.ks_prob   = 0.
         self.ks_tol    = 1.
         self.n_bins    = 0
+     
     
     def __repr__(self):
         return 'KSTest.new('+repr(self.variable)+','+repr(self.units)+','+\
-                repr(self.bins)+','+repr(self.content)+','+repr(self.n_events)+\
-                ','+repr(self.pid)+','+repr(self.ks_dist)+','+\
-                repr(self.ks_prob)+','+repr(self.ks_tol)+','+repr(self.n_bins)+\
-                ')'
+                repr(self.bins)+','+repr(self.content)+','+\
+                repr(self.n_events)+','+\
+                repr(self.pid)+','+\
+                repr(self.ks_dist)+','+repr(self.ks_prob)+','+\
+                repr(self.ks_tol)+','+repr(self.n_bins)+')'
 
     def __str__(self):
         """Summary of the KS test along with test pass information"""
@@ -150,8 +159,10 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         my_ks_test.ks_prob   = copy.deepcopy(ks_prob)
         my_ks_test.ks_tol    = copy.deepcopy(ks_tol)
         my_ks_test.n_bins    = copy.deepcopy(n_bins)
+
         return my_ks_test
     new = staticmethod(new)
+
 
     def deepcopy(self):
         """
@@ -191,10 +202,12 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
                          (ks_test_out.n_events+self.n_events))**0.5
         ks_test_out.ks_prob = ROOT.TMath.KolmogorovProb(ks_dist_mod) # pylint: disable=E1101, C0301
         return ks_test_out
+   
+
 
     def test_result(self):
         """Return whether the test passed or failed"""
-        if self.ks_prob < self.ks_tol:
+        if self.ks_prob < 0.001:
             return 'fail'
         else:
             return 'pass'
@@ -207,20 +220,24 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         return contents
     cdf_function = staticmethod(cdf_function)
         
+    
+    
     def pdf_function(c_in):
-        """
-        helper function for make_plot. Set to make a probability density
-        function plot.
-        """
+        """calculates pdf function"""
         c_out = [c_in[0]]
+    
         for i in range(1, len(c_in)):
             c_out.append(c_in[i] - c_in[i-1])
+        
         c_max = max(c_out)
         for i in range(len(c_out)):
             c_out[i] /= c_max
+        
         return c_out
     pdf_function = staticmethod(pdf_function)
+    
 
+    
     def hist_width(ks_test_list):
         """
         Return the maximum and minimum of the histogram
@@ -242,6 +259,7 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
         my_array = bin_array()
         for i in range(len(bins)):
             my_array[i] = ctypes.c_double(bins[i])
+     
         return my_array
     _get_bins = staticmethod(_get_bins)
 
@@ -256,47 +274,360 @@ class KSTest(BaseTest): #note inheritance from test pylint: disable=R0902
                     running_min = bin_cont
         return running_min
     _get_min_non_zero_bin = staticmethod(_get_min_non_zero_bin)
+    
 
     def make_plots(ks_test_list):
         """
         Plot the distributions used for the ks test.
-        """
+        """        
         name = ks_test_list[0].variable
+        print name
         if ks_test_list[0].units != '':
             name += ' ['+ks_test_list[0].units+']'
+            print name
         canv = Common.make_root_canvas(name)
-
-        lower, upper = KSTest.hist_width(ks_test_list)
-
+        canv.SetLogy()
+       # lower, upper = KSTest.hist_width(ks_test_list)
+        
+        
+        
+        #my_ymin = KSTest._get_min_non_zero_bin(ks_test_list)
         h_start = len(BaseTest._hists)
-        my_ymin = KSTest._get_min_non_zero_bin(ks_test_list)
+        
         hist = xboa.Common.make_root_histogram(
                   name+'-'+str(len(BaseTest._hists)),
-                  [], name, n_x_bins = 10000, xmin=lower, xmax=upper,
-                  ymin=my_ymin/2., line_color=10)
+                  [], name, n_x_bins = 10000, xmin = -20, xmax = 20,
+                  ymin = 0.0001, ymax = 100, line_color = 10)
         hist.Draw('Y+')
+
         BaseTest._hists.append(hist)
-        # ack need complicated bin widths
+     
         for k, test in  enumerate(ks_test_list): 
             bin_array = KSTest._get_bins(test.bins)
-            hist = ROOT.TH1D(name+'-'+str(len(BaseTest._hists)),  # pylint: disable = E1101, C0301
-                             ';'+name, len(test.bins)-1, bin_array)
+            theta_arr = array('d')
+             
+            for i in range(1, len(bin_array)):
+                theta = bin_array[i-1]
+                theta_arr.append(theta)
+            
+          
+            hist = ROOT.TH1D("theta", "theta/rad", len(theta_arr)-1, theta_arr)#pylint:disable=E1101, C0301
+            
             if test.content[-1] != 0.:
                 c_out = KSTest.pdf_function(test.content)
-                for i, value in enumerate(c_out): 
+        
+                for i, value in enumerate(c_out):
+                     
+           
                     hist.SetBinContent(i+1, value)
+           
+                
             BaseTest._hists.append(hist)
             color = k+1
             while color in [5, 10]: # yellow, white
                 color += 1
             hist.SetLineColor(color)
             hist.SetStats(False)
-            hist.Draw('same')
+            hist.SetMarkerStyle(20)
+            hist.SetMarkerColor(color)
+            hist.Draw('Psame')
+   
         canv.Update()
+        
+
         return (canv, BaseTest._hists[h_start:len(BaseTest._hists)])
+         
     make_plots = staticmethod(make_plots)
 
-#######################
+
+class Chi2Test(BaseTest): #pylint:disable=R0902
+    """ defines class for getting chi squared distribution"""
+    def __init__(self):
+        BaseTest.__init__(self)
+        self.variable  = 0
+        self.units     = ''
+        self.bins      = []
+        self.content   = []
+        self.n_events  = 0
+        self.pid       = -13
+        self.errors    = []
+        self.chi2   = 0.
+        self.chi2_prob   = 0.
+        self.chi2_tol    = 1.
+        self.n_bins    = 0
+     
+    
+    def __repr__(self):
+        return 'Chi2Test.new('+repr(self.variable)+','+repr(self.units)+','+\
+                repr(self.bins)+','+repr(self.content)+','+\
+                repr(self.n_events)+','+\
+                repr(self.pid)+','+repr(self.errors)+','+repr(self.chi2)+','+\
+                repr(self.chi2_prob)+','+repr(self.chi2_tol)+','+\
+                repr(self.n_bins)+')'
+
+    def __str__(self):
+        """Summary of the Chi2 test along with test pass information"""
+        return 'chi2 test with variable '+str(self.variable)+' chi2 distance '+\
+               str(self.chi2)+' probability '+str(self.chi2_prob)+\
+               ' tolerance '+str(self.chi2_tol)+' : '+str(self.test_result())
+
+    def new(variable, units, bins, content, n_events, pid, errors, chi2, chi2_prob, chi2_tol, n_bins): #pylint: disable=R0913, C0301
+        """
+        Initialises the object
+        """
+        my_chi2_test = Chi2Test()
+        my_chi2_test.variable  = copy.deepcopy(variable)
+        my_chi2_test.units     = copy.deepcopy(units)
+        my_chi2_test.bins      = copy.deepcopy(bins)
+        my_chi2_test.content   = copy.deepcopy(content)
+        my_chi2_test.n_events  = copy.deepcopy(n_events)
+        my_chi2_test.pid       = copy.deepcopy(pid)
+        my_chi2_test.errors    = copy.deepcopy(errors)
+        my_chi2_test.chi2   = copy.deepcopy(chi2)
+        my_chi2_test.chi2_prob   = copy.deepcopy(chi2_prob)
+        my_chi2_test.chi2_tol    = copy.deepcopy(chi2_tol)
+        my_chi2_test.n_bins    = copy.deepcopy(n_bins)
+
+        return my_chi2_test
+    new = staticmethod(new)
+
+
+    def deepcopy(self):
+        """
+        Return a copy of the object
+        """
+        return Chi2Test.new(self.variable, self.units, self.bins, \
+                self.n_events, self.content, self.pid,self.errors, \
+                self.chi2, self.chi2_prob, self.chi2_tol, \
+                self.n_bins)
+
+    def cdf_function(contents):
+        """
+        helper function for make_plot. Set to make a cumulative density
+        function plot
+        """
+        return contents
+    cdf_function = staticmethod(cdf_function)
+        
+    def pdf_function(c_in):
+        """ calculates pdf function """
+        c_out = [c_in[0]]
+    
+        for i in range(1, len(c_in)):
+            c_out.append(c_in[i] - c_in[i-1])
+        
+        c_max = max(c_out)
+        for i in range(len(c_out)):
+            if c_out[i] != 0:
+                c_out[i] /= c_max
+        
+        return c_out
+    pdf_function = staticmethod(pdf_function)
+    
+    def hist_width(chi2_test_list):
+        """
+        Return the maximum and minimum of the histogram
+        """
+        (lower, upper) = None, None
+        for chi2_test in chi2_test_list:
+            if lower == None or chi2_test.bins[0] < lower:
+                lower = chi2_test.bins[0]
+            if upper == None or chi2_test.bins[-1] > upper:
+                upper = chi2_test.bins[-1]
+        return lower, upper
+    hist_width = staticmethod(hist_width)
+
+    def _get_bins(bins):
+        """
+        Get ctypes array from a list of bins
+        """
+        bin_array = ctypes.c_double*len(bins)
+        my_array = bin_array()
+        for i in range(len(bins)):
+            my_array[i] = ctypes.c_double(bins[i])
+     
+        return my_array
+    _get_bins = staticmethod(_get_bins)
+
+    def _get_min_non_zero_bin(test_list, float_tolerance=1e-9):
+        """
+        Get the content of the minimum bin that is not zero
+        """
+        running_min = 1.
+        for test in test_list:
+            for bin_cont in test.content:
+                if bin_cont < running_min and bin_cont > float_tolerance:
+                    running_min = bin_cont
+        return running_min
+    _get_min_non_zero_bin = staticmethod(_get_min_non_zero_bin)
+    
+
+    
+
+    def get_data():
+        """ imports MUSCAT data from file """
+        data = []
+        
+        data_file  = open("muscat_data.dat")
+       
+        test_data_list = eval(data_file.read())
+       
+      
+        data = Chi2Test.pdf_function(test_data_list[0].content)
+           
+        
+        return data
+        
+    get_data = staticmethod(get_data)
+
+
+    def run_test(self, test_bunch): #pylint:disable=R0902, R0914
+        """ runs chis squared test"""
+        data_file  = open("MUSCAT_data.dat")
+        test_data_list = eval(data_file.read())
+       
+        hist   = test_bunch.histogram_var_bins(self.variable, \
+                                                self.bins, self.units)
+                                                                   
+        chi2_test_out = self.deepcopy()
+      
+        chi2_test_out.n_events = len(test_bunch)
+        chi2_test_out.content  = [0.]
+        
+       
+        for i in hist[0]:
+            chi2_test_out.content.append(i[0]+chi2_test_out.content[-1])
+        del chi2_test_out.content[0]
+        if chi2_test_out.content[-1] == 0:
+            chi2_test_out.content[-1] = 1.
+        
+  
+       
+        chi2_test_out.chi2 = 0.
+        chi = 0
+        for i in range(len(chi2_test_out.content)):
+            chi2_test_out.content[i] /= chi2_test_out.content[-1]
+        if chi2_test_out.content[-1] != 0.:
+            
+            sim_pdf = [chi2_test_out.n_events*x \
+                      for x in Chi2Test.pdf_function(chi2_test_out.content)]
+        
+      
+        for i, geo in enumerate(test_data_list):#pylint:disable=W0612
+            for test in test_data_list[i].tests:
+                chi = 0
+                data_pdf = [test.n_events*x \
+                             for x in Chi2Test.pdf_function(test.content)]
+                print "DATA PDF", data_pdf
+                weight_sim = 0
+                weight_data = 0
+                for i, simulation in enumerate(sim_pdf):#pylint:disable=W0612
+                    weight_sim += sim_pdf[i]
+            
+                for i, data in enumerate(data_pdf):#pylint:disable=W0612
+                    weight_data += data_pdf[i]
+          
+                
+               
+                for i, data in enumerate(data_pdf):#pylint:disable=W0612
+               
+                      
+                    chi += (1/(weight_sim*weight_data))*\
+                            ((weight_data*sim_pdf[i]-\
+                            weight_sim*data_pdf[i])**2)\
+                            /(sim_pdf[i]+data_pdf[i])
+                print "CHI", chi
+     
+                
+                    
+   
+        if chi > 200:
+            chi2_test_out.chi2 = chi
+       
+        return chi2_test_out
+  
+            
+
+    def test_result(self):
+        """Return whether the test passed or failed"""
+        if self.chi2_prob < self.chi2_tol:
+            return 'fail'
+        else:
+            return 'pass'
+
+ 
+    def make_plots(chi2_test_list):
+        """
+        Plot the distributions used for the chi2 test.
+        """
+       
+        
+        mom = 172
+
+        
+        
+        name = '#theta'
+        canv = Common.make_root_canvas(name)
+        canv.SetLogy()
+       # lower, upper = Chi2Test.hist_width(chi2_test_list)
+        canv.SetTitle(name)
+
+        
+       # my_ymin = Chi2Test._get_min_non_zero_bin(chi2_test_list)
+        h_start = len(BaseTest._hists_theta)
+        
+        hist = xboa.Common.make_root_histogram(
+                  name+'-'+str(len(BaseTest._hists_theta)),
+                  [] , name , n_x_bins = 10000 , xmin = -0.1 , xmax = 0.1 ,
+                  ymin = 0.0001 , ymax = 10 , line_color = 10)
+        hist.Draw('Y+')
+      
+
+        BaseTest._hists_theta.append(hist)
+
+        for k, test in  enumerate(chi2_test_list): 
+          
+            bin_array = Chi2Test._get_bins(test.bins)
+           
+           
+            theta_arr = array('d')
+            
+            for i in range(1 , len(bin_array)):
+                theta = bin_array[i-1]/(mom)
+                theta_arr.append(theta)
+       
+    
+            hist = ROOT.TH1D("theta", "theta", len(theta_arr)-1, theta_arr) #pylint:disable=E1101, C0301
+          
+          
+            if test.content[-1] != 0.:
+                c_out = Chi2Test.pdf_function(test.content)
+               
+            
+                for i, value in enumerate(c_out):
+                     
+           
+                    hist.SetBinContent(i+1, value)
+            
+
+            BaseTest._hists_theta.append(hist)
+            color = k+1
+            while color in [5, 10]: # yellow, white
+                color += 1
+            hist.SetLineColor(color)
+            hist.SetStats(False)
+            hist.SetMarkerStyle(20)
+            hist.SetMarkerColor(color)
+            hist.GetXaxis().SetTitle('#theta_{RMS}')
+            hist.Draw('Psame')
+                 
+        canv.SetGrid()
+        canv.Update()
+       
+        canv.Update()
+        return (canv, BaseTest._hists_theta[h_start:len(BaseTest._hists_theta)])
+         
+    make_plots = staticmethod(make_plots)
 
 
 

@@ -10,6 +10,7 @@
 #include "Optics.hh"
 
 #include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/legacy/Interface/MiceMaterials.hh"
@@ -28,7 +29,7 @@ using MAUS::MAUSGeant4Manager;
 using MAUS::MAUSPrimaryGeneratorAction;
 using MAUS::operator*;
 
-void  writeEvent() {throw Squeal(Squeal::recoverable, "Not implemented", "writeEvent()");}
+void  writeEvent() {throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "writeEvent()");}
 std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string> classesToProcess ) 
 {return Output::ReadLoop(filename, classesToProcess) ;}
 
@@ -64,6 +65,7 @@ void  PhaseCavities(::PhaseSpaceVector ref) {
 MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
 {
   Json::Value json_config(Json::objectValue);
+  json_config["maximum_module_depth"] = 50;
   json_config["will_do_stack_trace"] = Json::Value(true);
   json_config["verbose_level"] = Json::Value(1);
   json_config["maximum_number_of_steps"] = Json::Value(25000);
@@ -80,6 +82,9 @@ MiceModule* SetupSimulation(std::vector< ::CovarianceMatrix> envelope)
   json_config["default_keep_or_kill"] = true;
   json_config["keep_or_kill_particles"] = "{}";
   json_config["kinetic_energy_threshold"] = 0.1;
+  json_config["max_step_length"] = 100.;
+  json_config["max_track_time"] = 1.e9;
+  json_config["max_track_length"] = 1.e8;
   json_config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
@@ -144,8 +149,8 @@ namespace Optics
 ::CovarianceMatrix EllipseIn(const MiceModule* root)
 {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
-  if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::EllipseIn"));
-  if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::EllipseIn"));
+  if(envelope_mods.size() == 0) throw(MAUS::Exception(MAUS::Exception::recoverable, "No envelope modules detected in Optics", "Optics::EllipseIn"));
+  if(envelope_mods.size() >  1) throw(MAUS::Exception(MAUS::Exception::recoverable, "More than 1 envelope modules detected in Optics", "Optics::EllipseIn"));
   Simulation::g_pid = envelope_mods[0]->propertyInt("Pid");
   return ::CovarianceMatrix(envelope_mods[0]);
 }
@@ -183,8 +188,8 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
 
 	::CLHEP::HepVector GetDeltaMax(const MiceModule* root) {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
-  if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::GetDeltaMax"));
-  if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDeltaMax"));
+  if(envelope_mods.size() == 0) throw(MAUS::Exception(MAUS::Exception::recoverable, "No envelope modules detected in Optics", "Optics::GetDeltaMax"));
+  if(envelope_mods.size() >  1) throw(MAUS::Exception(MAUS::Exception::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDeltaMax"));
   const MiceModule* mod = envelope_mods[0];
   ::CLHEP::HepVector deltaMax(6);
   for(int i=1; i<=deltaMax.num_row(); i++) deltaMax(i) = numeric_limits<double>::max();
@@ -196,7 +201,7 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{deltaMax[5] = mod->propertyDouble("Delta_Py_Max");} catch(...) {}
   for (size_t i = 0; i < 6; ++i) {
       if (deltaMax[i] <= 0.) {
-          throw(Squeal(Squeal::recoverable,
+          throw(MAUS::Exception(MAUS::Exception::recoverable,
                   "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
                   "Optics::GetDelta"));
       }
@@ -207,8 +212,8 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
 
 ::CLHEP::HepVector GetDelta(const MiceModule* root) {
   std::vector<const MiceModule*> envelope_mods = root->findModulesByPropertyExists("string", "EnvelopeType");
-  if(envelope_mods.size() == 0) throw(Squeal(Squeal::recoverable, "No envelope modules detected in Optics", "Optics::GetDelta"));
-  if(envelope_mods.size() >  1) throw(Squeal(Squeal::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDelta"));
+  if(envelope_mods.size() == 0) throw(MAUS::Exception(MAUS::Exception::recoverable, "No envelope modules detected in Optics", "Optics::GetDelta"));
+  if(envelope_mods.size() >  1) throw(MAUS::Exception(MAUS::Exception::recoverable, "More than 1 envelope modules detected in Optics", "Optics::GetDelta"));
   const MiceModule* mod = envelope_mods[0];
   ::CLHEP::HepVector delta(6);
   delta[0] = 0.1;
@@ -221,7 +226,7 @@ void Envelope(const MiceModule* root, std::vector< ::CovarianceMatrix>& env_out,
   try{delta[5] = mod->propertyDouble("Delta_Py");} catch(...) {}
   for (size_t i = 0; i < 6; ++i) {
       if (delta[i] <= 0.) {
-          throw(Squeal(Squeal::recoverable,
+          throw(MAUS::Exception(MAUS::Exception::recoverable,
                   "DeltaMax should be > 0. in Envelope module "+mod->fullName(),
                   "Optics::GetDelta"));
       }
@@ -360,7 +365,7 @@ std::vector< ::TransferMap*> MakePolyfitMaps(
         // Add a mapping between the station and the transfer map that links the
         // start plane and that station.
         AddStationToMapping(it->first, maps.back());
-      } catch(Squeal squee) {
+      } catch(MAUS::Exception exc) {
         Squeak::mout(Squeak::warning) << "Failed to find " << order
                                       << " order transfer map for plane "
                                       << it->first << " from "
@@ -384,8 +389,8 @@ void DoPolyfit(const Function& func, const MiceModule& mod)
   double deltaFactor      = 2.;
   if(mod.propertyExistsThis("DeltaFactor",      "double" )) deltaFactor      = mod.propertyDoubleThis("DeltaFactor");
   if(mod.propertyExistsThis("MaxNumberOfSteps", "int"    )) maxNumberOfSteps = mod.propertyIntThis   ("MaxNumberOfSteps");
-  if(deltaFactor      <= 1.) throw(Squeal(Squeal::recoverable, "DeltaFactor must be > 1",      "Optics::DoPolyfit"));
-  if(maxNumberOfSteps <= 0 ) throw(Squeal(Squeal::recoverable, "MaxNumberOfSteps must be > 0", "Optics::DoPolyfit"));
+  if(deltaFactor      <= 1.) throw(MAUS::Exception(MAUS::Exception::recoverable, "DeltaFactor must be > 1",      "Optics::DoPolyfit"));
+  if(maxNumberOfSteps <= 0 ) throw(MAUS::Exception(MAUS::Exception::recoverable, "MaxNumberOfSteps must be > 0", "Optics::DoPolyfit"));
 	::TransferMap tm = TransferMapCalculator::GetSweepingPolynomialTransferMap(&func, order, chi2Max, delta, deltaMax, deltaFactor, maxNumberOfSteps, g_mean, g_mean);
   Squeak::mout(Squeak::info) << "Found polynomial fit at order " << tm.GetOrder() << " with valid region ";
   for(int i=1; i<=delta.num_row(); i++) Squeak::mout(Squeak::info) << delta(i) << " ";
@@ -419,12 +424,12 @@ void SetPolyFitModule(const MiceModule* root)
 {
   bool                           foundModule = false;
   std::vector<const MiceModule*> polyFitModule = root->findModulesByPropertyExists("bool", "PolyFitDetector");
-  if(polyFitModule.size() == 0) throw(Squeal(Squeal::recoverable, "Could not find PolyFit Detector", "Optics::Optics::SetPolyFitModule()") );
+  if(polyFitModule.size() == 0) throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not find PolyFit Detector", "Optics::Optics::SetPolyFitModule()") );
   for(size_t i=0; i<polyFitModule.size(); i++) 
     if(polyFitModule[i]->propertyBool("PolyFitDetector"))
     {
       if(!foundModule) g_polyfit_module = StationId(*polyFitModule[i]);
-      else             throw(Squeal(Squeal::recoverable, "Found more than one PolyFit Module", "Optics::SetPolyFitModule()") );
+      else             throw(MAUS::Exception(MAUS::Exception::recoverable, "Found more than one PolyFit Module", "Optics::SetPolyFitModule()") );
     }
 }
 
@@ -444,14 +449,14 @@ StationId::StationId(VirtualHit hit) :   _type(virt), _station_number(hit.GetSta
 StationId::StationId(SpecialHit hit) :   _type(special), _station_number(hit.GetStationNo())
 {}
 
-StationId::StationId(const MiceModule& mod) throw(Squeal)
+StationId::StationId(const MiceModule& mod) throw(MAUS::Exception)
     : _type(virt),
       _station_number(MAUSGeant4Manager::GetInstance()->GetVirtualPlanes()
                       ->GetStationNumberFromModule(&mod ))
 {
   std::string sd = mod.propertyStringThis("SensitiveDetector");
   if(sd!="Envelope") 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Attempt to make a StationId when SensitiveDetector was "
                  + sd + " - should be Envelope",
                  "Optics::StationId()"));
@@ -537,7 +542,7 @@ void MakeOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
 void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::TransferMap*> tms, std::string outfile) {
   std::string names[6] = {"t","E","x","Px","y","Py"};
   ofstream out(outfile.c_str());
-  if(!out) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  if(!out) throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
   std::string out_names_arr[] = {
       "mean_t", "mean_E", "mean_x", "mean_Px", "mean_y", "mean_Py", "mean_z", "mean_Pz", "planeType", "planeNumber", "statisticalWeight", "betaTrans", "alphaTrans", "gammaTrans", "phiTrans", "traceTrans", "angularMommentum", "amplitudePzCovariance", "beta_x", "alpha_x", "gamma_x", "phi_x", "beta_y", "alpha_y", "gamma_y", "phi_y", "beta_t", "alpha_t", "gamma_t", "dispersion_x", "dispersion_y", "emittance_x", "emittance_y", "emittance_t", "emittance4D", "emittance6D"};
   std::vector<std::string> out_names(out_names_arr, out_names_arr+36);
@@ -558,8 +563,8 @@ void JsonOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
            disp_x=cov.GetDispersion(1), disp_y=cov.GetDispersion(1);
     double phi_trans(0), phi_x(0), phi_y(0), trace_trans(0.);
     if(i>0) {
-      try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
-      try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
+      try{phi_x = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
       for (size_t k = 0; k < 4; ++k) {
           trace_trans += tms[i-1]->GetFirstOrderMap()[k+2][k+2];
@@ -594,7 +599,7 @@ void TextOutput(std::vector< ::CovarianceMatrix> matrix, std::string outfile)
 {
   if(outfile == "") return;
   ofstream out(outfile.c_str());
-  if(!out) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  if(!out) throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
   for(unsigned int i=0; i<matrix.size(); i++)
     out << matrix[i].GetAnalysisPlaneBank() << std::endl;
   out.close();
@@ -604,7 +609,7 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
 {
   std::string names[6] = {"t","E","x","Px","y","Py"};
   ofstream out(outfile.c_str());
-  if(!out) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  if(!out) throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
 
   out << std::scientific << std::setprecision(8);
   out << "mean_t mean_E mean_x mean_Px mean_y mean_Py mean_z  mean_Pz planeType planeNumber statisticalWeight betaTrans alphaTrans gammaTrans phiTrans angularMommentum amplitudePzCovariance beta_x alpha_x gamma_x phi_x  beta_y alpha_y gamma_y phi_y beta_t alpha_t gamma_t dispersion_x dispersion_y emittance_x emittance_y emittance_t emittance4D emittance6D" << std::endl;
@@ -625,8 +630,8 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
     double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
-      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
+      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
     }
     for(int j=0; j<6; j++)
@@ -647,7 +652,7 @@ void LongTextOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Tran
   out.close();
 
   ofstream out_tm(("tm_"+outfile).c_str());
-  if(!out_tm) throw(Squeal(Squeal::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
+  if(!out_tm) throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to open "+outfile, "Optics::TextOutput"));
   for(unsigned int i=0; i<tms.size(); i++) {
     out_tm << *tms[i];
   }
@@ -717,8 +722,8 @@ void RootOutput(std::vector< ::CovarianceMatrix> matrix, std::vector< ::Transfer
     double phi_trans(0), phi_x(0), phi_y(0);
     if(i>0)
     {
-      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(Squeal squee) {}
-      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(Squeal squee) {}
+      try{phi_x     = tms[i-1]->PhaseAdvance(1);} catch(MAUS::Exception exc) {}
+      try{phi_y     = tms[i-1]->PhaseAdvance(2);} catch(MAUS::Exception exc) {}
       phi_trans = (phi_x+phi_y)/2.;
     }
     //Set the address to the variables in the plane bank
@@ -774,7 +779,7 @@ void  writeEvent()
 {
   if(settingRF) return;
   ++evtno;
-  throw Squeal(Squeal::recoverable, "Not implemented", "Output::writeEvent()");
+  throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "Output::writeEvent()");
 
   clearEvent( simEvent );
 }
@@ -786,13 +791,13 @@ void  writeEvent()
 //This is for use in MICEPrimaryGeneratorAction and will likely be removed for mice-2-4-0
 std::vector<MICEEvent*> ReadLoop( std::string filename, std::vector<std::string> classesToProcess )
 {
-  throw Squeal(Squeal::recoverable, "Not implemented", "Output::ReadLoop");
+  throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "Output::ReadLoop");
 }
 
 
 void CloseGzFile()
 {
-  throw Squeal(Squeal::recoverable, "Not implemented", "Output::CloseGzFile");
+  throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "Output::CloseGzFile");
   return;
 }
 
@@ -820,10 +825,10 @@ namespace Optimiser
     g_score_mod = root->findModulesByPropertyString("SensitiveDetector", "Envelope");
     std::vector<const MiceModule*> optimiser_mods = root->findModulesByPropertyExists("string", "Optimiser");
     if(optimiser_mods.size() < 1) return;
-    if(optimiser_mods.size() > 1) throw(Squeal(Squeal::recoverable, "Multiple optimiser modules detected when only 1 is allowed", "Optimiser::Optimiser"));
+    if(optimiser_mods.size() > 1) throw(MAUS::Exception(MAUS::Exception::recoverable, "Multiple optimiser modules detected when only 1 is allowed", "Optimiser::Optimiser"));
     if(optimiser_mods[0]->propertyString("Optimiser") == "Minuit")
       RunMinuit(optimiser_mods[0]);
-    else throw(Squeal(Squeal::recoverable, "Did not recognise optimiser option "+optimiser_mods[0]->propertyString("Optimiser"), "Optics::RunOptimiser") );
+    else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise optimiser option "+optimiser_mods[0]->propertyString("Optimiser"), "Optics::RunOptimiser") );
   }
 
   //Return nth parameter in mod; return NULL if not found
@@ -848,9 +853,9 @@ namespace Optimiser
       try{par->name  = mod->propertyString(p+"Name"); par->value = mod->propertyDouble(p+"Start");} catch(...) 
       {
         if(par->name != "") 
-        {delete par; throw(Squeal(Squeal::recoverable, "In optimisation "+p+"Name defined but not "+p+"Start", "Optimiser::BuildParameter"));}
+        {delete par; throw(MAUS::Exception(MAUS::Exception::recoverable, "In optimisation "+p+"Name defined but not "+p+"Start", "Optimiser::BuildParameter"));}
         if(fabs(par->value) > 1e-9) 
-        {delete par; throw(Squeal(Squeal::recoverable, "In optimisation "+p+"Start defined but not "+p+"Name", "Optimiser::BuildParameter"));}
+        {delete par; throw(MAUS::Exception(MAUS::Exception::recoverable, "In optimisation "+p+"Start defined but not "+p+"Name", "Optimiser::BuildParameter"));}
         else delete par;
         return NULL;
       }
@@ -874,8 +879,8 @@ namespace Optimiser
       minimiser->mnparm(i, g_parameters[i]->name.c_str(), g_parameters[i]->value, g_parameters[i]->delta, g_parameters[i]->min, g_parameters[i]->max, errFlag);
       if(g_parameters[i]->fixed) minimiser->FixParameter(i); 
     }
-    try{g_rebuild_simulation = mod->propertyBool("RebuildSimulation");} catch(Squeal squee) {}
-    try{g_redo_tracking = mod->propertyBool("RedoTracking");} catch(Squeal squee) {}
+    try{g_rebuild_simulation = mod->propertyBool("RebuildSimulation");} catch(MAUS::Exception exc) {}
+    try{g_redo_tracking = mod->propertyBool("RedoTracking");} catch(MAUS::Exception exc) {}
     //Final setup
     minimiser->SetFCN(RunOptics);
     double argList[2];
@@ -956,7 +961,7 @@ namespace Optimiser
     for(int i=0; i<int(g_score_mod.size()); i++)
     {
       if(Optics::g_module_to_map.find(g_score_mod[i]) == Optics::g_module_to_map.end())
-        throw( Squeal(Squeal::recoverable, "No transfer matrix for module "+g_score_mod[i]->fullName()+" needed to calculate score. Tracking out of bounds?", "Optics::GetScore") );
+        throw(MAUS::Exception(MAUS::Exception::recoverable, "No transfer matrix for module "+g_score_mod[i]->fullName()+" needed to calculate score. Tracking out of bounds?", "Optics::GetScore") );
       ::TransferMap* tm_i  = Optics::g_module_to_map[g_score_mod[i]];
       GetScore((*tm_i)*ellipse_in, g_score_mod[i], scores);
     }
@@ -990,7 +995,7 @@ namespace Optimiser
       ss << "EnvelopeOut" << index << "_";
       std::string name;
       try{ name = mod->propertyString(ss.str()+"Name"); }
-      catch(Squeal squee) {return;}
+      catch(MAUS::Exception exc) {return;}
       std::string var  = mod->propertyString(ss.str()+"Type");
       try{ var += " "+mod->propertyString(ss.str()+"Variable");} catch(...) {;}
       for(int i=0; i<int(var.size()); i++)
@@ -1036,7 +1041,7 @@ int main(int argc, char **argv)
 
   Squeak::mout(Squeak::info) << "done" << std::endl;
   }
-  catch(Squeal exc)         {Squeak::mout(Squeak::error) << "Caught Squeal        " << std::endl; exc.Print(); exit(1);}
+  catch(MAUS::Exception exc)         {Squeak::mout(Squeak::error) << "Caught MAUS::Exception        " << std::endl; exc.Print(); exit(1);}
   catch(std::exception exc) {Squeak::mout(Squeak::error) << "Caught std::exception" << std::endl; Squeak::mout(Squeak::error) << exc.what() << std::endl; exit(1);}
   exit(0);
 }

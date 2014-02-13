@@ -21,7 +21,7 @@
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/legacy/Interface/Squeak.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace {
 
@@ -56,7 +56,8 @@ TEST_F(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
 // test mout(Squeal::exceptionLevel)
 TEST_F(SqueakTest, SqueakMoutExceptionTest) {
   std::stringstream sstr;
-  Squeal::exceptionLevel exc[] = {Squeal::recoverable, Squeal::nonRecoverable};
+  MAUS::Exception::exceptionLevel exc[] = {
+    MAUS::Exception::recoverable, MAUS::Exception::nonRecoverable};
   Squeak::errorLevel err[] = {Squeak::error, Squeak::fatal};
   for (int i = 0; i < 2; ++i) {
     Squeak::setAnOutput(err[i], sstr);

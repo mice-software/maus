@@ -23,6 +23,7 @@ import math
 import numpy
 import xboa #pylint: disable=F0401
 import xboa.Bunch #pylint: disable=F0401
+import xboa.Common #pylint: disable=F0401
 
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
 # goes to 4294967295 in both 32 bit and 64 bit.

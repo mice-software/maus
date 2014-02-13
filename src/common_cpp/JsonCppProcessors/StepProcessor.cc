@@ -35,6 +35,10 @@ StepProcessor::StepProcessor() {
                                                       &Step::SetMomentum, true);
     RegisterValueBranch("spin", &_three_vec_proc, &Step::GetSpin,
                                                       &Step::SetSpin, true);
+    RegisterValueBranch("b_field", &_three_vec_proc, &Step::GetBField,
+                                                     &Step::SetBField, true);
+    RegisterValueBranch("e_field", &_three_vec_proc, &Step::GetEField,
+                                                     &Step::SetEField, true);
 }
 }
 

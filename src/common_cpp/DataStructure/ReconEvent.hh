@@ -115,7 +115,7 @@ class ReconEvent {
     MAUS_VERSIONED_CLASS_DEF(ReconEvent)
 };
 
-typedef std::vector<ReconEvent*> ReconEventArray;
+typedef std::vector<ReconEvent*> ReconEventPArray;
 }
 
 #endif

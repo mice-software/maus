@@ -50,7 +50,7 @@ class BaseClassItem : public BaseItem<ParentType> {
      *  with the baseclass only.  The parent's processor must not set
      *  that information directly.
      *  @param is_required if the branch doesnt exist in json, throw
-     *  Squeal if is_required is set to true.  Default is true, as it
+     *  Exception if is_required is set to true.  Default is true, as it
      *  would be very strange for it not to exist.
      */
     BaseClassItem(std::string branch_name,

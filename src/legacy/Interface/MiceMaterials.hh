@@ -26,7 +26,7 @@ class MiceMaterials
 
     MiceMaterials( bool );
 
-    ~MiceMaterials()				{};
+    ~MiceMaterials();
 
     void		addMaterial( G4Material*, std::string );
 
@@ -68,7 +68,7 @@ class MiceMaterials
 
   private :
 
-    std::map<std::string,G4Material*>	_materials;
+    std::map<std::string, G4Material*>	_materials;
 
     std::map<std::string,std::string>	_formula;
     std::map<std::string,double>	_density;

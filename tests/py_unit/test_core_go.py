@@ -215,7 +215,6 @@ class GoTestCase(unittest.TestCase): #pylint: disable = R0904
         outputer = OutputPyJSON(open(self.tmp_file, 'w'))
         for map_red_type in ['multi_process']:
             config = StringIO(u"""type_of_dataflow="%s" """ % map_red_type)
-
             with self.assertRaises(Exception):
                 Go(inputer, transformer, merger, outputer, config, \
                        command_line_args = False)

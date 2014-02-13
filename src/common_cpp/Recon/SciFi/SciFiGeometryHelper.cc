@@ -15,6 +15,10 @@
  *
  */
 
+/*
+TODO: take back changes in plane position.
+*/
+
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 namespace MAUS {
@@ -63,6 +67,9 @@ void SciFiGeometryHelper::Build() {
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction     = direction;
+      // TO BE REMOVED. Ed
+      tracker_ref_frame_pos.setX(0);
+      tracker_ref_frame_pos.setY(0);
       this_plane.Position      = tracker_ref_frame_pos;
       this_plane.CentralFibre  = centralfibre;
       this_plane.Pitch         = pitch;
@@ -104,7 +111,7 @@ const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int p
     }
   }
   if ( this_plane == NULL ) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
     "Failed to find tracker plane.",
     "SciFiGeometryHelper::find_plane"));
   }
@@ -120,7 +127,6 @@ ThreeVector SciFiGeometryHelper::GetReferenceFramePosition(int tracker) {
 
   assert(reference_plane != NULL);
   ThreeVector reference_pos = clhep_to_root(reference_plane->globalPosition());
-
   return reference_pos;
 }
 

@@ -122,7 +122,7 @@ cat > env.sh <<EOF
 if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MAUS_ROOT_DIR="${maus_root_dir}"
-
+     export MAUS_TMP_DIR="${maus_root_dir}/tmp"
      export MAUS_THIRD_PARTY="${maus_third_party}"
      echo "INFO: Using third party libraries from ${maus_third_party}"
      # hack to get scons working (doesnt do well with --prefix_dir on build)
@@ -163,27 +163,33 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
+     # python scripts for running doxygen
+     export PYTHONPATH="\$MAUS_ROOT_DIR/doc/doc_tools:\$PYTHONPATH"
+
      # Celery
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
+
      export G4DEBUG=1
-     export G4VERS=geant4.9.2.p04
+     export G4VERS=geant4.9.6.p02
      export G4SYSTEM=$arch-g++
-     export G4INSTALL="\${MAUS_THIRD_PARTY}/third_party/build/\${G4VERS}"
-     export G4LIB="\${G4INSTALL}/lib"
-     export $DYLIB_VAR="\${G4LIB}/\${G4SYSTEM}:\${$DYLIB_VAR}"
-     export G4INCLUDE="\${G4INSTALL}/include/"
-     export G4TMP="\${G4INSTALL}"
+     export G4LIB="\${MAUS_THIRD_PARTY}/third_party/install/lib64"
+     export G4INCLUDE="\${MAUS_THIRD_PARTY}/third_party/install/include/Geant4"
      export G4VIS_BUILD_DAWNFILE_DRIVER=1
      export G4VIS_USE_DAWNFILE=1
      export G4VIS_USE=0
      export G4OPTIMISE=2
      export OGLHOME=/usr/X11R6
-     export G4LEDATA="\${G4INSTALL}/data/G4EMLOW6.2/"
-     export G4ABLADATA="\${G4INSTALL}/data/G4ABLA3.0/"
-     export G4NEUTRONDATA="\${G4INSTALL}/data/G4NDL3.13/"
-     export G4LEVELGAMMADATA"=\${G4INSTALL}/data/PhotonEvaporation2.0/"
-     export G4RADIOACTIVEDATA"=\${G4INSTALL}/data/RadioactiveDecay3.2/"
+     export G4DATA="\${MAUS_THIRD_PARTY}/third_party/install/share/Geant4-9.6.2/data"
+     export G4LEDATA="\${G4DATA}/G4EMLOW6.32/"
+     export G4ABLADATA="\${G4DATA}/G4NEUTRONXS1.2/"
+     export G4NEUTRONDATA="\${G4DATA}/G4NDL4.2/"
+     export G4LEVELGAMMADATA="\${G4DATA}/PhotonEvaporation2.3/"
+     export G4RADIOACTIVEDATA="\${G4DATA}/RadioactiveDecay3.6/"
+     export G4SAIDXSDATA="\${G4DATA}/G4SAIDDATA1.1/"
+     # GEANT4 installs to lib64 on 64bit systems
+     export LD_LIBRARY_PATH="\${MAUS_THIRD_PARTY}/third_party/install/lib64:\${LD_LIBRARY_PATH}"
+
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 

@@ -19,7 +19,7 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
@@ -64,10 +64,10 @@ std::string MapCppTrackerDigits::process(std::string document) {
       return writer.write(_json_root);
     }
   // If an exception is caught, the JSON file returned is the same that was read-in (_json_root)...
-  } catch(Squeal& squee) {
-    squee.Print();
+  } catch (Exception& exception) {
+    exception.Print();
     return writer.write(_json_root);
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -90,7 +90,7 @@ void MapCppTrackerDigits::read_in_json(std::string json_data) {
     _json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(_spill_json);
-  } catch(...) {
+  } catch (...) {
     Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();

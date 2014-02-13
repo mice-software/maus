@@ -107,7 +107,8 @@ class Track : public TObject {
 
   /// Get the associated track points, as a vector of const pointers,
   /// ensuring they are unchanged.
-  std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints();
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints()
+      const;
 
   /// Set the list of associated TrackPoints, #_track_points, from a
   /// TRefArray.  The Track takes ownership of this pointer, deleting
@@ -130,14 +131,15 @@ class Track : public TObject {
 
   /// Check whether the input bit is set in #_detectorpoints (via
   /// bitmask and enumerator value).
-  bool HasDetector(MAUS::DataStructure::Global::DetectorPoint detector);
+  bool HasDetector(MAUS::DataStructure::Global::DetectorPoint detector) const;
 
   /// Set #_detectorpoints = 0, clearing all detector bits.
   void ClearDetectors();
 
   /// Provides a list of detector points associated with the track
   /// object.
-  std::vector<MAUS::DataStructure::Global::DetectorPoint> GetDetectorPoints();
+  std::vector<MAUS::DataStructure::Global::DetectorPoint> GetDetectorPoints()
+      const;
 
   /// Directly set the #_detectorpoints value.
   void set_detectorpoints(unsigned int detectorpoints);
@@ -154,7 +156,7 @@ class Track : public TObject {
   void RemoveGeometryPath(std::string geometry_path);
 
   /// Search for a geometry path in #_geometry_paths.
-  bool HasGeometryPath(std::string geometry_path);
+  bool HasGeometryPath(std::string geometry_path) const;
 
   /// Clear the std::vector #_geometry_paths.
   void ClearGeometryPaths();
@@ -174,14 +176,15 @@ class Track : public TObject {
   void RemoveTrack(Track* track);
 
   /// Check for a historical track in the #_constituent_tracks TRefArray.
-  bool HasTrack(Track* track);
+  bool HasTrack(Track* track) const;
 
   /// Empty the book-keeping track TRefArray, #_constituent_tracks.
   void ClearTracks();
 
   /// User method for accessing the constituent tracks.  These are
   /// returned as const, so that they can't be changed.
-  std::vector<const MAUS::DataStructure::Global::Track*> GetConstituentTracks();
+  std::vector<const MAUS::DataStructure::Global::Track*> GetConstituentTracks()
+      const;
 
   /// Directly set the #_constituent_tracks TRefArray.  This passes
   /// ownership of the pointer to the Track, and is mostly for use by
@@ -246,6 +249,10 @@ class Track : public TObject {
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track
 
+typedef std::vector<MAUS::DataStructure::Global::Track> TrackArray;
+typedef std::vector<MAUS::DataStructure::Global::Track *> TrackPArray;
+typedef
+std::vector<const MAUS::DataStructure::Global::Track *> ConstTrackPArray;
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

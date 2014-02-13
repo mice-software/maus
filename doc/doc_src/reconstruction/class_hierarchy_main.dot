@@ -21,23 +21,23 @@ digraph G {
   ]
   
   ReconstructionInput [
-    label = "{\N|beamPolarityNegative: Boolean\ldetectors: Detector[]\ltracks: TrackPoint[]\l}"
+    label = "{\N|detectors: Detector[]\levent: GlobalEvent\l}"
   ]
 
   MapCppTrackReconstructor [
-    label = "{\N|input: ReconstructionInput\lopticsModel: OpticsModel\lTrackFitter: TrackFitter\ltrajectories: Track[]\l|Process()\l}"
+    label = "{\N|input: ReconstructionInput\lopticsModel: OpticsModel\ltrackFitter: TrackFitter\l|Process()\l}"
   ]
 
   Track [
-    label = "{\N|particleID: Integer\ltracks: TrackPoint[]\l}"
+    label = "{\N|particleID: Integer\ltrackPoints: TrackPoint[]\l}"
   ]
 
   OpticsModel [
-    label = "{\<\<interface\>\>\n\N||GenerateTransferMap(Double z1, Double z2): TransferMap\l}"
+    label = "{\<\<interface\>\>\n\N||Transport(PhaseSpaceVector, Double z2): PhaseSpaceVector\lTransport(CovarianceMatrix, Double z2): PhaseSpaceVector\lTransport(PhaseSpaceVector, Double z1, Double z2): PhaseSpaceVector\lTransport(CovarianceMatrix, Double z1, Double z2): PhaseSpaceVector\l}"
   ]
 
   TrackFitter [
-    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\ldetectors: Detector[]\l|Fit(TrackPoint[], Track *)}"
+    label = "{\<\<interface\>\>\n\N|opticsModel: OpticsModel\lstartPlane: Double\l|Fit(Track * measuredTrack, Track * reconstructedTrack)}"
   ]
 
   subgraph Main {
@@ -49,7 +49,7 @@ digraph G {
   ]
 
   TrackPoint [
-    label = "{\N|z: Double\lPz: Double\ldetectorID: Integer\luncertainties: CovarianceMatrix\l|FillInCoordinates()\l}"
+    label = "{\N|z: Double\lPz: Double\ldetectorID: Integer\luncertainties: CovarianceMatrix\lparticleID: Integer\l}"
   ]
 
   TransferMap [

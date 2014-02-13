@@ -24,6 +24,7 @@
 
 #include "Geant4/globals.hh"
 #include "Geant4/G4StepLimiter.hh"
+#include "Geant4/G4UserSpecialCuts.hh"
 #include "Geant4/G4UImanager.hh"
 #include "Geant4/G4ProcessTable.hh"
 #include "Geant4/G4ProcessVector.hh"
@@ -54,8 +55,15 @@ MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
   _list = physList;
 }
 
-MAUSPhysicsList::~MAUSPhysicsList()
-{}
+MAUSPhysicsList::~MAUSPhysicsList() {
+    for (size_t i = 0; i < _limits.size(); ++i) {
+        delete _limits[i];
+    }
+    for (size_t i = 0; i < _specialCuts.size(); ++i) {
+        delete _specialCuts[i];
+    }
+    delete _list;
+}
 
 MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
   Json::Value& dc = *Globals::GetInstance()->GetConfigurationCards();
@@ -69,12 +77,12 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
         mpl->Setup();
         return mpl;
     }
-    catch(Squeal squee) {
+    catch (Exception exc) {
         delete mpl;
-        throw squee;
+        throw exc;
     }
   } else {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
         "Failed to recognise physics list model "+physModel,
         "MAUSPhysicsList::GetMAUSPhysicsList()")
     );
@@ -183,6 +191,7 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
     std::string pname = (*pvec)[i]->GetProcessName();
     UIApplyCommand(activation+pname);
   }
+  delete pvec;
 }
 
 void MAUSPhysicsList::ConstructParticle() {
@@ -190,7 +199,7 @@ void MAUSPhysicsList::ConstructParticle() {
 }
 
 void MAUSPhysicsList::ConstructProcess() {
-    _list->ConstructProcess();
+    _list->ConstructProcess();  // BUG: Memory leak on G4 side
     SetSpecialProcesses();
 }
 
@@ -199,7 +208,12 @@ void MAUSPhysicsList::SetSpecialProcesses() {
   while ( (*theParticleIterator)() ) {
     G4ProcessManager* pmanager = theParticleIterator->value()->
                                                             GetProcessManager();
-    pmanager->AddProcess(new G4StepLimiter, -1, -1, 2);
+    // step limiter for G4StepMax parameter; _limits exists for memory cleanup
+    _limits.push_back(new G4StepLimiter);
+    pmanager->AddProcess(_limits.back(), -1, -1, 2);
+    // track limiter for G4KinMax, etc
+    _specialCuts.push_back(new G4UserSpecialCuts());
+    pmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
   }
 }
 

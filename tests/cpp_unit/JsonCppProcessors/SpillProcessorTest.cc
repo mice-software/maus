@@ -39,6 +39,9 @@
 //         example, if we never touch "energy" or something, it never gets used.
 //         But checking this is a lot of work...
 
+// Tests the MC branch and the Spill overall
+// Recon branch should go in ReconEventProcessorTest (this is getting unwieldy)
+
 namespace MAUS {
 namespace SpillProcessorTest {
 
@@ -50,6 +53,8 @@ std::string STEP =
         std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
         std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
+        std::string("\"b_field\":{\"x\":11.,\"y\":12.,\"z\":13.},")+
+        std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.}}");
 
 std::string TRACK_SEED =
         std::string("{\"particle_id\":1,\"track_id\":2,\"kill_reason\":\"Z\",")+
@@ -71,7 +76,8 @@ std::string PRIMARY =
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string SF_CHANNEL_ID =
-    std::string("{\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
+    std::string("{\"digit_id\":0.0,")+
+    std::string("\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
     std::string("\"tracker_number\":4}");
 
 std::string TOF_CHANNEL_ID =
@@ -129,12 +135,11 @@ std::string SPILL_SEED =
     std::string("\"maus_event_type\":\"Spill\"");
 
 std::string SPILL_ALL = SPILL_SEED+","+
-    std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
+    std::string("\"scalars\":{}, ")+
     std::string("\"mc_events\":[], \"recon_events\":[], \"test_branch\":"+
                 TEST_BRANCH("test_branch/")+"}");
 
 std::string SPILL_MINIMAL = SPILL_SEED+"}";
-
 
 TEST(SpillProcessorTest, ThreeVectorProcessorTest) {
     ThreeVectorProcessor proc;
@@ -210,6 +215,7 @@ TEST(SpillProcessorTest, TestBranchProcessorTest) {
 TEST(SpillProcessorTest, SpillProcessorTest) {
     SpillProcessor proc;
     ProcessorTest::test_value(&proc, SPILL_MINIMAL);
+    std::cerr << SPILL_MINIMAL << std::endl;
     ProcessorTest::test_value(&proc, SPILL_ALL);
 }
 }

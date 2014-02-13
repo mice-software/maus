@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/legacy/Interface/STLUtils.hh"
@@ -31,7 +31,7 @@ Globals* Globals::GetInstance() {
         return _process;
     } else {
         // watch out here, error handler not initialised(!)
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      std::string("Attempt to get Globals ")+
                           "instance when it has not been initialised",
                           "Globals::GetInstance()"));
@@ -49,7 +49,8 @@ bool Globals::HasInstance() {
 Globals::Globals()
   : _configuration_cards(NULL), _legacy_mice_run(NULL), _error_handler(NULL),
     _legacy_cards(NULL), _run_action_manager(NULL), _mc_mods(NULL),
-    _recon_mods(NULL), _maus_geant4_manager(NULL) {
+    _recon_mods(NULL), _mc_field_constructor(NULL),
+    _recon_field_constructor(NULL), _maus_geant4_manager(NULL) {
 }
 
 // in all the below I call GetInstance() to check that _process is initialised

@@ -47,14 +47,14 @@ namespace MAUS {
     FRIEND_TEST(MapBaseTest, TestCopyConstructor);
   };
 
-  class MyMapper_squeal : public MyMapper {
+  class MyMapper_maus_exception : public MyMapper {
   public:
-    MyMapper_squeal() : MyMapper() {}
+    MyMapper_maus_exception() : MyMapper() {}
 
   private:
     virtual int* _process(double* t) const {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _process",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _process",
 		   "int* _process(double* t) const");
     }
   };
@@ -115,7 +115,7 @@ namespace MAUS {
     try {
       tc1.birth("TestConfig");
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
 	<<"Fail: Birth function failed. Check ModuleBaseTest"
 	<< std::endl;
@@ -127,7 +127,7 @@ namespace MAUS {
     try {
       tc1.death();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
 	<<"Fail: Death function failed. Check ModuleBaseTest"
 	<< std::endl;
@@ -154,20 +154,20 @@ namespace MAUS {
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(NullInputException& e) {}
-    catch(...) {
+    catch (NullInputException& e) {}
+    catch (...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type NullInputException to be thrown"
 	<< std::endl;
     }
     /////////////////////////////////////////////////////
-    MyMapper_squeal mm_s;
+    MyMapper_maus_exception mm_s;
     try {
       mm_s.process(d);
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -176,9 +176,9 @@ namespace MAUS {
     try {
       mm_e.process(d);
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
+	<< "Fail: MAUS::Exception should have been handled"
 	<< std::endl;
     }
 
@@ -190,8 +190,8 @@ namespace MAUS {
 	<< "Fail: No exception thrown"
 	<< std::endl;
     }
-    catch(UnhandledException& e) {}
-    catch(...) {
+    catch (UnhandledException& e) {}
+    catch (...) {
       ASSERT_TRUE(false)
 	<< "Fail: Expected exception of type UnhandledException to be thrown"
 	<< std::endl;

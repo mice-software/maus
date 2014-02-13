@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "Rtypes.h"  // ROOT
+#include "src/common_cpp/Utils/VersionNumber.hh"
 
 #include "src/common_cpp/DataStructure/VLSB.hh"
 #include "src/common_cpp/DataStructure/VLSB_C.hh"
@@ -75,7 +75,7 @@ class TrackerDaq {
     VLSBArray   _VLSB;
     VLSB_CArray _VLSB_C;
 
-    ClassDef(TrackerDaq, 1)
+    MAUS_VERSIONED_CLASS_DEF(TrackerDaq)
 };
 }
 

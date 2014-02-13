@@ -97,6 +97,14 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     primary->Push(part_in);
     part_in.x = 1;  // outside world volume
 
+    part_in.px = 1e-16;  // p too small (causes G4 hang)
+    part_in.py = 1e-16;  // p too small (causes G4 hang)
+    part_in.pz = 1e-16;  // p too small (causes G4 hang)
+    primary->Push(part_in);
+    part_in.px = 5.;
+    part_in.py = 6.;
+    part_in.pz = 7.;
+
     G4Event* event = new G4Event();
     for (size_t i=0; i<2; ++i) {
         primary->GeneratePrimaries(event);
@@ -124,8 +132,8 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(part_in.seed, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
-    for (size_t i=0; i<5; ++i) {
-        EXPECT_THROW(primary->GeneratePrimaries(event), Squeal);
+    for (size_t i=0; i<6; ++i) {
+        EXPECT_THROW(primary->GeneratePrimaries(event), MAUS::Exception);
     }
  
     delete event;
@@ -163,6 +171,15 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     EXPECT_EQ(part_in.pid, part_out.pid);
     EXPECT_EQ(part_in.seed, part_out.seed);
 
+    // Test bad (negative assigned to unsigned int) seed value in JSON
+    bool passed = false;
+    val["random_seed"] = Json::Value(-1);
+    try {
+      part_out.ReadJson(val);
+    } catch (MAUS::Exception exc) {
+      passed = true;
+    }
+    EXPECT_TRUE(passed);
 }
 
 TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {

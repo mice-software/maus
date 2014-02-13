@@ -4,7 +4,7 @@ objects, or entirely independently of them, as the user desires. Properties for 
 physical and engineering model of the simulation are described below. This includes properties for
 sensitive detectors.
 
-\subsection{General Properties}
+\section{General Properties}
 There are a number of properties that are applicable to any MiceModule.
 
 \begin{center}
@@ -60,7 +60,8 @@ Set to the type of sensitive detector required. Possible sensitive detectors are
 \textit{CKOV}, \textit{SpecialVirtual, Virtual, Envelope} or \textit{EMCAL}.\\\hline
 \end{supertabular}
 \end{center}
-\subsection{Sensitive Detectors}
+
+\section{Sensitive Detectors}
 A sensitive detector (one in which hits are recorded) can be defined by including the SensitiveDetector property. When a
 volume is set to be a sensitive detector MAUS will automatically record tracks entering, exiting and crossing the
 volume. Details such as the energy deposited by the track are sometimes also recorded in order to enable subsequent
@@ -68,10 +69,10 @@ modelling of the detector response.
 
 Some sensitive detectors use extra properties.
 
-\subsubsection[Scintillating Fibre Detector (SciFi)]{Scintillating Fibre Detector (SciFi)}
-\subsubsection{Cerenkov Detector (CKOV)}
-\subsubsection{Time Of Flight Counter (TOF)}
-\subsubsection{Special Virtual Detectors}
+\subsection[Scintillating Fibre Detector (SciFi)]{Scintillating Fibre Detector (SciFi)}
+\subsection{Cerenkov Detector (CKOV)}
+\subsection{Time Of Flight Counter (TOF)}
+\subsection{Special Virtual Detectors}
 Special virtual detectors are used to monitor tracking through a particular physical volume. Normally particle tracks
 are written in the global coordinate system, although an alternate coordinate system can be defined. Additional
 properties can be used to parameterise special virtual detectors.
@@ -139,7 +140,7 @@ Vector &
 If set, record hits relative to a reference position in the coordinate system of the Configuration.\\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Virtual Detectors}
+\subsection{Virtual Detectors}
 Virtual detectors are used to extract all particle data at a particular plane, irrespective of geometry. Virtual
 detectors do not need to have a physical volume. The \textit{plane} can be a plane in z, time, proper time, or a
 physical plane with some arbitrary rotation and translation.
@@ -202,7 +203,7 @@ Set to false to prevent backwards-going particles from being recorded. Default i
 \end{supertabular}
 \end{center}
 
-\subsubsection{Envelope Detectors}
+\subsection{Envelope Detectors}
 Envelope detectors are a type of Virtual detector that take all of the properties listed under virtual detectors, above.
 In addition, in the optics application they can be used to interact with the beam envelope in a special way. The
 following properties can be defined for Envelope Detectors \textit{in addition to} the properties specified above for
@@ -289,7 +290,7 @@ For Standard\_Deviation, a single variable should be selected and the 1 sigma be
 For Covariance and Correlation, two variables should be selected separated by a comma.\\\hline
 \end{supertabular}
 \end{center}
-\subsection{Unconventional Volumes}
+\section{Unconventional Volumes}
 It is possible to define a number of volumes that use properties rather than the Dimensions keyword to define the volume
 size.
 
@@ -328,11 +329,11 @@ Double &
 Gives length along z\\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Trapezoid Volume}
+\subsection{Trapezoid Volume}
 A Trapezoid Volume is like a Wedge Volume (look visualization below) with the possibility to have
 different values for x width and 2 (non-zero) values for y.
 
-\subsubsection{Volume Wedge}
+\subsection{Volume Wedge}
 A wedge is a triangular prism as shown in the diagram. Here the blue line extends along the positive z-axis and the red
 line extends along the x-axis.
 \begin{figure}[!p]
@@ -367,7 +368,7 @@ Vector &
 \\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Volume Polycone}
+\subsection{Volume Polycone}
 A polycone is a volume of rotation, defined by a number of points in r and z. The volume is found by a linear
 interpolation of the points.
 
@@ -393,7 +394,7 @@ string &
 The name of the file that contains the polycone data.\\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Volume Quadrupole}
+\subsection{Volume Quadrupole}
 Quadrupoles are defined by an empty cylinder with four further cylinders that are approximations to pole tips.
 
 \begin{center}
@@ -434,7 +435,7 @@ string &
 The material from which the quadrupole volume is made.\\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Volume Multipole}
+\subsection{Volume Multipole}
 Multipoles are defined by an empty box with an arbitrary number of cylinders that are approximations to pole tips. Poles
 are placed around the centre of the box with n-fold symmetry. Multipoles can be curved, in which case poles cannot be
 defined -- only a curved rectangular aperture will be present.
@@ -482,7 +483,7 @@ double &
 The outer full width of the aperture.\\\hline
 \end{supertabular}
 \end{center}
-\subsubsection{Volume Boolean}
+\subsection{Volume Boolean}
 Boolean volumes enable several volumes to be combined to make very sophisticated shapes from a number of elements.
 Elements can be combined either by union, intersection or subtraction operations. A union creates a volume that is the
 sum of two elements; an intersection creates a volume that covers the region where two volumes intersect each other;
@@ -552,7 +553,7 @@ Vector} &
 \\\hhline{--~}
 \end{supertabular}
 \end{center}
-\subsubsection{Volume Sphere}
+\subsection{Volume Sphere}
 A sphere is a spherical shell, with options for opening angles to make segments.
 
 \begin{center}
@@ -589,7 +590,7 @@ used. Theta values must be in the range 0 to 180 degrees. If undefined, defaults
 \end{supertabular}
 \end{center}
 
-\subsection{Repeating Modules}
+\section{Repeating Modules}
 It is possible to set up a repeating structure for e.g. a repeating magnet lattice. The RepeatModule property enables
 the user to specify that a particular module will be repeated a number of times, with all properties passed onto the
 child module, but with a new position, orientation and scale factor. Each successive repetition will be given a
@@ -657,7 +658,7 @@ Number of times the module will be repeated in addition to the initial placement
 \end{supertabular}
 \end{center}
 
-\subsection{Beam Definition and Beam Envelopes}
+\section{Beam Definition and Beam Envelopes}
 The Optics application can be used to track a trajectory and associated beam envelope through the accelerator structure.
 Optics works by finding the Jacobian around some arbitrary trajectory using a numerical differentiation. This is used
 to define a linear mapping about this trajectory, which can then be used to transport the beam envelope.
@@ -928,7 +929,7 @@ modules until it the datacard \textit{numEvts} is reached or all modules have be
 Default is for MAUS to keep tracking from the first module it finds until \textit{numEvts} is reached.\\\hline
 \end{supertabular}
 \end{center}
-\subsection{Optimiser}
+\section{Optimiser}
 It is possible to define an optimiser for use in the Optics application. The optimiser enables the user to vary
 parameters in the MiceModule file and try to find some optimum setting. For each value of the parameters, MAUS Optics
 will calculate a score; the optimiser attempts to find a minimum value for this score.

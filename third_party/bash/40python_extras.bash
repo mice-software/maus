@@ -19,19 +19,21 @@ download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo==2.3 readline numpy==1.5 matplotlib==1.1.0 scons==2.2.0\
- pil django magickwand
+ pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
+ pil django==1.5.1 magickwand
 "
 # these are the packages to install - note the version dependencies
 package_list="\
  anyjson python-dateutil amqplib kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
- pymongo scons readline numpy matplotlib \
+ pymongo scons readline matplotlib \
  pil django magickwand
 "
-module_test_list="suds validictory nose coverage \
- pylint numpy bitarray matplotlib celery pymongo \
+# note numpy was installed previously, not in this script. We test it's import
+# here for convenience
+module_test_list="numpy suds validictory nose coverage \
+ pylint bitarray matplotlib celery pymongo \
  Image django magickwand" #Image is pil bottom level
 binary_test_list="scons"
 

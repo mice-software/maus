@@ -1,5 +1,6 @@
-import sys
-import math
+"""MakeEMR creates EMR geometry MICEModules."""
+
+#pylint:disable=C0102, C0103, R0902, R0913, W0231
 
 NumberOfLayers = 48
 BarsPerLayer = 59
@@ -7,7 +8,10 @@ ExportFolder = "EMR/"
 WithBars = 1
 
 class G4MiceGeoBase:
-    def __init__( self, Name ):#pylint:disable=C0103
+    """
+    @class G3MiceGeoBase This class controls the global positions and dimensions of the EMR
+    """
+    def __init__( self, Name ):
         self.Name = Name
         self.Height = 0.0
         self.Length = 0.0
@@ -20,16 +24,25 @@ class G4MiceGeoBase:
         self.Psi = 0.0
 
     def SetDimensions( self, Length, Width, Height ):
+        """
+        @method SetDimensions This method sets the dimensions of the EMR detector
+        """
         self.Length = Length
         self.Width = Width
         self.Height = Height
 
     def SetPosition( self, X, Y, Z ):
+        """
+        @method SetRotation This method sets the global position of the Detector with Tait-Bryan angles
+        """
         self.X = X
         self.Y = Y
         self.Z = Z
 
     def SetRotation( self, Phi, Theta, Psi ):
+        """
+        @method SetRotation This method sets the global rotation of the Detector with Tait-Bryan angles
+        """
         self.Phi = Phi
         self.Theta = Theta
         self.Psi = Psi
@@ -38,11 +51,15 @@ class G4MiceGeoBase:
         message = """Name: %s
           Dimensions: %d %d %d
           Position: %d %d %d
-          Rotation:
-        """% ( self.Name, self.Width, self.Height, self.Length, self.X, self.Y, self.Z )
+          Rotation: """% ( self.Name, self.Width, self.Height, self.Length,
+                           self.X, self.Y, self.Z )
         return message
 
 class EMRBar( G4MiceGeoBase ):
+    """
+    @class EMRBar This class defines an EMR Bar within the detector geometry and writes
+    a MICEModule file. 
+    """
     def __init__( self, LayerId, BarId, BarLength, BarHeight, BarWidth ):
         self.Name = "EMRLayer%dBar%d" % ( LayerId, BarId )
         self.BarId = BarId
@@ -59,6 +76,9 @@ class EMRBar( G4MiceGeoBase ):
 
 
     def Export( self ):
+        """
+        @method Export This method writes a MICE module describing an EMR bar
+        """
 
     #  if( self.BarId % 2 ):
     #    Y1HalfLength = 0
@@ -99,8 +119,9 @@ class EMRBar( G4MiceGeoBase ):
                 self.BarId,
                 self.Name )
 
-        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength, Y1HalfLength,
-        #Y2HalfLength, ZHalfLength, self.LayerId, self.BarId, self.Name )
+        #% ( ExportFolder, self.Name, self.Name, XHalfLength, XHalfLength,
+        #    Y1HalfLength, Y2HalfLength, ZHalfLength, self.LayerId,
+        #    self.BarId, self.Name )
 
         BarFile = open( ExportFolder + self.Name + ".dat", 'w' )
         BarFile.write( Content )
@@ -137,6 +158,9 @@ class EMRBar( G4MiceGeoBase ):
         SciFile.close()
 
 class EMRLayer( G4MiceGeoBase ):
+    """
+    @class EMRLayer This class defines a layer of bars within the EMR
+    """
     def __init__(self, LayerId, BarCount, BarLength, BarHeight, BarWidth ):
         self.Bars = []
         self.LayerId = LayerId
@@ -157,7 +181,8 @@ class EMRLayer( G4MiceGeoBase ):
         HalfLayerLength = ( ( self.BarWidth / 2 ) * (self.BarCount - 1) ) / 2
         if WithBars == 1 :
             for i in range( self.BarCount ):
-                b = EMRBar( self.LayerId, i, self.BarLength, self.BarHeight, self.BarWidth )
+                b = EMRBar( self.LayerId, i, self.BarLength,
+                            self.BarHeight, self.BarWidth )
                 #if not( self.LayerId % 2 ):
                 #  XPos = 0.0
                 #  YPos = ( -HalfLayerLength + ( i * ( b.Width / 2 ) ) )
@@ -165,7 +190,8 @@ class EMRLayer( G4MiceGeoBase ):
                 #  XPos = ( -HalfLayerLength + ( i * ( b.Width / 2 ) ) )
                 #  YPos = 0.0
                 #b.SetPosition( XPos, YPos, 0.0 )
-                b.SetPosition( 0.0, ( -HalfLayerLength + ( i * ( b.Width / 2 ) ) ), 0.0 )
+                b.SetPosition(0.0, 
+                             (-HalfLayerLength + (i * (b.Width / 2))), 0.0)
                 if i % 2 == 0:
                     b.SetRotation( 0.0, 0.0, 0.0 )
                 else:
@@ -173,19 +199,27 @@ class EMRLayer( G4MiceGeoBase ):
                 self.Bars.insert( i, b )
 
     def IsVertical( self ):
+        """
+        @method IsVertical Returns a 1 for a vertical layer based on the LayerID number
+        """
         return self.LayerId % 2
 
     def Export( self ):
+        """
+        @method Export This method writes a MICEModule file describing the EMR layer
+        """
         #Calculating trapezoid halflengths
         #ZHL = ( self.BarHeight / 2 )
         #if not self.IsVertical():
         #  X1HL = self.BarLength / 2
         #  X2HL = self.BarLength / 2
         #  Y1HL = ( self.BarWidth * ( self.BarCount / 2 ) ) / 2
-        #  Y2HL = ( self.BarWidth * ( ( self.BarCount / 2 ) + ( self.BarCount % 2 ) ) ) / 2
+        #  Y2HL = ( self.BarWidth * ( ( self.BarCount / 2 ) + 
+        #                           ( self.BarCount % 2 ) ) ) / 2
         #else:
         #  X1HL = ( self.BarWidth * ( self.BarCount / 2 ) ) / 2;
-        #  X2HL = ( self.BarWidth * ( ( self.BarCount / 2 ) + ( self.BarCount % 2 ) ) ) / 2
+        #  X2HL = ( self.BarWidth * ( ( self.BarCount / 2 ) +
+        #         ( self.BarCount % 2 ) ) ) / 2
         #  Y1HL = self.BarLength / 2
         #  Y2HL = self.BarLength / 2
 
@@ -208,13 +242,15 @@ class EMRLayer( G4MiceGeoBase ):
                  self.Name,
                  self.Length / 2,
                  self.Length / 2,
-                 ( self.BarWidth * ( self.BarCount / 2 ) ) / 2,
-                 ( self.BarWidth * ( ( self.BarCount / 2 ) + ( self.BarCount % 2 ) ) ) / 2,
+                 ( self.BarWidth * (self.BarCount / 2)) / 2,
+                 ( self.BarWidth * ((self.BarCount / 2) + 
+                                   (self.BarCount % 2))) / 2,
                  self.Height / 2,
                  self.LayerId,
                  self.BarCount,
                  self.BarCount )
-            #% ( ExportFolder, self.Name, self.Name, X1HL, X2HL, Y1HL, Y2HL, ZHL,
+            #% ( ExportFolder, self.Name, self.Name, X1HL, X2HL,
+            #    Y1HL, Y2HL, ZHL,
             #self.LayerId, self.BarCount, self.BarCount )
         if WithBars == 1:
             for bar in self.Bars:
@@ -223,7 +259,8 @@ class EMRLayer( G4MiceGeoBase ):
                   Position %.2f %.2f %.2f cm
                   Rotation %.2f %.2f %.2f degree
                 }
-                """ % ( ExportFolder, bar.Name, bar.X, bar.Y, bar.Z, bar.Phi, bar.Theta, bar.Psi )
+                """ % ( ExportFolder, bar.Name, bar.X, bar.Y, bar.Z,
+                        bar.Phi, bar.Theta, bar.Psi )
                 bar.Export()
         Content += "}"
         LayerFile = open( ExportFolder + self.Name + ".dat", 'w' )
@@ -231,6 +268,9 @@ class EMRLayer( G4MiceGeoBase ):
         LayerFile.close()
 
 class EMRGeometry( G4MiceGeoBase ):
+    """
+    @class EMRGeometry This class defines the global geometry of the EMR
+    """
     def __init__(self, NumLayers, NumBars, BarLength, BarHeight, BarWidth ):
         self.Layers = []
         self.Name = "Calorimeter"
@@ -256,7 +296,8 @@ class EMRGeometry( G4MiceGeoBase ):
 
         HalfEMRLength = ( self.BarHeight * (self.LayersCount - 1 ) ) / 2
         for i in range( self.LayersCount ):
-            l = EMRLayer( i, self.BarsCount, self.BarLength, self.BarHeight, self.BarWidth )
+            l = EMRLayer( i, self.BarsCount, self.BarLength,
+                          self.BarHeight, self.BarWidth )
             l.SetPosition( 0.0, 0.0, - HalfEMRLength + ( i * self.BarHeight ) )
             if i % 2 == 0:
                 l.SetRotation( 0.0, 0.0, 0.0 )
@@ -265,6 +306,9 @@ class EMRGeometry( G4MiceGeoBase ):
             self.Layers.insert( i, l )
 
     def Export( self ):
+        """
+        @method Export This method writes a MICEModule file describing the EMR geometry
+        """
         Content = """// FILES/Models/Modules/%s%s.dat
         //
         //
@@ -319,6 +363,6 @@ class EMRGeometry( G4MiceGeoBase ):
 #print Layer
 #Layer.Export()
 
-EMR = EMRGeometry( NumberOfLayers, BarsPerLayer, 110.0, 1.7, 3.3 );
+EMR = EMRGeometry( NumberOfLayers, BarsPerLayer, 110.0, 1.7, 3.3 )
 print EMR
 EMR.Export()

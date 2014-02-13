@@ -19,7 +19,7 @@
 
 #include <string>
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/ConverterFactory.hh"
 
@@ -51,13 +51,13 @@ namespace MAUS {
     try {
       o =  _process(i);
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    catch (Exception& s) {
+      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
     return o;
@@ -69,13 +69,13 @@ namespace MAUS {
     try {
       o = _process(i);
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSqueal(*i, s, _classname);
+    catch (Exception& s) {
+      CppErrorHandler::getInstance()->HandleException(*i, s, _classname);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExc(*i, e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
     return o;
@@ -92,7 +92,7 @@ namespace MAUS {
       tmp = c.convert<OTHER, INPUT>(o);
       ret =  process(tmp);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       if (tmp) { delete tmp; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
       return ret;
@@ -116,7 +116,7 @@ namespace MAUS {
       tmp = c.convert<OTHER, Json::Value>(o);
       ret =  process(tmp);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       if (tmp) { delete tmp; }
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
       return ret;

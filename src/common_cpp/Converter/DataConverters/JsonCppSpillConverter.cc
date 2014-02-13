@@ -32,10 +32,9 @@ Data* JsonCppSpillConverter::_convert(const Json::Value* json_data) const {
     ReferenceResolver::JsonToCpp::RefManager::Death();
     Data *cpp_data = new Data();
     cpp_data->SetEvent(spill);
-    cpp_data->SetEventType(spill->GetDaqEventType());
     return cpp_data;
   }
-  catch(...) {
+  catch (...) {
     if (ReferenceResolver::JsonToCpp::RefManager::HasInstance())
       ReferenceResolver::JsonToCpp::RefManager::Death();
     throw;

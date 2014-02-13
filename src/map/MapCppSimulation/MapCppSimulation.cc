@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -41,9 +41,9 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
     _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
     return true;  // Sucessful completion
   // Normal session, no visualization
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception& exc) {
+  } catch (Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -52,7 +52,7 @@ bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
 std::string MapCppSimulation::process(std::string document) {
   Json::Value spill;
   try {spill = JsonWrapper::StringToJson(document);}
-  catch(...) {
+  catch (...) {
     return std::string("{\"errors\":{\"bad_json_document\":")+
            std::string("\"Failed to parse input document\"}}");
   }
@@ -67,10 +67,10 @@ std::string MapCppSimulation::process(std::string document) {
     if (_doVis)
         MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
   }
-  catch(Squeal& squee) {
+  catch (Exception& exception) {
     spill = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(spill, squee, _classname);
-  } catch(std::exception& exc) {
+                                       ->HandleException(spill, exception, _classname);
+  } catch (std::exception& exc) {
     spill = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(spill, exc, _classname);
   }

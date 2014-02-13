@@ -20,25 +20,30 @@
 #ifndef SRC_COMMON_CPP_RECONSTRUCTION_TRACK_FITTER_HH
 #define SRC_COMMON_CPP_RECONSTRUCTION_TRACK_FITTER_HH
 
+#include <string>
 #include <vector>
-
-#include "Recon/Global/WorkingTrackPoint.hh"
-#include "Recon/Global/WorkingTrack.hh"
 
 namespace MAUS {
 
 class OpticsModel;
+
+namespace DataStructure {
+namespace Global {
+  class Track;
+}
+}
 
 namespace recon {
 namespace global {
 
 class TrackFitter {
  public:
-  TrackFitter(const MAUS::OpticsModel & optics_model, const double start_plane)
-      : optics_model_(&optics_model), start_plane_(start_plane) { }
+  TrackFitter(MAUS::OpticsModel const * optics_model, const double start_plane)
+      : optics_model_(optics_model), start_plane_(start_plane) { }
   virtual ~TrackFitter() { }
-  virtual void Fit(const WorkingTrack & detector_events,
-                   WorkingTrack & track) = 0;
+  virtual void Fit(MAUS::DataStructure::Global::Track const * const raw_track,
+                   MAUS::DataStructure::Global::Track * const track,
+                   const std::string mapper_name) = 0;
  protected:
   MAUS::OpticsModel const * optics_model_;
   const double start_plane_;

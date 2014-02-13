@@ -1,23 +1,37 @@
 #!/usr/bin/env bash
 
-run_list="04234 04258 04235"
-cat_list="04234 04258 04234 04258 04234 04258 04234 04258 04234 04258 04235 04235 04235 04235 04235"
+stagedir=${MAUS_THIRD_PARTY}/third_party/source/
+destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
+
+if [ "$#" -gt 0 ]; then
+    # if there are command line arguments it should be a list of run numbers
+    # eventually this becomes a load test (but online recon is failing right now)
+    run_list=$@
+    cat_list=$@
+else
+    # if there are no command line arguments we generate default data set
+    run_list="04234 04258 04235"
+    cat_list="04234 04235"
+fi
+
+echo "INFO: Building test data set"
+echo "INFO: Getting runs numbered "${run_list}
+echo
+
 if [ ! -n "${MAUS_THIRD_PARTY+x}" ]; then
     echo
     echo "FATAL: MAUS_THIRD_PARTY is not set" >&2
     exit 1
 fi
 
-
 for run in ${run_list}
 do
     filename=${run}.tar
-    url=http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/04200/${filename}
+    century="${run:0:3}00"
+    url=http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/${century}/${filename}
 
-    stagedir=${MAUS_THIRD_PARTY}/third_party/source/
     stagefile=${stagedir}/${filename}
 
-    destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
     destfile=${destdir}/${filename}
 
     # the point of staging to third_party/source/ is that then this will get 
@@ -56,22 +70,16 @@ do
     fi
 done
 
-echo "INFO: Concatenating run data"
+echo "INFO: Concatenating run data for runs "
+cd ${destdir}
 cat_file=${destdir}/test_data.cat
-if [ -e ${cat_file} ]
-then
-    rm ${cat_file}
-fi
-touch ${destdir}/test_data.cat
 for item in ${cat_list}
 do
-    file_list=`ls ${destdir}/${item}.0*`
-    for a_file in ${file_list}
-    do
-        cat ${cat_file} ${a_file} >& ${cat_file}.tmp
-        mv ${cat_file}.tmp ${cat_file}
-    done
+    echo "INFO:       ${item}"
+    file_list="${file_list} "`ls ${destdir}/${item}.0*`
 done
-echo "INFO: Following files were downloaded"
-ls ${destdir}
+echo "INFO: Following files were found "${file_list}
+echo "INFO: concatenating"
+cat ${file_list} > ${cat_file}
+echo "INFO: Successfully built test data set"
 

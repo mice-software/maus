@@ -12,8 +12,10 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+
+#include "Geant4/G4Material.hh"
 #include "Interface/MiceMaterials.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::mm;
 using CLHEP::cm2;
@@ -32,9 +34,9 @@ MiceMaterials::MiceMaterials( bool noG4 )
 {
   if( noG4 )
   {
-    if(getenv( "MICEFILES" ) == NULL) throw(Squeal(Squeal::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
-    if(getenv( "COMPILER" )  == NULL) throw(Squeal(Squeal::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
-    if(getenv( "G4VERS" )    == NULL) throw(Squeal(Squeal::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
+    if(getenv( "MICEFILES" ) == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
+    if(getenv( "COMPILER" )  == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
+    if(getenv( "G4VERS" )    == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
     std::string fname = std::string( getenv( "MICEFILES" ) ) + "/Models/Materials/micematerials_" 
                       + std::string( getenv( "COMPILER" ) ) + "_"
                       + std::string( getenv( "G4VERS" ) ) + ".txt";
@@ -143,13 +145,13 @@ void MiceMaterials::addMaterial( G4Material* mat, std::string name )
 G4Material* MiceMaterials::materialByName( std::string mat ) const
 {
   if ( _materials.find( mat ) == _materials.end() ) {
-    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
   }
   G4Material* matter = _materials.find( mat )->second;
 
   if( ! matter ) // can't find this material!
   {
-    throw(Squeal(Squeal::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
     matter = _materials.find( "Galactic" )->second;
   }
 
@@ -286,5 +288,19 @@ void MiceMaterials::updateProperties( std::string name, std::string chemical, do
   _aNumber[ name ] = ANum;
   _meanExcitationEnergy[ name ] = meanExE;
   _densityCorrection[ name ] = densityCor;  
+}
+
+MiceMaterials::~MiceMaterials() {
+    // There is a G4 memory leak where
+    //   G4Material::G4MaterialPropertiesTable::G4MaterialPropertyVector
+    // contains a list of pointers to G4MPVEntry which are alloc'd on the stack
+    // but cannot be reached by user to delete them and are not handled properly
+    // in G4MaterialPropertyVector destructor 
+    typedef std::map<std::string, G4Material*>::iterator mat_iter;
+    for (mat_iter it = _materials.begin(); it != _materials.end(); ++it) {
+        G4Material* mat = (*it).second;
+        if (mat->GetMaterialPropertiesTable() != NULL)
+            delete mat->GetMaterialPropertiesTable();
+    }
 }
 

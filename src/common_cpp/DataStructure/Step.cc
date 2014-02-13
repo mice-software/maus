@@ -18,7 +18,8 @@
 
 namespace MAUS {
 
-Step::Step() : _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0), _proper_time(0), //added spin
+Step::Step() : _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0),
+               _bfield(0, 0, 0), _efield(0, 0, 0), _proper_time(0),
                _path_length(0), _time(0), _energy(0), _energy_deposited(0) {
 }
 
@@ -33,6 +34,8 @@ Step& Step::operator=(const Step& step) {
     _position = step._position;
     _momentum = step._momentum;
     _spin = step._spin; //added
+    _bfield = step._bfield;
+    _efield = step._efield;
     _proper_time = step._proper_time;
     _path_length = step._path_length;
     _time = step._time;
@@ -108,6 +111,22 @@ double Step::GetEnergyDeposited() const {
 
 void Step::SetEnergyDeposited(double edep) {
     _energy_deposited = edep;
+}
+
+ThreeVector Step::GetBField() const {
+    return _bfield;
+}
+
+void Step::SetBField(ThreeVector bfield) {
+    _bfield = bfield;
+}
+
+ThreeVector Step::GetEField() const {
+    return _efield;
+}
+
+void Step::SetEField(ThreeVector efield) {
+    _efield = efield;
 }
 }
 

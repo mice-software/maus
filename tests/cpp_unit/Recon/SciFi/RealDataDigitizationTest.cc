@@ -20,7 +20,7 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -34,7 +34,7 @@ class RealDataDigitizationTest : public ::testing::Test {
 
 TEST_F(RealDataDigitizationTest, test_calibration_load) {
   RealDataDigitization test_case_1;
-  EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), Squeal);
+  EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), MAUS::Exception);
   RealDataDigitization test_case_2;
   bool good_calib = test_case_2.load_calibration("scifi_calibration_jan2013.txt");
   EXPECT_TRUE(good_calib);
@@ -57,7 +57,7 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
 
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
   RealDataDigitization test_case;
-  EXPECT_THROW(test_case.load_mapping("nonsense.txt"), Squeal);
+  EXPECT_THROW(test_case.load_mapping("nonsense.txt"), MAUS::Exception);
   bool good_map = test_case.load_mapping("mapping_7.txt");
   EXPECT_TRUE(good_map);
   int missing_channel_counter = 0;
@@ -65,8 +65,9 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
     for ( int bank = 0; bank < 4; bank++ ) {
       for ( int chan_ro = 0; chan_ro < 128; chan_ro++ ) {
         int tracker, station, plane, channel;
+        int extWG, inWG, WGfib;
         test_case.get_StatPlaneChannel(board, bank, chan_ro,
-                                       tracker, station, plane, channel);
+                                       tracker, station, plane, channel, extWG, inWG, WGfib);
         if ( tracker == -1 ) {
           missing_channel_counter += 1;
         }
@@ -87,12 +88,15 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
   int plane = 0;
   int channel = 0;
   int bad_bank = 99;
+  int extWG, inWG, WGfib;
 
   bool correct = test_case.get_StatPlaneChannel(board, bank, chan_ro,
-                                                tracker, station, plane, channel);
+                                                tracker, station, plane,
+                                                channel, extWG, inWG, WGfib);
   EXPECT_TRUE(correct);
   bool wrong = test_case.get_StatPlaneChannel(board, bad_bank, chan_ro,
-                                                tracker, station, plane, channel);
+                                              tracker, station, plane,
+                                              channel, extWG, inWG, WGfib);
   EXPECT_FALSE(wrong);
 }
 

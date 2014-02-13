@@ -19,9 +19,9 @@
 #define _MAUS_INPUTCPPREALDATA_CABLINGTOOLS_HH_
 
 
+#include <Python.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <Python.h>
 #include <limits.h>
 #include <string>
 #include <vector>
@@ -33,9 +33,11 @@
 
 #include "json/json.h"
 #include "src/common_cpp/Utils/DAQChannelMap.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+
+namespace MAUS {
 
 using std::string;
 using std::ostream;
@@ -57,7 +59,7 @@ class TOFChannelKey {
   TOFChannelKey(int st, int pl, int sl, int pmt, string d)
   :_station(st), _plane(pl), _slab(sl), _pmt(pmt), _detector(d) {}
 
-  explicit TOFChannelKey(string keyStr) throw(Squeal);
+  explicit TOFChannelKey(string keyStr) throw(Exception);
   virtual ~TOFChannelKey() {}
 
   bool operator==( TOFChannelKey key );
@@ -77,7 +79,7 @@ class TOFChannelKey {
   string GetOppositeSidePMTStr();
 
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
-  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exception);
 
   string detector() const {return _detector;}
 
@@ -184,6 +186,8 @@ class TOFChannelMap {
   PyObject* _get_cabling_func;
   bool pymod_ok;
 };
+
+}  // namespace MAUS
 
 #endif
 

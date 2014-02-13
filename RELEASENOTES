@@ -5,6 +5,56 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.8.1
+  The following changes were made:
+    - fix bug with geometry id integration test
+    - clean up obsolete third parties
+MAUS-v0.8.0
+  The following changes were made:
+    - Upgraded to GEANT 4.9.6p02
+    - several changes in SciFi tracker
+      -- pattern-recognition, reducer, hits-digits lookup, Kalman
+    - added SciFi documentation
+    - added doxygen third party for building improved documentation
+     -- requires flex version >= 2.5.35, flex provided as third party
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.7
+  The following changes were made:
+    - updated third party daq installation
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.6
+  The following changes were made:
+    - EMR Reconstruction
+    - first version of Global Track Reconstruction
+    - stability fixes for online reconstruction
+    - calls to squeals replaced by exceptions
+    - support for long long integers
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.5
+  The following changes were made:
+    - stability fixes
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.4
+  The following changes were made:
+    - Step IV geometry and CDB interface
+    - Examples for Optics python API
+    - Citation for MAUS
+    - stability fixes
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.3
+  The following changes were made:
+    - OutputCppROOT now writes to EOR directory
+    - Fixed memory leak from field map
+MAUS-v0.7.1
+  The following changes were made:
+    - Memory leak fix for MAUS-Online
+    - New KL reducer 
+    - Python-TofCalib reducer and updated TOF plots
+    - Optics API
+    - Various changes to MC, added MuScat data
+    - New third party library - numpy
+  If upgrading from a previous version, redo the entire installation
+
 MAUS-v0.7.0
   The following functionality was added:
     - SciFi Track Reconstruction

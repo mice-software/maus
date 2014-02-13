@@ -1,0 +1,13 @@
+
+Module G4DetectorTest
+{
+  PropertyString Material Galactic
+  PropertyHep3Vector Dimensions 10. 10. 8. m
+  PropertyDouble G4StepMax 1000. mm
+  Module G4DetectorError
+  {
+    PropertyHep3Vector Position 0. 0. 0. m
+    PropertyString G4Detector ErrorDoesNotExist
+  }
+}
+

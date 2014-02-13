@@ -23,7 +23,8 @@ DAQDataProcessor::DAQDataProcessor()
       _tof1_proc(new TOFDaqProcessor), _ckov_proc(new CkovDaqProcessor),
       _tof2_proc(new TOFDaqProcessor), _unknown_proc(new UnknownProcessor),
       _kl_proc(new KLDaqProcessor), _tag_proc(new TagProcessor),
-      _tof0_proc(new TOFDaqProcessor), _trigger_proc(new TriggerProcessor) {
+      _tof0_proc(new TOFDaqProcessor), _emr_proc(),
+      _trigger_proc(new TriggerProcessor) {
     RegisterValueBranch
           ("V830", &_V830_proc, &DAQData::GetV830,
           &DAQData::SetV830, false);
@@ -54,6 +55,9 @@ DAQDataProcessor::DAQDataProcessor()
     RegisterValueBranch
           ("trigger", &_trigger_proc, &DAQData::GetTriggerArray,
           &DAQData::SetTriggerArray, false);
+    RegisterValueBranch
+          ("emr", &_emr_proc, &DAQData::GetEMRDaq,
+          &DAQData::SetEMRDaq, false);
     RegisterIgnoredBranch("single_station", false);
 }
 }  // namespace MAUS

@@ -41,14 +41,14 @@ namespace MAUS {
     FRIEND_TEST(InputBaseTest, TestCopyConstructor);
   };
 
-  class MyInputter_squeal : public MyInputter {
+  class MyInputter_maus_exception : public MyInputter {
   public:
-    MyInputter_squeal() : MyInputter() {}
+    MyInputter_maus_exception() : MyInputter() {}
 
   private:
     virtual int* _emitter_cpp() {
-      throw Squeal(Squeal::recoverable,
-                   "Expected Test Squeal in _emitter_cpp",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+                   "Expected Test MAUS::Exception in _emitter_cpp",
                    "int* _emitter_cpp()");
     }
   };
@@ -93,7 +93,7 @@ namespace MAUS {
     try {
       tc1.birth("TestConfig");
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Birth function failed. Check ModuleBaseTest"
         << std::endl;
@@ -105,7 +105,7 @@ namespace MAUS {
     try {
       tc1.death();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Death function failed. Check ModuleBaseTest"
         << std::endl;
@@ -122,13 +122,13 @@ namespace MAUS {
       << std::endl;
 
     /////////////////////////////////////////////////////
-    MyInputter_squeal mm_s;
+    MyInputter_maus_exception mm_s;
     try {
       mm_s.emitter_cpp();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: Squeal should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
@@ -137,9 +137,9 @@ namespace MAUS {
     try {
       mm_e.emitter_cpp();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
@@ -151,8 +151,8 @@ namespace MAUS {
         << "Fail: No exception thrown"
         << std::endl;
     }
-    catch(UnhandledException& e) {}
-    catch(...) {
+    catch (UnhandledException& e) {}
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Expected exception of type UnhandledException to be thrown"
         << std::endl;

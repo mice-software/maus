@@ -24,6 +24,7 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
+namespace MAUS {
 
 class InputCppDAQOfflineData : public InputCppDAQData {
 
@@ -75,10 +76,6 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */ 
   int _maxNumEvents;
 
- /** Counter of the DAQ events.
-  */
-  int _eventsCount;
-
  /** If this is true only the phys. evens will be processed.
   */
   bool _phys_Events_Only;
@@ -87,6 +84,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */
   bool _calib_Events_Only;
 };
+}
 
 #endif
 

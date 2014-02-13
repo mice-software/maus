@@ -1,0 +1,161 @@
+\section{Helical Track Pattern Recognition}
+\label{App:SciFiHelicalTrackPatternRecognition}
+The equation of motion of a charged particle in an external magnetic field
+can be written as
+
+\begin{equation}
+\frac{d^2 x}{ds^2}=\frac{q}{p}(\frac{d \vec{x}}{ds})\times \vec{B}(s)
+\end{equation}
+If we assume that the magnetic filed lies along the $z$ axis $\vec{B}=(0,0,B)$
+, then the three scaler components of it can be wirttien as
+\begin{equation}
+\begin{split}
+\frac{d^2 x}{ds^2} &=\frac{q}{P}(\frac{dy}{ds})B\\
+\frac{d^2 y}{ds^2} &=-\frac{q}{P}(\frac{dx}{ds})B\\
+\frac{d^2 z}{ds^2} &=0
+\end{split}
+\end{equation}
+
+we also note that $P$ is the total momentum and the transverse
+momenumte $p_t =P \cos \lambda=qBR_H$
+can be written as
+
+\begin{equation}
+\begin{split}
+p_x &=p_t \cos \phi\\
+p_x &=-p_t \sin \phi
+\end{split}
+\end{equation}
+
+the solution of the above equations will be a helix
+
+\begin{equation}
+\begin{split}
+x(s) &=x_{1} + R \left[\cos \left(\Phi_{0}+\frac{hs\cos \lambda}{R} \right)-\cos \Phi_{0} \right]\\
+y(s) &=y_{1} + R \left[\cos \left(\Phi_{0}+\frac{hs\cos \lambda}{R} \right)-\sin \Phi_{0} \right]\\
+z(s) &=z_{1}+s \sin \lambda
+\end{split}
+\end{equation}
+
+where $x_{1}$, $y_{1}$ and $z_{1}$ is the starting point. $R$ is the radius of the helix.
+$h=\pm 1$ is the sense of the rotation in $x-y$ plane. We note that
+\begin{equation}
+ \begin{split}
+ds^2 =dx^2+dy^2+dz^2\\
+ds/dz =(1+\acute{x}^2+\acute{y}^2)^{1/2}\\
+(\frac{dx}{ds})^2 +(\frac{dy}{ds})^2 + (\frac{dz}{ds})^2 = 1
+\end{split}
+\end{equation}
+
+On the other hand, the equation of a circle passing through three space points $(x_i,y_i)$ , where
+$i=1,2,3$ can be found from the following determinant.
+
+\begin{equation}
+\left|
+\begin{matrix}
+x^2+y^2 & x & y & 1\\
+x_1^2+y_1^2 & x_1 & y_1 & 1\\
+x_2^2+y_2^2 & x_2 & y_2 & 1\\
+x_3^2+y_3^3 & x_3 & y_3  & 1
+\end{matrix}
+\right|
+=0
+\end{equation}
+which can be re-written as
+\begin{equation}
+(x^2+y^2)
+\left|
+\begin{matrix}
+ x_1 & y_1 & 1\\
+ x_2 & y_2 & 1\\
+ x_3 & y_3 & 1
+\end{matrix}
+\right|
+-x
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & y_1 & 1\\
+x_2^2+y_2^2 & y_2 & 1\\
+x_3^2+y_3^3 & y_3  & 1
+\end{matrix}
+\right|
++y
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & x_1 & 1\\
+x_2^2+y_2^2 & x_2 & 1\\
+x_3^2+y_3^3 & x_3 & 1
+\end{matrix}
+\right|
+-
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & x_1 & y_1 \\
+x_2^2+y_2^2 & x_2 & y_2 \\
+x_3^2+y_3^3 & x_3 & y_3
+\end{matrix}
+\right|
+=0
+\end{equation}
+
+comparing the above relation with the conventional circle equation
+\begin{equation}
+a(x^2+y^2)+dx+ey+f=0
+\end{equation}
+or
+\begin{equation}
+(x+\frac{d}{2a})^2+(y+\frac{e}{2a})^2=\left( \sqrt{\frac{d^2+e^2}{4a^2}-\frac{f}{a} } \right)^2
+\end{equation}
+we find that
+
+
+\begin{equation}
+a=
+\left|
+\begin{matrix}
+ x_1 & y_1 & 1\\
+ x_2 & y_2 & 1\\
+ x_3 & y_3 & 1
+\end{matrix}
+\right|
+\end{equation}
+
+\begin{equation}
+d=-
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & y_1 & 1\\
+x_2^2+y_2^2 & y_2 & 1\\
+x_3^2+y_3^3 & y_3  & 1
+\end{matrix}
+\right|
+\end{equation}
+\begin{equation}
+e=
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & x_1 & 1\\
+x_2^2+y_2^2 & x_2 & 1\\
+x_3^2+y_3^3 & x_3 & 1
+\end{matrix}
+\right|
+\end{equation}
+\begin{equation}
+f=-
+\left|
+\begin{matrix}
+x_1^2+y_1^2 & x_1 & y_1 \\
+x_2^2+y_2^2 & x_2 & y_2 \\
+x_3^2+y_3^3 & x_3 & y_3
+\end{matrix}
+\right|
+\end{equation}
+
+and also the centre and the radius of the circle will be
+\begin{equation}
+ \begin{split}
+x_0 &=-\frac{d}{2a}\\
+y_0 &=-\frac{e}{2a}\\
+R &=\sqrt{\frac{d^2+e^2}{4a^2}-\frac{f}{a}}
+\end{split}
+\end{equation}

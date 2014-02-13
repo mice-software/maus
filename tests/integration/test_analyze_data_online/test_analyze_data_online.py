@@ -59,6 +59,8 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
         os.remove(raw_dir)
         time.sleep(1)
     os.symlink(my_tmp, raw_dir)
+    time.sleep(1)
+    os.mkdir(raw_dir+'/end_of_run')
     log = open(my_tmp+"test_analyze_data_online.log", "w")
     print "Running analyze online"
     print "Point your browser at http://localhost:9000/maus/"
@@ -67,7 +69,8 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     env_cp['MAUS_WEB_MEDIA_RAW'] = my_tmp+'/raw/'
     proc = subprocess.Popen(['python', ANALYZE_EXE,
                              '--daq_online_file', TMP_DIR+data_file_name,
-                             '--daq_online_spill_delay_time', '0.1'],
+                              '--daq_online_spill_delay_time', '0.5',
+                              '--TOF_calib_date_from', '2012-10-13 16:51:00'],
                              env=env_cp, stdout=log,
                              stderr=subprocess.STDOUT)
     if send_signal != None:
@@ -142,11 +145,14 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         test_pass = True
         # ROOT Chi2 is giving False negatives (test fails) so we exclude 
         test_config = [regression.KolmogorovTest(0.1, 0.05)]
-        for data in ['test_data.cat_histos']:
+        test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
+                             'test_analyze_data_online/test_data.cat_histos/')
+        eor_dir = test_dir+'end_of_run/4235/'
+        for data in [eor_dir]:
             ref_dir = os.path.expandvars('${MAUS_ROOT_DIR}/tests/integration'+\
                '/test_analyze_data_online/reference_plots_04235.000/')
             for ref_root in glob.glob(ref_dir+'*.root'):
-                test_root = temp_dir(data)+ref_root.split('/')[-1]
+                test_root = data+ref_root.split('/')[-1]
                 pass_dict[test_root] = regression.AggregateRegressionTests(
                                                    test_root,
                                                    ref_root,
@@ -155,9 +161,6 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             for key, value in pass_dict.iteritems():
                 print 'test file:', key, 'passes:', value
             self.assertEquals(test_pass, True)
-        test_dir = os.path.expandvars('$MAUS_ROOT_DIR/tmp/'+\
-                             'test_analyze_data_online/test_data.cat_histos/')
-        eor_dir = test_dir+'end_of_run/4235/'
         self.assertTrue(os.path.exists(eor_dir), msg="Failed to find "+eor_dir)
         ref_png = [item.split('/')[-1] for item in glob.glob(test_dir+'*.png')]
         eor_png = [item.split('/')[-1] for item in glob.glob(eor_dir+'*.png')]
@@ -167,6 +170,8 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
         for item in eor_png:
             self.assertTrue(item in ref_png, msg = "Failed to find '"+item+\
                             "' in "+str(eor_dir)+" "+str(ref_png))
+        self.assertTrue(
+               os.path.exists(eor_dir+'/reconstruct_daq_tofcalib_reducer.root'))
       
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ Tools for setting up the environment for SCons
 A whole bunch of tools for setting up each of the external c++ libraries from
 third_party - adding libraries, plus any extra directives for the path, etc.
 These can be called individually, by calling set_*(conf, env) functions, or by
-calling set_lib(lib_name, conf, env) where lib_name is a string naming the
+calling set_lib(lib_name, conf, env) where lib_name is a string naming the 
 library.
 
 A few helper functions also in there.
@@ -109,12 +109,12 @@ def get_environment():
     """
     Set up the SCons environment
 
-    Setup the environment with bindings for SWIG, llvm, Darwin, some
+    Setup the environment with bindings for SWIG, llvm, Darwin, some 
     third_party_libs
 
     @returns the scons environment
     """
-
+ 
    #  NOTE: SHLIBPREFIX means that shared libraries don't
     # have a 'lib' prefix, which is needed for python to find SWIG generated
     # libraries
@@ -128,7 +128,7 @@ def get_environment():
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
     # tell SWIG to make python bindings for C++
-    env.Append(SWIGFLAGS=['-python', '-c++'])
+    env.Append(SWIGFLAGS=['-python', '-c++']) 
 
     # useful to set for root-config
     env['ENV']['PATH'] =  os.environ.get('PATH')
@@ -154,7 +154,6 @@ def get_environment():
                         "%s/src/legacy" % maus_root,
                         "%s/src/common_cpp" % maus_root,
                         "%s/" % maus_root])
-
     env['USE_G4'] = False
     env['USE_ROOT'] = False
     env['USE_UNPACKER'] = False
@@ -209,13 +208,13 @@ def set_cpp(conf, env):
 
     env.Append(CCFLAGS=["""-Wall""",
                         """-Dlong32='int'""",
-                        """-Dlong64='long long'"""])
+                        """-DdatePointer='long'"""])
 
     cpp_extras(env)
 
 def cpp_extras(env):
     """
-    Sets compilation to include coverage, debugger, profiler depending on
+    Sets compilation to include coverage, debugger, profiler depending on 
     environment variable flags. Following controls are enabled:
         if maus_lcov is set, sets gcov flags (for subsequent use in lcov); also
         disables inlining
@@ -228,11 +227,11 @@ def cpp_extras(env):
     debug = 'maus_debug' in os.environ and os.environ['maus_debug'] != '0'
     gprof = 'maus_gprof' in os.environ and os.environ['maus_gprof'] != '0'
     # optimise by default
-    optimise = not ('maus_no_optimize' in os.environ
+    optimise = not ('maus_no_optimize' in os.environ 
                   and os.environ['maus_no_optimize'] != '0')
     assert_active = 'maus_assert_active' in os.environ \
                     and os.environ['maus_assert_active'] != '0'
-
+    
     if lcov:
         env.Append(LIBS=['gcov'])
         env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""",
@@ -246,7 +245,7 @@ def cpp_extras(env):
         env.Append(LINKFLAGS=["""-pg"""])
 
     if not (lcov or debug or gprof) and optimise:
-        env.Append(CCFLAGS=["""-O3"""])
+        env.Append(CCFLAGS=["""-O3"""])        
 
     if not assert_active: # disable debug flags
         env.Append(CCFLAGS=["""-DNDEBUG"""])
@@ -257,7 +256,7 @@ def set_python(conf, env): # pylint: disable=W0613
     """
     if sys.version[0:3] != '2.7':
         my_exit(1)
-
+    
     if not conf.CheckCommand('python'):
         my_exit(1)
 
@@ -282,6 +281,19 @@ def set_gsl(conf, env): # pylint: disable=W0613
         my_exit(1)
     if not conf.CheckLib('gslcblas'):
         print "ERROR: Cound't find GSL (required for ROOT)."
+        my_exit(1)
+
+def set_numpy(conf, env): # pylint: disable=W0613
+    """
+    Setup numpy
+    """
+    conf.env.Append(LIBS = ['npymath'])
+    if not conf.CheckLib('npymath'):
+        print "ERROR: Cound't find Numpy library"
+        my_exit(1)
+    # note other includes require Python
+    if not conf.CheckCXXHeader('numpy/utils.h'):
+        print "ERROR: Cound't find Numpy includes"
         my_exit(1)
 
 
@@ -352,7 +364,7 @@ def get_g4_libs(): # pylint: disable=W0511
     List of geant4 libraries
     """
     if os.environ['G4VERS'] == 'geant4.9.2.p04':
-        return [ 'G4FR',
+        return [ 'G4FR', 
              'G4RayTracer',
              'G4Tree',
              'G4UIGAG',
@@ -568,6 +580,7 @@ LIBS = {
     'compiler':set_cpp,
     'python':set_python,
     'gsl':set_gsl,
+    'numpy':set_numpy,
     'root':set_root,
     'clhep':set_clhep,
     'geant4':set_geant4,

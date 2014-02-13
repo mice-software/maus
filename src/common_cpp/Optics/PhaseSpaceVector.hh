@@ -22,6 +22,10 @@
 
 #include <iostream>
 
+#include "TLorentzVector.h"
+
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/VirtualHit.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -56,9 +60,51 @@ class PhaseSpaceVector : public Vector<double> {
                    const double x, const double px,
                    const double y, const double py);
 
+  explicit PhaseSpaceVector(const MAUS::VirtualHit & hit);
+
+  PhaseSpaceVector(const double time,
+                   const double energy,
+                   const MAUS::ThreeVector position,
+                   const MAUS::ThreeVector momentum);
+
+  PhaseSpaceVector(const TLorentzVector position,
+                   const TLorentzVector momentum);
+
   ~PhaseSpaceVector();
 
-  PhaseSpaceVector & operator=(const PhaseSpaceVector & rhs);
+  // *************************
+  //  Assignment Operators
+  // *************************
+  PhaseSpaceVector& operator =(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator+=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator-=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator*=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator/=(
+    const PhaseSpaceVector&                  rhs);
+  PhaseSpaceVector& operator+=(const double& rhs);
+  PhaseSpaceVector& operator-=(const double& rhs);
+  PhaseSpaceVector& operator*=(const double& rhs);
+  PhaseSpaceVector& operator/=(const double& rhs);
+
+  // *************************
+  //  Algebraic Operators
+  // *************************
+  const PhaseSpaceVector operator+(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator-(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator*(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator/(
+    const PhaseSpaceVector&                      rhs) const;
+  const PhaseSpaceVector operator+(const double& rhs) const;
+  const PhaseSpaceVector operator-(const double& rhs) const;
+  const PhaseSpaceVector operator*(const double& rhs) const;
+  const PhaseSpaceVector operator/(const double& rhs) const;
 
   // accessors
   double time()       const {return (*this)[0];}
