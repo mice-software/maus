@@ -53,8 +53,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         # get the gdml directory
         self.dl_dir = os.path.join(
             config_dict['geometry_download_directory'],'gdml')
-        # get the survey target detectors
-        self.sfTarget = config_dict['survey_target_detectors']
+        
+        # 
         # extract data files from configuration files
         # 
         self.GDMLFile = ''
@@ -86,6 +86,34 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             print self.GDMLFile, self.XMLFile
             self.datafile = libxml2.parseFile(self.XMLFile)
             self.gdmlfile = libxml2.parseFile(self.GDMLFile)
+
+            
+            # get the survey target detectors
+            # The list of active detectors should appear in
+            # the Maus_Information file under the following path
+            basepath = 'MICE_Information/Detector_Information/'
+            # This is a list of all possible detectors (which
+            # have GDML geometries).
+            detectors = ['TOF0', 'TOF1', 'TOF2', \
+                         'KL', 'Ckov1', 'Ckov2', \
+                         'Tracker0', 'Tracker1', 'LH2', \
+                         'Disk_LiH', 'Disk_PE', 'Wedge_LiH_45', \
+                         'Wedge_LiH_90']
+            # Evaluate the set of entries consistant with the path
+            detector_search = self.datafile.xpathEval(basepath+'/*')
+            # initialize the container for the detector target
+            self.sfTarget = []
+            # loop over the path elements
+            for elem in detector_search:
+                # loop over the potential detector names
+                for det in detectors:
+                    # check for matches between the list
+                    if det == elem.name:
+                        # add the detector name to the list
+                        self.sfTarget.append(det)
+            if not len(self.sfTarget):
+                # check for an alternate list if no detectors match. 
+                self.sfTarget = config_dict['survey_target_detectors']
         else:
             self.DataFile = config_dict['survey_measurement_record']
             self.RefFile = config_dict['survey_reference_position']
