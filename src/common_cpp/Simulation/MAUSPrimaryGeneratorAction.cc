@@ -68,6 +68,10 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
     throw(Exception(Exception::recoverable,
                  "Particle total energy less than particle mass",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
+  if ( part.px*part.px+part.py*part.py+part.pz*part.pz < 1e-15 )
+    throw(Exception(Exception::recoverable,
+                 "Particle total momentum too small",
+                 "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if (!isInWorldVolume(part.x, part.y, part.z)) {
     throw(Exception(Exception::recoverable,
                  "Particle is outside world volume at position ("+
