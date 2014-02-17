@@ -47,6 +47,7 @@
 #include "src/common_cpp/DataStructure/SciFiChannelId.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/Track.hh"
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 
 /** Access Tracker data using ROOT */
@@ -61,6 +62,13 @@ struct ReducedTrackData {
   int n_matched;
   int n_mismatched;
   int n_missed;
+};
+
+struct ReducedTrackMomentum {
+  double pt_mc;
+  double pz_mc;
+  double pt_rec;
+  double pz_rec;
 };
 
 int find_mc_track_id(std::map<int, int> &track_id_counter) {
@@ -105,6 +113,32 @@ bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid
   return true;
 };
 
+bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp,
+                             MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom) {
+
+  std::vector<MAUS::SciFiCluster*> clusters = sp->get_channels();
+  std::vector<MAUS::SciFiCluster*>::iterator clus_it;
+  for (clus_it = clusters.begin(); clus_it != clusters.end(); ++clus_it) {
+    std::vector<MAUS::SciFiDigit*> digits = (*clus_it)->get_digits();
+    std::vector<MAUS::SciFiDigit*>::iterator dig_it;
+    for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
+      std::vector<MAUS::SciFiHit*> hits;
+      if (!lkup.get_hits((*dig_it), hits)) {
+        std::cerr << "Lookup failed\n";
+        continue;
+      }
+      std::vector<MAUS::SciFiHit*>::iterator hit_it;
+      for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
+        if (track_id == (*hit_it)->GetTrackId()) {
+          mom = (*hit_it)->GetMomentum();
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
 int main(int argc, char *argv[]) {
   // First argument to code should be the input ROOT file name
   std::string filename = std::string(argv[1]);
@@ -118,8 +152,11 @@ int main(int argc, char *argv[]) {
   // Set up an output ROOT tree
   TTree t1("t1", "scifi analysis data");
   ReducedTrackData rtd1;
-  t1.Branch("track_data", &rtd1.spill,
-            "spill/I:tracker:n_points:charge:mc_track_id:mc_pid:n_matched:n_mismatched:n_missed");
+  ReducedTrackMomentum rtm1;
+  std::string sData = "spill/I:tracker:n_points:charge:mc_track_id:mc_pid:n_matched:n_mismatched:";
+  sData += "n_missed";
+  t1.Branch("track_data", &rtd1.spill, sData.c_str());
+  t1.Branch("track_momentum", &rtm1.pt_mc, "pt_mc/D:pz_mc:pt_rec:pz_rec");
 
   // Loop over all spills
   while ( infile >> readEvent != NULL ) {
@@ -210,6 +247,28 @@ int main(int argc, char *argv[]) {
         rtd1.mc_track_id = track_id;
         rtd1.n_matched = counter;
         rtd1.n_mismatched = spoint_mc_tids.size() - counter;
+        rtd1.n_missed = 5 - counter; // TODO: improve
+
+        // Calc the MC track momentum using hits only with this track id
+        rtm1.pt_mc = 0.0;
+        rtm1.pz_mc = 0.0;
+        rtm1.pt_rec = 0.0;
+        rtm1.pz_rec = 0.0;
+        int counter2 = 0;
+        for ( size_t k = 0; k < spnts.size(); ++k ) {
+          MAUS::ThreeVector mom_mc;
+          bool success = find_mc_spoint_momentum(track_id, spnts[k], lkup, mom_mc);
+          if (!success) continue;
+          rtm1.pt_mc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
+          rtm1.pz_mc += mom_mc.z();
+          ++counter2;
+        }
+        rtm1.pt_mc /= counter2;
+        rtm1.pz_mc /= counter2;
+        // ... and now the recon track momentum
+        rtm1.pt_rec = 1.2 * htrks[j]->get_R();
+        rtm1.pz_rec = rtm1.pt_rec / htrks[j]->get_dsdz();
+
         // Fill the tree for this track
         t1.Fill();
       } // ~Loop over helical PR tracks
