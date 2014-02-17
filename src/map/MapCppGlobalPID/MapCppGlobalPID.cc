@@ -50,9 +50,9 @@ namespace MAUS {
     _hypotheses.clear();
     _pid_vars.clear();
 
-    std::string filename = std::string(pMAUS_ROOT_DIR) + "/PIDhists.root";
+    PDF_file = _configJSON["PID_PDFs_file"].asString();;
 
-    _histFile = new TFile(filename.c_str(), "READ");
+    _histFile = new TFile(PDF_file.c_str(), "READ");
 
     // vector of hypotheses
     // TODO(Pidcott) find a more elegant way of accessing hypotheses

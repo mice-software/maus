@@ -102,6 +102,9 @@ namespace MAUS {
 
     /// The current spill
     Spill* _spill;
+
+    /// File containing PDFs for use in PID
+    std::string PDF_file;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 
