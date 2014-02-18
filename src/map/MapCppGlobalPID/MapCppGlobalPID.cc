@@ -50,7 +50,7 @@ namespace MAUS {
     _hypotheses.clear();
     _pid_vars.clear();
 
-    PDF_file = _configJSON["PID_PDFs_file"].asString();;
+    PDF_file = _configJSON["PID_PDFs_file"].asString();
 
     _histFile = new TFile(PDF_file.c_str(), "READ");
 

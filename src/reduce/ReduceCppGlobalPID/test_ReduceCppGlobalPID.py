@@ -97,8 +97,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         deathsuccess = self.reducer.death()
         self.assertTrue(deathsuccess)
         if not deathsuccess:
-            raise Exception('Initialize Fail', 'Could not start worker')   
-
+            raise Exception('Initialize Fail', 'Could not start worker')
+            
     def test_no_unique_identifier(self):
         """Check for unique identifier in config document"""
         self.config4['global_pid_hypothesis'] = 'test_200MeV_pi_plus'

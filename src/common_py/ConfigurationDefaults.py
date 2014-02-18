@@ -454,6 +454,8 @@ PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MA
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
 global_pid_hypothesis = ""
-# Unique identifier used when creating PDFs in Global PID to distinguish between
-# PDFs for the same hypothesis generated at different times
-unique_identifier = now.strftime("%Y_%m_%dT%H_%M_%S_%f")
+# Unique identifier used when creating PDFs in Global PID to distinguish between PDFs for
+# the same hypothesis generated at different times. For PDFs to be produced, this must be set.
+# Any string can be used but date and time is recommended, by using python datetime module and 
+# the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
+unique_identifier = ""
