@@ -31,7 +31,11 @@ class TestXBOA(unittest.TestCase): # pylint: disable=R0904
         Run the xboa test
         """
         ROOT.gROOT.SetBatch(True) #pylint: disable=E1101
-        passes, fails, warns = xboa.test.XBOATest.test_all()
+        # xboa v0.15.3 does not have a test_all
+        # calling test_old() instead to get pylint tests to pass through
+        # -DR Feb 12 2014
+        # passes, fails, warns = xboa.test.XBOATest.test_all()
+        passes, fails, warns = xboa.test.XBOATest.test_old()
         self.assertEqual(fails, 0, msg = str((passes, fails, warns)))
         ROOT.gROOT.SetBatch(False) #pylint: disable=E1101
 
