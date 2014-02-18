@@ -52,7 +52,7 @@ std::string STEP =
         std::string("\"energy\":4.,\"energy_deposited\":5.,")+
         std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
         std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
-        std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}")+
+        std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
         std::string("\"b_field\":{\"x\":11.,\"y\":12.,\"z\":13.},")+
         std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.}}");
 
