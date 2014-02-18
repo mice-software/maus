@@ -17,6 +17,7 @@
 
 // C++ headers
 #include <cmath>
+#include <map>
 
 // ROOT headers
 #include "TAxis.h"
@@ -32,6 +33,8 @@
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
@@ -47,8 +50,13 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _tracker_num(0),
     _charge(0),
     _num_points(0),
-    _pt(0.0),
-    _pz(0.0),
+    _mc_track_id(0),
+    _mc_pid(0),
+    _n_matched(0),
+    _n_mismatched(0),
+    _n_missed(0),
+    _pt_rec(0.0),
+    _pz_rec(0.0),
     _pt_mc(0.0),
     _pz_mc(0.0),
     _out_file(NULL),
@@ -101,8 +109,13 @@ void TrackerDataAnalyserMomentum::setUp() {
   _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
   _tree->Branch("charge", &_charge, "charge/I");
   _tree->Branch("num_points", &_num_points, "num_points/I");
-  _tree->Branch("pt", &_pt, "pt/D");
-  _tree->Branch("pz", &_pz, "pz/D");
+  _tree->Branch("mc_track_id", &_mc_track_id, "mc_track_id/I");
+  _tree->Branch("mc_pid", &_mc_pid, "mc_pid/I");
+  _tree->Branch("n_matched", &_n_matched, "n_matched/I");
+  _tree->Branch("n_mismatched", &_n_mismatched, "n_mismatched/I");
+  _tree->Branch("n_missed", &_n_missed, "n_missed/I");
+  _tree->Branch("pt_rec", &_pt_rec, "pt_rec/D");
+  _tree->Branch("pz_rec", &_pz_rec, "pz_rec/D");
   _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
   _tree->Branch("pz_mc", &_pz_mc, "pz_mc/D");
 
@@ -142,77 +155,120 @@ void TrackerDataAnalyserMomentum::setUp() {
 void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
   if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
     _spill_num = spill->GetSpillNumber();
-    // Loop over recon events in the spill
-    for (size_t iRevt = 0; iRevt < spill->GetReconEvents()->size(); ++iRevt) {
-      // MCEvent *mc_evt = (*spill->GetMCEvents())[iRevt];
-      SciFiEvent *evt = (*spill->GetReconEvents())[iRevt]->GetSciFiEvent();
+
+    // Loop over MC events in the spill
+    for (size_t iMevt = 0; iMevt < spill->GetMCEvents()->size(); ++iMevt) {
+      MCEvent *mc_evt = (*spill->GetMCEvents())[iMevt];
+      SciFiEvent *evt = (*spill->GetReconEvents())[iMevt]->GetSciFiEvent();
       std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
+
+      // Create the lookup bridge between MC and Recon
+      SciFiLookup lkup;
+      lkup.make_hits_map(mc_evt);
+
       // Loop over helical pattern recognition tracks in event
       for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
         SciFiHelicalPRTrack* trk = htrks[iTrk];
+        _pt_rec = 0.0;
+        _pz_rec = 0.0;
         if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
           _num_points = trk->get_num_points();
-          _pt = 1.2 * trk->get_R();
-          _pz = _pt / trk->get_dsdz();
+          std::vector< std::vector<int> > spoint_mc_tids;  // Vector of MC track ids for each spoint
+
+          // Calc recon momentum
+          _pt_rec = 1.2 * trk->get_R();
+          _pz_rec = _pt_rec / trk->get_dsdz();
+
+          // Calc MC momentum
           _pt_mc = 0.0;
           _pz_mc = 0.0;
-          // Loop over seed spacepoints associated with the track,
-          // and the clusters forming that,
-          // to calculate  average MC truth momentum
-          int num_spoint_skipped = 0;
-          for (size_t iSp = 0; iSp < trk->get_spacepoints().size(); ++iSp) {
-            SciFiSpacePoint* seed = trk->get_spacepoints()[iSp];
-            double seed_px_mc = 0.0;
-            double seed_py_mc = 0.0;
-            double seed_pz_mc = 0.0;
-            int num_clus_skipped = 0;
-            for (size_t iCl = 0; iCl < seed->get_channels().size(); ++iCl) {
-              ThreeVector p_mc = seed->get_channels()[iCl]->get_true_momentum();
-              if ( fabs(p_mc.z()) > _pz_mc_cut ) { // Cut to remove bad clusters from the analysis
-                seed_px_mc += p_mc.x();
-                seed_py_mc += p_mc.y();
-                seed_pz_mc += p_mc.z();
-              } else {
-                std::cerr << "Low cluster MC pz of " << p_mc.z() << ", skipping cluster\n";
-                ++num_clus_skipped;
-              }
+
+          // Loop over seed spacepoints associated with the track
+          std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints();
+          for ( size_t k = 0; k < spnts.size(); ++k ) {
+            std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
+            std::vector<SciFiCluster*> clusters = spnts[k]->get_channels();
+
+            // Loop over clusters
+            for ( size_t l = 0; l < clusters.size(); ++l ) {
+              std::vector<SciFiDigit*> digits = clusters[l]->get_digits();
+
+              // Loop over digits
+              for ( size_t m = 0; m < digits.size(); ++m ) {
+                // Perform the digits to hits lookup
+                std::vector<SciFiHit*> hits;
+                if (!lkup.get_hits(digits[m], hits)) {
+                  std::cerr << "Lookup failed\n";
+                  continue;
+                }
+
+                // Loop over MC hits
+                for ( size_t n = 0; n < hits.size(); ++n ) {
+                  int track_id = hits[n]->GetTrackId();
+                  if (track_id_counter.count(track_id))
+                    track_id_counter[track_id] = track_id_counter[track_id] + 1;
+                  else
+                    track_id_counter[track_id] = 1;
+                } // ~Loop over MC hits
+              } // ~Loop over digits
+            } // ~// Loop over clusters
+
+            // Find the track_ids for this spacepoint
+            std::map<int, int>::iterator mit1;
+            std::vector<int> mc_tracks_ids;
+            for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
+              mc_tracks_ids.push_back(mit1->first);
             }
-            if ((seed->get_channels().size() - num_clus_skipped) > 0) {
-              seed_px_mc /= (seed->get_channels().size() - num_clus_skipped);
-              seed_py_mc /= (seed->get_channels().size() - num_clus_skipped);
-              seed_pz_mc /= (seed->get_channels().size() - num_clus_skipped);
-              _pt_mc += sqrt(seed_px_mc*seed_px_mc + seed_py_mc*seed_py_mc);
-              _pz_mc += seed_pz_mc;
-            } else {
-              std::cerr << "Spoint with " << num_clus_skipped << " bad MC cluster momenta found,";
-              std::cerr << " skipping spoint\n";
-              ++num_spoint_skipped;
-              continue;
-            }
+            spoint_mc_tids.push_back(mc_tracks_ids);
+          } // ~Loop over seed spacepoints
+
+          // Is there a track id associated with 3 or more spoints?
+          int track_id = 0;
+          int counter = 0;
+          bool success = find_mc_tid(spoint_mc_tids, track_id, counter);
+          // If we have not found a common track id, abort for this track
+          if (!success) {
+            std::cerr << "Malformed track, skipping\n";
+            break;
           }
-          _pt_mc /= (trk->get_spacepoints().size() - num_spoint_skipped);
-          _pz_mc /= (trk->get_spacepoints().size() - num_spoint_skipped);
-          if ( TMath::IsNaN(_pt_mc) || TMath::IsNaN(_pz_mc) ) {
-            std::cerr << "Track with bad MC momenta found, skipping track\n";
-            continue;
+          // If we have found a common track id amoung the spoints, fill the tree
+          _mc_track_id = track_id;
+          _n_matched = counter;
+          _n_mismatched = spoint_mc_tids.size() - counter;
+          _n_missed = 5 - counter; // TODO: improve
+
+          // Calc the MC track momentum using hits only with this track id
+          _pt_mc = 0.0;
+          _pz_mc = 0.0;
+          int counter2 = 0;
+          for ( size_t k = 0; k < spnts.size(); ++k ) {
+            ThreeVector mom_mc;
+            bool success = find_mc_spoint_momentum(track_id, spnts[k], lkup, mom_mc);
+            if (!success) continue;
+            _pt_mc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
+            _pz_mc += mom_mc.z();
+            ++counter2;
           }
+          _pt_mc /= counter2;
+          _pz_mc /= counter2;
+
           // Fill the vectors and tree with the extracted recon and MC momenta
           if (trk->get_tracker() == 0) {
-            _t1_pt_res->Fill(_pt_mc - _pt);
-            _t1_pz_res->Fill(_pz_mc + trk->get_charge()*_pz);
-            _t1_pz_res_log->Fill(_pz_mc + trk->get_charge()*_pz);
-            _t1_vPtMc.push_back(_pt_mc);
-            _t1_vPt_res.push_back(_pt_mc - _pt);
-            _t1_vPz.push_back(_pz);
-            _t1_vPz_res.push_back(_pz_mc + trk->get_charge()*_pz);
+            _t1_pt_res->Fill(_pt_mc - _pt_rec);
+            _t1_pz_res->Fill(_pz_mc + trk->get_charge()*_pz_rec);
+            _t1_pz_res_log->Fill(_pz_mc + trk->get_charge()*_pz_rec);
+            _vec_t1_pt_mc.push_back(_pt_mc);
+            _vec_t1_pt_res.push_back(_pt_mc - _pt_rec);
+            _vec_t1_pz.push_back(_pz_rec);
+            _vec_t1_pz_res.push_back(_pz_mc + trk->get_charge()*_pz_rec);
           } else if (trk->get_tracker() == 1) {
-            _t2_pt_res->Fill(_pt_mc - _pt);
-            _t2_pz_res->Fill(_pz_mc - trk->get_charge()*_pz);
-            _t2_pz_res_log->Fill(_pz_mc - trk->get_charge()*_pz);
-            _t2_vPtMc.push_back(_pt_mc);
-            _t2_vPt_res.push_back(_pt_mc - _pt);
-            _t2_vPz.push_back(_pz);
-            _t2_vPz_res.push_back(_pz_mc - trk->get_charge()*_pz);
+            _t2_pt_res->Fill(_pt_mc - _pt_rec);
+            _t2_pz_res->Fill(_pz_mc - trk->get_charge()*_pz_rec);
+            _t2_pz_res_log->Fill(_pz_mc - trk->get_charge()*_pz_rec);
+            _vec_t2_ptMc.push_back(_pt_mc);
+            _vec_t2_pt_res.push_back(_pt_mc - _pt_rec);
+            _vec_t2_pz.push_back(_pz_rec);
+            _vec_t2_pz_res.push_back(_pz_mc - trk->get_charge()*_pz_rec);
           }
           _tracker_num = trk->get_tracker();
           _charge = trk->get_charge();
@@ -226,6 +282,62 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
     std::cout << "Not a usable spill" << std::endl;
   }
 }
+
+bool TrackerDataAnalyserMomentum::find_mc_spoint_momentum(const int track_id,
+                const SciFiSpacePoint* sp, SciFiLookup &lkup, ThreeVector &mom) {
+
+  std::vector<SciFiCluster*> clusters = sp->get_channels();
+  std::vector<SciFiCluster*>::iterator clus_it;
+  for (clus_it = clusters.begin(); clus_it != clusters.end(); ++clus_it) {
+    std::vector<SciFiDigit*> digits = (*clus_it)->get_digits();
+    std::vector<SciFiDigit*>::iterator dig_it;
+    for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
+      std::vector<SciFiHit*> hits;
+      if (!lkup.get_hits((*dig_it), hits)) {
+        std::cerr << "Lookup failed\n";
+        continue;
+      }
+      std::vector<SciFiHit*>::iterator hit_it;
+      for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
+        if (track_id == (*hit_it)->GetTrackId()) {
+          mom = (*hit_it)->GetMomentum();
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
+bool TrackerDataAnalyserMomentum::find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids,
+                                              int &tid, int &counter) {
+
+  std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
+
+  for ( size_t i = 0; i < spoint_mc_tids.size(); ++i ) {
+    for ( size_t j = 0; j < spoint_mc_tids[i].size(); ++j ) {
+      int current_tid = spoint_mc_tids[i][j];
+      if (track_id_counter.count(current_tid))
+        track_id_counter[current_tid] = track_id_counter[current_tid] + 1;
+      else
+        track_id_counter[current_tid] = 1;
+    }
+  }
+
+  std::map<int, int>::iterator mit1;
+  tid = 0;
+  for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
+    if ( mit1->second > 2 && tid == 0 ) {
+      tid = mit1->first;
+      counter = mit1->second;
+    } else if ( mit1->second > 2 && tid != 0 ) {
+      tid = -1;  // A malformed track, cannot asscoiate with an mc track id
+      counter = 0;
+      return false;
+    }
+  }
+  return true;
+};
 
 void TrackerDataAnalyserMomentum::make_all() {
   make_residual_histograms();
@@ -331,7 +443,7 @@ void TrackerDataAnalyserMomentum::make_residual_graphs() {
   _cGraphs->Divide(2, 2);
 
   _cGraphs->cd(1);
-  _t1_pt_res_pt = new TGraph(_t1_vPtMc.size(), &_t1_vPtMc[0], &_t1_vPt_res[0]);
+  _t1_pt_res_pt = new TGraph(_vec_t1_pt_mc.size(), &_vec_t1_pt_mc[0], &_vec_t1_pt_res[0]);
   _t1_pt_res_pt->SetName("t1_pt_res_pt");
   _t1_pt_res_pt->SetTitle("T1 p_{t} res vs. p_{t}^{MC}");
   _t1_pt_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -340,7 +452,7 @@ void TrackerDataAnalyserMomentum::make_residual_graphs() {
   _t1_pt_res_pt->Draw("AP");
 
   _cGraphs->cd(2);
-  _t1_pz_res_pt = new TGraph(_t1_vPtMc.size(), &_t1_vPtMc[0], &_t1_vPz_res[0]);
+  _t1_pz_res_pt = new TGraph(_vec_t1_pt_mc.size(), &_vec_t1_pt_mc[0], &_vec_t1_pz_res[0]);
   _t1_pz_res_pt->SetName("t1_pz_res_pt");
   _t1_pz_res_pt->SetTitle("T1 p_{z} res vs. p_{t}^{MC}");
   _t1_pz_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -350,7 +462,7 @@ void TrackerDataAnalyserMomentum::make_residual_graphs() {
   _t1_pz_res_pt->Draw("AP");
 
   _cGraphs->cd(3);
-  _t2_pt_res_pt = new TGraph(_t2_vPtMc.size(), &_t2_vPtMc[0], &_t2_vPt_res[0]);
+  _t2_pt_res_pt = new TGraph(_vec_t2_ptMc.size(), &_vec_t2_ptMc[0], &_vec_t2_pt_res[0]);
   _t2_pt_res_pt->SetName("t2_pt_res_pt");
   _t2_pt_res_pt->SetTitle("T2 p_{t} res vs. p_{t}^{MC}");
   _t2_pt_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -359,7 +471,7 @@ void TrackerDataAnalyserMomentum::make_residual_graphs() {
   _t2_pt_res_pt->Draw("AP");
 
   _cGraphs->cd(4);
-  _t2_pz_res_pt = new TGraph(_t2_vPtMc.size(), &_t2_vPtMc[0], &_t2_vPz_res[0]);
+  _t2_pz_res_pt = new TGraph(_vec_t2_ptMc.size(), &_vec_t2_ptMc[0], &_vec_t2_pz_res[0]);
   _t2_pz_res_pt->SetName("t2_pz_res_pt");
   _t2_pz_res_pt->SetTitle("T2 p_{z} res vs. p_{t}^{MC}");
   _t2_pz_res_pt->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -394,9 +506,9 @@ void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
     TCanvas lCanvas;
     // Create a histogram of the pz residual for the pt_mc interval defined by the input cut
     if (trker == 0) {
-      _tree->Draw("pz_mc-pz>>h1", cut);
+      _tree->Draw("pz_mc+charge*pz_rec>>h1", cut);
     } else if (trker == 1) {
-      _tree->Draw("pz_mc+pz>>h1", cut);
+      _tree->Draw("pz_mc-charge*pz_rec>>h1", cut);
     }
     // Pull the histogram from the current pad
     TH1 *h1 = reinterpret_cast<TH1*>(gPad->GetPrimitive("h1"));

@@ -38,6 +38,7 @@
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 
 namespace MAUS {
 
@@ -59,6 +60,13 @@ class TrackerDataAnalyserMomentum {
      */
     void calc_pz_resolution(const int trker, const TCut cut,
                             double &res, double &res_err);
+
+    /** Find the MC momentum of a track spacepoint */
+    bool find_mc_spoint_momentum(const int track_id, const SciFiSpacePoint* sp,
+                                 SciFiLookup &lkup, ThreeVector &mom);
+
+    /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
+    bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
 
     /** Make all plots and histograms using accumulated data */
     void make_all();
@@ -89,20 +97,26 @@ class TrackerDataAnalyserMomentum {
     int _tracker_num;
     int _charge;
     int _num_points;
-    double _pt;
-    double _pz;
+    int _mc_track_id;
+    int _mc_pid;
+    int _n_matched;
+    int _n_mismatched;
+    int _n_missed;
+
+    double _pt_rec;
+    double _pz_rec;
     double _pt_mc;
     double _pz_mc;
 
     // Vectors used to store momentum data used to produce graphs
-    std::vector<double> _t1_vPtMc;
-    std::vector<double> _t1_vPt_res;
-    std::vector<double> _t1_vPz;
-    std::vector<double> _t1_vPz_res;
-    std::vector<double> _t2_vPtMc;
-    std::vector<double> _t2_vPt_res;
-    std::vector<double> _t2_vPz;
-    std::vector<double> _t2_vPz_res;
+    std::vector<double> _vec_t1_pt_mc;
+    std::vector<double> _vec_t1_pt_res;
+    std::vector<double> _vec_t1_pz;
+    std::vector<double> _vec_t1_pz_res;
+    std::vector<double> _vec_t2_ptMc;
+    std::vector<double> _vec_t2_pt_res;
+    std::vector<double> _vec_t2_pz;
+    std::vector<double> _vec_t2_pz_res;
 
     TFile* _out_file;  // The output ROOT file
     TTree* _tree;      // The output ROOT tree
