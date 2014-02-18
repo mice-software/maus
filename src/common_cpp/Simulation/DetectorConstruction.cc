@@ -39,6 +39,8 @@
 #include "Geant4/G4UniformMagField.hh"
 #include "Geant4/G4EqMagElectricField.hh"
 #include "Geant4/G4Mag_UsualEqRhs.hh"
+#include "Geant4/G4EqEMFieldWithSpin.hh"
+#include "Geant4/G4Mag_SpinEqRhs.hh"
 // Electromagnetic steppers
 #include "Geant4/G4ClassicalRK4.hh"
 #include "Geant4/G4SimpleHeum.hh"
@@ -51,14 +53,7 @@
 #include "Geant4/G4HelixExplicitEuler.hh"
 #include "Geant4/G4HelixSimpleRunge.hh"
 #include "Geant4/G4HelixHeum.hh"
-<<<<<<< TREE
-#include "Geant4/G4Mag_SpinEqRhs.hh"
-#include "Geant4/G4PVPlacement.hh"
-#include "Geant4/G4EqEMFieldWithSpin.hh"
-//#ifdef G4VIS_USE
-=======
 // Visualisation
->>>>>>> MERGE-SOURCE
 #include "Geant4/G4VisAttributes.hh"
 #include "Geant4/G4Colour.hh"
 
@@ -94,7 +89,7 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   : _model(), _btField(NULL), _miceMagneticField(NULL),
     _miceElectroMagneticField(NULL), _rootLogicalVolume(NULL),
     _rootPhysicalVolume(NULL), _stepper(NULL), _chordFinder(NULL),
-    _rootVisAtts(NULL), _equationM(NULL), _equationE(NULL) {
+    _rootVisAtts(NULL), _equation(NULL) {
   _event = new MICEEvent();
   SetDatacardVariables(cards);
   SetBTMagneticField();
@@ -102,40 +97,6 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   if (_materials == NULL)
     throw(MAUS::Exception(MAUS::Exception::recoverable,
                  "Failed to acquire MiceMaterials",
-<<<<<<< TREE
-                 "MiceDetectorConstruction::MiceDetectorConstruction()"));
-}
-
-MICEDetectorConstruction::~MICEDetectorConstruction() {
-}
-
-G4VPhysicalVolume* MICEDetectorConstruction::Construct()
-{
-  G4Box* MICEExpHallBox = new G4Box( _model->name(), _model->dimensions().x(),
-                           _model->dimensions().y(), _model->dimensions().z() );
-  G4Material* hallMat = _materials->materialByName
-                                       ( _model->propertyString( "Material" ) );
-  MICEExpHallLog = new G4LogicalVolume
-                           ( MICEExpHallBox, hallMat, _model->name(), 0, 0, 0 );
-
-  G4PVPlacement* MICEExpHall = new G4PVPlacement( 0, G4ThreeVector(),
-                   _model->name(), MICEExpHallLog, 0, false, 0, _checkVolumes);
-
-  G4VisAttributes* vis = new G4VisAttributes( false );
-
-  MICEExpHallLog->SetVisAttributes( vis );
-
-  setUserLimits( MICEExpHallLog, _model );
-
-  setBTMagneticField( _model );
-  // turn on cout if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(0);
-  for( int i = 0; i < _model->daughters(); ++i )
-    addDaughter( _model->daughter( i ), MICEExpHall );
-  // turn cout back to default mode if check volumes is active
-  if(_checkVolumes) Squeak::setStandardOutputs(-1);
-  return MICEExpHall;
-=======
                  "DetectorConstruction::DetectorConstruction()"));
 }
 
@@ -178,11 +139,8 @@ DetectorConstruction::~DetectorConstruction() {
     if (_rootVisAtts != NULL) {
         delete _rootVisAtts;
     }
-    if (_equationM != NULL) {
-        delete _equationM;
-    }
-    if (_equationE != NULL) {
-        delete _equationE;
+    if (_equation != NULL) {
+        delete _equation;
     }
 }
 
@@ -295,7 +253,6 @@ void DetectorConstruction::ResetGeometry() {
   G4RunManager::GetRunManager()->Initialize();  // makes a G4 segv
   // std::cout << "Dumping new geometry" << std::endl;  // need verbose level 0
   // G4RunManager::GetRunManager()->DumpRegion();
->>>>>>> MERGE-SOURCE
 }
 
 void DetectorConstruction::AddDaughter
@@ -303,52 +260,6 @@ void DetectorConstruction::AddDaughter
   CheckModuleDepth(mod);
   G4LogicalVolume* logic = NULL;
   G4PVPlacement* place = NULL;
-<<<<<<< TREE
-
-  G4Material* mat = _materials->materialByName( mod->propertyString( "Material" ) );
-
-  // if we have to use a special G4 description of the shape of this component
-  
-  if( mod->propertyExistsThis( "G4Detector", "string" ) )
-  {
-    std::string detector = mod->propertyString( "G4Detector" );
-
-    if( detector == "SciFiPlane" )
-    {
-      SciFiPlane* plane = new SciFiPlane( mod, mat, moth );
-      logic = plane->logicalCore();
-      place = plane->placementCore();
-    }
-    else if ( detector == "KLGlue" )
-    {
-      KLGlue* glue = new KLGlue( mod, mat, moth);
-      logic = glue->logicalStrip();
-      place = glue->placementStrip();
-    }
-    else if ( detector == "KLFiber" )
-    {
-      KLFiber* fiber = new KLFiber( mod, mat, moth);
-      logic = fiber->logicalFiber();
-      place = fiber->placementFiber();
-    }
-    else if ( detector == "CkovMirror" )
-    {
-      CkovMirror* mirror = new CkovMirror( mod, mat, moth);
-      logic = mirror->logicalMirror();
-      place = mirror->placementMirror();
-    }
-    else
-      std::cerr << "ERROR unknown G4Detector type " << detector << " crashing shortly..." << std::endl;
-  }
-  else if( mod->volType() == "None" )
-  {
-    if(mod->daughters() > 0)
-      std::cerr << "Module with Volume None cannot have daughters. They will not be placed." << std::endl;
-    return;
-  }
-  else // standard shapes such as box, tube, etc...
-  {
-=======
   if (mod->propertyExistsThis("G4Detector", "string")) {
     BuildG4DetectorVolume(&place, &logic, moth, mod);
   } else if (mod->volType() == "None") {
@@ -403,12 +314,7 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
                                              MiceModule* mod) {
     G4Material* mat =
                     _materials->materialByName(mod->propertyString("Material"));
->>>>>>> MERGE-SOURCE
     G4VSolid* solid = MiceModToG4Solid::buildSolid(mod);
-<<<<<<< TREE
-    logic = new G4LogicalVolume( solid, mat, mod->name() + "Logic", 0, 0, 0 );
-    place = new G4PVPlacement( (G4RotationMatrix*) mod->rotationPointer(), mod->position(), mod->name(), logic, moth, false, 0, _checkVolumes);
-=======
     *logic = new G4LogicalVolume(solid, mat, mod->name() + "Logic", 0, 0, 0);
     // who owns memory allocated to rot? This is making a bug... not defined in
     // G4 docs
@@ -419,22 +325,7 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
     if (moth == _rootPhysicalVolume) {
         _rootLogicalVolume->AddDaughter(*place);
     }
->>>>>>> MERGE-SOURCE
     Squeak::errorLevel my_err = Squeak::debug;
-<<<<<<< TREE
-    if(mod->mother()->isRoot()) my_err = Squeak::info;
-    Squeak::mout(my_err) << "Placing " << mod->name() << " of type " 
-                        << mod->volType() << " position: " 
-                        << mod->globalPosition() << " rotationVector: " 
-                        << mod->globalRotation().getAxis() 
-                        << " angle: "  << mod->globalRotation().delta()/degree 
-                        << " volume: "
-                        << solid->GetCubicVolume()/meter/meter/meter << " m^3 "
-                        << " density: " << mat->GetDensity()/gram*centimeter*centimeter*centimeter << " g cm^-3 ";
-    if(mod->propertyExistsThis("Material", "string"))
-        Squeak::mout(my_err)  << " material: "
-                             << mod->propertyStringThis("Material") << std::endl;
-=======
     if (mod->mother()->isRoot()) my_err = Squeak::info;
     Squeak::mout(my_err) << "Placing " << mod->name() << " of type "
                         << mod->volType() << " position: "
@@ -449,7 +340,6 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
                             << " mass (excl daughters): "
                             << (*logic)->GetMass(false, false)/kilogram
                             << " kg" << std::endl;
->>>>>>> MERGE-SOURCE
     else
         Squeak::mout(my_err)  << std::endl;
 }
@@ -493,85 +383,6 @@ void DetectorConstruction::BuildSensitiveDetector
       TofSD* tofSD = new TofSD(mod);
       logic->SetSensitiveDetector(tofSD);
       _SDs.push_back(tofSD);
-<<<<<<< TREE
-    }
-    else if( sdName == "SciFi" )
-    {
-      SciFiSD* sciFiSD = new SciFiSD( mod );
-      MICESDMan->AddNewDetector( sciFiSD );
-      logic->SetSensitiveDetector( sciFiSD );
-      _SDs.push_back(sciFiSD); 
-    }
-    else if( sdName == "CKOV" )
-    {
-      CkovSD* ckovSD = new CkovSD( _event, mod, cut );
-      MICESDMan->AddNewDetector( ckovSD );
-      logic->SetSensitiveDetector( ckovSD );
-    }
-    else if( sdName == "EMR" )
-    {
-      EMRSD* emrSD = new EMRSD( mod );
-      MICESDMan->AddNewDetector( emrSD );
-      logic->SetSensitiveDetector( emrSD );
-      _SDs.push_back( emrSD );
-    }
-    else if( sdName == "KL" )
-    {
-      KLSD* klSD = new KLSD( _event, mod );
-      MICESDMan->AddNewDetector( klSD );
-      logic->SetSensitiveDetector( klSD );
-    }
-    else if( sdName == "SpecialVirtual" )
-    {
-      SpecialVirtualSD * specVirtSD = new SpecialVirtualSD(_event, mod);
-      MICESDMan->AddNewDetector( specVirtSD );
-      logic->SetSensitiveDetector( specVirtSD );
-      _SDs.push_back( specVirtSD );
-    }
-    else if( sdName != "Virtual" && sdName != "Envelope") //note these are special cases
-      std::cerr << "Error in volume " << mod->fullName() << " do not have an SD definition for " << sdName << std::  endl;
-  }
-  for( int i = 0; i < mod->daughters(); ++i )
-    addDaughter( mod->daughter( i ), place );
-}
-
-//void MICEDetectorConstruction::AllowSpinTracking()//#############################
-//{   
-
-  //  if(Enable_Spin_Traking == True){
-    //    G4Mag_EqRhs* fEquation = new G4Mag_SpinEqRhs(magField); //my stuff
-  
-      //  G4MagIntegratorStepper* pStepper = new G4ClassicalRK4(fEquation,12); //my stuff
-   // };
-    
-//}//#################################################################################
-
-
-
-void    MICEDetectorConstruction::setUserLimits( G4LogicalVolume* logic, MiceModule* module )
-{
-    double stepMax = 100.*mm;
-    double trackMax = 1.*parsec;
-    double timeMax = 1000.*second;
-    double kinMin = 0.;
-
-    if(module->propertyExistsThis("G4StepMax", "double")) 
-        stepMax  = module->propertyDouble( "G4StepMax" );
-    if(module->propertyExistsThis("G4TrackMax", "double")) 
-        trackMax = module->propertyDouble( "G4TrackMax" );
-    if(module->propertyExistsThis("G4TimeMax", "double")) 
-        timeMax  = module->propertyDouble( "G4TimeMax" );
-    if(module->propertyExistsThis("G4KinMin", "double")) 
-        kinMin   = module->propertyDouble( "G4KinMin" );
-
-    logic->SetUserLimits(  new G4UserLimits( stepMax, trackMax, timeMax, kinMin ) );
-}
-
-
-void MICEDetectorConstruction::setBTMagneticField(MiceModule* rootModule)
-{
-  _btField = new BTFieldConstructor(rootModule);
-=======
     } else if (sdName == "SciFi") {
       SciFiSD* sciFiSD = new SciFiSD(mod);
       logic->SetSensitiveDetector(sciFiSD);
@@ -615,7 +426,6 @@ void DetectorConstruction::SetUserLimits
 
 void DetectorConstruction::SetBTMagneticField() {
   _btField = new BTFieldConstructor();
->>>>>>> MERGE-SOURCE
   _miceMagneticField = new MiceMagneticField(_btField);
   _miceElectroMagneticField = new MiceElectroMagneticField(_btField);
 }
@@ -626,133 +436,29 @@ void DetectorConstruction::SetBTMagneticField() {
 void DetectorConstruction::SetSteppingAlgorithm() {
   G4FieldManager*        fieldMgr     =
          G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  int n_vars = 0;
 
+  if (_equation != NULL)
+    delete _equation;
   if (!_btField->HasRF()) { // No rf field, default integration
     fieldMgr->SetDetectorField(_miceMagneticField);
-    if (_equationM != NULL)
-      delete _equationM;
-    _equationM = new G4Mag_UsualEqRhs(_miceMagneticField);
+    if (_stepperType == "SpinTracking") {
+        _equation = new G4Mag_SpinEqRhs(_miceMagneticField);
+        n_vars = 9;
+    } else {
+        _equation = new G4Mag_UsualEqRhs(_miceMagneticField);
+        n_vars = 6;
+    }
   } else { // Electrical field are present, used full E.M.
     fieldMgr->SetFieldChangesEnergy(true);
     fieldMgr->SetDetectorField(_miceElectroMagneticField);
-<<<<<<< TREE
-    fEquationE = new G4EqMagElectricField(_miceElectroMagneticField);
-  }
-
-  //Scan through the list of steppers
-  if(stepperType == "Classic" || stepperType=="ClassicalRK4")
-  {
-    if(!_btField->HasRF()) pStepper = new G4ClassicalRK4(fEquationM);
-    else                   pStepper = new G4ClassicalRK4(fEquationE, 8);
-  }
-  else if(stepperType == "SimpleHeum")
-  {
-    if(!_btField->HasRF()) pStepper = new G4SimpleHeum(fEquationM);
-    else                   pStepper = new G4SimpleHeum(fEquationE, 8);
-  }
-  else if(stepperType == "ImplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4ImplicitEuler(fEquationM);
-    else                   pStepper = new G4ImplicitEuler(fEquationE, 8);
-  }
-  else if(stepperType == "SimpleRunge")
-  {
-    if(!_btField->HasRF()) pStepper = new G4SimpleRunge(fEquationM);
-    else                   pStepper = new G4SimpleRunge(fEquationE, 8);
-  }
-  else if(stepperType == "ExplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4ExplicitEuler(fEquationM);
-    else                   pStepper = new G4ExplicitEuler(fEquationE, 8);
-  }
-  else if(stepperType == "CashKarpRKF45")
-  {
-    if(!_btField->HasRF()) pStepper = new G4CashKarpRKF45(fEquationM);
-    else                   pStepper = new G4CashKarpRKF45(fEquationE, 8);
-  }
-  else if(stepperType == "HelixImplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixImplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixHeum")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixHeum(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixSimpleRunge")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixSimpleRunge(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType == "HelixExplicitEuler")
-  {
-    if(!_btField->HasRF()) pStepper = new G4HelixExplicitEuler(fEquationM);
-    else std::cerr << "Attempt to load magnet only stepper when RF present" << std::endl;
-  }
-  else if(stepperType=="SpinTrack")//#################################################
-  {
-    G4EqEMFieldWithSpin* fEquation = new G4EqEMFieldWithSpin(_miceMagneticField); //my stuff
-
-    pStepper = new G4ClassicalRK4(fEquation,12); //my stuff
-  }//#################################################################################
-  if(pStepper == NULL)
-  {
-    std::cerr << "Stepper not found - using ClassicalRK4" << std::endl;
-    if(!_btField->HasRF()) pStepper = new G4ClassicalRK4(fEquationM);
-    else                   pStepper = new G4ClassicalRK4(fEquationE, 8);
-  }
-
-  if(!_btField->HasRF())
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-  else
-    pChordFinder =  new G4ChordFinder(_miceMagneticField, 0.1* mm , pStepper);
-
-  fieldMgr->SetChordFinder(pChordFinder);
-
-}
-/*void DetectorConstruction::SetSteppingAccuracy() {
-   G4FieldManager* fieldMgr
-    = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-
-  G4double deltaOneStep = JsonWrapper::GetProperty(*_cards, "delta_one_step",
-                                          JsonWrapper::realValue).asDouble();
-  G4double deltaIntersection = JsonWrapper::GetProperty(*_cards,
-                      "delta_intersection", JsonWrapper::realValue).asDouble();
-  G4double epsilonMin = JsonWrapper::GetProperty(*_cards,
-                              "epsilon_min", JsonWrapper::realValue).asDouble();
-  G4double epsilonMax = JsonWrapper::GetProperty(*_cards,
-                              "epsilon_max", JsonWrapper::realValue).asDouble();
-  G4double missDistance = JsonWrapper::GetProperty(*_cards,
-                            "miss_distance", JsonWrapper::realValue).asDouble();
-  if (_deltaOneStep > 0)
-    fieldMgr->SetDeltaOneStep(_deltaOneStep);
-  if (_deltaIntersection > 0)
-    fieldMgr->SetDeltaIntersection(_deltaIntersection);
-  if (_missDistance > 0)
-    fieldMgr->GetChordFinder()->SetDeltaChord(_missDistance);
-  if (_epsilonMin > 0)
-    fieldMgr->SetMinimumEpsilonStep(_epsilonMin);
-  if (_epsilonMax > 0)
-    fieldMgr->SetMaximumEpsilonStep(_epsilonMax);
-}
-
-Json::Value DetectorConstruction::GetSDHits(size_t i) {
-  if (i >= _SDs.size()) {
-    throw Exception(Exception::recoverable,
-                    "Attempt to get SD for out-of-range detector",
-                    "DetectorConstruction::GetSDHits(...)");
-  }
-  if (_SDs[i] and _SDs[i]->isHit()) {
-    return _SDs[i]->GetHits();
-  }
-  Json::Value empty(Json::objectValue);
-  return empty;
-}*/
-=======
-    if (_equationE != NULL)
-      delete _equationE;
-    _equationE = new G4EqMagElectricField(_miceElectroMagneticField);
+    if (_stepperType == "SpinTracking") {
+        // _equation = new G4EqEMFieldWithSpin(_miceElectroMagneticField);
+        n_vars = 12;
+    } else {
+        _equation = new G4EqMagElectricField(_miceElectroMagneticField);
+        n_vars = 8;
+    }
   }
 
   if (_chordFinder != NULL) {
@@ -766,23 +472,19 @@ Json::Value DetectorConstruction::GetSDHits(size_t i) {
 
   // Scan through the list of steppers
   if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
-    if (!_btField->HasRF()) _stepper = new G4ClassicalRK4(_equationM);
-    else                    _stepper = new G4ClassicalRK4(_equationE, 8);
+    _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "SimpleHeum") {
-    if (!_btField->HasRF()) _stepper = new G4SimpleHeum(_equationM);
-    else                    _stepper = new G4SimpleHeum(_equationE, 8);
+    _stepper = new G4SimpleHeum(_equation, n_vars);
   } else if (_stepperType == "ImplicitEuler") {
-    if (!_btField->HasRF()) _stepper = new G4ImplicitEuler(_equationM);
-    else                    _stepper = new G4ImplicitEuler(_equationE, 8);
+    _stepper = new G4ImplicitEuler(_equation, n_vars);
   } else if (_stepperType == "SimpleRunge") {
-    if (!_btField->HasRF()) _stepper = new G4SimpleRunge(_equationM);
-    else                    _stepper = new G4SimpleRunge(_equationE, 8);
+    _stepper = new G4SimpleRunge(_equation, n_vars);
   } else if (_stepperType == "ExplicitEuler") {
-    if (!_btField->HasRF()) _stepper = new G4ExplicitEuler(_equationM);
-    else                    _stepper = new G4ExplicitEuler(_equationE, 8);
+    _stepper = new G4ExplicitEuler(_equation, n_vars);
+  } else if (_stepperType == "SpinTracking") {
+    _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "CashKarpRKF45") {
-    if (!_btField->HasRF()) _stepper = new G4CashKarpRKF45(_equationM);
-    else                    _stepper = new G4CashKarpRKF45(_equationE, 8);
+    _stepper = new G4CashKarpRKF45(_equation, n_vars);
   } else {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "stepping_algorithm '"+_stepperType+"' not found",
@@ -791,7 +493,6 @@ Json::Value DetectorConstruction::GetSDHits(size_t i) {
   _chordFinder =  new G4ChordFinder(_miceMagneticField, 0.1*mm, _stepper);
   fieldMgr->SetChordFinder(_chordFinder);
 }
->>>>>>> MERGE-SOURCE
 
 // Set G4 Stepping Accuracy parameters
 void DetectorConstruction::SetSteppingAccuracy() {

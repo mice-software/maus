@@ -47,8 +47,7 @@ class G4VSolid;
 class G4ChordFinder;
 class G4UserLimits;
 class G4VisAttributes;
-class G4Mag_UsualEqRhs;
-class G4EqMagElectricField;
+class G4EquationOfMotion;
 
 class SciFiPlane;
 class KLFiber;
@@ -186,8 +185,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   std::vector<KLFiber*> _klFibers;
   std::vector<CkovMirror*> _ckovMirrors;
   G4VisAttributes* _rootVisAtts;
-  G4Mag_UsualEqRhs* _equationM;
-  G4EqMagElectricField* _equationE;
+  G4EquationOfMotion* _equation;
 
   size_t _maxModDepth;
   std::string _stepperType;
