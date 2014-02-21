@@ -168,8 +168,8 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  Note: don't forget Get method has to be const
      */
     void RegisterTRef(std::string branch_name,
-                      TRef (ObjectType::*GetMethod)() const,
-                      void (ObjectType::*SetMethod)(TRef value),
+                      TObject* (ObjectType::*GetMethod)() const,
+                      void (ObjectType::*SetMethod)(TObject* value),
                       bool is_required);
 
     /** Register a ROOT TRefArray for processing, which contains a

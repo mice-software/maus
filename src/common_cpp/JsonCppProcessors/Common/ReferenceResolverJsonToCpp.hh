@@ -103,7 +103,7 @@ class TRefResolver : public Resolver {
     /** SetMethod function pointer for setting the C++ pointer during
      *  dereference operation
      */
-    typedef void (ParentType::*SetMethod)(TRef value);
+    typedef void (ParentType::*SetMethod)(TObject* value);
 
     /** Constructor
      *
