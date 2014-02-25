@@ -86,8 +86,10 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             print self.GDMLFile, self.XMLFile
             self.datafile = libxml2.parseFile(self.XMLFile)
             self.gdmlfile = libxml2.parseFile(self.GDMLFile)
-
-            
+            # Fitting tolerance. Reject fit if chi^2/ndof > value
+            self.tolerance = 3 # this should be read from the CDB files
+            # default ndof. 6 parameters in fit
+            self.ndof = -6.0
             # get the survey target detectors
             # The list of active detectors should appear in
             # the Maus_Information file under the following path
@@ -150,6 +152,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         @method FitForDetectors: A subroutine to execute the fit based on a set of input data points.
         """
         isgood = True
+        self.ndof = -6
         # extract the measured data
         # if the GDML file is to be used, a list of files associated with the
         # survey points must be provided. Order must match reference points. 
@@ -171,7 +174,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             # print  self.result
             # if self.FitQP() == 0: isgood = True
             # else: isgood = False
-        if len(self.result) ==  2 and self.UseGDML:
+        if len(self.result) == 3 and self.UseGDML:
             if not self.writeResulttoGDML(isgood, detectorPath, detectorFile):
                 print "Result not recorded to "+detectorPath
                 # print  "GDML corrected"
@@ -238,6 +241,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
                                float(node.prop('z'))))
             # print  "Location of survey point in detector coordinates: ", temp
             self.refpoints.append(temp)
+            
             # Search for the position for
             # the indicated file name. This is the measured position
             # of the survey point.
@@ -251,13 +255,19 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
                     data[0] = float(q.prop('x'))
                     data[1] = float(q.prop('y'))
                     data[2] = float(q.prop('z'))
-                    # print q.prop('err')
-                    error[0] = 5. # float(q.prop('err'))
-                    error[1] = 5. #float(q.prop('err'))
-                    error[2] = 5. #float(q.prop('err'))
-                    # print  "Survey point in global coordinates: ", data
                     break
+            # print node.prop('err')
+            error[0] = float(node.prop('err'))
+            error[1] = float(node.prop('err'))
+            error[2] = float(node.prop('err'))
+            # print  "Survey point in global coordinates: ", data
+            
             self.datapoints.append([data, error])
+            # also add to degrees of freedom
+            self.ndof += 3
+        if self.ndof <= 0:
+            print "Not enough degrees of freedom for fit"
+            isgood = False
         return isgood
     
     def extractRefPoints(self):
@@ -357,8 +367,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             gMinuit.GetParameter(i, temp, terr)
             param.append(temp)
             errors.append(terr)
-            
-        return [param, errors]
+        return [param, errors, amin]
     
 
     
@@ -421,6 +430,11 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         else:
             PosRefName = det[0].prop("gdml_posref")
         # print  "Write results of "+path+" to GDML file in "+PosRefName
+        
+        if self.result[2] / self.ndof > self.tolerance :
+            print "Fit exceeds tolerance: result not written to GDML"
+            isgood = False
+            
         nodefound = 0
         for node in self.gdmlfile.xpathEval("gdml/structure/volume/physvol"):
             # print  "testing"+node.xpathEval("position")[0].prop("name")
