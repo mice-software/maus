@@ -50,6 +50,7 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _tracker_num(0),
     _charge(0),
     _num_points(0),
+    _n_bad_tracks(0),
     _mc_track_id(0),
     _mc_pid(0),
     _n_matched(0),
@@ -109,6 +110,7 @@ void TrackerDataAnalyserMomentum::setUp() {
   _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
   _tree->Branch("charge", &_charge, "charge/I");
   _tree->Branch("num_points", &_num_points, "num_points/I");
+  _tree->Branch("n_bad_tracks", &_n_bad_tracks, "n_bad_tracks/I");
   _tree->Branch("mc_track_id", &_mc_track_id, "mc_track_id/I");
   _tree->Branch("mc_pid", &_mc_pid, "mc_pid/I");
   _tree->Branch("n_matched", &_n_matched, "n_matched/I");
@@ -165,6 +167,9 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
       // Create the lookup bridge between MC and Recon
       SciFiLookup lkup;
       lkup.make_hits_map(mc_evt);
+
+      // Reset tracks counters
+      _n_bad_tracks = 0;
 
       // Loop over helical pattern recognition tracks in event
       for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
@@ -229,6 +234,7 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
           // If we have not found a common track id, abort for this track
           if (!success) {
             std::cerr << "Malformed track, skipping\n";
+            ++_n_bad_tracks;
             break;
           }
           // If we have found a common track id amoung the spoints, fill the tree

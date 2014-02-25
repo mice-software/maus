@@ -97,6 +97,7 @@ class TrackerDataAnalyserMomentum {
     int _tracker_num;
     int _charge;
     int _num_points;
+    int _n_bad_tracks;
     int _mc_track_id;
     int _mc_pid;
     int _n_matched;
