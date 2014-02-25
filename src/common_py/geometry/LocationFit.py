@@ -177,6 +177,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         if len(self.result) == 3 and self.UseGDML:
             if not self.writeResulttoGDML(isgood, detectorPath, detectorFile):
                 print "Result not recorded to "+detectorPath
+                exit(1)
                 # print  "GDML corrected"
         else: #
             print "Fit abandoned"
@@ -432,7 +433,8 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         # print  "Write results of "+path+" to GDML file in "+PosRefName
         
         if self.result[2] / self.ndof > self.tolerance :
-            print "Fit exceeds tolerance: result not written to GDML"
+            print "Fit Tolerance test failed: chi-square = ",self.result[2],\
+                  " for ",self.ndof," degrees of freedom."
             isgood = False
             
         nodefound = 0
