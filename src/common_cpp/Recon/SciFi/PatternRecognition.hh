@@ -259,6 +259,9 @@ class PatternRecognition {
     /** @brief Set the verbosity level */
     void set_verbosity(const bool verb) { _verb = verb; }
 
+    /** @brief A function to set all the internal parameters to their default values (for tests) */
+    void set_parameters_to_default();
+
   private:
     bool _straight_pr_on;      /** Straight pattern recogntion on or off */
     bool _helical_pr_on;      /** Helical pattern recogntion on or off */

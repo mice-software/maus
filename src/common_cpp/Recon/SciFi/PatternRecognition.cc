@@ -68,12 +68,30 @@ PatternRecognition::PatternRecognition(): _straight_pr_on(true),
                                           _sz_chisq_cut(4.0),
                                           _Pt_max(180.0),
                                           _Pz_min(50.0) {
-  /*
   bool success = LoadGlobals();
   if (!success) {
     std::cerr << "WARNING: Pattern Recognition failed to load Globals, using default values\n";
   }
-  */
+}
+
+void PatternRecognition::set_parameters_to_default() {
+  _straight_pr_on = true;
+  _helical_pr_on = true;
+  _verb = 0;
+  _n_trackers = 2;
+  _n_stations = 5;
+  _sd_1to4 = 0.3844;
+  _sd_5 = 0.4298;
+  _sd_phi_1to4 = 1.0;
+  _sd_phi_5 = 1.0;
+  _res_cut = 2.0;
+  _straight_chisq_cut = 15.0;
+  _R_res_cut = 150.0;
+  _circle_chisq_cut = 15.0;
+  _n_turns_cut = 0.75;
+  _sz_chisq_cut = 4.0;
+  _Pt_max = 180.0;
+  _Pz_min = 50.0;
 }
 
 PatternRecognition::~PatternRecognition() {
@@ -85,6 +103,7 @@ bool PatternRecognition::LoadGlobals() {
     Json::Value *json = Globals::GetConfigurationCards();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
     _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
     _n_stations = (*json)["SciFinStations"].asInt();
     _sd_1to4 = (*json)["SciFi_sigma_triplet"].asDouble();
@@ -99,10 +118,6 @@ bool PatternRecognition::LoadGlobals() {
     _sz_chisq_cut = (*json)["SciFiPatRecSZChi2Cut"].asDouble();
     _Pt_max = (*json)["SciFiMaxPt"].asDouble();
     _Pz_min = (*json)["SciFiMinPz"].asDouble();
-    std::cerr << _straight_pr_on << " " << _helical_pr_on << " " << _n_trackers << " "
-              << _n_stations << " " << _sd_1to4 << " " << _sd_5 << " " << _sd_phi_1to4
-              << " " << _sd_phi_5 << " " << _res_cut << " " << _R_res_cut << " "
-	      << _n_turns_cut << " " << _Pt_max << " " << _Pz_min << std::endl;
     return true;
   } else {
     return false;
