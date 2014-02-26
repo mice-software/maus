@@ -28,8 +28,8 @@ keep_only_muon_tracks = False
 keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # 
-# simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
+# simulation_geometry_filename = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # 
+simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 # simulation_geometry_filename = "Stage4_NoField.dat" # geometry used by simulation
 maximum_number_of_steps = 1000
 simulation_reference_particle = {
