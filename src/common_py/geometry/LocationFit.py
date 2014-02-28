@@ -222,9 +222,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         for q in self.gdmlfile.xpathEval(\
             "gdml/structure/volume/physvol/position"):
             if q.prop("name") == det[0].prop("gdml_posref"):
-                self.initguess[0] = float(q.prop('x'))
-                self.initguess[1] = float(q.prop('y'))
-                self.initguess[2] = float(q.prop('z'))
+                self.initguess[0] =  float(q.prop('x'))
+                self.initguess[1] =  float(q.prop('y'))
+                self.initguess[2] = -float(q.prop('z'))
         # print  "Initial guess for detector location is ", self.initguess
         # clear all previous reference and data points
         self.refpoints  = []
