@@ -97,7 +97,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             # This is a list of all possible detectors (which
             # have GDML geometries).
             detectors = ['TOF0', 'TOF1', 'TOF2', \
-                         'KL', 'Ckov1', 'Ckov2', \
+                         'KL', 'Ckov1', 'Ckov2', 'EMR', \
                          'Tracker0', 'Tracker1', 'LH2', \
                          'Disk_LiH', 'Disk_PE', 'Wedge_LiH_45', \
                          'Wedge_LiH_90']
@@ -224,7 +224,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             if q.prop("name") == det[0].prop("gdml_posref"):
                 self.initguess[0] =  float(q.prop('x'))
                 self.initguess[1] =  float(q.prop('y'))
-                self.initguess[2] = -float(q.prop('z'))
+                self.initguess[2] =  float(q.prop('z'))
         # print  "Initial guess for detector location is ", self.initguess
         # clear all previous reference and data points
         self.refpoints  = []
@@ -239,7 +239,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
             # Extract the expected survey point position from the xml file
             temp = array('d', (float(node.prop('x')), \
                                float(node.prop('y')), \
-                               float(node.prop('z'))))
+                              -float(node.prop('z'))))
             # print  "Location of survey point in detector coordinates: ", temp
             self.refpoints.append(temp)
             
