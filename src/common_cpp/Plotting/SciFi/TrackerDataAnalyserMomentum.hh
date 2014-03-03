@@ -54,6 +54,9 @@ class TrackerDataAnalyserMomentum {
     /** Takes in the data, one spill at a time */
     void accumulate(Spill* spill);
 
+    /** Calculate pattern recognition efficiency parameters */
+    void calc_pat_rec_efficiency(MCEvent *mc_evt, SciFiEvent* evt);
+
     /** Calculate the pz resolution for a particular pt_mc interval,
      *  by plotting a histo of the pz_mc - pz for the interval,
      *  fitting a gaussian, and returning the sigma and error on sigma.
