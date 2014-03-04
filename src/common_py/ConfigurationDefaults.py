@@ -378,6 +378,20 @@ TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
+# KL digitization
+KLconversionFactor = 0.000125 # MeV
+KLlightCollectionEff = 0.031
+KLlightGuideEff  = 0.85
+KLquantumEff = 0.18
+KLlightSpeed =  170.0 # mm/ns
+KLattLengthLong  = 2400.0 # mm
+KLattLengthShort =  200.0 # mm
+KLattLengthLongNorm  = 0.655 # mm
+KLattLengthShortNorm   = 0.345 # mm
+KLhardCodedTrigger = True
+KLsamplingTimeStart = 0.0 # ns
+KLadcConversionFactor = 0.125
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 

@@ -5,9 +5,6 @@ Module KLFoilModule6
 {
   Volume Box
   Dimensions 932 132.2 40.2 mm
-  PropertyInt Plane 0
-//  PropertyDouble GreenColour 1.
-  PropertyBool Invisible 1
   PropertyString Material Al
   Module KL/KLModule6.dat
   {
