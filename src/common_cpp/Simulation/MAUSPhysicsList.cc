@@ -70,7 +70,7 @@ const int         MAUSPhysicsList::_nScatNames   = 9;
 const int         MAUSPhysicsList::_nELossNames  = 8;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
-                                                       : G4VUserPhysicsList() {
+                                                       : G4VUserPhysicsList(), _polDecay(false) {
   _list = physList;
 }
 
@@ -135,7 +135,8 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  hadronic model " << _hadronicModel
                               << "\n  particle decay " << _partDecay
                               << "\n  pi 1/2 life " << _piHalfLife
-                              << "\n  mu 1/2 life " << _muHalfLife << std::endl;
+                              << "\n  mu 1/2 life " << _muHalfLife 
+                              << "\n polarised muons true/false ? "<< _polDecay<<std::endl; //added
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
   SetHalfLife(_piHalfLife, _muHalfLife);
 }
@@ -226,15 +227,101 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
   delete pvec;
 }
 
-//void MAUSPhysicsList::ConstructParticle() {
-//    _list->ConstructParticle();
-
-//}
-
 void MAUSPhysicsList::ConstructParticle() {
+    _list->ConstructParticle();
+
+}
+
+
+void MAUSPhysicsList::ConstructProcess() {
+    _list->ConstructProcess();  // BUG: Memory leak on G4 side
+    SetSpecialProcesses();
+}
+
+
+
+
+void MAUSPhysicsList::SetSpecialProcesses() {
+  theParticleIterator->reset();  // from G4VUserPhysicsList
+  while ( (*theParticleIterator)() ) {
+    G4ProcessManager* fmanager = theParticleIterator->value()->
+                                                            GetProcessManager();
+    // step limiter for G4StepMax parameter; _limits exists for memory cleanup
+    _limits.push_back(new G4StepLimiter);
+    fmanager->AddProcess(_limits.back(), -1, -1, 2);
+    // track limiter for G4KinMax, etc
+    _specialCuts.push_back(new G4UserSpecialCuts());
+    fmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
+  }
+  if (_polDecay == true) {
+        
+        G4ProcessManager* pmanager;
+        pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
+        G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
+    
+        G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
+   
+        G4VProcess* decay;
+        decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
+    
+      
+   
+        if (pmanager) {
+            if (decay) pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(decayWithSpin);
+            // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
+            pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+            }
+   
+        decay = processTable->FindProcess("Decay",G4MuonMinus::MuonMinus());
+   
+        pmanager = G4MuonMinus::MuonMinus()->GetProcessManager();
+   
+        if (pmanager) {
+            if (decay) pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(decayWithSpin);
+            // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
+            pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+          }
+ 
+        G4PionDecayMakeSpin* poldecay = new G4PionDecayMakeSpin();
+ 
+       decay = processTable->FindProcess("Decay",G4PionPlus::PionPlus());
+ 
+        pmanager = G4PionPlus::PionPlus()->GetProcessManager();
+ 
+        if (pmanager) {
+            if (decay) pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(poldecay);
+              // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager ->SetProcessOrdering(poldecay, idxPostStep);
+            pmanager ->SetProcessOrdering(poldecay, idxAtRest);
+        }
+ 
+        decay = processTable->FindProcess("Decay",G4PionMinus::PionMinus());
+
+ 
+        pmanager = G4PionMinus::PionMinus()->GetProcessManager();
+ 
+        if (pmanager) {
+            if (decay) pmanager->RemoveProcess(decay);
+                pmanager->AddProcess(poldecay);
+                // set ordering for PostStepDoIt and AtRestDoIt
+                pmanager ->SetProcessOrdering(poldecay, idxPostStep);
+                pmanager ->SetProcessOrdering(poldecay, idxAtRest);
+            }
+    }
+
+  }
+
+
+/*
+  void MAUSPhysicsList::ConstructParticle() {
     
 
-    //G4VModularPhysicsList::ConstructParticle();
+    MAUSPhysicsList::ConstructParticle();
     
     G4GenericIon::GenericIonDefinition();
   
@@ -253,91 +340,73 @@ void MAUSPhysicsList::ConstructParticle() {
     G4MuonMinus::MuonMinusDefinition() -> SetDecayTable(MuonMinusDecayTable);
 
 
-}
+    }
 
-//void MAUSPhysicsList::ConstructProcess() {
-//    _list->ConstructProcess();  // BUG: Memory leak on G4 side
-//    SetSpecialProcesses();
-//}
-void MAUSPhysicsList::ConstructProcess(){
+  void MAUSPhysicsList::ConstructProcess(){
      
-        //G4VModularPhysicsList::ConstructProcess();
+    MAUSPhysicsList::ConstructProcess();
     
-        G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
+    G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
     
-        G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
+    G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
    
-        G4VProcess* decay;
-        decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
+    G4VProcess* decay;
+    decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
     
-        G4ProcessManager* fManager;
-        fManager = G4MuonPlus::MuonPlus()->GetProcessManager();
+    G4ProcessManager* pmanager;
+    pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
    
-       if (fManager) {
-         if (decay) fManager->RemoveProcess(decay);
-         fManager->AddProcess(decayWithSpin);
-         // set ordering for PostStepDoIt and AtRestDoIt
-         fManager ->SetProcessOrdering(decayWithSpin, idxPostStep);
-         fManager ->SetProcessOrdering(decayWithSpin, idxAtRest);
-       }
+    if (pmanager) {
+        if (decay) pmanager->RemoveProcess(decay);
+        pmanager->AddProcess(decayWithSpin);
+            // set ordering for PostStepDoIt and AtRestDoIt
+        pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
+        pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+        }
    
-       decay = processTable->FindProcess("Decay",G4MuonMinus::MuonMinus());
+    decay = processTable->FindProcess("Decay",G4MuonMinus::MuonMinus());
    
-       fManager = G4MuonMinus::MuonMinus()->GetProcessManager();
+    pmanager = G4MuonMinus::MuonMinus()->GetProcessManager();
    
-       if (fManager) {
-         if (decay) fManager->RemoveProcess(decay);
-         fManager->AddProcess(decayWithSpin);
-       // set ordering for PostStepDoIt and AtRestDoIt
-       fManager ->SetProcessOrdering(decayWithSpin, idxPostStep);
-       fManager ->SetProcessOrdering(decayWithSpin, idxAtRest);
-     }
+    if (pmanager) {
+        if (decay) pmanager->RemoveProcess(decay);
+        pmanager->AddProcess(decayWithSpin);
+        // set ordering for PostStepDoIt and AtRestDoIt
+        pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
+        pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+      }
  
-     G4PionDecayMakeSpin* poldecay = new G4PionDecayMakeSpin();
+  G4PionDecayMakeSpin* poldecay = new G4PionDecayMakeSpin();
  
-     decay = processTable->FindProcess("Decay",G4PionPlus::PionPlus());
+  decay = processTable->FindProcess("Decay",G4PionPlus::PionPlus());
  
-     fManager = G4PionPlus::PionPlus()->GetProcessManager();
+  pmanager = G4PionPlus::PionPlus()->GetProcessManager();
  
-     if (fManager) {
-       if (decay) fManager->RemoveProcess(decay);
-       fManager->AddProcess(poldecay);
-       // set ordering for PostStepDoIt and AtRestDoIt
-       fManager ->SetProcessOrdering(poldecay, idxPostStep);
-       fManager ->SetProcessOrdering(poldecay, idxAtRest);
-     }
- 
-     decay = processTable->FindProcess("Decay",G4PionMinus::PionMinus());
-
- 
-     fManager = G4PionMinus::PionMinus()->GetProcessManager();
- 
-     if (fManager) {
-       if (decay) fManager->RemoveProcess(decay);
-       fManager->AddProcess(poldecay);
-       // set ordering for PostStepDoIt and AtRestDoIt
-       fManager ->SetProcessOrdering(poldecay, idxPostStep);
-       fManager ->SetProcessOrdering(poldecay, idxAtRest);
-     }
- 
- }
-
-
-
-
-void MAUSPhysicsList::SetSpecialProcesses() {
-  theParticleIterator->reset();  // from G4VUserPhysicsList
-  while ( (*theParticleIterator)() ) {
-    G4ProcessManager* pmanager = theParticleIterator->value()->
-                                                            GetProcessManager();
-    // step limiter for G4StepMax parameter; _limits exists for memory cleanup
-    _limits.push_back(new G4StepLimiter);
-    pmanager->AddProcess(_limits.back(), -1, -1, 2);
-    // track limiter for G4KinMax, etc
-    _specialCuts.push_back(new G4UserSpecialCuts());
-    pmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
+  if (pmanager) {
+      if (decay) pmanager->RemoveProcess(decay);
+      pmanager->AddProcess(poldecay);
+          // set ordering for PostStepDoIt and AtRestDoIt
+      pmanager ->SetProcessOrdering(poldecay, idxPostStep);
+      pmanager ->SetProcessOrdering(poldecay, idxAtRest);
   }
-}
+ 
+  decay = processTable->FindProcess("Decay",G4PionMinus::PionMinus());
+
+ 
+  pmanager = G4PionMinus::PionMinus()->GetProcessManager();
+ 
+  if (pmanager) {
+      if (decay) pmanager->RemoveProcess(decay);
+          pmanager->AddProcess(poldecay);
+          // set ordering for PostStepDoIt and AtRestDoIt
+          pmanager ->SetProcessOrdering(poldecay, idxPostStep);
+          pmanager ->SetProcessOrdering(poldecay, idxAtRest);
+      }
+ 
+ }*/
+
+
+
 
 void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
   SetParticleHalfLife("pi+", pionHalfLife);
@@ -362,7 +431,7 @@ void MAUSPhysicsList::Setup() {
             "reference_physics_processes", JsonWrapper::stringValue).asString();
     std::string physicsModel = JsonWrapper::GetProperty(dc, "physics_processes",
                                           JsonWrapper::stringValue).asString();
-
+    
     if (refPhysicsModel == "none")
       _refDEModel = no_eloss;
     if (refPhysicsModel == "mean_energy_loss")
@@ -386,16 +455,9 @@ void MAUSPhysicsList::Setup() {
       _hadronicModel = all_hadronic;
     }
 
-    if (physicsModel == "polarized_muons") {
-      _msModel = mcs;
-      _dEModel = energyStraggling;
-      _hadronicModel = all_hadronic;
-    }
-
-
-
-
     _partDecay = JsonWrapper::GetProperty(dc, "particle_decay",
+                                          JsonWrapper::booleanValue).asBool();
+    _polDecay = JsonWrapper::GetProperty(dc, "polarised_decay",
                                           JsonWrapper::booleanValue).asBool();
     _piHalfLife = JsonWrapper::GetProperty(dc, "charged_pion_half_life",
                                           JsonWrapper::realValue).asDouble();

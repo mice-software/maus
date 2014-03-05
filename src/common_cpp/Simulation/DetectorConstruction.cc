@@ -471,7 +471,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   }
 
   // Scan through the list of steppers
-  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
+  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4" || _stepperType == "SpinTracking") {
     _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "SimpleHeum") {
     _stepper = new G4SimpleHeum(_equation, n_vars);

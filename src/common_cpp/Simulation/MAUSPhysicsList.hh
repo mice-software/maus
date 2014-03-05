@@ -213,6 +213,7 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     eloss _dEModel;
     hadronic _hadronicModel;
     bool        _partDecay;
+    bool        _polDecay;
     double      _piHalfLife;
     double      _muHalfLife;
     double      _productionThreshold;
