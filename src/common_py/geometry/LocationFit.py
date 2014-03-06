@@ -66,7 +66,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         if self.UseGDML:
             # The survey information is in the CAD geometry
             # file which should have one of these names
-            fnames = ['fastradModel', 'FastradModel.gdml', 'Step_IV.gdml']
+            fnames = ['fastradModel.gdml', 'FastradModel.gdml', 'Step_IV.gdml']
             for name in fnames:
                 tempfile = os.path.join(self.dl_dir, name)
                 if os.path.exists(tempfile):
@@ -74,17 +74,18 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
                     # break on the first qualifing instance.
                     break
             # An override method --- if necessary
-            if config_dict['survey_measurement_record']:
+            if config_dict['survey_measurement_record'] != "":
                 self.GDMLFile = config_dict['survey_measurement_record']
             # The default source of reference information for the fit.
             self.XMLFile  = os.path.join(self.dl_dir,'Maus_Information.gdml')
             if not os.path.exists(self.XMLFile):
                 self.XMLFile = ''
             # An override method --- if necessary
-            if config_dict['survey_reference_position']:
+            if config_dict['survey_reference_position'] != "":
                 self.XMLFile  = config_dict['survey_reference_position'] 
             print self.GDMLFile, self.XMLFile
             self.datafile = libxml2.parseFile(self.XMLFile)
+            print self.GDMLFile
             self.gdmlfile = libxml2.parseFile(self.GDMLFile)
             # Fitting tolerance. Reject fit if chi^2/ndof > value
             self.tolerance = 3 # this should be read from the CDB files
@@ -182,8 +183,6 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         else: #
             print "Fit abandoned"
 
-        
-    
         return isgood
     
     def extractData(self):
@@ -434,7 +433,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         
         if self.result[2] / self.ndof > self.tolerance :
             print "Fit Tolerance test failed: chi-square = ",self.result[2],\
-                  " for ",self.ndof," degrees of freedom."
+                  " for ", self.ndof, " degrees of freedom."
             isgood = False
             
         nodefound = 0
