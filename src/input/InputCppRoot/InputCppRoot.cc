@@ -137,13 +137,13 @@ std::string InputCppRoot::_emitter_cpp() {
                     isUseful  = load_event<Data>(std::string("data"), spillData);
 
                     if ( isUseful ) {
-                        if (spillData.GetEvent()->GetRunNumber() != _current_run_number[_event_type]) {
+                        if ( ! is_selected_spill(spillData.GetEvent()->GetSpillNumber()) ) {
+                            isUseful = false;
+                        } else if (spillData.GetEvent()->GetRunNumber() != _current_run_number[_event_type]) {
                             cache_event(_event_type, convert_data<CppJsonSpillConverter, Data>(spillData));
                             _current_run_number[_event_type] = spillData.GetEvent()->GetRunNumber();
                             isUseful = false;
                             break;
-                        } else if ( ! is_selected_spill(spillData.GetEvent()->GetSpillNumber()) ) {
-                            isUseful = false;
                         } else {
                             event = convert_data<CppJsonSpillConverter, Data>(spillData);
                         }
