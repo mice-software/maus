@@ -45,7 +45,7 @@ void PointerTRefItem<ParentType>::_SetCppChild
                    "Missing required branch "+_branch+" converting json->cpp",
                    "PointerTRefItem::SetCppChild");
     } else {
-      (parent_cpp.*_setter)(TRef(NULL));
+      (parent_cpp.*_setter)(NULL);
       return;
     }
   }
@@ -55,7 +55,7 @@ void PointerTRefItem<ParentType>::_SetCppChild
                    "Null branch "+_branch+" converting json->cpp",
                    "PointerTRefItem::SetCppChild");
     } else {
-      (parent_cpp.*_setter)(TRef(NULL));
+      (parent_cpp.*_setter)(NULL);
       return;
     }
   }
@@ -65,7 +65,7 @@ void PointerTRefItem<ParentType>::_SetCppChild
                    "Null branch "+_branch+" converting json->cpp",
                    "PointerTRefItem::SetCppChild");
     } else {
-      (parent_cpp.*_setter)(TRef(NULL));
+      (parent_cpp.*_setter)(NULL);
       return;
     }
   }
@@ -82,14 +82,13 @@ void PointerTRefItem<ParentType>::_SetCppChild
     RefManager::GetInstance().AddReference(res);
   }
   // syntax is (_object.*_function)(args);
-  (parent_cpp.*_setter)(TRef(NULL));
+  (parent_cpp.*_setter)(NULL);
 }
 
 template <class ParentType>
 void PointerTRefItem<ParentType>::_SetJsonChild
 (const ParentType& parent_cpp, Json::Value& parent_json) {
-  TRef reference = (parent_cpp.*_getter)();
-  TObject* child_cpp = reference.GetObject();
+  TObject* child_cpp = (parent_cpp.*_getter)();
   if (child_cpp == NULL) {
     if (_required) {
       throw MAUS::Exception(Exception::recoverable,

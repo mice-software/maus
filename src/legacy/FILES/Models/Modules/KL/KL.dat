@@ -9,9 +9,6 @@ Module KL
 {
   Volume Box
   Dimensions 932 927.2 40.2 mm
-  PropertyBool Invisible 1
-  PropertyDouble RedColour 1.
-  PropertyInt numPlanes 1
   PropertyDouble G4StepMax 5.0 mm
   Module KL/KLFoilModule0.dat
   {

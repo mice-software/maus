@@ -5,12 +5,9 @@ Module KLFiber
   PropertyString SensitiveDetector KL
   PropertyString G4Detector KLFiber
   PropertyDouble FibreDiameter 1.0 mm
-  PropertyDouble FibreLength 1000.0 mm
+  PropertyDouble FibreLength 932.0 mm
   PropertyDouble FibreSpacingY 1.34 mm
   PropertyDouble FibreSpacingZ 0.98 mm
   PropertyString Material POLYSTYRENE
- // PropertyDouble BlueColour 0.5
- // PropertyDouble RedColour 1.0
-//  PropertyDouble GreenColour 1.0
-  PropertyBool Invisible 1
+  PropertyDouble GreenColour 1
 }

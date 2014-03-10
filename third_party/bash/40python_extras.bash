@@ -75,7 +75,24 @@ if [ "$get_packages" == "1" ]; then
     cd $egg_source
     for package in $download_package_list
     do
-        easy_install -zmaxeb . $package
+        easy_install -zmaxeb . $package &
+        # kill the command after <timeout> seconds
+        ((timeout = 120))
+        while ((timeout > 0)); do
+            sleep 1
+            kill -0 $! >& /dev/null
+            if [ "$?" == "0" ]; then # pid is running (can be killed)
+                ((timeout -= 1))
+            else # pid is finished (can't be killed)
+                ((timeout = 0))
+            fi
+        done
+        kill -0 $! >& /dev/null
+        if [ "$?" == "0" ]; then # pid is running (can be killed)
+            echo "easy_install of $package has timed out - killing"
+            kill -9 $!
+        fi
+
     done
     downloaded_list=`ls --hide=*.tar.gz`
     echo "INFO: Downloaded the following packages"

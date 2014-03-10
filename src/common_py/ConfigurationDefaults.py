@@ -385,6 +385,20 @@ TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
+# KL digitization
+KLconversionFactor = 0.000125 # MeV
+KLlightCollectionEff = 0.031
+KLlightGuideEff  = 0.85
+KLquantumEff = 0.18
+KLlightSpeed =  170.0 # mm/ns
+KLattLengthLong  = 2400.0 # mm
+KLattLengthShort =  200.0 # mm
+KLattLengthLongNorm  = 0.655 # mm
+KLattLengthShortNorm   = 0.345 # mm
+KLhardCodedTrigger = True
+KLsamplingTimeStart = 0.0 # ns
+KLadcConversionFactor = 0.125
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
@@ -455,3 +469,14 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+# Default location of root file containing PDF histograms used for Global PID
+PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+# Particle hypothesis used in Global PID when creating PDFs from MC data.
+# For PDFs to be produced, this must be set, preferably as the type of simulated particle
+# i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
+global_pid_hypothesis = ""
+# Unique identifier used when creating PDFs in Global PID to distinguish between PDFs for
+# the same hypothesis generated at different times. For PDFs to be produced, this must be set.
+# Any string can be used but date and time is recommended, by using python datetime module and 
+# the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
+unique_identifier = ""

@@ -17,6 +17,7 @@ echo "INFO: Now building DAQ extras" 2>>$log_file 1>>$log_file
 source env.sh 2>>$log_file 1>>$log_file
 echo "INFO: Building DAQ add-on"  2>>$log_file 1>>$log_file
 bash third_party/bash/70daq.bash 2>>$log_file 1>>$log_file
+bash third_party/bash/61monitoring.bash 2>>$log_file 1>>$log_file
 if [ "$?" != "0" ]
 then
     echo "FATAL: DAQ add-ons failed to build okay" 2>>$log_file 1>>$log_file

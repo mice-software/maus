@@ -393,7 +393,9 @@ void DetectorConstruction::BuildSensitiveDetector
       logic->SetSensitiveDetector(emrSD);
       _SDs.push_back(emrSD);
     } else if (sdName == "KL")  {
-      // disabled
+      KLSD* klSD = new KLSD(mod);
+      logic->SetSensitiveDetector(klSD);
+      _SDs.push_back(klSD);
     } else if (sdName == "CKOV") {
       // disabled
     } else if (sdName != "Virtual" && sdName != "Envelope") {

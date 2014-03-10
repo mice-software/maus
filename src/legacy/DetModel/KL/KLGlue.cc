@@ -43,7 +43,6 @@ KLGlue::KLGlue(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
   G4double zStart, zStep, z, yStart, yStep, y;
 
-//   G4double cellX = mod->dimensions().x();
   G4double cellY = mod->dimensions().y();
   G4double cellZ = mod->dimensions().z();
   G4double fiberRad = 0.5*mod->propertyDouble( "FibreDiameter" );
@@ -58,18 +57,18 @@ KLGlue::KLGlue(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
   G4RotationMatrix rm90;
   rm90.rotateY(90.*deg);
 
-  // The strip of glue between to lead foils, center of fiber = center of strip
+  // The strip of glue between lead foils, center of fiber = center of strip
   G4double glueStripW = 0.5*fiberSpacing-fiberRad;
-  fSolidGlueStrip = new G4Box("sGlueStripCAL", 0.5*fiberLength, 0.5*glueStripW, 0.5*glueThickness);
-  fLogicGlueStrip = new G4LogicalVolume(fSolidGlueStrip, mater, "lGlueStripCAL");
+  fSolidGlueStrip = new G4Box("sGlueStripKL", 0.5*fiberLength, 0.5*glueStripW, 0.5*glueThickness);
+  fLogicGlueStrip = new G4LogicalVolume(fSolidGlueStrip, mater, "lGlueStripKL");
   G4ThreeVector upVect = G4ThreeVector(0,fiberRad+0.5*glueStripW,0);
   G4ThreeVector dnVect = G4ThreeVector(0,-fiberRad-0.5*glueStripW,0);
 
   // The space to put the fiber inside
   G4double holeRad = 0.5*glueThickness+fiberRad;
-  fSolidHole = new G4Tubs("sHoleCAL", fiberRad, holeRad,
+  fSolidHole = new G4Tubs("sHoleKL", fiberRad, holeRad,
                             0.5*fiberLength ,0.0,2*pi) ;
-  fLogicHole = new G4LogicalVolume(fSolidHole, mater, "lHoleCAL");
+  fLogicHole = new G4LogicalVolume(fSolidHole, mater, "lHoleKL");
 
   G4AssemblyVolume* assemblyCell = new G4AssemblyVolume();
   assemblyCell->AddPlacedVolume( fLogicGlueStrip, upVect, &rm0 );
