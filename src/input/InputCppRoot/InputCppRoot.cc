@@ -257,10 +257,9 @@ bool InputCppRoot::is_selected_spill( int spillNum ) const {
 
   if ( _selected_spill_numbers.find( spillNum ) ==
      _selected_spill_numbers.end() ) {
-    Squeak::mout( Squeak::warning ) << "NOT Loading Spill!" << std::endl;
+    Squeak::mout( Squeak::info ) << "Skipping Spill " << spillNum << std::endl;
     return false;
   }
-  Squeak::mout( Squeak::warning ) << "Loading Spill!" << std::endl;
   return true;
 }
 
