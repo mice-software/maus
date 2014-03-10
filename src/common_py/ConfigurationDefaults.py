@@ -324,9 +324,8 @@ get_beamline_stop_time = ""
 tof_0_file_number = "Iges_10"
 tof_1_file_number = "Iges_11"
 tof_2_file_number = "Iges_13"
-ckov_file_number = "Iges_19"
-acc1_file_number = "Iges_20"
-acc2_file_number = "Iges_21"
+ckov1_file_number = "Iges_19"
+ckov2_file_number = "Iges_21"
 kl_file_number = "Iges_14"
 emr_file_number = "Iges_15"
 tracker0_file_number = "Iges_17"
@@ -334,6 +333,14 @@ tracker1_file_number = "Iges_18"
 absorber0_file_number = "9999"
 absorber1_file_number = "Iges_16"
 absorber2_file_number = "9999"
+
+# Survey fit information
+survey_measurement_record = ""
+# This file should include position references and true locations of each detector.
+survey_reference_position = ""
+use_gdml_source           = True
+# Survey targets
+survey_target_detectors = []
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
@@ -377,6 +384,20 @@ TOFadcConversionFactor = 0.125
 TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
+
+# KL digitization
+KLconversionFactor = 0.000125 # MeV
+KLlightCollectionEff = 0.031
+KLlightGuideEff  = 0.85
+KLquantumEff = 0.18
+KLlightSpeed =  170.0 # mm/ns
+KLattLengthLong  = 2400.0 # mm
+KLattLengthShort =  200.0 # mm
+KLattLengthLongNorm  = 0.655 # mm
+KLattLengthShortNorm   = 0.345 # mm
+KLhardCodedTrigger = True
+KLsamplingTimeStart = 0.0 # ns
+KLadcConversionFactor = 0.125
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
