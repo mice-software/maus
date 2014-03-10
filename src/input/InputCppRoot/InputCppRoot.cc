@@ -41,7 +41,8 @@ namespace MAUS {
 InputCppRoot::InputCppRoot(std::string filename)
             : InputBase<std::string>("InputCppRoot"), _infile(NULL),
               _infile_tree(""), _filename(filename),
-              _event_type(_job_header_tp) {
+              _event_type(_job_header_tp),
+              _select_spills(false) {
     _current_run_number[_run_header_tp] = 0;
     _current_run_number[_spill_tp] = 0;
     _current_run_number[_run_footer_tp] = 0;
@@ -59,6 +60,30 @@ void InputCppRoot::_birth(const std::string& json_datacards) {
   }
   _infile = new irstream(_filename.c_str(), "Spill");
   _infile_tree = "Spill";
+
+  if ( json_dc.isMember( "selected_spills" ) ) {
+    Json::Value spill_list = JsonWrapper::GetProperty( json_dc,
+                  "selected_spills", JsonWrapper::arrayValue );
+    if ( ! spill_list.isArray() ) {
+      _select_spills = false;
+      Squeak::mout( Squeak::warning ) << "Expected array of spill numbers"
+        << " for \"selected_spills\" data card.\n"
+        << "Assuming None Supplied" << std::endl;
+    } else {
+      for ( unsigned int i = 0; i < spill_list.size(); ++i )
+        _selected_spill_numbers.insert( JsonWrapper::GetItem( spill_list, i,
+                                              JsonWrapper::intValue ).asInt() );
+      if ( _selected_spill_numbers.size() == 0 ) {
+        _select_spills = false;
+        Squeak::mout( Squeak::info ) << "Loading all spills from data file"
+          << std::endl;
+      } else {
+        _select_spills = true;
+        Squeak::mout( Squeak::info ) << "Found " << _selected_spill_numbers.size()
+          << " spills in the \"selected_spills\" data card." << std::endl;
+      }
+    }
+  }
 }
 
 void InputCppRoot::_death() {
@@ -87,8 +112,10 @@ std::string InputCppRoot::_emitter_cpp() {
                                                     (std::string("run_header"));
                 break;
             case _spill_tp:
+                do {
                 event = load_event<CppJsonSpillConverter, Data>
                                                           (std::string("data"));
+                } while ( ! is_selected_spill( event ) );
                 break;
             case _run_footer_tp:
                 event = load_event<CppJsonRunFooterConverter, RunFooterData>
@@ -133,6 +160,8 @@ std::string InputCppRoot::load_event(std::string branch_name) {
         _infile->set_current_event(_current_event_number[branch_name]);
     }
     (*_infile) >> branchName(branch_name.c_str()) >> data;
+    // if there was no branch of this type at all then we might get an exception
+    // - let's just try the next type
     ++_current_event_number[branch_name];
     if ((*_infile) >> readEvent == NULL) {
         return output;
@@ -162,7 +191,7 @@ bool InputCppRoot::use_event(std::string event) {
         _current_run_number[_event_type] = json["run_number"].asInt();
         return false;  // run_number has changed - save this for next time
     } else {
-        return true;  // run_number is same - keep on extracting this data
+      return true;  // run_number is same - keep on extracting this data
     }
 }
 
@@ -183,6 +212,26 @@ void InputCppRoot::cache_event(event_type type, std::string event) {
                      "Trying to uncache event but none saved",
                      "InputCppRoot::uncache_event"));
     _cache[type] = event;
+}
+
+
+bool InputCppRoot::is_selected_spill( std::string event ) const {
+  if ( ! _select_spills ) return true;
+
+  if (event == "" || _event_type == _job_header_tp || _event_type == _job_footer_tp)
+      return true;  
+
+  Json::Value json = JsonWrapper::StringToJson(event);
+  if ( json.isMember( "spill_number" ) ) {
+    Squeak::mout( Squeak::warning ) << "HERE!!!" << std::endl;
+    if ( _selected_spill_numbers.find( json["spill_number"].asInt() ) ==
+       _selected_spill_numbers.end() ) {
+      Squeak::mout( Squeak::warning ) << "NOT Loading Spill!" << std::endl;
+      return false;
+    }
+    Squeak::mout( Squeak::warning ) << "Loading Spill!" << std::endl;
+  }
+  return true;
 }
 
 
