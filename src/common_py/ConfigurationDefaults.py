@@ -324,9 +324,8 @@ get_beamline_stop_time = ""
 tof_0_file_number = "Iges_10"
 tof_1_file_number = "Iges_11"
 tof_2_file_number = "Iges_13"
-ckov_file_number = "Iges_19"
-acc1_file_number = "Iges_20"
-acc2_file_number = "Iges_21"
+ckov1_file_number = "Iges_19"
+ckov2_file_number = "Iges_21"
 kl_file_number = "Iges_14"
 emr_file_number = "Iges_15"
 tracker0_file_number = "Iges_17"
@@ -334,6 +333,14 @@ tracker1_file_number = "Iges_18"
 absorber0_file_number = "9999"
 absorber1_file_number = "Iges_16"
 absorber2_file_number = "9999"
+
+# Survey fit information
+survey_measurement_record = ""
+# This file should include position references and true locations of each detector.
+survey_reference_position = ""
+use_gdml_source           = True
+# Survey targets
+survey_target_detectors = []
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1

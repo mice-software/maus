@@ -10,7 +10,7 @@
     </xd:doc>
     <!-- This is the translation style sheet the individual GDML module files produced by Fastrad.
          It searches through the GDML and selects certain node and writes the .dat mice module
-         in the correcnt format
+         in the correct format
     -->
     <xsl:output method="text"/>
     <xsl:template match="gdml">
