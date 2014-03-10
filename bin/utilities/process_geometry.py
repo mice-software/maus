@@ -18,7 +18,7 @@ M. Littlefield
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-#pylint: disable=W0611
+#pylint: disable=W0611, C0103
 import os
 import shutil
 import geometry
@@ -32,7 +32,7 @@ from geometry.LocationFit import ElementRotationTranslation
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
 
-def main(): # pylint: disable = C0103
+def main():
     """
     This is the code for the executable file which downloads the current valid
     geometry. It takes the arguments of the download directory. It will download
@@ -48,8 +48,8 @@ def main(): # pylint: disable = C0103
         os.mkdir(gdml_cache)
     except OSError:
         pass
-    #Download file
-    #geometry_downloader = Downloader()
+    # Download file
+    # geometry_downloader = Downloader()
     #if configuration.geometry_download_by == "run_number":
     #    geometry_downloader.download_geometry_by_run \
     #                   (configuration.geometry_download_run_number, gdml_cache)
