@@ -39,6 +39,8 @@ output_json_file_type = "text"
 input_root_file_name = "maus_input.root"
 output_root_file_name = "maus_output.root"
 
+selected_spills = []
+
 # one_big_file - puts everything in output_root_file_name
 # one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
 #                    maus_output_1111.root

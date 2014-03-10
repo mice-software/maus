@@ -22,10 +22,15 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/DataStructure/JobHeader.hh"
 #include "src/common_cpp/DataStructure/JobFooterData.hh"
+#include "src/common_cpp/DataStructure/JobFooter.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooterData.hh"
+#include "src/common_cpp/DataStructure/RunFooter.hh"
 
 #include "src/common_cpp/Converter/DataConverters/CppJsonJobFooterConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonJobHeaderConverter.hh"
@@ -95,6 +100,12 @@ void InputCppRoot::_death() {
 
 std::string InputCppRoot::_emitter_cpp() {
     std::string event = "";
+    bool isUseful = true;
+    JobHeaderData JHData;
+    RunHeaderData RHData;
+    Data spillData;
+    RunFooterData RFData;
+    JobFooterData JFData;
     try {
         // first check the cache
         event = uncache_event(_event_type);
@@ -104,29 +115,67 @@ std::string InputCppRoot::_emitter_cpp() {
         // not cached? then we'd better extract from the file
         switch (_event_type) {
             case _job_header_tp:
-                event = load_event<CppJsonJobHeaderConverter, JobHeaderData>
-                                                    (std::string("job_header"));
-                break;
+                isUseful = load_event<JobHeaderData>(std::string("job_header"), JHData);
+                if ( isUseful ) event = convert_data<CppJsonJobHeaderConverter, JobHeaderData>(JHData);
+            break;
+
             case _run_header_tp:
-                event = load_event<CppJsonRunHeaderConverter, RunHeaderData>
-                                                    (std::string("run_header"));
+                isUseful = load_event<RunHeaderData>(std::string("run_header"), RHData);
+                if ( isUseful ) {
+                    if (RHData.GetRunHeader()->GetRunNumber() != _current_run_number[_event_type]) {
+                        cache_event(_event_type, convert_data<CppJsonRunHeaderConverter, RunHeaderData>(RHData));
+                        _current_run_number[_event_type] = RHData.GetRunHeader()->GetRunNumber();
+                        isUseful = false;
+                    } else {
+                        event = convert_data<CppJsonRunHeaderConverter, RunHeaderData>(RHData);
+                    }
+                }
                 break;
+
             case _spill_tp:
                 do {
-                event = load_event<CppJsonSpillConverter, Data>
-                                                          (std::string("data"));
-                } while ( ! is_selected_spill( event ) );
+                    isUseful  = load_event<Data>(std::string("data"), spillData);
+
+                    if ( isUseful ) {
+                        if (spillData.GetEvent()->GetRunNumber() != _current_run_number[_event_type]) {
+                            cache_event(_event_type, convert_data<CppJsonSpillConverter, Data>(spillData));
+                            _current_run_number[_event_type] = spillData.GetEvent()->GetRunNumber();
+                            isUseful = false;
+                            break;
+                        } else if ( ! is_selected_spill(spillData.GetEvent()->GetSpillNumber()) ) {
+                            isUseful = false;
+                        } else {
+                            event = convert_data<CppJsonSpillConverter, Data>(spillData);
+                        }
+                    } else {
+                        break;
+                    }
+                } while ( ! isUseful );
                 break;
+
             case _run_footer_tp:
-                event = load_event<CppJsonRunFooterConverter, RunFooterData>
-                                                    (std::string("run_footer"));
+                isUseful = load_event<RunFooterData>(std::string("run_footer"), RFData);
+                if ( isUseful ) {
+                    if (RFData.GetRunFooter()->GetRunNumber() != _current_run_number[_event_type]) {
+                        cache_event(_event_type, convert_data<CppJsonRunFooterConverter, RunFooterData>(RFData));
+                        _current_run_number[_event_type] = RFData.GetRunFooter()->GetRunNumber();
+                        isUseful = false;
+                    } else {
+                        event = convert_data<CppJsonRunFooterConverter, RunFooterData>(RFData);
+                    }
+                }
                 break;
+
             case _job_footer_tp:
-                event = load_event<CppJsonJobFooterConverter, JobFooterData>
-                                                    (std::string("job_footer"));
+                isUseful = load_event<JobFooterData>(std::string("job_footer"), JFData);
+                if ( isUseful ) event = convert_data<CppJsonJobFooterConverter, JobFooterData>(JFData);
+                break;
+
+            default:
+                isUseful = false;
                 break;
         }
-        if (!use_event(event)) {
+        if ( !isUseful ) {
             // event number changed or we ran out of events of this type
             // advance event and recursively call emitter_cpp
             return advance_event_type();
@@ -140,17 +189,15 @@ std::string InputCppRoot::_emitter_cpp() {
     return event;
 }
 
-template <class ConverterT, class DataT>
-std::string InputCppRoot::load_event(std::string branch_name) {
+template <class DataT>
+bool InputCppRoot::load_event(std::string branch_name, DataT& data) {
     if (_infile == NULL) {
       throw(Exception(
         Exception::recoverable,
         "InputCppRoot was not initialised properly",
-        "InputCppRoot::getNextEvent"
+        "InputCppRoot::load_event"
       ));
     }
-    std::string output = "";
-    DataT data;
     if (_current_event_number.find(branch_name) == _current_event_number.end())
         _current_event_number[branch_name] = 0;
     if (_infile_tree != data.GetEventType()) {
@@ -164,35 +211,25 @@ std::string InputCppRoot::load_event(std::string branch_name) {
     // - let's just try the next type
     ++_current_event_number[branch_name];
     if ((*_infile) >> readEvent == NULL) {
-        return output;
+        return false;
     }
-    Json::Value* value = ConverterT()(&data);
-    if (value == NULL)
-        return output;
-    if (value->isNull()) {
-        delete value;
-        return output;
-    }
-    Json::FastWriter writer;
-    output = writer.write(*value);
-    delete value;
-    return output;
+    return true;
 }
 
-bool InputCppRoot::use_event(std::string event) {
-    if (event == "")
-        return false;
-    if (_event_type == _job_header_tp || _event_type == _job_footer_tp)
-        return true;  // job header/footer
-    Json::Value json = JsonWrapper::StringToJson(event);
-    if (json.isMember("run_number") &&
-        json["run_number"].asInt() != _current_run_number[_event_type]) {
-        cache_event(_event_type, event);
-        _current_run_number[_event_type] = json["run_number"].asInt();
-        return false;  // run_number has changed - save this for next time
-    } else {
-      return true;  // run_number is same - keep on extracting this data
+template <class ConverterT, class DataT>
+std::string InputCppRoot::convert_data( DataT& data ) {
+    std::string event( "" );
+    Json::Value* value = ConverterT()(&data);
+    if (value == NULL)
+        return event;
+    if (value->isNull()) {
+        delete value;
+        return event;
     }
+    Json::FastWriter writer;
+    event = writer.write(*value);
+    delete value;
+    return event;
 }
 
 std::string InputCppRoot::uncache_event(event_type type) {
@@ -209,28 +246,21 @@ void InputCppRoot::cache_event(event_type type, std::string event) {
     std::map<event_type, std::string>::iterator it = _cache.find(type);
     if (it != _cache.end() && it->second != "")
         throw(Exception(Exception::recoverable,
-                     "Trying to uncache event but none saved",
+                     "Trying to cache event but cannot find event type in map",
                      "InputCppRoot::uncache_event"));
     _cache[type] = event;
 }
 
 
-bool InputCppRoot::is_selected_spill( std::string event ) const {
+bool InputCppRoot::is_selected_spill( int spillNum ) const {
   if ( ! _select_spills ) return true;
 
-  if (event == "" || _event_type == _job_header_tp || _event_type == _job_footer_tp)
-      return true;  
-
-  Json::Value json = JsonWrapper::StringToJson(event);
-  if ( json.isMember( "spill_number" ) ) {
-    Squeak::mout( Squeak::warning ) << "HERE!!!" << std::endl;
-    if ( _selected_spill_numbers.find( json["spill_number"].asInt() ) ==
-       _selected_spill_numbers.end() ) {
-      Squeak::mout( Squeak::warning ) << "NOT Loading Spill!" << std::endl;
-      return false;
-    }
-    Squeak::mout( Squeak::warning ) << "Loading Spill!" << std::endl;
+  if ( _selected_spill_numbers.find( spillNum ) ==
+     _selected_spill_numbers.end() ) {
+    Squeak::mout( Squeak::warning ) << "NOT Loading Spill!" << std::endl;
+    return false;
   }
+  Squeak::mout( Squeak::warning ) << "Loading Spill!" << std::endl;
   return true;
 }
 
