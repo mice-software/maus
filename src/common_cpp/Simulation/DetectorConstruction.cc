@@ -34,6 +34,7 @@
 // fields and transport
 #include "Geant4/G4ChordFinder.hh"
 #include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4PropagatorInField.hh"
 #include "Geant4/G4EquationOfMotion.hh"
 #include "Geant4/G4FieldManager.hh"
 #include "Geant4/G4UniformMagField.hh"
@@ -440,26 +441,24 @@ void DetectorConstruction::SetSteppingAlgorithm() {
 
   if (_equation != NULL)
     delete _equation;
-  if (!_btField->HasRF()) { // No rf field, default integration
+  std::cerr << "DetectorConstruction::SetSteppingAlgorithm " << _stepperType << " " << _btField->HasRF() << std::endl;
+  // Note G4Mag_SpinEqRhs did not work for spin tracking in pure magnetic field
+  if (_btField->HasRF() || _stepperType == "SpinTracking") {
+      fieldMgr->SetFieldChangesEnergy(true);
+      fieldMgr->SetDetectorField(_miceElectroMagneticField);
+      if (_stepperType == "SpinTracking") {
+          _equation = new G4EqEMFieldWithSpin(_miceElectroMagneticField);
+          n_vars = 12;
+      } else {
+          _equation = new G4EqMagElectricField(_miceElectroMagneticField);
+          n_vars = 8;
+      }
+  } else {
     fieldMgr->SetDetectorField(_miceMagneticField);
-    if (_stepperType == "SpinTracking") {
-        _equation = new G4Mag_SpinEqRhs(_miceMagneticField);
-        n_vars = 9;
-    } else {
-        _equation = new G4Mag_UsualEqRhs(_miceMagneticField);
-        n_vars = 6;
-    }
-  } else { // Electrical field are present, used full E.M.
-    fieldMgr->SetFieldChangesEnergy(true);
-    fieldMgr->SetDetectorField(_miceElectroMagneticField);
-    if (_stepperType == "SpinTracking") {
-        // _equation = new G4EqEMFieldWithSpin(_miceElectroMagneticField);
-        n_vars = 12;
-    } else {
-        _equation = new G4EqMagElectricField(_miceElectroMagneticField);
-        n_vars = 8;
-    }
+    _equation = new G4Mag_UsualEqRhs(_miceMagneticField);
+    n_vars = 6;
   }
+
 
   if (_chordFinder != NULL) {
     delete _chordFinder;  // owns _stepper memory
@@ -471,7 +470,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   }
 
   // Scan through the list of steppers
-  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
+  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4" || _stepperType == "SpinTracking") {
     _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "SimpleHeum") {
     _stepper = new G4SimpleHeum(_equation, n_vars);
@@ -481,7 +480,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
     _stepper = new G4SimpleRunge(_equation, n_vars);
   } else if (_stepperType == "ExplicitEuler") {
     _stepper = new G4ExplicitEuler(_equation, n_vars);
-  } else if (_stepperType == "CashKarpRKF45" || _stepperType == "SpinTracking") {
+  } else if (_stepperType == "CashKarpRKF45") {
     _stepper = new G4CashKarpRKF45(_equation, n_vars);
   } else {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -502,10 +501,14 @@ void DetectorConstruction::SetSteppingAccuracy() {
     fieldMgr->SetDeltaIntersection(_deltaIntersection);
   if (_missDistance > 0)
     fieldMgr->GetChordFinder()->SetDeltaChord(_missDistance);
+
+  G4PropagatorInField* fieldPropagator =
+    G4TransportationManager::GetTransportationManager()->GetPropagatorInField();
+
   if (_epsilonMin > 0)
-    fieldMgr->SetMinimumEpsilonStep(_epsilonMin);
+    fieldPropagator->SetMinimumEpsilonStep(_epsilonMin);
   if (_epsilonMax > 0)
-    fieldMgr->SetMaximumEpsilonStep(_epsilonMax);
+    fieldPropagator->SetMaximumEpsilonStep(_epsilonMax);
 }
 
 Json::Value DetectorConstruction::GetSDHits(size_t i) {
