@@ -151,8 +151,8 @@ void MAUSPhysicsList::SetStochastics(scat scatteringModel,
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  if (!decay) UIApplyCommand("/process/inactivate Decay");
-  else        UIApplyCommand("/process/activate   Decay");
+  if (!decay) UIApplyCommand("/process/inactivate DecayWithSpin");
+  else        UIApplyCommand("/process/activate DecayWithSpin");
 }
 
 
@@ -254,16 +254,20 @@ void MAUSPhysicsList::SetSpecialProcesses() {
     fmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
   }
   if (_polDecay == true) {
-        
+        std::cerr << "pol_decay" <<std::endl;
         G4ProcessManager* pmanager;
         pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
         G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
     
         G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
-   
+        G4ProcessVector* p = processTable->FindProcesses();
+        for(int j=0; j<p->size() ; j++){
+            std::cout<<(*p)[j]->GetProcessName()<<std::endl;
+        }
+        std::cerr<<"pol_decay_vector "<< p<<std::endl;
         G4VProcess* decay;
         decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
-    
+        
       
    
         if (pmanager) {
@@ -273,6 +277,13 @@ void MAUSPhysicsList::SetSpecialProcesses() {
             pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
             pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
             }
+        decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
+        std::cerr << "Decay " << decay << std::endl;
+        decay = processTable->FindProcess("DecayWithSpin",G4MuonPlus::MuonPlus());
+        std::cerr << "DecayWithSpin " << decay << std::endl;
+
+        decay = processTable->FindProcess("Garbage",G4MuonPlus::MuonPlus());
+        std::cerr << "Garbage " << decay << std::endl;
    
         decay = processTable->FindProcess("Decay",G4MuonMinus::MuonMinus());
    
@@ -312,6 +323,9 @@ void MAUSPhysicsList::SetSpecialProcesses() {
                 pmanager ->SetProcessOrdering(poldecay, idxPostStep);
                 pmanager ->SetProcessOrdering(poldecay, idxAtRest);
             }
+    for(int j=0; j<p->size() ; j++){
+            std::cout<<(*p)[j]->GetProcessName()<<std::endl;
+        }
     }
 
   }
