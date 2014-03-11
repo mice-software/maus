@@ -55,16 +55,16 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         spill.SetRunNumber(10)
         data.SetSpill(spill)
         for num in range( 1, 11 ) : # Add 10 spills
-          spill.SetSpillNumber(num)
-          tree.Fill()
+            spill.SetSpillNumber(num)
+            tree.Fill()
         spill.SetRunNumber(11)
         for num in range( 1, 3 ) : # Add 2 spills
-          spill.SetSpillNumber(num)
-          tree.Fill()
+            spill.SetSpillNumber(num)
+            tree.Fill()
         spill.SetRunNumber(12)
         for num in range( 1, 3 ) : # Add 2 spills
-          spill.SetSpillNumber(num)
-          tree.Fill()
+            spill.SetSpillNumber(num)
+            tree.Fill()
         tree.Write()
 
         job_header_data = ROOT.MAUS.JobHeaderData() # pylint: disable = E1101
@@ -318,8 +318,14 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
 
 
     def test_read_selected_spills( self ) :
+        """
+          Tests the functionality to select individual spills from a data file.
+          Selection is performed by using an array of spill numbers passed via
+          the configuration file.
+        """
         inputter = InputCppRoot.InputCppRoot()
-        inputter.birth(json.dumps( { "input_root_file_name":self.fname, "selected_spills":[2, 5, 8] } ))
+        inputter.birth(json.dumps( { "input_root_file_name":self.fname, \
+                                                "selected_spills":[2, 5, 8] } ))
         self.assertTrue(inputter.useSelectedSpills())
         # job header
         self.__test_event(inputter, {"maus_event_type":"JobHeader",

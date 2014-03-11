@@ -66,25 +66,25 @@ void InputCppRoot::_birth(const std::string& json_datacards) {
   _infile = new irstream(_filename.c_str(), "Spill");
   _infile_tree = "Spill";
 
-  if ( json_dc.isMember( "selected_spills" ) ) {
-    Json::Value spill_list = JsonWrapper::GetProperty( json_dc,
-                  "selected_spills", JsonWrapper::arrayValue );
-    if ( ! spill_list.isArray() ) {
+  if (json_dc.isMember("selected_spills")) {
+    Json::Value spill_list = JsonWrapper::GetProperty(json_dc,
+                  "selected_spills", JsonWrapper::arrayValue);
+    if (!spill_list.isArray()) {
       _select_spills = false;
-      Squeak::mout( Squeak::warning ) << "Expected array of spill numbers"
+      Squeak::mout(Squeak::warning) << "Expected array of spill numbers"
         << " for \"selected_spills\" data card.\n"
         << "Assuming None Supplied" << std::endl;
     } else {
-      for ( unsigned int i = 0; i < spill_list.size(); ++i )
-        _selected_spill_numbers.insert( JsonWrapper::GetItem( spill_list, i,
-                                              JsonWrapper::intValue ).asInt() );
-      if ( _selected_spill_numbers.size() == 0 ) {
+      for (unsigned int i = 0; i < spill_list.size(); ++i)
+        _selected_spill_numbers.insert(JsonWrapper::GetItem(spill_list, i,
+                                              JsonWrapper::intValue).asInt());
+      if (_selected_spill_numbers.size() == 0) {
         _select_spills = false;
-        Squeak::mout( Squeak::info ) << "Loading all spills from data file"
+        Squeak::mout(Squeak::info) << "Loading all spills from data file"
           << std::endl;
       } else {
         _select_spills = true;
-        Squeak::mout( Squeak::info ) << "Found " << _selected_spill_numbers.size()
+        Squeak::mout(Squeak::info) << "Found " << _selected_spill_numbers.size()
           << " spills in the \"selected_spills\" data card." << std::endl;
       }
     }
@@ -116,14 +116,17 @@ std::string InputCppRoot::_emitter_cpp() {
         switch (_event_type) {
             case _job_header_tp:
                 isUseful = load_event<JobHeaderData>(std::string("job_header"), JHData);
-                if ( isUseful ) event = convert_data<CppJsonJobHeaderConverter, JobHeaderData>(JHData);
+                if (isUseful) event = convert_data<CppJsonJobHeaderConverter,
+                                                                            JobHeaderData>(JHData);
             break;
 
             case _run_header_tp:
                 isUseful = load_event<RunHeaderData>(std::string("run_header"), RHData);
-                if ( isUseful ) {
-                    if (RHData.GetRunHeader()->GetRunNumber() != _current_run_number[_event_type]) {
-                        cache_event(_event_type, convert_data<CppJsonRunHeaderConverter, RunHeaderData>(RHData));
+                if (isUseful) {
+                    if (RHData.GetRunHeader()->GetRunNumber() !=
+                                                                _current_run_number[_event_type]) {
+                        cache_event(_event_type, convert_data<CppJsonRunHeaderConverter,
+                                                                           RunHeaderData>(RHData));
                         _current_run_number[_event_type] = RHData.GetRunHeader()->GetRunNumber();
                         isUseful = false;
                     } else {
@@ -136,12 +139,15 @@ std::string InputCppRoot::_emitter_cpp() {
                 do {
                     isUseful  = load_event<Data>(std::string("data"), spillData);
 
-                    if ( isUseful ) {
-                        if ( ! is_selected_spill(spillData.GetEvent()->GetSpillNumber()) ) {
+                    if (isUseful) {
+                        if (!is_selected_spill(spillData.GetEvent()->GetSpillNumber())) {
                             isUseful = false;
-                        } else if (spillData.GetEvent()->GetRunNumber() != _current_run_number[_event_type]) {
-                            cache_event(_event_type, convert_data<CppJsonSpillConverter, Data>(spillData));
-                            _current_run_number[_event_type] = spillData.GetEvent()->GetRunNumber();
+                        } else if (spillData.GetEvent()->GetRunNumber() !=
+                                                                _current_run_number[_event_type]) {
+                            cache_event(_event_type, convert_data<CppJsonSpillConverter,
+                                                                                 Data>(spillData));
+                            _current_run_number[_event_type] =
+                                                              spillData.GetEvent()->GetRunNumber();
                             isUseful = false;
                             break;
                         } else {
@@ -150,14 +156,16 @@ std::string InputCppRoot::_emitter_cpp() {
                     } else {
                         break;
                     }
-                } while ( ! isUseful );
+                } while (!isUseful);
                 break;
 
             case _run_footer_tp:
                 isUseful = load_event<RunFooterData>(std::string("run_footer"), RFData);
-                if ( isUseful ) {
-                    if (RFData.GetRunFooter()->GetRunNumber() != _current_run_number[_event_type]) {
-                        cache_event(_event_type, convert_data<CppJsonRunFooterConverter, RunFooterData>(RFData));
+                if (isUseful) {
+                    if (RFData.GetRunFooter()->GetRunNumber() !=
+                                                                _current_run_number[_event_type]) {
+                        cache_event(_event_type, convert_data<CppJsonRunFooterConverter,
+                                                                           RunFooterData>(RFData));
                         _current_run_number[_event_type] = RFData.GetRunFooter()->GetRunNumber();
                         isUseful = false;
                     } else {
@@ -168,14 +176,15 @@ std::string InputCppRoot::_emitter_cpp() {
 
             case _job_footer_tp:
                 isUseful = load_event<JobFooterData>(std::string("job_footer"), JFData);
-                if ( isUseful ) event = convert_data<CppJsonJobFooterConverter, JobFooterData>(JFData);
+                if (isUseful) event = convert_data<CppJsonJobFooterConverter,
+                                                                            JobFooterData>(JFData);
                 break;
 
             default:
                 isUseful = false;
                 break;
         }
-        if ( !isUseful ) {
+        if (!isUseful) {
             // event number changed or we ran out of events of this type
             // advance event and recursively call emitter_cpp
             return advance_event_type();
@@ -196,7 +205,7 @@ bool InputCppRoot::load_event(std::string branch_name, DataT& data) {
         Exception::recoverable,
         "InputCppRoot was not initialised properly",
         "InputCppRoot::load_event"
-      ));
+     ));
     }
     if (_current_event_number.find(branch_name) == _current_event_number.end())
         _current_event_number[branch_name] = 0;
@@ -217,8 +226,8 @@ bool InputCppRoot::load_event(std::string branch_name, DataT& data) {
 }
 
 template <class ConverterT, class DataT>
-std::string InputCppRoot::convert_data( DataT& data ) {
-    std::string event( "" );
+std::string InputCppRoot::convert_data(DataT& data) {
+    std::string event("");
     Json::Value* value = ConverterT()(&data);
     if (value == NULL)
         return event;
@@ -252,12 +261,12 @@ void InputCppRoot::cache_event(event_type type, std::string event) {
 }
 
 
-bool InputCppRoot::is_selected_spill( int spillNum ) const {
-  if ( ! _select_spills ) return true;
+bool InputCppRoot::is_selected_spill(int spillNum) const {
+  if (!_select_spills) return true;
 
-  if ( _selected_spill_numbers.find( spillNum ) ==
-     _selected_spill_numbers.end() ) {
-    Squeak::mout( Squeak::info ) << "Skipping Spill " << spillNum << std::endl;
+  if (_selected_spill_numbers.find(spillNum) ==
+     _selected_spill_numbers.end()) {
+    Squeak::mout(Squeak::info) << "Skipping Spill " << spillNum << std::endl;
     return false;
   }
   return true;

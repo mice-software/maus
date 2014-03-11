@@ -112,7 +112,7 @@ class InputCppRoot : public InputBase<std::string> {
     bool load_event(std::string branch_name, DataT&);
 
     template <class ConverterT, class DataT>
-    std::string convert_data( DataT& );
+    std::string convert_data(DataT&);
 
     /** Move to the next event type and return the event */
     std::string advance_event_type();
@@ -149,7 +149,7 @@ class InputCppRoot : public InputBase<std::string> {
      *  This is a help function to see if the set of loaded spill numbers
      *  contains the spill \"spillNum\".
      */
-    bool is_selected_spill( int ) const;
+    bool is_selected_spill(int spillNum) const;
 
     /** _irstream holds root TFile.
      */
