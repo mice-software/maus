@@ -7,9 +7,9 @@ Module KLModule3Cell10
   Dimensions 932 44 40 mm
   PropertyInt Cell 10
   PropertyInt numPMTs 2
-  PropertyDouble BlueColour 0.5
-  PropertyDouble RedColour 0.5
-  PropertyDouble GreenColour 0.5
+  PropertyHep3Vector Pmt1Pos -700 0.0 0.0 mm
+  PropertyHep3Vector Pmt2Pos 700 0.0 0.0 mm
+  PropertyDouble RedColour 1
   PropertyString Material Pb
   Module KL/KLGlue.dat
   {

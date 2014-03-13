@@ -68,16 +68,16 @@ class TRefTrackPair : public std::pair<TRef, TRef> {
   MAUS::DataStructure::Global::Track* GetParent() const;
 
   /// Setter for first element, for TRefTrackPairProcessor
-  void set_first(TRef first);
+  void set_first(TObject* first);
 
   /// Getter for first element, for TRefTrackPairProcessor
-  TRef get_first() const;
+  TObject* get_first() const;
 
   /// Setter for second element, for TRefTrackPairProcessor
-  void set_second(TRef second);
+  void set_second(TObject* second);
 
   /// Getter for second element, for TRefTrackPairProcessor
-  TRef get_second() const;
+  TObject* get_second() const;
 
   MAUS_VERSIONED_CLASS_DEF(TRefTrackPair);
 };

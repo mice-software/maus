@@ -22,6 +22,7 @@ MCEventProcessor::MCEventProcessor()
     : _sci_fi_hit_proc(new SciFiHitProcessor()),
       _sci_fi_noise_hit_proc(new SciFiNoiseHitProcessor()),
       _tof_hit_proc(new TOFHitProcessor()),
+      _kl_hit_proc(new KLHitProcessor()),
       _special_virtual_hit_proc(new SpecialVirtualHitProcessor()),
       _track_proc(new TrackProcessor()),
       _virtual_hit_proc(new VirtualHitProcessor()) {
@@ -37,6 +38,9 @@ MCEventProcessor::MCEventProcessor()
     RegisterPointerBranch
         ("tof_hits", &_tof_hit_proc, &MCEvent::GetTOFHits,
                                      &MCEvent::SetTOFHits, false);
+    RegisterPointerBranch
+        ("kl_hits", &_kl_hit_proc, &MCEvent::GetKLHits,
+                                     &MCEvent::SetKLHits, false);
     RegisterPointerBranch("special_virtual_hits", &_special_virtual_hit_proc,
                           &MCEvent::GetSpecialVirtualHits,
                           &MCEvent::SetSpecialVirtualHits, false);

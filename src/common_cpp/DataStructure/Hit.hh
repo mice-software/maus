@@ -24,6 +24,7 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 #include "src/common_cpp/DataStructure/TOFChannelId.hh"
+#include "src/common_cpp/DataStructure/KLChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiChannelId.hh"
 
 namespace MAUS {
@@ -153,6 +154,7 @@ class Hit {
 typedef Hit<SciFiChannelId> SciFiHit;
 typedef std::vector<SciFiHit*> SciFiHitPArray;
 typedef Hit<TOFChannelId> TOFHit;
+typedef Hit<KLChannelId> KLHit;
 typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
 }
 

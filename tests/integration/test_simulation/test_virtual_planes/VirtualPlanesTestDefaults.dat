@@ -9,6 +9,18 @@ Configuration VirtualPlanesTest
     PropertyString SensitiveDetector Virtual
     PropertyHep3Vector Position 0.0 0.0 100. mm
   }
+  MiceModule VirtualTest_Default
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 200. mm
+  }
+  MiceModule VirtualTest_Default
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 300. mm
+  }
 }
 
 
