@@ -40,7 +40,6 @@ KLFiber::KLFiber(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
 {
   G4double zStart, zStep, z, yStart, yStep, y;
 
-//   G4double cellX = mod->dimensions().x();
   G4double cellY = mod->dimensions().y();
   G4double cellZ = mod->dimensions().z();
   G4double fiberRad = 0.5*mod->propertyDouble( "FibreDiameter" );
@@ -57,10 +56,10 @@ KLFiber::KLFiber(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
   if (fiberRad > 0) { // We can disable fibers by giving negative radius
 
     // Individial fiber
-    fSolidFiber = new G4Tubs("sFiberCAL", 0.0, fiberRad,
+    fSolidFiber = new G4Tubs("sFiberKL", 0.0, fiberRad,
                               0.5*fiberLength ,0.0,2*pi) ;
-    fLogicFiber = new G4LogicalVolume(fSolidFiber, mater, "lFiberCAL");
-    
+    fLogicFiber = new G4LogicalVolume(fSolidFiber, mater, "lFiberKL");
+
     G4AssemblyVolume* assemblyCell = new G4AssemblyVolume();
     assemblyCell->AddPlacedVolume( fLogicFiber, nullVect, &rm90 );
 
@@ -73,7 +72,7 @@ KLFiber::KLFiber(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
     zStart = -0.5*cellZ+zStep; // boundaries are glue filled holes
     yStart = -0.5*cellY+0.5*yStep;
     int layer = 0;
-  //   int nbrFibers = 0;
+    int nbrFibers = 0;
     z = zStart;
 
     while(z<=fabs(zStart)){
@@ -81,26 +80,23 @@ KLFiber::KLFiber(MiceModule* mod, G4Material* mater, G4VPhysicalVolume *mlv )
       while(y<=fabs(yStart)){
         G4ThreeVector Tm( 0,y,z);
         assemblyCell->MakeImprint( mlv->GetLogicalVolume(), Tm, &rm0, cellNr );
-  //       nbrFibers++;
+        nbrFibers++;
         y += yStep;
-      }
+	}
       if ( (cellNr%10 !=0) && (layer%2 != 0)) {
         // add one extra row at the bottom (not copied over by next cell)
         y = yStart-0.5*yStep;
         G4ThreeVector Tm( 0,y,z);
         assemblyCell->MakeImprint( mlv->GetLogicalVolume(), Tm, &rm0, cellNr );
+        nbrFibers++;
       }
       layer++;
-      z += zStep;
-    }
-  //   G4cout << "Fibers per EMCal cell = " << nbrFibers << G4endl;
+      z += zStep;    
+
+}
   }
 
-//     G4VisAttributes* visAttSciFi =
-//                       new G4VisAttributes(true, G4Colour(0.87,0.87,0.45));
     G4VisAttributes* visAttInv = new G4VisAttributes(false);
     if (fLogicFiber) fLogicFiber ->SetVisAttributes(visAttInv);
-//     if (fLogicFiber) fLogicFiber->SetVisAttributes(visAttSciFi);
-
 }
 

@@ -48,7 +48,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         sleep 1
         cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
-
         echo
         echo "INFO: Running make:"
         echo
@@ -66,6 +65,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
                 ################################################## 
         if [ $? == 0 ]
         then
+            cp -r ${MAUS_ROOT_DIR}/third_party/source/${directory}/examples ${MAUS_ROOT_DIR}/third_party/build/${directory}/examples
+            # copy examples and original source files to the build directory before destroying source
+            cd ${MAUS_ROOT_DIR}/third_party/source/${directory} 
+            for d in `find . -name src`; do \cp -fr $d /home/durga/maus-merge/third_party/build/geant4.9.6.p02/$d >& /dev/null; done
             rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory_old}
             rm -Rf ${MAUS_ROOT_DIR}/third_party/source/${directory}
             echo

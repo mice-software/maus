@@ -70,23 +70,23 @@ MAUS::DataStructure::Global::Track* TRefTrackPair::GetParent() const {
 }
 
 // Setter for first element, for TRefTrackPairProcessor
-void TRefTrackPair::set_first(TRef first) {
+void TRefTrackPair::set_first(TObject* first) {
   this->first = first;
 }
 
 // Getter for first element, for TRefTrackPairProcessor
-TRef TRefTrackPair::get_first() const {
-  return this->first;
+TObject* TRefTrackPair::get_first() const {
+  return this->first.GetObject();
 }
 
 // Setter for second element, for TRefTrackPairProcessor
-void TRefTrackPair::set_second(TRef second) {
+void TRefTrackPair::set_second(TObject* second) {
   this->second = second;
 }
 
 // Getter for second element, for TRefTrackPairProcessor
-TRef TRefTrackPair::get_second() const {
-  return this->second;
+TObject* TRefTrackPair::get_second() const {
+  return this->second.GetObject();
 }
 } // ~namespace Global
 } // ~namespace DataStructure
