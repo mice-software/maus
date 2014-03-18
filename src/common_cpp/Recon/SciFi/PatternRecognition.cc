@@ -215,8 +215,6 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
                                       SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if ( _verb > 0 ) std::cout << "Making 4 point tracks" << std::endl;
-
   int n_points = 4;
 
   // Count how many stations have at least one *unused* spacepoint
@@ -225,7 +223,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( _verb > 0 ) std::cout << "4pt track: 5 stations with unused spacepoints" << std::endl;
+    if ( _verb > 0 ) std::cout << "Making 4 point track: 5 stations with unused spacepoints\n";
 
     for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
       // Recount how many stations have at least one unused spacepoint
@@ -245,7 +243,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
     } // ~Loop of stations, ignoring each one in turn
   } else if ( num_stations_hit == 4 ) {
 
-    if ( _verb > 0 ) std::cout << "4pt track: 4 stations with unused spacepoints" << std::endl;
+    if ( _verb > 0 ) std::cout << "Making 4 point track: 4 stations with unused spacepoints\n";
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -261,22 +259,20 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
       }
     } else {
       if ( _verb > 0 )
-        std::cerr << "Wrong number of stations without spacepoints aborting 4 pt track.\n";
+        std::cerr << "Wrong number of stations without spacepoints aborting 4 pt track\n";
     }
   } else if ( num_stations_hit < 4 ) {
     if ( _verb > 0 )
-      std::cout << "Not enough unused spacepoints, quiting 4 point track." << std::endl;
+      std::cout << "Not enough unused spacepoints, quiting 4 point track\n";
   } else if ( num_stations_hit > 6 ) {
     if ( _verb > 0 )
-      std::cerr << "Wrong number of stations with spacepoints, aborting 4 pt track.\n";
+      std::cerr << "Wrong number of stations with spacepoints, aborting 4 pt track\n";
   }
-  if ( _verb > 0 ) std::cout << "Finished making 4 pt tracks" << std::endl;
+  if ( _verb > 0 ) std::cout << "Finished making 4 point tracks\n";
 } // ~make_straight_4tracks(...)
 
 void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks) {
-  if ( _verb > 0 ) std::cout << "Making 3 point track" << std::endl;
-
   int n_points = 3;
 
   // Count how many stations have at least one *unused* spacepoint
@@ -287,7 +283,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( _verb > 0 ) std::cout << "3pt track: 5 stations with unused spacepoints" << std::endl;
+    if ( _verb > 0 ) std::cout << "Making 3 pointt track: 5 stations with unused spacepoints\n";
 
     for (int i = 0; i < 4; ++i) { // Loop of first station to ignore
       if ( sufficient_hit_stations ) {
@@ -310,7 +306,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
     } // ~Loop of first station to ignore
   } else if ( num_stations_hit == 4 ) {
 
-    if ( _verb > 0 ) std::cout << "3pt track: 4 stations with unused spacepoints" << std::endl;
+    if ( _verb > 0 ) std::cout << "Making 3 point track: 4 stations with unused spacepoints\n";
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -337,7 +333,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
     }
   } else if ( num_stations_hit == 3 ) {
 
-    if ( _verb > 0 ) std::cout << "3pt track: 3 stations with unused spacepoints" << std::endl;
+    if ( _verb > 0 ) std::cout << "Making 3 point track: 3 stations with unused spacepoints\n";
 
     // Find out which station has no unused hits (1st entry in stations_not_hit vector)
     std::vector<int> stations_hit, stations_not_hit;
@@ -354,12 +350,12 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
     }
   } else if ( num_stations_hit < 3 ) {
     if ( _verb > 0 )
-      std::cout << "Not enough unused spacepoints, quiting 3 point track." << std::endl;
+      std::cout << "Not enough unused spacepoints, quiting 3 point track\n";
   } else if ( num_stations_hit > 6 ) {
     if ( _verb > 0 )
-      std::cerr << "Wrong number of stations with spacepoints, aborting 3 pt track." << std::endl;
+      std::cerr << "Wrong number of stations with spacepoints, aborting 3 pt track\n";
   }
-  if ( _verb > 0 ) std::cout << "Finished making 3 pt tracks" << std::endl;
+  if ( _verb > 0 ) std::cout << "Finished making 3 pt tracks\n";
 } // ~make_straight_3tracks(...)
 
 void PatternRecognition::make_straight_tracks(const int n_points, const int trker_no,
@@ -501,7 +497,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     std::vector<SciFiSpacePoint*> &current_spnts,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if (_verb > 0) std::cout << "make_helix: no. of current spnts: " << current_spnts.size() << "\n";
+  // if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
 
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
@@ -525,14 +521,14 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
     // If the current sp is used, skip it
     if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
-      if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipping\n";
+      // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
       continue;
     }
 
     // Add the current spnt to the list being tried at present
-    if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding... ";
+    // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
     current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
-    if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
+    // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
 
     // If we are on the last station, attempt to form a track using the spacepoints collected
     if (stat_num == stat_num_max) {
@@ -566,6 +562,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
 SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                     std::vector<SciFiSpacePoint*> spnts ) {
+  // SciFiTools::print_spacepoint_xyz(spnts);
 
   // Perform a circle fit now that we have found a set of spacepoints
   SimpleCircle c_trial;
@@ -650,15 +647,30 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   // Using the circle radius and the true_dphi, calc the s_i (distance in x-y between sp)
   std::vector<double> s_i = SciFiTools::phi_to_s(circle.get_R(), true_phi_i);
 
+  if ( _verb > 0 ) {
+    for (size_t i = 0; i < s_i.size(); ++i) {
+      std::cout << "(" << z_i[i] << ", " << s_i[i] << ")  ";
+    }
+    std::cout << std::endl;
+  }
+
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
   LeastSquaresFitter::linear_fit(z_i, s_i, phi_err, line_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
-    if ( _verb > 0 ) std::cerr << "Failed s-z cut, chisq = " << line_sz.get_chisq() << std::endl;
+    if ( _verb > 0 ) {
+      std::cerr << "Failed s-z cut, ds/dz = " << line_sz.get_m() << ", ";
+      std::cerr << "intercept = " << line_sz.get_c() << ", ";
+      std::cerr << "chisq = " << line_sz.get_chisq() << std::endl;
+    }
     return false;
   } else {
-    if ( _verb > 0 ) std::cerr << "Passed s-z cut, ds/dz is " << line_sz.get_m() << "\n";
+    if ( _verb > 0 ) {
+      std::cerr << "Passed s-z cut, ds/dz is " << line_sz.get_m() << ", ";
+      std::cerr << "intercept = " << line_sz.get_c() << ", ";
+      std::cerr << "chisq = " << line_sz.get_chisq() << std::endl;
+    }
     return true;
   }
 }
@@ -714,8 +726,8 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       // If a sufficiently small residual is produced, accept current n as correct, for this angle
       double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
-      // std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j]
-      //          << "\t" << remainder << "\t" << residual << std::endl;
+      std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j]
+                << "\t" << remainder << "\t" << residual << std::endl;
       if ( fabs(residual) > _n_turns_cut ) pass = false;
     }
 
@@ -723,6 +735,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     if (pass) {
       found = true;
       true_n = n_values[i];
+      if ( _verb > 0 ) std::cout << "Found n = " << true_n << std::endl;
       break;
     }
   } // ~Loop over n_values
@@ -736,7 +749,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     }
     // std::cout << "Found particle track with charge " << charge << std::endl;
 
-    // Transfor dphi to phi
+    // Transform dphi to phi
     for (size_t i = 0; i < close_dphi.size(); ++i) {
       close_phi[i] = close_dphi[i] + phi[0];
     }
