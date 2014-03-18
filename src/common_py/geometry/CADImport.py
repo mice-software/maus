@@ -251,7 +251,8 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'DiameterOfPmt[mm]'\
                            or elemtype == 'DiameterOfGate[mm]'\
                            or elemtype == 'XoffsetOfPmt[mm]'\
-                           or elemtype == 'ZoffsetOfPmt[mm]':
+                           or elemtype == 'ZoffsetOfPmt[mm]'\
+                           or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
                     if elemtype == 'ActiveRadius' \
@@ -263,7 +264,12 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'FibreLength' \
                            or elemtype == 'FibreSpacingY'\
                            or elemtype == 'FibreSpacingZ'\
-                           or elemtype == 'OpticsMaterialLength':
+                           or elemtype == 'OpticsMaterialLength'\
+                           or elemtype == 'BarWidth'\
+                           or elemtype == 'Barheight'\
+                           or elemtype == 'BarLength'\
+                           or elemtype == 'HoleRad'\
+                           or elemtype == 'FiberCladdingExtRadius':
                         result.append('PropertyDouble '+elemtype+' '\
                                       +value+' '+unit+'\n')
                     # Extract integer elements
@@ -285,7 +291,8 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
-                             or elemtype == 'UseDaughtersInOptics':
+                             or elemtype == 'UseDaughtersInOptics'\
+                             or elemtype == 'AddWLSFiber':
                         result.append('PropertyBool '+elemtype+' '\
                                       +value+"\n")
                     # Extract selected vector typed elements
