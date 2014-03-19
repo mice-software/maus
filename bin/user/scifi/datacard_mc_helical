@@ -80,10 +80,3 @@ SciFiPRStraightOn = False
 SciFiKalmanOn = True
 SciFiPatRecVerbosity = 1
 
-#------------------------------------------
-# Geometry download
-#------------------------------------------
-geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use the currently valid geometry or 'id' to use the cdb internal id
-geometry_download_run_number = 0
-geometry_download_id = 0
-geometry_download_cleanup = True # set to True to clean up after download

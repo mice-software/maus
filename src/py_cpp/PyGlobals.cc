@@ -91,7 +91,7 @@ PyObject* Birth(PyObject *dummy, PyObject *args) {
   const char* temp = NULL;
   if (!PyArg_ParseTuple(args, "s", &temp)) {
     PyErr_SetString(PyExc_TypeError,
-         "Failed to recognise arghas_instanceuments to Globals.birth as a string");
+         "Failed to recognise arguments to Globals.birth as a string");
     return NULL;
   }
   std::string cards(temp);

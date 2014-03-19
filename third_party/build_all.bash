@@ -61,10 +61,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/50cloc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/72maus-apps.bash
 
-    # This will fail if we don't have appropriate DATE install
-    # Comment for now
-    #${MAUS_ROOT_DIR}/third_party/bash/61monitoring.bash
-
 else
 echo
 echo "FATAL: MAUS_ROOT_DIR is not set, which is required to" >&2

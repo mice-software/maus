@@ -43,6 +43,16 @@ TrackPoint::TrackPoint(const TrackPoint &track_point)
       _momentum_error(track_point.get_momentum_error()),
       _space_point(track_point.get_space_point()) {}
 
+// Trackpoint from spacepoint
+TrackPoint::TrackPoint(SpacePoint *space_point)
+    : BasePoint(*space_point),
+      _mapper_name(""),
+      _charge(space_point->get_charge()),
+      _momentum(0., 0., 0., 0.),
+      _momentum_error(0., 0., 0., 0.) {
+        _space_point = space_point;
+      }
+
 // Destructor
 TrackPoint::~TrackPoint() {}
 
@@ -128,12 +138,12 @@ TLorentzVector TrackPoint::get_momentum_error() const {
   return _momentum_error;
 }
 
-void TrackPoint::set_space_point_tref(TRef space_point) {
+void TrackPoint::set_space_point_tref(TObject* space_point) {
   _space_point = space_point;
 }
 
-TRef TrackPoint::get_space_point_tref() const {
-  return _space_point;
+TObject* TrackPoint::get_space_point_tref() const {
+  return _space_point.GetObject();
 }
 
 void TrackPoint::set_space_point(

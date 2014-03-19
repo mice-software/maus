@@ -68,6 +68,9 @@ class TrackPoint : public BasePoint {
   /// Copy constructor - any pointers are deep copied
   TrackPoint(const TrackPoint &track_point);
 
+  /// Trackpoint from spacepoint
+  explicit TrackPoint(SpacePoint *space_point);
+
   /// Destructor
   virtual ~TrackPoint();
 
@@ -120,11 +123,11 @@ class TrackPoint : public BasePoint {
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  void set_space_point_tref(TRef space_point);
+  void set_space_point_tref(TObject *space_point);
 
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  TRef get_space_point_tref() const;
+  TObject* get_space_point_tref() const;
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
