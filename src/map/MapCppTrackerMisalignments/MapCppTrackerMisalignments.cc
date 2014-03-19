@@ -185,8 +185,16 @@ void MapCppTrackerMisalignments::initialize_PDFs() {
   std::vector<PDF> tracker1_y_PDFS;
   _y_shift_pdfs.push_back(tracker0_y_PDFS);
   _y_shift_pdfs.push_back(tracker1_y_PDFS);
+  _x_shift_pdfs.resize(2);
+  _x_shift_pdfs[0].resize(5);
+  _x_shift_pdfs[1].resize(5);
+
+  _y_shift_pdfs.resize(2);
+  _y_shift_pdfs[0].resize(5);
+  _y_shift_pdfs[1].resize(5);
+
   for ( int tracker = 0; tracker < 2; tracker++ ) {
-    for ( int station = 0; station < 6; station++ ) {
+    for ( int station = 0; station < 5; station++ ) {
       std::string pname_x("x_station_");
       std::string pname_y("y_station_");
       std::ostringstream station_n;
@@ -198,15 +206,15 @@ void MapCppTrackerMisalignments::initialize_PDFs() {
 
       PDF *_probability_x = new PDF(pname_x, bin_width, shift_min, shift_max);
       PDF *_probability_y = new PDF(pname_y, bin_width, shift_min, shift_max);
-      _x_shift_pdfs[tracker][station] = _probability_x;
-      _y_shift_pdfs[tracker][station] = _probability_y;
+      //_x_shift_pdfs[tracker][station] = _probability_x;
+      //_y_shift_pdfs[tracker][station] = _probability_y;
     }
   }
-
+  /*
   try {
-    if (!Globals::HasInstance()) {
-      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
+    // if (!Globals::HasInstance()) {
+    //  GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    // }
     // Json::Value *json = Globals::GetConfigurationCards();
     // _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
     return true;
@@ -216,6 +224,7 @@ void MapCppTrackerMisalignments::initialize_PDFs() {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
+  */
 }
 
 bool MapCppTrackerMisalignments::death() {
