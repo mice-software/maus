@@ -15,8 +15,8 @@ keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and every step point
 
 # Geometry used by simulation
-# simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
-simulation_geometry_filename = "Stage4.dat"
+simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
+# simulation_geometry_filename = "Stage4.dat"
 
 # Geant4 physics model
 maximum_number_of_steps = 1000
