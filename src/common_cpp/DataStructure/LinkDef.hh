@@ -95,6 +95,8 @@
 #pragma link C++ class MAUS::KLHit+;
 #pragma link C++ class MAUS::TOFChannelId+;
 #pragma link C++ class MAUS::KLChannelId+;
+#pragma link C++ class MAUS::EMRHit+;
+#pragma link C++ class MAUS::EMRChannelId+;
 #pragma link C++ class MAUS::SpecialVirtualHit+;
 #pragma link C++ class MAUS::SpecialVirtualChannelId+;
 
