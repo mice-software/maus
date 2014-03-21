@@ -67,9 +67,9 @@ bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
                  _SciFivlpcQE;
     // ______________________________________________
     return true;
-  } catch (Exception& exception) {
+  } catch(Exception& exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch (std::exception& exc) {
+  } catch(std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -116,9 +116,9 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
       add_noise(mc_evt->GetSciFiNoiseHits(), digits);
     }
     // Smearing NPE results from ADC resolution
-    //for (size_t digit_j = 0; digit_j < digits.size(); digit_j++ ) {
+    // for (size_t digit_j = 0; digit_j < digits.size(); digit_j++ ) {
     //  digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)->get_npe()));
-    //}
+    // }
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
@@ -151,7 +151,7 @@ void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch (...) {
+  } catch(...) {
     Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
@@ -226,7 +226,7 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
     *  added to the digit, else noise is added as a new digit.
     **************************************************************************/
 
-  std::map<int,int> digit_map;
+  std::map<int, int> digit_map;
   for (size_t digit_i = 0; digit_i < digits.size(); digit_i++) {
     int track_id = digits.at(digit_i)->get_tracker();
     int stat_id  = digits.at(digit_i)->get_station();
@@ -241,19 +241,19 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
     int plane_id = noises->at(noise_j).GetPlane();
     int chan_id  = noises->at(noise_j).GetChannel();
     int key = chan_id + 1000*plane_id + 10000*stat_id + 100000*track_id;
-    
+
     if (digit_map.find(key) != digit_map.end()) {
       double digit_npe = digits.at(digit_map[key])->get_npe();
       double noise_npe = noises->at(noise_j).GetNPE();
       digits.at(digit_map[key])->set_npe(digit_npe + noise_npe);
     } else {
-      SciFiDigit* a_digit = new SciFiDigit(noises->at(noise_j).GetSpill(), 
+      SciFiDigit* a_digit = new SciFiDigit(noises->at(noise_j).GetSpill(),
                                            noises->at(noise_j).GetEvent(),
-                                           noises->at(noise_j).GetTracker(), 
+                                           noises->at(noise_j).GetTracker(),
                                            noises->at(noise_j).GetStation(),
-                                           noises->at(noise_j).GetPlane(), 
+                                           noises->at(noise_j).GetPlane(),
                                            noises->at(noise_j).GetChannel(),
-                                           noises->at(noise_j).GetNPE(), 
+                                           noises->at(noise_j).GetNPE(),
                                            noises->at(noise_j).GetTime());
       digits.push_back(a_digit);
     }
