@@ -15,7 +15,7 @@
 #
 
 """Tests for ReduceCppGlobalPID"""
-# pylint: disable = C0103,E1101
+# pylint: disable = C0103,E1101,W0611
 import os
 import json
 import unittest
