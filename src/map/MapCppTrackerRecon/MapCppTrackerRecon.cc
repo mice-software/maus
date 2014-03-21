@@ -70,6 +70,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
   // Read in json data
   read_in_json(document);
   Spill& spill = *_spill_cpp;
+  std::cout << "Spill: " << _spill_cpp->GetSpillNumber() << "\t";
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
@@ -93,7 +94,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
-        print_event_info(*event);
+        // print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";
@@ -158,7 +159,6 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 
 void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
   PatternRecognition pr1; // Pat rec constructor calls Globals again
-  pr1.set_verbosity(0);
   // We let the Map's helical and straight flags overide the interal pat rec variables for these,
   // (pulled by pat rec from Globals) as this way we can customise which type runs for
   // testing purposes.

@@ -41,8 +41,8 @@ namespace ObjectProcessorNS {
 template <class ParentType>
 class PointerTRefItem : public BaseItem<ParentType> {
  public:
-  typedef void (ParentType::*SetMethod)(TRef);
-  typedef TRef (ParentType::*GetMethod)() const;
+  typedef void (ParentType::*SetMethod)(TObject* _tobj);
+  typedef TObject* (ParentType::*GetMethod)() const;
 
   /** Constructor
    *
