@@ -14,6 +14,7 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <map>
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
@@ -110,10 +111,14 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
     if ( mc_evt->GetSciFiHits() ) {
       construct_digits(mc_evt->GetSciFiHits(), spill.GetSpillNumber(), event_i, digits);
     }
+    // Adding in effects from noise in VLPC
     if ( mc_evt->GetSciFiNoiseHits() ) {
       add_noise(mc_evt->GetSciFiNoiseHits(), digits);
     }
-
+    // Smearing NPE results from ADC resolution
+    //for (size_t digit_j = 0; digit_j < digits.size(); digit_j++ ) {
+    //  digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)->get_npe()));
+    //}
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
@@ -218,58 +223,39 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
     /**************************************************************************
     *  Function checks which channel has noise against which channel has a
     *  digit.  If noise is in the same channel as a digit then the noise is 
-    *  added to the digit.  If the noise is removed from the digit by one 
-    *  channel, then a new digit is created.
-    *  Regardless, if noise is over the NPE cut off, 2 NPE, then a new digit
-    *  is created.
+    *  added to the digit, else noise is added as a new digit.
     **************************************************************************/
 
-  SciFiLookup lookup;
-
-  for (unsigned int j = 0; j < noises->size(); j++) {
-    for (unsigned int i = 0; i < digits.size(); i++) {
-
-      // Checks if noise is in the same channel as a digit
-      if (digits[i]->get_tracker() == noises->at(j).GetTracker() &&
-          digits[i]->get_station() == noises->at(j).GetStation() &&
-          digits[i]->get_plane()   == noises->at(j).GetPlane()   &&
-          digits[i]->get_channel() == noises->at(j).GetChannel() &&
-          noises->at(j).GetUsed() == false) {
-        double digit_npe = digits[i]->get_npe();
-        double noise_npe = noises->at(j).GetNPE();
-        digits[i]->set_npe(digit_npe + noise_npe);
-        noises->at(j).SetUsed(true);
-        noises->at(j).SetID(static_cast<double>(lookup.get_digit_id(digits[i])));
-        continue;
-
-        // Checks if noise is one channel removed from a digit
-      } else if (digits[i]->get_tracker() == noises->at(j).GetTracker() &&
-                 digits[i]->get_station() == noises->at(j).GetStation() &&
-                 digits[i]->get_plane()   == noises->at(j).GetPlane()   &&
-                 abs(digits[i]->get_channel() - noises->at(j).GetChannel()) <= 1.0 &&
-                 noises->at(j).GetUsed() == false) {
-        SciFiNoiseHit a_noise = noises->at(j);
-        SciFiDigit* a_digit = new SciFiDigit(a_noise.GetSpill(), a_noise.GetEvent(),
-                           a_noise.GetTracker(), a_noise.GetStation(), a_noise.GetPlane(),
-                           a_noise.GetChannel(), a_noise.GetNPE(), a_noise.GetTime());
-        digits.push_back(a_digit);
-        noises->at(j).SetUsed(true);
-        noises->at(j).SetID(static_cast<double>(lookup.get_digit_id(a_digit)));
-        continue;
-      }
-    }
-
-    // Checks if noise is above NPE cutoff
-    if (noises->at(j).GetNPE() >= _SciFiNPECut &&
-        noises->at(j).GetUsed() == false) {
-      SciFiNoiseHit a_noise = noises->at(j);
-      SciFiDigit* a_digit = new SciFiDigit(a_noise.GetSpill(), a_noise.GetEvent(),
-                                           a_noise.GetTracker(), a_noise.GetStation(),
-                                           a_noise.GetPlane(), a_noise.GetChannel(),
-                                           a_noise.GetNPE(), a_noise.GetTime());
+  std::map<int,int> digit_map;
+  for (size_t digit_i = 0; digit_i < digits.size(); digit_i++) {
+    int track_id = digits.at(digit_i)->get_tracker();
+    int stat_id  = digits.at(digit_i)->get_station();
+    int plane_id = digits.at(digit_i)->get_plane();
+    int chan_id  = digits.at(digit_i)->get_channel();
+    int key = chan_id + 1000*plane_id + 10000*stat_id + 100000*track_id;
+    digit_map[key] = digit_i;
+  }
+  for (size_t noise_j = 0; noise_j < noises->size(); noise_j++) {
+    int track_id = noises->at(noise_j).GetTracker();
+    int stat_id  = noises->at(noise_j).GetStation();
+    int plane_id = noises->at(noise_j).GetPlane();
+    int chan_id  = noises->at(noise_j).GetChannel();
+    int key = chan_id + 1000*plane_id + 10000*stat_id + 100000*track_id;
+    
+    if (digit_map.find(key) != digit_map.end()) {
+      double digit_npe = digits.at(digit_map[key])->get_npe();
+      double noise_npe = noises->at(noise_j).GetNPE();
+      digits.at(digit_map[key])->set_npe(digit_npe + noise_npe);
+    } else {
+      SciFiDigit* a_digit = new SciFiDigit(noises->at(noise_j).GetSpill(), 
+                                           noises->at(noise_j).GetEvent(),
+                                           noises->at(noise_j).GetTracker(), 
+                                           noises->at(noise_j).GetStation(),
+                                           noises->at(noise_j).GetPlane(), 
+                                           noises->at(noise_j).GetChannel(),
+                                           noises->at(noise_j).GetNPE(), 
+                                           noises->at(noise_j).GetTime());
       digits.push_back(a_digit);
-      noises->at(j).SetUsed(true);
-      noises->at(j).SetID(static_cast<double>(lookup.get_digit_id(a_digit)));
     }
   }
 }
