@@ -140,7 +140,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         #however for PIDVarA the behavior to spread one event over all bins
         #is turned on, so there should be as many entries as there are bins.
         self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        shutil.rmtree(PDFdirectory)
+        #shutil.rmtree(PDFdirectory)
+        os.system('rm -rf %s' % PDFdirectory)
     
 
     def test_no_data(self):
@@ -180,7 +181,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # however for PIDVarA the behavior to spread one event over all bins
         # is turned on, so there should be as many entries as there are bins.
         self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        shutil.rmtree(PDFdirectory)
+        #shutil.rmtree(PDFdirectory)
+        os.system('rm -rf %s' % PDFdirectory)
 
     def test_invalid_json_birth(self):
         """Check with an invalid json input"""
@@ -239,7 +241,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # however for PIDVarA the behavior to spread one event over all bins
         # is turned on, so there should be as many entries as there are bins.
         self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        shutil.rmtree(PDFdirectory)
+        #shutil.rmtree(PDFdirectory)
+        os.system('rm -rf %s' % PDFdirectory)
 
     def test_process(self):
         """Check ReduceCppGlobalPID process function"""
@@ -275,7 +278,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # N.B. for PIDVarA the behavior to spread one event over all bins is
         # on, so there should be as many additional entries as there are bins.
         self.assertEqual(hist.GetEntries(), (hist.GetSize() + 5))
-        shutil.rmtree(PDFdirectory)
+        #shutil.rmtree(PDFdirectory)
+        os.system('rm -rf %s' % PDFdirectory)
 
     def tearDown(self): #pylint: disable = C0103
         """Death is being checked in each test, so this is empty"""
