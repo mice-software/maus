@@ -252,6 +252,11 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'DiameterOfGate[mm]'\
                            or elemtype == 'XoffsetOfPmt[mm]'\
                            or elemtype == 'ZoffsetOfPmt[mm]'\
+                           or elemtype == 'TrapezoidWidthX1'\
+                           or elemtype == 'TrapezoidWidthX2'\
+                           or elemtype == 'TrapezoidHeightY1'\
+                           or elemtype == 'TrapezoidHeightY2'\
+                           or elemtype == 'TrapezoidLength'\
                            or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
