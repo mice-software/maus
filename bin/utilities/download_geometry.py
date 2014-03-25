@@ -30,7 +30,7 @@ from geometry.GDMLPacker import Unpacker
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
 
-def main():
+def main(): # pylint: disable = C0103
     """
     This is the code for the executable file which downloads the current valid
     geometry. It takes the arguments of the download directory. It will download

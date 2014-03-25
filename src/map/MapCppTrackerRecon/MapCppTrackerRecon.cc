@@ -93,7 +93,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
-        print_event_info(*event);
+        // print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";

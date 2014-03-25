@@ -152,7 +152,6 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = recon_event->GetGlobalEvent();
-      MAUS::recon::global::TrackMatching track_matching;
       global_event = Import(recon_event);
     }
 
