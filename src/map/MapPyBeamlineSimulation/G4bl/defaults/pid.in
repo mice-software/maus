@@ -1,0 +1,73 @@
+###
+### The MICE particleID elements
+###
+### APPROXIMATION: the Ckov1 mirror is approximated as 1 mm Al, not tilted
+virtualdetector TargetDet2 radius=100 length=1 material=Vacuum
+virtualdetector TOF0 height=480 width=480 length=50.8 color=1,1,1 format=ascii\
+	material=Scint.
+virtualdetector TOF1 height=480 width=480 length=50.8 color=1,1,1 format=ascii\
+	material=Scint.
+virtualdetector TOF2 height=480 width=480 length=50.8 color=1,1,1 \
+	material=Scint.
+box Ckov1Box width=450 height=450 length=2 material=Delrin color=1,1,1
+virtualdetector Ckov1Aerogel width=450 height=450 length=23  \
+                color=0,0,1 format=ascii
+box Ckov1Window width=450 height=450 length=3 material=Glass color=1,1,1
+box Ckov1Air width=450 height=450 length=351.1-2-23-3-3-2 material=Air color=I
+box Ckov1Mirror width=450 height=450 length=3 material=Lexan color=1,1,1
+group Cherenkov1a color=1,0,1
+	place Ckov1Box rename=Box
+	place Ckov1Aerogel material=Aerogel1 rename=Ckov1a
+	place Ckov1Window rename=Window
+	place Ckov1Air rename=Air
+	place Ckov1Mirror rename=Mirror
+	place Ckov1Box rename=Box
+endgroup
+group Cherenkov1b color=1,0,1
+	place Ckov1Box rename=Box
+	place Ckov1Aerogel material=Aerogel2 rename=Ckov1b
+	place Ckov1Window rename=Window
+	place Ckov1Air rename=Air
+	place Ckov1Mirror rename=Mirror
+	place Ckov1Box rename=Box
+endgroup
+material Calorim. density=3.7 Pb,0.85 Scint.,0.15
+virtualdetector Calorimeter width=1200 height=1200 length=160 \
+	   format=ascii material=Calorim. color=0,1,1 
+
+###
+### IC beam counters 
+###
+box CounterCover width=200 height=200 length=3 material=Delrin
+virtualdetector BeamCounter width=200 height=200 length=4 material=Scint.
+group Counter
+	place CounterCover
+	place BeamCounter rename=+
+	place CounterCover
+endgroup
+###
+### Geneva counters
+###
+box GenevaBeamCounter width=175 height=175 length=10 \
+                material=Scint. 
+
+###
+### Fermilab Monitors
+###
+box BeamMonitorCover        width=192 height=192 length=1.52   material=Delrin
+box BeamMonitorGap          width=192 height=192 length=99.0   material=Air
+### box BeamMonitorRohacell     width=192 height=192 length=2.54   
+virtualdetector BeamMonitor width=192 height=192 length=1.0    material=Scint.
+group Monitor
+	place BeamMonitorCover
+	place BeamMonitorGap
+	place BeamMonitor rename=+
+	place BeamMonitorGap
+	place BeamMonitorCover
+endgroup
+
+###
+### virtual plane
+###
+
+virtualdetector VirtualPlane width=400 height=400 length=0.1 material=Vacuum format=ascii
