@@ -86,7 +86,8 @@ div
 </body>
 </html>
     """
-    file1 = open('../index.html', 'w')
+    file1 = open(os.path.join(os.environ['MAUS_ROOT_DIR'], \
+                             'doc/' 'index.html'), 'w')
     file1.write(upper_html_snippet + root_segment + geant4_segment +
                 clhep_segment + jsoncpp_segment + lower_html_snippet)
     file1.close()
