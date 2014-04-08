@@ -1,0 +1,151 @@
+*	JAN08-Stage0.in  January 29, 2008; TJR
+#
+#	This file is intended to be included from the specific input file;
+#	this file does not define parameters that vary with beam momentum
+#	or emittance.
+#
+#	Command-line parameters (optional - default as follows):
+#		first=0 Protons=6900 viewer=none
+#
+
+# include default_values
+include $WRKDIR/defaults/default_values.in
+
+# HistoScope filename from first event #
+param histoFile=$first.root histoUpdate=1000000000 FIRST=$first
+
+physics QGSP_BIC doStochastics=$STOCHASTICS
+trackcuts keep=$keep kineticEnergyCut=5 maxTime=100000000
+if "($C 1)==+1"
+	particlecolor proton=1,0,0 pi+=0,1,0 mu+=0,0,1 plus=1,0,1 minus=1,1,0 \
+        	neutral=0,1,1 reference=1,1,1
+else
+	particlecolor proton=1,0,0 pi-=0,1,0 mu-=0,0,1 plus=1,0,1 minus=1,1,0 \
+        	neutral=0,1,1 reference=1,1,1
+endif
+
+# include Materials
+include $WRKDIR/defaults/materials.in
+
+# The MICE TargetBox -- assumed a cube, not actual size but correct along 
+# MICE beamline; assumed normal to MICE beam, not actual orientation, but
+# correct for the window; ignore rounded corners of window.
+# Window for MICE beam is 2 mm of SS304.
+include $WRKDIR/defaults/mice_tgt_box.in
+
+# The MICE magnets
+include $WRKDIR/defaults/magnets.in
+
+# The Beamline Vacuum Components
+include $WRKDIR/defaults/vacuum.in
+
+# The PID detectors
+include $WRKDIR/defaults/pid.in
+
+###
+### Lay out the beamline
+###
+
+# reference particle for tuning B1
+#reference referenceMomentum=$piMomentumRef particle=proton beamZ=0
+reference referenceMomentum=$piMomentumRef particle=pi$C beamZ=0
+#tune B1Field z0=3500 z1=9595 initial=$B1 step=0.01 maxIter=100 expr="Px1/Pz1" \
+	tolerance=0.000001
+
+###
+### beam - TargetModel for positives 
+### NOTE: set Protons to determine the # events, and particle params for content
+###
+param positives=1
+randomseed Now $random_seed
+include $WRKDIR/TargetModel/beam_secondaries.in
+#beam rectangular particle=211 firstEvent=$first lastEvent=$last beamHeight=50 beamWidth=50 \
+meanMomentum=$piMomentumRef
+
+# test - point beam
+#beam gaussian particle=proton meanMomentum=$piMomentumRef \
+#	firstEvent=$first lastEvent=$last sigmaXp=$sigmaXp sigmaYp=$sigmaYp \
+#	beamZ=0
+
+###beam gaussian sigmaX=-2.55 sigmaY=-1.0 sigmaXp=-0.033 sigmaYp=-0.014 \
+###	particle=pi+ meanMomentum=$piMomentumRef sigmaP=15.0 \
+###	firstEvent=$first lastEvent=$last \
+###        beamZ=0	
+
+place TargetBox z=0
+place vacuumWindow z=239.4
+
+place TargetShield z=250
+
+#place TargetDet2 z=1000 parent=vacuum1
+place vacuum1 z=1391.5
+place pipe1 z=1391.5
+
+#place Q1Det z=2542.25   rename=Q1USDet
+
+place QuadTypeIV rename=Q1 gradient=$q_1 z=3000
+
+#place DummyDet  z=3200.   rename=Dum3
+#place Q1Det z=3457.5   rename=Q1DSDet
+
+place vacuum2 z=3700
+place pipe2 z=3700
+
+place QuadTypeIV rename=Q2 gradient=$q_2 z=4400 ironColor=0,0,.6
+
+place vacuum2 z=5100
+place pipe2 z=5100
+
+place QuadTypeIV rename=Q3 gradient=$q_3 z=5800
+
+place vacuum3 z=7078.5
+
+place BendTypeI6inIron rename=B1 z=7979.1 x=200 rotation=Y30 By=0 \
+	fieldMaterial=$USAirOrVacuum
+place TypeI6inTaperedField z=7979.1 x=200 rotation=Y30 \
+	current=$d_1
+cornerarc z=7495.28 angle=60 centerRadius=1038 radiusCut=1000
+
+############place Foil z=8720
+//virtualdetector AfterB1Det   length=.01 height=500 width=500
+//place AfterB1Det   z=8718
+place vacuumWindow z=9641.7
+############place Counter rename=Count1 z=9545.45
+
+############place vacuumWindow z=9595.45
+place DecaySolenoid z=12210.7
+place vacuumWindow z=14779.7
+
+# Proton Absorber
+box ProtonAbsorber width=400 height=400 length=$proton_absorber_thickness material=polyethylene \
+        color=1,0,1
+place ProtonAbsorber z=14880
+
+#first Geneva Counter 
+place GenevaBeamCounter rename=GVA1 z=15050
+
+# reference particle for tuning B2 and RF
+# omit if pi = mu momentum (so pi is tuned to the end)
+#if $piMomentumRef!=$muMomentumRef
+	#reference referenceMomentum=$muMomentumRef particle=mu$C beamZ=12164.7
+	#tune B2Field z0=12370 z1=17053 initial=$B2 step=0.002 \
+		start="PDGid0==-13" expr="Px1/Pz1" tolerance=0.000001
+###start="PDGid0==-($C 13)"
+#else
+	#tune B2Field z0=12370 z1=17053 initial=$B2 step=0.002 \
+		expr="Px1/Pz1" tolerance=0.000001
+#endif
+
+zntuple z=15050 format=ascii file=G4BLoutput.txt
+#ntuple TriggerParticles category=NTuples detectors=*
+
+#place BendTypeI6inIron rename=B2 z=15808.1 x=100 rotation=Y15 By=0 \
+	fieldMaterial=Air
+#place TypeI6inTaperedField z=15808.1 x=100 rotation=Y15 \
+	current=$B2
+#cornerarc z=15298.3 angle=30 centerRadius=2005.2 radiusCut=1000
+
+#place BeamMonitor rename=BM1 z=16992
+
+
+

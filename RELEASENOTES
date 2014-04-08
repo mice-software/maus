@@ -5,6 +5,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.8.3
+  The following changes were made:
+    - Added G4Beamline as a third party package
+    - bugfixes and cleanup of build system
+  If upgrading from a previous version, redo the entire installation
 MAUS-v0.8.2
   The following changes were made:
     - Global PID framework
