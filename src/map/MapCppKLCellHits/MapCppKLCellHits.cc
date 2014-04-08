@@ -178,6 +178,9 @@ Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) {
 Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) {
   Json::Value xDocCellHit, xDocPMT0, xDocPMT1;
 
+  std::cout << "xDocPMT0 " << xDocDigit0["kl_key"] << std::endl;
+  std::cout << "xDocPMT1 " << xDocDigit1["kl_key"] << std::endl;
+  xDocPMT1["kl_key"] = xDocDigit1["kl_key"];
   // Use the information from the digits to fill the cell hit.
   std::string xKeyStr = JsonWrapper::GetProperty(xDocDigit0,
                                                  "kl_key",
@@ -207,8 +210,11 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
     xDocPMT0["charge"] = xChargeDigit0;
     xDocPMT1["charge"] = xChargeDigit1;
     xDocCellHit["charge"] = xChargeDigit0 + xChargeDigit1;
-    xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
-				    (xChargeDigit0 + xChargeDigit1);
+    if (xDocCellHit["charge"] == 0)
+        xDocCellHit["charge_product"] = 0;
+    else
+        xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
+				        (xChargeDigit0 + xChargeDigit1);
   }
 
 //  xDocCellHit["pmt0"] = xDocPMT0;
