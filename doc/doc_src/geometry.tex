@@ -6,8 +6,8 @@ access and use these models.
 
 \section{Geometry Download}
 
-There are two executable files available to users both can be found in the directory /bin/utilities found within your copy of MAUS. The two files of
-interest are download\_geometry.py and get\_geometry\_ids.py. These files do the following.
+There are two executable files available to users both can be found in the directory /bin/utilities found within your copy of MAUS. The three files of
+interest are upload\_geometry.py, download\_fit\_geometry.py and get\_geometry\_ids.py. These files do the following.
 
 \begin{description}
   \item[Upload Geometry] \hfill 
@@ -27,25 +27,47 @@ zip file.
    \item Instantiate a Downloader class object and downloads either the current, time specified or run number zipped geometry to a temporary cache
 location.
    \item The zip file is then unzipped in this location.
-   \item The Formatter class is then called and this class formats the GDMLs. The formatting alters the schema location of these files and points
-them to the correct local locations of the Materials GDML file. This formatting leaves the original GDMLs in the tmeporary cache and places the new
-formatted files in the download directory specified in the configuration file.
-   \item GDMLtoMAUS is then called with the location of the new formatted files as its argument. This class converts the GDMLs to the MICE Module
-text files using the XSLT stylesheets previously described.
-   \item[Optional] If specified in the configuration file the temporary cache location is removed along with the zip file and unzipped files.
+   \item The Location Fit is called which extracts the expected
+   positions of the detector elements, the measured position of the
+   surevey points, and the anticipated positions of the survey points
+   with respect to the detector centre from the GDML files. The fit
+   completes a fit with a chi-square statistic to match the position
+   of the survey nest in the detector coordinate system to its
+   position in the hall coordinate system using a change in the
+   position and the rotation of the detector. The result is written to
+   the GDML file. If the detector description is present in the
+   download from CDB, that detector file name is also written to the
+   main GDML file in place of the place-holder element.
+   \item The Formatter class is then called and this class formats the
+GDMLs. The formatting alters the schema location of these files and
+points them to the correct local locations of the Materials GDML
+file. This formatting leaves the original GDMLs in the tmeporary cache
+and places the new formatted files in the download directory specified
+in the configuration file.
+   \item GDMLtoMAUS is then called with the location of the new
+formatted files as its argument. This class converts the CAD GDMLs to
+the MICE Module text files using the XSLT stylesheets previously
+described and the Detector GDMLs to MICE modules using a python driven
+routine.
+   \item[Optional] If specified in the configuration file the
+   temporary cache location is removed along with the zip file and
+   unzipped files.
   \end{enumerate}
 
   \item[Get Geometry IDs]
   \begin{enumerate}
-   \item Set up the Configreader() class and read the values provided by ConfigurationDefaults.py or by custom config files. This file takes start
-and stop time arguments to specify a period to search the CDB.
-   \item A CDB class object is then instantiated with the server specified in the configuration file.
-   \item The get ids method from the CDB class is called and the python dict which is downloaded is formatted and either printed to screen or to file
-as specified in the configuration file.
+   \item Set up the Configreader() class and read the values provided
+by ConfigurationDefaults.py or by custom config files. This file takes
+start and stop time arguments to specify a period to search the CDB.
+   \item A CDB class object is then instantiated with the server
+   specified in the configuration file.
+   \item The get ids method from the CDB class is called and the
+python dict which is downloaded is formatted and either printed to
+screen or to file as specified in the configuration file.
   \end{enumerate}
 \end{description}
 
-To use these files the user must use the arguments in the ConfigurationDefaults.py file. The arguments relating to these executables are as follows.
+Two other python files are also present in the utilities directory; process\_geometry.py which fits, formats, and processes the GDML files assuming the download is complete, and download\_geometry.py which downloads, formats, and processes the GDML files without applying the location fit--- legacy MICE module files will be used in the simulation rather than the downloaded detector geometry files because the Location fit makes this replacement. To use these files the user must use the arguments in the ConfigurationDefaults.py file. The arguments relating to these executables are as follows.
 
 \begin{table*}
 \begin{center}
@@ -60,7 +82,7 @@ To use these files the user must use the arguments in the ConfigurationDefaults.
 \verb|geometry_download_directory| & Set the directory where you wish the geometry to be downloaded to.\\
 \verb|geometry_download_by| & This can be set to either \textit{current, id or run\_number}. Current will download the current valid geometry stored
 on the CDB. ID will download the geometry for the ID specified N.B ID numbers can be found using the get geometry ids executable. Run\_number will
-download the geometry along with control room information for specified run. \\ 
+download the geometry along with control room information for specified run including the beamline currents. \\ 
 \verb|geometry_download_run_number| & Set the number of the run to be downloaded.\\
 \verb|geometry_download_id| & Set the number of the geometry ID to be downloaded.\\
 \verb|geometry_download_cleanup| & Set to True in order to cleanup the temporary files creaated during the download process. These are the zip file
