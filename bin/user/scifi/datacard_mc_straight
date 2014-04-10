@@ -32,15 +32,20 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 10
+spill_generator_number_of_spills = 5
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
 #------------------------------------------
-
+simulation_reference_particle = {
+    "position":{"x":0.0, "y":-0.0, "z":11000.0},
+    "momentum":{"x":0.0, "y":0.0, "z":1.0},
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+}
+# This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":1, # number of coin tosses
+    "binomial_n":10, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
@@ -62,17 +67,16 @@ beam = {
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
-    }]
+    }
+  ]
 }
 
 #------------------------------------------
 # Reconstruction parameters
 #------------------------------------------
-
-reconstruction_geometry_filename = simulation_geometry_filename
-
 reconstruction_geometry_filename = simulation_geometry_filename
 SciFiPRHelicalOn = False
 SciFiPRStraightOn = True
 SciFiKalmanOn = True
 SciFiPatRecVerbosity = 1
+
