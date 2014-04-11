@@ -1,0 +1,35 @@
+###
+### The beamline vacuum components
+###
+### GUESS: vacuum windows are 0.5mm Al, flat.
+### GUESS: 0.5mm Al flat isolation windows at each end of DecaySolenoid.
+### NOTE: vacuum3 and vacuum4 intersect B1; this is OK as all are Vacuum.
+tubs vacuumWindow outerRadius=120 length=0.5 material=Al color=.6,.6,.6
+
+# invisible shield to kill junk from the target
+tubs TargetShield innerRadius=103 outerRadius=4000 length=1 kill=1 \
+	color=invisible
+
+tubs vacuum1 outerRadius=100 length=2303-2 material=$USAirOrVacuum
+tubs pipe1 innerRadius=100 outerRadius=103 length=2303-2 material=Al \
+	color=.6,.6,.6 kill=1
+
+tubs vacuum2 outerRadius=100 length=486-2 material=$USAirOrVacuum
+tubs pipe2 innerRadius=100 outerRadius=103 length=486-2 material=Al \
+	color=.6,.6,.6  kill=1
+
+box vacuum3 width=300 height=200 length=1643 material=$USAirOrVacuum \
+	color=.6,.6,.6
+
+box vacuum4 width=300 height=200 length=1745.2 material=$USAirOrVacuum \
+	color=.6,.6,.6
+
+# temporary Al foil to keep vacuum chambers clean when filled with Air
+tubs Foil outerRadius=100 length=0.05 material=Al
+
+## place Foil parent=vacuum1 z=2323/2-100
+## place Foil parent=vacuum2 z=-486/2+100
+## place Foil parent=vacuum2 z=486/2-100
+## place Foil parent=vacuum3 z=-1643/2+100
+## place Foil parent=vacuum3 z=1643/2-600
+ 

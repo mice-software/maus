@@ -1,0 +1,26 @@
+
+*	MAY09-B1B2-positives.in   
+*
+*	B1 and B2 only.
+#
+#	Command-line parameter REQUIRED: P  (target meanMomentum)
+#	Command-line parameters (optional - default as follows):
+param -unset first=0 last=4000 viewer=none
+
+# piMomentumRef is the pion referenceKinCut momentum at target
+# muMomentumRef is the muon reference momentum at center of DecaySolenoid
+# if they are equal, no mu reference is generated, so pi is tuned to the end.
+param -unset Ppi=480 Pmu=238
+param piMomentumRef=$Ppi muMomentumRef=$Pmu 
+
+# B1Type, B2Type: 0=genericbend, 1=6" field map, 2=6"field map tapered
+#                 3=6"field map tapered, offset position (B1 only)
+param -unset B1Type=2 B2Type=2
+param -unset CollimatorHalfAperture=236
+param -unset DiffThick=3
+
+param -unset piplus=1 piminus=0 eplus=1 eminus=0 proton=1 gamma=1
+param -unset keep='' C='+'
+
+include $WRKDIR/MAY09-Stage0.in
+
