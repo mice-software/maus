@@ -92,7 +92,7 @@ def check_tagfiles(tagfiles, prompt):
 
 def run_doxygen_framework(tagfiles):
     """Run doxygen for the MAUS framework"""
-    script = """( cat Doxyfile.general ;
+    script = """( cat ${MAUS_ROOT_DIR}/doc/doc_tools/Doxyfile.general ;
         echo 'PROJECT_NAME = "MAUS-framework"';
         echo INPUT = ${MAUS_ROOT_DIR}/src/common_*/ ${MAUS_ROOT_DIR}/src/py_cpp/ ${MAUS_ROOT_DIR}/src/legacy/;
         echo OUTPUT_DIRECTORY = ${MAUS_ROOT_DIR}/doc/doxygen_framework/;
@@ -106,7 +106,7 @@ def run_doxygen_framework(tagfiles):
 
 def run_doxygen_datastructure(tagfiles):
     """Run doxygen for the MAUS DataStructure"""
-    script = """( cat Doxyfile.general ;
+    script = """( cat ${MAUS_ROOT_DIR}/doc/doc_tools/Doxyfile.general ;
         echo 'PROJECT_NAME = "MAUS-datastructure"';
         echo INPUT = ${MAUS_ROOT_DIR}/src/common_cpp/DataStructure/;
         echo OUTPUT_DIRECTORY = ${MAUS_ROOT_DIR}/doc/doxygen_datastructure/;
@@ -120,7 +120,7 @@ def run_doxygen_datastructure(tagfiles):
 
 def run_doxygen(component, tagfiles):
     """Run doxygen for other MAUS components"""
-    script = """( cat Doxyfile.general ;
+    script = """( cat ${MAUS_ROOT_DIR}/doc/doc_tools/Doxyfile.general ;
         echo PROJECT_NAME = MAUS-$0;
         echo INPUT = ${MAUS_ROOT_DIR}/src/$0/;
         echo OUTPUT_DIRECTORY = ${MAUS_ROOT_DIR}/doc/doxygen_$0/;

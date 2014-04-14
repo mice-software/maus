@@ -1,0 +1,177 @@
+*	beam_secondaries.in  2007/06/12 TJR
+#
+#	This file generates a beam corresponding to the G4beamline
+#	simulation of secondaries from the MICE target. It includes
+#	protons, pi+, pi-, e+, e-, and gammas.
+#
+#	The number of events generated is controlled by Protons, 1.97E9 gives:
+#	79k protons, 6.5k pi+, 1.9k pi-, .49k e+, .49k e-, 7.2k gamma
+#
+#	These values include the absolute normalization, and the value of
+#	Protons corresponds to protons intersecting the MICE target.
+#	The target simulation tracked 1E7 protons and gave the above numbers
+#	of secondaries into the annulus 20-30 degrees. This file generates
+#	into a much smaller solid angle, 1/197 of the one used in the
+#	target simulation.
+#
+#param -unset protonnumber=$proton_number first=0 viewer=none
+#param -unset Protons=1.97E9 first=0 viewer=none
+
+#	The following parameters control the generation of individual particles
+#	set positives=1, negatives=1, or set ALL of the individual particles
+param -unset positives=0 negatives=0
+if $positives
+#####	param piplus=1 piminus=0 eplus=1 eminus=0 proton=1 gamma=0
+#####   I do not GENERATE protons
+	param piplus=1 piminus=0 eplus=0 eminus=0 proton=0 gamma=0
+endif
+if $negatives
+	param piplus=0 piminus=1 eplus=0 eminus=1 proton=0 gamma=0
+endif
+param -unset piplus=1 piminus=1 eplus=1 eminus=1 proton=1 gamma=1
+
+#	proton_weight will reduce the number of protons generated.
+#param -unset protonweight=$proton_weight
+
+# Target is 1mm wide and 10mm long: (1*cos(25*deg)+10*sin(25*deg))/2 = 2.57
+# For now we assume the target dips 2mm into the ISIS beam.
+# sigmaXp, and sigmaYp are determined empirically to be larger than 
+# the actual beamline acceptance.
+param n1=floor(4350*$proton_number/1.97E9/$proton_weight)
+param n2=floor(64650*$proton_number/1.97E9/$proton_weight)
+param n3=floor(10000*$proton_number/1.97E9/$proton_weight)
+if $proton
+    if $proton_weight!=1.0
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=1450 sigmaP=2.15 nEvents=$n1 \
+		firstEvent=$first weight=$proton_weight
+	param first=$first+$n1
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=775 sigmaP=-575 nEvents=$n2 \
+		firstEvent=$first weight=$proton_weight
+	param first=$first+$n2
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=1275 sigmaP=80 nEvents=$n3 \
+		firstEvent=$first weight=$proton_weight
+	param first=$first+$n3
+    else
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=1450 sigmaP=2.15 nEvents=$n1 \
+		firstEvent=$first
+	param first=$first+$n1
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=775 sigmaP=-575 nEvents=$n2 \
+		firstEvent=$first
+	param first=$first+$n2
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=proton meanMomentum=1275 sigmaP=80 nEvents=$n3 \
+		firstEvent=$first
+	param first=$first+$n3
+    endif
+endif
+param n4=floor(4650*$proton_number/1.97E9)
+param n5=floor(650*$proton_number/1.97E9)
+param n6=floor(1000*$proton_number/1.97E9)
+param n6a=floor(200*$proton_number/1.97E9)
+if $piplus
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi+ meanMomentum=320 sigmaP=-220 nEvents=$n4 \
+		firstEvent=$first
+	param first=$first+$n4
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi+ meanMomentum=190 sigmaP=30 nEvents=$n5 \
+		firstEvent=$first
+	param first=$first+$n5
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi+ meanMomentum=440 sigmaP=50 nEvents=$n6 \
+		firstEvent=$first
+	param first=$first+$n6
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi+ meanMomentum=600 sigmaP=-60 nEvents=$n6a \
+		firstEvent=$first
+	param first=$first+$n6a
+endif
+param n7=floor(1600*$proton_number/1.97E9)
+param n8=floor(300*$proton_number/1.97E9)
+if $piminus
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi- meanMomentum=320 sigmaP=-220 nEvents=$n7 \
+		firstEvent=$first
+	param first=$first+$n7
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=pi- meanMomentum=150 sigmaP=30 nEvents=$n8 \
+		firstEvent=$first
+	param first=$first+$n8
+endif
+param n9=floor(250*$proton_number/1.97E9)
+param n10=floor(120*$proton_number/1.97E9)
+param n11=floor(80*$proton_number/1.97E9)
+param n12=floor(40*$proton_number/1.97E9)
+if $eminus
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e- meanMomentum=35 sigmaP=-25 nEvents=$n9 \
+		firstEvent=$first
+	param first=$first+$n9
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e- meanMomentum=90 sigmaP=-30 nEvents=$n10 \
+		firstEvent=$first
+	param first=$first+$n10
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e- meanMomentum=200 sigmaP=-80 nEvents=$n11 \
+		firstEvent=$first
+	param first=$first+$n11
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e- meanMomentum=380 sigmaP=-100 nEvents=$n12 \
+		firstEvent=$first
+	param first=$first+$n12
+endif
+if $eplus
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e+ meanMomentum=35 sigmaP=-25 nEvents=$n9 \
+		firstEvent=$first
+	param first=$first+$n9
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e+ meanMomentum=90 sigmaP=-30 nEvents=$n10 \
+		firstEvent=$first
+	param first=$first+$n10
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e+ meanMomentum=200 sigmaP=-80 nEvents=$n11 \
+		firstEvent=$first
+	param first=$first+$n11
+	beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+		particle=e+ meanMomentum=380 sigmaP=-100 nEvents=$n12 \
+		firstEvent=$first
+	param first=$first+$n12
+endif
+param n13=floor(400*$proton_number/1.97E9)
+param n14=floor(2900*$proton_number/1.97E9)
+param n15=floor(1800*$proton_number/1.97E9)
+param n16=floor(1200*$proton_number/1.97E9)
+param n17=floor(600*$proton_number/1.97E9)
+param n18=floor(300*$proton_number/1.97E9)
+if $gamma
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=25 sigmaP=-15 nEvents=$n13 \
+	firstEvent=$first
+    param first=$first+$n13
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=90 sigmaP=-50 nEvents=$n14 \
+	firstEvent=$first
+    param first=$first+$n14
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=190 sigmaP=-50 nEvents=$n15 \
+	firstEvent=$first
+    param first=$first+$n15
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=290 sigmaP=-50 nEvents=$n16 \
+	firstEvent=$first
+    param first=$first+$n16
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=390 sigmaP=-50 nEvents=$n17 \
+	firstEvent=$first
+    param first=$first+$n17
+    beam gaussian sigmaX=-2.57 sigmaY=-1.0 sigmaXp=-0.040 sigmaYp=-0.020 \
+    	particle=gamma meanMomentum=500 sigmaP=-60 nEvents=$n18 \
+	firstEvent=$first
+    param first=$first+$n18
+endif
