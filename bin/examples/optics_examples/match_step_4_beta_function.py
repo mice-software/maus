@@ -462,6 +462,13 @@ about z = 0.
                                                           0.15, 0.15, 0.5, 0.35)
     beta_canvas.Print(lattice_optimiser.lattice.plot_file('beta_vs_z'))
     bz_canvas.Print(lattice_optimiser.lattice.plot_file('bz_vs_z'))
+    
+    ellipse_start = lattice_optimiser.lattice.transport_covariance_matrix(-2900.)
+    beta_start = lattice_optimiser.lattice.get_beta(ellipse_start)
+    ellipse_end = lattice_optimiser.lattice.transport_covariance_matrix(2900.)
+    beta_end = lattice_optimiser.lattice.get_beta(ellipse_end)
+    print "beta at start is ", beta_start, "mm"
+    print "beta at end is  ", beta_end, "mm"
 
     print "Finished - press <Enter> to end"
     raw_input()
