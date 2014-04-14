@@ -107,6 +107,9 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         self._test_load_root_file_cpp()
 
     def _test_optics_match_beta(self, match_log):
+        """
+        Check match_step_4_beta_function.py produces matched beta functions
+        """
         fin = open(match_log)
         beta_start, beta_end = None, None
         for line in fin.readlines():
