@@ -62,8 +62,7 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUS::MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
-  reference_primary_ = DataStructureHelper::GetInstance().
-    PGParticle2Primary(reference_pgparticle);
+  reference_primary_ = reference_pgparticle.GetPrimary();
 
   primary_plane_ = reference_pgparticle.z;
 

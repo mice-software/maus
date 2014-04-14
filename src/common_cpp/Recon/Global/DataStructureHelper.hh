@@ -60,8 +60,6 @@ class DataStructureHelper {
       const MAUS::PhaseSpaceVector& vector,
       const double z,
       const MAUS::DataStructure::Global::PID particle_id) const;
-  MAUS::Primary PGParticle2Primary(
-      MAUS::MAUSPrimaryGeneratorAction::PGParticle& pgparticle) const;
 
   /*
   void GetGlobalRawTracks(const Json::Value& recon_event,

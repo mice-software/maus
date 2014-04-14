@@ -259,25 +259,6 @@ std::vector<PrimaryChain*>* DataStructureHelper::GetPrimaryChains(
   return global_event->get_primary_chains();
 }
 
-MAUS::Primary DataStructureHelper::PGParticle2Primary(
-    MAUS::MAUSPrimaryGeneratorAction::PGParticle& pgparticle) const {
-  ThreeVector position(pgparticle.x,
-                       pgparticle.y,
-                       pgparticle.z);
-  ThreeVector momentum(pgparticle.px,
-                       pgparticle.py,
-                       pgparticle.pz);
-  Primary primary;
-  primary.SetPosition(position);
-  primary.SetMomentum(momentum);
-  primary.SetTime(pgparticle.time);
-  primary.SetEnergy(pgparticle.energy);
-  primary.SetParticleId(pgparticle.pid);
-  primary.SetRandomSeed(pgparticle.seed);
-
-  return primary;
-}
-
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {
   if (value.size() < static_cast<Json::Value::UInt>(6)) {
