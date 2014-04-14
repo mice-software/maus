@@ -85,15 +85,12 @@ class EMRSD : public MAUS::MAUSSD {
 
  private:
   int findBarHit(int copyNumber);
+  int AddBarHit(G4Step* aStep, int barNumber);
 
 //   MAUS::EMRHit          _hit_cppdata;
 //   MAUS::EMRChannelId    _ch_id;
   MAUS::EMRHitArray     _hits_cppdata;
   MAUS::EMRHitProcessor _hit_proc;
-
-  double _Edep;
-  double _path;
-  int    _nSteps;
 };
 
 #endif

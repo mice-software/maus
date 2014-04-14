@@ -113,41 +113,26 @@ void EMRSD::Initialize(G4HCofThisEvent* HCE) {
 
 G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
-  G4Track* track = aStep->GetTrack();
   G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
   G4int barNumber = theTouchable->GetCopyNumber();  // get the bar copy number
+  G4int hitTime =  aStep->GetPreStepPoint()->GetGlobalTime();  // get the hit time
 //   std::cerr << "ProcessHits   BarId: " << barNumber << std::endl;
   int xHitNum = this->findBarHit(barNumber);
   if (xHitNum < 0) {
 //     std::cerr << "ProcessHits:   Make new hist for bar " << barNumber << std::endl;
-    MAUS::EMRHit          hit_cppdata;
-    MAUS::EMRChannelId    *ch_id = new MAUS::EMRChannelId();
-    ch_id->SetBar(barNumber);
-    hit_cppdata.SetChannelId(ch_id);
-
-    MAUS::ThreeVector pos(aStep->GetPreStepPoint()->GetPosition().x(),
-                          aStep->GetPreStepPoint()->GetPosition().y(),
-                          aStep->GetPreStepPoint()->GetPosition().z());
-    MAUS::ThreeVector mom(track->GetMomentum().x(),
-                          track->GetMomentum().y(),
-                          track->GetMomentum().z());
-    hit_cppdata.SetPosition(pos);
-    hit_cppdata.SetMomentum(mom);
-
-    hit_cppdata.SetTrackId(track->GetTrackID());
-    hit_cppdata.SetParticleId(track->GetDefinition()->GetPDGEncoding());
-    hit_cppdata.SetEnergy(track->GetTotalEnergy());
-    hit_cppdata.SetCharge(track->GetDefinition()->GetPDGCharge());
-    hit_cppdata.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
-
-    _hits_cppdata.push_back(hit_cppdata);
-    xHitNum = _hits_cppdata.size() - 1;
+    xHitNum = this->AddBarHit(aStep, barNumber);
+  } else if (fabs(_hits_cppdata[xHitNum].GetTime() - hitTime) > 10*ns) {
+//     std::cerr << "ProcessHits:   Make second hist for bar " << barNumber << std::endl;
+//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime() - hitTime) << std::endl;
+    xHitNum = this->AddBarHit(aStep, barNumber);
+  } else {
+//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime() - hitTime)*ns << std::endl;
   }
 
   int Edep = aStep->GetTotalEnergyDeposit();
   int path = aStep->GetStepLength();
   _hits_cppdata[xHitNum].AddEnergyDeposited(Edep);
-  _hits_cppdata[xHitNum].AddPathLength(_path);
+  _hits_cppdata[xHitNum].AddPathLength(path);
 
   return true;
 }
@@ -177,6 +162,36 @@ int EMRSD::findBarHit(int copyNumber) {
   }
 
   return -1;
+}
+
+int EMRSD::AddBarHit(G4Step* aStep, int barNumber) {
+  G4Track* track = aStep->GetTrack();
+
+  MAUS::EMRHit          hit_cppdata;
+  MAUS::EMRChannelId    *ch_id = new MAUS::EMRChannelId();
+  ch_id->SetBar(barNumber);
+  hit_cppdata.SetChannelId(ch_id);
+
+  MAUS::ThreeVector pos(aStep->GetPreStepPoint()->GetPosition().x(),
+                        aStep->GetPreStepPoint()->GetPosition().y(),
+                        aStep->GetPreStepPoint()->GetPosition().z());
+  MAUS::ThreeVector mom(track->GetMomentum().x(),
+                        track->GetMomentum().y(),
+                        track->GetMomentum().z());
+  hit_cppdata.SetPosition(pos);
+  hit_cppdata.SetMomentum(mom);
+
+  hit_cppdata.SetTrackId(track->GetTrackID());
+  hit_cppdata.SetParticleId(track->GetDefinition()->GetPDGEncoding());
+  hit_cppdata.SetEnergy(track->GetTotalEnergy());
+  hit_cppdata.SetCharge(track->GetDefinition()->GetPDGCharge());
+  hit_cppdata.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
+
+  hit_cppdata.SetEnergyDeposited(0.);
+  hit_cppdata.SetPathLength(0.);
+
+  _hits_cppdata.push_back(hit_cppdata);
+  return _hits_cppdata.size() - 1;
 }
 
 
