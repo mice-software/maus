@@ -45,15 +45,15 @@ class EMRChannelId {
     /** Set the bar that was hit */
     void SetBar(int bar) {_bar = bar;}
 
-    /** Get the bar that was hit */
-    int GetPlane() const  {return _plane;}
-
-    /** Set the bar that was hit */
-    void SetPlane(int p) {_plane = p;}
+//     /** Get the bar that was hit */
+//     int GetPlane() const  {return _plane;}
+//
+//     /** Set the bar that was hit */
+//     void SetPlane(int p) {_plane = p;}
 
   private:
     int _bar;
-    int _plane;
+//     int _plane;
 
     ClassDef(EMRChannelId, 1)
 };

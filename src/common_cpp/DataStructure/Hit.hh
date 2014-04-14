@@ -113,6 +113,10 @@ class Hit {
      */
     virtual void SetEnergyDeposited(double edep);
 
+    /** Add to the energy deposited by the track when it made the hit
+     */
+    virtual void AddEnergyDeposited(double edep);
+
     /** Returns the position of the track when it made the hit
      */
     virtual ThreeVector GetPosition() const;
@@ -144,6 +148,10 @@ class Hit {
     /** Sets the path length of the track
      */
     virtual void SetPathLength(double path);
+
+    /** Add the path length to the track
+     */
+    virtual void AddPathLength(double path);
 
   private:
     int _track_id;

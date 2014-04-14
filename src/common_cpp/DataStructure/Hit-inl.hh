@@ -127,6 +127,11 @@ void Hit<ChannelId>::SetEnergyDeposited(double edep) {
 }
 
 template <class ChannelId>
+void Hit<ChannelId>::AddEnergyDeposited(double edep) {
+    _energy_deposited += edep;
+}
+
+template <class ChannelId>
 ThreeVector Hit<ChannelId>::GetPosition() const {
     return _position;
 }
@@ -167,6 +172,11 @@ double Hit<ChannelId>::GetPathLength() const {
 template <class ChannelId>
 void Hit<ChannelId>::SetPathLength(double path) {
     _path_length = path;
+}
+
+template <class ChannelId>
+void Hit<ChannelId>::AddPathLength(double path) {
+    _path_length += path;
 }
 }
 

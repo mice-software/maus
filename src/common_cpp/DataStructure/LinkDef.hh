@@ -82,6 +82,7 @@
 #pragma link C++ class std::vector<SciFiHit>;
 #pragma link C++ class std::vector<TOFHit>;
 #pragma link C++ class std::vector<KLHit>;
+#pragma link C++ class std::vector<EMRHit>;
 #pragma link C++ class std::vector<SpecialVirtualHit>;
 
 #pragma link C++ class MAUS::VirtualHit+;

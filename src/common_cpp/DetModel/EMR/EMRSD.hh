@@ -26,6 +26,7 @@
 #include "DetModel/MAUSSD.hh"
 #include "DataStructure/Hit.hh"
 #include "DataStructure/EMRChannelId.hh"
+#include "DataStructure/MCEvent.hh"
 #include "JsonCppProcessors/HitProcessor.hh"
 
 // // Geant 4
@@ -36,7 +37,7 @@ class G4HCofThisEvent;
 class MiceModule;
 
 /**
-* EMRSD is the sensitive detector for GEANT4 that handles the 
+* EMRSD is the sensitive detector for GEANT4 that handles the
 * EMR calorimeter simulation.
 **/
 
@@ -62,7 +63,7 @@ class MiceModule;
 // #endif
 
 /**
-* SAVING DATA IN CPP FILES (TO BE CONVERTED LATER TO JSON OR ROOT) 
+* SAVING DATA IN CPP FILES (TO BE CONVERTED LATER TO JSON OR ROOT)
 **/
 
 class EMRSD : public MAUS::MAUSSD {
@@ -83,8 +84,11 @@ class EMRSD : public MAUS::MAUSSD {
   void EndOfEvent(G4HCofThisEvent* HCE);
 
  private:
-  MAUS::EMRHit          _hit_cppdata;
-  MAUS::EMRChannelId    _ch_id;
+  int findBarHit(int copyNumber);
+
+//   MAUS::EMRHit          _hit_cppdata;
+//   MAUS::EMRChannelId    _ch_id;
+  MAUS::EMRHitArray     _hits_cppdata;
   MAUS::EMRHitProcessor _hit_proc;
 
   double _Edep;

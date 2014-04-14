@@ -90,64 +90,93 @@
 **/
 
 EMRSD::EMRSD(MiceModule* mod) : MAUSSD(mod) {
-  int bar = _module->propertyInt("Cell");
-  int plane = _module->propertyInt("Layer");
-  _ch_id.SetBar(bar);
-  _ch_id.SetPlane(plane);
-  _hit_cppdata.SetChannelId(&_ch_id);
+//   int bar = _module->propertyInt("Cell");
+//   int plane = _module->propertyInt("Layer");
+//   int bar   = 0;
+//   int plane = 0;
+//   _ch_id.SetBar(bar);
+//   _ch_id.SetPlane(plane);
+//   _hit_cppdata.SetChannelId(&_ch_id);
+//   _hits_cppdata.resize(0);
 }
 
 void EMRSD::Initialize(G4HCofThisEvent* HCE) {
 
-  _hit_cppdata.SetEnergyDeposited(0.);
-  _hit_cppdata.SetPathLength(0.);
-
-  _Edep   = 0.;
-  _path   = 0.;
-  _nSteps = 0;
+//   _hit_cppdata.SetEnergyDeposited(0.);
+//   _hit_cppdata.SetPathLength(0.);
+//
+//   _Edep   = 0.;
+//   _path   = 0.;
+//   _nSteps = 0;
+  _hits_cppdata.resize(0);
 }
 
 G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 
   G4Track* track = aStep->GetTrack();
+  G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
+  G4int barNumber = theTouchable->GetCopyNumber();  // get the bar copy number
+//   std::cerr << "ProcessHits   BarId: " << barNumber << std::endl;
+  int xHitNum = this->findBarHit(barNumber);
+  if (xHitNum < 0) {
+//     std::cerr << "ProcessHits:   Make new hist for bar " << barNumber << std::endl;
+    MAUS::EMRHit          hit_cppdata;
+    MAUS::EMRChannelId    *ch_id = new MAUS::EMRChannelId();
+    ch_id->SetBar(barNumber);
+    hit_cppdata.SetChannelId(ch_id);
 
-
-  if (_nSteps == 0) {
     MAUS::ThreeVector pos(aStep->GetPreStepPoint()->GetPosition().x(),
                           aStep->GetPreStepPoint()->GetPosition().y(),
                           aStep->GetPreStepPoint()->GetPosition().z());
     MAUS::ThreeVector mom(track->GetMomentum().x(),
                           track->GetMomentum().y(),
                           track->GetMomentum().z());
+    hit_cppdata.SetPosition(pos);
+    hit_cppdata.SetMomentum(mom);
 
-    _hit_cppdata.SetTrackId(track->GetTrackID());
-    _hit_cppdata.SetParticleId(track->GetDefinition()->GetPDGEncoding());
-    _hit_cppdata.SetEnergy(track->GetTotalEnergy());
-    _hit_cppdata.SetCharge(track->GetDefinition()->GetPDGCharge());
-    _hit_cppdata.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
-    _hit_cppdata.SetPosition(pos);
-    _hit_cppdata.SetMomentum(mom);
+    hit_cppdata.SetTrackId(track->GetTrackID());
+    hit_cppdata.SetParticleId(track->GetDefinition()->GetPDGEncoding());
+    hit_cppdata.SetEnergy(track->GetTotalEnergy());
+    hit_cppdata.SetCharge(track->GetDefinition()->GetPDGCharge());
+    hit_cppdata.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
+
+    _hits_cppdata.push_back(hit_cppdata);
+    xHitNum = _hits_cppdata.size() - 1;
   }
 
-  _Edep += aStep->GetTotalEnergyDeposit();
-  _path += aStep->GetStepLength();
-  _nSteps++;
+  int Edep = aStep->GetTotalEnergyDeposit();
+  int path = aStep->GetStepLength();
+  _hits_cppdata[xHitNum].AddEnergyDeposited(Edep);
+  _hits_cppdata[xHitNum].AddPathLength(_path);
 
   return true;
 }
 
 void EMRSD::EndOfEvent(G4HCofThisEvent* HCE) {
 
-  if (_nSteps) {
+  int nHits = _hits_cppdata.size();
+  if (nHits > 0) {
     if (!_hits.isMember("emr_hits")) {
       _hits["emr_hits"] = Json::Value(Json::arrayValue);
     }
 
 //     std::cerr << "hit in plane: " <<  _ch_id.GetPlane()
 //     << "  bar: " <<  _ch_id.GetBar() << std::endl;
-    _hit_cppdata.SetEnergyDeposited(_Edep);
-    _hit_cppdata.SetPathLength(_path);
-    _hits["emr_hits"].append(*_hit_proc.CppToJson(_hit_cppdata, ""));
-//     std::cerr << _hits["emr_hits"] << std::end;
+    for (int xHitNum = 0; xHitNum < nHits; xHitNum++)
+      _hits["emr_hits"].append(*_hit_proc.CppToJson(_hits_cppdata[xHitNum], ""));
+
+//     std::cerr << _hits["emr_hits"] << std::endl;
   }
 }
+
+int EMRSD::findBarHit(int copyNumber) {
+  int nBarHist = _hits_cppdata.size();
+  for (int xBH = 0; xBH < nBarHist; xBH++) {
+    if (_hits_cppdata[xBH].GetChannelId()->GetBar() == copyNumber)
+      return xBH;
+  }
+
+  return -1;
+}
+
+
