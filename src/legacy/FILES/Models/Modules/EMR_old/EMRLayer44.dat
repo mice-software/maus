@@ -1,0 +1,310 @@
+// FILES/Models/Modules/EMR/EMRLayer44.dat
+    //
+    
+      Module EMRLayer44
+      {
+        Volume Trapezoid
+        Dimensions  55.00 55.00 47.85 49.50 0.85 cm
+
+        PropertyString Material Galactic
+
+        PropertyInt Layer 44
+        //  PropertyInt numSlabs 59
+        PropertyInt numBars 59
+        PropertyBool Invisible 1
+      Module EMR/EMRLayer44Bar0.dat
+        {
+          Position 0.00 -47.85 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar1.dat
+        {
+          Position 0.00 -46.20 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar2.dat
+        {
+          Position 0.00 -44.55 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar3.dat
+        {
+          Position 0.00 -42.90 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar4.dat
+        {
+          Position 0.00 -41.25 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar5.dat
+        {
+          Position 0.00 -39.60 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar6.dat
+        {
+          Position 0.00 -37.95 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar7.dat
+        {
+          Position 0.00 -36.30 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar8.dat
+        {
+          Position 0.00 -34.65 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar9.dat
+        {
+          Position 0.00 -33.00 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar10.dat
+        {
+          Position 0.00 -31.35 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar11.dat
+        {
+          Position 0.00 -29.70 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar12.dat
+        {
+          Position 0.00 -28.05 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar13.dat
+        {
+          Position 0.00 -26.40 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar14.dat
+        {
+          Position 0.00 -24.75 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar15.dat
+        {
+          Position 0.00 -23.10 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar16.dat
+        {
+          Position 0.00 -21.45 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar17.dat
+        {
+          Position 0.00 -19.80 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar18.dat
+        {
+          Position 0.00 -18.15 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar19.dat
+        {
+          Position 0.00 -16.50 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar20.dat
+        {
+          Position 0.00 -14.85 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar21.dat
+        {
+          Position 0.00 -13.20 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar22.dat
+        {
+          Position 0.00 -11.55 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar23.dat
+        {
+          Position 0.00 -9.90 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar24.dat
+        {
+          Position 0.00 -8.25 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar25.dat
+        {
+          Position 0.00 -6.60 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar26.dat
+        {
+          Position 0.00 -4.95 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar27.dat
+        {
+          Position 0.00 -3.30 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar28.dat
+        {
+          Position 0.00 -1.65 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar29.dat
+        {
+          Position 0.00 0.00 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar30.dat
+        {
+          Position 0.00 1.65 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar31.dat
+        {
+          Position 0.00 3.30 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar32.dat
+        {
+          Position 0.00 4.95 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar33.dat
+        {
+          Position 0.00 6.60 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar34.dat
+        {
+          Position 0.00 8.25 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar35.dat
+        {
+          Position 0.00 9.90 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar36.dat
+        {
+          Position 0.00 11.55 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar37.dat
+        {
+          Position 0.00 13.20 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar38.dat
+        {
+          Position 0.00 14.85 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar39.dat
+        {
+          Position 0.00 16.50 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar40.dat
+        {
+          Position 0.00 18.15 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar41.dat
+        {
+          Position 0.00 19.80 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar42.dat
+        {
+          Position 0.00 21.45 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar43.dat
+        {
+          Position 0.00 23.10 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar44.dat
+        {
+          Position 0.00 24.75 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar45.dat
+        {
+          Position 0.00 26.40 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar46.dat
+        {
+          Position 0.00 28.05 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar47.dat
+        {
+          Position 0.00 29.70 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar48.dat
+        {
+          Position 0.00 31.35 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar49.dat
+        {
+          Position 0.00 33.00 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar50.dat
+        {
+          Position 0.00 34.65 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar51.dat
+        {
+          Position 0.00 36.30 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar52.dat
+        {
+          Position 0.00 37.95 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar53.dat
+        {
+          Position 0.00 39.60 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar54.dat
+        {
+          Position 0.00 41.25 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar55.dat
+        {
+          Position 0.00 42.90 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar56.dat
+        {
+          Position 0.00 44.55 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar57.dat
+        {
+          Position 0.00 46.20 0.00 cm
+          Rotation 0.00 180.00 0.00 degree
+        }
+        Module EMR/EMRLayer44Bar58.dat
+        {
+          Position 0.00 47.85 0.00 cm
+          Rotation 0.00 0.00 0.00 degree
+        }
+        }
