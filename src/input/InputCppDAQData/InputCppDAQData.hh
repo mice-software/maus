@@ -41,15 +41,15 @@
 namespace MAUS {
 
 /** \class InputCppDAQData
-* Load MICE raw data and unpack it into a JSON stream.
-* 
+* Load MICE raw data and unpack it into a JSON stream or a Cpp Data format.
+*
 * InputCppDAQData is a base imput class and can not be used to access the DAQ data!
 * The access to the data is provided by the two daughter classes InputCppDAQOfflineData
 * and InputCppDAQOnlineData.
-* 
+*
 * This module reads binary data in the format of the MICE DAQ.  It drives the
 * 'unpacker' library to do this conversion.  The end result is the MICE data
-* in JSON format.  The data includes TDC and flash ADC values, so this
+* in a JSON or a Cpp Data format.  The data includes TDC and flash ADC values, so this
 * information is low-level.
 *
 */
@@ -59,24 +59,22 @@ class InputCppDAQData {
  public:
 
   /** Create an instance of InputCppDAQData.
-  * 
-  * This is the constructor for InputCppDAQData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQData.
   */
   InputCppDAQData();
 
   /** Initialise the Unpacker.
   *
-  * This prepares the unpacker to read the files given in the constructor.
+  * This prepares the unpacker to read the data according to the configuration.
   *
-  * \return True if at least one file was opened sucessfully.
+  * \return True if the configuration is loaded and the processors are
+  * initialised sucessfully.
   */
   bool birth(std::string pJSONConfig);
 
  /** Dummy function.
-  * The access to the data is provided by the two daughter classes 
+  * The access to the data is provided by the two daughter classes
   * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
   * \return false after printing an error message.
@@ -93,6 +91,14 @@ class InputCppDAQData {
   */
   std::string getCurEvent();
 
+  /** Unpack the current event into Cpp Data.
+  *
+  * This unpacks the current event into the Cpp Data Structure.
+  * Don't call this until readNextEvent() has been called and returned true at
+  * least once!
+  *
+  * \return JSON document containing the unpacked DAQ data.
+  */
   void getCurEvent(MAUS::Data *data);
 
   /** Disable one equipment type.
@@ -146,14 +152,13 @@ class InputCppDAQData {
  private:
 
  /** Initialise the processor.
-  * 
-  * 
+  * Template function used to initialise a processor
+  * according to the configuration.
   */
   template <class procType>
   bool initProcessor(procType* &processor, Json::Value configJSON);
 
- /** Configure the zero supression filter.
-  */
+ /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
  /** Process manager object.
@@ -179,16 +184,13 @@ class InputCppDAQData {
   /** Processor for VLSB data. */
   VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
- /** Processor for DBB data.
-  */
+ /** Processor for DBB data. */
   DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
- /** Processor for DBBChain data.
-  */
+ /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
- /** Enum of event types
-  */
+ /** Enum of event types */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
@@ -197,8 +199,6 @@ class InputCppDAQData {
     DBB = 141,
     VLSB_C = 80
   };
-
-  bool json_out;  // !!!!!!!!!!!!!!!!
 
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.
