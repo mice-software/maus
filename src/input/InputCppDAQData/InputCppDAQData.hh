@@ -51,7 +51,6 @@ namespace MAUS {
 * 'unpacker' library to do this conversion.  The end result is the MICE data
 * in a JSON or a Cpp Data format.  The data includes TDC and flash ADC values, so this
 * information is low-level.
-*
 */
 
 class InputCppDAQData {
@@ -73,7 +72,7 @@ class InputCppDAQData {
   */
   bool birth(std::string pJSONConfig);
 
- /** Dummy function.
+  /** Dummy function.
   * The access to the data is provided by the two daughter classes
   * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
@@ -139,8 +138,7 @@ class InputCppDAQData {
 
   std::string _classname;
 
- /** Counter of the DAQ events.
-  */
+  /** Counter of the DAQ events. */
   int _eventsCount;
 
   /** File manager object. */
@@ -151,18 +149,17 @@ class InputCppDAQData {
 
  private:
 
- /** Initialise the processor.
+  /** Initialise the processor.
   * Template function used to initialise a processor
   * according to the configuration.
   */
   template <class procType>
   bool initProcessor(procType* &processor, Json::Value configJSON);
 
- /** Configure the zero supression filter. */
+  /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
- /** Process manager object.
-  */
+  /** Process manager object. */
   MDprocessManager _dataProcessManager;
 
   /** The DAQ channel map object.
@@ -184,13 +181,13 @@ class InputCppDAQData {
   /** Processor for VLSB data. */
   VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
- /** Processor for DBB data. */
+  /** Processor for DBB data. */
   DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
- /** Processor for DBBChain data. */
+  /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
- /** Enum of event types */
+  /** Enum of event types */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
