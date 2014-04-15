@@ -118,7 +118,7 @@ void MAUSPhysicsList::SetStochastics(scat scatteringModel,
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  if (decay) { 
+  if (decay) {
       SetHalfLife(_piHalfLife, _muHalfLife);
   } else {
       // note that disabling decays makes a G4Exception, as per #1404
