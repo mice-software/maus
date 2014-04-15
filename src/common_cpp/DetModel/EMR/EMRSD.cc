@@ -146,11 +146,11 @@ void EMRSD::EndOfEvent(G4HCofThisEvent* HCE) {
       _hits["emr_hits"] = Json::Value(Json::arrayValue);
     }
 
-//     std::cerr << "hit in plane: " <<  _ch_id.GetPlane()
-//     << "  bar: " <<  _ch_id.GetBar() << std::endl;
-    for (int xHitNum = 0; xHitNum < nHits; xHitNum++)
+    for (int xHitNum = 0; xHitNum < nHits; xHitNum++) {
       _hits["emr_hits"].append(*_hit_proc.CppToJson(_hits_cppdata[xHitNum], ""));
-
+      std::cerr << "hit in EMR bar: " <<  _hits_cppdata[xHitNum].GetChannelId()->GetBar()
+                << std::endl;
+    }
 //     std::cerr << _hits["emr_hits"] << std::endl;
   }
 }
