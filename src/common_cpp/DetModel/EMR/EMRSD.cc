@@ -86,7 +86,7 @@
 
 
 /**
-* SAVING DATA IN CPP FILES (TO BE CONVERTED LATER TO JSON OR ROOT) 
+* SAVING DATA IN CPP FILES (TO BE CONVERTED LATER TO JSON OR ROOT)
 **/
 
 EMRSD::EMRSD(MiceModule* mod) : MAUSSD(mod) {
@@ -123,10 +123,11 @@ G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
     xHitNum = this->AddBarHit(aStep, barNumber);
   } else if (fabs(_hits_cppdata[xHitNum].GetTime() - hitTime) > 10*ns) {
 //     std::cerr << "ProcessHits:   Make second hist for bar " << barNumber << std::endl;
-//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime() - hitTime) << std::endl;
+//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime) << std::endl;
     xHitNum = this->AddBarHit(aStep, barNumber);
   } else {
-//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime() - hitTime)*ns << std::endl;
+//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime)*ns
+//     << std::endl;
   }
 
   int Edep = aStep->GetTotalEnergyDeposit();
