@@ -24,6 +24,7 @@ Use Kolmogorov Smirnov test to compare distributions a lot of the time...
 import unittest
 import subprocess
 import os
+import sys  
 
 from xboa.Bunch import Bunch #pylint: disable=F0401
 
@@ -55,6 +56,8 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
         out_name += str(value)+"_"
     out_name += str(prod)
     log_file = open(out_name+".log", "w")
+    print "Running", out_name,
+    sys.stdout.flush()
     config = os.path.join(TEST_DIR, 'physics_model_config.py')
     proc = subprocess.Popen([SIM_PATH, '-configuration_file', config, 
       "-reference_physics_processes", str(ref_phys),
@@ -66,6 +69,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
       "-output_root_file_name", str(out_name)+".root",
     ], stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
+    print "...done"
     return out_name+".root"
 
 
@@ -92,7 +96,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         Long 100 m baseline is chosen st pion is likely to decay.
         """
         file_no_de = run_simulation("none", "none", False, -1., -1., 5.)
-        print file_no_de
         bunch_no_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                          file_no_de, "pid")[211]
         # assert no energy lost in absorber
@@ -105,7 +108,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
 
         file_de = run_simulation("mean_energy_loss", "mean_energy_loss",
                                                           False, -1., -1., 5.)
-        print file_de
         bunch_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                             file_de, "pid")[211]
         # assert energy lost in absorber
@@ -130,7 +132,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # particle has no energy loss
         file_de = run_simulation("none", "mean_energy_loss", False,
                                                                   -1., -1., 5.)
-        print file_de
         bunch_de = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                            file_de, "pid")[211]
         # should lose energy in absorber
@@ -144,7 +145,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         self.assertAlmostEqual(de_hits_2[1]['px'], 0., 3)
 
         file_strag = run_simulation("none", "standard", False, -1., -1., 5.)
-        print file_strag
         bunch_strag = Bunch.new_dict_from_read_builtin('maus_root_virtual_hit',
                                                       file_strag, "pid")[211]
         strag_hits = bunch_strag.get_hits('station', 2) # pions ds of material
@@ -158,24 +158,27 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         """
         Check that we can disable particle decay
         """
-        file_decay = run_simulation("none", "none", True, 1.e-9, 1.e+9, 5.)
-        print file_decay
+        # decays on, short pion lifetime, long muon lifetime
+        file_decay = run_simulation("none", "mean_energy_loss", True,
+                                    1.e-9, 1.e+9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
                                    ('maus_root_virtual_hit', file_decay, "pid")
         # pions should decay immediately; muons should never decay
         self.assertTrue(-13 in bunch.keys())
         self.assertFalse(211 in bunch.keys())
     
-        file_decay = run_simulation("none", "none", True, 1.e+9, 1.e-9, 5.)
-        print file_decay
+        # decays on, long pion lifetime, short muon lifetime
+        file_decay = run_simulation("none", "mean_energy_loss", True,
+                                    1.e+9, 1.e-9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
                                    ('maus_root_virtual_hit', file_decay, "pid")
         # muons should decay immediately; pions should never decay
         self.assertTrue(211 in bunch.keys())
         self.assertFalse(-13 in bunch.keys())
-    
-        file_decay = run_simulation("none", "none", False, 1.e+9, 1.e+9, 5.)
-        print file_decay
+
+        # decays off, long pion lifetime, long muon lifetime
+        file_decay = run_simulation("none", "mean_energy_loss", False,
+                                     1.e-9, 1.e-9, 5.)
         bunch = Bunch.new_dict_from_read_builtin \
                                    ('maus_root_virtual_hit', file_decay, "pid")
         # decays off
