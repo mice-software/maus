@@ -19,6 +19,8 @@
 #include <limits>
 #include <queue>
 
+#include "Geant4/G4ParticleTable.hh"
+#include "Geant4/G4ParticleDefinition.hh"
 #include "Geant4/G4Event.hh"
 #include "Geant4/G4PrimaryVertex.hh"
 #include "Geant4/G4Track.hh"
@@ -166,6 +168,24 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   return particle;
 }
 
+void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
+  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->
+                                                              FindParticle(pid);
+  double mass = particle->GetPDGMass();
+  if (energy < mass)
+      throw Exception(Exception::recoverable,
+            "Attempt to set mass shell condition when (total) energy < mass",
+            "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
+  if (fabs(px)+fabs(py)+fabs(pz) == 0.)
+      throw Exception(Exception::recoverable,
+            "Attempt to set mass shell condition when momentum is 0.",
+            "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
+  double norm = sqrt((energy*energy-mass*mass)/(px*px + py*py + pz*pz));
+  px *= norm;
+  py *= norm;
+  pz *= norm;
+}
+
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     x = hit.GetPos().x();
@@ -178,6 +198,17 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     energy = hit.GetEnergy();
     pid = hit.GetPID();
     seed = 0;
+}
+
+Primary MAUSPrimaryGeneratorAction::PGParticle::GetPrimary() {
+  Primary prim;
+  prim.SetRandomSeed(seed);
+  prim.SetParticleId(pid);
+  prim.SetTime(time);
+  prim.SetEnergy(energy);
+  prim.SetPosition(ThreeVector(x, y, z));
+  prim.SetMomentum(ThreeVector(px, py, pz));
+  return prim;
 }
 
 }  // ends MAUS namespace
