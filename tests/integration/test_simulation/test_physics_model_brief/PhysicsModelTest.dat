@@ -5,7 +5,7 @@
 
 Configuration Test
 {
-  Dimensions 10000. 10000. 300. m
+  Dimensions 10000. 10000. 1000. m
   PropertyString Material Galactic
   PropertyDouble G4StepMax 200. m
 
@@ -58,6 +58,13 @@ Configuration Test
     PropertyString Volume None
     PropertyString SensitiveDetector Virtual
     Position 0.0 0.0 100. m
+  }
+  MiceModule BeamStop // check AtRestDoIt processes by putting a beamstop in
+  {
+    PropertyString Volume Cylinder
+    Dimensions 10. 100. m
+    PropertyString Material STEEL304
+    Position 0.0 0.0 200. m
   }
 
 }

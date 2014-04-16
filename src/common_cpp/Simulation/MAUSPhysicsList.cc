@@ -15,6 +15,7 @@
  *
  */
 
+#include <limits>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -105,7 +106,6 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  pi 1/2 life " << _piHalfLife
                               << "\n  mu 1/2 life " << _muHalfLife << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
-  SetHalfLife(_piHalfLife, _muHalfLife);
 }
 
 void MAUSPhysicsList::SetStochastics(scat scatteringModel,
@@ -118,8 +118,18 @@ void MAUSPhysicsList::SetStochastics(scat scatteringModel,
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  if (!decay) UIApplyCommand("/process/inactivate Decay");
-  else        UIApplyCommand("/process/activate   Decay");
+  if (decay) {
+      SetHalfLife(_piHalfLife, _muHalfLife);
+  } else {
+      // note that disabling decays makes a G4Exception, as per #1404
+      // This is a G4 bug.
+      //
+      // Here we just set the lifetime to be very long (this could cause a
+      // problem if user sets simulation time to be even longer, default
+      // max time is 1e9 nanoseconds
+      double life = std::numeric_limits<double>::max()/10.;
+      SetHalfLife(life, life);
+  }
 }
 
 
