@@ -58,36 +58,41 @@ TEST(JsonWrapperTest, GetItemTest) {
 TEST(JsonWrapperTest, GetPropertyTest) {
   Json::Value test;
   std::string good_json =
-      std::string("{\"real\":2.5, \"int\":3, \"null\":null, \"bool\":true, ")+
-      std::string("\"object\":{}, \"array\":[]}");
+      std::string("{\"real\":2.5, \"int\":-3, \"null\":null, ")+
+      std::string("\"bool\":true, \"object\":{}, \"array\":[]}");
   std::string gets [] = {"real", "int", "null", "bool", "object", "array"};
   JsonWrapper::JsonType types[] =
-   {JsonWrapper::realValue, JsonWrapper::intValue, JsonWrapper::nullValue,
-    JsonWrapper::booleanValue, JsonWrapper::objectValue,
+   {JsonWrapper::realValue, JsonWrapper::intValue,
+    JsonWrapper::nullValue, JsonWrapper::booleanValue, JsonWrapper::objectValue,
     JsonWrapper::arrayValue};
   Json::Value good_val = JsonWrapper::StringToJson(good_json);
+  good_val["uint"] = Json::Value(Json::UInt(4));
   for (unsigned int i = 0; i < 5; ++i)
     for (unsigned int j = 0; j < 5; ++j) {
-      if ( i != j )
-      EXPECT_THROW(
-           JsonWrapper::GetProperty(good_val, gets[i], types[j]), MAUS::Exception)
-        << i << " " << j << " " << gets[i];
-     }
+      if ( i == j || (i == 1 && j == 0)) {
+          // it's okay
+          EXPECT_NO_THROW(JsonWrapper::GetProperty(good_val, gets[i], types[j]))
+                          << i << " " << j << " " << gets[i];
+      } else {
+          EXPECT_THROW(JsonWrapper::GetProperty(good_val, gets[i], types[j]),
+                       MAUS::Exception)  << i << " " << j << " " << gets[i];
+      }
+    }
   EXPECT_EQ(Json::Value(2.5),
-                   JsonWrapper::GetProperty(good_val, gets[0], types[0]));
-  EXPECT_EQ(Json::Value(3),
-                   JsonWrapper::GetProperty(good_val, gets[1], types[1]));
-  EXPECT_EQ(Json::Value(Json::nullValue),
-                   JsonWrapper::GetProperty(good_val, gets[2], types[2]));
+            JsonWrapper::GetProperty(good_val, gets[0], types[0]));
+  EXPECT_EQ(Json::Value(-3),
+            JsonWrapper::GetProperty(good_val, gets[1], types[1]));
+   EXPECT_EQ(Json::Value(Json::nullValue),
+            JsonWrapper::GetProperty(good_val, gets[2], types[2]));
   EXPECT_EQ(Json::Value(true),
-                   JsonWrapper::GetProperty(good_val, gets[3], types[3]));
+            JsonWrapper::GetProperty(good_val, gets[3], types[3]));
   EXPECT_EQ(Json::Value(Json::objectValue),
-                   JsonWrapper::GetProperty(good_val, gets[4], types[4]));
+            JsonWrapper::GetProperty(good_val, gets[4], types[4]));
   EXPECT_EQ(Json::Value(Json::arrayValue),
-                   JsonWrapper::GetProperty(good_val, gets[5], types[5]));
+            JsonWrapper::GetProperty(good_val, gets[5], types[5]));
   Json::Value emptyProp =  JsonWrapper::StringToJson("{}");
-  EXPECT_THROW( // non-existent property
-    JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue), MAUS::Exception);
+  EXPECT_THROW(JsonWrapper::GetProperty(emptyProp, "a", JsonWrapper::anyValue),
+               MAUS::Exception);
 }
 
 TEST(JsonWrapperTest, TypeConversionTest) {
@@ -113,8 +118,10 @@ TEST(JsonWrapperTest, SimilarTypeTest) {
      JsonWrapper::arrayValue, JsonWrapper::objectValue, JsonWrapper::anyValue};
   for (size_t i = 0; i < 9; ++i)
     for (size_t j = 0; j < 9; ++j) {
-      EXPECT_EQ(JsonWrapper::SimilarType(wr_tp[i], wr_tp[j]),
-                i == j || i == 8 || j == 8 );
+      bool is_okay = i == j || i == 8 || j == 8 || (i == 1 && j == 3) ||
+                     (i == 2 && j == 3) || (i == 1 && j == 2);
+      EXPECT_EQ(JsonWrapper::SimilarType(wr_tp[i], wr_tp[j]), is_okay) 
+                << i << " " << j << std::endl;
     }
 }
 
