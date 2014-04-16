@@ -155,9 +155,9 @@ bool JsonWrapper::SimilarType(const JsonWrapper::JsonType cast_target,
     // there is an efficiency saving by using one big OR here and it isn't too
     // unreadable
     return (cast_target == cast_type ||
-            cast_target == JsonWrapper::anyValue || 
+            cast_target == JsonWrapper::anyValue ||
             cast_type == JsonWrapper::anyValue ||
-            (cast_type == realValue && IsNumeric(cast_target)) || 
+            (cast_type == realValue && IsNumeric(cast_target)) ||
             (cast_type == intValue && cast_target == uintValue));
 }
 
