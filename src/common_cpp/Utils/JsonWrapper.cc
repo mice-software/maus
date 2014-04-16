@@ -59,8 +59,11 @@ Json::Value JsonWrapper::GetItem(const Json::Value & array,
                                                       +" in Json array lookup",
                          "JsonWrapper::GetItemStrict"));
   }
-  if (SimilarType(ValueTypeToJsonType(array[value_index].type()), value_type))
+  JsonType actual_type = ValueTypeToJsonType(array[value_index].type());
+  if (SimilarType(actual_type, value_type) ||
+      (value_type == realValue && IsNumeric(actual_type))) {
     return array[value_index];
+  }
   throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Value of wrong type in Json array lookup",
                "JsonWrapper::GetItemStrict"));
@@ -76,7 +79,8 @@ Json::Value JsonWrapper::GetProperty(const Json::Value& object,
                  "JsonWrapper::GetPropertyStrict"));
   }
   if (object.isMember(name)) {
-    if (SimilarType(ValueTypeToJsonType(object[name].type()), value_type)) {
+    JsonType actual_type = ValueTypeToJsonType(object[name].type());
+    if (SimilarType(actual_type, value_type)) {
       return object[name];
     } else {  // type incorrect
       throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -146,10 +150,19 @@ CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector(const Json::Value& j_vec)
   return c_vec;
 }
 
-bool JsonWrapper::SimilarType(const JsonWrapper::JsonType jt1,
-                              const JsonWrapper::JsonType jt2) {
-    return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
-                       || jt2 == JsonWrapper::anyValue);
+bool JsonWrapper::SimilarType(const JsonWrapper::JsonType cast_target,
+                              const JsonWrapper::JsonType cast_type) {
+    // there is an efficiency saving by using one big OR here and it isn't too
+    // unreadable
+    return (cast_target == cast_type ||
+            cast_target == JsonWrapper::anyValue || 
+            cast_type == JsonWrapper::anyValue ||
+            (cast_type == realValue && IsNumeric(cast_target)) || 
+            (cast_type == intValue && cast_target == uintValue));
+}
+
+bool JsonWrapper::IsNumeric(const JsonWrapper::JsonType jt) {
+    return (jt == intValue || jt == uintValue || jt == realValue);
 }
 
 void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
