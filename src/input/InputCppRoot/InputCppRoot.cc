@@ -106,7 +106,7 @@ std::string InputCppRoot::_emitter_cpp() {
         }
     // if there was no branch of this type at all then we might get an exception
     // - let's just try the next type
-    } catch(const std::exception& exc) {
+    } catch (const std::exception& exc) {
         std::cerr << (&exc)->what() << std::endl;
         return advance_event_type();
     }
@@ -116,8 +116,8 @@ std::string InputCppRoot::_emitter_cpp() {
 template <class ConverterT, class DataT>
 std::string InputCppRoot::load_event(std::string branch_name) {
     if (_infile == NULL) {
-      throw(Squeal(
-        Squeal::recoverable,
+      throw(Exception(
+        Exception::recoverable,
         "InputCppRoot was not initialised properly",
         "InputCppRoot::getNextEvent"
       ));
@@ -179,7 +179,7 @@ std::string InputCppRoot::uncache_event(event_type type) {
 void InputCppRoot::cache_event(event_type type, std::string event) {
     std::map<event_type, std::string>::iterator it = _cache.find(type);
     if (it != _cache.end() && it->second != "")
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Trying to uncache event but none saved",
                      "InputCppRoot::uncache_event"));
     _cache[type] = event;

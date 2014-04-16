@@ -167,9 +167,7 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
 
   SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints();
   RetrieveClusters(spacepoints);
-
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
-
   BuildKalmanStates();
 }
 } // ~namespace MAUS

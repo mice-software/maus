@@ -68,6 +68,9 @@ class TrackPoint : public BasePoint {
   /// Copy constructor - any pointers are deep copied
   TrackPoint(const TrackPoint &track_point);
 
+  /// Trackpoint from spacepoint
+  explicit TrackPoint(SpacePoint *space_point);
+
   /// Destructor
   virtual ~TrackPoint();
 
@@ -80,6 +83,12 @@ class TrackPoint : public BasePoint {
   TrackPoint* Clone();
 
   // Getters and Setters for the member variables
+
+  /// Set the index of the particle event that created this track point.
+  void set_particle_event(const int particle_event);
+
+  /// Get the name for the mapper which produced the track, #_mapper_name.
+  int get_particle_event() const;
 
   /// Set the name for the mapper which produced the track, #_mapper_name.
   void set_mapper_name(std::string mapper_name);
@@ -114,11 +123,11 @@ class TrackPoint : public BasePoint {
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  void set_space_point_tref(TRef space_point);
+  void set_space_point_tref(TObject *space_point);
 
   /// Get the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
-  TRef get_space_point_tref() const;
+  TObject* get_space_point_tref() const;
 
   /// Set the component MAUS::DataStructure::Global::SpacePoint, the detector
   /// measurement matching this reconstructed position.
@@ -129,6 +138,11 @@ class TrackPoint : public BasePoint {
   MAUS::DataStructure::Global::SpacePoint* get_space_point() const;
 
  private:
+
+  /// The index of the particle event that produced this track point. If
+  /// creation of the TrackPoint was not due to a particle event the value
+  /// should remain at the default value of -1.
+  int _particle_event;
 
   /// The name of the mapper which produced this track.
   std::string    _mapper_name;
@@ -153,6 +167,13 @@ class TrackPoint : public BasePoint {
   MAUS_VERSIONED_CLASS_DEF(TrackPoint);
 }; // ~class TrackPoint
 
+typedef std::vector<MAUS::DataStructure::Global::TrackPoint> TrackPointArray;
+typedef std::vector<MAUS::DataStructure::Global::TrackPoint *>
+  TrackPointPArray;
+typedef std::vector<const MAUS::DataStructure::Global::TrackPoint *>
+  TrackPointCPArray;
+typedef std::vector<const MAUS::DataStructure::Global::TrackPoint *>
+  ConstTrackPointPArray;
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

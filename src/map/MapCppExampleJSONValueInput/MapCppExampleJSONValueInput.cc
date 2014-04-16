@@ -17,6 +17,7 @@
 
 #include "src/map/MapCppExampleJSONValueInput/MapCppExampleJSONValueInput.hh"
 
+#include "src/common_cpp/Utils/Exception.hh""
 #include "src/common_cpp/API/APIExceptions.hh"
 
 namespace MAUS {
@@ -27,9 +28,9 @@ void MapCppExampleJSONValueInput::_birth(const std::string& argJsonConfigDocumen
   // Check if the JSON document can be parsed, else return error only.
   bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw(Squeal(Squeal::nonRecoverable,
-                 "Unable to Parse Json Config",
-                 "MapCppExampleJSONValueInput::_birth"));
+    throw(Exception(Exception::nonRecoverable,
+                    "Unable to Parse Json Config",
+                    "MapCppExampleJSONValueInput::_birth"));
   }
 }
 
@@ -37,9 +38,9 @@ void MapCppExampleJSONValueInput::_death() {}
 
 Json::Value* MapCppExampleJSONValueInput::_process(Json::Value* json) const {
   if (!json) {
-    throw(Squeal(Squeal::nonRecoverable,
-                 "NULL Json::Value* passed to process.",
-                 "MapCppExampleJSONValueInput::_process"));
+    throw(Exception(Exception::nonRecoverable,
+                    "NULL Json::Value* passed to process.",
+                    "MapCppExampleJSONValueInput::_process"));
   }
 
   std::cout << "Run: " << (*json)["run_number"].asInt()

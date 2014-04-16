@@ -22,6 +22,8 @@
 #include "BeamTools/BTRFFieldMap.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
+
 std::string       BTFieldConstructor::_defaultSolenoidMode = "";
 const int         BTFieldConstructor::_numberOfFieldTypes  = 14;
 const std::string BTFieldConstructor::_fieldTypes[15] 
@@ -36,7 +38,7 @@ BTFieldConstructor::BTFieldConstructor() :
                                               _needsPhases(false), _amalgamatedFields(0)
 {
 	if(GetGridDefault()[0]<2 || GetGridDefault()[1]<2 || GetGridDefault()[2]<2) 
-		throw(Squeal(Squeal::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
+		throw(MAUS::Exception(MAUS::Exception::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
 	SetGridSize( BTFieldGroup::GetGridDefault() );
 	_electroMagneticField->AddField(_magneticField, Hep3Vector(0,0,0));
 	AddField(_electroMagneticField, Hep3Vector(0,0,0));
@@ -62,58 +64,69 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
   delete BTPhaser::GetInstance();
 	SetDefaults();
 	if(GetGridDefault()[0]<2 || GetGridDefault()[1]<2 || GetGridDefault()[2]<2) 
-		throw(Squeal(Squeal::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
+		throw(MAUS::Exception(MAUS::Exception::recoverable, "FieldGridX, FieldGridY, FieldGridZ datacards must be > 1", "BTFieldConstructor::BTFieldConstructor"));
 	SetGridSize( BTFieldGroup::GetGridDefault() );
 	_magneticField       ->SetGridSize( BTFieldGroup::GetGridDefault() );
 	_electroMagneticField->SetGridSize( BTFieldGroup::GetGridDefault() );
 	try {
-	int ignoredAmalgamated = 0;
-	_needsPhases = false;
-	BTSolenoid::ClearStaticMaps();
-	std::vector<const MiceModule*> daughterModules;
-	for(int fields = 0; fields < _numberOfFieldTypes; fields++)
-	{
-		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
-		for(unsigned int i=0; i<daughterModules.size(); i++)
-		{ try{
-			BTField * newField;
-			const MiceModule * theModule   = daughterModules[i];
-			if(daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool"))
-			{
-				if(daughterModules[i]->propertyBoolThis("IsAmalgamated")) //don't use, the BTFieldAmalgamation should deal with it
-				{ignoredAmalgamated++; newField = NULL;}
-				else{ newField = GetField(theModule); } //not amalgamated, use as normal
-			}
-			else{   newField    = GetField(theModule); } //not amalgamated, use as normal
-			Hep3Vector         position    = theModule->globalPosition();
-			HepRotation        rotation    = theModule->globalRotation();
-			double             scaleFactor = theModule->globalScaleFactor();
-  		if(newField==NULL) {;} //error do nothing
-			else if(newField->DoesFieldChangeEnergy())
-				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
-			else
-				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
-			SetName(newField, theModule);
-		}
-		catch(Squeal squee) {std::cerr << "Error while loading fields from module "+daughterModules[i]->fullName() << std::endl; squee.Print(); exit(1);}
-		catch(...)          
-		{std::cerr << "Unhandled exception while loading fields from module "+daughterModules[i]->fullName()+" - bailing" << std::endl; exit(1);}
-		}
-	}
-  _magneticField->Close();
-  _electroMagneticField->Close();
+  	int ignoredAmalgamated = 0;
+  	_needsPhases = false;
+  	BTSolenoid::ClearStaticMaps();
+  	std::vector<const MiceModule*> daughterModules;
+  	for(int fields = 0; fields < _numberOfFieldTypes; fields++) {
+  		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );
+  		for(unsigned int i=0; i<daughterModules.size(); i++) {
+  		  try {
+    			BTField * newField;
+    			const MiceModule * theModule   = daughterModules[i];
+    			if (daughterModules[i]->propertyExistsThis("IsAmalgamated", "bool")) {
+    				if (daughterModules[i]->propertyBoolThis("IsAmalgamated")) { //don't use, the BTFieldAmalgamation should deal with it
+    				  ignoredAmalgamated++; newField = NULL;
+    				} else {
+    				  newField = GetField(theModule);  // not amalgamated, use as normal
+    				}
+    			} else {
+    			  newField    = GetField(theModule); //not amalgamated, use as normal
+    			}
+    			Hep3Vector         position    = theModule->globalPosition();
+    			HepRotation        rotation    = theModule->globalRotation();
+    			double             scaleFactor = theModule->globalScaleFactor();
+    			if ((newField!=NULL) && (newField->DoesFieldChangeEnergy())) {
+    				_electroMagneticField->AddField(newField, position, rotation, scaleFactor, false); //make sure that I call Close at the end!
+    			} else {
+    				_magneticField->AddField(newField, position, rotation, scaleFactor, false);
+    		  }
+    			SetName(newField, theModule);
+    		} catch (MAUS::Exception exc) {
+    		  std::cerr << "Error while loading fields from module "
+    		            << daughterModules[i]->fullName() << std::endl;
+    		  exc.Print(); exit(1);
+    		} catch (...) {
+    		  std::cerr << "Unhandled exception while loading fields from module "
+    		            << daughterModules[i]->fullName() << " - bailing"
+    		            << std::endl;
+    		  exit(1);
+    		}
+  		}
+  	}
+    _magneticField->Close();
+    _electroMagneticField->Close();
 
-	WriteFieldMaps();
-	if(_amalgamatedFields != ignoredAmalgamated)
-	{
-		std::stringstream in;
-		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
-		   << _amalgamatedFields << " in Amalgamation MiceModules";
-		throw(Squeal(Squeal::recoverable, in.str(), "BTFieldConstructor()"));
+  	WriteFieldMaps();
+  	if(_amalgamatedFields != ignoredAmalgamated) {
+  		std::stringstream in;
+  		in << "Error - detected " << ignoredAmalgamated << " fields with PropertyBool IsAmalgamated 1, but only " 
+  		   << _amalgamatedFields << " in Amalgamation MiceModules";
+  		throw(MAUS::Exception(MAUS::Exception::recoverable, in.str(), "BTFieldConstructor()"));
+  	}
+	} catch (MAUS::Exception exc) {
+	  exc.Print();
+	  exit(1);
+	} catch (...) {
+	  std::cerr << "Unhandled exception while loading fields - bailing"
+	            << std::endl;
+	  exit(1);
 	}
-	}
-	catch(Squeal squee) {squee.Print(); exit(1);}
-	catch(...)          {std::cerr << "Unhandled exception while loading fields - bailing" << std::endl; exit(1);}
 }
 
 bool BTFieldConstructor::ModuleHasElectromagneticField(const MiceModule * theModule)
@@ -197,7 +210,7 @@ BTField * BTFieldConstructor::GetSolenoid(const MiceModule * theModule)
 		else
 		{
 			theModule->printTree(0);
-			throw(Squeal(Squeal::recoverable, "Solenoid mode is WriteDynamic but no tolerance set in module "+theModule->name(), 
+			throw(MAUS::Exception(MAUS::Exception::recoverable, "Solenoid mode is WriteDynamic but no tolerance set in module "+theModule->name(), 
 			                                  "BTFieldConstructor::GetSolenoid") );
 		}
 	}
@@ -243,7 +256,7 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 		double radius = theModule->propertyDoubleThis("FieldRadius");
 		newPillBox = new BTPillBox(length, energyGain, radius);
 		if(theModule->propertyStringThis("FieldType") == "RFFieldMap")
-			throw(Squeal(Squeal::recoverable, "Can't have electrostatic RFFieldMap", "BTFieldConstructor::GetRFCavity"));
+			throw(MAUS::Exception(MAUS::Exception::recoverable, "Can't have electrostatic RFFieldMap", "BTFieldConstructor::GetRFCavity"));
 	}
 	else if(pillBoxMode == "Unphased" || pillBoxMode == "AutomaticPhasing")
 	{
@@ -274,7 +287,7 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 			newPillBox = new BTRFFieldMap(frequency, length, energyGain, timeDelay, fieldMapFile, fieldMapType);
 	}
 	if(newPillBox==NULL)
-		throw(Squeal(Squeal::recoverable, "Unrecognised CavityMode", "BTFieldConstructor::GetRFCavity" ));
+		throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognised CavityMode", "BTFieldConstructor::GetRFCavity" ));
 	if(theModule->propertyExistsThis("ReferenceParticlePhase", "double"))
 		newPillBox->SetRefParticlePhase(theModule->propertyDoubleThis("ReferenceParticlePhase"));
 	return newPillBox;
@@ -359,19 +372,19 @@ BTField * BTFieldConstructor::GetMultipole(const MiceModule * theModule) {
     field   = theModule->propertyDoubleThis("FieldStrength");
 
   if (height <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
         "Multipole height must be more than 0 in module "+theModule->fullName(), 
         "BTFieldConstructor::GetMultipole"));
   if (width <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
          "Multipole width must be more than 0 in module "+theModule->fullName(), 
          "BTFieldConstructor::GetMultipole"));
   if (length <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
         "Multipole length must be more than 0 in module "+theModule->fullName(),
         "BTFieldConstructor::GetMultipole"));
   if (pole <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Multipole pole must be more than 0 in module "+theModule->fullName(),
           "BTFieldConstructor::GetMultipole"));
   // MaxEndPole is also called in end field calculation
@@ -388,13 +401,13 @@ BTField * BTFieldConstructor::GetMultipole(const MiceModule * theModule) {
 		if(theModule->propertyExistsThis("ReferenceMomentum", "double"))
 			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
 		else 
-			throw(Squeal(Squeal::nonRecoverable, 
+			throw(MAUS::Exception(MAUS::Exception::nonRecoverable, 
                    "Did not define multipole reference momentum",
                    "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 		if(theModule->propertyExistsThis("BendingAngle", "double"))
 			field          = theModule->propertyDoubleThis("BendingAngle");
 		else 
-			throw(Squeal(Squeal::nonRecoverable,
+			throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
                    "Did not define multipole bending angle",
                    "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 	}
@@ -414,23 +427,23 @@ BTField * BTFieldConstructor::GetCombinedFunction
   double index   = theModule->propertyDoubleThis("FieldIndex");
 
   if (height <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
         "CombinedFunction Height must be more than 0 in module "+theModule->fullName(), 
         "BTFieldConstructor::GetCombinedFunction"));
   if (width <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
          "CombinedFunction Width must be more than 0 in module "+theModule->fullName(), 
          "BTFieldConstructor::GetCombinedFunction"));
   if (length <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
         "CombinedFunction Length must be more than 0 in module "+theModule->fullName(),
         "BTFieldConstructor::GetCombinedFunction"));
   if (pole <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
           "CombinedFunction Pole must be more than 0 in module "+theModule->fullName(),
           "BTFieldConstructor::GetCombinedFunction"));
   if (index <= 0) 
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
           "CombinedFunction FieldIndex must be more than 0 in module "+theModule->fullName(),
           "BTFieldConstructor::GetCombinedFunction"));
 
@@ -451,13 +464,13 @@ BTField * BTFieldConstructor::GetCombinedFunction
 		if(theModule->propertyExistsThis("ReferenceMomentum", "double"))
 			radiusVariable = theModule->propertyDoubleThis("ReferenceMomentum");
 		else 
-			throw(Squeal(Squeal::nonRecoverable,
+			throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
                    "Did not define multipole reference momentum",
                    "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 		if(theModule->propertyExistsThis("BendingAngle", "double")) 
 			field          = theModule->propertyDoubleThis("BendingAngle");
 		else 
-			throw(Squeal(Squeal::nonRecoverable,
+			throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
                    "Did not define multipole bending angle",
                    "BTFieldConstructor::GetMultipole(const MiceModule*)"));
 	}
@@ -474,15 +487,15 @@ BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
     double x0    = mod->propertyDoubleThis("CentreLength");
     int    max_p = mod->propertyIntThis("MaxEndPole")-pole;
     if (l <= 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
         "Tanh EndLength must be more than 0 in module "+mod->fullName(), 
         "BTFieldConstructor::GetEndFieldModel"));
     if (x0 <= 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
        "Tanh CentreLength must be more than 0 in module "+mod->fullName(), 
        "BTFieldConstructor::GetEndFieldModel"));
     if (max_p < 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
        "Tanh MaxEndPole must be >= Pole in module "+mod->fullName(),
        "BTFieldConstructor::GetEndFieldModel"));
     return new BTMultipole::TanhEndField(x0, l, max_p);
@@ -492,15 +505,15 @@ BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
 		double x0    = mod->propertyDoubleThis("CentreLength");
 		int    max_p = mod->propertyIntThis("MaxEndPole") - pole;
     if (l <= 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
         "Enge EndLength must be more than 0 in module "+mod->fullName(), 
         "BTFieldConstructor::GetEndFieldModel"));
     if (x0 <= 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
        "Enge CentreLength must be more than 0 in module "+mod->fullName(),
        "BTFieldConstructor::GetEndFieldModel"));
     if (max_p < 0)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
        "Enge MaxEndPole must be >= Pole in module "+mod->fullName(),
        "BTFieldConstructor::GetEndFieldModel"));
     std::vector<double> enge;
@@ -515,13 +528,13 @@ BTMultipole::EndFieldModel* BTFieldConstructor::GetEndFieldModel
 			else propertyExists = false;
 		}
 		if (engeNumber == 1)
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Must define at least one Enge parameter for Enge end field",
           "BTFieldConstructor::GetEndFieldModel"));
 		return new BTMultipole::EngeEndField
                                        (enge, x0, l, max_p);
   }
-  throw(Squeal(Squeal::recoverable,
+  throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Failed to recognise EndFieldModel "+
           mod->propertyStringThis("EndFieldType")+" in module "+mod->fullName(),
           "BTFieldConstructor::GetEndFieldModel"));
@@ -535,7 +548,7 @@ BTField * BTFieldConstructor::GetDerivativesSolenoid(const MiceModule * theModul
   int         order = theModule->propertyIntThis   ("MaxEndPole");
   MAUS::EndFieldModel* end_field = GetEndFieldModel(theModule, 0);
   if (end_field == NULL) {  // hard edged == NULL
-      throw(Squeal(Squeal::recoverable,
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "DerivativesSolenoid must have soft edged end field",
                    "BTFieldConstructor::GetDerivativesSolenoid"));
   }

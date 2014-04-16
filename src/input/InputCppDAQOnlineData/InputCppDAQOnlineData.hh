@@ -26,24 +26,25 @@
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
+namespace MAUS {
+/** \class InputCppDAQOnlineData
+* This class is used to access the DAQ data online.
+*/
 class InputCppDAQOnlineData : public InputCppDAQData {
 
  public:
 
   /** Create an instance of InputCppDAQOnlineData.
-  * 
-  * This is the constructor for InputCppDAQOnlineData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQOnlineData.
   */
   InputCppDAQOnlineData();
 
   /** Initialise the Unpacker.
   *
-  * This prepares the unpacker to read the files given in the constructor.
+  * This prepares the unpacker to read from a socket given in the configuration.
   *
-  * \return True if at least one file was opened sucessfully.
+  * \return True if initialised sucessfully.
   */
   bool birth(std::string pJSONConfig);
 
@@ -60,10 +61,7 @@ class InputCppDAQOnlineData : public InputCppDAQData {
    *
    *  \param mon file name of the source
    */
-  void setMonitorSrc(std::string mon) {
-    _dataManager->setMonSrc(mon);
-    _dataManager->Init();
-  }
+  void setMonitorSrc(std::string mon);
 
  private:
 
@@ -71,5 +69,6 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   MDmonitoring * _dataManager;
   struct timespec _sleep_time; // time.h
 };
+}
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

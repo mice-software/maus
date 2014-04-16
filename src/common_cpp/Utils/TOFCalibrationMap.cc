@@ -17,6 +17,10 @@
 
 #include "Utils/TOFCalibrationMap.hh"
 
+#include "Utils/TOFChannelMap.hh"
+
+namespace MAUS {
+
 TOFCalibrationMap::TOFCalibrationMap() {
   pymod_ok = true;
   if (!this->InitializePyMod()) pymod_ok = false;
@@ -182,7 +186,7 @@ bool TOFCalibrationMap::LoadT0File(std::string t0File) {
       _reff[n] = reff;
       // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadT0File : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -215,7 +219,7 @@ bool TOFCalibrationMap::LoadTWFile(std::string twFile) {
       _twPar[n][3] = p3;
       // std::cout<< key << " pos:" << n << "  p0:" << p0 << "  p1:" << p1 << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTWFile : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -243,7 +247,7 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
       _Trt0.push_back(dt);
       // std::cout<< Pkey << "  dt:" << dt << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTriggerFile. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -376,13 +380,13 @@ void TOFCalibrationMap::Print() {
   std::cout<< "===================================================================" << std::endl;
 }
 
-TOFPixelKey::TOFPixelKey(string keyStr) throw(Squeal) {
+TOFPixelKey::TOFPixelKey(string keyStr) throw(MAUS::Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Squeal e) {
-    throw(Squeal(Squeal::recoverable,
+  }catch(MAUS::Exception e) {
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  std::string("corrupted TOF Pixel Key"),
                  "TOFPixelKey::TOFPixelKey(std::string)"));
   }
@@ -418,12 +422,12 @@ ostream& operator<<( ostream& stream, TOFPixelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Squeal) {
+istream& operator>>( istream& stream, TOFPixelKey &key ) throw(MAUS::Exception) {
   string xLabel;
   stream >> xLabel >> key._station >> key._slabX >> key._slabY >> key._detector;
 
   if (xLabel != "TOFPixelKey") {
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
                  std::string("corrupted TOF Pixel Key"),
                  "istream& operator>>(istream& stream, TOFPixelKey)"));
   }
@@ -480,7 +484,7 @@ void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
   py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
   if (py_arg == NULL) {
     PyErr_Clear();
-    throw(Squeal(Squeal::recoverable,
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
               "Failed to resolve arguments to get_calib",
               "MAUSEvaluator::evaluate"));
     }
@@ -497,7 +501,7 @@ void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
     if (py_value == NULL) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
-        throw(Squeal(Squeal::recoverable,
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
                      "Failed to parse argument "+devname,
                      "GetCalib::get_calib"));
     }
@@ -520,7 +524,7 @@ bool TOFCalibrationMap::LoadT0Calib() {
       _reff[n] = reff;
       // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadT0Calib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -547,7 +551,7 @@ bool TOFCalibrationMap::LoadTWCalib() {
       _twPar[n][3] = p3;
        // std::cout<< key << " pos:" << n << "  p0:" << p0 << "  p1:" << p1 << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTWCalib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -569,7 +573,7 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
       _Trt0.push_back(dt);
        // std::cout<< Pkey << "  dt:" << dt << std::endl;
     }
-  } catch(Squeal e) {
+  } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFCalibrationMap::LoadTriggerCalib. Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -579,4 +583,5 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
   _triggerStation = Pkey.station();
 
   return true;
+}
 }

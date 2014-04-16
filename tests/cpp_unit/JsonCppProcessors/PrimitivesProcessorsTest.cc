@@ -15,6 +15,7 @@
  */
 
 #include <string>
+#include <limits>
 
 #include "gtest/gtest.h"
 
@@ -30,7 +31,7 @@ TEST(PrimitivesProcessorsTest, DoubleJsonToCpp) {
   double* value = proc.JsonToCpp(Json::Value(1.));
   EXPECT_EQ(*value, 1.);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Squeal);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
 }
 
 TEST(PrimitivesProcessorsTest, DoubleCppToJson) {
@@ -49,7 +50,7 @@ TEST(PrimitivesProcessorsTest, BoolJsonToCpp) {
   bool* value = proc.JsonToCpp(Json::Value(true));
   EXPECT_EQ(*value, true);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Squeal);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
 }
 
 TEST(PrimitivesProcessorsTest, BoolCppToJson) {
@@ -68,7 +69,7 @@ TEST(PrimitivesProcessorsTest, StringJsonToCpp) {
   std::string* value = proc.JsonToCpp(Json::Value("string"));
   EXPECT_EQ(*value, "string");
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value(1.)), Squeal);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value(1.)), Exception);
 }
 
 TEST(PrimitivesProcessorsTest, StringCppToJson) {
@@ -87,7 +88,7 @@ TEST(PrimitivesProcessorsTest, IntJsonToCpp) {
   int* value = proc.JsonToCpp(Json::Value(1));
   EXPECT_EQ(*value, 1);
   delete value;
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Squeal);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
 }
 
 TEST(PrimitivesProcessorsTest, IntCppToJson) {
@@ -113,7 +114,7 @@ TEST(PrimitivesProcessorsTest, UIntJsonToCpp) {
   EXPECT_EQ(*value, static_cast<unsigned int>(0));
   delete value;
 
-  EXPECT_THROW(proc.JsonToCpp(Json::Value(-1)), Squeal); // negative int
+  EXPECT_THROW(proc.JsonToCpp(Json::Value(-1)), Exception); // negative int
 
   unsigned int uint_in = 1;
   value = proc.JsonToCpp(Json::Value(uint_in)); // uint
@@ -130,7 +131,7 @@ TEST(PrimitivesProcessorsTest, UIntJsonToCpp) {
   EXPECT_EQ(*value, static_cast<unsigned int>(2147483648));
   delete value;
 
-  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Squeal);
+  EXPECT_THROW(proc.JsonToCpp(Json::Value("string")), Exception);
 }
 
 TEST(PrimitivesProcessorsTest, UIntCppToJson) {
@@ -142,6 +143,37 @@ TEST(PrimitivesProcessorsTest, UIntCppToJson) {
   value_json = proc.CppToJson(value_cpp, "path");
   EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
   delete value_json;
+}
+
+TEST(PrimitivesProcessorsTest, LLUIntCppToJson) {
+  LLUIntProcessor proc;
+  uint64 value_cpp = std::numeric_limits<uint64>::max();
+  Json::Value* value_json = proc.CppToJson(value_cpp);
+  uint64* value_cpp_2 = proc.JsonToCpp(*value_json);
+  EXPECT_EQ(value_cpp, *value_cpp_2);
+  delete value_cpp_2;
+  delete value_json;
+  value_json = proc.CppToJson(value_cpp, "path");
+  EXPECT_EQ(JsonWrapper::Path::GetPath(*value_json), "path");
+  delete value_json;
+}
+
+TEST(PrimitivesProcessorsTest, LLUIntJsonToCpp) {
+  LLUIntProcessor proc;
+  Json::Value value_json;
+
+  value_json = Json::Value("0");
+  uint64* value_cpp = proc.JsonToCpp(value_json);
+  EXPECT_EQ(*value_cpp, static_cast<uint64>(0));
+
+  value_json = Json::Value("-0");
+  EXPECT_THROW(proc.JsonToCpp(value_json), Exception);
+
+  value_json = Json::Value("abc");
+  EXPECT_THROW(proc.JsonToCpp(value_json), Exception);
+
+  value_json = Json::Value(1);
+  EXPECT_THROW(proc.JsonToCpp(value_json), Exception);
 }
 }
 

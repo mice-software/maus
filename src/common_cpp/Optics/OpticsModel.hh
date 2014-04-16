@@ -30,7 +30,12 @@ namespace MAUS {
 
 class OpticsModel {
  public:
-  OpticsModel() : configuration_(NULL) { }
+  OpticsModel() : configuration_(NULL), primary_plane_(0.) { }
+  explicit OpticsModel(Json::Value const * const configuration)
+      : configuration_(configuration), primary_plane_(0.) { }
+  OpticsModel(Json::Value const * const configuration,
+              const double primary_plane)
+      : configuration_(configuration), primary_plane_(primary_plane) { }
   virtual ~OpticsModel() { }
 
   virtual void Build() = 0;
@@ -84,11 +89,13 @@ class OpticsModel {
 
   Json::Value const * configuration() const {return configuration_;}
 
-  const double first_plane() const {return first_plane_;}
-  void set_first_plane(const double first_plane) {first_plane_ = first_plane;}
+  const double primary_plane() const {return primary_plane_;}
+  void set_primary_plane(const double primary_plane) {
+    primary_plane_ = primary_plane;
+  }
  protected:
   Json::Value const * configuration_;
-  double first_plane_;
+  double primary_plane_;
 };
 }
 

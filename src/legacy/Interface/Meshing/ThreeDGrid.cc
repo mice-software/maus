@@ -15,7 +15,7 @@
  */
 
 #include "src/legacy/Interface/Meshing/ThreeDGrid.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 ThreeDGrid::ThreeDGrid()
     : _x(2, 0), _y(2, 0), _z(2, 0), _xSize(0), _ySize(0), _zSize(0), _maps(0),
@@ -32,10 +32,9 @@ ThreeDGrid::ThreeDGrid(int xSize, const double *x,
       _maps(), _constantSpacing(false) {
   SetConstantSpacing();
   if (_xSize < 2 || _ySize < 2 || _zSize < 2)
-    throw(Squeal(
-        Squeal::recoverable,
-        "3D Grid must be at least 2x2x2 grid",
-        "ThreeDGrid::ThreeDGrid(...)")
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
+                          "3D Grid must be at least 2x2x2 grid",
+                          "ThreeDGrid::ThreeDGrid(...)")
     );
 }
 
@@ -47,10 +46,9 @@ ThreeDGrid::ThreeDGrid(std::vector<double> x,
       _maps(), _constantSpacing(false) {
   SetConstantSpacing();
   if (_xSize < 2 || _ySize < 2 || _zSize < 2)
-      throw(Squeal(
-          Squeal::recoverable,
-          "3D Grid must be at least 2x2x2 grid",
-          "ThreeDGrid::ThreeDGrid(...)")
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
+                            "3D Grid must be at least 2x2x2 grid",
+                            "ThreeDGrid::ThreeDGrid(...)")
       );
 }
 

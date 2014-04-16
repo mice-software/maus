@@ -22,7 +22,7 @@ V1731Processor::V1731Processor()
     : _ldc_id_proc(), _samples_proc(new IntProcessor), _charge_mm_proc(),
       _equip_type_proc(), _phys_event_number_proc(), _charge_pm_proc(),
       _arrival_time_proc(), _channel_key_proc(), _position_min_proc(),
-      _pulse_area_proc(), _max_pos_proc(), _trigger_time_tag_proc(),
+      _pulse_area_proc(), _position_max_proc(), _trigger_time_tag_proc(),
       _time_stamp_proc(), _detector_proc(), _part_event_number_proc(),
       _geo_proc(), _pedestal_proc(), _channel_proc() {
     RegisterValueBranch
@@ -56,8 +56,8 @@ V1731Processor::V1731Processor()
           ("pulse_area", &_pulse_area_proc, &V1731::GetPulseArea,
           &V1731::SetPulseArea, true);
     RegisterValueBranch
-          ("max_pos", &_max_pos_proc, &V1731::GetMaxPos,
-          &V1731::SetMaxPos, true);
+          ("position_max", &_position_max_proc, &V1731::GetPositionMax,
+          &V1731::SetPositionMax, true);
     RegisterValueBranch
           ("trigger_time_tag", &_trigger_time_tag_proc, &V1731::GetTriggerTimeTag,
           &V1731::SetTriggerTimeTag, true);

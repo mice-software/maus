@@ -44,8 +44,8 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
 
 MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     if (_instance != NULL)
-        throw(Squeal(
-              Squeal::recoverable,
+        throw(Exception(
+              Exception::recoverable,
               "Attempt to initialise MAUSGeant4Manager twice",
               "MAUSGeant4Manager::MAUSGeant4Manager"));
     _instance = this;
@@ -98,6 +98,7 @@ MAUSPrimaryGeneratorAction::PGParticle
     Json::Value ref = JsonWrapper::GetProperty
              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);
+    p.MassShellCondition();
     return p;
 }
 

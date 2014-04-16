@@ -101,7 +101,25 @@ class TestExamples(unittest.TestCase): # pylint: disable=R0904
         for item in examples:
             proc, log = run_example(item)
             self.assertEqual(proc.returncode, 0, msg="Check logfile "+log)
+            if "match_step_4_beta_function.py" in item:
+                match_log = log
+        self._test_optics_match_beta(match_log)
         self._test_load_root_file_cpp()
+
+    def _test_optics_match_beta(self, match_log):
+        """
+        Check match_step_4_beta_function.py produces matched beta functions
+        """
+        fin = open(match_log)
+        beta_start, beta_end = None, None
+        for line in fin.readlines():
+            if "beta at start" in line:
+                beta_start = float(line.split()[-2])
+            if "beta at end" in line:
+                beta_end = float(line.split()[-2])
+        self.assertAlmostEqual(beta_start, 322., 0) # mm
+        self.assertAlmostEqual(beta_end, 322., 0) # mm
+
 
     def _test_load_root_file_cpp(self):
         """

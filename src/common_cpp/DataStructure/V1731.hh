@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
+#include "Utils/VersionNumber.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -130,16 +130,16 @@ class V1731 {
     void SetPulseArea(int pulse_area);
 
     /** Returns MaxPos */
-    int GetMaxPos() const;
+    int GetPositionMax() const;
 
     /** Sets MaxPos */
-    void SetMaxPos(int max_pos);
+    void SetPositionMax(int max_pos);
 
     /** Returns TriggerTimeTag */
-    double GetTriggerTimeTag() const;
+    int GetTriggerTimeTag() const;
 
     /** Sets TriggerTimeTag */
-    void SetTriggerTimeTag(double trigger_time_tag);
+    void SetTriggerTimeTag(int trigger_time_tag);
 
     /** Returns TimeStamp */
     int GetTimeStamp() const;
@@ -166,10 +166,10 @@ class V1731 {
     void SetGeo(int geo);
 
     /** Returns Pedestal */
-    int GetPedestal() const;
+    double GetPedestal() const;
 
     /** Sets Pedestal */
-    void SetPedestal(int pedestal);
+    void SetPedestal(double pedestal);
 
     /** Returns Channel */
     int GetChannel() const;
@@ -188,13 +188,13 @@ class V1731 {
     std::string _channel_key;
     int _position_min;
     int _pulse_area;
-    int _max_pos;
-    double _trigger_time_tag;
+    int _position_max;
+    int _trigger_time_tag;
     int _time_stamp;
     std::string _detector;
     int _part_event_number;
     int _geo;
-    int _pedestal;
+    double _pedestal;
     int _channel;
 
     MAUS_VERSIONED_CLASS_DEF(V1731)

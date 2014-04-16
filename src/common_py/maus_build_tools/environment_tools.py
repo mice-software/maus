@@ -208,7 +208,7 @@ def set_cpp(conf, env):
 
     env.Append(CCFLAGS=["""-Wall""",
                         """-Dlong32='int'""",
-                        """-Dlong64='long long'"""])
+                        """-DdatePointer='long'"""])
 
     cpp_extras(env)
 

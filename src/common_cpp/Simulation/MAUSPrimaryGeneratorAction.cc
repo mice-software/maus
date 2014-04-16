@@ -19,6 +19,8 @@
 #include <limits>
 #include <queue>
 
+#include "Geant4/G4ParticleTable.hh"
+#include "Geant4/G4ParticleDefinition.hh"
 #include "Geant4/G4Event.hh"
 #include "Geant4/G4PrimaryVertex.hh"
 #include "Geant4/G4Track.hh"
@@ -54,22 +56,26 @@ MAUSPrimaryGeneratorAction::PGParticle MAUSPrimaryGeneratorAction::Pop() {
 
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   if (_part_q.size() == 0)
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No primary particles",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   PGParticle part = Pop();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* particle = particleTable->FindParticle(part.pid);
   if ( particle == NULL )
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle pid not recognised",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if ( part.energy < particle->GetPDGMass() )
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle total energy less than particle mass",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
+  if ( part.px*part.px+part.py*part.py+part.pz*part.pz < 1e-15 )
+    throw(Exception(Exception::recoverable,
+                 "Particle total momentum too small",
+                 "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if (!isInWorldVolume(part.x, part.y, part.z)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Particle is outside world volume at position ("+
                  STLUtils::ToString(part.x)+", "+
                  STLUtils::ToString(part.y)+", "+
@@ -88,7 +94,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
   if ( part.seed < 0 || part.seed > uint_max ) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   }
@@ -114,13 +120,20 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle()
 
 void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   Json::Value pos = JsonWrapper::GetProperty
-                             (particle, "position", JsonWrapper::objectValue);
+                            (particle, "position", JsonWrapper::objectValue);
   Json::Value mom = JsonWrapper::GetProperty
-                             (particle, "momentum", JsonWrapper::objectValue);
+                            (particle, "momentum", JsonWrapper::objectValue);
   pid = JsonWrapper::GetProperty
-                       (particle, "particle_id", JsonWrapper::intValue).asInt();
-  seed = JsonWrapper::GetProperty
-                     (particle, "random_seed", JsonWrapper::intValue).asUInt();
+                      (particle, "particle_id", JsonWrapper::intValue).asInt();
+  try {
+    seed = JsonWrapper::GetProperty
+                      (particle, "random_seed", JsonWrapper::intValue).asUInt();
+  } catch (std::exception stde) {
+    throw(Exception(Exception::recoverable,
+                 "Failed to convert Json::Value integer \"random_seed\" to "
+                 "unsigned int.",
+                 "MAUSPrimaryGeneratorAction::PGParticle::ReadJson"));
+  }
   x = JsonWrapper::GetProperty(pos, "x", JsonWrapper::realValue).asDouble();
   y = JsonWrapper::GetProperty(pos, "y", JsonWrapper::realValue).asDouble();
   z = JsonWrapper::GetProperty(pos, "z", JsonWrapper::realValue).asDouble();
@@ -155,6 +168,24 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   return particle;
 }
 
+void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
+  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->
+                                                              FindParticle(pid);
+  double mass = particle->GetPDGMass();
+  if (energy < mass)
+      throw Exception(Exception::recoverable,
+            "Attempt to set mass shell condition when (total) energy < mass",
+            "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
+  if (fabs(px)+fabs(py)+fabs(pz) == 0.)
+      throw Exception(Exception::recoverable,
+            "Attempt to set mass shell condition when momentum is 0.",
+            "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
+  double norm = sqrt((energy*energy-mass*mass)/(px*px + py*py + pz*pz));
+  px *= norm;
+  py *= norm;
+  pz *= norm;
+}
+
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     x = hit.GetPos().x();
@@ -167,6 +198,17 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     energy = hit.GetEnergy();
     pid = hit.GetPID();
     seed = 0;
+}
+
+Primary MAUSPrimaryGeneratorAction::PGParticle::GetPrimary() {
+  Primary prim;
+  prim.SetRandomSeed(seed);
+  prim.SetParticleId(pid);
+  prim.SetTime(time);
+  prim.SetEnergy(energy);
+  prim.SetPosition(ThreeVector(x, y, z));
+  prim.SetMomentum(ThreeVector(px, py, pz));
+  return prim;
 }
 
 }  // ends MAUS namespace

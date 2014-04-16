@@ -33,21 +33,24 @@
 #include "unpacking/MDfragment.h"
 
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
-#include "Utils/DAQChannelMap.hh"
+#include "DataStructure/Data.hh"
+#include "DataStructure/Spill.hh"
+#include "DataStructure/DAQData.hh"
 #include "Interface/Squeak.hh"
 
+namespace MAUS {
+
 /** \class InputCppDAQData
-* Load MICE raw data and unpack it into a JSON stream.
-* 
+* Load MICE raw data and unpack it into a JSON stream or a Cpp Data format.
+*
 * InputCppDAQData is a base imput class and can not be used to access the DAQ data!
 * The access to the data is provided by the two daughter classes InputCppDAQOfflineData
 * and InputCppDAQOnlineData.
-* 
+*
 * This module reads binary data in the format of the MICE DAQ.  It drives the
 * 'unpacker' library to do this conversion.  The end result is the MICE data
-* in JSON format.  The data includes TDC and flash ADC values, so this
+* in a JSON or a Cpp Data format.  The data includes TDC and flash ADC values, so this
 * information is low-level.
-*
 */
 
 class InputCppDAQData {
@@ -55,24 +58,22 @@ class InputCppDAQData {
  public:
 
   /** Create an instance of InputCppDAQData.
-  * 
-  * This is the constructor for InputCppDAQData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQData.
   */
-  InputCppDAQData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQData();
 
   /** Initialise the Unpacker.
   *
-  * This prepares the unpacker to read the files given in the constructor.
+  * This prepares the unpacker to read the data according to the configuration.
   *
-  * \return True if at least one file was opened sucessfully.
+  * \return True if the configuration is loaded and the processors are
+  * initialised sucessfully.
   */
   bool birth(std::string pJSONConfig);
 
- /** Dummy function.
-  * The access to the data is provided by the two daughter classes 
+  /** Dummy function.
+  * The access to the data is provided by the two daughter classes
   * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
   * \return false after printing an error message.
@@ -88,6 +89,16 @@ class InputCppDAQData {
   * \return JSON document containing the unpacked DAQ data.
   */
   std::string getCurEvent();
+
+  /** Unpack the current event into Cpp Data.
+  *
+  * This unpacks the current event into the Cpp Data Structure.
+  * Don't call this until readNextEvent() has been called and returned true at
+  * least once!
+  *
+  * \return JSON document containing the unpacked DAQ data.
+  */
+  void getCurEvent(MAUS::Data *data);
 
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment
@@ -127,8 +138,7 @@ class InputCppDAQData {
 
   std::string _classname;
 
- /** Counter of the DAQ events.
-  */
+  /** Counter of the DAQ events. */
   int _eventsCount;
 
   /** File manager object. */
@@ -139,19 +149,17 @@ class InputCppDAQData {
 
  private:
 
- /** Initialise the processor.
-  * 
-  * 
+  /** Initialise the processor.
+  * Template function used to initialise a processor
+  * according to the configuration.
   */
   template <class procType>
   bool initProcessor(procType* &processor, Json::Value configJSON);
 
- /** Configure the zero supression filter.
-  */
+  /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
- /** Process manager object.
-  */
+  /** Process manager object. */
   MDprocessManager _dataProcessManager;
 
   /** The DAQ channel map object.
@@ -159,41 +167,27 @@ class InputCppDAQData {
   DAQChannelMap _map;
 
   /** Processor for TDC particle event data. */
-  V1290DataProcessor*  _v1290PartEventProc;
+  V1290CppDataProcessor  *_v1290PartEventProc_cpp;
 
   /** Processor for fADC V1724 particle event data. */
-  V1724DataProcessor*  _v1724PartEventProc;
+  V1724CppDataProcessor  *_v1724PartEventProc_cpp;
 
   /** Processor for fADC V1731 particle event data. */
-  V1731DataProcessor*  _v1731PartEventProc;
+  V1731CppDataProcessor  *_v1731PartEventProc_cpp;
 
   /** Processor for scaler data. */
-  V830DataProcessor*  _v830FragmentProc;
+  V830CppDataProcessor   *_v830FragmentProc_cpp;
 
   /** Processor for VLSB data. */
-  VLSBDataProcessor* _vLSBFragmentProc;
+  VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
- /** Processor for VLSB data from the cosmic test in Lab7.
-  */
-  VLSB_CDataProcessor* _vLSB_cFragmentProc;
+  /** Processor for DBB data. */
+  DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
- /** Processor for DBB data.
-  */
-  DBBDataProcessor* _DBBFragmentProc;
+  /** Processor for DBBChain data. */
+  DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
-  /** Paths to the data.
-  * This string has to contain one or more space separated paths.
-  */
-  std::string _dataPaths;
-
-  /** File and run names within _dataPaths.
-  * This string has to contain one or more space separated
-  * file names or run numbers.
-  */
-  std::string _datafiles;
-
- /** Enum of event types
-  */
+  /** Enum of event types */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
@@ -208,6 +202,9 @@ class InputCppDAQData {
   * \return The type of the event as string.
   */
   std::string event_type_to_str(int pType);
+
+  void resetAllProcessors();
 };
+}
 
 #endif  // _MAUS_INPUTCPPDAQDATA_INPUTCPPDAQDATA_H__

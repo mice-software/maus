@@ -18,6 +18,7 @@
 #include "src/map/MapCppExampleMAUSDataInput/MapCppExampleMAUSDataInput.hh"
 
 #include "src/common_cpp/API/APIExceptions.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 
 namespace MAUS {
 MapCppExampleMAUSDataInput::MapCppExampleMAUSDataInput()
@@ -27,7 +28,7 @@ void MapCppExampleMAUSDataInput::_birth(const std::string& argJsonConfigDocument
   // Check if the JSON document can be parsed, else return error only.
   bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
                  "Unable to Parse Json Config",
                  "MapCppExampleMAUSDataInput::_birth"));
   }
@@ -37,14 +38,14 @@ void MapCppExampleMAUSDataInput::_death() {}
 
 MAUS::Data* MapCppExampleMAUSDataInput::_process(MAUS::Data* data) const {
   if (!data) {
-    throw(Squeal(Squeal::nonRecoverable,
+    throw(Exception(Exception::nonRecoverable,
                  "NULL MAUS::Data* passed to process.",
                  "MapCppExampleMAUSDataInput::_process"));
   }
 
   const MAUS::Spill* spill = data->GetSpill();
   if (!spill) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "No MAUS::Spill in MAUS::Data, required!",
                  "MapCppExampleMAUSDataInput::_process"));
   }

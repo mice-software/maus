@@ -49,10 +49,13 @@
 \input{mice_modules/mice_module_fields} % how to set up fields
 
 \include{detectors/tof}
-%\include{detectors/tracker}
+\input{detectors/tracker}
 %\include{detectors/emr}
 %\include{detectors/ckov}
 %\include{detectors/kl}
+
+\input{envelope_tool} % envelope utility - could be an appendix
+
 
 %\chapter{Geometry}
 %\include{geometry_definitions}
@@ -62,7 +65,10 @@
 
 %\chapter{Appendix B: Spill Structure}
 %\include{spill_schema} % automatically constructed by build script
-%
+
+\chapter{Appendix C: Tracker Appendices}
+\label{chapter:TrackerAppendices}
+\input{detectors/tracker/11-Appendices/11-Appendices}
 
 \end{document}
 

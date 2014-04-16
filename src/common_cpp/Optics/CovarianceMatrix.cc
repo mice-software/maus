@@ -27,8 +27,9 @@
 
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Units/PhysicalConstants.h"
+#include "TMatrixDSym.h"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 
@@ -86,7 +87,7 @@ CovarianceMatrix::CovarianceMatrix(const Matrix<double>& matrix)
     : SymmetricMatrix() {
   if (   (matrix.number_of_rows() < 6)
       || (matrix.number_of_columns() < 6)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to construct with a Matrix<double> containing "
                  "fewer than six rows and/or columns",
                  "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
@@ -103,10 +104,10 @@ CovarianceMatrix::CovarianceMatrix(const SymmetricMatrix& symmetric_matrix)
     : SymmetricMatrix() {
   if (   (symmetric_matrix.number_of_rows() < 6)
       || (symmetric_matrix.number_of_columns() < 6)) {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a SymmetricMatrix containing "
-                 "fewer than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
+    throw(Exception(Exception::recoverable,
+          "Attempted to construct with a SymmetricMatrix containing "
+          "fewer than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(SymmetricMatrix<double>)"));
   }
   build_matrix(6);
   for (size_t row = 1; row <= 6; ++row) {
@@ -120,10 +121,10 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
     : SymmetricMatrix() {
   if (   (hep_sym_matrix.num_row() < 6)
       || (hep_sym_matrix.num_col() < 6)) {
-    throw(Squeal(Squeal::recoverable,
-                 "Attempted to construct with a HepSymMatrix containing fewer "
-                 "than six rows and/or columns",
-                 "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
+    throw(Exception(Exception::recoverable,
+          "Attempted to construct with a HepSymMatrix containing fewer "
+          "than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(CLHEP::HepSymMatrix<double>)"));
   }
   build_matrix(6);
   double element;
@@ -134,6 +135,19 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
       Matrix<double>::operator()(column, row) = element;
     }
   }
+}
+
+CovarianceMatrix::CovarianceMatrix(const TMatrixDSym& root_sym_matrix)
+    : SymmetricMatrix(root_sym_matrix) {
+  if (   (root_sym_matrix.GetNrows() < 6)
+      || (root_sym_matrix.GetNcols() < 6)) {
+    throw(Exception(Exception::recoverable,
+          "Attempted to construct with a TMatrixDSym containing fewer "
+          "than six rows/columns",
+          "CovarianceMatrix::CovarianceMatrix(TMatrixDSym<double>)"));
+  }
+  const double * data = root_sym_matrix.GetMatrixArray();
+  build_matrix(6, data);
 }
 
 CovarianceMatrix::CovarianceMatrix(double const * const array_matrix)
@@ -179,7 +193,7 @@ const CovarianceMatrix CovarianceMatrix::CreateFromPennParameters(
   double sigma_E_E  =  emittance_l * mass * gamma_l * momentum;
 
   double sigma_x_t  =  0.;
-  double sigma_x_E  = -dispersion_x * sigma_E_E / energy;
+  double sigma_x_E  =  dispersion_x * sigma_E_E / energy;
   double sigma_x_x  =  emittance_t * beta_t * mass / momentum;
 
   double sigma_Px_t =  0.;
@@ -188,7 +202,7 @@ const CovarianceMatrix CovarianceMatrix::CreateFromPennParameters(
   double sigma_Px_Px=  mass * momentum * emittance_t * gamma_t;
 
   double sigma_y_t  =  0.;
-  double sigma_y_E  = -dispersion_y * sigma_E_E / energy;
+  double sigma_y_E  = dispersion_y * sigma_E_E / energy;
   double sigma_y_x  =   0.;
   // this differes from G. Penn's paper
   double sigma_y_Px =  mass * emittance_t

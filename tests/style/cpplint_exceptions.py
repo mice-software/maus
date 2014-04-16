@@ -27,6 +27,7 @@ exceptions = { #pylint: disable=C0103
 
 CPP_CM = os.path.join('src','common_cpp')
 LEGACY = os.path.join('src','LEGACY')
+MAP = os.path.join('src', 'map')
 TST = os.path.join('tests', 'cpp_unit')
 
 exceptions[os.path.join(CPP_CM, 'Simulation',
@@ -71,26 +72,6 @@ exceptions[os.path.join(CPP_CM, 'Maths','Vector.hh')] = [
 exceptions[os.path.join(CPP_CM, 'DataStructure', 'ThreeVector.hh')] = [
 ('	  ThreeVector(const TVector3& value) : TVector3(value) {}',
  'explicit conversion is okay from ROOT to ThreeVectpr', 'rogers')
-]
-
-exceptions[os.path.join(TST, 'Maths', 'PolynomialVectorTest.cc')] = [
-('  } catch (Squeal squee) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Maths', 'VectorTest.cc')] = [
-('  } catch (Squeal squeal) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Optics', 'PhaseSpaceVectorTest.cc')] = [
-('  } catch (Squeal squeal) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
-]
-
-exceptions[os.path.join(TST, 'Optics', 'CovarianceMatrixTest.cc')] = [
-('  } catch (Squeal squeal) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane')
 ]
 
 exceptions[os.path.join(CPP_CM, 'JsonCppStreamer','ORStream.hh')] = [
@@ -179,31 +160,6 @@ exceptions[os.path.join(TST, 'JsonCppStreamer','RStreamTest.cc')] = [
 
 ]
 
-exceptions[os.path.join(TST, 'Maths', 'PolynomialMapTest.cc')] = [
-('  } catch (Squeal squeal) {}',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Optics',
-                        'LinearApproximationOpticsModelTest.cc')] = [
-('  } catch (Squeal squeal) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Optics',
-                        'PolynomialOpticsModelTest.cc')] = [
-('  } catch (Squeal squeal) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-('    } catch (Squeal squeal) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
-exceptions[os.path.join(TST, 'Recon/Global',
-                        'TrackPointTest.cc')] = [
-('  } catch (Squeal squeal) {',
- '"catch" is a keyword like "for" and "if", not a function', 'lane'),
-]
-
 exceptions[os.path.join(CPP_CM, 
                         'JsonCppProcessors',
                         'Common',
@@ -222,6 +178,14 @@ exceptions[os.path.join(CPP_CM,
  'A C style cast is the only option here, without requiring' +
  ' all processed objects inherit from TObject',
  'taylor'),
+]
+
+exceptions[os.path.join(CPP_CM,
+                        'JsonCppProcessors',
+                        'PrimitivesProcessors.hh')] = [
+('typedef unsigned long long uint64;',
+ 'This is setting up the uint64 that cpplint wants',
+ 'rogers'),
 ]
 
 exceptions[os.path.join('src', 'input', 'InputCppDAQOnlineData', 
@@ -249,4 +213,5 @@ exceptions[os.path.join('src', 'py_cpp', 'PyMiceModule.hh')] = [
 'cpplint misinterprets function pointer as a cast',
 'rogers')
 ]
+
 

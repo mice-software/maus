@@ -1,0 +1,110 @@
+{
+"type":"transient_frame",
+"name":"Penn Setup",
+"children":[{
+    "type":"vertical_frame",
+    "children":[{
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"1000.0",
+            "label_length":10,
+            "name":"beta_trans",
+            "tool_tip":"Transverse beta function [mm]"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"alpha_trans",
+            "tool_tip":"Transverse alpha function []"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"1.0",
+            "label_length":10,
+            "name":"emittance_trans",
+            "tool_tip":"Transverse emittance [mm]"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"B0",
+            "tool_tip":"Magnetic field parallel to reference particle momentum [T]"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"Lc",
+            "tool_tip":"Normalised canonical angular momentum []"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"10.0",
+            "label_length":10,
+            "name":"beta_l",
+            "tool_tip":"Longitudinal beta function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"alpha_l",
+            "tool_tip":"Longitudinal alpha function"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"1.0",
+            "label_length":10,
+            "name":"emittance_l",
+            "tool_tip":"Longitudinal emittance"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "layout":"close",
+        "children":[{
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_x",
+            "tool_tip":"Horizontal dispersion"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_prime_x",
+            "tool_tip":"Horizontal dispersion prime"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_y",
+            "tool_tip":"Vertical dispersion"
+        }, {
+            "type":"named_text_entry",
+            "default_text":"0.0",
+            "label_length":10,
+            "name":"disp_prime_y",
+            "tool_tip":"Vertical dispersion prime"
+        }
+        ]}, {
+        "type":"horizontal_frame",
+        "children":[{
+            "type":"button",
+            "name":"Get &B0"
+        }, {
+            "type":"button",
+            "name":"&Constant Beta"
+        }
+        ]}, {
+            "type":"horizontal_frame",
+            "children":[{
+                "type":"button",
+                "name":"&Okay"
+            }, {
+                "type":"button",
+                "name":"&Cancel"
+            }]
+    }]
+}]
+}

@@ -21,7 +21,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
@@ -40,9 +40,9 @@ bool MapCppKLCellHits::birth(std::string argJsonConfigDocument) {
     //  this will contain the configuration
 
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
+  } catch (Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
+  } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
 
@@ -58,7 +58,7 @@ std::string MapCppKLCellHits::process(std::string document) {
   Json::Value xEventType;
   // Check if the JSON document can be parsed, else return error only
   try {root = JsonWrapper::StringToJson(document);}
-  catch(...) {
+  catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says: Failed to parse input document";
@@ -99,10 +99,10 @@ std::string MapCppKLCellHits::process(std::string document) {
 	}
       }
     }
-  } catch(Squeal squee) {
+  } catch (Exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
-  } catch(std::exception exc) {
+                                       ->HandleException(root, exc, _classname);
+  } catch (std::exception exc) {
     root = MAUS::CppErrorHandler::getInstance()
                                          ->HandleStdExc(root, exc, _classname);
   }
@@ -178,6 +178,9 @@ Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) {
 Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) {
   Json::Value xDocCellHit, xDocPMT0, xDocPMT1;
 
+  std::cout << "xDocPMT0 " << xDocDigit0["kl_key"] << std::endl;
+  std::cout << "xDocPMT1 " << xDocDigit1["kl_key"] << std::endl;
+  xDocPMT1["kl_key"] = xDocDigit1["kl_key"];
   // Use the information from the digits to fill the cell hit.
   std::string xKeyStr = JsonWrapper::GetProperty(xDocDigit0,
                                                  "kl_key",
@@ -207,8 +210,11 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
     xDocPMT0["charge"] = xChargeDigit0;
     xDocPMT1["charge"] = xChargeDigit1;
     xDocCellHit["charge"] = xChargeDigit0 + xChargeDigit1;
-    xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
-				    (xChargeDigit0 + xChargeDigit1);
+    if (xDocCellHit["charge"] == 0)
+        xDocCellHit["charge_product"] = 0;
+    else
+        xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
+				        (xChargeDigit0 + xChargeDigit1);
   }
 
 //  xDocCellHit["pmt0"] = xDocPMT0;

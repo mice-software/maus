@@ -76,6 +76,14 @@ will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
 # to the output
 header_and_footer_mode = "append" #append or dont_append
 
+# Dictionary of variable to be set when using G4BL to generate particles. If
+# "get_magnet_currents_pa_cdb" is set to True magnet currents & proton absorber
+# thickness will be retrieved from the CDB for the run_number specified 
+g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
+        "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":731.89,\
+        "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
+        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
+
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
@@ -156,6 +164,10 @@ beam = {
     "binomial_p":0.5, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
+
+#    "particle_generator":"g4bl", # Uses G4BL as input for MAUS
+#    "g4bl_generator":"True", # Call G4BL each time new spill is created
+#    "random_seed":5,
     "definitions":[
     ##### MUONS #######
     {
@@ -262,6 +274,11 @@ SciFiParams_A = 104.15
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160.
 SciFiParams_RMS = 370.
+AirParams_Z = 7.2
+AirParams_Radiation_Legth = 30855.4817276 #cm. This is 37.15 g cm/2 / 0.001204 g/cm3
+AirParams_Density = 0.001204
+AirParams_Mean_Excitation_Energy = 85.7 # eV
+AirParams_A = 28.96
 SciFiSeedCovariance = 1000 # Error estimate for Seed values of the Kalman Fit
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
@@ -312,8 +329,34 @@ get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""
 
+# File Numbers
+# This following section gives the files numbers of each detector. The numbers speficy the technical drawing
+# number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
+# and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
+tof_0_file_number = "Iges_10"
+tof_1_file_number = "Iges_11"
+tof_2_file_number = "Iges_13"
+ckov1_file_number = "Iges_19"
+ckov2_file_number = "Iges_21"
+kl_file_number = "Iges_14"
+emr_file_number = "Iges_15"
+tracker0_file_number = "Iges_17"
+tracker1_file_number = "Iges_18"
+absorber0_file_number = "9999"
+absorber1_file_number = "Iges_16"
+absorber2_file_number = "9999"
+
+# Survey fit information
+survey_measurement_record = ""
+# This file should include position references and true locations of each detector.
+survey_reference_position = ""
+use_gdml_source           = True
+# Survey targets
+survey_target_detectors = []
+
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
+Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
 Enable_V1290_Unpacking = True
@@ -323,14 +366,15 @@ Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
 Enable_VLSB_C_Unpacking = True
 Enable_DBB_Unpacking = True
+Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
 Do_VLSB_Zero_Suppression = False
 VLSB_Zero_Suppression_Threshold = 60
-Do_VLSB_C_Zero_Suppression = True
-VLSB_C_Zero_Suppression_Threshold = 60
+Do_VLSB_C_Zero_Suppression = False
+VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
@@ -353,6 +397,20 @@ TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
 
+# KL digitization
+KLconversionFactor = 0.000125 # MeV
+KLlightCollectionEff = 0.031
+KLlightGuideEff  = 0.85
+KLquantumEff = 0.18
+KLlightSpeed =  170.0 # mm/ns
+KLattLengthLong  = 2400.0 # mm
+KLattLengthShort =  200.0 # mm
+KLattLengthLongNorm  = 0.655 # mm
+KLattLengthShortNorm   = 0.345 # mm
+KLhardCodedTrigger = True
+KLsamplingTimeStart = 0.0 # ns
+KLadcConversionFactor = 0.125
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
@@ -370,7 +428,7 @@ TOF_calib_source = "CDB"
 #TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
 
 TOF_findTriggerPixelCut = 0.5 # nanosecond
-TOF_makeSpacePiontCut = 0.5 # nanosecond
+TOF_makeSpacePointCut = 0.5 # nanosecond
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
@@ -383,6 +441,9 @@ Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
 KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+
+# this is used by the reconstuction of the EMR detectors
+EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
@@ -420,3 +481,14 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+# Default location of root file containing PDF histograms used for Global PID
+PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+# Particle hypothesis used in Global PID when creating PDFs from MC data.
+# For PDFs to be produced, this must be set, preferably as the type of simulated particle
+# i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
+global_pid_hypothesis = ""
+# Unique identifier used when creating PDFs in Global PID to distinguish between PDFs for
+# the same hypothesis generated at different times. For PDFs to be produced, this must be set.
+# Any string can be used but date and time is recommended, by using python datetime module and 
+# the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
+unique_identifier = ""

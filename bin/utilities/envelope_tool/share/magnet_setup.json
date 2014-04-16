@@ -1,0 +1,17 @@
+{
+"type":"transient_frame",
+"name":"Magnet Setup",
+"children":[{
+    "type":"special",
+    "manipulator":"magnet_setup_action"
+    }, {
+    "type":"horizontal_frame",
+    "children":[{
+        "type":"button",
+        "name":"&Okay"
+      }, {
+          "type":"button",
+          "name":"&Cancel"
+    }]
+}]
+}

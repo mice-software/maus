@@ -52,9 +52,9 @@ bool MapCppTrackerRecon::birth(std::string argJsonConfigDocument) {
     _geometry_helper = SciFiGeometryHelper(modules);
     _geometry_helper.Build();
     return true;
-  } catch(Squeal& squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception& exc) {
+  } catch (Exception& exception) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -73,9 +73,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
 
   try { // ================= Reconstruction =========================
     if ( spill.GetReconEvents() ) {
-    std::cerr << "Spill has " << spill.GetReconEvents()->size() << " events." << std::endl;
       for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
-        std::cerr << "Processing event " << k << std::endl;
         SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
         // Build Clusters.
         if ( event->digits().size() ) {
@@ -87,10 +85,7 @@ std::string MapCppTrackerRecon::process(std::string document) {
         }
         // Pattern Recognition.
         if ( event->spacepoints().size() ) {
-          std::cout << "Calling Pattern Recognition, helical " << _helical_pr_on;
-          std::cout << ", straight " << _straight_pr_on << std::endl;
           pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
-          std::cout << "Pattern Recognition complete." << std::endl;
         }
         // Kalman Track Fit.
         if ( _kalman_on ) {
@@ -98,17 +93,15 @@ std::string MapCppTrackerRecon::process(std::string document) {
             track_fit(*event);
           }
         }
-        print_event_info(*event);
+        // print_event_info(*event);
       }
     } else {
       std::cout << "No recon events found\n";
     }
     save_to_json(spill);
-  } catch(Squeal& squee) {
-    squee.Print();
-    // _spill_json = MAUS::CppErrorHandler::getInstance()
-    //                                   ->HandleSqueal(_spill_json, squee, _classname);
-  } catch(...) {
+  } catch (Exception& exception) {
+    exception.Print();
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
     ss << _classname << " says:" << reader.getFormatedErrorMessages();
@@ -133,7 +126,7 @@ void MapCppTrackerRecon::read_in_json(std::string json_data) {
     json_root = JsonWrapper::StringToJson(json_data);
     SpillProcessor spill_proc;
     _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch(...) {
+  } catch (...) {
     std::cerr << "Bad json document" << std::endl;
     _spill_cpp = new Spill();
     MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
@@ -166,6 +159,7 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) {
 void MapCppTrackerRecon::pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
                                              SciFiEvent &evt) {
   PatternRecognition pr1;
+  pr1.set_verbosity(0);
   pr1.process(helical_pr_on, straight_pr_on, evt);
 }
 

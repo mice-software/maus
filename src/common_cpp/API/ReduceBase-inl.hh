@@ -19,7 +19,7 @@
 
 #include <string>
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
@@ -40,13 +40,13 @@ namespace MAUS {
     try {
       o = _process(t);
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    catch (Exception& s) {
+      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
     return o;

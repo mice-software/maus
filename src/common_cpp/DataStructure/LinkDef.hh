@@ -81,6 +81,8 @@
 #pragma link C++ class std::vector<VirtualHit>;
 #pragma link C++ class std::vector<SciFiHit>;
 #pragma link C++ class std::vector<TOFHit>;
+#pragma link C++ class std::vector<KLHit>;
+#pragma link C++ class std::vector<EMRHit>;
 #pragma link C++ class std::vector<SpecialVirtualHit>;
 
 #pragma link C++ class MAUS::VirtualHit+;
@@ -91,9 +93,16 @@
 #pragma link C++ class MAUS::SciFiHit+;
 #pragma link C++ class MAUS::SciFiChannelId+;
 #pragma link C++ class MAUS::TOFHit+;
+#pragma link C++ class MAUS::KLHit+;
 #pragma link C++ class MAUS::TOFChannelId+;
+#pragma link C++ class MAUS::KLChannelId+;
+#pragma link C++ class MAUS::EMRHit+;
+#pragma link C++ class MAUS::EMRChannelId+;
 #pragma link C++ class MAUS::SpecialVirtualHit+;
 #pragma link C++ class MAUS::SpecialVirtualChannelId+;
+
+#pragma link C++ class MAUS::SciFiNoiseHit+;
+#pragma link C++ class std::vector<MAUS::SciFiNoiseHit*>+;
 
 #pragma link C++ class MAUS::VLSB+;
 #pragma link C++ class std::vector<MAUS::VLSB>;
@@ -173,6 +182,17 @@
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::Track*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::PrimaryChain*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TRefTrackPair*>+;
+
+#pragma link C++ class MAUS::EMRDaq+;
+#pragma link C++ class MAUS::DBBHit+;
+// #pragma link C++ class std::vector<MAUS::DBBHit>+;
+#pragma link C++ class MAUS::DBBHitsArray+;
+#pragma link C++ class MAUS::DBBSpillData+;
+#pragma link C++ class MAUS::EMRBar+;
+#pragma link C++ class MAUS::EMRBarHit+;
+#pragma link C++ class MAUS::EMRPlaneHit+;
+// #pragma link C++ class std::vector<EMRBar*>+;
+// #pragma link C++ class std::vector<EMRBarHit>+;
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

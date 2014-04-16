@@ -25,7 +25,7 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/API/InputBase.hh"
 
 class irstream;
@@ -93,7 +93,7 @@ class InputCppRoot : public InputBase<std::string> {
 
     /** Should be overloaded in SWIG call */
     std::string emitter() {
-        throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));
+        throw(Exception(Exception::recoverable, "Test Exception", "Test::Exception"));
     }
 
     /** Gets an event from the root file.
@@ -112,7 +112,7 @@ class InputCppRoot : public InputBase<std::string> {
 
     /** Push an event to the cache.
      *
-     *  If an event of this type is already cached, throw a Squeal
+     *  If an event of this type is already cached, throw a Exception
      */
     void cache_event(event_type type, std::string event);
 

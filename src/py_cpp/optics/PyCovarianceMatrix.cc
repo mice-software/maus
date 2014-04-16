@@ -74,7 +74,7 @@ PyObject* get_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         value = (*cm)(row, col);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
@@ -120,7 +120,7 @@ PyObject* set_element(PyObject* self, PyObject *args, PyObject *kwds) {
 
     try {
         cm->set(row, col, value);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_IndexError, (&exc)->what());
         return NULL;
     }
@@ -396,7 +396,7 @@ std::string(" - dispersion_x (float): dispersion in x direction [?]\n")+
 std::string(" - dispersion_prime_x (float): dispersion prime in x\n")+
 std::string("   direction (derivative with respect to s) [?]\n")+
 std::string(" - dispersion_y (float): dispersion in y direction [?]\n")+
-std::string(" - dispersion_prime_x (float): dispersion prime in y\n")+
+std::string(" - dispersion_prime_y (float): dispersion prime in y\n")+
 std::string("   direction (derivative with respect to s) [?]\n");
 
 PyObject* create_from_penn_parameters
@@ -491,7 +491,7 @@ PyObject* create_from_matrix(PyObject* self, PyObject *args, PyObject *kwds) {
     // now initialise the internal covariance matrix
     try {
         cm->cov_mat = create_from_numpy_matrix(array);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         free(cm);
         return NULL;

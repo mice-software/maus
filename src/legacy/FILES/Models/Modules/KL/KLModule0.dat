@@ -5,9 +5,6 @@ Module KLModule0
 {
   Volume Box
   Dimensions 932 132 40 mm
-//  PropertyDouble RedColour 1.
-//  PropertyInt numSlabs 24
-  PropertyBool Invisible 1
   Module KL/KLModule0Cell0.dat
   {
     Position 0.0 -4.4 0.0 cm

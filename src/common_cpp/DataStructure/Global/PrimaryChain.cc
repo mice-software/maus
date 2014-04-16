@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -132,7 +132,7 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
                             MAUS::DataStructure::Global::Track* parent) {
   // Check track is valid
   if (!track) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to add a NULL Track",
                  "DataStructure::Global::PrimaryChain::AddTrack()"));
   }
@@ -151,7 +151,7 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
   }
 
   if (!found) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Proposed Parent not in Primary Chain",
                  "DataStructure::Global::PrimaryChain::AddTrack()"));
   }
@@ -166,7 +166,7 @@ bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
 bool PrimaryChain::AddPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
   // Check track is valid
   if (!track) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to add a NULL Track",
                  "DataStructure::Global::PrimaryChain::AddPrimaryTrack()"));
   }
@@ -276,7 +276,7 @@ void PrimaryChain::AddParentChain(
     MAUS::DataStructure::Global::PrimaryChain* chain) {
   // Check primary chain is valid
   if (!chain) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to add a NULL PrimaryChain",
                  "DataStructure::Global::PrimaryChain::AddParentChain()"));
   }

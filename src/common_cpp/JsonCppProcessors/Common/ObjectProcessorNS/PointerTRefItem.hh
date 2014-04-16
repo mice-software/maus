@@ -41,8 +41,8 @@ namespace ObjectProcessorNS {
 template <class ParentType>
 class PointerTRefItem : public BaseItem<ParentType> {
  public:
-  typedef void (ParentType::*SetMethod)(TRef);
-  typedef TRef (ParentType::*GetMethod)() const;
+  typedef void (ParentType::*SetMethod)(TObject* _tobj);
+  typedef TObject* (ParentType::*GetMethod)() const;
 
   /** Constructor
    *
@@ -52,7 +52,7 @@ class PointerTRefItem : public BaseItem<ParentType> {
    *  @param SetMethod callback that will set a pointer to the child data,
    *  where memory is given to the ObjectProcessor
    *  @param is_required if the branch doesnt exist in json, is null in json
-   *  or is NULL in C++, throw Squeal if is_required is set to true when
+   *  or is NULL in C++, throw MAUS::Exception if is_required is set to true when
    *  Set...Child methods are called
    */
   PointerTRefItem(std::string branch_name,

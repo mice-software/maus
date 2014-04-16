@@ -26,6 +26,7 @@ namespace Global {
 // Default constructor
 TrackPoint::TrackPoint()
     : BasePoint(),
+      _particle_event(-1),
       _mapper_name(""),
       _charge(0.),
       _momentum(0., 0., 0., 0.),
@@ -35,11 +36,22 @@ TrackPoint::TrackPoint()
 // Copy contructor
 TrackPoint::TrackPoint(const TrackPoint &track_point)
     : BasePoint(track_point),
+      _particle_event(track_point.get_particle_event()),
       _mapper_name(track_point.get_mapper_name()),
       _charge(track_point.get_charge()),
       _momentum(track_point.get_momentum()),
       _momentum_error(track_point.get_momentum_error()),
       _space_point(track_point.get_space_point()) {}
+
+// Trackpoint from spacepoint
+TrackPoint::TrackPoint(SpacePoint *space_point)
+    : BasePoint(*space_point),
+      _mapper_name(""),
+      _charge(space_point->get_charge()),
+      _momentum(0., 0., 0., 0.),
+      _momentum_error(0., 0., 0., 0.) {
+        _space_point = space_point;
+      }
 
 // Destructor
 TrackPoint::~TrackPoint() {}
@@ -51,6 +63,7 @@ TrackPoint& TrackPoint::operator=(const TrackPoint &track_point) {
   }
   BasePoint::operator=(track_point);
 
+  _particle_event  = track_point.get_particle_event();
   _mapper_name     = track_point.get_mapper_name();
   _charge          = track_point.get_charge();
   _momentum        = track_point.get_momentum();
@@ -68,6 +81,7 @@ TrackPoint* TrackPoint::Clone() {
   // Clone the BasePoint elements
   this->BasePoint::Clone(tpNew);
 
+  tpNew->set_particle_event(this->get_particle_event());
   tpNew->set_mapper_name(this->get_mapper_name());
   tpNew->set_charge(this->get_charge());
   tpNew->set_momentum(this->get_momentum());
@@ -82,6 +96,14 @@ TrackPoint* TrackPoint::Clone() {
   tpNew->set_space_point(this->get_space_point());
 
   return tpNew;
+}
+
+void TrackPoint::set_particle_event(const int particle_event) {
+  _particle_event = particle_event;
+}
+
+int TrackPoint::get_particle_event() const {
+  return _particle_event;
 }
 
 void TrackPoint::set_mapper_name(std::string mapper_name) {
@@ -116,12 +138,12 @@ TLorentzVector TrackPoint::get_momentum_error() const {
   return _momentum_error;
 }
 
-void TrackPoint::set_space_point_tref(TRef space_point) {
+void TrackPoint::set_space_point_tref(TObject* space_point) {
   _space_point = space_point;
 }
 
-TRef TrackPoint::get_space_point_tref() const {
-  return _space_point;
+TObject* TrackPoint::get_space_point_tref() const {
+  return _space_point.GetObject();
 }
 
 void TrackPoint::set_space_point(

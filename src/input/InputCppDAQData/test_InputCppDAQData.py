@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for MapCppTOFDigits"""
+"""Tests for InputCppDAQData"""
 
 # pylint: disable = C0103
 
@@ -37,23 +37,11 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
-    def test_init(self):
+        self._mapper = InputCppDAQData()
+    def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
-        self._mapper = InputCppDAQData(self._datapath, \
-                                       self._datafile)
         self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))
-        # Check re-init without closing fails
-        self.assertFalse(self._mapper.birth( self._c.getConfigJSON() ))
         self.assertTrue(self._mapper.death())
-        return
-
-    def test_single(self):
-        """Test a single event"""
-        self._mapper = InputCppDAQData(self._datapath, \
-                                       self._datafile)
-        self.assertTrue(self._mapper.birth(self. _c.getConfigJSON() ))
-        # Get a single event and check it's the right size
-        self.assertFalse(self._mapper.readNextEvent())
         return
 
     @classmethod
