@@ -1,0 +1,26 @@
+box TargetBox length=440 width=440 height=440 material=SS304 color=.6,.6,.6
+box TargetBoxVacuum length=420 width=420 height=420 material=Vacuum color=0,0,0
+# optional momentum cut
+param -unset momentumCut=-1
+if $momentumCut>0
+	particlefilter MomentumCut height=420 width=420 length=1 require="sqrt(Px*Px+Py*Py+Pz*Pz)>$piMomentumRef-$momentumCut&&sqrt(Px*Px+Py*Py+Pz*Pz)<$piMomentumRef+$momentumCut"
+	place MomentumCut parent=TargetBoxVacuum z=10
+endif
+
+//particlefilter  KillProton length=1. height=300 width=300 kill=proton
+//place           KillProton parent=TargetBoxVacuum z=12
+
+virtualdetector ZeroDet   length=.01 height=40 width=40 
+virtualdetector DummyDet  length=.01 height=400 width=400 
+virtualdetector TargetDet length=1 height=40 width=40
+virtualdetector Q1Det     length=.1 height=400 width=400 material=Vacuum \
+                format=ascii color=1,0,0
+virtualdetector SolDet    length=.1 height=400 width=400 material=Vacuum \
+                format=ascii color=1,0,0
+
+//place ZeroDet   parent=TargetBoxVacuum z=1   rename=ZeroDet
+//place TargetDet parent=TargetBoxVacuum z=209 rename=TargetDet
+box TargetWindowAir length=8.0019 width=60 height=60 material=Air color=0,0,0
+place TargetBoxVacuum parent=TargetBox z=0 rename=Vacuum
+place TargetWindowAir parent=TargetBox z=216.001 rename=Air
+//place DummyDet                         z=230.   rename=Dum1
