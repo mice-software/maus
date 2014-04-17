@@ -48,16 +48,21 @@ TEST(MAUSGeant4ManagerTest, GetSetTest) {
 TEST(MAUSGeant4ManagerTest, GetReferenceParticleTest) {
     Json::Value* conf = MAUS::Globals::GetInstance()->GetConfigurationCards();
     Json::Value pos(Json::objectValue);
-    pos["x"] = pos["y"] = pos["z"] = 0.;
+    pos["x"] = pos["y"] = pos["z"] = 1.;
 
     // read of json value is dealt with elsewhere
-    (*conf)["simulation_reference_particle"]["particle_id"] = Json::Value(111);
+    (*conf)["simulation_reference_particle"]["particle_id"] = Json::Value(13);
     (*conf)["simulation_reference_particle"]["position"] = pos;
     (*conf)["simulation_reference_particle"]["momentum"] = pos;
-    (*conf)["simulation_reference_particle"]["energy"] = -1.;
+    (*conf)["simulation_reference_particle"]["energy"] = 200.;
     (*conf)["simulation_reference_particle"]["time"] = -2.;
     (*conf)["simulation_reference_particle"]["random_seed"] = Json::Int(2);
-    EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pid, 111);
+    EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pid, 13);
+    // check that we set mass shell condition (details elsewhere)
+    EXPECT_EQ(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().px,
+              MAUSGeant4Manager::GetInstance()->GetReferenceParticle().pz);
+    EXPECT_GT(MAUSGeant4Manager::GetInstance()->GetReferenceParticle().px,
+              MAUSGeant4Manager::GetInstance()->GetReferenceParticle().x);
 }
 
 TEST(MAUSGeant4ManagerTest, SetPhasesTest) {

@@ -25,6 +25,7 @@
 #include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 #include "src/common_cpp/DataStructure/TOFChannelId.hh"
 #include "src/common_cpp/DataStructure/KLChannelId.hh"
+#include "src/common_cpp/DataStructure/EMRChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiChannelId.hh"
 
 namespace MAUS {
@@ -112,6 +113,10 @@ class Hit {
      */
     virtual void SetEnergyDeposited(double edep);
 
+    /** Add to the energy deposited by the track when it made the hit
+     */
+    virtual void AddEnergyDeposited(double edep);
+
     /** Returns the position of the track when it made the hit
      */
     virtual ThreeVector GetPosition() const;
@@ -136,6 +141,18 @@ class Hit {
      */
     virtual void SetChannelId(ChannelId* id);
 
+    /** Returns the path length of the track
+     */
+    virtual double GetPathLength() const;
+
+    /** Sets the path length of the track
+     */
+    virtual void SetPathLength(double path);
+
+    /** Add the path length to the track
+     */
+    virtual void AddPathLength(double path);
+
   private:
     int _track_id;
     int _particle_id;
@@ -143,6 +160,7 @@ class Hit {
     double _charge;
     double _time;
     double _energy_deposited;
+    double _path_length;
     ThreeVector _position;
     ThreeVector _momentum;
 
@@ -155,6 +173,7 @@ typedef Hit<SciFiChannelId> SciFiHit;
 typedef std::vector<SciFiHit*> SciFiHitPArray;
 typedef Hit<TOFChannelId> TOFHit;
 typedef Hit<KLChannelId> KLHit;
+typedef Hit<EMRChannelId> EMRHit;
 typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
 }
 

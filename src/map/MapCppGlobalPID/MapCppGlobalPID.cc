@@ -64,8 +64,8 @@ namespace MAUS {
       // vector of pid vars
       _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
 							   _hypotheses[i]));
-      // _pid_vars.push_back(new MAUS::recon::global::PIDVarB(histFile,
-      //                                                      _hypotheses[i]));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
+                                                           _hypotheses[i]));
       // etc.
       }
 
@@ -180,6 +180,7 @@ namespace MAUS {
 	     ++track_i) {
           MAUS::DataStructure::Global::Track* track =
 	    GlobalTrackArray->at(track_i);
+	  if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
           // doubles to hold cumulative log likelihoods for each hypothesis
           double logL_200MeV_mu_plus = 0;
           double logL_200MeV_e_plus = 0;
@@ -224,8 +225,6 @@ namespace MAUS {
 	      " determined." << std::endl;
             continue;
           }
-          Squeak::mout(Squeak::error) << "PID of track : " <<
-	    track->get_pid() << std::endl;
         }
       }
       }

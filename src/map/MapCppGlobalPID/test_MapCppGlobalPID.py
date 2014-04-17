@@ -106,11 +106,12 @@ class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            self.assertEqual(1, len(gevt['tracks']))
-            track = tracksarray[0]
-            self.assertTrue('pid' in track)
-            print track['pid']
-            self.assertEqual(-13, track['pid'])
+            for i in tracksarray:
+                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    track = i
+                    self.assertTrue('pid' in track)
+                    print track['pid']
+                    self.assertEqual(-13, track['pid'])
 
     def test_positron_PID(self):
         """Check that process can identify positrons"""
@@ -131,11 +132,12 @@ class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            self.assertEqual(1, len(gevt['tracks']))
-            track = tracksarray[0]
-            self.assertTrue('pid' in track)
-            print track['pid']
-            self.assertEqual(-11, track['pid'])
+            for i in tracksarray:
+                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    track = i
+                    self.assertTrue('pid' in track)
+                    print track['pid']
+                    self.assertEqual(-11, track['pid'])
 
     def test_pion_PID(self):
         """Check that process can identify pions"""
@@ -156,12 +158,13 @@ class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            self.assertEqual(1, len(gevt['tracks']))
-            track = tracksarray[0]
-            self.assertTrue('pid' in track)
-            print track['pid']
-            self.assertEqual(211, track['pid'])
-
+            for i in tracksarray:
+                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    track = i
+                    self.assertTrue('pid' in track)
+                    print track['pid']
+                    self.assertEqual(211, track['pid'])
+            
     def test_undef_PID(self):
         """Check that PID set to 0 for indistinguishable particles"""
         test7 = ('%s/src/map/MapCppGlobalPID/undef_pid_test.json' %
@@ -180,11 +183,13 @@ class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
             gevt = revt['global_event']
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            track = tracksarray[0]
-            self.assertTrue('pid' in track)
-            print track['pid']
-            self.assertEqual(0, track['pid'])
-
+            for i in tracksarray:
+                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    track = i
+                    self.assertTrue('pid' in track)
+                    print track['pid']
+                    self.assertEqual(0, track['pid'])
+            
     def test_invalid_logL(self):
         """Check that a track that returns an invalid logL does not get
         set a PID"""

@@ -32,6 +32,8 @@
 
 // MAUS headers
 #include "DataStructure/ReconEvent.hh"
+#include "Recon/Global/ImportTOFRecon.hh"
+#include "Recon/Global/ImportSciFiRecon.hh"
 
 namespace MAUS {
 namespace recon {
@@ -51,7 +53,7 @@ namespace global {
      *  
      *  @param global_event The Global Event, which will be changed
      */
-    void FormTracks(MAUS::GlobalEvent* global_event);
+    void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -59,6 +61,12 @@ namespace global {
 
     /// Disallow operator= as unnecessary
     void operator=(const TrackMatching);
+
+    void MakeTOFTracks(MAUS::GlobalEvent* global_event,
+		       std::vector<MAUS::DataStructure::Global::SpacePoint*>
+		       *GlobalSpacePointArray,
+		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray,
+		       std::string mapper_name);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

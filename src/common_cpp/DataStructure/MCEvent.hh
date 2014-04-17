@@ -43,6 +43,7 @@ typedef std::vector<SciFiHit> SciFiHitArray;
 typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
 typedef std::vector<TOFHit> TOFHitArray;
 typedef std::vector<KLHit> KLHitArray;
+typedef std::vector<EMRHit> EMRHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
 
 /** @class MCEvent describes data pertaining to a single Monte Carlo event
@@ -135,6 +136,15 @@ class MCEvent {
    */
   void SetKLHits(KLHitArray* hits);
 
+  /** Get the EMR hits pertaining to this event MCEvent still owns HitArray*.
+   */
+  EMRHitArray* GetEMRHits() const;
+
+  /** Set the EMR hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
+  void SetEMRHits(EMRHitArray* hits);
+
   /** Get the Special Virtual hits pertaining to this event. MCEvent still owns
    *  SpecialVirtualHitArray*.
    */
@@ -156,14 +166,15 @@ class MCEvent {
 
  private:
 
-  Primary* _primary;
-  VirtualHitArray* _virtuals;
-  SciFiHitArray* _sci_fi_hits;
-  SciFiNoiseHitArray* _sci_fi_noise_hits;
-  TOFHitArray* _tof_hits;
-  KLHitArray* _kl_hits;
+  Primary*                _primary;
+  VirtualHitArray*        _virtuals;
+  SciFiHitArray*          _sci_fi_hits;
+  SciFiNoiseHitArray*     _sci_fi_noise_hits;
+  TOFHitArray*            _tof_hits;
+  KLHitArray*             _kl_hits;
+  EMRHitArray*            _emr_hits;
   SpecialVirtualHitArray* _special_virtual_hits;
-  TrackArray* _tracks;
+  TrackArray*             _tracks;
 
   MAUS_VERSIONED_CLASS_DEF(MCEvent)
 };
