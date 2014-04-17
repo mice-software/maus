@@ -19,8 +19,13 @@
 
 #include "src/common_cpp/Utils/Exception.hh""
 #include "src/common_cpp/API/APIExceptions.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppExampleJSONValueInput(void) {
+  PyWrapMapBase<MAUS::MapCppExampleJSONValueInput>::ModuleInitialisation();
+}
+
 MapCppExampleJSONValueInput::MapCppExampleJSONValueInput()
     : MapBase<Json::Value, Json::Value>("MapCppExampleJSONValueInput") {}
 

@@ -68,6 +68,9 @@ namespace MAUS {
      */
     void death();
 
+    /** \brief Get the class name for the module */
+    std::string get_classname() {return _classname;}
+
   protected:
     /*!\var std::string _classname
      * \brief The name of the derived module class

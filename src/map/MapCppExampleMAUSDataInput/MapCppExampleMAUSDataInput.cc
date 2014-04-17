@@ -19,8 +19,13 @@
 
 #include "src/common_cpp/API/APIExceptions.hh"
 #include "src/common_cpp/Utils/Exception.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppExampleMAUSDataInput(void) {
+  PyWrapMapBase<MAUS::MapCppExampleMAUSDataInput>::ModuleInitialisation();
+}
+
 MapCppExampleMAUSDataInput::MapCppExampleMAUSDataInput()
     : MapBase<MAUS::Data, MAUS::Data>("MapCppExampleMAUSDataInput") {}
 
