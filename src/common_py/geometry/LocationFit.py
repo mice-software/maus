@@ -225,7 +225,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         # if len(det)==0:
         for q in self.gdmlfile.xpathEval(\
             "gdml/structure/volume/physvol/position"):
-            print q.prop("name")
+            
             if q.prop("name") == det[0].prop("gdml_posref"):
                 self.initguess[0] =  float(q.prop('x'))
                 self.initguess[1] =  float(q.prop('y'))

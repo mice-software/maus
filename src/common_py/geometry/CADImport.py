@@ -292,7 +292,9 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'BooleanModule1' \
                              or elemtype == 'BooleanModule1Type'\
                              or elemtype == 'BooleanModule2' \
-                             or elemtype == 'BooleanModule2Type':
+                             or elemtype == 'BooleanModule2Type'\
+                             or elemtype == 'FileName'\
+                             or elemtype == 'PolyconeType':
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
