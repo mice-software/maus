@@ -188,7 +188,6 @@ class V1731DataProcessor : public fADCDataProcessor {
 typedef std::vector<MAUS::V1731>           V1731HitArray;
 typedef std::vector<V1731HitArray>   V1731PartEventArray;
 
-#define V1731_SAMPLES_PER_WORD   4
 class V1731CppDataProcessor : public fADCDataProcessor {
  public:
   V1731CppDataProcessor() {_equipment="V1731";}

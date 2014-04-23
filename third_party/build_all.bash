@@ -43,6 +43,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/29expat.bash
     ${MAUS_ROOT_DIR}/third_party/bash/32clhep2.1.1.0.bash
     ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash
+    # resource environment so that g4bl picks up our ROOT env
+    source ${MAUS_ROOT_DIR}/env.sh >& /dev/null
+    ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash

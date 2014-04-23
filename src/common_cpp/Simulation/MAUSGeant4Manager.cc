@@ -98,6 +98,7 @@ MAUSPrimaryGeneratorAction::PGParticle
     Json::Value ref = JsonWrapper::GetProperty
              (*conf, "simulation_reference_particle", JsonWrapper::objectValue);
     p.ReadJson(ref);
+    p.MassShellCondition();
     return p;
 }
 

@@ -43,6 +43,7 @@ class MCEventProcessor : public ObjectProcessor<MCEvent> {
     ValueArrayProcessor<SciFiNoiseHit> _sci_fi_noise_hit_proc;
     ValueArrayProcessor<TOFHit> _tof_hit_proc;
     ValueArrayProcessor<KLHit> _kl_hit_proc;
+    ValueArrayProcessor<EMRHit> _emr_hit_proc;
     ValueArrayProcessor<SpecialVirtualHit> _special_virtual_hit_proc;
     ValueArrayProcessor<Track> _track_proc;
     ValueArrayProcessor<VirtualHit> _virtual_hit_proc;

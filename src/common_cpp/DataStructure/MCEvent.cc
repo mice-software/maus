@@ -24,12 +24,14 @@ namespace MAUS {
 
 MCEvent::MCEvent()
        : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL),
-         _tof_hits(NULL), _kl_hits(NULL), _special_virtual_hits(NULL), _tracks(NULL) {
+         _tof_hits(NULL), _kl_hits(NULL), _emr_hits(NULL), _special_virtual_hits(NULL),
+         _tracks(NULL) {
 }
 
 MCEvent::MCEvent(const MCEvent& md)
        : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL),
-         _tof_hits(NULL), _kl_hits(NULL), _special_virtual_hits(NULL), _tracks(NULL) {
+         _tof_hits(NULL), _kl_hits(NULL), _emr_hits(NULL), _special_virtual_hits(NULL),
+         _tracks(NULL) {
   *this = md;
 }
 
@@ -91,6 +93,15 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _kl_hits = new KLHitArray(*md._kl_hits);
     }
 
+    if (_emr_hits != NULL) {
+        delete _emr_hits;
+    }
+    if (md._emr_hits == NULL) {
+        _emr_hits = NULL;
+    } else {
+        _emr_hits = new EMRHitArray(*md._emr_hits);
+    }
+
     if (_special_virtual_hits != NULL) {
         delete _special_virtual_hits;
     }
@@ -137,6 +148,10 @@ MCEvent::~MCEvent() {
     if (_kl_hits != NULL) {
         delete _kl_hits;
         _kl_hits = NULL;
+    }
+    if (_emr_hits != NULL) {
+        delete _emr_hits;
+        _emr_hits = NULL;
     }
     if (_special_virtual_hits != NULL) {
         delete _special_virtual_hits;
@@ -220,6 +235,17 @@ void MCEvent::SetKLHits(KLHitArray* hits) {
         delete _kl_hits;
     }
     _kl_hits = hits;
+}
+
+EMRHitArray* MCEvent::GetEMRHits() const {
+    return _emr_hits;
+}
+
+void MCEvent::SetEMRHits(EMRHitArray* hits) {
+    if (_emr_hits != NULL) {
+        delete _emr_hits;
+    }
+    _emr_hits = hits;
 }
 
 SpecialVirtualHitArray* MCEvent::GetSpecialVirtualHits() const {

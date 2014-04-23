@@ -69,6 +69,7 @@
 #include "DetModel/KL/KLGlue.hh"
 #include "DetModel/KL/KLFiber.hh"
 #include "DetModel/Ckov/CkovMirror.hh"
+#include "DetModel/EMR/EMRBar.hh"
 #include "DetModel/TOF/TofSD.hh"
 #include "DetModel/SciFi/SciFiSD.hh"
 #include "DetModel/Ckov/CKOVSD.hh"
@@ -286,7 +287,11 @@ void DetectorConstruction::BuildG4DetectorVolume(G4PVPlacement** place,
     G4Material* mat =
                     _materials->materialByName(mod->propertyString("Material"));
     std::string detector = mod->propertyString("G4Detector");
-    if (detector == "SciFiPlane") {
+    if (detector == "EMR") {
+      EMRBar* bar = new EMRBar(mod, mat, moth);
+      *logic = bar->logicalBar();
+      *place = bar->placementBar();
+    } else if (detector == "SciFiPlane") {
       _sciFiPlanes.push_back(new SciFiPlane(mod, mat, moth));
       *logic = _sciFiPlanes.back()->logicalCore();
       *place = _sciFiPlanes.back()->placementCore();
