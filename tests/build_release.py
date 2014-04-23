@@ -30,6 +30,7 @@ TEST_PLOTS = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tests', 'integration',
 DOXY_LOG = TMP+'doxygen.log'
 LATEX_LOG = TMP+'pdflatex.log'
 TEMP_DST = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', 'server_build')
+DOC_OUTPUT_DIR = os.path.join(TEMP_DST, 'doc')
 SCP_LOG = TMP+'scp.log'
 COPY_TARGETS = []
 
@@ -55,17 +56,21 @@ def build_doxygen():
     """Build doxygen add to copy targets"""
     global COPY_TARGETS # pylint: disable=W0603
     print "Building doxygen"
-    doc_tools = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_tools')
     doxy_log = open(DOXY_LOG, 'w')
-    for doxyfile in ['Doxyfile.framework', 'Doxyfile.backend']:
-        path = os.path.join(doc_tools, doxyfile)
-        doxyproc = subprocess.Popen(['doxygen', path], stdout=doxy_log,
+    for doxy_script in ['generate_third_party_doc.py', 'generate_maus_doc.py']:
+        doxy_cmd = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', \
+                                                       'doc_tools', \
+                                                       doxy_script)
+        doxyproc = subprocess.Popen(['python', doxy_cmd, '--noprompt'], \
+                                                       stdout=doxy_log, \
                                                        stderr=subprocess.STDOUT)
         doxyproc.wait() # pylint: disable=E1101
         if doxyproc.returncode != 0: # pylint: disable=E1101
-            print "ERROR - doxygen failed for doxyfile: "+path
+            print "ERROR - doxygen failed for doxyfile: ", doxy_script
     COPY_TARGETS += glob.glob(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
-                                                                   'doxygen_*'))
+                                                       'doxygen_*'))
+    COPY_TARGETS.append(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
+                                                       'index.html'))
 
 def build_user_guide():
     """Build user guide (html and pdf) add to copy targets"""
@@ -130,8 +135,12 @@ def copy_targets():
     version = version.replace(' ', '_')
     out_dir = os.path.join(TEMP_DST, version)
     os.mkdir(out_dir)
+    doc_out_dir = os.path.join(TEMP_DST, version, 'doc')
+    os.mkdir(doc_out_dir)
     print COPY_TARGETS
     for target in COPY_TARGETS:
+        if 'doxygen' in target:
+            out_dir = doc_out_dir
         print 'Copying target', target
         if os.path.isdir(target):
             last = target.split('/')[-1]

@@ -71,21 +71,21 @@ class MapCppTrackerMCNoise {
   void read_in_json(std::string json_data);
 
   /** Saves digits to json. */
-  void save_to_json(MAUS::Spill &spill);
+  void save_to_json(MAUS::Spill* spill);
 
   /** @brief Simulates dark count
    *
    *  Check each SciFi channel for Dark PEs
    *  adds results to SciFiDigits
    */
-  void dark_count(MAUS::Spill &spill);
+  void get_dark_count(MAUS::Spill* spill);
 
   private:
   // MapCppMCNoise setup containers
   /// This should be the classname
   std::string _classname;
   /// This will contain the configuration
-  Json::Value* _configJSON;
+  Json::Value* _config_json;
   /// This will contain the root value after parsing
   Json::Value* _spill_json;
   /// This will contain the root value before parsing
@@ -93,11 +93,12 @@ class MapCppTrackerMCNoise {
   /// This will contain the spill value
   Spill* _spill_cpp;
   /// This will contain all SciFi elements in MICE
-  std::vector<const MiceModule*> SF_modules;
+  std::vector<const MiceModule*> _sf_modules;
   /// Mean number of dark count PE
-  double poisson_mean;
+  double _poisson_mean;
   ///  JsonCpp setup
   Json::Reader reader;
+  Json::FastWriter writer;
 };
 } // end namespace
 

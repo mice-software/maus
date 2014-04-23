@@ -1,0 +1,17 @@
+# command-line parameter default values
+
+param -unset first=0 last=0 viewer=none STOCHASTICS=1  sigmaXp=-0.010 sigmaYp=-0.005
+param -unset USAirOrVacuum=Vacuum
+
+param -unset piplus=1 piminus=0 eplus=1 eminus=0 proton=1 gamma=1 C='+'
+param -unset keep=pi$C,mu$C,e$C,proton,gamma
+param -unset Protons=1E7
+
+param steppingFormat="TAG CL SEG STEP VOL MAT P B"
+
+# trace reference and center particles
+#trace nTrace=100 primaryOnly=1 require=PDGid==2212 coordinates=reference \
+	oneNTuple=1 file=$first.trace format=ascii
+
+param worldMaterial=Air  maxStep=100.0
+

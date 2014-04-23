@@ -74,8 +74,10 @@ class MapPyBeamMaker: #pylint: disable=R0902
         self.beam_file = None
         self.beam_file_format = None
         self.bm_fh = None
-        self.file_particles_per_spill = 25
+        self.file_particles_per_spill = 0
         self.beam_seed = 0
+        self.g4bl_generator = False
+        self.random_seed = 0
 
     def birth(self, json_configuration):
         """
@@ -144,8 +146,10 @@ class MapPyBeamMaker: #pylint: disable=R0902
             self.beam_file = os.path.expandvars(beam_def["beam_file"])
             self.beam_file_format = beam_def["beam_file_format"]
             self.file_particles_per_spill = beam_def["file_particles_per_spill"]
-
-
+        if beam_def["particle_generator"] == "g4bl":
+            self.g4bl_generator = beam_def["g4bl_generator"]
+            self.random_seed = beam_def["random_seed"]
+            
     def __check_beam_file(self):
         """
         Check the input beam file
@@ -218,6 +222,8 @@ class MapPyBeamMaker: #pylint: disable=R0902
             spill = self.__process_check_spill(spill)
             new_particles = self.__process_gen_empty(spill)
             for index, particle in enumerate(new_particles):
+                if str(self.g4bl_generator) in ['True']:
+                    break
                 # if beam IO, then read hits from file and fill spill
                 if (self.use_beam_file):
                     spill_hit = Hit.new_from_read_builtin(self.beam_file_format,
@@ -231,6 +237,11 @@ class MapPyBeamMaker: #pylint: disable=R0902
                     particle["primary"] = a_beam.make_one_primary()
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException(spill, self)
+#        print("json.dumps(spill)")
+        if str(self.g4bl_generator) in ['True']:
+            with open('G4BLoutput.txt', 'w') as outfile:
+                json.dump(spill, outfile)
+#        print json.dumps(spill)
         return json.dumps(spill)
             
     def __process_check_spill(self, spill): #pylint: disable=R0201
@@ -265,6 +276,9 @@ class MapPyBeamMaker: #pylint: disable=R0902
         elif self.particle_generator == "file":
             for i in range(self.file_particles_per_spill):
                 spill["mc_events"].append({"primary":{}})
+        elif self.particle_generator == "g4bl":
+            for i in range(self.file_particles_per_spill):
+                spill["mc_events"].append({"primary":{}})
         else:
             raise RuntimeError("Didn't recognise particle_generator command "+\
                                str(self.particle_generator))
@@ -292,4 +306,4 @@ class MapPyBeamMaker: #pylint: disable=R0902
             self.bm_fh.close()
         return True
 
-    gen_keys = ["binomial", "counter", "overwrite_existing", "file"]
+    gen_keys = ["binomial", "counter", "overwrite_existing", "file", "g4bl"]
