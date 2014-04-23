@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Simulate the MICE SciFi Tracker
 
@@ -17,8 +18,8 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    my_input = MAUS.InputPySpillGenerator()
-    # my_input = MAUS.InputCppRoot()
+    # my_input = MAUS.InputPySpillGenerator()
+    my_input = MAUS.InputCppRoot()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.

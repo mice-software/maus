@@ -49,6 +49,7 @@
 #include "src/common_cpp/DataStructure/Track.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 
 /** Access Tracker data using ROOT */
 
@@ -89,11 +90,48 @@ int main(int argc, char *argv[]) {
       // Pull out the scifi event
       MAUS::SciFiEvent* sfevt = revts->at(i)->GetSciFiEvent();
 
-      // Perform your analysis here
+      // Perform your analysis here, e.g.
+      std::vector<MAUS::SciFiHelicalPRTrack*> htrks = sfevt->helicalprtracks();
+      std::vector<MAUS::SciFiHelicalPRTrack*>::iterator htrk;
 
+      // Loop over helical pat rec tracks
+      for ( htrk = htrks.begin(); htrk != htrks.end(); ++htrk ) {
+        std::vector<MAUS::SciFiSpacePoint*> spnts = (*htrk)->get_spacepoints();
+        std::vector<MAUS::SciFiSpacePoint*>::iterator spnt;
+        SciFiTools::print_spacepoint_xyz(spnts);
+
+        // Loop over seed spacepoints
+        for ( spnt = spnts.begin(); spnt != spnts.end(); ++spnt ) {
+          std::vector<MAUS::SciFiCluster*> clusters = (*spnt)->get_channels();
+          std::vector<MAUS::SciFiCluster*>::iterator clus;
+
+          // Loop over clusters
+          for ( clus = clusters.begin(); clus != clusters.end(); ++clus ) {
+            std::vector<MAUS::SciFiDigit*> digits = (*clus)->get_digits();
+            std::vector<MAUS::SciFiDigit*>::iterator dig;
+
+            // Loop over digits
+            for ( dig = digits.begin(); dig != digits.end(); ++dig ) {
+
+              // Perform the digits to hits lookup
+              std::vector<MAUS::SciFiHit*> hits;
+              std::vector<MAUS::SciFiHit*>::iterator hit;
+
+              if (!lkup.get_hits((*dig), hits)) {
+                std::cerr << "Lookup failed\n";
+                continue;
+              }
+
+              // Loop over MC hits
+              for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
+                int track_id = (*hit)->GetTrackId();
+              } // ~Loop over MC hits
+            } // ~Loop over digits
+          } // ~// Loop over clusters
+        } // ~Loop over seed spacepoints
+      } // ~Loop over helical pat rec tracks
     } // ~Loop over MC events
   } // ~Loop over all spills
-
   theApp.Run();
 }
 

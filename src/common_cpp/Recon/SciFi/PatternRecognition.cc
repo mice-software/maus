@@ -127,11 +127,18 @@ bool PatternRecognition::LoadGlobals() {
 void PatternRecognition::process(SciFiEvent &evt) {
 
   if ( evt.spacepoints().size() > 0 ) {
+    std::cout << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = SciFiTools::sort_by_tracker(evt.spacepoints());
+    if (_verb > 0) {
+      std::cout << "Number of spoints in event in T1: " << spnts_by_tracker[0].size() << std::endl;
+      SciFiTools::print_spacepoint_xyz(spnts_by_tracker[0]);
+      std::cout << "Number of spoints in event in T2: " << spnts_by_tracker[1].size() << std::endl;
+      SciFiTools::print_spacepoint_xyz(spnts_by_tracker[1]);
+    }
 
     // Loop over trackers
     for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
@@ -608,6 +615,8 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
                                    SimpleLine &line_sz, int &charge) {
 
+  if (_verb > 0) std::cout << "sz chi2 cut: " << _sz_chisq_cut << std::endl;
+
   // Sort spacepoints in order seen by the beam (descending z for T1, ascending z for T2)
   if (spnts[0]->get_tracker() == 0)
     std::sort(spnts.begin(), spnts.end(), compare_spoints_descending_z);
@@ -683,6 +692,14 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     return false;
   }
 
+  if (_verb > 0) {
+    std::cout << "n_turns_cut: " << _n_turns_cut << ", and using phi: ";
+    for (size_t i = 0; i < phi.size(); ++i) {
+      std::cout << phi[i] << " ";
+    }
+    std::cout << std::endl;
+  }
+
   true_phi.clear();
   true_phi.resize(phi.size());
   // Separations are calculated in z and phi between each station and the first station seen by
@@ -738,6 +755,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       if ( _verb > 0 ) std::cout << "Found n = " << true_n << std::endl;
       break;
     }
+    if ( _verb > 0 ) std::cout << std::endl;
   } // ~Loop over n_values
 
   // If we have found a value of n which was accepted, calc the true turning angles

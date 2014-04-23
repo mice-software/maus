@@ -4,9 +4,15 @@ import os
 # Some initial setup
 #------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
-# input_root_file = "maus_output_10kspills_muplus_digitisation_2013-11-18.root"
-# output_root_file_name = "maus_output_norecon_muplus_10kspills_2014-02-25.root"
 verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
+# output_root_file_name = "maus_output_muplus_2014-03-21_sz_testing.root"
+
+#------------------------------------------
+# Used by InputCppRoot
+#------------------------------------------
+# data_dir = '/vols/mice3/adobbs/maus/output/muplus/'
+# input_root_file_name = data_dir + 'maus_output_10kspills_muplus_norecon_2014-02-25.root'
+# selected_spills = [1, 2, 805 ] # e.g. [27, 52, 75] to use those spills only
 
 #------------------------------------------
 # Used by MapCppSimulation
@@ -15,8 +21,8 @@ keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and every step point
 
 # Geometry used by simulation
-simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
-# simulation_geometry_filename = "Stage4.dat"
+# simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
+simulation_geometry_filename = "Stage4.dat"
 
 # Geant4 physics model
 maximum_number_of_steps = 1000
@@ -78,5 +84,13 @@ reconstruction_geometry_filename = simulation_geometry_filename
 SciFiPRHelicalOn = True
 SciFiPRStraightOn = False
 SciFiKalmanOn = True
-SciFiPatRecVerbosity = 1
+SciFiPatRecVerbosity = 1 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
+SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
+SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
+SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
+SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
+SciFiPatRecSZChi2Cut = 8.0 # Chi^2 cut on pat rec s-z fit
+SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
+SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 

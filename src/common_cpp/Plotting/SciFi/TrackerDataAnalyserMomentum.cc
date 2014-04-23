@@ -553,7 +553,6 @@ bool TrackerDataAnalyserMomentum::save_graphics(std::string save_type) {
       _cResolutions->Print(save_name.c_str());
     }
   } else {
-    std::cerr << "Invalid graphics output type given\n";
     return false;
   }
   return true;
