@@ -271,7 +271,7 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'FibreSpacingZ'\
                            or elemtype == 'OpticsMaterialLength'\
                            or elemtype == 'BarWidth'\
-                           or elemtype == 'Barheight'\
+                           or elemtype == 'BarHeight'\
                            or elemtype == 'BarLength'\
                            or elemtype == 'HoleRad'\
                            or elemtype == 'FiberCladdingExtRadius':
