@@ -88,19 +88,7 @@ class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
    * \param OTHER* The input data to be processed
    * \return A python container for the result
    */
-  template <typename OTHER> PyObject* process_pyobj(OTHER* o) const;
-
-  /*!\brief Set input format
-   */
-  void set_input(std::string);
-
-  /*!\brief Get input format
-   */
-  std::string get_input();
-
-  /*!\brief Get output format
-   */
-  std::string get_output();
+  inline PyObject* process_pyobj(PyObject* py_input) const;
 
  private:
   /*!\brief Process data
@@ -111,9 +99,6 @@ class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
    * \return The processed data
    */
   virtual OUTPUT* _process(INPUT* i) const = 0;
-
-  /// Variable setting the input format the Mapper has been told to receive.
-  std::string _input_format;
 };
 
 }// end of namespace

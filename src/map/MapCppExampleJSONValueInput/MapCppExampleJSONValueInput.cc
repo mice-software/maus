@@ -17,7 +17,7 @@
 
 #include "src/map/MapCppExampleJSONValueInput/MapCppExampleJSONValueInput.hh"
 
-#include "src/common_cpp/Utils/Exception.hh""
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 

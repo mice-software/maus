@@ -17,6 +17,15 @@
 #ifndef _SRC_COMMON_CPP_API_PYWRAPMAPBASE_
 #define _SRC_COMMON_CPP_API_PYWRAPMAPBASE_
 
+// These ifdefs are required to avoid cpp compiler warning
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
 #include <Python.h>
 
 #include <string>
@@ -52,12 +61,6 @@ class PyWrapMapBase {
 
   /// Run the MODULE object's death function.
   static PyObject* ModuleDeath(PyObject *self, PyObject *args);
-
-  /// Set the MODULE object's input format.
-  static PyObject* ModuleSetInput(PyObject *self, PyObject *args);
-
-  /// Get the MODULE object's output format.
-  static PyObject* ModuleGetOutput(PyObject *self, PyObject *args);
 
   /// Run the MODULE object's process function.
   static PyObject* ModuleProcess(PyObject *self, PyObject *args);

@@ -19,7 +19,7 @@
 
 #include <string>
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/common_cpp/API/Functions.hh"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/ConverterFactory.hh"
@@ -82,34 +82,12 @@ namespace MAUS {
   }
 
   template<typename INPUT, typename OUTPUT>
-  template<typename OTHER>
-  PyObject* MapBase<INPUT, OUTPUT>::process_pyobj(OTHER* o) const {
-
-    OUTPUT* result = process(o);
-
-    void* vptr = static_cast<void*>(result);
-    PyObject *resultobj = PyCapsule_New(vptr,
-                                        format_output<OUTPUT>().c_str(),
-                                        NULL);
-    return resultobj;
+  PyObject* MapBase<INPUT, OUTPUT>::process_pyobj(PyObject* py_input) const {
+    INPUT* cpp_input = PyObjectWrapper::unwrap_pyobject<INPUT>(py_input);
+    OUTPUT* cpp_output = process(cpp_input);
+    PyObject* py_output = PyObjectWrapper::wrap_pyobject(cpp_output);
+    return py_output;
   }
-
-  template <typename INPUT, typename OUTPUT>
-  void MapBase<INPUT, OUTPUT>::set_input(std::string s) {
-    _input_format = s;
-  }
-
-  template <typename INPUT, typename OUTPUT>
-  std::string MapBase<INPUT, OUTPUT>::get_input() {
-    return _input_format;
-  }
-
-  template <typename INPUT, typename OUTPUT>
-  std::string MapBase<INPUT, OUTPUT>::get_output() {
-    std::string output_format = format_output<OUTPUT>();
-    return output_format;
-  }
-
 }// end of namespace
 #endif
 

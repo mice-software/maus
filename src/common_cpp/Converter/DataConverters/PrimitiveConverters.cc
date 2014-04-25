@@ -12,24 +12,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-#ifndef _SRC_COMMON_CPP_API_FUNCTIONS_HH_
-#define _SRC_COMMON_CPP_API_FUNCTIONS_HH_
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConverters.hh"
 
-#include <string>
-#include "json/json.h"
-#include "src/common_cpp/DataStructure/Data.hh"
+// nothing to do, but make sure it compiles to .so by including the cc file
 
-// Inline functions to return strings for the known OUTPUT types, or
-// undefined for an unknown type.
-template <typename T>
-inline std::string format_output() { return "Undefined"; }
-
-template <>
-inline std::string format_output<MAUS::Data>() { return "MAUS::Data"; }
-
-template <>
-inline std::string format_output<Json::Value>() { return "Json::Value"; }
-
-#endif

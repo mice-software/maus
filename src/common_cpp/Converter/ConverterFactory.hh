@@ -50,14 +50,34 @@ namespace MAUS {
    * be used to generically convert from one type to another without 
    * knowledge of the correct conversion object required for the specific
    * data types.
+   *
+   * conversions are provided for
+   *    - string -> string
+   *    - string -> json
+   *    - string -> MAUS::Data
+   *    - string -> PyObject* (py json)
+   *    - json -> string
+   *    - json -> json
+   *    - json -> MAUS::Data
+   *    - json -> PyObject* (py json)
+   *    - MAUS::Data -> string
+   *    - MAUS::Data -> json
+   *    - MAUS::Data -> MAUS::Data
+   *    - MAUS::Data -> PyObject* (py json)
+   *    - PyObject* -> string
+   *    - PyObject* -> json
+   *    - PyObject* -> MAUS::Data
+   *    - PyObject* -> PyObject* (py json)
+   * logic is only non-trivial for MAUS -> json and PyObject* -> json (all
+   * other conversions are based around this)
    */
   class ConverterFactory {
   public:
     template <typename INPUT, typename OUTPUT>
-    IConverter<INPUT, OUTPUT>* getConverter() const throw(ConverterNotFoundException);
+    IConverter<INPUT, OUTPUT>* getConverter() const;
 
     template <typename INPUT, typename OUTPUT>
-    OUTPUT* convert(INPUT* i) const throw(NullInputException, UnhandledException);
+    OUTPUT* convert(INPUT* i) const;
   };
 
 } // end of namespace

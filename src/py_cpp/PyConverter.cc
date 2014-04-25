@@ -22,9 +22,8 @@
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
-#include "src/py_cpp/converter/ObjectProxy.h"
 
-#include "src/py_cpp/converter/PyConverter.hh"
+#include "src/py_cpp/PyConverter.hh"
 
 namespace MAUS {
 namespace PyConverter{

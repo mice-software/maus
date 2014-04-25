@@ -117,166 +117,8 @@ PyObject* PyWrapMapBase<MODULE>::ModuleDeath(PyObject *self, PyObject *args) {
 }
 
 template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleSetInput(PyObject *self, PyObject *args) {
-  PyObject* obj0 = NULL;
-  const char *input_char = NULL;
-
-  // Interpret the input as a PyObject* and a string, otherwise fail.
-  if (!PyArg_ParseTuple(args,
-                        (std::string("Os:ModuleSetInput")+
-                         ModuleClassName).c_str(),
-                        &obj0, &input_char)) {
-    std::string error;
-    error  = "Input parameters must be 'Module'";
-    error +=" + 'string', where string defines the input type.";
-    PyErr_SetString(InvalidInputError, error.c_str());
-    return NULL;
-  }
-
-  // Check the PyObject* is a MODULE*
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-
-  // Get the module
-  void* vptr0 = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr0);
-
-  // Check the MODULE* is valid
-  if (!module) {
-    std::string error;
-    error  = "First input Module is invalid pointer";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-
-  module->set_input(input_char);
-  Py_RETURN_NONE;
-}
-
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleGetOutput(PyObject *self, PyObject *args) {
-  PyObject* obj0 = NULL;
-
-  // Interpret the input as a PyObject*, otherwise fail.
-  if (!PyArg_ParseTuple(args,
-                        (std::string("O:ModuleGetOutput")+
-                         ModuleClassName).c_str(),
-                        &obj0)) {
-    std::string error;
-    error  = "Input parameters must be 'Module'";
-    PyErr_SetString(InvalidInputError, error.c_str());
-    return NULL;
-  }
-
-  // Check the PyObject* is a MODULE*,
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-
-  // Get the module
-  void* vptr0 = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr0);
-
-  // Check the MODULE* is valid
-  if (!module) {
-    std::string error;
-    error  = "First input Module is invalid pointer";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-
-  std::string temp = module->get_output();
-
-  return PyString_FromString(temp.c_str());
-}
-
-template <class MODULE>
 PyObject* PyWrapMapBase<MODULE>::ModuleProcess(PyObject *self, PyObject *args) {
-  // Parse two elements, the module and the data object
-  PyObject* obj0 = NULL;
-  PyObject* obj1 = NULL;
-  std::string format = "OO:ModuleProcess";
-  format += ModuleClassName;
-  if (!PyArg_ParseTuple(args,
-                        format.c_str(),
-                        &obj0, &obj1)) {
-    std::string error;
-    error  = "Unable to interpret inputs as two PyObject pointers";
-    PyErr_SetString(InvalidInputError, error.c_str());
-    return NULL;
-  }
 
-  // First object is going to be the module
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-  void* vptr0 = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr0);
-
-  // input_type can be either: std::string, MAUS::Data* or Json::Value*.
-  std::string input_type  = module->get_input();
-
-  if (input_type.compare("std::string") == 0) {
-    // std::string input
-    if (!PyString_Check(obj1)) {
-      std::string error;
-      error  = "Expected std::string, data of wrong type";
-      PyErr_SetString(InvalidInputError, error.c_str());
-      return NULL;
-    }
-    std::string event_string(PyString_AsString(obj1));
-
-    // Convert the string to a Json::Value
-    Json::Value imported_json = JsonWrapper::StringToJson(event_string);
-    PyObject *resultobj = module->process_pyobj(&imported_json);
-    return resultobj;
-  }
-
-  if (input_type.compare("Json::Value") == 0) {
-    // Json::Value* input
-    if (!PyCapsule_IsValid(obj1, "Json::Value")) {
-      std::string error;
-      error  = "Expected Json::Value pointer, data of wrong type";
-      PyErr_SetString(InvalidInputError, error.c_str());
-      return NULL;
-    }
-    void* vptr1 = PyCapsule_GetPointer(obj1, "Json::Value");
-    Json::Value* input_json = static_cast<Json::Value*>(vptr1);
-    PyObject *resultobj = module->process_pyobj(input_json);
-    return resultobj;
-  }
-
-  if (input_type.compare("MAUS::Data") == 0) {
-    // MAUS::Data* input
-    if (!PyCapsule_IsValid(obj1, "MAUS::Data")) {
-      std::string error;
-      error  = "Expected MAUS::Data pointer, data of wrong type";
-      PyErr_SetString(InvalidInputError, error.c_str());
-      return NULL;
-    }
-    void* vptr1 = PyCapsule_GetPointer(obj1, "MAUS::Data");
-    MAUS::Data* input_data = static_cast<MAUS::Data*>(vptr1);
-    PyObject *resultobj = module->process_pyobj(input_data);
-    return resultobj;
-  }
-
-  std::string error;
-  error  = "Second input PyCapsule must contain; 'std::string',";
-  error += " 'Json::Value' or 'MAUS::Data'";
-  PyErr_SetString(InvalidInputError, error.c_str());
   return NULL;
 }
 
@@ -291,16 +133,12 @@ PyMethodDef* PyWrapMapBase<MODULE>::GetModuleMethods() {
       METH_VARARGS,    "Running ModuleBase::birth()."},
     { "death",         ModuleDeath,
       METH_VARARGS,    "Running ModuleBase::death()."},
-    { "set_input",     ModuleSetInput,
-      METH_VARARGS,    "Running ModuleBase::set_input()."},
-    { "get_output",    ModuleGetOutput,
-      METH_VARARGS,    "Running ModuleBase::get_output()."},
     { "process",       ModuleProcess,
       METH_VARARGS,    "Running ModuleBase::process()."},
     {NULL, NULL, 0, NULL}
   };
   std::vector<PyMethodDef>* method_vec = new std::vector<PyMethodDef>(8);
-  for (size_t i = 0; i < 8; ++i) {
+  for (size_t i = 0; i < 5; ++i) {
       (*method_vec)[i] = ModuleMethods[i];
   }
   return &((*method_vec)[0]);
