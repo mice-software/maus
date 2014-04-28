@@ -47,7 +47,8 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Constructor from SimpleCircle and SimpleLine */
     SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
-                        double psi0, SimpleCircle circle, SimpleLine line_sz);
+                        double psi0, SimpleCircle circle, SimpleLine line_sz, double chisq,
+                        double chisq_dof, DoubleArray phi, SciFiSpacePointPArray spoints);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);

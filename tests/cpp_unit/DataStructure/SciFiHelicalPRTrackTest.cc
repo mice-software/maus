@@ -77,8 +77,13 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   line_sz.set_chisq(7.0);
   circle.set_R(13.0);
   circle.set_chisq(6.0);
+  double chisq = 1.0;
+  double chisq_dof = 2.0;
+  std::vector<double> phi;
+  std::vector<SciFiSpacePoint*> spnts;
 
-  SciFiHelicalPRTrack prtrack(0, 5, -1, pos0, phi0, psi0, circle, line_sz);
+  SciFiHelicalPRTrack prtrack(0, 5, -1, pos0, phi0, psi0, circle, line_sz, chisq, chisq_dof,
+                              phi, spnts);
   EXPECT_EQ(prtrack.get_pos0().x(), 1.0);
   EXPECT_EQ(prtrack.get_pos0().y(), 2.0);
   EXPECT_EQ(prtrack.get_pos0().z(), 1100.0);
@@ -91,6 +96,11 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   EXPECT_EQ(prtrack.get_tracker(), 0);
   EXPECT_EQ(prtrack.get_num_points(), 5);
   EXPECT_EQ(prtrack.get_charge(), -1);
+  EXPECT_EQ(prtrack.get_chisq(), 1.0);
+  EXPECT_EQ(prtrack.get_chisq_dof(), 2.0);
+  size_t size = 0;
+  EXPECT_EQ(prtrack.get_spacepoints().size(), size);
+  EXPECT_EQ(prtrack.get_phi().size(), size);
 }
 
 TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
