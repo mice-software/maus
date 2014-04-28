@@ -225,11 +225,15 @@ std::string InputCppDAQData::getCurEvent() {
 
   Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(data_cpp);
 //   std::cerr << *spill_json_out << std::endl;
-  delete data_cpp;
   _eventsCount++;
 
   Json::FastWriter xJSONWr;
-  return xJSONWr.write(*spill_json_out);
+  std::string output = xJSONWr.write(*spill_json_out);
+
+  delete spill_json_out;
+  delete data_cpp;
+
+  return output;
 }
 
 bool InputCppDAQData::death() {
