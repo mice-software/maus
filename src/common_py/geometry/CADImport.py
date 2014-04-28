@@ -233,6 +233,34 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append('Dimensions '+elem.prop('rmin')+' '+\
                                       elem.prop('rmax')+' '+\
                                       elem.prop('lunit')+'\n')
+                # For a polycone, a data file should be written locally
+                # based on the listed vertices
+                polycone  = datafile.xpathEval("gdml/solids/polycone")
+                for elem in polycone:
+                    # look for a polycone object with a name
+                    # matching the volume
+                    if elem.prop('name') == solid[0].prop('ref'):
+                        result.append('Volume Polycone\n')
+                        points = []
+                        zplane = elem.xpathEval('zplane')
+                        # loop over the z planes of the object.
+                        for p in zplane:
+                            point = []
+                            point.append(float(p.prop('z')))
+                            point.append(float(p.prop('rmin')))
+                            point.append(float(p.prop('rmax')))
+                            points.append(point)
+                        # Create a text files containing the z plane positions
+                        # particular to the volume.
+                        f = open(self.output[:-4]+"_"+vol.prop('name')+\
+                                 '.txt','w')
+                        f.write(" NumberOfPoints \t" + str(len(points)) +"\n")
+                        f.write(" Units    mm \n")
+                        f.write(" Z        RInner       ZOuter\n")
+                        for p in points:
+                            f.write(str(p[0])+"\t"+str(p[1])+"\t"+str(p[2])+"\n")
+                        # close the text file
+                        f.close()
                 aux        = vol.xpathEval('auxiliary')
                 unit = "cm"
                 # Get the auxhilary elements of the volume
@@ -295,6 +323,10 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'BooleanModule2Type'\
                              or elemtype == 'FileName'\
                              or elemtype == 'PolyconeType':
+                        # An exception for the case of polycone objects
+                        if value == "PolyconeProfile":
+                            value = self.output[:-4] + '_' + vol.prop('name') + \
+                                    '.txt'
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
