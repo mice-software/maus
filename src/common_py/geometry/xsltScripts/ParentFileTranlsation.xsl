@@ -91,7 +91,31 @@
                             <xsl:when test="contains(@name, 'Q9')">Substitution $Q9Current <xsl:value-of select="@setCurrent"/>
 			    Substitution $Q9Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
-                            </xsl:text></xsl:when></xsl:choose>
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'SSU')">Substitution $SSUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $SSUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCU')">Substitution $FCUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'CCU')">Substitution $CCUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $CCUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCM')">Substitution $FCMCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCMPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'CCD')">Substitution $CCDCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $CCDPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCD')">Substitution $FCDCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCDPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+			    </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
                             
                             //Module <xsl:value-of select="MICE_Information/Other_Information/GDML_Files/@location"/>RotatedGeometryFile.dat
@@ -101,6 +125,15 @@
                             //}
 
                            // 
+	         	   //Module Virtuals
+                           //     {
+                           //             Volume None
+                           //             Position 0.0 0.0 0.0+0.1*@RepeatNumber m
+                           //             PropertyString SensitiveDetector Virtual
+                           //             PropertyBool RepeatModule2 True
+                           //             PropertyInt NumberOfRepeats 240
+                           //     }
+
 
                             <xsl:variable name="tof_0_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof0FileNumber/@number"/>
                             <xsl:variable name="tof_1_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof1FileNumber/@number"/>
