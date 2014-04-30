@@ -74,7 +74,22 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch (...) {
+    } catch (Exception& exception) {
+      MAUS::CppErrorHandler::getInstance()->
+	HandleExceptionNoJson(exception, _classname);
+      std::cerr << "String to Json conversion failed,"
+		<< "MapCppGlobalTrackMatching::process" << std::endl;
+      Json::Value errors;
+      std::stringstream ss;
+      ss << _classname << " says: Bad json document";
+      errors["bad_json_document"] = ss.str();
+      root["errors"] = errors;
+      delete data_json;
+      return writer.write(root);
+    } catch (std::exception& exc) {
+      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+      std::cerr << "String to Json conversion failed,"
+		<< "MapCppGlobalTrackMatching::process" << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -83,7 +98,6 @@ namespace MAUS {
       delete data_json;
       return writer.write(root);
     }
-
 
     if (!data_json || data_json->isNull()) {
       if (data_json) delete data_json;

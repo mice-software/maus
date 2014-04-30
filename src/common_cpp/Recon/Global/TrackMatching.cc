@@ -52,7 +52,7 @@ namespace global {
     std::vector<MAUS::DataStructure::Global::SpacePoint*>
       *GlobalSpacePointArray = global_event->get_space_points();
     MAUS::DataStructure::Global::TrackPArray TOFTrackArray;
-    MakeTOFTracks(global_event, GlobalSpacePointArray, TOFTrackArray, mapper_name);
+    MakeTOFTracks(global_event, GlobalSpacePointArray, TOFTrackArray);
 
     // Adding global tracks for case where global event contains both SciFi and TOF tracks
     if (!SciFiTrackArray->empty() && !TOFTrackArray.empty()) {
@@ -131,8 +131,9 @@ namespace global {
       MAUS::GlobalEvent* global_event,
       std::vector<MAUS::DataStructure::Global::SpacePoint*>
       *GlobalSpacePointArray,
-      MAUS::DataStructure::Global::TrackPArray& TOFTrackArray,
-      std::string mapper_name) {
+      MAUS::DataStructure::Global::TrackPArray& TOFTrackArray) {
+
+    std::string local_mapper_name = "GlobalTOFTrack";
 
     std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF0tp;
     std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF1tp;
@@ -168,7 +169,7 @@ namespace global {
     for (unsigned int i = 0; i < TOF1tp.size(); ++i) {
       MAUS::DataStructure::Global::Track* TOFtrack =
 	new MAUS::DataStructure::Global::Track();
-      TOFtrack->set_mapper_name(mapper_name);
+      TOFtrack->set_mapper_name(local_mapper_name);
       for (unsigned int j = 0; j < TOF0tp.size(); ++j) {
 	if ((TOF1tp[i]->get_position().T() - TOF0tp[j]->get_position().T()) <=
 	    (TOF01offset + allowance) &&
@@ -186,16 +187,16 @@ namespace global {
 	}
       }
       if (tempTOF0tp.size() < 2 && tempTOF2tp.size() < 2) {
-	TOF1tp[i]->set_mapper_name(mapper_name);
+	TOF1tp[i]->set_mapper_name(local_mapper_name);
 	TOFtrack->AddTrackPoint(TOF1tp[i]);
 	global_event->add_track_point_recursive(TOF1tp[i]);
 	if (tempTOF0tp.size() == 1) {
-	  tempTOF0tp[0]->set_mapper_name(mapper_name);
+	  tempTOF0tp[0]->set_mapper_name(local_mapper_name);
 	  TOFtrack->AddTrackPoint(tempTOF0tp[0]);
 	  global_event->add_track_point_recursive(tempTOF0tp[0]);
 	}
 	if (tempTOF2tp.size() == 1) {
-	  tempTOF2tp[0]->set_mapper_name(mapper_name);
+	  tempTOF2tp[0]->set_mapper_name(local_mapper_name);
 	  TOFtrack->AddTrackPoint(tempTOF2tp[0]);
 	  global_event->add_track_point_recursive(tempTOF2tp[0]);
 	}

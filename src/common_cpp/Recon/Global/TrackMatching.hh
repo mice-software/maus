@@ -65,8 +65,7 @@ namespace global {
     void MakeTOFTracks(MAUS::GlobalEvent* global_event,
 		       std::vector<MAUS::DataStructure::Global::SpacePoint*>
 		       *GlobalSpacePointArray,
-		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray,
-		       std::string mapper_name);
+		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon
