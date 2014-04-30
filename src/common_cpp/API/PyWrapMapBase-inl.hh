@@ -108,11 +108,26 @@ PyObject* PyWrapMapBase<MAPCLASS>::_new(PyTypeObject* type, PyObject *args, PyOb
 }
 
 template <class MAPCLASS>
-std::string PyWrapMapBase<MAPCLASS>::_birth_docstring = "birth docstring";
+std::string PyWrapMapBase<MAPCLASS>::_birth_docstring =
+  std::string("Initialise the mapper based on datacards\n\n")+
+  std::string(" - datacards: string representation of the control variables\n");
+
 template <class MAPCLASS>
-std::string PyWrapMapBase<MAPCLASS>::_process_docstring = "birth docstring";
+std::string PyWrapMapBase<MAPCLASS>::_process_docstring =
+  std::string("Process the data\n\n")+
+  std::string(" - data: a MAUS::Data event, either in json, string or MAUS\n")+
+  std::string(" native representation.\n");
+
 template <class MAPCLASS>
-std::string PyWrapMapBase<MAPCLASS>::_death_docstring = "birth docstring";
+std::string PyWrapMapBase<MAPCLASS>::_death_docstring =
+  std::string("Deinitialise the mapper ready for the next run\n");
+
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_class_docstring =
+  std::string("Class for processing the MAUS data.\n\n")+
+  std::string("  def __init__(self)\n")+
+  std::string("    Initialise the class\n");
+
 
 template <class MAPCLASS>
 int PyWrapMapBase<MAPCLASS>::_init(PyWrappedMap* self, PyObject *args, PyObject *kwds) {
@@ -151,12 +166,17 @@ PyMethodDef PyWrapMapBase<MAPCLASS>::_module_methods[] = {
 
 template <class MAPCLASS>
 std::string PyWrapMapBase<MAPCLASS>::_class_name = "";
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_module_name = "";
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_path_name = "";
+
 
 template <class MAPCLASS>
 PyTypeObject PyWrapMapBase<MAPCLASS>::_class_type = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    ("_"+PyWrapMapBase<MAPCLASS>::_class_name+"."+PyWrapMapBase<MAPCLASS>::_class_name).c_str(),             /*tp_name*/
+    _path_name.c_str(),             /*tp_name*/
     sizeof(PyWrappedMap),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)_dealloc, /*tp_dealloc*/
@@ -175,7 +195,7 @@ PyTypeObject PyWrapMapBase<MAPCLASS>::_class_type = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Noddy objects",           /* tp_doc */
+    _class_docstring.c_str(),           /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */
@@ -201,13 +221,24 @@ void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
                 std::string birth_docstring,
                 std::string death_docstring,
                 std::string process_docstring) {
+    if (class_docstring != "")
+        _class_docstring = class_docstring;
+    if (birth_docstring != "")
+        _birth_docstring = birth_docstring;
+    if (death_docstring != "")
+        _death_docstring = death_docstring;
+    if (process_docstring != "")
+        _process_docstring = process_docstring;
     _class_name = MAPCLASS().get_classname();
+    _module_name = "_"+_class_name;
+    _path_name = "_"+_class_name+"."+_class_name;
+    _class_type.tp_name = _path_name.c_str();
     PyObject* module;
 
     if (PyType_Ready(&_class_type) < 0)
         return;
 
-    module = Py_InitModule3(("_"+_class_name).c_str(), _module_methods,
+    module = Py_InitModule3(_module_name.c_str(), _module_methods,
                        "Better to import the class directly from MAUS.");
 
     if (module == NULL)

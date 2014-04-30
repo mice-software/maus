@@ -266,7 +266,7 @@ def cleanup_extras():
             if os.path.isdir(dirname):
                 shutil.rmtree(dirname) 
 
-def build_maus_lib(filename, stuff_to_import):
+def build_maus_lib(filename, import_module_list):
     """
     Build MAUS.py - single point of entry importer for all of the MAUS libraries
     """
@@ -282,15 +282,15 @@ def build_maus_lib(filename, stuff_to_import):
     file_to_import.write("     print 'failed to import Go'\n")
     file_to_import.write("\n")
 
-    for single_stuff in stuff_to_import:
-        file_to_import.write("try:\n")
-        file_to_import.write("     from %s import %s\n" % \
-                                                   (single_stuff, single_stuff))
-        file_to_import.write("except ImportError:\n")
-        file_to_import.write("     print 'failed to import %s'\n" % \
-                                                                   single_stuff)
-        file_to_import.write("\n")
-
+    for import_module in import_module_list:
+        import_string = """
+try:
+    from %%MODULE%% import %%MODULE%%
+except ImportError:
+    from _%%MODULE%% import %%MODULE%%
+"""
+        import_string = import_string.replace("%%MODULE%%", import_module) 
+        file_to_import.write(import_string)
     file_to_import.close()
 
 def fail_path(directory):

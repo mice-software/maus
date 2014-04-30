@@ -9,36 +9,22 @@ def test_data():
     data = ROOT.MAUS.Data()
     spill = ROOT.MAUS.Spill()
     spill.SetRunNumber(99)
-    spill.SetSpillNumber(666)
+    spill.SetSpillNumber(999)
     data.SetSpill(spill)
     return data 
 
 class ConverterTestCase(unittest.TestCase):
-    def test_cpp_to_json_spill_convert(self):
-        self.assertRaises(ValueError, converter._cpp_to_json_spill_convert)
-        self.assertRaises(ValueError, converter._cpp_to_json_spill_convert, ("",))
+    def test_convert(self):
+        self.assertRaises(ValueError, converter.json_repr, ())
+        self.assertRaises(ValueError, converter.json_repr, ("",))
         dummy_tree = ROOT.TTree()
-        self.assertRaises(ValueError, converter._cpp_to_json_spill_convert, dummy_tree)
+        self.assertRaises(ValueError,converter.json_repr, dummy_tree)
         maus_data = test_data()
-        self.assertRaises(ValueError, converter._cpp_to_json_spill_convert, (maus_data, ""))
-        json_str = converter._cpp_to_json_spill_convert(maus_data)
-
-    def test_json_to_cpp_spill_convert(self):
-        with self.assertRaises(ValueError):
-            converter._json_to_cpp_spill_convert()
-        with self.assertRaises(ValueError):
-            converter._json_to_cpp_spill_convert(1,)
-        with self.assertRaises(ValueError):
-            converter._json_to_cpp_spill_convert("", "")
-        with self.assertRaises(ValueError):
-            converter._json_to_cpp_spill_convert("",)
-        ref_data = test_data()
-        json_str = converter._cpp_to_json_spill_convert(ref_data)
-        print json_str
-        maus_data = converter._json_to_cpp_spill_convert(json_str,)
-        self.assertEqual(maus_data.GetSpill().GetRunNumber(),
-                         ref_data.GetSpill().GetRunNumber())
-
+        self.assertRaises(ValueError, converter.json_repr, (maus_data, ""))
+        json_dict = converter.json_repr(maus_data)
+        self.assertEqual(json_dict["spill_number"], 999)
+        converter.data_repr(maus_data)
+        converter.string_repr(maus_data)
 
 if __name__ == "__main__":
     unittest.main()

@@ -36,6 +36,7 @@
 #endif
 
 #include "Python.h"
+#include "json/value.h"
 
 #include "src/common_cpp/Utils/Exception.hh"
 

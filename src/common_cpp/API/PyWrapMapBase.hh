@@ -51,39 +51,41 @@ typedef struct {
 
 template<class MAPCLASS>
 class PyWrapMapBase {
+  public:
+    /* \brief Initialise python module for this class
+     *
+     * \param class_docstring docstring for the python class.
+     * \param birth_docstring docstring for the birth function.
+     * \param death_docstring docstring for the death function.
+     * \param process_docstring docstring for the process function.
+     * 
+     * If docstrings are left empty ("") then some reasonable default docs will
+     * be generated.
+     *
+     * PyWrapMapBase initialises a python module for this class. This
+     * function should be called in a function in the MAUS namespace called
+     * init<MapName> e.g.
+     * PyMODINIT_FUNC init_MapCppSimulation(void) {
+     *   PyWrapMapBase("", "", "", "");
+     * }
+     * When user calls import MAUS, MAUS looks in the library 
+     * build/_MapCppSimulation.so for a function called init_MapCppSimulation
+     * and runs that function to load the python module.
+     */
+    static void PyWrapMapBaseModInit(std::string class_docstring,
+                  std::string birth_docstring,
+                  std::string death_docstring,
+                  std::string process_docstring);
 
- public:
-  /* \brief Initialise python module for this class
-   *
-   * \param class_docstring docstring for the python class.
-   * \param birth_docstring docstring for the birth function.
-   * \param death_docstring docstring for the death function.
-   * \param process_docstring docstring for the process function.
-   * 
-   * PyWrapMapBase initialises a python module for this class. This
-   * function should be called in a function in the MAUS namespace called
-   * init<MapName> e.g.
-   * PyMODINIT_FUNC init_MapCppSimulation(void) {
-   *   PyWrapMapBase(class, birth, death, process);
-   * }
-   * When user calls import MAUS, MAUS looks in the library 
-   * build/_MapCppSimulation.so for a function called init_MapCppSimulation and
-   * runs that function to load the python module.
-   */
-  static void PyWrapMapBaseModInit(std::string class_docstring,
-                std::string birth_docstring,
-                std::string death_docstring,
-                std::string process_docstring);
-
-  /** PyWrappedMap is the python implementation of the C++ Map
-   */
-  typedef struct {
-      PyObject_HEAD;
-      MAPCLASS* map;
-  } PyWrappedMap;
+    /** PyWrappedMap is the python implementation of the C++ Map
+     */
+    typedef struct {
+        PyObject_HEAD;
+        MAPCLASS* map;
+    } PyWrappedMap;
 
  private:
-  // wrappers for map functions
+  // python wrappers for map functions
   static PyObject* birth(PyObject* self, PyObject *args, PyObject *kwds);
   static PyObject* death(PyObject* self, PyObject *args, PyObject *kwds);
   static PyObject* process(PyObject* self, PyObject *args, PyObject *kwds);
@@ -100,7 +102,10 @@ class PyWrapMapBase {
   static PyTypeObject _class_type;
 
   // class name
-  static std::string _class_name;
+  static std::string _class_name;  // Class
+  static std::string _module_name;  // module
+  static std::string _path_name;  // module.Class
+
   // docstrings
   static std::string _class_docstring;
   static std::string _birth_docstring;

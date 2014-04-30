@@ -28,17 +28,32 @@
 #endif
 
 #include "Python.h"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
 
 namespace MAUS {
-
 namespace PyConverter{
-PyObject* JsonCppSpillConvert(PyObject* dummy, PyObject* args, PyObject *kwds);
 
-PyObject* CppJsonSpillConvert(PyObject* dummy, PyObject* args, PyObject *kwds);
+/** Python function to wrap data as a string
+ *
+ *  Takes one argument, returns a PyObject* which is the new data
+ */
+PyObject* py_wrap_string(PyObject* self, PyObject* args);
 
+/** Python function to wrap data as a MAUS::Data
+ *
+ *  Takes one argument, returns a PyObject* which is the new data
+ */
+PyObject* py_wrap_data(PyObject* self, PyObject* args);
+
+/** Python function to wrap data as a PyObject
+ *
+ *  Takes one argument, returns a PyObject* which is the new data
+ */
+PyObject* py_wrap_pyobject(PyObject* self, PyObject* args);
 }
-
 } // MAUS
+
+
 
 #endif
 
