@@ -23,11 +23,11 @@
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppExampleMAUSDataInput(void) {
-  PyWrapMapBase<MAUS::MapCppExampleMAUSDataInput>::ModuleInitialisation();
+  PyWrapMapBase<MAUS::MapCppExampleMAUSDataInput>::PyWrapMapBaseModInit("", "", "", "");
 }
 
 MapCppExampleMAUSDataInput::MapCppExampleMAUSDataInput()
-    : MapBase<MAUS::Data, MAUS::Data>("MapCppExampleMAUSDataInput") {}
+    : MapBase<MAUS::Data>("MapCppExampleMAUSDataInput") {}
 
 void MapCppExampleMAUSDataInput::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only.
@@ -41,21 +41,8 @@ void MapCppExampleMAUSDataInput::_birth(const std::string& argJsonConfigDocument
 
 void MapCppExampleMAUSDataInput::_death() {}
 
-MAUS::Data* MapCppExampleMAUSDataInput::_process(MAUS::Data* data) const {
-  if (!data) {
-    throw(Exception(Exception::nonRecoverable,
-                 "NULL MAUS::Data* passed to process.",
-                 "MapCppExampleMAUSDataInput::_process"));
-  }
-
-  const MAUS::Spill* spill = data->GetSpill();
-  if (!spill) {
-    throw(Exception(Exception::recoverable,
-                 "No MAUS::Spill in MAUS::Data, required!",
-                 "MapCppExampleMAUSDataInput::_process"));
-  }
-  std::cout << "Run: " << spill->GetRunNumber()
-            << "\tSpill: " << spill->GetSpillNumber() << std::endl;
-  return data;
+void MapCppExampleMAUSDataInput::_process(Data* data) const {
+  int spill_number = data->GetSpill()->GetSpillNumber();
+  data->GetSpill()->SetSpillNumber(spill_number+1);
 }
 } // ~MAUS

@@ -193,23 +193,11 @@ class ModuleBuilder:
         if not os.path.exists(builddir):
             os.makedirs(builddir)
 
-        # Prepare the python wrapper
-        pywraptemplate = os.path.join(MAUS_ROOT_DIR,
-                                      'src/map/Templates/MapCppTemplate.py')
-        pywrap = os.path.join(builddir, '%s.py' % name)
-        file1 = open(pywraptemplate, 'r')
-        file2 = open(pywrap, 'w')
-        for line in file1:
-            file2.write(line.replace('MapCppTemplate', name))
-        file1.close()
-        file2.close()
-
         # Locate the test file
         tests = glob.glob('test_*.py')
 
         # Install the files in the build directory, under MAUS_ROOT_DIR.
         print 'Installing', project
-        self.env.Install(full_build_dir, pywrap)
         self.env.Install(full_build_dir, normal_lib1)
         self.env.Install(full_build_dir, normal_lib2)
         self.env.Install(full_build_dir, tests)

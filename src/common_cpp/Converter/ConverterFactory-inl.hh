@@ -151,9 +151,6 @@ namespace MAUS {
   ConverterFactory::getConverter<PyObject, std::string>() const {
     return new PyDictStringConverter();
   }
-
-
-
 } // end of namespace
 
 #endif

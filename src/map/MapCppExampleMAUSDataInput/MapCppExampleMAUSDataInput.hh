@@ -45,7 +45,7 @@
 
 namespace MAUS {
 
-class MapCppExampleMAUSDataInput : public MapBase<MAUS::Data, MAUS::Data> {
+class MapCppExampleMAUSDataInput : public MapBase<MAUS::Data> {
  public:
   /** Constructor, setting the internal variable #_classname */
   MapCppExampleMAUSDataInput();
@@ -70,9 +70,8 @@ class MapCppExampleMAUSDataInput : public MapBase<MAUS::Data, MAUS::Data> {
    *  MAUS::Data* format.
    *  \param spill in MAUS::Data* format
    */
-  MAUS::Data* _process(MAUS::Data* data) const;
+  void _process(MAUS::Data* data) const;
 
- private:
   /// This will contain the configuration
   Json::Value _configJSON;
 

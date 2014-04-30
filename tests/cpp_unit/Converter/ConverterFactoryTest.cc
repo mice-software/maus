@@ -104,6 +104,12 @@ TEST_F(ConverterFactoryTest, TestStringToPython) {
     PyObject* py_value = NULL;
     py_value = ConverterFactory().convert<std::string, PyObject>(_data);
     EXPECT_EQ(PyDict_Check(py_value), 1);
+    EXPECT_EQ(py_value->ob_refcnt, 1);
+    // py_run_number is a borrowed ref (so no decref)
+    PyObject* py_run_number = PyDict_GetItemString(py_value, "run_number");
+    EXPECT_TRUE(py_run_number != NULL);
+    long run_number =  PyInt_AsLong(py_run_number);
+    EXPECT_EQ(run_number, 99);
     Py_DECREF(py_value);
     py_value = ConverterFactory().convert<std::string, PyObject>(_json);
     EXPECT_EQ(PyDict_Check(py_value), 1);
@@ -308,6 +314,22 @@ TEST_F(ConverterFactoryTest, TestPyDictToX) {
 
     Py_DECREF(py_json);
     Py_DECREF(py_data);
+}
+
+//////// delete_type //////////////////
+TEST_F(ConverterFactoryTest, TestDeleteType) {
+    PyObject* py_val = ConverterFactory().convert<std::string, PyObject>(_data);
+    EXPECT_EQ(py_val->ob_refcnt, 1);
+    ConverterFactory::delete_type(py_val);
+    EXPECT_EQ(py_val->ob_refcnt, 0);
+    Json::Value* json_val =
+                    ConverterFactory().convert<std::string, Json::Value>(_data);
+    ConverterFactory::delete_type(json_val);
+    Data* maus_val = ConverterFactory().convert<std::string, Data>(_data);
+    ConverterFactory::delete_type(maus_val);
+    std::string* str_val =
+                    ConverterFactory().convert<std::string, std::string>(_data);
+    ConverterFactory::delete_type(str_val);
 }
 }
 

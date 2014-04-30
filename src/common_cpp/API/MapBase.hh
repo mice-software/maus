@@ -45,8 +45,8 @@ namespace MAUS {
  * \author Alexander Richards, Imperial College London
  * \date 06/06/2012
  */
-template <typename INPUT, typename OUTPUT>
-class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
+template <typename TYPE>
+class MapBase : public virtual IMap<TYPE>, public ModuleBase {
 
  public:
   /*!\brief Constructor
@@ -60,45 +60,27 @@ class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
   // ! Destructor
   virtual ~MapBase();
 
- public:
   /*!\brief Process data
    *
-   * Implementation of the interface. Wraps the _process function
-   * providing additional control/checking.
-   * \param INPUT* The input data to be processed
-   * \return The processed data
-   */
-  OUTPUT* process(INPUT* i) const;
-
-  /*!\brief Process data
+   *  Uses PyObjectWrapper to convert py_input to TYPE; calls user defined 
+   *  _process to process TYPE; wraps output to as a PyObject and returns
    *
-   * Templated function that uses the converter suite to automatically
-   * attempt to convert the data (OTHER*) into the expected (INPUT*) type
-   * that the mapper expects. If this succeeds then the untemplated version
-   * is called on the conversion output to perform the necessary processing. 
-   * \param OTHER* The input data to be converted and processed
-   * \return The processed data
-   */
-  template <typename OTHER> OUTPUT* process(OTHER* o) const;
-
-  /*!\brief Process data
-   *
-   * Templated function that calls the OUTPUT* process(OTHER* o)
-   * function, and then creates a Python Object to hold the result.
-   * \param OTHER* The input data to be processed
-   * \return A python container for the result
+   *  \param py_input a borrowed reference to the input data (process_pyobj does
+   *         not take any ownership of the memory)
+   *  \returns the processed data as a new PyObject
    */
   inline PyObject* process_pyobj(PyObject* py_input) const;
+
 
  private:
   /*!\brief Process data
    *
-   * Pure virtual private function to be implemented by the
-   * derived map author to correctly process the input data
-   * \param INPUT* The input data to be processed
-   * \return The processed data
+   * Pure virtual private function to be implemented in the child map to process
+   * the input data
+   * \param data The input data to be processed; this is a borrowed reference -
+   *        MapBase retains ownership of memory allocated by data.
    */
-  virtual OUTPUT* _process(INPUT* i) const = 0;
+  virtual void _process(TYPE* data) const = 0;
 };
 
 }// end of namespace

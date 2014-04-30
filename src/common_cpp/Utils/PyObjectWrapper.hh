@@ -66,45 +66,82 @@ class PyObjectWrapper {
   public:
     /* @brief Template for Unwrapping a PyObject*
      *
-     * - args - the argument to be unwrapped
+     * - args - the argument to be unwrapped - should be a tuple containing a
+     * single object.
      *
-     * Makes any necessary conversions on the PyObject*
+     * Makes any necessary conversions on the PyObject* to get into TEMP format
      *
      * Caller keeps ownership of memory allocated by args. INPUT* is a new
      * block of memory that is now owned by caller.
      *
      * @throws MAUS::Exception if input is NULL or any part of the conversion
      *         fails
+     *
+     * e.g. Data* data = unwrap_pyobject<Data>(my_py_object);
+     * e.g. Json::Value* value = unwrap_pyobject<Json::Value>(my_py_object);
+     * 
      */
     template <typename TEMP>
-    static TEMP* unwrap_pyobject(PyObject *args);
+    static inline TEMP* unwrap(PyObject *args);
 
-    /* @brief Template for wrapping an OUTPUT into a PyObject*
-     * - input - the input value to be wrapped
+    /* @brief Wrap a MAUS::Data into a PyObject*
      *
-     * Wrap an OUTPUT into a PyObject*, to be implemented for MAUS::Data types,
-     * Json::Value and std::string only at this time.  All others will
-     * not compile.
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
      *
-     * Caller keeps ownership of memory allocated by OUTPUT*. return value is a
-     * new block of memory that is now owned by Python (Py_INCREF is called).
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
      *
      * @throws MAUS::Exception if output is NULL
      */
-    template <typename TEMP>
-    static PyObject* wrap_pyobject(TEMP* output);
+    static inline PyObject* wrap(MAUS::Data* data);
+
+    /* @brief Wrap a Json::Value into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by json. 
+     *
+     * @returns a new block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(Json::Value* json);
+
+    /* @brief Wrap a std::string into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by str.
+     *
+     * @returns a new block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(std::string* str);
+
+    /* @brief Wrap a PyObject* into a PyObject* (NULL op)
+     *
+     * @throws MAUS::Exception if py_object is NULL
+     */
+    static inline PyObject* wrap(PyObject* py_object);
 
     /** @brief delete the pycapsule object and any Json::Value stored within
      */
-    static void delete_jsoncpp_pycapsule(PyObject* object); 
+    static void delete_jsoncpp_pycapsule(PyObject* object);
 
   private:
-    // lazy unwrap - conversion happens in (not lazy) unwrap
+    // lazy unwrap
     // fills the unwrapped data or leaves the pointer to the unwrapped data as
-    // NULL
+    // NULL 
+    //
     // py_input should be a function argument, i.e. a tuple of a single python
     // object
-    static void lazy_unwrap(PyObject* args,
+    // string_ret, json_ret, data_ret, py_ret should be pointers to NULL pointer
+    //
+    // lazy_unwrap will only fill one of <blah>_ret; lazy_unwrap will allocate
+    // new memory (possibly unnecessary)
+    static inline void lazy_unwrap(PyObject* args,
                             std::string** string_ret,
                             Json::Value** json_ret,
                             MAUS::Data** data_ret,
@@ -116,7 +153,7 @@ class PyObjectWrapper {
     // TPython::ObjectProxy_Check
     // data_ret should be a pointer to a NULL pointer (which we fill with
     // MAUS::Data data) 
-    static void parse_root_object_proxy(PyObject* py_object_proxy,
+    static inline void parse_root_object_proxy(PyObject* py_object_proxy,
                                         MAUS::Data** data_ret);
 };
 }  // namespace MAUS

@@ -17,162 +17,205 @@
 #ifndef _SRC_COMMON_CPP_API_PYWRAPMAPBASE_INL_
 #define _SRC_COMMON_CPP_API_PYWRAPMAPBASE_INL_
 
-#include <Python.h>
+#include "Python.h"
+#include "structmember.h"  // python PyMemberDef
 
 #include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleNew(PyObject *self, PyObject *args) {
-  if (!PyArg_ParseTuple(args,
-                        (std::string(":ModuleNew_")+
-                         ModuleClassName).c_str())) {
-    return NULL;
+template <class MAPCLASS>
+PyObject* PyWrapMapBase<MAPCLASS>::birth(PyObject* self,
+                                       PyObject *args,
+                                       PyObject *kwds) {
+  PyWrappedMap* py_map = reinterpret_cast<PyWrappedMap*>(self);
+  if (!py_map->map) {
+      PyErr_SetString(PyExc_ValueError, "self was not initialised properly");
+      return NULL;
   }
 
-  MODULE* module = new MODULE();
-  void* vptr = static_cast<void*>(module);
-  PyObject *resultobj = PyCapsule_New(vptr, "Module", NULL);
-  return resultobj;
-}
+  static char *kwlist[] = {const_cast<char*>("datacards"), NULL};
+  char* cards;
 
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleDelete(PyObject *self, PyObject *args) {
-  PyObject* obj0 = NULL;
-  if (!PyArg_ParseTuple(args,
-                        (std::string("O:ModuleDelete_")+
-                         ModuleClassName).c_str(),
-                        &obj0)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|", kwlist, &cards)) {
     return NULL;
   }
-
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
+  std::string config(cards);
+  try {
+      py_map->map->birth(config);
+  } catch (std::exception& exc) {
+      PyErr_SetString(PyExc_ValueError, (&exc)->what());
+      return NULL;
+  } catch (...) {
+      PyErr_SetString(PyExc_SystemError, "Caught an unknown error during birth");
+      return NULL;
   }
-
-  void* vptr = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr);
-  delete module;
 
   Py_RETURN_NONE;
 }
 
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleBirth(PyObject *self, PyObject *args) {
-  PyObject* obj0 = NULL;
-  char* birth_arg = NULL;
-  if (!PyArg_ParseTuple(args,
-                        (std::string("Os:ModuleBirth_")+
-                         ModuleClassName).c_str(),
-                        &obj0, &birth_arg)) {
-    return NULL;
+template <class MAPCLASS>
+PyObject* PyWrapMapBase<MAPCLASS>::death(PyObject* self,
+                                       PyObject *args,
+                                       PyObject *kwds) {
+  PyWrappedMap* py_map = reinterpret_cast<PyWrappedMap*>(self);
+  if (!py_map->map) {
+      PyErr_SetString(PyExc_ValueError, "self was not initialised properly");
+      return NULL;
   }
-
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
+  try {
+      py_map->map->death();
+  } catch (std::exception& exc) {
+      PyErr_SetString(PyExc_ValueError, (&exc)->what());
+      return NULL;
+  } catch (...) {
+      PyErr_SetString(PyExc_SystemError, "Caught an unknown error during birth");
+      return NULL;
   }
-  void* vptr = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr);
-  std::string argJsonConfigDocument(birth_arg);
-
-  module->birth(argJsonConfigDocument);
 
   Py_RETURN_NONE;
 }
 
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleDeath(PyObject *self, PyObject *args) {
-  PyObject* obj0 = NULL;
-  if (!PyArg_ParseTuple(args,
-                        (std::string("O:ModuleDeath_")+
-                         ModuleClassName).c_str(),
-                        &obj0)) {
+template <class MAPCLASS>
+PyObject* PyWrapMapBase<MAPCLASS>::process(PyObject* self,
+                                       PyObject *args,
+                                       PyObject *kwds) {
+  PyWrappedMap* py_map = reinterpret_cast<PyWrappedMap*>(self);
+  if (!py_map->map) {
+      PyErr_SetString(PyExc_ValueError, "self was not initialised properly");
+      return NULL;
+  }
+
+  static char *kwlist[] = {const_cast<char*>("data"), NULL};
+  PyObject* data_in;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &data_in)) {
     return NULL;
   }
-
-  if (!PyCapsule_IsValid(obj0, "Module")) {
-    std::string error;
-    error  = "First input PyCapsule must contain the pointer";
-    error += " to the Module";
-    PyErr_SetString(InvalidModuleError, error.c_str());
-    return NULL;
-  }
-  void* vptr = PyCapsule_GetPointer(obj0, "Module");
-  MODULE* module = static_cast<MODULE*>(vptr);
-
-  module->death();
-
-  Py_RETURN_NONE;
+  PyObject* data_out = py_map->map->process_pyobj(data_in);
+  // PyObject* data_tuple_out = Py_BuildValue("(O)", &data_out);
+  return data_out;
 }
 
-template <class MODULE>
-PyObject* PyWrapMapBase<MODULE>::ModuleProcess(PyObject *self, PyObject *args) {
-
-  return NULL;
+template <class MAPCLASS>
+PyObject* PyWrapMapBase<MAPCLASS>::_new(PyTypeObject* type, PyObject *args, PyObject *kwds) {
+    PyWrappedMap* self = reinterpret_cast<PyWrappedMap*>(type->tp_alloc(type, 0));
+    self->map = NULL;
+    return reinterpret_cast<PyObject*>(self);
 }
 
-template <class MODULE>
-PyMethodDef* PyWrapMapBase<MODULE>::GetModuleMethods() {
-  PyMethodDef ModuleMethods[] = {
-    { "module_new",    ModuleNew,
-      METH_VARARGS,    "Creating a new instance of the Module"},
-    { "module_delete", ModuleDelete,
-      METH_VARARGS,    "Deleting the instance of the Module"},
-    { "birth",         ModuleBirth,
-      METH_VARARGS,    "Running ModuleBase::birth()."},
-    { "death",         ModuleDeath,
-      METH_VARARGS,    "Running ModuleBase::death()."},
-    { "process",       ModuleProcess,
-      METH_VARARGS,    "Running ModuleBase::process()."},
-    {NULL, NULL, 0, NULL}
-  };
-  std::vector<PyMethodDef>* method_vec = new std::vector<PyMethodDef>(8);
-  for (size_t i = 0; i < 5; ++i) {
-      (*method_vec)[i] = ModuleMethods[i];
-  }
-  return &((*method_vec)[0]);
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_birth_docstring = "birth docstring";
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_process_docstring = "birth docstring";
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_death_docstring = "birth docstring";
+
+template <class MAPCLASS>
+int PyWrapMapBase<MAPCLASS>::_init(PyWrappedMap* self, PyObject *args, PyObject *kwds) {
+    if (self->map == NULL)
+        self->map = new MAPCLASS();
+    return 0;
 }
 
-template <class MODULE>
-void PyWrapMapBase<MODULE>::ModuleInitialisation() {
-  ModuleClassName = "_"+MODULE().get_classname();
+template <class MAPCLASS>
+void PyWrapMapBase<MAPCLASS>::_dealloc(PyWrappedMap* self) {
+    if (self->map != NULL)
+        delete self->map;
+}
 
-  PyObject *m;
-  m = Py_InitModule(ModuleClassName.c_str(), GetModuleMethods());
-  if (m == NULL)
-    return;
+template <class MAPCLASS>
+PyMemberDef PyWrapMapBase<MAPCLASS>::_members[] = {
+    {NULL}  /* Sentinel */
+};
 
-  InvalidModuleError =
-      PyErr_NewExceptionWithDoc((char *)(ModuleClassName+".InvalidModule").c_str(),
-                                (char *)"Invalid Module pointer passed in.",
-                                NULL, NULL);
-  Py_INCREF(InvalidModuleError);
-  PyModule_AddObject(m, "InvalidModule", InvalidModuleError);
 
-  InvalidInputError =
-      PyErr_NewExceptionWithDoc((char *)(ModuleClassName+".InvalidInput").c_str(),
-                                (char *)"Invalid Input passed in.",
-                                NULL, NULL);
-  Py_INCREF(InvalidInputError);
-  PyModule_AddObject(m, "InvalidInput", InvalidInputError);
+template <class MAPCLASS>
+PyMethodDef PyWrapMapBase<MAPCLASS>::_methods[] = {
+    {"birth", (PyCFunction)birth,
+      METH_VARARGS|METH_KEYWORDS, _birth_docstring.c_str()},
+    {"death", (PyCFunction)death,
+      METH_VARARGS|METH_KEYWORDS, _death_docstring.c_str()},
+    {"process", (PyCFunction)process,
+      METH_VARARGS|METH_KEYWORDS, _process_docstring.c_str()},
+    {NULL}  // Sentinel
+};
 
-  InvalidOutputError =
-      PyErr_NewExceptionWithDoc((char *)(ModuleClassName+".InvalidOutput").c_str(),
-                                (char *)"Invalid Output defined.",
-                                NULL, NULL);
-  Py_INCREF(InvalidOutputError);
-  PyModule_AddObject(m, "InvalidOutput", InvalidOutputError);
+template <class MAPCLASS>
+PyMethodDef PyWrapMapBase<MAPCLASS>::_module_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+template <class MAPCLASS>
+std::string PyWrapMapBase<MAPCLASS>::_class_name = "";
+
+template <class MAPCLASS>
+PyTypeObject PyWrapMapBase<MAPCLASS>::_class_type = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    ("_"+PyWrapMapBase<MAPCLASS>::_class_name+"."+PyWrapMapBase<MAPCLASS>::_class_name).c_str(),             /*tp_name*/
+    sizeof(PyWrappedMap),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Noddy objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		               /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    PyWrapMapBase<MAPCLASS>::_methods,             /* tp_methods */
+    PyWrapMapBase<MAPCLASS>::_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    _new,                 /* tp_new */
+};
+
+template <class MAPCLASS>
+void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
+                std::string class_docstring,
+                std::string birth_docstring,
+                std::string death_docstring,
+                std::string process_docstring) {
+    _class_name = MAPCLASS().get_classname();
+    PyObject* module;
+
+    if (PyType_Ready(&_class_type) < 0)
+        return;
+
+    module = Py_InitModule3(("_"+_class_name).c_str(), _module_methods,
+                       "Better to import the class directly from MAUS.");
+
+    if (module == NULL)
+      return;
+
+    Py_INCREF(&_class_type);
+    PyModule_AddObject(module, _class_name.c_str(), (PyObject *)&_class_type);
 }
 }  // ~MAUS
 #endif
+

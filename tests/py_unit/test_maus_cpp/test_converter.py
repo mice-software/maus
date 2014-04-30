@@ -34,6 +34,7 @@ class ConverterTestCase(unittest.TestCase):
             converter._json_to_cpp_spill_convert("",)
         ref_data = test_data()
         json_str = converter._cpp_to_json_spill_convert(ref_data)
+        print json_str
         maus_data = converter._json_to_cpp_spill_convert(json_str,)
         self.assertEqual(maus_data.GetSpill().GetRunNumber(),
                          ref_data.GetSpill().GetRunNumber())

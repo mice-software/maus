@@ -14,8 +14,15 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// I thought about putting this straight into MapBase, but decided against it;
+// I thought it better to split the C API and the python API more strongly.
+//
+// C. T. Rogers, 2014
+
 #ifndef _SRC_COMMON_CPP_API_PYWRAPMAPBASE_
 #define _SRC_COMMON_CPP_API_PYWRAPMAPBASE_
+
+#include <string>
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -28,45 +35,77 @@
 
 #include <Python.h>
 
-#include <string>
-
 namespace MAUS {
 
-static PyObject *InvalidModuleError;
-static PyObject *InvalidInputError;
-static PyObject *InvalidOutputError;
-static std::string ModuleClassName;
-
-/** Python wrapper for objects inheriting from MapBase
+/** @class PyWrapMapBase Python wrapper for objects inheriting from MapBase
  *
- *  PyWrapMapBase provides interfaces between C++ API and python code for 
+ *  PyWrapMapBase provides interfaces between C++ API and python code for a
+ *  MapBase class
  */
 
-template<class MODULE>
+typedef struct {
+    PyObject_HEAD
+    void* map;
+} WrapMap;
+
+
+template<class MAPCLASS>
 class PyWrapMapBase {
 
  public:
-  /// Initialise a python module with the appropriate methods defined
-  static void ModuleInitialisation();
+  /* \brief Initialise python module for this class
+   *
+   * \param class_docstring docstring for the python class.
+   * \param birth_docstring docstring for the birth function.
+   * \param death_docstring docstring for the death function.
+   * \param process_docstring docstring for the process function.
+   * 
+   * PyWrapMapBase initialises a python module for this class. This
+   * function should be called in a function in the MAUS namespace called
+   * init<MapName> e.g.
+   * PyMODINIT_FUNC init_MapCppSimulation(void) {
+   *   PyWrapMapBase(class, birth, death, process);
+   * }
+   * When user calls import MAUS, MAUS looks in the library 
+   * build/_MapCppSimulation.so for a function called init_MapCppSimulation and
+   * runs that function to load the python module.
+   */
+  static void PyWrapMapBaseModInit(std::string class_docstring,
+                std::string birth_docstring,
+                std::string death_docstring,
+                std::string process_docstring);
+
+  /** PyWrappedMap is the python implementation of the C++ Map
+   */
+  typedef struct {
+      PyObject_HEAD;
+      MAPCLASS* map;
+  } PyWrappedMap;
 
  private:
-  /// Create a new instance of the MODULE parameter
-  static PyObject* ModuleNew(PyObject *self, PyObject *args);
+  // wrappers for map functions
+  static PyObject* birth(PyObject* self, PyObject *args, PyObject *kwds);
+  static PyObject* death(PyObject* self, PyObject *args, PyObject *kwds);
+  static PyObject* process(PyObject* self, PyObject *args, PyObject *kwds);
 
-  /// Delete the MODULE object owned by the wrapper class
-  static PyObject* ModuleDelete(PyObject *self, PyObject *args);
+  // memory allocation etc
+  static PyObject* _new(PyTypeObject* type, PyObject *args, PyObject *kwds);
+  static int _init(PyWrappedMap* self, PyObject *args, PyObject *kwds);
+  static void _dealloc(PyWrappedMap* self);
 
-  /// Run the MODULE object's birth function.
-  static PyObject* ModuleBirth(PyObject *self, PyObject *args);
+  // python stuff
+  static PyMethodDef _module_methods[];
+  static PyMethodDef _methods[];
+  static PyMemberDef _members[];
+  static PyTypeObject _class_type;
 
-  /// Run the MODULE object's death function.
-  static PyObject* ModuleDeath(PyObject *self, PyObject *args);
-
-  /// Run the MODULE object's process function.
-  static PyObject* ModuleProcess(PyObject *self, PyObject *args);
-
-  /// Get an array of Methods for calling during module initialisation
-  static PyMethodDef* GetModuleMethods();
+  // class name
+  static std::string _class_name;
+  // docstrings
+  static std::string _class_docstring;
+  static std::string _birth_docstring;
+  static std::string _death_docstring;
+  static std::string _process_docstring;
 };
 }  // ~MAUS
 

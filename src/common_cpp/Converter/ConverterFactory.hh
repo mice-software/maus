@@ -31,9 +31,27 @@
 #ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_
 #define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_
 #include <iostream>
+#include <string>
+
+// These ifdefs are required to avoid cpp compiler warning (gcc4.6.1)
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
+#include "Python.h"
+
+#include "json/value.h"
+
 #include "src/common_cpp/Converter/IConverter.hh"
 #include "src/common_cpp/Converter/ConverterExceptions.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
+
+
 
 namespace MAUS {
 
@@ -78,6 +96,18 @@ namespace MAUS {
 
     template <typename INPUT, typename OUTPUT>
     OUTPUT* convert(INPUT* i) const;
+
+    /** Overloaded function to delete value */
+    static void delete_type(Json::Value* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::Data* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(std::string* value) {delete value;}
+
+    /** Overloaded function to call Py_DECREF on value */
+    static void delete_type(PyObject* value) {Py_DECREF(value);}
   };
 
 } // end of namespace
