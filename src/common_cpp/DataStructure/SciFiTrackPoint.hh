@@ -30,6 +30,7 @@
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -123,6 +124,10 @@ class SciFiTrackPoint {
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
   void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
 
+  /** @brief Set the mother cluster
+   */
+  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
+
   /** @brief  Returns the tracker number.
    */
   int tracker()              const { return _tracker;  }
@@ -188,6 +193,10 @@ class SciFiTrackPoint {
   double mc_y()              const { return _mc_y;     }
   double mc_py()             const { return _mc_py;    }
   double mc_pz()             const { return _mc_pz;    }
+
+  /** @brief  Returns the mother cluster.
+   */
+  SciFiCluster* cluster()    const { return _cluster; }
 
  private:
   /** @brief The tracker the trackpoint belongs to.
@@ -256,6 +265,10 @@ class SciFiTrackPoint {
   double _mc_y;
   double _mc_py;
   double _mc_pz;
+
+  /** @brief A pointer to the cluster used to form the state - does not assume control of memory
+   */
+  SciFiCluster* _cluster;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

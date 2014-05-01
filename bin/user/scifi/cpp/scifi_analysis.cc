@@ -40,6 +40,8 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -91,45 +93,44 @@ int main(int argc, char *argv[]) {
       MAUS::SciFiEvent* sfevt = revts->at(i)->GetSciFiEvent();
 
       // Perform your analysis here, e.g.
-      std::vector<MAUS::SciFiHelicalPRTrack*> htrks = sfevt->helicalprtracks();
-      std::vector<MAUS::SciFiHelicalPRTrack*>::iterator htrk;
+      std::vector<MAUS::SciFiTrack*> trks = sfevt->scifitracks();
+      std::vector<MAUS::SciFiTrack*>::iterator trk;
 
-      // Loop over helical pat rec tracks
-      for ( htrk = htrks.begin(); htrk != htrks.end(); ++htrk ) {
-        std::vector<MAUS::SciFiSpacePoint*> spnts = (*htrk)->get_spacepoints();
-        std::vector<MAUS::SciFiSpacePoint*>::iterator spnt;
-        SciFiTools::print_spacepoint_xyz(spnts);
+      // Loop over kalman tracks
+      for ( trk = trks.begin(); trk != trks.end(); ++trk ) {
+        std::vector<MAUS::SciFiTrackPoint*> tpnts = (*trk)->scifitrackpoints();
+        std::vector<MAUS::SciFiTrackPoint*>::iterator tpnt;
 
-        // Loop over seed spacepoints
-        for ( spnt = spnts.begin(); spnt != spnts.end(); ++spnt ) {
-          std::vector<MAUS::SciFiCluster*> clusters = (*spnt)->get_channels();
-          std::vector<MAUS::SciFiCluster*>::iterator clus;
+        // Loop over trackpoints
+        for ( tpnt = tpnts.begin(); tpnt != tpnts.end(); ++tpnt ) {
+          MAUS::SciFiCluster* clus = (*tpnt)->cluster();
+          if (!clus) {
+            std::cout << "Empty cluster pointer, address " << clus  << std::endl;
+            continue;
+          }
+          std::vector<MAUS::SciFiDigit*> digits = clus->get_digits();
+          std::vector<MAUS::SciFiDigit*>::iterator dig;
 
-          // Loop over clusters
-          for ( clus = clusters.begin(); clus != clusters.end(); ++clus ) {
-            std::vector<MAUS::SciFiDigit*> digits = (*clus)->get_digits();
-            std::vector<MAUS::SciFiDigit*>::iterator dig;
+          // Loop over digits
+          for ( dig = digits.begin(); dig != digits.end(); ++dig ) {
 
-            // Loop over digits
-            for ( dig = digits.begin(); dig != digits.end(); ++dig ) {
+            // Perform the digits to hits lookup
+            std::vector<MAUS::SciFiHit*> hits;
+            std::vector<MAUS::SciFiHit*>::iterator hit;
 
-              // Perform the digits to hits lookup
-              std::vector<MAUS::SciFiHit*> hits;
-              std::vector<MAUS::SciFiHit*>::iterator hit;
+            if (!lkup.get_hits((*dig), hits)) {
+              std::cerr << "Lookup failed\n";
+              continue;
+            }
 
-              if (!lkup.get_hits((*dig), hits)) {
-                std::cerr << "Lookup failed\n";
-                continue;
-              }
-
-              // Loop over MC hits
-              for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
-                int track_id = (*hit)->GetTrackId();
-              } // ~Loop over MC hits
-            } // ~Loop over digits
-          } // ~// Loop over clusters
-        } // ~Loop over seed spacepoints
-      } // ~Loop over helical pat rec tracks
+            // Loop over MC hits
+            for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
+              int track_id = (*hit)->GetTrackId();
+              std::cout << "track_id: " << track_id << std::endl;
+            } // ~Loop over MC hits
+          } // ~Loop over digits
+        } // ~Loop over track points
+      } // ~Loop over kalman tracks
     } // ~Loop over MC events
   } // ~Loop over all spills
   theApp.Run();

@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -DDEBUG -Wall
+CFLAGS = -DDEBUG -ggdb -Wall
 
 all : scifi_offline_viewer scifi_momentum_analysis scifi_analysis
 

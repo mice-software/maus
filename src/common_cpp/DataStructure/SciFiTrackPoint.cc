@@ -37,7 +37,8 @@ SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
                                      _mc_px(0.),
                                      _mc_y(0.),
                                      _mc_py(0.),
-                                     _mc_pz(0.) {
+                                     _mc_pz(0.),
+                                     _cluster(0) {
 }
 
 SciFiTrackPoint::~SciFiTrackPoint() {}
@@ -92,6 +93,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   double* matrix_elements = C.GetMatrixArray();
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
+  _cluster = kalman_site->cluster();
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
@@ -120,6 +122,7 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _smoothed_residual = point.smoothed_residual();
 
   _covariance = point.covariance();
+  _cluster = point.cluster();
 }
 
 SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
@@ -151,6 +154,7 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _smoothed_residual = rhs.smoothed_residual();
 
   _covariance= rhs.covariance();
+  _cluster = rhs.cluster();
 
   return *this;
 }
