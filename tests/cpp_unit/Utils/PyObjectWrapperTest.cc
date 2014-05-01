@@ -108,7 +108,6 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   EXPECT_EQ(py_json->ob_refcnt, 1);
   test_unwrap(py_json);
   Py_DECREF(py_json);
-  delete json_value;
 
   std::cerr << "PyObject" << std::endl;
   PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>(&test);
@@ -118,15 +117,27 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   EXPECT_EQ(run_number, 99);
 
   PyObject* py_py_dict = PyObjectWrapper::wrap(py_dict);
-  EXPECT_EQ(py_py_dict->ob_refcnt, 2);
-  EXPECT_EQ(py_py_dict, py_dict);  // we just called INCREF, nothing else
+  EXPECT_EQ(py_py_dict->ob_refcnt, 1);
+  EXPECT_EQ(py_py_dict, py_dict);  // it was a null op
   test_unwrap(py_dict);
-  Py_DECREF(py_dict);
   Py_DECREF(py_dict);
 }
 
-TEST(PyObjectWrapperTest, TestJsonMemoryCleanUp) {
-  EXPECT_TRUE(false) << "NEED TO FIX MEMORY LEAK";
+TEST(PyObjectWrapperTest, TestDeleteJsonCppPyCapsule) {
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(NULL), Exception);
+  PyObject* py_int = PyLong_FromLong(0);
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_int), Exception);
+  Py_DECREF(py_int);
+
+  Json::Value* json = new Json::Value();
+  void* void_json = static_cast<void*>(json);
+  PyObject *py_no_name = PyCapsule_New(void_json, "", NULL);
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_no_name), Exception);
+  Py_DECREF(py_no_name);
+
+  PyObject* py_okay = PyCapsule_New(void_json, "JsonCpp", NULL);
+  PyObjectWrapper::delete_jsoncpp_pycapsule(py_okay);  // and this deletes json
+  Py_DECREF(py_okay);
 }
 } // namespace MAUS
 

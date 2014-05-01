@@ -100,7 +100,7 @@ PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
 
   // Place the Json::Value* inside a PyCapsule
   void* vptr = static_cast<void*>(json_value);
-  PyObject *py_cap = PyCapsule_New(vptr, "JsonCpp", NULL);
+  PyObject *py_cap = PyCapsule_New(vptr, "JsonCpp", delete_jsoncpp_pycapsule);
   return py_cap;
 }
 
@@ -194,6 +194,16 @@ void PyObjectWrapper::parse_root_object_proxy(PyObject* py_cpp,
                         std::string(c_string),
                         "PyObjectWrapper::lazy_unwrap");
     }
+}
+
+void PyObjectWrapper::delete_jsoncpp_pycapsule(PyObject* py_capsule) {
+    void* void_json = PyCapsule_GetPointer(py_capsule, "JsonCpp");
+    Json::Value* json = static_cast<Json::Value*>(void_json);
+    if (!void_json || !json)
+        throw Exception(Exception::recoverable,
+                    "Attempting to delete a JsonCpp capsule but none was found",
+                    "PyObjectWrapper::delete_jsoncpp_pycapsule");
+    delete json;
 }
 }  // namespace MAUS
 

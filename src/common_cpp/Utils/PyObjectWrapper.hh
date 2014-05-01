@@ -129,7 +129,7 @@ class PyObjectWrapper {
 
     /** @brief delete the pycapsule object and any Json::Value stored within
      */
-    static void delete_jsoncpp_pycapsule(PyObject* object);
+    static inline void delete_jsoncpp_pycapsule(PyObject* object);
 
   private:
     // lazy unwrap
