@@ -77,8 +77,9 @@ namespace MAUS {
     } catch (Exception& exception) {
       MAUS::CppErrorHandler::getInstance()->
 	HandleExceptionNoJson(exception, _classname);
-      std::cerr << "String to Json conversion failed,"
-		<< "MapCppGlobalReconImport::process" << std::endl;
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalReconImport::process"
+				  << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -88,8 +89,9 @@ namespace MAUS {
       return writer.write(root);
     } catch (std::exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-      std::cerr << "String to Json conversion failed,"
-		<< "MapCppGlobalReconImport::process" << std::endl;
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalReconImport::process"
+				  << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
