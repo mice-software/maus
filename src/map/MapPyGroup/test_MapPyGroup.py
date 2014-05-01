@@ -46,7 +46,9 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         ErrorHandler.DefaultHandler().on_error='none'
         if not maus_cpp.globals.has_instance():
-            maus_cpp.globals.birth(Configuration.Configuration().getConfigJSON())
+            maus_cpp.globals.birth(
+              Configuration.Configuration().getConfigJSON()
+            )
 
     def test_init_default(self):
         """
@@ -364,11 +366,12 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             self.assertTrue(worker.death_called, 
                 "death wasn't called for worker %s" % worker.map_id)
 
-    def test_conversion(self):       
-        class MapPyGroupConvert():
+    def test_conversion(self):      
+        """Test MapPyGroup handles conversions appropriately"""
+        class MapPyGroupConvert: # pylint:disable = C0111, W0232, R0201 
             def __init__(self):
                 pass
-            def birth(self, json):
+            def birth(self, _json):
                 pass
             def death(self):
                 pass
@@ -379,10 +382,10 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                 return data
             can_convert = True
 
-        class MapPyGroupNoConvert():
+        class MapPyGroupNoConvert: # pylint:disable = C0111, W0232, R0201 
             def __init__(self):
                 pass
-            def birth(self, json):
+            def birth(self, _json):
                 pass
             def death(self):
                 pass
@@ -391,8 +394,8 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                     raise ValueError("Expected data with type string")
                 return data
 
-        workers = [MapPyGroupNoConvert(), MapPyGroupConvert(), MapPyGroupNoConvert(),
-                   MapPyGroupConvert()]
+        workers = [MapPyGroupNoConvert(), MapPyGroupConvert(), 
+                   MapPyGroupNoConvert(), MapPyGroupConvert()]
         my_group = MapPyGroup(workers)
         output = my_group.process("{}")
         self.assertEqual(output, "{}")

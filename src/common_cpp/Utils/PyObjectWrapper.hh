@@ -134,7 +134,7 @@ class PyObjectWrapper {
   private:
     // lazy unwrap
     // fills the unwrapped data or leaves the pointer to the unwrapped data as
-    // NULL 
+    // NULL
     //
     // py_input should be a function argument, i.e. a tuple of a single python
     // object
@@ -150,10 +150,10 @@ class PyObjectWrapper {
 
     // parse a PyROOT ObjectProxy into a C++ Event object
     //
-    // py_object_proxy should be an object that e.g. passes 
+    // py_object_proxy should be an object that e.g. passes
     // TPython::ObjectProxy_Check
     // data_ret should be a pointer to a NULL pointer (which we fill with
-    // MAUS::Data data) 
+    // MAUS::Data data)
     static inline void parse_root_object_proxy(PyObject* py_object_proxy,
                                         MAUS::Data** data_ret);
 };

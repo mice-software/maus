@@ -44,11 +44,11 @@ namespace MAUS {
     try {
         _process(cpp_data);
     }
-    catch(Exception& s) {
+    catch (Exception& s) {
         CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    } catch(std::exception& e) {
+    } catch (std::exception& e) {
         CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    } catch(...) {
+    } catch (...) {
         throw Exception(Exception::recoverable,
                         _classname+" threw an unhandled exception",
                         "MapBase::process_pyobj");

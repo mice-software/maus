@@ -1,7 +1,7 @@
 """
 A group of workers which iterates through each worker in turn.
 """
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ A group of workers which iterates through each worker in turn.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-from types import ListType, StringType
+from types import ListType
 import inspect
 import sys
 

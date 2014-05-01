@@ -78,7 +78,7 @@ void test_unwrap(PyObject* py_data) {
   EXPECT_EQ(py_out->ob_refcnt, 1);
   // py_run_number is a borrowed ref (so no decref)
   PyObject* py_run_number = PyDict_GetItemString(py_out, "run_number");
-  long run_number =  PyInt_AsLong(py_run_number);
+  int run_number =  PyInt_AsLong(py_run_number);
   EXPECT_EQ(run_number, 99);
   Py_DECREF(py_out);
 }
@@ -113,7 +113,7 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>(&test);
   EXPECT_EQ(py_dict->ob_refcnt, 1);
   PyObject* py_run_number = PyDict_GetItemString(py_dict, "run_number");
-  long run_number =  PyInt_AsLong(py_run_number);
+  int run_number =  PyInt_AsLong(py_run_number);
   EXPECT_EQ(run_number, 99);
 
   PyObject* py_py_dict = PyObjectWrapper::wrap(py_dict);

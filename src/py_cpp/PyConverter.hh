@@ -40,7 +40,7 @@ namespace MAUS {
  *    - string_repr: represent data as a string element
  */
 
-namespace PyConverter{
+namespace PyConverter {
 
 /** Python function to wrap data as a string
  *

@@ -61,7 +61,7 @@ namespace MAUS {
 
     virtual void _process(PyObject* data) const {
         PyObject* py_run = PyDict_GetItemString(data, "run_number");
-        long run = PyLong_AsLong(py_run);
+        int run = PyLong_AsLong(py_run);
         py_run = PyLong_FromLong(run+1);
         PyDict_SetItemString(data, "run_number", py_run);
     }

@@ -64,7 +64,7 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
 
 PyObject* PyObjectWrapper::wrap(MAUS::Data* cpp_data) {
   // Confirm the object exists.
-  if(!cpp_data) {
+  if (!cpp_data) {
       throw Exception(Exception::recoverable,
                       "Cpp data was NULL",
                       "PyObjectWrapper::wrap_pyobject<MAUS::Data>");
@@ -92,7 +92,7 @@ PyObject* PyObjectWrapper::wrap(MAUS::Data* cpp_data) {
 
 PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
   // Confirm the object exists.
-  if(!json_value) {
+  if (!json_value) {
       throw Exception(Exception::recoverable,
                       "Json::Value was NULL",
                       "PyObjectWrapper::wrap_pyobject<Json::Value>");
@@ -106,7 +106,7 @@ PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
 
 PyObject* PyObjectWrapper::wrap(std::string* str) {
   // Export the std::string as a Python string.
-  if(!str) {
+  if (!str) {
       throw Exception(Exception::recoverable,
                       "str was NULL",
                       "PyObjectWrapper::wrap_pyobject<string>");
@@ -117,7 +117,7 @@ PyObject* PyObjectWrapper::wrap(std::string* str) {
 
 PyObject* PyObjectWrapper::wrap(PyObject* py_object) {
   // We just do an incref (nothing else to do here)
-  if(!py_object) {
+  if (!py_object) {
       throw Exception(Exception::recoverable,
                       "py_object was NULL",
                       "PyObjectWrapper::wrap_pyobject<py_object>");
@@ -147,7 +147,7 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
     } else if (PyCapsule_IsValid(py_cpp, "JsonCpp")) {
         void* vptr = PyCapsule_GetPointer(py_cpp, "JsonCpp");
         Json::Value *json_ptr = static_cast<Json::Value*>(vptr);
-        if(!json_ptr) {
+        if (!json_ptr) {
             throw Exception(Exception::recoverable,
                             "Could not parse JsonCpp capsule to Json::Value",
                             "PyObjectWrapper::lazy_unwrap");
@@ -166,7 +166,9 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
 
 void PyObjectWrapper::parse_root_object_proxy(PyObject* py_cpp,
                                               MAUS::Data** data_ret) {
-    PyObject* name = PyObject_CallMethod(py_cpp, (char*)"Class_Name", NULL);
+    PyObject* name = PyObject_CallMethod(py_cpp,
+                                         const_cast<char*>("Class_Name"),
+                                         NULL);
     if (!name) {
         throw Exception(Exception::recoverable,
                         "Class_Name method could not be called on ObjectProxy",
@@ -180,7 +182,7 @@ void PyObjectWrapper::parse_root_object_proxy(PyObject* py_cpp,
     }
     if (strcmp(c_string, "MAUS::Data") == 0) {
         Py_INCREF(py_cpp);  // TPyReturn decrefs py_cpp; we want to keep it
-        void * vptr = (void*)TPyReturn(py_cpp);
+        void * vptr = static_cast<void*>(TPyReturn(py_cpp));
         Data* data = static_cast<Data*>(vptr); // caller owns this memory
         *data_ret = new Data(*data); // we own this memory
         if (!data_ret) {

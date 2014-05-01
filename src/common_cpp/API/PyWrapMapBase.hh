@@ -33,7 +33,7 @@
 #undef _XOPEN_SOURCE
 #endif
 
-#include <Python.h>
+#include "Python.h"
 
 namespace MAUS {
 

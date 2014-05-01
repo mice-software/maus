@@ -16,6 +16,8 @@
  */
 #ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
 #define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
+#include <string>
+
 #include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
@@ -27,10 +29,7 @@ namespace Json {
 }
 
 namespace MAUS {
-
   class Spill;
-
-
 
   // Template implementation
   // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -127,7 +126,7 @@ namespace MAUS {
     return new DataStringConverter();
   }
 
-  ///PyDICT to X
+  /// PyDICT to X
   template <>
   inline IConverter<PyObject, Json::Value>*
   ConverterFactory::getConverter<PyObject, Json::Value>() const {

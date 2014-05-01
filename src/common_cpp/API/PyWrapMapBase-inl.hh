@@ -16,11 +16,10 @@
 
 #ifndef _SRC_COMMON_CPP_API_PYWRAPMAPBASE_INL_
 #define _SRC_COMMON_CPP_API_PYWRAPMAPBASE_INL_
+#include <string>
 
 #include "Python.h"
 #include "structmember.h"  // python PyMemberDef
-
-#include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -149,7 +148,7 @@ void PyWrapMapBase<MAPCLASS>::_dealloc(PyWrappedMap* self) {
 
 template <class MAPCLASS>
 PyMemberDef PyWrapMapBase<MAPCLASS>::_members[] = {
-  {const_cast<char*>("can_convert"), 
+  {const_cast<char*>("can_convert"),
   T_OBJECT_EX, offsetof(PyWrappedMap, can_convert), 0,
   const_cast<char*>(
   "Returns true if the module can do conversions, else false (or non-existent)"
@@ -253,9 +252,11 @@ void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
 
     if (module == NULL)
       return;
-
-    Py_INCREF(&_class_type);
-    PyModule_AddObject(module, _class_name.c_str(), (PyObject *)&_class_type);
+    PyTypeObject* obj_class_type = &_class_type;
+    Py_INCREF(obj_class_type);
+    PyModule_AddObject(module,
+                       _class_name.c_str(),
+                       reinterpret_cast<PyObject*>(obj_class_type));
 }
 }  // ~MAUS
 #endif

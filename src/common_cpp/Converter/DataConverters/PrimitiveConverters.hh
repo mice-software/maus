@@ -17,6 +17,8 @@
 
 #ifndef SRC_COMMON_CPP_CONVERTERS_DATACONVERTERS_PRIMITIVECONVERTERS_H
 #define SRC_COMMON_CPP_CONVERTERS_DATACONVERTERS_PRIMITIVECONVERTERS_H
+#include <string>
+
 #include "json/json.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -268,7 +270,7 @@ std::string* PyDictStringConverter::_convert(const PyObject* py_dict) const {
                                                   format,
                                                   py_dict);
         Py_DECREF(dumps_function);
-        // memory owned by py_str; py_str checking done as part of this call 
+        // memory owned by py_str; py_str checking done as part of this call
         char* c_string = PyString_AsString(py_str);
         if (!c_string)
             throw Exception(Exception::recoverable,

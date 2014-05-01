@@ -108,7 +108,7 @@ TEST_F(ConverterFactoryTest, TestStringToPython) {
     // py_run_number is a borrowed ref (so no decref)
     PyObject* py_run_number = PyDict_GetItemString(py_value, "run_number");
     EXPECT_TRUE(py_run_number != NULL);
-    long run_number =  PyInt_AsLong(py_run_number);
+    int run_number =  PyInt_AsLong(py_run_number);
     EXPECT_EQ(run_number, 99);
     Py_DECREF(py_value);
     py_value = ConverterFactory().convert<std::string, PyObject>(_json);
