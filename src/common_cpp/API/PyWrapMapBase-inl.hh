@@ -133,6 +133,10 @@ template <class MAPCLASS>
 int PyWrapMapBase<MAPCLASS>::_init(PyWrappedMap* self, PyObject *args, PyObject *kwds) {
     if (self->map == NULL)
         self->map = new MAPCLASS();
+    if (self->can_convert == NULL) {
+        self->can_convert = Py_True;
+        Py_INCREF(Py_True);
+    }
     return 0;
 }
 
@@ -140,11 +144,17 @@ template <class MAPCLASS>
 void PyWrapMapBase<MAPCLASS>::_dealloc(PyWrappedMap* self) {
     if (self->map != NULL)
         delete self->map;
+    Py_DECREF(Py_True);
 }
 
 template <class MAPCLASS>
 PyMemberDef PyWrapMapBase<MAPCLASS>::_members[] = {
-    {NULL}  /* Sentinel */
+  {const_cast<char*>("can_convert"), 
+  T_OBJECT_EX, offsetof(PyWrappedMap, can_convert), 0,
+  const_cast<char*>(
+  "Returns true if the module can do conversions, else false (or non-existent)"
+  )},
+  {NULL}  /* Sentinel */
 };
 
 

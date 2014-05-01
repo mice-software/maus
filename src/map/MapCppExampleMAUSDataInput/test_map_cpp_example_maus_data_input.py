@@ -39,6 +39,9 @@ class test_map_cpp_example(unittest.TestCase):
         self.assertEqual(data_3.GetSpill().GetSpillNumber(),
                          data_2.GetSpill().GetSpillNumber()+1)
 
+    def test_can_convert(self):
+        self.assertTrue(MapCppExampleMAUSDataInput().can_convert)
+
     def test_import(self):
         from MAUS import MapCppExampleMAUSDataInput
 

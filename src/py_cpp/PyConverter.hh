@@ -31,6 +31,15 @@
 #include "src/common_cpp/Utils/PyObjectWrapper.hh"
 
 namespace MAUS {
+/** @namespace PyConverter converter module for MICE data
+ *  
+ *  Provides functions to represent MAUS Data structures in various ways.
+ *  Functions are
+ *    - json_repr: represent data as a python dict
+ *    - data_repr: represent data as a ROOT element
+ *    - string_repr: represent data as a string element
+ */
+
 namespace PyConverter{
 
 /** Python function to wrap data as a string

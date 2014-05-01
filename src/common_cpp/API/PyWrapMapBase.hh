@@ -82,6 +82,7 @@ class PyWrapMapBase {
     typedef struct {
         PyObject_HEAD;
         MAPCLASS* map;
+        PyObject* can_convert;
     } PyWrappedMap;
 
  private:
