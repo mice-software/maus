@@ -26,6 +26,10 @@
  */
 #ifndef _SRC_COMMON_CPP_API_MAPBASE_
 #define _SRC_COMMON_CPP_API_MAPBASE_
+
+// Python include statement insists on being first
+#include <Python.h>
+
 #include <string>
 #include "json/json.h"
 #include "src/common_cpp/API/IMap.hh"
@@ -33,77 +37,51 @@
 
 namespace MAUS {
 
-  /*!
-   * \class MapBase
-   *
-   * \brief Abstract base class for all mappers
-   *
-   * \author Alexander Richards, Imperial College London
-   * \date 06/06/2012
+/*!
+ * \class MapBase
+ *
+ * \brief Abstract base class for all mappers
+ *
+ * \author Alexander Richards, Imperial College London
+ * \date 06/06/2012
+ */
+template <typename TYPE>
+class MapBase : public virtual IMap<TYPE>, public ModuleBase {
+
+ public:
+  /*!\brief Constructor
+   * \param std::string& The name of the mapper.
    */
-  template <typename INPUT, typename OUTPUT>
-  class MapBase : public virtual IMap<INPUT, OUTPUT>, public ModuleBase {
+  explicit MapBase(const std::string&);
+  /*!\brief Copy Constructor
+   * \param MapBase& An mapper to copy from.
+   */
+  MapBase(const MapBase&);
+  // ! Destructor
+  virtual ~MapBase();
 
-  public:
-    /*!\brief Constructor
-     * \param std::string& The name of the mapper.
-     */
-    explicit MapBase(const std::string&);
-    /*!\brief Copy Constructor
-     * \param MapBase& An mapper to copy from.
-     */
-    MapBase(const MapBase&);
-    // ! Destructor
-    virtual ~MapBase();
+  /*!\brief Process data
+   *
+   *  Uses PyObjectWrapper to convert py_input to TYPE; calls user defined 
+   *  _process to process TYPE; wraps output to as a PyObject and returns
+   *
+   *  \param py_input a borrowed reference to the input data (process_pyobj does
+   *         not take any ownership of the memory)
+   *  \returns the processed data as a new PyObject
+   */
+  inline PyObject* process_pyobj(PyObject* py_input) const;
 
-  public:
-    /*!\brief Process data
-     *
-     * Implementation of the interface. Wraps the _process function
-     * providing additional control/checking.
-     * \param INPUT* The input data to be processed
-     * \return The processed data
-     */
-    OUTPUT* process(INPUT* i) const;
-    /*!\brief Process data
-     *
-     * Templated function that uses the converter suite to automatically
-     * attempt to convert the data (OTHER*) into the expected (INPUT*) type
-     * that the mapper expects. If this succeeds then the untemplated version
-     * is called on the conversion output to perform the necessary processing. 
-     * \param INPUT* The input data to be processed
-     * \return The processed data
-     */
-    template <typename OTHER> OUTPUT* process(OTHER* o) const;
 
-  private:
-    /*!\brief Process data
-     *
-     * Pure virtual private function to be implemented by the
-     * derived map author to correctly process the input data
-     * \param INPUT* The input data to be processed
-     * \return The processed data
-     */
-    virtual OUTPUT* _process(INPUT* i) const = 0;
-  };
-
-  // Partial specialisation of MapBase class to deal with special error
-  // handling for Json::Value objects.
-  template <typename OUTPUT>
-  class MapBase<Json::Value, OUTPUT> : public virtual IMap<Json::Value, OUTPUT>, public ModuleBase {
-
-  public:
-    explicit MapBase(const std::string&);
-    MapBase(const MapBase&);
-    virtual ~MapBase();
-
-  public:
-    OUTPUT* process(Json::Value*) const;
-    template <typename OTHER> OUTPUT* process(OTHER* o) const;
-
-  private:
-    virtual OUTPUT* _process(Json::Value*) const = 0;
-  };
+ private:
+  /*!\brief Process data
+   *
+   * Pure virtual private function to be implemented in the child map to process
+   * the input data
+   * \param data The input data to be processed; this is a borrowed reference -
+   *        MapBase retains ownership of memory allocated by data.
+   */
+  virtual void _process(TYPE* data) const = 0;
+};
 
 }// end of namespace
 

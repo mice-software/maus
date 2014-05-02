@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,23 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/API/ModuleBase.hh"
-#include "src/common_cpp/API/APIExceptions.hh"
-#include "Utils/Exception.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
 
-namespace MAUS {
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConverters.hh"
 
-  ModuleBase::ModuleBase(const std::string& s) : IModule(), _classname(s) {}
-  ModuleBase::ModuleBase(const ModuleBase& mb) : IModule(), _classname(mb._classname) {}
-  ModuleBase::~ModuleBase() {}
+// nothing to do, but make sure it compiles to .so by including the cc file
 
-  void ModuleBase::birth(const std::string& s) {
-    _birth(s);
-  }
-
-  void ModuleBase::death() {
-    _death();
-  }
-
-}// end of namespace

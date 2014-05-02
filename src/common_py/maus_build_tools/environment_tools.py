@@ -316,6 +316,7 @@ def get_root_libs():
                 'Net', \
                 'Physics', \
                 'Postscript', \
+                'PyROOT', \
                 'RIO', \
                 'Rint', \
                 'Thread', \

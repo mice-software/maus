@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "TObject.h" // ROOT
+
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 

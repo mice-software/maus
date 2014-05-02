@@ -14,23 +14,33 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/API/ModuleBase.hh"
-#include "src/common_cpp/API/APIExceptions.hh"
-#include "Utils/Exception.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
+
+#ifndef _SRC_PY_CPP_PYDATATOSTRING_HH_
+#define _SRC_PY_CPP_PYDATATOSTRING_HH_
+
+// // These ifdefs are required to avoid cpp compiler warning
+// #ifdef _POSIX_C_SOURCE
+// #undef _POSIX_C_SOURCE
+// #endif
+
+// #ifdef _XOPEN_SOURCE
+// #undef _XOPEN_SOURCE
+// #endif
+
+#include "Python.h"
 
 namespace MAUS {
 
-  ModuleBase::ModuleBase(const std::string& s) : IModule(), _classname(s) {}
-  ModuleBase::ModuleBase(const ModuleBase& mb) : IModule(), _classname(mb._classname) {}
-  ModuleBase::~ModuleBase() {}
+namespace PyDataToString {
 
-  void ModuleBase::birth(const std::string& s) {
-    _birth(s);
-  }
+/* @brief Convert a MAUS::Data or Json::Value to std::string
+ *
+ * Convert an input PyCapsule object, containing either a MAUS::Data*
+ * or a Json::Value* into a std::string, to be used by any MapPyXXX
+ * mappers.
+ */
+PyObject* Convert(PyObject *dummy, PyObject *args);
+}  // namespace PyDataToString
+}  // namespace MAUS
 
-  void ModuleBase::death() {
-    _death();
-  }
-
-}// end of namespace
+#endif  // _SRC_PY_CPP_PYDATATOSTRING_HH_
