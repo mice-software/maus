@@ -93,6 +93,7 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   PyObject* py_data = PyObjectWrapper::wrap(data_in);
   EXPECT_EQ(py_data->ob_refcnt, 1);
   test_unwrap(py_data);
+  EXPECT_EQ(py_data->ob_refcnt, 1);
   Py_DECREF(py_data);
 
   std::cerr << "String " << std::flush;

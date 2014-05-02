@@ -78,7 +78,7 @@ PyObject* PyObjectWrapper::wrap(MAUS::Data* cpp_data) {
 
   // Place the MAUS::MAUSEvent* inside a ROOT Object Proxy
   void* void_data = static_cast<void*>(cpp_data);
-  // data, class name, is owned by python?
+  // cpp_data is now owned by python
   PyObject* py_data = TPython::ObjectProxy_FromVoidPtr(void_data,
                                                        "MAUS::Data",
                                                        true);
