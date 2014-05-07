@@ -94,7 +94,7 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
         Polarization["x"] = aTrack->GetPolarization().x();
         Polarization["y"] = aTrack->GetPolarization().y();
         Polarization["z"] = aTrack->GetPolarization().z();
-        
+        //json_track["Polarization"] = Polarization;        
         json_track["final_position"] = position;
         json_track["final_momentum"] = momentum;
         if (_stepping->GetWillKeepSteps())
