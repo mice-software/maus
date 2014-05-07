@@ -84,23 +84,11 @@ class SciFiTrackPoint {
 
   /** @brief  Sets the x coordinate.
    */
-  void set_x(double x)                          { _x      = x;          }
+  void set_pos(ThreeVector pos)                 { _pos   = pos;      }
 
   /** @brief  Sets the x momentum component.
    */
-  void set_px(double px)                        { _px     = px;         }
-
-  /** @brief  Sets the y coordinate.
-   */
-  void set_y(double y)                          { _y      = y;          }
-
-  /** @brief  Sets the y momentum component.
-   */
-  void set_py(double py)                        { _py     = py;         }
-
-  /** @brief  Sets the z momentum component.
-   */
-  void set_pz(double pz)                        { _pz     = pz;         }
+  void set_mom(ThreeVector mom)                 { _mom  = mom;         }
 
   /** @brief  Sets the covariance matrix.
    */
@@ -154,23 +142,11 @@ class SciFiTrackPoint {
 
   /** @brief  Returns the x position.
    */
-  double x()                 const { return _x;        }
+  ThreeVector pos()                 const { return _pos; }
 
   /** @brief  Returns the x momentum component.
    */
-  double px()                const { return _px;       }
-
-  /** @brief  Returns the y position.
-   */
-  double y()                 const { return _y;        }
-
-  /** @brief  Returns the y momentum component.
-   */
-  double py()                const { return _py;       }
-
-  /** @brief  Returns the z momentum component.
-   */
-  double pz()                const { return _pz;       }
+  ThreeVector mom()                const { return _mom;       }
 
   /** @brief  Returns the covariance matrix.
    */
@@ -223,25 +199,13 @@ class SciFiTrackPoint {
    */
   double _s_chi2;
 
-  /** @brief x position
+  /** @brief position
    */
-  double _x;
+  ThreeVector _pos;
 
-  /** @brief x momentum component
+  /** @brief momentum
    */
-  double _px;
-
-  /** @brief y position
-   */
-  double _y;
-
-  /** @brief y momentum component
-   */
-  double _py;
-
-  /** @brief z momentum component
-   */
-  double _pz;
+  ThreeVector _mom;
 
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */

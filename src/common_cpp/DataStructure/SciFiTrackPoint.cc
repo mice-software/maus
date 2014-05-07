@@ -25,11 +25,8 @@ SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
                                      _channel(666),
                                      _f_chi2(-1),
                                      _s_chi2(-1),
-                                     _x(0.),
-                                     _px(0.),
-                                     _y(0.),
-                                     _py(0.),
-                                     _pz(0.),
+                                     _pos(ThreeVector(0, 0, 0)),
+                                     _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
                                      _residual(-1),
                                      _smoothed_residual(-1),
@@ -62,17 +59,19 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   int dimension = state_vector.GetNrows();
 
   if ( dimension == 4 ) {
-    _pz = 200; // MeV/c
-    _x  = state_vector(0, 0);
-    _px = state_vector(1, 0);
-    _y  = state_vector(2, 0);
-    _py = state_vector(3, 0);
+    _pos.setZ(kalman_site->z());
+    _mom.setZ(200.0); // MeV/c
+    _pos.setX(state_vector(0, 0));
+    _mom.setX(state_vector(1, 0));
+    _pos.setY(state_vector(2, 0));
+    _mom.setY(state_vector(3, 0));
   } else if ( dimension == 5 ) {
-    _x  = state_vector(0, 0);
-    _px = state_vector(1, 0)/fabs(state_vector(4, 0));
-    _y  = state_vector(2, 0);
-    _py = state_vector(3, 0)/fabs(state_vector(4, 0));
-    _pz = 1./fabs(state_vector(4, 0));
+    _pos.setX(state_vector(0, 0));
+    _mom.setX(state_vector(1, 0)/fabs(state_vector(4, 0)));
+    _pos.setY(state_vector(2, 0));
+    _mom.setY(state_vector(3, 0)/fabs(state_vector(4, 0)));
+    _pos.setZ(kalman_site->z());
+    _mom.setZ(1./fabs(state_vector(4, 0)));
   }
 
   ThreeVector mc_mom = kalman_site->true_momentum();
@@ -105,11 +104,8 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _f_chi2 = point.f_chi2();
   _s_chi2 = point.s_chi2();
 
-  _x  = point.x();
-  _px = point.px();
-  _y  = point.y();
-  _py = point.py();
-  _pz = point.pz();
+  _pos = point.pos();
+  _mom = point.mom();
 
   _mc_x  = point.mc_x();
   _mc_px = point.mc_px();
@@ -137,11 +133,8 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _f_chi2 = rhs.f_chi2();
   _s_chi2 = rhs.s_chi2();
 
-  _x  = rhs.x();
-  _px = rhs.px();
-  _y  = rhs.y();
-  _py = rhs.py();
-  _pz = rhs.pz();
+  _pos = rhs.pos();
+  _mom = rhs.mom();
 
   _mc_x  = rhs.mc_x();
   _mc_px = rhs.mc_px();

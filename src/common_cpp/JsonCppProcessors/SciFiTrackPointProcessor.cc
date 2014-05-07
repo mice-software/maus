@@ -37,21 +37,12 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("s_chi2", &_double_proc,
                         &SciFiTrackPoint::s_chi2,
                         &SciFiTrackPoint::set_s_chi2, false);
-    RegisterValueBranch("x", &_double_proc,
-                        &SciFiTrackPoint::x,
-                        &SciFiTrackPoint::set_x, false);
-    RegisterValueBranch("px", &_double_proc,
-                        &SciFiTrackPoint::px,
-                        &SciFiTrackPoint::set_px, false);
-    RegisterValueBranch("y", &_double_proc,
-                        &SciFiTrackPoint::y,
-                        &SciFiTrackPoint::set_y, false);
-    RegisterValueBranch("py", &_double_proc,
-                        &SciFiTrackPoint::py,
-                        &SciFiTrackPoint::set_py, false);
-    RegisterValueBranch("pz", &_double_proc,
-                        &SciFiTrackPoint::pz,
-                        &SciFiTrackPoint::set_pz, false);
+    RegisterValueBranch("pos", &_threevector_proc,
+                        &SciFiTrackPoint::pos,
+                        &SciFiTrackPoint::set_pos, false);
+    RegisterValueBranch("mom", &_threevector_proc,
+                        &SciFiTrackPoint::mom,
+                        &SciFiTrackPoint::set_mom, false);
     RegisterValueBranch("mc_x", &_double_proc,
                         &SciFiTrackPoint::mc_x,
                         &SciFiTrackPoint::set_mc_x, false);
