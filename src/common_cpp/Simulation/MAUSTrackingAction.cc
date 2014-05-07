@@ -60,6 +60,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         Json::Value json_track(Json::objectValue);
         json_track["initial_position"] = position;
         json_track["initial_momentum"] = momentum;
+        //json_track["Polarization"] = Polarization;
         json_track["particle_id"] = aTrack->GetDefinition()->GetPDGEncoding();
         json_track["track_id"] = aTrack->GetTrackID();
         json_track["parent_track_id"] = aTrack->GetParentID();
@@ -94,7 +95,7 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
         Polarization["x"] = aTrack->GetPolarization().x();
         Polarization["y"] = aTrack->GetPolarization().y();
         Polarization["z"] = aTrack->GetPolarization().z();
-        
+        //json_track["Polarization"] = Polarization;        
         json_track["final_position"] = position;
         json_track["final_momentum"] = momentum;
         if (_stepping->GetWillKeepSteps())

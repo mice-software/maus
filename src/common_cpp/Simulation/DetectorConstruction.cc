@@ -441,6 +441,8 @@ void DetectorConstruction::SetSteppingAlgorithm() {
 
   if (_equation != NULL)
     delete _equation;
+
+
   std::cerr << "DetectorConstruction::SetSteppingAlgorithm " << _stepperType << " " << _btField->HasRF() << std::endl;
   // Note G4Mag_SpinEqRhs did not work for spin tracking in pure magnetic field
   if (_btField->HasRF() || _stepperType == "SpinTracking") {
@@ -457,6 +459,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
     fieldMgr->SetDetectorField(_miceMagneticField);
     _equation = new G4Mag_UsualEqRhs(_miceMagneticField);
     n_vars = 6;
+
   }
 
 
