@@ -202,6 +202,10 @@ class SciFiTrackPoint {
   double mc_py()             const { return _mc_py;    }
   double mc_pz()             const { return _mc_pz;    }
 
+  int spill()                const { return _spill; }
+
+  int event()                const { return _event; }
+
   /** @brief  Returns the mother cluster.
    */
   SciFiCluster* cluster()    const { return _cluster; }

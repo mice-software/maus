@@ -32,7 +32,8 @@ KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
 
 KalmanTrackFit::~KalmanTrackFit() {}
 
-void KalmanTrackFit::SaveGeometry(std::vector<ThreeVector> positions, std::vector<HepRotation> rotations) {
+void KalmanTrackFit::SaveGeometry(std::vector<ThreeVector> positions, 
+                                  std::vector<HepRotation> rotations) {
   _RefPos = positions;
   _Rot    = rotations;
 }
