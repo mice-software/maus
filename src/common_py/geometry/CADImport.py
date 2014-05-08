@@ -258,7 +258,8 @@ class CADImport: #pylint: disable = R0903, C0103
                         f.write(" Units    mm \n")
                         f.write(" Z        RInner       ZOuter\n")
                         for p in points:
-                            f.write(str(p[0])+"\t"+str(p[1])+"\t"+str(p[2])+"\n")
+                            f.write(str(p[0])+"\t"+\
+                                    str(p[1])+"\t"+str(p[2])+"\n")
                         # close the text file
                         f.close()
                 aux        = vol.xpathEval('auxiliary')
@@ -325,7 +326,7 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'PolyconeType':
                         # An exception for the case of polycone objects
                         if value == "PolyconeProfile":
-                            value = self.output[:-4] + '_' + vol.prop('name') + \
+                            value = self.output[:-4]+'_'+vol.prop('name')+\
                                     '.txt'
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements

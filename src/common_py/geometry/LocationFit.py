@@ -67,65 +67,69 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         
         self.UseGDML  = config_dict['use_gdml_source']
         self.tempList = config_dict['survey_target_detectors']
+        # Fitting tolerance. Reject fit if chi^2/ndof > value
+        self.tolerance = 3 # this should be read from the CDB files
+        # detector positions to be fit.
+        self.sfTarget = []
+        # default ndof. 6 parameters in fit
+        self.ndof = -6.0
+        self.datafile = None
+        self.gdmlfile = None
         if self.UseGDML:
             self.defineGDMLVariables()
             
         self.result = []
 
     def defineGDMLVariables(self):
-                # The survey information is in the CAD geometry
-            # file which should have one of these names
-            fnames = ['fastradModel.gdml', 'FastradModel.gdml', 'Step_IV.gdml']
-            for name in fnames:
-                tempfile = os.path.join(self.dl_dir, name)
-                if os.path.exists(tempfile):
-                    self.GDMLFile = tempfile
-                    # break on the first qualifing instance.
-                    break
-            # An override method --- if necessary
-            if self.DataFile != "":
-                self.GDMLFile = self.DataFile
-            # The default source of reference information for the fit.
-            self.XMLFile  = os.path.join(self.dl_dir,'Maus_Information.gdml')
-            if not os.path.exists(self.XMLFile):
-                self.XMLFile = ''
-            # An override method --- if necessary
-            if self.RefFile != "":
-                self.XMLFile  = self.RefFile
-            # print 
-            print self.GDMLFile, self.XMLFile
-            self.datafile = libxml2.parseFile(self.XMLFile)
-            self.gdmlfile = libxml2.parseFile(self.GDMLFile)
-            # Fitting tolerance. Reject fit if chi^2/ndof > value
-            self.tolerance = 3 # this should be read from the CDB files
-            # default ndof. 6 parameters in fit
-            self.ndof = -6.0
-            # get the survey target detectors
-            # The list of active detectors should appear in
-            # the Maus_Information file under the following path
-            basepath = 'MICE_Information/Detector_Information/'
-            # This is a list of all possible detectors (which
-            # have GDML geometries).
-            detectors = ['TOF0', 'TOF1', 'TOF2', \
-                         'KL', 'Ckov1', 'Ckov2', 'EMR', \
-                         'Tracker0', 'Tracker1', 'LH2', \
-                         'Disk_LiH', 'Disk_PE', 'Wedge_LiH_45', \
-                         'Wedge_LiH_90']
-            # Evaluate the set of entries consistant with the path
-            detector_search = self.datafile.xpathEval(basepath+'/*')
-            # initialize the container for the detector target
-            self.sfTarget = []
-            # loop over the path elements
-            for elem in detector_search:
-                # loop over the potential detector names
-                for det in detectors:
-                    # check for matches between the list
-                    if det == elem.name:
-                        # add the detector name to the list
-                        self.sfTarget.append(det)
-            if not len(self.sfTarget):
-                # check for an alternate list if no detectors match. 
-                self.sfTarget = self.tempList
+        # The survey information is in the CAD geometry
+        # file which should have one of these names
+        fnames = ['fastradModel.gdml', 'FastradModel.gdml', 'Step_IV.gdml']
+        for name in fnames:
+            tempfile = os.path.join(self.dl_dir, name)
+            if os.path.exists(tempfile):
+                self.GDMLFile = tempfile
+                # break on the first qualifing instance.
+                break
+        # An override method --- if necessary
+        if self.DataFile != "":
+            self.GDMLFile = self.DataFile
+        # The default source of reference information for the fit.
+        self.XMLFile  = os.path.join(self.dl_dir,'Maus_Information.gdml')
+        if not os.path.exists(self.XMLFile):
+            self.XMLFile = ''
+        # An override method --- if necessary
+        if self.RefFile != "":
+            self.XMLFile  = self.RefFile
+        # print 
+        print self.GDMLFile, self.XMLFile
+        self.datafile = libxml2.parseFile(self.XMLFile)
+        self.gdmlfile = libxml2.parseFile(self.GDMLFile)
+        # get the survey target detectors
+        # The list of active detectors should appear in
+        # the Maus_Information file under the following path
+        basepath = 'MICE_Information/Detector_Information/'
+        # This is a list of all possible detectors (which
+        # have GDML geometries).
+        detectors = ['TOF0', 'TOF1', 'TOF2', \
+                     'KL', 'Ckov1', 'Ckov2', 'EMR', \
+                     'Tracker0', 'Tracker1', 'LH2', \
+                     'Disk_LiH', 'Disk_PE', 'Wedge_LiH_45', \
+                     'Wedge_LiH_90']
+        # Evaluate the set of entries consistant with the path
+        detector_search = self.datafile.xpathEval(basepath+'/*')
+        # initialize the container for the detector target
+        self.sfTarget = []
+        # loop over the path elements
+        for elem in detector_search:
+            # loop over the potential detector names
+            for det in detectors:
+                # check for matches between the list
+                if det == elem.name:
+                    # add the detector name to the list
+                    self.sfTarget.append(det)
+        if not len(self.sfTarget):
+            # check for an alternate list if no detectors match. 
+            self.sfTarget = self.tempList
 
     def execute(self): #pylint: disable = R0903, R0902, C0103
         """
