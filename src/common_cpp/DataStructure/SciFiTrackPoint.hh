@@ -58,21 +58,29 @@ class SciFiTrackPoint {
    */
   SciFiTrackPoint& operator=(const SciFiTrackPoint& site);
 
+  /** @brief  Sets spill number.
+   */
+  void set_spill(int spill)                     { _spill   = spill;   }
+
+  /** @brief  Sets event number.
+   */
+  void set_event(int event)                     { _event   = event;   }
+
   /** @brief  Sets tracker number.
    */
-  void set_tracker(int tracker)                 { _tracker   = tracker; }
+  void set_tracker(int tracker)                 { _tracker = tracker; }
 
   /** @brief  Sets station number.
    */
-  void set_station(int station)                 { _station   = station; }
+  void set_station(int station)                 { _station = station; }
 
   /** @brief  Sets plane number.
    */
-  void set_plane(int plane)                     { _plane     = plane;   }
+  void set_plane(int plane)                     { _plane   = plane;   }
 
   /** @brief  Sets channel number.
    */
-  void set_channel(double channel)              { _channel   = channel; }
+  void set_channel(double channel)              { _channel = channel; }
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
@@ -170,11 +178,23 @@ class SciFiTrackPoint {
   double mc_py()             const { return _mc_py;    }
   double mc_pz()             const { return _mc_pz;    }
 
+  int spill()                const { return _spill; }
+
+  int event()                const { return _event; }
+
   /** @brief  Returns the mother cluster.
    */
   SciFiCluster* cluster()    const { return _cluster; }
 
  private:
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _spill;
+
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _event;
+
   /** @brief The tracker the trackpoint belongs to.
    */
   int _tracker;

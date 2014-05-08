@@ -162,6 +162,20 @@ void KalmanState::Initialise(int dim) {
   _shift_covariance.ResizeTo(3, 3);
 }
 
+void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos) {
+  ThreeVector pos(_smoothed_a(0, 0), _smoothed_a(2, 0), _z);
+  ThreeVector mom(_smoothed_a(1, 0), _smoothed_a(3, 0), 1.);
+
+  pos += ref_pos;
+
+  int sign = 1;
+  if ( _id < 0 ) sign = -1;
+  _smoothed_a(0, 0) = sign*pos.x();
+  _smoothed_a(1, 0) = sign*mom.x();
+  _smoothed_a(2, 0) = pos.y();
+  _z = pos.z();
+}
+
 void KalmanState::set_a(TMatrixD a, State kalman_state) {
   switch ( kalman_state ) {
     case(Projected) :

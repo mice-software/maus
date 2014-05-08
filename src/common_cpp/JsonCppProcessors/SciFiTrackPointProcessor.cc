@@ -19,6 +19,12 @@
 namespace MAUS {
 
 SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoubleProcessor) {
+    RegisterValueBranch("spill", &_int_proc,
+                        &SciFiTrackPoint::spill,
+                        &SciFiTrackPoint::set_spill, false);
+    RegisterValueBranch("event", &_int_proc,
+                        &SciFiTrackPoint::event,
+                        &SciFiTrackPoint::set_event, false);
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiTrackPoint::tracker,
                         &SciFiTrackPoint::set_tracker, false);

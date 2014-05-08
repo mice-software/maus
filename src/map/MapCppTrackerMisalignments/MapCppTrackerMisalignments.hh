@@ -84,6 +84,11 @@ class MapCppTrackerMisalignments {
    */
   bool death();
 
+  /**
+   *
+   */
+  void initialize_PDFs();
+
   /** Process JSON document
    *
    *  Receive a document with digits (either MC or real) and then call the higher level
@@ -93,7 +98,9 @@ class MapCppTrackerMisalignments {
    */
   std::string process(std::string document);
 
-  void process(MAUS::SciFiEvent *evt);
+  std::vector< std::vector<MAUS::SciFiSpacePoint*> > setup(MAUS::SciFiEvent *event);
+
+  void process(std::vector<MAUS::SciFiSpacePoint*> spacepoints);
 
   void linear_fit(std::vector<MAUS::SciFiSpacePoint*> spacepoints,
                   double &x0,
@@ -117,42 +124,62 @@ class MapCppTrackerMisalignments {
 
   /// This should be the classname
   std::string _classname;
+
   /// This will contain the configuration
   Json::Value _configJSON;
+
   /// This will contain the root value after parsing
   Json::Value* _spill_json;
+
+  /// The MAUS::Spill.
   Spill* _spill_cpp;
+
   ///  JsonCpp setup
   Json::Reader reader;
 
   /// This will store
   TFile *_root_file;
 
+  /// This is the used for generating the joint distribution.
+  double _station_rms;
+
+  /// This is a vector storing all TGraphs with misalignment update.
+  std::vector< std::vector<TGraph*> > _graph_map;
+
+  /// This contains TGraphs with misalignment update in tracker 0.
   TMultiGraph *_tracker0_graphs;
+
+  /// This contains TGraphs with misalignment update in tracker 0.
+  TMultiGraph *_tracker1_graphs;
+
+  /// These are the TGraphs.
   TGraph *_t0s2_x;
   TGraph *_t0s3_x;
   TGraph *_t0s4_x;
-  TGraph *_t0s2_y;
-  TGraph *_t0s3_y;
-  TGraph *_t0s4_y;
-  TMultiGraph *_tracker1_graphs;
   TGraph *_t1s2_x;
   TGraph *_t1s3_x;
   TGraph *_t1s4_x;
-  TGraph *_t1s2_y;
-  TGraph *_t1s3_y;
-  TGraph *_t1s4_y;
 
-  TH1D *t1st2residual;
-  TH1D *t1st3residual;
-  TH1D *t1st4residual;
+  /// This is a vector where all residuals are stored.
+  std::vector< std::vector<TH1D*> >_residuals;
 
+  /// These are histograms with residuals in each station.
+  TH1D *_t0st2residual;
+  TH1D *_t0st3residual;
+  TH1D *_t0st4residual;
+  TH1D *_t1st2residual;
+  TH1D *_t1st3residual;
+  TH1D *_t1st4residual;
+
+  /// This is the iteration number.
   int _iteraction;
 
-  JointPDF *_jointPDF;
+  /// This is the Joint PDF.
+  JointPDF _jointPDF;
 
-  PDF* _x_shift_pdfs[2][6];
-  PDF* _y_shift_pdfs[2][6];
+  /// These are the PDF of x and y misaligments in each station.
+  std::vector< std::vector<PDF> > _x_shift_pdfs;
+  std::vector< std::vector<PDF> > _y_shift_pdfs;
 
   int SciFiRunRecon;
 }; // Don't forget this trailing colon!!!!

@@ -21,6 +21,7 @@ namespace MAUS {
 
 MapCppTrackerRecon::MapCppTrackerRecon()
     : _spill_json(NULL), _spill_cpp(NULL) {
+  Squeak::activateCerr(true);
 }
 
 MapCppTrackerRecon::~MapCppTrackerRecon() {
@@ -189,11 +190,24 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) {
 
   if ( seeds.size() ) {
     KalmanTrackFit fit;
+    fit.SaveGeometry(_geometry_helper.RefPos(), _geometry_helper.Rot());
     fit.Process(seeds, evt);
   }
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
+  std::cerr << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                                << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  std::cerr << std::endl;
+/*
   Squeak::mout(Squeak::info) << event.digits().size() << " "
                               << event.clusters().size() << " "
                               << event.spacepoints().size() << "; "
@@ -201,9 +215,11 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
                               << event.helicalprtracks().size() << "; ";
   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
     Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                                << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
   }
   Squeak::mout(Squeak::info) << std::endl;
+*/
 }
 
 } // ~namespace MAUS
