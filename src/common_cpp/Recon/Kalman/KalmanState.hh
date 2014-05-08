@@ -113,6 +113,9 @@ class KalmanState {
    */
   void set_a(TMatrixD a, State current_state);
 
+  /** @brief Set the mother cluster */
+  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
+
   void set_covariance_matrix(TMatrixD C, State current_state);
 
   /** @brief Sets the residual
@@ -168,6 +171,8 @@ class KalmanState {
 
   double chi2(State desired_state)       const;
 
+  SciFiCluster* cluster()                const { return _cluster; }
+
   TMatrixD input_shift()                 const { return _input_shift; }
 
   TMatrixD input_shift_covariance()      const { return _input_shift_covariance; }
@@ -202,6 +207,9 @@ class KalmanState {
   /// The Chi2 at this site.
   double _f_chi2;
   double _s_chi2;
+
+  /// A pointer to the cluster used to form the state - does not assume control of memory
+  SciFiCluster* _cluster;
 
   /// Orientation of the measuring plane.
   ThreeVector _direction;

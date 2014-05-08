@@ -266,7 +266,7 @@ bool InputCppRoot::is_selected_spill(int spillNum) const {
 
   if (_selected_spill_numbers.find(spillNum) ==
      _selected_spill_numbers.end()) {
-    Squeak::mout(Squeak::info) << "Skipping Spill " << spillNum << std::endl;
+    // Squeak::mout(Squeak::info) << "Skipping Spill " << spillNum << std::endl;
     return false;
   }
   return true;

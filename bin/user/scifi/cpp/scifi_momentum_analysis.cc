@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
       if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
         std::cout << "Saving plots as " << save_type << " files.\n";
         bool_save = true;
-      } else {
+      } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
     }

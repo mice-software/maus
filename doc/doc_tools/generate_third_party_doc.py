@@ -96,7 +96,7 @@ def find_paths(thirdpartylibs, maus_thirdparty_build, prompt):
 # No graphs for 3rd party to keep time and space requirements reasonable.
 def run_doxygen(tplib, input_path):
     """Run doxygen for third party libraries"""
-    script = """( cat Doxyfile.general ;
+    script = """( cat ${MAUS_THIRD_PARTY}/doc/doc_tools/Doxyfile.general ;
         echo PROJECT_NAME = MAUS-$0;
         echo INPUT = $1;
         echo CALLER_GRAPH = NO;

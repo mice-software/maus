@@ -82,6 +82,14 @@ will_do_stack_trace = verbose_level < 1 # set to True to make stack trace on C++
 # to the output
 header_and_footer_mode = "append" #append or dont_append
 
+# Dictionary of variable to be set when using G4BL to generate particles. If
+# "get_magnet_currents_pa_cdb" is set to True magnet currents & proton absorber
+# thickness will be retrieved from the CDB for the run_number specified
+g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
+        "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":731.89,\
+        "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
+        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
+
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
 
@@ -162,6 +170,10 @@ beam = {
     "binomial_p":0.5, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
+
+#    "particle_generator":"g4bl", # Uses G4BL as input for MAUS
+#    "g4bl_generator":"True", # Call G4BL each time new spill is created
+#    "random_seed":5,
     "definitions":[
     ##### MUONS #######
     {
@@ -260,12 +272,7 @@ SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker 
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
-SciFiPerChanFlag = 0
-SciFiNoiseFlag = 0
-SciFiCrossTalkSigma = 50.0
-SciFiCrossTalkAmplitude = 1.5
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
-SciFiChannelCalibList = "%s/files/calibration/SciFiChanCal.txt" % os.environ.get("MAUS_ROOT_DIR")
 SciFiParams_Z = 5.61291
 SciFiParams_Plane_Width = 0.6523 # mm
 SciFiParams_Radiation_Length = 413.124 # mm

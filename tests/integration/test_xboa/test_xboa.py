@@ -17,6 +17,8 @@
 Run xboa tests as part of MAUS integration tests
 """
 
+# pylint: disable=E1101
+
 import unittest
 import ROOT
 import xboa.test.XBOATest

@@ -24,6 +24,7 @@ KalmanState::KalmanState(): _current_state(Initialized),
                           _id(-1),
                           _f_chi2(0.),
                           _s_chi2(0.),
+                          _cluster(0),
                           _direction(ThreeVector()),
                           _mc_pos(ThreeVector()),
                           _mc_mom(ThreeVector()) {}
@@ -35,6 +36,7 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
                                                 _id(-1),
                                                 _f_chi2(0.),
                                                 _s_chi2(0.),
+                                                _cluster(0),
                                                 _direction(ThreeVector()),
                                                 _mc_pos(ThreeVector()),
                                                 _mc_mom(ThreeVector()) {
@@ -45,6 +47,7 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
   _id= site.id();
   _f_chi2 = site.chi2(KalmanState::Filtered);
   _s_chi2 = site.chi2(KalmanState::Smoothed);
+  _cluster = site.cluster();
   _direction = site.direction();
   _mc_pos = site.true_position();
   _mc_mom = site.true_momentum();
@@ -89,6 +92,7 @@ KalmanState& KalmanState::operator=(const KalmanState &rhs) {
   _id = rhs.id();
   _f_chi2 = rhs.chi2(KalmanState::Filtered);
   _s_chi2 = rhs.chi2(KalmanState::Smoothed);
+  _cluster = rhs.cluster();
   _direction = rhs.direction();
   _mc_pos = rhs.true_position();
   _mc_mom = rhs.true_momentum();

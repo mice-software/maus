@@ -127,11 +127,18 @@ bool PatternRecognition::LoadGlobals() {
 void PatternRecognition::process(SciFiEvent &evt) {
 
   if ( evt.spacepoints().size() > 0 ) {
+    std::cout << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = SciFiTools::sort_by_tracker(evt.spacepoints());
+    if (_verb > 0) {
+      std::cout << "Number of spoints in event in T1: " << spnts_by_tracker[0].size() << std::endl;
+      SciFiTools::print_spacepoint_xyz(spnts_by_tracker[0]);
+      std::cout << "Number of spoints in event in T2: " << spnts_by_tracker[1].size() << std::endl;
+      SciFiTools::print_spacepoint_xyz(spnts_by_tracker[1]);
+    }
 
     // Loop over trackers
     for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
@@ -585,20 +592,18 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
 
   // Form the helical track
+  // if (spnts[0]->get_tracker() == 0) track->set_dsdz(-track->get_dsdz());  // sign flip for t1
+  // Set all the good sp to used and set the track seeds with them
+  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+    spnts[i]->set_used(true);
+  }
   double phi_0 = phi_i[0];
   double psi_0 = phi_0 + (CLHEP::pi / 2);
   double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
   double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
   ThreeVector pos_0(x0, y0, -1);
-  SciFiHelicalPRTrack *track = NULL;
-  track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, psi_0, c_trial, line_sz);
-  track->set_phi(phi_i);
-  // if (spnts[0]->get_tracker() == 0) track->set_dsdz(-track->get_dsdz());  // sign flip for t1
-
-  // Set all the good sp to used and set the track seeds with them
-  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i )
-    spnts[i]->set_used(true);
-  track->set_spacepoints(spnts);
+  SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, psi_0,
+                                                       c_trial, line_sz, -1.0, -1.0, phi_i, spnts);
 
   // Return the completed track
   return track;
@@ -607,6 +612,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts,
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
                                    SimpleLine &line_sz, int &charge) {
+
+  if (_verb > 0) std::cout << "sz chi2 cut: " << _sz_chisq_cut << std::endl;
 
   // Sort spacepoints in order seen by the beam (descending z for T1, ascending z for T2)
   if (spnts[0]->get_tracker() == 0)
@@ -683,6 +690,14 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
     return false;
   }
 
+  if (_verb > 0) {
+    std::cout << "n_turns_cut: " << _n_turns_cut << ", and using phi: ";
+    for (size_t i = 0; i < phi.size(); ++i) {
+      std::cout << phi[i] << " ";
+    }
+    std::cout << std::endl;
+  }
+
   true_phi.clear();
   true_phi.resize(phi.size());
   // Separations are calculated in z and phi between each station and the first station seen by
@@ -738,6 +753,7 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       if ( _verb > 0 ) std::cout << "Found n = " << true_n << std::endl;
       break;
     }
+    if ( _verb > 0 ) std::cout << std::endl;
   } // ~Loop over n_values
 
   // If we have found a value of n which was accepted, calc the true turning angles

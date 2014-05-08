@@ -17,6 +17,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiSpacePointProcessor.hh"
 
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -36,6 +37,7 @@ class SciFiHelicalPRTrackProcessor : public ObjectProcessor<SciFiHelicalPRTrack>
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
+    ThreeVectorProcessor _threevector_proc;
     PointerArrayProcessor<SciFiSpacePoint> _sf_spoint_array_proc;
     ValueArrayProcessor<double> _double_array_proc;
 };
