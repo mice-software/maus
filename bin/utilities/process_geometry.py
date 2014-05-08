@@ -18,7 +18,7 @@ M. Littlefield
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-#pylint: disable=W0611
+#pylint: disable=W0611, C0103
 import os
 import shutil
 import geometry
@@ -27,6 +27,7 @@ from geometry.GDMLtoMAUSModule import GDMLtomaus
 from geometry.ConfigReader import Configreader
 from geometry.GDMLFormatter import Formatter
 from geometry.GDMLPacker import Unpacker
+from geometry.LocationFit import ElementRotationTranslation
 
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
@@ -47,8 +48,8 @@ def main():
         os.mkdir(gdml_cache)
     except OSError:
         pass
-    #Download file
-    #geometry_downloader = Downloader()
+    # Download file
+    # geometry_downloader = Downloader()
     #if configuration.geometry_download_by == "run_number":
     #    geometry_downloader.download_geometry_by_run \
     #                   (configuration.geometry_download_run_number, gdml_cache)
@@ -66,6 +67,9 @@ def main():
     #               (gdml_cache, geometry.GDMLtoCDB.GEOMETRY_ZIPFILE)
     #zipped_geom = Unpacker(zip_filename, gdml_cache)
     # zipped_geom.unzip_file()
+    # fit the detector information to the survey points.
+    surveyFit = ElementRotationTranslation()
+    surveyFit.execute()
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
     gdmls.format()

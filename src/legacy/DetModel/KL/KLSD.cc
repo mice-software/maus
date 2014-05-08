@@ -1,67 +1,69 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-/*
-** Modified example 1 from the GEANT4 distribution to simulate the
-** MICE scintillating fiber tracker for the MICE proposal
-** Ed McKigney - August 21, 2002
-*/
-#include "DetModel/KL/KLSD.hh"
-
-#include "Geant4/G4HCofThisEvent.hh"
-#include "Geant4/G4Step.hh"
-#include "Geant4/G4ThreeVector.hh"
-#include "Geant4/G4SDManager.hh"
-#include "Geant4/G4ios.hh"
-
+#include "KLSD.hh"
 #include "Interface/dataCards.hh"
-#include <fstream>
-
+#include "Geant4/G4StepStatus.hh"
+#include <cstring>
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
+#include <iostream>
 
-KLSD::KLSD( MICEEvent* event, MiceModule* mod ) : G4VSensitiveDetector( mod->fullName() )
+KLSD::KLSD( MiceModule* mod)
+    : MAUSSD(mod)
 {
-  _event = event;
-  _module = mod;
 }
 
 void KLSD::Initialize(G4HCofThisEvent* HCE)
 {
-  if( HCE ) ;
+
 }
 
-G4bool KLSD::ProcessHits(G4Step* aStep,G4TouchableHistory* ROhist)
+G4bool KLSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
-  G4Track* aTrack = aStep->GetTrack();
   G4double edep = aStep->GetTotalEnergyDeposit();
-  G4double stepl = aTrack->GetStepLength();
 
+  if( edep == 0. ) return false;
+  if (!_hits.isMember("kl_hits")) {
+    _hits["kl_hits"] = Json::Value(Json::arrayValue);
+  }
+  int hit_i = _hits["kl_hits"].size();
+  _hits["kl_hits"].append(Json::Value());
 
-  if ((edep == 0.) && (stepl == 0.) ) return false;
-  if(edep == 0) return true; 
+  Json::Value channel_id;
 
-  G4VPhysicalVolume* physVol = aStep->GetTrack()->GetVolume();
+  channel_id["cell"] =  _module->propertyInt( "Cell" ) ;
 
-  KLHit* hitKL = new KLHit();
+  _hits["kl_hits"][hit_i]["channel_id"] = channel_id;
 
-  hitKL->SetCellNumber(_module->propertyInt( "Cell" ));
-  hitKL->SetCopyNumber(physVol->GetCopyNo());
+  _hits["kl_hits"][hit_i]["energy_deposited"] = 0.0;
 
-  //ME - probably other stuff needed here!
-  hitKL->SetEdep     (edep);
-  hitKL->SetPosition (aTrack->GetPosition() );
-  hitKL->SetMomentum (aTrack->GetMomentum());
-  hitKL->SetTime     (aTrack->GetGlobalTime());
-  hitKL->SetEnergy   (aTrack->GetTotalEnergy());
-  hitKL->SetTrackID  (aTrack->GetTrackID());
-  hitKL->SetPID      (aTrack->GetDefinition()->GetPDGEncoding());
-  hitKL->SetCharge   (aTrack->GetDefinition()->GetPDGCharge() );
-  hitKL->SetMass     (aTrack->GetDefinition()->GetPDGMass() );
+  G4Track* track = aStep->GetTrack();
 
-  _event->klHits.push_back( hitKL );
+  Json::Value threeVectorValue;
+  
+  threeVectorValue["x"] = aStep->GetPreStepPoint()->GetPosition().x();
+  threeVectorValue["y"] = aStep->GetPreStepPoint()->GetPosition().y();
+  threeVectorValue["z"] = aStep->GetPreStepPoint()->GetPosition().z(); 
+        
+  _hits["kl_hits"][hit_i]["position"] = threeVectorValue;
+
+  threeVectorValue["x"] = track->GetMomentum().x();
+  threeVectorValue["y"] = track->GetMomentum().y();
+  threeVectorValue["z"] = track->GetMomentum().z();
+
+  _hits["kl_hits"][hit_i]["momentum"] = threeVectorValue;
+  
+  _hits["kl_hits"][hit_i]["time"] = aStep->GetPreStepPoint()->GetGlobalTime();
+  
+  _hits["kl_hits"][hit_i]["charge"] = track->GetDefinition()->GetPDGCharge();
+  _hits["kl_hits"][hit_i]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
+  _hits["kl_hits"][hit_i]["energy"] = track->GetTotalEnergy();
+  _hits["kl_hits"][hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
+  _hits["kl_hits"][hit_i]["energy_deposited"] = aStep->GetTotalEnergyDeposit();
+
   return true;
 }
 
 void KLSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-  if( HCE ) ;
+ 
 }

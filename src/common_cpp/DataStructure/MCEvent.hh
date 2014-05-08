@@ -32,6 +32,7 @@ class Primary;
 
 class SciFiChannelId;
 class TOFChannelId;
+class KLChannelId;
 class SpecialVirtualChannelId;
 class SciFiNoiseHit;
 class SciFiMCLookup;
@@ -41,6 +42,7 @@ typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<SciFiHit> SciFiHitArray;
 typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
 typedef std::vector<TOFHit> TOFHitArray;
+typedef std::vector<KLHit> KLHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
 
 /** @class MCEvent describes data pertaining to a single Monte Carlo event
@@ -124,6 +126,15 @@ class MCEvent {
    */
   void SetTOFHits(TOFHitArray* hits);
 
+  /** Get the KL hits pertaining to this event MCEvent still owns HitArray*.
+   */
+  KLHitArray* GetKLHits() const;
+
+  /** Set the KL hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
+  void SetKLHits(KLHitArray* hits);
+
   /** Get the Special Virtual hits pertaining to this event. MCEvent still owns
    *  SpecialVirtualHitArray*.
    */
@@ -150,6 +161,7 @@ class MCEvent {
   SciFiHitArray* _sci_fi_hits;
   SciFiNoiseHitArray* _sci_fi_noise_hits;
   TOFHitArray* _tof_hits;
+  KLHitArray* _kl_hits;
   SpecialVirtualHitArray* _special_virtual_hits;
   TrackArray* _tracks;
 

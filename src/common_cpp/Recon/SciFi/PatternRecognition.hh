@@ -259,6 +259,9 @@ class PatternRecognition {
     /** @brief Set the verbosity level */
     void set_verbosity(const bool verb) { _verb = verb; }
 
+    /** @brief A function to set all the internal parameters to their default values (for tests) */
+    void set_parameters_to_default();
+
   private:
     bool _straight_pr_on;      /** Straight pattern recogntion on or off */
     bool _helical_pr_on;      /** Helical pattern recogntion on or off */
@@ -270,10 +273,11 @@ class PatternRecognition {
     double _sd_phi_1to4;      /** Rotation error associated with stations 1 t0 4 */
     double _sd_phi_5;         /** Rotation error associated with station 5 */
     double _res_cut;          /** Road cut for linear fit in mm */
+    double _straight_chisq_cut; /** Cut on the chi^2 of the least sqs fit in mm */
     double _R_res_cut;        /** Cut on the radius of the track helix in mm */
-    double _chisq_cut;        /** Cut on the chi^2 of the least sqs fit in mm */
-    double _sz_chisq_cut;     /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _circle_chisq_cut; /** Cut on the chi^2 of the circle least sqs fit in mm */
     double _n_turns_cut;      /** Cut to decide if a given n turns value is good */
+    double _sz_chisq_cut;     /** Cut on the sz chi^2 from least sqs fit in mm */
     double _Pt_max;           /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;           /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */

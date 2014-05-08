@@ -41,6 +41,18 @@ Configuration Stage5
   {
     Position 0. 0. 3.7 m
     Rotation 0. 0. 0. degree
+  }  
+  Module KL/KL.dat
+  {
+    Position 0. 0. 3.7147 m
+    Rotation 0. 0. 0. degree
   }
+// EMR pending geometry update and SD from EMR group
+// DR March 10, 2014
+//Module EMR/Calorimeter.dat
+//{
+//  Position 0. 0. 3.80594 mm
+//  Rotation 0. 0. 0. degree
+//}
 }
 

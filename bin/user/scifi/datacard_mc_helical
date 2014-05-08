@@ -1,75 +1,48 @@
 import os
 
+#------------------------------------------
+# Some initial setup
+#------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
-
-output_json_file_name = "maus_output.json"
-output_json_file_type = "text"
 # input_root_file = "maus_output_10kspills_muplus_digitisation_2013-11-18.root"
-# output_root_file_name = "maus_output_muminus_10kspills_2013-12-03.root"
+# output_root_file_name = "maus_output_norecon_muplus_10kspills_2014-02-25.root"
+verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
 
-
-# Used, for now, to determine what level of c++ log messages are reported to the user
-# 0 = debug info (and std::cout)
-# 1 = run info
-# 2 = warnings
-# 3 = errors (and std::cerr)
-# 4 = fatal
-# >4 = silent
-# Doesnt effect python
-verbose_level = 0
-errors_to_stderr = None # None = from verbose_level; else True or False
-errors_to_json = True
-on_error = 'none' # none, halt or raise
-
-# Used by MapPyRemoveTracks.
-keep_only_muon_tracks = False
-
+#------------------------------------------
 # Used by MapCppSimulation
+#------------------------------------------
 keep_tracks = True # set to true to keep start and end point of every track
-keep_steps = False # set to true to keep start and end point of every track and
-                   # every step point
-simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
-# simulation_geometry_filename = "Stage4_NoField.dat" # geometry used by simulation
+keep_steps = False # set to true to keep start and end point of every track and every step point
+
+# Geometry used by simulation
+# simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
+simulation_geometry_filename = "Stage4.dat"
+
+# Geant4 physics model
 maximum_number_of_steps = 1000
+physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
+reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
+physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
+particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+
+# Geant4 visualisation (not event display)
+geant4_visualisation = False
+accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 0 = no
+
+#------------------------------------------
+# Used by InputPySpillGenerator
+#------------------------------------------
+spill_generator_number_of_spills = 10
+
+#------------------------------------------
+# Used by MapPyBeamMaker to generate input particle data
+#------------------------------------------
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
 }
-# geant4 physics model
-physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
-reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
-physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
-particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
-charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
-muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
-production_threshold = 0.5 # set the threshold for delta ray production [mm]
-
-# geant4 visualisation (not event display)
-geant4_visualisation = False
-visualisation_viewer = "VRML2FILE"  # only supported option
-visualisation_theta = 90.
-visualisation_phi = 90.
-visualisation_zoom = 1.
-accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 0 = no
-#particle colour alterations
-default_vis_colour = {"red":0. , "green":100.  ,"blue":0.} #green
-pi_plus_vis_colour = {"red":255. , "green":250.  ,"blue":240.} # white
-pi_minus_vis_colour = {"red":105. , "green":105.  ,"blue":105.} # grey
-mu_plus_vis_colour = {"red":25. , "green":25.  ,"blue":112.} # dark blue
-mu_minus_vis_colour = {"red":135. , "green":206.  ,"blue":250.} # light blue
-e_plus_vis_colour = {"red":250. , "green":0.  ,"blue":0.} # red
-e_minus_vis_colour = {"red":250. , "green":69.  ,"blue":0.} # orange red
-gamma_vis_colour = {"red":255. , "green":20.  ,"blue":147.} # pink
-neutron_vis_colour = {"red":139. , "green":69.  ,"blue":19.} # brown
-photon_vis_colour = {"red":255. , "green":255.  ,"blue":0.} # yellow
-
-# used by InputPySpillGenerator to determine the number of empty spills that
-# will be generated by the simulation
-spill_generator_number_of_spills = 10
-# used by MapPyBeamMaker to generate input particle data
-# This is a sample beam distribution based on guesses by Chris Rogers of what
-# an optimised beam might look like
+# This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
     "binomial_n":1, # number of coin tosses
@@ -98,97 +71,12 @@ beam = {
   ]
 }
 
-# this is used by reconstruction
+#------------------------------------------
+# Reconstruction parameters
+#------------------------------------------
 reconstruction_geometry_filename = simulation_geometry_filename
-
-# scifi tracker digitization
-#SciFiDeadChanFName = ""
-SciFiMUXNum = 7
-SciFiFiberDecayConst = 2.7
-SciFiFiberConvFactor =  3047.1
-SciFiFiberRefractiveIndex = 1.6
-SciFiFiberCriticalAngle = 0.4782 # rad
-SciFiFiberTrappingEff = 0.056
-SciFiFiberMirrorEff = 0.6
-SciFiFiberTransmissionEff = 0.8
-SciFiMUXTransmissionEff = 1.0
-SciFiFiberRunLength = 5000.0 # mm
-SciFivlpcQE = 0.8
-SciFivlpcEnergyRes = 4.0 # MeV
-SciFivlpcTimeRes = 0.2 # ns
-SciFiadcBits = 8
-SciFiadcFactor = 6.0
-SciFitdcBits = 16
-SciFitdcFactor = 1.0
-SciFinElecChanPerPlane = 1429
-SciFinPlanes = 3
-SciFinStations = 5
-SciFinTrackers = 2
-SciFiNPECut = 2
-SciFiClustExcept = 100
 SciFiPRHelicalOn = True
 SciFiPRStraightOn = False
 SciFiKalmanOn = True
+SciFiPatRecVerbosity = 1
 
-# configuration database
-cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads
-cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
-
-# geometry download
-geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
-geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
-                                    # the currently valid geometry or 'id' to use the cdb internal id 
-                                    # (e.g. if it is desired to access an old version of a particular
-                                    # geometry)
-geometry_download_run_number = 0
-geometry_download_id = 0
-geometry_download_cleanup = True # set to True to clean up after download
-
-# geometry upload
-geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
-geometry_upload_directory = "%s/files/geometry/upload" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where uploads are drawn from
-geometry_upload_note = "" # note, pushed to the server to describe the geometry. A note must be specified here (default will throw an exception).
-geometry_upload_valid_from = "" # date-time in format like: that the specified installation was made in the experiment. A date-time must be specified here (default will throw an exception).
-geometry_upload_cleanup = True # set to True to clean up after upload
-
-# this is used by InputCppRealData
-Number_of_DAQ_Events = -1
-Phys_Events_Only = False
-Calib_Events_Only = False
-Enable_V1290_Unpacking = True
-Enable_V1731_Unpacking = True
-Enable_V1724_Unpacking = True
-Enable_V830_Unpacking = True
-Enable_VLSB_Unpacking = True
-Enable_VLSB_C_Unpacking = True
-Enable_DBB_Unpacking = True
-Do_V1731_Zero_Suppression = False
-V1731_Zero_Suppression_Threshold = 100
-Do_V1724_Zero_Suppression = True
-V1724_Zero_Suppression_Threshold = 100
-Do_VLSB_Zero_Suppression = False
-VLSB_Zero_Suppression_Threshold = 0
-Do_VLSB_C_Zero_Suppression = False
-VLSB_C_Zero_Suppression_Threshold = 0
-Enable_TOF = True
-Enable_EMR = True
-Enable_KL = True
-Enable_CKOV = True
-DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-
-daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
-#daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
-daq_data_file = 'gdc1901.001'
-
-maus_version = "" # set at runtime - do not edit this (changes are ignored)
-configuration_file = "" # should be set on the command line only (else ignored)
-
-doc_store_class = "InMemoryDocumentStore.InMemoryDocumentStore"
-couchdb_url = "http://localhost:5984" # Default CouchDB URL. Only needed if using CouchDBDocumentStore.
-couchdb_database_name = "mausdb" # Default CouchDB database name. Only needed if using CouchDBDocumentStore.
-
-mongodb_host = "localhost" # Default MongoDB host name. Only needed if using MongoDBDocumentStore.
-mongodb_port = 27017 # Default MongoDB port. Only needed if using MongoDBDocumentStore.
-mongodb_database_name = "mausdb" # Default MongoDB database name. Only needed if using MongoDBDocumentStore.
-mongodb_collection_name = "spills" # Default MongoDB collection name. Only needed if using MongoDBDocumentStore.

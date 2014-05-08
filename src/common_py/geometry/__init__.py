@@ -9,8 +9,9 @@ from geometry.GDMLPacker import Unpacker
 from geometry.GDMLtoCDB import Uploader
 from geometry.GDMLtoCDB import Downloader
 from geometry.GDMLtoMAUSModule import GDMLtomaus
-# from geometry.LocationFits import ElementRotationTranslation
+from geometry.LocationFit import ElementRotationTranslation
 
 __all__ = ["CADImport", "Configreader", "Formatter", 
-           "Packer", "Unpacker", "GDMLtocdb", "Downloader", "GDMLtomaus"]
+           "Packer", "Unpacker", "GDMLtocdb", "Downloader", "GDMLtomaus",
+           "ElementRotationTranslation"]
 

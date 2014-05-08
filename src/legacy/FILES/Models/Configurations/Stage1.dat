@@ -10,5 +10,22 @@ Configuration Stage1
     Position 0. 0. -10.283 m
     Rotation 0. 0. 0. degree
   }
+  Module TOF/TOF2.dat
+  {
+    Position 0. 0. 3.059 m
+    Rotation 0. 0. 0. degree
+  }
+  Module KL/KL.dat
+  {
+    Position 0. 0. 3.206 m
+    Rotation 0. 0. 0. degree
+  }
+// EMR pending geometry update and SD from EMR group
+// DR March 10, 2014
+//Module EMR/Calorimeter.dat
+//{
+//  Position 0. 0. 3.813 m
+//  Rotation 0. 0. 0. degree
+//}
 }
 

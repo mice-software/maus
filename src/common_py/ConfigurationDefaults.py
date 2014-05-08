@@ -39,6 +39,23 @@ output_json_file_type = "text"
 input_root_file_name = "maus_input.root"
 output_root_file_name = "maus_output.root"
 
+# For InputCppRoot Enter an array of spill numbers here to select them from the
+# input root file. Leaving the array empty automatically loads all spills.
+# (Note present version emits selected spills for all input run numbers)
+# e.g. selected_spills = [ 2, 34, 432, 3464 ]
+selected_spills = []
+
+# one_big_file - puts everything in output_root_file_name
+# one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
+#                    maus_output_1111.root
+# end_of_run_file_per_run - as above, and places in
+#        <end_of_run_output_root_directory>/<run_number>/<output_root_file_name>
+#      users responsibility to ensure that <end_of_run_output_root_directory>
+#      exists but MAUS will make <run_number> subdirectories
+output_root_file_mode = "one_big_file"
+end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of_run/" \
+              if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+
 # Used, for now, to determine what level of
 # c++ log messages are reported to the user:
 # 0 = debug info (and std::cout)
@@ -94,7 +111,7 @@ production_threshold = 0.5 # set the threshold for delta ray production [mm]
 kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
-keep_or_kill_particles = {"mu+":True, "mu-":True,   
+keep_or_kill_particles = {"mu+":True, "mu-":True,
                           "nu_e":False, "anti_nu_e":False,
                           "nu_mu":False, "anti_nu_mu":False,
                           "nu_tau":False, "anti_nu_tau":False,
@@ -230,12 +247,19 @@ SciFi_sigma_tracker0_station5 = 0.4298 # Position error associated with station 
 SciFi_sigma_triplet = 0.3844 # Position error for stations 1 to 4 (mm)
 SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
+SciFi_sigma_phi_1to4 = 1.0
+SciFi_sigma_phi_5 = 1.0
 SciFiPRHelicalOn = True # Flag to turn on the tracker helical pattern recognition
 SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognition
+SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
+SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
+SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition 
-SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition 
+SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
+SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
+SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPerChanFlag = 0
 SciFiNoiseFlag = 0
 SciFiCrossTalkSigma = 50.0
@@ -271,7 +295,7 @@ cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuratio
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
 geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
-                                    # the currently valid geometry or 'id' to use the cdb internal id 
+                                    # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_run_number = 0
@@ -296,15 +320,40 @@ get_ids_create_file = True
 #get beamline information
 # This executable will give the run numbers of the runs which the CDB has information on.
 # The information is the magnet currents, reasons for run and other information which
-# is specific to that run. When downloading a geometry by run number the beamline 
+# is specific to that run. When downloading a geometry by run number the beamline
 # information is merged with the geometrical infomation. Options for querying
 # beamline information are; 'all_entries' returns a list of all run numbers with beamline info.
 #                           'run_number'  prints whether info is held for this run number or not.
 #                           'dates'       returns a list of run numbers with info during specified time period.
-get_beamline_by = "all_entries" 
+get_beamline_by = "all_entries"
 get_beamline_run_number = ""
 get_beamline_start_time = ""
 get_beamline_stop_time = ""
+
+# File Numbers
+# This following section gives the files numbers of each detector. The numbers speficy the technical drawing
+# number for the sphere which represents each detector in the CAD model. These tags are seen in the style sheet
+# and are used to replace the location sphere with the detecor geometry whether it is legacy or GDML.
+tof_0_file_number = "Iges_10"
+tof_1_file_number = "Iges_11"
+tof_2_file_number = "Iges_13"
+ckov1_file_number = "Iges_19"
+ckov2_file_number = "Iges_21"
+kl_file_number = "Iges_14"
+emr_file_number = "Iges_15"
+tracker0_file_number = "Iges_17"
+tracker1_file_number = "Iges_18"
+absorber0_file_number = "9999"
+absorber1_file_number = "Iges_16"
+absorber2_file_number = "9999"
+
+# Survey fit information
+survey_measurement_record = ""
+# This file should include position references and true locations of each detector.
+survey_reference_position = ""
+use_gdml_source           = True
+# Survey targets
+survey_target_detectors = []
 
 # this is used by ImputCppRealData
 Number_of_DAQ_Events = -1
@@ -346,6 +395,20 @@ TOFadcConversionFactor = 0.125
 TOFtdcConversionFactor = 0.025 # nanosecond
 TOFpmtQuantumEfficiency = 0.25
 TOFscintLightSpeed =  170.0 # mm/ns
+
+# KL digitization
+KLconversionFactor = 0.000125 # MeV
+KLlightCollectionEff = 0.031
+KLlightGuideEff  = 0.85
+KLquantumEff = 0.18
+KLlightSpeed =  170.0 # mm/ns
+KLattLengthLong  = 2400.0 # mm
+KLattLengthShort =  200.0 # mm
+KLattLengthLongNorm  = 0.655 # mm
+KLattLengthShortNorm   = 0.345 # mm
+KLhardCodedTrigger = True
+KLsamplingTimeStart = 0.0 # ns
+KLadcConversionFactor = 0.125
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -414,3 +477,14 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+# Default location of root file containing PDF histograms used for Global PID
+PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+# Particle hypothesis used in Global PID when creating PDFs from MC data.
+# For PDFs to be produced, this must be set, preferably as the type of simulated particle
+# i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
+global_pid_hypothesis = ""
+# Unique identifier used when creating PDFs in Global PID to distinguish between PDFs for
+# the same hypothesis generated at different times. For PDFs to be produced, this must be set.
+# Any string can be used but date and time is recommended, by using python datetime module and
+# the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
+unique_identifier = ""
