@@ -80,7 +80,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
   config["default_keep_or_kill"] = true;
-  config["polarised_tracking"] = true;
+  config["spin_tracking"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";
   config["kinetic_energy_threshold"] = 0.1;
   config["max_step_length"] = 100.;
