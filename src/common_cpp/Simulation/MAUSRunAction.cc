@@ -27,25 +27,9 @@
 namespace MAUS {
 
 void MAUSRunAction::BeginOfRunAction(const G4Run* aRun) {
-  
-  const std::vector<const G4Event*, std::allocator<const G4Event*> >* e = aRun->GetEventVector();
-  std::cerr<<"event length"<<(*e).size()<<std::endl;
-  for(size_t i=0; i<(*e).size(); i++){
-      G4PrimaryVertex* pv = (*e)[i]->GetPrimaryVertex();
-      G4PrimaryParticle* p = pv->GetPrimary(0);
-      std::cerr<<"pol"<<p->GetPolarization()<<std::endl;
-      
-  }
-  //->GetPrimaryVertex()->GetPrimary()->GetPolarization();
-  //G4Event->GetPrimaryVertex();
-  //G4PrimaryVertex->GetPrimary();
-  //G4PrimaryParticle  polarization= ...  ->GetPolarization();
-  //std::cerr<<polarization<<" "<<std::endl;
-  
   // Visualization
   if (G4VVisManager::GetConcreteInstance()) {
      G4UImanager::GetUIpointer()->ApplyCommand("/vis/scene/notifyHandlers");
-     
   }
 }
 }

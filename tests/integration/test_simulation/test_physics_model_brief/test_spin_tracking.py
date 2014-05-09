@@ -13,12 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Check that the spin vector precesses in a magnetic field"""
+
 import unittest
 import subprocess
 import os
 import ROOT
-import libMausCpp
-import json
+import libMausCpp # pylint: disable = W0611
 import math
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
@@ -32,10 +33,14 @@ HIST_PERSIST = []
 IS_MAIN = __name__ == "__main__"
 
 class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
-    def setUp(self):
+    """Check that the spin vector precesses in a magnetic field"""
+
+    def setUp(self): # pylint: disable = C0103
+        """Set up the test"""
         self.file = "${MAUS_ROOT_DIR}/tmp/test_spin_tracking"
   
     def run_simulation(self):
+        """Run the simulation"""
         print "Running spin tracking simulation"
         log_file = open(os.path.expandvars(self.file+".log"), "w")
         config = os.path.join(TEST_DIR, 'spin_tracking_config.py')
@@ -44,7 +49,8 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
                                         stderr=subprocess.STDOUT)
         proc.wait()
 
-    def parse_primary(self, primary):
+    def parse_primary(self, primary): # pylint: disable = R0201
+        """Extract data from primary"""
         pos = primary.GetPosition()
         spin = primary.GetSpin()
         return {
@@ -53,7 +59,8 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
             "spin":[spin.x(), spin.y(), spin.z()]
         }
 
-    def parse_virtual(self, virtual_hit):
+    def parse_virtual(self, virtual_hit): # pylint: disable = R0201
+        """Extract data from virtual hit"""
         pos = virtual_hit.GetPosition()
         spin = virtual_hit.GetSpin()
         field = virtual_hit.GetBField()
@@ -64,9 +71,11 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
         }
 
     def hack_data(self):
+        """Extract the data from the data structure"""
         print "  Hacking data"
-        root_file = ROOT.TFile(self.file+".root", "READ") # pylint: disable = E1101
-        maus_data = ROOT.MAUS.Data() # pylint: disable = E1101
+        # pylint: disable = E1101
+        root_file = ROOT.TFile(self.file+".root", "READ")
+        maus_data = ROOT.MAUS.Data()
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", maus_data)
         tree.GetEntry(0)
@@ -78,6 +87,7 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
         return data
 
     def check_data(self, data):
+        """Check that the data is okay"""
         print "  Checking data"
         self.assertAlmostEqual(data[0]["spin"][0], 0., 6)
         self.assertAlmostEqual(data[0]["spin"][1], 0., 6)
@@ -85,7 +95,7 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
         for hit in data[1:]:
             self.assertAlmostEqual(hit["field"][1], 0.0001)
         dphi2 = None
-        for i, hit2 in enumerate(data[3:]):
+        for i in range(len(data[3:])):
             spin0 = data[i+1]["spin"]
             spin2 = data[i+3]["spin"]
             phi0 = math.atan2(spin0[0], spin0[2])
@@ -95,6 +105,7 @@ class SpinTrackingTest(unittest.TestCase): # pylint: disable = R0904
             self.assertAlmostEqual(phi2-phi0, dphi2, 4)
 
     def test_spin_tracking(self):
+        """Run simulation, extract data and check spin precesses in the field"""
         self.run_simulation()
         data = self.hack_data()
         print "  Found", len(data)-1, "virtual hits and 1 primary"

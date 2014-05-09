@@ -160,10 +160,10 @@ TEST_UNIFORM_T_F1 = {"longitudinal_mode":"uniform_time",
                    "t_end":750.}
 
 TEST_POL = {
-          "beam_polarisation" : "flat" , "beam_mean_x" :1.0 , "beam_mean_y" : 2.0 , "beam_mean_z" : 3.0,
+         "beam_polarisation" : "flat" ,
+         "beam_mean_x" :1.0 , "beam_mean_y" : 2.0 , "beam_mean_z" : 3.0,
          "beam_sigma_x" : 4.0 , "beam_sigma_y" : 5.0, "beam_sigma_z" : 6.0
-          
-        } 
+} 
 
 TEST_SPIN = { 'sx' : 0.0 , 'sy' : 0.0 , 'sz' : 1.0}
 
@@ -193,9 +193,7 @@ TEST_GAUSSIAN_UNITS = {
              "beam_sigma_y":3.,
              "beam_mean_y":4.,
              "beam_sigma_z":30.,
-             "beam_mean_z":20.}
-  #}}
-  
+             "beam_mean_z":20.} 
 }
 
 
@@ -225,15 +223,7 @@ TEST_NO_POL = {
   "reference":TEST_PRIM_MU,
   "transverse":TEST_PENN,
   "longitudinal":TEST_TWISS_L,
-  "coupling":{"coupling_mode":"none"},
-  #"beam_polarisation":{"polarisation_mode": "gaussian_unit_vectors",
-  #           "beam_sigma_x":1.,
-   #          "beam_mean_x":2.,
-    #         "beam_sigma_y":3.,
-     #        "beam_mean_y":4.,
-      #       "beam_sigma_z":5.,
-       #      "beam_mean_z":6.}
-  
+  "coupling":{"coupling_mode":"none"}, 
 }
 
 class TestBeam(unittest.TestCase):  #pylint: disable = R0904
@@ -467,13 +457,11 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertAlmostEqual(self._beam.reference[mom_var],
                                    self._beam.beam_mean[5])
 
-
-###############################################################################################
     def test_birth_beam_polarisation(self):
         """tests polarisation"""
-        global TEST_BIRTH
         self._beam._Beam__birth_beam_polarisation(TEST_BIRTH)
-        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'], 'flat')
+        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'],
+                          'flat')
         self.assertEquals(self._beam.beam_mean_x, 0.0)
         self.assertEquals(self._beam.beam_sigma_x, 1.0)
         self.assertEquals(self._beam.beam_mean_y, 0.0)
@@ -482,7 +470,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEquals(self._beam.beam_sigma_z, 1.0)
         print "polarization test_beam", self._beam.beam_polarisation
         self._beam._Beam__birth_beam_polarisation(TEST_GAUSSIAN_UNITS)
-        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'], 'gaussian_unit_vectors')
+        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'],
+                         'gaussian_unit_vectors')
         self.assertEquals(self._beam.beam_mean_x, 2.0)
         self.assertEquals(self._beam.beam_sigma_x, 1.0)
         self.assertEquals(self._beam.beam_mean_y, 4.0)
@@ -490,17 +479,10 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEquals(self._beam.beam_mean_z, 20.0)
         self.assertEquals(self._beam.beam_sigma_z, 30.0)
         print "polarization test_beam", self._beam.beam_polarisation
-################################################################################################
-
-
-
 
     def test_birth(self):
         """ Overall check birth works """
         a_beam = beam.Beam()
-        
-        #a_beam.birth(TEST_BIRTH, "binomial", 2) #NEED TO WORKOUT HOW TO FIX THIS
-       
         self.assertRaises(KeyError, a_beam.birth, TEST_BIRTH, "counter", 2)
         
     def test_process_array_to_primary(self):
@@ -653,27 +635,24 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam._Beam__process_get_seed(), 13)
         self.assertEqual(self._beam._Beam__process_get_seed(), 14)
 
-################################################################################################
     def test_process_beam_polarisation(self):
        
         """tests polarisation"""
         a_beam = beam.Beam()
-        global TEST_FORWARD, TEST_NO_POL
         array = []
        
         self._beam._Beam__birth_beam_polarisation(TEST_FORWARD)    
         array = self._beam._Beam__process_beam_polarisation()  
-        self.assertAlmostEqual(((array[0]**2)+ (array[1]**2)+(array[2]**2))**0.5 ,1.0)
+        self.assertAlmostEqual(
+              ((array[0]**2)+ (array[1]**2)+(array[2]**2))**0.5, 1.0)
         self.assertTrue(array[0] < array[2] and array[1] < array[2])
-        seeds = []       
-        spin_x = []
         flag_more_x = False
         flag_less_x = False
         flag_more_y = False
         flag_less_y = False
         flag_more_z = False
         flag_less_z = False
-        for i in range(100):
+        for i in range(100): # pylint: disable=W0612
             
             self._beam._Beam__birth_beam_polarisation(TEST_NO_POL)  
             array = self._beam._Beam__process_beam_polarisation()  
@@ -695,12 +674,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertEqual(flag_more_x or flag_less_x, True) 
             self.assertEqual(flag_more_y or flag_less_y, True) 
             self.assertEqual(flag_more_z or flag_less_z, True) 
-            primary = a_beam.make_one_primary()   
+            a_beam.make_one_primary()
             
-
-###############################################################################################
-
-
     def __cmp_matrix(self, ref_matrix, test_matrix):
         """Compare to numpy matrices"""
         self.assertEqual(ref_matrix.shape, test_matrix.shape)

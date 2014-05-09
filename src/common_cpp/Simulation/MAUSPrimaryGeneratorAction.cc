@@ -114,8 +114,8 @@ bool MAUSPrimaryGeneratorAction::isInWorldVolume(double x, double y, double z) {
 }
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle()
-  : x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.), sx(0.), sy(0.), sz(0.), energy(0.), pid(0),
-  seed(0) { //added
+  : x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.),
+    sx(0.), sy(0.), sz(0.), energy(0.), pid(0), seed(0) {
 }
 
 void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
@@ -143,9 +143,9 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   try {
       Json::Value spin = JsonWrapper::GetProperty
                                  (particle, "spin", JsonWrapper::objectValue);
-      sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();//added
-      sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();//added
-      sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();//added
+      sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();
+      sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();
+      sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();
   } catch (MAUS::Exception exc) {
       // it's okay, caller is not interested in spin
   }
@@ -173,7 +173,7 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   Json::Value particle(Json::objectValue);
   particle["position"] = pos;
   particle["momentum"] = mom;
-  particle["spin"] = spin; //added
+  particle["spin"] = spin;
   particle["particle_id"] = Json::Value(pid);
   particle["random_seed"] = Json::Value(Json::Int(seed));
 
@@ -191,7 +191,7 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     px = hit.GetMomentum().x();
     py = hit.GetMomentum().y();
     pz = hit.GetMomentum().z();
-    sx = hit.GetSpin().x();//added
+    sx = hit.GetSpin().x();
     sy = hit.GetSpin().y();
     sz = hit.GetSpin().z();
     energy = hit.GetEnergy();

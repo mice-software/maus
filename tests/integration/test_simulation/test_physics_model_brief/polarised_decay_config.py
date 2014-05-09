@@ -18,7 +18,7 @@ Configuration to generate a beam distribution with binomial distribution in
 the spill and various distributions for difference particle types
 """
 
-
+import os
 
 #pylint: disable = C0103, R0801
 output_root_file_name = \

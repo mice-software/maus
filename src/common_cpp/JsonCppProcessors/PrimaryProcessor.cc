@@ -33,6 +33,6 @@ PrimaryProcessor::PrimaryProcessor() {
                                                    &Primary::SetMomentum, true);
     RegisterValueBranch("spin", &_three_vec_proc, &Primary::GetSpin,
                                                    &Primary::SetSpin, true);
- }
+}
 }
 

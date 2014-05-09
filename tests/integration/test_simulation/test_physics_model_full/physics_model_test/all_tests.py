@@ -935,11 +935,11 @@ class Chi2Test(BaseTest): #pylint:disable=R0902
               
                 print "array ", chi_arr
            
-       #-------P-VALUE---------#
-       for i, sim in enumerate(sim_pdf)
-           PValue = 0
-           PValue = 1 - sim
-           print "P-Value is: ", PValue
+        #-------P-VALUE---------#
+        for i, sim in enumerate(sim_pdf):
+            PValue = 0
+            PValue = 1 - sim
+            print "P-Value is: ", PValue
     
        #########################          
    

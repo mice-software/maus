@@ -18,7 +18,6 @@ Responsible for initialising parent distribution and sampling single particles
 for beam generation.
 """
 
-import sys
 import math
 import numpy
 import xboa #pylint: disable=F0401
@@ -198,18 +197,8 @@ class Beam(): # pylint: disable=R0902
 
     def __birth_reference_particle(self, beam_definition):
         """Setup the reference particle - of type maus_primary"""
-        
-        #try:
-        #    if 'sigma_x' in beam_definition.keys():
-        #        raise RuntimeError('Found sigma_x in '+str(beam_definition.keys()))
         self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
                                                 beam_definition['reference'], 0)
-            
-            
-        #except:
-        #    sys.excepthook(*sys.exc_info())
-        #    raise ValueError("Failed to parse reference particle "+\
-         #                    str(beam_definition['reference']))
 
     def __birth_transverse_ellipse(self, beam_def):
         """
@@ -337,6 +326,9 @@ class Beam(): # pylint: disable=R0902
 
     
     def __birth_beam_polarisation(self, beam_def):
+        """
+        Setup the beam polarisation
+        """
         self.beam_polarisation = {}
         try:
             self.beam_polarisation = beam_def["beam_polarisation"]
@@ -352,19 +344,15 @@ class Beam(): # pylint: disable=R0902
             self.beam_sigma_y = 1.
             self.beam_sigma_z = 1.
             #if flat backward compatibility
-        if self.beam_polarisation['polarisation_mode'] == 'gaussian_unit_vectors':
-              
+        if self.beam_polarisation['polarisation_mode'] == \
+           'gaussian_unit_vectors':
             self.beam_mean_x = self.beam_polarisation['beam_mean_x']
             self.beam_mean_y = self.beam_polarisation['beam_mean_y']
             self.beam_mean_z = self.beam_polarisation['beam_mean_z']
             self.beam_sigma_x = self.beam_polarisation['beam_sigma_x']
             self.beam_sigma_y = self.beam_polarisation['beam_sigma_y']
             self.beam_sigma_z = self.beam_polarisation['beam_sigma_z']
-        
-        #else:
-            #raise ValueError('no polarisation set')
        
-        #print  self.beam_polarisation['polarisation_mode'] , self.beam_mean_x, self.beam_sigma_x
     def make_one_primary(self):
         """
         Make a primary particle.
@@ -381,9 +369,9 @@ class Beam(): # pylint: disable=R0902
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
-        spin_array= self.__process_beam_polarisation()
-        hit["sx"]=spin_array[0]
-        hit["sy"]=spin_array[1]
+        spin_array = self.__process_beam_polarisation()
+        hit["sx"] = spin_array[0]
+        hit["sy"] = spin_array[1]
         hit["sz"] = spin_array[2]
         primary = self.__process_hit_to_primary(hit)
         primary["spin"] = {"x": hit["sx"] , "y":hit["sy"], "z":hit["sz"]}
@@ -396,16 +384,18 @@ class Beam(): # pylint: disable=R0902
         """
         Generates a particle array for gaussians
         """
-        #hit = xboa.Hit.Hit.new_from_dict({'sx':0.0, 'sy':0.0, 'sz':1.0})
-        beam_mean_matrix = numpy.array([self.beam_mean_x, self.beam_mean_y, self.beam_mean_z])
-        beam_sigma_matrix = numpy.array([[((self.beam_sigma_x)**2) , 0., 0.] , [0., ((self.beam_sigma_y)**2), 0.] , [0., 0., ((self.beam_sigma_z)**2)]])
-       
-  
-        particle_array = numpy.random.multivariate_normal(beam_mean_matrix ,beam_sigma_matrix )
-        #print "PARTICLE ARRAY" , particle_array
+        beam_mean_matrix = numpy.array([self.beam_mean_x,
+                                        self.beam_mean_y,
+                                        self.beam_mean_z])
+        beam_sigma_matrix = numpy.array([[((self.beam_sigma_x)**2) , 0., 0.],
+                                         [0., ((self.beam_sigma_y)**2), 0.],
+                                         [0., 0., ((self.beam_sigma_z)**2)]])
+        particle_array = numpy.random.multivariate_normal(beam_mean_matrix,
+                                                          beam_sigma_matrix)
       
         try:
-            array_norm = particle_array/(particle_array[0]**2+particle_array[1]**2+particle_array[2]**2)**0.5
+            array_norm = particle_array/\
+           (particle_array[0]**2+particle_array[1]**2+particle_array[2]**2)**0.5
         except ZeroDivisionError:
             array_norm = numpy.array([0., 0., 1.])
         

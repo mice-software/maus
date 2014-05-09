@@ -18,12 +18,13 @@ High level tests for polarised decay; run a beam, look for decays, check the
 distribution looks sensible
 """
 
+# pylint: disable=E1101
+
 import unittest
 import subprocess
 import os
 import math
-import ROOT
-import libMausCpp
+import libMausCpp # pylint: disable = W0611
 import xboa.Common
 import ROOT
 ROOT.gROOT.SetBatch(True) # batch job (override if running from command line)
@@ -43,13 +44,13 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
     Test that physics model datacards work correctly
     """
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls): # pylint: disable=C0103
         try:
             os.makedirs(PLOT_DIR)
         except OSError:
             pass # probably the directory already exists
 
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         self.file = "${MAUS_ROOT_DIR}/tmp/test_polarised_decay"
 
     def run_simulation(self):
@@ -64,10 +65,10 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
                                         stderr=subprocess.STDOUT)
         proc.wait()
 
-    def hack_data(self, pid):
+    def hack_data(self, pid): # pylint: disable = R0914
         """Do some simple analysis"""
-        root_file = ROOT.TFile(self.file+".root", "READ") # pylint: disable = E1101
-        data = ROOT.MAUS.Data() # pylint: disable = E1101
+        root_file = ROOT.TFile(self.file+".root", "READ")
+        data = ROOT.MAUS.Data()
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
         pol_x_list, pol_y_list, pol_z_list, cos_theta_list = [], [], [], []
@@ -81,11 +82,10 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
                 if primary.GetParticleId() != pid:
                     continue
                 for track in spill_event.GetTracks():
-                    pos = track.GetInitialPosition()
                     mom = track.GetInitialMomentum()
-                    pt = (mom.x()**2 + mom.y()**2)**0.5
+                    ptrans = (mom.x()**2 + mom.y()**2)**0.5
                     if abs(track.GetParticleId()) == 11:
-                        theta = math.atan2(pt, mom.z())
+                        theta = math.atan2(ptrans, mom.z())
                         cos_theta = math.cos(theta)
                         cos_theta_list.append(cos_theta)
                 for hit in spill_event.GetVirtualHits():
@@ -108,7 +108,9 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
         print ")"
 
     def make_plot(self, pid, cos_theta_list):
-        """Make plots"""
+        """
+        Check that we have dF/d(cos(f)) = 1-Pcos(f)/3 and plot
+        """
         canvas = xboa.Common.make_root_canvas("cos(phi) "+str(pid))
         canvas.Draw()
         n_bins = 100
@@ -120,8 +122,8 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
         hist = ROOT.TH1D("hist2"+str(pid), "cos(#phi): "+str(pid),
                          n_bins, -1.001, 1.001)
         HIST_PERSIST.append(hist)
-        for i, ct in enumerate(cos_theta_list):
-            hist.Fill(ct)
+        for i, cos_theta in enumerate(cos_theta_list):
+            hist.Fill(cos_theta)
         print "  Number of angles", len(cos_theta_list),
         for i in range(n_bins+2):
             if hist.GetSumOfWeights() < 1.:
@@ -146,12 +148,16 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
         return hist
 
     def test_run(self):
+        """
+        Run the simulation, check that particle decays have appropriate dist
+        """
         self.run_simulation()
         for pid in [-13, 13]:
             print "Analysing polarised decay data for pid", pid
-            pol_x_list, pol_y_list, pol_z_list, cos_theta_list = self.hack_data(pid)
+            pol_x_list, pol_y_list, pol_z_list, cos_theta_list = \
+                                                            self.hack_data(pid)
             self.check_polarisation(pol_x_list, pol_y_list, pol_z_list)
-            hist = self.make_plot(pid, cos_theta_list)
+            self.make_plot(pid, cos_theta_list)
         if IS_MAIN:
             raw_input()
 

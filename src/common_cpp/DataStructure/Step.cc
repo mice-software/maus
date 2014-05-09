@@ -33,7 +33,7 @@ Step& Step::operator=(const Step& step) {
     }
     _position = step._position;
     _momentum = step._momentum;
-    _spin = step._spin; //added
+    _spin = step._spin;
     _bfield = step._bfield;
     _efield = step._efield;
     _proper_time = step._proper_time;
@@ -63,7 +63,6 @@ ThreeVector Step::GetMomentum() const {
 void Step::SetMomentum(ThreeVector mom) {
     _momentum = mom;
 }
-//################################################################################
 ThreeVector Step::GetSpin() const {
     return _spin;
 }
@@ -71,7 +70,6 @@ ThreeVector Step::GetSpin() const {
 void Step::SetSpin(ThreeVector spin) {
     _spin = spin;
 }
-//##################################################################################
 
 double Step::GetProperTime() const {
     return _proper_time;

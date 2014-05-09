@@ -23,27 +23,25 @@
 #include "json/json.h"
 
 
-    
+
 #include "Geant4/G4ProcessManager.hh"
+#include "Geant4/G4ProcessTable.hh"
+#include "Geant4/G4ProcessVector.hh"
+
 #include "Geant4/G4ParticleTypes.hh"
 #include "Geant4/G4ParticleTable.hh"
-   
-#include "Geant4/G4DecayPhysics.hh"
-#include "Geant4/G4ProcessTable.hh"
- 
+
 #include "Geant4/G4PionDecayMakeSpin.hh"
-#include "Geant4/G4DecayWithSpin.hh"
-    
-#include "Geant4/G4DecayTable.hh"
 #include "Geant4/G4MuonDecayChannelWithSpin.hh"
 #include "Geant4/G4MuonRadiativeDecayChannelWithSpin.hh"
+#include "Geant4/G4DecayWithSpin.hh"
+#include "Geant4/G4DecayPhysics.hh"
+#include "Geant4/G4DecayTable.hh"
 
 #include "Geant4/globals.hh"
 #include "Geant4/G4StepLimiter.hh"
 #include "Geant4/G4UserSpecialCuts.hh"
 #include "Geant4/G4UImanager.hh"
-#include "Geant4/G4ProcessTable.hh"
-#include "Geant4/G4ProcessVector.hh"
 #include "Geant4/G4PhysListFactory.hh"
 
 #include "Interface/Squeak.hh"
@@ -120,8 +118,9 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  hadronic model " << _hadronicModel
                               << "\n  particle decay " << _partDecay
                               << "\n  pi 1/2 life " << _piHalfLife
-                              << "\n  mu 1/2 life " << _muHalfLife 
-                              << "\n polarised muons " << _polDecay << std::endl;
+                              << "\n  mu 1/2 life " << _muHalfLife
+                              << "\n polarised muons " << _polDecay
+                              << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
   SetHalfLife(_piHalfLife, _muHalfLife);
 }
@@ -139,8 +138,7 @@ void MAUSPhysicsList::SetDecay(bool decay) {
   if (!decay) {
       UIApplyCommand("/process/inactivate DecayWithSpin");
       UIApplyCommand("/process/inactivate Decay");
-  }
-  else {
+  } else {
       UIApplyCommand("/process/activate DecayWithSpin");
       UIApplyCommand("/process/activate Decay");
   }
@@ -222,17 +220,17 @@ void MAUSPhysicsList::ConstructParticle() {
     _list->ConstructParticle();
     if (_polDecay == true) {
         G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
-        MuonPlusDecayTable -> Insert(new
-                               G4MuonDecayChannelWithSpin("mu+",0.986));
-        MuonPlusDecayTable -> Insert(new
-                               G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
+        MuonPlusDecayTable -> Insert(new G4MuonDecayChannelWithSpin
+                                                                ("mu+", 0.986));
+        MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin
+                                                                ("mu+", 0.014));
         G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
 
         G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
         MuonMinusDecayTable -> Insert(new
-                               G4MuonDecayChannelWithSpin("mu-",0.986));
-        MuonMinusDecayTable -> Insert(new
-                               G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
+                               G4MuonDecayChannelWithSpin("mu-", 0.986));
+        MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin
+                                                                ("mu-", 0.014));
         G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
     }
 }
@@ -263,7 +261,7 @@ void MAUSPhysicsList::SetSpecialProcesses() {
         ////////// MUON PLUS ///////////
         pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
         G4DecayWithSpin* decayWithSpinPlus = new G4DecayWithSpin();
-        decay = processTable->FindProcess("Decay", G4MuonPlus::MuonPlus());    
+        decay = processTable->FindProcess("Decay", G4MuonPlus::MuonPlus());
         if (pmanager) {
             if (decay)
                 pmanager->RemoveProcess(decay);
@@ -278,7 +276,7 @@ void MAUSPhysicsList::SetSpecialProcesses() {
         ////////// MUON MINUS ///////////
         pmanager = G4MuonMinus::MuonMinus()->GetProcessManager();
         G4DecayWithSpin* decayWithSpinMinus = new G4DecayWithSpin();
-        decay = processTable->FindProcess("Decay", G4MuonMinus::MuonMinus());    
+        decay = processTable->FindProcess("Decay", G4MuonMinus::MuonMinus());
         if (pmanager) {
             if (decay)
                 pmanager->RemoveProcess(decay);
@@ -315,7 +313,7 @@ void MAUSPhysicsList::Setup() {
             "reference_physics_processes", JsonWrapper::stringValue).asString();
     std::string physicsModel = JsonWrapper::GetProperty(dc, "physics_processes",
                                           JsonWrapper::stringValue).asString();
-    
+
     if (refPhysicsModel == "none")
       _refDEModel = no_eloss;
     if (refPhysicsModel == "mean_energy_loss")
