@@ -38,6 +38,7 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
         self._datafile = '02873'
         self._c = Configuration()
         self._mapper = InputCppDAQData()
+
     def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
         self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))

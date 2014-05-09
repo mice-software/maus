@@ -19,7 +19,7 @@
 namespace MAUS {
 
 Primary::Primary() : _seed(0), _particle_id(0), _energy(0.), _time(0.),
-                     _position(0, 0, 0), _momentum(0, 0, 0) {
+                     _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0) {
 }
 
 Primary::Primary(const Primary& md) {
@@ -36,6 +36,7 @@ Primary& Primary::operator=(const Primary& md) {
     _time = md._time;
     _position = md._position;
     _momentum = md._momentum;
+    _spin = md._spin;
     return *this;
 }
 
@@ -80,6 +81,15 @@ ThreeVector Primary::GetMomentum() const {
 
 void Primary::SetMomentum(ThreeVector mom) {
     _momentum = mom;
+}
+
+
+ThreeVector Primary::GetSpin() const {
+    return _spin;
+}
+
+void Primary::SetSpin(ThreeVector spin) {
+    _spin = spin;
 }
 
 int Primary::GetRandomSeed() const {

@@ -17,7 +17,7 @@ class MCHit
 
     MCHit();
 
-    MCHit( int, int, double, double, Hep3Vector, Hep3Vector, double, double, double );
+    MCHit( int, int, double, double, Hep3Vector, Hep3Vector, double, double, double, Hep3Vector);
 
     virtual ~MCHit() {};
 
@@ -38,6 +38,8 @@ class MCHit
     double	Edep() const			{ return _edep; };
 
     double	energy() const			{ return _energy; };
+
+    Hep3Vector	spin() const		{ return _spin; };
 
     MCParticle* particle() const		{ return _particle; };
 
@@ -62,6 +64,8 @@ class MCHit
 
     void	setParticle( MCParticle* p )	{ _particle = p; };
 
+    void	setSpin( Hep3Vector spin )	{ _spin= spin; };
+
   private :
 
     int		_trackID;
@@ -74,6 +78,7 @@ class MCHit
     double	_edep;
     double	_energy;
     MCParticle*	_particle;
+    Hep3Vector	_spin;
 };
 
 

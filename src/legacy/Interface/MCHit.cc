@@ -9,7 +9,7 @@ MCHit::MCHit()
 }
 
 
-MCHit::MCHit( int id, int pdg, double q, double m, Hep3Vector pos, Hep3Vector mom, double t, double de, double e )
+MCHit::MCHit( int id, int pdg, double q, double m, Hep3Vector pos, Hep3Vector mom, double t, double de, double e, Hep3Vector spin )
 {
   _trackID = id;
   _pdg = pdg;
@@ -20,5 +20,6 @@ MCHit::MCHit( int id, int pdg, double q, double m, Hep3Vector pos, Hep3Vector mo
   _time = t;
   _edep = de;
   _energy = e;
+  _spin = spin;
 }
 
