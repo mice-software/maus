@@ -21,119 +21,97 @@
 namespace MAUS {
 
 // Constructors
-SciFiHelicalPRTrack::SciFiHelicalPRTrack() : _phi(0), _spoints(0) {
-  _x0 = -1.0;
-  _y0 = -1.0;
-  _z0 = -1.0;
-  _R = -1.0;
-  _phi0 = -1.0;
-  _psi0 = -1.0;
-  _dsdz = -1.0;
-  _line_sz_c = -1.0;
-  _line_sz_chisq = -1.0;
-  _circle_x0 = -1.0;
-  _circle_y0 = -1.0;
-  _circle_chisq = -1.0;
-  _chisq = -1.0;
-  _chisq_dof = -1.0;
-  _tracker = -1;
-  _num_points = -1;
-  _charge = 0;
-}
+SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
+                                              _num_points(-1),
+                                              _charge(0),
+                                              _R(-1.0),
+                                              _phi0(-1.0),
+                                              _psi0(-1.0),
+                                              _dsdz(-1.0),
+                                              _line_sz_c(-1.0),
+                                              _line_sz_chisq(-1.0),
+                                              _circle_x0(-1.0),
+                                              _circle_y0(-1.0),
+                                              _circle_chisq(-1.0),
+                                              _chisq(-1.0),
+                                              _chisq_dof(-1.0),
+                                              _pos0(-1.0, -1.0, -1.0),
+                                              _phi(0),
+                                              _spoints(0) {
 
-
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, double x0,
-                                         double y0, double z0, double phi0, double psi0,
-                                         double dsdz, double R, double chisq) {
-  _x0 = x0;
-  _y0 = y0;
-  _z0 = z0;
-  _R = R;
-  _phi0 = phi0;
-  _psi0 = psi0;
-  _dsdz = dsdz;
-  _tracker = tracker;
-  _num_points = num_points;
-  _charge = charge;
-  _chisq = chisq;
+  // Do nothing
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
                                          double phi0, double psi0, SimpleCircle circle,
-                                         SimpleLine line_sz) {
+                                         SimpleLine line_sz, double chisq, double chisq_dof,
+                                         DoubleArray phi, SciFiSpacePointPArray spoints) {
   _tracker = tracker;
   _num_points = num_points;
   _charge = charge;
-  _x0 = pos0.x();
-  _y0 = pos0.y();
-  _z0 = pos0.z();
-  _R    = circle.get_R();
+  _R  = circle.get_R();
+  _phi0 = phi0;
+  _psi0 = psi0;
   _dsdz = line_sz.get_m();
   _line_sz_c = line_sz.get_c();
   _line_sz_chisq = line_sz.get_chisq();
   _circle_x0 = circle.get_x0();
   _circle_y0 = circle.get_y0();
   _circle_chisq = circle.get_chisq();
-  _phi0 = phi0;
-  _psi0 = psi0;
-}
-
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
-                                         SimpleHelix helix) : _phi(0), _spoints(0)  {
-  _tracker = tracker;
-  _num_points = num_points;
-  _charge = charge;
-  _x0        = pos0.x();
-  _y0        = pos0.y();
-  _z0        = pos0.z();
-  _R         = helix.get_R();
-  _phi0      = helix.get_Phi_0();
-  _dsdz      = helix.get_dsdz();
-  _chisq     = helix.get_chisq();
-  _chisq_dof = helix.get_chisq_dof(); // already reduced chisq
-  _psi0 = -1.0;
-  _line_sz_c = -1.0;
-  _line_sz_chisq = -1.0;
-  _circle_x0 = -1.0;
-  _circle_y0 = -1.0;
-  _circle_chisq = -1.0;
+  _chisq = chisq;
+  _chisq_dof = chisq_dof;
+  _pos0 = pos0;
+  _phi = phi;
+  _spoints = spoints;
 }
 
 // Destructor
 SciFiHelicalPRTrack::~SciFiHelicalPRTrack() {}
 
 // Assignment operator
-SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &_htrk) {
-  if (this == &_htrk) {
+SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &htrk) {
+  if (this == &htrk) {
       return *this;
   }
-  _x0 = _htrk.get_x0();
-  _y0 = _htrk.get_y0();
-  _z0 = _htrk.get_z0();
-  _R = _htrk.get_R();
-  _phi0 = _htrk.get_phi0();
-  _psi0 = _htrk.get_psi0();
-  _dsdz = _htrk.get_dsdz();
-  _line_sz_c = _htrk.get_line_sz_c();
-  _line_sz_chisq = _htrk.get_line_sz_chisq();
-  _circle_chisq = _htrk.get_circle_chisq();
-  _circle_x0 = _htrk.get_circle_x0();
-  _circle_y0 = _htrk.get_circle_y0();
-  _chisq = _htrk.get_chisq();
-  _chisq_dof = _htrk.get_chisq_dof();
-  _num_points = _htrk.get_num_points();
-  _charge = _htrk.get_charge();
-  _tracker = _htrk.get_tracker();
-  _spoints = _htrk.get_spacepoints();
-  _phi = _htrk.get_phi();
+  _R = htrk.get_R();
+  _phi0 = htrk.get_phi0();
+  _psi0 = htrk.get_psi0();
+  _dsdz = htrk.get_dsdz();
+  _line_sz_c = htrk.get_line_sz_c();
+  _line_sz_chisq = htrk.get_line_sz_chisq();
+  _circle_chisq = htrk.get_circle_chisq();
+  _circle_x0 = htrk.get_circle_x0();
+  _circle_y0 = htrk.get_circle_y0();
+  _chisq = htrk.get_chisq();
+  _chisq_dof = htrk.get_chisq_dof();
+  _num_points = htrk.get_num_points();
+  _charge = htrk.get_charge();
+  _tracker = htrk.get_tracker();
+  _pos0 = htrk.get_pos0();
+  _spoints = htrk.get_spacepoints();
+  _phi = htrk.get_phi();
   return *this;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk)
-  : _tracker(-1), _num_points(-1), _charge(0), _x0(-1.0), _y0(-1.0), _z0(-1.0),
-    _R(-1.0), _phi0(-1.0), _psi0(-1.0), _dsdz(-1.0), _line_sz_c(-1.0), _line_sz_chisq(-1.0),
-    _circle_x0(-1.0), _circle_y0(-1.0), _circle_chisq(-1.0), _chisq(-1.0), _phi(0), _spoints(0) {
-  *this = _htrk;
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
+  : _tracker(-1),
+    _num_points(-1),
+    _charge(0),
+    _R(-1.0),
+    _phi0(-1.0),
+    _psi0(-1.0),
+    _dsdz(-1.0),
+    _line_sz_c(-1.0),
+    _line_sz_chisq(-1.0),
+    _circle_x0(-1.0),
+    _circle_y0(-1.0),
+    _circle_chisq(-1.0),
+    _chisq(-1.0),
+    _chisq_dof(-1.0),
+    _pos0(-1.0, -1.0, -1.0),
+    _phi(0),
+    _spoints(0) {
+  *this = htrk;
 }
 
 } // ~namespace MAUS

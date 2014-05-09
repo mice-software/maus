@@ -97,10 +97,13 @@ void KalmanSeed::BuildKalmanStates() {
     a_site->Initialise(_n_parameters);
 
     int id = cluster.get_id();
+    a_site->set_spill(cluster.get_spill());
+    a_site->set_event(cluster.get_event());
     a_site->set_id(id);
     a_site->set_measurement(cluster.get_alpha());
     a_site->set_direction(cluster.get_direction());
     a_site->set_z(cluster.get_position().z());
+    a_site->set_cluster(_clusters[j]);
 
     std::map<int, SciFiPlaneGeometry>::iterator iterator;
     iterator = _geometry_map.find(id);

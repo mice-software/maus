@@ -30,6 +30,7 @@
 #include "TMatrixD.h"
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
+#include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
@@ -57,21 +58,29 @@ class SciFiTrackPoint {
    */
   SciFiTrackPoint& operator=(const SciFiTrackPoint& site);
 
+  /** @brief  Sets spill number.
+   */
+  void set_spill(int spill)                     { _spill   = spill;   }
+
+  /** @brief  Sets event number.
+   */
+  void set_event(int event)                     { _event   = event;   }
+
   /** @brief  Sets tracker number.
    */
-  void set_tracker(int tracker)                 { _tracker   = tracker; }
+  void set_tracker(int tracker)                 { _tracker = tracker; }
 
   /** @brief  Sets station number.
    */
-  void set_station(int station)                 { _station   = station; }
+  void set_station(int station)                 { _station = station; }
 
   /** @brief  Sets plane number.
    */
-  void set_plane(int plane)                     { _plane     = plane;   }
+  void set_plane(int plane)                     { _plane   = plane;   }
 
   /** @brief  Sets channel number.
    */
-  void set_channel(double channel)              { _channel   = channel; }
+  void set_channel(double channel)              { _channel = channel; }
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
@@ -83,23 +92,11 @@ class SciFiTrackPoint {
 
   /** @brief  Sets the x coordinate.
    */
-  void set_x(double x)                          { _x      = x;          }
+  void set_pos(ThreeVector pos)                 { _pos   = pos;      }
 
   /** @brief  Sets the x momentum component.
    */
-  void set_px(double px)                        { _px     = px;         }
-
-  /** @brief  Sets the y coordinate.
-   */
-  void set_y(double y)                          { _y      = y;          }
-
-  /** @brief  Sets the y momentum component.
-   */
-  void set_py(double py)                        { _py     = py;         }
-
-  /** @brief  Sets the z momentum component.
-   */
-  void set_pz(double pz)                        { _pz     = pz;         }
+  void set_mom(ThreeVector mom)                 { _mom  = mom;         }
 
   /** @brief  Sets the covariance matrix.
    */
@@ -122,6 +119,10 @@ class SciFiTrackPoint {
   void set_mc_y(double mc_y)                    { _mc_y   = mc_y;       }
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
   void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
+
+  /** @brief Set the mother cluster
+   */
+  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
 
   /** @brief  Returns the tracker number.
    */
@@ -149,23 +150,11 @@ class SciFiTrackPoint {
 
   /** @brief  Returns the x position.
    */
-  double x()                 const { return _x;        }
+  ThreeVector pos()                 const { return _pos; }
 
   /** @brief  Returns the x momentum component.
    */
-  double px()                const { return _px;       }
-
-  /** @brief  Returns the y position.
-   */
-  double y()                 const { return _y;        }
-
-  /** @brief  Returns the y momentum component.
-   */
-  double py()                const { return _py;       }
-
-  /** @brief  Returns the z momentum component.
-   */
-  double pz()                const { return _pz;       }
+  ThreeVector mom()                const { return _mom;       }
 
   /** @brief  Returns the covariance matrix.
    */
@@ -189,7 +178,23 @@ class SciFiTrackPoint {
   double mc_py()             const { return _mc_py;    }
   double mc_pz()             const { return _mc_pz;    }
 
+  int spill()                const { return _spill; }
+
+  int event()                const { return _event; }
+
+  /** @brief  Returns the mother cluster.
+   */
+  SciFiCluster* cluster()    const { return _cluster; }
+
  private:
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _spill;
+
+  /** @brief The tracker the trackpoint belongs to.
+   */
+  int _event;
+
   /** @brief The tracker the trackpoint belongs to.
    */
   int _tracker;
@@ -214,25 +219,13 @@ class SciFiTrackPoint {
    */
   double _s_chi2;
 
-  /** @brief x position
+  /** @brief position
    */
-  double _x;
+  ThreeVector _pos;
 
-  /** @brief x momentum component
+  /** @brief momentum
    */
-  double _px;
-
-  /** @brief y position
-   */
-  double _y;
-
-  /** @brief y momentum component
-   */
-  double _py;
-
-  /** @brief z momentum component
-   */
-  double _pz;
+  ThreeVector _mom;
 
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */
@@ -256,6 +249,10 @@ class SciFiTrackPoint {
   double _mc_y;
   double _mc_py;
   double _mc_pz;
+
+  /** @brief A pointer to the cluster used to form the state - does not assume control of memory
+   */
+  SciFiCluster* _cluster;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

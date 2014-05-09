@@ -23,6 +23,7 @@
 
 // C++ headers
 #include <vector>
+
 #include "TMath.h"
 #include "TMatrixD.h"
 
@@ -38,9 +39,9 @@ struct SciFiParams {
   /// Width of the fibre plane in mm.
   double Plane_Width;
   /// Fibre radiation lenght in mm
-  double Radiation_Legth;
+  double Radiation_Length;
   /// Fractional Radiation Length
-  double R0(double lenght) { return lenght/Radiation_Legth; }
+  double R0(double lenght) { return lenght/Radiation_Length; }
   /// Density in g.cm-3
   double Density;
   /// Mean excitation energy in eV.
@@ -59,9 +60,9 @@ struct AirParams {
   /// Air mean atomic number.
   double Z;
   /// Air radiation lenght in mm
-  double Radiation_Legth;
+  double Radiation_Length;
   /// Fractional Radiation Length
-  double R0(double lenght) { return lenght/Radiation_Legth; }
+  double R0(double lenght) { return lenght/Radiation_Length; }
   /// Density in g.cm-3
   double Density;
   /// Mean excitation energy in eV.
@@ -102,9 +103,18 @@ class KalmanState {
 
   void Build(SciFiCluster *cluster);
 
+  void MoveToGlobalFrame(ThreeVector ref_pos);
+
+  void set_spill(int spill) { _spill = spill; }
+
+  void set_event(int event) { _event = event; }
+
   /** @brief Sets the state vector at the site.
    */
   void set_a(TMatrixD a, State current_state);
+
+  /** @brief Set the mother cluster */
+  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
 
   void set_covariance_matrix(TMatrixD C, State current_state);
 
@@ -145,6 +155,9 @@ class KalmanState {
 
   void set_current_state(State kalman_state)       { _current_state = kalman_state; }
 
+  int spill()                            const { return _spill; }
+
+  int event()                            const { return _event; }
 
   State current_state()                  const { return _current_state; }
 
@@ -157,6 +170,8 @@ class KalmanState {
   TMatrixD covariance_residual(State st) const;
 
   double chi2(State desired_state)       const;
+
+  SciFiCluster* cluster()                const { return _cluster; }
 
   TMatrixD input_shift()                 const { return _input_shift; }
 
@@ -179,6 +194,10 @@ class KalmanState {
   ThreeVector true_position()      const { return _mc_pos; }
 
  private:
+  /// The spill.
+  int _spill;
+  /// The event number.
+  int _event;
   /// State of the site.
   State _current_state;
   /// Z placement of the site (mm).
@@ -188,6 +207,9 @@ class KalmanState {
   /// The Chi2 at this site.
   double _f_chi2;
   double _s_chi2;
+
+  /// A pointer to the cluster used to form the state - does not assume control of memory
+  SciFiCluster* _cluster;
 
   /// Orientation of the measuring plane.
   ThreeVector _direction;
