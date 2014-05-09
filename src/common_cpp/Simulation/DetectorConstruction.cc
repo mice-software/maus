@@ -171,7 +171,7 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
                                          "everything_special_virtual",
                                          JsonWrapper::booleanValue).asBool();
   _polarisedTracking = JsonWrapper::GetProperty(cards,
-                                         "polarised_tracking",
+                                         "spin_tracking",
                                          JsonWrapper::booleanValue).asBool() ||
                        JsonWrapper::GetProperty(cards,
                                          "polarised_decay",

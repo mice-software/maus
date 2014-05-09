@@ -14,11 +14,8 @@
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-High level tests for the beam maker - some pushed back from unit tests because
-they are too slow. Check that we can generate appropriate distributions and that
-the simulate_mice.py executable interfaces correctly.
-
-Use Kolmogorov Smirnov test to compare distributions a lot of the time...
+High level tests for polarised decay; run a beam, look for decays, check the
+distribution looks sensible
 """
 
 import unittest
@@ -45,6 +42,13 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
     """
     Test that physics model datacards work correctly
     """
+    @classmethod
+    def setUpClass(cls):
+        try:
+            os.makedirs(PLOT_DIR)
+        except OSError:
+            pass # probably the directory already exists
+
     def setUp(self):
         self.file = "${MAUS_ROOT_DIR}/tmp/test_polarised_decay"
 
@@ -136,7 +140,9 @@ class PolarisedDecayModelTest(unittest.TestCase): # pylint: disable = R0904
             self.assertGreater(fit.GetParameter(i), par_range[0])
             self.assertLess(fit.GetParameter(i), par_range[1])
             self.assertLess(fit.GetChisquare(), 100.)
-        print 
+        print
+        plot_name = "test_polarised_decay_p="+str(abs(pid)/pid)
+        canvas.Print(PLOT_DIR+"/"+plot_name+".png")
         return hist
 
     def test_run(self):

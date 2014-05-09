@@ -1,0 +1,26 @@
+// Dummy configuration for most unit tests
+//
+// For testing details of MiceModules, tracking, field maps, detector models you
+// will want obviously something more sophisticated.
+
+Configuration Test
+{
+  Dimensions 100. 100. 100. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100. mm
+
+  PropertyString FieldType RectangularField
+  PropertyHep3Vector ConstantField 0. 0.1 0.0 T
+  PropertyDouble Width  100.0 m
+  PropertyDouble Height 100.0 m
+  PropertyDouble Length 100.0 m
+
+  MiceModule Virtual
+  {
+    PropertyString Volume None
+    PropertyString SensitiveDetector Virtual
+    PropertyHep3Vector Position 0.0 0.0 1.e-9
+    PropertyString MultiplePasses NewStation
+  }
+}
+
