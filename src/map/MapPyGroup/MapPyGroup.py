@@ -128,9 +128,10 @@ class MapPyGroup:
                 birth_ok = birth_ok and worker.birth(json_config_doc)
             except: # pylint:disable = W0702
                 # Record the exception.
-                exceptions.append(worker.__class__.__name__ + ":" + 
-                    str(sys.exc_info()[0]) + ": " + 
-                    str(sys.exc_info()[1]))
+                new_exc = str(sys.exc_info()[0])+": " +\
+                          str(sys.exc_info()[1])
+                sys.excepthook(*sys.exc_info())
+                exceptions.append(worker.__class__.__name__+":"+new_exc)
                 birth_ok = False
             if (not birth_ok):
                 # Break out the loop now.

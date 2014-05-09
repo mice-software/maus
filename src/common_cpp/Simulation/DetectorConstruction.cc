@@ -170,6 +170,12 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
   _everythingSpecialVirtual = JsonWrapper::GetProperty(cards,
                                          "everything_special_virtual",
                                          JsonWrapper::booleanValue).asBool();
+  _polarisedTracking = JsonWrapper::GetProperty(cards,
+                                         "polarised_tracking",
+                                         JsonWrapper::booleanValue).asBool() ||
+                       JsonWrapper::GetProperty(cards,
+                                         "polarised_decay",
+                                         JsonWrapper::booleanValue).asBool();
   _physicsProcesses = JsonWrapper::GetProperty(cards,
                      "physics_processes", JsonWrapper::stringValue).asString();
   _keThreshold = JsonWrapper::GetProperty(cards, "kinetic_energy_threshold",
@@ -443,10 +449,10 @@ void DetectorConstruction::SetSteppingAlgorithm() {
     delete _equation;
   std::cerr << "DetectorConstruction::SetSteppingAlgorithm " << _stepperType << " " << _btField->HasRF() << std::endl;
   // Note G4Mag_SpinEqRhs did not work for spin tracking in pure magnetic field
-  if (_btField->HasRF() || _stepperType == "SpinTracking") {
+  if (_btField->HasRF() || _polarisedTracking) {
       fieldMgr->SetFieldChangesEnergy(true);
       fieldMgr->SetDetectorField(_miceElectroMagneticField);
-      if (_stepperType == "SpinTracking") {
+      if (_polarisedTracking) {
           _equation = new G4EqEMFieldWithSpin(_miceElectroMagneticField);
           n_vars = 12;
       } else {
@@ -470,7 +476,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   }
 
   // Scan through the list of steppers
-  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4" || _stepperType == "SpinTracking") {
+  if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
     _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "SimpleHeum") {
     _stepper = new G4SimpleHeum(_equation, n_vars);

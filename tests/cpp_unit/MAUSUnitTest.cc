@@ -75,10 +75,12 @@ Json::Value SetupConfig(int verbose_level) {
   config["reference_physics_processes"] = "mean_energy_loss";
   config["physics_processes"] = "standard";
   config["particle_decay"] = true;
+  config["polarised_decay"] = true;
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
   config["default_keep_or_kill"] = true;
+  config["polarised_tracking"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";
   config["kinetic_energy_threshold"] = 0.1;
   config["max_step_length"] = 100.;

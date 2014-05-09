@@ -101,6 +101,7 @@ physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default valu
 reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
 physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+polarised_decay = False # set to true to make muon decays polarised; if true, will force polarised tracking on (if polarised tracking is off, spin vectors will not be propagated to the decay point)
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
@@ -120,6 +121,7 @@ field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepp
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
 stepping_algorithm = "ClassicalRK4" # numerical integration routine
+polarised_tracking = False # set to true to track polarised particles through magnetic fields
 delta_one_step = -1. # Geant4 step accuracy parameter
 delta_intersection = -1.
 epsilon_min = -1.

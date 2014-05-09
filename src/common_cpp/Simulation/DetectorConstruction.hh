@@ -192,6 +192,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   std::string _physicsProcesses;
   bool _checkVolumes;
   bool _everythingSpecialVirtual;
+  bool _polarisedTracking;
   G4double _deltaOneStep;
   G4double _deltaIntersection;
   G4double _epsilonMin;

@@ -175,8 +175,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue(211 in bunch.keys())
         self.assertTrue(-13 in bunch.keys())
 
-
-
 if __name__ == "__main__":
     unittest.main()
 

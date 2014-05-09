@@ -82,19 +82,6 @@ MAUSPhysicsList::~MAUSPhysicsList() {
     delete _list;
 }
 
-//MAUSPhysicsList::MAUSPhysicsList() : G4VModularPhysicsList() 
- //   {
- //       RegisterPhysics(new G4DecayPhysics());
- //       RegisterPhysics(new MAUSExtraPhysics());
- //   }
-   
-//MAUSPhysicsList::~MAUSPhysicsList() {;}
-    
-    
-
-
-
-
 MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
   Json::Value& dc = *Globals::GetInstance()->GetConfigurationCards();
   std::string physModel = JsonWrapper::GetProperty
@@ -134,7 +121,7 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  particle decay " << _partDecay
                               << "\n  pi 1/2 life " << _piHalfLife
                               << "\n  mu 1/2 life " << _muHalfLife 
-                              << "\n polarised muons true/false ? "<< _polDecay<<std::endl; //added
+                              << "\n polarised muons " << _polDecay << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
   SetHalfLife(_piHalfLife, _muHalfLife);
 }
@@ -233,16 +220,21 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
 
 void MAUSPhysicsList::ConstructParticle() {
     _list->ConstructParticle();
+    if (_polDecay == true) {
+        G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
+        MuonPlusDecayTable -> Insert(new
+                               G4MuonDecayChannelWithSpin("mu+",0.986));
+        MuonPlusDecayTable -> Insert(new
+                               G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
+        G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
 
-    G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
-    MuonPlusDecayTable -> Insert(new
-                           G4MuonDecayChannelWithSpin("mu+",0.986));
-    MuonPlusDecayTable -> Insert(new
-                           G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
-    G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
-    std::cerr << "G4MuonPlus Decay table " << MuonPlusDecayTable
-              << " " << G4MuonPlus::MuonPlusDefinition()->GetDecayTable()
-              << std::endl;
+        G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
+        MuonMinusDecayTable -> Insert(new
+                               G4MuonDecayChannelWithSpin("mu-",0.986));
+        MuonMinusDecayTable -> Insert(new
+                               G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
+        G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
+    }
 }
 
 
@@ -264,35 +256,38 @@ void MAUSPhysicsList::SetSpecialProcesses() {
     fmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
   }
   if (_polDecay == true) {
-        G4ProcessManager* pmanager;
-        pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
-        G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
-    
+        G4ProcessManager* pmanager = NULL;
         G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
+        G4VProcess* decay = NULL;
 
-        G4VProcess* decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());    
+        ////////// MUON PLUS ///////////
+        pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
+        G4DecayWithSpin* decayWithSpinPlus = new G4DecayWithSpin();
+        decay = processTable->FindProcess("Decay", G4MuonPlus::MuonPlus());    
         if (pmanager) {
             if (decay)
                 pmanager->RemoveProcess(decay);
-            pmanager->AddProcess(decayWithSpin);
-            processTable->Insert(decayWithSpin, G4MuonPlus::MuonPlus()->GetProcessManager());
+            pmanager->AddProcess(decayWithSpinPlus);
+            processTable->Insert(decayWithSpinPlus,
+                                 G4MuonPlus::MuonPlus()->GetProcessManager());
             // set ordering for PostStepDoIt and AtRestDoIt
-            pmanager ->SetProcessOrdering(decayWithSpin, idxPostStep);
-            pmanager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+            pmanager ->SetProcessOrdering(decayWithSpinPlus, idxPostStep);
+            pmanager ->SetProcessOrdering(decayWithSpinPlus, idxAtRest);
         }
 
-        std::cerr << "Mu+ Process Table:" << std::endl;
-        decay = processTable->FindProcess("Decay",G4MuonPlus::MuonPlus());
-        std::cerr << "  Decay " << decay << std::endl;
-        decay = processTable->FindProcess("DecayWithSpin",G4MuonPlus::MuonPlus());
-        std::cerr << "  DecayWithSpin " << decay << std::endl;
-        decay = processTable->FindProcess("Garbage",G4MuonPlus::MuonPlus());
-        std::cerr << "  Garbage " << decay << std::endl;
-   
-        std::cerr << "Global Process Table:" << std::endl;
-        G4ProcessVector* processVector = processTable->FindProcesses();
-        for(int j=0; j<processVector->size(); j++) {
-                std::cerr << "  " << (*processVector)[j]->GetProcessName() << std::endl;
+        ////////// MUON MINUS ///////////
+        pmanager = G4MuonMinus::MuonMinus()->GetProcessManager();
+        G4DecayWithSpin* decayWithSpinMinus = new G4DecayWithSpin();
+        decay = processTable->FindProcess("Decay", G4MuonMinus::MuonMinus());    
+        if (pmanager) {
+            if (decay)
+                pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(decayWithSpinMinus);
+            processTable->Insert(decayWithSpinMinus,
+                                 G4MuonMinus::MuonMinus()->GetProcessManager());
+            // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager->SetProcessOrdering(decayWithSpinMinus, idxPostStep);
+            pmanager->SetProcessOrdering(decayWithSpinMinus, idxAtRest);
         }
     }
 }
