@@ -157,9 +157,9 @@ bool MapCppTrackerMisalignments::birth(std::string argJsonConfigDocument) {
     _station_rms/=1000.; // convert microns to mm.
     initialize_PDFs();
     return true;
-  } catch(Exception &exception) {
+  } catch (Exception &exception) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch(std::exception& exc) {
+  } catch (std::exception& exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
   return false;
@@ -206,8 +206,8 @@ void MapCppTrackerMisalignments::initialize_PDFs() {
 
       PDF *_probability_x = new PDF(pname_x, bin_width, shift_min, shift_max);
       PDF *_probability_y = new PDF(pname_y, bin_width, shift_min, shift_max);
-      //_x_shift_pdfs[tracker][station] = _probability_x;
-      //_y_shift_pdfs[tracker][station] = _probability_y;
+      // _x_shift_pdfs[tracker][station] = _probability_x;
+      // _y_shift_pdfs[tracker][station] = _probability_y;
     }
   }
   /*

@@ -561,7 +561,7 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
       // ==== compensate for bug #1394 ===
       ++station;
       const double position[2] = {
-        (*scifi_track_point)->x(), (*scifi_track_point)->y()
+        (*scifi_track_point)->pos().x(), (*scifi_track_point)->pos().y()
       };
       if (((station-last_station) > 0) &&
           (::abs(position[0]-last_position[0]) < .1) &&
@@ -577,11 +577,11 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
       std::cout << "DEBUG MapCppGlobalRawTracks::LoadSciFiTrack: " << std::endl
                 << "\tTracker: " << tracker << "\tStation: " << station
                 << std::endl
-                << "\tr=(" << (*scifi_track_point)->x() << ", "
-                << (*scifi_track_point)->y() << ")"
-                << "\tP=(" << (*scifi_track_point)->px() << ", "
-                << (*scifi_track_point)->py() << ", "
-                << (*scifi_track_point)->pz() << ")" << std::endl;
+                << "\tr=(" << (*scifi_track_point)->pos().x() << ", "
+                << (*scifi_track_point)->pos().y() << ")"
+                << "\tP=(" << (*scifi_track_point)->mom().x() << ", "
+                << (*scifi_track_point)->mom().y() << ", "
+                << (*scifi_track_point)->mom().z() << ")" << std::endl;
       const GlobalDS::DetectorPoint detector_id = GlobalDS::DetectorPoint(
           GlobalDS::kTracker0 + 6 * tracker + station);
       MAUS::recon::global::DetectorMap::const_iterator detector_mapping
@@ -647,8 +647,8 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
 
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   const double x = (detector.id() <= GlobalDS::kTracker0_5)?
-                   -(*scifi_track_point)->x():(*scifi_track_point)->x();
-  const double y = (*scifi_track_point)->y();
+                   -(*scifi_track_point)->pos().x():(*scifi_track_point)->pos().x();
+  const double y = (*scifi_track_point)->pos().y();
   const double z = helper.GetDetectorZPosition(detector.id());
   std::cout << "DEBUG MapCppGlobalRawTracks::PopulateSciFiTrackPoint: "
             << "z position of detector with ID " << detector.id() << " is "
@@ -664,9 +664,9 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
   track_point->set_mapper_name(kClassname);
 
   const double Px = (detector.id() <= GlobalDS::kTracker0_5)?
-                   -(*scifi_track_point)->px():(*scifi_track_point)->px();
-  const double Py = (*scifi_track_point)->py();
-  const double Pz = (*scifi_track_point)->pz();
+                   -(*scifi_track_point)->mom().x():(*scifi_track_point)->mom().x();
+  const double Py = (*scifi_track_point)->mom().y();
+  const double Pz = (*scifi_track_point)->mom().z();
   const double momentum = ::sqrt(Px*Px + Py*Py + Pz*Pz);
   const GlobalDS::PID particle_id = GlobalDS::PID(reference_pgparticle.pid);
   const double beta = Beta(particle_id, momentum);

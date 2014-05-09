@@ -16,7 +16,7 @@
  */
 
 /** @class PatternRecognition
- *  
+ *
  * Pattern Recognition algorithms encapsulated in a class
  *
  */

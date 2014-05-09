@@ -91,9 +91,9 @@ class SciFiGeometryHelper {
 
   double GetFieldValue(int tracker) const { return _field_value[tracker]; }
 
-  std::vector<ThreeVector> RefPos()  const { return _RefPos; };
+  std::vector<ThreeVector> RefPos()  const { return _RefPos; }
 
-  std::vector<HepRotation> Rot()     const { return _Rot;    };
+  std::vector<HepRotation> Rot()     const { return _Rot;    }
 
  private:
   std::vector<const MiceModule*> _modules;

@@ -127,7 +127,8 @@ bool PatternRecognition::LoadGlobals() {
 void PatternRecognition::process(SciFiEvent &evt) {
 
   if ( evt.spacepoints().size() > 0 ) {
-    std::cout << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
+    if ( _verb > 0 )
+      std::cout << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
@@ -290,7 +291,7 @@ void PatternRecognition::make_3tracks(const int trker_no, SpacePoint2dPArray &sp
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( _verb > 0 ) std::cout << "Making 3 pointt track: 5 stations with unused spacepoints\n";
+    if ( _verb > 0 ) std::cout << "Making 3 point track: 5 stations with unused spacepoints\n";
 
     for (int i = 0; i < 4; ++i) { // Loop of first station to ignore
       if ( sufficient_hit_stations ) {
@@ -741,8 +742,6 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       // If a sufficiently small residual is produced, accept current n as correct, for this angle
       double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
-      std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j]
-                << "\t" << remainder << "\t" << residual << std::endl;
       if ( fabs(residual) > _n_turns_cut ) pass = false;
     }
 

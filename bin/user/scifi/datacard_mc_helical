@@ -10,9 +10,9 @@ verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings #
 #------------------------------------------
 # Used by InputCppRoot
 #------------------------------------------
-# data_dir = '/vols/mice3/adobbs/maus/output/muplus/'
-# input_root_file_name = data_dir + 'maus_output_10kspills_muplus_norecon_2014-02-25.root'
-# selected_spills = [1, 2, 805 ] # e.g. [27, 52, 75] to use those spills only
+data_dir = '/home/adobbs/maus/output/'
+input_root_file_name = data_dir + 'maus_output_10kspills_muplus_norecon_2014-02-25.root'
+selected_spills = [1, 176, 7778] # e.g. [27, 52, 75] to use those spills only
 
 #------------------------------------------
 # Used by MapCppSimulation
@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 10
+spill_generator_number_of_spills = 100
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -82,9 +82,9 @@ beam = {
 #------------------------------------------
 reconstruction_geometry_filename = simulation_geometry_filename
 SciFiPRHelicalOn = True
-SciFiPRStraightOn = False
+SciFiPRStraightOn = True
 SciFiKalmanOn = True
-SciFiPatRecVerbosity = 1 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
