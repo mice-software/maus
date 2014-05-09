@@ -53,7 +53,7 @@ class TestSciFiRecon(unittest.TestCase): # pylint: disable=R0904
     """ Run the examples and check they return 0 """
 
     def test_recon(self):
-        """ Run the simulation and check the output """
+        """ TestSciFiRecon: Run the simulation and check the output """
 
         # Run the simulation and check it completes with return code 0
         proc, log_file_name = run_simulation()
@@ -69,8 +69,8 @@ class TestSciFiRecon(unittest.TestCase): # pylint: disable=R0904
         # Check the mean and standard deviation of some final track data
         tree.Draw("_spill._recon._scifi_event._scifitracks._P_value>>h1")
         h1 = ROOT.gDirectory.Get('h1')
-        self.assertGreater(h1.GetMean(), 0.93)
-        self.assertLess(h1.GetRMS(), 0.1)
+        self.assertGreater(h1.GetMean(), 0.90)
+        self.assertLess(h1.GetRMS(), 0.15)
 
         tree.Draw("_spill._recon._scifi_event._scifitracks._f_chi2>>h2")
         h2 = ROOT.gDirectory.Get('h2')
