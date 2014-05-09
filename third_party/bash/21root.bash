@@ -61,7 +61,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "INFO: Making:"
     echo
     sleep 1
-    make LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
+    make -j8 LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
 
 	            ################################################## 
 	echo

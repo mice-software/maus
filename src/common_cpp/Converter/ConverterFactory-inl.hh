@@ -115,8 +115,7 @@ namespace MAUS {
 
   template <>
   inline IConverter<Data, PyObject>*
-  ConverterFactory::getConverter<Data, PyObject>() const
-    throw(ConverterNotFoundException) {
+  ConverterFactory::getConverter<Data, PyObject>() const {
     return new DataPyDictConverter();
   }
 
