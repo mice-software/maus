@@ -2,7 +2,7 @@
 # people who are used to make.
 
 all:
-	scons -j8
+	scons
 	@echo 'You can run "scons" directly to compile MAUS.'
 
 doc:
