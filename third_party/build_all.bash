@@ -20,15 +20,15 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     set -e
 
     # Now build libraries
-    #${MAUS_ROOT_DIR}/third_party/bash/01python.bash
-    #python ${MAUS_ROOT_DIR}/third_party/check_path.py
-    #${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
-    #${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/01python.bash
+    python ${MAUS_ROOT_DIR}/third_party/check_path.py
+    ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
     # Install python modules with copies pulled down from web - will get 
     # latest versions and overwrite any from third_party tarball
-    #${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
-    #${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -gi
-    #${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -gi
+    ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash
     ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash
     ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
