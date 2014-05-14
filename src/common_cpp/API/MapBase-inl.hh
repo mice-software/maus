@@ -40,26 +40,53 @@ namespace MAUS {
   template<typename TYPE>
   PyObject* MapBase<TYPE>::process_pyobj(PyObject* py_input) const {
     // this function owns cpp_data; py_input is still owned by caller
-    TYPE* cpp_data = PyObjectWrapper::unwrap<TYPE>(py_input);
+    TYPE* cpp_data = NULL;
     try {
+        cpp_data = PyObjectWrapper::unwrap<TYPE>(py_input);
         _process(cpp_data);
-    }
-    catch (Exception& s) {
-        CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    } catch (std::exception& e) {
-        CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+    } catch (std::exception& exc) {
+        HandleException(&cpp_data, &exc, _classname);
     } catch (...) {
         throw Exception(Exception::recoverable,
                         _classname+" threw an unhandled exception",
                         "MapBase::process_pyobj");
     }
-
     PyObject* py_output = PyObjectWrapper::wrap(cpp_data);
     // py_output now owns cpp_data
     return py_output;
   }
 
-
+  // Need some wrapper code for the exception handler as the interface is
+  // assumed to be json. As conversion is error prone, need to be a bit careful
+  // and do the conversion here.
+  template <typename TYPE>
+  void MapBase<TYPE>::HandleException(TYPE** data,
+                               std::exception* exc,
+                               std::string class_name) const {
+      if (!data) {
+          throw *exc;
+      }
+      Json::Value* val = NULL;
+      try {
+          try {
+              val = ConverterFactory().convert<TYPE, Json::Value>(*data);
+          } catch (...) {
+              // do nothing; catch data == NULL or failed conversion to json
+          }
+          delete *data;  // we don't need it any more
+          if (val == NULL) {  // conversion failed, try to build from scratch 
+              MAUS::Data data_temp;
+              data_temp.SetSpill(new Spill());
+              val = ConverterFactory().convert<MAUS::Data, Json::Value>(&data_temp);
+          }
+          *val = CppErrorHandler::getInstance()->HandleStdExc(*val, *exc, class_name);
+          *data = ConverterFactory().convert<Json::Value, TYPE>(val);
+          delete val;
+      } catch (...) {
+          std::cerr << "Unhandled exception" << std::endl;
+          throw;
+      }
+  }
 
 }// end of namespace
 #endif

@@ -19,30 +19,37 @@
 
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 
 
 namespace MAUS {
-  MapCppGlobalPID::MapCppGlobalPID() {
-    _classname = "MapCppGlobalPID";
+
+  PyMODINIT_FUNC init_MapCppGlobalPID(void) {
+    PyWrapMapBase<MAUS::MapCppGlobalPID>::PyWrapMapBaseModInit
+                                                  ("", "", "", "");
   }
 
-  bool MapCppGlobalPID::birth(std::string argJsonConfigDocument) {
+
+  MapCppGlobalPID::MapCppGlobalPID() : MapBase("MapCppGlobalPID") {
+  }
+
+  void MapCppGlobalPID::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-      _configCheck = false;
-      return false;
+      throw MAUS::Exception(Exception::recoverable,
+	                          "Failed to parse Json configuration file",
+                            "MapCppGlobalPID::_birth");
     }
 
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
-      Squeak::mout(Squeak::error)
-	<< "Could not find the $MAUS_ROOT_DIR env variable." << std::endl;
-      Squeak::mout(Squeak::error)
-	<< "Did you try running: source env.sh ?" << std::endl;
-      return false;
+      throw MAUS::Exception(Exception::recoverable,
+	          std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
+            std::string("Did you try running: source env.sh?"),
+            "MapCppGlobalPID::_birth");
     }
 
     _configCheck = true;
@@ -69,102 +76,17 @@ namespace MAUS {
       // etc.
       }
 
-    return true;
   }
 
-  bool MapCppGlobalPID::death() {
-    return true;
+  void MapCppGlobalPID::_death() {
   }
 
-  std::string MapCppGlobalPID::process(std::string document) const {
-    Json::FastWriter writer;
-    Json::Value root;
-
-    if (document.empty()) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Empty document passed to process";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-    }
-
-    if (!_configCheck) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: process was not passed a valid configuration";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-    }
-
-    // Prepare converters, spill and json objects
-    JsonCppSpillConverter json2cppconverter;
-    CppJsonSpillConverter cpp2jsonconverter;
-    Json::Value *data_json = NULL;
-    MAUS::Data *data_cpp = NULL;
-
-    // Read string and convert to a Json object
-    try {
-      Json::Value imported_json = JsonWrapper::StringToJson(document);
-      data_json = new Json::Value(imported_json);
-    } catch (...) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Bad json document";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-    }
-
-    if (!data_json || data_json->isNull()) {
-      if (data_json) delete data_json;
-      return std::string("{\"errors\":{\"bad_json_document\":")+
-	std::string("\"Failed to parse input document\"}}");
-    }
-
-    if (data_json->empty()) {
-      delete data_json;
-      return std::string("{\"errors\":{\"bad_json_document\":")+
-	std::string("\"Failed to parse input document\"}}");
-    }
-
-    std::string maus_event = JsonWrapper::GetProperty(
-        *data_json, "maus_event_type",
-	JsonWrapper::stringValue).asString();
-
-    if ( maus_event.compare("Spill") != 0 ) {
-      Squeak::mout(Squeak::error) << "Line of json document did not contain "
-	  << "a Spill" << std::endl;
-      delete data_json;
-      return document;
-    }
-
-    std::string daq_event = JsonWrapper::GetProperty(
-        *data_json, "daq_event_type",
-        JsonWrapper::stringValue).asString();
-
-    if ( daq_event.compare("physics_event") != 0 ) {
-      Squeak::mout(Squeak::error) << "daq_event_type did not return a "
-				  << "physics event" << std::endl;
-      delete data_json;
-      return document;
-    }
-
-    // Convert Json into MAUS::Spill object.  In future, this will all
-    // be done for me, and process will take/return whichever object we
-    // prefer.
-    try {
-      data_cpp = json2cppconverter(data_json);
-      delete data_json;
-    } catch (...) {
-      Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
-          << " converting json->cpp, MapCppGlobalPID" << std::endl;
-    }
-
+  void MapCppGlobalPID::_process(MAUS::Data* data) const {
+    MAUS::Data* data_cpp = data;
     if (!data_cpp) {
-      return std::string("{\"errors\":{\"failed_json_cpp_conversion\":")+
-	std::string("\"Failed to convert Json to Cpp Spill object\"}}");
+      throw Exception(Exception::recoverable,
+                      "Data was NULL",
+                      "MapCppGlobalPID::process");
     }
 
     const MAUS::Spill* _spill = data_cpp->GetSpill();
@@ -229,18 +151,5 @@ namespace MAUS {
         }
       }
       }
-
-    data_json = cpp2jsonconverter(data_cpp);
-
-    if (!data_json) {
-      delete data_cpp;
-      return std::string("{\"errors\":{\"failed_cpp_json_conversion\":")+
-	std::string("\"Failed to convert Cpp to Json Spill object\"}}");
-    }
-
-    std::string output_document = JsonWrapper::JsonToString(*data_json);
-    delete data_json;
-    delete data_cpp;
-    return output_document;
   }
 } // ~MAUS

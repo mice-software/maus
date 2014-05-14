@@ -17,69 +17,39 @@
 
 #include <Python.h>
 
-#include <vector>
 #include <string>
 
-#include "Utils/Exception.hh"
-
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-
 #include "src/map/MapCppSimulation/MapCppSimulation.hh"
 
 namespace MAUS {
+std::string class_docstring =
+std::string("MapCppSimulation is the interface from the MAUS module\n")+
+std::string("framework to the Geant4 simulation modules. MapCppSimulation\n")+
+std::string("tracks particles and fills the MC branch of the MAUS event.\n");
 
-bool MapCppSimulation::birth(std::string argJsonConfigDocument) {
+PyMODINIT_FUNC init_MapCppSimulation(void) {
+  PyWrapMapBase<MAUS::MapCppSimulation>::PyWrapMapBaseModInit
+                                                  (class_docstring, "", "", "");
+}
+
+void MapCppSimulation::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
-  try {
-    if (!Globals::HasInstance()) {
-        GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
-    _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
-    return true;  // Sucessful completion
-  // Normal session, no visualization
-  } catch (Exception& exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch (std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-  }
-  return false;
+  _doVis = MAUSGeant4Manager::GetInstance()->GetVisManager() != NULL;
 }
 
-std::string MapCppSimulation::process(std::string document) {
-  Json::Value spill;
-  try {spill = JsonWrapper::StringToJson(document);}
-  catch (...) {
-    return std::string("{\"errors\":{\"bad_json_document\":")+
-           std::string("\"Failed to parse input document\"}}");
+void MapCppSimulation::_process(Json::Value* json_document) const {
+  Json::Value& spill = *json_document;
+  if (_doVis) {
+      MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
   }
-  try {
-    if (_doVis) {
-        MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
-    }
-    Json::Value mc = JsonWrapper::GetProperty
-                                  (spill, "mc_events", JsonWrapper::arrayValue);
-    spill["mc_events"] =
-                   MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
-    if (_doVis)
-        MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
-  }
-  catch (Exception& exception) {
-    spill = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleException(spill, exception, _classname);
-  } catch (std::exception& exc) {
-    spill = MAUS::CppErrorHandler::getInstance()
-                                         ->HandleStdExc(spill, exc, _classname);
-  }
-  Json::FastWriter writer;
-  std::string output = writer.write(spill);
-  return output;
-}
-
-bool MapCppSimulation::death() {
-  return true;  // successful
+  Json::Value mc = JsonWrapper::GetProperty
+                                (spill, "mc_events", JsonWrapper::arrayValue);
+  spill["mc_events"] =
+                 MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+  if (_doVis)
+      MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
 }
 }

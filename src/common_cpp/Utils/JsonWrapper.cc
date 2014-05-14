@@ -31,7 +31,7 @@ Json::Value JsonWrapper::StringToJson(const std::string& json_in)
   bool parsingSuccessful = reader.parse(json_in, json_out);
   if (!parsingSuccessful) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
-          "Failed to parse Json configuration. Json reports\n"
+          "Failed to parse Json document. Json reports\n"
                                       +reader.getFormatedErrorMessages(),
           "JsonWrapper::StringToJson()"));
   }
