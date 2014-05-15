@@ -32,11 +32,13 @@ namespace MAUS {
   }
 
 
-  MapCppGlobalPID::MapCppGlobalPID() : MapBase("MapCppGlobalPID") {
+  MapCppGlobalPID::MapCppGlobalPID()
+     : MapBase("MapCppGlobalPID"), _configCheck(false) {
   }
 
   void MapCppGlobalPID::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
+    _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
       throw MAUS::Exception(Exception::recoverable,
@@ -52,7 +54,7 @@ namespace MAUS {
             "MapCppGlobalPID::_birth");
     }
 
-    _configCheck = true;
+
 
     _hypotheses.clear();
     _pid_vars.clear();
@@ -75,7 +77,7 @@ namespace MAUS {
       //                                                      _hypotheses[i]));
       // etc.
       }
-
+    _configCheck = true;
   }
 
   void MapCppGlobalPID::_death() {
@@ -88,6 +90,12 @@ namespace MAUS {
                       "Data was NULL",
                       "MapCppGlobalPID::process");
     }
+    if (!_configCheck) {
+      throw Exception(Exception::recoverable,
+                      "Birth was not called successfully",
+                      "MapCppGlobalPID::process");
+    }
+
 
     const MAUS::Spill* _spill = data_cpp->GetSpill();
 
