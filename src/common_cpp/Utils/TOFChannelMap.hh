@@ -143,14 +143,14 @@ class TOFChannelMap {
  * \param[in] daqch DAQ channel to search for.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */
-  TOFChannelKey* find(DAQChannelKey* daqKey);
+  TOFChannelKey* find(DAQChannelKey* daqKey) const;
 
  /** Return pointer to the TOF key.
  * This function returns pointer to the TOF channel key for the required DAQ channel.
  * \param[in] daqch DAQ channel to search for, coded as string.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */  
-  TOFChannelKey* find(string daqKeyStr);
+  TOFChannelKey* find(string daqKeyStr) const;
 
  /** Return pointer to the fADC DAQ key.
  * This function returns pointer to the fADC DAQ channel key coupled to the required TDC channel.
