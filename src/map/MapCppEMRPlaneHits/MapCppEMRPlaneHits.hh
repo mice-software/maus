@@ -102,7 +102,7 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
                    int nPartTrigger,
                    EMREventVector_2& emr_events_tmp2) const;
   void fill(MAUS::Spill *spill,
-            int nPartTrigger, 
+            int nPartTrigger,
             EMREventVector_2& emr_events_tmp2,
             EMREventVector_4& emr_events_tmp4) const;
 

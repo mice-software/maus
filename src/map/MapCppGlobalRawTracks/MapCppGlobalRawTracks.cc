@@ -76,7 +76,7 @@ PyMODINIT_FUNC init_MapCppGlobalRawTracks(void) {
                                                 ("", "", "", "");
 }
 
-MapCppGlobalRawTracks::MapCppGlobalRawTracks() 
+MapCppGlobalRawTracks::MapCppGlobalRawTracks()
     : MapBase<Data>("MapCppGlobalRawTracks") {
 }
 

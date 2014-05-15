@@ -18,7 +18,6 @@
 # pylint: disable = C0103
 
 import os
-import json
 import unittest
 from Configuration import Configuration
 import maus_cpp.converter

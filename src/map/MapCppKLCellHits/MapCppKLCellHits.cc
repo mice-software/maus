@@ -56,9 +56,11 @@ void MapCppKLCellHits::_process(Json::Value* data) const {
   //  JsonCpp setup
   Json::Value xEventType = JsonWrapper::GetProperty(root,
                                         "daq_event_type",
-				   JsonWrapper::stringValue);
+  JsonWrapper::stringValue);
   if (xEventType== "physics_event" || xEventType == "calibration_event") {
-    Json::Value events = JsonWrapper::GetProperty(root, "recon_events", JsonWrapper::arrayValue);
+    Json::Value events = JsonWrapper::GetProperty(root,
+                                                  "recon_events",
+                                                  JsonWrapper::arrayValue);
     for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
       Json::Value xDocKlEvent = JsonWrapper::GetItem(events,
                                                       n_event,
@@ -68,23 +70,24 @@ void MapCppKLCellHits::_process(Json::Value* data) const {
                                              JsonWrapper::objectValue);
       if (root["recon_events"][n_event]["kl_event"].isMember("kl_digits")) {
 
- root["recon_events"][n_event]["kl_event"]["kl_cell_hits"] = Json::Value(Json::objectValue);
+          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"] =
+                                                 Json::Value(Json::objectValue);
 
- Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocKlEvent,
-                                                      "kl_digits",
-                                                      JsonWrapper::objectValue);
+          Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocKlEvent,
+                                                        "kl_digits",
+                                                        JsonWrapper::objectValue);
 
- xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
-                                                  "kl",
-                                                  JsonWrapper::anyValue);
+          xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
+                                                          "kl",
+                                                          JsonWrapper::anyValue);
 
 
- Json::Value xDocCellHits = makeCellHits(xDocPartEvent);
+          Json::Value xDocCellHits = makeCellHits(xDocPartEvent);
 
- root["recon_events"][n_event]["kl_event"]["kl_cell_hits"]["kl"] = xDocCellHits;
-	}
+          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"]["kl"] = xDocCellHits;
       }
     }
+  }
 }
 
 Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) const {
@@ -191,7 +194,7 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
         xDocCellHit["charge_product"] = 0;
     else
         xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
-				        (xChargeDigit0 + xChargeDigit1);
+                                        (xChargeDigit0 + xChargeDigit1);
   }
 
 //  xDocCellHit["pmt0"] = xDocPMT0;

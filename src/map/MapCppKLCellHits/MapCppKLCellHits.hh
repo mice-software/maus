@@ -33,30 +33,30 @@
 #include "src/common_cpp/Utils/KLChannelMap.hh"
 
 namespace MAUS {
-class MapCppKLCellHits : public MapBase<Json::Value>{
+class MapCppKLCellHits : public MapBase<Json::Value> {
 
  public:
- MapCppKLCellHits();
+  MapCppKLCellHits();
 
  private:
- /** @brief Sets up the worker
- *
- *  @param argJsonConfigDocument a JSON document with
- *         the configuration.
- */
+  /** @brief Sets up the worker
+  *
+  *  @param argJsonConfigDocument a JSON document with
+  *         the configuration.
+  */
   void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
- *
- *  This takes no arguments and does nothing.
- */
+  *
+  *  This takes no arguments and does nothing.
+  */
   void _death();
 
   /** @brief process JSON document
- *
- *  @param document Receive a document with digits and return
- *  a document with slab hits.
- */
+  *
+  *  @param document Receive a document with digits and return
+  *  a document with slab hits.
+  */
   void _process(Json::Value* data) const;
 
   /// Vector to hold the names of all detectors to be processed.

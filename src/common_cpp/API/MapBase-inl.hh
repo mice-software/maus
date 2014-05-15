@@ -74,7 +74,7 @@ namespace MAUS {
               // do nothing; catch data == NULL or failed conversion to json
           }
           delete *data;  // we don't need it any more
-          if (val == NULL) {  // conversion failed, try to build from scratch 
+          if (val == NULL) {  // conversion failed, try to build from scratch
               MAUS::Data data_temp;
               data_temp.SetSpill(new Spill());
               val = ConverterFactory().convert<MAUS::Data, Json::Value>(&data_temp);

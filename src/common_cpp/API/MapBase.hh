@@ -80,13 +80,11 @@ class MapBase : public virtual IMap<TYPE>, public ModuleBase {
    *        MapBase retains ownership of memory allocated by data.
    */
   virtual void _process(TYPE* data) const = 0;
-  
+
   virtual void HandleException(TYPE** data,
                                std::exception* exc,
                                std::string class_name) const;
-
 };
-
 }// end of namespace
 
 #include "src/common_cpp/API/MapBase-inl.hh"

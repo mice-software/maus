@@ -134,7 +134,7 @@ int PyWrapMapBase<MAPCLASS>::_init(PyWrappedMap* self, PyObject *args, PyObject 
         self->map = new MAPCLASS();
     if (self->can_convert == NULL) {
         self->can_convert = Py_True;
-        Py_INCREF(Py_True);
+        Py_INCREF(self->can_convert);
     }
     return 0;
 }
@@ -143,7 +143,7 @@ template <class MAPCLASS>
 void PyWrapMapBase<MAPCLASS>::_dealloc(PyWrappedMap* self) {
     if (self->map != NULL)
         delete self->map;
-    Py_DECREF(Py_True);
+    Py_DECREF(self->can_convert);
 }
 
 template <class MAPCLASS>
