@@ -21,93 +21,36 @@
 
 #include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppTrackerDigits(void) {
+  PyWrapMapBase<MAUS::MapCppTrackerDigits>::PyWrapMapBaseModInit
+                                                ("", "", "", "");
+}
 
-MapCppTrackerDigits::MapCppTrackerDigits(): _spill_json(NULL),
-                                            _spill_cpp(NULL) {}
+MapCppTrackerDigits::MapCppTrackerDigits()
+    : MapBase<Data>("MapCppTrackerDigits") {}
 
 MapCppTrackerDigits::~MapCppTrackerDigits() {
-  if (_spill_json != NULL) {
-    delete _spill_json;
-  }
-  if (_spill_cpp != NULL) {
-    delete _spill_cpp;
-  }
 }
 
-bool MapCppTrackerDigits::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppTrackerDigits";
-  return true;
+void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
 }
 
-bool MapCppTrackerDigits::death() {
-  return true;
+void MapCppTrackerDigits::_death() {
 }
 
-std::string MapCppTrackerDigits::process(std::string document) {
-  Json::FastWriter writer;
-
-  read_in_json(document);
-
-  try {
-    if ( _json_root.isMember("daq_data") && !(_json_root["daq_data"].isNull()) ) {
-      // Get daq data.
-      Json::Value daq = _json_root.get("daq_data", 0);
-      // Fill spill object with
-      RealDataDigitization real;
-      real.initialise();
-      real.process(_spill_cpp, daq);
-      // Save to JSON output.
-      save_to_json(_spill_cpp);
-    } else {
-      return writer.write(_json_root);
-    }
-  // If an exception is caught, the JSON file returned is the same that was read-in (_json_root)...
-  } catch (Exception& exception) {
-    exception.Print();
-    return writer.write(_json_root);
-  } catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    _json_root["errors"] = errors;
-    return writer.write(_json_root);
+void MapCppTrackerDigits::_process(Data* data) const {
+  Json::Value& json_root = *(ConverterFactory().convert<Data, Json::Value>(data));
+  if ( json_root.isMember("daq_data") && !(json_root["daq_data"].isNull()) ) {
+    // Get daq data.
+    Json::Value daq = json_root.get("daq_data", 0);
+    // Fill spill object with
+    RealDataDigitization real;
+    real.initialise();
+    real.process(data->GetSpill(), daq);
   }
-  // ... if everything went alright, we return a modified spill (_spill_json).
-  return writer.write(*_spill_json);
+  delete &json_root;
 }
-
-void MapCppTrackerDigits::read_in_json(std::string json_data) {
-  Json::FastWriter writer;
-  if (_spill_cpp != NULL) {
-    delete _spill_cpp;
-    _spill_cpp = NULL;
-  }
-
-  try {
-    _json_root = JsonWrapper::StringToJson(json_data);
-    SpillProcessor spill_proc;
-    _spill_cpp = spill_proc.JsonToCpp(_spill_json);
-  } catch (...) {
-    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
-    _spill_cpp = new Spill();
-    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    _spill_cpp->GetErrors();
-  }
-}
-
-void MapCppTrackerDigits::save_to_json(Spill *spill) {
-  SpillProcessor spill_proc;
-  if (_spill_json != NULL) {
-      delete _spill_json;
-      _spill_json = NULL;
-  }
-  _spill_json = spill_proc.CppToJson(*spill, "");
-}
-
 } // ~namespace MAUS

@@ -24,8 +24,9 @@ import unittest
 import os
 from Configuration import Configuration
 
-from MapCppTrackerDigits import MapCppTrackerDigits
+from MAUS import MapCppTrackerDigits
 import maus_cpp.globals
+import maus_cpp.converter
 
 # Disable: Too many public methods
 # pylint: disable-msg=R0904
@@ -49,13 +50,11 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         # Test whether the configuration files were loaded correctly at birth
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        success = self.mapper.birth(json.dumps(self.cfg))
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        self.mapper.birth(json.dumps(self.cfg))
 
     def testDeath(self):
         """ Test to make sure death occurs """
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
 
     # def testBadData(self):
     #    """Check can handle nonsense json input data"""
@@ -77,24 +76,22 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         # Spill 1 is corrupted.
         spill_1 = _file.readline().rstrip()
         output_1 = self.mapper.process(spill_1)
-        self.assertFalse("recon_events" in json.loads(output_1))
-        # Spill 2 is sain.
+        self.assertFalse("recon_events" in maus_cpp.converter.json_repr(output_1))
+        # Spill 2 is sane.
         spill_2 = _file.readline().rstrip()
         output_2 = self.mapper.process(spill_2)
-        self.assertTrue("recon_events" in json.loads(output_2))
+        self.assertTrue("recon_events" in maus_cpp.converter.json_repr(output_2))
         # spill 3 is end of event
         spill_3 = _file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)
-        self.assertTrue("END_OF_RUN" in json.loads(output_3))
+        self.assertTrue("END_OF_RUN" in maus_cpp.converter.json_repr(output_3))
         # Close file.
         _file.close()
 
     @classmethod
     def tear_down_class(self):
         """___"""
-        success = self.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        self.mapper.death()
         self.mapper = None
 
 if __name__ == '__main__':
