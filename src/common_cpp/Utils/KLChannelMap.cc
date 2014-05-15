@@ -63,7 +63,7 @@ bool KLChannelMap::InitFromFile(string filename) {
 
 void KLChannelMap::InitFromCDB() {}
 
-KLChannelKey* KLChannelMap::find(DAQChannelKey *daqKey) {
+KLChannelKey* KLChannelMap::find(DAQChannelKey *daqKey) const {
   if (daqKey->eqType() == 120) {
     for (unsigned int i = 0;i < _klKey.size();i++) {
       if ( _fadcKey[i]->ldc()     == daqKey->ldc() &&
@@ -76,7 +76,7 @@ KLChannelKey* KLChannelMap::find(DAQChannelKey *daqKey) {
   return NULL;
 }
 
-KLChannelKey* KLChannelMap::find(std::string daqKeyStr) {
+KLChannelKey* KLChannelMap::find(std::string daqKeyStr) const {
   DAQChannelKey xDaqKey;
   stringstream xConv;
   try {

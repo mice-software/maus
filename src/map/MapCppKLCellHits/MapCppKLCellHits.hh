@@ -29,47 +29,47 @@
 #include <vector>
 #include <map>
 #include "json/json.h"
+#include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/Utils/KLChannelMap.hh"
 
 namespace MAUS {
-class MapCppKLCellHits {
+class MapCppKLCellHits : public MapBase<Json::Value>{
 
  public:
+ MapCppKLCellHits();
 
+ private:
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
  *  This takes no arguments and does nothing.
  */
-  bool death();
+  void _death();
 
   /** @brief process JSON document
  *
  *  @param document Receive a document with digits and return
  *  a document with slab hits.
  */
-  std::string process(std::string document);
-
- private:
-  std::string _classname;
+  void _process(Json::Value* data) const;
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1);
+  Json::Value fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const;
 
   /** @brief makes slab hits
    *
    *  @param xDocDetectorData Json document containing digits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeCellHits(Json::Value xDocPartEvent);
+  Json::Value makeCellHits(Json::Value xDocPartEvent) const;
 };
 }
 #endif
