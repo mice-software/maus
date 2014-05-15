@@ -45,6 +45,7 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
@@ -68,52 +69,50 @@ struct EMRPlaneData {
 typedef std::vector<EMRPlaneData>                EMRPlaneHitsVector;
 typedef std::vector<EMRPlaneHitsVector>          EMREventVector_2;
 
-class MapCppEMRPlaneHits {
-
+class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  public:
+  MapCppEMRPlaneHits();
+
+ private:
 
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
  *  This takes no arguments and does nothing.
  */
-  bool death();
-
-  /** @brief process JSON document
- *
- *  @param document ?????.
- */
-  std::string process(std::string document);
+  void _death();
 
   /** @brief process the data object
  *
  *  @param
  */
-  void process(MAUS::Data *data);
+  void _process(MAUS::Data *data) const;
 
- private:
+  void processDBB(MAUS::EMRDaq EMRdaq,
+                  int nPartTrigger,
+                  EMREventVector_2& emr_events_tmp2,
+                  EMREventVector_4& emr_events_tmp4) const;
+  void processFADC(MAUS::EMRDaq EMRdaq,
+                   int nPartTrigger,
+                   EMREventVector_2& emr_events_tmp2) const;
+  void fill(MAUS::Spill *spill,
+            int nPartTrigger, 
+            EMREventVector_2& emr_events_tmp2,
+            EMREventVector_4& emr_events_tmp4) const;
 
-  void processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger);
-  void processFADC(MAUS::EMRDaq EMRdaq, int nPartTrigger);
-  void fill(MAUS::Spill *spill, int nPartTrigger);
-
-  void reset_data_tmp(int nPartEvts);
-
-  std::string _classname;
+  EMREventVector_2 get_data_tmp2(int nPartEvts) const;
+  EMREventVector_4 get_data_tmp4(int nPartEvts) const;
 
   EMRChannelMap _emrMap;
 
   int _trigger_window_lower;
   int _trigger_window_upper;
-
-  EMREventVector_2     _emr_events_tmp2;
-  EMREventVector_4     _emr_events_tmp4;
 };
 }
 
