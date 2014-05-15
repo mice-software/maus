@@ -60,6 +60,7 @@
 #include "Utils/Globals.hh"
 #include "Utils/JsonWrapper.hh"
 #include "Utils/CppErrorHandler.hh"
+#include "API/PyWrapMapBase.hh"
 
 namespace MAUS {
 
@@ -69,30 +70,26 @@ using MAUS::recon::global::Detector;
 using MAUS::recon::global::DetectorMap;
 using MAUS::recon::global::Particle;
 
-MapCppGlobalRawTracks::MapCppGlobalRawTracks() {
+
+PyMODINIT_FUNC init_MapCppGlobalRawTracks(void) {
+  PyWrapMapBase<MAUS::MapCppGlobalRawTracks>::PyWrapMapBaseModInit
+                                                ("", "", "", "");
+}
+
+MapCppGlobalRawTracks::MapCppGlobalRawTracks() 
+    : MapBase<Data>("MapCppGlobalRawTracks") {
 }
 
 MapCppGlobalRawTracks::~MapCppGlobalRawTracks() {
 }
 
-bool MapCppGlobalRawTracks::birth(std::string configuration_string) {
+void MapCppGlobalRawTracks::_birth(const std::string& configuration_string) {
   // parse the JSON document.
-  try {
     const Json::Value configuration
       = JsonWrapper::StringToJson(configuration_string);
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors_);
-  } catch (Exception& exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(
-      exception, MapCppGlobalRawTracks::kClassname);
-    return false;
-  } catch (std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(
-      exc, MapCppGlobalRawTracks::kClassname);
-    return false;
-  }
-
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
@@ -112,30 +109,13 @@ bool MapCppGlobalRawTracks::birth(std::string configuration_string) {
                    "Reference particle is not a pion+/-, muon+/-, or e+/-.",
                    "MapCppGlobalRawTracks::birth()"));
   }
-
-  return true;  // Sucessful parsing
 }
 
-std::string MapCppGlobalRawTracks::process(std::string run_data_string) {
-  // parse the JSON document.
-  Json::Value run_data_json
-    = Json::Value(JsonWrapper::StringToJson(run_data_string));
-  if (run_data_json.isNull() || run_data_json.empty()) {
-    return std::string("{\"errors\":{\"bad_json_document\":"
-                        "\"Failed to parse input document\"}}");
-  }
-
-  JsonCppSpillConverter deserialize;
-  MAUS::Data * run_data = deserialize(&run_data_json);
-  if (!run_data) {
-    return std::string("{\"errors\":{\"failed_json_cpp_conversion\":"
-                        "\"Failed to convert Json to C++ Data object\"}}");
-  }
-
+void MapCppGlobalRawTracks::_process(Data* run_data) const {
   const MAUS::Spill * spill = run_data->GetSpill();
   MAUS::ReconEventPArray * recon_events = spill->GetReconEvents();
   if (!recon_events) {
-    return run_data_string;
+    return;
   }
 
   MAUS::ReconEventPArray::const_iterator recon_event;
@@ -147,23 +127,9 @@ std::string MapCppGlobalRawTracks::process(std::string run_data_string) {
     // Load the ReconEvent, and import it into the GlobalEvent
     AssembleRawTracks(*recon_event, global_event);
   }
-
-  // Serialize the Spill for passing on to the next map in the workflow
-  CppJsonSpillConverter serialize;
-  Json::FastWriter writer;
-  std::string output = writer.write(*serialize(run_data));
-  /*
-  std::cout << "DEBUG MapCppGlobalRawTracks::process(): "
-            << "Output: " << std::endl
-            << output << std::endl;
-  */
-  delete run_data;
-
-  return output;
 }
 
-bool MapCppGlobalRawTracks::death() {
-  return true;  // successful
+void MapCppGlobalRawTracks::_death() {
 }
 
 /** AssembleRawTracks - load data provided by the DAQ system or via digitized MC
@@ -176,7 +142,7 @@ bool MapCppGlobalRawTracks::death() {
  */
 void MapCppGlobalRawTracks::AssembleRawTracks(
     MAUS::ReconEvent * recon_event,
-    MAUS::GlobalEvent * global_event) {
+    MAUS::GlobalEvent * global_event) const {
 
   // Load TOF and SciFi tracks from the appropriate recon event trees
   GlobalDS::TrackPArray tracks;
@@ -222,7 +188,7 @@ void MapCppGlobalRawTracks::AssembleRawTracks(
  */
 void MapCppGlobalRawTracks::LoadTOFTrack(
     MAUS::ReconEvent const * const recon_event,
-    GlobalDS::TrackPArray & tof_tracks) {
+    GlobalDS::TrackPArray & tof_tracks) const {
   const int particle_event_number = recon_event->GetPartEventNumber();
   const TOFEvent * tof_event = recon_event->GetTOFEvent();
   const TOFEventSpacePoint space_point_events
@@ -316,7 +282,7 @@ void MAUS::MapCppGlobalRawTracks::PopulateTOFTrackPoint(
     const std::vector<TOFSpacePoint>::const_iterator & tof_space_point,
     const double slab_width,
     const size_t number_of_slabs,
-    GlobalDS::TrackPoint * track_point) {
+    GlobalDS::TrackPoint * track_point) const {
   DataStructureHelper helper = DataStructureHelper::GetInstance();
   const double z = helper.GetDetectorZPosition(detector.id());
   std::cerr << "DEBUG MapCppGlobalRawTracks::PopulateTOFTrackPoint: "
@@ -511,7 +477,7 @@ double MapCppGlobalRawTracks::TOFMeanStoppingPower(const double beta,
  */
 void MapCppGlobalRawTracks::LoadSciFiTracks(
     MAUS::ReconEvent const * const recon_event,
-    GlobalDS::TrackPArray & tracks) {
+    GlobalDS::TrackPArray & tracks) const {
   if (tracks.size() == 0) {
     // Add a new track if none previously existed
     GlobalDS::Track * track = new GlobalDS::Track();
@@ -633,7 +599,7 @@ void MapCppGlobalRawTracks::LoadSciFiTracks(
 void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
     const MAUS::recon::global::Detector & detector,
     const SciFiTrackPointPArray::const_iterator & scifi_track_point,
-    GlobalDS::TrackPoint * track_point) {
+    GlobalDS::TrackPoint * track_point) const {
   GlobalDS::SpacePoint * space_point = new GlobalDS::SpacePoint();
 
   space_point->set_detector(detector.id());
@@ -704,7 +670,7 @@ void MapCppGlobalRawTracks::PopulateSciFiTrackPoint(
 /* Take an educated guess at the particle ID based on the axial velocity
  * of the particle (beta)
  */
-GlobalDS::PID MapCppGlobalRawTracks::IdentifyParticle(const double beta) {
+GlobalDS::PID MapCppGlobalRawTracks::IdentifyParticle(const double beta) const {
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
@@ -747,7 +713,7 @@ GlobalDS::PID MapCppGlobalRawTracks::IdentifyParticle(const double beta) {
   return particle_id;
 }
 
-double MapCppGlobalRawTracks::Beta(GlobalDS::PID pid, const double momentum) {
+double MapCppGlobalRawTracks::Beta(GlobalDS::PID pid, const double momentum) const {
   const double mass = Particle::GetInstance().GetMass(pid);
   const double one_over_beta_squared
     = 1+ (mass*mass) / (momentum*momentum);
