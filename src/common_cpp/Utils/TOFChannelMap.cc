@@ -224,7 +224,7 @@ TOFChannelKey::TOFChannelKey(string keyStr) throw(Exception) {
   }
 }
 
-bool TOFChannelKey::operator==( TOFChannelKey const key ) {
+bool TOFChannelKey::operator==( const TOFChannelKey& key ) const {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&
@@ -236,7 +236,7 @@ bool TOFChannelKey::operator==( TOFChannelKey const key ) {
   }
 }
 
-bool TOFChannelKey::operator!=( TOFChannelKey const key ) {
+bool TOFChannelKey::operator!=( const TOFChannelKey& key ) const {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&

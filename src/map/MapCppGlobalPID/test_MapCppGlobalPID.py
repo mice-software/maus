@@ -21,14 +21,14 @@ import os
 import unittest
 from Configuration import Configuration
 import maus_cpp.converter
-import MAUS
+from _MapCppGlobalPID import MapCppGlobalPID
 
 class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalPID"""
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
-        cls.mapper = MAUS.MapCppGlobalPID()
+        cls.mapper = MapCppGlobalPID()
         cls.c = Configuration()
 
     def test_empty(self):

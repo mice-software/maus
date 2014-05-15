@@ -20,13 +20,20 @@
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 #include "Config/MiceModule.hh"
 #include "Utils/Exception.hh"
+#include "API/PyWrapMapBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppTOFMCDigitizer(void) {
+  PyWrapMapBase<MAUS::MapCppTOFMCDigitizer>::PyWrapMapBaseModInit
+                                                ("", "", "", "");
+}
+
+MapCppTOFMCDigitizer::MapCppTOFMCDigitizer()
+    : MapBase<Json::Value>("MapCppTOFMCDigitizer") {
+}
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppTOFMCDigitizer";
-
+void MapCppTOFMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // print level
   fDebug = false;
 
@@ -35,7 +42,9 @@ bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to parse Json Configuration",
+                          "MapCppTOFMCDigitizer::_birth");
   }
 
   // get the geometry
@@ -56,26 +65,20 @@ bool MapCppTOFMCDigitizer::birth(std::string argJsonConfigDocument) {
   // load the TOF calibration map
   bool loaded = _map.InitializeFromCards(_configJSON);
   if (!loaded)
-     return false;
-
-  return true;
+    throw(Exception(Exception::recoverable,
+                 "Could not find TOF calibration map",
+                 "MapCppTOFMCDigitizer::birth"));
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppTOFMCDigitizer::death() {
-  return true;
+void MapCppTOFMCDigitizer::_death() {
 }
 
 //////////////////////////////////////////////////////////////////////
-std::string MapCppTOFMCDigitizer::process(std::string document) {
-
-  Json::FastWriter writer;
-
+void MapCppTOFMCDigitizer::_process(Json::Value* document) const {
+  Json::Value& root = *document;
   // check sanity of json input file and mc brach
-  if ( !check_sanity_mc(document) ) {
-    // if bad, write error file
-    return writer.write(root);
-  }
+  Json::Value mc = check_sanity_mc(*document);
 
   // all_tof_digits store all the tof hits
   // then we'll weed out multiple hits, add up yields, and store the event
@@ -87,7 +90,7 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
   if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
   for ( unsigned int i = 0; i < mc.size(); i++ ) {
     Json::Value particle = mc[i];
-    gentime = particle["primary"]["time"].asDouble();
+    double gentime = particle["primary"]["time"].asDouble();
     if (fDebug) std::cout << "evt: " << i << " pcle= " << particle << std::endl;
 
     // hits for this event
@@ -95,14 +98,13 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
     // if _hits.size() = 0, the make_digits and fill_tof_evt functions will
     // return null. The TOF recon expects something - either null or data, can't just skip
     all_tof_digits.clear();
-    strig.str(std::string());
 
     // pick out tof hits, digitize and store
-    all_tof_digits = make_tof_digits(_hits);
+    all_tof_digits = make_tof_digits(_hits, gentime, *document);
 
     // go through tof hits and find the hit in the trig station (TOF1)
     // if (all_tof_digits.size() != 0) findTriggerPixel(all_tof_digits);
-    findTriggerPixel(all_tof_digits);
+    std::string strig = findTriggerPixel(all_tof_digits);
 
     // now go through the stations and fill tof events
     // real data tof digits look like so:
@@ -110,22 +112,23 @@ std::string MapCppTOFMCDigitizer::process(std::string document) {
     // loop over tof stations
     for (int snum = 0; snum < 3; ++snum) {
        tof_evt.clear();
-       tof_evt[i] = fill_tof_evt(i, snum, all_tof_digits);
+       tof_evt[i] = fill_tof_evt(i, snum, all_tof_digits, strig);
        if (fDebug) {
           std::cout << "mcevt: " << i << " tof" << snum << " " << _hits.size()
                     << " hits, " << all_tof_digits.size() << std::endl;
        }
-       Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits);
+       Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits, strig);
        root["recon_events"][i]["tof_event"]["tof_digits"][_stationKeys[snum]]
                                                                      = tof_digs;
      } // end loop over stations
   } // end loop over events
-  // write it out
-  return writer.write(root);
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits) {
+std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
+                                                        Json::Value hits,
+                                                        double gentime,
+                                                        Json::Value& root) const {
   std::vector<Json::Value> tof_digits;
   tof_digits.clear();
   if (hits.size() == 0) return tof_digits;
@@ -304,43 +307,27 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(Json::Value hits)
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppTOFMCDigitizer::check_sanity_mc(std::string document) {
+Json::Value MapCppTOFMCDigitizer::check_sanity_mc(Json::Value& root) const {
   // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return false;
-  }
-
   // Check if the JSON document has a 'mc' branch, else return error
   if (!root.isMember("mc_events")) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "I need an MC branch to simulate.";
-    errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "Could not find an MC branch to simulate.",
+                          "MapCppTOFMCDigitizer::check_sanity_mc");
   }
 
-  mc = root.get("mc_events", 0);
+  Json::Value mc = root.get("mc_events", 0);
   // Check if JSON document is of the right type, else return error
   if (!mc.isArray()) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC branch isn't an array";
-    errors["bad_type"] = ss.str();
-    root["errors"] = errors;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "MC branch was not an array.",
+                          "MapCppTOFMCDigitizer::check_sanity_mc");
   }
-  return true;
+  return mc;
 }
 
 //////////////////////////////////////////////////////////////////////
-double MapCppTOFMCDigitizer::get_npe(double dist, double edep) {
+double MapCppTOFMCDigitizer::get_npe(double dist, double edep) const {
       double nphot = 0;
       double nptmp = 0.;
       if (fDebug) std::cout << "get_npe::edep= " << edep << std::endl;
@@ -381,7 +368,7 @@ double MapCppTOFMCDigitizer::get_npe(double dist, double edep) {
 }
 
 //////////////////////////////////////////////////////////////////////
-void MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_digits) {
+std::string MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_digits) const {
   int tstn = 1;
   int tsx = 99, tsy = 99;
 
@@ -398,19 +385,22 @@ void MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_dig
       }
     }
   }
+  std::stringstream strig_str("");
   // set trigger to be "unknown" if we could not find the hit in TOF1
   if (tsx == 99 || tsy == 99)
-     strig << "unknown";
+     strig_str << "unknown";
   else
-     strig << "TOFPixelKey " << tstn << " " << tsx << " " << tsy << " tof" << tstn;
+     strig_str << "TOFPixelKey " << tstn << " " << tsx << " " << tsy << " tof" << tstn;
   if (fDebug)
-     std::cout << "pixelKey: " << strig.str() << std::endl;
+     std::cout << "pixelKey: " << strig_str.str() << std::endl;
+  return strig_str.str();
 }
 
 
 //////////////////////////////////////////////////////////////////////
 Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
-                                             std::vector<Json::Value> all_tof_digits) {
+                                             std::vector<Json::Value> all_tof_digits,
+                                             std::string pixStr) const {
   Json::Value tof_digit(Json::arrayValue);
   // return null if this evt had no tof hits
   if (all_tof_digits.size() == 0) return tof_digit;
@@ -448,6 +438,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       */
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
       // ROGERS = changed from "charge" to "charge_pm" for data integrity
+      Json::Value digit;
       digit["charge_pm"] = adc;
       // NOTE: needs tweaking/verifying -- DR 3/15
       digit["charge_mm"] = adc;
@@ -461,7 +452,6 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       std::string keyStr = all_tof_digits[i]["tof_key"].asString();
       TOFChannelKey xChannelKey(keyStr);
       double dT = 0.;
-      std::string pixStr = strig.str();
       if (pixStr != "unknown") {
         TOFPixelKey xTriggerPixelKey(pixStr);
         dT = _map.dT(xChannelKey, xTriggerPixelKey, adc);
@@ -508,7 +498,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppTOFMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) {
+bool MapCppTOFMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) const {
   int station1   = (*hit1)["station"].asInt();
   int station2   = (*hit2)["station"].asInt();
   int plane1 = (*hit1)["plane"].asInt();

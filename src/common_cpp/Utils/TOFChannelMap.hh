@@ -62,8 +62,8 @@ class TOFChannelKey {
   explicit TOFChannelKey(string keyStr) throw(Exception);
   virtual ~TOFChannelKey() {}
 
-  bool operator==( TOFChannelKey key );
-  bool operator!=( TOFChannelKey key );
+  bool operator==( const TOFChannelKey& key ) const;
+  bool operator!=( const TOFChannelKey& key ) const;
 
   /** Return true only if the given TOF channel is connected 
   * to the the opposit side of the slab.
