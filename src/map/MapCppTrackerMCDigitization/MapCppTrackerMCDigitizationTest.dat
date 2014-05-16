@@ -1,0 +1,16 @@
+Configuration TrackerMCDigitizationTest
+{
+  PropertyHep3Vector Dimensions 1.0 1.0 10.0 m
+  PropertyString Material Galactic
+  Module Tracker/Tracker0.dat
+  {
+    Position 0.0 0.0 -2.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/Tracker1.dat
+  {
+    Position 0.0 0.0 2.0 m
+    Rotation 0.0 0.0 0.0 degree
+  }
+}
+

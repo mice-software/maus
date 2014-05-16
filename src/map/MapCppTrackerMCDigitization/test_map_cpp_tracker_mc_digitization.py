@@ -59,7 +59,9 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         """
         self.mapper = MapCppTrackerMCDigitization()
         conf = json.loads(Configuration().getConfigJSON())
-        conf["simulation_geometry_filename"] = "Stage4.dat"
+        geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
+               "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+        conf["simulation_geometry_filename"] = geom
         # Test whether the configuration files were loaded correctly at birth
         self.mapper.birth(json.dumps(conf))
 
@@ -85,9 +87,9 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         # Line 3 is good data
         line_3 = _file.readline()
         output_3 = self.mapper.process(line_3)
-        self.assertTrue("recon_events" in maus_cpp.converter.json_repr(output_3))
-        # Check the digits have been made
         spill_out = maus_cpp.converter.json_repr(output_3)
+        self.assertTrue("recon_events" in spill_out)
+        # Check the digits have been made
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])

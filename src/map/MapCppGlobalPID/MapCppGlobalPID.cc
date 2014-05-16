@@ -33,7 +33,7 @@ namespace MAUS {
 
 
   MapCppGlobalPID::MapCppGlobalPID()
-     : MapBase("MapCppGlobalPID"), _configCheck(false) {
+     : MapBase<Data>("MapCppGlobalPID"), _configCheck(false) {
   }
 
   void MapCppGlobalPID::_birth(const std::string& argJsonConfigDocument) {
