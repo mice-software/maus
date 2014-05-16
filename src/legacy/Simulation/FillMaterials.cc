@@ -332,9 +332,9 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   name = "BRASS";
   G4Material* brass = new G4Material(name, density, nComp=3, kStateSolid);
   G4Element* elZn = man->FindOrBuildElement("Zn");
-  brass->AddMaterial(elCu, 58*perCent);
-  brass->AddMaterial(elZn, 39*perCent);
-  brass->AddMaterial(elPb,  3*perCent);
+  brass->AddElement(elCu, 58*perCent);
+  brass->AddElement(elZn, 39*perCent);
+  brass->AddElement(elPb,  3*perCent);
   materials_list->addMaterial( brass, name );
 
   // POLYURETHANE
@@ -342,10 +342,10 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   name = "POLYURETHANE";
   G4Material* TufsetPU = new G4Material(name, density, nComp=4, kStateSolid);
   G4Element* elN = man->FindOrBuildElement("N");
-  TufsetPU->AddMaterial(elC, 64.38*perCent);
-  TufsetPU->AddMaterial(elH,  9.01*perCent);
-  TufsetPU->AddMaterial(elN,  6.01*perCent);
-  TufsetPU->AddMaterial(elO, 20.60*perCent);
+  TufsetPU->AddElement(elC, 64.38*perCent);
+  TufsetPU->AddElement(elH,  9.01*perCent);
+  TufsetPU->AddElement(elN,  6.01*perCent);
+  TufsetPU->AddElement(elO, 20.60*perCent);
   materials_list->addMaterial( TufsetPU, name );
 
   // TUFNOL 
