@@ -58,9 +58,7 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         _filename = root_dir+ \
                    '/tests/py_unit/test_maus_cpp/test_converter_regression.json'
         _file = open(_filename, 'r')
-        _file.readline()
-        _file.readline()
-        output_3 = converter.data_repr(_file.readline())
+        output_3 = converter.data_repr(_file.read())
         for i in range(2):
             print output_3.GetSpill()
             print output_3.GetSpill().GetMCEvents(), output_3.GetSpill().GetMCEvents().size()
