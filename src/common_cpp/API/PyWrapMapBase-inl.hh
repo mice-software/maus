@@ -226,6 +226,7 @@ PyTypeObject PyWrapMapBase<MAPCLASS>::_class_type = {
 
 template <class MAPCLASS>
 void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
+                std::string class_name,
                 std::string class_docstring,
                 std::string birth_docstring,
                 std::string death_docstring,
@@ -238,7 +239,13 @@ void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
         _death_docstring = death_docstring;
     if (process_docstring != "")
         _process_docstring = process_docstring;
-    _class_name = MAPCLASS().get_classname();
+    _methods[0].ml_doc = _birth_docstring.c_str();
+    _methods[1].ml_doc = _process_docstring.c_str();
+    _methods[2].ml_doc = _death_docstring.c_str();
+
+    _class_type.tp_doc = _class_docstring.c_str();
+    // Static so allocates c_str() memory for lifetime of the program
+    _class_name = class_name;
     _module_name = "_"+_class_name;
     _path_name = "_"+_class_name+"."+_class_name;
     _class_type.tp_name = _path_name.c_str();
@@ -248,7 +255,7 @@ void PyWrapMapBase<MAPCLASS>::PyWrapMapBaseModInit(
         return;
 
     module = Py_InitModule3(_module_name.c_str(), _module_methods,
-                       "Better to import the class directly from MAUS.");
+                      "Please import the class directly from the MAUS module.");
 
     if (module == NULL)
       return;

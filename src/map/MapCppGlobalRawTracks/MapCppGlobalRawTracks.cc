@@ -73,7 +73,7 @@ using MAUS::recon::global::Particle;
 
 PyMODINIT_FUNC init_MapCppGlobalRawTracks(void) {
   PyWrapMapBase<MAUS::MapCppGlobalRawTracks>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                      ("MapCppGlobalRawTracks", "", "", "", "");
 }
 
 MapCppGlobalRawTracks::MapCppGlobalRawTracks()

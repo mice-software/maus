@@ -73,11 +73,11 @@ namespace MAUS {
      */
     void _death();
 
-    /** @brief process JSON document
+    /** @brief process MAUS Data
      *
-     *  Receive a document with global tracks, perform PID functons
+     *  Receive a Spill data object with global tracks, perform PID functons
      *  and return tracks with PID set
-     * @param document a line/spill from the JSON input
+     * @param document a spill data event
      */
     void _process(MAUS::Data* data) const;
 

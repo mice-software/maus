@@ -29,7 +29,7 @@ namespace MAUS {
 
 PyMODINIT_FUNC init_MapCppEMRPlaneHits(void) {
   PyWrapMapBase<MAUS::MapCppEMRPlaneHits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                                ("MapCppEMRPlaneHits", "", "", "", "");
 }
 
 MapCppEMRPlaneHits::MapCppEMRPlaneHits()

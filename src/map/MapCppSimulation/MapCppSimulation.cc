@@ -30,9 +30,24 @@ std::string("MapCppSimulation is the interface from the MAUS module\n")+
 std::string("framework to the Geant4 simulation modules. MapCppSimulation\n")+
 std::string("tracks particles and fills the MC branch of the MAUS event.\n");
 
+std::string birth_docstring =
+std::string("Checks whether the visualisation manager is initialised.\n\n")+
+std::string("  datacards: ignored.\n");
+
+std::string process_docstring =
+std::string("Run tracks through the simulation.\n\n")+
+std::string("  data: data from a single spill. Tracks primary of each MC\n")+
+std::string("        event in the spill data.\n");
+
+std::string death_docstring = std::string("Does nothing.\n");
+
 PyMODINIT_FUNC init_MapCppSimulation(void) {
   PyWrapMapBase<MAUS::MapCppSimulation>::PyWrapMapBaseModInit
-                                                  (class_docstring, "", "", "");
+                              ("MapCppSimulation",
+                               class_docstring,
+                               birth_docstring,
+                               process_docstring,
+                               death_docstring);
 }
 
 void MapCppSimulation::_birth(const std::string& argJsonConfigDocument) {

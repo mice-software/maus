@@ -24,7 +24,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerMCDigitization(void) {
   PyWrapMapBase<MAUS::MapCppTrackerMCDigitization>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                ("MapCppTrackerMCDigitization", "", "", "", "");
 }
 
 MapCppTrackerMCDigitization::MapCppTrackerMCDigitization()

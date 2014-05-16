@@ -29,7 +29,7 @@ namespace MAUS {
 
 PyMODINIT_FUNC init_MapCppKLDigits(void) {
   PyWrapMapBase<MAUS::MapCppKLDigits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                            ("MapCppKLDigits", "", "", "", "");
 }
 
 MapCppKLDigits::MapCppKLDigits() : MapBase<Json::Value>("MapCppKLDigits") {

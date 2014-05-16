@@ -30,7 +30,7 @@ namespace MAUS {
 
 PyMODINIT_FUNC init_MapCppKLCellHits(void) {
   PyWrapMapBase<MAUS::MapCppKLCellHits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                          ("MapCppKLCellHits", "", "", "", "");
 }
 
 MapCppKLCellHits::MapCppKLCellHits() : MapBase<Json::Value>("MapCppKLCellHits") {

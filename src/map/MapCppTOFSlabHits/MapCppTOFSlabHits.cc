@@ -30,7 +30,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTOFSlabHits(void) {
   PyWrapMapBase<MAUS::MapCppTOFSlabHits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                          ("MapCppTOFSlabHits", "", "", "", "");
 }
 
 MapCppTOFSlabHits::MapCppTOFSlabHits()

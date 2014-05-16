@@ -21,7 +21,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
   PyWrapMapBase<MAUS::MapCppTrackerRecon>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                        ("MapCppTrackerRecon", "", "", "", "");
 }
 
 MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon") {

@@ -70,10 +70,10 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
    */
   void _death();
 
-  /** @brief process JSON document
+  /** @brief process MAUS Data object
    *
-   *  Receive a document with MC hits and return
-   *  a document with digits
+   *  Receive a object with MC hits and return
+   *  a object with digits
    */
   void _process(MAUS::Data * data) const;
 

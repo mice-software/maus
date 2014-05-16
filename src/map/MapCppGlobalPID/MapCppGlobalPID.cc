@@ -28,7 +28,7 @@ namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalPID(void) {
     PyWrapMapBase<MAUS::MapCppGlobalPID>::PyWrapMapBaseModInit
-                                                  ("", "", "", "");
+                                            ("MapCppGlobalPID", "", "", "", "");
   }
 
 

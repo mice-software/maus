@@ -62,10 +62,10 @@ class MapCppTrackerMCNoise : public MapBase<Data> {
   /** Shuts down the worker */
   void _death();
 
-  /** @brief Process JSON document
+  /** @brief Process Data object
    *
-   *  Receive a document with SciFi digits and returns
-   *  a document with simulated noise digits added
+   *  Receive a structure with SciFi digits and returns
+   *  a structure with simulated noise digits added
    */
   void _process(Data* data) const;
 

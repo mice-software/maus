@@ -74,11 +74,11 @@ namespace MAUS {
      */
     void _death();
 
-    /** process JSON document
+    /** process MAUS Data
      *
-     *  Receive a document with recon events and return a 
-     *  document with populated global events and tracks.
-     * @param document a line/spill from the JSON input
+     *  Receive a structure with recon events and return a 
+     *  structure with populated global events and tracks.
+     * @param MAUS data corresponding to a single MICE spill
      */
     void _process(MAUS::Data* data) const;
 

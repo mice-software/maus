@@ -26,7 +26,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerDigits(void) {
   PyWrapMapBase<MAUS::MapCppTrackerDigits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                        ("MapCppTrackerDigits", "", "", "", "");
 }
 
 MapCppTrackerDigits::MapCppTrackerDigits()

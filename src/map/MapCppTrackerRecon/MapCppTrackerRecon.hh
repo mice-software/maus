@@ -82,9 +82,9 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void _death();
 
-  /** Process JSON document
+  /** Process MAUS data object
    *
-   *  Receive a document with digits (either MC or real) and then call the higher level
+   *  Receive a data object with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
    * 
    * \param document a line/spill from the JSON input

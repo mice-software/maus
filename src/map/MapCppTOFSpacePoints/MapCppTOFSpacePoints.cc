@@ -30,7 +30,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTOFSpacePoints(void) {
   PyWrapMapBase<MAUS::MapCppTOFSpacePoints>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                      ("MapCppTOFSpacePoints", "", "", "", "");
 }
 
 MapCppTOFSpacePoints::MapCppTOFSpacePoints()

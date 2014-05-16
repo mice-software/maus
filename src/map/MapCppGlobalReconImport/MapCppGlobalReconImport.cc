@@ -27,7 +27,7 @@ namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalReconImport(void) {
     PyWrapMapBase<MAUS::MapCppGlobalReconImport>::PyWrapMapBaseModInit
-                                                  ("", "", "", "");
+                                    ("MapCppGlobalReconImport", "", "", "", "");
   }
 
   MapCppGlobalReconImport::MapCppGlobalReconImport()

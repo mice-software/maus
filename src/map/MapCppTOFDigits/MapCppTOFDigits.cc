@@ -28,7 +28,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTOFDigits(void) {
   PyWrapMapBase<MAUS::MapCppTOFDigits>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                            ("MapCppTOFDigits", "", "", "", "");
 }
 
 MapCppTOFDigits::MapCppTOFDigits() : MapBase<Json::Value>("MapCppTOFDigits") {

@@ -22,7 +22,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerMCNoise(void) {
   PyWrapMapBase<MAUS::MapCppTrackerMCNoise>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                      ("MapCppTrackerMCNoise", "", "", "", "");
 }
 
 MapCppTrackerMCNoise::MapCppTrackerMCNoise()

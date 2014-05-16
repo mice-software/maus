@@ -36,7 +36,7 @@ def test_data():
 
 class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
     """Tests for maus_cpp.converter"""
-    def _test_convert(self):
+    def test_convert(self):
         """Tests for maus_cpp.converter.X_repr()"""
         self.assertRaises(ValueError, converter.json_repr, ())
         self.assertRaises(ValueError, converter.json_repr, ("",))
@@ -60,10 +60,6 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         _file = open(_filename, 'r')
         output_3 = converter.data_repr(_file.read())
         for i in range(2):
-            print output_3.GetSpill()
-            print output_3.GetSpill().GetMCEvents(), output_3.GetSpill().GetMCEvents().size()
-            for event in output_3.GetSpill().GetMCEvents():
-                print event
             spill_out = converter.data_repr(output_3)
 
 if __name__ == "__main__":

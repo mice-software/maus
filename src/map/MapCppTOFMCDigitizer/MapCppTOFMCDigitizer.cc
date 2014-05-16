@@ -25,7 +25,7 @@
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTOFMCDigitizer(void) {
   PyWrapMapBase<MAUS::MapCppTOFMCDigitizer>::PyWrapMapBaseModInit
-                                                ("", "", "", "");
+                                      ("MapCppTOFMCDigitizer", "", "", "", "");
 }
 
 MapCppTOFMCDigitizer::MapCppTOFMCDigitizer()

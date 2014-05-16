@@ -70,11 +70,11 @@ class MapCppTrackerDigits : public MapBase<Data> {
    */
   void _death();
 
-  /** process JSON document
+  /** process MAUS spill object
    *
    *  Receive a document with MC hits and return
    *  a document with digits
-   * \param document a line/spill from the JSON input
+   * \param document a MAUS data object for a MICE spill
    */
   void _process(Data* document) const;
 

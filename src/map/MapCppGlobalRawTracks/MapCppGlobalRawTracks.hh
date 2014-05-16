@@ -90,7 +90,7 @@ class MapCppGlobalRawTracks : public MapBase<MAUS::Data> {
    *  This function takes a single spill and generates a list of tracks based
    *  on the desired method of recon.
    *
-   * @param document a JSON document for a spill
+   * @param document data for a MICE a spill
    */
   void _process(MAUS::Data* document) const;
 

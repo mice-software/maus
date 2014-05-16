@@ -65,7 +65,7 @@ class MapCppSimulation : public MapBase<Json::Value> {
    */
   void _death() {}
 
-  /** @brief Simulate JSON input and return new document
+  /** @brief Track JSON input and return new document
    *
    *  This function will simulate a single spill defined
    *  in JSON format.
