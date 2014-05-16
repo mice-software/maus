@@ -1,3 +1,6 @@
+// Test tracker setup
+// Used in TrackerMCDigitization test and TrackerMCNoise test
+
 Configuration TrackerMCDigitizationTest
 {
   PropertyHep3Vector Dimensions 1.0 1.0 10.0 m

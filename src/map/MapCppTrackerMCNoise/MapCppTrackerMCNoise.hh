@@ -42,11 +42,12 @@
 #include "src/common_cpp/DataStructure/SciFiNoiseHit.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
 
-class MapCppTrackerMCNoise {
+class MapCppTrackerMCNoise : public MapBase<Data> {
   public:
   /** Constructor - initialises pointers to NULL */
   MapCppTrackerMCNoise();
@@ -54,50 +55,37 @@ class MapCppTrackerMCNoise {
   /** Constructor - deletes any allocated memory */
   ~MapCppTrackerMCNoise();
 
+  private:
   /** Sets up the worker */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** Shuts down the worker */
-  bool death();
+  void _death();
 
   /** @brief Process JSON document
    *
    *  Receive a document with SciFi digits and returns
    *  a document with simulated noise digits added
    */
-  std::string process(std::string document);
-
-  /** Reads in json data to a Spill object */
-  void read_in_json(std::string json_data);
-
-  /** Saves digits to json. */
-  void save_to_json(MAUS::Spill &spill);
+  void _process(Data* data) const;
 
   /** @brief Simulates dark count
    *
    *  Check each SciFi channel for Dark PEs
    *  adds results to SciFiDigits
    */
-  void dark_count(MAUS::Spill &spill);
+  void dark_count(MAUS::Spill &spill) const;
 
   private:
   // MapCppMCNoise setup containers
-  /// This should be the classname
-  std::string _classname;
   /// This will contain the configuration
   Json::Value* _configJSON;
-  /// This will contain the root value after parsing
-  Json::Value* _spill_json;
   /// This will contain the root value before parsing
   std::string argJsonConfigDocument;
-  /// This will contain the spill value
-  Spill* _spill_cpp;
   /// This will contain all SciFi elements in MICE
   std::vector<const MiceModule*> SF_modules;
   /// Mean number of dark count PE
   double poisson_mean;
-  ///  JsonCpp setup
-  Json::Reader reader;
 };
 } // end namespace
 
