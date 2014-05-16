@@ -23,7 +23,7 @@ from Configuration import Configuration
 import maus_cpp.converter
 from _MapCppGlobalPID import MapCppGlobalPID
 
-class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
+class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalPID"""
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103

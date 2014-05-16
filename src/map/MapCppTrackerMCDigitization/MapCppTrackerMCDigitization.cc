@@ -68,7 +68,7 @@ void MapCppTrackerMCDigitization::_death() {
 void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
   Spill& spill = *(data->GetSpill());
 
-  if (!spill.GetMCEvents() ) {
+  if (!spill.GetMCEvents()) {
     throw MAUS::Exception(Exception::recoverable,
             "MC event array not initialised.",
             "MapCppTrackerMCDigitization::process");

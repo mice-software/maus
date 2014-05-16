@@ -88,7 +88,7 @@ void MapCppTOFSpacePoints::_process(Json::Value* document) const {
   std::cout << "DEBUG MapCppTOFSpacePoints::process| Entry Checkpoint"
             << std::endl;
   //  JsonCpp setup
-  Json::Value& root = *document; 
+  Json::Value& root = *document;
   if (!_map_init) {
     throw MAUS::Exception(Exception::recoverable,
                           "Failed to initialize calibration map",
@@ -141,8 +141,8 @@ void MapCppTOFSpacePoints::_process(Json::Value* document) const {
                       << n_station << std::endl;
             root["recon_events"][n_event]["tof_event"]["tof_space_points"]
                  [detector] = processTOFStation(xSlabHits,
-                                                detector, 
-                                                n_event, 
+                                                detector,
+                                                n_event,
                                                 triggerhit_pixels);
         }
         // The slab hit document is now modified. The calibrated time
@@ -215,7 +215,7 @@ Json::Value MapCppTOFSpacePoints::processTOFStation(
     if (triggerhit_pixels[part_event] != "unknown") {
       // Create the space point. Add the calibrated value of the time to the
       // slab hits.
-      xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent, 
+      xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent,
                                                  xPlane0Hits,
                                                  xPlane1Hits,
                                                  triggerhit_pixels);

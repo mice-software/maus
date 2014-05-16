@@ -76,7 +76,8 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         # Spill 1 is corrupted.
         spill_1 = _file.readline().rstrip()
         output_1 = self.mapper.process(spill_1)
-        self.assertFalse("recon_events" in maus_cpp.converter.json_repr(output_1))
+        self.assertFalse(
+                      "recon_events" in maus_cpp.converter.json_repr(output_1))
         # Spill 2 is sane.
         print "*********************** WARNING - TRACKER UNPACKING WILL FAIL "+\
               "DUE TO INCOMPATIBLE DATA STRUCTURE (rogers) ******************"
@@ -86,7 +87,7 @@ class MapCppTrackerDigitsTestCase(unittest.TestCase):
         # spill 3 is end of event
         spill_3 = _file.readline().rstrip()
         output_3 = self.mapper.process(spill_3)
-        self.assertTrue("errors" in maus_cpp.converter.json_repr(output_2))
+        self.assertTrue("errors" in maus_cpp.converter.json_repr(output_3))
         # Close file.
         _file.close()
 
