@@ -39,7 +39,7 @@ class SciFiSpacePointProcessor : public ObjectProcessor<SciFiSpacePoint> {
     DoubleProcessor _double_proc;
     StringProcessor _string_proc;
     ThreeVectorProcessor _three_vec_proc;
-    PointerArrayProcessor<SciFiCluster> _sf_cluster_array_proc;
+    ReferenceArrayProcessor<SciFiCluster> _sf_cluster_array_proc;
 };
 } // ~namespace MAUS
 

@@ -18,8 +18,7 @@
 
 namespace MAUS {
 
-SciFiSpacePointProcessor::SciFiSpacePointProcessor()
-                         : _sf_cluster_array_proc(new SciFiClusterProcessor) {
+SciFiSpacePointProcessor::SciFiSpacePointProcessor() {
 
     RegisterValueBranch("used", &_bool_proc,
                         &SciFiSpacePoint::is_used,
