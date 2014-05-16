@@ -82,8 +82,10 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # changed checksum to reflect the run_num addition
         # changed checksum from ca8fb803f65c2ef93327379bee9399d0
         # to reflect new changes due to the cpp data - Dec 1,2013
+        # changed checksum from 08bdfba7e5cad1b8da503742c545a7c8
+        # to reflect changes from addition of raw tracker data - 16/05/2014
         self.assertEqual(digester.hexdigest(), \
-                         '08bdfba7e5cad1b8da503742c545a7c8')
+                         '2ca9328c6bf981fb242b3d985d226125')
 
         self.assertTrue(self.mapper.death())
 
