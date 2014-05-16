@@ -78,7 +78,9 @@ void RefManager::SetPointerAsValue
         throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " to hash table when it was already added",
+                     " to C++ hash table at json address "+json_address+
+                     " when it was already added at json address "+
+                     table->_data_hash[pointer],
                      "CppToJson::RefManager::SetPointerAsValue(...)"));
     table->_data_hash[pointer] = json_address;
 
@@ -93,7 +95,9 @@ void RefManager::SetPointerAsValue
         throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " to TObject hash table when it was already added",
+                     " to TObject hash table at json address "+json_address+
+                     " when it was already added at json address "+
+                     table->_data_hash[pointer],
                      "CppToJson::RefManager::SetPointerAsValue(...)"));
       tableTObject->_data_hash[tobject_pointer] = json_address;
     }
