@@ -101,21 +101,21 @@ namespace MAUS {
 
     if ( _spill->GetReconEvents() ) {
       for ( unsigned int event_i = 0;
-	    event_i < _spill->GetReconEvents()->size(); ++event_i ) {
+        event_i < _spill->GetReconEvents()->size(); ++event_i ) {
         MAUS::GlobalEvent* global_event =
-	  _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
+        _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
         std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
-	  global_event->get_tracks();
+        global_event->get_tracks();
         for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-	     ++track_i) {
+             ++track_i) {
           MAUS::DataStructure::Global::Track* track =
-	    GlobalTrackArray->at(track_i);
+          GlobalTrackArray->at(track_i);
           // doubles to hold cumulative log likelihoods for each hypothesis
           double logL_200MeV_mu_plus = 0;
           double logL_200MeV_e_plus = 0;
           double logL_200MeV_pi_plus = 0;
           for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-	       ++pid_var_count) {
+               ++pid_var_count) {
             std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
             if (hyp == "200MeV_mu_plus") {
               if (_pid_vars[pid_var_count]->logL(track) == 1) {
@@ -137,27 +137,27 @@ namespace MAUS {
               }
             } else {
               Squeak::mout(Squeak::error) << "Unrecognised particle hypothesis,"
-	          << " MapCppGlobalPID::process" << std::endl;
-	    }
+                  << " MapCppGlobalPID::process" << std::endl;
+            }
           }
           if ((logL_200MeV_mu_plus - logL_200MeV_e_plus > 0.5) &&
               (logL_200MeV_mu_plus - logL_200MeV_pi_plus > 0.5)) {
             track->set_pid(MAUS::DataStructure::Global::kMuPlus);
           } else if ((logL_200MeV_e_plus - logL_200MeV_mu_plus > 0.5) &&
-		     (logL_200MeV_e_plus - logL_200MeV_pi_plus > 0.5)) {
+                     (logL_200MeV_e_plus - logL_200MeV_pi_plus > 0.5)) {
             track->set_pid(MAUS::DataStructure::Global::kEPlus);
           } else if ((logL_200MeV_pi_plus - logL_200MeV_mu_plus > 0.5) &&
-		     (logL_200MeV_pi_plus - logL_200MeV_e_plus > 0.5)) {
+                     (logL_200MeV_pi_plus - logL_200MeV_e_plus > 0.5)) {
             track->set_pid(MAUS::DataStructure::Global::kPiPlus);
           } else {
             Squeak::mout(Squeak::error) << "PID for track could not be" <<
-	      " determined." << std::endl;
+                                           " determined." << std::endl;
             continue;
           }
           Squeak::mout(Squeak::error) << "PID of track : " <<
-	    track->get_pid() << std::endl;
+          track->get_pid() << std::endl;
         }
       }
-      }
+    }
   }
 } // ~MAUS

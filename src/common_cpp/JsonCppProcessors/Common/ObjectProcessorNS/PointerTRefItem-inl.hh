@@ -101,7 +101,7 @@ void PointerTRefItem<ParentType>::_SetJsonChild
   }
   parent_json[_branch] = Json::Value();
   BaseItem<ParentType>::SetPath(parent_json);
-  using ReferenceResolver::CppToJson::TypedResolver;
+  using ReferenceResolver::CppToJson::TypedResolver; SHOULD THIS BE TRefResolver??? As Per _SetCppChild(...) defined above
   using ReferenceResolver::CppToJson::RefManager;
   if (RefManager::HasInstance()) {
     TypedResolver<TObject>* res = new TypedResolver<TObject>
