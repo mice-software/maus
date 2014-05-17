@@ -43,9 +43,14 @@ void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
                    JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
     child = Json::Value();
     // will throw if pointer is not in the RefManager
-    std::string json_address =
+    try {
+        std::string json_address =
                       RefManager::GetInstance().GetPointerAsValue(_cpp_pointer);
-    child["$ref"] = Json::Value(json_address);
+        child["$ref"] = Json::Value(json_address);
+    } catch (MAUS::Exception& exc) {
+        exc.SetMessage(exc.GetMessage()+"\n"+"Error at address "+_json_pointer);
+        throw exc;
+    }
 }
 
 
