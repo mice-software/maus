@@ -42,7 +42,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
     Output still to be determined.
     """
     # initialize class
-    def __init__(self): #pylint: disable = R0903, R0902, C0103
+    def __init__(self, base_dir=''): #pylint: disable = R0903, R0902, C0103
         # initialize input data arrays
         self.refpoints  = []
         self.datapoints = []
@@ -51,9 +51,11 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         inputs = Configuration().getConfigJSON(command_line_args = True)
         config_dict = json.loads(inputs)
         # get the gdml directory
-        self.dl_dir = os.path.join(
-            config_dict['geometry_download_directory'],'gdml')
-        
+        self.dl_dir = base_dir
+        if base_dir == '':
+            self.dl_dir = os.path.join(
+                config_dict['geometry_download_directory'],'gdml')
+            
         # 
         # extract data files from configuration files
         # 

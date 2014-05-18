@@ -19,6 +19,7 @@ R. Bayes
 
 import os
 import unittest
+import json
 import geometry
 from Configuration import Configuration
 from geometry.LocationFit import  ElementRotationTranslation
@@ -34,21 +35,15 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         test_location_fit::setUp This sets some variables for the tests
         """
-        # inputs = Configuration().getConfigJSON(command_line_args = False)
-        # config_dict = json.loads(inputs)
+        
         self.maus = os.environ['MAUS_ROOT_DIR']
         self.constructor = None
         test_locationfit = '/tests/py_unit/test_geometry/testCases/testLocationFit/'
-        # config_dict['geometry_download_director'] = self.maus + test_locationfit
-        # Initialize the fitting algorithm
-        self.fittest = ElementRotationTranslation()
-        # Update input variables independent of configuration defaults.
-        self.fittest.DataFile = ''
-        self.fittest.RefFile  = ''
-        self.UseGDML = True
         
-        self.fittest.dl_dir = self.maus + test_locationfit
-        self.fittest.defineGDMLVariables()
+        data_dir = self.maus + test_locationfit
+        # Initialize the fitting algorithm
+        self.fittest = ElementRotationTranslation(data_dir)
+        
         # define the expected resolution for resampling the data
         self.sigmax = self.sigmay = self.sigmaz = 5. # 5mm position resolution
         self.sthetax = self.sthetay = self.sthetaz = 0.5 # 200 mrad
