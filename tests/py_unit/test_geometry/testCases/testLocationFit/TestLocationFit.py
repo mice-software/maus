@@ -16,9 +16,11 @@ R. Bayes
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable=C0103, R0903, W0232, E0611, R0914, R0915, W0612
 
+import unittest
 import os
-import geometry
+# import geometry
 # from geometry.ConfigReader import Configreader
 from geometry.LocationFit import  ElementRotationTranslation
 from ROOT import TRandom3
@@ -37,11 +39,15 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         """
         self.maus = os.environ['MAUS_ROOT_DIR']
         self.constructor = None
-        test_locationfit = 'tests/py_unit/test_geometry/testCases/testLocationFit/'
-        fourPoints = 'MICE_Information/Detector_Information/EMR'
+        # test_locationfit = \
+        #     'tests/py_unit/test_geometry/testCases/testLocationFit/'
+        # fourPoints = 'MICE_Information/Detector_Information/EMR'
         self.fittest = ElementRotationTranslation()
 
-def testFittingPulls():
+def testFittingPulls(): #pylint disable=C0324
+    """
+    check fits and pull distributions
+    """
     # Initialize the random number generator
     rand = TRandom3()
     # Intialize histograms for the fit validation
@@ -80,21 +86,21 @@ def testFittingPulls():
     i = 0
     while i < 1000:
         # Sample the random distributions
-        dx = rand.Gaus(0,sigmax)
-        dy = rand.Gaus(0,sigmay)
-        dz = rand.Gaus(0,sigmaz)
-        dtx = rand.Gaus(0,sthetax)
-        dty = rand.Gaus(0,sthetay)
-        dtz = rand.Gaus(0,sthetaz)
+        dx = rand.Gaus(0, sigmax)
+        dy = rand.Gaus(0, sigmay)
+        dz = rand.Gaus(0, sigmaz)
+        dtx = rand.Gaus(0, sthetax)
+        dty = rand.Gaus(0, sthetay)
+        dtz = rand.Gaus(0, sthetaz)
         par0 = [dx, dy, dz, dtx, dty, dtz]
         newdatapoints = []
         # Rotate the data based on the random variations
         for point in data:
             rotpoint = fittest.ApplyRotations(point[0], par0)
             # also apply random noise in positions
-            rotpoint[0] += rand.Gaus(0,drnoise)
-            rotpoint[1] += rand.Gaus(0,drnoise)
-            rotpoint[2] += rand.Gaus(0,drnoise)
+            rotpoint[0] += rand.Gaus(0, drnoise)
+            rotpoint[1] += rand.Gaus(0, drnoise)
+            rotpoint[2] += rand.Gaus(0, drnoise)
             newdatapoints.append([rotpoint, point[1]])
         fittest.datapoints = newdatapoints
         # Run the fit and extract the result
@@ -110,15 +116,21 @@ def testFittingPulls():
         hthy.Fill( (result[0][4] - dty) / result[1][4] )
         hthz.Fill( (result[0][5] - dtz) / result[1][5] )
         # iterate the counter
-        i+=1
+        i += 1
 
     # Check the behaviour of the pull histogram
-    print 'Mean of x position is ',hx.GetMean(),' with width ',hx.GetRMS()
-    print 'Mean of y position is ',hy.GetMean(),' with width ',hy.GetRMS()
-    print 'Mean of z position is ',hz.GetMean(),' with width ',hz.GetRMS()
-    print 'Mean of x rotation is ',hthx.GetMean(),' with width ',hthx.GetRMS()
-    print 'Mean of y rotation is ',hthy.GetMean(),' with width ',hthy.GetRMS()
-    print 'Mean of z rotation is ',hthz.GetMean(),' with width ',hthz.GetRMS()
+    print 'Mean of x position is ', hx.GetMean(), ' with width ', \
+          hx.GetRMS()
+    print 'Mean of y position is ', hy.GetMean(), ' with width ', \
+          hy.GetRMS()
+    print 'Mean of z position is ', hz.GetMean(), ' with width ', \
+          hz.GetRMS()
+    print 'Mean of x rotation is ', hthx.GetMean(), ' with width ', \
+          hthx.GetRMS()
+    print 'Mean of y rotation is ', hthy.GetMean(), ' with width ', \
+          hthy.GetRMS()
+    print 'Mean of z rotation is ', hthz.GetMean(), ' with width ', \
+          hthz.GetRMS()
         
     f = TFile("SurveyFitPull.root","recreate")
     hx.Write()

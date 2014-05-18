@@ -43,6 +43,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
     """
     # initialize class
     def __init__(self, base_dir=''): #pylint: disable = R0903, R0902, C0103
+        """
+        Initialize arrays and arguments
+        """
         # initialize input data arrays
         self.refpoints  = []
         self.datapoints = []
@@ -83,6 +86,9 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         self.result = []
 
     def defineGDMLVariables(self):
+        """
+        setup gdml file, parse and verify it
+        """
         # The survey information is in the CAD geometry
         # file which should have one of these names
         fnames = ['fastradModel.gdml', 'FastradModel.gdml', 'Step_IV.gdml']
