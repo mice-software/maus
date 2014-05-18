@@ -28,7 +28,7 @@ MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
 DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
             'Tracker0.gdml', 'Tracker1.gdml',\
             'KL.gdml', 'Ckov1.gdml', 'Ckov2.gdml', 'Disk_LiH.gdml',\
-            'Wedge_LiH_90.gdml', 'Wedge_LiH_45.gdml', 'LH2.gdml']
+            'Wedge_LiH_90.gdml', 'Wedge_LiH_45.gdml', 'LH2.gdml','EMR.gdml']
 
 class GDMLtomaus(): #pylint: disable = R0903
     """
