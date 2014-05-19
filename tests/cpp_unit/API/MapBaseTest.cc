@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <Python.h>
+
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -24,22 +26,22 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
 
 namespace MAUS {
-
-
-  class MyMapper : public MapBase<double, int> {
+  class DataMapper : public MapBase<Data> {
   public:
-    MyMapper() : MapBase<double, int>("TestClass") {}
-    MyMapper(const MyMapper& mm) : MapBase<double, int>(mm) {}
-    virtual ~MyMapper() {}
+    DataMapper() : MapBase<Data>("DataClass") {}
+    DataMapper(const DataMapper& mm) : MapBase<Data>(mm) {}
+    virtual ~DataMapper() {}
 
   private:
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _process(double* t) const {
-      return new int(*t);
+    virtual void _process(Data* data) const {
+        int run_number = data->GetSpill()->GetRunNumber();
+        data->GetSpill()->SetRunNumber(run_number+1);
     }
 
   private:
@@ -47,176 +49,124 @@ namespace MAUS {
     FRIEND_TEST(MapBaseTest, TestCopyConstructor);
   };
 
-  class MyMapper_maus_exception : public MyMapper {
+  class PyObjectMapper : public MapBase<PyObject> {
   public:
-    MyMapper_maus_exception() : MyMapper() {}
+    PyObjectMapper() : MapBase<PyObject>("JsonClass") {}
+    PyObjectMapper(const PyObjectMapper& mm) : MapBase<PyObject>(mm) {}
+    virtual ~PyObjectMapper() {}
 
   private:
-    virtual int* _process(double* t) const {
+    virtual void _birth(const std::string&) {}
+    virtual void _death() {}
+
+    virtual void _process(PyObject* data) const {
+        PyObject* py_run = PyDict_GetItemString(data, "run_number");
+        int run = PyLong_AsLong(py_run);
+        py_run = PyLong_FromLong(run+1);
+        PyDict_SetItemString(data, "run_number", py_run);
+    }
+
+  private:
+    FRIEND_TEST(MapBaseTest, TestConstructor);
+    FRIEND_TEST(MapBaseTest, TestCopyConstructor);
+  };
+
+
+  class DataMapper_maus_exception : public DataMapper {
+  public:
+    DataMapper_maus_exception() : DataMapper() {}
+
+  private:
+    virtual void _process(Data* data) const {
       throw MAUS::Exception(MAUS::Exception::recoverable,
 		   "Expected Test MAUS::Exception in _process",
 		   "int* _process(double* t) const");
     }
   };
 
-  class MyMapper_exception : public MyMapper {
+  class DataMapper_exception : public DataMapper {
   public:
-    MyMapper_exception() : MyMapper() {}
+    DataMapper_exception() : DataMapper() {}
 
   private:
-    virtual int* _process(double* t) const {
+    virtual void _process(Data* data) const {
       throw std::exception();
     }
   };
 
-  class MyMapper_otherexcept : public MyMapper {
+  class DataMapper_otherexcept : public DataMapper {
   public:
-    MyMapper_otherexcept() : MyMapper() {}
+    DataMapper_otherexcept() : DataMapper() {}
 
   private:
-    virtual int* _process(double* t) const {throw 17;}
+    virtual void _process(Data* t) const {throw 17;}
   };
-
-  class MyMapper_converter : public MapBase<Data, int> {
-  public:
-    MyMapper_converter() : MapBase<Data, int>("TestClass") {}
-    MyMapper_converter(const MyMapper_converter& mm) : MapBase<Data, int>(mm) {}
-    virtual ~MyMapper_converter() {}
-
-  private:
-    virtual void _birth(const std::string&) {}
-    virtual void _death() {}
-
-    virtual int* _process(Data* t) const {
-      return new int(999);
-    }
-  };
-
 
   TEST(MapBaseTest, TestConstructor) {
-    MyMapper m;
-
-    ASSERT_FALSE(strcmp("TestClass", m._classname.c_str()))
-      << "Fail: Constructor failed, Classname not set properly"
-      << std::endl;
+    DataMapper m;
+    EXPECT_EQ("DataClass", m._classname);
   }
 
   TEST(MapBaseTest, TestCopyConstructor) {
-    MyMapper tc1;
-    MyMapper tc2(tc1);
-
-    ASSERT_FALSE(strcmp("TestClass", tc2._classname.c_str()))
-      << "Fail: Copy Constructor failed, Classname not set properly"
-      << std::endl;
+    DataMapper tc1;
+    DataMapper tc2(tc1);
+    EXPECT_EQ("DataClass", tc2._classname);
   }
 
   TEST(MapBaseTest, TestBirth) {
-    MyMapper tc1;
-    try {
-      tc1.birth("TestConfig");
-    }
-    catch (...) {
-      ASSERT_TRUE(false)
-	<<"Fail: Birth function failed. Check ModuleBaseTest"
-	<< std::endl;
-    }
+    DataMapper tc1;
+    tc1.birth("TestConfig");
   }
 
   TEST(MapBaseTest, TestDeath) {
-    MyMapper tc1;
-    try {
-      tc1.death();
-    }
-    catch (...) {
-      ASSERT_TRUE(false)
-	<<"Fail: Death function failed. Check ModuleBaseTest"
-	<< std::endl;
-    }
+    DataMapper tc1;
+    tc1.death();
   }
 
-  TEST(MapBaseTest, TestSameTypeProcess) {
-    MyMapper mm;
-
-    double* d = new double(27.3445);
-
-    int* i = mm.process(d);
-
-    ASSERT_TRUE(*i == 27)
-      <<"Fail: _process method not called properly"
-      <<std::endl;
-
-    /////////////////////////////////////////////////////
-    MyMapper mm2;
-    try {
-      double* dub = 0;
-      mm2.process(dub);
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
-    }
-    catch (NullInputException& e) {}
-    catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type NullInputException to be thrown"
-	<< std::endl;
-    }
-    /////////////////////////////////////////////////////
-    MyMapper_maus_exception mm_s;
-    try {
-      mm_s.process(d);
-    }
-    catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: MAUS::Exception should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyMapper_exception mm_e;
-    try {
-      mm_e.process(d);
-    }
-    catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: MAUS::Exception should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    MyMapper_otherexcept mm_oe;
-    try {
-      mm_oe.process(d);
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
-    }
-    catch (UnhandledException& e) {}
-    catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
-    }
-
-    delete d;
-    delete i;
+  PyObject* data_as_pyobj() {
+    Data* data_in = new Data();
+    Spill* spill = new Spill();
+    data_in->SetSpill(spill);
+    EXPECT_EQ(spill->GetRunNumber(), 0);
+    // py_data_0 now owns memory allocated to data_in
+    PyObject* py_data_0 = PyObjectWrapper::wrap(data_in);
+    return py_data_0;
   }
 
-  TEST(MapBaseTest, TestOtherTypeProcess) {
-    std::string minimal_spill =
-        std::string("{\"spill_number\":1, \"run_number\":-1, ")+
-        std::string("\"daq_event_type\":\"physics_event\", ")+
-        std::string("\"maus_event_type\":\"Spill\", ")+
-        std::string("\"errors\":{\"an_error\":\"message\"}}");
-    Json::Value json_in;
-    ASSERT_NO_THROW(json_in = JsonWrapper::StringToJson(minimal_spill))
-                                                               << minimal_spill;
-    MyMapper_converter mm_c;
-    int* out = mm_c.process(&json_in);
-    ASSERT_EQ(*out, 999)
-      << "Fail: Processing of alternate input type failed possibly "
-      << "as a result of conversion failure."
-      << std::endl;
-    delete out;
+  TEST(MapBaseTest, TestDataMapperProcessData) {
+    DataMapper map;
+    PyObject* py_data_0 = data_as_pyobj();
+    PyObject* py_data_1 = map.process_pyobj(py_data_0);
+    Data* data_out = PyObjectWrapper::unwrap<Data>(py_data_1);
+    EXPECT_EQ(data_out->GetSpill()->GetRunNumber(), 1);
+    EXPECT_EQ(py_data_1->ob_refcnt, 1);
+    EXPECT_EQ(py_data_0->ob_refcnt, 1);
+    delete data_out;
+    Py_DECREF(py_data_1);
+    Py_DECREF(py_data_0);
   }
 
-}// end of namespace
+  TEST(MapBaseTest, TestPyObjectMapperProcessData) {
+    PyObjectMapper map;
+    PyObject* py_data_0 = data_as_pyobj();
+    PyObject* py_object_0 = PyObjectWrapper::unwrap<PyObject>(py_data_0);
+    PyObject* py_object_1 = map.process_pyobj(py_object_0);
+    Data* data_out = PyObjectWrapper::unwrap<Data>(py_object_1);
+    EXPECT_EQ(data_out->GetSpill()->GetRunNumber(), 1);
+    EXPECT_EQ(py_object_1->ob_refcnt, 1);
+    EXPECT_EQ(py_object_0->ob_refcnt, 1);
+    EXPECT_EQ(py_data_0->ob_refcnt, 1);
+    delete data_out;
+    Py_DECREF(py_object_1);
+    Py_DECREF(py_object_0);
+    Py_DECREF(py_data_0);
+  }
+
+  TEST(MapBaseTest, TestExceptionHandlingProcess) {
+    PyObject* py_data_0 = data_as_pyobj();
+    DataMapper_maus_exception().process_pyobj(py_data_0);
+    DataMapper_exception().process_pyobj(py_data_0);
+    EXPECT_THROW(DataMapper_otherexcept().process_pyobj(py_data_0), Exception);
+  }
+}  // end of namespace
+

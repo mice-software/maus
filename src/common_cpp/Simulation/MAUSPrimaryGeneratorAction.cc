@@ -30,7 +30,6 @@
 
 #include "src/legacy/Config/MiceModule.hh"
 
-#include "src/legacy/Interface/STLUtils.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 
@@ -91,6 +90,9 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->SetParticleEnergy(part.energy-particle->GetPDGMass());
   gun->SetParticleMomentumDirection(G4ThreeVector
                                  (part.px, part.py, part.pz));
+  gun->
+  SetParticlePolarization(G4ThreeVector
+                                   (part.sx, part.sy, part.sz));
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
   if ( part.seed < 0 || part.seed > uint_max ) {
@@ -114,8 +116,8 @@ bool MAUSPrimaryGeneratorAction::isInWorldVolume(double x, double y, double z) {
 }
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle()
-  : x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.), energy(0.), pid(0),
-  seed(0) {
+  : x(0.), y(0.), z(0.), time(0.), px(0.), py(0.), pz(0.),
+    sx(0.), sy(0.), sz(0.), energy(0.), pid(0), seed(0) {
 }
 
 void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
@@ -140,6 +142,16 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
   px = JsonWrapper::GetProperty(mom, "x", JsonWrapper::realValue).asDouble();
   py = JsonWrapper::GetProperty(mom, "y", JsonWrapper::realValue).asDouble();
   pz = JsonWrapper::GetProperty(mom, "z", JsonWrapper::realValue).asDouble();
+  try {
+      Json::Value spin = JsonWrapper::GetProperty
+                                 (particle, "spin", JsonWrapper::objectValue);
+      sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();
+      sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();
+      sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();
+  } catch (MAUS::Exception exc) {
+      // it's okay, caller is not interested in spin
+  }
+  // theta = px/pz;
   energy = JsonWrapper::GetProperty
                         (particle, "energy", JsonWrapper::realValue).asDouble();
   time = JsonWrapper::GetProperty
@@ -156,10 +168,14 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   mom["x"] = Json::Value(px);
   mom["y"] = Json::Value(py);
   mom["z"] = Json::Value(pz);
-
+  Json::Value spin(Json::objectValue);
+  spin["x"] = Json::Value(sx);
+  spin["y"] = Json::Value(sy);
+  spin["z"] = Json::Value(sz);
   Json::Value particle(Json::objectValue);
   particle["position"] = pos;
   particle["momentum"] = mom;
+  particle["spin"] = spin;
   particle["particle_id"] = Json::Value(pid);
   particle["random_seed"] = Json::Value(Json::Int(seed));
 
@@ -195,6 +211,9 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     px = hit.GetMomentum().x();
     py = hit.GetMomentum().y();
     pz = hit.GetMomentum().z();
+    sx = hit.GetSpin().x();
+    sy = hit.GetSpin().y();
+    sz = hit.GetSpin().z();
     energy = hit.GetEnergy();
     pid = hit.GetPID();
     seed = 0;
@@ -208,6 +227,7 @@ Primary MAUSPrimaryGeneratorAction::PGParticle::GetPrimary() {
   prim.SetEnergy(energy);
   prim.SetPosition(ThreeVector(x, y, z));
   prim.SetMomentum(ThreeVector(px, py, pz));
+  prim.SetSpin(ThreeVector(sx, sy, sz));
   return prim;
 }
 

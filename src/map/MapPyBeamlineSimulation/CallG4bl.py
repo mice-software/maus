@@ -16,8 +16,6 @@ Class to call G4BL and generate primaries for MAUS
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-#pylint: disable=W0611
-
 import cdb 
 from cdb import Beamline
 import random
@@ -58,8 +56,10 @@ class CallG4bl: #pylint: disable=R0903
         self.pdgid_mass = {}
 
         self.pdgid_mass = {'211':139.5700, '-211':139.5700, '2212':938.27231, \
-        '-13':105.6584, '13':105.6584, '11':0.5109906, '-11':0.5109906, \
-        '22':0, '2112':939.5653, '14':0, '-14':0} #pylint: disable=C0103
+            '-13':105.6584, '13':105.6584, '11':0.5109906, '-11':0.5109906, \
+            '22':0, '2112':939.5653, '14':0, '-14':0, '12':0, '-12':0, \
+            '1000010020':1875.6, '1000010030':2808.9, \
+            '1000020030':2808.30665} #pylint: disable=C0103
 
         try:
             off = open(file_path+'/MAY09-B1B2-positives.in',"r")
@@ -266,7 +266,7 @@ class CallG4bl: #pylint: disable=R0903
                 key = 'entry'+str(i)
 
                 self.particles[key] = dict(position = dict(\
-                x = math.cos(theta) * float(element[0]) + 737.63,
+                x = math.cos(theta) * float(element[0]) + 392.39,
                 y = float(element[1]), 
                 z = math.sin(theta) * float(element[0]) - deltaz))
 
@@ -281,8 +281,8 @@ class CallG4bl: #pylint: disable=R0903
             except IOError as err:
                 print('Bad G4beamline file, not enough elements or empty file')
                 raise IOError(err)
-#        with open('G4BLoutput.txt', 'w') as outfile:
-#              json.dump(self.particles, outfile)
+        with open('maus_beam_output.txt', 'w') as outfile:
+            json.dump(self.particles, outfile)
 
 #        for i in range(0, len(line)):
 #            for j in range(i + 1, len(line)):

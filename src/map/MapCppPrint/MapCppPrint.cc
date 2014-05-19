@@ -24,6 +24,7 @@ std::string  MapCppPrint::process(std::string document) {
       Json::FastWriter writer;
       return writer.write(root);
   }
+  std::cout << "MapCppPrint output" << std::endl;
   std::cout << root;
 
   return document;

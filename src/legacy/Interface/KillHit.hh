@@ -13,8 +13,8 @@ class KillHit : public MCHit
   public :
 
     KillHit() : MCHit(), _reason("") {;}
-    KillHit( int trackID, int pdgID, double q, double m, Hep3Vector pos, Hep3Vector mom, double t, double energy, std::string reasonForDying) 
-           : MCHit(trackID, pdgID, q, m, pos, mom, t, 0, energy), _reason(reasonForDying)
+    KillHit( int trackID, int pdgID, double q, double m, Hep3Vector pos, Hep3Vector mom, double t, double energy,  Hep3Vector spin, std::string reasonForDying) 
+           : MCHit(trackID, pdgID, q, m, pos, mom, t, 0, energy, spin), _reason(reasonForDying)
 	{;}
     ~KillHit() {};
 

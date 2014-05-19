@@ -19,7 +19,7 @@
 namespace MAUS {
 VirtualHit::VirtualHit() : _station_id(0), _particle_id(0), _track_id(0),
       _time(0), _mass(0), _charge(0), _proper_time(0), _path_length(0),
-      _position(0, 0, 0), _momentum(0, 0, 0), _b_field(0, 0, 0),
+      _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0), _b_field(0, 0, 0),
       _e_field(0, 0, 0) {
 }
 
@@ -37,6 +37,7 @@ VirtualHit& VirtualHit::operator=(const VirtualHit& md) {
     _proper_time = md._proper_time;
     _path_length = md._path_length;
     _position = md._position;
+    _spin = md._spin;
     _momentum = md._momentum;
     _b_field = md._b_field;
     _e_field = md._e_field;
@@ -114,6 +115,15 @@ ThreeVector VirtualHit::GetPosition() const {
 void VirtualHit::SetPosition(ThreeVector position) {
     _position = position;
 }
+
+ThreeVector VirtualHit::GetSpin() const {
+    return _spin;
+}
+
+void VirtualHit::SetSpin(ThreeVector spin) {
+    _spin = spin;
+}
+
 
 ThreeVector VirtualHit::GetMomentum() const {
     return _momentum;

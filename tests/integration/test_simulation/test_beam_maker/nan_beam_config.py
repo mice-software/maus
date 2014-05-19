@@ -42,6 +42,7 @@ beam = {
        "reference":{
             "position":{"x":0.0, "y":0.0, "z":3.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "spin":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-13,
             "energy":105.659, # ~ muon mass
             "time":2.e6,
