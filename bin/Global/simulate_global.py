@@ -35,10 +35,12 @@ def run():
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
     # SciFi
-   # my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-   # my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
+    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
-    # Global Digits - post detector digitisation
+    # Global
+    my_map.append(MAUS.MapCppGlobalReconImport())
+    my_map.append(MAUS.MapCppGlobalTrackMatching())
 
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputPyJSON()

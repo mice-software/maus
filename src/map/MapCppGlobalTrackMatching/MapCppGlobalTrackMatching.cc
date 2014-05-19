@@ -15,68 +15,34 @@
  *
  */
 
-#include "src/map/MapCppGlobalPID/MapCppGlobalPID.hh"
+#include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
 
-#include "Interface/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "Interface/Squeak.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 
-
 namespace MAUS {
-  MapCppGlobalPID::MapCppGlobalPID() {
-    _classname = "MapCppGlobalPID";
+  MapCppGlobalTrackMatching::MapCppGlobalTrackMatching() {
+    _classname = "MapCppGlobalTrackMatching";
   }
 
-  bool MapCppGlobalPID::birth(std::string argJsonConfigDocument) {
+  bool MapCppGlobalTrackMatching::birth(std::string argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
       _configCheck = false;
       return false;
     }
-
-    char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-    if (!pMAUS_ROOT_DIR) {
-      Squeak::mout(Squeak::error)
-	<< "Could not find the $MAUS_ROOT_DIR env variable." << std::endl;
-      Squeak::mout(Squeak::error)
-	<< "Did you try running: source env.sh ?" << std::endl;
-      return false;
-    }
-
     _configCheck = true;
-
-    _hypotheses.clear();
-    _pid_vars.clear();
-
-    PDF_file = _configJSON["PID_PDFs_file"].asString();
-
-    _histFile = new TFile(PDF_file.c_str(), "READ");
-
-    // vector of hypotheses
-    // TODO(Pidcott) find a more elegant way of accessing hypotheses
-    _hypotheses.push_back("200MeV_mu_plus");
-    _hypotheses.push_back("200MeV_e_plus");
-    _hypotheses.push_back("200MeV_pi_plus");
-
-    for (unsigned int i =0; i < _hypotheses.size(); ++i) {
-      // vector of pid vars
-      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
-							   _hypotheses[i]));
-      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
-                                                           _hypotheses[i]));
-      // etc.
-      }
-
     return true;
   }
 
-  bool MapCppGlobalPID::death() {
+  bool MapCppGlobalTrackMatching::death() {
     return true;
   }
 
-  std::string MapCppGlobalPID::process(std::string document) const {
+  std::string MapCppGlobalTrackMatching::process(std::string document) const {
     Json::FastWriter writer;
     Json::Value root;
 
@@ -92,7 +58,7 @@ namespace MAUS {
     if (!_configCheck) {
       Json::Value errors;
       std::stringstream ss;
-      ss << _classname << " says: process was not passed a valid configuration";
+      ss << _classname << " says: process passed an invalid configuration";
       errors["bad_json_document"] = ss.str();
       root["errors"] = errors;
       return writer.write(root);
@@ -112,7 +78,7 @@ namespace MAUS {
       MAUS::CppErrorHandler::getInstance()->
 	HandleExceptionNoJson(exception, _classname);
       Squeak::mout(Squeak::error) << "String to Json conversion failed,"
-				  << "MapCppGlobalPID::process" << std::endl;
+		<< "MapCppGlobalTrackMatching::process" << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -123,7 +89,8 @@ namespace MAUS {
     } catch (std::exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
       Squeak::mout(Squeak::error) << "String to Json conversion failed,"
-				  << "MapCppGlobalPID::process" << std::endl;
+				  << "MapCppGlobalTrackMatching::process"
+				  << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -146,7 +113,7 @@ namespace MAUS {
     }
 
     std::string maus_event = JsonWrapper::GetProperty(
-        *data_json, "maus_event_type",
+	*data_json, "maus_event_type",
 	JsonWrapper::stringValue).asString();
 
     if ( maus_event.compare("Spill") != 0 ) {
@@ -162,7 +129,7 @@ namespace MAUS {
 
     if ( daq_event.compare("physics_event") != 0 ) {
       Squeak::mout(Squeak::error) << "daq_event_type did not return a "
-				  << "physics event" << std::endl;
+	  << "physics event" << std::endl;
       delete data_json;
       return document;
     }
@@ -175,7 +142,7 @@ namespace MAUS {
       delete data_json;
     } catch (...) {
       Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
-          << " converting json->cpp, MapCppGlobalPID" << std::endl;
+	  << "converting json->cpp, MapCppGlobalTrackMatching" << std::endl;
     }
 
     if (!data_cpp) {
@@ -183,67 +150,24 @@ namespace MAUS {
 	std::string("\"Failed to convert Json to Cpp Spill object\"}}");
     }
 
-    const MAUS::Spill* _spill = data_cpp->GetSpill();
+    const MAUS::Spill* spill = data_cpp->GetSpill();
 
-    if ( _spill->GetReconEvents() ) {
-      for ( unsigned int event_i = 0;
-	    event_i < _spill->GetReconEvents()->size(); ++event_i ) {
-        MAUS::GlobalEvent* global_event =
-	  _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
-        std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
-	  global_event->get_tracks();
-        for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-	     ++track_i) {
-          MAUS::DataStructure::Global::Track* track =
-	    GlobalTrackArray->at(track_i);
-	  if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
-          // doubles to hold cumulative log likelihoods for each hypothesis
-          double logL_200MeV_mu_plus = 0;
-          double logL_200MeV_e_plus = 0;
-          double logL_200MeV_pi_plus = 0;
-          for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-	       ++pid_var_count) {
-            std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
-            if (hyp == "200MeV_mu_plus") {
-              if (_pid_vars[pid_var_count]->logL(track) == 1) {
-                continue;
-              } else {
-                logL_200MeV_mu_plus += _pid_vars[pid_var_count]->logL(track);
-              }
-            } else if (hyp == "200MeV_e_plus") {
-              if (_pid_vars[pid_var_count]->logL(track) == 1) {
-                continue;
-              } else {
-                logL_200MeV_e_plus += _pid_vars[pid_var_count]->logL(track);
-              }
-            } else if (hyp == "200MeV_pi_plus") {
-              if (_pid_vars[pid_var_count]->logL(track) == 1) {
-                continue;
-              } else {
-                logL_200MeV_pi_plus += _pid_vars[pid_var_count]->logL(track);
-              }
-            } else {
-              Squeak::mout(Squeak::error) << "Unrecognised particle hypothesis,"
-	          << " MapCppGlobalPID::process" << std::endl;
-	    }
-          }
-          if ((logL_200MeV_mu_plus - logL_200MeV_e_plus > 0.5) &&
-              (logL_200MeV_mu_plus - logL_200MeV_pi_plus > 0.5)) {
-            track->set_pid(MAUS::DataStructure::Global::kMuPlus);
-          } else if ((logL_200MeV_e_plus - logL_200MeV_mu_plus > 0.5) &&
-		     (logL_200MeV_e_plus - logL_200MeV_pi_plus > 0.5)) {
-            track->set_pid(MAUS::DataStructure::Global::kEPlus);
-          } else if ((logL_200MeV_pi_plus - logL_200MeV_mu_plus > 0.5) &&
-		     (logL_200MeV_pi_plus - logL_200MeV_e_plus > 0.5)) {
-            track->set_pid(MAUS::DataStructure::Global::kPiPlus);
-          } else {
-            Squeak::mout(Squeak::error) << "PID for track could not be" <<
-	      " determined." << std::endl;
-            continue;
-          }
-        }
-      }
-      }
+    MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
+
+    if (!recon_events) {
+      delete data_cpp;
+      return document;
+    }
+
+    MAUS::GlobalEvent* global_event;
+    MAUS::ReconEventPArray::iterator recon_event_iter;
+    for (recon_event_iter = recon_events->begin();
+	 recon_event_iter != recon_events->end();
+	 ++recon_event_iter) {
+      // Load the ReconEvent, and import it into the GlobalEvent
+      MAUS::ReconEvent* recon_event = (*recon_event_iter);
+      global_event = MakeTracks(recon_event);
+    }
 
     data_json = cpp2jsonconverter(data_cpp);
 
@@ -257,5 +181,21 @@ namespace MAUS {
     delete data_json;
     delete data_cpp;
     return output_document;
+  }
+
+  MAUS::GlobalEvent*
+  MapCppGlobalTrackMatching::MakeTracks(MAUS::ReconEvent* recon_event) const {
+    if (!recon_event) {
+      throw(Exception(Exception::recoverable,
+		      "Trying to import an empty recon event.",
+		      "MapCppGlobalTrackMatching::Import"));
+    }
+
+    MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+
+    MAUS::recon::global::TrackMatching track_matching;
+    track_matching.FormTracks(global_event, _classname);
+    // Return the new GlobalEvent, to be added to the ReconEvent
+    return global_event;
   }
 } // ~MAUS

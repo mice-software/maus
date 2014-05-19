@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _SRC_MAP_MAPCPPGLOBALRECONIMPORT_H_
-#define _SRC_MAP_MAPCPPGLOBALRECONIMPORT_H_
+#ifndef _SRC_MAP_MAPCPPGLOBALTRACKMATCHING_H_
+#define _SRC_MAP_MAPCPPGLOBALTRACKMATCHING_H_
 
 // Python / C API
 #include <Python.h>
@@ -48,16 +48,14 @@
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "Recon/Global/ImportTOFRecon.hh"
-#include "Recon/Global/ImportSciFiRecon.hh"
 #include "Recon/Global/TrackMatching.hh"
 
 namespace MAUS {
 
-  class MapCppGlobalReconImport {
+  class MapCppGlobalTrackMatching {
   public:
     /** Constructor, setting the internal variable #_classname */
-    MapCppGlobalReconImport();
+    MapCppGlobalTrackMatching();
 
     /** Sets up the worker
      *
@@ -87,7 +85,7 @@ namespace MAUS {
      *                  
      * @return global_event The GlobalEvent with spacepoints and track(s)
      */
-    MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
+    MAUS::GlobalEvent* MakeTracks(MAUS::ReconEvent* recon_event) const;
 
   private:
     /// Check that a valid configuration is passed to the process

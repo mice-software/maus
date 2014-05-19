@@ -76,27 +76,27 @@ Whilst the PID framework comes with PDFs provided in PIDhists.root, it is possib
 \end{figure}
 \begin{itemize}
 \item Simulation: Production of MC data for a given particle 
-hypothesis. To produce and output the MC to a Json file, a copy of 
-simulate\_mice.py should be made, with the my\_output flag set to 
-MAUS.OutputPyJSON().
+hypothesis.
 \item Global Reconstruction: The MC data should then be passed through 
-the global reconstruction. Detector information is currently added global tracks using the GlobalReconImport.py script in \\
-\$\{MAUS\_ROOT\_DIR\}\textbackslash bin\textbackslash Global. This script calls the mapper 
-MapCppGlobalReconImport, which constructs the global tracks required 
-for the calculation of PID variables. The control variables to specify 
-the input Json data sample, and the name of the output Json file that 
-contains the reconstructed tracks can be set at the command line, or by 
+the global reconstruction. Detector information is currently to added to global tracks. Simulation and global recon can be performed 
+by using the simulate\_global.py script in \\
+\$\{MAUS\_ROOT\_DIR\}\textbackslash bin\textbackslash Global. As well as performing the simulation
+ and TOF and Tracker reconstruction, this script also calls the mappers  
+MapCppGlobalReconImport and MapCppGlobalTrackMatching, which import the detector 
+information into the global event and then construct the global tracks required 
+for the calculation of PID variables. The control variable to specify 
+the name of the output Json file that contains the reconstructed tracks can be set at the command line, or by 
 using another datacard, as shown in listing ~\ref{globaldatacard}. To run 
 the global reconstruction with the datacard, the following should be entered at the command line:
 
 \begin{lstlisting}[breaklines=true,basicstyle=\ttfamily]
-${MAUS_ROOT_DIR}/bin/Global/GlobalReconImport.py --configuration_file <name_of_datacard>
+${MAUS_ROOT_DIR}/bin/Global/simulate_global.py --configuration_file <name_of_datacard>
 \end{lstlisting}
 
 which for the example in ~\ref{globaldatacard} would be:
 
 \begin{lstlisting}[breaklines=true,basicstyle=\ttfamily]
-${MAUS_ROOT_DIR}/bin/Global/GlobalReconImport.py --configuration_file ex_global_datacard.py
+${MAUS_ROOT_DIR}/bin/Global/simulate_global.py --configuration_file ex_global_datacard.py
 \end{lstlisting}
 
 \item PDF Production: To produce the PDFs from the reconstructed MC 
@@ -112,7 +112,7 @@ This will create a directory within \$\{MAUS\_ROOT\_DIR\}\textbackslash files\te
 
 \vspace*{1\baselineskip}
 
-\begin{lstlisting}[language=Python,basicstyle=\ttfamily,frame=single,breaklines=true,commentstyle=\color{gray}, keywordstyle=\color{red}\bfseries,stringstyle=\color{green!50!black},captionpos=b,caption={An example datacard (ex\_global\_datacard.py) for use with GlobalReconImport.py},label=globaldatacard]
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,frame=single,breaklines=true,commentstyle=\color{gray}, keywordstyle=\color{red}\bfseries,stringstyle=\color{green!50!black},captionpos=b,caption={An example datacard (ex\_global\_datacard.py) for use with GlobalReconImport.py Other configuration flags can be added to this datacard, if they need to differ from those set in ConfigurationDefaults.py},label=globaldatacard]
 import os
 
 # A json document containing spills from MC data
@@ -270,8 +270,7 @@ will be added
 
 \subsubsection{PIDVarA}
 \label{PIDVarA}
-There is currently a single PID variable defined within the framework, 
-PIDVarA (see PIDVarA.hh and .cc), which uses the difference between the times measured at TOF1 
+PIDVarA (see PIDVarA.hh and .cc), uses the difference between the times measured at TOF1 
 and TOF0 as its variable. Only for tracks where there is a single TOF0 
 and a single TOF1 time measurement, and for which the time difference 
 between the detectors falls within the minimum and maximum set within 
@@ -279,6 +278,13 @@ the class, will a valid value of the variable be returned. Otherwise,
 the value of the variable is set to -1, such that it falls outside of 
 the allowed range for the variable, and so variable for the track is 
 not used in PDF production, or in the PID.
+
+\subsubsection{PIDVarB}
+\label{PIDVarB}
+PIDVarB uses the correlation between the momentum measured in the upstream tracker 
+and the difference between the times measured at TOF1 and TOF0 as its variable.
+It places the same constraints on accepted tracks as those used in PIDVarA.
+
 
 \clearpage
 
