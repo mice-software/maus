@@ -186,6 +186,7 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
         if count == 0:
             self.assertTrue(False, "output file is not of MAUS Module format")
         os.remove(self.out_put)      
-    
+
+        
 if __name__ == '__main__':
     unittest.main()

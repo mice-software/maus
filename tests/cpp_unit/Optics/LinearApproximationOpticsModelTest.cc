@@ -66,15 +66,13 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     (*config)["particle_decay"] = Json::Value(false);
     simulation->GetPhysicsList()->Setup();
 
-    std::stringstream reference_particle_string;
-    reference_particle_string
-      << std::setprecision(1)
-      << "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":" << kPrimaryPlane << "},"
-      << "\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},"
-      << "\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,"
-      << "\"random_seed\":2}";
-    (*config)["simulation_reference_particle"]
-      = JsonWrapper::StringToJson(reference_particle_string.str());
+    (*config)["simulation_reference_particle"] = JsonWrapper::StringToJson(
+      std::string("{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":-1000.0},")+
+      std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},")+
+      std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
+      std::string("\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,")+
+      std::string("\"random_seed\":2}")
+    );
 
     Json::Value ellipse(Json::objectValue);
     ellipse["Emittance_T"] = Json::Value(10.0);

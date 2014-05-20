@@ -57,6 +57,8 @@ class Data;
      * written as the top level in ROOT. To make it worse, Spill doesn't always
      * hold spill data - as DAQ sometimes spits out start_of_burst or
      * calibration data.
+     *
+     * Caller owns memory allocated to Json::Value* in return.
      */
     Json::Value* _convert(const Data*) const;
 

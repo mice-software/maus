@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for MapCppTOFDigits"""
+"""Tests for InputCppDAQData"""
 
 # pylint: disable = C0103
 
@@ -37,9 +37,10 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
         self._c = Configuration()
+        self._mapper = InputCppDAQData()
+
     def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
-        self._mapper = InputCppDAQData()
         self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))
         self.assertTrue(self._mapper.death())
         return

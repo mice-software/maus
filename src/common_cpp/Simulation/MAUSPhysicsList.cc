@@ -15,6 +15,7 @@
  *
  */
 
+#include <limits>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -22,12 +23,26 @@
 
 #include "json/json.h"
 
+
+
+#include "Geant4/G4ProcessManager.hh"
+#include "Geant4/G4ProcessTable.hh"
+#include "Geant4/G4ProcessVector.hh"
+
+#include "Geant4/G4ParticleTypes.hh"
+#include "Geant4/G4ParticleTable.hh"
+
+#include "Geant4/G4PionDecayMakeSpin.hh"
+#include "Geant4/G4MuonDecayChannelWithSpin.hh"
+#include "Geant4/G4MuonRadiativeDecayChannelWithSpin.hh"
+#include "Geant4/G4DecayWithSpin.hh"
+#include "Geant4/G4DecayPhysics.hh"
+#include "Geant4/G4DecayTable.hh"
+
 #include "Geant4/globals.hh"
 #include "Geant4/G4StepLimiter.hh"
 #include "Geant4/G4UserSpecialCuts.hh"
 #include "Geant4/G4UImanager.hh"
-#include "Geant4/G4ProcessTable.hh"
-#include "Geant4/G4ProcessVector.hh"
 #include "Geant4/G4PhysListFactory.hh"
 
 #include "Interface/Squeak.hh"
@@ -51,8 +66,9 @@ const int         MAUSPhysicsList::_nScatNames   = 9;
 const int         MAUSPhysicsList::_nELossNames  = 8;
 
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
-                                                       : G4VUserPhysicsList() {
+                                                       : G4VUserPhysicsList(), _polDecay(false) {
   _list = physList;
+  _list->RegisterPhysics(new G4DecayPhysics());
 }
 
 MAUSPhysicsList::~MAUSPhysicsList() {
@@ -103,9 +119,10 @@ void MAUSPhysicsList:: BeginOfRunAction() {
                               << "\n  hadronic model " << _hadronicModel
                               << "\n  particle decay " << _partDecay
                               << "\n  pi 1/2 life " << _piHalfLife
-                              << "\n  mu 1/2 life " << _muHalfLife << std::endl;
+                              << "\n  mu 1/2 life " << _muHalfLife
+                              << "\n polarised muons " << _polDecay
+                              << std::endl;
   SetStochastics(_msModel, _dEModel, _hadronicModel, _partDecay);
-  SetHalfLife(_piHalfLife, _muHalfLife);
 }
 
 void MAUSPhysicsList::SetStochastics(scat scatteringModel,
@@ -118,8 +135,18 @@ void MAUSPhysicsList::SetStochastics(scat scatteringModel,
 }
 
 void MAUSPhysicsList::SetDecay(bool decay) {
-  if (!decay) UIApplyCommand("/process/inactivate Decay");
-  else        UIApplyCommand("/process/activate   Decay");
+  if (decay) {
+      SetHalfLife(_piHalfLife, _muHalfLife);
+  } else {
+      // note that disabling decays makes a G4Exception, as per #1404
+      // This is a G4 bug.
+      //
+      // Here we just set the lifetime to be very long (this could cause a
+      // problem if user sets simulation time to be even longer, default
+      // max time is 1e9 nanoseconds
+      double life = std::numeric_limits<double>::max()/10.;
+      SetHalfLife(life, life);
+  }
 }
 
 
@@ -196,7 +223,23 @@ void MAUSPhysicsList::SetHadronic(hadronic hadronicModel) {
 
 void MAUSPhysicsList::ConstructParticle() {
     _list->ConstructParticle();
+    if (_polDecay == true) {
+        G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
+        MuonPlusDecayTable -> Insert(new G4MuonDecayChannelWithSpin
+                                                                ("mu+", 0.986));
+        MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin
+                                                                ("mu+", 0.014));
+        G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
+
+        G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
+        MuonMinusDecayTable -> Insert(new
+                               G4MuonDecayChannelWithSpin("mu-", 0.986));
+        MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin
+                                                                ("mu-", 0.014));
+        G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
+    }
 }
+
 
 void MAUSPhysicsList::ConstructProcess() {
     _list->ConstructProcess();  // BUG: Memory leak on G4 side
@@ -206,15 +249,50 @@ void MAUSPhysicsList::ConstructProcess() {
 void MAUSPhysicsList::SetSpecialProcesses() {
   theParticleIterator->reset();  // from G4VUserPhysicsList
   while ( (*theParticleIterator)() ) {
-    G4ProcessManager* pmanager = theParticleIterator->value()->
+    G4ProcessManager* fmanager = theParticleIterator->value()->
                                                             GetProcessManager();
     // step limiter for G4StepMax parameter; _limits exists for memory cleanup
     _limits.push_back(new G4StepLimiter);
-    pmanager->AddProcess(_limits.back(), -1, -1, 2);
+    fmanager->AddProcess(_limits.back(), -1, -1, 2);
     // track limiter for G4KinMax, etc
     _specialCuts.push_back(new G4UserSpecialCuts());
-    pmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
+    fmanager->AddProcess(_specialCuts.back(), -1, -1, 3);
   }
+  if (_polDecay == true) {
+        G4ProcessManager* pmanager = NULL;
+        G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
+        G4VProcess* decay = NULL;
+
+        ////////// MUON PLUS ///////////
+        pmanager = G4MuonPlus::MuonPlus()->GetProcessManager();
+        G4DecayWithSpin* decayWithSpinPlus = new G4DecayWithSpin();
+        decay = processTable->FindProcess("Decay", G4MuonPlus::MuonPlus());
+        if (pmanager) {
+            if (decay)
+                pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(decayWithSpinPlus);
+            processTable->Insert(decayWithSpinPlus,
+                                 G4MuonPlus::MuonPlus()->GetProcessManager());
+            // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager ->SetProcessOrdering(decayWithSpinPlus, idxPostStep);
+            pmanager ->SetProcessOrdering(decayWithSpinPlus, idxAtRest);
+        }
+
+        ////////// MUON MINUS ///////////
+        pmanager = G4MuonMinus::MuonMinus()->GetProcessManager();
+        G4DecayWithSpin* decayWithSpinMinus = new G4DecayWithSpin();
+        decay = processTable->FindProcess("Decay", G4MuonMinus::MuonMinus());
+        if (pmanager) {
+            if (decay)
+                pmanager->RemoveProcess(decay);
+            pmanager->AddProcess(decayWithSpinMinus);
+            processTable->Insert(decayWithSpinMinus,
+                                 G4MuonMinus::MuonMinus()->GetProcessManager());
+            // set ordering for PostStepDoIt and AtRestDoIt
+            pmanager->SetProcessOrdering(decayWithSpinMinus, idxPostStep);
+            pmanager->SetProcessOrdering(decayWithSpinMinus, idxAtRest);
+        }
+    }
 }
 
 void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
@@ -265,6 +343,8 @@ void MAUSPhysicsList::Setup() {
     }
 
     _partDecay = JsonWrapper::GetProperty(dc, "particle_decay",
+                                          JsonWrapper::booleanValue).asBool();
+    _polDecay = JsonWrapper::GetProperty(dc, "polarised_decay",
                                           JsonWrapper::booleanValue).asBool();
     _piHalfLife = JsonWrapper::GetProperty(dc, "charged_pion_half_life",
                                           JsonWrapper::realValue).asDouble();

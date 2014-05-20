@@ -80,6 +80,14 @@ class MAUSEvent {
      */
     virtual int GetSizeOf() const = 0;
 
+    /** Overloads ROOT::TObject ClassName(); returns EventType as a C string
+     *
+     *  There may be a way to achieve this functionality using RTypes macros
+     */
+    virtual const char*	ClassName() const {
+        return _event_type.c_str();
+    }
+
   private:
     std::string _event_type;
 

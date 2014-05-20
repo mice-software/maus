@@ -16,6 +16,9 @@
  */
 
 #include "Geant4/G4Run.hh"
+#include "Geant4/G4Event.hh"
+#include "Geant4/G4PrimaryVertex.hh"
+#include "Geant4/G4PrimaryParticle.hh"
 #include "Geant4/G4VVisManager.hh"
 #include "Geant4/G4UImanager.hh"
 

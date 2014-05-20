@@ -45,6 +45,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.particle = {"primary":{
                 "position":{"x":1.,"y":2.,"z":3.},
                 "momentum":{"x":4.,"y":5.,"z":6.},
+                "spin":{"x":0., "y":0., "z":1.},
                 "particle_id":-13,
                 "random_seed":1,
                 "energy":110.,

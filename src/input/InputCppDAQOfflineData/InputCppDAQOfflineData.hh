@@ -25,17 +25,17 @@
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
 namespace MAUS {
+/** \class InputCppDAQOfflineData
+* This class is used to access the DAQ data offline.
+*/
 
 class InputCppDAQOfflineData : public InputCppDAQData {
 
  public:
 
-  /** Create an instance of InputCppDAQData.
-  * 
-  * This is the constructor for InputCppDAQData.
+  /** Create an instance of InputCppDAQOfflineData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQOfflineData.
   */
   InputCppDAQOfflineData(std::string pDataPath = "", std::string pFilename = "");
 

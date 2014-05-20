@@ -64,8 +64,8 @@ namespace MAUS {
       // vector of pid vars
       _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
 							   _hypotheses[i]));
-      // _pid_vars.push_back(new MAUS::recon::global::PIDVarB(histFile,
-      //                                                      _hypotheses[i]));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
+                                                           _hypotheses[i]));
       // etc.
       }
 
@@ -108,12 +108,28 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch (...) {
+    } catch (Exception& exception) {
+      MAUS::CppErrorHandler::getInstance()->
+	HandleExceptionNoJson(exception, _classname);
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalPID::process" << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
       errors["bad_json_document"] = ss.str();
       root["errors"] = errors;
+      delete data_json;
+      return writer.write(root);
+    } catch (std::exception& exc) {
+      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalPID::process" << std::endl;
+      Json::Value errors;
+      std::stringstream ss;
+      ss << _classname << " says: Bad json document";
+      errors["bad_json_document"] = ss.str();
+      root["errors"] = errors;
+      delete data_json;
       return writer.write(root);
     }
 
@@ -180,6 +196,7 @@ namespace MAUS {
 	     ++track_i) {
           MAUS::DataStructure::Global::Track* track =
 	    GlobalTrackArray->at(track_i);
+	  if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
           // doubles to hold cumulative log likelihoods for each hypothesis
           double logL_200MeV_mu_plus = 0;
           double logL_200MeV_e_plus = 0;
@@ -224,8 +241,6 @@ namespace MAUS {
 	      " determined." << std::endl;
             continue;
           }
-          Squeak::mout(Squeak::error) << "PID of track : " <<
-	    track->get_pid() << std::endl;
         }
       }
       }

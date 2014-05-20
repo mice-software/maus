@@ -49,6 +49,7 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "Recon/Global/ImportTOFRecon.hh"
+#include "Recon/Global/ImportSciFiRecon.hh"
 #include "Recon/Global/TrackMatching.hh"
 
 namespace MAUS {

@@ -201,10 +201,8 @@ class Go: # pylint: disable=R0921, R0903
             pass
         try:
             mrd = os.environ["MAUS_ROOT_DIR"]
-            proc = subprocess.Popen(['bzr', 'status', mrd],
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            proc.wait()
-            bzr_status = proc.stdout.read()
+            bzr_status = subprocess.check_output(['bzr', 'status', mrd],
+                                                 stderr=subprocess.STDOUT)
         except (OSError, IOError):
             pass
         maus_version = json_datacards["maus_version"]

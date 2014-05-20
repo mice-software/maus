@@ -137,6 +137,9 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["momentum"]["x"].asDouble(), point->GetMomentum().x());
   EXPECT_DOUBLE_EQ(out["momentum"]["y"].asDouble(), point->GetMomentum().y());
   EXPECT_DOUBLE_EQ(out["momentum"]["z"].asDouble(), point->GetMomentum().z());
+  EXPECT_DOUBLE_EQ(out["spin"]["x"].asDouble(), point->GetPolarization().x());
+  EXPECT_DOUBLE_EQ(out["spin"]["y"].asDouble(), point->GetPolarization().y());
+  EXPECT_DOUBLE_EQ(out["spin"]["z"].asDouble(), point->GetPolarization().z());
   EXPECT_DOUBLE_EQ(out["b_field"]["x"].asDouble(), 0.);
   EXPECT_DOUBLE_EQ(out["b_field"]["y"].asDouble(), 0.);
   EXPECT_DOUBLE_EQ(out["b_field"]["z"].asDouble(), 0.);

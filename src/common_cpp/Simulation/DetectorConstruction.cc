@@ -34,11 +34,14 @@
 // fields and transport
 #include "Geant4/G4ChordFinder.hh"
 #include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4PropagatorInField.hh"
 #include "Geant4/G4EquationOfMotion.hh"
 #include "Geant4/G4FieldManager.hh"
 #include "Geant4/G4UniformMagField.hh"
 #include "Geant4/G4EqMagElectricField.hh"
 #include "Geant4/G4Mag_UsualEqRhs.hh"
+#include "Geant4/G4EqEMFieldWithSpin.hh"
+#include "Geant4/G4Mag_SpinEqRhs.hh"
 // Electromagnetic steppers
 #include "Geant4/G4ClassicalRK4.hh"
 #include "Geant4/G4SimpleHeum.hh"
@@ -69,6 +72,7 @@
 #include "DetModel/KL/KLGlue.hh"
 #include "DetModel/KL/KLFiber.hh"
 #include "DetModel/Ckov/CkovMirror.hh"
+#include "DetModel/EMR/EMRBar.hh"
 #include "DetModel/TOF/TofSD.hh"
 #include "DetModel/SciFi/SciFiSD.hh"
 #include "DetModel/Ckov/CKOVSD.hh"
@@ -87,7 +91,7 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   : _model(), _btField(NULL), _miceMagneticField(NULL),
     _miceElectroMagneticField(NULL), _rootLogicalVolume(NULL),
     _rootPhysicalVolume(NULL), _stepper(NULL), _chordFinder(NULL),
-    _rootVisAtts(NULL), _equationM(NULL), _equationE(NULL) {
+    _rootVisAtts(NULL), _equation(NULL) {
   _event = new MICEEvent();
   SetDatacardVariables(cards);
   SetBTMagneticField();
@@ -137,11 +141,8 @@ DetectorConstruction::~DetectorConstruction() {
     if (_rootVisAtts != NULL) {
         delete _rootVisAtts;
     }
-    if (_equationM != NULL) {
-        delete _equationM;
-    }
-    if (_equationE != NULL) {
-        delete _equationE;
+    if (_equation != NULL) {
+        delete _equation;
     }
 }
 
@@ -169,6 +170,12 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
                             "miss_distance", JsonWrapper::realValue).asDouble();
   _everythingSpecialVirtual = JsonWrapper::GetProperty(cards,
                                          "everything_special_virtual",
+                                         JsonWrapper::booleanValue).asBool();
+  _polarisedTracking = JsonWrapper::GetProperty(cards,
+                                         "spin_tracking",
+                                         JsonWrapper::booleanValue).asBool() ||
+                       JsonWrapper::GetProperty(cards,
+                                         "polarised_decay",
                                          JsonWrapper::booleanValue).asBool();
   _physicsProcesses = JsonWrapper::GetProperty(cards,
                      "physics_processes", JsonWrapper::stringValue).asString();
@@ -286,7 +293,11 @@ void DetectorConstruction::BuildG4DetectorVolume(G4PVPlacement** place,
     G4Material* mat =
                     _materials->materialByName(mod->propertyString("Material"));
     std::string detector = mod->propertyString("G4Detector");
-    if (detector == "SciFiPlane") {
+    if (detector == "EMR") {
+      EMRBar* bar = new EMRBar(mod, mat, moth);
+      *logic = bar->logicalBar();
+      *place = bar->placementBar();
+    } else if (detector == "SciFiPlane") {
       _sciFiPlanes.push_back(new SciFiPlane(mod, mat, moth));
       *logic = _sciFiPlanes.back()->logicalCore();
       *place = _sciFiPlanes.back()->placementCore();
@@ -439,19 +450,27 @@ void DetectorConstruction::SetBTMagneticField() {
 void DetectorConstruction::SetSteppingAlgorithm() {
   G4FieldManager*        fieldMgr     =
          G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  int n_vars = 0;
 
-  if (!_btField->HasRF()) { // No rf field, default integration
+  if (_equation != NULL)
+    delete _equation;
+  // Note G4Mag_SpinEqRhs did not work for spin tracking in pure magnetic field
+  if (_btField->HasRF() || _polarisedTracking) {
+      fieldMgr->SetFieldChangesEnergy(true);
+      fieldMgr->SetDetectorField(_miceElectroMagneticField);
+      if (_polarisedTracking) {
+          _equation = new G4EqEMFieldWithSpin(_miceElectroMagneticField);
+          n_vars = 12;
+      } else {
+          _equation = new G4EqMagElectricField(_miceElectroMagneticField);
+          n_vars = 8;
+      }
+  } else {
     fieldMgr->SetDetectorField(_miceMagneticField);
-    if (_equationM != NULL)
-      delete _equationM;
-    _equationM = new G4Mag_UsualEqRhs(_miceMagneticField);
-  } else { // Electrical field are present, used full E.M.
-    fieldMgr->SetFieldChangesEnergy(true);
-    fieldMgr->SetDetectorField(_miceElectroMagneticField);
-    if (_equationE != NULL)
-      delete _equationE;
-    _equationE = new G4EqMagElectricField(_miceElectroMagneticField);
+    _equation = new G4Mag_UsualEqRhs(_miceMagneticField);
+    n_vars = 6;
   }
+
 
   if (_chordFinder != NULL) {
     delete _chordFinder;  // owns _stepper memory
@@ -464,23 +483,17 @@ void DetectorConstruction::SetSteppingAlgorithm() {
 
   // Scan through the list of steppers
   if (_stepperType == "Classic" || _stepperType == "ClassicalRK4") {
-    if (!_btField->HasRF()) _stepper = new G4ClassicalRK4(_equationM);
-    else                    _stepper = new G4ClassicalRK4(_equationE, 8);
+    _stepper = new G4ClassicalRK4(_equation, n_vars);
   } else if (_stepperType == "SimpleHeum") {
-    if (!_btField->HasRF()) _stepper = new G4SimpleHeum(_equationM);
-    else                    _stepper = new G4SimpleHeum(_equationE, 8);
+    _stepper = new G4SimpleHeum(_equation, n_vars);
   } else if (_stepperType == "ImplicitEuler") {
-    if (!_btField->HasRF()) _stepper = new G4ImplicitEuler(_equationM);
-    else                    _stepper = new G4ImplicitEuler(_equationE, 8);
+    _stepper = new G4ImplicitEuler(_equation, n_vars);
   } else if (_stepperType == "SimpleRunge") {
-    if (!_btField->HasRF()) _stepper = new G4SimpleRunge(_equationM);
-    else                    _stepper = new G4SimpleRunge(_equationE, 8);
+    _stepper = new G4SimpleRunge(_equation, n_vars);
   } else if (_stepperType == "ExplicitEuler") {
-    if (!_btField->HasRF()) _stepper = new G4ExplicitEuler(_equationM);
-    else                    _stepper = new G4ExplicitEuler(_equationE, 8);
+    _stepper = new G4ExplicitEuler(_equation, n_vars);
   } else if (_stepperType == "CashKarpRKF45") {
-    if (!_btField->HasRF()) _stepper = new G4CashKarpRKF45(_equationM);
-    else                    _stepper = new G4CashKarpRKF45(_equationE, 8);
+    _stepper = new G4CashKarpRKF45(_equation, n_vars);
   } else {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "stepping_algorithm '"+_stepperType+"' not found",
@@ -500,10 +513,14 @@ void DetectorConstruction::SetSteppingAccuracy() {
     fieldMgr->SetDeltaIntersection(_deltaIntersection);
   if (_missDistance > 0)
     fieldMgr->GetChordFinder()->SetDeltaChord(_missDistance);
+
+  G4PropagatorInField* fieldPropagator =
+    G4TransportationManager::GetTransportationManager()->GetPropagatorInField();
+
   if (_epsilonMin > 0)
-    fieldMgr->SetMinimumEpsilonStep(_epsilonMin);
+    fieldPropagator->SetMinimumEpsilonStep(_epsilonMin);
   if (_epsilonMax > 0)
-    fieldMgr->SetMaximumEpsilonStep(_epsilonMax);
+    fieldPropagator->SetMaximumEpsilonStep(_epsilonMax);
 }
 
 Json::Value DetectorConstruction::GetSDHits(size_t i) {
@@ -618,3 +635,4 @@ void DetectorConstruction::CheckModuleDepth(MiceModule* module) {
 }
 }
 }
+
