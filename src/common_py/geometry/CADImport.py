@@ -233,6 +233,35 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append('Dimensions '+elem.prop('rmin')+' '+\
                                       elem.prop('rmax')+' '+\
                                       elem.prop('lunit')+'\n')
+                # For a polycone, a data file should be written locally
+                # based on the listed vertices
+                polycone  = datafile.xpathEval("gdml/solids/polycone")
+                for elem in polycone:
+                    # look for a polycone object with a name
+                    # matching the volume
+                    if elem.prop('name') == solid[0].prop('ref'):
+                        result.append('Volume Polycone\n')
+                        points = []
+                        zplane = elem.xpathEval('zplane')
+                        # loop over the z planes of the object.
+                        for p in zplane:
+                            point = []
+                            point.append(float(p.prop('z')))
+                            point.append(float(p.prop('rmin')))
+                            point.append(float(p.prop('rmax')))
+                            points.append(point)
+                        # Create a text files containing the z plane positions
+                        # particular to the volume.
+                        f = open(self.output[:-4]+"_"+vol.prop('name')+\
+                                 '.txt','w')
+                        f.write(" NumberOfPoints \t" + str(len(points)) +"\n")
+                        f.write(" Units    mm \n")
+                        f.write(" Z        RInner       ZOuter\n")
+                        for p in points:
+                            f.write(str(p[0])+"\t"+\
+                                    str(p[1])+"\t"+str(p[2])+"\n")
+                        # close the text file
+                        f.close()
                 aux        = vol.xpathEval('auxiliary')
                 unit = "cm"
                 # Get the auxhilary elements of the volume
@@ -251,7 +280,13 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'DiameterOfPmt[mm]'\
                            or elemtype == 'DiameterOfGate[mm]'\
                            or elemtype == 'XoffsetOfPmt[mm]'\
-                           or elemtype == 'ZoffsetOfPmt[mm]':
+                           or elemtype == 'ZoffsetOfPmt[mm]'\
+                           or elemtype == 'TrapezoidWidthX1'\
+                           or elemtype == 'TrapezoidWidthX2'\
+                           or elemtype == 'TrapezoidHeightY1'\
+                           or elemtype == 'TrapezoidHeightY2'\
+                           or elemtype == 'TrapezoidLength'\
+                           or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
                     if elemtype == 'ActiveRadius' \
@@ -263,7 +298,12 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'FibreLength' \
                            or elemtype == 'FibreSpacingY'\
                            or elemtype == 'FibreSpacingZ'\
-                           or elemtype == 'OpticsMaterialLength':
+                           or elemtype == 'OpticsMaterialLength'\
+                           or elemtype == 'BarWidth'\
+                           or elemtype == 'BarHeight'\
+                           or elemtype == 'BarLength'\
+                           or elemtype == 'HoleRad'\
+                           or elemtype == 'FiberCladdingExtRadius':
                         result.append('PropertyDouble '+elemtype+' '\
                                       +value+' '+unit+'\n')
                     # Extract integer elements
@@ -281,11 +321,18 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'BooleanModule1' \
                              or elemtype == 'BooleanModule1Type'\
                              or elemtype == 'BooleanModule2' \
-                             or elemtype == 'BooleanModule2Type':
+                             or elemtype == 'BooleanModule2Type'\
+                             or elemtype == 'FileName'\
+                             or elemtype == 'PolyconeType':
+                        # An exception for the case of polycone objects
+                        if value == "PolyconeProfile":
+                            value = self.output[:-4]+'_'+vol.prop('name')+\
+                                    '.txt'
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
-                             or elemtype == 'UseDaughtersInOptics':
+                             or elemtype == 'UseDaughtersInOptics'\
+                             or elemtype == 'AddWLSFiber':
                         result.append('PropertyBool '+elemtype+' '\
                                       +value+"\n")
                     # Extract selected vector typed elements

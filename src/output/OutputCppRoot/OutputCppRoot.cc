@@ -85,6 +85,9 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
                                           datacards,
                                           "end_of_run_output_root_directory",
                                           JsonWrapper::stringValue).asString();
+  } catch (std::exception& exc) {
+    std::cerr << (&exc)->what() << std::endl;
+    death();
   } catch (...) {
     death();
     throw;

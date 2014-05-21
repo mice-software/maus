@@ -69,7 +69,7 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     Json::Value WriteJson();
     /// Represent as a "primary" particle object
     Primary GetPrimary();
-    double x, y, z, time, px, py, pz, energy;
+    double x, y, z, time, px, py, pz, sx, sy, sz, energy;
     int pid;
     unsigned int seed;
   };

@@ -1,4 +1,4 @@
-param -unset q_1=1.066 q_2=-1.332 q_3=0.927 d_1=-1.302 proton_absorber_thickness=93 proton_number=1000000000.0 proton_weight=1 WRKDIR=/home/durga/trunk-dev/src/map/MapPyBeamlineSimulation/G4bl g4bl_output_file_name=/home/durga/trunk-dev/src/map/MapPyBeamlineSimulation/maus_beam_output.txt d_s=3.837 particle_charge=3 DecayMapFileDir=/home/durga/trunk-dev/src/map/MapPyBeamlineSimulation/G4bl/Magnets/DecaySolenoid
+param -unset q_1=1.066 q_2=-1.332 q_3=0.927 d_1=-1.302 proton_absorber_thickness=93 proton_number=1000000000.0 proton_weight=1 WRKDIR=/afs/phas.gla.ac.uk/user/j/jnugent/private/PhD_Year_1/Coding/bzrstuff/develG4beamline/src/map/MapPyBeamlineSimulation/G4bl g4bl_output_file_name=/afs/phas.gla.ac.uk/user/j/jnugent/private/PhD_Year_1/Coding/bzrstuff/develG4beamline/src/map/MapPyBeamlineSimulation/maus_beam_output.txt d_s=130 particle_charge=3 DecayMapFileDir=/afs/phas.gla.ac.uk/user/j/jnugent/private/PhD_Year_1/Coding/bzrstuff/develG4beamline/src/map/MapPyBeamlineSimulation/G4bl/Magnets/DecaySolenoid
 param random_seed=1
 *	MAY09-B1B2-positives.in   
 *

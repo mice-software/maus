@@ -124,7 +124,7 @@ bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
 
 void VirtualPlane::FillKinematics
                                (VirtualHit * aHit, const G4Step * aStep) const {
-  double  x[8];
+  double  x[12];
   double* x_from_beginning = NULL;
   double* x_from_end = NULL;
   switch (_stepping) {
@@ -142,13 +142,13 @@ void VirtualPlane::FillKinematics
   }
   double indep_beg     = GetIndependentVariable(aStep->GetPreStepPoint());
   double indep_end     = GetIndependentVariable(aStep->GetPostStepPoint());
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < 12; i++)
     x[i] = (x_from_end[i]-x_from_beginning[i])/(indep_end-indep_beg)
           *(_independentVariable-indep_beg)+x_from_beginning[i];
 
   aHit->SetPos(CLHEP::Hep3Vector(x[1], x[2], x[3]));
   aHit->SetMomentum(CLHEP::Hep3Vector(x[5], x[6], x[7]));
-
+  aHit->SetSpin(CLHEP::Hep3Vector(x[8], x[9], x[10]));
   double mass = aStep->GetPostStepPoint()->GetMass();
   // FORCE mass shell condition
   x[4] = ::sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
@@ -182,10 +182,11 @@ double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
 }
 
 double * VirtualPlane::ExtractPointData(G4StepPoint *aPoint) const {
-  double* x_in = new double[8];
+  double* x_in = new double[12];
   for (int i = 0; i < 3; i++) {
     x_in[i+1] = aPoint->GetPosition()[i];
     x_in[i+5] = aPoint->GetMomentum()[i];
+    x_in[i+8] = aPoint->GetPolarization()[i];
   }
   x_in[0] = aPoint->GetGlobalTime();
   x_in[4] = aPoint->GetTotalEnergy();
@@ -406,6 +407,10 @@ Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
     hit_v["momentum"]["x"] = hit.GetMomentum().x();
     hit_v["momentum"]["y"] = hit.GetMomentum().y();
     hit_v["momentum"]["z"] = hit.GetMomentum().z();
+    hit_v["spin"] = Json::Value(Json::objectValue);
+    hit_v["spin"]["x"] = hit.GetSpin().x();
+    hit_v["spin"]["y"] = hit.GetSpin().y();
+    hit_v["spin"]["z"] = hit.GetSpin().z();
     hit_v["proper_time"] = hit.GetProperTime();
     hit_v["path_length"] = hit.GetPathLength();
     hit_v["b_field"] = Json::Value(Json::objectValue);
@@ -441,6 +446,8 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
          JsonWrapper::GetProperty(v_hit, "position", JsonWrapper::objectValue);
     Json::Value mom_v =
          JsonWrapper::GetProperty(v_hit, "momentum", JsonWrapper::objectValue);
+    Json::Value spin_v =
+         JsonWrapper::GetProperty(v_hit, "spin", JsonWrapper::objectValue);
     Json::Value b_v =
          JsonWrapper::GetProperty(v_hit, "b_field", JsonWrapper::objectValue);
     Json::Value e_v =
@@ -459,6 +466,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
 
     hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
+    hit.SetSpin(JsonWrapper::JsonToThreeVector(spin_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
     hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));

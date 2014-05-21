@@ -19,115 +19,47 @@
 
 #include <string>
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "Utils/Exception.hh"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/ConverterFactory.hh"
 
 namespace MAUS {
 
-  template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const std::string& s) :
-    IMap<INPUT, OUTPUT>(), ModuleBase(s) {}
-  template <typename OUTPUT>
-  MapBase<Json::Value, OUTPUT>::MapBase(const std::string& s) :
-    IMap<Json::Value, OUTPUT>(), ModuleBase(s) {}
+  template <typename TYPE>
+  MapBase<TYPE>::MapBase(const std::string& s) :
+    IMap<TYPE>(), ModuleBase(s) {}
 
-  template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::MapBase(const MapBase& mb) :
-    IMap<INPUT, OUTPUT>(), ModuleBase(mb._classname) {}
-  template <typename OUTPUT>
-  MapBase<Json::Value, OUTPUT>::MapBase(const MapBase& mb) :
-    IMap<Json::Value, OUTPUT>(), ModuleBase(mb._classname) {}
+  template <typename TYPE>
+  MapBase<TYPE>::MapBase(const MapBase& mb) :
+    IMap<TYPE>(), ModuleBase(mb._classname) {}
 
-  template <typename INPUT, typename OUTPUT>
-  MapBase<INPUT, OUTPUT>::~MapBase() {}
-  template <typename OUTPUT>
-  MapBase<Json::Value, OUTPUT>::~MapBase() {}
+  template <typename TYPE>
+  MapBase<TYPE>::~MapBase() {}
 
-  template<typename INPUT, typename OUTPUT>
-  OUTPUT* MapBase<INPUT, OUTPUT>::process(INPUT* i) const {
-    if (!i) { throw NullInputException(_classname); }
-    OUTPUT* o = 0;
+  template<typename TYPE>
+  PyObject* MapBase<TYPE>::process_pyobj(PyObject* py_input) const {
+    // this function owns cpp_data; py_input is still owned by caller
+    TYPE* cpp_data = PyObjectWrapper::unwrap<TYPE>(py_input);
     try {
-      o =  _process(i);
+        _process(cpp_data);
     }
     catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    }
-    catch (std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch (...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
-  template<typename OUTPUT>
-  OUTPUT* MapBase<Json::Value, OUTPUT>::process(Json::Value* i) const {
-    if (!i) { throw NullInputException(_classname); }
-    OUTPUT* o = 0;
-    try {
-      o = _process(i);
-    }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleException(*i, s, _classname);
-    }
-    catch (std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExc(*i, e, _classname);
-    }
-    catch (...) {
-      throw UnhandledException(_classname);
-    }
-    return o;
-  }
-
-  template<typename INPUT, typename OUTPUT>
-  template<typename OTHER>
-  OUTPUT* MapBase<INPUT, OUTPUT>::process(OTHER* o) const {
-
-    ConverterFactory c;
-    INPUT* tmp = 0;
-    OUTPUT* ret = 0;
-    try {
-      tmp = c.convert<OTHER, INPUT>(o);
-      ret =  process(tmp);
-    }
-    catch (std::exception& e) {
-      if (tmp) { delete tmp; }
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-      return ret;
+        CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
+    } catch (std::exception& e) {
+        CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+    } catch (...) {
+        throw Exception(Exception::recoverable,
+                        _classname+" threw an unhandled exception",
+                        "MapBase::process_pyobj");
     }
 
-    // catch the pass through case
-    if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) {
-      delete tmp;
-    }
-    return ret;
+    PyObject* py_output = PyObjectWrapper::wrap(cpp_data);
+    // py_output now owns cpp_data
+    return py_output;
   }
-  template<typename OUTPUT>
-  template<typename OTHER>
-  OUTPUT* MapBase<Json::Value, OUTPUT>::process(OTHER* o) const {
 
-    ConverterFactory c;
-    Json::Value* tmp;
-    OUTPUT* ret;
-    try {
-      tmp = c.convert<OTHER, Json::Value>(o);
-      ret =  process(tmp);
-    }
-    catch (std::exception& e) {
-      if (tmp) { delete tmp; }
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-      return ret;
-    }
-    // catch the pass through case
-    if (reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(o)  &&
-        reinterpret_cast<void*>(tmp) != reinterpret_cast<void*>(ret)   ) {
-      delete tmp;
-    }
-    return ret;
-  }
+
 
 }// end of namespace
 #endif

@@ -38,7 +38,7 @@ namespace MAUS {
    * \author Alexander Richards, Imperial College London
    * \date 06/06/2012
    */
-  template <typename INPUT, typename OUTPUT>
+  template <typename TYPE>
   class IMap : public virtual IModule {
   public:
     // ! Destructor
@@ -52,7 +52,7 @@ namespace MAUS {
      * \param INPUT* Pointer to the input data
      * \return OUTPUT* Pointer to the output data
      */
-    virtual OUTPUT* process(INPUT* i) const = 0;
+    virtual PyObject* process_pyobj(PyObject* i) const = 0;
   };
 
 }// end of namespace
