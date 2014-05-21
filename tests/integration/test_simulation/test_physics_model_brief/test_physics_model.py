@@ -78,7 +78,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
     Test that physics model datacards work correctly
     """
 
-    def _test_reference_physics(self):
+    def test_reference_physics(self):
         """
         Check that reference_physics_processes works okay
 
@@ -118,7 +118,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # assert no scattering
         self.assertAlmostEqual(bunch_no_de[1]['px'], 0., 3)
 
-    def _test_physics(self):
+    def test_physics(self):
         """
         Check physics_processes datacard works okay
 
@@ -168,7 +168,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         for hit in bunch:
             self.assertEqual(hit["pid"], -11)
 
-    def _test_decay_lifetime(self):
+    def test_decay_lifetime(self):
         """
         Check that we can control particle lifetime
         """
@@ -190,7 +190,7 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue(211 in bunch.keys())
         self.assertFalse(-13 in bunch.keys())
 
-    def _test_decay_disabled(self):
+    def test_decay_disabled(self):
         """
         Check that we can disable particle decay
         """
