@@ -8,7 +8,9 @@ unique_id=20130212090645-5dg2axdjmtby60vz-1
 directory=cdb-${version}
 filename=cdb-${version}.tar.gz
 filename_mash=cdb${version}.tar.gz-${unique_id}/${filename}
-url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
+# this url does not seem to work anymore - what? when?
+# url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
+url=http://micewww.pp.rl.ac.uk/attachments/download/2180/cdb-${version}.tar.gz
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
