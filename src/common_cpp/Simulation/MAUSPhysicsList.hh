@@ -218,6 +218,9 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     double      _muHalfLife;
     double      _productionThreshold;
 
+    static double _defaultChargedPiHalfLife;
+    static double _defaultChargedMuHalfLife;
+
     G4VModularPhysicsList* _list;
     std::vector<G4StepLimiter*> _limits;
     std::vector<G4UserSpecialCuts*> _specialCuts;
