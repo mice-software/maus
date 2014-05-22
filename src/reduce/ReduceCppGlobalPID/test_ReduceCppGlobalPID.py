@@ -96,8 +96,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         deathsuccess = self.reducer.death()
         self.assertTrue(deathsuccess)
         if not deathsuccess:
-            raise Exception('Initialize Fail', 'Could not start worker')
-            
+            raise Exception('Initialize Fail', 'Could not start worker')   
+
     def test_no_unique_identifier(self):
         """Check for unique identifier in config document"""
         self.config4['global_pid_hypothesis'] = 'test_200MeV_pi_plus'
@@ -128,22 +128,28 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         #check birth created PDF file
         PDFdirectory = ('%s/files/PID/%s_%s' 
                     % (os.environ.get("MAUS_ROOT_DIR"), hypothesis, timestamp))
-        PDFfile = ('%s/diffTOF1TOF0_%s.root' 
+        PDFfile1 = ('%s/diffTOF1TOF0_%s.root' 
                     % (PDFdirectory, hypothesis))
-        self.assertTrue(os.path.exists(PDFfile))
-        rootPDFfile = ROOT.TFile(PDFfile)
+        self.assertTrue(os.path.exists(PDFfile1))
+        rootPDFfile1 = ROOT.TFile(PDFfile1)
+        PDFfile2 = ('%s/diffTOF0TOF1vsTrackerMom_%s.root' 
+                    % (PDFdirectory, hypothesis))
+        self.assertTrue(os.path.exists(PDFfile2))
+        rootPDFfile2 = ROOT.TFile(PDFfile2)
         #check histogram exists in file
-        histname = "diffTOF1TOF0_test_200MeV_pi_plus"
-        hist = rootPDFfile.Get(histname)
+        hist1name = "diffTOF1TOF0_test_200MeV_pi_plus"
+        hist1 = rootPDFfile1.Get(hist1name)
+        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
+        hist2 = rootPDFfile2.Get(hist2name)
         #no information from tracks should have been added to histogram,
-        #however for PIDVarA the behavior to spread one event over all bins
-        #is turned on, so there should be as many entries as there are bins.
-        self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        # force removal of directory rmtree fails on some systems
-        os.system('rm -rf %s' % PDFdirectory)
-    
+        #however for PIDVarA and PIDVarB the behavior to spread one event
+        #over all bins is turned on, so there should be as many entries as
+        #there are bins.
+        self.assertEqual(hist1.GetEntries(), (hist1.GetSize()))
+        self.assertEqual(hist2.GetEntries(), (hist2.GetSize()))
+        os.system('rm -rf %s' % PDFdirectory) 
 
-    def test_no_data(self):
+    def test_no_data(self): # pylint: disable = R0914
         """Check that against data stream is empty"""
         self.config0['global_pid_hypothesis'] = 'test_200MeV_pi_plus'
         now = datetime.datetime.now()
@@ -169,18 +175,26 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # Check birth created PDF file
         PDFdirectory = ('%s/files/PID/%s_%s' 
                     % (os.environ.get("MAUS_ROOT_DIR"), hypothesis, timestamp))
-        PDFfile = ('%s/diffTOF1TOF0_%s.root' 
+        PDFfile1 = ('%s/diffTOF1TOF0_%s.root' 
                     % (PDFdirectory, hypothesis))
-        self.assertTrue(os.path.exists(PDFfile))
-        rootPDFfile = ROOT.TFile(PDFfile)
-        # Check histogram exists in file
-        hist = rootPDFfile.Get("diffTOF1TOF0_test_200MeV_pi_plus")
+        self.assertTrue(os.path.exists(PDFfile1))
+        rootPDFfile1 = ROOT.TFile(PDFfile1)
+        PDFfile2 = ('%s/diffTOF0TOF1vsTrackerMom_%s.root' 
+                    % (PDFdirectory, hypothesis))
+        self.assertTrue(os.path.exists(PDFfile2))
+        rootPDFfile2 = ROOT.TFile(PDFfile2)
+        #check histogram exists in file
+        hist1name = "diffTOF1TOF0_test_200MeV_pi_plus"
+        hist1 = rootPDFfile1.Get(hist1name)
+        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
+        hist2 = rootPDFfile2.Get(hist2name)
         # Check process hasn't added anything to histogram:
-        # no information from tracks should have been added to histogram,
-        # however for PIDVarA the behavior to spread one event over all bins
-        # is turned on, so there should be as many entries as there are bins.
-        self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        # force removal of directory rmtree fails on some systems
+        #no information from tracks should have been added to histogram,
+        #however for PIDVarA and PIDVarB the behavior to spread one event over
+        #all bins is turned on, so there should be as many entries as there
+        #are bins.
+        self.assertEqual(hist1.GetEntries(), (hist1.GetSize()))
+        self.assertEqual(hist2.GetEntries(), (hist2.GetSize()))
         os.system('rm -rf %s' % PDFdirectory)
 
     def test_invalid_json_birth(self):
@@ -205,7 +219,7 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         if not deathsuccess:
             raise Exception('Initialize Fail', 'Could not start worker')
 
-    def test_invalid_json_process(self):
+    def test_invalid_json_process(self): # pylint: disable = R0914
         """Check with an invalid json input"""
         self.config0['global_pid_hypothesis'] = 'test_200MeV_pi_plus'
         now = datetime.datetime.now()
@@ -229,26 +243,34 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # Check birth created PDF file
         PDFdirectory = ('%s/files/PID/%s_%s' 
                     % (os.environ.get("MAUS_ROOT_DIR"), hypothesis, timestamp))
-        PDFfile = ('%s/diffTOF1TOF0_%s.root' 
+        PDFfile1 = ('%s/diffTOF1TOF0_%s.root' 
                     % (PDFdirectory, hypothesis))
-        self.assertTrue(os.path.exists(PDFfile))
-        rootPDFfile = ROOT.TFile(PDFfile)
-        # Check histogram exists in file
-        hist = rootPDFfile.Get("diffTOF1TOF0_test_200MeV_pi_plus")
+        self.assertTrue(os.path.exists(PDFfile1))
+        rootPDFfile1 = ROOT.TFile(PDFfile1)
+        PDFfile2 = ('%s/diffTOF0TOF1vsTrackerMom_%s.root' 
+                    % (PDFdirectory, hypothesis))
+        self.assertTrue(os.path.exists(PDFfile2))
+        rootPDFfile2 = ROOT.TFile(PDFfile2)
+        #check histogram exists in file
+        hist1name = "diffTOF1TOF0_test_200MeV_pi_plus"
+        hist1 = rootPDFfile1.Get(hist1name)
+        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
+        hist2 = rootPDFfile2.Get(hist2name)
         # Check process hasn't added anything to histogram:
-        # no information from tracks should have been added to histogram,
-        # however for PIDVarA the behavior to spread one event over all bins
-        # is turned on, so there should be as many entries as there are bins.
-        self.assertEqual(hist.GetEntries(), (hist.GetSize()))
-        # force removal of directory rmtree fails on some systems
+        #no information from tracks should have been added to histogram,
+        #however for PIDVarA and PIDVarB the behavior to spread one event over
+        #all bins is turned on, so there should be as many entries as there 
+        #are bins.
+        self.assertEqual(hist1.GetEntries(), (hist1.GetSize()))
+        self.assertEqual(hist2.GetEntries(), (hist2.GetSize()))
         os.system('rm -rf %s' % PDFdirectory)
 
-    def test_process(self):
+    def test_process(self): # pylint: disable = R0914
         """Check ReduceCppGlobalPID process function"""
         self.config0['global_pid_hypothesis'] = 'test_200MeV_pi_plus'
         now = datetime.datetime.now()
         self.config0['unique_identifier'] = now.strftime("%Y_%m_%dT%H_%M_%S_%f")
-        test5 = ('%s/src/reduce/ReduceCppGlobalPID/Global_PID_reduce_test.json' 
+        test5 = ('%s/src/reduce/ReduceCppGlobalPID/PDF_test.json' 
                                               % os.environ.get("MAUS_ROOT_DIR"))
         birthresult = self.reducer.birth(json.dumps(self.config0))
         self.assertTrue(birthresult)
@@ -266,18 +288,24 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # Check birth created PDF file
         PDFdirectory = ('%s/files/PID/%s_%s' 
                     % (os.environ.get("MAUS_ROOT_DIR"), hypothesis, timestamp))
-        PDFfile = ('%s/diffTOF1TOF0_%s.root' 
+        PDFfile1 = ('%s/diffTOF1TOF0_%s.root' 
                     % (PDFdirectory, hypothesis))
-        self.assertTrue(os.path.exists(PDFfile))
-        rootPDFfile = ROOT.TFile(PDFfile)
-        # Check histogram exists in file
-        histname = "diffTOF1TOF0_test_200MeV_pi_plus"
-        hist = rootPDFfile.Get(histname)
-        # Check process has added info from 5 tracks to histogram:
+        self.assertTrue(os.path.exists(PDFfile1))
+        rootPDFfile1 = ROOT.TFile(PDFfile1)
+        PDFfile2 = ('%s/diffTOF0TOF1vsTrackerMom_%s.root' 
+                    % (PDFdirectory, hypothesis))
+        self.assertTrue(os.path.exists(PDFfile2))
+        rootPDFfile2 = ROOT.TFile(PDFfile2)
+        #check histogram exists in file
+        hist1name = "diffTOF1TOF0_test_200MeV_pi_plus"
+        hist1 = rootPDFfile1.Get(hist1name)
+        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
+        hist2 = rootPDFfile2.Get(hist2name)
+        # Check process has added info from 5 tracks to histograms:
         # N.B. for PIDVarA the behavior to spread one event over all bins is
         # on, so there should be as many additional entries as there are bins.
-        self.assertEqual(hist.GetEntries(), (hist.GetSize() + 5))
-        # force removal of directory rmtree fails on some systems
+        self.assertEqual(hist1.GetEntries(), (hist1.GetSize() + 5))
+        self.assertEqual(hist2.GetEntries(), (hist2.GetSize() + 5))
         os.system('rm -rf %s' % PDFdirectory)
 
     def tearDown(self): #pylint: disable = C0103

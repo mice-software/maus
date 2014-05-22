@@ -80,7 +80,7 @@ header_and_footer_mode = "append" #append or dont_append
 # "get_magnet_currents_pa_cdb" is set to True magnet currents & proton absorber
 # thickness will be retrieved from the CDB for the run_number specified 
 g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
-        "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":731.89,\
+        "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":680.31,\
         "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
         "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
 
@@ -93,12 +93,14 @@ keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
 check_volume_overlaps = False
-maximum_number_of_steps = 500000 # particles are killed after this number of
+maximum_number_of_steps = 50000000 # particles are killed after this number of
                                  # steps (assumed to be stuck in the fields)
 simulation_reference_particle = { # used for setting particle phase
     "position":{"x":0.0, "y":-0.0, "z":-6400.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
+    "spin":{"x":0.0, "y":0.0, "z":1.0}
+   # "beam_polarisation" : "Flat"
 }
 everything_special_virtual = False
 
@@ -107,6 +109,7 @@ physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default valu
 reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
 physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
 particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+polarised_decay = False # set to true to make muons decay with the correct distribution if the beam is polarised; if true, will force spin tracking on (if spin tracking is off, spin vectors will not be propagated to the decay point)
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
@@ -126,13 +129,14 @@ field_tracker_absolute_error = 1.e-4 # set absolute error on MAUS internal stepp
 field_tracker_relative_error = 1.e-4 # set relative error on MAUS internal stepping routines - used by e.g. VirtualPlanes to control accuracy of interpolation
 
 stepping_algorithm = "ClassicalRK4" # numerical integration routine
+spin_tracking = False # set to true to use G4 routines to precess the spin vector as particles go through EM fields
 delta_one_step = -1. # Geant4 step accuracy parameter
 delta_intersection = -1.
 epsilon_min = -1.
 epsilon_max = -1.
 miss_distance = -1.
-maximum_module_depth = 10 # maximum depth for MiceModules as used by the simulation
 
+maximum_module_depth = 10 # maximum depth for MiceModules as used by the simulation
 # geant4 visualisation (not event display)
 geant4_visualisation = False
 visualisation_viewer = "VRML2FILE"  # only supported option
@@ -186,12 +190,14 @@ beam = {
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
+       #"spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### PIONS #####
     { # as above...
        "reference":{
            "position":{"x":0.0, "y":-0.0, "z":-6400.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+           "spin":{"x":0.0, "y":0.0, "z":1.0},
            "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
        },
        "random_seed_algorithm":"incrementing_random",
@@ -204,12 +210,14 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
        "coupling":{"coupling_mode":"none"}
+      # "spin":{"x":0.0, "y":0.0, "z":1.0}
     },
     ##### ELECTRONS #####
     { # as above...
         "reference":{
             "position":{"x":0.0, "y":-0.0, "z":-6400.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "spin":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
         },
         "random_seed_algorithm":"incrementing_random",
@@ -222,6 +230,7 @@ beam = {
                    "t_start":-1.e6,
                    "t_end":+1.e6},
         "coupling":{"coupling_mode":"none"}
+       # "spin":{"x":0.0, "y":0.0, "z":1.0}
     }]
 }
 

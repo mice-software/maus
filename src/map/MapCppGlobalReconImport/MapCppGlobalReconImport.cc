@@ -74,7 +74,24 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch (...) {
+    } catch (Exception& exception) {
+      MAUS::CppErrorHandler::getInstance()->
+	HandleExceptionNoJson(exception, _classname);
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalReconImport::process"
+				  << std::endl;
+      Json::Value errors;
+      std::stringstream ss;
+      ss << _classname << " says: Bad json document";
+      errors["bad_json_document"] = ss.str();
+      root["errors"] = errors;
+      delete data_json;
+      return writer.write(root);
+    } catch (std::exception& exc) {
+      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
+				  << "MapCppGlobalReconImport::process"
+				  << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
@@ -152,7 +169,6 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = recon_event->GetGlobalEvent();
-      MAUS::recon::global::TrackMatching track_matching;
       global_event = Import(recon_event);
     }
 
@@ -182,12 +198,15 @@ namespace MAUS {
 
     MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
 
+    MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
+
     if (tof_event) {
       MAUS::recon::global::ImportTOFRecon tofrecon_importer;
       tofrecon_importer.process((*tof_event), global_event, _classname);
-      // currently TrackMatching only uses TOF spacepoints, leave here for now
-      MAUS::recon::global::TrackMatching track_matching;
-      track_matching.FormTracks(global_event);
+    }
+    if (scifi_event) {
+      MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
+      scifirecon_importer.process((*scifi_event), global_event, _classname);
     }
     // Return the new GlobalEvent, to be added to the ReconEvent
     return global_event;

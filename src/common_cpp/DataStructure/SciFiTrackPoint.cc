@@ -50,7 +50,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
     _tracker = 1;
   }
   id = abs(id);
-  _station = id/3;
+  _station = ((id-1)/3)+1;
   _plane   = (id-1)%3;
   _channel = kalman_site->measurement()(0, 0);
 

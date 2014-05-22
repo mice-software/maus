@@ -118,43 +118,45 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
 
   MAUS::Spill* spill = data->GetSpill();
   try {
-    // Now do the loop over the binary DAQ data.
+    // Do the loop over the binary DAQ data.
     _dataProcessManager.Process(_eventPtr);
-//     data->SetEventType("Spill");
-    unsigned int event_type = _dataProcessManager.GetEventType();
 
-    // The data is processed and is ready to be filled in daq_data.
+    // The data is now processed and is ready to be filled.
+    unsigned int event_type = _dataProcessManager.GetEventType();
     spill->SetDaqEventType(event_type_to_str(event_type));
     spill->SetRunNumber(_dataProcessManager.GetRunNumber());
     spill->SetSpillNumber(_dataProcessManager.GetSpillNumber());
 
     if (event_type == PHYSICS_EVENT) {
+      // Create a new DAQData object.
       MAUS::DAQData *daq_data = new MAUS::DAQData;
-      // Set the map (a static data member) of all the processors.
+      // Set the DAQData object (a static data member) of all the processors.
       MDarranger::set_daq_data(daq_data);
 
-    if (_DBBFragmentProc_cpp)
-      _DBBFragmentProc_cpp->fill_daq_data();
+      // Now fill the DAQData object with the data processed by all the processors.
+      if (_DBBFragmentProc_cpp)
+        _DBBFragmentProc_cpp->fill_daq_data();
 
-    if (_DBBChainFragmentProc_cpp)
-      _DBBChainFragmentProc_cpp->fill_daq_data();
+      if (_DBBChainFragmentProc_cpp)
+        _DBBChainFragmentProc_cpp->fill_daq_data();
 
-    if (_v1731PartEventProc_cpp)
-      _v1731PartEventProc_cpp->fill_daq_data();
+      if (_v1731PartEventProc_cpp)
+        _v1731PartEventProc_cpp->fill_daq_data();
 
-    if (_v1724PartEventProc_cpp)
-      _v1724PartEventProc_cpp->fill_daq_data();
+      if (_v1724PartEventProc_cpp)
+        _v1724PartEventProc_cpp->fill_daq_data();
 
-    if (_v1290PartEventProc_cpp)
-      _v1290PartEventProc_cpp->fill_daq_data();
+      if (_v1290PartEventProc_cpp)
+        _v1290PartEventProc_cpp->fill_daq_data();
 
-    if (_v830FragmentProc_cpp)
-      _v830FragmentProc_cpp->fill_daq_data();
+      if (_v830FragmentProc_cpp)
+        _v830FragmentProc_cpp->fill_daq_data();
 
-    if (_vLSBFragmentProc_cpp)
-      _vLSBFragmentProc_cpp->fill_daq_data();
+      if (_vLSBFragmentProc_cpp)
+        _vLSBFragmentProc_cpp->fill_daq_data();
 
-    spill->SetDAQData(daq_data);
+      // Set the DAQData object of the spill.
+      spill->SetDAQData(daq_data);
     }
   }
   // Deal with exceptions
@@ -223,11 +225,15 @@ std::string InputCppDAQData::getCurEvent() {
 
   Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(data_cpp);
 //   std::cerr << *spill_json_out << std::endl;
-  delete data_cpp;
   _eventsCount++;
 
   Json::FastWriter xJSONWr;
-  return xJSONWr.write(*spill_json_out);
+  std::string output = xJSONWr.write(*spill_json_out);
+
+  delete spill_json_out;
+  delete data_cpp;
+
+  return output;
 }
 
 bool InputCppDAQData::death() {

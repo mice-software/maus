@@ -21,14 +21,14 @@ namespace MAUS {
 
 template <class ChannelId>
 Hit<ChannelId>::Hit() : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
-             _energy_deposited(0), _position(0, 0, 0), _momentum(0, 0, 0),
+             _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
              _channel_id(NULL) {
 }
 
 template <class ChannelId>
 Hit<ChannelId>::Hit(const Hit<ChannelId>& md)
            : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
-             _energy_deposited(0), _position(0, 0, 0), _momentum(0, 0, 0),
+             _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
              _channel_id(NULL) {
     *this = md;
 }
@@ -44,6 +44,7 @@ Hit<ChannelId>& Hit<ChannelId>::operator=(const Hit<ChannelId>& md) {
     _charge = md._charge;
     _time = md._time;
     _energy_deposited = md._energy_deposited;
+    _path_length = md._path_length;
     _position = md._position;
     _momentum = md._momentum;
     if (_channel_id != NULL) {
@@ -126,6 +127,11 @@ void Hit<ChannelId>::SetEnergyDeposited(double edep) {
 }
 
 template <class ChannelId>
+void Hit<ChannelId>::AddEnergyDeposited(double edep) {
+    _energy_deposited += edep;
+}
+
+template <class ChannelId>
 ThreeVector Hit<ChannelId>::GetPosition() const {
     return _position;
 }
@@ -156,6 +162,21 @@ void Hit<ChannelId>::SetChannelId(ChannelId* id) {
         delete _channel_id;
     }
     _channel_id = id;
+}
+
+template <class ChannelId>
+double Hit<ChannelId>::GetPathLength() const {
+    return _path_length;
+}
+
+template <class ChannelId>
+void Hit<ChannelId>::SetPathLength(double path) {
+    _path_length = path;
+}
+
+template <class ChannelId>
+void Hit<ChannelId>::AddPathLength(double path) {
+    _path_length += path;
 }
 }
 

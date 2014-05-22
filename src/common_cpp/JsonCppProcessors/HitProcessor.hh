@@ -48,6 +48,7 @@ class HitProcessor : public ObjectProcessor<Hit<ChannelId> > {
 typedef HitProcessor<SciFiChannelId> SciFiHitProcessor;
 typedef HitProcessor<TOFChannelId> TOFHitProcessor;
 typedef HitProcessor<KLChannelId> KLHitProcessor;
+typedef HitProcessor<EMRChannelId> EMRHitProcessor;
 typedef HitProcessor<SpecialVirtualChannelId> SpecialVirtualHitProcessor;
 
 template <class ChannelId>

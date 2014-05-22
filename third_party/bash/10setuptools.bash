@@ -15,7 +15,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
 
-        wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
+        wget --no-check-certificate --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
     fi
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]

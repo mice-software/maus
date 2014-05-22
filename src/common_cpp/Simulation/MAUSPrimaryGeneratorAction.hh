@@ -28,6 +28,7 @@
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
 
 // TODO (Rogers): should use src/common_cpp/DataStructure/Primary.hh rather than
 //                PGParticle
@@ -56,11 +57,19 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    */
   class PGParticle {
    public:
+    /// Initialise to 0
     PGParticle();
+    /// Initialise from Virtual Hit
     explicit PGParticle(VirtualHit hit);
+    /// Re-initialise from Json
     void ReadJson(Json::Value pg_particle);
+    /// Change momentum to set the mass shell condition (E^2 = p^2+m^2)
+    void MassShellCondition();
+    /// Represent as a Json object
     Json::Value WriteJson();
-    double x, y, z, time, px, py, pz, energy;
+    /// Represent as a "primary" particle object
+    Primary GetPrimary();
+    double x, y, z, time, px, py, pz, sx, sy, sz, energy;
     int pid;
     unsigned int seed;
   };

@@ -22,7 +22,7 @@ Configuration Stage1
   }
 // EMR pending geometry update and SD from EMR group
 // DR March 10, 2014
-//Module EMR/Calorimeter.dat
+//Module EMR/EMR.dat
 //{
 //  Position 0. 0. 3.813 m
 //  Rotation 0. 0. 0. degree

@@ -5,7 +5,7 @@ Datacard to run with simulation of 200MeV/c positrons
 
 import os
 
-output_json_file_name = "200MeV_e_plus_hypothesis.json"
+output_json_file_name = "200MeV_e_plus_hypothesis_Global_Recon.json"
 output_json_file_type = "text"
 
 # Used by MapPyRemoveTracks.
@@ -18,7 +18,7 @@ keep_steps = False # set to true to keep start and end point of every track and
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":0.0},
+    "position":{"x":0.0, "y":-0.0, "z":2770.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
 }
@@ -31,22 +31,30 @@ spill_generator_number_of_spills = 10000
 # This is a sample beam distribution based on guesses by Chris Rogers of what
 # an optimised beam might look like
 beam = {
-    "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":1, # number of coin tosses
-    "binomial_p":1.0, # probability of making a particle on each toss
-    "random_seed":5, # random seed for beam generation; controls also how the MC
+    "particle_generator":"counter", # routine for generating empty primaries
+    "random_seed":1, # random seed for beam generation; controls also how the MC
                      # seeds are generated
     "definitions":[
     {
        "reference":simulation_reference_particle, # reference particle
        "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
-       "weight":100., # probability of generating a particle
-       "transverse":{"transverse_mode":"pencil"},
-       "longitudinal":{"longitudinal_mode":"pencil", # longitudinal distribution
-                                                     # sawtooth in time
-                       "momentum_variable":"p"}, # end time of sawtooth
+       "n_particles_per_spill":1, # probability of generating a particle
+       "transverse":{
+          # transverse distribution matched to constant solenoid field
+          "transverse_mode":"twiss",
+          "beta_x":1000.,
+          "alpha_x":0.,
+          "emittance_x":1., # 4d emittance
+          "beta_y":8000.,
+          "alpha_y":0.,
+          "emittance_y":1.,
+          },
+       "longitudinal":{"longitudinal_mode":"sawtooth_time",
+                   "momentum_variable":"p",
+                   "sigma_p":25., # RMS total momentum
+                   "t_start":-1.e6, # start time of sawtooth
+                   "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
     }]
 }
 
-particle_decay = False
