@@ -36,7 +36,9 @@ class EMREventProcessor : public ObjectProcessor<EMREvent> {
     EMREventProcessor();
 
   private:
-    PointerArrayProcessor<EMRPlaneHit> _plane_hit_proc;
+    DoubleProcessor _double_proc;
+    BoolProcessor _bool_proc;
+    PointerArrayProcessor<EMRPlaneHit> _plane_hit_array_proc;
 };
 }  // namespace MAUS
 

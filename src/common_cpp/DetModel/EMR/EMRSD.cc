@@ -130,8 +130,8 @@ G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 //     << std::endl;
   }
 
-  int Edep = aStep->GetTotalEnergyDeposit();
-  int path = aStep->GetStepLength();
+  double Edep = aStep->GetTotalEnergyDeposit();
+  double path = aStep->GetStepLength();
   _hits_cppdata[xHitNum].AddEnergyDeposited(Edep);
   _hits_cppdata[xHitNum].AddPathLength(path);
 
@@ -148,10 +148,7 @@ void EMRSD::EndOfEvent(G4HCofThisEvent* HCE) {
 
     for (int xHitNum = 0; xHitNum < nHits; xHitNum++) {
       _hits["emr_hits"].append(*_hit_proc.CppToJson(_hits_cppdata[xHitNum], ""));
-      std::cerr << "hit in EMR bar: " <<  _hits_cppdata[xHitNum].GetChannelId()->GetBar()
-                << std::endl;
     }
-//     std::cerr << _hits["emr_hits"] << std::endl;
   }
 }
 

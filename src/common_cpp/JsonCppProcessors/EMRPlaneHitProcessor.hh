@@ -39,7 +39,9 @@ class EMRPlaneHitProcessor : public ObjectProcessor<EMRPlaneHit> {
 
   private:
     IntProcessor _int_proc;
-    PointerArrayProcessor<EMRBar> _hit_arr_proc;
+    DoubleProcessor _double_proc;
+    PointerArrayProcessor<EMRBar> _bar_arr_proc;
+    ValueArrayProcessor<int> _int_arr_proc;
 };
 }  // namespace MAUS
 
