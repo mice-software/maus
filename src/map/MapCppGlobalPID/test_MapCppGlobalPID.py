@@ -31,7 +31,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         cls.mapper = MapCppGlobalPID()
         cls.c = Configuration()
 
-    def _test_empty(self):
+    def test_empty(self):
         """Check can handle empty configuration"""
         self.assertRaises(ValueError, self.mapper.birth, "",)
         result = self.mapper.process("")
@@ -39,11 +39,11 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue("errors" in doc)
         self.assertTrue("MapCppGlobalPID" in doc["errors"])
 
-    def _test_init(self):
+    def test_init(self):
         """Check birth with default configuration"""
         self.mapper.birth(self. c.getConfigJSON())
 
-    def _test_no_data(self):
+    def test_no_data(self):
         """Check that nothing happens in absence of data"""
         test1 = ('%s/src/map/MapCppGlobalPID/noDataTest.json' % 
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -55,7 +55,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertEqual(len(spill_out["errors"]), 0)
 
-    def _test_invalid_json_birth(self):
+    def test_invalid_json_birth(self):
         """Check birth with an invalid json input"""
         print "birth"
         test2 = ('%s/src/map/MapCppGlobalPID/invalid.json' % 
@@ -72,7 +72,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalPID" in doc["errors"])
 
-    def _test_invalid_json_process(self):
+    def test_invalid_json_process(self):
         """Check process with an invalid json input"""
         self.mapper.birth(self. c.getConfigJSON())
         test3 = ('%s/src/map/MapCppGlobalPID/invalid.json' % 
@@ -91,11 +91,6 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         fin = open(test4,'r')
         for line in fin:
             result = self.mapper.process(line)
-            for track_point in result.GetSpill().GetReconEvents()[0].GetGlobalEvent().get_track_points():
-                print track_point
-                print "   ", track_point.get_space_point()
-            for space_point in result.GetSpill().GetReconEvents()[0].GetGlobalEvent().get_space_points():
-                print space_point
             spill_out = maus_cpp.converter.json_repr(result)
             self.assertTrue('recon_events' in spill_out)
             revtarray = spill_out['recon_events']
@@ -112,7 +107,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             print track['pid']
             self.assertEqual(-13, track['pid'])
 
-    def _test_positron_PID(self):
+    def test_positron_PID(self):
         """Check that process can identify positrons"""
         test5 = ('%s/src/map/MapCppGlobalPID/positron_pid_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -136,7 +131,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             print track['pid']
             self.assertEqual(-11, track['pid'])
 
-    def _test_pion_PID(self):
+    def test_pion_PID(self):
         """Check that process can identify pions"""
         test6 = ('%s/src/map/MapCppGlobalPID/pion_pid_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -160,7 +155,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             print track['pid']
             self.assertEqual(211, track['pid'])
 
-    def _test_undef_PID(self):
+    def test_undef_PID(self):
         """Check that PID set to 0 for indistinguishable particles"""
         test7 = ('%s/src/map/MapCppGlobalPID/undef_pid_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -182,7 +177,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             print track['pid']
             self.assertEqual(0, track['pid'])
 
-    def _test_invalid_logL(self):
+    def test_invalid_logL(self):
         """Check that a track that returns an invalid logL does not get
         set a PID"""
         test8 = ('%s/src/map/MapCppGlobalPID/invalid_logL.json' %
