@@ -48,6 +48,7 @@
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/Recon/Global/ImportSciFiRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportTOFRecon.hh"
 #include "src/common_cpp/Recon/Global/TrackMatching.hh"
 #include "src/common_cpp/API/MapBase.hh"

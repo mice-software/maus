@@ -76,6 +76,7 @@ class PolynomialOpticsModelTest : public testing::Test {
       << "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":" << kPrimaryPlane << "},"
       << "\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},"
       << "\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,"
+      << "\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},"
       << "\"random_seed\":2}";
     (*config)["simulation_reference_particle"]
       = JsonWrapper::StringToJson(reference_particle_string.str());

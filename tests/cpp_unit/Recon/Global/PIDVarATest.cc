@@ -36,7 +36,7 @@
 TEST(PIDVarATestSetUp, TestSetUpAndTearDown) {
 	MAUS::recon::global::PIDVarA *testPIDVarA = NULL;
 	ASSERT_NO_THROW(testPIDVarA = new MAUS::recon::global::PIDVarA("test",
-																																 "test"));
+								       "test"));
 	std::string testfile = testPIDVarA->Get_filename();
 	std::string testdir = testPIDVarA->Get_directory();
 	ASSERT_NO_THROW(delete testPIDVarA);
@@ -53,32 +53,35 @@ class PIDVarATest : public ::testing::Test {
 		testdir = testPIDVarA.Get_directory();
 		TRandom3 r;
 		for (int i = 0; i < 1000; i++) {
-			MAUS::DataStructure::Global::Track* testTrack =
-					new MAUS::DataStructure::Global::Track();
-			MAUS::DataStructure::Global::TrackPoint* tp0 =
-					new MAUS::DataStructure::Global::TrackPoint();
-			MAUS::DataStructure::Global::TrackPoint* tp1 =
-					new MAUS::DataStructure::Global::TrackPoint();
-			tp0->set_detector(MAUS::DataStructure::Global::kTOF0_1);
-			tp1->set_detector(MAUS::DataStructure::Global::kTOF1_1);
+		  MAUS::DataStructure::Global::Track* testTrack =
+		    new MAUS::DataStructure::Global::Track();
+		  MAUS::DataStructure::Global::TrackPoint* tp0 =
+		    new MAUS::DataStructure::Global::TrackPoint();
+		  MAUS::DataStructure::Global::TrackPoint* tp1 =
+		    new MAUS::DataStructure::Global::TrackPoint();
+		  tp0->set_detector(MAUS::DataStructure::Global::kTOF0);
+		  tp1->set_detector(MAUS::DataStructure::Global::kTOF1);
 
-			double x0 = 0.0;
-			double y0 = 0.0;
-			double z0 = 0.0;
-			double t0 = r.Gaus(15, 2);
-			TLorentzVector pos0(x0, y0, z0, t0);
+		  double x0 = 0.0;
+		  double y0 = 0.0;
+		  double z0 = 0.0;
+		  double t0 = r.Gaus(15, 2);
+		  TLorentzVector pos0(x0, y0, z0, t0);
 
-			double x1 = 0.0;
-			double y1 = 0.0;
-			double z1 = 0.0;
-			double t1 = r.Gaus(45, 2);
-			TLorentzVector pos1(x1, y1, z1, t1);
+		  double x1 = 0.0;
+		  double y1 = 0.0;
+		  double z1 = 0.0;
+		  double t1 = r.Gaus(45, 2);
+		  TLorentzVector pos1(x1, y1, z1, t1);
 
-			tp0->set_position(pos0);
-			tp1->set_position(pos1);
-			testTrack->AddTrackPoint(tp0);
-			testTrack->AddTrackPoint(tp1);
-			testTracks.push_back(testTrack);
+		  tp0->set_position(pos0);
+		  tp1->set_position(pos1);
+		  tp0->set_mapper_name("MapCppGlobalTrackMatching");
+		  tp1->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->AddTrackPoint(tp0);
+		  testTrack->AddTrackPoint(tp1);
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTracks.push_back(testTrack);
 		}
 	}
 
@@ -134,7 +137,7 @@ TEST_F(PIDVarATest, FillHist) {
 
 	MAUS::recon::global::PIDVarA testPIDVarA("test", "test");
 	for (int i = 0; i < 1000; i++) {
-		testPIDVarA.Fill_TH1(testTracks[i]);
+		testPIDVarA.Fill_Hist(testTracks[i]);
 	}
 	testfile = testPIDVarA.Get_filename();
 	testdir = testPIDVarA.Get_directory();
@@ -151,7 +154,7 @@ TEST_F(PIDVarATest, LogL) {
 	 {
 		MAUS::recon::global::PIDVarA writetestPIDVarA("test", "test");
 		for (int i = 0; i < 1000; i++) {
-			writetestPIDVarA.Fill_TH1(testTracks[i]);
+			writetestPIDVarA.Fill_Hist(testTracks[i]);
 		}
 		testfile = writetestPIDVarA.Get_filename();
 		testdir = writetestPIDVarA.Get_directory();
@@ -163,8 +166,8 @@ TEST_F(PIDVarATest, LogL) {
 			new MAUS::DataStructure::Global::TrackPoint();
 	MAUS::DataStructure::Global::TrackPoint* ctp1 =
 			new MAUS::DataStructure::Global::TrackPoint();
-	ctp0->set_detector(MAUS::DataStructure::Global::kTOF0_1);
-	ctp1->set_detector(MAUS::DataStructure::Global::kTOF1_1);
+	ctp0->set_detector(MAUS::DataStructure::Global::kTOF0);
+	ctp1->set_detector(MAUS::DataStructure::Global::kTOF1);
 
 	double x0 = 0.0;
 	double y0 = 0.0;
@@ -180,8 +183,11 @@ TEST_F(PIDVarATest, LogL) {
 
 	ctp0->set_position(cpos0);
 	ctp1->set_position(cpos1);
+	ctp0->set_mapper_name("MapCppGlobalTrackMatching");
+	ctp1->set_mapper_name("MapCppGlobalTrackMatching");
 	checkTrack->AddTrackPoint(ctp0);
 	checkTrack->AddTrackPoint(ctp1);
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
 
 	file = new TFile(testfile.c_str(), "READ");
 

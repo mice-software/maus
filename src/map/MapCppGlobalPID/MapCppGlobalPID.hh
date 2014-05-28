@@ -48,8 +48,8 @@
 
 #include "DataStructure/Global/Track.hh"
 
-#include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
+#include "src/common_cpp/Recon/Global/PIDVarB.hh"
 
 
 namespace MAUS {
@@ -89,7 +89,7 @@ namespace MAUS {
     ///  JsonCpp setup
     Json::Reader _reader;
 
-    /// PIDs to perform
+    /// PID variables to perform
     std::vector<MAUS::recon::global::PIDBase*> _pid_vars;
 
     /// Hypotheses to test PID variables against

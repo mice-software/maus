@@ -34,7 +34,11 @@
 
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/Global/PIDBase.hh"
+#include "src/common_cpp/Recon/Global/PIDBase1D.hh"
+#include "src/common_cpp/Recon/Global/PIDBase2D.hh"
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
+#include "src/common_cpp/Recon/Global/PIDVarB.hh"
+
 
 namespace MAUS {
 

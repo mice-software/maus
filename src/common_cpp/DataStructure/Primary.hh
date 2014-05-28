@@ -85,6 +85,14 @@ class Primary {
 
   /** Set the particle position
    */
+  ThreeVector GetSpin() const;
+
+  /** Set the particle position
+   */
+  void SetSpin(ThreeVector spin);
+
+  /** Get the particle momentum
+   */
   void SetPosition(ThreeVector pos);
 
   /** Get the particle momentum
@@ -103,7 +111,7 @@ class Primary {
   double _time;
   ThreeVector _position;
   ThreeVector _momentum;
-
+  ThreeVector _spin;
   MAUS_VERSIONED_CLASS_DEF(Primary)
 };
 }

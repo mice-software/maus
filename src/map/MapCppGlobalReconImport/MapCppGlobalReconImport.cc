@@ -78,7 +78,6 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = recon_event->GetGlobalEvent();
-      MAUS::recon::global::TrackMatching track_matching;
       global_event = Import(recon_event);
     }
   }
@@ -95,12 +94,15 @@ namespace MAUS {
 
     MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
 
+    MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
+
     if (tof_event) {
       MAUS::recon::global::ImportTOFRecon tofrecon_importer;
       tofrecon_importer.process((*tof_event), global_event, _classname);
-      // currently TrackMatching only uses TOF spacepoints, leave here for now
-      MAUS::recon::global::TrackMatching track_matching;
-      track_matching.FormTracks(global_event);
+    }
+    if (scifi_event) {
+      MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
+      scifirecon_importer.process((*scifi_event), global_event, _classname);
     }
     // Return the new GlobalEvent, to be added to the ReconEvent
     return global_event;

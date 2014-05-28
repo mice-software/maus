@@ -23,7 +23,7 @@
 #define PIDVARA_HH
 
 #include <string>
-
+#include <utility>
 
 #include "TLorentzVector.h"
 #include "TH1.h"
@@ -33,13 +33,13 @@
 #include "DataStructure/Global/TrackPoint.hh"
 #include "DataStructure/Global/BasePoint.hh"
 
-#include "Recon/Global/PIDBase.hh"
+#include "Recon/Global/PIDBase1D.hh"
 
 namespace MAUS {
 namespace recon {
 namespace global {
 
-  class PIDVarA : public PIDBase {
+  class PIDVarA : public PIDBase1D {
   public:
     /// Constructor to create a PDF
     explicit PIDVarA(std::string hypothesis, std::string unique_identifier);
@@ -56,7 +56,7 @@ namespace global {
      *
      *	@return Returns value of PID variable
      */
-    double Calc_Var(MAUS::DataStructure::Global::Track* track);
+    std::pair<double, double> Calc_Var(MAUS::DataStructure::Global::Track* track);
 
     /// Name of PID variable
     static const std::string VARIABLE;

@@ -85,6 +85,12 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
 
+    Json::Value spin;
+    spin["x"] = point->GetPolarization().x();
+    spin["y"] = point->GetPolarization().y();
+    spin["z"] = point->GetPolarization().z();
+    step["spin"] = spin;
+
     double f_pos[4] = {point->GetPosition().x(), point->GetPosition().y(),
                        point->GetPosition().z(), point->GetGlobalTime()};
     double field[6] = {0., 0., 0., 0., 0., 0.};
