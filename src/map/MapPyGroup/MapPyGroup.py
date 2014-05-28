@@ -89,26 +89,10 @@ class MapPyGroup:
         """
         if not hasattr(worker, 'birth'):
             raise TypeError(str(worker) + ' does not have a birth()')
-        # Python uses args, SWIG uses varargs.
-        py_ok = len(inspect.getargspec(worker.birth).args) == 2 # for python
-        swig_ok = inspect.getargspec(worker.birth).varargs != None # for swig
-        if not py_ok ^ swig_ok: # exclusive or
-            raise TypeError(str(worker) + ' birth() has wrong call signature')
-
         if not hasattr(worker, 'process'):
             raise TypeError(str(worker) + ' does not have a process()')
-        # Python uses args, SWIG uses varargs.
-        py_ok = len(inspect.getargspec(worker.process).args) == 2
-        swig_ok = inspect.getargspec(worker.process).varargs != None
-        if not py_ok ^ swig_ok: # exclusive or
-            raise TypeError(str(worker) + 
-                ' process() has wrong call signature')
-
         if not hasattr(worker, 'death'):
             raise TypeError(str(worker)+' does not have a death()')
-        if len(inspect.getargspec(worker.death).args) != 1: # self only
-            raise TypeError(str(worker) + ' death() has wrong call signature')
-
         self._workers.append(worker)
 
     def birth(self, json_config_doc):

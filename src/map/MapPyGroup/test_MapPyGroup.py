@@ -192,8 +192,6 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                 pass
             def process(self, spill):
                 pass
-            def death(self, argument):
-                pass
         self.execute_bad_append(TestWorker())
  
     def test_birth(self):
