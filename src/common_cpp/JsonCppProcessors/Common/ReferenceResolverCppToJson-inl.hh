@@ -60,6 +60,7 @@ class RefManager::PointerValueTable {
   public:
     virtual ~PointerValueTable() {}
     virtual void ClearData() = 0;
+    virtual std::string Dump() = 0;
   private:
 };
 
@@ -69,8 +70,18 @@ class RefManager::TypedPointerValueTable
   public:
     virtual ~TypedPointerValueTable() {}
     void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}
+    std::string Dump();
     std::map<PointerType*, std::string> _data_hash;
 };
+
+template <class PointerType>
+std::string RefManager::TypedPointerValueTable<PointerType>::Dump() {
+        std::string dump_str = "PointerValueTable\n";
+        typename std::map<PointerType*, std::string>::iterator it; 
+        for (it = _data_hash.begin(); it != _data_hash.end(); ++it)
+            dump_str += "  "+STLUtils::ToString(it->first)+" "+it->second+"\n";
+        return dump_str;
+}
 
 template <class PointerType>
 void RefManager::SetPointerAsValue
@@ -114,16 +125,16 @@ std::string RefManager::GetPointerAsValue(PointerType* pointer) {
                                        GetTypedPointerValueTable<PointerType>();
     if (!table) {
         throw(Exception(Exception::recoverable,
-                     "Attempt to get pointer for json address "+
+                     "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " when it was never added",
+                     " when no pointers of this type were ever added",
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     }
     if (table->_data_hash.find(pointer) == table->_data_hash.end())
         throw(Exception(Exception::recoverable,
-                     "Attempt to get pointer for json address "+
+                     "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " when it was never added",
+                     " when it was never added. "+table->Dump(),
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     return table->_data_hash[pointer];
 }
