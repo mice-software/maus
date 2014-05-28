@@ -16,12 +16,10 @@ R. Bayes
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable=C0103, R0902, R0914, W0612
 
 import os
 import unittest
-import json
-import geometry
-from Configuration import Configuration
 from geometry.LocationFit import  ElementRotationTranslation
 
 
@@ -38,7 +36,8 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         
         self.maus = os.environ['MAUS_ROOT_DIR']
         self.constructor = None
-        test_locationfit = '/tests/py_unit/test_geometry/testCases/testLocationFit/'
+        test_locationfit = \
+            '/tests/py_unit/test_geometry/testCases/testLocationFit/'
         
         data_dir = self.maus + test_locationfit
         # Initialize the fitting algorithm
@@ -58,8 +57,9 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         # required by the configuration
         fourPoints = 'MICE_Information/Detector_Information/EMR'
         try:
-            self.assertTrue(not self.fittest.extractDatafromGDML(fourPoints),"Data successfully read")
-        except:
+            self.assertTrue(not self.fittest.extractDatafromGDML(fourPoints), \
+                            "Data successfully read")
+        except: #pylint: disable=W0702
             pass
         # Get the data from the fitting object
         data = self.fittest.datapoints
@@ -69,7 +69,7 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         result = self.fittest.FitQP()
         try:
             self.assertTrue(len(result)!=3,"Fit successfully completed")
-        except:
+        except:#pylint: disable=W0702
             pass
         
         # Setup and attempt a fit that will produce nonsense
@@ -79,7 +79,7 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
         dy = -3 * self.sigmay
         dz =  2 * self.sigmaz
         dtx = 3 * self.sthetax
-        dty =-3 * self.sthetay
+        dty = -3 * self.sthetay
         dtz = 2 * self.sthetaz
         par0 = [dx, dy, dz, dtx, dty, dtz]
         newdatapoints = []
@@ -105,7 +105,7 @@ class test_location_fit(unittest.TestCase): #pylint: disable = C0103, R0904
             success = result[2] / self.fittest.ndof \
                       < self.fittest.tolerance
             self.assertTrue(success,"Fit should be outside of tolerance")
-        except:
+        except: #pylint: disable=W0702
             pass
 
 if __name__ == '__main__':

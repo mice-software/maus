@@ -122,6 +122,7 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
   threeVectorValue["z"] = aStep->GetPostStepPoint()->GetMomentum().z(); 
   hit_i["momentum"] = threeVectorValue;
 
+
   _hits["special_virtual_hits"].append(hit_i);
   return true;
 }

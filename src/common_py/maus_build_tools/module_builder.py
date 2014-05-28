@@ -57,9 +57,27 @@ class ModuleBuilder:
         SConscript(sconscript_path(project),
                    exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
-
-    #sets up the build for a given project
+    # Determine if the project uses SWIG to build, and pass to either
+    # build_project_swig or build_project_capi
     def build_project(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+        """
+        Add a particular subproject to the build list
+
+        Buildit is called by SConscript files to request that we build a module.
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param dependencies list of projects on which this project depends
+        @return True on success
+        """
+        name = project.split('/')[-1]
+        potential_swig_file = os.path.join(MAUS_ROOT_DIR, project, name + '.i')
+        if os.path.isfile(potential_swig_file):
+            self.build_project_swig(localenv, project, dependencies)
+        else:
+            self.build_project_capi(localenv, project, dependencies)
+
+    #sets up the build for a given project, using SWIG
+    def build_project_swig(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
         """
         Add a particular subproject to the build list
 
@@ -115,6 +133,73 @@ class ModuleBuilder:
         self.env.Install(full_build_dir, "build/%s.py" % name)
         self.env.Install(full_build_dir, swig_lib)
         self.env.Install(full_build_dir, normal_lib)
+        self.env.Install(full_build_dir, tests)
+        return True
+
+    #sets up the build for a given project, using the C/Python API
+    def build_project_capi(self, localenv, project, dependencies=None): #pylint: disable=R0914, C0301
+        """
+        Add a particular subproject to the build list
+
+        Buildit is called by SConscript files to request that we build a module.
+        @param localenv the local environment set up in the sconscript file
+        @param project the name of the project (string)
+        @param dependencies list of projects on which this project depends
+        @return True on success
+        """
+        if dependencies == None:
+            dependencies = [] # can cause evil if we use [] as default value
+
+        # Determine the name of the project
+        name = project.split('/')[-1]
+        
+        # Find the sources
+        ccpath = [x for x in glob.glob('*.cc')]
+
+        #append the user's additional compile flags
+        #assume debugcflags and releasecflags are defined
+        localenv.Append(LIBS=['MausCpp'])
+        localenv.Append(LIBPATH = "%s/src/common_cpp" % MAUS_ROOT_DIR)
+        if type(dependencies) != type([]):
+            print 'Warning - dependencies should be a list - found '+\
+                  str(dependencies)+' in project '+project
+            dependencies = []
+        for dep in dependencies:
+            lib_name = dep.split('/')[-1]
+            localenv.Append(LIBS=lib_name)
+
+        #specify the build directory
+        builddir = 'build'
+        localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
+        localenv.Append(CPPPATH='.')
+        full_build_dir = os.path.join(MAUS_ROOT_DIR, builddir)
+
+        # Build the library, and set the dependencies
+        lib1_path = os.path.join(builddir, 'lib%s' % name)
+        lib2_path = os.path.join(builddir, '_%s.so' % name)
+        normal_lib1 = localenv.SharedLibrary(lib1_path, source=ccpath)
+        normal_lib2 = localenv.SharedLibrary(lib2_path, source=ccpath)
+        for dep in dependencies:
+            localenv.Depends(dep, normal_lib1)
+            localenv.Depends(dep, normal_lib2)
+
+        # Build an extra copy with the .dylib extension for linking on OS X
+        if (os.uname()[0] == 'Darwin'):
+            lib_so = self.env.Dylib2SO(lib1_path)
+            Depends(lib_so, pgm) #pylint: disable=E0602
+            self.env.Install(full_build_dir, lib_so)
+
+        # Ensure the build directory exists
+        if not os.path.exists(builddir):
+            os.makedirs(builddir)
+
+        # Locate the test file
+        tests = glob.glob('test_*.py')
+
+        # Install the files in the build directory, under MAUS_ROOT_DIR.
+        print 'Installing', project
+        self.env.Install(full_build_dir, normal_lib1)
+        self.env.Install(full_build_dir, normal_lib2)
         self.env.Install(full_build_dir, tests)
         return True
 
@@ -181,7 +266,7 @@ def cleanup_extras():
             if os.path.isdir(dirname):
                 shutil.rmtree(dirname) 
 
-def build_maus_lib(filename, stuff_to_import):
+def build_maus_lib(filename, import_module_list):
     """
     Build MAUS.py - single point of entry importer for all of the MAUS libraries
     """
@@ -197,15 +282,15 @@ def build_maus_lib(filename, stuff_to_import):
     file_to_import.write("     print 'failed to import Go'\n")
     file_to_import.write("\n")
 
-    for single_stuff in stuff_to_import:
-        file_to_import.write("try:\n")
-        file_to_import.write("     from %s import %s\n" % \
-                                                   (single_stuff, single_stuff))
-        file_to_import.write("except ImportError:\n")
-        file_to_import.write("     print 'failed to import %s'\n" % \
-                                                                   single_stuff)
-        file_to_import.write("\n")
-
+    for import_module in import_module_list:
+        import_string = """
+try:
+    from %%MODULE%% import %%MODULE%%
+except ImportError:
+    from _%%MODULE%% import %%MODULE%%
+"""
+        import_string = import_string.replace("%%MODULE%%", import_module) 
+        file_to_import.write(import_string)
     file_to_import.close()
 
 def fail_path(directory):

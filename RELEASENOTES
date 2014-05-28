@@ -5,6 +5,15 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.8.4
+  The following changes were made:
+    - Added EMR geometry and sensitive detector hits
+    - Implemented polarized decays and spin tracking
+    - API to handle conversions between json/string/cpp types
+    - Tracker added to global PID
+    - Geometry updates
+    - Fixed memory leak
+    - Bug fixes
 MAUS-v0.8.3
   The following changes were made:
     - Added G4Beamline as a third party package

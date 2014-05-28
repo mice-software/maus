@@ -154,9 +154,23 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # check for transverse distribution
         self.assertNotAlmostEqual(strag_hits[0]['px'], 0., 7)
 
-    def test_decay(self):
+    def test_decay_defaults(self):
         """
-        Check that we can disable particle decay
+        Check that we get particle decay with default settings
+        (regression #1470)
+        """
+        # defaults
+        file_decay = run_simulation("none", "none", True,
+                                     -1, -1, 5.)
+        bunch = Bunch.new_list_from_read_builtin \
+                                   ('maus_root_virtual_hit', file_decay)[-1]
+        # pions decay to muons decay to electrons
+        for hit in bunch:
+            self.assertEqual(hit["pid"], -11)
+
+    def test_decay_lifetime(self):
+        """
+        Check that we can control particle lifetime
         """
         # decays on, short pion lifetime, long muon lifetime
         file_decay = run_simulation("none", "mean_energy_loss", True,
@@ -176,6 +190,10 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue(211 in bunch.keys())
         self.assertFalse(-13 in bunch.keys())
 
+    def test_decay_disabled(self):
+        """
+        Check that we can disable particle decay
+        """
         # decays off, long pion lifetime, long muon lifetime
         file_decay = run_simulation("none", "mean_energy_loss", False,
                                      1.e-9, 1.e-9, 5.)
@@ -184,8 +202,6 @@ class PhysicsModelTest(unittest.TestCase): # pylint: disable = R0904
         # decays off
         self.assertTrue(211 in bunch.keys())
         self.assertTrue(-13 in bunch.keys())
-
-
 
 if __name__ == "__main__":
     unittest.main()

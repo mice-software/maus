@@ -84,7 +84,6 @@ TEST_F(DetectorConstructionTest, SetSteppingAlgorithmTest) {
 }
 }
 }
-
 /*
 TEST_F(DetectorConstructionTest, RootVolumeTest) {
     // I dont test anywhere that the volume name is updated. I dont know how
@@ -137,7 +136,7 @@ TEST_F(DetectorConstructionTest, NormalVolumePlacementTest) {
     dc->SetMiceModules(mod);
     Json::Value out = Globals::GetInstance()->GetGeant4Manager()->RunParticle(p);
     Json::Value steps = out["tracks"][Json::Value::UInt(0)]["steps"];
-    EXPECT_EQ(steps.size(), 4);
+    EXPECT_EQ(steps.size(), size_t(4));
     EXPECT_DOUBLE_EQ(steps[Json::Value::UInt(0)]["position"]["z"].asDouble(),
                     0.);
     EXPECT_DOUBLE_EQ(steps[Json::Value::UInt(1)]["position"]["z"].asDouble(),
@@ -247,6 +246,7 @@ TEST_F(DetectorConstructionTest, BuildG4DetectorVolumeTest) {
     MiceModule modError(mod_path+"G4DetectorTestError.dat");
     EXPECT_THROW(dc->SetMiceModules(modError), MAUS::Exception);
 }
-
+}
+}
 */
 

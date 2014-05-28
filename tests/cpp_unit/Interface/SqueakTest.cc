@@ -25,8 +25,20 @@
 
 namespace {
 
+class SqueakTest : public ::testing::Test {
+ protected:
+  SqueakTest() {}
+  virtual ~SqueakTest() {
+    Json::Value& cards = *MAUS::Globals::GetConfigurationCards();
+    int verbose_level = cards["verbose_level"].asInt();
+    Squeak::setStandardOutputs(verbose_level);
+    Squeak::setOutputs(verbose_level);
+  }
+};
+
+
 // test mout(Squeak::errorLevel) and SetOutput(Squeak::errorLevel)
-TEST(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
+TEST_F(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
   std::stringstream sstr;
   // debug, info, warning, error, fatal
   Squeak::errorLevel err[] = {Squeak::debug, Squeak::info, Squeak::warning,
@@ -41,8 +53,8 @@ TEST(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
   }
 }
 
-// test mout(MAUS::Exception::exceptionLevel)
-TEST(SqueakTest, SqueakMoutExceptionTest) {
+// test mout(Squeal::exceptionLevel)
+TEST_F(SqueakTest, SqueakMoutExceptionTest) {
   std::stringstream sstr;
   MAUS::Exception::exceptionLevel exc[] = {
     MAUS::Exception::recoverable, MAUS::Exception::nonRecoverable};
@@ -56,7 +68,7 @@ TEST(SqueakTest, SqueakMoutExceptionTest) {
 }
 
 // test mout()
-TEST(SqueakTest, SqueakMoutDefaultTest) {
+TEST_F(SqueakTest, SqueakMoutDefaultTest) {
   std::stringstream sstr;
   Squeak::setAnOutput(Squeak::debug, sstr);
   ASSERT_EQ(Squeak::mout(), sstr);
@@ -89,7 +101,7 @@ void __TestStdOutputs(int test_value) {
     }
 }
 
-TEST(SqueakTest, ActivateCoutTest) {
+TEST_F(SqueakTest, ActivateCoutTest) {
   Squeak::activateCout(true);
   EXPECT_EQ(std::cout.rdbuf(), Squeak::coutOut().rdbuf());
   EXPECT_EQ(Squeak::coutIsActive(), true);
@@ -104,7 +116,7 @@ TEST(SqueakTest, ActivateCoutTest) {
   EXPECT_EQ(Squeak::coutIsActive(), true);
 }
 
-TEST(SqueakTest, ActivateClogTest) {
+TEST_F(SqueakTest, ActivateClogTest) {
   Squeak::activateClog(true);
   EXPECT_EQ(std::clog.rdbuf(), Squeak::clogOut().rdbuf());
   EXPECT_EQ(Squeak::clogIsActive(), true);
@@ -119,7 +131,7 @@ TEST(SqueakTest, ActivateClogTest) {
   EXPECT_EQ(Squeak::clogIsActive(), true);
 }
 
-TEST(SqueakTest, ActivateCerrTest) {
+TEST_F(SqueakTest, ActivateCerrTest) {
   Squeak::activateCerr(true);
   EXPECT_EQ(std::cerr.rdbuf(), Squeak::cerrOut().rdbuf());
   EXPECT_EQ(Squeak::cerrIsActive(), true);
@@ -134,7 +146,7 @@ TEST(SqueakTest, ActivateCerrTest) {
   EXPECT_EQ(Squeak::cerrIsActive(), true);
 }
 
-TEST(SqueakTest, SetStandardOutputsTest) {
+TEST_F(SqueakTest, SetStandardOutputsTest) {
   for (int i = 0; i < 6; ++i) {
     Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
@@ -143,8 +155,6 @@ TEST(SqueakTest, SetStandardOutputsTest) {
     Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
   }
-  Json::Value& cards = *MAUS::Globals::GetConfigurationCards();
-  Squeak::setStandardOutputs(cards["verbose_level"].asInt());
 }
 
 void __TestOutputs(int test_value) {
@@ -186,7 +196,7 @@ void __TestOutputs(int test_value) {
     }
 }
 
-TEST(SqueakTest, SetOutputsTest) {
+TEST_F(SqueakTest, SetOutputsTest) {
   for (int i = 0; i < 6; ++i) {
     Squeak::setOutputs(i);
     __TestOutputs(i);
@@ -195,8 +205,6 @@ TEST(SqueakTest, SetOutputsTest) {
     Squeak::setOutputs(i);
     __TestOutputs(i);
   }
-  Json::Value& cards = *MAUS::Globals::GetConfigurationCards();
-  Squeak::setOutputs(cards["verbose_level"].asInt());
 }
 }
 

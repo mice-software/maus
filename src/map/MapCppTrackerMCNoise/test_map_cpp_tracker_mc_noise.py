@@ -53,7 +53,7 @@ class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
         self.mapper = MapCppTrackerMCNoise()
         conf = json.loads(Configuration().getConfigJSON())
         conf["simulation_geometry_filename"] = "Stage4.dat"
-        conf["SciFiDarkCountProababilty"] = ".02"
+        conf["SciFiDarkCountProababilty"] = 0.02
         # Test whether the configuration files were loaded correctly at birth
         success = self.mapper.birth(json.dumps(conf))
         if not success:
