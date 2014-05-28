@@ -107,7 +107,7 @@ class MapCppGlobalTrackMatching(unittest.TestCase): # pylint: disable = R0904
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
-        self.assertEqual(33, len(revt['global_event']['track_points']))
+        self.assertEqual(32, len(revt['global_event']['track_points']))
         numTMtrackpoints = 0
         for i in revt['global_event']['track_points']:
             self.assertTrue('mapper_name' in i)
