@@ -77,7 +77,7 @@ class RefManager::TypedPointerValueTable
 template <class PointerType>
 std::string RefManager::TypedPointerValueTable<PointerType>::Dump() {
         std::string dump_str = "PointerValueTable\n";
-        typename std::map<PointerType*, std::string>::iterator it; 
+        typename std::map<PointerType*, std::string>::iterator it;
         for (it = _data_hash.begin(); it != _data_hash.end(); ++it)
             dump_str += "  "+STLUtils::ToString(it->first)+" "+it->second+"\n";
         return dump_str;

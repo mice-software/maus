@@ -162,7 +162,7 @@ def HandleCppException(doc, caller, error_message):# pylint:disable = C0103
         try:
             out = json.dumps(__default_handler.HandleException(json_doc,
                                                                caller))
-        except:
+        except: # pylint: disable = W0702
             out = """{"errors":"Failed to handle exception"}"""
     
     return out
