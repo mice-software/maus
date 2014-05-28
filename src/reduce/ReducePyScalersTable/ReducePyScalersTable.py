@@ -285,7 +285,7 @@ class ReducePyScalersTable: # pylint: disable=R0902
             if "errors" not in out:
                 out["errors"] = {}
             out["errors"]["ReducePyScalersTable"] = \
-                              ["Bad input spill - no maus_event_type"]
+                                        "Bad input spill - no maus_event_type"
             return out
         elif spill["maus_event_type"] != "Spill": 
             return self._create_output()
