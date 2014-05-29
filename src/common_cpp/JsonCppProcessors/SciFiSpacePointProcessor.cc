@@ -63,6 +63,8 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor() {
                         &SciFiSpacePoint::get_position,
                         &SciFiSpacePoint::set_position, true);
 
+    RegisterIgnoredBranch("clusters", false);
+
 //    RegisterValueBranch("clusters", &_sf_cluster_array_proc,
 //                        &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
 }

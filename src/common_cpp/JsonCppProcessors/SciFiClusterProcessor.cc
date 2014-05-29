@@ -69,6 +69,7 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::get_position,
                         &SciFiCluster::set_position, true);
 
+    RegisterIgnoredBranch("digits", false);
     // RegisterValueBranch("digits", &_scifidigit_array_proc,
     //                    &SciFiCluster::get_digits,
     //                    &SciFiCluster::set_digits, true);

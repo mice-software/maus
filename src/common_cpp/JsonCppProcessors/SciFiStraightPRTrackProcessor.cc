@@ -46,6 +46,7 @@ SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor() {
                         &SciFiStraightPRTrack::get_y_chisq,
                         &SciFiStraightPRTrack::set_y_chisq, true);
 
+    RegisterIgnoredBranch("spacepoints", false);
 //    RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
 //                        &SciFiStraightPRTrack::get_spacepoints,
 //                        &SciFiStraightPRTrack::set_spacepoints, true);

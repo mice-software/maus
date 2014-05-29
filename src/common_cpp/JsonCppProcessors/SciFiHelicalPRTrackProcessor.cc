@@ -74,6 +74,7 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
                         &SciFiHelicalPRTrack::get_chisq_dof,
                         &SciFiHelicalPRTrack::set_chisq_dof, true);
 
+    RegisterIgnoredBranch("spacepoints", false);
 //    RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
 //                        &SciFiHelicalPRTrack::get_spacepoints,
 //                        &SciFiHelicalPRTrack::set_spacepoints, true);
