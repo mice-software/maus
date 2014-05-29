@@ -47,24 +47,6 @@ namespace PyLibMausCpp {
  * available in libMausCpp.
  */
 PyMODINIT_FUNC initlibMausCpp(void);
-
-
-// Nb: Following tested in tests/py_unit/test_error_handler.py and
-//                         tests/cpp_unit/CppErrorHandlerTest.cc
-
-/* @brief Call back to make Python ErrorHandler by the CppErrorHandler
- *
- * Tell C++ which python function to call in the event of an error. Calls the
- * SetHandleExceptionFunction. Aim is to use the same python code to manage
- * errors arising from both C and Python; argument is a function with callsign
- * like\n
- *
- *    def HandleExceptionStrings(doc, caller, error_message)
- *
- * See also: src/common_py/ErrorHandler, src/common_cpp/CppErrorHandler
- */
-static PyObject* CppErrorHandler_SetHandleExceptionFunction
-                                              (PyObject *dummy, PyObject *args);
 }
 }  // namespace MAUS
 

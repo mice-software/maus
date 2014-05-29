@@ -1,4 +1,4 @@
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ import subprocess
 import signal
 import sys
 
-import process_monitor
+import process_monitor #pylint: disable = F0401
 
 MAX_RUN_TIME = 60*10*1 # 10 minutes
 PLOT_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/plots/")
-TEST_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/test_load/")
 TMP_DIR = os.path.expandvars("${MAUS_TMP_DIR}")
 MRD = os.path.expandvars("${MAUS_ROOT_DIR}")
 MTP = os.path.expandvars("${MAUS_THIRD_PARTY}")
+TEST_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/test_load/")
 
 def get_data(run_number):
     """Get data for run number"""
@@ -43,38 +43,48 @@ def get_data(run_number):
     proc.wait()
 
 
+def get_sim_proc():
+    """Start up a simulate_mice process"""
+    sim_path = MRD+"/bin/simulate_mice.py"  
+    config = TEST_DIR+"/test_load_configuration"
+    sim_options = [sim_path, "--configuration_file", config]
+    sim_log = open(TMP_DIR+"/test_load_simulate_mice.log", "w")
+    proc = subprocess.Popen(sim_options, stdout=sim_log,
+                                         stderr=subprocess.STDOUT)
+    return proc
+
+def get_rec_proc(run_number):
+    """Start up a analyze_data_offline process"""
+    rec_path = MRD+"/bin/analyze_data_offline.py"
+    config = TEST_DIR+"/test_load_configuration"
+    rec_options = [rec_path, "--configuration_file", config,
+                   "--daq_data_file", run_number]
+    rec_log = open(TMP_DIR+"/test_load_analyze_data_offline.log", "w")
+    proc = subprocess.Popen(rec_options, stdout=rec_log,
+                                         stderr=subprocess.STDOUT)
+    return proc
+
+
 class LoadTest(unittest.TestCase): # pylint: disable = R0904
     """
     Look for memory usage over a long duration MC
     """
-    def get_sim_proc(self):
-        """Start up a simulate_mice process"""
-        sim_path = MRD+"/bin/simulate_mice.py"  
-        config = TEST_DIR+"/test_load_configuration.py"
-        sim_options = [sim_path, "--configuration_file", config]
-        sim_log = open(TMP_DIR+"/test_load_simulate_mice.log", "w")
-        proc = subprocess.Popen(sim_options, stdout=sim_log,
-                                             stderr=subprocess.STDOUT)
-        return proc
-
-    def get_rec_proc(self, run_number):
-        """Start up a analyze_data_offline process"""
-        rec_path = MRD+"/bin/analyze_data_offline.py"
-        config = TEST_DIR+"/test_load_configuration.py"
-        rec_options = [rec_path, "--configuration_file", config,
-                       "--daq_data_file", "04258"]
-        rec_log = open(TMP_DIR+"/test_load_analyze_data_offline.log", "w")
-        proc = subprocess.Popen(rec_options, stdout=rec_log,
-                                             stderr=subprocess.STDOUT)
-        return proc
+    def check_resource_usage(self,
+                             resource_usage_list,
+                             fraction_of_time,
+                             mem_threshold_factor):
+        """
+        Check that resource usage does not grow excessively
+        """
+        pass
 
     def test_simulate_mice(self):
         """
         Test that we can simulate mice for a long duration without memory 
         problems
         """
-        sim_proc = self.get_sim_proc()
-        rec_proc = self.get_rec_proc(self.run_number)
+        sim_proc = get_sim_proc()
+        rec_proc = get_rec_proc(self.run_number)
         try:
             resource_usage_list = process_monitor.main(
                                 [sim_proc.pid, rec_proc.pid], 
@@ -83,6 +93,7 @@ class LoadTest(unittest.TestCase): # pylint: disable = R0904
                                 MAX_RUN_TIME)
             self.assertFalse(sim_proc.returncode) # no crash during running
             self.assertFalse(rec_proc.returncode) # no crash during running
+            self.check_resource_usage(resource_usage_list, 0.5, 2.)
         except Exception:
             raise
         finally:
