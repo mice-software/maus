@@ -75,10 +75,12 @@ Json::Value SetupConfig(int verbose_level) {
   config["reference_physics_processes"] = "mean_energy_loss";
   config["physics_processes"] = "standard";
   config["particle_decay"] = true;
+  config["polarised_decay"] = true;
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
   config["default_keep_or_kill"] = true;
+  config["spin_tracking"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";
   config["kinetic_energy_threshold"] = 0.1;
   config["max_step_length"] = 100.;
@@ -86,6 +88,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["max_track_length"] = 1.e8;
   config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
     std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
     std::string("\"random_seed\":10}")
