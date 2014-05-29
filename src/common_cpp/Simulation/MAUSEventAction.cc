@@ -72,7 +72,7 @@ void MAUSEventAction::SetEvents(Json::Value events) {
         throw(Exception(Exception::recoverable, "Particles must be an array value",
                      "MAUSEventAction::SetEvent"));
     for (size_t i = 0; i < events.size(); ++i) {
-        if (!events[i].isObject())
+        if (!events[int(i)].isObject())
             throw(Exception(Exception::recoverable,
                          "Each Particle must be an object value",
                          "MAUSEventAction::SetEvent"));

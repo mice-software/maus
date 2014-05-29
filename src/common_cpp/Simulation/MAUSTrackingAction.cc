@@ -103,8 +103,8 @@ void MAUSTrackingAction::SetTracks(Json::Value tracks) {
 void MAUSTrackingAction::SetKillReason
                                   (const G4Track* aTrack, std::string reason) {
     for (size_t i = 0; i < _tracks.size(); ++i) {
-        if (_tracks[i]["track_id"] == aTrack->GetTrackID()) {
-            _tracks[i]["kill_reason"] = reason;
+        if (_tracks[int(i)]["track_id"] == aTrack->GetTrackID()) {
+            _tracks[int(i)]["kill_reason"] = reason;
         }
     }
 }

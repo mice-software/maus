@@ -56,30 +56,38 @@ void MapCppTrackerRecon::_process(Data* data) const {
 
   if ( spill.GetReconEvents() ) {
     for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
+      std::cerr << "Recon " << k << std::endl;
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
       // Build Clusters.
+      std::cerr << "  Clusters" << std::endl;
       if ( event->digits().size() ) {
         cluster_recon(*event);
       }
       // Build SpacePoints.
+      std::cerr << "  Space points" << std::endl;
       if ( event->clusters().size() ) {
         spacepoint_recon(*event);
       }
       // Pattern Recognition.
+      std::cerr << "  PR" << std::endl;
       if ( event->spacepoints().size() ) {
         pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
       }
       // Kalman Track Fit.
+      std::cerr << "  Kalman" << std::endl;
       if ( _kalman_on ) {
         if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
           track_fit(*event);
         }
       }
+      std::cerr << "  Next please" << std::endl;
       // print_event_info(*event);
     }
   } else {
     std::cout << "No recon events found\n";
   }
+  std::cerr << "All Done" << std::endl;
+
 }
 
 void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) const {

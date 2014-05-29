@@ -38,15 +38,16 @@ namespace MAUS {
   bool OutputBase<T>::save(T t) {
     bool ret = false;
     try {
+      std::cerr << "OutputBase::save" << std::endl;
       ret = _save(t);
-    }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
+      std::cerr << "OutputBase::save done" << std::endl;
     }
     catch (std::exception& e) {
+      std::cerr << "OutputBase::save exc 2" << std::endl;
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
     catch (...) {
+      std::cerr << "OutputBase::save exc 3" << std::endl;
       throw UnhandledException(_classname);
     }
     return ret;

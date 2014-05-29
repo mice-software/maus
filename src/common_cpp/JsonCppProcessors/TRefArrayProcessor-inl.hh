@@ -41,9 +41,9 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
 
   for (size_t i = 0; i < json_array.size(); ++i) {
     try {
-      if (json_array[i].type() != Json::nullValue) {
+      if (json_array[int(i)].type() != Json::nullValue) {
         std::string data_path = JsonWrapper::GetProperty
-            (json_array[i], "$ref", JsonWrapper::stringValue).asString();
+            (json_array[int(i)], "$ref", JsonWrapper::stringValue).asString();
         // allocate the TRefArray element
         if (RefManager::HasInstance()) {
           TRefArrayResolver* res =

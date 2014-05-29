@@ -59,10 +59,10 @@ Json::Value JsonWrapper::GetItem(const Json::Value & array,
                                                       +" in Json array lookup",
                          "JsonWrapper::GetItemStrict"));
   }
-  JsonType actual_type = ValueTypeToJsonType(array[value_index].type());
+  JsonType actual_type = ValueTypeToJsonType(array[int(value_index)].type());
   if (SimilarType(actual_type, value_type) ||
       (value_type == realValue && IsNumeric(actual_type))) {
-    return array[value_index];
+    return array[int(value_index)];
   }
   throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Value of wrong type in Json array lookup",
@@ -241,7 +241,8 @@ bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
     }
     // check each item is the same (recursively)
     for (size_t i = 0; i < value_1.size(); ++i) {
-        if (!AlmostEqual(value_1[i], value_2[i], tolerance, int_permissive)) {
+        if (!AlmostEqual(value_1[int(i)],
+                         value_2[int(i)], tolerance, int_permissive)) {
             return false;
         }
     }
@@ -300,7 +301,7 @@ Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
     }
     Json::Value array_merge(array_1);
     for (size_t i = 0; i < array_2.size(); ++i) {
-        array_merge.append(array_2[i]);
+        array_merge.append(array_2[int(i)]);
     }
     return array_merge;
 }
@@ -411,7 +412,7 @@ void JsonWrapper::Path::_SetPathRecursive(Json::Value& tree) {
   std::string path = GetPath(tree);
   switch (tree.type()) {
       case Json::arrayValue: {
-          for (size_t i = 0; i < tree.size(); ++i) {
+          for (int i = 0; i < int(tree.size()); ++i) {
               SetPath(tree[i], path);
               AppendPath(tree[i], i);
               _SetPathRecursive(tree[i]);

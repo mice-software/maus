@@ -41,22 +41,30 @@ namespace MAUS {
   template<typename TYPE>
   PyObject* MapBase<TYPE>::process_pyobj(PyObject* py_input) const {
     // this function owns cpp_data; py_input is still owned by caller
+    std::cerr << "Process pyobj" << std::endl;
     TYPE* cpp_data = NULL;
     try {
+        std::cerr << " unwrap" << std::endl;
         cpp_data = PyObjectWrapper::unwrap<TYPE>(py_input);
+        std::cerr << " process" << std::endl;
         _process(cpp_data);
     } catch (MAUS::Exception& exc) {
+        std::cerr << " handle exception 1" << std::endl;
         Squeak::mout(Squeak::debug) << "Stack trace:" << exc.GetStackTrace()
                                                                    << std::endl;
         HandleException(&cpp_data, &exc, _classname);
     } catch (std::exception& exc) {
+        std::cerr << " handle exception 2" << std::endl;
         HandleException(&cpp_data, &exc, _classname);
     } catch (...) {
+        std::cerr << " handle exception 3" << std::endl;
         throw Exception(Exception::recoverable,
                         _classname+" threw an unhandled exception",
                         "MapBase::process_pyobj");
     }
+    std::cerr << " wrap" << std::endl;
     PyObject* py_output = PyObjectWrapper::wrap(cpp_data);
+    std::cerr << " return" << std::endl;
     // py_output now owns cpp_data
     return py_output;
   }

@@ -383,7 +383,7 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
 
   Json::Value json = vpm.GetVirtualHits();
   ASSERT_EQ(json.size(), (Json::UInt) 3);
-  for (size_t i = 0; i < json.size(); ++i)
+  for (int i = 0; i < int(json.size()); ++i)
     EXPECT_EQ(json[i]["station_id"].asInt(), (Json::Int) i+2);
 
   delete step;
@@ -457,7 +457,7 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
 
   ASSERT_EQ(json1.size(), (Json::UInt) 3);
-  for (size_t i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i)
     EXPECT_EQ(json1[i]["station_id"].asInt(), (Json::Int) i+1);
 
   ASSERT_EQ(json2.size(), (Json::UInt) 5);
@@ -474,7 +474,7 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
   Json::Value json4 = vpm.GetVirtualHits();
 
   ASSERT_EQ(json4.size(), (Json::UInt) 3);
-  for (size_t i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i) {
     EXPECT_EQ(json4[i]["station_id"].asInt(), (Json::Int) i+1);
     EXPECT_EQ(vpm.GetNumberOfHits(i+1), 1);
   }
