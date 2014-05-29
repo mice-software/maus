@@ -102,11 +102,9 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     if (branch_name == "")
         return false;
 
-    std::cerr << "A" << std::endl;
     ConverterT conv;
     data_cpp = conv.convert(&data_json);
     check_file_exists(data_cpp);
-    std::cerr << "B" << std::endl;
     if (_outfile == NULL) {
         throw(Exception(
           Exception::recoverable,
@@ -114,7 +112,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
           "OutputCppRoot::write_event"
         ));
     }
-    std::cerr << "C" << std::endl;
 
     std::string data_type = data_cpp->GetEventType();
     if (_outfile_branch != data_type) {
@@ -126,7 +123,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         _outfile_branch = data_type;
     }
     (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
-    std::cerr << "D" << std::endl;
 
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
@@ -138,7 +134,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
     }
-    std::cerr << "E" << std::endl;
     return true;
 }
 
