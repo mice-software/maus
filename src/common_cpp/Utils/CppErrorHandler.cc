@@ -29,6 +29,12 @@ namespace MAUS {
 
 CppErrorHandler* CppErrorHandler::instance = NULL;
 
+CppErrorHandler* CppErrorHandler::getInstance() {
+    if (!instance)
+        instance = new CppErrorHandler();
+    return instance;
+}
+
 Json::Value CppErrorHandler::HandleException
                          (Json::Value val, Exception exc, std::string class_name) {
   Squeak::mout(Squeak::debug) << "Stack trace:" << exc.GetStackTrace()
@@ -59,24 +65,15 @@ Json::Value CppErrorHandler::ExceptionToPython
   // * Hand json_value, class name, description of error to python
   // * Convert return PyObject to string
   // * Convert string to json value
-  if (!getInstance()->GetPyErrorHandler()) {
-    // Importing ErrorHandler calls libMausCpp which calls SetPyErrorHandler
-    std::cerr << "Not GetInstance" << std::endl;
-    PyImport_ImportModule("ErrorHandler");
-    PyErr_Clear();
-    if (CppErrorHandler::getInstance()->GetPyErrorHandler() == 0) {
-      Squeak::mout(Squeak::error)
-             << "ERROR: Failed to get python error handler" << std::endl;
-    }
-  }
-
   PyErr_Clear();  // clear any existing exceptions
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
   char sss[4] = {'s', 's', 's', '\0'};  // gotta love C (dodge compiler warning)
+  PyObject* error_handler_function = GetPyErrorHandler();
   PyObject* json_out_py = PyObject_CallFunction  // call the Python ErrorHandler
-                (getInstance()->GetPyErrorHandler(), &sss[0],
+                (error_handler_function, &sss[0],
                  json_in_cpp.c_str(), class_name.c_str(), what.c_str());
+  Py_DECREF(error_handler_function);
   const char* json_str;
   if (!json_out_py) {  // python ErrorHandler was set to raise the error
     // Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
@@ -94,17 +91,26 @@ Json::Value CppErrorHandler::ExceptionToPython
   return json_out_cpp;
 }
 
-CppErrorHandler::CppErrorHandler() : HandleExceptionFunction(NULL) {
+CppErrorHandler::CppErrorHandler() {
 }
 
-CppErrorHandler* CppErrorHandler::getInstance() {
-  if (instance == NULL) {
-    // Don't initialise PyErrorHandler here - because we can get caught up in
-    // initalisation order issues
-    instance = new CppErrorHandler();
-    Py_Initialize();
-  }
-  return instance;
+PyObject* CppErrorHandler::GetPyErrorHandler() {
+    // import ErrorHandler
+    PyObject* py_error_handler_module = PyImport_ImportModule("ErrorHandler");
+    if (!py_error_handler_module) {
+        throw Exception(Exception::recoverable,
+                        "Failed to import ErrorHandler module",
+                        "CppErrorHandler::GetPyErrorHandler");
+    }
+    // ErrorHandler.getattr("HandleCppException")
+    PyObject* handle_error_fnc = PyObject_GetAttrString(py_error_handler_module,
+                                                       "HandleCppException");
+    Py_DECREF(py_error_handler_module);
+    if (!PyCallable_Check(handle_error_fnc))
+        throw Exception(Exception::recoverable,
+                        "Failed to get HandleCppException function",
+                        "CppErrorHandler::GetPyErrorHandler");
+    return handle_error_fnc;
 }
 
 CppErrorHandler::~CppErrorHandler() {
