@@ -17,6 +17,8 @@
 
 """Script to test the CallG4bl Application"""
 
+#pylint: disable=R0902, R0914
+
 import unittest
 import os
 import fileinput
@@ -24,7 +26,7 @@ from ast import literal_eval
 
 from CallG4bl import CallG4bl
 
-class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
+class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904
     """
     Set of tests for CallG4bl.
     """
@@ -51,9 +53,9 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
 
         cls.output_path = os.path.join(os.getcwd())
         
-        cls.test_newline = "param -unset q_1=1.155989 q_2=-1.445 \
-        q_3=1.005937 " + "d_1=-1.413 proton_absorber_thickness=29 \
-        proton_weight=100 " + "proton_number=1.97E9 " + \
+        cls.test_newline = "param -unset q_1=1.066 q_2=-1.332 \
+        q_3=0.927 " + "d_1=-1.302 proton_absorber_thickness=93 \
+        proton_weight=1 " + "proton_number=1E11 " + \
         "g4bl_output_file_name=" + cls.test_file_path + \
         "/maus_beam_output " + "d_s=86.02 particle_charge=3 " + \
         "WRKDIR=" + cls.g4bl_file_path + " Random_Seed=0" + \
@@ -81,7 +83,7 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
             cls.test_db['entry' + str(i)]['energy'] = \
             int(cls.test_db['entry' + str(i)]['energy'])
 
-    def test_callg4bl(cls): #pylint: disable = R0912, R0915, E0213, R0914
+    def test_callg4bl(cls): #pylint: disable = R0912, R0915, E0213
         """
         Test CallG4bl class
         """
@@ -102,9 +104,9 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
 
         cls.output_path = os.path.join(os.getcwd())
 
-        cls.test_newline = "param -unset q_1=1.155989 q_2=-1.445 \
-        q_3=1.005937 " + "d_1=-1.413 proton_absorber_thickness=29 \
-        proton_weight=100 " + "proton_number=1.97E9 " + \
+        cls.test_newline = "param -unset q_1=1.066 q_2=-1.332 \
+        q_3=0.927 " + "d_1=-1.302 proton_absorber_thickness=93 \
+        proton_weight=1 " + "proton_number=1E11 " + \
         "g4bl_output_file_name=" + cls.test_file_path + \
         "/maus_beam_output " + "d_s=86.02 particle_charge=3 " + \
         "WRKDIR=" + cls.g4bl_file_path + " random_seed=0" + \
@@ -142,10 +144,10 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
         cls.test_file_path + '/maus_beam_output.txt' ,\
         'Error: The randomization process in CallG4bl failed.')
 
-        of1 = open(cls.test_file_path + '/maus_beam_output.txt')
+        of1 = open(cls.test_file_path + '/G4BLoutput.txt')
         test_line = []
         for column in fileinput.input\
-                ([cls.test_file_path + '/maus_beam_output.txt']):
+                ([cls.test_file_path + '/G4BLoutput.txt']):
             test_line.append(column)
         of1.close()
 
@@ -162,12 +164,12 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
         for i in range(3):
             line_for_test.pop(0)
 
-        cls.assertTrue(len(line_for_test)  == 105, \
+        cls.assertTrue(len(line_for_test)  == 634, \
         'The amount of entries is not correct.')
 
         no_error = True
         i = 0
-        while i <= 104 and no_error:
+        while i <= 633 and no_error:
             j = 0
             keep_on = True
             no_error = False
@@ -187,7 +189,7 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
 
         cls.test_particles = test_particles.particles
 
-        cls.assertTrue(len(cls.test_particles) == 105, \
+        cls.assertTrue(len(cls.test_particles) == 634, \
         'The amount of elements in dictionary is not correct.')
 
         for i in range(0, len(cls.test_particles)):
@@ -204,7 +206,7 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
         
         no_error = True
         matched = 0
-        for i in range(0, 104):
+        for i in range(0, 634):
             #print('--------'+str(i)+'---------')
             #print('checking:'+str(cls.test_db['entry'+str(i)]))
             j = 0
@@ -219,10 +221,10 @@ class TestCallG4bl(unittest.TestCase): #pylint: disable = R0904, R0902
                     matched = matched + 1                   
                 j = j + 1
 
-        print(str(matched) + ' out of 105 entries match the default \
+        print(str(matched) + ' out of 634 entries match the default \
         dictionary.')
 
-        if matched >= 90:   
+        if matched >= 570:   
             test_result = True
         else:
             test_result = False

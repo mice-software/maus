@@ -65,6 +65,10 @@ const std::string MAUSPhysicsList::_eLossNames[] = {"muBrems", "hBrems",
 const int         MAUSPhysicsList::_nScatNames   = 9;
 const int         MAUSPhysicsList::_nELossNames  = 8;
 
+double MAUSPhysicsList::_defaultChargedPiHalfLife = -1;
+double MAUSPhysicsList::_defaultChargedMuHalfLife = -1;
+
+
 MAUSPhysicsList::MAUSPhysicsList(G4VModularPhysicsList* physList)
                                                        : G4VUserPhysicsList(), _polDecay(false) {
   _list = physList;
@@ -296,6 +300,15 @@ void MAUSPhysicsList::SetSpecialProcesses() {
 }
 
 void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
+  if (_defaultChargedPiHalfLife < 0 || _defaultChargedMuHalfLife < 0) {
+      G4ParticleTable* p_table = G4ParticleTable::GetParticleTable();
+      _defaultChargedPiHalfLife = p_table->FindParticle(211)->GetPDGLifeTime();
+      _defaultChargedMuHalfLife = p_table->FindParticle(13)->GetPDGLifeTime();
+  }
+  if (pionHalfLife <= 0.)
+      pionHalfLife = _defaultChargedPiHalfLife;
+  if (muonHalfLife <= 0.)
+      muonHalfLife = _defaultChargedMuHalfLife;
   SetParticleHalfLife("pi+", pionHalfLife);
   SetParticleHalfLife("pi-", pionHalfLife);
   SetParticleHalfLife("mu+", muonHalfLife);
@@ -304,7 +317,10 @@ void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
 
 void MAUSPhysicsList::SetParticleHalfLife(std::string particleName,
                                           double halfLife) {
-  if (halfLife <= 0.) return;
+  if (halfLife <= 0.)
+      throw Exception(Exception::recoverable,
+                      "Negative half life",
+                      "MAUSPhysicsList::SetParticleHalfLife");
   std::stringstream ss_in;
   ss_in << halfLife;
   UIApplyCommand("/particle/select "+particleName);

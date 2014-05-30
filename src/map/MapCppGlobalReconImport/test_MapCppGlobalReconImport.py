@@ -98,22 +98,28 @@ class MapCppGlobalReconImport(unittest.TestCase): # pylint: disable = R0904
         birthresult = self.mapper.birth(self. c.getConfigJSON())
         self.assertTrue(birthresult)
         fin = open(test5,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = json.loads(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            self.assertTrue('track_points' in revt['global_event'])
-            self.assertEqual(3, len(revt['global_event']['track_points']))
-            self.assertTrue('tracks' in revt['global_event'])
-            self.assertEqual(1, len(revt['global_event']['tracks']))
-            self.assertTrue('space_points' in revt['global_event'])
-            self.assertEqual(3, len(revt['global_event']['space_points']))
-            self.assertTrue('primary_chains' in revt['global_event'])
-            self.assertEqual(0, len(revt['global_event']['primary_chains']))
+        line = fin.read()
+        result = self.mapper.process(line)
+        spill_out = json.loads(result)
+        self.assertTrue('recon_events' in spill_out)
+        revtarray = spill_out['recon_events']
+        self.assertEqual(1, len(revtarray))
+        revt = revtarray[0]
+        self.assertTrue('global_event' in revt)
+        self.assertTrue('track_points' in revt['global_event'])
+        self.assertEqual(30, len(revt['global_event']['track_points']))
+        for i in revt['global_event']['track_points']:
+            self.assertTrue('mapper_name' in i)
+            self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
+        self.assertTrue('tracks' in revt['global_event'])
+        self.assertEqual(2, len(revt['global_event']['tracks']))
+        for i in revt['global_event']['tracks']:
+            self.assertTrue('mapper_name' in i)
+            self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
+        self.assertTrue('space_points' in revt['global_event'])
+        self.assertEqual(33, len(revt['global_event']['space_points']))
+        self.assertTrue('primary_chains' in revt['global_event'])
+        self.assertEqual(0, len(revt['global_event']['primary_chains']))
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
