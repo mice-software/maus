@@ -59,10 +59,11 @@ Json::Value JsonWrapper::GetItem(const Json::Value & array,
                                                       +" in Json array lookup",
                          "JsonWrapper::GetItemStrict"));
   }
-  JsonType actual_type = ValueTypeToJsonType(array[int(value_index)].type());
+  int value_i = value_index;
+  JsonType actual_type = ValueTypeToJsonType(array[value_i].type());
   if (SimilarType(actual_type, value_type) ||
       (value_type == realValue && IsNumeric(actual_type))) {
-    return array[int(value_index)];
+    return array[value_i];
   }
   throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Value of wrong type in Json array lookup",
@@ -240,9 +241,10 @@ bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
         return false;
     }
     // check each item is the same (recursively)
-    for (size_t i = 0; i < value_1.size(); ++i) {
-        if (!AlmostEqual(value_1[int(i)],
-                         value_2[int(i)], tolerance, int_permissive)) {
+    int value_1_size = value_1.size();
+    for (int i = 0; i < value_1_size; ++i) {
+        if (!AlmostEqual(value_1[i],
+                         value_2[i], tolerance, int_permissive)) {
             return false;
         }
     }
@@ -300,8 +302,9 @@ Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
                      "JsonWrapper::ArrayMerge"));
     }
     Json::Value array_merge(array_1);
-    for (size_t i = 0; i < array_2.size(); ++i) {
-        array_merge.append(array_2[int(i)]);
+    int array_2_size = array_2.size();
+    for (int i = 0; i < array_2_size; ++i) {
+        array_merge.append(array_2[i]);
     }
     return array_merge;
 }
@@ -412,7 +415,8 @@ void JsonWrapper::Path::_SetPathRecursive(Json::Value& tree) {
   std::string path = GetPath(tree);
   switch (tree.type()) {
       case Json::arrayValue: {
-          for (int i = 0; i < int(tree.size()); ++i) {
+          int tree_size = tree.size();
+          for (int i = 0; i < tree_size; ++i) {
               SetPath(tree[i], path);
               AppendPath(tree[i], i);
               _SetPathRecursive(tree[i]);

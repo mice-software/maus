@@ -84,8 +84,8 @@ class MapCppGlobalReconImport(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue("errors" in doc)
         self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
 
-   
-    def test_fill_Global_Event(self):
+    # ROGERS - disabled - issue #1376
+    def _test_fill_Global_Event(self):
         """Check that process fills global events from TOF data"""
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))

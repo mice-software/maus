@@ -383,7 +383,8 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionTest) {
 
   Json::Value json = vpm.GetVirtualHits();
   ASSERT_EQ(json.size(), (Json::UInt) 3);
-  for (int i = 0; i < int(json.size()); ++i)
+  int json_size = json.size();
+  for (int i = 0; i < json_size; ++i)
     EXPECT_EQ(json[i]["station_id"].asInt(), (Json::Int) i+2);
 
   delete step;

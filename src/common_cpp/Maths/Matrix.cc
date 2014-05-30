@@ -1412,9 +1412,9 @@ template <> std::istream& operator>>(
     columns = json_document[Json::Value::ArrayIndex(0)].size();
     matrix = Matrix<double>(rows, columns);
     for (size_t row = 1; row <= rows; ++row) {
-      Json::Value json_row = json_document[int(row-1)];
+      Json::Value json_row = json_document[Json::Value::ArrayIndex(row-1)];
       for (size_t column = 1; column <= columns; ++column) {
-        Json::Value json_element = json_row[int(column-1)];
+        Json::Value json_element = json_row[Json::Value::ArrayIndex(column-1)];
         matrix(row, column) = json_element.asDouble();
       }
     }

@@ -17,7 +17,6 @@ A group of workers which iterates through each worker in turn.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 from types import ListType
-import inspect
 import sys
 
 import ErrorHandler

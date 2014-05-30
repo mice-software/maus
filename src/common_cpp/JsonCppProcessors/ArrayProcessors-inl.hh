@@ -53,13 +53,15 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
             // allocate the vector
-            if (json_array[int(i)].type() == Json::nullValue) {
+            if (json_array[Json::Value::ArrayIndex(i)].type() == Json::nullValue) {
                 (*vec)[i] = NULL;
             } else {
-                ArrayContents* data = _proc->JsonToCpp(json_array[int(i)]);
+                ArrayContents* data = _proc->JsonToCpp(
+                                      json_array[Json::Value::ArrayIndex(i)]);
                 (*vec)[i] = data;
                 using ReferenceResolver::JsonToCpp::RefManager;
-                std::string path = JsonWrapper::Path::GetPath(json_array[int(i)]);
+                std::string path = JsonWrapper::Path::GetPath(
+                                        json_array[Json::Value::ArrayIndex(i)]);
                 if (RefManager::HasInstance())
                     RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
@@ -99,8 +101,10 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             } else {
                 data = _proc->CppToJson(*cpp_array[i], GetPath(path, i));
             }
-            (*json_array)[int(i)] = *data; // json copies memory here but not path
-            JsonWrapper::Path::SetPath((*json_array)[int(i)], GetPath(path, i));
+            // json copies memory here but not path
+            (*json_array)[Json::Value::ArrayIndex(i)] = *data;
+            JsonWrapper::Path::SetPath((*json_array)[Json::Value::ArrayIndex(i)],
+                                       GetPath(path, i));
             delete data; // so we need to clean up here
             using ReferenceResolver::CppToJson::RefManager;
             if (RefManager::HasInstance())
@@ -155,7 +159,8 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
             // allocate the vector
-            ArrayContents* data = _proc->JsonToCpp(json_array[int(i)]);
+            ArrayContents* data = _proc->JsonToCpp(json_array[
+                                      Json::Value::ArrayIndex(i)]);
             (*vec)[i] = *data;
             delete data;
         } catch (Exception exc) {
@@ -186,8 +191,9 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
         try {
             Json::Value* data = _proc->CppToJson(cpp_array[i],
                                                               GetPath(path, i));
-            (*json_array)[int(i)] = *data; // json copies memory but not path
-            JsonWrapper::Path::SetPath((*json_array)[int(i)], GetPath(path, i));
+            (*json_array)[Json::Value::ArrayIndex(i)] = *data; // json copies memory but not path
+            JsonWrapper::Path::SetPath((*json_array)[Json::Value::ArrayIndex(i)],
+                                       GetPath(path, i));
             delete data; // so we need to clean up here
         } catch (Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
@@ -225,9 +231,11 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
     for (size_t i = 0; i < json_array.size(); ++i) {
         try {
             (*vec)[i] = NULL;
-            if (json_array[int(i)].type() != Json::nullValue) {
+            if (json_array[Json::Value::ArrayIndex(i)].type() != Json::nullValue) {
                 std::string data_path = JsonWrapper::GetProperty
-                   (json_array[int(i)], "$ref", JsonWrapper::stringValue).asString();
+                   (json_array[Json::Value::ArrayIndex(i)],
+                    "$ref",
+                    JsonWrapper::stringValue).asString();
                 // allocate the vector
                 if (RefManager::HasInstance()) {
                     VectorResolver<ArrayContents>* res =
@@ -254,12 +262,13 @@ Json::Value* ReferenceArrayProcessor<ArrayContents>::CppToJson(
     JsonWrapper::Path::SetPath(*array, path);
     array->resize(cpp_array.size());
     for (size_t i = 0; i < cpp_array.size(); ++i) {
-        (*array)[int(i)] = Json::Value();
-        if (cpp_array[int(i)] != NULL) {
-            JsonWrapper::Path::SetPath((*array)[int(i)], path);
-            JsonWrapper::Path::AppendPath((*array)[int(i)], i);
+        (*array)[Json::Value::ArrayIndex(i)] = Json::Value();
+        if (cpp_array[Json::Value::ArrayIndex(i)] != NULL) {
+            JsonWrapper::Path::SetPath((*array)[Json::Value::ArrayIndex(i)], path);
+            JsonWrapper::Path::AppendPath((*array)[Json::Value::ArrayIndex(i)], i);
             if (RefManager::HasInstance()) {
-                std::string arr_path = JsonWrapper::Path::GetPath((*array)[int(i)]);
+                std::string arr_path = JsonWrapper::Path::GetPath(
+                                          (*array)[Json::Value::ArrayIndex(i)]);
                 TypedResolver<ArrayContents>* res = new TypedResolver
                                         <ArrayContents>(cpp_array[i], arr_path);
                 RefManager::GetInstance().AddReference(res);
