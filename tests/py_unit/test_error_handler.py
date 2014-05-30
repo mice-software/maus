@@ -26,7 +26,6 @@ import json
 import unittest
 
 import ErrorHandler
-import libMausCpp
 
 class ErrorHandlerTestCase(unittest.TestCase):
     """
@@ -187,17 +186,6 @@ class ErrorHandlerTestCase(unittest.TestCase):
         my_error = ErrorHandler.CppError("Some message")
         assert(my_error.args == ("Some message",))
         assert(repr(my_error) == "Some message")
-
-    def test_set_handle_exception(self): #pylint:disable = R0201
-        """
-        Test we can do interface with Cpp correctly
-        """
-        self.assertRaises(TypeError,  libMausCpp.SetHandleException, 1)
-        refcount = sys.getrefcount(ErrorHandler.HandleCppException)
-        for i in range(100): #pylint: disable = W0612
-            # should decref correctly
-            libMausCpp.SetHandleException(ErrorHandler.HandleCppException)
-        assert(refcount == sys.getrefcount(ErrorHandler.HandleCppException))
 
     def test_config_to_error_handler(self):
         """
