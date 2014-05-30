@@ -354,7 +354,7 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   density = 1.220 * g/cm3;
   name = "POLYURETHANE";
   G4Material* TufsetPU = new G4Material(name, density, nComp=4, kStateSolid);
-  G4Element* elN = man->FindOrBuildElement("N");
+  // G4Element* elN = man->FindOrBuildElement("N");
   TufsetPU->AddElement(elC, 64.38*perCent);
   TufsetPU->AddElement(elH,  9.01*perCent);
   TufsetPU->AddElement(elN,  6.01*perCent);

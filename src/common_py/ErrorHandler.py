@@ -19,7 +19,6 @@
 
 import sys
 import json
-import libMausCpp
 
 class ErrorHandler:
     """
@@ -164,7 +163,3 @@ def HandleCppException(doc, caller, error_message):# pylint:disable = C0103
         out = json.dumps(__default_handler.HandleException(json_doc, caller))
     return out
 
-# Sets the function call for CppErrorHandler. If not set, assume we
-# don't use python error handler; libMausCpp is defined in
-#   src/common_cpp/Utils/PyMausCpp.hh
-libMausCpp.SetHandleException(HandleCppException)

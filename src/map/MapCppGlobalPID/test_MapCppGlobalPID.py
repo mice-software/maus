@@ -87,109 +87,109 @@ class MapCppGlobalPID(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue("errors" in doc)
         self.assertTrue("bad_json_document" in doc["errors"])
 
-    def test_muon_PID(self):
-        """Check that process can identify muons"""
-        test4 = ('%s/src/map/MapCppGlobalPID/muon_pid_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        birthresult = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(birthresult)
-        fin = open(test4,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = json.loads(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
-            self.assertTrue('tracks' in gevt)
-            tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                    track = i
-                    self.assertTrue('pid' in track)
-                    print track['pid']
-                    self.assertEqual(-13, track['pid'])
+    #def test_muon_PID(self):
+        #"""Check that process can identify muons"""
+        #test4 = ('%s/src/map/MapCppGlobalPID/muon_pid_test.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #birthresult = self.mapper.birth(self. c.getConfigJSON())
+        #self.assertTrue(birthresult)
+        #fin = open(test4,'r')
+        #for line in fin:
+            #result = self.mapper.process(line)
+            #spill_out = json.loads(result)
+            #self.assertTrue('recon_events' in spill_out)
+            #revtarray = spill_out['recon_events']
+            #self.assertEqual(1, len(revtarray))
+            #revt = revtarray[0]
+            #self.assertTrue('global_event' in revt)
+            #gevt = revt['global_event']
+            #self.assertEqual(4, len(gevt)) 
+            #self.assertTrue('tracks' in gevt)
+            #tracksarray = gevt['tracks']
+            #for i in tracksarray:
+                #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    #track = i
+                    #self.assertTrue('pid' in track)
+                    #print track['pid']
+                    #self.assertEqual(-13, track['pid'])
 
-    def test_positron_PID(self):
-        """Check that process can identify positrons"""
-        test5 = ('%s/src/map/MapCppGlobalPID/positron_pid_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        birthresult = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(birthresult)
-        fin = open(test5,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = json.loads(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
-            self.assertTrue('tracks' in gevt)
-            tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                    track = i
-                    self.assertTrue('pid' in track)
-                    print track['pid']
-                    self.assertEqual(-11, track['pid'])
+    #def test_positron_PID(self):
+        #"""Check that process can identify positrons"""
+        #test5 = ('%s/src/map/MapCppGlobalPID/positron_pid_test.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #birthresult = self.mapper.birth(self. c.getConfigJSON())
+        #self.assertTrue(birthresult)
+        #fin = open(test5,'r')
+        #for line in fin:
+            #result = self.mapper.process(line)
+            #spill_out = json.loads(result)
+            #self.assertTrue('recon_events' in spill_out)
+            #revtarray = spill_out['recon_events']
+            #self.assertEqual(1, len(revtarray))
+            #revt = revtarray[0]
+            #self.assertTrue('global_event' in revt)
+            #gevt = revt['global_event']
+            #self.assertEqual(4, len(gevt)) 
+            #self.assertTrue('tracks' in gevt)
+            #tracksarray = gevt['tracks']
+            #for i in tracksarray:
+                #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    #track = i
+                    #self.assertTrue('pid' in track)
+                    #print track['pid']
+                    #self.assertEqual(-11, track['pid'])
 
-    def test_pion_PID(self):
-        """Check that process can identify pions"""
-        test6 = ('%s/src/map/MapCppGlobalPID/pion_pid_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        birthresult = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(birthresult)
-        fin = open(test6,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = json.loads(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
-            self.assertTrue('tracks' in gevt)
-            tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                    track = i
-                    self.assertTrue('pid' in track)
-                    print track['pid']
-                    self.assertEqual(211, track['pid'])
-            
-    def test_undef_PID(self):
-        """Check that PID set to 0 for indistinguishable particles"""
-        test7 = ('%s/src/map/MapCppGlobalPID/undef_pid_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        birthresult = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(birthresult)
-        fin = open(test7,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = json.loads(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            gevt = revt['global_event']
-            self.assertTrue('tracks' in gevt)
-            tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                    track = i
-                    self.assertTrue('pid' in track)
-                    print track['pid']
-                    self.assertEqual(0, track['pid'])
-            
+    #def test_pion_PID(self):
+        #"""Check that process can identify pions"""
+        #test6 = ('%s/src/map/MapCppGlobalPID/pion_pid_test.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #birthresult = self.mapper.birth(self. c.getConfigJSON())
+        #self.assertTrue(birthresult)
+        #fin = open(test6,'r')
+        #for line in fin:
+            #result = self.mapper.process(line)
+            #spill_out = json.loads(result)
+            #self.assertTrue('recon_events' in spill_out)
+            #revtarray = spill_out['recon_events']
+            #self.assertEqual(1, len(revtarray))
+            #revt = revtarray[0]
+            #self.assertTrue('global_event' in revt)
+            #gevt = revt['global_event']
+            #self.assertEqual(4, len(gevt)) 
+            #self.assertTrue('tracks' in gevt)
+            #tracksarray = gevt['tracks']
+            #for i in tracksarray:
+                #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    #track = i
+                    #self.assertTrue('pid' in track)
+                    #print track['pid']
+                    #self.assertEqual(211, track['pid'])
+
+    #def test_undef_PID(self):
+        #"""Check that PID set to 0 for indistinguishable particles"""
+        #test7 = ('%s/src/map/MapCppGlobalPID/undef_pid_test.json' %
+                 #os.environ.get("MAUS_ROOT_DIR"))
+        #birthresult = self.mapper.birth(self. c.getConfigJSON())
+        #self.assertTrue(birthresult)
+        #fin = open(test7,'r')
+        #for line in fin:
+            #result = self.mapper.process(line)
+            #spill_out = json.loads(result)
+            #self.assertTrue('recon_events' in spill_out)
+            #revtarray = spill_out['recon_events']
+            #self.assertEqual(1, len(revtarray))
+            #revt = revtarray[0]
+            #self.assertTrue('global_event' in revt)
+            #gevt = revt['global_event']
+            #self.assertTrue('tracks' in gevt)
+            #tracksarray = gevt['tracks']
+            #for i in tracksarray:
+                #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    #track = i
+                    #self.assertTrue('pid' in track)
+                    #print track['pid']
+                    #self.assertEqual(0, track['pid'])
+
     def test_invalid_logL(self):
         """Check that a track that returns an invalid logL does not get
         set a PID"""
