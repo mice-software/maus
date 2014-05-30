@@ -31,7 +31,7 @@ def print_mem_usage(pid):
 
     @returns dict of {"pid":pid, "memory":mem_usage} or None on failure
     """
-    columns = "%cpu,%mem,etime"
+    columns = "%cpu,%mem,etime,sz"
     ps_out = os.popen('ps -p %d -o %s' % (pid, columns)).readlines()
     if len(ps_out) == 2:
         out_list = ps_out[1].rstrip().split()
@@ -73,8 +73,7 @@ def main(pid_list, title, wait_time, max_time):
     delta = datetime.timedelta.max
     if max_time:
         delta = datetime.timedelta(0, max_time)
-    while len(mem_list[-1]) > 0 and \
-          (max_time and datetime.datetime.now()-start < delta):
+    while len(mem_list[-1]) > 0 and datetime.datetime.now()-start < delta:
         index += 1
         time.sleep(wait_time)
         mem_list_step = []
