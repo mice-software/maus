@@ -58,7 +58,7 @@ class MapPyCkov:
             ErrorHandler.HandleException({}, self)
             return False
            
-    def process(self, doc): #pylint:disable=R0912,R0914,R0915
+    def process(self, doc): #pylint:disable=R0912,R0914,R0915,R0911
         """
         Finds coincidences in each of the PMTs and outputs the total charge
         and number of photoelectrons for a single particle event.
@@ -75,6 +75,12 @@ class MapPyCkov:
             return doc
         if spill['daq_data'] is None:
             return doc
+
+        # look for daq only in physics or calib event types
+        if spill["daq_event_type"] != "physics_event" and \
+           spill["daq_event_type"] != "calibration_event":
+            return doc
+
         daq_event = spill['daq_data']
         if 'ckov' not in daq_event:
             return doc
@@ -95,9 +101,12 @@ class MapPyCkov:
         one_pe = [23.0, 23.0, 23.0, 23.0, 23.0, 23.0, 23.0, 23.0]
                     
         for i in range(len(ckov)):
-           
             if ckov[i] != None:
-
+                # move on if there is no flash adc data
+                # this can happen if the ckov did not readout
+                # or was disabled. it is not an error per se
+                if not any(ckov[i]['V1731']):
+                    continue
                 ckov_digit['A'] = {}
                 ckov_digit['B'] = {}
 
@@ -116,7 +125,7 @@ class MapPyCkov:
                     ckov_digit[ckov_sta]['total_charge']      = 0
                     ckov_digit[ckov_sta]['number_of_pes']     = 0.
                     ckov_digit[ckov_sta]['part_event_number'] = 0
-                    
+                   
                     ckov_digit[ckov_sta][arrival_time] = \
                                ckov[i]['V1731'][pmt]['arrival_time']
                     ckov_digit[ckov_sta][pulse]        = \
@@ -215,7 +224,10 @@ class MapPyCkov:
                         photoelectrons = []
                         position = []
 
-        #spill['daq_data']['ckov'] = {}                                      
+        #spill['daq_data']['ckov'] = {}
+        if 'recon_events' not in spill:
+            return json.dumps(spill)
+
         for event in spill['recon_events']:
             event['ckov_event']['ckov_digits'] = []
             if event['part_event_number'] in digits.keys():
