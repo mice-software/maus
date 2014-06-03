@@ -61,7 +61,7 @@ def get_rec_proc(run_number):
     rec_options = [rec_path, "--configuration_file", config,
                    "--daq_data_file", run_number]
     rec_log = TMP_DIR+"/test_load_analyze_data_offline_"+run_number+".log"
-    proc = subprocess.Popen(rec_options, stdout=open(rec_log, "w",
+    proc = subprocess.Popen(rec_options, stdout=open(rec_log, "w"),
                                          stderr=subprocess.STDOUT)
     return proc
 
