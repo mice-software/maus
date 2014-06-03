@@ -18,8 +18,7 @@
 
 namespace MAUS {
 
-SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor()
-                         : _sf_spoint_array_proc(new SciFiSpacePointProcessor) {
+SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor() {
 
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiStraightPRTrack::get_tracker,

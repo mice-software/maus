@@ -171,8 +171,7 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertTrue("ReducePyROOTTester" in errors,
             "No ReducePyROOTTester field")        
         errors = errors["ReducePyROOTTester"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors) # pylint: disable=C0301
 
     def test_process_multiple_spills(self):
         """
@@ -211,9 +210,7 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertTrue("ReducePyROOTTester" in errors,
             "No ReducePyROOTTester field")        
         errors = errors["ReducePyROOTTester"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        print errors[0]
-        self.assertEquals("<type 'exceptions.Exception'>: error", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.Exception'>: error", errors) # pylint: disable=C0301
 
     def test_svg(self):
         """

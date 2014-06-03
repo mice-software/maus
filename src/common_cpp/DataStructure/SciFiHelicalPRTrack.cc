@@ -36,10 +36,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _chisq(-1.0),
                                               _chisq_dof(-1.0),
                                               _pos0(-1.0, -1.0, -1.0),
-                                              _phi(0),
-                                              _spoints(0) {
-
-  // Do nothing
+                                              _phi(0) {
+  _spoint = new TRefArray();
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,

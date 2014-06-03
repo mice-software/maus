@@ -39,7 +39,8 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
   }
   TRefArray* tref_array = new TRefArray(json_array.size());
 
-  for (size_t i = 0; i < json_array.size(); ++i) {
+  int json_arr_size = json_array.size();
+  for (int i = 0; i < json_arr_size; ++i) {
     try {
       if (json_array[i].type() != Json::nullValue) {
         std::string data_path = JsonWrapper::GetProperty

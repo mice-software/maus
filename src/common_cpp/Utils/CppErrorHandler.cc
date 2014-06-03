@@ -44,16 +44,19 @@ Json::Value CppErrorHandler::HandleException
 
 Json::Value CppErrorHandler::HandleStdExc
                 (Json::Value val, std::exception& exc, std::string class_name) {
-  return getInstance()->ExceptionToPython((&exc)->what(), val, class_name);
+  Json::Value out = getInstance()->ExceptionToPython((&exc)->what(), val, class_name);
+  return out;
 }
 
 void CppErrorHandler::HandleExceptionNoJson(Exception exc, std::string class_name) {
-  HandleException(Json::Value(), exc, class_name);
+  Json::Value json = Json::Value();
+  HandleException(json, exc, class_name);
 }
 
 void CppErrorHandler::HandleStdExcNoJson
                                  (std::exception& exc, std::string class_name) {
-  HandleStdExc(Json::Value(), exc, class_name);
+  Json::Value json = Json::Value();
+  HandleStdExc(json, exc, class_name);
 }
 
 Json::Value CppErrorHandler::ExceptionToPython
@@ -68,16 +71,16 @@ Json::Value CppErrorHandler::ExceptionToPython
   PyErr_Clear();  // clear any existing exceptions
   Json::FastWriter writer;
   std::string json_in_cpp = writer.write(json_value);
-  char sss[4] = {'s', 's', 's', '\0'};  // gotta love C (dodge compiler warning)
+  char* sss = const_cast<char*>("sss");  // gotta love C (dodge compiler warning)
   PyObject* error_handler_function = GetPyErrorHandler();
   PyObject* json_out_py = PyObject_CallFunction  // call the Python ErrorHandler
-                (error_handler_function, &sss[0],
+                (error_handler_function, sss,
                  json_in_cpp.c_str(), class_name.c_str(), what.c_str());
   Py_DECREF(error_handler_function);
   const char* json_str;
   if (!json_out_py) {  // python ErrorHandler was set to raise the error
-    // Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
-    // PyErr_Print();
+    Squeak::mout(Squeak::error) << "ERROR: Failed to handle error:" << std::endl;
+    PyErr_Print();
     throw std::exception();
   }
   int ok = PyArg_Parse(json_out_py, "s", &json_str);  // convert to string

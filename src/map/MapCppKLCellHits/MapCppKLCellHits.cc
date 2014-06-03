@@ -19,98 +19,78 @@
 #include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
 
 namespace MAUS {
-bool MapCppKLCellHits::birth(std::string argJsonConfigDocument) {
-  // Check if the JSON document can be parsed, else return error only
-  _classname = "MapCppKLCellHits";
-  _stationKeys.push_back("kl");
 
-  // Check if the JSON document can be parsed, else return error only
-  try {
-    //  JsonCpp setup
-    Json::Value configJSON;
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-    //  this will contain the configuration
-
-    return true;
-  } catch (Exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch (std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-  }
-
-  return false;
+PyMODINIT_FUNC init_MapCppKLCellHits(void) {
+  PyWrapMapBase<MAUS::MapCppKLCellHits>::PyWrapMapBaseModInit
+                                          ("MapCppKLCellHits", "", "", "", "");
 }
 
-bool MapCppKLCellHits::death()  {return true;}
+MapCppKLCellHits::MapCppKLCellHits() : MapBase<Json::Value>("MapCppKLCellHits") {
+}
 
-std::string MapCppKLCellHits::process(std::string document) {
-  //  JsonCpp setup
-  Json::FastWriter writer;
-  Json::Value root;
-  Json::Value xEventType;
+void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
-  try {root = JsonWrapper::StringToJson(document);}
-  catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
+  _stationKeys.push_back("kl");
+
+  //  JsonCpp setup
+  Json::Value configJSON;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+}
+
+void MapCppKLCellHits::_death()  {}
+
+void MapCppKLCellHits::_process(Json::Value* data) const {
+  if (!data) {
+      throw MAUS::Exception(Exception::recoverable,
+                            "data was NULL", "MapCppKLCellHits::_process");
   }
+  Json::Value& root = *data;
+  //  JsonCpp setup
+  Json::Value xEventType = JsonWrapper::GetProperty(root,
+                                        "daq_event_type",
+  JsonWrapper::stringValue);
+  if (xEventType== "physics_event" || xEventType == "calibration_event") {
+    Json::Value events = JsonWrapper::GetProperty(root,
+                                                  "recon_events",
+                                                  JsonWrapper::arrayValue);
+    for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
+      Json::Value xDocKlEvent = JsonWrapper::GetItem(events,
+                                                      n_event,
+                                                      JsonWrapper::objectValue);
+      xDocKlEvent = JsonWrapper::GetProperty(xDocKlEvent,
+                                             "kl_event",
+                                             JsonWrapper::objectValue);
+      if (root["recon_events"][n_event]["kl_event"].isMember("kl_digits")) {
 
-  try {
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-					   JsonWrapper::stringValue);
-    if (xEventType== "physics_event" || xEventType == "calibration_event") {
-      Json::Value events = JsonWrapper::GetProperty(root, "recon_events", JsonWrapper::arrayValue);
-      for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
-        Json::Value xDocKlEvent = JsonWrapper::GetItem(events,
-                                                        n_event,
-                                                        JsonWrapper::objectValue);
-        xDocKlEvent = JsonWrapper::GetProperty(xDocKlEvent,
-                                               "kl_event",
-                                               JsonWrapper::objectValue);
-        if (root["recon_events"][n_event]["kl_event"].isMember("kl_digits")) {
+          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"] =
+                                                 Json::Value(Json::objectValue);
 
-	 root["recon_events"][n_event]["kl_event"]["kl_cell_hits"] = Json::Value(Json::objectValue);
-
-	 Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocKlEvent,
+          Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocKlEvent,
                                                         "kl_digits",
                                                         JsonWrapper::objectValue);
 
-	xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
-                                                    "kl",
-                                                    JsonWrapper::anyValue);
+          xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
+                                                          "kl",
+                                                          JsonWrapper::anyValue);
 
 
-	 Json::Value xDocCellHits = makeCellHits(xDocPartEvent);
+          Json::Value xDocCellHits = makeCellHits(xDocPartEvent);
 
-	 root["recon_events"][n_event]["kl_event"]["kl_cell_hits"]["kl"] = xDocCellHits;
-	}
+          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"]["kl"] = xDocCellHits;
       }
     }
-  } catch (Exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleException(root, exc, _classname);
-  } catch (std::exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                         ->HandleStdExc(root, exc, _classname);
   }
-
-  return writer.write(root);
 }
 
-Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) {
+Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) const {
 
   Json::Value xDocCellHits;
   if (xDocPartEvent.isArray()) {
@@ -175,7 +155,7 @@ Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) {
   return xDocCellHits;
 }
 
-Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) {
+Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const {
   Json::Value xDocCellHit, xDocPMT0, xDocPMT1;
 
   std::cout << "xDocPMT0 " << xDocDigit0["kl_key"] << std::endl;
@@ -214,7 +194,7 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
         xDocCellHit["charge_product"] = 0;
     else
         xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
-				        (xChargeDigit0 + xChargeDigit1);
+                                        (xChargeDigit0 + xChargeDigit1);
   }
 
 //  xDocCellHit["pmt0"] = xDocPMT0;
