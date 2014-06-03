@@ -129,7 +129,7 @@ bool TOFChannelMap::InitFromCDB() {
   return true;
 }
 
-TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqKey) {
+TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqKey) const {
   if (daqKey->eqType() == 102)
     for (unsigned int i = 0;i < _tofKey.size();i++) {
       if ( _tdcKey[i]->ldc()     == daqKey->ldc() &&
@@ -151,7 +151,7 @@ TOFChannelKey* TOFChannelMap::find(DAQChannelKey *daqKey) {
   return NULL;
 }
 
-TOFChannelKey* TOFChannelMap::find(std::string daqKeyStr) {
+TOFChannelKey* TOFChannelMap::find(std::string daqKeyStr) const {
   DAQChannelKey xDaqKey;
   stringstream xConv;
   try {
@@ -224,7 +224,7 @@ TOFChannelKey::TOFChannelKey(string keyStr) throw(Exception) {
   }
 }
 
-bool TOFChannelKey::operator==( TOFChannelKey const key ) {
+bool TOFChannelKey::operator==( const TOFChannelKey& key ) const {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&
@@ -236,7 +236,7 @@ bool TOFChannelKey::operator==( TOFChannelKey const key ) {
   }
 }
 
-bool TOFChannelKey::operator!=( TOFChannelKey const key ) {
+bool TOFChannelKey::operator!=( const TOFChannelKey& key ) const {
   if ( _station == key._station &&
        _plane == key._plane &&
        _slab == key._slab &&

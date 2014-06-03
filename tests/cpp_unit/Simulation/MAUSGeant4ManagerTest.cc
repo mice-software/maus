@@ -153,7 +153,7 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
     Json::Value pg = JsonWrapper::StringToJson(pg_array_string);
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     Json::Value out = MAUSGeant4Manager::GetInstance()->RunManyParticles(pg);
-    for (size_t i = 0; i < out.size(); ++i) {
+    for (int i = 0; i < int(out.size()); ++i) {
       Json::Value track = out[i]["tracks"][Json::Value::UInt(0)];
       ASSERT_TRUE(out.isArray());
       ASSERT_TRUE(out[i].isObject());

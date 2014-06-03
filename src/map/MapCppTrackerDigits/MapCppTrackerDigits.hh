@@ -46,47 +46,42 @@
 #include "src/common_cpp/Recon/SciFi/RealDataDigitization.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
 
+#include "src/common_cpp/API/MapBase.hh"
+
 namespace MAUS {
 
-class MapCppTrackerDigits {
+class MapCppTrackerDigits : public MapBase<Data> {
  public:
   MapCppTrackerDigits();
 
   ~MapCppTrackerDigits();
 
+ private:
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool death();
+  void _death();
 
-  /** process JSON document
+  /** process MAUS spill object
    *
    *  Receive a document with MC hits and return
    *  a document with digits
-   * \param document a line/spill from the JSON input
+   * \param document a MAUS data object for a MICE spill
    */
-  std::string process(std::string document);
-
-  void read_in_json(std::string json_data);
-
-  void save_to_json(MAUS::Spill *spill);
+  void _process(Data* document) const;
 
  private:
-  /// This should be the classname
-  std::string _classname;
   /// This will contain the configuration
   Json::Value _configJSON;
   /// This will contain the root value after parsing
-  Json::Value _json_root;
-  Json::Value* _spill_json;
   Spill* _spill_cpp;
   ///  JsonCpp setup
   Json::Reader reader;

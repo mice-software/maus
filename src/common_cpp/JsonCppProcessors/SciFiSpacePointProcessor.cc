@@ -18,8 +18,7 @@
 
 namespace MAUS {
 
-SciFiSpacePointProcessor::SciFiSpacePointProcessor()
-                         : _sf_cluster_array_proc(new SciFiClusterProcessor) {
+SciFiSpacePointProcessor::SciFiSpacePointProcessor() {
 
     RegisterValueBranch("used", &_bool_proc,
                         &SciFiSpacePoint::is_used,
@@ -64,7 +63,9 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor()
                         &SciFiSpacePoint::get_position,
                         &SciFiSpacePoint::set_position, true);
 
-    RegisterValueBranch("clusters", &_sf_cluster_array_proc,
-                        &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
+    RegisterIgnoredBranch("clusters", false);
+
+//    RegisterValueBranch("clusters", &_sf_cluster_array_proc,
+//                        &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
 }
 } // ~namespace MAUS

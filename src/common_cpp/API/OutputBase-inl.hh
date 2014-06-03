@@ -40,9 +40,6 @@ namespace MAUS {
     try {
       ret = _save(t);
     }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    }
     catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
