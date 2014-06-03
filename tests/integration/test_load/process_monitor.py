@@ -31,7 +31,7 @@ def print_mem_usage(pid):
 
     @returns dict of {"pid":pid, "memory":mem_usage} or None on failure
     """
-    columns = "%cpu,%mem,etime,sz"
+    columns = "%cpu,%mem,etime,sz,rsz,vsz"
     ps_out = os.popen('ps -p %d -o %s' % (pid, columns)).readlines()
     if len(ps_out) == 2:
         out_list = ps_out[1].rstrip().split()
