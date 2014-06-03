@@ -65,15 +65,19 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     if ( tracker_event[i].isMember("VLSB_C") ) {
       Json::Value input_event = tracker_event[i]["VLSB_C"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_c_size = daq["tracker2"][i]["VLSB_C"].size();
+      for ( int idig = 0; idig < vlsb_c_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB_C"][idig];
       }
       process_VLSB_c(input_event, event, tracker0daq_event, tracker1daq_event);
     } else if ( tracker_event[i].isMember("VLSB") ) {
       Json::Value input_event = tracker_event[i]["VLSB"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_size = daq["tracker2"][i]["VLSB"].size();
+      for ( int idig = 0; idig < vlsb_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB"][idig];
       }
       process_VLSB(input_event, event, tracker0daq_event, tracker1daq_event);
     } else {

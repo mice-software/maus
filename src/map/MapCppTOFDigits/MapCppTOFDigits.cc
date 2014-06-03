@@ -21,163 +21,123 @@
 #include "Utils/DAQChannelMap.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
+#include "API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppTOFDigits/MapCppTOFDigits.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppTOFDigits(void) {
+  PyWrapMapBase<MAUS::MapCppTOFDigits>::PyWrapMapBaseModInit
+                                            ("MapCppTOFDigits", "", "", "", "");
+}
 
-bool MapCppTOFDigits::birth(std::string argJsonConfigDocument) {
+MapCppTOFDigits::MapCppTOFDigits() : MapBase<Json::Value>("MapCppTOFDigits") {
+}
 
-  _classname = "MapCppTOFDigits";
+void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
   _stationKeys.push_back("tof0");
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
-  if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error)
-    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
-  }
+  if (!pMAUS_ROOT_DIR)
+    throw Exception(Exception::recoverable,
+                    "Could not find the $MAUS_ROOT_DIR environmental variable",
+                    "MapCppTOFDigits::_birth");
 
   // Check if the JSON document can be parsed, else return error only
-  try {
-    //  JsonCpp setup
-    Json::Value configJSON;
-    Json::Value map_file_name;
-    Json::Value xEnable_V1290_Unpacking;
-    Json::Value xEnable_V1724_Unpacking;
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-    //  this will contain the configuration
+  //  JsonCpp setup
+  Json::Value configJSON;
+  Json::Value map_file_name;
+  Json::Value xEnable_V1290_Unpacking;
+  Json::Value xEnable_V1724_Unpacking;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+  //  this will contain the configuration
 
-/*
-    map_file_name = JsonWrapper::GetProperty(configJSON,
-                                             "TOF_cabling_file",
-                                             JsonWrapper::stringValue);
+  map_init = true;
+  bool loaded = _map.InitializeCards(configJSON);
+  if (!loaded)
+    map_init = false;
 
-    std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-    bool loaded = _map.InitFromFile(xMapFile);
-*/
-    map_init = true;
-    bool loaded = _map.InitializeCards(configJSON);
-    if (!loaded)
-      map_init = false;
+  xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_V1290_Unpacking",
+                                                     JsonWrapper::booleanValue);
+  xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_V1724_Unpacking",
+                                                     JsonWrapper::booleanValue);
 
-    xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1290_Unpacking",
-                                                       JsonWrapper::booleanValue);
-    xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1724_Unpacking",
-                                                       JsonWrapper::booleanValue);
-
-    if (!xEnable_V1290_Unpacking.asBool()) {
-      Squeak::mout(Squeak::warning)
-      << "WARNING in MapCppTOFDigits::birth. The unpacking of the TDC V1290 is disabled!!!"
-      << " Are you shure you want this?"
-      << std::endl;
-    }
-    if (!xEnable_V1724_Unpacking.asBool()) {
-      Squeak::mout(Squeak::warning)
-      << "WARNING in MapCppTOFDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
-      << " Are you shure you want this?"
-      << std::endl;
-    }
-
-  return true;
-  } catch (Exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch (std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  if (!xEnable_V1290_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppTOFDigits::birth. The unpacking of the TDC V1290 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
   }
-
-  return false;
+  if (!xEnable_V1724_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppTOFDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
+  }
 }
 
 
-bool MapCppTOFDigits::death()  {return true;}
+void MapCppTOFDigits::_death()  {}
 
-std::string MapCppTOFDigits::process(std::string document) {
-  //  JsonCpp setup
-  Json::FastWriter writer;
-  Json::Value root;
+void MapCppTOFDigits::_process(Json::Value* document) const {
+  Json::Value& root = *document;
   Json::Value xEventType;
   // don't try to process if we have not initialized the channel map
   // this could be because of an invalid map
   // or because the CDB is down
-  if (!map_init) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Failed to intialize channel map";
-      errors["no_channel_map"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-  }
+  if (!map_init)
+      throw MAUS::Exception(Exception::recoverable,
+                            "Failed to intialize channel map",
+                            "MapCppTOFDigits::_process");
   // Check if the JSON document can be parsed, else return error only
-  try {root = JsonWrapper::StringToJson(document);}
-  catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
+  xEventType = JsonWrapper::GetProperty(root,
+                                        "daq_event_type",
+                                        JsonWrapper::stringValue);
+  if (xEventType == "physics_event" || xEventType == "calibration_event") {
+    Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
+    Json::Value xDocTrig, xDocTrigReq;
+    if (xDaqData.isMember("trigger") &&
+        xDaqData.isMember("trigger_request")) {
 
-  try {
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-    if (xEventType == "physics_event" || xEventType == "calibration_event") {
-      Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
-      Json::Value xDocTrig, xDocTrigReq;
-      if (xDaqData.isMember("trigger") &&
-          xDaqData.isMember("trigger_request")) {
+      xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
+                                             "trigger_request",
+                                             JsonWrapper::arrayValue);
 
-        xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
-                                               "trigger_request",
-                                               JsonWrapper::arrayValue);
+      xDocTrig = JsonWrapper::GetProperty(xDaqData,
+                                          "trigger",
+                                          JsonWrapper::arrayValue);
 
-        xDocTrig = JsonWrapper::GetProperty(xDaqData,
-                                            "trigger",
-                                            JsonWrapper::arrayValue);
-
-        Json::Value xDocAllDigits; // list by station then by event
-        unsigned int n_events = 0;
-        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-          if (xDaqData.isMember(_stationKeys[n_station])) {
-            Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
-                                                                    _stationKeys[n_station],
-                                                                    JsonWrapper::arrayValue);
-            // list of events for station n_station
-            xDocAllDigits[n_station] = makeDigits
-                                    (xDocDetectorData, xDocTrigReq, xDocTrig);
-            n_events = xDocAllDigits[n_station].size();
-          }
-        }
-        for (unsigned int ev = 0; ev < n_events; ev++) {
-          Json::Value xDocTofDigits(Json::objectValue);
-          for (unsigned int stat = 0; stat < _stationKeys.size(); stat++) {
-            if (xDocAllDigits[stat][ev].type() == Json::arrayValue) {
-              xDocTofDigits[_stationKeys[stat]] = xDocAllDigits[stat][ev];
-            } else {
-              xDocTofDigits[_stationKeys[stat]] = Json::Value(Json::arrayValue);
-            }
-          }
-          root["recon_events"][ev]["tof_event"]["tof_digits"] = xDocTofDigits;
+      Json::Value xDocAllDigits; // list by station then by event
+      unsigned int n_events = 0;
+      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+        if (xDaqData.isMember(_stationKeys[n_station])) {
+          Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
+                                                                  _stationKeys[n_station],
+                                                                  JsonWrapper::arrayValue);
+          // list of events for station n_station
+          xDocAllDigits[n_station] = makeDigits
+                                  (xDocDetectorData, xDocTrigReq, xDocTrig);
+          n_events = xDocAllDigits[n_station].size();
         }
       }
+      for (unsigned int ev = 0; ev < n_events; ev++) {
+        Json::Value xDocTofDigits(Json::objectValue);
+        for (unsigned int stat = 0; stat < _stationKeys.size(); stat++) {
+          if (xDocAllDigits[stat][ev].type() == Json::arrayValue) {
+            xDocTofDigits[_stationKeys[stat]] = xDocAllDigits[stat][ev];
+          } else {
+            xDocTofDigits[_stationKeys[stat]] = Json::Value(Json::arrayValue);
+          }
+        }
+        root["recon_events"][ev]["tof_event"]["tof_digits"] = xDocTofDigits;
+      }
     }
-  } catch (Exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleException(root, exc, _classname);
-  } catch (std::exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                         ->HandleStdExc(root, exc, _classname);
   }
-  // if (root.isMember("digits")) std::cout<<root["digits"]<<std::endl;
-  return writer.write(root);
 }
 
 bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
@@ -187,7 +147,7 @@ bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
 
 Json::Value MapCppTOFDigits::makeDigits(Json::Value xDocDetData,
                                         Json::Value xDocTrigReq,
-                                        Json::Value xDocTrig) {
+                                        Json::Value xDocTrig) const {
   Json::Value xDocDigits;
   // Get number of Particle trigger.
   int n_part_event_triggers = xDocTrig.size();
@@ -249,7 +209,7 @@ Json::Value MapCppTOFDigits::makeDigits(Json::Value xDocDetData,
   return xDocDigits;
 }
 
-Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) {
+Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) const {
   std::stringstream xConv;
   Json::Value xDocInfo;
 
@@ -284,7 +244,7 @@ Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) {
 
 bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
                              Json::Value xDocTdcHit,
-                             Json::Value &xDocDigit) throw(Exception) {
+                             Json::Value &xDocDigit) const throw(Exception) {
 
   int n_Adc_hits = xDocfAdc.size();
   std::string xTofKey_str = JsonWrapper::GetProperty(xDocDigit,
@@ -333,7 +293,7 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
 
 bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
                               Json::Value xDocTdcHit,
-                              Json::Value &xDocDigit ) throw(Exception) {
+                              Json::Value &xDocDigit ) const throw(Exception) {
   Json::Value xDocT = JsonWrapper::GetProperty(xDocTrig, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
   int n_count = xDocT.size();
@@ -372,7 +332,7 @@ bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
 
 bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
                                  Json::Value xDocTdcHit,
-                                 Json::Value &xDocDigit ) throw(Exception) {
+                                 Json::Value &xDocDigit ) const throw(Exception) {
   Json::Value xDocTR = JsonWrapper::GetProperty(xDocTrigReq, "V1290", JsonWrapper::arrayValue);
   int HitGeo = JsonWrapper::GetProperty(xDocTdcHit, "geo", JsonWrapper::intValue).asInt();
   int n_req_count = xDocTR.size();

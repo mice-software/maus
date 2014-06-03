@@ -154,9 +154,8 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         errors = result["errors"]
         self.assertTrue("ReducePyMatplotlibTester" in errors,
             "No ReducePyMatplotlibTester field")        
-        errors = errors["ReducePyMatplotlibTester"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertTrue("ReducePyMatplotlibTester" in errors)
+        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors["ReducePyMatplotlibTester"]) # pylint: disable=C0301
 
     def test_process_multiple_spills(self):
         """
@@ -194,10 +193,8 @@ class ReducePyMatplotlibHistogramTestCase(unittest.TestCase): # pylint: disable=
         errors = result["errors"]
         self.assertTrue("ReducePyMatplotlibTester" in errors,
             "No ReducePyMatplotlibTester field")        
-        errors = errors["ReducePyMatplotlibTester"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        print errors[0]
-        self.assertEquals("<type 'exceptions.Exception'>: error", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        error = errors["ReducePyMatplotlibTester"]
+        self.assertEquals("<type 'exceptions.Exception'>: error", error) # pylint: disable=C0301
 
     def test_svg(self):
         """

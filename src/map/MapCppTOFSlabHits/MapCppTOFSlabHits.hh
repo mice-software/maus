@@ -30,47 +30,48 @@
 #include <map>
 #include "json/json.h"
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTOFSlabHits {
+class MapCppTOFSlabHits : public MapBase<Json::Value> {
 
  public:
+  MapCppTOFSlabHits();
 
+ private:
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
  *  This takes no arguments and does nothing.
  */
-  bool death();
+  void _death();
 
   /** @brief process JSON document
  *
  *  @param document Receive a document with digits and return
  *  a document with slab hits.
  */
-  std::string process(std::string document);
+  void _process(Json::Value* document) const;
 
  private:
-  std::string _classname;
-
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1);
+  Json::Value fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const;
 
   /** @brief makes slab hits
    *
    *  @param xDocDetectorData Json document containing digits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeSlabHits(Json::Value xDocPartEvent);
+  Json::Value makeSlabHits(Json::Value xDocPartEvent) const;
 
   double _tdcV1290_conversion_factor;
 };

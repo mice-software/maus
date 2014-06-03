@@ -23,7 +23,8 @@
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppExampleMAUSDataInput(void) {
-  PyWrapMapBase<MAUS::MapCppExampleMAUSDataInput>::PyWrapMapBaseModInit("", "", "", "");
+  PyWrapMapBase<MAUS::MapCppExampleMAUSDataInput>::PyWrapMapBaseModInit
+                                ("MapCppExampleMAUSDataInput", "", "", "", "");
 }
 
 MapCppExampleMAUSDataInput::MapCppExampleMAUSDataInput()

@@ -16,110 +16,53 @@
  *
  */
 
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/map/MapCppTrackerMCNoise/MapCppTrackerMCNoise.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppTrackerMCNoise(void) {
+  PyWrapMapBase<MAUS::MapCppTrackerMCNoise>::PyWrapMapBaseModInit
+                                      ("MapCppTrackerMCNoise", "", "", "", "");
+}
+
 MapCppTrackerMCNoise::MapCppTrackerMCNoise()
-    : _spill_json(NULL), _spill_cpp(NULL) {
+    : MapBase<Data>("MapCppTrackerMCNoise") {
 }
 
 MapCppTrackerMCNoise::~MapCppTrackerMCNoise() {
-    if (_spill_json != NULL) {
-        delete _spill_json;
-    }
-    if (_spill_cpp != NULL) {
-        delete _spill_cpp;
-    }
 }
 
-bool MapCppTrackerMCNoise::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppTrackerMCNoise";
-
-  try {
-    if (!Globals::HasInstance()) {
-      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
-
-    static MiceModule* _mice_modules = Globals::GetMonteCarloMiceModules();
-    SF_modules = _mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    _configJSON = Globals::GetConfigurationCards();
-    poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
-    return true;
-  } catch (Exception& exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch (std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+void MapCppTrackerMCNoise::_birth(const std::string& argJsonConfigDocument) {
+  if (!Globals::HasInstance()) {
+    GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
-  return false;
+
+  static MiceModule* _mice_modules = Globals::GetMonteCarloMiceModules();
+  SF_modules = _mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  _configJSON = Globals::GetConfigurationCards();
+  poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
 }
 
-bool MapCppTrackerMCNoise::death() {
-  return true;
+void MapCppTrackerMCNoise::_death() {
 }
 
-std::string MapCppTrackerMCNoise::process(std::string document) {
-  Json::FastWriter writer;
-
-  // Set up a spill object, then continue only if MC event array is initialised
-  read_in_json(document);
-  Spill& spill = *_spill_cpp;
+void MapCppTrackerMCNoise::_process(Data* data) const {
+  Spill& spill = *(data->GetSpill());
 
   if ( spill.GetMCEvents() ) {
   } else {
-    std::cerr << "MC event array not initialised, aborting noise for this spill\n";
-    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC event array not initialised, aborting noise";
-    errors["missing_branch"] = ss.str();
-    save_to_json(spill);
-    return writer.write(*_spill_json);
+    throw MAUS::Exception(Exception::recoverable,
+                          "MC event array not initialised, aborting noise",
+                          "MapCppTrackerMCNoise::_process");
   }
-
   // ================= Noise ==================================
 
   // Adds Effects of Noise from Electrons to MC
   dark_count(spill);
   // ==========================================================
-
-  save_to_json(spill);
-  return writer.write(*_spill_json);
 }
 
-void MapCppTrackerMCNoise::read_in_json(std::string json_data) {
-  Json::Reader reader;
-  Json::Value json_root;
-  Json::FastWriter writer;
-
-  if (_spill_cpp != NULL) {
-    delete _spill_cpp;
-    _spill_cpp = NULL;
-  }
-
-  try {
-    json_root = JsonWrapper::StringToJson(json_data);
-    SpillProcessor spill_proc;
-    _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch (...) {
-    std::cerr << "Bad json document" << std::endl;
-    _spill_cpp = new Spill();
-    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    _spill_cpp->GetErrors();
-  }
-}
-
-void MapCppTrackerMCNoise::save_to_json(Spill &spill) {
-    SpillProcessor spill_proc;
-    if (_spill_json != NULL) {
-        delete _spill_json;
-        _spill_json = NULL;
-    }
-    _spill_json = spill_proc.CppToJson(spill, "");
-}
-
-void MapCppTrackerMCNoise::dark_count(Spill &spill) {
+void MapCppTrackerMCNoise::dark_count(Spill &spill) const {
   int spill_n = spill.GetSpillNumber();
   double time1 = 0.;  // Fix: Need to assign a value to this!
   double D_NPE;
