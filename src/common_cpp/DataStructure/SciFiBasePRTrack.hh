@@ -23,7 +23,11 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TRefArray.h"
+
 // MAUS headers
+#include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
@@ -35,6 +39,25 @@ class SciFiBasePRTrack {
 
     /** Default destructor */
     virtual ~SciFiBasePRTrack();
+
+    /** Get the vector holding pointers to the spacepoints used by the track */
+    TRefArray* get_spacepoints() const { return _spoints; }
+
+    /** Set the vector holding pointers to the spacepoints
+     * used by the track from a TRefArray */
+    void set_spacepoints(TRefArray* spoints) { _spoints = spoints; }
+
+   /** Return a vector holding pointers to the spacepoints
+     * (requires extracting them from the TRefArray holder 
+     */
+    SciFiSpacePointPArray get_spacepoints_pointers();
+
+    /** Set the vector holding pointers to the spacepoints
+     *  used by the track from a vector  of spacepoint pointers */
+    void set_spacepoints_pointers(SciFiSpacePointPArray spoints);
+
+  protected:
+    TRefArray* _spoints;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

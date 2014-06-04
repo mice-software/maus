@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+// ROOT headers
+#include "TObject.h"
+
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -35,7 +38,7 @@
 
 namespace MAUS {
 
-class SciFiSpacePoint {
+class SciFiSpacePoint : public TObject {
  public:
 
   /** Default constructor - initialises to 0/NULL */

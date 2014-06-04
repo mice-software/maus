@@ -110,7 +110,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    *
    *  \param evt the current SciFiEvent
    */
-  void pattern_recognition(MAUS::SciFiEvent &evt);
+  void pattern_recognition(MAUS::SciFiEvent &evt) const;
 
   /** Performs the final track fit
    *
@@ -121,7 +121,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void track_fit(MAUS::SciFiEvent &evt) const;
 
-  void print_event_info(MAUS::SciFiEvent &event) const;
+  // void print_event_info(MAUS::SciFiEvent &event) const;
 
  private:
   /// This will contain the configuration

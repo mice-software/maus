@@ -144,8 +144,9 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
 
     // Pull out the z coord for each track seed
     std::vector<double> z_i;
-    for ( size_t i = 0; i < trk->get_spacepoints().size(); ++i ) {
-      z_i.push_back(trk->get_spacepoints()[i]->get_position().z());
+    for ( size_t i = 0; i < (trk->get_spacepoints()->GetLast()+1); ++i ) {
+      z_i.push_back(
+        static_cast<SciFiSpacePoint*>(trk->get_spacepoints()->At(i))->get_position().z());
     }
 
     double x0 = trk->get_circle_x0();
@@ -190,7 +191,7 @@ void TrackerDataManager::process_htrks(const std::vector<SciFiHelicalPRTrack*> h
       std::cout << "px_mc1\tpx_mc2\tpx_mc3\tpy_mc1\tpy_mc2\tpy_mc3\tpz_mc1\tpz_mc2\tpz_mc3\n";
     }
 
-    for ( size_t j = 0; j < trk->get_spacepoints().size(); ++j ) {
+    for ( size_t j = 0; j < (trk->get_spacepoints()->GetLast()+1); ++j ) {
       if ( trk->get_tracker() == 0 ) ++_t1._num_seeds;
       if ( trk->get_tracker() == 1 ) ++_t2._num_seeds;
       if (_print_seeds) print_seed_info(trk, j);
@@ -281,9 +282,10 @@ void TrackerDataManager::print_track_info(const SciFiHelicalPRTrack * const trk,
 };
 
 void TrackerDataManager::print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num) {
-  MAUS::ThreeVector pos = trk->get_spacepoints()[seed_num]->get_position();
-  std::vector<MAUS::SciFiCluster*> chans = trk->get_spacepoints()[seed_num]->get_channels();
-  double t = trk->get_spacepoints()[seed_num]->get_time();
+  SciFiSpacePoint* sp = static_cast<SciFiSpacePoint*>(trk->get_spacepoints()->At(seed_num));
+  MAUS::ThreeVector pos = sp->get_position();
+  std::vector<MAUS::SciFiCluster*> chans = sp->get_channels();
+  double t = sp->get_time();
 
   double seed_px_mc = 0.0;
   double seed_py_mc = 0.0;

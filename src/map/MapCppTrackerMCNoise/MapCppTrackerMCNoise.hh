@@ -85,7 +85,7 @@ class MapCppTrackerMCNoise : public MapBase<Data> {
   /// This will contain all SciFi elements in MICE
   std::vector<const MiceModule*> SF_modules;
   /// Mean number of dark count PE
-  double poisson_mean;
+  double _poisson_mean;
 };
 } // end namespace
 

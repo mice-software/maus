@@ -39,7 +39,7 @@ void MapCppTrackerMCNoise::_birth(const std::string& argJsonConfigDocument) {
   static MiceModule* _mice_modules = Globals::GetMonteCarloMiceModules();
   SF_modules = _mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _configJSON = Globals::GetConfigurationCards();
-  poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
+  _poisson_mean = -log(1.0-(*_configJSON)["SciFiDarkCountProababilty"].asDouble());
 }
 
 void MapCppTrackerMCNoise::_death() {
@@ -48,7 +48,7 @@ void MapCppTrackerMCNoise::_death() {
 void MapCppTrackerMCNoise::_process(Data* data) const {
   Spill& spill = *(data->GetSpill());
 
-  if ( _spill_cpp->GetMCEvents() ) {
+  if ( spill.GetMCEvents() ) {
   } else {
     throw MAUS::Exception(Exception::recoverable,
                           "MC event array not initialised, aborting noise",
@@ -57,7 +57,7 @@ void MapCppTrackerMCNoise::_process(Data* data) const {
   // ================= Noise ==================================
 
   // Adds Effects of Noise from Electrons to MC
-  get_dark_count(_spill_cpp);
+  dark_count(spill);
   // ==========================================================
 }
 
@@ -74,11 +74,11 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) const {
   * a simple calculation in the birth function
   **************************************************************************************/
 
-  for ( unsigned int event_i = 0; event_i < spill->GetMCEvents()->size(); event_i++ ) {
+  for ( unsigned int event_i = 0; event_i < spill.GetMCEvents()->size(); event_i++ ) {
     SciFiNoiseHitArray* noise_hits = new SciFiNoiseHitArray();
-    for ( unsigned int mod_i = 0; mod_i < _sf_modules.size(); mod_i++ ) {
+    for ( unsigned int mod_i = 0; mod_i < SF_modules.size(); mod_i++ ) {
       int nChannels = static_cast <int>
-                      (2*((_sf_modules[mod_i]->propertyDouble("CentralFibre"))+0.5));
+                      (2*((SF_modules[mod_i]->propertyDouble("CentralFibre"))+0.5));
       for ( int chan_i = 0; chan_i < nChannels; chan_i++ ) {
         D_NPE = CLHEP::RandPoisson::shoot(_poisson_mean);
 
@@ -90,9 +90,9 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) const {
         ********************************************************************************/
 
         if ( D_NPE ) {
-          int tracker = _sf_modules[mod_i]->propertyInt("Tracker");
-          int station = _sf_modules[mod_i]->propertyInt("Station");
-          int plane   = _sf_modules[mod_i]->propertyInt("Plane");
+          int tracker = SF_modules[mod_i]->propertyInt("Tracker");
+          int station = SF_modules[mod_i]->propertyInt("Station");
+          int plane   = SF_modules[mod_i]->propertyInt("Plane");
           SciFiNoiseHit a_noise_hit(spill_n, event_i,
                                     tracker, station, plane,
                                     chan_i, D_NPE, time1);
@@ -107,7 +107,7 @@ void MapCppTrackerMCNoise::dark_count(Spill &spill) const {
     * into the SciFiDigit array and merged back into the spill.
     ************************************************************************************/
 
-    spill->GetMCEvents()->at(event_i)->SetSciFiNoiseHits(noise_hits);
+    spill.GetMCEvents()->at(event_i)->SetSciFiNoiseHits(noise_hits);
   } // end of event_i of spill_n, start of event_i+1.
 }
 

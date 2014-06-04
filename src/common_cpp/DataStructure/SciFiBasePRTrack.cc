@@ -21,11 +21,31 @@
 namespace MAUS {
 
 SciFiBasePRTrack::SciFiBasePRTrack() {
-  // Do nothing
+  _spoints = new TRefArray();
 }
 
 SciFiBasePRTrack::~SciFiBasePRTrack() {
-  // Do nothing
+  delete _spoints;
+}
+
+SciFiSpacePointPArray SciFiBasePRTrack::get_spacepoints_pointers() {
+  SciFiSpacePointPArray sp_pointers;
+
+  // Check the _spoints container is initialised
+  if (!_spoints) return sp_pointers;
+
+  for (int i = 0; i < (_spoints->GetLast()+1); ++i) {
+    sp_pointers.push_back(static_cast<SciFiSpacePoint*>(_spoints->At(i)));
+  }
+  return sp_pointers;
+}
+
+void SciFiBasePRTrack::set_spacepoints_pointers(SciFiSpacePointPArray spoints) {
+  if (_spoints) delete _spoints;
+  _spoints = new TRefArray();
+  for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
+    _spoints->Add(*sp);
+  }
 }
 
 } // ~namespace MAUS

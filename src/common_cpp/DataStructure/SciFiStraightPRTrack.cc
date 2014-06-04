@@ -15,7 +15,13 @@
  *
  */
 
+// C++ headers
 #include <vector>
+
+// ROOT headers
+#include "TRefArray.h"
+
+// MAUS headers
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 
 namespace MAUS {
@@ -23,7 +29,8 @@ namespace MAUS {
 // Constructors
 SciFiStraightPRTrack::SciFiStraightPRTrack() : _tracker(-1), _num_points(-1),
                                                _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
-                                               _y0(-1.0), _my(-1.0), _y_chisq(-1.0), _spoints(0) {
+                                               _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
+  // Do nothing
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
@@ -31,7 +38,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            double y0, double my, double y_chisq)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
-                                            _y0(-1.0), _my(-1.0), _y_chisq(-1.0), _spoints(0) {
+                                            _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
   _tracker = tracker;
   _num_points = num_points;
   _x0 = x0;
@@ -46,7 +53,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            SimpleLine line_x, SimpleLine line_y)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
-                                            _y0(-1.0), _my(-1.0), _y_chisq(-1.0), _spoints(0) {
+                                            _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
 
   _x0 = line_x.get_c();
   _mx = line_x.get_m();
@@ -58,13 +65,19 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 
   _tracker = tracker;
   _num_points = num_points;
+
 }
 
-SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk)
-                                          : _tracker(-1), _num_points(-1),
-                                            _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
-                                            _y0(-1.0), _my(-1.0), _y_chisq(-1.0), _spoints(0) {
-  *this = _strk;
+SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
+                                          : _tracker(strk.get_tracker()),
+                                            _num_points(strk.get_num_points()),
+                                            _x0(strk.get_x0()),
+                                            _mx(strk.get_mx()), 
+                                            _x_chisq(strk.get_x_chisq()),
+                                            _y0(strk.get_y0()),
+                                            _my(strk.get_my()), 
+                                            _y_chisq(strk.get_y_chisq()) {
+  _spoints = new TRefArray();
 }
 
 // Destructor

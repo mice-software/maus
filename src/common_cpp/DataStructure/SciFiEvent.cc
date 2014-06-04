@@ -109,18 +109,18 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
       // now set cross-pointers so they point to correct place in the new copy
       // of the datastructure
       SciFiSpacePointPArray new_sps(
-              _scifievent._scifistraightprtracks[i]->get_spacepoints().size()
+              _scifievent._scifistraightprtracks[i]->get_spacepoints()->GetLast() + 1
       );
       for (unsigned int j = 0; j < new_sps.size(); ++j) {
           new_sps[j] = NULL;
           for (unsigned int k = 0; k < _scifievent._scifispacepoints.size(); ++k)
-              if (_scifievent._scifistraightprtracks[i]->get_spacepoints()[j] ==
+              if (_scifievent._scifistraightprtracks[i]->get_spacepoints_pointers()[j] ==
                   _scifievent._scifispacepoints[k]) {
                   new_sps[j] = _scifispacepoints[k];
                   break;
               }
       }
-      _scifistraightprtracks[i]->set_spacepoints(new_sps);
+      _scifistraightprtracks[i]->set_spacepoints_pointers(new_sps);
     }
 
     _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
@@ -130,18 +130,18 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
       // now set cross-pointers so they point to correct place in the new copy
       // of the datastructure
       SciFiSpacePointPArray new_sps(
-              _scifievent._scifihelicalprtracks[i]->get_spacepoints().size()
+              _scifievent._scifihelicalprtracks[i]->get_spacepoints()->GetLast() + 1
       );
       for (unsigned int j = 0; j < new_sps.size(); ++j) {
           new_sps[j] = NULL;
           for (unsigned int k = 0; k < _scifievent._scifispacepoints.size(); ++k)
-              if (_scifievent._scifihelicalprtracks[i]->get_spacepoints()[j] ==
+              if (_scifievent._scifihelicalprtracks[i]->get_spacepoints()->At(j) ==
                   _scifievent._scifispacepoints[k]) {
                   new_sps[j] = _scifispacepoints[k];
                   break;
               }
       }
-      _scifihelicalprtracks[i]->set_spacepoints(new_sps);
+      _scifihelicalprtracks[i]->set_spacepoints_pointers(new_sps);
     }
 
     _scifitracks.resize(_scifievent._scifitracks.size());

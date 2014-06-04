@@ -67,7 +67,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       }
       // Pattern Recognition.
       if ( event->spacepoints().size() ) {
-        pattern_recognition(_helical_pr_on, _straight_pr_on, *event);
+        pattern_recognition(*event);
       }
       // Kalman Track Fit.
       if ( _kalman_on ) {
@@ -92,7 +92,7 @@ void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) const {
   spacepoints.process(evt);
 }
 
-void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) {
+void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) const {
   PatternRecognition pr1; // Pat rec constructor calls Globals again
   // We let the Map's helical and straight flags overide the interal pat rec variables for these,
   // (pulled by pat rec from Globals) as this way we can customise which type runs for
@@ -129,31 +129,31 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
   }
 }
 
-void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-  std::cerr << event.digits().size() << " "
-                              << event.clusters().size() << " "
-                              << event.spacepoints().size() << "; "
-                              << event.straightprtracks().size() << " "
-                              << event.helicalprtracks().size() << "; ";
-  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-                                << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
-  }
-  std::cerr << std::endl;
-  /*
-  Squeak::mout(Squeak::info) << event.digits().size() << " "
-                              << event.clusters().size() << " "
-                              << event.spacepoints().size() << "; "
-                              << event.straightprtracks().size() << " "
-                              << event.helicalprtracks().size() << "; ";
-  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-    Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-                                << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-                                << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
-  }
-  Squeak::mout(Squeak::info) << std::endl;
-  */
-}
+// void MapCppTrackerRecon::print_event_info(MAUS::SciFiEvent &event) {
+//   std::cerr << event.digits().size() << " "
+//                               << event.clusters().size() << " "
+//                               << event.spacepoints().size() << "; "
+//                               << event.straightprtracks().size() << " "
+//                               << event.helicalprtracks().size() << "; ";
+//   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+//     std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+//                                 << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+//                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+//   }
+//   std::cerr << std::endl;
+//   /*
+//   Squeak::mout(Squeak::info) << event.digits().size() << " "
+//                               << event.clusters().size() << " "
+//                               << event.spacepoints().size() << "; "
+//                               << event.straightprtracks().size() << " "
+//                               << event.helicalprtracks().size() << "; ";
+//   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+//     Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+//                                 << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+//                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+//   }
+//   Squeak::mout(Squeak::info) << std::endl;
+//   */
+// }
 
 } // ~namespace MAUS

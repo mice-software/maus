@@ -66,7 +66,7 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("pos0", &_threevector_proc,
                         &SciFiHelicalPRTrack::get_pos0,
                         &SciFiHelicalPRTrack::set_pos0, true);
-    RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
+    RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);
     RegisterValueBranch("phi", &_double_array_proc,

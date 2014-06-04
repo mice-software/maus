@@ -37,7 +37,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _chisq_dof(-1.0),
                                               _pos0(-1.0, -1.0, -1.0),
                                               _phi(0) {
-  _spoint = new TRefArray();
+  _spoints = new TRefArray();
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
@@ -60,11 +60,12 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
   _chisq_dof = chisq_dof;
   _pos0 = pos0;
   _phi = phi;
-  _spoints = spoints;
 }
 
 // Destructor
-SciFiHelicalPRTrack::~SciFiHelicalPRTrack() {}
+SciFiHelicalPRTrack::~SciFiHelicalPRTrack() {
+  // Do nothing
+}
 
 // Assignment operator
 SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &htrk) {
@@ -86,30 +87,30 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _charge = htrk.get_charge();
   _tracker = htrk.get_tracker();
   _pos0 = htrk.get_pos0();
-  _spoints = htrk.get_spacepoints();
+  _spoints = new TRefArray(*(htrk.get_spacepoints()));
   _phi = htrk.get_phi();
   return *this;
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
-  : _tracker(-1),
-    _num_points(-1),
-    _charge(0),
-    _R(-1.0),
-    _phi0(-1.0),
-    _psi0(-1.0),
-    _dsdz(-1.0),
-    _line_sz_c(-1.0),
-    _line_sz_chisq(-1.0),
-    _circle_x0(-1.0),
-    _circle_y0(-1.0),
-    _circle_chisq(-1.0),
-    _chisq(-1.0),
-    _chisq_dof(-1.0),
-    _pos0(-1.0, -1.0, -1.0),
-    _phi(0),
-    _spoints(0) {
-  *this = htrk;
+  : _tracker(htrk.get_tracker()),
+    _num_points(htrk.get_num_points()),
+    _charge(htrk.get_charge()),
+    _R(htrk.get_R()),
+    _phi0(htrk.get_phi0()),
+    _psi0(htrk.get_psi0()),
+    _dsdz(htrk.get_dsdz()),
+    _line_sz_c(htrk.get_line_sz_c()),
+    _line_sz_chisq(htrk.get_line_sz_chisq()),
+    _circle_x0(htrk.get_circle_x0()),
+    _circle_y0(htrk.get_circle_y0()),
+    _circle_chisq(htrk.get_circle_chisq()),
+    _chisq(htrk.get_chisq()),
+    _chisq_dof(htrk.get_chisq_dof()),
+    _pos0(htrk.get_pos0()),
+    _phi(htrk.get_phi()) {
+  _spoints = new TRefArray(*htrk.get_spacepoints());
 }
+
 
 } // ~namespace MAUS
