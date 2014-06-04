@@ -93,6 +93,14 @@ class LoadTest(unittest.TestCase): # pylint: disable = R0904
     """
     Look for memory usage over a long duration MC
     """
+    @classmethod
+    def setUpClass(cls): # pylint: disable = C0103
+        """
+        Class setup
+        """
+        if not cls.args:
+            cls.args = arg_parser().parse_args([]) # defaults
+
     def check_resource_usage(self,
                              resource_usage_list,
                              max_mem_size):

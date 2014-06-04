@@ -71,7 +71,7 @@ def monitor_step(delta_t, mem_list, graph_dict):
         if mem and (mem_p > 1e-9 or index == 1):
             mem_list_step.append(mem)
             graph_dict[pid].Expand(index+1)
-            graph_dict[pid].SetPoint(index+1,
+            graph_dict[pid].SetPoint(index,
                                     delta_t.seconds,
                                     mem_p)
         graph_dict[pid].SetLineStyle(i+1)
