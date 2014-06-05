@@ -65,38 +65,37 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 
   _tracker = tracker;
   _num_points = num_points;
-
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
                                           : _tracker(strk.get_tracker()),
                                             _num_points(strk.get_num_points()),
                                             _x0(strk.get_x0()),
-                                            _mx(strk.get_mx()), 
+                                            _mx(strk.get_mx()),
                                             _x_chisq(strk.get_x_chisq()),
                                             _y0(strk.get_y0()),
-                                            _my(strk.get_my()), 
+                                            _my(strk.get_my()),
                                             _y_chisq(strk.get_y_chisq()) {
-  _spoints = new TRefArray();
+  _spoints = new TRefArray(*strk.get_spacepoints());
 }
 
 // Destructor
 SciFiStraightPRTrack::~SciFiStraightPRTrack() {}
 
 // Assignment operator
-SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack &_strk) {
-    if (this == &_strk) {
+SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack &strk) {
+    if (this == &strk) {
         return *this;
     }
-    _tracker = _strk.get_tracker();
-    _num_points = _strk.get_num_points();
-    _x0 = _strk.get_x0();
-    _mx = _strk.get_mx();
-    _x_chisq = _strk.get_x_chisq();
-    _y0 = _strk.get_y0();
-    _my = _strk.get_my();
-    _y_chisq = _strk.get_y_chisq();
-    _spoints = _strk.get_spacepoints();
+    _tracker = strk.get_tracker();
+    _num_points = strk.get_num_points();
+    _x0 = strk.get_x0();
+    _mx = strk.get_mx();
+    _x_chisq = strk.get_x_chisq();
+    _y0 = strk.get_y0();
+    _my = strk.get_my();
+    _y_chisq = strk.get_y_chisq();
+    _spoints = new TRefArray(*(strk.get_spacepoints()));
     return *this;
 }
 

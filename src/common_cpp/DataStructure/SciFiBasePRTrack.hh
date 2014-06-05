@@ -45,12 +45,12 @@ class SciFiBasePRTrack {
 
     /** Set the vector holding pointers to the spacepoints
      * used by the track from a TRefArray */
-    void set_spacepoints(TRefArray* spoints) { _spoints = spoints; }
+    void set_spacepoints(TRefArray* spoints);
 
    /** Return a vector holding pointers to the spacepoints
      * (requires extracting them from the TRefArray holder 
      */
-    SciFiSpacePointPArray get_spacepoints_pointers();
+    SciFiSpacePointPArray get_spacepoints_pointers() const;
 
     /** Set the vector holding pointers to the spacepoints
      *  used by the track from a vector  of spacepoint pointers */

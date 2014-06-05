@@ -137,8 +137,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
 //                               << event.helicalprtracks().size() << "; ";
 //   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
 //     std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-//                                 << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-//                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+//                            << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+//                            << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
 //   }
 //   std::cerr << std::endl;
 //   /*
@@ -149,8 +149,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
 //                               << event.helicalprtracks().size() << "; ";
 //   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
 //     Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-//                                 << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-//                                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+//                  << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+//                  << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
 //   }
 //   Squeak::mout(Squeak::info) << std::endl;
 //   */

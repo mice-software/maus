@@ -486,7 +486,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
           }
 
           // Populate the sp of the track and then push the track back into the strks vector
-          track->set_spacepoints(good_spnts);
+          track->set_spacepoints_pointers(good_spnts);
           strks.push_back(track);
         } else {
           if ( _verb > 0 ) {

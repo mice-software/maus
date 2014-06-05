@@ -17,6 +17,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/TRefArrayProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiSpacePointProcessor.hh"
 
