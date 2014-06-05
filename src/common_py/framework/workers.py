@@ -16,6 +16,8 @@ MAUS worker utilities.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import MAUS
+
 from types import ListType
 from types import StringType
 from types import UnicodeType
@@ -57,11 +59,7 @@ class WorkerUtilities: # pylint: disable=W0232
             return group
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            try:
-                module_object = __import__(transform)
-            except ImportError: 
-                raise ValueError("No such transform: %s" % transform)
-            transform_class = getattr(module_object, transform)
+            transform_class = getattr(MAUS, transform)
             return transform_class()
         else:
             raise ValueError("Transform name %s is not a string" % transform)
@@ -94,8 +92,8 @@ class WorkerUtilities: # pylint: disable=W0232
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
             try:
-                __import__(transform)
-            except ImportError: 
+                getattr(MAUS, transform)
+            except AttributeError: 
                 raise ValueError("No such transform: %s" % transform)
         else:
             raise ValueError("Transform name %s is not a string" % transform)
