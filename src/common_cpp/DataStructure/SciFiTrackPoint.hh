@@ -29,6 +29,10 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+// ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
+
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
@@ -36,7 +40,7 @@
 
 namespace MAUS {
 
-class SciFiTrackPoint {
+class SciFiTrackPoint : public TObject {
  public:
   /** @brief  Constructor.
    */
@@ -120,10 +124,6 @@ class SciFiTrackPoint {
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
   void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
 
-  /** @brief Set the mother cluster
-   */
-  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
-
   /** @brief  Returns the tracker number.
    */
   int tracker()              const { return _tracker;  }
@@ -182,9 +182,29 @@ class SciFiTrackPoint {
 
   int event()                const { return _event; }
 
-  /** @brief  Returns the mother cluster.
+  /** @brief  Add a cluster to the mother clusters (should be only 1).
    */
-  SciFiCluster* cluster()    const { return _cluster; }
+  void add_cluster(SciFiCluster* cluster);
+
+  /** @brief  Return the first cluster in the array (which should be of size 1 anyway)
+   */
+  SciFiCluster* cluster() const;
+
+  /** @brief  Returns the mother clusters as a TRefArray*.
+   */
+  TRefArray* get_clusters() const { return _clusters; }
+
+   /** @brief Set the mother clusters using a TRefArray* (should be an array of size 1!).
+   */
+  void set_clusters(TRefArray* cluster) { _clusters = cluster; }
+
+  /** @brief  Returns the mother clusters as an array of pointers.
+   */
+  SciFiClusterPArray get_clusters_pointers() const;
+
+  /** @brief  Set the mother clusters using an array of pointers (should be an array of size 1!).
+   */
+  void set_clusters_pointers(const SciFiClusterPArray &clusters);
 
  private:
   /** @brief The tracker the trackpoint belongs to.
@@ -252,7 +272,7 @@ class SciFiTrackPoint {
 
   /** @brief A pointer to the cluster used to form the state - does not assume control of memory
    */
-  SciFiCluster* _cluster;
+  TRefArray* _clusters;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

@@ -28,6 +28,7 @@
 
 // ROOT headers
 #include "TObject.h"
+#include "TRefArray.h"
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -110,9 +111,13 @@ class SciFiCluster : public TObject {
 
   int get_id() const { return _id; }
 
-  SciFiDigitPArray get_digits() const { return _digits; }
+  TRefArray* get_digits() const { return _digits; }
 
-  void set_digits(SciFiDigitPArray digits) { _digits = digits; }
+  void set_digits(TRefArray* digits) { _digits = digits; }
+
+  SciFiDigitPArray get_digits_pointers() const;
+
+  void set_digits_pointers(SciFiDigitPArray const &digits);
 
   void set_true_momentum(ThreeVector p) { _true_p = p; }
 
@@ -129,11 +134,11 @@ class SciFiCluster : public TObject {
 
   double _channel_w, _npe, _time, _alpha;
 
-  ThreeVector _true_pos, _true_p;
-
   ThreeVector _direction, _position;
 
-  SciFiDigitPArray _digits;
+  ThreeVector _true_pos, _true_p;
+
+  TRefArray* _digits;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiCluster)
 }; // Don't forget this trailing colon!!!!

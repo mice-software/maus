@@ -27,21 +27,26 @@ SciFiCluster::SciFiCluster(): _used(false),
                               _plane(-1),
                               _channel_w(-1),
                               _npe(-1),
-                              _time(-1),
-                              _digits(0) {
+                              _time(-1) {
+  _digits = new TRefArray();
 }
 
-SciFiCluster::SciFiCluster(const SciFiCluster &scificluster): _used(false),
-                                                              _spill(0),
-                                                              _event(0),
-                                                              _tracker(0),
-                                                              _station(0),
-                                                              _plane(0),
-                                                              _channel_w(0),
-                                                              _npe(0.0),
-                                                              _time(0.0),
-                                                              _digits(0) {
-  *this = scificluster;
+SciFiCluster::SciFiCluster(const SciFiCluster &clus): _used(clus.is_used()),
+                                                      _spill(clus.get_spill()),
+                                                      _event(clus.get_event()),
+                                                      _tracker(clus.get_tracker()),
+                                                      _station(clus.get_station()),
+                                                      _plane(clus.get_plane()),
+                                                      _id(clus.get_id()),
+                                                      _channel_w(clus.get_channel()),
+                                                      _npe(clus.get_npe()),
+                                                      _time(clus.get_time()),
+                                                      _alpha(clus.get_alpha()) {
+  _direction = clus.get_direction();
+  _position = clus.get_position();
+  _true_pos = clus.get_true_position();
+  _true_p = clus.get_true_momentum();
+  _digits = new TRefArray(*(clus.get_digits()));
 }
 
 SciFiCluster::SciFiCluster(SciFiDigit *scifidigit): _used(false),
@@ -53,50 +58,77 @@ SciFiCluster::SciFiCluster(SciFiDigit *scifidigit): _used(false),
                                                     _channel_w(scifidigit->get_channel()),
                                                     _npe(scifidigit->get_npe()),
                                                     _time(scifidigit->get_time()),
-                                                    _digits(0) {
+                                                    _true_pos(scifidigit->get_true_position()),
+                                                    _true_p(scifidigit->get_true_momentum()) {
   scifidigit->set_used(true);
-  _digits.push_back(scifidigit);
-  _true_pos = scifidigit->get_true_position();
-  _true_p   = scifidigit->get_true_momentum();
+  _digits = new TRefArray();
+  _digits->Add(scifidigit);
 }
 
 // Destructor
-SciFiCluster::~SciFiCluster() {}
+SciFiCluster::~SciFiCluster() {
+  delete _digits;
+}
 
 // Assignment operator
 SciFiCluster& SciFiCluster::operator=(const SciFiCluster &scificluster) {
   if (this == &scificluster) {
     return *this;
   }
-  _true_pos  = scificluster.get_true_position();
-  _true_p    = scificluster.get_true_momentum();
   _used      = scificluster.is_used();
   _spill     = scificluster.get_spill();
   _event     = scificluster.get_event();
   _tracker   = scificluster.get_tracker();
   _station   = scificluster.get_station();
   _plane     = scificluster.get_plane();
+  _id        = scificluster.get_id();
   _channel_w = scificluster.get_channel();
   _npe       = scificluster.get_npe();
   _time      = scificluster.get_time();
+  _alpha     = scificluster.get_alpha();
   _direction = scificluster.get_direction();
   _position  = scificluster.get_position();
-  _alpha     = scificluster.get_alpha();
-  _id        = scificluster.get_id();
-  _digits    = scificluster.get_digits();
+  _true_pos  = scificluster.get_true_position();
+  _true_p    = scificluster.get_true_momentum();
+  if (_digits) delete _digits;
+  _digits    = new TRefArray(*(scificluster.get_digits()));
   return *this;
 }
 
 // Merge digits
 void SciFiCluster::add_digit(SciFiDigit* neigh) {
   neigh->set_used(true);
-  _digits.push_back(neigh);
+  _digits->Add(neigh);
 
   _npe += neigh->get_npe();
   _channel_w /= 2.0;
   _channel_w += (neigh->get_channel())/2.0;
   _time /= 2.0;
   _time += (neigh->get_time())/2.0;
+}
+
+SciFiDigitPArray SciFiCluster::get_digits_pointers() const {
+  SciFiDigitPArray dig_pointers;
+
+  // Check the _spoints container is not initialised
+  if (!_digits) {
+    std::cerr << "Digit TRefArray not initialised" << std::endl;
+    return dig_pointers;
+  }
+
+  for (int i = 0; i < (_digits->GetLast()+1); ++i) {
+    dig_pointers.push_back(static_cast<SciFiDigit*>(_digits->At(i)));
+  }
+  return dig_pointers;
+}
+
+void SciFiCluster::set_digits_pointers(const SciFiDigitPArray &digits) {
+  if (_digits) delete _digits;
+  _digits = new TRefArray();
+  for (
+    std::vector<SciFiDigit*>::const_iterator dig = digits.begin(); dig != digits.end(); ++dig) {
+    _digits->Add(*dig);
+  }
 }
 
 } // ~namespace MAUS

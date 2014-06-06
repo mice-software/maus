@@ -48,18 +48,18 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
       // now set cross-pointers so they point to correct place in the new copy
       // of the datastructure
       SciFiDigitPArray new_digs(
-              _scifievent._scificlusters[i]->get_digits().size()
+              _scifievent._scificlusters[i]->get_digits()->GetLast() + 1
       );
       for (unsigned int j = 0; j < new_digs.size(); ++j) {
           new_digs[j] = NULL;
           for (unsigned int k = 0; k < _scifievent._scifidigits.size(); ++k)
-              if (_scifievent._scificlusters[i]->get_digits()[j] ==
+              if (_scifievent._scificlusters[i]->get_digits_pointers()[j] ==
                   _scifievent._scifidigits[k]) {
                   new_digs[j] = _scifidigits[k];
                   break;
               }
       }
-      _scificlusters[i]->set_digits(new_digs);
+      _scificlusters[i]->set_digits_pointers(new_digs);
     }
 
     _scifispacepoints.resize(_scifievent._scifispacepoints.size());
