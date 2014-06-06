@@ -68,18 +68,18 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
       // now set cross-pointers so they point to correct place in the new copy
       // of the datastructure
       SciFiClusterPArray new_clus(
-              _scifievent._scifispacepoints[i]->get_channels().size()
+              _scifievent._scifispacepoints[i]->get_channels()->GetLast() + 1
       );
       for (unsigned int j = 0; j < new_clus.size(); ++j) {
           new_clus[j] = NULL;
           for (unsigned int k = 0; k < _scifievent._scificlusters.size(); ++k)
-              if (_scifievent._scifispacepoints[i]->get_channels()[j] ==
+              if (_scifievent._scifispacepoints[i]->get_channels()->At(j) ==
                   _scifievent._scificlusters[k]) {
                   new_clus[j] = _scificlusters[k];
                   break;
               }
       }
-      _scifispacepoints[i]->set_channels(new_clus);
+      _scifispacepoints[i]->set_channels_pointers(new_clus);
     }
 
     _scifiseeds.resize(_scifievent._scifiseeds.size());
@@ -88,18 +88,18 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
       // now set cross-pointers so they point to correct place in the new copy
       // of the datastructure
       SciFiClusterPArray new_clus(
-              _scifievent._scifiseeds[i]->get_channels().size()
+              _scifievent._scifiseeds[i]->get_channels()->GetLast() + 1
       );
       for (unsigned int j = 0; j < new_clus.size(); ++j) {
           new_clus[j] = NULL;
           for (unsigned int k = 0; k < _scifievent._scificlusters.size(); ++k)
-              if (_scifievent._scifiseeds[i]->get_channels()[j] ==
+              if (_scifievent._scifiseeds[i]->get_channels()->At(j) ==
                   _scifievent._scificlusters[k]) {
                   new_clus[j] = _scificlusters[k];
                   break;
               }
       }
-      _scifiseeds[i]->set_channels(new_clus);
+      _scifiseeds[i]->set_channels_pointers(new_clus);
     }
 
     _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());

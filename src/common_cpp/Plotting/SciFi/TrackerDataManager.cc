@@ -284,7 +284,7 @@ void TrackerDataManager::print_track_info(const SciFiHelicalPRTrack * const trk,
 void TrackerDataManager::print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num) {
   SciFiSpacePoint* sp = static_cast<SciFiSpacePoint*>(trk->get_spacepoints()->At(seed_num));
   MAUS::ThreeVector pos = sp->get_position();
-  std::vector<MAUS::SciFiCluster*> chans = sp->get_channels();
+  std::vector<MAUS::SciFiCluster*> chans = sp->get_channels_pointers();
   double t = sp->get_time();
 
   double seed_px_mc = 0.0;

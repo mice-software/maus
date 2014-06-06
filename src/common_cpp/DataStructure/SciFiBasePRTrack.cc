@@ -48,10 +48,11 @@ void SciFiBasePRTrack::set_spacepoints(TRefArray* spoints) {
   _spoints = spoints;
 }
 
-void SciFiBasePRTrack::set_spacepoints_pointers(SciFiSpacePointPArray spoints) {
+void SciFiBasePRTrack::set_spacepoints_pointers(const SciFiSpacePointPArray &spoints) {
   if (_spoints) delete _spoints;
   _spoints = new TRefArray();
-  for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
+  for (
+    std::vector<SciFiSpacePoint*>::const_iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
     _spoints->Add(*sp);
   }
 }

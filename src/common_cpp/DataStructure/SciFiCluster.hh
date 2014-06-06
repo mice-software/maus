@@ -26,6 +26,9 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TObject.h"
+
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiDigit.hh"
@@ -33,7 +36,7 @@
 
 namespace MAUS {
 
-class SciFiCluster {
+class SciFiCluster : public TObject {
  public:
 
   /** Default constructor - initialises to 0/NULL */

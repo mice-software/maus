@@ -61,7 +61,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
   _pos0 = pos0;
   _spoints = new TRefArray();
   for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
-   _spoints->Add(*sp); 
+    _spoints->Add(*sp);
   }
   _phi = phi;
 }
@@ -91,6 +91,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _charge = htrk.get_charge();
   _tracker = htrk.get_tracker();
   _pos0 = htrk.get_pos0();
+  if (_spoints) delete _spoints;
   _spoints = new TRefArray(*(htrk.get_spacepoints()));
   _phi = htrk.get_phi();
   return *this;
@@ -113,7 +114,9 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _chisq_dof(htrk.get_chisq_dof()),
     _pos0(htrk.get_pos0()),
     _phi(htrk.get_phi()) {
-  _spoints = new TRefArray(*htrk.get_spacepoints());
+
+    // Shallow copy the SpacePoints
+    _spoints = new TRefArray(*(htrk.get_spacepoints()));
 }
 
 

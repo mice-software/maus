@@ -203,9 +203,9 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {
     SciFiSpacePoint *spacepoint = spacepoints[i];
-    size_t numb_clusters = spacepoint->get_channels().size();
+    size_t numb_clusters = spacepoint->get_channels()->GetLast() + 1;
     for ( size_t j = 0; j < numb_clusters; ++j ) {
-      SciFiCluster *cluster = spacepoint->get_channels()[j];
+      SciFiCluster *cluster = spacepoint->get_channels_pointers()[j];
       _clusters.push_back(cluster);
     }
   }

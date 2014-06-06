@@ -17,6 +17,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/TRefArrayProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiClusterProcessor.hh"
 
@@ -39,7 +40,7 @@ class SciFiSpacePointProcessor : public ObjectProcessor<SciFiSpacePoint> {
     DoubleProcessor _double_proc;
     StringProcessor _string_proc;
     ThreeVectorProcessor _three_vec_proc;
-    ReferenceArrayProcessor<SciFiCluster> _sf_cluster_array_proc;
+    TRefArrayProcessor _cluster_tref_proc;
 };
 } // ~namespace MAUS
 

@@ -30,6 +30,7 @@
 
 // ROOT headers
 #include "TObject.h"
+#include "TRefArray.h"
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -113,11 +114,15 @@ class SciFiSpacePoint : public TObject {
 
   bool get_used() const { return _used; }
 
-  void add_channel(SciFiCluster *channel) { _channels.push_back(channel); }
+  void add_channel(SciFiCluster *channel);
 
-  void set_channels(SciFiClusterPArray channels) { _channels = channels; }
+  void set_channels(TRefArray* channels) { _channels = channels; }
 
-  SciFiClusterPArray get_channels()  const { return _channels; }
+  TRefArray* get_channels() const { return _channels; }
+
+  void set_channels_pointers(const SciFiClusterPArray &channels);
+
+  SciFiClusterPArray get_channels_pointers() const;
 
  private:
   bool _used;
@@ -132,7 +137,7 @@ class SciFiSpacePoint : public TObject {
 
   ThreeVector _position;
 
-  SciFiClusterPArray  _channels;
+  TRefArray*  _channels;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiSpacePoint)
 };  // Don't forget this trailing colon!!!!
