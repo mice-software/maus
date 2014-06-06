@@ -59,7 +59,10 @@ class WorkerUtilities: # pylint: disable=W0232
             return group
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            transform_class = getattr(MAUS, transform)
+            try:
+                transform_class = getattr(MAUS, transform)
+            except AttributeError:
+                raise ValueError("No such transform: %s" % transform)
             return transform_class()
         else:
             raise ValueError("Transform name %s is not a string" % transform)
@@ -93,7 +96,7 @@ class WorkerUtilities: # pylint: disable=W0232
             or isinstance(transform, UnicodeType):
             try:
                 getattr(MAUS, transform)
-            except AttributeError: 
+            except AttributeError:
                 raise ValueError("No such transform: %s" % transform)
         else:
             raise ValueError("Transform name %s is not a string" % transform)

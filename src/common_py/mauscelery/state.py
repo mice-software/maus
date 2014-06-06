@@ -114,7 +114,7 @@ class MausTransform(): # pylint:disable = W0232
         # return_value can be None and it is okay
         exc_str = ""
         try:
-            exc_str = cls.transform.__class__
+            exc_str = cls.transform.__class__.__name__
             return_value = cls.transform.birth(configuration)
         except Exception: # pylint: disable=W0703
             return_value = False
@@ -163,7 +163,7 @@ class MausTransform(): # pylint:disable = W0232
             # return_value can be None and it is okay
             exc_str = ""
             try:
-                exc_str = cls.transform.__class__
+                exc_str = cls.transform.__class__.__name__
                 return_value = cls.transform.death()
             except Exception: # pylint: disable=W0703
                 return_value = False
