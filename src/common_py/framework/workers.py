@@ -121,6 +121,8 @@ class WorkerUtilities: # pylint: disable=W0232
         Get the transform type object (for instantiation) given string name or
         raise a ValueError
         """
+        # nb tempting to use MAUS here - but it doesnt work, as it creates a
+        # circular dependency
         try:
             transform_module = __import__(transform)
         except ImportError:
