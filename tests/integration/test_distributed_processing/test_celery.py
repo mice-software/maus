@@ -445,6 +445,23 @@ class Regression1483(unittest.TestCase): #pylint: disable=R0904
             print "Killing celeryd process", cls.proc.pid
             cls.proc.send_signal(signal.SIGKILL)
 
+    def setUp(self):
+        """ 
+        Check for at least one active Celery worker else skip the
+        test.
+        @param self Object reference.
+        """
+        self.__inspection = inspect()
+        try:
+            active_nodes = self.__inspection.active()
+        except Exception: # pylint:disable = W0703
+            unittest.TestCase.skipTest(self, 
+                                       "Skip - RabbitMQ seems to be down")
+        if (active_nodes == None):
+            unittest.TestCase.skipTest(self, 
+                                       "Skip - No active Celery workers")
+ 
+
     def test_birth_map_cpp(self):
         """
         Test birth can birth a MapCpp*. This is a regression of #1483
