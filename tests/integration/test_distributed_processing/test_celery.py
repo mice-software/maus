@@ -428,5 +428,41 @@ class MausCeleryWorkerTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         # should have failed
         self.assertEqual(result.state, 'FAILURE')
 
+class Regression1483(unittest.TestCase): #pylint: disable=R0904
+    """
+    MapCpp* was not importing correctly
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Run the celeryd"""
+        cls.proc = subprocess.Popen(['celeryd', '-lINFO', '-c2', '--purge'])
+        time.sleep(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        """Kill the celeryd"""
+        if cls.proc != None:
+            print "Killing celeryd process", cls.proc.pid
+            cls.proc.send_signal(signal.SIGKILL)
+
+    def test_birth_map_cpp(self):
+        """
+        Test birth can birth a MapCpp*. This is a regression of #1483
+
+        @param self Object reference.
+        """
+        config_id = datetime.now().microsecond
+        transform = "MapCppExampleMAUSDataInput"
+        result = broadcast("birth",
+            arguments={"configuration":Configuration().getConfigJSON(),
+                       "transform":transform, 
+                       "config_id":config_id,
+                       "run_number":1}, reply=True)
+        print "birth(OK): %s " % result
+        for item in result:
+            for value in item.values():
+                self.assertEquals(value['status'], 'ok')
+        return True
+
 if __name__ == '__main__':
     unittest.main()
