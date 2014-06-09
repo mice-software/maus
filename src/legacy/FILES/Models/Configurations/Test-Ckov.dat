@@ -1,0 +1,12 @@
+Configuration Stage4
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 100.0 mm
+  Module Ckov/Cherenkov.dat
+  {
+    Position 0. 0. -5.7000 m
+    Rotation 0. 0. 0. degree
+  }
+}
+
