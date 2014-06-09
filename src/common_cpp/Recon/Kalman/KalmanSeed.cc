@@ -82,6 +82,7 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
     _clusters[i] = new SciFiCluster(*seed._clusters[i]);
   }
 
+
   _kalman_sites.resize(seed._kalman_sites.size());
   for (size_t i = 0; i < seed._kalman_sites.size(); ++i) {
     _kalman_sites[i] = new KalmanState(*seed._kalman_sites[i]);
@@ -91,18 +92,18 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    SciFiCluster& cluster = (*_clusters[j]);
+    //SciFiCluster& cluster = (*_clusters[j]);
 
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
-    int id = cluster.get_id();
-    a_site->set_spill(cluster.get_spill());
-    a_site->set_event(cluster.get_event());
+    int id = _clusters[j]->get_id();
+    a_site->set_spill(_clusters[j]->get_spill());
+    a_site->set_event(_clusters[j]->get_event());
     a_site->set_id(id);
-    a_site->set_measurement(cluster.get_alpha());
-    a_site->set_direction(cluster.get_direction());
-    a_site->set_z(cluster.get_position().z());
+    a_site->set_measurement(_clusters[j]->get_alpha());
+    a_site->set_direction(_clusters[j]->get_direction());
+    a_site->set_z(_clusters[j]->get_position().z());
     a_site->set_cluster(_clusters[j]);
 
     std::map<int, SciFiPlaneGeometry>::iterator iterator;
@@ -205,7 +206,7 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
     SciFiSpacePoint *spacepoint = spacepoints[i];
     size_t numb_clusters = spacepoint->get_channels()->GetLast() + 1;
     for ( size_t j = 0; j < numb_clusters; ++j ) {
-      SciFiCluster *cluster = spacepoint->get_channels_pointers()[j];
+      SciFiCluster *cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
       _clusters.push_back(cluster);
     }
   }
