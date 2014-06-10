@@ -51,7 +51,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         echo "INFO: Running make:"
         echo
-        make -j8
+        make
 
         echo
         echo "INFO: Installing:"
