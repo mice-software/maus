@@ -80,7 +80,6 @@ class MapPyTestMap: # pylint:disable = R0902
         if (config.has_key("process_delay")):
             self.process_delay = config["process_delay"]
         assert(maus_cpp.globals.has_instance())
-        return True
 
     def process(self, spill_doc): # pylint:disable = R0201
         """
@@ -121,5 +120,4 @@ class MapPyTestMap: # pylint:disable = R0902
             return False
         if (self.__death_result == MapPyTestMap.EXCEPTION):
             raise ValueError("Death exception")
-        return True
 

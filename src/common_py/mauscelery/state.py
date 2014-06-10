@@ -17,6 +17,7 @@ MAUS Celery configuration and transform wrapper.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import sys
 
 import ROOT
 from framework.workers import WorkerUtilities
@@ -110,8 +111,16 @@ class MausTransform(): # pylint:disable = W0232
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Birthing transform")
             logger.debug(configuration)
-        if (not cls.transform.birth(configuration)):
-            raise WorkerBirthFailedException(cls.transform.__class__)
+        # return_value can be None and it is okay
+        exc_str = ""
+        try:
+            exc_str = cls.transform.__class__.__name__
+            return_value = cls.transform.birth(configuration)
+        except Exception: # pylint: disable=W0703
+            return_value = False
+            exc_str += " exception: "+str(sys.exc_info()[1]) 
+        if return_value == False:
+            raise WorkerBirthFailedException(exc_str)
         cls.is_dead = False
 
     @classmethod
@@ -151,5 +160,13 @@ class MausTransform(): # pylint:disable = W0232
             logger.debug("Deathing transform")
         if not cls.is_dead:
             cls.is_dead = True
-            if (not cls.transform.death()):
-                raise WorkerDeathFailedException(cls.transform.__class__)
+            # return_value can be None and it is okay
+            exc_str = ""
+            try:
+                exc_str = cls.transform.__class__.__name__
+                return_value = cls.transform.death()
+            except Exception: # pylint: disable=W0703
+                return_value = False
+                exc_str += " exception: "+str(sys.exc_info()[1]) 
+            if return_value == False:
+                raise WorkerDeathFailedException(exc_str)
