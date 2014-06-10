@@ -16,6 +16,7 @@
 """Tests for MapCppGlobalReconImport"""
 
 # pylint: disable = C0103
+# pylint: disable = W0611
 
 import os
 import json

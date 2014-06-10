@@ -56,10 +56,10 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.cfg['reconstruction_geometry_filename'] = self.geom
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
-        self.cfg['SciFiPatRecVerbosity'] = 1
-        print "Flags passed: "
-        print self.cfg['SciFiPRHelicalOn']
-        print self.cfg['SciFiPRStraightOn']
+        # self.cfg['SciFiPatRecVerbosity'] = 1
+        # print "Flags passed: "
+        # print self.cfg['SciFiPRHelicalOn']
+        # print self.cfg['SciFiPRStraightOn']
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
@@ -98,13 +98,13 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.cfg['reconstruction_geometry_filename'] = self.geom
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
-        self.cfg['SciFiPatRecVerbosity'] = 1
+        # self.cfg['SciFiPatRecVerbosity'] = 1
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
         #          os.environ.get("MAUS_ROOT_DIR"))
         test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
+                os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (helices)
         fin.readline()

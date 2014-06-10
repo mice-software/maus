@@ -59,7 +59,8 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _clusters.resize(rhs._clusters.size());
   for (size_t i = 0; i < rhs._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    _clusters[i] = rhs._clusters[i];
   }
 
   _kalman_sites.resize(rhs._kalman_sites.size());
@@ -79,7 +80,8 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _clusters.resize(seed._clusters.size());
   for (size_t i = 0; i < seed._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+     _clusters[i] = seed._clusters[i];
   }
 
 
@@ -92,7 +94,7 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    //SciFiCluster& cluster = (*_clusters[j]);
+    // SciFiCluster& cluster = (*_clusters[j]);
 
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);

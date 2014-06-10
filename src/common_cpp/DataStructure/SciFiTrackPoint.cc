@@ -101,6 +101,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _covariance = covariance;
 
   _clusters = new TRefArray();
+  // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
   _clusters->Add(kalman_site->cluster());
 }
 
@@ -201,8 +202,5 @@ void SciFiTrackPoint::set_clusters_pointers(const SciFiClusterPArray &clusters) 
     _clusters->Add(*cl);
   }
 }
-
-
-
 
 } // ~namespace MAUS

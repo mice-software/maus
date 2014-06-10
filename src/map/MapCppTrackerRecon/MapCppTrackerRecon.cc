@@ -57,6 +57,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
   if ( spill.GetReconEvents() ) {
     for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
+
       // Build Clusters.
       if ( event->digits().size() ) {
         cluster_recon(*event);
