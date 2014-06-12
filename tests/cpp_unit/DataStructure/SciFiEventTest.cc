@@ -23,6 +23,8 @@
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
 namespace MAUS {
 
@@ -124,6 +126,17 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
   evt1->add_digit(digit);
 
+  SciFiCluster *c1 = new SciFiCluster(digit);
+  evt1->add_cluster(c1);
+
+  SciFiTrack *trk1 = new SciFiTrack();
+  SciFiTrackPoint *tpoint = new SciFiTrackPoint();
+  tpoint->add_cluster(c1);
+  trk1->add_scifitrackpoint(tpoint);
+  evt1->add_scifitrack(trk1);
+
+  EXPECT_EQ(evt1->clusters()[0], evt1->scifitracks()[0]->scifitrackpoints()[0]->cluster());
+
   SciFiEvent* evt2 = new SciFiEvent();
   *evt2 = *evt1;
   delete evt1;
@@ -136,7 +149,13 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   EXPECT_EQ(evt2->digits()[0]->get_channel(), channel);
   EXPECT_EQ(evt2->digits()[0]->get_npe(), npe);
   EXPECT_EQ(evt2->digits()[0]->get_time(), time);
-  EXPECT_FALSE(evt2->digits()[0]->is_used());
+  EXPECT_TRUE(evt2->digits()[0]->is_used());
+
+  EXPECT_EQ(evt2->clusters()[0]->get_tracker(), tracker);
+  EXPECT_EQ(evt2->clusters()[0]->get_digits()->At(0), evt2->digits()[0]);
+
+  EXPECT_EQ(evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker(), -1);
+  EXPECT_EQ(evt2->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {

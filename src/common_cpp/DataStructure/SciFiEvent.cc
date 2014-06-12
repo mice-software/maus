@@ -137,7 +137,7 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
   // Deep copy the kalman tracks
   _scifitracks.resize(rhs._scifitracks.size());
   for (unsigned int i = 0; i < rhs._scifitracks.size(); ++i) {
-    _scifitracks[i] = rhs._scifitracks[i];
+    _scifitracks[i] =  new SciFiTrack(*rhs._scifitracks[i]);
     SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[i]->scifitrackpoints();
     for (unsigned int j = 0; j < rhs_tpoints.size(); ++j) {
       // Now set cross-pointers so they point to correct place in the new copy of the datastructure
