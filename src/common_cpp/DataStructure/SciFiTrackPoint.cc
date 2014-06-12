@@ -19,17 +19,16 @@
 
 namespace MAUS {
 
-SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
+SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
+                                     _event(-1),
+                                     _tracker(-1),
                                      _station(-1),
                                      _plane(-1),
                                      _channel(666),
                                      _f_chi2(-1),
                                      _s_chi2(-1),
-                                     _x(0.),
-                                     _px(0.),
-                                     _y(0.),
-                                     _py(0.),
-                                     _pz(0.),
+                                     _pos(ThreeVector(0, 0, 0)),
+                                     _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
                                      _residual(-1),
                                      _smoothed_residual(-1),
@@ -38,9 +37,12 @@ SciFiTrackPoint::SciFiTrackPoint() : _tracker(-1),
                                      _mc_y(0.),
                                      _mc_py(0.),
                                      _mc_pz(0.) {
+  _clusters = new TRefArray();
 }
 
-SciFiTrackPoint::~SciFiTrackPoint() {}
+SciFiTrackPoint::~SciFiTrackPoint() {
+  delete _clusters;
+}
 
 SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   int id = kalman_site->id();
@@ -49,6 +51,9 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   } else {
     _tracker = 1;
   }
+  _spill = kalman_site->spill();
+  _event = kalman_site->event();
+
   id = abs(id);
   _station = ((id-1)/3)+1;
   _plane   = (id-1)%3;
@@ -61,17 +66,19 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   int dimension = state_vector.GetNrows();
 
   if ( dimension == 4 ) {
-    _pz = 200; // MeV/c
-    _x  = state_vector(0, 0);
-    _px = state_vector(1, 0);
-    _y  = state_vector(2, 0);
-    _py = state_vector(3, 0);
+    _pos.setZ(kalman_site->z());
+    _mom.setZ(200.0); // MeV/c
+    _pos.setX(state_vector(0, 0));
+    _mom.setX(state_vector(1, 0));
+    _pos.setY(state_vector(2, 0));
+    _mom.setY(state_vector(3, 0));
   } else if ( dimension == 5 ) {
-    _x  = state_vector(0, 0);
-    _px = state_vector(1, 0)/fabs(state_vector(4, 0));
-    _y  = state_vector(2, 0);
-    _py = state_vector(3, 0)/fabs(state_vector(4, 0));
-    _pz = 1./fabs(state_vector(4, 0));
+    _pos.setX(state_vector(0, 0));
+    _mom.setX(state_vector(1, 0)/fabs(state_vector(4, 0)));
+    _pos.setY(state_vector(2, 0));
+    _mom.setY(state_vector(3, 0)/fabs(state_vector(4, 0)));
+    _pos.setZ(kalman_site->z());
+    _mom.setZ(1./fabs(state_vector(4, 0)));
   }
 
   ThreeVector mc_mom = kalman_site->true_momentum();
@@ -92,9 +99,16 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   double* matrix_elements = C.GetMatrixArray();
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
+
+  _clusters = new TRefArray();
+  // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
+  _clusters->Add(kalman_site->cluster());
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
+  _spill = point.spill();
+  _event = point.event();
+
   _tracker = point.tracker();
   _station = point.station();
   _plane   = point.plane();
@@ -103,11 +117,8 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _f_chi2 = point.f_chi2();
   _s_chi2 = point.s_chi2();
 
-  _x  = point.x();
-  _px = point.px();
-  _y  = point.y();
-  _py = point.py();
-  _pz = point.pz();
+  _pos = point.pos();
+  _mom = point.mom();
 
   _mc_x  = point.mc_x();
   _mc_px = point.mc_px();
@@ -120,12 +131,15 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _smoothed_residual = point.smoothed_residual();
 
   _covariance = point.covariance();
+  _clusters = new TRefArray(*point.get_clusters());
 }
 
 SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   if ( this == &rhs ) {
     return *this;
   }
+  _spill   = rhs.spill();
+  _event   = rhs.event();
   _tracker = rhs.tracker();
   _station = rhs.station();
   _plane   = rhs.plane();
@@ -134,11 +148,8 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _f_chi2 = rhs.f_chi2();
   _s_chi2 = rhs.s_chi2();
 
-  _x  = rhs.x();
-  _px = rhs.px();
-  _y  = rhs.y();
-  _py = rhs.py();
-  _pz = rhs.pz();
+  _pos = rhs.pos();
+  _mom = rhs.mom();
 
   _mc_x  = rhs.mc_x();
   _mc_px = rhs.mc_px();
@@ -152,7 +163,44 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
 
   _covariance= rhs.covariance();
 
+  if (_clusters) delete _clusters;
+  _clusters = new TRefArray(*rhs.get_clusters());
+
   return *this;
+}
+
+void SciFiTrackPoint::add_cluster(SciFiCluster* cluster) {
+  if (!_clusters) _clusters = new TRefArray();
+  _clusters->Add(cluster);
+}
+
+SciFiCluster* SciFiTrackPoint::cluster() const {
+  if (!_clusters) return NULL;
+  return static_cast<SciFiCluster*>(_clusters->At(0));
+}
+
+SciFiClusterPArray SciFiTrackPoint::get_clusters_pointers() const {
+  SciFiClusterPArray cl_pointers;
+
+  // Check the _clusters container is initialised
+  if (!_clusters) {
+    std::cerr << "Cluster TRefArray not initialised" << std::endl;
+    return cl_pointers;
+  }
+
+  for (int i = 0; i < (_clusters->GetLast()+1); ++i) {
+    cl_pointers.push_back(static_cast<SciFiCluster*>(_clusters->At(i)));
+  }
+  return cl_pointers;
+}
+
+void SciFiTrackPoint::set_clusters_pointers(const SciFiClusterPArray &clusters) {
+  if (_clusters) delete _clusters;
+  _clusters = new TRefArray();
+  for (
+    std::vector<SciFiCluster*>::const_iterator cl = clusters.begin(); cl != clusters.end(); ++cl) {
+    _clusters->Add(*cl);
+  }
 }
 
 } // ~namespace MAUS

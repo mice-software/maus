@@ -346,7 +346,7 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue(hit.check())
         spill_out = \
                json.loads(self.beam_maker.process(json.dumps({"mc_events":""})))
-        self.assertEqual(len(spill_out["errors"]["MapPyBeamMaker"]), 1)
+        self.assertTrue("MapPyBeamMaker" in spill_out["errors"])
         
 if __name__ == "__main__":
     unittest.main()

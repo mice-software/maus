@@ -151,6 +151,14 @@ int num_stations_with_unused_spnts(const MAUS::SpacePoint2dPArray &spnts_by_stat
   return stations_hit;
 } // ~num_stations_with_unused_spnts(...)
 
+void print_spacepoint_xyz(const std::vector<MAUS::SciFiSpacePoint*> &spnts) {
+  for ( size_t i = 0; i < spnts.size(); ++i ) {
+    MAUS::ThreeVector pos = spnts[i]->get_position();
+    std::cout << "( " << pos.x() << ", " << pos.y() << ", " << pos.z() << ")  ";
+  }
+  std::cout << std::endl;
+} // print_spacepoint_xyz(...)
+
 void sort_by_station(const std::vector<MAUS::SciFiSpacePoint*> &spnts,
                      MAUS::SpacePoint2dPArray &spnts_by_station) {
   for ( int st_num = 0; st_num < static_cast<int>(spnts_by_station.size()); ++st_num ) {

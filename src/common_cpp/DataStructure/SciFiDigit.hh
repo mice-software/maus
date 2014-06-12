@@ -20,6 +20,10 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
+
 // MAUS Headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
@@ -29,7 +33,7 @@ namespace MAUS {
 
 /** @class SciFiDigit Represents a channel hit in a tracker station plane. */
 
-class SciFiDigit {
+class SciFiDigit : public TObject {
   public:
     /** Default constructor - initialises to 0/NULL */
     SciFiDigit();
