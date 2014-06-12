@@ -130,32 +130,36 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   evt1->add_cluster(c1);
 
   SciFiTrack *trk1 = new SciFiTrack();
-  SciFiTrackPoint *tpoint = new SciFiTrackPoint();
-  tpoint->add_cluster(c1);
-  trk1->add_scifitrackpoint(tpoint);
+  SciFiTrackPoint *tp1 = new SciFiTrackPoint();
+  tp1->add_cluster(c1);
+  trk1->add_scifitrackpoint(tp1);
   evt1->add_scifitrack(trk1);
 
-  EXPECT_EQ(evt1->clusters()[0], evt1->scifitracks()[0]->scifitrackpoints()[0]->cluster());
+  ASSERT_EQ(evt1->clusters()[0], evt1->scifitracks()[0]->scifitrackpoints()[0]->cluster());
 
   SciFiEvent* evt2 = new SciFiEvent();
   *evt2 = *evt1;
+
+  ASSERT_EQ(evt2->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
+
   delete evt1;
 
-  EXPECT_EQ(evt2->digits()[0]->get_spill(), spill);
-  EXPECT_EQ(evt2->digits()[0]->get_event(), event);
-  EXPECT_EQ(evt2->digits()[0]->get_tracker(), tracker);
-  EXPECT_EQ(evt2->digits()[0]->get_station(), station);
-  EXPECT_EQ(evt2->digits()[0]->get_plane(), plane);
-  EXPECT_EQ(evt2->digits()[0]->get_channel(), channel);
-  EXPECT_EQ(evt2->digits()[0]->get_npe(), npe);
-  EXPECT_EQ(evt2->digits()[0]->get_time(), time);
+  EXPECT_EQ(spill, evt2->digits()[0]->get_spill());
+  EXPECT_EQ(event, evt2->digits()[0]->get_event());
+  EXPECT_EQ(tracker, evt2->digits()[0]->get_tracker());
+  EXPECT_EQ(station, evt2->digits()[0]->get_station());
+  EXPECT_EQ(plane, evt2->digits()[0]->get_plane());
+  EXPECT_EQ(channel, evt2->digits()[0]->get_channel());
+  EXPECT_EQ(npe, evt2->digits()[0]->get_npe());
+  EXPECT_EQ(time, evt2->digits()[0]->get_time());
   EXPECT_TRUE(evt2->digits()[0]->is_used());
 
-  EXPECT_EQ(evt2->clusters()[0]->get_tracker(), tracker);
-  EXPECT_EQ(evt2->clusters()[0]->get_digits()->At(0), evt2->digits()[0]);
+  EXPECT_EQ(tracker, evt2->clusters()[0]->get_tracker());
+  EXPECT_EQ(evt2->digits()[0], evt2->clusters()[0]->get_digits()->At(0));
 
-  EXPECT_EQ(evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker(), -1);
+  EXPECT_EQ(-1, evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker());
   EXPECT_EQ(evt2->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
+  EXPECT_EQ(tracker, evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster()->get_tracker());
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {
