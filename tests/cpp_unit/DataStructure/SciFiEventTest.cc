@@ -141,6 +141,7 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   *evt2 = *evt1;
 
   ASSERT_EQ(evt2->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
+  ASSERT_NE(evt1->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
 
   delete evt1;
 
@@ -160,6 +161,8 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   EXPECT_EQ(-1, evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker());
   EXPECT_EQ(evt2->clusters()[0], evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster());
   EXPECT_EQ(tracker, evt2->scifitracks()[0]->scifitrackpoints()[0]->cluster()->get_tracker());
+  EXPECT_EQ(tracker, static_cast<SciFiCluster*>(evt2->scifitracks()[0]->scifitrackpoints()[0]
+                     ->get_clusters()->At(0))->get_tracker());
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {

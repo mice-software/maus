@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -DDEBUG -ggdb -Wall
 
-all : scifi_offline_viewer scifi_momentum_analysis scifi_analysis
+all : scifi_offline_viewer scifi_analysis
 
 scifi_offline_viewer : scifi_offline_viewer.cc
 	@echo "Running with ${MAUS_ROOT_DIR} on "

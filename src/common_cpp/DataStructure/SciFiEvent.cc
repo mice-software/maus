@@ -138,11 +138,10 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
   _scifitracks.resize(rhs._scifitracks.size());
   for (unsigned int i = 0; i < rhs._scifitracks.size(); ++i) {
     _scifitracks[i] =  new SciFiTrack(*rhs._scifitracks[i]);
-    // Deep copy the scifi trackpoints
+    // Deep copy the scifi trackpoints done by scifitrack = operator
     SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[i]->scifitrackpoints();
-    SciFiTrackPointPArray new_tpoints(rhs_tpoints.size());
+    // Loop over the rhs trackpoints
     for (unsigned int j = 0; j < rhs_tpoints.size(); ++j) {
-      new_tpoints[j] = new SciFiTrackPoint(*rhs_tpoints[j]);
       // Now set cross-pointers to clusters within the trackpoints so they point to correct place
       // in the new copy of the datastructure
       SciFiClusterPArray new_clusters(rhs_tpoints[j]->get_clusters()->GetLast() + 1);
@@ -155,9 +154,8 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
           }
         }
       }
-      new_tpoints[j]->set_clusters_pointers(new_clusters);
+      _scifitracks[i]->scifitrackpoints()[j]->set_clusters_pointers(new_clusters);
     }
-    _scifitracks[i]->set_scifitrackpoints(new_tpoints);
   }
   return *this;
 }

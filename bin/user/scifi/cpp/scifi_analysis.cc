@@ -93,39 +93,72 @@ int main(int argc, char *argv[]) {
       MAUS::SciFiEvent* sfevt = revts->at(i)->GetSciFiEvent();
 
       // Perform your analysis here, e.g.
-      std::vector<MAUS::SciFiTrack*> trks = sfevt->scifitracks();
-      std::vector<MAUS::SciFiTrack*>::iterator trk;
+
+      // Loop over pattern recognition helical tracks
+      std::vector<MAUS::SciFiHelicalPRTrack*> htrks = sfevt->helicalprtracks();
+      std::vector<MAUS::SciFiHelicalPRTrack*>::iterator htrk;
+      for ( htrk = htrks.begin(); htrk != htrks.end(); ++htrk ) {
+        std::vector<MAUS::SciFiSpacePoint*> spnts = (*htrk)->get_spacepoints_pointers();
+        std::vector<MAUS::SciFiSpacePoint*>::iterator spnt;
+        // Loop over associated spacepoints
+        for ( spnt = spnts.begin(); spnt != spnts.end(); ++spnt ) {
+          // Loop over associated clusters
+          std::vector<MAUS::SciFiCluster*> clusters = (*spnt)->get_channels_pointers();
+          std::vector<MAUS::SciFiCluster*>::iterator clus;
+          for ( clus = clusters.begin(); clus != clusters.end(); ++clus ) {
+            // Loop over associated digits
+            std::vector<MAUS::SciFiDigit*> digits = (*clus)->get_digits_pointers();
+            std::vector<MAUS::SciFiDigit*>::iterator dig;
+            for ( dig = digits.begin(); dig != digits.end(); ++dig ) {
+              // Perform the digits to hits lookup
+              std::vector<MAUS::SciFiHit*> hits;
+              std::vector<MAUS::SciFiHit*>::iterator hit;
+              if (!lkup.get_hits((*dig), hits)) {
+                std::cerr << "Lookup failed\n";
+                continue;
+              }
+              // Loop over associated MC hits
+              for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
+                // Print the MC track ID
+                int track_id = (*hit)->GetTrackId();
+                std::cout << "track_id: " << track_id << std::endl;
+              } // ~Loop over associated MC hits
+            } // ~Loop over associated digits
+          } // ~Loop over associated clusters
+        } // ~Loop over associated spacepoints
+      } // Loop over pattern recognition helical tracks
 
       // Loop over kalman tracks
+      std::vector<MAUS::SciFiTrack*> trks = sfevt->scifitracks();
+      std::vector<MAUS::SciFiTrack*>::iterator trk;
       for ( trk = trks.begin(); trk != trks.end(); ++trk ) {
+        std::cout << "  SciFi Track filtered chi_sq: " << (*trk)->f_chi2() << std::endl;
         std::vector<MAUS::SciFiTrackPoint*> tpnts = (*trk)->scifitrackpoints();
         std::vector<MAUS::SciFiTrackPoint*>::iterator tpnt;
-
-        // Loop over trackpoints
+        // Loop over associated trackpoints
         for ( tpnt = tpnts.begin(); tpnt != tpnts.end(); ++tpnt ) {
+          std::cout << "    SciFi TrackPoint filtered chi_sq: " << (*tpnt)->f_chi2() << std::endl;
+          // Pull out the associated cluster
           MAUS::SciFiCluster* clus = (*tpnt)->cluster();
           if (!clus) {
             std::cout << "Empty cluster pointer, address " << clus  << std::endl;
             continue;
           }
-          std::vector<MAUS::SciFiDigit*> digits = clus->get_digits();
+          // Loop over associated digits
+          std::vector<MAUS::SciFiDigit*> digits = clus->get_digits_pointers();
           std::vector<MAUS::SciFiDigit*>::iterator dig;
-
-          // Loop over digits
           for ( dig = digits.begin(); dig != digits.end(); ++dig ) {
-
             // Perform the digits to hits lookup
             std::vector<MAUS::SciFiHit*> hits;
             std::vector<MAUS::SciFiHit*>::iterator hit;
-
             if (!lkup.get_hits((*dig), hits)) {
               std::cerr << "Lookup failed\n";
               continue;
             }
-
-            // Loop over MC hits
+            // Loop over associated MC hits
             for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
               int track_id = (*hit)->GetTrackId();
+              // Print the MC track ID
               std::cout << "track_id: " << track_id << std::endl;
             } // ~Loop over MC hits
           } // ~Loop over digits

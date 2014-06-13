@@ -83,6 +83,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   _npe = clust1->get_npe()+clust2->get_npe()+clust3->get_npe();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
+  // std::cerr << "SP: " << clust1 << " " << clust2 << " " << clust3 << std::endl;
 }
 
 // Two cluster constructor
@@ -102,6 +103,7 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
+  // std::cerr << "SP: " << clust1 << " " << clust2 << std::endl;
 }
 
 SciFiSpacePoint::~SciFiSpacePoint() {
