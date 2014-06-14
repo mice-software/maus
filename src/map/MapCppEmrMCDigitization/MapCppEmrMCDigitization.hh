@@ -126,7 +126,7 @@ class MapCppEmrMCDigitization {
  *  Fill the EMRData with 
  *  reconstructed events
  */
-  void fill(int nPartEvents);
+  void fill(Spill *spill, int nPartEvents);
 
   /** @brief digitize ReconEvents
  *
@@ -165,8 +165,7 @@ class MapCppEmrMCDigitization {
 
   std::string _classname;
 
-  // Spill data
-  Spill* _spill;
+  // Spill count
   int _spillCount;
 
   // fADC and DBB data arrays

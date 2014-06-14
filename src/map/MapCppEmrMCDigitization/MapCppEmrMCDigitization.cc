@@ -174,32 +174,33 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
   //==================== DIGITIZATION ====================//
 
   // Get spill, break if there's no trigger
-  _spill = spill_cpp->GetSpill();
-  int nPartEvents = _spill->GetMCEventSize();
+  Spill *spill = spill_cpp->GetSpill();
+  int nPartEvents = spill->GetMCEventSize();
   if (!nPartEvents) return document;
 
   // Check the Recon event array is initialised, and if not make it so
-  if ( !_spill->GetReconEvents() ) {
+  if (!spill->GetReconEvents()) {
     ReconEventPArray* revts = new ReconEventPArray();
-    _spill->SetReconEvents(revts);
+    spill->SetReconEvents(revts);
   }
 
   // Set primary hits/noise time windows
   std::vector<double> delta_t_array;
+  delta_t_array.resize(0);
 
   for (int xPe = 0; xPe < nPartEvents; xPe++) {
-    EMRHitArray *hits = _spill->GetAnMCEvent(xPe).GetEMRHits();
+    EMRHitArray *hits = spill->GetAnMCEvent(xPe).GetEMRHits();
 
     if (hits) {
       int nHits = hits->size();
 
-      Primary *primary = _spill->GetAnMCEvent(xPe).GetPrimary();
+      Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
       int pTime = primary->GetTime(); // ns
 
       for (int ihit = 0; ihit < nHits; ihit++) {
 	EMRHit hit = hits->at(ihit);
 
-	int time = static_cast<int>(hit.GetTime()); /*ns*/
+	int time = static_cast<int>(hit.GetTime()); // ns
 	double delta_t = time-pTime;
 
         delta_t_array.push_back(delta_t);
@@ -207,13 +208,15 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
     }
   }
 
+  if (!delta_t_array.size()) return document;
+
   int lt = static_cast<int>(*std::min_element(delta_t_array.begin(), delta_t_array.end())
 			    /_dbb_count);
 
-  _deltat_signal_up = lt + 15;
-  _deltat_signal_low = lt - 5;
+  _deltat_signal_low = lt;
+  _deltat_signal_up = lt + 20;
+  _deltat_noise_low = lt + 20;
   _deltat_noise_up = lt + 40;
-  _deltat_noise_low = lt + 15;
 
   // Reset/Resize DBB and fADC arrays with n events (1 per trigger)
   reset_data_tmp(nPartEvents);
@@ -221,10 +224,10 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
   // Fill the Recon event array with G4 Spill information
 
   for (int xPe = 0; xPe < nPartEvents; xPe++) {
-    EMRHitArray *hits = _spill->GetAnMCEvent(xPe).GetEMRHits();
+    EMRHitArray *hits = spill->GetAnMCEvent(xPe).GetEMRHits();
 
     if (hits) {
-      Primary *primary = _spill->GetAnMCEvent(xPe).GetPrimary();
+      Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
       int pTime = primary->GetTime(); // ns
 
       processDBB(hits, xPe, pTime);
@@ -232,35 +235,30 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
     }
   }
 
-  fill(nPartEvents);
+  fill(spill, nPartEvents);
 
   // Reset/Resize DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
   reset_data_tmp(nPartEvents+2);
 
   // Digitize the Recon event array
   for (int xPe = 0; xPe < nPartEvents; xPe++) {
-    EMREvent *evt = _spill->GetReconEvents()->at(xPe)->GetEMREvent();
+    EMREvent *evt = spill->GetReconEvents()->at(xPe)->GetEMREvent();
 
     if (evt) {
       digitize(evt, xPe, nPartEvents);
     }
   }
 
-  fill(nPartEvents+2);
+  fill(spill, nPartEvents+2);
 
   // Increment Spill Count
   _spillCount++;
-
-  // Fill data with digitized spill
-  Data *spill_cpp_out = new MAUS::Data;
-  spill_cpp_out->SetEventType("Spill");
-  spill_cpp_out->SetSpill(_spill);
 
   //==================== OUTPUT ====================//
 
   Json::Value* spill_json_out;
   try {
-    spill_json_out = CppJsonSpillConverter().convert(spill_cpp_out);
+    spill_json_out = CppJsonSpillConverter().convert(spill_cpp);
   } catch (...) {
     Json::Value errors;
     std::stringstream ss;
@@ -269,6 +267,7 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
     spill_json["errors"] = errors;
     return JsonWrapper::JsonToString(spill_json);
   }
+
   document = JsonWrapper::JsonToString(*spill_json_out);
 
   delete spill_cpp;
@@ -387,10 +386,10 @@ void MapCppEmrMCDigitization::processDBB(EMRHitArray *hits, int xPe, int ptime) 
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void MapCppEmrMCDigitization::fill(int nPartEvents) {
+void MapCppEmrMCDigitization::fill(Spill *spill, int nPartEvents) {
 
-  int recPartEvents = _spill->GetReconEventSize();
-  ReconEventPArray *recEvts =  _spill->GetReconEvents();
+  int recPartEvents = spill->GetReconEventSize();
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
 
   // Resize the recon event to harbour all the EMR noise+decays
   if (recPartEvents == 0) { // No recEvts yet
@@ -452,7 +451,7 @@ void MapCppEmrMCDigitization::fill(int nPartEvents) {
     recEvts->at(ipe)->SetEMREvent(evt);
   }
 
-  _spill->SetReconEvents(recEvts);
+  spill->SetReconEvents(recEvts);
 }
 
 ////////////////////////////////////////////////////////////////////////////
