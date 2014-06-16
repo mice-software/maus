@@ -95,6 +95,7 @@ bool InputCppDAQOfflineData::readNextEvent() {
     if (_eventsCount >= _maxNumEvents)
       return false;
 
+
 //   cerr << "InputCppDAQData::readNextEvent   event: " << _eventsCount << endl;
 
   // Use the MDfileManager object to get the next event.

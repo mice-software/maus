@@ -219,14 +219,14 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   trks[0]->set_circle_y0(y0);
   trks[0]->set_dsdz(dsdz);
   trks[0]->set_line_sz_c(sz_c);
-  trks[0]->set_spacepoints(spnts1);
+  trks[0]->set_spacepoints_pointers(spnts1);
   trks[3]->set_phi(phi_i);
   trks[3]->set_R(rad);
   trks[3]->set_circle_x0(x0);
   trks[3]->set_circle_y0(y0);
   trks[3]->set_dsdz(dsdz);
   trks[3]->set_line_sz_c(sz_c);
-  trks[3]->set_spacepoints(spnts2);
+  trks[3]->set_spacepoints_pointers(spnts2);
 
   // Run them through the function and check the output
   tdm.process_htrks(trks);

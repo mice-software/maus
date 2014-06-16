@@ -16,6 +16,7 @@
  */
 
 #include "src/common_cpp/Recon/Bayes/PDF.hh"
+#include <iostream>
 
 namespace MAUS {
 PDF::PDF() : _probability(NULL),
@@ -43,7 +44,9 @@ PDF::PDF(std::string name, double bin_width, double min, double max)
   }
 }
 
-PDF::~PDF() {}
+PDF::~PDF() {
+  delete _probability;
+}
 
 PDF& PDF::operator=(const PDF &rhs) {
   if ( this == &rhs ) {
@@ -53,7 +56,7 @@ PDF& PDF::operator=(const PDF &rhs) {
   _name = rhs._name;
   const char *c_name = _name.c_str();
 
-  _probability = reinterpret_cast<TH1D*>(rhs._probability->Clone(c_name));
+  _probability = static_cast<TH1D*>(rhs._probability->Clone(c_name));
 
   _n_bins    = rhs._n_bins;
   _bin_width = rhs._bin_width;
@@ -67,7 +70,7 @@ PDF::PDF(const PDF &pdf) {
   _name = pdf._name;
   const char *c_name = _name.c_str();
 
-  _probability = reinterpret_cast<TH1D*>(pdf._probability->Clone(c_name));
+  _probability = static_cast<TH1D*>(pdf._probability->Clone(c_name));
 
   _n_bins    = pdf._n_bins;
   _bin_width = pdf._bin_width;
@@ -76,7 +79,6 @@ PDF::PDF(const PDF &pdf) {
 }
 
 void PDF::ComputeNewPosterior(TH1D likelihood) {
-  // posterior = prior*likelihood
   _probability->Multiply(&likelihood);
 
   // The likelihood isn't a PDF. Get around this

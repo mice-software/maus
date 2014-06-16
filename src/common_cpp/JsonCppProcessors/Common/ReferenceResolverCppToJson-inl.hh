@@ -43,9 +43,14 @@ void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
                    JsonWrapper::Path::DereferencePath(json_root, _json_pointer);
     child = Json::Value();
     // will throw if pointer is not in the RefManager
-    std::string json_address =
+    try {
+        std::string json_address =
                       RefManager::GetInstance().GetPointerAsValue(_cpp_pointer);
-    child["$ref"] = Json::Value(json_address);
+        child["$ref"] = Json::Value(json_address);
+    } catch (MAUS::Exception& exc) {
+        exc.SetMessage(exc.GetMessage()+"\n"+"Error at address "+_json_pointer);
+        throw exc;
+    }
 }
 
 
@@ -55,6 +60,7 @@ class RefManager::PointerValueTable {
   public:
     virtual ~PointerValueTable() {}
     virtual void ClearData() = 0;
+    virtual std::string Dump() = 0;
   private:
 };
 
@@ -64,8 +70,18 @@ class RefManager::TypedPointerValueTable
   public:
     virtual ~TypedPointerValueTable() {}
     void ClearData() {_data_hash.erase(_data_hash.begin(), _data_hash.end());}
+    std::string Dump();
     std::map<PointerType*, std::string> _data_hash;
 };
+
+template <class PointerType>
+std::string RefManager::TypedPointerValueTable<PointerType>::Dump() {
+        std::string dump_str = "PointerValueTable\n";
+        typename std::map<PointerType*, std::string>::iterator it;
+        for (it = _data_hash.begin(); it != _data_hash.end(); ++it)
+            dump_str += "  "+STLUtils::ToString(it->first)+" "+it->second+"\n";
+        return dump_str;
+}
 
 template <class PointerType>
 void RefManager::SetPointerAsValue
@@ -78,7 +94,9 @@ void RefManager::SetPointerAsValue
         throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " to hash table when it was already added",
+                     " to C++ hash table at json address "+json_address+
+                     " when it was already added at json address "+
+                     table->_data_hash[pointer],
                      "CppToJson::RefManager::SetPointerAsValue(...)"));
     table->_data_hash[pointer] = json_address;
 
@@ -93,7 +111,9 @@ void RefManager::SetPointerAsValue
         throw(Exception(Exception::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " to TObject hash table when it was already added",
+                     " to TObject hash table at json address "+json_address+
+                     " when it was already added at json address "+
+                     table->_data_hash[pointer],
                      "CppToJson::RefManager::SetPointerAsValue(...)"));
       tableTObject->_data_hash[tobject_pointer] = json_address;
     }
@@ -105,16 +125,16 @@ std::string RefManager::GetPointerAsValue(PointerType* pointer) {
                                        GetTypedPointerValueTable<PointerType>();
     if (!table) {
         throw(Exception(Exception::recoverable,
-                     "Attempt to get pointer for json address "+
+                     "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " when it was never added",
+                     " when no pointers of this type were ever added",
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     }
     if (table->_data_hash.find(pointer) == table->_data_hash.end())
         throw(Exception(Exception::recoverable,
-                     "Attempt to get pointer for json address "+
+                     "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
-                     " when it was never added",
+                     " when it was never added. "+table->Dump(),
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     return table->_data_hash[pointer];
 }

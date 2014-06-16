@@ -16,7 +16,7 @@
  */
 
 /** @class MapCppExampleMAUSDataInput
- *  Digitize events by running Global electronics simulation.
+ *  Lightweight example of the API
  *
  */
 

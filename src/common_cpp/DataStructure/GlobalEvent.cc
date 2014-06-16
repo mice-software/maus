@@ -42,6 +42,9 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     return *this;
   }
 
+  // This is a deep copy operation; we go through, deepcopying data and
+  // processing any cross links (pointer-as-reference) so that they point into
+  // the new data structure
   if (_primary_chains != NULL) {
     if (!_primary_chains->empty())
       for (size_t i = 0; i < _primary_chains->size(); ++i)
@@ -59,36 +62,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       _primary_chains->push_back(old_primary_chain->at(i)->Clone());
   }
 
-  if (_tracks != NULL) {
-    for (size_t i = 0; i < _tracks->size(); ++i)
-      delete _tracks->at(i);
-    delete _tracks;
-  }
-  if (globalevent._tracks == NULL) {
-    _tracks = NULL;
-  } else {
-    _tracks = new std::vector<MAUS::DataStructure::Global::Track*>();
-    std::vector<MAUS::DataStructure::Global::Track*>* old_tracks =
-        globalevent._tracks;
-    for (size_t i = 0; i < old_tracks->size(); ++i)
-      _tracks->push_back(old_tracks->at(i)->Clone());
-  }
-
-  if (_track_points != NULL) {
-    for (size_t i = 0; i < _track_points->size(); ++i)
-      delete _track_points->at(i);
-    delete _track_points;
-  }
-  if (globalevent._track_points == NULL) {
-    _track_points = NULL;
-  } else {
-    _track_points = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
-    std::vector<MAUS::DataStructure::Global::TrackPoint*>* old_track_points =
-        globalevent._track_points;
-    for (size_t i = 0; i < old_track_points->size(); ++i)
-      _track_points->push_back(old_track_points->at(i)->Clone());
-  }
-
   if (_space_points != NULL) {
     for (size_t i = 0; i < _space_points->size(); ++i)
       delete _space_points->at(i);
@@ -102,6 +75,59 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
         globalevent._space_points;
     for (size_t i = 0; i < old_space_points->size(); ++i)
       _space_points->push_back(old_space_points->at(i)->Clone());
+  }
+
+  if (_track_points != NULL) {
+    for (size_t i = 0; i < _track_points->size(); ++i)
+      delete _track_points->at(i);
+    delete _track_points;
+  }
+  if (globalevent._track_points == NULL) {
+    _track_points = NULL;
+  } else {
+    _track_points = new std::vector<MAUS::DataStructure::Global::TrackPoint*>();
+    std::vector<MAUS::DataStructure::Global::TrackPoint*>* old_track_points =
+        globalevent._track_points;
+    for (size_t i = 0; i < old_track_points->size(); ++i) {
+      _track_points->push_back(old_track_points->at(i)->Clone());
+      // copy across also the space point pointer-as-reference to the new
+      // structure
+      MAUS::DataStructure::Global::SpacePoint* sp =
+                                        _track_points->at(i)->get_space_point();
+      if (!sp)
+          continue;
+      for (size_t j = 0; j < globalevent._space_points->size(); ++j) {
+          if (globalevent._space_points->at(j) == sp) {
+              _track_points->at(i)->set_space_point(_space_points->at(j));
+              break;
+          }
+      }
+    }
+  }
+
+  if (_tracks != NULL) {
+    for (size_t i = 0; i < _tracks->size(); ++i)
+      delete _tracks->at(i);
+    delete _tracks;
+  }
+  if (globalevent._tracks == NULL) {
+    _tracks = NULL;
+  } else {
+    _tracks = new std::vector<MAUS::DataStructure::Global::Track*>();
+    std::vector<MAUS::DataStructure::Global::Track*>* old_tracks =
+        globalevent._tracks;
+    for (size_t i = 0; i < old_tracks->size(); ++i) {
+      _tracks->push_back(old_tracks->at(i)->Clone());
+      TRefArray* old_track_points_on_track = old_tracks->at(i)->get_track_points();
+      TRefArray* new_track_points_on_track = _tracks->at(i)->get_track_points();
+      for (int j = 0; j < old_track_points_on_track->GetLast()+1; ++j) {
+          for (size_t k = 0; k < globalevent._track_points->size(); ++k)
+              if (old_track_points_on_track->At(j) == globalevent._track_points->at(k)) {
+                  new_track_points_on_track->AddAt(_track_points->at(k), j);
+                  break;
+              }
+      }
+    }
   }
 
   return *this;

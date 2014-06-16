@@ -53,6 +53,9 @@ class KalmanTrackFit {
 
   virtual ~KalmanTrackFit();
 
+  void SaveGeometry(std::vector<ThreeVector> positions,
+                    std::vector<HepRotation> rotations);
+
   /** @brief The main worker. All Kalman Filtering lives within.
    */
   void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
@@ -75,6 +78,10 @@ class KalmanTrackFit {
   bool _use_Eloss;
 
   bool _verbose;
+
+  std::vector<ThreeVector> _RefPos;
+
+  std::vector<HepRotation> _Rot;
 
   KalmanPropagator *_propagator;
 

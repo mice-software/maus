@@ -67,15 +67,15 @@ namespace global {
       double z = 0;
       SetStationEnum(GlobalSciFiTrackPoint, GlobalSciFiTrack, tracker,
 		     station, z);
-      double x = scifi_tp->x();
-      double y = scifi_tp->y();
+      double x = scifi_tp->pos().x();
+      double y = scifi_tp->pos().y();
       // double z = scifi_tp->z();
       // time not provided by tracker, set to unphysical value
       double t = -1000000.0;
       TLorentzVector pos(x, y, z, t);
-      double px = scifi_tp->px();
-      double py = scifi_tp->py();
-      double pz = scifi_tp->pz();
+      double px = scifi_tp->mom().x();
+      double py = scifi_tp->mom().y();
+      double pz = scifi_tp->mom().z();
       // Energy unknown, set to unphysical value
       double E = -1000000.0;
       TLorentzVector mom(px, py, pz, E);

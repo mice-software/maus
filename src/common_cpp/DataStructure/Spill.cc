@@ -63,6 +63,8 @@ Spill& Spill::operator=(const Spill& md) {
         _mc = NULL;
     } else {
         _mc = new MCEventPArray(*md._mc);
+        for (size_t i = 0; i < _mc->size(); ++i)
+            _mc->at(i) = new MCEvent(*_mc->at(i));
     }
 
     if (_recon != NULL) {
@@ -75,6 +77,8 @@ Spill& Spill::operator=(const Spill& md) {
         _recon = NULL;
     } else {
         _recon = new ReconEventPArray(*md._recon);
+        for (size_t i = 0; i < _recon->size(); ++i)
+            _recon->at(i) = new ReconEvent(*_recon->at(i));
     }
 
     _daq_event_type = md._daq_event_type;

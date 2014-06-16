@@ -39,12 +39,23 @@ ONLINE_TEST = os.path.expandvars(
 ANALYZE_EXE = os.path.expandvars("$MAUS_ROOT_DIR/bin/analyze_data_online.py")
 TMP_DIR =  os.path.expandvars("$MAUS_ROOT_DIR/tmp/test_analyze_data_online/")
 LOCKFILE = os.path.join(os.environ['MAUS_ROOT_DIR'], 'tmp', '.maus_lockfile')
+MRD =  os.path.expandvars("${MAUS_ROOT_DIR}")
 
 def temp_dir(data_file_name):
     """
     Return the directory name for temp data associated with given file
     """
     return "%s/%s/" % (TMP_DIR, data_file_name)
+
+def install_data():
+    """
+    Install test_data source files and concatenate them
+    The default runs are defined in 71test_data.bash
+    Runs 4234, 4235
+    """
+    proc = subprocess.Popen(["bash",
+                             MRD+"/third_party/bash/71test_data.bash"])
+    proc.wait()
 
 def run_process(data_file_name, dir_suffix, send_signal=None):
     """Run analyze_data_online.py and generate plots"""
@@ -102,6 +113,9 @@ class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
             print 'Removing', target
             os.remove(target)
             time.sleep(1)
+        # load_test leaves test_data.cat with run 4258
+        # reinstall test data to make sure we have the right runs (4234,4235)
+        install_data()
         share = os.path.expandvars(
                      "${MAUS_THIRD_PARTY}/third_party/install/share/test_data/")
         share = share+"test_data.cat"
