@@ -90,6 +90,42 @@ class MapCppGlobalTrackMatching(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue("errors" in doc)
         self.assertTrue("bad_json_document" in doc["errors"])
 
+    def test_fill_Global_Event(self):
+        """Check that process makes global tracks from TOF and tracker data"""
+        test5 = ('%s/src/map/MapCppGlobalTrackMatching/global_tm_test.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        birthresult = self.mapper.birth(self. c.getConfigJSON())
+        self.assertTrue(birthresult)
+        fin = open(test5,'r')
+        line = fin.read()
+        result = self.mapper.process(line)
+        spill_out = json.loads(result)
+        self.assertTrue('recon_events' in spill_out)
+        revtarray = spill_out['recon_events']
+        self.assertEqual(1, len(revtarray))
+        revt = revtarray[0]
+        self.assertTrue('global_event' in revt)
+        self.assertTrue('track_points' in revt['global_event'])
+        self.assertEqual(33, len(revt['global_event']['track_points']))
+        numTMtrackpoints = 0
+        for i in revt['global_event']['track_points']:
+            self.assertTrue('mapper_name' in i)
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                numTMtrackpoints += 1
+        self.assertEqual(numTMtrackpoints, 15)
+        self.assertTrue('tracks' in revt['global_event'])
+        self.assertEqual(3, len(revt['global_event']['tracks']))
+        numTMtracks = 0
+        for i in revt['global_event']['tracks']:
+            self.assertTrue('mapper_name' in i)
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                numTMtracks += 1
+        self.assertEqual(numTMtracks, 1)
+        self.assertTrue('space_points' in revt['global_event'])
+        self.assertEqual(33, len(revt['global_event']['space_points']))
+        self.assertTrue('primary_chains' in revt['global_event'])
+        self.assertEqual(0, len(revt['global_event']['primary_chains']))
+
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that we can death() MapCppGlobalTrackMatching"""
