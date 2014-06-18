@@ -78,6 +78,7 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = recon_event->GetGlobalEvent();
+      std::cerr << "Pre import" << std::endl;
       global_event = Import(recon_event);
     }
   }
@@ -97,12 +98,16 @@ namespace MAUS {
     MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
 
     if (tof_event) {
+      std::cerr << "Happily TOFing" << std::endl;
       MAUS::recon::global::ImportTOFRecon tofrecon_importer;
       tofrecon_importer.process((*tof_event), global_event, _classname);
+      std::cerr << "Finished TOFing" << std::endl;
     }
     if (scifi_event) {
+      std::cerr << "SCIFI time" << std::endl;
       MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
       scifirecon_importer.process((*scifi_event), global_event, _classname);
+      std::cerr << "I doubt I'll see this message" << std::endl;
     }
     if (ckov_event) {
       MAUS::recon::global::ImportCkovRecon ckovrecon_importer;

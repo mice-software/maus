@@ -29,14 +29,18 @@ namespace global {
 				 MAUS::GlobalEvent* global_event,
 				 std::string mapper_name) {
 
+    std::cerr << "So we made it into the importer" << std::endl;
     // Get array of scifi tracks
     SciFiTrackPArray scifi_track_array = scifi_event.scifitracks();
+    std::cerr << "We got the scifi_track_array" << std::endl;
     // For each track, make a global track
     for (size_t i = 0; i < scifi_track_array.size(); i++) {
       SciFiTrack* scifi_track = scifi_track_array[i];
       MAUS::DataStructure::Global::Track* GlobalSciFiTrack =
 	new MAUS::DataStructure::Global::Track();
+      std::cerr << "In the scifi_Track loop, about to import shizz" << std::endl;
       ImportSciFiTrack(scifi_track, GlobalSciFiTrack, mapper_name);
+      std::cerr << "Post the importing of the shizz, I expect this message will not be seen" << std::endl;
       GlobalSciFiTrack->set_mapper_name(mapper_name);
       global_event->add_track_recursive(GlobalSciFiTrack);
     }
@@ -48,12 +52,15 @@ namespace global {
 					  MAUS::DataStructure::Global::Track*
 					  GlobalSciFiTrack,
 					  std::string mapper_name) {
-
+    std::cerr << "Inside ImportSciFiTrack" << std::endl;
     int charge = scifi_track->charge();
+    std::cerr << "post charge" << std::endl;
     // Get trackpoint array
     SciFiTrackPointPArray scifi_tp_array = scifi_track->scifitrackpoints();
+    std::cerr << "post get tp array" << std::endl;
     // Loop through trackpoints
     for (size_t i = 0; i < scifi_tp_array.size(); i++) {
+      std::cerr << "Did we make it to the for loop?" << std::endl;
       SciFiTrackPoint* scifi_tp = scifi_tp_array[i];
       MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint =
 	new MAUS::DataStructure::Global::TrackPoint();
@@ -61,15 +68,18 @@ namespace global {
 	new MAUS::DataStructure::Global::SpacePoint();
       int tracker = scifi_tp->tracker();
       int station = scifi_tp->station();
+      std::cerr << "got tracker and station" << std::endl;
       // currently, z values are not returned by scifi trackpoints, so set
       // z position as position of station in Stage4.dat, currently hard
       // coded into the SetStationEnum function
-      double z = 0;
+      //double z = 0;
+      std::cerr << "We are looping through scifi tracks, pre position importing, which I think is where the problem lies" << std::endl;
       SetStationEnum(GlobalSciFiTrackPoint, GlobalSciFiTrack, tracker,
-		     station, z);
+		     station);
       double x = scifi_tp->pos().x();
       double y = scifi_tp->pos().y();
-      // double z = scifi_tp->z();
+      double z = scifi_tp->pos().z();
+      std::cerr << "If we made it here then I was wrong" << std::endl;
       // time not provided by tracker, set to unphysical value
       double t = -1000000.0;
       TLorentzVector pos(x, y, z, t);
@@ -95,7 +105,7 @@ namespace global {
   void ImportSciFiRecon::SetStationEnum(
     MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint,
     MAUS::DataStructure::Global::Track* GlobalSciFiTrack, int tracker,
-    int station, double& z) {
+    int station) {
 
     MAUS::DataStructure::Global::DetectorPoint detector =
       MAUS::DataStructure::Global::kUndefined;
@@ -105,31 +115,31 @@ namespace global {
 	detector = MAUS::DataStructure::Global::kTracker0_1;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	z = 12303.1189;
+	//z = 12303.1189;
 	break;
       case 2:
 	detector = MAUS::DataStructure::Global::kTracker0_2;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	z = 12106.1543;
+	//z = 12106.1543;
 	break;
       case 3:
 	detector = MAUS::DataStructure::Global::kTracker0_3;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	z = 11856.2913;
+	//z = 11856.2913;
 	break;
       case 4:
 	detector = MAUS::DataStructure::Global::kTracker0_4;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	z = 11556.291;
+	//z = 11556.291;
 	break;
       case 5:
 	detector = MAUS::DataStructure::Global::kTracker0_5;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	z = 11206.3611;
+	//z = 11206.3611;
 	break;
       }
     } else if (tracker == 1) {
@@ -138,31 +148,31 @@ namespace global {
 	detector = MAUS::DataStructure::Global::kTracker1_1;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	z = 16022.24;
+	//z = 16022.24;
 	break;
       case 2:
 	detector = MAUS::DataStructure::Global::kTracker1_2;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	z = 16222.25;
+	//z = 16222.25;
 	break;
       case 3:
 	detector = MAUS::DataStructure::Global::kTracker1_3;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	z = 16472.24;
+	//z = 16472.24;
 	break;
       case 4:
 	detector = MAUS::DataStructure::Global::kTracker1_4;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	z = 16772.24;
+	//z = 16772.24;
 	break;
       case 5:
 	detector = MAUS::DataStructure::Global::kTracker1_5;
 	GlobalSciFiTrackPoint->set_detector(detector);
 	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	z = 17122.24;
+	//z = 17122.24;
 	break;
       }
     }

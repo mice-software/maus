@@ -80,7 +80,7 @@ namespace global {
     void SetStationEnum(
       MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint,
       MAUS::DataStructure::Global::Track* GlobalSciFiTrack, int tracker,
-      int station, double& z);
+      int station);
   }; // ~class ImportSciFiRecon
 } // ~namespace global
 } // ~namespace recon
