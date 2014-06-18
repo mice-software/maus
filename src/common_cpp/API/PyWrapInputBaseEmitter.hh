@@ -17,6 +17,8 @@
 #ifndef _SRC_COMMON_CPP_API_PYWRAPINPUTBASEEMITTER_
 #define _SRC_COMMON_CPP_API_PYWRAPINPUTBASEEMITTER_
 
+#include <string>
+
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
 #undef _POSIX_C_SOURCE

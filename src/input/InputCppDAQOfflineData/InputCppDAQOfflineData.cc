@@ -64,7 +64,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   _dataFileManager.OpenFile();
   unsigned int nfiles = _dataFileManager.GetNFiles();
   if (!nfiles) {
-   throw(MAUS::Exception(Exception::recoverable,
+    throw(MAUS::Exception(Exception::recoverable,
                         "Unable to load any data files. Check your run"+
                         std::string("number (or file name) and data path."),
                         "InputCppDAQOfflineData::_birth"));
@@ -80,11 +80,11 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   _calib_Events_Only = configJSON["Calib_Events_Only"].asBool();
 
   if (_phys_Events_Only && _calib_Events_Only) {
-   throw(MAUS::Exception(Exception::recoverable,
-                        "There is a contradiction in the configuration:\n"+
-                        std::string("Phys_Events_Only and Calib_Events_Only ")+
-                        std::string("are both true!!!"),
-                        "InputCppDAQOfflineData::_birth"));
+     throw(MAUS::Exception(Exception::recoverable,
+                          "There is a contradiction in the configuration:\n"+
+                          std::string("Phys_Events_Only and Calib_Events_Only ")+
+                          std::string("are both true!!!"),
+                          "InputCppDAQOfflineData::_birth"));
   }
 
   InputCppDAQData::_childbirth(jsonDataCards);

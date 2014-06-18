@@ -45,7 +45,6 @@ InputCppDAQOnlineData::InputCppDAQOnlineData()
 void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   std::cerr << "Initialising MAUS online input" << std::endl;
   InputCppDAQData::_childbirth(jsonDataCards);
-  std::cerr << "A" << std::endl;
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;

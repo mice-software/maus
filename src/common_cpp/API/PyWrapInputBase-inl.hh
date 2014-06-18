@@ -33,8 +33,6 @@
 
 #include "src/common_cpp/API/PyWrapInputBaseEmitter.hh"
 
-#include <iostream>
-
 namespace MAUS {
 template <class INPUTCLASS>
 PyObject* PyWrapInputBase<INPUTCLASS>::birth(PyObject* self,
