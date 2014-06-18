@@ -62,6 +62,19 @@ namespace MAUS {
     FRIEND_TEST(APIExceptionsTest, TestUnhandledException_What);
   };
 
+  class NoInputException : public MAUSExceptionBase {
+
+  public:
+    explicit NoInputException() : MAUSExceptionBase("") {}
+    virtual ~NoInputException() throw() {}
+
+  private:
+    virtual const char* _what() const throw() {return ret.c_str();}
+
+    static const std::string ret;  
+  };
+
+
 }// end of namespace
 
 #endif

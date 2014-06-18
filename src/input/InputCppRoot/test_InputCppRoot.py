@@ -25,7 +25,7 @@ import json
 import ROOT
 import os
 
-import InputCppRoot
+import _InputCppRoot as InputCppRoot
 
 class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
     """
@@ -142,7 +142,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Run the inputter, check that output contains key:value pair.
         """
-        event = inputter.emitter_cpp()
+        event = inputter.emitter().next()
         json_event = json.loads(event)
         for key, value in checks.iteritems():
             self.assertEqual(json_event[key], value,
@@ -227,7 +227,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
 
         # out of events
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
     def test_read_spills_only(self):
         """
@@ -258,7 +258,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         # job footer
         self.__test_event(inputter, {"maus_event_type":"Spill"})
         self.__test_event(inputter, {"maus_event_type":"Spill"})
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
     def test_read_job_header_footer_only(self):
         """
@@ -314,10 +314,10 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         # job footers
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
 
-    def test_read_selected_spills( self ) :
+    def _test_read_selected_spills( self ):
         """
           Tests the functionality to select individual spills from a data file.
           Selection is performed by using an array of spill numbers passed via
