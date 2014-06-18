@@ -267,7 +267,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
 
         # reset input
         print("INPUT: Birth")
-        if (not self.inputer.birth(self.config_doc)):
+        if self.inputer.birth(self.config_doc) == False:
             raise WorkerBirthFailedException(self.inputer.__class__)
         emitter = self.inputer.emitter()
         map_buffer = DataflowUtilities.buffer_input(emitter, 1)
