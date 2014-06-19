@@ -72,7 +72,7 @@ class SciFiTrack {
 
   /** @brief Sets trackpoints vector, deep copy
    */
-  void set_scifitrackpoints(SciFiTrackPointPArray points);
+  void set_scifitrackpoints(SciFiTrackPointPArray points) { _trackpoints = points; }
 
   /** @brief Returns the tracker number.
    */

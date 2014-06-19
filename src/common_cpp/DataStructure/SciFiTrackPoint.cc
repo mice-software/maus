@@ -37,11 +37,11 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _mc_y(0.),
                                      _mc_py(0.),
                                      _mc_pz(0.) {
-  _clusters = new TRefArray();
+  _cluster = new TRef();
 }
 
 SciFiTrackPoint::~SciFiTrackPoint() {
-  delete _clusters;
+  delete _cluster;
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
@@ -100,9 +100,8 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
 
-  _clusters = new TRefArray();
   // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
-  _clusters->Add(kalman_site->cluster());
+  _cluster = new TRef(kalman_site->cluster());
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
@@ -131,7 +130,7 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _smoothed_residual = point.smoothed_residual();
 
   _covariance = point.covariance();
-  _clusters = new TRefArray(*point.get_clusters());
+  _cluster = new TRef(*point.get_cluster());
 }
 
 SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
@@ -163,44 +162,10 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
 
   _covariance= rhs.covariance();
 
-  if (_clusters) delete _clusters;
-  _clusters = new TRefArray(*rhs.get_clusters());
+  if (_cluster) delete _cluster;
+  _cluster = new TRef(*rhs.get_cluster());
 
   return *this;
-}
-
-void SciFiTrackPoint::add_cluster(SciFiCluster* cluster) {
-  if (!_clusters) _clusters = new TRefArray();
-  _clusters->Add(cluster);
-}
-
-SciFiCluster* SciFiTrackPoint::cluster() const {
-  if (!_clusters) return NULL;
-  return static_cast<SciFiCluster*>(_clusters->At(0));
-}
-
-SciFiClusterPArray SciFiTrackPoint::get_clusters_pointers() const {
-  SciFiClusterPArray cl_pointers;
-
-  // Check the _clusters container is initialised
-  if (!_clusters) {
-    std::cerr << "Cluster TRefArray not initialised" << std::endl;
-    return cl_pointers;
-  }
-
-  for (int i = 0; i < (_clusters->GetLast()+1); ++i) {
-    cl_pointers.push_back(static_cast<SciFiCluster*>(_clusters->At(i)));
-  }
-  return cl_pointers;
-}
-
-void SciFiTrackPoint::set_clusters_pointers(const SciFiClusterPArray &clusters) {
-  if (_clusters) delete _clusters;
-  _clusters = new TRefArray();
-  for (
-    std::vector<SciFiCluster*>::const_iterator cl = clusters.begin(); cl != clusters.end(); ++cl) {
-    _clusters->Add(*cl);
-  }
 }
 
 } // ~namespace MAUS

@@ -15,6 +15,10 @@
  *
  */
 
+
+#include "TObject.h"
+#include "TRef.h"
+
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
@@ -47,8 +51,7 @@ TEST_F(SciFiTrackPointTestDS, test_default_contructor) {
   EXPECT_EQ(-1, tp1->pull());
   EXPECT_EQ(-1, tp1->residual());
   EXPECT_EQ(-1, tp1->smoothed_residual());
-  EXPECT_TRUE(tp1->get_clusters());
-  EXPECT_EQ(-1, tp1->get_clusters()->GetLast());
+  EXPECT_TRUE(tp1->get_cluster());
   delete tp1;
 }
 
@@ -122,11 +125,47 @@ TEST_F(SciFiTrackPointTestDS, test_kalman_state_contructor) {
   SciFiTrackPoint* tp1 = new SciFiTrackPoint(&state1);
 
   // Perform the tests
-  EXPECT_EQ(clus1, tp1->cluster());
-  EXPECT_EQ(tp1->cluster()->get_tracker(), tracker);
+  EXPECT_EQ(clus1, tp1->get_cluster_pointer());
+  EXPECT_EQ(tp1->get_cluster_pointer()->get_tracker(), tracker);
 
   delete tp1;
   delete clus1;
+}
+
+TEST_F(SciFiTrackPointTestDS, test_cluster_getters_and_setters) {
+  SciFiTrackPoint *tp = new SciFiTrackPoint();
+  SciFiCluster* cl = new SciFiCluster();
+  int tracker = 1;
+  cl->set_tracker(tracker);
+
+  TRef *trf = new TRef(cl);
+  tp->set_cluster(trf);
+  ASSERT_TRUE(tp->get_cluster());
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster()->GetObject()));
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster_tobject()));
+  EXPECT_EQ(cl, tp->get_cluster_pointer());
+
+  delete tp;
+  tp = new SciFiTrackPoint();
+  TObject* tobj = cl;
+
+  tp->set_cluster_tobject(tobj);
+  ASSERT_TRUE(tp->get_cluster());
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster()->GetObject()));
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster_tobject()));
+  EXPECT_EQ(cl, tp->get_cluster_pointer());
+
+  delete tp;
+  tp = new SciFiTrackPoint();
+
+  tp->set_cluster_pointer(cl);
+  ASSERT_TRUE(tp->get_cluster());
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster()->GetObject()));
+  EXPECT_EQ(cl, static_cast<SciFiCluster*>(tp->get_cluster_tobject()));
+  EXPECT_EQ(cl, tp->get_cluster_pointer());
+
+  delete cl;
+  delete tp;
 }
 
 } // ~namespace MAUS
