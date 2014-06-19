@@ -25,6 +25,8 @@ import time
 import celery.states
 import celery.task.control
 
+import maus_cpp.converter
+
 from docstore.DocumentStore import DocumentStoreException
 from framework.utilities import CeleryUtilities
 from framework.utilities import DataflowUtilities
@@ -305,7 +307,7 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         Process a single event - if it is a Spill, check for run_number change
         and call EndOfEvent/StartOfEvent if run_number has changed.
         """
-        event_json = json.loads(event)
+        event_json = maus_cpp.converter.json_repr(event)
         if DataflowUtilities.get_event_type(event_json) == "Spill":
             current_run_number = DataflowUtilities.get_run_number(event_json)
             if current_run_number != self.run_number:
@@ -314,7 +316,8 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
             self.spill_input_count += 1
-            self.submit_spill_to_celery(event)
+            event_str = maus_cpp.converter.string_repr(event_json)
+            self.submit_spill_to_celery(event_str)
 
     @staticmethod
     def get_dataflow_description():

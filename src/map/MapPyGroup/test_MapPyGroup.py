@@ -21,10 +21,10 @@ Tests for MapPyGroup module.
 import json
 from types import ListType
 import unittest
-import Configuration
+
 import maus_cpp.globals 
 import maus_cpp.converter
-
+import Configuration
 import ErrorHandler
 from MapPyDoNothing import MapPyDoNothing
 from MapPyGroup import MapPyGroup
@@ -32,6 +32,7 @@ from MapPyGroup import MapPyGroupBirthException
 from MapPyGroup import MapPyGroupDeathException
 from MapPyPrint import MapPyPrint
 from MapPyTestMap import MapPyTestMap
+
 
 
 class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
@@ -396,7 +397,7 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                    MapPyGroupNoConvert(), MapPyGroupConvert()]
         my_group = MapPyGroup(workers)
         output = my_group.process("{}")
-        self.assertEqual(output, "{}")
+        self.assertEqual(output, {})
 
 
 
