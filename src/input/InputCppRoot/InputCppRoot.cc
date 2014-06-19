@@ -38,10 +38,15 @@
 #include "src/common_cpp/Converter/DataConverters/CppJsonRunHeaderConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
+#include "src/common_cpp/API/PyWrapInputBase.hh"
 
 #include "src/input/InputCppRoot/InputCppRoot.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_InputCppRoot(void) {
+    PyWrapInputBase<MAUS::InputCppRoot>::PyWrapInputBaseModInit(
+                  "InputCppRoot", "", "", "", "");
+}
 
 InputCppRoot::InputCppRoot(std::string filename)
             : InputBase<std::string>("InputCppRoot"), _infile(NULL),
@@ -98,7 +103,7 @@ void InputCppRoot::_death() {
   }
 }
 
-std::string InputCppRoot::_emitter_cpp() {
+std::string InputCppRoot::_emit_cpp() {
     std::string event = "";
     bool isUseful = true;
     JobHeaderData JHData;
@@ -286,7 +291,7 @@ std::string InputCppRoot::advance_event_type() {
       } else {
           _event_type = event_type(_event_type+1);
       }
-      return _emitter_cpp();
+      return _emit_cpp();
 }
 }  // namespace MAUS
 

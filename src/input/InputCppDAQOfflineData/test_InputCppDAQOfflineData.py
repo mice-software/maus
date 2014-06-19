@@ -20,14 +20,16 @@
 import os
 import md5
 import unittest
+import json
 from Configuration import Configuration
-from InputCppDAQOfflineData import InputCppDAQOfflineData
+from _InputCppDAQOfflineData import InputCppDAQOfflineData
 
 class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
     """Tests for InputCppDAQOfflineData"""
     @classmethod
     def setUpClass(self): # pylint: disable = C0103, C0202
         """Sets a mapper and configuration"""
+        print "SETUPCLASS"
         if not os.environ.get("MAUS_ROOT_DIR"):
             raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
         # Set our data path & filename
@@ -35,37 +37,41 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
         self._datafile = '02873'
-        self._c = Configuration()
+        config = Configuration().getConfigJSON()
+        config_json = json.loads(config)
+        config_json["daq_data_path"] = self._datapath
+        config_json["daq_data_file"] = self._datafile
+        self._config = json.dumps(config_json)
         self.mapper = None
 
     def test_init(self):
         """Check birth with default configuration"""
-        self.mapper = InputCppDAQOfflineData(self._datapath, \
-                                       self._datafile)
-        self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
+        self.mapper = InputCppDAQOfflineData()
+        self.mapper.birth( self._config)
         # Check re-init without closing fails
-        self.assertFalse(self.mapper.birth( self._c.getConfigJSON() ))
-        self.assertTrue(self.mapper.death())
-        return
+        try:
+            self.mapper.birth( self._config )
+            self.assertTrue(False, msg="Should have raised ValueError")
+        except ValueError:
+            pass
+        self.mapper.death()
 
     def test_single(self):
         """Test a single event"""
         self.mapper = InputCppDAQOfflineData(self._datapath, \
                                        self._datafile)
-        self.assertTrue(self.mapper.birth(self. _c.getConfigJSON() ))
+        self.mapper.birth(self._config)
         # Get a single event and check it's the right size
-        self.assertTrue(self.mapper.readNextEvent())
-        data = self.mapper.getCurEvent()
+        data = self.mapper.emitter().next()
         # Data shold be 108 (first event is start of burst)
         self.assertEqual(len(data), 108)
-        self.assertTrue(self.mapper.death())
-        return
+        self.mapper.death()
 
     def test_multi(self):
         """Test reading the whole file"""
         self.mapper = InputCppDAQOfflineData(self._datapath, \
                                        self._datafile)
-        self.assertTrue(self.mapper.birth( self._c.getConfigJSON() ))
+        self.mapper.birth(self._config)
         event_count = 0
 
         # We can try md5'ing the whole dataset
@@ -85,7 +91,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         self.assertEqual(digester.hexdigest(), \
                          '08bdfba7e5cad1b8da503742c545a7c8')
 
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
 
     @classmethod
     def tearDownClass(self): # pylint: disable = C0103, C0202
