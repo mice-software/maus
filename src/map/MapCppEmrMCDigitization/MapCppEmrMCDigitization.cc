@@ -24,6 +24,7 @@
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 
 #include "src/map/MapCppEmrMCDigitization/MapCppEmrMCDigitization.hh"
+#include <iostream>
 
 namespace MAUS {
 
@@ -39,7 +40,8 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
     // Load constants and hit preselection cuts
-    Json::Value *json = Globals::GetConfigurationCards();
+//     Json::Value *json = Globals::GetConfigurationCards();
+    Json::Value *json = &configJSON;
 
     _number_of_planes = (*json)["EMRnumberOfPlanes"].asInt();
     _number_of_bars = (*json)["EMRnumberOfBars"].asInt();
@@ -90,14 +92,14 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
 
     for (int i = 0; i < 48; i++) {
       _baseline[i] = _baseline_position
-		   + static_cast<int>(_rand->Uniform(-_baseline_spread, _baseline_spread));
+                   + static_cast<int>(_rand->Uniform(-_baseline_spread, _baseline_spread));
       _noise_level[i] = static_cast<int>(_rand->Uniform(0, _maximum_noise_level));
       _noise_position[i] = static_cast<int>(_rand->Uniform(0, 1.9999999));
     }
 
     // Check calibration file
     _calibfilename = std::string(pMAUS_ROOT_DIR)
-		   + (*json)["EMR_calibration_file"].asString();
+                   + (*json)["EMR_calibration_file"].asString();
     _calibfile = fopen(_calibfilename.Data(), "r");
     if ( _calibfile == NULL ) {
        std::cerr << "EMR calibration data file not found..." << std::endl;
@@ -107,7 +109,7 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
 
     // Check clear fiber length map
     _cflengthfilename = std::string(pMAUS_ROOT_DIR)
-			+ (*json)["EMR_clear_fiber_length_map"].asString();
+                      + (*json)["EMR_clear_fiber_length_map"].asString();
     _cflengthfile = fopen(_cflengthfilename.Data(), "r");
     if ( _cflengthfile == NULL ) {
        std::cerr << "EMR clear fibre length map not found..." << std::endl;
@@ -117,7 +119,7 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
 
     // Check clear fiber length map
     _cattenfilename = std::string(pMAUS_ROOT_DIR)
-		    + (*json)["EMR_connector_attenuation_map"].asString();
+                    + (*json)["EMR_connector_attenuation_map"].asString();
     _cattenfile = fopen(_cattenfilename.Data(), "r");
     if ( _cattenfile == NULL ) {
        std::cerr << "EMR connector attenuation map not found..." << std::endl;
@@ -175,8 +177,12 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
 
   // Get spill, break if there's no trigger
   Spill *spill = spill_cpp->GetSpill();
-  int nPartEvents = spill->GetMCEventSize();
-  if (!nPartEvents) return document;
+  int nPartEvents(0);
+  if (spill->GetMCEvents())
+    nPartEvents = spill->GetMCEventSize();
+
+  if (!nPartEvents)
+   return document;
 
   // Check the Recon event array is initialised, and if not make it so
   if (!spill->GetReconEvents()) {
@@ -195,7 +201,7 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
       int nHits = hits->size();
 
       Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
-      int pTime = primary->GetTime(); // ns
+      double pTime = primary->GetTime(); // ns
 
       for (int ihit = 0; ihit < nHits; ihit++) {
 	EMRHit hit = hits->at(ihit);
@@ -228,7 +234,7 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
 
     if (hits) {
       Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
-      int pTime = primary->GetTime(); // ns
+      double pTime = primary->GetTime(); // ns
 
       processDBB(hits, xPe, pTime);
       processFADC(hits, xPe, pTime);
