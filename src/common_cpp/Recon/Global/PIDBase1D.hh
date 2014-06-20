@@ -14,9 +14,10 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
- /** @class PIDBase
- *  Base class containing constructors and functions required for PID
- *  analysis
+ /** @class PIDBase1D
+ *  @author Celeste Pidcott, University of Warwick
+ *  Class containing constructors and functions required for PID
+ *  analysis (1D case)
  */
 
 #ifndef PIDBASE1D_HH

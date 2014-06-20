@@ -20,7 +20,7 @@
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
-  PyWrapMapBase<MAUS::MapCppTrackerRecon>::PyWrapMapBaseModInit
+  PyWrapMapBase<MapCppTrackerRecon>::PyWrapMapBaseModInit
                                         ("MapCppTrackerRecon", "", "", "", "");
 }
 
@@ -130,7 +130,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
   }
 }
 
-// void MapCppTrackerRecon::print_event_info(MAUS::SciFiEvent &event) {
+// void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
 //   std::cerr << event.digits().size() << " "
 //                               << event.clusters().size() << " "
 //                               << event.spacepoints().size() << "; "

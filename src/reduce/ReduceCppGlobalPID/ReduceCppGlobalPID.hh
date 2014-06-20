@@ -16,6 +16,7 @@
  */
 
 /** @class ReduceCppGlobalPID
+ *  @author Celeste Pidcott, University of Warwick
  *  Produce PDFs from MC data for use in global PID
  *
  */

@@ -16,6 +16,7 @@
  */
 
 /** @class ImportCkovRecon
+ *  @author Celeste Pidcott, University of Warwick
  *  Imports the space points from the Ckov detectors into
  *  the MAUS::recon::global format.  
  */

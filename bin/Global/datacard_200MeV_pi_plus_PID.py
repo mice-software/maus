@@ -6,8 +6,7 @@ Datacard to use when performing PID on simulated 200MeV/c pions
 import os
 
 # A json document containing global tracks from MC data
-input_json_file_name = "200MeV_pi_plus_hypothesis_Global_Recon.json"
-input_json_file_type = "text"
+input_json_file_name = "200MeV_pi_plus_hypothesis_Global_Recon
 
 # Output json document with track pid information included
 output_json_file_name = "200MeV_pi_plus_Global_PID.json"

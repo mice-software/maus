@@ -16,6 +16,7 @@
  */
 
 /** @class ImportTOFRecon
+ *  @author Celeste Pidcott, University of Warwick
  *  Imports the space points from the TOF detectors into
  *  the MAUS::recon::global format.  
  */

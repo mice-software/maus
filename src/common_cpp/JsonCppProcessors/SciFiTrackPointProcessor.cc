@@ -76,7 +76,7 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("covariance", &_matrix_proc,
                         &SciFiTrackPoint::covariance,
                         &SciFiTrackPoint::set_covariance, false);
-//     RegisterTRefArray("clusters", &_cluster_tref_proc,
-//                       &SciFiTrackPoint::get_clusters, &SciFiTrackPoint::set_clusters, true);
+    RegisterTRefArray("clusters", &_cluster_tref_proc,
+                      &SciFiTrackPoint::get_clusters, &SciFiTrackPoint::set_clusters, true);
 }
 } // ~namespace MAUS

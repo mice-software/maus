@@ -15,9 +15,9 @@
  *
  */
 
-/** @class ImportTOFRecon
+/** @class ImportKLRecon
  *  @author Celeste Pidcott, University of Warwick 
- *  Imports the space points from the TOF detectors into
+ *  Imports the detector information from the KL detector into
  *  the MAUS::recon::global format.  
  */
 

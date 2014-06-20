@@ -16,6 +16,7 @@
  */
 
 /** @class MapCppGlobalReconImport
+ *  @author Celeste Pidcott, University of Warwick
  *  Import detector events from Recon Event into a Global Event and create
  *  global tracks.
  *
@@ -49,34 +50,39 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "Recon/Global/TrackMatching.hh"
+#include "src/common_cpp/API/MapBase.hh"
+
 
 namespace MAUS {
+ class Data;
 
-  class MapCppGlobalTrackMatching {
+  class MapCppGlobalTrackMatching : public MapBase<Data> {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalTrackMatching();
 
+  private:
     /** Sets up the worker
      *
      *  @param argJsonConfigDocument a JSON document with
      *         the configuration.
      */
-    bool birth(std::string argJsonConfigDocument);
+    void _birth(const std::string& argJsonConfigDocument);
 
     /** Shutdowns the worker
      *
      *  This takes no arguments and does nothing
      */
-    bool death();
+    void _death();
 
-    /** process JSON document
+    /** process MAUS Data
      *
-     *  Receive a document with recon events and return a 
-     *  document with populated global events and tracks.
-     * @param document a line/spill from the JSON input
+     *  Receive a structure with recon events and return a 
+     *  structure with populated global events and tracks.
+     * @param MAUS data corresponding to a single MICE spill
      */
-    std::string process(std::string) const;
+    void _process(MAUS::Data* data) const;
+
 
     /** Import the existing MAUS::ReconEvent, creating a new
      * MAUS::GlobalEvent and populating a

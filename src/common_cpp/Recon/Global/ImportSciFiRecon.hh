@@ -15,8 +15,9 @@
  *
  */
 
-/** @class ImportTOFRecon
- *  Imports the space points from the TOF detectors into
+/** @class ImportSciFiRecon
+ *  @author Celeste Pidcott, University of Warwick
+ *  Imports the track points from the SciFi detectors into
  *  the MAUS::recon::global format.  
  */
 

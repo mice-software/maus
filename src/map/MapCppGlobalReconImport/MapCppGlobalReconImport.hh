@@ -16,6 +16,7 @@
  */
 
 /** @class MapCppGlobalReconImport
+ *  @author Celeste Pidcott, University of Warwick
  *  Import detector events from Recon Event into a Global Event and create
  *  global tracks.
  *
@@ -101,6 +102,8 @@ namespace MAUS {
     Json::Value _configJSON;
     ///  JsonCpp setup
     Json::Reader _reader;
+    // Mapper name, useful for tracking results...
+    std::string _classname;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

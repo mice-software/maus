@@ -21,133 +21,47 @@
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
+
 
 namespace MAUS {
-  MapCppGlobalTrackMatching::MapCppGlobalTrackMatching() {
+
+  PyMODINIT_FUNC init_MapCppGlobalTrackMatching(void) {
+    PyWrapMapBase<MAUS::MapCppGlobalTrackMatching>::PyWrapMapBaseModInit
+                                    ("MapCppGlobalTrackMatching", "", "", "", "");
+  }
+
+  MapCppGlobalTrackMatching::MapCppGlobalTrackMatching()
+    : MapBase<Data>("MapCppGlobalTrackMatching"), _configCheck(false) {
+  }
+  
+  void MapCppGlobalTrackMatching::_birth(const std::string& argJsonConfigDocument) {
+    // Check if the JSON document can be parsed, else return error only.
+    _configCheck = false;
+    bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
+    if (!parsingSuccessful) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Failed to parse configuration",
+                              "MapCppGlobalTrackMatching::birth");
+    }
+    _configCheck = true;
     _classname = "MapCppGlobalTrackMatching";
   }
 
-  bool MapCppGlobalTrackMatching::birth(std::string argJsonConfigDocument) {
-    // Check if the JSON document can be parsed, else return error only.
-    bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
-    if (!parsingSuccessful) {
-      _configCheck = false;
-      return false;
-    }
-    _configCheck = true;
-    return true;
+  void MapCppGlobalTrackMatching::_death() {
   }
 
-  bool MapCppGlobalTrackMatching::death() {
-    return true;
-  }
-
-  std::string MapCppGlobalTrackMatching::process(std::string document) const {
-    Json::FastWriter writer;
-    Json::Value root;
-
-    if (document.empty()) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Empty document passed to process";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-    }
-
-    if (!_configCheck) {
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: process passed an invalid configuration";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      return writer.write(root);
-    }
-
-    // Prepare converters, spill and json objects
-    JsonCppSpillConverter json2cppconverter;
-    CppJsonSpillConverter cpp2jsonconverter;
-    Json::Value *data_json = NULL;
-    MAUS::Data *data_cpp = NULL;
-
+  void MapCppGlobalTrackMatching::_process(MAUS::Data* data_cpp) const {
     // Read string and convert to a Json object
-    try {
-      Json::Value imported_json = JsonWrapper::StringToJson(document);
-      data_json = new Json::Value(imported_json);
-    } catch (Exception& exception) {
-      MAUS::CppErrorHandler::getInstance()->
-	HandleExceptionNoJson(exception, _classname);
-      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
-		<< "MapCppGlobalTrackMatching::process" << std::endl;
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Bad json document";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      delete data_json;
-      return writer.write(root);
-    } catch (std::exception& exc) {
-      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-      Squeak::mout(Squeak::error) << "String to Json conversion failed,"
-				  << "MapCppGlobalTrackMatching::process"
-				  << std::endl;
-      Json::Value errors;
-      std::stringstream ss;
-      ss << _classname << " says: Bad json document";
-      errors["bad_json_document"] = ss.str();
-      root["errors"] = errors;
-      delete data_json;
-      return writer.write(root);
-    }
-
-    if (!data_json || data_json->isNull()) {
-      if (data_json) delete data_json;
-      return std::string("{\"errors\":{\"bad_json_document\":")+
-	std::string("\"Failed to parse input document\"}}");
-    }
-
-    if (data_json->empty()) {
-      delete data_json;
-      return std::string("{\"errors\":{\"bad_json_document\":")+
-	std::string("\"Failed to parse input document\"}}");
-    }
-
-    std::string maus_event = JsonWrapper::GetProperty(
-	*data_json, "maus_event_type",
-	JsonWrapper::stringValue).asString();
-
-    if ( maus_event.compare("Spill") != 0 ) {
-      Squeak::mout(Squeak::error) << "Line of json document did not contain "
-	  << "a Spill" << std::endl;
-      delete data_json;
-      return document;
-    }
-
-    std::string daq_event = JsonWrapper::GetProperty(
-        *data_json, "daq_event_type",
-        JsonWrapper::stringValue).asString();
-
-    if ( daq_event.compare("physics_event") != 0 ) {
-      Squeak::mout(Squeak::error) << "daq_event_type did not return a "
-	  << "physics event" << std::endl;
-      delete data_json;
-      return document;
-    }
-
-    // Convert Json into MAUS::Spill object.  In future, this will all
-    // be done for me, and process will take/return whichever object we
-    // prefer.
-    try {
-      data_cpp = json2cppconverter(data_json);
-      delete data_json;
-    } catch (...) {
-      Squeak::mout(Squeak::error) << "Missing required branch daq_event_type"
-	  << "converting json->cpp, MapCppGlobalTrackMatching" << std::endl;
-    }
-
     if (!data_cpp) {
-      return std::string("{\"errors\":{\"failed_json_cpp_conversion\":")+
-	std::string("\"Failed to convert Json to Cpp Spill object\"}}");
+        throw MAUS::Exception(Exception::recoverable,
+                              "data_cpp was NULL",
+                              "MapCppGlobalTrackMatching::_process");
+    }
+    if (!_configCheck) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Birth has not been successfully called",
+                              "MapCppGlobalTrackMatching::_process");
     }
 
     const MAUS::Spill* spill = data_cpp->GetSpill();
@@ -155,8 +69,7 @@ namespace MAUS {
     MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
 
     if (!recon_events) {
-      delete data_cpp;
-      return document;
+      return;
     }
 
     MAUS::GlobalEvent* global_event;
@@ -168,27 +81,14 @@ namespace MAUS {
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = MakeTracks(recon_event);
     }
-
-    data_json = cpp2jsonconverter(data_cpp);
-
-    if (!data_json) {
-      delete data_cpp;
-      return std::string("{\"errors\":{\"failed_cpp_json_conversion\":")+
-	std::string("\"Failed to convert Cpp to Json Spill object\"}}");
-    }
-
-    std::string output_document = JsonWrapper::JsonToString(*data_json);
-    delete data_json;
-    delete data_cpp;
-    return output_document;
   }
 
   MAUS::GlobalEvent*
   MapCppGlobalTrackMatching::MakeTracks(MAUS::ReconEvent* recon_event) const {
     if (!recon_event) {
       throw(Exception(Exception::recoverable,
-		      "Trying to import an empty recon event.",
-		      "MapCppGlobalTrackMatching::Import"));
+		      "Trying to use an empty recon event.",
+		      "MapCppGlobalTrackMatching::MakeTracks"));
     }
 
     MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
