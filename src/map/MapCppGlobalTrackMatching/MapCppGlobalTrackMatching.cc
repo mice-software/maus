@@ -34,7 +34,7 @@ namespace MAUS {
   MapCppGlobalTrackMatching::MapCppGlobalTrackMatching()
     : MapBase<Data>("MapCppGlobalTrackMatching"), _configCheck(false) {
   }
-  
+
   void MapCppGlobalTrackMatching::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;

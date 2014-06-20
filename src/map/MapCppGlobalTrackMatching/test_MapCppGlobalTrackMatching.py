@@ -23,7 +23,7 @@ from Configuration import Configuration
 import maus_cpp.converter
 from _MapCppGlobalTrackMatching import MapCppGlobalTrackMatching
 
-class MapCppGlobalTrackMatchingTestCase(unittest.TestCase): # pylint: disable = R0904
+class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalTrackMatching"""
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103

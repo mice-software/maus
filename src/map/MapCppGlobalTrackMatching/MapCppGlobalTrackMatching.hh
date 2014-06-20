@@ -54,7 +54,7 @@
 
 
 namespace MAUS {
- class Data;
+  class Data;
 
   class MapCppGlobalTrackMatching : public MapBase<Data> {
   public:
