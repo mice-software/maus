@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 directory=flex-2.5.37
 filename=${directory}.tar.gz
-url=http://sourceforge.net/projects/flex/files/${filename}/download
+url=http://sourceforge.net/projects/flex/files/${filename}
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 

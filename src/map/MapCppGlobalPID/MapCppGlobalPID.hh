@@ -42,45 +42,46 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
+#include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 #include "DataStructure/Global/Track.hh"
 
-#include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
+#include "src/common_cpp/Recon/Global/PIDVarB.hh"
 
 
 namespace MAUS {
 
-  class MapCppGlobalPID {
+  class MapCppGlobalPID : public MapBase<Data> {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalPID();
 
+  private:
     /** @brief Sets up the worker
      *
      *  @param argJsonConfigDocument a JSON document with
      *         the configuration.
      */
-    bool birth(std::string argJsonConfigDocument);
+    void _birth(const std::string& argJsonConfigDocument);
 
     /** @brief Shutdowns the worker
      *
      *  This takes no arguments and does nothing
      */
-    bool death();
+    void _death();
 
-    /** @brief process JSON document
+    /** @brief process MAUS Data
      *
-     *  Receive a document with global tracks, perform PID functons
+     *  Receive a Spill data object with global tracks, perform PID functons
      *  and return tracks with PID set
-     * @param document a line/spill from the JSON input
+     * @param document a spill data event
      */
-    std::string process(std::string) const;
+    void _process(MAUS::Data* data) const;
 
 
-  private:
     bool _configCheck;
     /// This will contain the configuration
     Json::Value _configJSON;
@@ -88,10 +89,7 @@ namespace MAUS {
     ///  JsonCpp setup
     Json::Reader _reader;
 
-    /// Mapper name, useful for tracking results...
-    std::string _classname;
-
-    /// PIDs to perform
+    /// PID variables to perform
     std::vector<MAUS::recon::global::PIDBase*> _pid_vars;
 
     /// Hypotheses to test PID variables against

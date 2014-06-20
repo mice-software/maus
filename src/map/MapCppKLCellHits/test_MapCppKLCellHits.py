@@ -17,9 +17,9 @@
 # pylint: disable = C0103
 
 import os
-import json
 import unittest
 from Configuration import Configuration
+import maus_cpp.converter
 import MAUS
 
 class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
@@ -32,17 +32,15 @@ class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
 
     def test_empty(self):
         """Check against configuration is empty"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
+        self.assertRaises(ValueError, self.mapper.birth, "")
         result = self.mapper.process("")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
+        self.assertTrue("MapCppKLCellHits" in doc["errors"])
 
     def test_init(self):
         """Check that birth works properly"""
-        success = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.mapper.birth(self. c.getConfigJSON())
 
     def test_no_data(self):
         """Check that against data stream is empty"""
@@ -52,7 +50,7 @@ class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
         data = fin.read()
         # test with no data.
         result = self.mapper.process(data)
-        spill = json.loads(result)
+        spill = maus_cpp.converter.json_repr(result)
         no_cell_hits = True
         if 'cell_hits' in spill:
             no_cell_hits = False
@@ -66,7 +64,7 @@ class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        spill = json.loads(result)
+        spill = maus_cpp.converter.json_repr(result)
         self.assertTrue( not 'errors' in spill)
           
         # test the kl output
@@ -89,10 +87,7 @@ class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that death works ok"""
-        success = cls.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-        cls.mapper = None
+        cls.mapper.death()
 
 if __name__ == '__main__':
     unittest.main()

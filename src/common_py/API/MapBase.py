@@ -57,3 +57,6 @@ class MapBase(ModuleBase, IMap):#pylint: disable=R0921
         """
         raise NotImplementedError('_process function not implemented '\
                                   'in class %s' % self.__class__.__name__)
+
+    # set can_convert to True if this module does conversion to a MAUS type
+    can_convert = False

@@ -1,0 +1,16 @@
+// FILES/Models/Modules/EMR/EMR.dat
+//
+
+Module EMR
+{
+  Volume None
+  PropertyString G4Detector EMR
+  PropertyString SensitiveDetector EMR
+  PropertyDouble NbOfBars 2832
+  PropertyDouble BarWidth 1.7 cm
+  PropertyDouble BarHeight 1.7 cm
+  PropertyDouble BarLength 110.0 cm
+  PropertyDouble HoleRad 3.0 mm
+  PropertyDouble FiberCladdingExtRadius 1.2 mm
+  PropertyBool AddWLSFiber 1
+}

@@ -26,33 +26,11 @@ namespace MAUS {
   ModuleBase::~ModuleBase() {}
 
   void ModuleBase::birth(const std::string& s) {
-    try {
-      _birth(s);
-    }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    }
-    catch (std::exception & e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch (...) {
-      throw UnhandledException(_classname);
-    }
+    _birth(s);
   }
 
   void ModuleBase::death() {
-    try {
-      _death();
-    }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
-    }
-    catch (std::exception & e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch (...) {
-      throw UnhandledException(_classname);
-    }
+    _death();
   }
 
 }// end of namespace

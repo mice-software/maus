@@ -38,6 +38,11 @@ class VirtualHit : public MCHit
     void SetStationNumber (int sn)         { _stationNumber = sn; }
     void SetPos  (Hep3Vector xyz){ setPosition( xyz ); }
     void SetMomentum  (Hep3Vector xyz){ setMomentum( xyz ); }
+
+    void SetSpin (Hep3Vector xyz){ setSpin( xyz ); }
+
+
+
     void SetTime      (double ti)      { setTime( ti ); }
     void SetEnergy    (double en)      { setEnergy( en ); }
     void SetPID       (int id)         { setPdg( id ); }
@@ -54,6 +59,7 @@ class VirtualHit : public MCHit
     int GetStationNumber() const   { return _stationNumber; }
     Hep3Vector GetPos() const  { return position(); }
     Hep3Vector GetMomentum() const { return momentum(); }
+    Hep3Vector GetSpin() const { return spin(); }
     double GetTime() const     { return time(); }
     double GetEnergy() const   { return energy(); }
     int    GetPID() const      { return pdg(); }

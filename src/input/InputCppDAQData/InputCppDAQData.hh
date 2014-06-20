@@ -32,6 +32,8 @@
 #include "unpacking/MDequipMap.h"
 #include "unpacking/MDfragment.h"
 
+#include "src/common_cpp/API/InputBase.hh"
+
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
@@ -41,47 +43,35 @@
 namespace MAUS {
 
 /** \class InputCppDAQData
-* Load MICE raw data and unpack it into a JSON stream.
-* 
+* Load MICE raw data and unpack it into a JSON stream or a Cpp Data format.
+*
 * InputCppDAQData is a base imput class and can not be used to access the DAQ data!
 * The access to the data is provided by the two daughter classes InputCppDAQOfflineData
 * and InputCppDAQOnlineData.
-* 
+*
 * This module reads binary data in the format of the MICE DAQ.  It drives the
 * 'unpacker' library to do this conversion.  The end result is the MICE data
-* in JSON format.  The data includes TDC and flash ADC values, so this
+* in a JSON or a Cpp Data format.  The data includes TDC and flash ADC values, so this
 * information is low-level.
-*
 */
 
-class InputCppDAQData {
+class InputCppDAQData : public InputBase<std::string> {
 
  public:
 
   /** Create an instance of InputCppDAQData.
-  * 
-  * This is the constructor for InputCppDAQData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQData.
   */
   InputCppDAQData();
 
-  /** Initialise the Unpacker.
-  *
-  * This prepares the unpacker to read the files given in the constructor.
-  *
-  * \return True if at least one file was opened sucessfully.
-  */
-  bool birth(std::string pJSONConfig);
-
- /** Dummy function.
-  * The access to the data is provided by the two daughter classes 
+  /** Dummy function.
+  * The access to the data is provided by the two daughter classes
   * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
   * \return false after printing an error message.
   */
-  bool readNextEvent();
+  virtual bool readNextEvent();
 
   /** Unpack the current event into JSON.
   *
@@ -93,6 +83,14 @@ class InputCppDAQData {
   */
   std::string getCurEvent();
 
+  /** Unpack the current event into Cpp Data.
+  *
+  * This unpacks the current event into the Cpp Data Structure.
+  * Don't call this until readNextEvent() has been called and returned true at
+  * least once!
+  *
+  * \return JSON document containing the unpacked DAQ data.
+  */
   void getCurEvent(MAUS::Data *data);
 
   /** Disable one equipment type.
@@ -103,38 +101,27 @@ class InputCppDAQData {
     _dataProcessManager.Disable(pEquipType);
   }
 
-  /** Close the file and free memory.
-  *
-  * This function frees all resources allocated by Birth().
-  * It is unlikely this will ever fail!
-  *
-  * \return True if successful.
-  */
-  bool death();
-
   /* Functions for python use only!
    * They are written in InputCppDAQData.i so that they
    * can use pure python code in the python bindings!
    */
 
-  /** Internal emitter function.
-  *
-  * When called from C++, this function does nothing.
-  * From python (where it is overriden by the bindings,
-  * it returns an iterable result which allows access to all events.
-  *
-  * \return An empty string from C++.
-  */
-  std::string emitter() {
-     return "";
-  };
-
  protected:
 
-  std::string _classname;
-
- /** Counter of the DAQ events.
+  /** Internal emitter function.
+  *
+  * \return An event string.
   */
+  std::string _emit_cpp() {
+     if (this->readNextEvent())
+        return this->getCurEvent();
+     else
+        throw(MAUS::Exception(Exception::recoverable,
+                              "Failed to read next event",
+                              "InputCppDAQData::_emit_cpp()"));
+  };
+
+  /** Counter of the DAQ events. */
   int _eventsCount;
 
   /** File manager object. */
@@ -143,21 +130,38 @@ class InputCppDAQData {
   /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
+  /** Initialise the Unpacker.
+  *
+  * This protected birth is intended to be called from children
+  *
+  * This prepares the unpacker to read the data according to the configuration.
+  */
+  void _childbirth(const std::string& pJSONConfig);
+
  private:
 
- /** Initialise the processor.
-  * 
-  * 
+  void _birth(const std::string& pJSONConfig) {
+    _childbirth(pJSONConfig);
+  }
+
+  /** Close the file and free memory.
+  *
+  * This function frees all resources allocated by Birth().
+  * It is unlikely this will ever fail!
+  */
+  void _death();
+
+  /** Initialise the processor.
+  * Template function used to initialise a processor
+  * according to the configuration.
   */
   template <class procType>
   bool initProcessor(procType* &processor, Json::Value configJSON);
 
- /** Configure the zero supression filter.
-  */
+  /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
 
- /** Process manager object.
-  */
+  /** Process manager object. */
   MDprocessManager _dataProcessManager;
 
   /** The DAQ channel map object.
@@ -179,16 +183,13 @@ class InputCppDAQData {
   /** Processor for VLSB data. */
   VLSBCppDataProcessor      *_vLSBFragmentProc_cpp;
 
- /** Processor for DBB data.
-  */
+  /** Processor for DBB data. */
   DBBCppDataProcessor  *_DBBFragmentProc_cpp;
 
- /** Processor for DBBChain data.
-  */
+  /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
- /** Enum of event types
-  */
+  /** Enum of event types */
   enum {
     VmeTdc = 102,
     VmefAdc1724 = 120,
@@ -197,8 +198,6 @@ class InputCppDAQData {
     DBB = 141,
     VLSB_C = 80
   };
-
-  bool json_out;  // !!!!!!!!!!!!!!!!
 
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.

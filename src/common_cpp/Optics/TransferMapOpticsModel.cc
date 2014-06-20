@@ -62,8 +62,7 @@ TransferMapOpticsModel::TransferMapOpticsModel(
   MAUSGeant4Manager * const simulator = MAUSGeant4Manager::GetInstance();
   MAUS::MAUSPrimaryGeneratorAction::PGParticle reference_pgparticle
     = simulator->GetReferenceParticle();
-  reference_primary_ = DataStructureHelper::GetInstance().
-    PGParticle2Primary(reference_pgparticle);
+  reference_primary_ = reference_pgparticle.GetPrimary();
 
   primary_plane_ = reference_pgparticle.z;
 
@@ -165,7 +164,7 @@ std::cerr << "DEBUG TransferMapOpticsModel::Build: "
        ++virtual_track) {
 /*DEBUG*/
 const Json::Value hits = (*virtual_track)["virtual_hits"];
-for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
+for (int hit_index = 0; hit_index < Json::Value::ArrayIndex(hits.size()); ++hit_index) {
   std::cerr << setprecision(12)
             << "(" << hits[hit_index]["position"]["x"].asDouble() << ", "
             << hits[hit_index]["position"]["y"].asDouble() << ", "
@@ -325,7 +324,7 @@ void TransferMapOpticsModel::MapStationsToHits(
 std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
           << "# virtual track hits: " << hits.size() << std::endl;
   for (size_t hit_index = 0; hit_index < hits.size(); ++hit_index) {
-    const Json::Value hit = hits[hit_index];
+    const Json::Value hit = hits[Json::Value::ArrayIndex(hit_index)];
     const PID particle_id = PID(hit["particle_id"].asInt());
     const double mass = Particle::GetInstance().GetMass(particle_id);
     const double px = hit["momentum"]["x"].asDouble();

@@ -18,6 +18,7 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/TRefArrayProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiDigitProcessor.hh"
 
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -38,7 +39,7 @@ class SciFiClusterProcessor : public ObjectProcessor<SciFiCluster> {
     BoolProcessor _bool_proc;
     DoubleProcessor _double_proc;
     ThreeVectorProcessor _three_vec_proc;
-    PointerArrayProcessor<SciFiDigit> _scifidigit_array_proc;
+    TRefArrayProcessor _digit_tref_proc;
 };
 }
 

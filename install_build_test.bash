@@ -65,6 +65,8 @@ if [ "$MAUS_THIRD_PARTY" ]; then
 	./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD 
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
+	echo "Installing field maps in MAUS_ROOT_DIR..."
+	./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
 else
 	echo "The other loop"
 	./configure 2>>$FILE_STD 1>>$FILE_STD

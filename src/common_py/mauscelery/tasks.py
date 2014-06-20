@@ -23,6 +23,8 @@ import json
 from celery.task import task
 from celery.task import Task
 
+import maus_cpp.converter
+
 from framework.workers import WorkerProcessException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
@@ -53,7 +55,7 @@ def execute_transform(spill, client_id = "Unknown"):
            spill_json["maus_event_type"] != "Spill":
             return spill
         else:
-            return MausTransform.process(spill)
+            return maus_cpp.converter.string_repr(MausTransform.process(spill))
     except Exception as exc: # pylint:disable = W0703
         # Filter exceptions so no unPicklable exception causes
         # problems.

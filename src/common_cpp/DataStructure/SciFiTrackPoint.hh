@@ -29,6 +29,10 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
+// ROOT headers
+#include "TObject.h"
+#include "TRef.h"
+
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
@@ -36,7 +40,7 @@
 
 namespace MAUS {
 
-class SciFiTrackPoint {
+class SciFiTrackPoint : public TObject {
  public:
   /** @brief  Constructor.
    */
@@ -120,10 +124,6 @@ class SciFiTrackPoint {
   void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
   void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
 
-  /** @brief Set the mother cluster
-   */
-  void set_cluster(SciFiCluster* cluster) { _cluster = cluster; }
-
   /** @brief  Returns the tracker number.
    */
   int tracker()              const { return _tracker;  }
@@ -182,9 +182,31 @@ class SciFiTrackPoint {
 
   int event()                const { return _event; }
 
-  /** @brief  Returns the mother cluster.
+  /** @brief  Returns the mother clusters as a TRef*.
    */
-  SciFiCluster* cluster()    const { return _cluster; }
+  TRef* get_cluster() const { return _cluster; }
+
+   /** @brief Set the mother cluster using a TRef*.
+   */
+  void set_cluster(TRef* const cluster) { _cluster = cluster; }
+
+
+  /** @brief  Returns the mother cluster as a TObject pointer
+   */
+  TObject* get_cluster_tobject() const { return _cluster->GetObject(); }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_tobject(TObject* const cluster) { *_cluster = cluster; }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_pointer(SciFiCluster* const cluster) { *_cluster = cluster; }
+
+  /** @brief  Returns the mother clusters as an array of pointers.
+   */
+  SciFiCluster* get_cluster_pointer() const
+                { return static_cast<SciFiCluster*>(_cluster->GetObject()); }
 
  private:
   /** @brief The tracker the trackpoint belongs to.
@@ -252,7 +274,7 @@ class SciFiTrackPoint {
 
   /** @brief A pointer to the cluster used to form the state - does not assume control of memory
    */
-  SciFiCluster* _cluster;
+  TRef* _cluster;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

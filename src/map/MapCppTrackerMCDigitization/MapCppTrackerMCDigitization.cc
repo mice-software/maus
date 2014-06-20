@@ -20,81 +20,59 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_MapCppTrackerMCDigitization(void) {
+  PyWrapMapBase<MAUS::MapCppTrackerMCDigitization>::PyWrapMapBaseModInit
+                                ("MapCppTrackerMCDigitization", "", "", "", "");
+}
 
 MapCppTrackerMCDigitization::MapCppTrackerMCDigitization()
-    : _spill_json(NULL), _spill_cpp(NULL) {
+    : MapBase<Data>("MapCppTrackerMCDigitization") {
 }
 
 MapCppTrackerMCDigitization::~MapCppTrackerMCDigitization() {
-  if (_spill_json != NULL) {
-    delete _spill_json;
-  }
-  if (_spill_cpp != NULL) {
-    delete _spill_cpp;
-  }
 }
 
-bool MapCppTrackerMCDigitization::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppTrackerMCDigitization";
-
-  try {
-    if (!Globals::HasInstance()) {
-      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
-    }
-    static MiceModule* mice_modules = Globals::GetMonteCarloMiceModules();
-    modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
-    Json::Value *json = Globals::GetConfigurationCards();
-    // Load constants.
-    _SciFiNPECut        = (*json)["SciFiNoiseNPECut"].asDouble();
-    _SciFivlpcEnergyRes = (*json)["SciFivlpcEnergyRes"].asDouble();
-    _SciFiadcFactor     = (*json)["SciFiadcFactor"].asDouble();
-    _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
-    _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
-    _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
-    _SciFiFiberConvFactor  = (*json)["SciFiFiberConvFactor"].asDouble();
-    _SciFiFiberTrappingEff = (*json)["SciFiFiberTrappingEff"].asDouble();
-    _SciFiFiberMirrorEff   = (*json)["SciFiFiberMirrorEff"].asDouble();
-    _SciFivlpcQE           = (*json)["SciFivlpcQE"].asDouble();
-    _SciFiFiberTransmissionEff = (*json)["SciFiFiberTransmissionEff"].asDouble();
-    _SciFiMUXTransmissionEff   = (*json)["SciFiMUXTransmissionEff"].asDouble();
-    _eV_to_phe = _SciFiFiberConvFactor *
-                 _SciFiFiberTrappingEff *
-                 ( 1.0 + _SciFiFiberMirrorEff ) *
-                 _SciFiFiberTransmissionEff *
-                 _SciFiMUXTransmissionEff *
-                 _SciFivlpcQE;
-    // ______________________________________________
-    return true;
-  } catch (Exception& exception) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exception, _classname);
-  } catch (std::exception& exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocument) {
+  if (!Globals::HasInstance()) {
+    GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
-  return false;
+  static MiceModule* mice_modules = Globals::GetMonteCarloMiceModules();
+  modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  Json::Value *json = Globals::GetConfigurationCards();
+  // Load constants.
+  _SciFiNPECut        = (*json)["SciFiNoiseNPECut"].asDouble();
+  _SciFivlpcEnergyRes = (*json)["SciFivlpcEnergyRes"].asDouble();
+  _SciFiadcFactor     = (*json)["SciFiadcFactor"].asDouble();
+  _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
+  _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
+  _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
+  _SciFiFiberConvFactor  = (*json)["SciFiFiberConvFactor"].asDouble();
+  _SciFiFiberTrappingEff = (*json)["SciFiFiberTrappingEff"].asDouble();
+  _SciFiFiberMirrorEff   = (*json)["SciFiFiberMirrorEff"].asDouble();
+  _SciFivlpcQE           = (*json)["SciFivlpcQE"].asDouble();
+  _SciFiFiberTransmissionEff = (*json)["SciFiFiberTransmissionEff"].asDouble();
+  _SciFiMUXTransmissionEff   = (*json)["SciFiMUXTransmissionEff"].asDouble();
+  _eV_to_phe = _SciFiFiberConvFactor *
+               _SciFiFiberTrappingEff *
+               ( 1.0 + _SciFiFiberMirrorEff ) *
+               _SciFiFiberTransmissionEff *
+               _SciFiMUXTransmissionEff *
+               _SciFivlpcQE;
 }
 
-bool MapCppTrackerMCDigitization::death() {
-  return true;
+void MapCppTrackerMCDigitization::_death() {
 }
 
-std::string MapCppTrackerMCDigitization::process(std::string document) {
-  Json::FastWriter writer;
+void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
+  Spill& spill = *(data->GetSpill());
 
-  // Set up a spill object, then continue only if MC event array is initialised
-  read_in_json(document);
-  Spill& spill = *_spill_cpp;
-
-  if ( spill.GetMCEvents() ) {
-  } else {
-    std::cerr << "MC event array not initialised, aborting digitisation for this spill\n";
-    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC event array not initialised, aborting digitisation";
-    errors["missing_branch"] = ss.str();
-    save_to_json(spill);
-    return writer.write(*_spill_json);
+  if (!spill.GetMCEvents()) {
+    throw MAUS::Exception(Exception::recoverable,
+            "MC event array not initialised.",
+            "MapCppTrackerMCDigitization::process");
   }
 
   // ================= Reconstruction =========================
@@ -134,36 +112,10 @@ std::string MapCppTrackerMCDigitization::process(std::string document) {
       spill.GetReconEvents()->push_back(revt);
     }
   }
-  // ==========================================================
-  save_to_json(spill);
-  return writer.write(*_spill_json);
-}
-
-void MapCppTrackerMCDigitization::read_in_json(std::string json_data) {
-  Json::FastWriter writer;
-  Json::Value json_root;
-  if (_spill_cpp != NULL) {
-    delete _spill_cpp;
-    _spill_cpp = NULL;
-  }
-
-  try {
-    json_root = JsonWrapper::StringToJson(json_data);
-    SpillProcessor spill_proc;
-    _spill_cpp = spill_proc.JsonToCpp(json_root);
-  } catch (...) {
-    Squeak::mout(Squeak::error) << "Bad json document" << std::endl;
-    _spill_cpp = new Spill();
-    MAUS::ErrorsMap errors = _spill_cpp->GetErrors();
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    _spill_cpp->GetErrors();
-  }
 }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
-                                                   int event_num, SciFiDigitPArray &digits) {
+                                                   int event_num, SciFiDigitPArray &digits) const {
   SciFiLookup lookup;
   for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
     if ( !hits->at(hit_i).GetChannelId()->GetUsed() ) {
@@ -218,7 +170,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
 }
 
 void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
-                                            SciFiDigitPArray &digits) {
+                                            SciFiDigitPArray &digits) const {
 
     /**************************************************************************
     *  Function checks which channel has noise against which channel has a
@@ -260,7 +212,7 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
   }
 }
 
-int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
+int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) const {
   double tmpcounts;
 
   tmpcounts = CLHEP::RandGauss::shoot(time1, _SciFivlpcTimeRes)*_SciFitdcFactor;
@@ -274,7 +226,7 @@ int MapCppTrackerMCDigitization::compute_tdc_counts(double time1) {
   return tdcCounts;
 }
 
-int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
+int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) const {
   // This is the channel number computed from the fibre number.
   int fiberNumber = ahit->GetChannelId()->GetFibreNumber();
   int chanNo      = static_cast<int> (floor(fiberNumber/7.0));
@@ -282,7 +234,7 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) {
   return chanNo;
 }
 
-int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
+int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) const {
   double tmpcounts;
   if ( numb_pe == 0 ) return 0;
 
@@ -300,7 +252,7 @@ int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) {
   return adcCounts;
 }
 
-bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) {
+bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) const {
   if ( hit2->GetChannelId()->GetUsed() ) {
     return false;
   } else {
@@ -323,14 +275,5 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
     }
   }
 }
-
-void MapCppTrackerMCDigitization::save_to_json(Spill &spill) {
-    SpillProcessor spill_proc;
-    if (_spill_json != NULL) {
-        delete _spill_json;
-        _spill_json = NULL;
-    }
-    _spill_json = spill_proc.CppToJson(spill, "");
-}
-
 } // ~namespace MAUS
+

@@ -26,6 +26,9 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TRefArray.h"
+
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -58,12 +61,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Assignment operator - any pointers are deep copied */
     SciFiHelicalPRTrack& operator=(const SciFiHelicalPRTrack &_htrk);
-
-    /** Get the vector holding pointers to the spacepoints used by the track */
-    SciFiSpacePointPArray get_spacepoints() const { return _spoints; }
-
-    /** Set the vector holding pointers to the spacepoints used by the track */
-    void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
 
     /** Get the vector the turning angles of the spacepoints used by the track  */
     DoubleArray get_phi() const { return _phi; }
@@ -185,7 +182,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present
 
     DoubleArray _phi;
-    SciFiSpacePointPArray  _spoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

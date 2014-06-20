@@ -21,11 +21,15 @@
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "Utils/Exception.hh"
+#include "src/common_cpp/API/PyWrapInputBase.hh"
 
 namespace MAUS {
+PyMODINIT_FUNC init_InputCppDAQData(void) {
+    PyWrapInputBase<MAUS::InputCppDAQData>::PyWrapInputBaseModInit(
+                  "InputCppDAQData", "", "", "", "");
+}
 
-InputCppDAQData::InputCppDAQData() {
-  _classname = "InputCppDAQData";
+InputCppDAQData::InputCppDAQData() : InputBase<std::string>("InputCppDAQData") {
   _eventPtr = NULL;
   _eventsCount = 0;
 
@@ -39,9 +43,9 @@ InputCppDAQData::InputCppDAQData() {
 }
 
 
-bool InputCppDAQData::birth(std::string jsonDataCards) {
+void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open
+     throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   //  JsonCpp setup
@@ -51,7 +55,7 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    return false;
+    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   // Comfigure the V830 (scaler) data processor.
@@ -86,23 +90,18 @@ bool InputCppDAQData::birth(std::string jsonDataCards) {
     Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
     << std::endl;
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
+    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   // Initialize the map by using text file.
   bool loaded = _map.InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
   if (!loaded) {
-    return false;
+    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   // Set the map (a static data member) of all the processors.
   MDarranger::set_DAQ_map(&_map);
-
-//   _dataProcessManager.DumpProcessors();
-
-  return true;
 }
-
 
 bool InputCppDAQData::readNextEvent() {
 
@@ -115,46 +114,46 @@ bool InputCppDAQData::readNextEvent() {
 }
 
 void InputCppDAQData::getCurEvent(MAUS::Data *data) {
-
   MAUS::Spill* spill = data->GetSpill();
   try {
-    // Now do the loop over the binary DAQ data.
+    // Do the loop over the binary DAQ data.
     _dataProcessManager.Process(_eventPtr);
-//     data->SetEventType("Spill");
+    // The data is now processed and is ready to be filled.
     unsigned int event_type = _dataProcessManager.GetEventType();
-
-    // The data is processed and is ready to be filled in daq_data.
     spill->SetDaqEventType(event_type_to_str(event_type));
     spill->SetRunNumber(_dataProcessManager.GetRunNumber());
     spill->SetSpillNumber(_dataProcessManager.GetSpillNumber());
 
     if (event_type == PHYSICS_EVENT) {
+      // Create a new DAQData object.
       MAUS::DAQData *daq_data = new MAUS::DAQData;
-      // Set the map (a static data member) of all the processors.
+      // Set the DAQData object (a static data member) of all the processors.
       MDarranger::set_daq_data(daq_data);
 
-    if (_DBBFragmentProc_cpp)
-      _DBBFragmentProc_cpp->fill_daq_data();
+      // Now fill the DAQData object with the data processed by all the processors.
+      if (_DBBFragmentProc_cpp)
+        _DBBFragmentProc_cpp->fill_daq_data();
 
-    if (_DBBChainFragmentProc_cpp)
-      _DBBChainFragmentProc_cpp->fill_daq_data();
+      if (_DBBChainFragmentProc_cpp)
+        _DBBChainFragmentProc_cpp->fill_daq_data();
 
-    if (_v1731PartEventProc_cpp)
-      _v1731PartEventProc_cpp->fill_daq_data();
+      if (_v1731PartEventProc_cpp)
+        _v1731PartEventProc_cpp->fill_daq_data();
 
-    if (_v1724PartEventProc_cpp)
-      _v1724PartEventProc_cpp->fill_daq_data();
+      if (_v1724PartEventProc_cpp)
+        _v1724PartEventProc_cpp->fill_daq_data();
 
-    if (_v1290PartEventProc_cpp)
-      _v1290PartEventProc_cpp->fill_daq_data();
+      if (_v1290PartEventProc_cpp)
+        _v1290PartEventProc_cpp->fill_daq_data();
 
-    if (_v830FragmentProc_cpp)
-      _v830FragmentProc_cpp->fill_daq_data();
+      if (_v830FragmentProc_cpp)
+        _v830FragmentProc_cpp->fill_daq_data();
 
-    if (_vLSBFragmentProc_cpp)
-      _vLSBFragmentProc_cpp->fill_daq_data();
+      if (_vLSBFragmentProc_cpp)
+        _vLSBFragmentProc_cpp->fill_daq_data();
 
-    spill->SetDAQData(daq_data);
+      // Set the DAQData object of the spill.
+      spill->SetDAQData(daq_data);
     }
   }
   // Deal with exceptions
@@ -210,7 +209,6 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
   }
-
   this->resetAllProcessors();
 }
 
@@ -223,14 +221,18 @@ std::string InputCppDAQData::getCurEvent() {
 
   Json::Value* spill_json_out = MAUS::CppJsonSpillConverter().convert(data_cpp);
 //   std::cerr << *spill_json_out << std::endl;
-  delete data_cpp;
   _eventsCount++;
 
   Json::FastWriter xJSONWr;
-  return xJSONWr.write(*spill_json_out);
+  std::string output = xJSONWr.write(*spill_json_out);
+
+  delete spill_json_out;
+  delete data_cpp;
+
+  return output;
 }
 
-bool InputCppDAQData::death() {
+void InputCppDAQData::_death() {
   // Free the memory.
   if (_v1290PartEventProc_cpp)    delete _v1290PartEventProc_cpp;
   if (_v1724PartEventProc_cpp)    delete _v1724PartEventProc_cpp;
@@ -239,8 +241,6 @@ bool InputCppDAQData::death() {
   if (_vLSBFragmentProc_cpp)     delete _vLSBFragmentProc_cpp;
   if (_DBBFragmentProc_cpp)       delete _DBBFragmentProc_cpp;
   if (_DBBChainFragmentProc_cpp)  delete _DBBChainFragmentProc_cpp;
-
-  return true;
 }
 
 void InputCppDAQData::resetAllProcessors() {

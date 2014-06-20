@@ -59,7 +59,8 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _clusters.resize(rhs._clusters.size());
   for (size_t i = 0; i < rhs._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    _clusters[i] = rhs._clusters[i];
   }
 
   _kalman_sites.resize(rhs._kalman_sites.size());
@@ -79,8 +80,10 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _clusters.resize(seed._clusters.size());
   for (size_t i = 0; i < seed._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+     _clusters[i] = seed._clusters[i];
   }
+
 
   _kalman_sites.resize(seed._kalman_sites.size());
   for (size_t i = 0; i < seed._kalman_sites.size(); ++i) {
@@ -91,18 +94,18 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    SciFiCluster& cluster = (*_clusters[j]);
+    // SciFiCluster& cluster = (*_clusters[j]);
 
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
-    int id = cluster.get_id();
-    a_site->set_spill(cluster.get_spill());
-    a_site->set_event(cluster.get_event());
+    int id = _clusters[j]->get_id();
+    a_site->set_spill(_clusters[j]->get_spill());
+    a_site->set_event(_clusters[j]->get_event());
     a_site->set_id(id);
-    a_site->set_measurement(cluster.get_alpha());
-    a_site->set_direction(cluster.get_direction());
-    a_site->set_z(cluster.get_position().z());
+    a_site->set_measurement(_clusters[j]->get_alpha());
+    a_site->set_direction(_clusters[j]->get_direction());
+    a_site->set_z(_clusters[j]->get_position().z());
     a_site->set_cluster(_clusters[j]);
 
     std::map<int, SciFiPlaneGeometry>::iterator iterator;
@@ -203,9 +206,9 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {
     SciFiSpacePoint *spacepoint = spacepoints[i];
-    size_t numb_clusters = spacepoint->get_channels().size();
+    size_t numb_clusters = spacepoint->get_channels()->GetLast() + 1;
     for ( size_t j = 0; j < numb_clusters; ++j ) {
-      SciFiCluster *cluster = spacepoint->get_channels()[j];
+      SciFiCluster *cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
       _clusters.push_back(cluster);
     }
   }

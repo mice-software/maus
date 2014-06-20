@@ -1,4 +1,13 @@
 *	JAN08-Stage0.in  January 29, 2008; TJR
+#       Upstream beam line April 9th, 2014; JN
+#       
+#       The follwing resources were used to describe the geometry in this
+#       deck:
+#            MICE Note 216
+#            MICE Beam line paper 2012
+#
+#       If you have any comments regarding this deck please contact:
+#       j.nugent.1@research.gla.ac.uk
 #
 #	This file is intended to be included from the specific input file;
 #	this file does not define parameters that vary with beam momentum
@@ -72,37 +81,37 @@ meanMomentum=$piMomentumRef
 ###	firstEvent=$first lastEvent=$last \
 ###        beamZ=0	
 
-place TargetBox z=0
-place vacuumWindow z=239.4
+place TargetBox z=0 y=-427 rotation=X-2.98
+place vacuumWindow z=239.4 y=-427 rotation=X-2.98
 
-place TargetShield z=250
+place TargetShield z=250 y=-427 rotation=X-2.98
 
 #place TargetDet2 z=1000 parent=vacuum1
-place vacuum1 z=1391.5
-place pipe1 z=1391.5
+place vacuum1 z=1391.5 y=-354.56 rotation=X-2.98
+place pipe1 z=1391.5 y=-354.56 rotation=X-2.98
 
 #place Q1Det z=2542.25   rename=Q1USDet
 
-place QuadTypeIV rename=Q1 gradient=$q_1 z=3000
+place QuadTypeIV rename=Q1 gradient=$q_1 z=3000 y=-267.57 rotation=X-2.98
 
 #place DummyDet  z=3200.   rename=Dum3
 #place Q1Det z=3457.5   rename=Q1DSDet
 
-place vacuum2 z=3700
-place pipe2 z=3700
+place vacuum2 z=3700 y=-234.37 rotation=X-2.98
+place pipe2 z=3700 y=-234.37 rotation=X-2.98
 
-place QuadTypeIV rename=Q2 gradient=$q_2 z=4400 ironColor=0,0,.6
+place QuadTypeIV rename=Q2 gradient=$q_2 z=4400 ironColor=0,0,.6 y=-193.165 rotation=X-2.98
 
-place vacuum2 z=5100
-place pipe2 z=5100
+place vacuum2 z=5100 y=-161.51 rotation=X-2.98
+place pipe2 z=5100 y=-161.51 rotation=X-2.98
 
-place QuadTypeIV rename=Q3 gradient=$q_3 z=5800
+place QuadTypeIV rename=Q3 gradient=$q_3 z=5800 y=-118.765 rotation=X-2.98
 
-place vacuum3 z=7078.5
+place vacuum3 z=7078.5 y=-58.51 rotation=X-2.98
 
-place BendTypeI6inIron rename=B1 z=7979.1 x=200 rotation=Y30 By=0 \
+place BendTypeI6inIron rename=B1 z=7979.1 x=200 rotation=Y30,X-2.98 By=0 y=-12.23\
 	fieldMaterial=$USAirOrVacuum
-place TypeI6inTaperedField z=7979.1 x=200 rotation=Y30 \
+place TypeI6inTaperedField z=7979.1 x=200 rotation=Y30,X-2.98 y=-12.23 \
 	current=$d_1
 cornerarc z=7495.28 angle=60 centerRadius=1038 radiusCut=1000
 

@@ -16,9 +16,9 @@
 """Tests for MapCppEMRPlaneHits"""
 
 import os
-import json
 import unittest
 from Configuration import Configuration
+import maus_cpp.converter
 import MAUS
 
 class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
@@ -31,18 +31,14 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
 
     def test_empty(self):
         """Check can handle empty configuration"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
+        self.assertRaises(ValueError, self.mapper.birth, "")
         result = self.mapper.process("")
-        doc = json.loads(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"] or 
-                        "no_channel_map" in doc["errors"])
+        doc = maus_cpp.converter.json_repr(result)
+        self.assertTrue("MapCppEMRPlaneHits" in doc["errors"])
 
     def test_init(self):
         """Check birth with default configuration"""
-        success = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.mapper.birth(self. c.getConfigJSON())
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
@@ -52,12 +48,11 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         data = fin.read()
         # test with no data.
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         n_ev = len(spill_out['recon_events'])
         #print spill_out["errors"]
         self.assertEqual(0, n_ev)
-        self.assertFalse("bad_json_document" in spill_out["errors"])
-        self.assertFalse("bad_cpp_data" in spill_out["errors"])
+        self.assertFalse("MapCppEMRPlaneHits" in spill_out["errors"])
 
     def test_process(self):
         """Test MapCppEMRPlaneHits process method"""
@@ -68,10 +63,9 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         # test with some crazy events.
         result = self.mapper.process(data)
         #spill_in = json.loads(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         #print spill_out["errors"]
-        self.assertFalse("bad_json_document" in spill_out["errors"])
-        self.assertFalse("bad_cpp_data" in spill_out["errors"])
+        self.assertFalse("MapCppEMRPlaneHits" in spill_out["errors"])
         n_ev = len(spill_out['recon_events'])
         self.assertEqual(3, n_ev)
         n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\

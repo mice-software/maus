@@ -276,12 +276,13 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             if self.particles_per_spill == 0:
                 spill = {}
                 spill = json.loads(json_spill_doc)
+                print spill
                 spill['mc_events'] = []
                 for i in range(self.queue.qsize()):
                     primary = (self.queue.get_nowait())
                     spill['mc_events'].append({"primary":primary})
-                with open('G4BLoutput.txt', 'w') as outfile:
-                    json.dump(self.particles, outfile)
+                with open('G4BLoutput.json', 'w') as outfile:
+                    json.dump(spill, outfile)
                     #self.queue = 0  
                 return json.dumps(spill)
             else:
@@ -317,11 +318,17 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
                     for i in range(self.particles_per_spill):
                         primary = (self.queue.get_nowait())
                         spill['mc_events'].append({"primary":primary})
+                    with open('G4BLoutputsimulation'+str(i)+'.json', 'w') \
+                                                              as outfile:
+                        json.dump(spill, outfile)
                     return json.dumps(spill)
                 else:
                     for i in range(self.particles_per_spill):
                         primary = (self.queue.get_nowait())
                         spill['mc_events'].append({"primary":primary})
+                    with open('G4BLoutputsimulation'+str(i)+'.json', 'w') \
+                                                              as outfile:
+                        json.dump(spill, outfile)
                     return json.dumps(spill)
         else:
             print("Warning: G4BL simulated zero output particles!")

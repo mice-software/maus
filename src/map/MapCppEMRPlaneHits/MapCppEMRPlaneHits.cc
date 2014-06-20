@@ -15,137 +15,87 @@
  *
  */
 
-#include "Utils/CppErrorHandler.hh"
-#include "Utils/JsonWrapper.hh"
-#include "Utils/DAQChannelMap.hh"
-#include "Interface/dataCards.hh"
+#include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
+#include "src/common_cpp/Utils/DAQChannelMap.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
+
 
 #include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
 namespace MAUS {
 
-bool MapCppEMRPlaneHits::birth(std::string argJsonConfigDocument) {
+PyMODINIT_FUNC init_MapCppEMRPlaneHits(void) {
+  PyWrapMapBase<MAUS::MapCppEMRPlaneHits>::PyWrapMapBaseModInit
+                                                ("MapCppEMRPlaneHits", "", "", "", "");
+}
+
+MapCppEMRPlaneHits::MapCppEMRPlaneHits()
+    : MapBase<MAUS::Data>("MapCppEMRPlaneHits") {
+}
+
+
+void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   _classname = "MapCppEMRPlaneHits";
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error)
-    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                      "Could not resolve ${MAUS_ROOT_DIR} environment variable",
+                      "MapCppEMRHits::birth");
   }
 
-  try {
-    //  JsonCpp setup
-    Json::Value configJSON;
-    Json::Value map_file_name;
-    Json::Value xEnable_V1731_Unpacking;
-    Json::Value xEnable_DBB_Unpacking;
+  //  JsonCpp setup
+  Json::Value configJSON;
+  Json::Value map_file_name;
+  Json::Value xEnable_V1731_Unpacking;
+  Json::Value xEnable_DBB_Unpacking;
 
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
-    map_file_name = JsonWrapper::GetProperty(configJSON,
-                                             "EMR_cabling_file",
-                                             JsonWrapper::stringValue);
+  map_file_name = JsonWrapper::GetProperty(configJSON,
+                                           "EMR_cabling_file",
+                                           JsonWrapper::stringValue);
 
-    std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-    bool loaded = _emrMap.InitFromFile(xMapFile);
-    if (!loaded)
-      return false;
+  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
+  bool loaded = _emrMap.InitFromFile(xMapFile);
+  if (!loaded)
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to load EMR Map File",
+                          "MapCppEMRHits::birth");
 
-    // !!!!!!!!!!!!!!!!!!!!!!
-    _trigger_window_lower = -400;
-    _trigger_window_upper = 1000;
-    // !!!!!!!!!!!!!!!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!
+  _trigger_window_lower = -400;
+  _trigger_window_upper = 1000;
+  // !!!!!!!!!!!!!!!!!!!!!!
 
-    xEnable_V1731_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1731_Unpacking",
-                                                       JsonWrapper::booleanValue);
-    if (!xEnable_V1731_Unpacking.asBool()) {
-      Squeak::mout(Squeak::warning)
-      << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
-      << " Are you shure you want this?"
-      << std::endl;
-    }
-
-    xEnable_DBB_Unpacking   = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_DBB_Unpacking",
-                                                       JsonWrapper::booleanValue);
-    if (!xEnable_DBB_Unpacking.asBool()) {
-      Squeak::mout(Squeak::warning)
-      << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
-      << " Are you shure you want this?"
-      << std::endl;
-    }
-
-    return true;
-  } catch (Exception exc) {
-    CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
-  } catch (std::exception exc) {
-    CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  xEnable_V1731_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_V1731_Unpacking",
+                                                     JsonWrapper::booleanValue);
+  if (!xEnable_V1731_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
   }
 
-  return false;
+  xEnable_DBB_Unpacking   = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_DBB_Unpacking",
+                                                     JsonWrapper::booleanValue);
+  if (!xEnable_DBB_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
+  }
 }
 
-bool MapCppEMRPlaneHits::death() {
-  return true;
+void MapCppEMRPlaneHits::_death() {
 }
 
-string MapCppEMRPlaneHits::process(string document) {
-
-  Json::Value spill_json;
-  try {
-    spill_json = JsonWrapper::StringToJson(document);
-  } catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-//     ss << squee.what() << std::endl;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    spill_json["errors"] = errors;
-    return JsonWrapper::JsonToString(spill_json);
-  }
-
-  Data* spill_cpp;
-  try {
-    spill_cpp = JsonCppSpillConverter().convert(&spill_json);
-  } catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-//     ss << squee.what() << std::endl;
-    ss << _classname << " says: Failed to convert the input document into Data";
-    errors["bad_json_document"] = ss.str();
-    spill_json["errors"] = errors;
-    return JsonWrapper::JsonToString(spill_json);
-  }
-
-  process(spill_cpp);
-
-  Json::Value* spill_json_out;
-  try {
-    spill_json_out = CppJsonSpillConverter().convert(spill_cpp);
-  } catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-//     ss << squee.what() << std::endl;
-    ss << _classname << " says: Failed to convert the output Data into Json";
-    errors["bad_cpp_data"] = ss.str();
-    spill_json["errors"] = errors;
-    return JsonWrapper::JsonToString(spill_json);
-  }
-
-//   std::cerr << (*spill_json_out)["recon_events"] << std::endl;
-  document = JsonWrapper::JsonToString(*spill_json_out);
-
-  delete spill_cpp;
-  delete spill_json_out;
-  return document;
-}
-
-void MapCppEMRPlaneHits::process(Data *data) {
+void MapCppEMRPlaneHits::_process(Data *data) const {
 
   Spill *spill    = data->GetSpill();
   if (spill->GetDAQData() == NULL)
@@ -153,16 +103,20 @@ void MapCppEMRPlaneHits::process(Data *data) {
   EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
   int nPartEvents = emr_data.GetV1731NumPartEvents();
 //   cout << "nPartEvts: " << nPartEvents << endl;
-  reset_data_tmp(nPartEvents);
+  EMREventVector_2 emr_events_tmp2 = get_data_tmp2(nPartEvents);
+  EMREventVector_4 emr_events_tmp4 = get_data_tmp4(nPartEvents);
 
-  processFADC(emr_data, nPartEvents);
-  processDBB(emr_data, nPartEvents);
+  processFADC(emr_data, nPartEvents, emr_events_tmp2);
+  processDBB(emr_data, nPartEvents, emr_events_tmp2, emr_events_tmp4);
 
 //   arrange(emr_data);
-  fill(spill, nPartEvents);
+  fill(spill, nPartEvents, emr_events_tmp2, emr_events_tmp4);
 }
 
-void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq,
+                                    int nPartTrigger,
+                                    EMREventVector_2& emr_events_tmp2,
+                                    EMREventVector_4& emr_events_tmp4) const {
 //   cout << "DBBArraySize: " << EMRdaq.GetDBBArraySize() << endl;
   int nDBBs = EMRdaq.GetDBBArraySize();
   for (int idbb = 0; idbb < nDBBs; idbb++) {
@@ -203,8 +157,8 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
 //           int xCh   = this_trigger.GetChannel();
 
           if (ihit == 0) { // Set the plane information only when processing the very first hit.
-            _emr_events_tmp2[ipe][xPlane]._time  = tr_lt;
-            _emr_events_tmp2[ipe][xPlane]._spill = xSpill;
+            emr_events_tmp2[ipe][xPlane]._time  = tr_lt;
+            emr_events_tmp2[ipe][xPlane]._spill = xSpill;
           }
 
           int delta_t = lt - tr_lt;
@@ -216,7 +170,7 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
 //                  << "  tot: " << tt-lt
 //                  << "  delta: " << delta_t - _trigger_window_lower
 //                  << "(" << delta_t << ")" << endl;
-            _emr_events_tmp4[ipe][xPlane][xBar].push_back(bHit);
+            emr_events_tmp4[ipe][xPlane][xBar].push_back(bHit);
           }
         }
       }/* else {cout << "WARNING!!! unknow EMR DBB channel " << daq_key << endl;}*/
@@ -224,7 +178,9 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
   }
 }
 
-void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
+void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq,
+                                     int nPartTrigger,
+                                     EMREventVector_2& emr_events_tmp2) const {
 //   cout << "GetV1731NumPartEvents: " << EMRdaq.GetV1731NumPartEvents() << endl;
 
   for (int ipe = 0; ipe < nPartTrigger; ipe++) {
@@ -249,15 +205,18 @@ void MapCppEMRPlaneHits::processFADC(EMRDaq EMRdaq, int nPartTrigger) {
         int xOri   = emr_key->orientation();
 //         cout << ipe << "  " << *emr_key << " --> pos: "
 //              << xPos << "  area: " << xArea << endl << endl;
-        _emr_events_tmp2[ipe][xPlane]._orientation = xOri;
-        _emr_events_tmp2[ipe][xPlane]._charge      = xArea;
-        _emr_events_tmp2[ipe][xPlane]._deltat      = xPos;
+        emr_events_tmp2[ipe][xPlane]._orientation = xOri;
+        emr_events_tmp2[ipe][xPlane]._charge      = xArea;
+        emr_events_tmp2[ipe][xPlane]._deltat      = xPos;
       }/* else {cout << "WARNING!!! unknow EMR fADC channel " << daq_key << endl;}*/
     }
   }
 }
 
-void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
+void MapCppEMRPlaneHits::fill(Spill *spill,
+                              int nPartTrigger,
+                              EMREventVector_2& emr_events_tmp2,
+                              EMREventVector_4& emr_events_tmp4) const {
   ReconEventPArray *recEvts =  spill->GetReconEvents();
   if (recEvts->size() == 0) {
     for (int ipe = 0; ipe < nPartTrigger; ipe++)
@@ -273,7 +232,7 @@ void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
       plHit->SetPlane(ipl);
       plHit->SetTrigger(ipe);
 
-      EMRPlaneData xPlData = _emr_events_tmp2[ipe][ipl];
+      EMRPlaneData xPlData = emr_events_tmp2[ipe][ipl];
       int xOri     = xPlData._orientation;
       int xCharge  = xPlData._charge;
       int xTime    = xPlData._time;
@@ -289,11 +248,11 @@ void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
       EMRBarArray barArray;
 
       for (int ibar = 0; ibar < NUM_DBB_CHANNELS; ibar++) {
-        int nHits = _emr_events_tmp4[ipe][ipl][ibar].size();
+        int nHits = emr_events_tmp4[ipe][ipl][ibar].size();
         if ( nHits ) {
           EMRBar *bar = new EMRBar;
           bar->SetBar(ibar);
-          bar->SetEMRBarHitArray(_emr_events_tmp4[ipe][ipl][ibar]);
+          bar->SetEMRBarHitArray(emr_events_tmp4[ipe][ipl][ibar]);
           barArray.push_back(bar);
 //           cout << "Ev: " << ipe << "  Pl: " << ipl
 //                << "   Bar: " << ibar << "  Hits: " <<  nHits << endl;
@@ -316,20 +275,24 @@ void MapCppEMRPlaneHits::fill(Spill *spill, int nPartTrigger) {
   spill->SetReconEvents(recEvts);
 }
 
-void MapCppEMRPlaneHits::reset_data_tmp(int nPartEvts) {
-  _emr_events_tmp4.resize(0);
-  _emr_events_tmp4.resize(nPartEvts);
+EMREventVector_4 MapCppEMRPlaneHits::get_data_tmp4(int nPartEvts) const {
+  EMREventVector_4 emr_events_tmp4;
+  emr_events_tmp4.resize(nPartEvts);
   for (int ipe = 0; ipe < nPartEvts ;ipe++) {
-    _emr_events_tmp4[ipe].resize(NUM_DBB_PLANES);  // number of planes
+    emr_events_tmp4[ipe].resize(NUM_DBB_PLANES);  // number of planes
     for (int iplane = 0; iplane < NUM_DBB_PLANES; iplane++) {
-      _emr_events_tmp4[ipe][iplane].resize(NUM_DBB_CHANNELS); // number of bars in a plane
+      emr_events_tmp4[ipe][iplane].resize(NUM_DBB_CHANNELS); // number of bars in a plane
     }
   }
+  return emr_events_tmp4;
+}
 
-  _emr_events_tmp2.resize(0);
-  _emr_events_tmp2.resize(nPartEvts);
+EMREventVector_2 MapCppEMRPlaneHits::get_data_tmp2(int nPartEvts) const {
+  EMREventVector_2 emr_events_tmp2;
+  emr_events_tmp2.resize(nPartEvts);
   for (int ipe = 0; ipe < nPartEvts ;ipe++) {
-    _emr_events_tmp2[ipe].resize(NUM_DBB_PLANES);
+    emr_events_tmp2[ipe].resize(NUM_DBB_PLANES);
   }
+  return emr_events_tmp2;
 }
 }

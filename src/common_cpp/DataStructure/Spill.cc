@@ -63,6 +63,8 @@ Spill& Spill::operator=(const Spill& md) {
         _mc = NULL;
     } else {
         _mc = new MCEventPArray(*md._mc);
+        for (size_t i = 0; i < _mc->size(); ++i)
+            _mc->at(i) = new MCEvent(*_mc->at(i));
     }
 
     if (_recon != NULL) {
@@ -75,6 +77,8 @@ Spill& Spill::operator=(const Spill& md) {
         _recon = NULL;
     } else {
         _recon = new ReconEventPArray(*md._recon);
+        for (size_t i = 0; i < _recon->size(); ++i)
+            _recon->at(i) = new ReconEvent(*_recon->at(i));
     }
 
     _daq_event_type = md._daq_event_type;
@@ -115,6 +119,8 @@ Spill::~Spill() {
 }
 
 void Spill::SetScalars(Scalars *scalars) {
+  if (_scalars != NULL)
+      delete _scalars;
   _scalars = scalars;
 }
 
@@ -123,6 +129,11 @@ Scalars* Spill::GetScalars() const {
 }
 
 void Spill::SetMCEvents(MCEventPArray* mc) {
+  if (_mc != NULL && mc != _mc) {
+      for (size_t i = 0; i < _mc->size(); ++i)
+          delete (*_mc)[i];
+      delete _mc;
+  }
   _mc = mc;
 }
 
@@ -131,6 +142,11 @@ MCEventPArray* Spill::GetMCEvents() const {
 }
 
 void Spill::SetReconEvents(ReconEventPArray* recon) {
+  if (_recon != NULL && recon != _recon) {
+      for (size_t i = 0; i < _recon->size(); ++i)
+          delete (*_recon)[i];
+      delete _recon;
+  }
   _recon = recon;
 }
 
@@ -139,6 +155,9 @@ ReconEventPArray* Spill::GetReconEvents() const {
 }
 
 void Spill::SetDAQData(DAQData *daq) {
+  if (_daq != NULL && daq != _daq) {
+      delete _daq;
+  }
   _daq = daq;
 }
 
@@ -183,7 +202,7 @@ TestBranch* Spill::GetTestBranch() const {
 }
 
 void Spill::SetTestBranch(TestBranch* test) {
-  if (_test != NULL)
+  if (_test != NULL && test != _test)
     delete _test;
   _test = test;
 }

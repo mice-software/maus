@@ -37,7 +37,7 @@ class SciFiTrackPointProcessor : public ObjectProcessor<SciFiTrackPoint> {
     DoubleProcessor _double_proc;
     ThreeVectorProcessor _threevector_proc;
     ValueArrayProcessor<double> _matrix_proc;
-    SciFiClusterProcessor _cluster_proc;
+    // SciFiClusterProcessor _cluster_tref_proc;
 };
 } // ~namespace MAUS
 

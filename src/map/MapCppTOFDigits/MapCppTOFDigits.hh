@@ -39,32 +39,34 @@
 // G4MICE from commonCpp
 #include "Config/MiceModule.hh"  //  from old file?
 #include "Utils/TOFChannelMap.hh"
+#include "API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTOFDigits {
+class MapCppTOFDigits : public MapBase<Json::Value> {
 
  public:
+  MapCppTOFDigits();
+
+ private:
  /** @brief Sets up the worker
   *  @param argJsonConfigDocument a JSON document with
   *         the configuration.
   */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
  /** @brief Shutdowns the worker
   *  This takes no arguments and does nothing
   */
-  bool death();
+  void _death();
 
  /** @brief process JSON document
   *  @param document Receive a document with raw data and return
   *  a document with digits
   */
-  std::string process(std::string document);
+  void _process(Json::Value* value) const;
 
  private:
-  std::string _classname;
-
   TOFChannelMap _map;
 
   // Vector to hold the names of all detectors to be included
@@ -81,26 +83,29 @@ class MapCppTOFDigits {
    *  @param xDocPmtInfo A refernence to the Information to be included in a digit
    */
   Json::Value makeDigits(Json::Value xDocDetectorData,
-                         Json::Value xDocTrigReq, Json::Value xDocTrig);
+                         Json::Value xDocTrigReq,
+                         Json::Value xDocTrig) const;
 
   /** @brief Gets the information from the TDC branch and appends it to the digit
    *  @param xDocPartEvent One particle event from raw detector data
    */
-  Json::Value getTdc(Json::Value xDocPartEvent);
+  Json::Value getTdc(Json::Value xDocPartEvent) const;
 
   /** @brief Gets the information from the ADC data ascosiated with the current TDC data
    *  @param xDocPartEvent One particle event from raw detector data
    *  @param xDocInfo Json document with the TDC digit information. This is needed
    *  so ascosiate the proper ADC data to corresponding TDC data.
    */
-  bool getAdc(Json::Value xDocAdc, Json::Value xDocTdcHit, Json::Value &xDocDigit) throw(Exception);
+  bool getAdc(Json::Value xDocAdc,
+              Json::Value xDocTdcHit,
+              Json::Value &xDocDigit) const throw(Exception);
 
   /** @brief process JSON document
    *  @param xDocTrigReq Json document with the trigger request for a specific particle event
    *  @param xDocInfo 
    */
   bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit,
-                  Json::Value &xDocDigit) throw(Exception);
+                  Json::Value &xDocDigit) const throw(Exception);
 
   /** @brief process JSON document
    *  @param document Receive a document with raw data and return
@@ -108,7 +113,7 @@ class MapCppTOFDigits {
    */
   bool getTrig(Json::Value xDocTrig,
                Json::Value xDocTdcHit,
-               Json::Value &xDocDigit) throw(Exception);
+               Json::Value &xDocDigit) const throw(Exception);
   bool map_init;
 };
 }

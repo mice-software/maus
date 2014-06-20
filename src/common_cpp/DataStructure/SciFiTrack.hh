@@ -34,15 +34,15 @@ class SciFiTrack {
    */
   SciFiTrack();
 
-  /** @brief Destructor.
+  /** @brief Destructor, deletes the track points
    */
   virtual ~SciFiTrack();
 
-  /** @brief Copy constructor.
+  /** @brief Copy constructor, deeps copies the track points
    */
   SciFiTrack(const SciFiTrack &a_track);
 
-  /** @brief Assignment operator.
+  /** @brief Assignment operator, deeps copies the track points
    */
   SciFiTrack& operator=(const SciFiTrack &a_track);
 
@@ -70,9 +70,9 @@ class SciFiTrack {
    */
   void set_charge(int charge) { _charge = charge; }
 
-  /** @brief Sets trackpoints vector.
+  /** @brief Sets trackpoints vector, shallow copy
    */
-  void set_scifitrackpoints(SciFiTrackPointPArray points);
+  void set_scifitrackpoints(SciFiTrackPointPArray points) { _trackpoints = points; }
 
   /** @brief Returns the tracker number.
    */

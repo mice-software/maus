@@ -30,15 +30,8 @@ using namespace MAUS;
 namespace {
 class MAUSPrimaryGeneratorActionTest : public ::testing::Test {
  protected:
-  MAUSPrimaryGeneratorActionTest() : primary(MAUSGeant4Manager::GetInstance()->GetPrimaryGenerator()) {}
-  virtual ~MAUSPrimaryGeneratorActionTest() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-  MAUS::MAUSPrimaryGeneratorAction* primary;
-};
-
-TEST_F(MAUSPrimaryGeneratorActionTest, PushPopTest) {
-    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in, part_out;
+  MAUSPrimaryGeneratorActionTest()
+      : primary(MAUSGeant4Manager::GetInstance()->GetPrimaryGenerator()) {
     part_in.x = 1.;
     part_in.y = 2.;
     part_in.z = 3.;
@@ -46,9 +39,22 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PushPopTest) {
     part_in.px = 5.;
     part_in.py = 6.;
     part_in.pz = 7.;
+    part_in.sx = 8.;
+    part_in.sy = 9.;
+    part_in.sz = 10.;
     part_in.energy = 200.;
     part_in.seed = 10;
     part_in.pid = -13;
+  }
+  virtual ~MAUSPrimaryGeneratorActionTest() {}
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+  MAUS::MAUSPrimaryGeneratorAction* primary;
+  MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+};
+
+TEST_F(MAUSPrimaryGeneratorActionTest, PushPopTest) {
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_out;
 
     primary->Push(part_in);
     part_out = primary->Pop();
@@ -64,18 +70,6 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PushPopTest) {
 }
 
 TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
-    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
-    part_in.x = 1.;
-    part_in.y = 2.;
-    part_in.z = 3.;
-    part_in.time = 4.;
-    part_in.px = 5.;
-    part_in.py = 6.;
-    part_in.pz = 7.;
-    part_in.energy = 200.;
-    part_in.seed = 27;
-    part_in.pid = -13;
-
     primary->Push(part_in);
     primary->Push(part_in);
 
@@ -108,6 +102,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     double p_scale = 
         ::sqrt(part_in.px*part_in.px+part_in.py*part_in.py+part_in.pz*part_in.pz);
     double p_norm  = p_in/p_scale;
+    
     EXPECT_NEAR(part_in.x, event->GetPrimaryVertex()->GetX0(), 1e-3);
     EXPECT_NEAR(part_in.y, event->GetPrimaryVertex()->GetY0(), 1e-3);
     EXPECT_NEAR(part_in.z, event->GetPrimaryVertex()->GetZ0(), 1e-3);
@@ -116,6 +111,11 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_NEAR(part_in.px*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPx(), 1e-3);
     EXPECT_NEAR(part_in.py*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPy(), 1e-3);
     EXPECT_NEAR(part_in.pz*p_norm, event->GetPrimaryVertex()->GetPrimary()->GetPz(), 1e-3);
+
+
+    EXPECT_NEAR(part_in.sx, event->GetPrimaryVertex()->GetPrimary()->GetPolX(), 1e-3);
+    EXPECT_NEAR(part_in.sy, event->GetPrimaryVertex()->GetPrimary()->GetPolY(), 1e-3);
+    EXPECT_NEAR(part_in.sz, event->GetPrimaryVertex()->GetPrimary()->GetPolZ(), 1e-3);
 
     EXPECT_EQ(part_in.seed, CLHEP::HepRandom::getTheSeed());
     EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
@@ -128,17 +128,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
 }
 
 TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
-    MAUSPrimaryGeneratorAction::PGParticle part_in, part_out;
-    part_in.x = 1.;
-    part_in.y = 2.;
-    part_in.z = 3.;
-    part_in.time = 4.;
-    part_in.px = 5.;
-    part_in.py = 6.;
-    part_in.pz = 7.;
-    part_in.energy = 200.;
-    part_in.seed = 27;
-    part_in.pid = -13;
+    MAUSPrimaryGeneratorAction::PGParticle part_out;
 
     Json::Value val = part_in.WriteJson();
     part_out.ReadJson(val);
@@ -148,6 +138,9 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     EXPECT_NEAR(part_in.px, part_out.px, 1e-6);
     EXPECT_NEAR(part_in.py, part_out.py, 1e-6);
     EXPECT_NEAR(part_in.pz, part_out.pz, 1e-6);
+    EXPECT_NEAR(part_in.sx, part_out.sx, 1e-6);
+    EXPECT_NEAR(part_in.sy, part_out.sy, 1e-6);
+    EXPECT_NEAR(part_in.sz, part_out.sz, 1e-6);
     EXPECT_NEAR(part_in.time, part_out.time, 1e-6);
     EXPECT_NEAR(part_in.energy, part_out.energy, 1e-6);
     EXPECT_EQ(part_in.pid, part_out.pid);
@@ -169,21 +162,71 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
     hit.SetPos(CLHEP::Hep3Vector(1.,2.,3.));
     hit.SetTime(4.);
     hit.SetMomentum(CLHEP::Hep3Vector(5.,6.,7.));
+    hit.SetSpin(CLHEP::Hep3Vector(8.,9.,10.));
     hit.SetEnergy(200.);
     hit.SetPID(-13);
-    MAUSPrimaryGeneratorAction::PGParticle part_in(hit);
-    EXPECT_NEAR(part_in.x, 1., 1e-6);
-    EXPECT_NEAR(part_in.y, 2., 1e-6);
-    EXPECT_NEAR(part_in.z, 3., 1e-6);
-    EXPECT_NEAR(part_in.px, 5., 1e-6);
-    EXPECT_NEAR(part_in.py, 6., 1e-6);
-    EXPECT_NEAR(part_in.pz, 7., 1e-6);
-    EXPECT_NEAR(part_in.time, 4., 1e-6);
-    EXPECT_NEAR(part_in.energy, 200., 1e-6);
-    EXPECT_EQ(part_in.pid, -13);
-    EXPECT_EQ(part_in.seed, size_t(0));
+    MAUSPrimaryGeneratorAction::PGParticle part_virt(hit);
+    EXPECT_NEAR(part_virt.x, 1., 1e-6);
+    EXPECT_NEAR(part_virt.y, 2., 1e-6);
+    EXPECT_NEAR(part_virt.z, 3., 1e-6);
+    EXPECT_NEAR(part_virt.px, 5., 1e-6);
+    EXPECT_NEAR(part_virt.py, 6., 1e-6);
+    EXPECT_NEAR(part_virt.pz, 7., 1e-6);
+    EXPECT_NEAR(part_virt.sx, 8., 1e-6);
+    EXPECT_NEAR(part_virt.sy, 9., 1e-6);
+    EXPECT_NEAR(part_virt.sz, 10., 1e-6);
+    EXPECT_NEAR(part_virt.time, 4., 1e-6);
+    EXPECT_NEAR(part_virt.energy, 200., 1e-6);
+    EXPECT_EQ(part_virt.pid, -13);
+    EXPECT_EQ(part_virt.seed, size_t(0));
 
 }
 
+TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleMassShellConditionTest) {
+    part_in.MassShellCondition();
+    EXPECT_NEAR(part_in.x, 1., 1e-6);
+    EXPECT_NEAR(part_in.y, 2., 1e-6);
+    EXPECT_NEAR(part_in.z, 3., 1e-6);
+    EXPECT_NEAR(part_in.px/part_in.pz, 5./7., 1e-6);
+    EXPECT_NEAR(part_in.py/part_in.pz, 6./7., 1e-6);
+    EXPECT_NEAR(part_in.sx, 8., 1e-6);
+    EXPECT_NEAR(part_in.sy, 9., 1e-6);
+    EXPECT_NEAR(part_in.sz, 10., 1e-6);
+    EXPECT_NEAR(part_in.time, 4., 1e-6);
+    EXPECT_NEAR(part_in.energy, 200., 1e-6);
+    EXPECT_EQ(part_in.pid, -13);
+    EXPECT_EQ(part_in.seed, size_t(10));
+    EXPECT_NEAR(part_in.px/part_in.pz, 5./7., 1e-6);
+    EXPECT_NEAR(part_in.py/part_in.pz, 6./7., 1e-6);
+    double mass = sqrt(part_in.energy*part_in.energy-
+                        part_in.px*part_in.px-
+                        part_in.py*part_in.py-
+                        part_in.pz*part_in.pz);
+    EXPECT_NEAR(mass, 105.658, 1e-3);
+    part_in.px = 0.;
+    part_in.py = 0.;
+    part_in.pz = 0.;
+    EXPECT_THROW(part_in.MassShellCondition(), MAUS::Exception);
+    part_in.pz = 1.;
+    part_in.energy = 100.;
+    EXPECT_THROW(part_in.MassShellCondition(), MAUS::Exception);
+}
+
+TEST_F(MAUSPrimaryGeneratorActionTest, PGParticlePrimaryTest) {
+    Primary prim = part_in.GetPrimary();
+    EXPECT_NEAR(part_in.x, prim.GetPosition().x(), 1e-6);
+    EXPECT_NEAR(part_in.y, prim.GetPosition().y(), 1e-6);
+    EXPECT_NEAR(part_in.z, prim.GetPosition().z(), 1e-6);
+    EXPECT_NEAR(part_in.px, prim.GetMomentum().x(), 1e-6);
+    EXPECT_NEAR(part_in.py, prim.GetMomentum().y(), 1e-6);
+    EXPECT_NEAR(part_in.pz, prim.GetMomentum().z(), 1e-6);
+    EXPECT_NEAR(part_in.sx, prim.GetSpin().x(), 1e-6);
+    EXPECT_NEAR(part_in.sy, prim.GetSpin().y(), 1e-6);
+    EXPECT_NEAR(part_in.sz, prim.GetSpin().z(), 1e-6);
+    EXPECT_NEAR(part_in.time, prim.GetTime(), 1e-6);
+    EXPECT_NEAR(part_in.energy, prim.GetEnergy(), 1e-6);
+    EXPECT_EQ(part_in.pid, prim.GetParticleId());
+    EXPECT_EQ(part_in.seed, size_t(prim.GetRandomSeed()));
+}
 } //namespace end
 

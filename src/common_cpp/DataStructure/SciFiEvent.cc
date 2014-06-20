@@ -28,84 +28,138 @@ SciFiEvent::SciFiEvent() {
   _scifitracks.resize(0);
 }
 
-SciFiEvent::SciFiEvent(const SciFiEvent& _scifievent) {
-    _scifidigits.resize(_scifievent._scifidigits.size());
-    for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
-      _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
-    }
-
-    _scificlusters.resize(_scifievent._scificlusters.size());
-    for (unsigned int i = 0; i < _scifievent._scificlusters.size(); ++i) {
-      _scificlusters[i] = new SciFiCluster(*_scifievent._scificlusters[i]);
-    }
-
-    _scifispacepoints.resize(_scifievent._scifispacepoints.size());
-    for (unsigned int i = 0; i < _scifievent._scifispacepoints.size(); ++i) {
-      _scifispacepoints[i] = new SciFiSpacePoint(*_scifievent._scifispacepoints[i]);
-    }
-
-    _scifiseeds.resize(_scifievent._scifiseeds.size());
-    for (unsigned int i = 0; i < _scifievent._scifiseeds.size(); ++i) {
-      _scifiseeds[i] = new SciFiSpacePoint(*_scifievent._scifiseeds[i]);
-    }
-
-    _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] =
-          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
-    }
-
-    _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] =
-          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
-    }
-
-    _scifitracks.resize(_scifievent._scifitracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
-      _scifitracks[i] = _scifievent._scifitracks[i];
-    }
+SciFiEvent::SciFiEvent(const SciFiEvent& old_event) {
+  *this = old_event;
 }
 
-SciFiEvent& SciFiEvent::operator=(const SciFiEvent& _scifievent) {
-  std::cerr << "IN = operator " << std::endl;
-    if (this == &_scifievent) {
-        return *this;
-    }
+SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
+  if (this == &rhs) {
+      return *this;
+  }
 
-    _scifidigits.resize(_scifievent._scifidigits.size());
-    for (unsigned int i = 0; i < _scifievent._scifidigits.size(); ++i) {
-      _scifidigits[i] = new SciFiDigit(*_scifievent._scifidigits[i]);
-    }
+  // Deep copy the digits
+  _scifidigits.resize(rhs._scifidigits.size());
+  for (unsigned int i = 0; i < rhs._scifidigits.size(); ++i) {
+    _scifidigits[i] = new SciFiDigit(*rhs._scifidigits[i]);
+  }
 
-        _scifispacepoints.resize(_scifievent._scifispacepoints.size());
-    for (unsigned int i = 0; i < _scifievent._scifispacepoints.size(); ++i) {
-      _scifispacepoints[i] = new SciFiSpacePoint(*_scifievent._scifispacepoints[i]);
+  // Deep copy the clusters
+  _scificlusters.resize(rhs._scificlusters.size());
+  for (unsigned int i = 0; i < rhs._scificlusters.size(); ++i) {
+    _scificlusters[i] = new SciFiCluster(*rhs._scificlusters[i]);
+    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
+    SciFiDigitPArray new_digits(rhs._scificlusters[i]->get_digits()->GetLast() + 1);
+    for (unsigned int j = 0; j < new_digits.size(); ++j) {
+      new_digits[j] = NULL;
+      for (unsigned int k = 0; k < rhs._scifidigits.size(); ++k) {
+        if (rhs._scificlusters[i]->get_digits()->At(j) == rhs._scifidigits[k]) {
+          new_digits[j] = _scifidigits[k];
+          break;
+        }
+      }
     }
+    _scificlusters[i]->set_digits_pointers(new_digits);
+  }
 
-    _scifiseeds.resize(_scifievent._scifiseeds.size());
-    for (unsigned int i = 0; i < _scifievent._scifiseeds.size(); ++i) {
-      _scifiseeds[i] = new SciFiSpacePoint(*_scifievent._scifiseeds[i]);
+  // Deep copy the spacepoints
+  _scifispacepoints.resize(rhs._scifispacepoints.size());
+  for (unsigned int i = 0; i < rhs._scifispacepoints.size(); ++i) {
+    _scifispacepoints[i] = new SciFiSpacePoint(*rhs._scifispacepoints[i]);
+    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
+    SciFiClusterPArray new_clusters(rhs._scifispacepoints[i]->get_channels()->GetLast() + 1);
+    for (unsigned int j = 0; j < new_clusters.size(); ++j) {
+      new_clusters[j] = NULL;
+      for (unsigned int k = 0; k < rhs._scificlusters.size(); ++k) {
+        if (rhs._scifispacepoints[i]->get_channels()->At(j) == rhs._scificlusters[k]) {
+          new_clusters[j] = _scificlusters[k];
+          break;
+        }
+      }
     }
+    _scifispacepoints[i]->set_channels_pointers(new_clusters);
+  }
 
-    _scifistraightprtracks.resize(_scifievent._scifistraightprtracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifistraightprtracks.size(); ++i) {
-      _scifistraightprtracks[i] =
-          new SciFiStraightPRTrack(*_scifievent._scifistraightprtracks[i]);
+  // Deep copy the seeds
+  _scifiseeds.resize(rhs._scifiseeds.size());
+  for (unsigned int i = 0; i < rhs._scifiseeds.size(); ++i) {
+    _scifiseeds[i] = new SciFiSpacePoint(*rhs._scifiseeds[i]);
+    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
+    SciFiClusterPArray new_clusters(rhs._scifiseeds[i]->get_channels()->GetLast() + 1);
+    for (unsigned int j = 0; j < new_clusters.size(); ++j) {
+        new_clusters[j] = NULL;
+        for (unsigned int k = 0; k < rhs._scificlusters.size(); ++k) {
+            if (rhs._scifiseeds[i]->get_channels()->At(j) == rhs._scificlusters[k]) {
+                new_clusters[j] = _scificlusters[k];
+                break;
+            }
+        }
     }
+    _scifiseeds[i]->set_channels_pointers(new_clusters);
+  }
 
-    _scifihelicalprtracks.resize(_scifievent._scifihelicalprtracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifihelicalprtracks.size(); ++i) {
-      _scifihelicalprtracks[i] =
-          new SciFiHelicalPRTrack(*_scifievent._scifihelicalprtracks[i]);
+  // Deep copy the straight pattern recognition tracks
+  _scifistraightprtracks.resize(rhs._scifistraightprtracks.size());
+  for (unsigned int i = 0; i < rhs._scifistraightprtracks.size(); ++i) {
+    _scifistraightprtracks[i] = new SciFiStraightPRTrack(*rhs._scifistraightprtracks[i]);
+    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
+    SciFiSpacePointPArray new_sps(rhs._scifistraightprtracks[i]->get_spacepoints()->GetLast()+1);
+    for (unsigned int j = 0; j < new_sps.size(); ++j) {
+      new_sps[j] = NULL;
+      for (unsigned int k = 0; k < rhs._scifispacepoints.size(); ++k) {
+        if (rhs._scifistraightprtracks[i]->get_spacepoints_pointers()[j] ==
+          rhs._scifispacepoints[k]) {
+          new_sps[j] = _scifispacepoints[k];
+          break;
+        }
+      }
     }
+    _scifistraightprtracks[i]->set_spacepoints_pointers(new_sps);
+  }
 
-    _scifitracks.resize(_scifievent._scifitracks.size());
-    for (unsigned int i = 0; i < _scifievent._scifitracks.size(); ++i) {
-      _scifitracks[i] = _scifievent._scifitracks[i];
+  // Deep copy the helical pattern recognition tracks
+  _scifihelicalprtracks.resize(rhs._scifihelicalprtracks.size());
+  for (unsigned int i = 0; i < rhs._scifihelicalprtracks.size(); ++i) {
+    _scifihelicalprtracks[i] = new SciFiHelicalPRTrack(*rhs._scifihelicalprtracks[i]);
+    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
+    SciFiSpacePointPArray new_sps(rhs._scifihelicalprtracks[i]->get_spacepoints()->GetLast() + 1);
+    for (unsigned int j = 0; j < new_sps.size(); ++j) {
+      new_sps[j] = NULL;
+      for (unsigned int k = 0; k < rhs._scifispacepoints.size(); ++k) {
+        if (rhs._scifihelicalprtracks[i]->get_spacepoints()->At(j) == rhs._scifispacepoints[k]) {
+          new_sps[j] = _scifispacepoints[k];
+          break;
+        }
+      }
     }
+    _scifihelicalprtracks[i]->set_spacepoints_pointers(new_sps);
+  }
 
-    return *this;
+  // Deep copy the kalman tracks
+  _scifitracks.resize(rhs._scifitracks.size());
+  for (unsigned int iTrk = 0; iTrk < rhs._scifitracks.size(); ++iTrk) {
+    _scifitracks[iTrk] =  new SciFiTrack(*rhs._scifitracks[iTrk]);
+    // Deep copy the scifi trackpoints
+    SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[iTrk]->scifitrackpoints();
+    SciFiTrackPointPArray new_tpoints(rhs_tpoints.size());
+    // Loop over the rhs track trackpoints
+    for (unsigned int iRtp = 0; iRtp < rhs_tpoints.size(); ++iRtp) {
+      new_tpoints[iRtp] = new SciFiTrackPoint(*(rhs_tpoints[iRtp]));
+      // Now set the cross-pointer to the cluster within the trackpoint so that it points to
+      // correct place in the new copy of the datastructure, by searching for the cluster index in
+      // rhs event, which matches the pointer address of the cluster in the rhs trackpoint. Use
+      // this to set new trackpoint cluster to pointer to the correct cluster in the new event.
+      SciFiCluster* new_cluster = NULL;
+      for (unsigned int iRcl = 0; iRcl < rhs.clusters().size(); ++iRcl) {
+        if (rhs_tpoints[iRtp]->get_cluster_pointer() == rhs._scificlusters[iRcl]) {
+          new_cluster = _scificlusters[iRcl];
+          break;
+        }
+      }
+      new_tpoints[iRtp]->set_cluster_pointer(new_cluster);
+    }
+    _scifitracks[iTrk]->set_scifitrackpoints(new_tpoints);
+  }
+  return *this;
 }
 
 SciFiEvent::~SciFiEvent() {

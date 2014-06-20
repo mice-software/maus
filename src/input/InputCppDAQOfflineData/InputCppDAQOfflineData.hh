@@ -25,19 +25,21 @@
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"
 
 namespace MAUS {
+/** \class InputCppDAQOfflineData
+* This class is used to access the DAQ data offline.
+*/
 
 class InputCppDAQOfflineData : public InputCppDAQData {
 
  public:
 
-  /** Create an instance of InputCppDAQData.
-  * 
-  * This is the constructor for InputCppDAQData.
+  /** Create an instance of InputCppDAQOfflineData.
   *
-  * \param[in] pDataPath The (directory) path to read the data from
-  * \param[in] pFilename The filename to read from the pDataPath directory
+  * This is the constructor for InputCppDAQOfflineData.
   */
-  InputCppDAQOfflineData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQOfflineData();
+
+ private:
 
   /** Initialise the Unpacker.
   *
@@ -45,7 +47,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   *
   * \return True if at least one file was opened sucessfully.
   */
-  bool birth(std::string pJSONConfig);
+  void _birth(const std::string& pJSONConfig);
 
   /** Read the next event from the file into memory.
   *
@@ -55,8 +57,6 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   * \return True if an event was read ready for unpacking.
   */
   bool readNextEvent();
-
- private:
 
   /** File manager object. */
   MDfileManager _dataFileManager;

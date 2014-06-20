@@ -22,6 +22,9 @@ import json
 from types import ListType
 import unittest
 
+import maus_cpp.globals 
+import maus_cpp.converter
+import Configuration
 import ErrorHandler
 from MapPyDoNothing import MapPyDoNothing
 from MapPyGroup import MapPyGroup
@@ -29,6 +32,8 @@ from MapPyGroup import MapPyGroupBirthException
 from MapPyGroup import MapPyGroupDeathException
 from MapPyPrint import MapPyPrint
 from MapPyTestMap import MapPyTestMap
+
+
 
 class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
@@ -41,6 +46,10 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         ErrorHandler.DefaultHandler().on_error='none'
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(
+              Configuration.Configuration().getConfigJSON()
+            )
 
     def test_init_default(self):
         """
@@ -183,8 +192,6 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             def birth(self, json_document):
                 pass
             def process(self, spill):
-                pass
-            def death(self, argument):
                 pass
         self.execute_bad_append(TestWorker())
  
@@ -357,6 +364,42 @@ class MapPyGroupTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         for worker in workers:
             self.assertTrue(worker.death_called, 
                 "death wasn't called for worker %s" % worker.map_id)
+
+    def test_conversion(self):      
+        """Test MapPyGroup handles conversions appropriately"""
+        class MapPyGroupConvert: # pylint:disable = C0111, W0232, R0201 
+            def __init__(self):
+                pass
+            def birth(self, _json):
+                pass
+            def death(self):
+                pass
+            def process(self, data):
+                data = maus_cpp.converter. json_repr(data)
+                if type(data) != type({}):
+                    raise ValueError("Expected data with type dict")
+                return data
+            can_convert = True
+
+        class MapPyGroupNoConvert: # pylint:disable = C0111, W0232, R0201 
+            def __init__(self):
+                pass
+            def birth(self, _json):
+                pass
+            def death(self):
+                pass
+            def process(self, data):
+                if type(data) != type(""):
+                    raise ValueError("Expected data with type string")
+                return data
+
+        workers = [MapPyGroupNoConvert(), MapPyGroupConvert(), 
+                   MapPyGroupNoConvert(), MapPyGroupConvert()]
+        my_group = MapPyGroup(workers)
+        output = my_group.process("{}")
+        self.assertEqual(output, {})
+
+
 
 if __name__ == '__main__':
     unittest.main()

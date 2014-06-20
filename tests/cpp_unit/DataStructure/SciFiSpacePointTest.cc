@@ -68,7 +68,7 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   sp.set_time(time);
   sp.set_chi2(chi2);
   sp.set_position(pos);
-  sp.set_channels(cvec);
+  sp.set_channels_pointers(cvec);
   sp.set_type(type);
 
   EXPECT_EQ(used, sp.get_used());
@@ -82,9 +82,9 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   EXPECT_EQ(x, sp.get_position().x());
   EXPECT_EQ(y, sp.get_position().y());
   EXPECT_EQ(z, sp.get_position().z());
-  ASSERT_EQ(size, sp.get_channels().size());
-  EXPECT_EQ(plane1, sp.get_channels()[0]->get_plane());
-  EXPECT_EQ(plane2, sp.get_channels()[1]->get_plane());
+  ASSERT_EQ(size, sp.get_channels()->GetLast() + 1);
+  EXPECT_EQ(plane1, sp.get_channels_pointers()[0]->get_plane());
+  EXPECT_EQ(plane2, sp.get_channels_pointers()[1]->get_plane());
   EXPECT_EQ(type, sp.get_type());
 }
 
@@ -102,7 +102,7 @@ TEST_F(SciFiSpacePointTestDS, test_default_constructor) {
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
-  EXPECT_EQ(size, sp.get_channels().size());
+  EXPECT_EQ(size, sp.get_channels()->GetLast() + 1);
   EXPECT_EQ("", sp.get_type());
 }
 
@@ -144,7 +144,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   sp1->set_time(time);
   sp1->set_chi2(chi2);
   sp1->set_position(pos);
-  sp1->set_channels(cvec);
+  sp1->set_channels_pointers(cvec);
   sp1->set_type(type);
 
   SciFiSpacePoint * sp2 = new SciFiSpacePoint(*sp1);
@@ -161,9 +161,9 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   EXPECT_EQ(x, sp2->get_position().x());
   EXPECT_EQ(y, sp2->get_position().y());
   EXPECT_EQ(z, sp2->get_position().z());
-  ASSERT_EQ(size, sp2->get_channels().size());
-  EXPECT_EQ(plane1, sp2->get_channels()[0]->get_plane());
-  EXPECT_EQ(plane2, sp2->get_channels()[1]->get_plane());
+  ASSERT_EQ(size, sp2->get_channels()->GetLast() + 1);
+  EXPECT_EQ(plane1, sp2->get_channels_pointers()[0]->get_plane());
+  EXPECT_EQ(plane2, sp2->get_channels_pointers()[1]->get_plane());
   EXPECT_EQ(type, sp2->get_type());
 }
 
@@ -202,9 +202,9 @@ TEST_F(SciFiSpacePointTestDS, test_two_cluster_constructor) {
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
-  ASSERT_EQ(size, sp.get_channels().size());
-  EXPECT_EQ(true, sp.get_channels()[0]->is_used());
-  EXPECT_EQ(true, sp.get_channels()[1]->is_used());
+  ASSERT_EQ(size, sp.get_channels()->GetLast() + 1);
+  EXPECT_EQ(true, sp.get_channels_pointers()[0]->is_used());
+  EXPECT_EQ(true, sp.get_channels_pointers()[1]->is_used());
   EXPECT_EQ("duplet", sp.get_type());
 
   delete c1;
@@ -254,10 +254,10 @@ TEST_F(SciFiSpacePointTestDS, test_three_cluster_constructor) {
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
-  ASSERT_EQ(size, sp.get_channels().size());
-  EXPECT_EQ(true, sp.get_channels()[0]->is_used());
-  EXPECT_EQ(true, sp.get_channels()[1]->is_used());
-  EXPECT_EQ(true, sp.get_channels()[2]->is_used());
+  ASSERT_EQ(size, sp.get_channels()->GetLast() + 1);
+  EXPECT_EQ(true, sp.get_channels_pointers()[0]->is_used());
+  EXPECT_EQ(true, sp.get_channels_pointers()[1]->is_used());
+  EXPECT_EQ(true, sp.get_channels_pointers()[2]->is_used());
   EXPECT_EQ("triplet", sp.get_type());
 
   delete c1;
@@ -305,7 +305,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   sp1->set_time(time);
   sp1->set_chi2(chi2);
   sp1->set_position(pos);
-  sp1->set_channels(cvec);
+  sp1->set_channels_pointers(cvec);
   sp1->set_type(type);
 
   SciFiSpacePoint * sp2 = new SciFiSpacePoint();
@@ -323,9 +323,9 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   EXPECT_EQ(x, sp2->get_position().x());
   EXPECT_EQ(y, sp2->get_position().y());
   EXPECT_EQ(z, sp2->get_position().z());
-  ASSERT_EQ(size, sp2->get_channels().size());
-  EXPECT_EQ(plane1, sp2->get_channels()[0]->get_plane());
-  EXPECT_EQ(plane2, sp2->get_channels()[1]->get_plane());
+  ASSERT_EQ(size, sp2->get_channels()->GetLast() + 1);
+  EXPECT_EQ(plane1, sp2->get_channels_pointers()[0]->get_plane());
+  EXPECT_EQ(plane2, sp2->get_channels_pointers()[1]->get_plane());
   EXPECT_EQ(type, sp2->get_type());
 }
 

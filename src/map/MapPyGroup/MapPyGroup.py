@@ -1,7 +1,7 @@
 """
 A group of workers which iterates through each worker in turn.
 """
-#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@ A group of workers which iterates through each worker in turn.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 from types import ListType
-import inspect
 import sys
 
 import ErrorHandler
+from maus_cpp import converter
 
 class MapPyGroup:
     """
@@ -88,26 +88,10 @@ class MapPyGroup:
         """
         if not hasattr(worker, 'birth'):
             raise TypeError(str(worker) + ' does not have a birth()')
-        # Python uses args, SWIG uses varargs.
-        py_ok = len(inspect.getargspec(worker.birth).args) == 2 # for python
-        swig_ok = inspect.getargspec(worker.birth).varargs != None # for swig
-        if not py_ok ^ swig_ok: # exclusive or
-            raise TypeError(str(worker) + ' birth() has wrong call signature')
-
         if not hasattr(worker, 'process'):
             raise TypeError(str(worker) + ' does not have a process()')
-        # Python uses args, SWIG uses varargs.
-        py_ok = len(inspect.getargspec(worker.process).args) == 2
-        swig_ok = inspect.getargspec(worker.process).varargs != None
-        if not py_ok ^ swig_ok: # exclusive or
-            raise TypeError(str(worker) + 
-                ' process() has wrong call signature')
-
         if not hasattr(worker, 'death'):
             raise TypeError(str(worker)+' does not have a death()')
-        if len(inspect.getargspec(worker.death).args) != 1: # self only
-            raise TypeError(str(worker) + ' death() has wrong call signature')
-
         self._workers.append(worker)
 
     def birth(self, json_config_doc):
@@ -125,12 +109,18 @@ class MapPyGroup:
         birth_ok = True
         for worker in self._workers:
             try:
-                birth_ok = birth_ok and worker.birth(json_config_doc)
+                # Because None is also considered a pass, we can't
+                # simply use 'and' here.
+                worker_birth_ok = worker.birth(json_config_doc)
+                if (worker_birth_ok is None):
+                    worker_birth_ok = True
+                birth_ok = birth_ok and worker_birth_ok
             except: # pylint:disable = W0702
                 # Record the exception.
-                exceptions.append(worker.__class__.__name__ + ":" + 
-                    str(sys.exc_info()[0]) + ": " + 
-                    str(sys.exc_info()[1]))
+                new_exc = str(sys.exc_info()[0])+": " +\
+                          str(sys.exc_info()[1])
+                sys.excepthook(*sys.exc_info())
+                exceptions.append(worker.__class__.__name__+":"+new_exc)
                 birth_ok = False
             if (not birth_ok):
                 # Break out the loop now.
@@ -163,6 +153,8 @@ class MapPyGroup:
         """
         nu_spill = spill
         for worker in self._workers:
+            if not (hasattr(worker, "can_convert") and worker.can_convert):
+                nu_spill = converter.string_repr(nu_spill)
             nu_spill = worker.process(nu_spill)
         return nu_spill
 
@@ -179,7 +171,12 @@ class MapPyGroup:
         exceptions = [] # List of exceptions from each member.
         for worker in self._workers:
             try:
-                death_ok = death_ok and worker.death()
+                # Because None is also considered a pass, we can't
+                # simply use 'and' here.
+                worker_death_ok = worker.death()
+                if (worker_death_ok is None):
+                    worker_death_ok = True
+                death_ok = death_ok and worker_death_ok
             except: # pylint:disable = W0702
                 # Record the exception and continue.
                 exceptions.append(worker.__class__.__name__ + ": " + 

@@ -13,363 +13,69 @@ captionpos=b% caption at bottom
 
 \chapter{Introduction to the MAUS API}
 \label{chapter:api}
-This chapter introduces the MAUS API framework and looks in depth at the structure of the classes and interfaces that it comprises of. Several example \emph{minimal} implementations are given before a note on scalibility and extending the framework. 
+This chapter introduces the MAUS API framework and looks in depth at the
+structure of the classes and interfaces that it comprises of. Several example
+\emph{minimal} implementations are given before a note on scalability and
+extending the framework.
 
 \section{Motivation}
-The motivation behind the MAUS API framework was to provide MAUS developers with a flexible, well defined environment whilst minimising the job of actually implementing new functionality. The framework must be robust but also scabale enough to cope with both current and unforseen new functionality.
+The MAUS API framework provides MAUS developers with a well-defined environment
+for developing reconstruction code, while allowing independent development of
+the backend and code sharing of common elements like error handling and data
+mangling.
 
-To achieve these goals the MAUS framework has been designed from the ground up with scalibility and ease of developer implementation in mind. It features seperate interface and abstraction layers. While the interfaces provide guarenteed minimal implementation to ensure code works, the abstraction layer provides a convienient centrallised place for common as well as tedious implementation that would otherwise become a distraction or bloat a developers code.
-
-%% Module Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Everything starts with a `Module'}
-A \emph{Module} is the basic building block of the MAUS API framework it's design is layed out within the interface `IModule' shown in \ref{api:IModule}. The interface in essence requires two public void functions \emph{birth} and \emph{death} which are responsible for the initialisation and finalisation of the module.
-\begin{lstlisting}[
-    language=C++,
-    caption={The module interface `IModule'},
-    label=api:IModule, 
-    index={IModule},
-    emph={birth,death},
-    emphstyle={\color{DarkBlue}}
-  ]
-class IModule {
-  public:
-    virtual void birth(const std::string&) = 0;
-    virtual void death()                   = 0;
-};
-\end{lstlisting}
+An \emph{Module} is the basic building block of the MAUS API framework. Four
+types of module exist within MAUS.
 
-Accompanying the interface is an abstract base class \emph{ModuleBase}\ref{api:ModuleBase}. This again provides flexibility as the abstraction is seperated from the definition of the interface such that a developer may (if they wish) choose \emph{not} to have the abstracted behaviour but still have their module plug in to the rest of the MAUS framework. It should be noted however that the expected behaviour would be to inherit the abstractions from this base class.
+\begin{itemize}
+\item An Input module is used to create an instance of a MAUS Spill structure.
+\item An Output module is used to store an instance of a MAUS data structure.
+\item A Map module is used to modify a single Spill item. This enables the
+reconstruction to be parallelised across multiple Maps.
+\item A Reduce module is used to act on a collection of Spills.
+\end{itemize}
 
-In \ref{api:ModuleBase} the implementation of the interface can be seen with the definition of the public birth and death member functions. It is important to note the lack of the virtual specifier in this case. The intention here (as is good C++ practise) is that any derived classes do not overide (hide) these methods but rather implement the pure virtual \emph{and private} \emph{\_birth} and \emph{\_death} functions instead. This enables the public functions to wrap and provide abstracted behaviour around the private ones.
+Every module has a constructor, destructor, a birth and a death method. Input
+modules have an emitter function that yields a new data object. Output modules 
+have a save function that takes a data object and stores it (either on disk, or
+for example broadcasting across a socket).
 
-It is worth noting at this point the addition of the class member \emph{\_classname} which is set in the constructor and represents the name of the module. 
+Map modules and Reduce modules have a process function that takes a data object 
+and modifies it. The important difference is that Map modules have no internal
+state, meaning that they can be run in parallel. Reduce modules, on the other
+hand, do have internal state. This means that they can act on groups of Spills,
+for example collecting histogram data.
 
-\begin{lstlisting}[
-    language=C++,
-    caption={The abstract module base class `ModuleBase'},
-    label=api:ModuleBase,
-    index={ModuleBase},
-    emph={birth,death,_birth,_death},
-    emphstyle={\color{DarkBlue}},
-    emph={[2]_classname},
-    emphstyle={[2]\color{DarkKhaki}}
-  ]
-class ModuleBase : public virtual IModule {
-  public:
-    // Constructors & Destructors
-    explicit ModuleBase(const std::string&);
-    ModuleBase(const ModuleBase&);
-    virtual ~ModuleBase();
+\section{Inheritance}
+In order to correctly make a module, one should inherit from the correct type.
 
-  public:
-    void birth(const std::string&);
-    void death();
+\begin{itemize}
+\item Input modules should inherit from InputBase.
+\item Output modules should inherit from OutputBase.
+\item Map modules should inherit from MapBase.
+\item Reduce modules should inherit from ReduceBase.
+\end{itemize}
 
-  protected:
-    std::string _classname;
+Base types are defined in \verb|src/common_cpp/API| for C++ modules and
+\verb|src/common_py/API| for python modules.
 
-  private:
-    virtual void _birth(const std::string&) = 0;
-    virtual void _death()                   = 0;
-};
-\end{lstlisting}
+\section{Data Mangling}
+MAUS supports representation of the data structure in various different formats.
+MAUS support representation in ROOT, ascii string and json formats. It is
+recommended that reconstruction routines use the ROOT format. For legacy
+reasons, MAUS supports reconstruction of data stored in ascii or json formats.
 
+In python, the representation (i.e. format) of the data can be changed by using 
+the module \verb|maus_cpp.converter|. If a module implements conversion to a
+specific data type, the \verb|can_convert| flag should be set to True; otherwise 
+MAUS will always hand data in string format.
 
-A minimal working implementation of a module would be as in \ref{api:MinimalModule}. Note the implementation of the pure virtual private \emph{\_birth} and \emph{\_death} functions.
-\begin{lstlisting}[
-    language=C++,
-    caption={A minimal working module},
-    label=api:MinimalModule,
-    index={Minimal working Module},
-    emph={_birth,_death},
-    emphstyle={\color{DarkBlue}},
-    emph={[2]s,m},
-    emphstyle={[2]\color{DarkKhaki}}
-  ]
-class MyModule : public ModuleBase {
-  public:
-    // Constructors & Destructors
-    explicit MyModule(const std::string& s) : ModuleBase(s) {}
-    MyModule(const MyModule& m) : ModuleBase(m) {}
-    virtual ~ModuleBase() {}
+In C++, mappers are templated to a MAUS data type. The API then handles any
+necessary conversion to that data type, and provides the appropriate python
+wrapper code for that module.
 
-  private:
-    virtual void _birth(const std::string& s) {
-      // Your initialisation code here
-    }
-    virtual void _death() {
-      // Your finalisation code here
-    }
-};
-\end{lstlisting}
-
-As is, this module `MyModule' doesn't contain anything except the ability to be initialised and finalised. While generally a developer will extend one of the classes described in the next sections which derive from the ModuleBase it is worth noting that one can create a standalone module in this way.
-
-%% Inputters Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Inputters}
-The first module type defined in the API is the inputter. This type of module is responsible for the generation of a data object be it by monte carlo methods or streaming a disk resident file. It's layout is defined in the \emph{IInput} interface \ref{api:IInput}. As with the other module types defined in this chapter the IInput interface inherits from IModule picking up the pure virtual birth and death functions. In addition IInput defines a third pure virtual function \emph{emitter}. This function is responsible for returning the data object.
-
-The IInput interface is templated to allow for implementation specific data object return types.
-\begin{lstlisting}[
-    language=C++,
-    caption={The inputter interface `IInput'},
-    label=api:IInput, 
-    index={IInput},
-    emph={emitter},
-    emphstyle={\color{DarkBlue}}
-  ]
-template<typename T>
-class IInput : public virtual IModule {
-  public:
-    virtual T* emitter() = 0;
-};
-\end{lstlisting}
-
-
-The associated abstract base class \emph{InputBase} behaves in much the same way as for ModuleBase. Here the inheritance completes the diamond inheritance structure from both the IInput interface and the abstractions from ModuleBase. Note accordingly the use of the virtual inheritance. As with ModuleBase, it is expected that the developer creating an inputter module inherit from this class and implement the pure virtual private \emph{\_emitter} function.
-\begin{lstlisting}[
-    language=C++,
-    caption={The abstract inputter base class `InputBase'},
-    label=api:InputBase, 
-    index={InputBase},
-    emph={emitter,_emitter},
-    emphstyle={\color{DarkBlue}}
-  ]
-template <typename T>
-class InputBase : public virtual IInput<T>, 
-                  public ModuleBase {
-  public:
-    explicit InputBase(const std::string&);
-    InputBase(const InputBase&);
-    virtual ~InputBase();
-
-  public:
-    T* emitter();
-
-  private:
-    virtual T* _emitter() = 0;
-};
-\end{lstlisting}
-
-A minimal implementation of an inputter then would be as in \ref{api:MinimalInputter}. Note that here we are inheriting from the InputBase class template with a template parameter (data object type) of \emph{Spill}. This in turn means that our minimal class implementation need not itself be a class template. As InputBase also inherits from the ModuleBase both the pure virtual private functions \emph{\_birth} and \emph{\_death} must be implemented.
-\begin{lstlisting}[
-    language=C++,
-    caption={A minimal working inputter},
-    label=api:MinimalInputter,
-    index={Minimal working inputter},
-    emph={_birth,_death,_emitter},
-    emphstyle={\color{DarkBlue}},
-    emph={[2]s,m},
-    emphstyle={[2]\color{DarkKhaki}}
-  ]
-class MyInput : public InputBase<Spill> {
-  public:
-    explicit MyInput(const std::string& s) : 
-        InputBase<Spill>(s) {}
-    MyInput(const MyInput& m) : InputBase<Spill>(m) {}
-    virtual ~MyInput() {}
-
-  private:
-    virtual void _birth(const std::string& s) {
-      // Your initialisation code here
-    }
-    virtual void _death() {
-      // Your finalisation code here
-    }
-    virtual Spill* _emitter() {
-      // Your emitter code here
-    }
-  };
-\end{lstlisting}
-%% Outputters Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Outputters}
-
-Outputters are responsible for doing something with the data once processed. Typically the final element in the chain an outputter can for example be responsible for writing the data to a persistant media or uploading it to a web server etc. The layout of an outputter is not dissimilar from that of the inputter as one might expect and is defined in the \emph{IOutput} interface \ref{api:IOutput}. As with the inputter the interface defines a class template with the template parameter being the data object type.
-\begin{lstlisting}[
-    language=C++,
-    caption={The outputter interface `IOutput'},
-    label=api:IOutput, 
-    index={IOutput},
-    emph={save},
-    emphstyle={\color{DarkBlue}}
-  ]
-template<typename T>
-class IOutput : public virtual IModule {
-  public:
-    virtual bool save(T*) = 0;
-};
-\end{lstlisting}
-
-As ever there is the corresponding abstract base class \emph{OutputBase} shown in \ref{api:OutputBase}. The \_save member function is for the developer to implement and takes as an argument a pointer to the data object. The return value of this function is a simple bool type which represents the success/failure of the outputter to complete it's task.
-\begin{lstlisting}[
-    language=C++,
-    caption={The abstract outputter base class `OutputBase'},
-    label=api:OutputBase, 
-    index={OutputBase},
-    emph={save,_save},
-    emphstyle={\color{DarkBlue}}
-  ]
-template <typename T>
-class OutputBase : public virtual IOutput<T>, 
-                   public ModuleBase {
-  public:
-    // Constructors & Destructors
-    explicit OutputBase(const std::string&);
-    OutputBase(const OutputBase&);
-    virtual ~OutputBase();
-
-  public:
-    bool save(T*);
-
-  private:
-    virtual bool _save(T*) = 0;
-};
-\end{lstlisting}
-
-%% Reducers Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Reducers}\label{api:section:Reducers}
-
-Reducers are data processors and usually come at the end of a chain of mappers (see section \ref{api:section:Mappers}). They can accumulate data from several events in their internal state and do something with the information i.e. create a histogram. They are defined by the interface \emph{IReduce} as in \ref{api:IReducer}. Note as before this is also a class template with the template parameter being the data object type. The process method, having used the data then returns an object of the same type such that it can be passed to an outputter for storing/streaming etc.
-\begin{lstlisting}[
-    language=C++,
-    caption={The reducer interface `IReducer'},
-    label=api:IReducer, 
-    index={IReducer},
-    emph={process},
-    emphstyle={\color{DarkBlue}}
-  ]
-template<typename T>
-class IReduce : public virtual IModule {
-  public:
-    virtual T* process(T* t) = 0;
-};
-\end{lstlisting}
-
-The corresponding adstract base class \emph{ReduceBase} can be seen in \ref{api:ReduceBase}.
-\begin{lstlisting}[
-    language=C++,
-    caption={The abstract reducer base class `ReduceBase'},
-    label=api:ReduceBase, 
-    index={ReduceBase},
-    emph={process,_process},
-    emphstyle={\color{DarkBlue}}
-  ]
-template <typename T>
-class ReduceBase : public virtual IReduce<T>, 
-                   public ModuleBase {
-  public:
-    // Constructors & Destructors
-    explicit ReduceBase(const std::string&);
-    ReduceBase(const ReduceBase&);
-    virtual ~ReduceBase();
-
-  public:
-    T* process(T*);
-
-  private:
-    virtual T* _process(T*) = 0;
-};
-\end{lstlisting}
-
-%% Mappers Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Mappers}\label{api:section:Mappers}
-
-Similar to reducers, mappers are used to process data. They are defined by the \emph{IMap} interface as in \ref{api:IMap}. Unlike reducers they have no internal state and hence the process method is defined const. The IMap interface defines a class template as with the other module types in this chapter. However unlike them it takes two template parameters, \emph{INPUT} and \emph{OUTPUT}, which represent the input and output data object types respectively. The reason for this was due to an upgrade to the original specification which required the mappers to be able to accept input types \emph{other} than the expected type. This will become more clear when looking at the abstract base class. Surfice to say for now that when implementing a mapper the developer must give as template parameters those types which s/he expects to be input and output.
-\begin{lstlisting}[
-    language=C++,
-    caption={The map interface `IMap'},
-    label=api:IMap, 
-    index={IMap},
-    emph={process},
-    emphstyle={\color{DarkBlue}}
-  ]
-template <typename INPUT, typename OUTPUT>
-class IMap : public virtual IModule {
-  public:
-    virtual OUTPUT* process(INPUT*) const = 0;
-};
-\end{lstlisting}
-
-The abstract base class \emph{MapBase}, seen in \ref{api:MapBase} looks slightly different then from the other module types shown before precisly because of this upgraded functionality. Note the addition in this case of templated public member function which overloads the standard public process method. This overloaded method will be called in all cases where the input data object type is not the same as the expected type here denoted \emph{INPUT}. Since there remains only the one pure virtual private \_process method, this templated method attempts to perform an automatic conversion of the input data object to the type expected by the developer. This abstracted behaviour means that the developer can go ahead and write their mapper knowing that no matter what inputter is used in the chain their code will be able to run.
-
-This automatic conversion is performed by a \emph{converter} object which is retrieved from the \emph{ConverterFactory} as described in \ref{converters:ConverterFactory}.
-\begin{lstlisting}[
-    language=C++,
-    caption={The abstract map base class `MapBase'},
-    label=api:MapBase, 
-    index={MapBase},
-    emph={process,_process},
-    emphstyle={\color{DarkBlue}}
-  ]
-template <typename INPUT, typename OUTPUT>
-class MapBase : public virtual IMap<INPUT, OUTPUT>,
-                public ModuleBase {
-  public:
-    // Constructors & Destructors
-    explicit MapBase(const std::string&);
-    MapBase(const MapBase&);
-    virtual ~MapBase();
-
-  public:
-    OUTPUT* process(INPUT*) const;
-    template <typename OTHER> OUTPUT* process(OTHER*) const;
-
-  private:
-    virtual OUTPUT* _process(INPUT*) const = 0;
-};
-\end{lstlisting}
-
-While at first glance this looks like it has added an extra layer of complexity for the developer, it's actuall no extra work at all. This is due to the abstraction layer absorbing all the extra complexity and shielding the developer from it. By way of example, compare the minimal mapper example in \ref{api:MinimalMapper} with that of the minimal inputter in \ref{api:MinimalInputter}. In this example it is expected that the mapper receive a data object of type Json::Value and will return the data in a type Spill. If now a particular inputter returns the data as type Spill we will still be able to use our mapper as a Spill to Json::Value converter will run on the data first to ensure the data is of the right type.
-\begin{lstlisting}[
-    language=C++,
-    caption={A minimal working mapper},
-    label=api:MinimalMapper,
-    index={Minimal working mapper},
-    emph={_birth,_death,_process},
-    emphstyle={\color{DarkBlue}},
-    emph={[2]s,m},
-    emphstyle={[2]\color{DarkKhaki}}
-  ]
-class MyMap : public MapBase<Json::Value, Spill> {
-  public:
-    // Constructors & Destructors
-    explicit MyMap(const std::string& s) :
-        MapBase<Json::Value, Spill>(s) {}
-    MyMap(const MyMap& m) :
-        MapBase<Json::Value, Spill>(m) {}
-    virtual ~MyMap() {}
-
-  private:
-    virtual void _birth(const std::string& s) {
-      // Your initialisation code here
-    }
-    virtual void _death() {
-      // Your finalisation code here
-    }
-    virtual Spill* _process(Json::Value*) const {
-      // Your processing code here
-    }
-};
-\end{lstlisting}
-
-%% Inheritance Section
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Scalability}
-It was an important motivation that the MAUS code be scalable for future unseen uses. To this end, the MAUS API framework is build upon the idea of a inheritance ladder as depicted in \ref{api:inheritance_ladder}. The ladder is essentially an extension of the `dreaded diamond' structure and allows for extension at any point. This figure shows the inheritance ladder for a \emph{reducer} (see section\ref{api:section:Reducers}) but similar ladders exist for each of the other module types in the framework. The uppermost line of classes correspone to the interface layer while those on the second row represent the abstraction layer. The uncoloured elements represent possible extensions. The colourless box on the bottom, `MyReduce', represents a developers implementation of the abstract ReduceBase. This has been touched on in this chapter already an represents a common inheritance from the abstract base. It is assumed that many such classes will be constructed. These classes are not considered extensions to the framework but rather elements which may be run within it.
-
-The two leftmost colourless boxes do indeed represent an extension to the ladder an hence an extension to the framework. One may consider at some point in the future that there needs to be a more specialised sub class of the reducer. One can then implement a seperate interface and abstract base class for this and extend the ladder.
-\begin{figure}[!h]
-  \label{api:inheritance_ladder}
-  \begin{center}
-  \end{center}
-    \includegraphics[scale=0.35]{MausApiInheritanceLadder}
-  \caption{Inheritance ladder}
-\end{figure}
+Currently only map modules support data mangling.
 
 \section{Module Initialisation and Destruction}
 MAUS has two execution concepts. A \verb|Job| refers to a single execution of the code, while a \verb|Run| refers to the processing of data for a MICE data run or Monte Carlo run.
@@ -387,5 +93,60 @@ For python users, some Global objects can be accessed by reference to the \verb|
 Global objects are initialised before any modules in Go.py and deleted after all modules are deathed. Global object initialisation and destruction is handled at the Job level by \verb|src/common_cpp/Globals/GlobalManager.hh| and called in python via \verb|maus_cpp.globals| as above.
 
 Run-by-run initialisation is handled by the RunActionManager, defined in \verb|src/common_cpp/Utils/RunActionManager.hh|. The RunActionManager holds a list of objects inheriting from \verb|RunActionBase| each of which defines functions to call at the start and end of each run.
+
+\section{Internal Classes}
+The following classes and namespaces are used to provide an interface between
+reconstruction modules and the framework (backend).
+
+\subsection{Abstraction Layers}
+These are all defined in \verb|src/common_cpp/API| and \verb|src/common_py/API|
+folders
+
+\begin{itemize}
+\item IModule - interface class for all modules; defines \verb|birth| and 
+\verb|death|
+\item ModuleBase - base class for modules, includes some error handling.
+\item IInput - interface class for all inputs; defines \verb|emitter| and 
+              inherits from IModule
+\item InputBase - base class for all inputs, includes some error handling and
+             inherits from ModuleBase and IInput
+\item IMap - interface class for all inputs; defines \verb|process| and 
+              inherits from IModule
+\item MapBase - base class for all inputs, includes some error handling and 
+              inherits from ModuleBase and IMap
+\item IReduce - interface class for all reducers; defines \verb|process| and 
+              inherits from IModule
+\item ReduceBase - base class for all reducers, includes some error handling and
+              inherits from ModuleBase and IReduce
+\item IOutput - interface class for all outputs; defines \verb|save| and 
+              inherits from IModule
+\item OutputBase - base class for all outputs, includes some error handling and 
+              inherits from ModuleBase and IOutput
+\end{itemize}
+
+\subsection{C++ Python Wrapper}
+\verb|src/common_cpp/API/PyWrapMapBase| is a templated class that wraps a 
+generic map object and provides python interfaces to that map object.
+
+Currently, Input, Reduce, Output wrappers are provided by SWIG.
+
+\subsection{Data Mangling}
+Data mangling is handled in a variety of layers.
+\begin{itemize}
+\item \verb|src/common_cpp/Converter/ConverterBase| provides an abstraction for
+      conversion from one type to another
+\item \verb|src/common_cpp/Converter/DataConverters| provides implementations
+      of the data conversions
+\item \verb|src/common_cpp/Converter/ConverterFactory| provides a function like
+      \verb|TYPE2* convert<TYPE1, TYPE2>(TYPE1* data)| with implementations for
+      each of the types. This then provides explicit conversion (i.e. where both
+      input and output types are known.
+\item \verb|src/common_cpp/Utils/PyObjectWrapper| provides functions for 
+      wrapping all of the data types into a \verb|PyObject*|. It also provides a 
+      function that unwraps the \verb|PyObject*|, figures out the data type and 
+      returns a data of the appropriate type.
+\item \verb|src/common_cpp/API/PyWrapMapBase| calls unwrap based on the type
+      stored in the \verb|PyObject*|.
+\end{itemize}
 
 
