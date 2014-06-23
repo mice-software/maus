@@ -44,22 +44,26 @@ def get_data(run_number):
     proc.wait()
 
 
-def get_sim_proc():
+def get_sim_proc(valgrind):
     """Start up a simulate_mice process"""
     sim_path = MRD+"/bin/simulate_mice.py"  
     config = TEST_DIR+"/test_load_configuration"
     sim_options = [sim_path, "--configuration_file", config]
     sim_log = open(TMP_DIR+"/test_load_simulate_mice.log", "w")
+    if valgrind:
+        sim_options = ['valgrind', '--leak-check=yes', 'python']+sim_options
     proc = subprocess.Popen(sim_options, stdout=sim_log,
                                          stderr=subprocess.STDOUT)
     return proc
 
-def get_rec_proc(run_number):
+def get_rec_proc(run_number, valgrind):
     """Start up a analyze_data_offline process"""
     rec_path = MRD+"/bin/analyze_data_offline.py"
     config = TEST_DIR+"/test_load_configuration"
     rec_options = [rec_path, "--configuration_file", config,
                    "--daq_data_file", run_number]
+    if valgrind:
+        rec_options = ['valgrind', '--leak-check=yes', 'python']+rec_options
     rec_log = TMP_DIR+"/test_load_analyze_data_offline_"+run_number+".log"
     proc = subprocess.Popen(rec_options, stdout=open(rec_log, "w"),
                                          stderr=subprocess.STDOUT)
@@ -87,6 +91,9 @@ def arg_parser():
     parser.add_argument('--time-step', dest='time_step',
                         help='Time step for checking the process memory size',
                         default=5, type=int)
+    parser.add_argument('--valgrind', dest='valgrind',
+                        help='Set to 1 to run valgrind leak-check=yes',
+                        default=0, type=int)
     return parser
 
 class LoadTest(unittest.TestCase): # pylint: disable = R0904
@@ -133,15 +140,17 @@ class LoadTest(unittest.TestCase): # pylint: disable = R0904
         Test that we can simulate mice for a long duration without memory 
         problems
         """
+        do_valgrind = self.args.valgrind == 1
         if self.args.run_number == 0:
             self.run_number = self.default_run_number
             get_data(self.run_number)
-            procs = [get_sim_proc(), get_rec_proc(self.run_number)]
+            procs = [get_sim_proc(do_valgrind), get_rec_proc(self.run_number,
+                                                             do_valgrind)]
             title = PLOT_DIR+"maus"
         else:
             self.run_number = str(self.args.run_number).rjust(5, "0")
             get_data(self.run_number)
-            procs = [get_rec_proc(self.run_number)]
+            procs = [get_rec_proc(self.run_number, do_valgrind)]
             title = PLOT_DIR+"run_"+str(self.run_number)
         try:
             resource_usage_list = process_monitor.main(
@@ -159,7 +168,7 @@ class LoadTest(unittest.TestCase): # pylint: disable = R0904
             for proc in procs:
                 print "Killing process", proc.pid
                 proc.send_signal(signal.SIGINT)
-            time.sleep(5)
+            time.sleep(max(5, self.args.max_time/100))
             for proc in procs:
                 while proc.poll() == None:
                     proc.send_signal(signal.SIGKILL)

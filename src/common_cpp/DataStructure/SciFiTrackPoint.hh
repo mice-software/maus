@@ -31,7 +31,7 @@
 
 // ROOT headers
 #include "TObject.h"
-#include "TRefArray.h"
+#include "TRef.h"
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -182,29 +182,31 @@ class SciFiTrackPoint : public TObject {
 
   int event()                const { return _event; }
 
-  /** @brief  Add a cluster to the mother clusters (should be only 1).
+  /** @brief  Returns the mother clusters as a TRef*.
    */
-  void add_cluster(SciFiCluster* cluster);
+  TRef* get_cluster() const { return _cluster; }
 
-  /** @brief  Return the first cluster in the array (which should be of size 1 anyway)
+   /** @brief Set the mother cluster using a TRef*.
    */
-  SciFiCluster* cluster() const;
+  void set_cluster(TRef* const cluster) { _cluster = cluster; }
 
-  /** @brief  Returns the mother clusters as a TRefArray*.
-   */
-  TRefArray* get_clusters() const { return _clusters; }
 
-   /** @brief Set the mother clusters using a TRefArray* (should be an array of size 1!).
+  /** @brief  Returns the mother cluster as a TObject pointer
    */
-  void set_clusters(TRefArray* cluster) { _clusters = cluster; }
+  TObject* get_cluster_tobject() const { return _cluster->GetObject(); }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_tobject(TObject* const cluster) { *_cluster = cluster; }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_pointer(SciFiCluster* const cluster) { *_cluster = cluster; }
 
   /** @brief  Returns the mother clusters as an array of pointers.
    */
-  SciFiClusterPArray get_clusters_pointers() const;
-
-  /** @brief  Set the mother clusters using an array of pointers (should be an array of size 1!).
-   */
-  void set_clusters_pointers(const SciFiClusterPArray &clusters);
+  SciFiCluster* get_cluster_pointer() const
+                { return static_cast<SciFiCluster*>(_cluster->GetObject()); }
 
  private:
   /** @brief The tracker the trackpoint belongs to.
@@ -272,7 +274,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief A pointer to the cluster used to form the state - does not assume control of memory
    */
-  TRefArray* _clusters;
+  TRef* _cluster;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

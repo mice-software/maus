@@ -68,20 +68,20 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   return *this;
 }
 
-void SciFiTrack::set_scifitrackpoints(SciFiTrackPointPArray points) {
-  // Delete any existing track points.
-  std::vector<SciFiTrackPoint*>::iterator track_point;
-  for (track_point = _trackpoints.begin();
-       track_point!= _trackpoints.end(); ++track_point) {
-    delete (*track_point);
-  }
-
-  // Make the deep copy.
-  _trackpoints.resize(points.size());
-  for (size_t i = 0; i < points.size(); ++i) {
-    _trackpoints[i] = new SciFiTrackPoint(*points.at(i));
-  }
-}
+// void SciFiTrack::set_scifitrackpoints(SciFiTrackPointPArray points) {
+//   // Delete any existing track points.
+//   std::vector<SciFiTrackPoint*>::iterator track_point;
+//   for (track_point = _trackpoints.begin();
+//        track_point!= _trackpoints.end(); ++track_point) {
+//     delete (*track_point);
+//   }
+//
+//   // Make the deep copy.
+//   _trackpoints.resize(points.size());
+//   for (size_t i = 0; i < points.size(); ++i) {
+//     _trackpoints[i] = new SciFiTrackPoint(*points.at(i));
+//   }
+// }
 
 SciFiTrack::~SciFiTrack() {
   // Delete track points in this track.

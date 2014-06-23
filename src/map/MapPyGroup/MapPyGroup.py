@@ -156,7 +156,6 @@ class MapPyGroup:
             if not (hasattr(worker, "can_convert") and worker.can_convert):
                 nu_spill = converter.string_repr(nu_spill)
             nu_spill = worker.process(nu_spill)
-        nu_spill = converter.string_repr(nu_spill)
         return nu_spill
 
     def death(self):

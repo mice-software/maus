@@ -22,7 +22,7 @@ import os
 import unittest
 # import json
 from Configuration import Configuration
-from InputCppDAQData import InputCppDAQData
+from _InputCppDAQData import InputCppDAQData
 
 class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for InputCppDAQData"""
@@ -41,8 +41,8 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
-        self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))
-        self.assertTrue(self._mapper.death())
+        self._mapper.birth( self._c.getConfigJSON() )
+        self._mapper.death()
         return
 
     @classmethod

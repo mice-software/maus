@@ -136,26 +136,28 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
 
   // Deep copy the kalman tracks
   _scifitracks.resize(rhs._scifitracks.size());
-  for (unsigned int i = 0; i < rhs._scifitracks.size(); ++i) {
-    _scifitracks[i] =  new SciFiTrack(*rhs._scifitracks[i]);
-    // Deep copy the scifi trackpoints done by scifitrack = operator
-    SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[i]->scifitrackpoints();
-    // Loop over the rhs trackpoints
-    for (unsigned int j = 0; j < rhs_tpoints.size(); ++j) {
-      // Now set cross-pointers to clusters within the trackpoints so they point to correct place
-      // in the new copy of the datastructure
-      SciFiClusterPArray new_clusters(rhs_tpoints[j]->get_clusters()->GetLast() + 1);
-      for (unsigned int k = 0; k < new_clusters.size(); ++k) {
-        new_clusters[k] = NULL;
-        for (unsigned int l = 0; l < rhs.clusters().size(); ++l) {
-          if (rhs_tpoints[j]->get_clusters()->At(k) == rhs._scificlusters[l]) {
-            new_clusters[k] = _scificlusters[l];
-            break;
-          }
+  for (unsigned int iTrk = 0; iTrk < rhs._scifitracks.size(); ++iTrk) {
+    _scifitracks[iTrk] =  new SciFiTrack(*rhs._scifitracks[iTrk]);
+    // Deep copy the scifi trackpoints
+    SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[iTrk]->scifitrackpoints();
+    SciFiTrackPointPArray new_tpoints(rhs_tpoints.size());
+    // Loop over the rhs track trackpoints
+    for (unsigned int iRtp = 0; iRtp < rhs_tpoints.size(); ++iRtp) {
+      new_tpoints[iRtp] = new SciFiTrackPoint(*(rhs_tpoints[iRtp]));
+      // Now set the cross-pointer to the cluster within the trackpoint so that it points to
+      // correct place in the new copy of the datastructure, by searching for the cluster index in
+      // rhs event, which matches the pointer address of the cluster in the rhs trackpoint. Use
+      // this to set new trackpoint cluster to pointer to the correct cluster in the new event.
+      SciFiCluster* new_cluster = NULL;
+      for (unsigned int iRcl = 0; iRcl < rhs.clusters().size(); ++iRcl) {
+        if (rhs_tpoints[iRtp]->get_cluster_pointer() == rhs._scificlusters[iRcl]) {
+          new_cluster = _scificlusters[iRcl];
+          break;
         }
       }
-      _scifitracks[i]->scifitrackpoints()[j]->set_clusters_pointers(new_clusters);
+      new_tpoints[iRtp]->set_cluster_pointer(new_cluster);
     }
+    _scifitracks[iTrk]->set_scifitrackpoints(new_tpoints);
   }
   return *this;
 }

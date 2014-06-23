@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
         for ( tpnt = tpnts.begin(); tpnt != tpnts.end(); ++tpnt ) {
           std::cout << "    SciFi TrackPoint filtered chi_sq: " << (*tpnt)->f_chi2() << std::endl;
           // Pull out the associated cluster
-          MAUS::SciFiCluster* clus = (*tpnt)->cluster();
+          MAUS::SciFiCluster* clus = (*tpnt)->get_cluster_pointer();
           if (!clus) {
             std::cout << "Empty cluster pointer, address " << clus  << std::endl;
             continue;

@@ -32,6 +32,8 @@
 #include "unpacking/MDequipMap.h"
 #include "unpacking/MDfragment.h"
 
+#include "src/common_cpp/API/InputBase.hh"
+
 #include "src/input/InputCppDAQData/UnpackEventLib.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
@@ -53,7 +55,7 @@ namespace MAUS {
 * information is low-level.
 */
 
-class InputCppDAQData {
+class InputCppDAQData : public InputBase<std::string> {
 
  public:
 
@@ -63,22 +65,13 @@ class InputCppDAQData {
   */
   InputCppDAQData();
 
-  /** Initialise the Unpacker.
-  *
-  * This prepares the unpacker to read the data according to the configuration.
-  *
-  * \return True if the configuration is loaded and the processors are
-  * initialised sucessfully.
-  */
-  bool birth(std::string pJSONConfig);
-
   /** Dummy function.
   * The access to the data is provided by the two daughter classes
   * InputCppDAQOfflineData and InputCppDAQOnlineData.
   *
   * \return false after printing an error message.
   */
-  bool readNextEvent();
+  virtual bool readNextEvent();
 
   /** Unpack the current event into JSON.
   *
@@ -108,35 +101,25 @@ class InputCppDAQData {
     _dataProcessManager.Disable(pEquipType);
   }
 
-  /** Close the file and free memory.
-  *
-  * This function frees all resources allocated by Birth().
-  * It is unlikely this will ever fail!
-  *
-  * \return True if successful.
-  */
-  bool death();
-
   /* Functions for python use only!
    * They are written in InputCppDAQData.i so that they
    * can use pure python code in the python bindings!
    */
 
-  /** Internal emitter function.
-  *
-  * When called from C++, this function does nothing.
-  * From python (where it is overriden by the bindings,
-  * it returns an iterable result which allows access to all events.
-  *
-  * \return An empty string from C++.
-  */
-  std::string emitter() {
-     return "";
-  };
-
  protected:
 
-  std::string _classname;
+  /** Internal emitter function.
+  *
+  * \return An event string.
+  */
+  std::string _emit_cpp() {
+     if (this->readNextEvent())
+        return this->getCurEvent();
+     else
+        throw(MAUS::Exception(Exception::recoverable,
+                              "Failed to read next event",
+                              "InputCppDAQData::_emit_cpp()"));
+  };
 
   /** Counter of the DAQ events. */
   int _eventsCount;
@@ -147,7 +130,26 @@ class InputCppDAQData {
   /** Pointer to the start of the current event. */
   unsigned char *_eventPtr;
 
+  /** Initialise the Unpacker.
+  *
+  * This protected birth is intended to be called from children
+  *
+  * This prepares the unpacker to read the data according to the configuration.
+  */
+  void _childbirth(const std::string& pJSONConfig);
+
  private:
+
+  void _birth(const std::string& pJSONConfig) {
+    _childbirth(pJSONConfig);
+  }
+
+  /** Close the file and free memory.
+  *
+  * This function frees all resources allocated by Birth().
+  * It is unlikely this will ever fail!
+  */
+  void _death();
 
   /** Initialise the processor.
   * Template function used to initialise a processor

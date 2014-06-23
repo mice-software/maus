@@ -70,9 +70,9 @@ class SciFiTrack {
    */
   void set_charge(int charge) { _charge = charge; }
 
-  /** @brief Sets trackpoints vector, deep copy
+  /** @brief Sets trackpoints vector, shallow copy
    */
-  void set_scifitrackpoints(SciFiTrackPointPArray points);
+  void set_scifitrackpoints(SciFiTrackPointPArray points) { _trackpoints = points; }
 
   /** @brief Returns the tracker number.
    */
