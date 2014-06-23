@@ -185,15 +185,15 @@
                             //    ScaleFactor -1
                             //}
                                             //Other Modules
-                            <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
+                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
                             //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
                             //Go and select the diffuser model
-                            </xsl:when></xsl:choose>
+                            //</xsl:when></xsl:choose>
                 
-                            <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @protonAbsorberThickness)">
+                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @protonAbsorberThickness)">
                             //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@protonAbsorberThickness"/>
                             //Go and select the diffuser model
-                            </xsl:when></xsl:choose>
+                            //</xsl:when></xsl:choose>
 
                             // Fields
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
@@ -260,8 +260,14 @@
                             ScaleFactor <xsl:value-of select="ScaleFactor/@name"/>
                             }
                 </xsl:for-each>
+		<xsl:for-each select="MICE_Information/Detector_Information/Diffuser">
+			    Module iris_<xsl:value-of select="Iris/@name"/>_closed.dat
+			    {
+			    Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
+                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
+			    }
                        } 
-                       
+               </xsl:for-each>        
             </body>
         </html>
     </xsl:template>
