@@ -167,7 +167,7 @@
                             </xsl:for-each> 
                 	    
 			<xsl:for-each select="MICE_Information/Detector_Information/Diffuser">
-			    Module iris_<xsl:value-of select="Iris/@name"/>_closed.dat
+			    Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>iris<xsl:value-of select="Iris/@name"/>_closed.dat
 			    {
 			    Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
