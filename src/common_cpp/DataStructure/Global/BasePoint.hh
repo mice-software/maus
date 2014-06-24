@@ -95,6 +95,24 @@ class BasePoint : public TObject {
   /// Get the fully qualified geometry path for this point.
   std::string get_geometry_path() const;
 
+  /// Set the number of photoelectrons measured at this point.
+  void set_num_photoelectrons(double num_photoelectrons);
+
+  /// Get the number of photoelectrons measured at this point.
+  double get_num_photoelectrons() const;
+
+  /// Set the ADC charge measured at this point.
+  void set_ADC_charge(int ADC_charge);
+
+  /// Get the ADC charge measured at this point.
+  int get_ADC_charge() const;
+
+  /// Set the ADC charge product at this point.
+  void set_ADC_charge_product(int ADC_charge_product);
+
+  /// Get the ADC charge product at this point.
+  int get_ADC_charge_product() const;
+
   /// A special setter, for the RegisterBaseClass method in JsonCppProcessors.
   void set_base(BasePoint value);
 
@@ -109,6 +127,15 @@ class BasePoint : public TObject {
   DetectorPoint  _detector;
   /// The fully qualified geometry path for this point.
   std::string    _geometry_path;
+
+  /// Number of photoelectrons measured at this point.
+  double _num_photoelectrons;
+
+  /// ADC charge measured at this point.
+  int _ADC_charge;
+
+  /// ADC charge product at this point.
+  int _ADC_charge_product;
 
   MAUS_VERSIONED_CLASS_DEF(BasePoint);
 }; // ~class BasePoint

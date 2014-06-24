@@ -37,6 +37,25 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
+    # KL
+    my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
+    my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
+
+    # can specify datacards here or by using appropriate command line calls
+    datacards = io.StringIO(u"")
+
+    reducer = MAUS.ReducePyDoNothing()
+
+    # Then construct a MAUS output component - filename comes from datacards
+    my_output = MAUS.OutputPyJSON()
+
+    # The Go() drives all the components you pass in, then check the file
+    # (default simulation.out) for output
+
+    MAUS.Go(my_input, my_map, reducer, my_output, datacards)
+
+if __name__ == '__main__':
+    run()
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon

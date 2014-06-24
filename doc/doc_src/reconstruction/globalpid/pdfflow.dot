@@ -1,0 +1,21 @@
+digraph pdfflow {
+subgraph cluster0 {
+style=filled;
+color=grey;
+subgraph cluster1 {
+node [style=filled,color=white];
+style=filled;
+color=lightgrey;
+b1 -> b2 -> b3;
+b1 [shape=box,label="For PID variable, calculate\nvalue for track"];
+b2 [shape=box,label="Create/open corresponding\nhistogram, and fill with variable value "];
+b3 [shape=box,label="If required, ensure non-zero bin\nentries and normalise"];
+label="Loop through PID variables";
+}
+label="Loop through tracks";
+}
+b0 -> b1;
+b3 -> b4;
+b0 [shape=box,label="Pass globally reconstructed\nMC tracks to PID"];
+b4 [shape=box,label="Write to and save file"];
+}

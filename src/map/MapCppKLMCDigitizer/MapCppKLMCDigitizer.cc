@@ -39,13 +39,22 @@ void MapCppKLMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // print level
   fDebug = false;
 
+
+  // Check if the JSON document can be parsed, else return error only
+  Json::Reader reader;
+  bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
+  if (!parsingSuccessful) {
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to parse Json Configuration",
+                          "MapCppTOFMCDigitizer::_birth");
+  }
   // get the geometry
-  if (!_configJSON.isMember("reconstruction_geometry_filename"))
+  if (!_configJSON.isMember("simulation_geometry_filename"))
       throw(Exception(Exception::recoverable,
                    "Could not find geometry file",
                    "MapCppKLMCDigitizer::birth"));
   std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  filename = _configJSON["simulation_geometry_filename"].asString();
   // get the kl geometry modules
   geo_module = new MiceModule(filename);
   kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");

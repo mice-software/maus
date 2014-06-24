@@ -15,6 +15,7 @@
  */
 
  /** @class PIDVarA
+ *  @author Celeste Pidcott, University of Warwick
  *  Example PID variable class, for TOF1 time - TOF0 time, derived
  *  from PIDBase
  */

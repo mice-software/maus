@@ -16,6 +16,7 @@
  */
 
 /** @class MapCppGlobalPID
+ *  @author Celeste Pidcott, University of Warwick
  *  Perform PID on incoming global tracks.
  *
  */

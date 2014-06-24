@@ -15,14 +15,14 @@
  *
  */
 
-/** @class ImportTOFRecon
+/** @class ImportCkovRecon
  *  @author Celeste Pidcott, University of Warwick
- *  Imports the space points from the TOF detectors into
+ *  Imports the space points from the Ckov detectors into
  *  the MAUS::recon::global format.  
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTTOFRECON_HH_
-#define _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTTOFRECON_HH_
+#ifndef _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTCKOVRECON_HH_
+#define _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTCKOVRECON_HH_
 
 // C++ headers
 #include <string>
@@ -38,42 +38,31 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  class ImportTOFRecon {
+  class ImportCkovRecon {
   public:
 
     /// Default constructor
-    ImportTOFRecon() {}
+    ImportCkovRecon() {}
 
     /// Destructor
-    ~ImportTOFRecon() {}
+    ~ImportCkovRecon() {}
 
-    /**  Main process, accepting the MAUS::TOFEvent and importing
+    /**  Main process, accepting the MAUS::CkovEvent and importing
      *   space points into an existing MAUS::GlobalEvent
-     *  @param tof_event  The reconstructed TOF Event
+     *  @param ckov_event  The reconstructed Ckov Event
      *  @param global_event The Global Event, which will be changed
      */
-    void process(const MAUS::TOFEvent &tof_event,
+    void process(const MAUS::CkovEvent &ckov_event,
 		 MAUS::GlobalEvent* global_event,
 		 std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
-    ImportTOFRecon(const ImportTOFRecon&);
+    ImportCkovRecon(const ImportCkovRecon&);
 
     /// Disallow operator= as unnecessary
-    void operator=(const ImportTOFRecon);
-
-    /**  @brief Add TOF space points to global event
-     *   
-     *  @param tofEventSpacepoint  The reconstructed TOF Event
-     *  @param global_event The Global Event, which will be changed
-     *  @param mapper_name 
-     */
-    void ImportTOFSpacePoints(
-			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
-			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name);
-  }; // ~class ImportTOFRecon
+    void operator=(const ImportCkovRecon);
+  };// ~class ImportCkovRecon
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS
