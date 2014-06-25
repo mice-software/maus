@@ -42,6 +42,24 @@ BasePointProcessor::BasePointProcessor() {
       &MAUS::DataStructure::Global::BasePoint::get_geometry_path,
       &MAUS::DataStructure::Global::BasePoint::set_geometry_path,
       true);
+
+  RegisterValueBranch(
+      "num_photoelectrons", &_double_proc,
+      &MAUS::DataStructure::Global::BasePoint::get_num_photoelectrons,
+      &MAUS::DataStructure::Global::BasePoint::set_num_photoelectrons,
+      true);
+
+  RegisterValueBranch(
+      "ADC_charge", &_int_proc,
+      &MAUS::DataStructure::Global::BasePoint::get_ADC_charge,
+      &MAUS::DataStructure::Global::BasePoint::set_ADC_charge,
+      true);
+
+  RegisterValueBranch(
+      "ADC_charge_product", &_int_proc,
+      &MAUS::DataStructure::Global::BasePoint::get_ADC_charge_product,
+      &MAUS::DataStructure::Global::BasePoint::set_ADC_charge_product,
+      true);
 }
 
 } // ~namespace Global

@@ -247,9 +247,9 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             hname = "hPMT%d" % (j+1)
             htitle = "PMT%d" % (j+1)
-            nbins = 200
+            nbins = 500
             x_lo = -50
-            x_hi = 200
+            x_hi = 500
 
             self._hcharge.append(ROOT.TH1F(hname, htitle, nbins, x_lo, x_hi))
             self._hcharge[j].GetXaxis().SetTitle("Charge")

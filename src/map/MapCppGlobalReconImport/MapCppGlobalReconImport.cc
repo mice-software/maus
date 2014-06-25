@@ -44,6 +44,7 @@ namespace MAUS {
                               "MapCppGlobalReconImport::birth");
     }
     _configCheck = true;
+    _classname = "MapCppGlobalReconImport";
   }
 
   void MapCppGlobalReconImport::_death() {
@@ -91,10 +92,10 @@ namespace MAUS {
     }
 
     MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
-
     MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
-
     MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
+    MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
+    MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
 
     if (tof_event) {
       MAUS::recon::global::ImportTOFRecon tofrecon_importer;
@@ -103,6 +104,14 @@ namespace MAUS {
     if (scifi_event) {
       MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
       scifirecon_importer.process((*scifi_event), global_event, _classname);
+    }
+    if (ckov_event) {
+      MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
+      ckovrecon_importer.process((*ckov_event), global_event, _classname);
+    }
+    if (kl_event) {
+      MAUS::recon::global::ImportKLRecon klrecon_importer;
+      klrecon_importer.process((*kl_event), global_event, _classname);
     }
     // Return the new GlobalEvent, to be added to the ReconEvent
     return global_event;

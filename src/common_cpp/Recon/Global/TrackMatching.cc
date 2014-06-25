@@ -72,6 +72,7 @@ namespace global {
 	    MAUS::DataStructure::Global::TrackPoint* tempTOFTrackPoint =
 	      const_cast<MAUS::DataStructure::Global::TrackPoint*>
 	      (tempTOFTrackPointArray[k]);
+	    tempTOFTrackPoint->set_mapper_name(mapper_name);
 	    GlobalTrack->AddTrackPoint(tempTOFTrackPoint);
 	  }
 	  for (unsigned int k = 0; k < tempSciFiTrackPointArray.size(); k++) {

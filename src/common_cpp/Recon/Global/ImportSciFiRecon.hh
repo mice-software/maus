@@ -15,8 +15,9 @@
  *
  */
 
-/** @class ImportTOFRecon
- *  Imports the space points from the TOF detectors into
+/** @class ImportSciFiRecon
+ *  @author Celeste Pidcott, University of Warwick
+ *  Imports the track points from the SciFi detectors into
  *  the MAUS::recon::global format.  
  */
 
@@ -80,7 +81,7 @@ namespace global {
     void SetStationEnum(
       MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint,
       MAUS::DataStructure::Global::Track* GlobalSciFiTrack, int tracker,
-      int station, double& z);
+      int station);
   }; // ~class ImportSciFiRecon
 } // ~namespace global
 } // ~namespace recon
