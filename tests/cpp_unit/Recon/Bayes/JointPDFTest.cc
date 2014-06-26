@@ -31,9 +31,9 @@ class JointPDFTest : public ::testing::Test {
     // Sets up a JointPDF object for testing.
     std::string lname("JointPDF");
     std::string pname("prob_station3");
-    _shift_min = -10.;
-    _shift_max = 10.;
-    _bin_width = 0.1;
+    _shift_min = -8.;
+    _shift_max = 8.;
+    _bin_width = 0.01;
     _jointPDF = new JointPDF(lname, _bin_width, _shift_min, _shift_max);
     double sigma = 1.5; // mm
     int number_of_tosses = 100000;
@@ -61,13 +61,13 @@ TEST_F(JointPDFTest, test_binning) {
   int n_bins = _jointPDF->n_bins();
   // centre of bin 1
   double bin_1_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(1);
-  EXPECT_EQ(_shift_min, bin_1_centre);
+  EXPECT_NEAR(_shift_min, bin_1_centre, 1e-6);
   // centre of middle bin (x=0).
   double middle_bin_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(n_bins/2+1);
-  EXPECT_NEAR(0., middle_bin_centre, 1e-10);
+  EXPECT_NEAR(0., middle_bin_centre, 1e-6);
   // centre of bin nbins
   double bin_n_bins_centre = _jointPDF->GetJointPDF()->GetXaxis()->GetBinCenter(n_bins);
-  EXPECT_EQ(_shift_max, bin_n_bins_centre);
+  EXPECT_NEAR(_shift_max, bin_n_bins_centre, 1e-6);
 }
 
 TEST_F(JointPDFTest, test_mean) {

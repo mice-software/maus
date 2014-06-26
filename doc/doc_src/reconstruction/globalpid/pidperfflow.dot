@@ -1,0 +1,6 @@
+digraph pidperfflow {
+b1 -> b2 -> b3;
+b1 [shape=box,label="Data"];
+b2 [shape=box,label="Global\nReconstruction "];
+b3 [shape=box,label="Global PID"];
+}

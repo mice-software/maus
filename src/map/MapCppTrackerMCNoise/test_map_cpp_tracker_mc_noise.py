@@ -25,7 +25,8 @@ import unittest
 import os
 from Configuration import Configuration
 
-from MapCppTrackerMCNoise import MapCppTrackerMCNoise
+import maus_cpp.converter
+from MAUS import MapCppTrackerMCNoise
 
 class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
     """ The MapCppTrackerRecon test.
@@ -52,17 +53,17 @@ class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
         """
         self.mapper = MapCppTrackerMCNoise()
         conf = json.loads(Configuration().getConfigJSON())
-        conf["simulation_geometry_filename"] = "Stage4.dat"
+        geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
+               "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+        conf["simulation_geometry_filename"] = geom
         conf["SciFiDarkCountProababilty"] = 0.02
         # Test whether the configuration files were loaded correctly at birth
-        success = self.mapper.birth(json.dumps(conf))
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        self.mapper.birth(json.dumps(conf))
 
 
     def test_death(self):
         """ Test to make sure death occurs """
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
 
     def test_process(self):
         """ Test of the process function """
@@ -76,15 +77,15 @@ class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
         # First line is just info, use to check we get errors
         line_1 = _file.readline().rstrip()
         output_1 = self.mapper.process(line_1)
-        self.assertTrue("errors" in json.loads(output_1))
+        self.assertTrue("errors" in maus_cpp.converter.json_repr(output_1))
         # Line 2 is run header; throw away
         _file.readline()
         # Line 3 is good data
         line_3 = _file.readline()
         output_3 = self.mapper.process(line_3)
-        self.assertTrue("recon_events" in json.loads(output_3))
+        spill_out = maus_cpp.converter.json_repr(output_3)
+        self.assertTrue("recon_events" in spill_out)
         # Check the digits have been made
-        spill_out = json.loads(output_3)
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
@@ -96,9 +97,7 @@ class MapCppTrackerMCNoiseTestCase(unittest.TestCase):
     @classmethod
     def tear_down_class(self): # pylint: disable-msg=C0202
         """___"""
-        success = self.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        self.mapper.death()
         self.mapper = None
 
 if __name__ == '__main__':

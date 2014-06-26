@@ -24,30 +24,10 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
-namespace MAUS {
+namespace LeastSquaresFitter {
 
-LeastSquaresFitter::LeastSquaresFitter(double sd_1to4, double sd_5, double R_res_cut) {
-  _sd_1to4 = sd_1to4;
-  _sd_5 = sd_5;
-  _R_res_cut = R_res_cut;
-}
-
-LeastSquaresFitter::~LeastSquaresFitter() {}
-
-bool LeastSquaresFitter::LoadGlobals() {
-  if (!Globals::HasInstance()) {
-    Json::Value *json = Globals::GetConfigurationCards();
-    _sd_1to4 = (*json)["SciFiSD1To4"].asDouble();
-    _sd_5 = (*json)["SciFiSD5"].asDouble();
-    _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
-    return true;
-  } else {
-    return false;
-  }
-}
-
-void LeastSquaresFitter::linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
-                        const std::vector<double> &_y_err, SimpleLine &line) {
+void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
+                const std::vector<double> &_y_err, MAUS::SimpleLine &line) {
 
   int n_points = static_cast<int>(_x.size());
 
@@ -86,8 +66,8 @@ void LeastSquaresFitter::linear_fit(const std::vector<double> &_x, const std::ve
   line.set_chisq_dof(result[0][0] / n_points);
 } // ~linear_fit(...)
 
-bool LeastSquaresFitter::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
-                                    SimpleCircle &circle) {
+bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
+                const std::vector<MAUS::SciFiSpacePoint*> &spnts, MAUS::SimpleCircle &circle) {
 
   int n_points = static_cast<int>(spnts.size());
   CLHEP::HepMatrix A(n_points, 3); // rows, columns
@@ -98,9 +78,9 @@ bool LeastSquaresFitter::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
     // This part will change once I figure out proper errors
     double sd = -1.0;
     if ( spnts[i]->get_station() == 5 )
-      sd = _sd_5;
+      sd = sd_5;
     else
-      sd = _sd_1to4;
+      sd = sd_1to4;
 
     double x_i = spnts[i]->get_position().x();
     double y_i = spnts[i]->get_position().y();
@@ -140,7 +120,7 @@ bool LeastSquaresFitter::circle_fit(const std::vector<SciFiSpacePoint*> &spnts,
   //  std::cout << "R was < 0 but taking abs_val for physical correctness\n";
   R = fabs(R);
 
-  if (R > _R_res_cut) return false; // Cannot be larger than 150mm or the track is not contained
+  if (R > R_res_cut) return false; // Cannot be larger than 150mm or the track is not contained
 
   circle.set_x0(x0);
   circle.set_y0(y0);

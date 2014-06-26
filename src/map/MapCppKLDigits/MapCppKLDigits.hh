@@ -38,31 +38,33 @@
 
 // G4MICE from commonCpp
 #include "Utils/KLChannelMap.hh"
+#include "API/MapBase.hh"
 
 namespace MAUS {
-class MapCppKLDigits {
+class MapCppKLDigits : public MapBase<Json::Value> {
 
  public:
+  MapCppKLDigits();
+
+ private:
  /** @brief Sets up the worker
   *  @param argJsonConfigDocument a JSON document with
   *         the configuration.
   */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
  /** @brief Shutdowns the worker
   *  This takes no arguments and does nothing
   */
-  bool death();
+  void _death();
 
  /** @brief process JSON document
   *  @param document Receive a document with raw data and return
   *  a document with digits
   */
-  std::string process(std::string document);
+  void _process(Json::Value* document) const;
 
  private:
-  std::string _classname;
-
   KLChannelMap _map;
 
   // Vector to hold the names of all detectors to be included
@@ -77,12 +79,12 @@ class MapCppKLDigits {
    *  @param xDocTrig Json document containing the "trigger" info
    *  @param xDocPmtInfo A refernence to the Information to be included in a digit
    */
-  Json::Value makeDigits(Json::Value xDocDetectorData, Json::Value xDocTrig);
+  Json::Value makeDigits(Json::Value xDocDetectorData, Json::Value xDocTrig) const;
 
   /** @brief Gets the information from the flash ADC branch and appends it to the digit
    *  @param xDocPartEvent One particle event from raw detector data
    */
-  Json::Value getAdc(Json::Value xDocPartEvent);
+  Json::Value getAdc(Json::Value xDocPartEvent) const;
 };
 }
 #endif

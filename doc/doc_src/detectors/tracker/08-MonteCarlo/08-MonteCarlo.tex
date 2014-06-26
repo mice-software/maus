@@ -1,0 +1,29 @@
+\section{The Monte Carlo}
+\label{Sect:SciFiMonteCarlo}
+
+The tracker Monte Carlo can be run using the script at the beginning of the tracker section.  In addition to the basic Monte Carlo noise from dark count in the VLPCs can be simulated by including the mapper MapCppTrackerMCNoise, which should be run before MapCppTrackerMCDigitization.  Reconstruction after digitization is agnostic to source by design decision.
+
+\subsection{Station Geometry}
+The tracker geometry is built in Geant4 on a fibre-by-fibre basis.  The size of the active tracker plane and the fibre diameter is defined in the mice modules.  The fibre offset and translation are determined in code, the length of the fibres are then determined by its position within the plane.  Fibre placement is then iterated over from one end of the plane to the other filling in all gaps within the area.
+
+Each of the three scintillating fibre planes is built up this way.  In addition to these the Monte Carlo also includes a thin layer of mylar sandwiched between these planes.  The relative position of the three tracking planes and the three mylar layers within the station are defined in the mice modules.
+
+\subsection{MC VLPC Dark Count}
+When the mapper MapCppTrackerMCNoise is included in the MC each channel is tested for the presence of an integer number of PE randomly appearing in the data.  The chance of this per channel noise is defined by the parameter SciFiDarkCountProbabilty within the data cards, while the number of PE generated is given by a Poisson distribution.  If a noise hit is produced it is recorded to be passed to digitization later. 
+
+\subsection{Building Digits}
+When a particle crosses a scintillating fibre in the MC it may deposits some amount of energy in passing determined by Geant4.  The digitization process takes this deposited energy and transforms it into a number of PE as follows: 
+
+\begin{equation}
+NPE = Energy* SciFiFiberConvFactor *
+                 SciFiFiberTrappingEff *
+                 ( 1.0 + SciFiFiberMirrorEff ) *
+                 SciFiFiberTransmissionEff *
+                 SciFiMUXTransmissionEff *
+                 SciFivlpcQE;
+\end{equation}
+
+\noindent
+Where the value of each of these variable other than the deposited energy is given in the data cards.
+
+Hits in the same tracker, station, and plane are collected together to form a single digit.  The grouping of digits are merged with any noise effects and a Gaussian smearing is applied to the total NPE to finish the digitization process.

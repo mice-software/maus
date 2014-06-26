@@ -18,9 +18,9 @@
 # pylint: disable = C0103
 
 import os
-import json
 import unittest
 from Configuration import Configuration
+import maus_cpp.converter
 import MAUS
 
 class MapCppKLDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
@@ -33,17 +33,15 @@ class MapCppKLDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_empty(self):
         """Check can handle empty configuration"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
+        self.assertRaises(ValueError, self.mapper.birth, "")
         result = self.mapper.process("")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
+        self.assertTrue("MapCppKLDigits" in doc["errors"])
 
     def test_init(self):
         """Check birth with default configuration"""
-        success = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.mapper.birth(self. c.getConfigJSON())
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
@@ -53,7 +51,7 @@ class MapCppKLDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         data = fin.read()
         # test with no data.
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         self.assertFalse('digits' in spill_out)
 
     def __test_process_kl_digits(self, spill_in, spill_out):
@@ -84,8 +82,8 @@ class MapCppKLDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        spill_in = json.loads(data)
-        spill_out = json.loads(result)
+        spill_in = maus_cpp.converter.json_repr(data)
+        spill_out = maus_cpp.converter.json_repr(result)
 
         # test the outputs
         self.__test_process_kl_digits(spill_in, spill_out)
@@ -93,10 +91,7 @@ class MapCppKLDigitsTestCase(unittest.TestCase): # pylint: disable = R0904
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that we can death() MapCppKLDigits"""
-        success = cls.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-        cls.mapper = None
+        cls.mapper.death()
 
 if __name__ == '__main__':
     unittest.main()

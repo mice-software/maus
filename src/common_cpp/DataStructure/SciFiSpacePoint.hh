@@ -28,6 +28,10 @@
 #include <string>
 #include <vector>
 
+// ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
+
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -35,7 +39,7 @@
 
 namespace MAUS {
 
-class SciFiSpacePoint {
+class SciFiSpacePoint : public TObject {
  public:
 
   /** Default constructor - initialises to 0/NULL */
@@ -110,11 +114,15 @@ class SciFiSpacePoint {
 
   bool get_used() const { return _used; }
 
-  void add_channel(SciFiCluster *channel) { _channels.push_back(channel); }
+  void add_channel(SciFiCluster *channel);
 
-  void set_channels(SciFiClusterPArray channels) { _channels = channels; }
+  void set_channels(TRefArray* channels) { _channels = channels; }
 
-  SciFiClusterPArray get_channels()  const { return _channels; }
+  TRefArray* get_channels() const { return _channels; }
+
+  void set_channels_pointers(const SciFiClusterPArray &channels);
+
+  SciFiClusterPArray get_channels_pointers() const;
 
  private:
   bool _used;
@@ -129,7 +137,7 @@ class SciFiSpacePoint {
 
   ThreeVector _position;
 
-  SciFiClusterPArray  _channels;
+  TRefArray*  _channels;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiSpacePoint)
 };  // Don't forget this trailing colon!!!!

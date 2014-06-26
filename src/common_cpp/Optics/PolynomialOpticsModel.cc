@@ -168,7 +168,7 @@ void PolynomialOpticsModel::SetupAlgorithm() {
       JsonWrapper::stringValue);
   size_t algorithm;
   for (algorithm = 0; algorithm <= algorithm_names.size(); ++algorithm) {
-    if (algorithm_name == algorithm_names[algorithm]) {
+    if (algorithm_name == algorithm_names[Json::Value::ArrayIndex(algorithm)]) {
       break;  // leave the current index into algorithm_names in algorithm
     }
   }

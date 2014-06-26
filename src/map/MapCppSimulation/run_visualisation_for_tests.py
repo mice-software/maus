@@ -25,8 +25,10 @@ import os
 import json
 import unittest
 
+import maus_cpp.globals
+import maus_cpp.converter
 import Configuration
-from MapCppSimulation import MapCppSimulation
+from MAUS import MapCppSimulation
 
 class MapCppSimulationVisualisationTestCase(unittest.TestCase):
     """
@@ -36,7 +38,9 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
     def setUpClass(self): # pylint: disable=C0103, C0202
         self.float_tolerance = 1e-9
         self.mapper = MapCppSimulation()
-        success = self.mapper.birth(json.dumps(self.configuration))
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(json.dumps(self.configuration))
+        self.mapper.birth(json.dumps(self.configuration))
         self.particle = {"primary":{
                 "position":{"x":1.,"y":2.,"z":3.},
                 "momentum":{"x":4.,"y":5.,"z":6.},
@@ -47,15 +51,10 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
                 "time":7.,
                 "statistical_weight":1.
             }}
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
 
     @classmethod
     def tearDownClass(self): # pylint: disable=C0103, C0202
-        success = self.mapper.death()
-        if not success:
-            raise Exception('DestructFail', 'Could not kill worker')
-        self.mapper = None
+        self.mapper.death()
 
     ######## tests on Process #########
     def test_mc_vrml2file(self):  # should make a vrml file
@@ -68,7 +67,8 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         good_event = {
             "mc_events":[self.particle,self.particle]
         }
-        result = self.mapper.process(json.dumps(good_event))
+        result = self.mapper.process(good_event)
+        result = maus_cpp.converter.json_repr(result)
         if "errors" in result:
             raise Exception('test_mc_vis made an error')
         if len(glob.glob('g4_*.wrl')) < 1:

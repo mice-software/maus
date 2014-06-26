@@ -16,8 +16,8 @@
  */
 
 /** @class TrackMatching
- *  Takes a global event containing (currently just from TOF)
- *	space points and creates global tracks.
+ *  @author Celeste Pidcott, University of Warwick
+ *  Takes a global event containing space points and creates global tracks.
  */
 
 #ifndef _SRC_COMMON_CPP_RECON_TRACKMATCHING_HH_

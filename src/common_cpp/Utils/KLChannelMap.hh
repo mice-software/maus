@@ -124,14 +124,14 @@ class KLChannelMap {
  * \param[in] daqch DAQ channel to search for.
  * \return The key of the KL channel connected to the given DAQ channel.
  */
-  KLChannelKey* find(DAQChannelKey* daqKey);
+  KLChannelKey* find(DAQChannelKey* daqKey) const;
 
  /** Return pointer to the KL key.
  * This function returns pointer to the KL channel key for the required DAQ channel.
  * \param[in] daqch DAQ channel to search for, coded as string.
  * \return The key of the KL channel connected to the given DAQ channel.
  */  
-  KLChannelKey* find(string daqKeyStr);
+  KLChannelKey* find(string daqKeyStr) const;
 
  private:
 

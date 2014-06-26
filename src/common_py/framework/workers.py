@@ -57,11 +57,7 @@ class WorkerUtilities: # pylint: disable=W0232
             return group
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            try:
-                module_object = __import__(transform)
-            except ImportError: 
-                raise ValueError("No such transform: %s" % transform)
-            transform_class = getattr(module_object, transform)
+            transform_class = cls._get_transform_class(transform)
             return transform_class()
         else:
             raise ValueError("Transform name %s is not a string" % transform)
@@ -93,10 +89,7 @@ class WorkerUtilities: # pylint: disable=W0232
                 cls.validate_transform(transform_name)
         elif isinstance(transform, StringType) \
             or isinstance(transform, UnicodeType):
-            try:
-                __import__(transform)
-            except ImportError: 
-                raise ValueError("No such transform: %s" % transform)
+            return cls._get_transform_class(transform)
         else:
             raise ValueError("Transform name %s is not a string" % transform)
 
@@ -120,6 +113,28 @@ class WorkerUtilities: # pylint: disable=W0232
         else:
             workers = worker.__class__.__name__
         return workers
+
+
+    @classmethod
+    def _get_transform_class(cls, transform):
+        """
+        Get the transform type object (for instantiation) given string name or
+        raise a ValueError
+        """
+        # nb tempting to use MAUS here - but it doesnt work, as it creates a
+        # circular dependency
+        try:
+            transform_module = __import__(transform)
+        except ImportError:
+            try:
+                transform_module = __import__("_"+transform)
+            except ImportError:
+                raise ValueError("No such transform: %s" % transform)
+        try:
+            transform_class = getattr(transform_module, transform)
+        except AttributeError:
+            raise ValueError("No such transform: %s" % transform)
+        return transform_class
 
 class WorkerOperationException(Exception):
     """ Exception raised if a MAUS worker operation returns False. """

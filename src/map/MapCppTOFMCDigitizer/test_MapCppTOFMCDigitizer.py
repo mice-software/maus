@@ -3,9 +3,10 @@
 basic test of TOFDigitizer to see if digits come out on real spills
 and if errors come out on empty
 """ 
-import json
 import unittest
 import os
+import json
+import maus_cpp.converter
 import MAUS
 
 from Configuration import Configuration
@@ -26,14 +27,11 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         conf_json = json.loads(Configuration().getConfigJSON())
         conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
         # Test whether the configuration files were loaded correctly at birth
-        success = cls.mapper.birth(json.dumps(conf_json))
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-
+        cls.mapper.birth(json.dumps(conf_json))
 
     def test_death(self):
         """ Test to make sure death occurs """
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
 
     def test_process(self):
         """ Test of the process function """
@@ -48,21 +46,19 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         # Spill 1 is corrupted.
         spill = "{}"
         output = self.mapper.process(spill)
-        self.assertTrue("errors" in json.loads(output))
+        self.assertTrue("errors" in maus_cpp.converter.json_repr(output))
         # a real spill
         spill = _file.readline().rstrip()
         output = self.mapper.process(spill)
-        self.assertTrue("tof_digits" in \
-                             json.loads(output)["recon_events"][0]["tof_event"])
+        doc = maus_cpp.converter.json_repr(output)
+        tof_event = doc["recon_events"][0]["tof_event"]
+        self.assertTrue("tof_digits" in tof_event)
         _file.close()
 
     @classmethod
     def tear_down_class(cls):
         """___"""
-        success = cls.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
-        cls.mapper = None
+        cls.mapper.death()
 
 if __name__ == '__main__':
     unittest.main()

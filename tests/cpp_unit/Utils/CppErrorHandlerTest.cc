@@ -25,14 +25,14 @@ protected:
 TEST_F(CppErrorHandlerTest, HandleExceptionTest) {
   Json::Value value = 
            CppErrorHandler::getInstance()->HandleException(obj, exception, "exc_test");
-  EXPECT_EQ(value["errors"]["exc_test"][Json::UInt(0)],
+  EXPECT_EQ(value["errors"]["exc_test"],
            Json::Value("<class 'ErrorHandler.CppError'>: a_test at exc::test"));
 }
 
 TEST_F(CppErrorHandlerTest, HandleStdExcTest) {
   Json::Value value = 
         CppErrorHandler::getInstance()->HandleStdExc(obj, *std_exc, "exc_test");
-  std::string err = value["errors"]["exc_test"][Json::UInt(0)].asString();
+  std::string err = value["errors"]["exc_test"].asString();
   EXPECT_EQ(err.substr(0, 33), "<class 'ErrorHandler.CppError'>: ");
 }
 

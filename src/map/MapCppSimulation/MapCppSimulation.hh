@@ -33,71 +33,47 @@
 
 // C++ headers
 #include <string>
-#include <sstream>
-#include <vector>
 
 // external libraries
 #include "json/json.h"
 
 //  MAUS code
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
-// G4MICE from commonCpp
-#include "BeamTools/BTPhaser.hh"
-#include "Config/MiceModule.hh"
-#include "DetModel/MAUSSD.hh"  //  non-G4MICE addition
-#include "Interface/MICEEvent.hh"
-#include "Interface/MiceEventManager.hh"
-#include "Interface/MiceMaterials.hh"
-#include "Interface/MICERun.hh"
-#include "Interface/SpecialHit.hh"  // needed by persist
-#include "Interface/Squeak.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppSimulation {
+class MapCppSimulation : public MapBase<Json::Value> {
  public:
   /** @brief Sets up the worker
    */
-  MapCppSimulation() :_g4manager(NULL) {
-    _classname = "MapCppSimulation";
-    _geometry = "Stage6.dat";
-    _storeTracks = true;
+  MapCppSimulation()
+    : MapBase<Json::Value>("MapCppSimulation") {
   }
 
+  ~MapCppSimulation() {}
+
+ private:
   /** @brief Begin the startup procedure for Simulation
-   *
-   *  This takes one argument.  This constructs the geometry
-   *  and prepares geant4 for being able to run beamOn(1).
-   *  This process also builds the fields and can take a
-   *  while.  Be sure that you do not run birth() after
-   *  death due to Geant4 slopiness.
    *
    *  @param config a JSON document with the configuration.
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
-  /** @brief Shuts down the Simulation by closing files
+  /** @brief NULL op - nothing to death
    *
    *  This takes no arguments
    */
-  bool death();
+  void _death() {}
 
-  /** @brief Simulate JSON input and return new document
+  /** @brief Track JSON input and return new document
    *
    *  This function will simulate a single spill defined
    *  in JSON format.
    *
    * @param document a JSON document for a spill
    */
-  std::string process(std::string document);
+  void _process(Json::Value* json_spill_document) const;
 
- private:
-  MAUS::MAUSGeant4Manager* _g4manager;
-  std::string _jsonConfigDocument;
-  std::string _classname;
-  std::string _geometry;
-  bool _storeTracks;
   bool _doVis;
 };  // Don't forget this trailing colon!!!!
 }

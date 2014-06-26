@@ -65,6 +65,8 @@ if [ "$MAUS_THIRD_PARTY" ]; then
 	./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD 
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
+	echo "Installing field maps in MAUS_ROOT_DIR..."
+	./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
 else
 	echo "The other loop"
 	./configure 2>>$FILE_STD 1>>$FILE_STD
@@ -84,7 +86,7 @@ echo "Cleaning the MAUS build state"
 scons -c 2>>$FILE_STD 1>>$FILE_STD
 
 echo "Building MAUS"
-(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+(scons build -j8 || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
     cat $FILE_STD
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"
