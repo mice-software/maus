@@ -54,6 +54,27 @@ void OutputCppSocket::_death() {
     _root_doc_store = NULL;
 }
 
+bool OutputCppSocket::_save(JobHeaderData* jh) {
+    return false;
+}
+
+bool OutputCppSocket::_save(JobFooterData* jf) {
+    return false;
+}
+
+bool OutputCppSocket::_save(RunHeaderData* rh) {
+    return false;
+}
+
+bool OutputCppSocket::_save(RunFooterData* rf) {
+    return false;
+}
+
+bool OutputCppSocket::_save(Data* spill) {
+    return false;
+}
+
+
 bool OutputCppSocket::_save(ImageData* image) {
     if (image == NULL) {
         throw MAUS::Exception(MAUS::Exception::recoverable,

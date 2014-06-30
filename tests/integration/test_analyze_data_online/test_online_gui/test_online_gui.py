@@ -284,6 +284,7 @@ class OnlineGUITest(unittest.TestCase):
         rotate_text = self.ol_gui.window.set_text_entry("Rotate period", 2.1)
         self.ol_gui.window._find_text_entry("Rotate period")[0].ReturnPressed()
         self.assertEqual(self.ol_gui._rotate_period.get_value(), 2.1)
+        raw_input()
 
     def test_reload_period_action(self):
         reload_text = self.ol_gui.window.set_text_entry("Reload period", 2.1)

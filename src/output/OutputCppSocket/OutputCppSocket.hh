@@ -83,7 +83,11 @@ class OutputCppSocket : public OutputBase<ImageData*> {
    *  @param Image* image to be saved
    *  @returns true if successful
    */
-  bool _save(ImageData* image);
+  void _save(ImageData* image);
+  void _save(JobHeaderData* image);
+  void _save(JobFooterData* image);
+  void _save(RunHeaderData* image);
+  void _save(RunFooterData* image);
 
   bool _save_py_object(PyObject* object);
 
