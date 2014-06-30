@@ -35,6 +35,7 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TCut.h"
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -71,6 +72,11 @@ class TrackerDataAnalyserMomentum {
     /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
     bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
 
+    TCut formTCut(const std::string &var, const std::string &op, double value);
+
+    /** Return the cut on reconstructed pz */
+    double get_cutPzRec() const { return _cutPzRec; }
+
     /** Make all plots and histograms using accumulated data */
     void make_all();
 
@@ -91,6 +97,9 @@ class TrackerDataAnalyserMomentum {
 
     /** Save the root objects to the input root file*/
     void save_root();
+
+    /** Set the cut on reconstructed pz using a double, in MeV/c */
+    void set_cutPzRec(double cutPzRec) { _cutPzRec = cutPzRec; };
 
     /** Set up ROOT objects (too much work for constructor) */
     void setUp();
@@ -149,7 +158,9 @@ class TrackerDataAnalyserMomentum {
     TCanvas* _cResolutions;
 
   private:
-    static const double _pz_mc_cut = 5.0;
+    // Cuts
+    double _cutPzRec;  /// Cut on the reconstructed pz
+
 };
 
 } // ~namespace MAUS

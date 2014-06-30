@@ -30,6 +30,7 @@
 #include "TF1.h"
 #include "TApplication.h"
 #include "TGClient.h"
+#include "TCut.h"
 
 // MAUS headers
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
@@ -69,6 +70,8 @@ int main(int argc, char *argv[]) {
 
   // Set up analysis class
   MAUS::TrackerDataAnalyserMomentum analyser;
+  analyser.set_cutPzRec(500.0);
+  std::cout << "Using a pz rec cut of: " << analyser.get_cutPzRec() << std::endl;
   analyser.setUp();
 
   // Set up ROOT app, input file, and MAUS data class

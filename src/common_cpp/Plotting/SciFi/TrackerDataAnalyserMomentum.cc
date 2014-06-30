@@ -18,18 +18,19 @@
 // C++ headers
 #include <cmath>
 #include <map>
+#include <sstream>
 
 // ROOT headers
 #include "TAxis.h"
 #include "TVirtualPad.h"
 #include "TStyle.h"
-#include "TCut.h"
 #include "TF1.h"
 #include "TH1.h"
 #include "TMath.h"
 #include "Rtypes.h"
 #include "TRefArray.h"
 #include "TRef.h"
+#include "TMath.h"
 
 // MAUS headers
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
@@ -78,7 +79,8 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _t2_pz_resol(NULL),
     _cResiduals(NULL),
     _cGraphs(NULL),
-    _cResolutions(NULL) {
+    _cResolutions(NULL),
+    _cutPzRec(0.0) {
   // Do nothing
 }
 
@@ -359,7 +361,7 @@ void TrackerDataAnalyserMomentum::make_all() {
 }
 
 void TrackerDataAnalyserMomentum::make_pz_resolutions() {
-  int nPoints = 10;                        // The number of MC momentum intervals used in the plots
+  int nPoints = 9;                        // The number of MC momentum intervals used in the plots
   std::vector<TCut> vCuts(nPoints);        // The cuts defining the pt_mc intervals
   std::vector<double> vPtMc(nPoints);        // The centre of the pt_mc intervals
   std::vector<double> vPtMcErr(nPoints);     // The width of the intervals
@@ -378,7 +380,7 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   vCuts[6] = "pt_mc>=60&&pt_mc<70";
   vCuts[7] = "pt_mc>=70&&pt_mc<80";
   vCuts[8] = "pt_mc>=80&&pt_mc<90";
-  vCuts[9] = "pt_mc>=90&&pt_mc<100";
+  // vCuts[9] = "pt_mc>=90&&pt_mc<100";
 
   // The central MC momentum
   vPtMc[0] = 5.0;
@@ -390,7 +392,7 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   vPtMc[6] = 65.0;
   vPtMc[7] = 75.0;
   vPtMc[8] = 85.0;
-  vPtMc[9] = 95.0;
+  // vPtMc[9] = 95.0;
 
   // The error associated with the MC momentum (just the interval half width)
   vPtMcErr[0] = 5.0;
@@ -402,19 +404,22 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   vPtMcErr[6] = 5.0;
   vPtMcErr[7] = 5.0;
   vPtMcErr[8] = 5.0;
-  vPtMcErr[9] = 5.0;
+  // vPtMcErr[9] = 5.0;
 
   // Cuts for to select each tracker
   TCut cutT1 = "tracker_num==0";
   TCut cutT2 = "tracker_num==1";
 
+  // Form the reconstructed pz TCut
+  TCut tcut_pzrec = formTCut("TMath::Abs(pz_rec)", "<", _cutPzRec);
+
   // Loop over the mometum intervals and calculate the resolution for each
   for (int i = 0; i < nPoints; ++i) {
-    TCut input_cut = vCuts[i]&&cutT1;
+    TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
     calc_pz_resolution(0, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
   }
   for (int i = 0; i < nPoints; ++i) {
-    TCut input_cut = vCuts[i]&&cutT2;
+    TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
     calc_pz_resolution(1, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
   }
 
@@ -589,6 +594,17 @@ void TrackerDataAnalyserMomentum::save_root() {
   } else {
     std::cerr << "Invalid ROOT file pointer provided" << std::endl;
   }
+}
+
+TCut TrackerDataAnalyserMomentum::formTCut(const std::string &var, const std::string &op,
+                                           double value) {
+  TCut cut = "";
+  std::stringstream ss1;
+  TString s1;
+  ss1 << var << op << value;
+  ss1 >> s1;
+  cut = s1;
+  return cut;
 }
 
 } // ~namespace MAUS
