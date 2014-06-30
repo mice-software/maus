@@ -25,7 +25,7 @@
 
 #include "Interface/Differentiator.hh"
 #include "Interface/MathUtils.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/Vector.hh"
 

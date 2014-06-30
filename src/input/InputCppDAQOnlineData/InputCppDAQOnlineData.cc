@@ -17,7 +17,21 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 
+#include "src/common_cpp/API/PyWrapInputBase.hh"
+
 #include "src/input/InputCppDAQOnlineData/InputCppDAQOnlineData.hh"
+
+namespace MAUS {
+
+
+PyMODINIT_FUNC init_InputCppDAQOnlineData(void) {
+  PyWrapInputBase<MAUS::InputCppDAQOnlineData>::PyWrapInputBaseModInit
+                              ("InputCppDAQOnlineData",
+                               "",
+                               "",
+                               "",
+                               "");
+}
 
 InputCppDAQOnlineData::InputCppDAQOnlineData()
 :InputCppDAQData::InputCppDAQData() {
@@ -28,11 +42,9 @@ InputCppDAQOnlineData::InputCppDAQOnlineData()
   _sleep_time.tv_nsec = 0;
 }
 
-bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
+void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   std::cerr << "Initialising MAUS online input" << std::endl;
-  if (!InputCppDAQData::birth(jsonDataCards))
-    return false;
-
+  InputCppDAQData::_childbirth(jsonDataCards);
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
@@ -40,7 +52,9 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    return false;
+      throw MAUS::Exception(Exception::recoverable,
+                            "Failed to parse configuration to json",
+                            "InputCppDAQOnlineData::_birth(std::string)");
   }
 
   assert(configJSON.isMember("DAQ_hostname"));
@@ -66,7 +80,6 @@ bool InputCppDAQOnlineData::birth(std::string jsonDataCards) {
       _sleep_time.tv_sec = static_cast<long>(delay_time);
       _sleep_time.tv_nsec = 1000000000L*(delay_time-_sleep_time.tv_sec);
   }
-  return true;
 }
 
 bool InputCppDAQOnlineData::readNextEvent() {
@@ -81,3 +94,8 @@ bool InputCppDAQOnlineData::readNextEvent() {
   return true;
 }
 
+void InputCppDAQOnlineData::setMonitorSrc(std::string mon) {
+  _dataManager->setMonSrc(mon);
+  _dataManager->Init();
+}
+}

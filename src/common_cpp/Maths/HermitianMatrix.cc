@@ -23,7 +23,7 @@
 
 #include "gsl/gsl_eigen.h"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/SymmetricMatrix.hh"
 #include "Maths/Vector.hh"
@@ -63,7 +63,7 @@ Vector<double> eigenvalues(const HermitianMatrix& matrix) {
   gsl_eigen_herm_free(workspace);
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvalues"));
   }
@@ -86,7 +86,7 @@ std::pair<Vector<double>, Matrix<complex> > eigensystem(
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
     gsl_matrix_complex_free(eigenvectors);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }

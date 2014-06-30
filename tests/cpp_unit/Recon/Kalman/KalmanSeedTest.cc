@@ -189,7 +189,7 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
   straight_track.set_my(my);
   straight_track.set_mx(mx);
   straight_track.set_tracker(0);
-  straight_track.set_spacepoints(_spacepoints);
+  straight_track.set_spacepoints_pointers(_spacepoints);
   // Set up stuff for posterior use.
   seed.Build(&straight_track);
   //
@@ -213,7 +213,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   MAUS::KalmanSeed seed;
   seed.SetField(-0.004);
   //
-  // Now set up a Straight Pattern Recognition Track
+  // Now set up a Helical Pattern Recognition Track
   //
   MAUS::SciFiHelicalPRTrack helical_track;
   double r     = 10.; // mm
@@ -234,7 +234,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);
   helical_track.set_phi0(phi_0);
-  helical_track.set_spacepoints(_spacepoints);
+  helical_track.set_spacepoints_pointers(_spacepoints);
   // Set up stuff for posterior use.
   seed.Build(&helical_track);
   //

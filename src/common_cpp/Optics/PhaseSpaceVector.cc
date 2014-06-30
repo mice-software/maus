@@ -21,9 +21,13 @@
 
 #include <cmath>
 #include <iostream>
-#include "CLHEP/Units/PhysicalConstants.h"
 
-#include "Interface/Squeal.hh"
+#include "CLHEP/Units/PhysicalConstants.h"
+#include "TLorentzVector.h"
+
+#include "DataStructure/ThreeVector.hh"
+#include "DataStructure/VirtualHit.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 
 namespace MAUS {
@@ -35,7 +39,7 @@ PhaseSpaceVector::PhaseSpaceVector()
 PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
     : Vector<double>() {
   if (original_instance.size() < 6) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to construct with a Vector<double> containing "
                  "fewer than six elements",
                  "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));
@@ -64,12 +68,140 @@ PhaseSpaceVector::PhaseSpaceVector(const double t, const double E,
   build_vector(6, data);
 }
 
+PhaseSpaceVector::PhaseSpaceVector(const MAUS::VirtualHit & hit)
+    : MAUS::Vector<double>() {
+  const MAUS::ThreeVector position = hit.GetPosition();
+  const double mass = hit.GetMass();
+  const MAUS::ThreeVector momentum = hit.GetMomentum();
+  const double energy = ::sqrt(mass*mass + ::pow(momentum.mag(), 2.));
+  const double data[6] = {
+    hit.GetTime(), energy,
+    position.x(), momentum.x(),
+    position.y(), momentum.y()
+  };
+  build_vector(6, data);
+}
+
+PhaseSpaceVector::PhaseSpaceVector(const double time,
+                                   const double energy,
+                                   const MAUS::ThreeVector position,
+                                   const MAUS::ThreeVector momentum)
+    : MAUS::Vector<double>() {
+  const double data[6] = {
+    time, energy, position.x(), momentum.x(), position.y(), momentum.y()
+  };
+  build_vector(6, data);
+}
+
+PhaseSpaceVector::PhaseSpaceVector(const TLorentzVector position,
+                                   const TLorentzVector momentum)
+    : MAUS::Vector<double>() {
+  const double data[6] = {
+    position.T(), momentum.E(),
+    position.X(), momentum.Px(),
+    position.Y(), momentum.Py()
+  };
+  build_vector(6, data);
+}
+
 PhaseSpaceVector::~PhaseSpaceVector() { }
+
+// *************************
+//  Assignment Operators
+// *************************
 
 PhaseSpaceVector & PhaseSpaceVector::operator=(const PhaseSpaceVector & rhs) {
   (*this).Vector<double>::operator=(rhs);
 
   return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const PhaseSpaceVector& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator+=(const double& rhs) {
+  Vector<double>::operator+=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator-=(const double& rhs) {
+  Vector<double>::operator-=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator*=(const double& rhs) {
+  Vector<double>::operator*=(rhs);
+
+  return *this;
+}
+
+PhaseSpaceVector & PhaseSpaceVector::operator/=(const double& rhs) {
+  Vector<double>::operator/=(rhs);
+
+  return *this;
+}
+
+// *************************
+//  Algebraic Operators
+// *************************
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const PhaseSpaceVector& rhs)
+    const {
+  return PhaseSpaceVector(*this) /= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator+(const double& rhs) const {
+  return PhaseSpaceVector(*this) += rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator-(const double& rhs) const {
+  return PhaseSpaceVector(*this) -= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator*(const double& rhs) const {
+  return PhaseSpaceVector(*this) *= rhs;
+}
+
+const PhaseSpaceVector PhaseSpaceVector::operator/(const double& rhs) const {
+  return PhaseSpaceVector(*this) /= rhs;
 }
 
 std::ostream& operator<<(std::ostream& out, const PhaseSpaceVector& vector) {

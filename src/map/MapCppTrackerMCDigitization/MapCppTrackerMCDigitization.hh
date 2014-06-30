@@ -35,6 +35,7 @@
 
 #include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -43,10 +44,11 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTrackerMCDigitization {
+class MapCppTrackerMCDigitization : public MapBase<Data> {
  public:
   /** Constructor - initialises pointers to NULL */
   MapCppTrackerMCDigitization();
@@ -54,64 +56,54 @@ class MapCppTrackerMCDigitization {
   /** Constructor - deletes any allocated memory */
   ~MapCppTrackerMCDigitization();
 
+ private:
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool death();
+  void _death();
 
-  /** @brief process JSON document
+  /** @brief process MAUS Data object
    *
-   *  Receive a document with MC hits and return
-   *  a document with digits
+   *  Receive a object with MC hits and return
+   *  a object with digits
    */
-  std::string process(std::string document);
-
-  /** @brief reads in json data to a Spill object
-   *
-   */
-  void read_in_json(std::string json_data);
+  void _process(MAUS::Data * data) const;
 
   /** @brief builds digits
    */
-  void construct_digits(MAUS::SciFiHitArray *hits, int spill_num,
-                        int event_num, MAUS::SciFiDigitPArray &digits);
+  void construct_digits(MAUS::SciFiHitArray *hits,
+                        int spill_num,
+                        int event_num,
+                        MAUS::SciFiDigitPArray &digits) const;
+
+  void add_noise(MAUS::SciFiNoiseHitArray *noises,
+                 MAUS::SciFiDigitPArray &digits) const;
 
   /** @brief computes scifi chan numb from GEANT fibre copy numb
    */
-  int compute_chan_no(MAUS::SciFiHit *ahit);
+  int compute_chan_no(MAUS::SciFiHit *ahit) const;
 
   /** @brief computes tdc from time.
    */
-  int compute_tdc_counts(double time);
+  int compute_tdc_counts(double time) const;
 
   /** @brief computes adc from npe.
    */
-  int compute_adc_counts(double numb_pe);
+  int compute_adc_counts(double numb_pe) const;
 
   /** @brief checks if hits belong to the same scifi channel.
    */
-  bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2);
-
-  /** @brief saves digits to json.
-   */
-  void save_to_json(MAUS::Spill &spill);
+  bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) const;
 
  private:
-  /// This should be the classname
-  std::string _classname;
-  /// This will contain the root value after parsing
-  Json::Value* _spill_json;
-  Spill* _spill_cpp;
-  ///  JsonCpp setup
-  Json::Reader reader;
   /// The ratio of deposited eV to NPE
   double _eV_to_phe;
   double _SciFiNPECut;

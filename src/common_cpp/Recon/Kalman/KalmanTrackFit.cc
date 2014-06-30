@@ -32,6 +32,12 @@ KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
 
 KalmanTrackFit::~KalmanTrackFit() {}
 
+void KalmanTrackFit::SaveGeometry(std::vector<ThreeVector> positions,
+                                  std::vector<HepRotation> rotations) {
+  _RefPos = positions;
+  _Rot    = rotations;
+}
+
 void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
                              SciFiEvent &event) {
   // Prepare to loop over seeds. 1 seed = 1 track hypothesis
@@ -114,8 +120,10 @@ void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
 
 void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites) {
   double pvalue = track->P_value();
+  int tracker = track->tracker();
   if ( pvalue != pvalue ) return;
   for ( size_t i = 0; i < sites.size(); ++i ) {
+    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
     SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
     track->add_scifitrackpoint(track_point);
   }

@@ -33,12 +33,12 @@ RealDataDigitization::~RealDataDigitization() {}
 void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
-  // These calls are to be replaced by CDB interface...
-  bool calib = load_calibration("scifi_calibration_jan2013.txt");
+  // These calls are to be replaced by CDB interface.
   bool map = load_mapping("mapping_7.txt");
+  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
           "RealDataDigitization::process"));
   }
@@ -50,7 +50,7 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     spill->SetDAQData(new DAQData());
 
   if (spill->GetReconEvents() == NULL)
-    spill->SetReconEvents(new ReconEventArray());
+    spill->SetReconEvents(new ReconEventPArray());
 
   // Pick up JSON daq events.
   Json::Value tracker_event = daq["tracker1"];
@@ -65,15 +65,19 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     if ( tracker_event[i].isMember("VLSB_C") ) {
       Json::Value input_event = tracker_event[i]["VLSB_C"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_c_size = daq["tracker2"][i]["VLSB_C"].size();
+      for ( int idig = 0; idig < vlsb_c_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB_C"][idig];
       }
       process_VLSB_c(input_event, event, tracker0daq_event, tracker1daq_event);
     } else if ( tracker_event[i].isMember("VLSB") ) {
       Json::Value input_event = tracker_event[i]["VLSB"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_size = daq["tracker2"][i]["VLSB"].size();
+      for ( int idig = 0; idig < vlsb_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB"][idig];
       }
       process_VLSB(input_event, event, tracker0daq_event, tracker1daq_event);
     } else {
@@ -84,14 +88,13 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     tracker1.push_back(tracker1daq_event); // end of event. push back.
 
     ReconEvent * revt = new ReconEvent();
-    revt->SetSciFiEvent(new SciFiEvent(*event));
+    // revt->SetSciFiEvent(new SciFiEvent(*event));
+    revt->SetSciFiEvent(event);
     spill->GetReconEvents()->push_back(revt);
-  }  // ends loop over events (i)
+    // delete event;
+  } // ends loop over events (i)
   spill->GetDAQData()->SetTracker0DaqArray(tracker0);
   spill->GetDAQData()->SetTracker1DaqArray(tracker1);
-  std::cerr << "DAQ sizes: " << std::endl;
-  std::cerr << spill->GetDAQData()->GetTracker0DaqArraySize() << std::endl;
-  std::cerr << spill->GetDAQData()->GetTracker1DaqArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB(Json::Value input_event,
@@ -141,13 +144,13 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
 
     // Get pedestal and gain from calibration.
     // int new_bank = bank + 4*board;
-    double adc_pedestal = calibration_[bank][channel_ro]["adc_pedestal"].asDouble();
-    double adc_gain     = calibration_[bank][channel_ro]["adc_gain"].asDouble();
-    double tdc_pedestal = calibration_[bank][channel_ro]["tdc_pedestal"].asDouble();
-    double tdc_gain     = calibration_[bank][channel_ro]["tdc_gain"].asDouble();
+    double adc_pedestal = _calibration[bank][channel_ro]["adc_pedestal"].asDouble();
+    double adc_gain     = _calibration[bank][channel_ro]["adc_gain"].asDouble();
+    double tdc_pedestal = _calibration[bank][channel_ro]["tdc_pedestal"].asDouble();
+    double tdc_gain     = _calibration[bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -175,10 +178,6 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
   }  // ends loop over channels (j)
   tracker0daq_event->SetVLSBArray(vlsb_tracker0_array); // fill event with all vlsb digits
   tracker1daq_event->SetVLSBArray(vlsb_tracker1_array); // fill event with all vlsb digits
-
-  // std::cerr << "VLSB array sizes: " << std::endl;
-  // std::cerr << tracker0daq_event->GetVLSBArraySize() << std::endl;
-  // std::cerr << tracker1daq_event->GetVLSBArraySize() << std::endl;
 }
 
 void RealDataDigitization::process_VLSB_c(Json::Value input_event,
@@ -225,18 +224,18 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     }
 
     if ( !is_good_channel(bank, channel_ro) ) {
-      continue;
+      // continue;
     }
 
     // Get pedestal and gain from calibration.
     int new_bank = bank + 4*board;
-    double adc_pedestal = calibration_[new_bank][channel_ro]["adc_pedestal"].asDouble();
-    double adc_gain     = calibration_[new_bank][channel_ro]["adc_gain"].asDouble();
-    double tdc_pedestal = calibration_[new_bank][channel_ro]["tdc_pedestal"].asDouble();
-    double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
+    double adc_pedestal = _calibration[new_bank][channel_ro]["adc_pedestal"].asDouble();
+    double adc_gain     = _calibration[new_bank][channel_ro]["adc_gain"].asDouble();
+    double tdc_pedestal = _calibration[new_bank][channel_ro]["tdc_pedestal"].asDouble();
+    double tdc_gain     = _calibration[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _pedestal_min && adc_gain > 0 ) {
+    if ( adc_pedestal > _min && adc_gain > _min ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -251,7 +250,11 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     */
     // Find tracker, station, plane, channel.
     int tracker, station, plane, channel;
-    bool found = get_StatPlaneChannel(board, bank, channel_ro, tracker, station, plane, channel);
+    int extWG, inWG, WGfib;
+    bool found = get_StatPlaneChannel(board, bank, channel_ro,
+                                      tracker, station, plane,
+                                      channel, extWG, inWG, WGfib);
+
      // Exclude missing modules.
     if ( found ) { // pe > 1.0 &&
       SciFiDigit *digit = new SciFiDigit(spill, eventNo,
@@ -271,7 +274,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker Calibration.",
           "RealDataDigitization::load_calibration"));
   }
@@ -284,7 +287,6 @@ bool RealDataDigitization::load_calibration(std::string file) {
     return false;
 
   size_t n_channels = calibration_data.size();
-
   for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
     int bank            = calibration_data[i]["bank"].asInt();
     int channel_n       = calibration_data[i]["channel"].asInt();
@@ -297,7 +299,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
     channel["adc_gain"]     = adc_gain;
     channel["tdc_pedestal"] = tdc_pedestal;
     channel["tdc_gain"]     = tdc_gain;
-    calibration_[bank][channel_n] = channel;
+    _calibration[bank][channel_n] = channel;
   }
 
   return true;
@@ -309,7 +311,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker Mapping.",
           "RealDataDigitization::load_mapping"));
   }
@@ -338,7 +340,8 @@ bool RealDataDigitization::load_mapping(std::string file) {
 }
 
 bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
-                           int& tracker, int& station, int& plane, int& channel) const {
+                           int& tracker, int& station, int& plane, int& channel,
+                           int &extWG, int &inWG, int &WGfib) const {
   bool found = false;
   tracker = station = plane = channel = -1;
 
@@ -348,6 +351,9 @@ bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan
       plane = _view[i];
       channel = _fibre[i];
       tracker = _tracker[i];
+      extWG   = _extWG[i];
+      inWG    = _inWG[i];
+      WGfib   = _WGfib[i];
       found = true;
     }
   }
@@ -369,7 +375,7 @@ bool RealDataDigitization::load_bad_channels() {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Could not load Tracker bad channel list.",
           "RealDataDigitization::load_bad_channels"));
   }

@@ -18,6 +18,8 @@
 
 #include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/KLChannelIdProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/EMRChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
 
 namespace MAUS {
@@ -31,6 +33,18 @@ HitProcessor<SciFiChannelId>::HitProcessor()
 template <>
 HitProcessor<TOFChannelId>::HitProcessor()
     : _channel_id_proc(new TOFChannelIdProcessor()) {
+    this->RegisterBranches();
+}
+
+template <>
+HitProcessor<KLChannelId>::HitProcessor()
+    : _channel_id_proc(new KLChannelIdProcessor()) {
+    this->RegisterBranches();
+}
+
+template <>
+HitProcessor<EMRChannelId>::HitProcessor()
+    : _channel_id_proc(new EMRChannelIdProcessor()) {
     this->RegisterBranches();
 }
 

@@ -123,8 +123,7 @@ def build_cpp_tests(env, module_list):
     Build cpp unit tests
 
     Build all the unit tests for cpp code - all the stuff from tests/cpp_unit as
-    tests/cpp_unit/test_cpp_unit and all the stuff from
-    tests/integration/test_optics/src as optics
+    tests/cpp_unit/test_cpp_unit
     """
     env.Append(LIBPATH = 'src/common_cpp')
     env.Append(CPPPATH = MAUS_ROOT_DIR)
@@ -140,12 +139,6 @@ def build_cpp_tests(env, module_list):
                 source = test_cpp_files, \
                 LIBS= env['LIBS'] + ['MausCpp'])#+module_list)
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
-
-    test_optics_files = glob.glob("tests/integration/test_optics/src/*cc")
-    test_optics = env.Program(target = 'tests/integration/test_optics/optics', \
-                               source = test_optics_files, \
-                               LIBS= env['LIBS'] + ['MausCpp'] + module_list)
-    env.Install('build', test_optics)
 
     test_tof_files = glob.glob\
                 ("tests/integration/test_simulation/test_tof/src/*cc")

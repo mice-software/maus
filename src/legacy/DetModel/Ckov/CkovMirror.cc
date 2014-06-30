@@ -6,6 +6,7 @@
 */ 
 #include "DetModel/Ckov/CkovMirror.hh"
 
+
 CkovMirror::~CkovMirror()
 {
 	// Rotation Matrix
@@ -165,9 +166,9 @@ void CkovMirror::calVertex( MiceModule* mod )
 	std::cerr << "C "     << C    << std::endl;
 	std::cerr << "Z0 "    << Z0   << std::endl;
 	std::cerr << "H "     << H    << std::endl;
-	std::cerr << "MH "    << MH   << std::endl;
+	//	std::cerr << "MH "    << MH   << std::endl;
 	std::cerr << "T(deg) "<< T/deg<< std::endl;
-	std::cerr << "L "     << L    << std::endl;
+	// std::cerr << "L "     << L    << std::endl;
 	std::cerr << "S "     << S    << std::endl;
 	std::cerr << "CP "    << CP   << std::endl;
 	std::cerr << "CP2 "   << CP2  << std::endl;

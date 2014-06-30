@@ -19,8 +19,10 @@
 
 #include <string>
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
+
 
 namespace MAUS {
 
@@ -34,22 +36,38 @@ namespace MAUS {
   InputBase<T>::~InputBase() {}
 
   template <typename T>
-  T InputBase<T>::emitter_cpp() {
+  T InputBase<T>::emit_cpp() {
     T o;
     try {
-      o = _emitter_cpp();
+      o = _emit_cpp();
     }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
+    catch (Exception& s) {
+      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
+      throw NoInputException();
     }
-    catch(std::exception& e) {
+    catch (std::exception& e) {
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+      throw NoInputException();
     }
-    catch(...) {
+    catch (...) {
       throw UnhandledException(_classname);
     }
     return o;
   }
+
+  template <typename T>
+  PyObject* InputBase<T>::emit_pyobj() {
+      PyObject* wrapped = NULL;
+      try {
+          T temp_o = emit_cpp();
+          T* o = new T(temp_o);
+          wrapped = PyObjectWrapper::wrap(o);
+      } catch (NoInputException& exc) {
+          return NULL;
+      }
+      return wrapped;
+  }
+
 }  // end of namespace
 #endif
 

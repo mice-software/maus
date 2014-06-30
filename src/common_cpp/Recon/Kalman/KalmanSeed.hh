@@ -165,11 +165,9 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
 
   _a0.ResizeTo(_n_parameters, 1);
 
-  SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints();
+  SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints_pointers();
   RetrieveClusters(spacepoints);
-
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
-
   BuildKalmanStates();
 }
 } // ~namespace MAUS

@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/API/APIExceptions.hh"
 #include "src/common_cpp/API/ModuleBase.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -41,18 +41,18 @@ namespace MAUS {
     FRIEND_TEST(ModuleBaseTest, TestDeath);
   };
 
-  class testclass_squeal : public ModuleBase {
+  class testclass_maus_exception : public ModuleBase {
   public:
-    testclass_squeal(): ModuleBase("TestClass") {}
+    testclass_maus_exception(): ModuleBase("TestClass") {}
   private:
     virtual void _birth(const std::string&) {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _birth",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _birth",
 		   "void _birth (const std::string&)");
     }
     virtual void _death() {
-      throw Squeal(Squeal::recoverable,
-		   "Expected Test Squeal in _death",
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+		   "Expected Test MAUS::Exception in _death",
 		   "void _death ()");
     }
 
@@ -118,42 +118,6 @@ namespace MAUS {
     ASSERT_TRUE(tc.run_birth)
       << "Fail: Didn't run _birth code."
       << std::endl;
-    /////////////////////////////////////////////////////
-    testclass_squeal tc_s;
-    try {
-      tc_s.birth("TestConfig");
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    testclass_exception tc_e;
-    try {
-      tc_e.birth("TestConfig");
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    testclass_otherexcept tc_oe;
-    try {
-      tc_oe.birth("TestConfig");
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
-    }
-    catch(UnhandledException& e) {}
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
-    }
   }
 
   TEST(ModuleBaseTest, TestDeath) {
@@ -170,41 +134,6 @@ namespace MAUS {
       << std::endl;
 
     /////////////////////////////////////////////////////
-    testclass_squeal tc_s;
-    try {
-      tc_s.death();
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Squeal should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    testclass_exception tc_e;
-    try {
-      tc_e.death();
-    }
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Exception should have been handled"
-	<< std::endl;
-    }
-
-    /////////////////////////////////////////////////////
-    testclass_otherexcept tc_oe;
-    try {
-      tc_oe.death();
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
-    }
-    catch(UnhandledException& e) {}
-    catch(...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
-    }
   }
 
 }// end of namespace

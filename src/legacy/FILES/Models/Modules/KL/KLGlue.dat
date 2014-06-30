@@ -5,12 +5,9 @@ Module KLGlue.dat
   PropertyString G4Detector KLGlue
   PropertyDouble GlueThickness 0.09 mm
   PropertyDouble FibreDiameter 1.0 mm
-  PropertyDouble FibreLength 1000.0 mm
+  PropertyDouble FibreLength 932.0 mm
   PropertyDouble FibreSpacingY 1.34 mm
   PropertyDouble FibreSpacingZ 0.98 mm
+  PropertyDouble BlueColour 1
   PropertyString Material BC600
-//  PropertyDouble BlueColour 1
-//  PropertyDouble RedColour 0.8
-//  PropertyDouble GreenColour 0.8
-//  PropertyBool Invisible 1
 }

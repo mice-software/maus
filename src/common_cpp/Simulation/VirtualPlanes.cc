@@ -26,7 +26,7 @@
 
 #include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/Config/MiceModule.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
@@ -75,7 +75,7 @@ VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
   vp._allowBackwards       = allowBackwards;
   if (type != BTTracker::tau_field && type != BTTracker::u &&
       type != BTTracker::z && type != BTTracker::t) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Virtual plane type not implemented",
                  "VirtualPlane::BuildVirtualPlane(...)"));
   }
@@ -124,7 +124,7 @@ bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
 
 void VirtualPlane::FillKinematics
                                (VirtualHit * aHit, const G4Step * aStep) const {
-  double  x[8];
+  double  x[12];
   double* x_from_beginning = NULL;
   double* x_from_end = NULL;
   switch (_stepping) {
@@ -142,13 +142,13 @@ void VirtualPlane::FillKinematics
   }
   double indep_beg     = GetIndependentVariable(aStep->GetPreStepPoint());
   double indep_end     = GetIndependentVariable(aStep->GetPostStepPoint());
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < 12; i++)
     x[i] = (x_from_end[i]-x_from_beginning[i])/(indep_end-indep_beg)
           *(_independentVariable-indep_beg)+x_from_beginning[i];
 
   aHit->SetPos(CLHEP::Hep3Vector(x[1], x[2], x[3]));
   aHit->SetMomentum(CLHEP::Hep3Vector(x[5], x[6], x[7]));
-
+  aHit->SetSpin(CLHEP::Hep3Vector(x[8], x[9], x[10]));
   double mass = aStep->GetPostStepPoint()->GetMass();
   // FORCE mass shell condition
   x[4] = ::sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
@@ -159,7 +159,7 @@ void VirtualPlane::FillKinematics
   delete [] x_from_beginning;
   delete [] x_from_end;
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
-    throw(Squeal(Squeal::recoverable, "Hit outside radial cut",  // appropriate?
+    throw(Exception(Exception::recoverable, "Hit outside radial cut",  // appropriate?
                                   "VirtualPlane::FillKinematics"));
 }
 
@@ -182,10 +182,11 @@ double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
 }
 
 double * VirtualPlane::ExtractPointData(G4StepPoint *aPoint) const {
-  double* x_in = new double[8];
+  double* x_in = new double[12];
   for (int i = 0; i < 3; i++) {
     x_in[i+1] = aPoint->GetPosition()[i];
     x_in[i+5] = aPoint->GetMomentum()[i];
+    x_in[i+8] = aPoint->GetPolarization()[i];
   }
   x_in[0] = aPoint->GetGlobalTime();
   x_in[4] = aPoint->GetTotalEnergy();
@@ -265,12 +266,12 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
           _nHits[i]++;
         }
       }
-    } catch(Squeal squee) {}  // do nothing - just dont make a hit
+    } catch (Exception exc) {}  // do nothing - just dont make a hit
 }
 
 void VirtualPlaneManager::SetVirtualHits(Json::Value hits) {
   if (!hits.isArray())
-    throw(Squeal(Squeal::recoverable, "Virtual hits must be of array type",
+    throw(Exception(Exception::recoverable, "Virtual hits must be of array type",
           "VirtualPlaneManager::SetVirtualHits()"));
   _hits = hits;
 }
@@ -311,7 +312,7 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
       else if (m_pass == "SameStation") pass = VirtualPlane::same_station;
       else if (m_pass == "NewStation")  pass = VirtualPlane::new_station;
       else
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                  "Did not recognise MultiplePasses option "+m_pass,
                  "VirtualPlaneManager::ConstructFromModule") );
     }
@@ -333,7 +334,7 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
     } else if (variable == "u") {
       var_enum = BTTracker::u;
     } else {
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
             "Did not recognise IndependentVariable in Virtual detector module "+
             mod->fullName(),
             "VirtualPlaneManager::ConstructFromModule"));
@@ -361,7 +362,7 @@ const MiceModule*  VirtualPlaneManager::GetModuleFromStationNumber
 
 int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   if (_planes.size() == 0)
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "No Virtual planes initialised",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   VirtualPlane* plane = NULL;
@@ -369,13 +370,13 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   for (map_it it = _mods.begin(); it != _mods.end() && plane == NULL; it++)
     if (it->second == module) plane = it->first;  // find plane from module
   if (plane == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
           "Module "+module->name()+" not found in VirtualPlaneManager",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   }
   for (size_t i = 0; i < _planes.size(); i++)
     if (plane == _planes[i]) return i+1;  // find station from plane
-  throw(Squeal(Squeal::recoverable,
+  throw(Exception(Exception::recoverable,
         "Module "+module->name()+" not found in VirtualPlaneManager",
         "VirtualPlaneManager::GetStationNumberFromModule"));
 }
@@ -383,8 +384,8 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
     if (stationNumber-1 >= static_cast<int>(_nHits.size()) ||
         stationNumber-1 < 0)
-      throw(Squeal(
-              Squeal::recoverable,
+      throw(Exception(
+              Exception::recoverable,
               "Station number out of range",
               "VirtualPlaneManager::GetNumberOfHits"));
     return _nHits[stationNumber-1];
@@ -406,6 +407,10 @@ Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
     hit_v["momentum"]["x"] = hit.GetMomentum().x();
     hit_v["momentum"]["y"] = hit.GetMomentum().y();
     hit_v["momentum"]["z"] = hit.GetMomentum().z();
+    hit_v["spin"] = Json::Value(Json::objectValue);
+    hit_v["spin"]["x"] = hit.GetSpin().x();
+    hit_v["spin"]["y"] = hit.GetSpin().y();
+    hit_v["spin"]["z"] = hit.GetSpin().z();
     hit_v["proper_time"] = hit.GetProperTime();
     hit_v["path_length"] = hit.GetPathLength();
     hit_v["b_field"] = Json::Value(Json::objectValue);
@@ -441,6 +446,8 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
          JsonWrapper::GetProperty(v_hit, "position", JsonWrapper::objectValue);
     Json::Value mom_v =
          JsonWrapper::GetProperty(v_hit, "momentum", JsonWrapper::objectValue);
+    Json::Value spin_v =
+         JsonWrapper::GetProperty(v_hit, "spin", JsonWrapper::objectValue);
     Json::Value b_v =
          JsonWrapper::GetProperty(v_hit, "b_field", JsonWrapper::objectValue);
     Json::Value e_v =
@@ -459,6 +466,7 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
 
     hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
     hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
+    hit.SetSpin(JsonWrapper::JsonToThreeVector(spin_v));
     hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
     hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
     hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
@@ -467,10 +475,10 @@ VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
 
 VirtualPlane* VirtualPlaneManager::PlaneFromStation(int stationNumber) {
     if (_planes.size() == 0)
-      throw(Squeal(Squeal::recoverable, "No Virtual planes initialised",
+      throw(Exception(Exception::recoverable, "No Virtual planes initialised",
                    "VirtualPlaneManager::PlaneFromStation()"));
     if (stationNumber < 1)
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
       "Station number must be > 0",
       "VirtualPlaneManager::PlaneFromStation"));
     // map from module name to _planes index; if stationNumber > planes.size, it

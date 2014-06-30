@@ -16,7 +16,7 @@
  */
 #include "src/common_cpp/API/ModuleBase.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
@@ -26,33 +26,11 @@ namespace MAUS {
   ModuleBase::~ModuleBase() {}
 
   void ModuleBase::birth(const std::string& s) {
-    try {
-      _birth(s);
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception & e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
+    _birth(s);
   }
 
   void ModuleBase::death() {
-    try {
-      _death();
-    }
-    catch(Squeal& s) {
-      CppErrorHandler::getInstance()->HandleSquealNoJson(s, _classname);
-    }
-    catch(std::exception & e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
-    }
-    catch(...) {
-      throw UnhandledException(_classname);
-    }
+    _death();
   }
 
 }// end of namespace

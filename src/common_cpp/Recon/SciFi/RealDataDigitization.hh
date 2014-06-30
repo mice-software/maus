@@ -70,11 +70,23 @@ class RealDataDigitization {
    */
   void process(Spill *spill, Json::Value const &input_event);
 
+  /** @brief Reads the VLSB data
+   *  @params input_event The JSON input vlsb event to be processed.
+   *  @params event The SciFiEvent to be filled.
+   *  @params TrackerDaq The TrackerDaq object to be created for T0.
+   *  @params TrackerDaq The TrackerDaq object to be created for T1.
+   */
   void process_VLSB(Json::Value input_event,
                       SciFiEvent* event,
                       TrackerDaq *tracker0daq_event,
                       TrackerDaq *tracker1daq_event);
 
+  /** @brief Reads the VLSB data in the cosmic run format
+   *  @params input_event The JSON input vlsb event to be processed.
+   *  @params event The SciFiEvent to be filled.
+   *  @params TrackerDaq The TrackerDaq object to be created for T0.
+   *  @params TrackerDaq The TrackerDaq object to be created for T1.
+   */
   void process_VLSB_c(Json::Value input_event,
                       SciFiEvent* event,
                       TrackerDaq *tracker0daq_event,
@@ -91,7 +103,8 @@ class RealDataDigitization {
   /** @brief Converts read-out map into SciFi Fibre map
    */
   bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
-                            int &tracker, int &station, int &plane, int &channel) const;
+                            int &tracker, int &station, int &plane, int &channel,
+                            int &extWG, int &inWG, int &WGfib) const;
 
   /** @brief Reads the bad channel list from file.
    */
@@ -101,18 +114,15 @@ class RealDataDigitization {
    */
   bool is_good_channel(int bank, int chan_ro) const;
 
-  // int get_calibration_unique_chan_numb(int bank, int chan) const {
-  //                                 return _calibration_unique_chan_number[board][bank][chan]; }
-
  private:
   static const int _number_channels       = 128;
   static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
-  static const double _pedestal_min       = 0.000000001;
+  static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
-  Json::Value calibration_[_number_banks][_number_channels];
+  Json::Value _calibration[_number_banks][_number_channels];
   /// This is an array storing the goodness of each channel.
   bool _good_chan[_number_banks][_number_channels];
 

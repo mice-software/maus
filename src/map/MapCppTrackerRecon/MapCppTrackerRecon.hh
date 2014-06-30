@@ -35,7 +35,7 @@
 #include <map>
 
 // Other headers
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
@@ -53,12 +53,13 @@
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
 struct SciFiPlaneGeometry;
 
-class MapCppTrackerRecon {
+class MapCppTrackerRecon : public MapBase<Data> {
 
  public:
   /** Constructor - initialises pointers to NULL */
@@ -67,39 +68,40 @@ class MapCppTrackerRecon {
   /** Constructor - deletes any allocated memory */
   ~MapCppTrackerRecon();
 
+ private:
   /** Sets up the worker
    *
    *  \param argJsonConfigDocument a JSON document with
    *         the configuration.
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool death();
+  void _death();
 
-  /** Process JSON document
+  /** Process MAUS data object
    *
-   *  Receive a document with digits (either MC or real) and then call the higher level
+   *  Receive a data object with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
    * 
    * \param document a line/spill from the JSON input
    */
-  std::string process(std::string document);
+  void _process(Data* data) const;
 
   /** Performs the cluster reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void cluster_recon(MAUS::SciFiEvent &evt);
+  void cluster_recon(MAUS::SciFiEvent &evt) const;
 
   /** Performs the spacepoint reconstruction
    *
    *  \param evt the current SciFiEvent
    */
-  void spacepoint_recon(MAUS::SciFiEvent &evt);
+  void spacepoint_recon(MAUS::SciFiEvent &evt) const;
 
   /** Performs the pattern recogniton
    *
@@ -108,8 +110,7 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  void pattern_recognition(const bool helical_pr_on, const bool straight_pr_on,
-                           MAUS::SciFiEvent &evt);
+  void pattern_recognition(MAUS::SciFiEvent &evt) const;
 
   /** Performs the final track fit
    *
@@ -118,38 +119,20 @@ class MapCppTrackerRecon {
    *
    *  \param evt the current SciFiEvent
    */
-  void track_fit(MAUS::SciFiEvent &evt);
+  void track_fit(MAUS::SciFiEvent &evt) const;
 
-  /** Takes json data and returns a Sc
-   *
-   *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
-   *  which formed the spacepoints, fits the tracks more acurately using a Kalman filter
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void read_in_json(std::string json_data);
-
-  void save_to_json(MAUS::Spill &spill);
-
-  void print_event_info(MAUS::SciFiEvent &event);
+  // void print_event_info(MAUS::SciFiEvent &event) const;
 
  private:
-  /// This should be the classname
-  std::string _classname;
   /// This will contain the configuration
   Json::Value _configJSON;
-  /// This will contain the root value after parsing
-  Json::Value* _spill_json;
-  Spill* _spill_cpp;
-  ///  JsonCpp setup
-  Json::Reader reader;
   ///  Cut value for npe.
   double  _min_npe;
   /// Value above which reconstruction is aborted.
   int _size_exception;
   /// Pattern recognition flags
-  bool _helical_pr_on;
   bool _straight_pr_on;
+  bool _helical_pr_on;
   bool _kalman_on;
 
   ///  Map of the planes geometry.

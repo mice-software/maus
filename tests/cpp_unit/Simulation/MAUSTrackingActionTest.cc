@@ -14,7 +14,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with MAUS in the doc folder.  If not, see
-// <http://www.gnu.org/licenses/>.
+// <http://www.gnu.org/licenses/>
+
+
 
 #include "gtest/gtest.h"
 
@@ -99,7 +101,7 @@ TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
     ASSERT_EQ(json_track[1]["final_position"].type(), Json::objectValue);
 
     end->SetTrackID(4);
-    EXPECT_THROW(tracking->PostUserTrackingAction(end), Squeal);
+    EXPECT_THROW(tracking->PostUserTrackingAction(end), MAUS::Exception);
 }
 
 } // namespace

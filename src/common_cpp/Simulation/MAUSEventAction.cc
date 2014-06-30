@@ -52,7 +52,7 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
 void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
     //  For each detector i
     if (_primary >= _events.size())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Ran out of space in event array",
                      "MAUSEventAction::EndOfEventAction"));
     for (int i = 0; i < _geometry->GetSDSize(); i++) {
@@ -69,11 +69,11 @@ void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
 
 void MAUSEventAction::SetEvents(Json::Value events) {
     if (!events.isArray())
-        throw(Squeal(Squeal::recoverable, "Particles must be an array value",
+        throw(Exception(Exception::recoverable, "Particles must be an array value",
                      "MAUSEventAction::SetEvent"));
     for (size_t i = 0; i < events.size(); ++i) {
-        if (!events[i].isObject())
-            throw(Squeal(Squeal::recoverable,
+        if (!events[Json::Value::ArrayIndex(i)].isObject())
+            throw(Exception(Exception::recoverable,
                          "Each Particle must be an object value",
                          "MAUSEventAction::SetEvent"));
     }

@@ -39,6 +39,9 @@
 //         example, if we never touch "energy" or something, it never gets used.
 //         But checking this is a lot of work...
 
+// Tests the MC branch and the Spill overall
+// Recon branch should go in ReconEventProcessorTest (this is getting unwieldy)
+
 namespace MAUS {
 namespace SpillProcessorTest {
 
@@ -48,6 +51,7 @@ std::string STEP =
         std::string("{\"proper_time\":1.,\"path_length\":2.,\"time\":3.,")+
         std::string("\"energy\":4.,\"energy_deposited\":5.,")+
         std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
+        std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
         std::string("\"b_field\":{\"x\":11.,\"y\":12.,\"z\":13.},")+
         std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.}}");
@@ -68,10 +72,12 @@ std::string PRIMARY =
     std::string("{\"particle_id\":1,\"random_seed\":2,\"time\":3.,")+
     std::string("\"energy\":4.,")+
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
+    std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.}}");
 
 std::string SF_CHANNEL_ID =
-    std::string("{\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
+    std::string("{\"digit_id\":0.0,")+
+    std::string("\"fibre_number\":1,\"station_number\":2,\"plane_number\":3,")+
     std::string("\"tracker_number\":4}");
 
 std::string TOF_CHANNEL_ID =
@@ -107,6 +113,7 @@ std::string VIRTUAL_HIT =
     std::string("\"proper_time\":8.,\"path_length\":9.,")+
     std::string("\"position\":{\"x\":10.,\"y\":11.,\"z\":12.},")+
     std::string("\"momentum\":{\"x\":13.,\"y\":14.,\"z\":15.},")+
+    std::string("\"spin\":{\"x\":22.,\"y\":23.,\"z\":24.},")+
     std::string("\"b_field\":{\"x\":16.,\"y\":17.,\"z\":18.},")+
     std::string("\"e_field\":{\"x\":19.,\"y\":20.,\"z\":21.}}");
 
@@ -128,12 +135,11 @@ std::string SPILL_SEED =
     std::string("\"maus_event_type\":\"Spill\"");
 
 std::string SPILL_ALL = SPILL_SEED+","+
-    std::string("\"scalars\":{}, \"emr_spill_data\":{}, ")+
+    std::string("\"scalars\":{}, ")+
     std::string("\"mc_events\":[], \"recon_events\":[], \"test_branch\":"+
                 TEST_BRANCH("test_branch/")+"}");
 
 std::string SPILL_MINIMAL = SPILL_SEED+"}";
-
 
 TEST(SpillProcessorTest, ThreeVectorProcessorTest) {
     ThreeVectorProcessor proc;
@@ -209,6 +215,7 @@ TEST(SpillProcessorTest, TestBranchProcessorTest) {
 TEST(SpillProcessorTest, SpillProcessorTest) {
     SpillProcessor proc;
     ProcessorTest::test_value(&proc, SPILL_MINIMAL);
+    std::cerr << SPILL_MINIMAL << std::endl;
     ProcessorTest::test_value(&proc, SPILL_ALL);
 }
 }

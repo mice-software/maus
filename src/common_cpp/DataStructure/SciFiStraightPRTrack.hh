@@ -52,11 +52,6 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     /** Equality operator - any pointers are deep copied */
     SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
-    /** Get the vector holding pointers to the spacepoints used by the track */
-    SciFiSpacePointPArray get_spacepoints() const { return _spoints; }
-
-    /** Set the vector holding pointers to the spacepoints used by the track */
-    void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
 
     /** Get the x position of the track at z=0 */
     double get_x0() const { return _x0; }
@@ -110,7 +105,9 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     int get_type() const { return _type; }
 
   private:
-    SciFiSpacePointPArray _spoints;
+    int _tracker;
+    int _num_points;
+    static const int _type = 0; // 0 for straight, 1 for helical
 
     double _x0;
     double _mx;
@@ -118,10 +115,6 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     double _y0;
     double _my;
     double _y_chisq;
-
-    int _tracker;
-    int _num_points;
-    static const int _type = 0; // 0 for straight, 1 for helical
 
     MAUS_VERSIONED_CLASS_DEF(SciFiStraightPRTrack)
 };

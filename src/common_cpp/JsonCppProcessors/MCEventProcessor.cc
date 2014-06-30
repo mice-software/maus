@@ -14,29 +14,37 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/TrackProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 
 namespace MAUS {
 
 MCEventProcessor::MCEventProcessor()
     : _sci_fi_hit_proc(new SciFiHitProcessor()),
+      _sci_fi_noise_hit_proc(new SciFiNoiseHitProcessor()),
       _tof_hit_proc(new TOFHitProcessor()),
+      _kl_hit_proc(new KLHitProcessor()),
+      _emr_hit_proc(new EMRHitProcessor()),
       _special_virtual_hit_proc(new SpecialVirtualHitProcessor()),
       _track_proc(new TrackProcessor()),
       _virtual_hit_proc(new VirtualHitProcessor()) {
-    RegisterPointerBranch("primary", &_primary_proc, &MCEvent::GetPrimary,
-                                                    &MCEvent::SetPrimary, true);
+    RegisterPointerBranch
+        ("primary", &_primary_proc, &MCEvent::GetPrimary,
+                                    &MCEvent::SetPrimary, true);
     RegisterPointerBranch
         ("sci_fi_hits", &_sci_fi_hit_proc, &MCEvent::GetSciFiHits,
                                            &MCEvent::SetSciFiHits, false);
     RegisterPointerBranch
+        ("sci_fi_noise_hits", &_sci_fi_noise_hit_proc, &MCEvent::GetSciFiNoiseHits,
+                                                       &MCEvent::SetSciFiNoiseHits, false);
+    RegisterPointerBranch
         ("tof_hits", &_tof_hit_proc, &MCEvent::GetTOFHits,
                                      &MCEvent::SetTOFHits, false);
+    RegisterPointerBranch
+        ("kl_hits", &_kl_hit_proc, &MCEvent::GetKLHits,
+                                     &MCEvent::SetKLHits, false);
+    RegisterPointerBranch
+        ("emr_hits", &_emr_hit_proc, &MCEvent::GetEMRHits,
+                                     &MCEvent::SetEMRHits, false);
     RegisterPointerBranch("special_virtual_hits", &_special_virtual_hit_proc,
                           &MCEvent::GetSpecialVirtualHits,
                           &MCEvent::SetSpecialVirtualHits, false);
@@ -46,4 +54,3 @@ MCEventProcessor::MCEventProcessor()
                       &MCEvent::GetVirtualHits, &MCEvent::SetVirtualHits, false);
 }
 }
-

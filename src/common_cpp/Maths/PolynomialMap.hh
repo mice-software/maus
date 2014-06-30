@@ -198,7 +198,7 @@ class PolynomialMap : public VectorMap {
    *  @param[in] polyVector should be of size NumberOfPolynomialCoefficients().
    *  @param[in] point      should be of size PointDimension().
    */
-  double* UnmakePolynomialVector(const double* point, double* polyVector) const;
+  double* UnmakePolynomialVector(const double* polyVector, double* point) const;
 
   /** Transforms from a 1d index of polynomial coefficients to an nd index.
    *  This is slow - you should use it to build a lookup table.
@@ -463,7 +463,7 @@ class PolynomialMap : public VectorMap {
 
       /** transform coefficient from subspace space_in to subspace space_out,
        * both subspaces of some larger space if any of coeff variables is not
-       * in space_out OR not in space_in, leave this coeff untouched and Squeal
+       * in space_out OR not in space_in, leave this coeff untouched and Exception
        * so for coeff({1,2},0,1.1),
        * coeff.space_transform({0,2,3,5}, {4,7,1,2,3,0}) would return
        * coeff({3,4},5,1.1)
@@ -523,10 +523,11 @@ size_t PolynomialMap::NumberOfPolynomialCoefficients() {
 }
 
 Vector<double> generate_polynomial_2D(const PolynomialMap & map,
-                                      const size_t variable_index,
-                                      const double input_min,
-                                      const double input_max,
-                                      const double input_increment);
+                                      const size_t point_variable_index,
+                                      const size_t value_variable_index,
+                                      const double point_variable_min,
+                                      const double point_variable_max,
+                                      const double point_variable_increment);
 
 } // namespace MAUS
 

@@ -15,20 +15,25 @@
  *
  */
 
+#include "src/common_cpp/API/PyWrapInputBase.hh"
 #include "src/input/InputCppDAQOfflineData/InputCppDAQOfflineData.hh"
 
-InputCppDAQOfflineData::InputCppDAQOfflineData(std::string pDataPath, std::string pFilename)
-:InputCppDAQData::InputCppDAQData(), _dataPaths(pDataPath), _datafiles(pFilename) {
+namespace MAUS {
+PyMODINIT_FUNC init_InputCppDAQOfflineData(void) {
+    PyWrapInputBase<MAUS::InputCppDAQOfflineData>::PyWrapInputBaseModInit(
+                  "InputCppDAQOfflineData", "", "", "", "");
+}
+
+InputCppDAQOfflineData::InputCppDAQOfflineData()
+:InputCppDAQData::InputCppDAQData(), _dataPaths(""), _datafiles("") {
   _classname = "InputCppDAQOfflineData";
 }
 
-bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
-
-  if (!InputCppDAQData::birth(jsonDataCards))
-    return false;
-
+void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-     return false;  // Faile because files are already open.
+    throw(MAUS::Exception(Exception::recoverable,
+                          "Failed to get files - are they open already?",
+                          "InputCppDAQOfflineData::_birth"));
   }
 
   //  JsonCpp setup
@@ -38,7 +43,9 @@ bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    return false;
+    throw(MAUS::Exception(Exception::recoverable,
+                          "Failed to parse datacards",
+                          "InputCppDAQOfflineData::_birth"));
   }
 
   // Load some data.
@@ -57,10 +64,10 @@ bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
   _dataFileManager.OpenFile();
   unsigned int nfiles = _dataFileManager.GetNFiles();
   if (!nfiles) {
-    Squeak::mout(Squeak::error) << "Unable to load any data files." << std::endl;
-    Squeak::mout(Squeak::error) << "Check your run number (or file name) and data path."
-    << std::endl;
-    return false;
+    throw(MAUS::Exception(Exception::recoverable,
+                        "Unable to load any data files. Check your run"+
+                        std::string("number (or file name) and data path."),
+                        "InputCppDAQOfflineData::_birth"));
   }
 
   // Set the number of DAQ events to be processed.
@@ -73,16 +80,16 @@ bool InputCppDAQOfflineData::birth(std::string jsonDataCards) {
   _calib_Events_Only = configJSON["Calib_Events_Only"].asBool();
 
   if (_phys_Events_Only && _calib_Events_Only) {
-    Squeak::mout(Squeak::error) << "There is a contradiction in the configuration:"
-    << std::endl;
-    Squeak::mout(Squeak::error) << "Phys_Events_Only and Calib_Events_Only are both true!!!"
-    << std::endl;
-    return false;
+     throw(MAUS::Exception(Exception::recoverable,
+                          "There is a contradiction in the configuration:\n"+
+                          std::string("Phys_Events_Only and Calib_Events_Only ")+
+                          std::string("are both true!!!"),
+                          "InputCppDAQOfflineData::_birth"));
   }
 
-  // _dataProcessManager.DumpProcessors();
+  InputCppDAQData::_childbirth(jsonDataCards);
 
-  return true;
+  // _dataProcessManager.DumpProcessors();
 }
 
 
@@ -93,7 +100,8 @@ bool InputCppDAQOfflineData::readNextEvent() {
     if (_eventsCount >= _maxNumEvents)
       return false;
 
-  // cout << "InputCppDAQData::readNextEvent   event " << _eventsCount << endl;
+
+//   cerr << "InputCppDAQData::readNextEvent   event: " << _eventsCount << endl;
 
   // Use the MDfileManager object to get the next event.
   if (_phys_Events_Only && (!_calib_Events_Only))
@@ -110,8 +118,7 @@ bool InputCppDAQOfflineData::readNextEvent() {
 
   return true;
 }
-
-
+}
 
 
 

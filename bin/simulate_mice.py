@@ -22,6 +22,9 @@ def run():
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
+    # G4beamline
+    # my_map.append(MAUS.MapPyBeamlineSimulation())
+
     # GEANT4
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
@@ -35,8 +38,8 @@ def run():
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
     # SciFi
- #   my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-#    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
+    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # Global Digits - post detector digitisation
 

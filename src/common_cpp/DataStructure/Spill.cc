@@ -14,20 +14,18 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include "src/common_cpp/DataStructure/Spill.hh"
+#include "DataStructure/Spill.hh"
 
 namespace MAUS {
 
 Spill::Spill()
-        : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
 }
 
 Spill::Spill(const Spill& md)
-        : _daq(NULL), _scalars(NULL), _emr(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
   *this = md;
@@ -55,15 +53,6 @@ Spill& Spill::operator=(const Spill& md) {
         _scalars = new Scalars(*md._scalars);
     }
 
-    if (_emr != NULL) {
-        delete _emr;
-    }
-    if (md._emr == NULL) {
-        _emr = NULL;
-    } else {
-        _emr = new EMRSpillData(*md._emr);
-    }
-
     if (_mc != NULL) {
         for (size_t i = 0; i < _mc->size(); ++i) {
             delete (*_mc)[i];
@@ -73,7 +62,9 @@ Spill& Spill::operator=(const Spill& md) {
     if (md._mc == NULL) {
         _mc = NULL;
     } else {
-        _mc = new MCEventArray(*md._mc);
+        _mc = new MCEventPArray(*md._mc);
+        for (size_t i = 0; i < _mc->size(); ++i)
+            _mc->at(i) = new MCEvent(*_mc->at(i));
     }
 
     if (_recon != NULL) {
@@ -85,7 +76,9 @@ Spill& Spill::operator=(const Spill& md) {
     if (md._recon == NULL) {
         _recon = NULL;
     } else {
-        _recon = new ReconEventArray(*md._recon);
+        _recon = new ReconEventPArray(*md._recon);
+        for (size_t i = 0; i < _recon->size(); ++i)
+            _recon->at(i) = new ReconEvent(*_recon->at(i));
     }
 
     _daq_event_type = md._daq_event_type;
@@ -107,9 +100,7 @@ Spill::~Spill() {
     if (_scalars != NULL) {
         delete _scalars;
     }
-    if (_emr != NULL) {
-        delete _emr;
-    }
+
     if (_mc != NULL) {
         for (size_t i = 0; i < _mc->size(); ++i) {
             delete (*_mc)[i];
@@ -127,7 +118,9 @@ Spill::~Spill() {
     }
 }
 
-void Spill::SetScalars(Scalars* scalars) {
+void Spill::SetScalars(Scalars *scalars) {
+  if (_scalars != NULL)
+      delete _scalars;
   _scalars = scalars;
 }
 
@@ -135,31 +128,36 @@ Scalars* Spill::GetScalars() const {
   return _scalars;
 }
 
-void Spill::SetEMRSpillData(EMRSpillData* emr) {
-  _emr = emr;
-}
-
-EMRSpillData* Spill::GetEMRSpillData() const {
-  return _emr;
-}
-
-void Spill::SetMCEvents(MCEventArray* mc) {
+void Spill::SetMCEvents(MCEventPArray* mc) {
+  if (_mc != NULL && mc != _mc) {
+      for (size_t i = 0; i < _mc->size(); ++i)
+          delete (*_mc)[i];
+      delete _mc;
+  }
   _mc = mc;
 }
 
-MCEventArray* Spill::GetMCEvents() const {
+MCEventPArray* Spill::GetMCEvents() const {
   return _mc;
 }
 
-void Spill::SetReconEvents(ReconEventArray* recon) {
+void Spill::SetReconEvents(ReconEventPArray* recon) {
+  if (_recon != NULL && recon != _recon) {
+      for (size_t i = 0; i < _recon->size(); ++i)
+          delete (*_recon)[i];
+      delete _recon;
+  }
   _recon = recon;
 }
 
-ReconEventArray* Spill::GetReconEvents() const {
+ReconEventPArray* Spill::GetReconEvents() const {
   return _recon;
 }
 
-void Spill::SetDAQData(DAQData* daq) {
+void Spill::SetDAQData(DAQData *daq) {
+  if (_daq != NULL && daq != _daq) {
+      delete _daq;
+  }
   _daq = daq;
 }
 
@@ -191,7 +189,6 @@ std::string Spill::GetDaqEventType() const {
     return _daq_event_type;
 }
 
-
 void Spill::SetErrors(ErrorsMap errors) {
   _errors = errors;
 }
@@ -205,7 +202,7 @@ TestBranch* Spill::GetTestBranch() const {
 }
 
 void Spill::SetTestBranch(TestBranch* test) {
-  if (_test != NULL)
+  if (_test != NULL && test != _test)
     delete _test;
   _test = test;
 }

@@ -68,7 +68,7 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
         Json::Value json_track = _tracks[_tracks.size()-1];
         if (json_track["track_id"] != aTrack->GetTrackID()) {
-            throw Squeal(Squeal::recoverable,
+            throw MAUS::Exception(Exception::recoverable,
                          "Track ID misalignment",
                          "MAUSTrackingAction::PostUserTrackingAction");
         }
@@ -93,7 +93,7 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 
 void MAUSTrackingAction::SetTracks(Json::Value tracks) {
     if (!tracks.isArray())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               "Attempt to set tracks to non-array of type "
               +JsonWrapper::ValueTypeToString(tracks.type()),
               "MAUSTrackingAction::SetTracks()"));
@@ -103,8 +103,8 @@ void MAUSTrackingAction::SetTracks(Json::Value tracks) {
 void MAUSTrackingAction::SetKillReason
                                   (const G4Track* aTrack, std::string reason) {
     for (size_t i = 0; i < _tracks.size(); ++i) {
-        if (_tracks[i]["track_id"] == aTrack->GetTrackID()) {
-            _tracks[i]["kill_reason"] = reason;
+        if (_tracks[Json::Value::ArrayIndex(i)]["track_id"] == aTrack->GetTrackID()) {
+            _tracks[Json::Value::ArrayIndex(i)]["kill_reason"] = reason;
         }
     }
 }

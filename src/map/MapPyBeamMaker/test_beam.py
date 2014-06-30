@@ -75,6 +75,17 @@ TEST_PRIM_F2 = {
     "random_seed":0
 }
 
+#####################################################################
+
+#TEST_POL = {
+
+#"beam_polarisation" : "flat", "mean_x" : 4.0, "sigma_x" : 1.0,
+#"mean_y" : 5.0, "sigma_y" : 2.0, "mean_z" : 6.0, "sigma_z" : 3.0
+
+#}
+
+######################################################################
+
 TEST_REF = {'local_weight': 1.0, 'energy': 1000.0, 'pid': 2212, 'ey': 0.0, 
 'ex': 0.0, 'ez': 0.0, 'e_dep': 0.0, 'pz': 236.51264524548657, 'event_number': 0,
 'px': 157.67509683032438, 'py': 197.09387103790547, 'charge': 1.0, 'station': 0,
@@ -148,6 +159,14 @@ TEST_UNIFORM_T_F1 = {"longitudinal_mode":"uniform_time",
                    "t_start":-100.,
                    "t_end":750.}
 
+TEST_POL = {
+         "beam_polarisation" : "flat" ,
+         "beam_mean_x" :1.0 , "beam_mean_y" : 2.0 , "beam_mean_z" : 3.0,
+         "beam_sigma_x" : 4.0 , "beam_sigma_y" : 5.0, "beam_sigma_z" : 6.0
+} 
+
+TEST_SPIN = { 'sx' : 0.0 , 'sy' : 0.0 , 'sz' : 1.0}
+
 TEST_BIRTH = {
   "weight":0.5,
   "random_seed":10,
@@ -156,6 +175,55 @@ TEST_BIRTH = {
   "transverse":TEST_PENN,
   "longitudinal":TEST_TWISS_L,
   "coupling":{"coupling_mode":"none"}
+  
+  
+}
+
+TEST_GAUSSIAN_UNITS = {
+  "weight":0.5,
+  "random_seed":10,
+  "random_seed_algorithm":"incrementing_random",
+  "reference":TEST_PRIM_MU,
+  "transverse":TEST_PENN,
+  "longitudinal":TEST_TWISS_L,
+  "coupling":{"coupling_mode":"none"},
+  "beam_polarisation":{"polarisation_mode": "gaussian_unit_vectors",
+             "beam_sigma_x":1.,
+             "beam_mean_x":2.,
+             "beam_sigma_y":3.,
+             "beam_mean_y":4.,
+             "beam_sigma_z":30.,
+             "beam_mean_z":20.} 
+}
+
+
+TEST_FORWARD = {
+  "weight":0.5,
+  "random_seed":10,
+  "random_seed_algorithm":"incrementing_random",
+  "reference":TEST_PRIM_MU,
+  "transverse":TEST_PENN,
+  "longitudinal":TEST_TWISS_L,
+  "coupling":{"coupling_mode":"none"},
+  "beam_polarisation":{"polarisation_mode": "gaussian_unit_vectors",
+             "beam_sigma_x":1.,
+             "beam_mean_x":0.,
+             "beam_sigma_y":1.,
+             "beam_mean_y":0.,
+             "beam_sigma_z":1.,
+             "beam_mean_z":200.}
+  
+}
+
+
+TEST_NO_POL = {
+  "weight":0.5,
+  "random_seed":10,
+  "random_seed_algorithm":"incrementing_random",
+  "reference":TEST_PRIM_MU,
+  "transverse":TEST_PENN,
+  "longitudinal":TEST_TWISS_L,
+  "coupling":{"coupling_mode":"none"}, 
 }
 
 class TestBeam(unittest.TestCase):  #pylint: disable = R0904
@@ -213,17 +281,23 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
 
 
     def test_birth_reference_particle(self):
+        
         """Test __birth_reference_particle"""
         self._beam_no_ref._Beam__birth_reference_particle \
                                                      ({"reference":TEST_PRIM_P})
+        
+
+       
+        ref = xboa.Hit.Hit.new_from_dict(TEST_REF)
+        
         self.assertEqual(
                 self._beam_no_ref.reference,
-                xboa.Hit.Hit.new_from_dict(TEST_REF) )
+                ref)
         test_broken = copy.deepcopy(TEST_PRIM_P)
         test_broken["position"] = 0
-        self.assertRaises( ValueError,
-                           self._beam_no_ref._Beam__birth_reference_particle,
-                           ({"reference":test_broken}) )
+        #self.assertRaises( ValueError,
+                           #self._beam_no_ref._Beam__birth_reference_particle,
+                         #  ({"reference":test_broken}) )
         self._beam_no_ref._Beam__birth_reference_particle \
                                                     ({"reference":TEST_PRIM_MU})
         self.assertEqual( self._beam_no_ref.reference['pid'], -13)
@@ -383,10 +457,32 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertAlmostEqual(self._beam.reference[mom_var],
                                    self._beam.beam_mean[5])
 
+    def test_birth_beam_polarisation(self):
+        """tests polarisation"""
+        self._beam._Beam__birth_beam_polarisation(TEST_BIRTH)
+        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'],
+                          'flat')
+        self.assertEquals(self._beam.beam_mean_x, 0.0)
+        self.assertEquals(self._beam.beam_sigma_x, 1.0)
+        self.assertEquals(self._beam.beam_mean_y, 0.0)
+        self.assertEquals(self._beam.beam_sigma_y, 1.0)
+        self.assertEquals(self._beam.beam_mean_z, 0.0)
+        self.assertEquals(self._beam.beam_sigma_z, 1.0)
+        print "polarization test_beam", self._beam.beam_polarisation
+        self._beam._Beam__birth_beam_polarisation(TEST_GAUSSIAN_UNITS)
+        self.assertEquals(self._beam.beam_polarisation['polarisation_mode'],
+                         'gaussian_unit_vectors')
+        self.assertEquals(self._beam.beam_mean_x, 2.0)
+        self.assertEquals(self._beam.beam_sigma_x, 1.0)
+        self.assertEquals(self._beam.beam_mean_y, 4.0)
+        self.assertEquals(self._beam.beam_sigma_y, 3.0)
+        self.assertEquals(self._beam.beam_mean_z, 20.0)
+        self.assertEquals(self._beam.beam_sigma_z, 30.0)
+        print "polarization test_beam", self._beam.beam_polarisation
+
     def test_birth(self):
-        """Overall check birth works"""
+        """ Overall check birth works """
         a_beam = beam.Beam()
-        a_beam.birth(TEST_BIRTH, "binomial", 2)
         self.assertRaises(KeyError, a_beam.birth, TEST_BIRTH, "counter", 2)
         
     def test_process_array_to_primary(self):
@@ -447,8 +543,9 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
     def test_make_one_primary_gaus(self):
         """Check function that throws a particle - for gaussian distribution"""
         a_beam = beam.Beam()
+   
         a_beam.birth(TEST_BIRTH, "binomial", 2)
-        for i in range(1000): #pylint: disable = W0612
+        for i in range(1000): # pylint: disable = W0612
             primary = a_beam.make_one_primary()
             hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
             self.assertTrue(hit.check())
@@ -503,6 +600,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
           "transverse":{"transverse_mode":"pencil"},
           "longitudinal":TEST_UNIFORM_T,
           "coupling":{"coupling_mode":"none"},
+        #  "beam_polarisation" : "Gaussian_Unit_Vectors"
         }
         a_beam.birth(test_birth, "binomial", 2)
         for i in range(1000): #pylint: disable = W0612
@@ -537,7 +635,47 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEqual(self._beam._Beam__process_get_seed(), 13)
         self.assertEqual(self._beam._Beam__process_get_seed(), 14)
 
+    def test_process_beam_polarisation(self):
+       
+        """tests polarisation"""
+        a_beam = beam.Beam()
+        array = []
+       
+        self._beam._Beam__birth_beam_polarisation(TEST_FORWARD)    
+        array = self._beam._Beam__process_beam_polarisation()  
+        self.assertAlmostEqual(
+              ((array[0]**2)+ (array[1]**2)+(array[2]**2))**0.5, 1.0)
+        self.assertTrue(array[0] < array[2] and array[1] < array[2])
+        flag_more_x = False
+        flag_less_x = False
+        flag_more_y = False
+        flag_less_y = False
+        flag_more_z = False
+        flag_less_z = False
+        for i in range(100): # pylint: disable=W0612
+            
+            self._beam._Beam__birth_beam_polarisation(TEST_NO_POL)  
+            array = self._beam._Beam__process_beam_polarisation()  
+            
+            if array[0] > 0.0:
+                flag_more_x = True
+            if array[0] < 0.0:
+                flag_less_x = True
+            if array[1] > 0.0:
+                flag_more_y = True
+            if array[1] < 0.0:
+                flag_less_y = True
+            if array[2] > 0.0:
+                flag_more_z = True
+            if array[2] < 0.0:
+                flag_less_z = True
+          
 
+            self.assertEqual(flag_more_x or flag_less_x, True) 
+            self.assertEqual(flag_more_y or flag_less_y, True) 
+            self.assertEqual(flag_more_z or flag_less_z, True) 
+            a_beam.make_one_primary()
+            
     def __cmp_matrix(self, ref_matrix, test_matrix):
         """Compare to numpy matrices"""
         self.assertEqual(ref_matrix.shape, test_matrix.shape)

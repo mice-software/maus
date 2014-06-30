@@ -60,7 +60,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppWrongTypeTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value("string type"));
-    EXPECT_THROW(proc.JsonToCpp(json_array), Squeal); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_array), MAUS::Exception); // and should clean up
                                                       // memory allocation
 }
 
@@ -80,7 +80,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppNullTest) {
 TEST(ArrayProcessorsTest, PointerArrayJsonToCppNotArrayTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_string("string_type");
-    EXPECT_THROW(proc.JsonToCpp(json_string), Squeal); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_string), MAUS::Exception); // and should clean up
 }
 
 // test empty vector is handled okay in CppToJson
@@ -175,7 +175,7 @@ TEST(ArrayProcessorsTest, ValueArrayJsonToCppWrongTypeTest) {
     ValueArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value("string type"));
-    EXPECT_THROW(proc.JsonToCpp(json_array), Squeal); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_array), MAUS::Exception); // and should clean up
                                                       // memory allocation
 }
 
@@ -183,7 +183,7 @@ TEST(ArrayProcessorsTest, ValueArrayJsonToCppWrongTypeTest) {
 TEST(ArrayProcessorsTest, ValueArrayJsonToCppNotArrayTest) {
     ValueArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_string("string_type");
-    EXPECT_THROW(proc.JsonToCpp(json_string), Squeal); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_string), MAUS::Exception); // and should clean up
 }
 
 // test empty vector is handled okay in CppToJson
@@ -247,7 +247,7 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     JsonWrapper::Path::SetPath(obj["ref"][1], JsonWrapper::Path::GetPath(*refs));
     ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(obj);
     std::string ref_paths[] = {"0", "1", "1", "0"};
-    for (size_t i = 0; i < refs->size(); ++i)
+    for (int i = 0; i < Json::Value::ArrayIndex(refs->size()); ++i)
         EXPECT_EQ(obj["ref"][1][i]["$ref"], "#pointers/"+ref_paths[i]);
 
     std::vector<int*>* data_out = pointer_proc.JsonToCpp(*pointers);
@@ -255,7 +255,7 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     ReferenceResolver::JsonToCpp::RefManager::GetInstance().ResolveReferences();
 
     int ref_data[] = {0, 1, 1, 0};
-    for (size_t i = 0; i < ref_out->size(); ++i)
+    for (int i = 0; i < Json::Value::ArrayIndex(ref_out->size()); ++i)
         EXPECT_EQ((*ref_out)[i], (*data_out)[ref_data[i]]);
     delete refs;
     delete pointers;

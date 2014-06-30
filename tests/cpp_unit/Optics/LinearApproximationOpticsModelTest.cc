@@ -25,17 +25,13 @@
 #include <string>
 
 #include <cstdlib>
-/*
-#include <unistd.h>
-#include <sys/param.h> // MAXPATHLEN definition
-*/
 
 #include "gtest/gtest.h"
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "BeamTools/BTTracker.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Optics/CovarianceMatrix.hh"
 #include "src/common_cpp/Optics/LinearApproximationOpticsModel.hh"
@@ -56,24 +52,15 @@ Json::Value SetupConfig(int verbose_level);
 class LinearApproximationOpticsModelTest : public testing::Test {
  public:
   LinearApproximationOpticsModelTest()
-      : default_virtual_planes_(new MAUS::VirtualPlaneManager(*
-            MAUS::MAUSGeant4Manager::GetInstance()->GetVirtualPlanes())) {
+      : default_virtual_planes_(new MAUS::VirtualPlaneManager(
+          *MAUS::MAUSGeant4Manager::GetInstance()->GetVirtualPlanes())),
+        virtual_planes_(new MAUS::VirtualPlaneManager()) {
     MAUS::MAUSGeant4Manager * simulation
         = MAUS::MAUSGeant4Manager::GetInstance();
-    /*
-    char path1[MAXPATHLEN]; // This is a buffer for the text
-    getcwd(path1, MAXPATHLEN);
-    std::cout << "CWD: " << path1 << std::endl;
-    */
-    /*
-    const std::string maus_root_dir(getenv("MAUS_ROOT_DIR"));
-    const std::string geometry_filename = maus_root_dir + "/"
-                                        + kGeometryFilename;
-    */
 
     Json::Value * config = MAUS::Globals::GetConfigurationCards();
-    (*config)["verbose_level"] = Json::Value(2);
 
+    (*config)["verbose_level"] = Json::Value(2);
     (*config)["reference_physics_processes"] = Json::Value("none");
     (*config)["physics_processes"] = Json::Value("none");
     (*config)["particle_decay"] = Json::Value(false);
@@ -82,6 +69,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     (*config)["simulation_reference_particle"] = JsonWrapper::StringToJson(
       std::string("{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":-1000.0},")+
       std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":200.0},")+
+      std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
       std::string("\"particle_id\":-13,\"energy\":226.1939223,\"time\":0.0,")+
       std::string("\"random_seed\":2}")
     );
@@ -109,23 +97,22 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     MAUS::GlobalsManager::DeleteGlobals();
     MAUS::GlobalsManager::InitialiseGlobals(config_string);
 
-    std::cout << "Globals:" << std::endl
-              << (*MAUS::Globals::GetConfigurationCards()) << std::endl;
-    virtual_planes_ = new MAUS::VirtualPlaneManager();
     simulation->SetVirtualPlanes(virtual_planes_);
     MAUS::VirtualPlane start_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., -1000.), -1, true,
-        -1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane), -1,
+        true, kPrimaryPlane, BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes_->AddPlane(new MAUS::VirtualPlane(start_plane), NULL);
 
     MAUS::VirtualPlane mid_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 0.), -1, true,
-        0., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane+1000.),
+        -1, true, kPrimaryPlane+1000., BTTracker::z, MAUS::VirtualPlane::ignore,
+        false);
     virtual_planes_->AddPlane(new MAUS::VirtualPlane(mid_plane), NULL);
 
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
-        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 1000.), -1, true,
-        1000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
+        CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., kPrimaryPlane+2000.),
+        -1, true, kPrimaryPlane+2000., BTTracker::z, MAUS::VirtualPlane::ignore,
+        false);
     virtual_planes_->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
   }
 
@@ -139,6 +126,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     std::cout << "*** Reset Globals ***" << std::endl;
   }
 
+  static const double kPrimaryPlane;
  protected:
   void ResolveRootDirectory(std::string & str,
                             const std::string & maus_root_dir) {
@@ -153,13 +141,14 @@ class LinearApproximationOpticsModelTest : public testing::Test {
   static const double kCovariances[36];
   static const MAUS::CovarianceMatrix kCovarianceMatrix;
  private:
-  MAUS::VirtualPlaneManager * virtual_planes_;
-  MAUS::VirtualPlaneManager * default_virtual_planes_;
+  MAUS::VirtualPlaneManager * const default_virtual_planes_;
+  MAUS::VirtualPlaneManager * const virtual_planes_;
 };
 
 // *************************************************
 // LinearApproximationOpticsModelTest static const initializations
 // *************************************************
+const double LinearApproximationOpticsModelTest::kPrimaryPlane = -1000;
 const double LinearApproximationOpticsModelTest::kCovariances[36] = {
   0., 1., 2., 3., 4., 5.,
   1., 2., 3., 4., 5., 6.,
@@ -178,72 +167,77 @@ LinearApproximationOpticsModelTest::kCovarianceMatrix(
 
 TEST_F(LinearApproximationOpticsModelTest, Constructor) {
   const LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
+      MAUS::Globals::GetConfigurationCards());
 }
 
 TEST_F(LinearApproximationOpticsModelTest, Accessors) {
   LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
-  double first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(-1000., first_plane);
+      MAUS::Globals::GetConfigurationCards());
+  double primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(kPrimaryPlane, primary_plane);
 
-  optics_model.set_first_plane(0.);
-  first_plane = optics_model.first_plane();
-  ASSERT_DOUBLE_EQ(0., first_plane);
+  optics_model.set_primary_plane(0.);
+  primary_plane = optics_model.primary_plane();
+  ASSERT_DOUBLE_EQ(0., primary_plane);
 }
 
 TEST_F(LinearApproximationOpticsModelTest, Transport) {
   LinearApproximationOpticsModel optics_model(
-      *MAUS::Globals::GetConfigurationCards());
-
+      MAUS::Globals::GetConfigurationCards());
   // The configuration specifies a 2m drift between -1m and +1 m.
   optics_model.Build();
 
   // Check transport to start plane
   MAUS::PhaseSpaceVector input_vector(0., 226., 1., 0., 3., 0.);
   MAUS::PhaseSpaceVector output_vector = optics_model.Transport(input_vector,
-                                                                -1000.);
+                                                                kPrimaryPlane);
   EXPECT_EQ(input_vector, output_vector);
 
   MAUS::CovarianceMatrix output_errors
-      = optics_model.Transport(kCovarianceMatrix, -1000.);
+      = optics_model.Transport(kCovarianceMatrix, kPrimaryPlane);
   EXPECT_EQ(kCovarianceMatrix, output_errors);
 
   // Check transport to end plane
   MAUS::PhaseSpaceVector expected_vector(7.5466, 226., 1., 0., 3., 0.);
-  output_vector = optics_model.Transport(input_vector, 1000.);
+  output_vector = optics_model.Transport(input_vector, kPrimaryPlane+2000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
-  output_errors = optics_model.Transport(kCovarianceMatrix, 1000.);
+  output_errors = optics_model.Transport(kCovarianceMatrix,
+                                         kPrimaryPlane+2000.);
   EXPECT_EQ(kCovarianceMatrix, output_errors);
 
   // Check transport to mid plane
   expected_vector = MAUS::PhaseSpaceVector(3.7733, 226., 1., 0., 3., 0.);
-  output_vector = optics_model.Transport(input_vector, 0.);
+  output_vector = optics_model.Transport(input_vector, kPrimaryPlane+1000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
-  output_errors = optics_model.Transport(kCovarianceMatrix, 0.);
+  output_errors = optics_model.Transport(kCovarianceMatrix,
+                                         kPrimaryPlane+1000.);
   EXPECT_EQ(kCovarianceMatrix, output_errors);
 
   // Check transport between mid plane and end plane
-  output_vector = optics_model.Transport(input_vector, 0., 1000.);
+  output_vector = optics_model.Transport(input_vector,
+                                         kPrimaryPlane+1000.,
+                                         kPrimaryPlane+2000.);
   for (int index = 0; index < 6; ++index) {
     EXPECT_NEAR(expected_vector[index], output_vector[index], 5.0e-4);
   }
 
-  output_errors = optics_model.Transport(kCovarianceMatrix, 0., 1000.);
+  output_errors = optics_model.Transport(kCovarianceMatrix,
+                                         kPrimaryPlane+1000.,
+                                         kPrimaryPlane+2000.);
   EXPECT_EQ(kCovarianceMatrix, output_errors);
 
   // Check failure for off mass shell particle transport
   MAUS::PhaseSpaceVector off_shell_vector(0., 1., 0., 0., 0., 0.);
   bool transport_failed = false;
   try {
-    optics_model.Transport(off_shell_vector, -1000.);
-  } catch (Squeal squeal) {
+    optics_model.Transport(off_shell_vector, kPrimaryPlane);
+  } catch (MAUS::Exception exc) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);

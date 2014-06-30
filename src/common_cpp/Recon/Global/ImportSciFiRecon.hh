@@ -15,17 +15,13 @@
  *
  */
 
-/** @class MAUS::recon::global::ImportSciFiRecon
- *  @ingroup globalrecon
- *  @brief Imports the reconstructed output of the SciFi Tracker
- *
- *  Imports reconstructed tracks from the SciFi Tracker detector into
- *  the MAUS::recon::global format.  This will be the standard
- *  starting point of the global reconstruction.
+/** @class ImportTOFRecon
+ *  Imports the space points from the TOF detectors into
+ *  the MAUS::recon::global format.  
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_IMPORTSCIFI_HH_
-#define _SRC_COMMON_CPP_RECON_IMPORTSCIFI_HH_
+#ifndef _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTSCIFIRECON_HH_
+#define _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTSCIFIRECON_HH_
 
 // C++ headers
 #include <string>
@@ -41,49 +37,51 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-class ImportSciFiRecon {
- public:
+  class ImportSciFiRecon {
+  public:
 
-  /// Default constructor
-  ImportSciFiRecon() {}
+    /// Default constructor
+    ImportSciFiRecon() {}
 
-  /// Destructor
-  ~ImportSciFiRecon() {}
+    /// Destructor
+    ~ImportSciFiRecon() {}
 
-  /**  Main process, accepting the MAUS::SciFiEvent and importing
-       track details into an existing MAUS::GlobalEvent
-   *  @param[in]  scifi_event  The reconstructed Tracker Event
-   *  @param[out] global_event The Global Event, which will be changed
-   */
-  void process(const MAUS::SciFiEvent &scifi_event,
-               MAUS::GlobalEvent* global_event,
-               std::string mapper_name);
+    /**  Main process, accepting the MAUS::SciFiEvent and importing
+     *   track points and tracks into an existing MAUS::GlobalEvent
+     *  @param scifi_event  The reconstructed SciFi Event
+     *  @param global_event The Global Event, which will be changed
+     */
+    void process(const MAUS::SciFiEvent &scifi_event,
+		 MAUS::GlobalEvent* global_event,
+		 std::string mapper_name);
 
- private:
-  /// Disallow copy constructor as unnecessary
-  ImportSciFiRecon(const ImportSciFiRecon&);
+  private:
+    /// Disallow copy constructor as unnecessary
+    ImportSciFiRecon(const ImportSciFiRecon&);
 
-  /// Disallow operator= as unnecessary
-  void operator=(const ImportSciFiRecon);
+    /// Disallow operator= as unnecessary
+    void operator=(const ImportSciFiRecon);
 
-  /// Import Straight tracks, populating a
-  /// MAUS::recon::global::PrimaryChain object with
-  /// MAUS::recon::global::Track's, MAUS::recon::global::TrackPoint's
-  /// and MAUS::recon::global::SpacePoint's,
-  void ImportStraightTracks(
-      const MAUS::SciFiStraightPRTrackPArray straightarray,
-      MAUS::GlobalEvent* global_event,
-      std::string mapper_name);
-
-  /// Import Straight tracks, populating a
-  /// MAUS::recon::global::PrimaryChain object with
-  /// MAUS::recon::global::Track's, MAUS::recon::global::TrackPoint's
-  /// and MAUS::recon::global::SpacePoint's,
-  void ImportHelicalTracks(
-      const MAUS::SciFiHelicalPRTrackPArray helicalarray,
-      MAUS::GlobalEvent* global_event,
-      std::string mapper_name);
-}; // ~class ImportSciFiRecon
+    /**  @brief Add Scifi tracks to global event
+     *   
+     *  @param scifi_track  The reconstructed SciFi Track
+     *  @param global_track The Global Track, which will be changed
+     *  @param mapper_name 
+     */
+    void ImportSciFiTrack(const MAUS::SciFiTrack* scifi_track,
+			  MAUS::DataStructure::Global::Track* global_track,
+			  std::string mapper_name);
+    /**  @brief Obtain detector enum for a given tracker and station
+     *   
+     *  @param tracker  Tracker number
+     *  @param station  Station number
+     *  @param detector  Detector enum, which will be changed
+     */
+    void SetStationEnum(
+      MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint,
+      MAUS::DataStructure::Global::Track* GlobalSciFiTrack, int tracker,
+      int station, double& z);
+  }; // ~class ImportSciFiRecon
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS

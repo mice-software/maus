@@ -23,7 +23,7 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
@@ -37,6 +37,7 @@ namespace MAUS {
 bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
 
   mClassname = "ReduceCppPatternRecognition";
+  mDataManager.set_print_tracks(false);               // Do not print info about the PR tracks
   mDataManager.set_print_seeds(false);               // Do not print info about track seeds
   mXYZPlotter = new TrackerDataPlotterXYZ();         // The spacepoint and track plotter
   mInfoBoxPlotter = new TrackerDataPlotterInfoBox(); // The infobox plotter
@@ -48,35 +49,32 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
     return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, mClassname);
-  } catch(std::exception exc) {
+  } catch (Exception exc) {
+    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, mClassname);
+  } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
   }
   return false;
 }
 
 std::string ReduceCppPatternRecognition::process(std::string aDocument) {
-  std::cout << "Starting Pattern Recognition Reducer" << std::endl;
-
   bool read_success = read_in_json(aDocument);
-
   if (read_success) {
     try {
       if ( mSpill->GetReconEvents() ) {
         mDataManager.process(mSpill);
         mDataManager.draw(mPlotters);
       }
-    } catch(Squeal squee) {
-      Squeak::mout(Squeak::error) << squee.GetMessage() << std::endl;
-      mRoot = MAUS::CppErrorHandler::getInstance()->HandleSqueal(mRoot, squee, mClassname);
-    } catch(std::exception exc) {
+    } catch (Exception exc) {
+      Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
+      mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
+    } catch (std::exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);
     }
     mDataManager.clear_spill();
   } else {
-    std::cerr << "Failed to import json to spill\n";
+    std::cerr << mClassname << ": Failed to import json to spill\n";
   }
   return JsonWrapper::JsonToString(mRoot);
 }
@@ -93,10 +91,10 @@ bool ReduceCppPatternRecognition::read_in_json(std::string aJsonData) {
     SpillProcessor spill_proc;
     mSpill = spill_proc.JsonToCpp(mRoot);
     return true;
-  } catch(...) {
+  } catch (...) {
     Json::Value errors;
     std::stringstream ss;
-    ss << mClassname << " says: Failed when importing JSON to Spill";
+    ss << mClassname << ": Failed when importing JSON to Spill";
     errors["bad_json_document"] = ss.str();
     mRoot["errors"] = errors;
     writer.write(mRoot);

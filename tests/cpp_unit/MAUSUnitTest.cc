@@ -82,10 +82,12 @@ Json::Value SetupConfig(int verbose_level) {
   config["reference_physics_processes"] = "mean_energy_loss";
   config["physics_processes"] = "standard";
   config["particle_decay"] = true;
+  config["polarised_decay"] = true;
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
   config["default_keep_or_kill"] = true;
+  config["spin_tracking"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";
   config["kinetic_energy_threshold"] = 0.1;
   config["max_step_length"] = 100.;
@@ -93,6 +95,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["max_track_length"] = 1.e8;
   config["simulation_reference_particle"] = JsonWrapper::StringToJson(
     std::string("{\"position\":{\"x\":0.0,\"y\":-0.0,\"z\":-5500.0},")+
+    std::string("\"spin\":{\"x\":0.0,\"y\":-0.0,\"z\":1.0},")+
     std::string("\"momentum\":{\"x\":0.0,\"y\":0.0,\"z\":1.0},")+
     std::string("\"particle_id\":-13,\"energy\":226.0,\"time\":0.0,")+
     std::string("\"random_seed\":10}")
@@ -121,10 +124,10 @@ int main(int argc, char **argv) {
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
       test_out = RUN_ALL_TESTS();
-  } catch(Squeal squee) {
-      std::cerr << squee.GetMessage() << "\n" << squee.GetLocation() << "\n"
-                << squee.GetStackTrace() << std::endl;
-  } catch(std::exception exc) {
+  } catch (MAUS::Exception exc) {
+      std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"
+                << exc.GetStackTrace() << std::endl;
+  } catch (std::exception exc) {
       std::cerr << "Caught std::exception" << "\n" << exc.what() << std::endl;
   }
   MAUS::GlobalsManager::Finally();

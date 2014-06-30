@@ -33,9 +33,11 @@
 
 #include "json/json.h"
 #include "Utils/TOFChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+
+namespace MAUS {
 
 /** Identifier for a single TOF pixel.
  * This class is used to hold and manage all the information needed
@@ -50,15 +52,15 @@ class TOFPixelKey {
   TOFPixelKey(int st, int slX, int slY, string d)
   :_station(st), _slabX(slX), _slabY(slY), _detector(d) {}
 
-  explicit TOFPixelKey(string keyStr) throw(Squeal);
+  explicit TOFPixelKey(string keyStr) throw(Exception);
 
   virtual ~TOFPixelKey() {}
 
-  bool operator==( TOFPixelKey key );
-  bool operator!=( TOFPixelKey key );
+  bool operator==( const TOFPixelKey& key ) const;
+  bool operator!=( const TOFPixelKey& key ) const;
 
   friend ostream& operator<<( ostream& stream, TOFPixelKey key );
-  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Exception);
 
   string detector() {return _detector;}
 
@@ -139,14 +141,14 @@ class TOFCalibrationMap {
   * \returns the value of the T0 correction for this channel and sets the number of the 
   * refference pixel. If no calibration for this channel the function returns NOCALIB (-99999).
   */
-  double T0(TOFChannelKey key, int &r);
+  double T0(TOFChannelKey key, int &r) const;
 
  /** Return the Trigger delay correction for the pixel coded by the key.
   * \param[in] key the pixel of the hit that gives the trigger.
   * \returns the value of the trigger delay correction. If no calibration for this pixel the 
   * function returns NOCALIB (-99999).
   */
-  double TriggerT0(TOFPixelKey key);
+  double TriggerT0(TOFPixelKey key) const;
 
  /** Calculate the TimeWalk correction for the channel coded by the key and for given adc value.
   * \param[in] key the channel of the measurement.
@@ -154,7 +156,7 @@ class TOFCalibrationMap {
   * \returns the value of the time-walk correction. If no calibration for this channel the function
   * returns NOCALIB (-99999).
   */
-  double TW(TOFChannelKey key, int adc );
+  double TW(TOFChannelKey key, int adc ) const;
 
  /** Calculate the combined correction for the channel coded by Pkey, trigger 
   * pixel coded by the Tkey and for given adc value.
@@ -162,7 +164,7 @@ class TOFCalibrationMap {
   * \param[in] Tkey the pixel of the hit that gives the trigger.
   * \param[in] adc the measured value of the amplitude of the signal.
   */
-  double dT(TOFChannelKey Pkey, TOFPixelKey Tkey, int adc);
+  double dT(TOFChannelKey Pkey, TOFPixelKey Tkey, int adc) const;
 
  /** Return the data member Name.
   */
@@ -208,11 +210,11 @@ class TOFCalibrationMap {
 
  /** Find the position of the PMT key in the data member _Pkey.
   */
-  int FindTOFChannelKey(TOFChannelKey key);
+  int FindTOFChannelKey(TOFChannelKey key) const;
 
  /** Find the position of the trigger key in the data member _Tkey.
   */
-  int FindTOFPixelKey(TOFPixelKey key);
+  int FindTOFPixelKey(TOFPixelKey key) const;
 
  /** This vector holds one TOFChannelKey for each channel of the detector.
   */
@@ -271,6 +273,7 @@ class TOFCalibrationMap {
   bool LoadTriggerCalib();
   bool pymod_ok;
 };
+}
 
 #endif
 

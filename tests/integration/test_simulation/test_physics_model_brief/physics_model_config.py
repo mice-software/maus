@@ -71,5 +71,20 @@ beam = {
         "longitudinal":{"longitudinal_mode":"pencil","momentum_variable":"p"},
        "coupling":{"coupling_mode":"none"}
     },
+    {
+       "reference":{
+            "position":{"x":0.0, "y":0.0, "z":200000.0},
+            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "particle_id":211,
+            "energy":200.0,
+            "time":0.,
+            "random_seed":0
+        },
+       "n_particles_per_spill":1,
+       "random_seed_algorithm":"incrementing_random",
+       "transverse":{"transverse_mode":"pencil"},
+        "longitudinal":{"longitudinal_mode":"pencil","momentum_variable":"p"},
+       "coupling":{"coupling_mode":"none"}
+    },
     ],
 }

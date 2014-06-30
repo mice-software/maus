@@ -19,86 +19,70 @@
 #include "Utils/JsonWrapper.hh"
 #include "Utils/KLChannelMap.hh"
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
+#include "API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppKLDigits/MapCppKLDigits.hh"
 
 namespace MAUS {
-bool MapCppKLDigits::birth(std::string argJsonConfigDocument) {
 
-  _classname = "MapCppKLDigits";
+PyMODINIT_FUNC init_MapCppKLDigits(void) {
+  PyWrapMapBase<MAUS::MapCppKLDigits>::PyWrapMapBaseModInit
+                                            ("MapCppKLDigits", "", "", "", "");
+}
+
+MapCppKLDigits::MapCppKLDigits() : MapBase<Json::Value>("MapCppKLDigits") {
+}
+
+void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
 
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error)
-    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+              "Could not find the $MAUS_ROOT_DIR environmental variable.",
+              "MapCppKLDigits::_birth");
   }
 
   // Check if the JSON document can be parsed, else return error only
-  try {
-    //  JsonCpp setup
-    Json::Value configJSON;
-    Json::Value map_file_name;
-    Json::Value xEnable_V1724_Unpacking;
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-    //  this will contain the configuration
+  //  JsonCpp setup
+  Json::Value configJSON;
+  Json::Value map_file_name;
+  Json::Value xEnable_V1724_Unpacking;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+  //  this will contain the configuration
 
-    map_file_name = JsonWrapper::GetProperty(configJSON,
-                                             "KL_cabling_file",
-                                             JsonWrapper::stringValue);
+  map_file_name = JsonWrapper::GetProperty(configJSON,
+                                           "KL_cabling_file",
+                                           JsonWrapper::stringValue);
 
-    std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-    bool loaded = _map.InitFromFile(xMapFile);
-    if (!loaded)
-      return false;
+  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
+  bool loaded = _map.InitFromFile(xMapFile);
+  if (!loaded)
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to initialise map KLChannelMap",
+                          "MapCppKLDigits::_birth");
 
-    xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
-                                                       "Enable_V1724_Unpacking",
-                                                       JsonWrapper::booleanValue);
+  xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
+                                                     "Enable_V1724_Unpacking",
+                                                     JsonWrapper::booleanValue);
 
-    if (!xEnable_V1724_Unpacking.asBool()) {
-      Squeak::mout(Squeak::warning)
-      << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
-      << " Are you shure you want this?"
-      << std::endl;
-    }
-
-  return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+  if (!xEnable_V1724_Unpacking.asBool()) {
+    Squeak::mout(Squeak::warning)
+    << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << " Are you shure you want this?"
+    << std::endl;
   }
-
-  return false;
 }
 
 
-bool MapCppKLDigits::death()  {return true;}
+void MapCppKLDigits::_death()  {}
 
-std::string MapCppKLDigits::process(std::string document) {
+void MapCppKLDigits::_process(Json::Value* document) const {
 
-  //  JsonCpp setup
-  Json::FastWriter writer;
-  Json::Value root;
-  Json::Value xEventType;
-  // Check if the JSON document can be parsed, else return error only
-  try {root = JsonWrapper::StringToJson(document);}
-  catch(...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  try {
-    xEventType = JsonWrapper::GetProperty(root,
+    Json::Value& root = *document;
+    Json::Value xEventType = JsonWrapper::GetProperty(root,
                                           "daq_event_type",
                                           JsonWrapper::stringValue);
     if (xEventType == "physics_event" || xEventType == "calibration_event") {
@@ -134,23 +118,14 @@ std::string MapCppKLDigits::process(std::string document) {
 	  }
       }
     }
-  } catch(Squeal squee) {
-    root = MAUS::CppErrorHandler::getInstance()
-      ->HandleSqueal(root, squee, _classname);
-  } catch(std::exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-      ->HandleStdExc(root, exc, _classname);
-  }
-
-  return writer.write(root);
 }
 
 bool MapCppKLDigits::SetConfiguration(std::string json_configuration) {
-
   return true;
 }
 
-Json::Value MapCppKLDigits::makeDigits(Json::Value xDocDetData, Json::Value xDocTrig) {
+Json::Value MapCppKLDigits::makeDigits(Json::Value xDocDetData,
+                                       Json::Value xDocTrig) const {
   Json::Value xDocDigits;
   // Get number of Particle trigger.
   int n_part_event_triggers = xDocTrig.size();
@@ -191,7 +166,7 @@ Json::Value MapCppKLDigits::makeDigits(Json::Value xDocDetData, Json::Value xDoc
   return xDocDigits;
 }
 
-Json::Value MapCppKLDigits::getAdc(Json::Value xDocAdcHit) {
+Json::Value MapCppKLDigits::getAdc(Json::Value xDocAdcHit) const {
   std::stringstream xConv;
   Json::Value xDocInfo;
 

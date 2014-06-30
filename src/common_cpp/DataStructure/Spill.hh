@@ -21,17 +21,14 @@
 #include <map>
 #include <string>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "src/common_cpp/DataStructure/DAQData.hh"
-#include "src/common_cpp/DataStructure/EMRSpillData.hh"
-#include "src/common_cpp/DataStructure/Scalars.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/TestBranch.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/DAQData.hh"
+#include "DataStructure/Scalars.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/ReconEvent.hh"
+#include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
-typedef std::vector<ReconEvent*> ReconEventArray;
-typedef std::vector<MCEvent*> MCEventArray;
 typedef std::map<std::string, std::string> ErrorsMap;
 
 /** @class Spill stores data for all items in a given spill
@@ -53,29 +50,42 @@ class Spill {
   /** Destructor - frees memory */
   virtual ~Spill();
 
-  /** Set the scalars information */
-  void SetScalars(Scalars* scalars);
+  /** Set the scalars information
+   *
+   *  Spill takes ownership of memory assigned to scalars
+   */
+  void SetScalars(Scalars *scalars);
 
-  /** Get the scalars information */
+  /** Get the scalars information
+   *
+   *  Spill keeps ownership of this memory
+   */
   Scalars* GetScalars() const;
 
-  /** Set the EMR Spill information */
-  void SetEMRSpillData(EMRSpillData* emr);
 
-  /** Get the EMR Spill information */
-  EMRSpillData* GetEMRSpillData() const;
-
-  /** Set the DAQ output */
+  /** Set the DAQ output
+   *
+   *  Spill takes ownership of memory assigned to daq
+   */
   void SetDAQData(DAQData* daq);
 
-  /** Get the DAQ output */
+  /** Get the DAQ output
+   *
+   *  Spill keeps ownership of this memory
+   */
   DAQData* GetDAQData() const;
 
-  /** Set the MC events */
-  void SetMCEvents(MCEventArray* events);
+  /** Set the MC events
+   *
+   *  Spill takes ownership of memory assigned to events
+   */
+  void SetMCEvents(MCEventPArray* events);
 
-  /** Get the MC events */
-  MCEventArray* GetMCEvents() const;
+  /** Get the MC events
+   *
+   *  Spill keeps ownership of this memory
+   */
+  MCEventPArray* GetMCEvents() const;
 
   /** Get a single MC event (needed for PyROOT) */
   MCEvent& GetAnMCEvent(size_t i) const {
@@ -84,14 +94,21 @@ class Spill {
 
   /** Get the MC event size (needed for PyROOT)*/
   size_t GetMCEventSize() const {
+    if (!_mc) return 0;
     return _mc->size();
   }
 
-  /** Set the Recon events */
-  void SetReconEvents(ReconEventArray* ReconEvent);
+  /** Set the Recon events
+   *
+   *  Spill takes ownership of memory assigned to ReconEvent
+   */
+  void SetReconEvents(ReconEventPArray* ReconEvent);
 
-  /** Get the Recon events */
-  ReconEventArray* GetReconEvents() const;
+  /** Get the Recon events
+   *
+   *  Spill keeps ownership of this memory
+   */
+  ReconEventPArray* GetReconEvents() const;
 
   /** Get a single Recon event (needed for PyROOT) */
   ReconEvent& GetAReconEvent(int i) const {
@@ -100,6 +117,7 @@ class Spill {
 
   /** Get the Recon event size (needed for PyROOT)*/
   size_t GetReconEventSize() const {
+    if (!_recon) return 0;
     return _recon->size();
   }
 
@@ -134,11 +152,11 @@ class Spill {
   TestBranch* GetTestBranch() const;
 
  private:
+
   DAQData* _daq;
   Scalars* _scalars;
-  EMRSpillData* _emr;
-  MCEventArray* _mc;
-  ReconEventArray* _recon;
+  MCEventPArray* _mc;
+  ReconEventPArray* _recon;
   int _spill_number;
   int _run_number;
   std::string _daq_event_type;

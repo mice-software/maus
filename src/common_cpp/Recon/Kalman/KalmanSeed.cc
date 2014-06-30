@@ -22,13 +22,9 @@
 namespace MAUS {
 
 // Ascending z.
-bool SortByZ(const SciFiCluster *a, const SciFiCluster *b) {
+template <class element>
+bool SortByZ(const element *a, const element *b) {
   return ( a->get_position().z() < b->get_position().z() );
-}
-
-// Ascending station number.
-bool SortByStation(const SciFiSpacePoint *a, const SciFiSpacePoint *b) {
-  return ( a->get_station() < b->get_station() );
 }
 
 KalmanSeed::KalmanSeed() : _Bz(0.),
@@ -63,7 +59,8 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _clusters.resize(rhs._clusters.size());
   for (size_t i = 0; i < rhs._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
+    _clusters[i] = rhs._clusters[i];
   }
 
   _kalman_sites.resize(rhs._kalman_sites.size());
@@ -83,8 +80,10 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _clusters.resize(seed._clusters.size());
   for (size_t i = 0; i < seed._clusters.size(); ++i) {
-    _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+    // _clusters[i] = new SciFiCluster(*seed._clusters[i]);
+     _clusters[i] = seed._clusters[i];
   }
+
 
   _kalman_sites.resize(seed._kalman_sites.size());
   for (size_t i = 0; i < seed._kalman_sites.size(); ++i) {
@@ -95,16 +94,19 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 void KalmanSeed::BuildKalmanStates() {
   size_t numb_sites = _clusters.size();
   for ( size_t j = 0; j < numb_sites; ++j ) {
-    SciFiCluster& cluster = (*_clusters[j]);
+    // SciFiCluster& cluster = (*_clusters[j]);
 
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
-    int id = cluster.get_id();
+    int id = _clusters[j]->get_id();
+    a_site->set_spill(_clusters[j]->get_spill());
+    a_site->set_event(_clusters[j]->get_event());
     a_site->set_id(id);
-    a_site->set_measurement(cluster.get_alpha());
-    a_site->set_direction(cluster.get_direction());
-    a_site->set_z(cluster.get_position().z());
+    a_site->set_measurement(_clusters[j]->get_alpha());
+    a_site->set_direction(_clusters[j]->get_direction());
+    a_site->set_z(_clusters[j]->get_position().z());
+    a_site->set_cluster(_clusters[j]);
 
     std::map<int, SciFiPlaneGeometry>::iterator iterator;
     iterator = _geometry_map.find(id);
@@ -142,23 +144,16 @@ void KalmanSeed::BuildKalmanStates() {
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
-  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
   x = spacepoints.front()->get_position().x();
   y = spacepoints.front()->get_position().y();
   z = spacepoints.front()->get_position().z();
-  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
-
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
   // Charge guess should come from PR.
   // int _particle_charge = seed->get_charge();
+
   double pt = -_particle_charge*c*_Bz*r;
 
   double dsdz  = seed->get_dsdz();
@@ -167,8 +162,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double pz = pt*tan_lambda;
 
   double kappa = _particle_charge*fabs(1./pz);
-
   double phi_0 = seed->get_phi0();
+
   if ( _tracker == 0 ) {
     phi_0 = seed->get_phi().back();
   }
@@ -189,17 +184,10 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
   double x, y, z;
-  double mc_x, mc_y, mc_z, mc_px, mc_py, mc_pz;
 
   x = spacepoints.front()->get_position().x();
   y = spacepoints.front()->get_position().y();
   z = spacepoints.front()->get_position().z();
-  mc_x  = spacepoints.front()->get_channels()[0]->get_true_position().x();
-  mc_y  = spacepoints.front()->get_channels()[0]->get_true_position().y();
-  mc_z  = spacepoints.front()->get_channels()[0]->get_true_position().z();
-  mc_px = spacepoints.front()->get_channels()[0]->get_true_momentum().x();
-  mc_py = spacepoints.front()->get_channels()[0]->get_true_momentum().y();
-  mc_pz = spacepoints.front()->get_channels()[0]->get_true_momentum().z();
 
   double mx = seed->get_mx();
   double my = seed->get_my();
@@ -218,15 +206,15 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
 
   for ( size_t i = 0; i < numb_spacepoints; ++i ) {
     SciFiSpacePoint *spacepoint = spacepoints[i];
-    size_t numb_clusters = spacepoint->get_channels().size();
+    size_t numb_clusters = spacepoint->get_channels()->GetLast() + 1;
     for ( size_t j = 0; j < numb_clusters; ++j ) {
-      SciFiCluster *cluster = spacepoint->get_channels()[j];
+      SciFiCluster *cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
       _clusters.push_back(cluster);
     }
   }
 
-  std::sort(_clusters.begin(), _clusters.end(), SortByZ);
-  std::sort(spacepoints.begin(), spacepoints.end(), SortByStation);
+  std::sort(_clusters.begin(), _clusters.end(), SortByZ<SciFiCluster>);
+  std::sort(spacepoints.begin(), spacepoints.end(), SortByZ<SciFiSpacePoint>);
 }
 
 } // ~namespace MAUS

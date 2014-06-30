@@ -21,6 +21,7 @@ import os
 import json
 import unittest
 from Configuration import Configuration
+import maus_cpp.converter
 import MAUS
 
 class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
@@ -34,13 +35,11 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
 
     def test_empty(self):
         """Check against configuration is empty"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
+        self.assertRaises(ValueError, self.mapper.birth, "")
         result = self.mapper.process("")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"] or
-                        "no_tofcalib" in doc["errors"])
+        self.assertTrue("MapCppTOFSpacePoints" in doc["errors"])
 
     def test_init(self):
         """Check can handle empty spill"""
@@ -50,12 +49,10 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         test_conf_json['Enable_triggerDelay_correction'] = False
         test_conf_json['Enable_timeWalk_correction'] = False
         test_conf_json['TOF_findTriggerPixelCut'] = 1.001
-        test_conf_json['TOF_makeSpacePiontCut'] = 1.001
+        test_conf_json['TOF_makeSpacePointCut'] = 1.001
         #print testConfJSON
         test_configuration = json.dumps(test_conf_json)
-        success = self.mapper.birth(test_configuration)
-        #success = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.mapper.birth(test_configuration)
 
     def test_no_data(self):
         """Check for case where we have no data"""
@@ -65,8 +62,8 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         data = fin.read()
         # test with no data.
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
-        self.assertFalse('space_points' in spill_out)
+        spill_out = maus_cpp.converter.json_repr(result)
+        self.assertFalse('tof_space_points' in spill_out)
 
     def __get_space_point(self, spill, tof, event): # pylint: disable=R0201
         """Return the space point for given tof and particle event"""
@@ -119,7 +116,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         # test the output for each tof
         self.__test_process_tof_0(spill_out)
         self.__test_process_tof_1(spill_out)
@@ -127,9 +124,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
 
     @classmethod
     def tearDownClass(cls): #pylint: disable = C0103
-        success = cls.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        cls.mapper.death()
         cls.mapper = None
 
 if __name__ == '__main__':

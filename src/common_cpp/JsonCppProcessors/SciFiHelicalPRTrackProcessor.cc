@@ -19,8 +19,7 @@
 namespace MAUS {
 
 SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
-                   : _sf_spoint_array_proc(new SciFiSpacePointProcessor),
-                     _double_array_proc(new DoubleProcessor) {
+                   : _double_array_proc(new DoubleProcessor) {
 
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiHelicalPRTrack::get_tracker,
@@ -28,16 +27,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("num_points", &_int_proc,
                         &SciFiHelicalPRTrack::get_num_points,
                         &SciFiHelicalPRTrack::set_num_points, true);
-
-    RegisterValueBranch("x0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_x0,
-                        &SciFiHelicalPRTrack::set_x0, true);
-    RegisterValueBranch("y0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_y0,
-                        &SciFiHelicalPRTrack::set_y0, true);
-    RegisterValueBranch("z0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_z0,
-                        &SciFiHelicalPRTrack::set_z0, true);
+    RegisterValueBranch("charge", &_int_proc,
+                        &SciFiHelicalPRTrack::get_charge,
+                        &SciFiHelicalPRTrack::set_charge, true);
     RegisterValueBranch("phi0", &_double_proc,
                         &SciFiHelicalPRTrack::get_phi0,
                         &SciFiHelicalPRTrack::set_phi0, true);
@@ -71,8 +63,10 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("chisq_dof", &_double_proc,
                         &SciFiHelicalPRTrack::get_chisq_dof,
                         &SciFiHelicalPRTrack::set_chisq_dof, true);
-
-    RegisterValueBranch("spacepoints", &_sf_spoint_array_proc,
+    RegisterValueBranch("pos0", &_threevector_proc,
+                        &SciFiHelicalPRTrack::get_pos0,
+                        &SciFiHelicalPRTrack::set_pos0, true);
+    RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);
     RegisterValueBranch("phi", &_double_array_proc,

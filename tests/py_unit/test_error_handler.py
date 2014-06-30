@@ -26,7 +26,6 @@ import json
 import unittest
 
 import ErrorHandler
-import libMausCpp
 
 class ErrorHandlerTestCase(unittest.TestCase):
     """
@@ -53,10 +52,9 @@ class ErrorHandlerTestCase(unittest.TestCase):
             raise RuntimeError("Test error 2")
         except RuntimeError:
             doc = error_handler.ErrorsToJson(doc, self)
-        assert(doc["errors"]["ErrorHandlerTestCase"] == [
-            "<type 'exceptions.RuntimeError'>: Test error 1",
-            "<type 'exceptions.RuntimeError'>: Test error 2"
-        ])
+        self.assertEqual(doc["errors"]["ErrorHandlerTestCase"], 
+                         "<type 'exceptions.RuntimeError'>: Test error 2"
+        )
 
     def test_errors_to_user(self): #pylint: disable=R0201
         """Check that we send errors to sys.stderr if required"""
@@ -81,26 +79,25 @@ class ErrorHandlerTestCase(unittest.TestCase):
             raise RuntimeError("Test error 1")
         except RuntimeError:
             doc = error_handler.HandleException(doc, self)
-        assert(doc["errors"]["ErrorHandlerTestCase"] == [
-            "<type 'exceptions.RuntimeError'>: Test error 1",
-        ])
+        self.assertEqual(doc["errors"]["ErrorHandlerTestCase"],
+                         "<type 'exceptions.RuntimeError'>: Test error 1",
+        )
         error_handler.error_to_json = False
         try:
             raise RuntimeError("Test error 2")
         except RuntimeError:
             doc = error_handler.HandleException(doc, self)
-        assert(doc["errors"]["ErrorHandlerTestCase"] == [
-            "<type 'exceptions.RuntimeError'>: Test error 1",
-        ])
+        self.assertEqual(doc["errors"]["ErrorHandlerTestCase"],
+                         "<type 'exceptions.RuntimeError'>: Test error 1",
+        )
         error_handler.error_to_json = True
         try:
             raise RuntimeError("Test error 3")
         except RuntimeError:
             doc = error_handler.HandleException(doc, self)
-        assert(doc["errors"]["ErrorHandlerTestCase"] == [
-            "<type 'exceptions.RuntimeError'>: Test error 1",
-            "<type 'exceptions.RuntimeError'>: Test error 3",
-        ])
+        self.assertEqual(doc["errors"]["ErrorHandlerTestCase"],
+                    "<type 'exceptions.RuntimeError'>: Test error 3",
+        )
 
     def test_handle_exception_user(self):
         """Check the flag that controls sending errors to stderr"""
@@ -168,17 +165,17 @@ class ErrorHandlerTestCase(unittest.TestCase):
             raise RuntimeError("Test error 1")
         except RuntimeError:
             doc = ErrorHandler.HandleException(doc, self)
-        assert(doc["errors"]["ErrorHandlerTestCase"] == [
-            "<type 'exceptions.RuntimeError'>: Test error 1",
-        ])
+        assert(doc["errors"]["ErrorHandlerTestCase"] == 
+                      "<type 'exceptions.RuntimeError'>: Test error 1"
+        )
         try:
             raise RuntimeError("Test error 2")
         except RuntimeError:
             doc = json.loads(ErrorHandler.HandleCppException(json.dumps(doc),
                              "some caller", "Test error 3"))
-        assert(doc["errors"]["some caller"] == [
-            "<class 'ErrorHandler.CppError'>: Test error 3",
-        ])
+        self.assertEqual(doc["errors"]["some caller"],
+                         "<class 'ErrorHandler.CppError'>: Test error 3",
+        )
 
     def test_cpp_error(self): #pylint: disable = R0201
         """
@@ -187,17 +184,6 @@ class ErrorHandlerTestCase(unittest.TestCase):
         my_error = ErrorHandler.CppError("Some message")
         assert(my_error.args == ("Some message",))
         assert(repr(my_error) == "Some message")
-
-    def test_set_handle_exception(self): #pylint:disable = R0201
-        """
-        Test we can do interface with Cpp correctly
-        """
-        self.assertRaises(TypeError,  libMausCpp.SetHandleException, 1)
-        refcount = sys.getrefcount(ErrorHandler.HandleCppException)
-        for i in range(100): #pylint: disable = W0612
-            # should decref correctly
-            libMausCpp.SetHandleException(ErrorHandler.HandleCppException)
-        assert(refcount == sys.getrefcount(ErrorHandler.HandleCppException))
 
     def test_config_to_error_handler(self):
         """

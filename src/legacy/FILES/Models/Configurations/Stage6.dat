@@ -57,13 +57,18 @@ Configuration Stage6
   {
     Position 0. 0. 6.5245 m
     Rotation 0. 0. 0. degree
+  }  
+  Module KL/KL.dat
+  {
+    Position 0. 0. 6.5392 m
+    Rotation 0. 0. 0. degree
   }
-
-// Disabled to Sensitive Detector code exists
-//  Module EMR/Calorimeter.dat
-//  {
-//    Position 0. 0. 7.0495 m
-//    Rotation 0. 0. 0. degree
-//  }
+// EMR pending geometry update and SD from EMR group
+// DR March 10, 2014
+//Module EMR/EMR.dat
+//{
+//  Position 0. 0. 6.630438 m
+//  Rotation 0. 0. 0. degree
+//}
 }
 

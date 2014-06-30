@@ -21,101 +21,78 @@
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
+#include "API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppTOFSlabHits/MapCppTOFSlabHits.hh"
 
-bool MapCppTOFSlabHits::birth(std::string argJsonConfigDocument) {
+namespace MAUS {
+PyMODINIT_FUNC init_MapCppTOFSlabHits(void) {
+  PyWrapMapBase<MAUS::MapCppTOFSlabHits>::PyWrapMapBaseModInit
+                                          ("MapCppTOFSlabHits", "", "", "", "");
+}
+
+MapCppTOFSlabHits::MapCppTOFSlabHits()
+    : MapBase<Json::Value>("MapCppTOFSlabHits") {
+}
+
+void MapCppTOFSlabHits::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
-  _classname = "MapCppTOFSlabHits";
   _stationKeys.push_back("tof0");
   _stationKeys.push_back("tof1");
   _stationKeys.push_back("tof2");
 
   // Check if the JSON document can be parsed, else return error only
-  try {
-    //  JsonCpp setup
-    Json::Value configJSON;
-    configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-    //  this will contain the configuration
+  //  JsonCpp setup
+  Json::Value configJSON;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+  //  this will contain the configuration
 
-    _tdcV1290_conversion_factor = JsonWrapper::GetProperty(configJSON,
-                                                           "TOFtdcConversionFactor",
-                                                           JsonWrapper::realValue).asDouble();
-
-    return true;
-  } catch(Squeal squee) {
-    MAUS::CppErrorHandler::getInstance()->HandleSquealNoJson(squee, _classname);
-  } catch(std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
-  }
-
-  return false;
+  _tdcV1290_conversion_factor = JsonWrapper::GetProperty(configJSON,
+                                                         "TOFtdcConversionFactor",
+                                                         JsonWrapper::realValue).asDouble();
 }
 
-bool MapCppTOFSlabHits::death()  {return true;}
+void MapCppTOFSlabHits::_death()  {}
 
-std::string MapCppTOFSlabHits::process(std::string document) {
+void MapCppTOFSlabHits::_process(Json::Value* document) const {
   //  JsonCpp setup
-  Json::FastWriter writer;
-  Json::Value root;
-  Json::Value xEventType;
-  // Check if the JSON document can be parsed, else return error only
-  try {root = JsonWrapper::StringToJson(document);}
-  catch(...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed to parse input document";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return writer.write(root);
-  }
-
-  try {
-    xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-    if (xEventType== "physics_event" || xEventType == "calibration_event") {
-      Json::Value events = JsonWrapper::GetProperty(root, "recon_events", JsonWrapper::arrayValue);
-      // Loop over each station.
-      for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
-        Json::Value xDocTofEvent = JsonWrapper::GetItem(events,
-                                                        n_event,
-                                                        JsonWrapper::objectValue);
-        xDocTofEvent = JsonWrapper::GetProperty(xDocTofEvent,
-                                                "tof_event",
-                                                JsonWrapper::objectValue);
-        if (root["recon_events"][n_event]["tof_event"].isMember("tof_digits")) {
-          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] =
-                                                   Json::Value(Json::objectValue);
-          for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-            Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
-                                                        "tof_digits",
-                                                        JsonWrapper::objectValue);
-            // Ack! sometimes tofn is a nullValue
-            xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
-                                                    _stationKeys[n_station],
-                                                    JsonWrapper::anyValue);
-            Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
-            root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
-                                       [_stationKeys[n_station]] = xDocSlabHits;
-          }
+  Json::Value& root = *document;
+  Json::Value xEventType = JsonWrapper::GetProperty(root,
+                                        "daq_event_type",
+                                        JsonWrapper::stringValue);
+  if (xEventType== "physics_event" || xEventType == "calibration_event") {
+    Json::Value events = JsonWrapper::GetProperty(root, "recon_events", JsonWrapper::arrayValue);
+    // Loop over each station.
+    for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
+      Json::Value xDocTofEvent = JsonWrapper::GetItem(events,
+                                                      n_event,
+                                                      JsonWrapper::objectValue);
+      xDocTofEvent = JsonWrapper::GetProperty(xDocTofEvent,
+                                              "tof_event",
+                                              JsonWrapper::objectValue);
+      if (root["recon_events"][n_event]["tof_event"].isMember("tof_digits")) {
+        root["recon_events"][n_event]["tof_event"]["tof_slab_hits"] =
+                                                 Json::Value(Json::objectValue);
+        for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
+          Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocTofEvent,
+                                                      "tof_digits",
+                                                      JsonWrapper::objectValue);
+          // Ack! sometimes tofn is a nullValue
+          xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
+                                                  _stationKeys[n_station],
+                                                  JsonWrapper::anyValue);
+          Json::Value xDocSlabHits = makeSlabHits(xDocPartEvent);
+          root["recon_events"][n_event]["tof_event"]["tof_slab_hits"]
+                                     [_stationKeys[n_station]] = xDocSlabHits;
         }
       }
     }
-  } catch(Squeal squee) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                       ->HandleSqueal(root, squee, _classname);
-  } catch(std::exception exc) {
-    root = MAUS::CppErrorHandler::getInstance()
-                                         ->HandleStdExc(root, exc, _classname);
   }
-  // if (root.isMember("slab_hits")) std::cout<<root["slab_hits"]<<std::endl;
-  return writer.write(root);
 }
 
-Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) {
+Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) const {
 
   Json::Value xDocSlabHits;
   if (xDocPartEvent.isArray()) {
@@ -205,7 +182,7 @@ Json::Value MapCppTOFSlabHits::makeSlabHits(Json::Value xDocPartEvent) {
   return xDocSlabHits;
 }
 
-Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1) {
+Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const {
   Json::Value xDocSlabHit, xDocPMT0, xDocPMT1;
 
   // Use the information from the digits to fill the slab hit.
@@ -280,4 +257,4 @@ Json::Value MapCppTOFSlabHits::fillSlabHit(Json::Value xDocDigit0, Json::Value x
 
   return xDocSlabHit;
 }
-
+}

@@ -19,16 +19,17 @@
 
 #include <vector>
 
-#include "src/common_cpp/Utils/VersionNumber.hh"
-#include "src/common_cpp/DataStructure/KLDaq.hh"
-#include "src/common_cpp/DataStructure/Trigger.hh"
-#include "src/common_cpp/DataStructure/TOFDaq.hh"
-#include "src/common_cpp/DataStructure/V830.hh"
-#include "src/common_cpp/DataStructure/CkovDaq.hh"
-#include "src/common_cpp/DataStructure/Unknown.hh"
-#include "src/common_cpp/DataStructure/TriggerRequest.hh"
-#include "src/common_cpp/DataStructure/Tag.hh"
-#include "src/common_cpp/DataStructure/TrackerDaq.hh"
+#include "Utils/VersionNumber.hh"
+#include "DataStructure/KLDaq.hh"
+#include "DataStructure/Trigger.hh"
+#include "DataStructure/TOFDaq.hh"
+#include "DataStructure/V830.hh"
+#include "DataStructure/CkovDaq.hh"
+#include "DataStructure/EMRDaq.hh"
+#include "DataStructure/Unknown.hh"
+#include "DataStructure/TriggerRequest.hh"
+#include "DataStructure/Tag.hh"
+#include "DataStructure/TrackerDaq.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -56,6 +57,7 @@ typedef std::vector<TrackerDaq*> Tracker1DaqArray;
  *  @var tag  <--description-->
  *  @var tof0  <--description-->
  *  @var trigger  <--description-->
+ *  @var emr  <--description-->
  */
 
 class DAQData {
@@ -82,6 +84,9 @@ class DAQData {
     /** Returns TriggerRequestArray */
     TriggerRequestArray GetTriggerRequestArray() const;
 
+    /** Returns TriggerRequestArray pointer*/
+    TriggerRequestArray* GetTriggerRequestArrayPtr();
+
     /** Get an element from TriggerRequestArray (needed for PyROOT) */
     TriggerRequest* GetTriggerRequestArrayElement(size_t index) const;
 
@@ -93,6 +98,9 @@ class DAQData {
 
     /** Returns TOF1DaqArray */
     TOF1DaqArray GetTOF1DaqArray() const;
+
+    /** Returns TOF1DaqArray pointer*/
+    TOF1DaqArray* GetTOF1DaqArrayPtr();
 
     /** Get an element from TOF1DaqArray (needed for PyROOT) */
     TOFDaq* GetTOF1DaqArrayElement(size_t index) const;
@@ -106,6 +114,9 @@ class DAQData {
     /** Returns CkovArray */
     CkovArray GetCkovArray() const;
 
+    /** Returns CkovArray pointer*/
+    CkovArray* GetCkovArrayPtr();
+
     /** Get an element from CkovArray (needed for PyROOT) */
     CkovDaq* GetCkovArrayElement(size_t index) const;
 
@@ -118,6 +129,9 @@ class DAQData {
     /** Returns TOF2DaqArray */
     TOF2DaqArray GetTOF2DaqArray() const;
 
+    /** Returns TOF2DaqArray pointer*/
+    TOF2DaqArray* GetTOF2DaqArrayPtr();
+
     /** Get an element from TOF2DaqArray (needed for PyROOT) */
     TOFDaq* GetTOF2DaqArrayElement(size_t index) const;
 
@@ -129,6 +143,9 @@ class DAQData {
 
     Tracker0DaqArray GetTracker0DaqArray() const;
 
+    /** Returns UnknownArray pointer*/
+    Tracker0DaqArray* GetTracker0DaqArrayPtr();
+
     TrackerDaq* GetTracker0DaqArrayElement(size_t index) const;
 
     size_t GetTracker0DaqArraySize() const;
@@ -136,6 +153,9 @@ class DAQData {
     void SetTracker0DaqArray(Tracker0DaqArray tracker0);
 
     Tracker1DaqArray GetTracker1DaqArray() const;
+
+    /** Returns UnknownArray pointer*/
+    Tracker1DaqArray* GetTracker1DaqArrayPtr();
 
     TrackerDaq* GetTracker1DaqArrayElement(size_t index) const;
 
@@ -145,6 +165,9 @@ class DAQData {
 
     /** Returns UnknownArray */
     UnknownArray GetUnknownArray() const;
+
+    /** Returns UnknownArray pointer*/
+    UnknownArray* GetUnknownArrayPtr();
 
     /** Get an element from UnknownArray (needed for PyROOT) */
     Unknown* GetUnknownArrayElement(size_t index) const;
@@ -158,6 +181,9 @@ class DAQData {
     /** Returns KLArray */
     KLArray GetKLArray() const;
 
+    /** Returns KLArray pointer*/
+    KLArray* GetKLArrayPtr();
+
     /** Get an element from KLArray (needed for PyROOT) */
     KLDaq* GetKLArrayElement(size_t index) const;
 
@@ -169,6 +195,9 @@ class DAQData {
 
     /** Returns TagArray */
     TagArray GetTagArray() const;
+
+    /** Returns TagArray pointer*/
+    TagArray* GetTagArrayPtr();
 
     /** Get an element from TagArray (needed for PyROOT) */
     Tag* GetTagArrayElement(size_t index) const;
@@ -182,6 +211,9 @@ class DAQData {
     /** Returns TOF0DaqArray */
     TOF0DaqArray GetTOF0DaqArray() const;
 
+    /** Returns TOF0DaqArray pointer*/
+    TOF0DaqArray* GetTOF0DaqArrayPtr();
+
     /** Get an element from TOF0DaqArray (needed for PyROOT) */
     TOFDaq* GetTOF0DaqArrayElement(size_t index) const;
 
@@ -194,6 +226,9 @@ class DAQData {
     /** Returns TriggerArray */
     TriggerArray GetTriggerArray() const;
 
+    /** Returns TriggerArray pointer*/
+    TriggerArray* GetTriggerArrayPtr();
+
     /** Get an element from TriggerArray (needed for PyROOT) */
     Trigger* GetTriggerArrayElement(size_t index) const;
 
@@ -203,19 +238,29 @@ class DAQData {
     /** Sets TriggerArray */
     void SetTriggerArray(TriggerArray trigger);
 
+    /** Returns EMRDaqArray */
+    EMRDaq GetEMRDaq() const;
+
+    /** Returns EMRDaqArray pointer */
+    EMRDaq* GetEMRDaqPtr();
+
+    /** Sets EMRDaqArray */
+    void SetEMRDaq(EMRDaq emr);
+
   private:
     V830 _V830;
-    TriggerRequestArray _trigger_request;
-    TOF1DaqArray _tof1;
-    CkovArray _ckov;
-    TOF2DaqArray _tof2;
-    UnknownArray _unknown;
-    KLArray _kl;
-    TagArray _tag;
-    TOF0DaqArray _tof0;
-    TriggerArray _trigger;
-    Tracker0DaqArray _tracker0;
-    Tracker1DaqArray _tracker1;
+    TriggerRequestArray  _trigger_request;
+    TOF1DaqArray         _tof1;
+    CkovArray            _ckov;
+    TOF2DaqArray         _tof2;
+    UnknownArray         _unknown;
+    KLArray              _kl;
+    TagArray             _tag;
+    TOF0DaqArray         _tof0;
+    TriggerArray         _trigger;
+    EMRDaq               _emr;
+    Tracker0DaqArray     _tracker0;
+    Tracker1DaqArray     _tracker1;
 
     MAUS_VERSIONED_CLASS_DEF(DAQData)
 };

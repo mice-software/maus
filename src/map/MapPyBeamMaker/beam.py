@@ -18,7 +18,6 @@ Responsible for initialising parent distribution and sampling single particles
 for beam generation.
 """
 
-import sys
 import math
 import numpy
 import xboa #pylint: disable=F0401
@@ -142,6 +141,17 @@ class Beam(): # pylint: disable=R0902
         self.momentum_defined_by = "energy"
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
+        #############################################
+        self.beam_polarisation = "flat"
+        self.beam_mean_x = 1.0
+        self.beam_mean_y = 2.0
+        self.beam_mean_z = 3.0
+        self.beam_sigma_x = 4.0
+        self.beam_sigma_y = 5.0
+        self.beam_sigma_z = 6.0
+        #############################################
+
+
 
     def birth(self, beam_def, particle_generator, random_seed):
         """
@@ -162,7 +172,8 @@ class Beam(): # pylint: disable=R0902
         self.__birth_longitudinal_ellipse(beam_def["longitudinal"])
         self.__birth_trans_long_coupling(beam_def["coupling"])
         self.__birth_beam_mean()
-
+        self.__birth_beam_polarisation(beam_def)
+ 
     def __birth_particle_generator(self, beam_def, particle_generator):
         """
         Get n_particles_per_spill or weight from the particle generator
@@ -186,13 +197,8 @@ class Beam(): # pylint: disable=R0902
 
     def __birth_reference_particle(self, beam_definition):
         """Setup the reference particle - of type maus_primary"""
-        try:
-            self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
+        self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
                                                 beam_definition['reference'], 0)
-        except:
-            sys.excepthook(*sys.exc_info())
-            raise ValueError("Failed to parse reference particle "+\
-                             str(beam_definition['reference']))
 
     def __birth_transverse_ellipse(self, beam_def):
         """
@@ -318,6 +324,35 @@ class Beam(): # pylint: disable=R0902
             self.beam_mean[i] = self.reference[key]
         self.beam_mean[5] = self.reference[self.momentum_defined_by]
 
+    
+    def __birth_beam_polarisation(self, beam_def):
+        """
+        Setup the beam polarisation
+        """
+        self.beam_polarisation = {}
+        try:
+            self.beam_polarisation = beam_def["beam_polarisation"]
+        except KeyError:
+            self.beam_polarisation['polarisation_mode'] = 'flat'
+
+        if self.beam_polarisation['polarisation_mode'] == 'flat':
+            
+            self.beam_mean_x = 0.
+            self.beam_mean_y = 0.
+            self.beam_mean_z = 0.
+            self.beam_sigma_x = 1.
+            self.beam_sigma_y = 1.
+            self.beam_sigma_z = 1.
+            #if flat backward compatibility
+        if self.beam_polarisation['polarisation_mode'] == \
+           'gaussian_unit_vectors':
+            self.beam_mean_x = self.beam_polarisation['beam_mean_x']
+            self.beam_mean_y = self.beam_polarisation['beam_mean_y']
+            self.beam_mean_z = self.beam_polarisation['beam_mean_z']
+            self.beam_sigma_x = self.beam_polarisation['beam_sigma_x']
+            self.beam_sigma_y = self.beam_polarisation['beam_sigma_y']
+            self.beam_sigma_z = self.beam_polarisation['beam_sigma_z']
+       
     def make_one_primary(self):
         """
         Make a primary particle.
@@ -334,9 +369,38 @@ class Beam(): # pylint: disable=R0902
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
+        spin_array = self.__process_beam_polarisation()
+        hit["sx"] = spin_array[0]
+        hit["sy"] = spin_array[1]
+        hit["sz"] = spin_array[2]
         primary = self.__process_hit_to_primary(hit)
+        primary["spin"] = {"x": hit["sx"] , "y":hit["sy"], "z":hit["sz"]}
+        
+        
         return primary
 
+    def __process_beam_polarisation(self):
+        
+        """
+        Generates a particle array for gaussians
+        """
+        beam_mean_matrix = numpy.array([self.beam_mean_x,
+                                        self.beam_mean_y,
+                                        self.beam_mean_z])
+        beam_sigma_matrix = numpy.array([[((self.beam_sigma_x)**2) , 0., 0.],
+                                         [0., ((self.beam_sigma_y)**2), 0.],
+                                         [0., 0., ((self.beam_sigma_z)**2)]])
+        particle_array = numpy.random.multivariate_normal(beam_mean_matrix,
+                                                          beam_sigma_matrix)
+      
+        try:
+            array_norm = particle_array/\
+           (particle_array[0]**2+particle_array[1]**2+particle_array[2]**2)**0.5
+        except ZeroDivisionError:
+            array_norm = numpy.array([0., 0., 1.])
+        
+        return  array_norm
+                
     def __process_get_particle_array(self):
         """
         Generate a particle array like x,px,y,py,time,<p>
@@ -344,7 +408,7 @@ class Beam(): # pylint: disable=R0902
         particle_array = numpy.random.multivariate_normal\
                                               (self.beam_mean, self.beam_matrix)
         if self.transverse_mode == "pencil":
-            for i in range(4):
+            for i in range(4): 
                 particle_array[i] = self.beam_mean[i]
         if self.longitudinal_mode == "pencil":
             particle_array[4] = self.beam_mean[4]
@@ -381,7 +445,8 @@ class Beam(): # pylint: disable=R0902
         elif longitudinal_variable == "energy":
             hit["energy"] = particle_array[5]
             hit.mass_shell_condition("pz")
-        hit["pz"] *= self.reference['pz']/abs(self.reference['pz'])
+        if self.reference["pz"] != 0.:
+            hit["pz"] *= self.reference['pz']/abs(self.reference['pz'])
         return hit
 
     def __process_hit_to_primary(self, hit):
@@ -414,13 +479,15 @@ class Beam(): # pylint: disable=R0902
             random_seed = self.beam_seed
             self.beam_seed += 1
             return random_seed
-        raise NotImplementedError("Did not recognise seed algorithm "+\
-                                  str(self.particle_seed_algorithm))
+        #raise NotImplementedError("Did not recognise seed algorithm "+\
+                  #                str(self.particle_seed_algorithm))
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']
+
     seed_keys = ["beam_seed", "random", "incrementing", "incrementing_random"]
 
+  
 
     def __random_unsigned(self): # pylint: disable=R0201
         """

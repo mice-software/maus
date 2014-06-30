@@ -54,36 +54,39 @@ namespace Global {
  * updated.
  */
 enum DetectorPoint {
-  kUndefined   =  0, /**< enum Undefined, used for initialization only */
-  kVirtual     =  1, /**< enum For a Virtual point with a geometry path */
-  kTOF0_1      =  2,
-  kTOF0_2      =  3,
-  kCherenkov1  =  4,
-  kTOF1_1      =  5,
-  kTOF1_2      =  6,
-  kTracker1    =  7,
-  kTracker1_1  =  8,
-  kTracker1_2  =  9,
-  kTracker1_3  = 10,
-  kTracker1_4  = 11,
-  kTracker1_5  = 12,
-  kTracker2    = 13,
-  kTracker2_1  = 14,
-  kTracker2_2  = 15,
-  kTracker2_3  = 16,
-  kTracker2_4  = 17,
-  kTracker2_5  = 18,
-  kTOF2_1      = 19,
-  kTOF2_2      = 20,
-  kCherenkov2  = 21,
-  kCalorimeter = 22,
-  kEMR         = 23
+  kUndefined    =  0, /**< enum Undefined, used for initialization only */
+  kVirtual      =  1, /**< enum For a Virtual point with a geometry path */
+  kTOF0         =  2,
+  kTOF0_1       =  3,
+  kTOF0_2       =  4,
+  kCherenkov1   =  5,
+  kTOF1         =  6,
+  kTOF1_1       =  7,
+  kTOF1_2       =  8,
+  kTracker0     =  9,
+  kTracker0_1   = 10,
+  kTracker0_2   = 11,
+  kTracker0_3   = 12,
+  kTracker0_4   = 13,
+  kTracker0_5   = 14,
+  kTracker1     = 15,
+  kTracker1_1   = 16,
+  kTracker1_2   = 17,
+  kTracker1_3   = 18,
+  kTracker1_4   = 19,
+  kTracker1_5   = 20,
+  kTOF2         = 21,
+  kTOF2_1       = 22,
+  kTOF2_2       = 23,
+  kCherenkov2   = 24,
+  kCalorimeter  = 25,
+  kEMR          = 26
   // If you add an entry, remember to update kDetectorPointSize below.
 };
 
 /// A constant defining the upper limit of the DetectorPoint enum
 /// (i.e. one more than the highest value above).
-const int kDetectorPointSize = 24;
+const int kDetectorPointSize = 27;
 
 //////////////////////////////////////////////////////////////////////
 ///  @brief Defines the PID hypothesis for reconstruction objects,

@@ -19,6 +19,7 @@
 
 #include <vector>
 
+#include "src/common_cpp/DataStructure/SciFiNoiseHit.hh"
 #include "src/common_cpp/DataStructure/Hit.hh" // ROOT was tripping up on
                                                // forward declaration of this
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -31,12 +32,18 @@ class Primary;
 
 class SciFiChannelId;
 class TOFChannelId;
+class KLChannelId;
 class SpecialVirtualChannelId;
+class SciFiNoiseHit;
+class SciFiMCLookup;
 
 typedef std::vector<Track> TrackArray;
 typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<SciFiHit> SciFiHitArray;
+typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
 typedef std::vector<TOFHit> TOFHitArray;
+typedef std::vector<KLHit> KLHitArray;
+typedef std::vector<EMRHit> EMRHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
 
 /** @class MCEvent describes data pertaining to a single Monte Carlo event
@@ -103,6 +110,14 @@ class MCEvent {
    */
   void SetSciFiHits(SciFiHitArray* hits);
 
+  /** Get the hits pertaining to this event MCEvent still owns NoiseHitArray */
+  SciFiNoiseHitArray* GetSciFiNoiseHits() const;
+
+  /** Set the hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by noise_hits.
+   */
+  void SetSciFiNoiseHits(SciFiNoiseHitArray* noise_hits);
+
   /** Get the TOF hits pertaining to this event MCEvent still owns HitArray*.
    */
   TOFHitArray* GetTOFHits() const;
@@ -111,6 +126,24 @@ class MCEvent {
    *  memory pointed to by hits.
    */
   void SetTOFHits(TOFHitArray* hits);
+
+  /** Get the KL hits pertaining to this event MCEvent still owns HitArray*.
+   */
+  KLHitArray* GetKLHits() const;
+
+  /** Set the KL hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
+  void SetKLHits(KLHitArray* hits);
+
+  /** Get the EMR hits pertaining to this event MCEvent still owns HitArray*.
+   */
+  EMRHitArray* GetEMRHits() const;
+
+  /** Set the EMR hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
+  void SetEMRHits(EMRHitArray* hits);
 
   /** Get the Special Virtual hits pertaining to this event. MCEvent still owns
    *  SpecialVirtualHitArray*.
@@ -133,15 +166,20 @@ class MCEvent {
 
  private:
 
-  Primary* _primary;
-  VirtualHitArray* _virtuals;
-  SciFiHitArray* _sci_fi_hits;
-  TOFHitArray* _tof_hits;
+  Primary*                _primary;
+  VirtualHitArray*        _virtuals;
+  SciFiHitArray*          _sci_fi_hits;
+  SciFiNoiseHitArray*     _sci_fi_noise_hits;
+  TOFHitArray*            _tof_hits;
+  KLHitArray*             _kl_hits;
+  EMRHitArray*            _emr_hits;
   SpecialVirtualHitArray* _special_virtual_hits;
-  TrackArray* _tracks;
+  TrackArray*             _tracks;
 
   MAUS_VERSIONED_CLASS_DEF(MCEvent)
 };
+
+typedef std::vector<MCEvent*> MCEventPArray;
 }
 
 #endif

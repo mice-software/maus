@@ -1,0 +1,17 @@
+# Materials
+material H Z=1 A=1.00794 density=0.0838
+material C Z=6 A=12.011 density=2.265
+material polyethylene density=0.93  C,0.856 H,0.144
+material Mn Z=25 A=54.938 density=0.001
+material Cr Z=24 A=51.996 density=0.001
+material Ni Z=28 A=58.693 density=0.001
+material SS304 Mn,.02 Cr,.19 Ni,.09 Fe,.70 density=8.060
+material Si Z=14 A=28.086 density=2.33
+material O z=8 A=15.999 density=0.001
+material Scint. density=1.032  C,0.918 H,0.082
+material Delrin density=1.42  C,0.918 H,0.082
+material Lexan density=1.20 C,0.918 H,0.082
+material Glass density=2.55 Si,0.467 O,0.533
+material Aerogel1 density=0.35 Si,0.292 O,0.666 H,0.042
+material Aerogel2 density=0.60 Si,0.292 O,0.666 H,0.042
+#material Rohacell density=0.205 TO BE DEFINED

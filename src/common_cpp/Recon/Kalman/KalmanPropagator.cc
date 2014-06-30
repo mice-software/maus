@@ -30,13 +30,19 @@ KalmanPropagator::KalmanPropagator() : _n_parameters(0) {
   // Set Fibre Parameters.
   FibreParameters.Z              = (*json)["SciFiParams_Z"].asDouble();
   FibreParameters.Plane_Width    = (*json)["SciFiParams_Plane_Width"].asDouble();
-  FibreParameters.Radiation_Legth= (*json)["SciFiParams_Radiation_Legth"].asDouble();
+  FibreParameters.Radiation_Length = (*json)["SciFiParams_Radiation_Length"].asDouble();
   FibreParameters.Density        = (*json)["SciFiParams_Density"].asDouble();
   FibreParameters.Mean_Excitation_Energy = (*json)["SciFiParams_Mean_Excitation_Energy"].asDouble();
   FibreParameters.A              = (*json)["SciFiParams_A"].asDouble();
   FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
   FibreParameters.Station_Radius = (*json)["SciFiParams_Station_Radius"].asDouble();
   FibreParameters.RMS            = (*json)["SciFiParams_RMS"].asDouble();
+
+  AirParameters.Z                       = (*json)["AirParams_Z"].asDouble();
+  AirParameters.Radiation_Length         = (*json)["AirParams_Radiation_Length"].asDouble();
+  AirParameters.Density                 = (*json)["AirParams_Density"].asDouble();
+  AirParameters.Mean_Excitation_Energy  = (*json)["AirParams_Mean_Excitation_Energy"].asDouble();
+  AirParameters.A                       = (*json)["AirParams_A"].asDouble();
 }
 
 void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
@@ -149,18 +155,42 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
 
 void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
                                             const KalmanState *new_site) {
+  // Define fibre material parameters.
   double plane_width = FibreParameters.Plane_Width;
-  // Plane lenght in units of radiation lenght (~0.0015).
-  double L0          = FibreParameters.R0(plane_width);
-
-  double deltaZ = new_site->z() - old_site->z();
-  double deltaZ_squared = deltaZ*deltaZ;
-
+  int numb_planes = abs(new_site->id() - old_site->id());
+  double total_plane_length = numb_planes*plane_width;
+  // Plane lenght in units of radiation lenght (~0.0015 per plane).
+  double effective_plane_lenght = 1.*total_plane_length;
+  double plane_L0 = FibreParameters.R0(effective_plane_lenght);
+  // Get particle's parameters (gradients and total momentum).
   TMatrixD a = new_site->a(KalmanState::Projected);
-  double mx    = a(1, 0);
-  double my    = a(3, 0);
+  double mx  = a(1, 0);
+  double my  = a(3, 0);
+  double p   = GetTrackMomentum(old_site);
 
-  double p = GetTrackMomentum(old_site);
+  // Compute the fibre effect.
+  TMatrixD Q1(_n_parameters, _n_parameters);
+  Q1 = BuildQ(plane_L0, effective_plane_lenght, mx, my, p);
+
+  // Compute Air effect (if necessary).
+  TMatrixD Q2(_n_parameters, _n_parameters);
+  double deltaZ = new_site->z() - old_site->z();
+  // Check if we need to add propagation in air.
+  if ( deltaZ > 3.*plane_width ) {
+    double air_lenght = deltaZ-total_plane_length;
+    double air_L0     = AirParameters.R0(air_lenght);
+    Q2 = BuildQ(air_L0, air_lenght, mx, my, p);
+  }
+  // Q2.Zero();
+  _Q = Q1+Q2;
+}
+
+TMatrixD KalmanPropagator::BuildQ(double L0,
+                                  double deltaZ,
+                                  double mx,
+                                  double my,
+                                  double p) {
+  double deltaZ_squared = deltaZ*deltaZ;
 
   double muon_mass = Recon::Constants::MuonMass;
   double muon_mass2 = muon_mass*muon_mass;
@@ -179,42 +209,44 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
 
   double c_mx_my = C2 * mx*my * (1.+ mx*mx + my*my);
 
-  _Q.Zero();
+  TMatrixD Q(_n_parameters, _n_parameters);
   // x x
-  _Q(0, 0) = deltaZ_squared*c_mx_mx;
+  Q(0, 0) = deltaZ_squared*c_mx_mx;
   // x mx
-  _Q(0, 1) = -deltaZ*c_mx_mx;
+  Q(0, 1) = -deltaZ*c_mx_mx;
   // x y
-  _Q(0, 2) = deltaZ_squared*c_mx_my;
+  Q(0, 2) = deltaZ_squared*c_mx_my;
   // x my
-  _Q(0, 3) = -deltaZ*c_mx_my;
+  Q(0, 3) = -deltaZ*c_mx_my;
 
   // mx x
-  _Q(1, 0) = -deltaZ*c_mx_mx;
+  Q(1, 0) = -deltaZ*c_mx_mx;
   // mx mx
-  _Q(1, 1) = c_mx_mx;
+  Q(1, 1) = c_mx_mx;
   // mx y
-  _Q(1, 2) = -deltaZ*c_mx_my;
+  Q(1, 2) = -deltaZ*c_mx_my;
   // mx my
-  _Q(1, 3) = c_mx_my;
+  Q(1, 3) = c_mx_my;
 
   // y x
-  _Q(2, 0) = deltaZ_squared*c_mx_my;
+  Q(2, 0) = deltaZ_squared*c_mx_my;
   // y mx
-  _Q(2, 1) = -deltaZ*c_mx_my;
+  Q(2, 1) = -deltaZ*c_mx_my;
   // y y
-  _Q(2, 2) = deltaZ_squared*c_my_my;
+  Q(2, 2) = deltaZ_squared*c_my_my;
   // y my
-  _Q(2, 3) = -deltaZ*c_my_my;
+  Q(2, 3) = -deltaZ*c_my_my;
 
   // my x
-  _Q(3, 0) = -deltaZ*c_mx_my;
+  Q(3, 0) = -deltaZ*c_mx_my;
   // my mx
-  _Q(3, 1) = c_mx_my;
+  Q(3, 1) = c_mx_my;
   // my y
-  _Q(3, 2) = -deltaZ*c_my_my;
+  Q(3, 2) = -deltaZ*c_my_my;
   // my my
-  _Q(3, 3) = c_my_my;
+  Q(3, 3) = c_my_my;
+
+  return Q;
 }
 
 double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
@@ -222,6 +254,7 @@ double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   // Note that the z factor (charge of the incoming particle) is omitted.
   // We don't need to consider |z| > 1.
   double result = HighlandConstant*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+  // std::cerr << "Highland: " << result << std::endl;
   return result;
 }
 

@@ -32,10 +32,11 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
                                     _chi2(0.),
                                     _type(""),
                                     _position(ThreeVector(0, 0, 0)) {
+  _channels = new TRefArray();
 }
 
 // Copy contructor
-SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &scifispacepoint)
+SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
     : _used(false),
       _spill(0),
       _event(0),
@@ -48,25 +49,19 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &scifispacepoint)
       _chi2(0.),
       _type(""),
       _position(ThreeVector(0, 0, 0)) {
-  _used      = scifispacepoint.is_used();
-  _spill     = scifispacepoint.get_spill();
-  _event     = scifispacepoint.get_event();
-  _tracker   = scifispacepoint.get_tracker();
-  _station   = scifispacepoint.get_station();
-  _time      = scifispacepoint.get_time();
-  _time_error= scifispacepoint.get_time_error();
-  _time_res  = scifispacepoint.get_time_res();
-  _npe       = scifispacepoint.get_npe();
-  _chi2      = scifispacepoint.get_chi2();
-  _type      = scifispacepoint.get_type();
-  _position  = scifispacepoint.get_position();
-
-  _channels.resize(scifispacepoint._channels.size());
-  for (unsigned int i = 0; i < scifispacepoint._channels.size(); ++i) {
-    _channels[i] = new SciFiCluster(*scifispacepoint._channels[i]);
-  }
-
-  *this = scifispacepoint;
+  _used      = sp.is_used();
+  _spill     = sp.get_spill();
+  _event     = sp.get_event();
+  _tracker   = sp.get_tracker();
+  _station   = sp.get_station();
+  _time      = sp.get_time();
+  _time_error= sp.get_time_error();
+  _time_res  = sp.get_time_res();
+  _npe       = sp.get_npe();
+  _chi2      = sp.get_chi2();
+  _type      = sp.get_type();
+  _position  = sp.get_position();
+  _channels = new TRefArray(*(sp.get_channels()));
 }
 
 // Three cluster constructor
@@ -77,15 +72,18 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   clust1->set_used(true);
   clust2->set_used(true);
   clust3->set_used(true);
-  _channels.push_back(clust1);
-  _channels.push_back(clust2);
-  _channels.push_back(clust3);
+
+  _channels = new TRefArray();
+  _channels->Add(clust1);
+  _channels->Add(clust2);
+  _channels->Add(clust3);
 
   _spill   = clust1->get_spill();
   _event   = clust1->get_event();
   _npe = clust1->get_npe()+clust2->get_npe()+clust3->get_npe();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
+  // std::cerr << "SP: " << clust1 << " " << clust2 << " " << clust3 << std::endl;
 }
 
 // Two cluster constructor
@@ -95,41 +93,72 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
   _type = "duplet";
   clust1->set_used(true);
   clust2->set_used(true);
-  _channels.push_back(clust1);
-  _channels.push_back(clust2);
+
+  _channels = new TRefArray();
+  _channels->Add(clust1);
+  _channels->Add(clust2);
 
   _spill   = clust1->get_spill();
   _event   = clust1->get_event();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
+  // std::cerr << "SP: " << clust1 << " " << clust2 << std::endl;
 }
 
-SciFiSpacePoint::~SciFiSpacePoint() {}
+SciFiSpacePoint::~SciFiSpacePoint() {
+  delete _channels;
+}
 
-SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &_scifispacepoint) {
-  if (this == &_scifispacepoint) {
+SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &sp) {
+  if (this == &sp) {
     return *this;
   }
-  _used      = _scifispacepoint.is_used();
-  _spill     = _scifispacepoint.get_spill();
-  _event     = _scifispacepoint.get_event();
-  _tracker   = _scifispacepoint.get_tracker();
-  _station   = _scifispacepoint.get_station();
-  _time      = _scifispacepoint.get_time();
-  _time_error= _scifispacepoint.get_time_error();
-  _time_res  = _scifispacepoint.get_time_res();
-  _npe       = _scifispacepoint.get_npe();
-  _chi2      = _scifispacepoint.get_chi2();
-  _type      = _scifispacepoint.get_type();
-  _position  = _scifispacepoint.get_position();
+  _used      = sp.is_used();
+  _spill     = sp.get_spill();
+  _event     = sp.get_event();
+  _tracker   = sp.get_tracker();
+  _station   = sp.get_station();
+  _time      = sp.get_time();
+  _time_error= sp.get_time_error();
+  _time_res  = sp.get_time_res();
+  _npe       = sp.get_npe();
+  _chi2      = sp.get_chi2();
+  _type      = sp.get_type();
+  _position  = sp.get_position();
 
-  _channels.resize(_scifispacepoint._channels.size());
-  for (unsigned int i = 0; i < _scifispacepoint._channels.size(); ++i) {
-    _channels[i] = new SciFiCluster(*_scifispacepoint._channels[i]);
-  }
+  if (_channels) delete _channels;
+  _channels = new TRefArray(*(sp.get_channels()));
 
   return *this;
+}
+
+void SciFiSpacePoint::add_channel(SciFiCluster *channel) {
+  _channels->Add(channel);
+}
+
+SciFiClusterPArray SciFiSpacePoint::get_channels_pointers() const {
+  SciFiClusterPArray cl_pointers;
+
+  // Check the _spoints container is not initialised
+  if (!_channels) {
+    std::cerr << "Cluster TRefArray not initialised" << std::endl;
+    return cl_pointers;
+  }
+
+  for (int i = 0; i < (_channels->GetLast()+1); ++i) {
+    cl_pointers.push_back(static_cast<SciFiCluster*>(_channels->At(i)));
+  }
+  return cl_pointers;
+}
+
+void SciFiSpacePoint::set_channels_pointers(const SciFiClusterPArray &channels) {
+  if (_channels) delete _channels;
+  _channels = new TRefArray();
+  for (
+    std::vector<SciFiCluster*>::const_iterator cl = channels.begin(); cl != channels.end(); ++cl) {
+    _channels->Add(*cl);
+  }
 }
 
 } // ~namespace MAUS

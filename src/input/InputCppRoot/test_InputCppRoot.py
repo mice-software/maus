@@ -25,7 +25,7 @@ import json
 import ROOT
 import os
 
-import InputCppRoot
+import _InputCppRoot as InputCppRoot
 
 class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
     """
@@ -47,23 +47,24 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
-        spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
-        spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
+        spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
+        spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301
         # test branch makes segmentation fault... from ROOT side
         # spill.SetTestBranch(ROOT.MAUS.TestBranch()) # pylint: disable = E1101
-        spill.SetSpillNumber(1)
         spill.SetRunNumber(10)
         data.SetSpill(spill)
-        tree.Fill()
-        tree.Fill()
+        for num in range( 1, 11 ) : # Add 10 spills
+            spill.SetSpillNumber(num)
+            tree.Fill()
         spill.SetRunNumber(11)
-        tree.Fill()
-        tree.Fill()
+        for num in range( 1, 3 ) : # Add 2 spills
+            spill.SetSpillNumber(num)
+            tree.Fill()
         spill.SetRunNumber(12)
-        tree.Fill()
-        tree.Fill()
+        for num in range( 1, 3 ) : # Add 2 spills
+            spill.SetSpillNumber(num)
+            tree.Fill()
         tree.Write()
 
         job_header_data = ROOT.MAUS.JobHeaderData() # pylint: disable = E1101
@@ -141,7 +142,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         """
         Run the inputter, check that output contains key:value pair.
         """
-        event = inputter.emitter_cpp()
+        event = inputter.emitter().next()
         json_event = json.loads(event)
         for key, value in checks.iteritems():
             self.assertEqual(json_event[key], value,
@@ -152,7 +153,8 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         Try reading a realistic data structure
         """
         inputter = InputCppRoot.InputCppRoot()
-        inputter.birth(json.dumps({"input_root_file_name":self.fname}))
+        inputter.birth(json.dumps({"input_root_file_name":self.fname,
+                                   "selected_spills":[]}))
         # job header
         self.__test_event(inputter, {"maus_event_type":"JobHeader",
                            "json_configuration":"mushrooms"})
@@ -164,9 +166,35 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.__test_event(inputter, {"maus_event_type":"RunHeader",
                                      "run_number":10})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":10})
+                                     "run_number":10,
+                                     "spill_number":1})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":10})
+                                     "run_number":10,
+                                     "spill_number":2})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":3})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":4})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":5})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":6})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":7})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":8})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":9})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":10})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
                                      "run_number":10})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
@@ -175,27 +203,31 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         self.__test_event(inputter, {"maus_event_type":"RunHeader",
                                      "run_number":11})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":11})
+                                     "run_number":11,
+                                     "spill_number":1})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":11})
+                                     "run_number":11,
+                                     "spill_number":2})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
                                      "run_number":11})
         # run 12 & 13 - note this is a bit of a bug
         self.__test_event(inputter, {"maus_event_type":"RunHeader",
                                      "run_number":13})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":12})
+                                     "run_number":12,
+                                     "spill_number":1})
         self.__test_event(inputter, {"maus_event_type":"Spill",
-                                     "run_number":12})
+                                     "run_number":12,
+                                     "spill_number":2})
         self.__test_event(inputter, {"maus_event_type":"RunFooter",
                                      "run_number":13})
-        
+
         # job footers
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
 
         # out of events
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
     def test_read_spills_only(self):
         """
@@ -210,10 +242,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree2 = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree2.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
-        spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
-        spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
+        spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
+        spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301
         data.SetSpill(spill)
         tree2.Fill()
         tree2.Fill()
@@ -227,7 +258,7 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         # job footer
         self.__test_event(inputter, {"maus_event_type":"Spill"})
         self.__test_event(inputter, {"maus_event_type":"Spill"})
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
     def test_read_job_header_footer_only(self):
         """
@@ -242,10 +273,9 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
         tree.Branch("data", data, data.GetSizeOf(), 1)
         spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-        spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
         spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
-        spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
-        spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
+        spill.SetMCEvents(ROOT.MAUS.MCEventPArray()) # pylint: disable = E1101
+        spill.SetReconEvents(ROOT.MAUS.ReconEventPArray()) # pylint: disable = E1101, C0301
         data.SetSpill(spill)
         tree.Write()
 
@@ -284,8 +314,43 @@ class TestInputCppRoot(unittest.TestCase): # pylint: disable=R0904
         # job footers
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
         self.__test_event(inputter, {"maus_event_type":"JobFooter"})
-        self.assertEqual(inputter.emitter_cpp(), "")
+        self.assertEqual(inputter.emitter().next(), "")
 
+
+    def _test_read_selected_spills( self ):
+        """
+          Tests the functionality to select individual spills from a data file.
+          Selection is performed by using an array of spill numbers passed via
+          the configuration file.
+        """
+        inputter = InputCppRoot.InputCppRoot()
+        inputter.birth(json.dumps( { "input_root_file_name":self.fname, \
+                                                "selected_spills":[2, 5, 8] } ))
+        self.assertTrue(inputter.useSelectedSpills())
+        # job header
+        self.__test_event(inputter, {"maus_event_type":"JobHeader",
+                           "json_configuration":"mushrooms"})
+        self.__test_event(inputter, {"maus_event_type":"JobHeader",
+                           "json_configuration":"omelette"})
+        self.__test_event(inputter, {"maus_event_type":"RunHeader",
+                                     "run_number":10})
+        self.__test_event(inputter, {"maus_event_type":"RunHeader",
+                                     "run_number":10})
+        # run 10
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":2})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":5})
+        self.__test_event(inputter, {"maus_event_type":"Spill",
+                                     "run_number":10,
+                                     "spill_number":8})
+        self.__test_event(inputter, {"maus_event_type":"RunFooter",
+                                     "run_number":10})
+        self.__test_event(inputter, {"maus_event_type":"RunFooter",
+                                     "run_number":10})
+       
 
 if __name__ == "__main__":
     unittest.main()

@@ -80,7 +80,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   spoint->set_tracker(1);
   SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
-  trk1.set_spacepoints(spoints);
+  trk1.set_spacepoints_pointers(spoints);
 
   SciFiStraightPRTrack trk2(trk1);
 
@@ -92,7 +92,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
-  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), 1);
+  EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
@@ -102,7 +102,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   spoint->set_tracker(1);
   SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
-  trk1.set_spacepoints(spoints);
+  trk1.set_spacepoints_pointers(spoints);
 
   SciFiStraightPRTrack trk2;
 
@@ -116,7 +116,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
-  EXPECT_EQ(trk2.get_spacepoints()[0]->get_tracker(), 1);
+  EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
@@ -145,7 +145,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   prtrack.set_tracker(tracker);
   prtrack.set_num_points(num_points);
 
-  prtrack.set_spacepoints(spoints);
+  prtrack.set_spacepoints_pointers(spoints);
 
   EXPECT_EQ(prtrack.get_x0(), x0);
   EXPECT_EQ(prtrack.get_mx(), mx);
@@ -156,7 +156,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
 
-  EXPECT_EQ(prtrack.get_spacepoints()[0]->get_tracker(), tracker);
+  EXPECT_EQ(prtrack.get_spacepoints_pointers()[0]->get_tracker(), tracker);
 }
 
 } // ~namespace MAUS

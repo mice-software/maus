@@ -182,6 +182,7 @@ class MAUSGeant4Manager {
     MAUSVisManager*             _visManager;
 
     void SetVisManager();
+    void BeamOn(int number_of_particles);
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 

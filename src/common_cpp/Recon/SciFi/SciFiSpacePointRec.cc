@@ -16,6 +16,11 @@
  */
 
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <fstream>
 
 namespace MAUS {
 
@@ -177,7 +182,7 @@ bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
 // Given 3 input clusters, this function computes all the triplet variables,
 // like position and respective standard deviation
 void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
-  std::vector<SciFiCluster*> channels = triplet->get_channels();
+  std::vector<SciFiCluster*> channels = triplet->get_channels_pointers();
   SciFiCluster *vcluster = channels[0];
   SciFiCluster *wcluster = channels[1];
   SciFiCluster *ucluster = channels[2];
@@ -231,7 +236,7 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
 }
 
 void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
-  std::vector<SciFiCluster*> channels = duplet->get_channels();
+  std::vector<SciFiCluster*> channels = duplet->get_channels_pointers();
   SciFiCluster *clusterA = channels[0];
   SciFiCluster *clusterB = channels[1];
 

@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "Interface/Squeak.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Interface/MICERun.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -69,7 +69,7 @@ Json::Value MAUSSteppingAction::StepToJson
     G4StepPoint* point = aStep->GetPostStepPoint();
     if (prestep) point = aStep->GetPreStepPoint();
     if (!aTrack || !point || !aStep)
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
                      "Failed to resolve step point",
                      "MAUSSteppingAction::StepPointToJson"));
     Json::Value step;
@@ -84,6 +84,12 @@ Json::Value MAUSSteppingAction::StepToJson
     momentum["y"] = point->GetMomentum().y();
     momentum["z"] = point->GetMomentum().z();
     step["momentum"] = momentum;
+
+    Json::Value spin;
+    spin["x"] = point->GetPolarization().x();
+    spin["y"] = point->GetPolarization().y();
+    spin["z"] = point->GetPolarization().z();
+    step["spin"] = spin;
 
     double f_pos[4] = {point->GetPosition().x(), point->GetPosition().y(),
                        point->GetPosition().z(), point->GetGlobalTime()};
@@ -112,7 +118,7 @@ Json::Value MAUSSteppingAction::StepToJson
 
 void  MAUSSteppingAction::SetSteps(Json::Value steps) {
     if (!steps.isArray())
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
               "Attempting to set steps to non-array type",
               "MAUSSteppingAction::SetSteps()"));
     _steps = steps;

@@ -45,9 +45,8 @@ class Formatter: #pylint: disable = R0902
         self.tof_0_file_number     = Configreader().tof_0_file_number
         self.tof_1_file_number     = Configreader().tof_1_file_number
         self.tof_2_file_number     = Configreader().tof_2_file_number
-        self.ckov_file_number      = Configreader().ckov_file_number
-        self.acc1_file_number      = Configreader().acc1_file_number
-        self.acc2_file_number      = Configreader().acc2_file_number
+        self.ckov1_file_number      = Configreader().ckov1_file_number
+        self.ckov2_file_number      = Configreader().ckov2_file_number
         self.kl_file_number        = Configreader().kl_file_number
         self.emr_file_number       = Configreader().emr_file_number
         self.tracker0_file_number  = Configreader().tracker0_file_number
@@ -56,7 +55,7 @@ class Formatter: #pylint: disable = R0902
         self.absorber1_file_number = Configreader().absorber1_file_number
         self.absorber2_file_number = Configreader().absorber2_file_number
         self.path_in = path_in
-        self.path_out = path_out + '/'
+        self.path_out = path_out.rstrip('/') + '/'
         self.beamline_file = None
         self.maus_information_file = None
         self.configuration_file = None
@@ -86,8 +85,8 @@ class Formatter: #pylint: disable = R0902
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
-            elif fname.find('Tracker') >= 0:
-                self.tracker_file = fname
+            # elif fname.find('Tracker') >= 0:
+            #     self.tracker_file = fname
             else:
                 self.stepfiles.append(fname)
         if self.maus_information_file == None:
@@ -155,15 +154,12 @@ class Formatter: #pylint: disable = R0902
         tof_2_file_number.setAttribute("number", str(self.tof_2_file_number))
         file_numbers.appendChild(tof_2_file_number)
         
-        ckov_file_number = doc.createElement("CkovFileNumber")
-        ckov_file_number.setAttribute("number", str(self.ckov_file_number))
-        file_numbers.appendChild(ckov_file_number)
-        acc1_file_number = doc.createElement("Acc1FileNumber")
-        acc1_file_number.setAttribute("number", str(self.acc1_file_number))
-        file_numbers.appendChild(acc1_file_number)
-        acc2_file_number = doc.createElement("Acc2FileNumber")
-        acc2_file_number.setAttribute("number", str(self.acc2_file_number))
-        file_numbers.appendChild(acc2_file_number)
+        ckov1_file_number = doc.createElement("Ckov1FileNumber")
+        ckov1_file_number.setAttribute("number", str(self.ckov1_file_number))
+        file_numbers.appendChild(ckov1_file_number)
+        ckov2_file_number = doc.createElement("Ckov2FileNumber")
+        ckov2_file_number.setAttribute("number", str(self.ckov2_file_number))
+        file_numbers.appendChild(ckov2_file_number)
         
         kl_file_number = doc.createElement("KLFileNumber")
         kl_file_number.setAttribute("number", str(self.kl_file_number))
@@ -362,7 +358,7 @@ class Formatter: #pylint: disable = R0902
                 self.format_materials(self.stepfiles[num])
                 self.insert_materials_ref(self.txt_file)
             print "Formatted " + str(num+1) + \
-            " of " + str(noofstepfiles) + " Geometry Files"
+                  " of " + str(noofstepfiles) + " Geometry Files"
         print "Format Complete"
         
 

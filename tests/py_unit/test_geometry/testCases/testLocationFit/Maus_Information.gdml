@@ -1,0 +1,17 @@
+<?xml version="1.0" ?><MICE_Information xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:something">
+    <Detector_Information>
+	<EMR gdml_posref="point0_pos">
+		<Survey point="1" gdml_posref="point1_pos" units="mm" x="500" y="-500" z="-10" err="10"/>
+		<Survey point="2" gdml_posref="point2_pos" units="mm" x="-500" y="-500" z="-10" err="10"/>
+		<Survey point="3" gdml_posref="point3_pos" units="mm" x="-500" y="500" z="-10" err="10"/>
+		<Survey point="4" gdml_posref="point4_pos" units="mm" x="500" y="500" z="-10" err="10"/>
+	</EMR>
+	<Cherenkov>
+		<Ckov1 gdml_posref="tpoint0_pos">
+			<Survey point="1" gdml_posref="tpoint1_pos" units="mm" x="-500" y="-500" z="50" err="50"/>
+			<Survey point="2" gdml_posref="tpoint2_pos" units="mm" x="-500" y="-500" z="-50" err="50"/>
+			<Survey point="3" gdml_posref="tpoint3_pos" units="mm" x="-500" y="500" z="50" err="50"/>
+		</Ckov1>
+	</Cherenkov>
+    </Detector_Information>
+</MICE_Information>

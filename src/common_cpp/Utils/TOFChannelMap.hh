@@ -33,9 +33,11 @@
 
 #include "json/json.h"
 #include "src/common_cpp/Utils/DAQChannelMap.hh"
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
+
+namespace MAUS {
 
 using std::string;
 using std::ostream;
@@ -57,11 +59,11 @@ class TOFChannelKey {
   TOFChannelKey(int st, int pl, int sl, int pmt, string d)
   :_station(st), _plane(pl), _slab(sl), _pmt(pmt), _detector(d) {}
 
-  explicit TOFChannelKey(string keyStr) throw(Squeal);
+  explicit TOFChannelKey(string keyStr) throw(Exception);
   virtual ~TOFChannelKey() {}
 
-  bool operator==( TOFChannelKey key );
-  bool operator!=( TOFChannelKey key );
+  bool operator==( const TOFChannelKey& key ) const;
+  bool operator!=( const TOFChannelKey& key ) const;
 
   /** Return true only if the given TOF channel is connected 
   * to the the opposit side of the slab.
@@ -77,7 +79,7 @@ class TOFChannelKey {
   string GetOppositeSidePMTStr();
 
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
-  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Squeal);
+  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exception);
 
   string detector() const {return _detector;}
 
@@ -141,14 +143,14 @@ class TOFChannelMap {
  * \param[in] daqch DAQ channel to search for.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */
-  TOFChannelKey* find(DAQChannelKey* daqKey);
+  TOFChannelKey* find(DAQChannelKey* daqKey) const;
 
  /** Return pointer to the TOF key.
  * This function returns pointer to the TOF channel key for the required DAQ channel.
  * \param[in] daqch DAQ channel to search for, coded as string.
  * \return The key of the TOF channel connected to the given DAQ channel.
  */  
-  TOFChannelKey* find(string daqKeyStr);
+  TOFChannelKey* find(string daqKeyStr) const;
 
  /** Return pointer to the fADC DAQ key.
  * This function returns pointer to the fADC DAQ channel key coupled to the required TDC channel.
@@ -184,6 +186,8 @@ class TOFChannelMap {
   PyObject* _get_cabling_func;
   bool pymod_ok;
 };
+
+}  // namespace MAUS
 
 #endif
 

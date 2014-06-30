@@ -31,7 +31,7 @@ namespace MAUS {
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _emitter_cpp() {
+    virtual int* _emit_cpp() {
       return new int(27);
     }
 
@@ -41,15 +41,15 @@ namespace MAUS {
     FRIEND_TEST(InputBaseTest, TestCopyConstructor);
   };
 
-  class MyInputter_squeal : public MyInputter {
+  class MyInputter_maus_exception : public MyInputter {
   public:
-    MyInputter_squeal() : MyInputter() {}
+    MyInputter_maus_exception() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {
-      throw Squeal(Squeal::recoverable,
-                   "Expected Test Squeal in _emitter_cpp",
-                   "int* _emitter_cpp()");
+    virtual int* _emit_cpp() {
+      throw MAUS::Exception(MAUS::Exception::recoverable,
+                   "Expected Test MAUS::Exception in _emit_cpp",
+                   "int* _emit_cpp()");
     }
   };
 
@@ -58,7 +58,7 @@ namespace MAUS {
     MyInputter_exception() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {
+    virtual int* _emit_cpp() {
       throw std::exception();
     }
   };
@@ -68,7 +68,7 @@ namespace MAUS {
     MyInputter_otherexcept() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {throw 17;}
+    virtual int* _emit_cpp() {throw 17;}
   };
 
   TEST(InputBaseTest, TestConstructor) {
@@ -93,7 +93,7 @@ namespace MAUS {
     try {
       tc1.birth("TestConfig");
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Birth function failed. Check ModuleBaseTest"
         << std::endl;
@@ -105,7 +105,7 @@ namespace MAUS {
     try {
       tc1.death();
     }
-    catch(...) {
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Death function failed. Check ModuleBaseTest"
         << std::endl;
@@ -115,44 +115,46 @@ namespace MAUS {
   TEST(InputBaseTest, TestEmitter) {
     MyInputter mm;
 
-    int* i = mm.emitter_cpp();
+    int* i = mm.emit_cpp();
 
     ASSERT_TRUE(*i == 27)
-      << "Fail: _emitter_cpp method not called properly"
+      << "Fail: _emit_cpp method not called properly"
       << std::endl;
 
     /////////////////////////////////////////////////////
-    MyInputter_squeal mm_s;
+    MyInputter_maus_exception mm_s;
     try {
-      mm_s.emitter_cpp();
+      mm_s.emit_cpp();
     }
-    catch(...) {
+    catch (NoInputException& e) {}  // A MAUS exception stops the inputter
+    catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: Squeal should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
     /////////////////////////////////////////////////////
     MyInputter_exception mm_e;
     try {
-      mm_e.emitter_cpp();
+      mm_e.emit_cpp();
     }
-    catch(...) {
+    catch (NoInputException& e) {}  // A MAUS exception stops the inputter
+    catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: Exception should have been handled"
+        << "Fail: MAUS::Exception should have been handled"
         << std::endl;
     }
 
     /////////////////////////////////////////////////////
     MyInputter_otherexcept mm_oe;
     try {
-      mm_oe.emitter_cpp();
+      mm_oe.emit_cpp();
       ASSERT_TRUE(false)
         << "Fail: No exception thrown"
         << std::endl;
     }
-    catch(UnhandledException& e) {}
-    catch(...) {
+    catch (UnhandledException& e) {}
+    catch (...) {
       ASSERT_TRUE(false)
         << "Fail: Expected exception of type UnhandledException to be thrown"
         << std::endl;

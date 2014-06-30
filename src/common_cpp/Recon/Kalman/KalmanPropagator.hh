@@ -32,7 +32,7 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
@@ -106,6 +106,12 @@ class KalmanPropagator {
    */
   virtual double GetTrackMomentum(const KalmanState *a_site) = 0;
 
+  TMatrixD BuildQ(double L0,
+                  double deltaZ,
+                  double mx,
+                  double my,
+                  double p);
+
  protected:
   bool _use_MCS;
 
@@ -120,6 +126,8 @@ class KalmanPropagator {
   int _n_parameters;
 
   SciFiParams FibreParameters;
+
+  AirParams AirParameters;
 };
 
 } // ~namespace MAUS

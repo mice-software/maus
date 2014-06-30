@@ -38,10 +38,10 @@ std::ostream & Squeak::mout(errorLevel level) {
   return (*output[level]);
 }
 
-std::ostream & Squeak::mout(Squeal::exceptionLevel level) {
+std::ostream & Squeak::mout(MAUS::Exception::exceptionLevel level) {
   getInstance();
   // eventually a map or somesuch I suspect
-  if (level == Squeal::recoverable)
+  if (level == MAUS::Exception::recoverable)
     return (*output[Squeak::error]);
   else
     return (*output[Squeak::fatal]);

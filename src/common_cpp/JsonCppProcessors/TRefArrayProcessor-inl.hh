@@ -30,7 +30,7 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
   using ReferenceResolver::JsonToCpp::TRefArrayResolver;
   if (!json_array.isConvertibleTo(Json::arrayValue)) {
     // no memory allocated yet...
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to resolve Json::Value of type "+
                  JsonWrapper::ValueTypeToString(json_array.type())+
                  " to array",
@@ -39,7 +39,8 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
   }
   TRefArray* tref_array = new TRefArray(json_array.size());
 
-  for (size_t i = 0; i < json_array.size(); ++i) {
+  int json_arr_size = json_array.size();
+  for (int i = 0; i < json_arr_size; ++i) {
     try {
       if (json_array[i].type() != Json::nullValue) {
         std::string data_path = JsonWrapper::GetProperty
@@ -51,9 +52,9 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
           RefManager::GetInstance().AddReference(res);
         }
       }
-    } catch(Squeal squee) {
+    } catch (Exception exc) {
       // if there's a problem, clean up before rethrowing the exception
-      throw squee;
+      throw exc;
     }
   }
   return tref_array;

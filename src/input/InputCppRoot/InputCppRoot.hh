@@ -19,13 +19,14 @@
 #define _MAUS_SRC_INPUT_INPUTCPPROOT_INPUTCPPROOT_HH__
 
 #include <string>
+#include <set>
 #include <map>
 
 #include "Rtypes.h"  // ROOT
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "src/common_cpp/API/InputBase.hh"
 
 class irstream;
@@ -60,6 +61,9 @@ class InputCppRoot : public InputBase<std::string> {
         InputBase<std::string>::death();
     }
 
+    /** Return true if only loading spills specified in data cards
+      */
+    bool useSelectedSpills() const { return _select_spills; }
 
   private:
     /** Initialise the inputter
@@ -89,12 +93,7 @@ class InputCppRoot : public InputBase<std::string> {
      *  look for run number changing, so can get weirdness if there is a run
      *  with no spill data
      */
-    std::string _emitter_cpp();
-
-    /** Should be overloaded in SWIG call */
-    std::string emitter() {
-        throw(Squeal(Squeal::recoverable, "Test Exception", "Test::Exception"));
-    }
+    std::string _emit_cpp();
 
     /** Gets an event from the root file.
      *
@@ -104,15 +103,18 @@ class InputCppRoot : public InputBase<std::string> {
      *  Note that if we are accessing a different branch from last time, we have
      *  to reopen _infile with the new branch name (that's how irstream works). 
      */
+    template <class DataT>
+    bool load_event(std::string branch_name, DataT&);
+
     template <class ConverterT, class DataT>
-    std::string load_event(std::string branch_name);
+    std::string convert_data(DataT&);
 
     /** Move to the next event type and return the event */
     std::string advance_event_type();
 
     /** Push an event to the cache.
      *
-     *  If an event of this type is already cached, throw a Squeal
+     *  If an event of this type is already cached, throw a Exception
      */
     void cache_event(event_type type, std::string event);
 
@@ -135,6 +137,15 @@ class InputCppRoot : public InputBase<std::string> {
      */
     bool use_event(std::string event);
 
+    /** Returns true if we are only loading selected spill numbers and
+     *  the spill number is found in the data card, or if it is an invalid
+     *  spill - there are already methods to handle those cases.
+     *
+     *  This is a help function to see if the set of loaded spill numbers
+     *  contains the spill \"spillNum\".
+     */
+    bool is_selected_spill(int spillNum) const;
+
     /** _irstream holds root TFile.
      */
     irstream* _infile;
@@ -146,6 +157,8 @@ class InputCppRoot : public InputBase<std::string> {
     std::map<event_type, std::string> _cache;
     std::map<event_type, int> _current_run_number;
     std::map<std::string, Long64_t> _current_event_number;
+    bool _select_spills;
+    std::set< int > _selected_spill_numbers;
 };
 }
 

@@ -5,6 +5,59 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.8.5
+  The following changes were made:
+    - Bug fix - pi/mu decays in physics list (1470)
+    - Bug fix - SL6 build (1476)
+    - Bug fix - empty data handling in ckov reco 
+    - Updated documentaiton
+MAUS-v0.8.4
+  The following changes were made:
+    - Added EMR geometry and sensitive detector hits
+    - Implemented polarized decays and spin tracking
+    - API to handle conversions between json/string/cpp types
+    - Tracker added to global PID
+    - Geometry updates
+    - Fixed memory leak
+    - Bug fixes
+MAUS-v0.8.3
+  The following changes were made:
+    - Added G4Beamline as a third party package
+    - bugfixes and cleanup of build system
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.8.2
+  The following changes were made:
+    - Global PID framework
+    - KL: geometry update and first revision of MC digitizer
+    - Geometry: added detector-survey fits
+    - XBoa upgrade to v0.15.3
+    - cleanup and fixes to build system
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.8.1
+  The following changes were made:
+    - fix bug with geometry id integration test
+    - clean up obsolete third parties
+MAUS-v0.8.0
+  The following changes were made:
+    - Upgraded to GEANT 4.9.6p02
+    - several changes in SciFi tracker
+      -- pattern-recognition, reducer, hits-digits lookup, Kalman
+    - added SciFi documentation
+    - added doxygen third party for building improved documentation
+     -- requires flex version >= 2.5.35, flex provided as third party
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.7
+  The following changes were made:
+    - updated third party daq installation
+  If upgrading from a previous version, redo the entire installation
+MAUS-v0.7.6
+  The following changes were made:
+    - EMR Reconstruction
+    - first version of Global Track Reconstruction
+    - stability fixes for online reconstruction
+    - calls to squeals replaced by exceptions
+    - support for long long integers
+  If upgrading from a previous version, redo the entire installation
 MAUS-v0.7.5
   The following changes were made:
     - stability fixes

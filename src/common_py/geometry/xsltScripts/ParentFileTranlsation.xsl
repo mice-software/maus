@@ -91,7 +91,31 @@
                             <xsl:when test="contains(@name, 'Q9')">Substitution $Q9Current <xsl:value-of select="@setCurrent"/>
 			    Substitution $Q9Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
-                            </xsl:text></xsl:when></xsl:choose>
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'SSU')">Substitution $SSUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $SSUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCU')">Substitution $FCUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'CCU')">Substitution $CCUCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $CCUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCM')">Substitution $FCMCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCMPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'CCD')">Substitution $CCDCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $CCDPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'FCD')">Substitution $FCDCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $FCDPolarity <xsl:value-of select="@polarity"/><xsl:text>
+                                
+			    </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
                             
                             //Module <xsl:value-of select="MICE_Information/Other_Information/GDML_Files/@location"/>RotatedGeometryFile.dat
@@ -101,27 +125,44 @@
                             //}
 
                            // 
+	         	   //Module Virtuals
+                           //     {
+                           //             Volume None
+                           //             Position 0.0 0.0 0.0+0.1*@RepeatNumber m
+                           //             PropertyString SensitiveDetector Virtual
+                           //             PropertyBool RepeatModule2 True
+                           //             PropertyInt NumberOfRepeats 240
+                           //     }
+
 
                             <xsl:variable name="tof_0_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof0FileNumber/@number"/>
                             <xsl:variable name="tof_1_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof1FileNumber/@number"/>
                             <xsl:variable name="tof_2_file_number" select="MICE_Information/Other_Information/FileNumbers/Tof2FileNumber/@number"/>
                             <xsl:variable name="kl_file_number" select="MICE_Information/Other_Information/FileNumbers/KLFileNumber/@number"/>
-                            <xsl:variable name="ckov_file_number" select="MICE_Information/Other_Information/FileNumbers/CkovFileNumber/@number"/>
-                            <xsl:variable name="acc1_file_number" select="MICE_Information/Other_Information/FileNumbers/Acc1FileNumber/@number"/>
-                            <xsl:variable name="acc2_file_number" select="MICE_Information/Other_Information/FileNumbers/Acc2FileNumber/@number"/>
+                            <xsl:variable name="ckov1_file_number" select="MICE_Information/Other_Information/FileNumbers/Ckov1FileNumber/@number"/>
+                            <xsl:variable name="ckov2_file_number" select="MICE_Information/Other_Information/FileNumbers/Ckov2FileNumber/@number"/>
                             <xsl:variable name="emr_file_number" select="MICE_Information/Other_Information/FileNumbers/EMRFileNumber/@number"/>
                             <xsl:variable name="tracker0_file_number" select="MICE_Information/Other_Information/FileNumbers/Tracker0FileNumber/@number"/>
                             <xsl:variable name="tracker1_file_number" select="MICE_Information/Other_Information/FileNumbers/Tracker1FileNumber/@number"/>
                             <xsl:variable name="absorber0_file_number" select="MICE_Information/Other_Information/FileNumbers/Absorber0FileNumber/@number"/>                            
                             <xsl:variable name="absorber1_file_number" select="MICE_Information/Other_Information/FileNumbers/Absorber1FileNumber/@number"/>                            
                             <xsl:variable name="absorber2_file_number" select="MICE_Information/Other_Information/FileNumbers/Absorber2FileNumber/@number"/>                            
-                           
-                            
+                     
                             <xsl:for-each select="structure/volume/physvol"> 
-                                   Module <xsl:choose><xsl:when test="contains(file/@name, $tof_0_file_number)">TOF/TOF0.dat</xsl:when><xsl:when test="contains(file/@name, $tof_1_file_number)">TOF/TOF1.dat</xsl:when><xsl:when test="contains(file/@name, $tof_2_file_number)">TOF/TOF2.dat</xsl:when><xsl:when test="contains(file/@name, $kl_file_number)">KL/KL.dat</xsl:when><xsl:when test="contains(file/@name, $ckov_file_number)">Ckov/Cherenkov.dat</xsl:when><xsl:when test="contains(file/@name, $emr_file_number)">EMR/Calorimeter.dat</xsl:when><xsl:when test="contains(file/@name, $acc1_file_number)">Ckov/Acc1.dat</xsl:when><xsl:when test="contains(file/@name, $acc2_file_number)">Ckov/Acc2.dat</xsl:when><xsl:when test="contains(file/@name, $tracker0_file_number)">Tracker/Tracker0.dat</xsl:when><xsl:when test="contains(file/@name, $tracker1_file_number)">Tracker/Tracker1.dat</xsl:when><xsl:when test="contains(file/@name, $absorber1_file_number)">Absorbers/LH2.dat</xsl:when><xsl:otherwise><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat</xsl:otherwise></xsl:choose>
+                                Module <xsl:choose><xsl:when test="contains(file/@name, $tof_0_file_number)">TOF/TOF0.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $tof_1_file_number)">TOF/TOF1.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $tof_2_file_number)">TOF/TOF2.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $kl_file_number)">KL/KL.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $ckov1_file_number)">Ckov/Vessel1.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $ckov2_file_number)">Ckov/Vessel2.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $emr_file_number)">EMR/Calorimeter.dat</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $tracker0_file_number)">Tracker/</xsl:when>
+                                                   <xsl:when test="contains(file/@name, $tracker1_file_number)"><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="$tracker1_file_replacement"/></xsl:when>
+                                                   <xsl:when test="contains(file/@name, $absorber1_file_number)"><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="$absorber_file_replacement"/></xsl:when>
+                                                   <xsl:otherwise><xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat</xsl:otherwise></xsl:choose>
                                     { 
                                         Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
-                                        Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
+	                                Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:when test="contains(rotation/@name, 'rotRef')"><xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/> deg </xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
                                     }
                             </xsl:for-each> 
                 	    

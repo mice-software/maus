@@ -74,8 +74,10 @@ class MapPyBeamMaker: #pylint: disable=R0902
         self.beam_file = None
         self.beam_file_format = None
         self.bm_fh = None
-        self.file_particles_per_spill = 25
+        self.file_particles_per_spill = 0
         self.beam_seed = 0
+        self.g4bl_generator = False
+        self.random_seed = 0
 
     def birth(self, json_configuration):
         """
@@ -144,8 +146,7 @@ class MapPyBeamMaker: #pylint: disable=R0902
             self.beam_file = os.path.expandvars(beam_def["beam_file"])
             self.beam_file_format = beam_def["beam_file_format"]
             self.file_particles_per_spill = beam_def["file_particles_per_spill"]
-
-
+            
     def __check_beam_file(self):
         """
         Check the input beam file

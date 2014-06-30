@@ -17,7 +17,7 @@
  */
 
 #include "Interface/STLUtils.hh"
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 std::string STLUtils::ReplaceVariables(std::string fileName) {
   unsigned int pos = 0;
@@ -29,7 +29,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
           if (fileName[pos] == '{') {
               ++pos;
           } else {
-              throw(Squeal(Squeal::recoverable,
+              throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "Error - environment variable must be written like ${VARIABLE}"+
                 std::string(" in file "+fileName),
                 "STLUtils::ReplaceVariables"));
@@ -40,7 +40,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
               ++end;
           }
           if (end == static_cast<int>(fileName.size())) {
-              throw(Squeal(Squeal::recoverable,
+              throw(MAUS::Exception(MAUS::Exception::recoverable,
                 "Error - environment variable must be written like ${VARIABLE}"+
                 std::string(" in file "+fileName),
                 "STLUtils::ReplaceVariables"));
@@ -50,7 +50,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
               variable += fileName[vpos];
           }
           if (getenv(variable.c_str()) == NULL) {
-              throw(Squeal(Squeal::recoverable,
+              throw(MAUS::Exception(MAUS::Exception::recoverable,
                     "Error - "+variable+" environment variable was not defined",
                     "STLUtils::ReplaceVariables"));
           }

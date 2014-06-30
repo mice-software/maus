@@ -33,7 +33,7 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 
 namespace MAUS {
 
@@ -47,7 +47,7 @@ namespace MAUS {
 /** @class CppErrorHandler
  *  \brief Handler for c++ errors
  *
- *  In MAUS we typically have two sorts of errors - Squeals (which are specific
+ *  In MAUS we typically have two sorts of errors - Exceptions (which are specific
  *  to MAUS) and std::exceptions (which are more generic). These static
  *  functions are used to handle the errors, by default handing them up to the
  *  PyErrorHandler (See src/common_py/ErrorHandler).
@@ -59,16 +59,19 @@ namespace MAUS {
 class CppErrorHandler {
 
  public:
+  CppErrorHandler();
+  ~CppErrorHandler();
+
   /** @brief Call default Cpp exception handler
    *
    * This makes a python exception of type CppError and hands it to the Python
    * error handler.
    *
    *  @param val Json document that will take any error
-   *  @param exc the (MAUS Squeal) exception
+   *  @param exc the (MAUS Exception) exception
    *  @param class_name the name of the class that generated the error
    */
-  Json::Value HandleSqueal(Json::Value val, Squeal exc, std::string class_name);
+  Json::Value HandleException(Json::Value val, Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
@@ -78,7 +81,7 @@ class CppErrorHandler {
    *  @param exc the (std) exception
    *  @param class_name the name of the class that generated the error
    */
-  void HandleSquealNoJson(Squeal exc, std::string class_name);
+  void HandleExceptionNoJson(Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
@@ -102,36 +105,21 @@ class CppErrorHandler {
    */
   void HandleStdExcNoJson(std::exception& exc, std::string class_name);
 
-  /** @brief Set function that is called to pass errors to python
+  /** @brief Get a pointer to an instance of the error handler
    *
-   *  Note that this function INCREFs the input PyObject and DECREFs any
-   *  existing PyObject (i.e. CppErrorHandler owns memory).
+   *  Old way was to use a singleton for error handler
    */
-  void SetPyErrorHandler(PyObject* fn) {
-    if (getInstance()->HandleExceptionFunction != NULL)
-      Py_XDECREF(getInstance()->HandleExceptionFunction);
-    Py_XINCREF(fn);
-    getInstance()->HandleExceptionFunction = fn;
-  }
-
-  /** @brief Get function that is called to pass errors to python
-   */
-  PyObject* GetPyErrorHandler() {
-    return getInstance()->HandleExceptionFunction;
-  }
-
   static CppErrorHandler* getInstance();
-
-  ~CppErrorHandler();
 
  private:
   static CppErrorHandler* instance;
-  PyObject* HandleExceptionFunction;  // set by callback defined in PyMausCpp
+
+  /** @brief Get function that is called to pass errors to python
+   */
+  PyObject* GetPyErrorHandler();
 
   Json::Value ExceptionToPython
              (std::string what, Json::Value json_value, std::string class_name);
-
-  CppErrorHandler();
 };
 
 }  // namespace MAUS

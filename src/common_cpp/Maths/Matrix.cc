@@ -38,7 +38,7 @@
 #include "gsl/gsl_eigen.h"
 #include "json/json.h"
 
-#include "Interface/Squeal.hh"
+#include "Utils/Exception.hh"
 #include "Maths/Vector.hh"
 #include "Utils/JsonWrapper.hh"
 
@@ -167,15 +167,15 @@ template <>
 double& MatrixBase<double, gsl_matrix>::operator()(
   const size_t row, const size_t column) {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index an empty matrix.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   } else if ((row < 1) || (row > matrix_->size1)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Row index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   } else if ((column < 1) || (column > matrix_->size2)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Column index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   }
@@ -186,15 +186,15 @@ template <>
 complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
     const size_t row, const size_t column) {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index an empty matrix.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   } else if ((row < 1) || (row > matrix_->size1)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Row index out of bounds.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   } else if ((column < 1) || (column > matrix_->size2)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Column index out of bounds.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   }
@@ -205,15 +205,15 @@ template <>
 const double& MatrixBase<double, gsl_matrix>::operator()(
   const size_t row, const size_t column) const {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index an empty matrix.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   } else if ((row < 1) || (row > matrix_->size1)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Row index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   } else if ((column < 1) || (column > matrix_->size2)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Column index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   }
@@ -224,15 +224,15 @@ template <>
 const complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
   const size_t row, const size_t column) const {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index an empty matrix.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   } else if ((row < 1) || (row > matrix_->size1)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Row index out of bounds.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   } else if ((column < 1) || (column > matrix_->size2)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Column index out of bounds.",
                  "MatrixBase<complex, gsl_matrix_complex>::operator()"));
   }
@@ -242,11 +242,11 @@ const complex& MatrixBase<complex, gsl_matrix_complex>::operator()(
 template <typename StdType, typename GslType> Vector<StdType>
 MAUS::MatrixBase<StdType, GslType>::row(const size_t row) const {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index an empty matrix.",
                  "MatrixBase<double, gsl_matrix>::row()"));
   } else if ((row < 1) || (row > matrix_->size1)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Row index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   }
@@ -266,11 +266,11 @@ MatrixBase<complex, gsl_matrix_complex>::row(const size_t row) const;
 template <typename StdType, typename GslType> Vector<StdType>
 MatrixBase<StdType, GslType>::column(const size_t column) const {
   if (matrix_ == NULL) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempting to index and empty matrix.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   } else if ((column < 1) || (column > matrix_->size2)) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Column index out of bounds.",
                  "MatrixBase<double, gsl_matrix>::operator()"));
   }
@@ -355,7 +355,7 @@ MatrixBase<double, gsl_matrix>& MatrixBase<double, gsl_matrix>::operator=(
     } else if (   (rhs.matrix_ == NULL)
                || (matrix_->size1 != rhs.matrix_->size1)
                || (matrix_->size2 != rhs.matrix_->size2)) {
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                    "Attempted to assign a matrix of a different size.",
                    "MatrixBase<double>::operator=()"));
     }
@@ -377,7 +377,7 @@ MatrixBase<complex, gsl_matrix_complex>::operator=(
     } else if (   (rhs.matrix_ == NULL)
                || (matrix_->size1 != rhs.matrix_->size1)
                || (matrix_->size2 != rhs.matrix_->size2)) {
-      throw(Squeal(Squeal::recoverable,
+      throw(Exception(Exception::recoverable,
                    "Attempted to assign a matrix of a different size.",
                    "MatrixBase<complex>::operator=()"));
     }
@@ -392,7 +392,7 @@ MatrixBase<double, gsl_matrix>::operator+=(
   const MatrixBase<double, gsl_matrix>& rhs) {
   if (   (number_of_rows() != rhs.number_of_rows())
       || (number_of_columns() != rhs.number_of_columns())) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to add two matrices of different sizes",
                  "MatrixBase<double>::operator+=()"));
   }
@@ -407,7 +407,7 @@ MatrixBase<complex, gsl_matrix_complex>::operator+=(
   const MatrixBase<complex, gsl_matrix_complex>& rhs) {
   if (   (number_of_rows() != rhs.number_of_rows())
       || (number_of_columns() != rhs.number_of_columns())) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to add two matrices of different sizes",
                  "MatrixBase<complex>::operator+=()"));
   }
@@ -422,7 +422,7 @@ MatrixBase<double, gsl_matrix>::operator-=(
   const MatrixBase<double, gsl_matrix>& rhs) {
   if (   (number_of_rows() != rhs.number_of_rows())
       || (number_of_columns() != rhs.number_of_columns())) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to subtract two matrices of different sizes",
                  "MatrixBase<double,gsl_matrix>::operator-=()"));
   }
@@ -437,7 +437,7 @@ MatrixBase<complex, gsl_matrix_complex>::operator-=(
   const MatrixBase<complex, gsl_matrix_complex>& rhs) {
   if (   (number_of_rows() != rhs.number_of_rows())
       || (number_of_columns() != rhs.number_of_columns())) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to subtract two matrices of different sizes",
                  "MatrixBase<complex,gsl_matrix_complex>::operator-=()"));
   }
@@ -451,7 +451,7 @@ template<> MatrixBase<double, gsl_matrix>&
 MatrixBase<double, gsl_matrix>::operator*=(
   const MatrixBase<double, gsl_matrix>& rhs) {
   if (number_of_columns() != rhs.number_of_rows()) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to multiply two matrices of incompatible sizes",
                  "MatrixBase<complex,gsl_matrix_complex>::operator*=()"));
   }
@@ -465,7 +465,7 @@ template<> MatrixBase<complex, gsl_matrix_complex>&
 MatrixBase<complex, gsl_matrix_complex>::operator*=(
   const MatrixBase<complex, gsl_matrix_complex>& rhs) {
   if (number_of_columns() != rhs.number_of_rows()) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to multiply two matrices of incompatible sizes",
                  "MatrixBase<complex,gsl_matrix_complex>::operator*=()"));
   }
@@ -683,8 +683,8 @@ void MatrixBase<StdType, GslType>::gsl_error_handler(const char *   reason,
                                                      const char *   file,
                                                      int            line,
                                                      int            gsl_errno) {
-  throw(Squeal(
-      Squeal::recoverable,
+  throw(Exception(
+      Exception::recoverable,
       reason,
       "MatrixBase<StdType, GslType>::gsl_error_handler()"));
 }
@@ -725,8 +725,8 @@ Matrix<complex>::Matrix(
   size_t columns = real_matrix.number_of_columns();
   if (   (rows != imaginary_matrix.number_of_rows())
       || (columns != imaginary_matrix.number_of_columns())) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "Attempted to build a complex matrix using "
       "real and imaginary matrices of different sizes",
       "Matrix<complex>::Matrix()"));
@@ -969,8 +969,8 @@ Matrix<MAUS::complex> complex(const Matrix<double>& real_matrix,
   size_t columns = real_matrix.number_of_columns();
   if (   (rows != imaginary_matrix.number_of_rows())
       || (columns != imaginary_matrix.number_of_columns())) {
-    throw(Squeal(
-      Squeal::recoverable,
+    throw(Exception(
+      Exception::recoverable,
       "Attempted to build a complex matrix using "
       "real and imaginary matrices of different sizes",
       "MAUS::MAUS::Complex::complex"));
@@ -995,7 +995,7 @@ template <> double determinant(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get determinant of non-square matrix",
                  "MAUS::determinant()"));
   }
@@ -1014,7 +1014,7 @@ template <> complex determinant(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get determinant of non-square matrix",
                  "MAUS::determinant()"));
   }
@@ -1031,12 +1031,12 @@ Matrix<double> inverse(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to get inverse of non-square matrix",
                  "MAUS::inverse()"));
   }
   if (determinant(matrix) == 0.) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempted to get inverse of singular matrix",
                  "MAUS::inverse()"));
   }
@@ -1053,11 +1053,11 @@ Matrix<double> inverse(
     for (size_t column = 1; column <= columns; ++column) {
       test_value = matrix(row, column);
       if (test_value != test_value) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
           "Failed to invert matrix: result contained NaN elements - singular?",
           "MAUS::inverse()"));
       } else if (test_value == std::numeric_limits<double>::infinity()) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
           "Failed to invert matrix: "
           "result contained infinite elements - singular?",
           "MAUS::inverse()"));
@@ -1073,7 +1073,7 @@ Matrix<complex> inverse(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get inverse of non-square matrix",
                  "MAUS::inverse()"));
   }
@@ -1090,12 +1090,12 @@ Matrix<complex> inverse(
     for (size_t column = 1; column <= columns; ++column) {
       test_value = matrix(row, column);
       if (test_value != test_value) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
           "Failed to invert matrix: result contained NaN elements - singular?",
           "MAUS::inverse()"));
       } else if (   real(test_value) == infinity
                  || imag(test_value) == infinity) {
-        throw(Squeal(Squeal::recoverable,
+        throw(Exception(Exception::recoverable,
           "Failed to invert matrix: "
           "result contained infinite elements - singular?",
           "MAUS::inverse()"));
@@ -1161,7 +1161,7 @@ Vector<complex> eigenvalues(const Matrix<double>& matrix) {
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get eigenvalues of non-square matrix",
                  "MAUS::eigenvalues"));
   }
@@ -1173,7 +1173,7 @@ Vector<complex> eigenvalues(const Matrix<double>& matrix) {
   gsl_eigen_nonsymm_free(workspace);
   if (ierr != 0) {
     gsl_vector_complex_free(eigenvalues);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvalues"));
   }
@@ -1221,7 +1221,7 @@ std::pair<Vector<complex>, Matrix<complex> > eigensystem(
   size_t rows = matrix.number_of_rows();
   size_t columns = matrix.number_of_columns();
   if (rows != columns) {
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Attempt to get eigensystem of non-square matrix",
                  "MAUS::eigensystem"));
   }
@@ -1236,7 +1236,7 @@ std::pair<Vector<complex>, Matrix<complex> > eigensystem(
   if (ierr != 0) {
     gsl_vector_complex_free(eigenvalues);
     gsl_matrix_complex_free(eigenvectors);
-    throw(Squeal(Squeal::recoverable,
+    throw(Exception(Exception::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }
@@ -1409,12 +1409,12 @@ template <> std::istream& operator>>(
   Json::Value::ArrayIndex rows = json_document.size();
   Json::Value::ArrayIndex columns;
   if (rows > 0) {
-    columns = json_document[Json::Value::UInt(0)].size();
+    columns = json_document[Json::Value::ArrayIndex(0)].size();
     matrix = Matrix<double>(rows, columns);
     for (size_t row = 1; row <= rows; ++row) {
-      Json::Value json_row = json_document[row-1];
+      Json::Value json_row = json_document[Json::Value::ArrayIndex(row-1)];
       for (size_t column = 1; column <= columns; ++column) {
-        Json::Value json_element = json_row[column-1];
+        Json::Value json_element = json_row[Json::Value::ArrayIndex(column-1)];
         matrix(row, column) = json_element.asDouble();
       }
     }

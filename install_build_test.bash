@@ -38,6 +38,12 @@ echo
 # 2. Any existing environment variable called "maus_third_party" e.g. if set by user's .bashrc file
 # 3. The current maus working directory, as held by the variable MAUS_ROOT_DIR
 # If not location is found then the script aborts 
+cmake --version
+if [ $? != 0 ]; then
+    echo "FATAL: Require cmake to build g4.9.6.p02"
+    echo "FATAL: Exiting. Install cmake and try again"
+    exit 1
+fi
 if [ "$1" ]; then
     MAUS_THIRD_PARTY=$1
     echo "Your MAUS_THIRD_PARTY is:"
@@ -59,6 +65,8 @@ if [ "$MAUS_THIRD_PARTY" ]; then
 	./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD 
 	echo "Sourcing the environment..."
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
+	echo "Installing field maps in MAUS_ROOT_DIR..."
+	./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
 else
 	echo "The other loop"
 	./configure 2>>$FILE_STD 1>>$FILE_STD
@@ -68,13 +76,17 @@ else
 	./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
 	echo "Resource the environment (catches the new ROOT version)"
 	source env.sh 2>>$FILE_STD 1>>$FILE_STD
+        #./third_party/bash third_party/bash/29expat.bash
+        #./third_party/bash third_party/bash/32clhep2.1.1.0.bash
+        #./third_party/bash third_party/bash/35geant4.9.6.bash
+        # source env_geant4.9.6.p02.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
 
 echo "Cleaning the MAUS build state"
 scons -c 2>>$FILE_STD 1>>$FILE_STD
 
 echo "Building MAUS"
-(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+(scons build -j8 || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
     cat $FILE_STD
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"

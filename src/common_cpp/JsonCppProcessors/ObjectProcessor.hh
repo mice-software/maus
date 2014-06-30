@@ -65,7 +65,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  relevant processor, copy the data in using the mutator and then clean up
      *  memory allocation afterwards.
      *
-     *  If a branch is required but cannot be found, throw a Squeal.
+     *  If a branch is required but cannot be found, throw a Exception.
      *
      *  @param json_object object to be converted to C++
      *
@@ -79,7 +79,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  Iterate over each registered branch, adding items to the json object.
      *  Returned item is newly allocated memory (caller's responsibility).
      *
-     *  If a branch is required but has NULL value, throw a Squeal.
+     *  If a branch is required but has NULL value, throw a Exception.
      *
      *  @param cpp_instance C++ object to be converted to json
      *  @param path Path to the newly created json object
@@ -103,7 +103,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory ownership is given to the ParentType
      *  @param is_required if the branch doesnt exist in json or is NULL in C++,
-     *  throw Squeal if is_required is set to true
+     *  throw MAUS::Exception if is_required is set to true
      *
      *  Note: don't forget Get method has to be const
      */
@@ -134,7 +134,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
@@ -162,14 +162,14 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
      */
     void RegisterTRef(std::string branch_name,
-                      TRef (ObjectType::*GetMethod)() const,
-                      void (ObjectType::*SetMethod)(TRef value),
+                      TObject* (ObjectType::*GetMethod)() const,
+                      void (ObjectType::*SetMethod)(TObject* value),
                       bool is_required);
 
     /** Register a ROOT TRefArray for processing, which contains a
@@ -192,7 +192,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the TRefArray,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw Squeal if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
@@ -215,7 +215,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  associated with this branch
      *  @param SetMethod callback that will set the value of the child data
      *  associated with this branch
-     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
      *  is_required is set to true
      *
      *  Note: don't forget Get method has to be const
@@ -236,7 +236,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  representation of the child types
      *  @param SetMethod callback that will set the value of the child data
      *  associated with this branch
-     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
      *  is_required is set to true
      *
      *  Note: A Get method is not required, as the inherited class
@@ -252,7 +252,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *
      *  @param branch_name name used by json to reference the branch
      *  @param child_value the branch will always be filled with this value
-     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
      *  is_required is set to true
      *
      *  This method will never fill anything in the parent C++ class
@@ -264,7 +264,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
     /** Register a branch for ignoring
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param is_required if the branch doesnt exist in json, throw Squeal if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
      *  is_required is set to true
      *
      *  This method will never fill anything in the parent C++ class or the Json
