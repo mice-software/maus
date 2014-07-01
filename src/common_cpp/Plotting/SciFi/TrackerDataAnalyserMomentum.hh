@@ -99,7 +99,7 @@ class TrackerDataAnalyserMomentum {
     void save_root();
 
     /** Set the cut on reconstructed pz using a double, in MeV/c */
-    void set_cutPzRec(double cutPzRec) { _cutPzRec = cutPzRec; };
+    void set_cutPzRec(double cutPzRec) { _cutPzRec = cutPzRec; }
 
     /** Set up ROOT objects (too much work for constructor) */
     void setUp();
@@ -160,7 +160,6 @@ class TrackerDataAnalyserMomentum {
   private:
     // Cuts
     double _cutPzRec;  /// Cut on the reconstructed pz
-
 };
 
 } // ~namespace MAUS

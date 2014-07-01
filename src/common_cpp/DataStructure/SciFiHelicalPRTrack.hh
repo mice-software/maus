@@ -50,8 +50,8 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Constructor from SimpleCircle and SimpleLine */
     SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
-                        double psi0, SimpleCircle circle, SimpleLine line_sz, double chisq,
-                        double chisq_dof, DoubleArray phi, SciFiSpacePointPArray spoints);
+                        SimpleCircle circle, SimpleLine line_sz, double chisq, double chisq_dof,
+                        double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
@@ -97,12 +97,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Get phi0, angle between the helix centre & the rotated frame origin in x-y */
     void set_phi0(double phi0) { _phi0 = phi0; }
-
-    /** Get psi0 = phi0 + 90 deg */
-    double get_psi0() const { return _psi0; }
-
-    /** Set psi0 = phi0 + 90 deg */
-    void set_psi0(double psi0) { _psi0 = psi0; }
 
     /** Get dsdz, the slope in the s-z plane (s is path length) */
     double get_dsdz() const { return _dsdz; }
@@ -158,6 +152,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the chi^2 per degree of freedom of the final helix fit, if used */
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
 
+    /** Get the point spread (summed separations) in x - y of the seed spacepoints */
+    double get_point_spread() const { return _point_spread; }
+
+    /** Set the point spread (summed separations) in x - y of the seed spacepoints */
+    void set_point_spread(double point_spread) { _point_spread = point_spread; }
+
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
@@ -169,7 +169,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     double _R;
     double _phi0;
-    double _psi0;
     double _dsdz;
     double _line_sz_c;
     double _line_sz_chisq;
@@ -178,6 +177,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_chisq;
     double _chisq;
     double _chisq_dof;
+    double _point_spread;
 
     ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present
 

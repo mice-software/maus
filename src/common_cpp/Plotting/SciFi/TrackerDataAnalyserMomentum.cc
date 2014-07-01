@@ -30,7 +30,6 @@
 #include "Rtypes.h"
 #include "TRefArray.h"
 #include "TRef.h"
-#include "TMath.h"
 
 // MAUS headers
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"

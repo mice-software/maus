@@ -132,13 +132,6 @@ void KalmanSeed::BuildKalmanStates() {
   C(2, 2) = _plane_width*_plane_width/12.;
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
-
-  for ( size_t j = 0; j < numb_sites; ++j ) {
-    ThreeVector true_position = _clusters[j]->get_true_position();
-    ThreeVector true_momentum = _clusters[j]->get_true_momentum();
-    _kalman_sites[j]->set_true_position(true_position);
-    _kalman_sites[j]->set_true_momentum(true_momentum);
-  }
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,

@@ -31,12 +31,7 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
                                      _residual(-1),
-                                     _smoothed_residual(-1),
-                                     _mc_x(0.),
-                                     _mc_px(0.),
-                                     _mc_y(0.),
-                                     _mc_py(0.),
-                                     _mc_pz(0.) {
+                                     _smoothed_residual(-1) {
   _cluster = new TRef();
 }
 
@@ -81,14 +76,6 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
     _mom.setZ(1./fabs(state_vector(4, 0)));
   }
 
-  ThreeVector mc_mom = kalman_site->true_momentum();
-  ThreeVector mc_pos = kalman_site->true_position();
-  _mc_x  = mc_pos.x();
-  _mc_px = mc_mom.x();
-  _mc_y  = mc_pos.y();
-  _mc_py = mc_mom.y();
-  _mc_pz = mc_mom.z();
-
   _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
   _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
   _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
@@ -119,12 +106,6 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _pos = point.pos();
   _mom = point.mom();
 
-  _mc_x  = point.mc_x();
-  _mc_px = point.mc_px();
-  _mc_y  = point.mc_y();
-  _mc_py = point.mc_py();
-  _mc_pz = point.mc_pz();
-
   _pull              = point.pull();
   _residual          = point.residual();
   _smoothed_residual = point.smoothed_residual();
@@ -149,12 +130,6 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
 
   _pos = rhs.pos();
   _mom = rhs.mom();
-
-  _mc_x  = rhs.mc_x();
-  _mc_px = rhs.mc_px();
-  _mc_y  = rhs.mc_y();
-  _mc_py = rhs.mc_py();
-  _mc_pz = rhs.mc_pz();
 
   _pull              = rhs.pull();
   _residual          = rhs.residual();

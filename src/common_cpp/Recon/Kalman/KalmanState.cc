@@ -25,9 +25,7 @@ KalmanState::KalmanState(): _current_state(Initialized),
                           _f_chi2(0.),
                           _s_chi2(0.),
                           _cluster(NULL),
-                          _direction(ThreeVector()),
-                          _mc_pos(ThreeVector()),
-                          _mc_mom(ThreeVector()) {}
+                          _direction(ThreeVector()) {}
 
 KalmanState::~KalmanState() {}
 
@@ -37,9 +35,7 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
                                                 _f_chi2(0.),
                                                 _s_chi2(0.),
                                                 _cluster(NULL),
-                                                _direction(ThreeVector()),
-                                                _mc_pos(ThreeVector()),
-                                                _mc_mom(ThreeVector()) {
+                                                _direction(ThreeVector()) {
   int dim = site.a(KalmanState::Projected).GetNrows();
   Initialise(dim);
 
@@ -49,8 +45,6 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
   _s_chi2 = site.chi2(KalmanState::Smoothed);
   _cluster = site.cluster();
   _direction = site.direction();
-  _mc_pos = site.true_position();
-  _mc_mom = site.true_momentum();
 
   _projected_a = site.a(KalmanState::Projected);
   _a           = site.a(KalmanState::Filtered);
@@ -94,8 +88,6 @@ KalmanState& KalmanState::operator=(const KalmanState &rhs) {
   _s_chi2 = rhs.chi2(KalmanState::Smoothed);
   _cluster = rhs.cluster();
   _direction = rhs.direction();
-  _mc_pos = rhs.true_position();
-  _mc_mom = rhs.true_momentum();
 
   _projected_a = rhs.a(KalmanState::Projected);
   _a           = rhs.a(KalmanState::Filtered);
