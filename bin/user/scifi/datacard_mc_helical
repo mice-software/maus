@@ -5,7 +5,7 @@ import os
 #------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
 verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
-# output_root_file_name = "maus_output_muplus_2014-03-21_sz_testing.root"
+output_root_file_name = "maus_output_helical_tests.root"
 
 #------------------------------------------
 # Used by InputCppRoot
@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 2500
+spill_generator_number_of_spills = 5
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -51,7 +51,7 @@ simulation_reference_particle = {
 # This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":10, # number of coin tosses
+    "binomial_n":1, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated
