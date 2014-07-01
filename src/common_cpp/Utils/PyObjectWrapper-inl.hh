@@ -112,6 +112,7 @@ PyObject* PyObjectWrapper::wrap(std::string* str) {
                       "PyObjectWrapper::wrap_pyobject<string>");
   }
   PyObject* py_string = PyString_FromString(str->c_str());
+  delete str;
   return py_string;
 }
 
