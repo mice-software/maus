@@ -32,7 +32,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         """Sets a mapper and configuration"""
         cls.mapper = MapCppGlobalReconImport()
         cls.c = Configuration()
-    
+
     def test_empty(self):
         """Check can handle empty configuration"""
         self.assertRaises(ValueError, self.mapper.birth, "",)
@@ -44,7 +44,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
     def test_init(self):
         """Check birth with default configuration"""
         self.mapper.birth(self. c.getConfigJSON())
-    
+
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
         test1 = ('%s/src/map/MapCppGlobalReconImport/noDataTest.txt' % 
@@ -86,7 +86,6 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
 
-   
     def test_fill_Global_Event(self):
         """Check that process fills global events from TOF and scifi data"""
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
@@ -112,7 +111,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(33, len(revt['global_event']['space_points']))
+        self.assertEqual(34, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 
