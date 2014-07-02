@@ -5,7 +5,7 @@ import os
 #------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
 verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
-output_root_file_name = "maus_output_helical_tests.root"
+# output_root_file_name = "maus_output_helical_tests.root"
 
 #------------------------------------------
 # Used by InputCppRoot
@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 5
+spill_generator_number_of_spills = 20000
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
