@@ -126,7 +126,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
                   "_spill._recon._scifi_event._scifitracks._tracker==1")
         h8 = ROOT.gDirectory.Get('h8')
         self.assertLess(h8.GetMean(), 35)
-        self.assertLess(h8.GetRMS(), 35)
+        self.assertLess(h8.GetRMS(), 60)
         self.assertGreater(h8.GetEntries(), 30)
 
 if __name__ == "__main__":
