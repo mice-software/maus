@@ -221,7 +221,7 @@ void KalmanFilter::SetResidual(KalmanState *a_site, KalmanState::State kalman_st
   cov_residual.Invert();
   chi2 = residual_transposed * cov_residual *residual;
 
-  a_site->set_chi2(fabs(chi2(0, 0)), kalman_state);
+  a_site->set_chi2(chi2(0, 0), kalman_state);
 }
 
 void KalmanFilter::UpdateCovariance(KalmanState *a_site) {
