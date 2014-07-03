@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 20000
+spill_generator_number_of_spills = 10
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -89,8 +89,8 @@ SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
-SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 8.0 # Chi^2 cut on pat rec s-z fit
+SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
+SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 
