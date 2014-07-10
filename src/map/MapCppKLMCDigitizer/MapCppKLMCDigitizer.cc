@@ -70,9 +70,6 @@ std::string MapCppKLMCDigitizer::process(std::string document) {
     return writer.write(root);
   }
 
-  double triggerTime;
-  Json::Value hard_trigger = _configJSON["KLhardCodedTrigger"];
-
   // all_kl_digits store all the kl hits
   // then we'll weed out multiple hits, add up yields, and store the event
   std::vector<Json::Value> all_kl_digits;
@@ -83,17 +80,8 @@ std::string MapCppKLMCDigitizer::process(std::string document) {
   if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
   for ( unsigned int i = 0; i < mc.size(); i++ ) {
     Json::Value particle = mc[i];
-    gentime = particle["primary"]["time"].asDouble();
     if (fDebug) std::cout << "evt: " << i << " particle= " << particle << std::endl;
 
-  // Find trigger time trom tof's!!! To be used later for flash adc style.
-    Json::Value _hits_tof = particle["tof_hits"];
-    if (!hard_trigger.asBool()) {
-       triggerTime = calcTriggerTime(_hits_tof);
-    } else {
-    triggerTime = (_configJSON["KLsamplingTimeStart"].asDouble());
-    }
-    if (fDebug) std::cout << triggerTime << std::endl;
 
     // hits for this event
     Json::Value _hits = particle["kl_hits"];
@@ -215,12 +203,13 @@ std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits) {
       // can't convert to adc yet since we need to add up ph.el's
       //   from other hits if any
       if (fDebug) std::cout << "edep= " << edep << std::endl;
-      double npe1 = calculate_nphe_at_pmt(dist1, edep);
-      double npe2 = calculate_nphe_at_pmt(dist2, edep);
-      if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
-      if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
+      int npe1 = calculate_nphe_at_pmt(dist1, edep);
+      int npe2 = calculate_nphe_at_pmt(dist2, edep);
 
-       Json::Value tmpDigit;
+      if (fDebug) std::cout << "npe1: "<< npe1 << ", npe2: "<< npe2 << std::endl;
+
+
+      Json::Value tmpDigit;
       // set the hits for PMTs at both ends
       for (int p = 0; p < 2; ++p) {
         tmpDigit.clear();
@@ -289,41 +278,49 @@ bool MapCppKLMCDigitizer::check_sanity_mc(std::string document) {
 }
 
 //////////////////////////////////////////////////////////////////////
-double MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) {
+int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) {
   if (fDebug) std::cout << "edep= " << edep << std::endl;
 
   if (!_configJSON.isMember("KLattLengthLong"))
           throw(Exception(Exception::recoverable,
-                "Could not find KLattLengthLong in config",
-                "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+		       "Could not find KLattLengthLong in config",
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthShort"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLattLengthShort in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthLongNorm"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLattLengthLongNorm in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthShortNorm"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLattLengthShortNorm in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLconversionFactor"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLconversionFactor in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLlightCollectionEff"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLlightCollectionEff in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLquantumEff"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLquantumEff in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLlightGuideEff"))
           throw(Exception(Exception::recoverable,
                        "Could not find KLlightGuideEff in config",
-                       "MapCppKLMCDigitizer::CalculatePEAtPMT"));
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
+  if (!_configJSON.isMember("KLpmtGain"))
+          throw(Exception(Exception::recoverable,
+                       "Could not find KLpmtGain in config",
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
+  if (!_configJSON.isMember("KLpmtSigmaGain"))
+          throw(Exception(Exception::recoverable,
+                       "Could not find KLpmtSigmaGain in config",
+                       "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
 
   // convert energy deposited to number of photoelectrons
   double attLengthL   = (_configJSON["KLattLengthLong"].asDouble());
@@ -345,21 +342,53 @@ double MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) {
   // At the photomultiplier, after attenuation. Formula is from KLOE
   double attenuation = nL*exp(-dist/attLengthL)+nS*exp(-dist/attLengthS);
   collectedPh = floor(numberOfPh*effColl*attenuation*lgEff+0.5);
-  // gaussian distribute with 1 electron as sigma
-  pe = floor(RandGauss::shoot(collectedPh*qEff, 1)+0.5);
-  if (pe < 0) pe = 0;
+  // Poisson smearing of photoelctrons at pmt cathode
+  pe = floor(RandPoisson::shoot(collectedPh*qEff));
 
-  return pe;
+  // Now calculate amplified photoelectrons at the pmt anode and smear them with gaussian
+  int gain   = (_configJSON["KLpmtGain"].asInt());
+  int sigma_gain   = (_configJSON["KLpmtSigmaGain"].asInt());
+
+  int peAmplified = static_cast<int> (floor(pe*RandGauss::shoot(gain, sigma_gain)));
+
+  if (fDebug) {
+    std::cout << "created photons: " << meanPhN << std::endl;
+    std::cout << "smeared photons: " << numberOfPh << std::endl;
+    std::cout << "attenuated photons at pmt: " << collectedPh << std::endl;
+    std::cout << "photoelectrons at pmt cathode: " << collectedPh*qEff << std::endl;
+    std::cout << "smeared photoelectrons at pmt cathode: " << pe << std::endl;
+    std::cout << "amplified photoelectrons: " << peAmplified<< std::endl;
+  }
+
+  return peAmplified;
 }
 
 
 //////////////////////////////////////////////////////////////////////
 Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
                                              std::vector<Json::Value> all_kl_digits) {
+  if (!_configJSON.isMember("Do_V1724_Zero_Suppression"))
+          throw(Exception(Exception::recoverable,
+                "Could not find Do_V1724_Zero_Suppression",
+                "MapCppKLMCDigitizer::fill_kl_evt"));
+  if (!_configJSON.isMember("V1724_Zero_Suppression_Threshold"))
+          throw(Exception(Exception::recoverable,
+                "Could not find V1724_Zero_Suppression_Threshold",
+                "MapCppKLMCDigitizer::fill_kl_evt"));
+
+  bool zero_supp   = (_configJSON["Do_V1724_Zero_Suppression"].asBool());
+  int adc_thresh;
+
+  if (zero_supp) {
+    adc_thresh   = (_configJSON["V1724_Zero_Suppression_Threshold"].asInt());
+  } else {
+    adc_thresh = 0;
+  }
+
   Json::Value kl_digit(Json::arrayValue);
   // return null if this evt had no kl hits
   if (all_kl_digits.size() == 0) return kl_digit;
-  double npe;
+  int npe;
   int ndigs = 0;
 
   // throw out multihits and add up the light yields from multihits in slabs
@@ -368,32 +397,37 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
     if ( all_kl_digits[i]["isUsed"].asInt() == 0 ) {
       ndigs++;
 
-      npe = all_kl_digits[i]["npe"].asDouble();
+      npe = all_kl_digits[i]["npe"].asInt();
       // loop over all the other digits to find multihit slabs
       for ( unsigned int j = i+1; j < all_kl_digits.size(); j++ ) {
         if ( check_param(&(all_kl_digits[i]), &(all_kl_digits[j])) ) {
             // add up light yields if same bar was hit
-            npe += all_kl_digits[j]["npe"].asDouble();
+            npe += all_kl_digits[j]["npe"].asInt();
             // mark this hit as used so we don't multicount
             all_kl_digits[j]["isUsed"]=1;
         } // end check for used
       } // end loop over secondary digits
       // convert light yield to adc & set the charge
-      int adc = static_cast<int>(npe / (_configJSON["KLadcConversionFactor"].asDouble()));
+      int adc = static_cast<int> (npe / (_configJSON["KLadcConversionFactor"].asInt()));
 
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
 
-      digit["charge_pm"] = adc;
-      digit["charge_mm"] = adc;
-      digit["kl_key"] = all_kl_digits[i]["kl_key"].asString();
-      digit["cell"] = all_kl_digits[i]["cell"].asInt();
-      digit["pmt"] = all_kl_digits[i]["pmt"].asInt();
+      if (adc > adc_thresh) {
+	digit["charge_pm"] = adc;
+	digit["charge_mm"] = adc;
+	digit["kl_key"] = all_kl_digits[i]["kl_key"].asString();
+	digit["cell"] = all_kl_digits[i]["cell"].asInt();
+	digit["pmt"] = all_kl_digits[i]["pmt"].asInt();
 
-      // store event number
-      digit["phys_event_number"] = evnum;
-      digit["part_event_number"] = evnum;
+	// store event number
+	digit["phys_event_number"] = evnum;
+	digit["part_event_number"] = evnum;
 
-      kl_digit.append(digit);
+	if (fDebug) std::cout << "adc over thresh: "<< adc << std::endl;
+
+	kl_digit.append(digit);
+      }
+
       if (fDebug)
           std::cout << "digit #" << ndigs << " " <<  digit["kl_key"].asString() << std::endl;
       all_kl_digits[i]["isUsed"]=1;
@@ -415,24 +449,6 @@ bool MapCppKLMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) {
   } else {
     return false;
   }
-}
-
-///////////////////////////////////////////////////////////////////////
-double MapCppKLMCDigitizer::calcTriggerTime(Json::Value hits) {
-  double triggerTime = 1e6; // 1M means no trigger
-  double tofTime = 1e6;
-
-  for ( unsigned int j = 0; j < hits.size(); j++ ) {  //  j-th hit
-     Json::Value hit = hits[j];
-
-     int stat = hit["channel_id"]["station_number"].asInt();
-
-     if (( stat == 0 || stat == 1 || stat == 2) && (tofTime > hit["time"].asDouble()))
-       tofTime = hit["time"].asDouble();
-  }
-
-  if (tofTime < 1e6) triggerTime = tofTime;
-  return triggerTime;
 }
 
 

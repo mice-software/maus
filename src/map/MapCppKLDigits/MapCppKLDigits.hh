@@ -38,6 +38,7 @@
 
 // G4MICE from commonCpp
 #include "Utils/KLChannelMap.hh"
+#include "Utils/KLCalibrationMap.hh"
 
 namespace MAUS {
 class MapCppKLDigits {
@@ -64,6 +65,7 @@ class MapCppKLDigits {
   std::string _classname;
 
   KLChannelMap _map;
+  KLCalibrationMap _mapcal;
 
   // Vector to hold the names of all detectors to be included
   // in the digits.

@@ -53,7 +53,7 @@ class MapCppKLMCDigitizer {
 
   bool check_sanity_mc(std::string document);
 
-  double calculate_nphe_at_pmt(double dist, double edep);
+  int calculate_nphe_at_pmt(double dist, double edep);
 
   std::vector<Json::Value> make_kl_digits(Json::Value hits);
 
@@ -62,8 +62,6 @@ class MapCppKLMCDigitizer {
 
   bool check_param(Json::Value* hit1, Json::Value* hit2);
 
-  // Calculates the time of the calorimeter trigger.
-  double calcTriggerTime(Json::Value hits);
 
  private:
   MiceModule* geo_module;
@@ -76,7 +74,6 @@ class MapCppKLMCDigitizer {
   Json::Value mc;
   Json::Value digit;
 
-  double gentime;
   bool fDebug;
 };
 }
