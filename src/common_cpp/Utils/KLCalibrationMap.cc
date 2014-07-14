@@ -141,7 +141,7 @@ bool KLCalibrationMap::LoadGainFile(std::string gainFile) {
   return true;
 }
 
-int KLCalibrationMap::FindKLChannelKey(KLChannelKey key) {
+int KLCalibrationMap::FindKLChannelKey(KLChannelKey key) const {
   for (unsigned int i = 0; i < _Pkey.size(); ++i )
     if (_Pkey.at(i) == key)
       return i;
@@ -149,7 +149,7 @@ int KLCalibrationMap::FindKLChannelKey(KLChannelKey key) {
   return NOCALIB;
 }
 
-double KLCalibrationMap::Gain(KLChannelKey key) {
+double KLCalibrationMap::Gain(KLChannelKey key) const {
   if (!_do_gain_correction)
     return 1.;
 

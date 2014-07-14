@@ -40,47 +40,47 @@
 #include "TRandom.h"
 #include "Config/MiceModule.hh"
 #include "Utils/TOFCalibrationMap.hh"
+#include "API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTOFMCDigitizer {
+class MapCppTOFMCDigitizer : public MapBase<Json::Value> {
  public:
-  bool birth(std::string argJsonConfigDocument);
+  MapCppTOFMCDigitizer();
 
-  bool death();
+ private:
+  void _birth(const std::string& argJsonConfigDocument);
 
-  std::string process(std::string document);
+  void _death();
 
-  bool check_sanity_mc(std::string document);
+  void _process(Json::Value* data) const;
 
-  double get_npe(double dist, double edep);
+  Json::Value check_sanity_mc(Json::Value& document) const;
 
-  std::vector<Json::Value> make_tof_digits(Json::Value hits);
+  double get_npe(double dist, double edep) const;
 
-  void findTriggerPixel(std::vector<Json::Value> _alldigits);
+  std::vector<Json::Value> make_tof_digits(Json::Value hits,
+                                           double gentime,
+                                           Json::Value& root) const;
+
+  std::string findTriggerPixel(std::vector<Json::Value> _alldigits) const;
   Json::Value fill_tof_evt(int evnum, int snum,
-                           std::vector<Json::Value> _alldigits);
+                           std::vector<Json::Value> _alldigits,
+                           std::string strig) const;
 
-  bool check_param(Json::Value* hit1, Json::Value* hit2);
+  bool check_param(Json::Value* hit1, Json::Value* hit2) const;
 
  private:
   MiceModule* geo_module;
   std::vector<const MiceModule*> tof_modules;
 
-  std::string _classname;
   Json::Value _configJSON;
-  Json::Value root;
-  Json::Reader reader;
-  Json::Value mc;
-  Json::Value digit;
 
   TOFCalibrationMap _map;
   std::map<int, std::string> _triggerhit_pixels;
-  std::stringstream strig;
 
   std::vector<std::string> _stationKeys;
 
-  double gentime;
   bool fDebug;
 };
 }

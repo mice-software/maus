@@ -15,6 +15,7 @@
  */
 
  /** @class PIDBase
+ *  @author Celeste Pidcott, University of Warwick
  *  Base class containing constructors and functions required for PID
  *  analysis
  */

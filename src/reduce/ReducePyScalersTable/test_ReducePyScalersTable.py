@@ -168,8 +168,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors, "Unexpected error trace") # pylint: disable=C0301
 
     def test_no_daq_data(self):
         """
@@ -182,8 +181,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("Bad input spill - no maus_event_type", errors[0], "Unexpected error trace "+str(errors[0])) # pylint: disable=C0301
+        self.assertEquals("Bad input spill - no maus_event_type", errors, "Unexpected error trace "+str(errors)) # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -202,8 +200,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.ValueError'>: daq_data is None", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.ValueError'>: daq_data is None", errors, "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -221,8 +218,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.KeyError'>: 'V830 is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.KeyError'>: 'V830 is not in spill'", errors, "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -240,8 +236,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.KeyError'>: 'channels is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.KeyError'>: 'channels is not in spill'", errors, "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         self.__check_result(result, "", None, expected)
@@ -259,8 +254,7 @@ class ReducePyScalersTableTestCase(unittest.TestCase): # pylint: disable=R0904, 
         self.assertTrue("ReducePyScalersTable" in errors,
             "No ReducePyScalersTable field")        
         errors = errors["ReducePyScalersTable"]
-        self.assertTrue(len(errors) >= 1, "Missing error trace")
-        self.assertEquals("<type 'exceptions.KeyError'>: 'ch0 is not in spill'", errors[0], "Unexpected error trace") # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.KeyError'>: 'ch0 is not in spill'", errors, "Unexpected error trace") # pylint: disable=C0301
         # Scalar, for validation.
         expected = Scaler()
         print result

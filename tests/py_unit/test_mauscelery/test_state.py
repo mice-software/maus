@@ -103,7 +103,7 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         MausTransform.initialize("MapPyTestMap")
-        with self.assertRaisesRegexp(ValueError,
+        with self.assertRaisesRegexp(WorkerBirthFailedException,
             ".*Birth exception.*"):
             MausTransform.birth("""{"birth_result":%s}""" % \
                 MapPyTestMap.EXCEPTION)
@@ -175,7 +175,7 @@ class MausTransformTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         MausTransform.initialize("MapPyTestMap")
         MausTransform.birth("""{"death_result":%s}""" % \
             MapPyTestMap.EXCEPTION)
-        with self.assertRaisesRegexp(ValueError,
+        with self.assertRaisesRegexp(WorkerDeathFailedException,
             ".*Death exception.*"):
             MausTransform.death()
         self.assertTrue(MausTransform.is_dead, 

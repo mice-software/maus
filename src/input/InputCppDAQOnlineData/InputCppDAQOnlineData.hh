@@ -40,14 +40,6 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   */
   InputCppDAQOnlineData();
 
-  /** Initialise the Unpacker.
-  *
-  * This prepares the unpacker to read from a socket given in the configuration.
-  *
-  * \return True if initialised sucessfully.
-  */
-  bool birth(std::string pJSONConfig);
-
   /** Read the next event from the file into memory.
   *
   * This function simply reads an event into memory,
@@ -64,6 +56,14 @@ class InputCppDAQOnlineData : public InputCppDAQData {
   void setMonitorSrc(std::string mon);
 
  private:
+  /** Initialise the Unpacker.
+  *
+  * This prepares the unpacker to read from a socket given in the configuration.
+  *
+  * \return True if initialised sucessfully.
+  */
+  void _birth(const std::string& pJSONConfig);
+
 
   /** Data manager object. */
   MDmonitoring * _dataManager;

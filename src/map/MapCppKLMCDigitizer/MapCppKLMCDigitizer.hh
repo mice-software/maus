@@ -40,39 +40,37 @@
 #include "TRandom.h"
 #include "Config/MiceModule.hh"
 
+#include "API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppKLMCDigitizer {
+class MapCppKLMCDigitizer : public MapBase<Json::Value> {
  public:
-  bool birth(std::string argJsonConfigDocument);
+  MapCppKLMCDigitizer();
 
-  bool death();
+ private:
+  void _birth(const std::string& argJsonConfigDocument);
 
-  std::string process(std::string document);
+  void _death();
 
-  bool check_sanity_mc(std::string document);
+  void _process(Json::Value* document) const;
 
-  int calculate_nphe_at_pmt(double dist, double edep);
+  int calculate_nphe_at_pmt(double dist, double edep) const;
 
-  std::vector<Json::Value> make_kl_digits(Json::Value hits);
+  Json::Value check_sanity_mc(const Json::Value& document) const;
+
+  std::vector<Json::Value> make_kl_digits(Json::Value hits, Json::Value& root) const;
 
   Json::Value fill_kl_evt(int evnum,
-                           std::vector<Json::Value> _alldigits);
+                           std::vector<Json::Value> _alldigits) const;
 
-  bool check_param(Json::Value* hit1, Json::Value* hit2);
-
+  bool check_param(Json::Value* hit1, Json::Value* hit2) const;
 
  private:
   MiceModule* geo_module;
   std::vector<const MiceModule*> kl_modules;
 
-  std::string _classname;
   Json::Value _configJSON;
-  Json::Value root;
-  Json::Reader reader;
-  Json::Value mc;
-  Json::Value digit;
 
   bool fDebug;
 };

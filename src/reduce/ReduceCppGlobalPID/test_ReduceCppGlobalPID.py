@@ -271,7 +271,7 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         now = datetime.datetime.now()
         self.config0['unique_identifier'] = now.strftime("%Y_%m_%dT%H_%M_%S_%f")
         test5 = ('%s/src/reduce/ReduceCppGlobalPID/PDF_test.json' 
-                                              % os.environ.get("MAUS_ROOT_DIR"))
+                                            % os.environ.get("MAUS_ROOT_DIR"))
         birthresult = self.reducer.birth(json.dumps(self.config0))
         self.assertTrue(birthresult)
         fin = open(test5, 'r')
@@ -301,9 +301,9 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         hist1 = rootPDFfile1.Get(hist1name)
         hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
         hist2 = rootPDFfile2.Get(hist2name)
-        # Check process has added info from 5 tracks to histograms:
-        # N.B. for PIDVarA the behavior to spread one event over all bins is
-        # on, so there should be as many additional entries as there are bins.
+        ## Check process has added info from 5 tracks to histograms:
+        ## N.B. for PIDVarA the behavior to spread one event over all bins is
+        ## on, so there should be as many additional entries as there are bins.
         self.assertEqual(hist1.GetEntries(), (hist1.GetSize() + 5))
         self.assertEqual(hist2.GetEntries(), (hist2.GetSize() + 5))
         os.system('rm -rf %s' % PDFdirectory)

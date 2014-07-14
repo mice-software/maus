@@ -259,7 +259,7 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
   return true;
 }
 
-int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) {
+int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) const {
   for (unsigned int i = 0; i < _Pkey.size(); ++i )
     if (_Pkey.at(i) == key)
       return i;
@@ -267,7 +267,7 @@ int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) {
   return NOCALIB;
 }
 
-int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
+int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) const {
   for (unsigned int i = 0; i < _Tkey.size(); ++i )
     if  (_Tkey.at(i) == key)
       return i;
@@ -275,7 +275,7 @@ int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
+double TOFCalibrationMap::T0(TOFChannelKey key, int &r) const {
   if (!_do_t0_correction)
     return 0.;
 
@@ -290,7 +290,7 @@ double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
+double TOFCalibrationMap::TriggerT0(TOFPixelKey key) const {
   if (!_do_triggerDelay_correction)
     return 0.;
 
@@ -302,7 +302,7 @@ double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
   return n;
 }
 
-double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
+double TOFCalibrationMap::TW(TOFChannelKey key, int adc) const {
   if (!_do_timeWalk_correction)
     return 0.;
 
@@ -323,7 +323,7 @@ double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
+double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) const {
   // See equations 37-40 and 45 in MICE Note 251 "TOF Detectors Time Calibration".
   int reffSlab;
   double tw = TW(Pkey, adc);
@@ -392,7 +392,7 @@ TOFPixelKey::TOFPixelKey(string keyStr) throw(MAUS::Exception) {
   }
 }
 
-bool TOFPixelKey::operator==( TOFPixelKey const key ) {
+bool TOFPixelKey::operator==( const TOFPixelKey& key ) const {
   if ( _station == key._station &&
        _slabX == key._slabX &&
        _slabY == key._slabY &&
@@ -403,7 +403,7 @@ bool TOFPixelKey::operator==( TOFPixelKey const key ) {
   }
 }
 
-bool TOFPixelKey::operator!=( TOFPixelKey const key ) {
+bool TOFPixelKey::operator!=( const TOFPixelKey& key ) const {
   if ( _station == key._station &&
        _slabX == key._slabX &&
        _slabY == key._slabY &&

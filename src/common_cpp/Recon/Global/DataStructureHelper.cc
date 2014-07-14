@@ -269,7 +269,7 @@ CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
 
   const size_t size = 6;
   double matrix_data[size*size];
-  for (size_t row = 0; row < 6; ++row) {
+  for (int row = 0; row < 6; ++row) {
     const Json::Value row_json = value[row];
     if (row_json.size() < static_cast<Json::Value::UInt>(6)) {
       throw(Exception(
@@ -277,7 +277,7 @@ CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
           "Not enough column elements to convert JSON to CovarianceMatrix",
           "DataStructureHelper::GetJsonCovarianceMatrix()"));
     }
-    for (size_t column = 0; column < 6; ++column) {
+    for (int column = 0; column < 6; ++column) {
       const Json::Value element_json = row_json[column];
       matrix_data[row*size+column] = element_json.asDouble();
     }

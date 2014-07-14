@@ -23,6 +23,8 @@
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
 namespace MAUS {
 
@@ -124,19 +126,48 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   SciFiDigit *digit = new SciFiDigit(spill, event, tracker, station, plane, channel, npe, time);
   evt1->add_digit(digit);
 
+  SciFiCluster *c1 = new SciFiCluster(digit);
+  evt1->add_cluster(c1);
+
+  SciFiTrack *trk1 = new SciFiTrack();
+  SciFiTrackPoint *tp1 = new SciFiTrackPoint();
+  tp1->set_cluster_pointer(c1);
+  trk1->add_scifitrackpoint(tp1);
+  evt1->add_scifitrack(trk1);
+
+  ASSERT_EQ(evt1->clusters()[0],
+            evt1->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+
   SciFiEvent* evt2 = new SciFiEvent();
   *evt2 = *evt1;
+
+  ASSERT_EQ(evt2->clusters()[0],
+            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+  ASSERT_NE(evt1->clusters()[0],
+            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+
   delete evt1;
 
-  EXPECT_EQ(evt2->digits()[0]->get_spill(), spill);
-  EXPECT_EQ(evt2->digits()[0]->get_event(), event);
-  EXPECT_EQ(evt2->digits()[0]->get_tracker(), tracker);
-  EXPECT_EQ(evt2->digits()[0]->get_station(), station);
-  EXPECT_EQ(evt2->digits()[0]->get_plane(), plane);
-  EXPECT_EQ(evt2->digits()[0]->get_channel(), channel);
-  EXPECT_EQ(evt2->digits()[0]->get_npe(), npe);
-  EXPECT_EQ(evt2->digits()[0]->get_time(), time);
-  EXPECT_FALSE(evt2->digits()[0]->is_used());
+  EXPECT_EQ(spill, evt2->digits()[0]->get_spill());
+  EXPECT_EQ(event, evt2->digits()[0]->get_event());
+  EXPECT_EQ(tracker, evt2->digits()[0]->get_tracker());
+  EXPECT_EQ(station, evt2->digits()[0]->get_station());
+  EXPECT_EQ(plane, evt2->digits()[0]->get_plane());
+  EXPECT_EQ(channel, evt2->digits()[0]->get_channel());
+  EXPECT_EQ(npe, evt2->digits()[0]->get_npe());
+  EXPECT_EQ(time, evt2->digits()[0]->get_time());
+  EXPECT_TRUE(evt2->digits()[0]->is_used());
+
+  EXPECT_EQ(tracker, evt2->clusters()[0]->get_tracker());
+  EXPECT_EQ(evt2->digits()[0], evt2->clusters()[0]->get_digits()->At(0));
+
+  EXPECT_EQ(-1, evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker());
+  EXPECT_EQ(evt2->clusters()[0],
+            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+  EXPECT_EQ(tracker,
+            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer()->get_tracker());
+  EXPECT_EQ(tracker,
+            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer()->get_tracker());
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {
@@ -216,25 +247,29 @@ TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
 TEST_F(SciFiEventTestDS, test_add_helicalprtrack) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
-  trk->set_x0(5.0);
+  trk->set_pos0(ThreeVector(1.0, 2.0, 3.0));
   evt->add_helicalprtrack(trk);
   EXPECT_EQ(1u, evt->helicalprtracks().size());
-  EXPECT_EQ(5.0, evt->helicalprtracks()[0]->get_x0());
+  EXPECT_EQ(1.0, evt->helicalprtracks()[0]->get_pos0().x());
 }
 
 TEST_F(SciFiEventTestDS, test_helicalprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
-  trk->set_x0(5.0);
+  trk->set_pos0(ThreeVector(1.0, 2.0, 3.0));
   SciFiHelicalPRTrack* trk2 = new SciFiHelicalPRTrack();
-  trk2->set_x0(10.0);
+  trk2->set_pos0(ThreeVector(-1.0, -2.0, -3.0));
   std::vector<SciFiHelicalPRTrack*> trks;
   trks.push_back(trk);
   trks.push_back(trk2);
   evt->set_helicalprtrack(trks);
   EXPECT_EQ(2u, evt->helicalprtracks().size());
-  EXPECT_EQ(5.0, evt->helicalprtracks()[0]->get_x0());
-  EXPECT_EQ(10.0, evt->helicalprtracks()[1]->get_x0());
+  EXPECT_EQ(1.0, evt->helicalprtracks()[0]->get_pos0().x());
+  EXPECT_EQ(2.0, evt->helicalprtracks()[0]->get_pos0().y());
+  EXPECT_EQ(3.0, evt->helicalprtracks()[0]->get_pos0().z());
+  EXPECT_EQ(-1.0, evt->helicalprtracks()[1]->get_pos0().x());
+  EXPECT_EQ(-2.0, evt->helicalprtracks()[1]->get_pos0().y());
+  EXPECT_EQ(-3.0, evt->helicalprtracks()[1]->get_pos0().z());
 }
 
 } // ~namespace MAUS

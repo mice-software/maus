@@ -20,55 +20,55 @@
 #include "src/common_cpp/Utils/KLChannelMap.hh"
 #include "Config/MiceModule.hh"
 #include "Utils/Exception.hh"
-#include "Utils/JsonWrapper.hh"
+#include "API/PyWrapMapBase.hh"
 
 namespace MAUS {
 
-//////////////////////////////////////////////////////////////////////
-bool MapCppKLMCDigitizer::birth(std::string argJsonConfigDocument) {
-  _classname = "MapCppKLMCDigitizer";
+PyMODINIT_FUNC init_MapCppKLMCDigitizer(void) {
+  PyWrapMapBase<MAUS::MapCppKLMCDigitizer>::PyWrapMapBaseModInit
+                                        ("MapCppKLMCDigitizer", "", "", "", "");
+}
 
+MapCppKLMCDigitizer::MapCppKLMCDigitizer()
+  : MapBase<Json::Value>("MapCppKLMCDigitizer") {
+}
+
+//////////////////////////////////////////////////////////////////////
+void MapCppKLMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // print level
   fDebug = false;
 
-  Json::Reader reader;
 
   // Check if the JSON document can be parsed, else return error only
+  Json::Reader reader;
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to parse Json Configuration",
+                          "MapCppTOFMCDigitizer::_birth");
   }
-
+  std::cerr << "ok got config" << std::endl;
   // get the geometry
-  if (!_configJSON.isMember("reconstruction_geometry_filename"))
+  if (!_configJSON.isMember("simulation_geometry_filename"))
       throw(Exception(Exception::recoverable,
                    "Could not find geometry file",
                    "MapCppKLMCDigitizer::birth"));
+  std::cerr << "ok got geom filename" << std::endl;
   std::string filename;
-  filename = _configJSON["reconstruction_geometry_filename"].asString();
+  filename = _configJSON["simulation_geometry_filename"].asString();
   // get the kl geometry modules
   geo_module = new MiceModule(filename);
   kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");
-
-
-  return true;
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppKLMCDigitizer::death() {
-  return true;
+void MapCppKLMCDigitizer::_death() {
 }
 
 //////////////////////////////////////////////////////////////////////
-std::string MapCppKLMCDigitizer::process(std::string document) {
-
-  Json::FastWriter writer;
-
-  // check sanity of json input file and mc brach
-  if ( !check_sanity_mc(document) ) {
-    // if bad, write error file
-    return writer.write(root);
-  }
+void MapCppKLMCDigitizer::_process(Json::Value* data) const {
+  Json::Value& root = *data;
+  Json::Value mc = check_sanity_mc(root);
 
   // all_kl_digits store all the kl hits
   // then we'll weed out multiple hits, add up yields, and store the event
@@ -82,7 +82,6 @@ std::string MapCppKLMCDigitizer::process(std::string document) {
     Json::Value particle = mc[i];
     if (fDebug) std::cout << "evt: " << i << " particle= " << particle << std::endl;
 
-
     // hits for this event
     Json::Value _hits = particle["kl_hits"];
     // if _hits.size() = 0, the make_digits and fill_kl_evt functions will
@@ -90,7 +89,7 @@ std::string MapCppKLMCDigitizer::process(std::string document) {
     all_kl_digits.clear();
 
     // pick out kl hits, digitize and store
-    all_kl_digits = make_kl_digits(_hits);
+    all_kl_digits = make_kl_digits(_hits, root);
 
 
     // fill kl events
@@ -103,13 +102,11 @@ std::string MapCppKLMCDigitizer::process(std::string document) {
     Json::Value kl_digs = fill_kl_evt(i, all_kl_digits);
     root["recon_events"][i]["kl_event"]["kl_digits"]["kl"]  = kl_digs;
   } // end loop over events
-
-  // write it out
-  return writer.write(root);
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits) {
+std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits,
+                                                             Json::Value& root) const {
   std::vector<Json::Value> kl_digits;
   kl_digits.clear();
 
@@ -242,43 +239,26 @@ std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits) {
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppKLMCDigitizer::check_sanity_mc(std::string document) {
-  // Check if the JSON document can be parsed, else return error only
-  bool parsingSuccessful = reader.parse(document, root);
-  if (!parsingSuccessful) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << reader.getFormatedErrorMessages();
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    return false;
-  }
-
+Json::Value MapCppKLMCDigitizer::check_sanity_mc(const Json::Value& root) const {
   // Check if the JSON document has a 'mc' branch, else return error
   if (!root.isMember("mc_events")) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "I need an MC branch to simulate.";
-    errors["missing_branch"] = ss.str();
-    root["errors"] = errors;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "Missing MC branch from data",
+                          "MapCppKLDigitizer::check_sanity_mc");
   }
 
-  mc = root.get("mc_events", 0);
+  Json::Value mc = root.get("mc_events", 0);
   // Check if JSON document is of the right type, else return error
   if (!mc.isArray()) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says:" << "MC branch isn't an array";
-    errors["bad_type"] = ss.str();
-    root["errors"] = errors;
-    return false;
+    throw MAUS::Exception(Exception::recoverable,
+                          "MC branch isn't an array",
+                          "MapCppKLDigitizer::check_sanity_mc");
   }
-  return true;
+  return mc;
 }
 
 //////////////////////////////////////////////////////////////////////
-int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) {
+int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) const {
   if (fDebug) std::cout << "edep= " << edep << std::endl;
 
   if (!_configJSON.isMember("KLattLengthLong"))
@@ -366,7 +346,7 @@ int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) {
 
 //////////////////////////////////////////////////////////////////////
 Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
-                                             std::vector<Json::Value> all_kl_digits) {
+                                             std::vector<Json::Value> all_kl_digits) const {
   if (!_configJSON.isMember("Do_V1724_Zero_Suppression"))
           throw(Exception(Exception::recoverable,
                 "Could not find Do_V1724_Zero_Suppression",
@@ -408,10 +388,10 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
         } // end check for used
       } // end loop over secondary digits
       // convert light yield to adc & set the charge
-      int adc = static_cast<int> (npe / (_configJSON["KLadcConversionFactor"].asInt()));
+      int adc = static_cast<int>(npe / (_configJSON["KLadcConversionFactor"].asInt()));
 
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
-
+      Json::Value digit(Json::objectValue);
       if (adc > adc_thresh) {
 	digit["charge_pm"] = adc;
 	digit["charge_mm"] = adc;
@@ -437,7 +417,7 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppKLMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) {
+bool MapCppKLMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) const {
   int cell1 = (*hit1)["cell"].asInt();
   int cell2 = (*hit2)["cell"].asInt();
   int pmt1     = (*hit1)["pmt"].asInt();

@@ -19,7 +19,7 @@ Configuration Stage4_NoField
   {
     Position 0. 0. 16155.74 mm
     Rotation 0. 0. 0. degree
-  }
+  } 
   Module TOF/TOF2.dat
   {
     Position 0. 0. 17905.74 mm

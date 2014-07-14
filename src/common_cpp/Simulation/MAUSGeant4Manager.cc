@@ -17,6 +17,9 @@
 
 #include <vector>
 
+#include "Geant4/G4StateManager.hh"
+#include "Geant4/G4ApplicationState.hh"
+
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
@@ -113,7 +116,7 @@ Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
         primary.ReadJson(primary_json);
         GetPrimaryGenerator()->Push(primary);
     }
-    GetRunManager()->BeamOn(particle_array.size());
+    BeamOn(particle_array.size());
     return _eventAct->GetEvents();
 }
 
@@ -143,7 +146,7 @@ Json::Value MAUSGeant4Manager::Tracking
     _eventAct->SetEvents(event_array);
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
     GetField()->Print(Squeak::mout(Squeak::debug));
-    GetRunManager()->BeamOn(1);
+    BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
     return _eventAct->GetEvents()[Json::Value::UInt(0)];
 }
@@ -171,6 +174,16 @@ void MAUSGeant4Manager::SetMiceModules(MiceModule& module) {
     _detector->SetMiceModules(module);
     if (Globals::GetMCFieldConstructor() != NULL)
         SetPhases();
+}
+
+void MAUSGeant4Manager::BeamOn(int number_of_particles) {
+    G4StateManager* stateManager = G4StateManager::GetStateManager();
+    G4ApplicationState currentState = stateManager->GetCurrentState();
+    if (currentState != G4State_PreInit && currentState != G4State_Idle)
+        throw(MAUS::Exception(Exception::recoverable,
+              "Geant4 is not ready to run, aborting run",
+              "MAUSGeant4Manager::BeamOn"));
+    GetRunManager()->BeamOn(number_of_particles);
 }
 }  // namespace MAUS
 

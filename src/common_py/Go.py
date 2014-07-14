@@ -188,23 +188,27 @@ class Go: # pylint: disable=R0921, R0903
         bzr_dir = os.path.expandvars('$MAUS_ROOT_DIR/.bzr/branch/')
         bzr_configuration = 'bzr configuration not found'
         bzr_revision = 'bzr revision not found'
-        bzr_status = 'bzr executable not found'
-        try:
-            bzr_conf_file = open(os.path.join(bzr_dir, 'branch.conf'))
-            bzr_configuration = bzr_conf_file.read()
-        except (OSError, IOError):
-            pass
-        try:
-            bzr_rev_file = open(os.path.join(bzr_dir, 'last-revision'))
-            bzr_revision = bzr_rev_file.read()
-        except (OSError, IOError):
-            pass
-        try:
-            mrd = os.environ["MAUS_ROOT_DIR"]
-            bzr_status = subprocess.check_output(['bzr', 'status', mrd],
+        bzr_status = 'bzr status not found'
+        bzr_source = True
+        if not os.path.isdir(bzr_dir):
+            bzr_source = False 
+        if bzr_source:
+            try:
+                bzr_conf_file = open(os.path.join(bzr_dir, 'branch.conf'))
+                bzr_configuration = bzr_conf_file.read()
+            except (OSError, IOError):
+                pass
+            try:
+                bzr_rev_file = open(os.path.join(bzr_dir, 'last-revision'))
+                bzr_revision = bzr_rev_file.read()
+            except (OSError, IOError):
+                pass
+            try:
+                mrd = os.environ["MAUS_ROOT_DIR"]
+                bzr_status = subprocess.check_output(['bzr', 'status', mrd],
                                                  stderr=subprocess.STDOUT)
-        except (OSError, IOError):
-            pass
+            except (OSError, IOError, subprocess.CalledProcessError):
+                pass
         maus_version = json_datacards["maus_version"]
         return {
             "start_of_job":start_of_job,

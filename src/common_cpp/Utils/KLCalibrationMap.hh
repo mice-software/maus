@@ -69,7 +69,7 @@ class KLCalibrationMap {
   * \returns the value of the gain correction for this channel.
   * If no calibration for this channel the function returns NOCALIB (-99999).
   */
-  double Gain(KLChannelKey key);
+  double Gain(KLChannelKey key) const;
   bool InitializePyMod();
 
   /** Name of the calibration as in the CDB.
@@ -103,7 +103,7 @@ class KLCalibrationMap {
 
   /** Find the position of the PMT key in the data member _Pkey.
   */
-  int FindKLChannelKey(KLChannelKey key);
+  int FindKLChannelKey(KLChannelKey key) const;
 
  /** This vector holds one KLChannelKey for each channel of the detector.
   */

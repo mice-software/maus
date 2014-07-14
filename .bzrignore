@@ -1,3 +1,4 @@
+files/geometry/download/*
 *.gcov
 *.gcda
 *.gcno

@@ -102,7 +102,7 @@ TCanvas* TrackerDataPlotterSZ::operator() ( TrackerData &t1, TrackerData &t2, TC
     t1._trks_sz[i].Draw("same");
     lCanvas->Update();
   }
-  for (size_t i = 0; i < t1._trks_sz.size(); ++i) {
+  for (size_t i = 0; i < t2._trks_sz.size(); ++i) {
     lCanvas->cd(2);
     t2._trks_sz[i].Draw("same");
     lCanvas->Update();

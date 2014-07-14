@@ -77,16 +77,19 @@ double MAUSEvaluator::evaluate(std::string function) {
         py_value = PyObject_CallObject(_evaluate_func, py_arg);
     }
     if (py_value == NULL) {
-        PyErr_Clear();
+        if (PyErr_Occurred())
+            PyErr_Print();
         Py_DECREF(py_arg);
         throw(Exception(Exception::recoverable,
-                   "Failed to evaluate expression \""+function+"\"",
+                   "MAUS failed to evaluate expression \""+function+"\"",
                    "MAUSEvaluator::evaluate"));
     }
 
     // now put transform py_value into C++ double
     double value = 0.;
     if (!PyArg_Parse(py_value, "d", &value)) {
+        if (PyErr_Occurred())
+            PyErr_Print();
         throw(MAUS::Exception(MAUS::Exception::recoverable,
                    "Failed to evaluate expression \""+function+"\"",
                    "MAUSEvaluator::evaluate"));

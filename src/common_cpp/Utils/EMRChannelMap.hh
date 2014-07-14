@@ -114,7 +114,7 @@ class EMRChannelMap {
  * \param[in] daqch DAQ channel to search for.
  * \return The key of the EMR channel connected to the given DAQ channel.
  */
-  EMRChannelKey* find(DAQChannelKey* daqKey);
+  EMRChannelKey* find(DAQChannelKey* daqKey) const;
 
  /** Return pointer to the EMR key.
  * This function returns pointer to the EMR channel key for the required DAQ channel.
