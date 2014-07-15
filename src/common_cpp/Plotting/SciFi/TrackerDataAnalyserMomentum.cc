@@ -89,9 +89,9 @@ TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
   if (_t1_pt_res) delete _t1_pt_res;
   if (_t1_pz_res) delete _t1_pz_res;
   if (_t1_pz_res_log) delete _t1_pz_res_log;
-  if (_t2_pt_res) delete _t1_pt_res;
-  if (_t2_pz_res) delete _t1_pz_res;
-  if (_t2_pz_res_log) delete _t1_pz_res_log;
+  if (_t2_pt_res) delete _t2_pt_res;
+  if (_t2_pz_res) delete _t2_pz_res;
+  if (_t2_pz_res_log) delete _t2_pz_res_log;
   if (_t1_pt_res_pt) delete _t1_pz_res_pt;
   if (_t1_pz_res_pt) delete _t1_pt_res_pt;
   if (_t2_pt_res_pt) delete _t2_pz_res_pt;
@@ -196,9 +196,6 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       _pz_rec = _pt_rec / trk->get_dsdz();
 
       // Calc MC momentum
-      _pt_mc = 0.0;
-      _pz_mc = 0.0;
-
       // Loop over seed spacepoints associated with the track
       std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
       for ( size_t k = 0; k < spnts.size(); ++k ) {

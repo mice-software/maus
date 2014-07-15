@@ -212,6 +212,17 @@ class CADImport: #pylint: disable = R0903, C0103
                                           elem.prop('z')+' '+\
                                           elem.prop('lunit')+'\n')
                         break
+                trd      = datafile.xpathEval("gdml/solids/trd")
+                for elem in trd:
+                    if elem.prop("name") == solid[0].prop('ref'):
+                        result.append('Volume Trapezoid\n')
+                        result.append('TrapezoidWidthX1 '+elem.prop('x1')+'\n')
+                        result.append('TrapezoidWidthX2 '+elem.prop('x2')+'\n')
+                        result.append('TrapezoidHeightY1 '+elem.prop('y1')+'\n')
+                        result.append('TrapezoidHeightY2 '+elem.prop('y2')+'\n')
+                        result.append('TrapezoidLengthZ '+elem.prop('z')+'\n')
+                        break
+                            
                 intersection = datafile.xpathEval("gdml/solids/intersection")
                 for elem in intersection:
                     # if the solid name matches the element name, we leave
@@ -285,7 +296,7 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'TrapezoidWidthX2'\
                            or elemtype == 'TrapezoidHeightY1'\
                            or elemtype == 'TrapezoidHeightY2'\
-                           or elemtype == 'TrapezoidLength'\
+                           or elemtype == 'TrapezoidLengthZ'\
                            or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
