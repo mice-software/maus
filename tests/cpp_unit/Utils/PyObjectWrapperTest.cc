@@ -34,6 +34,8 @@
 #include "src/common_cpp/Utils/PyObjectWrapper.hh"
 
 namespace MAUS {
+// Stupid C++, why can't I do EXPECT_EQ(PyErr_Occurred(), NULL)?
+PyObject* null = NULL;
 // force the compiler to build conversions from all supported types...
 // This does nothing, just checks we can compile the code
 TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
@@ -42,6 +44,7 @@ TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
+  EXPECT_EQ(PyErr_Occurred(), null);
 }
 
 TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
@@ -51,6 +54,7 @@ TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
   Py_DECREF(args);
+  EXPECT_EQ(PyErr_Occurred(), null);
 }
 
 
@@ -81,6 +85,7 @@ void test_unwrap(PyObject* py_data) {
   int run_number =  PyInt_AsLong(py_run_number);
   EXPECT_EQ(run_number, 99);
   Py_DECREF(py_out);
+  EXPECT_EQ(PyErr_Occurred(), null);
 }
 
 TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
@@ -97,21 +102,22 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   Py_DECREF(py_data);
 
   std::cerr << "String " << std::flush;
-  PyObject* py_str = PyObjectWrapper::wrap(&test);
+  PyObject* py_str = PyObjectWrapper::wrap(new std::string(test));
   EXPECT_EQ(py_str->ob_refcnt, 1);
   test_unwrap(py_str);
   Py_DECREF(py_str);
 
   std::cerr << "Json " << std::flush;
-  Json::Value* json_value =
-                    ConverterFactory().convert<std::string, Json::Value>(&test);
+  Json::Value* json_value = ConverterFactory().convert<std::string, Json::Value>
+                                                        (new std::string(test));
   PyObject* py_json = PyObjectWrapper::wrap(json_value);
   EXPECT_EQ(py_json->ob_refcnt, 1);
   test_unwrap(py_json);
   Py_DECREF(py_json);
 
   std::cerr << "PyObject" << std::endl;
-  PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>(&test);
+  PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>
+                                                        (new std::string(test));
   EXPECT_EQ(py_dict->ob_refcnt, 1);
   PyObject* py_run_number = PyDict_GetItemString(py_dict, "run_number");
   int run_number =  PyInt_AsLong(py_run_number);
@@ -122,6 +128,7 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   EXPECT_EQ(py_py_dict, py_dict);  // it was a null op
   test_unwrap(py_dict);
   Py_DECREF(py_dict);
+  EXPECT_EQ(PyErr_Occurred(), null);
 }
 
 TEST(PyObjectWrapperTest, TestDeleteJsonCppPyCapsule) {
@@ -139,6 +146,7 @@ TEST(PyObjectWrapperTest, TestDeleteJsonCppPyCapsule) {
   PyObject* py_okay = PyCapsule_New(void_json, "JsonCpp", NULL);
   PyObjectWrapper::delete_jsoncpp_pycapsule(py_okay);  // and this deletes json
   Py_DECREF(py_okay);
+  EXPECT_EQ(PyErr_Occurred(), null);
 }
 } // namespace MAUS
 

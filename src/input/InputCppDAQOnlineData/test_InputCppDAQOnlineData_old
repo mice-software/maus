@@ -22,7 +22,7 @@ import json
 import md5
 import unittest
 from Configuration import Configuration
-from InputCppDAQOnlineData import InputCppDAQOnlineData
+from _InputCppDAQOnlineData import InputCppDAQOnlineData
 
 class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
     """Tests for InputCppDAQOnlineData"""
@@ -49,21 +49,18 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
     def test_single(self):
         """Test a single event"""
         self.mapper = InputCppDAQOnlineData()
-        self.assertTrue(self.mapper.birth( self._test_configuration ))
-        self.mapper.setMonitorSrc(self.mon)
+        self.mapper.birth( self._test_configuration )
         # Get a single event and check it's the right size
-        self.assertTrue(self.mapper.readNextEvent())
-        data = self.mapper.getCurEvent()
+        data = self.mapper.emitter().next()
         # Data shold be 80 (first event is start of burst)
         self.assertEqual(len(data), 96)
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
         return
 
     def test_multi(self):
         """Test reading the whole file"""
         self.mapper = InputCppDAQOnlineData()
-        self.assertTrue(self.mapper.birth( self._test_configuration ))
-        self.mapper.setMonitorSrc(self.mon)
+        self.mapper.birth( self._test_configuration )
         event_count = 0
 
         # We can try md5'ing the whole dataset
@@ -80,8 +77,7 @@ class InputCppDAQOnlineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # changed checksum to reflect the run_num addition
         self.assertEqual(digester.hexdigest(), \
                          'ca8fb803f65c2ef93327379bee9399d0')
-
-        self.assertTrue(self.mapper.death())
+        self.mapper.death()
 
     @classmethod
     def tearDownClass(self): # pylint: disable = C0103, C0202

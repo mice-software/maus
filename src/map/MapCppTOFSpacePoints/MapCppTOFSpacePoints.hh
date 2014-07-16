@@ -31,41 +31,39 @@
 #include "json/json.h"
 
 #include "Utils/TOFCalibrationMap.hh"
+#include "API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTOFSpacePoints {
+class MapCppTOFSpacePoints : public MapBase<Json::Value> {
 
  public:
+  MapCppTOFSpacePoints();
 
+ private:
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
  *  This takes no arguments and does nothing.
  */
-  bool death();
+  void _death();
 
   /** @brief process JSON document
  *
  *  @param document Receive a document with slab hits and return
  *  a document with space points.
  */
-  std::string process(std::string document);
+  void _process(Json::Value* document) const;
 
  private:
 
-  std::string _classname;
-
   TOFCalibrationMap _map;
-
-  std::vector<int> _xPlane0Hits;
-  std::vector<int> _xPlane1Hits;
 
   double _makeSpacePointCut; // nanoseconds
   double _findTriggerPixelCut; // nanoseconds
@@ -73,24 +71,33 @@ class MapCppTOFSpacePoints {
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
-  std::map<int, std::string> _triggerhit_pixels;
 
   Json::Value fillSpacePoint
-                         (Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1);
-  Json::Value processTOFStation
-        (Json::Value &xSlabHits, std::string detector, unsigned int part_event);
-  std::string findTriggerPixel(Json::Value xDocPartEvent);
+                   (Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1) const;
+  Json::Value processTOFStation(
+                          Json::Value &xSlabHits,
+                          std::string detector,
+                          unsigned int part_event,
+                          std::map<int, std::string>& _triggerhit_pixels) const;
+
+  std::string findTriggerPixel(Json::Value xDocPartEvent,
+                               std::vector<int> xPlane0Hits,
+                               std::vector<int> xPlane1Hits) const;
   bool calibratePmtHit
-                    (TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time);
+              (TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time) const;
   bool calibrateSlabHit
-                   (TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time);
+             (TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time) const;
 
   /** @brief makes space points
    *
    *  @param xDocDetectorData Json document containing slab hits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeSpacePoints(Json::Value &xDocPartEvent);
+  Json::Value makeSpacePoints(
+                          Json::Value &xDocPartEvent,
+                          std::vector<int> xPlane0Hits,
+                          std::vector<int> xPlane1Hits,
+                          std::map<int, std::string>& triggerhit_pixels) const;
   bool _map_init;
 };
 }

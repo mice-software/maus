@@ -12,7 +12,11 @@ Module TrackerSolenoid1_ST
   PropertyString Material Galactic
   PropertyBool Invisible 1
   PropertyInt KalmanSolenoid 1
-  PropertyInt KalmanSolenoidNumber 1
+  Module Tracker/Cryostat1.dat
+  {
+    Position 0.0 0.0 0.0 cm
+    Rotation 0.0 0.0 0.0 degree
+  }
   Module Tracker/Tracker1.dat
   {
     Position 0.0 0.0 416.5 mm

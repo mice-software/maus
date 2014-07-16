@@ -31,7 +31,7 @@ namespace MAUS {
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _emitter_cpp() {
+    virtual int* _emit_cpp() {
       return new int(27);
     }
 
@@ -46,10 +46,10 @@ namespace MAUS {
     MyInputter_maus_exception() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {
+    virtual int* _emit_cpp() {
       throw MAUS::Exception(MAUS::Exception::recoverable,
-                   "Expected Test MAUS::Exception in _emitter_cpp",
-                   "int* _emitter_cpp()");
+                   "Expected Test MAUS::Exception in _emit_cpp",
+                   "int* _emit_cpp()");
     }
   };
 
@@ -58,7 +58,7 @@ namespace MAUS {
     MyInputter_exception() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {
+    virtual int* _emit_cpp() {
       throw std::exception();
     }
   };
@@ -68,7 +68,7 @@ namespace MAUS {
     MyInputter_otherexcept() : MyInputter() {}
 
   private:
-    virtual int* _emitter_cpp() {throw 17;}
+    virtual int* _emit_cpp() {throw 17;}
   };
 
   TEST(InputBaseTest, TestConstructor) {
@@ -115,17 +115,18 @@ namespace MAUS {
   TEST(InputBaseTest, TestEmitter) {
     MyInputter mm;
 
-    int* i = mm.emitter_cpp();
+    int* i = mm.emit_cpp();
 
     ASSERT_TRUE(*i == 27)
-      << "Fail: _emitter_cpp method not called properly"
+      << "Fail: _emit_cpp method not called properly"
       << std::endl;
 
     /////////////////////////////////////////////////////
     MyInputter_maus_exception mm_s;
     try {
-      mm_s.emitter_cpp();
+      mm_s.emit_cpp();
     }
+    catch (NoInputException& e) {}  // A MAUS exception stops the inputter
     catch (...) {
       ASSERT_TRUE(false)
         << "Fail: MAUS::Exception should have been handled"
@@ -135,8 +136,9 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyInputter_exception mm_e;
     try {
-      mm_e.emitter_cpp();
+      mm_e.emit_cpp();
     }
+    catch (NoInputException& e) {}  // A MAUS exception stops the inputter
     catch (...) {
       ASSERT_TRUE(false)
         << "Fail: MAUS::Exception should have been handled"
@@ -146,7 +148,7 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyInputter_otherexcept mm_oe;
     try {
-      mm_oe.emitter_cpp();
+      mm_oe.emit_cpp();
       ASSERT_TRUE(false)
         << "Fail: No exception thrown"
         << std::endl;

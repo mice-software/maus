@@ -119,6 +119,9 @@ namespace SciFiTools {
      */
      std::vector<double> phi_to_s(const double R, const std::vector<double> &phi);
 
+     /** @brief Print the x,y,z coordinates of each spacepoint in vector */
+     void print_spacepoint_xyz(const std::vector<MAUS::SciFiSpacePoint*> &spnts);
+
     /** @brief Create a 2D vector of SciFi spacepoints sorted by tracker station
      *
      *  Take an input vector of spacepoints and output a 2D vector of spacepoints

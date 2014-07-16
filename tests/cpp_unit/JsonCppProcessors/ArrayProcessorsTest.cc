@@ -247,7 +247,7 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     JsonWrapper::Path::SetPath(obj["ref"][1], JsonWrapper::Path::GetPath(*refs));
     ReferenceResolver::CppToJson::RefManager::GetInstance().ResolveReferences(obj);
     std::string ref_paths[] = {"0", "1", "1", "0"};
-    for (size_t i = 0; i < refs->size(); ++i)
+    for (int i = 0; i < Json::Value::ArrayIndex(refs->size()); ++i)
         EXPECT_EQ(obj["ref"][1][i]["$ref"], "#pointers/"+ref_paths[i]);
 
     std::vector<int*>* data_out = pointer_proc.JsonToCpp(*pointers);
@@ -255,7 +255,7 @@ TEST(ArrayProcessorsTest, RefArrayCppToJsonTest) {
     ReferenceResolver::JsonToCpp::RefManager::GetInstance().ResolveReferences();
 
     int ref_data[] = {0, 1, 1, 0};
-    for (size_t i = 0; i < ref_out->size(); ++i)
+    for (int i = 0; i < Json::Value::ArrayIndex(ref_out->size()); ++i)
         EXPECT_EQ((*ref_out)[i], (*data_out)[ref_data[i]]);
     delete refs;
     delete pointers;

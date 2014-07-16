@@ -27,6 +27,19 @@
 #ifndef _SRC_COMMON_CPP_API_INPUTBASE_
 #define _SRC_COMMON_CPP_API_INPUTBASE_
 #include <string>
+
+
+// These ifdefs are required to avoid cpp compiler warning
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
+#include "Python.h"
+
 #include "src/common_cpp/API/IInput.hh"
 #include "src/common_cpp/API/ModuleBase.hh"
 
@@ -56,6 +69,12 @@ namespace MAUS {
     virtual ~InputBase();
 
   public:
+    /** Emits a wrapped object of type T
+     *
+     *  Python owns returned object (Py_INCREF was called)
+     */
+    PyObject* emit_pyobj();
+
     /*!\brief Generate data
      *
      * Implementation of the interface. Wraps the _emitter function
@@ -64,13 +83,7 @@ namespace MAUS {
      *
      * \return The data generated
      */
-    T emitter_cpp();
-
-    /** Python emitter - should be overloaded by SWIG script
-     */
-    T emitter() {
-      throw(std::exception());
-    }
+    T emit_cpp();
 
   private:
     /*!\brief Generate data
@@ -79,7 +92,7 @@ namespace MAUS {
      * derived inputter author to correctly generate the input data.
      * \return The data generated
      */
-    virtual T _emitter_cpp() = 0;
+    virtual T _emit_cpp() = 0;
   };
 
 }// end of namespace

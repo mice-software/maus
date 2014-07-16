@@ -42,7 +42,12 @@ TEST(PIDVarBTestSetUp, TestSetUpAndTearDown) {
 	ASSERT_NO_THROW(delete testPIDVarB);
 
 	EXPECT_EQ(gSystem->Unlink(testfile.c_str()), 0);
-	EXPECT_EQ(gSystem->Unlink(testdir.c_str()), 0);
+        // Unlink dir does not seem to work on some systems
+        // suspect NFS mounts or stale handles
+        // force system removal
+        std::string rmdirCmd = "rm -fr ";
+        rmdirCmd += testdir.c_str();
+	EXPECT_EQ(system(rmdirCmd.c_str()), 0);
 }
 
 class PIDVarBTest : public ::testing::Test {

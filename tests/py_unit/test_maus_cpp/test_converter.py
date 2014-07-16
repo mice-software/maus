@@ -18,6 +18,7 @@ Tests for maus_cpp.converter
 """
 
 import unittest
+import os
 
 import ROOT
 import libMausCpp # pylint: disable=W0611
@@ -44,9 +45,22 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         maus_data = test_data()
         self.assertRaises(ValueError, converter.json_repr, (maus_data, ""))
         json_dict = converter.json_repr(maus_data)
+        json_dict = converter.json_repr(maus_data)
+        converter.json_repr(json_dict)
+        converter.json_repr(json_dict)
         self.assertEqual(json_dict["spill_number"], 999)
         converter.data_repr(maus_data)
         converter.string_repr(maus_data)
+
+    def test_data(self): # pylint: disable = R0201
+        """Regression - memory issue in datastructure #1466"""
+        root_dir = os.environ.get("MAUS_ROOT_DIR")
+        _filename = root_dir+ \
+                   '/tests/py_unit/test_maus_cpp/test_converter_regression.json'
+        _file = open(_filename, 'r')
+        output_3 = converter.data_repr(_file.read())
+        for i in range(2): # pylint: disable = W0612
+            converter.data_repr(output_3)
 
 if __name__ == "__main__":
     unittest.main()

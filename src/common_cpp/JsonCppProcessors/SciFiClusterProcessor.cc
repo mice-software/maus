@@ -19,7 +19,6 @@
 namespace MAUS {
 
 SciFiClusterProcessor::SciFiClusterProcessor() {
-                       // : _scifidigit_array_proc(new SciFiDigitProcessor) {
     RegisterValueBranch("spill", &_int_proc,
                         &SciFiCluster::get_spill,
                         &SciFiCluster::set_spill, true);
@@ -56,12 +55,6 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::is_used,
                         &SciFiCluster::set_used, true);
 
-    RegisterValueBranch("true_position", &_three_vec_proc,
-                        &SciFiCluster::get_true_position,
-                        &SciFiCluster::set_true_position, true);
-    RegisterValueBranch("true_momentum", &_three_vec_proc,
-                        &SciFiCluster::get_true_momentum,
-                        &SciFiCluster::set_true_momentum, true);
     RegisterValueBranch("direction", &_three_vec_proc,
                         &SciFiCluster::get_direction,
                         &SciFiCluster::set_direction, true);
@@ -69,9 +62,9 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::get_position,
                         &SciFiCluster::set_position, true);
 
-    // RegisterValueBranch("digits", &_scifidigit_array_proc,
-    //                    &SciFiCluster::get_digits,
-    //                    &SciFiCluster::set_digits, true);
+    RegisterTRefArray("digits", &_digit_tref_proc,
+                      &SciFiCluster::get_digits,
+                      &SciFiCluster::set_digits, true);
 }
 
 } // ~namespace MAUS

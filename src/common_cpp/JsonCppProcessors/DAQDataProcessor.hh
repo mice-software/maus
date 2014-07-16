@@ -29,6 +29,7 @@
 #include "src/common_cpp/JsonCppProcessors/TriggerRequestProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/UnknownProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/V830Processor.hh"
+#include "src/common_cpp/JsonCppProcessors/TrackerDaqProcessor.hh"
 
 namespace MAUS {
 
@@ -44,6 +45,8 @@ namespace MAUS {
  *  @var _tag_proc_proc Processor for _tag
  *  @var _tof0_proc_proc Processor for _tof0
  *  @var _trigger_proc_proc Processor for _trigger
+ *  @var _tracker0_proc_proc Processor for _tracker0
+ *  @var _tracker1_proc_proc Processor for _tracker1
  */
 
 class DAQDataProcessor : public ObjectProcessor<DAQData> {
@@ -66,6 +69,8 @@ class DAQDataProcessor : public ObjectProcessor<DAQData> {
     PointerArrayProcessor<TOFDaq> _tof0_proc;
     EMRDaqProcessor _emr_proc;
     PointerArrayProcessor<Trigger> _trigger_proc;
+    PointerArrayProcessor<TrackerDaq> _tracker0_proc;
+    PointerArrayProcessor<TrackerDaq> _tracker1_proc;
 };
 }  // namespace MAUS
 

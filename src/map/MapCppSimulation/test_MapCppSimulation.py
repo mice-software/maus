@@ -25,7 +25,9 @@ import os
 import subprocess
 
 import Configuration
-from MapCppSimulation import MapCppSimulation
+import maus_cpp.globals
+import maus_cpp.converter
+from MAUS import MapCppSimulation
 
 class MapCppSimulationTestCase(unittest.TestCase):
     """
@@ -41,7 +43,9 @@ class MapCppSimulationTestCase(unittest.TestCase):
         """
         self.float_tolerance = 1e-9
         self.mapper = MapCppSimulation()
-        success = self.mapper.birth(json.dumps(self.configuration))
+        if not maus_cpp.globals.has_instance():
+            maus_cpp.globals.birth(json.dumps(self.configuration))
+        self.mapper.birth(json.dumps(self.configuration))
         self.particle = {"primary":{
                 "position":{"x":1.,"y":2.,"z":3.},
                 "momentum":{"x":4.,"y":5.,"z":6.},
@@ -52,43 +56,38 @@ class MapCppSimulationTestCase(unittest.TestCase):
                 "time":7.,
                 "statistical_weight":1.
             }}
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
 
     @classmethod
     def tearDownClass(self): # pylint: disable=C0103, C0202
         """
         Check we can call death on the mapper
         """
-        success = self.mapper.death()
-        if not success:
-            raise Exception('DestructFail', 'Could not kill worker')
-        self.mapper = None
+        self.mapper.death()
 
     ######## tests on Process #########
-    def test_birth(self):  # pylint: disable=R0201
+    def _test_birth(self):  # pylint: disable=R0201
         """Check we get an error for bad input to birth"""
         test_mapper = MapCppSimulation()
-        self.assertTrue(test_mapper.birth(json.dumps(self.configuration)))
+        test_mapper.birth(json.dumps(self.configuration))
 
     def test_empty(self):
         """Check mapper runs for empty string, returning an error"""
         result = self.mapper.process("")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertIn("errors", doc)
-        self.assertIn("bad_json_document", doc["errors"])
+        self.assertIn("MapCppSimulation", doc["errors"])
 
     def test_no_mc_branch(self):
         """Check mapper runs for no mc string, returning an error"""
         result = self.mapper.process("{}")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
 
     def test_mc_bad_type(self):
         """Check mapper runs for mc with wrong type, returning an error"""
         result = self.mapper.process("""{"mc_events" : 0.0}""")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertIn("errors", doc)
         self.assertIn("MapCppSimulation", doc["errors"])
 
@@ -101,7 +100,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
             "mc_events":[self.particle,self.particle]
         }
         result = self.mapper.process(json.dumps(good_event))
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertNotIn("errors", doc)
         ev_0 = doc["mc_events"][0]["tracks"][0]
         ev_1 = doc["mc_events"][1]["tracks"][0]
@@ -139,8 +138,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
     configuration = json.loads(Configuration.Configuration().getConfigJSON())
     configuration["verbose_level"] = 2
     configuration["keep_steps"] = True
-    
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -26,6 +26,9 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TRefArray.h"
+
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -45,17 +48,10 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Default constructor */
     SciFiHelicalPRTrack();
 
-    /** Constructor from parameters */
-    SciFiHelicalPRTrack(int tracker, int num_points, int charge, double x0, double y0, double z0,
-                        double phi0, double psi0, double dsdz, double R, double chisq);
-
     /** Constructor from SimpleCircle and SimpleLine */
     SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
-                        double psi0, SimpleCircle circle, SimpleLine line_sz);
-
-    /** Constructor from SimpleHelix */
-    SciFiHelicalPRTrack(int tracker, int num_points, int charge,
-                        ThreeVector pos0, SimpleHelix helix);
+                        SimpleCircle circle, SimpleLine line_sz, double chisq, double chisq_dof,
+                        double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
@@ -65,12 +61,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Assignment operator - any pointers are deep copied */
     SciFiHelicalPRTrack& operator=(const SciFiHelicalPRTrack &_htrk);
-
-    /** Get the vector holding pointers to the spacepoints used by the track */
-    SciFiSpacePointPArray get_spacepoints() const { return _spoints; }
-
-    /** Set the vector holding pointers to the spacepoints used by the track */
-    void set_spacepoints(SciFiSpacePointPArray spoints) { _spoints = spoints; }
 
     /** Get the vector the turning angles of the spacepoints used by the track  */
     DoubleArray get_phi() const { return _phi; }
@@ -96,35 +86,17 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the track charge */
     void set_charge(int charge) { _charge = charge; }
 
-    /** Get the intercept in x of the track with the tracker ref surface */
-    double get_x0() const { return _x0; }
+    /** Get the position of the intercept of the track with the tracker ref surface */
+    ThreeVector get_pos0() const { return _pos0; }
 
-    /** Set the intercept in x of the track with the tracker ref surface */
-    void set_x0(double x0) { _x0 = x0; }
-
-    /** Get the intercept in y of the track with the tracker ref surface */
-    double get_y0() const { return _y0; }
-
-    /** Set the intercept in y of the track with the tracker ref surface */
-    void set_y0(double y0) { _y0 = y0; }
-
-    /** Get the intercept in z of the track with the tracker ref surface */
-    double get_z0() const { return _z0; }
-
-    /** Set the intercept in z of the track with the tracker ref surface */
-    void set_z0(double z0) { _z0 = z0; }
+    /** Set the position of the intercept of the track with the tracker ref surface */
+    void set_pos0(ThreeVector pos0) { _pos0 = pos0; }
 
     /** Get phi0, angle between the helix centre & the rotated frame origin in x-y */
     double get_phi0() const { return _phi0; }
 
     /** Get phi0, angle between the helix centre & the rotated frame origin in x-y */
     void set_phi0(double phi0) { _phi0 = phi0; }
-
-    /** Get psi0 = phi0 + 90 deg */
-    double get_psi0() const { return _psi0; }
-
-    /** Set psi0 = phi0 + 90 deg */
-    void set_psi0(double psi0) { _psi0 = psi0; }
 
     /** Get dsdz, the slope in the s-z plane (s is path length) */
     double get_dsdz() const { return _dsdz; }
@@ -180,6 +152,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the chi^2 per degree of freedom of the final helix fit, if used */
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
 
+    /** Get the point spread (summed separations) in x - y of the seed spacepoints */
+    double get_point_spread() const { return _point_spread; }
+
+    /** Set the point spread (summed separations) in x - y of the seed spacepoints */
+    void set_point_spread(double point_spread) { _point_spread = point_spread; }
+
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
@@ -189,12 +167,8 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     int _charge;
     static const int _type = 1; // 0 for straight, 1 for helical
 
-    double _x0;
-    double _y0;
-    double _z0;
     double _R;
     double _phi0;
-    double _psi0;
     double _dsdz;
     double _line_sz_c;
     double _line_sz_chisq;
@@ -203,9 +177,11 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_chisq;
     double _chisq;
     double _chisq_dof;
+    double _point_spread;
+
+    ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present
 
     DoubleArray _phi;
-    SciFiSpacePointPArray  _spoints;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

@@ -259,6 +259,19 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   aero112->AddElement(elSi, 46.7*perCent);
   aero112->AddElement(elO,  53.3*perCent);
   materials_list->addMaterial( aero112, name );
+  
+  // Freeman RenCast6400-1 Polyurethane used in tracker station construction
+  density = 1.04*g/cm3;
+  name = "RenCast6400";
+  G4Material* renCast6400 = new G4Material(name,density, nComp=5, kStateSolid);
+  G4Element* elN = man->FindOrBuildElement("N");
+  G4Element* elP = man->FindOrBuildElement("P");
+  renCast6400->AddElement(elC, 51.15*perCent);
+  renCast6400->AddElement(elH, 34.95*perCent);
+  renCast6400->AddElement(elO,  7.07*perCent);
+  renCast6400->AddElement(elN,  6.76*perCent);
+  renCast6400->AddElement(elP,  0.07*perCent);
+  materials_list->addMaterial( renCast6400, name );
 
   // Be with PDG properties
   density = 1.848 * g/cm3;//at r.t
@@ -341,7 +354,7 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   density = 1.220 * g/cm3;
   name = "POLYURETHANE";
   G4Material* TufsetPU = new G4Material(name, density, nComp=4, kStateSolid);
-  G4Element* elN = man->FindOrBuildElement("N");
+  // G4Element* elN = man->FindOrBuildElement("N");
   TufsetPU->AddElement(elC, 64.38*perCent);
   TufsetPU->AddElement(elH,  9.01*perCent);
   TufsetPU->AddElement(elN,  6.01*perCent);

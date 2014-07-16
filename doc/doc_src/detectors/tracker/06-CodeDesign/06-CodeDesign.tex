@@ -48,9 +48,21 @@ This reducer displays spacepoints and pattern recognition tracks by tracker, in 
   \label{Fig:SciFiReducerXYZ}
 \end{figure}
 
+\subsubsection{Reducer Backend}
+
+The backend classes for the reducers are held in \verb;src/common_cpp/Plotting/SciFi;.  They consist of a reduced tracker data container class, TrackerData, a series of plotting class based on ROOT, and a manager class TrackerDataManager, used to populate the TrackerData and call the various plotters. The plotters themselves inherit from a base class, TrackerDataPlotterBase.  Each daughter class overloads the bracket operator, taking in arguments of two TrackerData objects, one per tracker, and a ROOT TCanvas, to plot on.  The current types available are:
+
+\begin{itemize}
+ \item \textbf{Info Box}: displays various information on the spill and run in text
+ \item \textbf{Spacepoints}: displays spacepoint positions in $x-y$, $x-z$, and $y-z$
+ \item \textbf{Tracks}: displays pattern recognition tracks in $x-y$, $x-z$, and $y-z$ 
+ \item \textbf{XYZ}: calls Tracks and Spacepoints to display them both together
+  \item \textbf{SZ}: displays pattern recognition tracks in $s-z$ ($s$ being the distance swept out by a particle in the $x-y$ plane)
+\end{itemize}
+
 \subsection{Tracker configuration variables}
 
-\renewcommand{\arraystretch}{1.1}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{| l | l | p{8cm} |}
   \hline                       
   \textbf{Variable} & \textbf{Default}& \textbf{Description}  \\
@@ -80,6 +92,9 @@ This reducer displays spacepoints and pattern recognition tracks by tracker, in 
   SciFiPRHelicalOn & True & Helical pattern recognition flag \\
   SciFiPRStraightOn  & True & Straight pattern recognition flag \\
   SciFiRadiusResCut & 150.0 & Helix radius cut (mm) \\
+  SciFiNTurnsCut & 0.75 & Cut checking turns between stations is correct \\
+  SciFiMaxPt & 180.0 & Transverse momn. upper limit cut used in pat rec \\
+  SciFiMinPz & 180.0 & Longitudinal momn. lower limit cut used in pat rec \\
   SciFiPerChanFlag & 0 & \\
   SciFiNoiseFlag & 1.5 & \\
   SciFiCrossTalkSigma & 50.0 & \\
