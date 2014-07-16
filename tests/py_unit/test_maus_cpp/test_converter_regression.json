@@ -1,0 +1,33 @@
+{
+  "run_number": 0, 
+  "maus_event_type": "Spill", 
+  "recon_events": [], 
+  "spill_number": 0, 
+  "errors": {}, 
+  "daq_event_type": "", 
+  "mc_events": [
+    {
+      "primary": {
+        "random_seed": 0, 
+        "energy": 0.0, 
+        "particle_id": 0, 
+        "time": 0.0, 
+        "position": {
+          "y": 0.0, 
+          "x": 0.0, 
+          "z": 0.0
+        }, 
+        "momentum": {
+          "y": 0.0, 
+          "x": 0.0, 
+          "z": 0.0
+        },
+        "spin": {
+          "y": 0.0, 
+          "x": 0.0, 
+          "z": 0.0
+        } 
+      }
+    }
+  ]
+}

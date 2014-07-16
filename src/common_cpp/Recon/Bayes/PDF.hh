@@ -23,6 +23,7 @@
 
 // C++ headers
 #include <vector>
+#include <iostream>
 #include <string>
 #include "TH1D.h"
 #include "TMath.h"
@@ -53,7 +54,7 @@ class PDF {
 
   double GetRMS()      const { return _probability->GetRMS();  }
 
-  TH1D *probability()  const { return _probability; }
+  TH1D* probability()  const { return _probability; }
 
   std::string name()   const { return _name;        }
 

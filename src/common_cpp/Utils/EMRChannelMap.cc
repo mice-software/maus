@@ -66,7 +66,7 @@ bool EMRChannelMap::InitFromFile(string filename) {
 
 void EMRChannelMap::InitFromCDB() {}
 
-EMRChannelKey* EMRChannelMap::find(DAQChannelKey *daqKey) {
+EMRChannelKey* EMRChannelMap::find(DAQChannelKey *daqKey) const {
     for (unsigned int i = 0;i < _emrKey.size();i++) {
       if ( _dbbKey[i]->eqType()  == daqKey->eqType() &&
            _dbbKey[i]->ldc()     == daqKey->ldc() &&

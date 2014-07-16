@@ -25,6 +25,7 @@ import json
 import maus_cpp.globals
 import Configuration
 import mauscelery.mausprocess
+from framework.workers import WorkerBirthFailedException
 from mauscelery.state import MausConfiguration
 from mauscelery.state import MausTransform
 from mauscelery.mausprocess import worker_process_init_callback
@@ -73,7 +74,8 @@ class ProcessInitialiseTestCase(unittest.TestCase): # pylint: disable=R0904, C03
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         # doesnt initialise globals with configuration {}
-        self.assertRaises(AssertionError, worker_process_init_callback)
+        self.assertRaises(WorkerBirthFailedException,
+                          worker_process_init_callback)
         self.assertFalse(maus_cpp.globals.has_instance())
         self.assertEquals(MapPyTestMap, MausTransform.transform.__class__)
         

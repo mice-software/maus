@@ -37,7 +37,9 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   *
   * This is the constructor for InputCppDAQOfflineData.
   */
-  InputCppDAQOfflineData(std::string pDataPath = "", std::string pFilename = "");
+  InputCppDAQOfflineData();
+
+ private:
 
   /** Initialise the Unpacker.
   *
@@ -45,7 +47,7 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   *
   * \return True if at least one file was opened sucessfully.
   */
-  bool birth(std::string pJSONConfig);
+  void _birth(const std::string& pJSONConfig);
 
   /** Read the next event from the file into memory.
   *
@@ -55,8 +57,6 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   * \return True if an event was read ready for unpacking.
   */
   bool readNextEvent();
-
- private:
 
   /** File manager object. */
   MDfileManager _dataFileManager;

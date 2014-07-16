@@ -54,6 +54,7 @@ class PyWrapMapBase {
   public:
     /* \brief Initialise python module for this class
      *
+     * \param class_name name string for the python class and module.
      * \param class_docstring docstring for the python class.
      * \param birth_docstring docstring for the birth function.
      * \param death_docstring docstring for the death function.
@@ -66,13 +67,17 @@ class PyWrapMapBase {
      * function should be called in a function in the MAUS namespace called
      * init<MapName> e.g.
      * PyMODINIT_FUNC init_MapCppSimulation(void) {
-     *   PyWrapMapBase("", "", "", "");
+     *   PyWrapMapBase("MapCppSimulation", "", "", "", "");
      * }
      * When user calls import MAUS, MAUS looks in the library 
      * build/_MapCppSimulation.so for a function called init_MapCppSimulation
-     * and runs that function to load the python module.
+     * and runs that function to load the python module. The class_name string
+     * must correspond to the .so name, so class_name must be "MapCppSimulation"
+     * in this case.
      */
-    static void PyWrapMapBaseModInit(std::string class_docstring,
+    static void PyWrapMapBaseModInit(
+                  std::string class_name,
+                  std::string class_docstring,
                   std::string birth_docstring,
                   std::string death_docstring,
                   std::string process_docstring);

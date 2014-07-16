@@ -270,7 +270,7 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
         << "]"
       << "},"
       << "{"
-        << "\"id\":6,"
+        << "\"id\":7,"
         << "\"uncertainties\":["
           << "[4.0, 0.0, 0.0, 0.0, 0.0, 0.0],"
           << "[0.0, 1.44e7, 0.0, 0.0, 0.0, 0.0],"

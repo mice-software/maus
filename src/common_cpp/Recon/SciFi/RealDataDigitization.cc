@@ -33,7 +33,7 @@ RealDataDigitization::~RealDataDigitization() {}
 void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
-  // These calls are to be replaced by CDB interface...
+  // These calls are to be replaced by CDB interface.
   bool map = load_mapping("mapping_7.txt");
   bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool bad_channels = load_bad_channels();
@@ -65,15 +65,19 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     if ( tracker_event[i].isMember("VLSB_C") ) {
       Json::Value input_event = tracker_event[i]["VLSB_C"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB_C"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB_C"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_c_size = daq["tracker2"][i]["VLSB_C"].size();
+      for ( int idig = 0; idig < vlsb_c_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB_C"][idig];
       }
       process_VLSB_c(input_event, event, tracker0daq_event, tracker1daq_event);
     } else if ( tracker_event[i].isMember("VLSB") ) {
       Json::Value input_event = tracker_event[i]["VLSB"];
       // Merge tracker events.
-      for ( size_t idig = 0; idig < daq["tracker2"][i]["VLSB"].size(); ++idig ) {
-        input_event[input_event.size()] = daq["tracker2"][i]["VLSB"][idig];
+      int ievent_size = input_event.size();
+      int vlsb_size = daq["tracker2"][i]["VLSB"].size();
+      for ( int idig = 0; idig < vlsb_size; ++idig ) {
+        input_event[ievent_size] = daq["tracker2"][i]["VLSB"][idig];
       }
       process_VLSB(input_event, event, tracker0daq_event, tracker1daq_event);
     } else {
@@ -88,7 +92,7 @@ void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
     revt->SetSciFiEvent(event);
     spill->GetReconEvents()->push_back(revt);
     // delete event;
-  }  // ends loop over events (i)
+  } // ends loop over events (i)
   spill->GetDAQData()->SetTracker0DaqArray(tracker0);
   spill->GetDAQData()->SetTracker1DaqArray(tracker1);
 }
@@ -140,10 +144,10 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
 
     // Get pedestal and gain from calibration.
     // int new_bank = bank + 4*board;
-    double adc_pedestal = calibration_[bank][channel_ro]["adc_pedestal"].asDouble();
-    double adc_gain     = calibration_[bank][channel_ro]["adc_gain"].asDouble();
-    double tdc_pedestal = calibration_[bank][channel_ro]["tdc_pedestal"].asDouble();
-    double tdc_gain     = calibration_[bank][channel_ro]["tdc_gain"].asDouble();
+    double adc_pedestal = _calibration[bank][channel_ro]["adc_pedestal"].asDouble();
+    double adc_gain     = _calibration[bank][channel_ro]["adc_gain"].asDouble();
+    double tdc_pedestal = _calibration[bank][channel_ro]["tdc_pedestal"].asDouble();
+    double tdc_gain     = _calibration[bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
     if ( adc_pedestal > _min && adc_gain > _min ) {
@@ -225,10 +229,10 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
 
     // Get pedestal and gain from calibration.
     int new_bank = bank + 4*board;
-    double adc_pedestal = calibration_[new_bank][channel_ro]["adc_pedestal"].asDouble();
-    double adc_gain     = calibration_[new_bank][channel_ro]["adc_gain"].asDouble();
-    double tdc_pedestal = calibration_[new_bank][channel_ro]["tdc_pedestal"].asDouble();
-    double tdc_gain     = calibration_[new_bank][channel_ro]["tdc_gain"].asDouble();
+    double adc_pedestal = _calibration[new_bank][channel_ro]["adc_pedestal"].asDouble();
+    double adc_gain     = _calibration[new_bank][channel_ro]["adc_gain"].asDouble();
+    double tdc_pedestal = _calibration[new_bank][channel_ro]["tdc_pedestal"].asDouble();
+    double tdc_gain     = _calibration[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
     if ( adc_pedestal > _min && adc_gain > _min ) {
@@ -295,7 +299,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
     channel["adc_gain"]     = adc_gain;
     channel["tdc_pedestal"] = tdc_pedestal;
     channel["tdc_gain"]     = tdc_gain;
-    calibration_[bank][channel_n] = channel;
+    _calibration[bank][channel_n] = channel;
   }
 
   return true;
