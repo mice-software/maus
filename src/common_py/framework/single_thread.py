@@ -16,7 +16,6 @@ Single-threaded dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter

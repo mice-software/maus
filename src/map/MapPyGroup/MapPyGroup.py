@@ -18,7 +18,6 @@ A group of workers which iterates through each worker in turn.
 
 from types import ListType
 import sys
-import gc
 
 import ErrorHandler
 from maus_cpp import converter

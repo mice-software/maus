@@ -67,7 +67,8 @@ PyObject* py_del_data_repr(PyObject* self, PyObject* args) {
     }
     char* c_string = NULL;
     if (!PyArg_Parse(name, "s", &c_string)) {
-        PyErr_SetString(PyExc_TypeError, "Could not resolve object as a ROOT type - Class_Name() should return string");
+        PyErr_SetString(PyExc_TypeError,
+           "Could not resolve object as a ROOT type - Class_Name() should return string");
     }
     if (c_string == NULL || strcmp(c_string, "MAUS::Data") != 0) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve object as a MAUS::Data type");

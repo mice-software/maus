@@ -72,7 +72,6 @@ PyObject* py_wrap_pyobject(PyObject* self, PyObject* args);
  *  not delete the associated C++ object, so we have to do it here.
  */
 PyObject* py_del_data_repr(PyObject* self, PyObject* args);
-
 }
 } // MAUS
 
