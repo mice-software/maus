@@ -127,6 +127,8 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
     }
+    delete data_cpp;
+    data_cpp = NULL;
     try {
         (*_outfile) << fillEvent;
     } catch (...) {

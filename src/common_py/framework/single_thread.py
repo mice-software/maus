@@ -16,6 +16,7 @@ Single-threaded dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
@@ -138,7 +139,12 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
             event = self.transformer.process(event)
-            event = maus_cpp.converter.string_repr(event)
+            old_event = event
+            event = maus_cpp.converter.string_repr(old_event)
+            try:
+                maus_cpp.converter.del_data_repr(old_event)
+            except TypeError:
+                pass
             event = self.merger.process(event)
         self.outputer.save(event)
 
