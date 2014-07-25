@@ -31,7 +31,7 @@ DAQData::DAQData(const DAQData& _daqdata)
 }
 
 DAQData& DAQData::operator=(const DAQData& _daqdata) {
-    using namespace DAQDataHelper;
+    using DAQDataHelper::VectorDeepcopy;
     if (this == &_daqdata) {
         return *this;
     }

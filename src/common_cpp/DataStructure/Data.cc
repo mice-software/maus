@@ -31,7 +31,7 @@ Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
 }
 
 Data::~Data() {
-   if (_spill != NULL) {
+    if (_spill != NULL) {
         delete _spill;
         _spill = NULL;
     }
