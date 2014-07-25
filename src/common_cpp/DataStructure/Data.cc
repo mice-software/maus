@@ -21,6 +21,8 @@
 
 namespace MAUS {
 
+int Data::_reference_count = 0;
+
 Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
 }
 
@@ -29,7 +31,7 @@ Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
 }
 
 Data::~Data() {
-    if (_spill != NULL) {
+   if (_spill != NULL) {
         delete _spill;
         _spill = NULL;
     }
@@ -63,6 +65,18 @@ Spill* Data::GetSpill() const {
 int Data::GetSizeOf() const {
   Data spill;
   return sizeof(spill);
+}
+
+void Data::IncreaseRefCount() {
+    _reference_count++;
+    std::cerr << "CONSTRUCT " << this << " " << _reference_count << std::endl;
+    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+}
+
+void Data::DecreaseRefCount() {
+    _reference_count--;
+    std::cerr << "DESTRUCT " << this << " " << _reference_count << std::endl;
+    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 }
 
