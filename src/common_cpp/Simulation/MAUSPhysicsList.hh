@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "Geant4/G4VUserPhysicsList.hh"
 
@@ -201,7 +202,12 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
      */
     void SetParticleHalfLife(std::string particleName, double halfLife);
 
+    /** Set the production thresholds for a given volume
+     */
+    void SetProductionThresholdByVolume(std::string volumeName,
+                                  std::map<int, double> particleIdToThreshold);
   private:
+    typedef std::map<std::string, std::map<int, double> > ProdMap;
 
     static const std::string _scatNames[];
     static const std::string _eLossNames[];
@@ -217,6 +223,7 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     double      _piHalfLife;
     double      _muHalfLife;
     double      _productionThreshold;
+    ProdMap _fineGrainedProductionThreshold;
 
     static double _defaultChargedPiHalfLife;
     static double _defaultChargedMuHalfLife;

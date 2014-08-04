@@ -31,6 +31,8 @@
 #include "Geant4/G4LogicalVolume.hh"
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4PVPlacement.hh"
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
 // fields and transport
 #include "Geant4/G4ChordFinder.hh"
 #include "Geant4/G4TransportationManager.hh"
@@ -280,6 +282,7 @@ void DetectorConstruction::AddDaughter
       SetUserLimits(logic, mod);
       SetVisAttributes(logic, mod);
       BuildSensitiveDetector(logic, mod);
+      AddToRegion(logic, mod);
   }
 
   for (int i = 0; i < mod->daughters(); ++i)
@@ -355,6 +358,15 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
     else
         Squeak::mout(my_err)  << std::endl;
 }
+
+void DetectorConstruction::AddToRegion(G4LogicalVolume* logic, MiceModule* mod) {
+    if (mod->propertyExistsThis("Region", "string")) {
+        G4Region* region = G4RegionStore::GetInstance()->
+                              FindOrCreateRegion(mod->propertyString("Region"));
+        region->AddRootLogicalVolume(logic);
+    }
+}
+
 
 void DetectorConstruction::SetVisAttributes
                                      (G4LogicalVolume* logic, MiceModule* mod) {

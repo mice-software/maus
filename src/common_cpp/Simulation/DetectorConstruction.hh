@@ -152,6 +152,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
 
   void GeometryCleanup();
 
+  // Add to a G4Region if required
+  void AddToRegion(G4LogicalVolume* logic, MiceModule* mod);
   // Set G4 Stepping Accuracy parameters
   void SetSteppingAccuracy();
   // Set G4 Stepping Algorithm

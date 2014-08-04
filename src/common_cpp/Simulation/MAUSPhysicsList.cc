@@ -23,8 +23,6 @@
 
 #include "json/json.h"
 
-
-
 #include "Geant4/G4ProcessManager.hh"
 #include "Geant4/G4ProcessTable.hh"
 #include "Geant4/G4ProcessVector.hh"
@@ -42,10 +40,15 @@
 #include "Geant4/globals.hh"
 #include "Geant4/G4StepLimiter.hh"
 #include "Geant4/G4UserSpecialCuts.hh"
+#include "Geant4/G4ProductionCuts.hh"
 #include "Geant4/G4UImanager.hh"
 #include "Geant4/G4PhysListFactory.hh"
 
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
+
 #include "Interface/Squeak.hh"
+#include "Interface/STLUtils.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -185,6 +188,12 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
 
   for (size_t i = 0; i < uiCommand.size(); i++) {
     UIApplyCommand(uiCommand[i]);
+  }
+
+  for (ProdMap::iterator it = _fineGrainedProductionThreshold.begin();
+       it != _fineGrainedProductionThreshold.end();
+       ++it) {
+      SetProductionThresholdByVolume(it->first, it->second);
   }
 }
 
@@ -368,12 +377,50 @@ void MAUSPhysicsList::Setup() {
                                           JsonWrapper::realValue).asDouble();
     _productionThreshold = JsonWrapper::GetProperty(dc, "production_threshold",
                                           JsonWrapper::realValue).asDouble();
+    Json::Value jsonFineGrained = JsonWrapper::GetProperty(dc,
+                                          "fine_grained_production_threshold",
+                                          JsonWrapper::objectValue);
+    // loop over json {region1:{pid1:cut1, pid2:cut2}, region2:{...}, ...}
+    std::vector<std::string> names = jsonFineGrained.getMemberNames();
+    for (size_t i = 0; i < names.size(); ++i) {
+        Json::Value jsonCuts = JsonWrapper::GetProperty(
+                              jsonFineGrained,
+                              names[i],
+                              JsonWrapper::objectValue);
+        std::vector<std::string> pidStrings = jsonCuts.getMemberNames();
+        std::map<int, double> cuts;
+        for (size_t j = 0; j < pidStrings.size(); ++j) {
+            int pid = STLUtils::FromString<int>(pidStrings[j]);
+            cuts[pid] = JsonWrapper::GetProperty(jsonCuts,
+                                          pidStrings[j],
+                                          JsonWrapper::realValue).asDouble();
+        }
+        _fineGrainedProductionThreshold[names[i]] = cuts;
+    }
 }
 
 void MAUSPhysicsList::UIApplyCommand(std::string command) {
     Squeak::mout(Squeak::debug)
         << "Apply G4UI command: " << command << std::endl;
     G4UImanager::GetUIpointer()->ApplyCommand(command);
+}
+
+void MAUSPhysicsList::SetProductionThresholdByVolume(
+                                std::string volumeName,
+                                std::map<int, double> particleIdToThreshold) {
+    G4Region* region = G4RegionStore::GetInstance()->GetRegion(volumeName);
+    if (region == NULL) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Failed to find region "+volumeName+" for G4Cuts",
+                              "MAUSPhysicsList::SetProductionThresholdByVolume");
+    }
+    G4ProductionCuts* cuts = new G4ProductionCuts();
+    for (std::map<int, double>::iterator it = particleIdToThreshold.begin();
+         it != particleIdToThreshold.end();
+         ++it) {
+        cuts->SetProductionCut(it->second, it->first);
+    }
+    region->SetProductionCuts(cuts);
 }
 }
 
