@@ -1,0 +1,46 @@
+Configuration config
+{
+    PropertyString Material Galactic
+    Dimensions 10. 10. 10. m
+    MiceModule Threshold
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   1.0 0.0 0.5 m
+        PropertyString Region Threshold
+    }
+    MiceModule Threshold2
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   0.5 0.0 0.5 m
+        PropertyString Region Threshold
+    }
+    MiceModule NoCut
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   0.0 0.0 0.5 m
+        PropertyString Region NoCut
+    }
+    MiceModule NoThreshold
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   -0.5 0.0 0.5 m
+        PropertyString Region NoThreshold
+    }
+    MiceModule NoRegion
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   0.0 0.0 1.0 m
+    }
+}
+
+
