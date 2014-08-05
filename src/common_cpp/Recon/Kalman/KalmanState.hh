@@ -30,7 +30,6 @@
 #include "Utils/Exception.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "CLHEP/Vector/Rotation.h"
 
 namespace MAUS {
 
@@ -103,7 +102,7 @@ class KalmanState {
 
   void Build(SciFiCluster *cluster);
 
-  void MoveToGlobalFrame(ThreeVector tracker_ref_pos, CLHEP::HepRotation tracker_rotation);
+  void MoveToGlobalFrame(ThreeVector tracker_ref_pos);
 
   void set_spill(int spill) { _spill = spill; }
 

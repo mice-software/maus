@@ -120,7 +120,7 @@ void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArr
   int tracker = track->tracker();
   if ( pvalue != pvalue ) return;
   for ( size_t i = 0; i < sites.size(); ++i ) {
-    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker], _Rot[tracker]);
+    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
     SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
     track->add_scifitrackpoint(track_point);
   }

@@ -147,41 +147,24 @@ void KalmanState::Initialise(int dim) {
   _shift_covariance.ResizeTo(3, 3);
 }
 
-void KalmanState::MoveToGlobalFrame(ThreeVector tracker_ref_pos,
-                                    CLHEP::HepRotation tracker_rotation) {
-  ThreeVector pos(_smoothed_a(0, 0), _smoothed_a(2, 0), _z);
-  ThreeVector mom(_smoothed_a(1, 0), _smoothed_a(3, 0), 1.);
-
+void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos) {
+  // Move to the global reference frame. This is a displacement for T1 and
+  // rotation + displacement for T0. The x and z coordinates are flipped in this last
+  // case.
   int sign = 1;
   if ( _id < 0 ) {
     sign = -1;
-    //pos.x() = -pos.x();
-    //pos.z() = -pos.z();
   }
 
-  // pos += ref_pos;
+  ThreeVector pos(sign*_smoothed_a(0, 0), _smoothed_a(2, 0), sign*_z);
+  ThreeVector mom(sign*_smoothed_a(1, 0), _smoothed_a(3, 0), 1.);
 
-  //int sign = 1;
-  //if ( _id < 0 ) sign = -1;
-  // x in global coordinates
-  _smoothed_a(0, 0) = sign*pos.x();
-  // y and z in global coordinates.
+  pos += ref_pos;
+
+  _smoothed_a(0, 0) = pos.x();
+  _smoothed_a(1, 0) = mom.x();
   _smoothed_a(2, 0) = pos.y();
   _z = pos.z();
-  // If tracker 0, px needs a sign flip
-  _smoothed_a(1, 0) = sign*mom.x();
-
-  ThreeVector global_position = tracker_ref_pos + tracker_rotation*pos;
-  ThreeVector global_momentum = tracker_rotation*mom;
-
-  std::cerr << _id << std::endl;
-  std::cerr << pos.x() << " " << pos.y() << " " << pos.z() << std::endl;
-  std::cerr << mom.x() << " " << mom.y() << " " << mom.z() << std::endl;
-
-  std::cerr << global_position.x() << " " << global_position.y() << global_position.z() << std::endl;
-  std::cerr << global_momentum.x() << " " << global_momentum.y() << global_momentum.z() << std::endl;
-
-  std::cerr << "------------------"<<std::endl;
 }
 
 void KalmanState::set_a(TMatrixD a, State kalman_state) {

@@ -216,7 +216,7 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   // Now set up a Helical Pattern Recognition Track
   //
   MAUS::SciFiHelicalPRTrack helical_track;
-  double r     = 10.; // mm
+  double r     = 3.; // mm
   double tan_lambda = 1./200.;
   double dsdz  = 1./tan_lambda;
   // Is this Pi really necessary?
@@ -224,7 +224,8 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   double phi_0 = 0.;
   int charge = -1.;
   double field = -0.004;
-  double pt = charge*0.3*fabs(field)*r;
+  double c  = CLHEP::c_light;
+  double pt = charge*c*fabs(field)*r;
   double pz = pt*tan_lambda;
 
   DoubleArray phi;
@@ -247,9 +248,10 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   //
   EXPECT_EQ(a.GetNrows(), 5);
   EXPECT_NEAR(a(0, 0), x, err);
-  EXPECT_NEAR(a(1, 0), pt*cos(phi_0+PI/2.), err);
+  // allow 2 MeV error due to the removal of PR bias.
+  EXPECT_NEAR(a(1, 0), pt*cos(phi_0+PI/2.), 2);
   EXPECT_NEAR(a(2, 0), y, err);
-  EXPECT_NEAR(a(3, 0), pt*sin(phi_0+PI/2.), err);
+  EXPECT_NEAR(a(3, 0), pt*sin(phi_0+PI/2.), 2);
 }
 
 } // ~namespace MAUS

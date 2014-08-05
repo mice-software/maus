@@ -69,7 +69,7 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
   static const double _Bz = -0.004;
   static const double _tracker0_Bz = -0.0039815;
   static const double _tracker1_Bz = -0.00400066;
-  static const double err = 1.e-3;
+  static const double err = 1.e-4;
 };
 
 TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
@@ -94,8 +94,8 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   double x15  = 98.65861;
   double y15  = -9.12456;
   double z15  = 16472.6;
-  double px15 = 24.22770;
-  double py15 = 44.5266;
+  double px15 = 24.22264;
+  double py15 = 44.54567;
   double pz15 = 212.686;
   // double mx15 = px15/pz15;
   // double my15 = py15/pz15;
