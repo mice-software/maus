@@ -63,8 +63,9 @@ class FineGrainedProductionThresholdTest(unittest.TestCase):
         self.run_simulation()
         self.load_root_file()
 
-    geometries = {1000.0:"Threshold", 500.:"Threshold", 0.0:"NoCut",
-                  -500.:"NoThreshold", -1000.:None, -1500.:"NegativeCut"}
+    geometries = {1500.0:"ThresholdInt", 1000.0:"Threshold", 500.:"Threshold",
+                  0.0:"NoCut", -500.:"NoThreshold", -1000.:None,
+                  -1500.:"NegativeCut"}
 
 if __name__ == "__main__":
     unittest.main()

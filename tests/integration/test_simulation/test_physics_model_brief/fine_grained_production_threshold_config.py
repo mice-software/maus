@@ -35,12 +35,19 @@ production_threshold = 1e12
 fine_grained_production_threshold = {
 # makes electrons, no gammas, default for positrons
 "Threshold":{"default":-1,
-             "-11":0.01,
+             "e+":0.01,
+             "e-":0.01,
+             "gamma":0.01},
+"ThresholdInt":{"default":-1,
              "11":0.01,
+             "-11":0.01,
              "22":0.01},
 # defaults
 "NoThreshold":{},
+# G4 defaults
 "NegativeCut":{"default":-1},
+# Region not defined
+"NoRegion":{"default":-1},
 }
 
 definitions = [{
@@ -57,7 +64,7 @@ definitions = [{
        "longitudinal":{"longitudinal_mode":"pencil",
                    "momentum_variable":"p",},
        "coupling":{"coupling_mode":"none"}
-} for x_position in [1000.0, 500., 0.0, -500., -1000., -1500.]]
+} for x_position in [1500.0, 1000.0, 500., 0.0, -500., -1000., -1500.]]
 
 beam = {
     "particle_generator":"counter",

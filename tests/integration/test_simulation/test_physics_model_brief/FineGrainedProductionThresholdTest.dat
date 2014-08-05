@@ -2,6 +2,14 @@ Configuration config
 {
     PropertyString Material Galactic
     Dimensions 10. 10. 10. m
+    MiceModule ThresholdInt
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   1.5 0.0 0.5 m
+        PropertyString Region ThresholdInt
+    }
     MiceModule Threshold
     {
         PropertyString Volume Box
