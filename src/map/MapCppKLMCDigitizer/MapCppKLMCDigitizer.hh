@@ -55,7 +55,7 @@ class MapCppKLMCDigitizer : public MapBase<Json::Value> {
 
   void _process(Json::Value* document) const;
 
-  double calculate_nphe_at_pmt(double dist, double edep) const;
+  int calculate_nphe_at_pmt(double dist, double edep) const;
 
   Json::Value check_sanity_mc(const Json::Value& document) const;
 
@@ -65,9 +65,6 @@ class MapCppKLMCDigitizer : public MapBase<Json::Value> {
                            std::vector<Json::Value> _alldigits) const;
 
   bool check_param(Json::Value* hit1, Json::Value* hit2) const;
-
-  // Calculates the time of the calorimeter trigger.
-  double calcTriggerTime(Json::Value hits) const;
 
  private:
   MiceModule* geo_module;

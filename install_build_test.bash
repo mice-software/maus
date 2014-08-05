@@ -44,27 +44,8 @@ if [ $? != 0 ]; then
     echo "FATAL: Exiting. Install cmake and try again"
     exit 1
 fi
-
-# Loop over command line arguments
-for i in "$@"
-do
-case $i in
-    -l=*|--third_party=*)
-    MAUS_THIRD_PARTY="${i#*=}"
-    shift
-    ;;
-    -j=*)
-    PROC_NUM="${i#*=}"
-    shift
-    ;;
-    -l=*|--lib=*)
-    LIBPATH="${i#*=}"
-    shift
-    ;;
-esac
-done
-
-if [ -n "$MAUS_THIRD_PARTY" ]; then
+if [ "$1" ]; then
+    MAUS_THIRD_PARTY=$1
     echo "Your MAUS_THIRD_PARTY is:"
     echo ${MAUS_THIRD_PARTY}
     echo
@@ -78,29 +59,23 @@ else
     echo
 fi
 
-if [ -n "$PROC_NUM" ]; then
-    echo "Number of processors to use for build:"
-    echo ${PROC_NUM}
-    echo
-fi
-
 uname -a 2>>$FILE_STD 1>>$FILE_STD 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-	./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD 
-	echo "Sourcing the environment..."
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
-	echo "Installing field maps in MAUS_ROOT_DIR..."
-	./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
+    ./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD
+    echo "Sourcing the environment..."
+    source env.sh 2>>$FILE_STD 1>>$FILE_STD
+    echo "Installing field maps in MAUS_ROOT_DIR..."
+    ./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
 else
-	echo "The other loop"
-	./configure 2>>$FILE_STD 1>>$FILE_STD
-	echo "Sourcing the environment..."
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD 
-	echo "Building third party libraries (takes a while...)"
-	./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
-	echo "Resource the environment (catches the new ROOT version)"
-	source env.sh 2>>$FILE_STD 1>>$FILE_STD
+    echo "The other loop"
+    ./configure 2>>$FILE_STD 1>>$FILE_STD
+    echo "Sourcing the environment..."
+    source env.sh 2>>$FILE_STD 1>>$FILE_STD
+    echo "Building third party libraries (takes a while...)"
+    ./third_party/build_all.bash 2>>$FILE_STD 1>>$FILE_STD
+    echo "Resource the environment (catches the new ROOT version)"
+    source env.sh 2>>$FILE_STD 1>>$FILE_STD
         #./third_party/bash third_party/bash/29expat.bash
         #./third_party/bash third_party/bash/32clhep2.1.1.0.bash
         #./third_party/bash third_party/bash/35geant4.9.6.bash
@@ -111,7 +86,7 @@ echo "Cleaning the MAUS build state"
 scons -c 2>>$FILE_STD 1>>$FILE_STD
 
 echo "Building MAUS"
-(scons build -j8 || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
+(scons build || (echo "FAIL! See logs.x" && exit 1))  2>>$FILE_STD 1>>$FILE_STD
 if [ $? != 0 ]; then
     cat $FILE_STD
     echo "FAIL Failed to make MAUS using scons. Fatal error - aborting"

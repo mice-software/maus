@@ -58,8 +58,8 @@ class KLChannelKey {
   explicit KLChannelKey(string keyStr) throw(Exception);
   virtual ~KLChannelKey() {}
 
-  bool operator==( KLChannelKey key );
-  bool operator!=( KLChannelKey key );
+  bool operator==( KLChannelKey key ) const;
+  bool operator!=( KLChannelKey key ) const;
 
   /** Return true only if the given KL channel is connected 
   * to the the opposit side of the cell.

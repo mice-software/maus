@@ -418,15 +418,15 @@ TOFscintLightSpeed =  170.0 # mm/ns
 KLconversionFactor = 0.000125 # MeV
 KLlightCollectionEff = 0.031
 KLlightGuideEff  = 0.85
-KLquantumEff = 0.18
+KLquantumEff = 0.26
 KLlightSpeed =  170.0 # mm/ns
 KLattLengthLong  = 2400.0 # mm
 KLattLengthShort =  200.0 # mm
 KLattLengthLongNorm  = 0.655 # mm
 KLattLengthShortNorm   = 0.345 # mm
-KLhardCodedTrigger = True
-KLsamplingTimeStart = 0.0 # ns
-KLadcConversionFactor = 0.125
+KLadcConversionFactor = 250000 # nphe/adc
+KLpmtGain = 2000000
+KLpmtSigmaGain = 1000000
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -457,7 +457,16 @@ Enable_triggerDelay_correction = True
 Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
+# this sets the source for the calibrations
+# by default it is from file
+# set it to 'file' if you want to load local files
+# if you set file, then uncomment the calib files below
+KL_calib_source = "file"
 KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+KL_calibration_file = "/files/calibration/klcalib.txt"
+
+KL_calib_date_from = 'current'
+Enable_klgain_correction = True
 
 # this is used by the reconstuction of the EMR detectors
 EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
