@@ -27,6 +27,7 @@
 class G4VModularPhysicsList;
 class G4StepLimiter;
 class G4UserSpecialCuts;
+class G4Region;
 
 namespace MAUS {
 
@@ -204,10 +205,12 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
 
     /** Set the production thresholds for a given volume
      */
-    void SetProductionThresholdByVolume(std::string volumeName,
-                                  std::map<int, double> particleIdToThreshold);
+    void SetProductionThresholdByVolume(
+                          std::string volumeName,
+                          double defaultProductionThreshold,
+                          std::map<std::string, double> particleIdToThreshold);
   private:
-    typedef std::map<std::string, std::map<int, double> > ProdMap;
+    typedef std::map<std::string, std::map<std::string, double> > ProdMap;
 
     static const std::string _scatNames[];
     static const std::string _eLossNames[];
@@ -231,6 +234,7 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     G4VModularPhysicsList* _list;
     std::vector<G4StepLimiter*> _limits;
     std::vector<G4UserSpecialCuts*> _specialCuts;
+    std::vector<std::string> _regions;
 };
 }
 

@@ -39,7 +39,15 @@ Configuration config
         PropertyString Volume Box
         PropertyString Material Pb
         PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
-        PropertyHep3Vector Position   0.0 0.0 1.0 m
+        PropertyHep3Vector Position   -1.0 0.0 0.5 m
+    }
+    MiceModule NegativeCut
+    {
+        PropertyString Volume Box
+        PropertyString Material Pb
+        PropertyHep3Vector Dimensions 0.1 0.1 0.01 m
+        PropertyHep3Vector Position   -1.5 0.0 0.5 m
+        PropertyString Region NegativeCut
     }
 }
 

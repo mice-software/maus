@@ -226,6 +226,8 @@ void DetectorConstruction::ResetGeometry() {
           _rootLogicalVolume->RemoveDaughter(vol);
       }
   }
+  // clear the regions list except G4 default region
+  _regions = std::vector<std::string>(1, "DefaultRegionForTheWorld");
 
   // now change the rootBox dimensions (and LV name)
   G4Box* rootBox = reinterpret_cast<G4Box*>(_rootLogicalVolume->GetSolid());
@@ -361,8 +363,20 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
 
 void DetectorConstruction::AddToRegion(G4LogicalVolume* logic, MiceModule* mod) {
     if (mod->propertyExistsThis("Region", "string")) {
-        G4Region* region = G4RegionStore::GetInstance()->
-                              FindOrCreateRegion(mod->propertyString("Region"));
+        std::string name = mod->propertyString("Region");
+        G4RegionStore* store = G4RegionStore::GetInstance();
+        // make a new region if required; should register itself in the
+        // G4RegionStore
+        if (store->GetRegion(name) == NULL) {
+            new G4Region(name);
+            _regions.push_back(name);
+        }
+        G4Region* region = store->GetRegion(name);
+        if (region == NULL) {  // just to cross check that G4 is doing its job
+            throw MAUS::Exception(Exception::recoverable,
+                                  "Failed to make region",
+                                  "DetectorConstruction::AddToRegion");
+        }
         region->AddRootLogicalVolume(logic);
     }
 }

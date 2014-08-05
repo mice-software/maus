@@ -53,6 +53,8 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
+#include "src/common_cpp/Simulation/DetectorConstruction.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 namespace MAUS {
 
@@ -158,8 +160,7 @@ void MAUSPhysicsList::SetDecay(bool decay) {
 
 
 void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
-  double       cutDouble = _productionThreshold;
-  std::stringstream cutStream;
+  double cutDouble = _productionThreshold;
   std::string  elossActive = "activate";
   std::string  flucActive  = "true";
   switch (eLossModel) {
@@ -179,9 +180,7 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
       cutDouble   = 1e12*mm;
       break;
   }
-  cutStream << cutDouble;
   std::vector<std::string> uiCommand;
-  uiCommand.push_back("/run/setCut "+cutStream.str());
   uiCommand.push_back("/process/eLoss/fluct "+flucActive);
   for (int i = 0; i < _nELossNames; i++)
     uiCommand.push_back("/process/"+elossActive+" "+_eLossNames[i]);
@@ -190,10 +189,16 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
     UIApplyCommand(uiCommand[i]);
   }
 
-  for (ProdMap::iterator it = _fineGrainedProductionThreshold.begin();
-       it != _fineGrainedProductionThreshold.end();
-       ++it) {
-      SetProductionThresholdByVolume(it->first, it->second);
+  // set by volume
+  MAUSGeant4Manager* g4man = MAUSGeant4Manager::GetInstance();
+  std::vector<std::string> regions = g4man->GetGeometry()->GetRegions();
+  for (size_t i = 0; i < regions.size(); ++i) {
+      std::map<std::string, double> thresholds;
+      if (_fineGrainedProductionThreshold.find(regions[i]) !=
+                                        _fineGrainedProductionThreshold.end()) {
+          thresholds = _fineGrainedProductionThreshold[regions[i]];
+      }
+      SetProductionThresholdByVolume(regions[i], cutDouble, thresholds);
   }
 }
 
@@ -388,10 +393,9 @@ void MAUSPhysicsList::Setup() {
                               names[i],
                               JsonWrapper::objectValue);
         std::vector<std::string> pidStrings = jsonCuts.getMemberNames();
-        std::map<int, double> cuts;
+        std::map<std::string, double> cuts;
         for (size_t j = 0; j < pidStrings.size(); ++j) {
-            int pid = STLUtils::FromString<int>(pidStrings[j]);
-            cuts[pid] = JsonWrapper::GetProperty(jsonCuts,
+            cuts[pidStrings[j]] = JsonWrapper::GetProperty(jsonCuts,
                                           pidStrings[j],
                                           JsonWrapper::realValue).asDouble();
         }
@@ -406,8 +410,9 @@ void MAUSPhysicsList::UIApplyCommand(std::string command) {
 }
 
 void MAUSPhysicsList::SetProductionThresholdByVolume(
-                                std::string volumeName,
-                                std::map<int, double> particleIdToThreshold) {
+                          std::string volumeName,
+                          double defaultProductionThreshold,
+                          std::map<std::string, double> particleIdToThreshold) {
     G4Region* region = G4RegionStore::GetInstance()->GetRegion(volumeName);
     if (region == NULL) {
         throw MAUS::Exception(Exception::recoverable,
@@ -415,10 +420,31 @@ void MAUSPhysicsList::SetProductionThresholdByVolume(
                               "MAUSPhysicsList::SetProductionThresholdByVolume");
     }
     G4ProductionCuts* cuts = new G4ProductionCuts();
-    for (std::map<int, double>::iterator it = particleIdToThreshold.begin();
-         it != particleIdToThreshold.end();
-         ++it) {
-        cuts->SetProductionCut(it->second, it->first);
+    Squeak::mout(Squeak::debug) << "Cuts for Volume " << volumeName << std::endl;
+    G4ParticleTable* ptable = G4ParticleTable::GetParticleTable();
+    if (particleIdToThreshold.find("default") != particleIdToThreshold.end()) {
+        defaultProductionThreshold = particleIdToThreshold["default"];
+    }
+
+    for (int i = 0; i < ptable->size(); ++i) {
+        int pid = ptable->GetParticle(i)->GetPDGEncoding();
+        std::string nameString = ptable->GetParticle(i)->GetParticleName();
+        std::string pidString = STLUtils::ToString(pid);
+        double cut = 0.;
+        if (particleIdToThreshold.find(pidString) != particleIdToThreshold.end()) {
+            cut = particleIdToThreshold[pidString];
+        } else if (particleIdToThreshold.find(nameString) != particleIdToThreshold.end()) {
+            cut = particleIdToThreshold[nameString];
+        } else {
+            cut = defaultProductionThreshold;
+        }
+        if (cut > 0.) {
+            Squeak::mout(Squeak::debug) << "    " << pid << " " << cut << std::endl;
+            cuts->SetProductionCut(cut, pid);
+        } else {
+            Squeak::mout(Squeak::debug) << "    " << pid
+                                        << " -ve so not set" << std::endl;
+        }
     }
     region->SetProductionCuts(cuts);
 }
