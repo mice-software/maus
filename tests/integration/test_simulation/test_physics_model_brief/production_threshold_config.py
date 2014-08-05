@@ -18,16 +18,18 @@ Configuration to generate a beam distribution with binomial distribution in
 the spill and various distributions for difference particle types
 """
 
+#pylint: disable = C0103
+
 import os
 
 output_root_file_name = os.path.expandvars(
-            "${MAUS_ROOT_DIR}/tmp/test_fine_grained_production_threshold.root"
+            "${MAUS_ROOT_DIR}/tmp/test_production_threshold.root"
 )
 physics_processes = "standard"
 spill_generator_number_of_spills = 1
 simulation_geometry_filename = os.path.expandvars("${MAUS_ROOT_DIR}/tests/"+\
       "integration/test_simulation/test_physics_model_brief/"+\
-      "FineGrainedProductionThresholdTest.dat")
+      "ProductionThresholdTest.dat")
 
 keep_steps = True
 verbose_level = 0
