@@ -16,8 +16,6 @@
  */
 
 #include "src/common_cpp/Recon/Kalman/KalmanPropagator.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Utils/Constants.hh"
 
 // TODO: add straggling to propagation. (optional)
 
@@ -53,6 +51,9 @@ void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
   const KalmanState *old_site = sites.at(i-1);
 
   // Calculate prediction for the state vector.
+  // This will also compute F. For straight tracks, F is computed
+  // first and then the extrapolation is Fa.
+  // For the helical case, a is calculated first and then F.
   CalculatePredictedState(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
@@ -125,8 +126,8 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
   TMatrixD a_old(_n_parameters, 1);
   a_old = new_site->a(KalmanState::Projected);
   double kappa = a_old(4, 0);
-  double px    = a_old(1, 0)/kappa;
-  double py    = a_old(3, 0)/kappa;
+  double px    = a_old(1, 0);
+  double py    = a_old(3, 0);
   double pz = 1./fabs(kappa);
   int sign = static_cast<int> (kappa/fabs(kappa));
   ThreeVector old_momentum(px, py, pz);
@@ -147,8 +148,8 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
   // Update momentum estimate at the site.
   TMatrixD a_subtracted(_n_parameters, 1);
   a_subtracted = new_site->a(KalmanState::Projected);
-  a_subtracted(1, 0) = new_momentum.x()/new_momentum.z();
-  a_subtracted(3, 0) = new_momentum.y()/new_momentum.z();
+  a_subtracted(1, 0) = new_momentum.x();
+  a_subtracted(3, 0) = new_momentum.y();
   a_subtracted(4, 0) = sign/new_momentum.z();
   new_site->set_a(a_subtracted, KalmanState::Projected);
 }
@@ -159,18 +160,12 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   double plane_width = FibreParameters.Plane_Width;
   int numb_planes = abs(new_site->id() - old_site->id());
   double total_plane_length = numb_planes*plane_width;
-  // Plane lenght in units of radiation lenght (~0.0015 per plane).
-  double effective_plane_lenght = 1.*total_plane_length;
-  double plane_L0 = FibreParameters.R0(effective_plane_lenght);
-  // Get particle's parameters (gradients and total momentum).
-  TMatrixD a = new_site->a(KalmanState::Projected);
-  double mx  = a(1, 0);
-  double my  = a(3, 0);
-  double p   = GetTrackMomentum(old_site);
+
+  double plane_L0 = FibreParameters.R0(total_plane_length);
 
   // Compute the fibre effect.
   TMatrixD Q1(_n_parameters, _n_parameters);
-  Q1 = BuildQ(plane_L0, effective_plane_lenght, mx, my, p);
+  Q1 = BuildQ(old_site, new_site, plane_L0, total_plane_length);
 
   // Compute Air effect (if necessary).
   TMatrixD Q2(_n_parameters, _n_parameters);
@@ -179,75 +174,12 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
   if ( deltaZ > 3.*plane_width ) {
     double air_lenght = deltaZ-total_plane_length;
     double air_L0     = AirParameters.R0(air_lenght);
-    Q2 = BuildQ(air_L0, air_lenght, mx, my, p);
+    Q2 = BuildQ(old_site, new_site, air_L0, air_lenght);
   }
-  // Q2.Zero();
   _Q = Q1+Q2;
 }
 
-TMatrixD KalmanPropagator::BuildQ(double L0,
-                                  double deltaZ,
-                                  double mx,
-                                  double my,
-                                  double p) {
-  double deltaZ_squared = deltaZ*deltaZ;
 
-  double muon_mass = Recon::Constants::MuonMass;
-  double muon_mass2 = muon_mass*muon_mass;
-  double E = TMath::Sqrt(muon_mass2+p*p);
-  double beta = p/E;
-
-  double C = HighlandFormula(L0, beta, p);
-
-  double C2 = C*C;
-
-  double c_mx_mx = C2 * (1. + mx*mx) *
-                        (1.+ mx*mx + my*my);
-
-  double c_my_my = C2 * (1. + my*my) *
-                        (1.+ mx*mx + my*my);
-
-  double c_mx_my = C2 * mx*my * (1.+ mx*mx + my*my);
-
-  TMatrixD Q(_n_parameters, _n_parameters);
-  // x x
-  Q(0, 0) = deltaZ_squared*c_mx_mx;
-  // x mx
-  Q(0, 1) = -deltaZ*c_mx_mx;
-  // x y
-  Q(0, 2) = deltaZ_squared*c_mx_my;
-  // x my
-  Q(0, 3) = -deltaZ*c_mx_my;
-
-  // mx x
-  Q(1, 0) = -deltaZ*c_mx_mx;
-  // mx mx
-  Q(1, 1) = c_mx_mx;
-  // mx y
-  Q(1, 2) = -deltaZ*c_mx_my;
-  // mx my
-  Q(1, 3) = c_mx_my;
-
-  // y x
-  Q(2, 0) = deltaZ_squared*c_mx_my;
-  // y mx
-  Q(2, 1) = -deltaZ*c_mx_my;
-  // y y
-  Q(2, 2) = deltaZ_squared*c_my_my;
-  // y my
-  Q(2, 3) = -deltaZ*c_my_my;
-
-  // my x
-  Q(3, 0) = -deltaZ*c_mx_my;
-  // my mx
-  Q(3, 1) = c_mx_my;
-  // my y
-  Q(3, 2) = -deltaZ*c_my_my;
-  // my my
-  Q(3, 3) = c_my_my;
-
-  return Q;
-}
 
 double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   double HighlandConstant = Recon::Constants::HighlandConstant;
@@ -258,7 +190,7 @@ double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
   return result;
 }
 
-////////////////
+// At the last site, the filtered values are also the smoothed values.
 void KalmanPropagator::PrepareForSmoothing(KalmanStatesPArray sites) {
   KalmanState *last_site = sites.back();
   TMatrixD a_smooth = last_site->a(KalmanState::Filtered);
@@ -267,14 +199,15 @@ void KalmanPropagator::PrepareForSmoothing(KalmanStatesPArray sites) {
   TMatrixD C_smooth = last_site->covariance_matrix(KalmanState::Filtered);
   last_site->set_covariance_matrix(C_smooth, KalmanState::Smoothed);
 
-  TMatrixD residual(2, 1);
+  // TMatrixD residual(2, 1);
+  TMatrixD residual(1, 1);
   residual = last_site->residual(KalmanState::Filtered);
   last_site->set_residual(residual, KalmanState::Smoothed);
   last_site->set_current_state(KalmanState::Smoothed);
 
   // Set smoothed chi2.
-  double f_chi2 = last_site->chi2(KalmanState::Filtered);
-  last_site->set_chi2(f_chi2, KalmanState::Smoothed);
+  double chi2 = last_site->chi2();
+  last_site->set_chi2(chi2);
 }
 
 void KalmanPropagator::Smooth(KalmanStatesPArray sites, int id) {

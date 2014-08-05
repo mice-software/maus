@@ -22,55 +22,43 @@ namespace MAUS {
 KalmanState::KalmanState(): _current_state(Initialized),
                           _z(0.),
                           _id(-1),
-                          _f_chi2(0.),
-                          _s_chi2(0.),
+                          _chi2(0.),
                           _cluster(NULL),
-                          _direction(ThreeVector()),
-                          _mc_pos(ThreeVector()),
-                          _mc_mom(ThreeVector()) {}
+                          _direction(ThreeVector()) {}
 
 KalmanState::~KalmanState() {}
 
 KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
                                                 _z(0.),
                                                 _id(-1),
-                                                _f_chi2(0.),
-                                                _s_chi2(0.),
+                                                _chi2(0.),
                                                 _cluster(NULL),
-                                                _direction(ThreeVector()),
-                                                _mc_pos(ThreeVector()),
-                                                _mc_mom(ThreeVector()) {
+                                                _direction(ThreeVector()) {
   int dim = site.a(KalmanState::Projected).GetNrows();
   Initialise(dim);
 
   _z = site.z();
   _id= site.id();
-  _f_chi2 = site.chi2(KalmanState::Filtered);
-  _s_chi2 = site.chi2(KalmanState::Smoothed);
+  _chi2 = site.chi2();
   _cluster = site.cluster();
   _direction = site.direction();
-  _mc_pos = site.true_position();
-  _mc_mom = site.true_momentum();
 
   _projected_a = site.a(KalmanState::Projected);
   _a           = site.a(KalmanState::Filtered);
   _smoothed_a  = site.a(KalmanState::Smoothed);
-  _a_excluded  = site.a(KalmanState::Excluded);
 
   _projected_C = site.covariance_matrix(KalmanState::Projected);
   _C           = site.covariance_matrix(KalmanState::Filtered);
   _smoothed_C  = site.covariance_matrix(KalmanState::Smoothed);
-  _C_excluded  = site.covariance_matrix(KalmanState::Excluded);
 
   _v = site.measurement();
 
   _pull                 = site.residual(KalmanState::Projected);
   _residual             = site.residual(KalmanState::Filtered);
   _smoothed_residual    = site.residual(KalmanState::Smoothed);
-  _excluded_residual    = site.residual(KalmanState::Excluded);
+
   _covariance_residual          = site.covariance_residual(KalmanState::Filtered);
   _covariance_smoothed_residual = site.covariance_residual(KalmanState::Smoothed);
-  _covariance_excluded_residual = site.covariance_residual(KalmanState::Excluded);
 
   _input_shift = site.input_shift();
   _input_shift_covariance = site.input_shift_covariance();
@@ -90,32 +78,25 @@ KalmanState& KalmanState::operator=(const KalmanState &rhs) {
 
   _z  = rhs.z();
   _id = rhs.id();
-  _f_chi2 = rhs.chi2(KalmanState::Filtered);
-  _s_chi2 = rhs.chi2(KalmanState::Smoothed);
+  _chi2 = rhs.chi2();
   _cluster = rhs.cluster();
   _direction = rhs.direction();
-  _mc_pos = rhs.true_position();
-  _mc_mom = rhs.true_momentum();
 
   _projected_a = rhs.a(KalmanState::Projected);
   _a           = rhs.a(KalmanState::Filtered);
   _smoothed_a  = rhs.a(KalmanState::Smoothed);
-  _a_excluded  = rhs.a(KalmanState::Excluded);
 
   _projected_C = rhs.covariance_matrix(KalmanState::Projected);
   _C           = rhs.covariance_matrix(KalmanState::Filtered);
   _smoothed_C  = rhs.covariance_matrix(KalmanState::Smoothed);
-  _C_excluded  = rhs.covariance_matrix(KalmanState::Excluded);
 
   _v = rhs.measurement();
 
   _pull                 = rhs.residual(KalmanState::Projected);
   _residual             = rhs.residual(KalmanState::Filtered);
   _smoothed_residual    = rhs.residual(KalmanState::Smoothed);
-  _excluded_residual    = rhs.residual(KalmanState::Excluded);
   _covariance_residual          = rhs.covariance_residual(KalmanState::Filtered);
   _covariance_smoothed_residual = rhs.covariance_residual(KalmanState::Smoothed);
-  _covariance_excluded_residual = rhs.covariance_residual(KalmanState::Excluded);
 
   _input_shift = rhs.input_shift();
   _input_shift_covariance = rhs.input_shift_covariance();
@@ -134,26 +115,30 @@ void KalmanState::Initialise(int dim) {
 
   _a.          ResizeTo(dim, 1);
   _smoothed_a. ResizeTo(dim, 1);
-  _a_excluded. ResizeTo(dim, 1);
 
   // The covariance matrix.
   _projected_C.ResizeTo(dim, dim);
   _C.          ResizeTo(dim, dim);
   _smoothed_C. ResizeTo(dim, dim);
-  _C_excluded. ResizeTo(dim, dim);
 
   // The measurement.
-  _v.          ResizeTo(2, 1);
+  // _v.          ResizeTo(2, 1);
+  _v.          ResizeTo(1, 1);
 
   // The residuals.
+  /*
   _pull.                ResizeTo(2, 1);
   _residual.            ResizeTo(2, 1);
   _smoothed_residual.   ResizeTo(2, 1);
-  _excluded_residual.   ResizeTo(2, 1);
-
   _covariance_residual.ResizeTo(2, 2);
   _covariance_smoothed_residual.ResizeTo(2, 2);
-  _covariance_excluded_residual.ResizeTo(2, 2);
+  */
+  _pull.                ResizeTo(1, 1);
+  _residual.            ResizeTo(1, 1);
+  _smoothed_residual.   ResizeTo(1, 1);
+  _covariance_residual.ResizeTo(1, 1);
+  _covariance_smoothed_residual.ResizeTo(1, 1);
+
   // The misalignments.
   _input_shift.ResizeTo(3, 1);
   _input_shift_covariance.ResizeTo(3, 3);
@@ -162,18 +147,41 @@ void KalmanState::Initialise(int dim) {
   _shift_covariance.ResizeTo(3, 3);
 }
 
-void KalmanState::MoveToGlobalFrame(ThreeVector ref_pos) {
+void KalmanState::MoveToGlobalFrame(ThreeVector tracker_ref_pos,
+                                    CLHEP::HepRotation tracker_rotation) {
   ThreeVector pos(_smoothed_a(0, 0), _smoothed_a(2, 0), _z);
   ThreeVector mom(_smoothed_a(1, 0), _smoothed_a(3, 0), 1.);
 
-  pos += ref_pos;
-
   int sign = 1;
-  if ( _id < 0 ) sign = -1;
+  if ( _id < 0 ) {
+    sign = -1;
+    //pos.x() = -pos.x();
+    //pos.z() = -pos.z();
+  }
+
+  // pos += ref_pos;
+
+  //int sign = 1;
+  //if ( _id < 0 ) sign = -1;
+  // x in global coordinates
   _smoothed_a(0, 0) = sign*pos.x();
-  _smoothed_a(1, 0) = sign*mom.x();
+  // y and z in global coordinates.
   _smoothed_a(2, 0) = pos.y();
   _z = pos.z();
+  // If tracker 0, px needs a sign flip
+  _smoothed_a(1, 0) = sign*mom.x();
+
+  ThreeVector global_position = tracker_ref_pos + tracker_rotation*pos;
+  ThreeVector global_momentum = tracker_rotation*mom;
+
+  std::cerr << _id << std::endl;
+  std::cerr << pos.x() << " " << pos.y() << " " << pos.z() << std::endl;
+  std::cerr << mom.x() << " " << mom.y() << " " << mom.z() << std::endl;
+
+  std::cerr << global_position.x() << " " << global_position.y() << global_position.z() << std::endl;
+  std::cerr << global_momentum.x() << " " << global_momentum.y() << global_momentum.z() << std::endl;
+
+  std::cerr << "------------------"<<std::endl;
 }
 
 void KalmanState::set_a(TMatrixD a, State kalman_state) {
@@ -186,9 +194,6 @@ void KalmanState::set_a(TMatrixD a, State kalman_state) {
       break;
     case(Smoothed) :
       _smoothed_a = a;
-      break;
-    case(Excluded) :
-      _a_excluded = a;
       break;
     default :
       throw(Exception(Exception::recoverable,
@@ -208,9 +213,6 @@ TMatrixD KalmanState::a(State desired_state) const {
     case(Smoothed) :
       return _smoothed_a;
       break;
-    case(Excluded) :
-      return _a_excluded;
-      break;
     default :
       throw(Exception(Exception::recoverable,
             "Bad request.",
@@ -228,9 +230,6 @@ void KalmanState::set_covariance_matrix(TMatrixD C, State kalman_state) {
       break;
     case(Smoothed) :
       _smoothed_C = C;
-      break;
-    case(Excluded) :
-      _C_excluded = C;
       break;
     default :
       throw(Exception(Exception::recoverable,
@@ -250,10 +249,6 @@ TMatrixD KalmanState::covariance_matrix(State desired_state) const {
     case(Smoothed) :
       return _smoothed_C;
       break;
-    case(Excluded) :
-      return _smoothed_C;
-      // add this.
-      break;
     default :
       throw(Exception(Exception::recoverable,
             "Bad request.",
@@ -271,9 +266,6 @@ void KalmanState::set_residual(TMatrixD residual, State kalman_state) {
       break;
     case(Smoothed) :
       _smoothed_residual = residual;
-      break;
-    case(Excluded) :
-      _excluded_residual = residual;
       break;
     default :
       throw(Exception(Exception::recoverable,
@@ -293,9 +285,6 @@ TMatrixD KalmanState::residual(State desired_state) const {
     case(Smoothed) :
       return _smoothed_residual;
       break;
-    case(Excluded) :
-      return _excluded_residual;
-      break;
     default :
       throw(Exception(Exception::recoverable,
             "Bad request.",
@@ -310,9 +299,6 @@ void KalmanState::set_covariance_residual(TMatrixD C, State kalman_state) {
       break;
     case(Smoothed) :
       _covariance_smoothed_residual = C;
-      break;
-    case(Excluded) :
-      _covariance_excluded_residual = C;
       break;
     default :
       throw(Exception(Exception::recoverable,
@@ -329,45 +315,10 @@ TMatrixD KalmanState::covariance_residual(State st) const {
     case(Smoothed) :
       return _covariance_smoothed_residual;
       break;
-    case(Excluded) :
-      return _covariance_excluded_residual;
-      break;
     default :
       throw(Exception(Exception::recoverable,
             "Bad request.",
             "KalmanState::get_covariance_matrix"));
-  }
-}
-
-void KalmanState::set_chi2(double chi2, State kalman_state) {
-  switch ( kalman_state ) {
-    case(Filtered) :
-      _f_chi2 = chi2;
-      break;
-    case(Smoothed) :
-      _s_chi2 = chi2;
-      break;
-    case(Excluded) :
-      break;
-    default :
-      throw(Exception(Exception::recoverable,
-            "Bad request.",
-            "KalmanState::set_chi2"));
-  }
-}
-
-double KalmanState::chi2(State desired_state) const {
-  switch ( desired_state ) {
-    case(Filtered) :
-      return _f_chi2;
-      break;
-    case(Smoothed) :
-      return _s_chi2;
-      break;
-    default :
-      throw(Exception(Exception::recoverable,
-            "Bad request.",
-            "KalmanState::get_chi2"));
   }
 }
 

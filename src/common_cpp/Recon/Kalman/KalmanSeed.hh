@@ -29,6 +29,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "Interface/Squeak.hh"
@@ -105,7 +106,7 @@ class KalmanSeed {
 
   void SetKalmanStates(KalmanStatesPArray sites) { _kalman_sites = sites; }
 
-  void SetField(double bz) { _Bz = bz; }
+  void SetField(double bz) { _Bz = fabs(bz); }
 
   double GetField() const { return _Bz; }
 
@@ -132,7 +133,7 @@ class KalmanSeed {
    */
   double _seed_cov;
 
-  double _plane_width;
+  double _pos_resolution;
 
   SciFiGeometryMap _geometry_map;
 
@@ -170,6 +171,7 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
   BuildKalmanStates();
 }
+
 } // ~namespace MAUS
 
 #endif

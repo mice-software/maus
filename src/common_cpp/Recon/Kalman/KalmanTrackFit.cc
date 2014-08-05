@@ -76,7 +76,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
       _propagator->Smooth(sites, k);
       _filter->UpdateH(sites.at(k));
-      _filter->SetResidual(sites.at(k), KalmanState::Smoothed);
+      _filter->ComputeResidual(sites.at(k), KalmanState::Smoothed);
     }
 
     track->set_tracker(seed->tracker());
@@ -97,8 +97,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
 }
 
 void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
-  double f_chi2 = 0.;
-  double s_chi2 = 0.;
+  double chi2 = 0.;
   // Find the ndf for this track: numb measurements - numb parameters to be estimated
   size_t n_sites = sites.size();
   // Find n_parameters by looking at the dimension of the state vector.
@@ -108,13 +107,11 @@ void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
 
   for ( size_t i = 0; i < n_sites; ++i ) {
     KalmanState *site = sites.at(i);
-    f_chi2 += site->chi2(KalmanState::Filtered);
-    s_chi2 += site->chi2(KalmanState::Smoothed);
+    chi2 += site->chi2();
   }
-  double P_value = TMath::Prob(f_chi2, ndf);
-  track->set_f_chi2(f_chi2);
-  track->set_s_chi2(s_chi2);
+  track->set_chi2(chi2);
   track->set_ndf(ndf);
+  double P_value = TMath::Prob(chi2, ndf);
   track->set_P_value(P_value);
 }
 
@@ -123,7 +120,7 @@ void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArr
   int tracker = track->tracker();
   if ( pvalue != pvalue ) return;
   for ( size_t i = 0; i < sites.size(); ++i ) {
-    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
+    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker], _Rot[tracker]);
     SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
     track->add_scifitrackpoint(track_point);
   }
@@ -135,7 +132,11 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanState* site = sites.at(i);
-    Squeak::mout(Squeak::info)
+    double res0 = (site->residual(KalmanState::Projected))(0, 0);
+    double res1 = (site->residual(KalmanState::Filtered))(0, 0);
+    double res2 = (site->residual(KalmanState::Smoothed))(0, 0);
+    // Squeak::mout(Squeak::info)
+    std::cerr
     << "=========================================="  << "\n"
     << "SITE ID: " << site->id() << "\n"
     << "SITE Z: " << site->z()   << "\n"
@@ -144,18 +145,17 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
                       << (site->a(KalmanState::Projected))(1, 0) << " "
                       << (site->a(KalmanState::Projected))(2, 0) << " "
                       << (site->a(KalmanState::Projected))(3, 0) << " "
-                      << (site->a(KalmanState::Projected))(4, 0) << "\n"
     << "Filtered: " << (site->a(KalmanState::Filtered))(0, 0) << " "
                       << (site->a(KalmanState::Filtered))(1, 0) << " "
                       << (site->a(KalmanState::Filtered))(2, 0) << " "
-                      << (site->a(KalmanState::Filtered))(3, 0) << " "
-                      << (site->a(KalmanState::Filtered))(4, 0) << "\n"
+                      << (site->a(KalmanState::Filtered))(3, 0) << "\n"
     << "================Residuals================"   << "\n"
     << (site->residual(KalmanState::Projected))(0, 0)  << "\n"
     << (site->residual(KalmanState::Filtered))(0, 0)   << "\n"
     << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
     << "=========================================="
     << std::endl;
+    std::cerr << res0 << " " << res1 << " " << res2 << std::endl;
   }
 }
 

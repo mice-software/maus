@@ -37,6 +37,9 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/Constants.hh"
+
 namespace MAUS {
 
 class KalmanPropagator {
@@ -106,11 +109,8 @@ class KalmanPropagator {
    */
   virtual double GetTrackMomentum(const KalmanState *a_site) = 0;
 
-  TMatrixD BuildQ(double L0,
-                  double deltaZ,
-                  double mx,
-                  double my,
-                  double p);
+  virtual TMatrixD BuildQ(const KalmanState *old_site, const KalmanState *new_site,
+                          double L0, double w) = 0;
 
  protected:
   bool _use_MCS;

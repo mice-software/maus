@@ -71,6 +71,8 @@ class KalmanHelicalPropagator : public KalmanPropagator {
    */
   double GetTrackMomentum(const KalmanState *a_site);
 
+  TMatrixD BuildQ(const KalmanState *old_site, const KalmanState *new_site, double L0, double w);
+
  private:
   double _Bz;
 };

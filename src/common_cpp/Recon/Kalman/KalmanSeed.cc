@@ -38,8 +38,8 @@ KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
                                               _n_parameters(-1),
                                               _particle_charge(1) {
   Json::Value *json = Globals::GetConfigurationCards();
-  _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
-  _plane_width = (*json)["SciFiParams_Plane_Width"].asDouble();
+  _seed_cov       = (*json)["SciFiSeedCovariance"].asDouble();
+  _pos_resolution = (*json)["SciFi_sigma_triplet"].asDouble();
 }
 
 KalmanSeed::~KalmanSeed() {}
@@ -126,25 +126,14 @@ void KalmanSeed::BuildKalmanStates() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  C(0, 0) = _plane_width*_plane_width/12.;
-  C(2, 2) = _plane_width*_plane_width/12.;
+  // C(0, 0) = _pos_resolution*_pos_resolution/12.;
+  // C(2, 2) = _pos_resolution*_pos_resolution/12.;
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
-
-  for ( size_t j = 0; j < numb_sites; ++j ) {
-    ThreeVector true_position = _clusters[j]->get_true_position();
-    ThreeVector true_momentum = _clusters[j]->get_true_momentum();
-    _kalman_sites[j]->set_true_position(true_position);
-    _kalman_sites[j]->set_true_momentum(true_momentum);
-  }
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  double x, y, z;
-  x = spacepoints.front()->get_position().x();
-  y = spacepoints.front()->get_position().y();
-  z = spacepoints.front()->get_position().z();
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
@@ -152,29 +141,39 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   // Charge guess should come from PR.
   int _particle_charge = seed->get_charge();
 
-  double pt = -_particle_charge*c*_Bz*r;
+  double pt = _particle_charge*c*_Bz*r;
 
-  double dsdz  = seed->get_dsdz();
-  double tan_lambda = 1./dsdz;
+  double dsdz  = fabs(seed->get_dsdz());
 
-  double pz = pt*tan_lambda;
+  double pz = fabs(pt/dsdz);
 
-  double kappa = _particle_charge*fabs(1./pz);
-  double phi_0 = seed->get_phi0();
+  double x, y, z;
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
 
+  double phi_0;
   if ( _tracker == 0 ) {
     phi_0 = seed->get_phi().back();
+  } else {
+    phi_0 = seed->get_phi().front();
   }
+
   double phi = phi_0 + TMath::PiOver2();
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
+  // Remove PR momentum bias.
+  ThreeVector mom(px, py, pz);
+  double reduction_factor = (mom.mag()-1.4)/mom.mag();
+  ThreeVector new_momentum = mom*reduction_factor;
+
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = px*fabs(kappa);
+  a(1, 0) = new_momentum.x();
   a(2, 0) = y;
-  a(3, 0) = py*fabs(kappa);
-  a(4, 0) = kappa;
+  a(3, 0) = new_momentum.y();
+  a(4, 0) = _particle_charge/new_momentum.z();
 
   return a;
 }

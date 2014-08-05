@@ -26,7 +26,6 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _charge(0),
                                               _R(-1.0),
                                               _phi0(-1.0),
-                                              _psi0(-1.0),
                                               _dsdz(-1.0),
                                               _line_sz_c(-1.0),
                                               _line_sz_chisq(-1.0),
@@ -35,21 +34,21 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _circle_chisq(-1.0),
                                               _chisq(-1.0),
                                               _chisq_dof(-1.0),
+                                              _point_spread(-1.0),
                                               _pos0(-1.0, -1.0, -1.0),
                                               _phi(0) {
   _spoints = new TRefArray();
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
-                                         double phi0, double psi0, SimpleCircle circle,
-                                         SimpleLine line_sz, double chisq, double chisq_dof,
+                                         double phi0, SimpleCircle circle, SimpleLine line_sz,
+                                         double chisq, double chisq_dof, double point_spread,
                                          DoubleArray phi, SciFiSpacePointPArray spoints) {
   _tracker = tracker;
   _num_points = num_points;
   _charge = charge;
   _R  = circle.get_R();
   _phi0 = phi0;
-  _psi0 = psi0;
   _dsdz = line_sz.get_m();
   _line_sz_c = line_sz.get_c();
   _line_sz_chisq = line_sz.get_chisq();
@@ -58,6 +57,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
   _circle_chisq = circle.get_chisq();
   _chisq = chisq;
   _chisq_dof = chisq_dof;
+  _point_spread = point_spread;
   _pos0 = pos0;
   _spoints = new TRefArray();
   for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
@@ -78,7 +78,6 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   }
   _R = htrk.get_R();
   _phi0 = htrk.get_phi0();
-  _psi0 = htrk.get_psi0();
   _dsdz = htrk.get_dsdz();
   _line_sz_c = htrk.get_line_sz_c();
   _line_sz_chisq = htrk.get_line_sz_chisq();
@@ -90,6 +89,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _num_points = htrk.get_num_points();
   _charge = htrk.get_charge();
   _tracker = htrk.get_tracker();
+  _point_spread = htrk.get_point_spread();
   _pos0 = htrk.get_pos0();
   if (_spoints) delete _spoints;
   _spoints = new TRefArray(*(htrk.get_spacepoints()));
@@ -103,7 +103,6 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _charge(htrk.get_charge()),
     _R(htrk.get_R()),
     _phi0(htrk.get_phi0()),
-    _psi0(htrk.get_psi0()),
     _dsdz(htrk.get_dsdz()),
     _line_sz_c(htrk.get_line_sz_c()),
     _line_sz_chisq(htrk.get_line_sz_chisq()),
@@ -112,6 +111,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _circle_chisq(htrk.get_circle_chisq()),
     _chisq(htrk.get_chisq()),
     _chisq_dof(htrk.get_chisq_dof()),
+    _point_spread(htrk.get_point_spread()),
     _pos0(htrk.get_pos0()),
     _phi(htrk.get_phi()) {
 

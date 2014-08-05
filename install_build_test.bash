@@ -44,8 +44,27 @@ if [ $? != 0 ]; then
     echo "FATAL: Exiting. Install cmake and try again"
     exit 1
 fi
-if [ "$1" ]; then
-    MAUS_THIRD_PARTY=$1
+
+# Loop over command line arguments
+for i in "$@"
+do
+case $i in
+    -l=*|--third_party=*)
+    MAUS_THIRD_PARTY="${i#*=}"
+    shift
+    ;;
+    -j=*)
+    PROC_NUM="${i#*=}"
+    shift
+    ;;
+    -l=*|--lib=*)
+    LIBPATH="${i#*=}"
+    shift
+    ;;
+esac
+done
+
+if [ -n "$MAUS_THIRD_PARTY" ]; then
     echo "Your MAUS_THIRD_PARTY is:"
     echo ${MAUS_THIRD_PARTY}
     echo
@@ -56,6 +75,12 @@ elif [ "${maus_third_party}" ]; then
     echo
 else
     echo "No MAUS_THIRD_PARTY set, installing third party libraries locally"
+    echo
+fi
+
+if [ -n "$PROC_NUM" ]; then
+    echo "Number of processors to use for build:"
+    echo ${PROC_NUM}
     echo
 fi
 

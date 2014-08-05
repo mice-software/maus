@@ -55,12 +55,6 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::is_used,
                         &SciFiCluster::set_used, true);
 
-    RegisterValueBranch("true_position", &_three_vec_proc,
-                        &SciFiCluster::get_true_position,
-                        &SciFiCluster::set_true_position, true);
-    RegisterValueBranch("true_momentum", &_three_vec_proc,
-                        &SciFiCluster::get_true_momentum,
-                        &SciFiCluster::set_true_momentum, true);
     RegisterValueBranch("direction", &_three_vec_proc,
                         &SciFiCluster::get_direction,
                         &SciFiCluster::set_direction, true);
