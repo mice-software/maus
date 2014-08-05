@@ -181,6 +181,8 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
       break;
   }
   std::vector<std::string> uiCommand;
+  if (eLossModel != energyStraggling)
+    uiCommand.push_back("/run/setCut "+STLUtils::ToString(cutDouble));
   uiCommand.push_back("/process/eLoss/fluct "+flucActive);
   for (int i = 0; i < _nELossNames; i++)
     uiCommand.push_back("/process/"+elossActive+" "+_eLossNames[i]);
