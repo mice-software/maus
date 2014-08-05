@@ -201,6 +201,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   // we never visualise the root LV
   _rootVisAtts = new G4VisAttributes(false);
   _rootLogicalVolume->SetVisAttributes(_rootVisAtts);
+  G4RegionStore* regionStore = G4RegionStore::GetInstance();
+  G4Region* rootRegion = regionStore->FindOrCreateRegion("DefaultRegionForTheWorld");
+  rootRegion->AddRootLogicalVolume(_rootLogicalVolume);
   return _rootPhysicalVolume;
 }
 

@@ -192,7 +192,7 @@ void MAUSPhysicsList::SetEnergyLoss(eloss eLossModel) {
   // set by volume
   MAUSGeant4Manager* g4man = MAUSGeant4Manager::GetInstance();
   std::vector<std::string> regions = g4man->GetGeometry()->GetRegions();
-  for (size_t i = 0; i < regions.size(); ++i) {
+  for (size_t i = 0; i < regions.size() && eLossModel == energyStraggling; ++i) {
       std::map<std::string, double> thresholds;
       if (_fineGrainedProductionThreshold.find(regions[i]) !=
                                         _fineGrainedProductionThreshold.end()) {
