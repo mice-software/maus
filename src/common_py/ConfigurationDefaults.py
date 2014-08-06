@@ -123,7 +123,6 @@ fine_grained_production_threshold = { # set the production threshold per pid and
 # "region_name":{"11":0.5, "-11":100.}
 # "another_region_name":{"11":0.5, "-11":100.}
 }
-kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,
