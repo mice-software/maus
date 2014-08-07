@@ -25,7 +25,8 @@ class ProductionThresholdTest(unittest.TestCase):
         Run the simulation
         """
         print "Running simulation"
-        log = os.path.expandvars("${MAUS_ROOT_DIR}/tmp/test_prod_threshold.log")
+        log = os.path.expandvars(
+                          "${MAUS_ROOT_DIR}/tmp/test_production_threshold.log")
         lout = open(log, "w")
         sim = os.path.expandvars("${MAUS_ROOT_DIR}/bin/simulate_mice.py")
         config =  os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/"+\
@@ -69,18 +70,27 @@ class ProductionThresholdTest(unittest.TestCase):
                     self.assertTrue(22 not in pids) 
                     self.assertTrue(11 in pids)
                     self.assertTrue(-13 in pids)
-                if region == "NoThreshold" or region == "NoCut" or \
+                elif region == "NoThreshold" or region == "NoCut" or \
                    region == None:
                     # production_threshold cut is too high for e+-
                     # production
                     self.assertTrue(22 not in pids)
                     self.assertTrue(11 not in pids)
                     self.assertTrue(-13 in pids)
-                if region == "NegativeCut":
+                elif region == "NegativeCut":
                     # G4 defaults do produce gammas
                     self.assertTrue(22 in pids)
                     self.assertTrue(11 in pids)
                     self.assertTrue(-13 in pids)
+                elif region == "KL1":
+                    self.assertTrue(22 not in pids)
+                    self.assertTrue(11 not in pids)
+                    self.assertTrue(-13 in pids)
+                elif region == "KL2":
+                    self.assertTrue(22 in pids)
+                    self.assertTrue(11 in pids)
+                    self.assertTrue(-13 in pids)
+
 
     def test_production_threshold(self):
         """
@@ -89,7 +99,8 @@ class ProductionThresholdTest(unittest.TestCase):
         self.run_simulation()
         self.load_root_file()
 
-    geometries = {1500.0:"ThresholdInt", 1000.0:"Threshold", 500.:"Threshold",
+    geometries = {3500.0:"KL1", 2500.0:"KL2",
+                  1500.0:"ThresholdInt", 1000.0:"Threshold", 500.:"Threshold",
                   0.0:"NoCut", -500.:"NoThreshold", -1000.:None,
                   -1500.:"NegativeCut"}
 

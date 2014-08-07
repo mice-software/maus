@@ -50,6 +50,8 @@ fine_grained_production_threshold = {
 "NegativeCut":{"default":-1},
 # Region not defined
 "NoRegion":{"default":-1},
+"KL1":{"default":1e12},
+"KL2":{"default":-1},
 }
 
 definitions = [{
@@ -66,7 +68,8 @@ definitions = [{
        "longitudinal":{"longitudinal_mode":"pencil",
                    "momentum_variable":"p",},
        "coupling":{"coupling_mode":"none"}
-} for x_position in [1500.0, 1000.0, 500., 0.0, -500., -1000., -1500.]]
+} for x_position in [3500.0, 2500.0, 1500.0, 1000.0, 500.,
+                     0.0, -500., -1000., -1500.]]
 
 beam = {
     "particle_generator":"counter",
