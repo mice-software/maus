@@ -29,7 +29,11 @@ KalmanSeed::KalmanSeed() : _Bz(0.),
                            _straight(false),
                            _helical(false),
                            _n_parameters(-1),
-                           _particle_charge(1) {}
+                           _particle_charge(1),
+  //                         _n_kalman_sites(28) {
+  //I
+ // _kalman_sites
+}
 
 KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
                                               _geometry_map(map),
@@ -126,8 +130,8 @@ void KalmanSeed::BuildKalmanStates() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  // C(0, 0) = _pos_resolution*_pos_resolution/12.;
-  // C(2, 2) = _pos_resolution*_pos_resolution/12.;
+  // C(0, 0) = 10.;
+  // C(2, 2) = 10.;
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
 }
@@ -164,16 +168,16 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double py  = pt*sin(phi);
 
   // Remove PR momentum bias.
-  ThreeVector mom(px, py, pz);
-  double reduction_factor = (mom.mag()-1.4)/mom.mag();
-  ThreeVector new_momentum = mom*reduction_factor;
+  // ThreeVector mom(px, py, pz);
+  // double reduction_factor = (mom.mag()-1.4)/mom.mag();
+  // ThreeVector new_momentum = mom*reduction_factor;
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = new_momentum.x();
+  a(1, 0) = px; // new_momentum.x();
   a(2, 0) = y;
-  a(3, 0) = new_momentum.y();
-  a(4, 0) = _particle_charge/new_momentum.z();
+  a(3, 0) = py; // new_momentum.y();
+  a(4, 0) = _particle_charge/pz; // _particle_charge/new_momentum.z();
 
   return a;
 }

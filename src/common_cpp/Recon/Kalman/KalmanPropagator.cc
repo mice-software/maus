@@ -134,7 +134,9 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
   //
   // Compute the correction using Bethe Bloch's formula.
   double plane_width = FibreParameters.Plane_Width;
-  double Delta_p = BetheBlochStoppingPower(old_momentum.mag())*plane_width;
+  // The number of planes crossed
+  int n_planes = abs(new_site->id() - old_site->id());
+  double Delta_p = BetheBlochStoppingPower(old_momentum.mag())*plane_width*n_planes;
   //
   // Reduce/increase momentum vector accordingly.
   // Indeed, for tracker 0, we want to ADD energy
@@ -176,6 +178,7 @@ void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
     double air_L0     = AirParameters.R0(air_lenght);
     Q2 = BuildQ(old_site, new_site, air_L0, air_lenght);
   }
+  Q2.Zero();
   _Q = Q1+Q2;
 }
 

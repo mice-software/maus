@@ -150,6 +150,8 @@ class KalmanSeed {
   int _n_parameters;
 
   int _particle_charge;
+
+  //bool _contains_measurement;
 };
 
 template <class PRTrack>

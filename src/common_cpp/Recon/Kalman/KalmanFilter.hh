@@ -86,6 +86,8 @@ class KalmanFilter {
  private:
   int _n_parameters;
 
+  int _measurement_dim;
+
   TMatrixD _V;
 
   TMatrixD _H;

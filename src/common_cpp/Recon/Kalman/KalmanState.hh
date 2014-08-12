@@ -138,6 +138,7 @@ class KalmanState {
                                 { _shift_covariance = shift_covariance; }
 
   void set_measurement(double alpha)           { _v(0, 0) = alpha; }
+//                                                 _v(1, 0) = 0.;}
 
   void set_direction(ThreeVector dir)          { _direction = dir; }
 

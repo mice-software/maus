@@ -122,7 +122,7 @@ void KalmanState::Initialise(int dim) {
   _smoothed_C. ResizeTo(dim, dim);
 
   // The measurement.
-  // _v.          ResizeTo(2, 1);
+  //_v.          ResizeTo(2, 1);
   _v.          ResizeTo(1, 1);
 
   // The residuals.

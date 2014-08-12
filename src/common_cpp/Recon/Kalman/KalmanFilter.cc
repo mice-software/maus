@@ -22,29 +22,26 @@ namespace MAUS {
 
 KalmanFilter::KalmanFilter() {}
 
-KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim) {
+KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim),
+                                      _measurement_dim(1) {
   Json::Value *json = Globals::GetConfigurationCards();
   FibreParameters.Station_Radius = (*json)["SciFiParams_Station_Radius"].asDouble();
   FibreParameters.Plane_Width    = (*json)["SciFiParams_Plane_Width"].asDouble();
   FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
   // Measurement equation.
-  // _H.ResizeTo(2, _n_parameters);
-  _H.ResizeTo(1, _n_parameters);
+  _H.ResizeTo(_measurement_dim, _n_parameters);
   _H.Zero();
   // Alignment shifts
-  _S.ResizeTo(2, 3);
+  _S.ResizeTo(_measurement_dim, 3);
   _S.Zero();
   // Measurement error.
-  // _V.ResizeTo(2, 2);
-  _V.ResizeTo(1, 1);
+  _V.ResizeTo(_measurement_dim, _measurement_dim);
   _V.Zero();
   // Kalman gain.
-  // _K.ResizeTo(_n_parameters, 2);
-  _K.ResizeTo(_n_parameters, 1);
+  _K.ResizeTo(_n_parameters, _measurement_dim);
   _K.Zero();
   // Weight matrix.
-  _W.ResizeTo(1, 1);
-  // _W.ResizeTo(2, 2);
+  _W.ResizeTo(_measurement_dim, _measurement_dim);
   _W.Zero();
 }
 
@@ -90,7 +87,7 @@ void KalmanFilter::UpdateV(const KalmanState *a_site) {
 
   _V.Zero();
   _V(0, 0) = sigma_alpha*sigma_alpha;
-  // _V(1, 1) = sigma_beta*sigma_beta;
+  //_V(1, 1) = sigma_beta*sigma_beta;
 }
 
 void KalmanFilter::UpdateH(const KalmanState *a_site) {
@@ -115,8 +112,8 @@ void KalmanFilter::UpdateH(const KalmanState *a_site) {
   _S.Zero();
   _S(0, 0) = -dy/pitch;
   _S(0, 1) =  dx/pitch;
-  _S(1, 0) = -perp_y/pitch;
-  _S(1, 1) =  perp_x/pitch;
+  // _S(1, 0) = -perp_y/pitch;
+  // _S(1, 1) =  perp_x/pitch;
   _S.Zero();
 }
 
@@ -161,8 +158,7 @@ void KalmanFilter::ComputePull(KalmanState *a_site) {
 
   TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
-  // TMatrixD pull(2, 1);
-  TMatrixD pull(1, 1);
+  TMatrixD pull(_measurement_dim, 1);
   pull = measurement - HA;
 
   a_site->set_residual(pull, KalmanState::Projected);
@@ -170,15 +166,14 @@ void KalmanFilter::ComputePull(KalmanState *a_site) {
 
 TMatrixD KalmanFilter::SolveMeasurementEquation(const TMatrixD &a,
                                                 const TMatrixD &s) {
-  // TMatrixD ha(2, 1);
-  TMatrixD ha(1, 1);
+  TMatrixD ha(_measurement_dim, 1);
   ha = _H * a;
 
   // TMatrixD Ss(2, 1);
   // Ss = _S * s;
 
-  // TMatrixD result(2, 1);
-  TMatrixD result(1, 1);
+  TMatrixD result(_measurement_dim, 1);
+  // TMatrixD result(1, 1);
   result = ha;// + Ss;
 
   return result;
@@ -209,8 +204,7 @@ void KalmanFilter::ComputeResidual(KalmanState *a_site, KalmanState::State kalma
   // residual.
   TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
-  // TMatrixD residual(2, 1);
-  TMatrixD residual(1, 1);
+  TMatrixD residual(_measurement_dim, 1);
   residual = measurement - HA;
 
   a_site->set_residual(residual, kalman_state);
@@ -220,19 +214,16 @@ void KalmanFilter::ComputeChi2(KalmanState *a_site) {
   TMatrixD residual = a_site->residual(KalmanState::Filtered);
   TMatrixD C = a_site->covariance_matrix(KalmanState::Filtered);
 
-  // TMatrixD _H_transposed(_n_parameters, 2);
-  TMatrixD _H_transposed(_n_parameters, 1);
+  TMatrixD _H_transposed(_n_parameters, _measurement_dim);
   _H_transposed.Transpose(_H);
 
   // The covariance of the filtered residuals.
-  // TMatrixD R(2, 2);
   TMatrixD R = _V - (_H*C*_H_transposed);
   R.Invert();
 
   a_site->set_covariance_residual(R, KalmanState::Filtered);
 
-  // TMatrixD residual_transposed(1, 2);
-  TMatrixD residual_transposed(1, 1);
+  TMatrixD residual_transposed(1, _measurement_dim);
   residual_transposed.Transpose(residual);
 
   TMatrixD chi2 = residual_transposed * R * residual;
@@ -248,10 +239,10 @@ void KalmanFilter::UpdateCovariance(KalmanState *a_site) {
 
   TMatrixD I(_n_parameters, _n_parameters);
   I.UnitMatrix();
-/*
+  /*
   TMatrixD C_new(_n_parameters, _n_parameters);
   C_new = ( I - _K*_H ) * C_old;
-*/
+  */
   TMatrixD A(_n_parameters, _n_parameters);
   A = ( I - _K*_H );
   TMatrixD A_transposed(_n_parameters, _n_parameters);
