@@ -134,10 +134,6 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         return false;
 
     ConverterT conv;
-    if (data_cpp) {
-        delete data_cpp;
-        data_cpp = NULL;
-    }
     data_cpp = conv.convert(&data_json);
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
@@ -170,6 +166,10 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
+    }
+    if (data_cpp) {
+        delete data_cpp;
+        data_cpp = NULL;
     }
     return true;
 }
