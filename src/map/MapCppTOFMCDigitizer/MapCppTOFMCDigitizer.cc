@@ -233,7 +233,6 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
       double npe1 = get_npe(dist1, edep);
       double npe2 = get_npe(dist2, edep);
       if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
-      if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
 
       // get the hit time
       double csp = _configJSON["TOFscintLightSpeed"].asDouble();
@@ -374,11 +373,8 @@ std::string MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_
   int tstn = 1;
   int tsx = 99, tsy = 99;
 
-  if (fDebug) std::cout << "adigsize= " << all_tof_digits.size() << std::endl;
   for (unsigned int digit_i = 0; digit_i < all_tof_digits.size(); digit_i++) {
     if (all_tof_digits[digit_i]["station"] == tstn) {
-      if (fDebug)
-         std::cout << "found trig stn " << tstn << " " << tsx << " " << tsy << " " << all_tof_digits[digit_i]["plane"] << std::endl;
       if (tsx == 99 || tsy == 99) {
         if (all_tof_digits[digit_i]["plane"].asInt() == 0)
            tsx = all_tof_digits[digit_i]["slab"].asInt();

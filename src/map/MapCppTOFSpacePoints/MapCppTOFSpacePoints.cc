@@ -44,7 +44,7 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   // JsonCpp setup
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-  
+
   _makeSpacePointCut =
   JsonWrapper::GetProperty(configJSON,
                            "TOF_makeSpacePointCut",
@@ -88,23 +88,22 @@ void MapCppTOFSpacePoints::_process(Json::Value* document) const {
   Json::Value xEventType = JsonWrapper::GetProperty(root,
                                         "daq_event_type",
                                         JsonWrapper::stringValue);
-  Json::Value mEventType;
-  try {
+  Json::Value mEventType = "";
+  if (root.isMember("maus_event_type")) {
       mEventType = JsonWrapper::GetProperty(root,
                                         "maus_event_type",
                                         JsonWrapper::stringValue);
-  } catch (Exception e) { 
-      mEventType = "";
   }
-  //std::cout << " MapCppTOFSpacePoints: event type: " << xEventType << " " << mEventType << std::endl;
   if (!_map_init) {
-        if (xEventType == "start_of_run" || root["spill_number"] == -1 || mEventType == "RunHeader") {
+        if (xEventType == "start_of_run" || root["spill_number"] == -1
+                                         || mEventType == "RunHeader") {
             int runNumber = JsonWrapper::GetProperty(root,
                                             "run_number",
                                             JsonWrapper::intValue).asInt();
             const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(runNumber);
         } else {
-            std::cout << "Could not determine run number. Getting current TOF calibration" << std::endl;
+            std::cout << "Could not determine run number."
+                          "Getting current TOF calibration" << std::endl;
             const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(0);
         }
   }
