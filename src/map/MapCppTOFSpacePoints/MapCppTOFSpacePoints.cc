@@ -24,6 +24,8 @@
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "API/PyWrapMapBase.hh"
+#include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/DataStructure/RunHeader.hh"
 
 #include "src/map/MapCppTOFSpacePoints/MapCppTOFSpacePoints.hh"
 
@@ -35,20 +37,14 @@ PyMODINIT_FUNC init_MapCppTOFSpacePoints(void) {
 
 MapCppTOFSpacePoints::MapCppTOFSpacePoints()
     : MapBase<Json::Value>("MapCppTOFSpacePoints") {
+    _map_init = false;
 }
 
 void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   // JsonCpp setup
-  Json::Value configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
-  // this will contain the configuration
-
-  // Load the calibration.
-  _map_init = true;
-  bool loaded = _map.InitializeFromCards(configJSON);
-  if (!loaded)
-    _map_init = false;
-  std::cout << "_map_init = " << _map_init << std::endl;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+  
   _makeSpacePointCut =
   JsonWrapper::GetProperty(configJSON,
                            "TOF_makeSpacePointCut",
@@ -89,14 +85,29 @@ void MapCppTOFSpacePoints::_process(Json::Value* document) const {
             << std::endl;
   //  JsonCpp setup
   Json::Value& root = *document;
-  if (!_map_init) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "Failed to initialize calibration map",
-                          "MapCppTOFSpacePoints::_process");
-  }
   Json::Value xEventType = JsonWrapper::GetProperty(root,
                                         "daq_event_type",
                                         JsonWrapper::stringValue);
+  Json::Value mEventType;
+  try {
+      mEventType = JsonWrapper::GetProperty(root,
+                                        "maus_event_type",
+                                        JsonWrapper::stringValue);
+  } catch (Exception e) { 
+      mEventType = "";
+  }
+  //std::cout << " MapCppTOFSpacePoints: event type: " << xEventType << " " << mEventType << std::endl;
+  if (!_map_init) {
+        if (xEventType == "start_of_run" || root["spill_number"] == -1 || mEventType == "RunHeader") {
+            int runNumber = JsonWrapper::GetProperty(root,
+                                            "run_number",
+                                            JsonWrapper::intValue).asInt();
+            const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(runNumber);
+        } else {
+            std::cout << "Could not determine run number. Getting current TOF calibration" << std::endl;
+            const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(0);
+        }
+  }
   if (xEventType == "physics_event" || xEventType == "calibration_event") {
     std::map<int, std::string> triggerhit_pixels;
     Json::Value xRecEvent = JsonWrapper::GetProperty(root,
@@ -439,5 +450,16 @@ bool MapCppTOFSpacePoints::calibrateSlabHit(TOFPixelKey xTriggerPixelKey,
     return true;
   }
   return false;
+}
+
+void MapCppTOFSpacePoints::getTofCalib(int runNumber) {
+  // Load the calibration.
+  _map_init = _map.InitializeFromCards(configJSON, runNumber);
+  if (!_map_init) {
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to initialize calibration map",
+                          "MapCppTOFSpacePoints::_process");
+  }
+  // _map.Print();
 }
 }

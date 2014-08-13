@@ -450,6 +450,11 @@ TOF_calib_source = "CDB"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
 
+# get calibrations by either a) run_number or b) date
+# default is by run_number
+# if set to "date" then set the appropriate TOF_calib_date_from flag below
+TOF_calib_by = "run_number"
+
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
 TOF_calib_date_from = 'current'

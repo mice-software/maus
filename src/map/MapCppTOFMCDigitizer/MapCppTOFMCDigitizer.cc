@@ -21,6 +21,8 @@
 #include "Config/MiceModule.hh"
 #include "Utils/Exception.hh"
 #include "API/PyWrapMapBase.hh"
+#include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/DataStructure/RunHeader.hh"
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTOFMCDigitizer(void) {
@@ -63,7 +65,7 @@ void MapCppTOFMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   _stationKeys.push_back("tof2");
 
   // load the TOF calibration map
-  bool loaded = _map.InitializeFromCards(_configJSON);
+  bool loaded = _map.InitializeFromCards(_configJSON, 0);
   if (!loaded)
     throw(Exception(Exception::recoverable,
                  "Could not find TOF calibration map",
@@ -376,7 +378,7 @@ std::string MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_
   for (unsigned int digit_i = 0; digit_i < all_tof_digits.size(); digit_i++) {
     if (all_tof_digits[digit_i]["station"] == tstn) {
       if (fDebug)
-         std::cout << "found trig stn " << tstn << " " << tsx << " " << tsy << std::endl;
+         std::cout << "found trig stn " << tstn << " " << tsx << " " << tsy << " " << all_tof_digits[digit_i]["plane"] << std::endl;
       if (tsx == 99 || tsy == 99) {
         if (all_tof_digits[digit_i]["plane"].asInt() == 0)
            tsx = all_tof_digits[digit_i]["slab"].asInt();
@@ -455,6 +457,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       if (pixStr != "unknown") {
         TOFPixelKey xTriggerPixelKey(pixStr);
         dT = _map.dT(xChannelKey, xTriggerPixelKey, adc);
+        if (fDebug) std::cout << "dT= " << dT << std::endl;
       }
       if (fDebug)
          std::cout << "calibCorr: " << dT << std::endl;

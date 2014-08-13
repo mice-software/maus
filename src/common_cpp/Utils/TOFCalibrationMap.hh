@@ -119,7 +119,7 @@ class TOFCalibrationMap {
   * \param[in] json_configuration Json document containing the configuration.
   * \returns true if all text files are loaded successfully.
   */
-  bool InitializeFromCards(Json::Value configJSON);
+  bool InitializeFromCards(Json::Value configJSON, int);
 
   /// Get calibrations from CDB
   bool InitializeFromCDB();
@@ -179,7 +179,7 @@ class TOFCalibrationMap {
   */
   void Print();
   bool InitializePyMod();
-  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
+  void GetCalib(std::string devname, std::string caltype);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
    /** This value is returned when the correction can not be calculated.
@@ -257,7 +257,7 @@ class TOFCalibrationMap {
   */
   std::string _name;
   std::stringstream t0str, twstr, trigstr;
-  std::string _tof_station, _tof_calibdate;
+  std::string _tof_station, _tof_calibdate, _tof_calib_by;
 
  /** Flags for switching On and Off of the different types of calibration corrections.
   */
@@ -272,6 +272,7 @@ class TOFCalibrationMap {
   bool LoadTWCalib();
   bool LoadTriggerCalib();
   bool pymod_ok;
+  int runNumber;
 };
 }
 
