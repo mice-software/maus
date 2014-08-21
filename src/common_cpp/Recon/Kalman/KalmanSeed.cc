@@ -22,18 +22,14 @@ namespace MAUS {
 // Ascending z.
 template <class element>
 bool SortByZ(const element *a, const element *b) {
-  return ( a->get_position().z() < b->get_position().z() );
+  return ( a->get_position().z() > b->get_position().z() );
 }
 
 KalmanSeed::KalmanSeed() : _Bz(0.),
                            _straight(false),
                            _helical(false),
                            _n_parameters(-1),
-                           _particle_charge(1),
-  //                         _n_kalman_sites(28) {
-  //I
- // _kalman_sites
-}
+                           _particle_charge(1) {}
 
 KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
                                               _geometry_map(map),
@@ -61,7 +57,6 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _clusters.resize(rhs._clusters.size());
   for (size_t i = 0; i < rhs._clusters.size(); ++i) {
-    // _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
     _clusters[i] = rhs._clusters[i];
   }
 
@@ -82,7 +77,6 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _clusters.resize(seed._clusters.size());
   for (size_t i = 0; i < seed._clusters.size(); ++i) {
-    // _clusters[i] = new SciFiCluster(*seed._clusters[i]);
      _clusters[i] = seed._clusters[i];
   }
 
@@ -94,33 +88,39 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 }
 
 void KalmanSeed::BuildKalmanStates() {
-  size_t numb_sites = _clusters.size();
-  for ( size_t j = 0; j < numb_sites; ++j ) {
-    // SciFiCluster& cluster = (*_clusters[j]);
+  size_t n_scifi_planes = 15;
 
+  int sign =1;
+  if ( _tracker == 0 ) sign = -1;
+
+  for ( size_t j = n_scifi_planes; j >= 1; --j ) {
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
-    int id = _clusters[j]->get_id();
-    a_site->set_spill(_clusters[j]->get_spill());
-    a_site->set_event(_clusters[j]->get_event());
+    int id = sign*j;
     a_site->set_id(id);
-    a_site->set_measurement(_clusters[j]->get_alpha());
-    a_site->set_direction(_clusters[j]->get_direction());
-    a_site->set_z(_clusters[j]->get_position().z());
-    a_site->set_cluster(_clusters[j]);
-
-    std::map<int, SciFiPlaneGeometry>::iterator iterator;
-    iterator = _geometry_map.find(id);
-    SciFiPlaneGeometry this_plane = (*iterator).second;
-    ThreeVector plane_position  = this_plane.Position;
-
-    TMatrixD shift(3, 1);
-    shift(0, 0) = plane_position.x();
-    shift(1, 0) = plane_position.y();
-    shift(2, 0) = 0.0;
-    a_site->set_input_shift(shift);
-
+    // Add more info if the plane registered a measurement:
+    for ( size_t i = 0; i < _clusters.size(); ++i ) {
+      if ( _clusters.at(i)->get_id() == id ) {
+            a_site->set_spill(_clusters.at(i)->get_spill());
+            a_site->set_event(_clusters.at(i)->get_event());
+            a_site->set_id(id);
+            a_site->contains_measurement(true);
+            a_site->set_measurement(_clusters.at(i)->get_alpha());
+            a_site->set_direction(_clusters.at(i)->get_direction());
+            a_site->set_z(_clusters.at(i)->get_position().z());
+            a_site->set_cluster(_clusters.at(i));
+            std::map<int, SciFiPlaneGeometry>::iterator iterator;
+            iterator = _geometry_map.find(_clusters.at(i)->get_id());
+            SciFiPlaneGeometry this_plane = (*iterator).second;
+            ThreeVector plane_position  = this_plane.Position;
+            TMatrixD shift(3, 1);
+            shift(0, 0) = plane_position.x();
+            shift(1, 0) = plane_position.y();
+            shift(2, 0) = 0.0;
+            a_site->set_input_shift(shift);
+      }
+    }
     _kalman_sites.push_back(a_site);
   }
   //
@@ -130,8 +130,6 @@ void KalmanSeed::BuildKalmanStates() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  // C(0, 0) = 10.;
-  // C(2, 2) = 10.;
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
 }
@@ -157,7 +155,7 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   z = spacepoints.front()->get_position().z();
 
   double phi_0;
-  if ( _tracker == 0 ) {
+  if ( _tracker == 1 ) {
     phi_0 = seed->get_phi().back();
   } else {
     phi_0 = seed->get_phi().front();

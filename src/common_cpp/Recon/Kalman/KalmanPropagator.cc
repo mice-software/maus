@@ -34,13 +34,28 @@ KalmanPropagator::KalmanPropagator() : _n_parameters(0) {
   FibreParameters.A              = (*json)["SciFiParams_A"].asDouble();
   FibreParameters.Pitch          = (*json)["SciFiParams_Pitch"].asDouble();
   FibreParameters.Station_Radius = (*json)["SciFiParams_Station_Radius"].asDouble();
-  FibreParameters.RMS            = (*json)["SciFiParams_RMS"].asDouble();
+  FibreParameters.Density_Correction = (*json)["SciFiParams_Density_Correction"].asDouble();
 
-  AirParameters.Z                       = (*json)["AirParams_Z"].asDouble();
-  AirParameters.Radiation_Length         = (*json)["AirParams_Radiation_Length"].asDouble();
-  AirParameters.Density                 = (*json)["AirParams_Density"].asDouble();
-  AirParameters.Mean_Excitation_Energy  = (*json)["AirParams_Mean_Excitation_Energy"].asDouble();
-  AirParameters.A                       = (*json)["AirParams_A"].asDouble();
+  GasParameters.Z                       = (*json)["GasParams_Z"].asDouble();
+  GasParameters.Radiation_Length        = (*json)["GasParams_Radiation_Length"].asDouble();
+  GasParameters.Density                 = (*json)["GasParams_Density"].asDouble();
+  GasParameters.Mean_Excitation_Energy  = (*json)["GasParams_Mean_Excitation_Energy"].asDouble();
+  GasParameters.A                       = (*json)["GasParams_A"].asDouble();
+  GasParameters.Density_Correction      = (*json)["GasParams_Density_Correction"].asDouble();
+
+  MylarParameters.Z                     = (*json)["MylarParams_Z"].asDouble();
+  MylarParameters.Plane_Width           = (*json)["MylarParams_Plane_Width"].asDouble();
+  MylarParameters.Radiation_Length      = (*json)["MylarParams_Radiation_Length"].asDouble();
+  MylarParameters.Density               = (*json)["MylarParams_Density"].asDouble();
+  MylarParameters.Mean_Excitation_Energy = (*json)["MylarParams_Mean_Excitation_Energy"].asDouble();
+  MylarParameters.A                     = (*json)["MylarParams_A"].asDouble();
+  MylarParameters.Density_Correction    = (*json)["MylarParams_Density_Correction"].asDouble();
+
+  _w_scifi = FibreParameters.Plane_Width; // mm
+
+  _w_mylar = MylarParameters.Plane_Width;  // mm
+
+  _mm_to_cm = 0.1;
 }
 
 void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
@@ -57,95 +72,176 @@ void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
   CalculatePredictedState(old_site, new_site);
 
   // Calculate the energy loss for the projected state.
-  if ( _n_parameters == 5 && _use_Eloss )
-    SubtractEnergyLoss(old_site, new_site);
+  // if ( _n_parameters == 5 && _use_Eloss )
+  //  SubtractEnergyLoss(old_site, new_site);
 
   // Calculate the system noise...
-  if ( _use_MCS )
-    CalculateSystemNoise(old_site, new_site);
+  // if ( _use_MCS )
+  // CalculateSystemNoise(old_site, new_site);
 
   // ... so that we can add it to the prediction for the
   // covariance matrix.
+
   CalculateCovariance(old_site, new_site);
 
   new_site->set_current_state(KalmanState::Projected);
+}
+
+TMatrixD KalmanPropagator::AddSystemNoise(const KalmanState *old_site, TMatrixD C_old) {
+  std::vector<double> widths;
+  widths.push_back(_w_scifi);
+  widths.push_back(_w_mylar);
+
+  std::vector<std::string> materials;
+  materials.push_back("scifi");
+  materials.push_back("mylar");
+
+  int id = abs(old_site->id());
+  // If we are extrapolating between stations, there's gas.
+  if ( id == 13 || id == 10 || id == 7 || id == 4 ) {
+    double w_gas;
+    if ( id == 4  ) w_gas = 200;
+    if ( id == 7  ) w_gas = 250;
+    if ( id == 10 ) w_gas = 300;
+    if ( id == 13 ) w_gas = 350;
+    widths.push_back(w_gas);
+    materials.push_back("gas");
+  }
+
+  int n_steps = materials.size();
+
+  TMatrixD C = C_old;
+  double delta_z = 0;
+  for ( int i = 0; i < n_steps; i++ ) {
+    delta_z += widths.at(i);
+
+    TMatrixD F;
+    TMatrixD a = GetIntermediateState(old_site, delta_z, F);
+
+    double L = GetL(materials.at(i), widths.at(i));
+    TMatrixD Q = BuildQ(a, L, widths.at(i));
+
+    TMatrixD F_transposed(_n_parameters, _n_parameters);
+    F_transposed.Transpose(F);
+
+    C = F*C*F_transposed + Q;
+  }
+  return C;
 }
 
 // C_proj = _F * C_old * _Ft + _Q;
 void KalmanPropagator::CalculateCovariance(const KalmanState *old_site,
                                            KalmanState *new_site) {
   TMatrixD C_old = old_site->covariance_matrix(KalmanState::Filtered);
-
-  TMatrixD F_transposed(_n_parameters, _n_parameters);
-  F_transposed.Transpose(_F);
-
   TMatrixD C_new(_n_parameters, _n_parameters);
-  C_new = _F*C_old*F_transposed + _Q;
+
+  if ( _use_MCS ) {
+    C_new = AddSystemNoise(old_site, C_old);
+  } else {
+    // Take the propagator which was prepared when
+    // 'CalculatePredictedState' was called and project C.
+    TMatrixD F_transposed(_n_parameters, _n_parameters);
+    F_transposed.Transpose(_F);
+    C_new = _F*C_old*F_transposed;
+  }
+
+  C_old.Print();
+  _F.Print();
+  C_new.Print();
+
+  if ( _use_Eloss && _n_parameters == 5 ) {
+    SubtractEnergyLoss(new_site);
+  }
 
   new_site->set_covariance_matrix(C_new, KalmanState::Projected);
 }
 
 // Returns (beta) * (-dE/dx). Formula and constants from PDG.
-double KalmanPropagator::BetheBlochStoppingPower(double p) {
+double KalmanPropagator::BetheBlochStoppingPower(double p, std::string material) {
   double muon_mass      = Recon::Constants::MuonMass;
   double electron_mass  = Recon::Constants::ElectronMass;
   double muon_mass2     = muon_mass*muon_mass;
 
   double E = TMath::Sqrt(muon_mass2+p*p);
 
-  double beta = p/E;
-  double beta2= beta*beta;
-  double gamma = E/muon_mass;
-  double gamma2= gamma*gamma;
+  double beta   = p/E;
+  double beta2  = beta*beta;
+  double gamma  = E/muon_mass;
+  double gamma2 = gamma*gamma;
 
   double K = Recon::Constants::BetheBlochParameters::K();
-  double A = FibreParameters.A;
-  double I = FibreParameters.Mean_Excitation_Energy;
+  double A = GetA(material);
+  double I = GetMeanExcitationEnergy(material);
   double I2= I*I;
-  double Z = FibreParameters.Z;
+  double Z = GetZ(material);
+  double density = GetDensity(material);
+  double density_correction = GetDensityCorrection(material);
 
   double outer_term = K*Z/(A*beta2);
-
   double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
                 (electron_mass*electron_mass/(muon_mass*muon_mass)));
-
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
-  double last_term = Tmax*Tmax/(gamma2*muon_mass2);
-  double density = FibreParameters.Density;
-  double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
-  double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
-  double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
+  // double last_term = Tmax*Tmax/(gamma2*muon_mass2);
 
-  return beta*dEdx;
+  // double plasma_energy = 28.816*TMath::Sqrt(density*Z/A); // eV
+  // double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
+  // double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
+  double dEdx = outer_term*(0.5*log_term-beta2-density_correction/2.);
+  std::cerr << material << " " << p << " " << dEdx << std::endl;
+  // return beta*dEdx;
+  return beta*dEdx*density;
 }
 
-void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
-                                          KalmanState *new_site) {
-  //
+void KalmanPropagator::SubtractEnergyLoss(KalmanState *new_site) {
   // Get the momentum vector to be corrected.
-  TMatrixD a_old(_n_parameters, 1);
-  a_old = new_site->a(KalmanState::Projected);
-  double kappa = a_old(4, 0);
-  double px    = a_old(1, 0);
-  double py    = a_old(3, 0);
-  double pz = 1./fabs(kappa);
-  int sign = static_cast<int> (kappa/fabs(kappa));
-  ThreeVector old_momentum(px, py, pz);
-  //
-  // Compute the correction using Bethe Bloch's formula.
-  double plane_width = FibreParameters.Plane_Width;
-  // The number of planes crossed
-  int n_planes = abs(new_site->id() - old_site->id());
-  double Delta_p = BetheBlochStoppingPower(old_momentum.mag())*plane_width*n_planes;
-  //
+  double old_momentum = GetTrackMomentum(new_site);
+
+  std::vector<double> widths;
+  widths.push_back(_w_scifi);
+  widths.push_back(_w_mylar);
+
+  std::vector<std::string> materials;
+  materials.push_back("scifi");
+  materials.push_back("mylar");
+
+  int id = abs(new_site->id());
+  // If we are extrapolating between stations, there's gas.
+  if ( id == 12 || id == 9 || id == 6 || id == 3 ) {
+    double w_gas;
+    if ( id == 3  ) w_gas = 200;
+    if ( id == 6  ) w_gas = 250;
+    if ( id == 9 ) w_gas = 300;
+    if ( id == 12 ) w_gas = 350;
+    widths.push_back(w_gas);
+    materials.push_back("gas");
+  }
   // Reduce/increase momentum vector accordingly.
   // Indeed, for tracker 0, we want to ADD energy
   // beause we are not following the energy loss.
-  if ( old_site->id() < 0 ) {
-    Delta_p = -Delta_p;
+  double e_loss_sign = 1.;
+  if ( new_site->id() > 0 ) {
+    e_loss_sign = -1.;
+    std::cerr << "tracker 1" << std::endl;
+  } else {
+    std::cerr << "tracker 0" << std::endl;
   }
-  double reduction_factor = (old_momentum.mag()-Delta_p)/old_momentum.mag();
-  ThreeVector new_momentum = old_momentum*reduction_factor;
+
+  double delta_p = 0;
+  int n_steps = materials.size();
+  double momentum = old_momentum;
+  for ( int i = 0; i < n_steps; i++ ) {
+    delta_p  += BetheBlochStoppingPower(momentum, materials.at(i))*widths.at(i)*_mm_to_cm;
+    momentum += e_loss_sign*delta_p;
+  }
+
+  double reduction_factor = momentum/old_momentum;
+  TMatrixD a = new_site->a(KalmanState::Projected);
+  double px = a(1, 0);
+  double py = a(3, 0);
+  double pz = fabs(1./a(4, 0));
+  int sign = a(4, 0)/fabs(a(4, 0));
+  ThreeVector old_p(px, py, pz);
+  ThreeVector new_momentum = old_p*reduction_factor;
   //
   // Update momentum estimate at the site.
   TMatrixD a_subtracted(_n_parameters, 1);
@@ -156,46 +252,17 @@ void KalmanPropagator::SubtractEnergyLoss(const KalmanState *old_site,
   new_site->set_a(a_subtracted, KalmanState::Projected);
 }
 
-void KalmanPropagator::CalculateSystemNoise(const KalmanState *old_site,
-                                            const KalmanState *new_site) {
-  // Define fibre material parameters.
-  double plane_width = FibreParameters.Plane_Width;
-  int numb_planes = abs(new_site->id() - old_site->id());
-  double total_plane_length = numb_planes*plane_width;
-
-  double plane_L0 = FibreParameters.R0(total_plane_length);
-
-  // Compute the fibre effect.
-  TMatrixD Q1(_n_parameters, _n_parameters);
-  Q1 = BuildQ(old_site, new_site, plane_L0, total_plane_length);
-
-  // Compute Air effect (if necessary).
-  TMatrixD Q2(_n_parameters, _n_parameters);
-  double deltaZ = new_site->z() - old_site->z();
-  // Check if we need to add propagation in air.
-  if ( deltaZ > 3.*plane_width ) {
-    double air_lenght = deltaZ-total_plane_length;
-    double air_L0     = AirParameters.R0(air_lenght);
-    Q2 = BuildQ(old_site, new_site, air_L0, air_lenght);
-  }
-  Q2.Zero();
-  _Q = Q1+Q2;
-}
-
-
-
-double KalmanPropagator::HighlandFormula(double L0, double beta, double p) {
+double KalmanPropagator::HighlandFormula(double L, double beta, double p) {
   double HighlandConstant = Recon::Constants::HighlandConstant;
   // Note that the z factor (charge of the incoming particle) is omitted.
   // We don't need to consider |z| > 1.
-  double result = HighlandConstant*TMath::Sqrt(L0)*(1.+0.038*TMath::Log(L0))/(beta*p);
+  double result = HighlandConstant*TMath::Sqrt(L)*(1.+0.038*TMath::Log(L))/(beta*p);
   // std::cerr << "Highland: " << result << std::endl;
   return result;
 }
 
 // At the last site, the filtered values are also the smoothed values.
-void KalmanPropagator::PrepareForSmoothing(KalmanStatesPArray sites) {
-  KalmanState *last_site = sites.back();
+void KalmanPropagator::PrepareForSmoothing(KalmanState *last_site) {
   TMatrixD a_smooth = last_site->a(KalmanState::Filtered);
   last_site->set_a(a_smooth, KalmanState::Smoothed);
 
@@ -213,12 +280,12 @@ void KalmanPropagator::PrepareForSmoothing(KalmanStatesPArray sites) {
   last_site->set_chi2(chi2);
 }
 
-void KalmanPropagator::Smooth(KalmanStatesPArray sites, int id) {
+void KalmanPropagator::Smooth(KalmanStatesPArray sites, int i) {
   // Get site to be smoothed...
-  KalmanState *smoothing_site = sites.at(id);
+  KalmanState *smoothing_site = sites.at(i);
 
   // ... and the already perfected site.
-  const KalmanState *optimum_site = sites.at(id+1);
+  const KalmanState *optimum_site = sites.at(i+1);
 
   // Set the propagator right.
   UpdatePropagator(optimum_site, smoothing_site);
@@ -269,6 +336,96 @@ void KalmanPropagator::SmoothBack(const KalmanState *optimum_site,
   TMatrixD C_smooth = C+temp2;
 
   smoothing_site->set_covariance_matrix(C_smooth, KalmanState::Smoothed);
+}
+
+double KalmanPropagator::GetL(std::string material, double material_w) {
+  double L;
+  if ( material == "scifi" ) {
+    L = FibreParameters.L(material_w);
+  } else if ( material == "mylar" ) {
+    L = MylarParameters.L(material_w);
+  } else if ( material == "gas" ) {
+    L = GasParameters.L(material_w);
+  } else {
+    L = 0; // effectively, computes no correction.
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return L;
+}
+
+double KalmanPropagator::GetA(std::string material) {
+  double A;
+  if ( material == "scifi" ) {
+    A = FibreParameters.A;
+  } else if ( material == "mylar" ) {
+    A = MylarParameters.A;
+  } else if ( material == "gas" ) {
+    A = GasParameters.A;
+  } else {
+    A = 0;
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return A;
+}
+
+double KalmanPropagator::GetZ(std::string material) {
+  double Z;
+  if ( material == "scifi" ) {
+    Z = FibreParameters.Z;
+  } else if ( material == "mylar" ) {
+    Z = MylarParameters.Z;
+  } else if ( material == "gas" ) {
+    Z = GasParameters.Z;
+  } else {
+    Z = 0;
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return Z;
+}
+
+double KalmanPropagator::GetMeanExcitationEnergy(std::string material) {
+  double E;
+  if ( material == "scifi" ) {
+    E = FibreParameters.Mean_Excitation_Energy;
+  } else if ( material == "mylar" ) {
+    E = MylarParameters.Mean_Excitation_Energy;
+  } else if ( material == "gas" ) {
+    E = GasParameters.Mean_Excitation_Energy;
+  } else {
+    E = 0;
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return E;
+}
+
+double KalmanPropagator::GetDensity(std::string material) {
+  double E;
+  if ( material == "scifi" ) {
+    E = FibreParameters.Density;
+  } else if ( material == "mylar" ) {
+    E = MylarParameters.Density;
+  } else if ( material == "gas" ) {
+    E = GasParameters.Density;
+  } else {
+    E = 0;
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return E;
+}
+
+double KalmanPropagator::GetDensityCorrection(std::string material) {
+  double E;
+  if ( material == "scifi" ) {
+    E = FibreParameters.Density_Correction;
+  } else if ( material == "mylar" ) {
+    E = MylarParameters.Density_Correction;
+  } else if ( material == "gas" ) {
+    E = GasParameters.Density_Correction;
+  } else {
+    E = 0;
+    std::cerr << "Unkown material!" << std::endl;
+  }
+  return E;
 }
 
 } // ~namespace MAUS

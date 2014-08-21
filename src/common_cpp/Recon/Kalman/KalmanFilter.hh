@@ -98,7 +98,9 @@ class KalmanFilter {
 
   TMatrixD _K;
 
-  SciFiParams FibreParameters;
+  MaterialParams FibreParameters;
+
+  double _sigma_alpha;
 };
 
 } // ~namespace MAUS

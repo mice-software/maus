@@ -24,7 +24,8 @@ KalmanState::KalmanState(): _current_state(Initialized),
                           _id(-1),
                           _chi2(0.),
                           _cluster(NULL),
-                          _direction(ThreeVector()) {}
+                          _direction(ThreeVector()),
+                          _contains_measurement(false) {}
 
 KalmanState::~KalmanState() {}
 
@@ -33,7 +34,8 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
                                                 _id(-1),
                                                 _chi2(0.),
                                                 _cluster(NULL),
-                                                _direction(ThreeVector()) {
+                                                _direction(ThreeVector()),
+                                                _contains_measurement(false) {
   int dim = site.a(KalmanState::Projected).GetNrows();
   Initialise(dim);
 
@@ -42,6 +44,7 @@ KalmanState::KalmanState(const KalmanState &site): _current_state(Initialized),
   _chi2 = site.chi2();
   _cluster = site.cluster();
   _direction = site.direction();
+  _contains_measurement = site.contains_measurement();
 
   _projected_a = site.a(KalmanState::Projected);
   _a           = site.a(KalmanState::Filtered);
@@ -81,6 +84,7 @@ KalmanState& KalmanState::operator=(const KalmanState &rhs) {
   _chi2 = rhs.chi2();
   _cluster = rhs.cluster();
   _direction = rhs.direction();
+  _contains_measurement = rhs.contains_measurement();
 
   _projected_a = rhs.a(KalmanState::Projected);
   _a           = rhs.a(KalmanState::Filtered);
@@ -122,17 +126,9 @@ void KalmanState::Initialise(int dim) {
   _smoothed_C. ResizeTo(dim, dim);
 
   // The measurement.
-  //_v.          ResizeTo(2, 1);
   _v.          ResizeTo(1, 1);
 
   // The residuals.
-  /*
-  _pull.                ResizeTo(2, 1);
-  _residual.            ResizeTo(2, 1);
-  _smoothed_residual.   ResizeTo(2, 1);
-  _covariance_residual.ResizeTo(2, 2);
-  _covariance_smoothed_residual.ResizeTo(2, 2);
-  */
   _pull.                ResizeTo(1, 1);
   _residual.            ResizeTo(1, 1);
   _smoothed_residual.   ResizeTo(1, 1);

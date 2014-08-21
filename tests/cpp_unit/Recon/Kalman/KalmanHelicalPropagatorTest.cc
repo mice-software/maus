@@ -96,7 +96,7 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   double z15  = 16472.6;
   double px15 = 24.22264;
   double py15 = 44.54567;
-  double pz15 = 212.686;
+  // double pz15 = 212.686;
   // double mx15 = px15/pz15;
   // double my15 = py15/pz15;
 
@@ -155,7 +155,6 @@ TEST_F(KalmanHelicalPropagatorTest, test_covariance_extrapolation) {
   //
   // MCS increases matrix elements.
   //
-  propagator->CalculateSystemNoise(&old_site, &new_site);
   propagator->CalculateCovariance(&old_site, &new_site);
   for ( int j = 0; j < 5; j++ ) {
     for ( int k = 0; k < 5; k++ ) {

@@ -33,6 +33,31 @@
 
 namespace MAUS {
 
+struct MaterialParams {
+  /// Polystyrene's atomic number.
+  double Z;
+  /// Width of the fibre plane in mm.
+  double Plane_Width;
+  /// Fibre radiation lenght in mm
+  double Radiation_Length;
+  /// Fractional Radiation Length
+  double L(double lenght) { return lenght/Radiation_Length; }
+  /// Density in g.cm-3
+  double Density;
+  /// Mean excitation energy in eV.
+  double Mean_Excitation_Energy;
+  /// Atomic number in g.mol-1 per styrene monomer
+  double A;
+  /// Channel width in mm
+  double Pitch;
+  /// Station Radius in mm
+  double Station_Radius;
+  /// Density correction.
+  double Density_Correction;
+  /// RMS per channel measurement (um).
+  double RMS;
+};
+/*
 struct SciFiParams {
   /// Polystyrene's atomic number.
   double Z;
@@ -56,10 +81,10 @@ struct SciFiParams {
   double RMS;
 };
 
-struct AirParams {
-  /// Air mean atomic number.
+struct GasParams {
+  /// Gas mean atomic number.
   double Z;
-  /// Air radiation lenght in mm
+  /// Gas radiation lenght in mm
   double Radiation_Length;
   /// Fractional Radiation Length
   double R0(double lenght) { return lenght/Radiation_Length; }
@@ -70,7 +95,7 @@ struct AirParams {
   /// Atomic number in g.mol-1 per styrene monomer
   double A;
 };
-
+*/
 /** @class KalmanState
  *
  *  @brief A KalmanState is a tracker plane. Each tracker contains 15 (if all planes are hit).
@@ -184,6 +209,10 @@ class KalmanState {
 
   TMatrixD covariance_residual(State st) const;
 
+  void contains_measurement(bool val)    {  _contains_measurement = val; }
+
+  bool contains_measurement()            const { return _contains_measurement; }
+
  private:
   /// The spill.
   int _spill;
@@ -197,6 +226,8 @@ class KalmanState {
   int _id;
   /// The Chi2 at this site.
   double _chi2;
+
+  bool _contains_measurement;
 
   /// A pointer to the cluster used to form the state - does not assume control of memory
   SciFiCluster* _cluster;

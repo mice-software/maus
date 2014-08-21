@@ -43,13 +43,28 @@ KalmanFilter::KalmanFilter(int dim) : _n_parameters(dim),
   // Weight matrix.
   _W.ResizeTo(_measurement_dim, _measurement_dim);
   _W.Zero();
+
+  _sigma_alpha = 1.0/TMath::Sqrt(12.);
+  _V.Zero();
+  _V(0, 0) = _sigma_alpha*_sigma_alpha;
 }
 
 KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Process(KalmanState *a_site) {
+  // If the site doesn't contain a measurement,
+  // the filtered state is a copy of the projection.
+  if ( !a_site->contains_measurement() ) {
+    TMatrixD a = a_site->a(KalmanState::Projected);
+    a_site->set_a(a, KalmanState::Filtered);
+
+    TMatrixD C = a_site->covariance_matrix(KalmanState::Projected);
+    a_site->set_covariance_matrix(C, KalmanState::Filtered);
+    return;
+  }
+
   // Update measurement error:
-  UpdateV(a_site);
+  // UpdateV(a_site);
 
   // Update H (depends on plane direction.)
   UpdateH(a_site);
@@ -74,7 +89,7 @@ void KalmanFilter::Process(KalmanState *a_site) {
 
 void KalmanFilter::UpdateV(const KalmanState *a_site) {
   // Fibre constants.
-  double pitch         = FibreParameters.Pitch;
+  double pitch          = FibreParameters.Pitch;
   // Station radius in units of channel width.
   double station_radius = FibreParameters.Station_Radius/pitch;
 
@@ -83,11 +98,10 @@ void KalmanFilter::UpdateV(const KalmanState *a_site) {
                                  alpha*alpha);
 
   double sigma_beta = length/TMath::Sqrt(12.);
-  double sigma_alpha = 1.0/TMath::Sqrt(12.);
+  // double sigma_alpha = 1.0/TMath::Sqrt(12.);
 
   _V.Zero();
-  _V(0, 0) = sigma_alpha*sigma_alpha;
-  //_V(1, 1) = sigma_beta*sigma_beta;
+  _V(0, 0) = _sigma_alpha*_sigma_alpha;
 }
 
 void KalmanFilter::UpdateH(const KalmanState *a_site) {
@@ -101,20 +115,20 @@ void KalmanFilter::UpdateH(const KalmanState *a_site) {
   double perp_x = perp.x();
   double perp_y = perp.y();
 
-  double pitch = FibreParameters.Pitch;
+  double channel_width = FibreParameters.Pitch;
 
   _H.Zero();
-  _H(0, 0) =  dy/pitch;
-  _H(0, 2) = -dx/pitch;
+  _H(0, 0) =  dy/channel_width;
+  _H(0, 2) = -dx/channel_width;
   // _H(1, 0) =  perp_y/pitch;
   // _H(1, 2) = -perp_x/pitch;
 
   _S.Zero();
-  _S(0, 0) = -dy/pitch;
-  _S(0, 1) =  dx/pitch;
+  _S(0, 0) = -dy/channel_width;
+  _S(0, 1) =  dx/channel_width;
   // _S(1, 0) = -perp_y/pitch;
   // _S(1, 1) =  perp_x/pitch;
-  _S.Zero();
+  // _S.Zero();
 }
 
 // W = [ V + H C_k-1 Ht + S cov_S_k-1 St ]-1
@@ -123,18 +137,20 @@ void KalmanFilter::UpdateW(const KalmanState *a_site) {
   TMatrixD C_a(_n_parameters, _n_parameters);
   C_a = a_site->covariance_matrix(KalmanState::Projected);
 
-  // TMatrixD C_s = a_site->input_shift_covariance();
+  TMatrixD C_s = a_site->input_shift_covariance();
 
   TMatrixD A = TMatrixD(TMatrixD(_H, TMatrixD::kMult, C_a),
                         TMatrixD::kMultTranspose,
                         _H);
 
-  // TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
-  //                      TMatrixD::kMultTranspose,
-  //                      _S);
+  C_s.Print();
+
+  TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
+                        TMatrixD::kMultTranspose,
+                        _S);
 
   _W.Zero();
-  _W = _V + A;// + B;
+  _W = _V + A + B;
   _W.Invert();
 }
 
@@ -156,6 +172,7 @@ void KalmanFilter::ComputePull(KalmanState *a_site) {
   TMatrixD a           = a_site->a(KalmanState::Projected);
   TMatrixD shifts      = a_site->input_shift();
 
+  shifts.Print();
   TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
   TMatrixD pull(_measurement_dim, 1);
@@ -169,12 +186,12 @@ TMatrixD KalmanFilter::SolveMeasurementEquation(const TMatrixD &a,
   TMatrixD ha(_measurement_dim, 1);
   ha = _H * a;
 
-  // TMatrixD Ss(2, 1);
-  // Ss = _S * s;
+  TMatrixD Ss(2, 1);
+  Ss = _S * s;
 
   TMatrixD result(_measurement_dim, 1);
   // TMatrixD result(1, 1);
-  result = ha;// + Ss;
+  result = ha + Ss;
 
   return result;
 }
@@ -232,14 +249,17 @@ void KalmanFilter::ComputeChi2(KalmanState *a_site) {
 }
 
 void KalmanFilter::UpdateCovariance(KalmanState *a_site) {
+  // Can be computed as:
   // Cp = (1-KH)C
+  // or:
   // Cp = (1-KH)C(1-KH)T + KVKT
-  // Cp = A C A + B
+  // Cp = A C AT + B
   TMatrixD C_old = a_site->covariance_matrix(KalmanState::Projected);
 
   TMatrixD I(_n_parameters, _n_parameters);
   I.UnitMatrix();
   /*
+  // If in need to save computing time, use this equation instead.
   TMatrixD C_new(_n_parameters, _n_parameters);
   C_new = ( I - _K*_H ) * C_old;
   */

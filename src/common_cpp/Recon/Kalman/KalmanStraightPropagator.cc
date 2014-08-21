@@ -64,17 +64,29 @@ double KalmanStraightPropagator::GetTrackMomentum(const KalmanState *a_site) {
   return 200.;
 }
 
-TMatrixD KalmanStraightPropagator::BuildQ(const KalmanState *old_site,
-                                          const KalmanState *new_site,
-                                          double L0, double w) {
-  double deltaZ = w;
+TMatrixD KalmanStraightPropagator::GetIntermediateState(const KalmanState *site,
+                                                       double delta_z,
+                                                       TMatrixD &F) {
+  // Build F.
+  F.ResizeTo(_n_parameters, _n_parameters);
+  F.UnitMatrix();
+  F(0, 1) = delta_z;
+  F(2, 3) = delta_z;
+
+  TMatrixD a = site->a(KalmanState::Filtered);
+  TMatrixD a_projected = F*a;
+
+  return a_projected;
+}
+
+TMatrixD KalmanStraightPropagator::BuildQ(TMatrixD a, double L0, double deltaZ) {
   double deltaZ_squared = deltaZ*deltaZ;
 
   // double L0 = FibreParameters.R0(total_plane_length);
-  TMatrixD a = new_site->a(KalmanState::Projected);
+  // TMatrixD a = new_site->a(KalmanState::Projected);
   double mx    = a(1, 0);
   double my    = a(3, 0);
-  double p   = GetTrackMomentum(new_site);
+  double p   = GetTrackMomentum();
   double p2  = p*p;
 
   double muon_mass = Recon::Constants::MuonMass;

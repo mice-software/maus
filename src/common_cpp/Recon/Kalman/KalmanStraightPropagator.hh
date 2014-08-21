@@ -62,9 +62,11 @@ class KalmanStraightPropagator : public KalmanPropagator {
 
   /** @brief Returns the momentum of the track. In the straight track case, p is just a guess.
    */
-  double GetTrackMomentum(const KalmanState *a_site);
+  double GetTrackMomentum(const KalmanState *a_site = 0);
 
-  TMatrixD BuildQ(const KalmanState *old_site, const KalmanState *new_site, double L0, double w);
+  TMatrixD BuildQ(TMatrixD a, double L0, double w);
+
+  TMatrixD GetIntermediateState(const KalmanState *old_site, double delta_z, TMatrixD &F);
 };
 
 } // ~namespace MAUS

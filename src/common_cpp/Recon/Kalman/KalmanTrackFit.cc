@@ -62,18 +62,22 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
 
     // Filter the first state.
     _filter->Process(sites.front());
+    // int first_site_id = abs(sites.front()->id());
 
     // Run the extrapolation & filter chain.
-    size_t numb_measurements = sites.size();
-    for ( size_t j = 1; j < numb_measurements; ++j ) {
+    size_t numb_sites = sites.size();
+    // Loop over all 15 planes
+    for ( size_t j = 1; j < sites.size(); ++j ) {
       // Predict the state vector at site i...
       _propagator->Extrapolate(sites, j);
+
       // ... Filter...
       _filter->Process(sites.at(j));
     }
-    _propagator->PrepareForSmoothing(sites);
+    // std::cerr << "Prepare For Smoothing... " << std::endl;
+    _propagator->PrepareForSmoothing(sites.back());
     // ...and Smooth back all sites.
-    for ( int k = static_cast<int> (numb_measurements-2); k > -1; --k ) {
+    for ( int k = static_cast<int> (sites.size()-2); k >= 0; --k ) {
       _propagator->Smooth(sites, k);
       _filter->UpdateH(sites.at(k));
       _filter->ComputeResidual(sites.at(k), KalmanState::Smoothed);
@@ -97,18 +101,22 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
 }
 
 void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
-  double chi2 = 0.;
-  // Find the ndf for this track: numb measurements - numb parameters to be estimated
+  // Prepare to loop over all Kalman sites...
   size_t n_sites = sites.size();
-  // Find n_parameters by looking at the dimension of the state vector.
-  int n_parameters = sites.at(0)->a(KalmanState::Filtered).GetNrows();
-
-  int ndf = n_sites - n_parameters;
-
+  // ... summing chi2...
+  double chi2 = 0.;
+  // .. and counting the numb. of measurements...
+  int n_measurements = 0;
   for ( size_t i = 0; i < n_sites; ++i ) {
     KalmanState *site = sites.at(i);
-    chi2 += site->chi2();
+    if  ( site->contains_measurement() ) {
+      n_measurements++;
+      chi2 += site->chi2();
+    }
   }
+  // Find the ndf for this track: numb measurements - numb parameters to be estimated
+  int n_parameters = sites.at(0)->a(KalmanState::Filtered).GetNrows();
+  int ndf = n_measurements - n_parameters;
   track->set_chi2(chi2);
   track->set_ndf(ndf);
   double P_value = TMath::Prob(chi2, ndf);
@@ -120,9 +128,11 @@ void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArr
   int tracker = track->tracker();
   if ( pvalue != pvalue ) return;
   for ( size_t i = 0; i < sites.size(); ++i ) {
-    sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
-    SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
-    track->add_scifitrackpoint(track_point);
+    if ( sites.at(i)->contains_measurement() ) {
+      sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
+      SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
+      track->add_scifitrackpoint(track_point);
+    }
   }
   event.add_scifitrack(track);
 }
@@ -132,9 +142,6 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanState* site = sites.at(i);
-    double res0 = (site->residual(KalmanState::Projected))(0, 0);
-    double res1 = (site->residual(KalmanState::Filtered))(0, 0);
-    double res2 = (site->residual(KalmanState::Smoothed))(0, 0);
     // Squeak::mout(Squeak::info)
     std::cerr
     << "=========================================="  << "\n"
@@ -155,7 +162,9 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
     << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
     << "=========================================="
     << std::endl;
-    std::cerr << res0 << " " << res1 << " " << res2 << std::endl;
+    // site->covariance_matrix(KalmanState::Projected).Print();
+    // site->covariance_matrix(KalmanState::Filtered).Print();
+    // site->covariance_matrix(KalmanState::Smoothed).Print();
   }
 }
 

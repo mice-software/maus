@@ -118,6 +118,8 @@ class KalmanSeed {
 
   void set_charge(int charge) { _particle_charge = charge; }
 
+  SciFiGeometryMap GetGeometryMap() { return _geometry_map; }
+
  private:
   /** @brief Initial 'guess' of the state vector [x, mx, y, my, (kappa)].
    */
@@ -150,8 +152,6 @@ class KalmanSeed {
   int _n_parameters;
 
   int _particle_charge;
-
-  //bool _contains_measurement;
 };
 
 template <class PRTrack>

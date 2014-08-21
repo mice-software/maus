@@ -47,7 +47,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
-        test1 = ('%s/src/map/MapCppGlobalReconImport/noDataTest.txt' % 
+        test1 = ('%s/src/map/MapCppGlobalReconImport/noDataTest.txt' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         data = fin.read()
@@ -59,7 +59,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_invalid_json_birth(self):
         """Check birth with an invalid json input"""
-        test2 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' % 
+        test2 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin1 = open(test2,'r')
         data = fin1.read()
@@ -78,14 +78,14 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
     def test_invalid_json_process(self):
         """Check process with an invalid json input"""
         self.mapper.birth(self. c.getConfigJSON())
-        test4 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' % 
+        test4 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test4,'r')
         data = fin.read()
         result = self.mapper.process(data)
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
-
+    '''
     def test_fill_Global_Event(self):
         """Check that process fills global events from TOF and scifi data"""
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
@@ -114,7 +114,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(34, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
-
+    '''
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that we can death() MapCppGlobalReconImport"""

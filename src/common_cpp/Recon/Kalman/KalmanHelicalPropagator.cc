@@ -36,6 +36,107 @@ KalmanHelicalPropagator::KalmanHelicalPropagator(double Bz) : KalmanPropagator()
 
 KalmanHelicalPropagator::~KalmanHelicalPropagator() {}
 
+TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
+                                                       double delta_z,
+                                                       TMatrixD &F) {
+  if ( site->id() > 0 ) {
+    delta_z = -delta_z;
+  }
+
+  // Get old state vector...
+  TMatrixD old_a    = site->a(KalmanState::Filtered);
+  double old_x      = old_a(0, 0);
+  double old_px     = old_a(1, 0);
+  double old_y      = old_a(2, 0);
+  double old_py     = old_a(3, 0);
+  double old_kappa  = old_a(4, 0);
+  double charge = old_kappa/fabs(old_kappa);
+
+  double c      = CLHEP::c_light;
+  double u      = charge*c*_Bz;
+  double delta_theta = u*delta_z*fabs(old_kappa);
+  double sine   = sin(delta_theta);
+  double cosine = cos(delta_theta);
+
+  // Calculate the new track parameters.
+  double new_x  = old_x + old_px*sine/u
+                  - old_py*(1.-cosine)/u;
+
+  double new_px = old_px*cosine - old_py*sine;
+
+  double new_y  = old_y + (old_py*sine)/u
+                  + old_px*(1.-cosine)/u;
+
+  double new_py = old_py*cosine + old_px*sine;
+
+  TMatrixD a_projected(_n_parameters, 1);
+  a_projected(0, 0) = new_x;
+  a_projected(1, 0) = new_px;
+  a_projected(2, 0) = new_y;
+  a_projected(3, 0) = new_py;
+  a_projected(4, 0) = old_kappa;
+
+  double dtheta = c*_Bz*delta_z;
+  // Setup F.
+  F.ResizeTo(_n_parameters, _n_parameters);
+  // @x/@x
+  F(0, 0) = 1.;
+  // @x/@px
+  F(0, 1) = sine/u;
+  // @x/@y
+  F(0, 2) = 0.;
+  // @x/@py
+  F(0, 3) = (cosine-1.)/u;
+  // @x/@kappa
+  // F(0, 4) = new_px*cosine*dtheta/u - new_py*sine*dtheta/u;
+
+  // @px/@x
+  F(1, 0) = 0.;
+  // @px/@px
+  F(1, 1) = cosine;
+  // @px/@y
+  F(1, 2) = 0.;
+  // @px/@py
+  F(1, 3) = -sine;
+  // @px/@kappa
+  // F(1, 4) = -new_px*sine*dtheta - new_py*cosine*dtheta;
+
+  // @y/@x
+  F(2, 0) = 0.;
+  // @y/@px
+  F(2, 1) = (1.-cosine)/u;
+  // @y/@y
+  F(2, 2) = 1.;
+  // @y/@py
+  F(2, 3) = sine/u;
+  // @y/@kappa
+  // F(2, 4) = new_py*cosine*dtheta/u + new_px*sine*dtheta/u;
+
+  // @py/@x
+  F(3, 0) = 0.;
+  // @py/@px
+  F(3, 1) = sine;
+  // @py/@y
+  F(3, 2) = 0.;
+  // @py/@py
+  F(3, 3) = cosine;
+  // @py/@kappa
+  // F(3, 4) = -new_py*sine*dtheta + new_px*cosine*dtheta;
+
+  // @kappa/@x
+  F(4, 0) = 0.;
+  // @kappa/@px
+  F(4, 1) = 0.;
+  // @kappa/@y
+  F(4, 2) = 0.;
+  // @kappa/@py
+  F(4, 3) = 0.;
+  // @kappa/@kappa
+  F(4, 4) = 1.;
+
+  return a_projected;
+}
+
 void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_site,
                                                       KalmanState *new_site) {
   // Find dz (mm).
@@ -47,13 +148,13 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   }
 
   // Get old state vector...
-  TMatrixD old_a    = old_site->a(KalmanState::Filtered);
-  double old_x      = old_a(0, 0);
-  double old_px     = old_a(1, 0);
-  double old_y      = old_a(2, 0);
-  double old_py     = old_a(3, 0);
-  double old_kappa  = old_a(4, 0);
-  double charge = old_kappa/fabs(old_kappa);
+  TMatrixD old_a   = old_site->a(KalmanState::Filtered);
+  double old_x     = old_a(0, 0);
+  double old_px    = old_a(1, 0);
+  double old_y     = old_a(2, 0);
+  double old_py    = old_a(3, 0);
+  double old_kappa = old_a(4, 0);
+  double charge    = old_kappa/fabs(old_kappa);
 
   double c      = CLHEP::c_light;
   double u      = charge*c*_Bz;
@@ -82,6 +183,10 @@ void KalmanHelicalPropagator::CalculatePredictedState(const KalmanState *old_sit
   new_site->set_a(a_projected, KalmanState::Projected);
 
   // Set up F.
+  // The goal is: a call to this function in either
+  // Helical or Straight tracks sets up the projected state
+  // in the next site and prepares the propagator (which is going to be used for
+  // extrapolating the covariance matrix.
   UpdatePropagator(old_site, new_site);
 }
 
@@ -101,8 +206,8 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);
-  double px = site(1, 0);
-  double py = site(3, 0);
+  // double px    = site(1, 0);
+  // double py    = site(3, 0);
   double kappa  = site(4, 0);
   double charge = kappa/fabs(kappa);
 
@@ -113,7 +218,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   double sine   = sin(delta_theta);
   double cosine = cos(delta_theta);
 
-  double dtheta = c*_Bz*deltaZ;
+  // double dtheta = c*_Bz*deltaZ;
 
   // @x/@x
   _F(0, 0) = 1.;
@@ -172,49 +277,37 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
 }
 
 double KalmanHelicalPropagator::GetTrackMomentum(const KalmanState *a_site) {
-  TMatrixD a = a_site->a(KalmanState::Projected);
+  TMatrixD a   = a_site->a(KalmanState::Projected);
   double px    = a(1, 0);
   double py    = a(3, 0);
   double kappa = a(4, 0);
-  double pz = fabs(1./kappa);
+  double pz    = fabs(1./kappa);
 
   double p = TMath::Sqrt(px*px+py*py+pz*pz); // MeV/c
   return p;
 }
 
-TMatrixD KalmanHelicalPropagator::BuildQ(const KalmanState *old_site,
-                                         const KalmanState *new_site,
-                                         double L0, double material_w) {
-  // Find dz.
-  double new_z = new_site->z();
-  double old_z = old_site->z();
-
-  // Delta Z in mm
-  double deltaZ = (new_z-old_z);
-  if ( new_site->id() < 0 ) {
-    deltaZ = -deltaZ;
-  }
-
-  TMatrixD a   = old_site->a(KalmanState::Filtered);
+TMatrixD KalmanHelicalPropagator::BuildQ(TMatrixD a, double L, double material_w) {
+  // 'a' is old_site->a(KalmanState::Filtered)
   double px    = a(1, 0);
   double py    = a(3, 0);
   double kappa = a(4, 0);
-  double pz    = fabs(1/kappa);
+  double pz    = fabs(1./kappa);
   double p     = sqrt(px*px+py*py+pz*pz);
   double p2    = p*p;
 
-  double muon_mass = Recon::Constants::MuonMass;
+  double muon_mass  = Recon::Constants::MuonMass;
   double muon_mass2 = muon_mass*muon_mass;
-  double E = TMath::Sqrt(muon_mass2+p2);
+  double E    = TMath::Sqrt(muon_mass2+p2);
   double beta = p/E;
 
-  double theta_mcs = HighlandFormula(L0, beta, p);
+  double theta_mcs  = HighlandFormula(L, beta, p);
   double theta_mcs2 = theta_mcs*theta_mcs;
 
   double charge = kappa/fabs(kappa);
   double c      = CLHEP::c_light;
   double u      = charge*c*_Bz;
-  double delta_theta = u*deltaZ*fabs(kappa);
+  double delta_theta = u*material_w*fabs(kappa);
   double sine   = sin(delta_theta);
   double cosine = cos(delta_theta);
 
