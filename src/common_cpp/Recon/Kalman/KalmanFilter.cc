@@ -143,8 +143,6 @@ void KalmanFilter::UpdateW(const KalmanState *a_site) {
                         TMatrixD::kMultTranspose,
                         _H);
 
-  C_s.Print();
-
   TMatrixD B = TMatrixD(TMatrixD(_S, TMatrixD::kMult, C_s),
                         TMatrixD::kMultTranspose,
                         _S);
@@ -172,7 +170,6 @@ void KalmanFilter::ComputePull(KalmanState *a_site) {
   TMatrixD a           = a_site->a(KalmanState::Projected);
   TMatrixD shifts      = a_site->input_shift();
 
-  shifts.Print();
   TMatrixD HA = SolveMeasurementEquation(a, shifts);
 
   TMatrixD pull(_measurement_dim, 1);
@@ -186,13 +183,12 @@ TMatrixD KalmanFilter::SolveMeasurementEquation(const TMatrixD &a,
   TMatrixD ha(_measurement_dim, 1);
   ha = _H * a;
 
-  TMatrixD Ss(2, 1);
+  TMatrixD Ss(_measurement_dim, 1);
   Ss = _S * s;
 
   TMatrixD result(_measurement_dim, 1);
   // TMatrixD result(1, 1);
   result = ha + Ss;
-
   return result;
 }
 

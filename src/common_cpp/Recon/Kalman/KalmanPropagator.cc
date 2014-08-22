@@ -145,10 +145,6 @@ void KalmanPropagator::CalculateCovariance(const KalmanState *old_site,
     C_new = _F*C_old*F_transposed;
   }
 
-  C_old.Print();
-  _F.Print();
-  C_new.Print();
-
   if ( _use_Eloss && _n_parameters == 5 ) {
     SubtractEnergyLoss(new_site);
   }
@@ -187,7 +183,7 @@ double KalmanPropagator::BetheBlochStoppingPower(double p, std::string material)
   // double density_term = TMath::Log(plasma_energy/I)+TMath::Log(beta*gamma)-0.5;
   // double dEdx = outer_term*(0.5*log_term-beta2-density_term/2.+last_term/8.);
   double dEdx = outer_term*(0.5*log_term-beta2-density_correction/2.);
-  std::cerr << material << " " << p << " " << dEdx << std::endl;
+  // std::cerr << material << " " << p << " " << dEdx << std::endl;
   // return beta*dEdx;
   return beta*dEdx*density;
 }
@@ -221,9 +217,6 @@ void KalmanPropagator::SubtractEnergyLoss(KalmanState *new_site) {
   double e_loss_sign = 1.;
   if ( new_site->id() > 0 ) {
     e_loss_sign = -1.;
-    std::cerr << "tracker 1" << std::endl;
-  } else {
-    std::cerr << "tracker 0" << std::endl;
   }
 
   double delta_p = 0;
