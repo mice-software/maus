@@ -33,9 +33,11 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TH1.h"
+#include "TH1D.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TCut.h"
+#include "TObjArray.h"
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -77,6 +79,15 @@ class TrackerDataAnalyserMomentum {
     /** Return the cut on reconstructed pz */
     double get_cutPzRec() const { return _cutPzRec; }
 
+    /** Return the number of points used in the pz resolution plots */
+    int get_n_pz_points() const { return _n_pz_points; }
+
+    /** Return the lower bound of the pt_mc range used in the pz resolution plots */
+    double get_pz_lower_bound() const { return _pz_lower_bound; }
+
+    /** Return the upper bound of the pt_mc range used in the pz resolution plots */
+    double get_pz_upper_bound() const { return _pz_upper_bound; }
+
     /** Make all plots and histograms using accumulated data */
     void make_all();
 
@@ -100,6 +111,15 @@ class TrackerDataAnalyserMomentum {
 
     /** Set the cut on reconstructed pz using a double, in MeV/c */
     void set_cutPzRec(double cutPzRec) { _cutPzRec = cutPzRec; }
+
+    /** Set the number of points used in the pz resolution plots */
+    void set_n_pz_points(double n_pz_points) { _n_pz_points = n_pz_points; }
+
+    /** Set the lower bound of the pt_mc range used in the pz resolution plots */
+    void set_pz_lower_bound(double pz_lower_bound) { _pz_lower_bound = pz_lower_bound; }
+
+    /** Set the upper bound of the pt_mc range used in the pz resolution plots */
+    void set_pz_upper_bound(double pz_upper_bound) { _pz_upper_bound = pz_upper_bound; }
 
     /** Set up ROOT objects (too much work for constructor) */
     void setUp();
@@ -152,6 +172,10 @@ class TrackerDataAnalyserMomentum {
     TGraphErrors* _t1_pz_resol;
     TGraphErrors* _t2_pz_resol;
 
+    // TObjArray of the histos used to calculate the pz resolution
+    TObjArray* _resol_histos_t1;
+    TObjArray* _resol_histos_t2;
+
     // The ROOT canvases
     TCanvas* _cResiduals;
     TCanvas* _cGraphs;
@@ -159,7 +183,10 @@ class TrackerDataAnalyserMomentum {
 
   private:
     // Cuts
-    double _cutPzRec;  /// Cut on the reconstructed pz
+    int _n_pz_points;         /// Number of points in the pz resolution plots
+    double _pz_lower_bound;   /// The lower bound of the pt_mc range for the pz resolution graphs
+    double _pz_upper_bound;   /// The upper bound of the pt_mc range for the pz resolution graph
+    double _cutPzRec;         /// Cut on the reconstructed pz
 };
 
 } // ~namespace MAUS

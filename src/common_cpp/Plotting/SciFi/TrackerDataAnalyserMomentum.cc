@@ -26,6 +26,7 @@
 #include "TStyle.h"
 #include "TF1.h"
 #include "TH1.h"
+#include "TH1D.h"
 #include "TMath.h"
 #include "Rtypes.h"
 #include "TRefArray.h"
@@ -76,9 +77,14 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _t2_pz_res_pt(NULL),
     _t1_pz_resol(NULL),
     _t2_pz_resol(NULL),
+    _resol_histos_t1(NULL),
+    _resol_histos_t2(NULL),
     _cResiduals(NULL),
     _cGraphs(NULL),
     _cResolutions(NULL),
+    _n_pz_points(9),
+    _pz_lower_bound(0.0),
+    _pz_upper_bound(90.0),
     _cutPzRec(0.0) {
   // Do nothing
 }
@@ -97,6 +103,9 @@ TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
   if (_t2_pt_res_pt) delete _t2_pz_res_pt;
   if (_t2_pz_res_pt) delete _t2_pt_res_pt;
   if (_t1_pz_resol) delete _t1_pz_resol;
+  if (_t2_pz_resol) delete _t2_pz_resol;
+  if (_resol_histos_t1) delete _resol_histos_t1;
+  if (_resol_histos_t2) delete _resol_histos_t2;
   if (_t2_pz_resol) delete _t2_pz_resol;
   if (_cResiduals) delete _cResiduals;
   if (_cGraphs) delete _cGraphs;
@@ -148,6 +157,11 @@ void TrackerDataAnalyserMomentum::setUp() {
   // Set up the residual graphs
   _t1_pz_res_pt = new TGraph();
   _t2_pz_res_pt = new TGraph();
+
+  _resol_histos_t1 = new TObjArray(0);
+  _resol_histos_t2 = new TObjArray(0);
+  _resol_histos_t1->SetOwner(kTRUE);
+  _resol_histos_t2->SetOwner(kTRUE);
 
   // Set global styles
   gStyle->SetOptStat(111111);
@@ -357,50 +371,36 @@ void TrackerDataAnalyserMomentum::make_all() {
 }
 
 void TrackerDataAnalyserMomentum::make_pz_resolutions() {
-  int nPoints = 9;                        // The number of MC momentum intervals used in the plots
-  std::vector<TCut> vCuts(nPoints);        // The cuts defining the pt_mc intervals
-  std::vector<double> vPtMc(nPoints);        // The centre of the pt_mc intervals
-  std::vector<double> vPtMcErr(nPoints);     // The width of the intervals
-  std::vector<double> vPzRes_t1(nPoints);    // The resulatant pz resolutions
-  std::vector<double> vPzResErr_t1(nPoints); // The errors assocaited with the pz res
-  std::vector<double> vPzRes_t2(nPoints);    // The resulatant pz resolutions
-  std::vector<double> vPzResErr_t2(nPoints); // The errors assocaited with the pz res
+  double pz_range = _pz_upper_bound - _pz_lower_bound;  // The range of the pz resolution graph
+  double resolution_error =  pz_range / ( _n_pz_points * 2 );  // Error in pt_mc of each data point
+  // The mid pt_mc value of the first data point
+  double first_resolution_point = _pz_lower_bound + resolution_error;
+  std::vector<TCut> vCuts(_n_pz_points);          // The cuts defining the pt_mc intervals
+  std::vector<double> vPtMc(_n_pz_points);        // The centre of the pt_mc intervals
+  std::vector<double> vPtMcErr(_n_pz_points);     // The width of the intervals
+  std::vector<double> vPzRes_t1(_n_pz_points);    // The resulatant pz resolutions
+  std::vector<double> vPzResErr_t1(_n_pz_points); // The errors assocaited with the pz res
+  std::vector<double> vPzRes_t2(_n_pz_points);    // The resulatant pz resolutions
+  std::vector<double> vPzResErr_t2(_n_pz_points); // The errors assocaited with the pz res
 
   // Cuts in pt_mc
-  vCuts[0] = "pt_mc>=0&&pt_mc<10";
-  vCuts[1] = "pt_mc>=10&&pt_mc<20";
-  vCuts[2] = "pt_mc>=20&&pt_mc<30";
-  vCuts[3] = "pt_mc>=30&&pt_mc<40";
-  vCuts[4] = "pt_mc>=40&&pt_mc<50";
-  vCuts[5] = "pt_mc>=50&&pt_mc<60";
-  vCuts[6] = "pt_mc>=60&&pt_mc<70";
-  vCuts[7] = "pt_mc>=70&&pt_mc<80";
-  vCuts[8] = "pt_mc>=80&&pt_mc<90";
-  // vCuts[9] = "pt_mc>=90&&pt_mc<100";
+  std::string s1 = "pt_mc>=";
+  std::string s2 = "&&pt_mc<";
+  for (int i = 0; i < _n_pz_points; ++i) {
+    std::stringstream ss1;
+    double point_lower_bound = _pz_lower_bound + (resolution_error * 2 * i);
+    double point_upper_bound = point_lower_bound + (resolution_error * 2);
+    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
+    vCuts[i] = ss1.str().c_str();
+    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
+  }
 
-  // The central MC momentum
-  vPtMc[0] = 5.0;
-  vPtMc[1] = 15.0;
-  vPtMc[2] = 25.0;
-  vPtMc[3] = 35.0;
-  vPtMc[4] = 45.0;
-  vPtMc[5] = 55.0;
-  vPtMc[6] = 65.0;
-  vPtMc[7] = 75.0;
-  vPtMc[8] = 85.0;
-  // vPtMc[9] = 95.0;
-
-  // The error associated with the MC momentum (just the interval half width)
-  vPtMcErr[0] = 5.0;
-  vPtMcErr[1] = 5.0;
-  vPtMcErr[2] = 5.0;
-  vPtMcErr[3] = 5.0;
-  vPtMcErr[4] = 5.0;
-  vPtMcErr[5] = 5.0;
-  vPtMcErr[6] = 5.0;
-  vPtMcErr[7] = 5.0;
-  vPtMcErr[8] = 5.0;
-  // vPtMcErr[9] = 5.0;
+  // The central MC momentum & error associated with the MC momentum (just the interval half width)
+  for (int i = 0; i < _n_pz_points; ++i) {
+    vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
+    vPtMcErr[i] = resolution_error;
+    std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
+  }
 
   // Cuts for to select each tracker
   TCut cutT1 = "tracker_num==0";
@@ -410,19 +410,19 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   TCut tcut_pzrec = formTCut("TMath::Abs(pz_rec)", "<", _cutPzRec);
 
   // Loop over the mometum intervals and calculate the resolution for each
-  for (int i = 0; i < nPoints; ++i) {
+  for (int i = 0; i < _n_pz_points; ++i) {
     TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
     calc_pz_resolution(0, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
   }
-  for (int i = 0; i < nPoints; ++i) {
+  for (int i = 0; i < _n_pz_points; ++i) {
     TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
     calc_pz_resolution(1, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
   }
 
   // Create the resultant resolution plots
-  _t1_pz_resol = new TGraphErrors(nPoints, &vPtMc[0], &vPzRes_t1[0],
+  _t1_pz_resol = new TGraphErrors(_n_pz_points, &vPtMc[0], &vPzRes_t1[0],
                                   &vPtMcErr[0], &vPzResErr_t1[0]);
-  _t2_pz_resol = new TGraphErrors(nPoints, &vPtMc[0], &vPzRes_t2[0],
+  _t2_pz_resol = new TGraphErrors(_n_pz_points, &vPtMc[0], &vPzRes_t2[0],
                                   &vPtMcErr[0], &vPzResErr_t2[0]);
 }
 
@@ -524,13 +524,20 @@ void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
       _tree->Draw("pz_mc-charge*pz_rec>>h1", cut);
     }
     // Pull the histogram from the current pad
-    TH1 *h1 = reinterpret_cast<TH1*>(gPad->GetPrimitive("h1"));
+    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
     // Fit a gaussian to the histogram
     h1->Fit("gaus");
     TF1 *fit1 = h1->GetFunction("gaus");
     // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
     res = fit1->GetParameter(2);
     res_err = fit1->GetParError(2);
+
+    if (trker == 0) {
+      _resol_histos_t1->Add(h1->Clone());
+    } else if (trker == 1) {
+      _resol_histos_t2->Add(h1->Clone());
+    }
+
     // Scale gets messed up unless histogram is deleted each time
     delete h1;
   } else {
@@ -580,6 +587,9 @@ void TrackerDataAnalyserMomentum::save_root() {
 
     if (_t1_pz_resol) _t1_pz_resol->Write();
     if (_t2_pz_resol) _t2_pz_resol->Write();
+
+    if (_resol_histos_t1) _resol_histos_t1->Write();
+    if (_resol_histos_t2) _resol_histos_t2->Write();
 
     if (_cResiduals) _cResiduals->Write();
     if (_cGraphs) _cGraphs->Write();

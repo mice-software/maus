@@ -70,8 +70,14 @@ int main(int argc, char *argv[]) {
 
   // Set up analysis class
   MAUS::TrackerDataAnalyserMomentum analyser;
+  analyser.set_n_pz_points(9);
+  analyser.set_pz_lower_bound(0.0);
+  analyser.set_pz_upper_bound(90.0);
   analyser.set_cutPzRec(500.0);
-  std::cout << "Using a pz rec cut of: " << analyser.get_cutPzRec() << std::endl;
+  std::cout << "Pz resolution graphs number of points:  " << analyser.get_n_pz_points() << "\n";
+  std::cout << "Pz resolution graphs lower bound:  " << analyser.get_pz_lower_bound() << " MeV/c\n";
+  std::cout << "Pz resolution graphs upper bound:  " << analyser.get_pz_upper_bound() << " MeV/c\n";
+  std::cout << "Pz rec cut: " << analyser.get_cutPzRec() << " MeV/c\n";
   analyser.setUp();
 
   // Set up ROOT app, input file, and MAUS data class
@@ -81,11 +87,14 @@ int main(int argc, char *argv[]) {
   MAUS::Data data;
 
   // Loop over all spills
+  int counter = 0;
   while ( infile >> readEvent != NULL ) {
+    ++counter;
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
-      std::cout << "Looking at spill " << spill->GetSpillNumber() << std::endl;
+      std::cout << "Total number of spills: " << counter << ".  ";
+      std::cout << "Spill number: " << spill->GetSpillNumber() << std::endl;
       analyser.accumulate(spill);
       if (bool_pause) {
         std::cout << "Press Enter to Continue";
