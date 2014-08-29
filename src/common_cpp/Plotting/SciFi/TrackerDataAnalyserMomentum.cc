@@ -516,6 +516,7 @@ void TrackerDataAnalyserMomentum::make_resolution_graphs() {
 void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut cut,
                                                      double &res, double &res_err) {
   if (_tree) {
+    _out_file->cd();
     TCanvas lCanvas;
     // Create a histogram of the pz residual for the pt_mc interval defined by the input cut
     if (trker == 0) {
@@ -525,17 +526,18 @@ void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
     }
     // Pull the histogram from the current pad
     TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
+    TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
     // Fit a gaussian to the histogram
-    h1->Fit("gaus");
-    TF1 *fit1 = h1->GetFunction("gaus");
+    h2->Fit("gaus");
+    TF1 *fit1 = h2->GetFunction("gaus");
     // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
     res = fit1->GetParameter(2);
     res_err = fit1->GetParError(2);
 
     if (trker == 0) {
-      _resol_histos_t1->Add(h1->Clone());
+      _resol_histos_t1->Add(h2);
     } else if (trker == 1) {
-      _resol_histos_t2->Add(h1->Clone());
+      _resol_histos_t2->Add(h2);
     }
 
     // Scale gets messed up unless histogram is deleted each time
