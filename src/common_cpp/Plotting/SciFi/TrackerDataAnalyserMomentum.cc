@@ -82,6 +82,7 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _cResiduals(NULL),
     _cGraphs(NULL),
     _cResolutions(NULL),
+    _n_bins(200),
     _n_pz_points(9),
     _pz_lower_bound(0.0),
     _pz_upper_bound(90.0),
@@ -526,7 +527,17 @@ void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
     }
     // Pull the histogram from the current pad
     TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
-    TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
+    double xmin = h1->GetXaxis()->GetXmin();
+    double xmax = h1->GetXaxis()->GetXmax();
+    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
+    if ( _n_bins == 0 ) _n_bins = h1->GetNbinsX();
+    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_bins, xmin, xmax);
+    if (trker == 0) {
+      _tree->Draw("pz_mc+charge*pz_rec>>h2", cut);
+    } else if (trker == 1) {
+      _tree->Draw("pz_mc-charge*pz_rec>>h2", cut);
+    }
+    // TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
     // Fit a gaussian to the histogram
     h2->Fit("gaus");
     TF1 *fit1 = h2->GetFunction("gaus");
@@ -590,8 +601,8 @@ void TrackerDataAnalyserMomentum::save_root() {
     if (_t1_pz_resol) _t1_pz_resol->Write();
     if (_t2_pz_resol) _t2_pz_resol->Write();
 
-    // if (_resol_histos_t1) _resol_histos_t1->Write();
-    // if (_resol_histos_t2) _resol_histos_t2->Write();
+    if (_resol_histos_t1) _resol_histos_t1->Write();
+    if (_resol_histos_t2) _resol_histos_t2->Write();
 
     if (_cResiduals) _cResiduals->Write();
     if (_cGraphs) _cGraphs->Write();

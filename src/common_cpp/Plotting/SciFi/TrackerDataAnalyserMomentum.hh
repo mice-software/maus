@@ -79,6 +79,9 @@ class TrackerDataAnalyserMomentum {
     /** Return the cut on reconstructed pz */
     double get_cutPzRec() const { return _cutPzRec; }
 
+    /** Return the number of bins used to make the histos for pz resolution graphs */
+    int get_n_bins() const { return _n_bins; }
+
     /** Return the number of points used in the pz resolution plots */
     int get_n_pz_points() const { return _n_pz_points; }
 
@@ -111,6 +114,12 @@ class TrackerDataAnalyserMomentum {
 
     /** Set the cut on reconstructed pz using a double, in MeV/c */
     void set_cutPzRec(double cutPzRec) { _cutPzRec = cutPzRec; }
+
+    /** Set the number of bins used to make the histos for pz resolution graphs
+        Note: If set to 0, the histos will use the number of bins set automatically by ROOT
+              when drawn from the TTree.
+    */
+    void set_n_bins(double n_bins) { _n_bins = n_bins; }
 
     /** Set the number of points used in the pz resolution plots */
     void set_n_pz_points(double n_pz_points) { _n_pz_points = n_pz_points; }
@@ -183,6 +192,7 @@ class TrackerDataAnalyserMomentum {
 
   private:
     // Cuts
+    int _n_bins;              /// Number of bins used to make the histos for pz resolution graphs
     int _n_pz_points;         /// Number of points in the pz resolution plots
     double _pz_lower_bound;   /// The lower bound of the pt_mc range for the pz resolution graphs
     double _pz_upper_bound;   /// The upper bound of the pt_mc range for the pz resolution graph
