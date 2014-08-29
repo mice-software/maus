@@ -590,8 +590,8 @@ void TrackerDataAnalyserMomentum::save_root() {
     if (_t1_pz_resol) _t1_pz_resol->Write();
     if (_t2_pz_resol) _t2_pz_resol->Write();
 
-    if (_resol_histos_t1) _resol_histos_t1->Write();
-    if (_resol_histos_t2) _resol_histos_t2->Write();
+    // if (_resol_histos_t1) _resol_histos_t1->Write();
+    // if (_resol_histos_t2) _resol_histos_t2->Write();
 
     if (_cResiduals) _cResiduals->Write();
     if (_cGraphs) _cGraphs->Write();
