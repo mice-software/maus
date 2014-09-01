@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
   //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
   bool bool_save = false;
+  int n_bins_pz_resol = 0;
   std::string save_type = "";
 
   for (int i = 2; i < argc; i++) {
@@ -65,11 +66,23 @@ int main(int argc, char *argv[]) {
       } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
+    } else if ( std::strcmp(argv[i], "-n_bins_pz_resol") == 0 ) {
+      if ( (i+1) < argc ) {
+        std::stringstream ss1;
+        ss1 << argv[i + 1];
+        ss1 >> n_bins_pz_resol;
+      }
     }
+  }
+  if ( n_bins_pz_resol == 0 ) {
+    std::cout << "Using ROOT auto binning for pz resolution histos" << std::endl;
+  } else {
+    std::cout << "pz resolution histos set to have number of bins = " << n_bins_pz_resol << "\n";
   }
 
   // Set up analysis class
   MAUS::TrackerDataAnalyserMomentum analyser;
+  analyser.set_n_bins(n_bins_pz_resol);
   analyser.set_n_pz_points(9);
   analyser.set_pz_lower_bound(0.0);
   analyser.set_pz_upper_bound(90.0);
