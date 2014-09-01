@@ -46,12 +46,20 @@ int main(int argc, char *argv[]) {
   // First argument to code should be the input ROOT file name
   std::string filename = std::string(argv[1]);
 
-  // Parse any extra arguments supplied
+  // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
+  int n_bins_pz_resol = 0;    // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_pz_points = 9;        // No. of data points in each pz resolution plot
+  double pz_fit_min = -50.0;    // Lower bound of the gaussian fit to histos used to find pz resols
+  double pz_fit_max = 50.0;    // Upper bound of the gaussian fit to histos used to find pz resols
+  double pz_lower_bound = 0;  // Lower bound on pt_mc of pz resolution plots
+  double pz_upper_bound = 90; // Upper bound on pt_mc of pz resolution plots
+  double pz_rec_cut = 500.0;  // Cut on reconstruction pz applied to histos used to find pz resols
+
+  // Parse any extra arguments supplied from the command line
   //   -p -> pause between events
   //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
   bool bool_save = false;
-  int n_bins_pz_resol = 0;
   std::string save_type = "";
 
   for (int i = 2; i < argc; i++) {
@@ -68,8 +76,7 @@ int main(int argc, char *argv[]) {
       }
     } else if ( std::strcmp(argv[i], "-n_bins_pz_resol") == 0 ) {
       if ( (i+1) < argc ) {
-        std::stringstream ss1;
-        ss1 << argv[i + 1];
+        std::stringstream ss1(argv[i + 1]);
         ss1 >> n_bins_pz_resol;
       }
     }
@@ -77,16 +84,20 @@ int main(int argc, char *argv[]) {
   if ( n_bins_pz_resol == 0 ) {
     std::cout << "Using ROOT auto binning for pz resolution histos" << std::endl;
   } else {
-    std::cout << "pz resolution histos set to have number of bins = " << n_bins_pz_resol << "\n";
+    std::cout << "Pz resolution histos set to have number of bins = " << n_bins_pz_resol << "\n";
   }
 
   // Set up analysis class
   MAUS::TrackerDataAnalyserMomentum analyser;
   analyser.set_n_bins(n_bins_pz_resol);
-  analyser.set_n_pz_points(9);
-  analyser.set_pz_lower_bound(0.0);
-  analyser.set_pz_upper_bound(90.0);
-  analyser.set_cutPzRec(500.0);
+  analyser.set_n_pz_points(n_pz_points);
+  analyser.set_pz_fit_min(pz_fit_min);
+  analyser.set_pz_fit_max(pz_fit_max);
+  analyser.set_pz_lower_bound(pz_lower_bound);
+  analyser.set_pz_upper_bound(pz_upper_bound);
+  analyser.set_cutPzRec(pz_rec_cut);
+  std::cout << "Pz resolution histogram fit lower bound: " << analyser.get_pz_fit_min() << "\n";
+  std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
   std::cout << "Pz resolution graphs number of points:  " << analyser.get_n_pz_points() << "\n";
   std::cout << "Pz resolution graphs lower bound:  " << analyser.get_pz_lower_bound() << " MeV/c\n";
   std::cout << "Pz resolution graphs upper bound:  " << analyser.get_pz_upper_bound() << " MeV/c\n";
@@ -118,6 +129,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // Make the final plots
   analyser.make_residual_histograms();
   analyser.make_residual_graphs();
   analyser.make_pz_resolutions();

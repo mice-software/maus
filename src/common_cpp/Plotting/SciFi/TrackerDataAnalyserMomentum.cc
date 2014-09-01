@@ -84,6 +84,8 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _cResolutions(NULL),
     _n_bins(200),
     _n_pz_points(9),
+    _pz_fit_min(-50),
+    _pz_fit_max(50),
     _pz_lower_bound(0.0),
     _pz_upper_bound(90.0),
     _cutPzRec(0.0) {
@@ -500,6 +502,8 @@ void TrackerDataAnalyserMomentum::make_resolution_graphs() {
   _cResolutions->Divide(2);
 
   _cResolutions->cd(1);
+  gPad->SetGridx(1);
+  gPad->SetGridy(1);
   _t1_pz_resol->SetName("t1_pz_resol");
   _t1_pz_resol->SetTitle("T1 p_{z} Resolution");
   _t1_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -507,6 +511,8 @@ void TrackerDataAnalyserMomentum::make_resolution_graphs() {
   _t1_pz_resol->Draw("AP");
 
   _cResolutions->cd(2);
+  gPad->SetGridx(1);
+  gPad->SetGridy(1);
   _t2_pz_resol->SetName("t2_pz_resol");
   _t2_pz_resol->SetTitle("T2 p_{z} Resolution");
   _t2_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
@@ -539,7 +545,7 @@ void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
     }
     // TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
     // Fit a gaussian to the histogram
-    h2->Fit("gaus");
+    h2->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
     TF1 *fit1 = h2->GetFunction("gaus");
     // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
     res = fit1->GetParameter(2);

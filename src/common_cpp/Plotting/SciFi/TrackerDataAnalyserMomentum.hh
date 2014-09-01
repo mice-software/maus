@@ -85,6 +85,12 @@ class TrackerDataAnalyserMomentum {
     /** Return the number of points used in the pz resolution plots */
     int get_n_pz_points() const { return _n_pz_points; }
 
+    /** Return the lower limit of each fit used to calc the pz resolution pnts */
+    int get_pz_fit_min() const { return _pz_fit_min; }
+
+    /** Return the upper limit of each fit used to calc the pz resolution pnts */
+    int get_pz_fit_max() const { return _pz_fit_max; }
+
     /** Return the lower bound of the pt_mc range used in the pz resolution plots */
     double get_pz_lower_bound() const { return _pz_lower_bound; }
 
@@ -123,6 +129,12 @@ class TrackerDataAnalyserMomentum {
 
     /** Set the number of points used in the pz resolution plots */
     void set_n_pz_points(double n_pz_points) { _n_pz_points = n_pz_points; }
+
+    /** Set the lower limit of each fit used to calc the pz resolution pnts  */
+    void set_pz_fit_min(double pz_fit_min) { _pz_fit_min = pz_fit_min; }
+
+    /** Set the upper limit of each fit used to calc the pz resolution pnts  */
+    void set_pz_fit_max(double pz_fit_max) { _pz_fit_max = pz_fit_max; }
 
     /** Set the lower bound of the pt_mc range used in the pz resolution plots */
     void set_pz_lower_bound(double pz_lower_bound) { _pz_lower_bound = pz_lower_bound; }
@@ -194,6 +206,8 @@ class TrackerDataAnalyserMomentum {
     // Cuts
     int _n_bins;              /// Number of bins used to make the histos for pz resolution graphs
     int _n_pz_points;         /// Number of points in the pz resolution plots
+    int _pz_fit_min;          /// The lower limit of each fit used to calc the pz resolution pnts
+    int _pz_fit_max;          /// The upper limit of each fit used to calc the pz resolution pnts
     double _pz_lower_bound;   /// The lower bound of the pt_mc range for the pz resolution graphs
     double _pz_upper_bound;   /// The upper bound of the pt_mc range for the pz resolution graph
     double _cutPzRec;         /// Cut on the reconstructed pz
