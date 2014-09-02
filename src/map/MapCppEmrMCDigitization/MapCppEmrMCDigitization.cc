@@ -38,66 +38,63 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
     Json::Value configJSON;
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
-    // Load constants and hit preselection cuts
-    Json::Value *json = Globals::GetConfigurationCards();
+    _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
+    _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
 
-    _number_of_planes = (*json)["EMRnumberOfPlanes"].asInt();
-    _number_of_bars = (*json)["EMRnumberOfBars"].asInt();
+    _tot_noise_up = configJSON["EMRtotNoiseUp"].asInt();
+    _tot_noise_low = configJSON["EMRtotNoiseLow"].asInt();
 
-    _tot_noise_up = (*json)["EMRtotNoiseUp"].asInt();
-    _tot_noise_low = (*json)["EMRtotNoiseLow"].asInt();
-
-    _do_sampling = (*json)["EMRdoSampling"].asInt();
-    _nph_per_MeV = (*json)["EMRnphPerMeV"].asInt();
-    _seed = (*json)["EMRseed"].asInt();
-    _trap_eff = (*json)["EMRtrapEff"].asDouble();
-    _QE_MAPMT = (*json)["EMRqeMAPMT"].asDouble();
-    _QE_SAPMT = (*json)["EMRqeSAPMT"].asDouble();
-    _nADC_per_pe_MAPMT = (*json)["EMRnadcPerPeMAPMT"].asDouble();
-    _nADC_per_pe_SAPMT = (*json)["EMRnadcPerPeSAPMT"].asDouble();
-    _electronics_response_spread_MAPMT = (*json)["EMRelectronicsResponseSpreadMAPMT"].asDouble();
-    _electronics_response_spread_SAPMT = (*json)["EMRelectronicsResponseSpreadSAPMT"].asDouble();
-    _atten_WLSf = (*json)["EMRattenWLSf"].asDouble();
-    _atten_CLRf = (*json)["EMRattenCLRf"].asDouble();
-    _bar_length = (*json)["EMRbarLength"].asInt();
-    _nbars = (*json)["EMRnBars"].asInt();
-    _dbb_count = (*json)["EMRdbbCount"].asDouble();
-    _fadc_count = (*json)["EMRfadcCount"].asDouble();
-    _spill_width = (*json)["EMRspillWidth"].asInt();
-    _time_response_spread = (*json)["EMRtimeResponseSpread"].asInt();
-    _tot_func_p1 = (*json)["EMRtotFuncP1"].asDouble();
-    _tot_func_p2 = (*json)["EMRtotFuncP2"].asDouble();
-    _tot_func_p3 = (*json)["EMRtotFuncP3"].asDouble();
-    _tot_func_p4 = (*json)["EMRtotFuncP4"].asDouble();
-    _acquisition_window = (*json)["EMRacquisitionWindow"].asInt();
-    _signal_integration_window = (*json)["EMRsignalIntegrationWindow"].asInt();
-    _arrival_time_shift = (*json)["EMRarrivalTimeShift"].asInt();
-    _arrival_time_gaus_width = (*json)["EMRarrivalTimeGausWidth"].asDouble();
-    _arrival_time_uniform_width = (*json)["EMRarrivalTimeUniformWidth"].asDouble();
-    _pulse_shape_landau_width = (*json)["EMRpulseShapeLandauWidth"].asDouble();
-    _fom = (*json)["EMRfom"].asString();
-    _birks_constant = (*json)["EMRbirksConstant"].asDouble();
-    _average_path_length = (*json)["EMRaveragePathLength"].asDouble();
-    _signal_energy_threshold = (*json)["EMRsignalEnergyThreshold"].asDouble();
-    _baseline_spread = (*json)["EMRbaselineSpread"].asInt();
-    _maximum_noise_level = (*json)["EMRmaximumNoiseLevel"].asInt();
-    _deltat_shift = (*json)["EMRdeltatShift"].asDouble();
-    _baseline_position = (*json)["EMRbaselinePosition"].asDouble();
-    _arrival_time_spread = (*json)["EMRarrivalTimeSpread"].asDouble();
+    _do_sampling = configJSON["EMRdoSampling"].asInt();
+    _nph_per_MeV = configJSON["EMRnphPerMeV"].asInt();
+    _seed = configJSON["EMRseed"].asInt();
+    _trap_eff = configJSON["EMRtrapEff"].asDouble();
+    _QE_MAPMT = configJSON["EMRqeMAPMT"].asDouble();
+    _QE_SAPMT = configJSON["EMRqeSAPMT"].asDouble();
+    _nADC_per_pe_MAPMT = configJSON["EMRnadcPerPeMAPMT"].asDouble();
+    _nADC_per_pe_SAPMT = configJSON["EMRnadcPerPeSAPMT"].asDouble();
+    _electronics_response_spread_MAPMT = configJSON["EMRelectronicsResponseSpreadMAPMT"].asDouble();
+    _electronics_response_spread_SAPMT = configJSON["EMRelectronicsResponseSpreadSAPMT"].asDouble();
+    _atten_WLSf = configJSON["EMRattenWLSf"].asDouble();
+    _atten_CLRf = configJSON["EMRattenCLRf"].asDouble();
+    _bar_length = configJSON["EMRbarLength"].asInt();
+    _nbars = configJSON["EMRnBars"].asInt();
+    _dbb_count = configJSON["EMRdbbCount"].asDouble();
+    _fadc_count = configJSON["EMRfadcCount"].asDouble();
+    _spill_width = configJSON["EMRspillWidth"].asInt();
+    _time_response_spread = configJSON["EMRtimeResponseSpread"].asInt();
+    _tot_func_p1 = configJSON["EMRtotFuncP1"].asDouble();
+    _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
+    _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
+    _tot_func_p4 = configJSON["EMRtotFuncP4"].asDouble();
+    _acquisition_window = configJSON["EMRacquisitionWindow"].asInt();
+    _signal_integration_window = configJSON["EMRsignalIntegrationWindow"].asInt();
+    _arrival_time_shift = configJSON["EMRarrivalTimeShift"].asInt();
+    _arrival_time_gaus_width = configJSON["EMRarrivalTimeGausWidth"].asDouble();
+    _arrival_time_uniform_width = configJSON["EMRarrivalTimeUniformWidth"].asDouble();
+    _pulse_shape_landau_width = configJSON["EMRpulseShapeLandauWidth"].asDouble();
+    _fom = configJSON["EMRfom"].asString();
+    _birks_constant = configJSON["EMRbirksConstant"].asDouble();
+    _average_path_length = configJSON["EMRaveragePathLength"].asDouble();
+    _signal_energy_threshold = configJSON["EMRsignalEnergyThreshold"].asDouble();
+    _baseline_spread = configJSON["EMRbaselineSpread"].asInt();
+    _maximum_noise_level = configJSON["EMRmaximumNoiseLevel"].asInt();
+    _deltat_shift = configJSON["EMRdeltatShift"].asDouble();
+    _baseline_position = configJSON["EMRbaselinePosition"].asDouble();
+    _arrival_time_spread = configJSON["EMRarrivalTimeSpread"].asDouble();
 
     // Generate random noise in each SAPMT
     _rand = new TRandom3(_seed);
 
     for (int i = 0; i < 48; i++) {
       _baseline[i] = _baseline_position
-		   + static_cast<int>(_rand->Uniform(-_baseline_spread, _baseline_spread));
+                   + static_cast<int>(_rand->Uniform(-_baseline_spread, _baseline_spread));
       _noise_level[i] = static_cast<int>(_rand->Uniform(0, _maximum_noise_level));
       _noise_position[i] = static_cast<int>(_rand->Uniform(0, 1.9999999));
     }
 
     // Check calibration file
     _calibfilename = std::string(pMAUS_ROOT_DIR)
-		   + (*json)["EMR_calibration_file"].asString();
+                   + configJSON["EMR_calibration_file"].asString();
     _calibfile = fopen(_calibfilename.Data(), "r");
     if ( _calibfile == NULL ) {
        std::cerr << "EMR calibration data file not found..." << std::endl;
@@ -107,7 +104,7 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
 
     // Check clear fiber length map
     _cflengthfilename = std::string(pMAUS_ROOT_DIR)
-			+ (*json)["EMR_clear_fiber_length_map"].asString();
+                      + configJSON["EMR_clear_fiber_length_map"].asString();
     _cflengthfile = fopen(_cflengthfilename.Data(), "r");
     if ( _cflengthfile == NULL ) {
        std::cerr << "EMR clear fibre length map not found..." << std::endl;
@@ -117,7 +114,7 @@ bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
 
     // Check clear fiber length map
     _cattenfilename = std::string(pMAUS_ROOT_DIR)
-		    + (*json)["EMR_connector_attenuation_map"].asString();
+                    + configJSON["EMR_connector_attenuation_map"].asString();
     _cattenfile = fopen(_cattenfilename.Data(), "r");
     if ( _cattenfile == NULL ) {
        std::cerr << "EMR connector attenuation map not found..." << std::endl;
@@ -175,8 +172,12 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
 
   // Get spill, break if there's no trigger
   Spill *spill = spill_cpp->GetSpill();
-  int nPartEvents = spill->GetMCEventSize();
-  if (!nPartEvents) return document;
+  int nPartEvents(0);
+  if (spill->GetMCEvents())
+    nPartEvents = spill->GetMCEventSize();
+
+  if (!nPartEvents)
+    return document;
 
   // Check the Recon event array is initialised, and if not make it so
   if (!spill->GetReconEvents()) {
@@ -195,7 +196,7 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
       int nHits = hits->size();
 
       Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
-      int pTime = primary->GetTime(); // ns
+      double pTime = primary->GetTime(); // ns
 
       for (int ihit = 0; ihit < nHits; ihit++) {
 	EMRHit hit = hits->at(ihit);
@@ -228,7 +229,7 @@ std::string MapCppEmrMCDigitization::process(std::string document) {
 
     if (hits) {
       Primary *primary = spill->GetAnMCEvent(xPe).GetPrimary();
-      int pTime = primary->GetTime(); // ns
+      double pTime = primary->GetTime(); // ns
 
       processDBB(hits, xPe, pTime);
       processFADC(hits, xPe, pTime);
