@@ -69,11 +69,11 @@ namespace global {
   };
 
   PIDBase::~PIDBase() {
-   // close file
-   if (_writeFile) {
-     _writeFile->Close();
-     _writeFile->Delete();
-   }
+    // close file
+    if (_writeFile) {
+      _writeFile->Close();
+      _writeFile->Delete();
+    }
   };
 
 
