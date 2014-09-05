@@ -1,0 +1,38 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 20. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100 mm
+  Module Mod1_Region1
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 20. mm
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyString Material Galactic
+    PropertyString Region Region1
+  }
+  Module Mod2_Region1
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 20. mm
+    PropertyHep3Vector Position 0. 0. 100. mm
+    PropertyString Material Galactic
+    PropertyString Region Region1
+  }
+  Module Mod3_Region2
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 20. mm
+    PropertyHep3Vector Position 0. 0. 200. mm
+    PropertyString Material Galactic
+    PropertyString Region Region2
+  }
+  Module Mod3_NoRegion
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 1. 1. 20. mm
+    PropertyHep3Vector Position 0. 0. 300. mm
+    PropertyString Material Galactic
+  }
+}
+

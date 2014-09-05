@@ -126,8 +126,8 @@ class TrackerDataManager {
     /** Print info about the track */
     void print_track_info(const SciFiHelicalPRTrack * const trk, int trk_num);
 
-    /** Print info about the seeds in a track */
-    void print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num);
+    // Print info about the seeds in a track */
+    // void print_seed_info(const SciFiHelicalPRTrack * const trk, int seed_num);
 
     /** Set whether to print track info to screen */
     void set_print_tracks(bool b) { _print_tracks = b; }

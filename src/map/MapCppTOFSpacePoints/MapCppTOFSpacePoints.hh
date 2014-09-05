@@ -99,6 +99,9 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
                           std::vector<int> xPlane1Hits,
                           std::map<int, std::string>& triggerhit_pixels) const;
   bool _map_init;
+  int runNumberSave;
+  void getTofCalib(int rnum);
+  Json::Value configJSON;
 };
 }
 

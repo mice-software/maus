@@ -154,8 +154,16 @@ class MapPyGroup:
         nu_spill = spill
         for worker in self._workers:
             if not (hasattr(worker, "can_convert") and worker.can_convert):
-                nu_spill = converter.string_repr(nu_spill)
-            nu_spill = worker.process(nu_spill)
+                old_spill = converter.string_repr(nu_spill)
+            else:
+                old_spill = nu_spill
+            nu_spill = worker.process(old_spill)
+            try:
+                converter.del_data_repr(old_spill)
+            except TypeError:
+                pass
+            old_spill = None
+
         return nu_spill
 
     def death(self):

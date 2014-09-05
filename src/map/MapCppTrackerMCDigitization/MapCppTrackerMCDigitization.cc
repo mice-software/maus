@@ -156,14 +156,6 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       } // ends loop over all the array
 
       a_digit->set_npe(nPE);
-
-      // .start. TO BE REMOVED .start.//
-      ThreeVector position = a_hit->GetPosition();
-      ThreeVector momentum = a_hit->GetMomentum();
-      a_digit->set_true_position(position);
-      a_digit->set_true_momentum(momentum);
-      // .end. TO BE REMOVED .end.//
-
       digits.push_back(a_digit);
     }
   } // ends 'for' loop over hits

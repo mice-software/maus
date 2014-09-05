@@ -38,6 +38,7 @@ namespace MAUS {
  *    - json_repr: represent data as a python dict
  *    - data_repr: represent data as a ROOT element
  *    - string_repr: represent data as a string element
+ *    - del_data_repr: explicitly free memory allocated to a ROOT element
  */
 
 namespace PyConverter {
@@ -59,6 +60,18 @@ PyObject* py_wrap_data(PyObject* self, PyObject* args);
  *  Takes one argument, returns a PyObject* which is the new data
  */
 PyObject* py_wrap_pyobject(PyObject* self, PyObject* args);
+
+/** Python function to delete MAUS::Data PyObject
+ *
+ *  Takes one argument which is the MAUS::Data. A type_error will be thrown if 
+ *  the argument is not a MAUS::Data. Returns Py_None.
+ *
+ *  The PyROOT data model wraps everything in a thing called an
+ *  ObjectProxy. Python counts the number of pointers to an object, and when
+ *  that reaches 0 python calls free on memory allocated; but ObjectProxy does
+ *  not delete the associated C++ object, so we have to do it here.
+ */
+PyObject* py_del_data_repr(PyObject* self, PyObject* args);
 }
 } // MAUS
 

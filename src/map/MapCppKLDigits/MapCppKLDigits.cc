@@ -64,6 +64,14 @@ void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
                           "Failed to initialise map KLChannelMap",
                           "MapCppKLDigits::_birth");
 
+    // Load the calibration
+    bool loaded_cal = _mapcal.InitializeFromCards(configJSON);
+    if (!loaded_cal)
+    throw MAUS::Exception(Exception::recoverable,
+                          "Failed to initialise map KLChannelMap",
+                          "MapCppKLDigits::_birth");
+
+
   xEnable_V1724_Unpacking = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_V1724_Unpacking",
                                                      JsonWrapper::booleanValue);
@@ -181,25 +189,42 @@ Json::Value MapCppKLDigits::getAdc(Json::Value xDocAdcHit) const {
 
   KLChannelKey* xKlAdcKey = _map.find(&xAdcDaqKey);
 
+  // Get the gain factors
+  double gain = _mapcal.Gain(*xKlAdcKey);
+
+  // Get the charge
+  int char_mm = JsonWrapper::GetProperty(xDocAdcHit,
+                                            "charge_mm",
+                                            JsonWrapper::intValue).asInt();
+  int char_pm = JsonWrapper::GetProperty(xDocAdcHit,
+                                            "charge_pm",
+                                            JsonWrapper::intValue).asInt();
+
+  // Equalize charges
+  char_mm /= gain;
+  char_pm /= gain;
+
   if (xKlAdcKey) {
     xDocInfo["kl_key"]            = xKlAdcKey->str();
     xDocInfo["cell"]              = xKlAdcKey->cell();
     xDocInfo["pmt"]               = xKlAdcKey->pmt();
 
 
-    xDocInfo["charge_mm"] = xDocAdcHit["charge_mm"];
-    xDocInfo["charge_pm"] = xDocAdcHit["charge_pm"];
+    xDocInfo["charge_mm"] = char_mm;
+    xDocInfo["charge_pm"] = char_pm;
     xDocInfo["position_max"] = xDocAdcHit["position_max"];
     xDocInfo["part_event_number"] = xDocAdcHit["part_event_number"];
     xDocInfo["phys_event_number"] = xDocAdcHit["phys_event_number"];
 
 
-    // std::cout << "phys_event_number= " << xDocInfo["phys_event_number"] << std::endl;
-    // std::cout << "part_event_number= " << xDocInfo["part_event_number"] << std::endl;
-    // std::cout << "adc= " << xDocAdcHit["charge_mm"] << std::endl;
-    // std::cout << "kl_key= " << xDocInfo["kl_key"] << std::endl;
-    // std::cout << "kl_cell= " << xDocInfo["cell"] << std::endl;
-    // std::cout << "kl_pmt= " << xDocInfo["pmt"] << std::endl;
+     // std::cout << "phys_event_number= " << xDocInfo["phys_event_number"] << std::endl;
+     // std::cout << "part_event_number= " << xDocInfo["part_event_number"] << std::endl;
+     // std::cout << "adc before= " << xDocAdcHit["charge_mm"] << std::endl;
+     // std::cout << "adc after= " << char_mm << std::endl;
+     // std::cout << "gain= " << gain << std::endl;
+     // std::cout << "kl_key= " << xDocInfo["kl_key"] << std::endl;
+     // std::cout << "kl_cell= " << xDocInfo["cell"] << std::endl;
+     // std::cout << "kl_pmt= " << xDocInfo["pmt"] << std::endl;
   }
 
   return xDocInfo;

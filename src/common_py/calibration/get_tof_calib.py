@@ -36,6 +36,7 @@ class GetCalib:
         Initialise the evaluator with math functions and units
         """
         self._current_cali = {}
+        self._run_cali = {}
         self.reset()
         cfg = Configuration()
         cfgdoc = cfg.getConfigJSON()
@@ -43,6 +44,8 @@ class GetCalib:
         cdb_url = cfgdoc_json['cdb_download_url'] + 'calibration?wsdl'
         self.cdb_server = cdb.Calibration()
         self.cdb_server.set_url(cdb_url)
+        self.tof_devs = {'TOF0', 'TOF1', 'TOF2'}
+        self.tof_ctypes = {'t0', 'tw', 'trigger'}
         #print 'Server: ', self.cdb_server.get_name(), \
         #                  self.cdb_server.get_version()
         try:
@@ -54,11 +57,9 @@ class GetCalib:
         """
         Evaluate a string expression given by formula
         """
-        tof_devs = {'TOF0', 'TOF1', 'TOF2'}
-        tof_ctypes = {'t0', 'tw', 'trigger'}
-        #print 'Calib: ', devname, ctype, fromdate
+        #print 'get_calib: ', devname, ctype, fromdate
         if devname != "" and ctype != "":
-            if devname not in tof_devs or ctype not in tof_ctypes:
+            if devname not in self.tof_devs or ctype not in self.tof_ctypes:
                 raise Exception('get_tof_calib failed. \
                                  Invalid detector/calib type.')
             # check whether we are asked for the current calibration 
@@ -84,8 +85,55 @@ class GetCalib:
             raise Exception('get_tof_calib failed.No device/calibration type.')
         return self._current_cali  
 
+    def get_calib_for_run(self, devname, run_num, ctype):
+        """
+        Evaluate a string expression given by formula
+        """
+        self.reset()
+        #print 'get_calib_for_run: ', devname, run_num, ctype
+        if devname != "" and ctype != "":
+            if devname not in self.tof_devs or ctype not in self.tof_ctypes:
+                raise Exception('get_tof_calib failed. \
+                                 Invalid detector/calib type.')
+            if run_num > 0 and run_num < 1251:
+                raise Exception('get_calib_for_run failed. \
+                                 Invalid run number.')
+            try:
+                #print 'getting calibration_for_run ',devname,run_num,ctype
+                self._run_cali = self.cdb_server.get_calibration_for_run(\
+                                                 devname, run_num, ctype)
+                #print self._run_cali
+                return self._run_cali
+            except CdbPermanentError:
+                #print 'failed to get calibration by run. trying by date...'
+                fromdate = self.date_from_run(run_num)
+                return self.get_calib(devname, ctype, fromdate)
+        else:
+            #print 'gtc: ',self._run_cali
+            return self._run_cali
+
+    def date_from_run(self, run_num):
+        """
+        This is really hacky because:
+         cdbServer->getDetectorCalibrationByRun is broken
+        So, set the valid date corresponding to this run number
+        And do a get_calibrations_for_date
+        Monte Carlo runs are 0 so just set them to 'current'
+        """
+        self.reset()
+        if run_num >= 1251 and run_num < 3201:
+            fromdate = '2009-11-01 12:00:00'
+        if run_num >= 3201 and run_num < 4956:
+            fromdate = '2011-11-24 12:00:00'
+        if run_num >= 4956 and run_num < 5790:
+            fromdate = '2013-08-01 12:00:00'
+        if run_num >= 5790 or run_num == 0:
+            fromdate = 'current'
+        return fromdate
+    
     def reset(self):
         """
         Reinitialize calibration 
         """
         self._current_cali = {}
+        self._run_cali = {}

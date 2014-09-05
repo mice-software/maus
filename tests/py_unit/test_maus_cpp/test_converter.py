@@ -25,7 +25,7 @@ import libMausCpp # pylint: disable=W0611
 
 from maus_cpp import converter
 
-def test_data():
+def make_test_data():
     """Generate a test MAUS.Data"""
     data = ROOT.MAUS.Data() # pylint: disable=E1101
     spill = ROOT.MAUS.Spill() # pylint: disable=E1101
@@ -42,7 +42,7 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         self.assertRaises(ValueError, converter.json_repr, ("",))
         dummy_tree = ROOT.TTree() # pylint: disable=E1101
         self.assertRaises(ValueError, converter.json_repr, dummy_tree)
-        maus_data = test_data()
+        maus_data = make_test_data()
         self.assertRaises(ValueError, converter.json_repr, (maus_data, ""))
         json_dict = converter.json_repr(maus_data)
         json_dict = converter.json_repr(maus_data)
@@ -61,6 +61,21 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         output_3 = converter.data_repr(_file.read())
         for i in range(2): # pylint: disable = W0612
             converter.data_repr(output_3)
+
+    def test_del_data(self):
+        """Check that we can delete MAUS data"""
+        try:
+            converter.del_data_repr("", "")
+            self.assertTrue(False, "Should have thrown")
+        except TypeError:
+            pass
+        try:
+            converter.del_data_repr("")
+            self.assertTrue(False, "Should have thrown")
+        except TypeError:
+            pass
+        maus_data = make_test_data()
+        converter.del_data_repr(maus_data)
 
 if __name__ == "__main__":
     unittest.main()

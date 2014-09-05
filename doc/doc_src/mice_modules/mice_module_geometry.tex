@@ -58,6 +58,9 @@ SensitiveDetector &
 string &
 Set to the type of sensitive detector required. Possible sensitive detectors are \textit{TOF}, \textit{SciFi},
 \textit{CKOV}, \textit{SpecialVirtual, Virtual, Envelope} or \textit{EMCAL}.\\\hline
+Region &
+string &
+Allocate the volume to the named Geant4 Region. This is used for setting up production thresholds (see simulation chapter). Child modules are automatically assigned to the parent module's region. The Root module is automatically assigned to \verb|DefaultRegionForTheWorld|. \\\hline
 \end{supertabular}
 \end{center}
 

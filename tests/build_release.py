@@ -85,7 +85,7 @@ def build_user_guide():
         if latexproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - latex failed"
         latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex',
-                                         "-split", "3", "-html_version", "3.2"],
+                                         "-split", "4", "-html_version", "3.2"],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait() # pylint: disable=E1101
         if latexproc.returncode != 0: # pylint: disable=E1101

@@ -68,6 +68,12 @@ class TestGetCalib(unittest.TestCase): #pylint: disable = R0904
         ctype = ""
         self.assertRaises(Exception, gtc_.get_calib, dev, ctype, calibdate)
 
+        # check we can get calib for a given run
+        dev = "TOF1"
+        ctype = "t0"
+        rnum = 4000
+        gtc_.get_calib_for_run(dev, rnum, ctype)
+
     def test_reset(self):
         """Test we can reset"""
         gtc_ = calibration.get_tof_calib.GetCalib()
