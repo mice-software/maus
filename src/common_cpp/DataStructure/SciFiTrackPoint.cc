@@ -31,17 +31,12 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
                                      _residual(-1),
-                                     _smoothed_residual(-1),
-                                     _mc_x(0.),
-                                     _mc_px(0.),
-                                     _mc_y(0.),
-                                     _mc_py(0.),
-                                     _mc_pz(0.) {
-  _clusters = new TRefArray();
+                                     _smoothed_residual(-1) {
+  _cluster = new TRef();
 }
 
 SciFiTrackPoint::~SciFiTrackPoint() {
-  delete _clusters;
+  delete _cluster;
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
@@ -81,14 +76,6 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
     _mom.setZ(1./fabs(state_vector(4, 0)));
   }
 
-  ThreeVector mc_mom = kalman_site->true_momentum();
-  ThreeVector mc_pos = kalman_site->true_position();
-  _mc_x  = mc_pos.x();
-  _mc_px = mc_mom.x();
-  _mc_y  = mc_pos.y();
-  _mc_py = mc_mom.y();
-  _mc_pz = mc_mom.z();
-
   _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
   _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
   _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
@@ -100,9 +87,8 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
 
-  _clusters = new TRefArray();
   // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
-  _clusters->Add(kalman_site->cluster());
+  _cluster = new TRef(kalman_site->cluster());
 }
 
 SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
@@ -120,18 +106,12 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _pos = point.pos();
   _mom = point.mom();
 
-  _mc_x  = point.mc_x();
-  _mc_px = point.mc_px();
-  _mc_y  = point.mc_y();
-  _mc_py = point.mc_py();
-  _mc_pz = point.mc_pz();
-
   _pull              = point.pull();
   _residual          = point.residual();
   _smoothed_residual = point.smoothed_residual();
 
   _covariance = point.covariance();
-  _clusters = new TRefArray(*point.get_clusters());
+  _cluster = new TRef(*point.get_cluster());
 }
 
 SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
@@ -151,56 +131,16 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _pos = rhs.pos();
   _mom = rhs.mom();
 
-  _mc_x  = rhs.mc_x();
-  _mc_px = rhs.mc_px();
-  _mc_y  = rhs.mc_y();
-  _mc_py = rhs.mc_py();
-  _mc_pz = rhs.mc_pz();
-
   _pull              = rhs.pull();
   _residual          = rhs.residual();
   _smoothed_residual = rhs.smoothed_residual();
 
   _covariance= rhs.covariance();
 
-  if (_clusters) delete _clusters;
-  _clusters = new TRefArray(*rhs.get_clusters());
+  if (_cluster) delete _cluster;
+  _cluster = new TRef(*rhs.get_cluster());
 
   return *this;
-}
-
-void SciFiTrackPoint::add_cluster(SciFiCluster* cluster) {
-  if (!_clusters) _clusters = new TRefArray();
-  _clusters->Add(cluster);
-}
-
-SciFiCluster* SciFiTrackPoint::cluster() const {
-  if (!_clusters) return NULL;
-  return static_cast<SciFiCluster*>(_clusters->At(0));
-}
-
-SciFiClusterPArray SciFiTrackPoint::get_clusters_pointers() const {
-  SciFiClusterPArray cl_pointers;
-
-  // Check the _clusters container is initialised
-  if (!_clusters) {
-    std::cerr << "Cluster TRefArray not initialised" << std::endl;
-    return cl_pointers;
-  }
-
-  for (int i = 0; i < (_clusters->GetLast()+1); ++i) {
-    cl_pointers.push_back(static_cast<SciFiCluster*>(_clusters->At(i)));
-  }
-  return cl_pointers;
-}
-
-void SciFiTrackPoint::set_clusters_pointers(const SciFiClusterPArray &clusters) {
-  if (_clusters) delete _clusters;
-  _clusters = new TRefArray();
-  for (
-    std::vector<SciFiCluster*>::const_iterator cl = clusters.begin(); cl != clusters.end(); ++cl) {
-    _clusters->Add(*cl);
-  }
 }
 
 } // ~namespace MAUS

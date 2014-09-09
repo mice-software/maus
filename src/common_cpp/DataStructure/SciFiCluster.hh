@@ -119,14 +119,6 @@ class SciFiCluster : public TObject {
 
   void set_digits_pointers(SciFiDigitPArray const &digits);
 
-  void set_true_momentum(ThreeVector p) { _true_p = p; }
-
-  ThreeVector get_true_momentum() const { return _true_p; }
-
-  void set_true_position(ThreeVector position) { _true_pos = position; }
-
-  ThreeVector get_true_position() const { return _true_pos; }
-
  private:
   bool _used;
 
@@ -135,8 +127,6 @@ class SciFiCluster : public TObject {
   double _channel_w, _npe, _time, _alpha;
 
   ThreeVector _direction, _position;
-
-  ThreeVector _true_pos, _true_p;
 
   TRefArray* _digits;
 

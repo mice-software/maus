@@ -126,6 +126,14 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    */
   void SetMiceModules(const MiceModule& mods);
 
+  /** Get the MAUS internal list of regions
+   *
+   *  MAUS needs to keep this internal list so that MAUS defaults can be 
+   *  applied to regions that are not listed in the datacards. It would be nice
+   *  if G4RegionStore let me access it's list of regions but not possible...
+   */
+  std::vector<std::string> GetRegions() {return _regions;}
+
  private:
   void ResetGeometry();
   void ResetFields();
@@ -152,6 +160,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
 
   void GeometryCleanup();
 
+  // Add to a G4Region if required
+  void AddToRegion(G4LogicalVolume* logic, MiceModule* mod);
   // Set G4 Stepping Accuracy parameters
   void SetSteppingAccuracy();
   // Set G4 Stepping Algorithm
@@ -202,6 +212,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   G4double _trackMax;
   G4double _timeMax;
   G4double _stepMax;
+
+  std::vector<std::string> _regions;
 
   #ifdef TESTS_CPP_UNIT_SIMULATION_DETECTORCONSTRUCTORTEST_CC
     FRIEND_TEST(DetectorConstructionTest, SetDatacardVariablesTest);

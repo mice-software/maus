@@ -1,0 +1,6 @@
+digraph pdfprodflow {
+b1 -> b2 -> b3;
+b1 [shape=box,label="Simulation"];
+b2 [shape=box,label="Global\nReconstruction "];
+b3 [shape=box,label="PDF\nProduction"];
+}

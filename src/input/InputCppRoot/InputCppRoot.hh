@@ -93,12 +93,7 @@ class InputCppRoot : public InputBase<std::string> {
      *  look for run number changing, so can get weirdness if there is a run
      *  with no spill data
      */
-    std::string _emitter_cpp();
-
-    /** Should be overloaded in SWIG call */
-    std::string emitter() {
-        throw(Exception(Exception::recoverable, "Test Exception", "Test::Exception"));
-    }
+    std::string _emit_cpp();
 
     /** Gets an event from the root file.
      *

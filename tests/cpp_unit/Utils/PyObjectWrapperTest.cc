@@ -102,21 +102,22 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   Py_DECREF(py_data);
 
   std::cerr << "String " << std::flush;
-  PyObject* py_str = PyObjectWrapper::wrap(&test);
+  PyObject* py_str = PyObjectWrapper::wrap(new std::string(test));
   EXPECT_EQ(py_str->ob_refcnt, 1);
   test_unwrap(py_str);
   Py_DECREF(py_str);
 
   std::cerr << "Json " << std::flush;
-  Json::Value* json_value =
-                    ConverterFactory().convert<std::string, Json::Value>(&test);
+  Json::Value* json_value = ConverterFactory().convert<std::string, Json::Value>
+                                                        (new std::string(test));
   PyObject* py_json = PyObjectWrapper::wrap(json_value);
   EXPECT_EQ(py_json->ob_refcnt, 1);
   test_unwrap(py_json);
   Py_DECREF(py_json);
 
   std::cerr << "PyObject" << std::endl;
-  PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>(&test);
+  PyObject* py_dict = ConverterFactory().convert<std::string, PyObject>
+                                                        (new std::string(test));
   EXPECT_EQ(py_dict->ob_refcnt, 1);
   PyObject* py_run_number = PyDict_GetItemString(py_dict, "run_number");
   int run_number =  PyInt_AsLong(py_run_number);

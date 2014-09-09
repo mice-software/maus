@@ -166,6 +166,13 @@
                                     }
                             </xsl:for-each> 
                 	    
+			<xsl:for-each select="MICE_Information/Detector_Information/Diffuser">
+			    Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>iris<xsl:value-of select="Iris/@name"/>_closed.dat
+			    {
+			    Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
+                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
+			    }
+               		</xsl:for-each>
                             //Module Tracker/TrackerSolenoid0.dat
                             //{
                             //    Position 0. 0. 15016.24 mm
@@ -185,15 +192,15 @@
                             //    ScaleFactor -1
                             //}
                                             //Other Modules
-                            <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
+                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
                             //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
                             //Go and select the diffuser model
-                            </xsl:when></xsl:choose>
+                            //</xsl:when></xsl:choose>
                 
-                            <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @protonAbsorberThickness)">
+                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @protonAbsorberThickness)">
                             //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@protonAbsorberThickness"/>
                             //Go and select the diffuser model
-                            </xsl:when></xsl:choose>
+                            //</xsl:when></xsl:choose>
 
                             // Fields
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
@@ -202,8 +209,8 @@
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">$D1Polarity*(1.0+($D1Current-240.516)/263.708)</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">$D2Polarity*(1.0+($D2Current-240.516)/263.708)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -260,8 +267,7 @@
                             ScaleFactor <xsl:value-of select="ScaleFactor/@name"/>
                             }
                 </xsl:for-each>
-                       } 
-                       
+		}        
             </body>
         </html>
     </xsl:template>

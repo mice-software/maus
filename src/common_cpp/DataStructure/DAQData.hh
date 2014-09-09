@@ -264,6 +264,19 @@ class DAQData {
 
     MAUS_VERSIONED_CLASS_DEF(DAQData)
 };
+
+// ROOT refused to build DAQData bindings when this was in the DAQData class
+// I guess it doesn't like templates? So put it somewhere separate
+namespace DAQDataHelper {
+template <class T>
+std::vector<T*> VectorDeepcopy(std::vector<T*> rhs) {
+    std::vector<T*> lhs;
+    for (size_t i = 0; i < rhs.size(); ++i) {
+        lhs.push_back(new T(*rhs[i]));
+    }
+    return lhs;
+}
+}
 }
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_DAQDATA_

@@ -18,13 +18,17 @@ def run():
     my_input = MAUS.InputPyJSON()
 
     my_output = MAUS.OutputPyJSON()
+    
+    my_map = MAUS.MapPyGroup()
+    
+    my_map.append(MAUS.MapCppGlobalPID())
 
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
-    MAUS.Go(my_input, MAUS.MapCppGlobalPID(), MAUS.ReducePyDoNothing(),
+    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(),
             my_output, datacards)
 
 if __name__ == '__main__':

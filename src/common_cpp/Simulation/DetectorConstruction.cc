@@ -31,6 +31,8 @@
 #include "Geant4/G4LogicalVolume.hh"
 #include "Geant4/G4ThreeVector.hh"
 #include "Geant4/G4PVPlacement.hh"
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
 // fields and transport
 #include "Geant4/G4ChordFinder.hh"
 #include "Geant4/G4TransportationManager.hh"
@@ -199,6 +201,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   // we never visualise the root LV
   _rootVisAtts = new G4VisAttributes(false);
   _rootLogicalVolume->SetVisAttributes(_rootVisAtts);
+  G4RegionStore* regionStore = G4RegionStore::GetInstance();
+  G4Region* rootRegion = regionStore->FindOrCreateRegion("DefaultRegionForTheWorld");
+  rootRegion->AddRootLogicalVolume(_rootLogicalVolume);
   return _rootPhysicalVolume;
 }
 
@@ -224,6 +229,8 @@ void DetectorConstruction::ResetGeometry() {
           _rootLogicalVolume->RemoveDaughter(vol);
       }
   }
+  // clear the regions list except G4 default region
+  _regions = std::vector<std::string>(1, "DefaultRegionForTheWorld");
 
   // now change the rootBox dimensions (and LV name)
   G4Box* rootBox = reinterpret_cast<G4Box*>(_rootLogicalVolume->GetSolid());
@@ -280,6 +287,7 @@ void DetectorConstruction::AddDaughter
       SetUserLimits(logic, mod);
       SetVisAttributes(logic, mod);
       BuildSensitiveDetector(logic, mod);
+      AddToRegion(logic, mod);
   }
 
   for (int i = 0; i < mod->daughters(); ++i)
@@ -355,6 +363,27 @@ void DetectorConstruction::BuildNormalVolume(G4PVPlacement** place,
     else
         Squeak::mout(my_err)  << std::endl;
 }
+
+void DetectorConstruction::AddToRegion(G4LogicalVolume* logic, MiceModule* mod) {
+    if (mod->propertyExistsThis("Region", "string")) {
+        std::string name = mod->propertyString("Region");
+        G4RegionStore* store = G4RegionStore::GetInstance();
+        // make a new region if required; should register itself in the
+        // G4RegionStore
+        if (store->GetRegion(name) == NULL) {
+            new G4Region(name);
+            _regions.push_back(name);
+        }
+        G4Region* region = store->GetRegion(name);
+        if (region == NULL) {  // just to cross check that G4 is doing its job
+            throw MAUS::Exception(Exception::recoverable,
+                                  "Failed to make region",
+                                  "DetectorConstruction::AddToRegion");
+        }
+        region->AddRootLogicalVolume(logic);
+    }
+}
+
 
 void DetectorConstruction::SetVisAttributes
                                      (G4LogicalVolume* logic, MiceModule* mod) {

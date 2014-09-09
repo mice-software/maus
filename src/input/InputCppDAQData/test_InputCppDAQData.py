@@ -22,7 +22,7 @@ import os
 import unittest
 # import json
 from Configuration import Configuration
-from InputCppDAQData import InputCppDAQData
+from _InputCppDAQData import InputCppDAQData
 
 class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for InputCppDAQData"""
@@ -35,14 +35,14 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
         # It would be nicer to test with a smaller data file!
         self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        self._datafile = '02873'
+        self._datafile = '05466'
         self._c = Configuration()
         self._mapper = InputCppDAQData()
 
     def test_init(self): # pylint: disable = W0201
         """Check birth with default configuration"""
-        self.assertTrue(self._mapper.birth( self._c.getConfigJSON() ))
-        self.assertTrue(self._mapper.death())
+        self._mapper.birth( self._c.getConfigJSON() )
+        self._mapper.death()
         return
 
     @classmethod

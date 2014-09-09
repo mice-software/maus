@@ -128,10 +128,6 @@ class KalmanState {
 
   void set_covariance_residual(TMatrixD C, State kalman_state);
 
-  void set_true_momentum(ThreeVector mc_mom) { _mc_mom = mc_mom; }
-
-  void set_true_position(ThreeVector mc_pos) { _mc_pos = mc_pos; }
-
   void set_input_shift(TMatrixD input_shift)       { _input_shift = input_shift; }
 
   void set_input_shift_covariance(TMatrixD input_covariance) {
@@ -189,10 +185,6 @@ class KalmanState {
 
   ThreeVector direction()          const { return _direction; }
 
-  ThreeVector true_momentum()      const { return _mc_mom; }
-
-  ThreeVector true_position()      const { return _mc_pos; }
-
  private:
   /// The spill.
   int _spill;
@@ -245,9 +237,6 @@ class KalmanState {
 
   TMatrixD _input_shift_covariance;
   TMatrixD _shift_covariance;
-
-  ThreeVector _mc_pos;
-  ThreeVector _mc_mom;
 };
 
 typedef std::vector<KalmanState*> KalmanStatesPArray;

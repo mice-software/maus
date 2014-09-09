@@ -49,21 +49,6 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("mom", &_threevector_proc,
                         &SciFiTrackPoint::mom,
                         &SciFiTrackPoint::set_mom, false);
-    RegisterValueBranch("mc_x", &_double_proc,
-                        &SciFiTrackPoint::mc_x,
-                        &SciFiTrackPoint::set_mc_x, false);
-    RegisterValueBranch("mc_px", &_double_proc,
-                        &SciFiTrackPoint::mc_px,
-                        &SciFiTrackPoint::set_mc_px, false);
-    RegisterValueBranch("mc_y", &_double_proc,
-                        &SciFiTrackPoint::mc_y,
-                        &SciFiTrackPoint::set_mc_y, false);
-    RegisterValueBranch("mc_py", &_double_proc,
-                        &SciFiTrackPoint::mc_py,
-                        &SciFiTrackPoint::set_mc_py, false);
-    RegisterValueBranch("mc_pz", &_double_proc,
-                        &SciFiTrackPoint::mc_pz,
-                        &SciFiTrackPoint::set_mc_pz, false);
     RegisterValueBranch("pull", &_double_proc,
                         &SciFiTrackPoint::pull,
                         &SciFiTrackPoint::set_pull, false);
@@ -76,7 +61,7 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("covariance", &_matrix_proc,
                         &SciFiTrackPoint::covariance,
                         &SciFiTrackPoint::set_covariance, false);
-//     RegisterTRefArray("clusters", &_cluster_tref_proc,
-//                       &SciFiTrackPoint::get_clusters, &SciFiTrackPoint::set_clusters, true);
+    ObjectProcessor<SciFiTrackPoint>::RegisterTRef("cluster",
+             &SciFiTrackPoint::get_cluster_tobject, &SciFiTrackPoint::set_cluster_tobject, true);
 }
 } // ~namespace MAUS

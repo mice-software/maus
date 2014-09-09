@@ -46,12 +46,5 @@ SciFiDigitProcessor::SciFiDigitProcessor() {
     RegisterValueBranch("used", &_bool_proc,
                         &SciFiDigit::is_used,
                         &SciFiDigit::set_used, true);
-
-    RegisterValueBranch("position", &_three_vec_proc,
-                        &SciFiDigit::get_true_position,
-                        &SciFiDigit::set_true_position, true);
-    RegisterValueBranch("momentum", &_three_vec_proc,
-                        &SciFiDigit::get_true_momentum,
-                        &SciFiDigit::set_true_momentum, true);
 }
 }

@@ -1,0 +1,80 @@
+import os
+
+#------------------------------------------
+# Some initial setup
+#------------------------------------------
+type_of_dataflow = 'pipeline_single_thread'
+verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
+
+#------------------------------------------
+# Used by MapCppSimulation
+#------------------------------------------
+keep_tracks = True # set to true to keep start and end point of every track
+keep_steps = False # set to true to keep start and end point of every track and every step point
+
+# Geometry used by simulation
+# simulation_geometry_filename = "%s/files/geometry/download/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
+simulation_geometry_filename = "Stage4_NoField.dat"
+
+# Geant4 physics model
+maximum_number_of_steps = 1000
+physics_model = "QGSP_BERT" # Physics package loaded by MAUS to set default values; modifications can be made
+reference_physics_processes = "mean_energy_loss" # controls the physics processes of the reference particle. Set to "none" to disable all physics processes; or "mean_energy_loss" to make the reference particle see deterministic energy loss only
+physics_processes = "standard" # controls the physics processes of normal particles. Set to "none" to disable all physics processes; "mean_energy_loss" to enable deterministic energy loss only; or "standard" to enable all physics processes
+particle_decay = True # set to true to activate particle decay, or False to inactivate particle decay
+
+# Geant4 visualisation (not event display)
+geant4_visualisation = False
+accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 0 = no
+
+#------------------------------------------
+# Used by InputPySpillGenerator
+#------------------------------------------
+spill_generator_number_of_spills = 100
+
+#------------------------------------------
+# Used by MapPyBeamMaker to generate input particle data
+#------------------------------------------
+simulation_reference_particle = {
+    "position":{"x":0.0, "y":-0.0, "z":11000.0},
+    "momentum":{"x":0.0, "y":0.0, "z":1.0},
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+}
+# This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
+beam = {
+    "particle_generator":"binomial", # routine for generating empty primaries
+    "binomial_n":2, # number of coin tosses
+    "binomial_p":1.0, # probability of making a particle on each toss
+    "random_seed":5, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+    "definitions":[
+    ##### MUONS #######
+    {
+       "reference":simulation_reference_particle, # reference particle
+       "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
+       "weight":100., # probability of generating a particle
+       "transverse":{
+          "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
+          "emittance_4d": 1, # 4d emittance
+          "normalised_angular_momentum":0.1, # angular momentum from diffuser
+          "bz":4.e-3 # magnetic field strength for angular momentum calculation
+       },
+       "longitudinal":{"longitudinal_mode":"sawtooth_time", # longitudinal distribution sawtooth in time
+                   "momentum_variable":"p", # Gaussian in total momentum (options energy, pz)
+                   "sigma_p":25., # RMS total momentum
+                   "t_start":-1.e6, # start time of sawtooth
+                   "t_end":+1.e6}, # end time of sawtooth
+       "coupling":{"coupling_mode":"none"} # no dispersion
+    }
+  ]
+}
+
+#------------------------------------------
+# Reconstruction parameters
+#------------------------------------------
+reconstruction_geometry_filename = simulation_geometry_filename
+SciFiPRHelicalOn = False
+SciFiPRStraightOn = True
+SciFiKalmanOn = True
+SciFiPatRecVerbosity = 0
+

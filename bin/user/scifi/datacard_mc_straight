@@ -5,7 +5,7 @@ import os
 #------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
 # input_root_file = "maus_output_10kspills_muplus_digitisation_2013-11-18.root"
-# output_root_file_name = "maus_output_norecon_muplus_10kspills_2014-02-25.root"
+output_root_file_name = "maus_output_straight_tracks.root"
 verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
 
 #------------------------------------------
@@ -32,7 +32,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 100
+spill_generator_number_of_spills = 5
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -78,5 +78,5 @@ reconstruction_geometry_filename = simulation_geometry_filename
 SciFiPRHelicalOn = False
 SciFiPRStraightOn = True
 SciFiKalmanOn = True
-SciFiPatRecVerbosity = 1
+SciFiPatRecVerbosity = 0
 
