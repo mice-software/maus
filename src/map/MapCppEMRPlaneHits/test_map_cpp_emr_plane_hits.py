@@ -73,13 +73,13 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         self.assertFalse("bad_json_document" in spill_out["errors"])
         self.assertFalse("bad_cpp_data" in spill_out["errors"])
         n_ev = len(spill_out['recon_events'])
-        self.assertEqual(3, n_ev)
+        self.assertEqual(3, n_ev-2)
         n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
                                 ['emr_plane_hits'])
-        self.assertEqual(1, n_hits_0)
+        self.assertEqual(0, n_hits_0)
         n_hits_1 = len(spill_out['recon_events'][1]['emr_event']\
                                 ['emr_plane_hits'])
-        self.assertEqual(2, n_hits_1)
+        self.assertEqual(1, n_hits_1)
         n_hits_2 = len(spill_out['recon_events'][2]['emr_event']\
                                 ['emr_plane_hits'])
         self.assertEqual(1, n_hits_2)

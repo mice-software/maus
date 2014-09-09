@@ -34,6 +34,7 @@
 #include <vector>
 #include <map>
 
+// MAUS
 #include "Utils/EMRChannelMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
@@ -48,25 +49,21 @@
 
 namespace MAUS {
 
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector;
-typedef std::vector<EMRBarHitsVector>   EMRBarVector;
-typedef std::vector<EMRBarVector>       EMRPlaneVector;
-typedef std::vector<EMRPlaneVector>     EMREventVector_4;
+typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
+typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
+typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
+typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 
-struct EMRPlaneData {
-  int _orientation;
-  int _charge;
-  int _time;
-  int _spill;
-  int _deltat;
+struct fADCdata {
+  int    _orientation;
+  double _charge;
+  int    _time;
+  int    _deltat;
+  int    _spill;
 };
 
-
-#define NUM_DBB_PLANES      48
-#define NUM_DBB_CHANNELS    61
-
-typedef std::vector<EMRPlaneData>                EMRPlaneHitsVector;
-typedef std::vector<EMRPlaneHitsVector>          EMREventVector_2;
+typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
+typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
 
 class MapCppEMRPlaneHits {
 
@@ -99,21 +96,52 @@ class MapCppEMRPlaneHits {
 
  private:
 
-  void processDBB(MAUS::EMRDaq EMRdaq, int nPartTrigger);
-  void processFADC(MAUS::EMRDaq EMRdaq, int nPartTrigger);
-  void fill(MAUS::Spill *spill, int nPartTrigger);
-
+  /** @brief resets fADC and DBB data
+ *
+ *  Resizes the DBB and fADC event
+ *  vectors and reinitialize their
+ *  values and parameters
+ */
   void reset_data_tmp(int nPartEvts);
+
+  /** @brief fill DBB Events
+ *
+ *  Fill DBBEventVector
+ */
+  void processDBB(EMRDaq EMRdaq, int nPartTrigger);
+
+  /** @brief fill fADC Events
+ *
+ *  Fill fADCEventVector
+ */
+  void processFADC(EMRDaq EMRdaq, int nPartTrigger);
+
+  /** @brief fill Recon Events
+ *
+ *  Fill the EMRData with 
+ *  reconstructed events
+ */
+  void fill(Spill *spill, int nPartTrigger);
 
   std::string _classname;
 
   EMRChannelMap _emrMap;
 
-  int _trigger_window_lower;
-  int _trigger_window_upper;
+  // fADC and DBB data arrays
+  EMRDBBEventVector  _emr_dbb_events_tmp;
+  EMRfADCEventVector _emr_fadc_events_tmp;
 
-  EMREventVector_2     _emr_events_tmp2;
-  EMREventVector_4     _emr_events_tmp4;
+  // Detector parameters
+  int _number_of_planes;
+  int _number_of_bars;
+
+  // Hit pre-selection cuts
+  int _tot_noise_low;
+  int _tot_noise_up;
+  int _deltat_signal_low;
+  int _deltat_signal_up;
+  int _deltat_noise_low;
+  int _deltat_noise_up;
 };
 }
 

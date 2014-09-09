@@ -62,7 +62,7 @@
 namespace MAUS {
 
 typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 61 elements */
+typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
 typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
 typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 

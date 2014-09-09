@@ -413,13 +413,18 @@ KLadcConversionFactor = 0.125
 
 # EMR characteristics
 EMRnumberOfPlanes = 48
-EMRnumberOfBars = 60 # number of bars in one plane (including the test channel)
+EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
 EMRnBars = 2832 # total number of bars in the EMR
 EMRbarLength = 110 # cm, length of a scintillating bar
 
 # EMR event pre-selection
 EMRtotNoiseLow = 0
 EMRtotNoiseUp = 7 # noise time over threshold window
+
+EMRdeltatSignalLow = -240 # Step I
+EMRdeltatSignalUp = -220 # Step I
+EMRdeltatNoiseLow = -220 # Step I
+EMRdeltatNoiseUp = -175 # Step I
 
 # EMR digitization
 EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution

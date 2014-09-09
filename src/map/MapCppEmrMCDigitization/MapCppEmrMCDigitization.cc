@@ -30,14 +30,21 @@ namespace MAUS {
 ////////////////////////////////////////////////////////////////////////////
 bool MapCppEmrMCDigitization::birth(std::string argJsonConfigDocument) {
   _classname = "MapCppEmrMCDigitization";
-
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+
+//  if (!pMAUS_ROOT_DIR) {
+//    Squeak::mout(Squeak::error)
+//    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+//    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+//    return false;
+//  }
 
   try {
     //  JsonCpp setup
     Json::Value configJSON;
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
+    // Fetch variables
     _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
     _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
 
@@ -399,7 +406,7 @@ void MapCppEmrMCDigitization::fill(Spill *spill, int nPartEvents) {
     }
   }
 
-  if (nPartEvents == recPartEvents+2) { // Regular size recEvts already created
+  if (nPartEvents == recPartEvents+2) { // Regular sized recEvts already created
     for (int ipe = 0; ipe < 2; ipe++) {
       recEvts->push_back(new ReconEvent);
     }
@@ -613,7 +620,7 @@ void MapCppEmrMCDigitization::digitize(EMREvent *evt, int xPe, int nPartEvents) 
 	bHit.SetDeltaT(xDeltaTDigi);
 	bHit.SetHitTime(xHitTimeDigi);
 
-	// select signal and noise events
+	// discriminate noise and decays from signal events
 	if (xDeltaTDigi > _deltat_signal_low && xDeltaTDigi < _deltat_signal_up) {
 	  _emr_dbb_events_tmp[xPe][xPlane][xBar].push_back(bHit);
 	} else if (xDeltaTDigi > _deltat_noise_low && xDeltaTDigi < _deltat_noise_up &&
