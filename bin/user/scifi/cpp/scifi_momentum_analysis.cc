@@ -47,13 +47,16 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
-  int n_bins_pz_resol = 0;    // No. of bins in histos used to find pz resols (0 = let ROOT decide)
-  int n_pz_points = 9;        // No. of data points in each pz resolution plot
-  double pz_fit_min = -50.0;    // Lower bound of the gaussian fit to histos used to find pz resols
+  int n_pt_bins = 0;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
+  int n_pz_bins = 0;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_points = 9;            // No. of data points in each resolution plot
+  double pt_fit_min = -10.0;   // Lower bound of the gaussian fit to histos used to find pt resols
+  double pt_fit_max = 10.0;    // Upper bound of the gaussian fit to histos used to find pt resols
+  double pz_fit_min = -50.0;   // Lower bound of the gaussian fit to histos used to find pz resols
   double pz_fit_max = 50.0;    // Upper bound of the gaussian fit to histos used to find pz resols
-  double pz_lower_bound = 0;  // Lower bound on pt_mc of pz resolution plots
-  double pz_upper_bound = 90; // Upper bound on pt_mc of pz resolution plots
-  double pz_rec_cut = 500.0;  // Cut on reconstruction pz applied to histos used to find pz resols
+  double lower_bound = 0;      // Lower bound on pt_mc of resolution plots
+  double upper_bound = 90;     // Upper bound on pt_mc of resolution plots
+  double pz_rec_cut = 500.0;   // Cut on reconstruction pz applied to histos used to find pz resols
 
   // Parse any extra arguments supplied from the command line
   //   -p -> pause between events
@@ -74,34 +77,45 @@ int main(int argc, char *argv[]) {
       } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
-    } else if ( std::strcmp(argv[i], "-n_bins_pz_resol") == 0 ) {
+    } else if ( std::strcmp(argv[i], "-n_pt_bins") == 0 ) {
       if ( (i+1) < argc ) {
         std::stringstream ss1(argv[i + 1]);
-        ss1 >> n_bins_pz_resol;
+        ss1 >> n_pt_bins;
+      } else if ( std::strcmp(argv[i], "-n_pz_bins") == 0 ) {
+      if ( (i+1) < argc ) {
+        std::stringstream ss1(argv[i + 1]);
+        ss1 >> n_pz_bins;
       }
     }
   }
-  if ( n_bins_pz_resol == 0 ) {
-    std::cout << "Using ROOT auto binning for pz resolution histos" << std::endl;
+  if ( n_bins_resol == 0 ) {
+    std::cout << "Using ROOT auto binning for resolution histos" << std::endl;
   } else {
-    std::cout << "Pz resolution histos set to have number of bins = " << n_bins_pz_resol << "\n";
+    std::cout << "Resolution histos set to have number of bins = " << n_bins_resol << "\n";
   }
 
   // Set up analysis class
   MAUS::TrackerDataAnalyserMomentum analyser;
-  analyser.set_n_bins(n_bins_pz_resol);
-  analyser.set_n_pz_points(n_pz_points);
+  analyser.set_n_pt_bins(n_pt_bins);
+  analyser.set_n_pz_bins(n_pz_bins);
+  analyser.set_n_points(n_points);
+  analyser.set_pt_fit_min(pt_fit_min);
+  analyser.set_pt_fit_max(pt_fit_max);
   analyser.set_pz_fit_min(pz_fit_min);
   analyser.set_pz_fit_max(pz_fit_max);
-  analyser.set_pz_lower_bound(pz_lower_bound);
-  analyser.set_pz_upper_bound(pz_upper_bound);
-  analyser.set_cutPzRec(pz_rec_cut);
+  analyser.set_resol_lower_bound(lower_bound);
+  analyser.set_resol_upper_bound(upper_bound);
+  analyser.set_cut_pz_rec(pz_rec_cut);
+  std::cout << "Pt resolution histogram number of bins: " << analyser.get_n_pt_bins() << "\n";
+  std::cout << "Pt resolution histogram fit lower bound: " << analyser.get_pt_fit_min() << "\n";
+  std::cout << "Pt resolution histogram fit upper bound: " << analyser.get_pt_fit_max() << "\n";
+  std::cout << "Pz resolution histogram number of bins: " << analyser.get_n_pz_bins() << "\n";
   std::cout << "Pz resolution histogram fit lower bound: " << analyser.get_pz_fit_min() << "\n";
   std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
-  std::cout << "Pz resolution graphs number of points:  " << analyser.get_n_pz_points() << "\n";
-  std::cout << "Pz resolution graphs lower bound:  " << analyser.get_pz_lower_bound() << " MeV/c\n";
-  std::cout << "Pz resolution graphs upper bound:  " << analyser.get_pz_upper_bound() << " MeV/c\n";
-  std::cout << "Pz rec cut: " << analyser.get_cutPzRec() << " MeV/c\n";
+  std::cout << "Resolution graphs number of points:  " << analyser.get_n_points() << "\n";
+  std::cout << "Resolution graphs lower bound:  " << analyser.get_resol_lower_bound() << " MeV/c\n";
+  std::cout << "Resolution graphs upper bound:  " << analyser.get_resol_upper_bound() << " MeV/c\n";
+  std::cout << "Pz rec cut: " << analyser.get_cut_pz_rec() << " MeV/c\n";
   analyser.setUp();
 
   // Set up ROOT app, input file, and MAUS data class
@@ -117,8 +131,7 @@ int main(int argc, char *argv[]) {
     infile >> branchName("data") >> data;
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
-      std::cout << "Total number of spills: " << counter << ".  ";
-      std::cout << "Spill number: " << spill->GetSpillNumber() << std::endl;
+      if ( fmod(counter, 1000) == 0 ) std::cout << "Total number of spills: " << counter << ".\n";
       analyser.accumulate(spill);
       if (bool_pause) {
         std::cout << "Press Enter to Continue";
@@ -132,6 +145,7 @@ int main(int argc, char *argv[]) {
   // Make the final plots
   analyser.make_residual_histograms();
   analyser.make_residual_graphs();
+  analyser.make_pt_resolutions();
   analyser.make_pz_resolutions();
   analyser.make_resolution_graphs();
   analyser.save_graphics(save_type);

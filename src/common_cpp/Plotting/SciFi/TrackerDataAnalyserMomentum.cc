@@ -75,103 +75,59 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _t1_pz_res_pt(NULL),
     _t2_pt_res_pt(NULL),
     _t2_pz_res_pt(NULL),
-    _t1_pz_resol(NULL),
-    _t2_pz_resol(NULL),
-    _resol_histos_t1(NULL),
-    _resol_histos_t2(NULL),
+    _t1_pt_resol_pt_mc(NULL),
+    _t1_pz_resol_pt_mc(NULL),
+    _t2_pt_resol_pt_mc(NULL),
+    _t2_pz_resol_pt_mc(NULL),
+    _t1_pt_resol_pt_mc_hists(NULL),
+    _t1_pz_resol_pt_mc_hists(NULL),
+    _t2_pt_resol_pt_mc_hists(NULL),
+    _t2_pz_resol_pt_mc_hists(NULL),
     _cResiduals(NULL),
     _cGraphs(NULL),
     _cResolutions(NULL),
-    _n_bins(200),
-    _n_pz_points(9),
+    _n_pt_bins(200),
+    _n_pz_bins(200),
+    _n_points(9),
+    _pt_fit_min(-50),
+    _pt_fit_max(50),
     _pz_fit_min(-50),
     _pz_fit_max(50),
-    _pz_lower_bound(0.0),
-    _pz_upper_bound(90.0),
-    _cutPzRec(0.0) {
+    _resol_lower_bound(0.0),
+    _resol_upper_bound(90.0),
+    _cut_pz_rec(0.0) {
   // Do nothing
 }
 
 TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
   if (_out_file) delete _out_file;
   if (_tree) delete _tree;
+  // Residual Histograms
   if (_t1_pt_res) delete _t1_pt_res;
   if (_t1_pz_res) delete _t1_pz_res;
   if (_t1_pz_res_log) delete _t1_pz_res_log;
   if (_t2_pt_res) delete _t2_pt_res;
   if (_t2_pz_res) delete _t2_pz_res;
   if (_t2_pz_res_log) delete _t2_pz_res_log;
-  if (_t1_pt_res_pt) delete _t1_pz_res_pt;
-  if (_t1_pz_res_pt) delete _t1_pt_res_pt;
-  if (_t2_pt_res_pt) delete _t2_pz_res_pt;
-  if (_t2_pz_res_pt) delete _t2_pt_res_pt;
-  if (_t1_pz_resol) delete _t1_pz_resol;
-  if (_t2_pz_resol) delete _t2_pz_resol;
-  if (_resol_histos_t1) delete _resol_histos_t1;
-  if (_resol_histos_t2) delete _resol_histos_t2;
-  if (_t2_pz_resol) delete _t2_pz_resol;
+  // Residual Graphs
+  if (_t1_pt_res_pt) delete _t1_pt_res_pt;
+  if (_t1_pz_res_pt) delete _t1_pz_res_pt;
+  if (_t2_pt_res_pt) delete _t2_pt_res_pt;
+  if (_t2_pz_res_pt) delete _t2_pz_res_pt;
+  // Resolution Graphs
+  if (_t1_pt_resol_pt_mc) delete _t1_pt_resol_pt_mc;
+  if (_t1_pz_resol_pt_mc) delete _t1_pz_resol_pt_mc;
+  if (_t2_pt_resol_pt_mc) delete _t2_pt_resol_pt_mc;
+  if (_t2_pz_resol_pt_mc) delete _t2_pz_resol_pt_mc;
+  // Histos used to make resolution graphs
+  if (_t1_pt_resol_pt_mc_hists) delete _t1_pt_resol_pt_mc_hists;
+  if (_t1_pz_resol_pt_mc_hists) delete _t1_pz_resol_pt_mc_hists;
+  if (_t2_pt_resol_pt_mc_hists) delete _t2_pt_resol_pt_mc_hists;
+  if (_t2_pz_resol_pt_mc_hists) delete _t2_pz_resol_pt_mc_hists;
+  // Canvases
   if (_cResiduals) delete _cResiduals;
   if (_cGraphs) delete _cGraphs;
   if (_cResolutions) delete _cResolutions;
-}
-
-void TrackerDataAnalyserMomentum::setUp() {
-  // Set up the output ROOT file
-  _out_file = new TFile("momentum_analysis_output.root", "recreate");
-
-  // Set up the output tree
-  _tree = new TTree("tree", "Momentum Residual Data");
-  _tree->Branch("spill_num", &_spill_num, "spill_num/I");
-  _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
-  _tree->Branch("charge", &_charge, "charge/I");
-  _tree->Branch("num_points", &_num_points, "num_points/I");
-  _tree->Branch("n_bad_tracks", &_n_bad_tracks, "n_bad_tracks/I");
-  _tree->Branch("mc_track_id", &_mc_track_id, "mc_track_id/I");
-  _tree->Branch("mc_pid", &_mc_pid, "mc_pid/I");
-  _tree->Branch("n_matched", &_n_matched, "n_matched/I");
-  _tree->Branch("n_mismatched", &_n_mismatched, "n_mismatched/I");
-  _tree->Branch("n_missed", &_n_missed, "n_missed/I");
-  _tree->Branch("pt_rec", &_pt_rec, "pt_rec/D");
-  _tree->Branch("pz_rec", &_pz_rec, "pz_rec/D");
-  _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
-  _tree->Branch("pz_mc", &_pz_mc, "pz_mc/D");
-
-  // Set up the residual histograms
-  int res_n_bins = 100;
-
-  _t1_pt_res = new TH1D("t1_pt_res", "T1 p_{t} Residual", res_n_bins, -5, 5);
-  _t1_pt_res->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
-
-  _t1_pz_res = new TH1D("t1_pz_res", "T1 p_{z} Residual", res_n_bins, -30, 30);
-  _t1_pz_res->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
-
-  _t1_pz_res_log = new TH1D("t1_pz_res_log", "T1 p_{z} Residual", res_n_bins, -500, 500);
-  _t1_pz_res_log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
-
-  _t2_pt_res = new TH1D("t2_pt_res", "T2 p_{t} Residual", res_n_bins, -5, 5);
-  _t2_pt_res->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
-
-  _t2_pz_res = new TH1D("t2_pz_res", "T2 p_{z} Residual", res_n_bins, -30, 30);
-  _t2_pz_res->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
-
-  _t2_pz_res_log = new TH1D("t2_pz_res_log", "T2 p_{z} Residual", res_n_bins, -500, 500);
-  _t2_pz_res_log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
-
-  // Set up the residual graphs
-  _t1_pz_res_pt = new TGraph();
-  _t2_pz_res_pt = new TGraph();
-
-  _resol_histos_t1 = new TObjArray(0);
-  _resol_histos_t2 = new TObjArray(0);
-  _resol_histos_t1->SetOwner(kTRUE);
-  _resol_histos_t2->SetOwner(kTRUE);
-
-  // Set global styles
-  gStyle->SetOptStat(111111);
-  gStyle->SetLabelSize(0.05, "XYZ");
-  gStyle->SetTitleOffset(1.15, "X");
-  gStyle->SetStatW(0.3);
-  gStyle->SetStatH(0.2);
 }
 
 void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
@@ -310,31 +266,152 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
   }
 }
 
-bool TrackerDataAnalyserMomentum::find_mc_spoint_momentum(const int track_id,
-                const SciFiSpacePoint* sp, SciFiLookup &lkup, ThreeVector &mom) {
+bool TrackerDataAnalyserMomentum::calc_pt_resolution(const int trker, const TCut cut,
+                                                     double &res, double &res_err) {
+  if (_tree) {
+    _out_file->cd();
+    TCanvas lCanvas;
 
-  std::vector<SciFiCluster*> clusters = sp->get_channels_pointers();
-  std::vector<SciFiCluster*>::iterator clus_it;
-  for (clus_it = clusters.begin(); clus_it != clusters.end(); ++clus_it) {
-    std::vector<SciFiDigit*> digits = (*clus_it)->get_digits_pointers();
-    std::vector<SciFiDigit*>::iterator dig_it;
-    for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
-      std::vector<SciFiHit*> hits;
-      if (!lkup.get_hits((*dig_it), hits)) {
-        std::cerr << "Lookup failed\n";
-        continue;
-      }
-      std::vector<SciFiHit*>::iterator hit_it;
-      for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
-        if (track_id == (*hit_it)->GetTrackId()) {
-          mom = (*hit_it)->GetMomentum();
-          return true;
-        }
+    // Create a histogram of the pt residual for the mc variable interval defined by the input cut
+    _tree->Draw("pt_mc-pt_rec>>h1", cut);
+
+    // Pull the histogram from the current pad
+    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
+    double xmin = h1->GetXaxis()->GetXmin();
+    double xmax = h1->GetXaxis()->GetXmax();
+
+    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
+    if ( _n_pt_bins == 0 ) _n_pt_bins = h1->GetNbinsX();
+    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_pt_bins, xmin, xmax);
+    _tree->Draw("pt_mc-pt_rec>>h2", cut);
+
+    // Fit a gaussian to the histogram
+    h2->Fit("gaus", "", "", _pt_fit_min, _pt_fit_max);
+    TF1 *fit1 = h2->GetFunction("gaus");
+    if (!fit1) {
+      std::cerr << "calc_pt_resolution: Fit failed\n";
+      return false;
+    }
+
+    // Extract the sigma of the gaussian fit (equivalent to the pt resolution for this interval)
+    res = fit1->GetParameter(2);
+    res_err = fit1->GetParError(2);
+
+    if (trker == 0) {
+      _t1_pt_resol_pt_mc_hists->Add(h2);
+    } else if (trker == 1) {
+      _t2_pt_resol_pt_mc_hists->Add(h2);
+    }
+
+    // Scale gets messed up unless histogram is deleted each time
+    delete h1;
+
+    return true;
+  } else {
+    std::cerr << "Tree pointer invalid" << std::endl;
+    return false;
+  }
+}
+
+bool TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut cut,
+                                                     double &res, double &res_err) {
+  if (_tree) {
+    _out_file->cd();
+    TCanvas lCanvas;
+    // Create a histogram of the pz residual for the pt_mc interval defined by the input cut
+    if (trker == 0) {
+      _tree->Draw("pz_mc+charge*pz_rec>>h1", cut);
+    } else if (trker == 1) {
+      _tree->Draw("pz_mc-charge*pz_rec>>h1", cut);
+    }
+    // Pull the histogram from the current pad
+    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
+    double xmin = h1->GetXaxis()->GetXmin();
+    double xmax = h1->GetXaxis()->GetXmax();
+    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
+    if ( _n_pz_bins == 0 ) _n_pz_bins = h1->GetNbinsX();
+    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_pz_bins, xmin, xmax);
+    if (trker == 0) {
+      _tree->Draw("pz_mc+charge*pz_rec>>h2", cut);
+    } else if (trker == 1) {
+      _tree->Draw("pz_mc-charge*pz_rec>>h2", cut);
+    }
+    // TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
+    // Fit a gaussian to the histogram
+    h2->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
+    TF1 *fit1 = h2->GetFunction("gaus");
+    if (!fit1) {
+      std::cerr << "calc_pz_resolution: Fit failed\n";
+      return false;
+    }
+
+    // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
+    res = fit1->GetParameter(2);
+    res_err = fit1->GetParError(2);
+
+    if (trker == 0) {
+      _t1_pz_resol_pt_mc_hists->Add(h2);
+    } else if (trker == 1) {
+      _t2_pz_resol_pt_mc_hists->Add(h2);
+    }
+
+    // Scale gets messed up unless histogram is deleted each time
+    delete h1;
+
+    return true;
+  } else {
+    std::cerr << "Tree pointer invalid" << std::endl;
+    return false;
+  }
+}
+
+bool TrackerDataAnalyserMomentum::find_mc_cluster_momentum(const int track_id,
+               const SciFiCluster* clus, SciFiLookup &lkup, ThreeVector &mom) {
+
+  // Loop over digits within the cluster
+  std::vector<SciFiDigit*> digits = clus->get_digits_pointers();
+  std::vector<SciFiDigit*>::iterator dig_it;
+  for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
+    std::vector<SciFiHit*> hits;
+    // Make the lookup table to access the MC hits associated with this digit
+    if (!lkup.get_hits((*dig_it), hits)) {
+      std::cerr << "Lookup failed\n";
+      continue;
+    }
+    // Loop over the hits until find one matching the track ID, then use to set the cluster mom
+    std::vector<SciFiHit*>::iterator hit_it;
+    for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
+      if (track_id == (*hit_it)->GetTrackId()) {
+        mom = (*hit_it)->GetMomentum();
+        return true;
       }
     }
   }
   return false;
 };
+
+bool TrackerDataAnalyserMomentum::find_mc_spoint_momentum(const int track_id,
+               const SciFiSpacePoint* sp, SciFiLookup &lkup, ThreeVector &mom) {
+
+  std::vector<SciFiCluster*> clusters = sp->get_channels_pointers();
+  mom = ThreeVector(0.0, 0.0, 0.0);
+  int counter = 0;
+
+  // Calculate the momentum for each cluster then take the average
+  for (size_t i = 0; i < clusters.size(); ++i) {
+    ThreeVector clus_mom(0.0, 0.0, 0.0);
+    if ( find_mc_cluster_momentum(track_id, clusters[i], lkup, clus_mom) ) {
+      mom += clus_mom;
+      ++counter;
+    }
+  }
+  if ( counter > 0 ) {
+    mom /= static_cast<double>(counter);
+    return true;
+  }
+  return false;
+};
+
 
 bool TrackerDataAnalyserMomentum::find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids,
                                               int &tid, int &counter) {
@@ -358,7 +435,7 @@ bool TrackerDataAnalyserMomentum::find_mc_tid(const std::vector< std::vector<int
       tid = mit1->first;
       counter = mit1->second;
     } else if ( mit1->second > 2 && tid != 0 ) {
-      tid = -1;  // A malformed track, cannot asscoiate with an mc track id
+      tid = -1;  // A malformed track, cannot associate with an mc track id
       counter = 0;
       return false;
     }
@@ -366,32 +443,47 @@ bool TrackerDataAnalyserMomentum::find_mc_tid(const std::vector< std::vector<int
   return true;
 };
 
+TCut TrackerDataAnalyserMomentum::form_tcut(const std::string &var, const std::string &op,
+                                           double value) {
+  TCut cut = "";
+  std::stringstream ss1;
+  TString s1;
+  ss1 << var << op << value;
+  ss1 >> s1;
+  cut = s1;
+  return cut;
+}
+
+
 void TrackerDataAnalyserMomentum::make_all() {
   make_residual_histograms();
   make_residual_graphs();
+  make_pt_resolutions();
   make_pz_resolutions();
   make_resolution_graphs();
 }
 
-void TrackerDataAnalyserMomentum::make_pz_resolutions() {
-  double pz_range = _pz_upper_bound - _pz_lower_bound;  // The range of the pz resolution graph
-  double resolution_error =  pz_range / ( _n_pz_points * 2 );  // Error in pt_mc of each data point
+void TrackerDataAnalyserMomentum::make_pt_resolutions() {
+
+  double pt_range = _resol_upper_bound - _resol_lower_bound;  // Range of the pz resolution graph
+  double resolution_error =  pt_range / ( _n_points * 2 );    // Error in pt_mc of each data point
   // The mid pt_mc value of the first data point
-  double first_resolution_point = _pz_lower_bound + resolution_error;
-  std::vector<TCut> vCuts(_n_pz_points);          // The cuts defining the pt_mc intervals
-  std::vector<double> vPtMc(_n_pz_points);        // The centre of the pt_mc intervals
-  std::vector<double> vPtMcErr(_n_pz_points);     // The width of the intervals
-  std::vector<double> vPzRes_t1(_n_pz_points);    // The resulatant pz resolutions
-  std::vector<double> vPzResErr_t1(_n_pz_points); // The errors assocaited with the pz res
-  std::vector<double> vPzRes_t2(_n_pz_points);    // The resulatant pz resolutions
-  std::vector<double> vPzResErr_t2(_n_pz_points); // The errors assocaited with the pz res
+  double first_resolution_point = _resol_lower_bound + resolution_error;
+
+  std::vector<TCut> vCuts(_n_points);          // The cuts defining the pt_mc intervals
+  std::vector<double> vPtMc(_n_points);        // The centre of the pt_mc intervals
+  std::vector<double> vPtMcErr(_n_points);     // The width of the intervals
+  std::vector<double> vPtRes_t1(_n_points);    // The resultant pt resolutions
+  std::vector<double> vPtResErr_t1(_n_points); // The errors associated with the pt res
+  std::vector<double> vPtRes_t2(_n_points);    // The resultant pt resolutions
+  std::vector<double> vPtResErr_t2(_n_points); // The errors associated with the pt res
 
   // Cuts in pt_mc
   std::string s1 = "pt_mc>=";
   std::string s2 = "&&pt_mc<";
-  for (int i = 0; i < _n_pz_points; ++i) {
+  for (int i = 0; i < _n_points; ++i) {
     std::stringstream ss1;
-    double point_lower_bound = _pz_lower_bound + (resolution_error * 2 * i);
+    double point_lower_bound = _resol_lower_bound + (resolution_error * 2 * i);
     double point_upper_bound = point_lower_bound + (resolution_error * 2);
     ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
     vCuts[i] = ss1.str().c_str();
@@ -399,7 +491,66 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   }
 
   // The central MC momentum & error associated with the MC momentum (just the interval half width)
-  for (int i = 0; i < _n_pz_points; ++i) {
+  for (int i = 0; i < _n_points; ++i) {
+    vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
+    vPtMcErr[i] = resolution_error;
+    std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
+  }
+
+  // Cuts for to select each tracker
+  TCut cutT1 = "tracker_num==0";
+  TCut cutT2 = "tracker_num==1";
+
+  // Form the reconstructed pt TCut
+  // TCut tcut_ptrec = form_tcut("TMath::Abs(pt_rec)", "<", _cutPtRec);
+
+  // Loop over the momentum intervals and calculate the resolution for each
+  for (int i = 0; i < _n_points; ++i) {
+    // TCut input_cut = vCuts[i]&&cutT1&&tcut_ptrec;
+    TCut input_cut = vCuts[i]&&cutT1;
+    calc_pt_resolution(0, input_cut, vPtRes_t1[i], vPtResErr_t1[i]);
+  }
+  for (int i = 0; i < _n_points; ++i) {
+    // TCut input_cut = vCuts[i]&&cutT2&&tcut_ptrec;
+    TCut input_cut = vCuts[i]&&cutT2;
+    calc_pt_resolution(1, input_cut, vPtRes_t2[i], vPtResErr_t2[i]);
+  }
+
+  // Create the resultant resolution plots
+  _t1_pt_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPtRes_t1[0],
+                                        &vPtMcErr[0], &vPtResErr_t1[0]);
+  _t2_pt_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPtRes_t2[0],
+                                        &vPtMcErr[0], &vPtResErr_t2[0]);
+}
+
+void TrackerDataAnalyserMomentum::make_pz_resolutions() {
+
+  double pz_range = _resol_upper_bound - _resol_lower_bound;  // Range of the pz resolution graph
+  double resolution_error =  pz_range / ( _n_points * 2 );    // Error in pt_mc of each data point
+  // The mid pt_mc value of the first data point
+  double first_resolution_point = _resol_lower_bound + resolution_error;
+  std::vector<TCut> vCuts(_n_points);          // The cuts defining the pt_mc intervals
+  std::vector<double> vPtMc(_n_points);        // The centre of the pt_mc intervals
+  std::vector<double> vPtMcErr(_n_points);     // The width of the intervals
+  std::vector<double> vPzRes_t1(_n_points);    // The resultant pz resolutions
+  std::vector<double> vPzResErr_t1(_n_points); // The errors associated with the pz res
+  std::vector<double> vPzRes_t2(_n_points);    // The resultant pz resolutions
+  std::vector<double> vPzResErr_t2(_n_points); // The errors associated with the pz res
+
+  // Cuts in pt_mc
+  std::string s1 = "pt_mc>=";
+  std::string s2 = "&&pt_mc<";
+  for (int i = 0; i < _n_points; ++i) {
+    std::stringstream ss1;
+    double point_lower_bound = _resol_lower_bound + (resolution_error * 2 * i);
+    double point_upper_bound = point_lower_bound + (resolution_error * 2);
+    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
+    vCuts[i] = ss1.str().c_str();
+    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
+  }
+
+  // The central MC momentum & error associated with the MC momentum (just the interval half width)
+  for (int i = 0; i < _n_points; ++i) {
     vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
     vPtMcErr[i] = resolution_error;
     std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
@@ -410,27 +561,27 @@ void TrackerDataAnalyserMomentum::make_pz_resolutions() {
   TCut cutT2 = "tracker_num==1";
 
   // Form the reconstructed pz TCut
-  TCut tcut_pzrec = formTCut("TMath::Abs(pz_rec)", "<", _cutPzRec);
+  TCut tcut_pzrec = form_tcut("TMath::Abs(pz_rec)", "<", _cut_pz_rec);
 
-  // Loop over the mometum intervals and calculate the resolution for each
-  for (int i = 0; i < _n_pz_points; ++i) {
+  // Loop over the momentum intervals and calculate the resolution for each
+  for (int i = 0; i < _n_points; ++i) {
     TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
     calc_pz_resolution(0, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
   }
-  for (int i = 0; i < _n_pz_points; ++i) {
+  for (int i = 0; i < _n_points; ++i) {
     TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
     calc_pz_resolution(1, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
   }
 
   // Create the resultant resolution plots
-  _t1_pz_resol = new TGraphErrors(_n_pz_points, &vPtMc[0], &vPzRes_t1[0],
+  _t1_pz_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPzRes_t1[0],
                                   &vPtMcErr[0], &vPzResErr_t1[0]);
-  _t2_pz_resol = new TGraphErrors(_n_pz_points, &vPtMc[0], &vPzRes_t2[0],
+  _t2_pz_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPzRes_t2[0],
                                   &vPtMcErr[0], &vPzResErr_t2[0]);
 }
 
 void TrackerDataAnalyserMomentum::make_residual_histograms() {
-  _cResiduals = new TCanvas("cResiduals", "Mometum Residuals");
+  _cResiduals = new TCanvas("cResiduals", "Momentum Residuals");
   _cResiduals->Divide(3, 2);
   _cResiduals->cd(1);
   _t1_pt_res->UseCurrentStyle();
@@ -455,7 +606,7 @@ void TrackerDataAnalyserMomentum::make_residual_histograms() {
 }
 
 void TrackerDataAnalyserMomentum::make_residual_graphs() {
-  _cGraphs = new TCanvas("cGraphs", "Mometum Graphs");
+  _cGraphs = new TCanvas("cGraphs", "Momentum Graphs");
   _cGraphs->Divide(2, 2);
 
   _cGraphs->cd(1);
@@ -498,71 +649,59 @@ void TrackerDataAnalyserMomentum::make_residual_graphs() {
 }
 
 void TrackerDataAnalyserMomentum::make_resolution_graphs() {
-  _cResolutions = new TCanvas("cResolutions", "Mometum Resolution Graphs");
-  _cResolutions->Divide(2);
+  _cResolutions = new TCanvas("cResolutions", "Momentum Resolution Graphs");
+  _cResolutions->Divide(2, 2);
 
-  _cResolutions->cd(1);
-  gPad->SetGridx(1);
-  gPad->SetGridy(1);
-  _t1_pz_resol->SetName("t1_pz_resol");
-  _t1_pz_resol->SetTitle("T1 p_{z} Resolution");
-  _t1_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
-  _t1_pz_resol->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
-  _t1_pz_resol->Draw("AP");
+  if (_t1_pt_resol_pt_mc) {
+    std::cout << "Drawing pt resolution as function of pt_mc in T1\n";
+    _cResolutions->cd(1);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t1_pt_resol_pt_mc->SetName("t1_pt_resol");
+    _t1_pt_resol_pt_mc->SetTitle("T1 p_{t} Resolution");
+    _t1_pt_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t1_pt_resol_pt_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t1_pt_resol_pt_mc->Draw("AP");
+  }
 
-  _cResolutions->cd(2);
-  gPad->SetGridx(1);
-  gPad->SetGridy(1);
-  _t2_pz_resol->SetName("t2_pz_resol");
-  _t2_pz_resol->SetTitle("T2 p_{z} Resolution");
-  _t2_pz_resol->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
-  _t2_pz_resol->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
-  _t2_pz_resol->Draw("AP");
-}
+  if (_t1_pz_resol_pt_mc) {
+    std::cout << "Drawing pz resolution as function of pt_mc in T1\n";
+    _cResolutions->cd(2);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t1_pz_resol_pt_mc->SetName("t1_pz_resol");
+    _t1_pz_resol_pt_mc->SetTitle("T1 p_{z} Resolution");
+    _t1_pz_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t1_pz_resol_pt_mc->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
+    _t1_pz_resol_pt_mc->Draw("AP");
+  }
 
-void TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut cut,
-                                                     double &res, double &res_err) {
-  if (_tree) {
-    _out_file->cd();
-    TCanvas lCanvas;
-    // Create a histogram of the pz residual for the pt_mc interval defined by the input cut
-    if (trker == 0) {
-      _tree->Draw("pz_mc+charge*pz_rec>>h1", cut);
-    } else if (trker == 1) {
-      _tree->Draw("pz_mc-charge*pz_rec>>h1", cut);
-    }
-    // Pull the histogram from the current pad
-    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
-    double xmin = h1->GetXaxis()->GetXmin();
-    double xmax = h1->GetXaxis()->GetXmax();
-    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
-    if ( _n_bins == 0 ) _n_bins = h1->GetNbinsX();
-    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_bins, xmin, xmax);
-    if (trker == 0) {
-      _tree->Draw("pz_mc+charge*pz_rec>>h2", cut);
-    } else if (trker == 1) {
-      _tree->Draw("pz_mc-charge*pz_rec>>h2", cut);
-    }
-    // TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
-    // Fit a gaussian to the histogram
-    h2->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
-    TF1 *fit1 = h2->GetFunction("gaus");
-    // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
-    res = fit1->GetParameter(2);
-    res_err = fit1->GetParError(2);
+  if (_t2_pt_resol_pt_mc) {
+    std::cout << "Drawing pt resolution as function of pt_mc in T2\n";
+    _cResolutions->cd(3);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t2_pt_resol_pt_mc->SetName("t2_pt_resol");
+    _t2_pt_resol_pt_mc->SetTitle("T2 p_{t} Resolution");
+    _t2_pt_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t2_pt_resol_pt_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t2_pt_resol_pt_mc->Draw("AP");
+  }
 
-    if (trker == 0) {
-      _resol_histos_t1->Add(h2);
-    } else if (trker == 1) {
-      _resol_histos_t2->Add(h2);
-    }
-
-    // Scale gets messed up unless histogram is deleted each time
-    delete h1;
-  } else {
-    std::cerr << "Tree pointer invalid" << std::endl;
+  if (_t2_pz_resol_pt_mc) {
+    std::cout << "Drawing pz resolution as function of pt_mc in T2\n";
+    _cResolutions->cd(4);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t2_pz_resol_pt_mc->SetName("t2_pz_resol");
+    _t2_pz_resol_pt_mc->SetTitle("T2 p_{z} Resolution");
+    _t2_pz_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t2_pz_resol_pt_mc->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
+    _t2_pz_resol_pt_mc->Draw("AP");
   }
 }
+
+
 
 bool TrackerDataAnalyserMomentum::save_graphics(std::string save_type) {
   if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
@@ -604,11 +743,13 @@ void TrackerDataAnalyserMomentum::save_root() {
     if (_t2_pt_res_pt) _t2_pt_res_pt->Write();
     if (_t2_pz_res_pt) _t2_pz_res_pt->Write();
 
-    if (_t1_pz_resol) _t1_pz_resol->Write();
-    if (_t2_pz_resol) _t2_pz_resol->Write();
+    if (_t1_pz_resol_pt_mc) _t1_pz_resol_pt_mc->Write();
+    if (_t2_pz_resol_pt_mc) _t2_pz_resol_pt_mc->Write();
 
-    if (_resol_histos_t1) _resol_histos_t1->Write();
-    if (_resol_histos_t2) _resol_histos_t2->Write();
+    if (_t1_pt_resol_pt_mc_hists) _t1_pt_resol_pt_mc_hists->Write();
+    if (_t1_pz_resol_pt_mc_hists) _t1_pz_resol_pt_mc_hists->Write();
+    if (_t2_pt_resol_pt_mc_hists) _t2_pt_resol_pt_mc_hists->Write();
+    if (_t2_pz_resol_pt_mc_hists) _t2_pz_resol_pt_mc_hists->Write();
 
     if (_cResiduals) _cResiduals->Write();
     if (_cGraphs) _cGraphs->Write();
@@ -621,15 +762,66 @@ void TrackerDataAnalyserMomentum::save_root() {
   }
 }
 
-TCut TrackerDataAnalyserMomentum::formTCut(const std::string &var, const std::string &op,
-                                           double value) {
-  TCut cut = "";
-  std::stringstream ss1;
-  TString s1;
-  ss1 << var << op << value;
-  ss1 >> s1;
-  cut = s1;
-  return cut;
+void TrackerDataAnalyserMomentum::setUp() {
+  // Set up the output ROOT file
+  _out_file = new TFile("momentum_analysis_output.root", "recreate");
+
+  // Set up the output tree
+  _tree = new TTree("tree", "Momentum Residual Data");
+  _tree->Branch("spill_num", &_spill_num, "spill_num/I");
+  _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
+  _tree->Branch("charge", &_charge, "charge/I");
+  _tree->Branch("num_points", &_num_points, "num_points/I");
+  _tree->Branch("n_bad_tracks", &_n_bad_tracks, "n_bad_tracks/I");
+  _tree->Branch("mc_track_id", &_mc_track_id, "mc_track_id/I");
+  _tree->Branch("mc_pid", &_mc_pid, "mc_pid/I");
+  _tree->Branch("n_matched", &_n_matched, "n_matched/I");
+  _tree->Branch("n_mismatched", &_n_mismatched, "n_mismatched/I");
+  _tree->Branch("n_missed", &_n_missed, "n_missed/I");
+  _tree->Branch("pt_rec", &_pt_rec, "pt_rec/D");
+  _tree->Branch("pz_rec", &_pz_rec, "pz_rec/D");
+  _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
+  _tree->Branch("pz_mc", &_pz_mc, "pz_mc/D");
+
+  // Set up the residual histograms
+  int res_n_bins = 100;
+
+  _t1_pt_res = new TH1D("t1_pt_res", "T1 p_{t} Residual", res_n_bins, -5, 5);
+  _t1_pt_res->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
+
+  _t1_pz_res = new TH1D("t1_pz_res", "T1 p_{z} Residual", res_n_bins, -30, 30);
+  _t1_pz_res->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+
+  _t1_pz_res_log = new TH1D("t1_pz_res_log", "T1 p_{z} Residual", res_n_bins, -500, 500);
+  _t1_pz_res_log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+
+  _t2_pt_res = new TH1D("t2_pt_res", "T2 p_{t} Residual", res_n_bins, -5, 5);
+  _t2_pt_res->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
+
+  _t2_pz_res = new TH1D("t2_pz_res", "T2 p_{z} Residual", res_n_bins, -30, 30);
+  _t2_pz_res->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+
+  _t2_pz_res_log = new TH1D("t2_pz_res_log", "T2 p_{z} Residual", res_n_bins, -500, 500);
+  _t2_pz_res_log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+
+  // Set up the residual graphs
+  _t1_pz_res_pt = new TGraph();
+  _t2_pz_res_pt = new TGraph();
+
+  _t1_pt_resol_pt_mc_hists = new TObjArray(0);
+  _t1_pz_resol_pt_mc_hists = new TObjArray(0);
+  _t2_pt_resol_pt_mc_hists = new TObjArray(0);
+  _t2_pz_resol_pt_mc_hists = new TObjArray(0);
+  _t1_pz_resol_pt_mc_hists->SetOwner(kTRUE);
+  _t2_pz_resol_pt_mc_hists->SetOwner(kTRUE);
+
+  // Set global styles
+  gStyle->SetOptStat(111111);
+  gStyle->SetLabelSize(0.05, "XYZ");
+  gStyle->SetTitleOffset(1.4, "X");
+  gStyle->SetTitleOffset(1.5, "Y");
+  gStyle->SetStatW(0.3);
+  gStyle->SetStatH(0.2);
 }
 
 } // ~namespace MAUS
