@@ -229,12 +229,6 @@ class TrackerDataAnalyserMomentum {
     TGraphErrors* _t2_pt_resol_pt_mc;
     TGraphErrors* _t2_pz_resol_pt_mc;
 
-    // TObjArray of the histos used to calculate the pz resolution
-    TObjArray* _t1_pt_resol_pt_mc_hists;
-    TObjArray* _t1_pz_resol_pt_mc_hists;
-    TObjArray* _t2_pt_resol_pt_mc_hists;
-    TObjArray* _t2_pz_resol_pt_mc_hists;
-
     // The ROOT canvases
     TCanvas* _cResiduals;
     TCanvas* _cGraphs;

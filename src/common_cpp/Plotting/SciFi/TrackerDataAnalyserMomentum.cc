@@ -79,10 +79,6 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _t1_pz_resol_pt_mc(NULL),
     _t2_pt_resol_pt_mc(NULL),
     _t2_pz_resol_pt_mc(NULL),
-    _t1_pt_resol_pt_mc_hists(NULL),
-    _t1_pz_resol_pt_mc_hists(NULL),
-    _t2_pt_resol_pt_mc_hists(NULL),
-    _t2_pz_resol_pt_mc_hists(NULL),
     _cResiduals(NULL),
     _cGraphs(NULL),
     _cResolutions(NULL),
@@ -119,11 +115,6 @@ TrackerDataAnalyserMomentum::~TrackerDataAnalyserMomentum() {
   if (_t1_pz_resol_pt_mc) delete _t1_pz_resol_pt_mc;
   if (_t2_pt_resol_pt_mc) delete _t2_pt_resol_pt_mc;
   if (_t2_pz_resol_pt_mc) delete _t2_pz_resol_pt_mc;
-  // Histos used to make resolution graphs
-  if (_t1_pt_resol_pt_mc_hists) delete _t1_pt_resol_pt_mc_hists;
-  if (_t1_pz_resol_pt_mc_hists) delete _t1_pz_resol_pt_mc_hists;
-  if (_t2_pt_resol_pt_mc_hists) delete _t2_pt_resol_pt_mc_hists;
-  if (_t2_pz_resol_pt_mc_hists) delete _t2_pz_resol_pt_mc_hists;
   // Canvases
   if (_cResiduals) delete _cResiduals;
   if (_cGraphs) delete _cGraphs;
@@ -273,21 +264,14 @@ bool TrackerDataAnalyserMomentum::calc_pt_resolution(const int trker, const TCut
     TCanvas lCanvas;
 
     // Create a histogram of the pt residual for the mc variable interval defined by the input cut
-    _tree->Draw("pt_mc-pt_rec>>h1", cut);
-
-    // Pull the histogram from the current pad
-    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
-    double xmin = h1->GetXaxis()->GetXmin();
-    double xmax = h1->GetXaxis()->GetXmax();
-
-    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
-    if ( _n_pt_bins == 0 ) _n_pt_bins = h1->GetNbinsX();
-    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_pt_bins, xmin, xmax);
-    _tree->Draw("pt_mc-pt_rec>>h2", cut);
+    std::string residual = "pt_mc-pt_rec";
+    std::string htitle = residual + " " + cut.GetTitle();
+    TH1D* hpt = new TH1D("hpt", htitle.c_str() , _n_pt_bins, _pt_fit_min, _pt_fit_max);
+    _tree->Draw((residual + ">>hpt").c_str(), cut);
 
     // Fit a gaussian to the histogram
-    h2->Fit("gaus", "", "", _pt_fit_min, _pt_fit_max);
-    TF1 *fit1 = h2->GetFunction("gaus");
+    hpt->Fit("gaus", "", "", _pt_fit_min, _pt_fit_max);
+    TF1 *fit1 = hpt->GetFunction("gaus");
     if (!fit1) {
       std::cerr << "calc_pt_resolution: Fit failed\n";
       return false;
@@ -297,14 +281,7 @@ bool TrackerDataAnalyserMomentum::calc_pt_resolution(const int trker, const TCut
     res = fit1->GetParameter(2);
     res_err = fit1->GetParError(2);
 
-    if (trker == 0) {
-      _t1_pt_resol_pt_mc_hists->Add(h2);
-    } else if (trker == 1) {
-      _t2_pt_resol_pt_mc_hists->Add(h2);
-    }
-
-    // Scale gets messed up unless histogram is deleted each time
-    delete h1;
+    hpt->Write();
 
     return true;
   } else {
@@ -318,45 +295,34 @@ bool TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
   if (_tree) {
     _out_file->cd();
     TCanvas lCanvas;
-    // Create a histogram of the pz residual for the pt_mc interval defined by the input cut
+    TH1D* hpz;
+
+    // Create a histogram of the pt residual for the mc variable interval defined by the input cut
     if (trker == 0) {
-      _tree->Draw("pz_mc+charge*pz_rec>>h1", cut);
-    } else if (trker == 1) {
-      _tree->Draw("pz_mc-charge*pz_rec>>h1", cut);
+      std::string residual = "pz_mc+charge*pz_rec";
+      std::string htitle = residual + " " + cut.GetTitle();
+      hpz = new TH1D("hpz", htitle.c_str(), _n_pz_bins, _pz_fit_min, _pz_fit_max);
+      _tree->Draw((residual + ">>hpz").c_str(), cut);
+    }  else if (trker == 1) {
+      std::string residual = "pz_mc-charge*pz_rec";
+      std::string htitle = residual + " " + cut.GetTitle();
+      hpz = new TH1D("hpz", htitle.c_str(), _n_pz_bins, _pz_fit_min, _pz_fit_max);
+      _tree->Draw((residual + ">>hpz").c_str(), cut);
     }
-    // Pull the histogram from the current pad
-    TH1D* h1 = reinterpret_cast<TH1D*>(gPad->GetPrimitive("h1"));
-    double xmin = h1->GetXaxis()->GetXmin();
-    double xmax = h1->GetXaxis()->GetXmax();
-    // If set to 0, set the number of bins in the histos equal to the auto value from the ROOT tree
-    if ( _n_pz_bins == 0 ) _n_pz_bins = h1->GetNbinsX();
-    TH1D* h2 = new TH1D("h2", h1->GetTitle(), _n_pz_bins, xmin, xmax);
-    if (trker == 0) {
-      _tree->Draw("pz_mc+charge*pz_rec>>h2", cut);
-    } else if (trker == 1) {
-      _tree->Draw("pz_mc-charge*pz_rec>>h2", cut);
-    }
-    // TH1D* h2 = reinterpret_cast<TH1D*>(h1->Clone("h2"));
+
     // Fit a gaussian to the histogram
-    h2->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
-    TF1 *fit1 = h2->GetFunction("gaus");
+    hpz->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
+    TF1 *fit1 = hpz->GetFunction("gaus");
     if (!fit1) {
       std::cerr << "calc_pz_resolution: Fit failed\n";
       return false;
     }
 
-    // Extract the sigma of the gaussian fit (equivalent to the pz resolution for this interval)
+    // Extract the sigma of the gaussian fit (equivalent to the pt resolution for this interval)
     res = fit1->GetParameter(2);
     res_err = fit1->GetParError(2);
 
-    if (trker == 0) {
-      _t1_pz_resol_pt_mc_hists->Add(h2);
-    } else if (trker == 1) {
-      _t2_pz_resol_pt_mc_hists->Add(h2);
-    }
-
-    // Scale gets messed up unless histogram is deleted each time
-    delete h1;
+    hpz->Write();
 
     return true;
   } else {
@@ -701,8 +667,6 @@ void TrackerDataAnalyserMomentum::make_resolution_graphs() {
   }
 }
 
-
-
 bool TrackerDataAnalyserMomentum::save_graphics(std::string save_type) {
   if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
     if (_cResiduals) {
@@ -745,11 +709,6 @@ void TrackerDataAnalyserMomentum::save_root() {
 
     if (_t1_pz_resol_pt_mc) _t1_pz_resol_pt_mc->Write();
     if (_t2_pz_resol_pt_mc) _t2_pz_resol_pt_mc->Write();
-
-    if (_t1_pt_resol_pt_mc_hists) _t1_pt_resol_pt_mc_hists->Write();
-    if (_t1_pz_resol_pt_mc_hists) _t1_pz_resol_pt_mc_hists->Write();
-    if (_t2_pt_resol_pt_mc_hists) _t2_pt_resol_pt_mc_hists->Write();
-    if (_t2_pz_resol_pt_mc_hists) _t2_pz_resol_pt_mc_hists->Write();
 
     if (_cResiduals) _cResiduals->Write();
     if (_cGraphs) _cGraphs->Write();
@@ -807,13 +766,6 @@ void TrackerDataAnalyserMomentum::setUp() {
   // Set up the residual graphs
   _t1_pz_res_pt = new TGraph();
   _t2_pz_res_pt = new TGraph();
-
-  _t1_pt_resol_pt_mc_hists = new TObjArray(0);
-  _t1_pz_resol_pt_mc_hists = new TObjArray(0);
-  _t2_pt_resol_pt_mc_hists = new TObjArray(0);
-  _t2_pz_resol_pt_mc_hists = new TObjArray(0);
-  _t1_pz_resol_pt_mc_hists->SetOwner(kTRUE);
-  _t2_pz_resol_pt_mc_hists->SetOwner(kTRUE);
 
   // Set global styles
   gStyle->SetOptStat(111111);

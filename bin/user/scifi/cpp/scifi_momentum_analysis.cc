@@ -81,17 +81,13 @@ int main(int argc, char *argv[]) {
       if ( (i+1) < argc ) {
         std::stringstream ss1(argv[i + 1]);
         ss1 >> n_pt_bins;
-      } else if ( std::strcmp(argv[i], "-n_pz_bins") == 0 ) {
-      if ( (i+1) < argc ) {
-        std::stringstream ss1(argv[i + 1]);
-        ss1 >> n_pz_bins;
       }
+    } else if ( std::strcmp(argv[i], "-n_pz_bins") == 0 ) {
+        if ( (i+1) < argc ) {
+          std::stringstream ss1(argv[i + 1]);
+          ss1 >> n_pz_bins;
+        }
     }
-  }
-  if ( n_bins_resol == 0 ) {
-    std::cout << "Using ROOT auto binning for resolution histos" << std::endl;
-  } else {
-    std::cout << "Resolution histos set to have number of bins = " << n_bins_resol << "\n";
   }
 
   // Set up analysis class
