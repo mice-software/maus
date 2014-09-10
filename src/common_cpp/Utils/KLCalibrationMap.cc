@@ -39,6 +39,14 @@ bool KLCalibrationMap::InitializeFromCards(Json::Value configJSON) {
                                                "KL_calib_source",
                                                JsonWrapper::stringValue).asString();
 
+  // convert KL_calib_source datacard to uppercase
+  std::transform(_kl_source.begin(), _kl_source.end(), _kl_source.begin(),
+                                          std::ptr_fun<int, int>(std::tolower));
+  if (_kl_source != "file" && _kl_source != "cdb") {
+    Squeak::mout(Squeak::error)
+    << "Invalid KL_calib_source datacard." << std::endl;
+    return false;
+  }
   bool fromDB = true;
   if (_kl_source == "file") {
       fromDB = false;
