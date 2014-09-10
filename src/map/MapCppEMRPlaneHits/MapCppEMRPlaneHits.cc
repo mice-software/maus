@@ -196,7 +196,7 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
     int xSpill  = dbb.GetSpillNumber();
     int xGeo    = dbb.GetDBBId();
     int nHits   = dbb.GetDBBHitsArraySize();
-//     int nTr     = dbb.GetDBBTriggersArraySize();
+//    int nTr     = dbb.GetDBBTriggersArraySize();
 
     for (int ihit = 0; ihit < nHits; ihit++) {
       DBBHit this_hit = dbb.GetDBBHitsArrayElement(ihit);
@@ -213,6 +213,14 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
         int xBar   = emr_key->bar();
 //         cout << *emr_key << " --> lt: " << lt << "  tt: " << tt << endl;
 
+        // Set the spill number for the noise and decay events
+        if (ihit == 0) { // Set the spill information only when processing the very first hit.
+          _emr_fadc_events_tmp[nPartTrigger][xPlane]._spill = xSpill;
+          _emr_fadc_events_tmp[nPartTrigger+1][xPlane]._spill = xSpill;
+        }
+
+	// Loop over the trigger and tries to associate the hit to one of them
+	bool matched = false;
         for (int ipe = 0; ipe < nPartTrigger; ipe++) {
           DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(ipe);
           int tr_lt = this_trigger.GetLTime();
@@ -236,15 +244,17 @@ void MapCppEMRPlaneHits::processDBB(EMRDaq EMRdaq, int nPartTrigger) {
             bHit.SetDeltaT(delta_t - _deltat_signal_low);
 //             cout << "*---> " << *emr_key << " --> trigger_Id: " << ipe
 //                  << "  tot: " << tt-lt
-//                  << "  delta: " << delta_t - _trigger_window_lower
+//                  << "  delta: " << delta_t - deltat_signal_low
 //                  << "(" << delta_t << ")" << endl;
             _emr_dbb_events_tmp[ipe][xPlane][xBar].push_back(bHit);
+	    matched = true;
           } else if (delta_t > _deltat_noise_low && delta_t < _deltat_noise_up &&
 		   tot > _tot_noise_low && tot < _tot_noise_up ) {
             bHit.SetDeltaT(delta_t - _deltat_signal_low);
 	    _emr_dbb_events_tmp[nPartTrigger][xPlane][xBar].push_back(bHit);
-	  } else {
-	    bHit.SetDeltaT(0);
+	    matched = true;
+	  } else if (ipe == nPartTrigger-1 && !matched) {
+	    bHit.SetDeltaT(0); // tt -lt is irrelevant for decay products
 	    _emr_dbb_events_tmp[nPartTrigger+1][xPlane][xBar].push_back(bHit);
 	  }
         }
