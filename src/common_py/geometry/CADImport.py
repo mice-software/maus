@@ -430,7 +430,7 @@ class CADImport: #pylint: disable = R0903, C0103
                     if elemtype == 'unit':
                         unit = value
                     # Extract unitless double elements
-                    if elemtype =='RedColour' \
+                    elif elemtype =='RedColour' \
                            or elemtype == 'BlueColour'\
                            or elemtype == 'GreenColour' \
                            or elemtype == 'G4StepMax' \
@@ -447,7 +447,7 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
-                    if elemtype == 'ActiveRadius' \
+                    elif elemtype == 'ActiveRadius' \
                            or elemtype == 'Pitch'\
                            or elemtype == 'FibreDiameter' \
                            or elemtype == 'CoreDiameter'\
@@ -514,6 +514,16 @@ class CADImport: #pylint: disable = R0903, C0103
                          or elemtype == 'Phi' or elemtype == 'Theta':
                         result.append('PropertyHep3Vector '+\
                                       elemtype+' '+value+"\n")
+                    elif elemtype == "PlaceModule" and value == 'Virtual':
+                        result.append('Module Virtual\n')
+                        result.append(' {\n')
+                        result.append('     Volume None\n')
+                        result.append('     Position 0.0 0.0 0.0 mm\n')
+                        result.append('     Rotation 0.0 0.0 0.0 degree\n')
+                        result.append('     PropertyString SensitiveDetector Virtual\n')
+                        result.append('     PropertyString IndependentVariable z\n')
+                        result.append(' }\n')
+                        
                 # Get the material reference     
                 material = vol.xpathEval("materialref")
                 result.append("PropertyString Material "+\
