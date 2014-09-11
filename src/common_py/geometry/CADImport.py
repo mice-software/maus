@@ -214,11 +214,11 @@ class CADImport: #pylint: disable = R0903, C0103
         for elem in trd:
             if elem.prop("name") == solid:
                 result.append('Volume Trapezoid\n')
-                result.append('TrapezoidWidthX1 '+elem.prop('x1')+'\n')
-                result.append('TrapezoidWidthX2 '+elem.prop('x2')+'\n')
-                result.append('TrapezoidHeightY1 '+elem.prop('y1')+'\n')
-                result.append('TrapezoidHeightY2 '+elem.prop('y2')+'\n')
-                result.append('TrapezoidLengthZ '+elem.prop('z')+'\n')
+                result.append('PropertyDouble TrapezoidWidthX1 '+elem.prop('x1')+'\n')
+                result.append('PropertyDouble TrapezoidWidthX2 '+elem.prop('x2')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY1 '+elem.prop('y1')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY2 '+elem.prop('y2')+'\n')
+                result.append('PropertyDouble TrapezoidLengthZ '+elem.prop('z')+'\n')
                 break
             
     def AppendSphereSolid(self, datafile, result, solid):
