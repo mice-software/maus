@@ -420,7 +420,6 @@ TCut TrackerDataAnalyserMomentum::form_tcut(const std::string &var, const std::s
   return cut;
 }
 
-
 void TrackerDataAnalyserMomentum::make_all() {
   make_residual_histograms();
   make_residual_graphs();
@@ -708,6 +707,8 @@ void TrackerDataAnalyserMomentum::save_root() {
     if (_t2_pz_res_pt) _t2_pz_res_pt->Write();
 
     if (_t1_pz_resol_pt_mc) _t1_pz_resol_pt_mc->Write();
+    if (_t1_pt_resol_pt_mc) _t1_pt_resol_pt_mc->Write();
+    if (_t2_pt_resol_pt_mc) _t2_pt_resol_pt_mc->Write();
     if (_t2_pz_resol_pt_mc) _t2_pz_resol_pt_mc->Write();
 
     if (_cResiduals) _cResiduals->Write();
@@ -770,8 +771,10 @@ void TrackerDataAnalyserMomentum::setUp() {
   // Set global styles
   gStyle->SetOptStat(111111);
   gStyle->SetLabelSize(0.05, "XYZ");
-  gStyle->SetTitleOffset(1.4, "X");
-  gStyle->SetTitleOffset(1.5, "Y");
+  gStyle->SetTitleOffset(1.1, "X");
+  gStyle->SetTitleSize(0.04, "X");
+  gStyle->SetTitleOffset(1.0, "Y");
+  gStyle->SetTitleSize(0.04, "Y");
   gStyle->SetStatW(0.3);
   gStyle->SetStatH(0.2);
 }

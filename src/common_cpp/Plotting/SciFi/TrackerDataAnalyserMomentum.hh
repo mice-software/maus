@@ -74,7 +74,7 @@ class TrackerDataAnalyserMomentum {
 
     /** Find the MC momentum of a track cluster */
     bool find_mc_cluster_momentum(const int track_id, const SciFiCluster* clus, SciFiLookup &lkup,
-    		                      ThreeVector &mom);
+                                  ThreeVector &mom);
 
     /** Find the MC momentum of a track spacepoint */
     bool find_mc_spoint_momentum(const int track_id, const SciFiSpacePoint* sp,
