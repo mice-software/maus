@@ -466,14 +466,16 @@ Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
 # this sets the source for the calibrations
-# by default it is from file
+# by default it is from CDB
 # set it to 'file' if you want to load local files
 # if you set file, then uncomment the calib files below
-KL_calib_source = "file"
-KL_cabling_file = "/files/cabling/KLChannelMap.txt"
-KL_calibration_file = "/files/calibration/klcalib.txt"
-
+KL_calib_source = "CDB"
 KL_calib_date_from = 'current'
+# uncomment the KL_calibration_file card below if you set KL_calib_source=file
+#KL_calibration_file = "/files/calibration/klcalib.txt"
+
+KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+
 Enable_klgain_correction = True
 
 # this is used by the reconstuction of the EMR detectors
