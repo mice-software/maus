@@ -72,17 +72,6 @@ class TrackerDataAnalyserMomentum {
      */
     bool calc_pz_resolution(const int trker, const TCut cut, double &res, double &res_err);
 
-    /** Find the MC momentum of a track cluster */
-    bool find_mc_cluster_momentum(const int track_id, const SciFiCluster* clus, SciFiLookup &lkup,
-                                  ThreeVector &mom);
-
-    /** Find the MC momentum of a track spacepoint */
-    bool find_mc_spoint_momentum(const int track_id, const SciFiSpacePoint* sp,
-                                 SciFiLookup &lkup, ThreeVector &mom);
-
-    /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
-    bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
-
     /** Make a TCut out of a variable and operator, input as strings, and a value input as double */
     TCut form_tcut(const std::string &var, const std::string &op, double value);
 

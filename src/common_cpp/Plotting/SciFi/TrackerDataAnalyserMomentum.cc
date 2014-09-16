@@ -33,6 +33,7 @@
 #include "TRef.h"
 
 // MAUS headers
+#include "src/common_cpp/Plotting/SciFi/SciFiAnalysisTools.hh"
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -202,7 +203,7 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       // Is there a track id associated with 3 or more spoints?
       int track_id = 0;
       int counter = 0;
-      bool success = find_mc_tid(spoint_mc_tids, track_id, counter);
+      bool success = SciFiAnalysisTools::find_mc_tid(spoint_mc_tids, track_id, counter);
       // If we have not found a common track id, abort for this track
       if (!success) {
         std::cerr << "Malformed track, skipping\n";
@@ -221,7 +222,8 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       int counter2 = 0;
       for ( size_t k = 0; k < spnts.size(); ++k ) {
         ThreeVector mom_mc;
-        bool success = find_mc_spoint_momentum(track_id, spnts[k], lkup, mom_mc);
+        bool success = SciFiAnalysisTools::find_mc_spoint_momentum(track_id, spnts[k],
+                                                                   lkup, mom_mc);
         if (!success) continue;
         _pt_mc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
         _pz_mc += mom_mc.z();
@@ -295,7 +297,7 @@ bool TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
   if (_tree) {
     _out_file->cd();
     TCanvas lCanvas;
-    TH1D* hpz;
+    TH1D* hpz(NULL);
 
     // Create a histogram of the pt residual for the mc variable interval defined by the input cut
     if (trker == 0) {
@@ -308,6 +310,11 @@ bool TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
       std::string htitle = residual + " " + cut.GetTitle();
       hpz = new TH1D("hpz", htitle.c_str(), _n_pz_bins, _pz_fit_min, _pz_fit_max);
       _tree->Draw((residual + ">>hpz").c_str(), cut);
+    }
+
+    if (!hpz) {
+      std::cerr << "ERROR: TrackerDataAnalyserMomentum::calc_pz_resolution: Invalid tracker #\n";
+      return false;
     }
 
     // Fit a gaussian to the histogram
@@ -330,84 +337,6 @@ bool TrackerDataAnalyserMomentum::calc_pz_resolution(const int trker, const TCut
     return false;
   }
 }
-
-bool TrackerDataAnalyserMomentum::find_mc_cluster_momentum(const int track_id,
-               const SciFiCluster* clus, SciFiLookup &lkup, ThreeVector &mom) {
-
-  // Loop over digits within the cluster
-  std::vector<SciFiDigit*> digits = clus->get_digits_pointers();
-  std::vector<SciFiDigit*>::iterator dig_it;
-  for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
-    std::vector<SciFiHit*> hits;
-    // Make the lookup table to access the MC hits associated with this digit
-    if (!lkup.get_hits((*dig_it), hits)) {
-      std::cerr << "Lookup failed\n";
-      continue;
-    }
-    // Loop over the hits until find one matching the track ID, then use to set the cluster mom
-    std::vector<SciFiHit*>::iterator hit_it;
-    for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
-      if (track_id == (*hit_it)->GetTrackId()) {
-        mom = (*hit_it)->GetMomentum();
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-bool TrackerDataAnalyserMomentum::find_mc_spoint_momentum(const int track_id,
-               const SciFiSpacePoint* sp, SciFiLookup &lkup, ThreeVector &mom) {
-
-  std::vector<SciFiCluster*> clusters = sp->get_channels_pointers();
-  mom = ThreeVector(0.0, 0.0, 0.0);
-  int counter = 0;
-
-  // Calculate the momentum for each cluster then take the average
-  for (size_t i = 0; i < clusters.size(); ++i) {
-    ThreeVector clus_mom(0.0, 0.0, 0.0);
-    if ( find_mc_cluster_momentum(track_id, clusters[i], lkup, clus_mom) ) {
-      mom += clus_mom;
-      ++counter;
-    }
-  }
-  if ( counter > 0 ) {
-    mom /= static_cast<double>(counter);
-    return true;
-  }
-  return false;
-};
-
-
-bool TrackerDataAnalyserMomentum::find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids,
-                                              int &tid, int &counter) {
-
-  std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
-
-  for ( size_t i = 0; i < spoint_mc_tids.size(); ++i ) {
-    for ( size_t j = 0; j < spoint_mc_tids[i].size(); ++j ) {
-      int current_tid = spoint_mc_tids[i][j];
-      if (track_id_counter.count(current_tid))
-        track_id_counter[current_tid] = track_id_counter[current_tid] + 1;
-      else
-        track_id_counter[current_tid] = 1;
-    }
-  }
-
-  std::map<int, int>::iterator mit1;
-  tid = 0;
-  for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
-    if ( mit1->second > 2 && tid == 0 ) {
-      tid = mit1->first;
-      counter = mit1->second;
-    } else if ( mit1->second > 2 && tid != 0 ) {
-      tid = -1;  // A malformed track, cannot associate with an mc track id
-      counter = 0;
-      return false;
-    }
-  }
-  return true;
-};
 
 TCut TrackerDataAnalyserMomentum::form_tcut(const std::string &var, const std::string &op,
                                            double value) {
@@ -771,7 +700,7 @@ void TrackerDataAnalyserMomentum::setUp() {
   // Set global styles
   gStyle->SetOptStat(111111);
   gStyle->SetLabelSize(0.05, "XYZ");
-  gStyle->SetTitleOffset(1.1, "X");
+  gStyle->SetTitleOffset(1.0, "X");
   gStyle->SetTitleSize(0.04, "X");
   gStyle->SetTitleOffset(1.0, "Y");
   gStyle->SetTitleSize(0.04, "Y");

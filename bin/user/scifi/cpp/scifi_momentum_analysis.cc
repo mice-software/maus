@@ -150,29 +150,4 @@ int main(int argc, char *argv[]) {
   analyser.save_root();
   infile.close();
   theApp.Run();
-
-  // Save the resolution graphs to pdf
-  TFile out_file("momentum_analysis_output.root");
-  TGraphErrors* t1_pt_resol = static_cast<TGraphErrors*>(out_file.Get("t1_pt_resol"));
-  TGraphErrors* t1_pz_resol = static_cast<TGraphErrors*>(out_file.Get("t1_pz_resol"));
-  TGraphErrors* t2_pt_resol = static_cast<TGraphErrors*>(out_file.Get("t2_pt_resol"));
-  TGraphErrors* t2_pz_resol = static_cast<TGraphErrors*>(out_file.Get("t2_pz_resol"));
-
-  TCanvas c1;
-  if (t1_pt_resol) {
-    t1_pt_resol->Draw("AP");
-    c1.Print("t1_pt_resol.pdf");
-  }
-  if (t1_pz_resol) {
-    t1_pz_resol->Draw("AP");
-    c1.Print("tz_pt_resol.pdf");
-  }
-  if (t2_pt_resol) {
-    t2_pt_resol->Draw("AP");
-    c1.Print("t2_pt_resol.pdf");
-  }
-  if (t2_pz_resol) {
-    t2_pz_resol->Draw("AP");
-    c1.Print("t2_pt_resol.pdf");
-  }
 }
