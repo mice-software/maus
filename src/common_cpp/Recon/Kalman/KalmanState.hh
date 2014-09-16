@@ -33,6 +33,31 @@
 
 namespace MAUS {
 
+struct MaterialParams {
+  /// Polystyrene's atomic number.
+  double Z;
+  /// Width of the fibre plane in mm.
+  double Plane_Width;
+  /// Fibre radiation lenght in mm
+  double Radiation_Length;
+  /// Fractional Radiation Length
+  double L(double lenght) { return lenght/Radiation_Length; }
+  /// Density in g.cm-3
+  double Density;
+  /// Mean excitation energy in eV.
+  double Mean_Excitation_Energy;
+  /// Atomic number in g.mol-1 per styrene monomer
+  double A;
+  /// Channel width in mm
+  double Pitch;
+  /// Station Radius in mm
+  double Station_Radius;
+  /// Density correction.
+  double Density_Correction;
+  /// RMS per channel measurement (um).
+  double RMS;
+};
+/*
 struct SciFiParams {
   /// Polystyrene's atomic number.
   double Z;
@@ -56,10 +81,10 @@ struct SciFiParams {
   double RMS;
 };
 
-struct AirParams {
-  /// Air mean atomic number.
+struct GasParams {
+  /// Gas mean atomic number.
   double Z;
-  /// Air radiation lenght in mm
+  /// Gas radiation lenght in mm
   double Radiation_Length;
   /// Fractional Radiation Length
   double R0(double lenght) { return lenght/Radiation_Length; }
@@ -70,7 +95,7 @@ struct AirParams {
   /// Atomic number in g.mol-1 per styrene monomer
   double A;
 };
-
+*/
 /** @class KalmanState
  *
  *  @brief A KalmanState is a tracker plane. Each tracker contains 15 (if all planes are hit).
@@ -92,8 +117,7 @@ class KalmanState {
   enum State { Initialized = -1,
                Projected,
                Filtered,
-               Smoothed,
-               Excluded };
+               Smoothed };
 
   /** @brief Initialises member matrices.
    *
@@ -103,7 +127,7 @@ class KalmanState {
 
   void Build(SciFiCluster *cluster);
 
-  void MoveToGlobalFrame(ThreeVector ref_pos);
+  void MoveToGlobalFrame(ThreeVector tracker_ref_pos);
 
   void set_spill(int spill) { _spill = spill; }
 
@@ -128,28 +152,28 @@ class KalmanState {
 
   void set_covariance_residual(TMatrixD C, State kalman_state);
 
-  void set_input_shift(TMatrixD input_shift)       { _input_shift = input_shift; }
+  void set_input_shift(TMatrixD input_shift) { _input_shift = input_shift; }
 
   void set_input_shift_covariance(TMatrixD input_covariance) {
                 _input_shift_covariance = input_covariance; }
 
-  void set_shift(TMatrixD shift)                   { _shift = shift; }
+  void set_shift(TMatrixD shift)               { _shift = shift; }
 
-  void set_shift_covariance(TMatrixD shift_covariance) {
-                _shift_covariance = shift_covariance; }
+  void set_shift_covariance(TMatrixD shift_covariance)
+                                { _shift_covariance = shift_covariance; }
 
-  void set_measurement(double alpha)               { _v(0, 0) = alpha;
-                                                     _v(1, 0) = 0.0; }
+  void set_measurement(double alpha)           { _v(0, 0) = alpha; }
+//                                                 _v(1, 0) = 0.;}
 
-  void set_direction(ThreeVector dir)        { _direction = dir; }
+  void set_direction(ThreeVector dir)          { _direction = dir; }
 
-  void set_z(double z)                             { _z = z; }
+  void set_z(double z)                         { _z = z; }
 
-  void set_id(int id)                              { _id = id; }
+  void set_id(int id)                          { _id = id; }
 
-  void set_chi2(double chi2, State kalman_state);
+  void set_chi2(double chi2)                   { _chi2 = chi2; }
 
-  void set_current_state(State kalman_state)       { _current_state = kalman_state; }
+  void set_current_state(State kalman_state)   { _current_state = kalman_state; }
 
   int spill()                            const { return _spill; }
 
@@ -157,15 +181,7 @@ class KalmanState {
 
   State current_state()                  const { return _current_state; }
 
-  TMatrixD a(State desired_state)        const;
-
-  TMatrixD covariance_matrix(State ds)   const;
-
-  TMatrixD residual(State desired_state) const;
-
-  TMatrixD covariance_residual(State st) const;
-
-  double chi2(State desired_state)       const;
+  double chi2()                          const { return _chi2; }
 
   SciFiCluster* cluster()                const { return _cluster; }
 
@@ -183,7 +199,19 @@ class KalmanState {
 
   int id()                               const { return _id; }
 
-  ThreeVector direction()          const { return _direction; }
+  ThreeVector direction()                const { return _direction; }
+
+  TMatrixD a(State desired_state)        const;
+
+  TMatrixD covariance_matrix(State ds)   const;
+
+  TMatrixD residual(State desired_state) const;
+
+  TMatrixD covariance_residual(State st) const;
+
+  void contains_measurement(bool val)    {  _contains_measurement = val; }
+
+  bool contains_measurement()            const { return _contains_measurement; }
 
  private:
   /// The spill.
@@ -197,8 +225,9 @@ class KalmanState {
   /// Site id.
   int _id;
   /// The Chi2 at this site.
-  double _f_chi2;
-  double _s_chi2;
+  double _chi2;
+
+  bool _contains_measurement;
 
   /// A pointer to the cluster used to form the state - does not assume control of memory
   SciFiCluster* _cluster;
@@ -210,13 +239,11 @@ class KalmanState {
   TMatrixD _projected_a;
   TMatrixD _a;
   TMatrixD _smoothed_a;
-  TMatrixD _a_excluded;
 
   /// The covariance matrix.
   TMatrixD _projected_C;
   TMatrixD _C;
   TMatrixD _smoothed_C;
-  TMatrixD _C_excluded;
 
   /// The measurement.
   TMatrixD _v;
@@ -225,11 +252,9 @@ class KalmanState {
   TMatrixD _pull;
   TMatrixD _residual;
   TMatrixD _smoothed_residual;
-  TMatrixD _excluded_residual;
 
   TMatrixD _covariance_residual;
   TMatrixD _covariance_smoothed_residual;
-  TMatrixD _covariance_excluded_residual;
 
   /// Alignment.
   TMatrixD _input_shift;

@@ -29,7 +29,9 @@
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/Track.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
@@ -47,8 +49,8 @@ bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp
 /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
 bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
 
-/** Test to see whether a MC track is good for scifi analysis, defined according to whether a hit
-bool is_valid_mc_track(int trker_num; const MAUS::Track* mc_trk;
-                       const std::vector<SciFiHits*> hits);
+/** Test to see whether a MC track is good for scifi analysis, defined according to whether a hit */
+bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk,
+                       const std::vector<MAUS::SciFiHit*> hits);
 
 } // ~namespace SciFiTools
