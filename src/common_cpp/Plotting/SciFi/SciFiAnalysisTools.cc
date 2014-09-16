@@ -99,5 +99,24 @@ bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid
   return true;
 };
 
+bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk;
+                       const std::vector<SciFiHits*> hits {
+
+  int station_counter(0);
+  std::vector<bool> stations_hit {false, false, false, false, false};
+  std::vector<SciFiHit*>::iterator hit;
+  for ( hit = hits.begin(); hit != hits.end(); ++hit ) {
+    if ( ((*hit)->GetChannelId()->GetTrackerNumber() == trker_num) &&
+         ((*hit)->GetTrackId() == mc_track->GetTrackId()) )  {
+      int station_num = (*hit)->GetChannelId()->GetStationNumber();
+      if ( stations_hits[station_num - 1] ) {
+        stations_hits[station_num - 1] = true;
+        station_counter++;
+      }
+    if (station_counter >= 4) return true;
+  }
+  return false;
+}
+
 } // ~namespace SciFiAnalysisTools
 
