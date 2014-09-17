@@ -90,8 +90,12 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   density = 0.69*g/cm3;
   name = "MICE_LITHIUM_HYDRIDE";
   G4Material* miceLiH = new G4Material(name, density, nComp=2);
-  G4Element* elLi = man->FindOrBuildElement("Li");
-  miceLiH->AddElement(elLi, 0.126797);
+  G4Element* elMiceLi = new G4Element("MICE_LITHIUM", "Li", 2);
+  G4Isotope* Li6 = new G4Isotope("Li6", 3, 6);
+  G4Isotope* Li7 = new G4Isotope("Li7", 3, 7);
+  elMiceLi->AddIsotope(Li6, 0.98);
+  elMiceLi->AddIsotope(Li7, 0.02);
+  miceLiH->AddElement(elMiceLi, 0.126797);
   G4Element* elH = man->FindOrBuildElement("H");
   miceLiH->AddElement(elH, 0.873203);
   materials_list->addMaterial( miceLiH, name );
