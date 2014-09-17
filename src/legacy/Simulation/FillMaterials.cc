@@ -84,13 +84,24 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   aerogel0_2->AddMaterial(water, 0.03);
   materials_list->addMaterial( aerogel0_2, name );
 
+  // MICE Lithium Hydride
+  // density of 0.69 g/cm3 is a myth/rumour; NO citation
+  // Gene Kafka/Dan Kaplan/Alan Bross are contacts
+  density = 0.69*g/cm3;
+  name = "MICE_LITHIUM_HYDRIDE";
+  G4Material* miceLiH = new G4Material(name, density, nComp=2);
+  G4Element* elLi = man->FindOrBuildElement("Li");
+  miceLiH->AddElement(elLi, 0.126797);
+  G4Element* elH = man->FindOrBuildElement("H");
+  miceLiH->AddElement(elH, 0.873203);
+  materials_list->addMaterial( miceLiH, name );
+
   // BC600, here represented only as bisphenol (rho_bisphenol=1.20gcm-3)
   density = 1.18*g/cm3; // refractive index = 1.56 
   name = "BC600";
   G4Material* bc600 = new G4Material(name, density, nComp=3);
   G4Element* elC = man->FindOrBuildElement("C");
   bc600->AddElement(elC, 15);
-  G4Element* elH = man->FindOrBuildElement("H");
   bc600->AddElement(elH, 16);
   G4Element* elO = man->FindOrBuildElement("O");
   bc600->AddElement(elO,  2);		//ME - Tamas thinks this should be 2, not 12!!!
