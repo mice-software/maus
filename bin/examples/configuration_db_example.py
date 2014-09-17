@@ -56,7 +56,7 @@ def run():
         print """
 
 	"""
-        print calibration.get_calibration_for_run('TOF1', 2873)
+        print calibration.get_calibration_for_run('TOF1', 2873, 'tw')
         print """
         We can also ask what the runs were for a certain date range:
 
