@@ -38,7 +38,6 @@ void MapCppKLMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // print level
   fDebug = false;
 
-
   // Check if the JSON document can be parsed, else return error only
   Json::Reader reader;
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
@@ -328,6 +327,7 @@ int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) const {
   int sigma_gain   = (_configJSON["KLpmtSigmaGain"].asInt());
 
   int peAmplified = static_cast<int> (floor(pe*RandGauss::shoot(gain, sigma_gain)));
+  // int peAmplified = static_cast<int> (pe*gain);
 
   if (fDebug) {
     std::cout << "created photons: " << meanPhN << std::endl;
@@ -386,7 +386,7 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
         } // end check for used
       } // end loop over secondary digits
       // convert light yield to adc & set the charge
-      int adc = static_cast<int>(npe / (_configJSON["KLadcConversionFactor"].asInt()));
+      int adc = static_cast<int>(npe / (_configJSON["KLadcConversionFactor"].asDouble()));
 
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
       Json::Value digit(Json::objectValue);
@@ -405,7 +405,6 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
 
 	kl_digit.append(digit);
       }
-
       if (fDebug)
           std::cout << "digit #" << ndigs << " " <<  digit["kl_key"].asString() << std::endl;
       all_kl_digits[i]["isUsed"]=1;

@@ -56,10 +56,14 @@ class CallG4bl: #pylint: disable=R0903
         self.pdgid_mass = {}
 
         self.pdgid_mass = {'211':139.5700, '-211':139.5700, '2212':938.27231, \
-            '-13':105.6584, '13':105.6584, '11':0.5109906, '-11':0.5109906, \
-            '22':0, '2112':939.5653, '14':0, '-14':0, '12':0, '-12':0, \
-            '1000010020':1875.6, '1000010030':2808.9, \
-            '1000020030':2808.30665} #pylint: disable=C0103
+        '-13':105.6584, '13':105.6584, '11':0.5109906, '-11':0.5109906, \
+        '22':0, '2112':939.5653, '14':0, '-14':0, '12':0, '-12':0, \
+	'1000010020':1875.6, '1000010030':2808.9, '1000020030':2808.30665, \
+        '1000080160':14895.10000, '1000020040':3727.417000, \
+	'1000070140':13043.78000, '1000060140':13043.93400, \
+	'1000030070': 6535.36500, '1000060120':11174.90000, \
+	'1000050100':9326.98900, \
+	'1000060130':12112.54500, '1000050110':10255.10100} #pylint: disable=C0103
 
         try:
             off = open(file_path+'/MAY09-B1B2-positives.in',"r")
@@ -70,34 +74,34 @@ class CallG4bl: #pylint: disable=R0903
         if str(get_magnet_currents_pa_cdb) in ['True']:
             try:
                 beamline = Beamline()
-                sf3 = open(file_path+'/key.txt',"w")
+                sf3 = open(output_path+'/key.txt',"w")
                 sf3.close()
                 for k, v in beamline.get_beamline_for_run(run_number).iteritems(): #pylint: disable = C0301
                     for k, v in v.iteritems():
                         if k == 'magnets':
                             for k, v in v.iteritems():
                                 newlines = str(k)+'\n'
-                                sff = open(file_path+'/key.txt',"r")
+                                sff = open(output_path+'/key.txt',"r")
                                 text5 = sff.read()
                                 sff.close()
-                                sf2 = open(file_path+'/key.txt',"w")
+                                sf2 = open(output_path+'/key.txt',"w")
                                 sf2.write(text5)
                                 sf2.write(newlines)
                                 sf2.close()
                         if k == 'proton_absorber_thickness':
                             newlines = str(k)+'\n'
-                            sff = open(file_path+'/key.txt',"r")
+                            sff = open(output_path+'/key.txt',"r")
                             text5 = sff.read()
                             sff.close()
-                            sf2 = open(file_path+'/key.txt',"w")
+                            sf2 = open(output_path+'/key.txt',"w")
                             sf2.write(text5)
                             sf2.write(newlines)
                             sf2.close()
                 line = []
-                for row in fileinput.input([file_path+'/key.txt']):
+                for row in fileinput.input([output_path+'/key.txt']):
                     line.append(row[:-1])
                 sf2.close()
-                sf4 = open(file_path+'/value.txt',"w")
+                sf4 = open(output_path+'/value.txt',"w")
                 sf4.close()
                 for k, v in beamline.get_beamline_for_run(run_number).iteritems(): #pylint: disable = C0301
                     for k, v in v.iteritems():
@@ -108,10 +112,10 @@ class CallG4bl: #pylint: disable=R0903
                                         if k == 'set_current':
                                             v = v / 96
                                             newlines = str(v)+'\n'
-                                            sf5 = open(file_path+'/value.txt',"r") #pylint: disable = C0301
+                                            sf5 = open(output_path+'/value.txt',"r") #pylint: disable = C0301
                                             text6 = sf5.read()
                                             sf5.close()
-                                            sf6 = open(file_path+'/value.txt',"w") #pylint: disable = C0301
+                                            sf6 = open(output_path+'/value.txt',"w") #pylint: disable = C0301
                                             sf6.write(text6)
                                             sf6.write(newlines)
                                             sf6.close()
@@ -120,10 +124,10 @@ class CallG4bl: #pylint: disable=R0903
                                         if k == 'set_current':
                                             v = - v / 96
                                             newlines = str(v)+'\n'
-                                            sf5 = open(file_path+'/value.txt',"r") #pylint: disable = C0301
+                                            sf5 = open(output_path+'/value.txt',"r") #pylint: disable = C0301
                                             text6 = sf5.read()
                                             sf5.close() 
-                                            sf6 = open(file_path+'/value.txt',"w") #pylint: disable = C0301
+                                            sf6 = open(output_path+'/value.txt',"w") #pylint: disable = C0301
                                             sf6.write(text6)
                                             sf6.write(newlines)
                                             sf6.close()
@@ -134,10 +138,10 @@ class CallG4bl: #pylint: disable=R0903
                                             roots = numpy.roots(coeff)
                                             root =  roots[2]
                                             newlines = str(root)[1:-4]+'\n'
-                                            sf5 = open(file_path+'/value.txt',"r") #pylint: disable = C0301
+                                            sf5 = open(output_path+'/value.txt',"r") #pylint: disable = C0301
                                             text6 = sf5.read()
                                             sf5.close()
-                                            sf6 = open(file_path+'/value.txt',"w") #pylint: disable = C0301
+                                            sf6 = open(output_path+'/value.txt',"w") #pylint: disable = C0301
                                             sf6.write(text6)
                                             sf6.write(newlines)
                                             sf6.close()
@@ -146,10 +150,10 @@ class CallG4bl: #pylint: disable=R0903
                                         if k == 'set_current':
                                             v = v / 174
                                             newlines = str(v)+'\n'
-                                            sf5 = open(file_path+'/value.txt',"r") #pylint: disable = C0301
+                                            sf5 = open(output_path+'/value.txt',"r") #pylint: disable = C0301
                                             text6 = sf5.read()
                                             sf5.close()
-                                            sf6 = open(file_path+'/value.txt',"w") #pylint: disable = C0301
+                                            sf6 = open(output_path+'/value.txt',"w") #pylint: disable = C0301
                                             sf6.write(text6)
                                             sf6.write(newlines)
                                             sf6.close()
@@ -160,46 +164,46 @@ class CallG4bl: #pylint: disable=R0903
                                             roots = numpy.roots(coeff)
                                             root =  roots[2]
                                             newlines = str(root)[1:-4]+'\n'
-                                            sf5 = open(file_path+'/value.txt',"r") #pylint: disable = C0301
+                                            sf5 = open(output_path+'/value.txt',"r") #pylint: disable = C0301
                                             text6 = sf5.read()
                                             sf5.close()
-                                            sf6 = open(file_path+'/value.txt',"w") #pylint: disable = C0301
+                                            sf6 = open(output_path+'/value.txt',"w") #pylint: disable = C0301
                                             sf6.write(text6)
                                             sf6.write(newlines)
                                             sf6.close()
                         if k == 'proton_absorber_thickness':
                             newlines = str(v)+'\n'
-                            sf5 = open(file_path+'/value.txt',"r")
+                            sf5 = open(output_path+'/value.txt',"r")
                             text6 = sf5.read()
                             sf5.close()
-                            sf6 = open(file_path+'/value.txt',"w")
+                            sf6 = open(output_path+'/value.txt',"w")
                             sf6.write(text6)
                             sf6.write(newlines)
                             sf6.close()
                      
                 line2 = []
-                for row in fileinput.input([file_path+'/value.txt']):
+                for row in fileinput.input([output_path+'/value.txt']):
                     line2.append(row[:-1])
                 sf6.close()
 
-                sf7 = open(file_path+'/magnet_currents.txt',"w")
+                sf7 = open(output_path+'/magnet_currents.txt',"w")
                 sf7.close()
 
                 for c, d in zip(line, line2):
                     text2 = 'param {0}={1}'.format(c, d)+'\n'              
-                    sf8 = open(file_path+'/magnet_currents.txt',"r")
+                    sf8 = open(output_path+'/magnet_currents.txt',"r")
                     text10 = sf8.read()
                     sf8.close()
-                    sf9 = open(file_path+'/magnet_currents.txt',"w")
+                    sf9 = open(output_path+'/magnet_currents.txt',"w")
                     sf9.write(text10)
                     sf9.write(text2)
                     sf9.close()
 
-                sf8 = open(file_path+'/magnet_currents.txt',"r")
+                sf8 = open(output_path+'/magnet_currents.txt',"r")
                 text3 = sf8.read()
          
-                os.remove(file_path+'/key.txt')
-                os.remove(file_path+'/value.txt')
+                os.remove(output_path+'/key.txt')
+                os.remove(output_path+'/value.txt')
                                 
             except cdb.CdbTemporaryError:
                 sys.excepthook(*sys.exc_info())
@@ -208,7 +212,7 @@ class CallG4bl: #pylint: disable=R0903
                 """
 
             try:  
-                sf = open(file_path+'/MAY09-B1B2-positives-param.in', "w")   
+                sf = open(output_path+'/MAY09-B1B2-positives-param.in', "w")   
             except IOError as err:
                 raise IOError(err)
             sf.write(newline)
@@ -221,7 +225,7 @@ class CallG4bl: #pylint: disable=R0903
         else:
 
             try:
-                sf = open(file_path+'/MAY09-B1B2-positives-param.in', "w")
+                sf = open(output_path+'/MAY09-B1B2-positives-param.in', "w")
             except IOError as err:
                 raise IOError(err)
             sf.write(newline)
@@ -230,7 +234,7 @@ class CallG4bl: #pylint: disable=R0903
             sf.close()
             off.close()
         
-        g4bl_command_line_input = path_g4bl + '/g4bl ' + file_path + '/MAY09-B1B2-positives-param.in' #pylint: disable = C0301
+        g4bl_command_line_input = path_g4bl + '/g4bl ' + output_path + '/MAY09-B1B2-positives-param.in' #pylint: disable = C0301
         try:
             call(g4bl_command_line_input, shell=True)
         except Exception: #pylint: disable = W0703
@@ -265,7 +269,12 @@ class CallG4bl: #pylint: disable=R0903
             try:     
                 key = 'entry'+str(i)
 
-                self.particles[key] = dict(position = dict(\
+                self.particles[key] = dict(spin = dict(\
+                x = math.cos(theta) * float(element[0]) + 392.39,
+                y = float(element[1]), 
+                z = math.sin(theta) * float(element[0]) - deltaz))
+
+                self.particles[key].update(position = dict(\
                 x = math.cos(theta) * float(element[0]) + 392.39,
                 y = float(element[1]), 
                 z = math.sin(theta) * float(element[0]) - deltaz))
@@ -292,5 +301,5 @@ class CallG4bl: #pylint: disable=R0903
 #                   =self.particles['entry' + str(j)]['random_seed']\
 #                   +1            
 
-        if(os.path.exists(file_path + '/magnet_currents.txt') == True):
-            os.remove(file_path + '/magnet_currents.txt')
+        if(os.path.exists(output_path + '/magnet_currents.txt') == True):
+            os.remove(output_path + '/magnet_currents.txt')

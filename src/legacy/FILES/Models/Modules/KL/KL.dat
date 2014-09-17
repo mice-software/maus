@@ -10,6 +10,8 @@ Module KL
   Volume Box
   Dimensions 932 927.2 40.2 mm
   PropertyDouble G4StepMax 5.0 mm
+  PropertyDouble G4KinMin 0.0001 MeV
+//  PropertyString Region KL_region 
   Module KL/KLFoilModule0.dat
   {
     Position 0.0 -397.5 0 mm
