@@ -1,0 +1,13 @@
+// FILES/Models/Modules/Ckov/Reflector_base.dat
+// 
+
+Module Reflector_base
+{
+  Volume Box
+  Dimensions 643.4 643.4 6.4 mm
+  PropertyString Material POLYSTYRENE
+
+  PropertyDouble RedColour 0.5
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 0.0
+}

@@ -131,6 +131,8 @@ class Go: # pylint: disable=R0921, R0903
                              self.get_job_footer())
             # Finish with job_footer
             #executor.finish(self.get_job_footer())
+        except StopIteration:
+            pass
         except:
             raise
         finally:

@@ -1,0 +1,13 @@
+// FILES/Models/Modules/Ckov/Window_rear.dat
+// 
+
+Module Window_rear
+{
+  Volume Box
+  Dimensions 786.0 786.0 3.2 mm
+  PropertyString Material POLYVINYL_CHLORIDE
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 1.0
+  PropertyDouble BlueColour 1.0
+}
+

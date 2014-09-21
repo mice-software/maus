@@ -119,7 +119,10 @@ polarised_decay = False # set to true to make muons decay with the correct distr
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
-kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
+fine_grained_production_threshold = { # set the production threshold per pid and per Geant4 region; regions are defined in MiceModules
+# "region_name":{"11":0.5, "-11":100.}
+# "another_region_name":{"11":0.5, "-11":100.}
+}
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,
@@ -447,6 +450,11 @@ TOF_calib_source = "CDB"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
 
+# get calibrations by either a) run_number or b) date
+# default is by run_number
+# if set to "date" then set the appropriate TOF_calib_date_from flag below
+TOF_calib_by = "run_number"
+
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
 TOF_calib_date_from = 'current'
@@ -458,21 +466,23 @@ Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
 # this sets the source for the calibrations
-# by default it is from file
+# by default it is from CDB
 # set it to 'file' if you want to load local files
 # if you set file, then uncomment the calib files below
-KL_calib_source = "file"
-KL_cabling_file = "/files/cabling/KLChannelMap.txt"
-KL_calibration_file = "/files/calibration/klcalib.txt"
-
+KL_calib_source = "CDB"
 KL_calib_date_from = 'current'
+# uncomment the KL_calibration_file card below if you set KL_calib_source=file
+#KL_calibration_file = "/files/calibration/klcalib.txt"
+
+KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+
 Enable_klgain_correction = True
 
 # this is used by the reconstuction of the EMR detectors
 EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
-daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
+daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)

@@ -43,10 +43,12 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
         subproc = subprocess.Popen([ANA_PATH, "-output_root_file_name",
                                     OUT_PATH+".root"])
         subproc.wait()
+        self.assertEqual(subproc.returncode, 0)
         subproc = subprocess.Popen([CONV_PATH,
                                     "-input_root_file_name", OUT_PATH+".root",
                                     "-output_json_file_name", OUT_PATH+".json"])
         subproc.wait()
+        self.assertEqual(subproc.returncode, 0)
         fin = open(OUT_PATH+".json")
         all_lines = fin.readlines()
         self.assertGreater(len(all_lines), 0)

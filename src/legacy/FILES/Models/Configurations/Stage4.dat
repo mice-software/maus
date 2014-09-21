@@ -35,10 +35,10 @@ Configuration Stage4
   }
 // EMR pending geometry update and SD from EMR group
 // DR March 10, 2014
-//Module EMR/EMR.dat
-//{
-//  Position 0. 0. 18964.38 mm
-//  Rotation 0. 0. 0. degree
-//}
+  Module EMR/EMR.dat
+  {
+    Position 0. 0. 18964.38 mm
+    Rotation 0. 0. 0. degree
+  }
 }
 

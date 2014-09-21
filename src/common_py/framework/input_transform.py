@@ -307,6 +307,8 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         Process a single event - if it is a Spill, check for run_number change
         and call EndOfEvent/StartOfEvent if run_number has changed.
         """
+        if event == "":
+            raise StopIteration("End of event")
         event_json = maus_cpp.converter.json_repr(event)
         if DataflowUtilities.get_event_type(event_json) == "Spill":
             current_run_number = DataflowUtilities.get_run_number(event_json)
