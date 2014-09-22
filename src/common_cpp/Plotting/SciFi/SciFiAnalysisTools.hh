@@ -50,8 +50,14 @@ bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp
 /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
 bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
 
-/** Find the number of MC tracks which intercept 4 or more stations in each tracker. */
-bool find_n_valid_mc_track(const MAUS::MCEvent* mc_evt, int &n_tracks_t1, int n_tracks_t2);
+/** @brief Find the number of MC tracks which intercept 4 or more stations in each tracker
+ *  @param pdg_id The particle data group ID. If set to zero, all particles are counted
+ *  @param mc_evt The MC event pointer
+ *  @param n_tracks_t1 The number of valid MC tracks in T1
+ *  @param n_tracks_t2 The number of valid MC tracks in T2
+ * */
+bool find_n_valid_mc_track(int pdg_id, const MAUS::MCEvent* mc_evt,
+                           int &n_tracks_t1, int &n_tracks_t2);
 
 /** Test to see whether a MC track is good for scifi analysis, defined according to whether a hit */
 bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk,

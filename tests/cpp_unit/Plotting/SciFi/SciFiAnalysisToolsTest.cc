@@ -56,9 +56,10 @@ TEST_F(SciFiAnalysisToolsTest, test_find_n_valid_mc_track) {
   }
 
   // Set up the MC track
-  Track* mc_trk = new Track();
-  mc_trk->SetTrackId(track_id);
+  Track mc_trk;
+  mc_trk.SetTrackId(track_id);
   std::vector<Track>* tracks = new std::vector<Track>();
+  tracks->push_back(mc_trk);
 
   // Set up the MC event
   MCEvent* mc_evt = new MCEvent();
@@ -68,7 +69,7 @@ TEST_F(SciFiAnalysisToolsTest, test_find_n_valid_mc_track) {
   // Run the function
   int n_tracks_t1 = 0;
   int n_tracks_t2 = 0;
-  SciFiAnalysisTools::find_n_valid_mc_track(mc_evt, n_tracks_t1, n_tracks_t2);
+  SciFiAnalysisTools::find_n_valid_mc_track(0, mc_evt, n_tracks_t1, n_tracks_t2);
 
   EXPECT_EQ(1, n_tracks_t1);
   EXPECT_EQ(1, n_tracks_t2);

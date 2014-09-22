@@ -63,6 +63,7 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _n_mc_tracks_invalid(0),
     _n_rec_tracks_matched(0),
     _n_rec_tracks_unmatched(0),
+    _n_rec_tracks_total(0),
     _pt_rec(0.0),
     _pz_rec(0.0),
     _pt_mc(0.0),
@@ -149,13 +150,14 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
   // Find the number of valid mc tracks in this mc event
   int n_tracks_t1 = 0;
   int n_tracks_t2 = 0;
-  bool b1 = SciFiAnalysisTools::find_n_valid_mc_track(mc_evt, n_tracks_t1, n_tracks_t2);
+  SciFiAnalysisTools::find_n_valid_mc_track(0, mc_evt, n_tracks_t1, n_tracks_t2);
   _n_mc_tracks_valid = _n_mc_tracks_valid + n_tracks_t1 + n_tracks_t2;
   _n_mc_tracks_invalid = _n_mc_tracks_invalid + ( mc_evt->GetTracks()->size()
                                                     - n_tracks_t1 - n_tracks_t2 );
 
   // Loop over helical pattern recognition tracks in event
   std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
+  _n_rec_tracks_total = _n_rec_tracks_total + static_cast<int>(htrks.size());
   for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
     SciFiHelicalPRTrack* trk = htrks[iTrk];
     _pt_rec = 0.0;

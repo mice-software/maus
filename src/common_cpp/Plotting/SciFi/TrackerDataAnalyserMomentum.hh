@@ -48,7 +48,7 @@ namespace MAUS {
 class TrackerDataAnalyserMomentum {
   public:
 
-    /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
+    /** Default constructor */
     TrackerDataAnalyserMomentum();
 
     /** Destructor */
@@ -104,6 +104,9 @@ class TrackerDataAnalyserMomentum {
 
     /** Return the number of recon tracks for which no corresponding MC track was found */
     int get_n_rec_tracks_unmatched() const { return _n_rec_tracks_unmatched; }
+
+    /** Return the number of recon tracks for which no corresponding MC track was found */
+    int get_n_rec_tracks_total() const { return _n_rec_tracks_total; }
 
     /** Return the lower limit of each fit used to calc the pt resolution pnts */
     int get_pt_fit_min() const { return _pt_fit_min; }
@@ -200,6 +203,7 @@ class TrackerDataAnalyserMomentum {
     int _n_mc_tracks_invalid;
     int _n_rec_tracks_matched;
     int _n_rec_tracks_unmatched;
+    int _n_rec_tracks_total;
 
     double _pt_rec;
     double _pz_rec;

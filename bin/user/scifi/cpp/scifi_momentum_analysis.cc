@@ -157,6 +157,11 @@ int main(int argc, char *argv[]) {
   std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
   std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
   std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
+  std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
+  std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+    / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
+  std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+    / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
 
   return 0;
 }
