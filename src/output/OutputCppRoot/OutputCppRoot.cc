@@ -45,7 +45,38 @@
 namespace MAUS {
 OutputCppRoot::OutputCppRoot() : OutputBase<std::string>("OutputCppRoot"),
      _outfile(NULL), _fname(""), _end_of_run_dir("./"), _outfile_branch(""),
-     _run_numbers(), _mode(one_big_file) {
+     _job_header_cpp(NULL), _run_header_cpp(NULL), _spill_cpp(NULL),
+     _run_footer_cpp(NULL), _job_footer_cpp(NULL), _run_numbers(),
+     _mode(one_big_file) {
+}
+
+void OutputCppRoot::_death() {
+    if (_outfile != NULL) {
+      if (_outfile->is_open())
+          _outfile->close();
+      delete _outfile;
+      _outfile = NULL;  // deletes spill
+    }
+    if (_job_header_cpp) {
+        delete _job_header_cpp;
+        _job_header_cpp = NULL;
+    }
+    if (_run_header_cpp) {
+        delete _run_header_cpp;
+        _run_header_cpp = NULL;
+    }
+    if (_spill_cpp) {
+        delete _spill_cpp;
+        _spill_cpp = NULL;
+    }
+    if (_run_footer_cpp) {
+        delete _run_footer_cpp;
+        _run_footer_cpp = NULL;
+    }
+    if (_job_footer_cpp) {
+        delete _job_footer_cpp;
+        _job_footer_cpp = NULL;
+    }
 }
 
 void OutputCppRoot::_birth(const std::string& json_datacards) {
@@ -127,12 +158,18 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
     }
+    // delete data_cpp;
+    // data_cpp = NULL;
     try {
         (*_outfile) << fillEvent;
     } catch (...) {
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
+    }
+    if (data_cpp) {
+        delete data_cpp;
+        data_cpp = NULL;
     }
     return true;
 }
@@ -143,19 +180,19 @@ bool OutputCppRoot::_save(std::string data_str) {
     switch (my_tp) {
         case _job_header_tp:
             return write_event<JsonCppJobHeaderConverter, JobHeader>
-                                    (&_job_header_cpp, data_json, "job_header");
+                                    (_job_header_cpp, data_json, "job_header");
         case _run_header_tp:
             return write_event<JsonCppRunHeaderConverter, RunHeader>
-                                    (&_run_header_cpp, data_json, "run_header");
+                                    (_run_header_cpp, data_json, "run_header");
         case _spill_tp:
             return write_event<JsonCppSpillConverter, Spill>
-                                               (&_spill_cpp, data_json, "data");
+                                               (_spill_cpp, data_json, "data");
         case _run_footer_tp:
             return write_event<JsonCppRunFooterConverter, RunFooter>
-                                    (&_run_footer_cpp, data_json, "run_footer");
+                                    (_run_footer_cpp, data_json, "run_footer");
         case _job_footer_tp:
             return write_event<JsonCppJobFooterConverter, JobFooter>
-                                    (&_job_footer_cpp, data_json, "job_footer");
+                                    (_job_footer_cpp, data_json, "job_footer");
     }
     return false;
 }
@@ -179,15 +216,6 @@ OutputCppRoot::event_type OutputCppRoot::get_event_type
                      "Failed to recognise maus_event_type "+type,
                      "OutputCppRoot::get_event_type");
     }
-}
-
-void OutputCppRoot::_death() {
-  if (_outfile != NULL) {
-    if (_outfile->is_open())
-        _outfile->close();
-    delete _outfile;
-    _outfile = NULL;  // deletes spill
-  }
 }
 
 std::string OutputCppRoot::file_name(int run_number) {

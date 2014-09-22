@@ -89,6 +89,11 @@ class Data : public MAUSEvent<Spill> {
     void SetEvent(Spill* spill) {SetSpill(spill);}
 
   private:
+    // Count number of references to data and make a stack trace at construction
+    // time so we know who built it
+    void IncreaseRefCount();
+    void DecreaseRefCount();
+    static int _reference_count;
     Spill* _spill;
     std::string _event_type;
     MAUS_VERSIONED_CLASS_DEF(Data)

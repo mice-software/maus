@@ -36,7 +36,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # It would be nicer to test with a smaller data file!
         self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        self._datafile = '02873'
+        self._datafile = '05466'
         config = Configuration().getConfigJSON()
         config_json = json.loads(config)
         config_json["daq_data_path"] = self._datapath
@@ -81,8 +81,10 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
             digester.update(i) #pylint: disable=E1101
             event_count = event_count + 1
 
+        print event_count
         # We should now have processed 26 events
-        self.assertEqual(event_count, 26)
+        #self.assertEqual(event_count, 26)
+        self.assertEqual(event_count, 12)
 
         # Check the md5 sum matches the expected value
         # changed checksum to reflect the run_num addition
@@ -90,8 +92,10 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # to reflect new changes due to the cpp data - Dec 1,2013
         # changed checksum from 08bdfba7e5cad1b8da503742c545a7c8
         # to reflect changes from addition of raw tracker data - 16/05/2014
+        #self.assertEqual(digester.hexdigest(), \
+        #                 '2ca9328c6bf981fb242b3d985d226125')
         self.assertEqual(digester.hexdigest(), \
-                         '2ca9328c6bf981fb242b3d985d226125')
+                         'f699f0d81aee1f64a2f1cec7968b9289')
 
         self.mapper.death()
 

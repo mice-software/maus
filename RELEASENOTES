@@ -5,6 +5,15 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.1
+  The following changes were made:
+    - Memory leak fixes #1489
+    - KL - MC tuning, calibrations in CDB
+    - TOF - calibrations by run-number
+    - MC - fine grained production thresholds by volume and particle type
+    - MC - add LiH material definition
+    - Geometry - updates, Ckov added
+    - Bug fixes
 MAUS-v0.9.0
   The following changes were made:
     - Data handling API changes propagated to inputers and mappers

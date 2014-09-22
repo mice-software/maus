@@ -79,6 +79,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.output_path = ''
         self.charge = 3
         self.newline = ''
+        self.grid_job = 0 
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
@@ -149,6 +150,20 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             ' /src/map/MapPyBeamlineSimulation/G4bl')  
             good_birth = False
 
+#	try:
+#            self.grid_job = config_doc["g4bl"]["grid_job"]
+#	except Exception: #pylint: disable=W0703
+#	    print("Error: grid_job is not found in the config file!")
+#	    good_birth = False
+
+#	if str(grid_job) in ['True']:
+#        try: 
+#            self.file_path_param = ''
+#        except Exception: #pylint: disable=W0703 
+#            print('Error: Cannot find file path'+\
+#            ' /src/map/MapPyBeamlineSimulation/G4bl')
+#            good_birth = False
+            
         try:
             self.path_g4bl = os.path.join(os.environ['MAUS_ROOT_DIR'], \
             'third_party', 'build', 'G4beamline-2.12-source', 'bin')

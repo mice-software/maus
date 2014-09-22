@@ -1,0 +1,13 @@
+// FILES/Models/Modules/Ckov/AcetateWindow.dat
+// 
+
+Module AcetateWindow
+{
+  Volume Box
+  Dimensions 450.0 450.0 0.1 mm
+  PropertyString Material POLYVINYL_ACETATE 
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.5
+  PropertyDouble BlueColour 0.0
+}
+

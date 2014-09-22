@@ -1,0 +1,24 @@
+// FILES/Models/Modules/Ckov/Reflector.dat
+// 
+
+Module Reflector
+{
+//  Volume Box
+//  Dimensions 400.0 400.0 2.0 mm
+  Volume Trapezoid
+//  PropertyString G4Detector CkovMirror
+  PropertyString Material AIR
+  //PropertyString SensitiveDetector CKOV
+   
+  PropertyDouble RedColour 1.0
+  PropertyDouble GreenColour 0.0
+  PropertyDouble BlueColour 0.0
+
+  PropertyDouble TrapezoidWidthX1	1.0
+  PropertyDouble TrapezoidWidthX2	321.69
+  PropertyDouble TrapezoidHeightY1	1.0
+  PropertyDouble TrapezoidHeightY2	321.69
+  PropertyDouble TrapezoidLengthZ 	70.64
+}
+
+
