@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   //   -p -> pause between events
   //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
-  bool bool_save = false;
+  // bool bool_save = false;
   std::string save_type = "";
 
   for (int i = 2; i < argc; i++) {
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
       if ( (i+1) < argc ) save_type = argv[i + 1];
       if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
         std::cout << "Saving plots as " << save_type << " files.\n";
-        bool_save = true;
+        // bool_save = true;
       } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
   analyser.setUp();
 
   // Set up ROOT app, input file, and MAUS data class
-  TApplication theApp("App", &argc, argv);
+  // TApplication theApp("App", &argc, argv);
   std::cout << "Opening file " << filename << std::endl;
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
@@ -144,10 +144,24 @@ int main(int argc, char *argv[]) {
   analyser.make_pt_resolutions();
   analyser.make_pz_resolutions();
   analyser.make_resolution_graphs();
-  // if (save_type != "") analyser.save_graphics(save_type);
+  if (save_type != "") analyser.save_graphics(save_type);
 
   // Tidy up
   analyser.save_root();
   infile.close();
-  theApp.Run();
+  // theApp.Run();
+
+  // Print some results
+  std::cerr << "\n-------------------------Results-------------------------\n";
+  std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
+  std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
+  std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
+  std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
+  std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
+  std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+    / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
+  std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+    / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
+
+  return 0;
 }

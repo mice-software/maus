@@ -98,6 +98,74 @@ bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid
   return true;
 }
 
+bool find_n_valid_mc_track(int pdg_id, const MAUS::MCEvent* mc_evt,
+                           int &n_tracks_t1, int &n_tracks_t2) {
+
+  // Check the MC evt pointer is not NULL
+  if (!mc_evt) {
+    std::cerr << "Empty MC event pointer passed, aborting." << std::endl;
+    return false;
+  }
+
+  std::vector<MAUS::SciFiHit>* hits = mc_evt->GetSciFiHits();
+  std::vector<MAUS::Track>* tracks = mc_evt->GetTracks();
+
+  // Loop over all MC tracks in the MC event
+  for ( size_t iTrk= 0; iTrk < tracks->size(); ++iTrk ) {
+    int station_counter_t1 = 0;   // # of stations in T1 found so far with hits from the MC track
+    int station_counter_t2 = 0;   // # of stations in T1 found so far with hits from the MC track
+    bool found_valid_t1 = false;  // Have enough stations been hit that know track is valid in T1
+    bool found_valid_t2 = false;  // Have enough stations been hit that know track is valid in T2
+
+    // Setup a vector, index is station number - 1, content is bool of whether station has been hit
+    int n_stations = 5;
+    std::vector<bool> stations_hit_t1(n_stations);
+    std::vector<bool> stations_hit_t2(n_stations);
+    for ( int i = 0; i < n_stations; ++i ) {
+      stations_hit_t1[i] = false;
+      stations_hit_t2[i] = false;
+    }
+
+    // Loop over all hits in MC event
+    for ( size_t iHit= 0; iHit < hits->size(); ++iHit ) {
+      // Check if the current hit caused by the current MC track
+      if ( hits->at(iHit).GetTrackId() == tracks->at(iTrk).GetTrackId() ) {
+        // Check that if the pdg_id is set, the current track matches the specified particle type
+        if ( pdg_id == 0 || pdg_id == tracks->at(iTrk).GetParticleId() ) {
+          int tracker_num = hits->at(iHit).GetChannelId()->GetTrackerNumber();
+          int station_num = hits->at(iHit).GetChannelId()->GetStationNumber();
+          if (tracker_num == 0) {
+            // Check if the current station has been NOT been hit (set false), and if not set to true
+            if ( !stations_hit_t1[station_num - 1] ) {
+            stations_hit_t1[station_num - 1] = true;
+            station_counter_t1++;
+            }
+          }
+          if (tracker_num == 1) {
+            if ( !stations_hit_t2[station_num - 1] ) {
+              stations_hit_t2[station_num - 1] = true;
+              station_counter_t2++;
+            }
+          }
+        }
+      }
+      // If have found that the MC track is valid in T1 for the first time for this track...
+      if ( station_counter_t1 >= 4 ) {
+        if (!found_valid_t1) ++n_tracks_t1;
+        found_valid_t1 = true;
+      }
+      // If have found that the MC track is valid in T2 for the first time for this track...
+      if ( station_counter_t2 >= 4 ) {
+        if (!found_valid_t2) ++n_tracks_t2;
+        found_valid_t2 = true;
+      }
+      // If have found that MC track is valid in both trackers, move on to next track
+      if ( found_valid_t1 && found_valid_t2 ) break;
+    }
+  }
+  return true;
+}
+
 bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk,
                        const std::vector<MAUS::SciFiHit*> hits) {
 
@@ -112,7 +180,7 @@ bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk,
     stations_hit[i] = false;
   }
 
-  for ( size_t i= 0; i < hits.size(); ++i ) {
+  for ( size_t i = 0; i < hits.size(); ++i ) {
     if (!hits[i]) {
       std::cerr << "Empty SciFiHit pointer found, skipping." << std::endl;
       continue;
@@ -120,18 +188,19 @@ bool is_valid_mc_track(int trker_num, const MAUS::Track* mc_trk,
       std::cerr << "Empty SciFiChannelId pointer found, skipping." << std::endl;
       continue;
     }
-    if ( (hits[i]->GetChannelId()->GetTrackerNumber() == trker_num) &&
-         (hits[i]->GetTrackId() == mc_trk->GetTrackId()) )  {
-      int station_num = hits[i]->GetChannelId()->GetStationNumber();
-      if ( station_num < 1 || station_num > 5 ) {
-        std::cerr << "Bad station number found (" << station_num << ") skipping." << std::endl;
-        continue;
+    if ( hits[i]->GetTrackId() == mc_trk->GetTrackId() ) {
+      if ( hits[i]->GetChannelId()->GetTrackerNumber() == trker_num )  {
+        int station_num = hits[i]->GetChannelId()->GetStationNumber();
+        if ( station_num < 1 || station_num > 5 ) {
+          std::cerr << "Bad station number found (" << station_num << ") skipping." << std::endl;
+          continue;
+        }
+        if ( !stations_hit[station_num - 1] ) {
+          stations_hit[station_num - 1] = true;
+          station_counter++;
+        }
+        if (station_counter >= 4) return true;
       }
-      if ( !stations_hit[station_num - 1] ) {
-        stations_hit[station_num - 1] = true;
-        station_counter++;
-      }
-      if (station_counter >= 4) return true;
     }
   }
   return false;
