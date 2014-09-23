@@ -44,9 +44,6 @@ class SciFiAnalysis {
     /** Default constructor */
     SciFiAnalysis();
 
-    /** Constructor which sets the displays to use */
-    SciFiAnalysis( std::vector<SciFiDataBase*> aSciFiData);
-
     /** Destructor */
     virtual ~SciFiAnalysis();
 
@@ -61,6 +58,10 @@ class SciFiAnalysis {
 
     /** Produce the plots */
     void Plot();
+
+    /** Setup the member variables by initiallising the displays,
+     *  and setting the SciFiData pointer */
+    void SetUpDisplays();
 
     /** Save the data to a ROOT File */
     void Save();

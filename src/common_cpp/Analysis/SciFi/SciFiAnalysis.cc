@@ -25,32 +25,48 @@ SciFiAnalysis::SciFiAnalysis() : mSciFiData(NULL) {
   // Do nothing
 }
 
-SciFiAnalysis::SciFiAnalysis( std::vector<SciFiDataBase*> aSciFiData) : mSciFiData(aSciFiData) {
-  // Do nothing
-}
-
 SciFiAnalysis::~SciFiAnalysis() {
-  // Do nothing
+  if (mSciFiData) delete mSciFiData;
 }
 
 bool SciFiAnalysis::Accumulate(Spill* aSpill)
 {
+  // Check the spill pointer
   if ( !aSpill ) {
-    std::cerr << "WARNING: Empty Spill pointer passed";
+    std::cerr << "SciFiAnalysis: Warning: Empty Spill pointer passed\n";
+    return false;
+  } else if ( aSpill->GetDaqEventType() != "physics_event" ) {
+    std::cerr << "SciFiAnalysis: Spill is not a physics event, skipping\n";
+    return false;
+  } else if ( !mSciFiData ) {
+     std::cerr << "SciFiAnalysis: Warning: SciFiData member not set up\n";
     return false;
   }
 
+  // Reduce the SciFi Data and store in the SciFiData object
   mSciFiData->Accumulate(aSpill);
+
+  // Update each of the displays objects added
+  std::vector<SciFiDisplayBase*>::iterator lDisplay;
+  for ( mDisplays.begin(); lDisplay != mDisplays.end(); ++lDisplay ) {
+    (*lDisplay)->Update();
+  }
   return true;
 }
 
 void SciFiAnalysis::Plot() {
   std::vector<SciFiDisplayBase*>::iterator lDisplay;
-  for ( mDisplays.begin(); lDisplay != mDisplays.end(); ++ lDisplay ) {
-   (*lDisplay)->Plot(mSciFiData);
+  for ( mDisplays.begin(); lDisplay != mDisplays.end(); ++lDisplay ) {
+    (*lDisplay)->Plot();
   }
 }
 
+void SciFiAnalysis::SetUpDisplays() {
+  if (mSciFiData) delete mSciFiData;
 
+  for ( size_t i = 0; i < mDisplays.size(); ++i ) {
+    mSciFiData = mDisplays[i]->SetUp();
+  }
+}
 
 } // ~namespace MAUS
