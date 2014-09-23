@@ -86,7 +86,7 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
 
   // MICE Lithium Hydride
   // density of 0.69 g/cm3 is a myth/rumour; NO citation
-  // Gene Kafka/Dan Kaplan/Alan Bross are contacts
+  // Alan Bross is contact #1551
   density = 0.69*g/cm3;
   name = "MICE_LITHIUM_HYDRIDE";
   G4Material* miceLiH = new G4Material(name, density, nComp=2);
@@ -95,9 +95,9 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   G4Isotope* Li7 = new G4Isotope("Li7", 3, 7);
   elMiceLi->AddIsotope(Li6, 0.98);
   elMiceLi->AddIsotope(Li7, 0.02);
-  miceLiH->AddElement(elMiceLi, 0.126797);
+  miceLiH->AddElement(elMiceLi, 1);
   G4Element* elH = man->FindOrBuildElement("H");
-  miceLiH->AddElement(elH, 0.873203);
+  miceLiH->AddElement(elH, 1);
   materials_list->addMaterial( miceLiH, name );
 
   // BC600, here represented only as bisphenol (rho_bisphenol=1.20gcm-3)
