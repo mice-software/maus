@@ -84,13 +84,28 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   aerogel0_2->AddMaterial(water, 0.03);
   materials_list->addMaterial( aerogel0_2, name );
 
+  // MICE Lithium Hydride
+  // density of 0.69 g/cm3 is a myth/rumour; NO citation
+  // Alan Bross is contact #1551
+  density = 0.69*g/cm3;
+  name = "MICE_LITHIUM_HYDRIDE";
+  G4Material* miceLiH = new G4Material(name, density, nComp=2);
+  G4Element* elMiceLi = new G4Element("MICE_LITHIUM", "Li", 2);
+  G4Isotope* Li6 = new G4Isotope("Li6", 3, 6);
+  G4Isotope* Li7 = new G4Isotope("Li7", 3, 7);
+  elMiceLi->AddIsotope(Li6, 0.98);
+  elMiceLi->AddIsotope(Li7, 0.02);
+  miceLiH->AddElement(elMiceLi, 1);
+  G4Element* elH = man->FindOrBuildElement("H");
+  miceLiH->AddElement(elH, 1);
+  materials_list->addMaterial( miceLiH, name );
+
   // BC600, here represented only as bisphenol (rho_bisphenol=1.20gcm-3)
   density = 1.18*g/cm3; // refractive index = 1.56 
   name = "BC600";
   G4Material* bc600 = new G4Material(name, density, nComp=3);
   G4Element* elC = man->FindOrBuildElement("C");
   bc600->AddElement(elC, 15);
-  G4Element* elH = man->FindOrBuildElement("H");
   bc600->AddElement(elH, 16);
   G4Element* elO = man->FindOrBuildElement("O");
   bc600->AddElement(elO,  2);		//ME - Tamas thinks this should be 2, not 12!!!

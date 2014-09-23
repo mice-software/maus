@@ -38,20 +38,20 @@ Module BeamLine
 	{
 	        Position 0. 0. +0.32355 m
 	        Rotation 0. 0. 0. degree
-	        ScaleFactor +1.293
+	        ScaleFactor +1.313688
 	}
 	Module BeamLine/QuadTypeQC_Boolean.dat
 	{
 	        Position 0. 0. +1.48355 m
 	        Rotation 0. 0. 0. degree
-	        ScaleFactor -1.293
+	        ScaleFactor -1.987341
 	}
 	Module BeamLine/QuadTypeQC_Boolean.dat
 	{
 	        Position 0. 0. +2.64355 m
 	        Rotation 0. 0. 0. degree
-	        ScaleFactor +1.293
-	}
+	        ScaleFactor +1.697709
+        }
 	Module TOF/TOF1.dat
 	{
 		Position 0. 0. +3.92455 m

@@ -164,7 +164,7 @@ class CADImport: #pylint: disable = R0903, C0103
         mmfile.close()
 
     def AppendTubeSolid(self, datafile, result, solid):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
         '''
         @Method AppendTubeSolid to generate a MICE module from a gdml tube solid
         '''
@@ -189,7 +189,7 @@ class CADImport: #pylint: disable = R0903, C0103
                 break
 
     def AppendBoxSolid(self, datafile, result, solid):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
         '''
         @Method AppendBoxSolid to generate a MICE module from a gdml box solid
         '''
@@ -206,7 +206,7 @@ class CADImport: #pylint: disable = R0903, C0103
                 break
 
     def AppendTrdSolid(self, datafile, result, solid):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
         '''
         @Method AppendTrdSolid to generate a MICE module from a gdml trd solid
         '''
@@ -214,15 +214,20 @@ class CADImport: #pylint: disable = R0903, C0103
         for elem in trd:
             if elem.prop("name") == solid:
                 result.append('Volume Trapezoid\n')
-                result.append('PropertyDouble TrapezoidWidthX1 '+elem.prop('x1')+'\n')
-                result.append('PropertyDouble TrapezoidWidthX2 '+elem.prop('x2')+'\n')
-                result.append('PropertyDouble TrapezoidHeightY1 '+elem.prop('y1')+'\n')
-                result.append('PropertyDouble TrapezoidHeightY2 '+elem.prop('y2')+'\n')
-                result.append('PropertyDouble TrapezoidLengthZ '+elem.prop('z')+'\n')
+                result.append('PropertyDouble TrapezoidWidthX1 '+\
+                              elem.prop('x1')+'\n')
+                result.append('PropertyDouble TrapezoidWidthX2 '+\
+                              elem.prop('x2')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY1 '+\
+                              elem.prop('y1')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY2 '+\
+                              elem.prop('y2')+'\n')
+                result.append('PropertyDouble TrapezoidLengthZ '+\
+                              elem.prop('z')+'\n')
                 break
             
     def AppendSphereSolid(self, datafile, result, solid):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
         '''
         @Method AppendSphereSolid to generate a MICE module from a gdml sphere solid
         '''
@@ -235,7 +240,7 @@ class CADImport: #pylint: disable = R0903, C0103
                               elem.prop('lunit')+'\n')
                 break
     def AppendTorusSolid(self, datafile, result, solid):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
         '''
         @Method AppendTorusSolid to generate a MICE module from a gdml torus solid
         '''
@@ -245,17 +250,17 @@ class CADImport: #pylint: disable = R0903, C0103
             # matching the volume
             if elem.prop('name') == solid:
                 result.append('Volume Torus\n')
-                result.append('PropertyDouble TorusInnerRadius '+elem.prop('rmin')
-                              +' '+elem.prop('lunit')+'\n')
-                result.append('PropertyDouble TorusOuterRadius '+elem.prop('rmax')
-                              +' '+elem.prop('lunit')+'\n')
-                result.append('PropertyDouble TorusRadiusOfCurvature '
-                              +elem.prop('rtor')+' '
-                              +elem.prop('lunit')+'\n')
-                result.append('PropertyDouble TorusAngleStart '+elem.prop('startphi')
-                              +' '+elem.prop('aunit')+'\n')
-                result.append('PropertyDouble TorusOpeningAngle '
-                              +elem.prop('deltaphi')+' '
+                result.append('PropertyDouble TorusInnerRadius '\
+                              +elem.prop('rmin') +' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusOuterRadius '\
+                              +elem.prop('rmax') +' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusRadiusOfCurvature '\
+                              +elem.prop('rtor')+' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusAngleStart '\
+                              +elem.prop('startphi') +' '\
+                              +elem.prop('aunit')+'\n')
+                result.append('PropertyDouble TorusOpeningAngle '\
+                              +elem.prop('deltaphi')+' '\
                               +elem.prop('aunit')+'\n')
 
     def AppendPolyconeSolid(self, datafile, result, solid, name):
@@ -293,7 +298,6 @@ class CADImport: #pylint: disable = R0903, C0103
                         # close the text file
                     f.close()
 
-        
     def AppendIntersectionSolid(self, datafile, result, solid):
         #pylint: disable = R0912, R0913, R0914, R0915, C0103
         '''
@@ -307,20 +311,23 @@ class CADImport: #pylint: disable = R0903, C0103
                 result.append('Volume Boolean\n')
                 result.append('PropertyString BaseModule '+\
                               os.path.join(self.geodir,\
-                                           elem.xpathEval('first')[0].prop('ref'))+\
-                              '.dat\n')
-                # This gets fun now... The base module must be defined independent of the
-                # existance of a GDML volume. For this reason using access module will not
+                                elem.xpathEval('first')[0].prop('ref'))+\
+                                '.dat\n')
+                # This gets fun now... The base module must be defined 
+                # independent of the # existance of a GDML volume. 
+                # For this reason using access module will not
                 # work because that uses a reference from a volume.
                 self.AccessBooleanModule(datafile, \
                                          elem.xpathEval('first')[0].prop('ref'))
                 result.append('PropertyString BooleanModule1 '+\
                               os.path.join(self.geodir,\
-                                           elem.xpathEval('second')[0].prop('ref'))+\
-                              '.dat\n')
+                                elem.xpathEval('second')[0].prop('ref'))+\
+                                '.dat\n')
                 self.AccessBooleanModule(datafile, \
-                                         elem.xpathEval('second')[0].prop('ref'))
-                result.append('PropertyString BooleanModule1Type Intersection\n')
+                              elem.xpathEval('second')[0].prop('ref'))
+                result.append(\
+                             'PropertyString BooleanModule1Type Intersection\n'
+                             )
                 result.append('PropertyHep3Vector BooleanModule1Pos '+\
                               elem.xpathEval('position')[0].prop('x')+' '+\
                               elem.xpathEval('position')[0].prop('y')+' '+\
@@ -344,16 +351,16 @@ class CADImport: #pylint: disable = R0903, C0103
                 result.append('Volume Boolean\n')
                 result.append('PropertyString BaseModule '+
                               os.path.join(self.geodir,\
-                                           elem.xpathEval('first')[0].prop('ref'))+
-                              '.dat\n')
+                                elem.xpathEval('first')[0].prop('ref'))+
+                                '.dat\n')
                 self.AccessBooleanModule(datafile, \
                                          elem.xpathEval('first')[0].prop('ref'))
                 result.append('PropertyString BooleanModule1 '+
                               os.path.join(self.geodir,\
-                                           elem.xpathEval('second')[0].prop('ref'))+
-                              '.dat\n')
+                                elem.xpathEval('second')[0].prop('ref'))+
+                                '.dat\n')
                 self.AccessBooleanModule(datafile, \
-                                         elem.xpathEval('second')[0].prop('ref'))
+                              elem.xpathEval('second')[0].prop('ref'))
                 result.append('PropertyString BooleanModule1Type Subtraction\n')
                 result.append('PropertyHep3Vector BooleanModule1Pos '+\
                               elem.xpathEval('position')[0].prop('x')+' ' +\
@@ -382,10 +389,10 @@ class CADImport: #pylint: disable = R0903, C0103
         self.AppendTrdSolid(datafile, result,  moduleName)
         self.AppendSphereSolid(datafile, result, moduleName)
         self.AppendTorusSolid(datafile, result,  moduleName)
-        self.AppendIntersectionSolid(datafile,result,moduleName)
-        self.AppendSubtractionSolid(datafile,result,moduleName)
+        self.AppendIntersectionSolid(datafile, result, moduleName)
+        self.AppendSubtractionSolid(datafile, result, moduleName)
         result.append("}\n")
-        f = open(os.path.join(self.geodir,moduleName + '.dat'), 'w')
+        f = open(os.path.join(self.geodir, moduleName + '.dat'), 'w')
         for line in result:
             f.write(line)
         f.close()
@@ -416,8 +423,8 @@ class CADImport: #pylint: disable = R0903, C0103
                 self.AppendSphereSolid(datafile, result, solid)
                 self.AppendTorusSolid(datafile, result, solid)
                 self.AppendPolyconeSolid(datafile, result, solid, moduleName)
-                self.AppendIntersectionSolid(datafile,result,solid)
-                self.AppendSubtractionSolid(datafile,result,solid)
+                self.AppendIntersectionSolid(datafile, result, solid)
+                self.AppendSubtractionSolid(datafile, result, solid)
 
                 aux        = vol.xpathEval('auxiliary')
                 
@@ -520,8 +527,12 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append('     Volume None\n')
                         result.append('     Position 0.0 0.0 0.0 mm\n')
                         result.append('     Rotation 0.0 0.0 0.0 degree\n')
-                        result.append('     PropertyString SensitiveDetector Virtual\n')
-                        result.append('     PropertyString IndependentVariable z\n')
+                        result.append(\
+                              '     PropertyString SensitiveDetector Virtual\n'\
+                                     )
+                        result.append(
+                              '     PropertyString IndependentVariable z\n'\
+                                     )
                         result.append(' }\n')
                         
                 # Get the material reference     
