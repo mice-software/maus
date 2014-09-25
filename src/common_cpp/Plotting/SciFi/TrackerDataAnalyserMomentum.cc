@@ -54,12 +54,16 @@ TrackerDataAnalyserMomentum::TrackerDataAnalyserMomentum()
     _tracker_num(0),
     _charge(0),
     _num_points(0),
-    _n_bad_tracks(0),
     _mc_track_id(0),
     _mc_pid(0),
-    _n_matched(0),
-    _n_mismatched(0),
-    _n_missed(0),
+    _n_sp_matched(0),
+    _n_sp_mismatched(0),
+    _n_sp_missed(0),
+    _n_mc_tracks_valid(0),
+    _n_mc_tracks_invalid(0),
+    _n_rec_tracks_matched(0),
+    _n_rec_tracks_unmatched(0),
+    _n_rec_tracks_total(0),
     _pt_rec(0.0),
     _pz_rec(0.0),
     _pt_mc(0.0),
@@ -138,16 +142,22 @@ void TrackerDataAnalyserMomentum::accumulate(Spill* spill) {
 }
 
 void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFiEvent* evt) {
-  std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
 
   // Create the lookup bridge between MC and Recon
   SciFiLookup lkup;
   lkup.make_hits_map(mc_evt);
 
-  // Reset tracks counters
-  _n_bad_tracks = 0;
+  // Find the number of valid mc tracks in this mc event
+  int n_tracks_t1 = 0;
+  int n_tracks_t2 = 0;
+  SciFiAnalysisTools::find_n_valid_mc_track(0, mc_evt, n_tracks_t1, n_tracks_t2);
+  _n_mc_tracks_valid = _n_mc_tracks_valid + n_tracks_t1 + n_tracks_t2;
+  _n_mc_tracks_invalid = _n_mc_tracks_invalid + ( mc_evt->GetTracks()->size()
+                                                    - n_tracks_t1 - n_tracks_t2 );
 
   // Loop over helical pattern recognition tracks in event
+  std::vector<SciFiHelicalPRTrack*> htrks = evt->helicalprtracks();
+  _n_rec_tracks_total = _n_rec_tracks_total + static_cast<int>(htrks.size());
   for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
     SciFiHelicalPRTrack* trk = htrks[iTrk];
     _pt_rec = 0.0;
@@ -207,14 +217,16 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       // If we have not found a common track id, abort for this track
       if (!success) {
         std::cerr << "Malformed track, skipping\n";
-        ++_n_bad_tracks;
+        ++_n_rec_tracks_unmatched;
         break;
+      } else {
+        ++_n_rec_tracks_matched;
       }
       // If we have found a common track id amoung the spoints, fill the tree
       _mc_track_id = track_id;
-      _n_matched = counter;
-      _n_mismatched = spoint_mc_tids.size() - counter;
-      _n_missed = 5 - counter; // TODO: improve
+      _n_sp_matched = counter;
+      _n_sp_mismatched = spoint_mc_tids.size() - counter;
+      _n_sp_missed = 5 - counter; // TODO: improve
 
       // Calc the MC track momentum using hits only with this track id
       _pt_mc = 0.0;
@@ -661,12 +673,13 @@ void TrackerDataAnalyserMomentum::setUp() {
   _tree->Branch("tracker_num", &_tracker_num, "tracker_num/I");
   _tree->Branch("charge", &_charge, "charge/I");
   _tree->Branch("num_points", &_num_points, "num_points/I");
-  _tree->Branch("n_bad_tracks", &_n_bad_tracks, "n_bad_tracks/I");
   _tree->Branch("mc_track_id", &_mc_track_id, "mc_track_id/I");
   _tree->Branch("mc_pid", &_mc_pid, "mc_pid/I");
-  _tree->Branch("n_matched", &_n_matched, "n_matched/I");
-  _tree->Branch("n_mismatched", &_n_mismatched, "n_mismatched/I");
-  _tree->Branch("n_missed", &_n_missed, "n_missed/I");
+  _tree->Branch("n_matched", &_n_sp_matched, "n_matched/I");
+  _tree->Branch("n_mismatched", &_n_sp_mismatched, "n_mismatched/I");
+  _tree->Branch("n_missed", &_n_sp_missed, "n_missed/I");
+  // _tree->Branch("n_tracks_matched", &_n_tracks_matched, "n_tracks_matched/I");
+  // _tree->Branch("n_tracks_unmatched", &_n_tracks_unmatched, "n_tracks_unmatched/I");
   _tree->Branch("pt_rec", &_pt_rec, "pt_rec/D");
   _tree->Branch("pz_rec", &_pz_rec, "pz_rec/D");
   _tree->Branch("pt_mc", &_pt_mc, "pt_mc/D");
