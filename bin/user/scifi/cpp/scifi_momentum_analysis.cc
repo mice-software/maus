@@ -31,6 +31,7 @@
 #include "TApplication.h"
 #include "TGClient.h"
 #include "TCut.h"
+#include "TPaveText.h"
 
 // MAUS headers
 #include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]) {
   analyser.setUp();
 
   // Set up ROOT app, input file, and MAUS data class
-  // TApplication theApp("App", &argc, argv);
+  TApplication theApp("App", &argc, argv);
   std::cout << "Opening file " << filename << std::endl;
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
@@ -146,22 +147,40 @@ int main(int argc, char *argv[]) {
   analyser.make_resolution_graphs();
   if (save_type != "") analyser.save_graphics(save_type);
 
-  // Tidy up
-  analyser.save_root();
-  infile.close();
-  // theApp.Run();
-
   // Print some results
+  double efficiency = static_cast<double>(analyser.get_n_rec_tracks_matched())
+                      / static_cast<double>(analyser.get_n_mc_tracks_valid());
+  double purity = static_cast<double>(analyser.get_n_rec_tracks_matched())
+                  / static_cast<double>(analyser.get_n_rec_tracks_total());
+
   std::cerr << "\n-------------------------Results-------------------------\n";
   std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
   std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
   std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
   std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
   std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
-  std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-    / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
-  std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-    / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
+  std::cerr << "=> Efficiency: " << efficiency << std::endl;
+  std::cerr << "=> Purity: " << purity << std::endl;
+
+  TCanvas c1("c1", "Info", 300, 200);
+  TPaveText tpt1(.05, .1, .95, .8);
+  tpt1.SetFillColor(kWhite);
+  tpt1.AddText("Run Results");
+  tpt1.AddLine(.0, .66, 1., .66);
+  std::stringstream ss1;
+  ss1 << "Efficiency: " << efficiency;
+  tpt1.AddText(ss1.str().c_str());
+  ss1.clear();
+  ss1.str("");
+  ss1 << "Purity: " << purity;
+  tpt1.AddText(ss1.str().c_str());
+  c1.Update();
+  tpt1.Draw();
+
+  // Tidy up
+  analyser.save_root();
+  infile.close();
+  theApp.Run();
 
   return 0;
 }

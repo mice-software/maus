@@ -23,5 +23,4 @@ namespace MAUS {
 SciFiDisplayBase::SciFiDisplayBase() : mCanvas(NULL) {
   // Do nothing
 }
-
 }

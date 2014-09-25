@@ -34,10 +34,10 @@ class SciFiDataBase  {
   public:
 
     /** Default constructor */
-    SciFiDataBase() {};
+    SciFiDataBase() {}
 
     /** Destructor */
-    virtual ~SciFiDataBase() {};
+    virtual ~SciFiDataBase() {}
 
     /** Pure virtual function hence must be overidden in daughter classes.
      *  Takes in the data, one spill at a time

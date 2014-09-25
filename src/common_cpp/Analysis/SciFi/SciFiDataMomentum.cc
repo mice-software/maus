@@ -15,6 +15,9 @@
  *
  */
 
+// C++ headers
+#include <vector>
+#include <map>
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
@@ -48,8 +51,7 @@ SciFiDataMomentum::~SciFiDataMomentum() {
   delete mTree;
 }
 
-bool SciFiDataMomentum::Accumulate(Spill* aSpill)
-{
+bool SciFiDataMomentum::Accumulate(Spill* aSpill) {
   if (aSpill != NULL && aSpill->GetDaqEventType() == "physics_event") {
     mDataStruct.SpillNumber = aSpill->GetSpillNumber();
 
@@ -170,5 +172,4 @@ void SciFiDataMomentum::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     }
   }
 }
-
 }

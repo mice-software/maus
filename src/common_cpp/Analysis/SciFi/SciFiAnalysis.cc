@@ -29,8 +29,7 @@ SciFiAnalysis::~SciFiAnalysis() {
   if (mSciFiData) delete mSciFiData;
 }
 
-bool SciFiAnalysis::Accumulate(Spill* aSpill)
-{
+bool SciFiAnalysis::Accumulate(Spill* aSpill) {
   // Check the spill pointer
   if ( !aSpill ) {
     std::cerr << "SciFiAnalysis: Warning: Empty Spill pointer passed\n";

@@ -51,7 +51,7 @@ class SciFiAnalysis {
     bool Accumulate(Spill* aSpill);
 
     /** Add a data display module */
-    void AddDisplay( SciFiDisplayBase* aDisplay ) { mDisplays.push_back(aDisplay); }
+    void AddDisplay(SciFiDisplayBase* aDisplay) { mDisplays.push_back(aDisplay); }
 
     /** Get the SciFiData member */
     SciFiDataBase* GetSciFiData() { return mSciFiData; }
@@ -67,12 +67,11 @@ class SciFiAnalysis {
     void Save();
 
     /** Set the SciFiData, which particular derived class depends on what analysis is required */
-    void SetSciFiData( SciFiDataBase* aSciFiData ) { mSciFiData = aSciFiData; }
+    void SetSciFiData(SciFiDataBase* aSciFiData) { mSciFiData = aSciFiData; }
 
   private:
     SciFiDataBase* mSciFiData;                 /** The SciFiData object */
     std::vector<SciFiDisplayBase*> mDisplays;  /** Vector of the different data displays */
-
 };
 
 } // ~namespace MAUS

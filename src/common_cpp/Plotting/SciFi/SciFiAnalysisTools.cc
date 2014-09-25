@@ -135,7 +135,7 @@ bool find_n_valid_mc_track(int pdg_id, const MAUS::MCEvent* mc_evt,
           int tracker_num = hits->at(iHit).GetChannelId()->GetTrackerNumber();
           int station_num = hits->at(iHit).GetChannelId()->GetStationNumber();
           if (tracker_num == 0) {
-            // Check if the current station has been NOT been hit (set false), and if not set to true
+            // Check if the current station has been NOT been hit (set false), if not set to true
             if ( !stations_hit_t1[station_num - 1] ) {
             stations_hit_t1[station_num - 1] = true;
             station_counter_t1++;

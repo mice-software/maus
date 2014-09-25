@@ -110,8 +110,10 @@ int main(int argc, char *argv[]) {
 //   std::cout << "Pz resolution histogram fit lower bound: " << analyser.get_pz_fit_min() << "\n";
 //   std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
 //   std::cout << "Resolution graphs number of points:  " << analyser.get_n_points() << "\n";
-//   std::cout << "Resolution graphs lower bound:  " << analyser.get_resol_lower_bound() << " MeV/c\n";
-//   std::cout << "Resolution graphs upper bound:  " << analyser.get_resol_upper_bound() << " MeV/c\n";
+//   std::cout << "Resolution graphs lower bound:  "
+               << analyser.get_resol_lower_bound() << " MeV/c\n";
+//   std::cout << "Resolution graphs upper bound:  "
+               << analyser.get_resol_upper_bound() << " MeV/c\n";
 //   std::cout << "Pz rec cut: " << analyser.get_cut_pz_rec() << " MeV/c\n";
   MAUS::SciFiDisplayMomentumResiduals* display = new MAUS::SciFiDisplayMomentumResiduals();
   analyser.AddDisplay(display);

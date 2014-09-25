@@ -81,5 +81,4 @@ void SciFiDisplayMomentumResiduals::Update() {
     std::cerr << "SciFiDisplayMomentumResiduals: Warning, local ROOT Tree not setup\n";
   }
 }
-
 }
