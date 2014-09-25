@@ -116,11 +116,11 @@ class OutputCppRoot : public OutputBase<std::string> {
   std::string _fname;
   std::string _end_of_run_dir;
   std::string _outfile_branch;
-  JobHeaderData _job_header_cpp;
-  RunHeaderData _run_header_cpp;
-  Data _spill_cpp;
-  RunFooterData _run_footer_cpp;
-  JobFooterData _job_footer_cpp;
+  JobHeaderData* _job_header_cpp;
+  RunHeaderData* _run_header_cpp;
+  Data* _spill_cpp;
+  RunFooterData* _run_footer_cpp;
+  JobFooterData* _job_footer_cpp;
   std::ofstream log;
   std::vector<int> _run_numbers;
   output_mode _mode;

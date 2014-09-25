@@ -109,8 +109,8 @@ The Module description is similar in structure to the Configuration file:
 \begin{verbatim}
     Module <Module Name>
     {
-        Volume  <Volume Type>
-        Dimensions  <Dimension1> <Dimension2> <Dimension3> <Units>
+        PropertyString Volume  <Volume Type>
+        PropertyHep3Vector Dimensions  <Dimension1> <Dimension2> <Dimension3> <Units>
         <Properties>
 
         <Child Modules>
@@ -205,9 +205,9 @@ The child module definition looks like:
 \begin{verbatim}
     Module <Module File Name>
     {
-        Position  <x position> <y position> <z position> <Units>
-        Rotation  <x rotation> <y rotation> <z rotation> <Units>
-        ScaleFactor <Value>
+        PropertyHep3Vector Position  <x position> <y position> <z position> <Units>
+        PropertyHep3Vector Rotation  <x rotation> <y rotation> <z rotation> <Units>
+        PropertyDouble ScaleFactor <Value>
         <Define volume, dimensions and properties for this instance only>
     }
 \end{verbatim}

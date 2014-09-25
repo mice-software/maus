@@ -17,6 +17,9 @@
 
 #include "gtest/gtest.h"
 
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
+
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 // #define wrapper for friend declarations
@@ -82,9 +85,15 @@ TEST_F(DetectorConstructionTest, SetSteppingAlgorithmTest) {
     EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
     SetStepperType(dc, "ClassicalRK4");
 }
-}
-}
-/*
+
+
+// Some instability in Geant4? I disable these tests by default because they
+// seem to not be quite stable
+// Could be some lurking darkness, I think just that Geant4 doesn't do
+// reinitialisation properly
+// #define FULL_GEANT4_TEST
+#ifdef FULL_GEANT4_TEST
+
 TEST_F(DetectorConstructionTest, RootVolumeTest) {
     // I dont test anywhere that the volume name is updated. I dont know how
     MiceModule mod(mod_path+"RootVolumeTest.dat");
@@ -146,6 +155,17 @@ TEST_F(DetectorConstructionTest, NormalVolumePlacementTest) {
     EXPECT_DOUBLE_EQ(steps[Json::Value::UInt(3)]["position"]["z"].asDouble(),
                      1.+sqrt(2.));
 }
+
+TEST_F(DetectorConstructionTest, NormalVolumeRegionTest) {
+    // Check rotation and translations
+    MiceModule mod(mod_path+"VolumeTestRegions.dat");
+    dc->SetMiceModules(mod);
+    G4Region* region1 = G4RegionStore::GetInstance()->GetRegion("Region1");
+    EXPECT_EQ(region1->GetNumberOfRootVolumes(), size_t(2));
+    G4Region* region2 = G4RegionStore::GetInstance()->GetRegion("Region2");
+    EXPECT_EQ(region2->GetNumberOfRootVolumes(), size_t(1));
+}
+
 
 TEST_F(DetectorConstructionTest, NormalVolumeMaterialTest) {
     // Check material
@@ -246,7 +266,8 @@ TEST_F(DetectorConstructionTest, BuildG4DetectorVolumeTest) {
     MiceModule modError(mod_path+"G4DetectorTestError.dat");
     EXPECT_THROW(dc->SetMiceModules(modError), MAUS::Exception);
 }
+#endif
 }
 }
-*/
+
 
