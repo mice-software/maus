@@ -31,22 +31,23 @@ DAQData::DAQData(const DAQData& _daqdata)
 }
 
 DAQData& DAQData::operator=(const DAQData& _daqdata) {
+    using DAQDataHelper::VectorDeepcopy;
     if (this == &_daqdata) {
         return *this;
     }
     SetV830(_daqdata._V830);
-    SetTriggerRequestArray(_daqdata._trigger_request);
-    SetTOF1DaqArray(_daqdata._tof1);
-    SetCkovArray(_daqdata._ckov);
-    SetTOF2DaqArray(_daqdata._tof2);
-    SetUnknownArray(_daqdata._unknown);
-    SetKLArray(_daqdata._kl);
-    SetTagArray(_daqdata._tag);
-    SetTOF0DaqArray(_daqdata._tof0);
-    SetTriggerArray(_daqdata._trigger);
+    SetTriggerRequestArray(VectorDeepcopy<>(_daqdata._trigger_request));
+    SetTOF1DaqArray(VectorDeepcopy<>(_daqdata._tof1));
+    SetCkovArray(VectorDeepcopy<>(_daqdata._ckov));
+    SetTOF2DaqArray(VectorDeepcopy<>(_daqdata._tof2));
+    SetUnknownArray(VectorDeepcopy<>(_daqdata._unknown));
+    SetKLArray(VectorDeepcopy<>(_daqdata._kl));
+    SetTagArray(VectorDeepcopy<>(_daqdata._tag));
+    SetTOF0DaqArray(VectorDeepcopy<>(_daqdata._tof0));
+    SetTriggerArray(VectorDeepcopy<>(_daqdata._trigger));
     SetEMRDaq(_daqdata._emr);
-    SetTracker0DaqArray(_daqdata._tracker0);
-    SetTracker1DaqArray(_daqdata._tracker1);
+    SetTracker0DaqArray(VectorDeepcopy<>(_daqdata._tracker0));
+    SetTracker1DaqArray(VectorDeepcopy<>(_daqdata._tracker1));
 
     return *this;
 }

@@ -79,6 +79,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["charged_pion_half_life"] = -1.;
   config["muon_half_life"] = -1.;
   config["production_threshold"] = 0.5;
+  config["fine_grained_production_threshold"] = Json::Value(Json::objectValue);
   config["default_keep_or_kill"] = true;
   config["spin_tracking"] = true;
   config["keep_or_kill_particles"] = "{\"neutron\":False}";

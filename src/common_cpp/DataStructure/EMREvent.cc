@@ -41,10 +41,6 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
 }
 
 EMREvent::~EMREvent() {
-  int nplhits = _emrplanehitarray.size();
-  for (int i = 0; i < nplhits; i++)
-    delete _emrplanehitarray[i];
-
   _emrplanehitarray.resize(0);
 }
 
@@ -53,6 +49,11 @@ EMRPlaneHitArray EMREvent::GetEMRPlaneHitArray() const {
 }
 
 void EMREvent::SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray) {
+  int nplhits = _emrplanehitarray.size();
+  for (int i = 0; i < nplhits; i++) {
+    if (_emrplanehitarray[i] != NULL)
+        delete _emrplanehitarray[i];
+  }
   _emrplanehitarray = emrplanehitarray;
 }
 }

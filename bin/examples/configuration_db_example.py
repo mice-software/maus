@@ -10,6 +10,7 @@ import pprint  #  pretty printer
 from datetime import datetime  #  for getting runs over a time range
 import cdb # configuration database lookups
 from cdb import Beamline       #  get beamline information for some run
+from cdb import Calibration
 
 def run():
     """Fetch information from the configuration database
@@ -37,6 +38,7 @@ def run():
     """
     try:
         beamline = Beamline()
+        calibration = Calibration()
 
         print """
         which was easy enough.  You can check that the beamline class was
@@ -51,7 +53,10 @@ def run():
             print beamline.get_beamline_for_run(2873)
         """
         pretty_print.pprint(beamline.get_beamline_for_run(2873))
+        print """
 
+	"""
+        print calibration.get_calibration_for_run('TOF1', 2873, 'tw')
         print """
         We can also ask what the runs were for a certain date range:
 
@@ -60,8 +65,8 @@ def run():
             run_info = beamline.get_beamlines_for_dates(date0, date1)
             print run_info.keys()
         """
-        date0 = datetime.strptime("2010-08-01", "%Y-%m-%d")
-        date1 = datetime.strptime("2010-08-12", "%Y-%m-%d")
+        date0 = datetime.strptime("2011-12-02", "%Y-%m-%d")
+        date1 = datetime.strptime("2011-12-12", "%Y-%m-%d")
         run_info = beamline.get_beamlines_for_dates(date0, date1)
         print run_info.keys()
         print """

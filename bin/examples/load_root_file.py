@@ -23,7 +23,8 @@ def generate_some_data(outfile):
     """
     analysis = os.path.join\
                  (os.environ["MAUS_ROOT_DIR"], "bin", "analyze_data_offline.py")
-    proc = subprocess.Popen([analysis, "-output_root_file_name", outfile])
+    proc = subprocess.Popen(['python', analysis,
+                             '--output_root_file_name', outfile])
     proc.wait() #pylint: disable = E1101
 
 def main():
