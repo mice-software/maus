@@ -48,7 +48,7 @@ namespace MAUS {
 class TrackerDataAnalyserMomentum {
   public:
 
-    /** Default constructor */
+    /** Default constructor, initialise the abstract base class, and set pointers to NULL. */
     TrackerDataAnalyserMomentum();
 
     /** Destructor */
@@ -86,27 +86,6 @@ class TrackerDataAnalyserMomentum {
 
     /** Return the number of points used in the resolution plots */
     int get_n_points() const { return _n_points; }
-
-    /** Return the number of mc tracks which caused hits in 4 or more tracker stations
-     *  in one tracker (hence an mc track which traversed both trackers producing hits in all
-     *  stations would raise this number by 2)
-     */
-    int get_n_mc_tracks_valid() const { return _n_mc_tracks_valid; }
-
-    /** Return the number of mc tracks which caused hits in less than 4 or more tracker stations
-     *  in one tracker (hence an mc track which traversed both trackers producing hits in only
-     *  three stations in each would raise this number by 2)
-     */
-    int get_n_mc_tracks_invalid() const { return _n_mc_tracks_invalid; }
-
-    /** Return the number of recon tracks for which a corresponding MC track was found */
-    int get_n_rec_tracks_matched() const { return _n_rec_tracks_matched; }
-
-    /** Return the number of recon tracks for which no corresponding MC track was found */
-    int get_n_rec_tracks_unmatched() const { return _n_rec_tracks_unmatched; }
-
-    /** Return the number of recon tracks for which no corresponding MC track was found */
-    int get_n_rec_tracks_total() const { return _n_rec_tracks_total; }
 
     /** Return the lower limit of each fit used to calc the pt resolution pnts */
     int get_pt_fit_min() const { return _pt_fit_min; }
@@ -194,16 +173,12 @@ class TrackerDataAnalyserMomentum {
     int _tracker_num;
     int _charge;
     int _num_points;
+    int _n_bad_tracks;
     int _mc_track_id;
     int _mc_pid;
-    int _n_sp_matched;
-    int _n_sp_mismatched;
-    int _n_sp_missed;
-    int _n_mc_tracks_valid;
-    int _n_mc_tracks_invalid;
-    int _n_rec_tracks_matched;
-    int _n_rec_tracks_unmatched;
-    int _n_rec_tracks_total;
+    int _n_matched;
+    int _n_mismatched;
+    int _n_missed;
 
     double _pt_rec;
     double _pz_rec;
