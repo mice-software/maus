@@ -123,9 +123,18 @@ namespace JsonWrapper {
    */
   Json::ValueType JsonTypeToValueType(const JsonType tp) throw(MAUS::Exception);
 
-  /** @brief Return true if types are equal or anyValue
+  /** @brief Return true if cast_target can be cast to cast_type in a safe way
+   *
+   *  Return true if the target can be cast to cast_type without loss of data,
+   *  i.e. int, uint can be cast to float; uint can be cast to int; anything can
+   *  be cast to anyValue and we allow anyValue to be cast back to anything.
    */
-  bool SimilarType(const JsonType jt1, const JsonType jt2);
+  bool SimilarType(const JsonType cast_target, const JsonType cast_type);
+
+  /** @brief Return true if types are numeric (integer or float)
+   */
+  bool IsNumeric(const JsonType jt);
+
 
   /** @brief Print the Json value to an ostream
    *

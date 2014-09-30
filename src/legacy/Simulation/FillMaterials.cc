@@ -84,16 +84,31 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   aerogel0_2->AddMaterial(water, 0.03);
   materials_list->addMaterial( aerogel0_2, name );
 
+  // MICE Lithium Hydride
+  // density of 0.69 g/cm3 is a myth/rumour; NO citation
+  // Gene Kafka/Dan Kaplan/Alan Bross are contacts
+  density = 0.69*g/cm3;
+  name = "MICE_LITHIUM_HYDRIDE";
+  G4Material* miceLiH = new G4Material(name, density, nComp=2);
+  G4Element* elMiceLi = new G4Element("MICE_LITHIUM", "Li", 2);
+  G4Isotope* Li6 = new G4Isotope("Li6", 3, 6);
+  G4Isotope* Li7 = new G4Isotope("Li7", 3, 7);
+  elMiceLi->AddIsotope(Li6, 0.98);
+  elMiceLi->AddIsotope(Li7, 0.02);
+  miceLiH->AddElement(elMiceLi, 0.126797);
+  G4Element* elH = man->FindOrBuildElement("H");
+  miceLiH->AddElement(elH, 0.873203);
+  materials_list->addMaterial( miceLiH, name );
+
   // BC600, here represented only as bisphenol (rho_bisphenol=1.20gcm-3)
-  density = 1.18*g/cm3; // refractive index = 1.56
+  density = 1.18*g/cm3; // refractive index = 1.56 
   name = "BC600";
   G4Material* bc600 = new G4Material(name, density, nComp=3);
   G4Element* elC = man->FindOrBuildElement("C");
   bc600->AddElement(elC, 15);
-  G4Element* elH = man->FindOrBuildElement("H");
   bc600->AddElement(elH, 16);
   G4Element* elO = man->FindOrBuildElement("O");
-  bc600->AddElement(elO, 12);		//ME - Tamas thinks this should be 2, not 12!!!
+  bc600->AddElement(elO,  2);		//ME - Tamas thinks this should be 2, not 12!!!
   materials_list->addMaterial( bc600, name );
 
   // Stainless steel, using generic 304 
@@ -259,6 +274,19 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   aero112->AddElement(elSi, 46.7*perCent);
   aero112->AddElement(elO,  53.3*perCent);
   materials_list->addMaterial( aero112, name );
+  
+  // Freeman RenCast6400-1 Polyurethane used in tracker station construction
+  density = 1.04*g/cm3;
+  name = "RenCast6400";
+  G4Material* renCast6400 = new G4Material(name,density, nComp=5, kStateSolid);
+  G4Element* elN = man->FindOrBuildElement("N");
+  G4Element* elP = man->FindOrBuildElement("P");
+  renCast6400->AddElement(elC, 51.15*perCent);
+  renCast6400->AddElement(elH, 34.95*perCent);
+  renCast6400->AddElement(elO,  7.07*perCent);
+  renCast6400->AddElement(elN,  6.76*perCent);
+  renCast6400->AddElement(elP,  0.07*perCent);
+  materials_list->addMaterial( renCast6400, name );
 
   // Be with PDG properties
   density = 1.848 * g/cm3;//at r.t
@@ -325,6 +353,30 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   G4Material* mAIR = man->FindOrBuildMaterial("G4_AIR");
   pdgAIR->AddMaterial(mAIR, 100*perCent);
   materials_list->addMaterial( pdgAIR, name );
+
+
+  // BRASS 
+  density = 8.4* g/cm3;
+  name = "BRASS";
+  G4Material* brass = new G4Material(name, density, nComp=3, kStateSolid);
+  G4Element* elZn = man->FindOrBuildElement("Zn");
+  brass->AddElement(elCu, 58*perCent);
+  brass->AddElement(elZn, 39*perCent);
+  brass->AddElement(elPb,  3*perCent);
+  materials_list->addMaterial( brass, name );
+
+  // POLYURETHANE
+  density = 1.220 * g/cm3;
+  name = "POLYURETHANE";
+  G4Material* TufsetPU = new G4Material(name, density, nComp=4, kStateSolid);
+  // G4Element* elN = man->FindOrBuildElement("N");
+  TufsetPU->AddElement(elC, 64.38*perCent);
+  TufsetPU->AddElement(elH,  9.01*perCent);
+  TufsetPU->AddElement(elN,  6.01*perCent);
+  TufsetPU->AddElement(elO, 20.60*perCent);
+  materials_list->addMaterial( TufsetPU, name );
+
+  // TUFNOL 
 
   // now fill in the other maps of the material properties
 

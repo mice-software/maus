@@ -56,8 +56,8 @@ class TOFPixelKey {
 
   virtual ~TOFPixelKey() {}
 
-  bool operator==( TOFPixelKey key );
-  bool operator!=( TOFPixelKey key );
+  bool operator==( const TOFPixelKey& key ) const;
+  bool operator!=( const TOFPixelKey& key ) const;
 
   friend ostream& operator<<( ostream& stream, TOFPixelKey key );
   friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Exception);
@@ -119,7 +119,7 @@ class TOFCalibrationMap {
   * \param[in] json_configuration Json document containing the configuration.
   * \returns true if all text files are loaded successfully.
   */
-  bool InitializeFromCards(Json::Value configJSON);
+  bool InitializeFromCards(Json::Value configJSON, int);
 
   /// Get calibrations from CDB
   bool InitializeFromCDB();
@@ -141,14 +141,14 @@ class TOFCalibrationMap {
   * \returns the value of the T0 correction for this channel and sets the number of the 
   * refference pixel. If no calibration for this channel the function returns NOCALIB (-99999).
   */
-  double T0(TOFChannelKey key, int &r);
+  double T0(TOFChannelKey key, int &r) const;
 
  /** Return the Trigger delay correction for the pixel coded by the key.
   * \param[in] key the pixel of the hit that gives the trigger.
   * \returns the value of the trigger delay correction. If no calibration for this pixel the 
   * function returns NOCALIB (-99999).
   */
-  double TriggerT0(TOFPixelKey key);
+  double TriggerT0(TOFPixelKey key) const;
 
  /** Calculate the TimeWalk correction for the channel coded by the key and for given adc value.
   * \param[in] key the channel of the measurement.
@@ -156,7 +156,7 @@ class TOFCalibrationMap {
   * \returns the value of the time-walk correction. If no calibration for this channel the function
   * returns NOCALIB (-99999).
   */
-  double TW(TOFChannelKey key, int adc );
+  double TW(TOFChannelKey key, int adc ) const;
 
  /** Calculate the combined correction for the channel coded by Pkey, trigger 
   * pixel coded by the Tkey and for given adc value.
@@ -164,7 +164,7 @@ class TOFCalibrationMap {
   * \param[in] Tkey the pixel of the hit that gives the trigger.
   * \param[in] adc the measured value of the amplitude of the signal.
   */
-  double dT(TOFChannelKey Pkey, TOFPixelKey Tkey, int adc);
+  double dT(TOFChannelKey Pkey, TOFPixelKey Tkey, int adc) const;
 
  /** Return the data member Name.
   */
@@ -179,7 +179,7 @@ class TOFCalibrationMap {
   */
   void Print();
   bool InitializePyMod();
-  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
+  void GetCalib(std::string devname, std::string caltype);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
    /** This value is returned when the correction can not be calculated.
@@ -210,11 +210,11 @@ class TOFCalibrationMap {
 
  /** Find the position of the PMT key in the data member _Pkey.
   */
-  int FindTOFChannelKey(TOFChannelKey key);
+  int FindTOFChannelKey(TOFChannelKey key) const;
 
  /** Find the position of the trigger key in the data member _Tkey.
   */
-  int FindTOFPixelKey(TOFPixelKey key);
+  int FindTOFPixelKey(TOFPixelKey key) const;
 
  /** This vector holds one TOFChannelKey for each channel of the detector.
   */
@@ -257,7 +257,7 @@ class TOFCalibrationMap {
   */
   std::string _name;
   std::stringstream t0str, twstr, trigstr;
-  std::string _tof_station, _tof_calibdate;
+  std::string _tof_station, _tof_calibdate, _tof_calib_by;
 
  /** Flags for switching On and Off of the different types of calibration corrections.
   */
@@ -272,6 +272,7 @@ class TOFCalibrationMap {
   bool LoadTWCalib();
   bool LoadTriggerCalib();
   bool pymod_ok;
+  int runNumber;
 };
 }
 

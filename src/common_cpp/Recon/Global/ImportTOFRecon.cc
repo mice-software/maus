@@ -41,7 +41,6 @@ namespace global {
       std::string mapper_name) {
 
     size_t max_i;
-    std::string local_mapper_name;
     std::vector<TOFSpacePoint> tofarray;
     double z;
     double x_err;
@@ -52,32 +51,29 @@ namespace global {
       switch (n) {
       case 0:
 	max_i = tofEventSpacepoint.GetTOF0SpacePointArraySize();
-	local_mapper_name = mapper_name + "/ImportTOF0spacepoint";
 	tofarray = tofEventSpacepoint.GetTOF0SpacePointArray();
 	z = 2773.0;
 	x_err = 20.0;
 	y_err = 20.0;
-	detector = MAUS::DataStructure::Global::kTOF0_1;
+	detector = MAUS::DataStructure::Global::kTOF0;
 	break;
 
       case 1:
 	max_i = tofEventSpacepoint.GetTOF1SpacePointArraySize();
-	local_mapper_name = mapper_name + "/ImportTOF1spacepoint";
 	tofarray = tofEventSpacepoint.GetTOF1SpacePointArray();
 	z = 10478.0;
 	x_err = 30.0;
 	y_err = 30.0;
-	detector = MAUS::DataStructure::Global::kTOF1_1;
+	detector = MAUS::DataStructure::Global::kTOF1;
 	break;
 
       case 2:
 	max_i = tofEventSpacepoint.GetTOF2SpacePointArraySize();
-	local_mapper_name = mapper_name + "/ImportTOF2spacepoint";
 	tofarray = tofEventSpacepoint.GetTOF2SpacePointArray();
-	z = 12883.0;
+	z = 17905.74;
 	x_err = 30.0;
 	y_err = 30.0;
-	detector = MAUS::DataStructure::Global::kTOF2_1;
+	detector = MAUS::DataStructure::Global::kTOF2;
 	break;
       }
 

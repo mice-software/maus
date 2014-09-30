@@ -59,6 +59,9 @@ namespace MAUS {
 class CppErrorHandler {
 
  public:
+  CppErrorHandler();
+  ~CppErrorHandler();
+
   /** @brief Call default Cpp exception handler
    *
    * This makes a python exception of type CppError and hands it to the Python
@@ -102,36 +105,21 @@ class CppErrorHandler {
    */
   void HandleStdExcNoJson(std::exception& exc, std::string class_name);
 
-  /** @brief Set function that is called to pass errors to python
+  /** @brief Get a pointer to an instance of the error handler
    *
-   *  Note that this function INCREFs the input PyObject and DECREFs any
-   *  existing PyObject (i.e. CppErrorHandler owns memory).
+   *  Old way was to use a singleton for error handler
    */
-  void SetPyErrorHandler(PyObject* fn) {
-    if (getInstance()->HandleExceptionFunction != NULL)
-      Py_XDECREF(getInstance()->HandleExceptionFunction);
-    Py_XINCREF(fn);
-    getInstance()->HandleExceptionFunction = fn;
-  }
-
-  /** @brief Get function that is called to pass errors to python
-   */
-  PyObject* GetPyErrorHandler() {
-    return getInstance()->HandleExceptionFunction;
-  }
-
   static CppErrorHandler* getInstance();
-
-  ~CppErrorHandler();
 
  private:
   static CppErrorHandler* instance;
-  PyObject* HandleExceptionFunction;  // set by callback defined in PyMausCpp
+
+  /** @brief Get function that is called to pass errors to python
+   */
+  PyObject* GetPyErrorHandler();
 
   Json::Value ExceptionToPython
              (std::string what, Json::Value json_value, std::string class_name);
-
-  CppErrorHandler();
 };
 
 }  // namespace MAUS

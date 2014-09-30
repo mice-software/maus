@@ -89,10 +89,32 @@ class PatternRecognitionTest : public ::testing::Test {
   }
 };
 
+TEST_F(PatternRecognitionTest, test_constructor) {
+  PatternRecognition pr;
+  pr.set_parameters_to_default();
+  EXPECT_TRUE(pr._straight_pr_on);
+  EXPECT_TRUE(pr._helical_pr_on);
+  EXPECT_EQ(0, pr._verb);
+  EXPECT_EQ(2, pr._n_trackers);
+  EXPECT_EQ(5, pr._n_stations);
+  EXPECT_EQ(0.3844, pr._sd_1to4);
+  EXPECT_EQ(0.4298, pr._sd_5);
+  EXPECT_EQ(1.0, pr._sd_phi_1to4);
+  EXPECT_EQ(1.0, pr._sd_phi_5);
+  EXPECT_EQ(2.0, pr._res_cut);
+  EXPECT_EQ(150.0, pr._R_res_cut);
+  EXPECT_EQ(15.0, pr._straight_chisq_cut);
+  EXPECT_EQ(4.0, pr._sz_chisq_cut);
+  EXPECT_EQ(0.75, pr._n_turns_cut);
+  EXPECT_EQ(180.0, pr._Pt_max);
+  EXPECT_EQ(50.0, pr._Pz_min);
+}
+
 /*
 TEST_F(PatternRecognitionTest, test_process_good) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_spacepoints();
@@ -165,6 +187,7 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts_t1_trk1;
@@ -301,7 +324,9 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
   spnts[17] = sp1;
 
   // Perform the recon
-  pr.process(true, false, evt1); // Helical on, Straight off
+  pr.set_helical_pr_on(true);
+  pr.set_straight_pr_on(false);
+  pr.process(evt1);
 
   std::vector<SciFiStraightPRTrack*> strks;
   std::vector<SciFiHelicalPRTrack*> htrks;
@@ -340,6 +365,7 @@ TEST_F(PatternRecognitionTest, test_make_tracks) {
   spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   int n_stations = 5;
 
   // Set up the spacepoints by station 2D vector
@@ -465,6 +491,7 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   int n_stations = 5;
 
   // Set up the spacepoints by station 2D vector
@@ -563,6 +590,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   spnts.push_back(spnts_all[0]);
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   int n_stations = 5;
 
   // Set up the spacepoints by station 2D vector
@@ -680,6 +708,7 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
   int n_stations = 5;
   int tracker_num = 0;
   PatternRecognition pr;
+  pr.set_parameters_to_default();
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_spacepoints();
@@ -735,6 +764,7 @@ TEST_F(PatternRecognitionTest, test_make_straight_tracks) {
 TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   std::vector<int> ignore_stations(0);
   int is1, is2;
 
@@ -761,6 +791,7 @@ TEST_F(PatternRecognitionTest, test_set_ignore_stations) {
 TEST_F(PatternRecognitionTest, test_set_seed_stations) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   std::vector<int> ignore_stations(0);
   int outer_st_num, inner_st_num, mid_st_num;
 
@@ -910,6 +941,7 @@ TEST_F(PatternRecognitionTest, test_set_seed_stations) {
 TEST_F(PatternRecognitionTest, test_set_end_stations) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
   std::vector<int> ignore_stations(0);
   int outer_st_num, inner_st_num;
 
@@ -1040,6 +1072,7 @@ TEST_F(PatternRecognitionTest, test_set_end_stations) {
 TEST_F(PatternRecognitionTest, test_find_dsdz) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
 
   // Set up spacepoints from an MC helical track
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
@@ -1078,9 +1111,8 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   spnts.push_back(sp4);
   spnts.push_back(sp5);
 
-  LeastSquaresFitter lsq(0.3844, 0.4298, 150.0);
   SimpleCircle circle;
-  bool good_radius = lsq.circle_fit(spnts, circle);
+  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle);
 
   double epsilon = 0.01;
 
@@ -1112,6 +1144,7 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
 TEST_F(PatternRecognitionTest, test_find_n_turns) {
 
   PatternRecognition pr;
+  pr.set_parameters_to_default();
 
   // T1 positives
   double arr_z[] = {1100.41, 750.48, 450.48, 200.617, 0.6523};

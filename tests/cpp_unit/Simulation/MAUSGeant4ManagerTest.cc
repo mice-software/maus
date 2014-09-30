@@ -119,8 +119,13 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
-    std::string pg_string =
-      "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
+    std::string pg_string = 
+      std::string("{\"primary\":{")+
+      std::string("\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, ")+
+      std::string("\"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
+      std::string("\"spin\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
+      std::string("\"particle_id\":-13, \"energy\":226.0, ")+
+      std::string("\"time\":0.0, \"random_seed\":10}}");
     Json::Value pg = JsonWrapper::StringToJson(pg_string);
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     Json::Value out = MAUSGeant4Manager::GetInstance()->RunParticle(pg);
@@ -137,13 +142,18 @@ TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
 }
 
 TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
-    std::string pg_string =
-      "{\"primary\":{\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, \"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, \"particle_id\":-13, \"energy\":226.0, \"time\":0.0, \"random_seed\":10}}";
+    std::string pg_string = 
+      std::string("{\"primary\":{")+
+      std::string("\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, ")+
+      std::string("\"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
+      std::string("\"spin\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
+      std::string("\"particle_id\":-13, \"energy\":226.0, ")+
+      std::string("\"time\":0.0, \"random_seed\":10}}");
     std::string pg_array_string = "["+pg_string+","+pg_string+","+pg_string+"]";
     Json::Value pg = JsonWrapper::StringToJson(pg_array_string);
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     Json::Value out = MAUSGeant4Manager::GetInstance()->RunManyParticles(pg);
-    for (size_t i = 0; i < out.size(); ++i) {
+    for (int i = 0; i < int(out.size()); ++i) {
       Json::Value track = out[i]["tracks"][Json::Value::UInt(0)];
       ASSERT_TRUE(out.isArray());
       ASSERT_TRUE(out[i].isObject());

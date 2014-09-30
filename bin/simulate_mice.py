@@ -37,6 +37,10 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
+    # KL
+    my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
+    my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
+
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon

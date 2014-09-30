@@ -63,7 +63,9 @@ namespace MAUS {
       // they have been determined
       _pid_vars.clear();
       _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypothesis_name,
-                                                           _unique_identifier));
+	_unique_identifier));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypothesis_name,
+	_unique_identifier));
 
       _configCheck = true;
       return true;
@@ -104,12 +106,28 @@ namespace MAUS {
     try {
       Json::Value imported_json = JsonWrapper::StringToJson(document);
       data_json = new Json::Value(imported_json);
-    } catch (...) {
+    } catch (Exception& exception) {
+      MAUS::CppErrorHandler::getInstance()->
+	HandleExceptionNoJson(exception, _classname);
+      std::cerr << "String to Json conversion failed,"
+		<< "ReduceCppGlobalPID::process" << std::endl;
       Json::Value errors;
       std::stringstream ss;
       ss << _classname << " says: Bad json document";
       errors["bad_json_document"] = ss.str();
       _root["errors"] = errors;
+      delete data_json;
+      return writer.write(_root);
+    } catch (std::exception& exc) {
+      MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
+      std::cerr << "String to Json conversion failed,"
+		<< "ReduceCppGlobalPID::process" << std::endl;
+      Json::Value errors;
+      std::stringstream ss;
+      ss << _classname << " says: Bad json document";
+      errors["bad_json_document"] = ss.str();
+      _root["errors"] = errors;
+      delete data_json;
       return writer.write(_root);
     }
 
@@ -176,10 +194,10 @@ namespace MAUS {
                ++track_i) {
             MAUS::DataStructure::Global::Track* track =
 	      GlobalTrackArray->at(track_i);
-
+	    if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
             for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
                  ++pid_var_count) {
-              _pid_vars[pid_var_count]->Fill_TH1(track);
+              _pid_vars[pid_var_count]->Fill_Hist(track);
             }
           }
         }

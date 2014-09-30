@@ -100,10 +100,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
 
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);
-  double mx     = site(1, 0);
-  double my     = site(3, 0);
   double kappa  = site(4, 0);
-  double kappa2 = kappa*kappa;
   double charge = kappa/fabs(kappa);
 
   // Define factors to be used in the matrix.

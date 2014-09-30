@@ -16,8 +16,8 @@
  */
 
 /** @class TrackMatching
- *  Takes a global event containing (currently just from TOF)
- *	space points and creates global tracks.
+ *  @author Celeste Pidcott, University of Warwick
+ *  Takes a global event containing space points and creates global tracks.
  */
 
 #ifndef _SRC_COMMON_CPP_RECON_TRACKMATCHING_HH_
@@ -32,6 +32,8 @@
 
 // MAUS headers
 #include "DataStructure/ReconEvent.hh"
+#include "Recon/Global/ImportTOFRecon.hh"
+#include "Recon/Global/ImportSciFiRecon.hh"
 
 namespace MAUS {
 namespace recon {
@@ -51,7 +53,7 @@ namespace global {
      *  
      *  @param global_event The Global Event, which will be changed
      */
-    void FormTracks(MAUS::GlobalEvent* global_event);
+    void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -59,6 +61,11 @@ namespace global {
 
     /// Disallow operator= as unnecessary
     void operator=(const TrackMatching);
+
+    void MakeTOFTracks(MAUS::GlobalEvent* global_event,
+		       std::vector<MAUS::DataStructure::Global::SpacePoint*>
+		       *GlobalSpacePointArray,
+		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 #include "TH2D.h"
+#include "TF1.h"
 #include "TMath.h"
 #include "TMatrixD.h"
 #include "TRandom.h"
@@ -53,11 +54,11 @@ class JointPDF {
 
   JointPDF& operator=(const JointPDF& pdf);
 
-  void Build(std::string model, double sigma, double number_of_tosses);
+  void Build(std::string model, double sigma, int number_of_tosses);
 
   TH1D GetLikelihood(double param);
 
-  TH2D* GetJointPDF() const { return _joint;     }
+  TH2D *GetJointPDF()  const { return _joint;     }
 
   std::string name()  const { return _name;      }
 

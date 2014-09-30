@@ -26,18 +26,18 @@ namespace global {
   const std::string PIDVarA::VARIABLE = "diffTOF1TOF0";
 
   PIDVarA::PIDVarA(std::string hypothesis, std::string unique_identifier)
-    : PIDBase(minBin, maxBin, numBins, VARIABLE, hypothesis,
-	      unique_identifier) {
+    : PIDBase1D(VARIABLE, hypothesis, unique_identifier, minBin, maxBin,
+                numBins) {
     _nonZeroHistEntries = true;
   }
 
   PIDVarA::PIDVarA(TFile* file, std::string hypothesis)
-    : PIDBase(file, VARIABLE, hypothesis) {
+    : PIDBase1D(file, VARIABLE, hypothesis) {
   }
 
   PIDVarA::~PIDVarA() {}
 
-  double PIDVarA::Calc_Var(MAUS::DataStructure::Global::Track* track) {
+  std::pair<double, double> PIDVarA::Calc_Var(MAUS::DataStructure::Global::Track* track) {
     double TOF0_t = 0;
     double TOF1_t = 0;
     int checkCount0 = 0;
@@ -46,37 +46,41 @@ namespace global {
       track_points = track->GetTrackPoints();
     // TODO(Pidcott) check that right detector enums are used
     MAUS::DataStructure::Global::DetectorPoint TOF0_DP =
-      MAUS::DataStructure::Global::kTOF0_1;
+      MAUS::DataStructure::Global::kTOF0;
     MAUS::DataStructure::Global::DetectorPoint TOF1_DP =
-      MAUS::DataStructure::Global::kTOF1_1;
+      MAUS::DataStructure::Global::kTOF1;
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
       ::iterator eachTP;
     for (eachTP = track_points.begin(); eachTP != track_points.end();
 	 ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_detector() == TOF0_DP) {
-	TOF0_t = (*eachTP)->get_position().T();
-	++checkCount0;
-      } else if ((*eachTP)->get_detector() == TOF1_DP) {
-	TOF1_t = (*eachTP)->get_position().T();
-	++checkCount1;
+      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching") {
+	if ((*eachTP)->get_detector() == TOF0_DP) {
+	  TOF0_t = (*eachTP)->get_position().T();
+	  ++checkCount0;
+	} else if ((*eachTP)->get_detector() == TOF1_DP) {
+	  TOF1_t = (*eachTP)->get_position().T();
+	  ++checkCount1;
+	}
+      } else {
+	continue;
       }
     }
     if (checkCount0 > 1 || checkCount1 > 1) {
       Squeak::mout(Squeak::error) << "Multiple measurements for TOF0/TOF1" <<
 	" times, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
-      return -1;
+      return std::make_pair(-1, 0);
     } else if (checkCount0 == 0 ||
 	       checkCount1 == 0 || (TOF1_t -TOF0_t) <= 0) {
       Squeak::mout(Squeak::error) << "Missing/invalid measurements for " <<
 	"TOF0/TOF1 times, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
-      return -1;
+      return std::make_pair(-1, 0);
     } else if ( minBin > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > maxBin ) {
       Squeak::mout(Squeak::error) << "Difference between TOF0 and TOF1 times" <<
 	" outside of range, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
-      return -1;
+      return std::make_pair(-1, 0);
     } else {
-      return (TOF1_t - TOF0_t);
+      return std::make_pair((TOF1_t - TOF0_t), 0);
     }
   }
 }

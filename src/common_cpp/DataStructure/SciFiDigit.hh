@@ -20,6 +20,10 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TObject.h"
+#include "TRefArray.h"
+
 // MAUS Headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
@@ -29,7 +33,7 @@ namespace MAUS {
 
 /** @class SciFiDigit Represents a channel hit in a tracker station plane. */
 
-class SciFiDigit {
+class SciFiDigit : public TObject {
   public:
     /** Default constructor - initialises to 0/NULL */
     SciFiDigit();
@@ -101,20 +105,7 @@ class SciFiDigit {
     /** Get the used flag */
     bool is_used()     const { return _used; }
 
-    /** Set the MC truth momentum (temporary) */
-    void set_true_momentum(ThreeVector p) { _p = p; }
-
-    /** Get the MC truth momentum (temporary) */
-    ThreeVector get_true_momentum() const { return _p; }
-
-    /** Set the MC truth position (temporary) */
-    void set_true_position(ThreeVector position) { _position = position; }
-
-    /** Get the MC truth position (temporary) */
-    ThreeVector get_true_position() const { return _position; }
-
   private:
-    ThreeVector _position, _p;
 
     int _spill, _event;
 

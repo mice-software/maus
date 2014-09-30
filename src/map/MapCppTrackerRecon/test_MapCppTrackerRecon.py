@@ -23,12 +23,15 @@ import unittest
 import Configuration
 import MAUS
 import maus_cpp.globals
+import maus_cpp.converter
 
 class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTrackerRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
-    cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
+    geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
+           "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+    cfg['reconstruction_geometry_filename'] = geom
     cfg['SciFiPRHelicalOn'] = 0
     cfg['SciFiStraightOn'] = 0
 
@@ -50,14 +53,14 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
            output with good straight track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        self.cfg['reconstruction_geometry_filename'] = 'Stage4.dat'
+        self.cfg['reconstruction_geometry_filename'] = self.geom
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
-        print "Flags passed: "
-        print self.cfg['SciFiPRHelicalOn']
-        print self.cfg['SciFiPRStraightOn']
-        success = self.mapper.birth(json.dumps(self.cfg))
-        self.assertTrue(success)
+        # self.cfg['SciFiPatRecVerbosity'] = 1
+        # print "Flags passed: "
+        # print self.cfg['SciFiPRHelicalOn']
+        # print self.cfg['SciFiPRStraightOn']
+        self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
@@ -70,9 +73,9 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         fin.readline()
         data = fin.readline()
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         self.assertTrue('recon_events' in spill_out)
-        self.assertEqual(5, len(spill_out['recon_events']))
+        self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
@@ -92,29 +95,29 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         output with good helical track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        self.cfg['reconstruction_geometry_filename'] = 'Stage6.dat'
+        self.cfg['reconstruction_geometry_filename'] = self.geom
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
-        success = self.mapper.birth(json.dumps(self.cfg))
-        self.assertTrue(success)
+        # self.cfg['SciFiPatRecVerbosity'] = 1
+        self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
         #          os.environ.get("MAUS_ROOT_DIR"))
         test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
+                os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (helices)
         fin.readline()
         fin.readline()
         data = fin.readline()
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         self.assertTrue('recon_events' in spill_out)
         self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
         revt = spill_out['recon_events'][0]
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(31, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])
@@ -134,9 +137,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         if cls.test_config != "":
             maus_cpp.globals.birth(cls.test_config)
         # Check we death() the mapper
-        success = cls.mapper.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        cls.mapper.death()
         cls.mapper = None
 
 if __name__ == '__main__':

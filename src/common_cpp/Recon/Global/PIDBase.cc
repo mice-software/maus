@@ -21,12 +21,14 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  PIDBase::PIDBase(int minBin, int maxBin, int numBins,
-		   std::string variable, std::string hypothesis,
-		   std::string unique_identifier)
-    : _minBin(minBin), _maxBin(maxBin), _numBins(numBins),
-      _var_name(variable), _hyp(hypothesis),
-      _unique_identifier(unique_identifier), _writeFile(NULL) {
+  PIDBase::PIDBase(std::string variable, std::string hypothesis,
+		   std::string unique_identifier, int XminBin, int XmaxBin,
+		   int XnumBins, int YminBin, int YmaxBin, int YnumBins)
+    : _var_name(variable), _hyp(hypothesis),
+      _unique_identifier(unique_identifier),
+      _XminBin(XminBin), _XmaxBin(XmaxBin), _XnumBins(XnumBins),
+      _YminBin(YminBin), _YmaxBin(YmaxBin), _YnumBins(YnumBins),
+      _writeFile(NULL) {
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
     if (!pMAUS_ROOT_DIR) {
@@ -58,51 +60,19 @@ namespace global {
 		      "File to write histograms to failed to be created.",
 		      "Recon::Global::PIDBase::PIDBase()"));
     }
-    _hist = new TH1F(_varhyp.c_str(), _varhyp.c_str(),
-		     numBins, minBin, maxBin);
   };
 
   PIDBase::PIDBase(TFile* file, std::string variable,
 		   std::string hypothesis)
-    : _var_name(variable), _hyp(hypothesis), _hist(NULL),
-      _writeFile(NULL) {
+    : _var_name(variable), _hyp(hypothesis), _writeFile(NULL) {
     std::string histname = _var_name + "_" + _hyp;
-    if (!file || file->IsZombie()) {
-      throw(Exception(Exception::recoverable,
-		      "File containing MC PID histograms not found.",
-		      "Recon::Global::PIDBase::PIDBase()"));
-    }
-    _hist = static_cast<TH1F*>(file->Get(histname.c_str()));
-    if (!_hist) {
-      throw(Exception(Exception::recoverable,
-		      "Histogram not found in file.",
-		      "Recon::Global::PIDBase::PIDBase()"));
-    }
-    _minBin = _hist->GetXaxis()->GetXmin();
-    _maxBin = _hist->GetXaxis()->GetXmax();
   };
 
   PIDBase::~PIDBase() {
+    // close file
     if (_writeFile) {
-      if (!_hist) {
-	throw(Exception(Exception::recoverable,
-			"Can't write histogram to file.",
-			"Recon::Global::PIDBase::~PIDBase()"));
-      }
-      if (_nonZeroHistEntries) {
-	int bins = _hist->GetSize();
-	_addToAllBins = 1/(static_cast<double>(bins));
-	for (int i = 0; i < bins; i++) {
-	  int entries = _hist->GetBinContent(i);
-	  _hist->SetBinContent(i, (static_cast<double>(entries)
-				   + _addToAllBins));
-	}
-      }
-
-      Double_t scale = 1/_hist->Integral();
-      _hist->Scale(scale);
-      _hist->Write();
       _writeFile->Close();
+      _writeFile->Delete();
     }
   };
 
@@ -121,39 +91,6 @@ namespace global {
 
   std::string PIDBase::Get_directory() {
     return PIDBase::_directory;
-  }
-
-  TH1F* PIDBase::Get_hist() {
-    return PIDBase::_hist;
-  }
-
-  double PIDBase::logL(MAUS::DataStructure::Global::Track* track) {
-    double var = Calc_Var(track);
-    if (var < _minBin || var > _maxBin) {
-      Squeak::mout(Squeak::error) << "Value of PID variable out of range, " <<
-	"Recon::Global::PIDBase::logL()" << std::endl;
-      return 1;
-    }
-    int bin = _hist->FindBin(var);
-    double entries = _hist->GetBinContent(bin);
-    if (entries <=0) {
-      Squeak::mout(Squeak::error) << "Corresponding bin content in PDF is " <<
-	"not greater than zero, Recon::Global::PIDBase::logL()" << std::endl;
-      return 1;
-    }
-    double probLL = TMath::Log(entries);
-    return probLL;
-  }
-
-  void PIDBase::Fill_TH1(MAUS::DataStructure::Global::Track* track) {
-    double var = Calc_Var(track);
-    if (var < _minBin || var > _maxBin) {
-       Squeak::mout(Squeak::error) << "Calc_Var returned invalid value of " <<
-  "PID variable, not added to histogram, " <<
-  "Recon::Global::PIDBase::Fill_TH1()" << std::endl;
-    } else {
-      _hist->Fill(var);
-    }
   }
 }
 }

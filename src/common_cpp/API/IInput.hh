@@ -50,7 +50,7 @@ namespace MAUS {
      * Pure virtual function to generate data
      * \return The data generated
      */
-    virtual T emitter_cpp() = 0;
+    virtual T emit_cpp() = 0;
   };
 
 }// end of namespace

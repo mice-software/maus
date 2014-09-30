@@ -111,6 +111,18 @@ class VirtualHit {
      *  momentum rotated relative to the detector, depending on detector
      *  settings)
      */
+
+    ThreeVector GetSpin() const;
+
+    /** Set the position of the hit (either global position or position
+     *  relative to the detector, depending on detector settings)
+     */
+    void SetSpin(ThreeVector spin);
+
+    /** Get the momentum of the hit (either momentum in the Lab frame or
+     *  momentum rotated relative to the detector, depending on detector
+     *  settings)
+     */
     ThreeVector GetMomentum() const;
 
     /** Set the momentum of the hit (either momentum in the Lab frame or
@@ -146,6 +158,7 @@ class VirtualHit {
     double _path_length;
     ThreeVector _position;
     ThreeVector _momentum;
+    ThreeVector _spin;
     ThreeVector _b_field;
     ThreeVector _e_field;
 

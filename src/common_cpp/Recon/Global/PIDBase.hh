@@ -15,6 +15,7 @@
  */
 
  /** @class PIDBase
+ *  @author Celeste Pidcott, University of Warwick
  *  Base class containing constructors and functions required for PID
  *  analysis
  */
@@ -24,6 +25,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <utility>
 
 #include "TMath.h"
 #include "TMathBase.h"
@@ -47,8 +49,9 @@ namespace global {
   public:
 
     /// Constructor to create a PDF
-    PIDBase(int minBin, int maxBin, int numBins, std::string variable,
-	    std::string hypothesis, std::string unique_identifier);
+    PIDBase(std::string variable, std::string hypothesis,
+		   std::string unique_identifier, int XminBin, int XmaxBin,
+		   int XnumBins, int YminBin, int YmaxBin, int YnumBins);
     /// Constructor to use a PDF to perform PID analysis
     PIDBase(TFile* file, std::string variable, std::string hypothesis);
     /// Destructor
@@ -66,36 +69,24 @@ namespace global {
     /// Get directory of file containing PDF created by constructor
     std::string Get_directory();
 
-    // Get histogram
-    TH1F* Get_hist();
-
-    /** @brief Calculate log likelihood of incoming track corresponding to 
-     *   a particle hypothesis
+    /** @brief Virtual function to calculate log likelihood of incoming track 
+     *   corresponding to a particle hypothesis
      *
      *  @param track The track for which the log likelihood is calculated
      *
      *  @return Returns the log likelihood
      */
-    double logL(MAUS::DataStructure::Global::Track* track);
+    virtual double logL(MAUS::DataStructure::Global::Track* track) = 0;
 
-    /** @brief Fill histogram with value of PID variable of global track
+    /** @brief Virtual function to Fill histogram with value of PID variable
+     *   of global track
      *
      *  @param track The track to have its PID variable value added to PDF
      */
-    void Fill_TH1(MAUS::DataStructure::Global::Track* track);
+    virtual void Fill_Hist(MAUS::DataStructure::Global::Track* track) = 0;
+
 
   protected:
-    /// Lower and upper values of range, and number of bins in range, of PDF,
-    /// set in derived PID classes
-    int _minBin, _maxBin, _numBins;
-
-    /// Check if we want to add one event spread over the entire histogram, to
-    /// avoid bins with zero entries
-    bool _nonZeroHistEntries;
-
-    double _addToAllBins;
-
-  private:
 
     /** @brief Virtual function (defined in derived classes) that calculates
      *    value of PID variable
@@ -103,7 +94,20 @@ namespace global {
      *  @param track The track for which the variable is calculated
      *
      */
-    virtual double Calc_Var(MAUS::DataStructure::Global::Track* track) = 0;
+    virtual std::pair<double, double> Calc_Var(MAUS::DataStructure::Global::Track* track) = 0;
+
+    /// Lower and upper values of range, and number of bins in range, of PDF,
+    /// set in derived PID classes
+    int _XminBin, _XmaxBin, _XnumBins, _YminBin, _YmaxBin, _YnumBins;
+
+    /// Check if we want to add one event spread over the entire histogram, to
+    /// avoid bins with zero entries
+    bool _nonZeroHistEntries;
+
+    /// File that PDF is written to
+    TFile *_writeFile;
+
+  private:
 
     /// Name of PID variable
     std::string _var_name;
@@ -122,12 +126,6 @@ namespace global {
 
     /// Directory of file containing PDF created by constructor
     std::string _directory;
-
-    /// Histogram that forms PDF
-    TH1F *_hist;
-
-    /// FIle that PDF is written to
-    TFile *_writeFile;
   };
 }
 }

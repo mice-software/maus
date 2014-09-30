@@ -16,91 +16,139 @@
  */
 #ifndef _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
 #define _SRC_COMMON_CPP_CONVERTER_CONVERTERFACTORY_INL_
+#include <string>
+
 #include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConverters.hh"
 
 namespace Json {
   class Value;
 }
 
 namespace MAUS {
-
   class Spill;
 
-
-
   // Template implementation
-  // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+  // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
   template <typename INPUT, typename OUTPUT>
-  OUTPUT* ConverterFactory::convert(INPUT* i) const throw(NullInputException, UnhandledException) {
+  OUTPUT* ConverterFactory::convert(INPUT* i) const {
     // not necessary if each converter does this check
     // but only if inheriting from converter base, not necessary as long as
     // implement the IConverter interface so check here anyway
-    if (!i) { throw NullInputException("ConverterFactory"); }
-
-    // Get converter
-    IConverter<INPUT, OUTPUT>* c = 0;
+    IConverter<INPUT, OUTPUT>* c = getConverter<INPUT, OUTPUT>();
+    OUTPUT* o = NULL;
     try {
-      c = getConverter<INPUT, OUTPUT>();
+        o = c->convert(i);
+    } catch (...) {
+        delete c;
+        throw;
     }
-    catch (ConverterNotFoundException& e) {
-      if (c) { delete c; }
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
-      return 0;
-    }
-
-    // Convert input using converter.
-    // Still have to catch all as user may have custom converter inheriting
-    // from IConverter not ConverterBase
-    OUTPUT* o = 0;
-    try {
-      o = c->convert(i);
-    }
-    catch (Exception& s) {
-      CppErrorHandler::getInstance()->HandleExceptionNoJson(s, "ConverterFactory");
-    }
-    catch (std::exception& e) {
-//       if(c){ delete c; }
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, "ConverterFactory");
-    }
-    catch (...) {
-      if (c) { delete c; }
-      throw UnhandledException("ConverterFactory");
-    }
-
     delete c;
     return o;
   }
 
-  template <typename INPUT, typename OUTPUT>
-  IConverter<INPUT, OUTPUT>* ConverterFactory::getConverter() const
-    throw(ConverterNotFoundException) {
-
-    throw ConverterNotFoundException("ConverterFactory");
-  }
+  /// STRING
   template <>
-  IConverter<Json::Value, Data>* ConverterFactory::getConverter<Json::Value, Data>() const
-    throw(ConverterNotFoundException) {
+  inline IConverter<std::string, Json::Value>*
+  ConverterFactory::getConverter<std::string, Json::Value>() const {
+    return new StringJsonConverter();
+  }
 
+  template <>
+  inline IConverter<std::string, Data>*
+  ConverterFactory::getConverter<std::string, Data>() const {
+    return new StringDataConverter();
+  }
+
+  template <>
+  inline IConverter<std::string, PyObject>*
+  ConverterFactory::getConverter<std::string, PyObject>() const {
+    return new StringPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<std::string, std::string>*
+  ConverterFactory::getConverter<std::string, std::string>() const {
+    return new StringStringConverter();
+  }
+
+  /// JSON
+  template <>
+  inline IConverter<Json::Value, Json::Value>*
+  ConverterFactory::getConverter<Json::Value, Json::Value>() const {
+    return new JsonJsonConverter();
+  }
+
+  template <>
+  inline IConverter<Json::Value, Data>*
+  ConverterFactory::getConverter<Json::Value, Data>() const {
     return new JsonCppSpillConverter();
   }
 
-  // DAMN cant do this as JsonCppSpillConverter only inherits from one type of Converter base
-  // Must split it up
   template <>
-  IConverter<Data, Json::Value>* ConverterFactory::getConverter<Data, Json::Value>() const
-    throw(ConverterNotFoundException) {
+  inline IConverter<Json::Value, PyObject>*
+  ConverterFactory::getConverter<Json::Value, PyObject>() const {
+    return new JsonPyDictConverter();
+  }
 
+  template <>
+  inline IConverter<Json::Value, std::string>*
+  ConverterFactory::getConverter<Json::Value, std::string>() const {
+    return new JsonStringConverter();
+  }
+
+  /// Data
+  template <>
+  inline IConverter<Data, Json::Value>*
+  ConverterFactory::getConverter<Data, Json::Value>() const {
     return new CppJsonSpillConverter();
   }
-//   template <>
-//   IConverter<int,double>* ConverterFactory::getConverter<double, int>() const
-//     throw (ConverterNotFoundException){
-//     return new myDoubleIntConverter();
-//   }
 
+  template <>
+  inline IConverter<Data, Data>*
+  ConverterFactory::getConverter<Data, Data>() const {
+    return new DataDataConverter();
+  }
+
+  template <>
+  inline IConverter<Data, PyObject>*
+  ConverterFactory::getConverter<Data, PyObject>() const {
+    return new DataPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<Data, std::string>*
+  ConverterFactory::getConverter<Data, std::string>() const {
+    return new DataStringConverter();
+  }
+
+  /// PyDICT to X
+  template <>
+  inline IConverter<PyObject, Json::Value>*
+  ConverterFactory::getConverter<PyObject, Json::Value>() const {
+    return new PyDictJsonConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, Data>*
+  ConverterFactory::getConverter<PyObject, Data>() const {
+    return new PyDictDataConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, PyObject>*
+  ConverterFactory::getConverter<PyObject, PyObject>() const {
+    return new PyDictPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, std::string>*
+  ConverterFactory::getConverter<PyObject, std::string>() const {
+    return new PyDictStringConverter();
+  }
 } // end of namespace
 
 #endif

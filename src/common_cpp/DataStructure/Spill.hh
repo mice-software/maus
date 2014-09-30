@@ -50,23 +50,41 @@ class Spill {
   /** Destructor - frees memory */
   virtual ~Spill();
 
-  /** Set the scalars information */
+  /** Set the scalars information
+   *
+   *  Spill takes ownership of memory assigned to scalars
+   */
   void SetScalars(Scalars *scalars);
 
-  /** Get the scalars information */
+  /** Get the scalars information
+   *
+   *  Spill keeps ownership of this memory
+   */
   Scalars* GetScalars() const;
 
 
-  /** Set the DAQ output */
+  /** Set the DAQ output
+   *
+   *  Spill takes ownership of memory assigned to daq
+   */
   void SetDAQData(DAQData* daq);
 
-  /** Get the DAQ output */
+  /** Get the DAQ output
+   *
+   *  Spill keeps ownership of this memory
+   */
   DAQData* GetDAQData() const;
 
-  /** Set the MC events */
+  /** Set the MC events
+   *
+   *  Spill takes ownership of memory assigned to events
+   */
   void SetMCEvents(MCEventPArray* events);
 
-  /** Get the MC events */
+  /** Get the MC events
+   *
+   *  Spill keeps ownership of this memory
+   */
   MCEventPArray* GetMCEvents() const;
 
   /** Get a single MC event (needed for PyROOT) */
@@ -76,13 +94,20 @@ class Spill {
 
   /** Get the MC event size (needed for PyROOT)*/
   size_t GetMCEventSize() const {
+    if (!_mc) return 0;
     return _mc->size();
   }
 
-  /** Set the Recon events */
+  /** Set the Recon events
+   *
+   *  Spill takes ownership of memory assigned to ReconEvent
+   */
   void SetReconEvents(ReconEventPArray* ReconEvent);
 
-  /** Get the Recon events */
+  /** Get the Recon events
+   *
+   *  Spill keeps ownership of this memory
+   */
   ReconEventPArray* GetReconEvents() const;
 
   /** Get a single Recon event (needed for PyROOT) */
@@ -92,6 +117,7 @@ class Spill {
 
   /** Get the Recon event size (needed for PyROOT)*/
   size_t GetReconEventSize() const {
+    if (!_recon) return 0;
     return _recon->size();
   }
 

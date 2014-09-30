@@ -19,7 +19,6 @@
 
 import sys
 import json
-import libMausCpp
 
 class ErrorHandler:
     """
@@ -86,7 +85,7 @@ class ErrorHandler:
         branch is appended with <exception type>: <exception message>.
         """
         if doc == None:
-            doc = {}
+            raise
         class_name = "<unknown caller>"
         if caller == None:
             pass
@@ -96,10 +95,8 @@ class ErrorHandler:
             class_name = caller.__class__.__name__
         if not 'errors' in doc:
             doc['errors'] = {}
-        if not class_name in doc['errors']:
-            doc['errors'][class_name] = []
-        doc['errors'][class_name].append(str(sys.exc_info()[0])+": "
-                                                        +str(sys.exc_info()[1]))
+        err_string = str(sys.exc_info()[0])+": "+str(sys.exc_info()[1])
+        doc['errors'][class_name] = err_string
         return doc
 
     def ConfigurationToErrorHandler(self, config):# pylint:disable = C0103
@@ -161,10 +158,11 @@ def HandleCppException(doc, caller, error_message):# pylint:disable = C0103
     try:
         raise CppError(error_message)
     except CppError:
-        out = json.dumps(__default_handler.HandleException(json_doc, caller))
+        try:
+            out = json.dumps(__default_handler.HandleException(json_doc,
+                                                               caller))
+        except: # pylint: disable = W0702
+            out = """{"errors":"Failed to handle exception"}"""
+    
     return out
 
-# Sets the function call for CppErrorHandler. If not set, assume we
-# don't use python error handler; libMausCpp is defined in
-#   src/common_cpp/Utils/PyMausCpp.hh
-libMausCpp.SetHandleException(HandleCppException)

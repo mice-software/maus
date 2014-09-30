@@ -44,6 +44,7 @@ beam = {
        "reference":{
             "position":{"x":0.0, "y":0.0, "z":3.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "spin":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-13,
             "energy":226.0,
             "time":2.e6,
@@ -72,6 +73,7 @@ beam = {
        "reference":{
            "position":{"x":0.0, "y":-0.0, "z":0.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+           "spin":{"x":0.0, "y":0.0, "z":1.0},
            "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
        },
        "random_seed_algorithm":"incrementing_random",
@@ -90,6 +92,7 @@ beam = {
         "reference":{
             "position":{"x":0.0, "y":-0.0, "z":0.0},
             "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "spin":{"x":0.0, "y":0.0, "z":1.0},
             "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
         },
         "random_seed_algorithm":"incrementing_random",

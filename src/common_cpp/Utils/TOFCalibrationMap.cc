@@ -24,6 +24,7 @@ namespace MAUS {
 TOFCalibrationMap::TOFCalibrationMap() {
   pymod_ok = true;
   if (!this->InitializePyMod()) pymod_ok = false;
+  runNumber = 0;
 }
 
 TOFCalibrationMap::~TOFCalibrationMap() {
@@ -34,7 +35,7 @@ TOFCalibrationMap::~TOFCalibrationMap() {
   _reff.resize(0);
 }
 
-bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
+bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
   // Fill the vector containing all TOF channel keys.
   this->MakeTOFChannelKeys();
 
@@ -44,11 +45,27 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   Json::Value t0_file;
   Json::Value tw_file;
   Json::Value trigger_file;
-  std::string _tof_source = JsonWrapper::GetProperty(configJSON,
+  std::string _calib_source = JsonWrapper::GetProperty(configJSON,
                                                "TOF_calib_source",
                                                JsonWrapper::stringValue).asString();
+  // Find out how we want to get the calibrations
+  // They are set by the TOF_calib_by flag in the data cards
+  // They can be by
+  // 1. run - to get calibrations by run number
+  // 2. date - to get calibrations by valid date range
+  // Default is by run
+  try {
+      _tof_calib_by = JsonWrapper::GetProperty(configJSON,
+                                           "TOF_calib_by",
+                                           JsonWrapper::stringValue).asString();
+  } catch (MAUS::Exception e) {
+    Squeak::mout(Squeak::error)
+    << "Error getting data card TOF_calib_by" << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
   bool fromDB = true;
-  if (_tof_source == "file") {
+  if (_calib_source == "file") {
       fromDB = false;
       // Check what needs to be done.
       t0_file = JsonWrapper::GetProperty(configJSON,
@@ -96,6 +113,7 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON) {
     Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
     return false;
   }
+  runNumber = rnum;
   bool loaded;
   if (!fromDB) {
       // std::cout << ">>>>>>> initializing from FILE<<<<<" << std::endl;
@@ -161,7 +179,6 @@ int TOFCalibrationMap::MakeTOFChannelKeys() {
   _t0.resize(nChannels);
   _reff.resize(nChannels);
   _twPar.resize(nChannels);
-
   return nChannels;
 }
 
@@ -259,7 +276,7 @@ bool TOFCalibrationMap::LoadTriggerFile(std::string triggerFile) {
   return true;
 }
 
-int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) {
+int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) const {
   for (unsigned int i = 0; i < _Pkey.size(); ++i )
     if (_Pkey.at(i) == key)
       return i;
@@ -267,7 +284,7 @@ int TOFCalibrationMap::FindTOFChannelKey(TOFChannelKey key) {
   return NOCALIB;
 }
 
-int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
+int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) const {
   for (unsigned int i = 0; i < _Tkey.size(); ++i )
     if  (_Tkey.at(i) == key)
       return i;
@@ -275,7 +292,7 @@ int TOFCalibrationMap::FindTOFPixelKey(TOFPixelKey key) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
+double TOFCalibrationMap::T0(TOFChannelKey key, int &r) const {
   if (!_do_t0_correction)
     return 0.;
 
@@ -290,7 +307,7 @@ double TOFCalibrationMap::T0(TOFChannelKey key, int &r) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
+double TOFCalibrationMap::TriggerT0(TOFPixelKey key) const {
   if (!_do_triggerDelay_correction)
     return 0.;
 
@@ -302,7 +319,7 @@ double TOFCalibrationMap::TriggerT0(TOFPixelKey key) {
   return n;
 }
 
-double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
+double TOFCalibrationMap::TW(TOFChannelKey key, int adc) const {
   if (!_do_timeWalk_correction)
     return 0.;
 
@@ -323,7 +340,7 @@ double TOFCalibrationMap::TW(TOFChannelKey key, int adc) {
   return NOCALIB;
 }
 
-double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) {
+double TOFCalibrationMap::dT(TOFChannelKey Pkey, TOFPixelKey TrKey, int adc) const {
   // See equations 37-40 and 45 in MICE Note 251 "TOF Detectors Time Calibration".
   int reffSlab;
   double tw = TW(Pkey, adc);
@@ -392,7 +409,7 @@ TOFPixelKey::TOFPixelKey(string keyStr) throw(MAUS::Exception) {
   }
 }
 
-bool TOFPixelKey::operator==( TOFPixelKey const key ) {
+bool TOFPixelKey::operator==( const TOFPixelKey& key ) const {
   if ( _station == key._station &&
        _slabX == key._slabX &&
        _slabY == key._slabY &&
@@ -403,7 +420,7 @@ bool TOFPixelKey::operator==( TOFPixelKey const key ) {
   }
 }
 
-bool TOFPixelKey::operator!=( TOFPixelKey const key ) {
+bool TOFPixelKey::operator!=( const TOFPixelKey& key ) const {
   if ( _station == key._station &&
        _slabX == key._slabX &&
        _slabY == key._slabY &&
@@ -428,7 +445,7 @@ istream& operator>>( istream& stream, TOFPixelKey &key ) throw(MAUS::Exception) 
 
   if (xLabel != "TOFPixelKey") {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
-                 std::string("corrupted TOF Pixel Key"),
+                 std::string("corrupted TOF Pixel Key Extr"),
                  "istream& operator>>(istream& stream, TOFPixelKey)"));
   }
 
@@ -462,26 +479,34 @@ bool TOFCalibrationMap::InitializePyMod() {
     std::cerr << "Failed to instantiate get_tof_calib" << std::endl;
     return false;
   }
-
-    // get the get_calib_func() function
-  _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
-  if (_get_calib_func == NULL) {
-    std::cerr << "Failed to find get_calib function" << std::endl;
-    return false;
-  }
   return true;
 }
 
-void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {
+void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype) {
   PyObject *py_arg = NULL, *py_value = NULL;
   // setup the arguments to get_calib_func
   // the arguments are 3 strings
   // arg1 = device name (TOF0/TOF1/TOF2) uppercase
   // arg2 = calibration type (tw/t0/trigger) lowercase
-  // arg3 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
-  // default date argument is "current"
-  // this is set via TOF_calib_date_from card in ConfigurationDefaults
-  py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
+
+  _get_calib_func = NULL;
+  if (_tof_calib_by == "date") {
+      py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), _tof_calibdate.c_str());
+      _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
+  } else if (_tof_calib_by == "run_number") {
+      py_arg = Py_BuildValue("(sis)", devname.c_str(), runNumber, caltype.c_str());
+      _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib_for_run");
+  } else {
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
+                     "Invalid tof_calib_by type "+_tof_calib_by,
+                     "TOFCalibrationMap::GetCalib"));
+  }
+
+  if (_get_calib_func == NULL)
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
+                     "Failed to find get_calib function",
+                     "TOFCalibrationMap::GetCalib"));
+
   if (py_arg == NULL) {
     PyErr_Clear();
     throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -511,18 +536,18 @@ void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
 }
 
 bool TOFCalibrationMap::LoadT0Calib() {
-  this->GetCalib(_tof_station, "t0", _tof_calibdate);
+  this->GetCalib(_tof_station, "t0");
   int reff;
   double p0;
   TOFChannelKey key;
   try {
     while (!t0str.eof()) {
       t0str >> key >> p0 >> reff;
-
+      // std::cerr << key << "  t0:" << p0 << "  reff:" << reff << std::endl;
       int n = FindTOFChannelKey(key);
       _t0[n] = p0;
       _reff[n] = reff;
-      // std::cout << key << " pos:" << n << "  t0:" << p0 << "  reff:" << reff << std::endl;
+      // std::cerr << " pos:" << n << std::endl;
     }
   } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
@@ -535,13 +560,13 @@ bool TOFCalibrationMap::LoadT0Calib() {
 }
 
 bool TOFCalibrationMap::LoadTWCalib() {
-  this->GetCalib(_tof_station, "tw", _tof_calibdate);
+  this->GetCalib(_tof_station, "tw");
   double p0, p1, p2, p3;
   TOFChannelKey key;
   try {
     while (!twstr.eof()) {
       twstr >> key >> p0 >> p1 >> p2 >> p3;
-      // std::cout << "tw: " << key.str() << " " << key << std::endl;
+      // std::cerr << "tw: " << key.str() << " " << key << std::endl;
 
       int n = FindTOFChannelKey(key);
       _twPar[n].resize(4);
@@ -562,7 +587,7 @@ bool TOFCalibrationMap::LoadTWCalib() {
 }
 
 bool TOFCalibrationMap::LoadTriggerCalib() {
-  this->GetCalib(_tof_station, "trigger", _tof_calibdate);
+  this->GetCalib(_tof_station, "trigger");
   TOFPixelKey Pkey;
   double dt;
   try {
@@ -571,7 +596,7 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
 
       _Tkey.push_back(Pkey);
       _Trt0.push_back(dt);
-       // std::cout<< Pkey << "  dt:" << dt << std::endl;
+      // std::cerr << Pkey << "  dt:" << dt << std::endl;
     }
   } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)

@@ -79,6 +79,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.output_path = ''
         self.charge = 3
         self.newline = ''
+        self.grid_job = 0 
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
@@ -149,6 +150,20 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             ' /src/map/MapPyBeamlineSimulation/G4bl')  
             good_birth = False
 
+#	try:
+#            self.grid_job = config_doc["g4bl"]["grid_job"]
+#	except Exception: #pylint: disable=W0703
+#	    print("Error: grid_job is not found in the config file!")
+#	    good_birth = False
+
+#	if str(grid_job) in ['True']:
+#        try: 
+#            self.file_path_param = ''
+#        except Exception: #pylint: disable=W0703 
+#            print('Error: Cannot find file path'+\
+#            ' /src/map/MapPyBeamlineSimulation/G4bl')
+#            good_birth = False
+            
         try:
             self.path_g4bl = os.path.join(os.environ['MAUS_ROOT_DIR'], \
             'third_party', 'build', 'G4beamline-2.12-source', 'bin')
@@ -276,12 +291,13 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             if self.particles_per_spill == 0:
                 spill = {}
                 spill = json.loads(json_spill_doc)
+                print spill
                 spill['mc_events'] = []
                 for i in range(self.queue.qsize()):
                     primary = (self.queue.get_nowait())
                     spill['mc_events'].append({"primary":primary})
-                with open('G4BLoutput.txt', 'w') as outfile:
-                    json.dump(self.particles, outfile)
+                with open('G4BLoutput.json', 'w') as outfile:
+                    json.dump(spill, outfile)
                     #self.queue = 0  
                 return json.dumps(spill)
             else:
@@ -317,11 +333,17 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
                     for i in range(self.particles_per_spill):
                         primary = (self.queue.get_nowait())
                         spill['mc_events'].append({"primary":primary})
+                    with open('G4BLoutputsimulation'+str(i)+'.json', 'w') \
+                                                              as outfile:
+                        json.dump(spill, outfile)
                     return json.dumps(spill)
                 else:
                     for i in range(self.particles_per_spill):
                         primary = (self.queue.get_nowait())
                         spill['mc_events'].append({"primary":primary})
+                    with open('G4BLoutputsimulation'+str(i)+'.json', 'w') \
+                                                              as outfile:
+                        json.dump(spill, outfile)
                     return json.dumps(spill)
         else:
             print("Warning: G4BL simulated zero output particles!")

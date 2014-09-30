@@ -31,7 +31,7 @@ Json::Value JsonWrapper::StringToJson(const std::string& json_in)
   bool parsingSuccessful = reader.parse(json_in, json_out);
   if (!parsingSuccessful) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
-          "Failed to parse Json configuration. Json reports\n"
+          "Failed to parse Json document. Json reports\n"
                                       +reader.getFormatedErrorMessages(),
           "JsonWrapper::StringToJson()"));
   }
@@ -59,8 +59,12 @@ Json::Value JsonWrapper::GetItem(const Json::Value & array,
                                                       +" in Json array lookup",
                          "JsonWrapper::GetItemStrict"));
   }
-  if (SimilarType(ValueTypeToJsonType(array[value_index].type()), value_type))
-    return array[value_index];
+  int value_i = value_index;
+  JsonType actual_type = ValueTypeToJsonType(array[value_i].type());
+  if (SimilarType(actual_type, value_type) ||
+      (value_type == realValue && IsNumeric(actual_type))) {
+    return array[value_i];
+  }
   throw(MAUS::Exception(MAUS::Exception::recoverable,
                "Value of wrong type in Json array lookup",
                "JsonWrapper::GetItemStrict"));
@@ -76,7 +80,8 @@ Json::Value JsonWrapper::GetProperty(const Json::Value& object,
                  "JsonWrapper::GetPropertyStrict"));
   }
   if (object.isMember(name)) {
-    if (SimilarType(ValueTypeToJsonType(object[name].type()), value_type)) {
+    JsonType actual_type = ValueTypeToJsonType(object[name].type());
+    if (SimilarType(actual_type, value_type)) {
       return object[name];
     } else {  // type incorrect
       throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -146,10 +151,19 @@ CLHEP::Hep3Vector JsonWrapper::JsonToThreeVector(const Json::Value& j_vec)
   return c_vec;
 }
 
-bool JsonWrapper::SimilarType(const JsonWrapper::JsonType jt1,
-                              const JsonWrapper::JsonType jt2) {
-    return (jt1 == jt2 || jt1 == JsonWrapper::anyValue
-                       || jt2 == JsonWrapper::anyValue);
+bool JsonWrapper::SimilarType(const JsonWrapper::JsonType cast_target,
+                              const JsonWrapper::JsonType cast_type) {
+    // there is an efficiency saving by using one big OR here and it isn't too
+    // unreadable
+    return (cast_target == cast_type ||
+            cast_target == JsonWrapper::anyValue ||
+            cast_type == JsonWrapper::anyValue ||
+            (cast_type == realValue && IsNumeric(cast_target)) ||
+            (cast_type == intValue && cast_target == uintValue));
+}
+
+bool JsonWrapper::IsNumeric(const JsonWrapper::JsonType jt) {
+    return (jt == intValue || jt == uintValue || jt == realValue);
 }
 
 void JsonWrapper::Print(std::ostream& out, const Json::Value& val) {
@@ -227,8 +241,10 @@ bool JsonWrapper::ArrayEqual(const Json::Value& value_1,
         return false;
     }
     // check each item is the same (recursively)
-    for (size_t i = 0; i < value_1.size(); ++i) {
-        if (!AlmostEqual(value_1[i], value_2[i], tolerance, int_permissive)) {
+    int value_1_size = value_1.size();
+    for (int i = 0; i < value_1_size; ++i) {
+        if (!AlmostEqual(value_1[i],
+                         value_2[i], tolerance, int_permissive)) {
             return false;
         }
     }
@@ -286,7 +302,8 @@ Json::Value JsonWrapper::ArrayMerge(const Json::Value& array_1,
                      "JsonWrapper::ArrayMerge"));
     }
     Json::Value array_merge(array_1);
-    for (size_t i = 0; i < array_2.size(); ++i) {
+    int array_2_size = array_2.size();
+    for (int i = 0; i < array_2_size; ++i) {
         array_merge.append(array_2[i]);
     }
     return array_merge;
@@ -398,7 +415,8 @@ void JsonWrapper::Path::_SetPathRecursive(Json::Value& tree) {
   std::string path = GetPath(tree);
   switch (tree.type()) {
       case Json::arrayValue: {
-          for (size_t i = 0; i < tree.size(); ++i) {
+          int tree_size = tree.size();
+          for (int i = 0; i < tree_size; ++i) {
               SetPath(tree[i], path);
               AppendPath(tree[i], i);
               _SetPathRecursive(tree[i]);
