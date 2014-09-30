@@ -52,7 +52,7 @@
 			    Substitution $D2Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'DS')">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/>
+                            <xsl:when test="contains(@name, 'DS') and contains(string-length(@name),2)">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/>
 			    Substitution $DSPolarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
@@ -279,8 +279,8 @@
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">0.71415*(8.648/1000.0+$D1Polarity*$D1Current*9.36614/1000.0+$D1Current*$D1Current*6.3209/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415*(8.648/1000.0+$D2Polarity*$D2Current*9.36614/1000.0+$D2Current*$D2Current*6.3209/1000.0/1000.0-$D2Polarity*$D2Current*$D2Current*$D2Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -335,14 +335,14 @@
                             PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
                             PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity * $SSUCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity * $SSUCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity * $SSUCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity * $FCMCurrent/180 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity * $DDSCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity * $DDSCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity * $DDSCurrent/281 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity * $FCMCurrent/180 *<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_0') and boolean($run_number) and boolean($SSUCurrent)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_0') and boolean($run_number) and boolean($SSUCurrent)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_0') and boolean($run_number) and boolean($SSUCurrent)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($run_number) and boolean($SSUPolarity)">$SSUPolarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_1') and boolean($run_number) and boolean($DDSCurrent)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_1') and boolean($run_number) and boolean($DDSCurrent)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_1') and boolean($run_number) and boolean($DDSCurrent)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($run_number) and boolean($DDSPolarity)">$DDSPolarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
                             </xsl:choose>
                             }
