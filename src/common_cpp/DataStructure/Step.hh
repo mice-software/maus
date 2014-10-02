@@ -17,6 +17,7 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_STEP_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_STEP_HH_
 
+#include <string>
 #include <vector>
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -104,10 +105,22 @@ class Step {
     /** Sets the electric field at the step point */
     void SetEField(ThreeVector field);
 
+    /** Returns the G4Material name at the step point */
+    std::string GetMaterial() const;
+
+    /** Sets the G4Material name at the step point */
+    void SetMaterial(std::string material);
+
+    /** Returns the G4Volume name at the step point */
+    std::string GetVolume() const;
+
+    /** Sets the G4Volume name at the step point */
+    void SetVolume(std::string volume);
+
   private:
     ThreeVector _position;
     ThreeVector _momentum;
-    ThreeVector _spin; // added
+    ThreeVector _spin;
     ThreeVector _bfield;
     ThreeVector _efield;
 
@@ -116,6 +129,9 @@ class Step {
     double _time;
     double _energy;
     double _energy_deposited;
+
+    std::string _volume;
+    std::string _material;
 
     MAUS_VERSIONED_CLASS_DEF(Step)
 };

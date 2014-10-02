@@ -14,13 +14,15 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include "src/common_cpp/DataStructure/Step.hh"
 
 namespace MAUS {
 
 Step::Step() : _position(0, 0, 0), _momentum(0, 0, 0), _spin(0, 0, 0),
                _bfield(0, 0, 0), _efield(0, 0, 0), _proper_time(0),
-               _path_length(0), _time(0), _energy(0), _energy_deposited(0) {
+               _path_length(0), _time(0), _energy(0), _energy_deposited(0),
+               _volume(""), _material("") {
 }
 
 Step::Step(const Step& step) {
@@ -41,6 +43,8 @@ Step& Step::operator=(const Step& step) {
     _time = step._time;
     _energy = step._energy;
     _energy_deposited = step._energy_deposited;
+    _volume = step._volume;
+    _material = step._material;
 
     return *this;
 }
@@ -125,6 +129,22 @@ ThreeVector Step::GetEField() const {
 
 void Step::SetEField(ThreeVector efield) {
     _efield = efield;
+}
+
+std::string Step::GetMaterial() const {
+    return _material;
+}
+
+void Step::SetMaterial(std::string material) {
+    _material = material;
+}
+
+std::string Step::GetVolume() const {
+    return _volume;
+}
+
+void Step::SetVolume(std::string volume) {
+    _volume = volume;
 }
 }
 
