@@ -39,6 +39,8 @@ TEST(MCEventTest, StepTest) {
     my_step.SetPathLength(11.);
     my_step.SetEnergy(12.);
     my_step.SetEnergyDeposited(13.);
+    my_step.SetVolume("vol");
+    my_step.SetMaterial("mat");
     EXPECT_EQ(my_step.GetPosition(), ThreeVector(1., 2., 3.));
     EXPECT_EQ(my_step.GetMomentum(), ThreeVector(-1., -2., -3.));
     EXPECT_EQ(my_step.GetBField(), ThreeVector(4., 5., 6.));
@@ -47,6 +49,8 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetPathLength(), 11.);
     EXPECT_EQ(my_step.GetEnergy(), 12.);
     EXPECT_EQ(my_step.GetEnergyDeposited(), 13.);
+    EXPECT_EQ(my_step.GetVolume(), "vol");
+    EXPECT_EQ(my_step.GetMaterial(), "mat");
 
     // copy_constructor
     Step my_step_copy(my_step);
@@ -57,6 +61,8 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetPathLength(), my_step_copy.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_copy.GetEnergy());
     EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_copy.GetEnergyDeposited());
+    EXPECT_EQ(my_step.GetVolume(), my_step_copy.GetVolume());
+    EXPECT_EQ(my_step.GetMaterial(), my_step_copy.GetMaterial());
 
     // equality operator
     Step my_step_equal;
@@ -68,6 +74,8 @@ TEST(MCEventTest, StepTest) {
     EXPECT_EQ(my_step.GetPathLength(), my_step_equal.GetPathLength());
     EXPECT_EQ(my_step.GetEnergy(), my_step_equal.GetEnergy());
     EXPECT_EQ(my_step.GetEnergyDeposited(), my_step_equal.GetEnergyDeposited());
+    EXPECT_EQ(my_step.GetVolume(), my_step_equal.GetVolume());
+    EXPECT_EQ(my_step.GetMaterial(), my_step_equal.GetMaterial());
 
     // test that equality on myself doesn't cause trouble
     my_step = my_step;
